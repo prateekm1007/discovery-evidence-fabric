@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/prateekm1007/discovery-evidence-fabric/evidence_item",
+  "title": "EvidenceItem",
+  "description": "Canonical representation of a scientific paper, patent, or other evidence object. Source-specific fields are preserved under 'source_specific'.",
+  "type": "object",
+  "required": ["id", "source_type", "source", "retrieval_timestamp", "provenance"],
+  "properties": {
+    "id": { "type": "string", "description": "Stable internal ID (hash or namespaced source_id)" },
+    "source_type": { "type": "string", "enum": ["scientific_paper", "patent", "preprint", "dataset", "other"] },
+    "source": { "type": "string", "description": "Primary provider: OpenAlex, SemanticScholar, arXiv, PubMed, Crossref, USPTO, EPO, WIPO, etc." },
+    "source_id": { "type": "string", "description": "Provider-native identifier" },
+    "source_uri": { "type": ["string", "null"] },
+    "jurisdiction": { "type": ["string", "null"], "description": "For patents: US, EP, WO, CN, IN, etc." },
+    "title": { "type": ["string", "null"] },
+    "abstract": { "type": ["string", "null"] },
+    "claims": { "type": ["array", "null"], "items": { "type": "string" }, "description": "Patent claims or key scientific claims" },
+    "full_text": { "type": ["string", "null"], "description": "Only when legally available and retrieved" },
+    "citations": { "type": ["array", "null"], "items": { "type": "string" } },
+    "references": { "type": ["array", "null"], "items": { "type": "string" } },
+    "authors": { "type": ["array", "null"], "items": { "type": "object" } },
+    "inventors": { "type": ["array", "null"], "items": { "type": "object" } },
+    "organizations": { "type": ["array", "null"], "items": { "type": "object" } },
+    "classifications": { "type": ["array", "null"], "items": { "type": "object" }, "description": "Topics, CPC, IPC, MeSH, etc." },
+    "publication_date": { "type": ["string", "null"], "format": "date" },
+    "priority_date": { "type": ["string", "null"], "format": "date" },
+    "family_id": { "type": ["string", "null"], "description": "Patent family identifier" },
+    "license": { "type": ["string", "null"] },
+    "access_status": { "type": ["string", "null"] },
+    "retrieval_timestamp": { "type": "string", "format": "date-time" },
+    "retrieval_method": { "type": "string" },
+    "content_hash": { "type": ["string", "null"], "description": "SHA-256 of canonical content where available" },
+    "provenance": {
+      "type": "object",
+      "required": ["provider", "retrieved_at", "query_or_method"],
+      "properties": {
+        "provider": { "type": "string" },
+        "retrieved_at": { "type": "string", "format": "date-time" },
+        "query_or_method": { "type": "string" },
+        "api_version": { "type": ["string", "null"] },
+        "license_note": { "type": ["string", "null"] },
+        "secondary_enrichment": { "type": ["array", "null"], "items": { "type": "string" }, "description": "Sources that enriched but did not replace primary evidence" }
+      }
+    },
+    "source_specific": { "type": "object", "description": "Original provider fields retained for auditability" },
+    "epistemic_state": { "type": "string", "enum": ["OBSERVED", "INFERRED", "ANALOGY", "CANDIDATE_CONNECTION", "MECHANISTIC_HYPOTHESIS", "EXPERIMENTAL_PROPOSAL", "INVENTION_CANDIDATE"], "default": "OBSERVED" }
+  },
+  "additionalProperties": false
+}
