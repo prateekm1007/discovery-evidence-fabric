@@ -1,97 +1,60 @@
 {
-  "experiment": "CLEAN_EVALUATOR_ABLATION",
-  "timestamp": "2026-08-14T21:51:50.100447+00:00",
-  "input_commit": "c4afac399fda2c7860f6b6c5635a032b7cdbc3bc",
-  "pre_registered_rule": {
-    "accept": "specific_recall improves AND negative_rejection does not decrease AND specific_precision = 1.0",
-    "reject": "specific_recall does not improve OR negative_rejection decreases OR false positives appear",
-    "stop": "If no individual change produces >=10pp recall improvement, STOP evaluator engineering",
-    "no_post_hoc": "Do not select the best-looking configuration post hoc"
-  },
+  "experiment": "CALIBRATION_GATE_FORENSIC",
+  "timestamp": "2026-08-14T22:07:24.115934+00:00",
+  "input_commit": "78b0383a26186f5a34d4cd294324201d35a0b4fc",
   "checklist": [
     {
-      "criterion": "Pre-register decision rule before execution",
+      "criterion": "Forensically audit alleged oracle bugs",
       "status": "PASS",
-      "evidence": "ABLATION_PRE_REGISTERED_RULE.json saved before any evaluation"
+      "evidence": "Case 21999911: IOL regex matched 'iol' in 'diol' \u2014 proven oracle bug"
     },
     {
-      "criterion": "Phase A: V1 baseline on dev set",
+      "criterion": "Correct label if proven wrong",
       "status": "PASS",
-      "evidence": "sr=1.0, nr=1.0, cf=1"
+      "evidence": "Case 21999911 corrected from SPECIFIC_DISCLOSURE to NOT_SPECIFIC_DISCLOSURE"
     },
     {
-      "criterion": "Phase B: Terminology only (same ontology)",
+      "criterion": "Rebuild holdout manifest",
       "status": "PASS",
-      "evidence": "sr=1.0, nr=1.0, cf=0"
+      "evidence": "hash=f5d616f6a48b8052"
     },
     {
-      "criterion": "Phase C: Claim/spec linkage only (same ontology)",
+      "criterion": "Re-run holdout with frozen evaluator (no cache)",
       "status": "PASS",
-      "evidence": "sr=1.0, nr=1.0, cf=1"
+      "evidence": "19 cases evaluated from raw patent text"
     },
     {
-      "criterion": "Phase D: Relationship extraction only (same ontology)",
+      "criterion": "Max 3 retries, 5s backoff",
       "status": "PASS",
-      "evidence": "sr=1.0, nr=1.0, cf=1"
+      "evidence": "Retry policy followed"
     },
     {
-      "criterion": "Ontology frozen across all phases",
+      "criterion": "specific_recall >= 80%",
       "status": "PASS",
-      "evidence": "ontology_version=c8ae93b52fb2c09d"
+      "evidence": "sr=0.8750"
     },
     {
-      "criterion": "Same model/provider across all phases",
+      "criterion": "specific_precision >= 80%",
       "status": "PASS",
-      "evidence": "primary=mistral-large-latest"
+      "evidence": "sp=1.0000"
     },
     {
-      "criterion": "Same temperature across all phases",
+      "criterion": "negative_rejection >= 80%",
       "status": "PASS",
-      "evidence": "temperature=0.0"
+      "evidence": "nr=1.0000"
     },
     {
-      "criterion": "No post-hoc selection",
-      "status": "PASS",
-      "evidence": "Pre-registered rule applied as-is"
-    },
-    {
-      "criterion": "Any meaningful improvement (>=10pp)",
+      "criterion": "call_failures = 0",
       "status": "FAIL",
-      "evidence": "any_meaningful_improvement=False"
+      "evidence": "cf=3 (Mistral 429 rate limiting)"
     },
     {
-      "criterion": "STOP evaluator engineering",
-      "status": "PASS",
-      "evidence": "Per pre-registered rule: no improvement \u2192 STOP"
+      "criterion": "CALIBRATION_PASS",
+      "status": "FAIL",
+      "evidence": "call_failures > 0 blocks pass per spec Section 5"
     }
   ],
-  "overall": "STOP_EVALUATOR_ENGINEERING",
-  "exit_state": "NO_INCREMENTAL_VALUE",
-  "ablation_summary": {
-    "A_baseline": {
-      "sr": 1.0,
-      "nr": 1.0,
-      "sp": 1.0,
-      "cf": 1
-    },
-    "B_terminology": {
-      "sr": 1.0,
-      "nr": 1.0,
-      "sp": 1.0,
-      "cf": 0
-    },
-    "C_claim_spec": {
-      "sr": 1.0,
-      "nr": 1.0,
-      "sp": 1.0,
-      "cf": 1
-    },
-    "D_rel_extraction": {
-      "sr": 1.0,
-      "nr": 1.0,
-      "sp": 1.0,
-      "cf": 1
-    }
-  },
-  "next_authorized_step": "STOP evaluator engineering. The evaluator has reached its performance ceiling. Remaining holdout failures are caused by API reliability and oracle bugs, not evaluator logic."
+  "overall": "HOLDOUT_FAIL",
+  "exit_state": "HOLDOUT_FAIL",
+  "next_authorized_step": "HOLDOUT_FAIL \u2014 3 API call failures block calibration pass. Retrying the 3 failed cases when Mistral rate limit clears may achieve CALIBRATION_PASS (all other metrics pass)."
 }
