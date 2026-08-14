@@ -1,226 +1,58 @@
 {
-  "experiment": "PRIOR_ART_INTEGRITY_GATE",
-  "timestamp": "2026-08-14T04:48:41.905280+00:00",
-  "search_universe": {
-    "active_sources": [
-      "Europe PMC",
-      "OpenAlex",
-      "Crossref",
-      "Google Patents (public)"
-    ],
-    "patent_sources_active": 1,
-    "patent_sources_pending": 1,
-    "coverage_cap": "MEDIUM"
-  },
-  "calibration": {
-    "total_cases": 16,
-    "distribution": {
-      "SPECIFIC_DISCLOSURE": 1,
-      "NOT_SPECIFIC_DISCLOSURE": 5,
-      "POSSIBLE_RELEVANCE": 5,
-      "CONTRADICTORY": 5
-    },
-    "v1_accuracy": "70% (7/10 non-ambiguous)",
-    "v2_accuracy": "50% (5/10 non-ambiguous)",
-    "pass_threshold": "80%",
-    "pass": false,
-    "failure_reason": "Google Patents snippets insufficient for SPECIFIC vs NOT_SPECIFIC determination. Full patent claim text required but Google Patents page scraping returns 503. EPO OPS PENDING_CREDENTIALS."
-  },
-  "regression_matrix": {
-    "all_6_rows_pass": true,
-    "results": [
-      {
-        "state": "TOPICAL_RELATED",
-        "kill_permitted": false,
-        "actual_kill": false,
-        "passed": true
-      },
-      {
-        "state": "POSSIBLE_RELEVANCE",
-        "kill_permitted": false,
-        "actual_kill": false,
-        "passed": true
-      },
-      {
-        "state": "NO_MATCH_FOUND",
-        "kill_permitted": false,
-        "actual_kill": false,
-        "passed": true
-      },
-      {
-        "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
-        "kill_permitted": false,
-        "actual_kill": false,
-        "passed": true
-      },
-      {
-        "state": "SPECIFIC_DISCLOSURE",
-        "kill_permitted": true,
-        "actual_kill": true,
-        "passed": true
-      },
-      {
-        "state": "IDENTICAL_OR_NEAR_IDENTICAL_DISCLOSURE",
-        "kill_permitted": true,
-        "actual_kill": true,
-        "passed": true
-      }
-    ]
-  },
-  "reclassification": {
-    "total_candidates": 53,
-    "total_prior_art_rejected": 24,
-    "true_specific_prior_art": 0,
-    "topical_only_false_kills": 14,
-    "false_prior_art_kills": 9,
-    "false_kill_rate": 0.375,
-    "decision_gate": "TOPICAL_ONLY majority (58.3%) \u2192 over-killing confirmed \u2192 fix evaluator"
-  },
+  "experiment": "PATENT_CALIBRATION_REPAIR",
+  "timestamp": "2026-08-14T04:56:16.522329+00:00",
+  "sources_tested": 9,
+  "active_with_claims": 0,
+  "pending_with_claims": 2,
+  "calibration_status": "BLOCKED",
+  "blocking_reason": "No machine-readable patent source with full claim text accessible",
+  "regression_matrix_status": "PASS (all 6 rows)",
+  "classify_fix_status": "APPLIED (TOPICAL_RELATED no longer kills)",
   "checklist": [
     {
       "criterion": "Patent sources verified",
       "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "Google Patents ACTIVE, EPO OPS PENDING_CREDENTIALS, USPTO UNAVAILABLE"
-      }
+      "evidence": "9 sources tested, results in PATENT_SOURCE_ACCESS_V2.json"
     },
     {
-      "criterion": "SEARCH_UNIVERSE_V1.json committed",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "File exists with hash"
-      }
-    },
-    {
-      "criterion": "20 calibration cases built from real patent text",
-      "status": "PARTIAL",
-      "evidence": {
-        "api_response_or_result": "16 cases built from Google Patents snippets (not full claim text)"
-      }
-    },
-    {
-      "criterion": "Calibration \u226580% on non-ambiguous",
+      "criterion": "Full claim text accessible",
       "status": "FAIL",
-      "evidence": {
-        "api_response_or_result": "50% accuracy \u2014 snippets insufficient for SPECIFIC vs NOT_SPECIFIC determination"
-      }
+      "evidence": "No ACTIVE source provides full claim text. EPO OPS and USPTO require credentials."
     },
     {
-      "criterion": "Known off-target case correctly classified",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "PMT/BATTERY_FAILURE \u2192 OFF_TARGET in reclassification"
-      }
+      "criterion": "20 calibration cases from real patent claims",
+      "status": "FAIL",
+      "evidence": "Cannot build without patent claim text access"
     },
     {
-      "criterion": "Known topical paper does NOT trigger kill",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "TOPICAL_RELATED \u2192 no kill in regression matrix"
-      }
-    },
-    {
-      "criterion": "Known specific disclosure DOES trigger kill",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "SPECIFIC_DISCLOSURE \u2192 kill in regression matrix"
-      }
-    },
-    {
-      "criterion": "POSSIBLE_RELEVANCE triggers escalation",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "POSSIBLE_RELEVANCE \u2192 no kill in regression matrix"
-      }
-    },
-    {
-      "criterion": "UNRESOLVED_INSUFFICIENT_EVIDENCE does not kill",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "UNRESOLVED \u2192 no kill in regression matrix"
-      }
-    },
-    {
-      "criterion": "Coverage confidence levels match floors",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "LOW/MEDIUM/HIGH implemented"
-      }
-    },
-    {
-      "criterion": "PENDING_CREDENTIALS caps at MEDIUM",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "EPO OPS PENDING \u2192 MEDIUM cap"
-      }
-    },
-    {
-      "criterion": "Provenance checklist enforced",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "11 tests pass"
-      }
-    },
-    {
-      "criterion": "V1/V2/V3 reclassification completed",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "53 candidates reclassified"
-      }
-    },
-    {
-      "criterion": "Reclassification decision gate applied",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "Majority = TOPICAL_ONLY (58.3%) \u2192 over-killing confirmed"
-      }
-    },
-    {
-      "criterion": "No simulation implemented",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "No simulation code"
-      }
-    },
-    {
-      "criterion": "No TEE changes",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "TEE quarantined"
-      }
-    },
-    {
-      "criterion": "No evidence threshold changed",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "Evidence verification unchanged"
-      }
-    },
-    {
-      "criterion": "No adversarial threshold changed",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "Adversarial gate unchanged"
-      }
-    },
-    {
-      "criterion": "No new corpus generated",
-      "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "No corpus generation in this task"
-      }
+      "criterion": "Calibration >=80% on non-ambiguous",
+      "status": "FAIL",
+      "evidence": "V1: 70%, V2: 50% \u2014 snippets insufficient"
     },
     {
       "criterion": "Regression matrix all 6 rows pass",
       "status": "PASS",
-      "evidence": {
-        "api_response_or_result": "All 6 rows PASS after classify.py fix"
-      }
+      "evidence": "All 6 rows pass after classify.py fix"
+    },
+    {
+      "criterion": "No threshold tuning",
+      "status": "PASS",
+      "evidence": "80% threshold unchanged"
+    },
+    {
+      "criterion": "No corpus generated",
+      "status": "PASS",
+      "evidence": "No corpus generation in this task"
+    },
+    {
+      "criterion": "No simulation",
+      "status": "PASS",
+      "evidence": "No simulation code"
+    },
+    {
+      "criterion": "No TEE changes",
+      "status": "PASS",
+      "evidence": "TEE quarantined"
     }
-  ],
-  "overall_pass": false,
-  "blocking_issues": [
-    "Calibration accuracy 50% < 80% threshold \u2014 patent claim text not accessible via available sources",
-    "Need EPO OPS credentials or USPTO API access to fetch full patent claims for calibration oracle"
   ]
 }
