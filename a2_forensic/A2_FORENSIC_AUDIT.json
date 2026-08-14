@@ -1,0 +1,160 @@
+{
+  "experiment": "A2_FORENSIC_AUDIT",
+  "timestamp": "2026-08-14T01:24:44.446496+00:00",
+  "commit": "1f6b806",
+  "path_trace": [
+    {
+      "step": "problem",
+      "file": "discovery_fabric/a2/run.py",
+      "function": "get_problem()",
+      "output": "frozen data",
+      "fail_closed": true
+    },
+    {
+      "step": "retrieve",
+      "file": "discovery_fabric/a2/retrieve.py",
+      "function": "retrieve()",
+      "output": "real external data",
+      "fail_closed": true
+    },
+    {
+      "step": "snapshot",
+      "file": "discovery_fabric/a2/run.py",
+      "function": "json+hash",
+      "output": "real data frozen",
+      "fail_closed": true
+    },
+    {
+      "step": "synthesize",
+      "file": "discovery_fabric/a2/synthesize.py",
+      "function": "synthesize()",
+      "output": "real LLM response",
+      "fail_closed": true
+    },
+    {
+      "step": "candidate",
+      "file": "discovery_fabric/a2/synthesize.py",
+      "function": "parse_candidate()",
+      "output": "parsed LLM output",
+      "fail_closed": true
+    },
+    {
+      "step": "verify",
+      "file": "discovery_fabric/a2/verify.py",
+      "function": "verify_evidence()",
+      "output": "deterministic check",
+      "fail_closed": true
+    },
+    {
+      "step": "prior_art",
+      "file": "discovery_fabric/a2/prior_art.py",
+      "function": "search_prior_art()",
+      "output": "real external data",
+      "fail_closed": true
+    },
+    {
+      "step": "adversarial",
+      "file": "discovery_fabric/a2/adversarial.py",
+      "function": "adversarial_challenge()",
+      "output": "real LLM response",
+      "fail_closed": true
+    },
+    {
+      "step": "classify",
+      "file": "discovery_fabric/a2/classify.py",
+      "function": "classify()",
+      "output": "deterministic state machine",
+      "fail_closed": true
+    }
+  ],
+  "connectors": [
+    {
+      "name": "Europe PMC",
+      "path": "discovery_fabric/a2/retrieve.py",
+      "status": "LIVE",
+      "reason": "Real HTTP calls to ebi.ac.uk"
+    },
+    {
+      "name": "OpenAlex",
+      "path": "discovery_fabric/connectors/openalex/mapper.py",
+      "status": "FUNCTIONAL_BUT_UNVERIFIED",
+      "reason": "Mapper exists, no live retrieval"
+    },
+    {
+      "name": "Semantic Scholar",
+      "path": null,
+      "status": "SCAFFOLD",
+      "reason": "README only"
+    },
+    {
+      "name": "arXiv",
+      "path": null,
+      "status": "SCAFFOLD",
+      "reason": "README only"
+    },
+    {
+      "name": "PubMed",
+      "path": null,
+      "status": "SCAFFOLD",
+      "reason": "README only"
+    },
+    {
+      "name": "Crossref",
+      "path": null,
+      "status": "SCAFFOLD",
+      "reason": "README only"
+    },
+    {
+      "name": "USPTO/Patents",
+      "path": null,
+      "status": "SCAFFOLD",
+      "reason": "README only"
+    }
+  ],
+  "llm_receipt": {
+    "model": "deepseek/deepseek-v4-flash",
+    "prompt_hash": "2428f61bf4b6cb1e",
+    "input_hash": "1e2280fc891c3dc5",
+    "output_hash": "28495933305a23d8",
+    "timestamp": "2026-08-14T01:23:54.166327+00:00",
+    "source_id": "europepmc:42205228",
+    "source_hash": "4aab6170f5060b8cb0d386ecb525454f01819b2b4d23fc63f6527384db6001be",
+    "temperature": 0.3,
+    "max_tokens": 2000,
+    "llm_received_evidence": true,
+    "evidence_in_prompt": "A 78-year-old male with a history of ischemic heart disease with prior myocardial infarction, severe"
+  },
+  "prior_art_semantics": {
+    "LIKELY_PRIOR_ART_EXISTS": "REJECTED",
+    "UNKNOWN": "UNKNOWN",
+    "NO_MATCHING_EVIDENCE_FOUND": "allows promotion",
+    "PARTIAL_PRIOR_ART": "allows promotion"
+  },
+  "adversarial_semantics": {
+    "overall_PASS": "allows promotion",
+    "overall_KILLED": "REJECTED"
+  },
+  "epistemic_promotion": {
+    "no_direct_assignment": true,
+    "no_silent_promotion": true,
+    "all_checks_required": true
+  },
+  "replay": {
+    "positive_reproducible": true,
+    "negative_reproducible": true,
+    "llm_nondeterminism": true,
+    "note": "Verify is deterministic. LLM steps vary at temp=0.3."
+  },
+  "exit_criteria": {
+    "connectors_verified": true,
+    "llm_call_verified": true,
+    "evidence_reaches_llm": true,
+    "positive_passes": true,
+    "negative_fails": true,
+    "prior_art_correct": true,
+    "adversarial_correct": true,
+    "epistemic_fail_closed": true,
+    "replay_reproducible": true
+  },
+  "verdict": "A2_MIGRATION_READY"
+}
