@@ -1,0 +1,227 @@
+{
+  "contract_version": "1.0.0",
+  "contract_name": "Simulation Readiness + Invention Contract Layer",
+  "description": "Machine-readable contract defining the interface between invention candidates and external physics/engineering simulation systems.",
+  "components": {
+    "AUTOMATED_INVENTION_CANDIDATE": {
+      "schema_file": "automated_invention_candidate_schema.json",
+      "required_fields": [
+        "candidate_id",
+        "device",
+        "failure_mode",
+        "target_constraint",
+        "observed_phenomenon",
+        "source_mechanisms",
+        "exact_evidence_spans",
+        "source_identifiers",
+        "mechanism",
+        "cross_domain_connection",
+        "proposed_intervention",
+        "expected_causal_effect",
+        "falsification_test",
+        "known_alternatives",
+        "prior_art_search_record",
+        "prior_art_coverage",
+        "adversarial_results",
+        "provenance",
+        "model_prompt_hashes",
+        "source_hashes",
+        "searched_universe_version",
+        "epistemic_state"
+      ],
+      "terminal_state": "AUTOMATED_INVENTION_CANDIDATE",
+      "future_states_defined_but_blocked": [
+        "SIMULATION_READY",
+        "SIMULATION_SUBMITTED",
+        "SIMULATION_COMPLETE",
+        "SIMULATION_SURVIVOR",
+        "EXTERNALLY_TESTABLE"
+      ]
+    },
+    "SimulationRequest": {
+      "schema_file": "simulation_request_schema.json",
+      "required_fields": [
+        "request_id",
+        "candidate_reference",
+        "simulation_type",
+        "geometry_requirements",
+        "materials",
+        "operating_conditions",
+        "loads",
+        "boundary_conditions",
+        "environmental_conditions",
+        "failure_mode",
+        "predicted_mechanism",
+        "predicted_measurable_outcome",
+        "baseline_control",
+        "success_criterion",
+        "falsification_criterion",
+        "uncertainty",
+        "missing_parameters",
+        "provenance"
+      ],
+      "blocking_statuses": [
+        "SIMULATION_READY",
+        "SIMULATION_BLOCKED_MISSING_PARAMETERS",
+        "SIMULATION_BLOCKED_NON_FALSIFIABLE",
+        "SIMULATION_BLOCKED_UNSUPPORTED_ASSUMPTION"
+      ]
+    },
+    "SimulationResult": {
+      "schema_file": "simulation_result_schema.json",
+      "required_fields": [
+        "result_id",
+        "request_reference",
+        "engine_info",
+        "job_status",
+        "completion_timestamp",
+        "outputs",
+        "provenance"
+      ],
+      "note": "No fake results generated. Adapter returns SIMULATION_UNAVAILABLE without real engine."
+    },
+    "SimulationAssessment": {
+      "schema_file": "simulation_assessment_schema.json",
+      "required_fields": [
+        "assessment_id",
+        "result_reference",
+        "request_reference",
+        "candidate_reference",
+        "comparison",
+        "falsification_outcome",
+        "scientific_validity",
+        "provenance"
+      ],
+      "key_rule": "Never report 'simulation successful' merely because solver completed. Must test falsifiable prediction."
+    }
+  },
+  "adapter_interface": {
+    "file": "adapter_interface.py",
+    "methods": ["submit", "status", "retrieve", "validate"],
+    "supported_engines_defined": [
+      "ANSYS_MECHANICAL",
+      "ANSYS_FLUENT",
+      "SIMSCALE",
+      "SIEMENS_NX_NASTRAN",
+      "SIEMENS_STAR_CCM",
+      "ALTAIR_HYPERWORKS",
+      "ALTAIR_OPTISTRUCT",
+      "QUANSCIENT"
+    ],
+    "implementation_status": "INTERFACE_ONLY_NO_INTEGRATION",
+    "no_fake_solver": true,
+    "provenance_attached": true
+  },
+  "baseline_control_requirement": {
+    "fields": [
+      "baseline_design",
+      "proposed_design",
+      "dependent_variable",
+      "baseline_value OR baseline_measurement_requirement",
+      "predicted_effect",
+      "success_threshold",
+      "falsification_condition",
+      "uncertainty"
+    ],
+    "rule": "No baseline → not simulation-ready"
+  },
+  "blocking_gates": {
+    "missing_parameters": {
+      "trigger": "missing_parameters array is non-empty",
+      "result": "SIMULATION_BLOCKED_MISSING_PARAMETERS"
+    },
+    "non_falsifiable": {
+      "trigger": "predicted_measurable_outcome lacks metric, predicted_value, or unit",
+      "result": "SIMULATION_BLOCKED_NON_FALSIFIABLE"
+    },
+    "unsupported_assumption": {
+      "trigger": "unsupported_assumptions array is non-empty",
+      "result": "SIMULATION_BLOCKED_UNSUPPORTED_ASSUMPTION"
+    },
+    "missing_baseline": {
+      "trigger": "baseline_control missing required fields",
+      "result": "SIMULATION_BLOCKED_MISSING_PARAMETERS"
+    }
+  },
+  "provenance_chain": {
+    "preserved_fields": [
+      "candidate_id",
+      "source_hashes",
+      "candidate_hash",
+      "searched_universe_hash",
+      "prior_art_coverage",
+      "model_prompt_hashes",
+      "generation_commit",
+      "creation_timestamp"
+    ],
+    "rule": "Simulation handoff must be reconstructable without discovery process"
+  },
+  "fixtures": {
+    "fixture_a_complete": {
+      "file": "fixtures/fixture_a_complete.json",
+      "expected": "SIMULATION_READY",
+      "status": "PASS"
+    },
+    "fixture_b_incomplete": {
+      "file": "fixtures/fixture_b_incomplete.json",
+      "expected": "SIMULATION_BLOCKED_MISSING_PARAMETERS",
+      "status": "PASS"
+    },
+    "fixture_c_non_falsifiable": {
+      "file": "fixtures/fixture_c_non_falsifiable.json",
+      "expected": "SIMULATION_BLOCKED_NON_FALSIFIABLE",
+      "status": "PASS"
+    },
+    "fixture_d_unsupported_assumption": {
+      "file": "fixtures/fixture_d_unsupported_assumption.json",
+      "expected": "SIMULATION_BLOCKED_UNSUPPORTED_ASSUMPTION",
+      "status": "PASS"
+    }
+  },
+  "portfolio_schema": {
+    "file": "invention_portfolio_schema.json",
+    "supports_thousands_of_candidates": true,
+    "commercial_disposition_values": [
+      "UNREVIEWED",
+      "PATENT_REVIEW",
+      "LICENSE_CANDIDATE",
+      "ACQUISITION_CANDIDATE",
+      "INTERNAL_DEVELOPMENT",
+      "REJECTED"
+    ]
+  },
+  "commercial_handoff_metadata": {
+    "preserved_fields": [
+      "evidence_package_hash",
+      "prior_art_coverage",
+      "technical_differentiation",
+      "expected_performance_delta",
+      "simulation_status",
+      "regulatory_category",
+      "likely_buyer_categories",
+      "licensing_readiness",
+      "unresolved_risks"
+    ]
+  },
+  "prohibited_actions": [
+    "modify FINAL V2 prior-art gate",
+    "change prior-art thresholds",
+    "resurrect TEE",
+    "generate 1000 candidates",
+    "run another corpus",
+    "declare anything novel",
+    "declare anything patentable",
+    "create fake simulation outputs",
+    "scrape commercial simulation websites",
+    "invent missing physical parameters",
+    "add another discovery algorithm",
+    "create new evidence ontology"
+  ],
+  "test_results": {
+    "all_tests_passed": true,
+    "total_tests": 6,
+    "fixtures_tested": 4,
+    "validation_tests": 1,
+    "provenance_tests": 1
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/prateekm1007/discovery-evidence-fabric/automated_invention_candidate",
+  "title": "AutomatedInventionCandidate",
+  "description": "Machine-readable contract for an invention candidate ready for simulation handoff. Extends EvidenceItem schema with intervention-specific fields and provenance chain.",
+  "type": "object",
+  "required": [
+    "candidate_id",
+    "device",
+    "failure_mode",
+    "target_constraint",
+    "observed_phenomenon",
+    "source_mechanisms",
+    "exact_evidence_spans",
+    "source_identifiers",
+    "mechanism",
+    "cross_domain_connection",
+    "proposed_intervention",
+    "expected_causal_effect",
+    "falsification_test",
+    "known_alternatives",
+    "prior_art_search_record",
+    "prior_art_coverage",
+    "adversarial_results",
+    "provenance",
+    "model_prompt_hashes",
+    "source_hashes",
+    "searched_universe_version",
+    "epistemic_state"
+  ],
+  "properties": {
+    "candidate_id": {
+      "type": "string",
+      "description": "Unique identifier for this candidate (namespaced hash)"
+    },
+    "device": {
+      "type": "string",
+      "description": "The device or system being improved"
+    },
+    "failure_mode": {
+      "type": "string",
+      "description": "Specific failure mode being addressed (e.g., BATTERY_FAILURE, FRACTURE, WEAR)"
+    },
+    "target_constraint": {
+      "type": "string",
+      "description": "Performance constraint that must be maintained (e.g., 'Must maintain cardiac pacing for 5-10 years without surgical replacement')"
+    },
+    "observed_phenomenon": {
+      "type": "string",
+      "description": "The physical/biological phenomenon observed in source evidence that motivates the intervention"
+    },
+    "source_mechanisms": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Array of mechanisms from source papers that inspire the intervention"
+    },
+    "exact_evidence_spans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "span_text", "span_hash"],
+        "properties": {
+          "source_id": { "type": "string" },
+          "span_text": { "type": "string" },
+          "span_hash": { "type": "string", "description": "SHA-256 hash of span_text" }
+        }
+      },
+      "description": "Verbatim spans from source evidence supporting the mechanism"
+    },
+    "source_identifiers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Array of all source evidence IDs (europepmc:XXX, arxiv:XXX, etc.)"
+    },
+    "mechanism": {
+      "type": "string",
+      "description": "Causal mechanism explaining how the intervention addresses the failure"
+    },
+    "cross_domain_connection": {
+      "type": "string",
+      "description": "Explicit statement of how source domain mechanism transfers to target device domain"
+    },
+    "proposed_intervention": {
+      "type": "string",
+      "description": "Specific engineering intervention transferring mechanism to device"
+    },
+    "expected_causal_effect": {
+      "type": "string",
+      "description": "Expected causal chain from intervention to outcome"
+    },
+    "falsification_test": {
+      "type": "string",
+      "description": "Concrete test that could falsify the candidate's claim"
+    },
+    "known_alternatives": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Known alternative solutions that were considered"
+    },
+    "prior_art_search_record": {
+      "type": "object",
+      "required": ["databases_searched", "queries", "timestamp", "result_count"],
+      "properties": {
+        "databases_searched": { "type": "array", "items": { "type": "string" } },
+        "queries": { "type": "array", "items": { "type": "string" } },
+        "date_range": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "result_count": { "type": "integer" },
+        "results": { "type": "array", "items": { "type": "object" } },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "prior_art_coverage": {
+      "type": "object",
+      "required": ["status", "confidence"],
+      "properties": {
+        "status": { "type": "string", "enum": ["NO_MATCHING_EVIDENCE_FOUND", "PARTIAL_PRIOR_ART", "LIKELY_PRIOR_ART_EXISTS"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1, "description": "Confidence in prior art assessment" },
+        "coverage_notes": { "type": "string" }
+      }
+    },
+    "adversarial_results": {
+      "type": "object",
+      "required": ["overall", "attacks"],
+      "properties": {
+        "overall": { "type": "string", "enum": ["PASS", "KILLED"] },
+        "killed_count": { "type": "integer" },
+        "reason": { "type": "string" },
+        "attacks": {
+          "type": "object",
+          "properties": {
+            "unsupported_mechanism": { "type": "string", "enum": ["PASS", "KILLED"] },
+            "weak_transfer": { "type": "string", "enum": ["PASS", "KILLED"] },
+            "obvious_combination": { "type": "string", "enum": ["PASS", "KILLED"] },
+            "prior_art": { "type": "string", "enum": ["PASS", "KILLED"] },
+            "contradiction": { "type": "string", "enum": ["PASS", "KILLED"] },
+            "boundary_failure": { "type": "string", "enum": ["PASS", "KILLED"] },
+            "engineering_infeasibility": { "type": "string", "enum": ["PASS", "KILLED"] },
+            "regulatory_incompatibility": { "type": "string", "enum": ["PASS", "KILLED"] }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["retrieval_method", "synthesis_method", "verification_status"],
+      "properties": {
+        "retrieval_method": { "type": "string" },
+        "synthesis_method": { "type": "string" },
+        "verification_status": { "type": "string", "enum": ["VERIFIED", "UNVERIFIED", "FAILED"] },
+        "run_id": { "type": "string" }
+      }
+    },
+    "model_prompt_hashes": {
+      "type": "object",
+      "required": ["model", "prompt_hash", "input_hash", "output_hash"],
+      "properties": {
+        "model": { "type": "string" },
+        "prompt_hash": { "type": "string" },
+        "input_hash": { "type": "string" },
+        "output_hash": { "type": "string" },
+        "synthesis_timestamp": { "type": "string", "format": "date-time" }
+      }
+    },
+    "source_hashes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "content_hash"],
+        "properties": {
+          "source_id": { "type": "string" },
+          "content_hash": { "type": "string" },
+          "retrieval_timestamp": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "searched_universe_version": {
+      "type": "object",
+      "required": ["databases", "snapshot_dates"],
+      "properties": {
+        "databases": { "type": "array", "items": { "type": "string" } },
+        "snapshot_dates": { "type": "array", "items": { "type": "string", "format": "date" } },
+        "api_versions": { "type": "object" }
+      }
+    },
+    "epistemic_state": {
+      "type": "string",
+      "enum": [
+        "OBSERVED",
+        "INFERRED",
+        "ANALOGY",
+        "CANDIDATE_CONNECTION",
+        "MECHANISTIC_HYPOTHESIS",
+        "EXPERIMENTAL_PROPOSAL",
+        "INVENTION_CANDIDATE",
+        "SIMULATION_READY",
+        "SIMULATION_SUBMITTED",
+        "SIMULATION_COMPLETE",
+        "SIMULATION_SURVIVOR",
+        "EXTERNALLY_TESTABLE"
+      ],
+      "description": "Current epistemic state. Note: SIMULATION_* states are DEFINED but BLOCKED until simulation layer is activated."
+    }
+  },
+  "additionalProperties": false
+}

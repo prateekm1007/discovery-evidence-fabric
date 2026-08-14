@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/prateekm1007/discovery-evidence-fabric/simulation_result",
+  "title": "SimulationResult",
+  "description": "Machine-readable contract for simulation results from external physics/engineering engines. Every result must have provenance attached and must NOT be trusted without validation.",
+  "type": "object",
+  "required": [
+    "result_id",
+    "request_reference",
+    "engine_info",
+    "job_status",
+    "completion_timestamp",
+    "outputs",
+    "provenance"
+  ],
+  "properties": {
+    "result_id": {
+      "type": "string",
+      "description": "Unique identifier for this simulation result"
+    },
+    "request_reference": {
+      "type": "string",
+      "description": "Reference to parent SimulationRequest (request_id)"
+    },
+    "engine_info": {
+      "type": "object",
+      "required": ["engine_name", "engine_version"],
+      "properties": {
+        "engine_name": { "type": "string", "enum": ["ANSYS_MECHANICAL", "ANSYS_FLUENT", "SIMSCALE", "SIEMENS_NX_NASTRAN", "SIEMENS_STAR_CCM", "ALTAIR_HYPERWORKS", "ALTAIR_OPTISTRUCT", "QUANSCIENT", "OTHER"] },
+        "engine_version": { "type": "string" },
+        "solver_settings": { "type": "object", "description": "Key solver settings used" },
+        "license_type": { "type": "string", "enum": ["COMMERCIAL", "ACADEMIC", "OPEN_SOURCE"] }
+      }
+    },
+    "job_status": {
+      "type": "string",
+      "enum": ["COMPLETED", "FAILED", "WARNING", "DID_NOT_CONVERGE", "PARTIAL_RESULTS"],
+      "description": "Solver completion status"
+    },
+    "completion_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "outputs": {
+      "type": "object",
+      "required": ["metric_values"],
+      "properties": {
+        "metric_values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["metric_name", "value", "unit"],
+            "properties": {
+              "metric_name": { "type": "string" },
+              "value": { "type": "number" },
+              "unit": { "type": "string" },
+              "location": { "type": "string", "description": "Where in the model this value was extracted" }
+            }
+          }
+        },
+        "field_outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field_name": { "type": "string" },
+              "file_reference": { "type": "string", "description": "Reference to output file (VTK, CSV, etc.) - not embedded" },
+              "format": { "type": "string" }
+            }
+          },
+          "description": "References to field output files (stress contours, velocity fields, etc.)"
+        },
+        "convergence_info": {
+          "type": "object",
+          "properties": {
+            "converged": { "type": "boolean" },
+            "iterations": { "type": "integer" },
+            "residual_history": { "type": "array", "items": {"type": "number"} },
+            "convergence_criterion": { "type": "string" }
+          }
+        },
+        "mesh_info": {
+          "type": "object",
+          "properties": {
+            "element_count": { "type": "integer" },
+            "node_count": { "type": "integer" },
+            "element_types": { "type": "array", "items": {"type": "string"} },
+            "mesh_quality_metrics": { "type": "object" }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["request_hash", "submission_timestamp", "retrieval_timestamp", "engine_run_id"],
+      "properties": {
+        "request_hash": { "type": "string", "description": "SHA-256 hash of SimulationRequest JSON" },
+        "submission_timestamp": { "type": "string", "format": "date-time" },
+        "retrieval_timestamp": { "type": "string", "format": "date-time" },
+        "engine_run_id": { "type": "string", "description": "Engine's internal job/run ID" },
+        "adapter_version": { "type": "string" },
+        "compute_resources": {
+          "type": "object",
+          "properties": {
+            "cpu_hours": { "type": "number" },
+            "gpu_hours": { "type": "number" },
+            "memory_gb": { "type": "number" },
+            "cluster_name": { "type": "string" }
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Warnings issued by solver"
+    },
+    "errors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Errors encountered during simulation"
+    }
+  },
+  "additionalProperties": false
+}

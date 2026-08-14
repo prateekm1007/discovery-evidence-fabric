@@ -1,0 +1,199 @@
+{
+  "fixture_id": "FIXTURE_A_COMPLETE",
+  "description": "Complete medical device invention with all parameters needed for simulation request. Expected status: SIMULATION_READY",
+  "automated_invention_candidate": {
+    "candidate_id": "cand:fixture:A:medical_infusion_pump",
+    "device": "Insulin Infusion Pump",
+    "failure_mode": "OCCLUSION_DETECTION_FAILURE",
+    "target_constraint": "Must detect occlusions within 2 minutes to prevent insulin overdose or underdose",
+    "observed_phenomenon": "Piezoelectric pressure sensors in microfluidic channels show measurable voltage spikes when flow is obstructed",
+    "source_mechanisms": [
+      "Piezoelectric effect in PZT thin films generates voltage proportional to pressure changes",
+      "Flow obstruction in microchannels creates pressure wave reflections detectable by embedded sensors"
+    ],
+    "exact_evidence_spans": [
+      {
+        "source_id": "europepmc:EXAMPLE123",
+        "span_text": "Piezoelectric pressure sensors demonstrated detection of flow occlusions in microfluidic channels with response time <30 seconds",
+        "span_hash": "a1b2c3d4e5f6789012345678901234567890abcd"
+      }
+    ],
+    "source_identifiers": ["europepmc:EXAMPLE123"],
+    "mechanism": "Embedding piezoelectric pressure sensors in the infusion pump's fluid path enables real-time occlusion detection through pressure wave monitoring",
+    "cross_domain_connection": "Microfluidic pressure sensing mechanism from lab-on-chip devices transfers to insulin pump occlusion detection",
+    "proposed_intervention": "Integrate PZT thin-film piezoelectric pressure sensor downstream of pump head, with signal processing to detect pressure spikes characteristic of occlusion events",
+    "expected_causal_effect": "Occlusion events generate pressure waves detected by PZT sensor within 30 seconds, triggering alarm before dangerous insulin delivery deviation occurs",
+    "falsification_test": "Measure time-to-detection for induced occlusions at various flow rates; if detection time exceeds 2 minutes in >5% of trials, hypothesis is falsified",
+    "known_alternatives": [
+      "Current pumping mechanism monitoring (indirect)",
+      "Flow sensor-based detection",
+      "Pressure switch threshold detection"
+    ],
+    "prior_art_search_record": {
+      "databases_searched": ["EuropePMC", "IEEE Xplore"],
+      "queries": ["insulin pump piezoelectric occlusion detection", "microfluidic pressure sensor infusion pump"],
+      "date_range": "all",
+      "timestamp": "2026-08-14T00:00:00Z",
+      "result_count": 0,
+      "results": [],
+      "limitations": ["Limited database coverage", "No patent databases searched"]
+    },
+    "prior_art_coverage": {
+      "status": "NO_MATCHING_EVIDENCE_FOUND",
+      "confidence": 0.7,
+      "coverage_notes": "Search covered major scientific databases but not comprehensive patent search"
+    },
+    "adversarial_results": {
+      "overall": "PASS",
+      "killed_count": 0,
+      "reason": "",
+      "attacks": {
+        "unsupported_mechanism": "PASS",
+        "weak_transfer": "PASS",
+        "obvious_combination": "PASS",
+        "prior_art": "PASS",
+        "contradiction": "PASS",
+        "boundary_failure": "PASS",
+        "engineering_infeasibility": "PASS",
+        "regulatory_incompatibility": "PASS"
+      }
+    },
+    "provenance": {
+      "retrieval_method": "EuropePMC API",
+      "synthesis_method": "A2 LLM synthesis",
+      "verification_status": "VERIFIED",
+      "run_id": "run:fixture:A"
+    },
+    "model_prompt_hashes": {
+      "model": "deepseek/deepseek-v4-flash-0731",
+      "prompt_hash": "fixture_a_prompt_hash",
+      "input_hash": "fixture_a_input_hash",
+      "output_hash": "fixture_a_output_hash",
+      "synthesis_timestamp": "2026-08-14T00:00:00Z"
+    },
+    "source_hashes": [
+      {
+        "source_id": "europepmc:EXAMPLE123",
+        "content_hash": "example_source_content_hash_abcdef",
+        "retrieval_timestamp": "2026-08-14T00:00:00Z"
+      }
+    ],
+    "searched_universe_version": {
+      "databases": ["EuropePMC", "IEEE Xplore"],
+      "snapshot_dates": ["2026-08-14"],
+      "api_versions": {"EuropePMC": "v1.0"}
+    },
+    "epistemic_state": "INVENTION_CANDIDATE"
+  },
+  "simulation_request": {
+    "request_id": "sim_req:fixture:A:001",
+    "candidate_reference": "cand:fixture:A:medical_infusion_pump",
+    "simulation_type": "MULTIPHYSICS",
+    "geometry_requirements": {
+      "description": "Microfluidic channel with integrated PZT sensor membrane",
+      "cad_file_reference": "cad:infusion_pump_channel_v1.step",
+      "dimensions": [
+        {"name": "channel_width", "value": 0.002, "unit": "m", "tolerance": 0.0001},
+        {"name": "channel_height", "value": 0.0005, "unit": "m", "tolerance": 0.00005},
+        {"name": "sensor_membrane_thickness", "value": 0.00001, "unit": "m", "tolerance": 1e-6}
+      ],
+      "simplifications": ["Neglect surface roughness", "Assume rigid channel walls except sensor membrane"]
+    },
+    "materials": [
+      {
+        "name": "PZT-5H",
+        "grade": "Standard",
+        "supplier": "Example Ceramics",
+        "properties": {
+          "youngs_modulus": 63000000000,
+          "poissons_ratio": 0.3,
+          "density": 7500,
+          "piezoelectric_coefficient_d33": 593e-12
+        },
+        "property_source": "Manufacturer datasheet"
+      },
+      {
+        "name": "PDMS",
+        "grade": "Sylgard 184",
+        "supplier": "Dow Corning",
+        "properties": {
+          "youngs_modulus": 2000000,
+          "poissons_ratio": 0.49,
+          "density": 970
+        },
+        "property_source": "Literature"
+      }
+    ],
+    "operating_conditions": {
+      "temperature_range": {"min": 293, "max": 310, "unit": "K"},
+      "pressure_range": {"min": 0, "max": 200000, "unit": "Pa"},
+      "frequency": null,
+      "duty_cycle": 1.0,
+      "lifetime_requirement": {"cycles": 1000000, "years": 5}
+    },
+    "loads": [
+      {
+        "type": "PRESSURE",
+        "magnitude": 100000,
+        "unit": "Pa",
+        "direction": [0, 0, 1],
+        "location": "channel_inlet",
+        "time_dependent": true,
+        "load_curve_reference": "occlusion_pressure_rise.csv"
+      }
+    ],
+    "boundary_conditions": [
+      {"type": "FIXED", "location": "channel_outer_walls", "degrees_of_freedom": ["UX", "UY", "UZ"]},
+      {"type": "SYMMETRY", "location": "midplane", "degrees_of_freedom": ["UX", "RY", "RZ"]}
+    ],
+    "environmental_conditions": {
+      "corrosive_media": null,
+      "radiation_exposure": null,
+      "humidity": null,
+      "fluid_medium": "insulin_solution"
+    },
+    "failure_mode": "OCCLUSION_DETECTION_FAILURE",
+    "predicted_mechanism": "Pressure wave reflection from occlusion site creates measurable deflection of PZT membrane",
+    "predicted_measurable_outcome": {
+      "metric": "peak_voltage_output",
+      "predicted_value": 0.5,
+      "unit": "V",
+      "baseline_value": 0.01,
+      "improvement_direction": "INCREASE"
+    },
+    "baseline_control": {
+      "description": "Standard infusion pump without integrated pressure sensor",
+      "reference_design": "Current peristaltic pump with motor current monitoring only",
+      "baseline_performance": {"detection_time": 300, "unit": "seconds"}
+    },
+    "success_criterion": {
+      "threshold": 0.1,
+      "unit": "V",
+      "comparison_operator": "GE",
+      "description": "Peak voltage must exceed 0.1V for reliable detection above noise floor"
+    },
+    "falsification_criterion": {
+      "condition": "If peak voltage output is less than 0.05V for standard occlusion event",
+      "threshold": 0.05,
+      "unit": "V"
+    },
+    "uncertainty": {
+      "confidence_interval": 0.95,
+      "uncertainty_bounds": {"lower": 0.4, "upper": 0.6},
+      "uncertainty_sources": ["Material property variability", "Mesh discretization", "Boundary condition approximation"]
+    },
+    "missing_parameters": [],
+    "provenance": {
+      "candidate_hash": "hash_of_candidate_json_above",
+      "request_timestamp": "2026-08-14T00:00:00Z",
+      "request_method": "Automated translation from candidate",
+      "translator_version": "1.0.0"
+    },
+    "blocking_status": "SIMULATION_READY",
+    "blocking_reason": ""
+  },
+  "expected_outcome": {
+    "status": "SIMULATION_READY",
+    "reason": "All required parameters present, falsifiable prediction with measurable outcome specified"
+  }
+}

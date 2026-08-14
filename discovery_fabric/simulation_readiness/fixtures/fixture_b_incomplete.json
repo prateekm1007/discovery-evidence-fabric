@@ -1,0 +1,196 @@
+{
+  "fixture_id": "FIXTURE_B_INCOMPLETE",
+  "description": "Incomplete invention missing material properties and boundary conditions. Expected status: SIMULATION_BLOCKED_MISSING_PARAMETERS",
+  "automated_invention_candidate": {
+    "candidate_id": "cand:fixture:B:bearing_coating",
+    "device": "Turbine Engine Bearing",
+    "failure_mode": "WEAR_FAILURE",
+    "target_constraint": "Must maintain bearing clearance within 10 microns over 10,000 hour lifetime",
+    "observed_phenomenon": "Diamond-like carbon (DLC) coatings reduce friction and wear in sliding contacts",
+    "source_mechanisms": [
+      "DLC coating provides low-friction surface with high hardness"
+    ],
+    "exact_evidence_spans": [
+      {
+        "source_id": "europepmc:EXAMPLE456",
+        "span_text": "DLC coatings reduced wear rate by factor of 10 in tribological testing",
+        "span_hash": "b2c3d4e5f67890123456789012345678901abcde"
+      }
+    ],
+    "source_identifiers": ["europepmc:EXAMPLE456"],
+    "mechanism": "Applying DLC coating to bearing surfaces reduces friction coefficient and wear rate",
+    "cross_domain_connection": "Tribological coating mechanism from automotive applications transfers to turbine engine bearings",
+    "proposed_intervention": "Apply 2-micron DLC coating to inner and outer race surfaces of turbine bearing",
+    "expected_causal_effect": "Reduced friction leads to lower wear rate, extending bearing lifetime beyond 10,000 hours",
+    "falsification_test": "Run accelerated wear test at elevated temperature and load; if wear rate exceeds baseline by >20%, hypothesis is falsified",
+    "known_alternatives": [
+      "Standard steel-on-steel contact",
+      "Ceramic bearings",
+      "Alternative coating materials (TiN, CrN)"
+    ],
+    "prior_art_search_record": {
+      "databases_searched": ["EuropePMC"],
+      "queries": ["DLC coating turbine bearing wear"],
+      "date_range": "all",
+      "timestamp": "2026-08-14T00:00:00Z",
+      "result_count": 0,
+      "results": [],
+      "limitations": ["Limited database coverage"]
+    },
+    "prior_art_coverage": {
+      "status": "NO_MATCHING_EVIDENCE_FOUND",
+      "confidence": 0.5,
+      "coverage_notes": "Minimal search performed"
+    },
+    "adversarial_results": {
+      "overall": "PASS",
+      "killed_count": 0,
+      "reason": "",
+      "attacks": {
+        "unsupported_mechanism": "PASS",
+        "weak_transfer": "PASS",
+        "obvious_combination": "PASS",
+        "prior_art": "PASS",
+        "contradiction": "PASS",
+        "boundary_failure": "PASS",
+        "engineering_infeasibility": "PASS",
+        "regulatory_incompatibility": "PASS"
+      }
+    },
+    "provenance": {
+      "retrieval_method": "EuropePMC API",
+      "synthesis_method": "A2 LLM synthesis",
+      "verification_status": "VERIFIED",
+      "run_id": "run:fixture:B"
+    },
+    "model_prompt_hashes": {
+      "model": "deepseek/deepseek-v4-flash-0731",
+      "prompt_hash": "fixture_b_prompt_hash",
+      "input_hash": "fixture_b_input_hash",
+      "output_hash": "fixture_b_output_hash",
+      "synthesis_timestamp": "2026-08-14T00:00:00Z"
+    },
+    "source_hashes": [
+      {
+        "source_id": "europepmc:EXAMPLE456",
+        "content_hash": "example_source_content_hash_123456",
+        "retrieval_timestamp": "2026-08-14T00:00:00Z"
+      }
+    ],
+    "searched_universe_version": {
+      "databases": ["EuropePMC"],
+      "snapshot_dates": ["2026-08-14"],
+      "api_versions": {"EuropePMC": "v1.0"}
+    },
+    "epistemic_state": "INVENTION_CANDIDATE"
+  },
+  "simulation_request": {
+    "request_id": "sim_req:fixture:B:001",
+    "candidate_reference": "cand:fixture:B:bearing_coating",
+    "simulation_type": "FEA",
+    "geometry_requirements": {
+      "description": "Ball bearing with coated race surfaces - GEOMETRY NOT PROVIDED",
+      "cad_file_reference": null,
+      "dimensions": [],
+      "simplifications": []
+    },
+    "materials": [
+      {
+        "name": "DLC coating",
+        "grade": "UNKNOWN",
+        "supplier": "NOT SPECIFIED",
+        "properties": {},
+        "property_source": "UNKNOWN - MISSING MATERIAL PROPERTIES"
+      }
+    ],
+    "operating_conditions": {
+      "temperature_range": {"min": 293, "max": 600, "unit": "K"},
+      "pressure_range": null,
+      "frequency": 100,
+      "duty_cycle": 1.0,
+      "lifetime_requirement": {"cycles": 100000000, "years": 10}
+    },
+    "loads": [],
+    "boundary_conditions": [],
+    "environmental_conditions": {
+      "corrosive_media": null,
+      "radiation_exposure": null,
+      "humidity": null,
+      "fluid_medium": "air"
+    },
+    "failure_mode": "WEAR_FAILURE",
+    "predicted_mechanism": "DLC coating reduces contact stress and friction",
+    "predicted_measurable_outcome": {
+      "metric": "wear_rate",
+      "predicted_value": null,
+      "unit": "mm^3/Nm",
+      "baseline_value": null,
+      "improvement_direction": "DECREASE"
+    },
+    "baseline_control": {
+      "description": "Uncoated steel bearing",
+      "reference_design": "Standard 6205 ball bearing",
+      "baseline_performance": {}
+    },
+    "success_criterion": {
+      "threshold": null,
+      "unit": "mm^3/Nm",
+      "comparison_operator": "LE",
+      "description": "Wear rate must be lower than baseline"
+    },
+    "falsification_criterion": {
+      "condition": "If wear rate is not reduced compared to baseline",
+      "threshold": null,
+      "unit": "mm^3/Nm"
+    },
+    "uncertainty": {
+      "confidence_interval": null,
+      "uncertainty_bounds": {},
+      "uncertainty_sources": []
+    },
+    "missing_parameters": [
+      {
+        "parameter_name": "bearing_geometry_dimensions",
+        "reason_missing": "GEOMETRY_NOT_PROVIDED",
+        "impact": "Cannot create finite element mesh without geometry definition",
+        "default_assumption": null
+      },
+      {
+        "parameter_name": "DLC_youngs_modulus",
+        "reason_missing": "UNKNOWN_MATERIAL_PROPERTY",
+        "impact": "Cannot compute contact stresses without coating stiffness",
+        "default_assumption": null
+      },
+      {
+        "parameter_name": "DLC_hardness",
+        "reason_missing": "UNKNOWN_MATERIAL_PROPERTY",
+        "impact": "Cannot predict wear resistance without hardness value",
+        "default_assumption": null
+      },
+      {
+        "parameter_name": "contact_load_magnitude",
+        "reason_missing": "LOADING_UNCERTAIN",
+        "impact": "Cannot apply realistic loads without specification",
+        "default_assumption": null
+      },
+      {
+        "parameter_name": "boundary_conditions",
+        "reason_missing": "BOUNDARY_CONDITION_UNKNOWN",
+        "impact": "Cannot constrain model without knowing mounting configuration",
+        "default_assumption": null
+      }
+    ],
+    "provenance": {
+      "candidate_hash": "hash_of_candidate_json_above",
+      "request_timestamp": "2026-08-14T00:00:00Z",
+      "request_method": "Automated translation from candidate",
+      "translator_version": "1.0.0"
+    },
+    "blocking_status": "SIMULATION_BLOCKED_MISSING_PARAMETERS",
+    "blocking_reason": "Missing 5 critical parameters: geometry dimensions, DLC material properties (Young's modulus, hardness), contact load magnitude, and boundary conditions. Cannot proceed with simulation until these are specified."
+  },
+  "expected_outcome": {
+    "status": "SIMULATION_BLOCKED_MISSING_PARAMETERS",
+    "reason": "Required simulation parameters are absent. Request correctly identifies missing geometry, material properties, loads, and boundary conditions."
+  }
+}

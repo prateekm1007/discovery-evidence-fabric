@@ -1,0 +1,188 @@
+{
+  "checklist_version": "1.0.0",
+  "checklist_name": "Simulation Readiness Verification Checklist",
+  "description": "Machine-readable checklist verifying all simulation readiness criteria are met.",
+  "criteria": [
+    {
+      "id": "CRITERION_01",
+      "name": "Repository forensic audit exists",
+      "file": "audits/SIMULATION_READINESS_FORENSIC.md",
+      "status": "PASS",
+      "evidence": "Audit file contains KEEP/QUARANTINE/UNPROVEN/REMOVE classifications"
+    },
+    {
+      "id": "CRITERION_02",
+      "name": "Existing schemas reused wherever possible",
+      "status": "PASS",
+      "evidence": "AUTOMATED_INVENTION_CANDIDATE extends EvidenceItem schema structure; epistemic states reuse existing ontology"
+    },
+    {
+      "id": "CRITERION_03",
+      "name": "AUTOMATED_INVENTION_CANDIDATE contract is explicit",
+      "file": "discovery_fabric/simulation_readiness/automated_invention_candidate_schema.json",
+      "status": "PASS",
+      "evidence": "Schema defines all 22 required fields including device, failure_mode, target_constraint, observed_phenomenon, source_mechanisms, exact_evidence_spans, source_identifiers, mechanism, cross_domain_connection, proposed_intervention, expected_causal_effect, falsification_test, known_alternatives, prior_art_search_record, prior_art_coverage, adversarial_results, provenance, model_prompt_hashes, source_hashes, searched_universe_version, epistemic_state"
+    },
+    {
+      "id": "CRITERION_04",
+      "name": "SimulationRequest contract exists",
+      "file": "discovery_fabric/simulation_readiness/simulation_request_schema.json",
+      "status": "PASS",
+      "evidence": "Schema defines geometry_requirements, materials, operating_conditions, loads, boundary_conditions, environmental_conditions, failure_mode, predicted_mechanism, predicted_measurable_outcome, baseline_control, success_criterion, falsification_criterion, uncertainty, missing_parameters, provenance"
+    },
+    {
+      "id": "CRITERION_05",
+      "name": "SimulationResult contract exists",
+      "file": "discovery_fabric/simulation_readiness/simulation_result_schema.json",
+      "status": "PASS",
+      "evidence": "Schema defines result_id, request_reference, engine_info, job_status, completion_timestamp, outputs, provenance with hash verification"
+    },
+    {
+      "id": "CRITERION_06",
+      "name": "Simulation adapter interface exists but has no fake solver",
+      "file": "discovery_fabric/simulation_readiness/adapter_interface.py",
+      "status": "PASS",
+      "evidence": "Abstract base class SimulationAdapter with submit/status/retrieve/validate methods; NotImplementedAdapter raises NotImplementedError preventing accidental use"
+    },
+    {
+      "id": "CRITERION_07",
+      "name": "Missing-parameter blocking works",
+      "file": "discovery_fabric/simulation_readiness/fixtures/fixture_b_incomplete.json",
+      "status": "PASS",
+      "evidence": "Fixture B correctly blocked with SIMULATION_BLOCKED_MISSING_PARAMETERS; test_fixture_b_incomplete() passes"
+    },
+    {
+      "id": "CRITERION_08",
+      "name": "Non-falsifiable blocking works",
+      "file": "discovery_fabric/simulation_readiness/fixtures/fixture_c_non_falsifiable.json",
+      "status": "PASS",
+      "evidence": "Fixture C correctly blocked with SIMULATION_BLOCKED_NON_FALSIFIABLE; test_fixture_c_non_falsifiable() passes"
+    },
+    {
+      "id": "CRITERION_09",
+      "name": "Unsupported assumption blocking works",
+      "file": "discovery_fabric/simulation_readiness/fixtures/fixture_d_unsupported_assumption.json",
+      "status": "PASS",
+      "evidence": "Fixture D correctly blocked with SIMULATION_BLOCKED_UNSUPPORTED_ASSUMPTION; test_fixture_d_unsupported_assumption() passes"
+    },
+    {
+      "id": "CRITERION_10",
+      "name": "Complete fixture reaches SIMULATION_READY",
+      "file": "discovery_fabric/simulation_readiness/fixtures/fixture_a_complete.json",
+      "status": "PASS",
+      "evidence": "Fixture A submitted successfully with SIMULATION_READY status; test_fixture_a_complete() passes"
+    },
+    {
+      "id": "CRITERION_11",
+      "name": "All tests pass",
+      "file": "discovery_fabric/simulation_readiness/fixtures/test_contracts.py",
+      "status": "PASS",
+      "evidence": "6/6 tests passed: fixture_a_complete, fixture_b_incomplete, fixture_c_non_falsifiable, fixture_d_unsupported_assumption, validation_result, provenance_chain"
+    },
+    {
+      "id": "CRITERION_12",
+      "name": "Provenance survives discovery → invention → simulation request",
+      "status": "PASS",
+      "evidence": "test_provenance_chain() verifies candidate_id referenced in request, candidate_hash in provenance, source_hashes preserved"
+    },
+    {
+      "id": "CRITERION_13",
+      "name": "No existing prior-art artifacts modified",
+      "status": "PASS",
+      "evidence": "a2_output/p01/, prior_art_forensic/, corpus_v2/ directories unchanged; prior-art thresholds not modified"
+    },
+    {
+      "id": "CRITERION_14",
+      "name": "No TEE code enters active path",
+      "status": "PASS",
+      "evidence": "TEE mechanisms remain quarantined; no TEE operators in simulation readiness layer"
+    },
+    {
+      "id": "CRITERION_15",
+      "name": "Baseline/control structure defined",
+      "file": "discovery_fabric/simulation_readiness/simulation_request_schema.json",
+      "status": "PASS",
+      "evidence": "baseline_control object requires description, reference_design, baseline_performance; comparison schema includes dependent_variable, baseline_value, intervention_value, delta, improvement_direction"
+    },
+    {
+      "id": "CRITERION_16",
+      "name": "Future state machine defined but blocked",
+      "file": "discovery_fabric/simulation_readiness/automated_invention_candidate_schema.json",
+      "status": "PASS",
+      "evidence": "Epistemic states include SIMULATION_READY, SIMULATION_SUBMITTED, SIMULATION_COMPLETE, SIMULATION_SURVIVOR, EXTERNALLY_TESTABLE but AUTOMATED_INVENTION_CANDIDATE remains terminal state"
+    },
+    {
+      "id": "CRITERION_17",
+      "name": "Invention portfolio schema supports thousands of candidates",
+      "file": "discovery_fabric/simulation_readiness/invention_portfolio_schema.json",
+      "status": "PASS",
+      "evidence": "Portfolio schema includes candidates array with summary_statistics; tracks discovery→invention→prior-art→adversarial→simulation→external_validation→commercial_disposition pipeline"
+    },
+    {
+      "id": "CRITERION_18",
+      "name": "Commercial disposition field defined",
+      "file": "discovery_fabric/simulation_readiness/invention_portfolio_schema.json",
+      "status": "PASS",
+      "evidence": "commercial_disposition enum: UNREVIEWED, PATENT_REVIEW, LICENSE_CANDIDATE, ACQUISITION_CANDIDATE, INTERNAL_DEVELOPMENT, REJECTED"
+    },
+    {
+      "id": "CRITERION_19",
+      "name": "Commercial handoff metadata preserved",
+      "file": "discovery_fabric/simulation_readiness/invention_portfolio_schema.json",
+      "status": "PASS",
+      "evidence": "commercial_metadata includes evidence_package_hash, technical_differentiation, expected_performance_delta, regulatory_category, likely_buyer_categories, licensing_readiness, unresolved_risks"
+    },
+    {
+      "id": "CRITERION_20",
+      "name": "No fake simulation outputs created",
+      "status": "PASS",
+      "evidence": "NotImplementedAdapter raises NotImplementedError; no mock results generated; fixtures contain only request-level data"
+    },
+    {
+      "id": "CRITERION_21",
+      "name": "No commercial simulation websites scraped",
+      "status": "PASS",
+      "evidence": "No web scraping code; adapter interface only defines method signatures"
+    },
+    {
+      "id": "CRITERION_22",
+      "name": "No physics parameters invented",
+      "status": "PASS",
+      "evidence": "SIMULATION_BLOCKED_UNSUPPORTED_ASSUMPTION gate prevents silent parameter invention; Fixture D demonstrates blocking of assumed values"
+    },
+    {
+      "id": "CRITERION_23",
+      "name": "No new discovery algorithm added",
+      "status": "PASS",
+      "evidence": "Simulation readiness layer operates on existing A2 output; no new discovery logic"
+    },
+    {
+      "id": "CRITERION_24",
+      "name": "No new evidence ontology created",
+      "status": "PASS",
+      "evidence": "Extends existing EvidenceItem schema; reuses epistemic state machine"
+    }
+  ],
+  "summary": {
+    "total_criteria": 24,
+    "passed": 24,
+    "failed": 0,
+    "completion_percentage": 100
+  },
+  "artifacts_produced": [
+    "audits/SIMULATION_READINESS_FORENSIC.md",
+    "discovery_fabric/simulation_readiness/automated_invention_candidate_schema.json",
+    "discovery_fabric/simulation_readiness/simulation_request_schema.json",
+    "discovery_fabric/simulation_readiness/simulation_result_schema.json",
+    "discovery_fabric/simulation_readiness/simulation_assessment_schema.json",
+    "discovery_fabric/simulation_readiness/adapter_interface.py",
+    "discovery_fabric/simulation_readiness/invention_portfolio_schema.json",
+    "discovery_fabric/simulation_readiness/fixtures/fixture_a_complete.json",
+    "discovery_fabric/simulation_readiness/fixtures/fixture_b_incomplete.json",
+    "discovery_fabric/simulation_readiness/fixtures/fixture_c_non_falsifiable.json",
+    "discovery_fabric/simulation_readiness/fixtures/fixture_d_unsupported_assumption.json",
+    "discovery_fabric/simulation_readiness/fixtures/test_contracts.py",
+    "discovery_fabric/simulation_readiness/SIMULATION_CONTRACT.json",
+    "discovery_fabric/simulation_readiness/SIMULATION_READINESS_CHECKLIST.json"
+  ]
+}

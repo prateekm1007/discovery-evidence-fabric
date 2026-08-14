@@ -1,0 +1,222 @@
+{
+  "fixture_id": "FIXTURE_D_UNSUPPORTED_ASSUMPTION",
+  "description": "Invention with invented/unsupported physical parameters not present in candidate evidence. Expected status: SIMULATION_BLOCKED_UNSUPPORTED_ASSUMPTION",
+  "automated_invention_candidate": {
+    "candidate_id": "cand:fixture:D:thermal_coating",
+    "device": "Gas Turbine Blade",
+    "failure_mode": "THERMAL_FATIGUE_FAILURE",
+    "target_constraint": "Must withstand 100,000 thermal cycles at temperatures up to 1200°C without crack initiation",
+    "observed_phenomenon": "Thermal barrier coatings (TBCs) reduce substrate temperature in high-temperature applications",
+    "source_mechanisms": [
+      "Ceramic coatings with low thermal conductivity create temperature gradient across coating thickness"
+    ],
+    "exact_evidence_spans": [
+      {
+        "source_id": "europepmc:EXAMPLE999",
+        "span_text": "Yttria-stabilized zirconia (YSZ) coatings reduced substrate temperature by 100-150°C in laboratory testing",
+        "span_hash": "d4e5f6789012345678901234567890123abcdef0"
+      }
+    ],
+    "source_identifiers": ["europepmc:EXAMPLE999"],
+    "mechanism": "Applying YSZ thermal barrier coating to turbine blade surface reduces metal substrate temperature, extending fatigue life",
+    "cross_domain_connection": "Thermal barrier coating mechanism from laboratory specimens transfers to gas turbine blade application",
+    "proposed_intervention": "Apply 300-micron YSZ coating via plasma spray to turbine blade airfoil surfaces",
+    "expected_causal_effect": "Coating creates 100°C temperature drop across coating thickness, reducing substrate temperature from 1100°C to 1000°C, extending fatigue life by factor of 3",
+    "falsification_test": "Run thermal cycling test with 300-micron YSZ coating; if substrate temperature reduction is less than 50°C or if coating spalls before 10,000 cycles, hypothesis is falsified",
+    "known_alternatives": [
+      "Single crystal superalloy blades",
+      "Internal cooling channels",
+      "Alternative TBC materials (alumina, mullite)"
+    ],
+    "prior_art_search_record": {
+      "databases_searched": ["EuropePMC"],
+      "queries": ["thermal barrier coating turbine blade YSZ"],
+      "date_range": "all",
+      "timestamp": "2026-08-14T00:00:00Z",
+      "result_count": 0,
+      "results": [],
+      "limitations": ["Limited database coverage"]
+    },
+    "prior_art_coverage": {
+      "status": "NO_MATCHING_EVIDENCE_FOUND",
+      "confidence": 0.4,
+      "coverage_notes": "Minimal search performed"
+    },
+    "adversarial_results": {
+      "overall": "PASS",
+      "killed_count": 0,
+      "reason": "",
+      "attacks": {
+        "unsupported_mechanism": "PASS",
+        "weak_transfer": "PASS",
+        "obvious_combination": "PASS",
+        "prior_art": "PASS",
+        "contradiction": "PASS",
+        "boundary_failure": "PASS",
+        "engineering_infeasibility": "PASS",
+        "regulatory_incompatibility": "PASS"
+      }
+    },
+    "provenance": {
+      "retrieval_method": "EuropePMC API",
+      "synthesis_method": "A2 LLM synthesis",
+      "verification_status": "UNVERIFIED",
+      "run_id": "run:fixture:D"
+    },
+    "model_prompt_hashes": {
+      "model": "deepseek/deepseek-v4-flash-0731",
+      "prompt_hash": "fixture_d_prompt_hash",
+      "input_hash": "fixture_d_input_hash",
+      "output_hash": "fixture_d_output_hash",
+      "synthesis_timestamp": "2026-08-14T00:00:00Z"
+    },
+    "source_hashes": [
+      {
+        "source_id": "europepmc:EXAMPLE999",
+        "content_hash": "example_source_content_hash_999000",
+        "retrieval_timestamp": "2026-08-14T00:00:00Z"
+      }
+    ],
+    "searched_universe_version": {
+      "databases": ["EuropePMC"],
+      "snapshot_dates": ["2026-08-14"],
+      "api_versions": {"EuropePMC": "v1.0"}
+    },
+    "epistemic_state": "INVENTION_CANDIDATE"
+  },
+  "simulation_request": {
+    "request_id": "sim_req:fixture:D:001",
+    "candidate_reference": "cand:fixture:D:thermal_coating",
+    "simulation_type": "THERMAL",
+    "geometry_requirements": {
+      "description": "Turbine blade airfoil section with coating layer",
+      "cad_file_reference": "cad:turbine_blade_section.step",
+      "dimensions": [
+        {"name": "blade_chord", "value": 0.05, "unit": "m", "tolerance": 0.001},
+        {"name": "coating_thickness", "value": 0.0003, "unit": "m", "tolerance": 0.00005}
+      ],
+      "simplifications": ["2D airfoil section", "Neglect cooling holes"]
+    },
+    "materials": [
+      {
+        "name": "YSZ coating",
+        "grade": "8% Yttria",
+        "supplier": "ASSUMED - NOT IN EVIDENCE",
+        "properties": {
+          "thermal_conductivity": 1.5,
+          "density": 5800,
+          "specific_heat": 500,
+          "thermal_expansion_coefficient": 10e-6
+        },
+        "property_source": "ASSUMPTION - Not provided in source evidence. Value taken from general literature, not specific to this candidate's evidence base."
+      },
+      {
+        "name": "Inconel 718 substrate",
+        "grade": "Standard",
+        "supplier": "ASSUMED - NOT SPECIFIED",
+        "properties": {
+          "thermal_conductivity": 11.4,
+          "density": 8190,
+          "specific_heat": 435
+        },
+        "property_source": "ASSUMPTION - Candidate does not specify substrate material"
+      }
+    ],
+    "operating_conditions": {
+      "temperature_range": {"min": 293, "max": 1473, "unit": "K"},
+      "pressure_range": null,
+      "frequency": null,
+      "duty_cycle": 1.0,
+      "lifetime_requirement": {"cycles": 100000, "years": 5}
+    },
+    "loads": [
+      {
+        "type": "PRESSURE",
+        "magnitude": 2000000,
+        "unit": "Pa",
+        "direction": [0, 1, 0],
+        "location": "blade_pressure_surface",
+        "time_dependent": false
+      }
+    ],
+    "boundary_conditions": [
+      {"type": "FIXED", "location": "blade_root", "degrees_of_freedom": ["UX", "UY", "UZ"]},
+      {"type": "CONTACT", "location": "coating_substrate_interface", "degrees_of_freedom": []}
+    ],
+    "environmental_conditions": {
+      "corrosive_media": "combustion_gases",
+      "radiation_exposure": null,
+      "humidity": null,
+      "fluid_medium": "hot_gas"
+    },
+    "failure_mode": "THERMAL_FATIGUE_FAILURE",
+    "predicted_mechanism": "Temperature gradient across YSZ coating reduces substrate temperature, lowering thermal stress amplitude",
+    "predicted_measurable_outcome": {
+      "metric": "substrate_temperature_drop",
+      "predicted_value": 100,
+      "unit": "°C",
+      "baseline_value": 0,
+      "improvement_direction": "INCREASE"
+    },
+    "baseline_control": {
+      "description": "Uncoated turbine blade",
+      "reference_design": "Bare Inconel 718 blade",
+      "baseline_performance": {"substrate_temperature": 1100, "unit": "°C"}
+    },
+    "success_criterion": {
+      "threshold": 50,
+      "unit": "°C",
+      "comparison_operator": "GE",
+      "description": "Temperature drop across coating must exceed 50°C"
+    },
+    "falsification_criterion": {
+      "condition": "If measured temperature drop is less than 50°C under specified conditions",
+      "threshold": 50,
+      "unit": "°C"
+    },
+    "uncertainty": {
+      "confidence_interval": 0.9,
+      "uncertainty_bounds": {"lower": 70, "upper": 130},
+      "uncertainty_sources": ["Material property assumptions", "Coating microstructure variability", "Interface thermal resistance uncertainty"]
+    },
+    "missing_parameters": [],
+    "unsupported_assumptions": [
+      {
+        "parameter_name": "YSZ_thermal_conductivity",
+        "assumed_value": 1.5,
+        "unit": "W/(m·K)",
+        "reason_unsupported": "Source evidence mentions YSZ but does not provide specific thermal conductivity value. Value assumed from general literature.",
+        "impact": "Temperature drop prediction is directly proportional to thermal conductivity. Wrong assumption could lead to >50% error in predicted temperature reduction.",
+        "evidence_gap": "No material property data in europepmc:EXAMPLE999"
+      },
+      {
+        "parameter_name": "substrate_material_identity",
+        "assumed_value": "Inconel 718",
+        "unit": "N/A",
+        "reason_unsupported": "Candidate does not specify which superalloy substrate is being coated. Inconel 718 assumed arbitrarily.",
+        "impact": "Different superalloys have different thermal conductivities and expansion coefficients, affecting thermal stress predictions.",
+        "evidence_gap": "No substrate specification in candidate or source evidence"
+      },
+      {
+        "parameter_name": "coating_microstructure",
+        "assumed_value": "plasma_sprayed_porosity_10%",
+        "unit": "N/A",
+        "reason_unsupported": "Coating process affects microstructure and properties. Candidate mentions 'plasma spray' but provides no microstructural details.",
+        "impact": "Porosity level strongly affects thermal conductivity. 5-15% porosity variation could change thermal conductivity by factor of 2.",
+        "evidence_gap": "No coating process parameters or microstructural characterization in evidence"
+      }
+    ],
+    "provenance": {
+      "candidate_hash": "hash_of_candidate_json_above",
+      "request_timestamp": "2026-08-14T00:00:00Z",
+      "request_method": "Automated translation from candidate",
+      "translator_version": "1.0.0"
+    },
+    "blocking_status": "SIMULATION_BLOCKED_UNSUPPORTED_ASSUMPTION",
+    "blocking_reason": "Request contains 3 unsupported assumptions not grounded in candidate evidence: (1) YSZ thermal conductivity assumed from literature rather than measured/specified, (2) substrate material arbitrarily chosen as Inconel 718 without candidate specification, (3) coating microstructure/porosity assumed without process parameters. These assumptions introduce unquantified uncertainty that could invalidate simulation predictions. The pipeline must never silently invent physical parameters."
+  },
+  "expected_outcome": {
+    "status": "SIMULATION_BLOCKED_UNSUPPORTED_ASSUMPTION",
+    "reason": "Simulation request contains material properties and boundary conditions that were invented/assumed rather than derived from candidate evidence. The system correctly identifies these unsupported assumptions and blocks the request to prevent silent parameter invention."
+  }
+}

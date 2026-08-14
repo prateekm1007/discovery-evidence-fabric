@@ -1,0 +1,145 @@
+{
+  "fixture_id": "FIXTURE_C_NON_FALSIFIABLE",
+  "description": "Non-falsifiable invention with vague claims like 'improves durability' without measurable endpoint. Expected status: SIMULATION_BLOCKED_NON_FALSIFIABLE",
+  "automated_invention_candidate": {
+    "candidate_id": "cand:fixture:C:vague_improvement",
+    "device": "Smartphone Battery",
+    "failure_mode": "CAPACITY_DEGRADATION",
+    "target_constraint": "Must maintain battery performance over device lifetime",
+    "observed_phenomenon": "Some battery treatments claim to improve longevity",
+    "source_mechanisms": [
+      "Unspecified mechanism that supposedly helps batteries"
+    ],
+    "exact_evidence_spans": [
+      {
+        "source_id": "europepmc:EXAMPLE789",
+        "span_text": "Treatment showed some improvement in battery performance",
+        "span_hash": "c3d4e5f678901234567890123456789012abcdef"
+      }
+    ],
+    "source_identifiers": ["europepmc:EXAMPLE789"],
+    "mechanism": "Applying special treatment to battery electrodes improves overall performance",
+    "cross_domain_connection": "Battery treatment from one application transfers to smartphone batteries",
+    "proposed_intervention": "Apply proprietary surface treatment to lithium-ion battery anode",
+    "expected_causal_effect": "Battery performs better and lasts longer with improved durability",
+    "falsification_test": "Test shows improvement in battery metrics",
+    "known_alternatives": [
+      "Standard battery chemistry",
+      "Other surface treatments"
+    ],
+    "prior_art_search_record": {
+      "databases_searched": ["EuropePMC"],
+      "queries": ["battery treatment improvement"],
+      "date_range": "all",
+      "timestamp": "2026-08-14T00:00:00Z",
+      "result_count": 0,
+      "results": [],
+      "limitations": ["Vague search terms"]
+    },
+    "prior_art_coverage": {
+      "status": "NO_MATCHING_EVIDENCE_FOUND",
+      "confidence": 0.3,
+      "coverage_notes": "Search was too vague to be meaningful"
+    },
+    "adversarial_results": {
+      "overall": "PASS",
+      "killed_count": 0,
+      "reason": "",
+      "attacks": {
+        "unsupported_mechanism": "PASS",
+        "weak_transfer": "PASS",
+        "obvious_combination": "PASS",
+        "prior_art": "PASS",
+        "contradiction": "PASS",
+        "boundary_failure": "PASS",
+        "engineering_infeasibility": "PASS",
+        "regulatory_incompatibility": "PASS"
+      }
+    },
+    "provenance": {
+      "retrieval_method": "EuropePMC API",
+      "synthesis_method": "A2 LLM synthesis",
+      "verification_status": "UNVERIFIED",
+      "run_id": "run:fixture:C"
+    },
+    "model_prompt_hashes": {
+      "model": "deepseek/deepseek-v4-flash-0731",
+      "prompt_hash": "fixture_c_prompt_hash",
+      "input_hash": "fixture_c_input_hash",
+      "output_hash": "fixture_c_output_hash",
+      "synthesis_timestamp": "2026-08-14T00:00:00Z"
+    },
+    "source_hashes": [
+      {
+        "source_id": "europepmc:EXAMPLE789",
+        "content_hash": "example_source_content_hash_789012",
+        "retrieval_timestamp": "2026-08-14T00:00:00Z"
+      }
+    ],
+    "searched_universe_version": {
+      "databases": ["EuropePMC"],
+      "snapshot_dates": ["2026-08-14"],
+      "api_versions": {"EuropePMC": "v1.0"}
+    },
+    "epistemic_state": "INVENTION_CANDIDATE"
+  },
+  "simulation_request": {
+    "request_id": "sim_req:fixture:C:001",
+    "candidate_reference": "cand:fixture:C:vague_improvement",
+    "simulation_type": "OTHER",
+    "geometry_requirements": {
+      "description": "Battery cell - details not specified",
+      "cad_file_reference": null,
+      "dimensions": [],
+      "simplifications": []
+    },
+    "materials": [],
+    "operating_conditions": {},
+    "loads": [],
+    "boundary_conditions": [],
+    "environmental_conditions": {},
+    "failure_mode": "CAPACITY_DEGRADATION",
+    "predicted_mechanism": "Surface treatment improves something about the battery",
+    "predicted_measurable_outcome": {
+      "metric": "durability",
+      "predicted_value": null,
+      "unit": "",
+      "baseline_value": null,
+      "improvement_direction": "INCREASE"
+    },
+    "baseline_control": {
+      "description": "Regular battery",
+      "reference_design": "Standard lithium-ion battery",
+      "baseline_performance": {}
+    },
+    "success_criterion": {
+      "threshold": null,
+      "unit": "",
+      "comparison_operator": "GT",
+      "description": "Battery should be more durable"
+    },
+    "falsification_criterion": {
+      "condition": "If battery does not improve",
+      "threshold": null,
+      "unit": ""
+    },
+    "uncertainty": {
+      "confidence_interval": null,
+      "uncertainty_bounds": {},
+      "uncertainty_sources": []
+    },
+    "missing_parameters": [],
+    "provenance": {
+      "candidate_hash": "hash_of_candidate_json_above",
+      "request_timestamp": "2026-08-14T00:00:00Z",
+      "request_method": "Automated translation from candidate",
+      "translator_version": "1.0.0"
+    },
+    "blocking_status": "SIMULATION_BLOCKED_NON_FALSIFIABLE",
+    "blocking_reason": "The predicted_measurable_outcome is non-falsifiable: metric 'durability' is vague with no specific measurement method, predicted_value is null, unit is empty. Success criterion has no numerical threshold. Cannot design a simulation test for 'improves durability' without specifying WHAT is being measured (capacity retention? cycle life? internal resistance?) and by HOW MUCH."
+  },
+  "expected_outcome": {
+    "status": "SIMULATION_BLOCKED_NON_FALSIFIABLE",
+    "reason": "Candidate makes vague claims ('improves durability', 'performs better') without specifying measurable endpoints. No numerical values, units, or thresholds provided. Cannot design falsifiable simulation test."
+  }
+}

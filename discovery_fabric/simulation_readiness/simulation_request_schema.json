@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/prateekm1007/discovery-evidence-fabric/simulation_request",
+  "title": "SimulationRequest",
+  "description": "Machine-readable contract for requesting external physics/engineering simulation. Translates invention candidate into simulation-neutral representation. If required parameters are absent, request becomes SIMULATION_BLOCKED_MISSING_PARAMETERS.",
+  "type": "object",
+  "required": [
+    "request_id",
+    "candidate_reference",
+    "simulation_type",
+    "geometry_requirements",
+    "materials",
+    "operating_conditions",
+    "loads",
+    "boundary_conditions",
+    "environmental_conditions",
+    "failure_mode",
+    "predicted_mechanism",
+    "predicted_measurable_outcome",
+    "baseline_control",
+    "success_criterion",
+    "falsification_criterion",
+    "uncertainty",
+    "missing_parameters",
+    "provenance"
+  ],
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "Unique identifier for this simulation request"
+    },
+    "candidate_reference": {
+      "type": "string",
+      "description": "Reference to parent AutomatedInventionCandidate (candidate_id)"
+    },
+    "simulation_type": {
+      "type": "string",
+      "enum": ["FEA", "CFD", "THERMAL", "ELECTROMAGNETIC", "MULTIPHYSICS", "OTHER"],
+      "description": "Type of simulation required"
+    },
+    "geometry_requirements": {
+      "type": "object",
+      "required": ["description"],
+      "properties": {
+        "description": { "type": "string" },
+        "cad_file_reference": { "type": "string", "description": "Reference to CAD file (not embedded)" },
+        "dimensions": { "type": "array", "items": { "type": "object", "properties": {"name": {"type":"string"}, "value": {"type":"number"}, "unit": {"type":"string"}, "tolerance": {"type":"number"}} } },
+        "simplifications": { "type": "array", "items": { "type": "string" }, "description": "Geometry simplifications made for simulation" }
+      }
+    },
+    "materials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "properties"],
+        "properties": {
+          "name": { "type": "string" },
+          "grade": { "type": "string" },
+          "supplier": { "type": "string" },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "youngs_modulus": { "type": "number", "description": "Pa" },
+              "poissons_ratio": { "type": "number" },
+              "density": { "type": "number", "description": "kg/m^3" },
+              "yield_strength": { "type": "number", "description": "Pa" },
+              "ultimate_strength": { "type": "number", "description": "Pa" },
+              "thermal_conductivity": { "type": "number", "description": "W/(m·K)" },
+              "specific_heat": { "type": "number", "description": "J/(kg·K)" },
+              "electrical_conductivity": { "type": "number", "description": "S/m" }
+            }
+          },
+          "property_source": { "type": "string", "description": "Reference for material properties (datasheet, standard, etc.)" }
+        }
+      }
+    },
+    "operating_conditions": {
+      "type": "object",
+      "properties": {
+        "temperature_range": { "type": "object", "properties": {"min": {"type":"number"}, "max": {"type":"number"}, "unit": {"type":"string"}} },
+        "pressure_range": { "type": "object", "properties": {"min": {"type":"number"}, "max": {"type":"number"}, "unit": {"type":"string"}} },
+        "frequency": { "type": "number", "description": "Operating frequency if applicable" },
+        "duty_cycle": { "type": "number", "description": "Duty cycle (0-1)" },
+        "lifetime_requirement": { "type": "object", "properties": {"cycles": {"type":"integer"}, "years": {"type":"number"}} }
+      }
+    },
+    "loads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "magnitude", "direction", "location"],
+        "properties": {
+          "type": { "type": "string", "enum": ["FORCE", "PRESSURE", "MOMENT", "TORQUE", "DISPLACEMENT", "ACCELERATION", "GRAVITY"] },
+          "magnitude": { "type": "number" },
+          "unit": { "type": "string" },
+          "direction": { "type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3, "description": "Vector [x, y, z]" },
+          "location": { "type": "string", "description": "Where load is applied (coordinate or named surface)" },
+          "time_dependent": { "type": "boolean" },
+          "load_curve_reference": { "type": "string", "description": "Reference to time-dependent load curve if applicable" }
+        }
+      }
+    },
+    "boundary_conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "location"],
+        "properties": {
+          "type": { "type": "string", "enum": ["FIXED", "PINNED", "ROLLER", "SYMMETRY", "PERIODIC", "CONTACT", "PRESCRIBED_DISPLACEMENT"] },
+          "location": { "type": "string", "description": "Named surface, edge, or vertex" },
+          "degrees_of_freedom": { "type": "array", "items": {"type": "string"}, "description": "Which DOFs are constrained [UX, UY, UZ, RX, RY, RZ]" }
+        }
+      }
+    },
+    "environmental_conditions": {
+      "type": "object",
+      "properties": {
+        "corrosive_media": { "type": "string", "description": "Corrosive environment if applicable" },
+        "radiation_exposure": { "type": "object", "properties": {"type": {"type":"string"}, "dose_rate": {"type":"number"}, "unit": {"type":"string"}} },
+        "humidity": { "type": "number", "description": "Relative humidity (0-1)" },
+        "fluid_medium": { "type": "string", "description": "Surrounding fluid (air, water, blood, etc.)" }
+      }
+    },
+    "failure_mode": {
+      "type": "string",
+      "description": "Specific failure mode being simulated (must match candidate failure_mode)"
+    },
+    "predicted_mechanism": {
+      "type": "string",
+      "description": "Physical mechanism predicted to dominate (stress concentration, fatigue crack growth, thermal expansion mismatch, etc.)"
+    },
+    "predicted_measurable_outcome": {
+      "type": "object",
+      "required": ["metric", "predicted_value", "unit", "baseline_value"],
+      "properties": {
+        "metric": { "type": "string", "description": "What is being measured (e.g., 'maximum von Mises stress', 'fatigue life cycles', 'temperature rise')" },
+        "predicted_value": { "type": "number", "description": "Predicted value for proposed invention" },
+        "unit": { "type": "string" },
+        "baseline_value": { "type": "number", "description": "Value for reference/current design" },
+        "improvement_direction": { "type": "string", "enum": ["INCREASE", "DECREASE"], "description": "Whether improvement means increase or decrease in metric" }
+      }
+    },
+    "baseline_control": {
+      "type": "object",
+      "required": ["description", "reference_design"],
+      "properties": {
+        "description": { "type": "string" },
+        "reference_design": { "type": "string", "description": "Description of current/reference design being compared" },
+        "baseline_performance": { "type": "object", "description": "Known or estimated performance of baseline" }
+      }
+    },
+    "success_criterion": {
+      "type": "object",
+      "required": ["threshold", "comparison_operator"],
+      "properties": {
+        "threshold": { "type": "number" },
+        "unit": { "type": "string" },
+        "comparison_operator": { "type": "string", "enum": ["GT", "LT", "GE", "LE", "EQ"] },
+        "description": { "type": "string" }
+      }
+    },
+    "falsification_criterion": {
+      "type": "object",
+      "required": ["condition"],
+      "properties": {
+        "condition": { "type": "string", "description": "What simulation result would falsify the hypothesis" },
+        "threshold": { "type": "number" },
+        "unit": { "type": "string" }
+      }
+    },
+    "uncertainty": {
+      "type": "object",
+      "properties": {
+        "confidence_interval": { "type": "number", "description": "Confidence level (e.g., 0.95)" },
+        "uncertainty_bounds": { "type": "object", "properties": {"lower": {"type":"number"}, "upper": {"type":"number"}} },
+        "uncertainty_sources": { "type": "array", "items": {"type": "string"}, "description": "Sources of uncertainty (material variability, mesh discretization, boundary condition approximation, etc.)" }
+      }
+    },
+    "missing_parameters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["parameter_name", "reason_missing", "impact"],
+        "properties": {
+          "parameter_name": { "type": "string" },
+          "reason_missing": { "type": "string", "enum": ["NOT_SPECIFIED_IN_CANDIDATE", "UNKNOWN_MATERIAL_PROPERTY", "GEOMETRY_NOT_PROVIDED", "LOADING_UNCERTAIN", "BOUNDARY_CONDITION_UNKNOWN"] },
+          "impact": { "type": "string", "description": "How this missing parameter affects simulation validity" },
+          "default_assumption": { "type": "string", "description": "If a default was used, what it was (should be rare)" }
+        }
+      },
+      "description": "Array of missing parameters. If non-empty, request status becomes SIMULATION_BLOCKED_MISSING_PARAMETERS"
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["candidate_hash", "request_timestamp", "request_method"],
+      "properties": {
+        "candidate_hash": { "type": "string", "description": "SHA-256 hash of parent candidate JSON" },
+        "request_timestamp": { "type": "string", "format": "date-time" },
+        "request_method": { "type": "string" },
+        "translator_version": { "type": "string" }
+      }
+    },
+    "blocking_status": {
+      "type": "string",
+      "enum": [
+        "SIMULATION_READY",
+        "SIMULATION_BLOCKED_MISSING_PARAMETERS",
+        "SIMULATION_BLOCKED_NON_FALSIFIABLE",
+        "SIMULATION_BLOCKED_UNSUPPORTED_ASSUMPTION"
+      ],
+      "description": "Request status. BLOCKED states prevent submission to simulation engine."
+    },
+    "blocking_reason": {
+      "type": "string",
+      "description": "If blocked, detailed explanation of why"
+    },
+    "unsupported_assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["parameter_name", "assumed_value", "reason_unsupported", "impact"],
+        "properties": {
+          "parameter_name": { "type": "string" },
+          "assumed_value": { "description": "The assumed value (any type)" },
+          "unit": { "type": "string" },
+          "reason_unsupported": { "type": "string" },
+          "impact": { "type": "string" },
+          "evidence_gap": { "type": "string", "description": "What evidence is missing to support this assumption" }
+        }
+      },
+      "description": "Array of assumptions made that are not grounded in candidate evidence. If non-empty, request status becomes SIMULATION_BLOCKED_UNSUPPORTED_ASSUMPTION"
+    }
+  },
+  "additionalProperties": false
+}

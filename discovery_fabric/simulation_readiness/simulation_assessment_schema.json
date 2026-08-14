@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/prateekm1007/discovery-evidence-fabric/simulation_assessment",
+  "title": "SimulationAssessment",
+  "description": "Machine-readable contract for assessing simulation results against invention hypothesis. Compares proposed invention vs baseline/control and determines if falsifiable prediction was tested.",
+  "type": "object",
+  "required": [
+    "assessment_id",
+    "result_reference",
+    "request_reference",
+    "candidate_reference",
+    "comparison",
+    "falsification_outcome",
+    "scientific_validity",
+    "provenance"
+  ],
+  "properties": {
+    "assessment_id": {
+      "type": "string",
+      "description": "Unique identifier for this assessment"
+    },
+    "result_reference": {
+      "type": "string",
+      "description": "Reference to SimulationResult (result_id)"
+    },
+    "request_reference": {
+      "type": "string",
+      "description": "Reference to SimulationRequest (request_id)"
+    },
+    "candidate_reference": {
+      "type": "string",
+      "description": "Reference to AutomatedInventionCandidate (candidate_id)"
+    },
+    "comparison": {
+      "type": "object",
+      "required": ["dependent_variable", "baseline_value", "intervention_value", "delta", "improvement_direction"],
+      "properties": {
+        "dependent_variable": {
+          "type": "string",
+          "description": "What is being measured (must match predicted_measurable_outcome.metric from request)"
+        },
+        "baseline_value": {
+          "type": "number",
+          "description": "Performance of reference/current design"
+        },
+        "intervention_value": {
+          "type": "number",
+          "description": "Performance of proposed invention"
+        },
+        "delta": {
+          "type": "number",
+          "description": "intervention_value - baseline_value (signed)"
+        },
+        "delta_percent": {
+          "type": "number",
+          "description": "Percent change relative to baseline"
+        },
+        "improvement_direction": {
+          "type": "string",
+          "enum": ["INCREASE", "DECREASE"],
+          "description": "Whether improvement means increase or decrease in metric"
+        },
+        "is_improvement": {
+          "type": "boolean",
+          "description": "True if delta represents an improvement per improvement_direction"
+        },
+        "uncertainty": {
+          "type": "object",
+          "properties": {
+            "confidence_interval": { "type": "number" },
+            "lower_bound": { "type": "number" },
+            "upper_bound": { "type": "number" }
+          }
+        }
+      }
+    },
+    "falsification_outcome": {
+      "type": "object",
+      "required": ["hypothesis_falsified", "reason"],
+      "properties": {
+        "hypothesis_falsified": {
+          "type": "boolean",
+          "description": "True if simulation result falsifies the invention's prediction"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Explanation of why hypothesis was or was not falsified"
+        },
+        "threshold_comparison": {
+          "type": "object",
+          "properties": {
+            "predicted_threshold": { "type": "number" },
+            "actual_value": { "type": "number" },
+            "unit": { "type": "string" },
+            "operator": { "type": "string", "enum": ["GT", "LT", "GE", "LE", "EQ"] }
+          }
+        }
+      }
+    },
+    "scientific_validity": {
+      "type": "object",
+      "required": ["simulation_completed", "falsifiable_test_executed", "baseline_compared"],
+      "properties": {
+        "simulation_completed": {
+          "type": "boolean",
+          "description": "True if solver completed without fatal errors"
+        },
+        "falsifiable_test_executed": {
+          "type": "boolean",
+          "description": "True if simulation actually tested the stated falsifiable prediction (CRITICAL: never report success just because solver completed)"
+        },
+        "baseline_compared": {
+          "type": "boolean",
+          "description": "True if baseline/reference design was simulated for comparison"
+        },
+        "assumptions_documented": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Key simulation assumptions (geometry simplifications, material idealizations, boundary condition approximations)"
+        },
+        "limitations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Known limitations of the simulation"
+        },
+        "validity_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Overall scientific validity score (0 = invalid, 1 = fully valid)"
+        }
+      }
+    },
+    "recommendation": {
+      "type": "string",
+      "enum": [
+        "PROCEED_TO_EXPERIMENTAL_VALIDATION",
+        "REFINE_SIMULATION",
+        "REJECT_CANDIDATE",
+        "NEEDS_ADDITIONAL_SIMULATIONS",
+        "INCONCLUSIVE"
+      ],
+      "description": "Recommended next action based on assessment"
+    },
+    "next_epistemic_state": {
+      "type": "string",
+      "enum": [
+        "SIMULATION_SURVIVOR",
+        "EXPERIMENTAL_PROPOSAL",
+        "INVENTION_CANDIDATE",
+        "OBSERVED"
+      ],
+      "description": "Proposed next epistemic state (blocked until simulation layer activated)"
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["assessment_timestamp", "assessor_version"],
+      "properties": {
+        "assessment_timestamp": { "type": "string", "format": "date-time" },
+        "assessor_version": { "type": "string" },
+        "result_hash": { "type": "string", "description": "SHA-256 hash of SimulationResult JSON" },
+        "human_reviewer": { "type": "string", "description": "If human reviewed, their identifier" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

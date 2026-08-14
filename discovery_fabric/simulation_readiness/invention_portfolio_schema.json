@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/prateekm1007/discovery-evidence-fabric/invention_portfolio",
+  "title": "InventionPortfolio",
+  "description": "Schema for representing a portfolio of invention candidates from discovery through commercial disposition. Supports tracking thousands of candidates with full provenance chain.",
+  "type": "object",
+  "required": [
+    "portfolio_id",
+    "creation_timestamp",
+    "candidates"
+  ],
+  "properties": {
+    "portfolio_id": {
+      "type": "string",
+      "description": "Unique identifier for this portfolio"
+    },
+    "creation_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "searched_universe_hash": {
+      "type": "string",
+      "description": "SHA-256 hash of the searched universe snapshot used for all candidates"
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "candidate_id",
+          "discovery_status",
+          "prior_art_coverage",
+          "adversarial_assessment",
+          "simulation_status",
+          "commercial_disposition"
+        ],
+        "properties": {
+          "candidate_id": {
+            "type": "string",
+            "description": "Reference to AutomatedInventionCandidate"
+          },
+          "candidate_hash": {
+            "type": "string",
+            "description": "SHA-256 hash of candidate JSON"
+          },
+          "discovery_status": {
+            "type": "string",
+            "enum": ["DISCOVERED", "EVIDENCE_VERIFIED", "MECHANISM_EXTRACTED", "CANDIDATE_SYNTHESIZED"],
+            "description": "Stage in discovery pipeline"
+          },
+          "invention_candidate_status": {
+            "type": "string",
+            "enum": ["AUTOMATED_INVENTION_CANDIDATE", "SIMULATION_READY", "SIMULATION_SUBMITTED", "SIMULATION_COMPLETE", "SIMULATION_SURVIVOR", "EXTERNALLY_TESTABLE"],
+            "description": "Current epistemic state. Note: SIMULATION_* states are DEFINED but BLOCKED until simulation layer is activated."
+          },
+          "prior_art_coverage": {
+            "type": "object",
+            "required": ["status", "confidence"],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["NO_MATCHING_EVIDENCE_FOUND", "PARTIAL_PRIOR_ART", "LIKELY_PRIOR_ART_EXISTS"]
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "search_record_reference": {
+                "type": "string",
+                "description": "Reference to prior art search record"
+              }
+            }
+          },
+          "adversarial_assessment": {
+            "type": "object",
+            "required": ["overall", "killed_count"],
+            "properties": {
+              "overall": {
+                "type": "string",
+                "enum": ["PASS", "KILLED"]
+              },
+              "killed_count": {
+                "type": "integer"
+              },
+              "report_reference": {
+                "type": "string",
+                "description": "Reference to adversarial report"
+              }
+            }
+          },
+          "simulation_status": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["NOT_REQUESTED", "SIMULATION_READY", "SIMULATION_BLOCKED_MISSING_PARAMETERS", "SIMULATION_BLOCKED_NON_FALSIFIABLE", "SIMULATION_BLOCKED_UNSUPPORTED_ASSUMPTION", "SIMULATION_SUBMITTED", "SIMULATION_COMPLETE", "SIMULATION_SURVIVOR", "SIMULATION_FAILED"]
+              },
+              "request_reference": {
+                "type": "string",
+                "description": "Reference to SimulationRequest"
+              },
+              "result_reference": {
+                "type": "string",
+                "description": "Reference to SimulationResult if completed"
+              },
+              "assessment_reference": {
+                "type": "string",
+                "description": "Reference to SimulationAssessment if assessed"
+              }
+            }
+          },
+          "external_validation": {
+            "type": "object",
+            "properties": {
+              "validation_type": {
+                "type": "string",
+                "enum": ["LABORATORY_EXPERIMENT", "FIELD_TEST", "CLINICAL_TRIAL", "NONE"]
+              },
+              "status": {
+                "type": "string",
+                "enum": ["NOT_VALIDATED", "VALIDATION_PLANNED", "VALIDATION_IN_PROGRESS", "VALIDATION_COMPLETE", "VALIDATION_FAILED"]
+              },
+              "result_summary": {
+                "type": "string"
+              },
+              "report_reference": {
+                "type": "string"
+              }
+            }
+          },
+          "commercial_disposition": {
+            "type": "string",
+            "enum": [
+              "UNREVIEWED",
+              "PATENT_REVIEW",
+              "LICENSE_CANDIDATE",
+              "ACQUISITION_CANDIDATE",
+              "INTERNAL_DEVELOPMENT",
+              "REJECTED"
+            ],
+            "description": "Commercial disposition of the candidate. Do not claim patentability or novelty."
+          },
+          "commercial_metadata": {
+            "type": "object",
+            "description": "Metadata for eventual commercial handoff",
+            "properties": {
+              "evidence_package_hash": {
+                "type": "string",
+                "description": "Hash of complete evidence package"
+              },
+              "technical_differentiation": {
+                "type": "string",
+                "description": "How this candidate differs from known alternatives"
+              },
+              "expected_performance_delta": {
+                "type": "string",
+                "description": "Quantified performance improvement over baseline"
+              },
+              "regulatory_category": {
+                "type": "string",
+                "description": "Likely regulatory category if known (e.g., FDA Class II, CE Mark)"
+              },
+              "likely_buyer_categories": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Categories of potential buyers/licensees (e.g., 'medical device manufacturers', 'aerospace suppliers')"
+              },
+              "licensing_readiness": {
+                "type": "string",
+                "enum": ["NOT_READY", "NEEDS_SIMULATION", "NEEDS_EXPERIMENTAL_VALIDATION", "READY_FOR_LICENSING"]
+              },
+              "unresolved_risks": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Known technical, regulatory, or commercial risks"
+              }
+            }
+          }
+        }
+      }
+    },
+    "summary_statistics": {
+      "type": "object",
+      "properties": {
+        "total_candidates": {"type": "integer"},
+        "by_prior_art_status": {
+          "type": "object",
+          "properties": {
+            "no_matching_evidence": {"type": "integer"},
+            "partial_prior_art": {"type": "integer"},
+            "likely_prior_art_exists": {"type": "integer"}
+          }
+        },
+        "by_adversarial_result": {
+          "type": "object",
+          "properties": {
+            "pass": {"type": "integer"},
+            "killed": {"type": "integer"}
+          }
+        },
+        "by_simulation_status": {
+          "type": "object",
+          "properties": {
+            "not_requested": {"type": "integer"},
+            "ready": {"type": "integer"},
+            "blocked": {"type": "integer"},
+            "submitted": {"type": "integer"},
+            "complete": {"type": "integer"},
+            "survivor": {"type": "integer"}
+          }
+        },
+        "by_commercial_disposition": {
+          "type": "object",
+          "properties": {
+            "unreviewed": {"type": "integer"},
+            "patent_review": {"type": "integer"},
+            "license_candidate": {"type": "integer"},
+            "acquisition_candidate": {"type": "integer"},
+            "internal_development": {"type": "integer"},
+            "rejected": {"type": "integer"}
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
