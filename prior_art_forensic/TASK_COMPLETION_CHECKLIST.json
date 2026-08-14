@@ -1,117 +1,108 @@
 {
-  "experiment": "PATENT_ORACLE_V3_BUILD_AND_CALIBRATE",
-  "timestamp": "2026-08-14T16:49:19.949929+00:00",
-  "input_commit": "c4eae5ccc3a8527f6a9dea94171435d9eb74ece7",
+  "experiment": "PRIOR_ART_EVALUATOR_REPAIR_V1",
+  "timestamp": "2026-08-14T19:00:59.640207+00:00",
+  "input_commit": "0299cac5bb5c524c973ab21e7100c3e8441fc250",
   "models_used": {
-    "primary": "deepseek/deepseek-v4-flash-0731",
-    "secondary": "qwen/qwen-2.5-72b-instruct",
-    "note": "FREE models per user instruction. NO Gemini used."
+    "primary": "mistral-large-latest (Mistral API)",
+    "secondary": "glm-4-plus (z-ai CLI)",
+    "fallback": "deepseek-chat (Comet API)",
+    "note": "Groq and Cerebras returned 403 Forbidden. OpenRouter returned 402 (out of credits) for deepseek-v4-flash."
   },
   "checklist": [
     {
-      "criterion": "Read governance/anti-entropy files",
+      "criterion": "Freeze the repair (terminology normalization)",
       "status": "PASS",
-      "evidence": "11/11 tests pass, 6/6 regression matrix invariants pass"
+      "evidence": "18-entry bounded ontology with confidence scores"
     },
     {
-      "criterion": "Positive definition: A/B/C disclosure types",
+      "criterion": "Device/component/system relationships",
       "status": "PASS",
-      "evidence": "Only A (same claim) and B (claim+linked spec) are SPECIFIC; C is not"
+      "evidence": "e.g., glucose sensor = continuous glucose monitor, ultrasonic transducer = transducer array"
     },
     {
-      "criterion": "Evidence graph for each positive (spans + hashes + offsets)",
+      "criterion": "Claim + linked specification reasoning",
       "status": "PASS",
-      "evidence": "All 5 SPECIFIC cases have device_span, mechanism_span, relationship_span + their SHA256 hashes + evidence_offsets + char_start/end + claim_number + section_id"
+      "evidence": "Prompt explicitly allows combining claim + specification when functional relationship is explicit"
     },
     {
-      "criterion": "Automated deterministic oracle validator",
+      "criterion": "Functional relationship extraction",
       "status": "PASS",
-      "evidence": "v3_deterministic validator checks 7 conditions per spec Section 3"
+      "evidence": "15+ functional language indicators defined"
     },
     {
-      "criterion": "Replace current 5 positives with validated ones",
+      "criterion": "No generic semantic similarity",
       "status": "PASS",
-      "evidence": "Scanned 31435 patents, found 6 verified A/B, selected 5"
+      "evidence": "Only bounded ontology mappings allowed"
     },
     {
-      "criterion": "Generate >=15 candidate positives",
+      "criterion": "Development test specific_recall >= 80%",
       "status": "PASS",
-      "evidence": "20 candidates mined (target was 15+)"
+      "evidence": "dev_specific_recall=0.8000"
     },
     {
-      "criterion": "Dual-model secondary audit (VALID_SPECIFIC/NOT_SPECIFIC/UNSTABLE)",
+      "criterion": "Development test negative_rejection >= 80%",
       "status": "PASS",
-      "evidence": "Both deepseek (primary) and qwen (secondary) audit each case"
+      "evidence": "dev_negative_rejection=1.0000"
     },
     {
-      "criterion": "If either model says NOT_SPECIFIC \u2192 exclude",
-      "status": "PASS",
-      "evidence": "ORACLE_REVIEW_REQUIRED cases excluded from SPECIFIC set"
-    },
-    {
-      "criterion": "Contradictory cases with actual patent+scientific evidence",
-      "status": "PASS",
-      "evidence": "5 CONTRADICTORY cases with real patent disclosures + scientific evidence (NEJM, Lancet, IOVS citations) + contradictory relationship"
-    },
-    {
-      "criterion": "Final oracle: 5+5+5+5 = 20 cases",
-      "status": "PASS",
-      "evidence": "Total: 20 cases"
-    },
-    {
-      "criterion": "Run V6 calibration with current evaluator unchanged",
-      "status": "PASS",
-      "evidence": "specific_recall=0.6, negative_rejection_rate=1.0"
-    },
-    {
-      "criterion": "specific_recall >= 80%",
+      "criterion": "Mine 10 SPECIFIC holdout cases",
       "status": "FAIL",
-      "evidence": "specific_recall=0.6000 (3/5) \u2014 below 80% threshold"
+      "evidence": "Only 9 SPECIFIC mined (scanned 81241 patents)"
     },
     {
-      "criterion": "negative_rejection_rate >= 80%",
+      "criterion": "Mine 10 NOT_SPECIFIC holdout cases",
       "status": "PASS",
-      "evidence": "negative_rejection_rate=1.0000 (5/5)"
+      "evidence": "12 NOT_SPECIFIC mined"
     },
     {
-      "criterion": "Report specific_recall separately",
+      "criterion": "Holdout cases from different patents than V1/V2/V3",
       "status": "PASS",
-      "evidence": "specific_recall=0.6000"
+      "evidence": "Excluded all patents used in V1, V2, V3 oracles"
     },
     {
-      "criterion": "Report specific_precision separately",
+      "criterion": "Secondary model from different provider",
       "status": "PASS",
-      "evidence": "specific_precision=1.0000"
+      "evidence": "Primary: Mistral API, Secondary: z-ai CLI (glm-4-plus)"
     },
     {
-      "criterion": "Report negative_rejection_rate separately",
+      "criterion": "Freeze evaluator before holdout",
       "status": "PASS",
-      "evidence": "negative_rejection_rate=1.0000"
+      "evidence": "Prompt, model, temperature, parser, ontology all frozen"
     },
     {
-      "criterion": "Report parse failures",
-      "status": "PASS",
-      "evidence": "parse_failures=0"
+      "criterion": "Holdout test specific_recall >= 80%",
+      "status": "N/A",
+      "evidence": "Holdout not formally run (insufficient cases). Informal: 77.78%"
     },
     {
-      "criterion": "Regression matrix (6 invariants) preserved",
-      "status": "PASS",
-      "evidence": "TOPICAL/POSSIBLE/NO_MATCH/UNRESOLVED \u2192 NO KILL; SPECIFIC/IDENTICAL \u2192 KILL (6/6 PASS)"
+      "criterion": "Holdout test specific_precision >= 80%",
+      "status": "N/A",
+      "evidence": "Informal: 100%"
     },
     {
-      "criterion": "No threshold tuning",
+      "criterion": "Holdout test negative_rejection >= 80%",
+      "status": "N/A",
+      "evidence": "Informal: 100%"
+    },
+    {
+      "criterion": "No changes after seeing holdout results",
       "status": "PASS",
-      "evidence": "80% threshold unchanged"
+      "evidence": "Evaluator frozen before holdout run"
+    },
+    {
+      "criterion": "Regression matrix preserved (6 invariants)",
+      "status": "PASS",
+      "evidence": "11/11 tests pass, 6/6 regression PASS"
+    },
+    {
+      "criterion": "No 80% threshold change",
+      "status": "PASS",
+      "evidence": "Threshold unchanged"
     },
     {
       "criterion": "No prior-art kill rule changes",
       "status": "PASS",
       "evidence": "classify.py unchanged"
-    },
-    {
-      "criterion": "No evaluator prompt tuning",
-      "status": "PASS",
-      "evidence": "Evaluator prompt unchanged"
     },
     {
       "criterion": "No corpus generation",
@@ -127,23 +118,12 @@
       "criterion": "No TEE resurrection",
       "status": "PASS",
       "evidence": "TEE still quarantined"
-    },
-    {
-      "criterion": "Use free models (no Gemini 3.6)",
-      "status": "PASS",
-      "evidence": "Used deepseek-v4-flash-0731 + qwen-2.5-72b-instruct (both free on OpenRouter)"
     }
   ],
-  "overall": "EVALUATOR_REPAIR_REQUIRED",
-  "oracle_validity": "VALID (all 5 SPECIFIC pass deterministic validator + dual-model audit)",
-  "exit_rule_applied": "Oracle validity passes, specific_recall (60%) < 80% \u2192 EVALUATOR_REPAIR_REQUIRED",
-  "next_authorized_step": "Evaluator repair \u2014 but per spec Section 10, this is a separate task. STOP here.",
-  "artifacts": {
-    "PATENT_ORACLE_V3.json": "sha256:2ce663b9a735441212e2044d9eb671a626c492fa31223e11beaf02bae2e8b14e",
-    "PATENT_ORACLE_V3.md": "markdown description",
-    "PATENT_ORACLE_VALIDITY_V3.json": "oracle validity assessment",
-    "PATENT_CALIBRATION_V6.json": "sha256:d48385ee4008e45c16c181ab4e6334491274d8ee0c5c362ad7a3a2868b11106e",
-    "PATENT_CALIBRATION_V6.md": "markdown report",
-    "TASK_COMPLETION_CHECKLIST.json": "this file"
-  }
+  "overall": "HOLDOUT_CONSTRUCTION_BLOCKED",
+  "exit_state": "HOLDOUT_CONSTRUCTION_BLOCKED",
+  "dev_pass": true,
+  "holdout_construction_blocked": true,
+  "holdout_specific_available": 9,
+  "next_authorized_step": "Continue mining holdout SPECIFIC cases until 10 are obtained, then re-run holdout test"
 }
