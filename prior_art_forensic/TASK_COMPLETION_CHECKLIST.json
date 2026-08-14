@@ -1,72 +1,97 @@
 {
-  "experiment": "PATENT_ORACLE_V2_BUILD_AND_CALIBRATE",
-  "timestamp": "2026-08-14T15:21:28.171388+00:00",
-  "input_commit": "233fd76d0d6fda32a2a6b4386a2a9f833b0d949b",
+  "experiment": "PATENT_ORACLE_V3_BUILD_AND_CALIBRATE",
+  "timestamp": "2026-08-14T16:49:19.949929+00:00",
+  "input_commit": "c4eae5ccc3a8527f6a9dea94171435d9eb74ece7",
+  "models_used": {
+    "primary": "deepseek/deepseek-v4-flash-0731",
+    "secondary": "qwen/qwen-2.5-72b-instruct",
+    "note": "FREE models per user instruction. NO Gemini used."
+  },
   "checklist": [
     {
       "criterion": "Read governance/anti-entropy files",
       "status": "PASS",
-      "evidence": "Verified 11/11 tests pass, 6/6 regression matrix invariants pass"
+      "evidence": "11/11 tests pass, 6/6 regression matrix invariants pass"
     },
     {
-      "criterion": "Mine candidate positive patents via co-occurrence",
+      "criterion": "Positive definition: A/B/C disclosure types",
       "status": "PASS",
-      "evidence": "Scanned 14561 patents, found 11 candidates"
+      "evidence": "Only A (same claim) and B (claim+linked spec) are SPECIFIC; C is not"
     },
     {
-      "criterion": "Each positive has device_span + mechanism_span + intervention_span + relationship_span",
+      "criterion": "Evidence graph for each positive (spans + hashes + offsets)",
       "status": "PASS",
-      "evidence": "All 5 SPECIFIC_DISCLOSURE cases have all 4 spans + evidence_offsets"
+      "evidence": "All 5 SPECIFIC cases have device_span, mechanism_span, relationship_span + their SHA256 hashes + evidence_offsets + char_start/end + claim_number + section_id"
     },
     {
-      "criterion": "Disclosure type A/B/C classification",
+      "criterion": "Automated deterministic oracle validator",
       "status": "PASS",
-      "evidence": "Distribution: A=1, B=4, C excluded from SPECIFIC"
+      "evidence": "v3_deterministic validator checks 7 conditions per spec Section 3"
     },
     {
-      "criterion": "Built 10+ verified positives (target: redundancy)",
-      "status": "PARTIAL",
-      "evidence": "Built 5 verified A/B (target was 10+, achieved 5 \u2014 sufficient for 5 SPECIFIC cases)"
-    },
-    {
-      "criterion": "Preserve 11 NOT_SPECIFIC_DISCLOSURE from V1",
-      "status": "PARTIAL",
-      "evidence": "Preserved 5 of 11 V1 negatives (sufficient for V5 calibration \u2014 5 SPECIFIC + 5 NOT_SPECIFIC = 10 non-ambiguous)"
-    },
-    {
-      "criterion": "Build 5 POSSIBLE_RELEVANCE cases",
+      "criterion": "Replace current 5 positives with validated ones",
       "status": "PASS",
-      "evidence": "5 POSSIBLE_RELEVANCE cases built from TYPE C + ORACLE_REVIEW_REQUIRED candidates"
+      "evidence": "Scanned 31435 patents, found 6 verified A/B, selected 5"
     },
     {
-      "criterion": "Secondary model audit on every positive",
+      "criterion": "Generate >=15 candidate positives",
       "status": "PASS",
-      "evidence": "All 5 SPECIFIC_DISCLOSURE cases verified by both deepseek-v4-flash (primary) and llama-3.3-70b (secondary)"
+      "evidence": "20 candidates mined (target was 15+)"
     },
     {
-      "criterion": "Build 5 CONTRADICTORY cases from real conflicts",
+      "criterion": "Dual-model secondary audit (VALID_SPECIFIC/NOT_SPECIFIC/UNSTABLE)",
       "status": "PASS",
-      "evidence": "5 CONTRADICTORY cases built from real patent-vs-science conflicts (NEJM, Lancet, IOVS citations)"
+      "evidence": "Both deepseek (primary) and qwen (secondary) audit each case"
     },
     {
-      "criterion": "Oracle V2 has 20 cases (5+5+5+5)",
+      "criterion": "If either model says NOT_SPECIFIC \u2192 exclude",
+      "status": "PASS",
+      "evidence": "ORACLE_REVIEW_REQUIRED cases excluded from SPECIFIC set"
+    },
+    {
+      "criterion": "Contradictory cases with actual patent+scientific evidence",
+      "status": "PASS",
+      "evidence": "5 CONTRADICTORY cases with real patent disclosures + scientific evidence (NEJM, Lancet, IOVS citations) + contradictory relationship"
+    },
+    {
+      "criterion": "Final oracle: 5+5+5+5 = 20 cases",
       "status": "PASS",
       "evidence": "Total: 20 cases"
     },
     {
-      "criterion": "Run V5 calibration",
+      "criterion": "Run V6 calibration with current evaluator unchanged",
       "status": "PASS",
-      "evidence": "specific_recall=0.2, negative_rejection_rate=1.0"
+      "evidence": "specific_recall=0.6, negative_rejection_rate=1.0"
     },
     {
       "criterion": "specific_recall >= 80%",
       "status": "FAIL",
-      "evidence": "specific_recall=0.2000 (1/5) \u2014 below 80% threshold"
+      "evidence": "specific_recall=0.6000 (3/5) \u2014 below 80% threshold"
     },
     {
       "criterion": "negative_rejection_rate >= 80%",
       "status": "PASS",
       "evidence": "negative_rejection_rate=1.0000 (5/5)"
+    },
+    {
+      "criterion": "Report specific_recall separately",
+      "status": "PASS",
+      "evidence": "specific_recall=0.6000"
+    },
+    {
+      "criterion": "Report specific_precision separately",
+      "status": "PASS",
+      "evidence": "specific_precision=1.0000"
+    },
+    {
+      "criterion": "Report negative_rejection_rate separately",
+      "status": "PASS",
+      "evidence": "negative_rejection_rate=1.0000"
+    },
+    {
+      "criterion": "Report parse failures",
+      "status": "PASS",
+      "evidence": "parse_failures=0"
     },
     {
       "criterion": "Regression matrix (6 invariants) preserved",
@@ -84,9 +109,9 @@
       "evidence": "classify.py unchanged"
     },
     {
-      "criterion": "No evaluator tuning to fit cases",
+      "criterion": "No evaluator prompt tuning",
       "status": "PASS",
-      "evidence": "Evaluator prompt unchanged from V4"
+      "evidence": "Evaluator prompt unchanged"
     },
     {
       "criterion": "No corpus generation",
@@ -102,18 +127,23 @@
       "criterion": "No TEE resurrection",
       "status": "PASS",
       "evidence": "TEE still quarantined"
+    },
+    {
+      "criterion": "Use free models (no Gemini 3.6)",
+      "status": "PASS",
+      "evidence": "Used deepseek-v4-flash-0731 + qwen-2.5-72b-instruct (both free on OpenRouter)"
     }
   ],
-  "overall": "CALIBRATION_BLOCKED",
-  "block_reason": "specific_recall (20%) below 80% threshold \u2014 evaluator cannot recognize SPECIFIC_DISCLOSURE cases",
-  "oracle_validity": "VALID (all 5 SPECIFIC cases verified by dual-model audit with verifiable spans)",
-  "next_step": "Per spec: 'Do not tune the evaluator until the oracle itself is proven valid.' Oracle is now valid. Evaluator tuning is the next authorized step.",
+  "overall": "EVALUATOR_REPAIR_REQUIRED",
+  "oracle_validity": "VALID (all 5 SPECIFIC pass deterministic validator + dual-model audit)",
+  "exit_rule_applied": "Oracle validity passes, specific_recall (60%) < 80% \u2192 EVALUATOR_REPAIR_REQUIRED",
+  "next_authorized_step": "Evaluator repair \u2014 but per spec Section 10, this is a separate task. STOP here.",
   "artifacts": {
-    "PATENT_ORACLE_V2.json": "sha256:e839360489e703b8d3c3564228b4c1ff3c55f2fa0569a6729ae032e534df27b4",
-    "PATENT_ORACLE_V2.md": "markdown description",
-    "PATENT_CALIBRATION_V5.json": "sha256:85dfe93098df72e2d0620311d327667c1f98cb255d65eb97de142ad6802e9347",
-    "PATENT_CALIBRATION_V5.md": "markdown report",
-    "PATENT_ORACLE_VALIDITY_V2.json": "oracle validity assessment",
+    "PATENT_ORACLE_V3.json": "sha256:2ce663b9a735441212e2044d9eb671a626c492fa31223e11beaf02bae2e8b14e",
+    "PATENT_ORACLE_V3.md": "markdown description",
+    "PATENT_ORACLE_VALIDITY_V3.json": "oracle validity assessment",
+    "PATENT_CALIBRATION_V6.json": "sha256:d48385ee4008e45c16c181ab4e6334491274d8ee0c5c362ad7a3a2868b11106e",
+    "PATENT_CALIBRATION_V6.md": "markdown report",
     "TASK_COMPLETION_CHECKLIST.json": "this file"
   }
 }
