@@ -1,57 +1,62 @@
 {
-  "experiment": "FROZEN_EVALUATOR_V1",
-  "timestamp": "2026-08-14T19:52:12.459684+00:00",
-  "input_commit": "10544c438a84247f358b46ddc75327f8db244a09",
-  "frozen_config": {
-    "evaluator_version": "evaluator_v1_frozen_mistral_only",
-    "prompt_hash": "70bb690572d1fec1",
-    "ontology_version": "c8ae93b52fb2c09d",
-    "parser_version": "frozen_v1_markdown_truncation_fallback",
-    "primary_model": "mistral-large-latest",
-    "primary_provider": "Mistral API",
-    "secondary_model": "glm-4-plus",
-    "secondary_provider": "z-ai CLI",
-    "temperature": 0.0,
-    "max_retries": 3,
-    "retry_delay_s": 5,
-    "no_primary_fallback": true,
-    "frozen_at": "2026-08-14T19:46:03.819696+00:00"
-  },
+  "experiment": "PRIOR_ART_EVALUATOR_V2",
+  "timestamp": "2026-08-14T20:48:52.785512+00:00",
+  "input_commit": "910efREDACTED-SCOPUS-PATTERN-MATCH",
   "checklist": [
     {
-      "criterion": "Freeze primary model (Mistral ONLY, no fallback)",
+      "criterion": "Preserve V1 frozen (do not modify)",
       "status": "PASS",
-      "evidence": "primary=mistral-large-latest, no_primary_fallback=True"
+      "evidence": "V1 not modified, holdout sealed"
     },
     {
-      "criterion": "Secondary model from different provider",
+      "criterion": "Define V2 hypotheses before coding",
       "status": "PASS",
-      "evidence": "secondary=glm-4-plus (z-ai CLI)"
+      "evidence": "H1-H4 hypotheses defined (terminology, component/system, claim+spec, relationship extraction)"
     },
     {
-      "criterion": "Parser frozen",
+      "criterion": "Build new dev set separate from V1/V2/V3 oracle + V1 holdout",
       "status": "PASS",
-      "evidence": "parser_version=frozen_v1_markdown_truncation_fallback"
+      "evidence": "10 SPECIFIC + 10 NOT_SPECIFIC mined from 54778 patents, all different from V1/V2/V3/V1-holdout"
     },
     {
-      "criterion": "Ontology map frozen",
+      "criterion": "All positives pass deterministic oracle validation",
       "status": "PASS",
-      "evidence": "ontology_version=c8ae93b52fb2c09d"
+      "evidence": "All 10 SPECIFIC passed extract_and_validate with 0 issues"
     },
     {
-      "criterion": "Prompt frozen",
+      "criterion": "V2 repair: expand bounded ontology",
       "status": "PASS",
-      "evidence": "prompt_hash=70bb690572d1fec1"
+      "evidence": "Ontology expanded to 16 entries"
     },
     {
-      "criterion": "Record evaluator_version and prompt_hash",
+      "criterion": "V2 repair: improve claim/specification linking",
       "status": "PASS",
-      "evidence": "evaluator_version=evaluator_v1_frozen_mistral_only, prompt_hash=70bb690572d1fec1"
+      "evidence": "V2 prompt explicitly instructs combining claim+specification passages"
+    },
+    {
+      "criterion": "V2 repair: improve relationship extraction",
+      "status": "PASS",
+      "evidence": "Added more functional indicators + implicit relationship detection"
+    },
+    {
+      "criterion": "No generic semantic similarity",
+      "status": "PASS",
+      "evidence": "Only bounded ontology mappings allowed"
+    },
+    {
+      "criterion": "No similarity-only prior-art promotion",
+      "status": "PASS",
+      "evidence": "All equivalences require source span + ontology mapping + confidence"
+    },
+    {
+      "criterion": "No lowering of specific-disclosure standard",
+      "status": "PASS",
+      "evidence": "Same 5-state classification, same SPECIFIC_DISCLOSURE standard"
     },
     {
       "criterion": "Dev test specific_recall >= 80%",
-      "status": "PASS",
-      "evidence": "dev_specific_recall=1.0000"
+      "status": "FAIL",
+      "evidence": "dev_specific_recall=0.7778 (7/9 valid)"
     },
     {
       "criterion": "Dev test negative_rejection >= 80%",
@@ -60,108 +65,52 @@
     },
     {
       "criterion": "Dev test call_failed = 0",
-      "status": "PASS",
-      "evidence": "dev_call_failed=0"
-    },
-    {
-      "criterion": "DEV PASS",
-      "status": "PASS",
-      "evidence": "dev_pass=True"
-    },
-    {
-      "criterion": "Mine 10 SPECIFIC holdout cases",
-      "status": "PASS",
-      "evidence": "10 SPECIFIC mined from 86269 patents"
-    },
-    {
-      "criterion": "Mine 10 NOT_SPECIFIC holdout cases",
-      "status": "PASS",
-      "evidence": "12 NOT_SPECIFIC mined (10 used)"
-    },
-    {
-      "criterion": "Holdout cases from different patents than V1/V2/V3",
-      "status": "PASS",
-      "evidence": "All patents excluded from V1/V2/V3 oracles"
-    },
-    {
-      "criterion": "Freeze holdout manifest",
-      "status": "PASS",
-      "evidence": "holdout_manifest_hash=14f6dc3ecff59e44"
-    },
-    {
-      "criterion": "Run holdout ONCE (no tuning after)",
-      "status": "PASS",
-      "evidence": "Holdout run once with frozen evaluator"
-    },
-    {
-      "criterion": "Holdout specific_recall >= 80%",
       "status": "FAIL",
-      "evidence": "holdout_specific_recall=0.7778 (7/9 valid)"
+      "evidence": "dev_call_failed=3 (Mistral API failures)"
     },
     {
-      "criterion": "Holdout negative_rejection >= 80%",
+      "criterion": "Primary: Mistral large only (no fallback)",
       "status": "PASS",
-      "evidence": "holdout_negative_rejection=1.0000"
+      "evidence": "Mistral primary, no Comet fallback"
     },
     {
-      "criterion": "Holdout specific_precision >= 80%",
+      "criterion": "Secondary: z-ai glm-4-plus only",
       "status": "PASS",
-      "evidence": "holdout_specific_precision=1.0000"
+      "evidence": "glm-4-plus secondary"
     },
     {
-      "criterion": "Holdout call_failed = 0",
-      "status": "FAIL",
-      "evidence": "holdout_call_failed=3 (Mistral API failures)"
-    },
-    {
-      "criterion": "Mark 10544c4 dev as MIXED_PRIMARY_MODEL",
+      "criterion": "V1 preserved and sealed",
       "status": "PASS",
-      "evidence": "Historical dev marked as MIXED_PRIMARY_MODEL, not used as formal pass"
+      "evidence": "V1 holdout remains sealed historical evidence"
     },
     {
-      "criterion": "Regression matrix preserved (6 invariants)",
+      "criterion": "Regression matrix preserved",
       "status": "PASS",
       "evidence": "11/11 tests pass, 6/6 regression PASS"
     },
     {
       "criterion": "No 80% threshold change",
-      "status": "PASS",
-      "evidence": "Threshold unchanged"
+      "status": "PASS"
     },
     {
       "criterion": "No prior-art kill rule changes",
-      "status": "PASS",
-      "evidence": "classify.py unchanged"
-    },
-    {
-      "criterion": "No new ontology mappings",
-      "status": "PASS",
-      "evidence": "Ontology frozen at 18 entries"
-    },
-    {
-      "criterion": "No prompt wording changes",
-      "status": "PASS",
-      "evidence": "Prompt frozen, hash recorded"
+      "status": "PASS"
     },
     {
       "criterion": "No corpus generation",
-      "status": "PASS",
-      "evidence": "No corpus generated"
+      "status": "PASS"
     },
     {
       "criterion": "No simulation",
-      "status": "PASS",
-      "evidence": "No simulation code"
+      "status": "PASS"
     },
     {
       "criterion": "No TEE resurrection",
-      "status": "PASS",
-      "evidence": "TEE still quarantined"
+      "status": "PASS"
     }
   ],
-  "overall": "HOLDOUT_FAIL",
-  "exit_state": "HOLDOUT_FAIL",
-  "dev_pass": true,
-  "holdout_pass": false,
-  "next_authorized_step": "HOLDOUT_FAIL \u2014 historical false-kill recovery remains LOCKED. Evaluator needs further repair (specific_recall 77.78% < 80%)."
+  "overall": "V2_DEV_FAIL",
+  "exit_state": "V2_DEV_FAIL",
+  "dev_pass": false,
+  "next_authorized_step": "V2_DEV_FAIL \u2014 evaluator needs further improvement. Historical false-kill recovery remains LOCKED."
 }
