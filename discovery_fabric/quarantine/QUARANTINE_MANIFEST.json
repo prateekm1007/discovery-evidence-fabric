@@ -1,0 +1,30 @@
+{
+  "quarantine_version": "v1",
+  "quarantined_at": "2026-08-14T00:00:00Z",
+  "reason": "Task 7 + Task 7.1 ablation showed TEE mechanism pipeline has negative expected value (10% QDR vs 40% for plain LLM synthesis). The first performance drop occurs at MechanismExtractor stage.",
+  "evidence": {
+    "task_7_commit": "68ee54c",
+    "task_7_result": "A2_TEE = 10% QDR, A2_SYNTHESIS_GUIDED = 40% QDR",
+    "task_7_1_commit": "0457aeb",
+    "task_7_1_result": "Ablation: A to B drop of -25pp at MechanismExtractor stage",
+    "fisher_exact_tee_vs_synth": "p=0.9837 (TEE is WORSE, not significant)"
+  },
+  "quarantined_components": [
+    {
+      "component": "tee-mechanism-extraction",
+      "reason": "MechanismExtractor destroys useful information. Feeding extracted graph to LLM hurts vs raw abstract.",
+      "experiment": "Task 7.1 ablation: A->B transition = -25pp QDR drop"
+    },
+    {
+      "component": "tee-abstraction",
+      "reason": "Abstraction does not cause additional drop beyond extraction, but adds no value.",
+      "experiment": "Task 7.1 ablation: B->C transition = 0pp"
+    },
+    {
+      "component": "tee-transfer",
+      "reason": "Transfer engine does not cause additional drop, but full pipeline is 30pp worse than plain LLM.",
+      "experiment": "Task 7.1 ablation: C->D transition = 0pp"
+    }
+  ],
+  "reopening_condition": "A future experiment may reopen one component ONLY if a measured problem appears that the simpler A2 (plain LLM synthesis) cannot solve, AND the reopening is pre-registered as a new experiment."
+}
