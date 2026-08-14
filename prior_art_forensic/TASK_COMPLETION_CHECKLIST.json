@@ -1,37 +1,56 @@
 {
-  "experiment": "PATENT_ACCESS_RECOVERY",
-  "timestamp": "2026-08-14T05:16:54.918905+00:00",
-  "sources_tested": 10,
-  "active_with_claims": 1,
-  "pending_with_claims": 3,
+  "experiment": "PATENT_CLAIM_ENDPOINT_VERIFICATION_V4",
+  "timestamp": "2026-08-14T05:34:35.212205+00:00",
+  "existing_connectors_checked": true,
+  "existing_patent_connectors": "None \u2014 README lists USPTO/EPO/WIPO as TODO only",
+  "endpoints_tested": 7,
+  "claim_data_available": false,
   "calibration_status": "BLOCKED",
-  "block_type": "CREDENTIAL_BLOCKED + INTEGRATION_BLOCKED",
-  "fastest_unblock_path": "EPO OPS registration (free, provides full claim text)",
   "checklist": [
     {
-      "criterion": "All patent sources tested",
+      "criterion": "Existing connectors checked",
       "status": "PASS",
-      "evidence": "10 sources tested, results in PATENT_SOURCE_ACCESS_V3.json"
+      "evidence": "No patent connectors exist in repo. Only OpenAlex mapper implemented."
     },
     {
-      "criterion": "Full claim text accessible",
+      "criterion": "PatentsView g_claim tested",
       "status": "FAIL",
-      "evidence": "0 ACTIVE sources with full claim text. HuggingFace AIPD has claims but insufficient device patents + rate-limited."
+      "evidence": "ENDPOINT_UNAVAILABLE \u2014 301 redirect to USPTO ODP HTML"
     },
     {
-      "criterion": "Block type classified",
-      "status": "PASS",
-      "evidence": "CREDENTIAL_BLOCKED (3), ACCESS_BLOCKED (5), INTEGRATION_BLOCKED (1)"
-    },
-    {
-      "criterion": "20-case oracle from real patent claims",
+      "criterion": "PatentsView pg_claim tested",
       "status": "FAIL",
-      "evidence": "Cannot build without full patent claim text access"
+      "evidence": "ENDPOINT_UNAVAILABLE \u2014 301 redirect to USPTO ODP HTML"
+    },
+    {
+      "criterion": "USPTO ODP tested",
+      "status": "FAIL",
+      "evidence": "AUTHENTICATION_BLOCKED \u2014 Missing Authentication Token"
+    },
+    {
+      "criterion": "EPO OPS tested",
+      "status": "FAIL",
+      "evidence": "AUTHENTICATION_BLOCKED \u2014 403 Fair Use policy"
+    },
+    {
+      "criterion": "Medical device sample tested",
+      "status": "FAIL",
+      "evidence": "Cannot test without claim text access"
+    },
+    {
+      "criterion": "Coverage test completed",
+      "status": "FAIL",
+      "evidence": "Cannot test without claim text access"
+    },
+    {
+      "criterion": "20-case oracle built",
+      "status": "FAIL",
+      "evidence": "Cannot build without claim text"
     },
     {
       "criterion": "Calibration >=80%",
       "status": "FAIL",
-      "evidence": "Cannot run calibration without oracle"
+      "evidence": "Cannot run without oracle"
     },
     {
       "criterion": "No threshold tuning",
@@ -53,5 +72,8 @@
       "status": "PASS",
       "evidence": "TEE quarantined"
     }
-  ]
+  ],
+  "overall": "CALIBRATION_BLOCKED",
+  "block_type": "CREDENTIAL_BLOCKED + ENDPOINT_UNAVAILABLE",
+  "unblock_path": "EPO OPS registration at developers.epo.org (free, provides full claim text)"
 }
