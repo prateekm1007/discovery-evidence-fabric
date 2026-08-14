@@ -1,0 +1,73 @@
+{
+  "experiment": "HISTORICAL_RECOVERY_V1_FORENSIC_CLOSEOUT",
+  "timestamp": "2026-08-14T22:48:43.866065+00:00",
+  "input_commit": "5276d414660ff0e551428064c999468e060c7ed9",
+  "checklist": [
+    {
+      "criterion": "Correct recovery statistics (CALL_FAILED \u2260 false kill)",
+      "status": "PASS",
+      "evidence": "false_kill=18, specific=5, unresolved=0"
+    },
+    {
+      "criterion": "Retry 4 CALL_FAILED cases",
+      "status": "PASS",
+      "evidence": "All 4 resolved: 2 TOPICAL_ONLY, 2 SPECIFIC_PRIOR_ART"
+    },
+    {
+      "criterion": "Re-run adversarial on AIC:V1:p0002",
+      "status": "PASS",
+      "evidence": "All 7 dimensions evaluated: KILLED"
+    },
+    {
+      "criterion": "UNKNOWN is NOT PASS",
+      "status": "PASS",
+      "evidence": "All dimensions have explicit verdicts (no UNKNOWN)"
+    },
+    {
+      "criterion": "KILLED dimensions block AIC promotion",
+      "status": "PASS",
+      "evidence": "All 7 dimensions KILLED \u2192 candidate downgraded to RECOVERED_CANDIDATE_PENDING_ADVERSARIAL"
+    },
+    {
+      "criterion": "Do not promote on incomplete adversarial data",
+      "status": "PASS",
+      "evidence": "AIC not promoted \u2014 status is RECOVERED_CANDIDATE_PENDING_ADVERSARIAL"
+    },
+    {
+      "criterion": "Check evidence grounding",
+      "status": "PASS",
+      "evidence": "Source ID and hash verified"
+    },
+    {
+      "criterion": "Check target alignment",
+      "status": "PASS",
+      "evidence": "Device, failure mode, mechanism, intervention all aligned"
+    },
+    {
+      "criterion": "No new candidates generated",
+      "status": "PASS"
+    },
+    {
+      "criterion": "No simulation",
+      "status": "PASS"
+    },
+    {
+      "criterion": "No TEE resurrection",
+      "status": "PASS"
+    },
+    {
+      "criterion": "Regression matrix preserved",
+      "status": "PASS",
+      "evidence": "6/6 PASS, 11/11 tests PASS"
+    }
+  ],
+  "final_report": {
+    "CONFIRMED_FALSE_KILL_RATE": "18/24",
+    "CONFIRMED_SPECIFIC_PRIOR_ART_RATE": "5/24",
+    "UNRESOLVED_RATE": "0/24",
+    "RECOVERED_CANDIDATE_COUNT": 1,
+    "RECOVERED_AIC_COUNT": 0
+  },
+  "overall": "COMPLETE \u2014 0 AICs promoted (candidate failed adversarial review)",
+  "next_authorized_step": "Do not begin the 1,000+ forward corpus in this task."
+}
