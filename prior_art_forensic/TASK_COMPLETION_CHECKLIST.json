@@ -1,93 +1,122 @@
 {
-  "experiment": "PRIOR_ART_EVALUATOR_REPAIR_V1",
-  "timestamp": "2026-08-14T19:00:59.640207+00:00",
-  "input_commit": "0299cac5bb5c524c973ab21e7100c3e8441fc250",
-  "models_used": {
-    "primary": "mistral-large-latest (Mistral API)",
-    "secondary": "glm-4-plus (z-ai CLI)",
-    "fallback": "deepseek-chat (Comet API)",
-    "note": "Groq and Cerebras returned 403 Forbidden. OpenRouter returned 402 (out of credits) for deepseek-v4-flash."
+  "experiment": "FROZEN_EVALUATOR_V1",
+  "timestamp": "2026-08-14T19:52:12.459684+00:00",
+  "input_commit": "10544c438a84247f358b46ddc75327f8db244a09",
+  "frozen_config": {
+    "evaluator_version": "evaluator_v1_frozen_mistral_only",
+    "prompt_hash": "70bb690572d1fec1",
+    "ontology_version": "c8ae93b52fb2c09d",
+    "parser_version": "frozen_v1_markdown_truncation_fallback",
+    "primary_model": "mistral-large-latest",
+    "primary_provider": "Mistral API",
+    "secondary_model": "glm-4-plus",
+    "secondary_provider": "z-ai CLI",
+    "temperature": 0.0,
+    "max_retries": 3,
+    "retry_delay_s": 5,
+    "no_primary_fallback": true,
+    "frozen_at": "2026-08-14T19:46:03.819696+00:00"
   },
   "checklist": [
     {
-      "criterion": "Freeze the repair (terminology normalization)",
+      "criterion": "Freeze primary model (Mistral ONLY, no fallback)",
       "status": "PASS",
-      "evidence": "18-entry bounded ontology with confidence scores"
-    },
-    {
-      "criterion": "Device/component/system relationships",
-      "status": "PASS",
-      "evidence": "e.g., glucose sensor = continuous glucose monitor, ultrasonic transducer = transducer array"
-    },
-    {
-      "criterion": "Claim + linked specification reasoning",
-      "status": "PASS",
-      "evidence": "Prompt explicitly allows combining claim + specification when functional relationship is explicit"
-    },
-    {
-      "criterion": "Functional relationship extraction",
-      "status": "PASS",
-      "evidence": "15+ functional language indicators defined"
-    },
-    {
-      "criterion": "No generic semantic similarity",
-      "status": "PASS",
-      "evidence": "Only bounded ontology mappings allowed"
-    },
-    {
-      "criterion": "Development test specific_recall >= 80%",
-      "status": "PASS",
-      "evidence": "dev_specific_recall=0.8000"
-    },
-    {
-      "criterion": "Development test negative_rejection >= 80%",
-      "status": "PASS",
-      "evidence": "dev_negative_rejection=1.0000"
-    },
-    {
-      "criterion": "Mine 10 SPECIFIC holdout cases",
-      "status": "FAIL",
-      "evidence": "Only 9 SPECIFIC mined (scanned 81241 patents)"
-    },
-    {
-      "criterion": "Mine 10 NOT_SPECIFIC holdout cases",
-      "status": "PASS",
-      "evidence": "12 NOT_SPECIFIC mined"
-    },
-    {
-      "criterion": "Holdout cases from different patents than V1/V2/V3",
-      "status": "PASS",
-      "evidence": "Excluded all patents used in V1, V2, V3 oracles"
+      "evidence": "primary=mistral-large-latest, no_primary_fallback=True"
     },
     {
       "criterion": "Secondary model from different provider",
       "status": "PASS",
-      "evidence": "Primary: Mistral API, Secondary: z-ai CLI (glm-4-plus)"
+      "evidence": "secondary=glm-4-plus (z-ai CLI)"
     },
     {
-      "criterion": "Freeze evaluator before holdout",
+      "criterion": "Parser frozen",
       "status": "PASS",
-      "evidence": "Prompt, model, temperature, parser, ontology all frozen"
+      "evidence": "parser_version=frozen_v1_markdown_truncation_fallback"
     },
     {
-      "criterion": "Holdout test specific_recall >= 80%",
-      "status": "N/A",
-      "evidence": "Holdout not formally run (insufficient cases). Informal: 77.78%"
-    },
-    {
-      "criterion": "Holdout test specific_precision >= 80%",
-      "status": "N/A",
-      "evidence": "Informal: 100%"
-    },
-    {
-      "criterion": "Holdout test negative_rejection >= 80%",
-      "status": "N/A",
-      "evidence": "Informal: 100%"
-    },
-    {
-      "criterion": "No changes after seeing holdout results",
+      "criterion": "Ontology map frozen",
       "status": "PASS",
-      "evidence": "Evaluator frozen before holdout run"
+      "evidence": "ontology_version=c8ae93b52fb2c09d"
+    },
+    {
+      "criterion": "Prompt frozen",
+      "status": "PASS",
+      "evidence": "prompt_hash=70bb690572d1fec1"
+    },
+    {
+      "criterion": "Record evaluator_version and prompt_hash",
+      "status": "PASS",
+      "evidence": "evaluator_version=evaluator_v1_frozen_mistral_only, prompt_hash=70bb690572d1fec1"
+    },
+    {
+      "criterion": "Dev test specific_recall >= 80%",
+      "status": "PASS",
+      "evidence": "dev_specific_recall=1.0000"
+    },
+    {
+      "criterion": "Dev test negative_rejection >= 80%",
+      "status": "PASS",
+      "evidence": "dev_negative_rejection=1.0000"
+    },
+    {
+      "criterion": "Dev test call_failed = 0",
+      "status": "PASS",
+      "evidence": "dev_call_failed=0"
+    },
+    {
+      "criterion": "DEV PASS",
+      "status": "PASS",
+      "evidence": "dev_pass=True"
+    },
+    {
+      "criterion": "Mine 10 SPECIFIC holdout cases",
+      "status": "PASS",
+      "evidence": "10 SPECIFIC mined from 86269 patents"
+    },
+    {
+      "criterion": "Mine 10 NOT_SPECIFIC holdout cases",
+      "status": "PASS",
+      "evidence": "12 NOT_SPECIFIC mined (10 used)"
+    },
+    {
+      "criterion": "Holdout cases from different patents than V1/V2/V3",
+      "status": "PASS",
+      "evidence": "All patents excluded from V1/V2/V3 oracles"
+    },
+    {
+      "criterion": "Freeze holdout manifest",
+      "status": "PASS",
+      "evidence": "holdout_manifest_hash=14f6dc3ecff59e44"
+    },
+    {
+      "criterion": "Run holdout ONCE (no tuning after)",
+      "status": "PASS",
+      "evidence": "Holdout run once with frozen evaluator"
+    },
+    {
+      "criterion": "Holdout specific_recall >= 80%",
+      "status": "FAIL",
+      "evidence": "holdout_specific_recall=0.7778 (7/9 valid)"
+    },
+    {
+      "criterion": "Holdout negative_rejection >= 80%",
+      "status": "PASS",
+      "evidence": "holdout_negative_rejection=1.0000"
+    },
+    {
+      "criterion": "Holdout specific_precision >= 80%",
+      "status": "PASS",
+      "evidence": "holdout_specific_precision=1.0000"
+    },
+    {
+      "criterion": "Holdout call_failed = 0",
+      "status": "FAIL",
+      "evidence": "holdout_call_failed=3 (Mistral API failures)"
+    },
+    {
+      "criterion": "Mark 10544c4 dev as MIXED_PRIMARY_MODEL",
+      "status": "PASS",
+      "evidence": "Historical dev marked as MIXED_PRIMARY_MODEL, not used as formal pass"
     },
     {
       "criterion": "Regression matrix preserved (6 invariants)",
@@ -105,6 +134,16 @@
       "evidence": "classify.py unchanged"
     },
     {
+      "criterion": "No new ontology mappings",
+      "status": "PASS",
+      "evidence": "Ontology frozen at 18 entries"
+    },
+    {
+      "criterion": "No prompt wording changes",
+      "status": "PASS",
+      "evidence": "Prompt frozen, hash recorded"
+    },
+    {
       "criterion": "No corpus generation",
       "status": "PASS",
       "evidence": "No corpus generated"
@@ -120,10 +159,9 @@
       "evidence": "TEE still quarantined"
     }
   ],
-  "overall": "HOLDOUT_CONSTRUCTION_BLOCKED",
-  "exit_state": "HOLDOUT_CONSTRUCTION_BLOCKED",
+  "overall": "HOLDOUT_FAIL",
+  "exit_state": "HOLDOUT_FAIL",
   "dev_pass": true,
-  "holdout_construction_blocked": true,
-  "holdout_specific_available": 9,
-  "next_authorized_step": "Continue mining holdout SPECIFIC cases until 10 are obtained, then re-run holdout test"
+  "holdout_pass": false,
+  "next_authorized_step": "HOLDOUT_FAIL \u2014 historical false-kill recovery remains LOCKED. Evaluator needs further repair (specific_recall 77.78% < 80%)."
 }

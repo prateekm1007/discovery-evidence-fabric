@@ -1,6 +1,6 @@
-# PRIOR-ART EVALUATOR REPAIR V1
+# PRIOR-ART EVALUATOR REPAIR V1 — FROZEN
 
-## Status: HOLDOUT_CONSTRUCTION_BLOCKED
+## Status: HOLDOUT_FAIL
 
 ## Frozen Evaluator Configuration
 
@@ -8,40 +8,41 @@
 |-----------|-------|
 | Primary model | mistral-large-latest |
 | Primary provider | Mistral API |
+| No primary fallback | True |
 | Secondary model | glm-4-plus |
-| Secondary provider | z-ai CLI (glm-4-plus) |
+| Secondary provider | z-ai CLI |
 | Temperature | 0.0 |
-| Parser | line-based with truncation normalization |
-| Ontology map | TERM_ONTOLOGY (18 entries covering 10 device/mechanism pairs) |
-| Evaluator version | evaluator_repair_v1_frozen |
+| Max retries | 3 |
+| Prompt hash | 70bb690572d1fec1 |
+| Ontology version | c8ae93b52fb2c09d |
+| Parser version | frozen_v1_markdown_truncation_fallback |
+| Evaluator version | evaluator_v1_frozen_mistral_only |
 
-## Repair Summary
+## Historical Dev Result (commit 10544c4) — MIXED_PRIMARY_MODEL
 
-The repaired evaluator addresses:
-1. **Terminology normalization** — bounded ontology with 18 entries covering 10 device/mechanism pairs
-2. **Device/component/system relationships** — explicit equivalence mappings (e.g., "glucose sensor" = "continuous glucose monitor")
-3. **Claim + linked specification reasoning** — evaluator may combine tightly linked patent sections when functional relationship is explicit
-4. **Functional relationship extraction** — explicit indicators: "configured to", "comprises", "wherein", "permeable to", etc.
+The dev result from commit 10544c4 is marked as **MIXED_PRIMARY_MODEL** because at least one case used Comet/deepseek-chat as primary fallback. It is retained as historical evidence but is NOT used as the formal frozen-evaluator pass.
 
-Every resolved equivalence points to: source text span, ontology mapping, mapping confidence.
+| Metric | Value | Formal? |
+|--------|-------|---------|
+| dev_specific_recall | 0.80 | NO (mixed model) |
+| dev_negative_rejection | 1.00 | NO (mixed model) |
 
-No generic semantic similarity is used.
-
-## Development Test Results (V3 development set)
+## Formal Dev Test (FROZEN, Mistral primary ONLY)
 
 | Metric | Value | Threshold | Pass |
 |--------|-------|-----------|------|
-| specific_recall | 0.8000 | ≥ 0.80 | ✓ |
-| negative_rejection | 1.0000 | ≥ 0.80 | ✓ |
+| specific_recall | 1.0000 | >= 0.80 | ✓ |
+| negative_rejection | 1.0000 | >= 0.80 | ✓ |
 | specific_precision | 1.0000 | — | — |
+| call_failed | 0 | 0 | ✓ |
 | **DEV PASS** | | | **✓** |
 
 ### Dev Case Details
 
-| Case | Device | Mechanism | Ground Truth | Primary | Secondary | Match | Failure Mode |
-|------|--------|-----------|--------------|---------|-----------|-------|--------------|
+| Case | Device | Mechanism | GT | Primary | Secondary | Match | Mode |
+|------|--------|-----------|----|---------|-----------|-------|------|
 | oracle_v3_specific_01 | continuous glucose monitor | biocompatible membrane | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | TOPICAL_RELATED | ✓ | TRUE_POSITIVE |
-| oracle_v3_specific_02 | ultrasound system | transducer array | SPECIFIC_DISCLOSURE | TOPICAL_RELATED | TOPICAL_RELATED | ✗ | RELATIONSHIP_EXTRACTION_FAILURE |
+| oracle_v3_specific_02 | ultrasound system | transducer array | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | TOPICAL_RELATED | ✓ | TRUE_POSITIVE |
 | oracle_v3_specific_03 | spinal fusion device | pedicle screw | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | ✓ | TRUE_POSITIVE |
 | oracle_v3_specific_04 | ultrasound system | transducer array | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | TOPICAL_RELATED | ✓ | TRUE_POSITIVE |
 | oracle_v3_specific_05 | insulin pump | closed-loop control | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | ✓ | TRUE_POSITIVE |
@@ -51,29 +52,56 @@ No generic semantic similarity is used.
 | oracle_v3_negative_04 | Coronary Stent | drug-eluting coating | NOT_SPECIFIC_DISCLOSURE | NO_MATCH_FOUND | NO_MATCH_FOUND | ✓ | TRUE_NEGATIVE |
 | oracle_v3_negative_05 | Coronary Stent | drug-eluting coating | NOT_SPECIFIC_DISCLOSURE | NO_MATCH_FOUND | NO_MATCH_FOUND | ✓ | TRUE_NEGATIVE |
 
-### Dev Failure Modes
+## Holdout Test (10 SPECIFIC + 10 NOT_SPECIFIC, run ONCE)
 
-{
-  "TRUE_POSITIVE": 4,
-  "RELATIONSHIP_EXTRACTION_FAILURE": 1,
-  "TRUE_NEGATIVE": 5
-}
+| Metric | Value | Threshold | Pass |
+|--------|-------|-----------|------|
+| specific_recall | 0.7778 | >= 0.80 | ✗ |
+| negative_rejection | 1.0000 | >= 0.80 | ✓ |
+| specific_precision | 1.0000 | >= 0.80 | ✓ |
+| call_failed | 3 | 0 | ✗ |
+| **HOLDOUT PASS** | | | **✗** |
 
-## Holdout Status
+### Holdout Case Details
 
-- SPECIFIC holdout cases mined: 9 (target: 10)
-- NOT_SPECIFIC holdout cases mined: 12 (target: 10)
-- Patents scanned: 81241
+| Case | Device | Mechanism | GT | Primary | Secondary | Match | Mode |
+|------|--------|-----------|----|---------|-----------|-------|------|
+| 17767816 | ultrasound system | transducer array | SPECIFIC_DISCLOSURE | POSSIBLE_RELEVANCE | TOPICAL_RELATED | ✗ | SPECIFICATION_LINKAGE |
+| 17810608 | ultrasound system | transducer array | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | ✓ | TRUE_POSITIVE |
+| 25228654 | insulin pump | closed-loop control | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | TOPICAL_RELATED | ✓ | TRUE_POSITIVE |
+| 28393619 | spinal fusion device | pedicle screw | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | ✓ | TRUE_POSITIVE |
+| 21297198 | insulin pump | closed-loop control | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | TOPICAL_RELATED | ✓ | TRUE_POSITIVE |
+| 25254346 | continuous glucose monitor | biocompatible membrane | SPECIFIC_DISCLOSURE | EVALUATOR_CALL_FAILED | TOPICAL_RELATED | ✗ | CALL_FAILED |
+| 27489049 | spinal fusion device | pedicle screw | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | TOPICAL_RELATED | ✓ | TRUE_POSITIVE |
+| 27833708 | cardiac pacemaker | adaptive pacing | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | ✓ | TRUE_POSITIVE |
+| 23667529 | coronary stent | drug-eluting coating | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | SPECIFIC_DISCLOSURE | ✓ | TRUE_POSITIVE |
+| 21999911 | intraocular lens | antimicrobial coating | SPECIFIC_DISCLOSURE | NO_MATCH_FOUND | NO_MATCH_FOUND | ✗ | FALSE_NEGATIVE |
+| 17354769 | intraocular lens | antimicrobial coating | NOT_SPECIFIC_DISCLOSURE | EVALUATOR_CALL_FAILED | NO_MATCH_FOUND | ✗ | CALL_FAILED |
+| 17371440 | intraocular lens | antimicrobial coating | NOT_SPECIFIC_DISCLOSURE | NO_MATCH_FOUND | NO_MATCH_FOUND | ✓ | TRUE_NEGATIVE |
+| 17391298 | intraocular lens | antimicrobial coating | NOT_SPECIFIC_DISCLOSURE | NO_MATCH_FOUND | NO_MATCH_FOUND | ✓ | TRUE_NEGATIVE |
+| 17397856 | intraocular lens | antimicrobial coating | NOT_SPECIFIC_DISCLOSURE | NO_MATCH_FOUND | NO_MATCH_FOUND | ✓ | TRUE_NEGATIVE |
+| 17411524 | intraocular lens | antimicrobial coating | NOT_SPECIFIC_DISCLOSURE | NO_MATCH_FOUND | NO_MATCH_FOUND | ✓ | TRUE_NEGATIVE |
+| 17416348 | intraocular lens | antimicrobial coating | NOT_SPECIFIC_DISCLOSURE | EVALUATOR_CALL_FAILED | NO_MATCH_FOUND | ✗ | CALL_FAILED |
+| 17416717 | intraocular lens | antimicrobial coating | NOT_SPECIFIC_DISCLOSURE | NO_MATCH_FOUND | NO_MATCH_FOUND | ✓ | TRUE_NEGATIVE |
+| 17432515 | intraocular lens | antimicrobial coating | NOT_SPECIFIC_DISCLOSURE | NO_MATCH_FOUND | NO_MATCH_FOUND | ✓ | TRUE_NEGATIVE |
+| 17440301 | intraocular lens | antimicrobial coating | NOT_SPECIFIC_DISCLOSURE | NO_MATCH_FOUND | NO_MATCH_FOUND | ✓ | TRUE_NEGATIVE |
+| 17440471 | intraocular lens | antimicrobial coating | NOT_SPECIFIC_DISCLOSURE | NO_MATCH_FOUND | NO_MATCH_FOUND | ✓ | TRUE_NEGATIVE |
 
-**Status: HOLDOUT_CONSTRUCTION_BLOCKED** — only 9 SPECIFIC holdout cases available (need 10 per spec Section 3)
+## Exit State
 
-Per spec: "If fewer than 10 valid positives can be obtained: do NOT substitute 2/5/etc. Continue mining or declare: HOLDOUT_CONSTRUCTION_BLOCKED"
+Per spec Section 10:
+- DEV_PASS: True
+- HOLDOUT_PASS: False
+- **Exit: HOLDOUT_FAIL**
+
+Only DEV_PASS AND HOLDOUT_PASS → CALIBRATION_PASS. Historical false-kill recovery remains LOCKED.
 
 ## Governance Invariants (all preserved)
 
 - 80% threshold: UNCHANGED
-- Prior-art kill semantics: UNCHANGED (6/6 regression PASS)
-- No broad semantic similarity
+- Prior-art kill semantics: UNCHANGED (6/6 regression PASS, 11/11 tests PASS)
+- No new ontology mappings added
+- No prompt wording changes after freezing
 - No corpus generation
 - No simulation
 - TEE still quarantined
