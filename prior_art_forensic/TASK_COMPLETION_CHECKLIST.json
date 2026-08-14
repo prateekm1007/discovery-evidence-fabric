@@ -1,38 +1,37 @@
 {
-  "experiment": "PATENT_CALIBRATION_REPAIR",
-  "timestamp": "2026-08-14T04:56:16.522329+00:00",
-  "sources_tested": 9,
-  "active_with_claims": 0,
-  "pending_with_claims": 2,
+  "experiment": "PATENT_ACCESS_RECOVERY",
+  "timestamp": "2026-08-14T05:16:54.918905+00:00",
+  "sources_tested": 10,
+  "active_with_claims": 1,
+  "pending_with_claims": 3,
   "calibration_status": "BLOCKED",
-  "blocking_reason": "No machine-readable patent source with full claim text accessible",
-  "regression_matrix_status": "PASS (all 6 rows)",
-  "classify_fix_status": "APPLIED (TOPICAL_RELATED no longer kills)",
+  "block_type": "CREDENTIAL_BLOCKED + INTEGRATION_BLOCKED",
+  "fastest_unblock_path": "EPO OPS registration (free, provides full claim text)",
   "checklist": [
     {
-      "criterion": "Patent sources verified",
+      "criterion": "All patent sources tested",
       "status": "PASS",
-      "evidence": "9 sources tested, results in PATENT_SOURCE_ACCESS_V2.json"
+      "evidence": "10 sources tested, results in PATENT_SOURCE_ACCESS_V3.json"
     },
     {
       "criterion": "Full claim text accessible",
       "status": "FAIL",
-      "evidence": "No ACTIVE source provides full claim text. EPO OPS and USPTO require credentials."
+      "evidence": "0 ACTIVE sources with full claim text. HuggingFace AIPD has claims but insufficient device patents + rate-limited."
     },
     {
-      "criterion": "20 calibration cases from real patent claims",
-      "status": "FAIL",
-      "evidence": "Cannot build without patent claim text access"
-    },
-    {
-      "criterion": "Calibration >=80% on non-ambiguous",
-      "status": "FAIL",
-      "evidence": "V1: 70%, V2: 50% \u2014 snippets insufficient"
-    },
-    {
-      "criterion": "Regression matrix all 6 rows pass",
+      "criterion": "Block type classified",
       "status": "PASS",
-      "evidence": "All 6 rows pass after classify.py fix"
+      "evidence": "CREDENTIAL_BLOCKED (3), ACCESS_BLOCKED (5), INTEGRATION_BLOCKED (1)"
+    },
+    {
+      "criterion": "20-case oracle from real patent claims",
+      "status": "FAIL",
+      "evidence": "Cannot build without full patent claim text access"
+    },
+    {
+      "criterion": "Calibration >=80%",
+      "status": "FAIL",
+      "evidence": "Cannot run calibration without oracle"
     },
     {
       "criterion": "No threshold tuning",
@@ -42,7 +41,7 @@
     {
       "criterion": "No corpus generated",
       "status": "PASS",
-      "evidence": "No corpus generation in this task"
+      "evidence": "No corpus generation"
     },
     {
       "criterion": "No simulation",
