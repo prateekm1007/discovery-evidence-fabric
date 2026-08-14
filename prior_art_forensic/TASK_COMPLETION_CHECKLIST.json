@@ -1,60 +1,87 @@
 {
-  "experiment": "CALIBRATION_GATE_FORENSIC",
-  "timestamp": "2026-08-14T22:07:24.115934+00:00",
-  "input_commit": "78b0383a26186f5a34d4cd294324201d35a0b4fc",
+  "experiment": "ADVERSARIAL_RECOVERY_STATE_CLOSEOUT",
+  "timestamp": "2026-08-14T23:02:28.432838+00:00",
+  "input_commit": "74bade0e593e1b36575653f46fe8bd1927b4c118",
   "checklist": [
     {
-      "criterion": "Forensically audit alleged oracle bugs",
+      "criterion": "Fix state machine: PENDING \u2192 REJECTED/INSUFFICIENT",
       "status": "PASS",
-      "evidence": "Case 21999911: IOL regex matched 'iol' in 'diol' \u2014 proven oracle bug"
+      "evidence": "final_state=RECOVERED_CANDIDATE_ADVERSARIAL_INSUFFICIENT_EVIDENCE"
     },
     {
-      "criterion": "Correct label if proven wrong",
+      "criterion": "aic_status = RECOVERED_CANDIDATE_ADVERSARIAL_INSUFFICIENT_EVIDENCE",
       "status": "PASS",
-      "evidence": "Case 21999911 corrected from SPECIFIC_DISCLOSURE to NOT_SPECIFIC_DISCLOSURE"
+      "evidence": "RECOVERED_CANDIDATE_ADVERSARIAL_INSUFFICIENT_EVIDENCE"
     },
     {
-      "criterion": "Rebuild holdout manifest",
+      "criterion": "aic_promotion = BLOCKED",
+      "status": "PASS"
+    },
+    {
+      "criterion": "recovery_status updated in all artifacts",
       "status": "PASS",
-      "evidence": "hash=f5d616f6a48b8052"
+      "evidence": "4 files updated"
     },
     {
-      "criterion": "Re-run holdout with frozen evaluator (no cache)",
+      "criterion": "Audit mechanism_validity for specific evidence",
       "status": "PASS",
-      "evidence": "19 cases evaluated from raw patent text"
+      "evidence": "INSUFFICIENT_EVIDENCE \u2014 reason is generic"
     },
     {
-      "criterion": "Max 3 retries, 5s backoff",
+      "criterion": "Audit transfer_validity for specific evidence",
       "status": "PASS",
-      "evidence": "Retry policy followed"
+      "evidence": "INSUFFICIENT_EVIDENCE \u2014 reason is generic"
     },
     {
-      "criterion": "specific_recall >= 80%",
+      "criterion": "Audit boundary_failure for specific boundary condition",
       "status": "PASS",
-      "evidence": "sr=0.8750"
+      "evidence": "INSUFFICIENT_EVIDENCE \u2014 no specific boundary cited"
     },
     {
-      "criterion": "specific_precision >= 80%",
+      "criterion": "Audit obvious_combination for specific prior art",
       "status": "PASS",
-      "evidence": "sp=1.0000"
+      "evidence": "INSUFFICIENT_EVIDENCE \u2014 no specific reference cited"
     },
     {
-      "criterion": "negative_rejection >= 80%",
+      "criterion": "Audit engineering_feasibility for specific limitation",
       "status": "PASS",
-      "evidence": "nr=1.0000"
+      "evidence": "INSUFFICIENT_EVIDENCE \u2014 no specific limitation cited"
     },
     {
-      "criterion": "call_failures = 0",
-      "status": "FAIL",
-      "evidence": "cf=3 (Mistral 429 rate limiting)"
+      "criterion": "Audit regulatory_feasibility for specific limitation",
+      "status": "PASS",
+      "evidence": "INSUFFICIENT_EVIDENCE \u2014 no specific requirement cited"
     },
     {
-      "criterion": "CALIBRATION_PASS",
-      "status": "FAIL",
-      "evidence": "call_failures > 0 blocks pass per spec Section 5"
+      "criterion": "Audit falsifiability for specific untestable problem",
+      "status": "PASS",
+      "evidence": "INSUFFICIENT_EVIDENCE \u2014 candidate has concrete falsification test"
+    },
+    {
+      "criterion": "Preserve false_prior_art_kill fact",
+      "status": "PASS",
+      "evidence": "NO_MATCH_FOUND confirmed"
+    },
+    {
+      "criterion": "recovered_AIC = 0",
+      "status": "PASS"
+    },
+    {
+      "criterion": "recovered_candidate = 1",
+      "status": "PASS"
+    },
+    {
+      "criterion": "No retroactive rescue or kill",
+      "status": "PASS",
+      "evidence": "Only artifact honesty corrections"
+    },
+    {
+      "criterion": "Regression matrix preserved",
+      "status": "PASS",
+      "evidence": "6/6 PASS, 11/11 tests PASS"
     }
   ],
-  "overall": "HOLDOUT_FAIL",
-  "exit_state": "HOLDOUT_FAIL",
-  "next_authorized_step": "HOLDOUT_FAIL \u2014 3 API call failures block calibration pass. Retrying the 3 failed cases when Mistral rate limit clears may achieve CALIBRATION_PASS (all other metrics pass)."
+  "overall": "RECOVERED_CANDIDATE_ADVERSARIAL_INSUFFICIENT_EVIDENCE",
+  "recovered_AIC": 0,
+  "recovered_candidate": 1
 }
