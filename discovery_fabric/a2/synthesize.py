@@ -38,7 +38,7 @@ def llm_chat(prompt, system="", max_retries=2, timeout=60):
     messages = []
     if system: messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
-    payload = {"model": FROZEN_MODEL, "messages": messages, "max_tokens": 2000, "temperature": 0.3}
+    payload = {"model": FROZEN_MODEL, "messages": messages, "max_tokens": 8000, "temperature": 0.0}
     for attempt in range(max_retries + 1):
         try:
             req = urllib.request.Request(OPENROUTER_URL, data=json.dumps(payload).encode(),
@@ -95,7 +95,7 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
             "source_id": paper["id"],
             "source_hash": paper["content_hash"],
             "source_title": paper["title"],
-            "source_span": paper["abstract"][:500],
+            "source_span": paper["abstract"][:2000],
             "retrieval_timestamp": paper["retrieval_timestamp"],
         },
         "model": FROZEN_MODEL,
