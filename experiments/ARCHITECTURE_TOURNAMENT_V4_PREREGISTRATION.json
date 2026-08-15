@@ -1,0 +1,240 @@
+{
+  "experiment": "ARCHITECTURE_TOURNAMENT_V4",
+  "status": "PRE_REGISTERED",
+  "date": "2026-08-15",
+  "preregistration_version": "V4",
+  "v3_historical_status": "ARCHITECTURE_TOURNAMENT_V3 = HISTORICAL_PILOT_NOT_PRODUCT_SELECTION",
+  "v3_historical_commit": "70f68d3e81391970f3a95e83efd42f2bcc08521b",
+  "v3_corrected_replay_commit": "pending",
+
+  "objective": "Determine empirically which architecture produces the strongest validated invention output, under corrected adversarial evaluation with external-evidence-grounded calibration.",
+
+  "arms": ["M0", "M1", "M2", "M3", "M4", "M4B", "M4C"],
+  "arm_definitions": {
+    "M0": "MACRO_ONLY — broad evidence discovery + synthesis, no Micro knowledge",
+    "M1": "MICRO_ONLY — device/failure/experience/regulatory-constrained, no Macro knowledge",
+    "M2": "MACRO_TO_MICRO — Macro produces mechanism memory (round 0), Micro consumes it",
+    "M3": "MICRO_TO_MACRO — Micro produces problem memory (round 0), Macro consumes it",
+    "M4": "RECURSIVE_MACRO_MICRO — 4 rounds of alternating frozen knowledge exchange with committed memory files",
+    "M4B": "INFORMATION_MATCHED_NON_RECURSIVE_CONTROL — same accumulated info as M4, non-recursive",
+    "M4C": "COMPUTE_MATCHED_NON_RECURSIVE_CONTROL — same total compute as M4, non-recursive"
+  },
+
+  "frozen_hashes": {
+    "routing_policy_sha256": "79a928166bce6fb9faf2368c9aba2ffc9f1aaeacc4e73bbade25218d4f76470d",
+    "problem_corpus_root_hash": "40adb5d0157f624a",
+    "evidence_packets_root_hash": "b9faf80e8aabf16b",
+    "micro_seed_manifest_root_hash": "a8b88c8fdcc961de",
+    "ontology_hash": "cd824023412623c6",
+    "v3_preregistration_sha256": "50971eadc2464e0e7bbf14a68574e38c1b4a3ed0ab3ca4d30c097897e0d867e6"
+  },
+
+  "configuration": {
+    "problem_count": 100,
+    "candidate_budget_per_arm": 100,
+    "candidate_budget_per_problem_per_arm": 1,
+    "total_arms": 7,
+    "total_candidate_opportunities": 700,
+    "ontology": "V2_FROZEN",
+    "temperature": 0.0,
+    "max_tokens": 2000,
+    "per_call_retry": {"max_attempts": 3, "timeout_s": 90, "backoff_s": "5*(attempt+1)"},
+    "routing_policy_path": "experiments/ARCHITECTURE_ROUTING_POLICY_V1.json",
+    "model_pool": {
+      "Mistral": ["mistral-medium-latest"],
+      "NVIDIA": ["deepseek-ai/deepseek-v4-flash-0731"]
+    },
+    "routing_rules": [
+      {"trigger": "HTTP 429", "action": "switch_model_immediately"},
+      {"trigger": "repeated_timeout", "action": "demote_model"},
+      {"trigger": "HTTP 5xx", "action": "retry_then_switch"},
+      {"trigger": "unhealthy_provider", "action": "switch_provider"},
+      {"trigger": "successful_model", "action": "retain_temporarily"}
+    ],
+    "model_agnosticism": "No model is hard-coded into architecture code. Routing is operational."
+  },
+
+  "eight_corrections": {
+    "correction_1_adversarial_calibration_oracles": {
+      "description": "35-case adversarial calibration suite MUST NOT obtain ground truth from the evaluator being tested. Use external evidence by category.",
+      "evidence_sources_by_category": {
+        "BOUNDARY_CONDITION": ["published medical-device failure/MDR records", "peer-reviewed case reports", "engineering/physics literature", "recognized engineering standards"],
+        "PRIOR_ART": ["real patent claims", "same evidentiary standard as existing prior-art oracle"],
+        "OBVIOUSNESS": ["patent examiner rejections", "prosecution records", "publications documenting the relevant combination"],
+        "NON_OBVIOUSNESS": ["cases with documented separation between claimed combination and cited prior art"],
+        "MECHANISM_VALIDITY_TRANSFER": ["source literature / device evidence with identifiable mechanism passages"]
+      },
+      "required_fields_per_case": ["oracle_source_id", "oracle_source_type", "oracle_source_hash", "oracle_evidence_span", "oracle_reason", "expected_verdict"],
+      "llm_label_is_not_oracle": true,
+      "acceptance_threshold": ">= 80% accuracy on non-ambiguous cases AND no critical category < 70%",
+      "blocked_state": "ADVERSARIAL_CALIBRATION_BLOCKED"
+    },
+
+    "correction_2_calibration_acceptance_threshold": {
+      "minimum_accuracy": 0.80,
+      "minimum_category_accuracy": 0.70,
+      "blocking_condition": "If threshold fails: ADVERSARIAL_CALIBRATION_BLOCKED. Do not tune thresholds silently."
+    },
+
+    "correction_3_m4_context_isolation": {
+      "description": "Each M4 round has committed memory files on disk before round begins.",
+      "file_pattern": "M4_R{round}_{MACRO,MICRO}_MEMORY.json",
+      "properties": ["immutable", "content-addressed", "hashed", "committed/recorded in round manifest"],
+      "round_n_reads_only": "frozen memory from round n-1",
+      "no_live_python_variable_substitution": true,
+      "machine_assertion": "context_source_mode == 'COMMITTED_FILE'",
+      "violation_state": "M4_INVALID_CONTEXT_SOURCE"
+    },
+
+    "correction_5_boundary_evidence_standard": {
+      "description": "BOUNDARY_CONDITION=KILL requires: specific boundary + failure mechanism + why candidate crosses + EXTERNAL evidence.",
+      "external_evidence_types": ["published device failure record", "peer-reviewed paper", "engineering/physics reference", "recognized engineering/regulatory standard"],
+      "evaluator_reasoning_is_not_evidence": true,
+      "no_evidence_disposition": "INSUFFICIENT_EVIDENCE",
+      "no_evidence_action": "Do NOT kill"
+    },
+
+    "correction_6_adversarial_invalid": {
+      "description": "If verdict conflicts with reason OR reason conflicts with evidence standard: ADVERSARIAL_INVALID → EVALUATION_FAILED.",
+      "candidate_disposition": {
+        "does_not_become_aic": true,
+        "not_killed_as_invention_defect": true,
+        "not_counted_as_successful_survivor": true,
+        "eligible_for_controlled_re_evaluation": true
+      },
+      "recorded_fields": ["invalid_dimension", "invalid_reason", "re_evaluation_required"]
+    },
+
+    "correction_7_source_hash_reconstruction": {
+      "description": "For V3 replay and V4: join candidate.source_ids to Phase-D evidence packet source content_hash.",
+      "method": "PHASE_D_PACKET_JOIN",
+      "missing_source_disposition": "PROVENANCE_INCOMPLETE",
+      "no_new_retrieval_universe": true
+    },
+
+    "correction_8_preliminary_m0_promotion": {
+      "winning_architecture_requires": {
+        "lift": ">= 5 percentage points over best preregistered comparator",
+        "fisher_exact_test": true,
+        "bonferroni_adjusted_p": "< 0.05"
+      },
+      "if_m0_highest_but_not_significant": "PRELIMINARY_BEST_M0",
+      "never": "WINNING_ARCHITECTURE without significance"
+    },
+
+    "correction_9_boundary_prefilter": {
+      "description": "Deterministic pre-filter before LLM BOUNDARY_CONDITION evaluator.",
+      "trigger": "Conditional language (if, could, might, may) AND no external citation",
+      "action": "Classify as INSUFFICIENT_EVIDENCE",
+      "scope": "SCREEN, not final scientific evaluator"
+    },
+
+    "correction_10_prior_art_firewall": {
+      "non_kill_states": ["TOPICAL_RELATED", "POSSIBLE_RELEVANCE", "NO_MATCH_FOUND", "UNRESOLVED_INSUFFICIENT_EVIDENCE"],
+      "kill_states": ["SPECIFIC_DISCLOSURE", "IDENTICAL_OR_NEAR_IDENTICAL_DISCLOSURE"],
+      "rule": "Non-kill states CANNOT become adversarial PRIOR_ART=KILL",
+      "regression_cases_required": "one per state"
+    },
+
+    "correction_11_evidence_adversarial_order": {
+      "hard_order": ["generation", "target_alignment", "evidence_verification", "prior_art", "adversarial", "aic"],
+      "if_evidence_fails": "adversarial MUST NOT run",
+      "stored_fields": ["adversarial_status=NOT_RUN", "adversarial_not_run_reason=EVIDENCE_GATE_FAILED"]
+    }
+  },
+
+  "downstream_gates": {
+    "order": ["target_alignment", "evidence_verification", "prior_art_search", "adversarial_evaluation", "aic_classification"],
+    "all_arms_same_gates": true,
+    "no_architecture_specific_threshold": true,
+    "no_architecture_specific_prior_art_rule": true,
+    "no_architecture_specific_adversarial_leniency": true,
+    "unknown_is_not_pass": true
+  },
+
+  "aic_definition": {
+    "candidate_becomes_aic_only_if": {
+      "evidence_passes": true,
+      "target_aligned": true,
+      "specific_prior_art_passes": true,
+      "all_adversarial_dimensions_pass": true,
+      "falsification_exists": true,
+      "provenance_complete": true
+    },
+    "do_not_call_generated_hypotheses_aics": true,
+    "do_not_call_them_novel": true,
+    "do_not_call_them_patentable": true
+  },
+
+  "primary_metric": "AIC_YIELD",
+  "secondary_metrics": ["SIMULATION_READY_RATE", "EVIDENCE_SURVIVAL", "SPECIFIC_PRIOR_ART_SURVIVAL", "ADVERSARIAL_SURVIVAL", "GENERATION_RELIABILITY"],
+
+  "winner_logic": {
+    "recursive_lift_candidate_requires": {
+      "m4_gt_m4b": true,
+      "m4_gt_m4c": true,
+      "m4_gte_best_baseline_plus_5pp": true,
+      "statistical_rule_passes": true
+    },
+    "classification_if_not": {
+      "m4_le_m4b": "INFORMATION_BUDGET_EFFECT_ONLY",
+      "m4_le_m4c": "COMPUTE_BUDGET_EFFECT_ONLY",
+      "otherwise": ["RECURSIVE_LIFT_NOT_DETECTED", "NO_WINNER", "INSUFFICIENT_POWER"]
+    }
+  },
+
+  "emergent_qualified_candidate": {
+    "definition": ["passes full AIC gate", "absent from both engines' previous-round qualified sets", "complete provenance"],
+    "merely_different_does_not_count": true
+  },
+
+  "search_shift_measurement": {
+    "per_recursive_round": ["mechanism distribution", "query distribution", "source-domain distribution", "cross-domain search usage"],
+    "if_no_shift": "RECURSIVE_SEARCH_SHIFT = FALSE"
+  },
+
+  "product_artifact_provenance": {
+    "every_candidate_carries": ["architecture_origin", "arm", "round", "problem_id", "provider", "model", "prompt_hash", "source_hashes", "evidence_spans", "prior_art_state", "adversarial_state", "aic_state", "simulation_state"]
+  },
+
+  "outcome_states": ["ARCHITECTURE_WINNER", "NO_WINNER", "INSUFFICIENT_POWER", "RECURSIVE_LIFT_NOT_DETECTED", "INFORMATION_BUDGET_EFFECT_ONLY", "COMPUTE_BUDGET_EFFECT_ONLY", "RECURSIVE_LOOP_DEAD"],
+
+  "v4_start_gate": {
+    "v4_may_begin_only_if": {
+      "v3_forensic_audit_complete": true,
+      "items_5_8_regression_pass": true,
+      "v3_corrected_replay_complete": true,
+      "adversarial_calibration_pass": false,
+      "m4_context_isolation_tests_pass": true,
+      "m4c_compute_matching_tests_pass": true,
+      "source_provenance_tests_pass": true
+    },
+    "otherwise": "TOURNAMENT_BLOCKED",
+    "current_status": "ADVERSARIAL_CALIBRATION_PENDING — V4 execution blocked until 35-case calibration suite is built and passes >=80% threshold"
+  },
+
+  "execution_discipline": {
+    "before_first_api_call_verify": ["routing_policy_hash", "problem_root_hash", "retrieval_root_hash", "ontology_hash", "candidate_budget", "tournament_preregistration_hash"],
+    "write": "TOURNAMENT_START_MANIFEST.json",
+    "commit_before_execution": true
+  },
+
+  "model_comparison": {
+    "during_tournament": "MODEL_QUALITY_COMPARISON = NOT_IDENTIFIABLE (routing is the constant)",
+    "after_architecture_selection": "separate model experiment may compare Mistral vs NVIDIA under the winning architecture"
+  },
+
+  "invariants": [
+    "V3 remains HISTORICAL_PILOT_NOT_PRODUCT_SELECTION — do not change V3 results",
+    "Do not generate V4 candidates until all start-gate conditions pass",
+    "Do not rerun 700 V3 candidates",
+    "Do not modify Micro-2 or Macro-1",
+    "Do not start simulation",
+    "Adversarial calibration suite must use EXTERNAL evidence, never LLM labels",
+    "M4 context isolation requires committed files, not live variables",
+    "Evidence→adversarial ordering is hard (skip adversarial if evidence fails)",
+    "Prior-art firewall: non-kill states cannot become PRIOR_ART=KILL",
+    "Boundary KILL requires external evidence; conditional language without citation is screened",
+    "WINNING_ARCHITECTURE requires Fisher exact + Bonferroni p<0.05 + >=5pp lift"
+  ]
+}
