@@ -1,0 +1,20 @@
+{
+  "experiment": "MACRO_MICRO_RECURSIVE_V1",
+  "status": "PRE_REGISTERED",
+  "date": "2026-08-15",
+  "arms": ["M0", "M1", "M2", "M3", "M4", "M4B"],
+  "primary_endpoint": "QUALIFIED_CANDIDATE_RATE",
+  "secondary_endpoints": ["SIMULATION_READY_RATE", "SIMULATION_SURVIVAL_RATE", "EVIDENCE_SURVIVAL", "SPECIFIC_PRIOR_ART_SURVIVAL", "ADVERSARIAL_SURVIVAL"],
+  "cooperative_lift_definition": "M4_qualified_rate - max(M0, M1, M2, M3, M4B)",
+  "execution_conditions": [
+    "MICRO-2 complete (all 100 seeds with V2 ontology)",
+    "MACRO baseline complete",
+    "Both output schemas frozen"
+  ],
+  "no_same_round_leakage": true,
+  "round_structure": "Round 0: independent. Round 1: frozen exchange. Round 2: frozen exchange.",
+  "m4b_control": "Same information as M4 Round 1, non-recursive",
+  "dead_loop_test": "mechanism distribution unchanged + search distribution unchanged + rate not improved vs M4B",
+  "outcome_states": ["RECURSIVE_LIFT_CONFIRMED", "RECURSIVE_LIFT_NOT_DETECTED", "INFORMATION_BUDGET_EFFECT_ONLY", "RECURSIVE_LOOP_DEAD", "INSUFFICIENT_POWER"],
+  "framing": "EVOLUTIONARY_ITERATION (not Gödelian/strange loop)"
+}

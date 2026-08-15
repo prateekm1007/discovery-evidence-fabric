@@ -6,7 +6,7 @@
       "device_name": "Cardiac Pacemaker",
       "device_class": "III",
       "failure_mechanism": "battery failure",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_UNSUPPORTED",
       "baseline_device": "Cardiac Pacemaker",
       "documented_failure": "Pacemaker battery depletion requiring surgical replacement every 5-8 years",
       "failure_mechanism_detail": "battery failure",
@@ -56,7 +56,78 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "ca062da06282b3dd",
       "timestamp": "2026-08-15T00:44:55.476636+00:00",
-      "latency_s": 24.0
+      "latency_s": 24.0,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is battery depletion requiring surgical replacement every 5-8 years. The evidence highlights leadless pacing as a transformative technology that eliminates lead-related complica",
+            "source_id": "europepmc:41682932",
+            "cited_span": "\"Leadless pacing (LP), once only a conceptual idea stemming from the early interest in eliminating lead-related complicatio\"",
+            "actual_span": "NOT_FOUND",
+            "support_level": "NOT_SUPPORTED"
+          }
+        ],
+        "proposed_parameters": [
+          "2.0V",
+          "5 seconds",
+          "72 hours",
+          "72 hours"
+        ],
+        "mechanism_support": "UNSUPPORTED",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 4,
+        "direct_support_count": 0,
+        "indirect_support_count": 0,
+        "not_supported_count": 1
+      },
+      "v2_status": "MICRO_UNSUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_UNSUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "DIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": false,
+          "supporting_spans": [],
+          "support_level": "UNSUPPORTED"
+        },
+        "transfer_evidence": {
+          "transfer_level": "DIRECT_TRANSFER",
+          "intervention_concepts": [
+            "backup",
+            "redundant",
+            "leadless"
+          ],
+          "transfer_spans": [
+            {
+              "source_id": "europepmc:41682932",
+              "span": "Cardiac pacing has undergone a significant transformation in the last decade. Leadless pacing (LP), once only a conceptual idea stemming from the early interest in eliminating lead-related complicatio",
+              "matched_concept": "leadless"
+            },
+            {
+              "source_id": "europepmc:41542788",
+              "span": "Background AVEIR DR, an industry-first dual-chamber leadless pacemaker (LP), provides continuous atrioventricular synchrony through implant-to-implant (i2i) communication between atrial and ventricula",
+              "matched_concept": "leadless"
+            }
+          ]
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Add a low-power, leadless pacing backup module that activates only upon detected battery depletion of the primary lithium-iodine cell, providing continuous pacing during the surgical replacement windo",
+          "expected_effect": "The system will maintain continuous cardiac pacing for an additional 2-3 years beyond the primary battery depletion, allowing elective rather than emergency surgical replacement, and reducing the tota",
+          "falsification_test": "In a bench test with a simulated pacemaker circuit, deplete the primary battery to the threshold voltage (e.g., 2.0V) and verify that the backup leadless module activates within 5 seconds and maintain",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_002",
@@ -64,7 +135,7 @@
       "device_name": "Cardiac Pacemaker",
       "device_class": "III",
       "failure_mechanism": "lead fracture",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_HYPOTHESIS",
       "baseline_device": "Cardiac Pacemaker",
       "documented_failure": "Pacing lead fracture causing loss of capture",
       "failure_mechanism_detail": "lead fracture",
@@ -123,7 +194,79 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "8574bc1f4e8e477e",
       "timestamp": "2026-08-15T00:46:47.637016+00:00",
-      "latency_s": 110.7
+      "latency_s": 110.7,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is \"lead fracture causing loss of capture.\" A fracture in the primary coil breaks the electrical circuit, eliminating pacing output. By adding a second, independently insulated ",
+            "source_id": "europepmc:42306589",
+            "cited_span": "\"Pacemaker implantation remains an established therapeutic strategy for a broad range of bradyarrhythmias and conduction system disorders. As implantation volumes continue to increase worldwide, devic",
+            "actual_span": "Pacemaker implantation remains an established therapeutic strategy for a broad range of bradyarrhythmias and conduction system disorders. As implantation volumes continue to increase worldwide, device",
+            "support_level": "NOT_SUPPORTED"
+          },
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is \"lead fracture causing loss of capture.\" A fracture in the primary coil breaks the electrical circuit, eliminating pacing output. By adding a second, independently insulated ",
+            "source_id": "europepmc:42200841",
+            "cited_span": "\"Early loss of pacing capture after pacemaker generator replacement is an uncommon but potentially life-threatening event, especially in pacemaker-dependent patie\"",
+            "actual_span": "NOT_FOUND",
+            "support_level": "NOT_SUPPORTED"
+          }
+        ],
+        "proposed_parameters": [
+          "10 Hz",
+          "37\u00b0C",
+          "5V"
+        ],
+        "mechanism_support": "UNSUPPORTED",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 2,
+        "proposed_parameter_count": 3,
+        "direct_support_count": 0,
+        "indirect_support_count": 0,
+        "not_supported_count": 2
+      },
+      "v2_status": "MICRO_HYPOTHESIS",
+      "v2_classification": {
+        "v2_status": "MICRO_HYPOTHESIS",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": false,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "INDIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": false,
+          "supporting_spans": [
+            {
+              "source_id": "europepmc:41607017",
+              "span": "Background Helix-fixation dual-chamber leadless pacemakers reliably provide bradycardia pacing, yet mechanical complexity of the delivery system can rarely lead to procedural failure. Case presentatio",
+              "evidence_type": "MECHANISM_MENTIONED"
+            }
+          ],
+          "support_level": "INDIRECT"
+        },
+        "transfer_evidence": {
+          "transfer_level": "UNSUPPORTED_TRANSFER",
+          "intervention_concepts": [
+            "backup",
+            "redundant"
+          ],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Add a redundant, parallel conductive path within the existing coaxial multifilar lead body, specifically a second, independently insulated inner coil that is electrically connected to the same electro",
+          "expected_effect": "The pacing lead will maintain electrical continuity and pacing capture even after a single fracture occurs in the primary coil, thereby preventing loss of capture and the associated life-threatening b",
+          "falsification_test": "Perform a standardized accelerated flexural fatigue test (e.g., per ISO 14708-1 or ASTM F2942) on 10 modified leads and 10 baseline leads. Cycle each lead through a 90-degree bend at 10 Hz for 10 mill",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_003",
@@ -131,7 +274,7 @@
       "device_name": "Cardiac Pacemaker",
       "device_class": "III",
       "failure_mechanism": "infection",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_UNSUPPORTED",
       "baseline_device": "Cardiac Pacemaker",
       "documented_failure": "Pocket infection at pacemaker implantation site requiring explant",
       "failure_mechanism_detail": "infection",
@@ -181,7 +324,62 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "282878cd1eeaa4f5",
       "timestamp": "2026-08-15T00:49:49.258370+00:00",
-      "latency_s": 180.1
+      "latency_s": 180.1,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The failure mechanism is bacterial colonization of the device surface leading to pocket infection. Silver ions disrupt bacterial cell membranes and DNA replication, providing a contact-killing effect ",
+            "source_id": "europepmc:42255771",
+            "cited_span": "\u201cPacemakers are cardiac implantable electronic devices (CIEDs) that deliver electrical impulses to regulate heart rhythm and manage conditions such as cardiac arrhythmias.\u201d",
+            "actual_span": "Pacemakers are cardiac implantable electronic devices (CIEDs) that deliver electrical impulses to regulate heart rhythm and manage conditions such as cardiac arrhythmias. While transvenous pacemakers ",
+            "support_level": "INDIRECT"
+          }
+        ],
+        "proposed_parameters": [],
+        "mechanism_support": "INFERRED_FROM_EVIDENCE",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "INFERRED_FROM_EVIDENCE",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 0,
+        "direct_support_count": 0,
+        "indirect_support_count": 1,
+        "not_supported_count": 0
+      },
+      "v2_status": "MICRO_UNSUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_UNSUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "DIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": false,
+          "supporting_spans": [],
+          "support_level": "UNSUPPORTED"
+        },
+        "transfer_evidence": {
+          "transfer_level": "UNSUPPORTED_TRANSFER",
+          "intervention_concepts": [
+            "coating",
+            "silver",
+            "polymer"
+          ],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Add a silver-ion-releasing polymer coating to the pacemaker\u2019s titanium housing, applied only to the subcutaneous pocket-facing surface, with a controlled elution profile that maintains a bactericidal ",
+          "expected_effect": "Reduction in the incidence of pocket infection requiring explant within the first 30 days post-implantation, by preventing initial bacterial adhesion and biofilm formation on the device surface.",
+          "falsification_test": "In a randomized controlled trial of 200 patients receiving the coated device versus 200 receiving the standard device, with identical perioperative antibiotic prophylaxis, compare the rate of pocket i",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_004",
@@ -189,7 +387,7 @@
       "device_name": "Hip Implant",
       "device_class": "III",
       "failure_mechanism": "wear",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_EVIDENCE_SUPPORTED",
       "baseline_device": "Hip Implant",
       "documented_failure": "Polyethylene wear debris causing osteolysis and implant loosening",
       "failure_mechanism_detail": "wear",
@@ -239,7 +437,71 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "48f230fcb7150b47",
       "timestamp": "2026-08-15T00:50:48.903243+00:00",
-      "latency_s": 58.1
+      "latency_s": 58.1,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is polyethylene wear debris generation leading to osteolysis. The evidence states that \"inflammatory responses to wear debris that lead to osteolytic lesions\" are the major comp",
+            "source_id": "europepmc:42290916",
+            "cited_span": "\"Adverse local tissue reaction (ALTR) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, remain major long-term complications of total hip r",
+            "actual_span": "Adverse local tissue reaction (ALTR) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, remain major long-term complications of total hip re",
+            "support_level": "NOT_SUPPORTED"
+          }
+        ],
+        "proposed_parameters": [
+          "400 nm",
+          "2 \u00b5m",
+          "5 \u00b5m",
+          "30%"
+        ],
+        "mechanism_support": "UNSUPPORTED",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 4,
+        "direct_support_count": 0,
+        "indirect_support_count": 0,
+        "not_supported_count": 1
+      },
+      "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "DIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": true,
+          "supporting_spans": [
+            {
+              "source_id": "europepmc:42290916",
+              "span": "Adverse local tissue reaction (ALTR) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, remain major long-term complications of total hip re",
+              "evidence_type": "MECHANISM_EVIDENCE"
+            }
+          ],
+          "support_level": "DIRECT"
+        },
+        "transfer_evidence": {
+          "transfer_level": "MECHANISTIC_INFERENCE",
+          "intervention_concepts": [
+            "microtextured"
+          ],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Introduce a controlled microtextured surface pattern on the femoral head bearing surface, specifically a deterministic array of sub-micron dimples (depth 200\u2013400 nm, diameter 1\u20132 \u00b5m, spacing 3\u20135 \u00b5m), ",
+          "expected_effect": "The modification will reduce the volumetric wear rate and the number of polyethylene particles released into the periprosthetic tissue per gait cycle, thereby delaying the onset of osteolysis and impl",
+          "falsification_test": "Conduct a hip simulator wear test per ISO 14242-1 (or ASTM F1714) using the modified femoral head (with microtextured dimples) paired with the same highly cross-linked polyethylene liner, run for 10 m",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_005",
@@ -247,7 +509,7 @@
       "device_name": "Hip Implant",
       "device_class": "III",
       "failure_mechanism": "mechanical failure",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_EVIDENCE_SUPPORTED",
       "baseline_device": "Hip Implant",
       "documented_failure": "Mechanical disengagement at blade-barrel interface",
       "failure_mechanism_detail": "mechanical failure",
@@ -306,7 +568,81 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "0b0cec378a776ecb",
       "timestamp": "2026-08-15T00:50:56.845569+00:00",
-      "latency_s": 6.4
+      "latency_s": 6.4,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is \"mechanical disengagement at blade-barrel interface\" under physiological loads. The evidence notes that \"implant-related complications remain a concern\" in proximal femoral n",
+            "source_id": "europepmc:42273451",
+            "cited_span": "\"Proximal femoral nail (PFN) fixation is widely used for intertrochanteric (IT) fractures; however, implant-related complications remain a concern.\"",
+            "actual_span": "NOT_FOUND",
+            "support_level": "NOT_SUPPORTED"
+          },
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is \"mechanical disengagement at blade-barrel interface\" under physiological loads. The evidence notes that \"implant-related complications remain a concern\" in proximal femoral n",
+            "source_id": "europepmc:42273451",
+            "cited_span": "\"While commonly reported failures include\"",
+            "actual_span": "NOT_FOUND",
+            "support_level": "NOT_SUPPORTED"
+          }
+        ],
+        "proposed_parameters": [
+          "30%"
+        ],
+        "mechanism_support": "UNSUPPORTED",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 2,
+        "proposed_parameter_count": 1,
+        "direct_support_count": 0,
+        "indirect_support_count": 0,
+        "not_supported_count": 2
+      },
+      "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": false,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "INDIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": true,
+          "supporting_spans": [
+            {
+              "source_id": "europepmc:42273451",
+              "span": "Introduction Proximal femoral nail (PFN) fixation is widely used for intertrochanteric (IT) fractures; however, implant-related complications remain a concern. While commonly reported failures include",
+              "evidence_type": "MECHANISM_EVIDENCE"
+            },
+            {
+              "source_id": "europepmc:42131059",
+              "span": "Introduction Constrained acetabular liners are used as a salvage option for recurrent instability in revision total hip arthroplasty (THA). While failure mechanisms, including pelvic fixation loss, li",
+              "evidence_type": "MECHANISM_MENTIONED"
+            }
+          ],
+          "support_level": "DIRECT"
+        },
+        "transfer_evidence": {
+          "transfer_level": "MECHANISTIC_INFERENCE",
+          "intervention_concepts": [
+            "redundant"
+          ],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Add a circumferential anti-rotation locking ridge on the blade's proximal barrel-engagement surface, designed to plastically deform into a corresponding annular groove in the barrel's inner wall upon ",
+          "expected_effect": "The modification will increase the pull-out strength and torsional resistance of the blade-barrel interface by at least 30% compared to the standard locking mechanism, while maintaining the same inser",
+          "falsification_test": "Conduct a standardized ASTM F2003 (or equivalent) static and cyclic axial pull-out and torsional test on 10 modified implants vs. 10 baseline implants. The modification is falsified if: (a) the mean p",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_006",
@@ -314,7 +650,7 @@
       "device_name": "Hip Implant",
       "device_class": "III",
       "failure_mechanism": "corrosion",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_EVIDENCE_SUPPORTED",
       "baseline_device": "Hip Implant",
       "documented_failure": "Modular junction corrosion causing adverse local tissue reaction",
       "failure_mechanism_detail": "corrosion",
@@ -373,7 +709,82 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "b7a36e1f11b6d189",
       "timestamp": "2026-08-15T00:51:10.321435+00:00",
-      "latency_s": 12.0
+      "latency_s": 12.0,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is galvanic corrosion at the modular junction, driven by the electrochemical potential difference between dissimilar metals (titanium alloy and cobalt-chromium) in the presence ",
+            "source_id": "europepmc:42099886",
+            "cited_span": "\u201cCorrosion at modular junctions is a well-known cause of failure in primary and revision total hip arthroplasty, but it is underrecognized in modular total knee arthroplasty (TKA) despite the potenti\u201d",
+            "actual_span": "NOT_FOUND",
+            "support_level": "NOT_SUPPORTED"
+          },
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is galvanic corrosion at the modular junction, driven by the electrochemical potential difference between dissimilar metals (titanium alloy and cobalt-chromium) in the presence ",
+            "source_id": "europepmc:42290916",
+            "cited_span": "\u201cAdverse local tissue reaction (ALTR) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, remain major long-term complications of total hip r",
+            "actual_span": "Adverse local tissue reaction (ALTR) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, remain major long-term complications of total hip re",
+            "support_level": "INDIRECT"
+          }
+        ],
+        "proposed_parameters": [
+          "37\u00b0C"
+        ],
+        "mechanism_support": "INFERRED_FROM_EVIDENCE",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "INFERRED_FROM_EVIDENCE",
+        "evidence_derived_facts": 0,
+        "model_inferences": 2,
+        "proposed_parameter_count": 1,
+        "direct_support_count": 0,
+        "indirect_support_count": 1,
+        "not_supported_count": 1
+      },
+      "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "DIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": true,
+          "supporting_spans": [
+            {
+              "source_id": "europepmc:42099886",
+              "span": "\u00bb Corrosion at modular junctions is a well-known cause of failure in primary and revision total hip arthroplasty, but it is underrecognized in modular total knee arthroplasty (TKA) despite the potenti",
+              "evidence_type": "MECHANISM_EVIDENCE"
+            },
+            {
+              "source_id": "europepmc:41960287",
+              "span": "Over the past decade, publications, legal cases, and regulatory panels have intensified scrutiny of implant degradation products-particularly nanoparticles and chemically reacted corrosion products-in",
+              "evidence_type": "MECHANISM_EVIDENCE"
+            }
+          ],
+          "support_level": "DIRECT"
+        },
+        "transfer_evidence": {
+          "transfer_level": "MECHANISTIC_INFERENCE",
+          "intervention_concepts": [
+            "coating",
+            "ceramic"
+          ],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Replace the modular taper junction\u2019s current metal-on-metal (titanium alloy stem trunnion against cobalt-chromium femoral head) interface with a ceramic-coated (e.g., titanium nitride or zirconia) bea",
+          "expected_effect": "The modification will eliminate galvanic corrosion at the modular junction by preventing dissimilar metal contact, thereby reducing the generation of metallic corrosion products and wear debris that d",
+          "falsification_test": "Conduct a standardized fretting-corrosion test (e.g., ASTM F1875) on the modified implant (ceramic-coated trunnion + CoCr head) versus the baseline (Ti alloy trunnion + CoCr head) in a saline or prote",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_007",
@@ -381,7 +792,7 @@
       "device_name": "Knee Implant",
       "device_class": "III",
       "failure_mechanism": "wear",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_UNSUPPORTED",
       "baseline_device": "Knee Implant",
       "documented_failure": "Tibial insert wear causing implant loosening and pain",
       "failure_mechanism_detail": "wear",
@@ -431,7 +842,62 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "4dfdf732965c43dc",
       "timestamp": "2026-08-15T00:51:23.970924+00:00",
-      "latency_s": 12.1
+      "latency_s": 12.1,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is polyethylene wear under high-cycle flexion. Evidence from modular TKA corrosion (europepmc:42099886) indicates that wear debris and corrosion products at junctions are a reco",
+            "source_id": "europepmc:42099886",
+            "cited_span": "\"Corrosion at modular junctions is a well-known cause of failure in primary and revision total hip arthroplasty, but it is underrecognized in modular total knee arthroplasty (TKA) despite the potenti\"",
+            "actual_span": "NOT_FOUND",
+            "support_level": "NOT_SUPPORTED"
+          }
+        ],
+        "proposed_parameters": [
+          "10 \u00b5m",
+          "50 \u00b5m",
+          "30%"
+        ],
+        "mechanism_support": "UNSUPPORTED",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 3,
+        "direct_support_count": 0,
+        "indirect_support_count": 0,
+        "not_supported_count": 1
+      },
+      "v2_status": "MICRO_UNSUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_UNSUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": false,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "INDIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": false,
+          "supporting_spans": [],
+          "support_level": "UNSUPPORTED"
+        },
+        "transfer_evidence": {
+          "transfer_level": "MECHANISTIC_INFERENCE",
+          "intervention_concepts": [],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Introduce a controlled micro-textured surface pattern on the tibial insert\u2019s articular surface, specifically a series of shallow, intersecting micro-grooves (depth 5\u201310 \u00b5m, width 20\u201350 \u00b5m) that act as",
+          "expected_effect": "Reduction in volumetric polyethylene wear rate by at least 30% under simulated 10-million-cycle gait loading, as measured by gravimetric analysis, with a corresponding decrease in submicron particle g",
+          "falsification_test": "Conduct a standardized knee wear simulator test (per ISO 14243-1) comparing the modified insert against the unmodified NexGen insert (baseline) under identical conditions (10 million cycles, same femo",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_008",
@@ -439,7 +905,7 @@
       "device_name": "Knee Implant",
       "device_class": "III",
       "failure_mechanism": "mechanical failure",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_EVIDENCE_SUPPORTED",
       "baseline_device": "Knee Implant",
       "documented_failure": "Tibial tray fracture under cyclic loading",
       "failure_mechanism_detail": "mechanical failure",
@@ -489,7 +955,69 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "3308acd82db586bc",
       "timestamp": "2026-08-15T00:52:02.086113+00:00",
-      "latency_s": 36.6
+      "latency_s": 36.6,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is tibial tray fracture under cyclic loading, specifically mechanical failure. The evidence from proximal femoral nail (PFN) fixation highlights that implant-related complicatio",
+            "source_id": "europepmc:42273451",
+            "cited_span": "\"implant-related complications remain a concern. While commonly reported failures include\"",
+            "actual_span": "NOT_FOUND",
+            "support_level": "NOT_SUPPORTED"
+          }
+        ],
+        "proposed_parameters": [
+          "1.5 mm",
+          "500 MPa",
+          "1.5 mm",
+          "5 Hz"
+        ],
+        "mechanism_support": "UNSUPPORTED",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 4,
+        "direct_support_count": 0,
+        "indirect_support_count": 0,
+        "not_supported_count": 1
+      },
+      "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "DIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": true,
+          "supporting_spans": [
+            {
+              "source_id": "europepmc:42273451",
+              "span": "Introduction Proximal femoral nail (PFN) fixation is widely used for intertrochanteric (IT) fractures; however, implant-related complications remain a concern. While commonly reported failures include",
+              "evidence_type": "MECHANISM_EVIDENCE"
+            }
+          ],
+          "support_level": "DIRECT"
+        },
+        "transfer_evidence": {
+          "transfer_level": "MECHANISTIC_INFERENCE",
+          "intervention_concepts": [],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Increase the thickness of the tibial tray\u2019s central locking screw boss by 1.5 mm, redistributing cyclic load away from the tray\u2019s thin central keel junction.",
+          "expected_effect": "The tray will withstand 10+ million gait cycles without fracture by reducing peak cyclic stress at the keel junction below the cobalt-chromium fatigue endurance limit (approx. 500 MPa for wrought CoCr",
+          "falsification_test": "Manufacture 10 modified trays (1.5 mm thicker boss) and 10 baseline trays. Subject all to ISO 14879-1 tibial tray fatigue testing (sinusoidal load 0\u20133000 N at 5 Hz) for 10 million cycles. Falsify if \u2265",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_009",
@@ -497,7 +1025,7 @@
       "device_name": "Spinal Fusion Device",
       "device_class": "III",
       "failure_mechanism": "mechanical failure",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_HYPOTHESIS",
       "baseline_device": "Spinal Fusion Device",
       "documented_failure": "Pedicle screw loosening causing fusion failure",
       "failure_mechanism_detail": "mechanical failure",
@@ -547,7 +1075,72 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "1085bbe59163afb3",
       "timestamp": "2026-08-15T00:52:45.626674+00:00",
-      "latency_s": 42.0
+      "latency_s": 42.0,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is \"pedicle screw loosening causing fusion failure\" under \"cyclic loading for 12+ months.\" Source 1 states that pedicle screw systems \"are prone to fail\" without specifying the ",
+            "source_id": "europepmc:42199852",
+            "cited_span": "\"Pedicle screw fixation is a mainstay surgical technique for providing posterior stability to the spinal column, and consists of screws, rods and set caps. These components are prone to fail\"",
+            "actual_span": "NOT_FOUND",
+            "support_level": "NOT_SUPPORTED"
+          }
+        ],
+        "proposed_parameters": [
+          "000 cycles",
+          "1 Hz",
+          "30%",
+          "50%"
+        ],
+        "mechanism_support": "UNSUPPORTED",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 4,
+        "direct_support_count": 0,
+        "indirect_support_count": 0,
+        "not_supported_count": 1
+      },
+      "v2_status": "MICRO_HYPOTHESIS",
+      "v2_classification": {
+        "v2_status": "MICRO_HYPOTHESIS",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "DIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": false,
+          "supporting_spans": [
+            {
+              "source_id": "europepmc:41987831",
+              "span": "Background Spinal implant development demands integration of biomechanical rigor with regulatory compliance. For surgeons, researchers, and biomedical engineers engaged in translational research, unde",
+              "evidence_type": "MECHANISM_MENTIONED"
+            }
+          ],
+          "support_level": "INDIRECT"
+        },
+        "transfer_evidence": {
+          "transfer_level": "UNSUPPORTED_TRANSFER",
+          "intervention_concepts": [
+            "coating",
+            "hydroxyapatite"
+          ],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Add a micro-textured, osteoconductive surface coating (e.g., plasma-sprayed titanium or hydroxyapatite) to the intraosseous thread region of the cortical bone trajectory screw, specifically limited to",
+          "expected_effect": "The screw-bone interface will exhibit increased pullout strength and higher resistance to cyclic loosening at 12 months compared to the uncoated baseline, as measured by reduced micromotion and mainta",
+          "falsification_test": "In a validated cadaveric or synthetic bone model (ASTM F543), implant coated and uncoated screws into matched osteoporotic bone specimens. Subject both groups to 1,000,000 cycles of combined flexion-e",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_010",
@@ -555,7 +1148,7 @@
       "device_name": "Spinal Fusion Device",
       "device_class": "III",
       "failure_mechanism": "infection",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_UNSUPPORTED",
       "baseline_device": "Spinal Fusion Device",
       "documented_failure": "Surgical site infection following spinal fusion",
       "failure_mechanism_detail": "infection",
@@ -605,7 +1198,64 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "74f601a20970bf75",
       "timestamp": "2026-08-15T00:53:20.247573+00:00",
-      "latency_s": 33.1
+      "latency_s": 33.1,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The failure mechanism is infection, specifically biofilm formation on implant surfaces. Silver ions disrupt bacterial cell membranes and DNA replication, preventing initial bacterial adhesion and subs",
+            "source_id": "europepmc:41893199",
+            "cited_span": "\"Despite advances in cage geometry and fixation strategies that\"",
+            "actual_span": "NOT_FOUND",
+            "support_level": "NOT_SUPPORTED"
+          }
+        ],
+        "proposed_parameters": [
+          "48 hours"
+        ],
+        "mechanism_support": "UNSUPPORTED",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 1,
+        "direct_support_count": 0,
+        "indirect_support_count": 0,
+        "not_supported_count": 1
+      },
+      "v2_status": "MICRO_UNSUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_UNSUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "DIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": false,
+          "supporting_spans": [],
+          "support_level": "UNSUPPORTED"
+        },
+        "transfer_evidence": {
+          "transfer_level": "UNSUPPORTED_TRANSFER",
+          "intervention_concepts": [
+            "coating",
+            "antimicrobial",
+            "silver"
+          ],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Add a silver ion-releasing coating to the implant surface that elutes bactericidal concentrations of Ag+ for at least 14 days post-implantation.",
+          "expected_effect": "Reduction in surgical site infection rates by preventing bacterial colonization and biofilm formation on the implant surface during the critical early postoperative period, without altering the fusion",
+          "falsification_test": "In a validated in vitro biofilm assay (e.g., CDC biofilm reactor), inoculate coated and uncoated implants with Staphylococcus aureus (common SSI pathogen) for 48 hours. Quantify viable biofilm CFU/cm\u00b2",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_011",
@@ -613,7 +1263,7 @@
       "device_name": "Shoulder Implant",
       "device_class": "III",
       "failure_mechanism": "mechanical failure",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_EVIDENCE_SUPPORTED",
       "baseline_device": "Shoulder Implant",
       "documented_failure": "Glenoid component loosening causing pain and instability",
       "failure_mechanism_detail": "mechanical failure",
@@ -663,7 +1313,70 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "a1e37588634d0826",
       "timestamp": "2026-08-15T00:58:45.676833+00:00",
-      "latency_s": 14.1
+      "latency_s": 14.1,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is glenoid loosening under rotational loads. Source 3 explicitly states that \"Implant manufacturers have developed innovative designs to address these issues, with hybrid glen..",
+            "source_id": "europepmc:42180036",
+            "cited_span": "\"Glenoid loosening is a well-documented failure mechanism in anatomic shoulder arthroplasty. Implant manufacturers have developed innovative designs to address these issues, with hybrid glen\"",
+            "actual_span": "NOT_FOUND",
+            "support_level": "NOT_SUPPORTED"
+          }
+        ],
+        "proposed_parameters": [
+          "000 cycles",
+          "50%"
+        ],
+        "mechanism_support": "UNSUPPORTED",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 2,
+        "direct_support_count": 0,
+        "indirect_support_count": 0,
+        "not_supported_count": 1
+      },
+      "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "DIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": true,
+          "supporting_spans": [
+            {
+              "source_id": "europepmc:42180036",
+              "span": "Background Glenoid loosening is a well-documented failure mechanism in anatomic shoulder arthroplasty. Implant manufacturers have developed innovative designs to address these issues, with hybrid glen",
+              "evidence_type": "MECHANISM_EVIDENCE"
+            }
+          ],
+          "support_level": "DIRECT"
+        },
+        "transfer_evidence": {
+          "transfer_level": "MECHANISTIC_INFERENCE",
+          "intervention_concepts": [
+            "coating",
+            "porous"
+          ],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Add a central, porous-coated, press-fit peg to the cemented polyethylene glenoid component, converting it to a hybrid fixation design that supplements cement fixation with biological ingrowth.",
+          "expected_effect": "Reduced incidence of glenoid component loosening under rotational loads, with improved long-term fixation stability compared to cemented-only designs, as the hybrid approach combines immediate cement ",
+          "falsification_test": "In a cadaveric or Sawbones biomechanical test, compare the cemented-only glenoid (baseline) vs. the hybrid design (cemented + porous peg) under cyclic rotational loading (e.g., 10,000 cycles at physio",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_012",
@@ -671,7 +1384,7 @@
       "device_name": "Shoulder Implant",
       "device_class": "III",
       "failure_mechanism": "wear",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_UNSUPPORTED",
       "baseline_device": "Shoulder Implant",
       "documented_failure": "Humeral head wear causing osteolysis",
       "failure_mechanism_detail": "wear",
@@ -721,7 +1434,63 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "82ccc0521ee294b8",
       "timestamp": "2026-08-15T00:59:38.969626+00:00",
-      "latency_s": 51.8
+      "latency_s": 51.8,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is humeral head wear causing osteolysis, driven by wear debris under rotational loading. The evidence notes that \"Advancements in biomaterials and implant design has created a l",
+            "source_id": "europepmc:41953535",
+            "cited_span": "\"Advancements in biomaterials and implant design has created a lasting impact on orthopedic surgery. Changes such as implant longevity, biocompatibility, and patient satisfaction have been attained wi",
+            "actual_span": "Advancements in biomaterials and implant design has created a lasting impact on orthopedic surgery. Changes such as implant longevity, biocompatibility, and patient satisfaction have been attained wit",
+            "support_level": "INDIRECT"
+          }
+        ],
+        "proposed_parameters": [
+          "000 cycles",
+          "1 \u00b5m"
+        ],
+        "mechanism_support": "INFERRED_FROM_EVIDENCE",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "INFERRED_FROM_EVIDENCE",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 2,
+        "direct_support_count": 0,
+        "indirect_support_count": 1,
+        "not_supported_count": 0
+      },
+      "v2_status": "MICRO_UNSUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_UNSUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": false,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "INDIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": false,
+          "supporting_spans": [],
+          "support_level": "UNSUPPORTED"
+        },
+        "transfer_evidence": {
+          "transfer_level": "UNSUPPORTED_TRANSFER",
+          "intervention_concepts": [
+            "ceramic"
+          ],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Replace the current metal-on-polyethylene humeral head articulation with a ceramic-on-polyethylene articulation, specifically using a ceramic humeral head component (e.g., alumina or zirconia-toughene",
+          "expected_effect": "The modification will reduce the generation of polyethylene wear debris at the humeral head\u2013glenoid articulation, thereby decreasing the incidence and severity of periprosthetic osteolysis and extendi",
+          "falsification_test": "Conduct a hip or shoulder simulator wear test per ASTM F2028 (or ISO 14242-1 adapted for shoulder kinematics) comparing the current metal-on-polyethylene articulation against the ceramic-on-polyethyle",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_013",
@@ -736,7 +1505,12 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "timestamp": "2026-08-15T01:02:55.961998+00:00",
       "latency_s": 195.5,
-      "predicate_status": "Nobel Biocare Br\u00e5nemark (510(k) K871877)"
+      "predicate_status": "Nobel Biocare Br\u00e5nemark (510(k) K871877)",
+      "v2_status": "GENERATION_CALL_FAILED",
+      "v2_classification": {
+        "v2_status": "GENERATION_CALL_FAILED",
+        "reason": "API call failed"
+      }
     },
     {
       "micro_seed_id": "micro_014",
@@ -744,7 +1518,7 @@
       "device_name": "Dental Implant",
       "device_class": "III",
       "failure_mechanism": "infection",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_EVIDENCE_SUPPORTED",
       "baseline_device": "Dental Implant",
       "documented_failure": "Peri-implantitis causing bone loss and implant failure",
       "failure_mechanism_detail": "infection",
@@ -794,7 +1568,72 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "4fb9a200dfc20d85",
       "timestamp": "2026-08-15T01:03:43.852815+00:00",
-      "latency_s": 46.4
+      "latency_s": 46.4,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The failure mechanism is infection at the IAI. Evidence states that \"Biofilm-associated infections, particularly peri-implantitis, threaten the long-term success of dental implants, and conventional d",
+            "source_id": "europepmc:42027784",
+            "cited_span": "\"Biofilm-associated infections, particularly peri-implantitis, threaten the long-term success of dental implants, and conventional debridement or chemotherapy often fails against mature biofilms.\"",
+            "actual_span": "Biofilm-associated infections, particularly peri-implantitis, threaten the long-term success of dental implants, and conventional debridement or chemotherapy often fails against mature biofilms. Nanom",
+            "support_level": "DIRECT"
+          }
+        ],
+        "proposed_parameters": [
+          "5 \u03bcm",
+          "72 hours"
+        ],
+        "mechanism_support": "DIRECT_EVIDENCE",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 2,
+        "direct_support_count": 1,
+        "indirect_support_count": 0,
+        "not_supported_count": 0
+      },
+      "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_EVIDENCE_SUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "DIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": true,
+          "supporting_spans": [
+            {
+              "source_id": "europepmc:42346669",
+              "span": "The long-term stability of dental implants is limited by multiple factors, including peri-implant infection, impaired osseointegration, and poor soft tissue sealing. Compared with conventional passive",
+              "evidence_type": "MECHANISM_EVIDENCE"
+            },
+            {
+              "source_id": "europepmc:42027784",
+              "span": "Biofilm-associated infections, particularly peri-implantitis, threaten the long-term success of dental implants, and conventional debridement or chemotherapy often fails against mature biofilms. Nanom",
+              "evidence_type": "MECHANISM_EVIDENCE"
+            }
+          ],
+          "support_level": "DIRECT"
+        },
+        "transfer_evidence": {
+          "transfer_level": "MECHANISTIC_INFERENCE",
+          "intervention_concepts": [],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Add a micro-textured, non-shedding surface pattern (e.g., laser-ablated pits or grooves of 1\u20135 \u03bcm width/depth) to the implant-abutment interface (IAI) collar region, specifically designed to physicall",
+          "expected_effect": "Reduced bacterial adhesion and biofilm formation at the IAI, leading to decreased incidence of peri-implantitis, reduced bone loss, and improved long-term implant survival.",
+          "falsification_test": "In an in vitro biofilm assay (e.g., using *Porphyromonas gingivalis* or *Streptococcus mutans*), compare the modified implant-abutment assembly against the unmodified baseline (same geometry, same mat",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_015",
@@ -802,7 +1641,7 @@
       "device_name": "Intraocular Lens",
       "device_class": "III",
       "failure_mechanism": "infection",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_UNSUPPORTED",
       "baseline_device": "Intraocular Lens",
       "documented_failure": "Postoperative endophthalmitis following IOL implantation",
       "failure_mechanism_detail": "infection",
@@ -852,7 +1691,64 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "dbb9a8a16b8b342e",
       "timestamp": "2026-08-15T01:05:28.405709+00:00",
-      "latency_s": 103.1
+      "latency_s": 103.1,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The failure mechanism is infection (bacterial contamination) during and after surgery. The evidence describes exogenous fungal endophthalmitis as a culture-proven entity requiring clinical management ",
+            "source_id": "europepmc:42329069",
+            "cited_span": "\"Purpose To characterize the clinical features, treatment modalities, and visual outcomes of culture-proven exogenous Fusarium endophthalmitis managed at a tertiary referral center.\"",
+            "actual_span": "Purpose To characterize the clinical features, treatment modalities, and visual outcomes of culture-proven exogenous Fusarium endophthalmitis managed at a tertiary referral center. Methods This retros",
+            "support_level": "NOT_SUPPORTED"
+          }
+        ],
+        "proposed_parameters": [
+          "37\u00b0C"
+        ],
+        "mechanism_support": "UNSUPPORTED",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 1,
+        "direct_support_count": 0,
+        "indirect_support_count": 0,
+        "not_supported_count": 1
+      },
+      "v2_status": "MICRO_UNSUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_UNSUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": false,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "INDIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": false,
+          "supporting_spans": [],
+          "support_level": "UNSUPPORTED"
+        },
+        "transfer_evidence": {
+          "transfer_level": "UNSUPPORTED_TRANSFER",
+          "intervention_concepts": [
+            "coating",
+            "antimicrobial",
+            "silver"
+          ],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Add a sustained-release antimicrobial coating (e.g., covalently bound or eluting chlorhexidine or silver) to the IOL optic and haptics, designed to maintain bactericidal activity for at least 7 days p",
+          "expected_effect": "The IOL will reduce or eliminate bacterial adhesion and proliferation on its surface for at least 7 days, thereby decreasing the incidence of postoperative endophthalmitis compared to the current sing",
+          "falsification_test": "In an in vitro assay, inoculate the modified IOL and a standard AcrySof IOL (control) with Staphylococcus epidermidis (common endophthalmitis pathogen) at 10^5 CFU/mL. Incubate in balanced salt soluti",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
     },
     {
       "micro_seed_id": "micro_016",
@@ -860,7 +1756,7 @@
       "device_name": "Coronary Stent",
       "device_class": "III",
       "failure_mechanism": "thrombosis",
-      "status": "MICRO_CANDIDATE",
+      "status": "MICRO_UNSUPPORTED",
       "baseline_device": "Coronary Stent",
       "documented_failure": "Late stent thrombosis causing myocardial infarction",
       "failure_mechanism_detail": "thrombosis",
@@ -910,7 +1806,145 @@
       "prompt_hash": "bdad7f76c4ebeaaa",
       "response_hash": "430948cd31ecad20",
       "timestamp": "2026-08-15T01:06:28.678972+00:00",
-      "latency_s": 58.8
+      "latency_s": 58.8,
+      "original_status": "MICRO_CANDIDATE",
+      "forensic_audit": {
+        "claims": [
+          {
+            "claim_type": "MODEL_INFERENCE",
+            "claim_text": "The documented failure is late stent thrombosis (LST) occurring 1\u20135 years post-implantation, driven by thrombus formation on the stent surface. The evidence states that PCI \u201ccompresses plaque, injurin",
+            "source_id": "europepmc:PPR1259976",
+            "cited_span": "\u201cPercutaneous coronary intervention (PCI) treats focal coronary obstruction by compressing plaque, injuring the vessel wall and placing a metallic or bioresorbable scaffold.\u201d",
+            "actual_span": "Percutaneous coronary intervention (PCI) treats focal coronary obstruction by compressing plaque, injuring the vessel wall and placing a metallic or bioresorbable scaffold. Most treated segments heal,",
+            "support_level": "NOT_SUPPORTED"
+          }
+        ],
+        "proposed_parameters": [],
+        "mechanism_support": "UNSUPPORTED",
+        "intervention_support": "INFERRED_FROM_EVIDENCE",
+        "expected_effect_support": "UNSUPPORTED",
+        "evidence_derived_facts": 0,
+        "model_inferences": 1,
+        "proposed_parameter_count": 0,
+        "direct_support_count": 0,
+        "indirect_support_count": 0,
+        "not_supported_count": 1
+      },
+      "v2_status": "MICRO_UNSUPPORTED",
+      "v2_classification": {
+        "v2_status": "MICRO_UNSUPPORTED",
+        "problem_evidence": {
+          "has_problem_evidence": true,
+          "device_mentioned_in_sources": true,
+          "failure_mentioned_in_sources": true,
+          "source": "FDA MAUDE / registry data (embedded in seed)",
+          "support_level": "DIRECT"
+        },
+        "mechanism_evidence": {
+          "has_mechanism_evidence": false,
+          "supporting_spans": [],
+          "support_level": "UNSUPPORTED"
+        },
+        "transfer_evidence": {
+          "transfer_level": "UNSUPPORTED_TRANSFER",
+          "intervention_concepts": [
+            "coating",
+            "polymer"
+          ],
+          "transfer_spans": []
+        },
+        "invention_hypothesis": {
+          "proposed_modification": "Add a covalently bonded, non-eluting, thrombin-inhibiting peptide (e.g., bivalirudin analog) to the stent\u2019s abluminal surface, replacing the current polymer-based paclitaxel elution with a permanent, ",
+          "expected_effect": "The stent surface will actively inhibit thrombin activity locally for the life of the device, preventing fibrin deposition and platelet aggregation on the stent struts, thereby reducing the incidence ",
+          "falsification_test": "In a porcine coronary stent model, implant the modified stent (with thrombin-inhibiting peptide) and a control TAXUS stent. After 12 months, perform optical coherence tomography (OCT) and histopatholo",
+          "has_falsification": true,
+          "is_hypothesis": true
+        }
+      }
+    },
+    {
+      "micro_seed_id": "micro_017",
+      "seed_hash": "db1e3823210ea880",
+      "device_name": "Coronary Stent",
+      "device_class": "III",
+      "failure_mechanism": "material degradation",
+      "status": "GENERATION_CALL_FAILED",
+      "model": "deepseek-ai/deepseek-v4-flash-0731",
+      "provider": "NVIDIA",
+      "temperature": 0.0,
+      "prompt_hash": "bdad7f76c4ebeaaa",
+      "timestamp": "2026-08-15T01:34:11.655354+00:00",
+      "latency_s": 195.6
+    },
+    {
+      "micro_seed_id": "micro_018",
+      "seed_hash": "1b66fb239ec94a65",
+      "device_name": "Heart Valve",
+      "device_class": "III",
+      "failure_mechanism": "mechanical failure",
+      "status": "GENERATION_CALL_FAILED",
+      "model": "deepseek-ai/deepseek-v4-flash-0731",
+      "provider": "NVIDIA",
+      "temperature": 0.0,
+      "prompt_hash": "bdad7f76c4ebeaaa",
+      "timestamp": "2026-08-15T01:37:28.822301+00:00",
+      "latency_s": 195.7
+    },
+    {
+      "micro_seed_id": "micro_019",
+      "seed_hash": "c84413e8bc81b8ba",
+      "device_name": "Heart Valve",
+      "device_class": "III",
+      "failure_mechanism": "thrombosis",
+      "status": "GENERATION_CALL_FAILED",
+      "model": "deepseek-ai/deepseek-v4-flash-0731",
+      "provider": "NVIDIA",
+      "temperature": 0.0,
+      "prompt_hash": "bdad7f76c4ebeaaa",
+      "timestamp": "2026-08-15T01:39:46.947798+00:00",
+      "latency_s": 136.6
+    },
+    {
+      "micro_seed_id": "micro_020",
+      "seed_hash": "ec6aaca86b9ac322",
+      "device_name": "Heart Valve",
+      "device_class": "III",
+      "failure_mechanism": "calcification",
+      "status": "GENERATION_CALL_FAILED",
+      "model": "deepseek-ai/deepseek-v4-flash-0731",
+      "provider": "NVIDIA",
+      "temperature": 0.0,
+      "prompt_hash": "bdad7f76c4ebeaaa",
+      "timestamp": "2026-08-15T01:48:36.826092+00:00",
+      "latency_s": 195.7
+    },
+    {
+      "micro_seed_id": "micro_021",
+      "seed_hash": "a8d50797643c0c3a",
+      "device_name": "Vascular Graft",
+      "device_class": "III",
+      "failure_mechanism": "leakage",
+      "status": "GENERATION_CALL_FAILED",
+      "model": "deepseek-ai/deepseek-v4-flash-0731",
+      "provider": "NVIDIA",
+      "temperature": 0.0,
+      "prompt_hash": "bdad7f76c4ebeaaa",
+      "timestamp": "2026-08-15T01:51:14.455612+00:00",
+      "latency_s": 156.1
+    },
+    {
+      "micro_seed_id": "micro_022",
+      "seed_hash": "c91fc479f9e3fd3a",
+      "device_name": "Vascular Graft",
+      "device_class": "III",
+      "failure_mechanism": "infection",
+      "status": "GENERATION_CALL_FAILED",
+      "model": "deepseek-ai/deepseek-v4-flash-0731",
+      "provider": "NVIDIA",
+      "temperature": 0.0,
+      "prompt_hash": "bdad7f76c4ebeaaa",
+      "timestamp": "2026-08-15T01:54:31.498022+00:00",
+      "latency_s": 195.5
     }
   ]
 }
