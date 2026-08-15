@@ -1,0 +1,113 @@
+{
+  "contract_name": "ADVERSARIAL_EVALUATOR_V2_CONTRACT",
+  "version": "V2",
+  "frozen_at": "2026-08-15T18:00:00.000000+00:00",
+  "frozen_before_first_v5_api_call": true,
+  "base_commit": "aa1ab09c1c779e988ca501354b464e253741d9e9",
+
+  "v1_root_cause": "BINARY_PASS_KILL_SCHEMA_NO_INSUFFICIENT_EVIDENCE",
+  "v1_kill_bias_rate": 0.7143,
+  "v1_false_kill_avg": 0.6043,
+
+  "three_state_logic": {
+    "PASS": "Evidence supports the candidate on this dimension.",
+    "KILL": "Specific evidence demonstrates that the candidate fails this dimension. KILL requires: kill_claim, specific_observation, source_id, source_hash, evidence_span, reasoning_link.",
+    "INSUFFICIENT_EVIDENCE": "Available evidence is insufficient to determine PASS or KILL. NOT KILL. NOT PASS.",
+    "critical_rule": "INSUFFICIENT_EVIDENCE is NOT KILL. INSUFFICIENT_EVIDENCE is NOT PASS."
+  },
+
+  "not_proven_vs_false": {
+    "rule_1": "Absence of evidence is not evidence of failure.",
+    "rule_2": "Do not infer KILL solely because the candidate lacks proof.",
+    "rule_3": "Do not infer PASS solely because no contradiction was found.",
+    "rule_4": "Use INSUFFICIENT_EVIDENCE when the available evidence cannot establish either PASS or KILL."
+  },
+
+  "neutral_framing": {
+    "v1": "Attack this candidate / adversarial reviewer",
+    "v2": "Evaluate the candidate against the evidence / neutral evidence evaluator",
+    "goal": "Discrimination, not destruction"
+  },
+
+  "neutral_dimensions": [
+    {"name": "MECHANISM", "v1": "Is the mechanism unsupported by evidence?", "v2": "Does the available evidence support the proposed mechanism?"},
+    {"name": "TRANSFER", "v1": "Is the transfer from source to device weak or superficial?", "v2": "Does the available evidence support the transfer from source to device?"},
+    {"name": "BOUNDARY_CONDITION", "v1": "Are boundary conditions missing or violated?", "v2": "Does external evidence establish a boundary condition that would invalidate the candidate?"},
+    {"name": "PRIOR_ART", "v1": "Does this appear to be already known?", "v2": "Does the available external evidence establish that the candidate is already specifically disclosed?"},
+    {"name": "COMBINATION", "v1": "Is this an obvious combination of known techniques?", "v2": "Does the available external evidence establish that the combination is already taught or would be routine?"},
+    {"name": "ENGINEERING_FEASIBILITY", "v1": "Is this engineering-infeasible?", "v2": "Does the available evidence demonstrate an engineering constraint that makes this infeasible?"},
+    {"name": "REGULATORY_FEASIBILITY", "v1": "Would this face regulatory barriers?", "v2": "Does the available evidence establish a regulatory barrier that cannot be overcome?"},
+    {"name": "FALSIFIABILITY", "v1": "(not in V1)", "v2": "Does the candidate provide a falsification test that could prove it wrong?"}
+  ],
+
+  "evidence_requirement_for_kill": {
+    "required_fields": ["kill_claim", "specific_observation", "source_id", "source_hash", "evidence_span", "reasoning_link"],
+    "if_absent": "KILL is INVALID. Convert to INSUFFICIENT_EVIDENCE.",
+    "llm_cannot_manufacture_evidence": true
+  },
+
+  "prior_art_firewall": "REMAINS: TOPICAL_RELATED, POSSIBLE_RELEVANCE, NO_MATCH_FOUND, UNRESOLVED cannot yield PRIOR_ART=KILL. Only SPECIFIC_DISCLOSURE, IDENTICAL_OR_NEAR_IDENTICAL_DISCLOSURE may support KILL.",
+  "boundary_firewall": "REMAINS: Boundary KILL requires semantic external evidence resolver.",
+
+  "invalid_verdict_handling": {
+    "verdict_reason_conflict": "ADVERSARIAL_INVALID (not KILL)",
+    "evidence_missing": "INSUFFICIENT_EVIDENCE (not KILL)",
+    "evaluator_api_fails": "EVALUATOR_CALL_FAILED (not KILL)"
+  },
+
+  "overall_verdict_logic": {
+    "OVERALL_KILL": "At least one dimension has a VALID KILL",
+    "OVERALL_INSUFFICIENT_EVIDENCE": "No valid KILL exists AND at least one dimension is INSUFFICIENT_EVIDENCE",
+    "OVERALL_PASS": "All dimensions PASS"
+  },
+
+  "aic_gate_adapter": {
+    "KILL": "adversarial failure",
+    "PASS": "adversarial pass",
+    "INSUFFICIENT_EVIDENCE": "unresolved / not promotable",
+    "rule": "Do not treat INSUFFICIENT_EVIDENCE as a pass"
+  },
+
+  "configuration": {
+    "temperature": 0.0,
+    "max_tokens": 8000,
+    "retry_policy": {"max_retries": 1, "timeout_s": 30, "backoff_s": "3*(attempt+1)"},
+    "oracle": "ADVERSARIAL_CALIBRATION_ORACLE_V3.json (42 cases, 24/24 critical GOLD, UNCHANGED)",
+    "models": ["meta/llama-3.1-8b-instruct", "z-ai/glm-5.2", "google/gemma-4-31b-it", "minimaxai/minimax-m3", "google/diffusiongemma-26b-a4b-it", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"]
+  },
+
+  "acceptance_gate": {
+    "determinate_accuracy_minimum": 0.80,
+    "false_kill_rate_maximum": 0.20,
+    "false_survival_rate_maximum": 0.20,
+    "critical_category_determinate_accuracy_minimum": 0.70,
+    "call_failure_rate_maximum": 0.20,
+    "zero_fabricated_evidence": true,
+    "zero_fabricated_patent_citations": true,
+    "zero_firewall_violations": true,
+    "zero_evaluator_failure_as_kill": true,
+    "coverage_must_be_reported": true
+  },
+
+  "metrics": {
+    "determinate_accuracy": "correct / (correct + incorrect) — excludes INSUFFICIENT_EVIDENCE",
+    "coverage": "determinate_cases / total_cases",
+    "false_kill_rate": "KILL when expected SURVIVE / determinate_cases",
+    "false_survival_rate": "PASS when expected KILL / determinate_cases",
+    "abstention_rate": "INSUFFICIENT_EVIDENCE / total_cases",
+    "insufficient_evidence_precision": "correct INSUFFICIENT_EVIDENCE / total INSUFFICIENT_EVIDENCE",
+    "insufficient_evidence_recall": "correct INSUFFICIENT_EVIDENCE / total expected INSUFFICIENT_EVIDENCE"
+  },
+
+  "invariants": [
+    "Contract frozen BEFORE any V5 API calls",
+    "42-case GOLD oracle UNCHANGED",
+    "Same 6 models as V4",
+    "Three-state logic: PASS / INSUFFICIENT_EVIDENCE / KILL at both dimension and overall level",
+    "No prompt changes after results",
+    "No threshold changes after results",
+    "No oracle changes",
+    "No large-model escape hatch — test same models with corrected contract",
+    "Coverage must be reported — cannot pass by abstaining on everything"
+  ]
+}
