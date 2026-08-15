@@ -1,0 +1,58 @@
+{
+  "manifest_name": "ARCHITECTURE_TOURNAMENT_V3_START",
+  "created_at": "2026-08-15T04:10:00.000000+00:00",
+  "status": "PRE_EXECUTION",
+  "description": "Architecture Tournament V3 — Production Architecture Selection Experiment. 7 arms (M0-M4C) × 100 problems, fresh runs, frozen routing policy, V2 ontology, common downstream gates.",
+
+  "frozen_hashes": {
+    "routing_policy_sha256": "79a928166bce6fb9faf2368c9aba2ffc9f1aaeacc4e73bbade25218d4f76470d",
+    "problem_corpus_root_hash": "40adb5d0157f624a",
+    "evidence_packets_root_hash": "b9faf80e8aabf16b",
+    "micro_seed_manifest_root_hash": "a8b88c8fdcc961de",
+    "ontology_hash": "cd824023412623c6",
+    "tournament_preregistration_sha256": "50971eadc2464e0e7bbf14a68574e38c1b4a3ed0ab3ca4d30c097897e0d867e6",
+    "macro_baseline_root_hash": "1968b35ac5a2c09e",
+    "micro_baseline_root_hash": "1d4d54bf930dc225"
+  },
+
+  "frozen_configuration": {
+    "problem_count": 100,
+    "candidate_budget_per_arm": 100,
+    "candidate_budget_per_problem_per_arm": 1,
+    "total_arms": 7,
+    "total_candidate_opportunities": 700,
+    "ontology": "V2_FROZEN",
+    "temperature": 0.0,
+    "max_tokens": 2000,
+    "per_call_retry": {"max_attempts": 3, "timeout_s": 90, "backoff_s": "5*(attempt+1)"},
+    "routing_policy_path": "experiments/ARCHITECTURE_ROUTING_POLICY_V1.json"
+  },
+
+  "arms": {
+    "M0": "MACRO_ONLY — broad evidence discovery + synthesis, no Micro knowledge",
+    "M1": "MICRO_ONLY — device/failure/experience/regulatory-constrained, no Macro knowledge",
+    "M2": "MACRO_TO_MICRO — Macro produces mechanism memory (round 0), Micro consumes it",
+    "M3": "MICRO_TO_MACRO — Micro produces problem memory (round 0), Macro consumes it",
+    "M4": "RECURSIVE_MACRO_MICRO — 4 rounds of alternating frozen knowledge exchange",
+    "M4B": "INFORMATION_MATCHED_NON_RECURSIVE — same accumulated info as M4, non-recursive",
+    "M4C": "COMPUTE_MATCHED_NON_RECURSIVE — same total compute as M4, non-recursive"
+  },
+
+  "primary_metric": "AIC_YIELD",
+  "winner_threshold": "M4 > M4B AND M4 > M4C AND M4 >= best_baseline + 5pp AND stats pass",
+  "model_quality_comparison": "NOT_IDENTIFIABLE (routing is the constant)",
+
+  "invariants": [
+    "All 7 arms use the SAME frozen routing policy",
+    "All 7 arms use the SAME V2_FROZEN ontology",
+    "All 7 arms use the SAME 100-problem universe",
+    "All 7 arms use the SAME Phase D frozen evidence packets",
+    "All 7 arms use the SAME downstream gates (target alignment, evidence verification, prior-art, adversarial, AIC)",
+    "No arm gets architecture-specific threshold leniency",
+    "No prior Macro-1 or Micro-2 outputs are reused as tournament results",
+    "GENERATION_CALL_FAILED is NOT a classification",
+    "Every candidate carries full provenance (architecture_origin, arm, round, problem_id, provider, model, prompt_hash, source_hashes, evidence_spans, prior_art_state, adversarial_state, AIC_state, simulation_state)"
+  ],
+
+  "gates_verified_before_first_api_call": true
+}
