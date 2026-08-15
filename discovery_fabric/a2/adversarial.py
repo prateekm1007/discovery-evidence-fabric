@@ -71,7 +71,7 @@ REASON: <one sentence>
 
 def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
 
-def llm_chat(prompt, system="", max_retries=2, timeout=60):
+def llm_chat(prompt, system="", max_retries=1, timeout=30):
     messages = []
     if system: messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
