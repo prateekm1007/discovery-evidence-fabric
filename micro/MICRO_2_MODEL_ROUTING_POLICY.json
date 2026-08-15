@@ -1,0 +1,49 @@
+{
+  "purpose": "Adaptive model pool for future invention production runs",
+  "primary_pool": {
+    "Mistral": [
+      "mistral-medium-latest",
+      "mistral-small-2603",
+      "mistral-large-latest"
+    ],
+    "NVIDIA": [
+      "deepseek-ai/deepseek-v4-flash-0731",
+      "deepseek-v4-pro",
+      "other_currently_verified_healthy_NVIDIA_text_models"
+    ]
+  },
+  "routing_rules": [
+    {
+      "trigger": "HTTP 429",
+      "action": "switch_model_immediately"
+    },
+    {
+      "trigger": "repeated_timeout",
+      "action": "demote_model"
+    },
+    {
+      "trigger": "HTTP 5xx",
+      "action": "retry_then_switch"
+    },
+    {
+      "trigger": "unhealthy_provider",
+      "action": "switch_provider"
+    },
+    {
+      "trigger": "successful_model",
+      "action": "retain_temporarily"
+    }
+  ],
+  "per_call_provenance_required": [
+    "provider",
+    "model",
+    "attempt",
+    "latency",
+    "failure_reason",
+    "routing_reason",
+    "prompt_hash",
+    "response_hash"
+  ],
+  "key_policy": "API keys are never exposed in artifacts, logs, or commits.",
+  "note": "This routing policy is for FUTURE invention production runs only. The architecture tournament will use a fresh, frozen routing configuration defined in the V3 preregistration."
+}

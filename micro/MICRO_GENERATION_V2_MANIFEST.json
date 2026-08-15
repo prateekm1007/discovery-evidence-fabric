@@ -1,6 +1,6 @@
 {
-  "manifest_version": "MICRO_GENERATION_V2_ROUTED_FINAL",
-  "created_at": "2026-08-15T03:14:50.615858+00:00",
+  "manifest_version": "MICRO_GENERATION_V2_RECONCILED_FINAL",
+  "reconciled_at": "2026-08-15T03:21:04.837288+00:00",
   "seed_manifest_root_hash": "a8b88c8fdcc961de",
   "ontology_version": "V2_FROZEN",
   "prompt_hash": "bdad7f76c4ebeaaa",
@@ -9,91 +9,84 @@
     "max_retries": 3,
     "timeout_s": 90
   },
-  "max_outer_rounds": 4,
-  "total_outer_rounds_executed": 1,
   "mistral_primary_model_used": "mistral-medium-latest",
+  "reconciliation": {
+    "total_records_audited": 100,
+    "inconsistent_before": 2,
+    "inconsistent_after": 0,
+    "corrections_applied": 8
+  },
   "all_attempt_denominator": 100,
   "successful_call_denominator": 100,
   "generation_failure_count": 0,
   "final_generation_unresolved_count": 0,
   "nonterminal_failure_residual": 0,
   "status_counts": {
-    "MICRO_UNSUPPORTED": 49,
-    "MICRO_HYPOTHESIS": 25,
-    "MICRO_MECHANISM_SUPPORTED_HYPOTHESIS": 26
+    "MICRO_UNSUPPORTED": 51,
+    "MICRO_MECHANISM_SUPPORTED_HYPOTHESIS": 26,
+    "MICRO_HYPOTHESIS": 23
   },
-  "v2_classification_counts": {
-    "MICRO_UNSUPPORTED": 49,
-    "MICRO_HYPOTHESIS": 25,
-    "MICRO_MECHANISM_SUPPORTED_HYPOTHESIS": 26
+  "audit_pass_rates": {
+    "problem_evidence_pass_rate": 1.0,
+    "mechanism_evidence_pass_rate": 0.26,
+    "mechanism_evidence_pass_or_partial_rate": 0.93,
+    "transfer_supported_rate": 0.43,
+    "falsifiable_hypothesis_rate": 0.97,
+    "hypothesis_boundary_pass_rate": 1.0,
+    "provenance_pass_rate": 1.0
   },
   "by_provider_model": {
     "NVIDIA/deepseek-ai/deepseek-v4-flash-0731": {
       "total": 17,
-      "candidate_count": 17,
-      "mechanism_supported_count": 7,
-      "hypothesis_count": 2,
-      "unsupported_count": 8,
-      "wrong_target_count": 0,
-      "non_functional_count": 0,
-      "failure_count": 0,
-      "unresolved_count": 0,
-      "candidate_rate": 1.0,
+      "mechanism_supported": 7,
+      "hypothesis": 0,
+      "unsupported": 10,
+      "wrong_target": 0,
+      "non_functional": 0,
       "mechanism_supported_rate": 0.4118,
-      "hypothesis_rate": 0.1176,
-      "unsupported_rate": 0.4706,
-      "call_failure_rate": 0.0,
+      "hypothesis_rate": 0.0,
+      "unsupported_rate": 0.5882,
+      "problem_evidence_pass_rate": 1.0,
+      "mechanism_evidence_pass_rate": 0.4118,
+      "transfer_supported_rate": 0.0588,
+      "falsifiable_hypothesis_rate": 1.0,
       "median_latency_s": 46.4,
       "p95_latency_s": 110.7
     },
     "Mistral/mistral-medium-latest": {
       "total": 83,
-      "candidate_count": 83,
-      "mechanism_supported_count": 19,
-      "hypothesis_count": 23,
-      "unsupported_count": 41,
-      "wrong_target_count": 0,
-      "non_functional_count": 0,
-      "failure_count": 0,
-      "unresolved_count": 0,
-      "candidate_rate": 1.0,
+      "mechanism_supported": 19,
+      "hypothesis": 23,
+      "unsupported": 41,
+      "wrong_target": 0,
+      "non_functional": 0,
       "mechanism_supported_rate": 0.2289,
       "hypothesis_rate": 0.2771,
       "unsupported_rate": 0.494,
-      "call_failure_rate": 0.0,
+      "problem_evidence_pass_rate": 1.0,
+      "mechanism_evidence_pass_rate": 0.2289,
+      "transfer_supported_rate": 0.506,
+      "falsifiable_hypothesis_rate": 0.9639,
       "median_latency_s": 2.6,
       "p95_latency_s": 7.6
     }
   },
-  "metrics": {
-    "RAW_GENERATION_RATE": 1.0,
-    "FINAL_UNRESOLVED_RATE": 0.0,
-    "MICRO_MECHANISM_SUPPORTED_HYPOTHESIS_RATE": 0.26,
-    "MICRO_HYPOTHESIS_RATE": 0.25,
-    "MICRO_UNSUPPORTED_RATE": 0.49,
-    "MICRO_WRONG_TARGET_RATE": 0.0,
-    "MICRO_NON_FUNCTIONAL_RATE": 0.0
-  },
-  "transfer_distribution": {
-    "NOT_APPLICABLE": 15,
-    "MECHANISTIC_INFERENCE": 40,
-    "UNSUPPORTED_TRANSFER": 42,
-    "DIRECT_TRANSFER": 3
-  },
-  "experience_signals_used": {
-    "uses_failure_evidence": 73,
-    "uses_adverse_event_evidence": 22,
-    "uses_scientific_mechanism": 50,
-    "uses_predicate_lineage": 3,
-    "uses_regulatory_constraint": 5
-  },
   "root_hash": "1d4d54bf930dc225",
+  "model_performance_note": {
+    "MISTRAL_OPERATIONALLY_SUPERIOR": true,
+    "MODEL_QUALITY_WINNER": "UNDETERMINED",
+    "reason": "Mistral showed higher throughput (2.6s median vs 46.4s), lower p95 latency (7.6s vs 110.7s), and 100% completion reliability (0 failures on 83 seeds vs 7/24 NVIDIA failures before fallback). However, no controlled downstream quality comparison has been run. Model quality winner remains UNDETERMINED pending a controlled head-to-head with frozen seeds, frozen prompt, frozen ontology, and blinded downstream evaluation."
+  },
   "gates": {
     "MICRO_2_COMPLETE": true,
+    "MICRO_2_CLASSIFICATION_CONSISTENCY_CLOSED": true,
     "GENERATION_CALL_FAILED_IS_NOT_CLASSIFICATION": true,
     "FINAL_GENERATION_UNRESOLVED_IS_TERMINAL_NOT_CLASSIFICATION": true,
     "DUAL_DENOMINATORS_REPORTED": true,
     "BY_PROVIDER_STRATIFICATION_REPORTED": true,
+    "AUDIT_PASS_RATES_REPORTED": true,
+    "MISTRAL_OPERATIONALLY_SUPERIOR": true,
+    "MODEL_QUALITY_WINNER": "UNDETERMINED",
     "TESTS_PASS": "11/11",
     "REGRESSION_PASS": "6/6"
   }
