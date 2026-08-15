@@ -1,0 +1,73 @@
+{
+  "protocol_name": "ADVERSARIAL_MODEL_TOURNAMENT_V4_PROTOCOL",
+  "frozen_at": "2026-08-15T17:00:00.000000+00:00",
+  "frozen_before_first_tournament_api_call": true,
+  "base_commit": "pending",
+  "v3_tournament_status": "INVALID_FOR_MODEL_SELECTION (oracle V1/V2 invalid)",
+  "oracle_v3_root_hash": "26f8f51e6d355e84",
+  "oracle_v3_sha256": "abbccREDACTED-SCOPUS-PATTERN-MATCH",
+  "oracle_v3_formal_calibration_ready": true,
+
+  "oracle": {
+    "source": "ADVERSARIAL_CALIBRATION_ORACLE_V3.json",
+    "total_cases": 42,
+    "critical_gold": "24/24",
+    "categories": {
+      "MECHANISM_VALID": 6,
+      "TRANSFER_VALID": 6,
+      "BOUNDARY_CONDITION": 6,
+      "NON_BOUNDARY": 6,
+      "SPECIFIC_PRIOR_ART": 6,
+      "TOPICAL_ONLY_PRIOR_ART": 6,
+      "COMBINATION_SUPPORTED_NOT_SUPPORTED": 6
+    },
+    "critical_categories": ["BOUNDARY_CONDITION", "SPECIFIC_PRIOR_ART", "TOPICAL_ONLY_PRIOR_ART", "COMBINATION_SUPPORTED_NOT_SUPPORTED"],
+    "no_llm_generated_oracle_labels": true,
+    "no_fabricated_patent_references": true
+  },
+
+  "candidate_models": [
+    {"id": "A", "model": "meta/llama-3.1-8b-instruct", "provider": "NVIDIA"},
+    {"id": "B", "model": "z-ai/glm-5.2", "provider": "NVIDIA"},
+    {"id": "C", "model": "google/gemma-4-31b-it", "provider": "NVIDIA"},
+    {"id": "D", "model": "minimaxai/minimax-m3", "provider": "NVIDIA"},
+    {"id": "E", "model": "google/diffusiongemma-26b-a4b-it", "provider": "NVIDIA"},
+    {"id": "F", "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", "provider": "NVIDIA"}
+  ],
+
+  "evaluator_configuration": {
+    "temperature": 0.0,
+    "max_tokens": 8000,
+    "retry_policy": {"max_retries": 1, "timeout_s": 30, "backoff_s": "3*(attempt+1)"},
+    "prompt": "ATTACK_PROMPT from discovery_fabric/a2/adversarial.py (unchanged)",
+    "system_prompt": "You are a strict adversarial reviewer.",
+    "v4_corrections": "all wired (firewall, boundary evidence, adversarial-invalid, evidence gate)"
+  },
+
+  "acceptance_gate": {
+    "overall_accuracy_minimum": 0.80,
+    "per_category_accuracy_minimum": 0.70,
+    "false_kill_rate_maximum": 0.20,
+    "false_survival_rate_maximum": 0.20,
+    "zero_fabricated_evidence": true,
+    "zero_fabricated_patent_references": true,
+    "zero_evaluator_failure_as_kill": true,
+    "zero_firewall_violations": true,
+    "model_reliability_requirement": "call_failure_rate <= 0.20"
+  },
+
+  "ranking_priority": [
+    "1. false_kill_rate (lower is better, must be <=20%)",
+    "2. critical_category_accuracy (must be >=70% in every category)",
+    "3. overall_accuracy (must be >=80%)",
+    "4. false_survival_rate (must be <=20%)",
+    "5. fabricated_evidence_rate (must be 0)",
+    "6. structured_output_reliability",
+    "7. latency (Pareto-optimal among passing models)"
+  ],
+
+  "no_cross_model_voting": true,
+  "no_averaging": true,
+  "no_post_hoc_tuning": true,
+  "no_oracle_modification": true
+}

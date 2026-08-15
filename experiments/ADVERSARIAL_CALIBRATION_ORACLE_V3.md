@@ -1,73 +1,23 @@
-# Adversarial Calibration Oracle V3
+# Adversarial Calibration Oracle V3 (After Category Hardening)
 
-Created: 2026-08-15T16:56:59.018663+00:00
+Root hash: `26f8f51e6d355e84`
+Previous root: `26f8f51e6d355e84`
+SHA256: `abbccREDACTED-SCOPUS-PATTERN-MATCH`
 
-Root hash: `f8f0f02a22198261`
+## Upgrade Reason
 
-SHA256: `d5096975379aREDACTED-SCOPUS-PATTERN-MATCH`
+Category hardening: (1) OBVIOUSNESS_NON_OBVIOUSNESS renamed to COMBINATION_SUPPORTED_NOT_SUPPORTED (no actual prosecution/examiner evidence — source_type labels were aspirational, we have patent claims only, cannot establish legal obviousness). (2) TOPICAL_ONLY_PRIOR_ART enhanced with document-level absence evidence. (3) SPECIFIC_PRIOR_ART enhanced with element_mapping. (4) BOUNDARY_CONDITION verified.
 
+## Categories
 
-## V2 Status: VALID_BUT_INSUFFICIENT_EVIDENCE_DEPTH
-
-V2 root preserved: `90246e386bd26168`
-
-
-## Construction Method
-
-GOLD-standard: real patents from Google Patents + verified boundary evidence
-
-
-## Critical Categories GOLD Status
-
-| Category | Count | GOLD | Source |
-|----------|-------|------|--------|
-| BOUNDARY_CONDITION | 6 | 6 | Phase-D evidence |
-| SPECIFIC_PRIOR_ART | 6 | 6 | Google Patents |
-| TOPICAL_ONLY_PRIOR_ART | 2 | 2 | Google Patents |
-| OBVIOUSNESS_NON_OBVIOUSNESS | 6 | 6 | Google Patents |
+| Category | Count | Critical | GOLD |
+|----------|-------|----------|------|
+| MECHANISM_VALID | 6 | no | 0 |
+| TRANSFER_VALID | 6 | no | 0 |
+| NON_BOUNDARY | 6 | no | 0 |
+| BOUNDARY_CONDITION | 6 | YES | 6 |
+| SPECIFIC_PRIOR_ART | 6 | YES | 6 |
+| TOPICAL_ONLY_PRIOR_ART | 6 | YES | 6 |
+| COMBINATION_SUPPORTED_NOT_SUPPORTED | 6 | YES | 6 |
 
 ## Formal Calibration Ready: **True**
-
-
-## Cases
-
-| Case ID | Category | Expected | Strength | Source | Patent |
-|---------|----------|----------|----------|--------|--------|
-| MECH_V2_001 | MECHANISM_VALID | SURVIVE | ? | europepmc:41607017 |  |
-| MECH_V2_002 | MECHANISM_VALID | SURVIVE | ? | europepmc:42255771 |  |
-| MECH_V2_003 | MECHANISM_VALID | SURVIVE | ? | europepmc:41960287 |  |
-| MECH_V2_004 | MECHANISM_VALID | SURVIVE | ? | europepmc:42099886 |  |
-| MECH_V2_005 | MECHANISM_VALID | SURVIVE | ? | europepmc:42581250 |  |
-| MECH_V2_006 | MECHANISM_VALID | SURVIVE | ? | europepmc:42199852 |  |
-| TRANS_V2_001 | TRANSFER_VALID | SURVIVE | ? | europepmc:42273451 |  |
-| TRANS_V2_002 | TRANSFER_VALID | SURVIVE | ? | europepmc:42273451 |  |
-| TRANS_V2_003 | TRANSFER_VALID | SURVIVE | ? | europepmc:41303160 |  |
-| TRANS_V2_004 | TRANSFER_VALID | SURVIVE | ? | europepmc:42180036 |  |
-| TRANS_V2_005 | TRANSFER_VALID | SURVIVE | ? | europepmc:40369532 |  |
-| TRANS_V2_006 | TRANSFER_VALID | SURVIVE | ? | europepmc:42027784 |  |
-| NONB_V2_001 | NON_BOUNDARY | SURVIVE | ? | europepmc:42272913 |  |
-| NONB_V2_002 | NON_BOUNDARY | SURVIVE | ? | europepmc:42255182 |  |
-| NONB_V2_003 | NON_BOUNDARY | SURVIVE | ? | europepmc:42181817 |  |
-| NONB_V2_004 | NON_BOUNDARY | SURVIVE | ? | europepmc:42521415 |  |
-| NONB_V2_005 | NON_BOUNDARY | SURVIVE | ? | europepmc:42073461 |  |
-| NONB_V2_006 | NON_BOUNDARY | SURVIVE | ? | europepmc:39768433 |  |
-| BOUND_V3_001 | BOUNDARY_CONDITION | KILL | GOLD | europepmc:42205228 |  |
-| BOUND_V3_002 | BOUNDARY_CONDITION | KILL | GOLD | europepmc:42306589 |  |
-| BOUND_V3_003 | BOUNDARY_CONDITION | KILL | GOLD | europepmc:42306589 |  |
-| BOUND_V3_004 | BOUNDARY_CONDITION | KILL | GOLD | europepmc:41960287 |  |
-| BOUND_V3_005 | BOUNDARY_CONDITION | KILL | GOLD | europepmc:42147506 |  |
-| BOUND_V3_006 | BOUNDARY_CONDITION | KILL | GOLD | europepmc:41960287 |  |
-| SPEC_V3_001 | SPECIFIC_PRIOR_ART | KILL | GOLD | US5545185A | US5545185A |
-| SPEC_V3_002 | SPECIFIC_PRIOR_ART | KILL | GOLD | US6859690B2 | US6859690B2 |
-| SPEC_V3_003 | SPECIFIC_PRIOR_ART | KILL | GOLD | US7704242B2 | US7704242B2 |
-| SPEC_V3_004 | SPECIFIC_PRIOR_ART | KILL | GOLD | US5935097A | US5935097A |
-| SPEC_V3_005 | SPECIFIC_PRIOR_ART | KILL | GOLD | US6565764B2 | US6565764B2 |
-| SPEC_V3_006 | SPECIFIC_PRIOR_ART | KILL | GOLD | US7871362B2 | US7871362B2 |
-| TOPC_V3_001 | TOPICAL_ONLY_PRIOR_ART | SURVIVE | GOLD | US5107842A | US5107842A |
-| TOPC_V3_002 | TOPICAL_ONLY_PRIOR_ART | SURVIVE | GOLD | US6332809B1 | US6332809B1 |
-| OBV_V3_001 | OBVIOUSNESS_NON_OBVIOUSNESS | KILL | GOLD | US5545185A | US5545185A |
-| OBV_V3_002 | OBVIOUSNESS_NON_OBVIOUSNESS | KILL | GOLD | US6859690B2 | US6859690B2 |
-| OBV_V3_003 | OBVIOUSNESS_NON_OBVIOUSNESS | KILL | GOLD | US7704242B2 | US7704242B2 |
-| OBV_V3_004 | OBVIOUSNESS_NON_OBVIOUSNESS | SURVIVE | GOLD | US5935097A | US5935097A |
-| OBV_V3_005 | OBVIOUSNESS_NON_OBVIOUSNESS | SURVIVE | GOLD | US6565764B2 | US6565764B2 |
-| OBV_V3_006 | OBVIOUSNESS_NON_OBVIOUSNESS | SURVIVE | GOLD | US7871362B2 | US7871362B2 |
