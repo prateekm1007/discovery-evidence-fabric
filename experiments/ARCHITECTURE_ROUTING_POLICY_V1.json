@@ -1,0 +1,77 @@
+{
+  "policy_name": "ARCHITECTURE_ROUTING_POLICY_V1",
+  "frozen_at": "2026-08-15T03:25:00.000000+00:00",
+  "frozen_before_first_macro_api_call": true,
+  "purpose": "Frozen routing policy for the Macro baseline (V1) and the architecture tournament (V3 preregistration). This policy is fixed before any Macro API call and will NOT be changed after seeing Macro results.",
+
+  "primary_pool": {
+    "Mistral": [
+      "mistral-medium-latest"
+    ],
+    "NVIDIA": [
+      "deepseek-ai/deepseek-v4-flash-0731"
+    ]
+  },
+
+  "preference_order": [
+    {"provider": "Mistral", "model": "mistral-medium-latest", "reason": "verified healthy, median 2.6s, p95 7.6s, 0 failures on 83 Micro seeds"},
+    {"provider": "NVIDIA", "model": "deepseek-ai/deepseek-v4-flash-0731", "reason": "verified working but slow (median 46.4s, p95 110.7s), used as fallback"}
+  ],
+
+  "routing_rules": [
+    {"trigger": "HTTP 429 (rate limited)", "action": "switch_model_immediately", "scope": "intra-provider then inter-provider"},
+    {"trigger": "repeated_timeout (>=2 consecutive timeouts on same model)", "action": "demote_model", "scope": "skip this model for next 5 calls"},
+    {"trigger": "HTTP 5xx", "action": "retry_then_switch", "scope": "retry up to 3 times then switch"},
+    {"trigger": "unhealthy_provider (provider down)", "action": "switch_provider", "scope": "Mistral <-> NVIDIA"},
+    {"trigger": "successful_model", "action": "retain_temporarily", "scope": "keep using same model for next call"}
+  ],
+
+  "per_call_provenance_required": [
+    "provider",
+    "model",
+    "attempt",
+    "latency_s",
+    "failure_reason",
+    "routing_reason",
+    "prompt_hash",
+    "response_hash",
+    "timestamp",
+    "temperature",
+    "max_tokens"
+  ],
+
+  "call_parameters": {
+    "temperature": 0.0,
+    "max_tokens": 2000,
+    "per_call_retry": {
+      "max_attempts": 3,
+      "timeout_s": 90,
+      "backoff_s": "5 * (attempt + 1)"
+    },
+    "max_outer_rounds": 4,
+    "max_attempts_per_seed_per_round": 2
+  },
+
+  "routing_reasons_enum": [
+    "MISTRAL_PRIMARY",
+    "MISTRAL_FALLBACK_SECONDARY",
+    "MISTRAL_UNAVAILABLE_FALLBACK_NVIDIA",
+    "NVIDIA_TIMEOUT_FALLBACK_TO_MISTRAL",
+    "NVIDIA_PRIMARY",
+    "ALL_ROUTES_EXHAUSTED_FINAL_UNRESOLVED"
+  ],
+
+  "key_policy": "API keys are NEVER exposed in artifacts, logs, manifests, or commits. Keys are read from environment variables only.",
+
+  "model_quality_comparison_statement": {
+    "MODEL_QUALITY_COMPARISON": "NOT_IDENTIFIABLE",
+    "reason": "This run establishes the Macro architecture baseline. Routing is operational, not balanced for model comparison. Model quality comparison is a separate future experiment."
+  },
+
+  "invariants": [
+    "This policy is FROZEN before the first Macro API call.",
+    "Policy will NOT be changed after seeing Macro results.",
+    "Any deviation must be recorded as a NEW policy version (V2, V3, ...).",
+    "The architecture tournament (M0-M4C) will use this same frozen policy OR a clearly-versioned successor."
+  ]
+}
