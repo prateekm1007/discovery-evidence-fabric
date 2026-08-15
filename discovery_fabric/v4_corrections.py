@@ -569,3 +569,33 @@ def load_m4_memory(round_num: int, engine: str, input_dir: Path) -> dict:
 
 # Import needed for commit_m4_memory
 from datetime import datetime, timezone
+
+
+# ===== PRODUCTION WRAPPERS (task-required function names) =====
+# These provide the exact API names the production adversarial path expects.
+# They delegate to the authoritative implementations above — ONE implementation.
+
+def evaluate_boundary_condition(kill_reason: str, external_evidence: Optional[dict] = None) -> dict:
+    """PRODUCTION ENTRY POINT for boundary-condition evaluation.
+    
+    Wraps validate_boundary_evidence() + boundary_prefilter().
+    A BOUNDARY_CONDITION=KILL requires:
+      - specific boundary
+      - failure mechanism
+      - why candidate crosses the boundary
+      - external evidence (published record, peer-reviewed paper, engineering reference, standard)
+    
+    The evaluator's own reasoning is NOT evidence.
+    If no external evidence: INSUFFICIENT_EVIDENCE, do NOT kill.
+    """
+    return validate_boundary_evidence(kill_reason, external_evidence)
+
+
+def skip_if_evidence_failed(evidence_verified: bool) -> dict:
+    """PRODUCTION ENTRY POINT for evidence-gate check.
+    
+    Wraps check_evidence_gate_before_adversarial().
+    If evidence fails: adversarial MUST NOT run.
+    Returns adversarial_status = NOT_RUN, adversarial_not_run_reason = EVIDENCE_GATE_FAILED.
+    """
+    return check_evidence_gate_before_adversarial(evidence_verified)
