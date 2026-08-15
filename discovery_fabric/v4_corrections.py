@@ -571,6 +571,91 @@ def load_m4_memory(round_num: int, engine: str, input_dir: Path) -> dict:
 from datetime import datetime, timezone
 
 
+# ===== BOUNDARY EVIDENCE RESOLVER =====
+# Retrieves external boundary evidence from the candidate's evidence packet.
+# The LLM adversarial evaluator does NOT get to invent evidence — it must
+# come from the frozen Phase-D evidence packet sources.
+
+def resolve_boundary_evidence(candidate: dict, evidence_packet_sources: list = None) -> Optional[dict]:
+    """Resolve external boundary evidence from the candidate's evidence packet.
+    
+    Searches the evidence packet sources for spans that contain boundary-condition
+    indicators (failure thresholds, limits, standards citations).
+    
+    Returns a dict with:
+      source_id, source_type, source_hash, source_url, evidence_span, retrieval_timestamp
+    
+    Returns None if no external boundary evidence exists.
+    """
+    if not evidence_packet_sources:
+        # Try to get sources from the candidate itself
+        evidence_packet_sources = candidate.get("sources", []) or candidate.get("evidence_sources", [])
+    
+    if not evidence_packet_sources:
+        return None
+    
+    # Boundary-condition indicators: thresholds, limits, standards, failure conditions
+    boundary_indicators = [
+        "threshold", "limit", "maximum", "minimum", "boundary", "range",
+        "ISO", "ASTM", "IEC", "FDA", "21 CFR", "standard",
+        "failure condition", "operating condition", "specification",
+        "temperature", "pressure", "voltage", "frequency", "cycle",
+        "mg/mL", "MPa", "kPa", "°C", "Hz",
+    ]
+    
+    for src in evidence_packet_sources:
+        span = src.get("source_span", "")
+        span_lower = span.lower()
+        
+        # Check if this span contains boundary-condition indicators
+        has_boundary = any(ind.lower() in span_lower for ind in boundary_indicators)
+        if not has_boundary:
+            continue
+        
+        # Check if this span is relevant to the candidate's failure mode
+        failure_mode = (candidate.get("failure_mode", "") or "").lower().replace("_", " ")
+        device = (candidate.get("device_class", "") or candidate.get("device_name", "") or "").lower()
+        
+        # The span must mention the device or failure mode to be relevant
+        relevant = False
+        if device:
+            dev_words = [w for w in device.split() if len(w) > 3]
+            relevant = any(w in span_lower for w in dev_words)
+        if not relevant and failure_mode:
+            fm_words = [w for w in failure_mode.split() if len(w) > 3]
+            relevant = any(w in span_lower for w in fm_words)
+        
+        if not relevant:
+            continue
+        
+        # Found valid external boundary evidence
+        return {
+            "oracle_source_id": src.get("source_id", ""),
+            "oracle_source_type": _classify_source_type(src),
+            "oracle_source_hash": src.get("content_hash", "")[:16],
+            "oracle_source_url": src.get("doi", "") or src.get("source_id", ""),
+            "oracle_evidence_span": span[:300],
+            "oracle_reason": f"Boundary evidence found in source {src.get('source_id','')}",
+            "retrieval_timestamp": src.get("retrieval_timestamp", ""),
+        }
+    
+    return None
+
+
+def _classify_source_type(src: dict) -> str:
+    """Classify the source type for external evidence."""
+    source_type = src.get("source_type", "")
+    if source_type == "PUBLICATION":
+        return "PEER_REVIEWED_PAPER"
+    if "patent" in source_type.lower():
+        return "PATENT_CLAIM"
+    if "fda" in src.get("source_id", "").lower() or "maude" in src.get("source_id", "").lower():
+        return "PUBLISHED_FAILURE_RECORD"
+    if "iso" in src.get("source_span", "").lower() or "astm" in src.get("source_span", "").lower():
+        return "REGULATORY_STANDARD"
+    return "PEER_REVIEWED_PAPER"  # default for Europe PMC / OpenAlex sources
+
+
 # ===== PRODUCTION WRAPPERS (task-required function names) =====
 # These provide the exact API names the production adversarial path expects.
 # They delegate to the authoritative implementations above — ONE implementation.

@@ -28,6 +28,7 @@ from discovery_fabric.v4_corrections import (
     evaluate_boundary_condition,
     enforce_prior_art_firewall,
     check_adversarial_invalid,
+    resolve_boundary_evidence,
     NON_KILL_PRIOR_ART_STATES,
     KILL_PRIOR_ART_STATES,
 )
@@ -135,8 +136,18 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
     print(f"  [adversarial] challenging candidate...")
     resp = llm_chat(prompt, system="You are a strict adversarial reviewer.")
     if not resp:
-        return {"overall": "KILLED", "reason": "LLM failed", "attacks": {},
-                "v4_corrections_applied": [], "timestamp": datetime.now(timezone.utc).isoformat()}
+        # DEFECT FIX: LLM failure must NEVER become KILL.
+        # This is an operational failure, not a scientific verdict.
+        return {
+            "overall": "EVALUATOR_CALL_FAILED",
+            "adversarial_status": "EVALUATOR_CALL_FAILED",
+            "reason": "LLM call failed (timeout, rate limit, or error)",
+            "attacks": {},
+            "killed_count": 0,
+            "v4_corrections_applied": [],
+            "is_scientific_verdict": False,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
 
     fields = ["UNSUPPORTED_MECHANISM", "WEAK_TRANSFER", "OBVIOUS_COMBINATION", "PRIOR_ART",
               "CONTRADICTION", "BOUNDARY_FAILURE", "ENGINEERING_INFEASIBILITY",
@@ -173,8 +184,11 @@ def adversarial_challenge(candidate: dict, evidence_verified: bool = True,
                 v4_corrections_applied.append(f"prior_art_firewall:{fw['action']}")
 
         # V4 CORRECTION 5+9: Boundary condition evidence standard
+        # Resolve external boundary evidence from the candidate's evidence packet
         if v4_dim_name == "BOUNDARY_CONDITION" and is_killed:
-            bc = evaluate_boundary_condition(reason, external_evidence=None)
+            # DEFECT FIX: resolve real external evidence, don't pass None
+            external_evidence = resolve_boundary_evidence(candidate)
+            bc = evaluate_boundary_condition(reason, external_evidence=external_evidence)
             if not bc["valid"]:
                 is_killed = False
                 raw_verdict = f"INSUFFICIENT_EVIDENCE ({bc['disposition']})"
