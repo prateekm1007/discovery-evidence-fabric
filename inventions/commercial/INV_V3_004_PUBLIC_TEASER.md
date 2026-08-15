@@ -14,7 +14,7 @@ Electrosurgical units (ESUs) are medical devices used to cut and coagulate tissu
 
 ## Value Proposition
 
-Potential for significant cost savings through reduced electrode replacement and improved procedure efficiency, with a potential return on investment of 200-300% over 5 years [HYPOTHESIS]
+Potential for significant cost savings through reduced electrode replacement and improved procedure efficiency, with a potential return on investment of 200-[REDACTED] over 5 years [HYPOTHESIS]
 
 ## Next Steps
 

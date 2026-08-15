@@ -14,7 +14,7 @@ Electrosurgical units are commonly used in surgical procedures to cut and coagul
 
 ## Value Proposition
 
-The device could potentially reduce surgical time by 10-20%, leading to cost savings and increased revenue for medical facilities [HYPOTHESIS]
+The device could potentially reduce surgical time by 10-[REDACTED], leading to cost savings and increased revenue for medical facilities [HYPOTHESIS]
 
 ## Next Steps
 
