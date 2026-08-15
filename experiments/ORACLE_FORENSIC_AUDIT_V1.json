@@ -1,0 +1,2408 @@
+{
+  "name": "ORACLE_FORENSIC_AUDIT_V1",
+  "generated_at": "2026-08-15T16:32:59.394477+00:00",
+  "oracle_source": "ADVERSARIAL_CALIBRATION_ORACLE_V1.json",
+  "total_cases": 35,
+  "summary": {
+    "ORACLE_VALID": 9,
+    "ORACLE_INVALID": 26,
+    "ORACLE_AMBIGUOUS": 0
+  },
+  "tournament_status": "ORACLE_VALIDITY_BLOCKED",
+  "tournament_status_reason": "The external oracle contains candidate/evidence mismatches. Model selection cannot proceed until oracle is corrected.",
+  "audit_results": [
+    {
+      "case_id": "MECH_001",
+      "category": "MECHANISM_VALID",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence does not discuss cardiac pacemaker / battery failure. Evidence span appears to discuss a different topic.",
+      "findings": [
+        "Device 'cardiac pacemaker' not found in evidence span",
+        "Failure mode 'battery failure' not found in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['defibrillator', 'implant'], candidate is about cardiac"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "cardiac pacemaker",
+      "failure_mode": "battery failure",
+      "evidence_span_excerpt": "a 78-year-old male with a history of ischemic heart disease with prior myocardial infarction, severe left ventricular systolic dysfunction, and a devi"
+    },
+    {
+      "case_id": "MECH_002",
+      "category": "MECHANISM_VALID",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence does not discuss hip implant / wear. Evidence span appears to discuss a different topic.",
+      "findings": [
+        "Device 'hip implant' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": true,
+      "device": "hip implant",
+      "failure_mode": "wear",
+      "evidence_span_excerpt": "adverse local tissue reaction (altr) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, re"
+    },
+    {
+      "case_id": "MECH_003",
+      "category": "MECHANISM_VALID",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence does not discuss coronary stent / thrombosis. Evidence span appears to discuss a different topic.",
+      "findings": [
+        "Failure mode 'thrombosis' not found in evidence span"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": false,
+      "device": "coronary stent",
+      "failure_mode": "thrombosis",
+      "evidence_span_excerpt": "percutaneous coronary intervention (pci) treats focal coronary obstruction by compressing plaque, injuring the vessel wall and placing a metallic or b"
+    },
+    {
+      "case_id": "MECH_004",
+      "category": "MECHANISM_VALID",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence does not discuss deep brain stimulator / battery failure. Evidence span appears to discuss a different topic.",
+      "findings": [
+        "Device 'deep brain stimulator' not found in evidence span",
+        "Failure mode 'battery failure' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "deep brain stimulator",
+      "failure_mode": "battery failure",
+      "evidence_span_excerpt": "background epidural motor cortex stimulation (mcs) is an established neuromodulatory option for refractory neuropathic pain; however, structured data "
+    },
+    {
+      "case_id": "MECH_005",
+      "category": "MECHANISM_VALID",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence does not discuss continuous glucose monitor / infection. Evidence span appears to discuss a different topic.",
+      "findings": [
+        "Device 'continuous glucose monitor' not found in evidence span",
+        "Failure mode 'infection' not found in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['stent'], candidate is about continuous"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "continuous glucose monitor",
+      "failure_mode": "infection",
+      "evidence_span_excerpt": "diabetic chronic wounds, characterized by persistent inflammation and a complex microenvironment, pose a major challenge to global healthcare. traditi"
+    },
+    {
+      "case_id": "TRANS_001",
+      "category": "TRANSFER_VALID",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence discusses ['implant'], not hip implant",
+      "findings": [
+        "Candidate/evidence mismatch: evidence discusses ['implant'], candidate is about hip"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": true,
+      "device": "hip implant",
+      "failure_mode": "mechanical failure",
+      "evidence_span_excerpt": "introduction proximal femoral nail (pfn) fixation is widely used for intertrochanteric (it) fractures; however, implant-related complications remain a"
+    },
+    {
+      "case_id": "TRANS_002",
+      "category": "TRANSFER_VALID",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence discusses ['stent'], not coronary stent",
+      "findings": [
+        "Failure mode 'material degradation' not found in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['stent'], candidate is about coronary"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": false,
+      "device": "coronary stent",
+      "failure_mode": "material degradation",
+      "evidence_span_excerpt": "biodegradable metal stents offer a promising approach for vascular intervention by providing temporary mechanical support and subsequently degrading o"
+    },
+    {
+      "case_id": "TRANS_003",
+      "category": "TRANSFER_VALID",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Transfer source does not discuss the target device",
+      "findings": [
+        "Device 'intraocular lens' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": true,
+      "device": "intraocular lens",
+      "failure_mode": "material degradation",
+      "evidence_span_excerpt": "the vitreous body is not only a transparent filling material of the posterior segment; it is a soft, hydrated, and biologically active matrix that sup"
+    },
+    {
+      "case_id": "TRANS_004",
+      "category": "TRANSFER_VALID",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Transfer source does not discuss the target device",
+      "findings": [
+        "Device 'mri scanner' not found in evidence span",
+        "Failure mode 'thermal failure' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "mri scanner",
+      "failure_mode": "thermal failure",
+      "evidence_span_excerpt": "background/objectives : magnetic nanoparticles have emerged as powerful tools for biomedical imaging, targeted drug delivery, and hyperthermia therapy"
+    },
+    {
+      "case_id": "TRANS_005",
+      "category": "TRANSFER_VALID",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Transfer source does not discuss the target device",
+      "findings": [
+        "Device 'insulin pump' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": true,
+      "device": "insulin pump",
+      "failure_mode": "mechanical failure",
+      "evidence_span_excerpt": "background end-organ hypoperfusion from cardiopulmonary shock may require mechanical circulatory support (mcs). however, patients receiving mcs risk t"
+    },
+    {
+      "case_id": "BOUND_001",
+      "category": "BOUNDARY_CONDITION",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "No boundary threshold in evidence span",
+      "findings": [
+        "Failure mode 'lead fracture' not found in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['pacemaker', 'implant'], candidate is about cardiac"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": false,
+      "device": "cardiac pacemaker",
+      "failure_mode": "lead fracture",
+      "evidence_span_excerpt": "pacemaker implantation remains an established therapeutic strategy for a broad range of bradyarrhythmias and conduction system disorders. as implantat"
+    },
+    {
+      "case_id": "BOUND_002",
+      "category": "BOUNDARY_CONDITION",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "No boundary threshold in evidence span",
+      "findings": [
+        "Candidate/evidence mismatch: evidence discusses ['implant'], candidate is about knee"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": true,
+      "device": "knee implant",
+      "failure_mode": "mechanical failure",
+      "evidence_span_excerpt": "introduction proximal femoral nail (pfn) fixation is widely used for intertrochanteric (it) fractures; however, implant-related complications remain a"
+    },
+    {
+      "case_id": "BOUND_003",
+      "category": "BOUNDARY_CONDITION",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "No boundary threshold in evidence span",
+      "findings": [
+        "Device 'heart valve' not found in evidence span",
+        "Failure mode 'mechanical failure' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "heart valve",
+      "failure_mode": "mechanical failure",
+      "evidence_span_excerpt": "background lutembacher syndrome (ls) is a rare condition characterized by the coexistence of mitral stenosis (ms) and an atrial septal defect (asd). c"
+    },
+    {
+      "case_id": "BOUND_004",
+      "category": "BOUNDARY_CONDITION",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "No boundary threshold in evidence span",
+      "findings": [
+        "Device 'lvad' not found in evidence span",
+        "Failure mode 'infection' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "lvad",
+      "failure_mode": "infection",
+      "evidence_span_excerpt": "sodium-glucose cotransporter inhibitors, originally developed for diabetes management, have demonstrated significant therapeutic benefit across the ph"
+    },
+    {
+      "case_id": "BOUND_005",
+      "category": "BOUNDARY_CONDITION",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "No boundary threshold in evidence span",
+      "findings": [
+        "Device 'spinal cord stimulator' not found in evidence span",
+        "Failure mode 'battery failure' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "spinal cord stimulator",
+      "failure_mode": "battery failure",
+      "evidence_span_excerpt": "vagal nerve stimulation (vns) is an established neuromodulation therapy used in the treatment of drug-resistant epilepsy and treatment-resistant depre"
+    },
+    {
+      "case_id": "NONB_001",
+      "category": "NON_BOUNDARY",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence discusses ['pacemaker', 'implant'], not cardiac pacemaker",
+      "findings": [
+        "Failure mode 'infection' not found in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['pacemaker', 'implant'], candidate is about cardiac"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": false,
+      "device": "cardiac pacemaker",
+      "failure_mode": "infection",
+      "evidence_span_excerpt": "pacemaker implantation remains an established therapeutic strategy for a broad range of bradyarrhythmias and conduction system disorders. as implantat"
+    },
+    {
+      "case_id": "NONB_002",
+      "category": "NON_BOUNDARY",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_VALID",
+      "correction_reason": null,
+      "findings": [
+        "Failure mode 'wear' not found in evidence span"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": false,
+      "device": "knee implant",
+      "failure_mode": "wear",
+      "evidence_span_excerpt": "abstract while there have been great advancements in total knee arthroplasty (tka) over the past 50 years, anterior knee pain (akp) remains the most c"
+    },
+    {
+      "case_id": "NONB_003",
+      "category": "NON_BOUNDARY",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence does not discuss the device",
+      "findings": [
+        "Device 'intraocular lens' not found in evidence span",
+        "Failure mode 'infection' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "intraocular lens",
+      "failure_mode": "infection",
+      "evidence_span_excerpt": "introduction capsular bag distension syndrome (cbds) is a rare complication of phacoemulsification, characterized by fluid retention in the capsular b"
+    },
+    {
+      "case_id": "NONB_004",
+      "category": "NON_BOUNDARY",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence does not discuss the device",
+      "findings": [
+        "Device 'closure device' not found in evidence span",
+        "Failure mode 'mechanical failure' not found in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['catheter'], candidate is about closure"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "closure device",
+      "failure_mode": "mechanical failure",
+      "evidence_span_excerpt": "background iatrogenic atrial septal defects (iasds) after mitral transcatheter edge-to-edge repair (m-teer) are generally benign. however, advanced at"
+    },
+    {
+      "case_id": "NONB_005",
+      "category": "NON_BOUNDARY",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence discusses ['implant'], not glaucoma shunt",
+      "findings": [
+        "Failure mode 'mechanical failure' not found in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['implant'], candidate is about glaucoma"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": false,
+      "device": "glaucoma shunt",
+      "failure_mode": "mechanical failure",
+      "evidence_span_excerpt": "purpose to describe a rare case of tube perforation after preserflo microshunt (pms) implantation and subsequent bleb revision, emphasizing the potent"
+    },
+    {
+      "case_id": "SPEC_001",
+      "category": "SPECIFIC_PRIOR_ART",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_VALID",
+      "correction_reason": null,
+      "findings": [
+        "Device 'hip implant' not found in evidence span",
+        "Failure mode 'corrosion' not found in evidence span",
+        "Device not in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "hip implant",
+      "failure_mode": "corrosion",
+      "evidence_span_excerpt": "adverse local tissue reaction (altr) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, re"
+    },
+    {
+      "case_id": "SPEC_002",
+      "category": "SPECIFIC_PRIOR_ART",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence discusses ['implant'], not dental implant",
+      "findings": [
+        "Candidate/evidence mismatch: evidence discusses ['implant'], candidate is about dental"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": true,
+      "device": "dental implant",
+      "failure_mode": "infection",
+      "evidence_span_excerpt": "the long-term stability of dental implants is limited by multiple factors, including peri-implant infection, impaired osseointegration, and poor soft "
+    },
+    {
+      "case_id": "SPEC_003",
+      "category": "SPECIFIC_PRIOR_ART",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence discusses ['valve', 'catheter'], not heart valve",
+      "findings": [
+        "Candidate/evidence mismatch: evidence discusses ['valve', 'catheter'], candidate is about heart"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": true,
+      "device": "heart valve",
+      "failure_mode": "thrombosis",
+      "evidence_span_excerpt": "background determinants of early prosthetic thrombosis following transcatheter tricuspid valve replacement (ttvr) are unknown. case summary a 70-year-"
+    },
+    {
+      "case_id": "SPEC_004",
+      "category": "SPECIFIC_PRIOR_ART",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_VALID",
+      "correction_reason": null,
+      "findings": [
+        "Device 'deep brain stimulator' not found in evidence span",
+        "Failure mode 'lead fracture' not found in evidence span",
+        "Device not in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "deep brain stimulator",
+      "failure_mode": "lead fracture",
+      "evidence_span_excerpt": "spinal cord stimulation (scs) is a minimally invasive neuromodulation technique utilized to manage chronic pain conditions such as complex regional pa"
+    },
+    {
+      "case_id": "SPEC_005",
+      "category": "SPECIFIC_PRIOR_ART",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence discusses ['monitor'], not pulse oximeter",
+      "findings": [
+        "Device 'pulse oximeter' not found in evidence span",
+        "Failure mode 'calibration failure' not found in evidence span",
+        "Device not in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['monitor'], candidate is about pulse"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "pulse oximeter",
+      "failure_mode": "calibration failure",
+      "evidence_span_excerpt": "the neonatal period is critical and stressful, particularly in low-resource settings where existing monitoring methods for newborns are sporadic and l"
+    },
+    {
+      "case_id": "TOPC_001",
+      "category": "TOPICAL_ONLY_PRIOR_ART",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_VALID",
+      "correction_reason": null,
+      "findings": [
+        "Failure mode 'mechanical failure' not found in evidence span"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": false,
+      "device": "spinal fusion device",
+      "failure_mode": "mechanical failure",
+      "evidence_span_excerpt": "background pedicle screw fixation is a mainstay surgical technique for providing posterior stability to the spinal column, and consists of screws, rod"
+    },
+    {
+      "case_id": "TOPC_002",
+      "category": "TOPICAL_ONLY_PRIOR_ART",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_VALID",
+      "correction_reason": null,
+      "findings": [
+        "Device 'shoulder implant' not found in evidence span",
+        "Failure mode 'wear' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "shoulder implant",
+      "failure_mode": "wear",
+      "evidence_span_excerpt": "background total elbow arthroplasty (tea) is rarely recommended in young patients because of a high risk of early failure. this study analyzes the lon"
+    },
+    {
+      "case_id": "TOPC_003",
+      "category": "TOPICAL_ONLY_PRIOR_ART",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence discusses ['catheter'], not vascular graft",
+      "findings": [
+        "Device 'vascular graft' not found in evidence span",
+        "Failure mode 'infection' not found in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['catheter'], candidate is about vascular"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "vascular graft",
+      "failure_mode": "infection",
+      "evidence_span_excerpt": "central venous catheters (cvcs) are essential in transplantation but can rarely fracture and embolize, with donor-to-recipient transmission of cathete"
+    },
+    {
+      "case_id": "TOPC_004",
+      "category": "TOPICAL_ONLY_PRIOR_ART",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence discusses ['implant'], not glaucoma shunt",
+      "findings": [
+        "Failure mode 'infection' not found in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['implant'], candidate is about glaucoma"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": false,
+      "device": "glaucoma shunt",
+      "failure_mode": "infection",
+      "evidence_span_excerpt": "purpose to describe a rare case of tube perforation after preserflo microshunt (pms) implantation and subsequent bleb revision, emphasizing the potent"
+    },
+    {
+      "case_id": "TOPC_005",
+      "category": "TOPICAL_ONLY_PRIOR_ART",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_VALID",
+      "correction_reason": null,
+      "findings": [
+        "Device 'endoscope' not found in evidence span",
+        "Failure mode 'infection' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "endoscope",
+      "failure_mode": "infection",
+      "evidence_span_excerpt": "gastrointestinal (gi) interventional endoscopy has evolved into a cornerstone of modern gastroenterology, offering minimally invasive solutions for co"
+    },
+    {
+      "case_id": "OBV_001",
+      "category": "OBVIOUSNESS_NON_OBVIOUSNESS",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence discusses ['graft'], not spinal fusion device",
+      "findings": [
+        "Device 'spinal fusion device' not found in evidence span",
+        "Failure mode 'infection' not found in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['graft'], candidate is about spinal"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "spinal fusion device",
+      "failure_mode": "infection",
+      "evidence_span_excerpt": "background/objectives: i-factor\u2122 bone graft is a composite bone substitute containing p-15 synthetic collagen fragment that has demonstrated noninferi"
+    },
+    {
+      "case_id": "OBV_002",
+      "category": "OBVIOUSNESS_NON_OBVIOUSNESS",
+      "expected_verdict": "KILL",
+      "verdict": "ORACLE_INVALID",
+      "correction_reason": "Evidence discusses ['valve', 'catheter'], not heart valve",
+      "findings": [
+        "Failure mode 'calcification' not found in evidence span",
+        "Candidate/evidence mismatch: evidence discusses ['valve', 'catheter'], candidate is about heart"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": false,
+      "device": "heart valve",
+      "failure_mode": "calcification",
+      "evidence_span_excerpt": "background late detection of paravalvular leak (pvl) after transcatheter aortic valve replacement (tavr) presents unique treatment challenges, especia"
+    },
+    {
+      "case_id": "OBV_003",
+      "category": "OBVIOUSNESS_NON_OBVIOUSNESS",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_VALID",
+      "correction_reason": null,
+      "findings": [
+        "Device 'spinal cord stimulator' not found in evidence span",
+        "Failure mode 'battery failure' not found in evidence span"
+      ],
+      "device_in_evidence": false,
+      "failure_in_evidence": false,
+      "device": "spinal cord stimulator",
+      "failure_mode": "battery failure",
+      "evidence_span_excerpt": "seventy-five years of research funding in benign urology from the national institute of diabetes and digestive and kidney diseases (niddk) at the nati"
+    },
+    {
+      "case_id": "OBV_004",
+      "category": "OBVIOUSNESS_NON_OBVIOUSNESS",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_VALID",
+      "correction_reason": null,
+      "findings": [
+        "Failure mode 'calibration failure' not found in evidence span"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": false,
+      "device": "mammography system",
+      "failure_mode": "calibration failure",
+      "evidence_span_excerpt": "background : explainable artificial intelligence (xai) is increasingly proposed to improve trust in mammography-based artificial-intelligence systems,"
+    },
+    {
+      "case_id": "OBV_005",
+      "category": "OBVIOUSNESS_NON_OBVIOUSNESS",
+      "expected_verdict": "SURVIVE",
+      "verdict": "ORACLE_VALID",
+      "correction_reason": null,
+      "findings": [
+        "Failure mode 'sensor drift' not found in evidence span"
+      ],
+      "device_in_evidence": true,
+      "failure_in_evidence": false,
+      "device": "smartwatch health monitor",
+      "failure_mode": "sensor drift",
+      "evidence_span_excerpt": "wearable healthcare technologies are transforming the healthcare landscape by enabling remote, real-time health data collection, supporting early diag"
+    }
+  ],
+  "corrected_oracle_root_hash": "05d11864400b0cf0",
+  "corrections_needed": 26,
+  "old_oracle_preserved": true,
+  "corrected_cases": [
+    {
+      "case_id": "MECH_001",
+      "category": "MECHANISM_VALID",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Modify Cardiac Pacemaker to address BATTERY FAILURE",
+        "mechanistic_reasoning": "A 78-year-old male with a history of ischemic heart disease with prior myocardial infarction, severe left ventricular systolic dysfunction, and a device-related implantable cardioverter defibrillator (DR ICD) was admitted following a road traffic accident due to a sudden loss of control of the vehic",
+        "falsification_test": "Bench test measuring improvement vs baseline",
+        "device_class": "Cardiac Pacemaker",
+        "failure_mode": "BATTERY_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42205228",
+      "oracle_source_url": "10.1155/cric/5546851",
+      "oracle_source_hash": "5cc814d79defa112318fa010d3bccce4cfad7926f3e7c6acaaf498d0c244414c",
+      "oracle_evidence_span": "A 78-year-old male with a history of ischemic heart disease with prior myocardial infarction, severe left ventricular systolic dysfunction, and a device-related implantable cardioverter defibrillator ",
+      "oracle_reason": "Mechanism supported by peer-reviewed source europepmc:42205228",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.752545+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42205228",
+          "title": "When the Pacemaker Goes Rogue: Pacemaker-Induced Tachycardia, Syncope, and Car Crash.",
+          "identifier": "europepmc:42205228",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:25:16.749370+00:00",
+          "content_hash": "5cc814d79defa112318fa010d3bccce4cfad7926f3e7c6acaaf498d0c244414c",
+          "source_span": "A 78-year-old male with a history of ischemic heart disease with prior myocardial infarction, severe left ventricular systolic dysfunction, and a device-related implantable cardioverter defibrillator (DR ICD) was admitted following a road traffic accident due to a sudden loss of control of the vehicle following a syncope. Initial investigations ruled out acute coronary syndrome and did not point to neurological causes. Device interrogation revealed the presence of pacemaker-mediated tachycardia (PMT), but since the episode trigger had been programmed off, it was not possible to determine when they occurred, how long they lasted, or their rate. However, atrial threshold testing promptly provoked a PMT. The induced PMT led to a tachycardia of 130 bpm, causing severe symptomatic hypotension with a mean blood pressure falling below 50 mmHg. This could be easily reproduced several times. Given the patient's severe left ventricular systolic dysfunction and the absence of any overt alternative explanation, the PMT likely triggered the syncope preceding the car accident. Management focused on reprogramming the DR ICD. The most critical adaptation was a mode switch from DDD to DDIR to prevent atrial tracking, effectively terminating PMT episodes. A prolongation of the postventricular atrial refractory period (PVARP) was not possible due to the very slow VA conduction. The follow-up revealed no other episodes of PMT and the patient no longer experiences episodes of presyncope or syncope. This report highlights the potential for PMTs to induce severe hemodynamic instability and syncope, underscoring the importance of meticulous device evaluation.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1155/cric/5546851",
+          "publication_date": "2026-05-26",
+          "query": "Cardiac Pacemaker battery failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [
+            "causes",
+            "due to",
+            "threshold"
+          ],
+          "mechanism_density_score": 3
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "MECH_001",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "A 78-year-old male with a history of ischemic heart disease with prior myocardial infarction, severe left ventricular systolic dysfunction, and a device-related implantable cardioverter defibrillator ",
+        "oracle_reason": "Mechanism supported by peer-reviewed source europepmc:42205228"
+      },
+      "correction_reason": "Evidence does not discuss cardiac pacemaker / battery failure. Evidence span appears to discuss a different topic.",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "MECH_002",
+      "category": "MECHANISM_VALID",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Modify Hip Implant to address WEAR",
+        "mechanistic_reasoning": "Adverse local tissue reaction (ALTR) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, remain major long-term complications of total hip replacement. Hard-bearing total hip prostheses with improved tribological properties-particularly larg",
+        "falsification_test": "Bench test measuring improvement vs baseline",
+        "device_class": "Hip Implant",
+        "failure_mode": "WEAR"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42290916",
+      "oracle_source_url": "10.1155/cro/6657448",
+      "oracle_source_hash": "a4523d8df74bbb27e011bbfa85f01cab35aeeabae5a65b6e57c88dd4def01e9e",
+      "oracle_evidence_span": "Adverse local tissue reaction (ALTR) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, remain major long-term complications of total hip re",
+      "oracle_reason": "Mechanism supported by peer-reviewed source europepmc:42290916",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.752860+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42290916",
+          "title": "Case Report: Pseudotumor due to Trunnionosis in Ceramic-on-Ceramic THA Monoblock Acetabular Cup Disengagement.",
+          "identifier": "europepmc:42290916",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:26:06.583998+00:00",
+          "content_hash": "a4523d8df74bbb27e011bbfa85f01cab35aeeabae5a65b6e57c88dd4def01e9e",
+          "source_span": "Adverse local tissue reaction (ALTR) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, remain major long-term complications of total hip replacement. Hard-bearing total hip prostheses with improved tribological properties-particularly large-diameter head (LDH) ceramic-on-ceramic (CoC) bearings and preassembled cup designs-have been introduced into clinical practice to minimize wear, increase the range of motion (ROM), and reduce dislocation rates. We describe the case of a young asymptomatic patient with a CoC total hip arthroplasty (THA) featuring a monoblock acetabular component, in whom a pseudotumor was incidentally detected. The lesion was associated with trunnionosis following spontaneous liner disassembly, which occurred without any clinical symptoms or audible signs such as the typical hip \"clunk.\" This case highlights the diagnostic challenges in identifying periprosthetic adverse reactions in asymptomatic patients and emphasizes the importance of timely recognition to prevent technically demanding revision procedures in catastrophic implant failures.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1155/cro/6657448",
+          "publication_date": "2026-06-11",
+          "query": "Hip Implant wear mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "due to",
+            "reaction",
+            "detect"
+          ],
+          "mechanism_density_score": 3
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "MECH_002",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Adverse local tissue reaction (ALTR) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, remain major long-term complications of total hip re",
+        "oracle_reason": "Mechanism supported by peer-reviewed source europepmc:42290916"
+      },
+      "correction_reason": "Evidence does not discuss hip implant / wear. Evidence span appears to discuss a different topic.",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "MECH_003",
+      "category": "MECHANISM_VALID",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Modify Coronary Stent to address THROMBOSIS",
+        "mechanistic_reasoning": "Percutaneous coronary intervention (PCI) treats focal coronary obstruction by compressing plaque, injuring the vessel wall and placing a metallic or bioresorbable scaffold. Most treated segments heal, but a small minority enter a prolonged, excessive or unstable repair state that contributes to in-s",
+        "falsification_test": "Bench test measuring improvement vs baseline",
+        "device_class": "Coronary Stent",
+        "failure_mode": "THROMBOSIS"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:PPR1259976",
+      "oracle_source_url": "10.20944/preprints202606.1930.v1",
+      "oracle_source_hash": "b8a68dde1bd73f8b2aba1d42b00023427699b74578fb6fdd3b84d004657397a2",
+      "oracle_evidence_span": "Percutaneous coronary intervention (PCI) treats focal coronary obstruction by compressing plaque, injuring the vessel wall and placing a metallic or bioresorbable scaffold. Most treated segments heal,",
+      "oracle_reason": "Mechanism supported by peer-reviewed source europepmc:PPR1259976",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.753100+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:PPR1259976",
+          "title": "Immune-Mediated Coronary Stent Failure: From PCI-Induced Vascular Injury to In-Stent Restenosis, Neoatherosclerosis and Stent Thrombosis",
+          "identifier": "europepmc:PPR1259976",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:29:00.951342+00:00",
+          "content_hash": "b8a68dde1bd73f8b2aba1d42b00023427699b74578fb6fdd3b84d004657397a2",
+          "source_span": "Percutaneous coronary intervention (PCI) treats focal coronary obstruction by compressing plaque, injuring the vessel wall and placing a metallic or bioresorbable scaffold. Most treated segments heal, but a small minority enter a prolonged, excessive or unstable repair state that contributes to in-stent restenosis (ISR), in-stent neoatherosclerosis and stent thrombosis (ST). Human evidence is strongest for delayed healing, uncovered struts, macrophage-rich neoatherosclerosis and hypersensitivity-associated late thrombosis, whereas routine immune biomarker-guided care remains unsupported. The narrowed lumen is only the visible endpoint; beneath it sits vascular repair shaped by de-vice-material exposure, local haemodynamics and host immunity. Endothelial denuda-tion and platelet activation initiate fibrin deposition, complement signalling and dam-age-associated molecular-pattern (DAMP) release. Neutrophils, monocytes and macro-phages dominate early, followed by lymphocytes and vascular smooth muscle cells that remodel the repair compartment. Drug-eluting stents (DES) have markedly reduced early neointimal hyperplasia, yet selected late failures still involve delayed endothelial recovery, chronic peristrut inflammation, hypersensitivity and neoatherosclerotic transformation. Immune biology is useful at the bedside only when interpreted with procedural context, device design and patient phenotype. Imaging-defined endpoints and paired immune phenotyping are therefore needed to guide treatment by mechanism instead of angiography or isolated biomarkers.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.20944/preprints202606.1930.v1",
+          "publication_date": "2026-06-25",
+          "query": "Coronary Stent thrombosis mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "mechanism"
+          ],
+          "mechanism_density_score": 1
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "MECH_003",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Percutaneous coronary intervention (PCI) treats focal coronary obstruction by compressing plaque, injuring the vessel wall and placing a metallic or bioresorbable scaffold. Most treated segments heal,",
+        "oracle_reason": "Mechanism supported by peer-reviewed source europepmc:PPR1259976"
+      },
+      "correction_reason": "Evidence does not discuss coronary stent / thrombosis. Evidence span appears to discuss a different topic.",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "MECH_004",
+      "category": "MECHANISM_VALID",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Modify Deep Brain Stimulator to address BATTERY FAILURE",
+        "mechanistic_reasoning": "Background Epidural motor cortex stimulation (MCS) is an established neuromodulatory option for refractory neuropathic pain; however, structured data on long-term outcomes, stimulation dependency, and real-world device management remain limited, particularly in chronic neuropathic orofacial pain. Me",
+        "falsification_test": "Bench test measuring improvement vs baseline",
+        "device_class": "Deep Brain Stimulator",
+        "failure_mode": "BATTERY_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42073461",
+      "oracle_source_url": "10.3390/life16040651",
+      "oracle_source_hash": "bf6c9cedb7eb5f59bf7e4f105ca9fe5b7561b1ea24f6d58621bf49c42b24404b",
+      "oracle_evidence_span": "Background Epidural motor cortex stimulation (MCS) is an established neuromodulatory option for refractory neuropathic pain; however, structured data on long-term outcomes, stimulation dependency, and",
+      "oracle_reason": "Mechanism supported by peer-reviewed source europepmc:42073461",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.753251+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42073461",
+          "title": "Long-Term Outcomes of Epidural Motor Cortex Stimulation for Refractory Chronic Neuropathic Orofacial Pain.",
+          "identifier": "europepmc:42073461",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:31:27.441552+00:00",
+          "content_hash": "bf6c9cedb7eb5f59bf7e4f105ca9fe5b7561b1ea24f6d58621bf49c42b24404b",
+          "source_span": "Background Epidural motor cortex stimulation (MCS) is an established neuromodulatory option for refractory neuropathic pain; however, structured data on long-term outcomes, stimulation dependency, and real-world device management remain limited, particularly in chronic neuropathic orofacial pain. Methods This retrospective single-center cohort study included patients with refractory neuropathic orofacial pain treated with epidural MCS at a tertiary neurosurgical center. Clinical data were extracted from medical records and longitudinal follow-up documentation. Pain intensity was assessed using a unified 0-10 numerical rating scale (NRS/VAS) at baseline, best achieved response, and last follow-up. Responder status was defined at the last follow-up (\u226550% pain reduction from baseline). Secondary outcomes included stimulation dependency during OFF periods, reprogramming burden, device-related events, and safety. Results Ten patients (6 women, 4 men; mean age 61.5 \u00b1 8.6 years) were followed for a mean of 7.6 \u00b1 6.3 years (range 2-22 years), with 70% exceeding five years of follow-up. Baseline pain intensity (8.8 \u00b1 0.4) decreased to 4.6 \u00b1 0.8 at the best achieved response and remained lower at last follow-up (5.6 \u00b1 0.9). At the last follow-up, eight patients (80%) were classified as partial responders (30-49% pain reduction), while two (20%) were classified as non-responders. Clinically relevant worsening during stimulator OFF periods occurred in 70% of patients. Reprogramming was required in all patients, and 60% underwent battery replacement. No clinically significant stimulation-related adverse effects were observed. Conclusions Epidural MCS was associated with sustained pain reduction over extended follow-up. These findings support the interpretation of MCS as a chronic neuromodulatory therapy requiring ongoing stimulation, individualized programming, and long-term device management, contributing clinically relevant long-term evidence to the evolving role of neuromodul",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3390/life16040651",
+          "publication_date": "2026-04-12",
+          "query": "Deep Brain Stimulator battery failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "limit"
+          ],
+          "mechanism_density_score": 1
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "MECH_004",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Background Epidural motor cortex stimulation (MCS) is an established neuromodulatory option for refractory neuropathic pain; however, structured data on long-term outcomes, stimulation dependency, and",
+        "oracle_reason": "Mechanism supported by peer-reviewed source europepmc:42073461"
+      },
+      "correction_reason": "Evidence does not discuss deep brain stimulator / battery failure. Evidence span appears to discuss a different topic.",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "MECH_005",
+      "category": "MECHANISM_VALID",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Modify Continuous Glucose Monitor to address INFECTION",
+        "mechanistic_reasoning": "Diabetic chronic wounds, characterized by persistent inflammation and a complex microenvironment, pose a major challenge to global healthcare. Traditional dressings act merely as passive physical barriers, lacking the ability to sense biochemical fluctuations or respond to dynamic pathological chang",
+        "falsification_test": "Bench test measuring improvement vs baseline",
+        "device_class": "Continuous Glucose Monitor",
+        "failure_mode": "INFECTION"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42345863",
+      "oracle_source_url": "10.3390/bios16060307",
+      "oracle_source_hash": "c1168587cd4f817cfd3184dd7cf49f1d8acae306e0091f6be493a07e71a6ac0c",
+      "oracle_evidence_span": "Diabetic chronic wounds, characterized by persistent inflammation and a complex microenvironment, pose a major challenge to global healthcare. Traditional dressings act merely as passive physical barr",
+      "oracle_reason": "Mechanism supported by peer-reviewed source europepmc:42345863",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.753375+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42345863",
+          "title": "Intelligent Biosensors for Diabetic Wound Monitoring.",
+          "identifier": "europepmc:42345863",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:34:40.739448+00:00",
+          "content_hash": "c1168587cd4f817cfd3184dd7cf49f1d8acae306e0091f6be493a07e71a6ac0c",
+          "source_span": "Diabetic chronic wounds, characterized by persistent inflammation and a complex microenvironment, pose a major challenge to global healthcare. Traditional dressings act merely as passive physical barriers, lacking the ability to sense biochemical fluctuations or respond to dynamic pathological changes. Therefore, developing smart platforms for in situ, continuous, and non-invasive monitoring is crucial for early warning and precision intervention. This review systematically explores recent advances in high-fidelity wound monitoring, focusing on the deep integration of \"front-end interface engineering\" and \"back-end data analysis\". We first analyze the specific physicochemical and biochemical abnormalities of the diabetic wound microenvironment. Next, we discuss how advanced material designs, such as active fluid management, anti-biofouling zwitterionic networks, and nanozyme-based reactive oxygen species (ROS) scavenging, ensure the long-term stability of sensing interfaces against complex microenvironmental interference. Building on this hardware foundation, we summarize in situ sensing strategies and multiparameter decoupling techniques tailored for key biomarkers, including pH, temperature, glucose, ROS, and MMP-9. Furthermore, we highlight cutting-edge developments in signal digitization, emphasizing the pivotal role of portable devices and machine learning algorithms in extracting high-dimensional features and translating complex multimodal signals into objective clinical metrics. By outlining this comprehensive technological closed-loop, this review aims to provide a systematic theoretical framework for the development and clinical translation of next-generation smart wound monitoring platforms.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3390/bios16060307",
+          "publication_date": "2026-05-26",
+          "query": "Continuous Glucose Monitor infection mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [
+            "monitor",
+            "parameter"
+          ],
+          "mechanism_density_score": 2
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "MECH_005",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Diabetic chronic wounds, characterized by persistent inflammation and a complex microenvironment, pose a major challenge to global healthcare. Traditional dressings act merely as passive physical barr",
+        "oracle_reason": "Mechanism supported by peer-reviewed source europepmc:42345863"
+      },
+      "correction_reason": "Evidence does not discuss continuous glucose monitor / infection. Evidence span appears to discuss a different topic.",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "TRANS_001",
+      "category": "TRANSFER_VALID",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Transfer mechanism from Hip Implant literature to address failure",
+        "mechanistic_reasoning": "Transfer supported by europepmc:42273451: Introduction Proximal femoral nail (PFN) fixation is widely used for intertrochanteric (IT) fractures; however, implant-related complications remain a concern. While commonly reported failures include",
+        "falsification_test": "Compare performance in target vs source domain",
+        "device_class": "Hip Implant",
+        "failure_mode": "MECHANICAL_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42273451",
+      "oracle_source_url": "10.13107/jocr.2026.v16.i06.7526",
+      "oracle_source_hash": "6c94c96476a79aca7e40bc2e4336bdae545d842c436861fc47fbac874f1d4f64",
+      "oracle_evidence_span": "Introduction Proximal femoral nail (PFN) fixation is widely used for intertrochanteric (IT) fractures; however, implant-related complications remain a concern. While commonly reported failures include",
+      "oracle_reason": "Transfer mechanism documented in europepmc:42273451",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.753539+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42273451",
+          "title": "Early Mechanical Dissociation of Helical Blade-Barrel Interface in Proximal Femoral Nail: A Case Report.",
+          "identifier": "europepmc:42273451",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:26:21.189058+00:00",
+          "content_hash": "6c94c96476a79aca7e40bc2e4336bdae545d842c436861fc47fbac874f1d4f64",
+          "source_span": "Introduction Proximal femoral nail (PFN) fixation is widely used for intertrochanteric (IT) fractures; however, implant-related complications remain a concern. While commonly reported failures include cut-out, back-out, and implant breakage, dissociation at the helical blade-barrel interface is extremely rare and poorly described in the literature. To the best of our knowledge, no prior case reports have described this specific mode of failure. Case report A 62-year-old male presented with pain in the left hip region following prior PFN fixation for an IT femur fracture. On evaluation, implant failure in the form of PFN nail breakage was identified. The patient underwent revision with a long PFN and lateral support plate. On post-operative day 21, he developed pain and implant prominence. Radiographs did not demonstrate classical blade back-out or cut-out but showed mechanical disengagement at the blade-barrel interface. Three-dimensional computed tomography confirmed dissociation of the barrel from the helical blade, with the blade remaining in situ within the femoral head. There was no evidence of infection. Revision surgery confirmed mechanical failure at the blade-barrel interface. The blade was replaced, and debridement performed. Microbiological cultures were sterile. The patient had an uneventful recovery. Conclusion This case highlights a rare and early mechanical failure of PFN involving blade-barrel dissociation. Awareness of this failure mode and early radiological evaluation are essential to prevent complications and guide timely intervention.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.13107/jocr.2026.v16.i06.7526",
+          "publication_date": "2026-06-01",
+          "query": "Hip Implant mechanical failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [],
+          "mechanism_density_score": 0
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "TRANS_001",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Introduction Proximal femoral nail (PFN) fixation is widely used for intertrochanteric (IT) fractures; however, implant-related complications remain a concern. While commonly reported failures include",
+        "oracle_reason": "Transfer mechanism documented in europepmc:42273451"
+      },
+      "correction_reason": "Evidence discusses ['implant'], not hip implant",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "TRANS_002",
+      "category": "TRANSFER_VALID",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Transfer mechanism from Coronary Stent literature to address failure",
+        "mechanistic_reasoning": "Transfer supported by europepmc:42239876: Biodegradable metal stents offer a promising approach for vascular intervention by providing temporary mechanical support and subsequently degrading once healing is complete. While significant progres",
+        "falsification_test": "Compare performance in target vs source domain",
+        "device_class": "Coronary Stent",
+        "failure_mode": "MATERIAL_DEGRADATION"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42239876",
+      "oracle_source_url": "10.1093/rb/rbag079",
+      "oracle_source_hash": "af029917117f98bfe3c3176c59e8bd97cbdba689d3a4d57a13ada154e0dfb534",
+      "oracle_evidence_span": "Biodegradable metal stents offer a promising approach for vascular intervention by providing temporary mechanical support and subsequently degrading once healing is complete. While significant progres",
+      "oracle_reason": "Transfer mechanism documented in europepmc:42239876",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.753709+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42239876",
+          "title": "Development and translation of biodegradable metal stents: from heart to brain.",
+          "identifier": "europepmc:42239876",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:29:16.530151+00:00",
+          "content_hash": "af029917117f98bfe3c3176c59e8bd97cbdba689d3a4d57a13ada154e0dfb534",
+          "source_span": "Biodegradable metal stents offer a promising approach for vascular intervention by providing temporary mechanical support and subsequently degrading once healing is complete. While significant progress has been made in cardiovascular applications, their adaptation for cerebrovascular use remains an active area of research. This review systematically examines three key biodegradable metal systems: Fe, Zn and Mg alloys. It traces their development and specific considerations in the transition from cardiac to cerebral indications. Fe-based stents exhibit high mechanical strength but degrade slowly, prompting strategies to accelerate corrosion. Zn-based stents provide a more moderate degradation rate and favorable biocompatibility, yet their neurovascular safety profile requires further assessment. Mg-based stents, which degrade rapidly and may confer neuroprotective benefits, have advanced into clinical use, though controlling their degradation kinetics remains essential. Translating these stents to the delicate and tortuous cerebrovascular environment introduces specific challenges, including the need for enhanced anatomical conformability, mitigation of potential neurotoxicity from degradation byproducts, and reduction of MRI artifacts. Future development will depend on material-specific strategies: accelerating degradation for Fe alloys, refining controlled-release coatings for Zn alloys, and leveraging the neuroprotective potential of Mg alloys. Ultimately, success hinges on optimizing stent degradation and neurovascular compatibility.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1093/rb/rbag079",
+          "publication_date": "2026-05-29",
+          "query": "Coronary Stent material degradation mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [],
+          "mechanism_density_score": 0
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "TRANS_002",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Biodegradable metal stents offer a promising approach for vascular intervention by providing temporary mechanical support and subsequently degrading once healing is complete. While significant progres",
+        "oracle_reason": "Transfer mechanism documented in europepmc:42239876"
+      },
+      "correction_reason": "Evidence discusses ['stent'], not coronary stent",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "TRANS_003",
+      "category": "TRANSFER_VALID",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Transfer mechanism from Intraocular Lens literature to address failure",
+        "mechanistic_reasoning": "Transfer supported by europepmc:42346692: The vitreous body is not only a transparent filling material of the posterior segment; it is a soft, hydrated, and biologically active matrix that supports structural, optical, and biochemical homeost",
+        "falsification_test": "Compare performance in target vs source domain",
+        "device_class": "Intraocular Lens",
+        "failure_mode": "MATERIAL_DEGRADATION"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42346692",
+      "oracle_source_url": "10.3390/jfb17060301",
+      "oracle_source_hash": "a4b340f0a7a452752b8282f73bf641956fb408471238f755805a71ed489e2a5e",
+      "oracle_evidence_span": "The vitreous body is not only a transparent filling material of the posterior segment; it is a soft, hydrated, and biologically active matrix that supports structural, optical, and biochemical homeost",
+      "oracle_reason": "Transfer mechanism documented in europepmc:42346692",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.753847+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42346692",
+          "title": "Vitreous Substitutes in Vitreoretinal Surgery: From Native Vitreous Physiology to Bioengineered Experimental Replacements.",
+          "identifier": "europepmc:42346692",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:33:11.630193+00:00",
+          "content_hash": "a4b340f0a7a452752b8282f73bf641956fb408471238f755805a71ed489e2a5e",
+          "source_span": "The vitreous body is not only a transparent filling material of the posterior segment; it is a soft, hydrated, and biologically active matrix that supports structural, optical, and biochemical homeostasis. Vitrectomy therefore leaves a functional deficit that current substitutes only partly address. Intraocular gases, silicone oils, and perfluorocarbon liquids remain essential surgical tools, but they mainly provide mechanical tamponade and do not reproduce native viscoelasticity, diffusion control, or protection against oxidative and inflammatory stress. This review considers vitreous replacement as a functional biomaterials challenge. We discuss native vitreous physiology, the limitations of present tamponade agents, and emerging bioengineered substitutes designed to create a more physiological intravitreal environment. Particular attention is given to hydrogel and polymer-based systems, especially hyaluronic acid-based and in situ crosslinked platforms, which are being developed to combine optical clarity, injectability, soft mechanical support, controlled degradation, and favorable tissue interaction. We also emphasize the need for standardized preclinical testing of swelling, enzymatic stability, drug diffusion, rheology, and long-term biocompatibility. Although next-generation materials may move the field beyond passive space filling, manufacturing reproducibility, regulatory validation, chronic safety, and cautious early-phase trials remain major translational barriers.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3390/jfb17060301",
+          "publication_date": "2026-06-17",
+          "query": "Intraocular Lens material degradation mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "interaction",
+            "limit"
+          ],
+          "mechanism_density_score": 2
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "TRANS_003",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "The vitreous body is not only a transparent filling material of the posterior segment; it is a soft, hydrated, and biologically active matrix that supports structural, optical, and biochemical homeost",
+        "oracle_reason": "Transfer mechanism documented in europepmc:42346692"
+      },
+      "correction_reason": "Transfer source does not discuss the target device",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "TRANS_004",
+      "category": "TRANSFER_VALID",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Transfer mechanism from MRI Scanner literature to address failure",
+        "mechanistic_reasoning": "Transfer supported by europepmc:42076147: Background/Objectives : Magnetic nanoparticles have emerged as powerful tools for biomedical imaging, targeted drug delivery, and hyperthermia therapy. Magnetic particle imaging (MPI) is among the mos",
+        "falsification_test": "Compare performance in target vs source domain",
+        "device_class": "MRI Scanner",
+        "failure_mode": "THERMAL_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42076147",
+      "oracle_source_url": "10.3390/pharmaceutics18040497",
+      "oracle_source_hash": "d33b53e6d5950ba79741795e20089e5dc4dbacbedb2520d63a17fb17248062d5",
+      "oracle_evidence_span": "Background/Objectives : Magnetic nanoparticles have emerged as powerful tools for biomedical imaging, targeted drug delivery, and hyperthermia therapy. Magnetic particle imaging (MPI) is among the mos",
+      "oracle_reason": "Transfer mechanism documented in europepmc:42076147",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.754007+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42076147",
+          "title": "From Magnetic Moment to Magnetic Particle Imaging: A Comprehensive Review on MPI Technology, Tracer Design and Biological Applications.",
+          "identifier": "europepmc:42076147",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:38:52.479472+00:00",
+          "content_hash": "d33b53e6d5950ba79741795e20089e5dc4dbacbedb2520d63a17fb17248062d5",
+          "source_span": "Background/Objectives : Magnetic nanoparticles have emerged as powerful tools for biomedical imaging, targeted drug delivery, and hyperthermia therapy. Magnetic particle imaging (MPI) is among the most promising technologies built around its properties: a radiation-free, quantitative tomographic modality that detects superparamagnetic iron oxide nanoparticles (SPIONs) directly against a biologically silent background. This review synthesizes MPI's physical principles, nanoparticle design strategies, and preclinical applications within the broader landscape of magnetic material engineering for biomedical use. Methods : A systematic review was conducted covering MPI signal generation and image reconstruction, nanoparticle core synthesis and surface coating approaches, and preclinical applications, spanning cell tracking, oncological imaging, vascular perfusion, neuroimaging, and MPI-guided theranostics. Studies were selected to provide quantitative benchmarks and direct comparisons with competing modalities where available. Results : MPI delivers signal-to-background ratios above 1000:1, iron-mass linearity at R 2 \u2265 0.99, regardless of tissue depth, and acquisition rates up to 46 volumes per second. Tracer architecture-encompassing single-core particles, multicore nanoflowers, and stimuli-responsive cluster designs-is the primary determinant of sensitivity, environmental robustness, and theranostic capability. Preclinical results include detection of cell populations in the low thousands, earlier ischaemia identification than diffusion-weighted MRI, real-time drug release quantification, and spatially confined tumour hyperthermia. Three translational bottlenecks are identified: the absence of a clinically approved tracer with optimal relaxation dynamics, hardware performance losses when scaling to human-bore systems, and overestimation of passive tumour accumulation in murine models. Conclusions : MPI illustrates how progress in magnetic material design directly expan",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3390/pharmaceutics18040497",
+          "publication_date": "2026-04-17",
+          "query": "MRI Scanner thermal failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "IRRELEVANT",
+          "mechanism_indicators": [
+            "results in",
+            "quantif",
+            "detect"
+          ],
+          "mechanism_density_score": 3
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "TRANS_004",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Background/Objectives : Magnetic nanoparticles have emerged as powerful tools for biomedical imaging, targeted drug delivery, and hyperthermia therapy. Magnetic particle imaging (MPI) is among the mos",
+        "oracle_reason": "Transfer mechanism documented in europepmc:42076147"
+      },
+      "correction_reason": "Transfer source does not discuss the target device",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "TRANS_005",
+      "category": "TRANSFER_VALID",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Transfer mechanism from Insulin Pump literature to address failure",
+        "mechanistic_reasoning": "Transfer supported by europepmc:41823487: Background End-organ hypoperfusion from cardiopulmonary shock may require mechanical circulatory support (MCS). However, patients receiving MCS risk the development of hemorrhagic complications, inclu",
+        "falsification_test": "Compare performance in target vs source domain",
+        "device_class": "Insulin Pump",
+        "failure_mode": "MECHANICAL_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:41823487",
+      "oracle_source_url": "10.1051/ject/2025061",
+      "oracle_source_hash": "e7acc05754dd24e67b79092bf6c2e36f2d9550af508aa75a301d8eee47f07ea7",
+      "oracle_evidence_span": "Background End-organ hypoperfusion from cardiopulmonary shock may require mechanical circulatory support (MCS). However, patients receiving MCS risk the development of hemorrhagic complications, inclu",
+      "oracle_reason": "Transfer mechanism documented in europepmc:41823487",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.754168+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:41823487",
+          "title": "Incidence and pathophysiology of gastrointestinal bleeding during mechanical circulatory support: A retrospective analysis using machine learning algorithms.",
+          "identifier": "europepmc:41823487",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:42:34.891082+00:00",
+          "content_hash": "e7acc05754dd24e67b79092bf6c2e36f2d9550af508aa75a301d8eee47f07ea7",
+          "source_span": "Background End-organ hypoperfusion from cardiopulmonary shock may require mechanical circulatory support (MCS). However, patients receiving MCS risk the development of hemorrhagic complications, including gastrointestinal bleeding (GI). Examining potential risk factors for these complications improves clinical understanding. The purpose of this investigation was to study the risk for GI bleeding in MCS patients. Methods Following IRB approval, patient characteristics, previously reported comorbidities, and the incidence of GI bleeding were reviewed from January 2017 to October 2023. Clinical variables underwent machine learning with autovalidation. Support vector machine modeling provided the best performance among the ensemble models tested. Results In this study of 156 patients who underwent 284 MCS procedures, the incidence of GI bleeding was 6.0% CI 3.3-10.4%. Following machine learning, patients with insulin-dependent diabetes were associated with GI bleeding. The Receiver Operating Characteristic (ROC) curve demonstrated an area under the curve (AUC) of 0.85 with a misclassification rate of 7.5%. The relative risk of the need for major transfusion (>2 packed red blood cell units/episode) was 1.7 CI 1.1-2.5. The majority (87%), but not all, of these patients received unfractionated heparin therapy. Finally, hospital length of stay was increased in patients with GI bleeding. Conclusion Insulin-dependent diabetes was associated with increased risk for GI bleeding during MCS, and these patients more often required major transfusions. Further evaluation of continuous anticoagulation therapy is warranted. Knowledge derived from this analytical study may guide the development of institutional protocols to improve care in this patient population.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1051/ject/2025061",
+          "publication_date": "2026-03-13",
+          "query": "Insulin Pump mechanical failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "results in"
+          ],
+          "mechanism_density_score": 1
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "TRANS_005",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Background End-organ hypoperfusion from cardiopulmonary shock may require mechanical circulatory support (MCS). However, patients receiving MCS risk the development of hemorrhagic complications, inclu",
+        "oracle_reason": "Transfer mechanism documented in europepmc:41823487"
+      },
+      "correction_reason": "Transfer source does not discuss the target device",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "BOUND_001",
+      "category": "BOUNDARY_CONDITION",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Modify Cardiac Pacemaker beyond documented operational threshold",
+        "mechanistic_reasoning": "The modification operates beyond the documented failure boundary",
+        "falsification_test": "Test at boundary threshold",
+        "device_class": "Cardiac Pacemaker",
+        "failure_mode": "LEAD_FRACTURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PUBLISHED_FAILURE_RECORD",
+      "oracle_source_id": "europepmc:42306589",
+      "oracle_source_url": "10.3389/fcvm.2026.1849223",
+      "oracle_source_hash": "a2bb580d384652c8ed716d71cd7337ae1040f7734e7e2edca61b8493dc245c64",
+      "oracle_evidence_span": "Pacemaker implantation remains an established therapeutic strategy for a broad range of bradyarrhythmias and conduction system disorders. As implantation volumes continue to increase worldwide, device",
+      "oracle_reason": "Documented failure boundary in europepmc:42306589",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.754422+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42306589",
+          "title": "Preventing complications in cardiac pacemaker therapy: a lifecycle-based risk management framework.",
+          "identifier": "europepmc:42306589",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:25:32.463466+00:00",
+          "content_hash": "a2bb580d384652c8ed716d71cd7337ae1040f7734e7e2edca61b8493dc245c64",
+          "source_span": "Pacemaker implantation remains an established therapeutic strategy for a broad range of bradyarrhythmias and conduction system disorders. As implantation volumes continue to increase worldwide, device-related complications have emerged as significant determinants of patient outcomes, healthcare utilization, and long-term prognosis. Pacemaker-related complications demonstrate substantial heterogeneity in terms of temporal onset, underlying pathophysiological mechanisms, and clinical impact. These events may arise from procedural factors, lead or device dysfunction, device-associated infection, or subsequent structural and functional alterations of the heart. This review proposes a structured lifecycle-based risk management framework that integrates complication prevention across the entire continuum of pacemaker therapy. This approach highlights the dynamic nature of complication risk across different phases of device therapy. Within this lifecycle risk-management paradigm, complication prevention should extend beyond isolated perioperative measures and encompass structured preprocedural assessments, standardized intraoperative techniques, and longitudinal postprocedural surveillance. By synthesizing current evidence regarding the underlying mechanisms and clinical manifestations of pacemaker-related complications and contemporary prevention and management strategies for these complications, this work provides a comprehensive overview. This framework-based approach offers a practical strategy to enhance risk stratification, guide procedural decision-making, and improve long-term outcomes in patients undergoing pacemaker therapy.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3389/fcvm.2026.1849223",
+          "publication_date": "2026-06-01",
+          "query": "Cardiac Pacemaker lead fracture mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "mechanism"
+          ],
+          "mechanism_density_score": 1
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "BOUND_001",
+        "expected_verdict": "KILL",
+        "oracle_evidence_span": "Pacemaker implantation remains an established therapeutic strategy for a broad range of bradyarrhythmias and conduction system disorders. As implantation volumes continue to increase worldwide, device",
+        "oracle_reason": "Documented failure boundary in europepmc:42306589"
+      },
+      "correction_reason": "No boundary threshold in evidence span",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "BOUND_002",
+      "category": "BOUNDARY_CONDITION",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Modify Knee Implant beyond documented operational threshold",
+        "mechanistic_reasoning": "The modification operates beyond the documented failure boundary",
+        "falsification_test": "Test at boundary threshold",
+        "device_class": "Knee Implant",
+        "failure_mode": "MECHANICAL_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PUBLISHED_FAILURE_RECORD",
+      "oracle_source_id": "europepmc:42273451",
+      "oracle_source_url": "10.13107/jocr.2026.v16.i06.7526",
+      "oracle_source_hash": "6c94c96476a79aca7e40bc2e4336bdae545d842c436861fc47fbac874f1d4f64",
+      "oracle_evidence_span": "Introduction Proximal femoral nail (PFN) fixation is widely used for intertrochanteric (IT) fractures; however, implant-related complications remain a concern. While commonly reported failures include",
+      "oracle_reason": "Documented failure boundary in europepmc:42273451",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.754588+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42273451",
+          "title": "Early Mechanical Dissociation of Helical Blade-Barrel Interface in Proximal Femoral Nail: A Case Report.",
+          "identifier": "europepmc:42273451",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:27:04.231720+00:00",
+          "content_hash": "6c94c96476a79aca7e40bc2e4336bdae545d842c436861fc47fbac874f1d4f64",
+          "source_span": "Introduction Proximal femoral nail (PFN) fixation is widely used for intertrochanteric (IT) fractures; however, implant-related complications remain a concern. While commonly reported failures include cut-out, back-out, and implant breakage, dissociation at the helical blade-barrel interface is extremely rare and poorly described in the literature. To the best of our knowledge, no prior case reports have described this specific mode of failure. Case report A 62-year-old male presented with pain in the left hip region following prior PFN fixation for an IT femur fracture. On evaluation, implant failure in the form of PFN nail breakage was identified. The patient underwent revision with a long PFN and lateral support plate. On post-operative day 21, he developed pain and implant prominence. Radiographs did not demonstrate classical blade back-out or cut-out but showed mechanical disengagement at the blade-barrel interface. Three-dimensional computed tomography confirmed dissociation of the barrel from the helical blade, with the blade remaining in situ within the femoral head. There was no evidence of infection. Revision surgery confirmed mechanical failure at the blade-barrel interface. The blade was replaced, and debridement performed. Microbiological cultures were sterile. The patient had an uneventful recovery. Conclusion This case highlights a rare and early mechanical failure of PFN involving blade-barrel dissociation. Awareness of this failure mode and early radiological evaluation are essential to prevent complications and guide timely intervention.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.13107/jocr.2026.v16.i06.7526",
+          "publication_date": "2026-06-01",
+          "query": "Knee Implant mechanical failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [],
+          "mechanism_density_score": 0
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "BOUND_002",
+        "expected_verdict": "KILL",
+        "oracle_evidence_span": "Introduction Proximal femoral nail (PFN) fixation is widely used for intertrochanteric (IT) fractures; however, implant-related complications remain a concern. While commonly reported failures include",
+        "oracle_reason": "Documented failure boundary in europepmc:42273451"
+      },
+      "correction_reason": "No boundary threshold in evidence span",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "BOUND_003",
+      "category": "BOUNDARY_CONDITION",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Modify Heart Valve beyond documented operational threshold",
+        "mechanistic_reasoning": "The modification operates beyond the documented failure boundary",
+        "falsification_test": "Test at boundary threshold",
+        "device_class": "Heart Valve",
+        "failure_mode": "MECHANICAL_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PUBLISHED_FAILURE_RECORD",
+      "oracle_source_id": "europepmc:42328660",
+      "oracle_source_url": "10.1155/cric/1744460",
+      "oracle_source_hash": "c8801382dc20818da93b0f5cd4364d5bed754ea9af6726744a8fbb2053dccf66",
+      "oracle_evidence_span": "Background Lutembacher syndrome (LS) is a rare condition characterized by the coexistence of mitral stenosis (MS) and an atrial septal defect (ASD). Clinical manifestations vary according to the sever",
+      "oracle_reason": "Documented failure boundary in europepmc:42328660",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.754769+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42328660",
+          "title": "Progressive Right-Sided Heart Failure and Secondary Tricuspid Valve Disease in Pediatric Lutembacher Syndrome: A Case Report.",
+          "identifier": "europepmc:42328660",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:29:31.118037+00:00",
+          "content_hash": "c8801382dc20818da93b0f5cd4364d5bed754ea9af6726744a8fbb2053dccf66",
+          "source_span": "Background Lutembacher syndrome (LS) is a rare condition characterized by the coexistence of mitral stenosis (MS) and an atrial septal defect (ASD). Clinical manifestations vary according to the severity of MS and the size of the ASD. Case presentation We report a 13-year-old female with congenital MS and a secundum ASD who presented with decompensated right heart failure after being lost to follow-up for 10 years. Progressive worsening of MS and enlargement of the ASD resulted in significant left-to-right shunting, severe right heart volume overload, pulmonary hypertension, tricuspid annular dilation, and severe tricuspid regurgitation. Cardiac catheterization demonstrated low cardiac output, pulmonary overcirculation, and postcapillary pulmonary hypertension. The patient underwent mechanical mitral valve replacement, ASD closure, and tricuspid annuloplasty. Outcome Postoperatively, the patient experienced transient left ventricular dysfunction that gradually improved with medical therapy. At 2-year follow-up, she demonstrated normal biventricular systolic function and complete resolution of heart failure symptoms. Conclusion This case highlights how a large ASD may initially mask symptoms of severe MS while simultaneously promoting progressive right-sided heart failure and secondary tricuspid valve disease. Early surveillance and timely intervention are essential to prevent irreversible cardiac remodeling in patients with LS.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1155/cric/1744460",
+          "publication_date": "2026-06-19",
+          "query": "Heart Valve mechanical failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [],
+          "mechanism_density_score": 0
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "BOUND_003",
+        "expected_verdict": "KILL",
+        "oracle_evidence_span": "Background Lutembacher syndrome (LS) is a rare condition characterized by the coexistence of mitral stenosis (MS) and an atrial septal defect (ASD). Clinical manifestations vary according to the sever",
+        "oracle_reason": "Documented failure boundary in europepmc:42328660"
+      },
+      "correction_reason": "No boundary threshold in evidence span",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "BOUND_004",
+      "category": "BOUNDARY_CONDITION",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Modify LVAD beyond documented operational threshold",
+        "mechanistic_reasoning": "The modification operates beyond the documented failure boundary",
+        "falsification_test": "Test at boundary threshold",
+        "device_class": "LVAD",
+        "failure_mode": "INFECTION"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PUBLISHED_FAILURE_RECORD",
+      "oracle_source_id": "europepmc:42181622",
+      "oracle_source_url": "10.3389/fcvm.2026.1809193",
+      "oracle_source_hash": "8e9af504e89b5f47a9aabb2d5364d69bfaf2e84c12a703f7e97553616bf13125",
+      "oracle_evidence_span": "Sodium-glucose cotransporter inhibitors, originally developed for diabetes management, have demonstrated significant therapeutic benefit across the phenotypic spectrum of heart failure in landmark tri",
+      "oracle_reason": "Documented failure boundary in europepmc:42181622",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.754947+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42181622",
+          "title": "Expanding the scope of SGLT inhibitors in underrepresented cardiac populations: from pathophysiology to clinical evidence.",
+          "identifier": "europepmc:42181622",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:30:58.652714+00:00",
+          "content_hash": "8e9af504e89b5f47a9aabb2d5364d69bfaf2e84c12a703f7e97553616bf13125",
+          "source_span": "Sodium-glucose cotransporter inhibitors, originally developed for diabetes management, have demonstrated significant therapeutic benefit across the phenotypic spectrum of heart failure in landmark trials. However, multiple patient populations predisposed to ventricular dysfunction, including transthyretin amyloid cardiomyopathy, hypertrophic cardiomyopathy, congenital heart disease, heart transplant, and left ventricular assist devices, were initially excluded from these key trials due to their unique underlying cardiac physiology and limited safety data. Nonetheless, the pleiotropic effects of SGLTi, like modulation of inflammation, fibrosis, systemic venous congestion, endothelial dysfunction, and renal impairment, may also be advantageous in these patient populations. This narrative review discusses the potential role of SGLTi in these populations, primarily based on current observational evidence. We also examine emerging mechanistic insights from preclinical research and summarize ongoing clinical trials that may further clarify the therapeutic potential of SGLTi in these contexts. Finally, safety considerations, including monitoring volume status, the risk of euglycemic ketoacidosis, and genitourinary infections, are discussed. Ongoing prospective studies and interventional trials will be essential to better define the safety and efficacy of SGLTi in these underrepresented patient groups.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3389/fcvm.2026.1809193",
+          "publication_date": "2026-05-08",
+          "query": "LVAD infection mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [
+            "due to",
+            "monitor",
+            "limit"
+          ],
+          "mechanism_density_score": 3
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "BOUND_004",
+        "expected_verdict": "KILL",
+        "oracle_evidence_span": "Sodium-glucose cotransporter inhibitors, originally developed for diabetes management, have demonstrated significant therapeutic benefit across the phenotypic spectrum of heart failure in landmark tri",
+        "oracle_reason": "Documented failure boundary in europepmc:42181622"
+      },
+      "correction_reason": "No boundary threshold in evidence span",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "BOUND_005",
+      "category": "BOUNDARY_CONDITION",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Modify Spinal Cord Stimulator beyond documented operational threshold",
+        "mechanistic_reasoning": "The modification operates beyond the documented failure boundary",
+        "falsification_test": "Test at boundary threshold",
+        "device_class": "Spinal Cord Stimulator",
+        "failure_mode": "BATTERY_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PUBLISHED_FAILURE_RECORD",
+      "oracle_source_id": "europepmc:41777571",
+      "oracle_source_url": "10.2147/ndt.s579314",
+      "oracle_source_hash": "3e7ce74dd1b79f7ed87343f0REDACTED-SCOPUS-PATTERN-MATCH",
+      "oracle_evidence_span": "Vagal nerve stimulation (VNS) is an established neuromodulation therapy used in the treatment of drug-resistant epilepsy and treatment-resistant depression. This therapy is expanding to avenues in aut",
+      "oracle_reason": "Documented failure boundary in europepmc:41777571",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.755151+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:41777571",
+          "title": "Anesthetic Management of Patients for Vagal Nerve Stimulator Placement: A Narrative Review.",
+          "identifier": "europepmc:41777571",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:32:29.991987+00:00",
+          "content_hash": "3e7ce74dd1b79f7ed87343f0REDACTED-SCOPUS-PATTERN-MATCH",
+          "source_span": "Vagal nerve stimulation (VNS) is an established neuromodulation therapy used in the treatment of drug-resistant epilepsy and treatment-resistant depression. This therapy is expanding to avenues in autonomic disorders, heart failure, and chronic migraine. Utilization of this therapy is continuing to grow, and anesthesiologists will increasingly encounter patients undergoing primary implantation or revision of VNS devices. Understanding of device mechanisms, implantation techniques, and physiologic responses to vagal stimulation is imperative to safer perioperative management. This narrative review summarizes current evidence regarding vagal nerve anatomy, VNS device components, perioperative assessment, intraoperative considerations, and postoperative complications. A targeted literature review was performed to identify clinical trials, cohort studies, device safety analyses, and review articles related to anesthetic management of VNS implantation. Preoperative considerations include evaluation of seizure control, prior surgical history, psychiatric comorbidities, and familiarity with magnet function for terminating or increasing stimulation. Intraoperatively, the proximity of the surgical field to the airway requires secure endotracheal tube positioning and alternes to displacement. Direct manipulation of the cervical vagus nerve can elicit bradycardia, hypotension, and, rarely, asystole. Further, electrocautery use should be minimized, with bipolar techniques being preferred to decrease the risk of lead or generator damage. Postoperative management involves appropriate analgesia without excess respiratory depression, prevention of seizure recurrence, and recognition of complications. Hematoma, pocket infection, lead fracture, pulse generator migration, and vocal cord dysfunction are device-related and transient physical complications. Overall, anesthetic management for VNS implantation must take an individualized and comprehensive approach that encompasses patient-",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.2147/ndt.s579314",
+          "publication_date": "2026-02-26",
+          "query": "Spinal Cord Stimulator battery failure failure prevention",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "mechanism"
+          ],
+          "mechanism_density_score": 1
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "BOUND_005",
+        "expected_verdict": "KILL",
+        "oracle_evidence_span": "Vagal nerve stimulation (VNS) is an established neuromodulation therapy used in the treatment of drug-resistant epilepsy and treatment-resistant depression. This therapy is expanding to avenues in aut",
+        "oracle_reason": "Documented failure boundary in europepmc:41777571"
+      },
+      "correction_reason": "No boundary threshold in evidence span",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "NONB_001",
+      "category": "NON_BOUNDARY",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Add monitoring capability to Cardiac Pacemaker",
+        "mechanistic_reasoning": "Monitoring does not alter operational boundaries",
+        "falsification_test": "Verify monitoring accuracy",
+        "device_class": "Cardiac Pacemaker",
+        "failure_mode": "INFECTION"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42306589",
+      "oracle_source_url": "10.3389/fcvm.2026.1849223",
+      "oracle_source_hash": "a2bb580d384652c8ed716d71cd7337ae1040f7734e7e2edca61b8493dc245c64",
+      "oracle_evidence_span": "Pacemaker implantation remains an established therapeutic strategy for a broad range of bradyarrhythmias and conduction system disorders. As implantation volumes continue to increase worldwide, device",
+      "oracle_reason": "No boundary crossed \u2014 monitoring only",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.755345+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42306589",
+          "title": "Preventing complications in cardiac pacemaker therapy: a lifecycle-based risk management framework.",
+          "identifier": "europepmc:42306589",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:25:48.697657+00:00",
+          "content_hash": "a2bb580d384652c8ed716d71cd7337ae1040f7734e7e2edca61b8493dc245c64",
+          "source_span": "Pacemaker implantation remains an established therapeutic strategy for a broad range of bradyarrhythmias and conduction system disorders. As implantation volumes continue to increase worldwide, device-related complications have emerged as significant determinants of patient outcomes, healthcare utilization, and long-term prognosis. Pacemaker-related complications demonstrate substantial heterogeneity in terms of temporal onset, underlying pathophysiological mechanisms, and clinical impact. These events may arise from procedural factors, lead or device dysfunction, device-associated infection, or subsequent structural and functional alterations of the heart. This review proposes a structured lifecycle-based risk management framework that integrates complication prevention across the entire continuum of pacemaker therapy. This approach highlights the dynamic nature of complication risk across different phases of device therapy. Within this lifecycle risk-management paradigm, complication prevention should extend beyond isolated perioperative measures and encompass structured preprocedural assessments, standardized intraoperative techniques, and longitudinal postprocedural surveillance. By synthesizing current evidence regarding the underlying mechanisms and clinical manifestations of pacemaker-related complications and contemporary prevention and management strategies for these complications, this work provides a comprehensive overview. This framework-based approach offers a practical strategy to enhance risk stratification, guide procedural decision-making, and improve long-term outcomes in patients undergoing pacemaker therapy.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3389/fcvm.2026.1849223",
+          "publication_date": "2026-06-01",
+          "query": "Cardiac Pacemaker infection mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "mechanism"
+          ],
+          "mechanism_density_score": 1
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "NONB_001",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Pacemaker implantation remains an established therapeutic strategy for a broad range of bradyarrhythmias and conduction system disorders. As implantation volumes continue to increase worldwide, device",
+        "oracle_reason": "No boundary crossed \u2014 monitoring only"
+      },
+      "correction_reason": "Evidence discusses ['pacemaker', 'implant'], not cardiac pacemaker",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "NONB_002",
+      "category": "NON_BOUNDARY",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Add monitoring capability to Knee Implant",
+        "mechanistic_reasoning": "Monitoring does not alter operational boundaries",
+        "falsification_test": "Verify monitoring accuracy",
+        "device_class": "Knee Implant",
+        "failure_mode": "WEAR"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42202304",
+      "oracle_source_url": "10.1097/bh9.0000000000000051",
+      "oracle_source_hash": "d5cae4a557e4cb516e3ac1eead8761a1172e3fbe8166f14c10ae29e7b10edced",
+      "oracle_evidence_span": "Abstract While there have been great advancements in total knee arthroplasty (TKA) over the past 50 years, anterior knee pain (AKP) remains the most common concern among patients postoperatively. Desp",
+      "oracle_reason": "No boundary crossed \u2014 monitoring only",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.755496+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42202304",
+          "title": "The anterior compartment in modern knee arthroplasty.",
+          "identifier": "europepmc:42202304",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:26:49.972337+00:00",
+          "content_hash": "d5cae4a557e4cb516e3ac1eead8761a1172e3fbe8166f14c10ae29e7b10edced",
+          "source_span": "Abstract While there have been great advancements in total knee arthroplasty (TKA) over the past 50 years, anterior knee pain (AKP) remains the most common concern among patients postoperatively. Despite exhausting evidence supporting no clinical difference in AKP with resurfaced vs. unresurfaced patellae in TKA, 87% of TKAs are resurfaced in the United States, compared with 2% in other countries. These large practice variations underscore a lack of consensus regarding the role of the patella and the approach to the anterior compartment of the knee in TKA. The aim of this review was to go beyond patellar resurfacing and describe the effects that surgical technique and implant design may have on AKP in current TKA.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1097/bh9.0000000000000051",
+          "publication_date": "2026-05-27",
+          "query": "Knee Implant wear mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [],
+          "mechanism_density_score": 0
+        }
+      ]
+    },
+    {
+      "case_id": "NONB_003",
+      "category": "NON_BOUNDARY",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Add monitoring capability to Intraocular Lens",
+        "mechanistic_reasoning": "Monitoring does not alter operational boundaries",
+        "falsification_test": "Verify monitoring accuracy",
+        "device_class": "Intraocular Lens",
+        "failure_mode": "INFECTION"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42254756",
+      "oracle_source_url": "10.1155/crop/8798298",
+      "oracle_source_hash": "6d023f25b40e6be1e5776c9dc594eb631a80ac20a61446381b1a07050606a9b5",
+      "oracle_evidence_span": "Introduction Capsular bag distension syndrome (CBDS) is a rare complication of phacoemulsification, characterized by fluid retention in the capsular bag leading to reduced visual acuity, a myopic shif",
+      "oracle_reason": "No boundary crossed \u2014 monitoring only",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.755643+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42254756",
+          "title": "Postoperative Capsular Bag Distension Syndrome: Case Report of an Early Case Following Athalamia due to Vigorous Eye Rubbing.",
+          "identifier": "europepmc:42254756",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:28:45.448748+00:00",
+          "content_hash": "6d023f25b40e6be1e5776c9dc594eb631a80ac20a61446381b1a07050606a9b5",
+          "source_span": "Introduction Capsular bag distension syndrome (CBDS) is a rare complication of phacoemulsification, characterized by fluid retention in the capsular bag leading to reduced visual acuity, a myopic shift, and a risk of pupillary block. Case presentation We report the case of a 65-year-old male who developed CBDS after rubbing his eye vigorously postoperatively. On Postoperative Day 1, his best corrected visual acuity (BCVA) was 0.1 with a myopic shift. We made the diagnosis of CBDS with the Scheimpflug camera and AS-OCT. Conservative management was initially attempted, but due to persistent symptoms, surgical aspiration of the trapped fluid was performed on Day 4. This intervention resulted in BCVA improvement to 0.8 and resolution of the myopic shift. Discussion Differential diagnoses considered included incorrect IOL power, IOL misplacement, transient corneal edema, and incisional astigmatism. We hypothesize that mechanical athalamia due to eye rubbing was an acute trigger leading to forward IOL displacement, adhering it to the anterior capsule and trapping fluid. A stepwise management approach, including observation followed by surgical intervention, proved effective. Conclusion CBDS may be precipitated by transient mechanical athalamia following vigorous eye rubbing, which can promote acute intraocular lens-capsular apposition and fluid entrapment. This case highlights the importance of postoperative patient education. Early recognition and management are essential to prevent severe complications such as endophthalmitis and pupillary block.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1155/crop/8798298",
+          "publication_date": "2026-05-30",
+          "query": "Intraocular Lens infection mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [
+            "due to"
+          ],
+          "mechanism_density_score": 1
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "NONB_003",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Introduction Capsular bag distension syndrome (CBDS) is a rare complication of phacoemulsification, characterized by fluid retention in the capsular bag leading to reduced visual acuity, a myopic shif",
+        "oracle_reason": "No boundary crossed \u2014 monitoring only"
+      },
+      "correction_reason": "Evidence does not discuss the device",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "NONB_004",
+      "category": "NON_BOUNDARY",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Add monitoring capability to Closure Device",
+        "mechanistic_reasoning": "Monitoring does not alter operational boundaries",
+        "falsification_test": "Verify monitoring accuracy",
+        "device_class": "Closure Device",
+        "failure_mode": "MECHANICAL_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42029379",
+      "oracle_source_url": "10.1016/j.jaccas.2026.108009",
+      "oracle_source_hash": "977a186f6f1de68867fdfb89399a77d6e986b9514ce53ba00f64491afa854d87",
+      "oracle_evidence_span": "Background Iatrogenic atrial septal defects (iASDs) after mitral transcatheter edge-to-edge repair (M-TEER) are generally benign. However, advanced atrial remodeling can trigger catastrophic mechanica",
+      "oracle_reason": "No boundary crossed \u2014 monitoring only",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.755738+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42029379",
+          "title": "Hyperacute Iatrogenic Atrial Septal Defect Expansion Driven by Tricuspid Regurgitation Jet Impingement.",
+          "identifier": "europepmc:42029379",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:31:12.907639+00:00",
+          "content_hash": "977a186f6f1de68867fdfb89399a77d6e986b9514ce53ba00f64491afa854d87",
+          "source_span": "Background Iatrogenic atrial septal defects (iASDs) after mitral transcatheter edge-to-edge repair (M-TEER) are generally benign. However, advanced atrial remodeling can trigger catastrophic mechanical failure via rapid morphologic expansion. Case summary An 84-year-old woman with atrial fibrillation and diastolic dysfunction underwent M-TEER. Despite a stable intraprocedural iASD, she developed cardiogenic shock within 3 hours. Three-dimensional transesophageal echocardiography documented hyperacute doubling of the defect area. The mechanism was direct tricuspid regurgitation (TR)-jet impingement on the thinned septum, reflecting severely impaired left atrial compliance. Emergency iASD closure using \"stationary deployment\" prevented further traumatic tearing, resulting in immediate hemodynamic stabilization. Discussion This case identifies TR-jet impingement as a predictor of acute iASD expansion. Transesophageal echocardiography is essential for monitoring this mechanical vicious cycle. Take-home messages Impaired atrial compliance and TR-jet impingement can cause rapid iASD enlargement after M-TEER. Prompt recognition and closure are vital for managing this life-threatening complication.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1016/j.jaccas.2026.108009",
+          "publication_date": "2026-04-24",
+          "query": "Closure Device mechanical failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "mechanism",
+            "monitor"
+          ],
+          "mechanism_density_score": 2
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "NONB_004",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Background Iatrogenic atrial septal defects (iASDs) after mitral transcatheter edge-to-edge repair (M-TEER) are generally benign. However, advanced atrial remodeling can trigger catastrophic mechanica",
+        "oracle_reason": "No boundary crossed \u2014 monitoring only"
+      },
+      "correction_reason": "Evidence does not discuss the device",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "NONB_005",
+      "category": "NON_BOUNDARY",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Add monitoring capability to Glaucoma Shunt",
+        "mechanistic_reasoning": "Monitoring does not alter operational boundaries",
+        "falsification_test": "Verify monitoring accuracy",
+        "device_class": "Glaucoma Shunt",
+        "failure_mode": "MECHANICAL_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42318282",
+      "oracle_source_url": "10.3389/fopht.2026.1749614",
+      "oracle_source_hash": "7b7c8c3059a4fc5adec81637a5894fc940971fc4b622a0891c15522f0cd1a797",
+      "oracle_evidence_span": "Purpose To describe a rare case of tube perforation after PreserFlo MicroShunt (PMS) implantation and subsequent bleb revision, emphasizing the potential mechanisms involved and the strategies employe",
+      "oracle_reason": "No boundary crossed \u2014 monitoring only",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.755874+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42318282",
+          "title": "Case Report: Tube perforation after bleb reformation after PreserFlo MicroShunt implantation.",
+          "identifier": "europepmc:42318282",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:33:40.786716+00:00",
+          "content_hash": "7b7c8c3059a4fc5adec81637a5894fc940971fc4b622a0891c15522f0cd1a797",
+          "source_span": "Purpose To describe a rare case of tube perforation after PreserFlo MicroShunt (PMS) implantation and subsequent bleb revision, emphasizing the potential mechanisms involved and the strategies employed for clinical management. Observations An 84-year-old woman with bilateral exfoliation glaucoma underwent PMS implantation in her left eye due to uncontrolled intraocular pressure (IOP) despite receiving maximum medical therapy. The patient had a history of multiple ocular surgeries and long-term use of glaucoma eye drops. The initial surgery was uneventful; however, the patient developed hypotony and choroidal detachment after stent removal, prompting a second procedure for stent reinsertion. Subsequently, a postoperative conjunctival leak developed, and petrolatum-based ophthalmic ointment was used; however, the leakage did not improve, leading to a third surgery. During this procedure, a conjunctival defect and a 0.5-mm tear posterior to the fin of the PMS tube were identified. The device was removed, and a new PMS tube was implanted in a different quadrant. The IOP stabilized postoperatively, with no recurrent leakage or hypotony. Conclusions and importance This is a rare case report of PMS tube perforation with a conjunctival hole. Potential contributing factors included chronic conjunctival inflammation from long-term use of glaucoma eye drops, previous ocular surgeries, and prostaglandin-associated periorbitopathy. These conditions may have resulted in tissue thinning and mechanical stress, leading to tube exposure and perforation. In addition, loss of the conjunctival barrier and subsequent exposure to petrolatum-based ophthalmic ointment may have compromised the structural integrity of the PMS, potentially leading to perforation due to continued eyelid friction. A careful preoperative assessment of the ocular surface and periocular anatomy is essential for identifying high-risk patients. Furthermore, if the PMS becomes exposed postoperatively, the use of petro",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3389/fopht.2026.1749614",
+          "publication_date": "2026-06-03",
+          "query": "Glaucoma Shunt mechanical failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "mechanism",
+            "due to"
+          ],
+          "mechanism_density_score": 2
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "NONB_005",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Purpose To describe a rare case of tube perforation after PreserFlo MicroShunt (PMS) implantation and subsequent bleb revision, emphasizing the potential mechanisms involved and the strategies employe",
+        "oracle_reason": "No boundary crossed \u2014 monitoring only"
+      },
+      "correction_reason": "Evidence discusses ['implant'], not glaucoma shunt",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "SPEC_001",
+      "category": "SPECIFIC_PRIOR_ART",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Use exactly the approach described in europepmc:42290916",
+        "mechanistic_reasoning": "This is the same mechanism already described in the prior art",
+        "falsification_test": "Compare to prior art",
+        "device_class": "Hip Implant",
+        "failure_mode": "CORROSION"
+      },
+      "prior_art_state": "SPECIFIC_DISCLOSURE",
+      "evidence_verified": true,
+      "oracle_source_type": "PATENT_CLAIM",
+      "oracle_source_id": "europepmc:42290916",
+      "oracle_source_url": "10.1155/cro/6657448",
+      "oracle_source_hash": "a4523d8df74bbb27e011bbfa85f01cab35aeeabae5a65b6e57c88dd4def01e9e",
+      "oracle_evidence_span": "Adverse local tissue reaction (ALTR) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, remain major long-term complications of total hip re",
+      "oracle_reason": "Specific disclosure in europepmc:42290916",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.756019+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42290916",
+          "title": "Case Report: Pseudotumor due to Trunnionosis in Ceramic-on-Ceramic THA Monoblock Acetabular Cup Disengagement.",
+          "identifier": "europepmc:42290916",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:26:35.605612+00:00",
+          "content_hash": "a4523d8df74bbb27e011bbfa85f01cab35aeeabae5a65b6e57c88dd4def01e9e",
+          "source_span": "Adverse local tissue reaction (ALTR) and pseudotumor formation, representing inflammatory responses to wear debris that lead to osteolytic lesions, remain major long-term complications of total hip replacement. Hard-bearing total hip prostheses with improved tribological properties-particularly large-diameter head (LDH) ceramic-on-ceramic (CoC) bearings and preassembled cup designs-have been introduced into clinical practice to minimize wear, increase the range of motion (ROM), and reduce dislocation rates. We describe the case of a young asymptomatic patient with a CoC total hip arthroplasty (THA) featuring a monoblock acetabular component, in whom a pseudotumor was incidentally detected. The lesion was associated with trunnionosis following spontaneous liner disassembly, which occurred without any clinical symptoms or audible signs such as the typical hip \"clunk.\" This case highlights the diagnostic challenges in identifying periprosthetic adverse reactions in asymptomatic patients and emphasizes the importance of timely recognition to prevent technically demanding revision procedures in catastrophic implant failures.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1155/cro/6657448",
+          "publication_date": "2026-06-11",
+          "query": "Hip Implant corrosion mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [
+            "due to",
+            "reaction",
+            "detect"
+          ],
+          "mechanism_density_score": 3
+        }
+      ]
+    },
+    {
+      "case_id": "SPEC_002",
+      "category": "SPECIFIC_PRIOR_ART",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Use exactly the approach described in europepmc:42346669",
+        "mechanistic_reasoning": "This is the same mechanism already described in the prior art",
+        "falsification_test": "Compare to prior art",
+        "device_class": "Dental Implant",
+        "failure_mode": "INFECTION"
+      },
+      "prior_art_state": "SPECIFIC_DISCLOSURE",
+      "evidence_verified": true,
+      "oracle_source_type": "PATENT_CLAIM",
+      "oracle_source_id": "europepmc:42346669",
+      "oracle_source_url": "10.3390/jfb17060278",
+      "oracle_source_hash": "f213732532c9dd4992fd981a17e5e4e29118678eaef00214469c663140b707c0",
+      "oracle_evidence_span": "The long-term stability of dental implants is limited by multiple factors, including peri-implant infection, impaired osseointegration, and poor soft tissue sealing. Compared with conventional passive",
+      "oracle_reason": "Specific disclosure in europepmc:42346669",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.756199+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42346669",
+          "title": "Research Progress and Translational Perspectives of Piezoelectric Materials in Dental Implant Surface Engineering.",
+          "identifier": "europepmc:42346669",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:28:31.040466+00:00",
+          "content_hash": "f213732532c9dd4992fd981a17e5e4e29118678eaef00214469c663140b707c0",
+          "source_span": "The long-term stability of dental implants is limited by multiple factors, including peri-implant infection, impaired osseointegration, and poor soft tissue sealing. Compared with conventional passive surface modification strategies, piezoelectric materials can convert mechanical energy into local electrical signals under occlusal loading, cell traction, or ultrasonic stimulation. With the aid of defect engineering, heterostructure construction, and co-catalytic design, these materials can also induce the generation of reactive oxygen species and reactive nitrogen species, thereby enabling on-demand antibacterial activity. This review systematically summarizes the bioelectric basis of bone tissue and clarifies how piezoelectricity and piezocatalysis may be used in dental implant surface engineering. Their applications are discussed in terms of antibiofilm and antibacterial activity, osteogenesis and osseointegration, osteoimmunomodulation, soft tissue healing, and temporally programmed therapy. In addition, this review also discusses issues that remain unresolved, such as polymer-based composite systems, realistic activation windows, evaluation standards, device-material integration, and multi-omics validation. Overall, piezoelectric surface engineering is evolving from a single osteogenesis-oriented strategy into an integrated platform that coordinates infection control, immune remodeling, and osseointegration. However, the actual effectiveness of its clinical application still needs to be determined through more rigorous mechanism analysis, long-term stability assessment, biosafety assessment, and standardized preclinical research.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3390/jfb17060278",
+          "publication_date": "2026-06-04",
+          "query": "Dental Implant infection mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "mechanism",
+            "limit"
+          ],
+          "mechanism_density_score": 2
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "SPEC_002",
+        "expected_verdict": "KILL",
+        "oracle_evidence_span": "The long-term stability of dental implants is limited by multiple factors, including peri-implant infection, impaired osseointegration, and poor soft tissue sealing. Compared with conventional passive",
+        "oracle_reason": "Specific disclosure in europepmc:42346669"
+      },
+      "correction_reason": "Evidence discusses ['implant'], not dental implant",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "SPEC_003",
+      "category": "SPECIFIC_PRIOR_ART",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Use exactly the approach described in europepmc:42535999",
+        "mechanistic_reasoning": "This is the same mechanism already described in the prior art",
+        "falsification_test": "Compare to prior art",
+        "device_class": "Heart Valve",
+        "failure_mode": "THROMBOSIS"
+      },
+      "prior_art_state": "SPECIFIC_DISCLOSURE",
+      "evidence_verified": true,
+      "oracle_source_type": "PATENT_CLAIM",
+      "oracle_source_id": "europepmc:42535999",
+      "oracle_source_url": "10.1016/j.jaccas.2026.109552",
+      "oracle_source_hash": "ad79a56dbcddc52f98bfbae7656c89720d3be05c1eb26c1401e6d8f19f86310f",
+      "oracle_evidence_span": "Background Determinants of early prosthetic thrombosis following transcatheter tricuspid valve replacement (TTVR) are unknown. Case summary A 70-year-old man with severe tricuspid regurgitation underw",
+      "oracle_reason": "Specific disclosure in europepmc:42535999",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.756371+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42535999",
+          "title": "Early Prosthetic Thrombosis After Transcatheter Tricuspid Valve Replacement: A Word of Caution.",
+          "identifier": "europepmc:42535999",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:29:45.562126+00:00",
+          "content_hash": "ad79a56dbcddc52f98bfbae7656c89720d3be05c1eb26c1401e6d8f19f86310f",
+          "source_span": "Background Determinants of early prosthetic thrombosis following transcatheter tricuspid valve replacement (TTVR) are unknown. Case summary A 70-year-old man with severe tricuspid regurgitation underwent an uneventful TTVR using the EVOQUE system (Edwards Lifesciences). Intravenous heparin was temporarily suspended a few days after the procedure to insert a permanent pacemaker. Sudden clinical deterioration occurred in the following days. Echocardiography demonstrated extensive thrombosis of the TTVR prosthesis, requiring surgical removal. Tricuspid valve repair was not possible because of the anchoring mechanism of the prosthesis, and a tricuspid valve replacement was necessary. The patient's postoperative course was unremarkable. Discussion The optimal management of anticoagulation in patients undergoing TTVR needs to be elucidated. Take-home messages Early interruption of anticoagulation after TTVR may be associated with severe prosthetic thrombosis in selected high-risk patients. Surgical TTVR explantation may damage the native tricuspid leaflets and subvalvular apparatus, reducing the likelihood of valve repair.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1016/j.jaccas.2026.109552",
+          "publication_date": "2026-07-30",
+          "query": "Heart Valve thrombosis mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "mechanism",
+            "because"
+          ],
+          "mechanism_density_score": 2
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "SPEC_003",
+        "expected_verdict": "KILL",
+        "oracle_evidence_span": "Background Determinants of early prosthetic thrombosis following transcatheter tricuspid valve replacement (TTVR) are unknown. Case summary A 70-year-old man with severe tricuspid regurgitation underw",
+        "oracle_reason": "Specific disclosure in europepmc:42535999"
+      },
+      "correction_reason": "Evidence discusses ['valve', 'catheter'], not heart valve",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "SPEC_004",
+      "category": "SPECIFIC_PRIOR_ART",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Use exactly the approach described in europepmc:41426908",
+        "mechanistic_reasoning": "This is the same mechanism already described in the prior art",
+        "falsification_test": "Compare to prior art",
+        "device_class": "Deep Brain Stimulator",
+        "failure_mode": "LEAD_FRACTURE"
+      },
+      "prior_art_state": "SPECIFIC_DISCLOSURE",
+      "evidence_verified": true,
+      "oracle_source_type": "PATENT_CLAIM",
+      "oracle_source_id": "europepmc:41426908",
+      "oracle_source_url": "10.7759/cureus.97316",
+      "oracle_source_hash": "7b29d2c06REDACTED-SCOPUS-PATTERN-MATCH",
+      "oracle_evidence_span": "Spinal cord stimulation (SCS) is a minimally invasive neuromodulation technique utilized to manage chronic pain conditions such as complex regional pain syndrome (CRPS), post-laminectomy syndrome, and",
+      "oracle_reason": "Specific disclosure in europepmc:41426908",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.756554+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:41426908",
+          "title": "Revision of an Eight-lead Boston Scientific\u00ae Spinal Cord Stimulator With Epidural Migration: A Case Report.",
+          "identifier": "europepmc:41426908",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:31:41.960020+00:00",
+          "content_hash": "7b29d2c06REDACTED-SCOPUS-PATTERN-MATCH",
+          "source_span": "Spinal cord stimulation (SCS) is a minimally invasive neuromodulation technique utilized to manage chronic pain conditions such as complex regional pain syndrome (CRPS), post-laminectomy syndrome, and peripheral neuropathy. Despite its efficacy, complications, including lead migration, discomfort, and device malfunction, can occur. We present the case of a male patient in his 60s with a history of chronic left lower extremity pain who underwent SCS implantation. Initial management included a successful trial period followed by permanent implantation. However, postoperative imaging revealed lead migration from the T10-T12 to the T12-L1 vertebral bodies. A subsequent lead revision was performed, yet the patient later experienced new abdominal pain due to further lead migration, necessitating referral to neurosurgery for paddle lead placement. The revision procedure involved reopening the initial incision, carefully removing scar tissue, and repositioning the lead within the epidural space using fluoroscopic guidance. The lead was anchored with a self-anchoring mechanism, and the incision was closed meticulously. Post revision, the patient experienced significant pain relief, confirmed by stable lead positioning on imaging. Unfortunately, lead migration recurred months later, leading to the decision for paddle-lead implantation. This case highlights the complexities of SCS implantation, particularly lead migration, and the importance of meticulous surgical technique and preoperative planning. The challenges of scar tissue formation and lead maneuverability are discussed, with a focus on improving fixation mechanisms and exploring alternative lead designs. Lead migration is a significant complication in SCS implantation that can compromise pain management efficacy. Vigilant postoperative monitoring, prompt revision, and advancements in lead design and fixation are essential to optimizing patient outcomes and minimizing the need for further interventions.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.7759/cureus.97316",
+          "publication_date": "2025-11-20",
+          "query": "Deep Brain Stimulator lead fracture mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "mechanism",
+            "due to",
+            "monitor"
+          ],
+          "mechanism_density_score": 3
+        }
+      ]
+    },
+    {
+      "case_id": "SPEC_005",
+      "category": "SPECIFIC_PRIOR_ART",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Use exactly the approach described in europepmc:40998977",
+        "mechanistic_reasoning": "This is the same mechanism already described in the prior art",
+        "falsification_test": "Compare to prior art",
+        "device_class": "Pulse Oximeter",
+        "failure_mode": "CALIBRATION_FAILURE"
+      },
+      "prior_art_state": "SPECIFIC_DISCLOSURE",
+      "evidence_verified": true,
+      "oracle_source_type": "PATENT_CLAIM",
+      "oracle_source_id": "europepmc:40998977",
+      "oracle_source_url": "10.1038/s41746-025-01974-8",
+      "oracle_source_hash": "34e996606REDACTED-SCOPUS-PATTERN-MATCH",
+      "oracle_evidence_span": "The neonatal period is critical and stressful, particularly in low-resource settings where existing monitoring methods for newborns are sporadic and labor-intensive. There is a pressing need for an af",
+      "oracle_reason": "Specific disclosure in europepmc:40998977",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.756722+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:40998977",
+          "title": "Soft, all-in-one, nanomembrane wearable system for advancing neonatal health monitoring in Ethiopia.",
+          "identifier": "europepmc:40998977",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:34:56.200396+00:00",
+          "content_hash": "34e996606REDACTED-SCOPUS-PATTERN-MATCH",
+          "source_span": "The neonatal period is critical and stressful, particularly in low-resource settings where existing monitoring methods for newborns are sporadic and labor-intensive. There is a pressing need for an affordable, user-friendly device that offers continuous and effective monitoring. Here, we present a soft, all-in-one, wearable system designed for continuous wireless monitoring of neonatal health in low-resource settings. Developed using advanced packaging technologies, this system features a chest-mounted patch and a forehead-mounted pulse oximeter that transmit real-time data to a smartphone app. The integrated device measures clinical-grade parameters, including electrocardiograms, heart rate, respiration rate, temperature, and blood oxygen saturation, showing excellent correlation with hospital-grade tabletop devices and reduced motion artifacts. This pilot study demonstrates a significant improvement over current monitoring methods by providing continuous oversight, ensures critical events are not missed, and automates the process for enhanced neonatal care, resulting in 84% satisfaction by parents interested in using the system at home.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1038/s41746-025-01974-8",
+          "publication_date": "2025-09-25",
+          "query": "Pulse Oximeter calibration failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [
+            "process",
+            "monitor",
+            "parameter"
+          ],
+          "mechanism_density_score": 3
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "SPEC_005",
+        "expected_verdict": "KILL",
+        "oracle_evidence_span": "The neonatal period is critical and stressful, particularly in low-resource settings where existing monitoring methods for newborns are sporadic and labor-intensive. There is a pressing need for an af",
+        "oracle_reason": "Specific disclosure in europepmc:40998977"
+      },
+      "correction_reason": "Evidence discusses ['monitor'], not pulse oximeter",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "TOPC_001",
+      "category": "TOPICAL_ONLY_PRIOR_ART",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Novel approach to Spinal Fusion Device inspired by adjacent field",
+        "mechanistic_reasoning": "Different from prior art in configuration and control rule",
+        "falsification_test": "Test novelty against prior art",
+        "device_class": "Spinal Fusion Device",
+        "failure_mode": "MECHANICAL_FAILURE"
+      },
+      "prior_art_state": "POSSIBLE_RELEVANCE",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42199852",
+      "oracle_source_url": "10.1016/j.xnsj.2026.100888",
+      "oracle_source_hash": "cd0aaa625bf4c8ef741d508fde74ecf2dd0c7d85d11af7dc6a36ab965135f46a",
+      "oracle_evidence_span": "Background Pedicle screw fixation is a mainstay surgical technique for providing posterior stability to the spinal column, and consists of screws, rods and set caps. These components are prone to fail",
+      "oracle_reason": "Topical relevance only, no specific disclosure",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.756875+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42199852",
+          "title": "Biomechanical analysis of a novel, triangular spinal fixation system.",
+          "identifier": "europepmc:42199852",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:27:18.684614+00:00",
+          "content_hash": "cd0aaa625bf4c8ef741d508fde74ecf2dd0c7d85d11af7dc6a36ab965135f46a",
+          "source_span": "Background Pedicle screw fixation is a mainstay surgical technique for providing posterior stability to the spinal column, and consists of screws, rods and set caps. These components are prone to failure in various ways, but developing fixation systems with fewer components at risk of malfunction may limit construct failures. Utilizing a rod-less, triangular design, the novel system is intended to optimize construct strength while minimizing points of failure. This study aims to characterize the biomechanical performance of a novel posterior spinal instrumentation construct compared to traditional pedicle screw fixation. Methods The ASTM (American Society for Testing and Materials) F1717 protocol for static compression bending, static torsion, and dynamic compression bending was followed. Biomechanical data for six (6) novel constructs were collected and compared to three (3) predicate traditional pedicle screw and rod constructs. Testing was performed to failure for each biomechanical test, and all mechanisms of failure were recorded. Results In static compression bending, the average stiffness and displacement across all novel systems tested were 111\u00b19.2 N/m and 4.2\u00b10.5 mm, respectively as compared to predicate constructs which were 50\u00b12 N/m and 18\u00b16 mm, respectively. Static torsion testing showed that the novel systems, on average, required 21\u00b11.7 N/m to rotate 1\u00b0-four times greater force than predicate systems. In dynamic compression bending, four novel constructs successfully reached runout at 5,000,000 cycles with a maximum applied force of 250 N. Predicate constructs were not able to tolerate loads greater than 160 N. Conclusions The novel spine fixation system demonstrated superior biomechanical performance compared with predicate constructs in all testing completed. The novel construct was stiffer, displaced less, and required approximately four times as much torque to rotate the construct by a single degree compared with the predicate pedicle screw constru",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1016/j.xnsj.2026.100888",
+          "publication_date": "2026-04-15",
+          "query": "Spinal Fusion Device mechanical failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "mechanism",
+            "results in",
+            "limit"
+          ],
+          "mechanism_density_score": 3
+        }
+      ]
+    },
+    {
+      "case_id": "TOPC_002",
+      "category": "TOPICAL_ONLY_PRIOR_ART",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Novel approach to Shoulder Implant inspired by adjacent field",
+        "mechanistic_reasoning": "Different from prior art in configuration and control rule",
+        "falsification_test": "Test novelty against prior art",
+        "device_class": "Shoulder Implant",
+        "failure_mode": "WEAR"
+      },
+      "prior_art_state": "POSSIBLE_RELEVANCE",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42233104",
+      "oracle_source_url": "10.1016/j.jsea.2026.100028",
+      "oracle_source_hash": "7200e21098b0f682b0824dae4557ba98d8a0bba923a58df51f94dc9307ce0e4b",
+      "oracle_evidence_span": "Background Total elbow arthroplasty (TEA) is rarely recommended in young patients because of a high risk of early failure. This study analyzes the long-term outcomes of a cohort of post-traumatic TEA ",
+      "oracle_reason": "Topical relevance only, no specific disclosure",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.757013+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42233104",
+          "title": "Total elbow arthroplasty for unreconstructible distal humerus fracture sequelae in patients less than 40 year old. Long-term outcomes.",
+          "identifier": "europepmc:42233104",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:28:02.198944+00:00",
+          "content_hash": "7200e21098b0f682b0824dae4557ba98d8a0bba923a58df51f94dc9307ce0e4b",
+          "source_span": "Background Total elbow arthroplasty (TEA) is rarely recommended in young patients because of a high risk of early failure. This study analyzes the long-term outcomes of a cohort of post-traumatic TEA patients under 40 years of age who received a linked semiconstrained implant to manage the sequelae of an unreconstructible distal humerus fracture. Material and methods A review of the patients who received a Coonrad-Morrey prosthesis between 1993 and 2013 to manage the sequelae of a distal humerus fracture identified 16 individuals with a minimum follow-up of 10 years who at the time of surgery were aged 40 years or less. A further patient required multiple implant revisions due to a deep elbow infection that ultimately prevented reimplantation and did not reach the minimum follow-up period. We excluded patients with inflammatory or rheumatoid arthritis. Clinical follow-up included the Mayo Elbow Performance Score, the Quick Disabilities of the Arm, Shoulder and Hand score, and triceps function. Overall satisfaction was also investigated. Radiographs were analyzed for component loosening, bushing wear, and periarticular ossifications. Results The mean follow-up was 151 (range, 125-225) months. After TEA, mean flexion-extension was 99\u00b0; mean pronation-supination was 103\u00b0; the mean Mayo Elbow Performance Score was 82, and the mean Quick Disabilities of the Arm, Shoulder and Hand score was 12. At the last follow-up, 10 of 16 patients (62%) required revision surgery, 5 for component loosening, 4 for isolated bushing exchange, and 1 for bushing exchange with triceps reconstruction. Nonetheless, 14 (87%) were satisfied with the procedure. Conclusion Semiconstrained TEA should be considered as a salvage procedure in young post-traumatic patients with unreconstructible distal humerus fractures. In our experience, TEA can achieve satisfactory outcomes in terms of pain relief, stability, and range of movement. However, at a mean follow-up of 151 months, the long-term complicati",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1016/j.jsea.2026.100028",
+          "publication_date": "2026-04-29",
+          "query": "Shoulder Implant wear mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "due to",
+            "because"
+          ],
+          "mechanism_density_score": 2
+        }
+      ]
+    },
+    {
+      "case_id": "TOPC_003",
+      "category": "TOPICAL_ONLY_PRIOR_ART",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Novel approach to Vascular Graft inspired by adjacent field",
+        "mechanistic_reasoning": "Different from prior art in configuration and control rule",
+        "falsification_test": "Test novelty against prior art",
+        "device_class": "Vascular Graft",
+        "failure_mode": "INFECTION"
+      },
+      "prior_art_state": "POSSIBLE_RELEVANCE",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42318550",
+      "oracle_source_url": "10.1002/ccr3.72962",
+      "oracle_source_hash": "fe8d1febd684a6e139088404ec6d17e3b3dbf49be78f30861bf93369d0e3fc84",
+      "oracle_evidence_span": "Central venous catheters (CVCs) are essential in transplantation but can rarely fracture and embolize, with donor-to-recipient transmission of catheter fragments scarcely described. A 62-year-old woma",
+      "oracle_reason": "Topical relevance only, no specific disclosure",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.757164+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42318550",
+          "title": "From Donor Liver to Recipient Pulmonary Artery: Embolization of a Transected Central Venous Catheter During Liver Transplantation, A Rare Complication of Organ Procurement.",
+          "identifier": "europepmc:42318550",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:30:29.243348+00:00",
+          "content_hash": "fe8d1febd684a6e139088404ec6d17e3b3dbf49be78f30861bf93369d0e3fc84",
+          "source_span": "Central venous catheters (CVCs) are essential in transplantation but can rarely fracture and embolize, with donor-to-recipient transmission of catheter fragments scarcely described. A 62-year-old woman with hepatitis C-related cirrhosis and hepatocellular carcinoma underwent orthotopic liver transplantation from a brain-dead donor with a left subclavian multi-lumen CVC in situ at procurement. Postoperative chest radiography identified a new curvilinear opacity at the left hilum, and contrast-enhanced computed tomography showed a 5 cm radiopaque structure in a segmental branch of the left lower lobe pulmonary artery, consistent with an embolized CVC tip. All recipient vascular access devices were removed intact, strongly suggesting a donor-origin catheter fragment transplanted with the liver graft. Alternative explanations, including unrecognized recipient catheter fracture and pre-existing foreign body, were considered but deemed less likely given the temporal relationship, imaging findings, and systematic device inspection. Percutaneous endovascular retrieval via femoral venous access was attempted but failed because of the fragment's distal location and probable endothelialization. Therapeutic anticoagulation was considered but not commenced because there was no radiological evidence of thrombus formation or pulmonary embolism, and substantial competing postoperative bleeding risk. The patient remained asymptomatic, and conservative management with clinical and imaging surveillance was adopted; at 6 months, she had excellent graft function and no cardiopulmonary sequelae. However, an uneventful short-term follow-up does not establish long-term safety, and early retrieval remains the preferred strategy whenever technically feasible and clinically safe. This case represents, to our knowledge, a previously unreported mechanism of donor-to-recipient CVC fragment transmission in liver transplantation, with the most plausible explanation being unrecognized transection o",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1002/ccr3.72962",
+          "publication_date": "2026-06-17",
+          "query": "Vascular Graft infection mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [
+            "mechanism",
+            "because"
+          ],
+          "mechanism_density_score": 2
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "TOPC_003",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Central venous catheters (CVCs) are essential in transplantation but can rarely fracture and embolize, with donor-to-recipient transmission of catheter fragments scarcely described. A 62-year-old woma",
+        "oracle_reason": "Topical relevance only, no specific disclosure"
+      },
+      "correction_reason": "Evidence discusses ['catheter'], not vascular graft",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "TOPC_004",
+      "category": "TOPICAL_ONLY_PRIOR_ART",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Novel approach to Glaucoma Shunt inspired by adjacent field",
+        "mechanistic_reasoning": "Different from prior art in configuration and control rule",
+        "falsification_test": "Test novelty against prior art",
+        "device_class": "Glaucoma Shunt",
+        "failure_mode": "INFECTION"
+      },
+      "prior_art_state": "POSSIBLE_RELEVANCE",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:42318282",
+      "oracle_source_url": "10.3389/fopht.2026.1749614",
+      "oracle_source_hash": "7b7c8c3059a4fc5adec81637a5894fc940971fc4b622a0891c15522f0cd1a797",
+      "oracle_evidence_span": "Purpose To describe a rare case of tube perforation after PreserFlo MicroShunt (PMS) implantation and subsequent bleb revision, emphasizing the potential mechanisms involved and the strategies employe",
+      "oracle_reason": "Topical relevance only, no specific disclosure",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.757314+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42318282",
+          "title": "Case Report: Tube perforation after bleb reformation after PreserFlo MicroShunt implantation.",
+          "identifier": "europepmc:42318282",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:33:55.040259+00:00",
+          "content_hash": "7b7c8c3059a4fc5adec81637a5894fc940971fc4b622a0891c15522f0cd1a797",
+          "source_span": "Purpose To describe a rare case of tube perforation after PreserFlo MicroShunt (PMS) implantation and subsequent bleb revision, emphasizing the potential mechanisms involved and the strategies employed for clinical management. Observations An 84-year-old woman with bilateral exfoliation glaucoma underwent PMS implantation in her left eye due to uncontrolled intraocular pressure (IOP) despite receiving maximum medical therapy. The patient had a history of multiple ocular surgeries and long-term use of glaucoma eye drops. The initial surgery was uneventful; however, the patient developed hypotony and choroidal detachment after stent removal, prompting a second procedure for stent reinsertion. Subsequently, a postoperative conjunctival leak developed, and petrolatum-based ophthalmic ointment was used; however, the leakage did not improve, leading to a third surgery. During this procedure, a conjunctival defect and a 0.5-mm tear posterior to the fin of the PMS tube were identified. The device was removed, and a new PMS tube was implanted in a different quadrant. The IOP stabilized postoperatively, with no recurrent leakage or hypotony. Conclusions and importance This is a rare case report of PMS tube perforation with a conjunctival hole. Potential contributing factors included chronic conjunctival inflammation from long-term use of glaucoma eye drops, previous ocular surgeries, and prostaglandin-associated periorbitopathy. These conditions may have resulted in tissue thinning and mechanical stress, leading to tube exposure and perforation. In addition, loss of the conjunctival barrier and subsequent exposure to petrolatum-based ophthalmic ointment may have compromised the structural integrity of the PMS, potentially leading to perforation due to continued eyelid friction. A careful preoperative assessment of the ocular surface and periocular anatomy is essential for identifying high-risk patients. Furthermore, if the PMS becomes exposed postoperatively, the use of petro",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3389/fopht.2026.1749614",
+          "publication_date": "2026-06-03",
+          "query": "Glaucoma Shunt infection mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [
+            "mechanism",
+            "due to"
+          ],
+          "mechanism_density_score": 2
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "TOPC_004",
+        "expected_verdict": "SURVIVE",
+        "oracle_evidence_span": "Purpose To describe a rare case of tube perforation after PreserFlo MicroShunt (PMS) implantation and subsequent bleb revision, emphasizing the potential mechanisms involved and the strategies employe",
+        "oracle_reason": "Topical relevance only, no specific disclosure"
+      },
+      "correction_reason": "Evidence discusses ['implant'], not glaucoma shunt",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "TOPC_005",
+      "category": "TOPICAL_ONLY_PRIOR_ART",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Novel approach to Endoscope inspired by adjacent field",
+        "mechanistic_reasoning": "Different from prior art in configuration and control rule",
+        "falsification_test": "Test novelty against prior art",
+        "device_class": "Endoscope",
+        "failure_mode": "INFECTION"
+      },
+      "prior_art_state": "POSSIBLE_RELEVANCE",
+      "evidence_verified": true,
+      "oracle_source_type": "PEER_REVIEWED_PAPER",
+      "oracle_source_id": "europepmc:41011458",
+      "oracle_source_url": "10.3390/microorganisms13092128",
+      "oracle_source_hash": "ba4d46742c586e6a95d2b783e1861af50f9f2191191a8534cbbc0f7db77749d9",
+      "oracle_evidence_span": "Gastrointestinal (GI) interventional endoscopy has evolved into a cornerstone of modern gastroenterology, offering minimally invasive solutions for complex conditions. However, these procedures are no",
+      "oracle_reason": "Topical relevance only, no specific disclosure",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.757493+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:41011458",
+          "title": "A Comprehensive Review of Digestive Endoscopy-Associated Infections: Bacterial Pathogens, Host Susceptibility, and the Impact of Viral Hepatitis.",
+          "identifier": "europepmc:41011458",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:38:08.743069+00:00",
+          "content_hash": "ba4d46742c586e6a95d2b783e1861af50f9f2191191a8534cbbc0f7db77749d9",
+          "source_span": "Gastrointestinal (GI) interventional endoscopy has evolved into a cornerstone of modern gastroenterology, offering minimally invasive solutions for complex conditions. However, these procedures are not without risk, particularly with respect to post-procedural infections. While rare, such infections can have significant clinical consequences and are increasingly recognized as a public health concern. This narrative review provides a comprehensive overview of infections associated with GI endoscopy, focusing on transmission mechanisms, microbial agents involved, host susceptibility, preventive strategies, and diagnostic and therapeutic approaches. Infections following GI endoscopy remain infrequent but clinically significant, particularly in high-risk procedures such as endoscopic retrograde cholangiopancreatography and endoscopic ultrasound. Duodenoscopes represent a major vector for exogenous infection, often involving multidrug-resistant bacteria such as Klebsiella pneumoniae , Pseudomonas aeruginosa , and Enterococcus spp. Host-related factors increase the risk of infection. Risk factors associated with post-endoscopic infections include advanced age, male sex, non-white ethnicity, immunosuppression, presence of cholangiocarcinoma, autoimmune diseases, liver cirrhosis of viral and/or alcoholic etiology, chronic kidney disease, high-risk cardiac conditions, or chemotherapy. New reprocessing methods, such as ethylene oxide gas sterilization, automated endoscope reprocessors, and selective use of single-use endoscopes and duodenoscopes, may contribute to lowering infection rates. Greater awareness of infection risks, improved infection control practices, and adherence to updated guidelines are crucial for enhancing patient safety in digestive endoscopy. Multidisciplinary strategies, including surveillance, device innovation, and personalized risk assessment, are needed to address this evolving challenge.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3390/microorganisms13092128",
+          "publication_date": "2025-09-11",
+          "query": "Endoscope infection mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "mechanism",
+            "process"
+          ],
+          "mechanism_density_score": 2
+        }
+      ]
+    },
+    {
+      "case_id": "OBV_001",
+      "category": "OBVIOUSNESS_NON_OBVIOUSNESS",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Combine known elements in Spinal Fusion Device",
+        "mechanistic_reasoning": "Combination would be obvious per europepmc:42278982",
+        "falsification_test": "Test combination vs prior art",
+        "device_class": "Spinal Fusion Device",
+        "failure_mode": "INFECTION"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PATENT_EXAMINER_REJECTION",
+      "oracle_source_id": "europepmc:42278982",
+      "oracle_source_url": "10.3390/jcm15114120",
+      "oracle_source_hash": "f713a21753ba0c9b372d2736068258REDACTED-SCOPUS-PATTERN-MATCH",
+      "oracle_evidence_span": "Background/Objectives: i-Factor\u2122 Bone Graft is a composite bone substitute containing P-15 synthetic collagen fragment that has demonstrated noninferiority to local autograft in single-level anterior ",
+      "oracle_reason": "Obvious combination \u2014 examiner rejection grounded in europepmc:42278982",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.757635+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42278982",
+          "title": "i-Factor\u2122 Bone Graft Versus Demineralized Bone Matrix for Single-Level Anterior Cervical Discectomy and Fusion: A Propensity Score-Matched Analysis.",
+          "identifier": "europepmc:42278982",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:27:33.216058+00:00",
+          "content_hash": "f713a21753ba0c9b372d2736068258REDACTED-SCOPUS-PATTERN-MATCH",
+          "source_span": "Background/Objectives: i-Factor\u2122 Bone Graft is a composite bone substitute containing P-15 synthetic collagen fragment that has demonstrated noninferiority to local autograft in single-level anterior cervical discectomy and fusion (ACDF); however, direct head-to-head comparisons with demineralized bone matrix (DBM) using contemporary 3D-printed titanium cages are lacking. The aim of this retrospective study was to compare radiographic fusion rates, segmental stability, and clinical outcomes between i-Factor\u2122 and DBM in single-level ACDF, with a particular focus on the early time course of fusion. Methods: A retrospective propensity score-matched cohort study was conducted in patients with single-level cervical degenerative disc disease (cervical disc herniation, cervical spondylotic radiculopathy, or cervical spondylotic myelopathy) operated between December 2021 and January 2024 at a single tertiary care hospital. Seventy-six consecutive patients undergoing single-level ACDF with 3D-printed titanium cages were matched 1:1 (i-Factor\u2122 vs. DBM) on age, sex, and operative level. Fusion status was assessed by serial dynamic radiographs at 1, 3, 6, and 12 months and by 3D-CT at 12 months in all patients (with additional CT at earlier timepoints when plain films were equivocal), by two independent spine surgeons blinded to graft type; inter-rater agreement (Cohen's \u03ba) was computed. Results: Mean follow-up was 18.1 months. Fusion rates for i-Factor\u2122 at 3, 6, and 12 months were 94.7%, 100%, and 100%, respectively, compared to 71.1%, 84.2%, and 94.7% for DBM. The differences were statistically significant at 3 months ( p = 0.047) and 6 months ( p = 0.012), but not at 12 months ( p = 0.493). Inter-rater agreement was almost perfect (\u03ba = 0.86-1.00). No adverse reactions or device-related complications were observed. Conclusions: In this matched cohort, i-Factor\u2122 was associated with significantly faster fusion than DBM in single-level ACDF, with similar 12-month fusion rates. N",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3390/jcm15114120",
+          "publication_date": "2026-05-26",
+          "query": "Spinal Fusion Device infection mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [
+            "reaction"
+          ],
+          "mechanism_density_score": 1
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "OBV_001",
+        "expected_verdict": "KILL",
+        "oracle_evidence_span": "Background/Objectives: i-Factor\u2122 Bone Graft is a composite bone substitute containing P-15 synthetic collagen fragment that has demonstrated noninferiority to local autograft in single-level anterior ",
+        "oracle_reason": "Obvious combination \u2014 examiner rejection grounded in europepmc:42278982"
+      },
+      "correction_reason": "Evidence discusses ['graft'], not spinal fusion device",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "OBV_002",
+      "category": "OBVIOUSNESS_NON_OBVIOUSNESS",
+      "expected_verdict": "KILL",
+      "candidate": {
+        "proposed_modification": "Combine known elements in Heart Valve",
+        "mechanistic_reasoning": "Combination would be obvious per europepmc:42274176",
+        "falsification_test": "Test combination vs prior art",
+        "device_class": "Heart Valve",
+        "failure_mode": "CALCIFICATION"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PATENT_EXAMINER_REJECTION",
+      "oracle_source_id": "europepmc:42274176",
+      "oracle_source_url": "10.1016/j.jaccas.2026.108690",
+      "oracle_source_hash": "63770793004e20bc6280123956f6227b8843f03dfc210889497f9ee8ce62b4e0",
+      "oracle_evidence_span": "Background Late detection of paravalvular leak (PVL) after transcatheter aortic valve replacement (TAVR) presents unique treatment challenges, especially in bicuspid valves, likely because of valve ge",
+      "oracle_reason": "Obvious combination \u2014 examiner rejection grounded in europepmc:42274176",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.757855+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42274176",
+          "title": "Successful Balloon Valvuloplasty for Paravalvular Leak 4 Months After TAVR in a Bicuspid Aortic Valve.",
+          "identifier": "europepmc:42274176",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:30:00.286333+00:00",
+          "content_hash": "63770793004e20bc6280123956f6227b8843f03dfc210889497f9ee8ce62b4e0",
+          "source_span": "Background Late detection of paravalvular leak (PVL) after transcatheter aortic valve replacement (TAVR) presents unique treatment challenges, especially in bicuspid valves, likely because of valve geometry and the mechanism of percutaneous anchoring. Case summary A 70-year-old man underwent TAVR for bicuspid aortic stenosis using a balloon-expandable valve. Moderate to severe PVL was detected 4 months later. A multidisciplinary team evaluated the PVL etiology, patient anatomy, and available treatment options including valve-in-valve and plug closure. A partially fused commissural raphe causing focal underexpansion was identified as the origin of PVL, and late balloon valvuloplasty was performed successfully. Discussion Unlike surgical-valve PVL, where percutaneous plug closure is the main treatment option, post-TAVR PVL offers additional approaches. Multimodality imaging helps define mechanism, feasibility, and risk. Take-home messages Late balloon valvuloplasty is a safe option for underexpanded TAVR in bicuspid valves. Assessment of calcified raphe anatomy and the underexpansion site guides procedural risk and informs treatment selection.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1016/j.jaccas.2026.108690",
+          "publication_date": "2026-06-01",
+          "query": "Heart Valve calcification mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [
+            "mechanism",
+            "because",
+            "detect"
+          ],
+          "mechanism_density_score": 3
+        }
+      ],
+      "_old_oracle_case": {
+        "case_id": "OBV_002",
+        "expected_verdict": "KILL",
+        "oracle_evidence_span": "Background Late detection of paravalvular leak (PVL) after transcatheter aortic valve replacement (TAVR) presents unique treatment challenges, especially in bicuspid valves, likely because of valve ge",
+        "oracle_reason": "Obvious combination \u2014 examiner rejection grounded in europepmc:42274176"
+      },
+      "correction_reason": "Evidence discusses ['valve', 'catheter'], not heart valve",
+      "correction_verdict": "ORACLE_INVALID",
+      "status": "NEEDS_CORRECTION"
+    },
+    {
+      "case_id": "OBV_003",
+      "category": "OBVIOUSNESS_NON_OBVIOUSNESS",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Combine known elements in Spinal Cord Stimulator",
+        "mechanistic_reasoning": "Combination has documented separation per europepmc:41869739",
+        "falsification_test": "Test combination vs prior art",
+        "device_class": "Spinal Cord Stimulator",
+        "failure_mode": "BATTERY_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PROSECUTION_RECORD",
+      "oracle_source_id": "europepmc:41869739",
+      "oracle_source_url": "10.1002/nau.70256",
+      "oracle_source_hash": "c7de05f111bc0d9b99c70e0b543abffeb20b2a267e675754f48bbe6cd9b424c6",
+      "oracle_evidence_span": "Seventy-five years of research funding in benign Urology from the National Institute of Diabetes and Digestive and Kidney Diseases (NIDDK) at the National Institutes of Health has greatly advanced not",
+      "oracle_reason": "Non-obvious \u2014 documented separation from cited prior art in europepmc:41869739",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.758016+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:41869739",
+          "title": "Seventy-Five Years of NIH NIDDK Funding Has Increased Knowledge and Greatly Impacted Clinical Care.",
+          "identifier": "europepmc:41869739",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:32:26.564020+00:00",
+          "content_hash": "c7de05f111bc0d9b99c70e0b543abffeb20b2a267e675754f48bbe6cd9b424c6",
+          "source_span": "Seventy-five years of research funding in benign Urology from the National Institute of Diabetes and Digestive and Kidney Diseases (NIDDK) at the National Institutes of Health has greatly advanced not only our knowledge of etiology and mechanisms of nononcologic urological conditions but has also advanced new technologies and treatments to improve clinical care. To illustrate the profound impact of NIDDK funding on research and clinical care, we undertook a survey of grants funded by NIDDK in the NIH Reporter website with a focus on translation of lower urinary tract health and disease research to the clinic. We highlight three examples of technologies whose development was funded by NIDDK: advanced artificial urinary sphincters, urodynamics, and neuromodulation. These examples demonstrate the difficulties in bringing innovations to clinical care, as well as successes. In addition, they illustrate how public investment through NIDDK funding can improve treatment outcomes, diagnostic capabilities, and provide multiple therapeutic options.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.1002/nau.70256",
+          "publication_date": "2026-03-23",
+          "query": "Spinal Cord Stimulator battery failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "IRRELEVANT",
+          "mechanism_indicators": [
+            "mechanism"
+          ],
+          "mechanism_density_score": 1
+        }
+      ]
+    },
+    {
+      "case_id": "OBV_004",
+      "category": "OBVIOUSNESS_NON_OBVIOUSNESS",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Combine known elements in Mammography System",
+        "mechanistic_reasoning": "Combination has documented separation per europepmc:42122114",
+        "falsification_test": "Test combination vs prior art",
+        "device_class": "Mammography System",
+        "failure_mode": "CALIBRATION_FAILURE"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PROSECUTION_RECORD",
+      "oracle_source_id": "europepmc:42122114",
+      "oracle_source_url": "10.3390/diagnostics16091412",
+      "oracle_source_hash": "ccd078345d13ebe4b18b18a31e0f6ebac167bd3e8d435e06309cda4b6f382c33",
+      "oracle_evidence_span": "Background : Explainable artificial intelligence (XAI) is increasingly proposed to improve trust in mammography-based artificial-intelligence systems, but the validity and clinical readiness of publis",
+      "oracle_reason": "Non-obvious \u2014 documented separation from cited prior art in europepmc:42122114",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.758140+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42122114",
+          "title": "Explainable Artificial Intelligence in Mammography: A Systematic Review of Methods, Evaluation Practices, and Clinical Readiness.",
+          "identifier": "europepmc:42122114",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:39:22.597005+00:00",
+          "content_hash": "ccd078345d13ebe4b18b18a31e0f6ebac167bd3e8d435e06309cda4b6f382c33",
+          "source_span": "Background : Explainable artificial intelligence (XAI) is increasingly proposed to improve trust in mammography-based artificial-intelligence systems, but the validity and clinical readiness of published explanations remain unclear. We aim to systematically review XAI methods applied to mammography and synthesize how explanations are evaluated for validity, robustness, and clinical usefulness. Methods: We conducted a systematic review according to PRISMA 2020. MEDLINE/PubMed, Embase, Scopus, Web of Science Core Collection, and the Cochrane Library were searched from 1 January 2015 to 15 January 2026. Two reviewers independently screened records and extracted data; disagreements were resolved by consensus with a third reviewer. Included studies used mammography as the primary input and reported an explicit explanation or interpretability mechanism. Because the literature was methodologically heterogeneous, we performed a structured narrative synthesis and an adapted XAI-specific appraisal of explanation claims, quantitative evaluation, external validation, human-factor assessment, and reporting transparency. Results : Fourteen studies were included. Ten studies addressed detection or lesion classification and four addressed risk or outcome prediction. Primary XAI families were interpretable-by-design architectures (6/14), post hoc saliency or attribution methods (5/14), and feature-level explanation methods (3/14). Five studies remained at tier-1 qualitative plausibility only, seven reached tier-2 internal quantitative explanation evaluation, two reached tier-3 external or cross-dataset interpretability assessment, and none reported reader or workflow studies. In the dedicated mammography saliency benchmark, Pointing Game scores for Grad-CAM, Grad-CAM++, and Eigen-CAM ranged from 0.30 to 0.41, indicating only modest lesion-pointing reliability despite acceptable classifier performance. Conclusions: Mammography XAI remains dominated by visually plausible explanations ",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3390/diagnostics16091412",
+          "publication_date": "2026-05-06",
+          "query": "Mammography System calibration failure mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "PARTIALLY_RELEVANT",
+          "mechanism_indicators": [
+            "mechanism",
+            "because",
+            "detect"
+          ],
+          "mechanism_density_score": 3
+        }
+      ]
+    },
+    {
+      "case_id": "OBV_005",
+      "category": "OBVIOUSNESS_NON_OBVIOUSNESS",
+      "expected_verdict": "SURVIVE",
+      "candidate": {
+        "proposed_modification": "Combine known elements in Smartwatch Health Monitor",
+        "mechanistic_reasoning": "Combination has documented separation per europepmc:42345900",
+        "falsification_test": "Test combination vs prior art",
+        "device_class": "Smartwatch Health Monitor",
+        "failure_mode": "SENSOR_DRIFT"
+      },
+      "prior_art_state": "NO_MATCH_FOUND",
+      "evidence_verified": true,
+      "oracle_source_type": "PROSECUTION_RECORD",
+      "oracle_source_id": "europepmc:42345900",
+      "oracle_source_url": "10.3390/bios16060344",
+      "oracle_source_hash": "bbe5a4c29389ec72f5135f0e5d3b843a30f2e343d5adb9650332279353e68a89",
+      "oracle_evidence_span": "Wearable healthcare technologies are transforming the healthcare landscape by enabling remote, real-time health data collection, supporting early diagnosis, personalizing treatment plans, and reducing",
+      "oracle_reason": "Non-obvious \u2014 documented separation from cited prior art in europepmc:42345900",
+      "oracle_creation_timestamp": "2026-08-15T15:29:20.758247+00:00",
+      "sources": [
+        {
+          "source_type": "PUBLICATION",
+          "source_id": "europepmc:42345900",
+          "title": "Integrating Artificial Intelligence with Wearable Sensors for Advanced Health Monitoring and Diagnosis.",
+          "identifier": "europepmc:42345900",
+          "retrieval_route": "europepmc_api",
+          "retrieval_timestamp": "2026-08-14T23:44:21.360504+00:00",
+          "content_hash": "bbe5a4c29389ec72f5135f0e5d3b843a30f2e343d5adb9650332279353e68a89",
+          "source_span": "Wearable healthcare technologies are transforming the healthcare landscape by enabling remote, real-time health data collection, supporting early diagnosis, personalizing treatment plans, and reducing healthcare costs and medical burdens. Central to these advancements are wearable sensors, which continuously capture physiological data such as heart rate, temperature, activity levels, and biomarker concentrations. However, the large volume and complexity of this data demand effective processing to extract meaningful medical insights. Artificial intelligence (AI) and machine learning (ML) have significantly enhanced the capabilities of wearable sensors by enabling advanced data analysis, pattern recognition, and predictive modeling. AI-enhanced wearable sensors can detect early signs of health issues, such as heart attacks, chronic diseases, and mental health conditions like stress, often before clinical symptoms become apparent. This review examines the integration of AI/ML models with wearable sensors across physical activity recognition, stress assessment, cardiovascular monitoring, personal exposure monitoring, and sweat biomarker detection. Unlike prior application-centered reviews, we emphasize methodological and translational evaluation by comparing task formulations, sensing modalities, dataset scale, validation protocols, performance metrics, and deployment constraints across domains. We further discuss advanced architectures, multimodal fusion, explainable AI, edge deployment, privacy and regulatory considerations, and the translational gap between research prototypes and clinically deployable wearable AI systems.",
+          "source_depth": "abstract",
+          "full_text_status": "abstract_only",
+          "doi": "10.3390/bios16060344",
+          "publication_date": "2026-06-18",
+          "query": "Smartwatch Health Monitor sensor drift mechanism",
+          "query_type": "INTRA_DOMAIN",
+          "source_resolution_status": "RESOLVED",
+          "relevance": "RELEVANT",
+          "mechanism_indicators": [
+            "process",
+            "detect",
+            "monitor"
+          ],
+          "mechanism_density_score": 3
+        }
+      ]
+    }
+  ]
+}
