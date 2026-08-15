@@ -1,0 +1,56 @@
+# Macro/Micro Baseline Comparability V1
+
+Generated: 2026-08-15T04:02:27.507504+00:00
+
+## Macro Configuration
+
+| Field | Value |
+|-------|-------|
+| Prompt hash | 84fd622650e67baf |
+| Routing policy SHA256 | 79a928166bce6fb9faf2368c9aba2ffc9f1aaeacc4e73bbade25218d4f76470d |
+| Routing policy frozen before first call | True |
+| Model distribution | {'Mistral/mistral-medium-latest': 100} |
+| Candidate budget per problem | 1 |
+| Ontology | V2_FROZEN |
+| Mechanism-supported rate | 0.89 |
+| Status consistency rate | 1.0 |
+| all_attempt_denominator | 100 |
+| successful_call_denominator | 100 |
+
+## Micro Configuration
+
+| Field | Value |
+|-------|-------|
+| Prompt hash | bdad7f76c4ebeaaa |
+| Routing policy SHA256 | None |
+| Routing policy frozen before first call | False |
+| Model distribution | {'NVIDIA/deepseek-ai/deepseek-v4-flash-0731': 17, 'Mistral/mistral-medium-latest': 83} |
+| Candidate budget per problem | 1 |
+| Ontology | V2_FROZEN |
+| Mechanism-supported rate | 0.26 |
+| Status consistency rate | 1.0 |
+| all_attempt_denominator | 100 |
+| successful_call_denominator | 100 |
+
+## Comparability Classification
+
+**PARTIALLY_COMPARABLE**
+
+Reason: Same V2 ontology, same candidate budget (1 per problem), same evidence standard. However: (a) prompts differ (Macro vs Micro prompts are different — broad evidence vs experience-constrained), which is by design; (b) Micro was run before the routing policy was frozen, so Micro's routing is retroactively described but not pre-frozen; (c) Micro mixed NVIDIA + Mistral providers while Macro used only Mistral. Baselines are partially comparable for architectural lift measurement, but model-quality comparison is NOT identifiable from these runs.
+
+
+## Asymmetry Note
+
+Macro mechanism-supported rate is higher than Micro. DO NOT interpret this as architectural superiority yet. The difference may be due to: (a) Macro has broader evidence (12 sources vs Micro's experience-constrained evidence); (b) Macro prompt allows cross-domain transfers; (c) different model distributions (Macro=Mistral only, Micro=mixed). Controlled architectural comparison requires the tournament (M0-M4C).
+
+
+## Mechanism-Supported Rate Delta
+
+Macro - Micro = 0.63
+
+
+## Classification Rule Symmetry
+
+Rules identical: True
+
+Note: Both Macro and Micro use the same V2 consistency rules: MECH_SUPPORTED requires all 4 gates PASS; HYPOTHESIS requires problem PASS + mechanism PARTIAL + transfer supported + hypothesis + falsifiable; UNSUPPORTED requires problem/mechanism FAIL or transfer UNSUPPORTED.
