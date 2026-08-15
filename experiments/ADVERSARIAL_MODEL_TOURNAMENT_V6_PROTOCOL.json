@@ -1,0 +1,113 @@
+{
+  "protocol_name": "ADVERSARIAL_MODEL_TOURNAMENT_V6_PROTOCOL",
+  "frozen_at": "2026-08-15T19:30:00.000000+00:00",
+  "frozen_before_first_v6_api_call": true,
+  "base_commit": "pending",
+
+  "v5_status": {
+    "contract_effect": "CONFIRMED",
+    "kill_bias_reduction": "CONFIRMED",
+    "adjudicator_selection": "BLOCKED_INSUFFICIENT_COVERAGE",
+    "v5_selected_model_coverage": 0.119,
+    "v5_selected_model_abstention": 0.881
+  },
+
+  "coverage_gate_rationale": {
+    "principle": "A calibrated adjudicator must be both accurate AND decisive. It must make determinate verdicts when evidence is sufficient and abstain when evidence is genuinely insufficient. Near-total abstention is not calibration — it is refusal to adjudicate.",
+    "minimum_overall_coverage": 0.50,
+    "coverage_justification": "50% coverage means the model must make a determinate verdict (PASS or KILL) on at least half the cases. This prevents a model from passing by abstaining on everything. The GOLD oracle contains 42 cases with clear expected verdicts (SURVIVE or KILL) — a model that can only determine 5/42 is not functioning as an adjudicator. 50% (21/42) is the minimum to demonstrate the model can actually adjudicate across categories, not just on one dimension. This threshold was chosen BEFORE reviewing V5 per-model coverage data.",
+    "minimum_critical_category_coverage": 0.30,
+    "critical_coverage_justification": "Critical categories (BOUNDARY, SPECIFIC_PRIOR_ART, TOPICAL_ONLY, COMBINATION) must have at least 30% coverage (at least ~2/6 per category). A model that only adjudicates SPECIFIC_PRIOR_ART and abstains on all other critical categories is not a general adversarial evaluator. 30% per critical category ensures the model can adjudicate at least 2 of 6 cases in each critical dimension."
+  },
+
+  "oracle": {
+    "source": "ADVERSARIAL_CALIBRATION_ORACLE_V3.json (UNCHANGED — 42 cases, 24/24 critical GOLD)",
+    "no_modifications": true
+  },
+
+  "contract": {
+    "source": "ADVERSARIAL_EVALUATOR_V2_CONTRACT.json (three-state, neutral, UNCHANGED)",
+    "sha256": "973ab7266211f7ce6b18458af2fb49303fef96e1d42f45fb4f672ff0301fd6ba",
+    "no_prompt_changes": true
+  },
+
+  "models": [
+    {"id": "A", "model": "meta/llama-3.1-8b-instruct"},
+    {"id": "B", "model": "z-ai/glm-5.2"},
+    {"id": "C", "model": "google/gemma-4-31b-it"},
+    {"id": "D", "model": "minimaxai/minimax-m3"},
+    {"id": "E", "model": "google/diffusiongemma-26b-a4b-it"},
+    {"id": "F", "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"}
+  ],
+
+  "configuration": {
+    "temperature": 0.0,
+    "max_tokens": 8000,
+    "retry_policy": {"max_retries": 1, "timeout_s": 30},
+    "same_as_v5": true
+  },
+
+  "new_acceptance_gate": {
+    "A_determinate_accuracy_minimum": 0.80,
+    "B_false_kill_rate_maximum": 0.20,
+    "C_false_survival_rate_maximum": 0.20,
+    "D_overall_coverage_minimum": 0.50,
+    "E_critical_category_coverage_minimum": 0.30,
+    "F_critical_category_determinate_accuracy_minimum": 0.70,
+    "G_evaluator_failure_rate_maximum": 0.20,
+    "H_zero_fabricated_evidence": true,
+    "I_zero_fabricated_patent_citations": true,
+    "J_zero_prior_art_firewall_violations": true,
+    "all_conditions_required": "A model must pass ALL conditions A-J to be CALIBRATED_ADJUDICATOR"
+  },
+
+  "abstention_quality_metrics": {
+    "ABSTENTION_CORRECT": "INSUFFICIENT_EVIDENCE when the case genuinely lacks sufficient evidence (no GOLD expected verdict or evidence is ambiguous)",
+    "ABSTENTION_INCORRECT": "INSUFFICIENT_EVIDENCE when the GOLD oracle has a clear expected verdict (SURVIVE or KILL) with sufficient evidence",
+    "unjustified_abstention_rate": "incorrect_abstentions / total_abstentions",
+    "correct_abstention_rate": "correct_abstentions / total_abstentions"
+  },
+
+  "three_state_confusion_matrix": {
+    "rows": "TRUE (GOLD expected): SURVIVE, INSUFFICIENT_EVIDENCE, KILL",
+    "columns": "PREDICTED (model verdict): PASS, INSUFFICIENT_EVIDENCE, KILL",
+    "required": "3x3 matrix per model"
+  },
+
+  "per_category_metrics_required": {
+    "determinate_count": "cases with PASS or KILL verdict",
+    "insufficient_count": "cases with INSUFFICIENT_EVIDENCE verdict",
+    "coverage": "determinate_count / total_in_category",
+    "determinate_accuracy": "correct_determinate / determinate_count",
+    "abstention_rate": "insufficient_count / total_in_category"
+  },
+
+  "critical_categories_for_coverage": [
+    "BOUNDARY_CONDITION",
+    "SPECIFIC_PRIOR_ART",
+    "TOPICAL_ONLY_PRIOR_ART",
+    "COMBINATION_SUPPORTED_NOT_SUPPORTED"
+  ],
+
+  "non_critical_categories": [
+    "MECHANISM_VALID",
+    "TRANSFER_VALID",
+    "NON_BOUNDARY"
+  ],
+
+  "do_not_punish_abstention_as_kill": true,
+  "do_not_reward_unjustified_abstention": true,
+
+  "invariants": [
+    "Protocol frozen BEFORE any V6 API calls",
+    "42-case GOLD oracle UNCHANGED",
+    "V2 three-state contract UNCHANGED",
+    "Same 6 models as V4/V5",
+    "No prompt changes after results",
+    "No threshold changes after results",
+    "No oracle changes",
+    "Coverage gate is preregistered, not post-hoc",
+    "V5 results preserved unchanged",
+    "LENS_UNAVAILABLE preserved (Google Patents = primary)"
+  ]
+}

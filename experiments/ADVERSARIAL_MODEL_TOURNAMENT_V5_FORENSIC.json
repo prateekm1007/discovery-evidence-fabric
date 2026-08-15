@@ -1,0 +1,61 @@
+{
+  "forensic_name": "ADVERSARIAL_MODEL_TOURNAMENT_V5_FORENSIC",
+  "created_at": "2026-08-15T19:00:00.000000+00:00",
+  "v5_commit": "bd5ca4f131f04409670778080dcd140efc9bacae",
+
+  "contract_effect": "CONFIRMED",
+  "kill_bias_reduction": "CONFIRMED",
+  "adjudicator_selection": "BLOCKED_INSUFFICIENT_COVERAGE",
+
+  "summary": {
+    "v1_avg_false_kill": 0.6043,
+    "v2_avg_false_kill": 0.0,
+    "kill_bias_eliminated": true,
+    "v5_selected_model": "meta/llama-3.1-8b-instruct",
+    "v5_determinate_accuracy": 1.0,
+    "v5_coverage": 0.119,
+    "v5_abstention_rate": 0.881,
+    "selection_valid": false,
+    "invalidation_reason": "Model achieves 100% determinate accuracy but only 11.9% coverage. It abstains on 37/42 cases (88.1%). The acceptance gate did not require minimum coverage, allowing near-total abstention to pass."
+  },
+
+  "v1_v2_contract_comparison": {
+    "contract_v1": "binary PASS/KILLED, adversarial framing, negative dimension phrasing",
+    "contract_v2": "three-state PASS/INSUFFICIENT_EVIDENCE/KILL, neutral framing",
+    "v1_kill_bias_rate": 0.7143,
+    "v2_kill_bias_rate": 0.0,
+    "contract_effect_confirmed": true,
+    "finding": "The V2 three-state contract eliminated systematic false kills. H1 (evaluator contract was KILL-biased) is confirmed. The same llama-3.1-8b that had 47.6% false-kill in V1 now has 0.0% in V2."
+  },
+
+  "coverage_problem": {
+    "description": "Model A produced 37 INSUFFICIENT_EVIDENCE verdicts out of 42 cases. Only 5 cases were determinate (all SPECIFIC_PRIOR_ART, all correctly KILLed). Zero coverage on MECHANISM, TRANSFER, BOUNDARY, NON_BOUNDARY, TOPICAL_ONLY, and COMBINATION categories.",
+    "per_category_coverage": {
+      "MECHANISM_VALID": {"determinate": 0, "abstentions": 6, "coverage": 0.0},
+      "TRANSFER_VALID": {"determinate": 0, "abstentions": 6, "coverage": 0.0},
+      "NON_BOUNDARY": {"determinate": 0, "abstentions": 6, "coverage": 0.0},
+      "BOUNDARY_CONDITION": {"determinate": 0, "abstentions": 6, "coverage": 0.0},
+      "SPECIFIC_PRIOR_ART": {"determinate": 5, "abstentions": 1, "coverage": 0.833},
+      "TOPICAL_ONLY_PRIOR_ART": {"determinate": 0, "abstentions": 6, "coverage": 0.0},
+      "COMBINATION_SUPPORTED_NOT_SUPPORTED": {"determinate": 0, "abstentions": 6, "coverage": 0.0}
+    },
+    "critical_finding": "The model only adjudicates when prior_art_state=SPECIFIC_DISCLOSURE. For all other categories, it defaults to INSUFFICIENT_EVIDENCE. This is not calibrated adjudication — it is systematic abstention."
+  },
+
+  "abstention_quality": {
+    "description": "INSUFFICIENT_EVIDENCE is correct when evidence is genuinely insufficient. It is incorrect (unjustified abstention) when the GOLD oracle contains sufficient evidence for a determinate verdict.",
+    "expected_determinate_but_abstained": 37,
+    "expected_insufficient_but_abstained": 0,
+    "unjustified_abstention_rate": 0.881,
+    "correct_abstention_rate": 0.0,
+    "finding": "All 37 abstentions are on cases where the GOLD oracle has a determinate expected verdict (SURVIVE or KILL). The model should have been able to make a determination on at least some of these cases."
+  },
+
+  "gate_defect": {
+    "defect": "The V5 acceptance gate did not require minimum coverage. A model could achieve 100% accuracy by abstaining on everything except 1 case.",
+    "fix_required": "Add preregistered minimum coverage threshold. Add per-category coverage requirements. Add abstention quality metrics."
+  },
+
+  "v5_results_preserved": true,
+  "do_not_delete_or_rewrite": true
+}
