@@ -1,0 +1,103 @@
+{
+  "protocol_name": "INVENTION_GENERATION_PROTOCOL_V2",
+  "frozen_at": "2026-08-15T12:00:00.000000+00:00",
+  "frozen_before_v2_rerun": true,
+  "v1_status": "DEVELOPMENT_RUN_INVALID_FOR_QUALITY_METRICS",
+
+  "routing_policy": {
+    "primary": {"provider": "NVIDIA", "model": "meta/llama-3.1-8b-instruct", "reason": "fast 0.9s/call, JSON-capable, available"},
+    "fallback_1": {"provider": "NVIDIA", "model": "deepseek-ai/deepseek-v4-flash-0731", "reason": "slower but available"},
+    "fallback_2": {"provider": "Mistral", "model": "mistral-medium-latest", "reason": "if NVIDIA fails (requires MISTRAL_API_KEY env)"},
+    "fallback_3": {"provider": "Cerebras", "model": "llama3.1-8b", "reason": "Cloudflare-blocked in testing, kept as optional (requires CEREBRAS_API_KEY env)"}
+  },
+
+  "call_parameters": {
+    "temperature": 0.0,
+    "max_tokens": 2000,
+    "per_call_timeout_s": 60,
+    "per_call_retries": 2,
+    "retry_backoff_s": 3
+  },
+
+  "pipeline_parameters": {
+    "max_architectures": 5,
+    "max_refinement_rounds": 3,
+    "adversarial_dimensions": [
+      "MECHANISM_VALIDITY",
+      "TRANSFER_LEGITIMACY",
+      "BOUNDARY_CONDITION",
+      "OBVIOUSNESS",
+      "PRIOR_ART_RISK",
+      "ENGINEERING_FEASIBILITY",
+      "FALSIFIABILITY"
+    ],
+    "all_dimensions_must_be_evaluated": true,
+    "adversarial_unknown_is_not_pass": true
+  },
+
+  "epistemic_states": {
+    "INVENTION_CANDIDATE": "survived final gate: adversarial SURVIVED + all 7 dims evaluated + predictions + experiment + prior-art NO_MATCH/ADJACENT",
+    "INVENTION_KILLED": "failed final gate (adversarial KILLED or missing predictions/experiment)",
+    "PRIOR_ART_UNRESOLVED": "prior-art classification UNRESOLVED",
+    "PIPELINE_CALL_FAILED": "operational failure (LLM timeout/error) — NOT a scientific rejection",
+    "REFINEMENT_LIMIT_REACHED": "refinement rounds exhausted without SURVIVED — runs final gate, NOT auto-success"
+  },
+
+  "distinct_failure_states": [
+    "PIPELINE_CALL_FAILED",
+    "PASS1_CALL_FAILED",
+    "PASS2_CALL_FAILED",
+    "PASS3_CALL_FAILED",
+    "PASS4_CALL_FAILED",
+    "PASS5_CALL_FAILED"
+  ],
+
+  "these_are_NOT_scientific_rejections": [
+    "PIPELINE_CALL_FAILED",
+    "PASS1_CALL_FAILED",
+    "PASS2_CALL_FAILED",
+    "PASS3_CALL_FAILED",
+    "PASS4_CALL_FAILED",
+    "PASS5_CALL_FAILED"
+  ],
+
+  "secret_policy": {
+    "no_hardcoded_secrets": true,
+    "all_keys_from_environment": true,
+    "secret_scanning_test": "tests/test_secret_scanning.py"
+  },
+
+  "lineage_policy": {
+    "per_stage_checkpoint": true,
+    "retain_all_previous_artifacts_on_later_failure": true,
+    "lineage_keys": ["pass1_reconstruction", "pass2_mechanisms", "pass3_architectures", "pass4_adversarial_*", "pass5_refinement_*", "predictions", "experiment_plan", "prior_art", "final_invention"]
+  },
+
+  "prior_art_classifications": ["NO_MATCH_FOUND", "ADJACENT_PRIOR_ART", "SPECIFIC_DISCLOSURE_RISK", "UNRESOLVED"],
+  "never_called_novel": true,
+
+  "quality_dimensions": [
+    "problem_value", "mechanism_depth", "novelty_distance", "technical_leverage",
+    "specificity", "validation_tractability", "regulatory_relevance", "inventive_step_strength"
+  ],
+  "no_single_composite_score": true,
+
+  "v1_outputs_preserved": {
+    "INV_TOP20_001": "kept as historical V1 output",
+    "INV_TOP20_007": "kept as historical V1 output",
+    "INV_TOP20_010": "kept as historical V1 output",
+    "v2_uses_new_ids": "INV_V2_001, INV_V2_002, etc."
+  },
+
+  "invariants": [
+    "No hard-coded secrets in source code",
+    "Full pipeline (5 architectures, 3 refinements, all 7 adversarial dims)",
+    "Operational failures distinguished from scientific rejections",
+    "Adversarial UNKNOWN = NOT_EVALUATED, never SURVIVED",
+    "REFINEMENT_EXHAUSTED runs final gate, not auto-success",
+    "Per-stage checkpointing retains lineage",
+    "V1 outputs not overwritten (new V2 IDs)",
+    "No novelty or patentability claimed",
+    "Model-agnostic routing (NVIDIA primary, Mistral/Cerebras fallback)"
+  ]
+}

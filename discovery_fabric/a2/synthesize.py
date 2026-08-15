@@ -1,10 +1,11 @@
 """A2 synthesize — LLM generates candidate from frozen evidence."""
 from __future__ import annotations
+import os
 import json, re, hashlib, ssl, time, urllib.request
 from datetime import datetime, timezone
 
 FROZEN_MODEL = "deepseek/deepseek-v4-flash-0731"
-OPENROUTER_API_KEY = "REDACTED-OPENROUTER-KEY"
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 _SSL = ssl.create_default_context()
 _SSL.check_hostname = False

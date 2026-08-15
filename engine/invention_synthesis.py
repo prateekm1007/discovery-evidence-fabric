@@ -41,21 +41,20 @@ from pathlib import Path
 from typing import Any, Optional
 
 # ===== ROUTING (frozen V1 policy + z-ai GLM-4-plus as primary) =====
-# Mistral is rate-limited (402), NVIDIA is slow (~110s/call).
-# z-ai GLM-4-plus is fast and available, used as primary.
-# The routing policy V1 SHA is preserved for provenance; the actual model
-# used is recorded per-call in provider_call_manifests.
+# V1 had hard-coded secrets here. They have been REMOVED.
+# Keys now come from environment variables ONLY.
+# V1 is superseded by engine/invention_synthesis_v2.py (no secrets, full pipeline).
 
-MISTRAL_KEY = os.environ.get("MISTRAL_API_KEY", "UsFQXJwSnuO9jaWJLw9eNKyStuwZ0BDs")
+MISTRAL_KEY = os.environ.get("MISTRAL_API_KEY", "")
 MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
-NVIDIA_KEY = os.environ.get("NVIDIA_API_KEY", "REDACTED-NVIDIA-KEY")
+NVIDIA_KEY = os.environ.get("NVIDIA_API_KEY", "")
 NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 NVIDIA_MODEL = "deepseek-ai/deepseek-v4-flash-0731"
 MISTRAL_PRIMARY = "mistral-medium-latest"
 
-# z-ai (GLM-4-plus) — used as primary due to Mistral rate-limit and NVIDIA latency
+# z-ai (GLM-4-plus)
 ZAI_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
-ZAI_KEY = os.environ.get("ZAI_API_KEY", "")  # z-ai CLI handles auth
+ZAI_KEY = os.environ.get("ZAI_API_KEY", "")
 ZAI_MODEL = "glm-4-plus"
 
 ROUTING_POLICY_SHA = "79a928166bce6fb9faf2368c9aba2ffc9f1aaeacc4e73bbade25218d4f76470d"
