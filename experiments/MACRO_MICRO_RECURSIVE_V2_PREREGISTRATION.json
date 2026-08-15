@@ -1,0 +1,36 @@
+{
+  "experiment": "MACRO_MICRO_RECURSIVE_V2",
+  "status": "PRE_REGISTERED",
+  "date": "2026-08-15",
+  "arms": ["M0", "M1", "M2", "M3", "M4", "M4B", "M4C"],
+  "arm_definitions": {
+    "M0": "MACRO_ONLY — broad evidence discovery + synthesis",
+    "M1": "MICRO_ONLY — experience-constrained invention",
+    "M2": "MACRO_TO_MICRO — Macro mechanisms fed to Micro",
+    "M3": "MICRO_TO_MACRO — Micro problems fed to Macro",
+    "M4": "RECURSIVE_MACRO_MICRO — alternating frozen knowledge exchange",
+    "M4B": "INFORMATION_MATCHED_NON_RECURSIVE_CONTROL — same info, non-recursive presentation",
+    "M4C": "COMPUTE_MATCHED_NON_RECURSIVE_CONTROL — same compute/token/synthesis budget, non-recursive"
+  },
+  "primary_endpoint": "QUALIFIED_CANDIDATE_RATE",
+  "winner_threshold": ">=5pp above best independent baseline AND statistical test satisfied",
+  "secondary_endpoints": ["SIMULATION_READY_RATE", "SIMULATION_SURVIVAL_RATE", "EVIDENCE_SURVIVAL", "SPECIFIC_PRIOR_ART_SURVIVAL", "ADVERSARIAL_SURVIVAL"],
+  "cooperative_lift": "M4_qualified_rate - max(M0, M1, M2, M3, M4B, M4C)",
+  "m4_vs_m4b": "tests recursion vs information presentation",
+  "m4_vs_m4c": "tests recursion vs reasoning/computation budget",
+  "recursive_lift_conditions": {
+    "M4 > M4B": "RECURSIVE_LIFT_CANDIDATE (information not just presentation)",
+    "M4 <= M4B": "INFORMATION_BUDGET_EFFECT_ONLY",
+    "M4 <= M4C": "COMPUTE_BUDGET_EFFECT_ONLY",
+    "M4 > both M4B AND M4C": "RECURSIVE_LIFT_CANDIDATE"
+  },
+  "compute_ledger_required": true,
+  "ledger_fields": ["problem_count", "candidate_count", "retrieval_calls", "synthesis_calls", "input_tokens", "output_tokens", "total_tokens", "wall_clock_time", "source_count", "context_tokens"],
+  "emergent_qualified_candidate": "passes AIC gate + absent from prior-round qualified sets + complete provenance",
+  "dead_loop_test": "mechanism distribution unchanged + search distribution unchanged + rate not improved vs M4B/M4C",
+  "outcome_states": ["RECURSIVE_LIFT_CONFIRMED", "RECURSIVE_LIFT_NOT_DETECTED", "INFORMATION_BUDGET_EFFECT_ONLY", "COMPUTE_BUDGET_EFFECT_ONLY", "RECURSIVE_LOOP_DEAD", "INSUFFICIENT_POWER"],
+  "execution_conditions": ["MICRO-2 complete", "MACRO baseline complete", "both schemas frozen", "single model frozen across all arms"],
+  "model": "deepseek-ai/deepseek-v4-flash-0731 via NVIDIA",
+  "framing": "EVOLUTIONARY_ITERATION",
+  "no_same_round_leakage": true
+}
