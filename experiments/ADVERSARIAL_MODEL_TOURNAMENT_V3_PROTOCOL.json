@@ -1,0 +1,101 @@
+{
+  "protocol_name": "ADVERSARIAL_MODEL_TOURNAMENT_V3_PROTOCOL",
+  "frozen_at": "2026-08-15T16:00:00.000000+00:00",
+  "frozen_before_first_tournament_api_call": true,
+  "base_commit": "ac49932644267ab048a438f5a5ebe60f3c446803",
+  "v2_status": "CALIBRATION_BLOCKED (Llama-3.1-8B, 34% accuracy, 60% false-kill rate)",
+
+  "objective": "Select the adversarial adjudication model empirically. No tuning. No post-hoc changes.",
+
+  "oracle": {
+    "source": "ADVERSARIAL_CALIBRATION_ORACLE_V1.json (unchanged)",
+    "total_cases": 35,
+    "no_rebuild": true,
+    "no_post_hoc_changes": true,
+    "categories": {
+      "MECHANISM_VALID": 5,
+      "TRANSFER_VALID": 5,
+      "BOUNDARY_CONDITION": 5,
+      "NON_BOUNDARY": 5,
+      "SPECIFIC_PRIOR_ART": 5,
+      "TOPICAL_ONLY_PRIOR_ART": 5,
+      "OBVIOUSNESS_NON_OBVIOUSNESS": 5
+    }
+  },
+
+  "candidate_models": [
+    {"id": "A", "model": "meta/llama-3.1-8b-instruct", "provider": "NVIDIA", "role": "historical_baseline"},
+    {"id": "B", "model": "z-ai/glm-5.2", "provider": "NVIDIA", "role": "candidate"},
+    {"id": "C", "model": "google/gemma-4-31b-it", "provider": "NVIDIA", "role": "candidate"},
+    {"id": "D", "model": "deepseek-ai/deepseek-v4-pro", "provider": "NVIDIA", "role": "candidate", "status": "UNAVAILABLE (HTTP 410)"},
+    {"id": "E", "model": "deepseek-ai/deepseek-v4-flash-0731", "provider": "NVIDIA", "role": "candidate", "status": "UNAVAILABLE (timeout)"},
+    {"id": "F", "model": "mistralai/mistral-medium-3.5-128b", "provider": "NVIDIA", "role": "candidate", "status": "UNAVAILABLE (HTTP 410)"},
+    {"id": "G", "model": "nvidia/nemotron-3-ultra-550b-a55b", "provider": "NVIDIA", "role": "candidate", "status": "UNAVAILABLE (timeout)"},
+    {"id": "H", "model": "qwen/qwen3-next-80b-a3b-instruct", "provider": "NVIDIA", "role": "candidate", "status": "UNAVAILABLE (HTTP 410)"}
+  ],
+
+  "available_models": [
+    "meta/llama-3.1-8b-instruct",
+    "z-ai/glm-5.2",
+    "google/gemma-4-31b-it"
+  ],
+
+  "evaluator_configuration": {
+    "temperature": 0.0,
+    "max_tokens": 8000,
+    "retry_policy": {"max_retries": 1, "timeout_s": 30, "backoff_s": "3*(attempt+1)"},
+    "prompt": "ATTACK_PROMPT from discovery_fabric/a2/adversarial.py (unchanged)",
+    "system_prompt": "You are a strict adversarial reviewer.",
+    "output_parser": "regex pattern in adversarial_challenge() (unchanged)",
+    "v4_corrections": "all wired (firewall, boundary evidence, adversarial-invalid, evidence gate)"
+  },
+
+  "scoring_rules": {
+    "correct": "production verdict matches expected_verdict",
+    "incorrect": "production verdict does NOT match expected_verdict",
+    "evaluator_call_failed": "not a classification — excluded from accuracy denominator",
+    "false_kill": "production returns KILL when expected is SURVIVE",
+    "false_survival": "production returns SURVIVE when expected is KILL"
+  },
+
+  "acceptance_gate": {
+    "overall_accuracy_minimum": 0.80,
+    "per_category_accuracy_minimum": 0.70,
+    "false_kill_rate_maximum": 0.20,
+    "zero_fabricated_evidence": true,
+    "zero_fabricated_patent_references": true,
+    "zero_evaluator_failure_as_kill": true,
+    "zero_firewall_violations": true
+  },
+
+  "ranking_priority": [
+    "1. false_kill_rate (lower is better, must be <=20%)",
+    "2. critical_category_accuracy (must be >=70% in every category)",
+    "3. overall_accuracy (must be >=80%)",
+    "4. fabricated_evidence_rate (must be 0)",
+    "5. structured_output_reliability",
+    "6. latency (Pareto-optimal among passing models)"
+  ],
+
+  "no_cross_model_voting": true,
+  "no_averaging": true,
+  "no_post_hoc_tuning": true,
+  "no_oracle_modification": true,
+
+  "model_provenance_required": [
+    "provider", "model", "model_identifier", "protocol_hash", "prompt_hash",
+    "oracle_case_id", "attempt", "latency", "response_hash", "routing_reason"
+  ],
+
+  "invariants": [
+    "Protocol frozen BEFORE first tournament API call",
+    "Same 35 cases for every model (no rebuild)",
+    "Same prompt, system prompt, temperature, max_tokens for every model",
+    "No model gets more information than another",
+    "No cross-model voting, averaging, or correction",
+    "No post-hoc oracle changes, prompt changes, or threshold changes",
+    "Failed model cannot count as scientific result",
+    "Winner selected only from models meeting hard acceptance gate",
+    "Generation and adjudication roles kept separate"
+  ]
+}
