@@ -98,12 +98,14 @@ class TestBoundaryEvidence:
         assert result["evidence_source"] == "INLINE_CITATION"
 
     def test_external_evidence_complete(self):
-        """External evidence with all required fields → KILL_PERMITTED."""
+        """External evidence with all required fields including semantic validation → KILL_PERMITTED."""
         ext_ev = {
             "oracle_source_id": "FDA-MAUDE-12345",
             "oracle_source_type": "PUBLISHED_FAILURE_RECORD",
             "oracle_source_hash": "abc123",
             "oracle_evidence_span": "Device failed at 80°C boundary...",
+            "boundary_claim_supported": "Device exceeds 80°C and failure begins",
+            "supporting_relationship": "source explicitly connects the threshold to the failure mode",
         }
         result = validate_boundary_evidence("Boundary crossed", ext_ev)
         assert result["valid"] is True

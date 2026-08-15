@@ -179,6 +179,21 @@ def validate_boundary_evidence(kill_reason: str, external_evidence: Optional[dic
             "evidence_source": "EXTERNAL_BUT_INCOMPLETE",
         }
     
+    # SEMANTIC VALIDATION: require boundary_claim_supported + supporting_relationship
+    # These fields prove the external span actually supports the boundary objection,
+    # not just keyword co-occurrence.
+    semantic_fields = ["boundary_claim_supported", "supporting_relationship"]
+    semantic_missing = [f for f in semantic_fields if f not in external_evidence or not external_evidence[f]]
+    if semantic_missing:
+        return {
+            "valid": False,
+            "disposition": "INSUFFICIENT_EVIDENCE",
+            "reason": f"External evidence missing semantic validation fields: {semantic_missing}. "
+                      f"Keyword co-occurrence alone is insufficient.",
+            "prefilter_result": prefilter_result,
+            "evidence_source": "EXTERNAL_BUT_SEMANTICALLY_INCOMPLETE",
+        }
+    
     valid_types = {"PUBLISHED_FAILURE_RECORD", "PEER_REVIEWED_PAPER",
                    "ENGINEERING_REFERENCE", "REGULATORY_STANDARD", "PATENT_CLAIM",
                    "CASE_REPORT", "REGISTRY_DATA"}
@@ -571,72 +586,179 @@ def load_m4_memory(round_num: int, engine: str, input_dir: Path) -> dict:
 from datetime import datetime, timezone
 
 
-# ===== BOUNDARY EVIDENCE RESOLVER =====
+# ===== BOUNDARY EVIDENCE RESOLVER (SEMANTIC VALIDATION) =====
 # Retrieves external boundary evidence from the candidate's evidence packet.
 # The LLM adversarial evaluator does NOT get to invent evidence — it must
 # come from the frozen Phase-D evidence packet sources.
+#
+# SEMANTIC VALIDATION (not keyword-only):
+#   A valid boundary evidence object requires the external span to support:
+#     A. the specific boundary/threshold
+#     B. the specific failure mechanism
+#     C. the RELATIONSHIP between the boundary and failure
+#   Keyword co-occurrence alone is INSUFFICIENT.
+
+# Boundary-condition indicators — used ONLY to identify CANDIDATE spans,
+# NOT to establish evidence sufficiency.
+_BOUNDARY_INDICATORS = [
+    "threshold", "limit", "maximum", "minimum", "boundary", "range",
+    "ISO", "ASTM", "IEC", "FDA", "21 CFR", "standard",
+    "failure condition", "operating condition", "specification",
+    "temperature", "pressure", "voltage", "frequency", "cycle",
+    "mg/mL", "MPa", "kPa", "°C", "Hz",
+    "mL/h", "mL/min", "L/min", "bpm", "mmHg",
+    "flow rate", "dose limit", "rate limit",
+    "exceeds", "surpasses", "above", "beyond",
+]
+
+# Causal relationship indicators — the span must connect the boundary
+# to the failure mechanism (not just mention both independently).
+_CAUSAL_RELATIONSHIP_INDICATORS = [
+    "causes", "due to", "because", "results in", "leads to",
+    "triggers", "initiates", "produces", "induces",
+    "when exceeded", "beyond", "above", "below",
+    "exceeds", "surpasses", "violates",
+    "failure occurs", "fails when", "fails at",
+    "degradation begins", "onset of",
+    "at this level", "at this threshold",
+    "consequently", "therefore", "as a result",
+]
+
+
+def _has_boundary_indicator(span_lower: str) -> bool:
+    """Check if span contains any boundary indicator (retrieval heuristic only)."""
+    return any(ind.lower() in span_lower for ind in _BOUNDARY_INDICATORS)
+
+
+def _has_causal_relationship(span_lower: str) -> bool:
+    """Check if span contains a causal relationship between boundary and failure."""
+    return any(ind.lower() in span_lower for ind in _CAUSAL_RELATIONSHIP_INDICATORS)
+
+
+def _has_failure_mechanism(span_lower: str, failure_mode: str) -> bool:
+    """Check if span mentions the specific failure mechanism."""
+    if not failure_mode:
+        return False
+    fm_words = [w for w in failure_mode.split() if len(w) > 3]
+    return any(w in span_lower for w in fm_words)
+
+
+def _has_device_reference(span_lower: str, device: str) -> bool:
+    """Check if span mentions the device."""
+    if not device:
+        return False
+    dev_words = [w for w in device.split() if len(w) > 3]
+    return any(w in span_lower for w in dev_words)
+
+
+def _extract_boundary_claim(span: str, failure_mode: str, device: str) -> str:
+    """Extract the specific boundary claim supported by this span."""
+    # Find the sentence containing both boundary indicator and failure/device reference
+    sentences = span.split(".")
+    for sent in sentences:
+        sent_lower = sent.lower()
+        if _has_boundary_indicator(sent_lower) and (
+            _has_failure_mechanism(sent_lower, failure_mode) or
+            _has_device_reference(sent_lower, device)):
+            return sent.strip()[:200]
+    # Fallback: first 200 chars of span
+    return span[:200]
+
+
+def _extract_supporting_relationship(span: str) -> str:
+    """Extract the causal relationship that connects boundary to failure."""
+    span_lower = span.lower()
+    for indicator in _CAUSAL_RELATIONSHIP_INDICATORS:
+        idx = span_lower.find(indicator.lower())
+        if idx != -1:
+            # Extract context around the causal indicator
+            start = max(0, idx - 50)
+            end = min(len(span), idx + len(indicator) + 80)
+            return span[start:end].strip()
+    return ""
+
 
 def resolve_boundary_evidence(candidate: dict, evidence_packet_sources: list = None) -> Optional[dict]:
     """Resolve external boundary evidence from the candidate's evidence packet.
     
-    Searches the evidence packet sources for spans that contain boundary-condition
-    indicators (failure thresholds, limits, standards citations).
+    SEMANTIC VALIDATION:
+      A valid boundary evidence object requires the external span to support:
+        A. the specific boundary/threshold (boundary indicator present)
+        B. the specific failure mechanism (failure mode mentioned)
+        C. the RELATIONSHIP between the boundary and failure (causal indicator present)
+      
+      Keyword co-occurrence alone is INSUFFICIENT.
     
     Returns a dict with:
-      source_id, source_type, source_hash, source_url, evidence_span, retrieval_timestamp
+      source_id, source_type, full_source_hash, source_url, retrieval_timestamp,
+      evidence_span, boundary_claim_supported, supporting_relationship
     
-    Returns None if no external boundary evidence exists.
+    Returns None if no valid external boundary evidence exists.
     """
     if not evidence_packet_sources:
-        # Try to get sources from the candidate itself
         evidence_packet_sources = candidate.get("sources", []) or candidate.get("evidence_sources", [])
     
     if not evidence_packet_sources:
         return None
     
-    # Boundary-condition indicators: thresholds, limits, standards, failure conditions
-    boundary_indicators = [
-        "threshold", "limit", "maximum", "minimum", "boundary", "range",
-        "ISO", "ASTM", "IEC", "FDA", "21 CFR", "standard",
-        "failure condition", "operating condition", "specification",
-        "temperature", "pressure", "voltage", "frequency", "cycle",
-        "mg/mL", "MPa", "kPa", "°C", "Hz",
-    ]
+    failure_mode = (candidate.get("failure_mode", "") or "").lower().replace("_", " ")
+    device = (candidate.get("device_class", "") or candidate.get("device_name", "") or "").lower()
     
     for src in evidence_packet_sources:
         span = src.get("source_span", "")
         span_lower = span.lower()
         
-        # Check if this span contains boundary-condition indicators
-        has_boundary = any(ind.lower() in span_lower for ind in boundary_indicators)
-        if not has_boundary:
+        # STEP 1: Must contain a boundary indicator (retrieval heuristic)
+        if not _has_boundary_indicator(span_lower):
             continue
         
-        # Check if this span is relevant to the candidate's failure mode
-        failure_mode = (candidate.get("failure_mode", "") or "").lower().replace("_", " ")
-        device = (candidate.get("device_class", "") or candidate.get("device_name", "") or "").lower()
-        
-        # The span must mention the device or failure mode to be relevant
-        relevant = False
-        if device:
-            dev_words = [w for w in device.split() if len(w) > 3]
-            relevant = any(w in span_lower for w in dev_words)
-        if not relevant and failure_mode:
-            fm_words = [w for w in failure_mode.split() if len(w) > 3]
-            relevant = any(w in span_lower for w in fm_words)
-        
-        if not relevant:
+        # STEP 2: Must mention the device OR the failure mechanism
+        has_device = _has_device_reference(span_lower, device)
+        has_failure = _has_failure_mechanism(span_lower, failure_mode)
+        if not has_device and not has_failure:
             continue
         
-        # Found valid external boundary evidence
+        # STEP 3 (SEMANTIC): Must contain a causal relationship connecting
+        # the boundary to the failure. This is the key semantic test.
+        # A span that merely mentions "device", "threshold", and "failure"
+        # independently is NOT sufficient.
+        has_causal = _has_causal_relationship(span_lower)
+        if not has_causal:
+            continue
+        
+        # STEP 4 (SEMANTIC): The boundary indicator and the failure/device
+        # reference must appear in the SAME sentence or adjacent context,
+        # not just in the same span. This prevents the case where a paper
+        # mentions "temperature threshold" in one paragraph and "device failure"
+        # in an unrelated paragraph.
+        boundary_claim = _extract_boundary_claim(span, failure_mode, device)
+        if not boundary_claim:
+            continue
+        
+        supporting_rel = _extract_supporting_relationship(span)
+        if not supporting_rel:
+            continue
+        
+        # All semantic checks passed — valid external boundary evidence
+        full_hash = src.get("content_hash", "")
         return {
             "oracle_source_id": src.get("source_id", ""),
             "oracle_source_type": _classify_source_type(src),
-            "oracle_source_hash": src.get("content_hash", "")[:16],
+            "oracle_source_hash": full_hash,  # FULL hash, not truncated
+            "full_source_hash": full_hash,  # explicit full hash field
             "oracle_source_url": src.get("doi", "") or src.get("source_id", ""),
-            "oracle_evidence_span": span[:300],
-            "oracle_reason": f"Boundary evidence found in source {src.get('source_id','')}",
+            "oracle_evidence_span": span[:500],
+            "oracle_reason": f"Boundary evidence with causal support found in source {src.get('source_id','')}",
+            "boundary_claim_supported": boundary_claim,
+            "supporting_relationship": supporting_rel,
             "retrieval_timestamp": src.get("retrieval_timestamp", ""),
+            "semantic_validation": {
+                "has_boundary_indicator": True,
+                "has_device_or_failure_reference": has_device or has_failure,
+                "has_causal_relationship": True,
+                "boundary_claim_extracted": bool(boundary_claim),
+                "supporting_relationship_extracted": bool(supporting_rel),
+            },
         }
     
     return None
