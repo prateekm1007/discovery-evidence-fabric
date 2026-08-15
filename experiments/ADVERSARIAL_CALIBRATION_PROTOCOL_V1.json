@@ -1,0 +1,122 @@
+{
+  "protocol_name": "ADVERSARIAL_CALIBRATION_PROTOCOL_V1",
+  "frozen_at": "2026-08-15T14:00:00.000000+00:00",
+  "frozen_before_first_calibration_api_call": true,
+  "base_commit": "2f59646dbbc2846a102e574f4a25d25a8b534409",
+
+  "evaluator_configuration": {
+    "evaluator_model": "deepseek/deepseek-v4-flash-0731",
+    "evaluator_provider": "OpenRouter",
+    "temperature": 0.0,
+    "max_tokens": 8000,
+    "prompt_hash": "will be computed from ATTACK_PROMPT in adversarial.py",
+    "ontology_version": "V2_FROZEN",
+    "retry_policy": {
+      "max_retries": 2,
+      "timeout_s": 60,
+      "backoff_s": "3*(attempt+1)"
+    }
+  },
+
+  "production_path": {
+    "entry_point": "discovery_fabric.a2.adversarial.adversarial_challenge()",
+    "v4_corrections_wired": true,
+    "evidence_gate": "skip_if_evidence_failed()",
+    "prior_art_firewall": "enforce_prior_art_firewall()",
+    "boundary_semantic_validator": "resolve_boundary_evidence() + validate_boundary_evidence()",
+    "adversarial_invalid": "check_adversarial_invalid()",
+    "failure_handling": "EVALUATOR_CALL_FAILED (never KILL)"
+  },
+
+  "oracle_categories": {
+    "MECHANISM_VALID": {
+      "count": 5,
+      "expected_verdict": "SURVIVE",
+      "oracle_source_types": ["PEER_REVIEWED_PAPER", "ENGINEERING_REFERENCE"],
+      "description": "Source-supported mechanism that is scientifically valid"
+    },
+    "TRANSFER_VALID": {
+      "count": 5,
+      "expected_verdict": "SURVIVE",
+      "oracle_source_types": ["PEER_REVIEWED_PAPER"],
+      "description": "Documented mechanism in another context with evidence supporting transfer relevance"
+    },
+    "BOUNDARY_CONDITION": {
+      "count": 5,
+      "expected_verdict": "KILL",
+      "oracle_source_types": ["PUBLISHED_FAILURE_RECORD", "REGULATORY_STANDARD", "ENGINEERING_REFERENCE"],
+      "description": "Actual documented failure threshold/limit with external evidence"
+    },
+    "NON_BOUNDARY": {
+      "count": 5,
+      "expected_verdict": "SURVIVE",
+      "oracle_source_types": ["PEER_REVIEWED_PAPER"],
+      "description": "Candidate that does NOT cross a documented boundary — should NOT be killed"
+    },
+    "SPECIFIC_PRIOR_ART": {
+      "count": 5,
+      "expected_verdict": "KILL",
+      "oracle_source_types": ["PATENT_CLAIM"],
+      "description": "Actual patent/application with exact claim/passage disclosing the target combination"
+    },
+    "TOPICAL_ONLY_PRIOR_ART": {
+      "count": 5,
+      "expected_verdict": "SURVIVE",
+      "oracle_source_types": ["PEER_REVIEWED_PAPER"],
+      "description": "Related topic/device/mechanism but NO specific disclosure — prior-art firewall should prevent KILL"
+    },
+    "OBVIOUSNESS_NON_OBVIOUSNESS": {
+      "count": 5,
+      "expected_verdict": "MIXED",
+      "oracle_source_types": ["PATENT_EXAMINER_REJECTION", "PROSECUTION_RECORD", "PEER_REVIEWED_PAPER"],
+      "description": "Independently grounded technical combination — obvious cases KILL, non-obvious cases SURVIVE"
+    }
+  },
+
+  "total_cases": 35,
+
+  "scoring_rules": {
+    "correct": "production verdict matches expected_verdict",
+    "incorrect": "production verdict does NOT match expected_verdict",
+    "evaluator_call_failed": "not a classification — excluded from accuracy denominator",
+    "false_kill": "production returns KILL when expected is SURVIVE",
+    "false_survival": "production returns SURVIVE/PASS when expected is KILL"
+  },
+
+  "acceptance_threshold": {
+    "aggregate_accuracy_minimum": 0.80,
+    "per_category_accuracy_minimum": 0.70,
+    "zero_fabricated_evidence": true,
+    "zero_fabricated_patent_references": true,
+    "zero_evaluator_failure_as_kill": true,
+    "zero_firewall_violations": true
+  },
+
+  "oracle_independence_rule": {
+    "ground_truth_source": "external evidence only (published records, patents, papers, standards)",
+    "no_llm_generated_oracle_labels": true,
+    "independent_review": "second evaluator reviews oracle cases without production prompt",
+    "unresolved_disagreement": "CALIBRATION_BLOCKED"
+  },
+
+  "no_tuning_after_results": {
+    "cannot_modify": ["prompt", "threshold", "oracle_labels", "ontology", "model"],
+    "if_fails": "report failure mode, do not move goalposts"
+  },
+
+  "live_integration_checks": {
+    "boundary_resolver_to_final_verdict": true,
+    "specific_prior_art_kill_permitted": true,
+    "topical_prior_art_kill_prohibited": true,
+    "timeout_to_evaluator_call_failed": true
+  },
+
+  "invariants": [
+    "Protocol frozen BEFORE first calibration API call",
+    "All 35 cases run through production adversarial_challenge()",
+    "No LLM-generated oracle labels",
+    "No fabricated patent references",
+    "Evaluator failures are EVALUATOR_CALL_FAILED, never KILL",
+    "No tuning after results observed"
+  ]
+}
