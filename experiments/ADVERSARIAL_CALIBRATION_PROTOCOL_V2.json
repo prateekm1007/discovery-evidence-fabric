@@ -1,0 +1,70 @@
+{
+  "protocol_name": "ADVERSARIAL_CALIBRATION_PROTOCOL_V2",
+  "frozen_at": "2026-08-15T15:00:00.000000+00:00",
+  "frozen_before_first_calibration_api_call": true,
+  "v1_status": "CALIBRATION_BLOCKED (OpenRouter unavailable, all 35 EVALUATOR_CALL_FAILED)",
+  "v1_commit": "ba086a16d541d5332f9211878b839befd5c7198d",
+  "base_commit": "ba086a16d541d5332f9211878b839befd5c7198d",
+
+  "change_from_v1": {
+    "v1_evaluator": "deepseek/deepseek-v4-flash-0731 via OpenRouter (unavailable)",
+    "v2_evaluator": "meta/llama-3.1-8b-instruct via NVIDIA (available, 0.3s/call)",
+    "reason": "V1 evaluator endpoint is unavailable (OpenRouter key expired/rate-limited). V1 calibration was BLOCKED with zero scientific results. No tuning of results occurred — the evaluator never produced a single verdict. V2 uses a different, available endpoint.",
+    "oracle_unchanged": true,
+    "acceptance_threshold_unchanged": true,
+    "v4_corrections_unchanged": true
+  },
+
+  "evaluator_configuration": {
+    "evaluator_model": "meta/llama-3.1-8b-instruct",
+    "evaluator_provider": "NVIDIA",
+    "temperature": 0.0,
+    "max_tokens": 8000,
+    "retry_policy": {
+      "max_retries": 1,
+      "timeout_s": 30,
+      "backoff_s": "3*(attempt+1)"
+    },
+    "fallback": "deepseek/deepseek-v4-flash-0731 via OpenRouter (if NVIDIA_API_KEY not set)"
+  },
+
+  "production_path": {
+    "entry_point": "discovery_fabric.a2.adversarial.adversarial_challenge()",
+    "v4_corrections_wired": true,
+    "evidence_gate": "skip_if_evidence_failed()",
+    "prior_art_firewall": "enforce_prior_art_firewall()",
+    "boundary_semantic_validator": "resolve_boundary_evidence() + validate_boundary_evidence()",
+    "adversarial_invalid": "check_adversarial_invalid()",
+    "failure_handling": "EVALUATOR_CALL_FAILED (never KILL)"
+  },
+
+  "oracle": {
+    "source": "ADVERSARIAL_CALIBRATION_ORACLE_V1.json (unchanged from V1)",
+    "total_cases": 35,
+    "categories": {
+      "MECHANISM_VALID": 5,
+      "TRANSFER_VALID": 5,
+      "BOUNDARY_CONDITION": 5,
+      "NON_BOUNDARY": 5,
+      "SPECIFIC_PRIOR_ART": 5,
+      "TOPICAL_ONLY_PRIOR_ART": 5,
+      "OBVIOUSNESS_NON_OBVIOUSNESS": 5
+    },
+    "ground_truth_source": "external evidence from frozen Phase-D evidence packets",
+    "no_llm_generated_oracle_labels": true
+  },
+
+  "acceptance_threshold": {
+    "aggregate_accuracy_minimum": 0.80,
+    "per_category_accuracy_minimum": 0.70,
+    "zero_fabricated_evidence": true,
+    "zero_fabricated_patent_references": true,
+    "zero_evaluator_failure_as_kill": true,
+    "zero_firewall_violations": true
+  },
+
+  "no_tuning_after_results": {
+    "cannot_modify": ["prompt", "threshold", "oracle_labels", "ontology", "model"],
+    "if_fails": "report failure mode, do not move goalposts"
+  }
+}

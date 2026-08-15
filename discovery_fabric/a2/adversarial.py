@@ -33,9 +33,15 @@ from discovery_fabric.v4_corrections import (
     KILL_PRIOR_ART_STATES,
 )
 
-FROZEN_MODEL = "deepseek/deepseek-v4-flash-0731"
+# Evaluator routing: NVIDIA primary (fast, available), OpenRouter fallback
+NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
+NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
+NVIDIA_MODEL = "meta/llama-3.1-8b-instruct"
+
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+FROZEN_MODEL = "deepseek/deepseek-v4-flash-0731"  # OpenRouter fallback model
+
 _SSL = ssl.create_default_context()
 _SSL.check_hostname = False
 _SSL.verify_mode = ssl.CERT_NONE
@@ -75,21 +81,39 @@ def llm_chat(prompt, system="", max_retries=1, timeout=30):
     messages = []
     if system: messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
-    payload = {"model": FROZEN_MODEL, "messages": messages, "max_tokens": 8000, "temperature": 0.0}
-    for attempt in range(max_retries + 1):
-        try:
-            req = urllib.request.Request(OPENROUTER_URL, data=json.dumps(payload).encode(),
-                headers={"Authorization": f"Bearer {OPENROUTER_API_KEY}", "Content-Type": "application/json",
-                         "HTTP-Referer": "https://a2-adversarial.local", "X-Title": "A2 Adversarial"}, method="POST")
-            resp = urllib.request.urlopen(req, timeout=timeout, context=_SSL)
-            data = json.loads(resp.read())
-            if "error" in data:
-                if attempt < max_retries: time.sleep(3*(attempt+1)); continue
-            content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-            if content: time.sleep(0.5); return content
-            if attempt < max_retries: time.sleep(3*(attempt+1))
-        except:
-            if attempt < max_retries: time.sleep(3*(attempt+1))
+
+    # Primary: NVIDIA (meta/llama-3.1-8b-instruct)
+    if NVIDIA_API_KEY:
+        payload = {"model": NVIDIA_MODEL, "messages": messages, "max_tokens": 8000, "temperature": 0.0}
+        for attempt in range(max_retries + 1):
+            try:
+                req = urllib.request.Request(NVIDIA_URL, data=json.dumps(payload).encode(),
+                    headers={"Authorization": f"Bearer {NVIDIA_API_KEY}",
+                             "Content-Type": "application/json", "Accept": "application/json"}, method="POST")
+                resp = urllib.request.urlopen(req, timeout=timeout, context=_SSL)
+                data = json.loads(resp.read())
+                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                if content: return content
+            except Exception:
+                if attempt < max_retries: time.sleep(3*(attempt+1))
+
+    # Fallback: OpenRouter (deepseek)
+    if OPENROUTER_API_KEY:
+        payload = {"model": FROZEN_MODEL, "messages": messages, "max_tokens": 8000, "temperature": 0.0}
+        for attempt in range(max_retries + 1):
+            try:
+                req = urllib.request.Request(OPENROUTER_URL, data=json.dumps(payload).encode(),
+                    headers={"Authorization": f"Bearer {OPENROUTER_API_KEY}", "Content-Type": "application/json",
+                             "HTTP-Referer": "https://a2-adversarial.local", "X-Title": "A2 Adversarial"}, method="POST")
+                resp = urllib.request.urlopen(req, timeout=timeout, context=_SSL)
+                data = json.loads(resp.read())
+                if "error" in data:
+                    if attempt < max_retries: time.sleep(3*(attempt+1)); continue
+                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                if content: return content
+            except Exception:
+                if attempt < max_retries: time.sleep(3*(attempt+1))
+
     return None
 
 
