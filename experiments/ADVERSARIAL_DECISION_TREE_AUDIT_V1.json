@@ -1,0 +1,94 @@
+{
+  "name": "ADVERSARIAL_DECISION_TREE_AUDIT_V1",
+  "generated_at": "2026-08-15T17:52:29.248474+00:00",
+  "decision_tree": {
+    "path": [
+      {
+        "step": 1,
+        "name": "evidence_gate",
+        "function": "skip_if_evidence_failed()",
+        "if_fails": "NOT_RUN (correct \u2014 no adversarial call)"
+      },
+      {
+        "step": 2,
+        "name": "llm_call",
+        "function": "llm_chat()",
+        "if_fails": "EVALUATOR_CALL_FAILED (correct \u2014 not KILL)"
+      },
+      {
+        "step": 3,
+        "name": "parse_response",
+        "function": "regex pattern",
+        "output": "per-dimension PASS or KILLED"
+      },
+      {
+        "step": 4,
+        "name": "prior_art_firewall",
+        "function": "enforce_prior_art_firewall()",
+        "if_applies": "non-kill states \u2192 PRIOR_ART KILL overridden to SURVIVE (correct)"
+      },
+      {
+        "step": 5,
+        "name": "boundary_evidence",
+        "function": "evaluate_boundary_condition()",
+        "if_no_evidence": "BOUNDARY_FAILURE KILL \u2192 INSUFFICIENT_EVIDENCE (correct)"
+      },
+      {
+        "step": 6,
+        "name": "adversarial_invalid",
+        "function": "check_adversarial_invalid()",
+        "if_conflict": "ADVERSARIAL_INVALID (correct \u2014 not KILL)"
+      },
+      {
+        "step": 7,
+        "name": "overall_verdict",
+        "function": "any KILLED remaining \u2192 overall KILLED",
+        "PROBLEM": "If ANY dimension is KILLED (even without evidence), overall is KILLED. No INSUFFICIENT_EVIDENCE option for non-boundary, non-prior-art dimensions."
+      }
+    ],
+    "critical_gap": {
+      "issue": "Dimensions MECHANISM_VALIDITY, TRANSFER_LEGITIMACY, OBVIOUSNESS, ENGINEERING_FEASIBILITY, FALSIFIABILITY, REGULATORY_INCOMPATIBILITY have NO INSUFFICIENT_EVIDENCE state. The LLM can only respond PASS or KILLED. When uncertain, it defaults to KILLED.",
+      "dimensions_with_insufficient_evidence_option": [
+        "BOUNDARY_CONDITION (via V4 correction)"
+      ],
+      "dimensions_without_insufficient_evidence_option": [
+        "UNSUPPORTED_MECHANISM",
+        "WEAK_TRANSFER",
+        "OBVIOUS_COMBINATION",
+        "CONTRADICTION",
+        "ENGINEERING_INFEASIBILITY",
+        "REGULATORY_INCOMPATIBILITY"
+      ],
+      "impact": "6 of 8 dimensions lack INSUFFICIENT_EVIDENCE. This is the structural root cause of false kills."
+    },
+    "three_state_logic": {
+      "PASS": "available for all dimensions",
+      "KILL": "available for all dimensions",
+      "INSUFFICIENT_EVIDENCE": "available ONLY for BOUNDARY_CONDITION (via V4 correction)",
+      "missing": "INSUFFICIENT_EVIDENCE is NOT available for 6 of 8 dimensions",
+      "verdict": "STRUCTURALLY_KILL_BIASED \u2014 the evaluator schema forces binary PASS/KILL on most dimensions"
+    }
+  },
+  "three_state_logic": {
+    "PASS": "available for all dimensions",
+    "KILL": "available for all dimensions",
+    "INSUFFICIENT_EVIDENCE": "available ONLY for BOUNDARY_CONDITION (via V4 correction)",
+    "missing": "INSUFFICIENT_EVIDENCE is NOT available for 6 of 8 dimensions",
+    "verdict": "STRUCTURALLY_KILL_BIASED \u2014 the evaluator schema forces binary PASS/KILL on most dimensions"
+  },
+  "critical_gap": {
+    "issue": "Dimensions MECHANISM_VALIDITY, TRANSFER_LEGITIMACY, OBVIOUSNESS, ENGINEERING_FEASIBILITY, FALSIFIABILITY, REGULATORY_INCOMPATIBILITY have NO INSUFFICIENT_EVIDENCE state. The LLM can only respond PASS or KILLED. When uncertain, it defaults to KILLED.",
+    "dimensions_with_insufficient_evidence_option": [
+      "BOUNDARY_CONDITION (via V4 correction)"
+    ],
+    "dimensions_without_insufficient_evidence_option": [
+      "UNSUPPORTED_MECHANISM",
+      "WEAK_TRANSFER",
+      "OBVIOUS_COMBINATION",
+      "CONTRADICTION",
+      "ENGINEERING_INFEASIBILITY",
+      "REGULATORY_INCOMPATIBILITY"
+    ],
+    "impact": "6 of 8 dimensions lack INSUFFICIENT_EVIDENCE. This is the structural root cause of false kills."
+  }
+}

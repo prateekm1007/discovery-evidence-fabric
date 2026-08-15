@@ -1,0 +1,108 @@
+{
+  "name": "ADVERSARIAL_PROMPT_BIAS_AUDIT_V1",
+  "generated_at": "2026-08-15T17:52:29.248078+00:00",
+  "prompt_hash": "eac82daaf1efed3a",
+  "prompt_text": "You are an adversarial reviewer for medical device invention candidates.\n\nAttack this candidate on the following dimensions. For each, respond PASS (survives) or KILLED (fails):\n\n1. UNSUPPORTED_MECHANISM: Is the mechanism unsupported by evidence?\n2. WEAK_TRANSFER: Is the transfer from source to device weak or superficial?\n3. OBVIOUS_COMBINATION: Is this an obvious combination of known techniques?\n4. PRIOR_ART: Does this appear to be already known?\n5. CONTRADICTION: Does the evidence contradict the claim?\n6. BOUNDARY_FAILURE: Are boundary conditions missing or violated?\n7. ENGINEERING_INFEASIBILITY: Is this engineering-infeasible?\n8. REGULATORY_INCOMPATIBILITY: Would this face regulatory barriers?\n\nCandidate (arm hidden):\n{candidate_json}\n\nRespond (each on ONE line):\nUNSUPPORTED_MECHANISM: PASS | KILLED\nWEAK_TRANSFER: PASS | KILLED\nOBVIOUS_COMBINATION: PASS | KILLED\nPRIOR_ART: PASS | KILLED\nCONTRADICTION: PASS | KILLED\nBOUNDARY_FAILURE: PASS | KILLED\nENGINEERING_INFEASIBILITY: PASS | KILLED\nREGULATORY_INCOMPATIBILITY: PASS | KILLED\nOVERALL: PASS | KILLED\nREASON: <one sentence>\n",
+  "bias_findings": [
+    {
+      "finding": "PROMPT_USES_ATTACK_LANGUAGE",
+      "evidence": "Prompt says 'Attack this candidate'",
+      "impact": "Frames the task as adversarial/attacking, not neutral evaluation. Creates KILL pressure.",
+      "severity": "HIGH"
+    },
+    {
+      "finding": "BINARY_PASS_KILL_SCHEMA_NO_INSUFFICIENT_EVIDENCE",
+      "evidence": "Response schema only offers 'PASS | KILLED' with no INSUFFICIENT_EVIDENCE option",
+      "impact": "Forces the evaluator to choose PASS or KILL when evidence is ambiguous. 'Not proven' becomes KILL. This is the ROOT CAUSE of false kills.",
+      "severity": "CRITICAL"
+    },
+    {
+      "finding": "NEGATIVE_FRAMING_UNSUPPORTED_MECHANISM",
+      "evidence": "Dimension 'UNSUPPORTED_MECHANISM' asks: 'Is the mechanism unsupported by evidence?'",
+      "impact": "Question is phrased to elicit a negative/KILL response. A neutral phrasing would ask 'Is the mechanism supported by evidence?' not 'Is the mechanism unsupported?'",
+      "severity": "MEDIUM"
+    },
+    {
+      "finding": "NEGATIVE_FRAMING_WEAK_TRANSFER",
+      "evidence": "Dimension 'WEAK_TRANSFER' asks: 'Is the transfer from source to device weak or superficial?'",
+      "impact": "Question is phrased to elicit a negative/KILL response. A neutral phrasing would ask 'Is the mechanism supported by evidence?' not 'Is the mechanism unsupported?'",
+      "severity": "MEDIUM"
+    },
+    {
+      "finding": "NEGATIVE_FRAMING_OBVIOUS_COMBINATION",
+      "evidence": "Dimension 'OBVIOUS_COMBINATION' asks: 'Is this an obvious combination of known techniques?'",
+      "impact": "Question is phrased to elicit a negative/KILL response. A neutral phrasing would ask 'Is the mechanism supported by evidence?' not 'Is the mechanism unsupported?'",
+      "severity": "MEDIUM"
+    },
+    {
+      "finding": "NEGATIVE_FRAMING_ENGINEERING_INFEASIBILITY",
+      "evidence": "Dimension 'ENGINEERING_INFEASIBILITY' asks: 'Is this engineering-infeasible?'",
+      "impact": "Question is phrased to elicit a negative/KILL response. A neutral phrasing would ask 'Is the mechanism supported by evidence?' not 'Is the mechanism unsupported?'",
+      "severity": "MEDIUM"
+    },
+    {
+      "finding": "ADVERSARIAL_REVIEWER_IDENTITY",
+      "evidence": "System prompt: 'You are an adversarial reviewer'",
+      "impact": "Identity primes the model to find faults, not to neutrally evaluate. A neutral identity would be 'You are a scientific evidence evaluator.'",
+      "severity": "HIGH"
+    },
+    {
+      "finding": "NO_INSUFFICIENT_EVIDENCE_INSTRUCTION",
+      "evidence": "Prompt never mentions INSUFFICIENT_EVIDENCE or uncertainty handling",
+      "impact": "Evaluator has no guidance on what to do when evidence is ambiguous. Defaults to KILL.",
+      "severity": "CRITICAL"
+    },
+    {
+      "finding": "STRONG_VERB_KILLED",
+      "evidence": "Uses 'KILLED' instead of 'FAIL' or 'INSUFFICIENT'",
+      "impact": "Binary strong verb leaves no room for nuance. 'KILLED' implies definitive rejection.",
+      "severity": "MEDIUM"
+    },
+    {
+      "finding": "NO_NOT_PROVEN_VS_FALSE_DISTINCTION",
+      "evidence": "Prompt does not distinguish 'not proven' from 'false'",
+      "impact": "Evaluator cannot express 'I cannot determine this' \u2014 forced into PASS or KILL.",
+      "severity": "CRITICAL"
+    }
+  ],
+  "finding_count": 10,
+  "critical_findings": [
+    {
+      "finding": "BINARY_PASS_KILL_SCHEMA_NO_INSUFFICIENT_EVIDENCE",
+      "evidence": "Response schema only offers 'PASS | KILLED' with no INSUFFICIENT_EVIDENCE option",
+      "impact": "Forces the evaluator to choose PASS or KILL when evidence is ambiguous. 'Not proven' becomes KILL. This is the ROOT CAUSE of false kills.",
+      "severity": "CRITICAL"
+    },
+    {
+      "finding": "NO_INSUFFICIENT_EVIDENCE_INSTRUCTION",
+      "evidence": "Prompt never mentions INSUFFICIENT_EVIDENCE or uncertainty handling",
+      "impact": "Evaluator has no guidance on what to do when evidence is ambiguous. Defaults to KILL.",
+      "severity": "CRITICAL"
+    },
+    {
+      "finding": "NO_NOT_PROVEN_VS_FALSE_DISTINCTION",
+      "evidence": "Prompt does not distinguish 'not proven' from 'false'",
+      "impact": "Evaluator cannot express 'I cannot determine this' \u2014 forced into PASS or KILL.",
+      "severity": "CRITICAL"
+    }
+  ],
+  "root_cause": {
+    "primary_root_cause": "BINARY_PASS_KILL_SCHEMA_NO_INSUFFICIENT_EVIDENCE",
+    "description": "The adversarial prompt uses a binary PASS/KILLED schema with no INSUFFICIENT_EVIDENCE option. When evidence is ambiguous, the evaluator cannot express 'I cannot determine this' \u2014 it is forced to choose PASS or KILLED. Combined with the 'attack' framing and negative dimension phrasing, this creates systematic KILL bias across all model families.",
+    "evidence": [
+      "Average false-kill rate across 6 models: 0.6877 (all above 40%)",
+      "Average false-survival rate across 6 models: 0.0079 (near zero)",
+      "Neutrality test kill bias: 0.7143",
+      "6 of 8 dimensions lack INSUFFICIENT_EVIDENCE state",
+      "Prompt uses 'attack' framing and negative dimension phrasing",
+      "Same directional error (over-kill) across unrelated model families (Llama, GLM, Gemma, MiniMax, Nemotron)"
+    ],
+    "fix_required": [
+      "Add INSUFFICIENT_EVIDENCE as a third state for ALL dimensions (not just BOUNDARY_CONDITION)",
+      "Change prompt from 'attack' framing to 'neutral evidence evaluation'",
+      "Rephrase dimensions from negative ('Is the mechanism unsupported?') to neutral ('Is the mechanism supported by evidence?')",
+      "Add explicit instruction: 'If evidence is insufficient to determine, respond INSUFFICIENT_EVIDENCE'",
+      "Add instruction: 'Absence of evidence is not evidence of failure'"
+    ]
+  }
+}
