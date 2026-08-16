@@ -1,0 +1,121 @@
+{
+  "protocol_name": "AUTONOMOUS_CALIBRATION_V3_6",
+  "version": "3.6",
+  "created_at": "2026-08-17T00:00:00Z",
+  "base_commit": "1b5a8ca",
+  "status_pre_inference": "CALIBRATION_BLOCKED",
+  "objective": "Evidence-grounded motivation + expectation graph. Fix V3.5 root cause: motivation_insufficient=85%, expectation_insufficient=90%. Build edge-based evidence graph (not free-form 'motivation=yes'). Use better NVIDIA models (gemma-4-31b-it, deepseek-v4-flash).",
+
+  "v3_5_frozen_results": {
+    "accuracy": 0.75,
+    "false_elite_rate": 0.00,
+    "false_reject_rate": 0.05,
+    "cited_art_recall": 1.00,
+    "cited_103_art_recall": 1.00,
+    "search_recall": 0.786,
+    "102_accuracy": 0.85,
+    "103_accuracy": 0.25,
+    "hindsight_high": 17,
+    "motivation_insufficient_rate": 0.85,
+    "expectation_insufficient_rate": 0.90,
+    "status": "CALIBRATION_BLOCKED",
+    "root_cause": "LLM too conservative in finding motivation/expectation evidence. 85% of cases get MOTIVATION_INSUFFICIENT, 90% get EXPECTATION_INSUFFICIENT. This is an evidence retrieval issue, not a prompt aggression issue."
+  },
+
+  "v3_6_changes_from_v3_5": [
+    "BETTER MODELS: use google/gemma-4-31b-it (31B params, better legal reasoning) + deepseek-v4-flash as fallback",
+    "MOTIVATION EVIDENCE GRAPH: edge-based, not free-form. Each edge: source_id + exact_span + date_valid + evidence_type + strength + reason. No 'motivation=yes' without supporting edges.",
+    "12 MOTIVATION EVIDENCE TYPES: REFERENCE_TEACHING / KNOWN_PROBLEM / DESIGN_INCENTIVE / MARKET_FORCE / PREDICTABLE_SUBSTITUTION / COMPATIBILITY_SAME_FUNCTION / COMMON_GENERAL_KNOWLEDGE / EXPLICIT_REFERENCE_CROSS_LINK / KNOWN_TRADEOFF / PERFORMANCE_IMPROVEMENT / COST_SIZE_SPEED_SAFETY_INCENTIVE / REGULATORY_ENGINEERING_CONSTRAINT",
+    "10 MOTIVATION SEARCH FAMILIES: M1=same_problem / M2=same_disadvantage / M3=same_desired_improvement / M4=same_component_improved_property / M5=known_substitution / M6=same_CPC_IPC_same_technical_effect / M7=citation_linked_combination / M8=explicit_cross_reference / M9=assignee_competitor_implementation / M10=market_manufacturing_regulatory_pressure",
+    "EXPECTATION EVIDENCE GRAPH: separate from motivation. modification -> mechanism_compatibility -> predicted_result -> evidence_result_reasonably_expected. Each edge: source + passage + date + confidence.",
+    "EXPECTATION EVIDENCE TYPES: known_compatible_mechanism / same_operating_regime / established_substitution / predictable_engineering_result / reference_explicitly_reporting_result / common_general_knowledge / demonstrated_compatibility / same_function_same_field",
+    "DO NOT TURN INSUFFICIENT INTO OBVIOUS: MOTIVATION_INSUFFICIENT -> not OBVIOUS. EXPECTATION_INSUFFICIENT -> not OBVIOUS. 103=INSUFFICIENT_EVIDENCE unless independent evidence closes the missing edge.",
+    "COMBINATION COMPATIBILITY TEST: before combining A+B, test technical_compatibility + operating_regime_compatibility + material_compatibility + functional_compatibility + architecture_compatibility. EPO: combining may not be obvious where essential features are inherently incompatible.",
+    "PRE-FILING DATE FIREWALL: every motivation/expectation evidence item must pass publication_date < relevant_date or be valid common-general-knowledge evidence at that time.",
+    "OBJECTIVE TECHNICAL PROBLEM: construct from closest_prior_art + distinguishing_features + technical_effect. Independently check for contamination by knowledge of claimed invention.",
+    "3-CANDIDATE CLOSEST PRIOR ART: score by purpose/technical_field/technical_effect/structural_similarity/functional_similarity. Choose best-supported closest reference.",
+    "PROSECUTION-GROUND-TRUTH COMPARISON: for each false-negative 103 case, compare examiner motivation vs system motivation graph, examiner expectation vs system expectation graph. Classify missing evidence: SEARCH / INTERPRETATION / MAPPING / MOTIVATION / EXPECTATION / ADJUDICATION.",
+    "NEW METRICS: motivation_evidence_recall / expectation_evidence_recall / motivation_graph_completeness / expectation_graph_completeness"
+  ],
+
+  "acceptance_thresholds": {
+    "overall_accuracy_min": 0.85,
+    "false_elite_rate_max": 0.10,
+    "false_reject_rate_max": 0.10,
+    "cited_art_recall_min": 0.90,
+    "search_recall_min": 0.80,
+    "102_accuracy_min": 0.85,
+    "103_accuracy_min": 0.80,
+    "motivation_evidence_recall_min": 0.80,
+    "expectation_evidence_recall_min": 0.80,
+    "minimum_cases": 20
+  },
+
+  "motivation_evidence_types": [
+    "REFERENCE_TEACHING",
+    "KNOWN_PROBLEM",
+    "DESIGN_INCENTIVE",
+    "MARKET_FORCE",
+    "PREDICTABLE_SUBSTITUTION",
+    "COMPATIBILITY_SAME_FUNCTION",
+    "COMMON_GENERAL_KNOWLEDGE",
+    "EXPLICIT_REFERENCE_CROSS_LINK",
+    "KNOWN_TRADEOFF",
+    "PERFORMANCE_IMPROVEMENT",
+    "COST_SIZE_SPEED_SAFETY_INCENTIVE",
+    "REGULATORY_ENGINEERING_CONSTRAINT"
+  ],
+
+  "motivation_search_families": [
+    "M1_SAME_PROBLEM",
+    "M2_SAME_DISADVANTAGE",
+    "M3_SAME_DESIRED_IMPROVEMENT",
+    "M4_SAME_COMPONENT_IMPROVED_PROPERTY",
+    "M5_KNOWN_SUBSTITUTION",
+    "M6_SAME_CPC_IPC_SAME_TECHNICAL_EFFECT",
+    "M7_CITATION_LINKED_COMBINATION",
+    "M8_EXPLICIT_CROSS_REFERENCE",
+    "M9_ASSIGNEE_COMPETITOR_IMPLEMENTATION",
+    "M10_MARKET_MANUFACTURING_REGULATORY_PRESSURE"
+  ],
+
+  "expectation_evidence_types": [
+    "KNOWN_COMPATIBLE_MECHANISM",
+    "SAME_OPERATING_REGIME",
+    "ESTABLISHED_SUBSTITUTION",
+    "PREDICTABLE_ENGINEERING_RESULT",
+    "REFERENCE_EXPLICITLY_REPORTING_RESULT",
+    "COMMON_GENERAL_KNOWLEDGE",
+    "DEMONSTRATED_COMPATIBILITY",
+    "SAME_FUNCTION_SAME_FIELD"
+  ],
+
+  "combination_compatibility_dimensions": [
+    "TECHNICAL_COMPATIBILITY",
+    "OPERATING_REGIME_COMPATIBILITY",
+    "MATERIAL_COMPATIBILITY",
+    "FUNCTIONAL_COMPATIBILITY",
+    "ARCHITECTURE_COMPATIBILITY"
+  ],
+
+  "models_used": {
+    "primary": "meta/llama-3.1-8b-instruct",
+    "legal_reasoning": "google/gemma-4-31b-it",
+    "fallback": "deepseek-ai/deepseek-v4-flash-0731"
+  },
+
+  "output_artifacts": [
+    "PROTOCOL.json",
+    "PROTOCOL.sha256",
+    "PROTOCOL.md",
+    "MOTIVATION_GRAPH.json",
+    "EXPECTATION_GRAPH.json",
+    "103_CASE_FORENSICS.json",
+    "ERROR_ANALYSIS.json",
+    "METRICS.json",
+    "REPORT.md"
+  ],
+
+  "stop_rule": "DO NOT run 50->5 until V3.6 reaches 103>=80% AND motivation_evidence_recall>=80% AND expectation_evidence_recall>=80%.",
+  "failure_state": "CALIBRATION_BLOCKED"
+}
