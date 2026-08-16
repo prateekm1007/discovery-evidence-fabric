@@ -1,0 +1,152 @@
+{
+  "protocol_name": "AUTONOMOUS_CALIBRATION_V3_3",
+  "version": "3.3",
+  "created_at": "2026-08-17T00:00:00Z",
+  "base_commit": "38df888",
+  "status_pre_inference": "CALIBRATION_BLOCKED",
+  "objective": "Fix V3.2 defects: (1) CLAIM_IDENTITY_VALIDATION to prevent cross-patent contamination, (2) SEARCH_RECALL to >=80%, (3) rebuild 103 with explicit evidence object, COULD!=WOULD rule, combination matrix, two-pass anti-hindsight.",
+
+  "v3_2_frozen_results": {
+    "accuracy": 0.65,
+    "false_elite_rate": 0.10,
+    "false_reject_rate": 0.10,
+    "cited_art_recall": 1.00,
+    "search_recall": 0.70,
+    "102_accuracy": 0.75,
+    "103_accuracy": 0.15,
+    "rescue_recognition_accuracy": 1.00,
+    "status": "CALIBRATION_BLOCKED",
+    "root_causes": [
+      "CLAIM_IDENTITY_FAILURE: CV2_A_01/CV2_A_02 had PatSnap claims for different patents than case metadata",
+      "103_FAILURE: 103 accuracy 15% — OBVIOUSNESS_ADVERSARY too lenient, no COULD/WOULD distinction",
+      "SEARCH_FAILURE: search_recall 70% — not all families contributing to recall"
+    ]
+  },
+
+  "v3_3_changes_from_v3_2": [
+    "CLAIM_IDENTITY_VALIDATION: validate case patent number vs retrieved patent number vs title vs assignee vs priority date vs claim text",
+    "claim_subject_fingerprint: title + abstract + claim terminology + device class + technical mechanism",
+    "States: IDENTITY_CONFIRMED / IDENTITY_MISMATCH / IDENTITY_UNRESOLVED",
+    "If IDENTITY_MISMATCH: STOP CASE, status=EVIDENCE_CORRUPTED, do NOT run 102/103/commercial/rescue",
+    "103 explicit evidence object: closest_prior_art + differences + objective_technical_problem + secondary_reference + motivation + technical_effect + expectation_of_success + teaching_away + could + would + why + hindsight",
+    "COULD != WOULD rule: OBVIOUSNESS_RISK requires WOULD=YES AND MOTIVATION_SUPPORTED=TRUE AND EXPECTED_SUCCESS_SUPPORTED=TRUE",
+    "Closest prior art must be technically close (similar purpose/effect OR closely related field)",
+    "103 combination matrix: REFERENCE_A + REFERENCE_B + ELEMENTS_FROM_A + ELEMENTS_FROM_B + MOTIVATION_TO_COMBINE + EXPECTED_BENEFIT + TECHNICAL_COMPATIBILITY + TEACHING_AWAY + PRE_FILING_REASON_TO_COMBINE",
+    "103 two-pass anti-hindsight: Pass A (hide solution) vs Pass B (reveal + compare). Large divergence = HINDSIGHT_RISK_HIGH",
+    "Technical effect: effect_source + effect_strength + documented/inferred/hypothesized. No commercial success substitute.",
+    "102 remains strict: one reference discloses all limitations + arrangement. Inherency requires necessity.",
+    "Model role separation: OBVIOUSNESS_ADVERSARY does NOT receive generator's narrative rationale. It receives canonical claim + prior art + claim mappings + technical evidence and constructs its own rationale.",
+    "Error attribution: CLAIM_IDENTITY_FAILURE / CLAIM_INTERPRETATION_FAILURE / SEARCH_FAILURE / 102_FAILURE / 103_FAILURE / HINDSIGHT_FAILURE / MODEL_JUDGMENT_FAILURE / GROUND_TRUTH_FAILURE / EVIDENCE_FAILURE"
+  ],
+
+  "acceptance_thresholds": {
+    "overall_accuracy_min": 0.85,
+    "false_elite_rate_max": 0.10,
+    "false_reject_rate_max": 0.10,
+    "cited_art_recall_min": 0.90,
+    "search_recall_min": 0.80,
+    "102_accuracy_min": 0.85,
+    "103_accuracy_min": 0.80,
+    "minimum_cases": 20
+  },
+
+  "case_corpus": {
+    "source": "V2 20 cases (frozen, no mutation post-results)",
+    "distribution": {"granted": 10, "abandoned_after_rejection": 5, "amended_allowed": 5}
+  },
+
+  "claim_identity_validation": {
+    "rule": "Before ANY claim enters the pipeline, validate identity",
+    "fields_to_validate": [
+      "case patent number",
+      "retrieved patent number",
+      "title",
+      "assignee",
+      "priority date",
+      "claim text"
+    ],
+    "states": ["IDENTITY_CONFIRMED", "IDENTITY_MISMATCH", "IDENTITY_UNRESOLVED"],
+    "on_mismatch": "STOP CASE. Do NOT run 102/103/commercial/rescue. Status=EVIDENCE_CORRUPTED."
+  },
+
+  "claim_subject_fingerprint": {
+    "components": ["title", "abstract", "claim terminology", "device class", "technical mechanism"],
+    "rule": "Compare fingerprint to case metadata. If similarity is materially inconsistent: CLAIM_IDENTITY_UNRESOLVED."
+  },
+
+  "obviousness_103_rules": {
+    "explicit_evidence_object": [
+      "closest_prior_art",
+      "differences",
+      "objective_technical_problem",
+      "secondary_reference",
+      "motivation",
+      "technical_effect",
+      "expectation_of_success",
+      "teaching_away",
+      "could",
+      "would",
+      "why",
+      "hindsight"
+    ],
+    "could_would_rule": "COULD = capability. WOULD = evidence of motivation + expectation of success. OBVIOUSNESS_RISK requires WOULD=YES AND MOTIVATION_SUPPORTED=TRUE AND EXPECTED_SUCCESS_SUPPORTED=TRUE.",
+    "closest_prior_art_selection": "Similar purpose/effect OR same/closely related field AND minimal structural/functional modification. Do NOT select a convenient patent merely because it shares one keyword.",
+    "combination_matrix": [
+      "REFERENCE_A",
+      "REFERENCE_B",
+      "ELEMENTS_FROM_A",
+      "ELEMENTS_FROM_B",
+      "MOTIVATION_TO_COMBINE",
+      "EXPECTED_BENEFIT",
+      "TECHNICAL_COMPATIBILITY",
+      "TEACHING_AWAY",
+      "PRE_FILING_REASON_TO_COMBINE"
+    ],
+    "two_pass_anti_hindsight": {
+      "pass_a": "Hide the final invention solution. Ask: 'What would a skilled person do to solve the objective problem?'",
+      "pass_b": "Reveal the actual claimed invention. Compare.",
+      "large_divergence": "HINDSIGHT_RISK_HIGH"
+    },
+    "technical_effect": "For each distinguishing feature: effect_source + effect_strength + documented/inferred/hypothesized. If unexpected and technically significant, require evidence linking effect to claimed feature. Do NOT use commercial success as substitute."
+  },
+
+  "novelty_102_rules": {
+    "single_reference_rule": "One reference must disclose all limitations + required arrangement.",
+    "inherency_rule": "Inherency requires necessity (MPEP §2131)."
+  },
+
+  "model_role_separation": {
+    "roles": ["GENERATOR", "SEARCHER", "NOVELTY_ADVERSARY", "OBVIOUSNESS_ADVERSARY", "FINAL_ADJUDICATOR"],
+    "obviousness_adversary_isolation": "OBVIOUSNESS_ADVERSARY must NOT receive the generator's narrative rationale. It receives: canonical claim + prior art + claim mappings + technical evidence. It constructs its own rationale."
+  },
+
+  "error_attribution_categories": [
+    "CLAIM_IDENTITY_FAILURE",
+    "CLAIM_INTERPRETATION_FAILURE",
+    "SEARCH_FAILURE",
+    "102_FAILURE",
+    "103_FAILURE",
+    "HINDSIGHT_FAILURE",
+    "MODEL_JUDGMENT_FAILURE",
+    "GROUND_TRUTH_FAILURE",
+    "EVIDENCE_FAILURE",
+    "CORRECT"
+  ],
+
+  "output_artifacts": [
+    "PROTOCOL.json",
+    "PROTOCOL.sha256",
+    "PROTOCOL.md",
+    "CLAIM_IDENTITY_AUDIT.json",
+    "SEARCH_RECALL_ANALYSIS.json",
+    "102_RESULTS.json",
+    "103_RESULTS.json",
+    "HINDSIGHT_RESULTS.json",
+    "ERROR_ANALYSIS.json",
+    "METRICS.json",
+    "REPORT.md"
+  ],
+
+  "stop_rule": "DO NOT run 50->5 until V3.3 reaches all thresholds including 102>=85% and 103>=80%.",
+  "failure_state": "CALIBRATION_BLOCKED"
+}
