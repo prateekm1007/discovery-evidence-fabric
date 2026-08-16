@@ -87,11 +87,11 @@ class LLMClient:
     Replaces z-ai-web-dev-sdk which was rate-limiting (HTTP 429).
     """
 
-    # Model priority list — V3.7: gemma-4-31b-it as primary for legal reasoning
+    # Model priority list — V3.7: llama-3.1-8b primary (fast), gemma-4 for deep reasoning
     MODELS = [
-        "google/gemma-4-31b-it",                # Gemma 4 31B — primary for legal/103 reasoning (5-8s)
-        "meta/llama-3.1-8b-instruct",            # Fast fallback for JSON (0.3s)
-        "deepseek-ai/deepseek-v4-flash-0731",    # DeepSeek V4 flash — final fallback
+        "meta/llama-3.1-8b-instruct",            # Fast primary (0.3s)
+        "google/gemma-4-31b-it",                  # Gemma 4 31B for deep reasoning (5-8s)
+        "deepseek-ai/deepseek-v4-flash-0731",     # Final fallback
     ]
 
     MIN_CALL_INTERVAL_S = 1.0  # NVIDIA has higher rate limits than z-ai
