@@ -46,6 +46,14 @@ from discovery_fabric.prior_art_v2.patsnap_claims import (
 from discovery_fabric.prior_art_v2.source_failover import (
     patsnap_search_count, check_all_sources,
 )
+from discovery_fabric.prior_art_v2.patsnap_discovery import (
+    patsnap_nested_search, patsnap_claim_data, discover_patents_multi_source,
+    verify_cited_patent_retrievable,
+    SearchAttempt, ClaimRetrievalAttempt, DiscoveredPatent,
+    SEARCH_STATES as DISCOVERY_SEARCH_STATES,
+    FAILURE_SUBSTATES as DISCOVERY_FAILURE_SUBSTATES,
+    FAMILY_COLLAPSE_MODES, DEFAULT_FAMILY_MODE,
+)
 
 
 # ============================================================
@@ -71,7 +79,28 @@ FAILURE_STATES = [
     "PATENT_EVIDENCE_UNAVAILABLE",
     "RATE_LIMITED",
     "TEMPORARILY_UNAVAILABLE",
+    # V3.1 — granular discovery state machine
+    "SEARCH_EXECUTED",
+    "SEARCH_RETURNED_NO_RESULTS",
+    "SEARCH_RETURNED_PATENTS",
+    "CLAIMS_RETRIEVED",
 ]
+
+FAILURE_SUBSTATES = [
+    "HTTP_ERROR",
+    "RATE_LIMITED",
+    "AUTH_FAILURE",
+    "PATSNAP_PERMISSION_ERROR",
+    "NO_RESULTS",
+    "CLAIM_UNAVAILABLE",
+    "TIMEOUT",
+    "EXCEPTION",
+    "NONE",
+]
+
+# Family collapse modes (PatSnap documented — never country prefixes)
+FAMILY_COLLAPSE_MODES = ["DOCDB", "INPADOC", "EXTEND", "PBD"]
+DEFAULT_FAMILY_MODE = "DOCDB"
 
 PREDICTED_OUTCOMES = [
     "NOVELTY_SURVIVES", "NOVELTY_FAILS", "OBVIOUSNESS_RISK",
@@ -80,7 +109,7 @@ PREDICTED_OUTCOMES = [
 
 PREDICTED_TIERS = [
     "ELITE", "STRONG", "PROMISING", "REJECT",
-    "SEARCH_INSUFFICIENT",
+    "SEARCH_INSUFFICIENT", "SOURCE_UNAVAILABLE",
 ]
 
 ERROR_CATEGORIES = [
@@ -140,16 +169,33 @@ class CanonicalClaim:
 
 @dataclass
 class SearchFamilyAttempt:
-    """One of the 14 search families — per-family failure tracking."""
+    """One of the 14 search families — per-family failure tracking.
+
+    V3.1: Added granular state machine per CEO directive:
+      - http_status, api_status, api_error_code, api_error_msg
+      - failure_substate (HTTP_ERROR / RATE_LIMITED / AUTH_FAILURE /
+        PATSNAP_PERMISSION_ERROR / NO_RESULTS / CLAIM_UNAVAILABLE / etc.)
+      - family_collapse (DOCDB / INPADOC / EXTEND / PBD)
+      - claim_retrieval_count
+    """
     family_id: str
     attempted: bool = False
-    source: str = ""  # patsnap / google_patents / lens_scholarly / patent_bear
+    source: str = ""  # patsnap_nested_search / google_patents / lens_scholarly / multi_source
     query: str = ""
     results_count: int = 0
     failure_state: str = "SUCCESS"  # one of FAILURE_STATES
+    failure_substate: str = "NONE"  # one of FAILURE_SUBSTATES
+    http_status: int = 0
+    api_status: bool = False        # PatSnap `status` field
+    api_error_code: int = 0
+    api_error_msg: str = ""
+    api_total_count: int = 0        # PatSnap's reported total
     patents_returned: List[str] = field(default_factory=list)
+    claim_retrieval_count: int = 0
+    family_collapse: str = "DOCDB"  # DOCDB / INPADOC / EXTEND / PBD
     error_message: str = ""
     attempted_at_utc: str = ""
+    latency_ms: int = 0
 
 
 @dataclass
@@ -406,6 +452,15 @@ def stage_search_families(
 ) -> Tuple[List[SearchFamilyAttempt], List[str]]:
     """SEARCHER role: run 14 search families with per-family failure tracking.
 
+    V3.1: Uses patsnap_nested_search (NOT query-search-count) for actual
+    patent discovery. Falls back to multi-source discovery (Google Patents).
+    Records granular state machine per family:
+      - SEARCH_RETURNED_PATENTS (good)
+      - SEARCH_RETURNED_NO_RESULTS (search ran, no patents)
+      - SOURCE_UNAVAILABLE + PATSNAP_PERMISSION_ERROR (account issue)
+      - SOURCE_UNAVAILABLE + HTTP_ERROR (network issue)
+      - etc.
+
     Returns (family_attempts, all_patent_ids).
     """
     title = case.get("title", "")
@@ -434,61 +489,121 @@ def stage_search_families(
     attempts: List[SearchFamilyAttempt] = []
     all_patents: List[str] = []
 
+    # KEY_FAMILIES_WITH_PATSNAP — actually call nested-search-patent
+    # Other families are concept-attempted with deterministic state
+    KEY_FAMILIES_WITH_DISCOVERY = {
+        "Q1_CONCEPT", "Q2_MECHANISM", "Q7_FULL_COMBINATION",
+        "Q10_CPC_IPC", "Q12_CITATION_NEIGHBORHOOD", "Q14_SEMANTIC_SEARCH",
+    }
+
     for family_id, query in family_queries.items():
         attempt = SearchFamilyAttempt(
             family_id=family_id,
             attempted=True,
-            source="patsnap_search_count",
             query=query[:300],
+            family_collapse=DEFAULT_FAMILY_MODE,
             attempted_at_utc=_now_utc(),
         )
 
-        # Try PatSnap search-count (with hard timeout) — only for key families
-        # to avoid hitting rate limits. Other families are marked as SUCCESS
-        # with results_count=0 (the family was attempted conceptually).
-        KEY_FAMILIES_WITH_PATSNAP = {
-            "Q1_CONCEPT", "Q2_MECHANISM", "Q7_FULL_COMBINATION",
-            "Q10_CPC_IPC", "Q12_CITATION_NEIGHBORHOOD", "Q14_SEMANTIC_SEARCH",
-        }
-        if family_id in KEY_FAMILIES_WITH_PATSNAP:
-            try:
-                import concurrent.futures
-                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
-                    fut = ex.submit(patsnap_search_count, query[:200])
-                    try:
-                        count_result = fut.result(timeout=8)
-                    except concurrent.futures.TimeoutError:
-                        count_result = None
-                if count_result is not None:
-                    attempt.results_count = count_result
-                    if family_id == "Q12_CITATION_NEIGHBORHOOD":
-                        attempt.patents_returned = list(cited_art)
-                        all_patents.extend(cited_art)
-                    attempt.failure_state = "SUCCESS"
+        if family_id in KEY_FAMILIES_WITH_DISCOVERY:
+            # Use multi-source discovery (PatSnap first, Google Patents fallback)
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+                fut = ex.submit(discover_patents_multi_source, query[:200], 5, DEFAULT_FAMILY_MODE)
+                try:
+                    ms_result = fut.result(timeout=15)
+                except concurrent.futures.TimeoutError:
+                    ms_result = {
+                        "query": query[:200],
+                        "attempts": [],
+                        "patents": [],
+                        "primary_source": "",
+                        "all_sources_failed": True,
+                        "timeout": True,
+                    }
+
+            # Aggregate per-source attempts
+            for src_attempt in ms_result.get("attempts", []):
+                src_name = src_attempt.get("source", "UNKNOWN")
+                # PatSnap returns nested 'attempt' dict (from asdict);
+                # Google Patents returns flat dict.
+                if "attempt" in src_attempt and isinstance(src_attempt["attempt"], dict):
+                    src_data = src_attempt["attempt"]
                 else:
-                    attempt.failure_state = "SOURCE_UNAVAILABLE"
-                    attempt.error_message = "PatSnap search returned None"
-            except Exception as e:
-                attempt.failure_state = "TEMPORARILY_UNAVAILABLE"
-                attempt.error_message = str(e)[:200]
+                    src_data = src_attempt
+
+                # Use the first source's status fields to populate attempt
+                if attempt.source == "":
+                    attempt.source = src_name
+                    attempt.http_status = src_data.get("http_status", 0)
+                    attempt.api_status = src_data.get("api_status", False)
+                    attempt.api_error_code = src_data.get("api_error_code", 0)
+                    attempt.api_error_msg = src_data.get("api_error_msg", "")
+                    attempt.failure_substate = src_data.get("failure_substate", "NONE")
+                    # Map the discovery state to the family failure_state
+                    norm_state = src_data.get("normalized_state", "SOURCE_UNAVAILABLE")
+                    # If we'll later discover patents, the state will be overridden
+                    attempt.failure_state = norm_state
+                    attempt.api_total_count = src_data.get("api_total_count", 0)
+                    attempt.latency_ms = src_data.get("latency_ms", 0)
+
+            # Collect discovered patents
+            discovered = ms_result.get("patents", [])
+            for p in discovered:
+                if p.get("patent_number"):
+                    attempt.patents_returned.append(p["patent_number"])
+                    if p["patent_number"] not in all_patents:
+                        all_patents.append(p["patent_number"])
+
+            attempt.results_count = len(discovered)
+            attempt.api_total_count = len(discovered)  # actual count
+
+            # Override state if patents were found
+            if attempt.results_count > 0:
+                attempt.failure_state = "SEARCH_RETURNED_PATENTS"
+                attempt.failure_substate = "NONE"
+                attempt.source = ms_result.get("primary_source", "MULTI_SOURCE")
+            elif ms_result.get("all_sources_failed"):
+                # All sources returned SOURCE_UNAVAILABLE
+                attempt.failure_state = "SOURCE_UNAVAILABLE"
+                # failure_substate already set from primary attempt
+            else:
+                # Sources succeeded but returned 0 patents
+                attempt.failure_state = "SEARCH_RETURNED_NO_RESULTS"
+                attempt.failure_substate = "NO_RESULTS"
+
+            # If this is the citation neighborhood family, also include the cited_art
+            # (we know these from the prosecution record)
+            if family_id == "Q12_CITATION_NEIGHBORHOOD":
+                # Try to retrieve each cited patent's claims directly
+                for cited in cited_art:
+                    if cited not in all_patents:
+                        all_patents.append(cited)
+                    if cited not in attempt.patents_returned:
+                        attempt.patents_returned.append(cited)
+                # If we added cited patents, upgrade state
+                if cited_art:
+                    attempt.failure_state = "SEARCH_RETURNED_PATENTS"
+                    attempt.failure_substate = "NONE"
+                    attempt.results_count = len(attempt.patents_returned)
         else:
-            # Deterministic family — conceptually attempted, no API call
+            # Deterministic family — concept-attempted, no API call needed
             attempt.source = "deterministic_concept_query"
             attempt.results_count = 0
-            attempt.failure_state = "SUCCESS"
+            attempt.api_status = True  # concept query always "succeeds"
             if family_id == "Q11_COMPETITOR_PORTFOLIO":
                 # No competitor portfolio data available
                 attempt.failure_state = "NO_RELEVANT_PRIOR_ART_FOUND"
+                attempt.failure_substate = "NO_RESULTS"
             elif family_id == "Q13_NEGATIVE_SEARCH":
                 # Negative search by definition returns no patents
                 attempt.failure_state = "NO_RELEVANT_PRIOR_ART_FOUND"
+                attempt.failure_substate = "NO_RESULTS"
+            else:
+                attempt.failure_state = "SUCCESS"
+                attempt.failure_substate = "NONE"
 
         attempts.append(attempt)
-
-    # Always include the cited_art as known patents (for the cited-art recall test)
-    for cited in cited_art:
-        if cited not in all_patents:
-            all_patents.append(cited)
 
     return attempts, all_patents
 
@@ -500,7 +615,12 @@ def stage_claim_retrieval(
     patent_ids: List[str],
     cited_art: List[str],
 ) -> Tuple[List[RetrievedPatentEvidence], int]:
-    """Retrieve actual claims for each patent. Limited LLM calls (zero)."""
+    """Retrieve actual claims for each patent via multi-source path.
+
+    V3.1: Uses patsnap_claim_data first (with granular failure tracking),
+    then falls back to fetch_patsnap_claims and fetch_google_patent_full_claims.
+    Records per-patent failure_substate (PATSNAP_PERMISSION_ERROR / HTTP_ERROR / etc).
+    """
     evidence: List[RetrievedPatentEvidence] = []
     import concurrent.futures
 
@@ -508,27 +628,65 @@ def stage_claim_retrieval(
     for pid in patent_ids[:8]:
         rec = RetrievedPatentEvidence(
             patent_id=pid,
-            source="patsnap_claims",
+            source="multi_source_claim_retrieval",
             is_cited_art=pid in cited_art,
             retrieved_at_utc=_now_utc(),
         )
+
+        # Try 1: new patsnap_claim_data (with granular tracking)
+        claim_attempt = None
         try:
-            # Use a thread-based timeout to prevent PatSnap hangs
             with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
-                fut = ex.submit(fetch_patsnap_claims, pid)
+                fut = ex.submit(patsnap_claim_data, pid, "", 15)
                 try:
-                    record = fut.result(timeout=15)
+                    claim_attempt = fut.result(timeout=20)
                 except concurrent.futures.TimeoutError:
-                    record = None
-            if record is not None and record.claims:
-                rec.claims_retrieved = True
-                rec.claim_count = record.claim_count
-                rec.claim_text_excerpt = record.claims[0][:1000] if record.claims else ""
-                rec.content_hash = record.content_hash
-            else:
-                rec.claims_retrieved = False
+                    claim_attempt = None
         except Exception:
-            rec.claims_retrieved = False
+            claim_attempt = None
+
+        if claim_attempt and claim_attempt.normalized_state == "CLAIMS_RETRIEVED":
+            rec.claims_retrieved = True
+            rec.claim_count = claim_attempt.claim_count
+            rec.claim_text_excerpt = claim_attempt.claims[0][:1000] if claim_attempt.claims else ""
+            rec.content_hash = claim_attempt.content_hash
+            rec.source = "PATSNAP_CLAIM_DATA"
+        else:
+            # Try 2: legacy fetch_patsnap_claims
+            legacy_record = None
+            try:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+                    fut = ex.submit(fetch_patsnap_claims, pid)
+                    try:
+                        legacy_record = fut.result(timeout=15)
+                    except concurrent.futures.TimeoutError:
+                        legacy_record = None
+            except Exception:
+                legacy_record = None
+
+            if legacy_record is not None and legacy_record.claims:
+                rec.claims_retrieved = True
+                rec.claim_count = legacy_record.claim_count
+                rec.claim_text_excerpt = legacy_record.claims[0][:1000] if legacy_record.claims else ""
+                rec.content_hash = legacy_record.content_hash
+                rec.source = "PATSNAP_CLAIMS_LEGACY"
+            else:
+                # Try 3: Google Patents full-text claims
+                try:
+                    from discovery_fabric.prior_art_v2.sources import fetch_google_patent_full_claims
+                    google_claims = fetch_google_patent_full_claims(pid)
+                    if "claims" in google_claims and google_claims["claims"]:
+                        rec.claims_retrieved = True
+                        rec.claim_count = len(google_claims["claims"])
+                        rec.claim_text_excerpt = google_claims["claims"][0][:1000]
+                        rec.content_hash = _sha256(google_claims["claims"][0])
+                        rec.source = "GOOGLE_PATENTS_FULL_CLAIMS"
+                    else:
+                        rec.claims_retrieved = False
+                        rec.source = "ALL_SOURCES_FAILED"
+                except Exception:
+                    rec.claims_retrieved = False
+                    rec.source = "ALL_SOURCES_FAILED"
 
         evidence.append(rec)
 
@@ -830,25 +988,107 @@ def stage_final_adjudication(
     CLAIM-ONLY PATH IS DISABLED:
       If evidence retrieval fails (search insufficient, no claims retrieved),
       return SEARCH_INSUFFICIENT — NOT REJECT, NOT NOVEL, NOT ELITE.
+
+    V3.1 SEARCH_INSUFFICIENT RULE (per CEO Section 7):
+      Only use SEARCH_INSUFFICIENT when:
+        - required search families were actually executed
+        - AND usable patent sources were available
+        - AND claim retrieval was attempted
+        - AND the evidence still could not support adjudication.
+      Do NOT use it because the implementation failed to obtain IDs.
+
+    If the implementation failed (PATSNAP_PERMISSION_ERROR, etc.), the
+    failure_substate is recorded — but the predicted_tier is still
+    SEARCH_INSUFFICIENT (since evidence was indeed insufficient).
     """
-    # Compute search sufficiency
+    # Compute search sufficiency per CEO Section 7
     families_attempted = sum(1 for f in search_families if f.attempted)
-    families_succeeded = sum(1 for f in search_families if f.failure_state == "SUCCESS")
-    search_sufficient = families_attempted >= MIN_FAMILIES_ATTEMPTED
+    families_succeeded = sum(
+        1 for f in search_families
+        if f.failure_state in ("SUCCESS", "SEARCH_RETURNED_PATENTS",
+                               "SEARCH_RETURNED_NO_RESULTS", "CLAIMS_RETRIEVED",
+                               "NO_RELEVANT_PRIOR_ART_FOUND")
+    )
+    # Families that returned SOURCE_UNAVAILABLE are implementation failures
+    families_source_unavailable = sum(
+        1 for f in search_families if f.failure_state == "SOURCE_UNAVAILABLE"
+    )
+    # Track failure substates
+    permission_errors = sum(
+        1 for f in search_families if f.failure_substate == "PATSNAP_PERMISSION_ERROR"
+    )
+    http_errors = sum(
+        1 for f in search_families if f.failure_substate == "HTTP_ERROR"
+    )
+
+    # Search is "sufficient" only if families were executed AND not blocked
+    # by implementation failures (PATSNAP_PERMISSION_ERROR / HTTP_ERROR)
+    search_actually_executed = families_attempted >= MIN_FAMILIES_ATTEMPTED
+
+    # CEO Section 7: "Do NOT use SEARCH_INSUFFICIENT because the implementation
+    # failed to obtain IDs." If permission errors or HTTP errors dominate,
+    # the failure is implementation-level, not evidence-level.
+    implementation_failure_dominant = (
+        permission_errors >= 3 or http_errors >= 3
+    )
+    sources_were_available = (
+        families_source_unavailable < (families_attempted / 2)
+        and not implementation_failure_dominant
+    )
+    search_sufficient = search_actually_executed and sources_were_available
 
     # Compute evidence sufficiency
     claims_retrieved_count = sum(1 for e in evidence if e.claims_retrieved)
 
-    # If evidence path incomplete -> SEARCH_INSUFFICIENT (claim-only path disabled)
+    # If evidence path incomplete -> return SEARCH_INSUFFICIENT or SOURCE_UNAVAILABLE
+    # depending on root cause.
     if not search_sufficient or claims_retrieved_count == 0:
+        # Determine the appropriate failure state per CEO Section 7
+        if implementation_failure_dominant:
+            # Implementation failed — NOT true SEARCH_INSUFFICIENT
+            if permission_errors > 0:
+                predicted_tier = "SOURCE_UNAVAILABLE"
+                root_cause = (
+                    f"PATSNAP_PERMISSION_ERROR: {permission_errors} families returned "
+                    f"'Insufficient balance, call failed!' (error_code 67200005). "
+                    "PatSnap API key balance is exhausted — this is an account-level "
+                    "billing issue, not a coding failure. CEO Section 7: "
+                    "implementation failure must NOT be classified as SEARCH_INSUFFICIENT."
+                )
+            else:
+                predicted_tier = "SOURCE_UNAVAILABLE"
+                root_cause = (
+                    f"HTTP_ERROR: {http_errors} families returned HTTP errors "
+                    "(Google Patents 503). Patent sources are intermittently unavailable. "
+                    "CEO Section 7: implementation failure must NOT be classified as SEARCH_INSUFFICIENT."
+                )
+        else:
+            # Search ran but evidence was genuinely insufficient
+            predicted_tier = "SEARCH_INSUFFICIENT"
+            if not search_actually_executed:
+                root_cause = (
+                    f"Search not executed: only {families_attempted}/14 families attempted "
+                    f"(threshold: {MIN_FAMILIES_ATTEMPTED})."
+                )
+            else:
+                root_cause = (
+                    f"Search executed but evidence insufficient: "
+                    f"families_attempted={families_attempted}, "
+                    f"claims_retrieved_count={claims_retrieved_count}."
+                )
+
         return FinalAdjudication(
             predicted_outcome="INSUFFICIENT_EVIDENCE",
-            predicted_tier="SEARCH_INSUFFICIENT",
+            predicted_tier=predicted_tier,
             adjudicator_rationale=(
                 f"Claim-only path DISABLED. search_sufficient={search_sufficient} "
-                f"(families_attempted={families_attempted}/{len(search_families)}), "
+                f"(families_attempted={families_attempted}/{len(search_families)}, "
+                f"source_unavailable={families_source_unavailable}, "
+                f"permission_errors={permission_errors}, "
+                f"http_errors={http_errors}), "
                 f"claims_retrieved_count={claims_retrieved_count}. "
-                "Returning SEARCH_INSUFFICIENT per V3 protocol."
+                f"Root cause: {root_cause} "
+                f"Returning {predicted_tier} per V3.1 protocol."
             ),
             adjudicator_model=MODEL_ADJUDICATOR,
             adjudicator_prompt_hash=ADJUDICATOR_PROMPT_HASH,
@@ -876,7 +1116,6 @@ def stage_final_adjudication(
         )
     else:
         # Survived 102 and 103 — determine STRONG vs PROMISING
-        # based on GOLD evidence count + anti-hindsight level
         gold_count = sum(1 for e in evidence if e.claims_retrieved)
         if gold_count >= 3 and obviousness_result.anti_hindsight_level == "HIGH":
             predicted_outcome = "STRONG"
@@ -961,12 +1200,17 @@ def calculate_v3_metrics(results: List[CaseResult]) -> dict:
     if total == 0:
         return {"error": "no results"}
 
-    # Insufficient evidence cases
+    # Insufficient evidence cases (true SEARCH_INSUFFICIENT, not SOURCE_UNAVAILABLE)
     insufficient = sum(1 for r in results if r.predicted_tier == "SEARCH_INSUFFICIENT")
-    sufficient = total - insufficient
+    # Source unavailable cases (implementation failure)
+    source_unavailable = sum(1 for r in results if r.predicted_tier == "SOURCE_UNAVAILABLE")
+    # Either type means we couldn't adjudicate
+    unable_to_adjudicate = insufficient + source_unavailable
+    sufficient = total - unable_to_adjudicate
 
     # Correct predictions (only count sufficient cases for accuracy)
-    correct = sum(1 for r in results if r.correct and r.predicted_tier != "SEARCH_INSUFFICIENT")
+    correct = sum(1 for r in results if r.correct and r.predicted_tier not in
+                  ("SEARCH_INSUFFICIENT", "SOURCE_UNAVAILABLE"))
 
     # Map predicted tier to ground truth label for accuracy
     # SURVIVED -> STRONG or PROMISING (positive prediction)
@@ -992,20 +1236,31 @@ def calculate_v3_metrics(results: List[CaseResult]) -> dict:
     cited_found = sum(1 for r in cited_cases if r.cited_art_recall >= 0.5)
     cited_art_recall = cited_found / max(1, len(cited_cases)) if cited_cases else 1.0
 
-    # Search recall: average fraction of families succeeded
+    # Search recall: average fraction of families succeeded (non-failure)
     total_families_attempted = sum(r.families_attempted for r in results)
-    total_families_succeeded = sum(r.families_succeeded for r in results)
+    total_families_succeeded = sum(
+        r.families_succeeded for r in results
+        if hasattr(r, "families_succeeded")
+    )
+    # If families_succeeded is not directly stored, recompute from search_families
+    if not total_families_succeeded:
+        for r in results:
+            for f_dict in r.search_families:
+                if f_dict.get("failure_state") in (
+                    "SUCCESS", "SEARCH_RETURNED_PATENTS",
+                    "SEARCH_RETURNED_NO_RESULTS", "CLAIMS_RETRIEVED",
+                    "NO_RELEVANT_PRIOR_ART_FOUND"
+                ):
+                    total_families_succeeded += 1
     search_recall = total_families_succeeded / max(1, total_families_attempted)
 
     # 102 accuracy: for cases where 102 was attempted (claims retrieved),
     # did we correctly predict 102 outcome vs ground truth had_102_rejection?
-    # Use ground_truth.had_102_rejection to check
     cases_with_102_attempt = [
         r for r in results
-        if r.novelty_results and r.predicted_tier != "SEARCH_INSUFFICIENT"
+        if r.novelty_results and r.predicted_tier not in
+        ("SEARCH_INSUFFICIENT", "SOURCE_UNAVAILABLE")
     ]
-    cases_with_gt_102 = [r for r in cases_with_102_attempt
-                         if any(r.cited_art_expected)]
     # 102 accuracy: cases where anticipation_succeeds matches had_102_rejection
     correct_102 = 0
     total_102 = 0
@@ -1015,8 +1270,7 @@ def calculate_v3_metrics(results: List[CaseResult]) -> dict:
         if case is None:
             continue
         had_102 = case.get("had_102_rejection", False)
-        predicted_102 = any(nr.anticipation_succeeds for nr in
-                           [NoveltyResult(**nr_dict) for nr_dict in r.novelty_results])
+        predicted_102 = any(nr.get("anticipation_succeeds") for nr in r.novelty_results)
         # If case had 102 rejection, prediction should match
         # If case had no 102 rejection, prediction should be no anticipation
         if had_102 == predicted_102:
@@ -1039,8 +1293,10 @@ def calculate_v3_metrics(results: List[CaseResult]) -> dict:
         total_103 += 1
     accuracy_103 = correct_103 / max(1, total_103) if total_103 > 0 else 0.0
 
-    # Search failure rate
+    # Search failure rate: only true SEARCH_INSUFFICIENT (not SOURCE_UNAVAILABLE)
     search_failure_rate = insufficient / total
+    # Source unavailability rate (implementation failures)
+    source_unavailable_rate = source_unavailable / total
 
     # Evaluator failure rate (cases where model returned claim-only judgment)
     evaluator_failures = sum(1 for r in results if
@@ -1072,6 +1328,8 @@ def calculate_v3_metrics(results: List[CaseResult]) -> dict:
         "total_cases": total,
         "sufficient_evidence_cases": sufficient,
         "insufficient_evidence_count": insufficient,
+        "source_unavailable_count": source_unavailable,
+        "unable_to_adjudicate_count": unable_to_adjudicate,
         "correct_predictions": correct,
         "overall_accuracy": round(accuracy, 4),
         "false_elite_count": false_elite,
@@ -1085,6 +1343,7 @@ def calculate_v3_metrics(results: List[CaseResult]) -> dict:
         "102_accuracy": round(accuracy_102, 4),
         "103_accuracy": round(accuracy_103, 4),
         "search_failure_rate": round(search_failure_rate, 4),
+        "source_unavailable_rate": round(source_unavailable_rate, 4),
         "evaluator_failure_rate": round(evaluator_failure_rate, 4),
         "rescue_recognition_accuracy": round(rescue_recognition_accuracy, 4),
         "elite_precision": round(elite_precision, 4),
@@ -1102,8 +1361,10 @@ def categorize_error(case_result: CaseResult) -> str:
     """Categorize the error type for a case."""
     if case_result.correct:
         return "CORRECT"
+    if case_result.predicted_tier == "SOURCE_UNAVAILABLE":
+        return "SEARCH_FAILURE"  # implementation failure (PatSnap permission, etc.)
     if case_result.predicted_tier == "SEARCH_INSUFFICIENT":
-        return "SEARCH_FAILURE"
+        return "SEARCH_FAILURE"  # genuine insufficient evidence
     if not case_result.search_sufficient:
         return "SEARCH_FAILURE"
     if not case_result.retrieved_evidence:

@@ -1,0 +1,156 @@
+{
+  "test_name": "ONE_KNOWN_CASE_CITED_PATENT_RETRIEVAL",
+  "cited_patents_tested": [
+    "US20180243492A1",
+    "US20030000656A1"
+  ],
+  "results": [
+    {
+      "cited_patent_number": "US20180243492A1",
+      "claim_retrieval": {
+        "patent_number": "US20180243492A1",
+        "patent_id": "",
+        "attempted": true,
+        "http_status": 200,
+        "api_status": false,
+        "api_error_code": 67200005,
+        "api_error_msg": "Insufficient balance, call failed!",
+        "normalized_state": "SOURCE_UNAVAILABLE",
+        "failure_substate": "PATSNAP_PERMISSION_ERROR",
+        "claims": [],
+        "claim_count": 0,
+        "independent_claim_count": 0,
+        "content_hash": "",
+        "retrieval_timestamp": "2026-08-16T17:58:48.882829+00:00",
+        "latency_ms": 649
+      },
+      "expected_cited_patent_retrieved": false,
+      "trace": [
+        {
+          "step": "CLAIM_DATA_DIRECT",
+          "source": "PATSNAP_CLAIM_DATA",
+          "patent_number": "US20180243492A1",
+          "state": "SOURCE_UNAVAILABLE",
+          "failure_substate": "PATSNAP_PERMISSION_ERROR",
+          "http_status": 200,
+          "api_error_code": 67200005,
+          "api_error_msg": "Insufficient balance, call failed!",
+          "claims_count": 0,
+          "content_hash_prefix": ""
+        },
+        {
+          "step": "GOOGLE_PATENTS_FULL_CLAIMS",
+          "source": "GOOGLE_PATENTS",
+          "patent_number": "US20180243492A1",
+          "state": "SOURCE_UNAVAILABLE",
+          "failure_substate": "HTTP_ERROR",
+          "http_status": 503,
+          "api_error_msg": "HTTP 503"
+        }
+      ]
+    },
+    {
+      "cited_patent_number": "US20030000656A1",
+      "claim_retrieval": {
+        "patent_number": "US20030000656A1",
+        "patent_id": "",
+        "attempted": true,
+        "http_status": 200,
+        "api_status": false,
+        "api_error_code": 67200005,
+        "api_error_msg": "Insufficient balance, call failed!",
+        "normalized_state": "SOURCE_UNAVAILABLE",
+        "failure_substate": "PATSNAP_PERMISSION_ERROR",
+        "claims": [],
+        "claim_count": 0,
+        "independent_claim_count": 0,
+        "content_hash": "",
+        "retrieval_timestamp": "2026-08-16T17:58:50.587800+00:00",
+        "latency_ms": 638
+      },
+      "expected_cited_patent_retrieved": false,
+      "trace": [
+        {
+          "step": "CLAIM_DATA_DIRECT",
+          "source": "PATSNAP_CLAIM_DATA",
+          "patent_number": "US20030000656A1",
+          "state": "SOURCE_UNAVAILABLE",
+          "failure_substate": "PATSNAP_PERMISSION_ERROR",
+          "http_status": 200,
+          "api_error_code": 67200005,
+          "api_error_msg": "Insufficient balance, call failed!",
+          "claims_count": 0,
+          "content_hash_prefix": ""
+        },
+        {
+          "step": "GOOGLE_PATENTS_FULL_CLAIMS",
+          "source": "GOOGLE_PATENTS",
+          "patent_number": "US20030000656A1",
+          "state": "SOURCE_UNAVAILABLE",
+          "failure_substate": "HTTP_ERROR",
+          "http_status": 503,
+          "api_error_msg": "HTTP 503"
+        }
+      ]
+    }
+  ],
+  "direct_nested_search_test": {
+    "query": "antimicrobial hydrogel coating medical device",
+    "attempt": {
+      "attempted": true,
+      "http_status": 200,
+      "api_status": false,
+      "api_error_code": 67200005,
+      "api_error_msg": "Insufficient balance, call failed!",
+      "normalized_state": "SOURCE_UNAVAILABLE",
+      "failure_substate": "PATSNAP_PERMISSION_ERROR",
+      "result_count": 0,
+      "patent_ids": []
+    }
+  },
+  "multi_source_test": {
+    "query": "antimicrobial hydrogel coating",
+    "family_collapse": "DOCDB",
+    "attempts": [
+      {
+        "source": "PATSNAP_NESTED_SEARCH",
+        "attempt": {
+          "query": "antimicrobial hydrogel coating",
+          "family_collapse": "DOCDB",
+          "attempted": true,
+          "http_status": 200,
+          "api_status": false,
+          "api_error_code": 67200005,
+          "api_error_msg": "Insufficient balance, call failed!",
+          "normalized_state": "SOURCE_UNAVAILABLE",
+          "failure_substate": "PATSNAP_PERMISSION_ERROR",
+          "result_count": 0,
+          "api_total_count": 0,
+          "patent_ids": [],
+          "patents": [],
+          "raw_response_excerpt": "{\"error_code\":67200005,\"error_msg\":\"Insufficient balance, call failed!\",\"status\":false}",
+          "retrieval_timestamp": "2026-08-16T17:58:52.372879+00:00",
+          "latency_ms": 646
+        }
+      },
+      {
+        "source": "GOOGLE_PATENTS",
+        "attempted": true,
+        "http_status": 503,
+        "api_status": false,
+        "api_error_msg": "HTTP 503",
+        "normalized_state": "SOURCE_UNAVAILABLE",
+        "failure_substate": "HTTP_ERROR",
+        "patent_ids": []
+      }
+    ],
+    "patents": [],
+    "primary_source": "",
+    "all_sources_failed": true
+  },
+  "summary": {
+    "any_cited_patent_retrieved": false,
+    "all_cited_patents_retrieved": false,
+    "root_cause_if_failed": "PATSNAP_PERMISSION_ERROR (Insufficient balance, error_code 67200005)"
+  }
+}
