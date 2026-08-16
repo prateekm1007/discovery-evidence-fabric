@@ -489,7 +489,13 @@ def stage_search_families(
     attempts: List[SearchFamilyAttempt] = []
     all_patents: List[str] = []
 
-    # KEY_FAMILIES_WITH_PATSNAP — actually call nested-search-patent
+    # BUDGET MODE: Always include the case's own patent for claim retrieval.
+    # This is the primary patent we need to adjudicate.
+    case_patent = case.get("patent_number", "")
+    if case_patent:
+        all_patents.append(case_patent)
+
+    # KEY_FAMILIES_WITH_DISCOVERY — actually call nested-search-patent
     # Other families are concept-attempted with deterministic state
     KEY_FAMILIES_WITH_DISCOVERY = {
         "Q1_CONCEPT", "Q2_MECHANISM", "Q7_FULL_COMBINATION",
