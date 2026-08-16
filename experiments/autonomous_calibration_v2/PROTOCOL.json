@@ -1,0 +1,90 @@
+{
+  "protocol_name": "AUTONOMOUS_CALIBRATION_V2",
+  "version": "2.0",
+  "created_at": "2026-08-17T00:00:00Z",
+  "objective": "Calibrate the autonomous invention evaluation pipeline against 20 known cases with publicly documented prosecution outcomes",
+  
+  "acceptance_thresholds": {
+    "overall_accuracy_min": 0.85,
+    "false_elite_rate_max": 0.10,
+    "false_reject_rate_max": 0.10,
+    "cited_art_recall_min": 0.80,
+    "minimum_cases": 20
+  },
+  
+  "case_requirements": {
+    "minimum_cases": 20,
+    "distribution": {
+      "granted": 10,
+      "abandoned_after_rejection": 5,
+      "amended_allowed": 5
+    },
+    "diversity": [
+      "medical device",
+      "sensor",
+      "materials",
+      "mechanical",
+      "electrical",
+      "software/controls",
+      "biomaterials"
+    ],
+    "ground_truth_fields": [
+      "CLAIM_AT_ISSUE",
+      "PRIOR_ART_CITED",
+      "102_REJECTIONS",
+      "103_REJECTIONS",
+      "FINAL_DISPOSITION",
+      "AMENDMENTS",
+      "FINAL_CLAIM",
+      "SEARCH_REPORT",
+      "EXAMINER_REASONING"
+    ]
+  },
+  
+  "pipeline_steps": [
+    "claim_interpretation",
+    "search_concept_graph",
+    "14_search_families",
+    "patent_retrieval",
+    "claim_retrieval",
+    "102_attack",
+    "103_attack",
+    "technical_effect",
+    "rescue_if_needed",
+    "final_adjudication"
+  ],
+  
+  "generator_evaluator_separation": {
+    "requirement": "GENERATOR != ADVERSARIAL_EVALUATOR",
+    "minimum": "different prompt, different context, different evidence set",
+    "preferred": "different models"
+  },
+  
+  "metrics": [
+    "overall_accuracy",
+    "elite_precision",
+    "elite_recall",
+    "false_elite_rate",
+    "false_reject_rate",
+    "102_accuracy",
+    "103_accuracy",
+    "search_recall",
+    "search_failure_rate",
+    "rescue_success_rate",
+    "cited_art_recall"
+  ],
+  
+  "error_audit_categories": [
+    "SEARCH_FAILURE",
+    "CLAIM_INTERPRETATION_FAILURE",
+    "102_FAILURE",
+    "103_FAILURE",
+    "MODEL_JUDGMENT_FAILURE",
+    "CIRCULAR_EVALUATION",
+    "EVIDENCE_FAILURE",
+    "GROUND_TRUTH_FAILURE"
+  ],
+  
+  "stop_rule": "DO NOT run 50→5 until calibration V2 passes all thresholds",
+  "failure_state": "CALIBRATION_BLOCKED"
+}
