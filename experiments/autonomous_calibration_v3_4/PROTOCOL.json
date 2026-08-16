@@ -1,0 +1,93 @@
+{
+  "protocol_name": "AUTONOMOUS_CALIBRATION_V3_4",
+  "version": "3.4",
+  "created_at": "2026-08-17T00:00:00Z",
+  "base_commit": "1e93a51",
+  "status_pre_inference": "CALIBRATION_BLOCKED",
+  "objective": "Fix V3.3 defects: (1) passage-grounded 102 with exact passage citation, (2) inherency firewall (NECESSARY only), (3) arrangement firewall, (4) independent 103 with ObviousnessEvidenceV34, (5) false-reject forensic on 7 V3.3 cases.",
+
+  "v3_3_frozen_results": {
+    "accuracy": 0.60,
+    "false_elite_rate": 0.00,
+    "false_reject_rate": 0.20,
+    "cited_art_recall": 1.00,
+    "search_recall": 0.786,
+    "102_accuracy": 0.60,
+    "103_accuracy": 0.15,
+    "identity_confirmed": 20,
+    "hindsight_high": 0,
+    "status": "CALIBRATION_BLOCKED",
+    "root_causes": [
+      "102_FAILURE: 7 cases — NOVELTY_ADVERSARY too aggressive, anticipating granted patents without exact passage citation",
+      "103_FAILURE: 15% accuracy — 103 not independent from 102, no real COULD/WOULD distinction",
+      "FALSE_REJECT: 4 cases — 102 overclaim on granted patents"
+    ]
+  },
+
+  "v3_4_changes_from_v3_3": [
+    "PASSAGE-GROUNDED 102: every claim limitation requires limitation_id + reference_id + disclosure_type + exact_passage + claim_number/paragraph + mapping_rationale + mapping_confidence",
+    "Disclosure types restricted to: EXPRESS / NECESSARILY_INHERENT / NOT_DISCLOSED / UNCERTAIN. Forbidden: POSSIBLE / PLAUSIBLE / TOPICAL / SEMANTICALLY_SIMILAR",
+    "INHERENCY FIREWALL: inherency requires NECESSARY (not LIKELY/PROBABLE/POSSIBLE). Machine assertion: inherency_necessity_proof. If missing: NOT_DISCLOSED/UNCERTAIN.",
+    "ARRANGEMENT FIREWALL: verify reference discloses REQUIRED RELATIONSHIPS, not just elements. A disclosed + B disclosed != A+B arranged as claimed.",
+    "NoveltyEvidenceV34 decision object: single_reference + all_limitations_mapped + all_relationships_mapped + passage_evidence + inherency_necessity + arrangement_supported + uncertainties + final_result",
+    "102_KILL legal only if: all_limitations_mapped=TRUE AND all_relationships_mapped=TRUE AND all_mapping_types in {EXPRESS, NECESSARILY_INHERENT} AND uncertainty_count=0",
+    "FALSE-REJECT FORENSIC: audit 7 V3.3 false-reject cases. For each: old_102_mapping + correct_mapping + bad_inference + source_passage + root_cause. Classify: ELEMENT_OVERCLAIM / ARRANGEMENT_OVERCLAIM / INHERENCY_ERROR / REFERENCE_MISMATCH / CLAIM_INTERPRETATION_ERROR / LLM_JUDGMENT_ERROR",
+    "ObviousnessEvidenceV34: closest_prior_art + objective_problem + difference_elements + secondary_reference + motivation + technical_compatibility + reasonable_expectation + teaching_away + could + would + why + technical_effect + hindsight",
+    "COULD/WOULD RULE: 103 requires COULD=TRUE AND WOULD=TRUE AND MOTIVATION_SUPPORTED=TRUE AND EXPECTED_SUCCESS_SUPPORTED=TRUE. If any missing: 103=INSUFFICIENT_EVIDENCE (not OBVIOUSNESS_RISK).",
+    "INDEPENDENT 103 PATH: 103 adversary does NOT see generator rationale, commercial rationale, or final invention explanation. Receives only: canonical claim + verified evidence + prior-art mappings + technical context.",
+    "PRE-DISCLOSURE / POST-DISCLOSURE: Pass A (hide novelty thesis) vs Pass B (reveal full claim). Compare motivation, difference, combination, expected success. Large divergence = HINDSIGHT_RISK_HIGH.",
+    "CITED_ART_MAPPING_ACCURACY: for each calibration case with examiner-cited reference, system must reproduce cited reference + claim mapping + reason it matters. Recall alone is not enough.",
+    "SEARCH RECALL: target >=80%. For missed references, identify: query-family miss / terminology miss / classification miss / citation miss / semantic miss / source failure. Fix relevant search family, not aggregate number."
+  ],
+
+  "acceptance_thresholds": {
+    "overall_accuracy_min": 0.85,
+    "false_elite_rate_max": 0.10,
+    "false_reject_rate_max": 0.10,
+    "cited_art_recall_min": 0.90,
+    "search_recall_min": 0.80,
+    "102_accuracy_min": 0.85,
+    "103_accuracy_min": 0.80,
+    "minimum_cases": 20
+  },
+
+  "novelty_102_rules": {
+    "passage_required": "Every claim limitation requires exact_passage citation from the reference",
+    "disclosure_types_allowed": ["EXPRESS", "NECESSARILY_INHERENT", "NOT_DISCLOSED", "UNCERTAIN"],
+    "disclosure_types_forbidden": ["POSSIBLE", "PLAUSIBLE", "TOPICAL", "SEMANTICALLY_SIMILAR"],
+    "inherency_firewall": "NECESSARY only. Not LIKELY/PROBABLE/POSSIBLE. Requires inherency_necessity_proof.",
+    "arrangement_firewall": "Verify reference discloses REQUIRED RELATIONSHIPS. A+B disclosed != A+B arranged as claimed.",
+    "102_kill_legal_only_if": "all_limitations_mapped=TRUE AND all_relationships_mapped=TRUE AND all_mapping_types in {EXPRESS, NECESSARILY_INHERENT} AND uncertainty_count=0"
+  },
+
+  "obviousness_103_rules": {
+    "independent_path": "103 adversary does NOT see generator/commercial rationale. Receives only: canonical claim + verified evidence + prior-art mappings + technical context.",
+    "could_would_rule": "103 requires COULD=TRUE AND WOULD=TRUE AND MOTIVATION_SUPPORTED=TRUE AND EXPECTED_SUCCESS_SUPPORTED=TRUE. If any missing: 103=INSUFFICIENT_EVIDENCE.",
+    "two_pass": "Pass A (hide novelty thesis) vs Pass B (reveal full claim). Large divergence = HINDSIGHT_RISK_HIGH.",
+    "evidence_object_fields": [
+      "closest_prior_art", "objective_problem", "difference_elements",
+      "secondary_reference", "motivation", "technical_compatibility",
+      "reasonable_expectation", "teaching_away", "could", "would", "why",
+      "technical_effect", "hindsight"
+    ]
+  },
+
+  "false_reject_forensic": {
+    "target_cases": "7 V3.3 false-reject cases",
+    "fields_per_case": ["old_102_mapping", "correct_mapping", "bad_inference", "source_passage", "root_cause"],
+    "classifications": [
+      "ELEMENT_OVERCLAIM", "ARRANGEMENT_OVERCLAIM", "INHERENCY_ERROR",
+      "REFERENCE_MISMATCH", "CLAIM_INTERPRETATION_ERROR", "LLM_JUDGMENT_ERROR"
+    ]
+  },
+
+  "output_artifacts": [
+    "PROTOCOL.json", "PROTOCOL.sha256", "PROTOCOL.md",
+    "102_FORENSIC.json", "103_FORENSIC.json", "SEARCH_RECALL.json",
+    "CLAIM_MAPPINGS.json", "CASE_RESULTS.json", "ERROR_ANALYSIS.json",
+    "METRICS.json", "REPORT.md"
+  ],
+
+  "stop_rule": "DO NOT run 50->5 until V3.4 reaches all thresholds including 102>=85% and 103>=80%.",
+  "failure_state": "CALIBRATION_BLOCKED"
+}
