@@ -1,0 +1,82 @@
+{
+  "protocol_name": "AUTONOMOUS_CALIBRATION_V3_9",
+  "version": "3.9",
+  "created_at": "2026-08-17T00:00:00Z",
+  "base_commit": "09402ee",
+  "status_pre_inference": "CALIBRATION_BLOCKED",
+  "objective": "Fix V3.8 false-reject problem (50%) while preserving 103_accuracy=70% and false_elite=0%. Separate 4 questions: EVIDENCE_EXISTS, MOTIVATION_TO_TRY, TECHNICAL_COMPATIBILITY, EXPECTATION_OF_SUCCESS. Add combination penalty, whole-claim test, and 103_precision metric.",
+
+  "v3_8_frozen_results": {
+    "accuracy": 0.50,
+    "false_elite_rate": 0.00,
+    "false_reject_rate": 0.50,
+    "cited_art_recall": 1.00,
+    "search_recall": 0.786,
+    "102_accuracy": 0.85,
+    "103_accuracy": 0.70,
+    "hindsight_high": 0,
+    "avg_motivation_edges": 4.25,
+    "status": "CALIBRATION_BLOCKED",
+    "root_cause": "Gemma-4 finds motivation evidence everywhere but over-promotes motivation into obviousness. System rejects granted patents that should survive. Need to separate motivation from technical compatibility and expectation of success."
+  },
+
+  "v3_9_changes": [
+    "SEPARATE FOUR QUESTIONS: A. EVIDENCE_EXISTS, B. MOTIVATION_TO_TRY, C. TECHNICAL_COMPATIBILITY, D. EXPECTATION_OF_SUCCESS. Do NOT collapse into one LLM verdict.",
+    "NEW 103 DECISION CHAIN: REFERENCE_A + REFERENCE_B -> EVIDENCE_EXISTS -> MOTIVATION_TO_TRY -> TECHNICAL_COMPATIBILITY -> EXPECTED_TO_WORK -> COULD/WOULD -> 103. Every edge needs evidence.",
+    "MOTIVATION != OBVIOUSNESS: valid motivation edge is NOT sufficient. Require bridge: motivation -> proposed modification -> why this specific modification -> expected benefit.",
+    "TECHNICAL COMPATIBILITY SCORING: 8 dimensions (operating_conditions, materials, mechanism, geometry, control_logic, energy_regime, failure_modes, performance_objective). States: COMPATIBLE / COMPATIBLE_WITH_MODIFICATION / INHERENTLY_CONFLICTING / UNKNOWN. INHERENTLY_CONFLICTING blocks combination unless prior art teaches how to resolve.",
+    "EXPECTATION OF SUCCESS: separate EXPECTED_SUCCESS from HOPE_OF_SUCCESS. Do NOT accept 'same field' or 'same function' alone. Require evidence that skilled person would reasonably expect combination to work.",
+    "COMBINATION PENALTY: if claim requires A from Ref1 + B from Ref2 + C from Ref3, record reference_count and combination_steps. Require evidence for every step. 3-reference reconstruction != single-reference obvious modification.",
+    "WHOLE-CLAIM TEST: evaluate claim AS A WHOLE. For each combination: functional_interaction + combined_technical_effect + synergy. Do not say 'A is known + B is known therefore A+B is obvious' without functional interaction.",
+    "MODEL ENSEMBLE: Gemma=evidence extraction/reasoning, Nemotron=independent challenge, separate model=structured adjudication. Do not average votes. Force structured evidence.",
+    "FALSE-REJECT FORENSICS: for every V3.8 granted case falsely rejected, identify: motivation_false_positive / compatibility_false_positive / expectation_false_positive / whole_claim_failure / technical_effect_failure / adjudication_failure.",
+    "PRESERVE false_elite=0%: do NOT sacrifice false_elite to improve accuracy.",
+    "NEW METRICS: motivation_precision, motivation_recall, compatibility_precision, expectation_precision, combination_precision, 103_precision, 103_recall"
+  ],
+
+  "acceptance_thresholds": {
+    "overall_accuracy_min": 0.85,
+    "false_elite_rate_max": 0.10,
+    "false_reject_rate_max": 0.10,
+    "cited_art_recall_min": 0.90,
+    "search_recall_min": 0.80,
+    "102_accuracy_min": 0.85,
+    "103_accuracy_min": 0.80,
+    "103_precision_min": 0.85,
+    "minimum_cases": 20
+  },
+
+  "technical_compatibility_dimensions": [
+    "OPERATING_CONDITIONS",
+    "MATERIALS",
+    "MECHANISM",
+    "GEOMETRY",
+    "CONTROL_LOGIC",
+    "ENERGY_REGIME",
+    "FAILURE_MODES",
+    "PERFORMANCE_OBJECTIVE"
+  ],
+
+  "compatibility_states": [
+    "COMPATIBLE",
+    "COMPATIBLE_WITH_MODIFICATION",
+    "INHERENTLY_CONFLICTING",
+    "UNKNOWN"
+  ],
+
+  "model_ensemble": {
+    "evidence_extraction": "google/gemma-4-31b-it",
+    "independent_challenge": "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "structured_adjudication": "meta/llama-3.1-8b-instruct"
+  },
+
+  "output_artifacts": [
+    "PROTOCOL.json", "PROTOCOL.sha256", "PROTOCOL.md",
+    "103_EVIDENCE_CHAIN.json", "COMPATIBILITY_ANALYSIS.json",
+    "FALSE_REJECT_FORENSICS.json", "103_CASE_FORENSICS.json",
+    "ERROR_ANALYSIS.json", "METRICS.json", "REPORT.md"
+  ],
+
+  "stop_rule": "DO NOT run 50->5 until 103>=80% AND 103_precision>=85% AND false_reject<=10%.",
+  "failure_state": "CALIBRATION_BLOCKED"
+}
