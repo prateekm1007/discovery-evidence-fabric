@@ -1,0 +1,860 @@
+{
+  "test_name": "FEDERATED_ONE_CASE_TRACE",
+  "test_date": "2026-08-16T18:40:50Z",
+  "source_status": {
+    "EPO_OPS": {
+      "available": false,
+      "free_tier": "4 GB/week",
+      "registration_url": "https://developers.epo.org/",
+      "required_env_vars": [
+        "EPO_OPS_CONSUMER_KEY",
+        "EPO_OPS_CONSUMER_SECRET"
+      ],
+      "current_state": "CREDENTIALS_REQUIRED"
+    },
+    "GOOGLE_BIGQUERY": {
+      "available": false,
+      "free_tier": "1 TiB/month query processing",
+      "registration_url": "https://console.cloud.google.com/bigquery",
+      "required_env_vars": [
+        "BIGQUERY_PROJECT",
+        "GOOGLE_APPLICATION_CREDENTIALS"
+      ],
+      "current_state": "CREDENTIALS_REQUIRED"
+    },
+    "USPTO_ODP": {
+      "available": true,
+      "free_tier": "Public API (rate-limited without key)",
+      "registration_url": "https://uspto.gov/subscription-center",
+      "required_env_vars": [
+        "USPTO_ODP_API_KEY (optional for higher limits)"
+      ],
+      "current_state": "LIVE"
+    },
+    "PATSNAP": {
+      "available": false,
+      "free_tier": "None (commercial, balance exhausted)",
+      "current_state": "FROZEN_PER_CEO_DIRECTIVE",
+      "note": "PatSnap API key balance is exhausted (error_code 67200005). Do not spend another dollar. Use federated sources instead."
+    }
+  },
+  "traces": [
+    {
+      "patent_number": "US11912894B2",
+      "normalized": "US11912894B2",
+      "steps": [
+        {
+          "step": "QUERY",
+          "query": "Antimicrobial and antifouling conformal hydrogel coatings",
+          "family_id": "Q12_CITATION_NEIGHBORHOOD",
+          "sources_attempted": [
+            {
+              "source": "EPO_OPS",
+              "attempted": true,
+              "api_status": false,
+              "api_error_msg": "No EPO OPS credentials",
+              "normalized_state": "SOURCE_UNAVAILABLE",
+              "failure_substate": "AUTH_FAILURE",
+              "patents_returned": 0,
+              "latency_ms": 0
+            },
+            {
+              "source": "CITED_ART_INJECTION",
+              "attempted": true,
+              "api_status": true,
+              "api_error_msg": "",
+              "normalized_state": "SEARCH_RETURNED_PATENTS",
+              "failure_substate": "NONE",
+              "patents_returned": 3,
+              "latency_ms": 0
+            }
+          ],
+          "patents_discovered_count": 3,
+          "primary_source": "CITED_ART_INJECTION"
+        },
+        {
+          "step": "SOURCE",
+          "sources_used": [
+            "EPO_OPS",
+            "CITED_ART_INJECTION"
+          ],
+          "source_provenances": [
+            {
+              "source": "PROSECUTION_RECORD",
+              "retrieved_at_utc": "2026-08-16T18:40:47.775744+00:00",
+              "fields_supplied": [
+                "identity"
+              ],
+              "note": "Examiner-cited prior art from prosecution history"
+            }
+          ]
+        },
+        {
+          "step": "PATENT_ID",
+          "patent_number": "US11912894B2",
+          "verified": true
+        },
+        {
+          "step": "CLAIM",
+          "claims_count": 0,
+          "claims_excerpt": "",
+          "independent_claims": 0
+        },
+        {
+          "step": "CLAIM_HASH",
+          "hash": "",
+          "hash_present": false
+        },
+        {
+          "step": "PRIORITY",
+          "priority_date": "",
+          "publication_date": "",
+          "filing_date": ""
+        },
+        {
+          "step": "FAMILY",
+          "family_id": "",
+          "family_type": "",
+          "family_members_count": 0,
+          "family_members_sample": []
+        },
+        {
+          "step": "CPC",
+          "cpc_codes": [],
+          "ipc_codes": []
+        },
+        {
+          "step": "CITATIONS",
+          "backward_citations_count": 0,
+          "backward_citations_sample": []
+        },
+        {
+          "step": "RELEVANCE",
+          "relevance_score": 0.0,
+          "relevance_method": "placeholder (full check in claim_relevance.py)"
+        }
+      ],
+      "sources_used": [
+        "EPO_OPS",
+        "CITED_ART_INJECTION"
+      ],
+      "gold_evidence": {
+        "is_gold": false,
+        "checklist": {
+          "verified_patent_identity": true,
+          "actual_claim_text": false,
+          "publication_date": false,
+          "priority_date": false,
+          "family_provenance": false,
+          "content_hash": false,
+          "current_claim_relevance": true,
+          "source_provenance": true
+        },
+        "source_count": 1,
+        "cross_source_corroboration": false
+      },
+      "final_record": {
+        "patent_number": "US11912894B2",
+        "title": "",
+        "abstract": "",
+        "assignee": "",
+        "inventor": "",
+        "publication_date": "",
+        "priority_date": "",
+        "filing_date": "",
+        "country_code": "",
+        "kind_code": "",
+        "cpc_codes": [],
+        "ipc_codes": [],
+        "family_id": "",
+        "family_type": "",
+        "family_members": [],
+        "claims": [],
+        "claim_count": 0,
+        "independent_claim_count": 0,
+        "claim_content_hash": "",
+        "backward_citations": [],
+        "forward_citations": [],
+        "source_provenances": [
+          {
+            "source": "PROSECUTION_RECORD",
+            "retrieved_at_utc": "2026-08-16T18:40:47.775744+00:00",
+            "fields_supplied": [
+              "identity"
+            ],
+            "note": "Examiner-cited prior art from prosecution history"
+          }
+        ],
+        "is_gold": false,
+        "gold_checklist": {
+          "verified_patent_identity": true,
+          "actual_claim_text": false,
+          "publication_date": false,
+          "priority_date": false,
+          "family_provenance": false,
+          "content_hash": false,
+          "current_claim_relevance": true,
+          "source_provenance": true
+        },
+        "retrieved_at_utc": "2026-08-16T18:40:47.775738+00:00"
+      },
+      "case_id": "CV2_G_01",
+      "case_title": "Antimicrobial and antifouling conformal hydrogel coatings"
+    },
+    {
+      "patent_number": "US20030000656A1",
+      "normalized": "US20030000656A1",
+      "steps": [
+        {
+          "step": "QUERY",
+          "query": "Medical device with antimicrobial coating",
+          "family_id": "Q12_CITATION_NEIGHBORHOOD",
+          "sources_attempted": [
+            {
+              "source": "EPO_OPS",
+              "attempted": true,
+              "api_status": false,
+              "api_error_msg": "No EPO OPS credentials",
+              "normalized_state": "SOURCE_UNAVAILABLE",
+              "failure_substate": "AUTH_FAILURE",
+              "patents_returned": 0,
+              "latency_ms": 0
+            },
+            {
+              "source": "CITED_ART_INJECTION",
+              "attempted": true,
+              "api_status": true,
+              "api_error_msg": "",
+              "normalized_state": "SEARCH_RETURNED_PATENTS",
+              "failure_substate": "NONE",
+              "patents_returned": 3,
+              "latency_ms": 0
+            }
+          ],
+          "patents_discovered_count": 3,
+          "primary_source": "CITED_ART_INJECTION"
+        },
+        {
+          "step": "SOURCE",
+          "sources_used": [
+            "EPO_OPS",
+            "CITED_ART_INJECTION"
+          ],
+          "source_provenances": [
+            {
+              "source": "PROSECUTION_RECORD",
+              "retrieved_at_utc": "2026-08-16T18:40:48.530152+00:00",
+              "fields_supplied": [
+                "identity"
+              ],
+              "note": "Examiner-cited prior art from prosecution history"
+            }
+          ]
+        },
+        {
+          "step": "PATENT_ID",
+          "patent_number": "US20030000656A1",
+          "verified": true
+        },
+        {
+          "step": "CLAIM",
+          "claims_count": 0,
+          "claims_excerpt": "",
+          "independent_claims": 0
+        },
+        {
+          "step": "CLAIM_HASH",
+          "hash": "",
+          "hash_present": false
+        },
+        {
+          "step": "PRIORITY",
+          "priority_date": "",
+          "publication_date": "",
+          "filing_date": ""
+        },
+        {
+          "step": "FAMILY",
+          "family_id": "",
+          "family_type": "",
+          "family_members_count": 0,
+          "family_members_sample": []
+        },
+        {
+          "step": "CPC",
+          "cpc_codes": [],
+          "ipc_codes": []
+        },
+        {
+          "step": "CITATIONS",
+          "backward_citations_count": 0,
+          "backward_citations_sample": []
+        },
+        {
+          "step": "RELEVANCE",
+          "relevance_score": 0.0,
+          "relevance_method": "placeholder (full check in claim_relevance.py)"
+        }
+      ],
+      "sources_used": [
+        "EPO_OPS",
+        "CITED_ART_INJECTION"
+      ],
+      "gold_evidence": {
+        "is_gold": false,
+        "checklist": {
+          "verified_patent_identity": true,
+          "actual_claim_text": false,
+          "publication_date": false,
+          "priority_date": false,
+          "family_provenance": false,
+          "content_hash": false,
+          "current_claim_relevance": true,
+          "source_provenance": true
+        },
+        "source_count": 1,
+        "cross_source_corroboration": false
+      },
+      "final_record": {
+        "patent_number": "US20030000656A1",
+        "title": "",
+        "abstract": "",
+        "assignee": "",
+        "inventor": "",
+        "publication_date": "",
+        "priority_date": "",
+        "filing_date": "",
+        "country_code": "",
+        "kind_code": "",
+        "cpc_codes": [],
+        "ipc_codes": [],
+        "family_id": "",
+        "family_type": "",
+        "family_members": [],
+        "claims": [],
+        "claim_count": 0,
+        "independent_claim_count": 0,
+        "claim_content_hash": "",
+        "backward_citations": [],
+        "forward_citations": [],
+        "source_provenances": [
+          {
+            "source": "PROSECUTION_RECORD",
+            "retrieved_at_utc": "2026-08-16T18:40:48.530152+00:00",
+            "fields_supplied": [
+              "identity"
+            ],
+            "note": "Examiner-cited prior art from prosecution history"
+          }
+        ],
+        "is_gold": false,
+        "gold_checklist": {
+          "verified_patent_identity": true,
+          "actual_claim_text": false,
+          "publication_date": false,
+          "priority_date": false,
+          "family_provenance": false,
+          "content_hash": false,
+          "current_claim_relevance": true,
+          "source_provenance": true
+        },
+        "retrieved_at_utc": "2026-08-16T18:40:48.530148+00:00"
+      },
+      "case_id": "CV2_A_01",
+      "case_title": "Medical device with antimicrobial coating"
+    },
+    {
+      "patent_number": "US20110215414A1",
+      "normalized": "US20110215414A1",
+      "steps": [
+        {
+          "step": "QUERY",
+          "query": "Biosensor with mechanical shutter",
+          "family_id": "Q12_CITATION_NEIGHBORHOOD",
+          "sources_attempted": [
+            {
+              "source": "EPO_OPS",
+              "attempted": true,
+              "api_status": false,
+              "api_error_msg": "No EPO OPS credentials",
+              "normalized_state": "SOURCE_UNAVAILABLE",
+              "failure_substate": "AUTH_FAILURE",
+              "patents_returned": 0,
+              "latency_ms": 0
+            },
+            {
+              "source": "CITED_ART_INJECTION",
+              "attempted": true,
+              "api_status": true,
+              "api_error_msg": "",
+              "normalized_state": "SEARCH_RETURNED_PATENTS",
+              "failure_substate": "NONE",
+              "patents_returned": 3,
+              "latency_ms": 0
+            }
+          ],
+          "patents_discovered_count": 3,
+          "primary_source": "CITED_ART_INJECTION"
+        },
+        {
+          "step": "SOURCE",
+          "sources_used": [
+            "EPO_OPS",
+            "CITED_ART_INJECTION"
+          ],
+          "source_provenances": [
+            {
+              "source": "PROSECUTION_RECORD",
+              "retrieved_at_utc": "2026-08-16T18:40:49.241463+00:00",
+              "fields_supplied": [
+                "identity"
+              ],
+              "note": "Examiner-cited prior art from prosecution history"
+            }
+          ]
+        },
+        {
+          "step": "PATENT_ID",
+          "patent_number": "US20110215414A1",
+          "verified": true
+        },
+        {
+          "step": "CLAIM",
+          "claims_count": 0,
+          "claims_excerpt": "",
+          "independent_claims": 0
+        },
+        {
+          "step": "CLAIM_HASH",
+          "hash": "",
+          "hash_present": false
+        },
+        {
+          "step": "PRIORITY",
+          "priority_date": "",
+          "publication_date": "",
+          "filing_date": ""
+        },
+        {
+          "step": "FAMILY",
+          "family_id": "",
+          "family_type": "",
+          "family_members_count": 0,
+          "family_members_sample": []
+        },
+        {
+          "step": "CPC",
+          "cpc_codes": [],
+          "ipc_codes": []
+        },
+        {
+          "step": "CITATIONS",
+          "backward_citations_count": 0,
+          "backward_citations_sample": []
+        },
+        {
+          "step": "RELEVANCE",
+          "relevance_score": 0.0,
+          "relevance_method": "placeholder (full check in claim_relevance.py)"
+        }
+      ],
+      "sources_used": [
+        "EPO_OPS",
+        "CITED_ART_INJECTION"
+      ],
+      "gold_evidence": {
+        "is_gold": false,
+        "checklist": {
+          "verified_patent_identity": true,
+          "actual_claim_text": false,
+          "publication_date": false,
+          "priority_date": false,
+          "family_provenance": false,
+          "content_hash": false,
+          "current_claim_relevance": true,
+          "source_provenance": true
+        },
+        "source_count": 1,
+        "cross_source_corroboration": false
+      },
+      "final_record": {
+        "patent_number": "US20110215414A1",
+        "title": "",
+        "abstract": "",
+        "assignee": "",
+        "inventor": "",
+        "publication_date": "",
+        "priority_date": "",
+        "filing_date": "",
+        "country_code": "",
+        "kind_code": "",
+        "cpc_codes": [],
+        "ipc_codes": [],
+        "family_id": "",
+        "family_type": "",
+        "family_members": [],
+        "claims": [],
+        "claim_count": 0,
+        "independent_claim_count": 0,
+        "claim_content_hash": "",
+        "backward_citations": [],
+        "forward_citations": [],
+        "source_provenances": [
+          {
+            "source": "PROSECUTION_RECORD",
+            "retrieved_at_utc": "2026-08-16T18:40:49.241463+00:00",
+            "fields_supplied": [
+              "identity"
+            ],
+            "note": "Examiner-cited prior art from prosecution history"
+          }
+        ],
+        "is_gold": false,
+        "gold_checklist": {
+          "verified_patent_identity": true,
+          "actual_claim_text": false,
+          "publication_date": false,
+          "priority_date": false,
+          "family_provenance": false,
+          "content_hash": false,
+          "current_claim_relevance": true,
+          "source_provenance": true
+        },
+        "retrieved_at_utc": "2026-08-16T18:40:49.241455+00:00"
+      },
+      "case_id": "CV2_A_02",
+      "case_title": "Biosensor with mechanical shutter"
+    },
+    {
+      "patent_number": "US10919033B2",
+      "normalized": "US10919033B2",
+      "steps": [
+        {
+          "step": "QUERY",
+          "query": "Flow cells with hydrogel coating",
+          "family_id": "Q12_CITATION_NEIGHBORHOOD",
+          "sources_attempted": [
+            {
+              "source": "EPO_OPS",
+              "attempted": true,
+              "api_status": false,
+              "api_error_msg": "No EPO OPS credentials",
+              "normalized_state": "SOURCE_UNAVAILABLE",
+              "failure_substate": "AUTH_FAILURE",
+              "patents_returned": 0,
+              "latency_ms": 0
+            },
+            {
+              "source": "CITED_ART_INJECTION",
+              "attempted": true,
+              "api_status": true,
+              "api_error_msg": "",
+              "normalized_state": "SEARCH_RETURNED_PATENTS",
+              "failure_substate": "NONE",
+              "patents_returned": 1,
+              "latency_ms": 0
+            }
+          ],
+          "patents_discovered_count": 1,
+          "primary_source": "CITED_ART_INJECTION"
+        },
+        {
+          "step": "SOURCE",
+          "sources_used": [
+            "EPO_OPS",
+            "CITED_ART_INJECTION"
+          ],
+          "source_provenances": [
+            {
+              "source": "PROSECUTION_RECORD",
+              "retrieved_at_utc": "2026-08-16T18:40:50.015047+00:00",
+              "fields_supplied": [
+                "identity"
+              ],
+              "note": "Examiner-cited prior art from prosecution history"
+            }
+          ]
+        },
+        {
+          "step": "PATENT_ID",
+          "patent_number": "US10919033B2",
+          "verified": true
+        },
+        {
+          "step": "CLAIM",
+          "claims_count": 0,
+          "claims_excerpt": "",
+          "independent_claims": 0
+        },
+        {
+          "step": "CLAIM_HASH",
+          "hash": "",
+          "hash_present": false
+        },
+        {
+          "step": "PRIORITY",
+          "priority_date": "",
+          "publication_date": "",
+          "filing_date": ""
+        },
+        {
+          "step": "FAMILY",
+          "family_id": "",
+          "family_type": "",
+          "family_members_count": 0,
+          "family_members_sample": []
+        },
+        {
+          "step": "CPC",
+          "cpc_codes": [],
+          "ipc_codes": []
+        },
+        {
+          "step": "CITATIONS",
+          "backward_citations_count": 0,
+          "backward_citations_sample": []
+        },
+        {
+          "step": "RELEVANCE",
+          "relevance_score": 0.0,
+          "relevance_method": "placeholder (full check in claim_relevance.py)"
+        }
+      ],
+      "sources_used": [
+        "EPO_OPS",
+        "CITED_ART_INJECTION"
+      ],
+      "gold_evidence": {
+        "is_gold": false,
+        "checklist": {
+          "verified_patent_identity": true,
+          "actual_claim_text": false,
+          "publication_date": false,
+          "priority_date": false,
+          "family_provenance": false,
+          "content_hash": false,
+          "current_claim_relevance": true,
+          "source_provenance": true
+        },
+        "source_count": 1,
+        "cross_source_corroboration": false
+      },
+      "final_record": {
+        "patent_number": "US10919033B2",
+        "title": "",
+        "abstract": "",
+        "assignee": "",
+        "inventor": "",
+        "publication_date": "",
+        "priority_date": "",
+        "filing_date": "",
+        "country_code": "",
+        "kind_code": "",
+        "cpc_codes": [],
+        "ipc_codes": [],
+        "family_id": "",
+        "family_type": "",
+        "family_members": [],
+        "claims": [],
+        "claim_count": 0,
+        "independent_claim_count": 0,
+        "claim_content_hash": "",
+        "backward_citations": [],
+        "forward_citations": [],
+        "source_provenances": [
+          {
+            "source": "PROSECUTION_RECORD",
+            "retrieved_at_utc": "2026-08-16T18:40:50.015047+00:00",
+            "fields_supplied": [
+              "identity"
+            ],
+            "note": "Examiner-cited prior art from prosecution history"
+          }
+        ],
+        "is_gold": false,
+        "gold_checklist": {
+          "verified_patent_identity": true,
+          "actual_claim_text": false,
+          "publication_date": false,
+          "priority_date": false,
+          "family_provenance": false,
+          "content_hash": false,
+          "current_claim_relevance": true,
+          "source_provenance": true
+        },
+        "retrieved_at_utc": "2026-08-16T18:40:50.015044+00:00"
+      },
+      "case_id": "CV2_G_02",
+      "case_title": "Flow cells with hydrogel coating"
+    },
+    {
+      "patent_number": "US11747519B2",
+      "normalized": "US11747519B2",
+      "steps": [
+        {
+          "step": "QUERY",
+          "query": "Silicone hydrogel lens with crosslinked hydrophilic coating",
+          "family_id": "Q12_CITATION_NEIGHBORHOOD",
+          "sources_attempted": [
+            {
+              "source": "EPO_OPS",
+              "attempted": true,
+              "api_status": false,
+              "api_error_msg": "No EPO OPS credentials",
+              "normalized_state": "SOURCE_UNAVAILABLE",
+              "failure_substate": "AUTH_FAILURE",
+              "patents_returned": 0,
+              "latency_ms": 0
+            },
+            {
+              "source": "CITED_ART_INJECTION",
+              "attempted": true,
+              "api_status": true,
+              "api_error_msg": "",
+              "normalized_state": "SEARCH_RETURNED_PATENTS",
+              "failure_substate": "NONE",
+              "patents_returned": 1,
+              "latency_ms": 0
+            }
+          ],
+          "patents_discovered_count": 1,
+          "primary_source": "CITED_ART_INJECTION"
+        },
+        {
+          "step": "SOURCE",
+          "sources_used": [
+            "EPO_OPS",
+            "CITED_ART_INJECTION"
+          ],
+          "source_provenances": [
+            {
+              "source": "PROSECUTION_RECORD",
+              "retrieved_at_utc": "2026-08-16T18:40:50.293641+00:00",
+              "fields_supplied": [
+                "identity"
+              ],
+              "note": "Examiner-cited prior art from prosecution history"
+            }
+          ]
+        },
+        {
+          "step": "PATENT_ID",
+          "patent_number": "US11747519B2",
+          "verified": true
+        },
+        {
+          "step": "CLAIM",
+          "claims_count": 0,
+          "claims_excerpt": "",
+          "independent_claims": 0
+        },
+        {
+          "step": "CLAIM_HASH",
+          "hash": "",
+          "hash_present": false
+        },
+        {
+          "step": "PRIORITY",
+          "priority_date": "",
+          "publication_date": "",
+          "filing_date": ""
+        },
+        {
+          "step": "FAMILY",
+          "family_id": "",
+          "family_type": "",
+          "family_members_count": 0,
+          "family_members_sample": []
+        },
+        {
+          "step": "CPC",
+          "cpc_codes": [],
+          "ipc_codes": []
+        },
+        {
+          "step": "CITATIONS",
+          "backward_citations_count": 0,
+          "backward_citations_sample": []
+        },
+        {
+          "step": "RELEVANCE",
+          "relevance_score": 0.0,
+          "relevance_method": "placeholder (full check in claim_relevance.py)"
+        }
+      ],
+      "sources_used": [
+        "EPO_OPS",
+        "CITED_ART_INJECTION"
+      ],
+      "gold_evidence": {
+        "is_gold": false,
+        "checklist": {
+          "verified_patent_identity": true,
+          "actual_claim_text": false,
+          "publication_date": false,
+          "priority_date": false,
+          "family_provenance": false,
+          "content_hash": false,
+          "current_claim_relevance": true,
+          "source_provenance": true
+        },
+        "source_count": 1,
+        "cross_source_corroboration": false
+      },
+      "final_record": {
+        "patent_number": "US11747519B2",
+        "title": "",
+        "abstract": "",
+        "assignee": "",
+        "inventor": "",
+        "publication_date": "",
+        "priority_date": "",
+        "filing_date": "",
+        "country_code": "",
+        "kind_code": "",
+        "cpc_codes": [],
+        "ipc_codes": [],
+        "family_id": "",
+        "family_type": "",
+        "family_members": [],
+        "claims": [],
+        "claim_count": 0,
+        "independent_claim_count": 0,
+        "claim_content_hash": "",
+        "backward_citations": [],
+        "forward_citations": [],
+        "source_provenances": [
+          {
+            "source": "PROSECUTION_RECORD",
+            "retrieved_at_utc": "2026-08-16T18:40:50.293641+00:00",
+            "fields_supplied": [
+              "identity"
+            ],
+            "note": "Examiner-cited prior art from prosecution history"
+          }
+        ],
+        "is_gold": false,
+        "gold_checklist": {
+          "verified_patent_identity": true,
+          "actual_claim_text": false,
+          "publication_date": false,
+          "priority_date": false,
+          "family_provenance": false,
+          "content_hash": false,
+          "current_claim_relevance": true,
+          "source_provenance": true
+        },
+        "retrieved_at_utc": "2026-08-16T18:40:50.293637+00:00"
+      },
+      "case_id": "CV2_G_03",
+      "case_title": "Silicone hydrogel lens with crosslinked hydrophilic coating"
+    }
+  ],
+  "summary": {
+    "total_cases": 5,
+    "gold_evidence_count": 0,
+    "multi_source_corroboration_count": 0,
+    "pass_5_of_5": false,
+    "ceo_acceptance_gate": "FAIL"
+  }
+}
