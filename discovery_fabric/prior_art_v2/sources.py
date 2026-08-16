@@ -39,6 +39,7 @@ def _load_keys() -> Dict[str, str]:
 _KEYS = _load_keys()
 LENS_TOKEN = _KEYS.get("LENS_API_TOKEN", "")
 PATSNAP_KEY = _KEYS.get("PATSNAP_EUREKA_API_KEY", "")
+PATENT_BEAR_KEY = _KEYS.get("PATENT_BEAR_API_KEY", "")
 
 # SSL context (permissive for testing; tighten for production)
 _SSL = ssl.create_default_context()
@@ -455,17 +456,275 @@ def search_patsnap_eureka(query: str, num_results: int = 8) -> SourceQueryResult
     )
 
 
+# ----------------------- SOURCE 4: PATENT_BEAR (MCP) -----------------------
+def search_patent_bear(query: str, num_results: int = 8) -> SourceQueryResult:
+    """
+    Search Patent Bear via MCP (Model Context Protocol) JSON-RPC endpoint.
+
+    Patent Bear exposes a Supabase Edge Function backend at api.patentbear.com
+    that is accessed via MCP at https://www.patentbear.com/mcp using Bearer auth.
+
+    MCP tools available:
+      - search_patents: keyword/identifier search across patents, publications, NPL
+      - get_patent_record: full text fetch by patent id
+
+    Rate limit: 20 searches/month on this key (tracked in usage response).
+    """
+    if not PATENT_BEAR_KEY:
+        return SourceQueryResult(
+            source_id="PATENT_BEAR",
+            success=False,
+            latency_ms=0,
+            error="PATENT_BEAR_API_KEY not configured",
+        )
+
+    url = "https://www.patentbear.com/mcp"
+    # Cap at 25 (Patent Bear max_hits limit)
+    max_hits = min(num_results, 25)
+    # Patent Bear has query length limits — truncate to 200 chars to avoid HTTP 502
+    truncated_query = query[:200]
+
+    # Patent Bear's "scope=all" sometimes returns HTTP 502 (upstream NPL index issue).
+    # Default to "patents" which is more reliable; NPL is already covered by LENS_SCHOLARLY.
+    def _do_search(scope_value: str) -> Tuple[int, bytes, int]:
+        payload = json.dumps({
+            "jsonrpc": "2.0",
+            "id": int(time.time() * 1000) % 1000000,
+            "method": "tools/call",
+            "params": {
+                "name": "search_patents",
+                "arguments": {
+                    "query": truncated_query,
+                    "max_hits": max_hits,
+                    "scope": scope_value,
+                    "sort": "relevance",
+                }
+            }
+        }).encode()
+        return _http_post(url, payload, headers=headers, timeout=30)
+
+    headers = {
+        "Authorization": f"Bearer {PATENT_BEAR_KEY}",
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream",
+        "MCP-Protocol-Version": "2025-06-18",
+    }
+
+    # Try "all" first, fall back to "patents" on 502
+    status, body, latency = _do_search("all")
+    used_fallback = False
+    if status == 200:
+        try:
+            data_check = json.loads(body)
+            if "error" in data_check and "502" in str(data_check.get("error", {}).get("message", "")):
+                # Fallback to patents-only
+                status, body, latency = _do_search("patents")
+                used_fallback = True
+        except Exception:
+            pass
+
+    if status != 200:
+        return SourceQueryResult(
+            source_id="PATENT_BEAR",
+            success=False,
+            latency_ms=latency,
+            error=f"HTTP {status}: {body.decode('utf-8', errors='ignore')[:200]}",
+            error_code=status,
+        )
+
+    try:
+        data = json.loads(body)
+    except Exception as e:
+        return SourceQueryResult(
+            source_id="PATENT_BEAR",
+            success=False,
+            latency_ms=latency,
+            error=f"JSON parse error: {e}",
+        )
+
+    # Check for MCP error
+    if "error" in data:
+        err = data["error"]
+        return SourceQueryResult(
+            source_id="PATENT_BEAR",
+            success=False,
+            latency_ms=latency,
+            error=f"MCP error {err.get('code')}: {err.get('message','')[:200]}",
+            error_code=err.get("code"),
+        )
+
+    # Extract text content from MCP response
+    result = data.get("result", {})
+    content = result.get("content", [])
+    if not content:
+        return SourceQueryResult(
+            source_id="PATENT_BEAR",
+            success=False,
+            latency_ms=latency,
+            error="Empty MCP content",
+        )
+
+    text_content = ""
+    for c in content:
+        if c.get("type") == "text":
+            text_content = c.get("text", "")
+            break
+
+    if not text_content:
+        return SourceQueryResult(
+            source_id="PATENT_BEAR",
+            success=False,
+            latency_ms=latency,
+            error="No text content in MCP response",
+        )
+
+    # Parse the text content as JSON (Patent Bear returns JSON-encoded search results)
+    try:
+        search_data = json.loads(text_content)
+    except json.JSONDecodeError as e:
+        return SourceQueryResult(
+            source_id="PATENT_BEAR",
+            success=False,
+            latency_ms=latency,
+            error=f"Search results parse error: {e}",
+        )
+
+    # Build PriorArtHit objects
+    hits: List[PriorArtHit] = []
+    for record in search_data.get("hits", []):
+        pid = record.get("id", "")  # e.g. "US10919033B2"
+        title = record.get("title", "")
+        abstract = record.get("abstract", "") or ""
+
+        # Build snippet from abstract + matched text
+        snippet_parts = [abstract[:300]] if abstract else []
+        snippet_data = record.get("snippet", {}) or {}
+        for field in ("abstract", "claimsText", "descriptionText"):
+            for s in snippet_data.get(field, [])[:2]:
+                snippet_parts.append(_strip_html(s)[:200])
+        snippet = " | ".join(snippet_parts)[:600]
+
+        # Authors/assignee
+        assignee = record.get("assignee") or record.get("assigneeName")
+        assignees = [assignee] if assignee else []
+        # For NPL articles, use authors
+        if record.get("source_type") == "article":
+            authors = record.get("authors", [])
+            if authors:
+                assignees = authors
+
+        pub_date = record.get("publication_date") or record.get("issue_date")
+        if pub_date:
+            pub_date = pub_date[:10]  # YYYY-MM-DD
+
+        source_url = record.get("source_url") or record.get("url", "")
+        doi = record.get("doi")
+        # If source_type is article and has DOI, set doi
+        if record.get("source_type") == "article" and not doi:
+            doi = record.get("externalIds", {}).get("doi") if isinstance(record.get("externalIds"), dict) else None
+
+        hit = PriorArtHit(
+            source_id="PATENT_BEAR",
+            source_url=source_url,
+            retrieved_at_utc=_now_utc(),
+            query=query,
+            raw_payload_sha256=_sha256(json.dumps(record, sort_keys=True)),
+            title=title,
+            snippet=snippet,
+            assignee_or_authors=assignees,
+            publication_date=pub_date,
+            patent_id=pid if record.get("source_type") in ("patent", "publication") else None,
+            doi=doi,
+            raw_metadata={
+                "source_type": record.get("source_type"),
+                "patent_number": record.get("patent_number"),
+                "inventors": record.get("inventors", []),
+                "cpc": record.get("cpc", []),
+                "publication_date": record.get("publication_date"),
+                "issue_date": record.get("issue_date"),
+                "assignee": record.get("assignee"),
+                "full_text_url": record.get("full_text_url"),
+                "snippet_raw": snippet_data,
+            },
+        )
+        hits.append(hit)
+
+    # Track usage in error field if rate limit hit (informational)
+    usage = search_data.get("usage", {})
+
+    return SourceQueryResult(
+        source_id="PATENT_BEAR",
+        success=True,
+        latency_ms=latency,
+        hits=hits,
+        rate_limit_remaining=usage.get("monthly_remaining"),
+    )
+
+
+def fetch_patent_bear_record(patent_id: str) -> Dict[str, Any]:
+    """
+    Fetch the full text of a patent via Patent Bear MCP get_patent_record tool.
+    Returns dict with: patent_id, title, abstract, claims (list), description, fetched_at_utc
+    """
+    if not PATENT_BEAR_KEY:
+        return {"patent_id": patent_id, "error": "PATENT_BEAR_API_KEY not configured"}
+
+    url = "https://www.patentbear.com/mcp"
+    payload = json.dumps({
+        "jsonrpc": "2.0",
+        "id": int(time.time() * 1000) % 1000000,
+        "method": "tools/call",
+        "params": {
+            "name": "get_patent_record",
+            "arguments": {
+                "id": patent_id,
+                "format": "both",
+                "fields": "abstract,claims,description",
+            }
+        }
+    }).encode()
+
+    headers = {
+        "Authorization": f"Bearer {PATENT_BEAR_KEY}",
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream",
+        "MCP-Protocol-Version": "2025-06-18",
+    }
+    status, body, latency = _http_post(url, payload, headers=headers, timeout=30)
+    if status != 200:
+        return {"patent_id": patent_id, "error": f"HTTP {status}", "latency_ms": latency}
+
+    try:
+        data = json.loads(body)
+        if "error" in data:
+            return {"patent_id": patent_id, "error": f"MCP: {data['error'].get('message','')[:200]}"}
+        content = data.get("result", {}).get("content", [])
+        for c in content:
+            if c.get("type") == "text":
+                record = json.loads(c.get("text", "{}"))
+                record["patent_id"] = patent_id
+                record["fetched_at_utc"] = _now_utc()
+                record["latency_ms"] = latency
+                record["raw_payload_sha256"] = _sha256(body)
+                return record
+    except Exception as e:
+        return {"patent_id": patent_id, "error": f"Parse error: {e}", "latency_ms": latency}
+
+    return {"patent_id": patent_id, "error": "No content", "latency_ms": latency}
+
+
 # ----------------------- UNIFIED SEARCH -----------------------
 def search_all_sources(query: str, num_per_source: int = 8) -> Dict[str, SourceQueryResult]:
     """
-    Query ALL three prior-art sources in parallel.
+    Query ALL prior-art sources in parallel.
     Returns a dict mapping source_id -> SourceQueryResult.
     """
-    with ThreadPoolExecutor(max_workers=3) as ex:
+    with ThreadPoolExecutor(max_workers=4) as ex:
         futures = {
             ex.submit(search_google_patents, query, num_per_source): "GOOGLE_PATENTS",
             ex.submit(search_lens_scholarly, query, num_per_source): "LENS_SCHOLARLY",
             ex.submit(search_patsnap_eureka, query, num_per_source): "PATSNAP_EUREKA",
+            ex.submit(search_patent_bear, query, num_per_source): "PATENT_BEAR",
         }
         results: Dict[str, SourceQueryResult] = {}
         for f in as_completed(futures):
@@ -508,6 +767,17 @@ def get_source_status() -> Dict[str, Dict[str, Any]]:
             "error_code": 67200203,
             "verified_at": _now_utc(),
         },
+        "PATENT_BEAR": {
+            "endpoint": "https://www.patentbear.com/mcp",
+            "auth": "Bearer token (MCP JSON-RPC)",
+            "token_present": bool(PATENT_BEAR_KEY),
+            "token_length": len(PATENT_BEAR_KEY),
+            "status": "LIVE" if PATENT_BEAR_KEY else "NO_TOKEN",
+            "protocol": "MCP 2025-06-18",
+            "tools": ["search_patents", "get_patent_record"],
+            "rate_limit": "20 searches/month on this key tier",
+            "verified_at": _now_utc(),
+        },
     }
 
 
@@ -518,11 +788,12 @@ if __name__ == "__main__":
     print("="*60)
     print(f"LENS token present: {bool(LENS_TOKEN)} (len={len(LENS_TOKEN)})")
     print(f"PATSNAP key present: {bool(PATSNAP_KEY)} (len={len(PATSNAP_KEY)})")
+    print(f"PATENT_BEAR key present: {bool(PATENT_BEAR_KEY)} (len={len(PATENT_BEAR_KEY)})")
 
     test_query = "hydrogel coating nanofiber reinforcement medical device"
 
     print(f"\nTest query: {test_query}")
-    print("\nQuerying 3 sources in parallel...")
+    print("\nQuerying 4 sources in parallel...")
 
     results = search_all_sources(test_query, num_per_source=5)
 

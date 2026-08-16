@@ -423,8 +423,25 @@ class EliteAuditor:
 
     # ----------------------- STEP 1: PRIOR-ART SEARCH -----------------------
     def _search_prior_art(self, claim_text: str) -> Dict[str, Any]:
-        """Run real prior-art search via the V2 sources adapter."""
-        query = claim_text[:250]
+        """Run real prior-art search via the V2 sources adapter.
+
+        Extracts a focused search query (key technical terms) rather than
+        passing the full claim text, because some sources (Patent Bear) have
+        query length limits and reject queries with special characters.
+        """
+        import re as _re
+        # Remove common claim boilerplate
+        cleaned = _re.sub(r'^(A|An|The)\s+(method|apparatus|device|system|composition|article|coating|compound)\s+(for|comprising|including|of|having)', '', claim_text, flags=_re.IGNORECASE)
+        # Remove "comprising", "wherein", "configured to", etc.
+        cleaned = _re.sub(r'\b(comprising|wherein|configured to|adapted to|operably|coupled to|in fluid communication|characterized in that|characterized by)\b', '', cleaned, flags=_re.IGNORECASE)
+        # Remove element labels (A), B), C), etc.
+        cleaned = _re.sub(r'\b[A-Z]\)\s', ' ', cleaned)
+        # Remove special characters that some sources (Patent Bear) reject
+        cleaned = _re.sub(r'[;:()\[\]{}\"\'\\/&]', ' ', cleaned)
+        # Collapse whitespace
+        cleaned = _re.sub(r'\s+', ' ', cleaned).strip()
+        # Take first 120 chars (Patent Bear prefers shorter queries)
+        query = cleaned[:120] if cleaned else claim_text[:120]
         results = search_all_sources(query, num_per_source=self.num_per_source)
         return {
             sid: {
@@ -433,6 +450,7 @@ class EliteAuditor:
                 "hits": [asdict(h) for h in r.hits],
                 "error": r.error,
                 "error_code": r.error_code,
+                "query_used": query,  # record for forensic provenance
             } for sid, r in results.items()
         }
 

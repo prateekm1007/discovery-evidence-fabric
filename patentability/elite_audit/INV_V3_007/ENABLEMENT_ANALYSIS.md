@@ -1,8 +1,8 @@
 # Enablement Analysis (35 USC 112) — INV_V3_007
 
-**Status:** MODERATE
+**Status:** NONE
 
-**Rationale:** The claim lacks sufficient detail about how the optical filter array is configured to reduce signal degradation, what specific filters are used, and how the adaptive signal fusion based on PI thresholds is implemented. A PHOSITA would need to conduct extensive experimentation to determine the optimal filter configuration, signal processing algorithms, and PI threshold values to achieve the claimed improvement in SpO2 accuracy under low perfusion conditions. The specification doesn't provide enough guidance to enable one of ordinary skill in the art to make and use the invention without undue experimentation.
+**Rationale:** The enablement analysis requires understanding the technical details of the optical filter array, the PPG sensor configuration, and the adaptive signal processing algorithm. The provided prior-art references do not contain any information relevant to these technical aspects. Without relevant prior art, we cannot determine if the specification provides sufficient enablement.
 
 **Can survive:** True
 

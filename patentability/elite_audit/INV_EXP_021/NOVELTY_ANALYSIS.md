@@ -4,17 +4,17 @@
 
 **Primary reference:** None
 
-**Rationale:** NO_NOVELTY_ATTACK_POSSIBLE. None of the prior art references disclose all elements of the claim. While AU2019267711B2 mentions a composite material comprising a gel and nanostructures, it does not specifically disclose that the nanofibers enhance mechanical strength and reduce the impact of polymer chain scission. The other references discuss various hydrogel and polymer applications but do not specifically teach the combination of nanofibers in a hydrogel matrix with the specific benefits claimed.
+**Rationale:** NO_NOVELTY_ATTACK_POSSIBLE. None of the provided prior art references disclose a hydrogel coating reinforced with nanofibers that enhance mechanical strength and reduce polymer chain scission. The references are primarily about steel welding, glass fiber reinforced epoxy composites, AI in education, professional development, sandstone mechanics, and high entropy alloys. None of these references teach or suggest the specific combination of elements in the claim.
 
 **Elements addressed:** []
 
 **Can survive:** True
 
-**Survival path:** The claim survives because no single reference discloses all elements, particularly the specific functional benefits of nanofibers in enhancing mechanical strength and reducing polymer chain scission impact.
+**Survival path:** The claim survives because none of the prior art references disclose all elements of the claimed invention.
 
 **Rule:** Novelty failure requires ONE reference containing EVERY element. Multiple references cannot be combined.
 
 **Prior-art search provenance:**
-- Sources searched: ['GOOGLE_PATENTS', 'PATSNAP_EUREKA', 'LENS_SCHOLARLY']
-- Sources live: ['GOOGLE_PATENTS', 'LENS_SCHOLARLY']
+- Sources searched: ['LENS_SCHOLARLY', 'PATSNAP_EUREKA', 'PATENT_BEAR', 'GOOGLE_PATENTS']
+- Sources live: ['LENS_SCHOLARLY', 'GOOGLE_PATENTS']
 - Total hits: 16

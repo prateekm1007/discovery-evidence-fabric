@@ -4,17 +4,17 @@
 
 **Primary reference:** None
 
-**Rationale:** None of the provided prior-art references disclose any elements of the claim. The references are unrelated to smartwatches, optical filters, PPG sensors, or SpO2 monitoring. They cover topics like ship readiness, herbal medicine, alcohol withdrawal treatment, AI in education, ICU situation awareness, and workplace stress reduction. There is no disclosure of an optical filter array for reducing signal degradation under low perfusion conditions, a PPG sensor, or adaptive signal fusion based on perfusion index thresholds.
+**Rationale:** None of the provided prior-art references disclose any elements of the smartwatch health monitor claim. The references are unrelated to health monitoring, optical filters, PPG sensors, or signal processing for SpO2 measurement. There is no evidence in the provided prior art that discloses the claimed invention.
 
 **Elements addressed:** []
 
 **Can survive:** True
 
-**Survival path:** The claim survives this attack as there is no relevant prior art that discloses any of the claim elements.
+**Survival path:** The claim survives this attack as there is no relevant prior art in the provided references that discloses any element of the claimed invention.
 
 **Rule:** Novelty failure requires ONE reference containing EVERY element. Multiple references cannot be combined.
 
 **Prior-art search provenance:**
-- Sources searched: ['GOOGLE_PATENTS', 'PATSNAP_EUREKA', 'LENS_SCHOLARLY']
-- Sources live: ['GOOGLE_PATENTS', 'LENS_SCHOLARLY']
+- Sources searched: ['LENS_SCHOLARLY', 'PATSNAP_EUREKA', 'GOOGLE_PATENTS', 'PATENT_BEAR']
+- Sources live: ['LENS_SCHOLARLY', 'GOOGLE_PATENTS', 'PATENT_BEAR']
 - Total hits: 6
