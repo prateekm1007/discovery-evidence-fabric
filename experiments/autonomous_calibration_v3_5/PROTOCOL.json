@@ -1,0 +1,100 @@
+{
+  "protocol_name": "AUTONOMOUS_CALIBRATION_V3_5",
+  "version": "3.5",
+  "created_at": "2026-08-17T00:00:00Z",
+  "base_commit": "ff3be20",
+  "status_pre_inference": "CALIBRATION_BLOCKED",
+  "objective": "Prosecution-grounded 103 forensics. Determine WHY the 103 adversary disagrees with known prosecution outcomes. Build case-by-case forensic table comparing examiner vs system field-by-field. Do NOT simply make 103 more aggressive.",
+
+  "v3_4_frozen_results": {
+    "accuracy": 0.75,
+    "false_elite_rate": 0.00,
+    "false_reject_rate": 0.00,
+    "cited_art_recall": 1.00,
+    "search_recall": 0.786,
+    "102_accuracy": 0.85,
+    "103_accuracy": 0.15,
+    "hindsight_high": 0,
+    "kill_legal_count": 1,
+    "status": "CALIBRATION_BLOCKED",
+    "root_cause": "103 accuracy 15% — adversary too lenient. COULD/WOULD rule correctly prevents false_elite but also prevents true positives on abandoned cases."
+  },
+
+  "v3_5_changes_from_v3_4": [
+    "CASE-BY-CASE 103 FORENSIC TABLE: for every case with known 103 outcome, compare examiner fields vs system fields",
+    "103 ERROR CLASSIFICATION (no generic MODEL_FAILURE): GROUND_TRUTH_EXTRACTION_FAILURE / SEARCH_FAILURE / REFERENCE_SELECTION_FAILURE / DIFFERENCE_IDENTIFICATION_FAILURE / MOTIVATION_FAILURE / EXPECTATION_OF_SUCCESS_FAILURE / TEACHING_AWAY_FAILURE / TECHNICAL_EFFECT_FAILURE / HINDSIGHT_FAILURE / FINAL_ADJUDICATION_FAILURE",
+    "EXAMINER_GROUND_TRUTH vs SYSTEM_INDEPENDENT_ANALYSIS: preserve both. If system has defensible alternative rationale, record ALTERNATIVE_REASONING. Do not force model to imitate examiner language.",
+    "3-Candidate closest prior art: construct >=3 candidates, score by technical_field/purpose/technical_effect/structural_similarity/functional_similarity, select CLOSEST_PRIOR_ART with provenance",
+    "DIFFERENCE VECTOR: CLAIM minus CLOSEST_PRIOR_ART. Every difference: element_id + exact_claim_span + prior_art_status + technical_significance",
+    "MOTIVATION evidence sources: EXPRESS_MOTIVATION / KNOWN_PROBLEM / DESIGN_PRESSURE / MARKET_ENGINEERING_CONSTRAINT / REFERENCE_TEACHING / ESTABLISHED_ART_KNOWLEDGE / PREDICTABLE_SUBSTITUTION. Record motivation_source + exact_passage + why_it_supports_combination. If no support: MOTIVATION_INSUFFICIENT.",
+    "EXPECTATION OF SUCCESS: separate CAN_WORK from EXPECTED_TO_WORK. Require technical basis: compatible_mechanism / compatible_operating_regime / known_substitution / same_function / established_design_principle / experimental_evidence / reference_teaching. No 'PHOSITA would know this' without evidence.",
+    "TEACHING AWAY: search explicit and implicit teaching-away signals. Record supporting_passage + contradicting_passage + strength.",
+    "TECHNICAL EFFECT: for each difference, record predicted_effect + documented_effect + unexpected_effect. If unexpectedly superior, record why.",
+    "ANTI-HINDSIGHT two-pass: Pass A (invention hidden) vs Pass B (invention visible). Compare problem_definition/reference_selection/motivation/difference/expected_success. If reasoning appears only after seeing invention: HINDSIGHT_HIGH.",
+    "PROSECUTION-CITED 103 ART RECALL: retrieve every substantive examiner-cited reference relevant to 103. Measure CITED_103_ART_RECALL (separate from overall cited-art recall).",
+    "103 SEARCH EXPANSION: search forward_citations / backward_citations / family_members / CPC_neighbors / same_assignee / same_inventor / same_technical_problem. Objective: determine whether system can find same or materially equivalent obviousness evidence.",
+    "MODEL SEPARATION: 103 searcher != 103 adversary != final adjudicator. Prefer SEARCHER_MODEL / OBVIOUSNESS_MODEL / ADJUDICATOR_MODEL. Adjudicator receives structured evidence, not searcher's conclusion.",
+    "SCORE EVIDENCE NOT CONFIDENCE: every 103 conclusion must have evidence_count + strongest_evidence + weakest_link + uncertainty + alternative_explanation. No model confidence field can substitute for evidence."
+  ],
+
+  "acceptance_thresholds": {
+    "overall_accuracy_min": 0.85,
+    "false_elite_rate_max": 0.10,
+    "false_reject_rate_max": 0.10,
+    "cited_art_recall_min": 0.90,
+    "search_recall_min": 0.80,
+    "102_accuracy_min": 0.85,
+    "103_accuracy_min": 0.80,
+    "minimum_cases": 20
+  },
+
+  "motivation_evidence_sources": [
+    "EXPRESS_MOTIVATION",
+    "KNOWN_PROBLEM",
+    "DESIGN_PRESSURE",
+    "MARKET_ENGINEERING_CONSTRAINT",
+    "REFERENCE_TEACHING",
+    "ESTABLISHED_ART_KNOWLEDGE",
+    "PREDICTABLE_SUBSTITUTION"
+  ],
+
+  "expectation_evidence_sources": [
+    "COMPATIBLE_MECHANISM",
+    "COMPATIBLE_OPERATING_REGIME",
+    "KNOWN_SUBSTITUTION",
+    "SAME_FUNCTION",
+    "ESTABLISHED_DESIGN_PRINCIPLE",
+    "EXPERIMENTAL_EVIDENCE",
+    "REFERENCE_TEACHING"
+  ],
+
+  "error_attribution_categories": [
+    "GROUND_TRUTH_EXTRACTION_FAILURE",
+    "SEARCH_FAILURE",
+    "REFERENCE_SELECTION_FAILURE",
+    "DIFFERENCE_IDENTIFICATION_FAILURE",
+    "MOTIVATION_FAILURE",
+    "EXPECTATION_OF_SUCCESS_FAILURE",
+    "TEACHING_AWAY_FAILURE",
+    "TECHNICAL_EFFECT_FAILURE",
+    "HINDSIGHT_FAILURE",
+    "FINAL_ADJUDICATION_FAILURE",
+    "CORRECT"
+  ],
+
+  "output_artifacts": [
+    "PROTOCOL.json",
+    "PROTOCOL.sha256",
+    "PROTOCOL.md",
+    "PROSECUTION_GROUND_TRUTH.json",
+    "103_CASE_FORENSICS.json",
+    "103_CITED_ART_RECALL.json",
+    "SEARCH_EXPANSION.json",
+    "ERROR_ANALYSIS.json",
+    "METRICS.json",
+    "REPORT.md"
+  ],
+
+  "stop_rule": "DO NOT run 50->5 until V3.5 reaches all thresholds including 103>=80%.",
+  "failure_state": "CALIBRATION_BLOCKED"
+}
