@@ -1,0 +1,72 @@
+{
+  "protocol_name": "MODEL_CALIBRATION_V1",
+  "version": "1.0",
+  "created_at": "2026-08-17T00:00:00Z",
+  "base_commit": "218451a",
+  "status_pre_inference": "CALIBRATION_BLOCKED",
+  "objective": "Calibrate model routing. Test 3 conditions: A=Gemma-only, B=Nemotron-only, C=Gemma+Nemotron ensemble. Only variable is model routing. Frozen engine: search, claims, 102, 103 evidence graph, thresholds, case corpus.",
+
+  "frozen_engine": {
+    "search_pipeline": "V3.9 (14 search families, PatSnap claim-data)",
+    "claim_parsing": "V3.9 canonical claim + identity validation",
+    "novelty_102": "V3.4 passage-grounded 102",
+    "obviousness_103": "V3.9 separated 4-question chain (EVIDENCE_EXISTS / MOTIVATION / COMPATIBILITY / EXPECTATION + whole-claim + combination penalty)",
+    "hindsight": "V3.7 fixed (evidence retrieval != hindsight)",
+    "thresholds": "frozen: accuracy>=85%, false_elite<=10%, false_reject<=10%, 102>=85%, 103>=80%, 103_precision>=85%",
+    "case_corpus": "V2 20 cases (frozen, no mutation)"
+  },
+
+  "experimental_conditions": {
+    "A_GEMMA_ONLY": {
+      "model": "google/gemma-4-31b-it",
+      "role": "all LLM stages (GENERATOR, NOVELTY, OBVIOUSNESS, ADJUDICATION)",
+      "description": "Control condition — same as V3.9"
+    },
+    "B_NEMOTRON_ONLY": {
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "role": "all LLM stages",
+      "description": "Test whether Nemotron alone improves generalization"
+    },
+    "C_ENSEMBLE": {
+      "gemma_role": "MOTIVATION + EXPECTATION evidence extraction",
+      "nemotron_role": "INDEPENDENT ADVERSARIAL CHALLENGE (separate 103 analysis, not seeded with Gemma's reasoning)",
+      "adjudicator_role": "receives structured evidence from both, NOT model verdicts. Must NOT see 'Gemma says obvious' or 'Nemotron says not obvious'",
+      "description": "Test whether ensemble adds signal"
+    }
+  },
+
+  "ensemble_rules": {
+    "obviousness_risk_accepted": "only when structured evidence graph satisfies the same frozen gate",
+    "model_disagreement": "produces MODEL_DISAGREEMENT status, not automatic vote",
+    "no_probability_blending": "do not blend model probabilities",
+    "no_blind_majority_vote": "do not majority-vote blindly"
+  },
+
+  "metrics_per_condition": [
+    "overall_accuracy", "false_elite_rate", "false_reject_rate",
+    "102_accuracy", "103_accuracy", "103_precision", "103_recall",
+    "search_recall", "cited_art_recall",
+    "motivation_precision", "motivation_recall",
+    "expectation_precision", "expectation_recall",
+    "hindsight_high"
+  ],
+
+  "acceptance_gate": {
+    "accuracy_min": 0.85,
+    "false_elite_max": 0.10,
+    "false_reject_max": 0.10,
+    "cited_art_recall_min": 0.90,
+    "search_recall_min": 0.80,
+    "102_accuracy_min": 0.85,
+    "103_accuracy_min": 0.80
+  },
+
+  "decision_rule": "Choose based on CALIBRATION PERFORMANCE ON FROZEN CORPUS, not parameter count or subjective quality.",
+  "output_artifacts": [
+    "PROTOCOL.json", "PROTOCOL.sha256",
+    "GEMMA_RESULTS.json", "NEMOTRON_RESULTS.json", "ENSEMBLE_RESULTS.json",
+    "DISAGREEMENT_ANALYSIS.json", "MODEL_COMPARISON.md", "REPORT.md"
+  ],
+  "stop_rule": "No 50->5. No buyer-directed inventions. First establish which model is calibrated.",
+  "failure_state": "CALIBRATION_BLOCKED"
+}
