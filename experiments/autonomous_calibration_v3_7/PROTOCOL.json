@@ -1,0 +1,65 @@
+{
+  "protocol_name": "AUTONOMOUS_CALIBRATION_V3_7",
+  "version": "3.7",
+  "created_at": "2026-08-17T00:00:00Z",
+  "base_commit": "0f36316",
+  "status_pre_inference": "CALIBRATION_BLOCKED",
+  "objective": "Fix V3.6 hindsight problem: 17/20 HIGH hindsight because system conflates 'evidence found after search' with 'evidence not available pre-filing'. Build PreFilingEvidence object with PRE_DATE/POST_DATE/DATE_UNRESOLVED. Fix hindsight test: evidence retrieval != hindsight.",
+
+  "v3_6_frozen_results": {
+    "accuracy": 0.80,
+    "false_elite_rate": 0.00,
+    "false_reject_rate": 0.05,
+    "cited_art_recall": 1.00,
+    "search_recall": 0.786,
+    "102_accuracy": 0.85,
+    "103_accuracy": 0.30,
+    "motivation_evidence_recall": 0.177,
+    "expectation_evidence_recall": 0.177,
+    "hindsight_high": 17,
+    "status": "CALIBRATION_BLOCKED",
+    "root_cause": "17/20 cases get HIGH hindsight. System conflates 'evidence was found after searching' with 'evidence was not available pre-filing'. These are different questions."
+  },
+
+  "v3_7_changes_from_v3_6": [
+    "PRE_FILING_EVIDENCE_OBJECT: every evidence edge has source_id + source_type + publication_date + priority_date + relevant_date + availability_before_relevant_date + exact_passage + evidence_type. States: PRE_DATE / POST_DATE / DATE_UNRESOLVED. POST_DATE evidence CANNOT establish pre-filing motivation.",
+    "HINDSIGHT TEST FIXED: evidence retrieval != hindsight. HINDSIGHT is HIGH only if the modification becomes persuasive primarily AFTER seeing the claimed solution. Evidence merely being retrieved during the audit does NOT imply hindsight.",
+    "INDEPENDENT COUNTERFACTUAL: for every 103 combination ask 'If the invention did not exist, would the same evidence still have led the skilled person to this modification?' Record COUNTERFACTUAL_SUPPORT: STRONG / MEDIUM / WEAK / NONE. This is a diagnostic, not a legal conclusion.",
+    "MOTIVATION GRAPH: closest_prior_art -> objective_problem -> known_disadvantage/design_pressure -> teaching/incentive -> candidate_modification -> technical_effect. Each edge independently sourced.",
+    "EXPECTATION GRAPH SEPARATE: motivation_to_try (WHY_TRY) vs expectation_of_success (WHY_EXPECT_SUCCESS). Different evidence required.",
+    "3-CANDIDATE CLOSEST PRIOR ART: generate 3 candidates, score by purpose/technical_field/technical_effect/structural/functional. Select BEFORE revealing final inventive solution.",
+    "MODEL ROUTING: gemma-4-31b-it as primary for legal reasoning. Separate model/context for final adjudication.",
+    "103 RESULT OBJECT: closest_prior_art + objective_problem + difference_elements + motivation_edges[] + expectation_edges[] + pre_date_evidence[] + counterfactual_support + teaching_away + technical_compatibility + could + would + hindsight + uncertainty"
+  ],
+
+  "acceptance_thresholds": {
+    "overall_accuracy_min": 0.85,
+    "false_elite_rate_max": 0.10,
+    "false_reject_rate_max": 0.10,
+    "cited_art_recall_min": 0.90,
+    "search_recall_min": 0.80,
+    "102_accuracy_min": 0.85,
+    "103_accuracy_min": 0.80,
+    "minimum_cases": 20
+  },
+
+  "pre_filing_evidence_states": ["PRE_DATE", "POST_DATE", "DATE_UNRESOLVED"],
+
+  "counterfactual_support_levels": ["STRONG", "MEDIUM", "WEAK", "NONE"],
+
+  "model_routing": {
+    "primary_legal_reasoning": "google/gemma-4-31b-it",
+    "fast_fallback": "meta/llama-3.1-8b-instruct",
+    "final_fallback": "deepseek-ai/deepseek-v4-flash-0731"
+  },
+
+  "output_artifacts": [
+    "PROTOCOL.json", "PROTOCOL.sha256", "PROTOCOL.md",
+    "PRE_FILING_EVIDENCE.json", "MOTIVATION_GRAPH.json", "EXPECTATION_GRAPH.json",
+    "COUNTERFACTUAL_ANALYSIS.json", "103_CASE_FORENSICS.json",
+    "ERROR_ANALYSIS.json", "METRICS.json", "REPORT.md"
+  ],
+
+  "stop_rule": "DO NOT run 50->5 until V3.7 reaches 103>=80%.",
+  "failure_state": "CALIBRATION_BLOCKED"
+}
