@@ -1,0 +1,68 @@
+{
+  "protocol_name": "AUTONOMOUS_CALIBRATION_V3_8",
+  "version": "3.8",
+  "created_at": "2026-08-17T00:00:00Z",
+  "base_commit": "a8939f6",
+  "status_pre_inference": "CALIBRATION_BLOCKED",
+  "objective": "Improve 103 evidence retrieval with better model routing (gemma-4-31b for 103 reasoning) and separated evidence chain: EXISTENCE → RELEVANCE → PRE-FILING → MOTIVATION → EXPECTATION → COMBINATION → HINDSIGHT. PatSnap semantic search endpoints require higher API tier (67200203) — not available.",
+
+  "v3_7_frozen_results": {
+    "accuracy": 0.80,
+    "false_elite_rate": 0.00,
+    "false_reject_rate": 0.05,
+    "cited_art_recall": 1.00,
+    "search_recall": 0.786,
+    "102_accuracy": 0.85,
+    "103_accuracy": 0.30,
+    "hindsight_high": 17,
+    "counterfactual_none": 17,
+    "avg_pre_date_motivation_edges": 0.15,
+    "status": "CALIBRATION_BLOCKED"
+  },
+
+  "v3_8_changes": [
+    "MODEL ROUTING: gemma-4-31b-it as primary for 103 reasoning (better legal analysis), nemotron-3.5-lightning-30b for fast analysis, llama-3.1-8b for JSON",
+    "SEPARATED EVIDENCE CHAIN: EXISTENCE → RELEVANCE → PRE-FILING → MOTIVATION → EXPECTATION → COMBINATION → HINDSIGHT",
+    "IMPROVED MOTIVATION EXTRACTION: use gemma-4's deeper reasoning to find implicit motivation (EPO permits implicit incentive when reconstructible before filing date)",
+    "IMPROVED EXPECTATION EXTRACTION: separate CAN_WORK from EXPECTED_TO_WORK with evidence-based distinction",
+    "COUNTERFACTUAL INTEGRATION: counterfactual_support feeds into hindsight assessment",
+    "PATSNAP SEMANTIC SEARCH: tested but not available (67200203 - API tier insufficient). Documented for future when tier upgraded."
+  ],
+
+  "acceptance_thresholds": {
+    "overall_accuracy_min": 0.85,
+    "false_elite_rate_max": 0.10,
+    "false_reject_rate_max": 0.10,
+    "cited_art_recall_min": 0.90,
+    "search_recall_min": 0.80,
+    "102_accuracy_min": 0.85,
+    "103_accuracy_min": 0.80
+  },
+
+  "model_routing": {
+    "primary_103_reasoning": "google/gemma-4-31b-it",
+    "fast_analysis": "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "json_generation": "meta/llama-3.1-8b-instruct",
+    "fallback": "deepseek-ai/deepseek-v4-flash-0731"
+  },
+
+  "patsnap_capability_status": {
+    "claim_data": "AVAILABLE",
+    "query_search_count": "AVAILABLE",
+    "nested_search_patent": "AVAILABLE (empty results for most queries)",
+    "semantic_search": "NOT_AVAILABLE (67200203 - API need a true rate)",
+    "claim_parser": "NOT_AVAILABLE (67200203)",
+    "invention_points": "NOT_AVAILABLE (67200203)",
+    "similar_patent_comparison": "NOT_AVAILABLE (67200203)"
+  },
+
+  "output_artifacts": [
+    "PROTOCOL.json", "PROTOCOL.sha256", "PROTOCOL.md",
+    "MOTIVATION_GRAPH.json", "EXPECTATION_GRAPH.json",
+    "COUNTERFACTUAL_ANALYSIS.json", "103_CASE_FORENSICS.json",
+    "ERROR_ANALYSIS.json", "METRICS.json", "REPORT.md"
+  ],
+
+  "stop_rule": "DO NOT run 50->5 until 103>=80%.",
+  "failure_state": "CALIBRATION_BLOCKED"
+}
