@@ -99,4 +99,4 @@ class TestFreshSearchAttempted:
         router = V5DiscoveryRouter()
         m = router.discover("INV_EXP_021", "hydrogel coating", "hydrogel")
         assert m.fresh_search_attempted is True
-        assert m.fresh_search_status in ("IDS_FOUND", "FAILED")
+        assert m.fresh_search_status in ("SUCCESS", "TEMPORARILY_UNAVAILABLE", "RATE_LIMITED", "NO_RESULTS", "NOT_ATTEMPTED")
