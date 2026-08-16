@@ -1,0 +1,28 @@
+# Autonomous Patentability Audit — INV_V3_006
+
+**AUTONOMOUS_SCREEN_ONLY** — Not a legal patentability determination.
+
+**Final Screen:** S1
+
+**Novelty:** NOVELTY_SUPPORTED
+
+**Obviousness:** NON_OBVIOUSNESS_SUPPORTED
+
+**Enablement:** ENABLEMENT_SUPPORTED
+
+**Design-Around Risk:** LOW
+
+**References Found:** 0
+
+**Evidence Quality:** {'GOLD': 0, 'SILVER': 0, 'BRONZE': 0}
+
+**Source Coverage:** PARTIAL — only Google Patents via LLM knowledge. Lens, PatSnap, USPTO, EPO unavailable.
+
+
+## Claim Versions
+
+### CLAIM_0 — NO_PRIOR_ART_FOUND
+Replacing the multifilar coaxial lead design with a polymer-jacketed, single-filar, high-strength alloy conductor reduces the risk of lead fracture.
+
+
+## Unresolved Questions

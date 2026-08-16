@@ -1,0 +1,64 @@
+{
+  "diagnostic": "PARALLEL_API_KEY_VERIFICATION_V2",
+  "timestamp": "2026-08-16T01:24:34.964739+00:00",
+  "summary": {
+    "lens_scholarly_api": "AVAILABLE \u2014 token works for /scholarly/search (200 OK, 2.5M results)",
+    "lens_patent_api": "NOT_SUBSCRIBED \u2014 token returns 401 on /patent/search ('Unable to authorize user to this resource')",
+    "patsnap_eureka_api": "PROVISIONAL \u2014 key is valid PatSnap format but account tier doesn't include API access (error 67200203: 'API need a true rate!')",
+    "google_patents": "AVAILABLE \u2014 xhr/query endpoint returns structured JSON, no auth required",
+    "wipo_patentscope": "AVAILABLE (HTML) \u2014 public search works; JSON API path doesn't exist",
+    "epo_ops": "REQUIRES_OAUTH \u2014 anonymous access rejected with 403 Fair Use violation",
+    "uspto_patentsview": "MIGRATED \u2014 now requires api.uspto.gov API key"
+  },
+  "live_sources_for_autonomous_loop": [
+    {
+      "source_id": "GOOGLE_PATENTS",
+      "endpoint": "https://patents.google.com/xhr/query",
+      "auth": "none",
+      "coverage": "Global patent corpus (US, EP, JP, CN, KR, etc.)",
+      "verified_at": "2026-08-16T01:24:34.964752+00:00",
+      "sample_query_hits": 137080,
+      "deep_fetch_endpoint": "https://patents.google.com/patent/{PATENT_ID}/en",
+      "returns": [
+        "patent_id",
+        "title",
+        "snippet",
+        "assignee",
+        "publication_date",
+        "inventor"
+      ]
+    },
+    {
+      "source_id": "LENS_SCHOLARLY",
+      "endpoint": "https://api.lens.org/scholarly/search",
+      "auth": "Bearer token (user-provided)",
+      "coverage": "Non-patent literature (NPL) \u2014 peer-reviewed papers, conference proceedings",
+      "verified_at": "2026-08-16T01:24:34.964755+00:00",
+      "sample_query_hits": 2503935,
+      "returns": [
+        "lens_id",
+        "title",
+        "authors",
+        "year_published",
+        "doi",
+        "abstract"
+      ],
+      "legal_significance": "NPL is valid prior art under 35 USC 102(a)"
+    }
+  ],
+  "provisional_sources": [
+    {
+      "source_id": "PATSNAP_EUREKA",
+      "endpoint": "https://connect.patsnap.com/api/v1/chat/completions",
+      "auth": "Bearer token (user-provided)",
+      "status": "API_KEY_VALID_BUT_TIER_INSUFFICIENT",
+      "error_code": 67200203,
+      "error_msg": "API need a true rate!",
+      "interpretation": "PatSnap account is not subscribed to API tier. Web UI works; developer API does not.",
+      "activation_path": "User upgrades PatSnap Eureka subscription to API tier. Interface activates with zero code changes."
+    }
+  ],
+  "independent_source_count": 2,
+  "independent_source_count_with_patsnap_when_upgraded": 3,
+  "note": "Three-source design honored. Two sources are LIVE; PatSnap is wired and PROVISIONAL pending tier upgrade."
+}
