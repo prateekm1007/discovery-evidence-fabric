@@ -1,0 +1,234 @@
+{
+  "protocol_name": "AUTONOMOUS_CALIBRATION_V3",
+  "version": "3.0",
+  "created_at": "2026-08-17T00:00:00Z",
+  "base_commit": "d942366",
+  "status_pre_inference": "CALIBRATION_BLOCKED",
+  "objective": "Calibrate the autonomous invention evaluation pipeline against 20 known cases using the REAL evidence-conditioned loop (search -> evidence -> claim mapping -> 102 -> 103 -> final adjudication). Claim-only judgment is DISABLED. If evidence retrieval fails, return SEARCH_INSUFFICIENT.",
+
+  "v2_frozen_results": {
+    "accuracy": 0.45,
+    "false_elite_rate": 0.05,
+    "false_reject_rate": 0.50,
+    "cited_art_recall": 1.00,
+    "status": "CALIBRATION_BLOCKED",
+    "root_cause": "V2 judged claims without performing the actual search -> evidence -> claim mapping -> 102 -> 103 pipeline. Final adjudicator received claim-only + generic model knowledge."
+  },
+
+  "v3_changes_from_v2": [
+    "Claim-only adjudication path DISABLED",
+    "Real pipeline: canonical claim -> search concept graph -> 14 search families -> patent discovery -> actual claim retrieval -> element mapping -> relationship mapping -> 102 -> closest prior art -> objective technical problem -> 103 -> COULD/WOULD -> anti-hindsight -> final adjudication",
+    "Search insufficiency explicitly distinguished from no-prior-art-found",
+    "14 search families with per-family attempted/source/query/results/failure_state tracking",
+    "Generator/evaluator separation enforced (distinct roles, distinct prompts, model hashes recorded)",
+    "Anti-hindsight: rationale built before solution disclosure, then compared",
+    "Ground truth per-case constructed from prosecution record (not simplistic granted/abandoned)",
+    "Rescue recognition for amended cases (not every amendment = successful rescue)",
+    "Cited-art recall preserved at >=90% after adding full loop"
+  ],
+
+  "acceptance_thresholds": {
+    "overall_accuracy_min": 0.85,
+    "false_elite_rate_max": 0.10,
+    "false_reject_rate_max": 0.10,
+    "cited_art_recall_min": 0.90,
+    "search_recall_min": 0.80,
+    "minimum_cases": 20
+  },
+
+  "case_corpus": {
+    "source": "V2 20 cases (frozen, no mutation post-results)",
+    "distribution": {
+      "granted": 10,
+      "abandoned_after_rejection": 5,
+      "amended_allowed": 5
+    },
+    "diversity": [
+      "medical device",
+      "sensor",
+      "materials",
+      "mechanical",
+      "electrical",
+      "software/controls",
+      "biomaterials"
+    ]
+  },
+
+  "ground_truth_construction": {
+    "rule": "Case-level ground truth from prosecution record",
+    "forbidden": "GRANTED == PATENTABLE / ABANDONED == UNPATENTABLE",
+    "fields": [
+      "CLAIM_AT_ISSUE",
+      "PRIOR_ART_CITED",
+      "102_REJECTIONS",
+      "103_REJECTIONS",
+      "AMENDMENTS",
+      "FINAL_CLAIM",
+      "FINAL_DISPOSITION",
+      "GROUND_TRUTH_CONFIDENCE"
+    ],
+    "labels": ["SURVIVED", "REJECTED", "AMENDED", "INSUFFICIENT_EVIDENCE"]
+  },
+
+  "pipeline_steps": [
+    "CANONICAL_CLAIM",
+    "SEARCH_CONCEPT_GRAPH",
+    "14_SEARCH_FAMILIES",
+    "PATENT_DISCOVERY",
+    "ACTUAL_PATENT_RECORD",
+    "ACTUAL_CLAIM_RETRIEVAL",
+    "ELEMENT_MAPPING",
+    "RELATIONSHIP_MAPPING",
+    "NOVELTY_102",
+    "CLOSEST_PRIOR_ART",
+    "OBJECTIVE_TECHNICAL_PROBLEM",
+    "OBVIOUSNESS_103",
+    "COULD_WOULD",
+    "ANTI_HINDSIGHT",
+    "FINAL_ADJUDICATION"
+  ],
+
+  "search_families": [
+    "Q1_CONCEPT",
+    "Q2_MECHANISM",
+    "Q3_STRUCTURE",
+    "Q4_MATERIAL",
+    "Q5_RELATIONSHIP",
+    "Q6_TECHNICAL_EFFECT",
+    "Q7_FULL_COMBINATION",
+    "Q8_FUNCTIONAL_EQUIVALENT",
+    "Q9_STRUCTURAL_EQUIVALENT",
+    "Q10_CPC_IPC",
+    "Q11_COMPETITOR_PORTFOLIO",
+    "Q12_CITATION_NEIGHBORHOOD",
+    "Q13_NEGATIVE_SEARCH",
+    "Q14_SEMANTIC_SEARCH"
+  ],
+
+  "search_failure_states": [
+    "SUCCESS",
+    "SEARCH_INSUFFICIENT",
+    "NO_RELEVANT_PRIOR_ART_FOUND",
+    "SOURCE_UNAVAILABLE",
+    "PATENT_EVIDENCE_UNAVAILABLE",
+    "RATE_LIMITED",
+    "TEMPORARILY_UNAVAILABLE"
+  ],
+
+  "search_insufficiency_rule": "A zero-result search without adequate coverage (fewer than 8 of 14 families attempted) must NEVER become NO_RELEVANT_PRIOR_ART_FOUND. It MUST be classified as SEARCH_INSUFFICIENT.",
+
+  "claim_only_path_disabled": {
+    "rule": "The final adjudicator must NOT receive claim-only + generic model knowledge and return a patentability result.",
+    "on_evidence_failure": "Return SEARCH_INSUFFICIENT. Do NOT return REJECT, NOVEL, or ELITE.",
+    "enforcement": "Final adjudicator input MUST include retrieved_evidence_summary. Empty evidence -> SEARCH_INSUFFICIENT regardless of claim quality."
+  },
+
+  "generator_evaluator_separation": {
+    "roles": [
+      "GENERATOR",
+      "SEARCHER",
+      "NOVELTY_ADVERSARY",
+      "OBVIOUSNESS_ADVERSARY",
+      "FINAL_ADJUDICATOR"
+    ],
+    "requirement": "Distinct computational roles. At minimum: different prompt + different context + different evidence path. Preferred: different models.",
+    "record": "Every model name and prompt hash recorded per role per case."
+  },
+
+  "novelty_102_rules": {
+    "single_reference_rule": "102 succeeds only when ONE reference discloses ALL required limitations + required arrangement.",
+    "element_mapping": "Map L1, L2, ..., Ln for every relevant patent.",
+    "relationship_mapping": "Map every relationship (A->B, B->C, A+B+C).",
+    "inherency_rule": "If inherency claimed, require NECESSITY_REQUIRED evidence (not merely possible)."
+  },
+
+  "obviousness_103_rules": {
+    "closest_prior_art_selection": "Most promising single-reference starting point. Normally has similar purpose/effect or closely related technical field (EPO 2026 Guidelines).",
+    "steps": [
+      "objective_technical_problem",
+      "distinguishing_features",
+      "technical_effect",
+      "secondary_reference",
+      "motivation",
+      "reasonable_expectation_of_success",
+      "COULD_question",
+      "WOULD_question",
+      "WHY_explanation"
+    ],
+    "epo_requirement": "The EPO explicitly requires the WOULD inquiry rather than merely COULD."
+  },
+
+  "anti_hindsight_rules": {
+    "step_1": "Build inventive-step rationale BEFORE exposing the final solution.",
+    "step_2": "Compare with post-disclosure reasoning.",
+    "levels": ["LOW", "MEDIUM", "HIGH"],
+    "forbidden": "Constructing the problem backwards from the claimed invention."
+  },
+
+  "case_outcome_predictions": [
+    "NOVELTY_SURVIVES",
+    "NOVELTY_FAILS",
+    "OBVIOUSNESS_RISK",
+    "STRONG",
+    "WEAK",
+    "INSUFFICIENT_EVIDENCE"
+  ],
+
+  "rescue_calibration": {
+    "rule": "For amended cases, AI must determine whether final amended claim is technically different from earlier rejected claim.",
+    "metric": "RESCUE_RECOGNITION_ACCURACY",
+    "forbidden": "Treating every amendment as successful rescue."
+  },
+
+  "metrics": [
+    "overall_accuracy",
+    "elite_precision",
+    "elite_recall",
+    "false_elite_rate",
+    "false_reject_rate",
+    "cited_art_recall",
+    "search_recall",
+    "102_accuracy",
+    "103_accuracy",
+    "search_failure_rate",
+    "evaluator_failure_rate",
+    "rescue_recognition_accuracy"
+  ],
+
+  "primary_metrics": [
+    "FALSE_ELITE_RATE",
+    "FALSE_REJECT_RATE",
+    "CITED_ART_RECALL",
+    "SEARCH_RECALL"
+  ],
+
+  "error_audit_categories": [
+    "SEARCH_FAILURE",
+    "CLAIM_INTERPRETATION_FAILURE",
+    "102_FAILURE",
+    "103_FAILURE",
+    "MODEL_JUDGMENT_FAILURE",
+    "CIRCULAR_EVALUATION",
+    "EVIDENCE_FAILURE",
+    "GROUND_TRUTH_FAILURE"
+  ],
+
+  "stop_rule": "DO NOT run 50->5 until V3 reaches all thresholds. On failure, status remains CALIBRATION_BLOCKED.",
+  "unblock_condition": "UNBLOCK_50_TO_5 only when all thresholds pass.",
+  "failure_state": "CALIBRATION_BLOCKED",
+
+  "output_artifacts": [
+    "PROTOCOL.json",
+    "PROTOCOL.sha256",
+    "PROTOCOL.md",
+    "GROUND_TRUTH.json",
+    "SEARCH_TRACE.json",
+    "CLAIM_MAPPINGS.json",
+    "102_RESULTS.json",
+    "103_RESULTS.json",
+    "ADJUDICATION.json",
+    "METRICS.json",
+    "ERROR_ANALYSIS.json",
+    "REPORT.md"
+  ]
+}
