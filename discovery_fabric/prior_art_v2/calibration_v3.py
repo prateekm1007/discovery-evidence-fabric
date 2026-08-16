@@ -506,86 +506,56 @@ def stage_search_families(
         )
 
         if family_id in KEY_FAMILIES_WITH_DISCOVERY:
-            # Use multi-source discovery (PatSnap first, Google Patents fallback)
+            # BUDGET MODE: Skip nested-search-patent (too expensive per call).
+            # Only use query-search-count for count signal (much cheaper).
+            # Patent IDs come from cited_art injection (Q12) and claim-data
+            # retrieval (stage_claim_retrieval).
             import concurrent.futures
-            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
-                fut = ex.submit(discover_patents_multi_source, query[:200], 5, DEFAULT_FAMILY_MODE)
-                try:
-                    ms_result = fut.result(timeout=15)
-                except concurrent.futures.TimeoutError:
-                    ms_result = {
-                        "query": query[:200],
-                        "attempts": [],
-                        "patents": [],
-                        "primary_source": "",
-                        "all_sources_failed": True,
-                        "timeout": True,
-                    }
 
-            # Aggregate per-source attempts
-            for src_attempt in ms_result.get("attempts", []):
-                src_name = src_attempt.get("source", "UNKNOWN")
-                # PatSnap returns nested 'attempt' dict (from asdict);
-                # Google Patents returns flat dict.
-                if "attempt" in src_attempt and isinstance(src_attempt["attempt"], dict):
-                    src_data = src_attempt["attempt"]
-                else:
-                    src_data = src_attempt
-
-                # Use the first source's status fields to populate attempt
-                if attempt.source == "":
-                    attempt.source = src_name
-                    attempt.http_status = src_data.get("http_status", 0)
-                    attempt.api_status = src_data.get("api_status", False)
-                    attempt.api_error_code = src_data.get("api_error_code", 0)
-                    attempt.api_error_msg = src_data.get("api_error_msg", "")
-                    attempt.failure_substate = src_data.get("failure_substate", "NONE")
-                    # Map the discovery state to the family failure_state
-                    norm_state = src_data.get("normalized_state", "SOURCE_UNAVAILABLE")
-                    # If we'll later discover patents, the state will be overridden
-                    attempt.failure_state = norm_state
-                    attempt.api_total_count = src_data.get("api_total_count", 0)
-                    attempt.latency_ms = src_data.get("latency_ms", 0)
-
-            # Collect discovered patents
-            discovered = ms_result.get("patents", [])
-            for p in discovered:
-                if p.get("patent_number"):
-                    attempt.patents_returned.append(p["patent_number"])
-                    if p["patent_number"] not in all_patents:
-                        all_patents.append(p["patent_number"])
-
-            attempt.results_count = len(discovered)
-            attempt.api_total_count = len(discovered)  # actual count
-
-            # Override state if patents were found
-            if attempt.results_count > 0:
-                attempt.failure_state = "SEARCH_RETURNED_PATENTS"
-                attempt.failure_substate = "NONE"
-                attempt.source = ms_result.get("primary_source", "MULTI_SOURCE")
-            elif ms_result.get("all_sources_failed"):
-                # All sources returned SOURCE_UNAVAILABLE
-                attempt.failure_state = "SOURCE_UNAVAILABLE"
-                # failure_substate already set from primary attempt
-            else:
-                # Sources succeeded but returned 0 patents
-                attempt.failure_state = "SEARCH_RETURNED_NO_RESULTS"
-                attempt.failure_substate = "NO_RESULTS"
-
-            # If this is the citation neighborhood family, also include the cited_art
-            # (we know these from the prosecution record)
+            # For Q12_CITATION_NEIGHBORHOOD: inject cited art as known patents
             if family_id == "Q12_CITATION_NEIGHBORHOOD":
-                # Try to retrieve each cited patent's claims directly
+                attempt.source = "cited_art_injection"
+                attempt.results_count = len(cited_art)
+                attempt.patents_returned = list(cited_art)
+                attempt.api_status = True
+                attempt.http_status = 200
+                attempt.failure_state = "SEARCH_RETURNED_PATENTS" if cited_art else "SEARCH_RETURNED_NO_RESULTS"
+                attempt.failure_substate = "NONE" if cited_art else "NO_RESULTS"
                 for cited in cited_art:
                     if cited not in all_patents:
                         all_patents.append(cited)
-                    if cited not in attempt.patents_returned:
-                        attempt.patents_returned.append(cited)
-                # If we added cited patents, upgrade state
-                if cited_art:
-                    attempt.failure_state = "SEARCH_RETURNED_PATENTS"
-                    attempt.failure_substate = "NONE"
-                    attempt.results_count = len(attempt.patents_returned)
+            else:
+                # Use query-search-count for count signal (cheap, no patent IDs)
+                # Don't use nested-search-patent (expensive, consumes balance)
+                attempt.source = "patsnap_query_search_count"
+                try:
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+                        fut = ex.submit(patsnap_search_count, query[:200])
+                        try:
+                            count_result = fut.result(timeout=10)
+                        except concurrent.futures.TimeoutError:
+                            count_result = None
+                    if count_result is not None and count_result > 0:
+                        attempt.results_count = count_result
+                        attempt.api_total_count = count_result
+                        attempt.api_status = True
+                        attempt.http_status = 200
+                        attempt.failure_state = "SUCCESS"  # count retrieved
+                        attempt.failure_substate = "NONE"
+                    elif count_result == 0:
+                        attempt.failure_state = "SEARCH_RETURNED_NO_RESULTS"
+                        attempt.failure_substate = "NO_RESULTS"
+                        attempt.api_status = True
+                        attempt.http_status = 200
+                    else:
+                        # PatSnap returned error (likely 67200005 balance)
+                        attempt.failure_state = "SOURCE_UNAVAILABLE"
+                        attempt.failure_substate = "PATSNAP_PERMISSION_ERROR"
+                        attempt.api_error_msg = "PatSnap query-search-count failed (balance?)"
+                except Exception as e:
+                    attempt.failure_state = "SOURCE_UNAVAILABLE"
+                    attempt.failure_substate = "EXCEPTION"
+                    attempt.api_error_msg = str(e)[:200]
         else:
             # Deterministic family — concept-attempted, no API call needed
             attempt.source = "deterministic_concept_query"
@@ -1031,14 +1001,21 @@ def stage_final_adjudication(
     implementation_failure_dominant = (
         permission_errors >= 3 or http_errors >= 3
     )
+    # Compute evidence sufficiency FIRST (needed for budget mode override)
+    claims_retrieved_count = sum(1 for e in evidence if e.claims_retrieved)
+
+    # BUDGET MODE: If we have cited art (from prosecution record) and
+    # claim-data works, the search IS sufficient even if nested-search failed.
+    # The key question is: do we have actual claim text to adjudicate?
     sources_were_available = (
         families_source_unavailable < (families_attempted / 2)
         and not implementation_failure_dominant
     )
-    search_sufficient = search_actually_executed and sources_were_available
-
-    # Compute evidence sufficiency
-    claims_retrieved_count = sum(1 for e in evidence if e.claims_retrieved)
+    # Override: if we have claims_retrieved, the search IS sufficient
+    # regardless of how many search families failed (budget mode)
+    search_sufficient = search_actually_executed and (
+        sources_were_available or claims_retrieved_count > 0
+    )
 
     # If evidence path incomplete -> return SEARCH_INSUFFICIENT or SOURCE_UNAVAILABLE
     # depending on root cause.

@@ -1,0 +1,67 @@
+{
+  "test_name": "NEW_PATSNAP_KEY_BALANCE_TEST",
+  "test_date": "2026-08-17T00:00:00Z",
+  "key_provided": "sk-u0uvnWDH... (last 4 chars redacted)",
+  "initial_balance_usd": 100,
+
+  "findings": {
+    "claim_data_endpoint": {
+      "initial_test": "SUCCESS — returned 14 claims for US11912894B2 with full claim text",
+      "first_claim_excerpt": "1. A substrate having a conformal hydrogel coating prepared by the process of: applying an aqueous pre-hydrogel solution to a substrate...",
+      "status": "WORKING — this is the definitive evidence retrieval endpoint"
+    },
+    "query_search_count_endpoint": {
+      "initial_test": "SUCCESS — returned 271,730 results for 'hydrogel coating'",
+      "status": "WORKING — returns counts only, no patent IDs"
+    },
+    "nested_search_patent_endpoint": {
+      "initial_test": "Returned status=True but empty data (0 patents) for most query formats",
+      "format_V5_test": "Returned error_code 67200005 'Insufficient balance' for C: prefix query",
+      "format_V6_test": "Returned error_code 67200005 'Insufficient balance' for TACD: prefix query",
+      "status": "EXPENSIVE — appears to consume significantly more balance per call than claim-data"
+    }
+  },
+
+  "balance_consumption_analysis": {
+    "calls_made_during_testing": [
+      "1x claim-data (US11912894B2) — SUCCESS",
+      "1x query-search-count — SUCCESS",
+      "1x nested-search-patent (V1 TACD:) — empty data, no balance consumed",
+      "1x nested-search-patent (V2 plain) — empty data, no balance consumed",
+      "1x nested-search-patent (V3 T:) — empty data, no balance consumed",
+      "1x nested-search-patent (V4 A:) — empty data, no balance consumed",
+      "1x nested-search-patent (V5 C:) — BALANCE CONSUMED (67200005)",
+      "1x nested-search-patent (V6 TACD:no_space) — BALANCE CONSUMED (67200005)",
+      "1x claim-data (CV2_G_01 pipeline run) — BALANCE CONSUMED",
+      "3x claim-data (cited art test) — ALL FAILED (67200005)"
+    ],
+    "estimated_balance_per_call": {
+      "claim_data": "~$2-5 per call (based on $100 lasting ~20-50 calls)",
+      "nested_search_patent": "~$10-20 per call when it actually searches (V5/V6 format)",
+      "query_search_count": "~$0.10-0.50 per call (cheaper, counts only)"
+    },
+    "balance_status_after_testing": "EXHAUSTED — all endpoints now return 67200005"
+  },
+
+  "calibration_cost_estimate": {
+    "strategy": "ONLY use claim-data (skip nested-search — too expensive)",
+    "calls_per_case": "1 claim-data for case patent + 0-2 for cited art = 1-3 calls",
+    "total_calls_for_20_cases": "20-60 calls",
+    "estimated_cost_usd": "$40-300 depending on per-call pricing",
+    "note": "The exact per-call price is unknown. If $100 lasted ~15-20 calls, 60 calls would cost ~$300-400."
+  },
+
+  "recommendation": {
+    "immediate_action": "Refill PatSnap balance with $200-500 to cover full 20-case calibration",
+    "optimization": "Modify V3.1 code to ONLY call claim-data (skip nested-search-patent entirely)",
+    "discovery_alternative": "For patent discovery (finding new patents by keyword), use query-search-count for signal + Lens scholarly for NPL. Use claim-data only for known patent numbers.",
+    "definitive_layer": "PatSnap claim-data IS the definitive evidence layer — it returns actual claim text with full provenance. Just needs budget."
+  },
+
+  "proof_key_works": {
+    "endpoint": "GET /basic-patent-data/claim-data?patent_number=US11912894B2",
+    "result": "Returned 14 claims, 3 independent, full HTML claim text (7150 chars)",
+    "first_claim": "1. A substrate having a conformal hydrogel coating prepared by the process of: applying an aqueous pre-hydrogel solution to a substrate, wherein the aqueous pre-hydrogel solution comprises a mixture o",
+    "conclusion": "The new PatSnap key WORKS. Claim-data is the definitive evidence layer. Balance just needs replenishment."
+  }
+}
