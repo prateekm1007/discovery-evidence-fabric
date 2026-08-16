@@ -1085,6 +1085,11 @@ def stage_final_adjudication(
     # 103 result
     obviousness_succeeds = obviousness_result.obviousness_succeeds
 
+    # Get anti_hindsight_level (V3.1 uses anti_hindsight_level, V3.3 uses hindsight_risk)
+    anti_hindsight_level = getattr(obviousness_result, "anti_hindsight_level", None)
+    if anti_hindsight_level is None:
+        anti_hindsight_level = getattr(obviousness_result, "hindsight_risk", "HIGH")
+
     # Determine outcome based on EVIDENCE — not claim-only judgment
     if anticipation_succeeds:
         predicted_outcome = "NOVELTY_FAILS"
@@ -1100,7 +1105,7 @@ def stage_final_adjudication(
     else:
         # Survived 102 and 103 — determine STRONG vs PROMISING
         gold_count = sum(1 for e in evidence if e.claims_retrieved)
-        if gold_count >= 3 and obviousness_result.anti_hindsight_level == "HIGH":
+        if gold_count >= 3 and anti_hindsight_level == "HIGH":
             predicted_outcome = "STRONG"
             predicted_tier = "STRONG"
             rationale = (
@@ -1112,7 +1117,7 @@ def stage_final_adjudication(
             predicted_tier = "PROMISING"
             rationale = (
                 f"Survived 102 + 103 but only {gold_count} GOLD patents reviewed "
-                f"or anti-hindsight level {obviousness_result.anti_hindsight_level}."
+                f"or anti-hindsight level {anti_hindsight_level}."
             )
 
     return FinalAdjudication(
