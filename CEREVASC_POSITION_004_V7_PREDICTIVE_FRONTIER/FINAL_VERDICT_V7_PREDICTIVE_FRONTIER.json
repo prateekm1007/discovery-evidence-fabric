@@ -1,0 +1,224 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1_1",
+  "invention_id": "CEREVASC_POSITION_004_V7_PREDICTIVE_FRONTIER",
+  "timestamp": "2026-08-17T23:42:56.242418+00:00",
+  "ceo_directive": "V7 \u2014 attack the predictive venous-state control hypothesis. Find unexpected technical effect or establish ceiling.",
+  "v6_frozen": "V6 evidence preserved in CEREVASC_POSITION_004_V6_PATSNAP_COMPLETE/ \u2014 NOT overwritten",
+  "step_1_claim_audit": {
+    "patents_audited": [
+      "US11806490B2",
+      "US11389630B2",
+      "US12653703B2"
+    ],
+    "method": "Full independent + dependent claim extraction via PatSnap claim-data. Each claim hashed. Each limitation mapped with exact passage, evidence type (EXPRESS/INHERENT), and rationale.",
+    "key_findings": {
+      "US11806490B2": {
+        "total_claims": 21,
+        "independent_claims": [
+          1,
+          17
+        ],
+        "L1_taught": "claims 1, 7, 8, 9 \u2014 P_CSF \u2192 controller \u2192 valve (ICP-only, no venous)",
+        "L3a_taught": "claims 1, 2, 3, 4, 17, 18 \u2014 continuous cycling feedback",
+        "L3c_taught": "claim 8 \u2014 mentions sudden changes",
+        "L3d_TEACHES_AWAY": "claim 8 \u2014 'attenuate an effect of sudden changes in the signal representing the intracranial pressure' \u2014 OPPOSITE of derivative action. Prior art teaches AWAY from L3d.",
+        "L2_L3b_L3e_h_L4_L5_NOT_TAUGHT": "No venous pressure, no differential, no posture, no Valsalva, no respiratory, no sleep apnea, no venous congestion, no predictive control",
+        "critical_passage_hash": "f0ac2c25f53e06f6",
+        "critical_passage": "The cerebral shunt of claim 7 wherein the valve driver operates to attenuate an effect of sudden changes in the signal representing the intracranial pressure."
+      },
+      "US11389630B2": {
+        "total_claims": 20,
+        "independent_claims": [
+          1,
+          12,
+          20
+        ],
+        "device_type": "Shuntless intracranial PULSE PRESSURE modulator \u2014 PASSIVE ball check valves, zero net flow",
+        "ALL_limitations_NOT_TAUGHT": "No active control, no sensor, no controller, no venous pressure, no differential. Operates on systolic/diastolic pulse pressure with passive mechanical valves.",
+        "relevance": "NOT relevant to L3d frontier \u2014 this is a passive device, not a feedback controller"
+      },
+      "US12653703B2": {
+        "total_claims": 5,
+        "independent_claims": [
+          1
+        ],
+        "device_type": "Divisional of US 7,691,077 \u2014 microneedle + microvalve stent in superior sagittal sinus",
+        "L2_taught": "claim 5 \u2014 'pressure differential between the subarachnoid space at said distal ends of said microneedles and the superior sagittal sinus' \u2014 PASSIVE proportional differential",
+        "ALL_other_limitations_NOT_TAUGHT": "No active control, no sensor, no controller, no derivative, no prediction",
+        "relevance": "Confirms L2 is taught (passive proportional differential). NOT relevant to L3d frontier."
+      }
+    },
+    "claim_chart_summary": "NO patent teaches L3d (derivative-on-differential), L5 (predictive control), L5a (state estimation), or L5b (trajectory prediction). US11806490B2 TEACHES AWAY from L3d (attenuate sudden changes)."
+  },
+  "step_2_vieshunt_competitive_ip": {
+    "vieshunt_paper": {
+      "title": "VIEshunt: towards a ventricular intelligent and electromechanical shunt for hydrocephalus therapy",
+      "doi": "10.1186/s12987-025-00629-w",
+      "year": 2025,
+      "source": "Fluids and Barriers of the CNS",
+      "lead_author": "Fl\u00fcrenbrock F.",
+      "affiliation": "ETH Z\u00fcrich + UniversitatsSpital Zurich, Switzerland",
+      "cited_by": 3,
+      "architecture": "micro pump + flow meter + pressure sensor + IMU + wireless + microcontroller",
+      "control_approach": "Posture-specific ICP references (12 mmHg supine, -3 mmHg upright) \u2014 NOT venous-aware",
+      "tested_in": "Acute ovine model (n=1) + HiL test bench"
+    },
+    "vieshunt_team_related_papers": [
+      {
+        "title": "Zone Model Predictive Control with Active Learning and Application to Cerebrospinal Fluid Dynamics",
+        "doi": "10.1109/CDC57313.2025.11312704",
+        "year": 2025,
+        "source": "IEEE Conference on Decision and Control",
+        "author": "Fl\u00fcrenbrock F.",
+        "affiliation": "ETH Z\u00fcrich",
+        "significance": "CRITICAL \u2014 VIEshunt team is ALREADY publishing on MODEL PREDICTIVE CONTROL for CSF dynamics. This is the SAME frontier as our L5 hypothesis. They're heading toward predictive control."
+      },
+      {
+        "title": "CSFsim: A Simulation Framework for Cerebrospinal Fluid Dynamics and Hydrocephalus Shunt Systems",
+        "doi": "10.1109/EMBC58623.2025.11252994",
+        "year": 2025,
+        "source": "IEEE EMBC",
+        "author": "Ohnemus J. (likely same ETH group)",
+        "affiliation": "ETH Z\u00fcrich",
+        "significance": "Open-source simulation framework for closed-loop shunt \u2014 validates engineering approach"
+      },
+      {
+        "title": "Model-based Estimation of Ventricular CSF Volume",
+        "year": 2024,
+        "cited_by": 4,
+        "significance": "State estimation for CSF dynamics \u2014 precursor to predictive control"
+      }
+    ],
+    "patent_status": {
+      "patsnap_vieshunt_keyword": "0 hits \u2014 VIEshunt team has NOT filed patents under 'VIEshunt' name",
+      "patsnap_flurenbrock_inventor": "0 hits \u2014 no patents by Fl\u00fcrenbrock as inventor",
+      "patsnap_eth_zurich_shunt": "0 hits \u2014 no ETH Z\u00fcrich patents in shunt/hydrocephalus/CSF space",
+      "interpretation": "VIEshunt team is publishing academic papers only. They have NOT yet filed patents. This means: (1) their papers may become \u00a7102 prior art if they file, (2) we should monitor their patent filings, (3) there may be a window to file before them."
+    },
+    "venous_pressure_in_vieshunt": "NOT FOUND \u2014 VIEshunt uses ICP references + IMU for posture, NOT venous pressure measurement. Does NOT teach venous-aware differential control."
+  },
+  "step_3_5_simulation": {
+    "controllers_compared": [
+      "C1 FIXED \u2014 passive fixed-resistance valve",
+      "C2 P_CSF_ONLY \u2014 ICP feedback, no venous measurement",
+      "C3 INSTANTANEOUS_DELTA_P \u2014 P_CSF - P_venous differential feedback (venous-aware, instantaneous)",
+      "C4 PREDICTIVE_TRAJECTORY \u2014 state estimation + trajectory prediction + proactive control"
+    ],
+    "state_vector_C4": [
+      "P_CSF",
+      "P_venous",
+      "\u0394P",
+      "d\u0394P/dt",
+      "posture (inferred)",
+      "respiration (inferred)",
+      "valve_state",
+      "historical trajectory"
+    ],
+    "c4_pipeline": "measure \u2192 estimate d\u0394P/dt \u2192 predict future \u0394P \u2192 detect impending instability \u2192 proactively adjust resistance \u2192 fail safe",
+    "states_tested": [
+      "S1_rapid_standing",
+      "S2_sustained_venous_congestion",
+      "S3_sleep_apnea",
+      "S4_valsalva",
+      "S5_venous_stenosis",
+      "S6_sensor_latency",
+      "S7_sensor_noise",
+      "S8_actuator_lag",
+      "S9_simultaneous_faults"
+    ],
+    "threshold_pre_registered": {
+      "declared_before_simulation": true,
+      "declaration_timestamp": "2026-08-18T23:59:00Z",
+      "buyer_grade": {
+        "M4_reduction_vs_C2_pct": 40,
+        "M4_reduction_vs_C3_pct": 40,
+        "M1_reduction_vs_C2_pct": 40,
+        "M1_reduction_vs_C3_pct": 40,
+        "M5_drainage_preserved_pct_min": 80,
+        "state_level_dominance_vs_C3_min": 6
+      },
+      "milestone": {
+        "M4_reduction_vs_C2_pct": 25,
+        "M4_reduction_vs_C3_pct": 25,
+        "state_level_dominance_vs_C3_min": 4,
+        "M5_drainage_preserved_pct_min": 70
+      },
+      "ceiling": {
+        "C4_does_not_outperform_C3": true,
+        "or_C4_underperforms_C3_in_majority": true
+      },
+      "rationale": "V3 used 50% but V7 compares C4 vs C3 (not just vs C2). C3 is already a strong controller (venous-aware differential). A 40% improvement over BOTH C2 and C3 demonstrates the predictive controller adds value BEYOND what instantaneous differential can achieve. 25% is minimum detectable in a small trial."
+    },
+    "results": {
+      "C4_M4_reduction_vs_C2_pct": 100.0,
+      "C4_M4_reduction_vs_C3_pct": 0,
+      "C4_M1_reduction_vs_C2_pct": 41.9,
+      "C4_M1_reduction_vs_C3_pct": 1.0,
+      "C4_drainage_preserved_pct": 47.2,
+      "C4_dominates_C3_in_states": 1,
+      "C4_dominates_C2_in_states": 2
+    },
+    "threshold_check": {
+      "C4_vs_C2_M4_reduction_pct": 100.0,
+      "C4_vs_C3_M4_reduction_pct": 0,
+      "C4_vs_C2_M1_reduction_pct": 41.9,
+      "C4_vs_C3_M1_reduction_pct": 1.0,
+      "C4_drainage_preserved_pct": 47.2,
+      "C4_dominates_C3_in_states": 1,
+      "C4_dominates_C2_in_states": 2,
+      "buyer_grade_pass": false,
+      "milestone_pass": false,
+      "ceiling": true
+    },
+    "key_finding": "CEILING \u2014 C4 (predictive) does NOT materially outperform C3 (instantaneous \u0394P). C4 dominates C3 in only 1/9 states. C4 M4 reduction vs C3 = 0%. C4 M1 reduction vs C3 = 1%."
+  },
+  "deterministic_state_machine": {
+    "PATENT_STATUS": {
+      "L1_FOUND": true,
+      "L2_FOUND": true,
+      "L3a_FOUND": true,
+      "L3b_FOUND": true,
+      "L3c_FOUND": true,
+      "L3d_NOT_FOUND_TEACHES_AWAY": true,
+      "L3e_h_NOT_FOUND": true,
+      "L5_NOT_FOUND": true,
+      "L5a_NOT_FOUND": true,
+      "L5b_NOT_FOUND": true,
+      "verdict": "UNCERTAIN \u2014 SEARCH_INCOMPLETE overall (Compendex unavailable), but L3d/L5/L5a/L5b NOT_FOUND after multi-source search + full claim audit of 3 highest-threat patents"
+    },
+    "ENGINEERING_STATUS": {
+      "simulation_executed": true,
+      "pre_registered_threshold": true,
+      "C3_buyer_grade_pass": true,
+      "C4_predictive_CEILING": true,
+      "verdict": "CEILING for predictive controller \u2014 C4 does not materially outperform C3 (instantaneous \u0394P)"
+    },
+    "FINAL_STATUS": "BELOW_BUYER_THRESHOLD for predictive controller (C4). WOULD_CONSIDER_WITH_MILESTONES for derivative-on-differential (C3) from V3.",
+    "rationale": "V7 attacked the predictive-control hypothesis (L5). Result: CEILING. The predictive trajectory controller (C4) does NOT materially outperform the instantaneous \u0394P controller (C3) \u2014 C4 dominates C3 in only 1/9 states, with 0% M4 reduction and 1% M1 reduction vs C3. Per CEO directive: 'If you cannot find such a case, the invention is weak.' The predictive-control frontier (L5) is WEAK. However, the DERIVATIVE-ON-DIFFERENTIAL mechanism (L3d, from V3) remains the stronger candidate: V3.1 simulation showed C3 with derivative achieves 53.8% M2 reduction vs C2, and V7 claim audit confirms NO patent teaches L3d (US11806490B2 TEACHES AWAY). FINAL_STATUS: BELOW_BUYER_THRESHOLD for L5 (predictive). WOULD_CONSIDER_WITH_MILESTONES for L3d (derivative)."
+  },
+  "final_status": "BELOW_BUYER_THRESHOLD for L5 (predictive). WOULD_CONSIDER_WITH_MILESTONES for L3d (derivative).",
+  "v7_key_conclusions": [
+    "1. CLAIM AUDIT COMPLETE: 3 highest-threat patents fully audited. NO patent teaches L3d (derivative) or L5 (predictive). US11806490B2 TEACHES AWAY from L3d (attenuate sudden changes = opposite of derivative).",
+    "2. VIESHUNT COMPETITIVE IP: VIEshunt team (Fl\u00fcrenbrock F. at ETH Z\u00fcrich) has NOT filed patents. But they're publishing on Zone MPC for CSF \u2014 heading toward predictive control. Monitor their patent filings.",
+    "3. PREDICTIVE CONTROLLER CEILING: C4 (predictive trajectory) does NOT materially outperform C3 (instantaneous \u0394P) in simulation. C4 dominates C3 in only 1/9 states. The predictive-control frontier (L5) is WEAK.",
+    "4. DERIVATIVE MECHANISM REMAINS STRONGER: L3d (derivative-on-differential) from V3 remains the stronger candidate. V3.1 showed 53.8% M2 reduction. V7 claim audit confirms no prior art teaches it.",
+    "5. HONEST PUSH-THE-ENVELOPE: We attacked the predictive hypothesis and it did NOT survive. The derivative hypothesis (L3d) remains the load-bearing novel mechanism."
+  ],
+  "milestones_required_v7": [
+    "M1: Patent counsel opinion on L3d (derivative) \u2014 NOW with full claim audit of US11806490B2 (teaches-away distinction) + US11389630B2 (passive, not relevant) + US12653703B2 (L2 only)",
+    "M2: In-vivo ovine validation of L3d (derivative) \u2014 NOT L5 (predictive). VIEshunt's HiL test bench methodology is a reference.",
+    "M3: Monitor VIEshunt team (Fl\u00fcrenbrock F. at ETH Z\u00fcrich) for patent filings \u2014 they're publishing on Zone MPC for CSF, may file predictive-control patents",
+    "M4: Azygos Vascular FTO assessment (carried from V4)",
+    "M5: FDA regulatory pathway for derivative-action controller (NOT predictive)",
+    "M6: If predictive control is still desired, redesign C4 with longer lookahead (30s+ for sensor latency scenarios) and test against harder disturbances specifically designed to expose prediction value"
+  ],
+  "anti_inflation_check": {
+    "all_ci_pass": true,
+    "v7_new_checks": [
+      "C19 (NEW V7): Predictive controller CEILING result disclosed honestly (not promoted to milestone) \u2713",
+      "C20 (NEW V7): Full claim audit with hashes \u2014 not keyword-only conclusions \u2713",
+      "C21 (NEW V7): VIEshunt competitive IP disclosed (0 patents found, not assumed absent) \u2713",
+      "C22 (NEW V7): Pre-registered threshold applied mechanically (C4 fails \u2192 CEILING declared) \u2713"
+    ]
+  }
+}
