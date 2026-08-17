@@ -1,0 +1,38 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "phase": "PATSNAP_NEW_KEY_TEST",
+  "timestamp": "2026-08-17T16:58:45.409005+00:00",
+  "key_fingerprint": "e452376879f9c32c",
+  "ceo_directive": "Test new PatSnap key",
+  "tests": [
+    {
+      "endpoint": "/basic-patent-data/claim-data",
+      "schema_used": "GET ?patent_number=US11850390B2 (correct per OpenAPI spec)",
+      "error_code": 67200005,
+      "result": "BLOCKED (Insufficient balance, call failed!)"
+    },
+    {
+      "endpoint": "/search/patent/nested-search-patent",
+      "schema_used": "POST {query_text:\"TTL:shunt\",limit:5,offset:0} (correct per OpenAPI spec)",
+      "error_code": 67200005,
+      "result": "BLOCKED (Insufficient balance, call failed!)"
+    },
+    {
+      "endpoint": "/search/patent/current-search-patent",
+      "schema_used": "POST {assignee:\"Apple\",limit:3,offset:0} (correct per OpenAPI spec)",
+      "error_code": 67200005,
+      "result": "BLOCKED (Insufficient balance, call failed!)"
+    },
+    {
+      "endpoint": "/search/patent/query-search-count/v2",
+      "schema_used": "POST {query_text:\"TTL:shunt\",collapse_by:\"PBD\",collapse_type:\"DOCDB\"}",
+      "error_code": 67200005,
+      "result": "BLOCKED (Insufficient balance, call failed!)"
+    }
+  ],
+  "overall_status": "BALANCE_EXHAUSTED",
+  "honest_assessment": "The new key (sk-OQF0...) was tested with correct schemas (validated against OpenAPI spec). All endpoints return error_code 67200005 (Insufficient balance, call failed). The first claim-data test appeared to work momentarily, but subsequent calls return 67200005. Diagnosis: BALANCE_EXHAUSTED (same as previous key). The key is valid but the account has insufficient balance. This is NOT a schema error (68300004) and NOT a tier restriction. It is a balance/credits issue.",
+  "schema_validation_status": "PASS — all schemas correct per OpenAPI spec (learned from V3.1 regression)",
+  "classification_rule_followed": "FETCH DOCS → VALIDATE SCHEMA → EXECUTE → INTERPRET ERROR → CLASSIFY (per PatSnap regression test)",
+  "implication_for_discovery": "Discovery endpoints remain blocked. The 18-ref corpus (from V72 when PatSnap had balance) is still the maximum achievable without PatSnap balance recharge or alternative APIs (EPO OPS, USPTO, Lens — all unconfigured). SEARCH_COMPLETENESS = INCOMPLETE for all inventions."
+}
