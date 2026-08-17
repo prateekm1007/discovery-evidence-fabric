@@ -5,8 +5,8 @@
 >
 > **Companion file:** `CREDENTIALS_AND_MODELS.md` — read this AFTER the handoff. Contains all API keys (PatSnap, NVIDIA, GitHub, Lens.org, PatentBear, Ollama), the 3-tier LLM routing policy (GLM-4-plus primary → Mistral → NVIDIA NIM), the 5-role multi-agent prompt-hash registry, full PatSnap endpoint documentation (P005/P007/P013/P015/P018/P073/AI30), GitHub REST API patterns, and the federated patent evidence layer.
 >
-> **Generated:** 2026-08-17 UTC
-> **Last commit on `main`:** `8b41ebe` (CereVasc dossier PDF pushed)
+> **Generated:** 2026-08-17 UTC (updated after the new coder's repair)
+> **Last commit on `main`:** `69ec0cc` (canonical-path repair complete)
 > **Repo:** https://github.com/prateekm1007/discovery-evidence-fabric
 > **Program:** discovery-evidence-fabric — medical-device invention discovery & patentability autonomous analysis for 15 companies × 10 moat positions = 150 inventions.
 > **Current company:** CereVasc, Inc.
@@ -274,25 +274,29 @@ Every new invention folder MUST follow this exact layout. CereVasc #2 (`CEREVASC
 3. **Legacy TASK*.json files may be preserved in the folder root** (e.g., `TASK1_RETENTION_PASSAGE_AUDIT.json`) — they are the source artifacts that were copied into canonical locations. Do NOT delete them. Do NOT add new ones.
 4. **Version supersession only.** When limitations change, create `_V<M+1>/` — do NOT edit `_V<M>/`. V1 is preserved forever (§9.11).
 
-### 5.4 `/home/z/my-project/scripts/` — Autocommand Library
+### 5.4 `/home/z/my-project/scripts/` — Session-Specific Experiments
+### 5.4.1 `protocol/scripts/` — Canonical Program Scripts (committed to repo)
 
-All scripts that operate on the repo MUST live in `/home/z/my-project/scripts/`, NOT in the repo root. The repo's `.gitignore` excludes them from commits (they are dev-side tooling, not deliverables).
+There are **two script locations**. Read carefully — confusing them causes the entropy the new coder hit in the prior session:
 
-Existing scripts (the new chat should use these as references and extend, not rewrite):
-
-```
-/home/z/my-project/scripts/
-├── assemble_cerevasc_v2_package.py       ← assembles CereVasc #2 package (regenerates SHA256SUMS, MANIFEST, EVIDENCE_LEDGER, REVISED_SCORE)
-├── migrate_v2_to_canonical.py            ← migrates an invention folder from flat TASK*.json to canonical 19-directory layout
-├── generate_cerevasc_dossier_pdf.py      ← compiles the dossier into a single CEO-grade PDF (ReportLab)
-└── (future scripts go here)
-```
+| Location | Purpose | Committed? | Examples |
+|----------|---------|-----------|----------|
+| `protocol/scripts/` (in the repo) | Canonical program-level scripts that every session needs | **YES — committed** | `assemble_invention_package.py`, `migrate_to_canonical_layout.py`, `generate_dossier_pdf.py` |
+| `/home/z/my-project/scripts/` (dev-side) | Session-specific experiments, one-off audits, scratch scripts | **NO — gitignored** | `audit_cycle*.py`, `run_*.py`, etc. |
 
 **Entropy prevention rules for scripts:**
 
 1. **Rule 9 (Script Persistence):** Scripts >10 lines MUST be saved to a file via `Write` tool BEFORE being executed. No `python3 -c "..."` heredocs for non-trivial work. Inline one-liners are fine.
 2. **On failure, edit in place.** Do NOT rewrite the whole script with `Write` after a partial failure — use `Edit` to patch the failing lines and re-run.
-3. **Same file path persists across iterations.** `assemble_cerevasc_v2_package.py` is the canonical script for assembling CereVasc #2; do not create `assemble_cerevasc_v2_package_v2.py` — extend the existing one.
+3. **Same file path persists across iterations.** `assemble_invention_package.py` is the canonical script for assembling invention packages; do not create `assemble_invention_package_v2.py` — extend the existing one.
+4. **Program-level scripts go in `protocol/scripts/`** (committed). These include: assemblers, migrators, dossier PDF generators, anything that operates on the invention folder structure or is needed by every session.
+5. **Session-specific scripts go in `/home/z/my-project/scripts/`** (not committed). These include: ad-hoc API tests, one-off audits, debugging helpers.
+
+#### Existing canonical scripts in `protocol/scripts/` (read before running any autocommand on an invention folder):
+
+1. **`protocol/scripts/assemble_invention_package.py`** — regenerates SHA256SUMS, MANIFEST.json for an invention folder. Idempotent. Usage: `python3 protocol/scripts/assemble_invention_package.py <invention_dir>`
+2. **`protocol/scripts/migrate_to_canonical_layout.py`** — migrates a flat-layout (TASK*.json) invention folder to canonical 19-directory layout. PRESERVES original TASK files per §9.11. Usage: `python3 protocol/scripts/migrate_to_canonical_layout.py <invention_dir> --limitations-json <path> --freeze-author "<name>"`
+3. **`protocol/scripts/generate_dossier_pdf.py`** — compiles an invention folder into a single CEO-grade PDF. Usage: `python3 protocol/scripts/generate_dossier_pdf.py <invention_dir> --output <path> --title "<title>"`
 
 ### 5.5 `/home/z/my-project/download/` — User-Facing Deliverables ONLY
 
@@ -378,9 +382,9 @@ In this exact order. Skipping any of these will cause the new chat to break the 
 
 ### 6.5 Script library (read before running any autocommand)
 
-9. **`/home/z/my-project/scripts/assemble_cerevasc_v2_package.py`** — how to regenerate a package's MANIFEST/EVIDENCE_LEDGER/SHA256SUMS
-10. **`/home/z/my-project/scripts/migrate_v2_to_canonical.py`** — how to migrate a flat-layout folder to canonical
-11. **`/home/z/my-project/scripts/generate_cerevasc_dossier_pdf.py`** — how to compile a dossier PDF
+9. **`protocol/scripts/assemble_invention_package.py`** — how to regenerate a package's MANIFEST/SHA256SUMS. Generic; works on any invention folder.
+10. **`protocol/scripts/migrate_to_canonical_layout.py`** — how to migrate a flat-layout folder to canonical. Generic; works on any invention folder with TASK*.json files.
+11. **`protocol/scripts/generate_dossier_pdf.py`** — how to compile a dossier PDF. Generic; works on any invention folder.
 
 ### 6.6 Credentials & Models (read BEFORE any API call)
 
