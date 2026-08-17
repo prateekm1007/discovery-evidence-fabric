@@ -1,0 +1,52 @@
+{
+  "pcp_id": "PCP-001",
+  "title": "BELOW_BUYER_THRESHOLD terminal status + 4-concept separation",
+  "diff_type": "V1.0 → V1.1",
+  "scope": "MINIMAL — only two changes, no other protocol modifications",
+  "changes": [
+    {
+      "section": "§16 (Terminal Statuses)",
+      "v1_0": "WOULD_NOT_PAY | WOULD_CONSIDER_WITH_MILESTONES | LEVEL_4_BUYER_READY",
+      "v1_1": "WOULD_NOT_PAY | BELOW_BUYER_THRESHOLD | WOULD_CONSIDER_WITH_MILESTONES | LEVEL_4_BUYER_READY",
+      "diff": "ADD: BELOW_BUYER_THRESHOLD",
+      "definition": "BELOW_BUYER_THRESHOLD: hard gates (Patent + Evidence) PASS, but any soft gate FAILS OR composite < 70. Distinct from WOULD_NOT_PAY (hard gates fail). Distinct from WOULD_CONSIDER_WITH_MILESTONES (all gates pass + composite >= 70).",
+      "rationale": "V3 FINAL exposed a case where hard gates passed but soft gates failed. Calling this WOULD_NOT_PAY is misleading — the IP is proven, the engineering just needs physical validation. BELOW_BUYER_THRESHOLD is the honest intermediate state."
+    },
+    {
+      "section": "§7 + §16 (Adjudication Schema)",
+      "v1_0": "Single 'final_status' field derived from gate results",
+      "v1_1": "4 conceptual fields + derived final_status:\n  - PATENT_STATUS (102 + 103 state)\n  - ENGINEERING_STATUS (TECHNICAL + SAFETY gate state)\n  - BUYER_SENTIMENT (blind test result + source)\n  - BUYER_READINESS (mechanical: READY if all gates pass + composite >= 70, else NOT_READY)\n  - final_status (deterministically derived from the above per state machine)",
+      "diff": "ADD: 4 conceptual fields; final_status becomes derived, not chosen",
+      "rationale": "Conflating sentiment with readiness caused the V3 FINAL silent-promotion bug. Separating them makes the machine honest."
+    }
+  ],
+  "what_does_NOT_change": [
+    "§7.2 non-compensable Patent + Evidence gates — unchanged",
+    "§5.9 102 single-reference rule — unchanged",
+    "§5.10 103 motivation/expectation requirement — unchanged",
+    "§3.4 provenance chain — unchanged",
+    "§9.1-9.12 all preflight checks — unchanged",
+    "Law 7 historical permanence — unchanged",
+    "§14 protocol evolution workflow — unchanged (this PCP uses it)",
+    "All other sections — unchanged"
+  ],
+  "constitutional_invariants_preserved": [
+    "Non-compensable status of Patent and Evidence gates (§7.2)",
+    "102 single-reference rule (§5.9, §9.4)",
+    "103 motivation/expectation requirement (§5.10, §9.5)",
+    "Provenance chain requirement (§3.4, §9.3, §10)",
+    "Historical permanence (Law 7)",
+    "Protocol immutability within a run (§3.8)"
+  ],
+  "approval_required_from": "CEO (not the agent who filed PCP-001)",
+  "current_status": "PROPOSED — awaiting CEO approval",
+  "if_approved": "V1.1 constitution created; CONSTITUTION_REGISTRY.json updated; all future inventions declare protocol_version=V1.1",
+  "if_rejected": "V1.0 remains; BELOW_BUYER_THRESHOLD maps to WOULD_NOT_PAY (current behavior)",
+  "deterministic_state_machine": {
+    "rule_1": "Hard gate fail → WOULD_NOT_PAY",
+    "rule_2": "Hard gates pass + (any soft gate fail OR composite < 70) → BELOW_BUYER_THRESHOLD (V1.1) / WOULD_NOT_PAY (V1.0)",
+    "rule_3": "All gates pass + composite >= 70 + milestones remain → WOULD_CONSIDER_WITH_MILESTONES",
+    "rule_4": "All gates pass + composite >= 70 + no required milestones → LEVEL_4_BUYER_READY",
+    "enforcement": "protocol/governance/DETERMINISTIC_STATE_MACHINE.py — no LLM may override"
+  }
+}

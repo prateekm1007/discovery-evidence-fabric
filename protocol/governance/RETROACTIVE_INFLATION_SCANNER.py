@@ -215,7 +215,7 @@ def main():
     print(f"Report: {report_path}")
     print("=" * 60)
 
-    return 1 if critical_findings > 0 else 0
+    return 1 if (critical_findings > 0 or sum(r['high_count'] for r in all_results) > 0) else 0
 
 if __name__ == "__main__":
     exit(main())
