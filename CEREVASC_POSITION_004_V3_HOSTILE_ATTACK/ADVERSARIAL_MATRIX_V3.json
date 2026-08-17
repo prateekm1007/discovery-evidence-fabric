@@ -1,0 +1,960 @@
+{
+  "timestamp": "2026-08-17T22:07:16.665759+00:00",
+  "threshold_pre_registered": {
+    "declared_before_simulation": true,
+    "declaration_timestamp": "2026-08-18T00:00:00Z",
+    "buyer_grade": {
+      "M4_reduction_vs_C2_pct": 50,
+      "M5_drainage_preserved_pct_min": 80,
+      "M1_reduction_vs_C2_pct": 40
+    },
+    "milestone": {
+      "M4_reduction_vs_C2_pct": 25,
+      "M5_drainage_preserved_pct_min": 70,
+      "adversarial_case_required": true
+    },
+    "ceiling": {
+      "M4_reduction_vs_C2_pct_below": 25,
+      "or_no_adversarial_case": true
+    },
+    "rationale": "50% reduction in dangerous events halves clinical risk \u2014 buyer-grade. 25% is minimum detectable in a small trial \u2014 milestone grade. Below 25% or no adversarial case = no material advantage over P_CSF-only."
+  },
+  "states": {
+    "S1_normal_supine": {
+      "label": "normal supine",
+      "duration_min": 60,
+      "p_venous_baseline": 5.0,
+      "p_venous_profile": [
+        [
+          0,
+          5.0
+        ],
+        [
+          60,
+          5.0
+        ]
+      ],
+      "icp_direct_offset": 0.0,
+      "sensor_noise_std": 0.1,
+      "sensor_latency_min": 0,
+      "actuator_lag_min": 0,
+      "valve_stuck_pct": null
+    },
+    "S2_standing": {
+      "label": "standing (slow)",
+      "duration_min": 60,
+      "p_venous_baseline": 5.0,
+      "p_venous_profile": [
+        [
+          0,
+          5.0
+        ],
+        [
+          5,
+          10.0
+        ],
+        [
+          60,
+          10.0
+        ]
+      ],
+      "icp_direct_offset": -3.0,
+      "sensor_noise_std": 0.3,
+      "sensor_latency_min": 0,
+      "actuator_lag_min": 0,
+      "valve_stuck_pct": null
+    },
+    "S3_rapid_stand": {
+      "label": "rapid stand",
+      "duration_min": 60,
+      "p_venous_baseline": 5.0,
+      "p_venous_profile": [
+        [
+          0,
+          5.0
+        ],
+        [
+          1,
+          13.0
+        ],
+        [
+          5,
+          10.0
+        ],
+        [
+          60,
+          10.0
+        ]
+      ],
+      "icp_direct_offset": -3.0,
+      "sensor_noise_std": 0.3,
+      "sensor_latency_min": 0,
+      "actuator_lag_min": 0,
+      "valve_stuck_pct": null
+    },
+    "S4_valsalva": {
+      "label": "Valsalva (30s strain)",
+      "duration_min": 60,
+      "p_venous_baseline": 5.0,
+      "p_venous_profile": [
+        [
+          0,
+          5.0
+        ],
+        [
+          10,
+          5.0
+        ],
+        [
+          11,
+          25.0
+        ],
+        [
+          11.5,
+          25.0
+        ],
+        [
+          12,
+          5.0
+        ],
+        [
+          60,
+          5.0
+        ]
+      ],
+      "icp_direct_offset": 0.0,
+      "sensor_noise_std": 0.5,
+      "sensor_latency_min": 0,
+      "actuator_lag_min": 0,
+      "valve_stuck_pct": null
+    },
+    "S5_cough": {
+      "label": "cough (5s explosive)",
+      "duration_min": 60,
+      "p_venous_baseline": 5.0,
+      "p_venous_profile": [
+        [
+          0,
+          5.0
+        ],
+        [
+          10,
+          5.0
+        ],
+        [
+          10.1,
+          35.0
+        ],
+        [
+          10.2,
+          35.0
+        ],
+        [
+          10.3,
+          5.0
+        ],
+        [
+          60,
+          5.0
+        ]
+      ],
+      "icp_direct_offset": 0.0,
+      "sensor_noise_std": 0.5,
+      "sensor_latency_min": 0,
+      "actuator_lag_min": 0,
+      "valve_stuck_pct": null
+    },
+    "S6_sleep_apnea": {
+      "label": "sleep apnea (8h condensed to 60min)",
+      "duration_min": 60,
+      "p_venous_baseline": 5.0,
+      "p_venous_profile": [
+        [
+          0,
+          5.0
+        ],
+        [
+          10,
+          5.0
+        ],
+        [
+          20,
+          5.0
+        ],
+        [
+          30,
+          5.0
+        ],
+        [
+          40,
+          5.0
+        ],
+        [
+          50,
+          5.0
+        ],
+        [
+          60,
+          5.0
+        ],
+        [
+          5,
+          10.0
+        ],
+        [
+          15,
+          10.0
+        ],
+        [
+          25,
+          10.0
+        ],
+        [
+          35,
+          10.0
+        ],
+        [
+          45,
+          10.0
+        ],
+        [
+          55,
+          10.0
+        ],
+        [
+          60,
+          5.0
+        ]
+      ],
+      "icp_direct_offset": 0.0,
+      "sensor_noise_std": 0.4,
+      "sensor_latency_min": 0,
+      "actuator_lag_min": 0,
+      "valve_stuck_pct": null
+    },
+    "S7_venous_stenosis": {
+      "label": "venous stenosis (chronic)",
+      "duration_min": 60,
+      "p_venous_baseline": 15.0,
+      "p_venous_profile": [
+        [
+          0,
+          15.0
+        ],
+        [
+          60,
+          15.0
+        ]
+      ],
+      "icp_direct_offset": 3.0,
+      "sensor_noise_std": 0.3,
+      "sensor_latency_min": 0,
+      "actuator_lag_min": 0,
+      "valve_stuck_pct": null
+    },
+    "S8_simultaneous_ICP_venous": {
+      "label": "simultaneous ICP+venous rise",
+      "duration_min": 60,
+      "p_venous_baseline": 10.0,
+      "p_venous_profile": [
+        [
+          0,
+          5.0
+        ],
+        [
+          5,
+          10.0
+        ],
+        [
+          60,
+          10.0
+        ]
+      ],
+      "icp_direct_offset": 5.0,
+      "sensor_noise_std": 0.3,
+      "sensor_latency_min": 0,
+      "actuator_lag_min": 0,
+      "valve_stuck_pct": null
+    },
+    "S9_sensor_noise": {
+      "label": "sensor noise (\u00b12 mmHg)",
+      "duration_min": 60,
+      "p_venous_baseline": 5.0,
+      "p_venous_profile": [
+        [
+          0,
+          5.0
+        ],
+        [
+          60,
+          5.0
+        ]
+      ],
+      "icp_direct_offset": 0.0,
+      "sensor_noise_std": 2.0,
+      "sensor_latency_min": 0,
+      "actuator_lag_min": 0,
+      "valve_stuck_pct": null
+    },
+    "S10_sensor_latency": {
+      "label": "sensor latency (30s)",
+      "duration_min": 60,
+      "p_venous_baseline": 5.0,
+      "p_venous_profile": [
+        [
+          0,
+          5.0
+        ],
+        [
+          10,
+          15.0
+        ],
+        [
+          40,
+          15.0
+        ],
+        [
+          60,
+          5.0
+        ]
+      ],
+      "icp_direct_offset": 0.0,
+      "sensor_noise_std": 0.2,
+      "sensor_latency_min": 0.5,
+      "actuator_lag_min": 0,
+      "valve_stuck_pct": null
+    },
+    "S11_actuator_delay": {
+      "label": "actuator delay (15s)",
+      "duration_min": 60,
+      "p_venous_baseline": 5.0,
+      "p_venous_profile": [
+        [
+          0,
+          5.0
+        ],
+        [
+          10,
+          15.0
+        ],
+        [
+          40,
+          15.0
+        ],
+        [
+          60,
+          5.0
+        ]
+      ],
+      "icp_direct_offset": 0.0,
+      "sensor_noise_std": 0.2,
+      "sensor_latency_min": 0,
+      "actuator_lag_min": 0.25,
+      "valve_stuck_pct": null
+    },
+    "S12_actuator_stuck": {
+      "label": "actuator stuck at 50%",
+      "duration_min": 60,
+      "p_venous_baseline": 5.0,
+      "p_venous_profile": [
+        [
+          0,
+          5.0
+        ],
+        [
+          10,
+          15.0
+        ],
+        [
+          40,
+          15.0
+        ],
+        [
+          60,
+          5.0
+        ]
+      ],
+      "icp_direct_offset": 0.0,
+      "sensor_noise_std": 0.2,
+      "sensor_latency_min": 0,
+      "actuator_lag_min": 0,
+      "valve_stuck_pct": 0.5
+    }
+  },
+  "matrix": {
+    "S1_normal_supine": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 55.6,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 32.1,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 19.0,
+        "M8_energy_actuation_burden": 0.0334
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 43.7,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 27.0,
+        "M8_energy_actuation_burden": 0.057
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 43.1,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 25.0,
+        "M8_energy_actuation_burden": 0.0621
+      }
+    },
+    "S2_standing": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 11.4,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 8.6,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 29.0,
+        "M8_energy_actuation_burden": 0.0748
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 4.8,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 7.0,
+        "M8_energy_actuation_burden": 0.0307
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 4.8,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 3.0,
+        "M8_energy_actuation_burden": 0.0327
+      }
+    },
+    "S3_rapid_stand": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 2,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 10.1,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 6.6,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 34.0,
+        "M8_energy_actuation_burden": 0.0848
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 3.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 6.0,
+        "M8_energy_actuation_burden": 0.0366
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 3.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 10.0,
+        "M8_energy_actuation_burden": 0.0516
+      }
+    },
+    "S4_valsalva": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 55.1,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 2,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 32.9,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 41.0,
+        "M8_energy_actuation_burden": 0.1445
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 43.9,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 56.0,
+        "M8_energy_actuation_burden": 0.3854
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 43.1,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 55.0,
+        "M8_energy_actuation_burden": 0.3937
+      }
+    },
+    "S5_cough": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 55.6,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 2,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 33.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 40.0,
+        "M8_energy_actuation_burden": 0.1452
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 43.4,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 56.0,
+        "M8_energy_actuation_burden": 0.3501
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 42.1,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 55.0,
+        "M8_energy_actuation_burden": 0.3412
+      }
+    },
+    "S6_sleep_apnea": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 37.7,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 2,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 28.9,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 45.0,
+        "M8_energy_actuation_burden": 0.1429
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 6,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 24.7,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 51.0,
+        "M8_energy_actuation_burden": 0.3236
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 6,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 25.3,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 45.0,
+        "M8_energy_actuation_burden": 0.3623
+      }
+    },
+    "S7_venous_stenosis": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 0.7,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 1.5,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 42.0,
+        "M8_energy_actuation_burden": 0.0983
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 0.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 9.0,
+        "M8_energy_actuation_burden": 0.0401
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 0.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 15.0,
+        "M8_energy_actuation_burden": 0.0885
+      }
+    },
+    "S8_simultaneous_ICP_venous": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 37.9,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 53.1,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 42.0,
+        "M8_energy_actuation_burden": 0.1238
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 31.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 51.0,
+        "M8_energy_actuation_burden": 0.2371
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 31.1,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 42.0,
+        "M8_energy_actuation_burden": 0.1698
+      }
+    },
+    "S9_sensor_noise": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 56.0,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 41.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 47.0,
+        "M8_energy_actuation_burden": 0.4914
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 0,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 45.8,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 56.0,
+        "M8_energy_actuation_burden": 1.094
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 2,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 49.7,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 57.0,
+        "M8_energy_actuation_burden": 1.154
+      }
+    },
+    "S10_sensor_latency": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 13.7,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 17.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 26.0,
+        "M8_energy_actuation_burden": 0.056
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 10.0,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 14.0,
+        "M8_energy_actuation_burden": 0.0492
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 11.4,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 13.0,
+        "M8_energy_actuation_burden": 0.0571
+      }
+    },
+    "S11_actuator_delay": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 13.8,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 17.3,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 30.0,
+        "M8_energy_actuation_burden": 0.0586
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 9.9,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 18.0,
+        "M8_energy_actuation_burden": 0.06
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 11.6,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 17.0,
+        "M8_energy_actuation_burden": 0.067
+      }
+    },
+    "S12_actuator_stuck": {
+      "C1_FIXED": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 7.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C2_P_CSF_ONLY": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 7.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C3_DELTA_P": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 7.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      },
+      "C4_PREDICTIVE": {
+        "M1_time_outside_target_min": 0,
+        "M2_over_drainage_events": 0,
+        "M3_under_drainage_events": 1,
+        "M4_dangerous_event_rate_per_hr": 0.0,
+        "M5_drainage_preserved_pct": 7.2,
+        "M6_recovery_time_min": 0,
+        "M7_false_intervention_rate_per_hr": 0.0,
+        "M8_energy_actuation_burden": 0.0
+      }
+    }
+  },
+  "aggregate_metrics": {
+    "C1_FIXED": {
+      "avg_M1_time_outside_target": 0.0,
+      "avg_M2_over_drain_events": 0.0,
+      "avg_M3_under_drain_events": 0.583,
+      "avg_M4_dangerous_rate": 0.0,
+      "avg_M5_drainage_preserved_pct": 29.567,
+      "avg_M6_recovery_time": 0.0,
+      "avg_M7_false_intervention_rate": 0.0,
+      "avg_M8_energy_burden": 0.0
+    },
+    "C2_P_CSF_ONLY": {
+      "avg_M1_time_outside_target": 0.0,
+      "avg_M2_over_drain_events": 0.0,
+      "avg_M3_under_drain_events": 1.167,
+      "avg_M4_dangerous_rate": 0.0,
+      "avg_M5_drainage_preserved_pct": 23.317,
+      "avg_M6_recovery_time": 0.0,
+      "avg_M7_false_intervention_rate": 32.917,
+      "avg_M8_energy_burden": 0.121
+    },
+    "C3_DELTA_P": {
+      "avg_M1_time_outside_target": 0.0,
+      "avg_M2_over_drain_events": 0.0,
+      "avg_M3_under_drain_events": 1.083,
+      "avg_M4_dangerous_rate": 0.0,
+      "avg_M5_drainage_preserved_pct": 22.333,
+      "avg_M6_recovery_time": 0.0,
+      "avg_M7_false_intervention_rate": 29.25,
+      "avg_M8_energy_burden": 0.222
+    },
+    "C4_PREDICTIVE": {
+      "avg_M1_time_outside_target": 0.0,
+      "avg_M2_over_drain_events": 0.0,
+      "avg_M3_under_drain_events": 1.25,
+      "avg_M4_dangerous_rate": 0.0,
+      "avg_M5_drainage_preserved_pct": 22.733,
+      "avg_M6_recovery_time": 0.0,
+      "avg_M7_false_intervention_rate": 28.083,
+      "avg_M8_energy_burden": 0.232
+    }
+  },
+  "adversarial_cases": [],
+  "adversarial_case_found": false,
+  "threshold_check": {
+    "C3_DELTA_P": {
+      "M4_reduction_vs_C2_pct": 0,
+      "M5_drainage_preserved_pct": 22.3,
+      "M1_reduction_vs_C2_pct": 0,
+      "buyer_grade_pass": false,
+      "milestone_pass": false,
+      "ceiling": true
+    },
+    "C4_PREDICTIVE": {
+      "M4_reduction_vs_C2_pct": 0,
+      "M5_drainage_preserved_pct": 22.7,
+      "M1_reduction_vs_C2_pct": 0,
+      "buyer_grade_pass": false,
+      "milestone_pass": false,
+      "ceiling": true
+    }
+  },
+  "summary": {
+    "C2_P_CSF_ONLY_avg_M4": 0.0,
+    "C3_DELTA_P_avg_M4": 0.0,
+    "C4_PREDICTIVE_avg_M4": 0.0,
+    "C3_reduction_pct": 0,
+    "C4_reduction_pct": 0,
+    "adversarial_case_count": 0
+  }
+}

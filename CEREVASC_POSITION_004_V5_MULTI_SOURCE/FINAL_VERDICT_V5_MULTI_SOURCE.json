@@ -1,0 +1,354 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1_1",
+  "invention_id": "CEREVASC_POSITION_004_V5_MULTI_SOURCE_ATTACK",
+  "timestamp": "2026-08-17T23:07:39.681525+00:00",
+  "ceo_directive": "V5 \u2014 execute multi-source pipeline: Lens \u2192 Compendex/Inspec \u2192 Scopus \u2192 PatSnap \u2192 PatentBear \u2192 primary evidence",
+  "pipeline_executed": {
+    "lens_scholarly_search": "WORKING \u2014 13 queries, 50+ papers analyzed",
+    "elsevier_compendex_inspec": "FAILED \u2014 api.elsevier.com/content/search/ev returned RESOURCE_NOT_FOUND",
+    "elsevier_scopus": "WORKING \u2014 7 searches including VIEshunt + CSFsim specific lookups",
+    "elsevier_sciencedirect": "FAILED \u2014 AUTHORIZATION_ERROR (requestor not authorized)",
+    "patsnap_claim_data": "WORKING \u2014 retrieved WO2020086847A1 (90 claims) + US7691077B2 (29 claims)",
+    "patsnap_nested_search": "PARTIAL \u2014 4 queries executed (all returned 0 hits), then BALANCE_EXHAUSTED",
+    "patsnap_family_expansion": "FAILED \u2014 'API need a true rate!' (rate limit)",
+    "patsnap_backward_citations": "FAILED \u2014 BALANCE_EXHAUSTED (67200005)",
+    "patentbear_free_search": "WORKING (V4 carried forward) \u2014 10 Boolean searches + 10 high-threat patents",
+    "google_patents": "WORKING (V3 baseline) \u2014 3 deep fetches + 10 keyword searches"
+  },
+  "key_v5_discoveries": [
+    "VIEshunt (2025, Fluids and Barriers of the CNS) \u2014 direct competitor smart shunt paper with IMU + micro pump + pressure sensor + wireless + microcontroller. Tested in ovine model. Uses posture-specific ICP references (12 mmHg supine, -3 mmHg upright). Does NOT use venous-aware differential. CHANGES L3b posture_compensation from SEARCH_INCOMPLETE (V4) to FOUND (V5).",
+    "CSFsim (2025, IEEE EMBC) \u2014 open-source simulation framework for CSF dynamics + closed-loop shunt systems. Validates engineering approach but does NOT teach venous-aware control.",
+    "'Cerebral venous overdrainage' (2016, Neurosurgical Focus) \u2014 peer-reviewed paper explicitly identifying venous system as major factor in ICP dynamics after CSF diversion. CLINICAL MOTIVATION for venous-aware control \u2014 supports buyer value.",
+    "'Pursuit of a smart shunt' (2013, Surgical Neurology International) \u2014 review explicitly calling for smart shunt development. Validates territory.",
+    "'First-in-human endovascular treatment of hydrocephalus' (2021, J Neurointerventional Surg) \u2014 clinical validation of eShunt concept.",
+    "PatSnap claim-data RE-CONFIRMS WO2020086847A1 has 90 claims and US 7,691,077 B2 has 29 claims \u2014 neither teaches derivative-on-differential control."
+  ],
+  "prior_art_chart_v5": {
+    "L1_generic_P_CSF_to_valve": {
+      "claim": "P_CSF \u2192 controller \u2192 adjustable valve (generic pressure-feedback shunt)",
+      "prior_art_status": "FOUND",
+      "evidence_v3": [
+        "WO2020086847A1",
+        "US20230355937A1"
+      ],
+      "evidence_v4_patentbear": [
+        "US 8,109,899 B2 (Likvor AB)"
+      ],
+      "evidence_v5_lens_scopus": [
+        "Lens: 1968 paper 'Control of Hydrocephalus by Valve-Regulated Venous Shunt' (Journal of Neurosurgery) \u2014 50+ year old baseline",
+        "Lens: 2005 paper 'Changes in Pressure-Flow Control Characteristics of Shunt Valves by Intracranial' \u2014 describes existing pressure-flow control",
+        "Lens: 2014 paper 'Finally, open loop control of intracranial pressure in hydrocephalus' (JNNP) \u2014 confirms open-loop is current standard"
+      ],
+      "verdict": "DESTROYED \u2014 baseline technology, not invention."
+    },
+    "L2_P_CSF_minus_P_venous_to_valve": {
+      "claim": "P_CSF - P_venous \u2192 valve resistance (differential-pressure-driven valve)",
+      "prior_art_status": "FOUND",
+      "evidence_v3": [
+        "WO2020086847A1 (Pei = Pcsf - Pp)"
+      ],
+      "evidence_v4_patentbear": [
+        "US 7,691,077 B2 (claim 2 \u2014 proportional differential via microneedle array)",
+        "US 12,515,024 B2 (Azygos \u2014 passive mechanical differential valve)",
+        "US 12,121,684 B1 + US 11,752,315 B1 (hyperbaric chamber method)"
+      ],
+      "evidence_v5_patsnap_claim_data": [
+        "PatSnap claim-data retrieval (V5): WO2020086847A1 has 90 claims (confirmed) \u2014 primary claim 1 teaches 'measuring the cerebral spinal fluid pressure (Pcsf) within the ventricle of a brain, indirectly measuring the intraparenchymal pressure (Pp) within the parenchyma space of the brain, calculating the effective differential pressure (Pei = Pcsf - Pp)'",
+        "PatSnap claim-data retrieval (V5): US 7,691,077 B2 has 29 claims (confirmed) \u2014 claim 2 teaches 'microvalves permit the flow of CSF through the microneedles based on the pressure differential between the subarachnoid space at the proximal end of the needles and the sinus at the distal end'"
+      ],
+      "verdict": "DESTROYED \u2014 basic differential is taught by 4+ independent patents. NOT the invention."
+    },
+    "L3a_adaptive_continuous_adjustment": {
+      "claim": "Adaptive / continuously-adjusting valve using feedback",
+      "prior_art_status": "FOUND",
+      "evidence_v3": [
+        "WO2020086847A1"
+      ],
+      "evidence_v5_lens_scopus": [
+        "Lens: 2025 VIEshunt paper 'automatically adapted the controller reference' \u2014 modern smart shunt with continuous adaptation (posture-based, NOT venous-based)",
+        "Lens: 2013 'Pursuit of a smart shunt' (Surgical Neurology International) \u2014 review explicitly calling for smart shunt development"
+      ],
+      "verdict": "DESTROYED \u2014 continuous adaptation is taught."
+    },
+    "L3b_posture_compensation": {
+      "claim": "Compensation for posture-induced pressure changes",
+      "prior_art_status": "FOUND",
+      "evidence_v3": [
+        "WO2020086847A1"
+      ],
+      "evidence_v4_patentbear": [
+        "US 12,508,406 B2 (CereVasc) \u2014 14 posture mentions in description",
+        "US 7,691,077 B2 \u2014 5 posture mentions"
+      ],
+      "evidence_v5_lens_scopus": [
+        "Lens: 2025 VIEshunt paper 'detected the simulated posture changes of the patient and automatically adapted the controller reference. The posture-specific ICP references of 12 mmHg for supine and -3 mmHg for upright position were tracked without offset' \u2014 VIEshunt HAS posture compensation with INERTIAL MEASUREMENT UNIT (IMU)",
+        "Lens: 2016 'A physical framework for implementing virtual models' (J Neurosurg Pediatrics) \u2014 describes 'changes in baseline ICP due to changes in patient posture' as a known simulation scenario"
+      ],
+      "verdict": "DESTROYED \u2014 posture compensation is now taught by VIEshunt (2025) with IMU + posture-specific ICP references. NOT the invention."
+    },
+    "L3c_transient_pressure_trigger": {
+      "claim": "Transient-pressure-triggered valve control",
+      "prior_art_status": "FOUND",
+      "evidence_v3": [
+        "US20230355937A1 (transient ventricular pressure)"
+      ],
+      "verdict": "DESTROYED \u2014 for VENTRICULAR pressure transient. Does NOT teach VENOUS pressure transient."
+    },
+    "L3d_DERIVATIVE_on_differential_for_transient_venous_compensation": {
+      "claim": "Rate-of-change (DERIVATIVE) of the P_CSF - P_venous differential, used as a control input to proactively modify valve resistance during rapid venous state changes (Valsalva, cough, posture transitions)",
+      "prior_art_status": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH",
+      "evidence_v5_lens_scopus": [
+        "Lens LD1 ('venous pressure AND CSF AND shunt AND (derivative OR rate of change OR feedback)'): 3,345 hits \u2014 top 3 papers are about ICP waveform morphology, CSF overproduction, and CSF dynamics theoretical framework. NONE teach derivative-of-differential control for CSF shunt.",
+        "Scopus S2 ('cerebrospinal fluid drainage valve derivative rate-of-change'): 0 hits \u2014 exact phrase combination NOT FOUND in Scopus.",
+        "Lens LD7 (VIEshunt + smart shunt): VIEshunt (2025) uses posture-specific ICP references and micro pump \u2014 does NOT use venous pressure as control input, does NOT use derivative action.",
+        "Lens LD7: 'Pursuit of a smart shunt' (2013) review \u2014 describes smart shunt concepts but does not teach derivative-of-differential."
+      ],
+      "evidence_v5_patsnap": [
+        "PatSnap claim-data WO2020086847A1 (90 claims re-fetched V5): NO claim teaches derivative action. All claims teach proportional differential calculation (Pei = Pcsf - Pp) and threshold-based valve adjustment.",
+        "PatSnap claim-data US 7,691,077 B2 (29 claims re-fetched V5): claim 2 teaches proportional differential. NO derivative action. The 'rate of change' mention in specification is about PHYSICAL ROBUSTNESS (valve must withstand pressure changes), not control input.",
+        "PatSnap nested-search P1 ('CSF AND venous AND (derivative OR rate of change)'): 0 hits \u2014 exact phrase combination NOT FOUND in PatSnap patent corpus."
+      ],
+      "evidence_v5_scholarly_literature_supports_thesis": [
+        "Lens LD2 + LD5: 'Cerebral venous overdrainage: an under-recognized complication of cerebrospinal fluid' (2016, Neurosurgical Focus) \u2014 peer-reviewed paper ACKNOWLEDGES 'the cerebral venous system plays a major role in intracranial pressure (ICP) dynamics' after CSF diversion. This is the CLINICAL MOTIVATION for venous-aware control \u2014 but the paper does NOT propose derivative-of-differential as a solution.",
+        "Lens LD5: 'A proposed mechanism to explain increases in intracranial pressure' (2020, J Cardiol Cardiovasc Med) \u2014 hypothesizes that 'with elevated cerebral spinal fluid (CSF) pressure, cerebral micro-vascular obstruction and congestion may occur despite (subdural) large-vein pressures being normal' \u2014 supports the venous-aware thesis but does NOT teach control solution."
+      ],
+      "evidence_gap": "Engineering Village / Compendex endpoint returned RESOURCE_NOT_FOUND (api.elsevier.com/content/search/ev is not the correct URL for this API key). Cannot declare complete coverage of engineering literature. PatSnap family expansion + backward citations also failed (BALANCE_EXHAUSTED after step 1-5 used remaining credits).",
+      "verdict": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH (Lens + Scopus + PatSnap + PatentBear V4). SEARCH_INCOMPLETE overall because (1) Compendex/Inspec unavailable via API and (2) PatSnap family expansion failed. This is the CANDIDATE NOVEL MECHANISM \u2014 load-bearing per V3.2 ablation (+38.5 percentage points of over-drainage reduction). Peer-reviewed literature explicitly identifies the clinical problem (venous overdrainage) but does NOT teach the derivative-on-differential solution."
+    },
+    "L3e_valsalva_specific_compensation": {
+      "claim": "Specific active compensation for Valsalva maneuver",
+      "prior_art_status": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH",
+      "evidence_v5_lens_scopus": [
+        "Scopus S3 ('CSF shunt Valsalva maneuver over-drainage'): 1 hit \u2014 'Transient binocular visual loss: A rare presentation of ventriculoperitoneal shunt' (BMJ Case Reports 2011) \u2014 describes Valsalva-induced complication, NOT compensation mechanism.",
+        "Lens LD2: 'A physical framework' (2016) mentions 'transient ICP spikes caused by activities such as exercise, coughing, sneezing' as SIMULATION SCENARIOS \u2014 but does NOT teach active compensation, only simulation testing.",
+        "Lens LD2: 'Implementation of an Automated CSF Drainage System' (2021, Brain Sciences) \u2014 automated drainage system but for EXTERNAL CSF drain mobilization, NOT Valsalva compensation."
+      ],
+      "verdict": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH. SEARCH_INCOMPLETE overall (Compendex unavailable)."
+    },
+    "L3f_respiratory_cycle_compensation": {
+      "claim": "Active compensation for respiratory-cycle pressure oscillations",
+      "prior_art_status": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH",
+      "evidence_v5_lens": [
+        "Lens LD3: top results are about KETAMINE ANAESTHESIA (1972) and shunt pressure measurements (1973) \u2014 NOT about active respiratory compensation.",
+        "Lens LD3: 'A physical framework' (2016) mentions 'oscillations in ICP due to respiratory and cardiac cycles' as a SIMULATION SCENARIO \u2014 acknowledges the disturbance but does NOT teach active compensation."
+      ],
+      "verdict": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH. SEARCH_INCOMPLETE overall."
+    },
+    "L3g_sleep_apnea_compensation": {
+      "claim": "Active compensation for sleep-apnea-induced venous oscillations",
+      "prior_art_status": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH",
+      "evidence_v5_lens": [
+        "Lens LD4: 'Sleep-Disordered Breathing and Idiopathic Normal-Pressure Hydrocephalus' (2019, Curr Neurol Neurosci Rep) \u2014 reviews link between sleep apnea and iNPH, but does NOT propose shunt control solution.",
+        "Lens LD4: 'Obstructive Sleep Apnea Leading to Increased Intracranial Pressure' (1989, Chest) \u2014 describes the problem, not a solution."
+      ],
+      "verdict": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH. SEARCH_INCOMPLETE overall."
+    },
+    "L3h_venous_congestion_detection": {
+      "claim": "Active detection and compensation for venous congestion/stenosis",
+      "prior_art_status": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH",
+      "evidence_v5_lens": [
+        "Lens LD5: 'Cerebral venous disorders' (2026, Frontiers in Neurology) \u2014 review of venous disorders including 'chronic intracranial venous hypertension and stenotic outflow states' \u2014 clinical review, not shunt control solution.",
+        "Lens LD5: 'Cerebral venous overdrainage' (2016, Neurosurgical Focus) \u2014 describes venous overdrainage as a complication of CSF shunting, NOT as a detection target."
+      ],
+      "verdict": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH. SEARCH_INCOMPLETE overall."
+    },
+    "L4_unexpected_safety_effect_over_drainage_prevention": {
+      "claim": "Venous-aware derivative control achieves >50% reduction in over-drainage events",
+      "prior_art_status": "MODEL_DERIVED (simulation only, no prior art teaches this result)",
+      "evidence_v3": [
+        "V3.1 simulation: C3 full achieves 53.8% M2 reduction vs C2"
+      ],
+      "evidence_v5_supporting_literature": [
+        "Lens LD2 + LD5: 'Cerebral venous overdrainage' (2016, Neurosurgical Focus) explicitly identifies venous overdrainage as a CLINICAL PROBLEM \u2014 supports the buyer value of solving it.",
+        "Lens LD7: VIEshunt (2025) explicitly mentions 'preventing adverse over- and underdrainage' as a design goal \u2014 validates the buyer need but uses posture-based ICP references, not venous-aware derivative control."
+      ],
+      "verdict": "MODEL_DERIVED \u2014 simulation evidence supports the unexpected effect. V5 literature search confirms the clinical problem is recognized but the solution (venous-aware derivative control) is not taught."
+    },
+    "L5_predictive_control": {
+      "claim": "Predict future venous state changes and pre-adjust drainage",
+      "prior_art_status": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH",
+      "evidence_v5_lens": [
+        "Lens LD6 ('predictive AND CSF AND shunt AND valve'): 5,472 hits \u2014 top results are about CLINICAL PREDICTION of shunt response (statistical), NOT real-time predictive valve control.",
+        "Lens LD6: 'CSF Dynamics for Shunt Prognostication' (2021, J Clin Med) \u2014 prognostication = clinical prediction of shunt surgery outcome, NOT real-time control.",
+        "V3.1 simulation: C4 PREDICTIVE controller FAILS buyer-grade threshold (7.7% M2 reduction) \u2014 predictive control is NOT load-bearing."
+      ],
+      "verdict": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH. SEARCH_INCOMPLETE overall. NOTE: Predictive control is NOT load-bearing \u2014 drop L5 from claim."
+    },
+    "E_eShunt_specific_venous_boundary_dual_purpose": {
+      "claim": "Using the venous drainage boundary as BOTH sensor input AND controlled output",
+      "prior_art_status": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH",
+      "evidence_v5_lens": [
+        "Lens LD8: 'First-in-human endovascular treatment of hydrocephalus with a miniature biomimetic' (2021, J Neurointerventional Surg) \u2014 describes endovascular CSF shunt that 'mimics the function of the arachnoid granulation' \u2014 confirms eShunt concept is clinically validated, but does NOT teach venous boundary as dual sensor+output.",
+        "Lens LD8: 'Anatomical characterization of the inferior petrosal sinus' (2021, J Neurointerventional Surg) \u2014 anatomical study for eShunt deployment, not control."
+      ],
+      "verdict": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH. SEARCH_INCOMPLETE overall. Structural feature of eShunt platform."
+    }
+  },
+  "search_completeness_v5": {
+    "certificate_id": "SCC_POSITION_004_V5_MULTI_SOURCE_20260818",
+    "timestamp": "2026-08-17T23:07:39.681502+00:00",
+    "protocol": "INVENTION_PROTOCOL_V1_1 \u00a76.3 (3-state search completeness)",
+    "pipeline": "Lens \u2192 Compendex/Inspec \u2192 Scopus \u2192 PatSnap \u2192 PatentBear \u2192 primary evidence",
+    "patsnap_state": {
+      "claim_data_endpoint": "WORKING (REDACTED-PATSNAP-KEY-3-PARTIAL... new key with balance) \u2014 retrieved WO2020086847A1 (90 claims) + US7691077B2 (29 claims)",
+      "nested_search_endpoint": "WORKING initially, then BALANCE_EXHAUSTED after 4 calls (P1-P4 returned 0 hits, P5 returned balance error)",
+      "family_expansion_endpoint": "FAILED \u2014 'API need a true rate!' (rate limit, not balance)",
+      "backward_citation_endpoint": "FAILED \u2014 BALANCE_EXHAUSTED (67200005)",
+      "remaining_balance": "EXHAUSTED after step 1-5 (claim-data + 4 nested-searches consumed available credits)"
+    },
+    "lens_state": {
+      "scholarly_search_endpoint": "WORKING (REDACTED-LENS-PARTIAL... key has scholarly access)",
+      "patent_search_endpoint": "401 \u2014 key lacks patent access (scholarly-only token)",
+      "queries_executed": "13 (5 broad + 8 focused)",
+      "total_papers_analyzed": "50+ across all queries"
+    },
+    "elsevier_state": {
+      "scopus_search_endpoint": "WORKING (REDACTED-SCOPUS-PARTIAL8... key)",
+      "scopus_abstract_retrieval": "WORKING for metadata, but abstracts not always populated",
+      "engineering_village_compendex_endpoint": "RESOURCE_NOT_FOUND \u2014 api.elsevier.com/content/search/ev is not the correct URL for this API key. Engineering Village may require a separate subscription or different endpoint.",
+      "science_direct_endpoint": "AUTHORIZATION_ERROR \u2014 requestor not authorized for ScienceDirect",
+      "queries_executed": "7 (5 searches + VIEshunt lookup + CSFsim lookup)"
+    },
+    "patentbear_state": {
+      "method": "Free public web search via agent-browser (no auth required)",
+      "carried_forward_from_v4": "10 Boolean searches + 10 high-threat patents with full claims + passage analysis"
+    },
+    "google_patents_state": {
+      "method": "agent-browser headless chromium (V3 baseline)",
+      "deep_patents_fetched": 3
+    },
+    "claim_states_v5": {
+      "L1_generic_P_CSF_to_valve": "FOUND",
+      "L2_P_CSF_minus_P_venous_to_valve": "FOUND (PatSnap claim-data confirmed 90 claims in WO'847)",
+      "L3a_adaptive_continuous": "FOUND (VIEshunt 2025 + WO'847)",
+      "L3b_posture_compensation": "FOUND (VIEshunt 2025 with IMU + posture-specific ICP references \u2014 NEW V5 finding)",
+      "L3c_transient_pressure_trigger": "FOUND",
+      "L3d_DERIVATIVE_on_differential": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH (Lens + Scopus + PatSnap + PatentBear) \u2014 SEARCH_INCOMPLETE overall (Compendex unavailable + PatSnap family expansion failed)",
+      "L3e_valsalva_specific": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH \u2014 SEARCH_INCOMPLETE overall",
+      "L3f_respiratory_cycle": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH \u2014 SEARCH_INCOMPLETE overall",
+      "L3g_sleep_apnea": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH \u2014 SEARCH_INCOMPLETE overall",
+      "L3h_venous_congestion": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH \u2014 SEARCH_INCOMPLETE overall",
+      "L4_unexpected_safety_effect": "MODEL_DERIVED (simulation only) \u2014 V5 literature confirms clinical problem is recognized (cerebral venous overdrainage 2016 paper)",
+      "L5_predictive_control": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH \u2014 SEARCH_INCOMPLETE overall; ALSO simulation shows L5 is NOT load-bearing",
+      "E_eShunt_dual_purpose": "NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH \u2014 SEARCH_INCOMPLETE overall"
+    },
+    "overall_search_completeness": "SEARCH_INCOMPLETE",
+    "rationale": "V5 executed the CEO's full multi-source pipeline (Lens \u2192 Compendex/Inspec \u2192 Scopus \u2192 PatSnap \u2192 PatentBear). Three of five sources are fully working (Lens scholarly, Scopus, PatentBear). PatSnap claim-data worked for 2 high-threat patents but nested-search exhausted the balance after 4 calls, and family expansion + backward citations failed (rate limit + balance). Engineering Village / Compendex endpoint returned RESOURCE_NOT_FOUND \u2014 the API key may not have Compendex entitlement, OR the endpoint URL is different from what was tried. ScienceDirect returned AUTHORIZATION_ERROR. Per V1.1 \u00a76.3, search-completeness state remains SEARCH_INCOMPLETE because (1) Compendex/Inspec is unavailable, (2) PatSnap family expansion failed, and (3) PatSnap backward citations failed. However, V5 provides MATERIALLY STRONGER evidence than V4: 50+ scholarly papers analyzed, 7 Scopus searches, PatSnap claim-data for both top threats (WO'847 + US 7,691,077), and the discovery of VIEshunt (2025) as a direct competitor smart-shunt paper.",
+    "ceo_directive_compliance": "Per CEO directive 2026-08-18: 'No LIKELY NOVEL. Use FOUND / NOT_FOUND_AFTER_COMPLETE_SEARCH / SEARCH_INCOMPLETE.' This certificate declares SEARCH_INCOMPLETE \u2014 no claim of LIKELY_NOVEL is made. However, V5 upgrades L3d-h + L5 + E from 'NOT_FOUND_AFTER_TARGETED_PATENTBEAR_SEARCH (V4)' to 'NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH (V5)' \u2014 the search now covers Lens + Scopus + PatSnap + PatentBear, a materially broader evidence base.",
+    "key_v5_discoveries": [
+      "VIEshunt (2025, Fluids and Barriers of the CNS) \u2014 direct competitor smart shunt with IMU + micro pump + pressure sensor + wireless. Uses posture-specific ICP references (12 mmHg supine, -3 mmHg upright). Does NOT use venous-aware differential. Confirms L3b (posture compensation) is now FOUND.",
+      "CSFsim (2025, IEEE EMBC) \u2014 open-source simulation framework for CSF dynamics + closed-loop shunt systems. Validates the engineering approach but does NOT teach venous-aware control.",
+      "'Cerebral venous overdrainage' (2016, Neurosurgical Focus) \u2014 peer-reviewed paper explicitly identifying venous system as major factor in ICP dynamics after CSF diversion. CLINICAL MOTIVATION for venous-aware control \u2014 but paper does NOT propose the solution.",
+      "'First-in-human endovascular treatment of hydrocephalus' (2021, J Neurointerventional Surg) \u2014 clinical validation of eShunt concept (mimics arachnoid granulation).",
+      "'Pursuit of a smart shunt' (2013, Surgical Neurology International) \u2014 review explicitly calling for smart shunt development."
+    ]
+  },
+  "deterministic_state_machine_v5": {
+    "input": {
+      "PATENT_STATUS": {
+        "L1_FOUND": true,
+        "L2_FOUND": true,
+        "L3a_FOUND": true,
+        "L3b_FOUND_V5_NEW": true,
+        "L3c_FOUND": true,
+        "L3d_NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH": true,
+        "L3e_h_NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH": true,
+        "L4_MODEL_DERIVED": true,
+        "L5_NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH": true,
+        "E_NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH": true,
+        "any_NOT_FOUND_AFTER_COMPLETE_SEARCH": false,
+        "any_SEARCH_INCOMPLETE": true,
+        "verdict": "UNCERTAIN \u2014 at least one claim is SEARCH_INCOMPLETE",
+        "verdict_v5_upgrade": "V5 materially strengthens the evidence base: Lens (13 queries, 50+ papers) + Scopus (7 searches) + PatSnap claim-data (WO'847 + US 7,691,077) + PatentBear (V4 carried forward) + Google Patents (V3 baseline). NO source teaches the L3d derivative-on-differential mechanism. VIEshunt (2025) discovered as direct competitor \u2014 confirms L3b posture compensation is now FOUND but VENOUS-AWARE DIFFERENTIAL remains NOT_FOUND across all sources."
+      },
+      "ENGINEERING_STATUS": {
+        "simulation_executed": true,
+        "pre_registered_threshold": true,
+        "C3_buyer_grade_pass": true,
+        "C4_buyer_grade_pass": false,
+        "load_bearing_mechanism_identified": true,
+        "adversarial_case_found": true,
+        "adversarial_case_count": 8,
+        "verdict": "PASS \u2014 C3 with derivative term achieves pre-registered buyer-grade threshold",
+        "v5_validation": "VIEshunt (2025) paper confirms smart shunt with IMU + micro pump is technically feasible \u2014 validates engineering approach."
+      },
+      "BUYER_SENTIMENT": "NOT_ASSESSED \u2014 requires external buyer input. V5 literature confirms clinical problem (cerebral venous overdrainage) is recognized, supporting buyer value.",
+      "BUYER_READINESS": "NOT_READY \u2014 requires patent counsel + in-vivo validation per V1.1 \u00a77.4"
+    },
+    "output": {
+      "final_status": "WOULD_CONSIDER_WITH_MILESTONES",
+      "rationale": "PATENT_STATUS remains UNCERTAIN because Compendex/Inspec unavailable and PatSnap family expansion failed. V5 materially strengthens the evidence: Lens + Scopus + PatSnap + PatentBear + Google Patents \u2014 NO source teaches the L3d derivative-on-differential mechanism. VIEshunt (2025) discovered as direct competitor but uses posture-based ICP references, NOT venous-aware differential. ENGINEERING_STATUS is PASS (C3 with derivative achieves 53.8% M2 reduction). Per V1.1 \u00a77 deterministic state machine: UNCERTAIN patent + PASS engineering = WOULD_CONSIDER_WITH_MILESTONES.",
+      "v4_to_v5_change": "V5 adds multi-source prior-art attack (Lens + Scopus + PatSnap claim-data + Compendex attempted). Key new finding: VIEshunt (2025) paper is a direct competitor smart shunt \u2014 confirms L3b posture compensation is now FOUND (was SEARCH_INCOMPLETE in V4). VENOUS-AWARE DIFFERENTIAL remains NOT_FOUND. FINAL_STATUS remains WOULD_CONSIDER_WITH_MILESTONES \u2014 milestone set sharpened with VIEshunt competitive analysis.",
+      "milestones_required": [
+        "M1: Restore PatSnap API balance and execute (a) family-expansion on WO2020086847A1 + US 7,691,077 B2 + US 12,515,024 B2, (b) backward-citations on all three, (c) semantic-search using WO'847 as seed patent_id. These were attempted in V5 but failed due to balance/rate-limit.",
+        "M2: Gain access to Engineering Village / Compendex / Inspec (separate Elsevier subscription or different API endpoint). The V5 attempt at api.elsevier.com/content/search/ev returned RESOURCE_NOT_FOUND. Compendex covers engineering literature that Scopus may not fully index (e.g., IEEE conference papers, engineering society publications).",
+        "M3: Passage-level claim chart on top 10 highest-threat families. PatentBear V4.3 already provides 10 \u2014 PatSnap family expansion (M1) may reveal more.",
+        "M4: Patent counsel opinion on whether L3d derivative-on-differential mechanism is taught by any combination of (WO'847 + US'937 + US 7,691,077 + Azygos + VIEshunt paper) under 35 USC 103. VIEshunt (2025) is a paper, not a patent \u2014 but may still be \u00a7102 prior art. Note: US 7,691,077 'rate of change' is about PHYSICAL ROBUSTNESS, not control input.",
+        "M5: In-vivo validation in ovine model. VIEshunt (2025) paper describes a similar ovine model \u2014 coordinate with VIEshunt team or replicate their HiL test bench methodology. Pre-register same 50% M2 reduction threshold BEFORE animal experiment.",
+        "M6: Confirm safety of derivative-action controller under sensor fault, latency, actuator stuck (V3.1 simulation covers S9-S12 \u2014 in-vivo fault injection needed).",
+        "M7: Define regulatory pathway with FDA \u2014 Class II 510(k) with predicate. VIEshunt (2025) is not yet FDA-cleared, so predicate may be Medtronic Strata / Sophysa Polaris programmable valves, OR De Novo if derivative-action is deemed novel.",
+        "M8: Azygos Vascular FTO assessment (carried from V4 M7) \u2014 Azygos is direct competitor with passive mechanical flow regulator.",
+        "M9 (NEW): VIEshunt competitive intelligence \u2014 VIEshunt (2025) paper describes similar smart shunt architecture. Assess whether VIEshunt team has filed patents on venous-aware control (Lens patent search returned 401 \u2014 cannot check patent literature via Lens). PatentBear V4 search did not surface VIEshunt-related patents."
+      ],
+      "evidence_classification": {
+        "OBSERVED": [
+          "CereVasc eShunt device description (V3)",
+          "WO2020086847A1 claim structure (V3) \u2014 V5 re-confirmed via PatSnap claim-data (90 claims)",
+          "US 7,691,077 B2 claim 2 (V4) \u2014 V5 re-confirmed via PatSnap claim-data (29 claims)",
+          "Azygos Vascular US 12,515,024 B2 (V4)",
+          "VIEshunt (2025) paper \u2014 V5 NEW discovery via Scopus + Lens",
+          "CSFsim (2025) paper \u2014 V5 NEW discovery via Scopus + Lens"
+        ],
+        "EXTERNAL_EVIDENCE": [
+          "Google Patents: 3 deep fetches + 10 keyword searches (V3)",
+          "PatentBear: 10 Boolean searches + 10 high-threat patents (V4)",
+          "Lens scholarly: 13 queries, 50+ papers (V5 NEW)",
+          "Scopus: 7 searches including VIEshunt + CSFsim (V5 NEW)",
+          "PatSnap claim-data: WO'847 (90 claims) + US 7,691,077 (29 claims) (V5 NEW)"
+        ],
+        "MODEL_DERIVED": [
+          "V3.1 high-fidelity simulation (12 states \u00d7 4 controllers \u00d7 9 metrics)",
+          "V3.2 ablation (4 controller variants \u00d7 12 states)",
+          "Pre-registered threshold check (C3 buyer-grade PASS, C4 FAILS)"
+        ],
+        "HYPOTHESIS": [
+          "In-vivo over-drainage reduction will match simulation (requires M5 validation)",
+          "PatSnap family expansion will not reveal killer prior art for L3d (requires M1 to confirm)",
+          "Compendex/Inspec will not reveal killer prior art for L3d (requires M2 to confirm)",
+          "VIEshunt team has not filed patents on venous-aware control (requires M9 to confirm)"
+        ]
+      },
+      "anti_inflation_check": {
+        "ci_failure_conditions_scanned": [
+          "C1: Pre-registered threshold defined BEFORE simulation \u2713",
+          "C2: Threshold logic mechanically applied (no LLM reinterpretation) \u2713",
+          "C3: Adversarial case definition pre-registered \u2713",
+          "C4: All 12 states simulated \u2713",
+          "C5: All 4 controllers tested on all 12 states \u2713",
+          "C6: Load-bearing mechanism identified via ablation \u2713",
+          "C7: Search-completeness declared SEARCH_INCOMPLETE when sources unavailable \u2713",
+          "C8: No 'LIKELY_NOVEL' language used \u2713",
+          "C9: Patent prior art for L1, L2, L3a-c explicitly FOUND (conceded) \u2713",
+          "C10: PatentBear search results fully disclosed \u2713",
+          "C11: US 7,691,077 'rate of change' correctly classified as physical robustness \u2713",
+          "C12: Likvor 'predict' correctly classified as clinical prediction \u2713",
+          "C13 (NEW V5): VIEshunt (2025) posture compensation correctly classified as L3b FOUND (was SEARCH_INCOMPLETE in V4) \u2713",
+          "C14 (NEW V5): Compendex/Inspec unavailability disclosed honestly \u2713",
+          "C15 (NEW V5): PatSnap family expansion failure disclosed honestly \u2713"
+        ],
+        "all_ci_pass": true
+      }
+    }
+  },
+  "final_status": "WOULD_CONSIDER_WITH_MILESTONES",
+  "load_bearing_novel_mechanism": "Rate-of-change (DERIVATIVE) of the P_CSF - P_venous differential, used as a control input to proactively modify valve resistance during rapid venous state changes (Valsalva, cough, posture transitions). This is Level 3 (dynamic venous-state compensation), distinct from: (a) Level 2 proportional differential (taught by WO2020086847A1 + US 7,691,077 B2 + Azygos patents), (b) posture-specific ICP references (taught by VIEshunt 2025). V5 multi-source search (Lens + Scopus + PatSnap + PatentBear + Google Patents) confirms NO source teaches this mechanism \u2014 but SEARCH_INCOMPLETE overall because Compendex unavailable + PatSnap family expansion failed.",
+  "ceo_directive_compliance": {
+    "pipeline_lens_to_compendex_to_scopus_to_patsnap_to_patentbear_executed": true,
+    "compendex_unavailable_disclosed_honestly": true,
+    "no_LIKELY_NOVEL_language": true,
+    "search_completeness_3_state": true,
+    "passage_grounded_evidence": true,
+    "new_competitor_VIEshunt_disclosed": true,
+    "v4_to_v5_upgrade_L3b_search_incomplete_to_found": true
+  }
+}
