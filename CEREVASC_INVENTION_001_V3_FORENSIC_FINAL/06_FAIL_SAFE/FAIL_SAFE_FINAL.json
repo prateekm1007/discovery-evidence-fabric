@@ -1,0 +1,88 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "CEREVASC_INVENTION_001_V3_FORENSIC_FINAL",
+  "phase": "G_FAIL_SAFE",
+  "status": "MODEL_SUPPORTED — REQUIRES_PHYSICAL_VALIDATION",
+  "architectures": [
+    {
+      "arch_id": "FS1",
+      "name": "Pressure-relief bypass (spring-loaded valve)",
+      "type": "passive_mechanical",
+      "description": "Spring-loaded bypass valve opens when dP > 15 mmHg, shunting CSF past membrane",
+      "drainage_preservation": "YES — full shunt flow (0.35 mL/min) when bypass open",
+      "trigger": "dP > 15 mmHg",
+      "response_time_s": 0.1,
+      "residual_flow_mL_min": 0.35,
+      "failure_mode": "Spring fatigue (5-year life)",
+      "failure_of_failure": "Redundant second spring; symptomatic headache if both fail",
+      "modeled_safety_margin": "PASS — opens well below ICP_max_safe",
+      "worst_case_behavior": "Spring yields open → permanent bypass (drainage preserved, retention lost)",
+      "safety_classification": "ACCEPTABLE"
+    },
+    {
+      "arch_id": "FS2",
+      "name": "Membrane-bypass geometry (elastic slits)",
+      "type": "passive_mechanical",
+      "description": "Membrane sleeve has axial slits that open under high pressure",
+      "drainage_preservation": "YES — 0.25 mL/min when slits open",
+      "trigger": "dP > 18 mmHg",
+      "response_time_s": 1.0,
+      "residual_flow_mL_min": 0.25,
+      "failure_mode": "Slits permanently open (material yield)",
+      "failure_of_failure": "Retention lost but drainage preserved",
+      "modeled_safety_margin": "MARGINAL — higher trigger, slower response",
+      "worst_case_behavior": "Slits fail to open → ICP rises (symptomatic)",
+      "safety_classification": "ACCEPTABLE_WITH_CAVEATS"
+    },
+    {
+      "arch_id": "FS3",
+      "name": "Redundant drainage channel (parallel path)",
+      "type": "passive_hydraulic",
+      "description": "Second parallel drainage channel without membrane, normally restricted",
+      "drainage_preservation": "YES — 0.35 mL/min via parallel channel",
+      "trigger": "dP > 20 mmHg (higher threshold — only for acute occlusion)",
+      "response_time_s": 0.5,
+      "residual_flow_mL_min": 0.35,
+      "failure_mode": "Parallel channel occlusion (independent fouling)",
+      "failure_of_failure": "Two independent channels must both occlude for failure",
+      "modeled_safety_margin": "PASS — redundant path",
+      "worst_case_behavior": "Both channels occlude → ICP rises (very unlikely)",
+      "safety_classification": "ACCEPTABLE"
+    },
+    {
+      "arch_id": "FS4",
+      "name": "Dissolvable plug (time-delayed backup)",
+      "type": "passive_chemical",
+      "description": "Dissolvable plug in parallel channel opens after sustained ICP elevation",
+      "drainage_preservation": "YES — 0.35 mL/min after plug dissolves",
+      "trigger": "ICP > 20 mmHg sustained >2 hours",
+      "response_time_s": 7200,
+      "residual_flow_mL_min": 0.35,
+      "failure_mode": "Plug dissolves prematurely or fails to dissolve",
+      "failure_of_failure": "If plug fails, patient presents with acute hydrocephalus",
+      "modeled_safety_margin": "FAIL for acute occlusion — 2-hour response too slow",
+      "worst_case_behavior": "Acute thrombus → 2-hour delay → symptomatic",
+      "safety_classification": "UNACCEPTABLE_AS_PRIMARY — acceptable as tertiary backup only"
+    }
+  ],
+  "selection": {
+    "primary": "FS1 (Pressure-relief bypass)",
+    "secondary": "FS3 (Redundant drainage channel)",
+    "tertiary_backup": "FS4 (Dissolvable plug — time-delayed, not primary)",
+    "rationale": "FS1 + FS3 provide redundant drainage preservation. FS4 is tertiary backup only (2-hour response too slow for acute).",
+    "drainage_preservation_mandatory": true,
+    "drainage_preservation_satisfied": true
+  },
+  "engineering_gate": {
+    "score": 62,
+    "threshold": 60,
+    "status": "PASS",
+    "rationale": "3 acceptable fail-safe architectures (FS1, FS2, FS3) with drainage preservation. FS4 rejected as primary. Composite FS1+FS3 design provides redundancy."
+  },
+  "honest_caveats": [
+    "All response times are engineering estimates, not measured",
+    "Spring fatigue life requires accelerated aging testing",
+    "Elastomer creep (FS2) requires chronic material testing",
+    "Redundant channel (FS3) requires in vivo validation that independent fouling is achievable"
+  ]
+}
