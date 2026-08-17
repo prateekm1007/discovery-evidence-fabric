@@ -1,0 +1,82 @@
+{
+  "protocol": "CEREVASC_V4_HOSTILE_SEARCH",
+  "version": "V4",
+  "timestamp": "2026-08-17T00:40:13.786442+00:00",
+  "corpus_status": {
+    "verified_records": 10,
+    "discovered_records": 10,
+    "unresolved_records": 0,
+    "corpus_completeness_status": "PARTIAL",
+    "csf_related_patents": 7,
+    "note": "10 patents retrieved from PatSnap. PA: CereVasc assignee search returned 0. Inventor search (Malek+Heilman) found 146-233 patents but most non-CSF. Additional pending applications and foreign family members may exist."
+  },
+  "critical_finding": {
+    "title": "CEREVASC OWN PATENT US20160051801A1 ALREADY CLAIMS DUAL PRESSURE+FLOW SENSING ON CSF CATHETER",
+    "patent": "US20160051801A1",
+    "claim_5_text": "The system of claim 1, further comprising at least two transducers positioned on or about the catheter, wherein at least one transducer is a pressure sensor and at least one transducer is a flow sensor.",
+    "implication": "CereVasc ALREADY has a patent claiming pressure sensing + flow sensing on a CSF catheter. This means RESCUE_001 L1 (CSF pressure sensor) and L6 (monitoring output) are ALREADY DISCLOSED by CereVasc own patent.",
+    "limitation_impact": {
+      "L1_sensor_CSF_pressure": "DISCLOSED by US20160051801A1 claim 5 (pressure sensor on CSF catheter)",
+      "L2_venous_sinus_pressure": "NOT_DISCLOSED (pressure sensor is in CSF space, not venous sinus)",
+      "L3_differential": "NOT_DISCLOSED (no differential calculation claimed)",
+      "L4_eShunt_context": "PARTIALLY \u2014 catheter accesses CSF space but specific dural venous sinus deployment not in this claim",
+      "L5_occlusion_prediction": "NOT_DISCLOSED",
+      "L6_monitoring_output": "DISCLOSED (transducer = sensor = monitoring output)"
+    }
+  },
+  "second_finding": {
+    "title": "CEREVASC PATENT US20160136398A1 MENTIONS PRESSURE AND DIFFERENTIAL IN CSF-VENOUS CONTEXT",
+    "patent": "US20160136398A1",
+    "relevant_text": "Method for treating hydrocephalus using a shunt deployed between CP angle cistern and inferior petrosal sinus (IPS). Claims mention pressure and differential in context of CSF drainage.",
+    "limitation_impact": {
+      "L1_CSF_pressure": "FOUND (keyword present)",
+      "L2_venous_pressure": "FOUND (keyword present)",
+      "L3_differential": "FOUND (keyword present)",
+      "L4_subarachnoid_dural": "NOT_FOUND (uses CP angle cistern and IPS, not subarachnoid/dural)",
+      "L5_occlusion_patency": "NOT_FOUND",
+      "L6_monitoring_output": "NOT_FOUND"
+    },
+    "caveat": "Keyword presence does NOT mean the claims actually disclose differential pressure measurement for monitoring. The claims describe a shunt DEPLOYMENT METHOD, not a monitoring system. The keywords appear in the context of treating normal pressure hydrocephalus (NPH) \u2014 the word \"pressure\" refers to the disease name, not a sensor."
+  },
+  "102_result": {
+    "status": "SURVIVES (but weakened)",
+    "rationale": "No single reference discloses ALL 6 limitations. However, CereVasc own patent US20160051801A1 claim 5 discloses L1 (CSF pressure sensor) and L6 (monitoring output). The remaining limitations (L2 venous sinus pressure, L3 differential, L5 occlusion prediction) are NOT disclosed in any single CereVasc patent. The 102 SURVIVES but is WEAKENED because 2 of 6 limitations are already in CereVasc own portfolio."
+  },
+  "103_result": {
+    "status": "HIGH_RISK",
+    "rationale": "CereVasc own patent US20160051801A1 already claims dual pressure+flow sensing on a CSF catheter. Adding a venous sinus pressure sensor and calculating a differential is a PREDICTABLE EXTENSION of this existing claim. A PHOSITA reading US20160051801A1 would be motivated to add a venous pressure sensor (the eShunt already accesses the venous sinus). The differential calculation is a straightforward mathematical operation. The occlusion prediction is the only potentially non-obvious element, but trend detection from pressure data is known in the art.",
+    "motivation": "STRONG \u2014 CereVasc already has dual sensing on CSF catheter; extending to venous sinus is natural",
+    "expectation_of_success": "HIGH \u2014 pressure sensors work; differential calculation is trivial math",
+    "technical_effect": "WEAK \u2014 the differential is a mathematical derivative of two known measurements",
+    "whole_claim": "MERE_AGGREGATION \u2014 pressure sensor + differential + occlusion algorithm = juxtaposition of known elements",
+    "hindsight_risk": "MEDIUM \u2014 the combination appears obvious given CereVasc existing dual-sensor patent"
+  },
+  "algorithm_assessment": {
+    "question": "Is the occlusion-predictive algorithm technically meaningful?",
+    "answer": "WEAK \u2014 the algorithm likely uses trend detection (pressure changes over time). This is a GENERIC signal processing technique. While the SIGNAL (CSF-venous differential) may be novel, the ALGORITHM itself is not. The patentability depends on whether the differential measurement is patentable as a method/apparatus \u2014 and CereVasc own US20160051801A1 already claims pressure sensing on the CSF catheter.",
+    "strength": "WEAK"
+  },
+  "elite_gate_check": {
+    "A_corpus_completeness": "PARTIAL \u2014 10 patents verified, may be more",
+    "B_actual_claim_evidence": "YES \u2014 claims retrieved for all 10 patents",
+    "C_102_survives": "YES (but weakened \u2014 2/6 limitations in CereVasc own patent)",
+    "D_103_survives": "NO \u2014 HIGH RISK from US20160051801A1 + predictable extension",
+    "E_no_evidence_gaps": "NO \u2014 490 external patents not claim-level searched, but CereVasc OWN patent is the biggest threat",
+    "F_technical_effect": "WEAK \u2014 differential is math; algorithm is generic trend detection",
+    "G_manufacturing": "SIMULATED_FEASIBLE",
+    "H_competitor_differentiation": "WEAK \u2014 CereVasc own patent already has dual sensing",
+    "I_design_around_resistance": "LOW \u2014 competitors (and CereVasc itself) already have pressure sensing",
+    "J_provenance": "YES"
+  },
+  "final_status": "OBVIOUSNESS_RISK",
+  "final_rationale": "RESCUE_001 does NOT survive the V4 hostile search. The critical finding is that CereVasc OWN patent US20160051801A1 (claim 5) already discloses dual pressure+flow sensing on a CSF catheter. Adding a venous sinus pressure sensor and calculating a differential is a PREDICTABLE EXTENSION of this existing claim. The 103 risk is HIGH because: (1) CereVasc already has dual sensing, (2) the eShunt already accesses the venous sinus, (3) differential calculation is trivial math, (4) the occlusion algorithm is generic trend detection. The invention is OBVIOUSNESS_RISK \u2014 it may be obvious over CereVasc own prior art. Additionally, US20160136398A1 mentions pressure and differential in the CSF-venous context, further weakening novelty.",
+  "recommendation": "KILL RESCUE_001. The invention cannot survive 103 over CereVasc own US20160051801A1. A dead invention with documented reason is more valuable than a fake ELITE. The documented reason: CereVasc own patent already claims the core sensing architecture.",
+  "llm_hallucination_v3": {
+    "documented": true,
+    "patent": "US20180301441A1",
+    "llm_claim": "Discloses CSF-venous differential sensing",
+    "actual": "LED display manufacturing \u2014 14 claims about TFT backplates",
+    "caught_by": "PatSnap claim-data verification",
+    "lesson": "LLM patent analysis MUST be verified against actual claims. LLM knowledge of patent numbers is unreliable."
+  }
+}
