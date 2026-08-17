@@ -1,0 +1,75 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1_1",
+  "invention_id": "CEREVASC_INVENTION_003_V1",
+  "phase": "PHYSICAL_TEST_PLAN",
+  "timestamp": "2026-08-17T18:14:40.786001+00:00",
+  "ceo_directive": "Complete reproducible flow-loop simulation and define exact physical tests to move TECHNICAL/SAFETY gates to PROVEN.",
+  "current_gates": {
+    "TECHNICAL_GATE": "60/65 FAIL",
+    "SAFETY_GATE": "58/60 FAIL"
+  },
+  "physical_tests": [
+    {
+      "test_id": "ET1",
+      "name": "Dual-lumen flow independence",
+      "purpose": "Verify CSF drainage and drug delivery operate without cross-contamination",
+      "metric": "cross_contamination_rate",
+      "target": "< 1% drug in drainage lumen at steady state",
+      "method": "Flow loop with fluorescent drug surrogate; measure fluorescence in drainage outflow",
+      "sample_size": "n=5",
+      "gate": "TECHNICAL_GATE",
+      "moves_to_PROVEN": true
+    },
+    {
+      "test_id": "ET2",
+      "name": "Pressure-limiting valve response",
+      "purpose": "Verify valve prevents drug backflow at differential pressures",
+      "metric": "backflow_rate_at_threshold",
+      "target": "0 mL/min backflow at dP ≤ 15 mmHg",
+      "method": "Progressive pressure ramp; measure drug backflow via fluorescence",
+      "sample_size": "n=5, 10 cycles each",
+      "gate": "SAFETY_GATE",
+      "moves_to_PROVEN": true
+    },
+    {
+      "test_id": "ET3",
+      "name": "Drug delivery rate control",
+      "purpose": "Verify sustained drug delivery at therapeutic rate",
+      "metric": "drug_delivery_rate_mL_per_hr",
+      "target": "0.1-1.0 mL/hr (therapeutic range for CSF drug delivery)",
+      "method": "Infusion pump + drug surrogate; measure delivery rate over 24h",
+      "sample_size": "n=3",
+      "gate": "TECHNICAL_GATE",
+      "moves_to_PROVEN": true
+    },
+    {
+      "test_id": "ET4",
+      "name": "Membrane/coating integrity",
+      "purpose": "Verify drug-lumen coating does not delaminate under flow",
+      "metric": "coating_integrity_after_72h",
+      "target": "No visible delamination; <5% drug burst release",
+      "method": "72h flow test; visual inspection + drug release measurement",
+      "sample_size": "n=3",
+      "gate": "SAFETY_GATE",
+      "moves_to_PROVEN": true
+    },
+    {
+      "test_id": "ET5",
+      "name": "Fail-safe: drainage preservation on drug-lumen failure",
+      "purpose": "Verify CSF drainage continues when drug lumen occludes",
+      "metric": "drainage_flow_after_drug_occlusion",
+      "target": "≥0.30 mL/min (≥85% baseline) after drug lumen occlusion",
+      "method": "Occlude drug lumen; measure drainage flow continuously",
+      "sample_size": "n=5",
+      "gate": "SAFETY_GATE",
+      "moves_to_PROVEN": true
+    }
+  ],
+  "estimated_cost": "$25,000 (equipment + consumables + 8 weeks)",
+  "estimated_timeline": "8 weeks",
+  "gate_progression": {
+    "TECHNICAL_GATE": "60 → PROVEN if ET1+ET3 pass (flow independence + delivery rate)",
+    "SAFETY_GATE": "58 → PROVEN if ET2+ET4+ET5 pass (valve + coating + fail-safe)"
+  },
+  "note": "Engineering is now the bottleneck. Patent result is no longer the dominant problem."
+}
