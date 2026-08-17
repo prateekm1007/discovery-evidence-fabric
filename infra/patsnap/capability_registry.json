@@ -1,0 +1,310 @@
+{
+  "version": "1.0",
+  "created_at": "2026-08-17T00:00:00Z",
+  "description": "PatSnap Open Platform capability registry. Documents every endpoint, its purpose, input/output, batch limits, cost behavior, authentication, status, and error codes.",
+  "governance_rules": [
+    "LLM-generated patent facts are hypotheses. Retrieved patent text is evidence.",
+    "Keyword presence is discovery evidence, never claim evidence.",
+    "Three separate counts: keyword_match_count, claim_relevant_count, claim_limitations_disclosed_count.",
+    "PatSnap similarity is discovery evidence, not anticipation evidence.",
+    "Never use abandonment as evidence that technical disclosure is irrelevant.",
+    "Three graphs: technology (who discloses), ownership (who owns), buyer (who wants). Never merge.",
+    "Every conclusion must point to evidence_id \u2192 primary source. If chain breaks: CONCLUSION = UNSUPPORTED.",
+    "Cost optimization: COUNT \u2192 DISCOVERY \u2192 SEMANTIC RANKING \u2192 FAMILY COLLAPSE \u2192 RELEVANCE \u2192 CLAIMS \u2192 DEEP EVIDENCE. Never retrieve claims for thousands of patents."
+  ],
+  "endpoints": {
+    "P018_claim_data": {
+      "endpoint": "/basic-patent-data/claim-data",
+      "method": "GET",
+      "purpose": "Retrieve patent claim text",
+      "input": "patent_number or patent_id",
+      "output": "claims[], claim_text, claim_count, claim_independent_count, patent_id, pn",
+      "batch_limit": 100,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "LIVE",
+      "last_verified": "2026-08-17",
+      "error_codes": {
+        "67200005": "Insufficient balance",
+        "67200203": "API need a true rate"
+      },
+      "fallback": "none",
+      "notes": "Primary evidence source for 102/103 analysis. Returns HTML claim text that must be parsed."
+    },
+    "P003_analytics_query": {
+      "endpoint": "/search/patent/query-search-count/v2",
+      "method": "POST",
+      "purpose": "Search patents with structured query, return count",
+      "input": "query_text (TACD: prefix, PA:, IN:, CPC:, IPC:, etc.), collapse_by, collapse_type, collapse_order",
+      "output": "total_search_result_count",
+      "batch_limit": 1,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "LIVE",
+      "last_verified": "2026-08-17",
+      "error_codes": {
+        "67200005": "Insufficient balance",
+        "67200203": "API need a true rate"
+      },
+      "fallback": "none",
+      "notes": "Returns COUNT only, not patent IDs. Use for discovery funnel: COUNT \u2192 filter \u2192 then use nested-search or current-assignee for IDs.",
+      "collapse_options": [
+        "PBD",
+        "DOCDB",
+        "INPADOC",
+        "EXTEND"
+      ]
+    },
+    "P005_current_assignee_search": {
+      "endpoint": "/search/patent/current-search-patent",
+      "method": "POST",
+      "purpose": "Search patents by current assignee \u2014 returns patent IDs and metadata",
+      "input": "assignee_name, collapse_by, pagination (limit, offset)",
+      "output": "patent_number, patent_id, current_assignee, original_assignee, title, inventor, publication_date, application_date, total_result_count",
+      "batch_limit": 1000,
+      "pagination_limit": 20000,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "ERROR",
+      "last_verified": "2026-08-17",
+      "error_codes": {
+        "68300004": "Invalid parameter \u2014 needs different parameter format"
+      },
+      "fallback": "web search + individual claim-data retrieval",
+      "notes": "CRITICAL: this is the proper way to build company corpus. Has not been tested with current API key. PA: field in query-search-count returns 0 for CereVasc \u2014 this endpoint may work differently."
+    },
+    "P007_similar_search_patent": {
+      "endpoint": "/search/patent/similar-search-patent",
+      "method": "POST",
+      "purpose": "Find patents similar to a given patent number",
+      "input": "patent_number, limit",
+      "output": "similar patents with relevance scores",
+      "batch_limit": 1,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "LIVE",
+      "last_verified": "2026-08-17",
+      "error_codes": {},
+      "fallback": "none",
+      "notes": "Patent-number-based similarity. Returns relevance scores."
+    },
+    "AI30_similar_patent_comparison": {
+      "endpoint": "/api/semantic-search/similar-patent-comparison",
+      "method": "POST",
+      "purpose": "Semantic similar patent search using technical means + technical effects description",
+      "input": "technical_means (>=50 words), technical_effects, limit (up to 20)",
+      "output": "similar patents with relevance scores and relevant passages from claims/descriptions",
+      "batch_limit": 1,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "UNAVAILABLE",
+      "last_verified": "2026-08-17",
+      "error_codes": {
+        "67200203": "API need a true rate"
+      },
+      "fallback": "keyword search + manual relevance assessment",
+      "notes": "Previously returned 67200203 'API need a true rate'. Requires higher API tier. This is the MOST IMPORTANT endpoint for semantic hostile search."
+    },
+    "nested_search_patent": {
+      "endpoint": "/search/patent/nested-search-patent",
+      "method": "POST",
+      "purpose": "Search patents and return patent IDs (not just count)",
+      "input": "query_text, collapse_by, limit, page",
+      "output": "patent_number, patent_id, title, assignee, publication_date",
+      "batch_limit": 20,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "PARTIAL",
+      "last_verified": "2026-08-17",
+      "error_codes": {
+        "67200005": "Insufficient balance"
+      },
+      "fallback": "current-assignee search or web search for patent IDs",
+      "notes": "Returns patent IDs for some queries but returns 0 results for others despite query-search-count showing results. Behavior inconsistent. May require different query syntax."
+    },
+    "P012_bibliography": {
+      "endpoint": "/basic-patent-data/biblio",
+      "method": "GET",
+      "purpose": "Retrieve patent bibliography (title, assignee, inventors, dates, CPC, IPC, family)",
+      "input": "patent_number or patent_id",
+      "output": "title, applicant, original_assignee, current_assignee, priority_date, application_date, publication_date, legal_status, family_id, inventors, CPC, IPC",
+      "batch_limit": 100,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "UNAVAILABLE",
+      "last_verified": "2026-08-17",
+      "error_codes": {
+        "67200203": "API need a true rate"
+      },
+      "fallback": "claim-data (partial metadata)",
+      "notes": "Critical for ownership graph and family reconstruction. Has not been tested."
+    },
+    "P013_legal_status": {
+      "endpoint": "/basic-patent-data/legal-status",
+      "method": "GET",
+      "purpose": "Retrieve patent legal status (granted, abandoned, expired, pending, etc.)",
+      "input": "patent_number or patent_id",
+      "output": "legal_status, legal_events, transfer history, litigation",
+      "batch_limit": 100,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "LIVE",
+      "last_verified": "2026-08-17",
+      "error_codes": {},
+      "fallback": "web search",
+      "notes": "Important for distinguishing active vs abandoned vs expired prior art."
+    },
+    "P015_cited_by": {
+      "endpoint": "/basic-patent-data/backward-citation",
+      "method": "GET",
+      "purpose": "Retrieve citations (backward and forward)",
+      "input": "patent_number or patent_id",
+      "output": "citing_patent, cited_patent, citation_type (examiner/applicant/other), citation_category (X/Y/A), country, organization",
+      "batch_limit": 100,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "LIVE",
+      "last_verified": "2026-08-17",
+      "error_codes": {},
+      "fallback": "Google Patents citation data",
+      "notes": "Critical for citation-neighborhood expansion. Has not been tested."
+    },
+    "P045_description_translated": {
+      "endpoint": "/basic-patent-data/description-data-translated",
+      "method": "GET",
+      "purpose": "Retrieve patent description (full text, translated to English)",
+      "input": "patent_number or patent_id",
+      "output": "description text",
+      "batch_limit": 1,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "NEEDS_PARAM",
+      "last_verified": "2026-08-17",
+      "error_codes": {
+        "10001": "Required parameter lang not present \u2014 try lang=en"
+      },
+      "fallback": "Google Patents full text",
+      "notes": "Important for understanding mechanism, technical effect, motivation, teaching away."
+    },
+    "P073_description_offset": {
+      "endpoint": "/basic-patent-data/description-offset",
+      "method": "GET",
+      "purpose": "Retrieve description section offsets for navigation",
+      "input": "patent_number or patent_id",
+      "output": "section offsets, paragraph numbers",
+      "batch_limit": 1,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "LIVE",
+      "last_verified": "2026-08-17",
+      "error_codes": {},
+      "fallback": "none",
+      "notes": "Allows locating specific passages in the description rather than treating as undifferentiated blob."
+    },
+    "P101_claim_parser": {
+      "endpoint": "/api/claim-analysis/claim-parser",
+      "method": "POST",
+      "purpose": "Parse claims into technical features, limitations, claim structure",
+      "input": "patent_number or claim_text",
+      "output": "independent/dependent claims, claim type, technical features, limitations, claim hierarchy",
+      "batch_limit": 1,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "UNAVAILABLE",
+      "last_verified": "2026-08-17",
+      "error_codes": {
+        "67200203": "API need a true rate"
+      },
+      "fallback": "our deterministic parser + LLM decomposition",
+      "notes": "Requires higher API tier. Should be used as independent decomposition oracle, not replacing our canonical resolver."
+    },
+    "R025_enterprise_core_patent": {
+      "endpoint": "/innovation/company/core-patent",
+      "method": "GET",
+      "purpose": "Identify core patents for a company",
+      "input": "company_name or company_id",
+      "output": "patent_value, legal_value, market_value, legal_status, events, invention_title",
+      "batch_limit": 1,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "UNAVAILABLE",
+      "last_verified": "2026-08-17",
+      "error_codes": {
+        "67200203": "API need a true rate"
+      },
+      "fallback": "manual analysis",
+      "notes": "Company-level intelligence. Identifies which patents PatSnap considers most valuable."
+    },
+    "A108_largest_patent_family": {
+      "endpoint": "/insights-company/largest-patent-family",
+      "method": "GET",
+      "purpose": "Identify largest invention families for a company",
+      "input": "company_name or company_id",
+      "output": "family_id, family_size, members, geographic coverage",
+      "batch_limit": 1,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "NEEDS_PARAM",
+      "last_verified": "2026-08-17",
+      "error_codes": {
+        "10001": "Required parameter lang not present"
+      },
+      "fallback": "manual family reconstruction",
+      "notes": "Company-level intelligence. Identifies strategically important families."
+    },
+    "P034_litigation": {
+      "endpoint": "/high-value-data/litigation",
+      "method": "GET",
+      "purpose": "Retrieve litigation data for patents",
+      "input": "patent_number or patent_id",
+      "output": "case, court, plaintiff, defendant, filing_date, verdict_date, region, judges",
+      "batch_limit": 100,
+      "cost_behavior": "per-call",
+      "authentication": "Bearer token",
+      "status": "LIVE_EMPTY",
+      "last_verified": "2026-08-17",
+      "error_codes": {},
+      "fallback": "web search",
+      "notes": "Important for strategic assessment. Litigated patents have different risk profiles."
+    }
+  },
+  "capability_summary": {
+    "total_endpoints_documented": 15,
+    "live": 6,
+    "unavailable": 4,
+    "needs_param": 2,
+    "error_partial": 2,
+    "live_endpoints": [
+      "P018_claim_data",
+      "P003_analytics_query",
+      "P007_similar_search_patent",
+      "P013_legal_status",
+      "P015_cited_by",
+      "P073_description_offset"
+    ],
+    "critical_gap": "Semantic search (AI30), bibliography (P012), claim parser (P101), and company intelligence (R025) require higher API tier. P005 assignee search needs parameter fix. P045 and A108 need lang parameter.",
+    "available_capabilities": [
+      "P018 claim-data \u2014 patent claim text (primary evidence)",
+      "P003 query-search-count \u2014 search with count",
+      "P007 similar-search-patent \u2014 patent similarity search (20 results)",
+      "P013 legal-status \u2014 patent legal status",
+      "P015 backward-citation \u2014 citation graph (forward + backward)",
+      "P073 description-offset \u2014 description section navigation"
+    ]
+  },
+  "cost_policy": {
+    "principle": "COUNT \u2192 DISCOVERY \u2192 SEMANTIC RANKING \u2192 FAMILY COLLAPSE \u2192 RELEVANCE \u2192 CLAIMS \u2192 DEEP EVIDENCE",
+    "rules": [
+      "Never retrieve claims for thousands of patents",
+      "Use query-search-count first to assess result volume",
+      "Use family collapse (DOCDB/INPADOC/EXTEND) to reduce duplicates",
+      "Batch claim retrieval (up to 100 per request)",
+      "Reserve description retrieval for top candidates only",
+      "Semantic search is per-call (1 query, up to 20 results) \u2014 use sparingly with well-crafted technical descriptions"
+    ]
+  },
+  "provenance_policy": {
+    "rule": "Every evidence item must trace to: source \u2192 patent_number \u2192 patent_id \u2192 family_id \u2192 claim_number/paragraph \u2192 exact_passage \u2192 content_hash \u2192 retrieval_timestamp",
+    "llm_assertion_rule": "LLM-generated patent facts are hypotheses. Retrieved patent text is evidence. If LLM asserts 'Patent X teaches Y' but retrieved claims do not support Y: HALLUCINATION_DETECTED. Automatically reject, record contradiction, preserve event permanently."
+  }
+}
