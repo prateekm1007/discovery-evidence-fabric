@@ -1,0 +1,66 @@
+{
+  "protocol": "CEREVASC_INV_001_V3_ELITE_AUDIT",
+  "version": "V3_ELITE_AUDIT",
+  "timestamp": "2026-08-17T00:24:10.431196+00:00",
+  "canonical_limitations": {
+    "L1": "sensor measures CSF pressure",
+    "L2": "sensor measures venous sinus pressure",
+    "L3": "differential is calculated from the two",
+    "L4": "measurements obtained in eShunt anatomical context",
+    "L5": "differential used to detect/predict obstruction or patency failure",
+    "L6": "resulting signal produces a technical monitoring output"
+  },
+  "search_results_summary": {
+    "total_queries": 18,
+    "A_CereVasc": 5,
+    "B_eShunt": 11,
+    "C_CSF_pressure_sensing": 7103,
+    "D_venous_sinus_pressure": 15828,
+    "E_ICP_differential": 44442,
+    "F_CSF_shunt_monitoring": 6556,
+    "G_shunt_occlusion_prediction": 1779,
+    "H_wireless_implantable_pressure": 90264,
+    "M_CSF_venous_differential_shunt": 2232,
+    "R_dual_pressure_sensor_shunt_CSF_venous": 490
+  },
+  "cerevasc_monitoring_language": "NONE \u2014 all 3 CereVasc patents (US8672871B2, US10307577B2, US11951270B2) contain ZERO monitoring/sensor/differential/pressure-sensing language in their claims",
+  "102_result": {
+    "status": "SURVIVES",
+    "killing_reference_found": false,
+    "llm_hallucinated_killing_reference": "US20180301441A1 \u2014 LLM claimed this patent discloses CSF-venous differential. ACTUAL patent is about LED display manufacturing. COMPLETELY IRRELEVANT. This is a documented LLM hallucination.",
+    "rationale": "No single reference was found that discloses ALL 6 limitations (L1-L6). The search covered 18 separate PatSnap queries with result counts ranging from 5 to 90,264 patents. While individual limitations (pressure sensing, wireless telemetry, CSF monitoring) are well-known, NO single reference combines CSF pressure + venous sinus pressure + differential + occlusion prediction in the endovascular eShunt context."
+  },
+  "103_result": {
+    "status": "UNCERTAIN",
+    "llm_103_attack_hallucinated": "The 103 attack claimed US8672871B2 teaches CSF pressure sensing and US10307577B2 teaches dual pressure sensors. ACTUAL claims of both patents contain NO pressure sensing, NO sensor, NO monitoring language. US8672871B2 is a CSF drainage METHOD. US10307577B2 is a deployment SYSTEM. Neither teaches sensing. The 103 attack was based on hallucinated prior art characteristics.",
+    "real_103_assessment": "The real 103 risk is MODERATE. While the individual components (pressure sensors, wireless telemetry, differential measurement) are known, the SPECIFIC combination of CSF-venous pressure differential in the endovascular eShunt context has not been found in any single reference. However, the competitor space is DENSE (490 patents for dual pressure sensor shunt CSF venous) and the combination MAY be obvious to a PHOSITA.",
+    "missing_evidence": "Claim-level search of the 490 most relevant patents has NOT been performed. The 103 risk cannot be definitively assessed without reviewing actual claims of the closest references."
+  },
+  "algorithm_assessment": {
+    "question": "Is the occlusion-predictive algorithm merely thresholding/classification/trend detection?",
+    "answer": "PARTIALLY \u2014 the algorithm likely uses trend detection (pressure differential changes over time). However, the algorithm is ENABLED by a new measurable physical signal (CSF-venous differential) that is NOT available from any existing sensor arrangement. The sensor arrangement creates the new signal; the algorithm processes it. This is a potentially STRONG technical effect.",
+    "strength": "MEDIUM \u2014 the algorithm itself may be generic, but the SIGNAL it processes is novel. Patentability depends on whether the differential measurement is patentable as a method/apparatus."
+  },
+  "elite_gate_check": {
+    "A_corpus_completeness": "PARTIAL \u2014 3 confirmed CereVasc patents, may be additional pending applications",
+    "B_actual_claim_evidence": "YES \u2014 claims retrieved for all 3 CereVasc patents",
+    "C_102_survives": "YES \u2014 no real killing reference found (LLM hallucination documented)",
+    "D_103_survives": "UNCERTAIN \u2014 real 103 risk is MODERATE; claim-level search of 490 closest references NOT performed",
+    "E_no_unresolved_evidence_gaps": "NO \u2014 490 closest patents not claim-level searched",
+    "F_technical_effect": "MEDIUM \u2014 new signal (CSF-venous differential) enables new algorithm; algorithm itself may be generic",
+    "G_manufacturing_plausibility": "SIMULATED_FEASIBLE \u2014 MEMS sensors + wireless + catheter integration",
+    "H_competitor_differentiation": "MEDIUM \u2014 CereVasc has 0 monitoring patents; competitors have thousands but none specific to endovascular CSF-venous differential",
+    "I_design_around_resistance": "MEDIUM \u2014 competitors could use flow sensing or imaging instead",
+    "J_complete_provenance": "YES \u2014 all searches recorded, all evidence traced"
+  },
+  "final_status": "PROMISING",
+  "final_rationale": "The invention SURVIVES 102 (no real killing reference found \u2014 the LLM hallucinated US20180301441A1). The 103 risk is UNCERTAIN \u2014 not eliminated. The CSF-venous pressure differential is a novel signal enabled by the eShunt anatomy, but the competitor space is dense and claim-level search of the 490 closest references has NOT been performed. The invention is PROMISING \u2014 it has a genuine technical differentiator (new measurable signal) but has NOT been proven to survive a hostile 103 attack with real claim-level evidence. ELITE gate is NOT MET: 4 of 10 criteria are unmet (corpus partial, 103 uncertain, evidence gaps, design-around MEDIUM).",
+  "llm_hallucination_documented": true,
+  "hallucination_details": "The LLM (gemma-4-31b-it) fabricated patent US20180301441A1 as a 102 killing reference, claiming it discloses CSF-venous pressure differential sensing. The actual patent (retrieved from PatSnap) is about LED display manufacturing with 14 claims about TFT backplates and light emitting diodes. This hallucination was caught by the verification step (claim-level retrieval from PatSnap). This demonstrates that LLM-based 102/103 analysis MUST be verified against actual patent claims \u2014 LLM knowledge of specific patent numbers is unreliable.",
+  "next_steps": [
+    "Claim-level search of top 10 patents from the 490 results for dual pressure sensor shunt CSF venous",
+    "Formal 103 analysis using ACTUAL claims (not LLM-hallucinated prior art)",
+    "Physical validation of CSF-venous differential measurement concept",
+    "Patent counsel opinion"
+  ]
+}
