@@ -1,0 +1,75 @@
+{
+  "experiment_title": "Spatial separation + selective retention vs CereVasc baseline: CSF and tissue drug exposure comparison",
+  "objective": "Determine whether the spatial separation + retention architecture produces materially greater target-tissue drug exposure than CereVasc's existing delivery method, while preserving CSF drainage.",
+  "pre_registered": true,
+  "pre_registration_hash": "6628e52a2cd0d54c729041837f338455944e2fea338542809c996fc8991effd4",
+  "design": {
+    "animal_model": "Ovine (sheep) — established CSF shunt model, 40-60 kg",
+    "groups": [
+      {
+        "group": "A_baseline",
+        "n": 6,
+        "description": "CereVasc existing delivery (endovascular, no retention, no spatial separation)"
+      },
+      {
+        "group": "B_proposed",
+        "n": 6,
+        "description": "Spatial separation + selective retention architecture"
+      }
+    ],
+    "drug": "Fluorescent drug surrogate (e.g., FITC-dextran 150 kDa, matching bevacizumab MW) for quantitative tissue measurement",
+    "dose": "5 mg equivalent",
+    "duration": "48 hours post-delivery"
+  },
+  "primary_endpoint": {
+    "endpoint": "Target-tissue AUC (brain-adjacent tissue drug concentration × time)",
+    "hypothesis": "Group B AUC ≥ 200% of Group A AUC (model predicts 327% median)",
+    "success_threshold": "Group B AUC ≥ 120% of Group A (conservative — model overestimates by ~50%)",
+    "failure_threshold": "Group B AUC ≤ 100% of Group A (no improvement)",
+    "statistical_test": "One-sided Wilcoxon rank-sum test, α=0.05",
+    "power": "n=6 per group provides 80% power to detect 100% difference (effect size d=1.2)"
+  },
+  "secondary_endpoints": [
+    {
+      "endpoint": "CSF drug concentration vs time",
+      "measurement": "CSF sampling at 0, 0.5, 1, 2, 4, 8, 12, 24, 48h"
+    },
+    {
+      "endpoint": "CSF drainage rate",
+      "measurement": "Continuous flow measurement"
+    },
+    {
+      "endpoint": "ICP",
+      "measurement": "Continuous ICP monitoring"
+    },
+    {
+      "endpoint": "Venous drug concentration (systemic loss)",
+      "measurement": "Venous blood sampling at same timepoints"
+    },
+    {
+      "endpoint": "Tissue drug distribution",
+      "measurement": "Post-mortem fluorescence imaging of brain tissue"
+    }
+  ],
+  "acceptance_criteria": {
+    "primary": "Group B tissue AUC ≥ 120% of Group A (p<0.05)",
+    "safety": "ICP < 20 mmHg in both groups; CSF drainage ≥ 0.3 mL/min in both groups",
+    "direction": "If Group B shows ANY improvement in the correct direction, proceed to larger study",
+    "failure": "If Group B AUC ≤ Group A or ICP unsafe → architecture does not work in vivo"
+  },
+  "failure_criteria": {
+    "if_no_improvement": "The model is structurally wrong. Return to model development. Do NOT claim the architecture works.",
+    "if_unsafe": "The spatial separation or retention mechanism interferes with drainage. Architecture is not clinically viable.",
+    "if_improvement_but_below_threshold": "The direction is correct but magnitude is smaller than predicted. Recalibrate model and reassess buyer value."
+  },
+  "estimated_cost": "$50,000 (12 animals + surgery + fluorescence analysis + CSF sampling)",
+  "estimated_timeline": "12 weeks (4 weeks setup, 4 weeks in-life, 4 weeks analysis)",
+  "regulatory": "Requires IACUC approval",
+  "decision_tree": {
+    "AUC_B ≥ 200% of AUC_A": "BUYABLE CONFIRMED — proceed to patent filing + partnership discussions",
+    "AUC_B 120-200% of AUC_A": "MILESTONE-WORTHY — improvement confirmed but smaller than model; recalibrate and reassess",
+    "AUC_B ≤ 120% of AUC_A": "TRUE CEILING — model overestimated; architecture does not produce material in vivo advantage",
+    "ICP unsafe or drainage not preserved": "ARCHITECTURE FAILED — safety issue, redesign required"
+  },
+  "ceo_directive_compliance": "The key test is not 'did we get 327%?' It is: 'Does the direction and magnitude of advantage survive physical validation?'"
+}
