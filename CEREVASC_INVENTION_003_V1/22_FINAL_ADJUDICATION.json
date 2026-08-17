@@ -11,9 +11,9 @@
       "maximum": 100,
       "threshold": 70,
       "weight": 0.35,
-      "status": "PASS",
+      "status": "FAIL",
       "evidence_pointer": "Passage-grounded 102 on 10 references",
-      "rationale": "102 SURVIVES on passage evidence. 103 103_UNCERTAIN.",
+      "rationale": "102 SURVIVES on passage evidence but score 68 < threshold 70 (partial search, 103 UNCERTAIN). Patent gate FAIL.",
       "evidence_type": "PASSAGE_GROUNDED"
     },
     "EVIDENCE_GATE": {
@@ -64,8 +64,14 @@
     "BUYER_SENTIMENT_SOURCE": "INTERNAL_SIMULATION",
     "BUYER_READINESS": "NOT_READY"
   },
-  "final_status": "BELOW_BUYER_THRESHOLD",
-  "final_status_derivation": "Passage-grounded evidence. Hard gates PASS. Soft gates FAIL. Composite 66.8. → BELOW_BUYER_THRESHOLD",
+  "final_status": "WOULD_NOT_PAY",
+  "final_status_derivation": "Passage-grounded. PATENT_GATE 68<70 FAIL (partial search). EVIDENCE_GATE 75>=70 PASS. Hard gates FAIL \u2192 WOULD_NOT_PAY. Composite 66.8.",
   "passage_grounding_verified": true,
-  "search_completeness": "PARTIAL"
+  "search_completeness": "PARTIAL",
+  "state_machine": {
+    "hard_gates_pass": false,
+    "soft_gates_pass": false,
+    "composite_pass": false,
+    "buyer_readiness": "NOT_READY"
+  }
 }
