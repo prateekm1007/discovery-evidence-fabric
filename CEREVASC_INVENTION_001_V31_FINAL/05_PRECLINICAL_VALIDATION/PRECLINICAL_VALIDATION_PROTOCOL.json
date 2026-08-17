@@ -1,0 +1,113 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "CEREVASC_INVENTION_001_V31_FINAL",
+  "phase": "5_PRECLINICAL_VALIDATION_PROTOCOL",
+  "timestamp": "2026-08-17T15:07:42.999169+00:00",
+  "ceo_directive_6_response": "Transition safety from DEMONSTRATED_IN_MODEL to preclinical validation protocol",
+  "status": "SPECIFICATION — not yet executed",
+  "purpose": "Validate fail-safe architecture (FS1+FS3) and biocompatibility in chronic animal model",
+  "test_article_definition": {
+    "device": "eShunt prototype with ePTFE membrane + FS1 bypass + FS3 redundant channel",
+    "sterilization": "EtO",
+    "quantity": "n=12 (8 test, 4 sham control)"
+  },
+  "animal_model": {
+    "species": "Ovine (sheep) — accepted CSF shunt model",
+    "weight": "40-60 kg",
+    "rationale": "Ovine CSF dynamics similar to human; accepted by FDA for CSF shunt testing",
+    "source": "Contract research organization (CRO)"
+  },
+  "flow_conditions": {
+    "implantation": "Endovascular deployment via jugular vein to dural venous sinus",
+    "duration": "12 weeks (chronic)",
+    "csf_pressure_monitoring": "Continuous via implanted pressure transducer"
+  },
+  "fouling_protocol": {
+    "natural_fouling": "Allow CSF protein adsorption over 12 weeks",
+    "measurement": "Weekly MRI to assess membrane patency",
+    "endpoint": "90% fouling or 12 weeks"
+  },
+  "failure_injections": [
+    {
+      "test": "Acute thrombus",
+      "method": "Inject 0.5mL thrombin at membrane inlet",
+      "timepoint": "Week 6",
+      "expected": "Bypass activates, drainage preserved"
+    },
+    {
+      "test": "Progressive fouling",
+      "method": "Natural CSF protein adsorption",
+      "timepoint": "Weeks 1-12",
+      "expected": "Flow decreases, bypass activates at threshold"
+    },
+    {
+      "test": "Membrane rupture",
+      "method": "Mechanical puncture via catheter",
+      "timepoint": "Week 12 (terminal)",
+      "expected": "Retention lost, drainage preserved"
+    }
+  ],
+  "bypass_testing": {
+    "FS1_activation": "Measure ICP when bypass opens (target: 15±2 mmHg)",
+    "FS3_redundancy": "If FS1 fails, does FS3 activate? (target: yes, <30s)",
+    "response_time": "ICP threshold to bypass open (target: <1s FS1, <30s FS3)"
+  },
+  "icp_measurement": {
+    "method": "Implanted Codman MicroSensor ICP monitor",
+    "sampling_rate": "1 Hz continuous",
+    "data_logged": "ICP, CSF pressure, venous pressure, differential, bypass state",
+    "alerting": "ICP > 20 mmHg triggers veterinary intervention"
+  },
+  "biocompatibility_testing": {
+    "iso_10993_5_cytotoxicity": "Membrane extract cytotoxicity (L929 cells)",
+    "iso_10993_10_sensitization": "Guinea pig maximization test",
+    "iso_10993_10_irritation": "Intracutaneous reactivity",
+    "iso_10993_6_implantation": "12-week chronic implantation (this study)",
+    "iso_10993_18_chemical": "Material chemical characterization (GC-MS)"
+  },
+  "acceptance_criteria": [
+    {
+      "metric": "patency_12_weeks",
+      "target": "≥75% of test animals maintain patency (>50% baseline flow)",
+      "test": "MRI + flow measurement"
+    },
+    {
+      "metric": "bypass_activation_in_vivo",
+      "target": "Bypass activates at 15±3 mmHg (in vivo tolerance wider)",
+      "test": "ICP monitoring during occlusion events"
+    },
+    {
+      "metric": "icp_safe",
+      "target": "ICP < 20 mmHg in ≥90% of measurements",
+      "test": "Continuous ICP monitoring"
+    },
+    {
+      "metric": "biocompatibility",
+      "target": "All ISO 10993 tests pass (no cytotoxicity, sensitization, irritation)",
+      "test": "ISO 10993 series"
+    },
+    {
+      "metric": "no_adverse_events",
+      "target": "No device-related deaths, infections, or migrations",
+      "test": "Necropsy at week 12"
+    },
+    {
+      "metric": "fs3_redundancy",
+      "target": "If FS1 fails, FS3 maintains drainage",
+      "test": "FS1 failure injection (week 12 terminal)"
+    }
+  ],
+  "statistical_plan": {
+    "sample_size": "n=8 test, n=4 sham (power 0.8, alpha 0.05)",
+    "primary_endpoint": "12-week patency rate",
+    "secondary_endpoints": [
+      "ICP safety",
+      "bypass activation pressure",
+      "biocompatibility"
+    ],
+    "analysis": "Fisher's exact test for patency; t-test for ICP; descriptive for bypass"
+  },
+  "estimated_cost": "$180,000 (CRO fees + animals + histology)",
+  "estimated_timeline": "6 months (2 months setup, 3 months in-life, 1 month histology)",
+  "regulatory": "Requires IACUC approval (institutional animal care and use committee)"
+}

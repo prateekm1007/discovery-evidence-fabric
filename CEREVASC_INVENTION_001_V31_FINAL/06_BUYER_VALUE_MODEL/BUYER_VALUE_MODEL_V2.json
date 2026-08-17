@@ -1,0 +1,81 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "CEREVASC_INVENTION_001_V31_FINAL",
+  "phase": "6_BUYER_VALUE_MODEL_V2",
+  "timestamp": "2026-08-17T15:07:42.999169+00:00",
+  "ceo_directive_7_response": "Replace unsupported commercial numbers with explicit model",
+  "status": "MODEL_SUPPORTED",
+  "canonical_numbers": {
+    "internal_cost_usd_M": 13.5,
+    "timeline_months": 48,
+    "source": "This artifact is the single source of truth (CEO §8)"
+  },
+  "value_components": [
+    {
+      "component": "TIME_SAVED",
+      "value_months": 24,
+      "source": "Acquisition skips preclinical + IDE cycle (18 months) + regulatory review (6 months)",
+      "assumption": "CereVasc has existing eShunt infrastructure to integrate the module",
+      "confidence": "MEDIUM",
+      "calculation": "48 months build - 24 months acquire = 24 months saved"
+    },
+    {
+      "component": "COST_AVOIDED",
+      "value_usd_M": 13.5,
+      "source": "Canonical build cost (BUILD_BUY_FINAL.json)",
+      "assumption": "CereVasc would otherwise build this internally",
+      "confidence": "HIGH",
+      "calculation": "If acquired, CereVasc avoids $13.5M internal development cost"
+    },
+    {
+      "component": "IP_VALUE",
+      "value": "MEDIUM",
+      "source": "102_PROVEN_ON_CURRENT_CORPUS + 103_UNCERTAIN",
+      "assumption": "Patent grants with claims covering L1-L6; continuation claims filed for design-arounds",
+      "confidence": "LOW",
+      "calculation": "If 103 resolves as NON_OBVIOUS: HIGH value. If 103 resolves as OBVIOUS: LOW value. Expected value: MEDIUM."
+    },
+    {
+      "component": "PLATFORM_VALUE",
+      "value": "HIGH",
+      "source": "Size-selective membrane is therapeutic-agnostic (albumin, IgG, bevacizumab all retained)",
+      "assumption": "Each therapeutic requires its own clinical validation but shares the device platform",
+      "confidence": "HIGH",
+      "calculation": "Platform supports multiple therapeutics → multiple product SKUs from one device"
+    },
+    {
+      "component": "COMPETITIVE_BLOCKING_VALUE",
+      "value": "MEDIUM",
+      "source": "102 blocks direct endovascular CSF-venous retention; does not block VP shunt (DA3) or alternative mechanisms (DA2, DA6, DA7)",
+      "assumption": "Continuation claims filed for DA2 (charge-based), DA4 (pulsed), DA6 (hydrogel), DA7 (affinity)",
+      "confidence": "MEDIUM",
+      "calculation": "Base claim blocks direct competitors; continuations needed for full territory coverage"
+    },
+    {
+      "component": "DEVELOPMENT_RISK_REDUCTION",
+      "value": "MEDIUM",
+      "source": "Buyer inherits reproducible engineering simulation + fail-safe design + manufacturing spec",
+      "assumption": "Engineering package reduces buyer's development risk by ~30%",
+      "confidence": "MEDIUM",
+      "calculation": "30% risk reduction × $13.5M build cost = $4.05M risk-adjusted value"
+    }
+  ],
+  "core_question": "Why would CereVasc pay us instead of building the technology internally?",
+  "core_answer": {
+    "reason_1_time": "CereVasc saves 24 months by acquiring vs. building (24 months × ~$0.5M/month burn = $12M time value)",
+    "reason_2_ip": "CereVasc acquires the patent application — blocks competitors from the retention space (if 103 resolves favorably)",
+    "reason_3_platform": "CereVasc gains a therapeutic-retention platform — multiple product SKUs from one device",
+    "reason_4_risk": "CereVasc inherits reproducible engineering + fail-safe + manufacturing — reduces their development risk",
+    "reason_5_regulatory": "CereVasc can leverage existing eShunt PMA (if confirmed) for combination product pathway — faster regulatory",
+    "net_assessment": "If 103 resolves as NON_OBVIOUS and CereVasc PMA is confirmed: acquisition value > $13.5M build cost. If 103 resolves as OBVIOUS: acquisition value < build cost (no IP moat).",
+    "confidence": "MEDIUM — depends on 103 resolution and PMA verification"
+  },
+  "commercial_gate_score": 62,
+  "commercial_gate_threshold": 65,
+  "commercial_gate_status": "FAIL — two strongest claims (IP_VALUE, COMPETITIVE_BLOCKING_VALUE) remain assumptions pending 103 resolution",
+  "what_would_move_commercial_to_pass": [
+    "103 resolved as NON_OBVIOUS (patent counsel opinion) → IP_VALUE becomes HIGH",
+    "CereVasc eShunt PMA status verified → REGULATORY_LEVERAGE confirmed",
+    "Continuation claims filed → COMPETITIVE_BLOCKING_VALUE becomes HIGH"
+  ]
+}

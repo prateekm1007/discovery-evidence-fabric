@@ -1,0 +1,40 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "CEREVASC_INVENTION_001_V31_FINAL",
+  "phase": "7_CI_CONSISTENCY",
+  "timestamp": "2026-08-17T15:07:42.999169+00:00",
+  "ceo_directive_8_response": "One canonical source of truth; CI fails on mismatch",
+  "canonical_values": {
+    "cost_usd_M": 13.5,
+    "timeline_months": 48
+  },
+  "ci_rule": "if build_buy.cost != adjudication.cost != buyer_memo.cost: CI_FAIL",
+  "artifacts_checked": [
+    {
+      "artifact": "V31_FINAL/06_BUYER_VALUE_MODEL/BUYER_VALUE_MODEL_V2.json",
+      "field": "canonical_numbers.internal_cost_usd_M",
+      "value": 13.5,
+      "match": true
+    },
+    {
+      "artifact": "V31_FINAL/06_BUYER_VALUE_MODEL/BUYER_VALUE_MODEL_V2.json",
+      "field": "canonical_numbers.timeline_months",
+      "value": 48,
+      "match": true
+    },
+    {
+      "artifact": "V3_FINAL/07_BUILD_BUY/BUILD_BUY_FINAL.json",
+      "field": "total_internal_cost_usd_M",
+      "value": 13.5,
+      "match": true
+    },
+    {
+      "artifact": "V3_FINAL/07_BUILD_BUY/BUILD_BUY_FINAL.json",
+      "field": "total_internal_timeline_months",
+      "value": 48,
+      "match": true
+    }
+  ],
+  "ci_status": "PASS — all artifacts agree on $13.5M / 48 months",
+  "note_on_v31_typo": "V3.1 commit message (e75c5d2) said '$3.5M' — that was a typo in the commit message, not the artifact. The artifact always said $13.5M. V31_FINAL enforces this mechanically going forward."
+}

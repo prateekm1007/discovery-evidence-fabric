@@ -1,0 +1,87 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "CEREVASC_INVENTION_001_V31_FINAL",
+  "phase": "8_FINAL_ADJUDICATION_V31",
+  "timestamp": "2026-08-17T15:07:42.999169+00:00",
+  "supersedes": "V3_FINAL (commit 278907c) — corrects state machine inconsistency",
+  "ceo_directive": "Fix adjudication contradiction — BUYER_READINESS != BUYER_SENTIMENT",
+  "four_separated_concepts": {
+    "PATENT_STATUS": "102_PROVEN_ON_CURRENT_CORPUS / 103_UNCERTAIN",
+    "ENGINEERING_STATUS": "BELOW_THRESHOLD (58/65)",
+    "SAFETY_STATUS": "DEMONSTRATED_IN_MODEL (62/60 PASS, but requires preclinical validation)",
+    "COMMERCIAL_STATUS": "BELOW_THRESHOLD (62/65)",
+    "BUYER_SENTIMENT": "WOULD_CONSIDER_WITH_MILESTONES (blind 3-role test, unanimous)",
+    "BUYER_READINESS": "NOT_READY"
+  },
+  "state_machine": {
+    "rule": "if any required hard/soft gate < threshold: BUYER_READINESS = NOT_READY",
+    "hard_gates_pass": true,
+    "soft_gates_pass": false,
+    "composite_pass": false,
+    "composite_score": 68.1,
+    "composite_threshold": 70,
+    "buyer_readiness": "NOT_READY",
+    "reason": "TECHNICAL_GATE (58<65) and COMMERCIAL_GATE (62<65) below threshold; composite (68.1<70) below threshold"
+  },
+  "gate_summary": {
+    "PATENT_GATE": {
+      "score": 72,
+      "threshold": 70,
+      "status": "PASS",
+      "label": "102_PROVEN_ON_CURRENT_CORPUS / 103_UNCERTAIN"
+    },
+    "EVIDENCE_GATE": {
+      "score": 75,
+      "threshold": 70,
+      "status": "PASS",
+      "label": "PROVEN (primary claims via PatSnap)"
+    },
+    "TECHNICAL_GATE": {
+      "score": 58,
+      "threshold": 65,
+      "status": "FAIL",
+      "label": "MODEL_SUPPORTED — REQUIRES_PHYSICAL_VALIDATION"
+    },
+    "SAFETY_GATE": {
+      "score": 62,
+      "threshold": 60,
+      "status": "PASS",
+      "label": "DEMONSTRATED_IN_MODEL — REQUIRES_PRECLINICAL_VALIDATION"
+    },
+    "COMMERCIAL_GATE": {
+      "score": 62,
+      "threshold": 65,
+      "status": "FAIL",
+      "label": "MODEL_SUPPORTED — IP and competitive blocking are assumptions"
+    }
+  },
+  "release_gate_checklist": {
+    "SELF_IP": "PROVEN",
+    "102": "PROVEN_ON_CURRENT_CORPUS (18 refs; hostile search expansion incomplete — PatSnap discovery endpoints blocked)",
+    "103": "UNCERTAIN (no motivation evidence found, but cannot call NON_OBVIOUS without patent counsel)",
+    "ENGINEERING": "BELOW_THRESHOLD (58/65) — in-vitro flow-loop spec created (Phase 4)",
+    "SAFETY": "PASS_IN_MODEL (62/60) — preclinical validation protocol created (Phase 5)",
+    "SIMULATION": "REPRODUCIBLE",
+    "FAIL_SAFE": "DEMONSTRATED_IN_MODEL (FS1+FS3, drainage preservation satisfied)",
+    "MANUFACTURING": "SPECIFIED",
+    "REGULATORY": "ASSUMPTION_MAPPED",
+    "DESIGN_AROUNDS": "7_PLUS",
+    "BUYER_UTILITY": "COMPLETE (6 dimensions)",
+    "BUILD_VS_BUY": "EVIDENCED (canonical $13.5M / 48 months)",
+    "EVIDENCE_LEDGER": "COMPLETE",
+    "BLIND_BUYER_TEST": "COMPLETE (unanimous WOULD_CONSIDER_WITH_MILESTONES)",
+    "BUYER_VALUE_MODEL": "V2 COMPLETE (6 components with source/assumption/confidence)",
+    "CI_CONSISTENCY": "PASS (all artifacts agree on $13.5M / 48 months)"
+  },
+  "honest_final_status": "BELOW_BUYER_THRESHOLD / CONDITIONAL_DEVELOPMENT",
+  "honest_final_statement": "The true state is BELOW_BUYER_THRESHOLD / CONDITIONAL_DEVELOPMENT. The invention is technically promising: 102 survives on the current 18-reference corpus, 103 is uncertain (no motivation evidence found but patent counsel needed), engineering is reproducible but below threshold (58/65), safety is demonstrated in model but requires preclinical validation, commercial case is below threshold (62/65) because IP and competitive blocking remain assumptions. Buyer sentiment is conditionally positive (WOULD_CONSIDER_WITH_MILESTONES, 3/3 unanimous blind test), but buyer readiness is NOT_READY — the machine correctly reports that soft gates and composite are below threshold. These are separate fields: sentiment is what buyers feel; readiness is what the machine can certify. The next step is the evidence-to-engineering bridge: execute the in-vitro flow-loop spec (Phase 4) and preclinical validation protocol (Phase 5), then re-adjudicate with physical data.",
+  "what_would_reach_buyer_ready": [
+    "Execute in-vitro flow-loop spec (Phase 4) → moves TECHNICAL_GATE from MODEL_SUPPORTED to PROVEN",
+    "Execute preclinical validation protocol (Phase 5) → moves SAFETY_GATE from DEMONSTRATED_IN_MODEL to PROVEN",
+    "103 resolved via patent counsel → moves PATENT_STATUS from UNCERTAIN to PROVEN or FAILS",
+    "CereVasc eShunt PMA status verified → improves COMMERCIAL_GATE confidence",
+    "Continuation claims filed → strengthens COMPETITIVE_BLOCKING_VALUE",
+    "Composite must reach >=70 with all gates passing"
+  ],
+  "repository_reproducibility": "All scores trace to stored evidence. Running build_v31_final.py regenerates this adjudication from the canonical numbers and gate definitions."
+}
