@@ -1,0 +1,110 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "CEREVASC_INVENTION_001_V32_CORRECTED",
+  "phase": "F_IN_VITRO_FLOW_LOOP_PROTOCOL_V1",
+  "timestamp": "2026-08-17T15:26:10.654165+00:00",
+  "ceo_directive": "Model generates test protocol BEFORE seeing experimental results (prevents post-hoc justification)",
+  "status": "PRE-REGISTERED — acceptance criteria defined before any experimental data exists",
+  "pre_registration_hash": "6c7809be1724df8120fd082c4REDACTED-SCOPUS-PATTERN-MATCH",
+  "purpose": "Validate engineering simulation against physical data",
+  "test_article": {
+    "device": "eShunt prototype with ePTFE membrane sleeve (ARCH-001)",
+    "membrane": "ePTFE, 50um thick, 0.05um pore, 30 kDa MWCO (W.L. Gore)",
+    "shunt_body": "Pebax tubing, 0.5mm ID × 0.8mm OD, 80mm length",
+    "bypass": "FS1 pressure-relief bypass, 15 mmHg threshold",
+    "quantity": "n=10 (5 flow, 3 fouling, 2 spare)"
+  },
+  "acceptance_criteria": [
+    {
+      "id": "AC1_BASELINE_DRAINAGE",
+      "metric": "baseline_drainage_flow",
+      "unit": "mL/min",
+      "baseline": "0.35 (CSF production rate)",
+      "acceptance_threshold": "≥0.30 (≥85% of baseline)",
+      "failure_threshold": "<0.25",
+      "measurement_method": "Sensirion SLI-0430 liquid flow meter, continuous 60s average",
+      "sample_size": "n=5 prototypes",
+      "uncertainty": "±0.02 mL/min (flow meter accuracy)"
+    },
+    {
+      "id": "AC2_THERAPEUTIC_RETENTION",
+      "metric": "albumin_retention_efficiency",
+      "unit": "%",
+      "baseline": "100% (no membrane = 0% retention)",
+      "acceptance_threshold": "≥80% retained at 0% fouling",
+      "failure_threshold": "<60%",
+      "measurement_method": "Spectrophotometer at 280nm, inlet vs outlet albumin concentration",
+      "sample_size": "n=5",
+      "uncertainty": "±5%"
+    },
+    {
+      "id": "AC3_ALBUMIN_PASSAGE",
+      "metric": "albumin_passage_rate",
+      "unit": "%",
+      "baseline": "0% (albumin should be retained, not pass)",
+      "acceptance_threshold": "≤20% passage (complement of AC2)",
+      "failure_threshold": ">40%",
+      "measurement_method": "Spectrophotometer at 280nm",
+      "sample_size": "n=5",
+      "uncertainty": "±5%"
+    },
+    {
+      "id": "AC4_IGG_PASSAGE",
+      "metric": "igg_passage_rate",
+      "unit": "%",
+      "baseline": "0% (IgG at 150 kDa should be retained by 30 kDa MWCO membrane)",
+      "acceptance_threshold": "≤10% passage",
+      "failure_threshold": ">25%",
+      "measurement_method": "ELISA or spectrophotometer",
+      "sample_size": "n=5",
+      "uncertainty": "±3%"
+    },
+    {
+      "id": "AC5_PROGRESSIVE_FOULING",
+      "metric": "flow_decline_vs_fouling_pct",
+      "unit": "mL/min per % fouling",
+      "baseline": "Linear decline per Hagen-Poiseuille model",
+      "acceptance_threshold": "Flow tracks model within ±15% across 0-90% fouling",
+      "failure_threshold": "Deviates >30% from model",
+      "measurement_method": "Weekly flow measurement during 12-week accelerated fouling (ASTM F1980)",
+      "sample_size": "n=3",
+      "uncertainty": "±10%"
+    },
+    {
+      "id": "AC6_PRESSURE_RISE",
+      "metric": "pressure_drop_across_membrane",
+      "unit": "mmHg",
+      "baseline": "7 mmHg (normal CSF-venous differential)",
+      "acceptance_threshold": "≤10 mmHg at 0% fouling (≤3 mmHg above baseline)",
+      "failure_threshold": ">15 mmHg",
+      "measurement_method": "Honeywell 26PC pressure transducers (inlet + outlet)",
+      "sample_size": "n=5",
+      "uncertainty": "±0.5 mmHg"
+    },
+    {
+      "id": "AC7_BYPASS_ACTIVATION",
+      "metric": "bypass_activation_pressure",
+      "unit": "mmHg",
+      "baseline": "15 mmHg (design threshold)",
+      "acceptance_threshold": "15±2 mmHg",
+      "failure_threshold": ">20 mmHg or <10 mmHg",
+      "measurement_method": "Progressive occlusion test, measure dP when bypass opens",
+      "sample_size": "n=5",
+      "uncertainty": "±1 mmHg"
+    },
+    {
+      "id": "AC8_BYPASS_RECOVERY",
+      "metric": "bypass_close_time_after_pressure_drop",
+      "unit": "seconds",
+      "baseline": "N/A (bypass should close when dP drops)",
+      "acceptance_threshold": "≤5s to close after dP drops below threshold",
+      "failure_threshold": ">10s or fails to close",
+      "measurement_method": "Pressure cycling — raise dP to activate bypass, then drop dP, measure close time",
+      "sample_size": "n=5, 10 cycles each",
+      "uncertainty": "±0.5s"
+    }
+  ],
+  "pre_registration_statement": "These 8 acceptance criteria are defined BEFORE any experimental data exists. This prevents the simulation from becoming post-hoc justification. If experimental results fail these criteria, the engineering model must be revised, not the criteria. Pre-registration hash: 6c7809be1724df8120fd082c4REDACTED-SCOPUS-PATTERN-MATCH",
+  "estimated_cost": "$20,000 (equipment + consumables)",
+  "estimated_timeline": "8 weeks"
+}
