@@ -1,0 +1,75 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "CEREVASC_INVENTION_002_V1",
+  "limitation_freeze_version": "v1",
+  "methodology": "For each architectural alternative, generate design-around variants that avoid at least one limitation. Each variant has a limitation-avoidance matrix.",
+  "alternatives": [
+    {
+      "da_id": "DA-001",
+      "avoids_limitation": "L2 (continuous CSF pressure sensor)",
+      "design_around": "Use periodic (not continuous) pressure measurement via a percutaneous needle tap — avoids L2's 'continuously' limitation",
+      "limitation_avoidance_matrix": {
+        "L2": "AVOIDED (periodic not continuous)",
+        "L1": "present",
+        "L3-L7": "n/a"
+      },
+      "103_motivation": "Periodic measurement is the current standard of care; no motivation to combine with L3-L6",
+      "blocking_strength": "WEAK — does not block the continuous monitoring claim"
+    },
+    {
+      "da_id": "DA-002",
+      "avoids_limitation": "L5 (occlusion prediction WITHOUT contrast)",
+      "design_around": "Use contrast-enhanced imaging (EP3212275A1 method) for prediction — avoids L5's 'without contrast' limitation",
+      "limitation_avoidance_matrix": {
+        "L5": "AVOIDED (uses contrast)",
+        "L1-L4": "present",
+        "L6-L7": "present"
+      },
+      "103_motivation": "This IS the prior art (EP3212275A1); no combination needed",
+      "blocking_strength": "WEAK — this is the prior art the invention improves upon"
+    },
+    {
+      "da_id": "DA-003",
+      "avoids_limitation": "L4 (differential calculator)",
+      "design_around": "Measure only absolute CSF pressure (not differential) and predict occlusion from absolute pressure trend",
+      "limitation_avoidance_matrix": {
+        "L4": "AVOIDED (no differential)",
+        "L3": "AVOIDED (no venous sensor)",
+        "L1-L2": "present",
+        "L5-L7": "modified"
+      },
+      "103_motivation": "ICP monitoring is standard; combining with occlusion prediction is known (1,681 patents)",
+      "blocking_strength": "MODERATE — may block if absolute-pressure prediction is deemed equivalent"
+    },
+    {
+      "da_id": "DA-004",
+      "avoids_limitation": "L6 (rate-of-change threshold)",
+      "design_around": "Use absolute threshold (not rate-of-change) for occlusion prediction — predicts when differential drops below a fixed value rather than when it changes fast",
+      "limitation_avoidance_matrix": {
+        "L6": "AVOIDED (absolute not rate)",
+        "L1-L5": "present",
+        "L7": "present"
+      },
+      "103_motivation": "Absolute threshold is simpler; a PHOSITA might prefer it",
+      "blocking_strength": "MODERATE — depends on whether rate-of-change is deemed essential"
+    },
+    {
+      "da_id": "DA-005",
+      "avoids_limitation": "L7 (eShunt / dural venous sinus)",
+      "design_around": "Apply to a ventriculoperitoneal (VP) shunt (not endovascular eShunt) — different anatomy, same pressure-differential principle",
+      "limitation_avoidance_matrix": {
+        "L7": "AVOIDED (VP shunt not eShunt)",
+        "L1": "modified (VP shunt body)",
+        "L2-L6": "present"
+      },
+      "103_motivation": "VP shunts are the standard; combining with pressure monitoring is known",
+      "blocking_strength": "STRONG — may block the endovascular-specific claim but not the broader concept"
+    }
+  ],
+  "summary": {
+    "total_design_arounds": 5,
+    "strongest_for_blocking_competitors": "DA-005 (VP shunt alternative) — but this is a different market segment, not a true block",
+    "design_around_gate_score": 72,
+    "rationale": "The claim is reasonably defensible. The strongest design-arounds (DA-003, DA-005) avoid core limitations but target different embodiments (absolute pressure, VP shunt). The endovascular CSF-venous differential with continuous prediction remains defensible."
+  }
+}

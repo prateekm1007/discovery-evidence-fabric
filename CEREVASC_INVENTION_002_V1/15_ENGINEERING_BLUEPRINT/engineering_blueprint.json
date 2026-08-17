@@ -1,0 +1,62 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "CEREVASC_INVENTION_002_V1",
+  "stage": "15_engineering_blueprint",
+  "selected_architecture": "ARCH-001 (Dual MEMS piezoresistive sensors)",
+  "materials": {
+    "pressure_sensors": "MEMS piezoresistive (silicon die, medical-grade epoxy encapsulation)",
+    "shunt_body": "Existing eShunt material (pebax/silicone composite per CereVasc spec)",
+    "sensor_housing": "Titanium (ASTM F67) for biocompatibility",
+    "interconnect": "Pt-Ir wires in PTFE insulation",
+    "asic": "Custom CMOS ASIC in hermetic ceramic package"
+  },
+  "dimensions": {
+    "sensor_1_cs_end": "0.5mm × 0.5mm MEMS die, 0.3mm thick",
+    "sensor_2_venous_end": "0.5mm × 0.5mm MEMS die, 0.3mm thick",
+    "asic_package": "2mm × 2mm × 0.5mm",
+    "total_added_volume": "< 5mm³ per sensor site"
+  },
+  "manufacturing_process": "Sensor die attach + wirebond + epoxy encapsulation onto existing eShunt catheter during assembly",
+  "integration_with_eshunt": "Sensors mounted at proximal (CSF) and distal (venous) ends of existing eShunt; ASIC embedded in catheter wall",
+  "failure_modes": [
+    {
+      "mode": "Sensor drift",
+      "effect": "False positive/negative occlusion prediction",
+      "mitigation": "Auto-zero calibration on power-up; drift compensation algorithm"
+    },
+    {
+      "mode": "Sensor delamination",
+      "effect": "Loss of pressure signal",
+      "mitigation": "Mechanical retention features + medical-grade epoxy"
+    },
+    {
+      "mode": "ASIC power failure",
+      "effect": "No monitoring",
+      "mitigation": "Low-power design (< 10µA); inductive power recharge"
+    },
+    {
+      "mode": "Wire fracture",
+      "effect": "Loss of one sensor channel",
+      "mitigation": "Redundant routing; fail-safe mode uses single sensor"
+    },
+    {
+      "mode": "Biofouling on sensor membrane",
+      "effect": "Drift / signal attenuation",
+      "mitigation": "Anti-fouling coating (parylene-C); differential measurement compensates for common-mode fouling"
+    }
+  ],
+  "worst_case_boundary_conditions": {
+    "csf_pressure_range": "5-30 mmHg (normal to elevated ICP)",
+    "venous_pressure_range": "0-15 mmHg (dural venous sinus)",
+    "differential_range": "0-25 mmHg",
+    "temperature": "37°C (body)",
+    "ph": "7.31-7.43 (CSF)",
+    "operating_life": "≥ 5 years (chronic implant)"
+  },
+  "safety_constraints": [
+    "No energized components in CSF contact (sensors are passively isolated)",
+    "ASIC hermetically sealed; no leachables",
+    "ISO 10993 biocompatibility for all CSF-contact materials",
+    "MRI conditional (sensors must function in 1.5T/3T MRI)"
+  ]
+}
