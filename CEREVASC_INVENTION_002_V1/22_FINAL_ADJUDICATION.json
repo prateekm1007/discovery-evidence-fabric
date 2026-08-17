@@ -1,73 +1,82 @@
 {
   "protocol": "INVENTION_PROTOCOL_V1",
   "invention_id": "CEREVASC_INVENTION_002_V1",
-  "score_version": "v1",
-  "timestamp": "2026-08-17T05:51:30.200936+00:00",
+  "supersedes": "Previous 22_FINAL_ADJUDICATION.json (composite 71, all gates PASS \u2014 inflated)",
+  "timestamp": "2026-08-17T15:43:16.629513+00:00",
+  "reaudit_reason": "CEO directive: Invention #3 was produced BEFORE the silent-promotion bug was caught. It has the same inflation pattern as V2: 75% model-derived evidence but Evidence gate scored 70/PASS.",
   "gates": {
     "PATENT_GATE": {
-      "score": 72,
+      "score": 45,
+      "maximum": 100,
       "threshold": 70,
       "weight": 0.35,
-      "status": "PASS",
-      "evidence_pointer": "E001 (EP3212275A1 L2-L6 absent) + E002 (US8672871B2 L2-L6 absent) + E003 (0 killers in 15 checked)",
-      "evidence": "102 SURVIVES (no single reference discloses all 7 limitations). 103 UNCERTAIN (EP3212275A1 + pressure sensor prior art motivation present but mechanism different). 5 design-around alternatives analyzed; strongest (DA-005) targets different market segment.",
-      "caveats": "41 foreign patents not claim-audited; 38 of 53 similar patents not claim-checked; patent counsel opinion required for 103."
+      "status": "FAIL",
+      "rationale": "102 based on model-derived summaries, not primary claims. 103 UNCERTAIN. Patent gate cannot PASS without primary claim analysis.",
+      "evidence_pointer": "E001,E002 (UNVERIFIED \u2014 model-derived summaries)"
     },
     "EVIDENCE_GATE": {
-      "score": 70,
+      "score": 40,
+      "maximum": 100,
       "threshold": 70,
       "weight": 0.25,
-      "status": "PASS",
-      "evidence_pointer": "E001..E008",
-      "evidence": "8 evidence entries; 2 primary-source (patent claim text), 6 model-derived. All conclusions trace to content_hash. No silent promotions.",
-      "caveats": "Only 2 of 8 evidence entries are primary-source. 41 foreign patents unaudited. Evidence coverage 68%."
+      "status": "FAIL",
+      "rationale": "Only 2/8 evidence entries are primary-source (25%). 75% model-derived. Evidence gate cannot PASS with 25% primary.",
+      "evidence_pointer": "E001-E008 (all model-derived)"
     },
     "TECHNICAL_GATE": {
-      "score": 72,
+      "score": 50,
+      "maximum": 100,
       "threshold": 65,
       "weight": 0.15,
-      "status": "PASS",
-      "evidence_pointer": "E004 (engineering feasibility) + E005 (simulation)",
-      "evidence": "ARCH-001 (dual MEMS) selected; CardioMEMS FDA-cleared precedent; hydraulic simulation detects occlusion within required timeframes; fail-safe analysis complete."
+      "status": "FAIL",
+      "rationale": "All engineering is model-derived. No in-vitro validation.",
+      "evidence_pointer": "E004,E005"
     },
-    "ENGINEERING_GATE": {
-      "score": 70,
+    "SAFETY_GATE": {
+      "score": 45,
+      "maximum": 100,
       "threshold": 60,
       "weight": 0.15,
-      "status": "PASS",
-      "evidence_pointer": "E005 (simulation + failure modes + fail-safe) + E004 (manufacturing feasibility)",
-      "evidence": "Hydraulic resistance model + occlusion sensitivity + 5 failure modes with mitigations + fail-safe for sensor/ASIC failure. Manufacturing: MEMS integration onto catheter is novel but components are mature."
+      "status": "FAIL",
+      "rationale": "Fail-safe is model-derived. No preclinical validation.",
+      "evidence_pointer": "E004 (engineering)"
     },
     "COMMERCIAL_GATE": {
-      "score": 70,
-      "threshold": 60,
+      "score": 50,
+      "maximum": 100,
+      "threshold": 65,
       "weight": 0.1,
-      "status": "PASS",
-      "evidence_pointer": "E006 (moat strength) + E007 (regulatory pathway) + E008 (buyer demand)",
-      "evidence": "MEANINGFUL moat; 15-20% shunt failure rate creates buyer demand; Class II 510(k) pathway identified; CereVasc is natural acquirer (eShunt platform)."
+      "status": "FAIL",
+      "rationale": "Build/buy numbers are model-derived. IP moat unverified (103 UNCERTAIN).",
+      "evidence_pointer": "E008"
     }
   },
-  "composite_score": 71.0,
+  "composite_score": 45.0,
+  "composite_maximum": 100,
   "composite_threshold": 70,
-  "all_gates_pass": true,
-  "all_hard_gates_pass": true,
-  "non_compensable_gates_status": {
-    "patent_gate_passed": true,
-    "evidence_gate_passed": true,
-    "both_non_compensable_satisfied": true
+  "composite_pass": false,
+  "four_concept_separation": {
+    "PATENT_STATUS": "102_UNCERTAIN (model-derived, not primary) / 103_UNCERTAIN",
+    "ENGINEERING_STATUS": "BELOW_THRESHOLD (50/65 technical, 45/60 safety)",
+    "BUYER_SENTIMENT": "INSUFFICIENT_EVIDENCE",
+    "BUYER_SENTIMENT_SOURCE": "INTERNAL_SIMULATION",
+    "BUYER_READINESS": "NOT_READY"
   },
-  "final_status": "WOULD_CONSIDER_WITH_MILESTONES",
-  "milestones_for_buyer_ready": [
-    "Patent counsel opinion on 103 obviousness over EP3212275A1",
-    "Claim-level search of 90,264 implantable pressure sensor patents for L4-L6 combination",
-    "In vivo proof-of-concept (swine — confirm CSF-venous differential is measurable)",
-    "510(k) pre-submission meeting with FDA",
-    "ISO 10993 chronic implantation testing (12-week)",
-    "IDE submission for pivotal clinical trial"
-  ],
-  "silent_promotion_check": "No silent promotions. All scores reference evidence_ids. Model-derived evidence explicitly labeled.",
-  "_adjudication_rules": "Patent + Evidence gates are non-compensable (≥70 required). Composite ≥70 for BUYER_READY. Milestones listed when status is WOULD_CONSIDER_WITH_MILESTONES.",
-  "buyer_test_question": "Would CereVasc pay to license or acquire this invention?",
-  "buyer_test_answer": "WOULD_CONSIDER_WITH_MILESTONES",
-  "buyer_test_rationale": "Strategic value is high (monitoring is #1 unmet need) but 103 uncertainty and evidence gaps require resolution before acquisition."
+  "state_machine": {
+    "rule": "if any hard/soft gate < threshold OR composite < 70: BUYER_READINESS = NOT_READY",
+    "hard_gates_pass": false,
+    "soft_gates_pass": false,
+    "composite_pass": false,
+    "buyer_readiness": "NOT_READY"
+  },
+  "final_status": "WOULD_NOT_PAY",
+  "final_status_rationale": "Re-audited under corrected state machine. Composite dropped from 71 (inflated) to 45.0 (honest). All 5 gates FAIL. Evidence is 75% model-derived (was scored 70/PASS, should be 40/FAIL). Patent gate: 102 on model-derived summaries, not primary claims (was 72/PASS, should be 45/FAIL). BUYER_READINESS = NOT_READY. final_status = WOULD_NOT_PAY (per current V1 \u00a716). Under PCP-001, this would be BELOW_BUYER_THRESHOLD if hard gates passed \u2014 but they don't.",
+  "what_would_re_score_this": [
+    "Retrieve primary claims for Invention #3's references via PatSnap (claim-data endpoint works)",
+    "Re-run 102 with primary claim text (not model-derived summaries)",
+    "Re-run 103 with A-E motivation framework on primary claims",
+    "If 102 SURVIVES on primary claims -> Patent gate could PASS",
+    "If 103 UNCERTAIN -> Patent gate stays UNCERTAIN (not PASS)",
+    "Engineering/safety/commercial require physical validation (same as Invention #1)"
+  ]
 }
