@@ -1,0 +1,69 @@
+{
+  "protocol": "CEREVASC_V7_1",
+  "version": "V7.1_CLAIM_COVERAGE",
+  "timestamp": "2026-08-17T01:40:55.409384+00:00",
+  "governance_rule": "DISCOVERY COVERAGE \u2260 EVIDENCE COVERAGE \u2260 FAMILY COVERAGE",
+  "coverage_numbers": {
+    "discovered": 147,
+    "claim_audited": 87,
+    "failed_to_retrieve": 41,
+    "provisionals_skipped": 19,
+    "evidence_coverage_percent": 68.0
+  },
+  "critical_finding": {
+    "title": "CereVasc HAS patent claims mentioning patency and detection \u2014 but NOT via pressure differential",
+    "significance": "This is the most important finding in the entire CereVasc audit. It changes the white-space assessment from \"CereVasc has 0 monitoring IP\" to \"CereVasc has patency verification IP, but via contrast agent + imaging, NOT via pressure differential + predictive algorithm.\"",
+    "patents_with_L5_L6": [
+      {
+        "patent": "EP3212275A1 / WO2016070147A1 (same family)",
+        "claim_61": "A method for determining patency of a shunt used for treating hydrocephalus, comprising: deploying a shunt... introducing a detectable substance into the patient CSFS, so that the detectable substance will flow through the shunt... detecting a presence of the detectable substance in the lumen of the shunt.",
+        "mechanism": "CONTRAST AGENT + IMAGING \u2014 inject detectable substance, image to see if it flows through shunt",
+        "L5_assessment": "EXPLICIT \u2014 patency determination is claimed",
+        "L6_assessment": "EXPLICIT \u2014 detection via imaging system is claimed",
+        "but": "This is a CONTRAST-AGENT-BASED method, NOT a pressure-differential-based method. It requires injecting a substance and using an imaging system. It does NOT use: CSF pressure sensor, venous sinus pressure sensor, differential calculation, or predictive algorithm.",
+        "relevance_to_RESCUE_001": "This is RELATED prior art for L5+L6, but uses a COMPLETELY DIFFERENT MECHANISM. RESCUE_001 uses pressure differential + predictive algorithm. This patent uses contrast agent + imaging. The mechanisms are different."
+      },
+      {
+        "patent": "US20260224866A1",
+        "claim_3": "prevent blockage of the one or more CSF intake openings and/or occlusion of the shunt lumen by the arachnoid layer",
+        "mechanism": "STRUCTURAL DESIGN \u2014 the shunt design prevents occlusion by pinning the arachnoid layer",
+        "L5_assessment": "OCCLUSION PREVENTION (not prediction/detection)",
+        "L6_assessment": "NOT_DISCLOSED \u2014 no monitoring, no sensor, no signal output",
+        "relevance_to_RESCUE_001": "This is about PREVENTING occlusion through structural design, not PREDICTING occlusion through pressure monitoring. Different problem, different solution."
+      },
+      {
+        "patent": "WO2023178077A1 / AR128776A1 / US20240390643A1 (same family)",
+        "claim_26": "An assembly for verifying patency of a shunt implant prior to clinical use",
+        "mechanism": "BENCH TESTING \u2014 verify patency before implantation, not monitor after",
+        "L5_assessment": "PRE-IMPLANT VERIFICATION (not in-vivo monitoring)",
+        "L6_assessment": "NOT_DISCLOSED \u2014 no in-vivo monitoring output",
+        "relevance_to_RESCUE_001": "This is about verifying patency BEFORE clinical use (bench testing), not monitoring AFTER implantation. Different time domain, different mechanism."
+      },
+      {
+        "patent": "US20230233819A1 / WO2022087369A1 (same family)",
+        "claim_7": "ultrasound or optical coherence tomography sensors for mapping critical anatomical structures",
+        "mechanism": "ANATOMICAL MAPPING \u2014 ultrasound/OCT sensors for navigation, not shunt monitoring",
+        "L5_assessment": "NOT_DISCLOSED \u2014 no occlusion/patency prediction",
+        "L6_assessment": "SENSOR for mapping, NOT for shunt monitoring",
+        "relevance_to_RESCUE_001": "These are imaging sensors for anatomical mapping during deployment, not pressure sensors for ongoing monitoring. Different sensor type, different purpose."
+      },
+      {
+        "patent": "US20250228618A1",
+        "claim_1": "measured unobstructed depth of the ISAS at the target penetration site",
+        "mechanism": "PRE-PROCEDURE PLANNING \u2014 measuring anatomy before procedure",
+        "L5_assessment": "NOT_DISCLOSED \u2014 no occlusion/patency prediction",
+        "L6_assessment": "MEASUREMENT for planning, NOT for shunt monitoring",
+        "relevance_to_RESCUE_001": "This is about measuring anatomical dimensions for procedure planning, not monitoring shunt patency. Different application entirely."
+      }
+    ],
+    "summary": "CereVasc HAS 6 patents with L5/L6 keywords. But passage-level audit reveals: (1) one family uses contrast agent + imaging for patency verification (different mechanism from RESCUE_001), (2) one patent prevents occlusion through structural design, (3) one family verifies patency pre-implant (bench testing), (4) two families use sensors for anatomical mapping (not monitoring), (5) one patent measures anatomy for procedure planning. NONE use CSF-venous pressure differential + predictive algorithm."
+  },
+  "rescue_001_impact": {
+    "102_impact": "STILL SURVIVES \u2014 no single reference discloses ALL 6 limitations. The closest (EP3212275A1) discloses L5+L6 but via contrast agent + imaging, NOT via pressure differential. L1 (CSF pressure sensor), L2 (venous sinus pressure sensor), L3 (differential calculation) are NOT disclosed.",
+    "103_impact": "INCREASED \u2014 CereVasc already has a patency verification method (contrast agent + imaging). The question becomes: is it obvious to REPLACE contrast agent + imaging with pressure differential + predictive algorithm? This is a non-trivial design choice \u2014 the mechanisms are fundamentally different.",
+    "white_space_revised": "The monitoring white space is NARROWER than V6 suggested. CereVasc already has patency verification IP (contrast agent + imaging). The remaining white space is specifically: CONTINUOUS, IN-VIVO monitoring via PRESSURE DIFFERENTIAL + PREDICTIVE ALGORITHM \u2014 not periodic, exogenous contrast-agent-based verification.",
+    "differentiation_needed": "RESCUE_001 must differentiate from EP3212275A1 by emphasizing: (1) CONTINUOUS monitoring vs periodic verification, (2) ENDOGENOUS pressure signal vs exogenous contrast agent, (3) PREDICTIVE algorithm vs detection imaging, (4) NO contrast injection needed."
+  },
+  "final_status": "PROMISING \u2014 with revised 103 risk",
+  "final_rationale": "RESCUE_001 still survives 102 (no single reference discloses all 6 limitations). However, V7.1 discovered that CereVasc already has patency verification IP (EP3212275A1) using contrast agent + imaging. This INCREASES 103 risk because CereVasc already recognized the need for patency verification. The question is whether switching from contrast agent + imaging to pressure differential + predictive algorithm is obvious. The mechanisms are fundamentally different (exogenous vs endogenous, periodic vs continuous, imaging vs pressure signal), but the MOTIVATION to verify patency is clearly present in CereVasc own portfolio."
+}
