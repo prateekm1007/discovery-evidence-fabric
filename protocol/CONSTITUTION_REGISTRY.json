@@ -1,0 +1,47 @@
+{
+  "_purpose": "Constitution registry — pins the SHA-256 of the canonical INVENTION_PROTOCOL_V<N>.md file. Preflight checks this pin on every run; a mismatch (file modified without V<N+1> supersession) is a hard CI failure.",
+  "_authority": "INVENTION_PROTOCOL_V1 §14 (Protocol Evolution Workflow) and §3.8 (Protocol Immutability Within a Run)",
+  "_immutability": "This file MAY be edited only via the Protocol Evolution Workflow (Section 14). An edit outside that workflow is itself a governance violation.",
+
+  "current_version": "V1",
+  "current_canonical_path": "protocol/INVENTION_PROTOCOL_V1.md",
+  "current_sha256": "8d75ca8fc17f031ffa3b8d7ea4a272b5114592bdd0476c3d95d8220171a389f8",
+  "current_frozen_at": "2026-08-17T03:27:00Z",
+  "current_frozen_by_commit": "ee77781",
+
+  "supersession_history": [
+    {
+      "version": "V1",
+      "canonical_path": "protocol/INVENTION_PROTOCOL_V1.md",
+      "sha256": "8d75ca8fc17f031ffa3b8d7ea4a272b5114592bdd0476c3d95d8220171a389f8",
+      "frozen_at": "2026-08-17T03:27:00Z",
+      "frozen_by_commit": "ee77781",
+      "supersedes": null,
+      "supersession_rationale": null,
+      "audit_status": "FROZEN",
+      "audit_notes": "Initial constitution. Canonical path moved from repo root to protocol/INVENTION_PROTOCOL_V1.md on 2026-08-17 to align with the protocol/ directory convention; this is a path-only correction (no content change), so V1 hash remains authoritative and no V2 was created. The path correction itself is recorded in protocol/CHANGELOG.md."
+    }
+  ],
+
+  "constitutional_invariants": [
+    "Non-compensable status of Patent and Evidence gates (Protocol §7.2)",
+    "102 single-reference rule (Protocol §5.9, §9.4)",
+    "103 motivation/expectation requirement (Protocol §5.10, §9.5)",
+    "Provenance chain requirement (Protocol §3.4, §9.3, §10)",
+    "Limitation freeze immutability (Protocol §3.8, §8, §9.2, §9.11)",
+    "Mandatory artifact list (Protocol §6, §9.1)",
+    "No silent promotion rule (Protocol §3.7, §9.9, §9.12)",
+    "The Protocol Evolution Workflow itself (Protocol §14)"
+  ],
+
+  "ci_enforcement": {
+    "preflight_must_verify": [
+      "Canonical constitution file exists at current_canonical_path",
+      "SHA-256 of the file at current_canonical_path equals current_sha256",
+      "Every invention folder's 00_MANIFEST.json references current_version (no orphan inventions on a superseded protocol)",
+      "Every invention folder's 21_EVIDENCE_LEDGER.json references current_version in its 'protocol' field"
+    ],
+    "on_mismatch": "preflight_check.py exits 1 (blocks commit) and writes the specific mismatch to preflight_report.json",
+    "on_missing_constitution": "preflight_check.py exits 1 with section 'X.0' check 'constitution_canonical_present' = false"
+  }
+}
