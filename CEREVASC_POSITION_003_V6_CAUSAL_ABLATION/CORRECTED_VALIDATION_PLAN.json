@@ -1,0 +1,77 @@
+{
+  "pre_registered": true,
+  "pre_registration_hash": "a10175ee3fcd223ebae969d3244c4a61b8596f64b6b4a37ce621150eac437ffd",
+  "primary_endpoint": {
+    "endpoint": "Target-tissue AUC (brain-adjacent tissue drug concentration × time)",
+    "hypothesis": "Spatial+retention AUC ≥ 200% of baseline (model predicts 327%)",
+    "success_threshold": "≥ 120% of baseline (conservative)",
+    "failure_threshold": "≤ 100% of baseline"
+  },
+  "secondary_endpoints": [
+    {
+      "endpoint": "CSF AUC",
+      "measurement": "CSF concentration × time"
+    },
+    {
+      "endpoint": "Tissue/CSF exposure ratio",
+      "measurement": "AUC_tissue / AUC_CSF — measures drug distribution efficiency"
+    },
+    {
+      "endpoint": "Time above therapeutic threshold (tissue)",
+      "measurement": "Hours where tissue concentration ≥ therapeutic threshold",
+      "threshold": 0.001
+    },
+    {
+      "endpoint": "Time above therapeutic threshold (CSF)",
+      "measurement": "Hours where CSF concentration ≥ therapeutic threshold",
+      "threshold": 0.01
+    },
+    {
+      "endpoint": "Systemic/venous drug exposure",
+      "measurement": "Venous blood drug concentration — measures systemic loss"
+    },
+    {
+      "endpoint": "CSF drainage rate",
+      "measurement": "Continuous flow measurement — must be ≥ 0.3 mL/min"
+    },
+    {
+      "endpoint": "ICP",
+      "measurement": "Continuous ICP monitoring — must be < 20 mmHg"
+    },
+    {
+      "endpoint": "Cmax tissue",
+      "measurement": "Peak tissue concentration — must reach therapeutic threshold for clinically meaningful result"
+    }
+  ],
+  "acceptance_criteria": {
+    "primary": "Tissue AUC ≥ 120% of baseline (p<0.05)",
+    "therapeutic": "Tissue Cmax ≥ therapeutic threshold for at least one timepoint",
+    "safety": "ICP < 20 mmHg; CSF drainage ≥ 0.3 mL/min",
+    "pk_proxy_acknowledgment": "If tissue Cmax does not reach therapeutic threshold, the result is a PK proxy (relative exposure improvement), not therapeutic benefit"
+  },
+  "design": {
+    "animal_model": "Ovine, n=6 per group",
+    "groups": [
+      {
+        "group": "A_baseline",
+        "description": "CereVasc existing delivery"
+      },
+      {
+        "group": "B_proposed",
+        "description": "Spatial separation + selective retention"
+      }
+    ],
+    "drug": "FITC-dextran 150 kDa (fluorescent surrogate, matches bevacizumab MW)",
+    "dose": "5 mg equivalent",
+    "duration": "48 hours",
+    "sampling": "CSF: 0, 0.5, 1, 2, 4, 8, 12, 24, 48h; Tissue: post-mortem; Venous: same as CSF; ICP: continuous"
+  },
+  "cost": "$50,000",
+  "timeline": "12 weeks",
+  "decision_tree": {
+    "AUC ≥ 200% AND Cmax ≥ therapeutic": "BUYABLE CONFIRMED — therapeutic advantage demonstrated",
+    "AUC ≥ 120% BUT Cmax < therapeutic": "PK PROXY CONFIRMED — relative exposure improvement; clinical benefit requires higher dose or different agent",
+    "AUC ≤ 120%": "TRUE CEILING — model overestimated",
+    "ICP unsafe": "ARCHITECTURE FAILED"
+  }
+}
