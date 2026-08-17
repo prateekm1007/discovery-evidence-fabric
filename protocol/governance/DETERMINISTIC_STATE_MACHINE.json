@@ -1,0 +1,29 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "phase": "DETERMINISTIC_STATE_MACHINE",
+  "ceo_directive": "No model gets to choose the final status. FINAL_STATUS must be deterministically derived.",
+  "derivation_rules": [
+    {
+      "condition": "Hard gate fail",
+      "final_status": "WOULD_NOT_PAY",
+      "rationale": "Non-compensable gates (Patent + Evidence) failed per §7.2"
+    },
+    {
+      "condition": "Hard gates pass + any soft gate fail OR composite < 70",
+      "final_status": "BELOW_BUYER_THRESHOLD (V1.1) / WOULD_NOT_PAY (V1.0)",
+      "rationale": "Hard gates pass but soft gates or composite below threshold. PCP-001 proposes BELOW_BUYER_THRESHOLD; under V1.0 maps to WOULD_NOT_PAY."
+    },
+    {
+      "condition": "All gates pass + composite >= 70 + milestones remain",
+      "final_status": "WOULD_CONSIDER_WITH_MILESTONES",
+      "rationale": "Per §16"
+    },
+    {
+      "condition": "All gates pass + composite >= 70 + no required milestones",
+      "final_status": "LEVEL_4_BUYER_READY",
+      "rationale": "Per §16"
+    }
+  ],
+  "implementation": "protocol/governance/DETERMINISTIC_STATE_MACHINE.py",
+  "test": "Run with Invention #1 V4 values → final_status = WOULD_NOT_PAY (V1.0) or BELOW_BUYER_THRESHOLD (V1.1 if PCP-001 approved)"
+}

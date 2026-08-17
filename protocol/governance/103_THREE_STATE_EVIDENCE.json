@@ -1,0 +1,30 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "phase": "103_THREE_STATE_EVIDENCE",
+  "ceo_directive": "Distinguish NO_MOTIVATION_FOUND from MOTIVATION_SEARCH_INCOMPLETE. If search is incomplete, never infer absence of motivation.",
+  "three_states": {
+    "FOUND": {
+      "definition": "Motivation evidence found in primary claims (exact passage retrieved)",
+      "implication": "103 may be OBVIOUS — proceed to expectation/compatibility analysis",
+      "action": "Document the passage, assess expectation of success, check teaching away"
+    },
+    "NOT_FOUND_AFTER_COMPLETE_SEARCH": {
+      "definition": "Search was complete (all discovery sources exhausted) and no motivation passage found",
+      "implication": "103 leans NON_OBVIOUS — but still requires patent counsel confirmation",
+      "action": "Document search completeness; recommend patent counsel opinion"
+    },
+    "SEARCH_INCOMPLETE": {
+      "definition": "Discovery did not cover all sources (PatSnap balance exhausted, EPO OPS/USPTO not configured)",
+      "implication": "CANNOT infer absence of motivation — 103 is UNCERTAIN",
+      "action": "Never say 'no motivation found' — say 'search incomplete, motivation state unknown'",
+      "critical_rule": "If search is incomplete, the system MUST NOT infer absence of motivation."
+    }
+  },
+  "current_state_for_invention_1": {
+    "103_evidence_state": "SEARCH_INCOMPLETE",
+    "rationale": "PatSnap discovery endpoints BALANCE_EXHAUSTED; EPO OPS/USPTO/Lens not configured. 18-ref corpus is not a complete search.",
+    "cannot_say": "NO_MOTIVATION_FOUND (search was not complete)",
+    "correct_label": "103_UNCERTAIN (SEARCH_INCOMPLETE)"
+  },
+  "ci_rule": "If 103_evidence_state = SEARCH_INCOMPLETE, then 103_status MUST be UNCERTAIN. Never NON_OBVIOUS."
+}
