@@ -1,0 +1,130 @@
+{
+  "scenarios": {
+    "PASSIVE_VALVE_SUPINE": {
+      "label": "Passive valve, supine (normal)",
+      "P_venous": 8,
+      "dP": 7,
+      "valve_threshold": 7,
+      "drainage_mode": "PASSIVE",
+      "Q_drainage": 0,
+      "valve_state": "CLOSED",
+      "ICP": 26.7,
+      "safety": "UNDER-DRAINAGE (intracranial hypertension)",
+      "drainage_vs_production": "UNDER"
+    },
+    "PASSIVE_VALVE_STANDING": {
+      "label": "Passive valve, standing (over-drainage risk)",
+      "P_venous": 2,
+      "dP": 13,
+      "valve_threshold": 7,
+      "drainage_mode": "PASSIVE",
+      "Q_drainage": 1.2,
+      "valve_state": "OPEN",
+      "ICP": 0.8,
+      "safety": "OVER-DRAINAGE (intracranial hypotension risk)",
+      "drainage_vs_production": "OVER"
+    },
+    "PASSIVE_VALVE_VALSALVA": {
+      "label": "Passive valve, Valsalva (under-drainage)",
+      "P_venous": 18,
+      "dP": -3,
+      "valve_threshold": 7,
+      "drainage_mode": "PASSIVE",
+      "Q_drainage": 0,
+      "valve_state": "CLOSED",
+      "ICP": 26.7,
+      "safety": "UNDER-DRAINAGE (intracranial hypertension)",
+      "drainage_vs_production": "UNDER"
+    },
+    "CLOSED_LOOP_SUPINE": {
+      "label": "Closed-loop, supine",
+      "P_venous": 8,
+      "dP": 7,
+      "valve_threshold": 2.2,
+      "drainage_mode": "ADAPTIVE",
+      "Q_drainage": 0.95,
+      "valve_state": "OPEN",
+      "ICP": 5.0,
+      "safety": "SAFE",
+      "drainage_vs_production": "OVER"
+    },
+    "CLOSED_LOOP_STANDING": {
+      "label": "Closed-loop, standing",
+      "P_venous": 2,
+      "dP": 13,
+      "valve_threshold": 8.2,
+      "drainage_mode": "ADAPTIVE",
+      "Q_drainage": 0.95,
+      "valve_state": "OPEN",
+      "ICP": 5.0,
+      "safety": "SAFE",
+      "drainage_vs_production": "OVER"
+    },
+    "CLOSED_LOOP_VALSALVA": {
+      "label": "Closed-loop, Valsalva",
+      "P_venous": 18,
+      "dP": -3,
+      "valve_threshold": 0,
+      "drainage_mode": "ADAPTIVE",
+      "Q_drainage": 0,
+      "valve_state": "CLOSED",
+      "ICP": 26.7,
+      "safety": "UNDER-DRAINAGE (intracranial hypertension)",
+      "drainage_vs_production": "UNDER"
+    }
+  },
+  "key_findings": {
+    "passive_standing": {
+      "label": "Passive valve, standing (over-drainage risk)",
+      "P_venous": 2,
+      "dP": 13,
+      "valve_threshold": 7,
+      "drainage_mode": "PASSIVE",
+      "Q_drainage": 1.2,
+      "valve_state": "OPEN",
+      "ICP": 0.8,
+      "safety": "OVER-DRAINAGE (intracranial hypotension risk)",
+      "drainage_vs_production": "OVER"
+    },
+    "passive_Valsalva": {
+      "label": "Passive valve, Valsalva (under-drainage)",
+      "P_venous": 18,
+      "dP": -3,
+      "valve_threshold": 7,
+      "drainage_mode": "PASSIVE",
+      "Q_drainage": 0,
+      "valve_state": "CLOSED",
+      "ICP": 26.7,
+      "safety": "UNDER-DRAINAGE (intracranial hypertension)",
+      "drainage_vs_production": "UNDER"
+    },
+    "closed_loop_standing": {
+      "label": "Closed-loop, standing",
+      "P_venous": 2,
+      "dP": 13,
+      "valve_threshold": 8.2,
+      "drainage_mode": "ADAPTIVE",
+      "Q_drainage": 0.95,
+      "valve_state": "OPEN",
+      "ICP": 5.0,
+      "safety": "SAFE",
+      "drainage_vs_production": "OVER"
+    },
+    "closed_loop_Valsalva": {
+      "label": "Closed-loop, Valsalva",
+      "P_venous": 18,
+      "dP": -3,
+      "valve_threshold": 0,
+      "drainage_mode": "ADAPTIVE",
+      "Q_drainage": 0,
+      "valve_state": "CLOSED",
+      "ICP": 26.7,
+      "safety": "UNDER-DRAINAGE (intracranial hypertension)",
+      "drainage_vs_production": "UNDER"
+    },
+    "passive_over_drainage": "PASSIVE valve causes OVER-DRAINAGE when standing (P_venous drops → dP increases → excessive flow)",
+    "passive_under_drainage": "PASSIVE valve causes UNDER-DRAINAGE during Valsalva (P_venous rises → dP decreases → insufficient flow)",
+    "closed_loop_fixes_both": "CLOSED-LOOP adjusts threshold to compensate for P_venous changes → maintains target ICP in all positions",
+    "eShunt_specificity": "This compensation REQUIRES measuring P_venous, which is only possible in an endovascular CSF-to-venous shunt. VP shunts cannot measure peritoneal pressure."
+  }
+}
