@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_template": "22_FINAL_ADJUDICATION.json — the final verdict per invention",
+  "_purpose": "Scores all 5 gates, computes composite, issues terminal status. Every gate score must reference evidence_ids. Silent promotion is forbidden (Section 9.12).",
+  "_required_by": "INVENTION_PROTOCOL_V1 Section 7, 16",
+
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "<COMPANY>_INVENTION_<NNN>_V<M>",
+  "score_version": "v<M>",
+  "timestamp": "<ISO-8601 UTC>",
+
+  "gates": {
+    "PATENT_GATE": {
+      "score": "<0-100>",
+      "threshold": 70,
+      "weight": 0.35,
+      "status": "PASS | FAIL",
+      "compensable": false,
+      "evidence_pointer": ["<evidence_id from 21_EVIDENCE_LEDGER.json>"],
+      "evidence": "<human-readable summary>"
+    },
+    "EVIDENCE_GATE": {
+      "score": "<0-100>",
+      "threshold": 70,
+      "weight": 0.25,
+      "status": "PASS | FAIL",
+      "compensable": false,
+      "evidence_pointer": ["<evidence_id>"],
+      "evidence": "<human-readable summary>"
+    },
+    "TECHNICAL_GATE": {
+      "score": "<0-100>",
+      "threshold": 65,
+      "weight": 0.15,
+      "status": "PASS | FAIL",
+      "compensable": true,
+      "evidence_pointer": ["<evidence_id>"],
+      "evidence": "<human-readable summary>"
+    },
+    "ENGINEERING_GATE": {
+      "score": "<0-100>",
+      "threshold": 60,
+      "weight": 0.15,
+      "status": "PASS | FAIL",
+      "compensable": true,
+      "evidence_pointer": ["<evidence_id>"],
+      "evidence": "<human-readable summary>"
+    },
+    "COMMERCIAL_GATE": {
+      "score": "<0-100>",
+      "threshold": 65,
+      "weight": 0.10,
+      "status": "PASS | FAIL",
+      "compensable": true,
+      "evidence_pointer": ["<evidence_id>"],
+      "evidence": "<human-readable summary>"
+    }
+  },
+
+  "composite_score": "<weighted sum, 0-100>",
+  "composite_threshold": 70,
+  "all_gates_pass": "<true|false>",
+  "all_hard_gates_pass": "<true|false>",
+
+  "non_compensable_gates_status": {
+    "patent_gate_passed": "<true|false>",
+    "evidence_gate_passed": "<true|false>",
+    "both_non_compensable_satisfied": "<true|false>"
+  },
+
+  "final_status": "WOULD_NOT_PAY | WOULD_CONSIDER_WITH_MILESTONES | LEVEL_4_BUYER_READY",
+
+  "milestones_for_buyer_ready": [
+    "<specific milestone required to reach LEVEL_4_BUYER_READY; each must reference the evidence_id gap it would close>"
+  ],
+
+  "silent_promotion_check": "<one of: NO_SILENT_PROMOTION | SILENT_PROMOTION_DETECTED (CI failure)>",
+
+  "_adjudication_rules": [
+    "If PATENT_GATE < 70 OR EVIDENCE_GATE < 70 → WOULD_NOT_PAY (regardless of composite).",
+    "If all gates pass AND composite ≥ 70 AND milestones list is non-empty → WOULD_CONSIDER_WITH_MILESTONES.",
+    "If all gates pass AND composite ≥ 70 AND milestones list is empty → LEVEL_4_BUYER_READY.",
+    "A WOULD_CONSIDER_WITH_MILESTONES verdict with an empty milestones list is a CI failure (Section 9.9).",
+    "A LEVEL_4_BUYER_READY verdict with any non-empty milestones list is a CI failure (Section 9.9).",
+    "Every gate score must have a non-empty evidence_pointer. A gate with no evidence_pointer is a silent promotion (Section 9.9)."
+  ],
+
+  "buyer_test_question": "If you were <buyer>'s CTO/CSO/BD lead, would you pay to acquire or license this invention today?",
+  "buyer_test_answer": "WOULD_NOT_PAY | WOULD_CONSIDER_WITH_MILESTONES | LEVEL_4_BUYER_READY",
+  "buyer_test_rationale": "<human-readable rationale for the buyer-test answer>"
+}

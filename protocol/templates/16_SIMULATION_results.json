@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_template": "16_SIMULATION/simulation_results.json — domain-specific engineering simulation slot",
+  "_purpose": "The protocol selects the appropriate simulation domain from the SIMULATION_DOMAIN registry (Protocol Section 12). An invalid selection (e.g., membrane_fouling for a battery invention) is a CI failure. All simulation outputs must include model_inputs.",
+  "_required_by": "INVENTION_PROTOCOL_V1 Section 5.14, 9.7, 9.8",
+
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "<COMPANY>_INVENTION_<NNN>_V<M>",
+
+  "simulation_domain": "<must match an entry in SIMULATION_DOMAIN registry; e.g., membrane_fouling | thermal | battery_degradation | structural_fatigue | fluid_dynamics | optical_propagation | pharmacokinetics | semiconductor_yield | network_latency | mechanical_wear | energy_efficiency | manufacturing_tolerance>",
+
+  "simulation_domain_justification": "<why this domain was selected for this invention; must reference the engineering blueprint>",
+
+  "physics_model": {
+    "model_name": "<e.g., Hagen-Poiseuille hydraulic resistance; Newton-Raphson thermal solver; etc.>",
+    "model_equations": [
+      "<equation 1 — verbatim>",
+      "<equation 2 — verbatim>"
+    ],
+    "model_citation": "<textbook or paper the model is drawn from>",
+    "model_assumptions": [
+      "<assumption 1>",
+      "<assumption 2>"
+    ]
+  },
+
+  "failure_modes": [
+    {
+      "mode": "<e.g., membrane fouling, thermal runaway, battery thermal expansion, fatigue crack propagation>",
+      "trigger": "<condition that triggers this failure mode>",
+      "consequence": "<what happens when this failure mode is active>",
+      "detection_method": "<how the failure is detected>",
+      "mitigation": "<design feature that prevents or mitigates this failure mode>"
+    }
+  ],
+
+  "worst_case_boundary_conditions": {
+    "description": "<e.g., complete membrane occlusion; 90% state-of-charge at 60°C; 10^7 stress cycles>",
+    "input_values": {
+      "<variable_1>": "<value>",
+      "<variable_2>": "<value>"
+    },
+    "output_values": {
+      "<output_1>": "<value>",
+      "<output_2>": "<value>"
+    },
+    "safety_classification": "SAFE | UNSAFE | MARGINAL"
+  },
+
+  "sensitivity_analysis": {
+    "dominant_variable": "<the variable to which the output is most sensitive>",
+    "secondary_variables": ["<list>"],
+    "sensitivity_method": "<e.g., finite-difference local sensitivity; Sobol global sensitivity>",
+    "sensitivity_table": [
+      {
+        "variable": "<name>",
+        "range": "[<low>, <high>]",
+        "output_range": "[<low_out>, <high_out>]"
+      }
+    ]
+  },
+
+  "safety_constraints": [
+    {
+      "constraint": "<e.g., max_ICP < 20 mmHg; max_temperature < 41°C; min_battery_voltage > 2.5V>",
+      "justification": "<why this constraint was chosen; e.g., ICP > 20 mmHg is symptomatic intracranial hypertension>",
+      "engineering_enforcement": "<how the design enforces this constraint; e.g., pressure-relief bypass valve>"
+    }
+  ],
+
+  "design_modification_loop": {
+    "triggered_by": "<which simulation result required a design modification>",
+    "modification": "<what was changed in the engineering blueprint>",
+    "new_blueprint_version": "<V2, V3, etc.>",
+    "re_simulation_result": "<the simulation output after the modification>"
+  },
+
+  "fail_safe_analysis": {
+    "required_for_domains": ["CNS implants", "cardiac implants", "vascular implants", "respiratory devices", "implantable power sources"],
+    "applicable": "<true|false>",
+    "if_applicable": {
+      "critical_failure_mode": "<the failure mode that would cause patient harm>",
+      "fail_safe_mechanism": "<how the device enters a safe state on failure; e.g., sleeve rupture → full bypass>",
+      "fail_safe_verification": "<how the fail-safe mechanism is verified>"
+    }
+  },
+
+  "model_inputs": {
+    "<variable_1>": "<value>",
+    "<variable_2>": "<value>"
+  },
+
+  "engineering_gate_result": "PASS | FAIL",
+  "label": "MODEL_PREDICTED | PRIMARY_SOURCE_VALIDATED",
+
+  "_provenance_rules": [
+    "Every numeric output must trace to a model_input (Section 9.8).",
+    "Every safety classification must trace to a worst_case_boundary_condition.",
+    "Every design modification must trace to a simulation result that required it.",
+    "Every fail-safe mechanism must trace to a critical_failure_mode."
+  ]
+}

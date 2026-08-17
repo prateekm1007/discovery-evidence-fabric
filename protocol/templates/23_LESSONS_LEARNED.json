@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_template": "23_LESSONS_LEARNED.json — immutable learning record per invention",
+  "_purpose": "Records what worked, what failed, and what protocol changes are suggested. Lessons CANNOT silently modify the constitution. They accumulate here and feed the Protocol Evolution Workflow (Section 14).",
+  "_required_by": "INVENTION_PROTOCOL_V1 Section 13",
+
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "<COMPANY>_INVENTION_<NNN>_V<M>",
+  "timestamp": "<ISO-8601 UTC>",
+
+  "what_worked": [
+    "<specific practice or technique that contributed to a successful stage; cite stage or task>"
+  ],
+
+  "what_failed": [
+    "<specific stage, task, or sub-procedure that did not produce usable output; cite stage or task; describe the failure mode>"
+  ],
+
+  "hallucinations_caught": [
+    {
+      "instance": "<what the model asserted>",
+      "reality": "<what the primary source actually said>",
+      "catch_mechanism": "<how the protocol caught the hallucination>",
+      "evidence_id": "<evidence_id in 21_EVIDENCE_LEDGER where this is recorded>"
+    }
+  ],
+
+  "false_positives": [
+    {
+      "instance": "<what the protocol marked as BUYER_READY that should not have been>",
+      "root_cause": "<why the false positive occurred>",
+      "corrective_action": "<what change would prevent recurrence>",
+      "protocol_change_proposed": "<if a protocol change is needed, name the section>"
+    }
+  ],
+
+  "false_negatives": [
+    {
+      "instance": "<what the protocol rejected that should have passed>",
+      "root_cause": "<why the false negative occurred>",
+      "corrective_action": "<what change would prevent recurrence>",
+      "protocol_change_proposed": "<if a protocol change is needed, name the section>"
+    }
+  ],
+
+  "prior_art_search_failures": [
+    {
+      "source": "PatSnap | EPO OPS | Google BigQuery | USPTO ODP | Lens.org",
+      "query": "<the query that failed>",
+      "failure_substate": "PERMISSION_ERROR | HTTP_ERROR | RATE_LIMIT | NO_RESULTS | SEARCH_INSUFFICIENT | SOURCE_UNAVAILABLE",
+      "error_code": "<if applicable, e.g., PatSnap 67200005>",
+      "impact_on_gates": "<which gates were affected by this failure>",
+      "evidence_id": "<evidence_id where this is recorded>"
+    }
+  ],
+
+  "patsnap_endpoint_failures": [
+    {
+      "endpoint": "P005 | P007 | P013 | P015 | P018 | P073 | AI30",
+      "error_code": "<e.g., 67200005>",
+      "error_message": "<verbatim>",
+      "impact_on_gates": "<which gates were affected>"
+    }
+  ],
+
+  "model_specific_errors": [
+    {
+      "model": "<which LLM/model produced the error>",
+      "error_type": "CLAIM_INTERPRETATION_FAILURE | MOTIVATION_FABRICATION | LIMITATION_MISCLASSIFICATION | OTHER",
+      "error_description": "<description>",
+      "evidence_id": "<where recorded>"
+    }
+  ],
+
+  "engineering_assumptions_invalidated": [
+    {
+      "assumption": "<what the engineering blueprint assumed>",
+      "invalidated_by": "<simulation result, experimental data, or literature reference>",
+      "impact_on_engineering_gate": "<how this affected the engineering gate score>",
+      "evidence_id": "<where recorded>"
+    }
+  ],
+
+  "buyer_objections": [
+    {
+      "objection": "<what a hypothetical buyer (CTO/CSO/BD) would object to>",
+      "gate_addressed": "<which gate the objection maps to>",
+      "evidence_id": "<where recorded>"
+    }
+  ],
+
+  "protocol_changes_proposed": [
+    {
+      "proposal_id": "PCP-<NNN>",
+      "section_affected": "<section number in INVENTION_PROTOCOL_V1>",
+      "proposed_change": "<one-sentence description of the proposed change>",
+      "lessons_motivating": ["<list of evidence_ids that motivate this proposal>"],
+      "audit_required": true,
+      "audit_status": "PENDING | APPROVED | REJECTED | DEFERRED",
+      "audit_notes": "<if audited, the auditor's notes>"
+    }
+  ],
+
+  "_immutability_rules": [
+    "Once written, this file may not be edited.",
+    "Appended entries are permitted (new lessons learned after-the-fact).",
+    "Existing entries may not be modified or deleted.",
+    "protocol_changes_proposed entries feed the Protocol Evolution Workflow but do NOT modify the constitution automatically.",
+    "V2 of the constitution is created only through the audit-approved workflow (Section 14)."
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_template": "08_LIMITATION_FREEZE.json — IMMUATION: once written, never edited; supersession only",
+  "_purpose": "Freezes the claim's limitations L1..Ln and their arrangement. All downstream artifacts (102, 103, design-around, evidence ledger) reference this freeze's content hash.",
+  "_required_by": "INVENTION_PROTOCOL_V1 Section 8",
+
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "<COMPANY>_INVENTION_<NNN>_V<M>",
+  "freeze_version": "v<M>",
+  "supersedes": "<previous freeze version, or null if first version>",
+  "supersession_rationale": "<required if supersedes is non-null; explanation of why limitations changed>",
+
+  "limitations": {
+    "L1": "<limitation 1 — single concept, explicit claim language>",
+    "L2": "<limitation 2>",
+    "L3": "<limitation 3>",
+    "L4": "<limitation 4>",
+    "L5": "<limitation 5>",
+    "L6": "<limitation 6>"
+  },
+
+  "arrangement": {
+    "structure": "means-plus-function | means-plus-step | jepson | markush | combination-of-elements",
+    "claim_dependencies": [
+      {"from": "L1", "to": "L2", "relation": "comprising"},
+      {"from": "L2", "to": "L3", "relation": "wherein"}
+    ]
+  },
+
+  "claim_language_verbatim": "<the full claim text as proposed to be filed, copied verbatim from the draft claim document>",
+
+  "freeze_timestamp": "<ISO-8601 UTC>",
+  "freeze_author": "<agent or human who created the freeze>",
+  "content_hash_self": "<sha256 of this file, written by preflight after creation>",
+
+  "_immuability_rules": [
+    "Once written, this file may not be edited.",
+    "Supersession requires creating a new freeze version (V2, V3, ...).",
+    "V1 is preserved in the repository; never overwritten.",
+    "The 102 and 103 attack artifacts reference THIS freeze's content_hash_self.",
+    "Any mismatch between the freeze's content_hash_self and the hash recorded in 11_102_ATTACK or 12_103_ATTACK is a CI failure (Section 9.3)."
+  ]
+}

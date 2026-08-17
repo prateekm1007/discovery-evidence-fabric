@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_template": "12_103_ATTACK/103_RESULTS.json — combination + motivation attack",
+  "_purpose": "For each reference pair (or n-tuple), document the explicit motivation to combine and the reasonable expectation of success. 'Both known in the art' is NOT motivation. Anti-hindsight required.",
+  "_required_by": "INVENTION_PROTOCOL_V1 Section 5.10, 9.5",
+
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "<COMPANY>_INVENTION_<NNN>_V<M>",
+  "limitation_freeze_version": "v<M>",
+  "limitation_freeze_content_hash": "<must match the content_hash_self of 08_LIMITATION_FREEZE.json>",
+
+  "limitations_frozen": {
+    "L1": "<verbatim>",
+    "L2": "<verbatim>",
+    "L3": "<verbatim>",
+    "L4": "<verbatim>",
+    "L5": "<verbatim>",
+    "L6": "<verbatim>"
+  },
+
+  "combinations_analyzed": [
+    {
+      "combination_id": "C001",
+      "reference_A": "<e.g., US12337140B2>",
+      "reference_B": "<e.g., US20200406018A1>",
+      "reference_n": ["<additional references if 3+ way combination>"],
+
+      "limitation_coverage": {
+        "L1": { "covered_by": "reference_A | reference_B | reference_n[0] | INHERENT_FROM_COMBINATION", "passage": "<passage in that reference>", "evidence_id": "<required>" },
+        "L2": { "covered_by": "...", "passage": "...", "evidence_id": "..." },
+        "L3": { "covered_by": "...", "passage": "...", "evidence_id": "..." },
+        "L4": { "covered_by": "...", "passage": "...", "evidence_id": "..." },
+        "L5": { "covered_by": "...", "passage": "...", "evidence_id": "..." },
+        "L6": { "covered_by": "...", "passage": "...", "evidence_id": "..." }
+      },
+
+      "motivation": {
+        "explicit_motivation": "<the documented reason a person of ordinary skill in the art would combine these references>",
+        "motivation_source": "PRIMARY_REFERENCE_TEACHING | PROBLEM_SOLUTION_ANALYSIS | MARKET_DEMAND | INDUSTRY_TREND",
+        "motivation_passage": "<passage from one of the references (or problem statement) that supports the motivation>",
+        "motivation_passage_location": "<where the passage appears>",
+        "evidence_id": "<required>",
+        "anti_hindsight_check": {
+          "motivation_exists_in_prior_art": "<true|false — motivation must be derivable from prior art, not from applicant's own disclosure>",
+          "hindsight_warning": "<if motivation_exists_in_prior_art=false, this combination is hindsight-driven and should be rejected>"
+        }
+      },
+
+      "reasonable_expectation_of_success": {
+        "expectation": "<explicit statement of why a person of ordinary skill would have reasonable expectation that the combination would work>",
+        "expectation_basis": "<what in the prior art supports this expectation>",
+        "evidence_id": "<required>"
+      },
+
+      "obvious": "<true|false>",
+      "obviousness_rationale": "<if obvious: cite the motivation and expectation. If not obvious: list what is missing>"
+    }
+  ],
+
+  "summary": {
+    "total_combinations_analyzed": "<count>",
+    "total_103_kills": "<count where obvious=true>",
+    "conclusion": "<e.g., '103 SURVIVES — no combination has documented motivation + reasonable expectation of success'>"
+  },
+
+  "_103_rules": [
+    "103 requires (a) all limitations covered across the combination AND (b) explicit motivation AND (c) reasonable expectation of success.",
+    "'Both known in the art' is NOT motivation. A documented reason is required.",
+    "Motivation must come from the prior art or problem statement, NOT from the applicant's own disclosure (anti-hindsight).",
+    "If motivation_passage is empty OR evidence_id is missing OR motivation_source is null → CI failure (Section 9.5).",
+    "If reasonable_expectation_of_success.expectation is empty OR evidence_id is missing → CI failure (Section 9.5)."
+  ],
+
+  "_ci_failure_conditions": [
+    "Section 9.5: motivation field is empty or only contains 'both known' / 'well-known' without a documented reason → CI failure.",
+    "Section 9.5: reasonable_expectation_of_success field is missing → CI failure.",
+    "Section 9.3: motivation or expectation assertion lacks evidence_id → CI failure.",
+    "Section 9.11: 103 references a different freeze version than 08_LIMITATION_FREEZE.json content_hash_self → CI failure."
+  ]
+}

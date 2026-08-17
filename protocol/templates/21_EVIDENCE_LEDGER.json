@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_template": "21_EVIDENCE_LEDGER.json — provenance for every conclusion in the invention package",
+  "_purpose": "Every conclusion in 22_FINAL_ADJUDICATION must reference one or more evidence_ids in this ledger. Each evidence_id traces to a primary source (with passage) or is explicitly labeled model-derived.",
+  "_required_by": "INVENTION_PROTOCOL_V1 Section 10",
+
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "<COMPANY>_INVENTION_<NNN>_V<M>",
+  "ledger_version": "v<M>",
+
+  "evidence": [
+    {
+      "evidence_id": "E001",
+      "task_id": "<TASK1..TASK8 or PIPELINE_STAGE_N>",
+      "claim": "<one-sentence claim this evidence supports>",
+      "evidence_source": "<where the evidence comes from: patent number, FDA database, ISO standard, benchmark source, physics model, etc.>",
+      "source_type": "patent_primary_text | fda_database | iso_standards | industry_benchmarks | physics_simulation | patent_law_framework | model_derived",
+      "passage_present": true,
+      "passage": "<direct quote from primary source, with location (claim number, column, line, etc.)>",
+      "passage_location": "claim 1, col 3, lines 5-15",
+      "passage_hash": "<sha256 of the passage string, for tamper-detection>",
+      "model_derived": false,
+      "model_derived_note": "<required if model_derived=true; what was derived and from what inputs>",
+      "artifact_pointer": "<file this evidence is recorded in, e.g., TASK1_RETENTION_PASSAGE_AUDIT.json>",
+      "content_hash": "<sha256 of the artifact_pointer file>"
+    },
+    {
+      "evidence_id": "E002",
+      "task_id": "TASK2",
+      "claim": "...",
+      "evidence_source": "...",
+      "source_type": "...",
+      "passage_present": true,
+      "passage": "...",
+      "passage_location": "...",
+      "passage_hash": "...",
+      "model_derived": false,
+      "artifact_pointer": "...",
+      "content_hash": "..."
+    }
+  ],
+
+  "model_derived_count": "<count of evidence entries where model_derived=true>",
+  "primary_source_count": "<count of evidence entries where source_type=patent_primary_text or fda_database or iso_standards>",
+  "total_evidence_count": "<total entries in evidence array>",
+  "provenance_chain_complete": true,
+
+  "bidirectional_trace": {
+    "_rule": "Every conclusion in 22_FINAL_ADJUDICATION must reference evidence_ids in this ledger. Every evidence_id must resolve to an artifact_pointer that exists in SHA256SUMS.",
+    "broken_chains": [],
+    "broken_chain_count": 0
+  },
+
+  "model_derived_labeling_check": {
+    "_rule": "Every evidence entry with source_type=model_derived must have model_derived=true AND non-empty model_derived_note.",
+    "violations": [],
+    "violation_count": 0
+  },
+
+  "notes": "<human-readable summary of evidence coverage; explicit acknowledgment of model-derived elements per CEO governance rule>"
+}

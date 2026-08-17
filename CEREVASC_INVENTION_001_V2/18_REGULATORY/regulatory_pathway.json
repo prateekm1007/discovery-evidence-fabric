@@ -1,0 +1,193 @@
+{
+  "task_id": "TASK6_REGULATORY_PATHWAY",
+  "ceo_directive": "Define regulatory pathway: device classification, combination product rules, CNS-contact material requirements",
+  "invention": "A1_MODIFIED: ePTFE size-selective membrane + pressure-relief bypass integrated into eShunt",
+  "limitation_freeze_reference": "v1 (L1..L6)",
+  "primary_mode": "DEVICE_LEAD_WITH_DRUG_CARRIER_DEPENDENCY",
+
+  "device_classification": {
+    "base_eshunt_classification": {
+      "fda_panel": "Neurological Devices (PNB)",
+      "product_code": "PMA, existing eShunt PMA assumed via STRIDE",
+      "class": "Class III",
+      "regulation_number": "21 CFR 882.5550 (CSF shunt system, ventricular)",
+      "rationale": "The base eShunt is a permanently implantable CSF diversion device. Permanent CNS implants are Class III by FDA panel precedent (shunts, ICP monitors, drug pumps)."
+    },
+    "a1_modified_classification": {
+      "remains_class_iii": true,
+      "rationale": "Adding an intraluminal membrane does not downgrade the device; it adds a device-side feature that contacts CSF and may retain a therapeutic. Class III still required.",
+      "combination_product_designation": {
+        "is_combination_product": true,
+        "type": "Device/Biologic (if used with gene therapy vector such as scAAV9) or Device/Drug (if used with small molecule or biologic therapeutic)",
+        "lead_center_assumption": "CDRH-led (because primary mode of action is mechanical CSF drainage, not drug delivery)",
+        "consult_center": "CDER (small molecule) or CBER (biologic/gene therapy vector)",
+        "legal_basis": "21 CFR 3.4 — primary mode of action determines lead center; device is the primary mode here because drainage must occur for any therapeutic effect.",
+        "opa_number_required": true,
+        "opa_application_step": "Submit Request for Designation (RFD) to FDA OOPD early, before pre-submission"
+      }
+    },
+    "predicate_analysis": {
+      "k_number_attempt": "510(k) NOT viable",
+      "rationale": "Existing predicates (Codman Certas, Medtronic Programmable, Sophysa Polaris) are CSF shunts WITHOUT intraluminal drug-retention membranes. No valid predicate for the new membrane-retention feature. 510(k) path foreclosed; PMA supplement or new PMA required.",
+      "pma_supplement_viability": {
+        "applicable_if": "CereVasc already holds PMA for base eShunt at time of A1 modification",
+        "supplement_type": "Panel-track or 180-day supplement depending on contact-time and material change",
+        "rationale": "Adding a permanent intraluminal membrane in contact with CSF is a significant modification (new material contacting CNS, new mechanism of action). 180-day supplement most likely required.",
+        "if_no_pma_held": "New PMA required"
+      }
+    }
+  },
+
+  "cns_contact_material_requirements": {
+    "iso_10993_subset_applicable": [
+      {
+        "clause": "ISO 10993-1:2018",
+        "scope": "Evaluation and testing framework",
+        "contact_site": "CSF-contacting, indirectly blood-contacting (venous end)",
+        "contact_duration": "permanent (>30 days)",
+        "required_tests": "Categorization 5 (implant devices, tissue/bone/dentin) AND Categorization 11 (circulating blood)"
+      },
+      {
+        "clause": "ISO 10993-5",
+        "scope": "In vitro cytotoxicity",
+        "rationale": "Direct cytotoxicity of membrane material and any extractables on neural/glial cell lines."
+      },
+      {
+        "clause": "ISO 10993-6",
+        "scope": "Tests for local effects after implantation",
+        "rationale": "Implant membrane in subarachnoid space model; assess local neuroinflammatory response."
+      },
+      {
+        "clause": "ISO 10993-10",
+        "scope": "Tests for irritation and sensitization",
+        "rationale": "CSF irritation, dural sensitization."
+      },
+      {
+        "clause": "ISO 10993-11",
+        "scope": "Systemic toxicity",
+        "rationale": "Membrane extractables could enter CSF and bloodstream."
+      },
+      {
+        "clause": "ISO 10993-18",
+        "scope": "Chemical characterization of materials",
+        "rationale": "Full extractables/leachables profile for membrane + bypass sleeve."
+      },
+      {
+        "clause": "ISO 10993-23",
+        "scope": "Tests for irritation",
+        "rationale": "Supplementary to -10 for neural tissue response."
+      }
+    ],
+    "usp_class_vi": "Recommended for membrane substrate (ePTFE already meets this in vascular indications)",
+    "fda_specific_guidance_documents": [
+      "Guidance for Industry and FDA Staff: Class II Special Controls Guidance Document for CSF Shunts (where applicable to supplement)",
+      "Guidance for Industry: Preparation of IDEs and INDs for Combination Products",
+      "Use of International Standard ISO 10993-1 (FDA 2016 / 2020 update)",
+      "Guidance for Industry: Considerations for the Use of Carcinogenicity Studies — generally not required for shunt materials but considered for novel polymer membranes in permanent CNS contact"
+    ],
+    "neurotoxicity_testing": {
+      "required": true,
+      "rationale": "CNS-contacting materials require dedicated neurotoxicity panel beyond standard ISO 10993 series; FDA may require in vitro blood-brain-barrier model + glial activation assay + neuronal viability assay.",
+      "models_suggested": [
+        "In vitro BBB transwell model (hCMEC/D3 + hAstrocyte co-culture)",
+        "Organotypic hippocampal slice culture (ex vivo)",
+        "In vivo chronic subarachnoid implant in ovine or porcine model (6-month minimum)"
+      ]
+    }
+  },
+
+  "combination_product_pathway": {
+    "opa_rfd_required": true,
+    "opa_rfd_timing": "Pre-pre-submission (Q-Sub Type B meeting) — file at least 90 days before intended Q-Sub",
+    "opa_rfd_inputs": [
+      "Mode of action statement for both device and drug/biologic",
+      "Proposed lead center (CDRH if drainage primary)",
+      "Therapeutic agent class (small molecule vs biologic vs gene therapy vector)",
+      "Whether therapeutic is already FDA-approved (affects bridging requirements)"
+    ],
+    "expected_designation": "DEVICE-LED combination product, CDRH lead, CDER/CBER consult",
+    "implications": [
+      "Single PMA application is acceptable; CDRH is primary reviewer",
+      "CDER/CBER consult review of drug-retention claims",
+      "If therapeutic is gene therapy vector (e.g., scAAV9), CBER will be heavily involved and may require IND parallel to IDE",
+      "Clinical protocol must be designed to isolate device-drainage endpoint from drug-efficacy endpoint"
+    ]
+  },
+
+  "clinical_trial_pathway": {
+    "ide_required": true,
+    "ide_submission": "FDA Form 3674 + supplements; submit to CDRH PNB",
+    "ide_phase_1_fpkas": "First-in-human safety study in small cohort (n=5-10)",
+    "pivotal_trial_assumption": "Randomized controlled trial vs standard eShunt without A1 modification, n=100-200",
+    "endpoints": {
+      "primary_safety": "ICP events, membrane occlusion requiring revision, neurotoxicity",
+      "primary_performance": "Therapeutic agent residence time (CSF sampling) + CSF drainage (ICP control)",
+      "secondary_efficacy": "Depends on therapeutic paired (e.g., NPH symptom score if treating NPH)"
+    }
+    ,
+    "expected_duration_to_pma_decision": {
+      "preclinical_months": 18,
+      "phase1_months": 12,
+      "pivotal_months": 24,
+      "fda_review_months": 12,
+      "total_months_low": 60,
+      "total_months_high": 78,
+      "rationale": "Combination product review is slower than device-only PMA. STRIDE precedent (CereVasc base) took ~5 years; A1 modification adds drug/retention complexity."
+    }
+  },
+
+  "regulatory_risks": [
+    {
+      "risk": "FDA may re-classify as DRUG-LED if retention is deemed the primary mode of action",
+      "probability": "LOW",
+      "rationale": "Without drainage, the device provides no therapeutic benefit. Drainage is necessary and sufficient for CSF volume control; the membrane is a feature, not a separate product. Still, RFD output must be obtained in writing.",
+      "mitigation": "File RFD early; obtain written OOPD designation letter before Q-Sub."
+    },
+    {
+      "risk": "Therapeutic agent change forces new PMA supplement per drug class",
+      "probability": "MEDIUM",
+      "rationale": "Each new therapeutic (small molecule vs biologic vs vector) likely requires biocompatibility and efficacy re-testing. The membrane is generic but the retention claim is therapeutic-specific.",
+      "mitigation": "Draft master PMA framework with modular supplements per therapeutic; negotiate with CDRH whether a single PMA can hold multiple therapeutic-specific Indications for Use."
+    },
+    {
+      "risk": "ISO 10993-18 extractables exceed thresholds for chronic CNS contact",
+      "probability": "MEDIUM",
+      "rationale": "ePTFE is well-characterized for vascular but its CNS-contact extractables profile is less established. Track-etched polycarbonate is even less characterized for CNS.",
+      "mitigation": "Switch candidate selection (ePTFE > track-etched polycarbonate) for biocompatibility data depth; perform early extractables screen."
+    },
+    {
+      "risk": "Membrane occlusion requires revision surgery (Class III recall exposure)",
+      "probability": "MEDIUM-HIGH (depends on fouling rate)",
+      "rationale": "If chronic CSF fouling causes occlusion, the A1 device requires explantation. This is a long-term device reliability risk.",
+      "mitigation": "Pressure-relief bypass valve (already in A1_MODIFIED) reduces ICP emergency but does not eliminate need for revision; engineering test must demonstrate 12-month patency minimum."
+    }
+  ],
+
+  "regulatory_gate_score": {
+    "subscore_pathway_clarity": 75,
+    "subscore_predicate_availability": 30,
+    "subscore_combination_complexity": 55,
+    "subscore_material_biocompatibility_data": 80,
+    "composite_regulatory_score": 60,
+    "rationale": "Pathway is clear (PMA supplement + combination product RFD), but no predicate exists for the retention feature and combination product review adds 12-24 months to a base PMA timeline. Material biocompatibility for ePTFE in vascular is well-established; for CNS contact, additional ISO 10993-6/-11/-18 testing required."
+  },
+
+  "regulatory_status_label": "MODEL_DERIVED_PATHWAY_PREDICTION",
+  "primary_source_provenance": {
+    "fda_guidance_citations": [
+      "21 CFR 3.4 (combination product designation)",
+      "21 CFR 882.5550 (CSF shunt classification)",
+      "ISO 10993-1:2018",
+      "ISO 10993-5/-6/-10/-11/-18/-23",
+      "FDA Combination Product Guidance (current)"
+    ],
+    "prior_pma_precedent": "STRIDE trial (CereVasc eShunt base) — assumed approved; if not yet approved, base PMA must precede A1 supplement.",
+    "model_derived_elements": [
+      "PMA-supplement-vs-new-PMA decision (depends on CereVasc PMA status at time of A1 filing)",
+      "OOPD designation outcome (likely CDRH-led but not guaranteed)",
+      "Clinical trial size estimate"
+    ]
+  },
+
+  "timestamp": "2026-08-17T03:30:00.000000+00:00"
+}
