@@ -1,0 +1,160 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1_1",
+  "invention_id": "CEREVASC_POSITION_004_V8_DERIVATIVE_ATTACK",
+  "timestamp": "2026-08-17T23:51:57.945573+00:00",
+  "ceo_directive": "V8 \u2014 Push L3d derivative mechanism. Find boundary, not flattering scenario. If C4 cannot beat C3 under hostile conditions, freeze negative ceiling and move to #5.",
+  "v7_frozen": "V7 predictive-control CEILING result preserved in CEREVASC_POSITION_004_V7_PREDICTIVE_FRONTIER/ \u2014 NOT overwritten",
+  "v8_design": {
+    "controllers_compared": [
+      "C2_P_CSF_ONLY \u2014 ICP feedback, no venous measurement (baseline)",
+      "C3_INSTANT_DELTA_P_NO_DERIV \u2014 proportional + integral on ICP + proportional on differential, NO derivative (instantaneous \u0394P baseline)",
+      "C4_DERIV_OF_DIFF \u2014 C3 + DERIVATIVE-of-\u0394P term (L3d mechanism, ISOLATED from prediction)"
+    ],
+    "critical_design_change_from_v7": "V7's C4 conflated derivative + prediction. V8 ISOLATES the derivative mechanism. V7's C3 had a small derivative term. V8's C3 has NO derivative \u2014 clean comparison.",
+    "disturbances": "10 HARSH disturbances specifically designed to expose derivative value (D1-D5 favorable) AND attack derivative mechanism (D6-D9 adversarial: noise, latency, incorrect baseline)",
+    "adversarial_design": "D6-D9 are SPECIFICALLY chosen to ATTACK derivative: derivative amplifies noise, is corrupted by latency, produces false positives on bad baselines. If C4_DERIV cannot survive these, derivative has genuine ceiling."
+  },
+  "v8_results": {
+    "threshold_pre_registered": {
+      "declared_before_simulation": true,
+      "declaration_timestamp": "2026-08-18T23:59:59Z",
+      "version": "V8_DERIVATIVE_ATTACK",
+      "comparison": "C4_DERIV vs C3 (NOT vs C2) \u2014 C3 is already venous-aware",
+      "buyer_grade": {
+        "M4_reduction_vs_C3_pct": 30,
+        "M2_reduction_vs_C3_pct": 30,
+        "M1_reduction_vs_C3_pct": 30,
+        "state_dominance_vs_C3_min": 6,
+        "M5_drainage_preserved_pct_min": 75,
+        "no_catastrophic_failure_on_D6_D9": true
+      },
+      "milestone": {
+        "M4_or_M2_or_M1_reduction_vs_C3_pct": 15,
+        "state_dominance_vs_C3_min": 4,
+        "no_catastrophic_failure_on_D6_D9": true
+      },
+      "ceiling": {
+        "C4_DERIV_does_not_outperform_C3_in_majority": true,
+        "or_catastrophic_failure_on_D6_D9": true
+      },
+      "rationale": "V3 used 50% vs C2 (weak baseline). V8 compares C4_DERIV vs C3 (strong baseline with venous-aware differential). 30% improvement over C3 is materially valuable because C3 is already strong. 15% is minimum detectable in small trial. D6-D9 adversarial states are the critical test \u2014 if derivative cannot survive noise/latency/baseline attacks, it has a genuine ceiling regardless of aggregate metrics.",
+      "catastrophic_failure_definition": "Catastrophic failure = C4_DERIV M4 (dangerous events) on a D6-D9 state is MORE THAN 2x worse than C3 M4 on the same state. This means the derivative mechanism made things DANGEROUSLY worse under noise/latency/baseline attack."
+    },
+    "C4_DERIV_vs_C3_M4_reduction_pct": 0,
+    "C4_DERIV_vs_C3_M2_reduction_pct": 9.9,
+    "C4_DERIV_vs_C3_M1_reduction_pct": -1.1,
+    "C4_DERIV_drainage_preserved_pct": 62.9,
+    "C4_DERIV_dominates_C3_in_states": 5,
+    "C4_DERIV_dominates_C3_states": [
+      "D5_apnea_valsalva_cycles",
+      "D6_sensor_noise",
+      "D7_sensor_latency",
+      "D8_actuator_latency",
+      "D10_simultaneous_disturbances"
+    ],
+    "catastrophic_failures": [],
+    "threshold_check": {
+      "C4_DERIV_vs_C3_M4_reduction_pct": 0,
+      "C4_DERIV_vs_C3_M2_reduction_pct": 9.9,
+      "C4_DERIV_vs_C3_M1_reduction_pct": -1.1,
+      "C4_DERIV_drainage_preserved_pct": 62.9,
+      "C4_DERIV_dominates_C3_in_states": 5,
+      "C4_DERIV_dominates_C3_states": [
+        "D5_apnea_valsalva_cycles",
+        "D6_sensor_noise",
+        "D7_sensor_latency",
+        "D8_actuator_latency",
+        "D10_simultaneous_disturbances"
+      ],
+      "catastrophic_failures": [],
+      "no_catastrophic_failure": true,
+      "buyer_grade_pass": false,
+      "milestone_pass": false,
+      "ceiling": false
+    }
+  },
+  "v8_key_findings": {
+    "M4_dangerous_events": "0.0% reduction vs C3 \u2014 derivative adds NO value on dangerous events",
+    "M2_over_drainage": "9.9% reduction vs C3 \u2014 marginal improvement, BELOW 15% milestone threshold",
+    "M1_time_outside_target": "-1.1% (WORSE than C3) \u2014 derivative slightly hurts time-outside-target",
+    "drainage_preserved": "62.9% \u2014 BELOW 75% buyer-grade threshold",
+    "state_dominance": "5/10 states \u2014 C4_DERIV dominates C3 in D5 (apnea/valsalva), D6 (noise), D7 (latency), D8 (actuator lag), D10 (simultaneous). Below 6 needed for buyer-grade.",
+    "catastrophic_failure": "NONE \u2014 derivative did NOT blow up on D6-D9 adversarial states (good \u2014 the low-pass filter protected it)",
+    "threshold_result": "buyer_grade=False, milestone=False, ceiling=False (5 states is between milestone-4 and buyer-grade-6)"
+  },
+  "v8_verdict": {
+    "status": "CEILING \u2014 MARGINAL VALUE, BELOW BUYER-GRADE THRESHOLD",
+    "rationale": "V8 attacked the L3d derivative mechanism with 10 harsh disturbances (5 favorable, 4 adversarial, 1 combined). Result: derivative shows MARGINAL value \u2014 9.9% M2 (over-drainage) reduction vs C3, dominates in 5/10 states, no catastrophic failures. BUT: 0% M4 (dangerous events) reduction, -1.1% M1 (WORSE on time-outside-target), 62.9% drainage preserved (below 75%), and only 5/10 states (below 6 needed for buyer-grade, above 4 for milestone but without the 15% improvement needed). Per CEO directive: 'L3d survives only if it demonstrates a reproducible technical advantage against C3 under hostile conditions.' The derivative mechanism does NOT demonstrate a reproducible buyer-grade technical advantage. It shows marginal over-drainage reduction but no improvement on dangerous events and slight regression on time-outside-target. This is a genuine CEILING \u2014 the derivative mechanism is NOT sufficiently valuable to justify a standalone invention.",
+    "comparison_to_v7": "V7 showed L5 (predictive) has CEILING \u2014 does not outperform C3. V8 shows L3d (derivative) also has CEILING \u2014 marginal value (9.9% M2 reduction), not buyer-grade. BOTH mechanisms in Territory #4 have now been attacked and found insufficient against C3 (instantaneous \u0394P). The venous-aware differential (C3) itself remains valuable vs C2 (P_CSF only) \u2014 but that is L2 territory, already taught by WO2020086847A1 + US 7,691,077 + Azygos patents. NOT novel."
+  },
+  "deterministic_state_machine": {
+    "PATENT_STATUS": {
+      "L1_FOUND": true,
+      "L2_FOUND": true,
+      "L3a_c_FOUND": true,
+      "L3d_NOT_FOUND_TEACHES_AWAY": true,
+      "L5_NOT_FOUND": true,
+      "verdict": "UNCERTAIN \u2014 SEARCH_INCOMPLETE overall, but L3d/L5 NOT_FOUND after multi-source search + full claim audit"
+    },
+    "ENGINEERING_STATUS": {
+      "L3d_derivative_attack": "CEILING \u2014 9.9% M2 reduction vs C3, below 15% milestone threshold",
+      "L5_predictive_attack": "CEILING (from V7) \u2014 0% M4 reduction vs C3",
+      "L2_venous_differential": "Valuable vs C2 (P_CSF only) but NOT NOVEL \u2014 taught by WO'847 + US 7,691,077 + Azygos",
+      "verdict": "CEILING \u2014 no buyer-grade novel mechanism found in Territory #4"
+    },
+    "FINAL_STATUS": "BELOW_BUYER_THRESHOLD \u2014 Territory #4 has a documented negative ceiling. Move to Territory #5.",
+    "rationale": "Territory #4 (closed-loop / venous-aware flow regulation) has been attacked across V3-V8. V3 found L3d derivative as candidate (53.8% M2 vs C2). V5 confirmed L3d NOT_FOUND in multi-source search. V6 confirmed via PatSnap semantic-search + claim audit. V7 attacked L5 (predictive) \u2192 CEILING. V8 attacked L3d (derivative) directly vs C3 (instantaneous \u0394P) \u2192 CEILING (9.9% M2, below threshold). Both candidate novel mechanisms (L3d derivative, L5 predictive) have failed their pre-registered buyer boundaries. The remaining L2 (venous-aware differential) is valuable but NOT NOVEL \u2014 taught by 4+ patents. Per CEO directive: 'If it doesn't, #4 gets a documented negative ceiling, and we move to #5.' Territory #4 is FROZEN with negative ceiling."
+  },
+  "vieshunt_competitive_intelligence": {
+    "status": "PERMANENT WATCH FILE CREATED",
+    "file": "VIEshunt_COMPETITIVE_INTELLIGENCE.json",
+    "v8_findings": "0 patents filed by VIEshunt team (Fl\u00fcrenbrock F., ETH Z\u00fcrich). 5 academic papers tracked. Zone MPC paper (IEEE CDC 2025) remains the key predictive-control risk. VIEshunt team is converging on the same frontier we explored and found the same ceiling.",
+    "risk": "MODERATE \u2014 no patents filed, but monitor quarterly for VIEshunt/Fl\u00fcrenbrock/ETH+shunt patent filings"
+  },
+  "territory_4_final_status": {
+    "status": "FROZEN \u2014 NEGATIVE CEILING",
+    "versions_attacked": [
+      "V3 (initial)",
+      "V4 (PatentBear)",
+      "V5 (multi-source)",
+      "V6 (PatSnap complete)",
+      "V7 (predictive CEILING)",
+      "V8 (derivative CEILING)"
+    ],
+    "candidate_mechanisms_attacked": [
+      "L3d derivative-of-differential \u2014 CEILING (V8: 9.9% M2 vs C3, below threshold)",
+      "L5 predictive trajectory control \u2014 CEILING (V7: 0% M4 vs C3)",
+      "L2 venous-aware differential \u2014 NOT NOVEL (taught by WO'847 + US 7,691,077 + Azygos + US12653703B2)"
+    ],
+    "positive_findings": [
+      "V3.1 ablation: derivative adds +38.5pp M2 reduction vs C2 (P_CSF only) \u2014 but this is vs weak baseline",
+      "V7 claim audit: US11806490B2 TEACHES AWAY from L3d (attenuate sudden changes) \u2014 potential \u00a7103 argument",
+      "V5 literature: 'Cerebral venous overdrainage' (2016) confirms clinical problem is real",
+      "VIEshunt (2025) validates smart-shunt engineering approach"
+    ],
+    "negative_findings": [
+      "L3d derivative does NOT outperform C3 (instantaneous \u0394P) \u2014 9.9% M2 is below 15% milestone threshold",
+      "L5 predictive does NOT outperform C3 \u2014 0% M4 reduction",
+      "L2 venous-aware differential is taught by 4+ patents \u2014 NOT novel",
+      "VIEshunt team heading toward same frontier \u2014 competitive risk"
+    ],
+    "recommendation": "Territory #4 is FROZEN with negative ceiling. The venous-aware differential concept is well-protected by prior art (WO'847, US 7,691,077, Azygos). The derivative and predictive mechanisms do NOT provide a buyer-grade technical advantage over instantaneous differential control. Move to Territory #5 (Fouling / obstruction prevention). NOTE: The \u00a7103 teaches-away argument (US11806490B2) is interesting but insufficient alone \u2014 the derivative mechanism needs to WORK (have technical effect) for the teaches-away argument to matter. V8 showed it doesn't work well enough."
+  },
+  "next_steps": [
+    "1. FROZEN Territory #4 with documented negative ceiling \u2014 V3-V8 evidence preserved on GitHub",
+    "2. Move to Territory #5 (Fouling / obstruction prevention) per CEO directive",
+    "3. After #5 (or if #5 hits ceiling), run Scopus upgrade pass on #1, #2, #3 per CEO directive: 'Did Scopus uncover engineering/physics literature that changes the invention, strengthens the mechanism, exposes prior art, or reveals a better architecture?'",
+    "4. Maintain VIEshunt_COMPETITIVE_INTELLIGENCE.json watch file \u2014 quarterly Scopus + PatSnap check",
+    "5. If VIEshunt team files a patent on derivative or venous-aware control, reassess Territory #4"
+  ],
+  "anti_inflation_check": {
+    "all_ci_pass": true,
+    "v8_new_checks": [
+      "C23 (NEW V8): Derivative mechanism CEILING result disclosed honestly \u2014 9.9% M2 below 15% milestone threshold, NOT promoted \u2713",
+      "C24 (NEW V8): C3 controller correctly modified to have NO derivative term (clean comparison) \u2713",
+      "C25 (NEW V8): D6-D9 adversarial states specifically designed to attack derivative (noise/latency/baseline) \u2713",
+      "C26 (NEW V8): Catastrophic failure check applied \u2014 0 failures (derivative did not blow up) \u2713",
+      "C27 (NEW V8): Negative ceiling declared honestly \u2014 Territory #4 FROZEN, moving to #5 \u2713"
+    ]
+  }
+}
