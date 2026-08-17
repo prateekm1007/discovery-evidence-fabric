@@ -1,0 +1,31 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1_1",
+  "timestamp": "2026-08-17T17:41:03.755017+00:00",
+  "ceo_directive": "Build evidence budget before execution. Never spend final hostile-attack reserve during exploration.",
+  "budget_template": {
+    "discovery_budget": "1 P005 call (up to 1000 results) + 2-3 P075 calls (ranked queries)",
+    "claim_budget": "1 batched P018 call (10-20 patents, comma-separated)",
+    "family_budget": "P015 for top 5 candidates only",
+    "semantic_budget": "P007 for top 3 threats only",
+    "reserved_for_final_hostile_attack": "2-3 P018 calls + 1 P007 call (DO NOT SPEND during exploration)"
+  },
+  "checkpoint_protocol": {
+    "before_discovery": "Check if P005 returns error_code=0 (balance available)",
+    "before_claims": "Check if P018 returns error_code=0 for test patent",
+    "before_batch": "Confirm at least reserve+batch credits remain",
+    "if_exhausted": "STOP → CACHE → WRITE_LEDGER → SEARCH_COMPLETENESS=BLOCKED"
+  },
+  "efficiency_metrics": {
+    "patents_discovered": "count",
+    "families_identified": "count",
+    "claims_retrieved": "count",
+    "unique_claims_retrieved": "count (deduplicated by claim_hash)",
+    "passages_charted": "count",
+    "api_calls": "count",
+    "successful_calls": "count",
+    "failed_calls": "count",
+    "credits_wasted": "failed_calls + duplicate_calls",
+    "duplicate_calls": "count (should be 0 with cache)",
+    "evidence_yield": "useful_claim_level_evidence / total_api_calls"
+  }
+}
