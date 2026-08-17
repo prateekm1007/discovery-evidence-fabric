@@ -1,0 +1,53 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1_1",
+  "phase": "PATSNAP_FAMILY_EXPANSION",
+  "ceo_directive": "Family expansion is mandatory for every serious candidate.",
+  "expansion_chain": [
+    {
+      "stage": "PUBLICATION",
+      "input": "Patent number",
+      "output": "Publication record"
+    },
+    {
+      "stage": "SIMPLE_FAMILY",
+      "input": "Publication",
+      "output": "DOCDB simple family members"
+    },
+    {
+      "stage": "INPADOC_FAMILY",
+      "input": "Publication",
+      "output": "INPADOC extended family members"
+    },
+    {
+      "stage": "CONTINUATIONS",
+      "input": "Family",
+      "output": "Continuation applications"
+    },
+    {
+      "stage": "DIVISIONALS",
+      "input": "Family",
+      "output": "Divisional applications"
+    },
+    {
+      "stage": "CIPS",
+      "input": "Family",
+      "output": "Continuation-in-part applications"
+    },
+    {
+      "stage": "GRANTED_COUNTERPARTS",
+      "input": "Family",
+      "output": "Granted patents in other jurisdictions"
+    },
+    {
+      "stage": "RELEVANT_FOREIGN",
+      "input": "Family",
+      "output": "Foreign family members with claims in English"
+    }
+  ],
+  "claim_substitution_rule": {
+    "ceo_directive": "If current claims are unavailable, P018 has replace_by_related option. Do NOT silently use the family substitute. Record that substitution explicitly in provenance.",
+    "implementation": "If replace_by_related=True is used, the evidence ledger MUST record: original_patent_number, substitute_patent_number, substitution_reason='claims_unavailable', substitution_timestamp",
+    "ci_rule": "If an evidence entry uses a family substitute without recording the substitution, CI fails."
+  },
+  "current_state": "Family expansion blocked — PatSnap BALANCE_EXHAUSTED. The 18-ref corpus has model-derived family data only (V72 moat map)."
+}
