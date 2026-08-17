@@ -3,6 +3,8 @@
 > **Read this file in full before writing any code or running any command.**
 > This handoff supersedes any prior conversational context. It is the single source of truth for the next chat session.
 >
+> **Companion file:** `CREDENTIALS_AND_MODELS.md` — read this AFTER the handoff. Contains all API keys (PatSnap, NVIDIA, GitHub, Lens.org, PatentBear, Ollama), the 3-tier LLM routing policy (GLM-4-plus primary → Mistral → NVIDIA NIM), the 5-role multi-agent prompt-hash registry, full PatSnap endpoint documentation (P005/P007/P013/P015/P018/P073/AI30), GitHub REST API patterns, and the federated patent evidence layer.
+>
 > **Generated:** 2026-08-17 UTC
 > **Last commit on `main`:** `8b41ebe` (CereVasc dossier PDF pushed)
 > **Repo:** https://github.com/prateekm1007/discovery-evidence-fabric
@@ -380,7 +382,19 @@ In this exact order. Skipping any of these will cause the new chat to break the 
 10. **`/home/z/my-project/scripts/migrate_v2_to_canonical.py`** — how to migrate a flat-layout folder to canonical
 11. **`/home/z/my-project/scripts/generate_cerevasc_dossier_pdf.py`** — how to compile a dossier PDF
 
-### 6.6 DO NOT READ (legacy noise, preserved per §9.11)
+### 6.6 Credentials & Models (read BEFORE any API call)
+
+12. **`/home/z/my-project/discovery-evidence-fabric/CREDENTIALS_AND_MODELS.md`** — comprehensive reference for:
+    - All API keys (PatSnap, NVIDIA, GitHub, Lens.org, PatentBear, Ollama) — verbatim
+    - The 3-tier LLM routing policy: Z.AI GLM-4-plus (primary) → Mistral Medium (fallback 1) → NVIDIA NIM deepseek-v4-flash (fallback 2)
+    - The NVIDIA NIM model priority list: `meta/llama-3.1-8b-instruct` (fast primary) → `google/gemma-4-31b-it` (deep reasoning) → `deepseek-ai/deepseek-v4-flash-0731` (final fallback)
+    - The 5-role multi-agent prompt-hash registry (GENERATOR, SEARCHER, NOVELTY_ADVERSARY, OBVIOUSNESS_ADVERSARY, FINAL_ADJUDICATOR)
+    - Full PatSnap endpoint documentation (P005/P007/P013/P015/P018/P073/AI30) with example payloads
+    - GitHub REST API patterns (issues, comments, commits, file contents)
+    - Federated patent evidence layer (EPO OPS, Google BigQuery, USPTO ODP) — adapters already written, need credentials
+    - Operational rules (never commit credentials, never print credentials, never put credentials in provenance artifacts)
+
+### 6.7 DO NOT READ (legacy noise, preserved per §9.11)
 
 Do NOT spend time reading these unless explicitly needed:
 - `CEREVASC_INVENTION_001/` (legacy pre-V1)
