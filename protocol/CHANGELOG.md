@@ -23,3 +23,12 @@ CereVasc Invention #1 (V2) is the first invention adjudicated under V1. It passe
 - A hash mismatch is a hard CI failure — the constitution was modified outside the Protocol Evolution Workflow (§14).
 - CereVasc Invention #1 (V2) now passes 17 checks (16 invention-level + 1 constitution hash-pin).
 - No change to V1 constitution content (hash unchanged: `8d75ca8fc17f031ffa3b8d7ea4a272b5114592bdd0476c3d95d8220171a389f8`). This is an enforcement update, not a protocol amendment.
+
+
+## V1.1 — 2026-08-17T16:24:11.272507+00:00 (PCP-001 APPROVED)
+- BELOW_BUYER_THRESHOLD added as 4th terminal status
+- 4-concept separation formalized (PATENT_STATUS, ENGINEERING_STATUS, BUYER_SENTIMENT, BUYER_READINESS)
+- Deterministic state machine enforced
+- 103 three-state evidence enforced
+- Retroactive inflation scanner is permanent CI gate
+- Approved by: CEO
