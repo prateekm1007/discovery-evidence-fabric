@@ -1,0 +1,97 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "CEREVASC_INVENTION_001_V3_FORENSIC_REMEDIATION",
+  "task": "15_NEW_ADJUDICATION",
+  "timestamp": "2026-08-17T06:08:23.937565+00:00",
+  "v2_conclusion_preserved": {
+    "v2_score": 73,
+    "v2_status": "WOULD_CONSIDER_WITH_MILESTONES",
+    "v2_not_inherited": true,
+    "rationale": "V2 was based on model-derived evidence; V3 requires primary evidence for patent gates"
+  },
+  "gates": {
+    "PATENT_GATE": {
+      "score": null,
+      "threshold": 70,
+      "status": "UNRESOLVED",
+      "evidence_classification": {
+        "102_status": "UNRESOLVED — no primary claim text retrieved",
+        "103_status": "UNRESOLVED — no primary motivation evidence",
+        "self_ip": "UNRESOLVED — no primary passage audit"
+      },
+      "rationale": "Cannot score the patent gate without primary claim analysis. All three patent sub-gates are UNRESOLVED. The V2 score of 75 was based on model-derived conclusions that do not survive the V3 standard."
+    },
+    "EVIDENCE_GATE": {
+      "score": 35,
+      "threshold": 70,
+      "status": "FAIL",
+      "evidence_classification": {
+        "primary_source_count": 2,
+        "model_derived_count": 3,
+        "assumed_count": 1,
+        "unresolved_count": 2,
+        "unverified_count": 3
+      },
+      "rationale": "Only 2 of 8 evidence entries are primary-source; 5 are model-derived or assumed; 3 are unverified. Evidence coverage is 25% primary — well below the 70% threshold implied by the gate. The V2 score of 72 was inflated by counting model-derived evidence as if it were primary."
+    },
+    "TECHNICAL_GATE": {
+      "score": 55,
+      "threshold": 65,
+      "status": "FAIL",
+      "evidence_classification": {
+        "engineering_blueprint": "MODEL_SUPPORTED — real calculations with stated assumptions",
+        "simulation": "MODEL_SUPPORTED — equations + inputs stored, not validated",
+        "manufacturing": "MODEL_SUPPORTED — feasible with standard materials, not prototyped"
+      },
+      "rationale": "The technical work is real and reproducible (equations stored, inputs documented), but it is entirely model-derived. No in vitro or in vivo validation exists. The V2 score of 75 was based on model outputs; V3 requires physical validation for a PASS."
+    },
+    "SAFETY_GATE": {
+      "score": 50,
+      "threshold": 60,
+      "status": "FAIL",
+      "evidence_classification": {
+        "fail_safe_architecture": "MODEL_SUPPORTED — 3 architectures modeled, FS1 selected",
+        "failure_modes": "MODEL_SUPPORTED — identified but not tested",
+        "worst_case": "MODEL_SUPPORTED — simulated, not validated"
+      },
+      "rationale": "The fail-safe analysis is credible engineering work, but the safety case requires physical validation (spring fatigue, chronic biofouling, in vivo ICP response). The V2 did not have a separate safety gate; V3 adds it and it FAILS without physical data."
+    },
+    "COMMERCIAL_GATE": {
+      "score": 45,
+      "threshold": 65,
+      "status": "FAIL",
+      "evidence_classification": {
+        "build_cost": "MODEL_SUPPORTED — sourced from industry benchmarks",
+        "buyer_demand": "MODEL_SUPPORTED — based on published shunt failure rates",
+        "moat_strength": "UNRESOLVED — depends on 103 status which is UNRESOLVED"
+      },
+      "rationale": "Commercial case depends on IP moat strength, which is UNRESOLVED. Without primary claim analysis, the moat cannot be quantified. The V2 score of 75 assumed the moat was defensible; V3 cannot confirm that."
+    }
+  },
+  "evidence_classification_summary": {
+    "PROVEN": 0,
+    "MODEL_SUPPORTED": 4,
+    "UNRESOLVED": 3,
+    "REQUIRES_PHYSICAL_VALIDATION": 3
+  },
+  "composite_score": null,
+  "composite_threshold": 70,
+  "all_gates_pass": false,
+  "non_compensable_gates_status": {
+    "patent_gate_passed": false,
+    "evidence_gate_passed": false,
+    "both_non_compensable_satisfied": false
+  },
+  "final_status": "EVIDENCE_INSUFFICIENT",
+  "final_status_rationale": "The system cannot honestly adjudicate this invention. Three hard gates are BLOCKED (self-IP UNRESOLVED, 102 lacks primary passages, 103 lacks motivation evidence). The root cause is the inability to retrieve primary patent claims — PatSnap is blocked, and no other patent search API is configured. Without primary IP analysis, the patent gate cannot be scored, the evidence gate is 25% primary (below threshold), and the commercial gate depends on an unresolvable moat question. The V2 conclusion (WOULD_CONSIDER_WITH_MILESTONES, 73/100) was based on model-derived evidence that does not survive hostile diligence. The true verdict is EVIDENCE_INSUFFICIENT.",
+  "what_would_resolve_this": [
+    "Configure EPO OPS credentials (free) — enables primary claim retrieval for 102/103",
+    "Configure USPTO ODP API (free) — enables US patent claim retrieval",
+    "Run in vitro flow loop with ePTFE membrane — validates simulation",
+    "Run chronic animal study (12-week) — validates biocompatibility + biofouling model",
+    "Obtain patent counsel opinion on 103 obviousness over EP3212275A1",
+    "Verify CereVasc eShunt PMA status with FDA database"
+  ],
+  "stop_condition_met": "EVIDENCE_INSUFFICIENT — the system cannot honestly adjudicate without primary evidence retrieval",
+  "honest_final_statement": "The directive said: 'Do not optimize the score. Make the underlying asset stronger, make the evidence stronger, make the safety case stronger, and make the buyer's ability to say yes rational.' The V3 remediation made the engineering stronger (real calculations, stored equations), made the safety case stronger (3 fail-safe architectures modeled), and made the evidence honesty stronger (primary vs model-derived explicitly separated). But the patent gate cannot be made stronger without primary claim retrieval, which is blocked. The buyer's ability to say 'yes' is not rational because the IP foundation is unverified. The true verdict is EVIDENCE_INSUFFICIENT."
+}

@@ -1,0 +1,294 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "invention_id": "CEREVASC_INVENTION_001_V3_FORENSIC_REMEDIATION",
+  "task": "5_FOULING_ICP_SIMULATION",
+  "status": "MODEL_SUPPORTED",
+  "label": "MODEL_DERIVED — Hagen-Poiseuille + Darcy model with engineering-estimated parameters; not validated against in vitro or in vivo data",
+  "model_equations": {
+    "shunt_resistance": "R_shunt = (8 * mu * L) / (pi * r^4)",
+    "membrane_resistance": "R_membrane = (t * mu) / (k * A)",
+    "fouling_model": "k_effective = k_0 * (1 - fouling_fraction)",
+    "flow_rate": "Q = dP / R_total",
+    "icp_steady_state": "ICP = ICP_baseline + (production - drainage) / compliance * scale_factor",
+    "bypass_trigger": "bypass_active if ICP > threshold OR fouling >= 99%"
+  },
+  "model_inputs": {
+    "shunt_inner_diameter_mm": 0.5,
+    "shunt_length_mm": 80,
+    "membrane_length_mm": 10,
+    "membrane_thickness_um": 50,
+    "membrane_permeability_m2": 1e-15,
+    "mu_csf_Pa_s": 0.001,
+    "dP_normal_mmHg": 7,
+    "csf_production_rate_mL_min": 0.35,
+    "icp_baseline_mmHg": 12,
+    "icp_max_safe_mmHg": 20,
+    "bypass_threshold_mmHg": 15,
+    "bypass_diameter_mm": 0.1
+  },
+  "fouling_sweep_results": [
+    {
+      "fouling_pct": 0,
+      "k_effective_m2": 1e-15,
+      "R_membrane_Pa_s_per_m3": 3183098861837.9067,
+      "R_total_Pa_s_per_m3": 3235250753590.259,
+      "Q_drainage_mL_min": 0.0173,
+      "net_accumulation_mL_min": 0.3327,
+      "icp_steady_state_mmHg": 23.09,
+      "bypass_active": true,
+      "safety_classification": "MARGINAL"
+    },
+    {
+      "fouling_pct": 10,
+      "k_effective_m2": 9e-16,
+      "R_membrane_Pa_s_per_m3": 3536776513153.23,
+      "R_total_Pa_s_per_m3": 3588928404905.582,
+      "Q_drainage_mL_min": 0.0156,
+      "net_accumulation_mL_min": 0.3344,
+      "icp_steady_state_mmHg": 23.15,
+      "bypass_active": true,
+      "safety_classification": "MARGINAL"
+    },
+    {
+      "fouling_pct": 25,
+      "k_effective_m2": 7.500000000000001e-16,
+      "R_membrane_Pa_s_per_m3": 4244131815783.876,
+      "R_total_Pa_s_per_m3": 4296283707536.228,
+      "Q_drainage_mL_min": 0.013,
+      "net_accumulation_mL_min": 0.337,
+      "icp_steady_state_mmHg": 23.23,
+      "bypass_active": true,
+      "safety_classification": "MARGINAL"
+    },
+    {
+      "fouling_pct": 50,
+      "k_effective_m2": 5e-16,
+      "R_membrane_Pa_s_per_m3": 6366197723675.813,
+      "R_total_Pa_s_per_m3": 6418349615428.166,
+      "Q_drainage_mL_min": 0.0087,
+      "net_accumulation_mL_min": 0.3413,
+      "icp_steady_state_mmHg": 23.38,
+      "bypass_active": true,
+      "safety_classification": "MARGINAL"
+    },
+    {
+      "fouling_pct": 75,
+      "k_effective_m2": 2.5e-16,
+      "R_membrane_Pa_s_per_m3": 12732395447351.627,
+      "R_total_Pa_s_per_m3": 12784547339103.979,
+      "Q_drainage_mL_min": 0.0044,
+      "net_accumulation_mL_min": 0.3456,
+      "icp_steady_state_mmHg": 23.52,
+      "bypass_active": true,
+      "safety_classification": "MARGINAL"
+    },
+    {
+      "fouling_pct": 90,
+      "k_effective_m2": 9.999999999999999e-17,
+      "R_membrane_Pa_s_per_m3": 31830988618379.074,
+      "R_total_Pa_s_per_m3": 31883140510131.426,
+      "Q_drainage_mL_min": 0.0018,
+      "net_accumulation_mL_min": 0.3482,
+      "icp_steady_state_mmHg": 23.61,
+      "bypass_active": true,
+      "safety_classification": "MARGINAL"
+    },
+    {
+      "fouling_pct": 95,
+      "k_effective_m2": 5.000000000000005e-17,
+      "R_membrane_Pa_s_per_m3": 63661977236758.08,
+      "R_total_Pa_s_per_m3": 63714129128510.43,
+      "Q_drainage_mL_min": 0.0009,
+      "net_accumulation_mL_min": 0.3491,
+      "icp_steady_state_mmHg": 23.64,
+      "bypass_active": true,
+      "safety_classification": "MARGINAL"
+    },
+    {
+      "fouling_pct": 99,
+      "k_effective_m2": 1.000000000000001e-17,
+      "R_membrane_Pa_s_per_m3": 318309886183790.4,
+      "R_total_Pa_s_per_m3": 318362038075542.75,
+      "Q_drainage_mL_min": 0.0002,
+      "net_accumulation_mL_min": 0.3498,
+      "icp_steady_state_mmHg": 23.66,
+      "bypass_active": true,
+      "safety_classification": "MARGINAL"
+    },
+    {
+      "fouling_pct": 100,
+      "k_effective_m2": 0,
+      "R_membrane_Pa_s_per_m3": null,
+      "R_total_Pa_s_per_m3": null,
+      "Q_drainage_mL_min": 0,
+      "net_accumulation_mL_min": 0.35,
+      "icp_steady_state_mmHg": 23.67,
+      "bypass_active": true,
+      "safety_classification": "MARGINAL"
+    }
+  ],
+  "sensitivity_sweeps": {
+    "membrane_area": [
+      {
+        "value": 0.5,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 1.0,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 2.0,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 5.0,
+        "Q_mL_min": 0.0087
+      }
+    ],
+    "membrane_thickness": [
+      {
+        "value": 25,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 50,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 100,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 200,
+        "Q_mL_min": 0.0087
+      }
+    ],
+    "lumen_diameter": [
+      {
+        "value": 0.3,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 0.5,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 0.8,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 1.0,
+        "Q_mL_min": 0.0087
+      }
+    ],
+    "pore_size": [
+      {
+        "value": 0.02,
+        "Q_mL_min": 0.0035
+      },
+      {
+        "value": 0.05,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 0.1,
+        "Q_mL_min": 0.0173
+      },
+      {
+        "value": 0.2,
+        "Q_mL_min": 0.0341
+      }
+    ],
+    "viscosity": [
+      {
+        "value": 0.8,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 1.0,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 1.2,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 1.5,
+        "Q_mL_min": 0.0087
+      }
+    ],
+    "csf_flow": [
+      {
+        "value": 0.2,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 0.35,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 0.5,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 0.7,
+        "Q_mL_min": 0.0087
+      }
+    ],
+    "venous_pressure": [
+      {
+        "value": 0,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 5,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 8,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 12,
+        "Q_mL_min": 0.0087
+      }
+    ],
+    "bypass_threshold": [
+      {
+        "value": 10,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 15,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 20,
+        "Q_mL_min": 0.0087
+      },
+      {
+        "value": 25,
+        "Q_mL_min": 0.0087
+      }
+    ]
+  },
+  "key_findings": [
+    "At 0% fouling: Q=0.0173 mL/min, ICP=23.09 mmHg, MARGINAL",
+    "At 50% fouling: Q=0.0087 mL/min, ICP=23.38 mmHg, MARGINAL",
+    "At 90% fouling: Q=0.0018 mL/min, ICP=23.61 mmHg, MARGINAL",
+    "At 100% fouling: Q=0 mL/min, ICP=23.67 mmHg, MARGINAL"
+  ],
+  "honest_caveats": [
+    "Fouling model is linear; real biofouling may be non-linear (protein adsorption, cell adhesion)",
+    "ICP compliance factor (0.3 mL/mmHg) is a population average; individual patients vary",
+    "No validation against in vivo CSF dynamics data",
+    "Bypass threshold (15 mmHg) is a design choice, not clinically validated",
+    "Simulation does not model time-dependent fouling kinetics"
+  ],
+  "requires_physical_validation": [
+    "In vitro flow loop with ePTFE membrane and simulated CSF",
+    "Chronic animal study (12-week) with biofouling measurement",
+    "ICP monitoring in animal model with fouled membrane"
+  ]
+}
