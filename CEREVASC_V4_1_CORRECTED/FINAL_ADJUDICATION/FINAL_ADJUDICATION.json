@@ -1,0 +1,74 @@
+{
+  "protocol": "CEREVASC_V4_1_CORRECTED",
+  "version": "V4.1",
+  "timestamp": "2026-08-17T00:46:02.460581+00:00",
+  "v4_error_corrected": "US20160051801A1 ownership: CereVasc \u2192 Minnetronix (CEO caught the error)",
+  "v4_error_preserved": "V4 conclusion preserved as immutable audit event in HALLUCINATION_EVENTS/",
+  "ownership_graphs": {
+    "technology_graph": "US20160051801A1 (Minnetronix) discloses dual pressure+flow sensing on CSF catheter",
+    "ownership_graph": "US20160051801A1 belongs to Minnetronix, NOT CereVasc",
+    "buyer_graph": "CereVasc would want the invention (they have eShunt venous access but no monitoring)",
+    "principle": "Three graphs cannot be conflated"
+  },
+  "cerevasc_owned_corpus": {
+    "total": 6,
+    "patents": [
+      "US8672871B2",
+      "US10307577B2",
+      "US11951270B2",
+      "US9199067B2",
+      "US9861799B2",
+      "US20160136398A1"
+    ],
+    "monitoring_language": "US20160136398A1 has pressure+differential+flow keywords (in NPH disease context, not sensing)",
+    "note": "US20160051801A1 REMOVED from CereVasc corpus (belongs to Minnetronix)"
+  },
+  "competitor_prior_art": {
+    "minnetronix": {
+      "US20160051801A1": "ABANDONED \u2014 dual pressure+flow sensing on CSF catheter (claim 5)",
+      "US20210236782A1": "PENDING continuation \u2014 1 claim retrieved (catheter structure, no sensing)"
+    }
+  },
+  "102_result": {
+    "status": "SURVIVES",
+    "strongest_reference": "US20160051801A1 (Minnetronix)",
+    "limitations_disclosed": "L1 (CSF pressure sensor), L6 (partial \u2014 transducer output)",
+    "limitations_not_disclosed": "L2 (venous sinus pressure), L3 (differential), L4 (eShunt context), L5 (occlusion prediction)",
+    "rationale": "No single reference discloses all 6 limitations. Minnetronix discloses CSF pressure sensing but NOT venous sinus pressure, NOT differential, NOT occlusion prediction."
+  },
+  "103_result": {
+    "status": "NOT_OBVIOUS (but UNCERTAIN)",
+    "combination": "US20160051801A1 (Minnetronix dual sensor) + US8672871B2 (CereVasc eShunt venous access)",
+    "missing_limitations": [
+      "L2",
+      "L3",
+      "L5"
+    ],
+    "motivation": "MODERATE (not STRONG \u2014 Minnetronix patent was ABANDONED)",
+    "expectation": "MEDIUM",
+    "technical_effect": "MODERATE \u2014 CSF-venous differential is a new measurable signal",
+    "whole_claim": "FUNCTIONAL_INTERACTION (not mere aggregation)",
+    "hindsight": "MEDIUM",
+    "caveat": "490 external patents NOT claim-level searched. 103 could still be threatened by unknown prior art."
+  },
+  "elite_gate_check": {
+    "A_corpus_completeness": "PARTIAL \u2014 6 CereVasc + 2 Minnetronix verified. Additional family members may exist.",
+    "B_actual_claim_evidence": "YES \u2014 claims retrieved for all key patents",
+    "C_102_survives": "YES \u2014 no single reference anticipates all 6 limitations",
+    "D_103_survives": "UNCERTAIN \u2014 reduced from HIGH to MEDIUM. Missing limitations + functional interaction + abandoned prior art. But 490 external patents not searched.",
+    "E_no_evidence_gaps": "NO \u2014 490 external patents not claim-level searched",
+    "F_technical_effect": "MODERATE \u2014 new differential signal, functional interaction",
+    "G_manufacturing": "SIMULATED_FEASIBLE",
+    "H_competitor_differentiation": "MODERATE \u2014 CereVasc has 0 monitoring patents; Minnetronix has dual sensing but abandoned",
+    "I_design_around_resistance": "MEDIUM",
+    "J_provenance": "YES \u2014 all evidence traced, ownership corrected"
+  },
+  "final_status": "PROMISING",
+  "final_rationale": "RESCUE_001 SURVIVES 102 (no single reference anticipates all 6 limitations). 103 risk is MEDIUM (reduced from V4 HIGH) because: (1) the Minnetronix dual-sensor patent was ABANDONED, reducing motivation; (2) 3 limitations (L2, L3, L5) are missing from both references; (3) the CSF-venous differential is a new signal with functional interaction (not mere aggregation); (4) the occlusion prediction requires fluid dynamics analysis not in the prior art. HOWEVER, 490 external patents have NOT been claim-level searched, so 103 risk is UNCERTAIN. The invention is PROMISING \u2014 it has a genuine technical differentiator and survives the strongest known prior art, but has NOT been proven against the full prior-art landscape.",
+  "regression_test": {
+    "name": "OWNERSHIP_MISATTRIBUTION_DETECTION",
+    "rule": "Same technical disclosure + wrong assignee \u2192 must NOT enter target-company-owned-IP corpus",
+    "test": "US20160051801A1 has CSF pressure sensing technology BUT assignee is Minnetronix, not CereVasc. Must be classified as competitor prior art, not CereVasc owned.",
+    "status": "TEST ADDED \u2014 this regression must be enforced in future corpus builds"
+  }
+}
