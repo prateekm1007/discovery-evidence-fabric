@@ -1,0 +1,130 @@
+{
+  "protocol": "CEREVASC_INVENTION_001_FINAL",
+  "version": "V8.3_FINAL_FORENSIC_AUDIT",
+  "timestamp": "2026-08-17T02:41:01.622096+00:00",
+  "invention": "Selective therapeutic retention while preserving eShunt CSF drainage",
+  "correction": "CereVasc HAS drug delivery IP (US11850390B2, US20200406018A1). The statement \"zero drug delivery patents\" is permanently prohibited.",
+  "cerevasc_existing_ip": {
+    "US11850390B2": "Method for accessing subarachnoid space to administer therapeutic agent \u2014 ACTIVE/GRANTED",
+    "US20200406018A1": "Endovascular drug delivery device for DVS deployment \u2014 ACTIVE/GRANTED, mentions \"retention\"",
+    "note": "CereVasc already has endovascular drug delivery to subarachnoid space via DVS. The invention must NOT claim \"drug delivery\" \u2014 it must claim SELECTIVE RETENTION + PRESERVED DRAINAGE."
+  },
+  "limitation_map": {
+    "CereVasc_US20200406018A1": {
+      "L1_therapeutic_delivery": {
+        "status": "EXPLICIT",
+        "passage": "endovascular drug delivery device"
+      },
+      "L2_retention_mechanism": {
+        "status": "UNCERTAIN",
+        "passage": "retention keyword found \u2014 needs passage-level verification whether it refers to a retention MECHANISM or drug residence in tissue"
+      },
+      "L3_CSF_drainage": {
+        "status": "NOT_FOUND",
+        "passage": ""
+      },
+      "L4_maintained_drainage": {
+        "status": "NOT_FOUND",
+        "passage": ""
+      },
+      "L5_residence_effect": {
+        "status": "UNCERTAIN",
+        "passage": "residence keyword found \u2014 context unclear"
+      },
+      "L6_eShunt_config": {
+        "status": "EXPLICIT",
+        "passage": "configured for being deployed in a dural venous sinus (DVS)"
+      },
+      "critical_finding": "CereVasc has a drug DELIVERY device patent (US20200406018A1) that mentions \"retention\" \u2014 BUT this patent does NOT describe CSF DRAINAGE. It is a DRUG DELIVERY device, not a shunt with retention. The \"retention\" may refer to drug residence in tissue, not a retention mechanism that preserves drainage."
+    },
+    "EnClear_US12337140B2": {
+      "L1_therapeutic_delivery": {
+        "status": "EXPLICIT",
+        "passage": "therapeutic inlet to the CSF circuit"
+      },
+      "L2_retention_mechanism": {
+        "status": "NOT_FOUND",
+        "passage": ""
+      },
+      "L3_CSF_drainage": {
+        "status": "EXPLICIT",
+        "passage": "catheter configured to form a closed loop CSF circuit"
+      },
+      "L4_maintained_drainage": {
+        "status": "EXPLICIT",
+        "passage": "controller configured to control CSF rate"
+      },
+      "L5_residence_effect": {
+        "status": "NOT_FOUND",
+        "passage": ""
+      },
+      "L6_eShunt_config": {
+        "status": "NOT_FOUND",
+        "passage": "external system, not endovascular implant"
+      },
+      "critical_finding": "EnClear has CSF flow control + drug delivery but uses an EXTERNAL pump with closed-loop circuit. No retention mechanism. No endovascular implant. Fundamentally different architecture."
+    }
+  },
+  "gap_analysis": {
+    "what_cerevasc_has": "Drug DELIVERY device (L1+L6) \u2014 endovascular, DVS, subarachnoid access",
+    "what_cerevasc_lacks": "Retention MECHANISM (L2), CSF DRAINAGE preservation (L3+L4), Residence EFFECT (L5)",
+    "what_enclear_has": "CSF flow control (L3+L4) + drug delivery (L1)",
+    "what_enclear_lacks": "Retention mechanism (L2), eShunt endovascular config (L6), implanted device",
+    "novel_territory": "L2 (retention mechanism) + L3+L4 (simultaneous drainage) + L5 (residence effect) + L6 (eShunt endovascular)",
+    "key_distinction": "The invention is NOT \"drug delivery\" (CereVasc has that). It is \"RETENTION while DRAINING\" \u2014 a conflict resolution mechanism."
+  },
+  "architecture_assessment": {
+    "A1_size_selective_filtration": {
+      "mechanism": "Nanoparticles too large for filtration membrane; CSF fluid passes through",
+      "L2_retention": "YES \u2014 size-selective membrane retains drug",
+      "L3_drainage": "YES \u2014 fluid passes through membrane",
+      "L4_maintained": "YES \u2014 drainage is continuous, not interrupted",
+      "L5_residence": "YES \u2014 drug stays in CSF while fluid drains",
+      "L6_eShunt": "YES \u2014 membrane integrated into eShunt lumen",
+      "safety": "Membrane failure = drug drains (no ICP risk)",
+      "102_risk": "LOW \u2014 no single reference has L2+L3+L4+L5+L6",
+      "103_risk": "MEDIUM \u2014 could combining CereVasc delivery + known filtration be obvious?",
+      "technical_effect": "CONTINUOUS retention while CONTINUOUS drainage \u2014 no interruption needed",
+      "score": 72
+    },
+    "A3_reversible_flow_interruption": {
+      "mechanism": "Temporarily close valve during dosing, reopen after",
+      "L2_retention": "YES \u2014 valve closure retains drug",
+      "L3_drainage": "YES \u2014 but INTERRUPTED during therapy mode",
+      "L4_maintained": "PARTIAL \u2014 drainage is intermittent, not continuous",
+      "L5_residence": "YES \u2014 drug stays during valve closure",
+      "L6_eShunt": "YES \u2014 exploits eShunt valve mechanism",
+      "safety": "Valve must auto-open if ICP rises \u2014 critical safety mechanism",
+      "102_risk": "LOW",
+      "103_risk": "MEDIUM-HIGH \u2014 programmable shunt valves exist; closing a valve is known",
+      "technical_effect": "INTERMITTENT retention with INTERRUPTED drainage",
+      "score": 58
+    },
+    "A4_two_phase_operation": {
+      "mechanism": "Therapy mode vs drainage mode, controllable valve",
+      "score": 55,
+      "note": "Similar to A3 \u2014 both interrupt drainage. A1 is superior because it provides CONTINUOUS operation."
+    },
+    "A5_valve_timing": {
+      "mechanism": "Brief valve closure post-delivery",
+      "score": 52,
+      "note": "Similar to A3/A4 \u2014 intermittent approach. A1 is superior."
+    },
+    "A2_affinity_based": {
+      "mechanism": "Drug binds to matrix, CSF flows past",
+      "score": 65,
+      "note": "Good continuous operation but affinity matrix may be harder to manufacture and regulate"
+    }
+  },
+  "selected_architecture": "A1 \u2014 Size-Selective Filtration",
+  "selection_rationale": "A1 is the only architecture that provides CONTINUOUS retention while maintaining CONTINUOUS drainage. All valve-based approaches (A3, A4, A5) require interrupting drainage, creating safety risk. A2 (affinity) is viable but harder to manufacture. A1 exploits the eShunt lumen geometry uniquely \u2014 the permanent transvenous shunt creates a fixed-diameter passage where a size-selective membrane can be integrated.",
+  "final_status": "PROMISING",
+  "final_rationale": "A1 (Size-Selective Filtration) survives initial 102/103 analysis. No single reference discloses all 6 limitations. CereVasc has delivery (L1+L6) but NOT retention+drainage (L2+L3+L4). EnClear has drainage (L3+L4) but NOT retention (L2) or eShunt config (L6). The combination of size-selective membrane + continuous drainage + eShunt anatomy is novel. HOWEVER, this is LLM-assessed, NOT passage-grounded. Full passage-level audit against all relevant prior art families is required before calling STRONG.",
+  "evidence_status": "INSUFFICIENT \u2014 LLM-assessed only. Passage-grounded evidence needed against: (1) filtration membrane patents, (2) drug-eluting shunt patents, (3) selective permeability CSF patents, (4) CereVasc US20200406018A1 \"retention\" keyword context.",
+  "next_steps": [
+    "Passage-level audit of US20200406018A1 \"retention\" keyword \u2014 is it a retention MECHANISM or tissue residence?",
+    "Claim-level search for size-selective filtration in CSF/shunt context",
+    "Claim-level search for drug-eluting shunt membranes",
+    "Passage-grounded 102/103 against all serious candidates"
+  ]
+}
