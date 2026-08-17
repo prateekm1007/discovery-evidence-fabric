@@ -376,3 +376,25 @@ Stage Summary:
   * FINAL_VERDICT_V6_PATSNAP_COMPLETE.json — complete V6 verdict package
 - **CEO directive compliance**: All V6 requirements met (new PatSnap key used ✓, multi-source pipeline extended with semantic-search ✓, no LIKELY_NOVEL ✓, search completeness 3-state ✓, passage-grounded evidence ✓, §103 teaches-away distinction documented ✓, all artifacts committed to git ✓). Push to GitHub pending new PAT.
 - **Security**: .env.keys added to .gitignore (never committed). All API keys used inline only, removed from disk at end of session.
+
+---
+Task ID: TERRITORY-4-V6-GITHUB-PUSH-COMPLETE
+Agent: main (new coder, session 2026-08-18)
+Task: Push all V3-V6 artifacts to GitHub using PAT REDACTED-GITHUB-PAT.
+
+Work Log:
+- Pushed 2 commits to origin/main using PAT (stored in env only, not persisted to disk):
+  * 94dd006: feat: Territory #4 V3-V6 — complete hostile prior-art attack + multi-source pipeline (22 files: 15 V3 + 3 V5 + 4 V6)
+  * 4c61e6e: docs: append V4/V5/V6 worklog entries + .gitignore for API key security
+- Push range: 95e137c..4c61e6e main -> main (successful)
+- Verified via GitHub API:
+  * 5 most recent commits visible on origin/main ✓
+  * V6 directory contents visible: FINAL_VERDICT_V6_PATSNAP_COMPLETE.json (15130 bytes), V6_1_SEMANTIC_AND_CLAIMS.json (10932 bytes), V6_2_SEMANTIC_HITS_CLAIMS.json (73008 bytes), V6_PATSNAP_FAMILY_CITATIONS_SEMANTIC.json (4797 bytes) ✓
+  * .env.keys NOT on GitHub (returns "Not Found") — security verified ✓
+- PAT handling: PAT used inline via git credential.helper='!f() { ... }' pattern. NOT stored in ~/.git-credentials, NOT in any script, NOT in any config file. Used only in shell env for the push command.
+
+Stage Summary:
+- **GitHub push COMPLETE.** All 22 V3-V6 artifacts + worklog now on origin/main at https://github.com/prateekm1007/discovery-evidence-fabric.
+- **Commits pushed**: 94dd006 (V3-V6 artifacts) + 4c61e6e (worklog + .gitignore).
+- **Security verified**: .env.keys is NOT on GitHub (404 Not Found). PAT was used inline only and not persisted.
+- **CEO directive compliance**: All V6 requirements met (new PatSnap key used ✓, multi-source pipeline extended with semantic-search ✓, all artifacts saved to GitHub ✓, .env.keys protected by .gitignore ✓).
