@@ -1,0 +1,42 @@
+{
+  "protocol": "INVENTION_PROTOCOL_V1",
+  "phase": "PCP_001_APPROVAL_REQUEST",
+  "timestamp": "2026-08-17T16:20:05.370284+00:00",
+  "request": "CEO must explicitly approve or reject PCP-001",
+  "firewall": {
+    "filed_by": "Main agent (Super Z)",
+    "filed_by_role": "coder",
+    "cannot_self_approve": true,
+    "approval_required_from": "CEO",
+    "approval_must_be_explicit": "Written 'approve PCP-001' or 'reject PCP-001'"
+  },
+  "what_pcp_001_proposes": {
+    "change_1": "Add BELOW_BUYER_THRESHOLD as 4th terminal status in §16",
+    "change_2": "4-concept separation (PATENT_STATUS, ENGINEERING_STATUS, BUYER_SENTIMENT, BUYER_READINESS)",
+    "scope": "MINIMAL — no other protocol changes",
+    "diff_document": "protocol/governance/PCP_001_DIFF_V10_V11.json + .md"
+  },
+  "what_happens_if_approved": [
+    "V1.1 constitution created (V1.0 preserved per Law 7)",
+    "CONSTITUTION_REGISTRY updated: current_version = V1.1",
+    "All current canonical inventions pinned to protocol_version=V1.1",
+    "Preflight enforces V1.1 on next run",
+    "Future inventions declare protocol_version=V1.1",
+    "BELOW_BUYER_THRESHOLD becomes constitutional (not just PROPOSED)"
+  ],
+  "what_happens_if_rejected": [
+    "V1.0 remains current",
+    "BELOW_BUYER_THRESHOLD maps to WOULD_NOT_PAY (current behavior)",
+    "4-concept separation remains advisory (not enforced by constitution)",
+    "Infrastructure (deterministic state machine, scanner, transition tests) remains in place",
+    "PCP-001 marked REJECTED in PCP_REGISTRY"
+  ],
+  "transition_script_prepared": "protocol/governance/V11_TRANSITION_SCRIPT.py (DO NOT RUN until CEO approves)",
+  "transition_script_safety": [
+    "Script requires --approve flag",
+    "Script requires --approved-by parameter",
+    "Script rejects self-approval (coder/agent cannot approve)",
+    "Script will not run without explicit CEO approval"
+  ],
+  "ceo_instruction": "To approve: say 'approve PCP-001' and I will run the transition script. To reject: say 'reject PCP-001' and I will mark it REJECTED in the registry."
+}
