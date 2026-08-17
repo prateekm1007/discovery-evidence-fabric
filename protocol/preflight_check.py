@@ -132,6 +132,97 @@ def load_json(path: Path) -> dict | list | None:
         return {"_parse_error": str(e)}
 
 
+# ---------- Section X.0 — Constitution hash-pin (repo-level, runs FIRST) ----------
+#
+# Per INVENTION_PROTOCOL_V1 §14 (Protocol Evolution Workflow) and §3.8
+# (Protocol Immutability Within a Run). The canonical constitution file's
+# SHA-256 is pinned in protocol/CONSTITUTION_REGISTRY.json. This check
+# verifies the file exists at the pinned path and its hash matches. A
+# mismatch means the constitution was modified outside the Protocol
+# Evolution Workflow — a hard CI failure.
+#
+# This check is repo-level, not per-invention. It runs BEFORE any
+# Section 9 check. Its result appears as a top-level `constitution_check`
+# field in preflight_report.json.
+
+def check_constitution_hash(repo_root: Path) -> list[CheckResult]:
+    """Verify the canonical constitution file exists and its SHA-256 matches the registry pin.
+
+    Returns a single CheckResult (section X.0) that passes only if:
+    1. CONSTITUTION_REGISTRY.json exists and is parseable
+    2. current_canonical_path field is present
+    3. The canonical file exists at that path
+    4. The file's SHA-256 matches current_sha256
+
+    If any sub-check fails, the single CheckResult fails with a message
+    identifying which step failed.
+    """
+    registry_path = repo_root / "protocol" / "CONSTITUTION_REGISTRY.json"
+    section = "X.0"
+    check_name = "constitution_hash_pin"
+
+    # Step 1: registry file exists and is parseable
+    registry = load_json(registry_path)
+    if registry is None:
+        return [CheckResult(
+            section=section, check_name=check_name, passed=False,
+            failure_reason="protocol/CONSTITUTION_REGISTRY.json is missing",
+            artifact=str(registry_path),
+        )]
+    if not isinstance(registry, dict) or "_parse_error" in registry:
+        parse_err = registry.get("_parse_error", "not a valid JSON object") if isinstance(registry, dict) else "not a valid JSON object"
+        return [CheckResult(
+            section=section, check_name=check_name, passed=False,
+            failure_reason=f"protocol/CONSTITUTION_REGISTRY.json is not valid: {parse_err}",
+            artifact=str(registry_path),
+        )]
+
+    # Step 2: current_canonical_path field present
+    canonical_rel = registry.get("current_canonical_path")
+    if not canonical_rel or not isinstance(canonical_rel, str):
+        return [CheckResult(
+            section=section, check_name=check_name, passed=False,
+            failure_reason="CONSTITUTION_REGISTRY.json missing or invalid 'current_canonical_path' field",
+            artifact=str(registry_path),
+        )]
+
+    # Step 3: canonical constitution file exists at the pinned path
+    canonical_path = repo_root / canonical_rel
+    if not canonical_path.is_file():
+        return [CheckResult(
+            section=section, check_name=check_name, passed=False,
+            failure_reason=f"Canonical constitution file not found at pinned path: {canonical_rel}",
+            artifact=str(canonical_path),
+        )]
+
+    # Step 4: SHA-256 matches the pin
+    pinned_hash = registry.get("current_sha256")
+    if not pinned_hash or not isinstance(pinned_hash, str):
+        return [CheckResult(
+            section=section, check_name=check_name, passed=False,
+            failure_reason="CONSTITUTION_REGISTRY.json missing or invalid 'current_sha256' field",
+            artifact=str(registry_path),
+        )]
+
+    actual_hash = sha256_of_file(canonical_path)
+    if actual_hash != pinned_hash:
+        return [CheckResult(
+            section=section, check_name=check_name, passed=False,
+            failure_reason=(
+                f"Constitution SHA-256 mismatch: pinned={pinned_hash}, actual={actual_hash}. "
+                "The constitution file was modified outside the Protocol Evolution Workflow (§14). "
+                "Either restore the file or follow §14 to create V2."
+            ),
+            artifact=str(canonical_path),
+        )]
+
+    # All steps passed
+    return [CheckResult(
+        section=section, check_name=check_name, passed=True,
+        artifact=str(canonical_path),
+    )]
+
+
 def find_invention_dirs(repo_root: Path) -> list[Path]:
     if not repo_root.is_dir():
         return []
@@ -795,22 +886,33 @@ def main():
         print(f"FATAL: repo root {repo_root} does not exist", file=sys.stderr)
         return 2
 
-    invention_dirs = find_invention_dirs(repo_root)
-    if not invention_dirs:
-        print("No invention directories found. CI passes trivially.")
-        return 0
+    # ---------- Section X.0 — Constitution hash-pin (repo-level, runs FIRST) ----------
+    print("Constitution hash-pin check (Section X.0) ...")
+    constitution_checks = check_constitution_hash(repo_root)
+    constitution_pass = all(c.passed for c in constitution_checks)
+    constitution_fails = [c for c in constitution_checks if not c.passed]
+    if constitution_pass:
+        print(f"  PASS  ({len(constitution_checks)} checks)")
+    else:
+        print(f"  FAIL  ({len(constitution_fails)} failures)")
+        for fail in constitution_fails:
+            print(f"    [{fail.section}] {fail.check_name}: {fail.failure_reason}")
 
+    invention_dirs = find_invention_dirs(repo_root)
     all_reports = []
-    for d in invention_dirs:
-        print(f"\nAuditing {d.name} ...")
-        report = audit_invention(d, repo_root)
-        all_reports.append(report)
-        if report.all_passed:
-            print(f"  PASS  ({len(report.checks)} checks)")
-        else:
-            print(f"  FAIL  ({len(report.failures)} failures)")
-            for fail in report.failures:
-                print(f"    [{fail.section}] {fail.check_name}: {fail.failure_reason}")
+    if not invention_dirs:
+        print("No invention directories found.")
+    else:
+        for d in invention_dirs:
+            print(f"\nAuditing {d.name} ...")
+            report = audit_invention(d, repo_root)
+            all_reports.append(report)
+            if report.all_passed:
+                print(f"  PASS  ({len(report.checks)} checks)")
+            else:
+                print(f"  FAIL  ({len(report.failures)} failures)")
+                for fail in report.failures:
+                    print(f"    [{fail.section}] {fail.check_name}: {fail.failure_reason}")
 
     # Write machine-readable report
     report_path = repo_root / "protocol" / "preflight_report.json"
@@ -819,8 +921,15 @@ def main():
         json.dump({
             "protocol": "INVENTION_PROTOCOL_V1",
             "timestamp": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
+            "constitution_check": {
+                "section": "X.0",
+                "all_passed": constitution_pass,
+                "check_count": len(constitution_checks),
+                "failure_count": len(constitution_fails),
+                "checks": [asdict(c) for c in constitution_checks],
+            },
             "inventions_audited": len(all_reports),
-            "all_pass": all(r.all_passed for r in all_reports),
+            "all_pass": constitution_pass and all(r.all_passed for r in all_reports),
             "reports": [
                 {
                     "invention_id": r.invention_id,
@@ -833,10 +942,18 @@ def main():
             ],
         }, f, indent=2)
 
-    total_failures = sum(len(r.failures) for r in all_reports)
+    total_failures = (
+        sum(len(r.failures) for r in all_reports)
+        + len(constitution_fails)
+    )
+    total_checks = (
+        sum(len(r.checks) for r in all_reports)
+        + len(constitution_checks)
+    )
     print(f"\n{'='*60}")
+    print(f"Constitution: {len(constitution_checks)} checks ({'PASS' if constitution_pass else 'FAIL'})")
     print(f"Inventions audited: {len(all_reports)}")
-    print(f"Total checks run: {sum(len(r.checks) for r in all_reports)}")
+    print(f"Total checks run: {total_checks}")
     print(f"Total failures: {total_failures}")
     print(f"Overall: {'PASS' if total_failures == 0 else 'FAIL'}")
     print(f"Report: {report_path}")
