@@ -1,0 +1,377 @@
+{
+  "spec_id": "AUTOMATED_RESEARCH_ORCHESTRATOR_V2",
+  "timestamp": "2026-08-18T00:43:29.017867+00:00",
+  "v1_to_v2_changes": [
+    "Research-question loop replaces rigid 8-stage sequence",
+    "Evidence-class-driven source routing (cheapest capable, not sequence)",
+    "EVIDENCE_QUESTION object (question \u2192 hypothesis \u2192 impact \u2192 source \u2192 stop condition)",
+    "6-axis equivalence engine (added FAILURE_MODE axis)",
+    "Robust stopping logic (coverage + quality + diversity + adversarial success, not count)",
+    "FALSE_POSITIVE state in research layer",
+    "SEARCH_INCOMPLETE independent from engineering failure (V8 pattern)",
+    "ALTERNATIVE_DEFEATED ledger (provenance)",
+    "FDA/clinical reserved for final portfolio audit (not in discovery loop)",
+    "Pushing-the-envelope rule encoded: guilty until survives attack"
+  ],
+  "doctrine": {
+    "pushing_the_envelope_rule": "The machine should behave as though every invention is guilty until it survives attack. Find the strongest plausible competing mechanism. Determine whether it actually solves the same constrained problem. If it does, compare mechanisms. If it wins, the invention changes or dies. If it loses, generate the next strongest alternative. Then attack the surviving architecture with a new evidence source and a harder operating condition. The pipeline should therefore seek CONTRADICTION and INFORMATION GAIN, not confirmation.",
+    "guilty_until_proven_survivor": true,
+    "seek_contradiction_not_confirmation": true,
+    "implementation_principle": "One canonical orchestrator. Do not create separate competing research engines for each territory."
+  },
+  "research_loop": {
+    "v1_limitation": "V1 was stage-driven (8 rigid stages). V2 is question-driven.",
+    "v2_loop": [
+      "candidate_architecture \u2192 freeze limitations",
+      "generate strongest plausible attack question",
+      "execute attack (search/simulation/ablation)",
+      "result \u2192 UNCERTAINTY (what do we still not know?)",
+      "uncertainty \u2192 next best search/test question",
+      "attack again with new evidence source or harder condition",
+      "repeat until: SURVIVOR (mechanism survives all attacks) or CEILING (genuine negative) or EXHAUSTED (no more questions)"
+    ],
+    "loop_termination": {
+      "SURVIVOR": "mechanism survives all generated attacks AND no more uncertainty questions remain",
+      "CEILING": "strongest alternative matches or beats candidate on same coupled problem",
+      "EXHAUSTED": "no more credible attack questions can be generated (coverage complete)"
+    },
+    "loop_continuation": "always \u2014 if uncertainty remains, generate next question"
+  },
+  "evidence_question_object": {
+    "schema": {
+      "question_id": "string (unique)",
+      "question": "string \u2014 the specific uncertainty to resolve",
+      "hypothesis": "string \u2014 what we expect to find",
+      "expected_decision_impact": {
+        "if_found": "how the result changes the invention state",
+        "if_not_found": "how the absence changes the state",
+        "if_ambiguous": "how ambiguity is resolved (next question)"
+      },
+      "evidence_class": "discovery | mechanism | architecture | hostile_prior_art | engineering | patent | clinical",
+      "cheapest_capable_source": "source selected by routing rules (not rigid sequence)",
+      "stop_condition": "when to stop searching (e.g., 'top 10 results all classified', '0 relevant hits after focused query')",
+      "result": "FOUND | NOT_FOUND | AMBIGUOUS | FALSE_POSITIVE (filled after execution)",
+      "result_evidence": "passage/hash/simulation output",
+      "next_question_generated": "question_id of follow-up (if any)"
+    },
+    "example_questions": [
+      {
+        "question_id": "EQ1_P1",
+        "question": "Does any prior art teach active valve perturbation for hydraulic parameter estimation in a CSF-venous shunt?",
+        "hypothesis": "No \u2014 active interrogation is architecturally distinct from passive observation",
+        "expected_decision_impact": {
+          "if_found": "Position #1 novelty destroyed \u2014 escalate to claim chart",
+          "if_not_found": "Position #1 survives this attack \u2014 generate next question",
+          "if_ambiguous": "Run PatSnap semantic-search using closest patent as seed"
+        },
+        "evidence_class": "hostile_prior_art",
+        "cheapest_capable_source": "PatentBear (free Boolean) \u2192 PatSnap (claim-data if threat found)",
+        "stop_condition": "top 10 PatentBear results classified + top 5 PatSnap semantic hits claim-audited"
+      },
+      {
+        "question_id": "EQ2_P1",
+        "question": "Does passive ML (without active perturbation) perform as well as active interrogation?",
+        "hypothesis": "No \u2014 active perturbation adds discriminative value",
+        "expected_decision_impact": {
+          "if_found": "Position #1 mechanism destroyed by passive ML \u2014 CEILING",
+          "if_not_found": "Position #1 mechanism validated \u2014 generate harder disturbance question",
+          "if_ambiguous": "Test with stronger ML (deep learning) or harder noise"
+        },
+        "evidence_class": "engineering",
+        "cheapest_capable_source": "Simulation (local compute, free)",
+        "stop_condition": "\u22653 ML algorithms tested (SVM/RF/KNN) on MEDIUM noise with \u2265200 samples/state"
+      }
+    ]
+  },
+  "source_routing_v2": {
+    "principle": "The orchestrator chooses the CHEAPEST source CAPABLE of answering the question. Not a rigid sequence.",
+    "evidence_class_to_source_map": {
+      "discovery": {
+        "description": "Broad scientific discovery, independent coverage",
+        "preferred_sources": [
+          "Lens scholarly",
+          "Google Patents"
+        ],
+        "rationale": "Free, broad coverage. Use for concept mapping and author/affiliation tracking."
+      },
+      "mechanism": {
+        "description": "Mechanism, engineering physics, alternative architectures",
+        "preferred_sources": [
+          "Scopus (TITLE-ABS-KEY)",
+          "Lens scholarly"
+        ],
+        "rationale": "Peer-reviewed literature reveals mechanisms and alternative architectures. Scopus TITLE-ABS-KEY gives focused results."
+      },
+      "architecture": {
+        "description": "Alternative architecture discovery and comparison",
+        "preferred_sources": [
+          "Scopus",
+          "Lens",
+          "PatentBear (for patented architectures)"
+        ],
+        "rationale": "Cross-source: Scopus/Lens for scientific architectures, PatentBear for patented ones."
+      },
+      "hostile_prior_art": {
+        "description": "Hostile family/claim investigation",
+        "preferred_sources": [
+          "PatentBear (Boolean + claim extraction)",
+          "PatSnap (claim-data for top threats)"
+        ],
+        "rationale": "PatentBear free for Boolean + claim extraction. PatSnap only for top \u226410 highest-threat patents (cost gate)."
+      },
+      "engineering": {
+        "description": "Simulation, ablation, comparator testing",
+        "preferred_sources": [
+          "Local simulation (free)",
+          "Monte Carlo"
+        ],
+        "rationale": "Engineering questions answered by simulation, not external search."
+      },
+      "patent": {
+        "description": "Patent family, citations, semantic similarity",
+        "preferred_sources": [
+          "PatSnap (semantic-search, family, citations) \u2014 HIGH COST"
+        ],
+        "rationale": "PatSnap only for residual high-value patent uncertainty. Must pass cost gate."
+      },
+      "clinical": {
+        "description": "FDA/clinical/post-market reality audit",
+        "preferred_sources": [
+          "MAUDE",
+          "ClinicalTrials.gov"
+        ],
+        "rationale": "RESERVED for final portfolio audit. NOT in 1-10 discovery loop."
+      }
+    },
+    "cost_gate_rule": "Every source selection must answer: 'Is this the cheapest source capable of answering this question?' If a cheaper source can answer, use it. If not, escalate.",
+    "information_gain_gate": "Every call must answer: 'What uncertainty will this call eliminate?' If 'none', don't execute."
+  },
+  "equivalence_engine_v2": {
+    "core_principle": "'Same problem' requires comparison on 6 axes, not just keyword overlap.",
+    "six_axis_comparison": {
+      "axis_1_objective": {
+        "description": "What clinical/technical problem does each solve?",
+        "example_match": "Both solve CSF drug exposure enhancement",
+        "example_mismatch": "Position #2 (CSF drainage + retention) vs hydrogel (SCI drug delivery) \u2014 different objectives"
+      },
+      "axis_2_mechanism": {
+        "description": "What physical principle does each use?",
+        "example_match": "Both use size-selective filtration",
+        "example_mismatch": "Position #2 (size-selective filter) vs hydrogel (sustained-release depot) \u2014 different mechanisms"
+      },
+      "axis_3_constraints": {
+        "description": "What constraints must each satisfy?",
+        "example_match": "Both must preserve CSF drainage",
+        "example_mismatch": "Position #2 (drainage maintained) vs hydrogel (no drainage constraint) \u2014 different constraints"
+      },
+      "axis_4_operating_environment": {
+        "description": "Where does each operate?",
+        "example_match": "Both operate in endovascular CSF shunt",
+        "example_mismatch": "Position #2 (eShunt lumen) vs hydrogel (intrathecal injection) \u2014 different environments"
+      },
+      "axis_5_output": {
+        "description": "What is the output/deliverable?",
+        "example_match": "Both deliver therapeutic agent to CSF",
+        "example_mismatch": "Position #2 (filtered CSF + retained drug) vs hydrogel (sustained drug release) \u2014 different outputs"
+      },
+      "axis_6_failure_mode": {
+        "description": "How does each fail?",
+        "example_match": "Both fail by filter obstruction",
+        "example_mismatch": "Position #2 (filter fouling) vs hydrogel (depot depletion) \u2014 different failure modes"
+      }
+    },
+    "classification": {
+      "SAME_PROBLEM_SAME_MECHANISM": "All 6 axes match \u2192 threatens novelty. Escalate to claim chart.",
+      "SAME_PROBLEM_DIFFERENT_MECHANISM": "Objective + constraints match, but mechanism/output differ \u2192 architecturally distinct. Run engineering comparator.",
+      "NEIGHBORING_PROBLEM": "Objective overlaps but constraints/environment/output differ \u2192 does not threaten. Record in FALSE_POSITIVE ledger.",
+      "DIFFERENT_PROBLEM": "No axis overlap \u2192 off-topic. Discard."
+    },
+    "v1_to_v2_improvement": "V1 used 5 questions. V2 uses 6 axes including FAILURE_MODE \u2014 this prevents hydrogel-like neighboring solutions from being treated as genuine threats."
+  },
+  "stopping_logic_v2": {
+    "v1_limitation": "V1 used 'CEILING after \u22653 alternatives' \u2014 mechanical shortcut. Three weak alternatives should never terminate a territory.",
+    "v2_rule": "Stopping depends on COVERAGE + EVIDENCE_QUALITY + MECHANISM_DIVERSITY + ADVERSARIAL_SUCCESS, not count.",
+    "stop_conditions": {
+      "SURVIVOR_positive_freeze": {
+        "required": [
+          "ALL generated attack questions have been executed",
+          "Coverage = COMPLETE (Lens + Scopus + PatentBear + PatSnap all searched, no SEARCH_INCOMPLETE)",
+          "Mechanism diversity = HIGH (\u22653 materially different alternative mechanisms tested)",
+          "Adversarial success = candidate beats ALL same-problem alternatives on pre-registered metrics",
+          "In-vivo validation = PASS (for LEVEL_4_BUYER_READY)"
+        ],
+        "result": "LEVEL_4_BUYER_READY \u2014 freeze positive"
+      },
+      "CEILING_negative_freeze": {
+        "required": [
+          "Strongest alternative matches or beats candidate on SAME coupled problem",
+          "AND alternative survives equivalence test (6-axis match on objective + constraints)",
+          "AND engineering comparator shows alternative \u2265 candidate on primary metric"
+        ],
+        "result": "BELOW_BUYER_THRESHOLD \u2014 freeze negative ceiling, move to next territory"
+      },
+      "EXHAUSTED": {
+        "required": [
+          "Coverage = COMPLETE",
+          "No more credible attack questions can be generated",
+          "Mechanism diversity = HIGH (\u22653 materially different alternatives tested)",
+          "No alternative achieves SAME_PROBLEM_SAME_MECHANISM threat"
+        ],
+        "result": "WOULD_CONSIDER_WITH_MILESTONES \u2014 survive with milestones, move to next territory"
+      }
+    },
+    "do_not_terminate_if": [
+      "Only 1-2 alternatives tested (mechanism diversity LOW)",
+      "Alternatives are not materially different (e.g., same mechanism with minor variation)",
+      "Alternatives are not credible (straw-man)",
+      "Coverage = SEARCH_INCOMPLETE (sources unavailable)",
+      "Adversarial success not demonstrated (no engineering comparator run)"
+    ],
+    "mechanism_diversity_check": "Alternatives must use DIFFERENT physical principles, not just different parameters. E.g., 'threshold vs ML' is mechanism diversity; 'SVM vs RF' is NOT (both are ML)."
+  },
+  "false_positive_state": {
+    "definition": "A search result that is REAL but IRRELEVANT to the invention. The system records why it was rejected rather than silently discarding.",
+    "example": "Position #1 Scopus 'shunt active power filter' hits \u2014 electrical engineering, NOT CSF shunts. Real patents/papers, but off-topic.",
+    "schema": {
+      "result_id": "string",
+      "source": "Lens | Scopus | PatentBear | PatSnap | Google",
+      "result_title": "string",
+      "result_doi_or_patent_number": "string",
+      "why_rejected": "string \u2014 explicit reason",
+      "rejection_axis": "which of the 6 equivalence axes failed",
+      "rejection_classification": "NEIGHBORING_PROBLEM | DIFFERENT_PROBLEM",
+      "timestamp": "ISO 8601"
+    },
+    "purpose": [
+      "Prevents silent discarding of irrelevant results (auditability)",
+      "Documents that the search WAS executed (proves coverage)",
+      "Provides evidence for patent counsel that false positives were considered",
+      "Enables learning \u2014 patterns of false positives can improve future queries"
+    ]
+  },
+  "state_separation_v2": {
+    "principle": "A mechanism can be technically poor while patent coverage remains incomplete. Engineering and patent states are ALWAYS independent.",
+    "v8_example": "Territory #4 V8: ENGINEERING = CEILING (derivative does not beat instantaneous \u0394P) but PATENT = SEARCH_INCOMPLETE (Compendex unavailable, PatSnap family/citations failed).",
+    "state_combinations": [
+      {
+        "engineering": "PASS",
+        "patent": "NOT_FOUND_AFTER_COMPLETE_SEARCH",
+        "readiness": "WOULD_CONSIDER_WITH_MILESTONES (in-vivo needed)"
+      },
+      {
+        "engineering": "PASS",
+        "patent": "SEARCH_INCOMPLETE",
+        "readiness": "WOULD_CONSIDER_WITH_MILESTONES (restore sources first)"
+      },
+      {
+        "engineering": "PARTIAL",
+        "patent": "NOT_FOUND_AFTER_COMPLETE_SEARCH",
+        "readiness": "NOT_READY (engineering not buyer-grade)"
+      },
+      {
+        "engineering": "PARTIAL",
+        "patent": "SEARCH_INCOMPLETE",
+        "readiness": "NOT_READY (both incomplete)"
+      },
+      {
+        "engineering": "CEILING",
+        "patent": "NOT_FOUND_AFTER_COMPLETE_SEARCH",
+        "readiness": "BELOW_BUYER_THRESHOLD (engineering failed, even if novel)"
+      },
+      {
+        "engineering": "CEILING",
+        "patent": "SEARCH_INCOMPLETE",
+        "readiness": "BELOW_BUYER_THRESHOLD (engineering failed; patent state moot)"
+      },
+      {
+        "engineering": "FAIL",
+        "patent": "any",
+        "readiness": "BELOW_BUYER_THRESHOLD"
+      }
+    ],
+    "critical_rule": "Engineering CEILING \u2192 BELOW_BUYER_THRESHOLD regardless of patent state. A novel mechanism that doesn't work is still not buyer-grade."
+  },
+  "alternative_defeated_ledger": {
+    "purpose": "Every rejected alternative becomes part of the invention's provenance. Demonstrates that the invention was attacked, not just supported.",
+    "schema": {
+      "alternative_id": "string",
+      "alternative_description": "string \u2014 what the alternative is",
+      "alternative_source": "Scopus | Lens | PatentBear | PatSnap | generated_by_orchestrator",
+      "same_problem_test": {
+        "axis_1_objective": "match | mismatch",
+        "axis_2_mechanism": "match | mismatch",
+        "axis_3_constraints": "match | mismatch",
+        "axis_4_operating_environment": "match | mismatch",
+        "axis_5_output": "match | mismatch",
+        "axis_6_failure_mode": "match | mismatch",
+        "classification": "SAME_PROBLEM_SAME_MECHANISM | SAME_PROBLEM_DIFFERENT_MECHANISM | NEIGHBORING_PROBLEM | DIFFERENT_PROBLEM"
+      },
+      "evidence": "passage/simulation/hash",
+      "comparator": "engineering metric comparison (if SAME_PROBLEM)",
+      "result": "alternative_defeated | alternative_wins | alternative_neighboring",
+      "why_rejected": "string \u2014 explicit reason",
+      "timestamp": "ISO 8601"
+    },
+    "examples_from_current_work": [
+      {
+        "alternative_id": "ALT_P1_ML",
+        "alternative_description": "ML classifier (SVM/RF/KNN) on active features",
+        "same_problem_test": "SAME_PROBLEM_SAME_MECHANISM (both classify shunt state from active features)",
+        "evidence": "P1_ML_ABLATION_V2_RESULTS.json \u2014 B (ML+active) = 55.3%, A (threshold+active) = 55.8%",
+        "comparator": "B - A = -0.5pp (ML does NOT improve active)",
+        "result": "alternative_defeated (ML does not improve; threshold sufficient)",
+        "why_rejected": "ML adds complexity without benefit. Family D rejected."
+      },
+      {
+        "alternative_id": "ALT_P2_hydrogel",
+        "alternative_description": "Intrathecal polymeric nanocomposite hydrogel for drug delivery",
+        "same_problem_test": {
+          "axis_1_objective": "mismatch (SCI drug delivery vs CSF drainage + retention)",
+          "axis_2_mechanism": "mismatch (depot vs filter)",
+          "axis_3_constraints": "mismatch (no drainage constraint vs drainage maintained)",
+          "classification": "NEIGHBORING_PROBLEM"
+        },
+        "evidence": "Hydrogel paper (2010 Biomaterials) + 2014 follow-up abstract",
+        "comparator": "N/A \u2014 neighboring problem, no engineering comparator needed",
+        "result": "alternative_neighboring (does not solve same coupled problem)",
+        "why_rejected": "Hydrogel is a sustained-release depot, not a size-selective filtration element. Does not preserve drainage. Position #2b rejected."
+      },
+      {
+        "alternative_id": "ALT_P4_predictive",
+        "alternative_description": "Predictive trajectory controller (state estimation + prediction + proactive control)",
+        "same_problem_test": "SAME_PROBLEM_DIFFERENT_MECHANISM (both regulate CSF drainage, but predictive vs instantaneous)",
+        "evidence": "V7_PREDICTIVE_SIMULATION.json \u2014 C4 vs C3: M4 reduction = 0%, M1 reduction = 1%",
+        "comparator": "C4 dominates C3 in only 1/9 states",
+        "result": "alternative_defeated (predictive does not outperform instantaneous)",
+        "why_rejected": "Predictive controller CEILING \u2014 does not materially outperform instantaneous \u0394P. V7 frozen."
+      }
+    ]
+  },
+  "fda_clinical_reservation": {
+    "ceo_directive": "Do not add FDA/clinical/post-market into the live 1-10 discovery loop yet. Reserve as final portfolio reality audit.",
+    "exclusion_from_discovery_loop": [
+      "MAUDE is passive surveillance with causality/quality limitations \u2014 NOT a simplistic score input",
+      "ClinicalTrials.gov is structured human-evidence audit data \u2014 NOT merely 'clinical validation'",
+      "Both should be an ADVERSARIAL REALITY LAYER, not a discovery input"
+    ],
+    "final_audit_scope": {
+      "trigger": "After all 10 territories reach SURVIVOR/CEILING/EXHAUSTED",
+      "data_sources": [
+        "FDA MAUDE \u2014 adverse event reports for predicate devices (e.g., Medtronic Strata, Sophysa Polaris)",
+        "ClinicalTrials.gov \u2014 study results and adverse events for competing approaches",
+        "FDA 510(k) database \u2014 predicate device clearances",
+        "FDA De Novo database \u2014 novel device classifications"
+      ],
+      "audit_questions": [
+        "Do predicate devices have adverse events that our mechanism could prevent?",
+        "Do competing clinical trials reveal safety signals we missed?",
+        "Is our regulatory pathway (510(k) vs De Novo) supported by predicate landscape?",
+        "Are there post-market surveillance findings that change our risk assessment?"
+      ],
+      "audit_output": "FINAL_PORTFOLIO_REALITY_AUDIT.json \u2014 adversarial reality layer applied to all 10 territories"
+    },
+    "rationale": "Discovery loop (1-10) focuses on mechanism + patent. Clinical reality is applied AFTER, as adversarial audit, to prevent survivorship bias."
+  },
+  "implementation_status": "SPECIFICATION ONLY \u2014 V2 hardened. Implementation not started. One canonical orchestrator (no competing engines).",
+  "next_step": "Implement V2 as automated Python pipeline. Test on Territory #5 (Fouling / obstruction prevention) \u2014 first fully-automated territory."
+}
