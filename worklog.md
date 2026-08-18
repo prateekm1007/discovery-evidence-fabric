@@ -1547,3 +1547,235 @@ Stage Summary:
   #8: V2 CONDITIONAL_SURVIVE
   #9-10: 0% not started
 - GitHub commit + push pending.
+
+---
+Task ID: TERRITORY-2-FINAL-ADJUDICATION (subagent)
+Agent: subagent (general-purpose)
+Task: #2 final adjudication — multi-mechanism architecture crux question, minimal simulation, hostile attacks, final verdict.
+
+Work Log:
+- Read worklog (1448 lines) + all #2 artifacts in discovery-evidence-fabric/.
+- Reconciled #2 state: V8.2 5 architectures, V17 payload dependence, V18 multi-mechanism, V21 Pareto PARTIAL.
+- Crux question: Does multi-mechanism achieve pre-registered buyer threshold (T1 retention≥0.30, T2 drainage≥0.85, T3 robustness≥0.20 at 90th-pct, T4 selectivity≥1.5, T5 Pareto-optimality) for ALL 3 payload classes at 90 days across patient variability?
+- Pre-registered threshold BEFORE simulation (V1.1 §6.3 anti-inflation).
+- Minimal simulation (reused V18 washout physics, no new physics):
+  * Result: NO mechanism passes ALL 5 thresholds for ALL 3 payloads
+  * Multi-mechanism PARETO-DOMINATED by hydrodynamic alone for peptide/small_molecule
+  * V21 "pareto=true for all payloads" was INFLATED — used broken conc-based metric
+- 3 hostile attacks:
+  * A1 Payload variability (extended to 6 payloads): same size-dependent pattern, no mechanism passes all 6
+  * A2 Extreme patient variability (5x CSF production, 5x degradation, 5x protein): ALL mechanisms → ZERO retention at 90 days
+  * A3 Long-duration durability (365d, 1825d): ALL mechanisms → ZERO retention due to membrane degradation/fouling
+- FINAL VERDICT: NEGATIVE_CEILING for multi-mechanism architecture.
+  * PARTIAL SURVIVOR documented: Size-selective filtration alone (A1) for LARGE THERAPEUTICS (antibody, gene vector, nanoparticle) at NOMINAL conditions, ACUTE duration (≤90 days). Patentable as narrow sub-invention.
+  * V-next for A2 Affinity-Based Retention: IDENTIFIED but NOT AUTHORIZED — CEO must approve.
+
+Stage Summary:
+- #2 CLOSED with definitive verdict: NEGATIVE_CEILING.
+- V21 inflation explicitly called out (broken conc metric).
+- Partial survivor preserved without overclaiming (size-selective for large therapeutics only, acute only).
+- 5-axis: Mechanism 100% / Engineering 65% / Robustness 100% / IP 35% / Validation 0%.
+- CEO directive "do not let it become endless simulation refinement branch" — honored. Closed with minimal simulation (4 total: 1 crux + 3 hostile).
+- Artifacts: 6 files in CEREVASC_TERRITORY_2_FINAL_ADJUDICATION/
+- GitHub commit: e69afb4
+
+---
+Task ID: TERRITORY-8-V2 (subagent)
+Agent: subagent (general-purpose)
+Task: #8 V2 — VIEshunt hostile audit + sleep physiology + buyer-effect threshold.
+
+Work Log:
+- Step 1 VIEshunt passage audit: ALL 3 DISTINCTIONS SURVIVE at passage level
+  * Distinction 1 (venous pressure): SURVIVES — VIEshunt measures ventricular ICP only, no venous sinus pressure, drains to abdomen (no venous access)
+  * Distinction 2 (patient-specific calibration): SURVIVES at §102, WEAKENED at §103 — VIEshunt explicitly identifies patient-specific as "beyond scope"
+  * Distinction 3 (sleep apnea compensation): SURVIVES — VIEshunt has ZERO mentions of sleep/apnea/circadian; FSM has only 3 states (upright/supine/undefined)
+  * Additional finding: VIEshunt is functionally a VP-shunt (abdominal drainage) — M5_REFINED's venous pressure compensation is STRUCTURALLY IMPOSSIBLE for VIEshunt without re-architecting into eShunt
+- Step 2 Venous pressure observability: OBSERVABLE — GRADE A
+  * CardioMEMS FDA-approved precedent (IJ access, PMID 31525097)
+  * Clinical magnitude: 12-15 mmHg venous elevation causes shunt dysfunction (PMID 40854253)
+- Step 3 Sleep-state physiology: STRONG POSITIVE — GRADE A
+  * Sleep apnea causes B-waves up to 50 mmHg (PMID 37784168)
+  * 96% of iNPH patients have sleep apnea (primary adult shunting indication)
+  * Román 2019 (PMID 31144048) documents causal chain OSA → venous hypertension → ICP elevation
+- Step 4 Patient-specific calibration: FEASIBLE — GRADE A
+  * 1-7 day monitoring period sufficient
+  * ICM monitoring standard-of-care (1-3 day hospital stays common)
+- Step 5 Hostile simulation: Pre-registered buyer-effect threshold
+  * Naive controller: FAILS threshold (insufficient over-drainage reduction)
+  * B-wave tolerant controller: PASSES threshold (≥30% reduction in over-drainage during sleep)
+
+Stage Summary:
+- #8 V2 COMPLETE. M5_REFINED CONDITIONAL_SURVIVE_V2.
+- All 3 VIEshunt distinctions survive passage-level audit.
+- Venous pressure observable, sleep physiology strong, calibration feasible.
+- NAIVE controller fails hostile simulation; B-WAVE TOLERANT controller passes.
+- V3 AUTHORIZED ONLY for B-wave tolerant controller design (NOT naive).
+- 5-axis: Mechanism 65% / Engineering 25% / Robustness 50% / IP 45% / Validation 0%.
+- Artifacts: 8 V2 JSON files in CEREVASC_TERRITORY_8_PATIENT_SPECIFIC_ADAPTIVE/
+- GitHub commit: 71a07d1
+
+---
+Task ID: TERRITORY-6-V5-A4-RESOLUTION-SMA-PRODUCTION-5-AXES
+Agent: main (session 2026-08-18)
+Task: Per CEO V5 directive — (1) A4 vs M3 technical resolution: what does M3 do that A4 cannot? (2) SMA Af/hysteresis under realistic production distribution + drift (not just tolerance tightening); (3) manufacturing cost consequence if tighter tolerance required; (4) 5 SEPARATE axes (engineering superiority / §103 / manufacturability / chronic safety / buyer value).
+
+Work Log:
+- Built /home/z/my-project/scripts/t6_v5_complete.py (450+ lines) with 5 stages.
+
+- V5 RESULTS (written to CEREVASC_TERRITORY_6_RETRIEVAL_RESCUE/V5_COMPLETE.json):
+
+  STAGE 1 — A4 vs M3 TECHNICAL DIFFERENTIATION:
+    M3 UNIQUE TECHNICAL CAPABILITIES (A4 cannot reproduce):
+      1. Binary release (SMA thermodynamic transition — deterministic; A4 depends on cold saline diffusion, non-uniform)
+      2. No catheter advancement (SMA integrated, triggered externally; A4 requires catheter advancement through venous sinus — vessel injury risk)
+      3. Pre-positioned release (no fluoroscopy positioning; A4 requires 5-15 min fluoroscopy)
+      4. Self-test capability (low-energy pulse verifies SMA function pre-activation; A4 cannot test without breaking adhesion)
+      5. Selective anchor-only release (SMA at anchor-shunt junction; A4 non-selective, cold diffuses everywhere)
+    M3 CRITICAL ADVANTAGES: 5
+
+    A4 UNIQUE TECHNICAL CAPABILITIES (M3 cannot reproduce):
+      7. No permanent material modification (no SMA + isolation added to implant)
+      8. Universal applicability (any endovascular implant — NOT CereVasc-relevant)
+      9. Lower manufacturing cost (~$500-2000/implant savings)
+    A4 CRITICAL ADVANTAGES: 2
+
+    CEO QUESTION ANSWER: YES — M3's critical advantages (binary release, no catheter advancement, self-test, selective release) are CLINICALLY IMPORTANT and A4 CANNOT reproduce them. A4's advantages (no permanent modification, lower cost) are MANUFACTURING/COMMERCIAL, not clinical. For CereVasc buyer (clinical优先), M3's clinical advantages outweigh A4's commercial advantages. Thermal/implant complexity IS justified.
+
+  STAGE 2 — SMA Af/HYSTERESIS PRODUCTION DISTRIBUTION + DRIFT:
+    Monte Carlo: 10,000 implants, Af ~ Normal(42, 1.2) per ASTM F2063, hysteresis ~ Normal(10, 2)
+    Long-term drift: +0.1°C/year × 5 years = +0.5°C Af shift
+    RESULT:
+      Activates within T4 limit (50°C): 9545/10000 (95.45%)
+      FAILS (T_required > 50°C): 455/10000 (4.55%)
+      T_required distribution: Mean 47.49°C, P95 49.93°C, P99 50.86°C, Max 52.00°C
+    Tighter tolerance (±1°C vs ±2°C): failure rate drops to 1.28% (98.72% pass)
+
+  STAGE 3 — MANUFACTURING COST CONSEQUENCE:
+    Standard tolerance (±2°C): $1819/good implant, 4.55% failure rate
+    Tighter tolerance (±1°C): $2344/good implant, 1.28% failure rate
+    COST DELTA: +$525/implant (+28.9%) for tighter tolerance
+    For 10,000 implants/year: +$5.25M annual cost
+    DECISION: STANDARD TOLERANCE ACCEPTABLE — 4.55% failure rate is acceptable for retrieval device used in <5% of patients. MITIGATION: M3 self-test capability identifies failed-SMA implants BEFORE retrieval attempt → fall back to standard snare. Makes 4.55% failure rate MANAGEABLE without tighter tolerance.
+
+  STAGE 4 — 5 SEPARATE AXES (per CEO):
+    Axis                              M3    A4    Winner
+    1 Engineering Superiority         8.5   6.0   M3_REFINED
+    2 §103 Differentiation            6.5   8.0   A4_cryo_debonding
+    3 Manufacturability               5.5   7.5   A4_cryo_debonding
+    4 Chronic Safety                  7.5   8.5   A4_cryo_debonding
+    5 Buyer Value                     8.0   7.0   M3_REFINED
+    AXIS WINS: M3 = 2, A4 = 3
+
+  STAGE 5 — ADJUDICATION:
+    AGGREGATE SCORES: M3 36.0/50 (avg 7.20), A4 37.0/50 (avg 7.40)
+    Delta: -1.0 (M3 trails by 0.20 avg — within 0.5 threshold)
+    STATUS: PARALLEL_DEVELOPMENT_V5
+    VERDICT: M3 (7.20) and A4 (7.40) within 0.5 points — too close to call. M3 wins on engineering/buyer axes; A4 wins on §103/manufacturability/chronic axes. BOTH retained for parallel V6 development. Decision deferred to V6 benchtop data.
+
+  5-AXIS TRACKER (NEVER AVERAGED):
+    1. Mechanism Exploration              85.0%  (V5 added A4 technical differentiation)
+    2. Engineering Evidence               70.0%  (V5 added SMA production MC, cost analysis)
+    3. Robustness/Falsification           75.0%  (V5 added production distribution attack)
+    4. Prior-Art/IP Exhaustion            70.0%  (V5 added A4 prior-art comparative)
+    5. Real-World Validation Readiness     0.0%  (unchanged)
+
+Stage Summary:
+- TERRITORY-6-V5 COMPLETE. PARALLEL_DEVELOPMENT — M3 and A4 too close to call.
+- M3 has 5 CRITICAL clinical advantages (binary release, no catheter advancement, self-test, selective release) that A4 CANNOT reproduce.
+- A4 has 2 commercial advantages (no permanent modification, lower cost) + lower §103 risk + better chronic safety.
+- SMA production distribution: 4.55% failure rate at standard tolerance — MANAGEABLE via self-test fallback (no tighter tolerance needed).
+- Manufacturing cost: tighter tolerance adds $525/implant (+28.9%) — NOT cost-effective.
+- V6 AUTHORIZED for parallel benchtop comparison of M3 vs A4.
+- Artifacts: CEREVASC_TERRITORY_6_RETRIEVAL_RESCUE/V5_COMPLETE.json
+
+---
+Task ID: TERRITORY-7-V3-PLGA-pH-FRAGMENTATION
+Agent: main (session 2026-08-18)
+Task: Per CEO V3 directive — quantify PLGA degradation kinetics, local pH/endothelial response (DO NOT assume natural metabolites = safe local dose), fragmentation/embolization attack.
+
+Work Log:
+- Built /home/z/my-project/scripts/t7_v3_complete.py (470+ lines) with 5 stages.
+
+- V3 RESULTS (written to CEREVASC_TERRITORY_7_VENOUS_INTERFACE_PROTECTION/V3_COMPLETE.json):
+
+  STAGE 1 — PLGA DEGRADATION KINETICS:
+    3 PLGA ratios tested (50:50, 75:25, 85:15) with exponential decay model
+    Sleeve: 50mg, 0.5mm thick, ~2.5cm² surface area
+    T5 threshold: ≥30% mass at 60 days (structural integrity through critical healing window)
+    RESULTS:
+      50:50 PLGA: 13.2% mass at 60 days — T5 FAIL
+      75:25 PLGA (V2 selected): 33.3% mass at 60 days — T5 PASS (marginal)
+      85:15 PLGA: 57.4% mass at 60 days — T5 PASS (comfortable)
+    RECOMMENDATION: Use 85:15 PLGA (not 75:25 from V2) for structural integrity
+
+  STAGE 2 — LOCAL pH MODELING (CEO: don't assume natural metabolites = safe):
+    Model: peak acid production rate / (local tissue perfusion clearance + diffusion clearance)
+    Local tissue perfusion: 0.1 mL/min (venous sinus wall poorly perfused)
+    Blood buffer capacity: 25 mmol/L/pH unit (bicarbonate)
+    RESULTS:
+      50:50 PLGA: local pH 7.393 (drop 0.007) — T8 PASS
+      75:25 PLGA: local pH 7.397 (drop 0.003) — T8 PASS
+      85:15 PLGA: local pH 7.399 (drop 0.001) — T8 PASS
+    All ratios maintain local pH ≥ 5.5 — blood flow clearance is effective.
+    CEO concern addressed: local dose/kinetics ARE safe given venous blood flow.
+
+  STAGE 3 — ENDOTHELIAL RESPONSE:
+    pH thresholds: normal 7.35-7.45, mild dysfunction 7.0-7.3, moderate 6.5-7.0, significant 6.0-6.5, severe <6.0
+    V3 local pH results: all PLGA ratios maintain pH ~7.4 (normal range)
+    Endothelial response at modeled pH: BENIGN
+    Caveat: model assumes uniform blood flow; in-vitro validation required for low-flow regions
+    VERDICT: CONDITIONAL_PASS
+
+  STAGE 4 — FRAGMENTATION/EMBOLIZATION (CEO: does sleeve remain where intended?):
+    Monte Carlo: 1000 sleeves, 180 days, 85:15 PLGA
+    WITHOUT mitigation:
+      Fragmentation events: 292/1000 (29.2%)
+      Embolization events: 93/1000 (9.3%) — T7 FAILS (0 required)
+      Deployment-period embolization (Day 0-7): 0/1000 — T7 deployment PASSES
+    WITH outer mesh mitigation (ePTFE constraint):
+      Fragmentation: 259/1000 (still occurs but contained)
+      Embolization: 5/1000 (0.50%) — T7 STILL FAILS (0 required)
+    Outer mesh REDUCES embolization by ~95% but does not eliminate it.
+    DESIGN CONSTRAINT ADDED: outer non-degrading mesh REQUIRED but insufficient alone.
+
+  STAGE 5 — ADJUDICATION:
+    Threshold results (85:15 PLGA + outer mesh):
+      T5 mechanical integrity: ✅ PASS (57.4% at 60 days)
+      T7 embolization: ❌ FAIL (0.50% with mitigation, 0 required)
+      T8 local pH: ✅ PASS (pH 7.399)
+      Endothelial response: ✅ SAFE
+    Total: 3/4 thresholds PASS
+    STATUS: PROVISIONAL_PARTIAL_V3
+    VERDICT: M9 PARTIAL V3. PLGA degradation + pH + endothelial all PASS. Fragmentation/embolization FAILS even with outer mesh mitigation. Requires additional design iteration: toughened PLGA + perforation pattern + outer mesh + periodic integrity imaging.
+
+  5-AXIS TRACKER (NEVER AVERAGED):
+    1. Mechanism Exploration              80.0%
+    2. Engineering Evidence               45.0%  (T5/T7/T8/endothelial — 3/4 pass)
+    3. Robustness/Falsification           65.0%  (fragmentation attack identified critical weakness)
+    4. Prior-Art/IP Exhaustion            65.0%  (unchanged)
+    5. Real-World Validation Readiness     0.0%  (unchanged)
+
+Stage Summary:
+- TERRITORY-7-V3 COMPLETE. M9 PROVISIONAL_PARTIAL_V3 (3/4 thresholds pass).
+- PLGA degradation kinetics: 85:15 ratio recommended (not 75:25 from V2).
+- Local pH SAFE (7.399) — CEO concern about "natural metabolites ≠ safe local dose" addressed: blood flow clearance effective.
+- Endothelial response BENIGN at modeled pH.
+- CRITICAL WEAKNESS: fragmentation/embolization — 0.50% embolization rate even with outer mesh (T7 requires 0).
+- Design iteration needed: toughened PLGA + perforation pattern (large capturable fragments) + outer mesh + periodic imaging.
+- Honest negative: T7 embolization is the weak point. If design iteration cannot achieve 0 embolization, M9 may need architecture change.
+- Artifacts: CEREVASC_TERRITORY_7_VENOUS_INTERFACE_PROTECTION/V3_COMPLETE.json
+
+Portfolio status after V5/V3/V2/V2-final:
+  #1: FROZEN — NEGATIVE CEILING
+  #2: FROZEN — NEGATIVE CEILING (V-final; partial survivor for large therapeutics only)
+  #3: VALIDATION-READY / FROZEN
+  #4: FROZEN — NEGATIVE CEILING
+  #5: FROZEN — NEGATIVE CEILING
+  #6: PARALLEL_DEVELOPMENT_V5 (M3 7.20 vs A4 7.40 — too close to call)
+    - Mechanism 85% / Engineering 70% / Robustness 75% / IP 70% / Validation 0%
+  #7: PROVISIONAL_PARTIAL_V3 (3/4 thresholds pass; T7 embolization FAILS)
+    - Mechanism 80% / Engineering 45% / Robustness 65% / IP 65% / Validation 0%
+  #8: CONDITIONAL_SURVIVE_V2 (M5_REFINED; B-wave tolerant controller design only)
+    - Mechanism 65% / Engineering 25% / Robustness 50% / IP 45% / Validation 0%
+  #9-10: 0% not started
+
