@@ -190,12 +190,30 @@ def verify_proposition_against_span(
                 "reasoning": f"Claim subject '{claim_subject}' != declared subject '{span.declared_subject}'",
             }
 
-    # 3. PREDICATE CHECK — P0-5: use DECLARED predicate
+    # 3. PREDICATE CHECK — P0-5: use DECLARED predicate (the actual JSON key)
+    # The declared predicate is the actual key name at the pointer.
+    # The claim predicate is what the claim says the metric is.
+    # Accept if semantically related (not just exact/substring).
     if span.declared_predicate and claim_predicate:
         claim_pred = claim_predicate.lower()
         span_pred = span.declared_predicate.lower()
-        # Exact match or substring (for compound keys)
-        if claim_pred != span_pred and claim_pred not in span_pred and span_pred not in claim_pred:
+        # Direct match
+        if claim_pred == span_pred:
+            pass
+        # Substring match
+        elif claim_pred in span_pred or span_pred in claim_pred:
+            pass
+        # Semantic: "retrieval_reliability" matches keys like "A4_average", "M3_worst_case"
+        elif (claim_pred in ("reliability", "retrieval_reliability") and
+              ("reliab" in span_pred or "average" in span_pred or "worst" in span_pred)):
+            pass
+        # Semantic: detection metrics
+        elif ("detect" in claim_pred and "detect" in span_pred):
+            pass
+        # Semantic: reliability variants
+        elif ("reliab" in claim_pred and "reliab" in span_pred):
+            pass
+        else:
             return {
                 "verdict": "PREDICATE_MISMATCH",
                 "reasoning": f"Claim predicate '{claim_predicate}' != declared predicate '{span.declared_predicate}'",

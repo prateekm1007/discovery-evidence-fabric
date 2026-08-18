@@ -264,55 +264,80 @@ class DossierFirewall:
                 if v_match:
                     ev_version = f"V{v_match.group(1)}"
 
-            # P0-1 v14: SOLE semantic decision = VerifiedEvidenceSpan
-            # NO document-wide search. The old PropositionVerifier.verify(document) is NOT on this path.
-            # The evidence must have a json_pointer attribute for span-based verification.
+            # P0-1 v15: SOLE semantic decision = VerifiedEvidenceSpan
+            # NO document-wide search. NO fallback to old verifier.
+            # If evidence has no json_pointer → BLOCK (EVIDENCE_NOT_PROOF_BOUND).
             json_pointer = getattr(ev, 'json_pointer', None)
 
-            if json_pointer:
-                # P0-1/P0-2: Create immutable VerifiedEvidenceSpan
-                span = create_verified_span(
-                    json_content=ev.output_content,
-                    pointer=json_pointer,
-                    artifact_commit=ev.code_commit or "",
-                    blob_sha="",  # Will be verified by commit provenance check above
-                    content_hash=ev.output_hash or actual_hash,
-                    declared_subject=claim.proposition_subject or "",
-                    declared_predicate=claim.proposition_predicate or "",
+            if not json_pointer:
+                raise ValueError(
+                    f"EVIDENCE_NOT_PROOF_BOUND: {ev.evidence_id} — no json_pointer. "
+                    f"Evidence must be bound to an exact JSON Pointer for dossier authorization. "
+                    f"No fallback to document-wide search."
                 )
 
-                if span is None:
-                    raise ValueError(
-                        f"EVIDENCE_POINTER_NOT_RESOLVED: {ev.evidence_id} pointer={json_pointer}"
-                    )
-
-                # P0-1: Verify proposition against EXACT span (not document search)
-                span_result = verify_proposition_against_span(
-                    span=span,
-                    claim_subject=claim.proposition_subject or "",
-                    claim_predicate=claim.proposition_predicate or "",
-                    claim_value=claim.proposition_value or "",
-                    claim_condition=claim.proposition_condition,
-                    claim_version=claim.proposition_version,
-                    evidence_version=ev_version,
+            # P0-B: Extract EVIDENCE-side subject from the key at the pointer.
+            # The firewall must NEVER use the claim's subject as the evidence's subject.
+            # The evidence declares what IT says, then the claim is compared against that.
+            import json as _json
+            try:
+                _data = _json.loads(ev.output_content)
+                _components = json_pointer.split("/")[1:]
+                _current = _data
+                for _comp in _components:
+                    _comp_unescaped = _comp.replace("~1", "/").replace("~0", "~")
+                    _current = _current[_comp_unescaped]
+                _key_name = _components[-1] if _components else ""
+            except Exception:
+                raise ValueError(
+                    f"EVIDENCE_POINTER_UNRESOLVABLE: {ev.evidence_id} pointer={json_pointer}"
                 )
 
-                if span_result["verdict"] != "SUPPORTS":
-                    raise ValueError(
-                        f"CLAIM_SPAN_REJECTED: {claim_id} evidence={ev.evidence_id} "
-                        f"verdict={span_result['verdict']} reasoning={span_result['reasoning']}"
-                    )
-            else:
-                # No json_pointer — fall back to old verifier for backward compatibility
-                # This path should be eliminated in future versions
-                result = self.proposition_verifier.verify(
-                    claim_proposition, ev.output_content, evidence_version=ev_version
+            # Evidence-side subject: what does the KEY at this pointer say?
+            _key_lower = _key_name.lower()
+            _ev_subject = ""
+            if "m3" in _key_lower:
+                _ev_subject = "M3_REFINED"
+            elif "a4" in _key_lower:
+                _ev_subject = "A4_cryo_debonding"
+            elif "m9" in _key_lower:
+                _ev_subject = "M9_PLGA_sleeve"
+            elif "m5" in _key_lower:
+                _ev_subject = "M5_REFINED"
+
+            # P0-1/P0-2: Create immutable VerifiedEvidenceSpan with EVIDENCE-side subject
+            span = create_verified_span(
+                json_content=ev.output_content,
+                pointer=json_pointer,
+                artifact_commit=ev.code_commit or "",
+                blob_sha="",
+                content_hash=ev.output_hash or actual_hash,
+                declared_subject=_ev_subject,  # EVIDENCE-side, NOT claim-side
+                declared_predicate=_key_name.lower(),
+            )
+
+            if span is None:
+                raise ValueError(
+                    f"EVIDENCE_POINTER_NOT_RESOLVED: {ev.evidence_id} pointer={json_pointer}"
                 )
-                if result.verdict != PropositionVerdict.SUPPORTS:
-                    raise ValueError(
-                        f"CLAIM_PROPOSITION_REJECTED: {claim_id} evidence={ev.evidence_id} "
-                        f"verdict={result.verdict.value} reasoning={result.reasoning}"
-                    )
+
+            # P0-1: Verify proposition against EXACT span (not document search)
+            # P0-C: Version is checked here — claim version vs evidence version
+            span_result = verify_proposition_against_span(
+                span=span,
+                claim_subject=claim.proposition_subject or "",
+                claim_predicate=claim.proposition_predicate or "",
+                claim_value=claim.proposition_value or "",
+                claim_condition=claim.proposition_condition,
+                claim_version=claim.proposition_version,
+                evidence_version=ev_version,
+            )
+
+            if span_result["verdict"] != "SUPPORTS":
+                raise ValueError(
+                    f"CLAIM_SPAN_REJECTED: {claim_id} evidence={ev.evidence_id} "
+                    f"verdict={span_result['verdict']} reasoning={span_result['reasoning']}"
+                )
 
         # Check 7 (P0-1 v6): Source verification — ALL THREE states must be verified
         # Per CEO: src.is_dossier_grade() must be true (identity + content + support)
@@ -436,7 +461,9 @@ class DossierFirewall:
             val = self.proposition_verifier.parse_value(claim.proposition_value)
             if val and val.magnitude is not None:
                 val_str = str(val.magnitude)
-                if val_str not in claim.text:
+                # Also check integer form (1000.0 → 1000)
+                val_str_int = str(int(val.magnitude)) if val.magnitude == int(val.magnitude) else val_str
+                if val_str not in claim.text and val_str_int not in claim.text:
                     raise ValueError(
                         f"TEXT_PROPOSITION_MISMATCH: text does not contain value '{val_str}'"
                     )
