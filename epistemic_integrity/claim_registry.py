@@ -60,12 +60,18 @@ class Claim:
 
 
 class ClaimRegistry:
-    """In-memory + on-disk registry of all canonical claims."""
+    """In-memory + on-disk registry of all canonical claims.
 
-    def __init__(self, registry_dir: Path):
+    Per CEO P0-E: claim validation must verify the ACTUAL binding graph,
+    not just nonempty ID lists. The registry takes EvidenceBinding as
+    an optional dependency for binding graph verification.
+    """
+
+    def __init__(self, registry_dir: Path, evidence_binding=None):
         self.registry_dir = Path(registry_dir)
         self.registry_dir.mkdir(parents=True, exist_ok=True)
         self.claims: Dict[str, Claim] = {}
+        self.evidence_binding = evidence_binding  # P0-E: optional binding graph verifier
         self._load()
 
     def _registry_file(self) -> Path:
@@ -168,8 +174,17 @@ class ClaimRegistry:
         errors = []
 
         # Rule 1: Every claim MUST have at least one evidence binding
+        # Per CEO P0-E: verify ACTUAL binding graph, not just nonempty IDs
         if not claim.evidence_ids and not claim.source_ids:
             errors.append("MISSING_EVIDENCE_BINDING: claim has no evidence_ids and no source_ids")
+        elif self.evidence_binding:
+            # Verify the actual binding graph exists and is consistent
+            binding_check = self.evidence_binding.verify_binding_graph(claim_id)
+            if not binding_check["valid"]:
+                errors.extend(binding_check["errors"])
+            # Also check that at least one verified evidence/source exists
+            if not binding_check["verified_evidence_ids"] and not binding_check["verified_source_ids"]:
+                errors.append("BINDING_GRAPH_EMPTY: no verified evidence or sources after graph check")
 
         # Rule 2: SUPERSEDED evidence cannot support current claims
         if claim.supersession_status == "SUPERSEDED":

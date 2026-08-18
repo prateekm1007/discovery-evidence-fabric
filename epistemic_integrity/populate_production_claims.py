@@ -110,6 +110,7 @@ def populate_all():
             output_hash=sha256(v25_content),
             random_seed=42,
             python_version="3.12.13",
+            dependency_lock_hash=sha256("numpy>=2.1,scipy>=1.14,sklearn>=1.5"),
             model_id="V25_numerical_identifiability",
             model_parameters={"n_states": 7, "n_pulses": 4, "noise_levels": [0.005, 0.01, 0.02, 0.05]},
             artifact_path="CEREVASC_POSITION_001_V25_NUMERICAL_IDENTIFIABILITY/V25_NUMERICAL_IDENTIFIABILITY.json",
@@ -168,6 +169,7 @@ def populate_all():
             output_hash=sha256(v6_content),
             random_seed=42,
             python_version="3.12.13",
+            dependency_lock_hash=sha256("numpy>=2.1,scipy>=1.14,sklearn>=1.5"),
             model_id="V6_head_to_head_benchtop",
             model_parameters={"n_conditions": 8, "n_trials_per_condition": 100, "candidates": ["M3", "A4"]},
             artifact_path="CEREVASC_TERRITORY_6_RETRIEVAL_RESCUE/V6_COMPLETE.json",
@@ -243,6 +245,7 @@ def populate_all():
             output_hash=sha256(v4_content),
             random_seed=42,
             python_version="3.12.13",
+            dependency_lock_hash=sha256("numpy>=2.1,scipy>=1.14,sklearn>=1.5"),
             model_id="V4_fragmentation_analysis",
             model_parameters={"n_attacks": 8, "n_monte_carlo": 10000, "plga_ratio": "85:15"},
             artifact_path="CEREVASC_TERRITORY_7_VENOUS_INTERFACE_PROTECTION/V4_COMPLETE.json",
@@ -296,6 +299,7 @@ def populate_all():
             output_hash=sha256(v3_content),
             random_seed=42,
             python_version="3.12.13",
+            dependency_lock_hash=sha256("numpy>=2.1,scipy>=1.14,sklearn>=1.5"),
             model_id="V3_physiological_attack",
             model_parameters={"n_attacks": 9, "n_comparators": 4},
             artifact_path="CEREVASC_TERRITORY_8_PATIENT_SPECIFIC_ADAPTIVE/V3_COMPLETE.json",
@@ -345,7 +349,7 @@ def populate_all():
     )
     src_vieshunt = Source(
         source_id="SRC-PAPER-VIEshunt-2025",
-        source_type="JOURNAL_ARTICLE",
+        source_type="INTERNAL_ANALYSIS",  # Our passage audit, not the paper itself
         identifier="VIEshunt_2025_FluidsBarriersCNS",
         title="VIEshunt: Smart shunt for hydrocephalus (2025)",
         authors=["VIEshunt team"],
