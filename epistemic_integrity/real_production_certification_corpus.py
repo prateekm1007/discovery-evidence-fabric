@@ -135,8 +135,8 @@ class RealProductionCertificationCorpus:
           6. Mark provenance as INCOMPLETE (V6 artifact doesn't contain original experiment provenance)
         """
         artifact_path = "CEREVASC_TERRITORY_6_RETRIEVAL_RESCUE/V6_COMPLETE.json"
-        # v25: Updated to post-scrub commit SHA (git filter-repo rewrote history)
-        short_commit = "88140df"
+        # v26: Updated to post-pass-3 commit SHA (OpenRouter key scrub)
+        short_commit = "dcd8d45"
 
         # Get full provenance from git
         full_commit = get_full_commit_sha(short_commit)

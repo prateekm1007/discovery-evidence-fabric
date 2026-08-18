@@ -46,18 +46,21 @@ def get_blob_content_hash(blob_sha: str) -> str:
 
 
 # Map territory → (artifact_path, commit_short_sha, version)
-# v25: Updated commit SHAs to post-scrub values (git filter-repo rewrote history)
+# v26: Updated commit SHAs to post-pass-3 values (git filter-repo pass 3
+#      scrubbed the OpenRouter API key that was missed by pass 1).
+#      All artifact content hashes are UNCHANGED — pass 3 only modified
+#      blobs containing the OpenRouter key (discovery_fabric/a2/*.py).
 TERRITORY_ARTIFACTS = {
-    "CV-T01": ("CEREVASC_POSITION_001_V25_NUMERICAL_IDENTIFIABILITY/V25_NUMERICAL_IDENTIFIABILITY.json", "8f11535", "V25"),
-    "CV-T02": ("CEREVASC_TERRITORY_2_FINAL_ADJUDICATION/T2_FINAL_ADJUDICATION.json", "6bdc717", "V-FINAL"),
-    "CV-T03": ("CEREVASC_INVENTION_003_V1/22_FINAL_ADJUDICATION.json", "31042b0", "V8.8"),
-    "CV-T04": ("CEREVASC_POSITION_004_V6_PATSNAP_COMPLETE/FINAL_VERDICT_V6_PATSNAP_COMPLETE.json", "3ac4f70", "V8"),
-    "CV-T05": ("CEREVASC_POSITION_005_V2_HOSTILE_ATTACK/V10_ROBUSTNESS_ADJUDICATION.json", "a3bb6dd", "V18"),
-    "CV-T06": ("CEREVASC_TERRITORY_6_RETRIEVAL_RESCUE/V6_COMPLETE.json", "88140df", "V6"),
-    "CV-T07": ("CEREVASC_TERRITORY_7_VENOUS_INTERFACE_PROTECTION/V4_COMPLETE.json", "88140df", "V4"),
-    "CV-T08": ("CEREVASC_TERRITORY_8_PATIENT_SPECIFIC_ADAPTIVE/V3_COMPLETE.json", "88140df", "V3"),
-    "CV-T09": ("CEREVASC_TERRITORY_9_CNS_THERAPY_PLATFORM/T9_DISCOVERY_REPORT.json", "82f45e4", "V1"),
-    "CV-T10": ("CEREVASC_TERRITORY_10_LIFECYCLE_INTELLIGENCE/T10_DISCOVERY_REPORT.json", "82f45e4", "V1"),
+    "CV-T01": ("CEREVASC_POSITION_001_V25_NUMERICAL_IDENTIFIABILITY/V25_NUMERICAL_IDENTIFIABILITY.json", "05fb09c", "V25"),
+    "CV-T02": ("CEREVASC_TERRITORY_2_FINAL_ADJUDICATION/T2_FINAL_ADJUDICATION.json", "54a12b1", "V-FINAL"),
+    "CV-T03": ("CEREVASC_INVENTION_003_V1/22_FINAL_ADJUDICATION.json", "58ccd4a", "V8.8"),
+    "CV-T04": ("CEREVASC_POSITION_004_V6_PATSNAP_COMPLETE/FINAL_VERDICT_V6_PATSNAP_COMPLETE.json", "efc554e", "V8"),
+    "CV-T05": ("CEREVASC_POSITION_005_V2_HOSTILE_ATTACK/V10_ROBUSTNESS_ADJUDICATION.json", "4ad58ad", "V18"),
+    "CV-T06": ("CEREVASC_TERRITORY_6_RETRIEVAL_RESCUE/V6_COMPLETE.json", "dcd8d45", "V6"),
+    "CV-T07": ("CEREVASC_TERRITORY_7_VENOUS_INTERFACE_PROTECTION/V4_COMPLETE.json", "dcd8d45", "V4"),
+    "CV-T08": ("CEREVASC_TERRITORY_8_PATIENT_SPECIFIC_ADAPTIVE/V3_COMPLETE.json", "dcd8d45", "V3"),
+    "CV-T09": ("CEREVASC_TERRITORY_9_CNS_THERAPY_PLATFORM/T9_DISCOVERY_REPORT.json", "0823583", "V1"),
+    "CV-T10": ("CEREVASC_TERRITORY_10_LIFECYCLE_INTELLIGENCE/T10_DISCOVERY_REPORT.json", "0823583", "V1"),
 }
 
 # Load canonical portfolio
@@ -82,14 +85,14 @@ for t in portfolio.get("territories", []):
             to_state="NOT_IN_CERTIFICATION_SCOPE",
             artifact_id=f"{tid}-branch",
             artifact_version="V1",
-            commit_sha=get_full_commit_sha("88140df"),
+            commit_sha=get_full_commit_sha("dcd8d45"),
             reason="Narrow branch, not yet developed. Explicitly excluded from certification scope.",
             artifact_hash=None,  # No artifact for scope-excluded territory
         )
         continue
 
     # Get artifact info
-    artifact_path, short_commit, version = TERRITORY_ARTIFACTS.get(tid, (None, "88140df", "V1"))
+    artifact_path, short_commit, version = TERRITORY_ARTIFACTS.get(tid, (None, "dcd8d45", "V1"))
 
     if artifact_path is None:
         # No artifact path — can't anchor

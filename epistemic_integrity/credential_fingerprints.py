@@ -79,6 +79,14 @@ CREDENTIAL_FORMAT_PATTERNS = {
         "pattern": r"(?<![A-Za-z0-9_])ghp_[A-Za-z0-9]{36}(?![A-Za-z0-9])",
         "description": "GitHub PAT format (ghp_ + exactly 36 alphanumeric, with boundaries)",
     },
+    "OPENROUTER_KEY_FORMAT": {
+        # v26: OpenRouter API keys are "sk-or-v1-" + exactly 64 hex chars.
+        # Added after credential_audit_split.py discovered this key format
+        # was missed by the v25 scrub (the sk-[A-Za-z0-9]{30,} regex didn't
+        # match because OpenRouter keys contain hyphens).
+        "pattern": r"(?<![A-Za-z0-9])sk-or-v1-[a-f0-9]{64}(?![A-Za-z0-9])",
+        "description": "OpenRouter API key format (sk-or-v1- + exactly 64 hex chars)",
+    },
 }
 
 # Forbidden filenames that should never appear in git history

@@ -191,6 +191,34 @@ class ResearchAuthorizationGate:
         if not g7.passed:
             blocking_reasons.append(f"G7 GOLDEN_CORPUS: {g7.details}")
 
+        # G10: Post-scrub evidence revalidation (CEO v25 P0-2)
+        # Verifies every ledger artifact resolves post-scrub commit→blob→content_hash
+        g10 = self._post_scrub_evidence_revalidation()
+        checks.append(g10)
+        if not g10.passed:
+            blocking_reasons.append(f"G10 POST_SCRUB_REVALIDATION: {g10.details}")
+
+        # G11: Historical artifact audit (CEO v25 P0-3)
+        # Verifies no unauthorized modifications in scientific artifacts
+        g11 = self._historical_artifact_audit()
+        checks.append(g11)
+        if not g11.passed:
+            blocking_reasons.append(f"G11 HISTORICAL_ARTIFACT_AUDIT: {g11.details}")
+
+        # G12: Credential audit split (CEO v25 P0-4)
+        # Split verification: pattern_scan + historical_object/path_audit
+        g12 = self._credential_audit_split()
+        checks.append(g12)
+        if not g12.passed:
+            blocking_reasons.append(f"G12 CREDENTIAL_AUDIT_SPLIT: {g12.details}")
+
+        # G13: Authorization binding (CEO v25 P0-5)
+        # Binds source_commit == detached_worktree_commit + all P0 control hashes
+        g13 = self._authorization_binding()
+        checks.append(g13)
+        if not g13.passed:
+            blocking_reasons.append(f"G13 AUTHORIZATION_BINDING: {g13.details}")
+
         authorized = len(blocking_reasons) == 0
 
         # P0-2: Compute production root hash AFTER certification
@@ -840,6 +868,170 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                                   raw_result={"mismatches": mismatches, "uses_real_artifacts": True})
         except Exception as e:
             return FreshCheck("G7", "real_e2e_corpus", False,
+                              f"Error: {e}",
+                              self.git_head, self.verifier_version, self.schema_version)
+
+    def _post_scrub_evidence_revalidation(self) -> FreshCheck:
+        """G10 (CEO v25 P0-2): Post-scrub evidence revalidation capsule.
+
+        Verifies every ledger artifact resolves:
+          commit_sha → git commit exists → artifact path exists →
+          blob_sha resolves → SHA256(blob) == artifact_hash
+
+        Also verifies ledger_root_hash matches replay and portfolio
+        projection matches canonical.
+        """
+        try:
+            sys.path.insert(0, str(REPO_ROOT))
+            from epistemic_integrity.post_scrub_evidence_revalidation import build_capsule
+
+            capsule = build_capsule(certified_commit=self.git_head)
+
+            if capsule.all_artifacts_valid:
+                return FreshCheck(
+                    "G10", "post_scrub_evidence_revalidation", True,
+                    f"capsule_hash={capsule.capsule_hash[:16]}... "
+                    f"ledger_root={capsule.ledger_root_hash[:16]}... "
+                    f"all {len(capsule.artifact_verifications)} artifacts valid",
+                    self.git_head, self.verifier_version, self.schema_version,
+                    raw_result={"capsule_hash": capsule.capsule_hash,
+                               "ledger_root_hash": capsule.ledger_root_hash,
+                               "portfolio_projection_root": capsule.portfolio_projection_root},
+                )
+            else:
+                failed = [av.transition_id for av in capsule.artifact_verifications
+                          if not av.content_hash_matches and av.error != "artifact_hash is null (scope-excluded or unanchored)"]
+                return FreshCheck(
+                    "G10", "post_scrub_evidence_revalidation", False,
+                    f"capsule_hash={capsule.capsule_hash[:16]}... "
+                    f"failed artifacts: {failed}",
+                    self.git_head, self.verifier_version, self.schema_version,
+                    raw_result={"capsule_hash": capsule.capsule_hash},
+                )
+        except Exception as e:
+            return FreshCheck("G10", "post_scrub_evidence_revalidation", False,
+                              f"Error: {e}",
+                              self.git_head, self.verifier_version, self.schema_version)
+
+    def _historical_artifact_audit(self) -> FreshCheck:
+        """G11 (CEO v25 P0-3): Historical artifact difference audit.
+
+        Verifies no unauthorized modifications in scientific artifacts.
+        Reports pre-scrub unrecoverability transparently.
+        """
+        try:
+            sys.path.insert(0, str(REPO_ROOT))
+            from epistemic_integrity.historical_artifact_audit import build_audit_report
+
+            report = build_audit_report(certified_commit=self.git_head)
+
+            scan = report.full_history_blob_scan
+            sci_corruption = scan.get("hash_corruption_in_scientific_artifacts", 0)
+            sci_unauthorized = scan.get("unauthorized_markers_in_scientific_artifacts", 0)
+
+            if sci_corruption == 0 and sci_unauthorized == 0:
+                infra_corruption = scan.get("hash_corruption_in_infrastructure", 0)
+                return FreshCheck(
+                    "G11", "historical_artifact_audit", True,
+                    f"audit_hash={report.audit_hash[:16]}... "
+                    f"pre_scrub_unreachable={report.pre_scrub_unreachable_count} "
+                    f"scientific_corruption=0 "
+                    f"infrastructure_corruption={infra_corruption} (known, pre-v25-rebuild)",
+                    self.git_head, self.verifier_version, self.schema_version,
+                    raw_result={"audit_hash": report.audit_hash,
+                               "pre_scrub_unreachable": report.pre_scrub_unreachable_count},
+                )
+            else:
+                return FreshCheck(
+                    "G11", "historical_artifact_audit", False,
+                    f"audit_hash={report.audit_hash[:16]}... "
+                    f"scientific_corruption={sci_corruption} "
+                    f"scientific_unauthorized={sci_unauthorized}",
+                    self.git_head, self.verifier_version, self.schema_version,
+                )
+        except Exception as e:
+            return FreshCheck("G11", "historical_artifact_audit", False,
+                              f"Error: {e}",
+                              self.git_head, self.verifier_version, self.schema_version)
+
+    def _credential_audit_split(self) -> FreshCheck:
+        """G12 (CEO v25 P0-4): Split credential verification.
+
+        Pass A: pattern_scan with exact-length credential format corpus.
+        Pass B: historical_object/path_audit with heuristic patterns.
+
+        Both must pass. Claim: "No credentials matching the configured
+        detection corpus were found in reachable history."
+        """
+        try:
+            sys.path.insert(0, str(REPO_ROOT))
+            from epistemic_integrity.credential_audit_split import build_report
+
+            report = build_report(certified_commit=self.git_head)
+
+            if report.combined_clean:
+                return FreshCheck(
+                    "G12", "credential_audit_split", True,
+                    f"audit_hash={report.audit_hash[:16]}... "
+                    f"pass_a_blobs={report.pass_a_total_blobs_scanned} "
+                    f"pass_b_blobs={report.pass_b_total_blobs_scanned} "
+                    f"claim=\"{report.authorized_claim}\"",
+                    self.git_head, self.verifier_version, self.schema_version,
+                    raw_result={"audit_hash": report.audit_hash,
+                               "authorized_claim": report.authorized_claim},
+                )
+            else:
+                return FreshCheck(
+                    "G12", "credential_audit_split", False,
+                    f"audit_hash={report.audit_hash[:16]}... "
+                    f"pass_a_clean={report.pass_a_clean} "
+                    f"pass_b_clean={report.pass_b_clean} "
+                    f"forbidden_files={report.forbidden_files_in_history}",
+                    self.git_head, self.verifier_version, self.schema_version,
+                )
+        except Exception as e:
+            return FreshCheck("G12", "credential_audit_split", False,
+                              f"Error: {e}",
+                              self.git_head, self.verifier_version, self.schema_version)
+
+    def _authorization_binding(self) -> FreshCheck:
+        """G13 (CEO v25 P0-5): Authorization binding.
+
+        Binds source_commit == detached_worktree_commit + all P0 control hashes
+        + ledger_root + portfolio_projection_root + certification_corpus_root
+        + gate_version + schema_version.
+        """
+        try:
+            sys.path.insert(0, str(REPO_ROOT))
+            from epistemic_integrity.attestation_binding import build_binding
+
+            binding = build_binding(
+                source_commit=self.git_head,
+                detached_worktree_commit=self.git_head,  # in-place mode
+            )
+
+            if binding.authorization == "RESEARCH_AUTHORIZED":
+                return FreshCheck(
+                    "G13", "authorization_binding", True,
+                    f"binding_hash={binding.binding_hash[:16]}... "
+                    f"source==detached={binding.source_equals_detached} "
+                    f"P0-2={'PASS' if binding.post_scrub_revalidation_passed else 'FAIL'} "
+                    f"P0-3={'PASS' if binding.historical_artifact_audit_passed else 'FAIL'} "
+                    f"P0-4={'PASS' if binding.credential_audit_split_passed else 'FAIL'}",
+                    self.git_head, self.verifier_version, self.schema_version,
+                    raw_result={"binding_hash": binding.binding_hash,
+                               "authorization": binding.authorization},
+                )
+            else:
+                return FreshCheck(
+                    "G13", "authorization_binding", False,
+                    f"binding_hash={binding.binding_hash[:16]}... "
+                    f"source==detached={binding.source_equals_detached} "
+                    f"authorization={binding.authorization}",
+                    self.git_head, self.verifier_version, self.schema_version,
+                )
+        except Exception as e:
+            return FreshCheck("G13", "authorization_binding", False,
                               f"Error: {e}",
                               self.git_head, self.verifier_version, self.schema_version)
 
