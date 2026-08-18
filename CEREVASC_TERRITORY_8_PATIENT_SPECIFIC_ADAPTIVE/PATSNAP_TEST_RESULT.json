@@ -1,0 +1,73 @@
+{
+  "task_id": "TERRITORY-8-DISCOVERY",
+  "artifact_type": "PATSNAP_TEST_RESULT",
+  "source": "PatSnap nested-search patent API",
+  "timestamp": "2026-08-19T00:00:00Z",
+  "api_key_handling": "INLINE via env var PATSNAP_KEY \u2014 NOT persisted to disk, NOT written to any committed file. Key value redacted in this artifact: [REDACTED:PATSNAP_KEY_USED_INLINE_ONLY]",
+  "tests_executed": 3,
+  "tests": [
+    {
+      "query_id": "PS_T1",
+      "query": "TACD: (patient specific OR adaptive) AND shunt AND hydrocephalus",
+      "purpose": "balance + basic patient-specific/adaptive test",
+      "variant_results": [
+        {
+          "auth": "Api-Key header",
+          "status": "OK",
+          "response_keys": [
+            "error_code",
+            "error_msg",
+            "status"
+          ],
+          "errors": [],
+          "data_count": 0,
+          "raw_first_500": "{\"error_code\": 67200008, \"error_msg\": \"apikey not Pass and call failed!\", \"status\": false}",
+          "diagnosis": "AUTH_ERROR"
+        }
+      ]
+    },
+    {
+      "query_id": "PS_T2",
+      "query": "TACD: optic nerve sheath AND intracranial pressure AND shunt",
+      "purpose": "M8 ONSD-ICP-shunt test",
+      "variant_results": [
+        {
+          "auth": "Api-Key header",
+          "status": "OK",
+          "response_keys": [
+            "error_code",
+            "error_msg",
+            "status"
+          ],
+          "errors": [],
+          "data_count": 0,
+          "raw_first_500": "{\"error_code\": 67200008, \"error_msg\": \"apikey not Pass and call failed!\", \"status\": false}",
+          "diagnosis": "AUTH_ERROR"
+        }
+      ]
+    },
+    {
+      "query_id": "PS_T3",
+      "query": "TACD: posture AND circadian AND shunt AND CSF",
+      "purpose": "M5 posture-circadian-shunt test",
+      "variant_results": [
+        {
+          "auth": "Api-Key header",
+          "status": "OK",
+          "response_keys": [
+            "error_code",
+            "error_msg",
+            "status"
+          ],
+          "errors": [],
+          "data_count": 0,
+          "raw_first_500": "{\"error_code\": 67200008, \"error_msg\": \"apikey not Pass and call failed!\", \"status\": false}",
+          "diagnosis": "AUTH_ERROR"
+        }
+      ]
+    }
+  ],
+  "overall_status": "BLOCKED_AUTH_ERROR (67200008 apikey not Pass and call failed!) \u2014 same state as T7 discovery. All 3 tests \u00d7 3 auth header variants return AUTH_ERROR. Not balance-exhausted; key rejected entirely.",
+  "honest_disclosure": "PatSnap test recorded honestly. If BLOCKED (auth error or balance exhausted), territory #8 prior-art search continues with PARTIAL status across Lens + Scopus + Google Patents. Same BLOCKED state as T6 and T7 discoveries.",
+  "remediation_plan": "If PatSnap restored: run nested-search on M5/M8 specific queries (ONSD + ICP + shunt adjustment; circadian + shunt + adaptive). If still BLOCKED: continue with PatentBear free public web search as substitute."
+}

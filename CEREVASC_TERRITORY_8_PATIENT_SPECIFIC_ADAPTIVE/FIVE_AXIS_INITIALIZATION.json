@@ -1,0 +1,107 @@
+{
+  "task_id": "TERRITORY-8-DISCOVERY",
+  "artifact_type": "FIVE_AXIS_INITIALIZATION",
+  "territory": "Patient-specific / adaptive eShunt",
+  "timestamp": "2026-08-19T00:00:00Z",
+  "agent": "subagent (general-purpose)",
+  "doctrine_compliance_note": "5-axis tracker NEVER averaged into a single '% complete'. Each axis is a separate completion percentage. Per CEO directive: 'the 5-axis tracker must NEVER be averaged into a single % complete.'",
+  "leading_candidate_selected": "M5_REFINED — Patient-specific sleep-state venous-pressure-aware adaptive drainage",
+  "leading_candidate_rationale": {
+    "why_M5_REFINED_leading": [
+      "PASSES physics pre-check (sleep-state ICP variation + venous congestion well-documented, magnitude 5-15 mmHg clinically consequential)",
+      "PASSES physiology pre-check (sleep apnea → venous congestion → reduced CSF-venous pressure differential → inadequate drainage during sleep is eShunt-specific physiology)",
+      "Has eShunt-specific novel angle (venous sinus pressure varies during sleep apnea — NOT present in VP shunts which drain to peritoneum where sleep-state venous pressure is irrelevant)",
+      "Lower prior-art saturation than M8 (M8 has 5+ direct hits on non-invasive ICP monitoring)",
+      "Lower novelty concern than M4 (M4 has near-direct hits on CSF production-rate measurement/regulation: US8109899B2 Likvor, US11173289B2 CSF Refresh)",
+      "Patient-specific calibration element (individual sleep-state venous pressure profile)",
+      "Adaptive response element (circadian/sleep-state drainage modulation)",
+      "Clear clinical problem (nocturnal over-drainage is documented VP shunt complication)"
+    ],
+    "leading_candidate_definition": "An eShunt with integrated (a) posture/activity sensor (accelerometer/IMU), (b) circadian clock, (c) optional sleep apnea detector (SpO2 or nasal pressure), (d) adaptive drainage controller that modulates drainage resistance based on patient-specific sleep-state venous pressure profile. The patient-specific calibration is established during a 1-7 day monitoring period post-implantation, then the controller operates autonomously. KEY DISTINCTION FROM VIEshunt: eShunt-specific venous pressure compensation (VP shunts do not have a venous pressure component because they drain to peritoneum)."
+  },
+  "alternative_candidate": {
+    "id": "M8",
+    "name": "Closed-loop non-invasive ICP proxy feedback (ONSD/TMD-driven)",
+    "rationale": "PASSES physics; novel system-level integration; HIGH §103 risk due to 5+ direct hits on non-invasive ICP monitoring (Cerebrotech, Wolf, MIT, Third Eye, Augusta). Retained as parallel candidate."
+  },
+  "five_axis_tracker": {
+    "axis_1_mechanism_exploration": {
+      "percentage": 50.0,
+      "gates_explored": 5,
+      "gates_total": 10,
+      "gates": [
+        {"id": "G1", "name": "patient_specific_sizing_M1", "status": "EXPLORED", "verdict": "WEAK_NOVEL — saturated by general patient-specific sizing literature"},
+        {"id": "G2", "name": "posture_gravity_valve_M2", "status": "EXPLORED", "verdict": "SATURATED + WEAKENED_BY_eShunt_ANATOMY"},
+        {"id": "G3", "name": "programmable_opening_pressure_M3", "status": "EXPLORED", "verdict": "DESTROYED_BY_PRIOR_ART"},
+        {"id": "G4", "name": "csf_production_rate_matching_M4", "status": "EXPLORED", "verdict": "MARGINAL_NOVEL — near-direct hits (Likvor, CSF Refresh)"},
+        {"id": "G5", "name": "sleep_state_circadian_adaptive_M5_REFINED", "status": "EXPLORED", "verdict": "LEADING CANDIDATE — CONDITIONALLY_NOVEL"},
+        {"id": "G6", "name": "disease_progression_ml_M6", "status": "EXPLORED", "verdict": "CONDITIONALLY_NOVEL + CRITICAL_IDENTIFIABILITY_RISK"},
+        {"id": "G7", "name": "custom_curved_distal_tip_M7", "status": "EXPLORED", "verdict": "WEAK_NOVEL — routine engineering adaptation"},
+        {"id": "G8", "name": "closed_loop_non_invasive_icp_M8", "status": "EXPLORED", "verdict": "CONDITIONALLY_NOVEL — HIGH §103 risk"},
+        {"id": "G9", "name": "patient_specific_venous_pressure_aware_adaptive (hybrid M5+M8)", "status": "NOT_EXPLORED", "verdict": "POTENTIAL V2 DIRECTION"},
+        {"id": "G10", "name": "broader_personalization_mechanism_space", "status": "NOT_EXPLORED", "verdict": "broader space may remain (per V22 #1 lesson: 'broader diagnostic mechanism space may remain')"}
+      ],
+      "honest_caveat": "Per CEO V24 directive applied to #1: 'do NOT call this 100% mechanism exploration'. Current patient-specific/adaptive branch: 5/10 gates explored. Broader mechanism space (G9 hybrid, G10 broader) NOT explored."
+    },
+    "axis_2_engineering_evidence": {
+      "percentage": 10.0,
+      "gates_explored": 1,
+      "gates_total": 7,
+      "gates": [
+        {"id": "E1", "name": "physics_precheck_complete", "status": "PASS", "note": "Physics pre-check executed for all 8 candidates (PHYSICS_PRECHECK.json). 4 candidates advanced to prior-art search."},
+        {"id": "E2", "name": "engineering_simulation", "status": "NOT_STARTED", "note": "V2 milestone — patient-specific venous pressure profile simulation + circadian/sleep-state drainage modulation"},
+        {"id": "E3", "name": "patient_specific_calibration_protocol", "status": "NOT_STARTED", "note": "V2 milestone — design 1-7 day monitoring period to establish individual sleep-state venous pressure profile"},
+        {"id": "E4", "name": "sleep_apnea_venous_congestion_model", "status": "NOT_STARTED", "note": "V2 milestone — model the relationship between sleep apnea severity and venous sinus pressure rise"},
+        {"id": "E5", "name": "controller_design", "status": "NOT_STARTED", "note": "V2 milestone — design adaptive drainage controller (PI/PID/state-space/ML)"},
+        {"id": "E6", "name": "benchtop_validation", "status": "NOT_STARTED", "note": "V3 milestone"},
+        {"id": "E7", "name": "in_vivo_validation", "status": "NOT_STARTED", "note": "V4+ milestone"}
+      ]
+    },
+    "axis_3_robustness_falsification": {
+      "percentage": 10.0,
+      "attacks_executed": 1,
+      "attacks_total": 5,
+      "attacks": [
+        {"id": "A1", "name": "VIEshunt_prior_art_saturation", "status": "CONDITIONAL_SURVIVE", "note": "ATTACK_1 executed (see FIRST_ATTACK.json). VIEshunt 2025 teaches posture-specific ICP references but does NOT teach eShunt-specific venous pressure compensation or sleep apnea-induced venous congestion adaptation. M5_REFINED survives conditionally on the eShunt-specific novel angle."},
+        {"id": "A2", "name": "single_sensor_unidentifiability", "status": "NOT_STARTED", "note": "V2 milestone — can a single IMU + pressure sensor distinguish sleep state from other supine activities (reading, watching TV)?"},
+        {"id": "A3", "name": "sleep_apnea_detection_reliability", "status": "NOT_STARTED", "note": "V2 milestone — can sleep apnea be reliably detected from eShunt's sensors without dedicated SpO2/PSG?"},
+        {"id": "A4", "name": "patient_specific_calibration_burden", "status": "NOT_STARTED", "note": "V2 milestone — is 1-7 day calibration period acceptable to patients/clinicians?"},
+        {"id": "A5", "name": "comparator_attack_vs_M8", "status": "NOT_STARTED", "note": "V2 milestone — head-to-head comparison: is M5_REFINED's venous-pressure-aware adaptation superior to M8's non-invasive ICP proxy feedback?"}
+      ]
+    },
+    "axis_4_prior_art_ip_exhaustion": {
+      "percentage": 30.0,
+      "sources": {
+        "Lens_scholarly": {"status": "PARTIAL", "queries": 10, "results": 250},
+        "Lens_patents": {"status": "BLOCKED", "queries": 0, "results": 0, "note": "401 — scholarly-only token"},
+        "Scopus": {"status": "COMPLETE", "queries": 10, "results": 200},
+        "Google_Patents": {"status": "PARTIAL", "queries": 10, "patents": 160, "note": "2 of 10 queries returned 0 (phrase too specific)"},
+        "PatSnap": {"status": "BLOCKED", "queries": 0, "results": 0, "note": "67200008 auth error — same as T7"},
+        "PatentBear": {"status": "NOT_STARTED", "note": "V2 substitute for PatSnap (per T6/T7 pattern)"},
+        "Passage_level_claim_audit": {"status": "NOT_STARTED", "note": "V2 milestone — must passage-audit VIEshunt paper + US8109899B2 (Likvor) + US11173289B2 (CSF Refresh) + Cerebrotech patents (US11357417B2, US11166671B2) + CereVasc self-patents (EP4275736B1, US20250001144A1)"}
+      },
+      "honest_disclosure": "PARTIAL overall — cannot declare COMPLETE without PatSnap + Lens patent endpoint + passage-level claim audit. Materially stronger than no search but not exhaustive."
+    },
+    "axis_5_real_world_validation_readiness": {
+      "percentage": 0.0,
+      "gates": [
+        {"id": "V1", "name": "benchtop_in_vitro", "status": "NOT_STARTED"},
+        {"id": "V2", "name": "in_vivo_animal", "status": "NOT_STARTED"},
+        {"id": "V3", "name": "first_in_human", "status": "NOT_STARTED"},
+        {"id": "V4", "name": "pivotal_clinical_trial", "status": "NOT_STARTED"},
+        {"id": "V5", "name": "post_market_surveillance", "status": "NOT_STARTED"}
+      ]
+    }
+  },
+  "five_axis_never_averaged_warning": "DO NOT average these 5 percentages into a single number. The 5 axes measure DIFFERENT dimensions of completion and cannot be combined. Reporting 'overall 20%' would OBSCURE the truth: Mechanism 50% (5/8 candidates explored), Engineering 10% (physics pre-check only), Robustness 10% (1/5 attacks), IP 30% (Lens+Scopus+GP done, PatSnap blocked), Validation 0% (no benchtop/animal/clinical). These are different dimensions of readiness.",
+  "milestones_required_for_buyer_ready": [
+    "M1: Passage-level claim audit of VIEshunt (2025 paper) — confirm it does not teach eShunt-specific venous pressure compensation",
+    "M2: Passage-level claim audit of US8109899B2 (Likvor) + US11173289B2 (CSF Refresh) — confirm they do not teach sleep-state circadian adaptive drainage",
+    "M3: PatentBear free public web search as PatSnap substitute — extend prior-art coverage for M5_REFINED specific keywords",
+    "M4: Engineering simulation — patient-specific venous pressure profile model + sleep-state adaptive drainage controller",
+    "M5: Pre-registered buyer thresholds BEFORE V2 simulation (per V1.1 §6.3 anti-inflation)",
+    "M6: In-vivo ovine validation — coordinate with VIEshunt team's HiL test bench methodology (per T4 V5 precedent)",
+    "M7: FDA regulatory pathway (510(k) with Medtronic Strata / Sophysa Polaris predicate, or De Novo for smart shunt adaptive control)",
+    "M8: CereVasc self-patent FTO assessment — confirm EP4275736B1 + US20250001144A1 + US12318564B2 do not anticipate M5_REFINED"
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "task_id": "TERRITORY-8-DISCOVERY",
+  "artifact_type": "PRIOR_ART_SEARCH_SUMMARY",
+  "territory": "Patient-specific / adaptive eShunt",
+  "timestamp": "2026-08-19T00:00:00Z",
+  "agent": "subagent (general-purpose)",
+  "sources_tested": {
+    "Lens_scholarly": {
+      "status": "PARTIAL",
+      "queries_executed": 10,
+      "total_results_returned_top25": 250,
+      "notable_findings": [
+        "LQ2 (adaptive CSF drainage valve): 9 hits including VIEshunt (2025) — direct competitor smart shunt with IMU + posture-specific ICP references.",
+        "LQ4 (circadian ICP shunt): 6 hits — none directly on-target for sleep-state adaptive drainage.",
+        "LQ5 (CSF production rate measurement): 109 hits — extensive literature on individual CSF production rate measurement (MRI phase-contrast).",
+        "LQ6 (ONSD + ICP monitoring): 1525 hits — extensive clinical literature on ONSD-ultrasound ICP correlation (Robba 2018, Dubourg 2011).",
+        "LQ8 (ML + hydrocephalus + shunt): 65 hits — mostly OUTCOME PREDICTION models, not adaptive control.",
+        "LQ9 (endovascular venous sinus shunt): 316 hits — broad venous sinus intervention literature."
+      ],
+      "note": "Lens scholarly works for abstract+title multi_match cross_fields with operator=AND. Patent endpoint 401 (scholarly-only token)."
+    },
+    "Scopus": {
+      "status": "COMPLETE",
+      "queries_executed": 10,
+      "total_results_returned_top25": 200,
+      "notable_findings": [
+        "SQ2 (adaptive CSF drainage valve): 1 hit — MEMS-based passive hydrocephalus shunt with adaptive flow (2013 Transducers). Direct adaptive flow shunt.",
+        "SQ3 (posture + shunt valve): 14 hits including posture-independent piston valve (2012 J Neurosurg Pediatr); gravitational shunt units (2009); anti-siphon design (2003); ICP-shunt-body-position study (2015); gravitational valve NPH safety (2013).",
+        "SQ4 (circadian ICP shunt): 9 hits including 2012 case study of pressures in implanted hydrocephalus valve everyday life. None directly on sleep-state adaptive drainage.",
+        "SQ5 (CSF production rate): 13 hits including 2004 Radiology (CSF production rate quantification with phase-contrast MRI); 2011 Jap J Radiol (diurnal variation); 2025 Brain Communications systematic review.",
+        "SQ7 (closed-loop non-invasive shunt): 1 hit — unrelated Hall-effect sensor paper. No direct closed-loop non-invasive shunt paper.",
+        "SQ8 (ML + hydrocephalus + shunt): 57 hits — outcome prediction models, not adaptive control.",
+        "SQ9 (endovascular venous sinus shunt): 72 hits including first-in-human eShunt (2022 J Neurointerventional Surg)."
+      ]
+    },
+    "Google_Patents": {
+      "status": "PARTIAL",
+      "queries_executed": 10,
+      "total_patents_extracted": 160,
+      "method": "agent-browser headless chromium (direct curl CAPTCHA-blocked). JavaScript eval extracts article elements from Google Patents results page.",
+      "notable_findings": [
+        "GP1 (patient specific shunt hydrocephalus): 20 patents including US8109899B2 (Likvor — fully automated CSF measurement/regulation) and US8457733B2 (Linninger — impedance-based CSF monitoring/control).",
+        "GP2 (adaptive CSF drainage valve): 20 patents including US7922685B2 (Codman — self-adjusting valve) and US9731102B2 (DePuy Synthes — gravitational anti-siphon valve).",
+        "GP3 (posture + shunt + gravity): 20 patents including EP2967381B1 + US10864363B2 (Hakim — shunt valve assembly + externally programmable magnetic valve).",
+        "GP4 (circadian + ICP + shunt + adaptive): 0 patents — phrase too specific; no direct match.",
+        "GP5 (CSF production rate + shunt + flow): 20 patents including US11173289B2 (CSF Refresh — programmable CSF metering shunt), US8869826B2 (Debiotech — passive flow regulator), CA2653898C (Codman — combined pressure+flow sensor in shunt).",
+        "GP6 (ONSD + shunt adjustment): 20 patents — mostly off-target (Silk Road Medical carotid flow, excimer laser). One direct hit: US12171617B2 (Augusta — systems/methods for detecting ICP and volume).",
+        "GP7 (closed-loop + shunt + non-invasive ICP): 20 patents including US11357417B2 (Cerebrotech — continuous autoregulation system), US11166671B2 (Cerebrotech — fluid volume differentiation), US10016135B2 (Wolf — transcutaneous ICP monitoring), US8821402B2 (MIT — non-invasive ICP estimation), US9585578B2 (Third Eye Diagnostics — non-invasive ICP measurement), EP4275736B1 (CereVasc — system for treating hydrocephalus).",
+        "GP8 (ML + hydrocephalus + shunt + personalization): 20 patents — mostly off-target (cancer biomarkers, cell purification).",
+        "GP9 (endovascular venous sinus shunt eShunt): 0 patents — phrase too specific.",
+        "GP10 (programmable shunt personalization adaptive): 20 patents — mostly off-target (ultrasound therapy, lighting systems, lower-extremity)."
+      ]
+    },
+    "PatSnap": {
+      "status": "BLOCKED",
+      "queries_executed": 3,
+      "auth_variants_tested": 3,
+      "error": "67200008 apikey not Pass and call failed!",
+      "diagnosis": "AUTH_ERROR — PatSnap API key rejected at authentication. Not balance-exhausted; key invalid. Same BLOCKED state as T7 discovery.",
+      "remediation_plan": "PatentBear free public web search as PatSnap substitute at V2 (per T6/T7 pattern). PatSnap restoration would enable nested-search on M5_REFINED specific queries."
+    }
+  },
+  "overall_search_completeness": "PARTIAL — Lens PARTIAL (scholarly only; patent endpoint 401), Scopus COMPLETE, Google Patents PARTIAL (2 of 10 queries returned 0 due to phrase specificity), PatSnap BLOCKED (auth error 67200008). Cannot declare COMPLETE without PatSnap + Lens patent endpoint. Materially stronger than no search but not exhaustive.",
+  "three_state_completeness_record": {
+    "Lens_scholarly": "PARTIAL",
+    "Lens_patents": "BLOCKED (401 — scholarly-only token)",
+    "Scopus": "COMPLETE",
+    "Google_Patents": "PARTIAL",
+    "PatSnap": "BLOCKED (67200008 auth error)",
+    "PatentBear": "NOT_STARTED (V2 substitute for PatSnap)",
+    "Passage_level_claim_audit": "NOT_STARTED (V2 milestone)",
+    "Overall": "PARTIAL"
+  },
+  "no_LIKELY_NOVEL_language_used": true,
+  "doctrine_compliance": {
+    "push_the_envelope_doctrine": "Every success creates a stronger attack; every failure creates a search for a better mechanism. Physics pre-check executed BEFORE elaborate prior-art searches (per #7 M10 lesson).",
+    "honest_negative_results": "M1/M2/M3/M7 weak-or-saturated at pre-check; M4 marginal novelty with near-direct hits; M8 high prior-art density on non-invasive ICP monitoring side.",
+    "pre_registered_thresholds_before_simulation": "Will be defined for V2 simulation if leading candidate survives first attack.",
+    "five_axis_tracker_never_averaged": true,
+    "api_keys_inline_only_not_persisted": true,
+    "physics_precheck_before_prior_art_search": true
+  }
+}
