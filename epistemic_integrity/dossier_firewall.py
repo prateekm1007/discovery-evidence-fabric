@@ -36,7 +36,7 @@ import json
 import re
 from pathlib import Path
 from typing import Dict, List, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .claim_registry import ClaimRegistry, Claim
 from .evidence_binding import EvidenceBinding, Evidence, Source
@@ -49,7 +49,8 @@ from .semantic_verifier import SemanticVerifier  # Only for hash verification, N
 @dataclass
 class RenderedClaim:
     """A claim rendered for the final dossier, with provenance metadata.
-    Per CEO P0-B: text is GENERATED from the verified proposition."""
+    Per CEO P0-B: text is GENERATED from the verified proposition.
+    Per CEO P0-2 v13: provenance_status is structurally carried forward."""
     claim_id: str
     text: str  # GENERATED from proposition, not AI-authored
     epistemic_class: str
@@ -61,6 +62,9 @@ class RenderedClaim:
     human_fact: bool
     provenance_chain: str
     proposition: dict  # the verified structured proposition
+    # P0-2 v13: Provenance status — structurally surfaced, never hidden
+    provenance_status: str = "COMPLETE"  # COMPLETE / INCOMPLETE
+    missing_provenance_fields: List[str] = field(default_factory=list)
 
 
 class DossierFirewall:
@@ -329,6 +333,16 @@ class DossierFirewall:
                 f"Source: {s.source_id} (type={s.source_type}, id={s.identifier})"
             )
 
+        # Determine provenance status for the rendered claim
+        provenance_status = "COMPLETE"
+        missing_fields = []
+        for ev in evidence:
+            if not ev.is_dossier_grade():
+                missing = ev.missing_reproducibility_fields()
+                if missing:
+                    provenance_status = "INCOMPLETE"
+                    missing_fields.extend(missing)
+
         return RenderedClaim(
             claim_id=claim.claim_id,
             text=generated_text,  # GENERATED, not AI-authored
@@ -348,6 +362,8 @@ class DossierFirewall:
                 "condition": claim.proposition_condition,
                 "version": claim.proposition_version,
             },
+            provenance_status=provenance_status,
+            missing_provenance_fields=list(set(missing_fields)),  # deduplicate
         )
 
     def _verify_text_proposition_consistency(self, claim: Claim, proposition: Proposition):

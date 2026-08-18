@@ -495,6 +495,7 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
             from epistemic_integrity.evidence_classes import EvidenceClass
             from epistemic_integrity.dossier_firewall import DossierFirewall
             from epistemic_integrity.proposition_verifier import PropositionVerifier, Proposition, PropositionVerdict
+            from epistemic_integrity.evidence_span_verifier import resolve_json_pointer, verify_proposition_against_span
             import hashlib as _hl
 
             temp_claims = ClaimRegistry(temp_dir / "claims")
@@ -585,17 +586,31 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                 evidence_version = case_data.get("claim_version")
                 provenance_complete = case_data.get("provenance_complete", False)
 
-                # LAYER 1: Verifier capability check
-                claim_prop = Proposition(
-                    subject=case_data.get("claim_subject"),
-                    predicate=case_data.get("claim_predicate"),
-                    value=pv.parse_value(case_data.get("claim_value", "")),
-                    comparator=case_data.get("claim_comparator"),
-                    condition=case_data.get("claim_condition"),
-                    version=case_data.get("claim_version"),
-                )
-                verifier_result = pv.verify(claim_prop, evidence_content, evidence_version)
-                verifier_admitted = (verifier_result.verdict == PropositionVerdict.SUPPORTS)
+                # LAYER 1: Pointer-based verification (P0-1: EXACT pointer, NOT document search)
+                json_pointer = case_data.get("json_pointer", "")
+                span = resolve_json_pointer(evidence_content, json_pointer)
+                if span is None:
+                    verifier_admitted = False
+                    verifier_result_verdict = "POINTER_NOT_FOUND"
+                else:
+                    # Fill in provenance on the span
+                    span.artifact_commit = commit_sha
+                    span.blob_sha = blob_sha
+                    span.content_hash = actual_content_hash
+
+                    # Verify proposition against EXACT span value
+                    span_result = verify_proposition_against_span(
+                        span=span,
+                        claim_subject=case_data.get("claim_subject", ""),
+                        claim_predicate=case_data.get("claim_predicate", ""),
+                        claim_value=case_data.get("claim_value", ""),
+                        claim_condition=case_data.get("claim_condition"),
+                        claim_version=case_data.get("claim_version"),
+                        evidence_version=evidence_version,
+                    )
+                    verifier_admitted = (span_result["verdict"] == "SUPPORTS")
+                    verifier_result_verdict = span_result["verdict"]
+
                 if verifier_admitted == expected_admitted:
                     verifier_only_correct += 1
 
@@ -662,7 +677,7 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                     mismatches.append(
                         f"{case_id}: expected={'ADMIT' if expected_admitted else 'BLOCK'} "
                         f"but actual={'ADMIT' if actual_admitted else 'BLOCK'} "
-                        f"(verifier={verifier_result.verdict.value})"
+                        f"(span_verifier={verifier_result_verdict})"
                     )
 
             try:
