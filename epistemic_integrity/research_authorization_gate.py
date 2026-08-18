@@ -395,57 +395,59 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
           - supersession chain
         Then compares against committed PORTFOLIO.json for ALL ledger-derived fields.
         """
-        ledger_path = EPISTEMIC_DIR / "approved_provenance" / "state_transition_ledger.json"
+        ledger_path = EPISTEMIC_DIR / "approved_provenance" / "state_transition_ledger.ndjson"
         if not ledger_path.exists():
             return FreshCheck("G5", "canonical_from_ledger", False,
                               "State transition ledger not found",
                               self.git_head, self.verifier_version, self.schema_version)
 
         try:
-            with open(ledger_path) as f:
-                ledger = json.load(f)
-            transitions = ledger.get("transitions", [])
+            # P0-3: Load from NDJSON append-only event log
+            from epistemic_integrity.state_transition_ledger import StateTransitionLedger
+            stl = StateTransitionLedger(EPISTEMIC_DIR / "approved_provenance")
+            transitions = stl._events  # Internal access for projection
+
             if not transitions:
                 return FreshCheck("G5", "canonical_from_ledger", False,
                                   "Ledger has no transitions",
                                   self.git_head, self.verifier_version, self.schema_version)
 
-            # Verify chain integrity
-            from epistemic_integrity.state_transition_ledger import StateTransitionLedger
-            stl = StateTransitionLedger(EPISTEMIC_DIR / "approved_provenance")
+            # Verify chain integrity (global sequence + genesis + root)
             chain_result = stl.verify_chain_integrity()
             if not chain_result["chain_valid"]:
                 return FreshCheck("G5", "canonical_from_ledger", False,
                                   f"Chain integrity failed: {chain_result['failures'][:2]}",
                                   self.git_head, self.verifier_version, self.schema_version)
 
-            # P0-A: Full deterministic projection from ledger
+            # P0-A: Full deterministic projection from ledger (dataclass objects)
             by_territory = {}
             for t in transitions:
-                by_territory.setdefault(t["territory_id"], []).append(t)
+                by_territory.setdefault(t.territory_id, []).append(t)
 
             # Reconstruct complete portfolio from ledger
             reconstructed_portfolio = {"territories": []}
             for tid, tid_transitions in sorted(by_territory.items()):
-                tid_transitions.sort(key=lambda t: int(t["transition_id"].split("-")[-1]))
+                # P0-1: Sort by global_sequence (true append order)
+                tid_transitions.sort(key=lambda t: t.global_sequence)
                 terminal = tid_transitions[-1]
 
                 # Build full chain for this territory
                 chain = []
                 for t in tid_transitions:
                     chain.append({
-                        "version": t.get("artifact_version", ""),
+                        "version": t.artifact_version,
                         "status": "SUPERSEDED" if t != terminal else "CURRENT",
-                        "to_state": t["to_state"],
-                        "commit_sha": t.get("commit_sha", ""),
-                        "reason": t.get("reason", ""),
+                        "to_state": t.to_state,
+                        "commit_sha": t.commit_sha,
+                        "reason": t.reason,
+                        "transition_type": t.transition_type,
                     })
 
                 reconstructed_portfolio["territories"].append({
                     "id": tid,
-                    "current_state": terminal["to_state"],
-                    "artifact_version": terminal.get("artifact_version", ""),
-                    "commit_sha": terminal.get("commit_sha", ""),
+                    "current_state": terminal.to_state,
+                    "artifact_version": terminal.artifact_version,
+                    "commit_sha": terminal.commit_sha,
                     "supersession_chain": chain,
                 })
 
@@ -850,7 +852,7 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
             "epistemic_integrity/approved_evidence/source_registry.json",
             "epistemic_integrity/approved_evidence/bindings.json",
             "epistemic_integrity/approved_provenance/supersession_registry.json",
-            "epistemic_integrity/approved_provenance/state_transition_ledger.json",
+            "epistemic_integrity/approved_provenance/state_transition_ledger.ndjson",
         ]
         hasher = hashlib.sha256()
         for rel_path in files_to_hash:

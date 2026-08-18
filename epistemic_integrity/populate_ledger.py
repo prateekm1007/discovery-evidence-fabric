@@ -138,12 +138,16 @@ for t in portfolio.get("territories", []):
     print(f"  blob: {blob_sha}")
     print(f"  hash: {content_hash[:32]}...")
 
-ledger._save()
-print(f"\nLedger populated with {len(ledger.transitions)} transitions")
+# P0-3: NDJSON append-only — no _save() needed, events already appended
+print(f"\nLedger populated with {len(ledger._events)} transitions (NDJSON append-only)")
 
 # Verify chain integrity
 chain_result = ledger.verify_chain_integrity()
 print(f"Chain integrity: {'VALID' if chain_result['chain_valid'] else 'INVALID'}")
+print(f"Topology: {chain_result['topology']}")
+print(f"Genesis: {chain_result['genesis_hash'][:16]}...")
+print(f"Root: {chain_result['ledger_root_hash'][:16]}...")
+print(f"Total events: {chain_result['total_events']}")
 if chain_result['failures']:
     for f in chain_result['failures']:
         print(f"  {f}")
