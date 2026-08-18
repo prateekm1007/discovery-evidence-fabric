@@ -1,0 +1,53 @@
+{
+  "task_id": "TERRITORY-8-V2",
+  "step": "STEP_5_HOSTILE_SIMULATION_ALTERNATIVE_CONTROLLERS",
+  "timestamp": "2026-08-19T00:00:00Z",
+  "agent": "subagent (general-purpose)",
+  "analysis_type": "EXPLORATORY post-primary analysis (NOT pre-registered primary result)",
+  "context": "Primary simulation revealed naive M5_REFINED (apnea hold + venous compensation + PI on ICP) FAILS pre-registered threshold with -14.5% reduction (WORSE than VIEshunt). This analysis tests whether smarter controller designs can rescue the M5_REFINED mechanism.",
+  "controllers_tested": {
+    "vieshunt": "PI on population ICP ref (12 mmHg), 30s avg, Kp=0.5 Ki=0.1, pump max 8 mL/min",
+    "m5_naive": "PI on patient-specific ref + venous compensation + apnea hold (drainage=CSF production during apnea)",
+    "m5_bwave_tolerant": "LOW-gain PI (Kp=0.05 Ki=0.02) + drainage capped at 1.5x CSF production + B-wave suppression (hold at production rate when venous elev >3 mmHg or apnea/post-apnea)",
+    "m5_predictive": "Drainage target = CSF production + 0.05*ICP_error, capped at 2x production, with suppression during apnea AND first 30s post-apnea (anti-backlash)"
+  },
+  "results": {
+    "vieshunt": {
+      "total_over_drainage_events": 8493,
+      "total_under_drainage_events": 14,
+      "over_drainage_reduction_vs_vieshunt_percent": 0.0,
+      "under_drainage_delta_vs_vieshunt_percent": 0.0,
+      "mean_drainage_ml_per_hr": 316.9245463119618,
+      "mean_icp_mmHg": 14.940853975501314,
+      "verdict_vs_preregistered_threshold": "FAIL"
+    },
+    "m5_naive": {
+      "total_over_drainage_events": 9726,
+      "total_under_drainage_events": 138,
+      "over_drainage_reduction_vs_vieshunt_percent": -14.517838219710349,
+      "under_drainage_delta_vs_vieshunt_percent": 885.7142857142858,
+      "mean_drainage_ml_per_hr": 329.6332405452367,
+      "mean_icp_mmHg": 14.940853975501314,
+      "verdict_vs_preregistered_threshold": "FAIL"
+    },
+    "m5_bwave_tolerant": {
+      "total_over_drainage_events": 1197,
+      "total_under_drainage_events": 0,
+      "over_drainage_reduction_vs_vieshunt_percent": 85.90604026845638,
+      "under_drainage_delta_vs_vieshunt_percent": -100.0,
+      "mean_drainage_ml_per_hr": 19.09556320939259,
+      "mean_icp_mmHg": 14.940853975501314,
+      "verdict_vs_preregistered_threshold": "PASS"
+    },
+    "m5_predictive": {
+      "total_over_drainage_events": 5496,
+      "total_under_drainage_events": 0,
+      "over_drainage_reduction_vs_vieshunt_percent": 35.2878841398799,
+      "under_drainage_delta_vs_vieshunt_percent": -100.0,
+      "mean_drainage_ml_per_hr": 20.795626312208775,
+      "mean_icp_mmHg": 14.940853975501314,
+      "verdict_vs_preregistered_threshold": "PASS"
+    }
+  },
+  "interpretation": "See V2_HOSTILE_SIMULATION_ALTERNATIVE.json for full per-controller results and interpretation."
+}

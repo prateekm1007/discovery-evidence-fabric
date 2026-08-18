@@ -1,0 +1,111 @@
+{
+  "task_id": "TERRITORY-8-V2",
+  "step": "STEP_1_VIESHUNT_PASSAGE_AUDIT",
+  "timestamp": "2026-08-19T00:00:00Z",
+  "agent": "subagent (general-purpose)",
+  "paper_identified": {
+    "title": "VIEshunt: towards a ventricular intelligent and electromechanical shunt for hydrocephalus therapy",
+    "authors": ["Flürenbrock F", "Korn L", "Schulte D", "Podgoršak A", "Chomarat J", "Hug J", "Hungerland T", "Holzer C", "Iselin D", "Krebs L", "Weiss R", "Oertel MF", "Stieglitz L", "Weisskopf M", "Meboldt M", "Zeilinger MN", "Schmid Daners M"],
+    "year": 2025,
+    "journal": "Fluids and Barriers of the CNS",
+    "doi": "10.1186/s12987-025-00629-w",
+    "pmid": 40087797,
+    "pmcid": "PMC11907855",
+    "license": "CC-BY 4.0 Open Access",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11907855/",
+    "retrieval_method": "PMC efetch full XML downloaded and parsed via NCBI E-utilities; 46 body paragraphs extracted for keyword search",
+    "passage_evidence_source": "vieshunt_paragraphs.txt (full-text body extracted from PMC11907855.xml, 56,879 chars across 46 paragraphs)"
+  },
+  "distinction_1_venous_sinus_pressure": {
+    "v1_claim": "VIEshunt measures VENTRICULAR ICP only, NOT venous sinus pressure. eShunt-specific venous pressure compensation is unique.",
+    "passage_audit_finding": "CONFIRMED SURVIVES — VIEshunt does NOT measure or compensate for venous sinus pressure.",
+    "passage_evidence": [
+      {
+        "paragraph": "P9 (Hardware)",
+        "quote": "An optical pressure sensor (Opsens OPP-M200, Québec, Canada) with 1 mmHg accuracy and a 250 Hz sampling rate was used for direct measurement of ICP within the ventricle for improved patient monitoring and feedback-based pressure control.",
+        "interpretation": "Single optical pressure sensor placed in the ventricle for ICP only. No venous sinus pressure sensor."
+      },
+      {
+        "paragraph": "P13 (HiL test bench)",
+        "quote": "The HiL test bench has two pressure-controlled fluid compartments that can simulate the fundamental dynamics of ICP and IAP. ... The VIEshunt prototype was mounted on the hip-to-shoulder beam to mimic a placement of the VIEshunt in the abdomen.",
+        "interpretation": "HiL simulates ICP and IAP (intra-ABDOMINAL pressure) only. No venous sinus pressure compartment simulated. VIEshunt is envisioned as a VP-style shunt placed in abdomen, NOT a venous-sinus-draining eShunt."
+      }
+    ],
+    "keyword_search_result": "Term 'sinus' = 0 hits. Term 'venous' = 1 hit (P17, 'intravenously' for anesthesia only — NOT a measurement). Term 'dural venous' = 0 hits.",
+    "verdict": "SURVIVES — VIEshunt does NOT measure venous sinus pressure. Distinction 1 is REAL."
+  },
+  "distinction_2_patient_specific_learned_calibration": {
+    "v1_claim": "VIEshunt uses POPULATION-LEVEL static ICP references (12 mmHg supine, -3 mmHg upright from literature [9]). M5_REFINED proposes patient-specific LEARNED calibration.",
+    "passage_audit_finding": "CONFIRMED SURVIVES at implementation level — VIEshunt uses population-level static references. HOWEVER, VIEshunt EXPLICITLY IDENTIFIES patient-specific calibration as future work / open research question, raising §103 obviousness risk.",
+    "passage_evidence": [
+      {
+        "paragraph": "P14 (In vitro test setup)",
+        "quote": "An ICP reference pressure of —3 mmHg and 12 mmHg was chosen for upright and supine position, respectively, to reflect pressure values observed in clinical evaluations of postural effects on ICP [9].",
+        "interpretation": "References are static population-level values drawn from literature reference [9]. NOT patient-specific. NOT learned. NOT adaptive over time."
+      },
+      {
+        "paragraph": "P25 (Discussion — CRITICAL ADMITTED OPEN QUESTION)",
+        "quote": "In the current VIEshunt prototype design, the definition of the actual controller reference values for the posture-dependent ICP or CSF drainage rate is considered to be at the discretion of the treating physician. How exactly the specific reference values could be determined for each patient individually and how sensory or human feedback could be utilized to adjust the reference values online to adapt to the respective patient over time remain open research questions that are beyond the scope of this study.",
+        "interpretation": "VIEshunt AUTHORS EXPLICITLY identify patient-specific reference determination and online adaptation over time as OPEN RESEARCH QUESTIONS, BEYOND SCOPE of their study. This is a HUGELY important finding: (a) confirms M5_REFINED's patient-specific calibration is NOT taught by VIEshunt — Distinction 2 SURVIVES at §102 novelty level. (b) BUT VIEshunt explicitly points PHOSITA toward solving this open question — STRONG §103 obviousness risk for any patent that merely claims 'patient-specific calibration' generically."
+      },
+      {
+        "paragraph": "P3 (Abstract conclusion)",
+        "quote": "Smart shunt systems based on VIEshunt could improve patient monitoring and enable optimal physiologic therapy by adapting to the individual patient.",
+        "interpretation": "Future-vision statement. Confirms individual-patient adaptation is FUTURE WORK, not implemented."
+      },
+      {
+        "paragraph": "P36 (Final conclusion)",
+        "quote": "Future shunts based on VIEshunt could improve patient monitoring and enable optimal physiologic therapy by adapting to measured parameters of the patient.",
+        "interpretation": "Confirms 'adapting to measured parameters of the patient' is FUTURE WORK, not implemented in current prototype."
+      }
+    ],
+    "keyword_search_result": "Term 'patient-specific' = 0 hits. Term 'personaliz' = 0 hits. Term 'individual calibration' = 0 hits. Term 'learning' = 0 hits. Term 'machine learning' = 0 hits. Term 'individual patient' = 2 hits (P3, P36 — both future-vision statements).",
+    "verdict": "SURVIVES at §102 level (VIEshunt does NOT teach patient-specific learned calibration — explicit 'beyond the scope of this study' admission). WEAKENED at §103 level (VIEshunt explicitly directs PHOSITA to solve patient-specific calibration as future work — generic claim of patient-specific calibration may be obvious). M5_REFINED's novelty must therefore rest on the SPECIFIC eShunt venous-pressure + sleep-state angle, NOT on patient-specific calibration per se."
+  },
+  "distinction_3_sleep_apnea_specific_compensation": {
+    "v1_claim": "VIEshunt does NOT mention sleep apnea or sleep-state-specific compensation. M5_REFINED explicitly compensates for sleep apnea-induced venous congestion.",
+    "passage_audit_finding": "CONFIRMED SURVIVES — VIEshunt does NOT mention sleep, apnea, circadian, or nocturnal anywhere in full body text.",
+    "passage_evidence": [
+      {
+        "paragraph": "Whole body keyword search",
+        "quote": "Term 'sleep' = 0 hits. Term 'apnea' = 0 hits. Term 'circadian' = 0 hits. Term 'nocturnal' = 0 hits.",
+        "interpretation": "VIEshunt paper body contains NO mention of sleep, sleep apnea, circadian rhythm, or nocturnal physiology. Posture is the ONLY state variable used; no temporal/chronobiological state is considered."
+      },
+      {
+        "paragraph": "P11 (FSM posture detection)",
+        "quote": "The FSM within this control approach uses the IMU measurements to keep track of the patient's torso inclination and detects different patient postures, such as the upright, supine, or undefined position.",
+        "interpretation": "VIEshunt's state machine has only 3 states: upright, supine, undefined. NO sleep/awake state. NO temporal/circadian state. NO apnea detection."
+      }
+    ],
+    "keyword_search_result": "Term 'sleep' = 0 hits. Term 'apnea' = 0 hits. Term 'circadian' = 0 hits. Term 'nocturnal' = 0 hits. Term 'overnight' = 0 hits.",
+    "verdict": "SURVIVES — VIEshunt does NOT teach sleep-state, sleep apnea, or circadian compensation. Distinction 3 is REAL."
+  },
+  "additional_finding_eShunt_anatomy_gap": {
+    "finding": "VIEshunt is described as placed in the ABDOMEN (P13: 'mimic a placement of the VIEshunt in the abdomen'). VIEshunt is functionally a VP-shunt (ventriculoperitoneal-style) — it does NOT drain to the venous sinus. VIEshunt therefore has no anatomical access to venous sinus pressure and no eShunt-specific venous-pressure-aware drainage physiology.",
+    "interpretation": "This is the strongest defense for M5_REFINED: VIEshunt's anatomical configuration (ventricle→abdomen) means venous sinus pressure is not even part of its drainage equation. M5_REFINED's eShunt-specific venous pressure compensation is structurally impossible for VIEshunt to reproduce without re-architecting the device into a venous-sinus-draining shunt (i.e., into a CereVasc eShunt)."
+  },
+  "aggravating_finding_for_m5_refined_obviousness": {
+    "finding": "P25 explicitly directs PHOSITA to: (a) 'determine reference values for each patient individually', (b) 'utilize sensory or human feedback to adjust the reference values online', (c) 'adapt to the respective patient over time'. These three directions map directly onto M5_REFINED's claimed patient-specific calibration, online learning, and chronic re-calibration. Generic claims of patient-specific adaptive shunt control therefore face STRONG §103 obviousness risk in light of VIEshunt's explicit teaching.",
+    "implication": "M5_REFINED patent claims MUST recite: (a) venous sinus pressure measurement or estimation specifically, (b) sleep-state / sleep apnea detection specifically, and (c) patient-specific calibration OF THE VENOUS PRESSURE PROFILE during sleep specifically. Generic 'patient-specific adaptive shunt' claims will likely be rejected as obvious over VIEshunt P25."
+  },
+  "overall_verdict": {
+    "all_three_distinctions_survive_at_passage_level": true,
+    "section_102_novelty": "M5_REFINED is NOT anticipated by VIEshunt — VIEshunt does not measure venous sinus pressure, does not implement patient-specific learned calibration, and does not mention sleep apnea or circadian compensation.",
+    "section_103_obviousness": "M5_REFINED faces MEDIUM-HIGH §103 obviousness risk for the GENERIC patient-specific adaptive shunt concept (VIEshunt P25 explicitly directs PHOSITA toward patient-specific online adaptation). The eShunt-specific venous-pressure-aware + sleep-state-specific compensation angle is the critical distinguishing feature that must be claimed specifically.",
+    "recommendation_for_patent_drafting": "Claim MUST recite: (1) measurement or estimation of venous sinus pressure at the eShunt drainage location; (2) sleep-state or sleep apnea detection from sensor inputs; (3) patient-specific calibration OF THE VENOUS PRESSURE PROFILE during sleep states; (4) drainage modulation that explicitly compensates for sleep-state venous pressure elevation. Generic 'patient-specific adaptive shunt' claims without these eShunt-specific venous/sleep elements will likely be rejected over VIEshunt.",
+    "destruction_trigger": "NONE TRIGGERED — all 3 distinctions survive at passage level. M5_REFINED proceeds to Step 2 (venous pressure observability)."
+  },
+  "passage_audit_methodology": {
+    "full_text_retrieved": "Yes — full XML from PMC11907855 (253,118 bytes)",
+    "paragraph_extraction": "46 body paragraphs extracted (56,879 chars)",
+    "keyword_searches_executed": ["venous", "sinus", "sleep", "apnea", "circadian", "nocturnal", "overnight", "patient-specific", "personaliz", "individual patient", "individual calibration", "learning", "machine learning", "adapt", "population", "pressure sensor", "reference value", "IMU", "posture", "intra-abdominal", "intracranial"],
+    "passages_quoted": "All quotes above are verbatim from the VIEshunt full text (PMC11907855). Quotes preserved original punctuation including em-dashes (—) used for negative sign in some paragraphs (P14, P20)."
+  },
+  "doctrine_compliance": {
+    "passage_level_not_abstract_level": true,
+    "honest_negative_results": true,
+    "all_3_distinctions_audited": true,
+    "verdict_per_distinction_recorded": true,
+    "destruction_trigger_evaluated": true
+  }
+}
