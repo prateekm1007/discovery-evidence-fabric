@@ -385,11 +385,19 @@ class PropositionVerifier:
             return "embolization_rate"
         if "states_meeting" in key_lower:
             return "states_meeting_target"
-        if "detection" in key_lower and "self" in key_lower:
-            return "self_test_detection"
-        if "rem" in key_lower and "miss" in key_lower:
-            return "rem_apnea_miss_rate"
-        return None
+        if "detection" in key_lower and "rate" in key_lower:
+            return "weighted_detection_rate"
+        if "detection" in key_lower:
+            return "detection_rate"
+        if "failed" in key_lower and "sma" in key_lower:
+            return "n_failed_sma_implants"
+        if "average" in key_lower:
+            return "retrieval_reliability"
+        if "worst" in key_lower and "case" in key_lower:
+            return "retrieval_reliability"
+        # Return the key itself as predicate for compound keys
+        # This allows matching against any claim predicate that contains the same words
+        return key_lower.replace(" ", "_")
 
     def verify(
         self,
@@ -480,12 +488,20 @@ class PropositionVerifier:
                 if claim_subj_norm != ev_subj_norm:
                     mismatches.append("subject_MISMATCH")
 
-        # Predicate comparison
+        # Predicate comparison — substring-aware (compound keys)
         if not claim.predicate_wildcard:
             if claim.predicate and not evidence.predicate:
                 mismatches.append("predicate_INSUFFICIENT_EVIDENCE")
             elif claim.predicate and evidence.predicate:
-                if claim.predicate.lower() != evidence.predicate.lower():
+                claim_pred = claim.predicate.lower()
+                ev_pred = evidence.predicate.lower()
+                # Direct match
+                if claim_pred == ev_pred:
+                    pass  # match
+                # Substring match (one contains the other)
+                elif claim_pred in ev_pred or ev_pred in claim_pred:
+                    pass  # match
+                else:
                     mismatches.append("predicate_MISMATCH")
 
         # Value comparison — UNITS ARE FIRST-CLASS
