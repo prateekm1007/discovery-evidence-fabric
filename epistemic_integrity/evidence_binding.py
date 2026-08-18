@@ -43,7 +43,10 @@ class Evidence:
 
 @dataclass
 class Source:
-    """An external source (paper, patent, etc.) cited as evidence."""
+    """An external source (paper, patent, etc.) cited as evidence.
+
+    Per CEO P0-2: sources must have cryptographically verifiable content.
+    """
     source_id: str  # SRC-<type>-<seq> e.g. SRC-PMID-12345, SRC-PATENT-US12345
     source_type: str  # PMID / PATENT / DOI / URL / BOOK
     identifier: str  # the actual PMID, patent number, DOI, etc.
@@ -52,8 +55,41 @@ class Source:
     year: Optional[int] = None
     url: Optional[str] = None
     retrieved_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-    content_hash: Optional[str] = None  # SHA256 of retrieved content
-    span: Optional[str] = None  # specific passage (page, claim number, etc.)
+    retrieval_method: Optional[str] = None  # "Lens API" / "Scopus API" / "Google Patents web" / etc.
+    content: Optional[str] = None  # actual retrieved content (abstract, claim text, passage)
+    content_hash: Optional[str] = None  # SHA256(content) — MUST recompute to verify
+    span: Optional[str] = None  # exact passage cited
+    span_hash: Optional[str] = None  # SHA256(span) — MUST recompute to verify
+    source_locator: Optional[str] = None  # full URL or file path to immutable artifact
+    # Immutability: once registered with content_hash, content cannot change
+    _content_immutable: bool = False
+
+
+@dataclass
+class Evidence:
+    """An experiment or simulation that produces evidence.
+
+    Per CEO P1: hashes must recompute from repository artifacts, not just be stored.
+    """
+    evidence_id: str  # EXP-CV-T<territory>-<seq>
+    territory_id: str
+    description: str
+    evidence_type: str  # SIMULATION / EXPERIMENT / BENCHTOP / ANALYSIS
+    reproducibility_capsule_id: Optional[str] = None  # links to reproducibility_capsules/
+    code_commit: Optional[str] = None  # git commit hash
+    config_hash: Optional[str] = None
+    input_hashes: List[str] = field(default_factory=list)
+    output_content: Optional[str] = None  # actual output JSON content
+    output_hash: Optional[str] = None  # SHA256(output_content) — MUST recompute
+    random_seed: Optional[int] = None
+    python_version: Optional[str] = None
+    dependency_lock_hash: Optional[str] = None
+    model_id: Optional[str] = None
+    model_parameters: Dict = field(default_factory=dict)
+    artifact_path: Optional[str] = None  # path to output file in repo
+    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    supersession_status: str = "CURRENT"
+    superseded_by: Optional[str] = None
 
 
 class EvidenceBinding:
@@ -84,16 +120,20 @@ class EvidenceBinding:
         return self.registry_dir / "bindings.json"
 
     def _load(self):
-        for path, attr, cls in [
-            (self._evidence_file(), "evidence", Evidence),
-            (self._sources_file(), "sources", Source),
+        for path, attr, cls_name in [
+            (self._evidence_file(), "evidence", "Evidence"),
+            (self._sources_file(), "sources", "Source"),
         ]:
             if path.exists():
                 with open(path) as f:
                     data = json.load(f)
+                cls = Evidence if cls_name == "Evidence" else Source
                 for item in data.get(attr, []):
+                    # Filter out private fields
+                    item = {k: v for k, v in item.items() if not k.startswith("_")}
                     obj = cls(**item)
-                    getattr(self, attr)[obj.evidence_id if cls == Evidence else obj.source_id] = obj
+                    key = obj.evidence_id if cls == Evidence else obj.source_id
+                    getattr(self, attr)[key] = obj
 
         if self._bindings_file().exists():
             with open(self._bindings_file()) as f:
@@ -106,13 +146,13 @@ class EvidenceBinding:
         with open(self._evidence_file(), "w") as f:
             json.dump({
                 "schema_version": "1.0.0",
-                "evidence": [asdict(e) for e in self.evidence.values()],
+                "evidence": [{k: v for k, v in asdict(e).items() if not k.startswith("_")} for e in self.evidence.values()],
             }, f, indent=2, default=str)
 
         with open(self._sources_file(), "w") as f:
             json.dump({
                 "schema_version": "1.0.0",
-                "sources": [asdict(s) for s in self.sources.values()],
+                "sources": [{k: v for k, v in asdict(s).items() if not k.startswith("_")} for s in self.sources.values()],
             }, f, indent=2, default=str)
 
         with open(self._bindings_file(), "w") as f:

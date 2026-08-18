@@ -46,6 +46,7 @@ from .claim_registry import ClaimRegistry, Claim
 from .evidence_binding import EvidenceBinding, Evidence, Source
 from .supersession_engine import SupersessionEngine
 from .evidence_classes import EvidenceClass, MANDATORY_WORDING, validate_wording
+from .semantic_verifier import SemanticVerifier, SemanticVerdict
 
 
 @dataclass
@@ -77,6 +78,7 @@ class DossierFirewall:
         self.claim_registry = ClaimRegistry(claim_registry_dir)
         self.evidence_binding = EvidenceBinding(evidence_registry_dir)
         self.supersession_engine = SupersessionEngine(supersession_registry_dir)
+        self.semantic_verifier = SemanticVerifier()
 
         # Load canonical state
         self.canonical_state = self._load_canonical_state()
@@ -113,9 +115,29 @@ class DossierFirewall:
         return result
 
     def get_approved_evidence(self, claim_id: str) -> List[Evidence]:
-        """Get CURRENT evidence supporting a claim."""
+        """Get CURRENT evidence supporting a claim.
+
+        Evidence that is not registered in supersession engine is treated as CURRENT
+        (registration is optional for evidence — only artifacts have supersession chains).
+        Evidence explicitly marked SUPERSEDED or INVALIDATED is excluded.
+        """
         evidence = self.evidence_binding.get_evidence_for_claim(claim_id)
-        return [e for e in evidence if self.supersession_engine.is_current(e.evidence_id)]
+        result = []
+        for ev in evidence:
+            # Check if evidence is registered in supersession engine
+            if ev.evidence_id in self.supersession_engine.artifacts:
+                # Registered — check status
+                if self.supersession_engine.is_current(ev.evidence_id):
+                    result.append(ev)
+                # If FROZEN/SUPERSEDED, exclude (but FROZEN evidence for a FROZEN territory
+                # is still valid — it proves the negative result)
+                elif self.supersession_engine.artifacts[ev.evidence_id].status == "FROZEN":
+                    # FROZEN evidence is valid for FROZEN territories (negative ceiling proof)
+                    result.append(ev)
+            else:
+                # Not registered in supersession — treat as CURRENT
+                result.append(ev)
+        return result
 
     def get_approved_sources(self, claim_id: str) -> List[Source]:
         """Get sources supporting a claim."""
@@ -163,6 +185,50 @@ class DossierFirewall:
         if not wording_check["valid"]:
             raise ValueError(
                 f"CLAIM_WORDING_VIOLATION: {claim_id} violations={wording_check['violations']}"
+            )
+
+        # Firewall check 5 (P0-1 NEW): SEMANTIC verification — evidence must actually support claim
+        semantic_failures = []
+        for ev in evidence:
+            if ev.output_content:
+                result = self.semantic_verifier.verify(claim.text, ev.output_content, ev.evidence_type)
+                if result.verdict == SemanticVerdict.CONTRADICTS:
+                    semantic_failures.append(f"Evidence {ev.evidence_id} CONTRADICTS claim: {result.reasoning}")
+                elif result.verdict == SemanticVerdict.UNRELATED:
+                    semantic_failures.append(f"Evidence {ev.evidence_id} UNRELATED to claim: {result.reasoning}")
+                elif result.verdict == SemanticVerdict.PARTIALLY_SUPPORTS:
+                    semantic_failures.append(f"Evidence {ev.evidence_id} PARTIALLY_SUPPORTS only: {result.reasoning}")
+                # SUPPORTS → OK, no failure
+            else:
+                semantic_failures.append(f"Evidence {ev.evidence_id} has NO output_content — cannot verify semantic support")
+
+        # Check sources semantically too
+        for src in sources:
+            if src.content:
+                # Verify content hash (P0-2)
+                if src.content_hash:
+                    if not self.semantic_verifier.verify_content_hash(src.content, src.content_hash):
+                        semantic_failures.append(f"Source {src.source_id} content_hash MISMATCH — content tampered")
+                # Verify span exists in content (P0-2)
+                if src.span:
+                    if not self.semantic_verifier.verify_span_exists(src.content, src.span):
+                        semantic_failures.append(f"Source {src.source_id} span NOT FOUND in content")
+                    # Verify span hash
+                    if src.span_hash:
+                        if not self.semantic_verifier.verify_span_hash(src.span, src.span_hash):
+                            semantic_failures.append(f"Source {src.source_id} span_hash MISMATCH — span tampered")
+                # Semantic check: does source content support claim?
+                result = self.semantic_verifier.verify(claim.text, src.content, "SOURCE")
+                if result.verdict == SemanticVerdict.CONTRADICTS:
+                    semantic_failures.append(f"Source {src.source_id} CONTRADICTS claim: {result.reasoning}")
+                elif result.verdict == SemanticVerdict.UNRELATED:
+                    semantic_failures.append(f"Source {src.source_id} UNRELATED to claim: {result.reasoning}")
+            else:
+                semantic_failures.append(f"Source {src.source_id} has NO content — cannot verify semantic support")
+
+        if semantic_failures:
+            raise ValueError(
+                f"CLAIM_SEMANTIC_VERIFICATION_FAILED: {claim_id} failures={semantic_failures}"
             )
 
         # Build provenance chain
