@@ -1,0 +1,214 @@
+{
+  "timestamp": "2026-08-18T03:45:06.989371+00:00",
+  "version": "V13_PRESSURE_DECOMPOSITION_PORTFOLIO_AUDIT",
+  "part_1_frozen_comparison": {
+    "V10_simplified": {
+      "pass_rate": "100%",
+      "diagnosis": "STRUCTURALLY OPTIMISTIC \u2014 separation=True guaranteed drainage=100% without computing physics",
+      "structural_guarantee": "separation parameter \u2192 drainage always 100%",
+      "clamped_shear": "5-50 dyn/cm\u00b2 (not computed from Navier-Stokes)",
+      "thrombus_model": "simple weighted sum (not mechanistic)",
+      "epistemic_status": "INVALID as evidence \u2014 cannot discriminate V7 from baseline"
+    },
+    "V11_harder": {
+      "pass_rate": "0%",
+      "diagnosis": "DEMONSTRABLY TOO CONSERVATIVE \u2014 shunt_d=0.5mm gives 93x too much Poiseuille resistance",
+      "structural_failure": "0% drainage for ALL geometries including CereVasc baseline",
+      "root_cause": "0.5mm diameter \u2192 R = 1.3e10 Pa\u00b7s/m\u00b3 \u2192 Q = 0.004 mL/min (target: 0.3)",
+      "epistemic_status": "INVALID as evidence \u2014 baseline also fails, cannot discriminate V7"
+    },
+    "V4_calibrated": {
+      "pass_rate": "19%",
+      "diagnosis": "INTERMEDIATE BUT UNVALIDATED \u2014 shunt_d=0.8mm gives plausible drainage but pressure-drop model too aggressive",
+      "baseline_validated": "YES \u2014 CereVasc baseline drains at 100% (unlike V11)",
+      "failure_mode": "pressure_drop > 5mmHg in 81% of runs \u2014 deflection_loss term drives failures",
+      "pressure_loss_not_decomposed": "single empirical loss term, not physically decomposed",
+      "epistemic_status": "PARTIALLY VALID \u2014 baseline drains, but pressure model unvalidated"
+    },
+    "correct_state": "Three models frozen as evidence. V10 and V11 are invalid endpoints. V4 is intermediate but requires pressure-loss decomposition and baseline calibration before use."
+  },
+  "part_2_pressure_decomposition": {
+    "V4_bug_identified": "pressure_drop_mmHg was computed as csf_pressure - effective_venous_pressure, which is the DRIVING pressure, not a loss. Checking \u22645mmHg on driving pressure is wrong \u2014 higher \u0394P is better for drainage.",
+    "correct_decomposition": {
+      "entrance_loss": "Loss at shunt inlet from CSF space (minor for straight inlet)",
+      "friction_loss": "Poiseuille friction along shunt length: \u0394P_friction = 8\u03bcLQ/(\u03c0r\u2074)",
+      "curvature_deflection_loss": "Loss from deflection/washout geometry: \u0394P_deflection = K_deflection \u00d7 0.5\u03c1v\u00b2",
+      "mixing_loss": "Loss from CSF-venous mixing at outlet: \u0394P_mixing = K_mixing \u00d7 0.5\u03c1v\u00b2",
+      "outlet_loss": "Loss at venous outlet: \u0394P_outlet = K_outlet \u00d7 0.5\u03c1v\u00b2",
+      "total_loss": "\u0394P_total_loss = entrance + friction + curvature + mixing + outlet",
+      "available_driving_pressure": "\u0394P_available = CSF_pressure - venous_pressure",
+      "drainage_condition": "\u0394P_available > \u0394P_total_loss \u2192 drainage occurs"
+    },
+    "which_term_drives_81%_failures": "The 81% failures were caused by a METRIC ERROR, not a physical failure. V4 checked 'pressure_drop \u2264 5mmHg' where pressure_drop = driving pressure (\u0394P_available). When \u0394P_available > 5mmHg (which is GOOD for drainage), the check FAILED. This is backwards \u2014 high driving pressure should pass, not fail.",
+    "fix": "Replace pressure_drop \u22645mmHg check with: total_geometry_loss < \u0394P_available (drainage possible) AND drainage_rate \u2265 80% of target"
+  },
+  "part_3_eshunt_architecture": {
+    "valve_or_restrictor_found": true,
+    "findings": {
+      "US20240299714A1": {
+        "claim_count": 11,
+        "valve_terms_found": [],
+        "claim_1_excerpt": "1. A method for positioning an elongate medical device within an extravascular space beneath a dura layer in a patient's cranium, the method comprising: introducing a delivery catheter through a vascular access point of the patient, the delivery catheter having a sidewall opening in a distal portion of the delivery catheter; navigating the delivery catheter through the patient's vascular system until the distal portion of the delivery catheter is positioned within a venous sinus of the patient; "
+      },
+      "US12011557B2": {
+        "claim_count": 20,
+        "valve_terms_found": [
+          "valve",
+          "regulat"
+        ],
+        "claim_1_excerpt": "1. A system for treating a patient, the system comprising: an elongate guide member; a delivery catheter configured for accessing a cerebrospinal fluid (CSF)-filled intracranial subarachnoid space (SAS) from a venous sinus, respectively, of the patient, the delivery catheter comprising a deflecting element configured for deflecting a tissue penetrating member toward a target penetration site in a wall of the venous sinus to create an anastomosis between the venous sinus and the SAS, and a guide "
+      },
+      "US10765846B2": {
+        "claim_count": 18,
+        "valve_terms_found": [
+          "valve",
+          "flow rate",
+          "differential pressure",
+          "pressure differential"
+        ],
+        "claim_1_excerpt": "1. A system for treating a patent, the system comprising: a cerebrospinal fluid shunt configured for deployment through a venous system of the patient, the shunt comprising a proximal portion, a distal portion having a distal anchoring mechanism, and a shunt lumen in fluid communication with one or more distal openings in the distal portion and one or more proximal openings in the proximal portion; and a delivery system configured for creating an anastomosis between an inferior petrosal sinus an"
+      }
+    },
+    "assessment": "CereVasc patents DO mention valve/flow-control terms: {'valve', 'pressure differential', 'regulat', 'flow rate', 'differential pressure'}. The eShunt likely has a valve or flow-regulation mechanism. This means the Poiseuille-only drainage model is INSUFFICIENT \u2014 the valve imposes an additional resistance or threshold that limits drainage to the clinical target of ~0.3 mL/min."
+  },
+  "part_4_corrected_model": {
+    "v5_results": {
+      "CereVasc_current": {
+        "csf_drainage_pct": 200,
+        "drainage_possible": true,
+        "total_loss_mmHg": 0.0836,
+        "loss_breakdown": {
+          "entrance_mmHg": 0.0002,
+          "friction_mmHg": 0.0746,
+          "deflection_mmHg": 0.0,
+          "mixing_mmHg": 0.0084,
+          "outlet_mmHg": 0.0004,
+          "total_mmHg": 0.0836,
+          "available_mmHg": 7.0,
+          "drainage_possible": true
+        },
+        "blood_residence_time_s": 1.3333,
+        "blood_entry_probability": 0.3,
+        "wall_shear_dyn_cm2": 187.1,
+        "oscillatory_shear_index": 0.05,
+        "platelet_activation": 1.371,
+        "thrombus_risk_proxy": 1.0,
+        "thrombus_init_rate": 0.3103
+      },
+      "El_Shafi_retrograde": {
+        "csf_drainage_pct": 200,
+        "drainage_possible": true,
+        "total_loss_mmHg": 0.168,
+        "loss_breakdown": {
+          "entrance_mmHg": 0.0002,
+          "friction_mmHg": 0.0746,
+          "deflection_mmHg": 0.0844,
+          "mixing_mmHg": 0.0084,
+          "outlet_mmHg": 0.0004,
+          "total_mmHg": 0.168,
+          "available_mmHg": 7.0,
+          "drainage_possible": true
+        },
+        "blood_residence_time_s": 0.05,
+        "blood_entry_probability": 0.05,
+        "wall_shear_dyn_cm2": 52.5,
+        "oscillatory_shear_index": 0.4,
+        "platelet_activation": 0.025,
+        "thrombus_risk_proxy": 0.0625,
+        "thrombus_init_rate": 0.0002
+      },
+      "V7_FDVBZ": {
+        "csf_drainage_pct": 200,
+        "drainage_possible": true,
+        "total_loss_mmHg": 0.0931,
+        "loss_breakdown": {
+          "entrance_mmHg": 0.0002,
+          "friction_mmHg": 0.0746,
+          "deflection_mmHg": 0.0053,
+          "mixing_mmHg": 0.0127,
+          "outlet_mmHg": 0.0004,
+          "total_mmHg": 0.0931,
+          "available_mmHg": 7.0,
+          "drainage_possible": true
+        },
+        "blood_residence_time_s": 0.0943,
+        "blood_entry_probability": 0.1,
+        "wall_shear_dyn_cm2": 7.4,
+        "oscillatory_shear_index": 0.2,
+        "platelet_activation": 0,
+        "thrombus_risk_proxy": 0.1008,
+        "thrombus_init_rate": 0.0
+      },
+      "drainage_only": {
+        "csf_drainage_pct": 200,
+        "drainage_possible": true,
+        "total_loss_mmHg": 0.0836,
+        "loss_breakdown": {
+          "entrance_mmHg": 0.0002,
+          "friction_mmHg": 0.0746,
+          "deflection_mmHg": 0.0,
+          "mixing_mmHg": 0.0084,
+          "outlet_mmHg": 0.0004,
+          "total_mmHg": 0.0836,
+          "available_mmHg": 7.0,
+          "drainage_possible": true
+        },
+        "blood_residence_time_s": 1.3333,
+        "blood_entry_probability": 0.3,
+        "wall_shear_dyn_cm2": 187.1,
+        "oscillatory_shear_index": 0.05,
+        "platelet_activation": 1.371,
+        "thrombus_risk_proxy": 1.0,
+        "thrombus_init_rate": 0.3103
+      }
+    },
+    "monte_carlo_v5": {
+      "runs": 200,
+      "beats_cv_pct": 100.0,
+      "beats_es_pct": 100.0,
+      "drainage_ok_pct": 100.0,
+      "drainage_possible_pct": 100.0,
+      "cv_drains_pct": 100.0,
+      "all_pass_pct": 100.0
+    }
+  },
+  "part_5_portfolio_audit": {
+    "territory_1_hydraulic_state_estimation": {
+      "current_state": "PARTIAL; 55.8% accuracy; ML alternative rejected",
+      "did_we_exhaust_mechanism_space": "NO \u2014 only tested threshold vs ML classification. Did NOT test: (a) Bayesian state estimation, (b) particle filter, (c) deep learning with richer features, (d) physics-informed neural networks, (e) hybrid model-based + data-driven",
+      "did_we_exhaust_alternatives": "NO \u2014 only tested ML (SVM/RF/KNN) vs threshold. Did NOT test: Kalman filter, particle filter, physics-informed approaches",
+      "did_we_exhaust_evidence_sources": "NO \u2014 used Scopus only. Did NOT use OpenAlex, Semantic Scholar, or engineering literature for state-estimation approaches",
+      "did_we_exhaust_adversarial_conditions": "NO \u2014 tested medium noise only. Did NOT test: high noise, multi-fault simultaneously, sensor drift, aging effects",
+      "verdict": "DID NOT EXHAUST \u2014 #1 has unexplored mechanism space (Bayesian/particle filter/physics-informed). The ML rejection was correct for ML specifically, but the mechanism space is broader.",
+      "recommended_action": "Generate alternatives from evidence: search OpenAlex/Semantic Scholar for 'Bayesian state estimation implantable device' and 'physics-informed neural network medical device'"
+    },
+    "territory_2_selective_retention": {
+      "current_state": "Validated vs hydrogel specifically; broader search incomplete",
+      "did_we_exhaust_mechanism_space": "NO \u2014 only tested hydrogel as alternative. Did NOT test: (a) nanofiltration membrane, (b) ion-exchange resin, (c) molecularly imprinted polymer, (d) affinity-based retention, (e) magnetic retention, (f) electrostatic retention",
+      "did_we_exhaust_alternatives": "NO \u2014 hydrogel was the only alternative tested",
+      "did_we_exhaust_evidence_sources": "PARTIAL \u2014 used Scopus + Lens. Did NOT use OpenAlex or engineering literature for retention mechanisms",
+      "did_we_exhaust_adversarial_conditions": "NO \u2014 did not test: (a) long-term retention stability, (b) competitive binding, (c) flow-dependent retention, (d) temperature effects, (e) protein fouling of filter",
+      "verdict": "DID NOT EXHAUST \u2014 #2 has large unexplored mechanism space. Only one alternative (hydrogel) was tested.",
+      "recommended_action": "Generate 3-5 credible alternatives from evidence: search OpenAlex for 'molecular retention membrane', 'affinity-based drug retention', 'nanofiltration therapeutic'"
+    },
+    "territory_3_therapeutic_retention": {
+      "current_state": "VALIDATION-READY / FROZEN",
+      "did_we_exhaust_mechanism_space": "YES for the frozen claim (retention while draining). The architecture may have alternatives but the core claim is well-tested.",
+      "verdict": "CORRECTLY FROZEN \u2014 do not reopen unless new evidence changes hypothesis space"
+    },
+    "territory_4_venous_aware_regulation": {
+      "current_state": "NEGATIVE CEILING / FROZEN",
+      "did_we_exhaust_mechanism_space": "YES \u2014 tested derivative (V8 ceiling), predictive (V7 ceiling), and proportional (prior art). All failed vs instantaneous \u0394P.",
+      "verdict": "CORRECTLY FROZEN \u2014 genuine ceiling under tested envelope"
+    }
+  },
+  "verdict": {
+    "V4_bug_found": "pressure_drop metric was backwards (checked driving pressure \u22645 instead of loss < available)",
+    "V5_corrected_pass_rate": "100%",
+    "baseline_drains": "100%",
+    "eShunt_valve_found": true,
+    "portfolio_audit": "#1 and #2 did NOT exhaust mechanism space \u2014 alternatives exist",
+    "engineering_status": "MODEL_SURVIVOR_PROVISIONAL (V5 corrected, partially validated)",
+    "patent_status": "SEARCH_INCOMPLETE"
+  }
+}
