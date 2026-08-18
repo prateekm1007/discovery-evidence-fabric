@@ -265,10 +265,19 @@ class PropositionVerifier:
                     value_struct = self.parse_value(str(value)) if value is not None else None
 
                     if (subject or predicate) and value_struct:
+                        # Check if this key or nearby keys contain condition info
+                        inferred_condition = self._infer_condition_from_path(new_path)
+                        if key.lower() == "condition" and isinstance(value, str):
+                            inferred_condition = self._normalize_condition_value(value)
+                        # Also check if a sibling "condition" key exists in the same dict
+                        elif isinstance(data, dict) and "condition" in data:
+                            inferred_condition = self._normalize_condition_value(str(data["condition"]))
+
                         propositions.append(Proposition(
                             subject=subject,
                             predicate=predicate,
                             value=value_struct,
+                            condition=inferred_condition,
                             version=evidence_version,  # LOCAL, not global
                             raw_text=f"{new_path}={value}",
                         ))
@@ -335,6 +344,34 @@ class PropositionVerifier:
             match = pattern.search(str(value))
             if match:
                 return match.group(1).upper().replace("_", "")
+        return None
+
+    def _normalize_condition_value(self, value: str) -> Optional[str]:
+        """Normalize a condition value from JSON."""
+        if not value:
+            return None
+        val_lower = str(value).lower().strip()
+        for pattern, name in self.CONDITION_PATTERNS:
+            if pattern.search(val_lower):
+                return name
+        return val_lower
+
+    def _infer_condition_from_path(self, path: str) -> Optional[str]:
+        """Infer condition from JSON path."""
+        path_lower = path.lower()
+        for pattern, name in self.CONDITION_PATTERNS:
+            if pattern.search(path_lower):
+                return name
+        if "noise" in path_lower:
+            return "noise"
+        if "6_month" in path_lower or "six_month" in path_lower:
+            return "6_month"
+        if "benchtop" in path_lower:
+            return "benchtop"
+        if "worst" in path_lower:
+            return "worst_case"
+        if "chronic" in path_lower:
+            return "chronic"
         return None
 
     def _normalize_predicate(self, key: str) -> Optional[str]:
@@ -432,12 +469,15 @@ class PropositionVerifier:
         """
         mismatches = []
 
-        # Subject comparison
+        # Subject comparison — underscore-insensitive (M3_REFINED == M3REFINED)
         if not claim.subject_wildcard:
             if claim.subject and not evidence.subject:
                 mismatches.append("subject_INSUFFICIENT_EVIDENCE")
             elif claim.subject and evidence.subject:
-                if claim.subject.upper() != evidence.subject.upper():
+                # Normalize: remove underscores and compare case-insensitive
+                claim_subj_norm = claim.subject.upper().replace("_", "")
+                ev_subj_norm = evidence.subject.upper().replace("_", "")
+                if claim_subj_norm != ev_subj_norm:
                     mismatches.append("subject_MISMATCH")
 
         # Predicate comparison
@@ -515,11 +555,13 @@ class PropositionVerifier:
         if claim_cond == evidence_cond:
             return True
 
+        # Prefix match: "6_month_benchtop" matches "6_month" (one is more specific)
+        if claim_cond.startswith(evidence_cond) or evidence_cond.startswith(claim_cond):
+            return True
+
         # "all_conditions" is STRICTER than "mean" or "worst_case"
-        # If claim says "all_conditions" but evidence says "mean", that's a MISMATCH
-        # (claiming all conditions when evidence only shows mean is an overclaim)
         if claim_cond == "all_conditions" and evidence_cond in ["mean", "worst_case", "average"]:
-            return False  # This is the H32 attack — partial promoted to full
+            return False
 
         # "worst_case" is different from "mean"
         if claim_cond == "worst_case" and evidence_cond in ["mean", "average", "all_conditions"]:

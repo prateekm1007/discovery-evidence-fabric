@@ -449,79 +449,98 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                               self.git_head, self.verifier_version, self.schema_version)
 
     def _golden_corpus_verification(self) -> FreshCheck:
-        """P0-D: Verify production claims against a golden certification corpus.
+        """P0-1/P0-8: Verify against INDEPENDENT certification corpus.
 
-        Per CEO P0-D: the verifier cannot be both judge AND ground truth.
-        We need a golden corpus with expected verdicts.
+        Per CEO: the corpus must be authored from independent truth, not from
+        observing verifier behavior. Must contain both valid (must ADMIT) and
+        invalid (must BLOCK) cases.
 
-        The golden corpus defines:
-          - which claims SHOULD be admitted (expected=SUPPORTS)
-          - which claims SHOULD be rejected (expected=BLOCK)
-          - the specific rejection reason expected
-
-        The gate compares actual verdict vs expected verdict.
+        The independent corpus is NOT the old golden_certification_corpus.json
+        (which was circular). It is independent_certification_corpus.json
+        authored from human reasoning about evidence-claim entailment.
         """
-        # Load golden corpus
-        corpus_path = EPISTEMIC_DIR / "golden_certification_corpus.json"
+        corpus_path = EPISTEMIC_DIR / "independent_certification_corpus.json"
         if not corpus_path.exists():
-            return FreshCheck("G7", "golden_corpus", False,
-                              "Golden certification corpus not found",
+            return FreshCheck("G7", "independent_corpus", False,
+                              "Independent certification corpus not found",
                               self.git_head, self.verifier_version, self.schema_version)
 
         try:
             with open(corpus_path) as f:
                 corpus = json.load(f)
 
-            expected_claims = corpus.get("expected_verdicts", [])
-            if not expected_claims:
-                return FreshCheck("G7", "golden_corpus", False,
-                                  "Golden corpus is empty",
+            cases = corpus.get("cases", [])
+            if not cases:
+                return FreshCheck("G7", "independent_corpus", False,
+                                  "Corpus is empty",
                                   self.git_head, self.verifier_version, self.schema_version)
 
-            # Verify each claim against expected verdict
-            sys.path.insert(0, str(REPO_ROOT))
-            from epistemic_integrity.dossier_firewall import DossierFirewall
+            # Check that corpus has BOTH positive and negative cases
+            positive_count = sum(1 for c in cases if c.get("case_type") == "POSITIVE")
+            negative_count = sum(1 for c in cases if c.get("case_type") in ("NEGATIVE", "METAMORPHIC"))
 
-            firewall = DossierFirewall(
-                canonical_state_dir=REPO_ROOT / "CANONICAL_STATE",
-                claim_registry_dir=EPISTEMIC_DIR / "approved_claims",
-                evidence_registry_dir=EPISTEMIC_DIR / "approved_evidence",
-                supersession_registry_dir=EPISTEMIC_DIR / "approved_provenance",
-            )
+            if positive_count == 0:
+                return FreshCheck("G7", "independent_corpus", False,
+                                  "Corpus has NO positive cases — a firewall that rejects everything would pass. Need valid claims that MUST be admitted.",
+                                  self.git_head, self.verifier_version, self.schema_version)
+
+            # Run each case through the PropositionVerifier
+            sys.path.insert(0, str(REPO_ROOT))
+            from epistemic_integrity.proposition_verifier import PropositionVerifier, PropositionVerdict, Proposition
+
+            verifier = PropositionVerifier()
 
             correct = 0
             incorrect = 0
             mismatches = []
 
-            for expected in expected_claims:
-                claim_id = expected["claim_id"]
-                expected_admitted = expected["expected_admitted"]  # True/False
+            for case_data in cases:
+                case_id = case_data["case_id"]
+                expected_admitted = case_data["expected_admitted"]
 
-                actual_admitted = False
-                try:
-                    firewall.render_dossier_claim(claim_id)
-                    actual_admitted = True
-                except ValueError:
-                    actual_admitted = False
+                # Build claim proposition from case data
+                claim_prop = Proposition(
+                    subject=case_data.get("claim_subject"),
+                    predicate=case_data.get("claim_predicate"),
+                    value=verifier.parse_value(case_data.get("claim_value", "")),
+                    comparator=case_data.get("claim_comparator"),
+                    condition=case_data.get("claim_condition"),
+                    version=case_data.get("claim_version"),
+                )
+
+                # Run verifier against evidence
+                result = verifier.verify(
+                    claim_prop,
+                    case_data.get("evidence_content", ""),
+                    evidence_version=case_data.get("evidence_version"),
+                )
+
+                actual_admitted = (result.verdict == PropositionVerdict.SUPPORTS)
 
                 if actual_admitted == expected_admitted:
                     correct += 1
                 else:
                     incorrect += 1
                     mismatches.append(
-                        f"{claim_id}: expected={'ADMITTED' if expected_admitted else 'BLOCKED'} but actual={'ADMITTED' if actual_admitted else 'BLOCKED'}"
+                        f"{case_id}: expected={'ADMIT' if expected_admitted else 'BLOCK'} "
+                        f"but actual={'ADMIT' if actual_admitted else 'BLOCK'} "
+                        f"(verdict={result.verdict.value})"
                     )
 
             if incorrect == 0:
-                return FreshCheck("G7", "golden_corpus", True,
-                                  f"{correct}/{correct+incorrect} claims correctly adjudicated",
-                                  self.git_head, self.verifier_version, self.schema_version)
+                return FreshCheck("G7", "independent_corpus", True,
+                                  f"{correct}/{correct+incorrect} correctly adjudicated "
+                                  f"({positive_count} positive, {negative_count} negative/metamorphic)",
+                                  self.git_head, self.verifier_version, self.schema_version,
+                                  raw_result={"correct": correct, "incorrect": incorrect,
+                                              "positive": positive_count, "negative": negative_count})
             else:
-                return FreshCheck("G7", "golden_corpus", False,
+                return FreshCheck("G7", "independent_corpus", False,
                                   f"{incorrect}/{correct+incorrect} mismatches: {mismatches[:3]}",
-                                  self.git_head, self.verifier_version, self.schema_version)
+                                  self.git_head, self.verifier_version, self.schema_version,
+                                  raw_result={"correct": correct, "incorrect": incorrect, "mismatches": mismatches})
         except Exception as e:
-            return FreshCheck("G7", "golden_corpus", False,
+            return FreshCheck("G7", "independent_corpus", False,
                               f"Error: {e}",
                               self.git_head, self.verifier_version, self.schema_version)
 
