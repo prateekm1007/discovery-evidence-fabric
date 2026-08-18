@@ -80,8 +80,8 @@ class ResearchAuthorizationGate:
     """READ-ONLY fresh-verification gate. Never mutates production state."""
 
     def __init__(self):
-        self.verifier_version = "v8"
-        self.schema_version = "3.0.0"
+        self.verifier_version = "v9"
+        self.schema_version = "3.1.0"
         self.git_head = self._get_git_head()
         self.worktree_clean = self._check_worktree_clean()
 
@@ -449,19 +449,21 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                               self.git_head, self.verifier_version, self.schema_version)
 
     def _golden_corpus_verification(self) -> FreshCheck:
-        """P0-1/P0-8: Verify against INDEPENDENT certification corpus.
+        """P0-1 v10: END-TO-END certification through the actual DossierFirewall.
 
-        Per CEO: the corpus must be authored from independent truth, not from
-        observing verifier behavior. Must contain both valid (must ADMIT) and
-        invalid (must BLOCK) cases.
+        Per CEO P0-1: G7 must be a true end-to-end certification test.
+        Every case must pass through:
+          ClaimRegistry → EvidenceBinding → Source verification →
+          Supersession → PropositionVerifier → DossierFirewall
 
-        The independent corpus is NOT the old golden_certification_corpus.json
-        (which was circular). It is independent_certification_corpus.json
-        authored from human reasoning about evidence-claim entailment.
+        NOT just direct PropositionVerifier.verify() calls.
+
+        Per CEO P0-9: Separate VERIFIER_CAPABILITY from PRODUCTION_DOSSIER.
+        This check reports both.
         """
         corpus_path = EPISTEMIC_DIR / "independent_certification_corpus.json"
         if not corpus_path.exists():
-            return FreshCheck("G7", "independent_corpus", False,
+            return FreshCheck("G7", "end_to_end_corpus", False,
                               "Independent certification corpus not found",
                               self.git_head, self.verifier_version, self.schema_version)
 
@@ -471,76 +473,179 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
 
             cases = corpus.get("cases", [])
             if not cases:
-                return FreshCheck("G7", "independent_corpus", False,
+                return FreshCheck("G7", "end_to_end_corpus", False,
                                   "Corpus is empty",
                                   self.git_head, self.verifier_version, self.schema_version)
 
-            # Check that corpus has BOTH positive and negative cases
             positive_count = sum(1 for c in cases if c.get("case_type") == "POSITIVE")
-            negative_count = sum(1 for c in cases if c.get("case_type") in ("NEGATIVE", "METAMORPHIC"))
-
             if positive_count == 0:
-                return FreshCheck("G7", "independent_corpus", False,
-                                  "Corpus has NO positive cases — a firewall that rejects everything would pass. Need valid claims that MUST be admitted.",
+                return FreshCheck("G7", "end_to_end_corpus", False,
+                                  "Corpus has NO positive cases",
                                   self.git_head, self.verifier_version, self.schema_version)
 
-            # Run each case through the PropositionVerifier
-            sys.path.insert(0, str(REPO_ROOT))
-            from epistemic_integrity.proposition_verifier import PropositionVerifier, PropositionVerdict, Proposition
+            # P0-1: Run each case through the FULL DossierFirewall pipeline
+            # Use a TEMP registry to avoid polluting production
+            import tempfile
+            temp_dir = Path(tempfile.mkdtemp(prefix="cert_e2e_"))
 
-            verifier = PropositionVerifier()
+            sys.path.insert(0, str(REPO_ROOT))
+            from epistemic_integrity.claim_registry import ClaimRegistry
+            from epistemic_integrity.evidence_binding import EvidenceBinding, Evidence, Source, SourceVerificationStates
+            from epistemic_integrity.supersession_engine import SupersessionEngine
+            from epistemic_integrity.evidence_classes import EvidenceClass
+            from epistemic_integrity.dossier_firewall import DossierFirewall
+            from epistemic_integrity.proposition_verifier import PropositionVerifier, Proposition, PropositionVerdict
+            import hashlib as _hl
+
+            # Create temp registries for certification
+            temp_claims = ClaimRegistry(temp_dir / "claims")
+            temp_evidence = EvidenceBinding(temp_dir / "evidence")
+            temp_supersession = SupersessionEngine(temp_dir / "supersession")
+
+            # Create a firewall pointing to temp registries
+            # We need a temp CANONICAL_STATE too
+            temp_canonical = temp_dir / "canonical"
+            temp_canonical.mkdir(parents=True, exist_ok=True)
+            # Copy PORTFOLIO.json
+            import shutil
+            src_portfolio = REPO_ROOT / "CANONICAL_STATE" / "PORTFOLIO.json"
+            if src_portfolio.exists():
+                shutil.copy(src_portfolio, temp_canonical / "PORTFOLIO.json")
+
+            firewall = DossierFirewall(
+                canonical_state_dir=temp_canonical,
+                claim_registry_dir=temp_dir / "claims",
+                evidence_registry_dir=temp_dir / "evidence",
+                supersession_registry_dir=temp_dir / "supersession",
+            )
+            # Override the registries with our temp ones
+            firewall.claim_registry = temp_claims
+            firewall.evidence_binding = temp_evidence
+            firewall.supersession_engine = temp_supersession
 
             correct = 0
             incorrect = 0
             mismatches = []
+            verifier_only_correct = 0
+            end_to_end_correct = 0
+
+            pv = PropositionVerifier()
 
             for case_data in cases:
                 case_id = case_data["case_id"]
                 expected_admitted = case_data["expected_admitted"]
+                evidence_content = case_data.get("evidence_content", "{}")
+                evidence_version = case_data.get("evidence_version")
 
-                # Build claim proposition from case data
+                # LAYER 1: Verifier capability check (direct)
                 claim_prop = Proposition(
                     subject=case_data.get("claim_subject"),
                     predicate=case_data.get("claim_predicate"),
-                    value=verifier.parse_value(case_data.get("claim_value", "")),
+                    value=pv.parse_value(case_data.get("claim_value", "")),
                     comparator=case_data.get("claim_comparator"),
                     condition=case_data.get("claim_condition"),
                     version=case_data.get("claim_version"),
                 )
+                verifier_result = pv.verify(claim_prop, evidence_content, evidence_version)
+                verifier_admitted = (verifier_result.verdict == PropositionVerdict.SUPPORTS)
 
-                # Run verifier against evidence
-                result = verifier.verify(
-                    claim_prop,
-                    case_data.get("evidence_content", ""),
-                    evidence_version=case_data.get("evidence_version"),
+                if verifier_admitted == expected_admitted:
+                    verifier_only_correct += 1
+
+                # LAYER 2: End-to-end through DossierFirewall
+                # Register evidence
+                ev_hash = _hl.sha256(evidence_content.encode()).hexdigest()
+                ev_id = f"EXP-CERT-{case_id}"
+                evidence_obj = Evidence(
+                    evidence_id=ev_id,
+                    territory_id="CV-T99",
+                    description=f"Certification evidence for {case_id}",
+                    evidence_type="SIMULATION",
+                    code_commit=self.git_head,
+                    config_hash=_hl.sha256(b"cert_config").hexdigest(),
+                    output_content=evidence_content,
+                    output_hash=ev_hash,
+                    random_seed=42,
+                    python_version=sys.version.split()[0],
+                    dependency_lock_hash=_hl.sha256(b"cert_deps").hexdigest(),
+                    model_id=f"cert_model_{case_id}",
+                    model_parameters={},
+                    artifact_path=None,  # synthetic — no real artifact path
+                    version=evidence_version,
+                )
+                temp_evidence.register_evidence(evidence_obj)
+
+                # Register claim
+                claim = temp_claims.register_claim(
+                    text=case_data.get("claim_text", ""),
+                    epistemic_class=EvidenceClass.SIMULATION_DERIVED,
+                    territory_id="CV-T99",
+                    evidence_ids=[ev_id],
+                    simulation_commit=self.git_head,
+                    simulation_output_hash=ev_hash,
+                    proposition_subject=case_data.get("claim_subject"),
+                    proposition_predicate=case_data.get("claim_predicate"),
+                    proposition_value=case_data.get("claim_value"),
+                    proposition_comparator=case_data.get("claim_comparator"),
+                    proposition_condition=case_data.get("claim_condition"),
+                    proposition_version=case_data.get("claim_version"),
+                )
+                temp_evidence.bind_claim_to_evidence(claim.claim_id, ev_id)
+
+                # Mark evidence as current in supersession
+                temp_supersession.register_artifact(
+                    artifact_id=ev_id,
+                    territory_id="CV-T99",
+                    version=evidence_version or "V1",
+                    description=f"Cert evidence for {case_id}",
+                    status="CURRENT",
+                    git_commit=self.git_head,
                 )
 
-                actual_admitted = (result.verdict == PropositionVerdict.SUPPORTS)
+                # Try to render through firewall
+                actual_admitted = False
+                try:
+                    firewall.render_dossier_claim(claim.claim_id)
+                    actual_admitted = True
+                except (ValueError, Exception):
+                    actual_admitted = False
 
                 if actual_admitted == expected_admitted:
+                    end_to_end_correct += 1
                     correct += 1
                 else:
                     incorrect += 1
                     mismatches.append(
                         f"{case_id}: expected={'ADMIT' if expected_admitted else 'BLOCK'} "
                         f"but actual={'ADMIT' if actual_admitted else 'BLOCK'} "
-                        f"(verdict={result.verdict.value})"
+                        f"(verifier={verifier_result.verdict.value})"
                     )
 
+            # Clean up temp directory
+            try:
+                shutil.rmtree(temp_dir)
+            except Exception:
+                pass
+
             if incorrect == 0:
-                return FreshCheck("G7", "independent_corpus", True,
-                                  f"{correct}/{correct+incorrect} correctly adjudicated "
-                                  f"({positive_count} positive, {negative_count} negative/metamorphic)",
+                return FreshCheck("G7", "end_to_end_corpus", True,
+                                  f"{correct}/{correct+incorrect} end-to-end correct "
+                                  f"(verifier_only={verifier_only_correct}, e2e={end_to_end_correct}, "
+                                  f"positive={positive_count})",
                                   self.git_head, self.verifier_version, self.schema_version,
-                                  raw_result={"correct": correct, "incorrect": incorrect,
-                                              "positive": positive_count, "negative": negative_count})
+                                  raw_result={
+                                      "verifier_capability_correct": verifier_only_correct,
+                                      "end_to_end_correct": end_to_end_correct,
+                                      "total": correct + incorrect,
+                                      "positive": positive_count,
+                                  })
             else:
-                return FreshCheck("G7", "independent_corpus", False,
+                return FreshCheck("G7", "end_to_end_corpus", False,
                                   f"{incorrect}/{correct+incorrect} mismatches: {mismatches[:3]}",
                                   self.git_head, self.verifier_version, self.schema_version,
-                                  raw_result={"correct": correct, "incorrect": incorrect, "mismatches": mismatches})
+                                  raw_result={"mismatches": mismatches})
         except Exception as e:
-            return FreshCheck("G7", "independent_corpus", False,
+            return FreshCheck("G7", "end_to_end_corpus", False,
                               f"Error: {e}",
                               self.git_head, self.verifier_version, self.schema_version)
 
