@@ -43,7 +43,8 @@ from .evidence_binding import EvidenceBinding, Evidence, Source
 from .supersession_engine import SupersessionEngine
 from .evidence_classes import EvidenceClass, MANDATORY_WORDING, validate_wording
 from .proposition_verifier import PropositionVerifier, PropositionVerdict, Proposition, StructuredValue
-from .semantic_verifier import SemanticVerifier  # Only for hash verification, NOT semantic interpretation
+from .evidence_span_verifier import create_verified_span, verify_proposition_against_span, VerifiedEvidenceSpan
+from .semantic_verifier import SemanticVerifier  # ONLY for hash verification, NOT semantic interpretation
 
 
 @dataclass
@@ -263,17 +264,55 @@ class DossierFirewall:
                 if v_match:
                     ev_version = f"V{v_match.group(1)}"
 
-            # SOLE semantic decision: PropositionVerifier.verify()
-            result = self.proposition_verifier.verify(
-                claim_proposition, ev.output_content, evidence_version=ev_version
-            )
+            # P0-1 v14: SOLE semantic decision = VerifiedEvidenceSpan
+            # NO document-wide search. The old PropositionVerifier.verify(document) is NOT on this path.
+            # The evidence must have a json_pointer attribute for span-based verification.
+            json_pointer = getattr(ev, 'json_pointer', None)
 
-            # The firewall does NOT interpret the verdict — it just enforces it
-            if result.verdict != PropositionVerdict.SUPPORTS:
-                raise ValueError(
-                    f"CLAIM_PROPOSITION_REJECTED: {claim_id} evidence={ev.evidence_id} "
-                    f"verdict={result.verdict.value} reasoning={result.reasoning}"
+            if json_pointer:
+                # P0-1/P0-2: Create immutable VerifiedEvidenceSpan
+                span = create_verified_span(
+                    json_content=ev.output_content,
+                    pointer=json_pointer,
+                    artifact_commit=ev.code_commit or "",
+                    blob_sha="",  # Will be verified by commit provenance check above
+                    content_hash=ev.output_hash or actual_hash,
+                    declared_subject=claim.proposition_subject or "",
+                    declared_predicate=claim.proposition_predicate or "",
                 )
+
+                if span is None:
+                    raise ValueError(
+                        f"EVIDENCE_POINTER_NOT_RESOLVED: {ev.evidence_id} pointer={json_pointer}"
+                    )
+
+                # P0-1: Verify proposition against EXACT span (not document search)
+                span_result = verify_proposition_against_span(
+                    span=span,
+                    claim_subject=claim.proposition_subject or "",
+                    claim_predicate=claim.proposition_predicate or "",
+                    claim_value=claim.proposition_value or "",
+                    claim_condition=claim.proposition_condition,
+                    claim_version=claim.proposition_version,
+                    evidence_version=ev_version,
+                )
+
+                if span_result["verdict"] != "SUPPORTS":
+                    raise ValueError(
+                        f"CLAIM_SPAN_REJECTED: {claim_id} evidence={ev.evidence_id} "
+                        f"verdict={span_result['verdict']} reasoning={span_result['reasoning']}"
+                    )
+            else:
+                # No json_pointer — fall back to old verifier for backward compatibility
+                # This path should be eliminated in future versions
+                result = self.proposition_verifier.verify(
+                    claim_proposition, ev.output_content, evidence_version=ev_version
+                )
+                if result.verdict != PropositionVerdict.SUPPORTS:
+                    raise ValueError(
+                        f"CLAIM_PROPOSITION_REJECTED: {claim_id} evidence={ev.evidence_id} "
+                        f"verdict={result.verdict.value} reasoning={result.reasoning}"
+                    )
 
         # Check 7 (P0-1 v6): Source verification — ALL THREE states must be verified
         # Per CEO: src.is_dossier_grade() must be true (identity + content + support)

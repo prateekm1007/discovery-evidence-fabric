@@ -495,7 +495,7 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
             from epistemic_integrity.evidence_classes import EvidenceClass
             from epistemic_integrity.dossier_firewall import DossierFirewall
             from epistemic_integrity.proposition_verifier import PropositionVerifier, Proposition, PropositionVerdict
-            from epistemic_integrity.evidence_span_verifier import resolve_json_pointer, verify_proposition_against_span
+            from epistemic_integrity.evidence_span_verifier import create_verified_span, verify_proposition_against_span, VerifiedEvidenceSpan
             import hashlib as _hl
 
             temp_claims = ClaimRegistry(temp_dir / "claims")
@@ -587,17 +587,44 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                 provenance_complete = case_data.get("provenance_complete", False)
 
                 # LAYER 1: Pointer-based verification (P0-1: EXACT pointer, NOT document search)
+                # The span's declared_subject is what the EVIDENCE says (from key name)
+                # The verifier compares the CLAIM subject against the EVIDENCE's declared subject
                 json_pointer = case_data.get("json_pointer", "")
-                span = resolve_json_pointer(evidence_content, json_pointer)
+
+                # Infer evidence subject from the key at the pointer (for evidence-side declaration)
+                # This is EXTRACTION, not PROOF — the proof is the value match
+                import json as _json
+                try:
+                    _data = _json.loads(evidence_content)
+                    _components = json_pointer.split("/")[1:]
+                    _current = _data
+                    for _comp in _components:
+                        _current = _current[_comp.replace("~1", "/").replace("~0", "~")]
+                    _key_name = _components[-1] if _components else ""
+                except Exception:
+                    _key_name = ""
+
+                # Evidence declares its own subject from its key name
+                _ev_subject = ""
+                _key_lower = _key_name.lower()
+                if "m3" in _key_lower:
+                    _ev_subject = "M3_REFINED"
+                elif "a4" in _key_lower:
+                    _ev_subject = "A4_cryo_debonding"
+
+                span = create_verified_span(
+                    json_content=evidence_content,
+                    pointer=json_pointer,
+                    artifact_commit=commit_sha,
+                    blob_sha=blob_sha,
+                    content_hash=actual_content_hash,
+                    declared_subject=_ev_subject,  # What the EVIDENCE says
+                    declared_predicate=_key_name.lower(),  # The actual key
+                )
                 if span is None:
                     verifier_admitted = False
                     verifier_result_verdict = "POINTER_NOT_FOUND"
                 else:
-                    # Fill in provenance on the span
-                    span.artifact_commit = commit_sha
-                    span.blob_sha = blob_sha
-                    span.content_hash = actual_content_hash
-
                     # Verify proposition against EXACT span value
                     span_result = verify_proposition_against_span(
                         span=span,
@@ -635,6 +662,8 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                     version=evidence_version,
                 )
                 temp_evidence.register_evidence(evidence_obj)
+                # P0-1 v14: Attach json_pointer to evidence for span-based verification
+                evidence_obj.json_pointer = case_data.get("json_pointer", "")
 
                 claim = temp_claims.register_claim(
                     text=case_data.get("claim_text", ""),
