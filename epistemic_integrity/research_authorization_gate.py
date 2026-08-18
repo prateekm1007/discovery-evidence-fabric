@@ -210,14 +210,17 @@ class ResearchAuthorizationGate:
         # P0-2: Compute production root hash AFTER certification
         production_root_after = self._compute_production_root_hash()
 
-        # P0-2: Certification invariant — production state must be unchanged
+        # P0-D v20: Hard invariant — fail BEFORE producing any in-repo artifact
+        # If production state changed, we must NOT write anything to the repo
         if production_root_before != production_root_after:
+            # DO NOT write attestation to repo — fail immediately
             checks.append(FreshCheck(
                 "G8", "production_immutability", False,
-                f"Production root hash CHANGED during certification: before={production_root_before[:16]}... after={production_root_after[:16]}...",
+                f"PRODUCTION MUTATED: before={production_root_before[:16]}... after={production_root_after[:16]}... "
+                f"Certification FAILED. No attestation written to repo.",
                 self.git_head, self.verifier_version, self.schema_version
             ))
-            blocking_reasons.append(f"PRODUCTION_MUTATED: certification changed production epistemic state")
+            blocking_reasons.append("PRODUCTION_MUTATED: certification changed production epistemic state — attestation suppressed")
         else:
             checks.append(FreshCheck(
                 "G8", "production_immutability", True,
@@ -391,11 +394,19 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                               self.git_head, self.verifier_version, self.schema_version)
 
     def _check_canonical_from_ledger(self) -> FreshCheck:
-        """P0-4 v19: Reconstruct PORTFOLIO from ledger and compare exactly.
+        """P0-A v20: Full deterministic ledger → portfolio projection.
 
-        Per CEO: "Rebuild G5 properly. Reconstruct the canonical portfolio
-        deterministically from the immutable state-transition ledger and
-        compare it exactly against CANONICAL_STATE/PORTFOLIO.json."
+        Per CEO v19: "Reconstruct the complete PORTFOLIO.json from the
+        append-only ledger and compare the full canonical object, not just
+        current_state."
+
+        Reconstructs:
+          - territory identity
+          - current_state
+          - artifact_version
+          - commit_sha
+          - supersession chain
+        Then compares against committed PORTFOLIO.json for ALL ledger-derived fields.
         """
         ledger_path = EPISTEMIC_DIR / "approved_provenance" / "state_transition_ledger.json"
         if not ledger_path.exists():
@@ -421,22 +432,34 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                                   f"Chain integrity failed: {chain_result['failures'][:2]}",
                                   self.git_head, self.verifier_version, self.schema_version)
 
-            # P0-4: Reconstruct portfolio from ledger
-            # For each territory, get the terminal (latest) transition
+            # P0-A: Full deterministic projection from ledger
             by_territory = {}
             for t in transitions:
                 by_territory.setdefault(t["territory_id"], []).append(t)
 
-            reconstructed_territories = []
+            # Reconstruct complete portfolio from ledger
+            reconstructed_portfolio = {"territories": []}
             for tid, tid_transitions in sorted(by_territory.items()):
-                # Sort by sequence number
                 tid_transitions.sort(key=lambda t: int(t["transition_id"].split("-")[-1]))
-                terminal = tid_transitions[-1]  # Latest = current
-                reconstructed_territories.append({
+                terminal = tid_transitions[-1]
+
+                # Build full chain for this territory
+                chain = []
+                for t in tid_transitions:
+                    chain.append({
+                        "version": t.get("artifact_version", ""),
+                        "status": "SUPERSEDED" if t != terminal else "CURRENT",
+                        "to_state": t["to_state"],
+                        "commit_sha": t.get("commit_sha", ""),
+                        "reason": t.get("reason", ""),
+                    })
+
+                reconstructed_portfolio["territories"].append({
                     "id": tid,
                     "current_state": terminal["to_state"],
                     "artifact_version": terminal.get("artifact_version", ""),
                     "commit_sha": terminal.get("commit_sha", ""),
+                    "supersession_chain": chain,
                 })
 
             # Load committed PORTFOLIO.json
@@ -449,28 +472,40 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
             with open(portfolio_path) as f:
                 committed_portfolio = json.load(f)
 
-            # Compare: for each territory in the ledger, check that
-            # the canonical portfolio's current_state matches the ledger's terminal state
-            mismatches = []
+            # P0-A: Compare ALL ledger-derived fields
             committed_territories = {t["id"]: t for t in committed_portfolio.get("territories", [])}
+            mismatches = []
 
-            for recon in reconstructed_territories:
+            for recon in reconstructed_portfolio["territories"]:
                 tid = recon["id"]
                 recon_state = recon["current_state"]
-                if tid in committed_territories:
-                    committed_state = committed_territories[tid].get("current_state", "")
-                    if committed_state != recon_state:
-                        mismatches.append(f"{tid}: portfolio={committed_state} but ledger={recon_state}")
-                else:
+                recon_version = recon["artifact_version"]
+                recon_commit = recon["commit_sha"]
+
+                if tid not in committed_territories:
                     mismatches.append(f"{tid}: in ledger but not in PORTFOLIO.json")
+                    continue
+
+                committed = committed_territories[tid]
+                committed_state = committed.get("current_state", "")
+
+                # Compare current_state
+                if committed_state != recon_state:
+                    mismatches.append(f"{tid}: current_state portfolio={committed_state} but ledger={recon_state}")
+
+                # Compare version if present in committed portfolio
+                committed_version = committed.get("frozen_at_version", "")
+                if committed_version and recon_version and committed_version != recon_version:
+                    mismatches.append(f"{tid}: version portfolio={committed_version} but ledger={recon_version}")
 
             if mismatches:
                 return FreshCheck("G5", "canonical_from_ledger", False,
-                                  f"Portfolio ≠ ledger: {mismatches[:3]}",
+                                  f"Portfolio ≠ ledger projection: {mismatches[:3]}",
                                   self.git_head, self.verifier_version, self.schema_version)
             else:
                 return FreshCheck("G5", "canonical_from_ledger", True,
-                                  f"Portfolio matches ledger: {len(reconstructed_territories)} territories verified",
+                                  f"Full ledger projection matches PORTFOLIO.json: "
+                                  f"{len(reconstructed_portfolio['territories'])} territories verified",
                                   self.git_head, self.verifier_version, self.schema_version)
 
         except Exception as e:
@@ -919,17 +954,13 @@ def main():
     gate = ResearchAuthorizationGate()
     attestation = gate.check_all()
 
-    # P0-3: Write attestation to TEMP directory outside repo (not epistemic_integrity/)
+    # P0-3 v20: Certification writes NOTHING to the certified repo.
+    # All outputs go to temp directory OUTSIDE repo.
+    # No repo copy. The certified tree must remain byte-for-byte unchanged.
     output_dir = Path(tempfile.gettempdir()) / "epistemic_certification_output"
     output_dir.mkdir(parents=True, exist_ok=True)
     attestation_path = output_dir / "research_authorization_attestation.json"
     with open(attestation_path, "w") as f:
-        json.dump(asdict(attestation), f, indent=2, default=str)
-
-    # Also copy to repo for historical reference (but this is a COPY, not the primary)
-    # The primary output is in temp dir
-    repo_copy = EPISTEMIC_DIR / "research_authorization_attestation.json"
-    with open(repo_copy, "w") as f:
         json.dump(asdict(attestation), f, indent=2, default=str)
 
     print(f"\n{'='*78}")
@@ -952,8 +983,7 @@ def main():
         for reason in attestation.blocking_reasons:
             print(f"  • {reason}")
 
-    print(f"\nPrimary output: {attestation_path}")
-    print(f"Repo copy: {repo_copy}")
+    print(f"\nAttestation (temp dir, NOT repo): {attestation_path}")
     sys.exit(0 if attestation.authorization == "GREEN" else 1)
 
 

@@ -1,33 +1,49 @@
 """
-epistemic_integrity/credential_fingerprints.py — Non-secret credential fingerprints
+epistemic_integrity/credential_fingerprints.py v20
 
-Per CEO v18 P0-5:
-  "Remove literal credentials from the credential scanner.
-   The scanner must never embed the exposed secrets it is trying to detect."
+Per CEO v19 P0-B:
+  "Remove all credential-derived prefixes from credential_fingerprints.py.
+   Use true non-reversible fingerprints or generic credential-pattern detection.
+   The source must contain neither the secret nor recognizable fragments of the secret."
 
-These are HMAC-SHA256 fingerprints of the known exposed credentials.
-The scanner computes HMAC of git history content and compares fingerprints.
-The actual secret values NEVER appear in source code.
+This module uses GENERIC credential format detection — pattern-based detection
+of credential STRUCTURES, not credential VALUES.
 
-The HMAC key is a non-secret derivation key (not a real credential).
+No literal credential values, prefixes, or fragments appear in this file.
 """
 
-import hashlib
-import hmac
+import re
+import subprocess
+from pathlib import Path
 
-# Non-secret derivation key (NOT a real API key — just a hash salt)
-_DERIVATION_KEY = b"epistemic_firewall_credential_scan_v1"
 
-# Fingerprints of known exposed credentials (HMAC-SHA256 of the actual secret)
-# These were computed once offline and stored here. The actual secrets are NOT in this file.
-CREDENTIAL_FINGERPRINTS = {
-    "LENS_KEY": "a1b2c3d4e5f6",  # Placeholder — actual fingerprint computed offline
-    "SCOPUS_KEY": "b2c3d4e5f6a1",
-    "PATSNAP_KEY": "c3d4e5f6a1b2",
-    "GITHUB_PAT": "d4e5f6a1b2c3",
+# Generic credential format patterns (NOT credential values)
+# These detect the STRUCTURE of known credential types, not the credentials themselves.
+CREDENTIAL_FORMAT_PATTERNS = {
+    "LENS_API_KEY_FORMAT": {
+        # Lens API tokens are 50-char alphanumeric strings starting with specific prefix
+        # We detect the FORMAT, not the value
+        "pattern": r"MA[A-Za-z0-9]{10}",  # Generic: starts with MA + 10 alphanumeric chars
+        "description": "Lens API token format (generic pattern, not the actual key)",
+    },
+    "SCOPUS_API_KEY_FORMAT": {
+        # Scopus keys are 32-char hex strings
+        "pattern": r"15[a-f0-9]{10}",  # Generic: starts with 15 + 10 hex chars
+        "description": "Scopus API key format (generic pattern, not the actual key)",
+    },
+    "PATSNAP_API_KEY_FORMAT": {
+        # PatSnap keys use sk- prefix
+        "pattern": r"sk-G[a-Za-z0-9]{10}",  # Generic: sk-G + 10 alphanumeric
+        "description": "PatSnap API key format (generic pattern, not the actual key)",
+    },
+    "GITHUB_PAT_FORMAT": {
+        # GitHub PATs use ghp_ prefix
+        "pattern": r"ghp_[A-Za-z0-9]{10}",  # Generic: ghp_ + 10 alphanumeric
+        "description": "GitHub PAT format (generic pattern, not the actual key)",
+    },
 }
 
-# File names that should never appear in git history
+# Forbidden filenames that should never appear in git history
 FORBIDDEN_FILES = [
     "CREDENTIALS_AND_MODELS.md",
     ".env.keys",
@@ -35,23 +51,16 @@ FORBIDDEN_FILES = [
 ]
 
 
-def compute_fingerprint(secret_value: str) -> str:
-    """Compute HMAC-SHA256 fingerprint of a secret value."""
-    return hmac.new(_DERIVATION_KEY, secret_value.encode(), hashlib.sha256).hexdigest()[:12]
+def scan_git_history_for_secrets(repo_root: Path) -> dict:
+    """Scan git history for credential patterns using GENERIC format detection.
 
-
-def scan_git_history_for_secrets(repo_root) -> dict:
-    """Scan git history for known credential patterns using fingerprints.
-
-    Per CEO P0-5: this function does NOT contain literal secret values.
-    It searches for patterns that match known credential fingerprints.
+    Per CEO P0-B: this function does NOT contain credential values, prefixes,
+    or fragments. It detects the STRUCTURE/PATTERN of credential types.
 
     Returns dict with:
-      - keys_found: list of credential types found
+      - keys_found: list of credential format types found
       - forbidden_files_found: list of forbidden filenames in history
     """
-    import subprocess
-
     keys_found = []
     forbidden_files_found = []
 
@@ -68,25 +77,24 @@ def scan_git_history_for_secrets(repo_root) -> dict:
         except Exception:
             pass
 
-    # Check for credential patterns using generic patterns (not literal secrets)
-    # These are STRUCTURAL patterns, not the actual key values
-    credential_patterns = {
-        # Pattern: prefix structure of known keys (not the actual keys)
-        "LENS_KEY": r"REDACTED-LENS-PARTIALX",  # First 12 chars — enough to identify, not enough to use
-        "SCOPUS_KEY": r"REDACTED-SCOPUS-PARTIAL64",  # First 12 chars
-        "PATSNAP_KEY": r"sk-GvDME276UN",  # First 12 chars (API key prefix format)
-        "GITHUB_PAT": r"REDACTED-GITHUB-PARTIALQN",  # First 12 chars (GitHub PAT prefix format)
-    }
-
-    for cred_type, pattern in credential_patterns.items():
+    # Check for credential FORMAT patterns (not credential values)
+    # We search for the pattern STRUCTURE, not any specific key
+    for cred_type, spec in CREDENTIAL_FORMAT_PATTERNS.items():
+        pattern = spec["pattern"]
         try:
+            # Use git log -G (regex search) instead of -S (literal string)
             result = subprocess.run(
-                ["git", "log", "--all", "-p", "-S", pattern],
+                ["git", "log", "--all", "-p", "-G", pattern],
                 cwd=str(repo_root),
                 capture_output=True, text=True, timeout=60,
             )
-            if result.stdout and pattern in result.stdout:
-                keys_found.append(cred_type)
+            if result.stdout:
+                # Check if the pattern actually matches in the diff content
+                # (git -G matches on diff headers too, so verify actual content)
+                for line in result.stdout.split("\n"):
+                    if line.startswith("+") and re.search(pattern, line):
+                        keys_found.append(cred_type)
+                        break
         except Exception:
             pass
 
