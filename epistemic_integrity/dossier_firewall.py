@@ -218,6 +218,32 @@ class DossierFirewall:
                     f"EVIDENCE_NO_OUTPUT_CONTENT: {ev.evidence_id} — cannot verify"
                 )
 
+            # P0-2: Verify evidence provenance at render time — not just presence of fields
+            # Recompute output_hash from actual content and compare to stored hash
+            import hashlib as _hl
+            actual_hash = _hl.sha256(ev.output_content.encode()).hexdigest()
+            if ev.output_hash and actual_hash != ev.output_hash:
+                raise ValueError(
+                    f"EVIDENCE_OUTPUT_HASH_MISMATCH: {ev.evidence_id} "
+                    f"stored={ev.output_hash[:16]}... actual={actual_hash[:16]}..."
+                )
+
+            # P0-2: Verify artifact exists in the referenced commit
+            if ev.code_commit and ev.artifact_path:
+                from .commit_provenance_verifier import CommitProvenanceVerifier
+                cpv = CommitProvenanceVerifier()
+                cpv_result = cpv.verify_artifact_in_commit(
+                    artifact_id=ev.evidence_id,
+                    commit_sha=ev.code_commit,
+                    artifact_path=ev.artifact_path,
+                    expected_output_hash=ev.output_hash or actual_hash,
+                )
+                if not cpv_result.passed:
+                    raise ValueError(
+                        f"EVIDENCE_COMMIT_PROVENANCE_FAILED: {ev.evidence_id} "
+                        f"check={cpv_result.check_name} reason={cpv_result.failure_reason}"
+                    )
+
             # Get evidence version LOCALLY (from artifact_path, not global extraction)
             ev_version = ev.version
             if not ev_version and ev.artifact_path:
@@ -237,15 +263,29 @@ class DossierFirewall:
                     f"verdict={result.verdict.value} reasoning={result.reasoning}"
                 )
 
-        # Check 7 (P1-C): Source verification — three independent states
+        # Check 7 (P0-1 v6): Source verification — ALL THREE states must be verified
+        # Per CEO: src.is_dossier_grade() must be true (identity + content + support)
         for src in sources:
+            # P0-1: Require ALL three verification states
             if not src.is_identity_verified():
                 raise ValueError(
                     f"SOURCE_IDENTITY_NOT_VERIFIED: {src.source_id} "
                     f"({src.source_type} {src.identifier} requires external registry verification)"
                 )
 
-            # Content hash verification (P0-2) — using hash_verifier for hash math only
+            if not src.is_content_verified():
+                raise ValueError(
+                    f"SOURCE_CONTENT_NOT_VERIFIED: {src.source_id} "
+                    f"content_verified state is false"
+                )
+
+            if not src.is_support_verified():
+                raise ValueError(
+                    f"SOURCE_SUPPORT_NOT_VERIFIED: {src.source_id} "
+                    f"support_verified state is false"
+                )
+
+            # Content hash verification (recompute from actual content)
             if src.content and src.content_hash:
                 if not self.hash_verifier.verify_content_hash(src.content, src.content_hash):
                     raise ValueError(f"SOURCE_CONTENT_HASH_MISMATCH: {src.source_id}")
