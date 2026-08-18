@@ -941,7 +941,32 @@ def main():
 
     P0-3 v19: Outputs (attestation, reports) go to a TEMP directory OUTSIDE the repo.
     The production repository tree must remain unchanged.
+
+    v25 CEO AUDIT P0-6: "Detached certification runner exists but not integrated
+    into gate main()". Per CEO v20 P0-1: "Run the entire certification gate from
+    a detached clean worktree of the exact certified commit. Production checkout
+    must not be the execution environment."
+
+    Default behavior: route through detached_certification_runner, which creates
+    a `git worktree add --detach` at the current HEAD and runs the gate INSIDE
+    that detached worktree. This makes G8 (production immutability) a
+    defense-in-depth invariant rather than the primary containment mechanism.
+
+    Escape hatch: `--in-place` flag runs the gate directly in the current
+    checkout (for debugging or CI environments where worktree creation is
+    not desirable). Use with caution.
     """
+    # v25: Default route — detached worktree certification
+    if "--in-place" not in sys.argv:
+        # Route through detached certification runner
+        # This creates a detached worktree at HEAD and runs the gate inside it
+        from epistemic_integrity.detached_certification_runner import (
+            run_detached_certification,
+        )
+        exit_code = run_detached_certification()
+        sys.exit(exit_code)
+
+    # --in-place: run directly in current checkout (debugging/CI mode)
     import tempfile
     gate = ResearchAuthorizationGate()
     attestation = gate.check_all()
@@ -957,7 +982,7 @@ def main():
 
     print(f"\n{'='*78}")
     status = "🟢 GREEN — RESEARCH AUTHORIZED" if attestation.authorization == "GREEN" else "🔴 RED — RESEARCH BLOCKED"
-    print(f"RESEARCH AUTHORIZATION GATE (v8 READ-ONLY FRESH): {status}")
+    print(f"RESEARCH AUTHORIZATION GATE (v8 READ-ONLY FRESH, IN-PLACE): {status}")
     print(f"{'='*78}")
     print(f"Attestation ID: {attestation.attestation_id}")
     print(f"Commit SHA: {attestation.commit_sha}")
