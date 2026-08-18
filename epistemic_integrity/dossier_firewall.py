@@ -48,7 +48,7 @@ from .evidence_binding import EvidenceBinding, Evidence, Source
 from .supersession_engine import SupersessionEngine
 from .evidence_classes import EvidenceClass, MANDATORY_WORDING, validate_wording
 from .semantic_verifier import SemanticVerifier, SemanticVerdict
-from .proposition_verifier import PropositionVerifier, PropositionVerdict
+from .proposition_verifier import PropositionVerifier, PropositionVerdict, Proposition, StructuredValue
 
 
 @dataclass
@@ -190,110 +190,146 @@ class DossierFirewall:
                 f"CLAIM_WORDING_VIOLATION: {claim_id} violations={wording_check['violations']}"
             )
 
-        # Firewall check 5 (P0-1): STRUCTURED PROPOSITION verification
-        # Uses the DECLARED proposition from claim fields (not extracted from text).
-        # This is deterministic — the claim explicitly states (subject, predicate, value, ...)
-        # and the verifier checks that the evidence contains that exact proposition.
+        # Firewall check 5 (P0-1 v4): STRICT STRUCTURED PROPOSITION verification
+        # Uses DECLARED proposition fields with STRICT rules:
+        #   - None is NOT wildcard — missing evidence = INSUFFICIENT_EVIDENCE
+        #   - Units are first-class — 96.97% != 96.97 mmHg
+        #   - Version is LOCAL to evidence artifact
+        #   - Subject+value must be colocated
+        #   - Condition semantics enforced (all_conditions != mean)
         semantic_failures = []
 
-        # Build claim proposition from DECLARED fields (not text extraction)
-        from .proposition_verifier import Proposition
+        # Build claim proposition from DECLARED fields
         claim_proposition = Proposition(
             subject=claim.proposition_subject,
             predicate=claim.proposition_predicate,
-            value=claim.proposition_value,
+            value=self.proposition_verifier.parse_value(claim.proposition_value) if claim.proposition_value else None,
             comparator=claim.proposition_comparator,
             condition=claim.proposition_condition,
             version=claim.proposition_version,
             raw_text=claim.text,
         )
 
+        # P0-D: Verify claim text matches the DECLARED proposition
+        # The claim text must contain the key elements of the proposition
+        # (subject, value magnitude) — if not, it's a text↔proposition mismatch
+        if claim.proposition_subject:
+            # Check if subject appears in text (try multiple forms)
+            subj = claim.proposition_subject
+            text_upper = claim.text.upper()
+            # Try: exact, without underscores, with spaces, first 4 chars
+            subj_variants = [
+                subj.upper(),
+                subj.upper().replace("_", ""),
+                subj.upper().replace("_", " "),
+                subj.upper()[:4],  # e.g., "M3_R" → "M3_R" or "M3" → "M3"
+                subj.upper()[:2],  # e.g., "M3"
+            ]
+            found = any(v in text_upper for v in subj_variants if len(v) >= 2)
+            if not found:
+                semantic_failures.append(
+                    f"TEXT_PROPOSITION_MISMATCH: claim text does not contain subject '{claim.proposition_subject}'"
+                )
+        if claim.proposition_value:
+            val = self.proposition_verifier.parse_value(claim.proposition_value)
+            if val and val.magnitude is not None:
+                val_str = str(val.magnitude)
+                if val_str not in claim.text:
+                    semantic_failures.append(
+                        f"TEXT_PROPOSITION_MISMATCH: claim text does not contain value '{val_str}'"
+                    )
+
         for ev in evidence:
             if ev.output_content:
-                # Extract all propositions from evidence and check if claim proposition matches any
-                evidence_props = self.proposition_verifier.extract_all_propositions(ev.output_content)
+                # Get evidence version from artifact_path (LOCAL, not global)
+                ev_version = None
+                if ev.artifact_path:
+                    v_match = re.search(r"V(\d+)", ev.artifact_path)
+                    if v_match:
+                        ev_version = f"V{v_match.group(1)}"
 
-                # Also do direct text search for the value in evidence (catches cases where
-                # JSON extraction misses the proposition)
-                value_in_evidence = False
-                if claim.proposition_value:
-                    # Check if the value appears in evidence content
-                    val_numeric = re.search(r"(\d+\.?\d*)", claim.proposition_value)
-                    if val_numeric:
-                        val_str = val_numeric.group(1)
-                        if val_str in ev.output_content:
-                            value_in_evidence = True
+                # Use STRICT proposition verifier
+                result = self.proposition_verifier.verify(
+                    claim_proposition, ev.output_content, evidence_version=ev_version
+                )
 
-                # Check if subject+value appear TOGETHER in evidence
-                # This prevents "wrong entity gets right number" attack
-                subject_value_together = False
-                if claim.proposition_subject and claim.proposition_value:
-                    # Check if subject and value appear within 200 chars of each other
-                    subj_pattern = re.compile(re.escape(claim.proposition_subject[:4]), re.IGNORECASE)
-                    val_numeric = re.search(r"(\d+\.?\d*)", claim.proposition_value)
-                    if val_numeric:
-                        val_str = val_numeric.group(1)
-                        for subj_match in subj_pattern.finditer(ev.output_content):
-                            # Check if value appears within 200 chars after subject
-                            region = ev.output_content[subj_match.start():subj_match.start()+200]
-                            if val_str in region:
-                                subject_value_together = True
-                                break
-
-                if not value_in_evidence and not any(
-                    self.proposition_verifier._values_equal(claim.proposition_value or "", ep.value or "")
-                    for ep in evidence_props
-                ):
-                    semantic_failures.append(
-                        f"Evidence {ev.evidence_id} VALUE_NOT_FOUND: claim value={claim.proposition_value} not in evidence"
-                    )
-                elif claim.proposition_subject and not subject_value_together:
-                    # Value exists but not associated with the claimed subject
-                    semantic_failures.append(
-                        f"Evidence {ev.evidence_id} SUBJECT_VALUE_MISMATCH: claim says {claim.proposition_subject}={claim.proposition_value} but this value is not associated with {claim.proposition_subject} in evidence"
-                    )
-                # Check version
-                elif claim.proposition_version and ev.code_commit:
-                    # Version mismatch if claim version doesn't match the evidence's version
-                    # (evidence version is derived from its artifact_path or description)
-                    ev_version = None
-                    if ev.artifact_path:
-                        import re as re_mod
-                        v_match = re_mod.search(r"V(\d+)", ev.artifact_path)
-                        if v_match:
-                            ev_version = f"V{v_match.group(1)}"
-                    if ev_version and claim.proposition_version.upper() != ev_version.upper():
-                        semantic_failures.append(
-                            f"Evidence {ev.evidence_id} VERSION_MISMATCH: claim version={claim.proposition_version} but evidence version={ev_version}"
-                        )
+                if result.verdict == PropositionVerdict.CONTRADICTS:
+                    semantic_failures.append(f"Evidence {ev.evidence_id} CONTRADICTS: {result.reasoning}")
+                elif result.verdict == PropositionVerdict.SUBJECT_MISMATCH:
+                    semantic_failures.append(f"Evidence {ev.evidence_id} SUBJECT_MISMATCH: {result.reasoning}")
+                elif result.verdict == PropositionVerdict.UNIT_MISMATCH:
+                    semantic_failures.append(f"Evidence {ev.evidence_id} UNIT_MISMATCH: {result.reasoning}")
+                elif result.verdict == PropositionVerdict.VERSION_MISMATCH:
+                    semantic_failures.append(f"Evidence {ev.evidence_id} VERSION_MISMATCH: {result.reasoning}")
+                elif result.verdict == PropositionVerdict.CONDITION_MISMATCH:
+                    semantic_failures.append(f"Evidence {ev.evidence_id} CONDITION_MISMATCH: {result.reasoning}")
+                elif result.verdict == PropositionVerdict.INSUFFICIENT_EVIDENCE:
+                    # Check colocation as fallback
+                    if claim.proposition_subject and claim.proposition_value:
+                        val = self.proposition_verifier.parse_value(claim.proposition_value)
+                        if val:
+                            colocation = self.proposition_verifier.verify_subject_value_colocation(
+                                claim.proposition_subject, val, ev.output_content
+                            )
+                            if not colocation:
+                                semantic_failures.append(
+                                    f"Evidence {ev.evidence_id} SUBJECT_VALUE_NOT_COLOCATED: subject '{claim.proposition_subject}' and value '{claim.proposition_value}' do not appear together in evidence"
+                                )
+                            else:
+                                # Value exists with subject but full proposition doesn't match
+                                # Check version
+                                if claim.proposition_version and ev_version:
+                                    if claim.proposition_version.upper() != ev_version.upper():
+                                        semantic_failures.append(
+                                            f"Evidence {ev.evidence_id} VERSION_MISMATCH: claim version={claim.proposition_version} but evidence version={ev_version}"
+                                        )
+                                else:
+                                    semantic_failures.append(
+                                        f"Evidence {ev.evidence_id} INSUFFICIENT_EVIDENCE: {result.reasoning}"
+                                    )
+                    else:
+                        semantic_failures.append(f"Evidence {ev.evidence_id} INSUFFICIENT_EVIDENCE: {result.reasoning}")
+                elif result.verdict == PropositionVerdict.UNRELATED:
+                    semantic_failures.append(f"Evidence {ev.evidence_id} UNRELATED: {result.reasoning}")
+                # SUPPORTS → OK
             else:
-                semantic_failures.append(f"Evidence {ev.evidence_id} has NO output_content — cannot verify proposition support")
+                semantic_failures.append(f"Evidence {ev.evidence_id} has NO output_content")
 
-        # Check sources semantically too
+        # Check sources
         for src in sources:
             if src.content:
                 # Verify content hash (P0-2)
                 if src.content_hash:
                     if not self.semantic_verifier.verify_content_hash(src.content, src.content_hash):
-                        semantic_failures.append(f"Source {src.source_id} content_hash MISMATCH — content tampered")
-                # Verify span exists in content (P0-2)
+                        semantic_failures.append(f"Source {src.source_id} content_hash MISMATCH")
+                # Verify span (P0-2)
                 if src.span:
                     if not self.semantic_verifier.verify_span_exists(src.content, src.span):
                         semantic_failures.append(f"Source {src.source_id} span NOT FOUND in content")
                     if src.span_hash:
                         if not self.semantic_verifier.verify_span_hash(src.span, src.span_hash):
-                            semantic_failures.append(f"Source {src.source_id} span_hash MISMATCH — span tampered")
-                # Check if source content contains the claimed value
+                            semantic_failures.append(f"Source {src.source_id} span_hash MISMATCH")
+                # P0-F: External identity verification (for DOI/patent sources)
+                if src.source_type in ("DOI", "PATENT") and src.identifier:
+                    # Check if external identity has been verified
+                    # (For now, flag as needing verification — full implementation requires
+                    # external API calls to Crossref/USPTO/etc.)
+                    if not getattr(src, 'external_identity_verified', False):
+                        semantic_failures.append(
+                            f"Source {src.source_id} EXTERNAL_IDENTITY_NOT_VERIFIED: "
+                            f"{src.source_type} {src.identifier} requires external registry verification"
+                        )
+                # Check value in source
                 if claim.proposition_value:
-                    val_numeric = re.search(r"(\d+\.?\d*)", claim.proposition_value)
-                    if val_numeric:
-                        val_str = val_numeric.group(1)
+                    val = self.proposition_verifier.parse_value(claim.proposition_value)
+                    if val and val.magnitude is not None:
+                        val_str = str(val.magnitude)
                         if val_str not in src.content:
                             semantic_failures.append(
-                                f"Source {src.source_id} VALUE_NOT_FOUND: claim value={claim.proposition_value} not in source content"
+                                f"Source {src.source_id} VALUE_NOT_FOUND: {val_str} not in source content"
                             )
             else:
-                semantic_failures.append(f"Source {src.source_id} has NO content — cannot verify proposition support")
+                semantic_failures.append(f"Source {src.source_id} has NO content")
 
         if semantic_failures:
             raise ValueError(

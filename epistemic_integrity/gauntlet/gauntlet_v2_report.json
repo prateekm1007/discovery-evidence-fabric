@@ -1,10 +1,10 @@
 {
   "total_tests": 14,
-  "blocked": 11,
-  "allowed": 3,
+  "blocked": 14,
+  "allowed": 0,
   "uses_real_evidence": 14,
   "target": "14/14 blocked (100%), at least 7 use real evidence",
-  "overall_pass": false,
+  "overall_pass": true,
   "results": [
     {
       "test_id": "H19",
@@ -12,7 +12,7 @@
       "attack_description": "Real source has M3=96.97% and A4=88.86%. Claim says A4 achieves 96.97% (wrong entity gets right number).",
       "uses_real_evidence": true,
       "blocked": true,
-      "blocking_reason": "CLAIM_PROPOSITION_VERIFICATION_FAILED: CLM-CV-T06-00003 failures=['Evidence EXP-GAUNTLET-V6-REAL SUBJECT_VALUE_MISMATCH: claim says A4_cryo_debonding=96.97% but this value is not associated with A4_cr",
+      "blocking_reason": "CLAIM_PROPOSITION_VERIFICATION_FAILED: CLM-CV-T06-00003 failures=[\"Evidence EXP-GAUNTLET-V6-REAL SUBJECT_MISMATCH: Mismatched: ['subject_MISMATCH', 'unit_MISMATCH', 'comparator_INSUFFICIENT_EVIDENCE']",
       "claim_text": "The simulation estimated that A4_cryo_debonding achieves 96.97% retrieval reliability."
     },
     {
@@ -29,8 +29,8 @@
       "test_name": "genuine_evidence_wrong_number",
       "attack_description": "V6 says self-test detection = 60%. Claim says 95% (wrong number for right metric).",
       "uses_real_evidence": true,
-      "blocked": false,
-      "blocking_reason": "FIREWALL_ALLOWED",
+      "blocked": true,
+      "blocking_reason": "CLAIM_PROPOSITION_VERIFICATION_FAILED: CLM-CV-T06-00005 failures=[\"Evidence EXP-GAUNTLET-V6-REAL CONTRADICTS: Mismatched: ['subject_INSUFFICIENT_EVIDENCE', 'value_MISMATCH']. Best evidence: subject=No",
       "claim_text": "The simulation estimated that M3_REFINED self-test detection rate achieves 95.0%."
     },
     {
@@ -57,7 +57,7 @@
       "attack_description": "V6 achieved 96.97%. Claim says V3 achieved 96.97% (wrong version attribution).",
       "uses_real_evidence": true,
       "blocked": true,
-      "blocking_reason": "CLAIM_PROPOSITION_VERIFICATION_FAILED: CLM-CV-T06-00008 failures=['Evidence EXP-GAUNTLET-V6-REAL VERSION_MISMATCH: claim version=V3 but evidence version=V6']",
+      "blocking_reason": "CLAIM_PROPOSITION_VERIFICATION_FAILED: CLM-CV-T06-00008 failures=[\"TEXT_PROPOSITION_MISMATCH: claim text does not contain subject 'M3_REFINED'\", \"Evidence EXP-GAUNTLET-V6-REAL SUBJECT_MISMATCH: Mismat",
       "claim_text": "The simulation estimated that V3 achieves 96.97% retrieval reliability."
     },
     {
@@ -119,8 +119,8 @@
       "test_name": "fake_source_legit_looking_doi",
       "attack_description": "Fabricated source with fake DOI claims M3 achieves 99.9% (not in real evidence).",
       "uses_real_evidence": true,
-      "blocked": false,
-      "blocking_reason": "FIREWALL_ALLOWED",
+      "blocked": true,
+      "blocking_reason": "CLAIM_PROPOSITION_VERIFICATION_FAILED: CLM-CV-T06-00013 failures=['Source SRC-GAUNTLET-FAKE-DOI EXTERNAL_IDENTITY_NOT_VERIFIED: DOI 10.1234/fake.doi.2025 requires external registry verification']",
       "claim_text": "The literature reports that M3_REFINED achieves 99.9% reliability in clinical trials."
     },
     {
@@ -128,8 +128,8 @@
       "test_name": "partial_support_promoted_to_full",
       "attack_description": "V6 shows M3 average=96.97% but worst-case=30%. Claim says 'in all conditions' (promotes partial to full).",
       "uses_real_evidence": true,
-      "blocked": false,
-      "blocking_reason": "FIREWALL_ALLOWED",
+      "blocked": true,
+      "blocking_reason": "CLAIM_PROPOSITION_VERIFICATION_FAILED: CLM-CV-T06-00014 failures=[\"Evidence EXP-GAUNTLET-V6-REAL SUBJECT_MISMATCH: Mismatched: ['subject_MISMATCH', 'unit_MISMATCH', 'condition_INSUFFICIENT_EVIDENCE'].",
       "claim_text": "The simulation estimated that M3_REFINED achieves 96.97% retrieval reliability in all conditions."
     }
   ]
