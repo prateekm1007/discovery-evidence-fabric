@@ -1,0 +1,366 @@
+{
+  "spec_id": "AUTOMATED_RESEARCH_ORCHESTRATOR_V3",
+  "timestamp": "2026-08-18T00:51:35.860523+00:00",
+  "v2_to_v3_changes": [
+    "NEXT_BEST_ACTION policy (info_gain \u00d7 decision_impact \u00f7 cost - redundancy_penalty)",
+    "Source redundancy measured at family/evidence/mechanism level (not query count)",
+    "NOT_FOUND_AFTER_COMPLETE_SEARCH mechanically derived from 7 coverage dimensions",
+    "7 search-coverage dimensions (query, family, jurisdiction, temporal, mechanism, claim, source)",
+    "Strengthened mechanism-diversity (credibility check: 4 criteria for CREDIBLE_COMPETITOR)",
+    "CONTRADICTION QUEUE (prioritized, attack highest-impact unresolved first)",
+    "Positive evidence does NOT terminate (generates 'what is strongest evidence this is wrong?')",
+    "REOPEN state (frozen territory reopens only on material hypothesis-class change)",
+    "PatSnap pre-call receipt (hard gate before expensive calls)",
+    "Machine-readable RESEARCH_MAP output (not just verdict)",
+    "Escalation doctrine: system becomes MORE hostile as confidence increases"
+  ],
+  "doctrine_v3": {
+    "survivor_definition": "A surviving invention is NOT one that accumulated enough evidence to look convincing. It is one for which the system has FAILED to find a credible way to kill the mechanism, FAILED to find a materially better alternative, and FAILED to find an operating condition that removes the buyer-relevant effect.",
+    "escalation_principle": "Every successful step creates NEW ATTACK SURFACE. A candidate that survives patent search should face a scientific attack. A candidate that survives science should face an engineering attack. A candidate that survives engineering should face a stronger comparator. A candidate that survives the comparator should face a harder disturbance. A candidate that survives all of those should face the strongest plausible alternative. THE SYSTEM BECOMES MORE HOSTILE AS CONFIDENCE INCREASES.",
+    "anti_confirmation_bias": "Do not let positive evidence terminate the loop. A strong Scopus result, successful simulation, or clean patent search should generate the question: 'What is the strongest evidence that this conclusion is wrong?'",
+    "implementation_principle": "One canonical orchestrator. Decides WHAT TO ATTACK NEXT, not just executes stages."
+  },
+  "next_best_action": {
+    "principle": "From every unresolved state, rank candidate actions by expected information gain \u00d7 decision impact \u00f7 cost, with penalty for redundant evidence.",
+    "scoring_formula": {
+      "score": "expected_information_gain \u00d7 decision_impact \u00f7 cost",
+      "redundancy_penalty": "subtract redundancy_penalty if evidence duplicates existing family/mechanism",
+      "formula": "action_score = (info_gain \u00d7 decision_impact) / cost - redundancy_penalty"
+    },
+    "factors": {
+      "expected_information_gain": {
+        "definition": "How much uncertainty does this action resolve?",
+        "scale": "0.0 (no new info) to 1.0 (resolves critical uncertainty)",
+        "estimation": "Based on evidence-class coverage gaps + contradiction queue priority"
+      },
+      "decision_impact": {
+        "definition": "How much does the result change the invention state?",
+        "scale": "0.0 (no state change) to 1.0 (terminates territory)",
+        "examples": [
+          "PatSnap claim-data on a SAME_PROBLEM_SAME_MECHANISM threat = 1.0 (could destroy novelty)",
+          "Scopus search on a NEIGHBORING_PROBLEM topic = 0.2 (low impact)",
+          "Simulation with harder disturbance = 0.7 (could establish CEILING)"
+        ]
+      },
+      "cost": {
+        "definition": "API credits + compute time + opportunity cost",
+        "scale": "1 (free Lens/Scopus) to 100 (PatSnap claim-data)",
+        "examples": [
+          "Lens scholarly search = 1",
+          "Scopus search = 1",
+          "PatentBear Boolean = 1",
+          "PatSnap claim-data = 50",
+          "PatSnap semantic-search = 50",
+          "PatSnap family-expansion = 50",
+          "Local simulation = 5",
+          "Monte Carlo (1000 runs) = 20"
+        ]
+      },
+      "redundancy_penalty": {
+        "definition": "Penalty for evidence that duplicates existing family/mechanism coverage",
+        "calculation": "If new evidence covers same family/mechanism as existing evidence, penalty = 0.5 \u00d7 action_score",
+        "purpose": "Prevents 'Lens \u2192 Google \u2192 PatentBear returning same family' from counting as 3 independent discoveries"
+      }
+    },
+    "ranking_process": [
+      "1. Generate all plausible candidate actions from current state",
+      "2. Score each action using the formula",
+      "3. Rank by score (descending)",
+      "4. Execute highest-scoring action",
+      "5. Update state + contradiction queue",
+      "6. Re-rank remaining actions (scores may change after new evidence)",
+      "7. Repeat until no action has score > threshold (0.1)"
+    ],
+    "example_calculation": {
+      "scenario": "Position #1 after Scopus upgrade. ML ablation done. What next?",
+      "candidate_actions": [
+        {
+          "action": "PatSnap semantic-search using US11806490B2 as seed",
+          "info_gain": 0.7,
+          "decision_impact": 0.9,
+          "cost": 50,
+          "redundancy_penalty": 0.0,
+          "score": "(0.7 \u00d7 0.9) / 50 - 0.0 = 0.0126"
+        },
+        {
+          "action": "Scopus search for 'active perturbation shunt diagnostics' (broader)",
+          "info_gain": 0.2,
+          "decision_impact": 0.3,
+          "cost": 1,
+          "redundancy_penalty": 0.3,
+          "score": "(0.2 \u00d7 0.3) / 1 - 0.3 = -0.24 (skip)"
+        },
+        {
+          "action": "Simulation: test active interrogation under HARDER noise (0.8 std)",
+          "info_gain": 0.5,
+          "decision_impact": 0.6,
+          "cost": 5,
+          "redundancy_penalty": 0.1,
+          "score": "(0.5 \u00d7 0.6) / 5 - 0.1 = -0.04 (skip)"
+        }
+      ],
+      "selected_action": "PatSnap semantic-search (highest positive score 0.0126)"
+    }
+  },
+  "redundancy_measurement": {
+    "principle": "Independence is measured at the FAMILY/EVIDENCE/MECHANISM level, not query count. Lens \u2192 Google \u2192 PatentBear returning the same family counts as ONE independent discovery, not three.",
+    "independence_dimensions": [
+      "family_independence: different patent families (DOCDB) = independent; same family = redundant",
+      "evidence_independence: different evidence types (OBSERVED vs EXTERNAL vs MODEL_DERIVED) = independent",
+      "mechanism_independence: different physical principles = independent; same mechanism = redundant",
+      "source_independence: different sources (Lens vs Scopus vs PatSnap) = independent IF they return different families/mechanisms"
+    ],
+    "redundancy_check_protocol": [
+      "Step 1: For each new evidence item, compute family_hash + mechanism_hash",
+      "Step 2: Check against existing evidence ledger",
+      "Step 3: If family_hash OR mechanism_hash matches existing, mark as REDUNDANT",
+      "Step 4: REDUNDANT evidence is recorded (for provenance) but does NOT increment coverage count",
+      "Step 5: Only INDEPENDENT evidence increments coverage count"
+    ],
+    "coverage_counting": {
+      "independent_evidence": "counts toward coverage",
+      "redundant_evidence": "recorded for provenance, does NOT count toward coverage",
+      "example": "Lens finds WO2020086847A1, Google finds same patent, PatentBear finds same patent \u2192 3 records but 1 independent discovery"
+    }
+  },
+  "completeness_mechanism": {
+    "principle": "NOT_FOUND_AFTER_COMPLETE_SEARCH is mechanically derived from satisfied coverage dimensions, NOT a human declaring 'we searched enough.'",
+    "mechanical_rule": "NOT_FOUND_AFTER_COMPLETE_SEARCH = TRUE if and only if ALL 7 coverage dimensions are SATISFIED AND no contradiction is unresolved",
+    "NOT_FOUND": "Searched some sources, found no teaching. Coverage may be incomplete. Cannot conclude.",
+    "NOT_FOUND_AFTER_COMPLETE_SEARCH": "All 7 coverage dimensions SATISFIED, no unresolved contradictions. Can conclude NOT_FOUND.",
+    "SEARCH_INCOMPLETE": "One or more coverage dimensions NOT SATISFIED (source unavailable, query coverage gap, etc.)"
+  },
+  "coverage_dimensions": {
+    "dimension_1_query_coverage": {
+      "description": "Have we queried the right keywords and combinations?",
+      "satisfied_when": "\u22655 focused TITLE-ABS-KEY queries executed covering core mechanism + 3 alternative architectures",
+      "metric": "query_count \u00d7 keyword_diversity"
+    },
+    "dimension_2_family_coverage": {
+      "description": "Have we covered the patent families of all seed patents?",
+      "satisfied_when": "Family-expansion executed on all CEO-cited + top PatentBear hits; all family members claim-audited",
+      "metric": "families_expanded / families_identified"
+    },
+    "dimension_3_jurisdiction_coverage": {
+      "description": "Have we covered US, EP, WO, JP, CN jurisdictions?",
+      "satisfied_when": "Search results include patents from \u22653 jurisdictions OR jurisdiction filter confirms no relevant foreign patents",
+      "metric": "jurisdictions_searched / jurisdictions_relevant"
+    },
+    "dimension_4_temporal_coverage": {
+      "description": "Have we covered the full temporal range (priority date 1980-present)?",
+      "satisfied_when": "Search covers 1980-present with no temporal gaps >5 years in relevant period",
+      "metric": "temporal_range_covered / temporal_range_relevant"
+    },
+    "dimension_5_mechanism_coverage": {
+      "description": "Have we covered all plausible mechanism variants?",
+      "satisfied_when": "\u22653 materially different alternative mechanisms generated and tested (6-axis equivalence)",
+      "metric": "mechanism_diversity_score (see below)"
+    },
+    "dimension_6_claim_coverage": {
+      "description": "Have we retrieved full claims for all high-threat patents?",
+      "satisfied_when": "Claim-data retrieved for top \u226410 highest-threat patents; each claim hashed and limitation-mapped",
+      "metric": "claims_retrieved / threats_identified"
+    },
+    "dimension_7_source_coverage": {
+      "description": "Have we used all available sources?",
+      "satisfied_when": "Lens + Scopus + PatentBear + Google + PatSnap all executed (or confirmed unavailable with reason)",
+      "metric": "sources_executed / sources_available"
+    },
+    "completeness_check": "ALL 7 dimensions SATISFIED \u2192 NOT_FOUND_AFTER_COMPLETE_SEARCH. Any dimension NOT SATISFIED \u2192 SEARCH_INCOMPLETE."
+  },
+  "mechanism_diversity_v3": {
+    "v2_limitation": "V2 said '\u22653 materially different physical principles' but did not verify alternatives are genuinely credible competitors.",
+    "v3_rule": "Alternatives must be (a) materially different mechanisms AND (b) genuinely credible competitors to the candidate \u2014 not merely 3 unrelated substitutions.",
+    "credibility_check": {
+      "criteria": [
+        "CRITERION_1_same_constrained_problem: Alternative plausibly solves the SAME coupled problem (objective + constraints match)",
+        "CRITERION_2_known_to_work: Alternative mechanism is established in adjacent field (not speculative)",
+        "CRITERION_3_materially_different: Alternative uses DIFFERENT physical principle (not just different parameters)",
+        "CRITERION_4_adversarial_hostility: Alternative is genuinely hostile to the candidate (could plausibly win)"
+      ],
+      "classification": {
+        "CREDIBLE_COMPETITOR": "All 4 criteria met \u2192 counts toward mechanism diversity",
+        "STRAW_MAN": "Criteria 1 or 4 fail \u2192 does NOT count (not a real threat)",
+        "UNRELATED_SUBSTITUTION": "Criteria 2 or 3 fail \u2192 does NOT count (not credible or not different)"
+      }
+    },
+    "diversity_score": {
+      "calculation": "count of CREDIBLE_COMPETITOR alternatives tested",
+      "minimum_for_diversity_HIGH": 3,
+      "example_pass": "Position #4 V8: C2 (P_CSF) vs C3 (instantaneous \u0394P) vs C4_DERIV (derivative) \u2014 3 different control principles, all credible competitors",
+      "example_fail": "Position #1: SVM vs RF vs KNN \u2014 all ML, NOT materially different. Counts as 1 mechanism, not 3."
+    }
+  },
+  "contradiction_queue": {
+    "principle": "Every result that could materially falsify the candidate enters a prioritized queue. The system attacks the highest-impact unresolved contradiction first.",
+    "schema": {
+      "contradiction_id": "string",
+      "description": "what could falsify the candidate",
+      "source": "which evidence/question generated this contradiction",
+      "impact_if_true": "HIGH (destroys novelty) | MEDIUM (forces architecture change) | LOW (requires milestone)",
+      "probability_unresolved": "0.0-1.0 (estimated likelihood contradiction is real)",
+      "priority_score": "impact_if_true \u00d7 probability_unresolved",
+      "status": "UNRESOLVED | RESOLVED_FALSE_ALARM | RESOLVED_REAL_THREAT",
+      "resolution_action": "what was done to resolve",
+      "resolution_result": "what was found"
+    },
+    "prioritization": "Attack highest priority_score first. HIGH impact + high probability = attack immediately.",
+    "example_contradictions": [
+      {
+        "contradiction_id": "CQ_P1_1",
+        "description": "US11806490B2 claim 8 teaches to 'attenuate sudden changes' \u2014 could this be interpreted as teaching derivative action (threatening L3d)?",
+        "impact_if_true": "HIGH (destroys L3d novelty)",
+        "probability_unresolved": 0.3,
+        "priority_score": 0.3,
+        "status": "RESOLVED_FALSE_ALARM",
+        "resolution_action": "Full claim audit V7 \u2014 retrieved all 21 claims, hashed, mapped to L1-Lx",
+        "resolution_result": "Claim 8 teaches ATTENUATE (opposite of derivative). TEACHES AWAY from L3d. Not a threat \u2014 actually supports non-obviousness."
+      }
+    ],
+    "anti_confirmation_rule": "When positive evidence is found, automatically generate a contradiction: 'What is the strongest evidence that this positive result is wrong?' Add to queue."
+  },
+  "anti_confirmation": {
+    "rule": "Positive evidence (strong Scopus result, successful simulation, clean patent search) does NOT terminate the loop. It generates a NEW question: 'What is the strongest evidence that this conclusion is wrong?'",
+    "automatic_question_generation": {
+      "after_clean_patent_search": "Generate: 'What mechanism could solve this problem that we haven't searched for?' \u2192 architecture attack",
+      "after_successful_simulation": "Generate: 'What harder disturbance would break this result?' \u2192 engineering attack with harder conditions",
+      "after_supportive_literature": "Generate: 'What literature contradicts this mechanism?' \u2192 hostile prior art search with negation queries",
+      "after_alternative_defeated": "Generate: 'What stronger alternative could defeat the candidate?' \u2192 next-strongest alternative generation"
+    },
+    "escalation_ladder": [
+      "survives patent search \u2192 face scientific attack (Scopus/Lens)",
+      "survives science \u2192 face engineering attack (simulation)",
+      "survives engineering \u2192 face stronger comparator (better alternative)",
+      "survives comparator \u2192 face harder disturbance (adversarial conditions)",
+      "survives all \u2192 face strongest plausible alternative (final attack)"
+    ],
+    "termination_only_when": "ALL escalation levels exhausted AND no new attack surface generated AND contradiction queue empty"
+  },
+  "reopen_state": {
+    "principle": "A frozen territory reopens ONLY when a new source, mechanism, competitor, or experiment materially changes the hypothesis class. Prevents endless polishing.",
+    "reopen_triggers": [
+      "TRIGGER_1_new_source: A previously unavailable source becomes available (e.g., PatSnap balance restored, Compendex access granted)",
+      "TRIGGER_2_new_mechanism: A new mechanism is discovered that was not in the original hypothesis class (e.g., VIEshunt files a patent on venous-aware control)",
+      "TRIGGER_3_new_competitor: A new competitor enters the space with a materially different architecture",
+      "TRIGGER_4_new_experiment: A new experimental capability becomes available (e.g., in-vivo ovine model ready)",
+      "TRIGGER_5_contradiction_overturned: A previously resolved contradiction is found to be a real threat (FALSE_ALARM was actually TRUE)"
+    ],
+    "do_not_reopen_for": [
+      "Minor parameter tweaks to existing simulations",
+      "Re-running the same search with slightly different keywords",
+      "Adding more strengthening literature",
+      "Polishing the existing verdict language"
+    ],
+    "example": "Territory #4 V8 is FROZEN with negative ceiling. It would REOPEN if: (a) VIEshunt files a patent on venous-aware derivative control (TRIGGER_2), or (b) PatSnap balance restored enabling family-expansion on WO'847 (TRIGGER_1), or (c) a new simulation capability enables testing under conditions not previously possible (TRIGGER_4). It would NOT reopen for re-running V8 with slightly different derivative gain.",
+    "reopen_process": [
+      "1. Identify trigger type",
+      "2. Document what materially changed",
+      "3. Generate new attack questions specific to the change",
+      "4. Unfreeze territory with new hypothesis class",
+      "5. Re-run orchestrator loop with new questions"
+    ]
+  },
+  "patsnap_precall_receipt": {
+    "principle": "Before every expensive PatSnap call, record a hard pre-call receipt. Prevents wasteful spending.",
+    "required_fields": {
+      "timestamp": "ISO 8601",
+      "uncertainty": "what specific uncertainty this call resolves",
+      "why_cheaper_sources_failed": "explicit reason why Lens/Scopus/PatentBear could not answer this question",
+      "expected_result": "what we expect to find (FOUND / NOT_FOUND / PARTIAL)",
+      "verdict_change_if_found": "how the verdict changes if the expected result is found",
+      "verdict_change_if_not_found": "how the verdict changes if NOT_FOUND",
+      "max_calls_remaining": "PatSnap balance remaining after this call",
+      "call_justified": "TRUE only if uncertainty is HIGH and cheaper sources failed"
+    },
+    "example_receipt": {
+      "timestamp": "2026-08-19T00:00:00Z",
+      "uncertainty": "What are the exact claims of US11806490B2? Does claim 8 teach derivative action?",
+      "why_cheaper_sources_failed": "PatentBear returned 0 hits for 'derivative control shunt'. Google Patents abstract is insufficient \u2014 need full claim text.",
+      "expected_result": "FOUND \u2014 claim 8 mentions 'attenuate sudden changes' which is OPPOSITE of derivative",
+      "verdict_change_if_found": "If claim 8 teaches derivative \u2192 L3d novelty destroyed \u2192 BELOW_BUYER_THRESHOLD",
+      "verdict_change_if_not_found": "If no derivative teaching \u2192 L3d survives \u2192 WOULD_CONSIDER_WITH_MILESTONES",
+      "max_calls_remaining": "29 (after this call)",
+      "call_justified": "TRUE \u2014 uncertainty is HIGH (could destroy novelty), cheaper sources insufficient"
+    },
+    "hard_rule": "If call_justified = FALSE, do NOT execute the call. Log the rejection."
+  },
+  "research_map_output": {
+    "principle": "The orchestrator outputs a machine-readable research map, not just a verdict. This enables auditability and re-use.",
+    "schema": {
+      "candidate": {
+        "invention_id": "string",
+        "frozen_limitations": "L1-Ln with hashes",
+        "claim_language": "verbatim"
+      },
+      "attacks": [
+        {
+          "attack_id": "string",
+          "question": "EVIDENCE_QUESTION",
+          "source": "which source executed",
+          "result": "FOUND / NOT_FOUND / AMBIGUOUS / FALSE_POSITIVE",
+          "evidence": "passage/hash/simulation output"
+        }
+      ],
+      "evidence_ledger": [
+        {
+          "evidence_id": "string",
+          "source": "Lens/Scopus/PatentBear/PatSnap/Google/simulation",
+          "content": "passage or result",
+          "hash": "SHA-256",
+          "independence": "INDEPENDENT / REDUNDANT (with reason)",
+          "classification": "OBSERVED / EXTERNAL / MODEL_DERIVED / HYPOTHESIS"
+        }
+      ],
+      "contradictions": [
+        {
+          "contradiction_id": "string",
+          "description": "what could falsify",
+          "status": "UNRESOLVED / RESOLVED_FALSE_ALARM / RESOLVED_REAL_THREAT",
+          "resolution": "how resolved"
+        }
+      ],
+      "alternatives": [
+        {
+          "alternative_id": "string",
+          "description": "what the alternative is",
+          "equivalence_test": "6-axis classification",
+          "comparator_result": "defeated / wins / neighboring",
+          "why_rejected": "explicit reason"
+        }
+      ],
+      "failed_alternatives": "subset of alternatives where result = defeated or neighboring",
+      "surviving_mechanisms": [
+        {
+          "mechanism_id": "string",
+          "description": "what survived",
+          "survival_evidence": "which attacks it survived",
+          "remaining_attack_surface": "what could still kill it"
+        }
+      ],
+      "unresolved_questions": [
+        {
+          "question_id": "string",
+          "question": "what we still don't know",
+          "why_unresolved": "source unavailable / cost too high / capability gap",
+          "reopen_trigger": "what would enable resolution"
+        }
+      ],
+      "stopping_rationale": {
+        "stop_state": "SURVIVOR / CEILING / EXHAUSTED",
+        "coverage_dimensions_satisfied": "list of 7 dimensions",
+        "mechanism_diversity": "count of CREDIBLE_COMPETITOR alternatives",
+        "contradiction_queue_status": "empty / unresolved count",
+        "escalation_level_reached": "patent / science / engineering / comparator / disturbance / final"
+      }
+    },
+    "output_format": "JSON (machine-readable) + human-readable summary",
+    "purpose": [
+      "Auditability \u2014 every decision traceable",
+      "Re-use \u2014 research map can inform related territories",
+      "Patent counsel \u2014 direct evidence for 102/103 analysis",
+      "Investor due diligence \u2014 demonstrates rigor"
+    ]
+  },
+  "implementation_status": "SPECIFICATION ONLY \u2014 V3 hardened. Implementation not started.",
+  "next_step": "Implement V3 as automated Python pipeline. Test on Territory #5."
+}
