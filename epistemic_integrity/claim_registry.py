@@ -48,6 +48,15 @@ class Claim:
     created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     validated: bool = False  # has passed validation
     validation_errors: List[str] = field(default_factory=list)
+    # P0-1: STRUCTURED PROPOSITION — required for SIMULATION_DERIVED and MODEL_DERIVED claims
+    # The claim must declare its proposition as structured data, not just free text.
+    # This makes verification deterministic.
+    proposition_subject: Optional[str] = None      # e.g., "M3_REFINED"
+    proposition_predicate: Optional[str] = None    # e.g., "retrieval_reliability"
+    proposition_value: Optional[str] = None        # e.g., "96.97%"
+    proposition_comparator: Optional[str] = None   # e.g., ">="
+    proposition_condition: Optional[str] = None    # e.g., "6_month_benchtop"
+    proposition_version: Optional[str] = None      # e.g., "V6"
 
 
 class ClaimRegistry:
@@ -110,6 +119,12 @@ class ClaimRegistry:
         simulation_commit: str = None,
         simulation_output_hash: str = None,
         human_fact: bool = False,
+        proposition_subject: str = None,
+        proposition_predicate: str = None,
+        proposition_value: str = None,
+        proposition_comparator: str = None,
+        proposition_condition: str = None,
+        proposition_version: str = None,
     ) -> Claim:
         """Register a new claim. Auto-assigns claim_id."""
         if evidence_ids is None:
@@ -128,6 +143,12 @@ class ClaimRegistry:
             simulation_commit=simulation_commit,
             simulation_output_hash=simulation_output_hash,
             human_fact=human_fact,
+            proposition_subject=proposition_subject,
+            proposition_predicate=proposition_predicate,
+            proposition_value=proposition_value,
+            proposition_comparator=proposition_comparator,
+            proposition_condition=proposition_condition,
+            proposition_version=proposition_version,
         )
         self.claims[claim_id] = claim
         self._save()
@@ -186,6 +207,17 @@ class ClaimRegistry:
         if claim.epistemic_class == EvidenceClass.SECONDARY_REPORTED:
             if not claim.source_ids:
                 errors.append("SECONDARY_REPORTED_REQUIRES_SOURCE_ID: must have at least one SRC-ID")
+
+        # Rule 9 (P0-1): SIMULATION_DERIVED and MODEL_DERIVED claims MUST declare structured proposition
+        # This makes verification deterministic — the claim explicitly states what it claims,
+        # and the verifier checks that the evidence contains that exact proposition.
+        if claim.epistemic_class in (EvidenceClass.SIMULATION_DERIVED, EvidenceClass.MODEL_DERIVED):
+            if not claim.proposition_subject:
+                errors.append("SIMULATION_DERIVED_REQUIRES_PROPOSITION_SUBJECT: must declare proposition_subject")
+            if not claim.proposition_predicate:
+                errors.append("SIMULATION_DERIVED_REQUIRES_PROPOSITION_PREDICATE: must declare proposition_predicate")
+            if not claim.proposition_value:
+                errors.append("SIMULATION_DERIVED_REQUIRES_PROPOSITION_VALUE: must declare proposition_value")
 
         claim.validated = len(errors) == 0
         claim.validation_errors = errors

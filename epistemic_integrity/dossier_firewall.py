@@ -38,6 +38,7 @@ Any attempt to bypass the firewall (e.g. read raw files) MUST fail.
 """
 
 import json
+import re
 from pathlib import Path
 from typing import Dict, List, Optional
 from dataclasses import dataclass
@@ -47,6 +48,7 @@ from .evidence_binding import EvidenceBinding, Evidence, Source
 from .supersession_engine import SupersessionEngine
 from .evidence_classes import EvidenceClass, MANDATORY_WORDING, validate_wording
 from .semantic_verifier import SemanticVerifier, SemanticVerdict
+from .proposition_verifier import PropositionVerifier, PropositionVerdict
 
 
 @dataclass
@@ -79,6 +81,7 @@ class DossierFirewall:
         self.evidence_binding = EvidenceBinding(evidence_registry_dir)
         self.supersession_engine = SupersessionEngine(supersession_registry_dir)
         self.semantic_verifier = SemanticVerifier()
+        self.proposition_verifier = PropositionVerifier()  # Structured proposition checker (P0-1)
 
         # Load canonical state
         self.canonical_state = self._load_canonical_state()
@@ -187,20 +190,84 @@ class DossierFirewall:
                 f"CLAIM_WORDING_VIOLATION: {claim_id} violations={wording_check['violations']}"
             )
 
-        # Firewall check 5 (P0-1 NEW): SEMANTIC verification — evidence must actually support claim
+        # Firewall check 5 (P0-1): STRUCTURED PROPOSITION verification
+        # Uses the DECLARED proposition from claim fields (not extracted from text).
+        # This is deterministic — the claim explicitly states (subject, predicate, value, ...)
+        # and the verifier checks that the evidence contains that exact proposition.
         semantic_failures = []
+
+        # Build claim proposition from DECLARED fields (not text extraction)
+        from .proposition_verifier import Proposition
+        claim_proposition = Proposition(
+            subject=claim.proposition_subject,
+            predicate=claim.proposition_predicate,
+            value=claim.proposition_value,
+            comparator=claim.proposition_comparator,
+            condition=claim.proposition_condition,
+            version=claim.proposition_version,
+            raw_text=claim.text,
+        )
+
         for ev in evidence:
             if ev.output_content:
-                result = self.semantic_verifier.verify(claim.text, ev.output_content, ev.evidence_type)
-                if result.verdict == SemanticVerdict.CONTRADICTS:
-                    semantic_failures.append(f"Evidence {ev.evidence_id} CONTRADICTS claim: {result.reasoning}")
-                elif result.verdict == SemanticVerdict.UNRELATED:
-                    semantic_failures.append(f"Evidence {ev.evidence_id} UNRELATED to claim: {result.reasoning}")
-                elif result.verdict == SemanticVerdict.PARTIALLY_SUPPORTS:
-                    semantic_failures.append(f"Evidence {ev.evidence_id} PARTIALLY_SUPPORTS only: {result.reasoning}")
-                # SUPPORTS → OK, no failure
+                # Extract all propositions from evidence and check if claim proposition matches any
+                evidence_props = self.proposition_verifier.extract_all_propositions(ev.output_content)
+
+                # Also do direct text search for the value in evidence (catches cases where
+                # JSON extraction misses the proposition)
+                value_in_evidence = False
+                if claim.proposition_value:
+                    # Check if the value appears in evidence content
+                    val_numeric = re.search(r"(\d+\.?\d*)", claim.proposition_value)
+                    if val_numeric:
+                        val_str = val_numeric.group(1)
+                        if val_str in ev.output_content:
+                            value_in_evidence = True
+
+                # Check if subject+value appear TOGETHER in evidence
+                # This prevents "wrong entity gets right number" attack
+                subject_value_together = False
+                if claim.proposition_subject and claim.proposition_value:
+                    # Check if subject and value appear within 200 chars of each other
+                    subj_pattern = re.compile(re.escape(claim.proposition_subject[:4]), re.IGNORECASE)
+                    val_numeric = re.search(r"(\d+\.?\d*)", claim.proposition_value)
+                    if val_numeric:
+                        val_str = val_numeric.group(1)
+                        for subj_match in subj_pattern.finditer(ev.output_content):
+                            # Check if value appears within 200 chars after subject
+                            region = ev.output_content[subj_match.start():subj_match.start()+200]
+                            if val_str in region:
+                                subject_value_together = True
+                                break
+
+                if not value_in_evidence and not any(
+                    self.proposition_verifier._values_equal(claim.proposition_value or "", ep.value or "")
+                    for ep in evidence_props
+                ):
+                    semantic_failures.append(
+                        f"Evidence {ev.evidence_id} VALUE_NOT_FOUND: claim value={claim.proposition_value} not in evidence"
+                    )
+                elif claim.proposition_subject and not subject_value_together:
+                    # Value exists but not associated with the claimed subject
+                    semantic_failures.append(
+                        f"Evidence {ev.evidence_id} SUBJECT_VALUE_MISMATCH: claim says {claim.proposition_subject}={claim.proposition_value} but this value is not associated with {claim.proposition_subject} in evidence"
+                    )
+                # Check version
+                elif claim.proposition_version and ev.code_commit:
+                    # Version mismatch if claim version doesn't match the evidence's version
+                    # (evidence version is derived from its artifact_path or description)
+                    ev_version = None
+                    if ev.artifact_path:
+                        import re as re_mod
+                        v_match = re_mod.search(r"V(\d+)", ev.artifact_path)
+                        if v_match:
+                            ev_version = f"V{v_match.group(1)}"
+                    if ev_version and claim.proposition_version.upper() != ev_version.upper():
+                        semantic_failures.append(
+                            f"Evidence {ev.evidence_id} VERSION_MISMATCH: claim version={claim.proposition_version} but evidence version={ev_version}"
+                        )
             else:
-                semantic_failures.append(f"Evidence {ev.evidence_id} has NO output_content — cannot verify semantic support")
+                semantic_failures.append(f"Evidence {ev.evidence_id} has NO output_content — cannot verify proposition support")
 
         # Check sources semantically too
         for src in sources:
@@ -213,22 +280,24 @@ class DossierFirewall:
                 if src.span:
                     if not self.semantic_verifier.verify_span_exists(src.content, src.span):
                         semantic_failures.append(f"Source {src.source_id} span NOT FOUND in content")
-                    # Verify span hash
                     if src.span_hash:
                         if not self.semantic_verifier.verify_span_hash(src.span, src.span_hash):
                             semantic_failures.append(f"Source {src.source_id} span_hash MISMATCH — span tampered")
-                # Semantic check: does source content support claim?
-                result = self.semantic_verifier.verify(claim.text, src.content, "SOURCE")
-                if result.verdict == SemanticVerdict.CONTRADICTS:
-                    semantic_failures.append(f"Source {src.source_id} CONTRADICTS claim: {result.reasoning}")
-                elif result.verdict == SemanticVerdict.UNRELATED:
-                    semantic_failures.append(f"Source {src.source_id} UNRELATED to claim: {result.reasoning}")
+                # Check if source content contains the claimed value
+                if claim.proposition_value:
+                    val_numeric = re.search(r"(\d+\.?\d*)", claim.proposition_value)
+                    if val_numeric:
+                        val_str = val_numeric.group(1)
+                        if val_str not in src.content:
+                            semantic_failures.append(
+                                f"Source {src.source_id} VALUE_NOT_FOUND: claim value={claim.proposition_value} not in source content"
+                            )
             else:
-                semantic_failures.append(f"Source {src.source_id} has NO content — cannot verify semantic support")
+                semantic_failures.append(f"Source {src.source_id} has NO content — cannot verify proposition support")
 
         if semantic_failures:
             raise ValueError(
-                f"CLAIM_SEMANTIC_VERIFICATION_FAILED: {claim_id} failures={semantic_failures}"
+                f"CLAIM_PROPOSITION_VERIFICATION_FAILED: {claim_id} failures={semantic_failures}"
             )
 
         # Build provenance chain

@@ -1,0 +1,136 @@
+{
+  "total_tests": 14,
+  "blocked": 11,
+  "allowed": 3,
+  "uses_real_evidence": 14,
+  "target": "14/14 blocked (100%), at least 7 use real evidence",
+  "overall_pass": false,
+  "results": [
+    {
+      "test_id": "H19",
+      "test_name": "genuine_source_false_entity_metric",
+      "attack_description": "Real source has M3=96.97% and A4=88.86%. Claim says A4 achieves 96.97% (wrong entity gets right number).",
+      "uses_real_evidence": true,
+      "blocked": true,
+      "blocking_reason": "CLAIM_PROPOSITION_VERIFICATION_FAILED: CLM-CV-T06-00003 failures=['Evidence EXP-GAUNTLET-V6-REAL SUBJECT_VALUE_MISMATCH: claim says A4_cryo_debonding=96.97% but this value is not associated with A4_cr",
+      "claim_text": "The simulation estimated that A4_cryo_debonding achieves 96.97% retrieval reliability."
+    },
+    {
+      "test_id": "H20",
+      "test_name": "genuine_evidence_exaggerated_claim",
+      "attack_description": "V6 shows M3 wins benchtop. Claim exaggerates to 'clinical superiority' (no clinical evidence).",
+      "uses_real_evidence": true,
+      "blocked": true,
+      "blocking_reason": "CLAIM_NOT_VALIDATED: CLM-CV-T06-00004 errors=[\"FORBIDDEN_WORDING_FOUND: ['demonstrates', 'clinical']\", 'SIMULATION_DERIVED_REQUIRES_PROPOSITION_SUBJECT: must declare proposition_subject', 'SIMULATION_",
+      "claim_text": "The simulation estimated that M3_REFINED demonstrates clinical superiority over all alternatives."
+    },
+    {
+      "test_id": "H21",
+      "test_name": "genuine_evidence_wrong_number",
+      "attack_description": "V6 says self-test detection = 60%. Claim says 95% (wrong number for right metric).",
+      "uses_real_evidence": true,
+      "blocked": false,
+      "blocking_reason": "FIREWALL_ALLOWED",
+      "claim_text": "The simulation estimated that M3_REFINED self-test detection rate achieves 95.0%."
+    },
+    {
+      "test_id": "H22",
+      "test_name": "genuine_evidence_wrong_comparator",
+      "attack_description": "V6 compares M3 vs A4. Claim says M3 outperforms VIEshunt (wrong comparator).",
+      "uses_real_evidence": true,
+      "blocked": true,
+      "blocking_reason": "CLAIM_NOT_VALIDATED: CLM-CV-T06-00006 errors=['SIMULATION_DERIVED_REQUIRES_PROPOSITION_SUBJECT: must declare proposition_subject', 'SIMULATION_DERIVED_REQUIRES_PROPOSITION_PREDICATE: must declare prop",
+      "claim_text": "The simulation estimated that M3_REFINED outperforms VIEshunt retrieval reliability."
+    },
+    {
+      "test_id": "H23",
+      "test_name": "genuine_evidence_false_causal",
+      "attack_description": "V6 shows M3 wins. Claim attributes causation to thermal isolation (not tested in V6).",
+      "uses_real_evidence": true,
+      "blocked": true,
+      "blocking_reason": "CLAIM_NOT_VALIDATED: CLM-CV-T06-00007 errors=['SIMULATION_DERIVED_REQUIRES_PROPOSITION_SUBJECT: must declare proposition_subject', 'SIMULATION_DERIVED_REQUIRES_PROPOSITION_PREDICATE: must declare prop",
+      "claim_text": "The simulation estimated that M3_REFINED wins because thermal isolation prevents tissue injury."
+    },
+    {
+      "test_id": "H24",
+      "test_name": "correct_data_wrong_version",
+      "attack_description": "V6 achieved 96.97%. Claim says V3 achieved 96.97% (wrong version attribution).",
+      "uses_real_evidence": true,
+      "blocked": true,
+      "blocking_reason": "CLAIM_PROPOSITION_VERIFICATION_FAILED: CLM-CV-T06-00008 failures=['Evidence EXP-GAUNTLET-V6-REAL VERSION_MISMATCH: claim version=V3 but evidence version=V6']",
+      "claim_text": "The simulation estimated that V3 achieves 96.97% retrieval reliability."
+    },
+    {
+      "test_id": "H25",
+      "test_name": "correct_hash_wrong_params",
+      "attack_description": "V6 used 8 conditions \u00d7 100 trials. Claim says 10 conditions \u00d7 200 trials (wrong params).",
+      "uses_real_evidence": true,
+      "blocked": true,
+      "blocking_reason": "CLAIM_NOT_VALIDATED: CLM-CV-T06-00009 errors=['SIMULATION_DERIVED_REQUIRES_PROPOSITION_SUBJECT: must declare proposition_subject', 'SIMULATION_DERIVED_REQUIRES_PROPOSITION_PREDICATE: must declare prop",
+      "claim_text": "The simulation estimated that M3_REFINED achieves 96.97% retrieval reliability across 10 conditions and 200 trials."
+    },
+    {
+      "test_id": "H26",
+      "test_name": "correct_hash_altered_narrative",
+      "attack_description": "V6 output is about retrieval reliability. Claim says it's about thrombosis reduction (altered narrative).",
+      "uses_real_evidence": true,
+      "blocked": true,
+      "blocking_reason": "CLAIM_NOT_VALIDATED: CLM-CV-T06-00010 errors=['SIMULATION_DERIVED_REQUIRES_PROPOSITION_SUBJECT: must declare proposition_subject', 'SIMULATION_DERIVED_REQUIRES_PROPOSITION_PREDICATE: must declare prop",
+      "claim_text": "The simulation estimated that M3_REFINED achieves 96.97% thrombosis reduction."
+    },
+    {
+      "test_id": "H27",
+      "test_name": "valid_evidence_wrong_territory",
+      "attack_description": "V25 (CV-T01) evidence used to support CV-T06 claim (wrong territory).",
+      "uses_real_evidence": true,
+      "blocked": true,
+      "blocking_reason": "CLAIM_NOT_VALIDATED: CLM-CV-T06-00011 errors=['SIMULATION_DERIVED_REQUIRES_PROPOSITION_SUBJECT: must declare proposition_subject', 'SIMULATION_DERIVED_REQUIRES_PROPOSITION_PREDICATE: must declare prop",
+      "claim_text": "The simulation estimated that M3_REFINED achieves 96.97% retrieval reliability."
+    },
+    {
+      "test_id": "H28",
+      "test_name": "two_valid_sources_incorrect_combination",
+      "attack_description": "Source has M3=96.97% and A4=88.86%. Claim states delta=8.11pp (not in evidence).",
+      "uses_real_evidence": true,
+      "blocked": true,
+      "blocking_reason": "CLAIM_NOT_VALIDATED: CLM-CV-T06-00012 errors=['SIMULATION_DERIVED_REQUIRES_PROPOSITION_SUBJECT: must declare proposition_subject', 'SIMULATION_DERIVED_REQUIRES_PROPOSITION_PREDICATE: must declare prop",
+      "claim_text": "The simulation estimated that M3_REFINED outperforms A4_cryo_debonding by 8.11 percentage points."
+    },
+    {
+      "test_id": "H29",
+      "test_name": "teaches_away_framed_as_support",
+      "attack_description": "V25 froze impedance branch (teaches away). Claim says V25 supports impedance viability.",
+      "uses_real_evidence": true,
+      "blocked": true,
+      "blocking_reason": "CLAIM_NOT_VALIDATED: CLM-CV-T01-00002 errors=['SIMULATION_DERIVED_REQUIRES_PROPOSITION_SUBJECT: must declare proposition_subject', 'SIMULATION_DERIVED_REQUIRES_PROPOSITION_PREDICATE: must declare prop",
+      "claim_text": "The simulation estimated that V25 supports the impedance state-separation architecture viability."
+    },
+    {
+      "test_id": "H30",
+      "test_name": "current_evidence_invalidated_by_own_finding",
+      "attack_description": "V3 found B-wave controller misses REM. Claim says V3 supports full sleep-stage coverage.",
+      "uses_real_evidence": true,
+      "blocked": true,
+      "blocking_reason": "CLAIM_NOT_VALIDATED: CLM-CV-T08-00003 errors=['MISSING_EVIDENCE_BINDING: claim has no evidence_ids and no source_ids', 'SIMULATION_DERIVED_REQUIRES_PROPOSITION_SUBJECT: must declare proposition_subjec",
+      "claim_text": "The simulation estimated that V3 provides full sleep-stage coverage for M5_REFINED."
+    },
+    {
+      "test_id": "H31",
+      "test_name": "fake_source_legit_looking_doi",
+      "attack_description": "Fabricated source with fake DOI claims M3 achieves 99.9% (not in real evidence).",
+      "uses_real_evidence": true,
+      "blocked": false,
+      "blocking_reason": "FIREWALL_ALLOWED",
+      "claim_text": "The literature reports that M3_REFINED achieves 99.9% reliability in clinical trials."
+    },
+    {
+      "test_id": "H32",
+      "test_name": "partial_support_promoted_to_full",
+      "attack_description": "V6 shows M3 average=96.97% but worst-case=30%. Claim says 'in all conditions' (promotes partial to full).",
+      "uses_real_evidence": true,
+      "blocked": false,
+      "blocking_reason": "FIREWALL_ALLOWED",
+      "claim_text": "The simulation estimated that M3_REFINED achieves 96.97% retrieval reliability in all conditions."
+    }
+  ]
+}

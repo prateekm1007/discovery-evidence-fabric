@@ -127,6 +127,11 @@ def populate_all():
             evidence_ids=["EXP-CV-T01-001"],
             simulation_commit="7b7644e",
             simulation_output_hash=sha256(v25_content),
+            proposition_subject="impedance_state_separation",
+            proposition_predicate="states_meeting_target",
+            proposition_value="1/7",
+            proposition_condition="0.005_noise",
+            proposition_version="V25",
         )
         evidence_binding.bind_claim_to_evidence(claim1.claim_id, "EXP-CV-T01-001")
         results["registered"].append(claim1.claim_id)
@@ -180,6 +185,12 @@ def populate_all():
             evidence_ids=["EXP-CV-T06-001"],
             simulation_commit="7c68f32",
             simulation_output_hash=sha256(v6_content),
+            proposition_subject="M3_REFINED",
+            proposition_predicate="retrieval_reliability",
+            proposition_value="96.97%",
+            proposition_comparator=">=",
+            proposition_condition="6_month_benchtop",
+            proposition_version="V6",
         )
         evidence_binding.bind_claim_to_evidence(claim6.claim_id, "EXP-CV-T06-001")
         results["registered"].append(claim6.claim_id)
@@ -192,6 +203,12 @@ def populate_all():
             evidence_ids=["EXP-CV-T06-001"],
             simulation_commit="7c68f32",
             simulation_output_hash=sha256(v6_content),
+            proposition_subject="A4_cryo_debonding",
+            proposition_predicate="retrieval_reliability",
+            proposition_value="88.86",
+            proposition_comparator="<",
+            proposition_condition="6_month_benchtop",
+            proposition_version="V6",
         )
         evidence_binding.bind_claim_to_evidence(claim6b.claim_id, "EXP-CV-T06-001")
         results["registered"].append(claim6b.claim_id)
@@ -242,6 +259,10 @@ def populate_all():
             evidence_ids=["EXP-CV-T07-001"],
             simulation_commit="7c68f32",
             simulation_output_hash=sha256(v4_content),
+            proposition_subject="M9_PLGA_sleeve",
+            proposition_predicate="embolization_rate",
+            proposition_value="1/10000",
+            proposition_version="V4",
         )
         evidence_binding.bind_claim_to_evidence(claim7.claim_id, "EXP-CV-T07-001")
         results["registered"].append(claim7.claim_id)
@@ -291,6 +312,10 @@ def populate_all():
             evidence_ids=["EXP-CV-T08-001"],
             simulation_commit="7c68f32",
             simulation_output_hash=sha256(v3_content),
+            proposition_subject="B-wave_tolerant_controller",
+            proposition_predicate="REM_apnea_miss_rate",
+            proposition_value="100%",
+            proposition_version="V3",
         )
         evidence_binding.bind_claim_to_evidence(claim8.claim_id, "EXP-CV-T08-001")
         results["registered"].append(claim8.claim_id)
