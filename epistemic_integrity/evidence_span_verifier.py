@@ -177,17 +177,16 @@ def verify_proposition_against_span(
                     "reasoning": f"Claim value '{claim_value}' != span value '{span.decoded_value}'",
                 }
 
-    # 2. SUBJECT CHECK — P0-5: use DECLARED subject, not key-name inference
-    # The span has declared_subject (from certification case) and key_name (for audit)
-    # We compare the claim subject against the DECLARED subject
+    # 2. SUBJECT CHECK — P0-3 v16: canonical entity registry, NO underscore stripping
+    # Per CEO: "Replace underscore-insensitive entity matching with canonical entity IDs
+    # + explicit aliases. No string normalization."
     if span.declared_subject and claim_subject:
-        # Normalize: case-insensitive, underscore-insensitive
-        claim_norm = claim_subject.upper().replace("_", "")
-        span_norm = span.declared_subject.upper().replace("_", "")
-        if claim_norm != span_norm:
+        from .entity_registry import create_default_registry
+        registry = create_default_registry()
+        if not registry.matches(claim_subject, span.declared_subject):
             return {
                 "verdict": "SUBJECT_MISMATCH",
-                "reasoning": f"Claim subject '{claim_subject}' != declared subject '{span.declared_subject}'",
+                "reasoning": f"Claim subject '{claim_subject}' does not resolve to same canonical entity as evidence subject '{span.declared_subject}' (registry lookup, no string normalization)",
             }
 
     # 3. PREDICATE CHECK — P0-5: use DECLARED predicate (the actual JSON key)

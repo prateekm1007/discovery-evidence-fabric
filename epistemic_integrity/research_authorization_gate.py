@@ -618,16 +618,10 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                 except Exception:
                     _key_name = ""
 
-                _ev_subject = ""
-                _key_lower = _key_name.lower()
-                if "m3" in _key_lower:
-                    _ev_subject = "M3_REFINED"
-                elif "a4" in _key_lower:
-                    _ev_subject = "A4_cryo_debonding"
-                elif "m9" in _key_lower:
-                    _ev_subject = "M9_PLGA_sleeve"
-                elif "m5" in _key_lower:
-                    _ev_subject = "M5_REFINED"
+                # P0-2/P0-3: Evidence-side subject via entity registry (NOT key-name inference)
+                from epistemic_integrity.entity_registry import create_default_registry
+                _registry = create_default_registry()
+                _ev_subject = _registry.resolve(_key_name) or ""
 
                 span = create_verified_span(
                     json_content=evidence_content,

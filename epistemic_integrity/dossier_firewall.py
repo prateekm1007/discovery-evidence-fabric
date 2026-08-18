@@ -293,17 +293,13 @@ class DossierFirewall:
                     f"EVIDENCE_POINTER_UNRESOLVABLE: {ev.evidence_id} pointer={json_pointer}"
                 )
 
-            # Evidence-side subject: what does the KEY at this pointer say?
-            _key_lower = _key_name.lower()
-            _ev_subject = ""
-            if "m3" in _key_lower:
-                _ev_subject = "M3_REFINED"
-            elif "a4" in _key_lower:
-                _ev_subject = "A4_cryo_debonding"
-            elif "m9" in _key_lower:
-                _ev_subject = "M9_PLGA_sleeve"
-            elif "m5" in _key_lower:
-                _ev_subject = "M5_REFINED"
+            # Evidence-side subject: resolve via entity registry, NOT key-name inference
+            # Per CEO P0-2: "Replace key-name subject inference with an immutable,
+            # explicitly declared evidence-side proposition bound to the exact JSON Pointer."
+            # Per CEO P0-3: "No string normalization."
+            from .entity_registry import create_default_registry
+            _registry = create_default_registry()
+            _ev_subject = _registry.resolve(_key_name) or ""
 
             # P0-1/P0-2: Create immutable VerifiedEvidenceSpan with EVIDENCE-side subject
             span = create_verified_span(
@@ -370,16 +366,11 @@ class DossierFirewall:
                 if not self.hash_verifier.verify_span_hash(src.span, src.span_hash):
                     raise ValueError(f"SOURCE_SPAN_HASH_MISMATCH: {src.source_id}")
 
-            # Proposition verification for sources too
-            if src.content:
-                src_result = self.proposition_verifier.verify(
-                    claim_proposition, src.content
-                )
-                if src_result.verdict != PropositionVerdict.SUPPORTS:
-                    raise ValueError(
-                        f"SOURCE_PROPOSITION_REJECTED: {src.source_id} "
-                        f"verdict={src_result.verdict.value}"
-                    )
+            # P0-1 v16: NO document-wide semantic search for sources.
+            # Source verification is identity + content hash + support state ONLY.
+            # The old PropositionVerifier.verify(src.content) is REMOVED from this path.
+            # Sources support claims through their verified identity and content,
+            # NOT through a second semantic claim engine.
 
         # Check 8 (P0-B): GENERATE claim text from verified proposition
         # The AI cannot supply the final factual sentence independently.
