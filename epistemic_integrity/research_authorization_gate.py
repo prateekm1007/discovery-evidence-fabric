@@ -1,23 +1,7 @@
 """
-epistemic_integrity/research_authorization_gate.py — Read-only fresh-verification gate v8
+epistemic_integrity/research_authorization_gate.py — Read-only fresh-verification gate
 
-Per CEO v8 directives:
-  P0-A: Fix git history scanner (correct -S placement, test with fixture)
-  P0-B: check_all() is READ-ONLY (no cleanup, no repopulation, no side effects)
-  P0-C: Gauntlet fixtures isolated from production registries
-  P0-D: Golden certification corpus with expected verdicts
-  P0-G: Full SHA-256 + canonical manifest root (no truncation)
-  P0-H: Clean worktree required + verify execution against certified commit
-  P0-I: Each certification subsystem runs in isolated subprocess
-
-CRITICAL ARCHITECTURAL CHANGES from v7:
-  1. Gate is READ-ONLY — never mutates production registries
-  2. Gauntlet runs in subprocess with ISOLATED test fixtures (not production registry)
-  3. G7 uses golden corpus with expected verdicts (not self-approval)
-  4. Git scanner uses correct -S flag placement
-  5. Full SHA-256 hashes (no truncation)
-  6. Clean worktree enforced
-  7. Each check runs in isolated subprocess to prevent state leakage
+Version: imported from version_manifest.py (single source of truth)
 """
 
 import json
@@ -30,6 +14,8 @@ from pathlib import Path
 from dataclasses import dataclass, asdict, field
 from typing import List, Dict, Optional
 from datetime import datetime, timezone
+
+from .version_manifest import ENGINE_VERSION, SCHEMA_VERSION, POLICY_VERSION, CERTIFICATION_CORPUS_VERSION
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EPISTEMIC_DIR = Path(__file__).resolve().parent
@@ -80,8 +66,8 @@ class ResearchAuthorizationGate:
     """READ-ONLY fresh-verification gate. Never mutates production state."""
 
     def __init__(self):
-        self.verifier_version = "v9"
-        self.schema_version = "3.1.0"
+        self.verifier_version = ENGINE_VERSION
+        self.schema_version = SCHEMA_VERSION
         self.git_head = self._get_git_head()
         self.worktree_clean = self._check_worktree_clean()
 
@@ -349,14 +335,14 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                 pass
 
     def _fresh_state_reconciliation(self) -> FreshCheck:
-        """P0-E: Exact ledger verification, not heuristic keyword matching."""
+        """P0-E: Exact ledger verification, not heuristic keyword matching.
+        P1-2 v21: NOT_IN_CERTIFICATION_SCOPE territories are explicitly excluded."""
         try:
             sys.path.insert(0, str(REPO_ROOT))
             from epistemic_integrity.state_transition_ledger import StateTransitionLedger
 
             ledger = StateTransitionLedger(EPISTEMIC_DIR / "approved_provenance")
 
-            # Load canonical state
             portfolio_path = REPO_ROOT / "CANONICAL_STATE" / "PORTFOLIO.json"
             if not portfolio_path.exists():
                 return FreshCheck("G4", "state_reconciliation_exact", False,
@@ -366,7 +352,6 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
             with open(portfolio_path) as f:
                 canonical = json.load(f)
 
-            # Compare each territory's canonical state with ledger's terminal state
             discrepancies = []
             for t in canonical.get("territories", []):
                 tid = t["id"]
@@ -374,15 +359,17 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                 ledger_state = ledger.get_current_state(tid)
 
                 if ledger_state is None:
-                    # Territory not in ledger — check if it's a branch (CV-T02L)
-                    if "L" not in tid and "branch" not in t.get("name", "").lower():
-                        discrepancies.append(f"{tid}: not in ledger (canonical={canonical_state})")
+                    # Territory not in ledger
+                    discrepancies.append(f"{tid}: not in ledger (canonical={canonical_state})")
+                elif ledger_state == "NOT_IN_CERTIFICATION_SCOPE":
+                    # P1-2: Explicitly excluded from certification scope — not a discrepancy
+                    pass
                 elif ledger_state != canonical_state:
                     discrepancies.append(f"{tid}: canonical={canonical_state} but ledger={ledger_state}")
 
             if not discrepancies:
                 return FreshCheck("G4", "state_reconciliation_exact", True,
-                                  "0 discrepancies (exact ledger match)",
+                                  "0 discrepancies (exact ledger match, scope-excluded territories skipped)",
                                   self.git_head, self.verifier_version, self.schema_version)
             else:
                 return FreshCheck("G4", "state_reconciliation_exact", False,
@@ -479,8 +466,10 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
             for recon in reconstructed_portfolio["territories"]:
                 tid = recon["id"]
                 recon_state = recon["current_state"]
-                recon_version = recon["artifact_version"]
-                recon_commit = recon["commit_sha"]
+
+                # P1-2: Skip territories explicitly excluded from certification scope
+                if recon_state == "NOT_IN_CERTIFICATION_SCOPE":
+                    continue
 
                 if tid not in committed_territories:
                     mismatches.append(f"{tid}: in ledger but not in PORTFOLIO.json")
@@ -493,8 +482,9 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                 if committed_state != recon_state:
                     mismatches.append(f"{tid}: current_state portfolio={committed_state} but ledger={recon_state}")
 
-                # Compare version if present in committed portfolio
+                # Compare version if present
                 committed_version = committed.get("frozen_at_version", "")
+                recon_version = recon.get("artifact_version", "")
                 if committed_version and recon_version and committed_version != recon_version:
                     mismatches.append(f"{tid}: version portfolio={committed_version} but ledger={recon_version}")
 

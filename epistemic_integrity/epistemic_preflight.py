@@ -240,6 +240,12 @@ class EpistemicPreflight:
             # For each territory in canonical state, verify it has at least one current claim
             # (if territory is in ACTIVE state)
             for t in state.get("territories", []):
+                # P1-2 v21: Skip territories explicitly excluded from certification scope
+                if t.get("current_state") == "NOT_IN_CERTIFICATION_SCOPE":
+                    continue
+                # Also skip CV-T02L (narrow branch, not in certification scope)
+                if t.get("id") == "CV-T02L":
+                    continue
                 if t.get("current_state") in ["PROVISIONAL_SURVIVOR_V6", "PROVISIONAL_PARTIAL_V3", "ACTIVE_CANDIDATE"]:
                     current_claims = self.claim_registry.get_current_claims(t["id"])
                     # Note: territory may have 0 claims if claims not yet registered
