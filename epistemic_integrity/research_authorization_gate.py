@@ -134,11 +134,25 @@ class ResearchAuthorizationGate:
     def check_all(self) -> AuthorizationAttestation:
         """Run ALL checks. READ-ONLY — no side effects on production registries.
 
-        Per CEO P0-B: certification is observational, never mutates production state.
-        Per CEO P0-I: each check runs in isolated subprocess to prevent state leakage.
+        Per CEO v16 P0-2: "Certification must be observational.
+        Add a certification invariant proving:
+        production epistemic root hash before == production epistemic root hash after"
+
+        Per CEO v16 P0-1: "Certification fixtures must live in an isolated
+        certification namespace and must be structurally impossible to
+        reference from a production dossier."
         """
+        # P0-2: Compute production root hash BEFORE certification
+        production_root_before = self._compute_production_root_hash()
+
         checks: List[FreshCheck] = []
         blocking_reasons: List[str] = []
+
+        # P0-4: Production graph purity test — verify no gauntlet contamination
+        purity = self._check_production_purity()
+        checks.append(purity)
+        if not purity.passed:
+            blocking_reasons.append(f"PRODUCTION_PURITY: {purity.details}")
 
         # P0-H: Clean worktree check (prerequisite)
         if not self.worktree_clean:
@@ -193,6 +207,24 @@ class ResearchAuthorizationGate:
 
         authorized = len(blocking_reasons) == 0
 
+        # P0-2: Compute production root hash AFTER certification
+        production_root_after = self._compute_production_root_hash()
+
+        # P0-2: Certification invariant — production state must be unchanged
+        if production_root_before != production_root_after:
+            checks.append(FreshCheck(
+                "G8", "production_immutability", False,
+                f"Production root hash CHANGED during certification: before={production_root_before[:16]}... after={production_root_after[:16]}...",
+                self.git_head, self.verifier_version, self.schema_version
+            ))
+            blocking_reasons.append(f"PRODUCTION_MUTATED: certification changed production epistemic state")
+        else:
+            checks.append(FreshCheck(
+                "G8", "production_immutability", True,
+                f"Production root hash unchanged: {production_root_before[:16]}...",
+                self.git_head, self.verifier_version, self.schema_version
+            ))
+
         # P0-G: Full SHA-256 manifest root
         root_hash = self._compute_full_manifest_hash()
 
@@ -221,7 +253,7 @@ class ResearchAuthorizationGate:
         # Write script to temp file to avoid escaping issues
         scripts = {
             "preflight": '''
-import sys, json
+import sys, json, tempfile
 sys.path.insert(0, "{repo}")
 from epistemic_integrity.epistemic_preflight import EpistemicPreflight
 pf = EpistemicPreflight()
@@ -229,17 +261,37 @@ results = pf.run_all()
 print(json.dumps({{"passed": results["overall_pass"], "details": "P0=" + str(results["p0_failures"]) + " P1=" + str(results["p1_failures"]), "raw": {{"p0": results["p0_failures"], "p1": results["p1_failures"]}}}}))
 ''',
             "gauntlet_v1": '''
-import sys, json
+import sys, json, tempfile, os
 sys.path.insert(0, "{repo}")
+# Use temp directory for gauntlet to avoid production contamination
+_tmp = tempfile.mkdtemp(prefix="gauntlet_iso_")
+os.environ["EPISTEMIC_TEMP_DIR"] = _tmp
 from epistemic_integrity.gauntlet.hallucination_gauntlet import HallucinationGauntlet
+# Monkey-patch the EPISTEMIC_DIR to use temp
+import epistemic_integrity.gauntlet.hallucination_gauntlet as _hg
+_hg.EPISTEMIC_DIR = __import__('pathlib').Path(_tmp)
+_hg.REPO_ROOT = __import__('pathlib').Path("{repo}")
+# Need to create subdirs
+(__import__('pathlib').Path(_tmp) / "approved_claims").mkdir(parents=True, exist_ok=True)
+(__import__('pathlib').Path(_tmp) / "approved_evidence").mkdir(parents=True, exist_ok=True)
+(__import__('pathlib').Path(_tmp) / "approved_provenance").mkdir(parents=True, exist_ok=True)
+(__import__('pathlib').Path(_tmp) / "gauntlet").mkdir(parents=True, exist_ok=True)
 g = HallucinationGauntlet()
 results = g.run_all()
 print(json.dumps({{"passed": results["overall_pass"], "details": str(results["blocked"]) + "/" + str(results["total_tests"]) + " blocked", "raw": {{"blocked": results["blocked"], "total": results["total_tests"]}}}}))
 ''',
             "gauntlet_v2": '''
-import sys, json
+import sys, json, tempfile, os
 sys.path.insert(0, "{repo}")
+_tmp = tempfile.mkdtemp(prefix="gauntlet2_iso_")
 from epistemic_integrity.gauntlet.hallucination_gauntlet_v2 import HallucinationGauntletV2
+import epistemic_integrity.gauntlet.hallucination_gauntlet_v2 as _hg2
+_hg2.EPISTEMIC_DIR = __import__('pathlib').Path(_tmp)
+_hg2.REPO_ROOT = __import__('pathlib').Path("{repo}")
+(__import__('pathlib').Path(_tmp) / "approved_claims").mkdir(parents=True, exist_ok=True)
+(__import__('pathlib').Path(_tmp) / "approved_evidence").mkdir(parents=True, exist_ok=True)
+(__import__('pathlib').Path(_tmp) / "approved_provenance").mkdir(parents=True, exist_ok=True)
+(__import__('pathlib').Path(_tmp) / "gauntlet").mkdir(parents=True, exist_ok=True)
 g = HallucinationGauntletV2()
 results = g.run_all()
 print(json.dumps({{"passed": results["overall_pass"], "details": str(results["blocked"]) + "/" + str(results["total_tests"]) + " blocked", "raw": {{"blocked": results["blocked"], "total": results["total_tests"], "real": results.get("uses_real_evidence", 0)}}}}))
@@ -749,11 +801,7 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                               self.git_head, self.verifier_version, self.schema_version)
 
     def _compute_full_manifest_hash(self) -> str:
-        """P0-G: Full SHA-256 Merkle root over ALL epistemic state.
-
-        Hashes ALL relevant files, not just a few registry files.
-        No truncation — full SHA-256.
-        """
+        """P0-G: Full SHA-256 Merkle root over ALL epistemic state."""
         files_to_hash = [
             "CANONICAL_STATE/PORTFOLIO.json",
             "epistemic_integrity/approved_claims/claim_registry.json",
@@ -763,7 +811,6 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
             "epistemic_integrity/approved_provenance/supersession_registry.json",
             "epistemic_integrity/approved_provenance/state_transition_ledger.json",
         ]
-
         hasher = hashlib.sha256()
         for rel_path in files_to_hash:
             full_path = REPO_ROOT / rel_path
@@ -775,8 +822,75 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
             else:
                 hasher.update(rel_path.encode())
                 hasher.update(b"MISSING")
+        return hasher.hexdigest()
 
-        return hasher.hexdigest()  # Full 64-char SHA-256, no truncation
+    def _compute_production_root_hash(self) -> str:
+        """P0-2: Compute hash of ALL production epistemic state files.
+
+        This is used for the before/after immutability check.
+        If this hash changes during certification, certification FAILED.
+        """
+        return self._compute_full_manifest_hash()
+
+    def _check_production_purity(self) -> FreshCheck:
+        """P0-1/P0-6: Verify production registries contain NO gauntlet/certification fixtures.
+
+        Per CEO: "no production claim → EXP-GAUNTLET-*
+                  no production claim → SRC-GAUNTLET-*
+                  no production dossier → certification fixture"
+        """
+        contamination = []
+
+        # Check claims
+        claims_path = EPISTEMIC_DIR / "approved_claims" / "claim_registry.json"
+        if claims_path.exists():
+            with open(claims_path) as f:
+                data = json.load(f)
+            for claim in data.get("claims", []):
+                cid = claim.get("claim_id", "")
+                # Production claims should only be CLM-CV-T01 through CLM-CV-T10
+                # with sequence numbers 00001-00010
+                if "GAUNTLET" in cid or "CERT" in cid or "TEST" in cid:
+                    contamination.append(f"claim {cid}")
+
+        # Check evidence
+        ev_path = EPISTEMIC_DIR / "approved_evidence" / "evidence_registry.json"
+        if ev_path.exists():
+            with open(ev_path) as f:
+                data = json.load(f)
+            for ev in data.get("evidence", []):
+                eid = ev.get("evidence_id", "")
+                if "GAUNTLET" in eid or "CERT" in eid or "TEST" in eid:
+                    contamination.append(f"evidence {eid}")
+
+        # Check sources
+        src_path = EPISTEMIC_DIR / "approved_evidence" / "source_registry.json"
+        if src_path.exists():
+            with open(src_path) as f:
+                data = json.load(f)
+            for src in data.get("sources", []):
+                sid = src.get("source_id", "")
+                if "GAUNTLET" in sid or "CERT" in sid or "TEST" in sid:
+                    contamination.append(f"source {sid}")
+
+        # Check bindings
+        bind_path = EPISTEMIC_DIR / "approved_evidence" / "bindings.json"
+        if bind_path.exists():
+            with open(bind_path) as f:
+                data = json.load(f)
+            for claim_id, ev_ids in data.get("claim_to_evidence", {}).items():
+                for eid in ev_ids:
+                    if "GAUNTLET" in eid or "CERT" in eid:
+                        contamination.append(f"binding {claim_id}→{eid}")
+
+        if not contamination:
+            return FreshCheck("G9", "production_purity", True,
+                              "Production registries clean — no gauntlet/certification fixtures",
+                              self.git_head, self.verifier_version, self.schema_version)
+        else:
+            return FreshCheck("G9", "production_purity", False,
+                              f"Production contamination: {contamination[:5]}",
+                              self.git_head, self.verifier_version, self.schema_version)
 
 
 def main():
