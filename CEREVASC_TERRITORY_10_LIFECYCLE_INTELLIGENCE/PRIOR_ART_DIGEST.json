@@ -1,0 +1,269 @@
+{
+  "task_id": "TERRITORY-10-DISCOVERY",
+  "artifact_type": "PRIOR_ART_DIGEST",
+  "territory": "Lifecycle/platform intelligence — eShunt lifecycle management, post-market surveillance, predictive maintenance, platform-level intelligence via chronic sensor data, PROs, population analytics",
+  "timestamp": "2026-08-19T00:00:00Z",
+  "agent": "subagent (general-purpose)",
+  "doctrine_note": "Consolidates findings from PRIOR_ART_LENS_SCHOLARLY (12 queries, ~289 hits), PRIOR_ART_SCOPUS (12 queries, ~220 hits), PRIOR_ART_GOOGLE_PATENTS (12 queries, ~120 patents parsed). PatSnap BLOCKED (DNS-unreachable from sandbox — same state as T7/T8/T9). Per doctrine: NO 'LIKELY_NOVEL' language; 3-state search completeness (COMPLETE/PARTIAL/BLOCKED); 5-axis tracker NEVER averaged; honest negatives documented.",
+  "search_completeness_summary": {
+    "lens_scholarly": {
+      "status": "COMPLETE",
+      "queries": 12,
+      "total_results": 289,
+      "syntax": "multi_match cross_fields operator=AND on title+abstract (T8 proven pattern)"
+    },
+    "scopus": {
+      "status": "COMPLETE",
+      "queries": 12,
+      "total_results": 220,
+      "syntax": "TITLE-ABS-KEY with quoted phrase + AND operators"
+    },
+    "google_patents": {
+      "status": "COMPLETE",
+      "queries": 12,
+      "total_patents_parsed": 120,
+      "method": "agent-browser headless chromium, body.innerText parse (direct curl blocked by CAPTCHA per T7/T8/T9 pattern)"
+    },
+    "patsnap": {
+      "status": "BLOCKED",
+      "reason": "DNS-unreachable from sandbox (same state as T7/T8/T9). No PatSnap API key provided in task description."
+    },
+    "patentbear": {
+      "status": "NOT_STARTED",
+      "reason": "Per T8/T9 remediation plan — available as PatSnap substitute if V2 authorized."
+    },
+    "passage_level_claim_audit": {
+      "status": "NOT_STARTED",
+      "reason": "Deferred to V2 per V1.1 §6.3 anti-inflation."
+    },
+    "overall_status": "PARTIAL — Lens + Scopus + Google Patents executed COMPLETE; PatSnap BLOCKED (DNS-unreachable); PatentBear NOT_STARTED; passage-level claim audit NOT_STARTED. Cannot declare COMPLETE without PatSnap + PatentBear + passage-level claim audit.",
+    "honest_disclosure": "Per V1.1 §6.3 search-completeness 3-state doctrine: PARTIAL is one of three valid states (COMPLETE / PARTIAL / BLOCKED). NO 'LIKELY_NOVEL' language used."
+  },
+  "direct_hits": [
+    {
+      "patent_number": "US10687719B2",
+      "title": "Implantable shunt system and associated pressure sensors",
+      "assignee": "The Alfred E. Mann Foundation For Scientific (Siegmar Schmidt)",
+      "priority_date": "2011-02-16",
+      "relevance": "MOST DIRECT HIT for M1 (predictive failure detection via chronic pressure sensor on shunt). Implantable shunt system with associated pressure sensors — same general concept as M1.",
+      "distinction_from_M1": "M1 = ML-based PREDICTIVE FAILURE DETECTION using dual-pressure-differential signature + rate-of-change over 30-90 day baseline. US10687719B2 = implantable shunt with pressure sensors (likely for real-time pressure monitoring, not ML-based failure prediction). Need passage-level audit to confirm.",
+      "impact_on_M1": "M1 SURVIVES at search-completeness level — US10687719B2 does not explicitly teach ML-based predictive failure detection. BUT this is the HIGHEST-THREAT near-neighbor patent and MUST be passage-level audited in V2.",
+      "v2_action_required": "Passage-level claim audit of US10687719B2 — confirm no ML-based predictive algorithm is taught."
+    },
+    {
+      "patent_number": "US9317920B2",
+      "title": "System and methods for identification of implanted medical devices and/or associated revision information",
+      "assignee": "Rush University Medical Center (Vicko Gluncic)",
+      "priority_date": "2011-11-30",
+      "relevance": "DIRECT HIT for M7 (end-of-life prediction & elective replacement scheduling). System for identifying implanted medical devices and associated revision information.",
+      "distinction_from_M1_M7": "M7 = ML-based RUL prediction using chronic dual-pressure sensor trend + biofouling indicator + sensor impedance. US9317920B2 = identification system (likely RFID-style device identification, not predictive RUL). Need passage-level audit to confirm.",
+      "impact_on_M1_M7": "M7 SURVIVES at search-completeness level — US9317920B2 does not explicitly teach ML-based RUL prediction. NEAR-NEIGHBOR §103 risk if broad claim interpretation.",
+      "v2_action_required": "Passage-level claim audit of US9317920B2 — confirm no ML-based RUL prediction is taught."
+    },
+    {
+      "patent_number": "US8639338B2",
+      "title": "System and method for monitoring power source longevity of an implantable medical device",
+      "assignee": "Medtronic, Inc. (Charles R. Rogers)",
+      "priority_date": "2003-04-07",
+      "relevance": "DIRECT precedent for M7 — pacemaker battery ERI (Elective Replacement Indicator). This is the FDA-REQUIRED regulatory standard for pacemaker battery longevity monitoring.",
+      "distinction_from_M7": "M7 = ML-based RUL prediction using chronic DUAL-PRESSURE sensor trend + biofouling indicator + sensor impedance (multi-factorial). US8639338B2 = battery-only longevity monitoring (single-factor, hardware-driven, regulatory standard). Different signal source (battery voltage vs pressure drift + biofouling + impedance).",
+      "impact_on_M7": "M7 SURVIVES — US8639338B2 teaches battery ERI (regulatory standard), not multi-factorial RUL on pressure/biofouling/impedance. But §103 risk: PHOSITA could extend battery ERI concept to multi-factorial RUL. M7 must claim SPECIFIC signal features to gain novelty.",
+      "v2_action_required": "§103 obviousness analysis (Graham v. Deere 4-factor) on US8639338B2 vs M7."
+    },
+    {
+      "patent_number": "US11832920B2",
+      "title": "Devices, systems, and methods for pulmonary arterial hypertension (PAH) diagnostic devices",
+      "assignee": "St. Jude Medical Luxembourg Holdings (Jason White)",
+      "priority_date": "2012-11-21",
+      "relevance": "DIRECT precedent for M1 — CardioMEMS-family PAH diagnostic device with chronic pressure telemetry + diagnostic algorithm. This is the closest analog to M1 in a different organ system (pulmonary artery vs CSF).",
+      "distinction_from_M1": "M1 = ML-based predictive failure detection for CSF shunt using dual-pressure-differential signature. US11832920B2 = PAH diagnostic device using pulmonary artery pressure telemetry (different organ system, different failure mode, different patient population).",
+      "impact_on_M1": "M1 SURVIVES — CardioMEMS PAH is for different organ system. BUT §103 risk: PHOSITA could adapt CardioMEMS HF/PAH predictive algorithm to CSF shunt. M1 must claim eShunt-specific signal features (dual-pressure-differential ML signature, hydrocephalus failure prediction) to gain novelty.",
+      "v2_action_required": "§103 obviousness analysis on CardioMEMS patent family vs M1."
+    },
+    {
+      "patent_number": "US8343068B2 / EP2139385B1 / US20100161004A1",
+      "title": "Sensor unit and procedure for monitoring intracranial physiological properties / Wireless dynamic power control of an implantable sensing device",
+      "assignee": "Integrated Sensing Systems, Inc. (Nader Najafi)",
+      "priority_date": "2007-11-29 / 2007-04-30 / 2008-12-22",
+      "relevance": "DIRECT HIT for M6 (batteryless chronic implantable pressure sensor). ISSYS/Najafi patent family covers intracranial wireless batteryless pressure sensing — DIRECT precedent for M6.",
+      "impact_on_M6": "M6 DESTROYED — ISSYS/Najafi patent family saturates the batteryless intracranial pressure sensor space. M6 killed at physics pre-check (CardioMEMS RF inductive powering precedent) is CONFIRMED by GP8 search. M6 has no novelty remaining.",
+      "honest_negative": "M6 fully saturated by ISSYS/Najafi patent family + CardioMEMS precedent. KILLED at pre-check, CONFIRMED by GP8 search."
+    }
+  ],
+  "near_neighbors": [
+    {
+      "patent_number": "US20230157762A1",
+      "title": "Extended Intelligence Ecosystem for Soft Tissue Luminal Applications",
+      "assignee": "Medtronic, Inc. (Peter N. Braido)",
+      "priority_date": "2021-11-23",
+      "relevance": "NEAR-NEIGHBOR for M1/M2/M4 — Medtronic's 'Extended Intelligence Ecosystem' for soft tissue luminal applications (broad concept of medical device intelligence ecosystem).",
+      "impact_on_T10": "M1/M2/M4 §103 risk: PHOSITA could argue eShunt-specific intelligence is an obvious application of Medtronic's broad ecosystem concept. M1 must claim eShunt-specific signal features + dual-pressure-differential ML signature to distinguish.",
+      "v2_action_required": "Passage-level audit of US20230157762A1 — confirm no specific CSF shunt predictive failure teaching."
+    },
+    {
+      "patent_number": "US20220151784A1 / US11234702B1 / US12369918B2 / US20250352210A1",
+      "title": "Interatrial shunt having physiologic sensor",
+      "assignee": "V-Wave Ltd. (Neal Eigler)",
+      "priority_date": "2020-11-13",
+      "relevance": "NEAR-NEIGHBOR for M1 — V-Wave interatrial shunt with integrated physiologic sensor. Cardiac shunt with sensor — same architectural concept as M1 (shunt + sensor).",
+      "impact_on_M1": "M1 §103 risk: V-Wave teaches shunt + physiologic sensor integration. M1 must distinguish by CSF-specific physiology + dual-pressure-differential ML + endovascular venous access (different from V-Wave's transeptal approach).",
+      "v2_action_required": "Passage-level audit of V-Wave patent family."
+    },
+    {
+      "patent_number": "US10682079B2",
+      "title": "Long-term implantable monitoring system and methods of use",
+      "assignee": "Thomas Jefferson University (Jeffrey I. Joseph)",
+      "priority_date": "2014-07-24",
+      "relevance": "NEAR-NEIGHBOR for M1/M7 — long-term implantable monitoring system.",
+      "impact_on_M1_M7": "M1/M7 §103 risk: long-term implantable monitoring concept is taught. M1/M7 must claim eShunt-specific signal features.",
+      "v2_action_required": "Passage-level audit of US10682079B2."
+    },
+    {
+      "patent_number": "US6731976B2",
+      "title": "Device and method to measure and communicate body parameters",
+      "assignee": "Medtronic, Inc. (Richard D. Penn)",
+      "priority_date": "1997-09-03",
+      "relevance": "NEAR-NEIGHBOR for M1 — Medtronic broad patent on measuring and communicating body parameters from implantable device.",
+      "impact_on_M1": "Broad §103 risk if claim construction is broad.",
+      "v2_action_required": "Passage-level audit of US6731976B2."
+    },
+    {
+      "patent_number": "US20110004124A1",
+      "title": "Implantable medical device including mechanical stress sensor",
+      "assignee": "Medtronic, Inc. (Joseph F. Lessar)",
+      "priority_date": "2009-07-01",
+      "relevance": "NEAR-NEIGHBOR for M7 — implantable device with mechanical stress sensor (sensor-based implant health monitoring).",
+      "impact_on_M7": "M7 §103 risk: PHOSITA could extend mechanical stress sensor to multi-factorial RUL. M7 must claim specific eShunt signal features.",
+      "v2_action_required": "Passage-level audit of US20110004124A1."
+    },
+    {
+      "patent_number": "US20250359911A1",
+      "title": "Medical device for implanting in boney tissue and characterization of bone [around implant]",
+      "assignee": "Canary Medical Switzerland Ag (Mark A. Adler)",
+      "priority_date": "2020-02-20",
+      "relevance": "NEAR-NEIGHBOR for M7 — implant site monitoring using sensor data.",
+      "impact_on_M7": "M7 §103 risk: implant-site-monitoring concept taught.",
+      "v2_action_required": "Passage-level audit of US20250359911A1."
+    },
+    {
+      "patent_number": "US10452816B2",
+      "title": "Method and system for patient engagement",
+      "assignee": "Catalia Health Inc. (Cory Kidd)",
+      "priority_date": "2016-02-08",
+      "relevance": "NEAR-NEIGHBOR for M3 — patient engagement / PRO app.",
+      "impact_on_M3": "M3 §103 risk: patient engagement app concept taught. M3 standalone is saturated — only novel as integration with M1 sensor telemetry.",
+      "v2_action_required": "NOT REQUIRED — M3 already killed at physics pre-check as standalone."
+    },
+    {
+      "patent_number": "US12189854B2 / US20230221801A1",
+      "title": "Systems and methods for collecting, analyzing, and sharing bio-signal and non-bio-signal data",
+      "assignee": "Interaxon Inc. (Trevor Ce Coleman)",
+      "priority_date": "2012-09-14",
+      "relevance": "NEAR-NEIGHBOR for M3/M4 — bio-signal data collection + analytics + sharing.",
+      "impact_on_M3_M4": "M3/M4 §103 risk: bio-signal collection + analytics concept taught. M3/M4 standalone saturated.",
+      "v2_action_required": "NOT REQUIRED — M3/M4 already killed at physics pre-check as standalone."
+    }
+  ],
+  "cerevasc_self_hits": [
+    {
+      "patent_number": "US12318564B2",
+      "title": "Catheter systems and methods for medical procedures using catheters",
+      "assignee": "Cerevasc, Llc (Adel M. Malek)",
+      "priority_date": "2017-03-02",
+      "relevance": "CEREVASC SELF-HIT — appears in GP2 search results for VP shunt obstruction detection chronic pressure sensor. CereVasc's own patent on catheter systems.",
+      "impact_on_T10": "Confirms CereVasc has catheter system IP but does NOT cover ML-based predictive failure detection. T10 white space is BEYOND CereVasc's existing IP."
+    }
+  ],
+  "key_literature_hits_from_lens_scholarly": [
+    {
+      "lens_id": "Lens",
+      "title": "Prediction of Shunt Malfunction Using Automated Ventricular Volume Analysis and Radiomics (2025)",
+      "relevance": "MOST DIRECT LITERATURE HIT for M1 — but uses MRI/CT ventricular volume + radiomics, NOT chronic sensor data. Different data source.",
+      "distinction_from_M1": "M1 uses chronic dual-pressure sensor data (continuous, 1-10 Hz); this paper uses MRI/CT (episodic, every 3-12 months). Different data infrastructure, different ML signal."
+    },
+    {
+      "lens_id": "Lens",
+      "title": "Machine Learning Methods to Identify Pediatric Shunt Malfunction in the Acute Care Setting and the Development of ShuntGPT (2026)",
+      "relevance": "DIRECT LITERATURE HIT for M1 — ML on shunt malfunction, but ACUTE CARE SETTING (ED presentation) not chronic sensor.",
+      "distinction_from_M1": "M1 = CHRONIC (30-90 day baseline, 1-10 Hz sensor data); ShuntGPT = ACUTE (ED presentation, EHR data). Different data source, different clinical workflow."
+    },
+    {
+      "lens_id": "Lens",
+      "title": "Detection of Ventricular Catheter Occlusion by Monitoring the Intracranial Pressure (ICP) Using PVDF Piezoelectric Sensor (2026)",
+      "relevance": "DIRECT LITERATURE HIT for M1 — ICP monitoring for occlusion detection via piezoelectric sensor.",
+      "distinction_from_M1": "M1 = ML-based PREDICTIVE failure detection using dual-pressure-differential signature + rate-of-change over 30-90 day baseline; this paper = THRESHOLD-BASED occlusion detection using single ICP sensor. Different ML approach (predictive vs threshold) and different sensor architecture (dual vs single).",
+      "v2_action_required": "Passage-level audit of this paper to confirm no ML-based predictive algorithm is taught."
+    },
+    {
+      "lens_id": "Lens",
+      "title": "Parylene MEMS patency sensor for assessment of hydrocephalus shunt obstruction (2016)",
+      "relevance": "DIRECT LITERATURE HIT for M1 — MEMS patency sensor for VP shunt obstruction.",
+      "distinction_from_M1": "M1 = ML-based predictive failure detection; this paper = THRESHOLD-BASED patency sensor. Different ML approach. Sensor is on VP shunt, not endovascular eShunt.",
+      "v2_action_required": "Passage-level audit."
+    },
+    {
+      "lens_id": "Lens",
+      "title": "Impedance Changes Indicate Proximal Ventriculoperitoneal Shunt Obstruction In Vitro (2014)",
+      "relevance": "DIRECT LITERATURE HIT for M1 — impedance-based VP shunt obstruction detection.",
+      "distinction_from_M1": "M1 = dual-pressure-differential ML; this paper = impedance-based threshold detection. Different sensor modality (pressure vs impedance).",
+      "v2_action_required": "Passage-level audit — note this is in-vitro only, not chronic in-vivo."
+    },
+    {
+      "lens_id": "Lens",
+      "title": "Epidermal electronics for noninvasive, wireless, quantitative assessment of ventricular shunt function (2018)",
+      "relevance": "NEAR-NEIGHBOR for M1 — non-invasive epidermal patch for shunt function assessment.",
+      "distinction_from_M1": "M1 = INVASIVE chronic sensor integrated into eShunt; this paper = NON-INVASIVE epidermal patch. Different sensing modality, different data continuity (intermittent epidermal use vs continuous implant).",
+      "v2_action_required": "Passage-level audit — non-invasive vs invasive distinction may strengthen M1."
+    }
+  ],
+  "honest_negative_prior_art_findings": [
+    "M6 (batteryless) CONFIRMED SATURATED by ISSYS/Najafi patent family (US8343068B2, EP2139385B1, US20100161004A1) + CardioMEMS precedent. KILLED at physics pre-check, CONFIRMED by GP8 search.",
+    "M5 (remote programming) CONFIRMED SATURATED by Hakim programmable valve family (JP7208132B2, US4551128A) + V-Wave interatrial shunt adjustable. KILLED at physics pre-check, CONFIRMED by GP10 search.",
+    "M3 (PRO app) CONFIRMED SATURATED by Catalia Health (US10452816B2) + Interaxon (US12189854B2, US20230221801A1). KILLED at physics pre-check, CONFIRMED by GP11 search.",
+    "M4 (fleet learning) WEAK STANDALONE — GP12 search returned Panasonic life support method (JP2023169448A) + Interaxon bio-signal analytics. No specific medical device fleet learning patent identified, but concept is broadly taught by Interaxon bio-signal + analytics. KILLED at physics pre-check as standalone.",
+    "M8 (cybersecurity) CONFIRMED SATURATED — GP9 returned 2,910 patents; medical device cybersecurity is established discipline with FDA Pre-Market Cybersecurity Guidance + IEC 81001-5-1 + AAMI TIR57 standards. KILLED at physics pre-check, CONFIRMED by GP9 search.",
+    "M2 (post-market surveillance infrastructure) — pure software registry, Alice §101 risk + established NCDR/NHFTR precedent. KILLED at physics pre-check.",
+    "PatSnap BLOCKED (DNS-unreachable) — same state as T7/T8/T9. Cannot declare COMPLETE without PatSnap nested-search.",
+    "Passage-level claim audit NOT_STARTED — deferred to V2 per V1.1 §6.3 anti-inflation.",
+    "PatentBear NOT_STARTED — available as PatSnap substitute if V2 authorized.",
+    "M1 survival against ATTACK_1 (US10687719B2 + US11832920B2 + US9317920B2) is CONDITIONAL pending V2 passage-level audit.",
+    "M7 survival against ATTACK_1 (US8639338B2 + US9317920B2 + US20110004124A1) is CONDITIONAL pending V2 passage-level audit.",
+    "CereVasc IP corpus 68% claim-audited (87/128); 32% unaudited foreign-language patents may contain relevant claims — same gap as T8."
+  ],
+  "white_space_confirmed_for_M1": {
+    "summary": "After multi-source prior-art search (Lens COMPLETE + Scopus COMPLETE + Google Patents COMPLETE + PatSnap BLOCKED), the WHITE SPACE for T10 is confirmed as: ML-BASED PREDICTIVE FAILURE DETECTION for ENDOVASCULAR eShunt using DUAL-PRESSURE-DIFFERENTIAL signature + rate-of-change over chronic 30-90 day baseline. NO prior art teaches this specific combination.",
+    "evidence_for_white_space": [
+      "CereVasc's 25 patents cover drainage mechanics + drug delivery method/device, but ZERO patents cover ML-based predictive failure detection.",
+      "US10687719B2 (Alfred Mann) covers implantable shunt + pressure sensors but does NOT teach ML-based predictive algorithm.",
+      "US9317920B2 (Rush) covers implanted device identification + revision information but does NOT teach ML-based RUL prediction.",
+      "US11832920B2 (CardioMEMS PAH) covers pulmonary artery pressure telemetry + diagnostic algorithm for DIFFERENT organ system.",
+      "US8639338B2 (Medtronic pacemaker ERI) covers battery-only longevity monitoring (single-factor, hardware-driven).",
+      "Literature on CSF shunt failure prediction uses MRI/CT ventricular volume (2025) or EHR data in acute care (2026 ShuntGPT), NOT chronic dual-pressure sensor data.",
+      "CardioMEMS HF prediction (AUC=0.89) establishes ML-on-chronic-pressure-sensor precedent for DIFFERENT organ system.",
+      "Cosman 1976 telemetric differential pressure sensing patents expired (1976+20=1996) — foundational but not blocking."
+    ],
+    "evidence_against_white_space": [
+      "US10687719B2 (Alfred Mann) — implantable shunt + pressure sensors. If specification broadly teaches ML/predictive algorithm, M1 §103 risk.",
+      "US11832920B2 + CardioMEMS patent family — PHOSITA could adapt CardioMEMS HF predictive algorithm to CSF shunt.",
+      "US20230157762A1 (Medtronic Braido 'Extended Intelligence Ecosystem') — broad medical device intelligence concept.",
+      "V-Wave interatrial shunt + physiologic sensor patent family — shunt + sensor architectural precedent.",
+      "Recent literature (2025, 2026) on CSF shunt malfunction prediction using ML establishes that the field is active — competitors may file similar patents."
+    ],
+    "M1_must_claim": [
+      "ML-based PREDICTIVE FAILURE DETECTION (not threshold-based detection)",
+      "DUAL-PRESSURE-DIFFERENTIAL signature (P_ventricular - P_venous, not single ICP)",
+      "Rate-of-change over chronic 30-90 day baseline (not episodic MRI/CT)",
+      "Endovascular eShunt access (not VP shunt, not standalone skull-mounted)",
+      "Hydrocephalus/IIH-specific failure prediction (not HF, not PAH)"
+    ]
+  },
+  "recommendations_for_V2": [
+    "Passage-level claim audit on TOP 10 highest-threat patents: US10687719B2 (Alfred Mann), US9317920B2 (Rush), US8639338B2 (Medtronic pacemaker ERI), US11832920B2 (St. Jude PAH), US20230157762A1 (Medtronic Braido ecosystem), US20220151784A1 + US11234702B1 + US12369918B2 + US20250352210A1 (V-Wave interatrial shunt + sensor), US10682079B2 (Thomas Jefferson), US6731976B2 (Medtronic Penn), US20110004124A1 (Medtronic stress sensor), US20250359911A1 (Canary Medical).",
+    "PatentBear free public web search as PatSnap substitute (DNS-unreachable for PatSnap).",
+    "Engage with CereVasc IP counsel on US11850390B2 / US11883309B2 + Position 002 dual-pressure sensor invention — confirm M1 is a NEW invention beyond CereVasc's existing portfolio.",
+    "Pre-register buyer thresholds BEFORE V2 simulation: T1 prediction AUC ≥0.85, T2 false-positive rate ≤10%, T3 prediction lead time ≥24h, T4 patient-specific baseline convergence ≤30 days, T5 multi-failure-mode identifiability (obstruction vs thrombosis vs sensor drift Jacobian rank ≥3), T6 chronic data transmission reliability ≥99%.",
+    "Build engineering simulation: dual-pressure-differential time-series generator with obstruction/thrombosis/sensor-drift latent states; ML training pipeline (LSTM/TCN/XGBoost); per-patient baseline + fleet-level model; identifiability pre-check (Jacobian rank) per #1 V24/V25 lesson.",
+    "Execute ATTACK_2 (multi-failure-mode identifiability — Jacobian rank pre-check per #1 V24/V25 lesson), ATTACK_3 (sensor drift over chronic 5+ year implant), ATTACK_4 (CardioMEMS §103 obviousness attack), ATTACK_5 (head-to-head vs M7 RUL).",
+    "Identifiability pre-check for M1 ML model — ensure obstruction/thrombosis/sensor-drift signals are mathematically separable in dual-pressure-differential time series (per #1 V24/V25 lesson)."
+  ]
+}

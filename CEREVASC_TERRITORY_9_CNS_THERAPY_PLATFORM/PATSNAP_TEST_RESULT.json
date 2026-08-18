@@ -1,0 +1,100 @@
+{
+  "task_id": "TERRITORY-9-DISCOVERY",
+  "artifact_type": "PATSNAP_TEST_RESULT",
+  "source": "PatSnap patent search API",
+  "timestamp": "2026-08-19T00:00:00Z",
+  "api_key_handling": "INLINE via env var PATSNAP_KEY \u2014 NOT persisted to disk, NOT written to any committed file. Key value redacted: [REDACTED:PATSNAP_KEY_USED_INLINE_ONLY]",
+  "key_provided_in_task": "NO \u2014 TERRITORY-9-DISCOVERY task description provides Lens and Scopus keys only. PatSnap is noted as 'balance-limited, may be BLOCKED \u2014 record honestly'.",
+  "tests_executed": 3,
+  "auth_header_variants_tested": [
+    "Api-Key header",
+    "Authorization Bearer",
+    "X-PatSnap-Key header"
+  ],
+  "tests": [
+    {
+      "query_id": "PS_T1",
+      "query": "(cerebrospinal fluid OR CSF) AND biosensor AND shunt",
+      "purpose": "M10 - CSF biosensor on shunt",
+      "variant_results": [
+        {
+          "auth": "Api-Key header",
+          "status": "EXC",
+          "raw_first_500": "<urlopen error [Errno -5] No address associated with hostname>",
+          "diagnosis": "NETWORK_ERROR"
+        },
+        {
+          "auth": "Authorization Bearer",
+          "status": "EXC",
+          "raw_first_500": "<urlopen error [Errno -5] No address associated with hostname>",
+          "diagnosis": "NETWORK_ERROR"
+        },
+        {
+          "auth": "X-PatSnap-Key header",
+          "status": "EXC",
+          "raw_first_500": "<urlopen error [Errno -5] No address associated with hostname>",
+          "diagnosis": "NETWORK_ERROR"
+        }
+      ]
+    },
+    {
+      "query_id": "PS_T2",
+      "query": "intrathecal drug delivery endovascular venous",
+      "purpose": "General intrathecal endovascular delivery",
+      "variant_results": [
+        {
+          "auth": "Api-Key header",
+          "status": "EXC",
+          "raw_first_500": "<urlopen error [Errno -5] No address associated with hostname>",
+          "diagnosis": "NETWORK_ERROR"
+        },
+        {
+          "auth": "Authorization Bearer",
+          "status": "EXC",
+          "raw_first_500": "<urlopen error [Errno -5] No address associated with hostname>",
+          "diagnosis": "NETWORK_ERROR"
+        },
+        {
+          "auth": "X-PatSnap-Key header",
+          "status": "EXC",
+          "raw_first_500": "<urlopen error [Errno -5] No address associated with hostname>",
+          "diagnosis": "NETWORK_ERROR"
+        }
+      ]
+    },
+    {
+      "query_id": "PS_T3",
+      "query": "intracranial pressure sensor implantable wireless",
+      "purpose": "M9 - wireless ICP sensor",
+      "variant_results": [
+        {
+          "auth": "Api-Key header",
+          "status": "EXC",
+          "raw_first_500": "<urlopen error [Errno -5] No address associated with hostname>",
+          "diagnosis": "NETWORK_ERROR"
+        },
+        {
+          "auth": "Authorization Bearer",
+          "status": "EXC",
+          "raw_first_500": "<urlopen error [Errno -5] No address associated with hostname>",
+          "diagnosis": "NETWORK_ERROR"
+        },
+        {
+          "auth": "X-PatSnap-Key header",
+          "status": "EXC",
+          "raw_first_500": "<urlopen error [Errno -5] No address associated with hostname>",
+          "diagnosis": "NETWORK_ERROR"
+        }
+      ]
+    }
+  ],
+  "overall_status": "BLOCKED_NO_KEY_PROVIDED_AND_DNS_UNRESOLVED \u2014 PatSnap key not provided in TERRITORY-9-DISCOVERY task description AND api.patsnap.com hostname cannot be resolved from sandbox (DNS lookup returns No answer). Even more fundamental BLOCKED than T7/T8 (which reached the API endpoint but had auth errors).",
+  "honest_disclosure": "PatSnap test recorded honestly. TERRITORY-9 prior-art search continues with PARTIAL status across Lens + Scopus + Google Patents via agent-browser. Same BLOCKED state as T6/T7/T8 discoveries.",
+  "remediation_plan": "If PatSnap restored: run nested-search on M10 specific queries (CSF biosensor shunt integration; wireless biomarker sensor endovascular; multi-analyte CSF monitoring). If still BLOCKED: continue with PatentBear free public web search as substitute.",
+  "dns_diagnosis": {
+    "hostname": "api.patsnap.com",
+    "dns_lookup_result": "Non-authoritative answer: Can't find api.patsnap.com: No answer",
+    "curl_result": "connection failed",
+    "diagnosis": "PatSnap API endpoint UNREACHABLE from this sandbox environment. Not just auth failure \u2014 DNS-level BLOCKED."
+  }
+}

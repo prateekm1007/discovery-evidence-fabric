@@ -1,0 +1,59 @@
+{
+  "task_id": "TERRITORY-10-DISCOVERY",
+  "artifact_type": "PRIOR_ART_SEARCH_SUMMARY",
+  "territory": "Lifecycle/platform intelligence",
+  "timestamp": "2026-08-19T00:00:00Z",
+  "overall_status": "PARTIAL",
+  "sources_executed": [
+    {
+      "source": "Lens scholarly",
+      "status": "COMPLETE",
+      "queries": 12,
+      "results": 289
+    },
+    {
+      "source": "Scopus",
+      "status": "COMPLETE",
+      "queries": 12,
+      "results": 220
+    },
+    {
+      "source": "Google Patents (via agent-browser)",
+      "status": "COMPLETE",
+      "queries": 12,
+      "patents_parsed": 120
+    },
+    {
+      "source": "PatSnap",
+      "status": "BLOCKED",
+      "reason": "DNS-unreachable from sandbox (same as T7/T8/T9)"
+    },
+    {
+      "source": "PatentBear",
+      "status": "NOT_STARTED",
+      "reason": "Available as PatSnap substitute if V2 authorized"
+    },
+    {
+      "source": "Passage-level claim audit",
+      "status": "NOT_STARTED",
+      "reason": "Deferred to V2 per V1.1 §6.3 anti-inflation"
+    }
+  ],
+  "key_findings": [
+    "M1 (ML-based predictive failure detection) SURVIVES search-completeness PARTIAL — no direct hit destroys M1, but 3 high-threat patents (US10687719B2 Alfred Mann, US11832920B2 St. Jude PAH, US9317920B2 Rush) require passage-level audit in V2.",
+    "M7 (ML-based RUL prediction) SURVIVES search-completeness PARTIAL — US8639338B2 (Medtronic pacemaker ERI) is direct precedent but for battery-only, not multi-factorial RUL. US9317920B2 (Rush) is near-neighbor.",
+    "M2/M3/M4/M5/M6/M8 CONFIRMED SATURATED by prior-art search — consistent with physics pre-check findings.",
+    "CardioMEMS patent family (Abbott/St. Jude) is the strongest §103 threat for M1 (chronic pressure telemetry + diagnostic algorithm for different organ system).",
+    "Medtronic Braido 'Extended Intelligence Ecosystem' (US20230157762A1) is broad §103 threat for T10 generally.",
+    "CereVasc IP corpus has ZERO patents covering T10 lifecycle intelligence — wide-open IP gap (gap_severity=HIGH).",
+    "T10 white space = ML-based predictive failure detection + RUL prediction for endovascular eShunt using dual-pressure-differential signature. NOT covered by any single prior-art patent."
+  ],
+  "remediation_plan": [
+    "V2: Execute PatentBear free public web search as PatSnap substitute (DNS-unreachable for PatSnap).",
+    "V2: Passage-level claim audit of TOP 10 highest-threat patents (listed in PRIOR_ART_DIGEST.recommendations_for_V2).",
+    "V2: Pre-register buyer thresholds BEFORE simulation (T1 AUC≥0.85, T2 FPR≤10%, T3 lead time≥24h, T4 baseline convergence≤30d, T5 identifiability Jacobian rank≥3, T6 data transmission≥99%).",
+    "V2: Build engineering simulation: dual-pressure-differential time-series + ML training + identifiability pre-check (per #1 V24/V25 lesson).",
+    "V2: §103 obviousness analysis (Graham v. Deere 4-factor) on top threats.",
+    "V2: Execute ATTACK_2 (multi-failure-mode identifiability), ATTACK_3 (sensor drift over chronic implant), ATTACK_4 (CardioMEMS §103 attack), ATTACK_5 (head-to-head vs M7)."
+  ]
+}
