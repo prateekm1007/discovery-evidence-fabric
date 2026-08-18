@@ -71,7 +71,9 @@ def run_detached_certification() -> int:
 
         result = subprocess.run(
             [
-                sys.executable, "-m", "epistemic_integrity.research_authorization_gate"
+                sys.executable, "-m", "epistemic_integrity.research_authorization_gate",
+                "--in-place",  # v25: Run gate directly inside the detached worktree
+                               # (avoids infinite recursion through detached runner)
             ],
             cwd=str(worktree_dir),
             capture_output=True, text=True, timeout=300,
