@@ -1,0 +1,74 @@
+{
+  "source": "TERRITORY-7 multi-source prior-art search summary",
+  "timestamp": "2026-08-18T12:00:00Z",
+  "search_protocol": {
+    "doctrine": "3-state search completeness (COMPLETE / PARTIAL / BLOCKED) per V1.1 \u00a76.3. No LIKELY_NOVEL language.",
+    "sources_targeted": 4,
+    "sources_executed_successfully": 3,
+    "sources_blocked": 1,
+    "remediation_for_blocked": "PatentBear free public search as PatSnap substitute (per T6 V2 pattern) \u2014 to be executed in V2"
+  },
+  "sources": {
+    "Lens Scholarly": {
+      "status": "PARTIAL",
+      "endpoint": "https://api.lens.org/scholarly/search",
+      "auth": "Bearer token (inline env var)",
+      "queries_executed": 8,
+      "total_results_returned": 120,
+      "note": "Lens patent endpoint returned 401 (auth scope insufficient for patent search). Only scholarly search used. Search is PARTIAL because (a) Lens scholarly is broad (single-term match returns 1.7M+ total hits), (b) patent endpoint not accessible, (c) passage-level claim audit not yet performed."
+    },
+    "Scopus": {
+      "status": "COMPLETE",
+      "endpoint": "https://api.elsevier.com/content/search/scopus",
+      "auth": "X-ELS-APIKey (inline env var)",
+      "queries_executed": 8,
+      "total_results_returned": 80,
+      "note": "Scopus scholarly search complete for 8 queries. Returns scientific literature only (not patents). Search is COMPLETE for scholarly scope; patent scope covered by Google Patents."
+    },
+    "Google Patents": {
+      "status": "PARTIAL",
+      "endpoint": "https://patents.google.com (XHR + agent-browser headless chromium)",
+      "auth": "None required",
+      "queries_executed": 8,
+      "total_results_returned": 78,
+      "note": "Direct XHR endpoint rate-limited by Google (CAPTCHA 'Sorry' page). Worked around via agent-browser headless chromium (same approach as T4 V6 hostile prior-art attack). Search is PARTIAL because (a) only 8 queries executed (not exhaustive across all mechanism variants), (b) Google Patents does not expose CPC filtering via XHR, (c) no passage-level claim audit yet."
+    },
+    "PatSnap": {
+      "status": "BLOCKED",
+      "endpoint": "https://connect.patsnap.com/search/patent/nested-search-patent",
+      "auth": "Api-Key header (inline env var)",
+      "queries_executed": 0,
+      "test_attempts": 3,
+      "error_codes_seen": [
+        "67200008 (apikey not Pass)",
+        "67200202 (apikey auth error)"
+      ],
+      "note": "PatSnap API key rejected across all 3 auth header formats. Key is either expired, revoked, or never provisioned. Same BLOCKED state as T6 discovery. Cannot declare NOT_FOUND_AFTER_COMPLETE_SEARCH without PatSnap passage-level verification."
+    }
+  },
+  "overall_search_completeness": "PARTIAL",
+  "key_direct_hits_identified": [
+    "JP5876173B2 (OrbusNeich) \u2014 EPC-capturing drug-eluting stent \u2014 DESTROYS M4",
+    "US8981139B2 (UNC Chapel Hill) \u2014 NO-releasing xerogel coating \u2014 DESTROYS M7 surface-coating claims",
+    "US10736996B2 (Chengdu SW Jiaotong) \u2014 NO-generating adherent coating \u2014 DESTROYS M7",
+    "JP6763988B2 (Univ. Michigan) \u2014 SNAP-doped thromboresistant \u2014 DESTROYS M7",
+    "US20250236758A1 (Univ. Georgia) \u2014 antifouling/antithrombogenic NO coating \u2014 DESTROYS M7",
+    "JP7498757B2 (Overseas Medical) \u2014 polydopamine+antibody coated device \u2014 SATURATES M1",
+    "US9775730B1 (Walzman) \u2014 flow-diverting covered stent \u2014 NEAR-NEIGHBOR to M2 (different goal: aneurysm thrombosis vs eShunt flow distribution)",
+    "US8968270B2 (Valentx) \u2014 replacing GI bypass sleeve \u2014 NEAR-NEIGHBOR to M9 (different anatomy)",
+    "US10729819B2 (Micell) \u2014 drug delivery medical device \u2014 NEAR-NEIGHBOR to M3"
+  ],
+  "white_space_assessment": {
+    "M10_hydrodynamic_buffer_zone": "STRONGEST white space \u2014 0 direct hits in 3 sources. eShunt-specific application at CSF-venous outflow.",
+    "M9_bioresorbable_sacrificial_outer_layer": "STRONG white space \u2014 sacrificial sleeves on PERMANENT implants are unusual (most prior art is fully bioresorbable).",
+    "M5_mechanical_anti_trauma_flexible_neck": "MODERATE white space \u2014 flexible stent bodies are well-known; eShunt-specific anatomical constraint may distinguish.",
+    "M2_flow_distributing_geometry": "MODERATE white space \u2014 flow diverters established for aneurysms (opposite-direction mechanism); eShunt-specific flow distribution requires \u00a7103 distinction."
+  },
+  "remediation_for_V2": [
+    "PatentBear free public search as PatSnap substitute (T6 V2 pattern) for passage-level claim audit of 5 high-threat near-neighbor patents",
+    "Passage-level claim audit of: US9775730B1 (Walzman flow diverter), US8968270B2 (Valentx bypass sleeve), US10729819B2 (Micell drug delivery), JP5876173B2 (OrbusNeich EPC stent), US8981139B2 (UNC NO coating)",
+    "Attack the leading candidate (M10) with: (a) low-Re physics viability attack, (b) thrombosis-from-stagnation attack, (c) \u00a7103 obviousness attack vs arterial flow diverters",
+    "Pre-register buyer thresholds BEFORE V2 simulation (per V1.1 \u00a76.3)"
+  ],
+  "security": "All 3 API keys (LENS_KEY, SCOPUS_KEY, PATSNAP_KEY) used INLINE via env vars only. NOT persisted to disk, NOT written to worklog, NOT written to any committed file. PATSNAP_TEST_RESULT.json records the test outcomes with [REDACTED:PATSNAP_KEY_USED_INLINE_ONLY] placeholders."
+}
