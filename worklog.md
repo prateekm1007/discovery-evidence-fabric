@@ -1,3 +1,8 @@
+<!-- 
+HISTORICAL_NARRATIVE_ONLY — DO NOT USE AS CURRENT-STATE AUTHORITY
+This worklog is an append-only audit trail. Current portfolio state is in CANONICAL_STATE/PORTFOLIO.json.
+The machine must NEVER derive current portfolio state by parsing worklog prose.
+-->
 # Multi-Agent Worklog — discovery-evidence-fabric
 
 This file is the shared worklog for all agents working on the
