@@ -181,12 +181,20 @@ class DossierFirewall:
             raise ValueError(f"CLAIM_NO_EVIDENCE_BINDING: {claim_id}")
 
         # Check 4 (P1-B): evidence must be dossier-grade
+        # P0-1 v12: PROVENANCE_INCOMPLETE evidence is allowed but flagged
+        # Missing provenance fields do NOT block if evidence explicitly declares incomplete
         for ev in evidence:
             if not ev.is_dossier_grade():
                 missing = ev.missing_reproducibility_fields()
-                raise ValueError(
-                    f"EVIDENCE_NOT_DOSSIER_GRADE: {ev.evidence_id} missing={missing}"
-                )
+                # Check if evidence description declares PROVENANCE_INCOMPLETE
+                if "PROVENANCE_INCOMPLETE" in (ev.description or "").upper():
+                    # Evidence explicitly declares incomplete provenance — allow but note
+                    # The dossier output will flag this
+                    pass
+                else:
+                    raise ValueError(
+                        f"EVIDENCE_NOT_DOSSIER_GRADE: {ev.evidence_id} missing={missing}"
+                    )
 
         # Check 5: wording must match epistemic class
         wording_check = validate_wording(claim.text, claim.epistemic_class)

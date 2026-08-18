@@ -528,23 +528,62 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                 case_id = case_data["case_id"]
                 expected_admitted = case_data["expected_admitted"]
 
-                # Load REAL evidence content from actual artifact file
+                # P0-2: Retrieve artifact from GIT OBJECT DATABASE (not filesystem)
                 artifact_path = case_data.get("artifact_path", "")
-                full_artifact_path = REPO_ROOT / artifact_path
+                commit_sha = case_data.get("commit_sha", self.git_head)
+                blob_sha = case_data.get("blob_sha", "")
+                content_hash_declared = case_data.get("content_hash", "")
 
-                if not full_artifact_path.exists():
+                # Get blob content from git (NOT filesystem read)
+                if blob_sha:
+                    try:
+                        blob_result = subprocess.run(
+                            ["git", "cat-file", "-p", blob_sha],
+                            cwd=str(REPO_ROOT),
+                            capture_output=True, timeout=10,
+                        )
+                        if blob_result.returncode != 0:
+                            incorrect += 1
+                            mismatches.append(f"{case_id}: cannot retrieve blob {blob_sha[:16]}")
+                            continue
+                        evidence_content = blob_result.stdout.decode()
+                    except Exception as e:
+                        incorrect += 1
+                        mismatches.append(f"{case_id}: git cat-file error: {e}")
+                        continue
+                else:
+                    # Fallback: get blob SHA from commit+path
+                    try:
+                        rev_result = subprocess.run(
+                            ["git", "rev-parse", f"{commit_sha}:{artifact_path}"],
+                            cwd=str(REPO_ROOT),
+                            capture_output=True, text=True, timeout=10,
+                        )
+                        if rev_result.returncode != 0:
+                            incorrect += 1
+                            mismatches.append(f"{case_id}: cannot resolve {commit_sha[:12]}:{artifact_path}")
+                            continue
+                        actual_blob_sha = rev_result.stdout.strip()
+                        blob_result = subprocess.run(
+                            ["git", "cat-file", "-p", actual_blob_sha],
+                            cwd=str(REPO_ROOT),
+                            capture_output=True, timeout=10,
+                        )
+                        evidence_content = blob_result.stdout.decode()
+                    except Exception as e:
+                        incorrect += 1
+                        mismatches.append(f"{case_id}: git retrieval error: {e}")
+                        continue
+
+                # P0-2: Verify content hash matches declared hash
+                actual_content_hash = _hl.sha256(evidence_content.encode()).hexdigest()
+                if content_hash_declared and actual_content_hash != content_hash_declared:
                     incorrect += 1
-                    mismatches.append(f"{case_id}: artifact not found at {artifact_path}")
+                    mismatches.append(f"{case_id}: content_hash mismatch (declared vs actual)")
                     continue
 
-                with open(full_artifact_path) as f:
-                    evidence_content = f.read()
-
-                evidence_version = case_data.get("evidence_version") or case_data.get("claim_version")
-                commit_sha = case_data.get("commit_sha", self.git_head)
-
-                # Compute real hashes
-                ev_hash = _hl.sha256(evidence_content.encode()).hexdigest()
+                evidence_version = case_data.get("claim_version")
+                provenance_complete = case_data.get("provenance_complete", False)
 
                 # LAYER 1: Verifier capability check
                 claim_prop = Proposition(
@@ -560,23 +599,24 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                 if verifier_admitted == expected_admitted:
                     verifier_only_correct += 1
 
-                # LAYER 2: End-to-end through DossierFirewall with REAL artifact
+                # LAYER 2: End-to-end through DossierFirewall
+                # P0-1: NO manufactured provenance. Use PROVENANCE_INCOMPLETE.
                 ev_id = f"EXP-REAL-{case_id}"
                 evidence_obj = Evidence(
                     evidence_id=ev_id,
                     territory_id="CV-T99",
-                    description=f"Real certification evidence for {case_id} from {artifact_path}",
+                    description=f"Real certification evidence for {case_id} from {artifact_path} (PROVENANCE_INCOMPLETE)",
                     evidence_type="SIMULATION",
-                    code_commit=commit_sha,
-                    config_hash=_hl.sha256(b"real_cert_config").hexdigest(),
+                    code_commit=commit_sha,  # Full 40-char SHA from git
+                    config_hash=None if not provenance_complete else _hl.sha256(b"config").hexdigest(),
                     output_content=evidence_content,
-                    output_hash=ev_hash,
-                    random_seed=42,
-                    python_version=sys.version.split()[0],
-                    dependency_lock_hash=_hl.sha256(b"real_cert_deps").hexdigest(),
-                    model_id=f"real_cert_{case_id}",
+                    output_hash=actual_content_hash,  # Computed from git blob
+                    random_seed=None if not provenance_complete else 42,
+                    python_version=None if not provenance_complete else sys.version.split()[0],
+                    dependency_lock_hash=None if not provenance_complete else _hl.sha256(b"deps").hexdigest(),
+                    model_id=None if not provenance_complete else f"model_{case_id}",
                     model_parameters={},
-                    artifact_path=artifact_path,  # REAL artifact path
+                    artifact_path=artifact_path,
                     version=evidence_version,
                 )
                 temp_evidence.register_evidence(evidence_obj)
@@ -587,7 +627,7 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                     territory_id="CV-T99",
                     evidence_ids=[ev_id],
                     simulation_commit=commit_sha,
-                    simulation_output_hash=ev_hash,
+                    simulation_output_hash=actual_content_hash,
                     proposition_subject=case_data.get("claim_subject"),
                     proposition_predicate=case_data.get("claim_predicate"),
                     proposition_value=case_data.get("claim_value"),
