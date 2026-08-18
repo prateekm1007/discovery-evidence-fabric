@@ -1,0 +1,764 @@
+{
+  "timestamp": "2026-08-18T06:08:53.171294+00:00",
+  "version": "V23_ACTIVE_INTERROGATION",
+  "ceo_directive_compliance": {
+    "doctrine_rule_6_turn_failure_into_sensed_state": true,
+    "active_perturbation_injection": true,
+    "dynamic_transfer_function_decomposition": true,
+    "redundant_reference_for_spof": true,
+    "five_axis_tracker_never_averaged": true
+  },
+  "physics_model": {
+    "type": "Active spectral interrogation (thermal + ionic pulses)",
+    "frequencies": [
+      10.0,
+      23.101297000831604,
+      53.3669923120631,
+      123.28467394420659,
+      284.8035868435802,
+      657.9332246575682,
+      1519.9110829529332,
+      3511.191734215131,
+      8111.308307896872,
+      18738.174228603868,
+      43287.612810830615,
+      100000.0
+    ],
+    "time_points": [
+      0.0,
+      0.5,
+      1.0,
+      5.0,
+      15.0,
+      60.0
+    ],
+    "n_electrodes": 3,
+    "n_pulses": 2,
+    "n_features": 1008,
+    "n_training_samples": 400,
+    "transfer_functions": {
+      "ionic_conductivity": "Instant response to ionic pulse (\u03c4=0.5s), no thermal response",
+      "temperature": "Slow response to thermal pulse (\u03c4=30s), no ionic response",
+      "hydraulic_obstruction": "No response to either pulse (mechanical)",
+      "lumen_fouling": "Slow response to ionic pulse (\u03c4=0.5*(1+2*s_lumen))",
+      "electrode_fouling": "C_dl changes during ionic pulse",
+      "reference_polarization": "Affects ONLY reference electrode (R2 divergence = SPOF signal)",
+      "hardware_degradation": "Common-mode (both electrodes equally)"
+    }
+  },
+  "section_3_in_distribution": {
+    "hydraulic_obstruction": {
+      "r2": 0.646,
+      "mae": 0.1392
+    },
+    "lumen_fouling": {
+      "r2": 0.248,
+      "mae": 0.2156
+    },
+    "electrode_fouling": {
+      "r2": 0.908,
+      "mae": 0.0719
+    },
+    "ionic_conductivity": {
+      "r2": 0.179,
+      "mae": 0.0661
+    },
+    "temperature": {
+      "r2": 0.018,
+      "mae": 0.4772
+    },
+    "reference_polarization": {
+      "r2": 0.683,
+      "mae": 0.0421
+    },
+    "hardware_degradation": {
+      "r2": 0.217,
+      "mae": 0.1115
+    }
+  },
+  "section_4_held_out_attacks": {
+    "A1_ionic+asymFouling50": {
+      "description": "V19 confounder, generalized",
+      "per_state": {
+        "hydraulic_obstruction": {
+          "r2": null,
+          "mae": 0.2738,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "lumen_fouling": {
+          "r2": null,
+          "mae": 0.3782,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "electrode_fouling": {
+          "r2": 0.337,
+          "mae": 0.1123,
+          "true_range": [
+            0.4,
+            0.899
+          ]
+        },
+        "ionic_conductivity": {
+          "r2": -21.791,
+          "mae": 0.1855,
+          "true_range": [
+            1.15,
+            1.3
+          ]
+        },
+        "temperature": {
+          "r2": null,
+          "mae": 0.1853,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "reference_polarization": {
+          "r2": null,
+          "mae": 0.0874,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "hardware_degradation": {
+          "r2": null,
+          "mae": 0.2168,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "A2_ionic+obstruction": {
+      "description": "Combined ionic + hydraulic",
+      "per_state": {
+        "hydraulic_obstruction": {
+          "r2": -2.959,
+          "mae": 0.3214,
+          "true_range": [
+            0.403,
+            0.998
+          ]
+        },
+        "lumen_fouling": {
+          "r2": null,
+          "mae": 0.3109,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "electrode_fouling": {
+          "r2": null,
+          "mae": 0.1738,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "ionic_conductivity": {
+          "r2": -20.721,
+          "mae": 0.1914,
+          "true_range": [
+            1.151,
+            1.299
+          ]
+        },
+        "temperature": {
+          "r2": null,
+          "mae": 0.0726,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "reference_polarization": {
+          "r2": null,
+          "mae": 0.0934,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "hardware_degradation": {
+          "r2": null,
+          "mae": 0.223,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "A3_ionic+lumenFouling": {
+      "description": "Combined ionic + lumen",
+      "per_state": {
+        "hydraulic_obstruction": {
+          "r2": null,
+          "mae": 0.2552,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "lumen_fouling": {
+          "r2": -4.839,
+          "mae": 0.354,
+          "true_range": [
+            0.401,
+            0.999
+          ]
+        },
+        "electrode_fouling": {
+          "r2": null,
+          "mae": 0.2252,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "ionic_conductivity": {
+          "r2": -18.714,
+          "mae": 0.1878,
+          "true_range": [
+            1.15,
+            1.3
+          ]
+        },
+        "temperature": {
+          "r2": null,
+          "mae": 0.0624,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "reference_polarization": {
+          "r2": null,
+          "mae": 0.0918,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "hardware_degradation": {
+          "r2": null,
+          "mae": 0.2245,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "A4_ionic+refDrift": {
+      "description": "KEY V22: ionic + reference drift",
+      "per_state": {
+        "hydraulic_obstruction": {
+          "r2": null,
+          "mae": 0.3523,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "lumen_fouling": {
+          "r2": null,
+          "mae": 0.3565,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "electrode_fouling": {
+          "r2": null,
+          "mae": 0.2537,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "ionic_conductivity": {
+          "r2": -16.484,
+          "mae": 0.1863,
+          "true_range": [
+            1.15,
+            1.299
+          ]
+        },
+        "temperature": {
+          "r2": null,
+          "mae": 0.1094,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "reference_polarization": {
+          "r2": -13.363,
+          "mae": 0.5175,
+          "true_range": [
+            0.503,
+            0.991
+          ]
+        },
+        "hardware_degradation": {
+          "r2": null,
+          "mae": 0.2125,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "A5_temp+ionic+fouling": {
+      "description": "Triple combined",
+      "per_state": {
+        "hydraulic_obstruction": {
+          "r2": null,
+          "mae": 0.2741,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "lumen_fouling": {
+          "r2": null,
+          "mae": 0.3477,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "electrode_fouling": {
+          "r2": 0.508,
+          "mae": 0.0885,
+          "true_range": [
+            0.301,
+            0.789
+          ]
+        },
+        "ionic_conductivity": {
+          "r2": -18.364,
+          "mae": 0.1825,
+          "true_range": [
+            1.151,
+            1.299
+          ]
+        },
+        "temperature": {
+          "r2": -38.756,
+          "mae": 1.8309,
+          "true_range": [
+            1.514,
+            2.499
+          ]
+        },
+        "reference_polarization": {
+          "r2": null,
+          "mae": 0.0953,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "hardware_degradation": {
+          "r2": null,
+          "mae": 0.2132,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "A6_6moChronic_allCombined": {
+      "description": "Worst-case chronic",
+      "per_state": {
+        "hydraulic_obstruction": {
+          "r2": 0.512,
+          "mae": 0.0803,
+          "true_range": [
+            0.205,
+            0.695
+          ]
+        },
+        "lumen_fouling": {
+          "r2": -0.049,
+          "mae": 0.1205,
+          "true_range": [
+            0.304,
+            0.798
+          ]
+        },
+        "electrode_fouling": {
+          "r2": 0.757,
+          "mae": 0.0589,
+          "true_range": [
+            0.4,
+            0.898
+          ]
+        },
+        "ionic_conductivity": {
+          "r2": -23.31,
+          "mae": 0.212,
+          "true_range": [
+            1.15,
+            1.3
+          ]
+        },
+        "temperature": {
+          "r2": -30.23,
+          "mae": 1.5604,
+          "true_range": [
+            1.001,
+            1.998
+          ]
+        },
+        "reference_polarization": {
+          "r2": -13.237,
+          "mae": 0.5452,
+          "true_range": [
+            0.502,
+            0.999
+          ]
+        },
+        "hardware_degradation": {
+          "r2": -11.529,
+          "mae": 0.4798,
+          "true_range": [
+            0.503,
+            0.996
+          ]
+        }
+      }
+    },
+    "A7_ONE_ref_altered": {
+      "description": "ONE reference biologically altered",
+      "per_state": {
+        "hydraulic_obstruction": {
+          "r2": null,
+          "mae": 0.3491,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "lumen_fouling": {
+          "r2": null,
+          "mae": 0.3749,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "electrode_fouling": {
+          "r2": null,
+          "mae": 0.2462,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "ionic_conductivity": {
+          "r2": -10.765,
+          "mae": 0.1357,
+          "true_range": [
+            1.1,
+            1.25
+          ]
+        },
+        "temperature": {
+          "r2": null,
+          "mae": 0.1346,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "reference_polarization": {
+          "r2": -5.274,
+          "mae": 0.2676,
+          "true_range": [
+            0.302,
+            0.699
+          ]
+        },
+        "hardware_degradation": {
+          "r2": null,
+          "mae": 0.2085,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "A8_BOTH_refs_drift": {
+      "description": "BOTH references drift (common-mode)",
+      "per_state": {
+        "hydraulic_obstruction": {
+          "r2": null,
+          "mae": 0.3511,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "lumen_fouling": {
+          "r2": null,
+          "mae": 0.3723,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "electrode_fouling": {
+          "r2": null,
+          "mae": 0.2422,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "ionic_conductivity": {
+          "r2": -11.369,
+          "mae": 0.1464,
+          "true_range": [
+            1.1,
+            1.249
+          ]
+        },
+        "temperature": {
+          "r2": null,
+          "mae": 0.0467,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "reference_polarization": {
+          "r2": -13.661,
+          "mae": 0.5214,
+          "true_range": [
+            0.503,
+            0.999
+          ]
+        },
+        "hardware_degradation": {
+          "r2": null,
+          "mae": 0.229,
+          "true_range": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    }
+  },
+  "section_5_refpol_spof_resolution": {
+    "one_ref_degraded_baseline_r2": -0.661,
+    "one_ref_degraded_baseline_mae": 0.3051,
+    "one_ref_degraded_perturbed_r2": -0.788,
+    "one_ref_degraded_perturbed_mae": 0.3134,
+    "v22_baseline_perturbed_r2": -0.913,
+    "improvement": 0.125,
+    "verdict": "REFERENCE SPOF PERSISTS"
+  },
+  "section_6_five_axis_tracker": {
+    "axis_1_mechanism_exploration": {
+      "pct": 100.0,
+      "gates": {
+        "threshold_baseline": [
+          "CONSIDERED",
+          "V4 baseline"
+        ],
+        "bayesian_filter": [
+          "DISCARDED",
+          "V15 56.7%"
+        ],
+        "particle_filter": [
+          "DISCARDED",
+          "V15 11.2%"
+        ],
+        "SVM": [
+          "DISCARDED",
+          "V15 56.8%"
+        ],
+        "RF_pressure_only": [
+          "CONSIDERED",
+          "V15 56.8%"
+        ],
+        "hybrid_temporal_features": [
+          "DISCARDED",
+          "V16 +0.4pp"
+        ],
+        "new_modality_search": [
+          "COMPLETED",
+          "V17 identified EIS"
+        ],
+        "single_electrode_impedance": [
+          "DEFEATED",
+          "V18 +34pp, V19 defeated"
+        ],
+        "dual_electrode_diff": [
+          "ADOPTED",
+          "V20 11/12 patterns pass"
+        ],
+        "multi_freq_state_separation": [
+          "DEFEATED_V22",
+          "V22 \u2014 7-state unidentifiable, R_sol collinearity"
+        ],
+        "active_spectral_interrogation": [
+          "ADOPTED_V23",
+          "V23 \u2014 thermal+ionic pulses, dynamic decomposition"
+        ]
+      }
+    },
+    "axis_2_engineering_evidence": {
+      "pct": 66.7,
+      "gates": {
+        "v22_unidentifiability_diagnosed": [
+          "PASS",
+          "V22 R_sol collinearity root-caused"
+        ],
+        "v23_active_pulse_model": [
+          "PASS",
+          "V23 thermal+ionic pulse physics"
+        ],
+        "v23_dynamic_response_model": [
+          "PASS",
+          "Per-state transfer functions documented"
+        ],
+        "in_distribution_recovery": [
+          "PARTIAL",
+          "R\u00b2 > 0.7 for all states in-distribution"
+        ],
+        "held_out_attack_evidence": [
+          "PARTIAL",
+          "8 attacks run; per-state recovery reported"
+        ],
+        "refpol_spof_resolution": [
+          "FAIL",
+          "Refpol R\u00b2 under perturbation=-0.788"
+        ]
+      }
+    },
+    "axis_3_robustness_falsification": {
+      "pct": 12.5,
+      "gates": {
+        "A1_ionic+asymFouling50": [
+          "FAIL",
+          "V19 confounder, generalized \u2014 0/2 states recovered"
+        ],
+        "A2_ionic+obstruction": [
+          "FAIL",
+          "Combined ionic + hydraulic \u2014 0/2 states recovered"
+        ],
+        "A3_ionic+lumenFouling": [
+          "FAIL",
+          "Combined ionic + lumen \u2014 0/2 states recovered"
+        ],
+        "A4_ionic+refDrift": [
+          "FAIL",
+          "KEY V22: ionic + reference drift \u2014 0/2 states recovered"
+        ],
+        "A5_temp+ionic+fouling": [
+          "PARTIAL",
+          "Triple combined \u2014 1/3 states recovered"
+        ],
+        "A6_6moChronic_allCombined": [
+          "PARTIAL",
+          "Worst-case chronic \u2014 2/7 states recovered"
+        ],
+        "A7_ONE_ref_altered": [
+          "FAIL",
+          "ONE reference biologically altered \u2014 0/2 states recovered"
+        ],
+        "A8_BOTH_refs_drift": [
+          "FAIL",
+          "BOTH references drift (common-mode) \u2014 0/2 states recovered"
+        ]
+      }
+    },
+    "axis_4_prior_art_ip_exhaustion": {
+      "pct": 16.7,
+      "gates": {
+        "v21_patsnap_search": [
+          "PARTIAL",
+          "V21 PatSnap nested-search partial"
+        ],
+        "v18_eis_patent_search": [
+          "PARTIAL",
+          "V18 EIS modality search partial"
+        ],
+        "v22_dual_electrode_claims": [
+          "NOT_STARTED",
+          "No claim-level exhaustion"
+        ],
+        "v23_active_interrogation_claims": [
+          "NOT_STARTED",
+          "No claim search for active interrogation"
+        ],
+        "v23_redundant_reference_claims": [
+          "NOT_STARTED",
+          "No claim search for redundant reference"
+        ],
+        "fto_vs_cerevasc": [
+          "NOT_STARTED",
+          "No FTO analysis"
+        ]
+      }
+    },
+    "axis_5_real_world_validation_readiness": {
+      "pct": 0.0,
+      "gates": {
+        "in_vitro_eis_setup": [
+          "NOT_STARTED",
+          "No benchtop EIS rig"
+        ],
+        "in_vivo_ovine_model": [
+          "NOT_STARTED",
+          "No animal model"
+        ],
+        "chronic_implant_6mo": [
+          "NOT_STARTED",
+          "No chronic data"
+        ],
+        "fda_pathway_pre_submission": [
+          "NOT_STARTED",
+          "No Q-sub"
+        ],
+        "clinical_protocol": [
+          "NOT_STARTED",
+          "No IRB/clinical protocol"
+        ]
+      }
+    },
+    "NEVER_AVERAGED": true
+  },
+  "section_7_adjudication": {
+    "status": "REDESIGN_REQUIRED_V23",
+    "verdict": "V23 FAILS: reference SPOF persists. Further redesign required.",
+    "attacks_survived_per_state": {
+      "hydraulic_obstruction": 1,
+      "lumen_fouling": 0,
+      "electrode_fouling": 2,
+      "ionic_conductivity": 0,
+      "temperature": 0,
+      "reference_polarization": 0,
+      "hardware_degradation": 0
+    },
+    "v22_to_v23_refpol_improvement": 0.125
+  }
+}

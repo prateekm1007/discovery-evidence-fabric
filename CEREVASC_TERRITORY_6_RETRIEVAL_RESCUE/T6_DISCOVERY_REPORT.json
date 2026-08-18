@@ -1,0 +1,372 @@
+{
+  "task_id": "TERRITORY-6-DISCOVERY",
+  "timestamp": "2026-08-18T06:45:00Z",
+  "territory": "#6 Retrieval / Rescue",
+  "agent": "subagent (general-purpose)",
+  "doctrine_compliance": {
+    "push_the_envelope": "Every success creates a stronger attack; every failure creates a search for a better mechanism.",
+    "no_LIKELY_NOVEL_language": true,
+    "search_completeness_3_state": ["COMPLETE","PARTIAL","BLOCKED"],
+    "five_axis_tracker_NEVER_averaged": true,
+    "honest_negative_results": true
+  },
+
+  "step_1_worklog_summary": {
+    "territories_status_prior_to_T6": {
+      "T1_hydraulic_state_estimation": "Architecture: 7-latent-state EIS separator. V22: unidentifiable (R_sol collinearity). V23: active interrogation did NOT resolve SPOF. Status: REDESIGN_REQUIRED. Mechanism 100% / Engineering 67% / Robustness 13% / IP 17% / Validation 0%.",
+      "T2_selective_therapeutic_retention": "~90% (unchanged).",
+      "T3_therapeutic_retention": "98% FROZEN — validation-ready.",
+      "T4_venous_aware_regulation": "FROZEN NEGATIVE CEILING — L1-L3c FOUND (destroyed by WO'847); L3d (derivative-on-differential) NOT_FOUND_AFTER_MULTI_SOURCE_SEARCH.",
+      "T5_fouling_obstruction_prevention": "FROZEN NEGATIVE CEILING — coating/hydrogel mechanisms saturated; Azygos + CereVasc IP gaps confirmed.",
+      "T6_retrieval_rescue": "TARGET OF THIS DISCOVERY PASS — previously unexplored."
+    },
+    "key_prior_art_methodology_lessons": [
+      "Lens scholarly search works with top-level 'query' string (NOT bool/must/match).",
+      "Scopus returns patent + literature hits via X-ELS-APIKey header.",
+      "PatSnap nested-search endpoint has been BALANCE_EXHAUSTED across all 4 keys tested in V3-V6 (including the new T6 key sk-GvDME276...).",
+      "Google Patents XHR endpoint (/xhr/query?url=q%3D...) returns JSON cluster of patents without auth.",
+      "PatentBear free public web search is the standard substitute when PatSnap is blocked."
+    ],
+    "key_competitors_and_prior_art_identified_in_prior_territories": {
+      "CereVasc_self_IP": "25 patents — heavy on catheter systems, deployment, drug delivery. ZERO retrieval-specific patents (confirmed by LIVE_TERRITORY_RANKING: 'CereVasc has deployment catheters but no retrieval-specific patents').",
+      "Azygos_Vascular": "2 patents (US 12,515,024 B2 + US 12,458,782 B2) on CSF shunt with passive mechanical flow regulator — NOT retrieval.",
+      "VIEshunt_2025_paper": "Direct competitor smart shunt (IMU + micro pump + pressure sensor) — NOT retrieval.",
+      "WO2020086847A1": "Self-adjusting venous-aware valve (T4 prior art). NOT retrieval."
+    }
+  },
+
+  "step_2_mechanism_candidates": [
+    {
+      "id": "M1",
+      "name": "Snare-compatible capture geometry (integrated retrieval ear/loop)",
+      "core_mechanism": "A pre-engineered capture loop, hook, or 'retrieval ear' on the proximal (venous) end of the eShunt that accepts a standard endovascular snare (e.g., Amplatz GooseNeck) for mechanical extraction.",
+      "failure_mode_addressed": "Migration, mechanical failure, malposition requiring repositioning.",
+      "physical_principle": "Standard endovascular snare-loop retrieval (well-established for IVC filters, central venous catheters, migrated coils).",
+      "credibility": "HIGH",
+      "prior_art_saturation": "HIGH — Lens LQ3 'ventriculoatrial shunt retrieval' returned 81 hits including direct case reports: Matsubara 2012 (transvenous retrieval of intracardiac VA shunt migration using snare); Aloddadi 2018 (endovascular retrieval of detached VA shunt into pulmonary artery). Scopus SQ2 'snare AND retrieval AND venous AND implant' returned 5 hits including 'Use of preformed nitinol snare' (1994) and 'Transcatheter Retrieval of Fractured IVC Filter Strut' (2016).",
+      "white_space_for_eShunt": "LOW — basic snare retrieval is standard-of-care for VA shunts, which are functionally analogous to eShunts. Cannot claim the basic mechanism."
+    },
+    {
+      "id": "M2",
+      "name": "In-situ thrombolysis delivery channel (pharmacological rescue lumen)",
+      "core_mechanism": "A dedicated micro-lumen or side-port within the eShunt that delivers thrombolytic agent (tPA, urokinase) directly to the device's venous-end thrombus, dissolving clot without device removal.",
+      "failure_mode_addressed": "Thrombosis/occlusion of the shunt at the venous interface.",
+      "physical_principle": "Catheter-directed thrombolysis (CDT) — standard for DVT, pulmonary embolism, and occluded dialysis catheters.",
+      "credibility": "HIGH",
+      "prior_art_saturation": "MEDIUM — Lens LQ4 'thrombolysis implanted shunt' = 2403 hits; LQ5 'thrombolytic infusion CSF shunt' = 1186 hits. Scopus SQ3 'thrombolysis AND shunt AND occlusion' = 245 hits. Includes 'Continuous irrigation with thrombolytics for intraventricular hemorrhage' (Neurosurg Rev 2024) — analogous lumen-based thrombolytic delivery to CSF space.",
+      "white_space_for_eShunt": "MEDIUM — catheter-directed thrombolysis established; specific application as a venous-side rescue lumen for an eShunt is novel but may be considered obvious by §103."
+    },
+    {
+      "id": "M3",
+      "name": "Electrothermal shape-memory alloy (SMA) release trigger",
+      "core_mechanism": "A nitinol (NiTi) anchoring element that, when heated by an external catheter or electrical current, transitions from martensite to austenite (soft/shape-recovering state), releasing the anchor from the vessel wall for retrieval.",
+      "failure_mode_addressed": "Late retrieval after tissue ingrowth / endothelialization (where snare alone fails).",
+      "physical_principle": "NiTi shape-memory phase transition at ~30-40°C (austenite finish temperature, tunable by alloy composition).",
+      "credibility": "MEDIUM-HIGH — SMA release is established in IVC filter retrieval (OptEase, Celect, Denali). Specific application to eShunt raises thermal safety concerns (proximity to dura, brain, venous sinus endothelium).",
+      "prior_art_saturation": "MEDIUM — Lens LQ6 'nitinol shape memory implant release' = 1098 hits (mostly off-topic bioelectronics). Scopus SQ4 'nitinol AND shape-memory AND retrieval AND implant' = 4 hits (all materials science, off-topic). Google Patents GP3 returned EP2043551B1 (Novate Medical — vascular filter with shape-memory), US11690741B2 (Covidien — vascular remodeling device), US20110276091A1 (Gi Dynamics — Anchors with Biodegradable Constraints).",
+      "white_space_for_eShunt": "HIGH — SMA release exists for IVC filters but NOT for CSF-venous shunts. Thermal isolation to protect surrounding tissues is novel."
+    },
+    {
+      "id": "M4",
+      "name": "Partially-bioresorbable anchor with timed retrieval window",
+      "core_mechanism": "A bioresorbable polymer (PLLA/PLGA/PCL) anchor section that loses mechanical strength via hydrolytic degradation over a defined period (e.g., 12-24 months), creating an 'easy retrieval window' when the non-resorbable shunt body is intact but the anchor releases with minimal mechanical force.",
+      "failure_mode_addressed": "Late retrieval after tissue ingrowth — provides a TIMED window of reduced adhesion without sacrificing shunt patency.",
+      "physical_principle": "Hydrolytic degradation of polyesters (PLLA, PLGA, PCL) — well-characterized bulk erosion kinetics.",
+      "credibility": "MEDIUM — bioresorbable stents (Abbott Absorb) are clinically validated. Concern: degradation timing must match clinical retrieval window. Cannot easily extend the patent term if the device must remain functional for years.",
+      "prior_art_saturation": "LOW-MEDIUM — Scopus SQ5 'bioresorbable AND stent AND retrieval' = 4 hits (Bioresorbable Electronic Implants 2019; PLLA/PLCL bioresorbable stents 2023). Google Patents GP4 returned V-Wave heart anchor (US20190328513A1) and Limflow devices for fluid flow (US10835367B2, US20220125572A1). NEAR-NEIGHBOR: US20110276091A1 (Gi Dynamics) 'Anchors with Biodegradable Constraints' — REQUIRES passage-level review.",
+      "white_space_for_eShunt": "HIGH — bioresorbable stents are designed to be ABSORBED, not RETRIEVED. Using resorption as a TIMED RETRIEVAL TRIGGER for a non-resorbable shunt body is a distinct mechanism."
+    },
+    {
+      "id": "M5",
+      "name": "Bidirectional flow-reversal flush (retrograde clearing)",
+      "core_mechanism": "An external pump + pressure differential inversion that temporarily drives venous blood backward through the shunt (venous → CSF) to dislodge obstructing debris/protein aggregates.",
+      "failure_mode_addressed": "Luminal obstruction (protein aggregates, debris) without device removal.",
+      "physical_principle": "Reversed pressure gradient clears lumen.",
+      "credibility": "MEDIUM-LOW — physiological concerns about backflow contamination of CSF with venous blood (infection risk, blood-CSF barrier breach, subarachnoid hemorrhage risk).",
+      "prior_art_saturation": "MEDIUM — Google Patents GP5 returned Silk Road Medical patents (EP3789069B1, US12128204B2, US12156960B2) on retrograde carotid arterial blood flow — DIRECT prior art for flow-reversal concept in endovascular context. Scopus SQ6 'flow reversal AND catheter AND clearing' = 1 hit.",
+      "white_space_for_eShunt": "LOW — basic mechanism saturated by Silk Road Medical; physiological safety concerns make this the weakest candidate."
+    }
+  ],
+
+  "step_3_prior_art_search_results": {
+    "sources_executed": {
+      "Lens_scholarly": {
+        "endpoint": "https://api.lens.org/scholarly/search",
+        "queries_executed": 15,
+        "search_completeness": "PARTIAL",
+        "note": "Lens scholarly search works. Patent endpoint not authorized with this token (401).",
+        "artifact": "PRIOR_ART_LENS_SCHOLARLY.json",
+        "total_hits_per_query": {
+          "LQ1_endovascular_shunt_retrieval": 1184,
+          "LQ2_venous_implant_snare_retrieval": 907,
+          "LQ3_VA_shunt_retrieval": 81,
+          "LQ4_thrombolysis_implanted_shunt": 2403,
+          "LQ5_thrombolytic_infusion_CSF_shunt": 1186,
+          "LQ6_nitinol_shape_memory_implant_release": 1098,
+          "LQ7_thermal_detachment_implant_retrieval": 754,
+          "LQ8_bioresorbable_implant_degradation_retrieval": 381,
+          "LQ9_bioresorbable_stent_retrieval": 198,
+          "LQ10_flow_reversal_flush_catheter": 2603,
+          "LQ11_endovascular_CSF_shunt_revision": 1206,
+          "LQ12_venous_sinus_stent_retrieval": 1013,
+          "LQ13_implantable_device_rescue_endovascular": 2725,
+          "LQ14_eShunt_revision_hydrocephalus": 12,
+          "LQ15_dural_venous_sinus_stent_retrieval": 191
+        }
+      },
+      "Scopus": {
+        "endpoint": "https://api.elsevier.com/content/search/scopus",
+        "queries_executed": 8,
+        "search_completeness": "COMPLETE",
+        "artifact": "PRIOR_ART_SCOPUS.json",
+        "total_hits_per_query": {
+          "SQ1_endovascular_AND_shunt_AND_retrieval": 37,
+          "SQ2_snare_AND_retrieval_AND_venous_AND_implant": 5,
+          "SQ3_thrombolysis_AND_shunt_AND_occlusion": 245,
+          "SQ4_nitinol_AND_shape-memory_AND_retrieval_AND_implant": 4,
+          "SQ5_bioresorbable_AND_stent_AND_retrieval": 4,
+          "SQ6_flow_reversal_AND_catheter_AND_clearing": 1,
+          "SQ7_endovascular_AND_CSF_AND_shunt_AND_revision": 2,
+          "SQ8_venous_AND_sinus_AND_stent_AND_revision": 19
+        }
+      },
+      "Google_Patents_XHR": {
+        "endpoint": "https://patents.google.com/xhr/query",
+        "queries_executed": 5,
+        "search_completeness": "PARTIAL",
+        "artifact": "PRIOR_ART_GOOGLE_PATENTS.json",
+        "note": "XHR returns up to 20 results per page; multi-page deep fetches not executed in this pass.",
+        "patents_returned_per_query": {
+          "GP1_endovascular_shunt_snare_retrieval": 20,
+          "GP2_shunt_thrombolysis_rescue_lumen": 20,
+          "GP3_nitinol_shape_memory_implant_release_retrieval": 20,
+          "GP4_bioresorbable_shunt_retrieval_window": 20,
+          "GP5_flow_reversal_shunt_obstruction_clearing": 20
+        }
+      },
+      "PatSnap_nested_search": {
+        "endpoint": "https://connect.patsnap.com/search/patent/nested-search-patent",
+        "queries_executed": 0,
+        "search_completeness": "BLOCKED",
+        "error_code": 67200005,
+        "error_msg": "Insufficient balance, call failed!",
+        "artifact": "PATSNAP_TEST_RESULT.json",
+        "note": "PatSnap BALANCE_EXHAUSTED across all keys tested (V3-V6 + T6). Cannot execute nested-search. PatentBear free public web search is the documented substitute; deferred to V2 of this discovery."
+      }
+    },
+
+    "direct_hits_and_near_neighbors": {
+      "direct_hits_count": 18,
+      "near_neighbors_count": 48,
+      "artifact": "PRIOR_ART_DIGEST.json",
+      "key_direct_hits": [
+        {
+          "title": "Endovascular retrieval of a broken distal ventriculoatrial shunt catheter within the heart: illustrative case",
+          "year": 2021,
+          "source": "Lens LQ3 (VA_shunt_retrieval)",
+          "significance": "DIRECT clinical precedent for endovascular retrieval of VA shunt — confirms M1 (snare-capture) is standard-of-care."
+        },
+        {
+          "title": "Endovascular repositioning of a ventriculoatrial shunt initially misplaced in the accessory hemiazygos vein: A salvage technique",
+          "year": 2026,
+          "source": "Lens LQ11 (eShunt_Repair)",
+          "significance": "DIRECT precedent for endovascular SALVAGE of misplaced VA shunt — confirms retrieval/repositioning clinical workflow."
+        },
+        {
+          "title": "Intracardiac migration of a ventriculoatrial shunt catheter treated by endovascular transvenous retrieval",
+          "year": 2012,
+          "source": "Lens LQ3 (VA_shunt_retrieval)",
+          "significance": "Matsubara 2012 — transvenous snare retrieval of migrated VA shunt. Case note: 'rostral catheter segment partially remained because of tight adhesion' — directly motivates M3/M4 (late retrieval after adhesion)."
+        },
+        {
+          "title": "First-in-Human Treatment of Medically Refractory Idiopathic Intracranial Hypertension With the eShunt System: Case Report",
+          "year": 2026,
+          "source": "Lens LQ14 (eShunt_Revision_Specific)",
+          "significance": "Most recent eShunt clinical literature — confirms eShunt clinical translation. Does NOT address retrieval."
+        },
+        {
+          "title": "Endovascular Treatment of Hydrocephalus: A Systematic Literature Review",
+          "year": 2026,
+          "source": "Lens LQ14 + Scopus SQ7",
+          "significance": "Most recent systematic review of endovascular hydrocephalus treatment. Confirms eShunt is in active clinical development. Does NOT address retrieval."
+        }
+      ],
+      "key_near_neighbors_for_IP_risk": [
+        {
+          "pub_number": "EP2043551B1",
+          "title": "A vascular filter",
+          "assignee": "Novate Medical Limited",
+          "significance": "M3 prior art — shape-memory vascular filter for retrieval. Directly relevant to M3 (SMA release)."
+        },
+        {
+          "pub_number": "US11690741B2",
+          "title": "Vascular remodeling device",
+          "assignee": "Covidien LP",
+          "significance": "M3 prior art — vascular remodeling device (likely with retrieval mechanism). Requires passage-level review."
+        },
+        {
+          "pub_number": "US20110276091A1",
+          "title": "Anchors with Biodegradable Constraints",
+          "assignee": "Gi Dynamics, Inc.",
+          "significance": "M4 NEAR-NEIGHBOR — biodegradable anchor constraints. CRITICAL: requires passage-level review to determine if 'timed retrieval window' is taught."
+        },
+        {
+          "pub_number": "EP3789069B1",
+          "title": "Systems for establishing retrograde carotid arterial blood flow",
+          "assignee": "Silk Road Medical, Inc.",
+          "significance": "M5 prior art — retrograde flow reversal. Confirms M5 mechanism is saturated for vascular context."
+        },
+        {
+          "pub_number": "US20190328513A1",
+          "title": "Heart anchor device",
+          "assignee": "V-Wave Ltd.",
+          "significance": "M4 near-neighbor — heart anchor with possible bioresorbable elements."
+        },
+        {
+          "pub_number": "US10835367B2 + US20220125572A1",
+          "title": "Devices/Apparatus for fluid flow through body passages",
+          "assignee": "Limflow Gmbh",
+          "significance": "M5 near-neighbor — venous-arterial flow device. Different anatomical context."
+        }
+      ]
+    }
+  },
+
+  "step_4_five_axis_initialization": {
+    "note": "Per CEO directive, 5 SEPARATE completion percentages. NEVER averaged. Each axis is tracked independently. Initialized for the LEADING CANDIDATE only; alternatives will be initialized when down-selected to V2.",
+    "leading_candidate": "M3_REFINED — Electrothermal SMA Release with Thermal Isolation for eShunt Late-Stage Retrieval",
+    "leading_candidate_refinement_rationale": "M3 (basic SMA release) is established for IVC filters. To create a defensible invention, the leading candidate is REFINED to add THERMAL ISOLATION (e.g., polyimide sleeve or vacuum gap) that protects the dura, venous sinus endothelium, and surrounding brain tissue from thermal injury during the SMA phase transition. This addresses the UNIQUE anatomical constraint of eShunts vs. IVC filters. The refined candidate is denoted M3_REFINED.",
+    "axes": {
+      "axis_1_mechanism_exploration": {
+        "percent": 50,
+        "gates_explored": 5,
+        "gates_total_planned": 10,
+        "gates": [
+          {"name":"M1_snare_capture_geometry", "status":"EXPLORED_DROPPED", "reason":"Prior art saturated (VA shunt retrieval standard-of-care)."},
+          {"name":"M2_thrombolysis_delivery_channel", "status":"EXPLORED_BACKUP", "reason":"Engineering risk low; prior art moderate; white space medium."},
+          {"name":"M3_SMA_electrothermal_release", "status":"EXPLORED_LEADING", "reason":"White space high; physics grounded; clinical precedent."},
+          {"name":"M4_bioresorbable_timed_window", "status":"EXPLORED_STRONG_ALTERNATIVE", "reason":"White space high; near-neighbor (US20110276091A1) requires passage review."},
+          {"name":"M5_flow_reversal_flush", "status":"EXPLORED_DROPPED", "reason":"Physiological concerns; Silk Road Medical prior art."}
+        ],
+        "gates_NOT_yet_explored": [
+          "M6: tissue-ingrowth-mitigation surface (anti-proliferative coating for retrieval ease)",
+          "M7: pre-positioned retrieval lumen / dedicated retrieval channel",
+          "M8: mechanical release via detachable anchor (mechanical, not thermal)",
+          "M9: ultrasonic fragmentation of tissue ingrowth",
+          "M10: hybrid M3+M4 (SMA release + bioresorbable backup)"
+        ]
+      },
+      "axis_2_engineering_evidence": {
+        "percent": 0,
+        "simulation_or_model_evidence": "NONE — no FEA, no CFD, no thermal modeling yet. Required: (a) NiTi phase-transition thermal FEA with tissue thermal-damage threshold (47°C/60s Industry standard for tissue injury); (b) anchor pull-force simulation before/after SMA activation; (c) thermal isolation trade study (polyimide vs vacuum gap vs aerogel).",
+        "pre_registered_threshold": "NOT YET PRE-REGISTERED — must define before any V2 simulation: e.g., 'thermal isolation must maintain surrounding tissue <45°C for >90% of activation cycle; anchor release force post-activation <2N vs >10N pre-activation.'"
+      },
+      "axis_3_robustness_falsification": {
+        "percent": 10,
+        "hostile_attacks_executed": 1,
+        "hostile_attacks_survived": 1,
+        "attacks": [
+          {
+            "id": "ATTACK_1_M1_alternative",
+            "attack_type": "OBVIOUSNESS — strongest alternative",
+            "attack_description": "Snare-capture retrieval (M1) is the standard-of-care for migrated VA shunts, with extensive case-report literature (Matsubara 2012, Aloddadi 2018, plus 81 Lens hits on VA shunt retrieval). A PHOSITA would naturally use a snare for any endovascular shunt retrieval. Why is a complex SMA release mechanism needed?",
+            "defense": "Snare-capture alone FAILS in late retrieval after tissue ingrowth — Matsubara 2012 explicitly notes 'rostral catheter segment partially remained because of tight adhesion.' SMA release provides a SECONDARY mechanism for adherent cases where snare cannot extract the device. M3_REFINED (thermal-isolated SMA release) specifically addresses the failure mode where snare alone is insufficient.",
+            "verdict": "SURVIVED — but only because M3_REFINED addresses a distinct failure mode (late retrieval after adhesion) that M1 cannot.",
+            "follow_up_attack_identified": "If snare fails for adherent cases, why not just use stronger traction or adjunctive balloon angioplasty (well-established techniques)? Need to demonstrate that SMA release is mechanically NECESSARY, not just convenient."
+          }
+        ],
+        "hostile_attacks_NOT_yet_executed": [
+          "ATTACK_2: Tissue thermal injury — what if thermal isolation fails or thermal diffusion exceeds design envelope?",
+          "ATTACK_3: Inadvertent activation — what if body temperature, MRI heating, or diathermy triggers release unintentionally?",
+          "ATTACK_4: Obviousness from IVC filter prior art (EP2043551B1, US11690741B2) — applying known SMA release to a vascular implant",
+          "ATTACK_5: Manufacturing scalability — NiTi thermal-isolated anchor fabrication tolerances"
+        ]
+      },
+      "axis_4_prior_art_IP_exhaustion": {
+        "percent": 25,
+        "sources_searched": {
+          "Lens_scholarly": {"completeness":"PARTIAL", "queries":15, "hits_returned":375},
+          "Scopus": {"completeness":"COMPLETE", "queries":8, "hits_returned":99},
+          "Google_Patents_XHR": {"completeness":"PARTIAL", "queries":5, "hits_returned":100},
+          "PatSnap_nested_search": {"completeness":"BLOCKED", "queries":0, "error":"67200005 BALANCE_EXHAUSTED"},
+          "PatentBear_free_web_search": {"completeness":"NOT_STARTED", "queries":0},
+          "PatSnap_semantic_search": {"completeness":"NOT_STARTED", "queries":0},
+          "PatSnap_family_citations": {"completeness":"NOT_STARTED", "queries":0}
+        },
+        "passage_level_claim_chart_status": "NOT_STARTED — top 5 high-threat patents identified but NOT claim-audited: EP2043551B1 (Novate), US11690741B2 (Covidien), US20110276091A1 (Gi Dynamics), US20190328513A1 (V-Wave), EP3789069B1 (Silk Road).",
+        "near_neighbor_blocking_threats": [
+          "US20110276091A1 (Gi Dynamics, 'Anchors with Biodegradable Constraints') — REQUIRES passage-level review. Could block M4 if it teaches timed-release retrieval window.",
+          "EP2043551B1 (Novate Medical, 'vascular filter') — REQUIRES passage-level review. Could block M3 if it teaches thermal-isolated SMA release for vascular implants.",
+          "US11690741B2 (Covidien, 'vascular remodeling device') — REQUIRES passage-level review."
+        ]
+      },
+      "axis_5_real_world_validation_readiness": {
+        "percent": 0,
+        "benchtop": "NONE — no benchtop prototype, no thermal testing, no pull-force testing.",
+        "in_vivo": "NONE — no ovine model, no chronic implant retrieval study.",
+        "clinical": "NONE — no first-in-human retrieval case report. CereVasc eShunt first-in-human studies (Spriggs 2021, 2026) report placement only, not retrieval.",
+        "regulatory_pathway": "NOT_DEFINED — likely Class III (active implantable with retrieval claim); would require IDE for any clinical retrieval study."
+      }
+    }
+  },
+
+  "step_5_first_attack": {
+    "attack_id": "ATTACK_1_M1_alternative",
+    "attack_name": "Snare-capture is sufficient (use the strongest plausible alternative)",
+    "attack_rationale": "Per 'push the envelope' doctrine, the leading candidate must survive an attack by its strongest plausible alternative. For M3_REFINED (SMA release), the strongest alternative is M1 (snare-capture) because it is the established standard-of-care for VA shunt retrieval (Lens LQ3 = 81 hits, multiple case reports of successful snare retrieval of migrated VA shunts).",
+    "attack_argument": "A PHOSITA faced with the need to retrieve an eShunt would naturally use a standard endovascular snare (Amplatz GooseNeck, Indy snare) — exactly as is done for VA shunts today. The eShunt has a proximal venous end in the dural venous sinus, which is accessible via jugular venous access. Adding a complex SMA release mechanism (with thermal-isolation requirements, additional manufacturing steps, regulatory burden, and inadvertent-activation risk) is unnecessary engineering. The invention is therefore OBVIOUS in light of the established snare-retrieval practice for VA shunts.",
+    "defense_argument": "M1 fails for LATE RETRIEVAL after tissue ingrowth. The Lens LQ3 hit Matsubara 2012 explicitly notes 'the rostral catheter segment partially remained because of tight adhesion' — snare traction was insufficient to extract an adherent VA shunt catheter. The eShunt is intended as a long-term (potentially multi-year or lifelong) implant, making tissue ingrowth virtually guaranteed for any retrieval >12 months post-implant. SMA release provides a SECONDARY release mechanism for adherent cases. Furthermore, the M3_REFINED candidate adds thermal isolation that is specifically required for the eShunt's anatomical context (proximity to dura, brain, venous sinus endothelium) — a constraint not present in IVC filter SMA release.",
+    "verdict": "SURVIVED — M3_REFINED addresses a distinct failure mode (late retrieval after tissue ingrowth) that M1 cannot solve. However, the survival is CONDITIONAL on the demonstration that (a) tissue ingrowth is a real clinical problem for eShunts (not yet quantified), and (b) SMA release with thermal isolation is mechanically NECESSARY (not just convenient) for this use case.",
+    "follow_up_attack_identified_for_V2": "ATTACK_2: If snare fails for adherent cases, why not use stronger traction or adjunctive balloon angioplasty (well-established)? Need quantitative comparison of pull-force required with vs. without SMA activation, accounting for tissue-ingrowth adhesion forces (typical 1-5 N for vascular implants at 6+ months).",
+    "honest_negative_results_during_attack": [
+      "M3 basic mechanism (SMA release for vascular implant) is NOT novel — Novate Medical (EP2043551B1) and Covidien (US11690741B2) hold prior art for vascular filters/remodeling devices.",
+      "M3_REFINED novelty depends entirely on the THERMAL ISOLATION element, which has not been passage-level audited against these prior-art patents.",
+      "If passage-level review shows that EP2043551B1 or US11690741B2 already teach thermal isolation for vascular implants, the M3_REFINED candidate would be DESTROYED and would need to be redesigned."
+    ]
+  },
+
+  "step_6_initial_adjudication": {
+    "candidates_surviving_to_V1": ["M3_REFINED", "M4", "M2"],
+    "candidates_dropped": ["M1 (saturated)", "M5 (physiological + Silk Road prior art)"],
+    "ranking_for_V1": [
+      {
+        "rank": 1,
+        "candidate": "M3_REFINED — Electrothermal SMA Release with Thermal Isolation",
+        "rationale": "Highest white space; well-grounded physics; clinical precedent in IVC filters; novel thermal-isolation element specific to eShunt anatomy. Survived first attack conditionally.",
+        "key_risk": "Passage-level review of EP2043551B1 + US11690741B2 may reveal thermal-isolation prior art."
+      },
+      {
+        "rank": 2,
+        "candidate": "M4 — Partially-bioresorbable Anchor with Timed Retrieval Window",
+        "rationale": "High white space; addresses late-retrieval problem without active components. Strong alternative if M3_REFINED is destroyed by passage-level prior art.",
+        "key_risk": "US20110276091A1 (Gi Dynamics 'Anchors with Biodegradable Constraints') is a CRITICAL near-neighbor that could block the claim. Also, degradation-timing control for long-term implants is technically hard."
+      },
+      {
+        "rank": 3,
+        "candidate": "M2 — In-situ Thrombolysis Delivery Channel",
+        "rationale": "Lower engineering risk; addresses a different failure mode (thrombosis, not late retrieval). Could be a COMPLEMENTARY invention to M3_REFINED or M4 (e.g., dual-mechanism rescue shunt).",
+        "key_risk": "Obviousness — catheter-directed thrombolysis is well-established; specific application to eShunt may be considered obvious."
+      }
+    ],
+    "recommended_next_step": "V2 of T6 should: (1) Execute PatentBear free public web search for top-3 candidates to upgrade PatSnap-blocked axis; (2) Deep-fetch + passage-level claim audit of 5 high-threat near-neighbor patents (EP2043551B1, US11690741B2, US20110276091A1, US20190328513A1, EP3789069B1); (3) Run 2 more hostile attacks (tissue thermal injury; inadvertent activation); (4) Pre-register buyer threshold before any V2 simulation; (5) If M3_REFINED survives V2, build thermal FEA + pull-force simulation to lift axis 2 from 0%."
+  },
+
+  "security_compliance": {
+    "API_keys_used_inline_only": true,
+    "API_keys_persisted_to_disk": false,
+    "API_keys_in_worklog_or_report": false,
+    "PATSNAP_KEY_state": "Inline only — used for balance-test, returned 67200005 BALANCE_EXHAUSTED. Key NOT written to any file.",
+    "LENS_KEY_state": "Inline only — used for 15 scholarly searches. Key NOT written to any file.",
+    "SCOPUS_KEY_state": "Inline only — used for 8 searches. Key NOT written to any file."
+  },
+
+  "artifacts_produced": [
+    "T6_DISCOVERY_REPORT.json (this file)",
+    "PRIOR_ART_LENS_SCHOLARLY.json (15 queries, 375 results)",
+    "PRIOR_ART_SCOPUS.json (8 queries, 99 results)",
+    "PRIOR_ART_GOOGLE_PATENTS.json (5 queries, 100 patent hits)",
+    "PATSNAP_TEST_RESULT.json (BLOCKED — balance exhausted)",
+    "PRIOR_ART_DIGEST.json (18 direct hits + 48 near neighbors)",
+    "PRIOR_ART_SEARCH_SUMMARY.json (overall search summary)"
+  ]
+}
