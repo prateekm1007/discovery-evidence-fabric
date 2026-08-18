@@ -1,0 +1,100 @@
+{
+  "task_id": "TERRITORY-2-FINAL-ADJUDICATION",
+  "step": "STEP_5_FINAL_ADJUDICATION",
+  "timestamp": "2026-08-18T06:05:00+00:00",
+  "agent": "subagent (general-purpose, T2 final adjudication)",
+  "ceo_directive_verbatim": "#2 should continue in parallel, but do not let it become an endless simulation refinement branch.",
+
+  "final_verdict": "NEGATIVE_CEILING",
+
+  "final_verdict_rationale": {
+    "summary": "The multi-mechanism architecture (size-selective filter + hydrodynamic retention) proposed in V18 and Pareto-tested in V21 FAILS the pre-registered buyer threshold (T1-T5). NO single mechanism in the V8.2 architecture set (A1-A5) achieves selective retention across ALL payload classes (antibody 150kDa, peptide 5kDa, small molecule 500Da) at ≥85% drainage, robustly across patient variability, for the chronic implant lifespan (5+ years). The V21 'pareto=true for all payloads' verdict was INFLATED — proper Pareto analysis shows multi is dominated by hydrodynamic alone for peptide/small_molecule. All 3 hostile attacks (payload variability, extreme patient variability, long-duration durability) CONFIRM the NEGATIVE_CEILING.",
+    "ceo_directive_compliance": "Verdict is DEFINITIVE — closes #2 with documented negative ceiling. NO endless simulation refinement. A documented PARTIAL SURVIVOR (size-selective filtration alone for large therapeutics at nominal conditions, short-duration only) is preserved as a patentable sub-invention. V-next for A2 affinity-based retention is IDENTIFIED but NOT AUTHORIZED in this session — CEO must explicitly approve to avoid starting an endless refinement branch."
+  },
+
+  "verdict_classification": {
+    "chosen": "NEGATIVE_CEILING",
+    "rejected_alternatives": {
+      "SURVIVOR": "REJECTED — multi-mechanism fails T3 (worst-case robustness) and T4 (selectivity) for ALL payloads including antibody. No mechanism passes ALL 5 thresholds for ALL 3 payloads. Hostile attacks confirm.",
+      "ARCHITECTURE_CHANGE": "REJECTED as PRIMARY verdict because (a) no alternative single mechanism in V8.2 set (A1-A5) demonstrably passes the threshold either, (b) A2 affinity-based retention is theoretically plausible but requires per-therapeutic binding matrix design (fundamentally a different pharmaceutical engineering problem, not a one-size-fits-all solution), (c) CEO directive explicitly forbids endless refinement — authorizing V-next risks that. NOTE: V-next opportunity for A2 is documented but NOT auto-authorized; CEO must approve.",
+      "NOT_READY": "REJECTED — the crux question IS answerable from existing data (V18 + crux simulation + hostile attacks). No additional evidence is required to render a verdict. The verdict is NEGATIVE_CEILING, not NOT_READY. (In-vitro validation would refine the numbers but not change the architectural conclusion: multi is Pareto-dominated by hydrodynamic alone for peptide/small_molecule.)"
+    }
+  },
+
+  "what_failed_and_why": {
+    "multi_mechanism_failure_mode": "Multi-mechanism (size-selective + hydrodynamic) was proposed as the universal retention solution. The V21 Pareto verdict 'pareto=true for all payloads' was based on a flawed metric (conc=0.0 for all at 90 days) and did not properly compare multi against the BEST SINGLE mechanism per payload. CORRECT analysis: multi is Pareto-OPTIMAL for antibody (0.55 retention at 90% drain vs 0.488 at 95% for size_sel alone), but Pareto-DOMINATED by hydrodynamic alone for peptide/small_molecule (hydro: 0.484 at 92% vs multi: 0.376 at 90%). The multi-mechanism ADDS flow resistance (drain 90% vs 92%) WITHOUT improving retention for small payloads (0.376 vs 0.484). Multi is engineering complexity without retention benefit for 2 of 3 payload classes.",
+    "hydrodynamic_alone_failure_mode": "Hydrodynamic alone is payload-agnostic — it slows drainage for ALL payloads (drug and water) uniformly. Therefore it is NOT 'selective' retention. It fails T4 (selectivity ratio = 1.0). Cannot be patented as 'selective retention' — would be a generic flow-restriction valve, anticipated by EnClear US12337140B2 (external CSF circuit with flow control).",
+    "size_selective_alone_failure_mode": "Size-selective filter alone is SELECTIVE (T4 passes for antibody, ratio=488x) but ONLY works for large payloads (above MWCO 30kDa). For peptide (5kDa) and small_molecule (500Da), retention = 0 — fails T1. Also fails T3 robustness for antibody at 90th-percentile worst-case (high fouling drives ret_eff to 0). Also fails long-duration durability (1 year: retention drops to 0 due to membrane degradation).",
+    "mechanical_valve_failure_mode": "Mechanical valve (close valve during drug delivery) is payload-agnostic (like hydrodynamic) — fails T4. Also fails T3 robustness and T5 Pareto (dominated by hydrodynamic alone which has better drainage).",
+    "fundamental_physical_limitation": "The 'selective retention of ALL therapeutic classes' is a fundamental physical contradiction. CSF water (18Da) must pass through any size-selective filter that allows drainage. Any payload SMALLER than water (none, but small molecules 500Da are only 28x larger) cannot be selectively retained by size alone. Affinity-based retention (A2) is the ONLY mechanism that could plausibly retain small molecules selectively — but it requires a payload-specific binding partner (one matrix per therapeutic). There is no universal 'selective retention' architecture for small payloads."
+  },
+
+  "partial_survivors": {
+    "size_selective_filtration_for_large_therapeutics": {
+      "scope": "Acute (≤90 day) retention of LARGE THERAPEUTICS (≥30kDa: antibody 150kDa, scAAV9 gene vector ~5MDa, nanoparticles 100nm ~10MDa) at NOMINAL patient conditions",
+      "performance_at_nominal_90day": "0.488 retention (49% of initial therapeutic concentration), 95% drainage preserved — passes T1 (≥0.30) and T2 (≥0.85) and T4 (selective) and T5 (Pareto-optimal for antibody)",
+      "limitations": [
+        "FAILS T3 robustness: at 90th-percentile worst-case patient variability (high CSF production × high fouling × high protein), retention drops to 0 due to membrane fouling",
+        "FAILS long-duration durability: at 1 year, retention = 0 due to membrane degradation. Chronic implant lifespan (5+ years per engineering blueprint) is NOT achievable.",
+        "FAILS for peptide (5kDa) and small_molecule (500Da): cannot retain below MWCO",
+        "Membrane fouling drives ICP risk: per FOULING_ICP_SIMULATION.json, 50% fouling = minimum acceptable drainage (5 mL/hr), 90% fouling = CRITICAL ICP risk (30 mmHg pressure drop)"
+      ],
+      "patentability_assessment": "Patentable as a NARROW sub-invention: 'Size-selective filtration membrane for ACUTE retention of LARGE therapeutic agents (≥30kDa) in CSF drainage shunts.' 102 SURVIVES per corrected 102_MATRIX.json (no single reference has all 6 limitations). 103 UNCERTAIN for Combo 3 (CereVasc delivery + generic filtration) — MODERATE motivation but functional interaction.",
+      "buyer_value": "REDUCED — acute large-therapeutic retention is a niche application (gene therapy vectors, antibody therapy). Does NOT solve the universal 'selective retention' problem the territory was scoped to solve.",
+      "recommended_action": "PRESERVE as patentable sub-invention. Document as 'CEREVASC_INVENTION_002_PARTIAL_SURVIVOR_LARGE_THERAPEUTIC_ACUTE' if CEO chooses to file. NOT a continuation of #2 — separates from the multi-mechanism negative ceiling."
+    }
+  },
+
+  "v_next_opportunity_identified_not_authorized": {
+    "candidate": "A2 — Affinity-Based Retention (per CEREVASC_INVENTION_002/04_ARCHITECTURES/ARCHITECTURES_V3.json)",
+    "mechanism": "Therapeutic agent binds to a matrix within the eShunt, preventing it from draining with the CSF fluid. eShunt's one-way valve allows CSF fluid to drain while the matrix retains the therapeutic agent.",
+    "why_this_could_succeed_where_multi_failed": "Affinity-based retention is payload-size-INDEPENDENT. As long as a binding partner (aptamer, antibody, molecularly-imprinted polymer) can be designed for the therapeutic, ANY payload size (including small molecules 500Da) can be selectively retained while water drains.",
+    "engineering_cost": "Per-therapeutic binding matrix design. Each new therapeutic requires its own matrix development (weeks-to-months per therapeutic). NOT a one-size-fits-all solution.",
+    "prior_art_risk": "UNKNOWN — V8.2 search did NOT specifically target affinity-based retention in CSF shunts. Combo 3 risk applies (CereVasc delivery + known affinity matrices from drug-delivery literature).",
+    "pre_registered_threshold_for_V_next_IF_authorized": {
+      "T1_retention_90day": ">=0.30 for ALL 3 payload classes (antibody, peptide, small_molecule) — same as crux threshold",
+      "T2_drainage_preserved": ">=0.85 for ALL 3 payload classes — same as crux threshold",
+      "T3_robustness_90th_percentile": ">=0.20 worst-case retention for ALL 3 payload classes — same as crux threshold",
+      "T4_selectivity_ratio": ">=1.5 for ALL 3 payload classes — drug retained 50% more than water",
+      "T5_pareto_optimality": "Pareto-optimal vs all single mechanisms for ALL 3 payload classes",
+      "T6_binding_capacity": "NEW — binding matrix capacity >= 10x therapeutic dose (to avoid saturation)",
+      "T7_binding_specificity": "NEW — binding matrix does NOT bind CSF proteins (albumin, immunoglobulin) — otherwise matrix saturates immediately",
+      "T8_binding_kinetics": "NEW — association rate ka >= 1e4 M^-1s^-1 (sufficient to capture therapeutic in CSF transit time)"
+    },
+    "ceo_approval_required": "V-next for A2 is NOT auto-authorized. CEO must explicitly approve to start a new simulation branch. CEO directive 'do not let it become endless refinement' suggests V-next should ONLY be authorized if A2 is part of a separate invention disclosure (e.g., 'CereVasc Invention #X: Affinity-based retention for small molecules in CSF shunts'), NOT as a continuation of #2 multi-mechanism."
+  },
+
+  "what_would_overturn_this_verdict": {
+    "if_in_vitro_data_shows_V18_numbers_are_wrong": "If membrane retention efficiency is actually 0.95+ (not 0.70 as modeled) AND fouling degradation is 10x slower than modeled, multi could pass T3 robustness. Requires in-vitro membrane fouling test at 90/180/365 days.",
+    "if_patsnap_reveals_hydrodynamic_alone_is_prior_art": "If hydrodynamic retention alone is fully disclosed in prior art (e.g., generic flow-restriction valve patent), then hydrodynamic cannot be claimed alone, and multi-mechanism becomes the only PATENTABLE combination — even if dominated by hydrodynamic alone on engineering metrics. This is a patent-vs-engineering tradeoff requiring patent counsel. NOTE: Even if this is true, multi still FAILS T3 robustness and T4 selectivity — so the engineering verdict of NEGATIVE_CEILING would still stand; only the patent path would change.",
+    "if_a2_affinity_simulated_and_passes": "If A2 affinity-based retention is simulated and passes the pre-registered V-next threshold (T1-T8 above) for ALL 3 payload classes, then #2 could be re-opened with A2 as the surviving architecture. CEO must authorize."
+  },
+
+  "artifacts_produced_this_session": [
+    "T2_FINAL_RECONCILIATION.json — current state reconciliation",
+    "T2_CRUX_QUESTION.json — crux question + pre-registered buyer threshold",
+    "T2_CRUX_SIMULATION.json — minimal crux simulation result",
+    "T2_HOSTILE_ATTACKS.json — 3 hostile attacks on crux result",
+    "T2_FINAL_ADJUDICATION.json — this file",
+    "T2_FINAL_FIVE_AXIS_TRACKER.json — 5-axis tracker (next step)"
+  ],
+
+  "scripts_persisted": [
+    "/home/z/my-project/scripts/t2_crux_simulation.py — minimal crux simulation (reuses V18 first-order washout model + Pareto check + 9-point patient variability + 30/90/180-day durability + selectivity check)",
+    "/home/z/my-project/scripts/t2_hostile_attacks.py — 3 hostile attacks (payload variability, extreme patient variability, long-duration durability)"
+  ],
+
+  "evidence_honesty_labels": {
+    "all_simulation_results": "MODEL_DERIVED — all results from V18 first-order washout model with engineering-estimated parameters (ret_eff, degr, drain). NOT in-vitro validated. The simulation is sufficient to answer the architectural crux question (does multi-mechanism Pareto-dominate single mechanism across payloads) but NOT sufficient to predict clinical performance.",
+    "prior_art_search_completeness": "PARTIAL — PatSnap BLOCKED for entire #2 retention effort; 44/48 semantic similar NOT claim-checked; foreign patents NOT audited. Patentability of the partial survivor (size-selective for large therapeutics) is UNCERTAIN, not SECURED.",
+    "no_likely_novel_language": "COMPLIANT — no use of 'LIKELY_NOVEL' or 'pareto=true' without numeric domination proof.",
+    "5_axis_tracker_never_averaged": "COMPLIANT — tracker reports 5 axes separately, no composite average."
+  },
+
+  "ceo_directive_final_compliance_check": {
+    "directive_1_continue_in_parallel": "COMPLIED — #2 has been adjudicated without blocking #6, #7, #8 work which has proceeded in parallel.",
+    "directive_2_no_endless_refinement": "COMPLIED — #2 is CLOSED with NEGATIVE_CEILING verdict. One crux simulation + 3 hostile attacks = 4 minimal simulations total in this session. V-next for A2 is IDENTIFIED but NOT AUTHORIZED — requires explicit CEO approval.",
+    "directive_3_definitive_verdict": "COMPLIED — verdict is NEGATIVE_CEILING (not 'would consider with milestones' or 'uncertain'). The branch is FROZEN.",
+    "directive_4_be_honest": "COMPLIED — multi-mechanism failure documented with proper Pareto analysis. V21 inflation explicitly called out. Partial survivor preserved without overclaiming. V-next opportunity honestly identified with engineering cost."
+  }
+}

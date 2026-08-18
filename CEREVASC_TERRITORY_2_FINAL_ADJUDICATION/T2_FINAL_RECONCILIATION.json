@@ -1,0 +1,137 @@
+{
+  "task_id": "TERRITORY-2-FINAL-ADJUDICATION",
+  "step": "STEP_1_RECONCILIATION",
+  "timestamp": "2026-08-18T06:00:00+00:00",
+  "agent": "subagent (general-purpose, T2 final adjudication)",
+  "ceo_directive_verbatim": "#2 should continue in parallel, but do not let it become an endless simulation refinement branch.",
+  "territory_definition": "Selective therapeutic retention + preserved drainage. Multi-mechanism architecture (size-selective filter + hydrodynamic) for retaining therapeutic agents in CSF while preserving CSF drainage.",
+  "exploration_status_at_handoff": "~90% (per worklog lines 580, 948, 1149, 1249, 1435 — unchanged for >5 portfolio cycles)",
+
+  "current_mechanism_architecture": {
+    "primary_architecture_under_test": "MULTI-MECHANISM (size-selective filter + hydrodynamic retention) — proposed in V18, Pareto-tested in V21",
+    "architecture_history": [
+      {
+        "version": "V8.2_A1_A5",
+        "source": "CEREVASC_INVENTION_002/04_ARCHITECTURES/ARCHITECTURES_V3.json",
+        "description": "5 single-mechanism architectures: A1 Size-Selective Filtration, A2 Affinity-Based Retention, A3 Reversible Flow Interruption, A4 Two-Phase Operation, A5 Valve Timing. A1 picked as leading candidate in BUYER_READY_DOSSIER_V1."
+      },
+      {
+        "version": "V17_PARTIAL",
+        "source": "PORTFOLIO_REOPENING_AUDIT/V17_FINAL_FRONTIER.json part_2_territory_2",
+        "description": "Initial 3-mechanism test (size_selective_filter, hydrodynamic_retention, mechanical_valve) across 3 payload classes (antibody 150kDa, peptide 5kDa, small_molecule 500Da). Finding: size-selective filter is PAYLOAD-DEPENDENT — works for antibody but fails for peptide/small_molecule. V17 retention metric showed all-zero values (bug in ret_eff computation); qualitative verdict survives."
+      },
+      {
+        "version": "V18_RECALIBRATED",
+        "source": "PORTFOLIO_REOPENING_AUDIT/V18_RESOLVE_CONTRADICTIONS.json part_2_territory_2",
+        "description": "Recalibrated with slower degradation (degr=0.0001-0.0002 per hour vs 0.001). Introduced multi_mechanism = size-selective filter (for large) + hydrodynamic (for small) at drain=0.90. Verified V18 retention values: size_sel antibody=0.488 (drain 95%); size_sel peptide/small=0 (drain 95%); hydrodynamic all=0.484 (drain 92%); mechanical all=0.476 (drain 88%); multi antibody=0.550 (drain 90%); multi peptide/small=0.376 (drain 90%)."
+      },
+      {
+        "version": "V21_PARETO",
+        "source": "PORTFOLIO_REOPENING_AUDIT/V21_CONFIDENCE_PATENT_CEILING.json part_3_pareto",
+        "description": "Pareto test. V21's verdict claims 'Multi-mechanism ACHIEVES Pareto improvement across all payloads' with pareto=true for antibody, peptide, small_molecule. INSPECTION OF UNDERLYING DATA: V21 used a flawed conc-based metric (conc=0.0 for all mechanisms and all payloads at 90 days) and did not properly compare multi-mechanism against the BEST SINGLE mechanism per payload class. The V21 Pareto verdict is INFLATED."
+      }
+    ],
+    "load_bearing_claim_of_multi_mechanism": "Size-selective filter retains large therapeutics (antibody 150kDa, nanoparticles, gene vectors ≥MWCO 30kDa); hydrodynamic retention slows drainage for all payloads; combined mechanism is supposed to retain ALL payload classes at 90% drainage.",
+    "architecture_components": {
+      "component_A_size_selective_filter": {
+        "mechanism": "ePTFE membrane with MWCO=30kDa (per V18) or 50-200nm pore (per BUYER_READY_DOSSIER_V1)",
+        "payload_specificity": "Antibody (150kDa) retained at 92% efficiency; peptide (5kDa) and small molecule (500Da) pass through (15% efficiency)",
+        "drainage_penalty": "5% (95% preserved)",
+        "engineering_concern": "Fouling. Per FOULING_ICP_SIMULATION.json: 50% fouling = minimum acceptable drainage; 90% fouling = CRITICAL ICP risk (>10 mmHg)."
+      },
+      "component_B_hydrodynamic_retention": {
+        "mechanism": "Increased flow resistance / tortuous path / low-velocity settling zone in shunt lumen; payload-independent (slows drainage for ALL payloads equally)",
+        "payload_specificity": "NONE — uniformly retains all payloads at 70% efficiency",
+        "drainage_penalty": "8% (92% preserved)",
+        "engineering_concern": "Non-selective — does not discriminate therapeutic from CSF water (18Da)."
+      },
+      "combined_multi_mechanism": {
+        "mechanism": "Size-selective filter (component A) in series with hydrodynamic retention (component B). For large payloads, both mechanisms contribute; for small payloads, only hydrodynamic contributes.",
+        "payload_specificity": "Antibody: 0.874 effective retention (0.92 × 0.95); peptide/small: 0.70 (hydrodynamic only)",
+        "drainage_penalty": "10% (90% preserved)",
+        "engineering_concern": "Combined resistance increases ICP risk; no selectivity improvement for small payloads over hydrodynamic alone."
+      }
+    }
+  },
+
+  "prior_art_status": {
+    "multi_source_search_completeness": "PARTIAL",
+    "sources_tested": [
+      {"source": "PatSnap", "status": "BLOCKED (balance exhausted / apikey auth error across V3-V6 of #4; never executed for #2 retention)"},
+      {"source": "Google Patents", "status": "EXECUTED (V8.2 hostile search: 15 queries, 48 semantic similar, 17 drug-related similar checked at first-claim level)", "coverage": "PARTIAL — 44 of 48 semantic similar NOT claim-checked per BUYER_READY_DOSSIER_V1 evidence_gate note"},
+      {"source": "PatentBear", "status": "NOT_EXECUTED for #2 retention (executed for #4 only)"},
+      {"source": "Lens.org scholarly", "status": "NOT_EXECUTED for #2 retention (executed for #7 only)"},
+      {"source": "Scopus", "status": "NOT_EXECUTED for #2 retention (executed for #7 only)"}
+    ],
+    "primary_references_for_102_103": [
+      {"ref": "US12337140B2 (EnClear)", "role": "Most dangerous — external CSF circuit with pump, therapeutic inlet, controller. L2 (membrane) absent from this ref. 102 SURVIVES per corrected 102_MATRIX.json."},
+      {"ref": "US20200406018A1 (CereVasc delivery device)", "role": "Self-IP. 'Retention' = drug supply reservoir, NOT retention mechanism. SELF_IP_RETENTION_AUDIT.json resolves this gap."},
+      {"ref": "US8672871B2 (CereVasc original eShunt)", "role": "Drainage-only; L1 (therapeutic) absent. No retention taught."},
+      {"ref": "US11850390B2 (CereVasc access method)", "role": "Method-of-positioning; L2 (membrane) absent."}
+    ],
+    "conclusion": "102 SURVIVES for A1 (size-selective membrane) per corrected 102_MATRIX.json. 103 UNCERTAIN for Combo 3 (CereVasc delivery + generic filtration membrane) — MODERATE motivation but functional interaction. Search completeness: PARTIAL — PatSnap unavailable, 44/48 semantic similar NOT claim-checked, foreign (JP/CN/DE) NOT audited."
+  },
+
+  "buyer_threshold_status": {
+    "pre_registered": false,
+    "prior_threshold_attempts": [
+      {"source": "CEREVASC_INVENTION_002_BUYER_READY_DOSSIER_V1/FINAL_ADJUDICATION.json", "threshold": "Composite 70 minimum buyable; gate scores Patent 65, Technical 70, Evidence 55, Engineering 55, Commercial 40", "status": "WOULD_CONSIDER_WITH_MILESTONES (composite 60.0, below 70)"},
+      {"source": "CEREVASC_INVENTION_002_V1/22_FINAL_ADJUDICATION.json", "threshold": "Composite 70; all gates ≥65-70 thresholds", "status": "WOULD_NOT_PAY (composite 45.0 after honest re-audit; V1 was a misaligned invention for pressure-differential occlusion monitoring, NOT selective retention — this artifact is for a different concept and should not be confused with #2 selective retention)"}
+    ],
+    "gap": "NO pre-registered payload-class × drainage × durability threshold exists for the MULTI-MECHANISM architecture (V18/V21). The V21 Pareto test does not constitute a buyer threshold because it lacks (a) drainage minimum, (b) retention minimum, (c) robustness across patient variability, (d) durability beyond 90 days.",
+    "action_required": "Pre-register buyer threshold NOW in Step 2 (Crux Question) before running minimal simulation in Step 3."
+  },
+
+  "simulations_run_history": [
+    {
+      "id": "V17_PARTIAL",
+      "what": "3 mechanisms × 3 payloads × 90-day retention",
+      "result": "Size-selective filter payload-dependent (works for antibody, fails for small molecules). Other mechanisms uniformly retain all payloads.",
+      "evidence_pointer": "PORTFOLIO_REOPENING_AUDIT/V17_FINAL_FRONTIER.json part_2_territory_2",
+      "credibility_issue": "final_retention values all = 0 in V17 raw output (bug in ret_eff assignment for non-multi mechanisms). Verbal verdict is consistent with V18 recalibration; numeric values invalid."
+    },
+    {
+      "id": "V18_RECALIBRATED",
+      "what": "4 mechanisms (added multi_mechanism) × 3 payloads × 90-day retention, slower degradation",
+      "result": "Multi-mechanism: antibody 0.55 (drain 90%), peptide/small 0.376 (drain 90%). Hydrodynamic alone: 0.484 (drain 92%) for all payloads. INSPECTION: hydrodynamic alone DOMINATES multi for peptide/small (0.484>0.376 AND 92%>90%).",
+      "evidence_pointer": "PORTFOLIO_REOPENING_AUDIT/V18_RESOLVE_CONTRADICTIONS.json part_2_territory_2"
+    },
+    {
+      "id": "V21_PARETO",
+      "what": "Pareto test: does multi beat best single mechanism for each payload class?",
+      "result": "V21 verdict: 'pareto=true' for all 3 payloads → 'Multi-mechanism ACHIEVES Pareto improvement across all payloads.' DATA INSPECTION: V21's pareto metric is broken — it uses final_conc (which is 0.0 for all at 90 days) and does not properly identify best_single per payload. Correct Pareto analysis: multi is Pareto-OPTIMAL for antibody (0.55 ret vs 0.488 size_sel; 90% drain vs 95%); multi is PARETO-DOMINATED by hydrodynamic alone for peptide (0.376<0.484 AND 90%<92%) and small_molecule (same). V21 verdict is INFLATED.",
+      "evidence_pointer": "PORTFOLIO_REOPENING_AUDIT/V21_CONFIDENCE_PATENT_CEILING.json part_3_pareto"
+    },
+    {
+      "id": "FOULING_ICP_SIMULATION_V1",
+      "what": "Membrane fouling impact on drainage (Hagen-Poiseuille, 0/10/50/90% fouling)",
+      "result": "50% fouling = minimum acceptable drainage (5 mL/hr); 90% fouling = CRITICAL ICP risk (30 mmHg pressure drop). Membrane area optimization needed.",
+      "evidence_pointer": "CEREVASC_INVENTION_002_BUYER_READY_DOSSIER_V1/FOULING_ICP_SIMULATION.json"
+    },
+    {
+      "id": "WASHOUT_MODEL",
+      "what": "Well-mixed compartment washout without retention (32% half-life reduction at mid-range eShunt flow)",
+      "result": "Without retention, eShunt materially reduces therapeutic residence time. JUSTIFIES the problem (#2 is real).",
+      "evidence_pointer": "CEREVASC_INVENTION_002/00_PROBLEM_PROOF/WASHOUT_MODEL.json"
+    }
+  ],
+
+  "open_questions_preventing_final_adjudication": [
+    "Q1_PARETO_HONESTY: Is V21's 'pareto=true' verdict for peptide/small_molecule actually correct, or is multi dominated by hydrodynamic alone for these payloads?",
+    "Q2_PATIENT_VARIABILITY: Has any simulation tested retention robustness across CSF production rate variation (e.g., 0.5x to 2x normal), protein concentration variation, or degradation rate variation? Answer: NO.",
+    "Q3_DURABILITY: Has any simulation tested retention beyond 90 days (e.g., 180 days, 365 days)? Answer: NO. V18 used 2160 hours = 90 days. Chronic implant lifespan is 5+ years per engineering blueprint.",
+    "Q4_BUYER_THRESHOLD: Is there a pre-registered quantitative threshold defining what 'buyer-grade selective retention' means? Answer: NO. V21's pareto=true is not a buyer threshold.",
+    "Q5_SELECTIVITY: Does 'selective retention' actually mean SELECTIVE (drug retained, CSF water drained)? Or does it mean SLOWED DRAINAGE (everything retained proportionally)? Hydrodynamic alone slows drainage for everything — is that 'selective'? Answer: NO — hydrodynamic alone is not selective, it's just slower drainage."
+  ],
+
+  "critical_assessment_for_ceo_directive": {
+    "ceo_concern": "Do not let #2 become an endless simulation refinement branch.",
+    "current_state_assessment": "#2 has had 4 simulation iterations (V17, V18, V21, FOULING_V1) without a pre-registered buyer threshold. The V21 verdict is inflated. The crux question (does multi-mechanism achieve selective retention across all payload classes) is answerable with ONE additional minimal simulation that (a) re-runs the V18 retention model with proper Pareto comparison, (b) adds patient variability sweep, (c) adds 180-day durability check. NO new mechanisms need to be simulated.",
+    "path_to_closure": "Run minimal crux simulation (1-2 hours compute), pre-register buyer threshold NOW, hostile attacks on the result, then FINAL ADJUDICATION in this session. NO further simulation after this session — verdict is FINAL."
+  },
+
+  "evidence_honesty_labels": {
+    "all_simulation_results": "MODEL_DERIVED — all V17/V18/V21 results are model-derived from a simplified first-order washout model with engineering-estimated parameters (ret_eff, degr, drain). No in-vitro or in-vivo validation exists. The simulation is sufficient to answer the architectural crux question (does multi-mechanism Pareto-dominate single mechanism across payloads) but NOT sufficient to predict clinical performance.",
+    "prior_art_search_completeness": "PARTIAL — PatSnap BLOCKED for entire #2 retention effort; 44/48 semantic similar NOT claim-checked; foreign patents NOT audited."
+  }
+}

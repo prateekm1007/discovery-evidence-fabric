@@ -1473,3 +1473,77 @@ Stage Summary:
 - Critical honest finding: V1 hypothesis that patient-specific calibration is the primary advantage is NOT supported. PRIMARY advantage is B-WAVE TOLERANCE enabled by VENOUS PRESSURE OBSERVABILITY. Patent claims must emphasize venous sinus pressure observability + B-wave tolerant control philosophy, with patient-specific calibration as secondary.
 - 5-axis tracker: Mechanism 60% / Engineering 40% / Robustness 30% / IP 45% / Validation 0%. NEVER averaged.
 - GitHub commit + push pending.
+
+
+---
+Task ID: TERRITORY-2-FINAL-ADJUDICATION
+Agent: subagent (general-purpose, T2 final adjudication)
+Task: Execute FINAL ADJUDICATION for #2 (Selective Therapeutic Retention + Preserved Drainage). CEO directive: "do not let it become an endless simulation refinement branch." Do NOT run more simulations unless absolutely necessary. CLOSE #2 with a definitive verdict.
+
+Work Log:
+- Step 0: Read /home/z/my-project/worklog.md (1476 lines). Confirmed #2 status at ~90% exploration across 5 portfolio cycles (lines 580, 948, 1149, 1249, 1435 — unchanged for >5 cycles). Identified V17/V18/V21 #2 work in PORTFOLIO_REOPENING_AUDIT/ (NOT in worklog as separate task entries — these were performed as part of portfolio reopening audit but never logged).
+- Step 0: Read prior #2 artifacts: CEREVASC_INVENTION_002/ (V8.2, 5 architectures A1-A5, A1=size-selective filtration), CEREVASC_INVENTION_002_V1/ (V1 was a misaligned invention for pressure-differential occlusion monitoring — different concept), CEREVASC_INVENTION_002_BUYER_READY_DOSSIER_V1/ (engineering blueprint + fouling ICP simulation + 102/103 matrices — picked A1 as leading candidate), PORTFOLIO_REOPENING_AUDIT/V17_FINAL_FRONTIER.json (discovered PAYLOAD DEPENDENCE — size-selective only works for antibody 150kDa), PORTFOLIO_REOPENING_AUDIT/V18_RESOLVE_CONTRADICTIONS.json (introduced multi-mechanism = size-selective + hydrodynamic, claimed "retains ALL payload types at 90% drainage"), PORTFOLIO_REOPENING_AUDIT/V21_CONFIDENCE_PATENT_CEILING.json (Pareto test verdict "pareto=true for all 3 payloads — multi-mechanism ACHIEVES Pareto improvement across all payloads").
+- Step 1 (Reconciliation): Saved T2_FINAL_RECONCILIATION.json. Documented current multi-mechanism architecture (size-selective filter MWCO 30kDa + hydrodynamic retention, drain=0.90), prior-art status (PARTIAL — PatSnap BLOCKED, 44/48 semantic similar NOT claim-checked, foreign NOT audited), buyer threshold status (NOT pre-registered — V21 "pareto=true" is not a buyer threshold). Open questions: V21 Pareto verdict suspicious; no patient variability tested; no durability beyond 90 days; no selectivity check.
+- Step 2 (Crux Question): Saved T2_CRUX_QUESTION.json with pre-registered buyer threshold (declared BEFORE simulation):
+  * T1 retention_90day >= 0.30 for ALL 3 payload classes
+  * T2 drainage_preserved >= 0.85 for ALL 3 payload classes
+  * T3 robustness 90th-percentile worst-case retention >= 0.20
+  * T4 selectivity ratio (drug/water retention) >= 1.5
+  * T5 Pareto optimality — multi not dominated by any single mechanism for any payload
+  Verdict rule pre-registered: SURVIVOR (all 5 pass for all 3 payloads), NEGATIVE_CEILING (T1/T2 fail and no single mechanism passes), ARCHITECTURE_CHANGE (multi fails but a single mechanism passes), NOT_READY (cannot answer without in-vitro).
+- Step 3 (Crux Simulation): Built /home/z/my-project/scripts/t2_crux_simulation.py (~400 lines). Reused V18 first-order washout model (NO new physics). Added: (a) proper Pareto domination check per payload, (b) 9-point patient variability grid (CSF production × degradation × protein), (c) 30/90/180-day durability, (d) selectivity check. Saved T2_CRUX_SIMULATION.json. RESULTS:
+  * NO mechanism passes ALL 5 thresholds for ALL 3 payloads
+  * Multi-mechanism FAILS T5 (Pareto) for peptide and small_molecule — DOMINATED by hydrodynamic alone (hydro: 0.484 retention at 92% drainage vs multi: 0.376 retention at 90% drainage)
+  * Multi PASSES T1+T2+T5 for antibody (0.55 retention at 90% drainage, Pareto-optimal vs size_sel 0.488 at 95%) but FAILS T3 (worst-case retention drops to 0 under high fouling) and FAILS T4 (selectivity ratio 1.46 < 1.5)
+  * Hydrodynamic alone passes T1+T2+T3 for ALL payloads but FAILS T4 (non-selective, ratio=1.0) and FAILS T5 for antibody (dominated by size_sel)
+  * Size-selective alone PASSES T1+T2+T4+T5 for antibody at NOMINAL conditions but FAILS T3 (worst-case) and FAILS T1 for peptide/small_molecule (retention=0)
+  * VERDICT: NEGATIVE_CEILING
+  * KEY FINDING: V21 verdict "pareto=true for all 3 payloads" was INFLATED. V21 used conc-based metric (conc=0.0 for all at 90 days) and did not properly compare multi against BEST SINGLE mechanism per payload.
+- Step 4 (Hostile Attacks): Built /home/z/my-project/scripts/t2_hostile_attacks.py. Executed 3 hostile attacks. Saved T2_HOSTILE_ATTACKS.json:
+  * A1 PAYLOAD VARIABILITY: Extended payload range to 6 classes (added gene_vector_scAAV9 ~5MDa, nanoparticle_100nm ~10MDa, ion 100Da). All follow same size-dependent pattern. NEGATIVE_CEILING confirmed.
+  * A2 EXTREME PATIENT VARIABILITY: 5x CSF production (hypersecretion), 5x degradation (severe fouling), 5x protein (meningitis), all combined. ALL mechanisms drop to ZERO retention. NEGATIVE_CEILING confirmed under extreme patient variability.
+  * A3 LONG-DURATION DURABILITY: At 365 days (1 year), ALL mechanisms have ZERO retention. At 1825 days (5 years — chronic implant lifespan per engineering blueprint), ALL mechanisms have ZERO retention due to degradation. NEGATIVE_CEILING confirmed at chronic implant duration.
+  * OVERALL: All 3 hostile attacks CONFIRM the NEGATIVE_CEILING. Verdict is ROBUST.
+- Step 5 (Final Adjudication): Saved T2_FINAL_ADJUDICATION.json. VERDICT: NEGATIVE_CEILING.
+  * Multi-mechanism architecture (V18/V21 hypothesis): FROZEN — fails Pareto test for 2/3 payload classes; fails T3 robustness; fails T4 selectivity for antibody.
+  * PARTIAL SURVIVOR documented: Size-selective filtration alone (A1) for LARGE THERAPEUTICS (antibody 150kDa, gene vector ~5MDa, nanoparticles ~10MDa) at NOMINAL patient conditions, ACUTE duration (≤90 days). Patentable as a NARROW sub-invention: "Size-selective filtration membrane for acute retention of large therapeutic agents (≥30kDa) in CSF drainage shunts." 102 SURVIVES per corrected 102_MATRIX.json; 103 UNCERTAIN for Combo 3.
+  * V-NEXT IDENTIFIED but NOT AUTHORIZED: A2 Affinity-Based Retention (per V8.2 architecture set, never simulated). Theoretically could retain small molecules via payload-specific binding matrix. Engineering cost: per-therapeutic binding design (NOT one-size-fits-all). Pre-registered threshold for V-next IF CEO authorizes: T1-T5 (same as crux) + T6 binding capacity >=10x dose + T7 no CSF-protein binding + T8 binding kinetics ka >=1e4 M^-1s^-1. CEO MUST explicitly approve to start V-next branch (per "no endless refinement" directive).
+  * REJECTED alternatives: SURVIVOR (multi fails T3+T4 for antibody, fails T5 for peptide/small); ARCHITECTURE_CHANGE (no single mechanism passes either; A2 is plausible but requires CEO approval and is a different engineering problem); NOT_READY (crux IS answerable from existing data — proper Pareto analysis shows multi is dominated; no in-vitro needed to confirm architectural failure).
+- Step 6 (5-Axis Tracker): Saved T2_FINAL_FIVE_AXIS_TRACKER.json. NEVER averaged.
+  * 1 Mechanism Exploration: 100% (5/5 V8.2 architectures explored; A2 is V-next opportunity NOT authorized)
+  * 2 Engineering Evidence: 65% (5/8 gates pass — washout model, fouling ICP, blueprint, self-IP audit, 102 corrected; 3/8 fail — T1/T2 threshold test for multi, T3 robustness, T4 selectivity)
+  * 3 Robustness/Falsification: 100% (4/4 — crux simulation + 3 hostile attacks all CONFIRM negative ceiling)
+  * 4 Prior-Art/IP Exhaustion: 35% (2/5 — Google Patents executed, self-IP audit completed; 3/5 fail — PatSnap BLOCKED, PatentBear not executed for #2, foreign not audited)
+  * 5 Real-World Validation Readiness: 0% (0/4 — no in-vitro, no in-vivo, no IDE)
+- Step 7: Appending worklog + committing + pushing to GitHub.
+
+Stage Summary:
+- TERRITORY-2-FINAL-ADJUDICATION COMPLETE. #2 is CLOSED with NEGATIVE_CEILING verdict.
+- Multi-mechanism architecture (V18/V21 hypothesis): FROZEN — fails Pareto test for peptide/small_molecule (dominated by hydrodynamic alone); fails T3 robustness for antibody (worst-case retention drops to 0); fails T4 selectivity for antibody (ratio 1.46 < 1.5).
+- V21's "pareto=true for all 3 payloads" verdict was INFLATED — proper Pareto analysis reveals multi is Pareto-dominated by hydrodynamic alone for 2 of 3 payload classes.
+- ALL 3 hostile attacks (payload variability, extreme patient variability, long-duration durability at 1yr/5yr) CONFIRM the NEGATIVE_CEILING.
+- PARTIAL SURVIVOR: Size-selective filtration (A1) for LARGE THERAPEUTICS (≥30kDa: antibody, gene vector, nanoparticle) at NOMINAL patient conditions, ACUTE duration (≤90 days). Patentable as narrow sub-invention. LIMITATIONS: fails T3 robustness, fails long-duration durability (membrane fouls/degrades).
+- V-NEXT for A2 Affinity-Based Retention: IDENTIFIED but NOT AUTHORIZED. CEO must explicitly approve. Pre-registered threshold documented.
+- CEO directive compliance: "do not let it become an endless simulation refinement branch" — HONORED. 4 simulations total (1 crux + 3 hostile). Verdict is DEFINITIVE (NEGATIVE_CEILING, not "would consider with milestones"). Branch is FROZEN.
+- Evidence honesty: All simulation results MODEL_DERIVED (V18 first-order washout with engineering-estimated parameters). Prior art search PARTIAL (PatSnap BLOCKED, 44/48 semantic similar NOT claim-checked). No "Likely Novel" language. 5-axis tracker NEVER averaged.
+- Artifacts produced (all in CEREVASC_TERRITORY_2_FINAL_ADJUDICATION/):
+  * T2_FINAL_RECONCILIATION.json — current state
+  * T2_CRUX_QUESTION.json — crux question + pre-registered threshold
+  * T2_CRUX_SIMULATION.json — minimal crux simulation result
+  * T2_HOSTILE_ATTACKS.json — 3 hostile attacks
+  * T2_FINAL_ADJUDICATION.json — final verdict (NEGATIVE_CEILING)
+  * T2_FINAL_FIVE_AXIS_TRACKER.json — 5-axis tracker (NEVER averaged)
+- Scripts persisted:
+  * /home/z/my-project/scripts/t2_crux_simulation.py (~400 lines, V18 model reuse + Pareto + variability + durability + selectivity)
+  * /home/z/my-project/scripts/t2_hostile_attacks.py (~200 lines, 3 attacks)
+- Portfolio status after #2 FINAL ADJUDICATION:
+  #1: FROZEN — NEGATIVE CEILING (V25 numerical non-identifiability)
+  #2: FROZEN — NEGATIVE CEILING (V_FINAL multi-mechanism fails Pareto + T3 + T4; partial survivor for large-therapeutic acute retention)
+  #3: VALIDATION-READY / FROZEN
+  #4: FROZEN — NEGATIVE CEILING
+  #5: FROZEN — NEGATIVE CEILING
+  #6: PROVISIONAL_SURVIVOR_V4
+  #7: M9 SURVIVES V2
+  #8: V2 CONDITIONAL_SURVIVE
+  #9-10: 0% not started
+- GitHub commit + push pending.

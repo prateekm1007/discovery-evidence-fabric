@@ -1,0 +1,86 @@
+{
+  "task_id": "TERRITORY-2-FINAL-ADJUDICATION",
+  "step": "STEP_2_CRUX_QUESTION",
+  "timestamp": "2026-08-18T06:01:00+00:00",
+  "ceo_directive_recall": "#2 should continue in parallel, but do not let it become an endless simulation refinement branch.",
+
+  "crux_question_single_sentence": "Does the multi-mechanism architecture (size-selective filter + hydrodynamic retention) achieve the pre-registered buyer threshold of ≥30% therapeutic retention at 90 days AND ≥85% drainage preservation, for ALL THREE payload classes (antibody 150 kDa, peptide 5 kDa, small molecule 500 Da), ROBUSTLY across patient variability (CSF production rate ±2×, degradation rate ±2×)?",
+
+  "crux_question_decomposed": {
+    "Q_A_threshold_achievement": "For each payload class (antibody, peptide, small_molecule), does multi-mechanism achieve (a) retention_90day ≥ 0.30 AND (b) drainage_preserved ≥ 85%?",
+    "Q_B_pareto_optimality": "For each payload class, is multi-mechanism Pareto-optimal (i.e., NOT dominated by any single mechanism — size_sel alone, hydrodynamic alone, or mechanical_valve alone)?",
+    "Q_C_robustness": "Does the threshold achievement hold at the WORST-CASE patient variability (90th percentile), not just the nominal case?",
+    "Q_D_selectivity": "Does the architecture actually achieve SELECTIVE retention (drug retained while CSF water drains) — or is the apparent retention just slower drainage that retains everything proportionally (which is NOT selective and provides no therapeutic advantage)?"
+  },
+
+  "why_this_is_the_crux": {
+    "rationale": "The V18/V21 work claims multi-mechanism is the strongest architecture for payload diversity. The V21 verdict 'pareto=true for all payloads' is what supports continuing #2 as a SURVIVOR. If the crux question's answer is YES (multi achieves threshold for all payloads, robustly, and is Pareto-optimal), then #2 is a SURVIVOR. If NO, then #2 is either a NEGATIVE_CEILING (no architecture can do it) or an ARCHITECTURE_CHANGE (multi fails but a different mechanism could succeed).",
+    "what_one_question_determines_verdict": "Does multi-mechanism Pareto-dominate hydrodynamic alone for peptide and small_molecule payloads? V18 data shows hydrodynamic alone achieves 0.484 retention at 92% drainage for peptide/small_molecule, while multi achieves 0.376 retention at 90% drainage. Hydrodynamic alone STRICTLY DOMINATES multi for these payloads. If this holds under patient variability, multi-mechanism is INFLATED and #2 must be adjudicated NEGATIVE_CEILING or ARCHITECTURE_CHANGE."
+  },
+
+  "pre_registered_buyer_threshold": {
+    "declared_before_simulation": true,
+    "timestamp_declared": "2026-08-18T06:01:00+00:00",
+    "thresholds": {
+      "T1_retention_90day": {
+        "target": ">=0.30 (30% of initial therapeutic concentration retained at 90 days)",
+        "failure": "<0.20 (less than 20% retained — clinically marginal)",
+        "applies_to": "ALL payload classes (antibody, peptide, small_molecule) — must hold for ALL, not just one",
+        "rationale": "30% retention at 90 days corresponds to ~2.5x increase over no-shunt baseline washout (which yields ~12% at 90 days per WASHOUT_MODEL.json). Below 20% retention, the washout problem is not materially solved."
+      },
+      "T2_drainage_preserved": {
+        "target": ">=0.85 (85% of baseline CSF drainage preserved)",
+        "failure": "<0.80 (less than 80% drainage — risk of ICP elevation per FOULING_ICP_SIMULATION.json which shows 50% fouling = 50% drainage drop = 6 mmHg pressure = HIGH ICP risk)",
+        "applies_to": "ALL payload classes",
+        "rationale": "Hydrocephalus drainage is the primary indication for eShunt. If retention mechanism reduces drainage below 85%, the patient is at ICP risk. 85% is the lowest defensible clinical minimum."
+      },
+      "T3_robustness_90th_percentile": {
+        "target": "Retention at 90th-percentile worst-case patient variability >=0.20 for ALL payload classes",
+        "failure": "<0.15 at 90th percentile",
+        "patient_variability_axes": [
+          "CSF production rate: 0.5x to 2x nominal (21 mL/hr) — clinical range per WASHOUT_MODEL.json",
+          "Degradation rate (membrane fouling / hydrodynamic resistance increase): 0.5x to 2x nominal — clinical range per FOULING_ICP_SIMULATION.json (50% fouling at 90d is realistic)",
+          "Protein concentration in CSF: 0.5x to 2x nominal (affects fouling rate)"
+        ],
+        "rationale": "Patient variability is wide. A mechanism that works only at nominal conditions is not clinically viable."
+      },
+      "T4_selectivity": {
+        "target": "Multi-mechanism achieves retention ratio (drug_retention / water_retention) > 1.5 for at least 2 of 3 payload classes",
+        "failure": "Ratio <= 1.2 — mechanism is just slowing drainage non-selectively",
+        "rationale": "'SELECTIVE retention' means drug is retained more than water. If a mechanism slows drainage for everything proportionally (e.g., hydrodynamic alone), it is NOT selective — it just reduces drainage."
+      },
+      "T5_pareto_optimality": {
+        "target": "Multi-mechanism is Pareto-optimal (not dominated by any single mechanism) for ALL 3 payload classes",
+        "failure": "Multi is dominated by any single mechanism for ANY payload class",
+        "rationale": "If multi is dominated by a single mechanism for any payload class, then the added complexity (size-selective filter + hydrodynamic in series) is not justified — the simpler single mechanism is strictly better. This is the anti-inflation check on V21's 'pareto=true' verdict."
+      }
+    },
+    "verdict_rule_pre_registered": {
+      "SURVIVOR": "All 5 thresholds (T1-T5) PASS for ALL 3 payload classes → multi-mechanism is the load-bearing invention.",
+      "NEGATIVE_CEILING": "T1 or T2 FAILS for any payload class AND no alternative single mechanism achieves both thresholds → architecture cannot solve the problem; freeze with documented negative ceiling.",
+      "ARCHITECTURE_CHANGE": "Multi fails T5 (Pareto) for some payload classes but a DIFFERENT mechanism (e.g., A2 affinity-based, A3 reversible flow interruption) could plausibly achieve both thresholds → identify new mechanism, authorize V-next.",
+      "NOT_READY": "Critical question cannot be answered without in-vitro data (e.g., actual membrane retention efficiencies are unknown to ±30pp) → identify specific milestone required."
+    },
+    "anti_inflation_commitments": [
+      "Threshold declared BEFORE Step 3 simulation (this file is timestamped before T2_CRUX_SIMULATION.json).",
+      "T1-T5 must hold for ALL 3 payload classes, not aggregate.",
+      "T4 selectivity check explicitly distinguishes 'selective' from 'slower drainage'.",
+      "T5 Pareto check uses PROPER pairwise domination (multi must not be dominated by ANY single mechanism for ANY payload class).",
+      "Worst-case (90th percentile) — not nominal — must satisfy T1-T2.",
+      "NO use of 'LIKELY_NOVEL' or 'pareto=true' without numeric domination proof."
+    ]
+  },
+
+  "minimal_simulation_required_to_answer_crux": {
+    "scope": "Re-run V18 retention model with PROPER Pareto comparison + patient variability sweep + 180-day durability check.",
+    "what_is_minimal": "Single Python script, <300 lines, runtime <60 seconds. Reuses V18's first-order washout model (no new physics). Adds: (1) explicit Pareto domination check per payload class, (2) 9-point patient variability grid per payload class (3 axes × 3 levels = 9 cases, take 90th percentile worst), (3) 30/90/180-day durability.",
+    "what_is_excluded": "No CFD. No finite element analysis. No multi-physics coupling. No in-vitro correlation. No Monte Carlo over continuous parameter space (just 9-point grid).",
+    "expected_outcome_per_V18_data": "Multi-mechanism will PASS T1 (retention >=0.30) for all payloads at nominal. Multi will PASS T2 (drainage >=85%) for all payloads. Multi will FAIL T5 (Pareto) for peptide and small_molecule because hydrodynamic alone (0.484, 92%) dominates multi (0.376, 90%). Verdict will likely be NEGATIVE_CEILING for multi-mechanism, with size-selective alone as a partial SURVIVOR for large payloads (antibody only)."
+  },
+
+  "what_would_change_my_verdict": {
+    "if_V18_numbers_are_wrong": "If a corrected simulation shows multi achieves >=0.50 retention for peptide/small_molecule at >=90% drainage (i.e., the V18 multi retention calculation is too conservative), the verdict could flip to SURVIVOR.",
+    "if_pareto_definition_differs": "If buyer accepts 'Pareto-optimal for at least one payload class' rather than 'for ALL payload classes', then multi could survive as the antibody-specific architecture. But CEO directive 'do not let #2 become endless refinement' suggests we should not narrow the claim post-hoc to antibody-only.",
+    "if_hydrodynamic_is_prior_art": "If hydrodynamic retention alone is fully disclosed in prior art (e.g., generic flow-restriction valve), then hydrodynamic cannot be patented alone and multi-mechanism is the only novel combination — even if dominated by hydrodynamic alone, multi could be SURVIVOR if the buyer accepts 'slightly worse performance but patentable'. This is a patent-vs-engineering tradeoff that should be escalated to counsel."
+  }
+}
