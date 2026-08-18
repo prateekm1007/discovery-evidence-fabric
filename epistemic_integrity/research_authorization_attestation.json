@@ -1,42 +1,47 @@
 {
   "authorization": "RED",
-  "attestation_id": "AUTH-20260818T200539Z",
-  "commit_sha": "6f17a7be568f6cf514be14074588ae06359ccfb9",
-  "root_state_hash": "39c9b829be97fbda",
-  "evidence_root_hash": "6be9cfe5adbe6c7d",
-  "binding_root_hash": "499d050ceb8672c4",
-  "ledger_root_hash": "1f47f3b19d2876cd",
-  "gauntlet_root_hash": "6f8b000b4cbc4c06",
-  "verifier_version": "v7",
-  "schema_version": "2.0.0",
-  "timestamp": "2026-08-18T20:05:39.528029+00:00",
-  "expires": "2026-08-18T23:59:39.528032+00:00",
+  "attestation_id": "AUTH-20260818T201506Z",
+  "commit_sha": "a6c596be6bc477db974bb0b1baf1615130168b9b",
+  "worktree_clean": false,
+  "root_manifest_hash": "2dee4dfd3af953df84REDACTED-SCOPUS-PATTERN-MATCH",
+  "verifier_version": "v8",
+  "schema_version": "3.0.0",
+  "timestamp": "2026-08-18T20:15:06.829381+00:00",
   "checks": [
     {
-      "check_id": "G1",
-      "check_name": "preflight_fresh",
+      "check_id": "G0",
+      "check_name": "worktree_clean",
       "passed": false,
-      "details": "0 P0 + 1 P1 failures (need 0+0)",
-      "git_head": "6f17a7be568f6cf514be14074588ae06359ccfb9",
-      "verifier_version": "v7",
-      "schema_version": "2.0.0",
-      "timestamp": "2026-08-18T20:05:39.218073+00:00",
+      "details": "Git worktree has unexpected uncommitted changes \u2014 certification cannot proceed",
+      "git_head": "a6c596be6bc477db974bb0b1baf1615130168b9b",
+      "verifier_version": "v8",
+      "schema_version": "3.0.0",
+      "timestamp": "2026-08-18T20:15:03.913305+00:00",
+      "raw_result": {}
+    },
+    {
+      "check_id": "G1",
+      "check_name": "preflight_fresh_isolated",
+      "passed": false,
+      "details": "P0=0 P1=1",
+      "git_head": "a6c596be6bc477db974bb0b1baf1615130168b9b",
+      "verifier_version": "v8",
+      "schema_version": "3.0.0",
+      "timestamp": "2026-08-18T20:15:03.991644+00:00",
       "raw_result": {
-        "p0_failures": 0,
-        "p1_failures": 1,
-        "passed": 14,
-        "total": 15
+        "p0": 0,
+        "p1": 1
       }
     },
     {
       "check_id": "G2",
-      "check_name": "gauntlet_h1_h18_fresh",
+      "check_name": "gauntlet_v1_fresh_isolated",
       "passed": true,
       "details": "18/18 blocked",
-      "git_head": "6f17a7be568f6cf514be14074588ae06359ccfb9",
-      "verifier_version": "v7",
-      "schema_version": "2.0.0",
-      "timestamp": "2026-08-18T20:05:39.252548+00:00",
+      "git_head": "a6c596be6bc477db974bb0b1baf1615130168b9b",
+      "verifier_version": "v8",
+      "schema_version": "3.0.0",
+      "timestamp": "2026-08-18T20:15:04.088753+00:00",
       "raw_result": {
         "blocked": 18,
         "total": 18
@@ -44,78 +49,70 @@
     },
     {
       "check_id": "G3",
-      "check_name": "gauntlet_h19_h32_fresh",
+      "check_name": "gauntlet_v2_fresh_isolated",
       "passed": true,
-      "details": "14/14 blocked, 14 use real evidence",
-      "git_head": "6f17a7be568f6cf514be14074588ae06359ccfb9",
-      "verifier_version": "v7",
-      "schema_version": "2.0.0",
-      "timestamp": "2026-08-18T20:05:39.311064+00:00",
+      "details": "14/14 blocked",
+      "git_head": "a6c596be6bc477db974bb0b1baf1615130168b9b",
+      "verifier_version": "v8",
+      "schema_version": "3.0.0",
+      "timestamp": "2026-08-18T20:15:04.306958+00:00",
       "raw_result": {
         "blocked": 14,
         "total": 14,
-        "real_evidence": 14
+        "real": 14
       }
     },
     {
       "check_id": "G4",
-      "check_name": "state_reconciliation_fresh",
+      "check_name": "state_reconciliation_exact",
       "passed": false,
-      "details": "11 discrepancies (need 0)",
-      "git_head": "6f17a7be568f6cf514be14074588ae06359ccfb9",
-      "verifier_version": "v7",
-      "schema_version": "2.0.0",
-      "timestamp": "2026-08-18T20:05:39.319047+00:00",
-      "raw_result": {
-        "passed": 5,
-        "failed": 11
-      }
+      "details": "10 discrepancies: ['CV-T01: not in ledger (canonical=FROZEN_NEGATIVE_CEILING)', 'CV-T02: not in ledger (canonical=FROZEN_NEGATIVE_CEILING)', 'CV-T03: not in ledger (canonical=VALIDATION_READY_FROZEN)']",
+      "git_head": "a6c596be6bc477db974bb0b1baf1615130168b9b",
+      "verifier_version": "v8",
+      "schema_version": "3.0.0",
+      "timestamp": "2026-08-18T20:15:04.310218+00:00",
+      "raw_result": {}
     },
     {
       "check_id": "G5",
-      "check_name": "canonical_state_fresh",
-      "passed": true,
-      "details": "11 territories, internally consistent",
-      "git_head": "6f17a7be568f6cf514be14074588ae06359ccfb9",
-      "verifier_version": "v7",
-      "schema_version": "2.0.0",
-      "timestamp": "2026-08-18T20:05:39.319182+00:00",
+      "check_name": "canonical_from_ledger",
+      "passed": false,
+      "details": "State transition ledger not found",
+      "git_head": "a6c596be6bc477db974bb0b1baf1615130168b9b",
+      "verifier_version": "v8",
+      "schema_version": "3.0.0",
+      "timestamp": "2026-08-18T20:15:04.310259+00:00",
       "raw_result": {}
     },
     {
       "check_id": "G6",
       "check_name": "credential_scan_fresh",
       "passed": false,
-      "details": "Git history scan: CREDENTIALS_AND_MODELS.md in history",
-      "git_head": "6f17a7be568f6cf514be14074588ae06359ccfb9",
-      "verifier_version": "v7",
-      "schema_version": "2.0.0",
-      "timestamp": "2026-08-18T20:05:39.387844+00:00",
-      "raw_result": {
-        "keys_found": 0,
-        "cred_file_in_history": true
-      }
+      "details": "Git history scan: 4 keys found, CREDENTIALS_AND_MODELS.md in history",
+      "git_head": "a6c596be6bc477db974bb0b1baf1615130168b9b",
+      "verifier_version": "v8",
+      "schema_version": "3.0.0",
+      "timestamp": "2026-08-18T20:15:06.758231+00:00",
+      "raw_result": {}
     },
     {
       "check_id": "G7",
-      "check_name": "production_claims_fresh",
+      "check_name": "golden_corpus",
       "passed": true,
-      "details": "0 admitted, 44 correctly rejected out of 44",
-      "git_head": "6f17a7be568f6cf514be14074588ae06359ccfb9",
-      "verifier_version": "v7",
-      "schema_version": "2.0.0",
-      "timestamp": "2026-08-18T20:05:39.527650+00:00",
-      "raw_result": {
-        "admitted": 0,
-        "rejected": 44,
-        "total": 44
-      }
+      "details": "6/6 claims correctly adjudicated",
+      "git_head": "a6c596be6bc477db974bb0b1baf1615130168b9b",
+      "verifier_version": "v8",
+      "schema_version": "3.0.0",
+      "timestamp": "2026-08-18T20:15:06.829007+00:00",
+      "raw_result": {}
     }
   ],
   "blocking_reasons": [
-    "G1 PREFLIGHT: 0 P0 + 1 P1 failures (need 0+0)",
-    "G4 STATE_RECONCILIATION: 11 discrepancies (need 0)",
-    "G6 CREDENTIAL_HISTORY: Git history scan: CREDENTIALS_AND_MODELS.md in history"
+    "G0 WORKTREE: dirty worktree \u2014 cannot certify",
+    "G1 PREFLIGHT: P0=0 P1=1",
+    "G4 STATE_RECONCILIATION: 10 discrepancies: ['CV-T01: not in ledger (canonical=FROZEN_NEGATIVE_CEILING)', 'CV-T02: not in ledger (canonical=FROZEN_NEGATIVE_CEILING)', 'CV-T03: not in ledger (canonical=VALIDATION_READY_FROZEN)']",
+    "G5 CANONICAL_FROM_LEDGER: State transition ledger not found",
+    "G6 CREDENTIAL_HISTORY: Git history scan: 4 keys found, CREDENTIALS_AND_MODELS.md in history"
   ],
-  "attestation_hash": "58132eb383cdcdc2e1afb7475e3d0a3c106b49529c37522c329ad89872450c52"
+  "attestation_hash": "d16da4b3f17aee62e80953b325410efe8a7463994e422d9d6c27ae8bf8ef0324"
 }

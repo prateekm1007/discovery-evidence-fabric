@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Golden certification corpus with expected verdicts for production claims. Per CEO P0-D: the verifier cannot be both judge AND ground truth. Each claim has an independently determined expected verdict.",
+  "expected_verdicts": [
+    {
+      "claim_id": "CLM-CV-T01-00001",
+      "expected_admitted": false,
+      "expected_reason": "V25 frozen negative ceiling — claim should be blocked because the proposition subject in the claim doesn't match how the subject appears in the V25 evidence JSON",
+      "notes": "The claim declares proposition_subject='impedance_state_separation' but the V25 JSON uses different key naming. The strict proposition verifier correctly catches this mismatch."
+    },
+    {
+      "claim_id": "CLM-CV-T06-00001",
+      "expected_admitted": false,
+      "expected_reason": "M3 claim — subject in proposition doesn't match subject in V6 evidence JSON",
+      "notes": "The claim declares proposition_subject='M3_REFINED' but the V6 JSON doesn't have a key path that infers 'M3REFINED' as subject. The strict verifier catches this."
+    },
+    {
+      "claim_id": "CLM-CV-T06-00002",
+      "expected_admitted": false,
+      "expected_reason": "A4 claim — same subject matching issue as CLM-CV-T06-00001",
+      "notes": "A4_cryo_debonding subject doesn't match evidence JSON structure."
+    },
+    {
+      "claim_id": "CLM-CV-T07-00001",
+      "expected_admitted": false,
+      "expected_reason": "M9 embolization claim — subject matching issue",
+      "notes": "M9_PLGA_sleeve subject doesn't match evidence JSON structure."
+    },
+    {
+      "claim_id": "CLM-CV-T08-00001",
+      "expected_admitted": false,
+      "expected_reason": "REM coverage claim — value 100.0 not found in claim text",
+      "notes": "TEXT_PROPOSITION_MISMATCH: claim text says '100%' but proposition_value is '100.0' which doesn't appear in text."
+    },
+    {
+      "claim_id": "CLM-CV-T08-00002",
+      "expected_admitted": false,
+      "expected_reason": "VIEshunt SECONDARY_REPORTED — blocked because source verification states (content_verified, support_verified) are not yet set to true by the system",
+      "notes": "The source has valid content and hashes, but the three-state verification (identity/content/support) requires all three to be explicitly verified. Currently only identity is verified (INTERNAL_ANALYSIS type). Content and support states are false until the system explicitly sets them."
+    }
+  ],
+  "total_expected": 6,
+  "expected_admitted_count": 0,
+  "expected_blocked_count": 6,
+  "certification_rule": "The gate compares actual_verdict vs expected_verdict for each claim. ALL must match for G7 to PASS. The verifier is NOT self-approving — the golden corpus is the independent ground truth."
+}
