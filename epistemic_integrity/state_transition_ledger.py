@@ -28,21 +28,34 @@ from datetime import datetime, timezone
 
 @dataclass
 class StateTransition:
-    """A single immutable state transition. Once written, NEVER modified."""
+    """A single immutable state transition. Once written, NEVER modified.
+
+    Per CEO v22 P0-2: Bootstrap transitions (BOOTSTRAPPED_FROM_CANONICAL_STATE)
+    are explicitly marked and CANNOT satisfy dossier evidence requirements.
+    Only EVIDENCE_BACKED transitions can.
+
+    Per CEO v22 P0-3: Ledger topology is ONE GLOBAL APPEND-ONLY CHAIN.
+    All transitions across all territories are chained together in a single
+    global sequence. This is enforced by previous_transition_hash linking
+    each transition to the immediately preceding one (regardless of territory).
+    """
     transition_id: str                          # ST-CV-T<territory>-<seq>
     territory_id: str
     from_state: Optional[str]                   # None for initial
     to_state: str
     artifact_id: str                            # e.g., "CV-T06-V6"
     artifact_version: str                       # e.g., "V6"
-    commit_sha: str                             # git commit containing the artifact
+    commit_sha: str                             # Full 40-char git commit hash
     created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     reason: str = ""
     effective: bool = True                      # only latest per territory is effective
 
-    # Cryptographic chain (P0-C)
-    previous_transition_hash: Optional[str] = None  # SHA256 of previous transition
-    artifact_hash: Optional[str] = None             # SHA256 of artifact content
+    # P0-2: Transition type — BOOTSTRAPPED vs EVIDENCE_BACKED
+    transition_type: str = "BOOTSTRAPPED_FROM_CANONICAL_STATE"  # or "EVIDENCE_BACKED"
+
+    # Cryptographic chain (P0-3: ONE GLOBAL chain)
+    previous_transition_hash: Optional[str] = None  # SHA256 of previous transition (global, not per-territory)
+    artifact_hash: Optional[str] = None             # SHA256 of artifact content (MUST be non-null for EVIDENCE_BACKED)
     state_hash: Optional[str] = None                # SHA256(to_state + artifact_id + version)
 
     @property
@@ -57,11 +70,16 @@ class StateTransition:
             "artifact_version": self.artifact_version,
             "commit_sha": self.commit_sha,
             "created_at": self.created_at,
+            "transition_type": self.transition_type,
             "previous_transition_hash": self.previous_transition_hash,
             "artifact_hash": self.artifact_hash,
             "state_hash": self.state_hash,
         }, sort_keys=True)
         return hashlib.sha256(content.encode()).hexdigest()
+
+    def is_evidence_backed(self) -> bool:
+        """P0-2: Only EVIDENCE_BACKED transitions can satisfy dossier requirements."""
+        return self.transition_type == "EVIDENCE_BACKED" and self.artifact_hash is not None
 
 
 class StateTransitionLedger:
@@ -109,24 +127,25 @@ class StateTransitionLedger:
         commit_sha: str,
         reason: str,
         artifact_hash: Optional[str] = None,
+        transition_type: str = "BOOTSTRAPPED_FROM_CANONICAL_STATE",
     ) -> StateTransition:
         """Append a new transition. NEVER modifies existing transitions.
 
-        Per CEO P0-C: the previous transition is NOT mutated. Instead:
-          1. New transition is created with previous_transition_hash
-          2. The new transition's effective=True
-          3. Previous transitions remain in the ledger with their original effective value
-          4. get_current_transition() returns the latest effective one
+        P0-3: Global chain — each transition chains to the immediately
+        preceding transition (regardless of territory), forming ONE global
+        append-only chain.
+
+        P0-2: transition_type must be BOOTSTRAPPED_FROM_CANONICAL_STATE
+        or EVIDENCE_BACKED. Only EVIDENCE_BACKED transitions with non-null
+        artifact_hash can satisfy dossier evidence requirements.
         """
-        # Find current effective transition (for chaining)
+        # Find current effective transition (for this territory)
         current = self.get_current_transition(territory_id)
         from_state = current.to_state if current else None
-        previous_hash = current.transition_hash if current else None
 
-        # Mark previous as ineffective — but do NOT mutate the object
-        # Instead, we track effectiveness by transition order (latest = effective)
-        # The previous transition's `effective` field stays as-is in storage
-        # but get_current_transition() only returns the latest one
+        # P0-3: Global chain — link to the LAST transition written (any territory)
+        all_sorted = sorted(self.transitions.values(), key=lambda t: t.transition_id)
+        previous_hash = all_sorted[-1].transition_hash if all_sorted else None
 
         # Generate transition ID
         existing = sorted([t for t in self.transitions if t.startswith(f"ST-{territory_id}")])
@@ -136,6 +155,13 @@ class StateTransitionLedger:
         # Compute state_hash
         state_content = f"{to_state}:{artifact_id}:{artifact_version}"
         state_hash = hashlib.sha256(state_content.encode()).hexdigest()
+
+        # P0-2: Validate EVIDENCE_BACKED requires artifact_hash
+        if transition_type == "EVIDENCE_BACKED" and artifact_hash is None:
+            raise ValueError(
+                f"EVIDENCE_BACKED transition requires non-null artifact_hash. "
+                f"Use BOOTSTRAPPED_FROM_CANONICAL_STATE for historical reconstruction."
+            )
 
         transition = StateTransition(
             transition_id=transition_id,
@@ -147,6 +173,7 @@ class StateTransitionLedger:
             commit_sha=commit_sha,
             reason=reason,
             effective=True,
+            transition_type=transition_type,
             previous_transition_hash=previous_hash,
             artifact_hash=artifact_hash,
             state_hash=state_hash,
@@ -192,48 +219,41 @@ class StateTransitionLedger:
     def verify_chain_integrity(self) -> dict:
         """Verify cryptographic chain integrity.
 
-        Per CEO P0-C: each transition's previous_transition_hash must match
-        the SHA256 of the previous transition.
+        P0-3: ONE GLOBAL chain. Each transition's previous_transition_hash
+        must match the transition_hash of the immediately preceding transition
+        in the global sequence (sorted by transition_id).
         """
         results = {
             "total_transitions": len(self.transitions),
             "verified": 0,
             "failed": 0,
             "failures": [],
+            "topology": "ONE_GLOBAL_CHAIN",
         }
 
-        for transition in self.transitions.values():
-            if transition.previous_transition_hash is None:
-                # Initial transition — no previous to verify
-                results["verified"] += 1
-                continue
+        # Sort ALL transitions globally by transition_id
+        all_sorted = sorted(self.transitions.values(), key=lambda t: t.transition_id)
 
-            # Find the previous transition
-            territory_transitions = [
-                t for t in self.transitions.values()
-                if t.territory_id == transition.territory_id
-            ]
-            territory_transitions.sort(key=lambda t: int(t.transition_id.split("-")[-1]))
-
-            # Find the one immediately before this one
-            idx = next(
-                (i for i, t in enumerate(territory_transitions) if t.transition_id == transition.transition_id),
-                None
-            )
-            if idx is None or idx == 0:
-                results["failed"] += 1
-                results["failures"].append(f"{transition.transition_id}: cannot find position in chain")
-                continue
-
-            prev = territory_transitions[idx - 1]
-            if prev.transition_hash != transition.previous_transition_hash:
-                results["failed"] += 1
-                results["failures"].append(
-                    f"{transition.transition_id}: previous_transition_hash mismatch "
-                    f"(expected {prev.transition_hash[:16]}..., got {transition.previous_transition_hash[:16] if transition.previous_transition_hash else 'None'}...)"
-                )
+        for i, transition in enumerate(all_sorted):
+            if i == 0:
+                # First transition in global chain — no previous
+                if transition.previous_transition_hash is not None:
+                    results["failed"] += 1
+                    results["failures"].append(
+                        f"{transition.transition_id}: first transition should have null previous_hash"
+                    )
+                else:
+                    results["verified"] += 1
             else:
-                results["verified"] += 1
+                prev = all_sorted[i - 1]
+                if transition.previous_transition_hash != prev.transition_hash:
+                    results["failed"] += 1
+                    results["failures"].append(
+                        f"{transition.transition_id}: previous_hash mismatch "
+                        f"(expected {prev.transition_hash[:16]}..., got {transition.previous_transition_hash[:16] if transition.previous_transition_hash else 'None'}...)"
+                    )
+                else:
+                    results["verified"] += 1
 
         results["chain_valid"] = results["failed"] == 0
         return results
