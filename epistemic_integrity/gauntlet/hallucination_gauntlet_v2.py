@@ -59,22 +59,48 @@ class GauntletV2Result:
 
 
 class HallucinationGauntletV2:
-    """H19-H32: Real evidence + subtle semantic mismatch attacks."""
+    """H19-H32: Real evidence + subtle semantic mismatch attacks.
 
-    def __init__(self):
+    P0-A v18: Requires explicit registry_dir parameter. NO production default.
+    """
+
+    def __init__(self, registry_dir: Path = None, canonical_dir: Path = None):
+        """Initialize with ISOLATED registries.
+
+        Args:
+            registry_dir: Required. Temp directory for isolated registries.
+            canonical_dir: Optional. Canonical state directory (read-only).
+        """
+        if registry_dir is None:
+            raise ValueError(
+                "HallucinationGauntletV2 requires explicit registry_dir parameter. "
+                "Gauntlets MUST use isolated temp directories, NEVER production registries."
+            )
         self.results: List[GauntletV2Result] = []
-        # Use firewall's own registries (same instance)
+        self.registry_dir = Path(registry_dir)
+        self.registry_dir.mkdir(parents=True, exist_ok=True)
+
+        claims_dir = self.registry_dir / "approved_claims"
+        evidence_dir = self.registry_dir / "approved_evidence"
+        supersession_dir = self.registry_dir / "approved_provenance"
+        claims_dir.mkdir(parents=True, exist_ok=True)
+        evidence_dir.mkdir(parents=True, exist_ok=True)
+        supersession_dir.mkdir(parents=True, exist_ok=True)
+
+        if canonical_dir is None:
+            canonical_dir = REPO_ROOT / "CANONICAL_STATE"
+
         self.firewall = DossierFirewall(
-            canonical_state_dir=REPO_ROOT / "CANONICAL_STATE",
-            claim_registry_dir=EPISTEMIC_DIR / "approved_claims",
-            evidence_registry_dir=EPISTEMIC_DIR / "approved_evidence",
-            supersession_registry_dir=EPISTEMIC_DIR / "approved_provenance",
+            canonical_state_dir=Path(canonical_dir),
+            claim_registry_dir=claims_dir,
+            evidence_registry_dir=evidence_dir,
+            supersession_registry_dir=supersession_dir,
         )
         self.claim_registry = self.firewall.claim_registry
         self.evidence_binding = self.firewall.evidence_binding
         self.supersession_engine = self.firewall.supersession_engine
 
-        # Load REAL evidence content from artifacts
+        # Load REAL evidence content from artifacts (read-only)
         self._load_real_evidence()
 
     def _load_real_evidence(self):

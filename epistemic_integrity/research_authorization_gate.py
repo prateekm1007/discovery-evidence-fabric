@@ -261,38 +261,22 @@ results = pf.run_all()
 print(json.dumps({{"passed": results["overall_pass"], "details": "P0=" + str(results["p0_failures"]) + " P1=" + str(results["p1_failures"]), "raw": {{"p0": results["p0_failures"], "p1": results["p1_failures"]}}}}))
 ''',
             "gauntlet_v1": '''
-import sys, json, tempfile, os
+import sys, json, tempfile
 sys.path.insert(0, "{repo}")
-# Use temp directory for gauntlet to avoid production contamination
-_tmp = tempfile.mkdtemp(prefix="gauntlet_iso_")
-os.environ["EPISTEMIC_TEMP_DIR"] = _tmp
+from pathlib import Path
+_tmp = Path(tempfile.mkdtemp(prefix="gauntlet1_iso_"))
 from epistemic_integrity.gauntlet.hallucination_gauntlet import HallucinationGauntlet
-# Monkey-patch the EPISTEMIC_DIR to use temp
-import epistemic_integrity.gauntlet.hallucination_gauntlet as _hg
-_hg.EPISTEMIC_DIR = __import__('pathlib').Path(_tmp)
-_hg.REPO_ROOT = __import__('pathlib').Path("{repo}")
-# Need to create subdirs
-(__import__('pathlib').Path(_tmp) / "approved_claims").mkdir(parents=True, exist_ok=True)
-(__import__('pathlib').Path(_tmp) / "approved_evidence").mkdir(parents=True, exist_ok=True)
-(__import__('pathlib').Path(_tmp) / "approved_provenance").mkdir(parents=True, exist_ok=True)
-(__import__('pathlib').Path(_tmp) / "gauntlet").mkdir(parents=True, exist_ok=True)
-g = HallucinationGauntlet()
+g = HallucinationGauntlet(registry_dir=_tmp)
 results = g.run_all()
 print(json.dumps({{"passed": results["overall_pass"], "details": str(results["blocked"]) + "/" + str(results["total_tests"]) + " blocked", "raw": {{"blocked": results["blocked"], "total": results["total_tests"]}}}}))
 ''',
             "gauntlet_v2": '''
-import sys, json, tempfile, os
+import sys, json, tempfile
 sys.path.insert(0, "{repo}")
-_tmp = tempfile.mkdtemp(prefix="gauntlet2_iso_")
+from pathlib import Path
+_tmp = Path(tempfile.mkdtemp(prefix="gauntlet2_iso_"))
 from epistemic_integrity.gauntlet.hallucination_gauntlet_v2 import HallucinationGauntletV2
-import epistemic_integrity.gauntlet.hallucination_gauntlet_v2 as _hg2
-_hg2.EPISTEMIC_DIR = __import__('pathlib').Path(_tmp)
-_hg2.REPO_ROOT = __import__('pathlib').Path("{repo}")
-(__import__('pathlib').Path(_tmp) / "approved_claims").mkdir(parents=True, exist_ok=True)
-(__import__('pathlib').Path(_tmp) / "approved_evidence").mkdir(parents=True, exist_ok=True)
-(__import__('pathlib').Path(_tmp) / "approved_provenance").mkdir(parents=True, exist_ok=True)
-(__import__('pathlib').Path(_tmp) / "gauntlet").mkdir(parents=True, exist_ok=True)
-g = HallucinationGauntletV2()
+g = HallucinationGauntletV2(registry_dir=_tmp)
 results = g.run_all()
 print(json.dumps({{"passed": results["overall_pass"], "details": str(results["blocked"]) + "/" + str(results["total_tests"]) + " blocked", "raw": {{"blocked": results["blocked"], "total": results["total_tests"], "real": results.get("uses_real_evidence", 0)}}}}))
 ''',

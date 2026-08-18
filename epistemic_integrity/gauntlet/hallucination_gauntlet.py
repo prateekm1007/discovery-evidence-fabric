@@ -61,16 +61,46 @@ class GauntletResult:
 
 class HallucinationGauntlet:
     """18 adversarial tests. Each attempts to inject a malicious claim and verifies
-    the firewall rejects it. Target: 18/18 blocked."""
+    the firewall rejects it. Target: 18/18 blocked.
 
-    def __init__(self):
+    P0-A v18: Requires explicit registry_dir parameter. NO production default.
+    Gauntlets MUST use isolated temp directories.
+    """
+
+    def __init__(self, registry_dir: Path = None, canonical_dir: Path = None):
+        """Initialize gauntlet with ISOLATED registries.
+
+        Args:
+            registry_dir: Required. Temp directory for isolated claim/evidence/supersession registries.
+            canonical_dir: Optional. Canonical state directory (can be production, read-only).
+        """
+        if registry_dir is None:
+            raise ValueError(
+                "HallucinationGauntlet requires explicit registry_dir parameter. "
+                "Gauntlets MUST use isolated temp directories, NEVER production registries."
+            )
         self.results: List[GauntletResult] = []
-        # Use the firewall's own registries (same instance) so claims are actually tested
+        self.registry_dir = Path(registry_dir)
+        self.registry_dir.mkdir(parents=True, exist_ok=True)
+
+        # Create ISOLATED subdirectories
+        claims_dir = self.registry_dir / "approved_claims"
+        evidence_dir = self.registry_dir / "approved_evidence"
+        supersession_dir = self.registry_dir / "approved_provenance"
+        claims_dir.mkdir(parents=True, exist_ok=True)
+        evidence_dir.mkdir(parents=True, exist_ok=True)
+        supersession_dir.mkdir(parents=True, exist_ok=True)
+
+        # Use production canonical state (read-only) if provided, else use registry_dir
+        if canonical_dir is None:
+            canonical_dir = REPO_ROOT / "CANONICAL_STATE"
+
+        # Use the firewall with ISOLATED registries
         self.firewall = DossierFirewall(
-            canonical_state_dir=REPO_ROOT / "CANONICAL_STATE",
-            claim_registry_dir=EPISTEMIC_DIR / "approved_claims",
-            evidence_registry_dir=EPISTEMIC_DIR / "approved_evidence",
-            supersession_registry_dir=EPISTEMIC_DIR / "approved_provenance",
+            canonical_state_dir=Path(canonical_dir),
+            claim_registry_dir=claims_dir,
+            evidence_registry_dir=evidence_dir,
+            supersession_registry_dir=supersession_dir,
         )
         self.claim_registry = self.firewall.claim_registry
         self.evidence_binding = self.firewall.evidence_binding
