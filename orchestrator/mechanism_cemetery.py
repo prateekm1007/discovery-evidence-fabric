@@ -31,19 +31,27 @@ CEMETERY_PATH = REPO_ROOT / "MECHANISM_CEMETERY" / "CEMETERY.json"
 
 @dataclass(frozen=True)
 class CemeteryEntry:
-    """A killed mechanism with reusable lessons."""
+    """A killed mechanism with reusable lessons.
+
+    PER CEO v29 AUDIT (P0):
+      "The Cemetery needs epistemic classes. Only PROVEN_INVARIANT
+       may automatically block. MODEL_SPECIFIC should trigger
+       'attack this constraint' — not BLOCK."
+    """
     entry_id: str
     territory_id: str
     mechanism_name: str
     proposed_version: str
     killed_at_version: str
-    kill_reason: str  # PHYSICS_CEILING / ENGINEERING_FAILURE / BUYER_VALUE_FAIL / PROBLEM_EXISTENCE_FAIL
+    kill_reason: str  # PHYSICS_CEILING / ENGINEERING_FAILURE / BUYER_VALUE_FAIL / PROBLEM_EXISTENCE_FAIL / PROBLEM_EXISTENCE_UNDETERMINED
     what_was_proposed: str
     why_it_failed: str
     reusable_lesson: str
     what_to_avoid: str  # What future candidates should NOT do based on this
     physical_constraint: Optional[str] = None  # If a physics constraint was discovered
     evidence_sources: List[str] = field(default_factory=list)
+    # v29: Epistemic class — controls blocking behavior
+    epistemic_class: str = "FAILURE_LESSON"  # PROVEN_INVARIANT / STRONG_CONSTRAINT / MODEL_SPECIFIC / FAILURE_LESSON / UNRESOLVED_WARNING
 
 
 # The initial cemetery entries from territories #1-#8
@@ -61,6 +69,7 @@ INITIAL_CEMETERY = [
         what_to_avoid="Do not propose state estimation from collinear measurements without first checking the condition number and noise sensitivity.",
         physical_constraint="7 hydraulic states cannot be recovered from impedance measurements under 0.5% noise. The information content of the measurement is insufficient.",
         evidence_sources=["V25_NUMERICAL_IDENTIFIABILITY.json"],
+        epistemic_class="PROVEN_INVARIANT",
     ),
     CemeteryEntry(
         entry_id="CE-002",
@@ -74,6 +83,7 @@ INITIAL_CEMETERY = [
         reusable_lesson="Always compare against the BEST SINGLE mechanism per payload class. A combined mechanism must DOMINATE all singles, not just be 'different'.",
         what_to_avoid="Do not propose multi-mechanism architectures without proving Pareto-dominance over each single mechanism.",
         evidence_sources=["T2_FINAL_ADJUDICATION.json"],
+        epistemic_class="FAILURE_LESSON",
     ),
     CemeteryEntry(
         entry_id="CE-003",
@@ -88,6 +98,7 @@ INITIAL_CEMETERY = [
         what_to_avoid="Do not propose membrane-based or affinity-based retention for >90 day duration. The CSF turnover rate makes it physically impossible.",
         physical_constraint="CSF turnover rate = 2.88x/day = 259 turnovers in 90 days. No membrane or affinity mechanism can overcome this. The ceiling is PHYSIOLOGICAL (CSF production rate is a constant).",
         evidence_sources=["V2_FINAL_ADJUDICATION.json", "V2_BENCHTOP_90DAY_SIMULATION.json"],
+        epistemic_class="PROVEN_INVARIANT",
     ),
     CemeteryEntry(
         entry_id="CE-004",
@@ -101,6 +112,7 @@ INITIAL_CEMETERY = [
         reusable_lesson="Derivative-based controllers are too sensitive to noise. Predictive models require accurate forward models that don't exist for CSF dynamics.",
         what_to_avoid="Do not propose derivative-based or predictive controllers without first proving the signal-to-noise ratio is sufficient.",
         evidence_sources=["V8_FINAL_VERDICT.json"],
+        epistemic_class="FAILURE_LESSON",
     ),
     CemeteryEntry(
         entry_id="CE-005",
@@ -114,6 +126,7 @@ INITIAL_CEMETERY = [
         reusable_lesson="Any anti-fouling mechanism that relies on flow direction must be tested against RETROGRADE flow. Retrograde flow is a realistic clinical scenario (cough, Valsalva, venous pressure changes).",
         what_to_avoid="Do not propose flow-direction-dependent anti-fouling without testing retrograde flow robustness.",
         evidence_sources=["V18_RESOLVE_CONTRADICTIONS.json"],
+        epistemic_class="FAILURE_LESSON",
     ),
     CemeteryEntry(
         entry_id="CE-006",
@@ -127,6 +140,7 @@ INITIAL_CEMETERY = [
         reusable_lesson="ALWAYS report worst-case reliability for clinical devices. Averages mask catastrophic failure modes. Thermal activation in a 37°C body environment has a narrow window (37-45°C = 8°C max). Sensor electronics are a SPOF that cannot be fully resolved by redundancy (common-mode failures).",
         what_to_avoid="Do not propose thermal activation mechanisms for implantable devices without (a) proving the thermal window is >8°C, (b) resolving sensor SPOF to <5% invisible, (c) addressing adhesion ceiling with non-snare mechanism.",
         evidence_sources=["V7_MECHANISM_ATTACK.json", "V7_FINAL_ADJUDICATION.json"],
+        epistemic_class="FAILURE_LESSON",
     ),
     CemeteryEntry(
         entry_id="CE-007",
@@ -141,6 +155,7 @@ INITIAL_CEMETERY = [
         what_to_avoid="Do not propose compliant/flexible interfaces for both-ends-anchored implants in compliant vessels. The problem (bending trauma) doesn't exist in this geometry. Do not use analogies from cantilevered devices (IVC filters) for supported-beam devices (eShunt).",
         physical_constraint="Rigid eShunt (EI=1.6e-1) is 1890x stiffer than venous wall (EI=8.4e-5). The vein conforms to the shunt. No bending stress is transmitted.",
         evidence_sources=["V5_PHYSICS_ATTACK.json", "V5_FINAL_ADJUDICATION.json"],
+        epistemic_class="STRONG_CONSTRAINT",
     ),
     CemeteryEntry(
         entry_id="CE-008",
@@ -155,6 +170,7 @@ INITIAL_CEMETERY = [
         what_to_avoid="Do not propose over-drainage prevention mechanisms for the eShunt without first establishing that over-drainage occurs in the eShunt specifically (not just in VP shunts). The eShunt's short drainage path may inherently prevent the siphon effect.",
         physical_constraint="eShunt normal CSF-venous differential = 7 mmHg. Valve closes at P_venous + P_valve = 2 + 5 = 7 mmHg (upright), above 5 mmHg over-drainage threshold. Without a hydrostatic column, over-drainage may be physically prevented.",
         evidence_sources=["V5_PRESSURE_GRADIENT_SIMULATION.json", "V5_1_PROBLEM_EXISTENCE_AUDIT.json"],
+        epistemic_class="UNRESOLVED_WARNING",
     ),
 ]
 
@@ -168,31 +184,97 @@ def load_cemetery() -> List[CemeteryEntry]:
     return INITIAL_CEMETERY
 
 
-def check_candidate_against_cemetery(candidate_description: str) -> List[Dict]:
+def check_candidate_against_cemetery(candidate_description: str) -> Dict:
     """Check a new candidate against cemetery lessons.
 
-    Returns list of violations (cemetery entries that the candidate may conflict with).
+    PER CEO v29 AUDIT (P0):
+      "Kill the cemetery keyword blocker. match_count > 3 is not acceptable.
+       Introduce typed lessons. Only proven invariants may hard-block."
+
+    Epistemic class controls blocking behavior:
+      PROVEN_INVARIANT  → HARD BLOCK (physics proven impossible)
+      STRONG_CONSTRAINT → WARNING + require explicit override justification
+      MODEL_SPECIFIC    → INFORMATIONAL (attack this constraint, don't block)
+      FAILURE_LESSON    → INFORMATIONAL (learn from this, don't block)
+      UNRESOLVED_WARNING → INFORMATIONAL (not proven either way, don't block)
+
+    Returns dict with:
+      - hard_blocks: List of PROVEN_INVARIANT violations (candidate must not proceed)
+      - warnings: List of STRONG_CONSTRAINT violations (require justification)
+      - informational: List of other lessons (for consideration)
+      - verdict: BLOCKED / WARNING / PROCEED
     """
     cemetery = load_cemetery()
-    violations = []
+    hard_blocks = []
+    warnings = []
+    informational = []
 
-    # Simple keyword matching — in production this would be semantic
-    candidate_lower = candidate_description.lower()
     for entry in cemetery:
-        keywords_in_lesson = entry.what_to_avoid.lower().split()
-        # Check if candidate shares keywords with what_to_avoid
-        match_count = sum(1 for kw in keywords_in_lesson if len(kw) > 4 and kw in candidate_lower)
-        if match_count > 3:  # threshold for keyword overlap
-            violations.append({
+        # Only PROVEN_INVARIANT can hard-block
+        # And only if the candidate appears to violate the specific physical constraint
+        if entry.epistemic_class == "PROVEN_INVARIANT" and entry.physical_constraint:
+            # Check if the candidate description relates to the physical constraint
+            # This is NOT keyword matching — it's checking if the candidate's domain
+            # matches the invariant's domain
+            candidate_lower = candidate_description.lower()
+            constraint_lower = entry.physical_constraint.lower()
+
+            # Extract key domain terms from the constraint
+            domain_terms = []
+            if "csf turnover" in constraint_lower or "retention" in constraint_lower:
+                domain_terms = ["retention", "membrane", "mwco", "filtration", "antibody", "therapeutic"]
+            elif "jacobian" in constraint_lower or "identifiab" in constraint_lower:
+                domain_terms = ["state estimation", "identifiab", "jacobian", "sensor", "measurement"]
+            elif "stiffness" in constraint_lower or "bending" in constraint_lower:
+                domain_terms = ["flexible", "compliant", "bending", "trauma", "neck", "interface"]
+
+            # Check domain overlap
+            domain_match = sum(1 for t in domain_terms if t in candidate_lower)
+            if domain_match >= 2:  # at least 2 domain terms match
+                hard_blocks.append({
+                    "cemetery_entry": entry.entry_id,
+                    "territory": entry.territory_id,
+                    "mechanism": entry.mechanism_name,
+                    "epistemic_class": entry.epistemic_class,
+                    "physical_constraint": entry.physical_constraint,
+                    "lesson": entry.reusable_lesson,
+                })
+
+        elif entry.epistemic_class == "STRONG_CONSTRAINT":
+            # Warn but don't block — requires explicit justification
+            warnings.append({
                 "cemetery_entry": entry.entry_id,
                 "territory": entry.territory_id,
                 "mechanism": entry.mechanism_name,
+                "epistemic_class": entry.epistemic_class,
                 "lesson": entry.reusable_lesson,
-                "what_to_avoid": entry.what_to_avoid,
-                "keyword_overlap": match_count,
+                "action_required": "Explicit justification required to proceed despite this constraint",
             })
 
-    return violations
+        else:
+            # Informational only — learn from, don't block
+            informational.append({
+                "cemetery_entry": entry.entry_id,
+                "territory": entry.territory_id,
+                "mechanism": entry.mechanism_name,
+                "epistemic_class": entry.epistemic_class,
+                "lesson": entry.reusable_lesson,
+            })
+
+    if hard_blocks:
+        verdict = "BLOCKED"
+    elif warnings:
+        verdict = "WARNING"
+    else:
+        verdict = "PROCEED"
+
+    return {
+        "verdict": verdict,
+        "hard_blocks": hard_blocks,
+        "warnings": warnings,
+        "informational": informational,
+        "total_lessons_consulted": len(cemetery),
+    }
 
 
 def save_cemetery(entries: List[CemeteryEntry]):
