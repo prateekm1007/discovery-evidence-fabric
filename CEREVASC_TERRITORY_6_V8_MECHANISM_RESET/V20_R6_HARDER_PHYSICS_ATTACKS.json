@@ -1,0 +1,222 @@
+{
+  "task_id": "R6-V20-HARDER-PHYSICS-ATTACKS",
+  "timestamp": "2026-08-19T17:12:37.611158+00:00",
+  "ceo_directive": "Attack R6 harder before benchtop \u2014 12 specified vectors",
+  "status": "PRELIMINARY_MODEL_SURVIVES (not validated)",
+  "parameter_provenance": {
+    "normal_icp_mmhg": {
+      "value": 15,
+      "source": "clinical literature",
+      "needs_validation": false
+    },
+    "obstruction_icp_mmhg": {
+      "value": 25,
+      "source": "clinical literature",
+      "needs_validation": false
+    },
+    "csf_production_ml_min": {
+      "value": 0.35,
+      "source": "clinical literature",
+      "needs_validation": false
+    },
+    "primary_radius_mm": {
+      "value": 0.5,
+      "source": "typical VP/VA shunt spec",
+      "needs_validation": true,
+      "uncertainty": "\u00b10.1 mm (estimated from typical VP shunt specs, not measured for R6)"
+    },
+    "bypass_radius_mm": {
+      "value": 0.25,
+      "source": "design assumption",
+      "needs_validation": true,
+      "uncertainty": "\u00b10.05 mm (design choice, not measured)"
+    },
+    "bypass_length_mm": {
+      "value": 200,
+      "source": "typical distal catheter length",
+      "needs_validation": true,
+      "uncertainty": "\u00b150 mm (patient/anatomy-dependent)"
+    },
+    "csf_viscosity_pa_s": {
+      "value": 0.001,
+      "source": "CSF \u2248 water viscosity",
+      "needs_validation": false
+    }
+  },
+  "attacks": [
+    {
+      "attack": "valve_failure_open",
+      "question": "What happens if the bypass valve fails in the OPEN position?",
+      "parameters": {
+        "q_primary_normal_ml_min": {
+          "value": 14.72496383537924,
+          "source": "Poiseuille equation with clinical parameters"
+        },
+        "q_bypass_at_normal_ml_min": {
+          "value": 0.9203102397112025,
+          "source": "Poiseuille equation, bypass at normal ICP"
+        },
+        "over_drainage_pct": {
+          "value": 6.25,
+          "source": "Q_bypass / Q_primary * 100"
+        }
+      },
+      "analysis": "If the valve fails open, the bypass adds 0.9203 mL/min (6.2%) to normal drainage. Total flow = 15.6453 mL/min vs 0.35 mL/min needed. Over-drainage of 6.2% is within the 10% threshold for slit ventricle syndrome risk.",
+      "sensitivity": "Over-drainage scales as (r_bypass/r_primary)^4 = 0.0625. A 10% increase in bypass radius increases over-drainage by 46%.",
+      "verdict": "CONDITIONAL_SURVIVE",
+      "kill_condition": "If bypass flow at normal ICP > 10% of primary flow (6.2% currently), valve failure-open causes chronic over-drainage. Bypass radius must be < 0.281 mm to keep over-drainage < 10%.",
+      "parameter_needs_validation": true
+    },
+    {
+      "attack": "valve_failure_closed",
+      "question": "What happens if the bypass valve fails in the CLOSED position?",
+      "analysis": "If the valve fails closed, the bypass never opens. The patient experiences obstruction identically to a standard shunt without bypass. R6 provides NO BENEFIT but also NO HARM. This is a fail-safe (null) outcome, not a kill condition.",
+      "verdict": "FAIL_SAFE_NO_BENEFIT",
+      "kill_condition": "None \u2014 failure-closed is not dangerous, just useless. But if failure-closed rate > 10% of obstructions, R6's value proposition is undermined (10% of patients get no benefit from the bypass).",
+      "parameter_needs_validation": true
+    },
+    {
+      "attack": "partial_obstruction",
+      "question": "Does partial obstruction trigger the bypass valve?",
+      "parameters": {
+        "normal_icp_mmhg": 15,
+        "obstruction_icp_mmhg": 25,
+        "obstruction_fraction_triggering_bypass": {
+          "value": 0.11988826320660662,
+          "source": "ICP_new = ICP_normal / (1-f)^4, solved for f at ICP=25"
+        }
+      },
+      "analysis": "The bypass opens when ICP reaches 25 mmHg. A partial obstruction that reduces primary radius by 12.0% (flow drops to 60.0% of normal) triggers the bypass. Obstructions below 12.0% radius reduction do NOT trigger the bypass \u2014 the patient experiences sub-threshold ICP elevation (15-25 mmHg) without bypass activation. This is a WINDOW where R6 provides no benefit but the patient has elevated ICP.",
+      "sensitivity": "Trigger threshold scales with (NORMAL_ICP/OBSTRUCTION_ICP)^0.25. If valve threshold is lowered to 20 mmHg, trigger drops to 6.9% obstruction.",
+      "verdict": "CONDITIONAL_SURVIVE",
+      "kill_condition": "If the sub-threshold window (15-25 mmHg ICP) causes symptomatic hydrocephalus in a significant fraction of patients, R6 leaves these patients untreated. Need clinical data on symptom threshold vs bypass threshold.",
+      "parameter_needs_validation": true
+    },
+    {
+      "attack": "simultaneous_obstruction",
+      "question": "What if both primary and bypass obstruct simultaneously?",
+      "analysis": "If tissue ingrowth, blood clot, or infection covers both the primary and bypass outlet openings, both lumens obstruct simultaneously. R6 provides NO benefit. The patient experiences obstruction identical to a standard shunt. This is the worst-case failure mode \u2014 R6 adds complexity without benefit.",
+      "probability_assessment": "SIMULTANEOUS obstruction of both paths is LESS LIKELY than single-path obstruction because: (a) the bypass outlet is normally closed (no debris exposure), (b) the bypass opens at a different location than the primary outlet (if designed with spatial offset), (c) tissue ingrowth that covers both openings must grow over a larger area. However, if both outlets are co-located, simultaneous obstruction probability is HIGH.",
+      "verdict": "CONDITIONAL_SURVIVE",
+      "kill_condition": "If bypass outlet is co-located with primary outlet (same anatomical position), simultaneous obstruction probability is high and R6 is DEAD. Bypass outlet must be SPATIALLY OFFSET from primary outlet.",
+      "parameter_needs_validation": true
+    },
+    {
+      "attack": "thrombus_formation",
+      "question": "Does thrombus form in the bypass lumen when it opens?",
+      "parameters": {
+        "wall_shear_stress_pa": {
+          "value": 2.0831562500000005,
+          "source": "\u03c4_w = 4\u03b7Q/(\u03c0r\u00b3)"
+        },
+        "bypass_flow_ml_min": {
+          "value": 1.5338503995186714,
+          "source": "Poiseuille equation"
+        },
+        "residence_time_s": {
+          "value": 1.5361305710985431,
+          "source": "V/Q"
+        }
+      },
+      "analysis": "Wall shear stress in the bypass is 2.0832 Pa (20.83 dyn/cm\u00b2). CSF is not blood (no fibrinogen), so thrombus formation is unlikely from CSF alone. However, if the bypass outlet is in the venous system (VA shunt), blood may backflow into the bypass. Blood at shear stress <0.5 Pa (5 dyn/cm\u00b2) has high thrombosis risk. The bypass shear stress is 2.0832 Pa \u2014 ABOVE the 0.5 Pa thrombosis threshold.",
+      "verdict": "CONDITIONAL_SURVIVE",
+      "kill_condition": "If wall shear stress < 0.5 Pa (2.0832 Pa currently), blood backflow into the bypass causes thrombosis. Need antithrombogenic coating or higher flow rate.",
+      "parameter_needs_validation": true
+    },
+    {
+      "attack": "biofilm_formation",
+      "question": "Does biofilm form on the bypass lumen walls?",
+      "analysis": "Biofilm formation is a CLINICAL PROBLEM for ALL CSF shunts (infection rate 5-10%). The bypass lumen adds surface area (50% more inner surface). However, the bypass is NORMALLY CLOSED \u2014 no flow means no nutrient delivery to bacteria in the bypass. Biofilm risk is proportional to EXPOSURE TIME (time the bypass is open). If the bypass opens rarely (only during obstruction events), biofilm risk is LOW. If the bypass opens frequently (e.g., valve failure-open), biofilm risk is HIGH.",
+      "risk_factors": [
+        "Bypass open time per event: ~hours to days (until revision surgery)",
+        "Frequency of opening: ~1 event per 2-5 years (obstruction rate)",
+        "Total exposure time: ~hours per 2-5 years = VERY LOW"
+      ],
+      "verdict": "CONDITIONAL_SURVIVE",
+      "kill_condition": "If bypass open time > 7 days per event (delayed revision), biofilm risk becomes significant (>1% infection probability). Need clinical protocol specifying revision within 48-72h of bypass activation.",
+      "parameter_needs_validation": true
+    },
+    {
+      "attack": "pressure_spike",
+      "question": "Does bypass valve opening cause a dangerous ICP transient?",
+      "analysis": "When the bypass opens, the elevated ICP ({OBSTRUCTION_ICP_MMHG} mmHg) suddenly has a drainage path. The ICP drops from {OBSTRUCTION_ICP_MMHG} toward normal ({NORMAL_ICP_MMHG}). The RATE of drop depends on valve opening dynamics. A SLAM-OPEN valve (instant) causes rapid ICP drop \u2192 risk of intracranial hemorrhage (bridge vein tearing). A GRADUALLY-OPENING valve (e.g., elastomeric) limits the drop rate. CSF shunts already handle ICP transients (coughing, straining = 20-30 mmHg spikes). The bypass opening is similar in magnitude but SLOWER (valve opens over seconds, cough is instantaneous).",
+      "verdict": "CONDITIONAL_SURVIVE",
+      "kill_condition": "If valve opening time < 0.1s (slam-open), ICP drop rate exceeds the safety threshold for bridge vein tearing. Need gradually-opening valve design (opening time > 1s).",
+      "parameter_needs_validation": true
+    },
+    {
+      "attack": "flow_reduction",
+      "question": "Is bypass flow sufficient to prevent acute ICP crisis?",
+      "parameters": {
+        "bypass_flow_ml_min": {
+          "value": 1.5338503995186714,
+          "source": "Poiseuille equation"
+        },
+        "csf_production_ml_min": 0.35,
+        "net_accumulation_ml_min": {
+          "value": -1.1838503995186715,
+          "source": "Q_production - Q_bypass"
+        },
+        "icp_rise_rate_mmhg_per_min": {
+          "value": -2.367700799037343,
+          "source": "net_accumulation / C_ic"
+        },
+        "time_to_herniation_min": {
+          "value": Infinity,
+          "source": "(40 - 25) / icp_rise_rate"
+        },
+        "intracranial_compliance_ml_mmhg": {
+          "value": 0.5,
+          "source": "clinical literature, typical"
+        }
+      },
+      "analysis": "Bypass flow = 1.5339 mL/min vs CSF production = 0.35 mL/min. Net accumulation = -1.1839 mL/min. ICP rises at -2.37 mmHg/min. Time from bypass activation (25 mmHg) to herniation (40 mmHg) = inf minutes = inf hours. This gives the patient inf hours to reach emergency care. SUFFICIENT for emergency response (target: >=4 hours).",
+      "verdict": "CONDITIONAL_SURVIVE",
+      "kill_condition": "If time to herniation < 4 hours (infh currently), the bypass does not provide enough time for emergency response. Need larger bypass radius or lower valve threshold.",
+      "parameter_needs_validation": true
+    },
+    {
+      "attack": "manufacturing_tolerance",
+      "question": "Can the valve be manufactured within tolerance at scale?",
+      "analysis": "For a slit valve, opening pressure depends on E (elastic modulus), t (wall thickness), w (slit width), L (slit length), r (radius). The sensitivity is: dP/P = 3*dt/t + dw/w - 2*dL/L - dr/r. If each dimension has \u00b15% tolerance, worst-case dP/P = 3*5% + 5% + 2*5% + 5% = 30%. For P=25 mmHg, that's \u00b17.5 mmHg \u2014 EXCEEDS the \u00b15 mmHg tolerance. Manufacturing tolerance is the CRITICAL PATH.",
+      "mitigation": "Use injection molding with precision tooling (\u00b12% dimensional tolerance) \u2192 worst-case dP/P = 3*2% + 2% + 2*2% + 2% = 12% \u2192 \u00b13 mmHg \u2192 within tolerance.",
+      "verdict": "CONDITIONAL_SURVIVE",
+      "kill_condition": "If manufacturing tolerance > \u00b13% per dimension, valve opening pressure varies > \u00b15 mmHg and R6 is DEAD. Requires precision injection molding.",
+      "parameter_needs_validation": true
+    },
+    {
+      "attack": "catastrophic_leakage",
+      "question": "Can the bypass lumen wall rupture, causing CSF leakage?",
+      "analysis": "The bypass lumen wall must withstand: (a) Normal CSF pressure (15 mmHg = 2 kPa), (b) Obstruction pressure (25 mmHg = 3.3 kPa), (c) Transient cough/strain spikes (50-100 mmHg = 6.7-13.3 kPa). Typical medical-grade silicone tubing burst pressure: >500 kPa. Safety factor: 500/13.3 = 37x. Leakage is NOT a likely failure mode.",
+      "verdict": "SURVIVE",
+      "kill_condition": "None \u2014 burst pressure safety factor >37x for worst-case ICP spike.",
+      "parameter_needs_validation": false
+    },
+    {
+      "attack": "new_obstruction_by_architecture",
+      "question": "Does the bypass lumen architecture create NEW obstruction sites?",
+      "analysis": "The bypass lumen adds: (a) A junction where bypass branches from primary (potential tissue ingrowth site), (b) A valve mechanism (potential debris accumulation site), (c) A bypass outlet (potential tissue ingrowth site, same as primary outlet). Each junction/valve/outlet is a POTENTIAL obstruction site. The bypass adds 2-3 new obstruction points. However, these are in the BYPASS path, not the primary path. If the bypass obstructs at its own junction/valve/outlet, the primary lumen is unaffected (bypass is normally closed). The NEW obstruction points only matter when the bypass is OPEN, and if the bypass is open, the primary is already obstructed. So the bypass obstructing during use is a secondary failure, not a primary one.",
+      "verdict": "CONDITIONAL_SURVIVE",
+      "kill_condition": "If the bypass junction creates a flow disturbance in the PRIMARY lumen (e.g., turbulence, recirculation zone) that increases primary obstruction risk, R6 is DEAD. Need CFD analysis of the junction geometry.",
+      "parameter_needs_validation": true
+    },
+    {
+      "attack": "delays_inevitable",
+      "question": "Does the bypass merely delay an inevitable emergency rather than improving outcomes?",
+      "analysis": "The bypass provides {time_to_herniation_min/60:.1f} hours of drainage after obstruction (from Attack 8). During this time, the patient MUST receive medical attention (shunt revision). If the patient reaches revision within {time_to_herniation_min/60:.1f} hours, the bypass has converted an EMERGENCY into a SCHEDULED procedure. If the patient does NOT reach revision within {time_to_herniation_min/60:.1f} hours, the bypass has merely DELAYED the emergency \u2014 the patient still experiences herniation. The value proposition depends on: (a) how quickly the patient can reach medical care, (b) whether the {time_to_herniation_min/60:.1f}-hour window is sufficient for the patient to recognize symptoms and seek help. For urban patients with quick access to neurosurgery: likely SUFFICIENT. For rural/remote patients: potentially INSUFFICIENT.",
+      "value_proposition": "R6 converts EMERGENCY revision (2-5x complication rate, mortality 1-2%) into SCHEDULED revision (lower complication rate, mortality <0.5%). The bypass provides a TIME WINDOW of {time_to_herniation_min/60:.1f} hours. This is valuable IF and ONLY IF the patient can access revision surgery within that window. For patients with delayed access (rural, developing countries), R6 provides LESS value.",
+      "verdict": "CONDITIONAL_SURVIVE",
+      "kill_condition": "If the time window ({time_to_herniation_min/60:.1f}h) is shorter than the median time-to-revision for the target patient population, R6 merely delays the emergency and does not improve outcomes. Need clinical data on time-to-revision for the target population.",
+      "parameter_needs_validation": true
+    }
+  ],
+  "summary": {
+    "total_attacks": 12,
+    "killed": 0,
+    "conditional_survive": 10,
+    "survive": 1,
+    "fail_safe_no_benefit": 1,
+    "overall_verdict": "PRELIMINARY_MODEL_SURVIVES",
+    "overall_reasoning": "R6 survived 1 attacks outright, 10 conditionally, and 1 as fail-safe (no benefit, no harm). 0 attacks killed R6. R6 has earned a benchtop experiment. However, ALL parameters are MODEL ESTIMATES, not measured values. The status is PRELIMINARY_MODEL_SURVIVES, not VALIDATED. Per Article II: model outputs are hypotheses, not evidence."
+  }
+}

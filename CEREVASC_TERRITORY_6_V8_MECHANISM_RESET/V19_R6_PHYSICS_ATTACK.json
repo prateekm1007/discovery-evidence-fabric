@@ -93,8 +93,8 @@
       "CONDITIONAL_SURVIVE",
       "CONDITIONAL_SURVIVE"
     ],
-    "overall_verdict": "CONDITIONAL_SURVIVE",
-    "overall_reasoning": "R6 survives all 5 physics attacks CONDITIONALLY. Each attack identified a specific failure mode and kill condition. R6 is not killed by any single attack, but ALL conditions must be met for R6 to be viable:",
+    "overall_verdict": "PRELIMINARY_MODEL_SURVIVES",
+    "overall_reasoning": "R6's passive bypass lumen model survives all 5 physics attacks at the MODEL level. However, these are ENGINEERING HYPOTHESES, not validated physical findings. No experimental evidence has been presented for: valve opening pressure, flow characteristics, bypass resistance, thrombogenicity, bacterial stagnation, manufacturing tolerances, or failure distributions. The model has earned an EXPERIMENT, not a VICTORY. Per Article II (exact evidence beats semantic plausibility), the parameters used (0.25mm bypass radius, 15-25 mmHg valve threshold, etc.) are reasonable estimates, not measured values. Each parameter must be validated experimentally before the model conclusion can be upgraded from PRELIMINARY_MODEL_SURVIVES to VALIDATED.",
     "conditions_for_viability": [
       "1. Bypass radius >= 0.25mm (provides >= 6.25% of primary flow \u2014 enough for emergency drainage to prevent acute ICP crisis)",
       "2. Bypass lumen drains completely when closed (distal closure design \u2014 no stagnant fluid reservoir)",
@@ -112,5 +112,58 @@
     ],
     "honest_comparison_to_alternatives": "R6's bypass lumen is a SIMPLER mechanism than M3 (SMA shape-memory retrieval), R2 (bioresorbable anchor), R7 (pressure-triggered flushing), or R4 (magnetic release). It has no active components, no electronics, no materials that degrade. Its main weakness is the narrow pressure window for the passive valve \u2014 but shunt valve manufacturers have solved this problem for decades. R6 is the MOST MANUFACTURABLE of all T6 candidates.",
     "comparison_to_existing_solutions": "The current standard for shunt obstruction is REVISION SURGERY (30-40% of shunts need revision within 2 years). R6 does NOT eliminate the need for revision \u2014 it converts an EMERGENCY revision into a SCHEDULED revision by providing temporary drainage. This is clinically valuable: emergency shunt revision has 2-5x higher complication rate than scheduled revision. R6's value proposition is TIME, not cure."
+  },
+  "parameter_provenance": {
+    "parameters": [
+      {
+        "parameter": "primary_lumen_radius",
+        "value": "0.5 mm",
+        "source": "Literature estimate for CSF shunt catheter inner radius",
+        "uncertainty": "\u00b10.1 mm (not measured \u2014 estimated from typical VP shunt specs)",
+        "needs_validation": true
+      },
+      {
+        "parameter": "bypass_lumen_radius",
+        "value": "0.25 mm",
+        "source": "Design assumption (50% of primary, must fit alongside)",
+        "uncertainty": "\u00b10.05 mm (design choice, not measured)",
+        "needs_validation": true
+      },
+      {
+        "parameter": "normal_icp",
+        "value": "15 mmHg",
+        "source": "Clinical literature (normal intracranial pressure range 10-15 mmHg)",
+        "uncertainty": "\u00b15 mmHg (patient-dependent)",
+        "needs_validation": false
+      },
+      {
+        "parameter": "obstruction_icp",
+        "value": "25 mmHg",
+        "source": "Clinical literature (obstruction typically presents at ICP >20 mmHg)",
+        "uncertainty": "\u00b15 mmHg (variable presentation threshold)",
+        "needs_validation": false
+      },
+      {
+        "parameter": "csf_production_rate",
+        "value": "0.35 mL/min (500 mL/day)",
+        "source": "Clinical literature (well-established CSF production rate)",
+        "uncertainty": "\u00b10.1 mL/min (patient-dependent)",
+        "needs_validation": false
+      },
+      {
+        "parameter": "bypass_length",
+        "value": "200 mm",
+        "source": "Typical distal catheter length for VA shunt",
+        "uncertainty": "\u00b150 mm (patient/anatomy-dependent)",
+        "needs_validation": true
+      }
+    ],
+    "note": "Parameters marked needs_validation=True are engineering assumptions, not measured values. The model conclusions depend on these parameters but the parameters have not been experimentally verified for R6's specific design."
+  },
+  "epistemic_correction": {
+    "correction_date": "2026-08-19T17:08:46.189962+00:00",
+    "problem": "The original V19 reported 'CONDITIONAL_SURVIVE' which could be read as a physics validation. The correct status is PRELIMINARY_MODEL_SURVIVES \u2014 the model has survived analytical attacks but has NOT been validated experimentally. Per Article II, model outputs are hypotheses, not evidence.",
+    "corrected_status": "PRELIMINARY_MODEL_SURVIVES \u2014 requires bench validation",
+    "what_must_happen_next": "Pre-register a benchtop experiment with: hypothesis \u2192 apparatus \u2192 measured quantity \u2192 threshold \u2192 failure criterion \u2192 sample size \u2192 stopping rule. Only after benchtop validation can the status be upgraded from PRELIMINARY_MODEL_SURVIVES."
   }
 }

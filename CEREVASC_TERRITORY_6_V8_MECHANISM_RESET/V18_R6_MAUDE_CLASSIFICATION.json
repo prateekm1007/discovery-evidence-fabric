@@ -49,8 +49,10 @@
       "what_r6_needs": "Query MAUDE for device problem codes specifically related to 'obstruction', 'occlusion', 'blockage', 'flow restriction' in CSF shunt devices. This would tell us what fraction of the 41,525 are obstruction-related (R6's target failure mode)."
     },
     "causality_unverified": {
-      "status": "ASSUMED_TRUE_FOR_ALL",
-      "reason": "Per FDA guidance, ALL MAUDE reports have unverified causality. No MAUDE report has been independently verified by FDA to establish that the device caused the adverse event. This is a blanket epistemic limitation, not a per-record classification."
+      "status": "DATABASE_LEVEL_LIMITATION",
+      "reason": "causality_unverified is a DATABASE-LEVEL LIMITATION per FDA guidance, NOT a per-record classification. FDA's disclaimer applies to the entire MAUDE database \u2014 it means FDA has not verified causation for ANY report. This is metadata about the database, not evidence about individual reports. The original V18 incorrectly assigned ASSUMED_TRUE_FOR_ALL as though it were an observed per-record classification. Per Article XXI.5, this is a structured metadata limitation, not a classification result.",
+      "fda_limitation": "Per FDA: 'MAUDE data cannot be used to establish causation.' This is a blanket disclaimer on the database, not per-record evidence.",
+      "correct_status": "DATABASE_LEVEL_LIMITATION (not per-record classification)"
     },
     "incidence_unknown": {
       "status": "CANNOT_BE_DETERMINED",
@@ -71,5 +73,11 @@
     "can_we_quantify_the_problem": "NO \u2014 MAUDE report counts cannot establish incidence. The 41,525 is a search count, not evidence of 41,525 obstruction events.",
     "can_we_compare_r6_to_existing_devices": "NO \u2014 MAUDE data should not be used to compare device event rates (FDA guidance). R6 must be compared on PHYSICS and ENGINEERING grounds, not on MAUDE statistics.",
     "what_is_the_graveyard_signal_really": "The 41,525 MAUDE reports indicate that CSF shunts have a HIGH FAILURE BURDEN. This is a GRAVEYARD SIGNAL for the PROBLEM DOMAIN \u2014 many approaches have been tried and the failure burden remains high. But it is NOT a graveyard signal for R6 SPECIFICALLY \u2014 R6's bypass lumen mechanism has ZERO direct prior art, so no one has tried THIS specific approach. The graveyard is for OTHER approaches, not for R6."
+  },
+  "epistemic_correction": {
+    "correction_date": "2026-08-19T17:08:46.189709+00:00",
+    "problem": "The original V18 reported ASSUMED_TRUE_FOR_ALL for causality_unverified, which incorrectly treated a database-level FDA disclaimer as a per-record classification. Also, the entire V18 is NOT a classification dataset \u2014 it is an explicit admission that individual MAUDE records were never retrieved. Only an aggregate count (41,525) exists.",
+    "corrected_status": "NOT_CLASSIFIED \u2014 individual records not retrieved; causality_unverified is a database-level limitation, not per-record classification",
+    "what_must_happen_next": "Retrieve actual individual MAUDE records for CSF shunt devices. For each record preserve: MDR_ID \u2192 device identity \u2192 event type \u2192 malfunction/injury/death \u2192 narrative \u2192 causality status \u2192 date \u2192 provenance. Missing fields must remain UNKNOWN, never ASSUMED_TRUE. Then determine how many reports are actually relevant to CSF shunt obstruction (R6's target failure mode)."
   }
 }
