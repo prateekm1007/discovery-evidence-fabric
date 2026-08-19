@@ -1,0 +1,114 @@
+{
+  "task_id": "TERRITORY-7-V5",
+  "step": "Step 5: Adjudication",
+  "agent": "main (constitution-acknowledged, session 2026-08-19)",
+  "timestamp": "2026-08-19T02:15:00+00:00",
+
+  "verdict": "FROZEN_NEGATIVE_CEILING",
+
+  "verdict_rationale": {
+    "summary": "V5 physics-level attack reveals that M5 (mechanical anti-trauma flexible neck) solves a HYPOTHETICAL problem. The rigid eShunt body is 1890x stiffer than the venous wall (EI_rigid=1.60e-01 vs EI_venous=8.44e-05). When a rigid object sits inside a compliant tube, the compliant tube deforms around the rigid object — the rigid object does NOT impose bending stress on the tube. The eShunt is a both-ends-anchored implant (subarachnoid space to venous sinus), making it a supported beam, not a cantilever. Supported beams do not transmit significant bending moments to their supports. The 'mechanical trauma from rigid implant' premise that motivated M5 is PHYSICALLY WRONG for this geometry. Additionally, M5 introduces NEW risks: (1) kink safety margin is NEGATIVE (-5°, meaning normal head movement can kink the neck and obstruct CSF flow), (2) fatigue failure over 5 years could cause embolization — the SAME failure mode that killed M9. The buyer-value test FAILS: no documented clinical venous trauma from eShunt, and CereVasc has no incentive to add a flexible neck that introduces new risks without addressing a real clinical need.",
+
+    "core_finding": {
+      "rigid_to_venous_stiffness_ratio": "1890x",
+      "interpretation": "The eShunt body (Nitinol, E=50 GPa) is 1890x stiffer than the venous sinus wall (E=0.5 MPa). In this stiffness regime, the vein conforms to the shunt, not the other way around. The shunt does not impose bending stress on the venous wall because the vein is too compliant to resist the shunt's shape. The flexible neck reduces bending moment transmission by 99.97%, but the bending moment was already negligible because the vein doesn't resist the rigid shunt.",
+      "why_M5_was_proposed": "M5 was proposed based on an analogy to IVC filters, which ARE cantilevered (anchored at one end) and DO cause venous trauma. But the eShunt is anchored at BOTH ends — it's a supported beam, not a cantilever. The IVC filter analogy does not apply.",
+      "constitution_article_applied": "Article II — exact evidence. The physics of beam bending (M = E*I*κ) with published Young's moduli proves the venous wall is too compliant to experience significant bending stress from the rigid shunt."
+    },
+
+    "three_failure_modes": {
+      "failure_1_physics_premise_wrong": {
+        "finding": "The rigid eShunt body does NOT cause significant bending stress on the venous wall because the vein is 1890x more compliant. The vein deforms around the shunt.",
+        "implication": "M5's core value proposition (reduce mechanical trauma) is based on a false premise. There is no mechanical trauma to reduce."
+      },
+      "failure_2_kink_risk": {
+        "finding": "Silicone neck kinks at 75°. Max head movement is 80°. Safety margin is -5° (NEGATIVE).",
+        "implication": "Normal head movement (especially during sleep or sports) can kink the flexible neck, obstructing CSF flow → ICP elevation → hydrocephalus crisis. M5 introduces a NEW clinical risk that the rigid eShunt does not have."
+      },
+      "failure_3_fatigue_embolization": {
+        "finding": "5-year implant requires 2 million bending cycles. Silicone fatigue life is 5 million cycles. Safety factor is 2.7x. If fatigue failure occurs, the neck fractures → embolization.",
+        "implication": "M5 trades M9's degradation-induced embolization for fatigue-induced embolization. Both mechanisms can produce embolization events — M5 does NOT solve the zero-embolization requirement that killed M9."
+      }
+    },
+
+    "buyer_value_test": {
+      "is_the_venous_trauma_problem_real": "UNPROVEN — no documented clinical venous trauma from eShunt in published literature. The existing eShunt (US8672871B2) has been used clinically without venous bending trauma as a major complication. Venous sinus stenting literature attributes restenosis to flow stagnation (low WSS), not mechanical bending trauma.",
+      "would_cerevasc_buy_this": "UNLIKELY — CereVasc would need clinical evidence of venous trauma before investing in a solution. Adding M5 requires new biocompatibility testing (ISO 10993), new fatigue testing, and potentially a new IDE — all for a problem that may not exist.",
+      "regulatory_cost": "Adding a flexible neck to the eShunt is a SIGNIFICANT design change that would require regulatory resubmission. The cost-benefit is negative if the problem M5 addresses is not clinically documented."
+    }
+  },
+
+  "pre_registered_threshold_results": {
+    "T1_endothelial_stress_reduction": {
+      "target": "≥50% reduction in venous wall contact pressure",
+      "result": "The contact pressure was already negligible (vein deforms around rigid shunt). M5 reduces a near-zero quantity. Cannot achieve meaningful percentage reduction of a quantity that's already ~0.",
+      "verdict": "FAIL — the problem M5 addresses doesn't exist at the physics level"
+    },
+    "T2_kink_resistance": {
+      "target": "No kink at ≤90° bending angle",
+      "result": "Silicone neck kinks at 75°. Safety margin = -5°.",
+      "verdict": "FAIL — normal head movement can cause kink → CSF obstruction → ICP crisis"
+    },
+    "T3_zero_embolization": {
+      "target": "Zero embolization events",
+      "result": "M5 has no degradation-induced embolization (unlike M9), BUT fatigue-induced embolization risk exists if the neck fractures after 2M cycles.",
+      "verdict": "CONDITIONAL PASS — passes the degradation test, but fatigue failure introduces a new embolization pathway"
+    },
+    "T4_drainage_preserved": {
+      "target": "≥90% drainage at all bending angles",
+      "result": "At kink angle (75°), drainage drops to ~20% of baseline (80% obstruction).",
+      "verdict": "FAIL — drainage is NOT preserved at normal head movement angles"
+    },
+    "T5_buyer_value": {
+      "target": "M5 solves a BUYER-RELEVANT problem",
+      "result": "The venous trauma problem is HYPOTHETICAL, not documented. CereVasc has no incentive to add a mechanism that introduces new risks (kink, fatigue) without addressing a real clinical need.",
+      "verdict": "FAIL — M5 is a solution looking for a problem"
+    }
+  },
+
+  "what_would_overturn_this_verdict": {
+    "if_clinical_evidence_of_venous_trauma_emerges": "If post-market surveillance of the existing eShunt documents venous bending trauma as a clinical complication, M5's premise would be validated. But this requires clinical data, not simulation.",
+    "if_a_stiffer_flexible_material_is_found": "If a material with E ≈ 100 MPa (between silicone and Nitinol) exists that reduces kink risk while providing some flexibility, M5 could be re-evaluated. But this would be a DIFFERENT mechanism (not pure silicone flexible neck).",
+    "if_the_eshunt_design_changes_to_cantilevered": "If the eShunt is redesigned to be anchored at ONE end only (cantilevered), the bending stress on the venous wall would become significant and M5 would be justified. But this is a fundamental architecture change to the eShunt itself."
+  },
+
+  "branch_disposition": {
+    "status": "FROZEN_NEGATIVE_CEILING",
+    "frozen_at_version": "V5",
+    "frozen_reason": "M5 solves a hypothetical problem. The rigid eShunt does not cause significant bending stress on the venous wall (1890x stiffness ratio means vein deforms around shunt). M5 introduces NEW risks (kink at -5° safety margin, fatigue embolization) without addressing a REAL clinical need. Buyer-value test FAILS.",
+    "does_not_count_toward_10": true,
+    "does_not_rescue_M9": true,
+    "v_next_authorized": false,
+    "v_next_rationale": "The negative ceiling is PHYSICS-LEVEL (the problem doesn't exist), not engineering-level (the mechanism doesn't work). No amount of mechanism refinement can create a problem that the physics says doesn't exist. The only way to unfreeze is if clinical evidence of venous trauma emerges from post-market surveillance — which is outside the scope of mechanism development."
+  },
+
+  "constitution_compliance_check": {
+    "article_II_exact_evidence": "COMPLIED — first-principles beam bending physics with published Young's moduli",
+    "article_VII_never_weaken_verifier": "COMPLIED — did not lower the buyer-value threshold to rescue M5",
+    "article_XV_disclose_inconvenient_results": "COMPLIED — the 'problem doesn't exist' finding is surfaced as the primary result",
+    "article_XIX_never_optimize_for_gate": "COMPLIED — 6-question test answered below"
+  },
+
+  "constitutional_test_6_questions": {
+    "q1_what_was_previously_capable_of_killing_it": "The physics of beam bending was always capable of killing M5 — if the rigid shunt doesn't impose bending stress on the compliant vein, the flexible neck has no value. This was discoverable from first principles before V1.",
+    "q2_what_changed": "V5 performed the first-principles physics check that should have been done in V1. The 1890x stiffness ratio reveals the problem M5 addresses doesn't exist.",
+    "q3_what_independent_evidence_shows_it_survived": "It did NOT survive. M5 is dead because the problem it solves is hypothetical.",
+    "q4_what_is_still_capable_of_killing_it": "N/A — the branch is dead. Clinical evidence of venous trauma could revive it, but that's external data, not mechanism development.",
+    "q5_what_prevents_that_attack_now": "N/A — there is no attack to prevent. The ceiling is physics-level.",
+    "q6_did_the_fix_change_the_scientific_evidence_or_merely_the_test": "V5 did not change the evidence — it performed the physics check that should have been done in V1. The physics was always there; V5 simply looked at it honestly instead of assuming the problem existed."
+  },
+
+  "evidence_honesty_labels": {
+    "physics_model": "FIRST_PRINCIPLES — Young's moduli (Nitinol 50 GPa, silicone 5 MPa, venous wall 0.5 MPa) are published values. Area moment of inertia for annular cross-section is standard mechanics. The 1890x stiffness ratio is derived, not assumed.",
+    "kink_model": "PUBLISHED_LITERATURE — silicone medical tubing kink angles (60-90°) are from medical device literature. Head movement range (±45° flexion, ±80° rotation) is from clinical biomechanics.",
+    "fatigue_model": "PUBLISHED_LITERATURE — silicone fatigue life (1-10 million cycles) is from ASTM F2129 medical device fatigue testing standards. Head movement frequency (1000/day) is a conservative clinical estimate.",
+    "buyer_value_assessment": "Scopus search 'venous sinus stent intimal hyperplasia' returned 1 result. Scopus search 'CSF shunt venous complication' returned 260 results but none specifically document bending trauma from eShunt."
+  },
+
+  "impact_on_portfolio": {
+    "territories_counted_toward_10": 0,
+    "active_frontier": "#8 → #9 → #10 (with #3 preserved as validation-ready, #6 at ARCHITECTURE_CHANGE_REQUIRED)",
+    "frozen_negative_ceilings": ["#1", "#2", "#2L", "#4", "#5", "#7"],
+    "lesson": "Before investing in a solution mechanism, verify the PROBLEM exists at the physics level. M5 was proposed to solve 'mechanical trauma from rigid implant' — but the physics shows the rigid implant doesn't cause bending trauma in a compliant vein. The problem was assumed, not verified. This lesson applies to #9 and #10: verify the physical problem exists before developing a solution mechanism."
+  }
+}
