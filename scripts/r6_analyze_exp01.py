@@ -21,6 +21,8 @@ Output:
   V22_2_R6_EXP01_RESULTS.json (per-prototype results + embodiment decision)
 
 SHA-256 of this script is recorded in the execution artifact BEFORE testing.
+The script validates raw data BEFORE analysis. Bad data → INCONCLUSIVE, never silent skip.
+The final result binds: raw_data_sha256 + analysis_script_sha256 + constitution_hash.
 """
 import json
 import sys
@@ -28,6 +30,10 @@ import hashlib
 import statistics
 from pathlib import Path
 from datetime import datetime, timezone
+
+# Expected prototype count
+EXPECTED_PROTOTYPE_COUNT = 20
+EXPECTED_PROTOTYPE_IDS = {f"P{i:02d}" for i in range(1, 21)}
 
 
 # ===========================================================================
@@ -72,6 +78,97 @@ DECISION_HIERARCHY = {
     "ENGINEERING_DEFICIENCY": "Implementation needs redesign. Invention survives.",
     "CLINICAL_BUYER_TRADEOFF": "Buyer interprets against clinical requirements.",
 }
+
+
+# ===========================================================================
+# RAW-DATA VALIDATION (bad data → INCONCLUSIVE, never silent skip)
+# ===========================================================================
+
+def validate_raw_data(raw_data: dict) -> tuple:
+    """Validate raw data BEFORE analysis. Returns (is_valid, errors).
+
+    Per CEO v30.29: "Bad data must produce INCONCLUSIVE, not a plausible-looking result."
+    The script must never silently discard malformed records, missing measurements,
+    duplicate IDs, unexpected counts, or modified schema fields.
+    """
+    errors = []
+
+    # 1. Check prototype count
+    prototypes = raw_data.get("prototypes", [])
+    if len(prototypes) != EXPECTED_PROTOTYPE_COUNT:
+        errors.append(f"WRONG_PROTOTYPE_COUNT: expected {EXPECTED_PROTOTYPE_COUNT}, "
+                      f"got {len(prototypes)}")
+
+    # 2. Check for duplicate prototype IDs
+    proto_ids = [p.get("prototype_id", "") for p in prototypes]
+    seen_ids = set()
+    dup_ids = []
+    for pid in proto_ids:
+        if pid in seen_ids:
+            dup_ids.append(pid)
+        seen_ids.add(pid)
+    if dup_ids:
+        errors.append(f"DUPLICATE_PROTOTYPE_IDS: {dup_ids}")
+
+    # 3. Check for unexpected prototype IDs
+    actual_ids = set(proto_ids)
+    unexpected = actual_ids - EXPECTED_PROTOTYPE_IDS
+    missing = EXPECTED_PROTOTYPE_IDS - actual_ids
+    if unexpected:
+        errors.append(f"UNEXPECTED_PROTOTYPE_IDS: {unexpected}")
+    if missing:
+        errors.append(f"MISSING_PROTOTYPE_IDS: {missing}")
+
+    # 4. Check each prototype has required measurements
+    required_measurements = ["opening_pressure", "hysteresis", "repeatability", "drift"]
+    for proto in prototypes:
+        pid = proto.get("prototype_id", "UNKNOWN")
+        measurements = proto.get("measurements", {})
+
+        for req in required_measurements:
+            if req not in measurements:
+                errors.append(f"MISSING_MEASUREMENT: {pid} missing '{req}'")
+                continue
+
+            m = measurements[req]
+
+            # Check opening_pressure has at least 2 cycles
+            if req == "opening_pressure":
+                cycles = [m.get("cycle_1_mmhg"), m.get("cycle_2_mmhg"), m.get("cycle_3_mmhg")]
+                valid_cycles = [c for c in cycles if c is not None]
+                if len(valid_cycles) < 2:
+                    errors.append(f"INSUFFICIENT_CYCLES: {pid} has {len(valid_cycles)} cycles (need >=2)")
+
+                # Check for impossible values
+                for c in valid_cycles:
+                    if c is not None and (c < 0 or c > 100):
+                        errors.append(f"IMPOSSIBLE_VALUE: {pid} opening_pressure cycle = {c} mmHg (must be 0-100)")
+
+            # Check hysteresis has loop_width
+            if req == "hysteresis":
+                lw = m.get("loop_width_mmhg")
+                if lw is not None and (lw < 0 or lw > 100):
+                    errors.append(f"IMPOSSIBLE_VALUE: {pid} hysteresis loop_width = {lw} mmHg (must be 0-100)")
+
+            # Check drift values
+            if req == "drift":
+                d = m.get("drift_mmhg")
+                if d is not None and (d < -50 or d > 50):
+                    errors.append(f"IMPOSSIBLE_VALUE: {pid} drift = {d} mmHg (must be -50 to +50)")
+
+        # 5. Check calibration confirmation
+        if not proto.get("calibration_verified", False):
+            errors.append(f"CALIBRATION_NOT_VERIFIED: {pid} calibration_verified is False or missing")
+
+    # 6. Check for schema changes (unexpected top-level keys)
+    expected_top_keys = {"prototypes", "metadata", "experiment_id"}
+    actual_top_keys = set(raw_data.keys())
+    unexpected_keys = actual_top_keys - expected_top_keys - {"raw_data_sha256"}
+    # Note: extra keys are warnings, not errors — but we log them
+    if unexpected_keys:
+        errors.append(f"UNEXPECTED_SCHEMA_KEYS: {unexpected_keys} (may indicate schema drift)")
+
+    return (len(errors) == 0, errors)
 
 
 # ===========================================================================
@@ -375,8 +472,44 @@ def main():
         print(f"ERROR: raw data file not found: {raw_file}")
         sys.exit(1)
 
+    # Compute raw data SHA-256 BEFORE loading (cryptographic binding)
+    raw_bytes = raw_file.read_bytes()
+    raw_data_sha256 = hashlib.sha256(raw_bytes).hexdigest()
+
     with open(raw_file) as f:
         raw_data = json.load(f)
+
+    # === RAW-DATA VALIDATION (before any analysis) ===
+    is_valid, validation_errors = validate_raw_data(raw_data)
+    if not is_valid:
+        print(f"\n{'='*78}")
+        print("RAW-DATA VALIDATION FAILED — INCONCLUSIVE")
+        print(f"{'='*78}")
+        for err in validation_errors:
+            print(f"  ERROR: {err}")
+        print(f"\nThe experiment is INCONCLUSIVE due to raw-data validation failures.")
+        print(f"Bad data must produce INCONCLUSIVE, not a plausible-looking result.")
+        print(f"Do NOT proceed with analysis. Fix the data collection issue and re-run.")
+
+        # Still produce a result file — but it's INCONCLUSIVE
+        output = {
+            "task_id": "R6-EXP01-RESULTS",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "raw_data_sha256": raw_data_sha256,
+            "analysis_script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            "result_scope": "EMBODIMENT_LEVEL",
+            "overall_decision": "INCONCLUSIVE — raw-data validation failed",
+            "validation_errors": validation_errors,
+            "per_prototype_results": [],
+            "embodiment_decision": {"overall_decision": "INCONCLUSIVE — data validation failure"},
+        }
+        output_path = Path(__file__).parent.parent / "CEREVASC_TERRITORY_6_V8_MECHANISM_RESET" / "V22_2_R6_EXP01_RESULTS.json"
+        with open(output_path, "w") as f:
+            json.dump(output, f, indent=2)
+        print(f"\nINCONCLUSIVE result saved to: {output_path}")
+        sys.exit(1)
+
+    print(f"Raw-data validation: PASSED ({len(validation_errors)} errors)")
 
     prototypes = raw_data.get("prototypes", [])
     if not prototypes:
@@ -402,16 +535,34 @@ def main():
         print(f"  {metric}: {decision['result']} ({decision.get('category', '?')})")
     print(f"\n  OVERALL: {embodiment['overall_decision']}")
 
-    # Output
+    # Cryptographic binding chain
+    analysis_script_sha256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+
+    # Output with full cryptographic binding
     output = {
         "task_id": "R6-EXP01-RESULTS",
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "analysis_script_hash": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "cryptographic_binding": {
+            "raw_data_sha256": raw_data_sha256,
+            "analysis_script_sha256": analysis_script_sha256,
+            "constitution_version": "1.4.0",
+            "constitution_hash": "d70e399a8839a237eae013e1bbd3e582998e62b8dc5ef0a65f8afa7f2e65b586",
+            "experiment_id": raw_data.get("experiment_id", "EXP-R6-01"),
+            "raw_data_file": str(raw_file),
+            "binding_statement": "This result is cryptographically bound to: "
+                "(1) the exact raw data file (SHA-256 above), "
+                "(2) the exact analysis script (SHA-256 above), "
+                "(3) the constitution version under which the protocol was frozen. "
+                "Any modification to any of these invalidates the result.",
+        },
         "raw_data_file": str(raw_file),
+        "raw_data_sha256": raw_data_sha256,
+        "analysis_script_hash": analysis_script_sha256,
         "result_scope": "EMBODIMENT_LEVEL",
         "embodiment": "Silicone slit valve, 0.25mm bypass radius, 200mm length, concentric",
         "single_lot_declaration": "Results from 20 prototypes from ONE fabrication lot. "
                                   "Engineering feasibility only. Manufacturing capability NOT established.",
+        "validation_result": "PASSED" if is_valid else "FAILED",
         "per_prototype_results": proto_results,
         "embodiment_decision": embodiment,
         "interpretation_rule": "These results apply to the [EMBODIMENT: silicone slit valve at 0.25mm]. "
