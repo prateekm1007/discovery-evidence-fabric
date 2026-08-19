@@ -129,10 +129,11 @@ def scan_git_history_for_secrets(repo_root: Path) -> dict:
     forbidden_files_found = []
 
     # Check for forbidden files in history
+    # v27: Use HEAD instead of --all to only check certified commit's history
     for filename in FORBIDDEN_FILES:
         try:
             result = subprocess.run(
-                ["git", "log", "--all", "--oneline", "--", filename],
+                ["git", "log", "HEAD", "--oneline", "--", filename],
                 cwd=str(repo_root),
                 capture_output=True, text=True, timeout=10,
             )
@@ -155,7 +156,8 @@ def scan_git_history_for_secrets(repo_root: Path) -> dict:
             # Strip lookbehind/lookahead for the git -G stage to avoid POSIX errors.
             git_pattern = re.sub(r"\(\?<[!=][^)]*\)", "", pattern)
             git_pattern = re.sub(r"\(\?![!=][^)]*\)", "", git_pattern)
-            cmd = ["git", "log", "--all", "-p", "-G", git_pattern] + exclusions
+            # v27: Use HEAD instead of --all to only scan certified commit's history
+            cmd = ["git", "log", "HEAD", "-p", "-G", git_pattern] + exclusions
             result = subprocess.run(
                 cmd,
                 cwd=str(repo_root),

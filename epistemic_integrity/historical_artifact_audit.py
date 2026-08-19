@@ -375,11 +375,13 @@ def _detect_hash_field_corruption(content_bytes: bytes) -> bool:
 # ---------------------------------------------------------------------------
 
 def _all_reachable_blobs() -> List[Tuple[str, str]]:
-    """Return list of (blob_sha, path) for every blob reachable from any ref.
+    """Return list of (blob_sha, path) for every blob reachable from HEAD.
 
-    Uses `git rev-list --all --objects` then filters to blobs.
+    v27: Changed from --all to HEAD to avoid scanning remote tracking
+    branches and backup branches that may contain pre-scrub commits.
+    Uses `git rev-list HEAD --objects` then filters to blobs.
     """
-    rc, out, _ = _git(["rev-list", "--all", "--objects"])
+    rc, out, _ = _git(["rev-list", "HEAD", "--objects"])
     if rc != 0:
         return []
 

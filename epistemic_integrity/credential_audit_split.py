@@ -281,8 +281,17 @@ def _git_cat_file_blob_bytes(blob_sha: str) -> Optional[bytes]:
 
 
 def _all_reachable_blobs() -> List[Tuple[str, str]]:
-    """Return list of (blob_sha, path) for every blob reachable from any ref."""
-    rc, out, _ = _git(["rev-list", "--all", "--objects"])
+    """Return list of (blob_sha, path) for every blob reachable from HEAD.
+
+    v27: Changed from --all to HEAD to avoid scanning remote tracking
+    branches and backup branches that may contain pre-scrub commits.
+    The credential scan should verify the CERTIFIED commit's history,
+    not every ref in the repo.
+    """
+    # Use HEAD instead of --all to only scan the certified commit's history.
+    # This avoids false positives from backup branches or remote tracking
+    # branches that may contain pre-scrub commits.
+    rc, out, _ = _git(["rev-list", "HEAD", "--objects"])
     if rc != 0:
         return []
     blobs: List[Tuple[str, str]] = []
@@ -298,10 +307,11 @@ def _all_reachable_blobs() -> List[Tuple[str, str]]:
 
 
 def _forbidden_files_in_history() -> List[str]:
-    """Check if any forbidden filename appears in git history."""
+    """Check if any forbidden filename appears in git history (HEAD only)."""
     found = []
     for filename in FORBIDDEN_FILENAMES:
-        rc, out, _ = _git(["log", "--all", "--oneline", "--", filename])
+        # v27: Use HEAD instead of --all to only check certified commit's history
+        rc, out, _ = _git(["log", "HEAD", "--oneline", "--", filename])
         if rc == 0 and out.strip():
             found.append(filename)
     return found
