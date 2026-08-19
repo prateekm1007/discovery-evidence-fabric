@@ -88,19 +88,76 @@ def validate_raw_data(raw_data: dict) -> tuple:
     """Validate raw data BEFORE analysis. Returns (is_valid, errors).
 
     Per CEO v30.29: "Bad data must produce INCONCLUSIVE, not a plausible-looking result."
+    Per CEO v30.30: Schema drift is INCONCLUSIVE (not a warning). Validate types,
+    units, timestamps, experiment ID, nested fields, and acquisition provenance.
+
     The script must never silently discard malformed records, missing measurements,
     duplicate IDs, unexpected counts, or modified schema fields.
     """
     errors = []
 
-    # 1. Check prototype count
+    # === TOP-LEVEL VALIDATION ===
+
+    # 0. Check experiment_id exists and matches
+    exp_id = raw_data.get("experiment_id")
+    if not exp_id:
+        errors.append("MISSING_EXPERIMENT_ID: top-level 'experiment_id' is missing")
+    elif exp_id != "EXP-R6-01":
+        errors.append(f"WRONG_EXPERIMENT_ID: expected 'EXP-R6-01', got '{exp_id}'")
+
+    # 1. Check metadata exists with acquisition provenance
+    metadata = raw_data.get("metadata", {})
+    if not metadata:
+        errors.append("MISSING_METADATA: top-level 'metadata' is missing")
+    else:
+        # Check acquisition provenance fields (CEO v30.30 Fix 3)
+        acq = metadata.get("acquisition_provenance", {})
+        if not acq:
+            errors.append("MISSING_ACQUISITION_PROVENANCE: metadata.acquisition_provenance is missing")
+        else:
+            for req_field in ["operator_id", "instrument_ids", "acquisition_start_timestamp",
+                              "acquisition_end_timestamp", "calibration_verified",
+                              "positive_control_passed"]:
+                if req_field not in acq:
+                    errors.append(f"MISSING_ACQUISITION_FIELD: metadata.acquisition_provenance.{req_field}")
+                elif acq[req_field] is None:
+                    errors.append(f"NULL_ACQUISITION_FIELD: metadata.acquisition_provenance.{req_field} is null")
+
+            # Check calibration is verified
+            if not acq.get("calibration_verified", False):
+                errors.append("CALIBRATION_NOT_VERIFIED: metadata.acquisition_provenance.calibration_verified is False")
+
+            # Check positive control passed
+            if not acq.get("positive_control_passed", False):
+                errors.append("POSITIVE_CONTROL_NOT_PASSED: metadata.acquisition_provenance.positive_control_passed is False")
+
+            # Validate timestamps are ISO format
+            for ts_field in ["acquisition_start_timestamp", "acquisition_end_timestamp"]:
+                ts_val = acq.get(ts_field)
+                if ts_val and not isinstance(ts_val, str):
+                    errors.append(f"INVALID_TIMESTAMP_TYPE: {ts_field} must be string, got {type(ts_val).__name__}")
+
+            # Check instrument IDs exist
+            inst_ids = acq.get("instrument_ids", {})
+            if not isinstance(inst_ids, dict):
+                errors.append("INVALID_INSTRUMENT_IDS: must be a dict")
+            elif not inst_ids:
+                errors.append("EMPTY_INSTRUMENT_IDS: no instrument IDs recorded")
+
+    # 2. Check prototype count
     prototypes = raw_data.get("prototypes", [])
+    if not isinstance(prototypes, list):
+        errors.append("INVALID_PROTOTYPES_TYPE: 'prototypes' must be a list")
+        prototypes = []
     if len(prototypes) != EXPECTED_PROTOTYPE_COUNT:
         errors.append(f"WRONG_PROTOTYPE_COUNT: expected {EXPECTED_PROTOTYPE_COUNT}, "
                       f"got {len(prototypes)}")
 
-    # 2. Check for duplicate prototype IDs
-    proto_ids = [p.get("prototype_id", "") for p in prototypes]
+    # 3. Check for duplicate prototype IDs
+    proto_ids = []
+    for p in prototypes:
+        pid = p.get("prototype_id", "")
+        proto_ids.append(pid)
     seen_ids = set()
     dup_ids = []
     for pid in proto_ids:
@@ -110,7 +167,7 @@ def validate_raw_data(raw_data: dict) -> tuple:
     if dup_ids:
         errors.append(f"DUPLICATE_PROTOTYPE_IDS: {dup_ids}")
 
-    # 3. Check for unexpected prototype IDs
+    # 4. Check for unexpected/missing prototype IDs
     actual_ids = set(proto_ids)
     unexpected = actual_ids - EXPECTED_PROTOTYPE_IDS
     missing = EXPECTED_PROTOTYPE_IDS - actual_ids
@@ -119,11 +176,33 @@ def validate_raw_data(raw_data: dict) -> tuple:
     if missing:
         errors.append(f"MISSING_PROTOTYPE_IDS: {missing}")
 
-    # 4. Check each prototype has required measurements
+    # 5. Check each prototype has required measurements with correct types
     required_measurements = ["opening_pressure", "hysteresis", "repeatability", "drift"]
     for proto in prototypes:
         pid = proto.get("prototype_id", "UNKNOWN")
+
+        # Check prototype_id is a string
+        if not isinstance(pid, str) or not pid:
+            errors.append(f"INVALID_PROTOTYPE_ID: prototype_id must be non-empty string, got {pid!r}")
+
+        # Check test_order exists and is integer
+        test_order = proto.get("test_order")
+        if test_order is None:
+            errors.append(f"MISSING_TEST_ORDER: {pid} missing test_order")
+        elif not isinstance(test_order, int):
+            errors.append(f"INVALID_TEST_ORDER_TYPE: {pid} test_order must be int, got {type(test_order).__name__}")
+
+        # Check timestamp exists
+        ts = proto.get("timestamp")
+        if not ts:
+            errors.append(f"MISSING_TIMESTAMP: {pid} missing timestamp")
+        elif not isinstance(ts, str):
+            errors.append(f"INVALID_TIMESTAMP_TYPE: {pid} timestamp must be string")
+
         measurements = proto.get("measurements", {})
+        if not isinstance(measurements, dict):
+            errors.append(f"INVALID_MEASUREMENTS_TYPE: {pid} measurements must be dict")
+            continue
 
         for req in required_measurements:
             if req not in measurements:
@@ -131,42 +210,50 @@ def validate_raw_data(raw_data: dict) -> tuple:
                 continue
 
             m = measurements[req]
+            if not isinstance(m, dict):
+                errors.append(f"INVALID_MEASUREMENT_TYPE: {pid}.{req} must be dict, got {type(m).__name__}")
+                continue
 
-            # Check opening_pressure has at least 2 cycles
+            # Type-check numeric fields
+            def check_numeric(field_name, val, min_val, max_val, unit=""):
+                if val is None:
+                    return
+                if not isinstance(val, (int, float)):
+                    errors.append(f"INVALID_TYPE: {pid}.{req}.{field_name} must be numeric, got {type(val).__name__}")
+                    return
+                if val < min_val or val > max_val:
+                    errors.append(f"IMPOSSIBLE_VALUE: {pid}.{req}.{field_name} = {val}{unit} (must be {min_val}-{max_val}{unit})")
+
             if req == "opening_pressure":
                 cycles = [m.get("cycle_1_mmhg"), m.get("cycle_2_mmhg"), m.get("cycle_3_mmhg")]
                 valid_cycles = [c for c in cycles if c is not None]
                 if len(valid_cycles) < 2:
                     errors.append(f"INSUFFICIENT_CYCLES: {pid} has {len(valid_cycles)} cycles (need >=2)")
+                for i, c in enumerate(cycles):
+                    check_numeric(f"cycle_{i+1}_mmhg", c, 0, 100, " mmHg")
 
-                # Check for impossible values
-                for c in valid_cycles:
-                    if c is not None and (c < 0 or c > 100):
-                        errors.append(f"IMPOSSIBLE_VALUE: {pid} opening_pressure cycle = {c} mmHg (must be 0-100)")
-
-            # Check hysteresis has loop_width
-            if req == "hysteresis":
+            elif req == "hysteresis":
                 lw = m.get("loop_width_mmhg")
-                if lw is not None and (lw < 0 or lw > 100):
-                    errors.append(f"IMPOSSIBLE_VALUE: {pid} hysteresis loop_width = {lw} mmHg (must be 0-100)")
+                check_numeric("loop_width_mmhg", lw, 0, 100, " mmHg")
 
-            # Check drift values
-            if req == "drift":
+            elif req == "drift":
                 d = m.get("drift_mmhg")
-                if d is not None and (d < -50 or d > 50):
-                    errors.append(f"IMPOSSIBLE_VALUE: {pid} drift = {d} mmHg (must be -50 to +50)")
+                check_numeric("drift_mmhg", d, -50, 50, " mmHg")
+                broke = m.get("broke_before_100")
+                if broke is not None and not isinstance(broke, bool):
+                    errors.append(f"INVALID_TYPE: {pid}.drift.broke_before_100 must be bool, got {type(broke).__name__}")
 
-        # 5. Check calibration confirmation
+        # Check calibration_verified per prototype
         if not proto.get("calibration_verified", False):
             errors.append(f"CALIBRATION_NOT_VERIFIED: {pid} calibration_verified is False or missing")
 
-    # 6. Check for schema changes (unexpected top-level keys)
+    # 6. Check for schema drift — INCONCLUSIVE for unexpected keys (CEO v30.30)
     expected_top_keys = {"prototypes", "metadata", "experiment_id"}
     actual_top_keys = set(raw_data.keys())
-    unexpected_keys = actual_top_keys - expected_top_keys - {"raw_data_sha256"}
-    # Note: extra keys are warnings, not errors — but we log them
+    unexpected_keys = actual_top_keys - expected_top_keys
     if unexpected_keys:
-        errors.append(f"UNEXPECTED_SCHEMA_KEYS: {unexpected_keys} (may indicate schema drift)")
+        errors.append(f"UNEXPECTED_SCHEMA_KEYS: {unexpected_keys} — schema drift detected, "
+                      f"INCONCLUSIVE (not a warning)")
 
     return (len(errors) == 0, errors)
 
