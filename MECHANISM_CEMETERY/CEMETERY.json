@@ -141,7 +141,60 @@
         "V5_1_PROBLEM_EXISTENCE_AUDIT.json"
       ],
       "epistemic_class": "UNRESOLVED_WARNING"
+    },
+    {
+      "entry_id": "CE-009",
+      "territory_id": "CV-T06",
+      "mechanism_name": "Mechanical snare via catheter (R1)",
+      "proposed_version": "V8-V10",
+      "killed_at_version": "V10",
+      "kill_reason": "ENGINEERING_FAILURE + NOVELTY_RISK",
+      "what_was_proposed": "Endovascular catheter with mechanical snare/grasper engages the eShunt and applies traction for removal. No thermal activation, no electronic sensors, no adhesion dependence.",
+      "why_it_failed": "Tissue ingrowth is the SAME adhesion ceiling as M3. IVC filter retrieval success drops to ~50% at 6 months. Embolization from tissue fragments conflicts with CE-007 zero-embolization. Not novel (FlowTriever/snares established). Poor failure recovery (craniotomy).",
+      "reusable_lesson": "Changing retrieval ACTIVATION does NOT change retrieval PHYSICS. Any retrieval mechanism for a permanently implanted endovascular anchor faces the same ingrowth ceiling. The problem is not HOW you pull \u2014 it is that the anchor is DESIGNED to be ingrown.",
+      "what_to_avoid": "Do not propose retrieval mechanisms for permanently implanted endovascular anchors without addressing tissue ingrowth. The ingrowth is by design.",
+      "physical_constraint": "eShunt anchor designed for tissue ingrowth. Retrieval after 6+ months has ~50% success (IVC filter data). Tissue fragments during retrieval conflict with zero-embolization threshold.",
+      "evidence_sources": [
+        "V10_R1_MECHANICAL_SNARE_ATTACK.json"
+      ],
+      "epistemic_class": "STRONG_CONSTRAINT"
+    },
+    {
+      "entry_id": "CE-010",
+      "territory_id": "CV-T06",
+      "mechanism_name": "Flow reversal obstruction clearing (R3)",
+      "proposed_version": "V8-V11",
+      "killed_at_version": "V11.2",
+      "kill_reason": "ENGINEERING_FAILURE + SAFETY_CONCERN (MODEL_DERIVED + ANALOGICAL)",
+      "what_was_proposed": "Retrograde flush from venous side to clear obstruction. eShunt stays in place, no device removal needed.",
+      "why_it_failed": "Retrograde flush pushes obstruction debris INTO the subarachnoid space (brain). V11.1 quantitative model: 100% particle SAS entry, 970/1000 >10um. V11.2 CORRECTION: USP <788> 9.7x comparison RETRACTED (USP applies to parenteral, not intrathecal). Replaced with analogical evidence: 152 SAH inflammation studies, 33 arachnoiditis studies. CLEARS device (2025) confirms retrograde flush is already known for VP shunts. eShunt venous drainage makes retrograde inherently more dangerous (debris to brain vs peritoneum).",
+      "reusable_lesson": "Retrograde flush for eShunt pushes debris toward brain. The eShunt venous drainage direction makes retrograde more dangerous than VP shunts (peritoneal). However, the clinical hazard is ANALOGICAL (SAH blood causes inflammation), not directly proven for shunt debris. MODEL_DERIVED + ANALOGICAL_EVIDENCE \u2014 not PROVEN_UNSAFE.",
+      "what_to_avoid": "Do not propose retrograde flush or debris-mobilizing clearing for eShunt without addressing the brain-ward debris transport. Safe clearing mechanisms must push debris DISTALLY (toward venous system).",
+      "physical_constraint": "eShunt drains subarachnoid\u2192venous. Retrograde = venous\u2192subarachnoid = debris to brain. 100% of modeled particles enter SAS. Clinical hazard supported by analogy (SAH, arachnoiditis), not direct shunt-debris evidence.",
+      "evidence_sources": [
+        "V11_R3_FLOW_REVERSAL_ATTACK.json",
+        "V11_1_R3_QUANTITATIVE_DEBRIS_MODEL.json",
+        "V11_2_R3_EVIDENCE_CORRECTION.json"
+      ],
+      "epistemic_class": "MODEL_DERIVED"
+    },
+    {
+      "entry_id": "CE-011",
+      "territory_id": "CV-T06",
+      "mechanism_name": "Magnetic actuated release (R4)",
+      "proposed_version": "V8-V12",
+      "killed_at_version": "V12",
+      "kill_reason": "MRI_SAFETY_GATEKEEPER + PHYSICS_FORCE_INSUFFICIENT",
+      "what_was_proposed": "eShunt anchor contains magnetic element. External magnetic field (MRI or electromagnet) applies force to disengage anchor.",
+      "why_it_failed": "MRI compatibility is a GATEKEEPER for neurosurgical implants (hydrocephalus patients need brain MRI). Magnetic element causes premature release, heating, torque, image artifact. Magnetic force at 5-10cm depth (1/r3 decay) is 10-50x less than needed for ingrowth disengagement (0.05-0.1N available vs 1-5N required). Demagnetization ~1%/year. Partial release creates new failure mode.",
+      "reusable_lesson": "Magnetic actuation is incompatible with neurosurgical implants that must coexist with brain MRI. The 1/r3 force decay makes deep-tissue magnetic actuation fundamentally insufficient. Any mechanism requiring external magnetic actuation for a deep endovascular implant faces both MRI safety and force-distance constraints.",
+      "what_to_avoid": "Do not propose magnetic actuation for neurosurgical implants requiring MRI compatibility. Do not propose magnetic mechanisms for deep-tissue (>3cm) actuation where 1/r3 force decay makes mechanism insufficient.",
+      "physical_constraint": "MRI field (1.5-3T) exerts force on magnetic element causing premature release. Force at 5-10cm depth: 0.05-0.1N (available) vs 1-5N (required). 1/r3 distance dependence is a physics constant.",
+      "evidence_sources": [
+        "V12_R4_MAGNETIC_RELEASE_ATTACK.json"
+      ],
+      "epistemic_class": "STRONG_CONSTRAINT"
     }
   ],
-  "updated_at": "2026-08-19T03:48:39.484080+00:00"
+  "updated_at": "2026-08-19T03:53:31.406324+00:00"
 }
