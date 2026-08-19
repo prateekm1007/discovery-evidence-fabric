@@ -41,6 +41,39 @@ class ExternalIdentityVerification:
 
 
 # ============================================================
+# CEO v30.9 P0-1: External vs Internal source type classification
+# ============================================================
+# Externally-sourced source types MUST go through register_source_from_verified_evidence.
+# Internally-generated source types can use register_source directly.
+# This classification is the P0 control that closes the raw-Source bypass loophole.
+_EXTERNAL_SOURCE_TYPES = frozenset({
+    "PMID", "DOI", "PATENT", "URL", "BOOK",
+    "K_NUMBER", "PMA_NUMBER", "MDR_REPORT_KEY", "RECALL_NUMBER",
+    "NCT_ID", "PROJECT_NUM",
+})
+
+_INTERNAL_SOURCE_TYPES = frozenset({
+    "INTERNAL_REPORT", "INTERNAL_ANALYSIS",
+})
+
+
+def _is_external_source_type(source_type: str) -> bool:
+    """CEO v30.9 P0-1: Returns True if source_type indicates external origin.
+
+    External sources (papers, patents, MAUDE reports, clinical trials, etc.)
+    MUST be registered via register_source_from_verified_evidence().
+    Internal sources (INTERNAL_REPORT, INTERNAL_ANALYSIS) can use
+    register_source() directly.
+    """
+    return source_type in _EXTERNAL_SOURCE_TYPES
+
+
+def _is_internal_source_type(source_type: str) -> bool:
+    """CEO v30.9 P0-1: Returns True if source_type indicates internal origin."""
+    return source_type in _INTERNAL_SOURCE_TYPES
+
+
+# ============================================================
 # P1-C: Three independently verified states for sources
 # ============================================================
 @dataclass
@@ -283,6 +316,39 @@ class EvidenceBinding:
         self._save()
 
     def register_source(self, source: Source):
+        """Register a Source in the production registry.
+
+        CEO v30.9 P0-1: This method is RESTRICTED to internally-generated
+        sources only (INTERNAL_REPORT, INTERNAL_ANALYSIS, simulation
+        outputs). Externally-sourced Source objects (PMID, DOI, PATENT,
+        URL, BOOK, K_NUMBER, PMA_NUMBER, MDR_REPORT_KEY, RECALL_NUMBER,
+        NCT_ID, PROJECT_NUM) MUST be registered via
+        register_source_from_verified_evidence() — which accepts ONLY
+        VerifiedEvidence and enforces the type-safe boundary.
+
+        An attacker attempting to register an externally-sourced Source
+        directly (bypassing VerifiedEvidence) will be rejected here. This
+        closes the second-order loophole identified in the CEO v30.9 audit:
+        v30.8 wired VerifiedEvidence into the new registration method but
+        left the old register_source() path open for external sources.
+
+        Article XVII: This check IS a P0 control. Every attempt to bypass
+        it must be adversarially tested.
+        """
+        if _is_external_source_type(source.source_type):
+            # Check if this Source carries VerifiedEvidence authorization
+            # (set by register_source_from_verified_evidence). If not, BLOCK.
+            auth = getattr(source, '_verified_evidence_authorization', None)
+            if not auth:
+                raise ValueError(
+                    f"EXTERNAL_SOURCE_REQUIRES_VERIFIED_EVIDENCE: "
+                    f"source_id={source.source_id} source_type={source.source_type} "
+                    f"is an externally-sourced type. It MUST be registered via "
+                    f"register_source_from_verified_evidence(VerifiedEvidence, ...) "
+                    f"NOT register_source(Source). Direct registration of external "
+                    f"sources bypasses the type-safe evidence authorization boundary "
+                    f"(CEO v30.9 P0-1). This is a P0 control violation."
+                )
         self.sources[source.source_id] = source
         self._save()
 

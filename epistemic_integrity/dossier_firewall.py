@@ -262,11 +262,27 @@ class DossierFirewall:
                 f"CLAIM_NOT_VALIDATED: {claim_id} errors={validation['errors']}"
             )
 
-        # Check 3: must have evidence binding
+        # Check 3: must have verified Evidence proof binding (P0-2 v30.9)
+        # CEO v30.9 P0-2: A dossier claim MUST require a verified proof object,
+        # not merely "source exists". A claim bound only to sources but with no
+        # Evidence proof object MUST BLOCK. The semantic verification loop runs
+        # over Evidence objects (Check 6 below); sources alone cannot carry
+        # the proof burden.
+        #
+        # This closes the source-only bypass loophole identified in the CEO
+        # v30.9 audit: the old check `if not evidence and not sources: BLOCK`
+        # allowed source-only claims to reach rendering without any proof
+        # binding verification.
         evidence = self.get_approved_evidence(claim_id)
         sources = self.get_approved_sources(claim_id)
-        if not evidence and not sources:
-            raise ValueError(f"CLAIM_NO_EVIDENCE_BINDING: {claim_id}")
+        if not evidence:
+            raise ValueError(
+                f"CLAIM_NO_VERIFIED_EVIDENCE_PROOF: {claim_id} "
+                f"— a dossier claim requires at least one verified Evidence "
+                f"proof object (not merely sources). Sources alone cannot "
+                f"carry the proof burden. CEO v30.9 P0-2: source-only claims "
+                f"are BLOCKED. (sources_present={len(sources)})"
+            )
 
         # Check 4 (P1-B): evidence must be dossier-grade
         # P0-1 v12: PROVENANCE_INCOMPLETE evidence is allowed but flagged
@@ -418,10 +434,27 @@ class DossierFirewall:
                     f"verdict={span_result['verdict']} reasoning={span_result['reasoning']}"
                 )
 
-        # Check 7 (P0-1 v6): Source verification — ALL THREE states must be verified
+        # Check 7 (P0-1 v6 + v30.9 P0-3): Source verification at render
         # Per CEO: src.is_dossier_grade() must be true (identity + content + support)
+        # CEO v30.9 P0-3: Actually CALL is_dossier_grade() and re-verify hashes.
+        #   Do not rely on the method existing — call it in the production path.
+        # CEO v30.9 P0-1: External sources MUST carry _verified_evidence_authorization
+        #   proving they entered through register_source_from_verified_evidence().
+        #   An external Source without this authorization is a bypass attempt.
         for src in sources:
-            # P0-1: Require ALL three verification states
+            # P0-3 v30.9: Explicitly call is_dossier_grade() — not just rely on
+            # individual state checks. This is the executive summary check.
+            if not src.is_dossier_grade():
+                raise ValueError(
+                    f"SOURCE_NOT_DOSSIER_GRADE: {src.source_id} "
+                    f"is_dossier_grade() returned False. identity_verified="
+                    f"{src.is_identity_verified()} content_verified="
+                    f"{src.is_content_verified()} support_verified="
+                    f"{src.is_support_verified()}. CEO v30.9 P0-3: all three "
+                    f"states MUST be True for dossier admission."
+                )
+
+            # P0-1: Require ALL three verification states (explicit, for error clarity)
             if not src.is_identity_verified():
                 raise ValueError(
                     f"SOURCE_IDENTITY_NOT_VERIFIED: {src.source_id} "
@@ -441,13 +474,49 @@ class DossierFirewall:
                 )
 
             # Content hash verification (recompute from actual content)
+            # CEO v30.9: If content is present, content_hash MUST also be present
+            # and MUST match. Content without a hash cannot be verified — BLOCK.
+            if src.content and not src.content_hash:
+                raise ValueError(
+                    f"SOURCE_CONTENT_MISSING_HASH: {src.source_id} has content "
+                    f"but no content_hash. Content cannot be verified without a "
+                    f"hash. CEO v30.9: content_hash is MANDATORY when content "
+                    f"is present."
+                )
             if src.content and src.content_hash:
                 if not self.hash_verifier.verify_content_hash(src.content, src.content_hash):
                     raise ValueError(f"SOURCE_CONTENT_HASH_MISMATCH: {src.source_id}")
 
+            # CEO v30.9: If span is present, span_hash MUST also be present
+            if src.span and not src.span_hash:
+                raise ValueError(
+                    f"SOURCE_SPAN_MISSING_HASH: {src.source_id} has span "
+                    f"but no span_hash. Span cannot be verified without a hash."
+                )
             if src.span and src.span_hash:
                 if not self.hash_verifier.verify_span_hash(src.span, src.span_hash):
                     raise ValueError(f"SOURCE_SPAN_HASH_MISMATCH: {src.source_id}")
+
+            # CEO v30.9 P0-1: External sources MUST carry VerifiedEvidence authorization.
+            # This is the render-time enforcement of the register_source boundary.
+            # An external Source without _verified_evidence_authorization was
+            # registered via the old register_source() path — which v30.9 P0-1
+            # now blocks. But defense-in-depth: check again at render time.
+            from .evidence_binding import _is_external_source_type
+            if _is_external_source_type(src.source_type):
+                auth = getattr(src, '_verified_evidence_authorization', None)
+                if not auth:
+                    raise ValueError(
+                        f"EXTERNAL_SOURCE_MISSING_VERIFIED_EVIDENCE_AUTHORIZATION: "
+                        f"{src.source_id} (source_type={src.source_type}) is an "
+                        f"externally-sourced Source but does not carry "
+                        f"_verified_evidence_authorization. This means it was "
+                        f"registered via register_source(Source) instead of "
+                        f"register_source_from_verified_evidence(VerifiedEvidence). "
+                        f"CEO v30.9 P0-1: external sources MUST enter through "
+                        f"the VerifiedEvidence boundary. This is a P0 control "
+                        f"violation at render time."
+                    )
 
             # P0-1 v16: NO document-wide semantic search for sources.
             # Source verification is identity + content hash + support state ONLY.
