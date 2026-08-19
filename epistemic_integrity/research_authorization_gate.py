@@ -63,13 +63,36 @@ class AuthorizationAttestation:
 
 
 class ResearchAuthorizationGate:
-    """READ-ONLY fresh-verification gate. Never mutates production state."""
+    """READ-ONLY fresh-verification gate. Never mutates production state.
+
+    v28: Constitution enforcement. The gate refuses to run if the
+    Epistemic Constitution has not been acknowledged.
+    """
 
     def __init__(self):
         self.verifier_version = ENGINE_VERSION
         self.schema_version = SCHEMA_VERSION
         self.git_head = self._get_git_head()
         self.worktree_clean = self._check_worktree_clean()
+
+        # v28: Require constitution acknowledgment before gate can run
+        self._require_constitution()
+
+    def _require_constitution(self):
+        """v28: Require the Epistemic Constitution to be acknowledged.
+
+        Per CEO v27 directive: "before every meaningful coding session,
+        the agent should receive [the constitution check]"
+
+        The gate is a "meaningful" action — it authorizes research.
+        Therefore the constitution MUST be acknowledged before the gate runs.
+        """
+        from epistemic_integrity.constitution_loader import require_acknowledgment
+        self.constitution_state = require_acknowledgment(
+            agent="research_authorization_gate",
+            session=self.git_head[:12],
+            intended_change="Running research authorization gate",
+        )
 
     def _get_git_head(self) -> str:
         try:
@@ -218,6 +241,13 @@ class ResearchAuthorizationGate:
         checks.append(g13)
         if not g13.passed:
             blocking_reasons.append(f"G13 AUTHORIZATION_BINDING: {g13.details}")
+
+        # G14: Constitution enforcement (CEO v27 directive)
+        # Verifies the Epistemic Constitution is present and acknowledged
+        g14 = self._constitution_check()
+        checks.append(g14)
+        if not g14.passed:
+            blocking_reasons.append(f"G14 CONSTITUTION: {g14.details}")
 
         authorized = len(blocking_reasons) == 0
 
@@ -1033,6 +1063,53 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                 )
         except Exception as e:
             return FreshCheck("G13", "authorization_binding", False,
+                              f"Error: {e}",
+                              self.git_head, self.verifier_version, self.schema_version)
+
+    def _constitution_check(self) -> FreshCheck:
+        """G14 (CEO v27 directive): Constitution enforcement.
+
+        Verifies that:
+        1. EPISTEMIC_CONSTITUTION.md is present
+        2. The constitution has been acknowledged
+        3. The acknowledgment hash matches the current constitution hash
+
+        Per CEO v27: "before every meaningful coding session, the agent
+        should receive [the constitution check]". The gate is a meaningful
+        action — it authorizes research. Therefore the constitution MUST
+        be acknowledged.
+        """
+        try:
+            sys.path.insert(0, str(REPO_ROOT))
+            from epistemic_integrity.constitution_loader import check_constitution_compliance
+
+            state = check_constitution_compliance()
+
+            if not state.constitution_present:
+                return FreshCheck(
+                    "G14", "constitution", False,
+                    "EPISTEMIC_CONSTITUTION.md is MISSING — repository cannot operate",
+                    self.git_head, self.verifier_version, self.schema_version,
+                )
+
+            if not state.acknowledgment_present:
+                return FreshCheck(
+                    "G14", "constitution", False,
+                    f"Constitution present (hash={state.constitution_hash[:16]}...) "
+                    f"but NOT acknowledged",
+                    self.git_head, self.verifier_version, self.schema_version,
+                )
+
+            return FreshCheck(
+                "G14", "constitution", True,
+                f"Constitution present and acknowledged "
+                f"(hash={state.constitution_hash[:16]}... v{state.constitution_version})",
+                self.git_head, self.verifier_version, self.schema_version,
+                raw_result={"constitution_hash": state.constitution_hash,
+                           "constitution_version": state.constitution_version},
+            )
+        except Exception as e:
+            return FreshCheck("G14", "constitution", False,
                               f"Error: {e}",
                               self.git_head, self.verifier_version, self.schema_version)
 

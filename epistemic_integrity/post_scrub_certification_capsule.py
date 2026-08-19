@@ -152,6 +152,10 @@ class PostScrubCertificationCapsule:
     historical_provenance_limitation_root: str
     historical_provenance_limitation_active: bool
 
+    # Constitution binding (v28)
+    constitution_hash: str  # SHA-256 of EPISTEMIC_CONSTITUTION.md
+    constitution_version: str
+
     # All 13 gate results
     gate_results: List[Dict[str, Any]]
 
@@ -183,6 +187,8 @@ class PostScrubCertificationCapsule:
             "certification_corpus_root": self.certification_corpus_root,
             "historical_provenance_limitation_root": self.historical_provenance_limitation_root,
             "historical_provenance_limitation_active": self.historical_provenance_limitation_active,
+            "constitution_hash": self.constitution_hash,
+            "constitution_version": self.constitution_version,
             "gate_results": self.gate_results,
             "post_scrub_revalidation_capsule_hash": self.post_scrub_revalidation_capsule_hash,
             "historical_artifact_audit_hash": self.historical_artifact_audit_hash,
@@ -291,6 +297,10 @@ def build_capsule(certified_commit: Optional[str] = None, run_gate: bool = True)
     limitation = _load_json(HISTORICAL_LIMITATION)
     limitation_active = limitation.get("status") == "ACTIVE"
 
+    # v28: Load constitution hash
+    from epistemic_integrity.constitution_loader import compute_constitution_hash, CONSTITUTION_VERSION
+    constitution_hash = compute_constitution_hash()
+
     # Authorization (narrower semantics per CEO v26)
     if all_gates_green:
         authorization = "AUTHORIZED_TO_RESUME_UNDER_POST_SCRUB_EPISTEMIC_STATE"
@@ -312,6 +322,8 @@ def build_capsule(certified_commit: Optional[str] = None, run_gate: bool = True)
         certification_corpus_root=_certification_corpus_root(),
         historical_provenance_limitation_root=_historical_limitation_root(),
         historical_provenance_limitation_active=limitation_active,
+        constitution_hash=constitution_hash,
+        constitution_version=CONSTITUTION_VERSION,
         gate_results=gate_results,
         post_scrub_revalidation_capsule_hash=p02.get("capsule_hash", ""),
         historical_artifact_audit_hash=p03.get("audit_hash", ""),
@@ -366,6 +378,10 @@ def main():
     print(f"HISTORICAL PROVENANCE LIMITATION:")
     print(f"  Limitation root:               {capsule.historical_provenance_limitation_root}")
     print(f"  Limitation active:             {capsule.historical_provenance_limitation_active}")
+    print()
+    print(f"CONSTITUTION (v28):")
+    print(f"  Constitution hash:             {capsule.constitution_hash}")
+    print(f"  Constitution version:          {capsule.constitution_version}")
     print()
     print(f"ALL 13 GATE RESULTS:")
     for g in capsule.gate_results:
