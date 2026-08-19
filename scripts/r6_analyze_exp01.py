@@ -117,11 +117,17 @@ def validate_raw_data(raw_data: dict) -> tuple:
         else:
             for req_field in ["operator_id", "instrument_ids", "acquisition_start_timestamp",
                               "acquisition_end_timestamp", "calibration_verified",
-                              "positive_control_passed"]:
+                              "positive_control_passed", "provenance_strength"]:
                 if req_field not in acq:
                     errors.append(f"MISSING_ACQUISITION_FIELD: metadata.acquisition_provenance.{req_field}")
                 elif acq[req_field] is None:
                     errors.append(f"NULL_ACQUISITION_FIELD: metadata.acquisition_provenance.{req_field} is null")
+
+            # Validate provenance_strength classification (CEO v30.31)
+            prov_strength = acq.get("provenance_strength")
+            if prov_strength and prov_strength not in ("INSTRUMENT_NATIVE_EXPORT", "OPERATOR_TRANSCRIPTION_FALLBACK"):
+                errors.append(f"INVALID_PROVENANCE_STRENGTH: must be 'INSTRUMENT_NATIVE_EXPORT' or "
+                              f"'OPERATOR_TRANSCRIPTION_FALLBACK', got '{prov_strength}'")
 
             # Check calibration is verified
             if not acq.get("calibration_verified", False):
@@ -650,6 +656,11 @@ def main():
         "single_lot_declaration": "Results from 20 prototypes from ONE fabrication lot. "
                                   "Engineering feasibility only. Manufacturing capability NOT established.",
         "validation_result": "PASSED" if is_valid else "FAILED",
+        "provenance_strength": raw_data.get("metadata", {}).get("acquisition_provenance", {}).get(
+            "provenance_strength", "UNKNOWN — not classified"),
+        "provenance_note": "INSTRUMENT_NATIVE_EXPORT = machine-generated record (highest strength). "
+                           "OPERATOR_TRANSCRIPTION_FALLBACK = human transcription + attestation (lower strength). "
+                           "Per CEO v30.31: the closer to reality, the less we should rely on human transcription.",
         "per_prototype_results": proto_results,
         "embodiment_decision": embodiment,
         "interpretation_rule": "These results apply to the [EMBODIMENT: silicone slit valve at 0.25mm]. "
