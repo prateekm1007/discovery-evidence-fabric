@@ -1,0 +1,168 @@
+{
+  "task_id": "TERRITORY-6-V9",
+  "step": "R2 bioresorbable anchor — full hypothesis attack",
+  "agent": "main (constitution-acknowledged, session 2026-08-19)",
+  "timestamp": "2026-08-19T06:00:00+00:00",
+
+  "ceo_directive_compliance": {
+    "directive": "Treat R2 as a HYPOTHESIS, not a leading invention. Attack: Article XX → material/degradation physics → premature/late release → fragment/embolization → biocompatibility → strongest non-bioresorbable competitor → exact patent claims. Do NOT use 0 search results as evidence of novelty.",
+    "epistemic_boundary": "DISCOVERY SIGNAL ≠ PHYSICAL FEASIBILITY ≠ NOVELTY ≠ BUYER VALUE ≠ INVENTION"
+  },
+
+  "step_1_article_xx_problem_existence": {
+    "q1_does_failure_occur": {
+      "answer": "YES — STRONG EVIDENCE",
+      "evidence": "openFDA: 1.3M adverse events for device retrieval. VP shunt revision rate 20-40% in 2 years. The retrieval/rescue problem is the #1 cost driver for CSF shunts. The problem EXISTS.",
+      "evidence_strength": "STRONG — established clinical problem"
+    },
+    "q2_does_it_matter_to_buyer": {
+      "answer": "YES — VERY HIGH",
+      "evidence": "Revision surgery costs $15K-$50K per event. Eliminating retrieval surgery (R2's value proposition) would be transformative."
+    },
+    "q3_does_mechanism_change_physical_quantity": {
+      "answer": "YES — bioresorbable anchor degrades, eliminating the need for mechanical retrieval force",
+      "mechanism_acting_on_variable": "The anchor's mechanical integrity (holding force) decreases over time via chemical degradation. This is a DIRECT change to the physical quantity that prevents retrieval."
+    },
+    "q4_is_change_large_enough": {
+      "answer": "UNKNOWN — depends on degradation kinetics control",
+      "evidence": "If the anchor degrades from full strength (holding eShunt in place) to zero strength (releasing eShunt) over a controlled period, the change is large enough. But the question is whether the degradation can be CONTROLLED precisely enough.",
+      "uncertainty": "HIGH — this is the core engineering question"
+    },
+    "q5_does_intervention_create_larger_failure": {
+      "answer": "POTENTIALLY YES — this is the CRITICAL finding",
+      "evidence": "See step_4 fragment/embolization attack below. Bioresorbable materials in vascular applications have documented thrombosis, fragmentation, and early failure. R2 may trade M3's retrieval problem for a bioresorbable degradation problem.",
+      "verdict": "CONDITIONAL FAIL — the intervention MAY create a larger failure mode (degradation-induced embolization/thrombosis)"
+    },
+    "gate_verdict": "CONDITIONAL PASS — problem exists and matters, but Q5 (new failure mode) is a serious concern that must be resolved before advancing."
+  },
+
+  "step_2_material_degradation_physics": {
+    "candidate_materials": {
+      "PLLA_poly-L-lactic-acid": {
+        "degradation_mechanism": "Hydrolysis of ester bonds → lactic acid → CO2 + H2O",
+        "degradation_timeline": "12-24 months for complete resorption (published, Absorb BVS)",
+        "timeline_controllability": "MODERATE — can be adjusted via crystallinity, molecular weight, thickness. But degradation is AUTOCATALYTIC (lactic acid accelerates degradation) → non-linear, hard to control precisely.",
+        "csf_environment_compatibility": "UNKNOWN — PLLA degrades in aqueous environments. CSF is aqueous (pH 7.3). Degradation rate in CSF may differ from blood.",
+        "concern": "Autocatalytic degradation means the timeline is not perfectly predictable. The anchor could degrade FASTER than expected in some patients (high CSF flow, low pH) and SLOWER in others."
+      },
+      "magnesium_alloy": {
+        "degradation_mechanism": "Corrosion: Mg + 2H2O → Mg(OH)2 + H2 gas",
+        "degradation_timeline": "Days to months (MUCH faster than PLLA)",
+        "timeline_controllability": "LOW — Mg corrosion is highly dependent on local pH, flow rate, and alloy composition. Hard to control to a specific timeline.",
+        "csf_environment_compatibility": "UNKNOWN — Mg degrades faster in chloride-rich environments. CSF has [Cl-] ≈ 120 mM (similar to blood). Hydrogen gas generation could be problematic in the CSF/venous system.",
+        "concern": "Hydrogen gas bubbles in the venous system → gas embolism risk. Mg degradation is TOO FAST and TOO VARIABLE for a timed-release application requiring 6+ months of anchoring."
+      }
+    },
+    "physics_verdict": {
+      "PLLA": "FEASIBLE but challenging — autocatalytic degradation makes precise timeline control difficult. 12-24 month timeline is established for vascular stents but may differ in CSF.",
+      "Mg": "PROBLEMATIC — hydrogen gas generation and rapid, variable corrosion make it unsuitable for timed-release in the venous system.",
+      "overall": "PLLA is the only viable candidate material. But the degradation kinetics in CSF/venous environment are UNKNOWN and must be tested."
+    }
+  },
+
+  "step_3_premature_late_release_attack": {
+    "premature_release_scenario": {
+      "description": "Anchor degrades faster than expected → eShunt detaches BEFORE the planned retrieval date",
+      "consequence": "Free-floating eShunt in the venous system → embolization to the heart/lungs. This is a CATASTROPHIC failure mode — worse than M3's retrieval failure because the eShunt becomes an embolic projectile.",
+      "probability": "UNKNOWN — depends on degradation kinetics variability across patients. If the degradation timeline varies ±30% (typical for bioresorbable materials), a 6-month anchor could release at 4.2 months in some patients.",
+      "severity": "CATASTROPHIC — detached eShunt migrating through the venous system is a life-threatening emergency"
+    },
+    "late_release_scenario": {
+      "description": "Anchor degrades slower than expected → eShunt cannot be retrieved when needed",
+      "consequence": "If the patient needs retrieval before the anchor has degraded (e.g., infection, obstruction), the anchor is still holding → the bioresorbable approach provides NO advantage over a permanent anchor. The patient still needs mechanical retrieval (R1 snare) as a fallback.",
+      "probability": "MODERATE — if the patient needs retrieval for any reason before the planned degradation date, R2 fails to provide its value proposition.",
+      "severity": "MODERATE — falls back to R1 (mechanical retrieval), but R2's value proposition (eliminate surgery) is lost."
+    },
+    "verdict": "R2 has a BIMODAL failure mode: premature release is catastrophic (embolization), late release negates the value proposition. The window between 'too early' and 'too late' must be precisely controlled — and bioresorbable materials have inherently variable degradation kinetics."
+  },
+
+  "step_4_fragment_embolization_attack": {
+    "ceo_warning": "R2 replaces M3's retrieval problem with a controlled degradation problem inside/adjacent to a venous interface. This creates fragment/embolization risk.",
+    "scopus_evidence": {
+      "bioresorbable_stent_thrombosis": "913 results — bioresorbable scaffolds have a DOCUMENTED thrombosis problem in clinical practice",
+      "bioabsorbable_scaffold_complications": "116 results — recoil, fragmentation, and complications documented",
+      "magnesium_bioresorbable_failure": "'Early failure of Magmaris bioresorbable stent after pulmonary artery stenting' — documented early failure in vascular application",
+      "absorb_bvs_withdrawal": "Abbott Absorb BVS was WITHDRAWN from the market due to thrombosis concerns (2017). This is the strongest negative evidence — a bioresorbable vascular scaffold that FAILED clinically."
+    },
+    "fragmentation_risk": {
+      "mechanism": "PLLA degradation is non-uniform. The anchor may fragment rather than dissolve uniformly. Fragments could embolize to the pulmonary circulation.",
+      "precedent": "The #7 M9 PLGA sleeve was KILLED for exactly this reason — 1/10000 embolization events from bioresorbable fragmentation. R2 uses the SAME material class (bioresorbable polymer) in the SAME location (venous interface).",
+      "cemetery_check": "CE-007 (#7 M9 failure) is a STRONG_CONSTRAINT — 'zero embolization threshold is a justified safety gate.' R2 must meet the SAME zero-embolization threshold that killed M9. Bioresorbable fragmentation makes this VERY DIFFICULT to achieve."
+    },
+    "verdict": "CRITICAL FAIL — R2 inherits the SAME failure mode that killed #7 M9 (bioresorbable fragmentation → embolization). The Scopus evidence (913 thrombosis results, Absorb BVS withdrawal) confirms that bioresorbable materials in vascular applications have a DOCUMENTED clinical failure pattern. R2 does NOT solve the embolization problem — it recreates it."
+  },
+
+  "step_5_biocompatibility": {
+    "inflammatory_response": {
+      "plla": "PLLA degradation produces lactic acid → local acidosis → inflammatory response. In the venous sinus, this could cause venous sinus thrombosis or intimal hyperplasia.",
+      "mg": "Mg degradation produces hydrogen gas → gas embolism risk. Hydrogen bubbles in the venous system can reach the pulmonary circulation.",
+      "csf_specific": "CSF has different protein content, cell count, and flow dynamics than blood. Biocompatibility data from vascular stents may NOT transfer to the CSF/venous sinus interface."
+    },
+    "iso_10993_compliance": "R2 requires full ISO 10993 biocompatibility testing for the CSF/venous environment. Existing data from vascular stents is NOT sufficient because the tissue environment is different.",
+    "verdict": "UNKNOWN — requires specific testing. The inflammatory/embolization risk from degradation products is a genuine concern that cannot be dismissed."
+  },
+
+  "step_6_strongest_non_bioresorbable_competitor": {
+    "competitor": "R3 — Flow reversal obstruction clearing",
+    "comparison": {
+      "R2_bioresorbable_anchor": {
+        "value_proposition": "Eliminates retrieval surgery (anchor dissolves)",
+        "failure_mode": "Fragmentation, embolization, premature/late release, thrombosis (913 Scopus results)",
+        "new_failure_modes_introduced": "YES — degradation products, fragmentation, gas (Mg), acidosis (PLLA)",
+        "cemetery_conflict": "CE-007 (#7 M9 zero-embolization threshold) — R2 uses bioresorbable material in the same location as M9"
+      },
+      "R3_flow_reversal": {
+        "value_proposition": "Clears obstruction without device removal (eShunt stays in place)",
+        "failure_mode": "Retrograde embolization risk (debris pushed into subarachnoid space)",
+        "new_failure_modes_introduced": "YES — retrograde flow into SAS (the #5 V18 El-Shafei problem in reverse)",
+        "cemetery_conflict": "CE-005 (#5 FDVBZ retrograde flow) — but this is a DIFFERENT retrograde (clearing, not anti-fouling)"
+      },
+      "R1_mechanical_snare": {
+        "value_proposition": "Established clinical technique (FlowTriever, Micra retrieval)",
+        "failure_mode": "Tissue ingrowth resistance (adhesion ceiling — M3 V7 failure mode 3)",
+        "new_failure_modes_introduced": "PARTIAL — inherits adhesion ceiling but uses mechanical engagement not thermal activation",
+        "cemetery_conflict": "CE-006 (#6 M3 adhesion ceiling) — but R1 uses a different engagement mechanism (catheter snare, not SMA thermal release)"
+      }
+    },
+    "does_R2_dominate": "NO — R2 does NOT dominate R3 or R1. R2 introduces the MOST new failure modes (fragmentation, embolization, premature/late release, thrombosis). R3 introduces one new failure mode (retrograde embolization). R1 partially inherits M3's adhesion ceiling but avoids thermal and sensor failures.",
+    "verdict": "R2 is NOT the strongest candidate. The bioresorbable approach introduces MORE failure modes than the alternatives. R1 (mechanical snare) or R3 (flow reversal) may be stronger because they introduce FEWER new failure modes."
+  },
+
+  "step_7_prior_art_novelty": {
+    "ceo_directive": "Do NOT use 0 search results as evidence of novelty.",
+    "scopus_results": {
+      "bioresorbable_anchor_retrieval": "0 results (V8 claimed this as 'novel')",
+      "but_bioresorbable_vascular_implant": "39 results — PLLA vascular implants are well-established",
+      "and_bioresorbable_stent_thrombosis": "913 results — bioresorbable vascular devices have extensive complication literature"
+    },
+    "correct_interpretation": "0 results for 'bioresorbable anchor retrieval' means NO papers matched that SPECIFIC query. It does NOT mean the concept is novel. The broader field (bioresorbable vascular implants) is well-established with 39+ papers and 913+ thrombosis papers. The SPECIFIC application (bioresorbable anchor for eShunt retrieval) may be novel, but the MECHANISM (bioresorbable timed degradation in vascular environment) is NOT novel — it is well-studied and has DOCUMENTED clinical failures.",
+    "verdict": "R2's novelty is UNPROVEN. The specific application may be new, but the mechanism is established and has failed clinically. '0 results' is a discovery signal, not a novelty proof."
+  },
+
+  "v9_adjudication": {
+    "verdict": "R2 FAILS — bioresorbable anchor is NOT the leading candidate",
+    "rationale": [
+      "1. Fragment/embolization risk: R2 inherits the SAME failure mode that killed #7 M9 (bioresorbable fragmentation). Scopus: 913 results for bioresorbable stent thrombosis, Absorb BVS withdrawn from market.",
+      "2. Premature release is CATASTROPHIC: detached eShunt → embolic projectile in venous system. The variability of bioresorbable degradation kinetics makes this a real risk.",
+      "3. Late release negates value: if patient needs retrieval before degradation, R2 provides no advantage over permanent anchor.",
+      "4. Does NOT dominate alternatives: R2 introduces MORE failure modes than R3 (flow reversal) or R1 (mechanical snare).",
+      "5. Novelty unproven: '0 Scopus results' is not novelty. The mechanism (bioresorbable vascular degradation) is well-studied with documented clinical failures.",
+      "6. Cemetery conflict: CE-007 (#7 M9 zero-embolization threshold) is a STRONG_CONSTRAINT. R2 uses bioresorbable material in the same location as M9."
+    ],
+    "revised_ranking": [
+      {"rank": 1, "candidate": "R1 — Mechanical snare via catheter (FlowTriever precedent, avoids thermal/sensor/adhesion-via-engagement)", "key_attack": "Tissue ingrowth resistance vs mechanical disengagement force"},
+      {"rank": 2, "candidate": "R3 — Flow reversal obstruction clearing (non-surgical, eShunt stays)", "key_attack": "Retrograde embolization to SAS"},
+      {"rank": 3, "candidate": "R2 — Bioresorbable anchor (FAILS — fragmentation/embolization/thrombosis risk)", "status": "DEMOTED from rank 1"},
+      {"rank": 4, "candidate": "R4 — Magnetic actuated release (novel but MRI safety untested)", "key_attack": "MRI safety, field strength, reliability"}
+    ],
+    "what_this_teaches": "A mechanism reset does NOT lower the burden of proof. R2 looked attractive because it 'avoids all V7 failures' — but it introduces NEW failure modes (fragmentation, embolization, thrombosis) that are WORSE than M3's. The destruction search (913 bioresorbable thrombosis results, Absorb BVS withdrawal) revealed this. The 4-search attack worked exactly as designed — the Destruction direction killed R2."
+  },
+
+  "constitution_compliance": {
+    "ceo_directive": "COMPLIED — treated R2 as hypothesis, not invention. Attacked through full pipeline. Did not use 0 results as novelty.",
+    "article_XX": "COMPLIED — Q5 (new failure mode) is the critical finding. R2 creates larger failure mode than it solves.",
+    "article_XVII": "COMPLIED — attacked R2 from multiple directions (material, degradation, fragment, biocompatibility, competitor, prior art)",
+    "cemetery": "CE-007 STRONG_CONSTRAINT applied — zero-embolization threshold conflicts with bioresorbable fragmentation risk",
+    "pushing_the_envelope": "COMPLIED — 'A mechanism reset is not permission to lower the burden of proof.' R2 was attacked as hard as M3."
+  }
+}
