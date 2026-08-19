@@ -1,0 +1,259 @@
+{
+  "task_id": "R6-V21-BENCHTOP-PRE-REGISTRATION",
+  "timestamp": "2026-08-19T17:26:58.434770+00:00",
+  "ceo_directive": "Pre-register the cheapest experiment that could prove us wrong. Do not tune the design to pass thresholds after seeing results.",
+  "status": "PRE_REGISTERED \u2014 experiments not yet run",
+  "principle": "A model that survives has earned an experiment, not a victory. The experiment's job is to try to KILL R6, not to confirm it.",
+  "experiments": [
+    {
+      "experiment_id": "EXP-R6-01",
+      "name": "Valve opening pressure and tolerance",
+      "hypothesis": "The passive bypass valve opens at 20-25 mmHg with <5 mmHg tolerance",
+      "dangerous_assumption": "V20 Attack 5: manufacturing tolerance \u00b15% per dimension \u2192 \u00b17.5 mmHg pressure variation \u2192 EXCEEDS \u00b15 mmHg tolerance",
+      "apparatus": [
+        "Dual-lumen catheter prototype with passive slit valve (silicone, injection-molded)",
+        "Pressure-controlled water column (0-50 mmHg, calibrated manometer \u00b10.5 mmHg)",
+        "Flow sensor (0.01-10 mL/min, \u00b12% accuracy)",
+        "Temperature-controlled bath (37\u00b0C, \u00b10.5\u00b0C)"
+      ],
+      "parameters": {
+        "valve_design": "slit valve in silicone catheter wall",
+        "bypass_radius_mm": 0.25,
+        "bypass_length_mm": 200,
+        "material": "medical-grade silicone (Shore 50A)",
+        "manufacturing_method": "injection molding (precision tooling)"
+      },
+      "sample_size": {
+        "n_valves": 20,
+        "n_pressure_points": 10,
+        "n_repeats_per_point": 3,
+        "total_measurements": 600
+      },
+      "measurement": "For each valve: ramp pressure from 0 to 50 mmHg in 1 mmHg steps. Record the pressure at which flow first exceeds 0.01 mL/min (= opening pressure). Record flow at each pressure point.",
+      "threshold": {
+        "opening_pressure_range_mmhg": "20-25 mmHg",
+        "tolerance_mmhg": "\u00b15 mmHg (i.e., 95% of valves must open between 15 and 30 mmHg)",
+        "flow_at_25_mmhg_ml_min": "\u2265 0.05 mL/min (minimum emergency drainage)"
+      },
+      "failure_criterion": "KILL R6 if >1 of 20 valves opens outside 15-30 mmHg range, OR if median opening pressure is outside 20-25 mmHg, OR if flow at 25 mmHg < 0.05 mL/min for any valve.",
+      "stopping_rule": "Test all 20 valves. Do not stop early. Report all results including failures. No post-hoc exclusion of outliers."
+    },
+    {
+      "experiment_id": "EXP-R6-02",
+      "name": "Bypass flow measurement at obstruction pressure",
+      "hypothesis": "Bypass flow at 25 mmHg \u2265 0.35 mL/min (meets CSF production rate)",
+      "dangerous_assumption": "V20 Attack 8: Poiseuille equation predicts 1.53 mL/min, but this assumes ideal laminar flow, no entrance effects, no valve resistance. Real flow may be 50-80% lower.",
+      "apparatus": [
+        "Same prototype as EXP-R6-01",
+        "Constant-pressure reservoir (25 mmHg, \u00b10.5 mmHg)",
+        "Precision flow meter (0.001-5 mL/min, \u00b11%)",
+        "Collection vessel on analytical balance (\u00b10.001 g) for gravimetric verification"
+      ],
+      "parameters": {
+        "test_pressure_mmhg": 25,
+        "fluid": "deionized water at 37\u00b0C (CSF viscosity proxy)",
+        "bypass_radius_mm": 0.25,
+        "bypass_length_mm": 200
+      },
+      "sample_size": {
+        "n_valves": 10,
+        "n_trials_per_valve": 5,
+        "trial_duration_min": 10,
+        "total_measurements": 50
+      },
+      "measurement": "For each valve: apply constant 25 mmHg pressure. Measure flow rate at 1, 5, and 10 minutes. Record steady-state flow (average of minutes 5-10). Weigh collected fluid for gravimetric verification.",
+      "threshold": {
+        "minimum_flow_ml_min": 0.35,
+        "target_flow_ml_min": 1.0,
+        "model_prediction_ml_min": 1.53
+      },
+      "failure_criterion": "KILL R6 if median steady-state flow < 0.35 mL/min (insufficient to match CSF production \u2192 ICP continues rising). CONDITIONAL_FAIL if flow 0.35-1.0 mL/min (partial drainage, need to re-evaluate time-to-herniation). PASS if flow \u2265 1.0 mL/min.",
+      "stopping_rule": "Test all 10 valves \u00d7 5 trials. Report all results."
+    },
+    {
+      "experiment_id": "EXP-R6-03",
+      "name": "Drainage under valve failure-open conditions",
+      "hypothesis": "Bypass flow at normal ICP (15 mmHg) < 10% of primary flow",
+      "dangerous_assumption": "V20 Attack 1: if valve fails open, 6.2% over-drainage predicted. Need to verify this is actually < 10%.",
+      "apparatus": [
+        "Prototype with valve intentionally locked open (failure-open simulation)",
+        "Dual-channel flow measurement (primary + bypass simultaneously)",
+        "Pressure reservoir at 15 mmHg"
+      ],
+      "parameters": {
+        "test_pressure_mmhg": 15,
+        "valve_state": "forced open (simulating failure-open)"
+      },
+      "sample_size": {
+        "n_prototypes": 5,
+        "n_trials": 3,
+        "total": 15
+      },
+      "measurement": "Measure primary flow and bypass flow simultaneously at 15 mmHg with valve forced open. Calculate bypass/primary ratio.",
+      "threshold": {
+        "max_bypass_to_primary_ratio": 0.1
+      },
+      "failure_criterion": "KILL R6 if bypass/primary ratio > 10% at normal ICP (chronic over-drainage risk exceeds obstruction-prevention benefit). CONDITIONAL_FAIL if 5-10% (marginal). PASS if < 5%.",
+      "stopping_rule": "Test all 5 prototypes \u00d7 3 trials. Report all results."
+    },
+    {
+      "experiment_id": "EXP-R6-04",
+      "name": "Bypass engagement at partial obstruction levels",
+      "hypothesis": "Bypass opens when primary lumen radius is reduced by \u226512%",
+      "dangerous_assumption": "V20 Attack 3: model predicts 12% radius reduction triggers bypass. Need to verify the ICP-pressure relationship experimentally.",
+      "apparatus": [
+        "Prototype with adjustable primary lumen obstruction (tapered plug, 0-100%)",
+        "Pressure transducer at proximal end (\u00b10.5 mmHg)",
+        "Flow sensors on both lumens"
+      ],
+      "parameters": {
+        "obstruction_levels_pct": [
+          0,
+          5,
+          10,
+          12,
+          15,
+          20,
+          30,
+          50,
+          75,
+          100
+        ],
+        "inflow_rate_ml_min": 0.35
+      },
+      "sample_size": {
+        "n_prototypes": 3,
+        "n_obstruction_levels": 10,
+        "n_repeats": 3,
+        "total": 90
+      },
+      "measurement": "At each obstruction level: measure ICP, primary flow, and bypass flow. Record the obstruction level at which bypass first activates (flow > 0.01 mL/min).",
+      "threshold": {
+        "max_obstruction_for_activation_pct": 20,
+        "target_obstruction_for_activation_pct": 12
+      },
+      "failure_criterion": "KILL R6 if bypass does not activate until >20% obstruction (sub-threshold window too large \u2014 symptomatic hydrocephalus  untreated). PASS if activates at \u226415% obstruction.",
+      "stopping_rule": "Test all levels. Report the full activation curve."
+    },
+    {
+      "experiment_id": "EXP-R6-05",
+      "name": "Common-mode failure: simultaneous obstruction of both lumens",
+      "hypothesis": "Spatially offset outlets prevent simultaneous obstruction",
+      "dangerous_assumption": "V20 Attack 4: if outlets are co-located, tissue ingrowth covers both. Need to test whether offset actually prevents common-mode failure.",
+      "apparatus": [
+        "Prototype with spatially offset outlets (primary at 0\u00b0, bypass at 180\u00b0)",
+        "Tissue-mimicking obstruction material (agarose gel, 2% w/v)",
+        "Pressure measurement at proximal end"
+      ],
+      "parameters": {
+        "outlet_offset_degrees": 180,
+        "obstruction_medium": "2% agarose gel (tissue ingrowth proxy)",
+        "obstruction_coverage_area_pct": [
+          25,
+          50,
+          75,
+          100
+        ]
+      },
+      "sample_size": {
+        "n_prototypes": 5,
+        "n_coverage_levels": 4,
+        "n_repeats": 2,
+        "total": 40
+      },
+      "measurement": "Apply obstruction medium covering increasing area. At each level, measure whether primary flow, bypass flow, or both are blocked. Record the coverage level at which each lumen obstructs.",
+      "threshold": {
+        "bypass_must_survive_coverage_pct": 75
+      },
+      "failure_criterion": "KILL R6 if bypass obstructs at <75% coverage (common-mode failure too easy). PASS if bypass survives until 100% coverage (only fails when entire outlet area is covered).",
+      "stopping_rule": "Test all coverage levels. Report the obstruction sequence."
+    },
+    {
+      "experiment_id": "EXP-R6-06",
+      "name": "Stagnant fluid in closed bypass lumen",
+      "hypothesis": "Distal closure design drains bypass lumen completely when closed",
+      "dangerous_assumption": "V20 Attack 2: model assumes distal closure drains lumen. Need to verify zero residual volume.",
+      "apparatus": [
+        "Prototype with distal closure valve",
+        "Fluorescent dye (fluorescein, 0.01% in saline) as fluid tracer",
+        "UV light for dye detection",
+        "Analytical balance (\u00b10.0001 g)"
+      ],
+      "parameters": {
+        "closure_design": "distal slit valve (closes at low pressure)",
+        "fluid": "fluorescein-saline (37\u00b0C)",
+        "drainage_time_s": 60
+      },
+      "sample_size": {
+        "n_prototypes": 5,
+        "n_trials": 3,
+        "total": 15
+      },
+      "measurement": "Fill bypass lumen with fluorescein-saline. Close valve. Wait 60s. Weigh the prototype. Then flush with clear saline and inspect under UV light for residual dye. Weigh again. Calculate residual volume by weight difference.",
+      "threshold": {
+        "max_residual_volume_ml": 0.01,
+        "uv_detection_limit_ml": 0.001
+      },
+      "failure_criterion": "KILL R6 if residual volume > 0.01 mL (stagnant reservoir for bacterial growth). CONDITIONAL_FAIL if 0.001-0.01 mL (trace residual, assess antimicrobial coating). PASS if < 0.001 mL (UV-negative).",
+      "stopping_rule": "Test all 5 prototypes \u00d7 3 trials. Report residual volume for each trial."
+    },
+    {
+      "experiment_id": "EXP-R6-07",
+      "name": "Primary lumen flow with bypass architecture installed",
+      "hypothesis": "Concentric bypass design does not reduce primary flow by > 5%",
+      "dangerous_assumption": "V20 Attack 3: model predicts 59% flow penalty if primary radius is reduced. Defense: concentric design. Need to verify concentric design actually preserves primary flow.",
+      "apparatus": [
+        "Concentric dual-lumen prototype (bypass as annular sleeve)",
+        "Single-lumen control catheter (same primary radius, no bypass)",
+        "Constant-pressure reservoir (15 mmHg)",
+        "Precision flow meter"
+      ],
+      "parameters": {
+        "primary_radius_mm": 0.5,
+        "test_pressure_mmhg": 15,
+        "fluid": "deionized water at 37\u00b0C"
+      },
+      "sample_size": {
+        "n_test_prototypes": 5,
+        "n_control_prototypes": 5,
+        "n_trials_each": 5,
+        "total": 50
+      },
+      "measurement": "Measure primary lumen flow in concentric dual-lumen prototype vs single-lumen control at identical pressure and radius. Calculate flow penalty = (1 - Q_test / Q_control) \u00d7 100%.",
+      "threshold": {
+        "max_flow_penalty_pct": 5,
+        "target_flow_penalty_pct": 0
+      },
+      "failure_criterion": "KILL R6 if flow penalty > 20% (chronic under-drainage during normal operation). CONDITIONAL_FAIL if 5-20% (marginal, need clinical assessment). PASS if < 5%.",
+      "stopping_rule": "Test all prototypes. Report flow penalty for each pair."
+    }
+  ],
+  "pre_registration_commitment": {
+    "date": "2026-08-19T17:26:58.434791+00:00",
+    "commitment": "These 7 experiments are PRE-REGISTERED. The thresholds, failure criteria, and stopping rules are FROZEN before any data is collected. Per Article VII (never weaken the verifier to rescue a claim): if results fail the pre-registered thresholds, the failure is REPORTED HONESTLY. No post-hoc threshold adjustment. No outlier exclusion. No 'the result is actually favorable if we look at it differently.' Per Article XX (problem existence gate): if the experiments show the bypass does not solve the obstruction problem (e.g., flow insufficient, valve unreliable), R6 is KILLED \u2014 not 'needs optimization.'",
+    "article_compliance": [
+      "Article II: exact evidence beats semantic plausibility (measurements, not models)",
+      "Article V: fail closed but not universal rejector (if R6 passes, it passes; if it fails, it fails)",
+      "Article VII: never weaken the verifier to rescue a claim (no post-hoc threshold adjustment)",
+      "Article XV: disclose inconvenient results (report ALL data including failures)",
+      "Article XIX: never optimize for the gate (the experiment tries to KILL R6, not confirm it)",
+      "Article XX: problem existence gate (if bypass doesn't solve obstruction, R6 is killed)"
+    ]
+  },
+  "summary": {
+    "total_experiments": 7,
+    "total_measurements": "600 + 50 + 15 + 90 + 40 + 15 + 50 = 860",
+    "estimated_cost": "Low \u2014 uses standard lab equipment (water column, flow meters, analytical balance). Most expensive item: 20 precision injection-molded valve prototypes (~$200-500 each = $4,000-10,000).",
+    "estimated_time": "2-4 weeks (prototype fabrication + testing)",
+    "kill_conditions_summary": [
+      "EXP-01: >1/20 valves opens outside 15-30 mmHg \u2192 KILL",
+      "EXP-02: median flow < 0.35 mL/min \u2192 KILL",
+      "EXP-03: bypass/primary ratio > 10% at normal ICP \u2192 KILL",
+      "EXP-04: bypass doesn't activate until >20% obstruction \u2192 KILL",
+      "EXP-05: bypass obstructs at <75% coverage \u2192 KILL",
+      "EXP-06: residual volume > 0.01 mL \u2192 KILL",
+      "EXP-07: flow penalty > 20% \u2192 KILL"
+    ],
+    "cheapest_experiment_that_could_prove_us_wrong": "EXP-R6-01 (valve opening threshold): If the valve cannot be manufactured to open at 20-25 mmHg with <5 mmHg tolerance, R6 is dead regardless of all other findings. This is the critical-path experiment. Cost: ~$5,000 + 1 week."
+  }
+}
