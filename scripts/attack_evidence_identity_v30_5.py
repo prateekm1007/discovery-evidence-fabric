@@ -254,34 +254,44 @@ print("\n--- Attack 9: Same MDR key, different event metadata → MERGE (MDR win
 m1 = [{"mdr_report_key": "MDR001", "event_type": "Malfunction", "date_received": "2024-01-15"}]
 m2 = [{"mdr_report_key": "MDR001", "event_type": "Injury", "date_received": "2024-09-30"}]
 # Note: different event_type and date — but same MDR key
+# v30.6: This is now a CONTENT_MISMATCH (same event ID, divergent bytes).
 m1_ids = deduplicate_records(m1, "FDA_MAUDE_feed1")
 m2_ids = deduplicate_records(m2, "FDA_MAUDE_feed2")
 merged, _ = merge_across_sources({"FDA_MAUDE_feed1": m1_ids, "FDA_MAUDE_feed2": m2_ids})
 events = [m for m in merged if m.record_type == "fda_event"]
 check(
-    "same MDR key with different metadata → 1 merged record",
+    "same MDR key with different metadata -> 1 merged record",
     len(events) == 1,
     f"(got {len(events)})"
 )
+from orchestrator.evidence_identity import EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH
 check(
-    "merged record is EVENT_ID_CONFIRMED",
-    events[0].identity_confidence == EVENT_ID_CONFIRMED
+    "merged record is EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH (v30.6)",
+    events[0].identity_confidence == EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
+    f"(got {events[0].identity_confidence})"
 )
 check(
     "merged record seen from 2 sources",
     events[0].is_deduplicated
 )
+check(
+    "can_merge=True (identity preserved)",
+    events[0].can_merge is True
+)
+check(
+    "can_use_as_verified_evidence=False (bytes blocked)",
+    events[0].can_use_as_verified_evidence is False
+)
 
 # ---------------------------------------------------------------------------
-# Attack 10: An identity attack — claim a paper's PMID, but supply a totally
-# different title/abstract. The current model trusts PMID; the audit may
-# want a future "MISMATCH" detection. Document this as a known limitation.
+# Attack 10 (v30.6 CLOSED): PMID + different title -> CONTENT_MISMATCH
 # ---------------------------------------------------------------------------
-print("\n--- Attack 10 (known limitation): PMID authoritative, even if title differs ---")
-# In v30.5, PMID is authoritative — if two records share a PMID, they merge
-# regardless of title. This is the intended behavior (PMID IS the document).
-# But this also means a corrupted record with the wrong PMID could
-# contaminate a good record. NOTE this as a known limitation.
+print("\n--- Attack 10 (v30.6 CLOSED): PMID + different title -> CONTENT_MISMATCH ---")
+# v30.5 had this as a KNOWN LIMITATION: PMID was trusted authoritatively
+# even when fingerprint diverged. v30.6 CLOSES this gap - the merged record
+# is now tagged DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH, identity
+# preserved but semantic use BLOCKED.
+from orchestrator.evidence_identity import DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH
 pmid_real = [{"pmid": "99999", "title": "Real Title", "abstract": "Real abstract"}]
 pmid_spoof = [{"pmid": "99999", "title": "DIFFERENT TITLE", "abstract": "DIFFERENT"}]
 r1 = deduplicate_records(pmid_real, "PubMed")
@@ -289,14 +299,34 @@ r2 = deduplicate_records(pmid_spoof, "EuropePMC")
 merged, _ = merge_across_sources({"PubMed": r1, "EuropePMC": r2})
 papers = [m for m in merged if m.record_type == "paper"]
 check(
-    "same PMID merges even with different title (PMID is authoritative)",
+    "same PMID + different title -> 1 merged record (identity preserved)",
     len(papers) == 1,
     f"(got {len(papers)})"
 )
-# Document the limitation:
-print("  ⚠️  KNOWN LIMITATION: PMID/DOI are trusted authoritatively. A corrupted")
-print("     upstream record could contaminate a good record. Future work:")
-print("     add CONTENT_MISMATCH flag when fingerprint diverges despite same ID.")
+if papers:
+    p = papers[0]
+    check(
+        "merged record tagged DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH",
+        p.identity_confidence == DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
+        f"(got {p.identity_confidence})"
+    )
+    check(
+        "can_merge=True (identity preserved)",
+        p.can_merge is True
+    )
+    check(
+        "can_use_as_verified_evidence=False (bytes BLOCKED from semantic use)",
+        p.can_use_as_verified_evidence is False
+    )
+    check(
+        "has_content_mismatch=True",
+        p.has_content_mismatch is True
+    )
+    check(
+        "1 audit record emitted",
+        len(p.content_mismatch_audits) == 1
+    )
+print("  v30.6 CLOSED the previous known limitation.")
 
 # ---------------------------------------------------------------------------
 # Summary

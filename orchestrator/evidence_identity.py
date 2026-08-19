@@ -63,6 +63,18 @@ DOCUMENT_ID_CONFIRMED = "DOCUMENT_ID_CONFIRMED"
 # A single adverse-event report is identified by MDR key or recall number.
 EVENT_ID_CONFIRMED = "EVENT_ID_CONFIRMED"
 
+# CEO v30.6: Two records share an authoritative document ID but produce
+# different content fingerprints. The identity is preserved, but the record
+# is BLOCKED from use as verified semantic evidence. All observed
+# fingerprints are retained for forensic audit.
+DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH = "DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH"
+
+# CEO v30.6: Same as above, but for event records (MDR key / recall number).
+# Two sources return the same MDR key but disagree on event_type, date, or
+# device description. The event identity is preserved, but the bytes are
+# not trusted as semantic evidence.
+EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH = "EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH"
+
 # A family identifier links MULTIPLE patent publications. Confirmation of a
 # family ID establishes a *relation*, not a single-document identity. Family
 # members MUST remain distinct evidence objects.
@@ -87,12 +99,60 @@ IDENTITY_CONFIRMED = DOCUMENT_ID_CONFIRMED
 IDENTITY_POSSIBLE_MATCH = POSSIBLE_FAMILY_MATCH
 
 # Convenience: which confidence levels authorize cross-source merging of the
-# *same* underlying entity. FAMILY_RELATION_CONFIRMED is intentionally absent
-# — family links records but each member remains its own evidence object.
+# *same* underlying entity (identity-level merge). FAMILY_RELATION_CONFIRMED
+# is intentionally absent — family links records but each member remains
+# its own evidence object.
+#
+# CEO v30.6: CONTENT_MISMATCH variants ARE in this set — the records DO
+# refer to the same underlying entity (same ID), so they ARE merged into
+# one evidence object. The mismatch is preserved ON the merged record
+# (via observed_content_fingerprints + content_mismatch_audits) and BLOCKS
+# semantic use via can_use_as_verified_evidence, NOT via blocking merge.
+# Rationale: counting "PMID 12345 was returned by 3 sources" is still
+# valid even if the sources disagree on bytes. What's blocked is treating
+# any one set of bytes as the verified content.
 _MERGE_AUTHORIZED_CONFIDENCE = frozenset({
     DOCUMENT_ID_CONFIRMED,
     EVENT_ID_CONFIRMED,
+    DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
+    EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
 })
+
+# CEO v30.6: Confidence levels that authorize use as VERIFIED SEMANTIC
+# evidence (i.e., the bytes can be trusted to support a dossier claim).
+# CONTENT_MISMATCH variants are intentionally absent — identity is
+# preserved, but the bytes disagree, so they cannot support a claim.
+_VERIFIED_EVIDENCE_AUTHORIZED_CONFIDENCE = frozenset({
+    DOCUMENT_ID_CONFIRMED,
+    EVENT_ID_CONFIRMED,
+})
+
+
+@dataclass(frozen=True)
+class ContentMismatchAudit:
+    """Audit record emitted when two records share an authoritative ID
+    but produce different content fingerprints.
+
+    CEO v30.6: This is the forensic trail. It preserves:
+    - which canonical_id triggered the mismatch
+    - which sources produced which fingerprints
+    - when the divergence was detected
+    - a sample of the divergent fields (title/abstract for papers,
+      event_type/date for events, etc.)
+
+    One ContentMismatchAudit per (canonical_id, mismatch-event). If three
+    sources return three different fingerprints for the same PMID, two
+    audit records are emitted (one per divergence from the primary).
+    """
+    canonical_id: str
+    canonical_id_type: str
+    primary_fingerprint: str           # first-seen fingerprint
+    primary_source: str                # source of the primary fingerprint
+    divergent_fingerprint: str         # the differing fingerprint
+    divergent_source: str              # source of the differing fingerprint
+    divergent_record_summary: str      # short summary of divergent fields
+    detected_at: str                   # ISO timestamp (set by merge_across_sources)
+    mismatch_severity: str = "CONTENT_MISMATCH"  # for future severity levels
 
 
 @dataclass(frozen=True)
@@ -129,6 +189,19 @@ class EvidenceIdentity:
     # the relation so downstream consumers can walk the family graph.
     family_relations: tuple = field(default_factory=tuple)
 
+    # CEO v30.6: Content-integrity fields.
+    # ALL observed content fingerprints for this canonical_id, with the
+    # source that produced each. Populated when divergence is detected.
+    # If empty, only one fingerprint was observed (no divergence).
+    # If non-empty, the record is CONTENT_MISMATCH and
+    # can_use_as_verified_evidence = False.
+    # Each entry: (fingerprint, source, record_summary)
+    observed_content_fingerprints: tuple = field(default_factory=tuple)
+
+    # CEO v30.6: Audit records for content mismatches. One entry per
+    # divergent fingerprint detected. Empty when no mismatch.
+    content_mismatch_audits: tuple = field(default_factory=tuple)
+
     @property
     def is_deduplicated(self) -> bool:
         """True if this record has been seen from multiple databases."""
@@ -141,15 +214,58 @@ class EvidenceIdentity:
         CEO v30.5: Only DOCUMENT_ID_CONFIRMED and EVENT_ID_CONFIRMED
         authorize merging two database records into one evidence object.
 
+        CEO v30.6: CONTENT_MISMATCH variants ALSO authorize merge — the
+        records DO refer to the same entity (same ID), so they ARE merged.
+        The mismatch is preserved on the merged record (via
+        observed_content_fingerprints + content_mismatch_audits) and
+        blocks SEMANTIC use via can_use_as_verified_evidence, not merge.
+
+        Rationale: "PMID 12345 was returned by 3 sources" is still a valid
+        identity-level statement even if the sources disagree on bytes.
+
         FAMILY_RELATION_CONFIRMED is intentionally excluded: a family ID
         links two DISTINCT patent publications. Each publication remains
-        its own evidence object. The relation is preserved via
-        family_relations, never by collapsing the members.
+        its own evidence object.
 
         CEO v30.4: 'When identity is uncertain, preserve the ambiguity.
         Never manufacture certainty to make the dataset cleaner.'
         """
         return self.identity_confidence in _MERGE_AUTHORIZED_CONFIDENCE
+
+    @property
+    def can_use_as_verified_evidence(self) -> bool:
+        """True if this record's bytes can be trusted to support a
+        dossier-grade semantic claim.
+
+        CEO v30.6: This is the content-integrity gate, distinct from
+        identity integrity (can_merge).
+
+          - Identity proves what the record CLAIMS to be.
+          - Content integrity proves the bytes we received ARE the right
+            content for that claimed identity.
+
+        Only DOCUMENT_ID_CONFIRMED and EVENT_ID_CONFIRMED authorize
+        semantic use. CONTENT_MISMATCH variants are BLOCKED — the bytes
+        disagree, so we cannot trust any one set as "the" content.
+
+        POSSIBLE_FAMILY_MATCH, FAMILY_RELATION_CONFIRMED, and
+        IDENTITY_INSUFFICIENT are also blocked — they lack authoritative
+        document identity.
+
+        CEO v30.6 principle:
+          "Never collapse identity integrity and content integrity
+           into one bit."
+        """
+        return self.identity_confidence in _VERIFIED_EVIDENCE_AUTHORIZED_CONFIDENCE
+
+    @property
+    def has_content_mismatch(self) -> bool:
+        """True if this record's content fingerprint diverges from at
+        least one other record sharing the same canonical_id."""
+        return self.identity_confidence in (
+            DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
+            EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -398,6 +514,16 @@ def deduplicate_records(records: List[dict], source: str) -> List[EvidenceIdenti
 # ---------------------------------------------------------------------------
 # Cross-source merge + family linking
 # ---------------------------------------------------------------------------
+def _summarize_record_for_audit(identity: EvidenceIdentity) -> str:
+    """Build a short summary of an evidence record for the mismatch audit.
+
+    CEO v30.6: We don't store the full content (privacy + size), but we
+    store enough to identify which fields diverged. The summary is built
+    from the content_fingerprint (first 16 chars) plus the source.
+    """
+    return f"fp={identity.content_fingerprint[:16]}... from {','.join(identity.source_databases)}"
+
+
 def merge_across_sources(source_results: Dict[str, List[EvidenceIdentity]]) -> tuple:
     """Merge deduplicated records across multiple sources.
 
@@ -408,10 +534,26 @@ def merge_across_sources(source_results: Dict[str, List[EvidenceIdentity]]) -> t
       - POSSIBLE_FAMILY_MATCH                      -> FLAG, do NOT auto-merge
       - IDENTITY_INSUFFICIENT                      -> DO NOT MERGE, preserve
 
+    CEO v30.6 content-integrity extension:
+      - DOCUMENT_ID_CONFIRMED + same canonical_id + DIFFERENT fingerprint
+        -> MERGE (identity preserved) BUT tag as
+           DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH
+        -> can_merge=True (identity preserved)
+        -> can_use_as_verified_evidence=False (bytes blocked from semantic use)
+        -> observed_content_fingerprints populated with ALL divergent fingerprints
+        -> content_mismatch_audits populated with one ContentMismatchAudit per divergence
+      - EVENT_ID_CONFIRMED + same canonical_id + DIFFERENT fingerprint
+        -> Same, but tagged EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH
+
     CEO v30.4: 'When identity is uncertain, preserve the ambiguity.
     Never manufacture certainty to make the dataset cleaner.'
 
-    Family linking (NEW in v30.5):
+    CEO v30.6: 'Identity proves what the record claims to be. It does not
+    prove that the bytes we received are truthful, intact, or the right
+    content. Never collapse identity integrity and content integrity
+    into one bit.'
+
+    Family linking (v30.5):
       Patents that share a patent_family_id are *linked* via
       family_relations. Each patent remains its own evidence object.
       Two patents with the same family_id but different publication numbers
@@ -421,10 +563,14 @@ def merge_across_sources(source_results: Dict[str, List[EvidenceIdentity]]) -> t
     is a list of (id1, id2) tuples flagging records that MAY be the same
     underlying fact but were not auto-merged.
     """
+    from datetime import datetime, timezone
+
     merged: Dict[str, EvidenceIdentity] = {}
     possible_matches: List[tuple] = []
 
     # First pass: collect all identities and merge merge-authorized duplicates.
+    # CEO v30.6: When merging, detect content fingerprint divergence and
+    # tag the merged record accordingly.
     for source, identities in source_results.items():
         for identity in identities:
             if identity.identity_confidence in _MERGE_AUTHORIZED_CONFIDENCE:
@@ -436,15 +582,76 @@ def merge_across_sources(source_results: Dict[str, List[EvidenceIdentity]]) -> t
                 if merge_key in merged:
                     existing = merged[merge_key]
                     new_sources = tuple(sorted(set(existing.source_databases + (source,))))
+
+                    # CEO v30.6: Detect content fingerprint divergence.
+                    # The existing record's confidence may already be a
+                    # CONTENT_MISMATCH variant (from a previous divergence).
+                    # In that case, we keep the mismatch tag and append
+                    # the new fingerprint to observed_content_fingerprints.
+                    fingerprints_match = (
+                        existing.content_fingerprint == identity.content_fingerprint
+                    )
+
+                    if fingerprints_match:
+                        # No divergence — keep existing confidence (could be
+                        # DOCUMENT_ID_CONFIRMED or already CONTENT_MISMATCH).
+                        new_confidence = existing.identity_confidence
+                        new_observed = existing.observed_content_fingerprints
+                        new_audits = existing.content_mismatch_audits
+                    else:
+                        # DIVERGENCE DETECTED.
+                        # Build the audit record for THIS divergence.
+                        now = datetime.now(timezone.utc).isoformat()
+                        audit = ContentMismatchAudit(
+                            canonical_id=existing.canonical_id,
+                            canonical_id_type=existing.canonical_id_type,
+                            primary_fingerprint=existing.content_fingerprint,
+                            primary_source=existing.source_databases[0] if existing.source_databases else "unknown",
+                            divergent_fingerprint=identity.content_fingerprint,
+                            divergent_source=source,
+                            divergent_record_summary=_summarize_record_for_audit(identity),
+                            detected_at=now,
+                        )
+
+                        # Append the new fingerprint to observed list.
+                        # Each entry: (fingerprint, source, summary)
+                        new_obs_entry = (
+                            identity.content_fingerprint,
+                            source,
+                            _summarize_record_for_audit(identity),
+                        )
+                        # Also ensure the primary fingerprint is in the list.
+                        if not existing.observed_content_fingerprints:
+                            # First divergence — seed with primary.
+                            primary_entry = (
+                                existing.content_fingerprint,
+                                existing.source_databases[0] if existing.source_databases else "unknown",
+                                _summarize_record_for_audit(existing),
+                            )
+                            new_observed = (primary_entry, new_obs_entry)
+                        else:
+                            new_observed = existing.observed_content_fingerprints + (new_obs_entry,)
+
+                        new_audits = existing.content_mismatch_audits + (audit,)
+
+                        # Tag the merged record with CONTENT_MISMATCH variant.
+                        # Determine which variant based on canonical_id_type.
+                        if existing.canonical_id_type in ("MDR_REPORT_KEY", "RECALL_NUMBER"):
+                            new_confidence = EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH
+                        else:
+                            new_confidence = DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH
+
                     merged[merge_key] = EvidenceIdentity(
                         record_type=existing.record_type,
                         canonical_id=existing.canonical_id,
                         canonical_id_type=existing.canonical_id_type,
                         content_fingerprint=existing.content_fingerprint,
-                        identity_confidence=existing.identity_confidence,
+                        identity_confidence=new_confidence,
                         source_databases=new_sources,
                         patent_family_id=existing.patent_family_id or identity.patent_family_id,
                         family_relations=existing.family_relations,
+                        observed_content_fingerprints=new_observed,
+                        content_mismatch_audits=new_audits,
                     )
                 else:
                     merged[merge_key] = identity
@@ -814,11 +1021,179 @@ def main():
     assert is_probe_stale(fresh_probe) == False
     print(f"  ✅ PASS: 2hr-old → STALE, fresh → CURRENT")
 
+    # ==================================================================
+    # v30.6 CONTENT-INTEGRITY TESTS
+    # ==================================================================
+
+    # ------------------------------------------------------------------
+    # CM1: Same DOI, different abstract → CONTENT_MISMATCH
+    # ------------------------------------------------------------------
+    print(f"\n--- CM1: Same DOI, different abstract → DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH ---")
+    crossref_a = [{"doi": "10.1234/test.001", "title": "CSF Shunt Obstruction", "abstract": "Original abstract about obstruction."}]
+    crossref_b = [{"doi": "10.1234/test.001", "title": "CSF Shunt Obstruction", "abstract": "CORRUPTED ABSTRACT with different text."}]
+    ca = deduplicate_records(crossref_a, "Crossref")
+    cb = deduplicate_records(crossref_b, "EuropePMC")
+    merged_cm1, _ = merge_across_sources({"Crossref": ca, "EuropePMC": cb})
+    papers_cm1 = [m for m in merged_cm1 if m.record_type == "paper"]
+    assert len(papers_cm1) == 1, f"Same DOI must merge to 1 record, got {len(papers_cm1)}"
+    p = papers_cm1[0]
+    assert p.identity_confidence == DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH, (
+        f"Expected CONTENT_MISMATCH, got {p.identity_confidence}"
+    )
+    assert p.can_merge is True, "Identity preserved — can_merge must be True"
+    assert p.can_use_as_verified_evidence is False, (
+        "Content mismatch must BLOCK semantic evidence use"
+    )
+    assert p.has_content_mismatch is True
+    assert len(p.observed_content_fingerprints) == 2, (
+        f"Expected 2 observed fingerprints, got {len(p.observed_content_fingerprints)}"
+    )
+    assert len(p.content_mismatch_audits) == 1, (
+        f"Expected 1 audit record, got {len(p.content_mismatch_audits)}"
+    )
+    audit = p.content_mismatch_audits[0]
+    assert audit.canonical_id == "10.1234/test.001"
+    assert audit.canonical_id_type == "DOI"
+    assert audit.primary_fingerprint != audit.divergent_fingerprint
+    print(f"  ✅ PASS: same DOI + different abstract → CONTENT_MISMATCH")
+    print(f"  ✅ PASS: can_merge=True (identity preserved), can_use_as_verified_evidence=False (bytes blocked)")
+    print(f"  ✅ PASS: 2 observed fingerprints retained, 1 audit record emitted")
+
+    # ------------------------------------------------------------------
+    # CM2: Same PMID, different title → CONTENT_MISMATCH
+    # ------------------------------------------------------------------
+    print(f"\n--- CM2: Same PMID, different title → CONTENT_MISMATCH ---")
+    pubmed_real = [{"pmid": "99999", "title": "Real Title", "abstract": "Same abstract."}]
+    europepmc_spoof = [{"pmid": "99999", "title": "DIFFERENT TITLE", "abstract": "Same abstract."}]
+    pr = deduplicate_records(pubmed_real, "PubMed")
+    es = deduplicate_records(europepmc_spoof, "EuropePMC")
+    merged_cm2, _ = merge_across_sources({"PubMed": pr, "EuropePMC": es})
+    papers_cm2 = [m for m in merged_cm2 if m.record_type == "paper"]
+    assert len(papers_cm2) == 1
+    p = papers_cm2[0]
+    assert p.identity_confidence == DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH
+    assert p.can_use_as_verified_evidence is False
+    assert len(p.content_mismatch_audits) == 1
+    print(f"  ✅ PASS: same PMID + different title → CONTENT_MISMATCH, semantic use BLOCKED")
+
+    # ------------------------------------------------------------------
+    # CM3: Same patent publication number, altered content → CONTENT_MISMATCH
+    # ------------------------------------------------------------------
+    print(f"\n--- CM3: Same patent publication number, altered content → CONTENT_MISMATCH ---")
+    pb_orig = [{"patent_number": "US10232151B2", "title": "Multi-Lumen Catheter", "abstract": "Original spec."}]
+    pb_alt  = [{"patent_number": "US10232151B2", "title": "Multi-Lumen Catheter", "abstract": "ALTERED SPEC text."}]
+    po = deduplicate_records(pb_orig, "PatentBear")
+    pa = deduplicate_records(pb_alt, "Espacenet")
+    merged_cm3, _ = merge_across_sources({"PatentBear": po, "Espacenet": pa})
+    patents_cm3 = [m for m in merged_cm3 if m.record_type == "patent"]
+    assert len(patents_cm3) == 1
+    p = patents_cm3[0]
+    assert p.identity_confidence == DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH
+    assert p.canonical_id == "US10232151B2"  # identity preserved
+    assert p.can_use_as_verified_evidence is False
+    print(f"  ✅ PASS: same patent pub + altered content → CONTENT_MISMATCH, identity preserved")
+
+    # ------------------------------------------------------------------
+    # CM4: Valid identity + corrupted payload (3 sources, 1 diverges)
+    # ------------------------------------------------------------------
+    print(f"\n--- CM4: 3 sources, 1 divergent fingerprint → 1 audit record ---")
+    # Use DOI as the authoritative ID — Crossref, EuropePMC, and PubMed
+    # all extract DOI. 3 sources return DOI 10.7777/test.4src; 2 agree on
+    # content, 1 diverges. Expected: 2 distinct fingerprints, 1 audit.
+    s1 = [{"doi": "10.7777/test.4src", "title": "T1", "abstract": "A1"}]  # primary
+    s2 = [{"doi": "10.7777/test.4src", "title": "T1", "abstract": "A1"}]  # matches primary
+    s3 = [{"doi": "10.7777/test.4src", "title": "T1", "abstract": "DIFFERENT"}]  # diverges
+    d1 = deduplicate_records(s1, "Crossref")
+    d2 = deduplicate_records(s2, "EuropePMC")
+    d3 = deduplicate_records(s3, "PubMed")
+    merged_cm4, _ = merge_across_sources({
+        "Crossref": d1, "EuropePMC": d2, "PubMed": d3
+    })
+    papers_cm4 = [m for m in merged_cm4 if m.record_type == "paper"]
+    assert len(papers_cm4) == 1
+    p = papers_cm4[0]
+    assert p.identity_confidence == DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH
+    assert len(p.source_databases) == 3, f"Expected 3 sources, got {len(p.source_databases)}"
+    assert len(p.observed_content_fingerprints) == 2, (
+        f"Expected 2 distinct fingerprints (1 primary + 1 divergent), got {len(p.observed_content_fingerprints)}"
+    )
+    assert len(p.content_mismatch_audits) == 1, (
+        f"Expected 1 audit record (one divergence), got {len(p.content_mismatch_audits)}"
+    )
+    print(f"  ✅ PASS: 3 sources, 2 distinct fingerprints → 1 audit, identity preserved")
+    print(f"  ✅ PASS: all 3 source_databases retained on merged record")
+
+    # ------------------------------------------------------------------
+    # CM5: MAUDE same MDR key, different event metadata → EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH
+    # ------------------------------------------------------------------
+    print(f"\n--- CM5: Same MDR key, different event metadata → EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH ---")
+    m1 = [{"mdr_report_key": "MDR001", "event_type": "Malfunction", "date_received": "2024-01-15"}]
+    m2 = [{"mdr_report_key": "MDR001", "event_type": "Injury", "date_received": "2024-09-30"}]
+    m1_ids = deduplicate_records(m1, "FDA_MAUDE_feed1")
+    m2_ids = deduplicate_records(m2, "FDA_MAUDE_feed2")
+    merged_cm5, _ = merge_across_sources({"FDA_MAUDE_feed1": m1_ids, "FDA_MAUDE_feed2": m2_ids})
+    events_cm5 = [m for m in merged_cm5 if m.record_type == "fda_event"]
+    assert len(events_cm5) == 1
+    e = events_cm5[0]
+    assert e.identity_confidence == EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH, (
+        f"Expected EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH, got {e.identity_confidence}"
+    )
+    assert e.can_merge is True  # identity preserved
+    assert e.can_use_as_verified_evidence is False  # bytes blocked
+    assert len(e.content_mismatch_audits) == 1
+    print(f"  ✅ PASS: same MDR key + different event_type/date → EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH")
+    print(f"  ✅ PASS: can_merge=True, can_use_as_verified_evidence=False")
+
+    # ------------------------------------------------------------------
+    # CM6: Same DOI + SAME content → NO mismatch (regression)
+    # ------------------------------------------------------------------
+    print(f"\n--- CM6: Same DOI + same content → NO mismatch (regression) ---")
+    ca2 = [{"doi": "10.1234/test.002", "title": "Same Title", "abstract": "Same Abstract"}]
+    cb2 = [{"doi": "10.1234/test.002", "title": "Same Title", "abstract": "Same Abstract"}]
+    ca2_ids = deduplicate_records(ca2, "Crossref")
+    cb2_ids = deduplicate_records(cb2, "EuropePMC")
+    merged_cm6, _ = merge_across_sources({"Crossref": ca2_ids, "EuropePMC": cb2_ids})
+    papers_cm6 = [m for m in merged_cm6 if m.record_type == "paper"]
+    assert len(papers_cm6) == 1
+    p = papers_cm6[0]
+    assert p.identity_confidence == DOCUMENT_ID_CONFIRMED, (
+        f"Same DOI + same content should be DOCUMENT_ID_CONFIRMED, got {p.identity_confidence}"
+    )
+    assert p.can_use_as_verified_evidence is True
+    assert len(p.observed_content_fingerprints) == 0
+    assert len(p.content_mismatch_audits) == 0
+    print(f"  ✅ PASS: same DOI + same content → DOCUMENT_ID_CONFIRMED (no mismatch)")
+    print(f"  ✅ PASS: can_use_as_verified_evidence=True")
+
+    # ------------------------------------------------------------------
+    # CM7: CONTENT_MISMATCH record BLOCKED from verified evidence even with 3 sources
+    # ------------------------------------------------------------------
+    print(f"\n--- CM7: CONTENT_MISMATCH blocks semantic use even with majority consensus ---")
+    # 2 sources return content A, 1 source returns content B.
+    # Majority says A, but the divergence means we cannot trust A as verified.
+    # Use DOI as the authoritative ID (Crossref, EuropePMC, PubMed all extract DOI).
+    maj_a1 = [{"doi": "10.5555/test.maj", "title": "T", "abstract": "Majority A"}]
+    maj_a2 = [{"doi": "10.5555/test.maj", "title": "T", "abstract": "Majority A"}]
+    minority_b = [{"doi": "10.5555/test.maj", "title": "T", "abstract": "Minority B"}]
+    ma1 = deduplicate_records(maj_a1, "Crossref")
+    ma2 = deduplicate_records(maj_a2, "EuropePMC")
+    mnb = deduplicate_records(minority_b, "PubMed")
+    merged_cm7, _ = merge_across_sources({"Crossref": ma1, "EuropePMC": ma2, "PubMed": mnb})
+    papers_cm7 = [m for m in merged_cm7 if m.record_type == "paper"]
+    assert len(papers_cm7) == 1
+    p = papers_cm7[0]
+    assert p.identity_confidence == DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH
+    # Even though 2 of 3 sources agree, the divergence BLOCKS semantic use.
+    assert p.can_use_as_verified_evidence is False
+    assert len(p.content_mismatch_audits) == 1
+    print(f"  ✅ PASS: 2-of-3 majority consensus does NOT override content mismatch")
+    print(f"  ✅ PASS: can_use_as_verified_evidence=False even with majority agreement")
+
     # ------------------------------------------------------------------
     # SUMMARY
     # ------------------------------------------------------------------
     print(f"\n{'='*78}")
-    print(f"ALL TESTS PASSED (v30.5 — typed identity semantics)")
+    print(f"ALL TESTS PASSED (v30.6 — typed identity + content integrity)")
     print(f"{'='*78}")
     tests = [
         "N1: Patent normalization preserves jurisdiction + kind code: ✅",
@@ -834,15 +1209,26 @@ def main():
         "F1: Family-ID-only → FAMILY_RELATION_CONFIRMED (NOT merged): ✅",
         "A6: Application vs grant (different kind code) → DISTINCT: ✅",
         "P4: Stale capability detection: ✅",
+        "CM1: Same DOI + different abstract → CONTENT_MISMATCH: ✅",
+        "CM2: Same PMID + different title → CONTENT_MISMATCH: ✅",
+        "CM3: Same patent pub + altered content → CONTENT_MISMATCH: ✅",
+        "CM4: 3 sources, 1 divergent fingerprint → 1 audit record: ✅",
+        "CM5: Same MDR key + different event metadata → EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH: ✅",
+        "CM6: Same DOI + same content → NO mismatch (regression): ✅",
+        "CM7: Majority consensus does NOT override content mismatch: ✅",
     ]
     for t in tests:
         print(f"  {t}")
-    print(f"\nKEY PRINCIPLES (v30.5):")
+    print(f"\nKEY PRINCIPLES (v30.5 + v30.6):")
     print(f"  'Identity is not cosmetic metadata. Identity defines what the evidence is.'")
     print(f"  'Same document, related document, same family, same event,")
     print(f"   similar document, unknown identity — these are NOT the same bucket.'")
     print(f"  'A family relationship must never merge two distinct patent documents")
     print(f"   into one evidence object.'")
+    print(f"  (v30.6) 'Identity proves what the record CLAIMS to be. It does not")
+    print(f"   prove that the bytes we received are truthful, intact, or the right")
+    print(f"   content. Never collapse identity integrity and content integrity")
+    print(f"   into one bit.'")
     print(f"{'='*78}")
 
 
