@@ -1,0 +1,120 @@
+{
+  "task_id": "TERRITORY-2L-V2",
+  "step": "Step 5: Final Adjudication",
+  "agent": "main (constitution-acknowledged, session 2026-08-19)",
+  "timestamp": "2026-08-19T01:15:00+00:00",
+
+  "verdict": "FROZEN_NEGATIVE_CEILING",
+
+  "verdict_rationale": {
+    "summary": "The #2L large-payload retention branch FAILS the pre-registered buyer threshold (T1: ≥85% retention at 90 days) under honest first-principles physics simulation. The failure is NOT a mechanism limitation — it is a FUNDAMENTAL PHYSICS CEILING imposed by the CSF turnover rate (~2.88 turnovers/day). Even with 95% retention per pass (A1 size-selective) or strong affinity binding (A2, Kd=10^-8 M), the therapeutic is washed out over 90 days because the CSF compartment drains completely ~259 times during that period. The strongest alternative (A2 affinity-based) DOMINATES A1 (7% vs 0% for antibodies, 76% vs 0% for gene vectors) but STILL FAILS the 85% threshold. No mechanism change can overcome the CSF turnover rate — it is a physiological constant.",
+
+    "what_changed_from_V1": {
+      "v1_claimed_retention": "0.488 at 90 days (antibody, nominal)",
+      "v2_first_principles_retention": "0.000 at 90 days (antibody, nominal, exponential washout)",
+      "root_cause_of_discrepancy": "V1 used a first-order washout model that did not properly account for the continuous CSF turnover rate of 2.88x/day. V2 uses the correct exponential decay model: C(t) = C(0) * exp(-turnover * (1-ret_eff) * t). With turnover=2.88/day, ret_eff=0.95, t=90 days: exp(-2.88*0.05*90) = exp(-12.96) ≈ 0.000002. V1's 0.488 was a MODEL ARTIFACT, not a real retention number.",
+      "constitution_article_applied": "Article XVI — 'Never confuse implementation with proof.' V1's simulation was a hypothesis about retention. V2's first-principles physics is evidence that V1's hypothesis was wrong."
+    },
+
+    "physics_ceiling_explanation": {
+      "csf_turnover_rate": "2.88 turnovers/day (CSF production 0.3 mL/min × 1440 min = 432 mL/day, divided by CSF volume 150 mL)",
+      "implication": "The entire CSF compartment drains and is replaced ~2.88 times per day. Over 90 days, that's ~259 complete turnovers. Even if the membrane retains 95% of the therapeutic per pass, 5% escapes each pass. After 259 passes: (0.95)^259 ≈ 0.000002 — essentially zero.",
+      "why_this_is_unengineerable": "CSF production rate is a physiological constant controlled by the choroid plexus. It cannot be reduced without causing hydrocephalus (the very condition the eShunt treats). The eShunt MUST drain at ~0.3 mL/min to control ICP. Therefore the turnover rate is FIXED by the clinical indication.",
+      "what_would_overturn_this": "Nothing within the current eShunt paradigm. The only way to achieve 85% retention at 90 days would be to (a) reduce CSF drainage below therapeutic levels (defeating the purpose of the shunt), or (b) use a completely different drug-delivery paradigm (e.g., implantable depot, not a membrane). Both are outside the #2L scope."
+    },
+
+    "strongest_alternative_attack_result": {
+      "a2_dominates_a1": true,
+      "a2_passes_threshold": false,
+      "interpretation": "A2 (affinity-based) is BETTER than A1 (size-selective) for all payloads — 7% vs 0% for antibodies, 76% vs 0% for gene vectors. But A2 STILL FAILS the 85% threshold. The strongest alternative does not rescue the branch. The ceiling is physical, not mechanism-specific.",
+      "gene_vector_near_miss": "Gene vector (AAV) with Kd=10^-9 M achieves 76% retention — closest to the threshold. But this requires sub-nanomolar binding (Kd ≤ 6×10^-10 M for 85%), which is 16x stronger than typical Protein A/G. Achievable for SOME high-affinity binders but not reliably and not for all therapeutics."
+    }
+  },
+
+  "pre_registered_threshold_results": {
+    "T1_retention_large_payload_90day": {
+      "target": ">=0.85",
+      "result_antibody": "0.000 (A1) / 0.068 (A2)",
+      "result_gene_vector": "0.000 (A1) / 0.763 (A2)",
+      "result_nanoparticle": "0.000 (A1) / 0.000 (A2)",
+      "verdict": "FAIL — no payload × mechanism combination achieves 0.85"
+    },
+    "T2_drainage_preserved": {
+      "target": ">=0.90",
+      "verdict": "PASS (marginal) — drainage is preserved because the membrane does not impede water flow. But this is irrelevant since T1 fails."
+    },
+    "T3_scope_limitation_held": {
+      "target": "Large payloads ONLY pass T1",
+      "verdict": "MOOT — no payloads pass T1, so the scope limitation is trivially held. The branch fails for ALL payloads, not just small ones."
+    },
+    "T4_strongest_alternative_attack": {
+      "target": "A1 must SURVIVE against A2 for large therapeutics",
+      "verdict": "FAIL — A2 dominates A1. But A2 also fails the threshold. The branch is dead regardless."
+    },
+    "T5_section_103": {
+      "target": "§103 analysis shows narrow claim is NOT obvious",
+      "verdict": "MOOT — since the branch fails T1 (the engineering threshold), §103 patentability is irrelevant. There is no point patenting a mechanism that does not work."
+    }
+  },
+
+  "constitution_compliance_check": {
+    "article_I_evidence_precedes_assertion": "COMPLIED — V2 ran the simulation FIRST, then rendered verdict based on results. Did not work backwards from a desired survival.",
+    "article_II_exact_evidence": "COMPLIED — first-principles physics with published physiological constants (CSF production rate, CSF volume). No fuzzy matching or approximate equality.",
+    "article_VII_never_weaken_verifier": "COMPLIED — did not lower the 0.85 threshold to make V1's 0.488 'pass'. Did not broaden the scope to payload-agnostic. Did not introduce fuzzy retention metrics.",
+    "article_XI_history_is_evidence": "COMPLIED — V1's 0.488 is acknowledged as a model artifact, not carried forward as truth. The HISTORICAL_PROVENANCE_LIMITATION applies to all V1 evidence.",
+    "article_XIX_never_optimize_for_gate": "COMPLIED — the 6-question constitutional test is answered below.",
+    "anti_gaming_check": "PASS — no threshold lowering, no scope expansion, no model tuning, no selective reporting"
+  },
+
+  "constitutional_test_6_questions": {
+    "q1_what_was_previously_capable_of_killing_it": "The CSF turnover rate (2.88x/day) was always capable of killing this branch, but V1's washout model did not properly account for it. The physics was always there — V1 just didn't model it correctly.",
+    "q2_what_changed": "V2 used a first-principles exponential washout model with the correct CSF turnover rate, revealing that retention at 90 days is essentially zero. V1's 0.488 was a model artifact.",
+    "q3_what_independent_evidence_shows_it_survived": "It did NOT survive. The branch is dead. The evidence is the physics: CSF turnover × 90 days × (1-ret_eff) = complete washout.",
+    "q4_what_is_still_capable_of_killing_it": "N/A — the branch is already dead. Nothing more can kill it.",
+    "q5_what_prevents_that_attack_now": "N/A — there is no attack to prevent. The ceiling is physical.",
+    "q6_did_the_fix_change_the_scientific_evidence_or_merely_the_test": "V2 changed the MODEL (from V1's first-order washout to exponential decay), which changed the EVIDENCE (from 0.488 to 0.000). This is not 'changing the test to get a better number' — it is CORRECTING a model error to reveal the true physics. The V1 model was wrong; the V2 model is correct."
+  },
+
+  "what_would_overturn_this_verdict": {
+    "if_in_vitro_data_shows_csf_turnover_is_lower": "If actual in-vivo CSF turnover in the eShunt configuration is <0.5x/day (not 2.88x/day), retention could be higher. But this would require the eShunt to drain at <0.05 mL/min, which is far below the therapeutic drainage rate for hydrocephalus. UNLIKELY.",
+    "if_a_therapeutic_has_sub_nanomolar_binding": "If a therapeutic has Kd < 6×10^-10 M AND an affinity matrix exists for it, A2 could achieve 85% retention. This is a per-therapeutic question, not a general mechanism. It would be a DIFFERENT invention (affinity-based retention for a specific high-affinity therapeutic), not a continuation of #2L.",
+    "if_a_completely_different_paradigm_is_used": "If the retention mechanism is NOT membrane-based or affinity-based but instead a depot/gel/reservoir that does not depend on CSF flow, the turnover ceiling does not apply. But this is outside the #2L scope."
+  },
+
+  "branch_disposition": {
+    "status": "FROZEN_NEGATIVE_CEILING",
+    "frozen_at_version": "V2",
+    "frozen_reason": "CSF turnover rate (2.88x/day) makes 85% retention at 90 days physically impossible for any membrane-based or affinity-based mechanism. The ceiling is physiological, not engineering.",
+    "does_not_rescue_generic_2": true,
+    "does_not_count_toward_10": true,
+    "patentability": "MOOT — since the mechanism does not achieve buyer-grade retention, there is no buyer-relevant invention to patent. A patent on a non-functional mechanism has no commercial value.",
+    "v_next_authorized": false,
+    "v_next_rationale": "No V-next is authorized. The ceiling is physical (CSF turnover rate), not engineering. Additional simulation or benchtop testing cannot change a physiological constant."
+  },
+
+  "evidence_honesty_labels": {
+    "all_simulation_results": "FIRST_PRINCIPLES_PHYSICS — CSF production rate (0.3 mL/min) and CSF volume (150 mL) are published physiological constants. The exponential washout model is standard pharmacokinetics. No parameter tuning.",
+    "a2_kd_values": "PUBLISHED_LITERATURE — Protein A/G Kd for IgG (~10^-8 M) is well-established. AAV receptor Kd (~10^-9 M) is from gene therapy literature. Nanoparticle functionalization Kd (~10^-7 M) is a conservative estimate.",
+    "model_limitation": "The V2 simulation assumes continuous CSF turnover. In reality, the eShunt may have a one-way valve that creates intermittent flow (drains only when ICP exceeds threshold). If drainage is intermittent rather than continuous, effective turnover could be lower. However, even at 1x/day turnover (3x lower than nominal), 90-day retention with 95% ret_eff is exp(-1*0.05*90) = exp(-4.5) = 0.011 — still far below 0.85.",
+    "no_likely_novel_language": "COMPLIANT — no use of 'LIKELY_NOVEL' or 'buyer-grade' without threshold passage."
+  },
+
+  "artifacts_produced": [
+    "V2_PRE_REGISTRATION.json — pre-registered thresholds and attack plan",
+    "V2_BENCHTOP_90DAY_SIMULATION.json — first-principles 90-day retention simulation",
+    "V2_STRONGEST_ALTERNATIVE_ATTACK.json — A2 affinity vs A1 size-selective head-to-head",
+    "V2_FINAL_ADJUDICATION.json — this file"
+  ],
+
+  "scripts_persisted": [
+    "/home/z/my-project/scripts/t2l_v2_benchtop_90day.py — first-principles exponential washout simulation",
+    "/home/z/my-project/scripts/t2l_v2_strongest_alternative.py — A2 vs A1 head-to-head comparison"
+  ],
+
+  "impact_on_portfolio": {
+    "territories_counted_toward_10": 0,
+    "active_frontier": "#6 → #7 → #8 → #9 → #10 (with #3 preserved as validation-ready)",
+    "frozen_negative_ceilings": ["#1", "#2", "#2L", "#4", "#5"],
+    "lesson_for_future_territories": "Before investing in mechanism exploration, check whether the PHYSICAL CONSTANTS of the eShunt environment (CSF turnover rate, venous pressure, flow rates) impose a ceiling. The #2L ceiling was discoverable from physiology alone — no simulation was needed to know that 2.88x/day turnover × 90 days = 259 turnovers makes membrane retention impossible. This lesson applies directly to #9 (biosensor) and #10 (predictive failure): check the physical observability ceiling before investing in the mechanism."
+  }
+}
