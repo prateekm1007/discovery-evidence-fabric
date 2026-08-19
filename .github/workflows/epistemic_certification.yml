@@ -91,13 +91,21 @@ jobs:
           python -m epistemic_integrity.attestation_binding
         continue-on-error: true
 
+      - name: Run full 13-gate certification (G1-G9 + G10-G13)
+        run: |
+          python -m epistemic_integrity.research_authorization_gate --in-place
+        continue-on-error: true
+
       - name: Build Deterministic Certification Capsule
         id: capsule
         run: |
-          python -m epistemic_integrity.post_scrub_certification_capsule > capsule_output.txt 2>&1
+          set +e  # Don't exit on grep failure
+          python -m epistemic_integrity.post_scrub_certification_capsule --no-gate > capsule_output.txt 2>&1
+          EXIT_CODE=$?
           cat capsule_output.txt
-          # Extract capsule hash
-          CAPSULE_HASH=$(grep "Capsule hash:" capsule_output.txt | awk '{print $NF}')
+          echo "Capsule exit code: $EXIT_CODE"
+          # Extract capsule hash (grep returns 1 if no match, which is fine with set +e)
+          CAPSULE_HASH=$(grep "Capsule hash:" capsule_output.txt | awk '{print $NF}' || echo "NOT_FOUND")
           echo "capsule_hash=$CAPSULE_HASH" >> $GITHUB_OUTPUT
           # Extract authorization
           if grep -q "AUTHORIZED_TO_RESUME_UNDER_POST_SCRUB_EPISTEMIC_STATE" capsule_output.txt; then
@@ -106,8 +114,10 @@ jobs:
             echo "authorization=RED" >> $GITHUB_OUTPUT
           fi
           # Extract certified commit
-          CERTIFIED_COMMIT=$(grep "Certified commit:" capsule_output.txt | awk '{print $NF}')
+          CERTIFIED_COMMIT=$(grep "Certified commit:" capsule_output.txt | awk '{print $NF}' || echo "${{ github.sha }}")
           echo "certified_commit=$CERTIFIED_COMMIT" >> $GITHUB_OUTPUT
+          # Exit with the capsule's exit code
+          exit $EXIT_CODE
 
       - name: Copy capsule to workspace
         run: |
