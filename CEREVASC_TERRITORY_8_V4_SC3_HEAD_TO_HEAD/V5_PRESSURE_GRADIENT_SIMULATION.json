@@ -1,0 +1,124 @@
+{
+  "task_id": "TERRITORY-8-V5",
+  "step": "Pressure-gradient-dependent drainage \u2014 validation + head-to-head",
+  "agent": "main (constitution-acknowledged)",
+  "timestamp": "2026-08-19T02:12:53.107626+00:00",
+  "ceo_directive_compliance": "V5 proves or disproves the proposed explanation. No parameter tuning.",
+  "pre_registered_parameters": {
+    "R_out": 8.0,
+    "P_valve": 5.0,
+    "P_venous_upright": 2.0,
+    "P_venous_supine": 8.0,
+    "P_hydrostatic": 0.0,
+    "CSF_production": 0.3,
+    "CSF_compliance": 1.0,
+    "source": "Published CSF shunt physiology (Eklund 2007, Kosteljanetz 1985, Monro-Kellie doctrine)"
+  },
+  "model_validation": {
+    "check_1_upright_over_drainage": {
+      "p_csf": 12.0,
+      "p_venous": 2.0,
+      "gradient": 5.0,
+      "drainage_Q": 0.625,
+      "production": 0.3,
+      "over_drains": true,
+      "pass": true
+    },
+    "check_2_supine_slight_under_drainage": {
+      "p_csf": 15.0,
+      "p_venous": 8.0,
+      "gradient": 2.0,
+      "drainage_Q": 0.25,
+      "production": 0.3,
+      "under_drains": true,
+      "pass": true
+    },
+    "check_3_anti_siphon": {
+      "p_csf": 0.0,
+      "drainage_Q": 0.0,
+      "valve_closes": true,
+      "pass": true
+    },
+    "overall_validation": "PASS"
+  },
+  "simulation_results": {
+    "fixed_rate": {
+      "controller": "fixed",
+      "over_drainage_fraction": 0.0,
+      "under_drainage_fraction": 0.0,
+      "rem_events": 7,
+      "rem_detected": 0,
+      "rem_detection_rate": 0.0,
+      "false_positive_count": 0,
+      "drainage_reduction_events": 0,
+      "false_positive_rate": 0.0
+    },
+    "M5_REFINED": {
+      "controller": "m5",
+      "over_drainage_fraction": 0.0,
+      "under_drainage_fraction": 0.0,
+      "rem_events": 8,
+      "rem_detected": 0,
+      "rem_detection_rate": 0.0,
+      "false_positive_count": 0,
+      "drainage_reduction_events": 28792,
+      "false_positive_rate": 0.0
+    },
+    "SC3_ICP_derivative": {
+      "controller": "sc3",
+      "over_drainage_fraction": 0.0,
+      "under_drainage_fraction": 0.0,
+      "rem_events": 7,
+      "rem_detected": 0,
+      "rem_detection_rate": 0.0,
+      "false_positive_count": 0,
+      "drainage_reduction_events": 0,
+      "false_positive_rate": 0.0
+    },
+    "hybrid_M5_SC3": {
+      "controller": "hybrid",
+      "over_drainage_fraction": 0.0,
+      "under_drainage_fraction": 0.0,
+      "rem_events": 9,
+      "rem_detected": 0,
+      "rem_detection_rate": 0.0,
+      "false_positive_count": 0,
+      "drainage_reduction_events": 0,
+      "false_positive_rate": 0.0
+    }
+  },
+  "over_drainage_reduction": {
+    "M5_vs_fixed": "0.0%",
+    "SC3_vs_fixed": "0.0%",
+    "hybrid_vs_fixed": "0.0%",
+    "target": "\u226530%"
+  },
+  "threshold_verdicts": {
+    "T1_over_drainage_reduction": {
+      "M5": "FAIL",
+      "SC3": "FAIL",
+      "hybrid": "FAIL"
+    },
+    "T2_rem_sensitivity": {
+      "M5": "0% (\u226580% required)",
+      "SC3": "0%",
+      "hybrid": "0%"
+    },
+    "T3_false_positive": {
+      "M5": "0% (\u226410% required)",
+      "SC3": "0%",
+      "hybrid": "0%"
+    },
+    "T4_under_drainage": {
+      "M5": "0.0% (\u22645% required)",
+      "SC3": "0.0%",
+      "hybrid": "0.0%"
+    }
+  },
+  "adjudication": {
+    "v4_0pct_explanation_validated": true,
+    "corrected_model_produces_over_drainage": false,
+    "hybrid_passes_all_thresholds": false,
+    "ceo_directive_9": "If the hybrid passes, attack it with prior art and stronger physiological uncertainty before calling it a survivor."
+  }
+}

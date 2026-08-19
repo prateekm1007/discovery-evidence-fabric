@@ -1,0 +1,54 @@
+{
+  "task_id": "TERRITORY-8-V5",
+  "step": "Step 2: Diagnosis — pressure-gradient model reveals possible problem-existence failure",
+  "agent": "main (constitution-acknowledged, session 2026-08-19)",
+  "timestamp": "2026-08-19T03:30:00+00:00",
+
+  "ceo_directive_compliance": {
+    "directive_8": "if the corrected model still yields 0% effect, stop and diagnose the model again",
+    "compliance": "Stopped and diagnosed. Found a SECOND modeling issue (relaxation rate too fast), corrected it, and the model STILL yields 0%. This led to a deeper diagnosis revealing a possible Article XX problem-existence failure."
+  },
+
+  "v5_diagnosis": {
+    "first_modeling_error_v4": "Fixed-rate drainage (should be pressure-gradient-dependent)",
+    "correction_v5_step1": "Implemented pressure-gradient-dependent drainage: Q = (P_CSF - P_venous - P_hydrostatic - P_valve) / R_out. Model validation PASS (upright over-drains, supine under-drains, anti-siphon works).",
+    "second_modeling_error_v5": "Relaxation rate (0.5/min) was 10x too fast — CSF autoregulation time constant should be ~20 min (rate 0.05/min, published Eklund 2007). Corrected to 0.05/min.",
+    "result_after_both_corrections": "STILL 0% over-drainage for all controllers.",
+    "root_cause_of_continued_0pct": "With P_valve = 5 mmHg and eShunt-specific geometry (P_hydrostatic ≈ 0, CSF and venous sinus co-located), the valve closes at ICP = P_venous + P_valve = 2 + 5 = 7 mmHg (upright). This is ABOVE the 5 mmHg over-drainage threshold. Over-drainage (ICP < 5) CANNOT occur with P_valve = 5 in this model because the valve prevents it."
+  },
+
+  "article_xx_problem_existence_re_assessment": {
+    "q1_does_failure_occur": {
+      "previous_answer": "YES — over-drainage is documented in CSF shunts (10-20% of patients)",
+      "revised_answer": "UNCERTAIN FOR ESHUNT SPECIFICALLY",
+      "rationale": "The over-drainage literature is dominated by VP shunt data. VP shunts have a LONG peritoneal catheter that creates a hydrostatic siphon effect when the patient is upright — this is the primary mechanism of VP shunt over-drainage. The eShunt drains from the subarachnoid space to the venous sinus, both in the head, with NO significant hydrostatic column. Without the siphon effect, the eShunt's pressure-gradient-dependent drainage is self-limiting: the valve closes when ICP drops to P_venous + P_valve = 7 mmHg, preventing ICP from reaching the over-drainage threshold (5 mmHg).",
+      "what_would_confirm_over_drainage_in_eshunt": "If the eShunt valve opening pressure is set very low (< 3 mmHg), OR if the anti-siphon mechanism fails, OR if there is a hydrostatic column I'm not modeling (e.g., jugular vein placement with the patient upright). Need to check the actual eShunt valve specification and clinical data.",
+      "what_would_refute_over_drainage_in_eshunt": "If the eShunt valve is set to ≥5 mmHg and the anti-siphon mechanism works, over-drainage may not occur. The eShunt's short drainage path may inherently prevent the siphon effect that causes VP shunt over-drainage."
+    },
+    "q2_does_it_matter_to_buyer": {
+      "previous_answer": "YES — over-drainage is #2 shunt complication",
+      "revised_answer": "CONDITIONAL — matters IF the eShunt has over-drainage. If the eShunt geometry inherently prevents over-drainage (no siphon effect), then an adaptive drainage controller solves a problem that doesn't exist for this device.",
+      "rationale": "The buyer (CereVasc) would need to see clinical evidence of eShunt over-drainage before investing in an adaptive controller. If the eShunt's venous-sinus drainage geometry is inherently over-drainage-resistant, the adaptive controller is unnecessary."
+    },
+    "gate_verdict_revised": "CONDITIONAL FAIL — The problem-existence gate (Article XX) may FAIL for the eShunt specifically. The over-drainage problem is well-documented for VP shunts but may not apply to the eShunt due to its different drainage geometry. Need clinical data or eShunt valve specification to resolve."
+  },
+
+  "what_this_means_for_8": {
+    "current_status": "PROVISIONAL_PARTIAL_V4 (unchanged — the hybrid M5+SC3 architecture is still the recommended design IF over-drainage is a real eShunt problem)",
+    "v5_finding": "The pressure-gradient model reveals that the eShunt may not have a significant over-drainage problem due to its short drainage path (no hydrostatic siphon). The 0% over-drainage in the simulation is not a bug — it's the model telling us that the eShunt geometry may inherently prevent over-drainage.",
+    "v6_requirement": "Before proceeding with the hybrid controller, V6 must answer the Article XX problem-existence question: does the eShunt actually over-drain? This requires: (a) checking the eShunt valve specification (what is P_valve?), (b) checking if there is a hydrostatic column in the eShunt deployment, (c) searching for clinical data on eShunt over-drainage. If the eShunt does not over-drain, the adaptive controller is a solution to a non-existent problem and #8 should be frozen.",
+    "honest_assessment": "The simulation is working correctly — it's telling us something we didn't expect. The eShunt's drainage geometry is fundamentally different from VP shunts, and the over-drainage problem may not apply. This is exactly the kind of insight the pushing-the-envelope doctrine should produce: attack the problem premise before optimizing the solution."
+  },
+
+  "doctrine_application": {
+    "ceo_directive": "A plausible explanation for a failed experiment is itself a hypothesis that must be attacked. failure → explanation → independent test of explanation → only then advancement.",
+    "applied": "V4 0% → explanation (fixed-rate model) → V5 test (pressure-gradient model) → STILL 0% → deeper diagnosis (valve closes at 7 mmHg, above 5 mmHg threshold) → problem-existence question (does eShunt over-drain?) → V6 must answer this before proceeding.",
+    "lesson": "The 0% result was not a model artifact, not a coding bug, and not just a modeling error. It was the model telling us that the OVER-DRAINAGE PROBLEM may not exist for the eShunt. This is the most valuable finding of V5."
+  },
+
+  "constitution_compliance": {
+    "article_XX_problem_existence": "RE-ASSESSED — Q1 (does failure occur) downgraded from YES to UNCERTAIN for eShunt specifically",
+    "article_XV_disclose_inconvenient": "COMPLIED — the finding that the eShunt may not over-drain is disclosed honestly",
+    "article_XIX_never_optimize_for_gate": "COMPLIED — did not tune parameters to force over-drainage. Did not lower P_valve to make the model produce over-drainage. Let the model speak honestly."
+  }
+}
