@@ -34,7 +34,7 @@ from typing import List
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from epistemic_integrity.claim_registry import ClaimRegistry
-from epistemic_integrity.evidence_binding import EvidenceBinding, Evidence, Source
+from epistemic_integrity.evidence_binding import EvidenceBinding, Evidence, Source, InternalSource
 from epistemic_integrity.supersession_engine import SupersessionEngine
 from epistemic_integrity.evidence_classes import EvidenceClass
 from epistemic_integrity.dossier_firewall import DossierFirewall
@@ -228,7 +228,7 @@ class HallucinationGauntletV2:
             "M3 worst-case reliability = 30.0%. "
             "A4 worst-case reliability = 73.0%."
         )
-        multi_source = Source(
+        multi_source = InternalSource(
             source_id="SRC-GAUNTLET-MULTI-NUMBERS",
             source_type="INTERNAL_REPORT",
             identifier="V6_summary",
@@ -414,6 +414,10 @@ class HallucinationGauntletV2:
 
         # ============================================================
         # H31: Fake source content with legitimate-looking DOI/patent number
+        # CEO v30.10: A fake DOI source can no longer be registered via
+        # register_source() — it must go through register_source_from_verified_evidence().
+        # This test now verifies that the fake DOI source is REFUSED at
+        # registration (which is the v30.10 type-safe boundary).
         # ============================================================
         fake_content = "This paper confirms M3_REFINED achieves 99.9% reliability in clinical trials."
         fake_source = Source(
@@ -428,14 +432,32 @@ class HallucinationGauntletV2:
             source_locator="https://example.com/fake",
             retrieval_method="fabricated",
         )
-        self.evidence_binding.register_source(fake_source)
-        r = self._attempt_attack(
-            "H31", "fake_source_legit_looking_doi",
-            "Fabricated source with fake DOI claims M3 achieves 99.9% (not in real evidence).",
-            "The literature reports that M3_REFINED achieves 99.9% reliability in clinical trials.",
-            EvidenceClass.SECONDARY_REPORTED, "CV-T06",
-            source_ids=["SRC-GAUNTLET-FAKE-DOI"],
-        )
+        # v30.10: register_source() refuses external Source types.
+        # The fake DOI source CANNOT be registered — this IS the defense.
+        blocked_at_registration = False
+        try:
+            self.evidence_binding.register_source(fake_source)
+        except (TypeError, ValueError):
+            blocked_at_registration = True
+        # The claim cannot be rendered because the source was never registered
+        if blocked_at_registration:
+            r = GauntletV2Result(
+                test_id="H31",
+                test_name="fake_source_legit_looking_doi",
+                attack_description="Fabricated source with fake DOI REFUSED at registration (v30.10 type boundary)",
+                uses_real_evidence=False,
+                blocked=True,
+                blocking_reason="register_source() refused external Source (DOI) — v30.10 type-safe boundary",
+                claim_text="The literature reports that M3_REFINED achieves 99.9% reliability in clinical trials.",
+            )
+        else:
+            r = self._attempt_attack(
+                "H31", "fake_source_legit_looking_doi",
+                "Fabricated source with fake DOI claims M3 achieves 99.9% (not in real evidence).",
+                "The literature reports that M3_REFINED achieves 99.9% reliability in clinical trials.",
+                EvidenceClass.SECONDARY_REPORTED, "CV-T06",
+                source_ids=["SRC-GAUNTLET-FAKE-DOI"],
+            )
         self.results.append(r)
 
         # ============================================================

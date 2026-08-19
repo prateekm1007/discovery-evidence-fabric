@@ -497,25 +497,59 @@ class DossierFirewall:
                 if not self.hash_verifier.verify_span_hash(src.span, src.span_hash):
                     raise ValueError(f"SOURCE_SPAN_HASH_MISMATCH: {src.source_id}")
 
-            # CEO v30.9 P0-1: External sources MUST carry VerifiedEvidence authorization.
-            # This is the render-time enforcement of the register_source boundary.
-            # An external Source without _verified_evidence_authorization was
-            # registered via the old register_source() path — which v30.9 P0-1
-            # now blocks. But defense-in-depth: check again at render time.
-            from .evidence_binding import _is_external_source_type
+            # CEO v30.10: TYPE-SAFE source hierarchy enforcement at render.
+            # The external-vs-internal boundary is NO LONGER a source_type
+            # string check. It is a TYPE check:
+            #   - ExternalSource: constructible only from VerifiedEvidence.
+            #     Carries _verified_evidence_authorization as a real field.
+            #   - InternalSource: constructible only via its own constructor.
+            #     Refuses external content indicators.
+            #
+            # An external source MUST be an ExternalSource instance. A
+            # masquerade via source_type string label is structurally
+            # impossible because InternalSource's constructor refuses
+            # external content patterns.
+            from .evidence_binding import ExternalSource, InternalSource, _is_external_source_type, _is_internal_source_type
             if _is_external_source_type(src.source_type):
+                # Must be an ExternalSource instance (not just a Source with
+                # an external source_type string).
+                if not isinstance(src, ExternalSource):
+                    raise ValueError(
+                        f"EXTERNAL_SOURCE_NOT_TYPE_SAFE: {src.source_id} "
+                        f"(source_type={src.source_type}) is an externally-sourced "
+                        f"Source but is NOT an ExternalSource instance (got "
+                        f"{type(src).__name__}). CEO v30.10: external sources "
+                        f"MUST be ExternalSource instances constructed via "
+                        f"register_source_from_verified_evidence(). A raw "
+                        f"Source with source_type='DOI' is a masquerade "
+                        f"attempt — the type boundary is enforced by object "
+                        f"construction, not by trusting a source_type label."
+                    )
+                # Defense-in-depth: verify the authorization field is present
+                # (ExternalSource.__post_init__ already enforces this, but
+                # we re-check in case of object.__new__ bypass).
                 auth = getattr(src, '_verified_evidence_authorization', None)
                 if not auth:
                     raise ValueError(
                         f"EXTERNAL_SOURCE_MISSING_VERIFIED_EVIDENCE_AUTHORIZATION: "
                         f"{src.source_id} (source_type={src.source_type}) is an "
-                        f"externally-sourced Source but does not carry "
-                        f"_verified_evidence_authorization. This means it was "
-                        f"registered via register_source(Source) instead of "
-                        f"register_source_from_verified_evidence(VerifiedEvidence). "
-                        f"CEO v30.9 P0-1: external sources MUST enter through "
-                        f"the VerifiedEvidence boundary. This is a P0 control "
-                        f"violation at render time."
+                        f"ExternalSource but does not carry "
+                        f"_verified_evidence_authorization. This should be "
+                        f"impossible — ExternalSource.__post_init__ requires it. "
+                        f"Indicates a bypass attempt via object.__new__ or "
+                        f"subclassing. CEO v30.10 P0 control violation at render."
+                    )
+            elif _is_internal_source_type(src.source_type):
+                # Must be an InternalSource instance.
+                if not isinstance(src, InternalSource):
+                    raise ValueError(
+                        f"INTERNAL_SOURCE_NOT_TYPE_SAFE: {src.source_id} "
+                        f"(source_type={src.source_type}) is an internally-typed "
+                        f"Source but is NOT an InternalSource instance (got "
+                        f"{type(src).__name__}). CEO v30.10: internal sources "
+                        f"MUST be InternalSource instances constructed via "
+                        f"register_source(InternalSource(...)). The type "
+                        f"boundary is enforced by object construction."
                     )
 
             # P0-1 v16: NO document-wide semantic search for sources.

@@ -14,6 +14,7 @@ evidence and source objects.
 
 import json
 import hashlib
+import re
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Dict, List, Optional, Set
@@ -213,6 +214,162 @@ class Source:
 
 
 # ============================================================
+# CEO v30.10: TYPE-SAFE SOURCE HIERARCHY
+# ============================================================
+# The external-vs-internal distinction is NO LONGER a source_type string
+# enum. It is enforced by OBJECT CONSTRUCTION.
+#
+#   InternalSource  — constructible only via its own constructor.
+#                     Refuses external content indicators (DOI/PMID/patent
+#                     patterns in identifier or content).
+#   ExternalSource  — constructible ONLY from VerifiedEvidence.
+#                     Carries _verified_evidence_authorization as a real
+#                     field (not a setattr attribute).
+#
+# register_source() now accepts ONLY InternalSource.
+# register_source_from_verified_evidence() returns ExternalSource.
+#
+# An attacker cannot construct an ExternalSource from a CONTENT_MISMATCH
+# EvidenceIdentity (VerifiedEvidence construction refuses). An attacker
+# cannot construct an InternalSource with external content (the InternalSource
+# constructor detects DOI/PMID/patent patterns and refuses).
+#
+# CEO principle: "A security boundary should be enforced by object
+# construction, not by trusting a label inside the object."
+# ============================================================
+
+# Patterns that indicate external content — an InternalSource must NOT
+# contain these in its identifier, title, or content.
+# CEO v30.10: Patterns use \b (word boundary) or ^ (start) to detect
+# external identifiers even when embedded in longer text.
+_EXTERNAL_CONTENT_PATTERNS = [
+    re.compile(r'\bPMID\s*:?\s*\d{7,8}\b', re.IGNORECASE),        # "PMID: 12345678"
+    re.compile(r'\b\d{7,8}\b'),                                    # bare 7-8 digit number (PMID-like)
+    re.compile(r'\b10\.\d{4,}/\S+'),                              # DOI (10.xxxx/...)
+    re.compile(r'\b[A-Z]{2}\d{6,}[A-Z]\d?\b'),                    # Patent (US12345678B2)
+    re.compile(r'\bK\d{5,}\b'),                                    # FDA K-number
+    re.compile(r'\bP\d{6,}\b'),                                    # FDA PMA number
+    re.compile(r'\bMDR\s*:?\s*\d+\b', re.IGNORECASE),              # MDR report key
+    re.compile(r'\bNCT\d+\b', re.IGNORECASE),                      # ClinicalTrials.gov NCT
+    re.compile(r'(?:https?://)?(?:dx\.)?doi\.org/', re.IGNORECASE),  # DOI URL
+    re.compile(r'(?:https?://)?pubmed\.ncbi\.nlm\.nih\.gov/', re.IGNORECASE),  # PubMed URL
+    re.compile(r'(?:https?://)?patents\.google\.com/', re.IGNORECASE),  # Google Patents URL
+]
+
+
+def _looks_like_external_content(identifier: str, title: str, content: Optional[str]) -> Optional[str]:
+    """CEO v30.10: Detect if an InternalSource is masquerading external content.
+
+    Returns a human-readable explanation of WHICH field looks external,
+    or None if the content passes the internal-only check.
+    """
+    for field_name, value in [("identifier", identifier), ("title", title), ("content", content or "")]:
+        if not value:
+            continue
+        for pattern in _EXTERNAL_CONTENT_PATTERNS:
+            if pattern.search(value):
+                return (
+                    f"field '{field_name}' matches external pattern "
+                    f"{pattern.pattern!r} (value: {value[:60]}...). "
+                    f"InternalSource must NOT contain external content "
+                    f"indicators (DOI/PMID/patent/K-number/PMA/MDR/NCT). "
+                    f"Use ExternalSource via register_source_from_verified_evidence()."
+                )
+    return None
+
+
+@dataclass
+class InternalSource(Source):
+    """A source generated internally (report, analysis, simulation output).
+
+    CEO v30.10: This is a TYPE-SAFE subclass of Source. It is the ONLY
+    type accepted by register_source(). Its constructor refuses external
+    content indicators — an attacker cannot masquerade an external paper
+    as an internal report by setting source_type="INTERNAL_REPORT".
+
+    The security boundary is enforced by CONSTRUCTION (the __post_init__
+    check), not by trusting the source_type string label.
+    """
+    # No new fields — the type itself IS the boundary.
+    # __post_init__ checks that content does not look external.
+
+    def __post_init__(self):
+        """Refuse external content in an InternalSource.
+
+        CEO v30.10: An InternalSource must NOT contain DOI/PMID/patent
+        patterns in its identifier, title, or content. If it does, the
+        constructor raises ValueError — the caller must use
+        ExternalSource via register_source_from_verified_evidence().
+        """
+        # source_type must be an internal type
+        if self.source_type not in ("INTERNAL_REPORT", "INTERNAL_ANALYSIS"):
+            raise ValueError(
+                f"InternalSource source_type must be INTERNAL_REPORT or "
+                f"INTERNAL_ANALYSIS, got {self.source_type!r}. External "
+                f"source types (DOI/PMID/PATENT/etc.) MUST use "
+                f"ExternalSource via register_source_from_verified_evidence()."
+            )
+        # content must not look external
+        external_match = _looks_like_external_content(
+            self.identifier, self.title, self.content
+        )
+        if external_match:
+            raise ValueError(
+                f"INTERNAL_SOURCE_MASQUERADE_BLOCKED: {external_match} "
+                f"CEO v30.10: the external-vs-internal boundary is enforced "
+                f"by object construction, not by trusting a source_type label."
+            )
+
+
+@dataclass
+class ExternalSource(Source):
+    """A source derived from an external database (paper, patent, MAUDE, etc.).
+
+    CEO v30.10: This is a TYPE-SAFE subclass of Source. It is constructible
+    ONLY from VerifiedEvidence — its __post_init__ requires
+    _verified_evidence_authorization to be non-None.
+
+    An attacker cannot construct an ExternalSource from a CONTENT_MISMATCH
+    EvidenceIdentity because VerifiedEvidence construction refuses such
+    identities. The type boundary is enforced at construction.
+
+    register_source_from_verified_evidence() returns ExternalSource.
+    register_source() REFUSES ExternalSource (it only accepts InternalSource).
+    """
+    # _verified_evidence_authorization is a REAL field, not a setattr attribute.
+    # This makes it structurally impossible to construct an ExternalSource
+    # without providing authorization provenance.
+    _verified_evidence_authorization: Optional[dict] = None
+
+    def __post_init__(self):
+        """Require _verified_evidence_authorization at construction.
+
+        CEO v30.10: An ExternalSource without authorization provenance is
+        a bypass attempt. The constructor refuses.
+        """
+        if self._verified_evidence_authorization is None:
+            raise ValueError(
+                f"EXTERNAL_SOURCE_REQUIRES_AUTHORIZATION: ExternalSource "
+                f"{self.source_id} was constructed without "
+                f"_verified_evidence_authorization. ExternalSource MUST be "
+                f"constructed via EvidenceBinding."
+                f"register_source_from_verified_evidence(VerifiedEvidence, ...). "
+                f"Direct construction is a P0 control violation. CEO v30.10: "
+                f"the external-vs-internal boundary is enforced by object "
+                f"construction, not by trusting a source_type label."
+            )
+        # source_type must be an external type
+        if not _is_external_source_type(self.source_type):
+            raise ValueError(
+                f"ExternalSource source_type must be an external type "
+                f"(PMID/DOI/PATENT/URL/BOOK/K_NUMBER/PMA_NUMBER/"
+                f"MDR_REPORT_KEY/RECALL_NUMBER/NCT_ID/PROJECT_NUM), got "
+                f"{self.source_type!r}. Internal types (INTERNAL_REPORT/"
+                f"INTERNAL_ANALYSIS) MUST use InternalSource."
+            )
+
+
+# ============================================================
 # EvidenceBinding — manages bidirectional bindings
 # ============================================================
 class EvidenceBinding:
@@ -318,37 +475,50 @@ class EvidenceBinding:
     def register_source(self, source: Source):
         """Register a Source in the production registry.
 
-        CEO v30.9 P0-1: This method is RESTRICTED to internally-generated
-        sources only (INTERNAL_REPORT, INTERNAL_ANALYSIS, simulation
-        outputs). Externally-sourced Source objects (PMID, DOI, PATENT,
-        URL, BOOK, K_NUMBER, PMA_NUMBER, MDR_REPORT_KEY, RECALL_NUMBER,
-        NCT_ID, PROJECT_NUM) MUST be registered via
-        register_source_from_verified_evidence() — which accepts ONLY
-        VerifiedEvidence and enforces the type-safe boundary.
+        CEO v30.10: This method now accepts ONLY InternalSource instances.
+        ExternalSource instances MUST be registered via
+        register_source_from_verified_evidence(). Raw Source instances
+        (the base class) are rejected — callers must explicitly choose
+        InternalSource or ExternalSource.
 
-        An attacker attempting to register an externally-sourced Source
-        directly (bypassing VerifiedEvidence) will be rejected here. This
-        closes the second-order loophole identified in the CEO v30.9 audit:
-        v30.8 wired VerifiedEvidence into the new registration method but
-        left the old register_source() path open for external sources.
+        This enforces the type-safe boundary: the external-vs-internal
+        distinction is encoded in the TYPE of object, not in a source_type
+        string label. An attacker cannot masquerade an external paper as
+        an internal report because InternalSource's constructor refuses
+        external content indicators (DOI/PMID/patent patterns).
 
-        Article XVII: This check IS a P0 control. Every attempt to bypass
-        it must be adversarially tested.
+        CEO principle: "A security boundary should be enforced by object
+        construction, not by trusting a label inside the object."
+
+        DEFENSE-IN-DEPTH: Even if an attacker subclasses InternalSource
+        and overrides __post_init__ to skip the masquerade check, this
+        method RE-RUNS the external-content pattern check before
+        registration. A forged subclass cannot bypass the boundary.
         """
-        if _is_external_source_type(source.source_type):
-            # Check if this Source carries VerifiedEvidence authorization
-            # (set by register_source_from_verified_evidence). If not, BLOCK.
-            auth = getattr(source, '_verified_evidence_authorization', None)
-            if not auth:
-                raise ValueError(
-                    f"EXTERNAL_SOURCE_REQUIRES_VERIFIED_EVIDENCE: "
-                    f"source_id={source.source_id} source_type={source.source_type} "
-                    f"is an externally-sourced type. It MUST be registered via "
-                    f"register_source_from_verified_evidence(VerifiedEvidence, ...) "
-                    f"NOT register_source(Source). Direct registration of external "
-                    f"sources bypasses the type-safe evidence authorization boundary "
-                    f"(CEO v30.9 P0-1). This is a P0 control violation."
-                )
+        # v30.10: Type-check — must be InternalSource
+        if not isinstance(source, InternalSource):
+            raise TypeError(
+                f"register_source() accepts ONLY InternalSource instances, "
+                f"got {type(source).__name__}. External sources MUST be "
+                f"registered via register_source_from_verified_evidence"
+                f"(VerifiedEvidence, ...). Raw Source instances are not "
+                f"accepted — callers must explicitly choose InternalSource "
+                f"or ExternalSource. CEO v30.10: the external-vs-internal "
+                f"boundary is enforced by object construction."
+            )
+        # Defense-in-depth: re-run the masquerade check even for InternalSource
+        # instances, in case a subclass overrode __post_init__ to skip it.
+        external_match = _looks_like_external_content(
+            source.identifier, source.title, source.content
+        )
+        if external_match:
+            raise ValueError(
+                f"INTERNAL_SOURCE_MASQUERADE_BLOCKED (defense-in-depth at "
+                f"register_source): {external_match} CEO v30.10: even if a "
+                f"subclass bypassed __post_init__, the register_source "
+                f"method re-checks for external content patterns. The type "
+                f"boundary is enforced at registration as well as construction."
+            )
         self.sources[source.source_id] = source
         self._save()
 
@@ -391,12 +561,18 @@ class EvidenceBinding:
         url: Optional[str] = None,
         retrieval_method: Optional[str] = None,
         source_locator: Optional[str] = None,
-    ) -> Source:
+    ) -> ExternalSource:
         """Register a discovery-layer source from a VerifiedEvidence object.
 
         CEO v30.8: This is the PRODUCTION entry point for discovery-layer
         sources. It accepts ONLY VerifiedEvidence — a type that cannot
         be constructed from a non-verified EvidenceIdentity.
+
+        CEO v30.10: Returns ExternalSource (not Source). ExternalSource is
+        a TYPE-SAFE subclass that carries _verified_evidence_authorization
+        as a REAL field (not a setattr attribute). This makes it structurally
+        impossible to construct an ExternalSource without authorization
+        provenance.
 
         Args:
             verified: A VerifiedEvidence object (NOT EvidenceIdentity).
@@ -410,7 +586,7 @@ class EvidenceBinding:
                 metadata.
 
         Returns:
-            The registered Source object.
+            The registered ExternalSource object.
 
         Raises:
             TypeError: if `verified` is not a VerifiedEvidence instance.
@@ -420,7 +596,8 @@ class EvidenceBinding:
 
         Article XVII: This method IS a P0 control. Every attempt to
         bypass it must be adversarially tested (see
-        scripts/attack_production_dossier_path_v30_8.py).
+        scripts/attack_production_dossier_path_v30_8.py and
+        scripts/attack_source_type_hierarchy_v30_10.py).
         """
         # Import here to avoid circular import at module load time.
         from .evidence_identity_adapter import (
@@ -474,8 +651,11 @@ class EvidenceBinding:
         source_type = _verified_evidence_to_source_type(verified)
         identifier = _verified_evidence_to_identifier(verified)
 
-        # Build the Source object
-        source = Source(
+        # Build the ExternalSource object (v30.10: type-safe subclass)
+        # _verified_evidence_authorization is a REAL field on ExternalSource,
+        # not a setattr attribute. This makes it structurally impossible
+        # to construct an ExternalSource without authorization provenance.
+        source = ExternalSource(
             source_id=source_id,
             source_type=source_type,
             identifier=identifier,
@@ -505,19 +685,17 @@ class EvidenceBinding:
                 content_verified=True,
                 support_verified=True,  # assumed at registration; verified at claim binding
             ),
+            # v30.10: _verified_evidence_authorization is a REAL field.
+            # The ExternalSource __post_init__ requires this to be non-None.
+            _verified_evidence_authorization={
+                'authorized_via': 'register_source_from_verified_evidence',
+                'identity_confidence': verified.identity_confidence,
+                'canonical_id': verified.canonical_id,
+                'canonical_id_type': verified.canonical_id_type,
+                'source_databases': list(verified.source_databases),
+                'content_fingerprint': verified.content_fingerprint,
+            },
         )
-
-        # Record the authorization provenance on the source for audit
-        # (stored in a private attribute; not part of the Source schema
-        # but accessible for forensic inspection)
-        setattr(source, '_verified_evidence_authorization', {
-            'authorized_via': 'register_source_from_verified_evidence',
-            'identity_confidence': verified.identity_confidence,
-            'canonical_id': verified.canonical_id,
-            'canonical_id_type': verified.canonical_id_type,
-            'source_databases': list(verified.source_databases),
-            'content_fingerprint': verified.content_fingerprint,
-        })
 
         self.sources[source_id] = source
         self._save()

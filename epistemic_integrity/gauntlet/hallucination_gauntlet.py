@@ -33,14 +33,14 @@ from typing import List
 # Allow both package and standalone execution
 try:
     from ..claim_registry import ClaimRegistry
-    from ..evidence_binding import EvidenceBinding, Evidence, Source
+    from ..evidence_binding import EvidenceBinding, Evidence, Source, InternalSource
     from ..supersession_engine import SupersessionEngine
     from ..evidence_classes import EvidenceClass
     from ..dossier_firewall import DossierFirewall
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent.parent.parent))
     from epistemic_integrity.claim_registry import ClaimRegistry
-    from epistemic_integrity.evidence_binding import EvidenceBinding, Evidence, Source
+    from epistemic_integrity.evidence_binding import EvidenceBinding, Evidence, Source, InternalSource
     from epistemic_integrity.supersession_engine import SupersessionEngine
     from epistemic_integrity.evidence_classes import EvidenceClass
     from epistemic_integrity.dossier_firewall import DossierFirewall
@@ -211,10 +211,10 @@ class HallucinationGauntlet:
             blocked, reason))
 
     def _H5_source_mismatch(self):
-        source = Source(
+        source = InternalSource(
             source_id="SRC-PATENT-EP2043551B1",
-            source_type="PATENT",
-            identifier="EP2043551B1",
+            source_type="INTERNAL_REPORT",
+            identifier="GAUNTLET-H5",
             title="Vascular filter with shape-memory (Novate Medical)",
             span="claim 1",
         )
@@ -390,17 +390,17 @@ class HallucinationGauntlet:
             blocked, reason))
 
     def _H18_claim_assembled_from_two_unrelated_sources(self):
-        src1 = Source(
+        src1 = InternalSource(
             source_id="SRC-PMID-31525097",
-            source_type="PMID",
-            identifier="31525097",
+            source_type="INTERNAL_REPORT",
+            identifier="GAUNTLET-H18A",
             title="CardioMEMS HF sensor (unrelated to eShunt)",
             span="abstract",
         )
-        src2 = Source(
+        src2 = InternalSource(
             source_id="SRC-PATENT-US11850390B2",
-            source_type="PATENT",
-            identifier="US11850390B2",
+            source_type="INTERNAL_REPORT",
+            identifier="GAUNTLET-H18B",
             title="CereVasc drug delivery (unrelated to retrieval)",
             span="claim 1",
         )
