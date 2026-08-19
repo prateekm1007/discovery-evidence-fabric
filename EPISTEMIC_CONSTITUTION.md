@@ -1,7 +1,8 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Ratified:** 2026-08-19
+**Amended:** 2026-08-19 (Article XX — Problem Existence Gate)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself
 
@@ -474,6 +475,59 @@ Whenever a gate changes from RED → GREEN, the coder must be able to answer:
 6. **Did the fix change the scientific evidence, or merely the test?**
 
 If those questions cannot be answered, **GREEN is not accepted.**
+
+---
+
+## Article XX — Problem existence is a gate before mechanism optimization
+
+Per CEO v28 directive (after #7 V5 discovered that M5 solved a hypothetical problem):
+
+> **Do not build an elegant solution to an assumed failure mode.**
+
+Before any mechanism optimization, the following five questions MUST be answered:
+
+1. **Does the failure mode actually occur?**
+   - Is there clinical evidence, post-market surveillance data, or documented complication?
+   - Or is the failure mode hypothetical / inferred from analogy?
+
+2. **Does it matter to the buyer?**
+   - Is the failure mode severe enough (morbidity, mortality, regulatory, commercial)?
+   - Would CereVasc pay to solve it?
+
+3. **Does the proposed mechanism change the relevant physical quantity?**
+   - Does the mechanism actually act on the variable that drives the failure mode?
+   - Or does it act on a proxy / correlated quantity?
+
+4. **Is the change large enough to matter?**
+   - Does the mechanism reduce the failure mode by a clinically meaningful margin?
+   - Or is the reduction within noise?
+
+5. **Does the intervention create a larger failure mode?**
+   - Does the mechanism introduce new risks (kink, fatigue, embolization)?
+   - Are the new risks worse than the original failure mode?
+
+**If any of these five questions cannot be answered affirmatively, the candidate is BLOCKED at the problem-existence gate. No mechanism optimization proceeds.**
+
+This is stronger than simply "attack the candidate." It attacks the **premise** of the candidate.
+
+### Application to #7 V5
+
+The #7 V5 result is the canonical example:
+- Question 1: The failure mode (venous bending trauma) was **not documented** clinically → FAIL
+- Question 2: Without documented failure, buyer consequence is **unproven** → FAIL
+- Question 3: The flexible neck acts on bending moment, but bending moment was **already negligible** (1890x stiffness ratio) → FAIL
+- Question 4: The reduction is of a near-zero quantity → FAIL
+- Question 5: The flexible neck introduces kink (-5° safety margin) and fatigue embolization risks → FAIL
+
+M5 failed all five questions. The territory was frozen not because the mechanism didn't work, but because the **problem didn't exist**.
+
+### Operational rule
+
+> **Problem existence is a gate before mechanism optimization.**
+>
+> Do not strengthen a candidate before trying to kill the underlying problem statement.
+>
+> Every candidate must be capable of being rejected at the problem-existence gate.
 
 ---
 
