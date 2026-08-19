@@ -1,84 +1,232 @@
 {
-  "schema_version": "1.0.0",
-  "canonical_state_version": "2026-08-18T17:00:00Z",
-  "authority": "CANONICAL_STATE is the SOLE source of current portfolio truth. All other files (worklog, historical V* directories, prior scoreboards) are HISTORICAL_NARRATIVE_ONLY and CANNOT be consumed as current-state authority by any downstream consumer (dossier generator, claim validator, epistemic preflight).",
+  "schema_version": "2.0.0",
+  "canonical_state_version": "2026-08-20T00:00:00Z",
+  "consolidation_event": {
+    "date": "2026-08-20",
+    "authority": "CEO directive — portfolio consolidation from 10 territories to 5 invention slots",
+    "rationale": "5 inventions that survive the entire pipeline, rather than 10 labels that we feel compelled to fill. An empty slot is infinitely better than a fabricated invention.",
+    "principle": "The goal is not to produce five inventions. The goal is to discover up to five inventions that deserve to exist.",
+    "historical_preservation": "The previous 10-territory portfolio is preserved verbatim in PORTFOLIO_10TERRITORY_HISTORICAL_2026-08-18.json. No history is deleted. All cemetery entries remain in MECHANISM_CEMETERY/CEMETERY.json. All historical V* directories remain untouched.",
+    "authority_statement": "CANONICAL_STATE/PORTFOLIO.json (this file) is the SOLE source of current portfolio truth. The historical 10-territory file and all V* directories are HISTORICAL_NARRATIVE_ONLY and CANNOT be consumed as current-state authority by any downstream consumer."
+  },
+
   "portfolio": {
-    "program": "CereVasc eShunt 150-invention patent portfolio",
-    "program_goal": "10 functional inventions via push-the-envelope methodology",
-    "territories_engaged": 10,
-    "territories_counted_toward_10": 0,
-    "note": "A territory counts toward the 10-invention goal ONLY when ALL of: ENGINEERING=SURVIVOR, PATENT=SEARCH_COMPLETE_OR_COUNSEL_CLEARED, EVIDENCE_INTEGRITY=COMPLETE, DOSSIER=READY. Currently 0 territories meet all four."
+    "program": "CereVasc eShunt patent portfolio",
+    "program_goal": "Up to 5 world-class inventions via push-the-envelope methodology",
+    "slot_rule": "A slot is earned only when: problem exists → evidence survives → prior art survives → strongest alternative survives → physics survives → experiment survives → buyer value survives. Five slots is a CEILING on active attention, not a quota requiring five inventions.",
+    "active_slots": 5,
+    "slots_filled": 4,
+    "slots_empty": 1,
+    "world_class_inventions_completed": 0,
+    "note": "A slot counts as a world-class invention ONLY when ALL of: ENGINEERING=SURVIVOR, PATENT=SEARCH_COMPLETE_OR_COUNSEL_CLEARED, EVIDENCE_INTEGRITY=COMPLETE, DOSSIER=READY, BUYER_VALUE=SURVIVES. Currently 0 slots meet all five."
   },
-  "territories": [
-    {"id": "CV-T01", "name": "Hydraulic state estimation / active interrogation", "branch": "impedance_state_separation", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V25", "frozen_reason": "Numerical non-identifiability under realistic noise. V24 proved structural identifiability (rank=7), V25 proved 6/7 states cannot be recovered under 0.5% noise. Condition number 1.88e5, parameter correlations hyd-ionic=0.98, hyd-temp=-0.98, lumen-elec=-0.95."},
-    {"id": "CV-T02", "name": "Selective therapeutic retention (generic)", "branch": "multi_mechanism_generic", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V-FINAL", "frozen_reason": "Multi-mechanism architecture Pareto-DOMINATED by hydrodynamic alone for peptide/small_molecule. V21 'pareto=true' was INFLATED (broken conc metric). 3 hostile attacks confirm fail."},
-    {"id": "CV-T02L", "name": "Large-therapeutic size-selective retention", "branch": "size_selective_large_payload_only", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V2", "parent_territory": "CV-T02", "scope_limitation": "Large therapeutics only (antibody 150kDa+, gene vector, nanoparticle), nominal conditions, acute duration ≤90 days", "counting_toward_10": false, "frozen_reason": "V2 first-principles physics simulation proves CSF turnover rate (2.88x/day) makes 85% retention at 90 days physically impossible. Even with 95% retention per pass (A1) or strong affinity binding (A2, Kd=10^-8 M), therapeutic washes out over 259 turnovers in 90 days. A2 dominates A1 (7% vs 0% for antibodies) but both fail the 0.85 buyer threshold. Ceiling is PHYSIOLOGICAL (CSF production rate is a constant), not engineering. V1's 0.488 retention was a model artifact — V2 corrected the washout model to exponential decay."},
-    {"id": "CV-T03", "name": "Controlled therapeutic retention / CNS delivery", "branch": "therapeutic_retention_validation_ready", "current_state": "VALIDATION_READY_FROZEN", "frozen_at_version": "V8.8"},
-    {"id": "CV-T04", "name": "Venous-aware regulation", "branch": "derivative_predictive_control", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V8", "frozen_reason": "Both candidate mechanisms (L3d derivative, L5 predictive) failed pre-registered buyer boundaries. L3d: 9.9% M2 reduction vs 15% threshold. L5: 0% M4 reduction."},
-    {"id": "CV-T05", "name": "Fouling / obstruction", "branch": "FDVBZ_flow_diverting", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V18", "frozen_reason": "V7 FDVBZ defeated by El-Shafei retrograde on thrombus robustness (5.4x vs NEVER). No new mechanism discovered."},
-    {"id": "CV-T06", "name": "Retrieval / rescue", "branch": "r6_triangulation_repaired_V16.2", "current_state": "SECOND_MECHANISM_SEARCH_V16.1", "previous_state": "SECOND_MECHANISM_SEARCH_V16", "v16_2_finding": "Triangulation engine P0 epistemic failure FIXED. Article XXI added to Constitution. Graveyard signal RETRACTED — was manufactured from contaminated search counts (irrelevant papers, provider timeouts as EMPTY, MAUDE misused as failure rate). All signals now UNVERIFIED until relevance is established per-record. R6 patent gate still SURVIVES (V15.2 exact claims, V16 broader search). R6 physics still BLOCKED pending relevance verification.", "r6_status": "SURVIVES patent gate. Physics BLOCKED pending discovery-layer relevance verification.", "next_step": "Establish relevance per-record for triangulation results, then proceed to R6 physics", "counting_toward_10": false},
-    {"id": "CV-T07", "name": "Venous-interface protection", "branch": "M5_flexible_neck_FROZEN", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V5", "archived_candidate": "M9 bioresorbable PLGA sleeve (FAILED V4 zero-embolization threshold) → M5 mechanical anti-trauma flexible neck (FAILED V5 buyer-value + physics test)", "frozen_reason": "V5 physics attack: rigid eShunt body is 1890x stiffer than venous wall — vein deforms around shunt, shunt does NOT impose bending stress. M5 solves a HYPOTHETICAL problem. Kink safety margin -5° (normal head movement can obstruct CSF flow). Fatigue failure could cause embolization (same as M9). Buyer-value test FAILS — no documented clinical venous trauma from eShunt. The entire territory #7 is frozen because the problem it addresses (mechanical venous trauma from rigid implant) is not established as real for a both-ends-anchored implant in a compliant vein.", "counting_toward_10": false},
-    {"id": "CV-T08", "name": "Patient-specific / adaptive eShunt", "branch": "obstruction_detection_V7", "current_state": "PROVISIONAL_SURVIVOR_V7", "previous_state": "PROVISIONAL_OBSTRUCTION_DETECTION_V6", "v7_finding": "ShuntCheck comparator attack SURVIVES. ShuntCheck (non-invasive thermal flow detector) exists for VP shunts only — 3 papers, 5 clinical trials, ALL VP shunt. eShunt is endovascular (venous sinus), NOT skin-accessible. No existing monitoring solution for eShunt. Proposed eShunt system: continuous (vs episodic), endovascular (vs skin-surface), pressure gradient (vs thermal flow). Residual unsolved problem CONFIRMED: eShunt patients have NO obstruction monitoring solution. Identifiability pre-check PASSES: obstruction has distinct temporal signature (sustained) vs posture (transient) vs cough (brief) vs drift (monotonic). #1 V25 collinearity does NOT apply — temporal patterns provide orthogonal information.", "leading_candidate": "Implantable differential pressure sensor for continuous eShunt obstruction detection", "what_is_genuinely_new": "(1) Continuous monitoring vs ShuntCheck episodic, (2) Endovascular location vs skin-surface, (3) Pressure gradient vs thermal flow, (4) eShunt patient population unserved by any existing technology", "next_step": "V8 — engineering (MEMS sensor form factor), biocompatibility (5yr CSF survival), prior art (endovascular CSF pressure monitoring patents), clinical pathway", "counting_toward_10": false},
-    {"id": "CV-T09", "name": "CNS therapy platform", "branch": "M10_CSF_biosensor", "current_state": "V1_DISCOVERY_COMPLETE", "leading_candidate": "M10 CSF biosensor integration (glucose, lactate, β-amyloid, tau, NfL, inflammatory markers)", "competitor": "Cognos US10786155B2 (skull-mounted drug+sensor)", "CereVasc_self_IP_constraint": "US11850390B2 + US11883309B2 saturate eShunt drug delivery — T9 must be sensing complement", "next_step": "V2 PatentBear passage audit of Cognos family + pre-register biosensor thresholds + identifiability pre-check"},
-    {"id": "CV-T10", "name": "Lifecycle / platform intelligence", "branch": "M1_ML_predictive_failure", "current_state": "V1_DISCOVERY_COMPLETE", "leading_candidate": "M1 ML-based predictive failure detection via chronic dual-pressure sensor data", "competitor": "US10687719B2 (Alfred Mann), US11832920B2 (CardioMEMS PAH), US9317920B2 (Rush)", "critical_risk": "IDENTIFIABILITY_PRE_CHECK_REQUIRED — if obstruction/thrombosis/sensor-drift are collinear, M1 collapses like #1 V25 (per V24/V25 lesson)", "next_step": "V2 Jacobian rank analysis BEFORE ML training"}
-  ],
-  "five_axis_trackers": {
-    "note": "Percentages are gate-derived (not manually assigned) per P2 directive. See per-territory JSON for gate-by-gate breakdown.",
-    "CV-T01": {"mechanism_exploration_pct": 100, "engineering_evidence_pct": 90, "robustness_falsification_pct": 40, "prior_art_ip_pct": 20, "real_world_validation_pct": 0, "evidence_integrity_complete": false, "dossier_ready": false},
-    "CV-T02": {"mechanism_exploration_pct": 100, "engineering_evidence_pct": 65, "robustness_falsification_pct": 100, "prior_art_ip_pct": 35, "real_world_validation_pct": 0, "evidence_integrity_complete": false, "dossier_ready": false},
-    "CV-T02L": {"mechanism_exploration_pct": 100, "engineering_evidence_pct": 100, "robustness_falsification_pct": 100, "prior_art_ip_pct": 0, "real_world_validation_pct": 0, "evidence_integrity_complete": true, "dossier_ready": false, "frozen": true, "frozen_reason": "V2 NEGATIVE_CEILING — CSF turnover rate makes 85% retention at 90 days physically impossible"},
-    "CV-T03": {"mechanism_exploration_pct": 98, "engineering_evidence_pct": 95, "robustness_falsification_pct": 90, "prior_art_ip_pct": 80, "real_world_validation_pct": 30, "evidence_integrity_complete": false, "dossier_ready": false},
-    "CV-T04": {"mechanism_exploration_pct": 100, "engineering_evidence_pct": 80, "robustness_falsification_pct": 100, "prior_art_ip_pct": 70, "real_world_validation_pct": 0, "evidence_integrity_complete": false, "dossier_ready": false},
-    "CV-T05": {"mechanism_exploration_pct": 100, "engineering_evidence_pct": 75, "robustness_falsification_pct": 100, "prior_art_ip_pct": 65, "real_world_validation_pct": 0, "evidence_integrity_complete": false, "dossier_ready": false},
-    "CV-T06": {"mechanism_exploration_pct": 85, "engineering_evidence_pct": 75, "robustness_falsification_pct": 80, "prior_art_ip_pct": 70, "real_world_validation_pct": 0, "evidence_integrity_complete": false, "dossier_ready": false},
-    "CV-T07": {"mechanism_exploration_pct": 80, "engineering_evidence_pct": 55, "robustness_falsification_pct": 70, "prior_art_ip_pct": 65, "real_world_validation_pct": 0, "evidence_integrity_complete": false, "dossier_ready": false},
-    "CV-T08": {"mechanism_exploration_pct": 75, "engineering_evidence_pct": 35, "robustness_falsification_pct": 60, "prior_art_ip_pct": 50, "real_world_validation_pct": 0, "evidence_integrity_complete": false, "dossier_ready": false},
-    "CV-T09": {"mechanism_exploration_pct": 50, "engineering_evidence_pct": 10, "robustness_falsification_pct": 10, "prior_art_ip_pct": 30, "real_world_validation_pct": 0, "evidence_integrity_complete": false, "dossier_ready": false},
-    "CV-T10": {"mechanism_exploration_pct": 50, "engineering_evidence_pct": 10, "robustness_falsification_pct": 10, "prior_art_ip_pct": 30, "real_world_validation_pct": 0, "evidence_integrity_complete": false, "dossier_ready": false}
-  },
-  "supersession_index": {
-    "note": "Every artifact version listed here is SUPERSEDED by a later version. The dossier firewall excludes SUPERSEDED artifacts from current-state answers.",
-    "CV-T01": {
-      "V1-V17": {"status": "SUPERSEDED", "superseded_by": "V18-V25 chain", "reason": "Iterative mechanism exploration; V18+ established final architecture"},
-      "V18": {"status": "SUPERSEDED", "superseded_by": "V19", "reason": "V19 defeated V18 by electrode-fouling attack"},
-      "V19": {"status": "SUPERSEDED", "superseded_by": "V20", "reason": "V20 dual-electrode resolved V19 fouling"},
-      "V20": {"status": "SUPERSEDED", "superseded_by": "V21", "reason": "V21 exposed combined-failure modes"},
-      "V21": {"status": "SUPERSEDED", "superseded_by": "V22", "reason": "V22 identified R_sol collinearity"},
-      "V22": {"status": "SUPERSEDED", "superseded_by": "V23", "reason": "V23 attempted active interrogation"},
-      "V23": {"status": "SUPERSEDED", "superseded_by": "V24", "reason": "V24 proved structural identifiability"},
-      "V24": {"status": "SUPERSEDED", "superseded_by": "V25", "reason": "V25 proved numerical non-identifiability — branch frozen"},
-      "V25": {"status": "FROZEN", "frozen_reason": "NUMERICAL_NON_IDENTIFIABLE — 1/7 states recoverable under 0.5% noise"}
+
+  "slots": [
+    {
+      "slot_id": 1,
+      "slot_name": "R6 Passive Rescue / Obstruction Bypass",
+      "current_state": "PHYSICAL_VALIDATION_PENDING",
+      "software_baseline": "e428a9c (14-gate CI GREEN, capsule fdac7e40)",
+      "consolidation_mapping": {
+        "absorbs_territories": ["CV-T06 (Retrieval / rescue)"],
+        "territory_state_mapping": {"CV-T06": "PHYSICAL_VALIDATION_PENDING"},
+        "mechanism": "Passive bypass lumen in CSF shunt — when primary lumen obstructs, bypass valve opens under pressure differential, restoring drainage without clearing obstruction",
+        "frozen_protocol": "V22.5 hardened benchtop pre-registration + V22.6 final control hierarchy",
+        "analysis_script_sha256": "f3536845973622de84c4... (frozen)",
+        "test_order": "[4,1,9,8,17,3,12,2,11,18,13,7,19,16,14,10,5,15,6,20] (frozen)"
+      },
+      "status_detail": {
+        "patent": "SURVIVES",
+        "evidence_infrastructure": "COMPLETE",
+        "protocol": "FROZEN",
+        "analysis": "FROZEN",
+        "provenance": "COMPLETE",
+        "control_architecture": "FROZEN (two-tier: NIST calibrator primary + Strata NSC secondary)",
+        "tur_classification": "ENGINEERING_METROLOGY_POLICY — PROVISIONAL",
+        "metrology_failure_decision_tree": "BOUND (option 5 relax-tolerance is NOT default; requires CEO approval)",
+        "ci": "14 gates GREEN at e428a9c",
+        "calibrator": "PENDING — Additel 161 GP5 candidate identified, certificate not verified",
+        "ifu": "PENDING — third-party Strata NSC IFU conditionally admissible (THIRD_PARTY_IFU_REPRODUCTION schema defined, document not bound)",
+        "physical_experiment": "NOT STARTED"
+      },
+      "next_step": "Acquire physical control chain (Additel 161 GP5 + certificate; Strata NSC + IFU). Verify calibrator certificate uncertainty over 5-40 mmHg. Run Tier-1 calibration. Run Tier-2 sanity check. Only then fabricate 20 prototypes and execute EXP-R6-01.",
+      "anti_gaming_rules_bound": [
+        "Never claim measurement precision greater than the traceability chain can support.",
+        "When reality rejects the measurement system, improve the measurement system before weakening the experiment.",
+        "When an assumption can be replaced with a direct document or a traceable measurement standard, replace it."
+      ]
     },
-    "CV-T02": {
-      "V1-V16": {"status": "SUPERSEDED", "superseded_by": "V17", "reason": "V17 discovered payload dependence"},
-      "V17": {"status": "SUPERSEDED", "superseded_by": "V18", "reason": "V18 proposed multi-mechanism"},
-      "V18": {"status": "SUPERSEDED", "superseded_by": "V21", "reason": "V21 Pareto test"},
-      "V21": {"status": "INVALIDATED", "invalidated_by": "V-FINAL", "reason": "V21 'pareto=true' was INFLATED (broken conc metric)"},
-      "V-FINAL": {"status": "FROZEN", "frozen_reason": "NEGATIVE_CEILING — multi-mechanism Pareto-DOMINATED by hydrodynamic for small payloads"}
+
+    {
+      "slot_id": 2,
+      "slot_name": "Adaptive / Sensing eShunt",
+      "current_state": "PROVISIONAL",
+      "software_baseline": "inherited from CV-T08 V7",
+      "consolidation_mapping": {
+        "absorbs_territories": ["CV-T08 (Patient-specific / adaptive eShunt, obstruction detection V7)"],
+        "territory_state_mapping": {"CV-T08": "PROVISIONAL_SURVIVOR_V7"},
+        "leading_candidate": "Implantable differential pressure sensor for continuous eShunt obstruction detection",
+        "what_is_genuinely_new": "(1) Continuous monitoring vs ShuntCheck episodic, (2) Endovascular location vs skin-surface, (3) Pressure gradient vs thermal flow, (4) eShunt patient population unserved by any existing technology"
+      },
+      "pipeline_structure": {
+        "ceo_directive": "Keep the distinction between: problem existence → sensing → identifiability → mechanism → buyer effect. Do not automatically use T5's yellow obstruction evidence to rescue it.",
+        "problem_existence": "YELLOW — eShunt patients have NO obstruction monitoring solution (confirmed via ShuntCheck comparator attack). But the CLINICAL FREQUENCY of eShunt obstruction is not yet observed (device is investigational, limited follow-up).",
+        "sensing": "PROVISIONAL — differential pressure sensor concept survives ShuntCheck comparator attack",
+        "identifiability": "PRE-CHECK PASSES — obstruction has distinct temporal signature (sustained) vs posture (transient) vs cough (brief) vs drift (monotonic). #1 V25 collinearity does NOT apply — temporal patterns provide orthogonal information.",
+        "mechanism": "PROVISIONAL — MEMS sensor form factor, biocompatibility (5yr CSF survival) not yet demonstrated",
+        "buyer_effect": "NOT YET ESTABLISHED — depends on (a) eShunt obstruction actually occurring in long-term follow-up, AND (b) continuous monitoring demonstrating clinical value over episodic presentation"
+      },
+      "critical_constraint": "This slot MUST NOT be rescued by T5's yellow obstruction evidence. The problem-existence gate for Slot 2 must be established INDEPENDENTLY — through eShunt-specific clinical observation of obstruction events in STRIDE 5-year follow-up, NOT through anatomical analogy to VA/VSS shunts.",
+      "next_step": "V8 — engineering (MEMS sensor form factor), biocompatibility (5yr CSF survival), prior art (endovascular CSF pressure monitoring patents), clinical pathway. BUT: full promotion requires eShunt-specific obstruction evidence from STRIDE 5-year data.",
+      "residual_risk": "If eShunt shows 0 obstruction events at 5 years (STRIDE data), the problem-existence gate FAILS and Slot 2 closes. This is the same yellow-gate risk as T5."
     },
-    "CV-T06": {
-      "V1-V2": {"status": "SUPERSEDED", "superseded_by": "V3", "reason": "V3 §103 + FEA"},
-      "V3": {"status": "SUPERSEDED", "superseded_by": "V4", "reason": "V4 T4 reconcile + chronic + A4"},
-      "V4": {"status": "SUPERSEDED", "superseded_by": "V5", "reason": "V5 5-separate-axes comparison"},
-      "V5": {"status": "SUPERSEDED", "superseded_by": "V6", "reason": "V5 self-test detection assumed 95%; V6 tested = 60%"},
-      "V6": {"status": "CURRENT", "current_reason": "M3 WINS 96.97% on pre-registered ≥95% reliability"}
+
+    {
+      "slot_id": 3,
+      "slot_name": "Controlled CNS Therapeutic Platform",
+      "current_state": "VALIDATION_READY_FROZEN",
+      "software_baseline": "inherited from CV-T03 V8.8",
+      "consolidation_mapping": {
+        "absorbs_territories": ["CV-T03 (Controlled therapeutic retention / CNS delivery)"],
+        "territory_state_mapping": {"CV-T03": "VALIDATION_READY_FROZEN"},
+        "frozen_at_version": "V8.8",
+        "scope": "Therapeutic retention / CNS delivery validation-ready package"
+      },
+      "ceo_directive": "Preserve the existing validation-ready state. Attack it from the strongest alternative before spending new experimental resources.",
+      "next_step": "Run strongest-alternative attack per Article XXXII. Identify the best existing CNS delivery solution that could make Slot 3 unnecessary. Only if Slot 3 survives the strongest-alternative attack should experimental resources be spent.",
+      "strongest_alternative_to_test": "PENDING — must be identified before experimental spend. Candidates include: existing CSF drug delivery (Ommaya reservoir, intrathecal pumps), CereVasc's own drug-delivery IP (US11850390B2 + US11883309B2), systemic delivery alternatives."
     },
-    "CV-T07": {
-      "V1-V2": {"status": "SUPERSEDED", "superseded_by": "V3", "reason": "V3 PLGA kinetics + pH + fragmentation"},
-      "V3": {"status": "SUPERSEDED", "superseded_by": "V4", "reason": "V4 attacked physical cause"},
-      "V4": {"status": "ARCHITECTURE_CHANGE", "archived_reason": "M9 FAILS — combined optimal design still 1/10000 embolization. PIVOT to M5."}
+
+    {
+      "slot_id": 4,
+      "slot_name": "CNS / Lifecycle Intelligence Platform",
+      "current_state": "DISCOVERY_COMPLETE",
+      "software_baseline": "inherited from CV-T09 V1 + CV-T10 V1",
+      "consolidation_mapping": {
+        "absorbs_territories": ["CV-T09 (CNS therapy platform, M10 CSF biosensor)", "CV-T10 (Lifecycle / platform intelligence, M1 ML predictive failure)"],
+        "territory_state_mapping": {"CV-T09": "V1_DISCOVERY_COMPLETE", "CV-T10": "V1_DISCOVERY_COMPLETE"},
+        "merge_rationale": "Both territories depend on the same sensor infrastructure (chronic dual-pressure sensor data). Merging avoids duplicative sensor work and aligns the biosensor (CV-T09) with the predictive failure detection (CV-T10) under one platform.",
+        "leading_candidate_combined": "Chronic dual-pressure sensor + CSF biosensor array + ML predictive failure detection, integrated as a lifecycle intelligence platform for eShunt patients"
+      },
+      "ceo_directive": "Merge the useful conceptual work from #9/#10 without claiming they are already inventions. Start with: problem → causal mechanism → prior art → measurable buyer outcome.",
+      "pipeline_restart_required": {
+        "problem": "NOT YET ESTABLISHED at the merged-platform level. CV-T09 and CV-T10 each had V1 discovery complete, but the MERGED platform has not been problem-gated.",
+        "causal_mechanism": "NOT YET ESTABLISHED at the merged-platform level. The sensor + biosensor + ML combination has not been mechanism-tested.",
+        "prior_art": "CV-T09 competitor: Cognos US10786155B2. CV-T10 competitors: US10687719B2, US11832920B2, US9317920B2. Merged platform prior art NOT yet searched.",
+        "measurable_buyer_outcome": "NOT YET ESTABLISHED. What does the merged platform enable that neither slot alone enables?"
+      },
+      "critical_risk": "IDENTIFIABILITY_PRE_CHECK_REQUIRED — if obstruction/thrombosis/sensor-drift are collinear across the merged sensor + biosensor + ML platform, the platform collapses like #1 V25 (per V24/V25 lesson). The Jacobian rank analysis MUST be run BEFORE ML training.",
+      "next_step": "Restart the pipeline at the problem-existence gate for the MERGED platform. Do NOT assume CV-T09 V1 + CV-T10 V1 discovery completeness transfers to the merged platform."
     },
-    "CV-T08": {
-      "V1": {"status": "SUPERSEDED", "superseded_by": "V2", "reason": "V2 VIEshunt hostile audit"},
-      "V2": {"status": "SUPERSEDED", "superseded_by": "V3", "reason": "V3 physiological assumption attack"},
-      "V3": {"status": "CURRENT", "current_reason": "M5 PROVISIONAL_PARTIAL_V3 — REM apnea coverage gap"}
+
+    {
+      "slot_id": 5,
+      "slot_name": "REPLACEMENT INVENTION — EMPTY",
+      "current_state": "EMPTY_DISCOVERY_REQUIRED",
+      "ceo_directive": "Do not fill it now. Run the replacement-candidate discovery engine and let the strongest surviving candidate earn the slot. The empty slot is intentional.",
+      "fill_rule": "A candidate may fill this slot ONLY when it survives: problem exists → evidence survives → prior art survives → strongest alternative survives → physics survives → experiment survives → buyer value survives.",
+      "anti_fabrication_rule": "An empty fifth slot is infinitely better than a fabricated fifth invention. The slot remains empty until a candidate earns it.",
+      "candidate_sources": [
+        "Replacement-candidate discovery engine (not yet run for this consolidation)",
+        "Conditional reopen of historical negative-ceiling territories IF new evidence overturns the kill reason (per Article XXIX)",
+        "Novel discoveries from adjacent fields (transfer mechanisms)"
+      ],
+      "historical_territories_eligible_for_reconsideration": [
+        "CV-T01 (Hydraulic state estimation) — frozen at V25 for numerical non-identifiability. Reopenable ONLY if a new identifiability approach (not impedance spectroscopy) is discovered.",
+        "CV-T02 (Therapeutic retention) — frozen at V-FINAL for Pareto domination. Reopenable ONLY if a new retention mechanism (not multi-mechanism, not size-selective) is discovered.",
+        "CV-T02L (Large-payload retention) — frozen at V2 for CSF turnover physics ceiling. Reopenable ONLY if CSF turnover can be modified (physiological constant — extremely unlikely).",
+        "CV-T04 (Venous-aware regulation) — frozen at V8 for buyer-boundary failure. Reopenable ONLY if a new regulation mechanism (not derivative, not predictive) is discovered.",
+        "CV-T05 (Fouling / obstruction) — frozen at V18, reopened 2026-08-20, pipeline completed through Step 6 with NO survivor. Reopenable ONLY if (a) eShunt-specific fouling is observed in STRIDE 5-year data, AND (b) a candidate survives the patent gate + El-Shafei strongest-alternative.",
+        "CV-T07 (Venous-interface protection) — frozen at V5 for problem-existence failure. Reopenable ONLY if clinical venous trauma from eShunt is documented (currently NOT documented)."
+      ],
+      "next_step": "Run replacement-candidate discovery engine. Do NOT force a candidate into this slot. The slot remains EMPTY until a candidate survives the full pipeline."
     }
+  ],
+
+  "slot_earning_rule": {
+    "rule": "A slot is earned only when ALL of the following survive:",
+    "gates": [
+      "1. problem_exists — Article XX problem-existence gate passes GREEN (not YELLOW)",
+      "2. evidence_survives — Article XXI discovery evidence with per-record relevance adjudication",
+      "3. prior_art_survives — §102/§103 patent gate with exact claim language, not abstract similarity",
+      "4. strongest_alternative_survives — Article XXXII strongest-alternative attack does not make the candidate unnecessary",
+      "5. physics_survives — model-derived conclusions survive harder physics attacks",
+      "6. experiment_survives — physical experiment confirms the model (EMBODIMENT-level, not just model-level)",
+      "7. buyer_value_survives — buyer-value test passes (morbidity, mortality, regulatory, commercial)"
+    ],
+    "failure_mode": "If ANY gate fails, the candidate does NOT earn a slot. The slot remains empty.",
+    "anti_quota_principle": "Five slots is a CEILING on active attention, not a quota requiring five inventions. World-class inventions completed: 0 / 5. That is the right number to chase now."
   },
-  "historical_secret_audit": {
-    "status": "REQUIRED_BEFORE_DOSSIER_READINESS",
-    "known_historical_exposure": "CREDENTIALS_AND_MODELS.md was committed in commits 47a4de9 and 55cb96a (2026-08-17) with API keys visible. File removed from tracking in commit a9ce501 (2026-08-18).",
-    "remaining_risk": "Keys remain in git history. .gitignore prevents future commits but does NOT scrub history.",
-    "required_action": "(1) Rotate ALL keys exposed in history (LENS, SCOPUS, PATSNAP, GITHUB PAT). (2) Run git filter-repo or BFG to scrub history. (3) Document rotation + scan.",
-    "current_status": "AUDIT_PENDING — credential rotation not yet executed"
+
+  "territories": [
+    {"id": "CV-T03", "name": "Controlled therapeutic retention / CNS delivery", "branch": "therapeutic_retention_validation_ready", "current_state": "VALIDATION_READY_FROZEN", "frozen_at_version": "V8.8", "mapped_to_slot": 3, "portfolio_role": "ABSORBED_ACTIVE"},
+    {"id": "CV-T06", "name": "Retrieval / rescue (R6)", "branch": "r6_physical_validation_pending", "current_state": "PHYSICAL_VALIDATION_PENDING", "frozen_at_version": "V22.6", "mapped_to_slot": 1, "software_baseline": "e428a9c", "portfolio_role": "ABSORBED_ACTIVE"},
+    {"id": "CV-T08", "name": "Patient-specific / adaptive eShunt", "branch": "obstruction_detection_V7", "current_state": "PROVISIONAL_SURVIVOR_V7", "mapped_to_slot": 2, "portfolio_role": "ABSORBED_ACTIVE"},
+    {"id": "CV-T09", "name": "CNS therapy platform", "branch": "M10_CSF_biosensor", "current_state": "V1_DISCOVERY_COMPLETE", "mapped_to_slot": 4, "portfolio_role": "ABSORBED_ACTIVE"},
+    {"id": "CV-T10", "name": "Lifecycle / platform intelligence", "branch": "M1_ML_predictive_failure", "current_state": "V1_DISCOVERY_COMPLETE", "mapped_to_slot": 4, "portfolio_role": "ABSORBED_ACTIVE"},
+    {"id": "CV-T01", "name": "Hydraulic state estimation", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V25", "cemetery_entry": "CE-001", "mapped_to_slot": null, "portfolio_role": "HISTORICAL_FROZEN", "reopenable": false, "reason": "PROVEN_INVARIANT — hard block"},
+    {"id": "CV-T02", "name": "Selective therapeutic retention", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V-FINAL", "cemetery_entry": "CE-002", "mapped_to_slot": null, "portfolio_role": "HISTORICAL_FROZEN", "reopenable": "conditional", "reason": "FAILURE_LESSON — reopenable only if new retention mechanism discovered"},
+    {"id": "CV-T02L", "name": "Large-therapeutic size-selective retention", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V2", "cemetery_entry": "CE-003", "mapped_to_slot": null, "portfolio_role": "HISTORICAL_FROZEN", "reopenable": false, "reason": "PROVEN_INVARIANT — hard block (CSF turnover physics)"},
+    {"id": "CV-T04", "name": "Venous-aware regulation", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V8", "cemetery_entry": "CE-004", "mapped_to_slot": null, "portfolio_role": "HISTORICAL_FROZEN", "reopenable": "conditional", "reason": "FAILURE_LESSON — reopenable only if new regulation mechanism discovered"},
+    {"id": "CV-T05", "name": "Fouling / obstruction", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V18", "cemetery_entry": "CE-005", "mapped_to_slot": null, "portfolio_role": "HISTORICAL_FROZEN", "reopenable": "conditional", "reason": "FAILURE_LESSON — reopened 2026-08-20 (see CEREVASC_TERRITORY_5_REFOULING/), pipeline through Step 6 produced no survivor. Reopenable only if eShunt-specific fouling observed in STRIDE 5-year data AND a candidate survives patent gate + El-Shafei strongest-alternative. NOTE: current_state remains FROZEN_NEGATIVE_CEILING (immutable historical state); reopening status tracked in CEREVASC_TERRITORY_5_REFOULING/ artifacts, not by mutating this canonical state."},
+    {"id": "CV-T07", "name": "Venous-interface protection", "current_state": "FROZEN_NEGATIVE_CEILING", "frozen_at_version": "V5", "cemetery_entry": "CE-007", "mapped_to_slot": null, "portfolio_role": "HISTORICAL_FROZEN", "reopenable": "conditional", "reason": "PROBLEM_EXISTENCE_FAIL — reopenable only if clinical venous trauma from eShunt documented"}
+  ],
+  "territories_backward_compatibility_note": "DERIVED PROJECTION — NOT INDEPENDENTLY EDITABLE. The 'territories' key above is a DERIVED compatibility projection of 'slots' + immutable_history (PORTFOLIO_10TERRITORY_HISTORICAL_2026-08-18.json). It is produced by epistemic_integrity/slot_territory_derivation.py. The invariant 'derived_territories == projection(slots + immutable_history)' is enforced by that script. If a coder manually edits 'territories' without updating 'slots', the invariant BREAKS and certification goes RED. Per Article X (canonical state has one authority), 'slots' is the SOLE canonical active portfolio authority. 'territories' exists ONLY for backward compatibility with certification scripts that read portfolio.get('territories', []). To change a territory state, update the corresponding slot's consolidation_mapping.territory_state_mapping — NEVER edit 'territories' directly.",
+
+  "historical_cemetery_preserved": {
+    "authority": "MECHANISM_CEMETERY/CEMETERY.json — unchanged, all 11 entries preserved",
+    "cemetery_entries": [
+      "CE-001 (CV-T01, Hydraulic state estimation via impedance spectroscopy, PHYSICS_CEILING, PROVEN_INVARIANT — HARD BLOCK)",
+      "CE-002 (CV-T02, Multi-mechanism retention, ENGINEERING_FAILURE, FAILURE_LESSON)",
+      "CE-003 (CV-T02L, Large-payload size-selective retention, PHYSICS_CEILING, PROVEN_INVARIANT — HARD BLOCK)",
+      "CE-004 (CV-T04, Derivative/predictive controllers, ENGINEERING_FAILURE, FAILURE_LESSON)",
+      "CE-005 (CV-T05, FDVBZ flow-diverting anti-fouling, ENGINEERING_FAILURE, FAILURE_LESSON)",
+      "CE-006 (CV-T06, M3 electrothermal SMA retrieval, ENGINEERING_FAILURE, FAILURE_LESSON)",
+      "CE-007 (CV-T07, M5 mechanical anti-trauma flexible neck, PROBLEM_EXISTENCE_FAIL, STRONG_CONSTRAINT)",
+      "CE-008 (CV-T08, M5_REFINED adaptive over-drainage controller, PROBLEM_EXISTENCE_UNDETERMINED, UNRESOLVED_WARNING)",
+      "CE-009 (CV-T06, Mechanical snare via catheter R1, ENGINEERING_FAILURE + NOVELTY_RISK, STRONG_CONSTRAINT)",
+      "CE-010 (CV-T06, Flow reversal obstruction clearing R3, ENGINEERING_FAILURE + SAFETY_CONCERN, MODEL_DERIVED)",
+      "CE-011 (CV-T06, Magnetic actuated release R4, MRI_SAFETY_GATEKEEPER + PHYSICS_FORCE_INSUFFICIENT, STRONG_CONSTRAINT)"
+    ],
+    "reopen_rule": "A previously killed mechanism stays dead unless new evidence overturns the reason it was killed (per Article XXIX and the anti-rescue rule). CE-001 and CE-003 are PROVEN_INVARIANT (hard block) and cannot be reopened. All others are FAILURE_LESSON or STRONG_CONSTRAINT and are conditionally reopenable."
+  },
+
+  "historical_territories_preserved": {
+    "authority": "PORTFOLIO_10TERRITORY_HISTORICAL_2026-08-18.json — preserved verbatim",
+    "territories_now_historical_not_active": [
+      "CV-T01 — Hydraulic state estimation (FROZEN_NEGATIVE_CEILING, V25) → historical cemetery, NOT active slot",
+      "CV-T02 — Selective therapeutic retention (FROZEN_NEGATIVE_CEILING, V-FINAL) → historical cemetery, NOT active slot",
+      "CV-T02L — Large-therapeutic size-selective retention (FROZEN_NEGATIVE_CEILING, V2) → historical cemetery, NOT active slot",
+      "CV-T03 — Controlled therapeutic retention (VALIDATION_READY_FROZEN, V8.8) → ABSORBED into Slot 3",
+      "CV-T04 — Venous-aware regulation (FROZEN_NEGATIVE_CEILING, V8) → historical cemetery, NOT active slot",
+      "CV-T05 — Fouling / obstruction (FROZEN_NEGATIVE_CEILING, V18, reopened 2026-08-20) → historical cemetery + T5 reopening artifacts in CEREVASC_TERRITORY_5_REFOULING/, NOT active slot",
+      "CV-T06 — Retrieval / rescue (R6 software complete, physical pending) → ABSORBED into Slot 1",
+      "CV-T07 — Venous-interface protection (FROZEN_NEGATIVE_CEILING, V5) → historical cemetery, NOT active slot",
+      "CV-T08 — Patient-specific / adaptive eShunt (PROVISIONAL_SURVIVOR_V7) → ABSORBED into Slot 2",
+      "CV-T09 — CNS therapy platform (V1_DISCOVERY_COMPLETE) → ABSORBED into Slot 4",
+      "CV-T10 — Lifecycle / platform intelligence (V1_DISCOVERY_COMPLETE) → ABSORBED into Slot 4"
+    ],
+    "not_deleted_not_forgotten": "All historical V* directories, evidence files, and cemetery entries remain in the repository untouched. The consolidation is a PORTFOLIO-LEVEL rebasing, not a data deletion. Any downstream consumer that needs historical context can access the preserved files."
+  },
+
+  "pushing_the_envelope_principle": {
+    "consolidation_form": "The goal is not to produce five inventions. The goal is to discover up to five inventions that deserve to exist.",
+    "anti_fabrication": "An empty fifth slot is infinitely better than a fabricated fifth invention.",
+    "full_principle_chain": [
+      "When software can no longer increase truth, stop improving software and increase contact with reality.",
+      "When reality rejects the measurement system, improve the measurement system before weakening the experiment.",
+      "When an assumption can be replaced with a direct document or a traceable measurement standard, replace it.",
+      "When evidence is insufficient to fill a slot, leave the slot empty.",
+      "When a previously killed mechanism has no new evidence overturning the kill, it stays dead."
+    ]
+  },
+
+  "provenance": {
+    "consolidation_authority": "CEO directive (deep audit, 2026-08-20)",
+    "consolidation_executed_by": "main (session 2026-08-20)",
+    "previous_canonical_state": "PORTFOLIO_10TERRITORY_HISTORICAL_2026-08-18.json (preserved verbatim)",
+    "constitution_version": "1.4.0",
+    "constitution_acknowledgment": "Articles I, II, VI, VII, XX, XXI, XXV, XXVII, XXVIII, XXIX, XXXII, XXXIII, XXXIV applied throughout consolidation.",
+    "anti_gaming_verification": "No history deleted. No cemetery entries removed. No negative ceilings silently reopened. No slot filled without earning it. Slot 5 left intentionally empty."
   }
 }

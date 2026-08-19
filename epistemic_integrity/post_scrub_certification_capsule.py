@@ -281,6 +281,27 @@ def build_capsule(certified_commit: Optional[str] = None, run_gate: bool = True)
              "details": f"binding_hash={p05.get('binding_hash', 'MISSING')[:16]}... auth={p05.get('authorization', 'MISSING')}"},
         ]
 
+        # G14: Slot-Territory Derivation Invariant (CEO directive 2026-08-20)
+        # slots = sole canonical active portfolio authority
+        # territories = derived compatibility projection
+        # If they diverge → certification RED
+        try:
+            from epistemic_integrity.slot_territory_derivation import verify_invariant as _verify_slot_territory_invariant
+            invariant_report = _verify_slot_territory_invariant()
+            g14_passed = invariant_report["invariant_holds"]
+            g14_details = (f"actual={invariant_report['actual_territories_count']} "
+                          f"derived={invariant_report['derived_territories_count']} "
+                          f"discrepancies={len(invariant_report['discrepancies'])}")
+        except Exception as e:
+            g14_passed = False
+            g14_details = f"INVARIANT_CHECK_EXCEPTION: {e}"
+        gate_results.append({
+            "check_id": "G14",
+            "check_name": "slot_territory_derivation_invariant",
+            "passed": g14_passed,
+            "details": g14_details,
+        })
+
         all_gates_green = all(g["passed"] for g in gate_results)
 
     # Load state roots
