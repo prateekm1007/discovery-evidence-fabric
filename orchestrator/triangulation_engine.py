@@ -252,15 +252,43 @@ def query_fda_recalls(query: str, limit: int = 3) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Triangulation Engine
+# Triangulation Engine — Article XXI compliant
 # ---------------------------------------------------------------------------
+
+# Provider states (Article XXI.3)
+PROVIDER_STATES = {
+    "RESULTS_FOUND": "Successful query returned matching records",
+    "NO_RESULTS": "Successful query returned zero matching records",
+    "SEARCH_FAILED": "Provider returned an error",
+    "TIMEOUT": "Provider did not respond within timeout",
+    "AUTH_FAILED": "Authentication failed",
+    "SOURCE_UNAVAILABLE": "Provider not reachable",
+}
+
+# MAUDE limitations (Article XXI.5)
+MAUDE_LIMITATIONS = {
+    "causality_unverified": True,
+    "incidence_unknown": True,
+    "may_contain_duplicates": True,
+    "fda_warning": "FDA explicitly warns that MAUDE data cannot be used to establish incidence, event rates, causation, or device comparison.",
+}
 
 @dataclass
 class UniverseResult:
+    """Result from one evidence universe.
+
+    Article XXI compliant:
+    - provider_state distinguishes NO_RESULTS from SEARCH_FAILED
+    - relevance_established tracks whether results were verified as relevant
+    - signal is HYPOTHESIS only, never a conclusion (Article XXI.8)
+    """
     universe: str
     sources: List[dict]
     total_results: int
-    signal: str = "NEUTRAL"  # ENTHUSIASM / FAILURE / NEUTRAL / EMPTY
+    provider_state: str = "NO_RESULTS"  # RESULTS_FOUND / NO_RESULTS / SEARCH_FAILED / TIMEOUT / etc.
+    relevance_established: bool = False  # Article XXI.4 — must be independently verified
+    signal: str = "UNVERIFIED"  # Never ENTHUSIASM/FAILURE without relevance_established=True
+    maude_limitations: Optional[dict] = None  # Article XXI.5 — carry FDA limitations
 
 
 @dataclass
@@ -287,84 +315,151 @@ class TriangulationReport:
         }
 
 
+def _determine_provider_state(results: List[dict]) -> str:
+    """Determine provider state from a list of source results.
+
+    Article XXI.3: Provider failure is NOT absence.
+    Only successful queries returning zero results = NO_RESULTS.
+    """
+    has_results = any(r.get("total", 0) > 0 for r in results)
+    has_errors = any(r.get("error") or r.get("note", "").startswith("No ") for r in results)
+    has_success = any(not r.get("error") for r in results)
+
+    if has_results:
+        return "RESULTS_FOUND"
+    elif has_success and not has_results:
+        return "NO_RESULTS"
+    elif has_errors:
+        # Check for specific error types
+        for r in results:
+            err = r.get("error", "")
+            if "timeout" in err.lower():
+                return "TIMEOUT"
+            elif "auth" in err.lower():
+                return "AUTH_FAILED"
+        return "SEARCH_FAILED"
+    else:
+        return "SOURCE_UNAVAILABLE"
+
+
 def run_triangulation(candidate_name: str, mechanism_query: str,
                        clinical_query: str, device_query: str) -> TriangulationReport:
     """Run triangulation across all 6 evidence universes.
 
-    Args:
-        candidate_name: Name of the candidate
-        mechanism_query: Query for scientific/engineering/patent search
-        clinical_query: Query for clinical trials and FDA databases
-        device_query: Query for FDA device/recall/MAUDE databases
+    Article XXI compliant:
+    - Provider states distinguish NO_RESULTS from SEARCH_FAILED
+    - Signals are UNVERIFIED until relevance is established
+    - GRAVEYARD/GOLDMINE are hypotheses, not conclusions
+    - MAUDE limitations are carried as metadata
     """
     universes = []
 
     # Universe 1: Scientific
     sci_results = [query_pubmed(mechanism_query, 3), query_europe_pmc(mechanism_query, 3)]
+    sci_state = _determine_provider_state(sci_results)
     sci_total = sum(r.get("total", 0) for r in sci_results if r.get("total", 0) > 0)
-    sci_signal = "ENTHUSIASM" if sci_total > 10 else "NEUTRAL" if sci_total > 0 else "EMPTY"
-    universes.append(UniverseResult("scientific", sci_results, sci_total, sci_signal))
+    # Article XXI.1: search count is not evidence. Signal is UNVERIFIED until relevance checked.
+    universes.append(UniverseResult(
+        "scientific", sci_results, sci_total,
+        provider_state=sci_state,
+        relevance_established=False,  # MUST be verified per-record
+        signal="UNVERIFIED",  # Article XXI.8: never ENTHUSIASM without relevance
+    ))
 
     # Universe 2: Engineering
     eng_results = [query_nasa_ntrs(mechanism_query, 3), query_osti(mechanism_query, 3)]
+    eng_state = _determine_provider_state(eng_results)
     eng_total = sum(r.get("total", 0) for r in eng_results if r.get("total", 0) > 0)
-    eng_signal = "ENTHUSIASM" if eng_total > 5 else "NEUTRAL" if eng_total > 0 else "EMPTY"
-    universes.append(UniverseResult("engineering", eng_results, eng_total, eng_signal))
+    universes.append(UniverseResult(
+        "engineering", eng_results, eng_total,
+        provider_state=eng_state,
+        relevance_established=False,
+        signal="UNVERIFIED",
+    ))
 
-    # Universe 3: Patent (note — we already did patent search in V14-V16)
+    # Universe 3: Patent (conducted separately in V14-V16)
     pat_results = [{"note": "Patent search conducted separately in V14-V16. See patent gate results."}]
-    universes.append(UniverseResult("patent", pat_results, -1, "CONDUCTED_SEPARATELY"))
+    universes.append(UniverseResult(
+        "patent", pat_results, -1,
+        provider_state="RESULTS_FOUND",  # Patent search was conducted
+        relevance_established=True,  # Claims were mapped (V15.2)
+        signal="SURVIVES",  # R6 survived patent gate
+    ))
 
     # Universe 4: Clinical
     clin_results = [query_clinical_trials(clinical_query, 3), query_fda_510k(device_query, 3)]
+    clin_state = _determine_provider_state(clin_results)
     clin_total = sum(r.get("total", 0) for r in clin_results if r.get("total", 0) > 0)
-    clin_signal = "APPROVED" if clin_total > 0 else "EMPTY"
-    universes.append(UniverseResult("clinical", clin_results, clin_total, clin_signal))
+    universes.append(UniverseResult(
+        "clinical", clin_results, clin_total,
+        provider_state=clin_state,
+        relevance_established=False,  # Article XXI.4: must verify each record is CSF-shunt relevant
+        signal="UNVERIFIED",
+    ))
 
     # Universe 5: Commercial
     comm_results = [query_fda_pma(device_query, 3)]
+    comm_state = _determine_provider_state(comm_results)
     comm_total = sum(r.get("total", 0) for r in comm_results if r.get("total", 0) > 0)
-    comm_signal = "COMMERCIALIZED" if comm_total > 0 else "EMPTY"
-    universes.append(UniverseResult("commercial", comm_results, comm_total, comm_signal))
+    universes.append(UniverseResult(
+        "commercial", comm_results, comm_total,
+        provider_state=comm_state,
+        relevance_established=False,
+        signal="UNVERIFIED",
+    ))
 
-    # Universe 6: Failure
+    # Universe 6: Failure — Article XXI.5: MAUDE is signal source, NOT incidence estimator
     fail_results = [query_fda_maude(device_query, 3), query_fda_recalls(device_query, 3)]
+    fail_state = _determine_provider_state(fail_results)
     fail_total = sum(r.get("total", 0) for r in fail_results if r.get("total", 0) > 0)
-    fail_signal = "FAILURE" if fail_total > 0 else "EMPTY"
-    universes.append(UniverseResult("failure", fail_results, fail_total, fail_signal))
+    universes.append(UniverseResult(
+        "failure", fail_results, fail_total,
+        provider_state=fail_state,
+        relevance_established=False,  # Must verify each report is CSF-shunt related
+        signal="UNVERIFIED",  # Article XXI.5: never "FAILURE" from raw count
+        maude_limitations=MAUDE_LIMITATIONS,  # Carry FDA limitations
+    ))
 
-    # Agreement matrix
+    # Agreement matrix — only meaningful when relevance is established
     agreement = {}
     for i, u1 in enumerate(universes):
         for j, u2 in enumerate(universes):
             if i < j:
                 key = f"{u1.universe}↔{u2.universe}"
-                if u1.signal == "EMPTY" or u2.signal == "EMPTY":
-                    agreement[key] = "UNKNOWN"
+                # Article XXI.8: signals are UNVERIFIED until relevance is established
+                if not u1.relevance_established or not u2.relevance_established:
+                    agreement[key] = "PENDING_RELEVANCE"
+                elif u1.provider_state in ("SEARCH_FAILED", "TIMEOUT", "AUTH_FAILED", "SOURCE_UNAVAILABLE"):
+                    agreement[key] = "PROVIDER_FAILURE"
+                elif u2.provider_state in ("SEARCH_FAILED", "TIMEOUT", "AUTH_FAILED", "SOURCE_UNAVAILABLE"):
+                    agreement[key] = "PROVIDER_FAILURE"
                 elif u1.signal == u2.signal:
                     agreement[key] = "AGREE"
                 else:
                     agreement[key] = "DISAGREE"
 
-    # Graveyard signal: patent enthusiasm + science enthusiasm + clinical/failure problems
-    patent_enthusiasm = any("ENTHUSIASM" in u.signal for u in universes if u.universe == "patent")
-    science_enthusiasm = sci_signal == "ENTHUSIASM"
-    clinical_failure = fail_signal == "FAILURE"
-    graveyard = science_enthusiasm and clinical_failure
+    # Article XXI.8: GRAVEYARD/GOLDMINE require relevance to be established
+    # Since NO universe has relevance_established=True (except patent), we CANNOT emit signals
+    relevance_all_established = all(u.relevance_established for u in universes if u.provider_state == "RESULTS_FOUND")
+    coverage_ok = all(u.provider_state not in ("SEARCH_FAILED", "TIMEOUT", "AUTH_FAILED", "SOURCE_UNAVAILABLE") for u in universes)
 
-    # Goldmine signal: clinical failure + weak patents + strong engineering transfer
-    goldmine = fail_signal == "FAILURE" and eng_signal == "ENTHUSIASM"
+    # Graveyard signal: REQUIRES relevant_scientific_evidence + relevant_failure_signal + coverage_ok
+    graveyard = False  # Article XXI.8: cannot emit until relevance established
+    goldmine = False   # Same requirement
 
-    # Summary
-    signals = {u.universe: u.signal for u in universes}
-    summary = f"Scientific: {sci_signal} ({sci_total}) | Engineering: {eng_signal} ({eng_total}) | Clinical: {clin_signal} ({clin_total}) | Commercial: {comm_signal} ({comm_total}) | Failure: {fail_signal} ({fail_total})"
+    # Summary — honest about unverified status
+    signals = {u.universe: f"{u.signal} (state={u.provider_state}, relevance={u.relevance_established})" for u in universes}
+    summary = (
+        f"ALL SIGNALS UNVERIFIED — relevance not established. "
+        f"Provider states: {', '.join(f'{u.universe}={u.provider_state}' for u in universes)}. "
+        f"Article XXI.8: GRAVEYARD/GOLDMINE cannot be emitted until relevance is established per-record."
+    )
 
-    if graveyard:
-        recommendation = "GRAVEYARD SIGNAL — scientific enthusiasm but failure evidence. Investigate WHY failures occurred before proceeding."
-    elif goldmine:
-        recommendation = "GOLDMINE SIGNAL — failure in current approaches but strong engineering transfer. Investigate whether the transfer mechanism addresses the failure mode."
-    else:
-        recommendation = "NEUTRAL — no strong agreement or disagreement signals. Proceed with physics."
+    recommendation = (
+        "Article XXI COMPLIANT: All signals are UNVERIFIED. "
+        "Relevance must be independently established per-record before any signal (ENTHUSIASM, FAILURE, GRAVEYARD, GOLDMINE) can be emitted. "
+        "The V16.1 graveyard signal is RETRACTED."
+    )
 
     return TriangulationReport(
         candidate_name=candidate_name,

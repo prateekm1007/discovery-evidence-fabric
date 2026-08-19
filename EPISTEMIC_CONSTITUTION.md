@@ -1,8 +1,8 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Ratified:** 2026-08-19
-**Amended:** 2026-08-19 (Article XX — Problem Existence Gate)
+**Amended:** 2026-08-19 (Article XX — Problem Existence Gate, Article XXI — Discovery Evidence Is Not Search Activity)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself
 
@@ -528,6 +528,106 @@ M5 failed all five questions. The territory was frozen not because the mechanism
 > Do not strengthen a candidate before trying to kill the underlying problem statement.
 >
 > Every candidate must be capable of being rejected at the problem-existence gate.
+
+---
+
+## Article XXI — Discovery evidence is not search activity
+
+Per CEO v30 audit (after the triangulation engine manufactured a false "graveyard signal" from contaminated search counts):
+
+> **A more sophisticated discovery engine can create more dangerous hallucinations than a simpler one if it aggregates bad evidence faster.**
+
+The discovery engine — including all search, triangulation, and multi-source systems — is an **untrusted evidence generator**, exactly as the constitution treats the LLM itself. The following rules permanently codify the distinction between search activity and evidence:
+
+### 1. Search count is not evidence.
+
+A database returning N hits for a query establishes only that N records matched the query string. It does NOT establish that N relevant papers, N relevant patents, or N relevant clinical devices exist. Relevance must be independently established per record.
+
+### 2. Zero results is not novelty.
+
+Zero search results for a query means no records matched that specific query string in that specific database. It does NOT mean the concept is novel, the mechanism is unknown, or the territory is unexplored. The query may be too narrow, the database may be incomplete, or the terminology may differ.
+
+### 3. Provider failure is not absence.
+
+When a search provider times out, returns an error, or has authentication issues, the result is `SEARCH_FAILED`, `TIMEOUT`, or `AUTH_FAILED` — NOT `EMPTY` or `NO_RESULTS`. Only a successful query that returns zero matching records constitutes `NO_RESULTS`. Provider failures must never masquerade as evidence of absence.
+
+### 4. Relevance must be independently established.
+
+Every search result that enters the evidence pipeline must pass a relevance adjudication:
+- Does the record actually belong to the relevant device/problem domain?
+- Is the record about the specific mechanism being investigated?
+- Or is it a generic keyword collision (e.g., "CSF" appearing in a vascular stent paper)?
+
+Generic string matching in a text field is insufficient. The relevance decision must be recorded as part of the evidence custody chain.
+
+### 5. MAUDE/reporting databases are signal sources, not incidence estimators.
+
+FDA explicitly warns that MAUDE/MDR data:
+- Cannot be used to establish incidence or event rates
+- Cannot establish causation
+- Should not be used to compare device event rates
+- May contain duplicate, incomplete, or inaccurate data
+
+Every MAUDE analysis must distinguish:
+- `REPORT_COUNT` (raw number of reports)
+- `MALFUNCTION_REPORTS` (device malfunction events)
+- `INJURY_REPORTS` (patient injury events)
+- `DEATH_REPORTS` (patient death events)
+- `CAUSALITY_UNVERIFIED` (FDA has not verified causation)
+- `INCIDENCE_UNKNOWN` (rate cannot be determined from report count)
+
+The system must carry FDA's limitations as structured metadata on every MAUDE-derived result.
+
+### 6. Database hits must be deduplicated and entity-resolved.
+
+Multiple databases may return the same patent, paper, or device under different identifiers. The engine must deduplicate by entity (DOI, patent number, FDA K-number) before counting. A count of 845 across PubMed + EuropePMC may represent fewer unique papers after deduplication.
+
+### 7. Triangulation requires genuinely independent evidence.
+
+"Independent universes" means the evidence in each universe is derived from different primary sources, not merely different queries to overlapping databases. Two queries to the same underlying database are NOT independent universes. The independence of each universe must be verified, not assumed.
+
+### 8. GRAVEYARD/GOLDMINE are hypotheses, not conclusions.
+
+`GRAVEYARD_SIGNAL` and `GOLDMINE_SIGNAL` are **hypotheses requiring further evidence**, never conclusions. They may only be emitted after:
+- `relevant_scientific_evidence` has been established (not just search count)
+- `relevant_clinical_evidence` has been established (not just database hits)
+- `relevant_failure_signal` has been established (not just raw MAUDE count)
+- `coverage_ok` has been verified (no provider failures masquerading as absence)
+
+A graveyard/goldmine signal is an **investigation trigger**, not a determination.
+
+### 9. Every discovery result must enter provenance custody.
+
+Every search result that enters the evidence pipeline must eventually be bound to the same provenance custody system as dossier evidence:
+```
+query → provider → raw result → relevance decision → exact record ID → exact span → hash → epistemic class
+```
+
+A search result without provenance custody is not evidence. It is noise.
+
+### 10. The discovery pipeline is:
+
+```
+search → relevance → identity → provenance → epistemic classification → synthesis
+```
+
+NOT:
+
+```
+search count → AI interpretation → conclusion
+```
+
+The discovery engine must never skip the intermediate steps. Aggregation without relevance verification is forbidden.
+
+### Application to the V16.1 failure
+
+The triangulation engine's V16.1 "graveyard signal" was manufactured from:
+- 845 EuropePMC hits (contaminated with irrelevant papers — Budd-Chiari, cardiac disease)
+- 0 NASA/OSTI results (actually provider timeouts, not absence)
+- 428 ClinicalTrials/FDA hits (contaminated with Ommaya reservoirs, vascular grafts)
+- 41,525 MAUDE reports (misused as failure rate — FDA explicitly prohibits this)
+
+This violated Articles XXI.1, XXI.3, XXI.4, XXI.5, XXI.8, and XXI.10. The graveyard signal is **RETRACTED** until relevance is established.
 
 ---
 

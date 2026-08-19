@@ -1,18 +1,13 @@
 """
 epistemic_integrity/version_manifest.py — Single canonical version authority
 
-Per CEO v20 P1-1:
-  "Create one canonical version manifest and eliminate all v8/v9/v20 version drift.
-   Everything imports it. No duplicated version literals."
-
-v28: Epistemic Constitution (19 Articles) encoded as first-class machine state.
-     constitution_loader.py enforces acknowledgment before gate/dossier/commit.
-     Pre-commit hook blocks commits without constitution acknowledgment.
-     Constitution hash bound into certification capsule.
+v29: Article XXI (Discovery Evidence Is Not Search Activity) added.
+     Triangulation engine P0 epistemic failure fixed.
+     Graveyard signal retracted.
 """
 
-ENGINE_VERSION = "v28"
-SCHEMA_VERSION = "4.4.0"
-POLICY_VERSION = "v28"
-CERTIFICATION_CORPUS_VERSION = "v15"
+ENGINE_VERSION = "v29"
+SCHEMA_VERSION = "4.5.0"
+POLICY_VERSION = "v29"
+CERTIFICATION_CORPUS_VERSION = "v16"
 
