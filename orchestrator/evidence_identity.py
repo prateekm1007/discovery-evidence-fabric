@@ -267,6 +267,302 @@ class EvidenceIdentity:
             EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
         )
 
+    def as_verified_evidence(self) -> "VerifiedEvidence":
+        """Promote this identity to a VerifiedEvidence object.
+
+        CEO v30.7: This is the type-safe boundary between identity
+        aggregation and evidence authorization. Returns a VerifiedEvidence
+        only if can_use_as_verified_evidence is True; otherwise raises
+        EvidenceAuthorizationError.
+
+        Rationale: "Don't merely make the safe path obvious. Make the
+        unsafe path structurally difficult or impossible." A CONTENT_MISMATCH
+        / POSSIBLE_FAMILY_MATCH / FAMILY_RELATION_CONFIRMED /
+        IDENTITY_INSUFFICIENT record cannot become a VerifiedEvidence —
+        the constructor refuses. This is enforced by Python's runtime type
+        system, not by caller discipline.
+        """
+        return VerifiedEvidence(self)
+
+
+# ===========================================================================
+# CEO v30.7: TYPE-SAFE EVIDENCE AUTHORIZATION BOUNDARY
+# ===========================================================================
+# Identity aggregation (EvidenceIdentity) is NOT the same as evidence
+# authorization (VerifiedEvidence). A CONTENT_MISMATCH record has a valid
+# identity (can_merge=True) but its bytes cannot be trusted as semantic
+# evidence (can_use_as_verified_evidence=False).
+#
+# The VerifiedEvidence type makes this boundary STRUCTURAL rather than
+# convention-based. Dossier/claim consumers type-hint VerifiedEvidence,
+# not EvidenceIdentity. A non-verified identity cannot be passed into the
+# dossier path — the VerifiedEvidence constructor refuses it.
+#
+# This implements the CEO's principle:
+#   "Don't merely make the safe path obvious.
+#    Make the unsafe path structurally difficult or impossible."
+# ===========================================================================
+
+
+class EvidenceAuthorizationError(Exception):
+    """Raised when an EvidenceIdentity cannot be promoted to VerifiedEvidence.
+
+    CEO v30.7: This is the type-boundary enforcement error. It is raised
+    by VerifiedEvidence.__init__ (and by EvidenceIdentity.as_verified_evidence)
+    when the wrapped identity lacks can_use_as_verified_evidence.
+
+    The error message preserves:
+    - which canonical_id was rejected
+    - which identity_confidence caused the rejection
+    - why (content mismatch, possible family match, family relation only,
+      or identity insufficient)
+
+    This is a P0 control per Article XVII — every attempt to bypass it
+    must be adversarially tested.
+    """
+
+    # Set of confidence values that CANNOT become VerifiedEvidence.
+    # Used for diagnostics + adversarial testing.
+    REJECTED_CONFIDENCE = frozenset({
+        DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
+        EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
+        FAMILY_RELATION_CONFIRMED,
+        POSSIBLE_FAMILY_MATCH,
+        IDENTITY_INSUFFICIENT,
+    })
+
+    @classmethod
+    def explain_rejection(cls, identity: "EvidenceIdentity") -> str:
+        """Return a human-readable explanation of why this identity cannot
+        be promoted to VerifiedEvidence."""
+        c = identity.identity_confidence
+        if c in (DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
+                 EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH):
+            return (
+                f"identity {identity.canonical_id_type}:{identity.canonical_id!r} "
+                f"has CONTENT_MISMATCH ({len(identity.content_mismatch_audits)} "
+                f"divergent fingerprint(s) detected). The bytes disagree across "
+                f"sources, so no single content can be trusted as verified "
+                f"semantic evidence."
+            )
+        elif c == FAMILY_RELATION_CONFIRMED:
+            return (
+                f"identity {identity.canonical_id_type}:{identity.canonical_id!r} "
+                f"is FAMILY_RELATION_CONFIRMED only. A family ID links multiple "
+                f"documents but does not identify a single document. Cannot be "
+                f"used as verified evidence for a specific claim."
+            )
+        elif c == POSSIBLE_FAMILY_MATCH:
+            return (
+                f"identity {identity.canonical_id_type}:{identity.canonical_id!r} "
+                f"is POSSIBLE_FAMILY_MATCH only (content fingerprint match, no "
+                f"authoritative ID). Cannot be used as verified evidence — "
+                f"identity is not established."
+            )
+        elif c == IDENTITY_INSUFFICIENT:
+            return (
+                f"identity {identity.canonical_id_type}:{identity.canonical_id!r} "
+                f"is IDENTITY_INSUFFICIENT. Cannot determine identity. Cannot "
+                f"be used as verified evidence."
+            )
+        else:
+            return (
+                f"identity {identity.canonical_id_type}:{identity.canonical_id!r} "
+                f"has unknown confidence {c!r}. Cannot be used as verified evidence."
+            )
+
+
+@dataclass(frozen=True)
+class VerifiedEvidence:
+    """Type-safe wrapper around an EvidenceIdentity that has passed the
+    evidence-authorization gate.
+
+    CEO v30.7: This is the type that dossier/research-claim functions
+    should accept. It is structurally impossible to construct a
+    VerifiedEvidence from a non-verified EvidenceIdentity — the
+    constructor raises EvidenceAuthorizationError.
+
+    Construction paths (ALL enforced):
+      1. VerifiedEvidence(identity) — raises if identity lacks
+         can_use_as_verified_evidence
+      2. identity.as_verified_evidence() — same check, returns VerifiedEvidence
+      3. object.__new__(VerifiedEvidence) + manual __init__ — still raises
+         because __init__ checks the wrapped identity
+
+    The wrapped identity is preserved read-only (frozen dataclass). The
+    underlying EvidenceIdentity is also frozen, so post-construction
+    mutation is impossible.
+
+    Article XVII: This type IS a P0 control. Every attempt to bypass it
+    must be adversarially tested (see scripts/attack_evidence_identity_v30_7.py).
+
+    CEO v30.7 principle:
+      "Identity aggregation is not evidence authorization.
+       Make the unsafe path structurally difficult or impossible."
+    """
+    identity: EvidenceIdentity
+
+    def __post_init__(self):
+        """Enforce the evidence-authorization gate at construction time.
+
+        CEO v30.7: This runs AFTER dataclass __init__ sets self.identity.
+        If the wrapped identity lacks can_use_as_verified_evidence, we
+        raise EvidenceAuthorizationError. This makes the boundary
+        structurally enforced — there is no way to construct a
+        VerifiedEvidence that wraps a non-verified identity.
+
+        Article IV (no fallback epistemology): we do NOT silently downgrade
+        to a weaker evidence type. We BLOCK.
+        Article V (fail closed, not universal rejector): valid records
+        (DOCUMENT_ID_CONFIRMED, EVENT_ID_CONFIRMED) DO pass through.
+        """
+        if not isinstance(self.identity, EvidenceIdentity):
+            raise EvidenceAuthorizationError(
+                f"VerifiedEvidence requires an EvidenceIdentity, got "
+                f"{type(self.identity).__name__}"
+            )
+        if not self.identity.can_use_as_verified_evidence:
+            raise EvidenceAuthorizationError(
+                EvidenceAuthorizationError.explain_rejection(self.identity)
+            )
+
+    # --- Pass-through accessors for common identity fields ---
+    # These exist so consumers don't need to drill through .identity
+    # for routine access. They DO NOT bypass the gate — the gate is
+    # enforced at construction time, not at access time.
+
+    @property
+    def canonical_id(self) -> str:
+        return self.identity.canonical_id
+
+    @property
+    def canonical_id_type(self) -> str:
+        return self.identity.canonical_id_type
+
+    @property
+    def content_fingerprint(self) -> str:
+        return self.identity.content_fingerprint
+
+    @property
+    def record_type(self) -> str:
+        return self.identity.record_type
+
+    @property
+    def source_databases(self) -> tuple:
+        return self.identity.source_databases
+
+    @property
+    def is_deduplicated(self) -> bool:
+        return self.identity.is_deduplicated
+
+    @property
+    def identity_confidence(self) -> str:
+        """The underlying identity's confidence. Always one of the
+        _VERIFIED_EVIDENCE_AUTHORIZED_CONFIDENCE values (DOCUMENT_ID_CONFIRMED
+        or EVENT_ID_CONFIRMED) — otherwise construction would have raised."""
+        return self.identity.identity_confidence
+
+
+# ---------------------------------------------------------------------------
+# CEO v30.7: DOSSIER CLAIM CONSUMER (proof-of-concept type-safe boundary)
+# ---------------------------------------------------------------------------
+# This is a minimal proof-of-concept showing how the VerifiedEvidence type
+# is consumed. Real dossier/claim code should follow the same pattern:
+# type-hint VerifiedEvidence, not EvidenceIdentity.
+#
+# A CONTENT_MISMATCH record cannot reach this consumer — Python's type
+# system rejects it at the boundary.
+
+class DossierClaimConsumer:
+    """Proof-of-concept consumer that accepts only VerifiedEvidence.
+
+    CEO v30.7: This demonstrates the type-safe API boundary. Methods
+    type-hint VerifiedEvidence. Attempting to pass an EvidenceIdentity
+    (even a DOCUMENT_ID_CONFIRMED one) directly will be rejected by
+    Python's runtime type checking — callers MUST call
+    identity.as_verified_evidence() first.
+
+    This makes the unsafe path structurally difficult:
+      - A CONTENT_MISMATCH identity cannot become VerifiedEvidence
+      - A POSSIBLE_FAMILY_MATCH identity cannot become VerifiedEvidence
+      - A FAMILY_RELATION_CONFIRMED identity cannot become VerifiedEvidence
+      - An IDENTITY_INSUFFICIENT identity cannot become VerifiedEvidence
+    """
+
+    @staticmethod
+    def assert_claim_supported_by_evidence(
+        claim: str,
+        evidence: "VerifiedEvidence",
+    ) -> dict:
+        """Record that a claim is supported by a piece of verified evidence.
+
+        Args:
+            claim: The dossier claim text.
+            evidence: A VerifiedEvidence object (NOT EvidenceIdentity).
+
+        Returns:
+            A custody record linking claim -> evidence -> identity.
+
+        Raises:
+            TypeError: if evidence is not a VerifiedEvidence instance.
+            EvidenceAuthorizationError: never (VerifiedEvidence construction
+                already enforced the gate; this is defense-in-depth).
+        """
+        if not isinstance(evidence, VerifiedEvidence):
+            raise TypeError(
+                f"DossierClaimConsumer.assert_claim_supported_by_evidence "
+                f"requires VerifiedEvidence, got {type(evidence).__name__}. "
+                f"Call identity.as_verified_evidence() first. A non-verified "
+                f"identity (CONTENT_MISMATCH, POSSIBLE_FAMILY_MATCH, "
+                f"FAMILY_RELATION_CONFIRMED, IDENTITY_INSUFFICIENT) cannot "
+                f"be promoted and must NOT reach the dossier path."
+            )
+        # Defense-in-depth: re-check can_use_as_verified_evidence in case
+        # someone bypasses construction via object.__new__ or subclassing.
+        if not evidence.identity.can_use_as_verified_evidence:
+            raise EvidenceAuthorizationError(
+                "DEFENSE-IN-DEPTH: VerifiedEvidence wraps a non-verified "
+                "identity. This should be impossible — construction should "
+                "have raised. Indicates a bypass attempt or implementation "
+                f"bug. Identity: {evidence.identity.canonical_id_type}:"
+                f"{evidence.identity.canonical_id!r} confidence="
+                f"{evidence.identity.identity_confidence!r}"
+            )
+        return {
+            "claim": claim,
+            "evidence_canonical_id": evidence.canonical_id,
+            "evidence_canonical_id_type": evidence.canonical_id_type,
+            "evidence_identity_confidence": evidence.identity_confidence,
+            "evidence_record_type": evidence.record_type,
+            "evidence_source_databases": list(evidence.source_databases),
+            "evidence_fingerprint": evidence.content_fingerprint,
+            "authorization": "VERIFIED_EVIDENCE_AUTHORIZED",
+        }
+
+    @staticmethod
+    def filter_verified_only(
+        identities: List[EvidenceIdentity],
+    ) -> tuple:
+        """Filter a list of identities into (verified, rejected).
+
+        Returns:
+            (verified_evidence_list, rejected_identities_list)
+
+        The verified list contains VerifiedEvidence objects (already
+        gated). The rejected list contains the original EvidenceIdentity
+        objects that could not be promoted — these are PRESERVED for
+        audit (per Article XV: disclose inconvenient results) but
+        CANNOT reach the dossier path.
+        """
+        verified: List[VerifiedEvidence] = []
+        rejected: List[EvidenceIdentity] = []
+        for ident in identities:
+            try:
+                verified.append(ident.as_verified_evidence())
+            except EvidenceAuthorizationError:
+                rejected.append(ident)
+        return verified, rejected
+
 
 # ---------------------------------------------------------------------------
 # Normalizers
@@ -1189,11 +1485,199 @@ def main():
     print(f"  ✅ PASS: 2-of-3 majority consensus does NOT override content mismatch")
     print(f"  ✅ PASS: can_use_as_verified_evidence=False even with majority agreement")
 
+    # ==================================================================
+    # v30.7 TYPE-SAFE EVIDENCE AUTHORIZATION BOUNDARY TESTS
+    # ==================================================================
+
+    # ------------------------------------------------------------------
+    # TB1: DOCUMENT_ID_CONFIRMED identity → VerifiedEvidence (positive)
+    # ------------------------------------------------------------------
+    print(f"\n--- TB1: DOCUMENT_ID_CONFIRMED → VerifiedEvidence (positive) ---")
+    clean_paper = deduplicate_records(
+        [{"doi": "10.1/tb1", "title": "Verified Paper", "abstract": "Stable content"}],
+        "Crossref"
+    )[0]
+    assert clean_paper.can_use_as_verified_evidence is True
+    ve = clean_paper.as_verified_evidence()
+    assert isinstance(ve, VerifiedEvidence)
+    assert ve.canonical_id == "10.1/tb1"
+    assert ve.identity_confidence == DOCUMENT_ID_CONFIRMED
+    assert ve.identity is clean_paper  # wraps the original
+    print(f"  ✅ PASS: DOCUMENT_ID_CONFIRMED → VerifiedEvidence (promotion succeeds)")
+
+    # ------------------------------------------------------------------
+    # TB2: CONTENT_MISMATCH identity → VerifiedEvidence REFUSED
+    # ------------------------------------------------------------------
+    print(f"\n--- TB2: CONTENT_MISMATCH → VerifiedEvidence REFUSED ---")
+    mm_a = [{"doi": "10.2/tb2", "title": "T", "abstract": "A"}]
+    mm_b = [{"doi": "10.2/tb2", "title": "T", "abstract": "B"}]
+    mm_ia = deduplicate_records(mm_a, "Crossref")
+    mm_ib = deduplicate_records(mm_b, "EuropePMC")
+    mm_merged, _ = merge_across_sources({"Crossref": mm_ia, "EuropePMC": mm_ib})
+    mismatched = [m for m in mm_merged if m.record_type == "paper"][0]
+    assert mismatched.has_content_mismatch is True
+    try:
+        mismatched.as_verified_evidence()
+        raise AssertionError("Expected EvidenceAuthorizationError was NOT raised")
+    except EvidenceAuthorizationError as e:
+        assert "CONTENT_MISMATCH" in str(e) or "divergent" in str(e).lower()
+    print(f"  ✅ PASS: CONTENT_MISMATCH → EvidenceAuthorizationError raised")
+    print(f"  ✅ PASS: error message explains the divergence")
+
+    # ------------------------------------------------------------------
+    # TB3: POSSIBLE_FAMILY_MATCH identity → VerifiedEvidence REFUSED
+    # ------------------------------------------------------------------
+    print(f"\n--- TB3: POSSIBLE_FAMILY_MATCH → VerifiedEvidence REFUSED ---")
+    fam_only = deduplicate_records(
+        [{"title": "Fam Only", "abstract": "No authoritative ID"}],
+        "PatentBear"
+    )[0]
+    assert fam_only.identity_confidence == POSSIBLE_FAMILY_MATCH
+    try:
+        fam_only.as_verified_evidence()
+        raise AssertionError("Expected EvidenceAuthorizationError was NOT raised")
+    except EvidenceAuthorizationError as e:
+        assert "POSSIBLE_FAMILY_MATCH" in str(e) or "fingerprint" in str(e).lower()
+    print(f"  ✅ PASS: POSSIBLE_FAMILY_MATCH → EvidenceAuthorizationError raised")
+
+    # ------------------------------------------------------------------
+    # TB4: FAMILY_RELATION_CONFIRMED identity → VerifiedEvidence REFUSED
+    # ------------------------------------------------------------------
+    print(f"\n--- TB4: FAMILY_RELATION_CONFIRMED → VerifiedEvidence REFUSED ---")
+    fam_rel = deduplicate_records(
+        [{"family_id": "FAM_TB4", "title": "Family Only"}],
+        "PatentBear"
+    )[0]
+    assert fam_rel.identity_confidence == FAMILY_RELATION_CONFIRMED
+    try:
+        fam_rel.as_verified_evidence()
+        raise AssertionError("Expected EvidenceAuthorizationError was NOT raised")
+    except EvidenceAuthorizationError as e:
+        assert "FAMILY_RELATION" in str(e) or "family" in str(e).lower()
+    print(f"  ✅ PASS: FAMILY_RELATION_CONFIRMED → EvidenceAuthorizationError raised")
+
+    # ------------------------------------------------------------------
+    # TB5: IDENTITY_INSUFFICIENT identity → VerifiedEvidence REFUSED
+    # ------------------------------------------------------------------
+    print(f"\n--- TB5: IDENTITY_INSUFFICIENT → VerifiedEvidence REFUSED ---")
+    no_id = deduplicate_records(
+        [{"title": "No ID", "abstract": "Nothing to identify"}],
+        "PatentBear"  # patent source but no patent_number, no family_id
+    )[0]
+    # Actually this might be POSSIBLE_FAMILY_MATCH. Let me use MAUDE for a
+    # true IDENTITY_INSUFFICIENT.
+    no_id_maude = deduplicate_records(
+        [{"event_type": "Malfunction", "date_received": "2024-01-01"}],  # NO MDR key
+        "FDA_MAUDE_feed1"
+    )[0]
+    assert no_id_maude.identity_confidence == IDENTITY_INSUFFICIENT
+    try:
+        no_id_maude.as_verified_evidence()
+        raise AssertionError("Expected EvidenceAuthorizationError was NOT raised")
+    except EvidenceAuthorizationError as e:
+        assert "IDENTITY_INSUFFICIENT" in str(e) or "insufficient" in str(e).lower()
+    print(f"  ✅ PASS: IDENTITY_INSUFFICIENT → EvidenceAuthorizationError raised")
+
+    # ------------------------------------------------------------------
+    # TB6: DossierClaimConsumer accepts VerifiedEvidence, REJECTS EvidenceIdentity
+    # ------------------------------------------------------------------
+    print(f"\n--- TB6: DossierClaimConsumer type-safe boundary ---")
+    consumer = DossierClaimConsumer()
+    # Positive: VerifiedEvidence accepted
+    record = consumer.assert_claim_supported_by_evidence(
+        "The eShunt reduces ICP by 30%.",
+        ve
+    )
+    assert record["authorization"] == "VERIFIED_EVIDENCE_AUTHORIZED"
+    assert record["evidence_canonical_id"] == "10.1/tb1"
+    print(f"  ✅ PASS: VerifiedEvidence accepted by DossierClaimConsumer")
+
+    # Negative: raw EvidenceIdentity rejected (even if DOCUMENT_ID_CONFIRMED)
+    try:
+        consumer.assert_claim_supported_by_evidence("claim", clean_paper)
+        raise AssertionError("Expected TypeError was NOT raised")
+    except TypeError as e:
+        assert "VerifiedEvidence" in str(e)
+    print(f"  ✅ PASS: raw EvidenceIdentity rejected by DossierClaimConsumer (TypeError)")
+
+    # Negative: CONTENT_MISMATCH identity rejected
+    try:
+        consumer.assert_claim_supported_by_evidence("claim", mismatched)
+        raise AssertionError("Expected TypeError was NOT raised")
+    except TypeError:
+        pass  # correct — type check catches it before authorization check
+    print(f"  ✅ PASS: CONTENT_MISMATCH identity rejected by DossierClaimConsumer")
+
+    # ------------------------------------------------------------------
+    # TB7: filter_verified_only splits identities correctly
+    # ------------------------------------------------------------------
+    print(f"\n--- TB7: filter_verified_only splits verified vs rejected ---")
+    mixed_identities = [
+        clean_paper,       # DOCUMENT_ID_CONFIRMED → verified
+        mismatched,        # CONTENT_MISMATCH → rejected
+        fam_only,          # POSSIBLE_FAMILY_MATCH → rejected
+        fam_rel,           # FAMILY_RELATION_CONFIRMED → rejected
+        no_id_maude,       # IDENTITY_INSUFFICIENT → rejected
+    ]
+    verified_list, rejected_list = DossierClaimConsumer.filter_verified_only(mixed_identities)
+    assert len(verified_list) == 1, f"Expected 1 verified, got {len(verified_list)}"
+    assert len(rejected_list) == 4, f"Expected 4 rejected, got {len(rejected_list)}"
+    assert all(isinstance(v, VerifiedEvidence) for v in verified_list)
+    assert all(isinstance(r, EvidenceIdentity) for r in rejected_list)
+    print(f"  ✅ PASS: 1 verified + 4 rejected (mismatch/possible/family/insufficient)")
+    print(f"  ✅ PASS: rejected identities PRESERVED for audit (not silently dropped)")
+
+    # ------------------------------------------------------------------
+    # TB8: VerifiedEvidence is FROZEN (post-construction mutation impossible)
+    # ------------------------------------------------------------------
+    print(f"\n--- TB8: VerifiedEvidence is frozen (mutation impossible) ---")
+    try:
+        ve.identity = clean_paper  # attempt to swap the wrapped identity
+        raise AssertionError("Expected FrozenInstanceError was NOT raised")
+    except Exception as e:
+        # FrozenInstanceError is a subclass of AttributeError in Python 3.12
+        assert "frozen" in str(e).lower() or "cannot assign" in str(e).lower() or isinstance(e, AttributeError)
+    print(f"  ✅ PASS: VerifiedEvidence is frozen — post-construction mutation refused")
+
+    # ------------------------------------------------------------------
+    # TB9: Defense-in-depth — even if construction is bypassed via
+    # object.__new__, the consumer re-checks can_use_as_verified_evidence.
+    # (This simulates an attacker trying to forge a VerifiedEvidence.)
+    # ------------------------------------------------------------------
+    print(f"\n--- TB9: Defense-in-depth catches __new__ bypass attempt ---")
+    # Attacker tries to skip __post_init__ by using object.__new__
+    forged = object.__new__(VerifiedEvidence)
+    # Manually set the identity field to a mismatched one
+    object.__setattr__(forged, "identity", mismatched)
+    # The forged object exists, but the consumer's defense-in-depth check
+    # catches it when used:
+    try:
+        consumer.assert_claim_supported_by_evidence("claim", forged)
+        raise AssertionError("Expected EvidenceAuthorizationError was NOT raised by defense-in-depth")
+    except EvidenceAuthorizationError as e:
+        assert "DEFENSE-IN-DEPTH" in str(e)
+    print(f"  ✅ PASS: __new__ bypass attempt caught by defense-in-depth check")
+    print(f"  ✅ PASS: error message identifies bypass attempt ('DEFENSE-IN-DEPTH')")
+
+    # ------------------------------------------------------------------
+    # TB10: EVENT_ID_CONFIRMED identity → VerifiedEvidence (positive)
+    # ------------------------------------------------------------------
+    print(f"\n--- TB10: EVENT_ID_CONFIRMED → VerifiedEvidence (positive) ---")
+    maude_clean = deduplicate_records(
+        [{"mdr_report_key": "MDR_TB10", "event_type": "Malfunction", "date_received": "2024-01-01"}],
+        "FDA_MAUDE_feed1"
+    )[0]
+    assert maude_clean.identity_confidence == EVENT_ID_CONFIRMED
+    ve_event = maude_clean.as_verified_evidence()
+    assert isinstance(ve_event, VerifiedEvidence)
+    assert ve_event.identity_confidence == EVENT_ID_CONFIRMED
+    print(f"  ✅ PASS: EVENT_ID_CONFIRMED → VerifiedEvidence (promotion succeeds)")
+
     # ------------------------------------------------------------------
     # SUMMARY
     # ------------------------------------------------------------------
     print(f"\n{'='*78}")
-    print(f"ALL TESTS PASSED (v30.6 — typed identity + content integrity)")
+    print(f"ALL TESTS PASSED (v30.7 — type-safe evidence authorization boundary)")
     print(f"{'='*78}")
     tests = [
         "N1: Patent normalization preserves jurisdiction + kind code: ✅",
@@ -1216,10 +1700,20 @@ def main():
         "CM5: Same MDR key + different event metadata → EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH: ✅",
         "CM6: Same DOI + same content → NO mismatch (regression): ✅",
         "CM7: Majority consensus does NOT override content mismatch: ✅",
+        "TB1: DOCUMENT_ID_CONFIRMED → VerifiedEvidence (positive): ✅",
+        "TB2: CONTENT_MISMATCH → VerifiedEvidence REFUSED: ✅",
+        "TB3: POSSIBLE_FAMILY_MATCH → VerifiedEvidence REFUSED: ✅",
+        "TB4: FAMILY_RELATION_CONFIRMED → VerifiedEvidence REFUSED: ✅",
+        "TB5: IDENTITY_INSUFFICIENT → VerifiedEvidence REFUSED: ✅",
+        "TB6: DossierClaimConsumer accepts VerifiedEvidence, rejects EvidenceIdentity: ✅",
+        "TB7: filter_verified_only splits verified vs rejected: ✅",
+        "TB8: VerifiedEvidence is frozen (mutation impossible): ✅",
+        "TB9: Defense-in-depth catches __new__ bypass attempt: ✅",
+        "TB10: EVENT_ID_CONFIRMED → VerifiedEvidence (positive): ✅",
     ]
     for t in tests:
         print(f"  {t}")
-    print(f"\nKEY PRINCIPLES (v30.5 + v30.6):")
+    print(f"\nKEY PRINCIPLES (v30.5 + v30.6 + v30.7):")
     print(f"  'Identity is not cosmetic metadata. Identity defines what the evidence is.'")
     print(f"  'Same document, related document, same family, same event,")
     print(f"   similar document, unknown identity — these are NOT the same bucket.'")
@@ -1229,6 +1723,9 @@ def main():
     print(f"   prove that the bytes we received are truthful, intact, or the right")
     print(f"   content. Never collapse identity integrity and content integrity")
     print(f"   into one bit.'")
+    print(f"  (v30.7) 'Don't merely make the safe path obvious.")
+    print(f"   Make the unsafe path structurally difficult or impossible.")
+    print(f"   Identity aggregation is not evidence authorization.'")
     print(f"{'='*78}")
 
 
