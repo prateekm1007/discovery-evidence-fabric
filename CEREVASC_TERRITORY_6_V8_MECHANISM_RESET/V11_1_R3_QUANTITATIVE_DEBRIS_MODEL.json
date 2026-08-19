@@ -1,0 +1,173 @@
+{
+  "task_id": "TERRITORY-6-V11.1",
+  "step": "R3 quantitative debris trajectory model",
+  "agent": "main (constitution-acknowledged)",
+  "timestamp": "2026-08-19T03:41:36.984193+00:00",
+  "ceo_directive_compliance": "Model debris trajectories, test particle sizes, quantify SAS entry probability, quantify pressure/shear, compare against clinical threshold. Record CE-010 as MODEL_DERIVED.",
+  "epistemic_status": "MODEL_DERIVED \u2014 not a PROVEN_INVARIANT. Can be overturned by primary clinical evidence.",
+  "model_parameters": {
+    "shunt_inner_diameter_mm": 0.5,
+    "shunt_length_mm": 80.0,
+    "flush_pressure_mmHg": 15.0,
+    "flush_flow_rate_mL_min": 2.0,
+    "flush_duration_s": 10,
+    "csf_compliance_mL_mmHg": 1.0,
+    "particle_types": {
+      "protein_aggregate": {
+        "diameter_range_um": [
+          10,
+          100
+        ],
+        "density": 1050,
+        "typical_fraction": 0.5
+      },
+      "cellular_debris": {
+        "diameter_range_um": [
+          5,
+          50
+        ],
+        "density": 1080,
+        "typical_fraction": 0.3
+      },
+      "thrombus_fragment": {
+        "diameter_range_um": [
+          100,
+          1000
+        ],
+        "density": 1100,
+        "typical_fraction": 0.15
+      },
+      "membrane_fragment": {
+        "diameter_range_um": [
+          50,
+          500
+        ],
+        "density": 1200,
+        "typical_fraction": 0.05
+      }
+    }
+  },
+  "results": {
+    "flow_parameters": {
+      "flush_velocity_ms": 0.1698,
+      "reynolds_number": 85.48,
+      "flush_volume_mL": 0.3333,
+      "net_volume_added_mL": 0.2833,
+      "icp_spike_mmHg": 0.28,
+      "wall_shear_stress_Pa": 2.7162,
+      "flow_regime": "LAMINAR"
+    },
+    "particle_results": {
+      "total_particles_simulated": 1000,
+      "particles_exiting_into_sas": 1000,
+      "sas_entry_rate": "100.0%",
+      "particles_above_clinical_threshold": 970,
+      "clinical_threshold_um": 10,
+      "clinical_particle_limit": 100,
+      "exceeds_clinical_limit": true,
+      "particles_that_settle_in_sas": 1000,
+      "sas_particles_by_type": {
+        "protein_aggregate": 500,
+        "cellular_debris": 300,
+        "thrombus_fragment": 150,
+        "membrane_fragment": 50
+      }
+    },
+    "sample_trajectories": [
+      {
+        "diameter_um": 67.54841186120953,
+        "transit_time_s": 0.4712,
+        "exits_sas": true,
+        "settling_velocity_ms": 0.00042772,
+        "settles_in_sas": true,
+        "particle_type": "protein_aggregate"
+      },
+      {
+        "diameter_um": 12.250967970040024,
+        "transit_time_s": 0.4712,
+        "exits_sas": true,
+        "settling_velocity_ms": 1.407e-05,
+        "settles_in_sas": true,
+        "particle_type": "protein_aggregate"
+      },
+      {
+        "diameter_um": 34.75263865322073,
+        "transit_time_s": 0.4712,
+        "exits_sas": true,
+        "settling_velocity_ms": 0.00011321,
+        "settles_in_sas": true,
+        "particle_type": "protein_aggregate"
+      },
+      {
+        "diameter_um": 30.08896643339405,
+        "transit_time_s": 0.4712,
+        "exits_sas": true,
+        "settling_velocity_ms": 8.487e-05,
+        "settles_in_sas": true,
+        "particle_type": "protein_aggregate"
+      },
+      {
+        "diameter_um": 76.28240927476112,
+        "transit_time_s": 0.4712,
+        "exits_sas": true,
+        "settling_velocity_ms": 0.00054547,
+        "settles_in_sas": true,
+        "particle_type": "protein_aggregate"
+      },
+      {
+        "diameter_um": 70.90295386806201,
+        "transit_time_s": 0.4712,
+        "exits_sas": true,
+        "settling_velocity_ms": 0.00047125,
+        "settles_in_sas": true,
+        "particle_type": "protein_aggregate"
+      },
+      {
+        "diameter_um": 90.29616109343608,
+        "transit_time_s": 0.4712,
+        "exits_sas": true,
+        "settling_velocity_ms": 0.0007643,
+        "settles_in_sas": true,
+        "particle_type": "protein_aggregate"
+      },
+      {
+        "diameter_um": 17.824494936647454,
+        "transit_time_s": 0.4712,
+        "exits_sas": true,
+        "settling_velocity_ms": 2.978e-05,
+        "settles_in_sas": true,
+        "particle_type": "protein_aggregate"
+      },
+      {
+        "diameter_um": 47.97296377167434,
+        "transit_time_s": 0.4712,
+        "exits_sas": true,
+        "settling_velocity_ms": 0.00021573,
+        "settles_in_sas": true,
+        "particle_type": "protein_aggregate"
+      },
+      {
+        "diameter_um": 12.68174974942633,
+        "transit_time_s": 0.4712,
+        "exits_sas": true,
+        "settling_velocity_ms": 1.508e-05,
+        "settles_in_sas": true,
+        "particle_type": "protein_aggregate"
+      }
+    ]
+  },
+  "adjudication": {
+    "sas_entry_probability": "100.0%",
+    "clinical_significance": {
+      "particles_above_threshold": 970,
+      "clinical_limit": 100,
+      "exceeds_limit": true,
+      "interpretation": "970 particles > 10\u03bcm enter SAS vs clinical limit of 100"
+    },
+    "pressure_spike": "0.28 mmHg",
+    "wall_shear": "2.7162 Pa",
+    "flow_regime": "LAMINAR",
+    "ce_010_epistemic_class": "MODEL_DERIVED",
+    "ce_010_rationale": "The model shows 100% of particles exit into SAS (retrograde flow pushes everything toward brain). But this is MODEL-DERIVED, not clinically proven. The model assumes: (1) valve allows retrograde flow, (2) all obstruction debris is mobilized, (3) particles follow flow velocity. These assumptions may not hold in vivo. CE-010 should be MODEL_DERIVED, not PROVEN_INVARIANT."
+  }
+}
