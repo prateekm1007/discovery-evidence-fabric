@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-REPO_ROOT = Path("/home/z/my-project/discovery-evidence-fabric")
+REPO_ROOT = Path(__file__).resolve().parent.parent
 CANONICAL_PORTFOLIO = REPO_ROOT / "CANONICAL_STATE" / "PORTFOLIO.json"
 
 
@@ -89,36 +89,34 @@ def _territory_name(territory_id: str) -> str:
 
 
 def _historical_territory_record(territory_id: str, portfolio: dict) -> dict:
-    """Build a historical-frozen territory record from immutable history."""
-    # Find in the historical territories preserved list
-    for t in portfolio.get("historical_territories_preserved", {}).get("territories_now_historical_not_active", []):
-        if territory_id in t:
-            # Extract the territory ID from the string
-            pass
-    # The historical records are stored as strings in the portfolio.
-    # We need structured data. Let's use the canonical historical file.
-    historical_file = REPO_ROOT / "CANONICAL_STATE" / "PORTFOLIO_10TERRITORY_HISTORICAL_2026-08-18.json"
-    if historical_file.exists():
-        with open(historical_file) as f:
-            hist = json.load(f)
-        for t in hist.get("territories", []):
-            if t["id"] == territory_id:
-                return {
-                    "id": t["id"],
-                    "name": t["name"],
-                    "branch": t.get("branch", ""),
-                    "current_state": t["current_state"],
-                    "mapped_to_slot": None,
-                    "portfolio_role": "HISTORICAL_FROZEN",
-                    "frozen_at_version": t.get("frozen_at_version", ""),
-                    "_derived_from": "PORTFOLIO_10TERRITORY_HISTORICAL_2026-08-18.json (immutable)",
-                }
+    """Build a historical-frozen territory record from the immutable ledger.
+
+    The LEDGER is the immutable record of state transitions. The historical
+    file (PORTFOLIO_10TERRITORY_HISTORICAL_2026-08-18.json) is a SNAPSHOT that
+    may be stale. The ledger is always current because it is append-only.
+
+    Per Article X (canonical state has one authority), the ledger projection
+    is the SOLE legitimate source of historical territory current_state.
+    """
+    # Read the ledger to find the latest state for this territory
+    ledger_path = REPO_ROOT / "epistemic_integrity" / "approved_provenance" / "state_transition_ledger.ndjson"
+    latest_state = "UNKNOWN"
+    if ledger_path.exists():
+        with open(ledger_path) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                event = json.loads(line)
+                if event.get("territory_id") == territory_id:
+                    latest_state = event.get("to_state", "UNKNOWN")
     return {
         "id": territory_id,
         "name": _territory_name(territory_id),
-        "current_state": "UNKNOWN",
+        "current_state": latest_state,
+        "mapped_to_slot": None,
         "portfolio_role": "HISTORICAL_FROZEN",
-        "_derived_from": "ERROR: historical record not found",
+        "_derived_from": "state_transition_ledger.ndjson (immutable ledger projection)",
     }
 
 
