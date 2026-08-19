@@ -51,7 +51,8 @@ from .semantic_verifier import SemanticVerifier  # ONLY for hash verification, N
 class RenderedClaim:
     """A claim rendered for the final dossier, with provenance metadata.
     Per CEO P0-B: text is GENERATED from the verified proposition.
-    Per CEO P0-2 v13: provenance_status is structurally carried forward."""
+    Per CEO P0-2 v13: provenance_status is structurally carried forward.
+    Per CEO v27: historical_provenance_limitation is structurally carried forward."""
     claim_id: str
     text: str  # GENERATED from proposition, not AI-authored
     epistemic_class: str
@@ -66,6 +67,8 @@ class RenderedClaim:
     # P0-2 v13: Provenance status — structurally surfaced, never hidden
     provenance_status: str = "COMPLETE"  # COMPLETE / INCOMPLETE
     missing_provenance_fields: List[str] = field(default_factory=list)
+    # v27: Historical provenance limitation — PERMANENT machine state
+    historical_provenance_limitation: Optional[dict] = None
 
 
 class DossierFirewall:
@@ -95,6 +98,86 @@ class DossierFirewall:
         self.hash_verifier = SemanticVerifier()  # ONLY for hash/span verification, NOT semantic
 
         self.canonical_state = self._load_canonical_state()
+
+        # v27: Load HISTORICAL_PROVENANCE_LIMITATION (CEO directive)
+        # This is a PERMANENT machine state that must survive into every dossier.
+        # The dossier generator can NEVER translate this into "historically verified" language.
+        self.historical_provenance_limitation = self._load_historical_provenance_limitation()
+
+    def _load_historical_provenance_limitation(self) -> dict:
+        """Load the HISTORICAL_PROVENANCE_LIMITATION state file.
+
+        Per CEO v26 audit: "Encode HISTORICAL_PROVENANCE_LIMITATION as a
+        first-class machine state covering the unrecoverable pre-scrub history."
+
+        This state is PERMANENT. It must be loaded by every DossierFirewall
+        instance and enforced on every rendered claim.
+        """
+        # Try multiple locations (canonical_state_dir is CANONICAL_STATE/,
+        # but the limitation lives in approved_provenance/)
+        candidates = [
+            self.canonical_state_dir.parent / "epistemic_integrity" / "approved_provenance" / "HISTORICAL_PROVENANCE_LIMITATION.json",
+            self.canonical_state_dir / "HISTORICAL_PROVENANCE_LIMITATION.json",
+            Path(__file__).parent / "approved_provenance" / "HISTORICAL_PROVENANCE_LIMITATION.json",
+        ]
+        for path in candidates:
+            if path.exists():
+                with open(path) as f:
+                    return json.load(f)
+        # If not found, return empty dict (not an error — the limitation
+        # may not have been declared yet in older checkouts)
+        return {}
+
+    def _enforce_historical_provenance_limitation(self, claim_text: str, evidence_commit: str) -> None:
+        """Enforce that dossier language never claims historical byte-equivalence.
+
+        Per CEO v26 audit: "Ensure the dossier generator can never translate
+        that state into 'historically verified' language."
+
+        This method BLOCKS any claim that uses forbidden phrases asserting
+        historical byte-equivalence, UNLESS the claim explicitly acknowledges
+        the HISTORICAL_PROVENANCE_LIMITATION.
+
+        Forbidden phrases (case-insensitive):
+          - "historically verified"
+          - "byte-equivalent"
+          - "byte-for-byte identical to original"
+          - "pre-scrub evidence preserved exactly"
+          - "evidence corpus unchanged except credentials"
+        """
+        if not self.historical_provenance_limitation:
+            return  # No limitation declared — skip enforcement
+
+        consequence = self.historical_provenance_limitation.get("consequence", {})
+        constraint = consequence.get("dossier_language_constraint", {})
+        forbidden = [p.lower() for p in constraint.get("forbidden_phrases", [])]
+
+        if not forbidden:
+            return
+
+        text_lower = claim_text.lower()
+        for phrase in forbidden:
+            if phrase in text_lower:
+                # Check if the claim explicitly acknowledges the limitation
+                required_ack = constraint.get("required_acknowledgment", "")
+                ack_keywords = [
+                    "post-scrub epistemic state",
+                    "pre-scrub byte-level equivalence is unproven",
+                    "historical_provenance_limitation",
+                ]
+                acknowledged = any(kw.lower() in text_lower for kw in ack_keywords)
+                if not acknowledged:
+                    raise ValueError(
+                        f"DOSSIER_HISTORICAL_PROVENANCE_VIOLATION: claim text contains "
+                        f"forbidden phrase '{phrase}' without acknowledging "
+                        f"HISTORICAL_PROVENANCE_LIMITATION. "
+                        f"Required acknowledgment: {required_ack[:200]}..."
+                    )
+
+        # Additional check: if evidence is anchored to a post-scrub commit,
+        # the rendered claim MUST carry the limitation acknowledgment.
+        # This is enforced at render time in render_dossier_claim().
+
 
     def _load_canonical_state(self) -> dict:
         path = self.canonical_state_dir / "PORTFOLIO.json"
@@ -377,6 +460,12 @@ class DossierFirewall:
         # Text is generated deterministically from the verified proposition.
         generated_text = self.proposition_verifier.generate_claim_text(claim_proposition)
 
+        # v27: Enforce HISTORICAL_PROVENANCE_LIMITATION (CEO directive)
+        # Block any claim that asserts historical byte-equivalence without
+        # acknowledging the limitation.
+        evidence_commit_for_check = evidence[0].code_commit if evidence else ""
+        self._enforce_historical_provenance_limitation(generated_text, evidence_commit_for_check)
+
         # Build provenance chain
         provenance_parts = []
         for ev in evidence:
@@ -387,6 +476,16 @@ class DossierFirewall:
             provenance_parts.append(
                 f"Source: {s.source_id} (type={s.source_type}, id={s.identifier})"
             )
+
+        # v27: Append HISTORICAL_PROVENANCE_LIMITATION to provenance chain
+        # Every dossier claim MUST carry this acknowledgment if the limitation is active.
+        if self.historical_provenance_limitation and self.historical_provenance_limitation.get("status") == "ACTIVE":
+            limitation_ack = (
+                "HISTORICAL_PROVENANCE_LIMITATION: Evidence is verified against the "
+                "post-scrub epistemic state. Pre-scrub byte-level equivalence is "
+                "unproven due to filter-repo garbage collection of pre-scrub commits."
+            )
+            provenance_parts.append(limitation_ack)
 
         # Determine provenance status for the rendered claim
         provenance_status = "COMPLETE"
@@ -419,6 +518,8 @@ class DossierFirewall:
             },
             provenance_status=provenance_status,
             missing_provenance_fields=list(set(missing_fields)),  # deduplicate
+            # v27: Carry the HISTORICAL_PROVENANCE_LIMITATION into every rendered claim
+            historical_provenance_limitation=self.historical_provenance_limitation or None,
         )
 
     def _verify_text_proposition_consistency(self, claim: Claim, proposition: Proposition):

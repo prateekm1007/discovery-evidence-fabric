@@ -1010,14 +1010,15 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                 detached_worktree_commit=self.git_head,  # in-place mode
             )
 
-            if binding.authorization == "RESEARCH_AUTHORIZED":
+            if binding.authorization == "AUTHORIZED_TO_RESUME_UNDER_POST_SCRUB_EPISTEMIC_STATE":
                 return FreshCheck(
                     "G13", "authorization_binding", True,
                     f"binding_hash={binding.binding_hash[:16]}... "
                     f"source==detached={binding.source_equals_detached} "
                     f"P0-2={'PASS' if binding.post_scrub_revalidation_passed else 'FAIL'} "
                     f"P0-3={'PASS' if binding.historical_artifact_audit_passed else 'FAIL'} "
-                    f"P0-4={'PASS' if binding.credential_audit_split_passed else 'FAIL'}",
+                    f"P0-4={'PASS' if binding.credential_audit_split_passed else 'FAIL'} "
+                    f"auth=AUTHORIZED_UNDER_POST_SCRUB_STATE",
                     self.git_head, self.verifier_version, self.schema_version,
                     raw_result={"binding_hash": binding.binding_hash,
                                "authorization": binding.authorization},

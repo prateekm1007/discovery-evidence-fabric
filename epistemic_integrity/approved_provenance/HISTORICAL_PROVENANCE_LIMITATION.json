@@ -1,0 +1,132 @@
+{
+  "schema_version": "1.0.0",
+  "state_type": "HISTORICAL_PROVENANCE_LIMITATION",
+  "declared_at": "2026-08-19T00:00:00Z",
+  "declared_at_version": "v27",
+  "status": "ACTIVE",
+  "permanence": "PERMANENT — this limitation must survive into every future dossier until pre-scrub evidence is independently recovered (which is impossible after filter-repo gc)",
+
+  "scope": {
+    "description": "Commits rewritten by the credential scrub operations (filter-repo passes 1, 2, and 3). All pre-scrub commit SHAs were rewritten and the original commits were garbage-collected by git filter-repo, making them unreachable.",
+    "scrub_operations": [
+      {
+        "pass": 1,
+        "date": "2026-08-18T22:54:54Z",
+        "description": "Removed CREDENTIALS_AND_MODELS.md from all history. Replaced 11 literal credential values (Lens, PatSnap x3, PatentBear x2, NVIDIA, Ollama, GitHub PAT, Scopus) and 6 regex pattern fallbacks with REDACTED markers.",
+        "commits_rewritten": 277
+      },
+      {
+        "pass": 2,
+        "date": "2026-08-18T22:55:00Z",
+        "description": "Replaced 15 short partial credential references in worklog (e.g., MA5xazB4ECC... → REDACTED-LENS-PARTIAL...).",
+        "commits_rewritten": 277
+      },
+      {
+        "pass": 3,
+        "date": "2026-08-18T23:40:00Z",
+        "description": "Scrubbed missed OpenRouter API key (sk-or-v1-...) discovered by credential_audit_split.py Pass B. The v25 scrub's regex sk-[A-Za-z0-9]{30,} did not match because OpenRouter keys contain hyphens.",
+        "commits_rewritten": 277
+      }
+    ],
+    "total_commits_rewritten": 277,
+    "pre_scrub_commit_shas_unrecoverable": true,
+    "pre_scrub_objects_gc'd": true,
+    "backup_branch_rewritten": "backup/pre-scrub-20260818T225454Z was also rewritten by filter-repo and now points to a post-scrub commit — it is NOT a pre-scrub snapshot"
+  },
+
+  "affected_artifacts": {
+    "description": "All 10 ledger-anchored scientific artifacts had their commit SHAs rewritten. However, their CONTENT HASHES (SHA-256 of blob bytes) are UNCHANGED — the scrub only modified blobs containing credentials, not the scientific evidence artifacts.",
+    "ledger_anchored_artifacts": [
+      {"territory_id": "CV-T01", "artifact_path": "CEREVASC_POSITION_001_V25_NUMERICAL_IDENTIFIABILITY/V25_NUMERICAL_IDENTIFIABILITY.json", "content_hash_unchanged": true, "pre_scrub_commit": "7b7644eaf9e89c9ead7c92abe0aa17d38baf7184 (UNRECOVERABLE)", "post_scrub_commit": "05fb09c5ecc210dfef66f61b399b9044feb57b05"},
+      {"territory_id": "CV-T02", "artifact_path": "CEREVASC_TERRITORY_2_FINAL_ADJUDICATION/T2_FINAL_ADJUDICATION.json", "content_hash_unchanged": true, "pre_scrub_commit": "e69afb4cd10d959a75195de4a8665d8ede09dd97 (UNRECOVERABLE)", "post_scrub_commit": "54a12b170d534141f8ba95d400d7e504ce99d43a"},
+      {"territory_id": "CV-T03", "artifact_path": "CEREVASC_INVENTION_003_V1/22_FINAL_ADJUDICATION.json", "content_hash_unchanged": true, "pre_scrub_commit": "a66daeb815b88a53332eeb4a89c59557cf010f17 (UNRECOVERABLE)", "post_scrub_commit": "58ccd4a..."},
+      {"territory_id": "CV-T04", "artifact_path": "CEREVASC_POSITION_004_V6_PATSNAP_COMPLETE/FINAL_VERDICT_V6_PATSNAP_COMPLETE.json", "content_hash_unchanged": true, "pre_scrub_commit": "94dd006c9ac84f8728b8009f8bfa597de48e3e1f (UNRECOVERABLE)", "post_scrub_commit": "efc554e..."},
+      {"territory_id": "CV-T05", "artifact_path": "CEREVASC_POSITION_005_V2_HOSTILE_ATTACK/V10_ROBUSTNESS_ADJUDICATION.json", "content_hash_unchanged": true, "pre_scrub_commit": "a37bae31c2765460ab089be372fea53725b694ec (UNRECOVERABLE)", "post_scrub_commit": "4ad58ad..."},
+      {"territory_id": "CV-T06", "artifact_path": "CEREVASC_TERRITORY_6_RETRIEVAL_RESCUE/V6_COMPLETE.json", "content_hash_unchanged": true, "pre_scrub_commit": "7c68f323137f398b4ad63e6eab8c5b3dd90d141b (UNRECOVERABLE)", "post_scrub_commit": "dcd8d45..."},
+      {"territory_id": "CV-T07", "artifact_path": "CEREVASC_TERRITORY_7_VENOUS_INTERFACE_PROTECTION/V4_COMPLETE.json", "content_hash_unchanged": true, "pre_scrub_commit": "7c68f323137f398b4ad63e6eab8c5b3dd90d141b (UNRECOVERABLE)", "post_scrub_commit": "dcd8d45..."},
+      {"territory_id": "CV-T08", "artifact_path": "CEREVASC_TERRITORY_8_PATIENT_SPECIFIC_ADAPTIVE/V3_COMPLETE.json", "content_hash_unchanged": true, "pre_scrub_commit": "7c68f323137f398b4ad63e6eab8c5b3dd90d141b (UNRECOVERABLE)", "post_scrub_commit": "dcd8d45..."},
+      {"territory_id": "CV-T09", "artifact_path": "CEREVASC_TERRITORY_9_CNS_THERAPY_PLATFORM/T9_DISCOVERY_REPORT.json", "content_hash_unchanged": true, "pre_scrub_commit": "0f09d4ef22b64c5fd84dee70f627d1191fd736ed (UNRECOVERABLE)", "post_scrub_commit": "0823583..."},
+      {"territory_id": "CV-T10", "artifact_path": "CEREVASC_TERRITORY_10_LIFECYCLE_INTELLIGENCE/T10_DISCOVERY_REPORT.json", "content_hash_unchanged": true, "pre_scrub_commit": "0f09d4ef22b64c5fd84dee70f627d1191fd736ed (UNRECOVERABLE)", "post_scrub_commit": "0823583..."}
+    ],
+    "infrastructure_blobs_corrupted_by_scrub": {
+      "description": "5 infrastructure blobs (pre-v25-rebuild ledger files) had hash field corruption — the regex 15[a-f0-9]{20,} matched substrings of SHA-256 hashes inside commit_sha, previous_transition_hash, and state_hash fields. These corrupted blobs are NOT at HEAD — they exist only in historical commits. The current HEAD ledger is the rebuilt clean v26 version.",
+      "count": 5,
+      "paths": [
+        "epistemic_integrity/approved_provenance/state_transition_ledger.ndjson",
+        "epistemic_integrity/approved_provenance/state_transition_ledger.json",
+        "epistemic_integrity/real_production_certification_corpus.json"
+      ],
+      "current_head_clean": true,
+      "verified_by": "post_scrub_evidence_revalidation.py capsule hash 1c15498a..."
+    }
+  },
+
+  "unavailable_comparison_evidence": {
+    "description": "Pre-scrub byte-level comparison is IMPOSSIBLE. The pre-scrub commits were garbage-collected by git filter-repo and no longer exist in the object store. There is no way to prove that the post-scrub evidence corpus is byte-for-byte equivalent to the original evidence corpus except for credential removal.",
+    "pre_scrub_commits_reachable": 0,
+    "pre_scrub_commits_unreachable": 277,
+    "byte_level_pre_post_comparison_possible": false,
+    "reason": "git filter-repo runs git gc after rewriting, which removes unreachable objects. The pre-scrub commits (e.g., 7b7644e, 5d62dbd) return 'fatal: Not a valid object name' when accessed via git cat-file."
+  },
+
+  "substitute_verification_performed": {
+    "description": "Since pre-scrub byte-level comparison is impossible, three substitute verifications were performed:",
+    "verifications": [
+      {
+        "name": "POST_SCRUB_EVIDENCE_REVALIDATION",
+        "module": "epistemic_integrity/post_scrub_evidence_revalidation.py",
+        "what_it_proves": "Every ledger artifact resolves post-scrub: commit_sha → git commit exists → artifact path exists → blob_sha resolves → SHA256(blob bytes) == artifact_content_hash. Ledger root hash matches replay. Portfolio projection matches canonical.",
+        "what_it_does_NOT_prove": "That the post-scrub artifact bytes are identical to the pre-scrub artifact bytes (except for credential removal).",
+        "result": "PASS — all 10 anchored artifacts verify",
+        "capsule_hash": "1c15498a66153338..."
+      },
+      {
+        "name": "HISTORICAL_ARTIFACT_DIFFERENCE_AUDIT",
+        "module": "epistemic_integrity/historical_artifact_audit.py",
+        "what_it_proves": "No unauthorized REDACTED-* markers in any scientific artifact. No hash field corruption in any scientific artifact. All REDACTED markers in scientific artifacts match authorized replacement patterns.",
+        "what_it_does_NOT_prove": "That the pre-scrub artifacts did not contain other modifications (we cannot compare to pre-scrub bytes).",
+        "result": "POST_SCRUB_INTERNAL_CONSISTENCY_VERIFIED — 0 scientific artifacts with unauthorized markers or hash corruption. 5 infrastructure blobs with KNOWN hash corruption (pre-v25-rebuild, fixed, HEAD clean).",
+        "audit_hash": "c641ef0665147f96..."
+      },
+      {
+        "name": "CREDENTIAL_AUDIT_SPLIT",
+        "module": "epistemic_integrity/credential_audit_split.py",
+        "what_it_proves": "No credentials matching the configured detection corpus (8 format patterns + heuristic object audit) were found in reachable history.",
+        "what_it_does_NOT_prove": "That no credentials exist in history at all (only that none matching the configured corpus were found). A credential in an unusual format could evade detection.",
+        "result": "PASS — both Pass A (pattern scan) and Pass B (object audit) clean",
+        "audit_hash": "c5212a584b3d8ead..."
+      }
+    ]
+  },
+
+  "consequence": {
+    "historical_byte_level_equivalence_unproven": true,
+    "what_is_proven": [
+      "Post-scrub internal consistency (every ledger artifact resolves to its recorded blob and content hash)",
+      "No unauthorized modifications in scientific artifacts (all REDACTED markers are authorized)",
+      "No credentials matching the configured detection corpus in reachable history",
+      "Current HEAD ledger is clean (hash field corruption only in pre-v25-rebuild historical blobs)"
+    ],
+    "what_is_NOT_proven": [
+      "Pre-scrub → post-scrub byte-for-byte equivalence (except credential removal)",
+      "That the scrub did not inadvertently modify scientific artifact bytes (we can only verify post-scrub internal consistency, not pre/post equivalence)"
+    ],
+    "dossier_language_constraint": {
+      "forbidden_phrases": [
+        "historically verified",
+        "byte-equivalent",
+        "byte-for-byte identical to original",
+        "pre-scrub evidence preserved exactly",
+        "evidence corpus unchanged except credentials"
+      ],
+      "required_acknowledgment": "Every dossier that references evidence anchored to post-scrub commits MUST acknowledge: 'Evidence is verified against the post-scrub epistemic state. Pre-scrub byte-level equivalence is unproven due to filter-repo garbage collection of pre-scrub commits.'",
+      "machine_enforced_by": "epistemic_integrity/dossier_firewall.py — _enforce_historical_provenance_limitation()"
+    }
+  },
+
+  "authorization_semantics": {
+    "research_authorized_means": "AUTHORIZED_TO_RESUME_UNDER_POST_SCRUB_EPISTEMIC_STATE — research may proceed against the current post-scrub evidence corpus, with the understanding that pre-scrub byte-level equivalence is unproven.",
+    "research_authorized_does_NOT_mean": "ALL_HISTORICAL_EVIDENCE_PRESERVED_EXACTLY — this stronger claim is FALSE and must never be made.",
+    "verdict_binding": "The authorization binding (attestation_binding.py) explicitly records both the authorization and this limitation. The binding hash includes the limitation hash."
+  }
+}

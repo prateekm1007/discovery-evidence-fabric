@@ -282,7 +282,14 @@ def build_binding(
         and p0_hashes["historical_artifact_audit_passed"]
         and p0_hashes["credential_audit_split_passed"]
     )
-    authorization = "RESEARCH_AUTHORIZED" if all_passed else "RESEARCH_BLOCKED"
+    # v27: Narrower authorization semantics per CEO v26 audit.
+    # "RESEARCH_AUTHORIZED" means AUTHORIZED_TO_RESUME_UNDER_POST_SCRUB_EPISTEMIC_STATE.
+    # It does NOT mean ALL_HISTORICAL_EVIDENCE_PRESERVED_EXACTLY.
+    # The HISTORICAL_PROVENANCE_LIMITATION is bound into the authorization.
+    if all_passed:
+        authorization = "AUTHORIZED_TO_RESUME_UNDER_POST_SCRUB_EPISTEMIC_STATE"
+    else:
+        authorization = "RESEARCH_BLOCKED"
 
     binding = AuthorizationBinding(
         att_binding_schema_version=ATT_BINDING_SCHEMA_VERSION,
@@ -360,14 +367,15 @@ def main():
     print(f"  P0-4 Credential audit split:      {'✅ PASS' if binding.credential_audit_split_passed else '❌ FAIL'}")
     print()
     print(f"FINAL AUTHORIZATION:")
-    if binding.authorization == "RESEARCH_AUTHORIZED":
-        print(f"  🟢 RESEARCH_AUTHORIZED")
+    if binding.authorization == "AUTHORIZED_TO_RESUME_UNDER_POST_SCRUB_EPISTEMIC_STATE":
+        print(f"  🟢 AUTHORIZED_TO_RESUME_UNDER_POST_SCRUB_EPISTEMIC_STATE")
+        print(f"     (does NOT mean ALL_HISTORICAL_EVIDENCE_PRESERVED_EXACTLY)")
     else:
         print(f"  🔴 RESEARCH_BLOCKED")
     print(f"  Binding hash: {binding.binding_hash}")
     print(f"\nBinding written to: {output_path}")
 
-    return 0 if binding.authorization == "RESEARCH_AUTHORIZED" else 1
+    return 0 if binding.authorization == "AUTHORIZED_TO_RESUME_UNDER_POST_SCRUB_EPISTEMIC_STATE" else 1
 
 
 if __name__ == "__main__":

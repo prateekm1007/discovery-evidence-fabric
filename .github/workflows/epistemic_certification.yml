@@ -1,0 +1,181 @@
+# Epistemic Firewall Certification
+#
+# Per CEO v26 audit directive 4:
+#   "Add a GitHub Actions workflow that runs the detached certification on
+#    the exact commit and exposes the result as a GitHub status/check."
+#
+# This workflow runs on every push to main and on manual dispatch.
+# It runs the full 13-gate certification inside a detached worktree
+# and uploads the capsule as a GitHub Actions artifact.
+#
+# The workflow is DETERMINISTIC: same commit → same capsule hash.
+# The CEO can independently reproduce the certification by:
+#   1. Cloning the repo at the exact commit
+#   2. Running: python -m epistemic_integrity.post_scrub_certification_capsule
+#   3. Comparing the capsule_hash to the one uploaded as an artifact
+#
+# The workflow also creates a GitHub status check on the commit, so the
+# CEO can query the GitHub combined-status endpoint to verify that an
+# external CI system emitted the certification result.
+
+name: Epistemic Certification
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'Commit SHA to certify (defaults to HEAD)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  statuses: write
+  actions: write
+
+jobs:
+  certify:
+    name: Run 13-Gate Detached Certification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history needed for credential scan and artifact audit
+          ref: ${{ github.event.inputs.commit_sha || github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install git-filter-repo
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Verify clean worktree
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "ERROR: Worktree is not clean"
+            git status
+            exit 1
+          fi
+          echo "✅ Worktree clean"
+
+      - name: Run P0-2 Post-Scrub Evidence Revalidation
+        run: |
+          python -m epistemic_integrity.post_scrub_evidence_revalidation
+        continue-on-error: true
+
+      - name: Run P0-3 Historical Artifact Audit
+        run: |
+          python -m epistemic_integrity.historical_artifact_audit
+        continue-on-error: true
+
+      - name: Run P0-4 Credential Audit Split
+        run: |
+          python -m epistemic_integrity.credential_audit_split
+        continue-on-error: true
+
+      - name: Run P0-5 Authorization Binding
+        run: |
+          python -m epistemic_integrity.attestation_binding
+        continue-on-error: true
+
+      - name: Build Deterministic Certification Capsule
+        id: capsule
+        run: |
+          python -m epistemic_integrity.post_scrub_certification_capsule > capsule_output.txt 2>&1
+          cat capsule_output.txt
+          # Extract capsule hash
+          CAPSULE_HASH=$(grep "Capsule hash:" capsule_output.txt | awk '{print $NF}')
+          echo "capsule_hash=$CAPSULE_HASH" >> $GITHUB_OUTPUT
+          # Extract authorization
+          if grep -q "AUTHORIZED_TO_RESUME_UNDER_POST_SCRUB_EPISTEMIC_STATE" capsule_output.txt; then
+            echo "authorization=GREEN" >> $GITHUB_OUTPUT
+          else
+            echo "authorization=RED" >> $GITHUB_OUTPUT
+          fi
+          # Extract certified commit
+          CERTIFIED_COMMIT=$(grep "Certified commit:" capsule_output.txt | awk '{print $NF}')
+          echo "certified_commit=$CERTIFIED_COMMIT" >> $GITHUB_OUTPUT
+
+      - name: Copy capsule to workspace
+        run: |
+          cp /tmp/epistemic_certification_output/post_scrub_certification_capsule.json .
+          cp /tmp/epistemic_certification_output/post_scrub_evidence_revalidation_capsule.json .
+          cp /tmp/epistemic_certification_output/historical_artifact_audit_report.json .
+          cp /tmp/epistemic_certification_output/credential_audit_split_report.json .
+          cp /tmp/epistemic_certification_output/authorization_binding.json .
+
+      - name: Upload certification capsule as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: epistemic-certification-capsule-${{ github.sha }}
+          path: |
+            post_scrub_certification_capsule.json
+            post_scrub_evidence_revalidation_capsule.json
+            historical_artifact_audit_report.json
+            credential_audit_split_report.json
+            authorization_binding.json
+            capsule_output.txt
+          retention-days: 90
+
+      - name: Create GitHub status check on commit
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const state = '${{ steps.capsule.outputs.authorization }}' === 'GREEN' ? 'success' : 'failure';
+            const target_url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const description = `Capsule ${{ steps.capsule.outputs.capsule_hash }}`.substring(0, 140);
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: '${{ steps.capsule.outputs.certified_commit || github.sha }}',
+              state: state,
+              target_url: target_url,
+              description: description,
+              context: 'Epistemic Certification (13 gates)'
+            });
+
+      - name: Fail if authorization is not GREEN
+        if: steps.capsule.outputs.authorization != 'GREEN'
+        run: |
+          echo "❌ Certification FAILED — authorization is ${{ steps.capsule.outputs.authorization }}"
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Epistemic Certification Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ steps.capsule.outputs.certified_commit }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Authorization:** ${{ steps.capsule.outputs.authorization }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Capsule hash:** \`${{ steps.capsule.outputs.capsule_hash }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Authorization Semantics" >> $GITHUB_STEP_SUMMARY
+          echo "🟢 **AUTHORIZED_TO_RESUME_UNDER_POST_SCRUB_EPISTEMIC_STATE**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This does NOT mean ALL_HISTORICAL_EVIDENCE_PRESERVED_EXACTLY." >> $GITHUB_STEP_SUMMARY
+          echo "Pre-scrub byte-level equivalence is unproven due to filter-repo GC." >> $GITHUB_STEP_SUMMARY
+          echo "See HISTORICAL_PROVENANCE_LIMITATION.json for details." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Independent Reproduction" >> $GITHUB_STEP_SUMMARY
+          echo "To independently reproduce this certification:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "git clone https://github.com/${{ github.repository }}.git" >> $GITHUB_STEP_SUMMARY
+          echo "cd discovery-evidence-fabric" >> $GITHUB_STEP_SUMMARY
+          echo "git checkout ${{ steps.capsule.outputs.certified_commit }}" >> $GITHUB_STEP_SUMMARY
+          echo "python -m epistemic_integrity.post_scrub_certification_capsule" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "Compare the capsule_hash to: \`${{ steps.capsule.outputs.capsule_hash }}\`" >> $GITHUB_STEP_SUMMARY
