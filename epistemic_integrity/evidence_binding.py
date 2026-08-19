@@ -286,6 +286,177 @@ class EvidenceBinding:
         self.sources[source.source_id] = source
         self._save()
 
+    # ============================================================
+    # CEO v30.8: PRODUCTION EVIDENCE AUTHORIZATION BOUNDARY
+    # ============================================================
+    # The method below is the ONLY production path for registering a
+    # discovery-layer source (paper, patent, MAUDE report, etc.) into
+    # the EvidenceBinding registry. It accepts a VerifiedEvidence object
+    # — NOT a raw EvidenceIdentity.
+    #
+    # A CONTENT_MISMATCH / POSSIBLE_FAMILY_MATCH /
+    # FAMILY_RELATION_CONFIRMED / IDENTITY_INSUFFICIENT identity CANNOT
+    # become a VerifiedEvidence (the constructor refuses — see
+    # orchestrator/evidence_identity.py v30.7). Therefore it is
+    # structurally impossible to register such an identity as a
+    # production Source via this path.
+    #
+    # The existing register_source(source: Source) is RETAINED for
+    # internally-generated sources (INTERNAL_REPORT, INTERNAL_ANALYSIS,
+    # simulation outputs) that do not originate from the discovery layer.
+    # But for any source derived from an external database (PubMed,
+    # Crossref, Espacenet, Lens, FDA MAUDE, etc.), callers MUST use
+    # register_source_from_verified_evidence().
+    #
+    # CEO principle: "A proof-of-concept defense is not a production
+    # defense. Can an adversarial model with repository access actually
+    # get unauthorized evidence into the real dossier path? Until the
+    # answer is structurally no, the evidence firewall is not finished."
+    # ============================================================
+    def register_source_from_verified_evidence(
+        self,
+        verified: "VerifiedEvidence",
+        source_id: str,
+        title: str,
+        content: Optional[str] = None,
+        span: Optional[str] = None,
+        authors: Optional[List[str]] = None,
+        year: Optional[int] = None,
+        url: Optional[str] = None,
+        retrieval_method: Optional[str] = None,
+        source_locator: Optional[str] = None,
+    ) -> Source:
+        """Register a discovery-layer source from a VerifiedEvidence object.
+
+        CEO v30.8: This is the PRODUCTION entry point for discovery-layer
+        sources. It accepts ONLY VerifiedEvidence — a type that cannot
+        be constructed from a non-verified EvidenceIdentity.
+
+        Args:
+            verified: A VerifiedEvidence object (NOT EvidenceIdentity).
+                Construction of VerifiedEvidence enforces
+                can_use_as_verified_evidence=True.
+            source_id: The SRC-<type>-<seq> identifier for the new Source.
+            title: Source title.
+            content: Optional content (abstract, span text, etc.).
+            span: Optional exact passage cited.
+            authors, year, url, retrieval_method, source_locator: optional
+                metadata.
+
+        Returns:
+            The registered Source object.
+
+        Raises:
+            TypeError: if `verified` is not a VerifiedEvidence instance.
+            EvidenceAuthorizationError: if the VerifiedEvidence wraps a
+                non-verified identity (defense-in-depth — should be
+                impossible because construction already enforced the gate).
+
+        Article XVII: This method IS a P0 control. Every attempt to
+        bypass it must be adversarially tested (see
+        scripts/attack_production_dossier_path_v30_8.py).
+        """
+        # Import here to avoid circular import at module load time.
+        from .evidence_identity_adapter import (
+            VerifiedEvidence,
+            EvidenceAuthorizationError,
+            _verified_evidence_to_source_type,
+            _verified_evidence_to_identifier,
+        )
+
+        if not isinstance(verified, VerifiedEvidence):
+            raise TypeError(
+                f"register_source_from_verified_evidence requires a "
+                f"VerifiedEvidence object, got {type(verified).__name__}. "
+                f"Call EvidenceIdentity.as_verified_evidence() first. A "
+                f"non-verified identity (CONTENT_MISMATCH, "
+                f"POSSIBLE_FAMILY_MATCH, FAMILY_RELATION_CONFIRMED, "
+                f"IDENTITY_INSUFFICIENT) cannot be promoted and MUST NOT "
+                f"reach the production dossier path."
+            )
+
+        # Defense-in-depth: re-check can_use_as_verified_evidence in case
+        # someone bypassed VerifiedEvidence construction via object.__new__
+        # or subclassing. This is the SECOND layer of defense (the first
+        # being VerifiedEvidence.__post_init__).
+        if not verified.identity.can_use_as_verified_evidence:
+            raise EvidenceAuthorizationError(
+                "DEFENSE-IN-DEPTH (register_source_from_verified_evidence): "
+                "VerifiedEvidence wraps a non-verified identity. This should "
+                "be impossible — construction should have raised. Indicates a "
+                f"bypass attempt or implementation bug. Identity: "
+                f"{verified.identity.canonical_id_type}:"
+                f"{verified.identity.canonical_id!r} confidence="
+                f"{verified.identity.identity_confidence!r}"
+            )
+
+        # Layer 3: Integrity check — detect forged identity_confidence.
+        # An attacker who used object.__setattr__ to forge identity_confidence
+        # from CONTENT_MISMATCH to DOCUMENT_ID_CONFIRMED will be caught here
+        # because content_mismatch_audits survives the forge (it's a separate
+        # field populated by merge_across_sources, not by identity_confidence).
+        integrity = verified.identity.verify_integrity()
+        if not integrity.integrity_ok:
+            raise EvidenceAuthorizationError(
+                f"FORGE DETECTED in production path "
+                f"(register_source_from_verified_evidence): "
+                f"{integrity.explanation} The record MUST NOT be registered "
+                f"as a production Source."
+            )
+
+        # Map VerifiedEvidence → Source fields
+        source_type = _verified_evidence_to_source_type(verified)
+        identifier = _verified_evidence_to_identifier(verified)
+
+        # Build the Source object
+        source = Source(
+            source_id=source_id,
+            source_type=source_type,
+            identifier=identifier,
+            title=title,
+            authors=authors or [],
+            year=year,
+            url=url,
+            retrieval_method=retrieval_method or "verified_evidence_promotion",
+            source_locator=source_locator,
+            content=content,
+            content_hash=verified.content_fingerprint if content else None,
+            span=span,
+            span_hash=hashlib.sha256(span.encode()).hexdigest() if span else None,
+            # P0-F: External identity verification — provenance from VerifiedEvidence
+            external_identity=ExternalIdentityVerification(
+                verified=True,
+                verification_provider=", ".join(verified.source_databases),
+                verification_timestamp=verified.identity.retrieval_timestamp
+                    if hasattr(verified.identity, 'retrieval_timestamp') else None,
+            ),
+            # P1-C: All three verification states set True because
+            # VerifiedEvidence construction already enforced identity +
+            # content integrity. Support is assumed True at registration
+            # time (the claim binding step will verify support separately).
+            verification_states=SourceVerificationStates(
+                identity_verified=True,
+                content_verified=True,
+                support_verified=True,  # assumed at registration; verified at claim binding
+            ),
+        )
+
+        # Record the authorization provenance on the source for audit
+        # (stored in a private attribute; not part of the Source schema
+        # but accessible for forensic inspection)
+        setattr(source, '_verified_evidence_authorization', {
+            'authorized_via': 'register_source_from_verified_evidence',
+            'identity_confidence': verified.identity_confidence,
+            'canonical_id': verified.canonical_id,
+            'canonical_id_type': verified.canonical_id_type,
+            'source_databases': list(verified.source_databases),
+            'content_fingerprint': verified.content_fingerprint,
+        })
+
+        self.sources[source_id] = source
+        self._save()
+        return source
+
     def bind_claim_to_evidence(self, claim_id: str, evidence_id: str):
         """Create bidirectional binding between claim and evidence."""
         if evidence_id not in self.evidence:

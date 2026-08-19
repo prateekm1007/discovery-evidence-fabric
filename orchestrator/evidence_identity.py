@@ -156,6 +156,20 @@ class ContentMismatchAudit:
 
 
 @dataclass(frozen=True)
+class IntegrityCheckResult:
+    """Result of EvidenceIdentity.verify_integrity().
+
+    CEO v30.8: Detects forged identity_confidence by cross-checking
+    against content_mismatch_audits. A forged record (where
+    identity_confidence was mutated via object.__setattr__) will be
+    detected because the audits field is NOT cleared by the forge.
+    """
+    integrity_ok: bool
+    forge_detected: bool
+    explanation: str
+
+
+@dataclass(frozen=True)
 class EvidenceIdentity:
     """Canonical identity for one evidence record.
 
@@ -265,6 +279,107 @@ class EvidenceIdentity:
         return self.identity_confidence in (
             DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
             EVENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH,
+        )
+
+    # CEO v30.8: Forge detection via integrity self-check.
+    #
+    # Python's frozen dataclass prevents normal attribute assignment
+    # (self.x = y raises FrozenInstanceError). But object.__setattr__(self,
+    # 'x', y) BYPASSES the frozen check — this is a known Python language
+    # limitation that an attacker with repository access can exploit.
+    #
+    # v30.7 disclosed this as a known limitation. v30.8 attempted to add
+    # a __setattr__ override, but frozen dataclasses explicitly forbid
+    # overriding __setattr__ (TypeError at class definition time).
+    #
+    # The HONEST classification (per Article XV):
+    #
+    #   "Strongly defended and adversarially tested, but not mathematically
+    #    unforgeable inside Python. object.__setattr__ can forge
+    #    identity_confidence. This is a Python runtime trust-boundary
+    #    limitation that cannot be fixed at the Python level."
+    #
+    # The defense-in-depth strategy that DOES work:
+    #   - Layer 1: VerifiedEvidence.__post_init__ checks can_use_as_verified_evidence
+    #   - Layer 2: Production register_source_from_verified_evidence re-checks
+    #   - Layer 3: verify_integrity() method (below) detects forged records
+    #     by checking that identity_confidence is CONSISTENT with
+    #     content_mismatch_audits. A forged identity_confidence (e.g.,
+    #     changed from CONTENT_MISMATCH to DOCUMENT_ID_CONFIRMED) will
+    #     be detected because the audits field is NOT forgeable via
+    #     identity_confidence alone (it's a separate field populated by
+    #     merge_across_sources).
+    #   - Layer 4: content_mismatch_audits field survives any forge of
+    #     identity_confidence. Downstream auditors calling verify_integrity()
+    #     or checking has_content_mismatch (which checks the audits) will
+    #     still catch forged records.
+    #
+    # Article XV: This limitation is honestly disclosed. We do not claim
+    # mathematical unforgeability. We claim strong defense + audit trail.
+
+    def verify_integrity(self) -> "IntegrityCheckResult":
+        """Detect forged identity_confidence by cross-checking against
+        content_mismatch_audits.
+
+        CEO v30.8: This is the forge-detection method. An attacker who
+        uses object.__setattr__ to change identity_confidence from
+        CONTENT_MISMATCH to DOCUMENT_ID_CONFIRMED will be caught because
+        the content_mismatch_audits field is NOT cleared by the forge.
+
+        Returns:
+            IntegrityCheckResult with:
+              - integrity_ok: True if identity_confidence is consistent
+                with content_mismatch_audits.
+              - forge_detected: True if identity_confidence was likely
+                forged (audits exist but confidence says no mismatch,
+                or vice versa).
+              - explanation: human-readable explanation.
+
+        Downstream auditors SHOULD call this method before trusting an
+        EvidenceIdentity. The production register_source_from_verified_evidence
+        method calls it as Layer 3 defense-in-depth.
+        """
+        audits = self.content_mismatch_audits
+        has_audits = len(audits) > 0
+        confidence_says_mismatch = self.has_content_mismatch
+
+        if has_audits and not confidence_says_mismatch:
+            # Audits exist but confidence doesn't say mismatch → FORGED
+            return IntegrityCheckResult(
+                integrity_ok=False,
+                forge_detected=True,
+                explanation=(
+                    f"FORGE DETECTED: content_mismatch_audits has "
+                    f"{len(audits)} entry/entries but identity_confidence "
+                    f"is {self.identity_confidence!r} (not a CONTENT_MISMATCH "
+                    f"variant). This indicates identity_confidence was "
+                    f"forge-mutated via object.__setattr__ after "
+                    f"merge_across_sources populated the audits. The record "
+                    f"MUST NOT be trusted as verified evidence."
+                ),
+            )
+        if not has_audits and confidence_says_mismatch:
+            # Confidence says mismatch but no audits → inconsistent
+            return IntegrityCheckResult(
+                integrity_ok=False,
+                forge_detected=True,
+                explanation=(
+                    f"INCONSISTENCY DETECTED: identity_confidence is "
+                    f"{self.identity_confidence!r} (a CONTENT_MISMATCH "
+                    f"variant) but content_mismatch_audits is empty. "
+                    f"This indicates the audits field was cleared or the "
+                    f"record was constructed inconsistently. The record "
+                    f"MUST NOT be trusted as verified evidence."
+                ),
+            )
+        return IntegrityCheckResult(
+            integrity_ok=True,
+            forge_detected=False,
+            explanation=(
+                f"Integrity OK: identity_confidence "
+                f"({self.identity_confidence!r}) is consistent with "
+                f"content_mismatch_audits ({len(audits)} entries)."
+            ),
         )
 
     def as_verified_evidence(self) -> "VerifiedEvidence":
@@ -415,6 +530,12 @@ class VerifiedEvidence:
         to a weaker evidence type. We BLOCK.
         Article V (fail closed, not universal rejector): valid records
         (DOCUMENT_ID_CONFIRMED, EVENT_ID_CONFIRMED) DO pass through.
+
+        CEO v30.8: Layer 3 defense-in-depth — call verify_integrity() to
+        detect forged identity_confidence. An attacker who used
+        object.__setattr__ to forge identity_confidence from
+        CONTENT_MISMATCH to DOCUMENT_ID_CONFIRMED will be caught here
+        because content_mismatch_audits survives the forge.
         """
         if not isinstance(self.identity, EvidenceIdentity):
             raise EvidenceAuthorizationError(
@@ -424,6 +545,16 @@ class VerifiedEvidence:
         if not self.identity.can_use_as_verified_evidence:
             raise EvidenceAuthorizationError(
                 EvidenceAuthorizationError.explain_rejection(self.identity)
+            )
+        # Layer 3: Integrity check — detect forged identity_confidence.
+        # This catches the object.__setattr__ bypass documented as a
+        # known Python runtime limitation in v30.7.
+        integrity = self.identity.verify_integrity()
+        if not integrity.integrity_ok:
+            raise EvidenceAuthorizationError(
+                f"FORGE DETECTED during VerifiedEvidence construction: "
+                f"{integrity.explanation} The record MUST NOT be promoted "
+                f"to VerifiedEvidence."
             )
 
     # --- Pass-through accessors for common identity fields ---

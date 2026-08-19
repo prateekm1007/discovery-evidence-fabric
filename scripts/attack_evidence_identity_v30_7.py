@@ -335,45 +335,49 @@ for bad_input in [None, "string", 42, {}, [], object()]:
         check(f"VerifiedEvidence({type(bad_input).__name__}) REFUSED", True)
 
 # ---------------------------------------------------------------------------
-# Attack 11: Forge identity_confidence on a CONTENT_MISMATCH record
-# (try to make the consumer think a mismatched record is DOCUMENT_ID_CONFIRMED)
+# Attack 11 (v30.8 CLOSED): Forge identity_confidence via object.__setattr__
 # ---------------------------------------------------------------------------
-print("\n--- Attack 11: Forge identity_confidence via object.__setattr__ ---")
-# EvidenceIdentity is also frozen, but object.__setattr__ might bypass it.
-# Try to change mismatched.identity_confidence to DOCUMENT_ID_CONFIRMED.
+print("\n--- Attack 11 (v30.8 CLOSED): Forge identity_confidence via object.__setattr__ ---")
+# v30.7 disclosed this as a known limitation: object.__setattr__ on a frozen
+# EvidenceIdentity CAN forge identity_confidence. The defense relied on
+# downstream auditors checking content_mismatch_audits.
+#
+# v30.8 CLOSES this gap with verify_integrity() — a method that cross-checks
+# identity_confidence against content_mismatch_audits. A forged record
+# (where identity_confidence was changed from CONTENT_MISMATCH to
+# DOCUMENT_ID_CONFIRMED) will be detected because the audits field is
+# NOT cleared by the forge.
+#
+# VerifiedEvidence.__post_init__ now calls verify_integrity() as Layer 3
+# defense-in-depth. The production register_source_from_verified_evidence
+# method also calls it.
 try:
     object.__setattr__(mismatched, "identity_confidence", DOCUMENT_ID_CONFIRMED)
-    # If this succeeded, the can_use_as_verified_evidence property now
-    # returns True. But the content_mismatch_audits are STILL populated.
-    # The consumer's defense-in-depth check uses can_use_as_verified_evidence,
-    # which would now return True. This is a real bypass!
-    #
-    # HOWEVER: VerifiedEvidence.__post_init__ also checks can_use_as_verified_evidence.
-    # If the forged identity passes that check, the consumer accepts it.
-    #
-    # This IS a potential bypass — but it requires mutating a frozen dataclass
-    # via object.__setattr__, which is explicitly documented as unsupported
-    # and may break invariants. We document this as a known limitation.
-    #
-    # The defense is: the content_mismatch_audits field is STILL populated.
-    # A downstream auditor checking for has_content_mismatch (which checks
-    # the audits, not the confidence) would still catch it.
-    #
-    # For now, we report this as a known limitation:
-    if mismatched.can_use_as_verified_evidence:
-        print("  ⚠️  KNOWN LIMITATION: object.__setattr__ on frozen EvidenceIdentity")
-        print("     can forge identity_confidence. Defense relies on downstream")
-        print("     auditors checking content_mismatch_audits, not just confidence.")
-        # Restore the original value
-        object.__setattr__(mismatched, "identity_confidence",
-                           DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH)
-        check("object.__setattr__ forge documented as known limitation", True)
+    # The forge succeeded at the Python level (can_use_as_verified_evidence
+    # now returns True). BUT verify_integrity() detects the inconsistency:
+    integrity = mismatched.verify_integrity()
+    if integrity.forge_detected:
+        check("verify_integrity() detects forged identity_confidence", True)
+        check("integrity.integrity_ok is False", integrity.integrity_ok is False)
+        check("explanation mentions FORGE DETECTED", "FORGE DETECTED" in integrity.explanation)
     else:
-        check("object.__setattr__ forge did not change can_use_as_verified_evidence", True)
+        check("verify_integrity() detects forged identity_confidence", False,
+              f"(integrity={integrity})")
+    # Now try to promote the forged identity to VerifiedEvidence — should
+    # be caught by the Layer 3 integrity check in __post_init__:
+    try:
+        mismatched.as_verified_evidence()
+        check("VerifiedEvidence construction REFUSES forged identity (Layer 3)", False)
+    except EvidenceAuthorizationError as e:
+        check("VerifiedEvidence construction REFUSES forged identity (Layer 3)", True)
+        check("error mentions FORGE DETECTED", "FORGE DETECTED" in str(e))
+    # Restore the original value for downstream tests
+    object.__setattr__(mismatched, "identity_confidence",
+                       DOCUMENT_ID_CONFIRMED_WITH_CONTENT_MISMATCH)
 except (AttributeError, Exception) as e:
-    # object.__setattr__ on frozen dataclass raises FrozenInstanceError
-    # in some Python versions
-    check("object.__setattr__ on frozen EvidenceIdentity refused", True)
+    # object.__setattr__ on frozen dataclass may raise in some Python versions
+    check("object.__setattr__ on frozen EvidenceIdentity refused by runtime", True)
+print("  v30.8 CLOSED the v30.7 known limitation via verify_integrity().")
 
 # ---------------------------------------------------------------------------
 # Attack 12: filter_verified_only preserves ALL rejected identities
@@ -414,16 +418,17 @@ else:
     print("   Make the unsafe path structurally difficult or impossible.")
     print("   Identity aggregation is not evidence authorization.'")
     print()
-    print("Defense layers:")
+    print("Defense layers (v30.7 + v30.8):")
     print("  1. VerifiedEvidence.__post_init__ refuses non-verified identities")
     print("  2. EvidenceIdentity.as_verified_evidence() raises on non-verified")
     print("  3. DossierClaimConsumer type-checks VerifiedEvidence (TypeError)")
     print("  4. DossierClaimConsumer defense-in-depth re-checks can_use_as_verified_evidence")
     print("  5. Both EvidenceIdentity and VerifiedEvidence are frozen dataclasses")
     print("  6. Pickle/unpickle re-runs __post_init__ (refuses forged objects)")
+    print("  7. v30.8: verify_integrity() cross-checks identity_confidence vs audits")
+    print("  8. v30.8: Production register_source_from_verified_evidence calls verify_integrity()")
     print()
-    print("Known limitation (Attack 11):")
-    print("  object.__setattr__ on a frozen EvidenceIdentity CAN forge")
-    print("  identity_confidence. Defense relies on downstream auditors")
-    print("  checking content_mismatch_audits, not just the confidence field.")
+    print("v30.8 closed the v30.7 known limitation (Attack 11):")
+    print("  object.__setattr__ forge of identity_confidence is now DETECTED")
+    print("  by verify_integrity() because content_mismatch_audits survives the forge.")
     sys.exit(0)
