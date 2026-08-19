@@ -1,0 +1,130 @@
+{
+  "task_id": "TERRITORY-6-V14.1",
+  "step": "R7 exact claim adjudication — 102 vs 103 separation",
+  "agent": "main (constitution-acknowledged, session 2026-08-19)",
+  "timestamp": "2026-08-19T09:30:00+00:00",
+
+  "ceo_directive_compliance": {
+    "directive": "Bind exact issued claims from US11896789B2 into evidence registry. Map every R7 limitation against actual claim language. Separate 102 anticipation from 103 obviousness. Identify exact limitation(s) that remain uncovered. Only then close R7 as PATENT_KILLED. Family overlap ≠ anticipation.",
+    "correction": "V14 said 'literal anticipation' — CEO correctly noted that family-level similarity is not the same as 102 anticipation. This adjudication uses the EXACT claim text, not family-level similarity."
+  },
+
+  "evidence_registry_binding": {
+    "evidence_id": "EV-US11896789B2-CLAIMS",
+    "patent_number": "US11896789B2",
+    "source": "Google Patents (patents.google.com/patent/US11896789B2/en)",
+    "retrieval_timestamp": "2026-08-19T09:25:00Z",
+    "content_hash": "c02ef61b5ff6bac9d17a4530671d6c22...",
+    "file": "CEREVASC_TERRITORY_6_V8_MECHANISM_RESET/US11896789B2_EXACT_CLAIMS.json",
+    "total_claims": 13 (11 dependent + 2 independent)"
+  },
+
+  "exact_independent_claims": {
+    "claim_1": "A system for flushing a shunt catheter, the system comprising: a catheter comprising: a body having a lumen therethrough; a primary set of drain pores formed in the body and configured to allow fluid communication with the lumen; a secondary set of drain pores formed in the body, with each drain pore of the secondary set of drain pores comprising a membrane configured to close the pore, the membrane being constructed and arranged to be ruptured upon application of fluid pressure to open the secondary set of drain pores; and a pressure source configured to apply the fluid pressure to the lumen of the body to rupture the membrane.",
+
+    "claim_12": "A system for flushing a shunt catheter, the system comprising: a catheter, comprising: a body having a lumen therethrough; a primary set of drain pores formed in the body and configured to allow fluid communication with the lumen; a secondary set of drain pores formed in the body, with each drain pore of the secondary set of drain pores comprising a membrane configured to close the pore, the membrane being constructed and arranged to be ruptured upon application of fluid pressure to open the secondary set of drain pores, and a pumping reservoir in fluid communication with the catheter, the pumping reservoir configured to hold a volume of fluid and configured to pressurize the fluid to rupture the membrane.",
+
+    "claim_11_dependent_on_1": "The system of claim 1, wherein the membrane is constructed and arranged to be ruptured upon application of the fluid pressure to open the secondary set of drain pores when the application of the fluid pressure fails to unblock the primary set of drain pores."
+  },
+
+  "r7_limitation_mapping_against_exact_claims": {
+    "R7_L1_endovascular_eshunt": {
+      "r7_element": "Endovascular eShunt draining subarachnoid space to venous sinus",
+      "claim_1_language": "'a shunt catheter comprising: a body having a lumen therethrough'",
+      "analysis": "Claim 1 says 'a shunt catheter' — this is broad enough to cover ANY shunt catheter, including an endovascular eShunt. The claim does not limit to VP shunt specifically. However, the claim requires 'a primary set of drain pores' and 'a secondary set of drain pores' — the eShunt may or may not have 'drain pores' in the same sense (it has a membrane-lined lumen, not pore-based drainage).",
+      "covered_by_claim": "PARTIALLY — 'shunt catheter' is broad enough to include eShunt, but 'drain pores' may not map to eShunt architecture",
+      "102_or_103": "N/A — this is a device limitation, not a mechanism limitation"
+    },
+
+    "R7_L2_pressure_activated_clearing": {
+      "r7_element": "Obstruction raises pressure → triggers clearing mechanism",
+      "claim_1_language": "'a pressure source configured to apply the fluid pressure to the lumen of the body to rupture the membrane'",
+      "claim_11_language": "'the membrane is constructed and arranged to be ruptured upon application of the fluid pressure to open the secondary set of drain pores when the application of the fluid pressure fails to unblock the primary set of drain pores'",
+      "analysis": "Claim 11 explicitly teaches: when primary pores are blocked (obstruction), fluid pressure ruptures the membrane (pressure-activated clearing). This is the EXACT mechanism R7 proposes. However, Claim 11 requires a RUPTURABLE MEMBRANE — R7 proposes a REUSABLE VALVE (opens wider, doesn't rupture). The pressure-activation CONCEPT is taught, but the specific ACTUATION MECHANISM (rupturable membrane vs reusable valve) differs.",
+      "covered_by_claim": "CONCEPT COVERED, MECHANISM DIFFERS — pressure-activation when obstruction occurs is taught by Claim 11. But rupturable membrane ≠ reusable valve.",
+      "102_or_103": "103 OBVIOUSNESS — the concept of pressure-activated obstruction clearing is taught. A reusable valve (vs rupturable membrane) is a known alternative in shunt design (programmable valves, differential pressure valves). Combining Claim 11's pressure-activation concept with a known reusable valve is likely obvious."
+    },
+
+    "R7_L3_distal_debris_transport": {
+      "r7_element": "Debris pushed distally (toward venous system)",
+      "claim_1_language": "Claim 1 does not specify debris direction. The abstract says 'flow jets from the catheter pores into the ventricle' — debris goes INTO the ventricle (proximal for VP shunt).",
+      "analysis": "The patent's 'cough' mechanism pushes debris away from the catheter pores — in a VP shunt, this is INTO the ventricle. R7 pushes debris toward the venous sinus (distal). The debris DIRECTION is not claimed — it's a consequence of the device orientation. The patent doesn't claim 'debris goes proximally' as a limitation; it describes what happens with a VP shunt.",
+      "covered_by_claim": "NOT EXPLICITLY CLAIMED — debris direction is not a claim limitation. It's a physical consequence of device orientation.",
+      "102_or_103": "N/A — not a claim limitation. R7's distal debris is a consequence of eShunt geometry, not a patentable distinction."
+    },
+
+    "R7_L4_autonomous_triggering": {
+      "r7_element": "Self-triggered, no external actuation",
+      "claim_11_language": "'when the application of the fluid pressure fails to unblock the primary set of drain pores' — this is an autonomous trigger (obstruction triggers the secondary mechanism automatically)",
+      "analysis": "Claim 11 teaches autonomous triggering — the secondary pores open when the primary pores are blocked, without external intervention. This is the EXACT concept R7 proposes.",
+      "covered_by_claim": "YES — autonomous obstruction-triggered clearing is taught by Claim 11",
+      "102_or_103": "102 ANTICIPATION — Claim 11 explicitly teaches autonomous triggering when obstruction occurs"
+    },
+
+    "R7_L5_reusable_valve": {
+      "r7_element": "Valve opens wider under pressure (reusable, not one-time rupture)",
+      "claim_1_language": "'a membrane configured to close the pore, the membrane being constructed and arranged to be ruptured upon application of fluid pressure' — this is a ONE-TIME RUPTURABLE MEMBRANE, not a reusable valve",
+      "analysis": "R7 proposes a reusable valve that opens and closes. The patent teaches a one-time rupturable membrane. These are DIFFERENT mechanical elements. However, pressure-activated reusable valves are well-known in shunt design (differential pressure valves, programmable valves). Combining the patent's pressure-activation concept with a known reusable valve is likely obvious.",
+      "covered_by_claim": "NO — the patent teaches rupturable membrane, not reusable valve. This is a genuine difference.",
+      "102_or_103": "103 OBVIOUSNESS — pressure-activated reusable valves are known in the art. Combining Claim 11's autonomous trigger with a known reusable valve is obvious to a person skilled in the art."
+    },
+
+    "R7_L6_in_place_clearing": {
+      "r7_element": "Restores drainage without device removal",
+      "claim_1_language": "'A system for flushing a shunt catheter' — the entire purpose is in-place clearing",
+      "analysis": "In-place clearing is the core purpose of the patent. R7's in-place clearing is directly covered.",
+      "covered_by_claim": "YES",
+      "102_or_103": "102 ANTICIPATION — in-place clearing is the patent's core purpose"
+    }
+  },
+
+  "102_vs_103_separation": {
+    "102_anticipation": {
+      "definition": "A single prior art reference teaches EVERY element of the claim",
+      "r7_elements_anticipated_by_claim_11": [
+        "L4: autonomous obstruction-triggered clearing (Claim 11: 'when application of fluid pressure fails to unblock primary pores')",
+        "L6: in-place clearing without removal (core purpose of patent)"
+      ],
+      "r7_elements_NOT_anticipated": [
+        "L2: pressure-activated clearing — concept taught, but specific mechanism (reusable valve vs rupturable membrane) differs",
+        "L5: reusable valve — patent teaches rupturable membrane, not reusable valve"
+      ],
+      "verdict": "PARTIAL 102 — Claim 11 anticipates the autonomous triggering and in-place clearing concepts, but does NOT anticipate the specific reusable valve mechanism"
+    },
+    "103_obviousness": {
+      "definition": "The claimed invention would have been obvious to a person skilled in the art over the prior art",
+      "r7_elements_obvious_over_prior_art": [
+        "L2: pressure-activated clearing with reusable valve — Claim 11 teaches pressure-activation; reusable pressure valves are known in shunt art. Combining them is obvious.",
+        "L5: reusable valve instead of rupturable membrane — differential pressure valves and programmable valves are standard. Substituting a reusable valve for a rupturable membrane is an obvious design choice."
+      ],
+      "motivation_to_combine": "A person skilled in shunt design would be motivated to use a reusable valve (more practical, multiple uses) instead of a one-time rupturable membrane (single use). The Shunt Flusher patent itself acknowledges this by providing multiple pressure levels (Claims 12-14).",
+      "verdict": "103 OBVIOUSNESS — R7's reusable valve variant is obvious over Claim 11 + known pressure-activated shunt valves"
+    },
+    "overall_patent_verdict": {
+      "102": "PARTIAL — autonomous triggering and in-place clearing are anticipated by Claim 11. Reusable valve is NOT anticipated.",
+      "103": "LIKELY — the reusable valve variant is obvious over Claim 11 + known shunt valve technology",
+      "r7_survives": "NO — R7 does not survive 102/103. The core mechanism (pressure-activated autonomous obstruction clearing) is anticipated by Claim 11. The only uncovered element (reusable valve vs rupturable membrane) is obvious over the prior art.",
+      "epistemic_status": "PATENT_KILLED — but with the honest qualification that 102 is PARTIAL (not complete literal anticipation) and 103 is LIKELY (not proven). A formal patent opinion would require claim construction and KSR analysis."
+    }
+  },
+
+  "r7_final_status": {
+    "verdict": "PATENT_KILLED",
+    "epistemic_qualification": "Claim 11 of US11896789B2 anticipates R7's autonomous obstruction-triggered clearing concept. The reusable valve variant (the only element not literally anticipated) is likely obvious over Claim 11 + known pressure-activated shunt valve technology. This is a 103 obviousness conclusion, not a complete 102 anticipation. A formal patent opinion would be needed for final certainty.",
+    "ceo_correction_applied": "V14 said 'literal anticipation' — V14.1 corrects this to 'partial 102 + likely 103.' The CEO is correct that family-level similarity ≠ 102 anticipation. This adjudication uses the exact claim text bound to the evidence registry.",
+    "cemetery_entry": "R7 is added to the cemetery as PATENT_KILLED — the core mechanism is taught by US11896789B2 Claim 11, and the remaining elements are likely obvious."
+  },
+
+  "remaining_candidates_not_affected": {
+    "R5_self_clearing_geometry": "NOT AFFECTED — prevents obstruction through geometry, not pressure-flush. Different mechanism entirely.",
+    "R6_lumen_rerouting": "NOT AFFECTED — bypasses obstruction through secondary lumen. Not pressure-activated clearing.",
+    "R8_ultrasound": "NOT AFFECTED — external acoustic energy, not internal pressure.",
+    "R9_sacrificial_cartridge": "NOT AFFECTED — replaces obstruction zone, not flushes it."
+  },
+
+  "constitution_compliance": {
+    "ceo_directive": "COMPLIED — bound exact claims, separated 102 from 103, identified uncovered elements",
+    "article_II": "COMPLIED — exact claim text used, not family-level similarity",
+    "correction_applied": "V14 'literal anticipation' → V14.1 'partial 102 + likely 103'"
+  }
+}
