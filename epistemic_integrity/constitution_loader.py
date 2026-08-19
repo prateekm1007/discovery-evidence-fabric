@@ -39,6 +39,7 @@ ENFORCEMENT MECHANISMS:
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -49,7 +50,27 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CONSTITUTION_PATH = REPO_ROOT / "EPISTEMIC_CONSTITUTION.md"
 ACKNOWLEDGMENT_FILE = REPO_ROOT / "epistemic_integrity" / "approved_provenance" / "CONSTITUTION_ACKNOWLEDGMENT.json"
 
-CONSTITUTION_VERSION = "1.0.0"
+
+def _parse_constitution_version() -> str:
+    """Parse the version from the actual constitution file.
+
+    CEO v30.1 audit: 'The Constitution acknowledgment metadata is stale.
+    The constitution hash + wrong version is not acceptable.'
+    The version must be atomically derived from the exact constitution bytes.
+    """
+    if not CONSTITUTION_PATH.exists():
+        return "UNKNOWN"
+    with open(CONSTITUTION_PATH) as f:
+        content = f.read()
+    # Look for **Version:** X.Y.Z in the header
+    match = re.search(r'\*\*Version:\*\*\s*(\S+)', content)
+    if match:
+        return match.group(1)
+    return "UNKNOWN"
+
+
+# Derive version from the actual file — NOT hardcoded
+CONSTITUTION_VERSION = _parse_constitution_version()
 
 
 @dataclass(frozen=True)

@@ -86,6 +86,43 @@ def _curl_json(url: str, headers: dict = None, timeout: int = 30) -> Optional[di
         return None
 
 
+def _make_result(universe: str, source: str, query: str, data: Optional[dict],
+                  limit: int, results_extractor=None) -> dict:
+    """Create a type-safe provider result.
+
+    CEO v30.1: 'Zero must mean zero. Nothing else.'
+    - On success with results: total=N, results=[...], error=None
+    - On success with zero results: total=0, results=[], error=None
+    - On failure: total=None, results=[], error=<reason>
+    """
+    if data is None:
+        return {
+            "universe": universe, "source": source, "query": query,
+            "total": None,  # None = failure, NOT zero
+            "results": [],
+            "error": "fetch_failed",
+        }
+    if isinstance(data, dict) and 'error' in data:
+        return {
+            "universe": universe, "source": source, "query": query,
+            "total": None,  # None = failure
+            "results": [],
+            "error": data.get('error', 'api_error'),
+        }
+    # Success — extract total and results
+    if results_extractor:
+        total, results = results_extractor(data, limit)
+    else:
+        total = 0
+        results = []
+    return {
+        "universe": universe, "source": source, "query": query,
+        "total": total,  # 0 means zero results (success)
+        "results": results,
+        "error": None,
+    }
+
+
 def _curl_post_json(url: str, payload: str, headers: dict = None, timeout: int = 30) -> Optional[dict]:
     cmd = ["curl", "-s", "-L", "-X", "POST", url, "-d", payload]
     if headers:
@@ -319,23 +356,25 @@ def _determine_provider_state(results: List[dict]) -> str:
     """Determine provider state from a list of source results.
 
     Article XXI.3: Provider failure is NOT absence.
-    Only successful queries returning zero results = NO_RESULTS.
+    CEO v30.1: 'Zero must mean zero. Nothing else.'
+    - total=None → provider failure (TIMEOUT/SEARCH_FAILED/etc.)
+    - total=0 → successful query, zero results (NO_RESULTS)
+    - total>0 → successful query with results (RESULTS_FOUND)
     """
-    has_results = any(r.get("total", 0) > 0 for r in results)
-    has_errors = any(r.get("error") or r.get("note", "").startswith("No ") for r in results)
-    has_success = any(not r.get("error") for r in results)
+    has_results = any(r.get("total") is not None and r.get("total", 0) > 0 for r in results)
+    has_no_results = any(r.get("total") == 0 and r.get("error") is None for r in results)
+    has_failures = any(r.get("total") is None or r.get("error") for r in results)
 
     if has_results:
         return "RESULTS_FOUND"
-    elif has_success and not has_results:
+    elif has_no_results and not has_failures:
         return "NO_RESULTS"
-    elif has_errors:
-        # Check for specific error types
+    elif has_failures:
         for r in results:
             err = r.get("error", "")
-            if "timeout" in err.lower():
+            if err and "timeout" in err.lower():
                 return "TIMEOUT"
-            elif "auth" in err.lower():
+            elif err and "auth" in err.lower():
                 return "AUTH_FAILED"
         return "SEARCH_FAILED"
     else:
@@ -357,7 +396,7 @@ def run_triangulation(candidate_name: str, mechanism_query: str,
     # Universe 1: Scientific
     sci_results = [query_pubmed(mechanism_query, 3), query_europe_pmc(mechanism_query, 3)]
     sci_state = _determine_provider_state(sci_results)
-    sci_total = sum(r.get("total", 0) for r in sci_results if r.get("total", 0) > 0)
+    sci_total = sum(r.get("total", 0) for r in sci_results if r.get("total") is not None and r.get("total", 0) > 0)
     # Article XXI.1: search count is not evidence. Signal is UNVERIFIED until relevance checked.
     universes.append(UniverseResult(
         "scientific", sci_results, sci_total,
@@ -369,7 +408,7 @@ def run_triangulation(candidate_name: str, mechanism_query: str,
     # Universe 2: Engineering
     eng_results = [query_nasa_ntrs(mechanism_query, 3), query_osti(mechanism_query, 3)]
     eng_state = _determine_provider_state(eng_results)
-    eng_total = sum(r.get("total", 0) for r in eng_results if r.get("total", 0) > 0)
+    eng_total = sum(r.get("total", 0) for r in eng_results if r.get("total") is not None and r.get("total", 0) > 0)
     universes.append(UniverseResult(
         "engineering", eng_results, eng_total,
         provider_state=eng_state,
@@ -389,7 +428,7 @@ def run_triangulation(candidate_name: str, mechanism_query: str,
     # Universe 4: Clinical
     clin_results = [query_clinical_trials(clinical_query, 3), query_fda_510k(device_query, 3)]
     clin_state = _determine_provider_state(clin_results)
-    clin_total = sum(r.get("total", 0) for r in clin_results if r.get("total", 0) > 0)
+    clin_total = sum(r.get("total", 0) for r in clin_results if r.get("total") is not None and r.get("total", 0) > 0)
     universes.append(UniverseResult(
         "clinical", clin_results, clin_total,
         provider_state=clin_state,
@@ -400,7 +439,7 @@ def run_triangulation(candidate_name: str, mechanism_query: str,
     # Universe 5: Commercial
     comm_results = [query_fda_pma(device_query, 3)]
     comm_state = _determine_provider_state(comm_results)
-    comm_total = sum(r.get("total", 0) for r in comm_results if r.get("total", 0) > 0)
+    comm_total = sum(r.get("total", 0) for r in comm_results if r.get("total") is not None and r.get("total", 0) > 0)
     universes.append(UniverseResult(
         "commercial", comm_results, comm_total,
         provider_state=comm_state,
@@ -411,7 +450,7 @@ def run_triangulation(candidate_name: str, mechanism_query: str,
     # Universe 6: Failure — Article XXI.5: MAUDE is signal source, NOT incidence estimator
     fail_results = [query_fda_maude(device_query, 3), query_fda_recalls(device_query, 3)]
     fail_state = _determine_provider_state(fail_results)
-    fail_total = sum(r.get("total", 0) for r in fail_results if r.get("total", 0) > 0)
+    fail_total = sum(r.get("total", 0) for r in fail_results if r.get("total") is not None and r.get("total", 0) > 0)
     universes.append(UniverseResult(
         "failure", fail_results, fail_total,
         provider_state=fail_state,
