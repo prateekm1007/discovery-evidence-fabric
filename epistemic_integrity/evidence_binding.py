@@ -306,6 +306,37 @@ class VerificationEnvelope:
     # CEO v30.12: External anchors — cannot be forged by editing JSON
     commit_anchor: Optional[str] = None       # git commit SHA at registration time
     ledger_root_anchor: Optional[str] = None  # ledger root hash at registration time
+    # CEO v30.13: Per-artifact immutable anchors
+    artifact_blob_sha: Optional[str] = None
+    artifact_content_hash: Optional[str] = None
+    registration_transition_hash: Optional[str] = None
+
+
+def _verify_commit_exists(commit_sha: str) -> bool:
+    """CEO v30.13: Verify that a git commit still EXISTS."""
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["git", "cat-file", "-t", commit_sha],
+            capture_output=True, text=True, timeout=5, check=True,
+            cwd=str(Path(__file__).parent),
+        )
+        return result.stdout.strip() == "commit"
+    except Exception:
+        return False
+
+
+def _verify_transition_in_ledger(transition_hash: str) -> bool:
+    """CEO v30.13: Verify transition hash exists in immutable ledger."""
+    try:
+        from .state_transition_ledger import StateTransitionLedger
+        ledger = StateTransitionLedger()
+        for event in ledger._events:
+            if event.transition_hash == transition_hash:
+                return True
+        return False
+    except Exception:
+        return False
 
 
 def _get_current_git_commit() -> str:
@@ -394,7 +425,11 @@ def _compute_verification_envelope(
     # auth dict will get a DIFFERENT hash than the one stored, because
     # the stored hash was computed with the ORIGINAL commit_anchor +
     # ledger_root_anchor from registration time.
-    verification_str = f"{evidence_identity_hash}|{content_hash}|{source_databases_hash}|{commit_anchor}|{ledger_root_anchor}|{authorization_version}"
+    artifact_blob_sha = auth.get("artifact_blob_sha", "")
+    artifact_content_hash = auth.get("artifact_content_hash", "")
+    registration_transition_hash = auth.get("registration_transition_hash", "")
+
+    verification_str = f"{evidence_identity_hash}|{content_hash}|{source_databases_hash}|{commit_anchor}|{ledger_root_anchor}|{artifact_blob_sha}|{artifact_content_hash}|{registration_transition_hash}|{authorization_version}"
     verification_hash = hashlib.sha256(verification_str.encode()).hexdigest()
 
     return VerificationEnvelope(
@@ -405,14 +440,16 @@ def _compute_verification_envelope(
         authorization_version=authorization_version,
         commit_anchor=commit_anchor,
         ledger_root_anchor=ledger_root_anchor,
+        artifact_blob_sha=artifact_blob_sha or None,
+        artifact_content_hash=artifact_content_hash or None,
+        registration_transition_hash=registration_transition_hash or None,
     )
 
 
 def _verify_envelope(
     auth: dict,
     stored_envelope: Optional[VerificationEnvelope],
-    current_commit_anchor: Optional[str] = None,
-    current_ledger_root_anchor: Optional[str] = None,
+    artifact_path: Optional[str] = None,
 ) -> bool:
     """Verify that a persisted authorization dict matches its stored envelope.
 
@@ -448,17 +485,15 @@ def _verify_envelope(
     if recomputed.verification_hash != stored_envelope.verification_hash:
         return False  # Auth dict was tampered
 
-    # CEO v30.12: Check 2 — external anchor: commit
-    if current_commit_anchor is None:
-        current_commit_anchor = _get_current_git_commit()
-    if stored_envelope.commit_anchor != current_commit_anchor:
-        return False  # Commit anchor doesn't match current repository state
+    # CEO v30.13: Check 2 - registration commit STILL EXISTS (not == HEAD)
+    if stored_envelope.commit_anchor and stored_envelope.commit_anchor != "UNKNOWN_COMMIT":
+        if not _verify_commit_exists(stored_envelope.commit_anchor):
+            return False
 
-    # CEO v30.12: Check 3 — external anchor: ledger root
-    if current_ledger_root_anchor is None:
-        current_ledger_root_anchor = _get_current_ledger_root()
-    if stored_envelope.ledger_root_anchor != current_ledger_root_anchor:
-        return False  # Ledger root doesn't match current repository state
+    # CEO v30.13: Check 3 - registration transition EXISTS in ledger
+    if stored_envelope.registration_transition_hash:
+        if not _verify_transition_in_ledger(stored_envelope.registration_transition_hash):
+            return False
 
     return True
 
@@ -779,6 +814,11 @@ class EvidenceBinding:
                             "source_databases_hash": env.source_databases_hash,
                             "verification_hash": env.verification_hash,
                             "authorization_version": env.authorization_version,
+                            "commit_anchor": env.commit_anchor,
+                            "ledger_root_anchor": env.ledger_root_anchor,
+                            "artifact_blob_sha": env.artifact_blob_sha,
+                            "artifact_content_hash": env.artifact_content_hash,
+                            "registration_transition_hash": env.registration_transition_hash,
                         }
                 sources_data.append(item)
             json.dump({
