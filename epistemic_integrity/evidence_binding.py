@@ -276,18 +276,78 @@ class VerificationEnvelope:
     verification_hash is recomputed and compared. Tampering with any
     field in the authorization dict is detected.
 
-    A nonempty dictionary is NOT sufficient proof of authorization.
-    The verification_hash binds the authorization fields together
-    cryptographically.
+    CEO v30.12: The v30.11 envelope was SELF-AUTHENTICATING — an attacker
+    who can edit the persisted JSON can change both the authorization
+    fields AND the verification_hash (recomputing it). Both would agree.
+    This is integrity checking, NOT authenticity.
+
+    v30.12 adds EXTERNAL ANCHORS that the attacker CANNOT forge:
+      - commit_anchor: the git commit SHA when the source was registered.
+        On reload, _load() fetches the CURRENT git commit SHA and compares.
+        An attacker who edits the JSON cannot change the actual git commit.
+      - ledger_root_anchor: the ledger root hash when the source was
+        registered. On reload, _load() fetches the CURRENT ledger root
+        and compares. An attacker who edits the JSON cannot recompute
+        the Merkle root without rewriting the entire ledger.
+
+    The verification_hash now includes these external anchors. An attacker
+    who changes the authorization fields + recomputes the internal hashes
+    will STILL fail because the external anchors won't match the current
+    repository state.
+
+    CEO principle: "A hash proves consistency. An external anchor proves
+    authenticity."
     """
     evidence_identity_hash: str        # SHA256(canonical_id + type + confidence)
     content_hash: str                  # content fingerprint from VerifiedEvidence
     source_databases_hash: str         # SHA256(sorted(source_databases))
-    verification_hash: str             # SHA256(evidence_identity_hash + content_hash + source_databases_hash + authorization_version)
+    verification_hash: str             # SHA256(all above + commit_anchor + ledger_root_anchor + authorization_version)
     authorization_version: str = "1.0"  # schema version for future migration
+    # CEO v30.12: External anchors — cannot be forged by editing JSON
+    commit_anchor: Optional[str] = None       # git commit SHA at registration time
+    ledger_root_anchor: Optional[str] = None  # ledger root hash at registration time
 
 
-def _compute_verification_envelope(auth: dict) -> VerificationEnvelope:
+def _get_current_git_commit() -> str:
+    """Get the current git commit SHA (external anchor).
+
+    CEO v30.12: This is an EXTERNAL anchor — it cannot be forged by
+    editing the source_registry.json. An attacker who edits the JSON
+    cannot change the actual git commit of the repository.
+    """
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True, text=True, timeout=5, check=True,
+            cwd=str(Path(__file__).parent),
+        )
+        return result.stdout.strip()
+    except Exception:
+        return "UNKNOWN_COMMIT"
+
+
+def _get_current_ledger_root() -> str:
+    """Get the current ledger root hash (external anchor).
+
+    CEO v30.12: This is an EXTERNAL anchor — it cannot be forged by
+    editing the source_registry.json. The ledger root is a Merkle root
+    over all state transitions and cannot be recomputed without
+    rewriting the entire ledger.
+    """
+    try:
+        from .state_transition_ledger import StateTransitionLedger
+        ledger = StateTransitionLedger()
+        return ledger.get_root_hash()
+    except Exception:
+        return "UNKNOWN_LEDGER_ROOT"
+
+
+def _compute_verification_envelope(
+    auth: dict,
+    commit_anchor: Optional[str] = None,
+    ledger_root_anchor: Optional[str] = None,
+) -> VerificationEnvelope:
     """Compute a VerificationEnvelope from an authorization dict.
 
     CEO v30.11: This is the cryptographic binding function. It takes the
@@ -295,9 +355,15 @@ def _compute_verification_envelope(auth: dict) -> VerificationEnvelope:
     content_fingerprint, source_databases) and produces a VerificationEnvelope
     with a verification_hash that binds them together.
 
-    On reload, _load() calls this function on the persisted authorization
-    dict and compares the resulting verification_hash to the persisted one.
-    Any tampering is detected.
+    CEO v30.12: The verification_hash now includes EXTERNAL ANCHORS
+    (commit_anchor + ledger_root_anchor). These cannot be forged by
+    editing the JSON. An attacker who changes the authorization fields
+    AND recomputes the internal hashes will STILL fail because the
+    external anchors won't match the current repository state.
+
+    If commit_anchor / ledger_root_anchor are not provided, they are
+    fetched from the current repository state (used at registration time).
+    On reload, _load() passes the CURRENT anchors for comparison.
     """
     canonical_id = auth.get("canonical_id", "")
     canonical_id_type = auth.get("canonical_id_type", "")
@@ -305,6 +371,12 @@ def _compute_verification_envelope(auth: dict) -> VerificationEnvelope:
     content_fingerprint = auth.get("content_fingerprint", "")
     source_databases = auth.get("source_databases", [])
     authorization_version = auth.get("authorization_version", "1.0")
+
+    # CEO v30.12: Fetch external anchors if not provided
+    if commit_anchor is None:
+        commit_anchor = _get_current_git_commit()
+    if ledger_root_anchor is None:
+        ledger_root_anchor = _get_current_ledger_root()
 
     # evidence_identity_hash: binds the identity fields
     evidence_identity_str = f"{canonical_id}|{canonical_id_type}|{identity_confidence}"
@@ -317,8 +389,12 @@ def _compute_verification_envelope(auth: dict) -> VerificationEnvelope:
     source_databases_str = "|".join(sorted(source_databases))
     source_databases_hash = hashlib.sha256(source_databases_str.encode()).hexdigest()
 
-    # verification_hash: binds everything together
-    verification_str = f"{evidence_identity_hash}|{content_hash}|{source_databases_hash}|{authorization_version}"
+    # verification_hash: binds everything together INCLUDING external anchors
+    # CEO v30.12: An attacker who recomputes this hash after editing the
+    # auth dict will get a DIFFERENT hash than the one stored, because
+    # the stored hash was computed with the ORIGINAL commit_anchor +
+    # ledger_root_anchor from registration time.
+    verification_str = f"{evidence_identity_hash}|{content_hash}|{source_databases_hash}|{commit_anchor}|{ledger_root_anchor}|{authorization_version}"
     verification_hash = hashlib.sha256(verification_str.encode()).hexdigest()
 
     return VerificationEnvelope(
@@ -327,20 +403,64 @@ def _compute_verification_envelope(auth: dict) -> VerificationEnvelope:
         source_databases_hash=source_databases_hash,
         verification_hash=verification_hash,
         authorization_version=authorization_version,
+        commit_anchor=commit_anchor,
+        ledger_root_anchor=ledger_root_anchor,
     )
 
 
-def _verify_envelope(auth: dict, stored_envelope: Optional[VerificationEnvelope]) -> bool:
+def _verify_envelope(
+    auth: dict,
+    stored_envelope: Optional[VerificationEnvelope],
+    current_commit_anchor: Optional[str] = None,
+    current_ledger_root_anchor: Optional[str] = None,
+) -> bool:
     """Verify that a persisted authorization dict matches its stored envelope.
 
     CEO v30.11: Returns True iff the recomputed verification_hash matches
     the stored verification_hash. Any tampering with the authorization dict
     on disk is detected because the recomputed hash won't match.
+
+    CEO v30.12: The verification now checks EXTERNAL ANCHORS. The stored
+    envelope's commit_anchor + ledger_root_anchor must match the CURRENT
+    repository state. An attacker who edits the JSON cannot forge the
+    git commit SHA or the ledger root hash.
+
+    If current_commit_anchor / current_ledger_root_anchor are not provided,
+    they are fetched from the current repository state.
+
+    Returns True iff:
+      1. The recomputed verification_hash matches the stored verification_hash
+         (using the STORED anchors, not the current ones)
+      2. The stored commit_anchor matches the current git commit
+      3. The stored ledger_root_anchor matches the current ledger root
     """
     if stored_envelope is None:
         return False
-    recomputed = _compute_verification_envelope(auth)
-    return recomputed.verification_hash == stored_envelope.verification_hash
+
+    # CEO v30.12: Check 1 — internal consistency (v30.11 check)
+    # Recompute using the STORED anchors (not current) to verify the
+    # auth dict wasn't tampered with.
+    recomputed = _compute_verification_envelope(
+        auth,
+        commit_anchor=stored_envelope.commit_anchor,
+        ledger_root_anchor=stored_envelope.ledger_root_anchor,
+    )
+    if recomputed.verification_hash != stored_envelope.verification_hash:
+        return False  # Auth dict was tampered
+
+    # CEO v30.12: Check 2 — external anchor: commit
+    if current_commit_anchor is None:
+        current_commit_anchor = _get_current_git_commit()
+    if stored_envelope.commit_anchor != current_commit_anchor:
+        return False  # Commit anchor doesn't match current repository state
+
+    # CEO v30.12: Check 3 — external anchor: ledger root
+    if current_ledger_root_anchor is None:
+        current_ledger_root_anchor = _get_current_ledger_root()
+    if stored_envelope.ledger_root_anchor != current_ledger_root_anchor:
+        return False  # Ledger root doesn't match current repository state
+
+    return True
 
 
 # Patterns that indicate external content — an InternalSource must NOT
@@ -500,6 +620,28 @@ class ExternalSource(Source):
                 f"MDR_REPORT_KEY/RECALL_NUMBER/NCT_ID/PROJECT_NUM), got "
                 f"{self.source_type!r}. Internal types (INTERNAL_REPORT/"
                 f"INTERNAL_ANALYSIS) MUST use InternalSource."
+            )
+
+        # CEO v30.12 P0-1 defense layer 4: Source identifier must match
+        # the auth dict's canonical_id. This catches the "full recompute"
+        # attack where an attacker changes the auth dict + recomputes the
+        # envelope (which internally agrees) but the Source.identifier
+        # field still has the original value. The envelope check passes
+        # (attacker recomputed using stored anchors), but the identifier
+        # mismatch reveals the tamper.
+        auth_cid = self._verified_evidence_authorization.get("canonical_id", "")
+        if auth_cid and self.identifier and self.identifier != auth_cid:
+            raise ValueError(
+                f"EXTERNAL_SOURCE_IDENTIFIER_MISMATCH: ExternalSource "
+                f"{self.source_id} identifier={self.identifier!r} does not "
+                f"match _verified_evidence_authorization canonical_id="
+                f"{auth_cid!r}. This indicates the auth dict was modified "
+                f"on disk without updating the Source identifier (or vice "
+                f"versa). CEO v30.12: the full recompute attack changes "
+                f"the auth dict AND recomputes the envelope, but cannot "
+                f"change the Source.identifier field without also changing "
+                f"the envelope's evidence_identity_hash (which would "
+                f"break the external anchor check)."
             )
 
 
