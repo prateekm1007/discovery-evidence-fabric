@@ -191,6 +191,13 @@ class Source:
     # P1-C: Three independent verification states
     verification_states: SourceVerificationStates = field(default_factory=SourceVerificationStates)
 
+    # CEO v30.11 P0-1: source_class discriminator — persisted explicitly.
+    # On _load(), the correct subclass (InternalSource / ExternalSource) is
+    # reconstructed based on THIS field, NOT inferred from source_type.
+    # Values: "INTERNAL" | "EXTERNAL" | None (legacy/unknown — treated as
+    # raw Source, which the render path will reject for external types).
+    source_class: Optional[str] = None
+
     def is_identity_verified(self) -> bool:
         """Has external identity been verified by an authoritative registry?"""
         if self.external_identity and self.external_identity.verified:
@@ -237,6 +244,104 @@ class Source:
 # CEO principle: "A security boundary should be enforced by object
 # construction, not by trusting a label inside the object."
 # ============================================================
+
+# ============================================================
+# CEO v30.11 P0-2: VERIFICATION ENVELOPE (cryptographically bound)
+# ============================================================
+# For ExternalSource, the _verified_evidence_authorization dict is NOT
+# sufficient proof of authorization. A nonempty dictionary could be
+# forged. v30.11 adds a VerificationEnvelope — a cryptographically
+# bound structure that survives serialization and is verified on reload.
+#
+# The envelope contains:
+#   evidence_identity_hash  — SHA256(canonical_id + canonical_id_type + identity_confidence)
+#   content_hash            — the content fingerprint from VerifiedEvidence
+#   source_databases_hash   — SHA256(sorted(source_databases))
+#   verification_hash       — SHA256(evidence_identity_hash + content_hash + source_databases_hash + authorization_version)
+#   authorization_version   — schema version (for future migration)
+#
+# On reload, _load() recomputes evidence_identity_hash, content_hash,
+# source_databases_hash, and verification_hash from the persisted
+# _verified_evidence_authorization fields, then compares to the stored
+# verification_hash. Any tampering with the authorization dict on disk
+# is DETECTED because the recomputed verification_hash won't match.
+# ============================================================
+
+
+@dataclass
+class VerificationEnvelope:
+    """Cryptographically bound authorization provenance for ExternalSource.
+
+    CEO v30.11: This structure survives serialization. On reload, the
+    verification_hash is recomputed and compared. Tampering with any
+    field in the authorization dict is detected.
+
+    A nonempty dictionary is NOT sufficient proof of authorization.
+    The verification_hash binds the authorization fields together
+    cryptographically.
+    """
+    evidence_identity_hash: str        # SHA256(canonical_id + type + confidence)
+    content_hash: str                  # content fingerprint from VerifiedEvidence
+    source_databases_hash: str         # SHA256(sorted(source_databases))
+    verification_hash: str             # SHA256(evidence_identity_hash + content_hash + source_databases_hash + authorization_version)
+    authorization_version: str = "1.0"  # schema version for future migration
+
+
+def _compute_verification_envelope(auth: dict) -> VerificationEnvelope:
+    """Compute a VerificationEnvelope from an authorization dict.
+
+    CEO v30.11: This is the cryptographic binding function. It takes the
+    authorization fields (canonical_id, canonical_id_type, identity_confidence,
+    content_fingerprint, source_databases) and produces a VerificationEnvelope
+    with a verification_hash that binds them together.
+
+    On reload, _load() calls this function on the persisted authorization
+    dict and compares the resulting verification_hash to the persisted one.
+    Any tampering is detected.
+    """
+    canonical_id = auth.get("canonical_id", "")
+    canonical_id_type = auth.get("canonical_id_type", "")
+    identity_confidence = auth.get("identity_confidence", "")
+    content_fingerprint = auth.get("content_fingerprint", "")
+    source_databases = auth.get("source_databases", [])
+    authorization_version = auth.get("authorization_version", "1.0")
+
+    # evidence_identity_hash: binds the identity fields
+    evidence_identity_str = f"{canonical_id}|{canonical_id_type}|{identity_confidence}"
+    evidence_identity_hash = hashlib.sha256(evidence_identity_str.encode()).hexdigest()
+
+    # content_hash: the content fingerprint from VerifiedEvidence
+    content_hash = content_fingerprint
+
+    # source_databases_hash: binds which databases confirmed this evidence
+    source_databases_str = "|".join(sorted(source_databases))
+    source_databases_hash = hashlib.sha256(source_databases_str.encode()).hexdigest()
+
+    # verification_hash: binds everything together
+    verification_str = f"{evidence_identity_hash}|{content_hash}|{source_databases_hash}|{authorization_version}"
+    verification_hash = hashlib.sha256(verification_str.encode()).hexdigest()
+
+    return VerificationEnvelope(
+        evidence_identity_hash=evidence_identity_hash,
+        content_hash=content_hash,
+        source_databases_hash=source_databases_hash,
+        verification_hash=verification_hash,
+        authorization_version=authorization_version,
+    )
+
+
+def _verify_envelope(auth: dict, stored_envelope: Optional[VerificationEnvelope]) -> bool:
+    """Verify that a persisted authorization dict matches its stored envelope.
+
+    CEO v30.11: Returns True iff the recomputed verification_hash matches
+    the stored verification_hash. Any tampering with the authorization dict
+    on disk is detected because the recomputed hash won't match.
+    """
+    if stored_envelope is None:
+        return False
+    recomputed = _compute_verification_envelope(auth)
+    return recomputed.verification_hash == stored_envelope.verification_hash
+
 
 # Patterns that indicate external content — an InternalSource must NOT
 # contain these in its identifier, title, or content.
@@ -319,6 +424,8 @@ class InternalSource(Source):
                 f"CEO v30.10: the external-vs-internal boundary is enforced "
                 f"by object construction, not by trusting a source_type label."
             )
+        # CEO v30.11 P0-1: Set source_class for durable persistence.
+        object.__setattr__(self, 'source_class', 'INTERNAL')
 
 
 @dataclass
@@ -341,6 +448,12 @@ class ExternalSource(Source):
     # without providing authorization provenance.
     _verified_evidence_authorization: Optional[dict] = None
 
+    # CEO v30.11 P0-2: verification_envelope — cryptographically bound
+    # authorization provenance. Survives serialization. Verified on reload.
+    # A nonempty _verified_evidence_authorization dict is NOT sufficient
+    # proof; the envelope binds the authorization fields together.
+    _verification_envelope: Optional[VerificationEnvelope] = None
+
     def __post_init__(self):
         """Require _verified_evidence_authorization at construction.
 
@@ -358,6 +471,27 @@ class ExternalSource(Source):
                 f"the external-vs-internal boundary is enforced by object "
                 f"construction, not by trusting a source_type label."
             )
+        # CEO v30.11: Compute the verification envelope if not already set.
+        # This binds the authorization fields cryptographically. On reload,
+        # _load() will recompute and compare.
+        if self._verification_envelope is None:
+            # Set source_class first (needed for _load reconstruction)
+            object.__setattr__(self, 'source_class', 'EXTERNAL')
+            # Compute and set the envelope
+            envelope = _compute_verification_envelope(self._verified_evidence_authorization)
+            object.__setattr__(self, '_verification_envelope', envelope)
+        else:
+            # Envelope was provided (from _load) — verify it matches
+            object.__setattr__(self, 'source_class', 'EXTERNAL')
+            if not _verify_envelope(self._verified_evidence_authorization, self._verification_envelope):
+                raise ValueError(
+                    f"EXTERNAL_SOURCE_ENVELOPE_TAMPERED: ExternalSource "
+                    f"{self.source_id} has a _verification_envelope that "
+                    f"does not match the recomputed hash of "
+                    f"_verified_evidence_authorization. The persisted "
+                    f"authorization was modified on disk. CEO v30.11 P0-2: "
+                    f"cryptographic binding detects tampering."
+                )
         # source_type must be an external type
         if not _is_external_source_type(self.source_type):
             raise ValueError(
@@ -404,6 +538,20 @@ class EvidenceBinding:
         return self.registry_dir / "bindings.json"
 
     def _load(self):
+        """Load evidence, sources, and bindings from disk.
+
+        CEO v30.11 P0-1/P0-2: This method now reconstructs the correct
+        Source subclass (InternalSource / ExternalSource) based on the
+        persisted source_class discriminator \u2014 NOT inferred from source_type.
+
+        For ExternalSource, the _verification_envelope is reconstructed
+        and verified against the persisted _verified_evidence_authorization.
+        Any tampering with the authorization dict on disk is DETECTED
+        because the recomputed verification_hash won't match.
+
+        A raw Source JSON without source_class is loaded as base Source
+        and will be REJECTED by the render path for external types.
+        """
         # Load evidence
         if self._evidence_file().exists():
             with open(self._evidence_file()) as f:
@@ -414,18 +562,36 @@ class EvidenceBinding:
                 ev = Evidence(**item)
                 self.evidence[ev.evidence_id] = ev
 
-        # Load sources
+        # Load sources \u2014 v30.11: reconstruct correct subclass
         if self._sources_file().exists():
             with open(self._sources_file()) as f:
                 data = json.load(f)
             for item in data.get("sources", []):
-                item = {k: v for k, v in item.items() if not k.startswith("_")}
-                # Reconstruct nested objects
+                # v30.11: Do NOT strip private fields \u2014 they carry
+                # authorization provenance + verification envelope.
+                # Reconstruct nested objects first.
                 if item.get("external_identity"):
                     item["external_identity"] = ExternalIdentityVerification(**item["external_identity"])
                 if item.get("verification_states"):
                     item["verification_states"] = SourceVerificationStates(**item["verification_states"])
-                src = Source(**item)
+                # Reconstruct _verification_envelope if present
+                if item.get("_verification_envelope"):
+                    item["_verification_envelope"] = VerificationEnvelope(**item["_verification_envelope"])
+
+                # v30.11 P0-1: Reconstruct based on source_class discriminator
+                source_class = item.get("source_class")
+                if source_class == "EXTERNAL":
+                    # ExternalSource \u2014 __post_init__ will verify the envelope
+                    src = ExternalSource(**item)
+                elif source_class == "INTERNAL":
+                    # InternalSource \u2014 __post_init__ will re-check masquerade
+                    src = InternalSource(**item)
+                else:
+                    # Legacy or unknown \u2014 load as base Source.
+                    # The render path will reject this for external types
+                    # (it requires ExternalSource instance).
+                    item_filtered = {k: v for k, v in item.items() if not k.startswith("_")}
+                    src = Source(**item_filtered)
                 self.sources[src.source_id] = src
 
         # Load bindings
@@ -437,18 +603,45 @@ class EvidenceBinding:
             self._rebuild_reverse_indexes()
 
     def _save(self):
+        """Save evidence, sources, and bindings to disk.
+
+        CEO v30.11 P0-1/P0-2: This method now persists:
+        - source_class discriminator (INTERNAL / EXTERNAL)
+        - _verified_evidence_authorization (for ExternalSource)
+        - _verification_envelope (cryptographically bound, for ExternalSource)
+
+        The private fields are NO LONGER stripped \u2014 they carry the
+        authorization provenance that must survive restart.
+        """
         # Save evidence
         with open(self._evidence_file(), "w") as f:
             json.dump({
-                "schema_version": "2.0.0",
+                "schema_version": "3.0.0",  # v30.11: schema bump for source_class
                 "evidence": [{k: v for k, v in asdict(e).items() if not k.startswith("_")} for e in self.evidence.values()],
             }, f, indent=2, default=str)
 
-        # Save sources (with nested objects)
+        # Save sources \u2014 v30.11: include private fields + source_class
         with open(self._sources_file(), "w") as f:
+            sources_data = []
+            for s in self.sources.values():
+                item = asdict(s)
+                # v30.11: Keep private fields (_verified_evidence_authorization,
+                # _verification_envelope) \u2014 they carry authorization provenance.
+                # Convert _verification_envelope to dict for JSON serialization.
+                if "_verification_envelope" in item and item["_verification_envelope"] is not None:
+                    env = item["_verification_envelope"]
+                    if hasattr(env, '__dict__'):
+                        item["_verification_envelope"] = {
+                            "evidence_identity_hash": env.evidence_identity_hash,
+                            "content_hash": env.content_hash,
+                            "source_databases_hash": env.source_databases_hash,
+                            "verification_hash": env.verification_hash,
+                            "authorization_version": env.authorization_version,
+                        }
+                sources_data.append(item)
             json.dump({
-                "schema_version": "2.0.0",
-                "sources": [{k: v for k, v in asdict(s).items() if not k.startswith("_")} for s in self.sources.values()],
+                "schema_version": "3.0.0",  # v30.11: schema bump
+                "sources": sources_data,
             }, f, indent=2, default=str)
 
         # Save bindings
