@@ -37,15 +37,21 @@ class HealthProbeResult:
 
     This is the ATOMIC unit of provider capability evidence.
     The capability registry is DERIVED from these records.
+
+    CEO v30.3: 'A provider that worked at 06:32 does not necessarily work
+    at 14:00. The capability registry needs TIME-BOUNDED evidence.'
     """
     provider: str
-    probe_time: str                # ISO 8601
+    probe_time: str                # ISO 8601 — observed_at
     request_fingerprint: str       # SHA-256 of (provider + query + timestamp)
     response_state: str            # RESULTS_FOUND / NO_RESULTS / TIMEOUT / AUTH_FAILED / SEARCH_FAILED / SOURCE_UNAVAILABLE
     latency_ms: int
     result_count: Optional[int]    # None = failure, 0 = zero results, N = N results
     failure_state: Optional[str]   # None if success, else error reason
     query_used: str                # The actual query sent
+    # v30.3: Temporal validity
+    valid_until: str = ""          # ISO 8601 — TTL expiration (default 1 hour)
+    probe_config_hash: str = ""    # Hash of probe configuration for reproducibility
 
 
 def _curl_with_timing(url: str, headers: dict = None, timeout: int = 15) -> tuple:
@@ -84,6 +90,40 @@ def _make_fingerprint(provider: str, query: str, timestamp: str) -> str:
     """Create a unique fingerprint for this probe."""
     content = f"{provider}:{query}:{timestamp}"
     return hashlib.sha256(content.encode()).hexdigest()
+
+
+def _compute_ttl(probe_time_iso: str, ttl_seconds: int) -> str:
+    """Compute the TTL expiration time for a probe result.
+
+    CEO v30.3: 'A provider that worked at 06:32 does not necessarily
+    work at 14:00. The capability registry needs TIME-BOUNDED evidence.'
+    """
+    from datetime import timedelta
+    dt = datetime.fromisoformat(probe_time_iso.replace("Z", "+00:00"))
+    expiry = dt + timedelta(seconds=ttl_seconds)
+    return expiry.isoformat()
+
+
+def _compute_probe_config_hash(provider: str, query: str) -> str:
+    """Hash the probe configuration for reproducibility."""
+    content = f"{provider}:{query}"
+    return hashlib.sha256(content.encode()).hexdigest()
+
+
+def is_probe_stale(probe: HealthProbeResult, max_age_seconds: int = 3600) -> bool:
+    """Check if a probe result is stale (past its TTL).
+
+    CEO v30.3: 'Historical provider success ≠ current provider availability.'
+    Stale probes CANNOT support a 'search completed' claim.
+    """
+    if not probe.valid_until:
+        return True  # No TTL = always stale
+    now = datetime.now(timezone.utc)
+    try:
+        expiry = datetime.fromisoformat(probe.valid_until.replace("Z", "+00:00"))
+        return now > expiry
+    except:
+        return True  # Can't parse = stale
 
 
 def _determine_response_state(data: Optional[dict], error: Optional[str]) -> tuple:
@@ -222,6 +262,8 @@ def probe_provider(provider: str, query: str) -> HealthProbeResult:
             latency_ms=0, result_count=None,
             failure_state="no_adapter",
             query_used=query,
+            valid_until=_compute_ttl(timestamp, 3600),
+            probe_config_hash=_compute_probe_config_hash(provider, query),
         )
 
     response_state, result_count, failure_state = _determine_response_state(data, error)
@@ -235,6 +277,8 @@ def probe_provider(provider: str, query: str) -> HealthProbeResult:
         result_count=result_count,
         failure_state=failure_state,
         query_used=query,
+        valid_until=_compute_ttl(timestamp, 3600),  # 1 hour TTL
+        probe_config_hash=_compute_probe_config_hash(provider, query),
     )
 
 
@@ -254,13 +298,21 @@ def derive_capability_state(probes: List[HealthProbeResult]) -> Dict[str, Dict]:
 
     The capability registry is a DERIVED VIEW of probe results,
     not manually trusted state.
+
+    CEO v30.3: Includes temporal validity. Stale probes are marked STALE.
     """
     capabilities = {}
     for probe in probes:
+        stale = is_probe_stale(probe)
         capabilities[probe.provider] = {
             "provider": probe.provider,
-            "actually_queryable": probe.response_state in ("RESULTS_FOUND", "NO_RESULTS"),
+            "actually_queryable": probe.response_state in ("RESULTS_FOUND", "NO_RESULTS") and not stale,
+            "current_state": "STALE" if stale else probe.response_state,
             "response_state": probe.response_state,
+            "observed_at": probe.probe_time,
+            "valid_until": probe.valid_until,
+            "is_stale": stale,
+            "probe_config_hash": probe.probe_config_hash,
             "last_success": probe.probe_time if probe.response_state in ("RESULTS_FOUND", "NO_RESULTS") else None,
             "last_failure": probe.probe_time if probe.response_state not in ("RESULTS_FOUND", "NO_RESULTS") else None,
             "failure_state": probe.failure_state,
