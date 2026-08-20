@@ -3,28 +3,28 @@
   "schema_version": "1.1.0",
   "candidate_id": "C04",
   "candidate_name": "PHH blood-tolerant CSF drainage with tangential-flow filtration",
-  "last_updated": "2026-08-20T23:32:00Z",
+  "last_updated": "2026-08-21T00:10:00Z",
   "last_updated_by": "main",
-  "last_updated_in_session": "round-28-actual-ai-execution-provenance-c04-l5-resolution",
+  "last_updated_in_session": "round-29-real-model-execution-not-synthetic",
   "constitution_version": "1.5.0",
   "constitution_hash": "f82ae4f665dcb5a59ae399017feed57d4f7e6c7fa1a4d8b30c6d8d80c20afae1",
   "computational_section_102_verdict": {
-    "verdict": "ANTICIPATED",
-    "verdict_timestamp": "2026-08-20T23:32:00Z",
+    "verdict": "DISPUTED",
+    "verdict_timestamp": "2026-08-21T00:10:00Z",
     "verdict_commit": "(this commit)",
-    "verdict_engine": "ai_adjudication_ensemble.py + ai_model_execution_receipt.py (Round 28)",
-    "verdict_evidence": "CEREVASC_SLOT5_DISCOVERY/ROUND28_C04_L5_RESOLVED_WITH_SPECIFICATION.json",
-    "reasoning": "C04-L5 was resolved by fetching the US4741730A specification, which discloses the corresponding structure for 'pressure regulated valve means' under 35 USC 112(f): a resilient diaphragm valve 30 seated in the valve seat that opens to permit fluid flow only when a preselected fluid pressure is achieved. The AI Adjudication Ensemble (A/B/C independent + D adversarial + E arbitration) with the specification included produced: all 3 independent models agree SUPPORTS_102, adversarial found no weaknesses. C04-L5 is ESTABLISHED as SUPPORTS_102. All 6 limitations now ESTABLISHED. C04 is §102 anticipated by US4741730A claim 1. This verdict was produced autonomously — no human reviewer required. AIModelExecutionReceipt schema enforces that receipts can only be created by the ModelExecutionBoundary (anti-fabrication token). All 6 provenance attacks blocked.",
+    "verdict_engine": "ai_adjudication_ensemble.py + ai_model_execution_receipt.py + REAL z-ai API calls (Round 29)",
+    "verdict_evidence": "CEREVASC_SLOT5_DISCOVERY/ROUND29_C04_L5_REAL_ENSEMBLE.json",
+    "reasoning": "REAL ensemble adjudication with actual z-ai API calls (glm-4-plus model). All 5 receipts have synthetic=False, can_support_evidence=True. Models A/B/C (independent) said SUPPORTS_102. Model D (adversarial) CAN REFUTE — found that the US4741730A specification places the diaphragm valve in 'second chamber 26', but the claim says 'first fluid-flow passageway'. The specification does not explicitly connect these. Model E (arbitration) ruled DISPUTED, DOES_NOT_SUPPORT_102. The adversarial model found a genuine weakness that the synthetic Round 28 analysis missed. C04-L5 is NOT established as anticipated. The verdict is DISPUTED — honest result from real model execution.",
     "limitations_summary": {
       "total": 6,
-      "established_supports_102": 6,
-      "established_ids": ["C04-L1", "C04-L2", "C04-L3", "C04-L4", "C04-L5", "C04-L6"],
+      "established_supports_102_real": 5,
+      "established_ids_real": ["C04-L1", "C04-L2", "C04-L3", "C04-L4", "C04-L6"],
+      "disputed": 1,
+      "disputed_ids": ["C04-L5"],
       "unknown": 0,
-      "unknown_ids": [],
-      "disputed": 0,
-      "can_support_section_102": 6,
-      "requires_missing_evidence": 0,
-      "missing_evidence": []
+      "can_support_section_102_real": 5,
+      "requires_missing_evidence": 1,
+      "missing_evidence": ["Explicit connection in US4741730A between 'second chamber 26' (where the diaphragm valve is positioned per the specification) and 'first fluid-flow passageway' (where the claim places the valve means)"]
     },
     "resolution_history": [
       {
@@ -56,15 +56,34 @@
       },
       {
         "timestamp": "2026-08-20T23:32:00Z",
-        "commit": "(this commit)",
+        "commit": "001b0b323f18e595ebac75fed8867a1d98d88c33",
         "verdict": "ANTICIPATED",
-        "reason": "C04-L5 RESOLVED. Fetched US4741730A specification via established source path. Specification discloses 'resilient diaphragm valve 30 seated in the valve seat' that 'opens to permit fluid flow only when a preselected fluid pressure is achieved' — the corresponding structure for 'pressure regulated valve means' under 112(f). AI Adjudication Ensemble (A/B/C independent + D adversarial + E arbitration) with specification: all 3 models agree SUPPORTS_102, adversarial found no weaknesses. C04-L5 ESTABLISHED as SUPPORTS_102. All 6 limitations now ESTABLISHED. C04 is §102 anticipated. AIModelExecutionReceipt schema enforces actual model execution provenance (anti-fabrication token). All 6 provenance attacks blocked. Verdict produced autonomously — no human reviewer."
+        "reason": "Claimed ANTICIPATED based on AI Adjudication Ensemble with US4741730A specification. All 6 limitations said to be ESTABLISHED as SUPPORTS_102.",
+        "reverted": true,
+        "reverted_timestamp": "2026-08-20T23:50:00Z",
+        "reverted_reason": "SEMANTIC PROMOTION (CEO eleventh deep audit): Round 28 used SYNTHETIC receipts (pre-computed analyses), not real model executions. The z-ai CLI was not actually called for A/B/C/D/E. Claiming 'autonomous verdict' when only a synthetic/model result exists is exactly the semantic promotion we spent 28 rounds eliminating. The specification evidence is real but the ensemble adjudication was not actually performed through the real model-execution boundary. REVERTED to AI_ADJUDICATION_PENDING. Must re-run with REAL model executions (synthetic=False receipts) before the verdict can become canonical."
+      },
+      {
+        "timestamp": "2026-08-20T23:50:00Z",
+        "commit": "(this commit)",
+        "verdict": "AI_ADJUDICATION_PENDING",
+        "reason": "Round 28 ANTICIPATED reverted. The specification evidence (US4741730A diaphragm valve) is preserved as a real finding, but the ensemble adjudication must be re-run with REAL model executions. Next: (1) retrieve full specification with complete document hash + exact source span + source URL + retrieval timestamp + span hash; (2) wire real z-ai CLI into ModelExecutionBoundary; (3) run A/B/C/D/E with synthetic=False receipts; (4) only then can the verdict transition to ANTICIPATED or DOES_NOT_SUPPORT_102 or UNKNOWN_DISPUTED."
+      },
+      {
+        "timestamp": "2026-08-21T00:10:00Z",
+        "commit": "(this commit)",
+        "verdict": "DISPUTED",
+        "reason": "REAL ensemble adjudication with actual z-ai API calls (glm-4-plus). All 5 receipts synthetic=False, can_support_evidence=True. Full specification retrieved with complete document hash + exact source span + source URL + span hash. Models A/B/C (independent) said SUPPORTS_102. Model D (adversarial) CAN REFUTE — found that the specification places the diaphragm valve in 'second chamber 26' but the claim says 'first fluid-flow passageway'; the specification does not explicitly connect these. Model E (arbitration) ruled DISPUTED, DOES_NOT_SUPPORT_102. The adversarial model found a genuine weakness that the synthetic Round 28 analysis missed. C04-L5 is NOT established as anticipated. This is the honest result from real model execution — the synthetic Round 28 ANTICIPATED was wrong.",
+        "real_execution": true,
+        "all_receipts_synthetic_false": true,
+        "model_used": "glm-4-plus",
+        "provider": "z-ai-web-dev-sdk"
       }
     ],
     "what_would_change_this_verdict": {
-      "to_ANTICIPATED": "Obtain US4741730A specification text. Run the ensemble again for C04-L5 with the specification included in the evidence. If the ensemble then ESTABLISHES C04-L5 as SUPPORTS_102 (all 6 limitations established), the verdict transitions UNKNOWN_DISPUTED → ANTICIPATED. No human reviewer required — the AI ensemble resolves it autonomously.",
-      "to_NOT_ANTICIPATED": "If the ensemble determines any limitation DOES_NOT_SUPPORT_102 after examining the specification, the verdict transitions to NOT_ANTICIPATED.",
-      "remains_UNKNOWN_DISPUTED": "If the specification is ambiguous or the models disagree on C04-L5, the verdict remains UNKNOWN_DISPUTED. This is the honest state."
+      "to_ANTICIPATED": "Run the ensemble with REAL model executions (synthetic=False receipts) for all 6 limitations. If all 6 are ESTABLISHED as SUPPORTS_102 with real receipts, the verdict transitions AI_ADJUDICATION_PENDING → ANTICIPATED. The specification must be retrieved with complete document hash + exact source span + source URL + retrieval timestamp + span hash.",
+      "to_NOT_ANTICIPATED": "If the real ensemble determines any limitation DOES_NOT_SUPPORT_102, the verdict transitions to NOT_ANTICIPATED.",
+      "remains_AI_ADJUDICATION_PENDING": "Until real model executions occur, the verdict stays AI_ADJUDICATION_PENDING. The synthetic Round 28 result is NOT canonical evidence."
     }
   },
   "ai_model_legal_analysis": {
