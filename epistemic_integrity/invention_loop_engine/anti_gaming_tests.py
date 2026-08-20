@@ -28,6 +28,10 @@ from .bayesian_eig import (
     BayesianEIGCalculator, Hypothesis, ExperimentalOutcome,
     EIGEpistemicClass, EIGProvenance,
 )
+from .patent_destruction_adapter import (
+    PatentDestructionAdapter, AttackStageStatus, CoverageLevel,
+    ExecutionProof, CoverageProof,
+)
 from .adapters.r6_adapter import R6Adapter
 from .adapters.sensing_adapter import SensingAdapter
 
@@ -657,6 +661,88 @@ def test_eig_provenance_enforced():
     print("✅ Test 17 (EIG provenance): SYNTHETIC→blocked, EVIDENCE_BOUND→allowed (P0.4)")
 
 
+def test_execution_proof_enforced():
+    """Test 18: Manually supplied stages are downgraded. Execute_stage required for COMPLETED.
+
+    Per CEO directive (sixth round):
+      'Never let a provenance framework certify work that it did not
+       independently execute.'
+    """
+    adapter = PatentDestructionAdapter()
+    manifest = adapter.create_manifest("test_exec", "test candidate")
+
+    # Try to mark COMPLETED without execution proof
+    adapter.record_stage(manifest, "keyword_search",
+        provider="Google Patents", query="test",
+        result_ids=["US123"],
+        status=AttackStageStatus.COMPLETED,
+        coverage=CoverageLevel.RELEVANT_FOUND,
+    )
+    stage = manifest.stages["keyword_search"]
+    assert stage.status == AttackStageStatus.INCOMPLETE, \
+        f"Manual COMPLETED must be downgraded to INCOMPLETE, got {stage.status}"
+    assert stage.execution.manually_supplied == True
+
+    # Now use execute_stage (actual execution with raw response)
+    adapter.execute_stage(manifest, "cpc_ipc_search",
+        provider="EPO", query="CPC A61M",
+        raw_response=b'{"results": ["US456"]}',
+        result_ids=["US456"],
+    )
+    stage2 = manifest.stages["cpc_ipc_search"]
+    assert stage2.status == AttackStageStatus.COMPLETED, \
+        f"execute_stage should get COMPLETED, got {stage2.status}"
+    assert stage2.execution.manually_supplied == False
+    assert bool(stage2.execution.raw_response_hash) == True
+    assert stage2.execution.provider_confirmed == True
+
+    print("✅ Test 18 (execution proof): manual→INCOMPLETE, executed→COMPLETED (sixth round)")
+
+
+def test_coverage_proof_enforced():
+    """Test 19: EXHAUSTED requires CoverageProof. Otherwise downgraded to QUERIED.
+
+    Per CEO directive (sixth round):
+      EXHAUSTED must require an explicit coverage record.
+      Otherwise COVERAGE_INSUFFICIENT, never EXHAUSTED.
+    """
+    adapter = PatentDestructionAdapter()
+    manifest = adapter.create_manifest("test_coverage", "test")
+
+    # Try EXHAUSTED without coverage proof
+    adapter.execute_stage(manifest, "keyword_search",
+        provider="Google Patents", query="test",
+        raw_response=b'{"results": []}',
+        result_ids=[],
+        coverage_proof=None,  # No coverage proof!
+    )
+    stage = manifest.stages["keyword_search"]
+    assert stage.coverage == CoverageLevel.QUERIED, \
+        f"EXHAUSTED without proof must downgrade to QUERIED, got {stage.coverage}"
+
+    # Now with proper CoverageProof
+    proof = CoverageProof(
+        databases_queried=["Google Patents", "PatentBear"],
+        query_families=["filter+bypass", "shunt+valve"],
+        pagination_exhausted=True,
+        jurisdictions=["US", "EP", "JP"],
+    )
+    assert proof.is_exhausted() == True
+
+    adapter.execute_stage(manifest, "claims_search",
+        provider="USPTO", query="claims:filter+bypass",
+        raw_response=b'{"results": ["US4741730A"]}',
+        result_ids=["US4741730A"],
+        coverage_proof=proof,
+    )
+    stage2 = manifest.stages["claims_search"]
+    assert stage2.coverage == CoverageLevel.EXHAUSTED, \
+        f"EXHAUSTED with valid proof should stay EXHAUSTED, got {stage2.coverage}"
+
+    print("✅ Test 19 (coverage proof): no proof→QUERIED, valid proof→EXHAUSTED (sixth round)")
+
+
+
 def run_all_tests():
     """Run all anti-gaming tests."""
     print("=" * 60)
@@ -681,10 +767,12 @@ def run_all_tests():
     test_tri_state_mechanism_verdict()
     test_evidence_predicate_real()
     test_eig_provenance_enforced()
+    test_execution_proof_enforced()
+    test_coverage_proof_enforced()
 
     print()
     print("=" * 60)
-    print("ALL 17 ANTI-GAMING TESTS PASSED")
+    print("ALL 19 ANTI-GAMING TESTS PASSED")
     print("=" * 60)
     return True
 

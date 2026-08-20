@@ -59,12 +59,97 @@ class CoverageLevel(str, Enum):
 
 
 @dataclass
+class CoverageProof:
+    """Proof that a search stage was actually executed exhaustively.
+
+    Per CEO directive (sixth round):
+      EXHAUSTED must require an explicit coverage record:
+        databases queried + classifications searched + query families +
+        pagination exhausted + failures + jurisdiction
+
+      Otherwise the engine must report COVERAGE_INSUFFICIENT, never EXHAUSTED.
+
+    This prevents the manifest from certifying work it did not execute.
+    """
+    databases_queried: list[str] = field(default_factory=list)
+    classifications_searched: list[str] = field(default_factory=list)  # CPC/IPC codes
+    query_families: list[str] = field(default_factory=list)  # Query variants tried
+    pagination_exhausted: bool = False  # All pages reviewed?
+    failures: list[str] = field(default_factory=list)  # Provider failures
+    jurisdictions: list[str] = field(default_factory=list)  # US, EP, JP, WO, etc.
+    total_queries_executed: int = 0
+    total_results_returned: int = 0
+
+    def is_exhausted(self) -> bool:
+        """True only if all coverage dimensions are demonstrated."""
+        return (
+            len(self.databases_queried) > 0 and
+            len(self.query_families) > 0 and
+            self.pagination_exhausted and
+            len(self.jurisdictions) > 0
+        )
+
+    def to_dict(self) -> dict:
+        return {
+            "databases_queried": self.databases_queried,
+            "classifications_searched": self.classifications_searched,
+            "query_families": self.query_families,
+            "pagination_exhausted": self.pagination_exhausted,
+            "failures": self.failures,
+            "jurisdictions": self.jurisdictions,
+            "total_queries_executed": self.total_queries_executed,
+            "total_results_returned": self.total_results_returned,
+            "is_exhausted": self.is_exhausted(),
+        }
+
+
+@dataclass
+class ExecutionProof:
+    """Proof that a stage was actually executed against a real provider.
+
+    Per CEO directive (sixth round):
+      'Never let a provenance framework certify work that it did not
+       independently execute.'
+
+    A stage cannot become COMPLETED because a caller manually supplied
+    result IDs. It must have:
+      - execution_id (unique per execution)
+      - raw_response_hash (hash of the actual provider response)
+      - execution_timestamp (when the query was actually run)
+      - provider_confirmed (the provider actually returned data)
+
+    Without this, the stage is MANUALLY_SUPPLIED, not EXECUTED.
+    """
+    execution_id: str = ""
+    raw_response_hash: str = ""  # SHA-256 of the actual provider response
+    execution_timestamp: str = ""
+    provider_confirmed: bool = False  # Did the provider actually return data?
+    manually_supplied: bool = True  # Default: manually supplied (NOT executed)
+    response_size_bytes: int = 0
+
+    def to_dict(self) -> dict:
+        return {
+            "execution_id": self.execution_id,
+            "raw_response_hash": self.raw_response_hash,
+            "execution_timestamp": self.execution_timestamp,
+            "provider_confirmed": self.provider_confirmed,
+            "manually_supplied": self.manually_supplied,
+            "response_size_bytes": self.response_size_bytes,
+        }
+
+
+@dataclass
 class AttackStageResult:
     """Result of one stage in the patent attack manifest.
 
     Every stage records:
       provider → query → timestamp → result IDs → coverage →
       failures → relevance → identity → provenance
+
+    Per CEO directive (sixth round):
+      - Stage cannot be COMPLETED from manually supplied result IDs alone
+      - Must carry ExecutionProof (actual provider execution)
+      - EXHAUSTED coverage requires CoverageProof
     """
     stage_name: str
     provider: str = ""
@@ -78,6 +163,10 @@ class AttackStageResult:
     relevant_results: list[dict] = field(default_factory=list)
     notes: str = ""
     stage_hash: str = ""
+    # CRITICAL: execution proof (sixth round)
+    execution: ExecutionProof = field(default_factory=ExecutionProof)
+    # CRITICAL: coverage proof for EXHAUSTED claims (sixth round)
+    coverage_proof: Optional[CoverageProof] = None
 
     def __post_init__(self):
         content = json.dumps({
@@ -103,6 +192,8 @@ class AttackStageResult:
             "relevant_results": self.relevant_results,
             "notes": self.notes,
             "stage_hash": self.stage_hash,
+            "execution": self.execution.to_dict(),
+            "coverage_proof": self.coverage_proof.to_dict() if self.coverage_proof else None,
         }
 
 
@@ -247,8 +338,15 @@ class PatentDestructionAdapter:
                      coverage: CoverageLevel,
                      relevant_results: list[dict] = None,
                      failures: list[str] = None,
-                     notes: str = "") -> AttackStageResult:
+                     notes: str = "",
+                     execution: ExecutionProof = None,
+                     coverage_proof: CoverageProof = None) -> AttackStageResult:
         """Record the result of one stage.
+
+        Per CEO directive (sixth round):
+          - A stage CANNOT become COMPLETED from manually supplied result IDs alone.
+          - COMPLETED requires ExecutionProof with manually_supplied=False.
+          - EXHAUSTED coverage requires CoverageProof with is_exhausted()=True.
 
         Hard rule: provider failure → FAILED, NOT NO_RESULTS.
         """
@@ -265,13 +363,75 @@ class PatentDestructionAdapter:
         stage.relevant_results = relevant_results or []
         stage.failures = failures or []
         stage.notes = notes
+        stage.execution = execution or ExecutionProof()  # Default: manually_supplied=True
+        stage.coverage_proof = coverage_proof
 
-        # Hard rule enforcement: provider failure ≠ zero results
+        # Hard rule: provider failure ≠ zero results
         if status == AttackStageStatus.FAILED:
             stage.coverage = CoverageLevel.NOT_QUERIED
             stage.notes += " | HARD RULE: Provider failure recorded as FAILED, NOT NO_RESULTS."
 
+        # CRITICAL (sixth round): COMPLETED requires execution proof
+        if status == AttackStageStatus.COMPLETED:
+            if stage.execution.manually_supplied:
+                stage.status = AttackStageStatus.INCOMPLETE
+                stage.notes += " | DOWNGRADED: COMPLETED→INCOMPLETE. " \
+                               "Stage was manually supplied, NOT executed. " \
+                               "ExecutionProof with manually_supplied=False required."
+
+        # CRITICAL (sixth round): EXHAUSTED requires coverage proof
+        if coverage == CoverageLevel.EXHAUSTED:
+            if stage.coverage_proof is None or not stage.coverage_proof.is_exhausted():
+                stage.coverage = CoverageLevel.QUERIED  # Downgrade
+                stage.notes += " | DOWNGRADED: EXHAUSTED→QUERIED. " \
+                               "CoverageProof with is_exhausted()=True required for EXHAUSTED."
+
         return stage
+
+    def execute_stage(self, manifest: PatentAttackManifest,
+                      stage_name: str,
+                      provider: str,
+                      query: str,
+                      raw_response: bytes,
+                      result_ids: list[str],
+                      coverage_proof: CoverageProof = None,
+                      relevant_results: list[dict] = None,
+                      failures: list[str] = None,
+                      notes: str = "") -> AttackStageResult:
+        """Actually execute a stage against a real provider.
+
+        Per CEO directive (sixth round):
+          This is the ONLY way to get COMPLETED status.
+          The raw_response is hashed to prove the provider actually returned data.
+
+        Args:
+            raw_response: The actual bytes returned by the provider.
+                         Will be hashed to create raw_response_hash.
+        """
+        import hashlib as _hl
+        response_hash = _hl.sha256(raw_response).hexdigest()
+        execution = ExecutionProof(
+            execution_id=str(uuid4()),
+            raw_response_hash=response_hash,
+            execution_timestamp=datetime.now(timezone.utc).isoformat(),
+            provider_confirmed=len(raw_response) > 0,
+            manually_supplied=False,  # CRITICAL: this was actually executed
+            response_size_bytes=len(raw_response),
+        )
+
+        coverage = CoverageLevel.EXHAUSTED if (coverage_proof and coverage_proof.is_exhausted()) \
+                   else CoverageLevel.QUERIED
+
+        return self.record_stage(
+            manifest, stage_name, provider, query, result_ids,
+            AttackStageStatus.COMPLETED if len(result_ids) > 0 else AttackStageStatus.NO_RESULTS,
+            coverage,
+            relevant_results=relevant_results,
+            failures=failures,
+            notes=notes,
+            execution=execution,
+            coverage_proof=coverage_proof,
+        )
 
     def add_claim_chart_entry(self, manifest: PatentAttackManifest,
                                limitation: str, patent: str, claim: str,
@@ -345,6 +505,27 @@ class PatentDestructionAdapter:
                 (AttackStageStatus.COMPLETED, AttackStageStatus.NO_RESULTS)
                 for s in self.REQUIRED_STAGES
             ),
+            # NEW (sixth round): execution proof audit
+            "execution_audit": {
+                s: {
+                    "manually_supplied": manifest.stages[s].execution.manually_supplied,
+                    "has_raw_response_hash": bool(manifest.stages[s].execution.raw_response_hash),
+                    "provider_confirmed": manifest.stages[s].execution.provider_confirmed,
+                }
+                for s in self.STAGE_NAMES
+            },
+            # NEW (sixth round): coverage proof audit
+            "coverage_audit": {
+                s: {
+                    "claimed_coverage": manifest.stages[s].coverage.value,
+                    "has_coverage_proof": manifest.stages[s].coverage_proof is not None,
+                    "coverage_proof_valid": (
+                        manifest.stages[s].coverage_proof.is_exhausted()
+                        if manifest.stages[s].coverage_proof else False
+                    ),
+                }
+                for s in self.STAGE_NAMES
+            },
         }
         manifest.completeness_check = result
         return result
