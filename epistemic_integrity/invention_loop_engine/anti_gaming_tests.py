@@ -41,6 +41,12 @@ from .live_vs_synthetic_transport import (
 )
 from .adapters.r6_adapter import R6Adapter
 from .adapters.sensing_adapter import SensingAdapter
+from .correspondence_engine import (
+    CorrespondenceEngine, LimitationCorrespondence, PriorArtEligibilityEvidence,
+    CorrespondenceType, CorrespondenceStatus, DisclosureType, CorrespondenceRule,
+    EligibilityPhase, LegalDecisionVerdict,
+    CorrespondenceAttestation, LegalCorrespondenceDecision,
+)
 
 
 def test_simulator_confidently_wrong():
@@ -1008,6 +1014,487 @@ def test_live_transport_rejects_caller_supplied_response():
     print("✅ Test 23 (live transport): no caller-supplied response, registry-validated (ninth round)")
 
 
+# ===========================================================================
+# Twentieth round (CEO deep audit 2026-08-21) — P0/P1 adversarial regression
+# tests for the correspondence engine and prior-art eligibility layer.
+#
+# Six fail-closed scenarios that must FAIL the certification if the engine
+# ever silently admits them:
+#   24 — all eligibility fields populated but legal rule never applied
+#   25 — functional equivalence marked explicit by mistake (semantic backdoor)
+#   26 — supporting evidence changed but provenance hash unchanged
+#   27 — forged reviewer string with no attestation
+#   28 — public_availability_date conflicts with publication_date
+#   29 — jurisdiction/rule mismatch (US rule on EPO jurisdiction, etc.)
+# ===========================================================================
+
+
+def test_eligibility_fields_populated_but_rule_never_applied():
+    """Test 24: All eligibility fields populated but legal rule never applied.
+
+    Per CEO directive (twentieth round — P0-1):
+      'A populated applicable_rule field is not proof that the rule was applied.'
+
+    Setup: Provide candidate_critical_date, public_availability_date,
+           jurisdiction, and applicable_rule — but leave
+           legal_rule_application_evidence empty.
+    Expected: eligibility_phase stops at LEGAL_RULE_IDENTIFIED.
+              eligibility != 'ELIGIBLE' with COMPLETE.
+              analysis_completeness == 'SIMPLIFIED'.
+    Failure mode if engine is wrong: returns ELIGIBILITY_ESTABLISHED based
+              on date comparison alone — the exact failure pattern the audit
+              identified in the v19 implementation.
+    """
+    ev = PriorArtEligibilityEvidence(
+        candidate_critical_date="2024-03-15",
+        reference_publication_date="1988-05-10",
+        public_availability_date="1988-05-10",
+        jurisdiction="US",
+        applicable_rule="35 USC 102(a)(1)",
+        # legal_rule_application_evidence is DELIBERATELY EMPTY
+        legal_rule_application_evidence="",
+    )
+    ev.evaluate()
+
+    # Phase must NOT reach ELIGIBILITY_ESTABLISHED
+    assert ev.eligibility_phase != EligibilityPhase.ELIGIBILITY_ESTABLISHED.value, (
+        f"FAIL: engine reached ELIGIBILITY_ESTABLISHED without "
+        f"legal_rule_application_evidence. Phase={ev.eligibility_phase}. "
+        f"A populated applicable_rule is NOT proof the rule was applied."
+    )
+    # Phase must NOT even reach LEGAL_RULE_APPLIED
+    assert ev.eligibility_phase != EligibilityPhase.LEGAL_RULE_APPLIED.value, (
+        f"FAIL: engine reached LEGAL_RULE_APPLIED without "
+        f"legal_rule_application_evidence. Phase={ev.eligibility_phase}."
+    )
+    # analysis_completeness must NOT be COMPLETE
+    assert ev.analysis_completeness != "COMPLETE", (
+        f"FAIL: analysis_completeness=COMPLETE without rule application. "
+        f"Got completeness={ev.analysis_completeness}, eligibility={ev.eligibility}."
+    )
+    print(f"✅ Test 24 (fields populated, rule never applied): phase={ev.eligibility_phase}, completeness={ev.analysis_completeness} (twentieth round)")
+
+
+def test_functional_equivalence_marked_explicit_does_not_support_102():
+    """Test 25: Functional equivalence marked explicit by mistake.
+
+    Per CEO directive (twentieth round — P0-2):
+      'Do not let merely setting disclosure_type=EXPLICIT_CLAIM_DISCLOSURE
+       turn equivalence into anticipation.'
+
+    Setup: A FUNCTIONAL_EQUIVALENT correspondence with disclosure_type
+           set to EXPLICIT_CLAIM_DISCLOSURE (the semantic backdoor) and
+           status=ESTABLISHED, rule=FUNCTIONAL_ANALYSIS.
+    Expected: can_support_section_102 returns False — equivalence requires
+              a separate LegalCorrespondenceDecision.
+    Failure mode if engine is wrong: returns True — semantic backdoor active.
+    """
+    # First, verify the structural invariant prevents the backdoor at construction
+    # time: VERBATIM_EXPLICIT_CLAIM_DISCLOSURE cannot be set on non-VERBATIM.
+    try:
+        bad = LimitationCorrespondence(
+            limitation_id="L1",
+            reference_patent="US123",
+            claim_number=1,
+            claim_passage="a valve mechanism",
+            correspondence_type=CorrespondenceType.FUNCTIONAL_EQUIVALENT,
+            disclosure_type=DisclosureType.VERBATIM_EXPLICIT_CLAIM_DISCLOSURE,
+            status=CorrespondenceStatus.ESTABLISHED,
+            rule=CorrespondenceRule.FUNCTIONAL_ANALYSIS,
+        )
+        raise AssertionError(
+            "FAIL: engine allowed VERBATIM_EXPLICIT_CLAIM_DISCLOSURE on "
+            "FUNCTIONAL_EQUIVALENT correspondence. Structural invariant broken."
+        )
+    except ValueError:
+        pass  # Expected: structural invariant rejects this combination
+
+    # Second, verify that even the legacy EXPLICIT_CLAIM_DISCLOSURE on
+    # FUNCTIONAL_EQUIVALENT does NOT auto-support §102.
+    c = LimitationCorrespondence(
+        limitation_id="L1",
+        reference_patent="US123",
+        claim_number=1,
+        claim_passage="a valve mechanism",
+        correspondence_type=CorrespondenceType.FUNCTIONAL_EQUIVALENT,
+        disclosure_type=DisclosureType.EXPLICIT_CLAIM_DISCLOSURE,  # legacy value
+        status=CorrespondenceStatus.ESTABLISHED,
+        rule=CorrespondenceRule.FUNCTIONAL_ANALYSIS,
+        supporting_evidence="Expert declares functional equivalence",
+        reviewer="EXPERT:J.Doe",
+    )
+    assert not c.can_support_section_102, (
+        "FAIL: FUNCTIONAL_EQUIVALENT with EXPLICIT_CLAIM_DISCLOSURE supported "
+        "§102 without a LegalCorrespondenceDecision. Semantic backdoor active."
+    )
+    assert c.requires_legal_decision, (
+        "FAIL: FUNCTIONAL_EQUIVALENT should require a legal decision."
+    )
+
+    # Third, verify that attaching a LegalCorrespondenceDecision with
+    # SUPPORTS_102 enables §102 support.
+    ld = LegalCorrespondenceDecision(
+        decision=LegalDecisionVerdict.SUPPORTS_102,
+        reviewer_id="pa-001",
+        reviewer_role="PATENT_AGENT",
+        jurisdiction="US",
+        legal_basis="35 USC 102(a) anticipation by functional equivalence",
+        rationale="The functional equivalence constitutes anticipation under 112(f).",
+        evidence_hash="abc123def456",
+    )
+    c.legal_decision = ld
+    c.recompute_provenance_hash()
+    assert c.can_support_section_102, (
+        "FAIL: FUNCTIONAL_EQUIVALENT with SUPPORTS_102 legal_decision should "
+        "support §102."
+    )
+    assert c.verify_provenance_integrity(), (
+        "FAIL: provenance hash integrity broken after attaching legal_decision."
+    )
+    print(f"✅ Test 25 (equivalence marked explicit): backdoor closed, requires LegalCorrespondenceDecision (twentieth round)")
+
+
+def test_supporting_evidence_changed_provenance_hash_mismatch():
+    """Test 26: Supporting evidence changed but provenance hash unchanged.
+
+    Per CEO directive (twentieth round — P0-3):
+      'So someone could alter the underlying provenance metadata without
+       changing the provenance hash. That is a real integrity gap.'
+
+    Setup: Create a correspondence, capture its provenance_hash, then
+           silently alter supporting_evidence WITHOUT calling
+           recompute_provenance_hash().
+    Expected: verify_provenance_integrity() returns False.
+              can_support_section_102 returns False (integrity check fails).
+    Failure mode if engine is wrong: returns True — undetected tampering.
+    """
+    eng = CorrespondenceEngine()
+    c = eng.evaluate_correspondence(
+        limitation_text="a fluid entry port",
+        claim_text="an implantable shunt device comprising a fluid entry port",
+        claim_number=1,
+        reference_patent="US123",
+        limitation_id="L1",
+    )
+    original_hash = c.provenance_hash
+    assert c.can_support_section_102, "Baseline: VERBATIM should support §102"
+    assert c.verify_provenance_integrity(), "Baseline: provenance should be intact"
+
+    # Tamper: silently alter supporting_evidence WITHOUT recomputing the hash
+    c.supporting_evidence = "TAMPERED: false evidence inserted by attacker"
+
+    # Integrity check must FAIL
+    assert not c.verify_provenance_integrity(), (
+        "FAIL: provenance integrity check passed after silent tampering. "
+        "The hash does not bind supporting_evidence."
+    )
+    # can_support_section_102 must FAIL (because integrity check is part of the gate)
+    assert not c.can_support_section_102, (
+        "FAIL: can_support_section_102 returned True after silent tampering. "
+        "Integrity check must be part of the §102 gate."
+    )
+
+    # Verify the same applies to other fields: claim_passage, claim_start_offset,
+    # correspondence_type, rule, reviewer, raw_response_hash, source_node_identifier
+    c2 = eng.evaluate_correspondence(
+        limitation_text="a fluid entry port",
+        claim_text="an implantable shunt device comprising a fluid entry port",
+        claim_number=1,
+        reference_patent="US123",
+        limitation_id="L2",
+    )
+    for field_name, new_value in [
+        ("claim_passage", "TAMPERED"),
+        ("claim_start_offset", 99999),
+        ("claim_end_offset", 99999),
+        ("reviewer", "FORGED:EXPERT:J.Doe"),
+        ("raw_response_hash", "forge"),
+        ("source_node_identifier", "forge"),
+        ("technical_relationship", "TAMPERED"),
+    ]:
+        # Reset and tamper one field at a time
+        c2_copy = eng.evaluate_correspondence(
+            limitation_text="a fluid entry port",
+            claim_text="an implantable shunt device comprising a fluid entry port",
+            claim_number=1,
+            reference_patent="US123",
+            limitation_id="L2",
+        )
+        setattr(c2_copy, field_name, new_value)
+        assert not c2_copy.verify_provenance_integrity(), (
+            f"FAIL: tampering {field_name} was not detected by provenance hash. "
+            f"Hash does not bind {field_name}."
+        )
+    print(f"✅ Test 26 (evidence tampering detected): all 8 fields protected by provenance hash (twentieth round)")
+
+
+def test_forged_reviewer_string_rejected_for_manual_expert():
+    """Test 27: Forged reviewer string with no attestation.
+
+    Per CEO directive (twentieth round — P0-4):
+      'reviewer=\"EXPERT:J.Doe\" is not evidence that an expert actually
+       performed the review.'
+
+    Setup: Attempt to confirm a candidate via MANUAL_EXPERT with
+           reviewer='EXPERT:J.Doe' but NO CorrespondenceAttestation.
+    Expected: confirm_candidate() refuses to set status=ESTABLISHED.
+              Status remains CANDIDATE.
+              can_support_section_102 returns False.
+    Failure mode if engine is wrong: silently accepts the forged string and
+              establishes legal correspondence.
+    """
+    eng = CorrespondenceEngine()
+    candidate = eng.propose_candidate_correspondence(
+        limitation_text="a valve mechanism",
+        claim_text="a valve mechanism",
+        claim_number=1,
+        reference_patent="US123",
+        limitation_id="L1",
+        proposed_passage="a valve mechanism",
+        proposed_relationship="model proposes correspondence",
+    )
+    assert candidate.status == CorrespondenceStatus.CANDIDATE
+
+    # Attempt to confirm via MANUAL_EXPERT with a forged reviewer string but
+    # NO CorrespondenceAttestation
+    confirmed = eng.confirm_candidate(
+        candidate=candidate,
+        confirming_rule=CorrespondenceRule.MANUAL_EXPERT,
+        confirming_evidence="Expert says this corresponds",
+        confirming_reviewer="EXPERT:J.Doe",  # Forged string
+        correspondence_type=CorrespondenceType.VERBATIM,
+        disclosure_type=DisclosureType.VERBATIM_EXPLICIT_CLAIM_DISCLOSURE,
+        attestation=None,  # NO ATTESTATION
+    )
+    # Must NOT reach ESTABLISHED
+    assert confirmed.status != CorrespondenceStatus.ESTABLISHED, (
+        "FAIL: MANUAL_EXPERT reached ESTABLISHED with only a free-form reviewer "
+        "string. A forged string is not evidence of an expert review."
+    )
+    assert not confirmed.can_support_section_102, (
+        "FAIL: forged MANUAL_EXPERT supported §102."
+    )
+    assert "attestation" in confirmed.unresolved_reason.lower(), (
+        f"FAIL: unresolved_reason should mention attestation. Got: {confirmed.unresolved_reason}"
+    )
+
+    # Now provide a real attestation — should succeed
+    real_attestation = CorrespondenceAttestation(
+        reviewer_id="pa-001",
+        reviewer_role="PATENT_AGENT",
+        decision="ESTABLISHED",
+        rationale="Reviewed the claim and limitation; correspondence confirmed.",
+        evidence_hash="abc123def456",
+    )
+    # Need a fresh candidate because confirm_candidate mutated the previous one
+    candidate2 = eng.propose_candidate_correspondence(
+        limitation_text="a valve mechanism",
+        claim_text="a valve mechanism",
+        claim_number=1,
+        reference_patent="US123",
+        limitation_id="L2",
+        proposed_passage="a valve mechanism",
+        proposed_relationship="model proposes correspondence",
+    )
+    confirmed2 = eng.confirm_candidate(
+        candidate=candidate2,
+        confirming_rule=CorrespondenceRule.MANUAL_EXPERT,
+        confirming_evidence="Expert says this corresponds",
+        confirming_reviewer="EXPERT:J.Doe",
+        correspondence_type=CorrespondenceType.VERBATIM,
+        disclosure_type=DisclosureType.VERBATIM_EXPLICIT_CLAIM_DISCLOSURE,
+        attestation=real_attestation,
+    )
+    assert confirmed2.status == CorrespondenceStatus.ESTABLISHED, (
+        "FAIL: MANUAL_EXPERT with valid attestation should reach ESTABLISHED."
+    )
+    assert confirmed2.can_support_section_102, (
+        "FAIL: MANUAL_EXPERT with valid attestation should support §102."
+    )
+    print(f"✅ Test 27 (forged reviewer rejected): MANUAL_EXPERT requires CorrespondenceAttestation (twentieth round)")
+
+
+def test_public_availability_publication_date_conflict():
+    """Test 28: public_availability_date conflicts with publication_date.
+
+    Per CEO directive (twentieth round — P1):
+      'public availability conflicts with publication date' must fail closed.
+
+    Setup: publication_date 1988-05-10, public_availability_date 1990-01-01.
+           A document cannot be formally published BEFORE it is publicly
+           available — this is suspicious.
+    Expected: eligibility = UNKNOWN, eligibility_phase = EMPTY,
+              analysis_completeness = INCOMPLETE.
+    Failure mode if engine is wrong: returns ELIGIBLE based on the earlier
+              publication_date without flagging the inconsistency.
+    """
+    ev = PriorArtEligibilityEvidence(
+        candidate_critical_date="2024-03-15",
+        reference_publication_date="1988-05-10",  # Published
+        public_availability_date="1990-01-01",    # But not publicly available until 1990?!
+        jurisdiction="US",
+        applicable_rule="35 USC 102(a)(1)",
+        legal_rule_application_evidence="Applied 35 USC 102(a)(1): public_availability_date precedes critical_date.",
+    )
+    ev.evaluate()
+
+    assert ev.eligibility == "UNKNOWN", (
+        f"FAIL: eligibility={ev.eligibility} despite publication_date < "
+        f"public_availability_date. Inconsistent dates must yield UNKNOWN."
+    )
+    assert ev.eligibility_phase == EligibilityPhase.EMPTY.value, (
+        f"FAIL: phase={ev.eligibility_phase} despite date conflict."
+    )
+    assert "inconsistency" in ev.eligibility_reasoning.lower(), (
+        f"FAIL: reasoning should flag inconsistency. Got: {ev.eligibility_reasoning}"
+    )
+    print(f"✅ Test 28 (date conflict): eligibility=UNKNOWN, flagged inconsistency (twentieth round)")
+
+
+def test_jurisdiction_rule_mismatch_fails_closed():
+    """Test 29: jurisdiction/rule mismatch.
+
+    Per CEO directive (twentieth round — P1):
+      'jurisdiction/rule mismatch occurs' must fail closed.
+
+    Setup: jurisdiction='EPO' but applicable_rule mentions 'USC' (US law).
+    Expected: eligibility = UNKNOWN, eligibility_phase = EMPTY,
+              analysis_completeness = INCOMPLETE.
+    Failure mode if engine is wrong: applies the wrong jurisdiction's rule
+              and returns ELIGIBLE.
+    """
+    ev = PriorArtEligibilityEvidence(
+        candidate_critical_date="2024-03-15",
+        reference_publication_date="1988-05-10",
+        public_availability_date="1988-05-10",
+        jurisdiction="EPO",  # European Patent Office
+        applicable_rule="35 USC 102(a)(1)",  # But US rule!
+        legal_rule_application_evidence="Applied 35 USC 102(a)(1): public_availability_date 1988-05-10 precedes critical_date 2024-03-15.",
+    )
+    ev.evaluate()
+
+    assert ev.eligibility == "UNKNOWN", (
+        f"FAIL: eligibility={ev.eligibility} despite jurisdiction/rule mismatch. "
+        f"EPO jurisdiction cannot use USC rules."
+    )
+    assert ev.eligibility_phase == EligibilityPhase.EMPTY.value, (
+        f"FAIL: phase={ev.eligibility_phase} despite jurisdiction/rule mismatch."
+    )
+    assert "mismatch" in ev.eligibility_reasoning.lower(), (
+        f"FAIL: reasoning should flag mismatch. Got: {ev.eligibility_reasoning}"
+    )
+
+    # Also test the reverse: US jurisdiction with EPC rule
+    ev2 = PriorArtEligibilityEvidence(
+        candidate_critical_date="2024-03-15",
+        reference_publication_date="1988-05-10",
+        public_availability_date="1988-05-10",
+        jurisdiction="US",
+        applicable_rule="EPC Art 54(2)",  # European rule!
+        legal_rule_application_evidence="Applied EPC Art 54(2): publicly available before priority date.",
+    )
+    ev2.evaluate()
+    assert ev2.eligibility == "UNKNOWN", (
+        f"FAIL: eligibility={ev2.eligibility} despite US/EPC mismatch."
+    )
+    print(f"✅ Test 29 (jurisdiction/rule mismatch): both directions fail closed (twentieth round)")
+
+
+# Additional positive tests for the new four-phase eligibility model
+
+
+def test_eligibility_four_phases_progress_correctly():
+    """Test 30: Four-phase eligibility progression.
+
+    Verify that:
+      - Empty evidence → phase=EMPTY
+      - Dates only → phase=SOURCE_DATES_COMPLETE, completeness=SIMPLIFIED
+      - + jurisdiction+rule → phase=LEGAL_RULE_IDENTIFIED, completeness=SIMPLIFIED
+      - + application_evidence → phase=ELIGIBILITY_ESTABLISHED, completeness=COMPLETE
+    """
+    # Phase 0: Empty
+    ev0 = PriorArtEligibilityEvidence()
+    ev0.evaluate()
+    assert ev0.eligibility_phase == EligibilityPhase.EMPTY.value
+    assert ev0.analysis_completeness == "INCOMPLETE"
+
+    # Phase 1: SOURCE_DATES_COMPLETE (with publication_date fallback)
+    ev1 = PriorArtEligibilityEvidence(
+        candidate_critical_date="2024-03-15",
+        reference_publication_date="1988-05-10",
+    )
+    ev1.evaluate()
+    assert ev1.eligibility_phase == EligibilityPhase.SOURCE_DATES_COMPLETE.value, (
+        f"Phase 1 failed: {ev1.eligibility_phase}"
+    )
+    assert ev1.analysis_completeness == "SIMPLIFIED"
+
+    # Phase 2: LEGAL_RULE_IDENTIFIED
+    ev2 = PriorArtEligibilityEvidence(
+        candidate_critical_date="2024-03-15",
+        reference_publication_date="1988-05-10",
+        public_availability_date="1988-05-10",
+        jurisdiction="US",
+        applicable_rule="35 USC 102(a)(1)",
+    )
+    ev2.evaluate()
+    assert ev2.eligibility_phase == EligibilityPhase.LEGAL_RULE_IDENTIFIED.value, (
+        f"Phase 2 failed: {ev2.eligibility_phase}"
+    )
+    assert ev2.analysis_completeness == "SIMPLIFIED"
+
+    # Phase 4: ELIGIBILITY_ESTABLISHED (with application evidence)
+    ev4 = PriorArtEligibilityEvidence(
+        candidate_critical_date="2024-03-15",
+        reference_publication_date="1988-05-10",
+        public_availability_date="1988-05-10",
+        jurisdiction="US",
+        applicable_rule="35 USC 102(a)(1)",
+        legal_rule_application_evidence=(
+            "Applied 35 USC 102(a)(1): the reference was publicly available "
+            "on 1988-05-10, which precedes the candidate's critical date of "
+            "2024-03-15 by approximately 36 years."
+        ),
+    )
+    ev4.evaluate()
+    assert ev4.eligibility_phase == EligibilityPhase.ELIGIBILITY_ESTABLISHED.value, (
+        f"Phase 4 failed: {ev4.eligibility_phase}"
+    )
+    assert ev4.analysis_completeness == "COMPLETE"
+    assert ev4.eligibility == "ELIGIBLE"
+    print(f"✅ Test 30 (four-phase progression): EMPTY → SOURCE_DATES → LEGAL_RULE_IDENTIFIED → ELIGIBILITY_ESTABLISHED (twentieth round)")
+
+
+def test_claim_dependency_supports_102():
+    """Test 31: EXPLICIT_DEPENDENCY + CLAIM_DEPENDENCY supports §102.
+
+    The second automatic §102 path (after VERBATIM). Verifies that
+    inheritance from a parent claim still constitutes automatic §102 support.
+    """
+    c = LimitationCorrespondence(
+        limitation_id="L1",
+        reference_patent="US123",
+        claim_number=5,  # Dependent claim
+        claim_passage="a fluid entry port",
+        claim_start_offset=0,
+        claim_end_offset=17,
+        correspondence_type=CorrespondenceType.EXPLICIT_DEPENDENCY,
+        disclosure_type=DisclosureType.CLAIM_DEPENDENCY,
+        status=CorrespondenceStatus.ESTABLISHED,
+        rule=CorrespondenceRule.DEPENDENCY_INHERITANCE,
+        supporting_evidence="Inherited from parent claim 1",
+        technical_relationship="Claim 5 depends on claim 1",
+        reviewer="DEPENDENCY_INHERITANCE_AUTO",
+    )
+    assert c.can_support_section_102, (
+        "FAIL: EXPLICIT_DEPENDENCY + CLAIM_DEPENDENCY should support §102."
+    )
+    assert not c.requires_legal_decision, (
+        "FAIL: EXPLICIT_DEPENDENCY should not require a legal decision."
+    )
+    print(f"✅ Test 31 (claim dependency): EXPLICIT_DEPENDENCY supports §102 (twentieth round)")
+
+
 
 def run_all_tests():
     """Run all anti-gaming tests."""
@@ -1040,9 +1527,19 @@ def run_all_tests():
     test_synthetic_rejected_for_real_verdicts()
     test_live_transport_rejects_caller_supplied_response()
 
+    # Twentieth round (CEO deep audit) — P0/P1 adversarial regression
+    test_eligibility_fields_populated_but_rule_never_applied()
+    test_functional_equivalence_marked_explicit_does_not_support_102()
+    test_supporting_evidence_changed_provenance_hash_mismatch()
+    test_forged_reviewer_string_rejected_for_manual_expert()
+    test_public_availability_publication_date_conflict()
+    test_jurisdiction_rule_mismatch_fails_closed()
+    test_eligibility_four_phases_progress_correctly()
+    test_claim_dependency_supports_102()
+
     print()
     print("=" * 60)
-    print("ALL 23 ANTI-GAMING TESTS PASSED")
+    print("ALL 31 ANTI-GAMING TESTS PASSED")
     print("=" * 60)
     return True
 

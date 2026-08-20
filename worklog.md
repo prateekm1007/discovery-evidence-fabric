@@ -2193,3 +2193,114 @@ Portfolio status after #2L + #9/#10 + #6 V6 + #7 V4 + #8 V3:
   #10: V1 DISCOVERY COMPLETE — M1 ML predictive failure leading
     - Mechanism 50% / Engineering 10% / Robustness 10% / IP 30% / Validation 0%
 
+
+---
+Task ID: ROUND-20-DEEP-AUDIT-ELIGIBILITY-ATTESTATION-PROVENANCE
+Agent: main (session 2026-08-21)
+Task: Per CEO 2026-08-21 deep audit — implement four P0 fixes and one P1 set for the
+correspondence engine and prior-art eligibility layer. Make the legal-correspondence
+and eligibility claims independently auditable, not more aggressive.
+
+Work Log:
+- Pre-session Constitution gate: re-acknowledged Constitution v1.5.0 (was stale at
+  v1.4.0). Acknowledgment recorded in approved_provenance/CONSTITUTION_ACKNOWLEDGMENT.json
+  with full intended_change description. G14 constitution gate now ✅ GREEN.
+
+- P0-1 (Four-state prior-art eligibility):
+  Replaced binary analysis_completeness (COMPLETE/SIMPLIFIED/INCOMPLETE) with
+  EligibilityPhase enum: EMPTY → SOURCE_DATES_COMPLETE → LEGAL_RULE_IDENTIFIED →
+  LEGAL_RULE_APPLIED → ELIGIBILITY_ESTABLISHED. Added legal_rule_application_evidence
+  field — a non-trivial (>= 20 chars) description of HOW the rule was applied to
+  the specific dates. A populated applicable_rule field now only reaches
+  LEGAL_RULE_IDENTIFIED, NOT LEGAL_RULE_APPLIED. ELIGIBILITY_ESTABLISHED requires
+  all four phases evidenced. analysis_completeness is retained as a derived field
+  for backward compatibility.
+
+- P0-2 (Equivalence is not automatic anticipation):
+  Split DisclosureType.EXPLICIT_CLAIM_DISCLOSURE into:
+    - VERBATIM_EXPLICIT_CLAIM_DISCLOSURE (only available when
+      correspondence_type==VERBATIM; auto-supports §102)
+    - EXPERT_DECLARED_EQUIVALENCE (for STRUCTURAL/FUNCTIONAL_EQUIVALENT;
+      does NOT auto-support §102)
+  EXPLICIT_CLAIM_DISCLOSURE is retained for backward compat but NO LONGER
+  auto-supports §102. Added LegalCorrespondenceDecision dataclass with
+  LegalDecisionVerdict (SUPPORTS_102 / DOES_NOT_SUPPORT_102 /
+  REQUIRES_MORE_EVIDENCE), reviewer_id, reviewer_role, jurisdiction,
+  legal_basis, rationale, evidence_hash, decision_id.
+  Structural invariant in __post_init__: VERBATIM correspondence can ONLY
+  have VERBATIM_EXPLICIT_CLAIM_DISCLOSURE; VERBATIM_EXPLICIT_CLAIM_DISCLOSURE
+  can ONLY be on VERBATIM correspondence. Equivalence requires
+  LegalCorrespondenceDecision to support §102.
+
+- P0-3 (Cryptographic binding of entire correspondence):
+  provenance_hash now binds 14 fields:
+    limitation_id, reference_patent, claim_number, claim_passage (full),
+    claim_start_offset, claim_end_offset, correspondence_type,
+    disclosure_type, rule, supporting_evidence, technical_relationship,
+    reviewer, raw_response_hash, source_node_identifier
+  PLUS attestation.attestation_id + attestation.evidence_hash (if attested)
+  PLUS legal_decision.decision_id + legal_decision.evidence_hash (if decided).
+  Added verify_provenance_integrity() method — returns False if any underlying
+  field has been altered without recomputing the hash.
+  can_support_section_102 now requires verify_provenance_integrity()==True
+  as an invariant. Tampering ANY of the 14 fields silently invalidates the
+  hash and disables §102 support.
+
+- P0-4 (CorrespondenceAttestation object):
+  Added CorrespondenceAttestation dataclass with reviewer_id, reviewer_role,
+  decision, rationale, evidence_hash (must be >= 8 chars), timestamp,
+  attestation_id. Validates that all fields are non-empty and evidence_hash
+  is non-trivial. MANUAL_EXPERT correspondence now REQUIRES an attestation
+  to reach ESTABLISHED status. confirm_candidate() refuses to set
+  status=ESTABLISHED for MANUAL_EXPERT without attestation — the candidate
+  remains CANDIDATE with an unresolved_reason explaining the requirement.
+
+- P1 (Adversarial regression tests):
+  Added 8 new tests to anti_gaming_tests.py:
+    Test 24: eligibility fields populated but rule never applied → SIMPLIFIED
+    Test 25: functional equivalence marked explicit → backdoor closed
+    Test 26: supporting evidence tampering → hash mismatch detected (all 8 fields)
+    Test 27: forged reviewer string → MANUAL_EXPERT blocked without attestation
+    Test 28: public_availability vs publication date conflict → UNKNOWN
+    Test 29: jurisdiction/rule mismatch (EPO+USC, US+EPC) → UNKNOWN
+    Test 30: four-phase eligibility progression (positive test)
+    Test 31: EXPLICIT_DEPENDENCY + CLAIM_DEPENDENCY supports §102 (positive test)
+
+- Attack-the-attacker verification (/home/z/my-project/scripts/attack_round20_fixes.py):
+  All 4 P0 fixes survive their targeted attack scenarios. All 14 provenance
+  fields protected. Each attack is BLOCKED with a clear failure mode.
+
+Test Results:
+- 31/31 anti-gaming tests pass (23 original + 8 new)
+- All 4 attack-the-attacker scenarios BLOCKED
+- Constitution gate: ✅ GREEN (v1.5.0 acknowledged)
+- Pre-commit constitution check: ✅ passes
+- Certification gate (in-place): G14 constitution ✅; G2/G3 gauntlet ✅;
+  G4 state reconciliation ✅; G6-G12 ✅. G0/G1/G5/G13 fail for pre-existing
+  reasons (dirty worktree from uncommitted changes; pre-existing T6/T7
+  portfolio/ledger version mismatch) — NOT introduced by this commit.
+
+Stage Summary:
+- Prior-art eligibility maturity: 🟡 → ✅ (four-phase model with explicit
+  rule-application evidence)
+- Legal-rule application proof: 🔴 → ✅ (legal_rule_application_evidence
+  field, fail-closed when absent)
+- Complete provenance hash: 🔴 → ✅ (14 fields + attestation + legal_decision)
+- Reviewer attestation: 🔴 → ✅ (CorrespondenceAttestation, required for
+  MANUAL_EXPERT)
+- Robust §102: 🔴 → 🟡 (automatic path locked down; equivalence requires
+  LegalCorrespondenceDecision. §103 still 🔴 — not addressed in this round.)
+- Patent engine maturity table updates:
+    Prior-art eligibility model:    🟡 → ✅
+    Legal-rule application proof:   🔴 → ✅
+    Complete provenance hash:       🔴 → ✅
+    Reviewer attestation:           🔴 → ✅
+    Robust §102:                    🔴 → 🟡 (automatic path locked, equivalence
+                                       requires separate legal decision)
+    §103:                           🔴 (unchanged)
+    Complete C04 destruction:       🔴 (unchanged — needs §103)
+    Complete C09 destruction:       🔴 (unchanged — needs §103)
+    Main invention-loop integration: 🔴 (unchanged)
+- 5-Invention Checklist unchanged: 0/5 completed.
+- Next milestone per CEO: §103 framework, then C04/C09 destruction
+  completion, then main invention-loop integration.
