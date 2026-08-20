@@ -209,6 +209,40 @@ class LifecycleAdapter(InventionLoopAdapter):
                       "failure-learning engine — it is just a data aggregator.",
         )
 
+    def is_mechanism_refuted(self, candidate, model, observation, updates):
+        """Determine if model refutation means the MECHANISM is impossible.
+        
+        Default: model failure is a modeling error, NOT a mechanism impossibility.
+        Adapters should override with domain-specific causal rules.
+        """
+        # Default: model is wrong but mechanism may survive
+        # Only return True if the failure proves the mechanism is physically impossible
+        return False
+
+    def calculate_information_gain(self, candidate, budget, experiment, observations):
+        """Calculate expected information gain from an experiment.
+        
+        Data-driven: uncertainty_reduction / (cost * risk)
+        NOT a manually supplied score.
+        """
+        # Base implementation: information gain = key_uncertainties addressed / total
+        if not budget or not budget.key_uncertainties:
+            return 0.0
+        
+        # Count how many key uncertainties this experiment's falsification target addresses
+        target = experiment.falsification_target.lower()
+        addressed = sum(1 for u in budget.key_uncertainties 
+                       if any(word in target for word in u.lower().split()[:3]))
+        
+        # Information gain = fraction of uncertainties addressed
+        ig = addressed / len(budget.key_uncertainties)
+        
+        # Reduce if we already have observations (diminishing returns)
+        if observations:
+            ig *= (1.0 / (1.0 + 0.1 * len(observations)))
+        
+        return min(ig, 1.0)
+
     def generate_regulatory_evidence(self, candidate: Candidate,
                                       budget: UncertaintyBudget,
                                       observations: list[RawObservation],

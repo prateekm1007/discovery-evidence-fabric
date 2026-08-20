@@ -52,6 +52,23 @@ class EvidenceType(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
+class ParameterClassification(str, Enum):
+    """Classification of every numerical parameter used in experiments/models.
+
+    Per CEO directive (P0.2): No unclassified number may enter an experiment
+    or falsification decision. Every parameter must be classified.
+
+    This prevents silent semantic drift (Article VII) where invented numbers
+    become frozen targets.
+    """
+    EVIDENCE_BOUND = "EVIDENCE_BOUND"              # Bound by external evidence (literature, IFU)
+    MODEL_ASSUMPTION = "MODEL_ASSUMPTION"           # Assumed for modeling, not externally bound
+    EXPERIMENTALLY_MEASURED = "EXPERIMENTALLY_MEASURED"  # Measured in a physical experiment
+    BUYER_DEFINED = "BUYER_DEFINED"                 # Defined by buyer requirement (CereVasc)
+    FROZEN_PROTOCOL = "FROZEN_PROTOCOL"             # From a frozen protocol artifact (e.g., R6 V22.5)
+    UNKNOWN = "UNKNOWN"                             # Must not enter experiments until classified
+
+
 class LoopState(str, Enum):
     """The states of the invention loop state machine."""
     CANDIDATE = "CANDIDATE"
@@ -67,8 +84,14 @@ class LoopState(str, Enum):
     INFORMATION_GAIN_RANKING = "INFORMATION_GAIN_RANKING"
     NEXT_FALSIFICATION_EXPERIMENT = "NEXT_FALSIFICATION_EXPERIMENT"
     EVIDENCE_DOSSIER = "EVIDENCE_DOSSIER"
-    KILLED = "KILLED"
+    # Epistemic failure states (Article XXIX — separate implementation from mechanism)
+    MODEL_REFUTED = "MODEL_REFUTED"            # Model prediction contradicted; model needs revision
+    EMBODIMENT_FAILED = "EMBODIMENT_FAILED"    # One prototype failed; other embodiments may survive
+    MECHANISM_REFUTED = "MECHANISM_REFUTED"    # The causal mechanism itself is proven impossible
+    CANDIDATE_KILLED = "CANDIDATE_KILLED"      # The invention concept is dead (mechanism or problem killed)
+    KILLED = "KILLED"                          # Alias for CANDIDATE_KILLED (backward compat)
     BLOCKED = "BLOCKED"
+    INCOMPLETE = "INCOMPLETE"                  # Dossier not yet completable (missing stages)
 
 
 @dataclass
@@ -207,6 +230,39 @@ class CausalGraph:
 
 
 @dataclass
+class ClassifiedParameter:
+    """A numerical parameter with mandatory classification.
+
+    Per CEO directive (P0.2): No unclassified number may enter an experiment
+    or falsification decision. This prevents silent semantic drift where
+    invented numbers become frozen targets.
+    """
+    name: str
+    value: float
+    unit: str
+    classification: ParameterClassification
+    source: str = ""  # Where did this value come from?
+    provenance: Provenance = field(default_factory=Provenance)
+
+    def __post_init__(self):
+        if self.classification == ParameterClassification.UNKNOWN:
+            raise ValueError(
+                f"Parameter '{self.name}' has UNKNOWN classification. "
+                f"No unclassified number may enter an experiment or falsification decision. "
+                f"Classify it as EVIDENCE_BOUND, MODEL_ASSUMPTION, EXPERIMENTALLY_MEASURED, "
+                f"BUYER_DEFINED, or FROZEN_PROTOCOL before use."
+            )
+
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name, "value": self.value, "unit": self.unit,
+            "classification": self.classification.value,
+            "source": self.source,
+            "provenance": self.provenance.to_dict(),
+        }
+
+
+@dataclass
 class MechanisticModel:
     """A simulator that tries to KILL the candidate (not validate it)."""
     candidate_id: str
@@ -214,6 +270,7 @@ class MechanisticModel:
     model_type: str  # CFD, PK/PD, FEA, control, etc.
     assumptions: list[str] = field(default_factory=list)
     parameters: dict[str, Any] = field(default_factory=dict)
+    classified_parameters: list[ClassifiedParameter] = field(default_factory=list)
     prediction: dict[str, Any] = field(default_factory=dict)
     model_hash: str = ""  # Hash of model code/config for reproducibility
     provenance: Provenance = field(default_factory=Provenance)
@@ -228,7 +285,9 @@ class MechanisticModel:
         return {
             "candidate_id": self.candidate_id, "model_name": self.model_name,
             "model_type": self.model_type, "assumptions": self.assumptions,
-            "parameters": self.parameters, "prediction": self.prediction,
+            "parameters": self.parameters,
+            "classified_parameters": [p.to_dict() for p in self.classified_parameters],
+            "prediction": self.prediction,
             "model_hash": self.model_hash, "provenance": self.provenance.to_dict(),
         }
 

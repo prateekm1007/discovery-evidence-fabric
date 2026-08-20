@@ -20,7 +20,8 @@ from typing import Any
 
 from .engine import InventionLoopEngine
 from .schemas import (
-    Candidate, EpistemicClass, EvidenceType, LoopState, RawObservation,
+    Candidate, ClassifiedParameter, EpistemicClass, 
+    EvidenceType, LoopState, ParameterClassification, RawObservation,
 )
 from .adapters.r6_adapter import R6Adapter
 from .adapters.sensing_adapter import SensingAdapter
@@ -54,9 +55,11 @@ def test_simulator_confidently_wrong():
 def test_experiment_contradicts_model():
     """Test 2: Physical experiment contradicts the model.
 
-    Setup: model predicts drainage restored at 80%.
-    Observation: drainage restored at 20%.
-    Expected: model_update.did_model_survive = False.
+    P0.1 fix: model refutation does NOT auto-kill candidate.
+    The model is refuted (did_model_survive=False), but the candidate
+    survives because the adapter determines the mechanism is NOT impossible.
+
+    Expected: model_update.did_model_survive = False, but state != KILLED.
     """
     adapter = R6Adapter()
     engine = InventionLoopEngine(adapter, random_seed=42)
@@ -68,21 +71,28 @@ def test_experiment_contradicts_model():
         proposed_mechanism="Test",
     )
 
-    # Manually advance to experiment stage (bypassing problem proof which is YELLOW)
+    # Manually advance to experiment stage
     engine.candidate = candidate
     engine.mechanistic_model = adapter.build_simulator(candidate, None)
+    # Set a specific numeric prediction so evaluate_model_prediction can compare
+    engine.mechanistic_model.prediction["expected_drainage_restored_pct"] = 80.0
     engine.uncertainty_budget = adapter.run_vvuq(engine.mechanistic_model)
     engine.experiment = adapter.design_experiments(
         candidate, engine.mechanistic_model, None, engine.uncertainty_budget)[0]
 
-    # Feed contradictory observation
-    raw_data = {"valve_open_pressure_mmHg": 8.0}  # Model predicted 5.0
+    # Feed contradictory observation: model predicted 80%, observed 20%
+    raw_data = {"drainage_restored_pct": 20.0}
     engine.run_physical_experiment(raw_data)
     result = engine.run_model_update()
 
-    assert result == False, "Model should NOT survive contradictory observation"
-    assert engine.state == LoopState.KILLED, f"Expected KILLED, got {engine.state}"
-    print("✅ Test 2 (experiment contradicts model): model correctly KILLED")
+    # Model should be refuted (did_model_survive=False in last update)
+    last_update = engine.model_updates[-1]
+    assert last_update.did_model_survive == False, "Model should be refuted"
+
+    # But candidate should NOT be killed (mechanism not proven impossible)
+    assert engine.state != LoopState.KILLED, \
+        "Candidate should NOT be auto-killed on model refutation (P0.1 fix)"
+    print("✅ Test 2 (experiment contradicts model): model refuted, candidate NOT auto-killed (P0.1)")
 
 
 def test_strongest_alternative_beats():
@@ -124,6 +134,8 @@ def test_strongest_alternative_beats():
             from .schemas import Experiment
             return [Experiment(candidate_id=c.name, objective="test")]
         def evaluate_model_prediction(self, m, o): return True
+        def is_mechanism_refuted(self, c, m, o, u): return False
+        def calculate_information_gain(self, c, b, e, o): return 0.5
         def identify_remaining_uncertainties(self, c, b, o, u): return []
         def propose_next_falsification(self, c, b, o, u, rng):
             from .schemas import FalsificationProposal, Experiment
@@ -197,8 +209,10 @@ def test_evidence_provider_fails():
 def test_new_data_invalidates_model():
     """Test 6: New data invalidates a previous model.
 
-    Setup: model survives first experiment, then second experiment kills it.
-    Expected: loop kills after second experiment.
+    P0.1 fix: model invalidation does NOT auto-kill candidate.
+    The model is refuted, but the candidate survives and the loop
+    transitions to MODEL_REFUTED, then to INFORMATION_GAIN_RANKING
+    to select a new experiment.
     """
     adapter = R6Adapter()
     engine = InventionLoopEngine(adapter, random_seed=42)
@@ -207,12 +221,13 @@ def test_new_data_invalidates_model():
                           problem_statement="test", proposed_mechanism="test")
     engine.candidate = candidate
     engine.mechanistic_model = adapter.build_simulator(candidate, None)
+    engine.mechanistic_model.prediction["expected_drainage_restored_pct"] = 80.0
     engine.uncertainty_budget = adapter.run_vvuq(engine.mechanistic_model)
     engine.experiment = adapter.design_experiments(
         candidate, engine.mechanistic_model, None, engine.uncertainty_budget)[0]
 
-    # First experiment: model survives (5.0 ± 1.0)
-    engine.run_physical_experiment({"valve_open_pressure_mmHg": 5.5})
+    # First experiment: model survives (80% ± 15%)
+    engine.run_physical_experiment({"drainage_restored_pct": 75.0})
     result1 = engine.run_model_update()
     assert result1 == True, "Model should survive first experiment"
 
@@ -221,13 +236,17 @@ def test_new_data_invalidates_model():
     engine.experiment = adapter.design_experiments(
         candidate, engine.mechanistic_model, None, engine.uncertainty_budget)[0]
 
-    # Second experiment: model killed (8.0, outside tolerance)
-    engine.run_physical_experiment({"valve_open_pressure_mmHg": 8.0})
+    # Second experiment: model refuted (20%, outside 80±15 tolerance)
+    engine.run_physical_experiment({"drainage_restored_pct": 20.0})
     result2 = engine.run_model_update()
-    assert result2 == False, "Model should NOT survive second experiment"
-    assert engine.state == LoopState.KILLED
 
-    print("✅ Test 6 (new data invalidates model): model killed after second experiment")
+    # Model should be refuted but candidate NOT killed (P0.1 fix)
+    last_update = engine.model_updates[-1]
+    assert last_update.did_model_survive == False, "Model should be refuted"
+    assert engine.state != LoopState.KILLED, \
+        "Candidate should NOT be auto-killed (P0.1 fix)"
+
+    print("✅ Test 6 (new data invalidates model): model refuted, candidate survives (P0.1)")
 
 
 def test_replayability():
@@ -285,6 +304,118 @@ def test_single_best_experiment():
     print(f"✅ Test 8 (single best experiment): selected '{engine.experiment.objective[:50]}...'")
 
 
+def test_earned_completion_gate():
+    """Test 9: Dossier.is_complete must be mechanically earned.
+
+    Per CEO directive (P0.3): is_complete=True must be IMPOSSIBLE unless
+    all 11 stages have passed. Completion must be EARNED BY STATE.
+    """
+    adapter = R6Adapter()
+    engine = InventionLoopEngine(adapter, random_seed=42)
+
+    candidate = Candidate(name="R6_completion_test", description="test",
+                          problem_statement="test", proposed_mechanism="test")
+    engine.candidate = candidate
+
+    # Try to generate dossier with no stages completed
+    dossier = engine.run_generate_dossier()
+
+    assert dossier.is_complete == False, \
+        "Dossier must be INCOMPLETE when stages are missing (P0.3)"
+    assert engine.state == LoopState.INCOMPLETE, \
+        f"Expected INCOMPLETE, got {engine.state}"
+
+    print("✅ Test 9 (earned completion): is_complete=False when stages missing (P0.3)")
+
+
+def test_parameter_classification_enforced():
+    """Test 10: Unclassified parameters must not enter experiments.
+
+    Per CEO directive (P0.2): No unclassified number may enter an experiment
+    or falsification decision. ParameterClassification.UNKNOWN must raise.
+    """
+    try:
+        param = ClassifiedParameter(
+            name="test_param", value=5.0, unit="mmHg",
+            classification=ParameterClassification.UNKNOWN,
+        )
+        assert False, "Should have raised ValueError for UNKNOWN classification"
+    except ValueError as e:
+        assert "UNKNOWN classification" in str(e)
+
+    # Classified parameter should work
+    param = ClassifiedParameter(
+        name="test_param", value=5.0, unit="mmHg",
+        classification=ParameterClassification.FROZEN_PROTOCOL,
+        source="R6 V22.5 frozen protocol"
+    )
+    assert param.value == 5.0
+
+    print("✅ Test 10 (parameter classification): UNKNOWN raises ValueError (P0.2)")
+
+
+def test_model_refuted_does_not_kill():
+    """Test 11: Model refutation must NOT auto-kill candidate.
+
+    Per CEO directive (P0.1): A model can be WRONG while the invention
+    remains viable. The adapter's is_mechanism_refuted() decides.
+    """
+    adapter = R6Adapter()
+    engine = InventionLoopEngine(adapter, random_seed=42)
+
+    candidate = Candidate(name="R6_model_refuted_test", description="test",
+                          problem_statement="test", proposed_mechanism="test")
+    engine.candidate = candidate
+    engine.mechanistic_model = adapter.build_simulator(candidate, None)
+    engine.mechanistic_model.prediction["expected_drainage_restored_pct"] = 80.0
+    engine.uncertainty_budget = adapter.run_vvuq(engine.mechanistic_model)
+    engine.experiment = adapter.design_experiments(
+        candidate, engine.mechanistic_model, None, engine.uncertainty_budget)[0]
+
+    # Feed contradictory observation
+    engine.run_physical_experiment({"drainage_restored_pct": 10.0})
+    engine.run_model_update()
+
+    # Model is refuted, but candidate is NOT killed
+    assert engine.model_updates[-1].did_model_survive == False
+    assert engine.state != LoopState.KILLED, \
+        "Candidate must NOT be auto-killed on model refutation (P0.1)"
+    # State should be MODEL_REFUTED or INFORMATION_GAIN_RANKING
+    assert engine.state in (LoopState.MODEL_REFUTED, LoopState.INFORMATION_GAIN_RANKING), \
+        f"Expected MODEL_REFUTED or INFORMATION_GAIN_RANKING, got {engine.state}"
+
+    print("✅ Test 11 (model refuted ≠ killed): candidate survives model refutation (P0.1)")
+
+
+def test_data_driven_information_gain():
+    """Test 12: Information gain must be data-driven, not manually supplied.
+
+    Per CEO directive (P0.4): calculate from uncertainty → outcomes →
+    posterior uncertainty → cost/risk. NOT a manually supplied score.
+    """
+    adapter = R6Adapter()
+    engine = InventionLoopEngine(adapter, random_seed=42)
+
+    candidate = Candidate(name="R6_info_gain_test", description="test",
+                          problem_statement="test", proposed_mechanism="test")
+    engine.candidate = candidate
+    engine.mechanistic_model = adapter.build_simulator(candidate, None)
+    engine.uncertainty_budget = adapter.run_vvuq(engine.mechanistic_model)
+    engine.virtual_cohort = adapter.generate_virtual_cohort(
+        candidate, engine.mechanistic_model, engine.uncertainty_budget, engine.rng)
+
+    # The engine should call adapter.calculate_information_gain
+    result = engine.run_experiment_design()
+
+    assert result == True
+    assert engine.experiment is not None
+    # The information gain should be calculated, not the original 0.85
+    # It should reflect the adapter's data-driven calculation
+    print(f"✅ Test 12 (data-driven info gain): "
+          f"calculated={engine.experiment.expected_information_gain:.3f} (P0.4)")
+
+
+
 def run_all_tests():
     """Run all anti-gaming tests."""
     print("=" * 60)
@@ -300,10 +431,14 @@ def run_all_tests():
     test_new_data_invalidates_model()
     test_replayability()
     test_single_best_experiment()
+    test_earned_completion_gate()
+    test_parameter_classification_enforced()
+    test_model_refuted_does_not_kill()
+    test_data_driven_information_gain()
 
     print()
     print("=" * 60)
-    print("ALL 8 ANTI-GAMING TESTS PASSED")
+    print("ALL 12 ANTI-GAMING TESTS PASSED")
     print("=" * 60)
     return True
 

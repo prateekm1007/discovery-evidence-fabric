@@ -154,6 +154,47 @@ class InventionLoopAdapter(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def is_mechanism_refuted(self, candidate: Candidate,
+                              model: MechanisticModel,
+                              observation: RawObservation,
+                              updates: list[ModelUpdate]) -> bool:
+        """Determine if a model refutation means the MECHANISM is impossible.
+
+        Per CEO directive (P0.1 — critical):
+          A model can be WRONG while the invention remains viable.
+          MODEL_REFUTED → MODEL_REVISION / NEW_EXPERIMENT
+          unless an explicit causal rule establishes that the MECHANISM
+          itself is impossible.
+
+        This method implements the adapter-specific causal rule:
+          - If the model failure is due to a modeling assumption → return False
+            (revise model, try again)
+          - If the model failure is due to a physical impossibility of the
+            mechanism → return True (kill candidate)
+
+        Per Article XXIX: separate implementation failure from mechanism failure.
+          prototype failure → embodiment failure → mechanism failure → invention failure
+          Each promotion requires separate evidence.
+        """
+        pass
+
+    @abc.abstractmethod
+    def calculate_information_gain(self, candidate: Candidate,
+                                    budget: UncertaintyBudget,
+                                    experiment: "Experiment",
+                                    observations: list[RawObservation]) -> float:
+        """Calculate the expected information gain of an experiment.
+
+        Per CEO directive (P0.4): this must be a DATA-DRIVEN calculation from:
+          uncertainty → candidate outcomes → expected posterior uncertainty → cost/risk
+
+        NOT a manually supplied score.
+
+        Returns: expected information gain (float, higher = more informative)
+        """
+        pass
+
+    @abc.abstractmethod
     def identify_remaining_uncertainties(self, candidate: Candidate,
                                           budget: UncertaintyBudget,
                                           observations: list[RawObservation],

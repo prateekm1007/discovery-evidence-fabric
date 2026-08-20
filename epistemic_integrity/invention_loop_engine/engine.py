@@ -271,8 +271,20 @@ class InventionLoopEngine:
     def run_model_update(self) -> bool:
         """Step 10: Update model from experimental evidence.
 
-        Per CEO directive: the loop must respond by CHANGING ITS NEXT EXPERIMENT,
-        not by adjusting its conclusion.
+        Per CEO directive (P0.1 — critical fix):
+          A model can be WRONG while the invention remains viable.
+          A model contradiction must NEVER automatically kill the candidate.
+          The adapter must explicitly establish the promotion rule:
+            MODEL_REFUTED → MODEL_REVISION / NEW_EXPERIMENT
+          unless an explicit causal rule establishes that the MECHANISM
+          itself is impossible.
+
+        Per Article XXIX: separate implementation failure from mechanism failure.
+          prototype failure → embodiment failure → mechanism failure → invention failure
+          Each promotion requires separate evidence.
+
+        The loop must respond by CHANGING ITS NEXT EXPERIMENT, not by
+        adjusting its conclusion.
         """
         if not self.mechanistic_model or not self.observations:
             raise RuntimeError("No model or observations")
@@ -297,8 +309,29 @@ class InventionLoopEngine:
         self.model_updates.append(update)
 
         if not did_survive:
-            self._kill(f"Model refuted by experiment {latest_obs.observation_id[:8]}...")
-            return False
+            # CRITICAL FIX: Model refuted does NOT auto-kill candidate.
+            # Transition to MODEL_REFUTED, then ask adapter if mechanism is refuted.
+            self._record_transition(LoopState.MODEL_REFUTED,
+                                    f"Model refuted by experiment {latest_obs.observation_id[:8]}... "
+                                    f"— but candidate NOT auto-killed. "
+                                    f"Asking adapter if mechanism is refuted.")
+
+            # The adapter decides: is this a model error (revise model) or a
+            # mechanism impossibility (kill candidate)?
+            mechanism_refuted = self.adapter.is_mechanism_refuted(
+                self.candidate, self.mechanistic_model, latest_obs,
+                self.model_updates)
+
+            if mechanism_refuted:
+                self._kill(f"MECHANISM REFUTED: the causal mechanism is proven "
+                           f"impossible by experiment {latest_obs.observation_id[:8]}...")
+                return False
+            else:
+                # Model is wrong but mechanism may survive. Revise model / new experiment.
+                self._record_transition(LoopState.INFORMATION_GAIN_RANKING,
+                                        f"Model refuted but mechanism survives. "
+                                        f"Revising model / selecting new experiment.")
+                return True  # Continue to next experiment selection
 
         self._record_transition(LoopState.INFORMATION_GAIN_RANKING,
                                 f"Model survived experiment. Proceeding to next experiment selection.")
@@ -339,29 +372,114 @@ class InventionLoopEngine:
                                 f"(kill_prob={next_exp.kill_probability:.2f})")
         return next_exp
 
+    def _check_completion_gate(self) -> dict:
+        """Check whether all 11 stages required for completion have occurred.
+
+        Per CEO directive (P0.3): is_complete=True must be IMPOSSIBLE unless:
+          problem_proof = GREEN
+          destruction = PASSED
+          mechanistic_model = VALID
+          VVUQ = COMPLETE
+          virtual_cohort = EXECUTED
+          experiment = EXECUTED
+          raw_data = INGESTED + INTEGRITY_VERIFIED
+          model_update = COMPLETE
+          next_falsification = GENERATED
+          buyer_value = EVIDENCED
+          regulatory_dossier = COMPLETE
+
+        Any missing stage → INCOMPLETE.
+
+        Completion must be EARNED BY STATE, not asserted by the code path.
+        """
+        stages = {
+            "problem_proof_green": (
+                self.problem_proof is not None and
+                self.problem_proof.question_1_exists == "GREEN"
+            ),
+            "destruction_passed": (
+                self.causal_graph is not None and
+                len(self.causal_graph.established_infeasible_edges) == 0 and
+                len(self.causal_graph.critical_unknowns) == 0
+            ),
+            "mechanistic_model_valid": self.mechanistic_model is not None,
+            "vvuq_complete": self.uncertainty_budget is not None,
+            "virtual_cohort_executed": (
+                self.virtual_cohort is not None and
+                len(self.virtual_cohort.patients) > 0
+            ),
+            "experiment_executed": self.experiment is not None,
+            "raw_data_ingested": len(self.observations) > 0,
+            "raw_data_integrity_verified": all(
+                o.data_hash != "" for o in self.observations
+            ),
+            "model_update_complete": len(self.model_updates) > 0,
+            "next_falsification_generated": self.falsification_proposal is not None,
+            "buyer_value_evidenced": len(self.buyer_requirements) > 0 and
+                all(r.is_met is True for r in self.buyer_requirements),
+            "regulatory_dossier_complete": self.regulatory_evidence is not None,
+        }
+        missing = [name for name, passed in stages.items() if not passed]
+        return {
+            "all_stages_passed": len(missing) == 0,
+            "missing_stages": missing,
+            "stages": stages,
+        }
+
     def run_generate_dossier(self) -> Dossier:
-        """Step 13: Generate the buyer/regulatory dossier from the validated system."""
+        """Step 13: Generate the buyer/regulatory dossier from the validated system.
+
+        Per CEO directive (P0.3): is_complete=True must be MECHANICALLY EARNED.
+        If any of the 11 stages is missing, is_complete=False (INCOMPLETE).
+        """
         self.regulatory_evidence = self.adapter.generate_regulatory_evidence(
             self.candidate, self.uncertainty_budget, self.observations,
             self.model_updates)
 
+        # Check the earned completion gate
+        gate = self._check_completion_gate()
+
+        if not gate["all_stages_passed"]:
+            # Dossier is INCOMPLETE — is_complete MUST be False
+            self.dossier = Dossier(
+                candidate_id=self.candidate.name,
+                candidate=self.candidate.to_dict(),
+                problem_proof=self.problem_proof.to_dict() if self.problem_proof else {},
+                causal_graph=self.causal_graph.to_dict() if self.causal_graph else {},
+                mechanistic_model=self.mechanistic_model.to_dict() if self.mechanistic_model else {},
+                uncertainty_budget=self.uncertainty_budget.to_dict() if self.uncertainty_budget else {},
+                virtual_cohort=self.virtual_cohort.to_dict() if self.virtual_cohort else {},
+                experiments=[self.experiment.to_dict()] if self.experiment else [],
+                observations=[o.to_dict() for o in self.observations],
+                model_updates=[u.to_dict() for u in self.model_updates],
+                buyer_requirements=[r.to_dict() for r in self.buyer_requirements],
+                regulatory_evidence=self.regulatory_evidence.to_dict() if self.regulatory_evidence else {},
+                is_complete=False,  # CRITICAL: mechanically False, not asserted
+            )
+            self._record_transition(LoopState.INCOMPLETE,
+                                    f"Dossier INCOMPLETE. Missing stages: "
+                                    f"{gate['missing_stages']}")
+            return self.dossier
+
+        # All 11 stages passed — is_complete is EARNED
         self.dossier = Dossier(
             candidate_id=self.candidate.name,
             candidate=self.candidate.to_dict(),
-            problem_proof=self.problem_proof.to_dict() if self.problem_proof else {},
-            causal_graph=self.causal_graph.to_dict() if self.causal_graph else {},
-            mechanistic_model=self.mechanistic_model.to_dict() if self.mechanistic_model else {},
-            uncertainty_budget=self.uncertainty_budget.to_dict() if self.uncertainty_budget else {},
-            virtual_cohort=self.virtual_cohort.to_dict() if self.virtual_cohort else {},
-            experiments=[self.experiment.to_dict()] if self.experiment else [],
+            problem_proof=self.problem_proof.to_dict(),
+            causal_graph=self.causal_graph.to_dict(),
+            mechanistic_model=self.mechanistic_model.to_dict(),
+            uncertainty_budget=self.uncertainty_budget.to_dict(),
+            virtual_cohort=self.virtual_cohort.to_dict(),
+            experiments=[self.experiment.to_dict()],
             observations=[o.to_dict() for o in self.observations],
             model_updates=[u.to_dict() for u in self.model_updates],
             buyer_requirements=[r.to_dict() for r in self.buyer_requirements],
             regulatory_evidence=self.regulatory_evidence.to_dict(),
-            is_complete=True,
+            is_complete=True,  # EARNED by state, not asserted
         )
         self._record_transition(LoopState.EVIDENCE_DOSSIER,
-                                "Dossier generated. Loop complete.")
+                                "Dossier generated. All 11 stages PASSED. "
+                                "is_complete=True EARNED.")
         return self.dossier
 
     def _kill(self, reason: str):
@@ -374,10 +492,18 @@ class InventionLoopEngine:
         self._record_transition(LoopState.BLOCKED, reason)
 
     def _rank_by_information_gain(self, experiments: list[Experiment]) -> list[Experiment]:
-        """Rank experiments by expected information gain.
+        """Rank experiments by DATA-DRIVEN information gain.
 
-        Per CEO directive: the loop must select the SINGLE best experiment.
+        Per CEO directive (P0.4): NOT a manually supplied score.
+        Must be calculated from:
+          uncertainty → candidate outcomes → expected posterior uncertainty → cost/risk
+
+        The adapter's calculate_information_gain() method provides the
+        domain-specific calculation.
         """
+        for exp in experiments:
+            exp.expected_information_gain = self.adapter.calculate_information_gain(
+                self.candidate, self.uncertainty_budget, exp, self.observations)
         return sorted(experiments,
                        key=lambda e: e.expected_information_gain,
                        reverse=True)
