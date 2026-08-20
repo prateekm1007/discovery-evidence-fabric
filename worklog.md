@@ -2304,3 +2304,105 @@ Stage Summary:
 - 5-Invention Checklist unchanged: 0/5 completed.
 - Next milestone per CEO: §103 framework, then C04/C09 destruction
   completion, then main invention-loop integration.
+
+---
+Task ID: ROUND-20-REPOSITORY-RECONCILIATION
+Agent: main (session 2026-08-21)
+Task: Per CEO 2026-08-21 second deep audit — repository reconciliation.
+The CEO caught an Article XXII/XXIII violation: Round-20 commit 55fb72b
+was claimed as "landed" but existed only locally. The live remote was
+still at ce4de1f (Round 19). This task performs the reconciliation the
+Constitution demands before any further work.
+
+Work Log:
+- Pre-session Constitution gate: v1.5.0 acknowledged, G14 GREEN.
+  Re-read Articles I, II, III, XXII, XXIII, XXXIV, XXXV before any action.
+
+- Repository reconciliation (the actual audit):
+    Local HEAD:                 55fb72b0730e19c6c3f78ab82c106d05810e2f40
+    Local origin/main cache:    55cb96a (STALE — needed fetch)
+    Live remote (ls-remote):    ce4de1f0a2b4aec7a5d2e7cf367d7f4a779531ee (PRE-PUSH)
+    Divergence:                 1 commit local-only (55fb72b)
+    Remote URL:                 https://github.com/prateekm1007/discovery-evidence-fabric.git
+
+  Diagnosis confirmed: the CEO was correct. 55fb72b existed only locally.
+  My previous claim "55fb72b landed" was a session-narrative claim that
+  did not match repository truth. This is exactly the Article XXIII
+  failure: "Never infer repository state from local state."
+
+- Push action:
+    Used CEO-provided PAT to push main:main.
+    Remote accepted: ce4de1f..55fb72b main -> main
+    PAT was used ONLY inline in the push command. It was NOT written to
+    any file, config, environment variable, or log. The git config was
+    not modified — the PAT was passed via the URL only for the single
+    push operation. (Per Article VI: never manufacture provenance; per
+    Article XV: the coder must disclose inconvenient results — the PAT
+    was used as instructed and discarded immediately.)
+
+- Post-push verification (three independent sources):
+    (1) ls-remote with PAT:
+        55fb72b0730e19c6c3f78ab82c106d05810e2f40  refs/heads/main
+    (2) Local HEAD:
+        55fb72b0730e19c6c3f78ab82c106d05810e2f40
+    (3) GitHub REST API (independent of git):
+        GET /repos/.../commits/55fb72b → 200 OK
+        sha:       55fb72b0730e19c6c3f78ab82c106d05810e2f40
+        author:    subagent
+        date:      2026-08-20T19:01:16Z
+        url:       https://github.com/prateekm1007/discovery-evidence-fabric/commit/55fb72b0730e19c6c3f78ab82c106d05810e2f40
+
+  All three sources agree. Remote truth == local truth == session claim.
+
+- Local cache update:
+    git fetch updated refs/remotes/origin/main from 55cb96a to 55fb72b.
+    git status now reports: "Your branch is up to date with 'origin/main'."
+
+- Re-ran anti-gaming tests on the verified remote SHA:
+    31/31 pass (23 original + 8 Round-20 adversarial).
+    All 8 new tests (24-31) pass on the remote-verified code.
+
+- Re-ran attack-the-attacker verification on the verified remote SHA:
+    P0-1 rule never applied:        BLOCKED
+    P0-2 equivalence backdoor:      BLOCKED
+    P0-3 provenance tamper:         BLOCKED (all 14 fields protected)
+    P0-4 forged attestation:        BLOCKED
+
+- Re-ran certification gate on the verified remote SHA:
+    G0  worktree_clean:             ✅ GREEN (was RED pre-commit)
+    G2  gauntlet_v1:                ✅ 18/18 blocked
+    G3  gauntlet_v2:                ✅ 14/14 blocked
+    G4  state_reconciliation:       ✅ 0 discrepancies
+    G6  credential_scan:            ✅ 0 keys, 0 forbidden files
+    G7  real_e2e_corpus:            ✅ 13/13 correct
+    G8  production_immutability:    ✅ hash unchanged
+    G9  production_purity:          ✅ clean
+    G10 post_scrub_evidence:        ✅ all 29 artifacts valid
+    G11 historical_artifact_audit:  ✅ clean
+    G12 credential_audit_split:     ✅ pass
+    G14 constitution:               ✅ v1.5.0 acknowledged
+    G1  preflight_fresh_isolated:   ❌ (cascade from G5; pre-existing)
+    G5  canonical_from_ledger:      ❌ pre-existing T6/T7 mismatch
+    G13 authorization_binding:      ❌ cascade from G1/G5
+
+  Pre-existing G5 issue (portfolio V22.6/V5 vs ledger V6/V4 for
+  territories T06/T07) was NOT introduced by Round 20. It exists at
+  the verified ce4de1f baseline and persists at 55fb72b. It is a
+  separate remediation task.
+
+Stage Summary:
+- Repository truth reconciled with session narrative. Remote == local.
+- Round-20 fixes (four-state eligibility, equivalence backdoor closure,
+  full provenance hash, CorrespondenceAttestation, 8 adversarial tests)
+  are now REMOTE-VERIFIED at 55fb72b.
+- The Article XXIII violation has been corrected. Future commits MUST
+  be pushed before being claimed as "landed." The pre-commit protocol
+  is hereby updated: any future Round claim must include the live
+  ls-remote SHA verification, not just the local git log SHA.
+- Anti-gaming tests: 31/31 pass on the verified remote.
+- Attack-the-attacker: 4/4 P0 fixes survive.
+- Constitution gate: GREEN.
+- World-class inventions: 0/5 (unchanged).
+- Next milestone per CEO: audit Round-20 fixes against the verified
+  remote SHA. Do NOT start §103 until the CEO signs off on the
+  Round-20 verification.
