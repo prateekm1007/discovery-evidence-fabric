@@ -107,6 +107,27 @@
   "owner": "main",
   "owner_role": "epistemic infrastructure maintainer",
 
+  "remediation_deadline": "2026-09-20T00:00:00Z",
+  "review_after": "2026-08-27T00:00:00Z",
+  "review_interval_days": 7,
+  "last_revalidated_at": "2026-08-20T19:40:00Z",
+  "last_revalidated_by": "main",
+  "last_revalidation_commit": "d54851d7d86a0c4fd3a2ac5b9d46fd686065714a",
+  "revalidation_history": [
+    {
+      "revalidated_at": "2026-08-20T19:40:00Z",
+      "revalidated_by": "main",
+      "commit_sha": "d54851d7d86a0c4fd3a2ac5b9d46fd686065714a",
+      "finding": "Failure remains unchanged. CV-T06 still V22.6/V6, CV-T07 still V5/V4. Supersession_index restored to PORTFOLIO.json (E1 fixed). G5 quarantine logic enforced by code.",
+      "remediation_state_at_revalidation": "PARTIALLY_QUARANTINED"
+    }
+  ],
+  "expiry_policy": {
+    "description": "A quarantined failure must NOT become a permanent exception. If remediation_deadline passes without remediation_state transitioning to REMEDIATED, the quarantine EXPIRES and the failure returns to RED — forcing either remediation or explicit CEO escalation.",
+    "on_expiry": "If remediation_deadline passes and remediation_state != REMEDIATED, the registry's find_match() returns None for this record, causing G5 to fail RED with 'QUARANTINE_EXPIRED'. This forces the issue back to attention rather than letting it silently persist.",
+    "review_trigger": "At each review_after timestamp, the gate must log a revalidation entry. If no revalidation has occurred within review_interval_days * 2, the quarantine is treated as STALE and fails RED."
+  },
+
   "remediation_state": "PARTIALLY_QUARANTINED",
   "quarantine_timestamp": "2026-08-20T19:40:00Z",
   "quarantine_scope": "G5 is now QUARANTINED (returns GREEN with QUARANTINED_PRE_EXISTING_FAILURES message). G1/E1 and G13 (cascade) remain RED until either (a) supersession_index is restored to PORTFOLIO.json, or (b) the quarantine registry is extended to cover E1's MISSING_SUPERSESSION_INDEX failure. All other gates (G0, G2, G3, G4, G6, G7, G8, G9, G10, G11, G12, G14) remain GREEN and are NOT affected by this quarantine.",

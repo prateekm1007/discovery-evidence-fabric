@@ -44,7 +44,10 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any
 
-REPO_ROOT = Path("/home/z/my-project/discovery-evidence-fabric")
+# P0 (twenty-second round): Derive REPO_ROOT from __file__, NOT hardcoded.
+import os as _os
+_REPO_ROOT_OVERRIDE = _os.environ.get("EPISTEMIC_REPO_ROOT")
+REPO_ROOT = Path(_REPO_ROOT_OVERRIDE).resolve() if _REPO_ROOT_OVERRIDE else Path(__file__).resolve().parents[2]
 INVENTION_PATTERN = re.compile(r"^(?:[A-Z]+_)?INVENTION_\d+", re.IGNORECASE)
 
 # Mandatory artifacts per Section 6

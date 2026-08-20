@@ -90,8 +90,15 @@ class PreExistingFailureRecord:
     root_cause: str
     why_round20_did_not_introduce_it: dict
     owner: str
-    remediation_state: str  # QUARANTINED / REMEDIATED / SUPERSEDED
+    remediation_state: str  # QUARANTINED / PARTIALLY_QUARANTINED / REMEDIATED / SUPERSEDED
     status: str  # ACTIVE / ARCHIVED
+    # P0-B (twenty-second round): Quarantine discipline fields
+    remediation_deadline: str = ""  # ISO timestamp — quarantine expires after this
+    review_after: str = ""  # ISO timestamp — next required revalidation
+    review_interval_days: int = 7  # how often revalidation must occur
+    last_revalidated_at: str = ""  # ISO timestamp of last revalidation
+    last_revalidated_by: str = ""
+    last_revalidation_commit: str = ""
     raw_record: dict = field(default_factory=dict)
     signatures: list[QuarantineSignature] = field(default_factory=list)
 
@@ -103,6 +110,46 @@ class PreExistingFailureRecord:
                 portfolio_version=t["portfolio_frozen_at_version"],
                 ledger_version=t["ledger_terminal_artifact_version"],
             ))
+
+    def is_expired(self, now: datetime = None) -> bool:
+        """P0-B (twenty-second round): Has the remediation_deadline passed?
+
+        If remediation_state != REMEDIATED and the deadline has passed,
+        the quarantine has EXPIRED — find_match() must return None,
+        forcing G5 to fail RED with 'QUARANTINE_EXPIRED'.
+        """
+        if not now:
+            now = datetime.now(timezone.utc)
+        if self.remediation_state == "REMEDIATED":
+            return False  # Remediated records don't expire
+        if not self.remediation_deadline:
+            return False  # No deadline set — cannot expire (legacy compat)
+        try:
+            deadline = datetime.fromisoformat(self.remediation_deadline.replace("Z", "+00:00"))
+            return now > deadline
+        except (ValueError, AttributeError):
+            return False  # Invalid deadline format — don't expire silently
+
+    def is_stale(self, now: datetime = None) -> bool:
+        """P0-B (twenty-second round): Has revalidation been skipped too long?
+
+        If review_interval_days * 2 have passed since last_revalidated_at
+        without a revalidation entry, the quarantine is STALE — find_match()
+        must return None, forcing G5 to fail RED with 'QUARANTINE_STALE'.
+        """
+        if not now:
+            now = datetime.now(timezone.utc)
+        if self.remediation_state == "REMEDIATED":
+            return False
+        if not self.last_revalidated_at or self.review_interval_days <= 0:
+            return False  # No revalidation history — can't determine staleness
+        try:
+            last_rev = datetime.fromisoformat(self.last_revalidated_at.replace("Z", "+00:00"))
+            max_gap_days = self.review_interval_days * 2
+            gap = now - last_rev
+            return gap.days > max_gap_days
+        except (ValueError, AttributeError):
+            return False
 
 
 class PreExistingFailureRegistry:
@@ -175,6 +222,13 @@ class PreExistingFailureRegistry:
                 owner=rec.get("owner", ""),
                 remediation_state=rs,
                 status=rec.get("status", "ACTIVE"),
+                # P0-B (twenty-second round): discipline fields
+                remediation_deadline=rec.get("remediation_deadline", ""),
+                review_after=rec.get("review_after", ""),
+                review_interval_days=rec.get("review_interval_days", 7),
+                last_revalidated_at=rec.get("last_revalidated_at", ""),
+                last_revalidated_by=rec.get("last_revalidated_by", ""),
+                last_revalidation_commit=rec.get("last_revalidation_commit", ""),
                 raw_record=rec,
             )
             self.records.append(r)
@@ -184,20 +238,49 @@ class PreExistingFailureRegistry:
     def find_match(self, territory_id: str, portfolio_version: str, ledger_version: str) -> Optional[PreExistingFailureRecord]:
         """Find a quarantined record matching the given drift signature.
 
-        Returns the matching record if one exists and is ACTIVE with
-        remediation_state in (QUARANTINED, PARTIALLY_QUARANTINED).
-        Returns None otherwise — which means the drift is NEW and must
-        fail G5.
+        Returns the matching record if one exists and is:
+          - ACTIVE
+          - remediation_state in (QUARANTINED, PARTIALLY_QUARANTINED)
+          - NOT expired (remediation_deadline not passed)
+          - NOT stale (last_revalidated_at within review_interval_days * 2)
+
+        Returns None otherwise — which means the drift is treated as NEW
+        and must fail G5 RED. This includes expired/stale quarantines,
+        which force re-attention rather than silently persisting.
         """
         for r in self.records:
             if r.status != "ACTIVE":
                 continue
             if r.remediation_state not in ("QUARANTINED", "PARTIALLY_QUARANTINED"):
                 continue
+            # P0-B (twenty-second round): enforce expiry and staleness
+            if r.is_expired():
+                continue  # Expired quarantine — treat as no match (RED)
+            if r.is_stale():
+                continue  # Stale quarantine — treat as no match (RED)
             for sig in r.signatures:
                 if sig.matches(territory_id, portfolio_version, ledger_version):
                     return r
         return None
+
+    def find_expired_or_stale(self) -> list[PreExistingFailureRecord]:
+        """P0-B (twenty-second round): Return all expired or stale quarantined records.
+
+        The gate can use this to report WHY a previously-quarantined failure
+        is now failing RED — distinguishing 'QUARANTINE_EXPIRED' from
+        'NEW drift (not quarantined)'.
+        """
+        result = []
+        for r in self.records:
+            if r.status != "ACTIVE":
+                continue
+            if r.remediation_state not in ("QUARANTINED", "PARTIALLY_QUARANTINED"):
+                continue
+            if r.is_expired():
+                result.append(r)
+            elif r.is_stale():
+                result.append(r)
+        return result
 
     def active_quarantined_count(self) -> int:
         """Count of active quarantined records (including partially quarantined)."""

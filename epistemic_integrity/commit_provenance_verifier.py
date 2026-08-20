@@ -23,7 +23,10 @@ from typing import Optional
 from datetime import datetime, timezone
 
 
-REPO_ROOT = Path("/home/z/my-project/discovery-evidence-fabric")
+# P0 (twenty-second round): Derive REPO_ROOT from __file__, NOT hardcoded.
+import os as _os
+_REPO_ROOT_OVERRIDE = _os.environ.get("EPISTEMIC_REPO_ROOT")
+REPO_ROOT = Path(_REPO_ROOT_OVERRIDE).resolve() if _REPO_ROOT_OVERRIDE else Path(__file__).resolve().parents[1]
 
 
 @dataclass

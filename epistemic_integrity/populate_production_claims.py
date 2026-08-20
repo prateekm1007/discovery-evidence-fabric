@@ -31,7 +31,10 @@ from epistemic_integrity.evidence_classes import EvidenceClass
 from epistemic_integrity.dossier_firewall import DossierFirewall
 from epistemic_integrity.semantic_verifier import SemanticVerifier, SemanticVerdict
 
-REPO_ROOT = Path("/home/z/my-project/discovery-evidence-fabric")
+# P0 (twenty-second round): Derive REPO_ROOT from __file__, NOT hardcoded.
+import os as _os
+_REPO_ROOT_OVERRIDE = _os.environ.get("EPISTEMIC_REPO_ROOT")
+REPO_ROOT = Path(_REPO_ROOT_OVERRIDE).resolve() if _REPO_ROOT_OVERRIDE else Path(__file__).resolve().parents[1]
 EPISTEMIC_DIR = REPO_ROOT / "epistemic_integrity"
 CAPSULES_DIR = EPISTEMIC_DIR / "reproducibility_capsules"
 

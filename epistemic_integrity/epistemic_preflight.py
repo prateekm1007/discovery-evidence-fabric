@@ -26,6 +26,7 @@ Exit codes:
 """
 
 import json
+import os
 import sys
 import re
 from dataclasses import dataclass, asdict
@@ -49,7 +50,20 @@ except ImportError:
     from epistemic_integrity.dossier_firewall import DossierFirewall
 
 
-REPO_ROOT = Path("/home/z/my-project/discovery-evidence-fabric")
+# P0 (twenty-second round): Derive REPO_ROOT from __file__, NOT hardcoded.
+# A hardcoded /home/z/my-project/... path violates the repository-state
+# principle (Article XXIII) and breaks clean-room certification — a fresh
+# clone at a different filesystem location would silently read the
+# original checkout's files instead of its own.
+#
+# Override: if EPISTEMIC_REPO_ROOT is set in the environment, use that
+# instead. This supports CI runners that mount the repo at a non-default
+# path and need to override the auto-derived root.
+_REPO_ROOT_OVERRIDE = os.environ.get("EPISTEMIC_REPO_ROOT")
+if _REPO_ROOT_OVERRIDE:
+    REPO_ROOT = Path(_REPO_ROOT_OVERRIDE).resolve()
+else:
+    REPO_ROOT = Path(__file__).resolve().parents[1]
 CANONICAL_STATE_DIR = REPO_ROOT / "CANONICAL_STATE"
 EPISTEMIC_DIR = REPO_ROOT / "epistemic_integrity"
 

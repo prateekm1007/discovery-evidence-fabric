@@ -603,6 +603,21 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
 
                 if unquarantined:
                     # NEW drift not in the registry — RED
+                    # But first check if any quarantined record has EXPIRED or gone STALE
+                    # — if so, report that distinctly.
+                    expired_stale = []
+                    if registry is not None:
+                        expired_stale = registry.find_expired_or_stale()
+                    if expired_stale:
+                        es_summary = "; ".join(
+                            f"{r.record_id} (state={r.remediation_state}, "
+                            f"deadline={r.remediation_deadline}, "
+                            f"last_revalidated={r.last_revalidated_at})"
+                            for r in expired_stale
+                        )
+                        return FreshCheck("G5", "canonical_from_ledger", False,
+                                          f"QUARANTINE_EXPIRED_OR_STALE: {es_summary}; NEW drift: {unquarantined[:2]}",
+                                          self.git_head, self.verifier_version, self.schema_version)
                     return FreshCheck("G5", "canonical_from_ledger", False,
                                       f"NEW drift (not quarantined): {unquarantined[:3]}",
                                       self.git_head, self.verifier_version, self.schema_version)

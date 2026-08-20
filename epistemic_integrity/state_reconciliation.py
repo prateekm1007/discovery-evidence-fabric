@@ -31,7 +31,10 @@ except ImportError:
     from epistemic_integrity.supersession_engine import SupersessionEngine
 
 
-REPO_ROOT = Path("/home/z/my-project/discovery-evidence-fabric")
+# P0 (twenty-second round): Derive REPO_ROOT from __file__, NOT hardcoded.
+import os as _os
+_REPO_ROOT_OVERRIDE = _os.environ.get("EPISTEMIC_REPO_ROOT")
+REPO_ROOT = Path(_REPO_ROOT_OVERRIDE).resolve() if _REPO_ROOT_OVERRIDE else Path(__file__).resolve().parents[1]
 CANONICAL_STATE_DIR = REPO_ROOT / "CANONICAL_STATE"
 EPISTEMIC_DIR = REPO_ROOT / "epistemic_integrity"
 

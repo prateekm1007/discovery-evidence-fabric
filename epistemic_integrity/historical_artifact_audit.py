@@ -82,8 +82,22 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 EPISTEMIC_DIR = Path(__file__).resolve().parent
 LEDGER_DIR = EPISTEMIC_DIR / "approved_provenance"
 COMMIT_MAP_PATH = REPO_ROOT / ".git" / "filter-repo" / "commit-map"
-REPLACEMENTS_PATH = Path("/home/z/my-project/scripts/credential_replacements.txt")
-REPLACEMENTS_PASS2_PATH = Path("/home/z/my-project/scripts/credential_replacements_pass2.txt")
+# P0 (twenty-second round): REPLACEMENTS_PATH must NOT be hardcoded to
+# /home/z/my-project/scripts/. Derive from REPO_ROOT, with env override.
+# The credential replacements files are repo-relative assets, not absolute.
+import os as _os
+_SCRIPTS_DIR_OVERRIDE = _os.environ.get("EPISTEMIC_SCRIPTS_DIR")
+if _SCRIPTS_DIR_OVERRIDE:
+    _SCRIPTS_DIR = Path(_SCRIPTS_DIR_OVERRIDE).resolve()
+else:
+    # Default: repo-root/scripts/ (sibling of discovery-evidence-fabric/)
+    # But since the scripts/ dir is OUTSIDE the repo, we use the env override
+    # or fall back to the repo-internal location if it exists.
+    _repo_scripts = REPO_ROOT / "scripts"
+    _external_scripts = REPO_ROOT.parent / "scripts"
+    _SCRIPTS_DIR = _external_scripts if _external_scripts.exists() else _repo_scripts
+REPLACEMENTS_PATH = _SCRIPTS_DIR / "credential_replacements.txt"
+REPLACEMENTS_PASS2_PATH = _SCRIPTS_DIR / "credential_replacements_pass2.txt"
 
 AUDIT_SCHEMA_VERSION = "1.0.0"
 

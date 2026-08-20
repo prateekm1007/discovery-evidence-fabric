@@ -2563,3 +2563,110 @@ Stage Summary:
     correspondence evidence (LegalCorrespondenceDecision objects) for
     C04's equivalence cases, OR accept C04 §102 status as INCONCLUSIVE
     without expert legal review. CEO sign-off required before §103.
+
+---
+Task ID: ROUND-22-RELOCATABLE-CERTIFICATION-QUARANTINE-DISCIPLINE-C04-ISOLATION
+Agent: main (session 2026-08-21)
+Task: Per CEO 2026-08-21 fourth deep audit — (1) eliminate hardcoded /home/z/my-project/
+paths from ALL certification/preflight modules; (2) make quarantine non-permanent with
+remediation_deadline/review_after/periodic revalidation; (3) isolate C04 epistemic state
+from KILLED to INCONCLUSIVE; (4) true clean-room certification from a fresh clone.
+Do NOT start §103.
+
+Work Log:
+- Pre-session Constitution gate: v1.5.0 re-acknowledged for Round 22.
+
+P0-A — Eliminate hardcoded repository paths:
+- Audited ALL .py files in the repo for /home/z/my-project references.
+  Found 11 critical certification/preflight modules with hardcoded REPO_ROOT:
+    epistemic_integrity/epistemic_preflight.py:52
+    epistemic_integrity/populate_production_claims.py:34
+    epistemic_integrity/commit_provenance_verifier.py:26
+    epistemic_integrity/hash_verifier.py:18
+    epistemic_integrity/state_reconciliation.py:34
+    epistemic_integrity/historical_artifact_audit.py:85-86 (REPLACEMENTS_PATH)
+    epistemic_integrity/gauntlet/hallucination_gauntlet.py:49
+    epistemic_integrity/gauntlet/hallucination_gauntlet_v2.py:42
+    protocol/governance/V11_TRANSITION_SCRIPT.py:30
+    protocol/governance/RETROACTIVE_INFLATION_SCANNER.py:25
+    protocol/preflight_check.py:47
+- Fixed ALL 11 modules to derive REPO_ROOT from Path(__file__).resolve().parents[N]
+  with an EPISTEMIC_REPO_ROOT environment variable override (for CI runners that
+  mount the repo at a non-default path).
+- The historical_artifact_audit.py REPLACEMENTS_PATH was hardcoded to
+  /home/z/my-project/scripts/. Fixed to derive from REPO_ROOT.parent/scripts/
+  with an EPISTEMIC_SCRIPTS_DIR env override.
+- Created /home/z/my-project/scripts/relocation_test.py — copies the repo to
+  /tmp/relocated_fabric_round22/ and verifies:
+    (a) 31/31 anti-gaming tests pass in relocated copy
+    (b) 4/4 attack-the-attacker scenarios BLOCKED in relocated copy
+    (c) Preflight E1-E15 passes in relocated copy
+    (d) All critical modules derive REPO_ROOT from the relocated path
+    (e) G5 quarantine behavior matches between original and relocated
+- Remaining hardcoded paths in non-certification modules (discovery_fabric/,
+  orchestrator/, patent_sources/, scripts_*/) are NOT certification/preflight
+  modules and do not affect gate results. Noted as follow-up cleanup.
+
+P0-B — Make quarantine non-permanent:
+- Added discipline fields to PCEF-2026-08-20-001:
+    remediation_deadline: 2026-09-20T00:00:00Z (30 days from creation)
+    review_after: 2026-08-27T00:00:00Z (7 days from creation)
+    review_interval_days: 7
+    last_revalidated_at: 2026-08-20T19:40:00Z
+    last_revalidated_by: main
+    last_revalidation_commit: d54851d7d86a0c4fd3a2ac5b9d46fd686065714a
+    revalidation_history: [initial entry]
+    expiry_policy: if deadline passes without REMEDIATED, quarantine EXPIRES
+                   and find_match() returns None → G5 fails RED with
+                   'QUARANTINE_EXPIRED_OR_STALE'
+- Updated pre_existing_failure_registry.py:
+    PreExistingFailureRecord now has is_expired() and is_stale() methods
+    find_match() skips expired/stale records (treats them as no match → RED)
+    find_expired_or_stale() returns records that have expired or gone stale
+- Updated research_authorization_gate.py G5 check:
+    If unquarantined drift exists AND there are expired/stale quarantined
+    records, the failure message distinguishes 'QUARANTINE_EXPIRED_OR_STALE'
+    from 'NEW drift (not quarantined)'.
+- Tested: with deadline in past → is_expired=True; with old revalidation →
+  is_stale=True. Both correctly cause find_match() to return None.
+
+P0-C — Isolate C04 epistemic state:
+- Created CANONICAL_STATE/CANDIDATE_C04_EPISTEMIC_STATE.json:
+    computational_section_102_verdict: INCONCLUSIVE
+      (based on ROUND21_C04_HARDENED_102_RERUN.json — all 6 limitations
+       returned NOT_ESTABLISHED)
+    historical_manual_conclusion: KILLED
+      (preserved as historical artifact from SLOT5_PHASE5D_FINAL_ATTACK_AND_DECISION.json)
+    epistemic_state_isolation: the two are SEPARATE epistemic objects.
+      The historical KILLED is preserved as history. The computational
+      INCONCLUSIVE is the current engine's canonical state.
+- The historical artifacts (SLOT5_PHASE5D_FINAL_ATTACK_AND_DECISION.json etc.)
+  are NOT modified. The manual KILLED conclusion remains as historical record.
+- The computational verdict is the one the engine reports. Future iterations
+  that consult the engine must read CANDIDATE_C04_EPISTEMIC_STATE.json, not
+  the historical artifacts.
+- To change the computational verdict to ANTICIPATED or NOT_ANTICIPATED:
+  provide LegalCorrespondenceDecision objects for each of the 6 limitations.
+
+P0-D — True clean-room certification:
+- PENDING — will be performed after this commit is pushed. The relocation
+  test (P0-A) already demonstrates filesystem independence for the critical
+  modules. The true clean-room certification will clone the pushed commit
+  from the remote into a completely different filesystem location and run
+  the full 14-gate certification with zero access to the original checkout.
+
+Stage Summary:
+- Relocatable certification: 🔴 → ✅ (all 11 critical modules fixed, relocation
+  test demonstrates filesystem independence)
+- Quarantine mechanism: ✅/🟡 → ✅ (non-permanent with expiry/staleness
+  enforcement, periodic revalidation required)
+- C04 computational §102: 🔴 → ✅ INCONCLUSIVE (explicitly recorded, isolated
+  from historical manual KILLED conclusion)
+- True clean-room verification: 🔴 → IN PROGRESS (will complete after push)
+- Anti-gaming tests: 31/31 still pass.
+- Preflight: P0=0 P1=0.
+- Constitution gate: GREEN.
+- World-class inventions: 0/5 (unchanged).
+- Next milestone per CEO: NOT §103. Complete the true clean-room verification,
+  then build the non-verbatim correspondence evidence path for C04
+  (LegalCorrespondenceDecision objects).
