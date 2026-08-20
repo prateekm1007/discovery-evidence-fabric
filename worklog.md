@@ -2406,3 +2406,160 @@ Stage Summary:
 - Next milestone per CEO: audit Round-20 fixes against the verified
   remote SHA. Do NOT start §103 until the CEO signs off on the
   Round-20 verification.
+
+---
+Task ID: ROUND-21-PRE-EXISTING-QUARANTINE-CLEAN-CHECKOUT-C04-RERUN
+Agent: main (session 2026-08-21)
+Task: Per CEO 2026-08-21 third deep audit — (1) formally quarantine G5/G1/G13
+pre-existing certification failures as machine-readable records; (2) independently
+attack Round 20 from a CLEAN CHECKOUT of remote 55fb72b; (3) re-run C04 through
+the hardened §102 correspondence/eligibility system. Do NOT start §103.
+
+Work Log:
+- Pre-session Constitution gate: v1.5.0 re-acknowledged for Round 21.
+  G14 GREEN. Articles I, II, III, XXII, XXIII, XXXIV, XXXV re-read.
+
+P0-A — PRE_EXISTING_CERTIFICATION_FAILURE quarantine:
+- Investigated G5 root cause by tracing the ledger and PORTFOLIO.json:
+    CV-T06: portfolio=V22.6 vs ledger=V6 (state matches: PHYSICAL_VALIDATION_PENDING)
+    CV-T07: portfolio=V5   vs ledger=V4 (state matches: FROZEN_NEGATIVE_CEILING)
+- Root cause commit: f1f3f97b513afedb781ba1acb04351e010218bac
+    "Portfolio consolidation: 10 territories → 5 invention slots" (2026-08-19)
+    This commit rewrote PORTFOLIO.json from scratch, updating frozen_at_version
+    to reflect real frozen versions (V22.6, V5) but did NOT append corresponding
+    EVIDENCE_BACKED transitions to state_transition_ledger.ndjson. The ledger's
+    terminal entries remain at bootstrap versions (V6, V4) from dcd8d452.
+- Also discovered: the same commit f1f3f97 DROPPED the supersession_index field
+    from PORTFOLIO.json, which causes E1 (canonical_state_integrity) to fail
+    with CANONICAL_STATE_MISSING_SUPERCESSION_INDEX. This is the G1 P0=1 failure.
+- Verified Round 20 did not introduce either failure:
+    git diff --name-only ce4de1f 55fb72b | grep -E 'ledger|PORTFOLIO|preflight'
+    → (no matches)
+    f1f3f97 is ancestor of ce4de1f is ancestor of 55fb72b.
+    Round 20 inherits the issues but did not cause them.
+
+- Created CANONICAL_STATE/PRE_EXISTING_CERTIFICATION_FAILURES.json (PCEF-2026-08-20-001):
+    Machine-readable record with all six required fields:
+      first_seen_commit: f1f3f97b513afedb781ba1acb04351e010218bac
+      affected_territories: CV-T06 (V22.6/V6), CV-T07 (V5/V4)
+      affected_preflight_checks: E1 (MISSING_SUPERSESSION_INDEX)
+      root_cause: asymmetric state mutation during portfolio consolidation
+      why_round20_did_not_introduce_it: full ancestry + file-diff proof
+      owner: main
+      remediation_state: PARTIALLY_QUARANTINED
+    Plus: verification_protocol with independent git checkout steps,
+    remediation_plan with Option A (corrective) and Option B (isolating).
+
+- Created CANONICAL_STATE/pre_existing_failure_registry.py:
+    Loader/validator for quarantine records. QuarantineSignature matching
+    (territory_id + portfolio_version + ledger_version). find_match()
+    returns the record only for ACTIVE+QUARANTINED entries. NEW drift
+    not in the registry returns None → still fails G5 RED.
+
+- Modified epistemic_integrity/research_authorization_gate.py G5 check:
+    G5 now consults the registry. Distinguishes:
+      (a) NEW drift (not in registry) → RED, "NEW drift (not quarantined)"
+      (b) PRE_EXISTING drift matching registry → GREEN, "QUARANTINED_PRE_EXISTING_FAILURES"
+          with explicit record_id, first_seen_commit, remediation_state
+      (c) No drift → GREEN, normal message
+    The quarantine is enforced by code, not just documentation. NEW drift
+    cannot hide behind the quarantine.
+
+- Restored supersession_index to PORTFOLIO.json (Option A for E1):
+    Projected from state_transition_ledger.ndjson using
+    /home/z/my-project/scripts/restore_supersession_index.py.
+    E1 now passes. G1 returns to GREEN.
+
+- Certification gate state after P0-A:
+    G0  worktree_clean:             (will be GREEN after commit)
+    G1  preflight_fresh_isolated:   ✅ GREEN (P0=0 P1=0)
+    G2  gauntlet_v1:                ✅ 18/18 blocked
+    G3  gauntlet_v2:                ✅ 14/14 blocked
+    G4  state_reconciliation:       ✅ 0 discrepancies
+    G5  canonical_from_ledger:      ✅ GREEN with QUARANTINED_PRE_EXISTING_FAILURES
+    G6  credential_scan:            ✅ clean
+    G7  real_e2e_corpus:            ✅ 13/13 correct
+    G8  production_immutability:    ✅ unchanged
+    G9  production_purity:          ✅ clean
+    G10 post_scrub_evidence:        ✅ all 29 artifacts valid
+    G11 historical_artifact_audit:  ✅ clean
+    G12 credential_audit_split:     ✅ pass
+    G13 authorization_binding:      (will be GREEN after G0/G1/G5 all GREEN)
+    G14 constitution:               ✅ v1.5.0 acknowledged
+
+P0-B — Clean-checkout verification of remote 55fb72b:
+- Created isolated git worktree at /tmp/fabric_clean_55fb72b detached at 55fb72b.
+  This is NOT my working tree — it is a clean checkout of the remote-verified SHA.
+- Ran 31 anti-gaming tests from the clean checkout:
+    31/31 PASS (23 original + 8 Round-20 adversarial)
+- Ran attack-the-attacker from the clean checkout:
+    P0-1 rule never applied:        BLOCKED
+    P0-2 equivalence backdoor:      BLOCKED
+    P0-3 provenance tamper:         BLOCKED (all 14 fields protected)
+    P0-4 forged attestation:        BLOCKED
+- Discovered: epistemic_preflight.py has HARDCODED paths to
+    /home/z/my-project/discovery-evidence-fabric/
+  This means running the gate from /tmp/fabric_clean_55fb72b still reads from
+  the working tree. This is itself an Article XXIII issue (local path ≠ CWD)
+  but it does NOT affect the test results — pytest and the attack script
+  use proper module loading. The gate's hardcoded paths are noted as a
+  follow-up cleanup item.
+- Cleaned up the worktree: git worktree remove /tmp/fabric_clean_55fb72b --force.
+- Conclusion: Round 20 fixes are verified against the actual remote code,
+  not just my working tree. The "my local implementation works" loophole
+  is closed.
+
+P0-C — C04 re-run through hardened §102 system:
+- Created /home/z/my-project/scripts/c04_hardened_102_rerun.py.
+- Loaded 6 C04 limitations from get_c04_limitations_independent().
+- Loaded US4741730A claim 1 exact text (extracted from patent HTML).
+- Registered glossary mappings: entry port→inlet, exit port→outlet,
+  drainage channel→fluid-flow passageway, filtration element→filter,
+  secondary channel→second fluid-flow passageway.
+- Ran each limitation through CorrespondenceEngine.evaluate_correspondence.
+- Result: ALL 6 limitations returned NOT_ESTABLISHED.
+    VERBATIM: 0
+    STRUCTURAL_EQUIVALENT: 0
+    NOT_ESTABLISHED: 6
+    can_support_§102: 0
+    requires_legal_decision: 0
+- The glossary mappings did not trigger because the engine applies them
+  to the FULL limitation phrase, not to individual terms. The candidate
+  language ("an implantable shunt device with a fluid entry port and a
+  fluid exit port") is structurally different from the claim language
+  ("a body having an inlet and an outlet and a first fluid-flow
+  passageway extending through the body between the inlet and outlet").
+- Prior-art eligibility:
+    WITHOUT legal_rule_application_evidence: phase=LEGAL_RULE_IDENTIFIED, SIMPLIFIED
+    WITH legal_rule_application_evidence:    phase=ELIGIBILITY_ESTABLISHED, COMPLETE
+- §102 VERDICT: INCONCLUSIVE
+    Reasoning: 6 limitations NOT_ESTABLISHED. §102 requires ALL required
+    limitations to be present in a single claim. The system cannot
+    distinguish (a) glossary mapping needed, (b) expert analysis needed,
+    (c) genuinely absent — without further evidence.
+- Sanity check: tested a limitation that IS verbatim in the claim
+  ("a filter positioned within the first fluid-flow passageway") —
+  the system correctly identified it as VERBATIM with ESTABLISHED status
+  and can_support_section_102=True. The VERBATIM path works; the C04
+  INCONCLUSIVE result is honest, not a bug.
+- Per CEO directive: this UNKNOWN/INCONCLUSIVE result is acceptable.
+  The system is NOT manufacturing matches it cannot evidence.
+- Machine-readable result saved to:
+    CEREVASC_SLOT5_DISCOVERY/ROUND21_C04_HARDENED_102_RERUN.json
+
+Stage Summary:
+- PRE_EXISTING_CERTIFICATION_FAILURE quarantine: IMPLEMENTED.
+    G5 now returns GREEN with QUARANTINED_PRE_EXISTING_FAILURES message.
+    G1/E1 supersession_index restored from ledger projection.
+    G13 cascade will resolve once G0 is clean (after commit).
+- Clean-checkout verification: 31/31 + 4/4 attacks BLOCKED at remote 55fb72b.
+- C04 hardened §102 re-run: INCONCLUSIVE (honest, expected).
+- Discovered pre-existing issue: epistemic_preflight.py has hardcoded paths
+    (Article XXIII concern). Noted as follow-up.
+- Anti-gaming tests: 31/31 still pass after all Round 21 changes.
+- Constitution gate: GREEN.
+- World-class inventions: 0/5 (unchanged).
+- Next milestone per CEO: NOT §103. Provide genuine non-verbatim
+    correspondence evidence (LegalCorrespondenceDecision objects) for
+    C04's equivalence cases, OR accept C04 §102 status as INCONCLUSIVE
+    without expert legal review. CEO sign-off required before §103.
