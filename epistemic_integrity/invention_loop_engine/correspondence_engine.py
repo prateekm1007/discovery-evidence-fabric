@@ -61,6 +61,26 @@ class CorrespondenceStatus(str, Enum):
     NOT_EVALUATED = "NOT_EVALUATED"
 
 
+class DisclosureType(str, Enum):
+    """The type of disclosure a correspondence represents.
+
+    Per CEO directive (nineteenth round):
+      Separate correspondence from legal sufficiency.
+      Do not let FUNCTIONAL_EQUIVALENT=True automatically mean §102-supported.
+
+      EXPLICIT_CLAIM_DISCLOSURE — the claim explicitly recites the limitation
+      CLAIM_DEPENDENCY — the limitation is inherited from a parent claim
+      INHERENCY — the limitation is inherent in the claim (NOT automatic §102)
+      OTHER_LEGAL_THEORY — some other legal theory (NOT automatic §102)
+      UNKNOWN — cannot determine the disclosure type
+    """
+    EXPLICIT_CLAIM_DISCLOSURE = "EXPLICIT_CLAIM_DISCLOSURE"
+    CLAIM_DEPENDENCY = "CLAIM_DEPENDENCY"
+    INHERENCY = "INHERENCY"
+    OTHER_LEGAL_THEORY = "OTHER_LEGAL_THEORY"
+    UNKNOWN = "UNKNOWN"
+
+
 class CorrespondenceRule(str, Enum):
     """The explicit rule that establishes (or rejects) correspondence.
 
@@ -95,6 +115,8 @@ class LimitationCorrespondence:
     claim_end_offset: int = -1
     # The correspondence type
     correspondence_type: CorrespondenceType = CorrespondenceType.NOT_ESTABLISHED
+    # P0-2 (nineteenth round): Disclosure type — separates correspondence from legal sufficiency
+    disclosure_type: DisclosureType = DisclosureType.UNKNOWN
     # Whether this is established or just proposed
     status: CorrespondenceStatus = CorrespondenceStatus.NOT_EVALUATED
     # The explicit rule that establishes (or rejects) correspondence
@@ -126,30 +148,49 @@ class LimitationCorrespondence:
     def can_support_section_102(self) -> bool:
         """Can this correspondence support a §102 conclusion?
 
-        Per CEO directive (eighteenth round):
-          Only VERBATIM and explicitly evidenced equivalence may feed §102.
+        Per CEO directive (nineteenth round):
+          Separate correspondence from legal sufficiency.
+          Do not let FUNCTIONAL_EQUIVALENT=True automatically mean §102-supported.
+
+          Only EXPLICIT_CLAIM_DISCLOSURE and CLAIM_DEPENDENCY can automatically
+          support §102. INHERENCY and OTHER_LEGAL_THEORY require separate
+          legal analysis — they are NOT automatic.
+
+          Additionally:
+          - status must be ESTABLISHED (not CANDIDATE)
+          - rule must not be NONE
+          - For VERBATIM: disclosure_type must be EXPLICIT_CLAIM_DISCLOSURE
+          - For EXPLICIT_DEPENDENCY: disclosure_type must be CLAIM_DEPENDENCY
+          - For STRUCTURAL_EQUIVALENT/FUNCTIONAL_EQUIVALENT: disclosure_type
+            must be EXPLICIT_CLAIM_DISCLOSURE (if the expert determined the
+            equivalence constitutes explicit disclosure) — otherwise UNKNOWN
         """
-        return (
-            self.status == CorrespondenceStatus.ESTABLISHED
-            and self.correspondence_type in (
-                CorrespondenceType.VERBATIM,
-                CorrespondenceType.STRUCTURAL_EQUIVALENT,
-                CorrespondenceType.FUNCTIONAL_EQUIVALENT,
-                CorrespondenceType.EXPLICIT_DEPENDENCY,
-            )
-            and self.rule != CorrespondenceRule.NONE
-        )
+        if self.status != CorrespondenceStatus.ESTABLISHED:
+            return False
+        if self.rule == CorrespondenceRule.NONE:
+            return False
+        # Only explicit disclosure and claim dependency can automatically support §102
+        if self.disclosure_type == DisclosureType.EXPLICIT_CLAIM_DISCLOSURE:
+            return True
+        if self.disclosure_type == DisclosureType.CLAIM_DEPENDENCY:
+            return True
+        # INHERENCY, OTHER_LEGAL_THEORY, UNKNOWN → cannot automatically support §102
+        return False
 
     def to_dict(self) -> dict:
+        # P0-1 (nineteenth round): Canonical evidence is NEVER truncated.
+        # Display-layer truncation is separate from canonical artifact.
         return {
             "correspondence_id": self.correspondence_id,
             "limitation_id": self.limitation_id,
             "reference_patent": self.reference_patent,
             "claim_number": self.claim_number,
-            "claim_passage": self.claim_passage[:200],
+            "claim_passage": self.claim_passage,  # FULL, not [:200]
+            "display_claim_passage": self.claim_passage[:200] + ("..." if len(self.claim_passage) > 200 else ""),
             "claim_start_offset": self.claim_start_offset,
             "claim_end_offset": self.claim_end_offset,
             "correspondence_type": self.correspondence_type.value,
+            "disclosure_type": self.disclosure_type.value,
             "status": self.status.value,
             "rule": self.rule.value,
             "supporting_evidence": self.supporting_evidence,
@@ -203,57 +244,81 @@ class PriorArtEligibilityEvidence:
             self.evidence_hash = hashlib.sha256(content.encode()).hexdigest()
 
     def evaluate(self):
-        """Evaluate prior-art eligibility.
+        """Evaluate prior-art eligibility from evidence.
 
-        Per CEO directive (eighteenth round):
-          This is a SEPARATE layer from claim correspondence.
-          The claim mapper does NOT calculate legal eligibility.
+        Per CEO directive (nineteenth round):
+          Derive the decision from the relevant date/public-availability
+          evidence and jurisdiction-specific rule, not merely check that
+          fields are nonempty.
 
-          A complete analysis needs all dates + jurisdiction + applicable rule.
-          Without all dates → UNKNOWN.
+          Having fields populated is NOT equivalent to applying the applicable
+          legal rule. The system must derive from dates + rule.
+
+          public_availability_date is the most important date for §102(a).
+          If it's unknown, eligibility is UNKNOWN even if publication_date exists.
         """
-        # Check if we have the minimum required dates
-        has_publication = bool(self.reference_publication_date)
+        # Check minimum required dates
         has_critical = bool(self.candidate_critical_date)
+        has_publication = bool(self.reference_publication_date)
+        has_public_availability = bool(self.public_availability_date)
+        has_jurisdiction = bool(self.jurisdiction)
+        has_rule = bool(self.applicable_rule)
 
-        if not has_publication or not has_critical:
+        if not has_critical or not has_publication:
             self.eligibility = "UNKNOWN"
             self.analysis_completeness = "INCOMPLETE"
             self.eligibility_reasoning = (
                 "Cannot evaluate: "
-                f"{'publication_date missing' if not has_publication else ''} "
-                f"{'critical_date missing' if not has_critical else ''}."
+                f"{'critical_date missing' if not has_critical else ''} "
+                f"{'publication_date missing' if not has_publication else ''}."
             )
             return
 
-        # Check completeness
-        has_all_dates = all([
-            self.reference_priority_date,
-            self.reference_filing_date,
-            self.reference_publication_date,
-            self.public_availability_date,
-            self.jurisdiction,
-            self.applicable_rule,
-        ])
+        # P0-3 (nineteenth round): public_availability_date is critical for §102
+        # If we don't know when the reference became publicly available,
+        # we cannot determine eligibility — even if we have publication_date.
+        if not has_public_availability:
+            # Use publication_date as a proxy but label as SIMPLIFIED
+            self.analysis_completeness = "SIMPLIFIED"
+            if self.reference_publication_date < self.candidate_critical_date:
+                self.eligibility = "ELIGIBLE_SIMPLIFIED"
+                self.eligibility_reasoning = (
+                    f"Publication date {self.reference_publication_date} < critical date "
+                    f"{self.candidate_critical_date}. BUT public_availability_date is UNKNOWN — "
+                    f"this is a simplified check, not a complete §102 eligibility analysis. "
+                    f"Publication ≠ public availability in all jurisdictions."
+                )
+            else:
+                self.eligibility = "INELIGIBLE"
+                self.eligibility_reasoning = (
+                    f"Publication date {self.reference_publication_date} >= critical date "
+                    f"{self.candidate_critical_date}."
+                )
+            return
 
-        if not has_all_dates:
+        # We have public_availability_date — can do a more complete check
+        # But still need jurisdiction and applicable_rule for COMPLETE
+        if not has_jurisdiction or not has_rule:
             self.analysis_completeness = "SIMPLIFIED"
         else:
             self.analysis_completeness = "COMPLETE"
 
-        # Simplified check: publication before critical date
-        if self.reference_publication_date < self.candidate_critical_date:
+        # Use public_availability_date for the primary check
+        # (This is the legally relevant date for §102(a) in most jurisdictions)
+        if self.public_availability_date < self.candidate_critical_date:
             self.eligibility = "ELIGIBLE" if self.analysis_completeness == "COMPLETE" else "ELIGIBLE_SIMPLIFIED"
             self.eligibility_reasoning = (
-                f"Reference published {self.reference_publication_date} "
-                f"before critical date {self.candidate_critical_date}. "
+                f"Public availability {self.public_availability_date} < critical date "
+                f"{self.candidate_critical_date}. "
+                f"Jurisdiction: {self.jurisdiction or 'UNKNOWN'}. "
+                f"Rule: {self.applicable_rule or 'UNKNOWN'}. "
                 f"Analysis completeness: {self.analysis_completeness}."
             )
         else:
             self.eligibility = "INELIGIBLE"
             self.eligibility_reasoning = (
-                f"Reference published {self.reference_publication_date} "
-                f"after critical date {self.candidate_critical_date}."
+                f"Public availability {self.public_availability_date} >= critical date "
+                f"{self.candidate_critical_date}."
             )
 
     def to_dict(self) -> dict:
@@ -335,6 +400,7 @@ class CorrespondenceEngine:
                 claim_start_offset=idx,
                 claim_end_offset=idx + len(lim_lower),
                 correspondence_type=CorrespondenceType.VERBATIM,
+                disclosure_type=DisclosureType.EXPLICIT_CLAIM_DISCLOSURE,  # P0-2: verbatim = explicit disclosure
                 status=CorrespondenceStatus.ESTABLISHED,
                 rule=CorrespondenceRule.EXACT_SUBSTRING,
                 supporting_evidence=f"Verbatim match: '{matched[:80]}'",
@@ -452,21 +518,26 @@ class CorrespondenceEngine:
         confirming_evidence: str,
         confirming_reviewer: str,
         correspondence_type: CorrespondenceType,
+        disclosure_type: DisclosureType = DisclosureType.UNKNOWN,
     ) -> LimitationCorrespondence:
         """Confirm a CANDIDATE correspondence with an explicit rule.
 
-        Per CEO directive (eighteenth round):
-          Only VERBATIM and explicitly evidenced equivalence may feed §102.
-          This method applies the explicit rule to confirm the candidate.
+        Per CEO directive (nineteenth round):
+          disclosure_type must be explicitly set by the confirmer.
+          Only EXPLICIT_CLAIM_DISCLOSURE and CLAIM_DEPENDENCY can support §102.
+          INHERENCY and OTHER_LEGAL_THEORY require separate legal analysis.
+
+          The confirmer must justify the disclosure_type — it is not automatic.
         """
         candidate.status = CorrespondenceStatus.ESTABLISHED
         candidate.rule = confirming_rule
         candidate.supporting_evidence = confirming_evidence
         candidate.reviewer = confirming_reviewer
         candidate.correspondence_type = correspondence_type
+        candidate.disclosure_type = disclosure_type
         candidate.confidence = "HIGH"
         candidate.unresolved_reason = ""
         # Re-compute provenance hash
-        content = f"{candidate.limitation_id}|{candidate.claim_number}|{candidate.claim_passage}|{candidate.correspondence_type.value}|{candidate.rule.value}"
+        content = f"{candidate.limitation_id}|{candidate.claim_number}|{candidate.claim_passage}|{candidate.correspondence_type.value}|{candidate.rule.value}|{candidate.disclosure_type.value}"
         candidate.provenance_hash = hashlib.sha256(content.encode()).hexdigest()
         return candidate
