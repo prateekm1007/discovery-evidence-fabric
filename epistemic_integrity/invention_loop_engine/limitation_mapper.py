@@ -165,31 +165,48 @@ class ClaimLimitationMapping:
 
 @dataclass
 class PriorArtEligibility:
-    """Prior-art temporal eligibility.
+    """Prior-art temporal eligibility with provenance-bound dates.
 
-    Per CEO directive (sixteenth round):
-      §102 ANTICIPATED is impossible if eligibility = UNKNOWN.
+    Per CEO directive (seventeenth round):
+      Separate DATE ELIGIBILITY from CLAIM ANTICIPATION.
+      Do not collapse them.
 
-      A technically perfect claim match can still be irrelevant to §102
-      if the reference became publicly available after the relevant date.
+      Need: critical_date, priority_date, filing_date, publication_date,
+      public_availability_date, jurisdiction, date_source, date_evidence_hash.
+
+      The current engine should NOT call its date logic complete §102
+      eligibility analysis — it is a simplified check.
     """
     candidate_critical_date: str = ""  # ISO date
-    reference_publication_date: str = ""
     reference_priority_date: str = ""
+    reference_filing_date: str = ""
+    reference_publication_date: str = ""
     public_availability_date: str = ""
     jurisdiction: str = ""
-    date_source: str = ""  # Where the date came from
+    date_source: str = ""  # Where each date came from
     date_evidence_hash: str = ""
-    eligibility: str = "UNKNOWN"  # ELIGIBLE / INELIGIBLE / UNKNOWN
+    eligibility: str = "UNKNOWN"  # ELIGIBLE / INELIGIBLE / UNKNOWN / SIMPLIFIED_CHECK_ONLY
 
     def check_eligibility(self):
-        """Determine eligibility from dates."""
+        """Determine eligibility from dates.
+
+        Per CEO directive (seventeenth round):
+          This is a SIMPLIFIED check, not a complete §102 eligibility analysis.
+          A real analysis needs priority date, filing date, publication date,
+          public availability, jurisdiction, and applicable legal rule.
+
+          If publication_date is unknown → UNKNOWN
+          If critical_date is unknown → UNKNOWN
+        """
         if not self.reference_publication_date or not self.candidate_critical_date:
             self.eligibility = "UNKNOWN"
             return
-        # Simple check: reference must be published BEFORE critical date
+
+        # Simplified check: reference must be published BEFORE critical date
+        # This does NOT account for priority dates, provisional applications,
+        # grace periods, or jurisdiction-specific rules.
         if self.reference_publication_date < self.candidate_critical_date:
-            self.eligibility = "ELIGIBLE"
+            self.eligibility = "SIMPLIFIED_CHECK_ONLY"
         else:
             self.eligibility = "INELIGIBLE"
 
@@ -255,13 +272,23 @@ class LimitationMapper:
     ) -> ClaimLimitationMapping:
         """Map one limitation to one claim using exact substring matching.
 
-        P0-2: Word-count overlap → SEMANTIC_CANDIDATE (never EXACT_SUBSTRING)
-        P0-3: Real claim span with offsets
+        Per CEO directive (seventeenth round):
+          - DIRECT: only via EXACT_SUBSTRING (verbatim text found in claim)
+          - PARTIAL: only via EXPLICIT_CORRESPONDENCE (human/rule-established)
+          - ABSENT: only via EXPLICIT_CORRESPONDENCE (human/rule-established)
+          - UNKNOWN: default when no exact match and no explicit correspondence
+
+          Semantic retrieval may NOMINATE a candidate passage.
+          It may NEVER establish the final disposition by itself.
+
+          No word-overlap heuristic may produce PARTIAL or ABSENT.
+          No generated string like "Partial match: ..." may be used as evidence.
+          If there is no exact supporting span → UNKNOWN.
         """
         lim_text = limitation.limitation_text.lower().strip()
         claim_lower = claim_text.lower()
 
-        # P0-2: EXACT_SUBSTRING — find the limitation text verbatim in the claim
+        # EXACT_SUBSTRING: find the limitation text verbatim in the claim
         idx = claim_lower.find(lim_text)
         if idx >= 0:
             # Found exact substring — extract the real span
@@ -284,48 +311,28 @@ class LimitationMapper:
                 mapping_confidence=MappingConfidence.HIGH,
             )
 
-        # P0-2: SEMANTIC_CANDIDATE — word overlap (NEVER EXACT_SUBSTRING)
-        lim_words = [w for w in lim_text.split() if len(w) > 3]
-        matched_words = [w for w in lim_words if w in claim_lower]
-
-        if len(matched_words) >= len(lim_words) * 0.7:
-            return ClaimLimitationMapping(
-                candidate_id=candidate_id,
-                reference_patent=reference_patent,
-                claim_number=claim_number,
-                limitation_id=limitation.limitation_id,
-                disposition=LimitationDisposition.PARTIAL,
-                claim_span=None,
-                mapping_method=MappingMethod.SEMANTIC_CANDIDATE,
-                mapping_confidence=MappingConfidence.MEDIUM,
-                unresolved_reason=f"Word overlap ({len(matched_words)}/{len(lim_words)}) "
-                                  f"but no exact substring match. SEMANTIC_CANDIDATE only.",
-            )
-
-        if len(matched_words) > 0:
-            return ClaimLimitationMapping(
-                candidate_id=candidate_id,
-                reference_patent=reference_patent,
-                claim_number=claim_number,
-                limitation_id=limitation.limitation_id,
-                disposition=LimitationDisposition.UNKNOWN,
-                claim_span=None,
-                mapping_method=MappingMethod.SEMANTIC_CANDIDATE,
-                mapping_confidence=MappingConfidence.LOW,
-                unresolved_reason=f"Low word overlap ({len(matched_words)}/{len(lim_words)}). "
-                                  f"Cannot determine.",
-            )
-
+        # No exact substring match → UNKNOWN (not PARTIAL, not ABSENT)
+        # Per CEO directive (seventeenth round):
+        #   - Absence of keywords ≠ absence of a technical limitation
+        #   - Synonyms, functional language, drafting variations make
+        #     automated ABSENT unsafe
+        #   - Word overlap is a SEMANTIC_CANDIDATE, not a disposition
+        #   - If there is no exact supporting span → UNKNOWN
         return ClaimLimitationMapping(
             candidate_id=candidate_id,
             reference_patent=reference_patent,
             claim_number=claim_number,
             limitation_id=limitation.limitation_id,
-            disposition=LimitationDisposition.ABSENT,
-            claim_span=None,
-            mapping_method=MappingMethod.EXACT_SUBSTRING,
-            mapping_confidence=MappingConfidence.HIGH,
-            unresolved_reason="No overlap with claim text.",
+            disposition=LimitationDisposition.UNKNOWN,
+            claim_span=None,  # No exact span → no span
+            mapping_method=MappingMethod.SEMANTIC_CANDIDATE,
+            mapping_confidence=MappingConfidence.UNKNOWN,
+            unresolved_reason=(
+                "No exact substring match found. "
+                "Semantic word overlap is insufficient to establish "
+                "DIRECT, PARTIAL, or ABSENT. Requires explicit correspondence "
+                "or expert analysis to resolve."
+            ),
         )
 
     def analyze_section_102(
@@ -360,6 +367,8 @@ class LimitationMapper:
                     "Reference is INELIGIBLE as prior art: published after critical date."
                 )
                 return analysis
+            # SIMPLIFIED_CHECK_ONLY: proceed but note in reasoning that
+            # the temporal check is simplified, not complete §102 eligibility
 
         required_limitations = [l for l in limitations if l.required]
         required_ids = {l.limitation_id for l in required_limitations}
