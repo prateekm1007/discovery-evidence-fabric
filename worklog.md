@@ -2775,3 +2775,73 @@ Stage Summary:
 - World-class inventions: 0/5 (unchanged).
 - Next milestone per CEO: NOT §103. Evidence-bound correspondence review for C04
   (LegalCorrespondenceDecision objects with real expert legal review).
+
+---
+Task ID: ROUND-24-FINAL-CLEANROOM-CONFIRMATION-THEN-STOP-INFRA
+Agent: main (session 2026-08-21)
+Task: Per CEO 2026-08-21 sixth deep audit — FINAL infrastructure round.
+(1) Run the entire 14-gate suite from a fresh no-hardlink clone of 1da66a9
+with adversarial environment. (2) Verify anti-renewal from the final commit.
+(3) After these two checks pass, STOP general infrastructure work.
+
+Work Log:
+- Pre-session Constitution gate: v1.5.0 re-acknowledged for Round 24 (final infra).
+
+P0-A — Final clean-room 14-gate on commit 1da66a9:
+- Fresh clone with --no-hardlinks to /tmp/cleanroom_final_round24/fabric
+- Checked out 1da66a952f045b6393427642fc1438aeef7b002f (verified)
+- Planted adversarial traps:
+    EPISTEMIC_REPO_ROOT=/tmp/malicious_attacker_path (poisoned)
+    EPISTEMIC_SCRIPTS_DIR=/tmp/malicious_scripts (poisoned)
+    PYTHONPATH=/home/z/my-project/discovery-evidence-fabric:... (poisoned)
+    PWD=/home/z/my-project/discovery-evidence-fabric (poisoned)
+    OLDPWD=/home/z/my-project/discovery-evidence-fabric (poisoned)
+    Stale /tmp/epistemic_certification_output/ with 4 fake capsule JSONs
+    Stale __pycache__ from original checkout
+- Ran P0 capsule builders (post_scrub, historical_audit, credential_audit)
+  with adversarial env — all completed, overwriting fake capsules with real data
+- Ran the ENTIRE 14-gate certification (check_all) — 104.2s
+
+  RESULT: ALL 14 GATES GREEN, 0 FAIL
+    G0  ✅ (clean room, no uncommitted changes)
+    G1  ✅ P0=0 P1=0
+    G2  ✅ 18/18 blocked
+    G3  ✅ 14/14 blocked
+    G4  ✅ 0 discrepancies
+    G5  ✅ QUARANTINED_PRE_EXISTING_FAILURES
+    G6  ✅ clean
+    G7  ✅ 13/13 correct
+    G8  ✅ unchanged (5d3620c7b6a9cdc3...)
+    G9  ✅ clean
+    G10 ✅ all 29 artifacts valid
+    G11 ✅ clean
+    G12 ✅ pass
+    G13 ✅ AUTHORIZED_UNDER_POST_SCRUB_STATE
+    G14 ✅ v1.5.0 acknowledged
+
+  Module isolation: ALL 9 critical modules imported from clean room.
+  EPISTEMIC_REPO_ROOT trap: REJECTED (fell back to __file__-derived path).
+  EPISTEMIC_SCRIPTS_DIR trap: REJECTED (fell back to derived path).
+  Root manifest: 5d3620c7b6a9cdc3... (matches original repo).
+
+P0-B — Anti-renewal verification from final commit 1da66a9:
+- Test 1: Self-renewal (same evidence + same actor + same commit) → ❌ REJECTED ✅
+    Reason: "revalidated_by is the same as the last revalidation"
+- Test 2: Independent revalidation (new evidence + new commit + independent review) → ✅ ACCEPTED ✅
+- Test 3: add_revalidation accepts the independent entry → ✅ added, history=2 ✅
+- Test 4: Second self-renewal (same as the independent entry just added) → ❌ REJECTED ✅
+    Reason: "evidence_hash is identical to the last revalidation"
+- ALL 4 ANTI-RENEWAL CHECKS PASS.
+
+Stage Summary:
+- Full clean-room 14-gate on final commit 1da66a9: ✅ PROVEN (all 14 GREEN
+  with adversarial environment)
+- Anti-renewal from final commit: ✅ PROVEN (self-renewal rejected,
+  independent accepted, add_revalidation works, second self-renewal rejected)
+- General infrastructure hardening: COMPLETE. No more generic invention-engine
+  infrastructure work.
+- Next phase per CEO: Move to individual invention campaigns.
+  - C04: evidence-bound correspondence review (LegalCorrespondenceDecision
+    objects with real expert legal review) — NOT automated matching.
+  - Other slots: per the 5-Invention Checklist.
+- World-class inventions: 0/5 (unchanged).
