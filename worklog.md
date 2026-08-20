@@ -2845,3 +2845,68 @@ Stage Summary:
     objects with real expert legal review) — NOT automated matching.
   - Other slots: per the 5-Invention Checklist.
 - World-class inventions: 0/5 (unchanged).
+
+---
+Task ID: ROUND-25-CI-VERIFICATION-THEN-C04-INVENTION-WORK
+Agent: main (session 2026-08-21)
+Task: Per CEO 2026-08-21 seventh deep audit — (1) Close Round 24 by obtaining
+an independent GitHub CI status for 9c3f04d. (2) Then STOP generic infrastructure
+and pivot to C04 evidence-bound correspondence work.
+
+Work Log:
+- Pre-session Constitution gate: v1.5.0 re-acknowledged for Round 25.
+
+P0-A — Independent GitHub CI verification for 9c3f04d:
+- CEO reported that GitHub's combined-status endpoint returned no status
+  entries for 9c3f04d at audit time. This was because the workflow had not
+  yet completed when the CEO checked.
+- Verified via ls-remote: 9c3f04de36ce2932db1df79c41b1cd7665f83af6 is on
+  origin/main.
+- Verified via GitHub REST API (GET /repos/.../commits/9c3f04d): commit
+  exists, message matches.
+- Checked combined-status: initially state=pending, total_count=0 (workflow
+  was in_progress).
+- Checked check-runs: "Run 14-Gate Detached Certification" status=in_progress.
+- Checked workflow runs: run 32420796706, head_sha=9c3f04de36ce,
+  status=in_progress, event=push, created_at=2026-08-20T21:43:05Z.
+- Polled every 30s. Workflow completed with conclusion=success.
+
+  FINAL VERIFIED STATE:
+    combined-status: state=success, total_count=1
+      context: "Epistemic Certification (14 gates)"
+      state: success
+      description: "Capsule 5074e15fb22d2c11b2587de1a223108d56327e1d7408fd57123171148066c3cf"
+      target_url: https://github.com/prateekm1007/discovery-evidence-fabric/actions/runs/32420796706
+    check-run:
+      name: "Run 14-Gate Detached Certification"
+      status: completed
+      conclusion: success
+      started_at: 2026-08-20T21:43:09Z
+      completed_at: 2026-08-20T21:47:29Z
+    workflow run:
+      head_sha: 9c3f04de36ce2932db1df79c41b1cd7665f83af6
+      status: completed
+      conclusion: success
+
+  9c3f04d = REMOTE_COMMITTED + CI_CERTIFIED (14-gate GREEN, independently
+  surfaced via GitHub combined-status endpoint, capsule hash
+  5074e15fb22d2c11b2587de1a223108d56327e1d7408fd57123171148066c3cf).
+
+- Generic infrastructure work: OFFICIALLY COMPLETE.
+  No more generic invention-engine infrastructure will be built.
+  The engine is the substrate; the next measure of success is inventions.
+
+P0-B — Pivot to C04 evidence-bound correspondence work:
+- NEXT: Resolve the C04 computational §102 INCONCLUSIVE state by providing
+  genuine LegalCorrespondenceDecision objects for each of the 6 C04
+  limitations vs US4741730A claim 1.
+- This requires expert legal review, not automated matching.
+- The matcher must NOT become more aggressive.
+- Do NOT start §103 infrastructure.
+
+Stage Summary:
+- 9c3f04d: CI_CERTIFIED (14-gate GREEN, independently verified via GitHub API)
+- Infrastructure hardening: COMPLETE (per CEO directive, STOP)
+- Next: C04 evidence-bound correspondence review → LegalCorrespondenceDecision
+  objects → resolve INCONCLUSIVE to ANTICIPATED or NOT_ANTICIPATED
+- World-class inventions: 0/5 (unchanged)
