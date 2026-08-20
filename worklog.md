@@ -2670,3 +2670,108 @@ Stage Summary:
 - Next milestone per CEO: NOT §103. Complete the true clean-room verification,
   then build the non-verbatim correspondence evidence path for C04
   (LegalCorrespondenceDecision objects).
+
+---
+Task ID: ROUND-23-FULL-CLEANROOM-ADVERSARIAL-QUARANTINE-ANTIRENEWAL
+Agent: main (session 2026-08-21)
+Task: Per CEO 2026-08-21 fifth deep audit — (1) finish the full clean-room 14-gate
+certification properly with strong isolation; (2) make the clean-room test adversarial
+by planting traps; (3) add anti-self-renewal rule to quarantine revalidation.
+Do NOT modify C04 computational verdict. Do NOT start §103.
+
+Work Log:
+- Pre-session Constitution gate: v1.5.0 re-acknowledged for Round 23.
+
+P0-A — Full clean-room 14-gate certification:
+- Created /home/z/my-project/scripts/cleanroom_full_14gate.py
+- Cloned local repo to /tmp/cleanroom_strong_round23/fabric with --no-hardlinks
+  (true copy independence, no shared inodes)
+- Checked out remote-verified commit 0dfd03c
+- Scrubbed ALL environment variables referencing /home/z/my-project:
+    DATABASE_URL, PWD, OLDPWD, CLAWHUB_WORKDIR
+- Removed /tmp/epistemic_certification_output/ (no reused cached artifacts)
+- Ran P0 capsule builders (post_scrub, historical_audit, credential_audit)
+- Ran the ENTIRE 14-gate certification (check_all) — took 105.1s
+- RESULT: ALL 14 GATES GREEN
+    G0  worktree_clean:              ✅ (clean room has no uncommitted changes)
+    G1  preflight_fresh_isolated:    ✅ P0=0 P1=0
+    G2  gauntlet_v1:                 ✅ 18/18 blocked
+    G3  gauntlet_v2:                 ✅ 14/14 blocked
+    G4  state_reconciliation:        ✅ 0 discrepancies
+    G5  canonical_from_ledger:       ✅ QUARANTINED_PRE_EXISTING_FAILURES
+    G6  credential_scan:             ✅ clean
+    G7  real_e2e_corpus:             ✅ 13/13 correct
+    G8  production_immutability:     ✅ unchanged
+    G9  production_purity:           ✅ clean
+    G10 post_scrub_evidence:         ✅ all 29 artifacts valid
+    G11 historical_artifact_audit:   ✅ clean
+    G12 credential_audit_split:      ✅ pass
+    G13 authorization_binding:       ✅ AUTHORIZED_UNDER_POST_SCRUB_STATE
+    G14 constitution:                ✅ v1.5.0 acknowledged
+- Root manifest hash: 5d3620c7b6a9cdc3... (matches original repo)
+- Module isolation verified: ALL 8 critical modules imported from clean room,
+  zero from /home/z/my-project
+- sys.path verified: no /home/z/my-project entries
+
+P0-B — Adversarial clean-room test:
+- Created /home/z/my-project/scripts/cleanroom_adversarial_test.py
+- Planted 5 traps:
+    Trap 1: Stale /tmp/epistemic_certification_output/ with FAKE capsule JSONs
+    Trap 2: EPISTEMIC_REPO_ROOT pointing to /tmp/wrong_repo (non-existent)
+    Trap 3: Stale __pycache__ from original (with old .pyc files)
+    Trap 4: PYTHONPATH with /home/z/my-project/discovery-evidence-fabric entries
+    Trap 5: PWD pointing to original checkout
+
+- CRITICAL FINDING from adversarial test:
+  The EPISTEMIC_REPO_ROOT env var override (added in Round 22) is a VULNERABILITY.
+  When set to /tmp/wrong_repo, the module HONORED the override and set REPO_ROOT
+  to /tmp/wrong_repo — which doesn't exist. An attacker could redirect the gate
+  to read from a completely different (potentially malicious) location.
+
+- FIX: Created epistemic_integrity/path_utils.py with derive_repo_root() that
+  VALIDATES the env var override — it must point to a directory containing
+  EPISTEMIC_CONSTITUTION.md (the sentinel file). If invalid, falls back to
+  __file__-derived path and emits a warning. Updated ALL 11 critical modules
+  to use this shared adversarial-safe derivation.
+
+- Also fixed: G2/G3 subprocess scripts now run with a CLEAN environment
+  (only PATH, HOME, PYTHONPATH=REPO_ROOT, LANG) instead of inheriting the
+  parent's trapped environment. This prevents PYTHONPATH traps from
+  influencing the subprocess.
+
+- After fixes, re-ran adversarial test:
+    - Module paths: ALL from clean room (traps ignored) ✅
+    - Root manifest: matches expected hash ✅
+    - Gate produced valid result ✅
+
+P0-C — Quarantine anti-self-renewal:
+- Added validate_revalidation_independence() to PreExistingFailureRecord:
+    Check 1: new_evidence_hash != last_evidence_hash
+    Check 2: new_reviewer != last_reviewer (or rationale must explain independence)
+    Check 3: new_timestamp > last_timestamp
+    Check 4: new_commit != last_commit
+- Added add_revalidation() method that validates before adding.
+- A quarantine record CANNOT renew itself with the same evidence, reviewer,
+  timestamp, and commit. Revalidation must be a genuinely independent event.
+- Tested:
+    Self-renewal attempt (same everything) → REJECTED ✅
+    Independent revalidation (different reviewer, commit, evidence) → ACCEPTED ✅
+    Same reviewer with independent rationale → ACCEPTED ✅
+
+Stage Summary:
+- Full clean-room 14-gate certification: 🔴 → ✅ PROVEN
+    (all 14 gates GREEN in isolated clone, 105s, root manifest matches)
+- Adversarial clean-room test: 🔴 → ✅ IMPLEMENTED
+    (5 traps planted, all ignored after path_utils.py fix)
+- Quarantine anti-self-renewal: 🔴 → ✅ ENFORCED
+    (validate_revalidation_independence + add_revalidation)
+- Critical vulnerability found and fixed: EPISTEMIC_REPO_ROOT env var override
+  was unchecked — could redirect gate to malicious path. Now validated against
+  sentinel file.
+- Anti-gaming tests: 31/31 still pass.
+- Preflight: P0=0 P1=0.
+- Constitution gate: GREEN.
+- C04 computational §102: 🟡 INCONCLUSIVE (unchanged — per CEO directive)
+- World-class inventions: 0/5 (unchanged).
+- Next milestone per CEO: NOT §103. Evidence-bound correspondence review for C04
+  (LegalCorrespondenceDecision objects with real expert legal review).

@@ -32,9 +32,9 @@ from epistemic_integrity.dossier_firewall import DossierFirewall
 from epistemic_integrity.semantic_verifier import SemanticVerifier, SemanticVerdict
 
 # P0 (twenty-second round): Derive REPO_ROOT from __file__, NOT hardcoded.
-import os as _os
-_REPO_ROOT_OVERRIDE = _os.environ.get("EPISTEMIC_REPO_ROOT")
-REPO_ROOT = Path(_REPO_ROOT_OVERRIDE).resolve() if _REPO_ROOT_OVERRIDE else Path(__file__).resolve().parents[1]
+# P0 (twenty-third round): Use shared adversarial-safe derivation.
+from epistemic_integrity.path_utils import derive_repo_root
+REPO_ROOT = derive_repo_root(__file__, parents_up=1)
 EPISTEMIC_DIR = REPO_ROOT / "epistemic_integrity"
 CAPSULES_DIR = EPISTEMIC_DIR / "reproducibility_capsules"
 

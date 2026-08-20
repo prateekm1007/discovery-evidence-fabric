@@ -99,6 +99,8 @@ class PreExistingFailureRecord:
     last_revalidated_at: str = ""  # ISO timestamp of last revalidation
     last_revalidated_by: str = ""
     last_revalidation_commit: str = ""
+    # P0-C (twenty-third round): Revalidation history for anti-self-renewal
+    revalidation_history: list = field(default_factory=list)
     raw_record: dict = field(default_factory=dict)
     signatures: list[QuarantineSignature] = field(default_factory=list)
 
@@ -150,6 +152,111 @@ class PreExistingFailureRecord:
             return gap.days > max_gap_days
         except (ValueError, AttributeError):
             return False
+
+    def validate_revalidation_independence(self, new_entry: dict) -> tuple[bool, str]:
+        """P0-C (twenty-third round): Anti-self-renewal rule.
+
+        Per CEO directive (2026-08-21 fifth deep audit, P0-C):
+          'A quarantine record cannot renew itself. Revalidation must be
+           an independent event with new evidence hash, new reviewer/actor,
+           new timestamp, new commit.'
+
+        This method validates that a proposed revalidation entry is
+        genuinely independent from the previous one. It checks:
+
+          1. new_evidence_hash != last_evidence_hash
+          2. new_reviewer != last_reviewer (or, if same reviewer, the
+             rationale must explain why independence is still maintained)
+          3. new_timestamp > last_timestamp (must be a later event)
+          4. new_commit != last_commit (must be a different commit)
+
+        Returns:
+          (True, "") if the revalidation is independent.
+          (False, reason) if the revalidation violates the anti-self-renewal rule.
+        """
+        if not self.revalidation_history:
+            # First revalidation — always independent (nothing to compare against)
+            return True, ""
+
+        last = self.revalidation_history[-1]
+
+        # Check 1: evidence_hash must differ
+        last_eh = last.get("evidence_hash", "")
+        new_eh = new_entry.get("evidence_hash", "")
+        if last_eh and new_eh and last_eh == new_eh:
+            return False, (
+                f"Anti-self-renewal violation: evidence_hash is identical to "
+                f"the last revalidation ({last_eh[:16]}...). A quarantine record "
+                f"cannot renew itself with the same evidence."
+            )
+
+        # Check 2: reviewer must differ (unless rationale explains)
+        last_rev = last.get("revalidated_by", "")
+        new_rev = new_entry.get("revalidated_by", "")
+        if last_rev and new_rev and last_rev == new_rev:
+            # Same reviewer — check if rationale explains why independence is maintained
+            rationale = new_entry.get("rationale", "")
+            if "independent" not in rationale.lower() and "different evidence" not in rationale.lower():
+                return False, (
+                    f"Anti-self-renewal violation: revalidated_by is the same as "
+                    f"the last revalidation ({new_rev}). Same reviewer must justify "
+                    f"independence in the rationale (e.g., 'independent review of "
+                    f"different evidence')."
+                )
+
+        # Check 3: timestamp must be later
+        last_ts = last.get("revalidated_at", "")
+        new_ts = new_entry.get("revalidated_at", "")
+        if last_ts and new_ts and new_ts <= last_ts:
+            return False, (
+                f"Anti-self-renewal violation: timestamp {new_ts} is not later "
+                f"than the last revalidation {last_ts}. Revalidation must be a "
+                f"new event in time."
+            )
+
+        # Check 4: commit must differ
+        last_commit = last.get("commit_sha", "")
+        new_commit = new_entry.get("commit_sha", "")
+        if last_commit and new_commit and last_commit == new_commit:
+            return False, (
+                f"Anti-self-renewal violation: commit_sha {new_commit} is the "
+                f"same as the last revalidation. Revalidation must occur at a "
+                f"different commit (the repository must have evolved)."
+            )
+
+        return True, ""
+
+    def add_revalidation(self, entry: dict) -> tuple[bool, str]:
+        """P0-C (twenty-third round): Add a revalidation entry with anti-self-renewal check.
+
+        Validates the entry against validate_revalidation_independence() before
+        adding. If the entry violates the anti-self-renewal rule, it is REJECTED.
+
+        Args:
+            entry: dict with keys: revalidated_at, revalidated_by, commit_sha,
+                   evidence_hash, rationale, finding, remediation_state_at_revalidation
+
+        Returns:
+            (True, "") if the revalidation was added.
+            (False, reason) if the revalidation was rejected.
+        """
+        # Validate required fields
+        required = ("revalidated_at", "revalidated_by", "commit_sha", "evidence_hash", "rationale")
+        for field in required:
+            if not entry.get(field):
+                return False, f"Missing required field: {field}"
+
+        # Validate anti-self-renewal
+        ok, reason = self.validate_revalidation_independence(entry)
+        if not ok:
+            return False, reason
+
+        # Add the entry
+        self.revalidation_history.append(entry)
+        self.last_revalidated_at = entry["revalidated_at"]
+        self.last_revalidated_by = entry["revalidated_by"]
+        self.last_revalidation_commit = entry["commit_sha"]
+        return True, ""
 
 
 class PreExistingFailureRegistry:
@@ -229,6 +336,8 @@ class PreExistingFailureRegistry:
                 last_revalidated_at=rec.get("last_revalidated_at", ""),
                 last_revalidated_by=rec.get("last_revalidated_by", ""),
                 last_revalidation_commit=rec.get("last_revalidation_commit", ""),
+                # P0-C (twenty-third round): revalidation history
+                revalidation_history=rec.get("revalidation_history", []),
                 raw_record=rec,
             )
             self.records.append(r)

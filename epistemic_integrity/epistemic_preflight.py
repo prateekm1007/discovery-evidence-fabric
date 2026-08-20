@@ -59,11 +59,39 @@ except ImportError:
 # Override: if EPISTEMIC_REPO_ROOT is set in the environment, use that
 # instead. This supports CI runners that mount the repo at a non-default
 # path and need to override the auto-derived root.
-_REPO_ROOT_OVERRIDE = os.environ.get("EPISTEMIC_REPO_ROOT")
-if _REPO_ROOT_OVERRIDE:
-    REPO_ROOT = Path(_REPO_ROOT_OVERRIDE).resolve()
-else:
-    REPO_ROOT = Path(__file__).resolve().parents[1]
+#
+# P0 (twenty-third round — adversarial hardening): The env var override
+# is a VULNERABILITY if unchecked — an attacker can set EPISTEMIC_REPO_ROOT
+# to redirect the gate to read from a completely different (potentially
+# malicious) location. The override is now VALIDATED: it must point to a
+# directory that contains EPISTEMIC_CONSTITUTION.md (the sentinel file).
+# If the override is invalid, we fall back to the __file__-derived path
+# and log a warning. This prevents the adversarial trap from succeeding.
+def _derive_repo_root():
+    """Derive REPO_ROOT with adversarial-safe env var override."""
+    file_derived = Path(__file__).resolve().parents[1]
+    env_override = os.environ.get("EPISTEMIC_REPO_ROOT")
+    if env_override:
+        override_path = Path(env_override).resolve()
+        # VALIDATE: the override must contain the sentinel file
+        sentinel = override_path / "EPISTEMIC_CONSTITUTION.md"
+        if sentinel.exists():
+            return override_path
+        else:
+            # Override is invalid — fall back to __file__-derived path
+            # (do NOT silently use the override; that would be a security hole)
+            import warnings
+            warnings.warn(
+                f"EPISTEMIC_REPO_ROOT={env_override} is invalid (no "
+                f"EPISTEMIC_CONSTITUTION.md found). Falling back to "
+                f"__file__-derived path: {file_derived}. This prevents "
+                f"adversarial env-var traps from redirecting the gate.",
+                stacklevel=2,
+            )
+            return file_derived
+    return file_derived
+
+REPO_ROOT = _derive_repo_root()
 CANONICAL_STATE_DIR = REPO_ROOT / "CANONICAL_STATE"
 EPISTEMIC_DIR = REPO_ROOT / "epistemic_integrity"
 

@@ -28,9 +28,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 # P0 (twenty-second round): Derive REPO_ROOT from __file__, NOT hardcoded.
-import os as _os
-_REPO_ROOT_OVERRIDE = _os.environ.get("EPISTEMIC_REPO_ROOT")
-REPO_ROOT = Path(_REPO_ROOT_OVERRIDE).resolve() if _REPO_ROOT_OVERRIDE else Path(__file__).resolve().parents[2]
+# P0 (twenty-third round): Use shared adversarial-safe derivation.
+# parents_up=2 because this module is at REPO_ROOT/protocol/governance/
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from epistemic_integrity.path_utils import derive_repo_root
+REPO_ROOT = derive_repo_root(__file__, parents_up=2)
 GOV_DIR = REPO_ROOT / "protocol" / "governance"
 NOW = datetime.now(timezone.utc).isoformat()
 

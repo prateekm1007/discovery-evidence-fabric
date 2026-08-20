@@ -344,10 +344,26 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
         check_ids = {"preflight": "G1", "gauntlet_v1": "G2", "gauntlet_v2": "G3"}
 
         try:
+            # P0 (twenty-third round): Clean the subprocess environment to prevent
+            # PYTHONPATH/EPISTEMIC_REPO_ROOT traps from influencing isolated checks.
+            # The adversarial clean-room test found that a trapped PYTHONPATH
+            # (pointing to /home/z/my-project/...) could cause the subprocess to
+            # import modules from the wrong location. We build a minimal env
+            # with only PATH and HOME, plus PYTHONPATH explicitly set to REPO_ROOT.
+            clean_subproc_env = {
+                "PATH": os.environ.get("PATH", ""),
+                "HOME": os.environ.get("HOME", ""),
+                "PYTHONPATH": str(REPO_ROOT),
+            }
+            # Preserve a minimal set of vars that Python needs
+            for var in ("LANG", "LC_ALL", "TERM"):
+                if var in os.environ:
+                    clean_subproc_env[var] = os.environ[var]
             result = subprocess.run(
                 [sys.executable, temp_script],
                 cwd=str(REPO_ROOT),
                 capture_output=True, text=True, timeout=120,
+                env=clean_subproc_env,
             )
             if result.returncode == 0 and result.stdout:
                 # Parse last line as JSON
