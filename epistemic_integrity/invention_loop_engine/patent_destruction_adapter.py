@@ -575,13 +575,15 @@ class PatentDestructionAdapter:
         # CRITICAL (tenth round): SEARCH_INTERMEDIARY receipts are valid for
         # keyword_search but NOT for claims/family/citations/legal stages
         # (which require direct patent provider access)
+        # DIRECT_PATENT_PROVIDER receipts are valid for ALL stages.
         is_intermediary = "SEARCH_INTERMEDIARY" in (receipt.adapter_version or "")
+        is_direct = "DIRECT_PATENT_PROVIDER" in (receipt.adapter_version or "")
         intermediary_restricted_stages = {
             "claims_search", "family_expansion", "backward_citations",
             "forward_citations", "continuation_divisional_search",
             "assignee_inventor_neighbors", "exact_claim_mapping",
         }
-        if is_intermediary and stage_name in intermediary_restricted_stages:
+        if is_intermediary and not is_direct and stage_name in intermediary_restricted_stages:
             return self.record_stage(
                 manifest, stage_name, receipt.provider, query, result_ids,
                 AttackStageStatus.FAILED,

@@ -191,11 +191,29 @@ def run_c09_blind_replay() -> dict:
     stage = manifest.stages["keyword_search"]
     print(f"\nkeyword_search stage: {stage.status.value}")
 
-    # Check A2A content
-    a2a_found = any(
-        "A2A" in str(item) or "adenosine" in str(item).lower()
-        for item in [receipt.provider_record_ids, receipt.adapter_version]
-    )
+    # P0 fix (tenth round): Check ACTUAL raw search result objects,
+    # NOT adapter_version, provider_name, or query string.
+    # The evidence must come from the search results themselves.
+    raw_results = json.loads(result.response_body.decode('utf-8'))
+    a2a_in_results = False
+    a2a_result_titles = []
+    for item in raw_results:
+        # Check the actual search result name (title) and snippet (content)
+        name = item.get("name", "")
+        snippet = item.get("snippet", "")
+        url = item.get("url", "")
+        # Evidence of A2A must come from the RESULT CONTENT, not metadata
+        if "A2A" in name or "adenosine" in name.lower() or \
+           "A2A" in snippet or "adenosine" in snippet.lower():
+            a2a_in_results = True
+            a2a_result_titles.append(name[:80])
+
+    if a2a_in_results:
+        print(f"\n  A2A content found in {len(a2a_result_titles)} search results:")
+        for t in a2a_result_titles[:5]:
+            print(f"    - {t}")
+    else:
+        print(f"\n  ⚠️  A2A content NOT found in search result content")
 
     # Claims search blocked for intermediary
     adapter.execute_stage(manifest, "claims_search", receipt, "claims:A2A")
@@ -206,6 +224,8 @@ def run_c09_blind_replay() -> dict:
     return {
         "candidate": "C09",
         "patent_ids_found": receipt.provider_record_ids,
+        "a2a_in_results": a2a_in_results,
+        "a2a_result_count": len(a2a_result_titles),
         "keyword_stage_status": stage.status.value,
         "claims_stage_status": claims_status,
         "receipt_provider": receipt.provider,
@@ -236,6 +256,7 @@ def run_honest_blind_replay():
     print()
     print(f"C09:")
     print(f"  Patent IDs: {c09['patent_ids_found']}")
+    print(f"  A2A in results: {c09['a2a_in_results']} ({c09['a2a_result_count']} results)")
     print(f"  keyword_search: {c09['keyword_stage_status']}")
     print(f"  claims_search: {c09['claims_stage_status']} (blocked for intermediary)")
     print()
@@ -243,6 +264,9 @@ def run_honest_blind_replay():
     print("No manual ProviderExecutionReceipt construction.")
     print("No manual transport_verified=True.")
     print("SEARCH_INTERMEDIARY honestly labeled — not impersonating Google Patents.")
+    print()
+    print("C04 status: DISCOVERY_CONFIRMED / PATENT_DESTRUCTION_INCOMPLETE")
+    print("  (keyword discovery works; claims/family/citations need direct provider)")
     print()
     print("Patent-level stages (claims, family, citations) require direct provider")
     print("access (Google Patents API, EPO OPS, USPTO, or PatSnap when key works).")
