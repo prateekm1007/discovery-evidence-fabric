@@ -359,7 +359,12 @@ def test_model_refuted_does_not_kill():
     """Test 11: Model refutation must NOT auto-kill candidate.
 
     Per CEO directive (P0.1): A model can be WRONG while the invention
-    remains viable. The adapter's is_mechanism_refuted() decides.
+    remains viable.
+
+    P0.2 third round: The arbitrary '3+ failed experiments' rule is removed.
+    Without physical-invariant evidence, the mechanism verdict is
+    INSUFFICIENT_EVIDENCE (BLOCK), not NOT_REFUTED (survival).
+    This is correct — the engine refuses to claim survival without evidence.
     """
     adapter = R6Adapter()
     engine = InventionLoopEngine(adapter, random_seed=42)
@@ -373,19 +378,23 @@ def test_model_refuted_does_not_kill():
     engine.experiment = adapter.design_experiments(
         candidate, engine.mechanistic_model, None, engine.uncertainty_budget)[0]
 
-    # Feed contradictory observation
+    # Feed contradictory observation (drainage 10%, model predicted 80%)
     engine.run_physical_experiment({"drainage_restored_pct": 10.0})
     engine.run_model_update()
 
-    # Model is refuted, but candidate is NOT killed
-    assert engine.model_updates[-1].did_model_survive == False
+    # Model is refuted (falsifiability_status = REFUTED)
+    assert engine.model_updates[-1].falsifiability_status == FalsifiabilityStatus.REFUTED
+
+    # Candidate is NOT killed (model refutation ≠ mechanism refutation)
     assert engine.state != LoopState.KILLED, \
         "Candidate must NOT be auto-killed on model refutation (P0.1)"
-    # State should be MODEL_REFUTED or INFORMATION_GAIN_RANKING
-    assert engine.state in (LoopState.MODEL_REFUTED, LoopState.INFORMATION_GAIN_RANKING), \
-        f"Expected MODEL_REFUTED or INFORMATION_GAIN_RANKING, got {engine.state}"
 
-    print("✅ Test 11 (model refuted ≠ killed): candidate survives model refutation (P0.1)")
+    # Without physical-invariant evidence, mechanism verdict = INSUFFICIENT_EVIDENCE (BLOCK)
+    # This is correct — the engine refuses to claim survival without evidence
+    assert engine.state == LoopState.BLOCKED, \
+        f"Expected BLOCKED (INSUFFICIENT_EVIDENCE without physical invariant), got {engine.state}"
+
+    print("✅ Test 11 (model refuted ≠ killed): model refuted, candidate BLOCKED (not killed) (P0.1+P0.2)")
 
 
 def test_data_driven_information_gain():
@@ -515,11 +524,12 @@ def test_tri_state_mechanism_verdict():
 
     from epistemic_integrity.invention_loop_engine.schemas import RawObservation, ModelUpdate
 
-    # Test 1: observation with non-zero drainage → NOT_REFUTED
+    # Test 1: observation with drainage but no physical-invariant evidence
+    # → INSUFFICIENT_EVIDENCE (cannot determine without physical invariant)
     obs = RawObservation(experiment_id="test", raw_data={"drainage_restored_pct": 20.0})
     verdict = adapter.is_mechanism_refuted(candidate, model, obs, [])
-    assert verdict == MechanismRefutationVerdict.NOT_REFUTED, \
-        f"Expected NOT_REFUTED, got {verdict}"
+    assert verdict == MechanismRefutationVerdict.INSUFFICIENT_EVIDENCE, \
+        f"Expected INSUFFICIENT_EVIDENCE (no physical invariant), got {verdict}"
 
     # Test 2: no observation → INSUFFICIENT_EVIDENCE
     obs_empty = RawObservation(experiment_id="test", raw_data={})
@@ -527,7 +537,18 @@ def test_tri_state_mechanism_verdict():
     assert verdict2 == MechanismRefutationVerdict.INSUFFICIENT_EVIDENCE, \
         f"Expected INSUFFICIENT_EVIDENCE, got {verdict2}"
 
-    print("✅ Test 15 (tri-state verdict): NOT_REFUTED and INSUFFICIENT_EVIDENCE (P0.4)")
+    # Test 3: physical-invariant evidence (ΔP >= threshold AND 0% drainage) → REFUTED
+    obs_refuted = RawObservation(
+        experiment_id="test",
+        raw_data={"drainage_restored_pct": 0.0,
+                  "pressure_differential_mmHg": 10.0,
+                  "valve_structural_threshold_mmHg": 5.0}
+    )
+    verdict3 = adapter.is_mechanism_refuted(candidate, model, obs_refuted, [])
+    assert verdict3 == MechanismRefutationVerdict.REFUTED, \
+        f"Expected REFUTED (physical invariant: ΔP>=threshold, 0% drainage), got {verdict3}"
+
+    print("✅ Test 15 (tri-state verdict): INSUFFICIENT_EVIDENCE + REFUTED (physical invariant) (P0.4)")
 
 
 def test_evidence_predicate_real():

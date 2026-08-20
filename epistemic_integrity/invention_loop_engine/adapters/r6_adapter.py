@@ -280,36 +280,61 @@ class R6Adapter(InventionLoopAdapter):
 
     def is_mechanism_refuted(self, candidate, model, observation, updates):
         """Determine if model refutation means the MECHANISM is impossible.
-        
-        R6 domain-specific rule:
-          The bypass mechanism is: obstruction → pressure builds → bypass valve
-          opens → drainage restored.
-          
-          If the model predicts wrong drainage %, that's a MODEL error (wrong
-          parameters, wrong fluid dynamics), NOT a mechanism impossibility.
-          The mechanism (passive pressure-driven bypass) could still work with
-          better parameters.
-          
-          The mechanism would be REFUTED only if: the bypass valve physically
-          CANNOT open under any pressure (e.g., valve is structurally locked).
-          That requires specific evidence, not just a drainage mismatch.
+
+        Per CEO directive (P0.2 — third round):
+          The arbitrary '3+ failed experiments' rule is REMOVED.
+          The mechanism verdict must be backed by:
+            - statistical evidence, OR
+            - physical invariant, OR
+            - pre-registered decision rule
+
+          Otherwise → INSUFFICIENT_EVIDENCE (BLOCK), not an invented escalation count.
+
+        R6 domain-specific rule (evidence-bound):
+          The bypass mechanism requires: obstruction → pressure builds → valve opens.
+          The mechanism is REFUTED only if there is a PHYSICAL INVARIANT proof that
+          the valve cannot open — e.g., the pressure differential across the valve
+          is structurally limited to below the valve's opening threshold, AND this
+          is confirmed by measurement.
+
+          A drainage % mismatch is NOT mechanism refutation — it is a model error.
+          The model parameters (geometry, viscosity) may be wrong, but the mechanism
+          (passive pressure-driven bypass) could still work with correct parameters.
+
+          Without a physical invariant or pre-registered statistical rule, we cannot
+          distinguish 'model is wrong' from 'mechanism is impossible' based on
+          drainage data alone.
         """
-        # A drainage % mismatch is a model error, not mechanism impossibility
+        # Without a physical invariant or pre-registered statistical rule,
+        # we CANNOT determine mechanism refutation from drainage data alone.
+        # A drainage mismatch is a model error, NOT evidence of mechanism impossibility.
+        #
+        # The mechanism would be REFUTED only if we had evidence like:
+        #   - Pressure measurement showing ΔP across valve is always below threshold
+        #   - Structural analysis showing valve is mechanically locked
+        #   - Pre-registered statistical rule (e.g., binomial test on N prototypes)
+        # None of these are available from drainage % data alone.
+        #
+        # Therefore: INSUFFICIENT_EVIDENCE (BLOCK), not an invented escalation count.
+
         observed = observation.raw_data.get("drainage_restored_pct")
-        if observed is not None:
-            # If drainage is 0% under ALL conditions tested, mechanism may be refuted
-            # But a single mismatch is a model error
-            if observed == 0.0 and len(updates) >= 3:
-                # 3+ experiments all showing 0% drainage → mechanism refuted
-                all_zero = all(
-                    u.falsifiability_status == FalsifiabilityStatus.REFUTED
-                    for u in updates
-                )
-                if all_zero:
-                    return MechanismRefutationVerdict.REFUTED
-            # Otherwise: model error, mechanism not refuted
-            return MechanismRefutationVerdict.NOT_REFUTED
-        # No observation → insufficient evidence
+        if observed is None:
+            return MechanismRefutationVerdict.INSUFFICIENT_EVIDENCE
+
+        # Check for physical-invariant evidence (not just drainage count)
+        # If the observation includes a measured pressure differential that is
+        # structurally below the valve opening threshold, that IS physical evidence
+        measured_delta_p = observation.raw_data.get("pressure_differential_mmHg")
+        valve_threshold = observation.raw_data.get("valve_structural_threshold_mmHg")
+
+        if measured_delta_p is not None and valve_threshold is not None:
+            # Physical invariant: if ΔP is always below threshold AND valve never opens,
+            # the mechanism is physically impossible
+            if measured_delta_p >= valve_threshold and observed == 0.0:
+                return MechanismRefutationVerdict.REFUTED
+
+        # Without physical-invariant evidence, we cannot determine mechanism refutation
+        # Default: INSUFFICIENT_EVIDENCE (BLOCK), NOT universal survival
         return MechanismRefutationVerdict.INSUFFICIENT_EVIDENCE
 
     def calculate_information_gain(self, candidate, budget, experiment, observations):
