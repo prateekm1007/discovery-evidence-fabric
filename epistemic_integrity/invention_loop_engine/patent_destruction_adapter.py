@@ -572,6 +572,27 @@ class PatentDestructionAdapter:
                 notes=f"SYNTHETIC receipt rejected. {notes}"
             )
 
+        # CRITICAL (tenth round): SEARCH_INTERMEDIARY receipts are valid for
+        # keyword_search but NOT for claims/family/citations/legal stages
+        # (which require direct patent provider access)
+        is_intermediary = "SEARCH_INTERMEDIARY" in (receipt.adapter_version or "")
+        intermediary_restricted_stages = {
+            "claims_search", "family_expansion", "backward_citations",
+            "forward_citations", "continuation_divisional_search",
+            "assignee_inventor_neighbors", "exact_claim_mapping",
+        }
+        if is_intermediary and stage_name in intermediary_restricted_stages:
+            return self.record_stage(
+                manifest, stage_name, receipt.provider, query, result_ids,
+                AttackStageStatus.FAILED,
+                CoverageLevel.NOT_QUERIED,
+                failures=[f"SEARCH_INTERMEDIARY cannot execute '{stage_name}'. "
+                          f"This stage requires direct patent provider access "
+                          f"(Google Patents API, EPO OPS, USPTO, or PatSnap). "
+                          f"Search intermediary evidence is discovery-level only."],
+                notes=f"Intermediary receipt rejected for provider-level stage. {notes}"
+            )
+
         return self.record_stage(
             manifest, stage_name, receipt.provider, query, result_ids,
             AttackStageStatus.COMPLETED if len(result_ids) > 0 else AttackStageStatus.NO_RESULTS,
