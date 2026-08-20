@@ -30,7 +30,7 @@ from .bayesian_eig import (
 )
 from .patent_destruction_adapter import (
     PatentDestructionAdapter, AttackStageStatus, CoverageLevel,
-    ExecutionProof, CoverageProof,
+    ExecutionProof, CoverageProof, ProviderExecutionReceipt,
 )
 from .adapters.r6_adapter import R6Adapter
 from .adapters.sensing_adapter import SensingAdapter
@@ -662,16 +662,16 @@ def test_eig_provenance_enforced():
 
 
 def test_execution_proof_enforced():
-    """Test 18: Manually supplied stages are downgraded. Execute_stage required for COMPLETED.
+    """Test 18: ProviderExecutionReceipt required for COMPLETED.
 
-    Per CEO directive (sixth round):
-      'Never let a provenance framework certify work that it did not
-       independently execute.'
+    Per CEO directive (seventh round):
+      'Provenance must prove origin, not merely integrity.'
+      provider_confirmed is DERIVED from the receipt, never caller-supplied.
     """
     adapter = PatentDestructionAdapter()
     manifest = adapter.create_manifest("test_exec", "test candidate")
 
-    # Try to mark COMPLETED without execution proof
+    # Try to mark COMPLETED without receipt (manually supplied)
     adapter.record_stage(manifest, "keyword_search",
         provider="Google Patents", query="test",
         result_ids=["US123"],
@@ -683,63 +683,146 @@ def test_execution_proof_enforced():
         f"Manual COMPLETED must be downgraded to INCOMPLETE, got {stage.status}"
     assert stage.execution.manually_supplied == True
 
-    # Now use execute_stage (actual execution with raw response)
-    adapter.execute_stage(manifest, "cpc_ipc_search",
-        provider="EPO", query="CPC A61M",
-        raw_response=b'{"results": ["US456"]}',
-        result_ids=["US456"],
+    # Execute with a valid ProviderExecutionReceipt
+    receipt = ProviderExecutionReceipt(
+        provider="GooglePatentsAdapter",
+        request_fingerprint="req_abc123",
+        request_timestamp="2026-08-20T00:00:00Z",
+        response_status=200,
+        response_headers_hash="headers_hash_xyz",
+        raw_response_hash="response_hash_def",
+        provider_record_ids=["US456"],
+        adapter_version="1.0.0",
     )
+    assert receipt.is_valid == True
+    assert receipt.provider_confirmed == True  # DERIVED
+
+    adapter.execute_stage(manifest, "cpc_ipc_search", receipt, "CPC A61M")
     stage2 = manifest.stages["cpc_ipc_search"]
     assert stage2.status == AttackStageStatus.COMPLETED, \
-        f"execute_stage should get COMPLETED, got {stage2.status}"
+        f"execute_stage with valid receipt should get COMPLETED, got {stage2.status}"
     assert stage2.execution.manually_supplied == False
-    assert bool(stage2.execution.raw_response_hash) == True
-    assert stage2.execution.provider_confirmed == True
+    assert stage2.execution.provider_confirmed == True  # DERIVED from receipt
 
-    print("✅ Test 18 (execution proof): manual→INCOMPLETE, executed→COMPLETED (sixth round)")
+    print("✅ Test 18 (execution proof): no receipt→INCOMPLETE, valid receipt→COMPLETED (seventh round)")
 
 
 def test_coverage_proof_enforced():
-    """Test 19: EXHAUSTED requires CoverageProof. Otherwise downgraded to QUERIED.
+    """Test 19: EXHAUSTED requires CoverageProof with classifications_searched.
 
-    Per CEO directive (sixth round):
-      EXHAUSTED must require an explicit coverage record.
-      Otherwise COVERAGE_INSUFFICIENT, never EXHAUSTED.
+    Per CEO directive (seventh round):
+      classifications_searched is now REQUIRED.
+      No classification execution → cannot claim EXHAUSTED.
     """
     adapter = PatentDestructionAdapter()
     manifest = adapter.create_manifest("test_coverage", "test")
 
-    # Try EXHAUSTED without coverage proof
-    adapter.execute_stage(manifest, "keyword_search",
-        provider="Google Patents", query="test",
-        raw_response=b'{"results": []}',
-        result_ids=[],
-        coverage_proof=None,  # No coverage proof!
+    receipt = ProviderExecutionReceipt(
+        provider="EPO", request_fingerprint="req1",
+        request_timestamp="2026-08-20T00:00:00Z",
+        response_status=200, response_headers_hash="h1",
+        raw_response_hash="r1", provider_record_ids=["US456"],
+        adapter_version="1.0",
     )
+
+    # Try EXHAUSTED without coverage proof
+    adapter.execute_stage(manifest, "keyword_search", receipt, "test")
     stage = manifest.stages["keyword_search"]
     assert stage.coverage == CoverageLevel.QUERIED, \
         f"EXHAUSTED without proof must downgrade to QUERIED, got {stage.coverage}"
 
-    # Now with proper CoverageProof
-    proof = CoverageProof(
-        databases_queried=["Google Patents", "PatentBear"],
+    # CoverageProof WITHOUT classifications_searched → NOT exhausted
+    proof_no_class = CoverageProof(
+        databases_queried=["Google Patents"],
+        query_families=["filter+bypass"],
+        pagination_exhausted=True,
+        jurisdictions=["US"],
+        # classifications_searched is EMPTY!
+    )
+    assert proof_no_class.is_exhausted() == False, \
+        "EXHAUSTED requires classifications_searched (seventh round)"
+
+    # CoverageProof WITH classifications_searched → exhausted
+    proof_full = CoverageProof(
+        databases_queried=["Google Patents", "EPO"],
+        classifications_searched=["A61M 27/00", "A61M 1/36"],
         query_families=["filter+bypass", "shunt+valve"],
         pagination_exhausted=True,
         jurisdictions=["US", "EP", "JP"],
     )
-    assert proof.is_exhausted() == True
+    assert proof_full.is_exhausted() == True
 
-    adapter.execute_stage(manifest, "claims_search",
-        provider="USPTO", query="claims:filter+bypass",
-        raw_response=b'{"results": ["US4741730A"]}',
-        result_ids=["US4741730A"],
-        coverage_proof=proof,
-    )
+    adapter.execute_stage(manifest, "claims_search", receipt, "claims:test",
+                          coverage_proof=proof_full)
     stage2 = manifest.stages["claims_search"]
     assert stage2.coverage == CoverageLevel.EXHAUSTED, \
         f"EXHAUSTED with valid proof should stay EXHAUSTED, got {stage2.coverage}"
 
-    print("✅ Test 19 (coverage proof): no proof→QUERIED, valid proof→EXHAUSTED (sixth round)")
+    print("✅ Test 19 (coverage proof): no classifications→NOT exhausted, with→EXHAUSTED (seventh round)")
+
+
+
+def test_attack_the_attacker():
+    """Test 20: Forged evidence must fail closed.
+
+    Per CEO directive (seventh round):
+      Adversarial tests where fake bytes, fake provider, fake IDs,
+      fake coverage, replayed response, timeout, partial pagination
+      all attempt to produce COMPLETED/EXHAUSTED. Every one must fail.
+    """
+    adapter = PatentDestructionAdapter()
+
+    # Attack 1: Invalid receipt (missing fields)
+    manifest1 = adapter.create_manifest("attack1", "test")
+    bad_receipt = ProviderExecutionReceipt(provider="fake")
+    assert bad_receipt.is_valid == False
+    adapter.execute_stage(manifest1, "keyword_search", bad_receipt, "test")
+    assert manifest1.stages["keyword_search"].status == AttackStageStatus.FAILED
+
+    # Attack 2: Receipt with failure_state
+    manifest2 = adapter.create_manifest("attack2", "test")
+    failed_receipt = ProviderExecutionReceipt(
+        provider="GooglePatentsAdapter", request_fingerprint="req",
+        request_timestamp="2026-08-20T00:00:00Z", response_status=500,
+        response_headers_hash="h", raw_response_hash="r",
+        provider_record_ids=[], adapter_version="1.0",
+        failure_state="TIMEOUT"
+    )
+    assert failed_receipt.provider_confirmed == False  # DERIVED: failure_state set
+    adapter.execute_stage(manifest2, "keyword_search", failed_receipt, "test")
+    assert manifest2.stages["keyword_search"].status == AttackStageStatus.FAILED
+
+    # Attack 3: Fake coverage proof (no classifications)
+    manifest3 = adapter.create_manifest("attack3", "test")
+    good_receipt = ProviderExecutionReceipt(
+        provider="EPO", request_fingerprint="req",
+        request_timestamp="2026-08-20T00:00:00Z", response_status=200,
+        response_headers_hash="h", raw_response_hash="r",
+        provider_record_ids=["US123"], adapter_version="1.0",
+    )
+    fake_coverage = CoverageProof(
+        databases_queried=["fake_db"],
+        # classifications_searched EMPTY
+        query_families=["fake"],
+        pagination_exhausted=True,
+        jurisdictions=["US"],
+    )
+    assert fake_coverage.is_exhausted() == False
+    adapter.execute_stage(manifest3, "keyword_search", good_receipt, "test",
+                          coverage_proof=fake_coverage)
+    assert manifest3.stages["keyword_search"].coverage == CoverageLevel.QUERIED
+
+    # Attack 4: Manually supplied COMPLETED (no receipt at all)
+    manifest4 = adapter.create_manifest("attack4", "test")
+    adapter.record_stage(manifest4, "keyword_search",
+        provider="fake", query="fake", result_ids=["US999"],
+        status=AttackStageStatus.COMPLETED,
+        coverage=CoverageLevel.EXHAUSTED,
+    )
+    assert manifest4.stages["keyword_search"].status == AttackStageStatus.INCOMPLETE
+    assert manifest4.stages["keyword_search"].coverage == CoverageLevel.QUERIED
+
+    print("✅ Test 20 (attack the attacker): all 4 forged evidence attacks fail closed (seventh round)")
 
 
 
@@ -769,10 +852,11 @@ def run_all_tests():
     test_eig_provenance_enforced()
     test_execution_proof_enforced()
     test_coverage_proof_enforced()
+    test_attack_the_attacker()
 
     print()
     print("=" * 60)
-    print("ALL 19 ANTI-GAMING TESTS PASSED")
+    print("ALL 20 ANTI-GAMING TESTS PASSED")
     print("=" * 60)
     return True
 

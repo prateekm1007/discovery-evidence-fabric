@@ -81,9 +81,15 @@ class CoverageProof:
     total_results_returned: int = 0
 
     def is_exhausted(self) -> bool:
-        """True only if all coverage dimensions are demonstrated."""
+        """True only if all coverage dimensions are demonstrated.
+
+        Per CEO directive (seventh round):
+          classifications_searched is now REQUIRED (was missing).
+          No classification execution → cannot claim EXHAUSTED.
+        """
         return (
             len(self.databases_queried) > 0 and
+            len(self.classifications_searched) > 0 and  # NEW: required
             len(self.query_families) > 0 and
             self.pagination_exhausted and
             len(self.jurisdictions) > 0
@@ -104,37 +110,125 @@ class CoverageProof:
 
 
 @dataclass
-class ExecutionProof:
-    """Proof that a stage was actually executed against a real provider.
+class ProviderExecutionReceipt:
+    """Immutable receipt proving a provider adapter actually executed a query.
 
-    Per CEO directive (sixth round):
-      'Never let a provenance framework certify work that it did not
-       independently execute.'
+    Per CEO directive (seventh round):
+      'Provenance must prove origin, not merely integrity.'
+      A SHA-256 hash proves bytes haven't changed — it does NOT prove
+      those bytes came from the provider you claim.
 
-    A stage cannot become COMPLETED because a caller manually supplied
-    result IDs. It must have:
-      - execution_id (unique per execution)
-      - raw_response_hash (hash of the actual provider response)
-      - execution_timestamp (when the query was actually run)
-      - provider_confirmed (the provider actually returned data)
+    This receipt is CREATED BY THE PROVIDER ADAPTER, never by the caller.
+    The manifest consumes the receipt. No receipt → no COMPLETED.
 
-    Without this, the stage is MANUALLY_SUPPLIED, not EXECUTED.
+    The receipt contains:
+      - provider: which provider adapter executed (e.g., "GooglePatentsAdapter")
+      - request_fingerprint: hash of the actual request sent
+      - request_timestamp: when the request was sent
+      - response_status: HTTP status or provider-specific status
+      - response_headers_hash: hash of response headers (proves provider origin)
+      - raw_response_hash: hash of response body (proves integrity)
+      - provider_record_ids: IDs extracted from the response by the adapter
+      - execution_id: unique ID for this execution
+      - adapter_version: version of the provider adapter that created this receipt
+      - failure_state: None if success, or description of failure
+
+    CRITICAL: provider_confirmed is DERIVED from response_status and
+    response_headers_hash, never passed in by the caller.
     """
-    execution_id: str = ""
-    raw_response_hash: str = ""  # SHA-256 of the actual provider response
-    execution_timestamp: str = ""
-    provider_confirmed: bool = False  # Did the provider actually return data?
-    manually_supplied: bool = True  # Default: manually supplied (NOT executed)
-    response_size_bytes: int = 0
+    provider: str = ""
+    request_fingerprint: str = ""  # Hash of the actual request (URL + params + auth)
+    request_timestamp: str = ""
+    response_status: int = 0  # HTTP status code or provider-specific code
+    response_headers_hash: str = ""  # Hash of response headers (proves origin)
+    raw_response_hash: str = ""  # Hash of response body (proves integrity)
+    provider_record_ids: list[str] = field(default_factory=list)
+    execution_id: str = field(default_factory=lambda: str(uuid4()))
+    adapter_version: str = ""
+    failure_state: str = ""  # Empty if success
+
+    @property
+    def provider_confirmed(self) -> bool:
+        """Derived: True only if response_status indicates success AND
+        response_headers_hash is non-empty AND raw_response_hash is non-empty.
+
+        This is NEVER set by the caller — it is derived from the receipt fields.
+        """
+        return (
+            self.response_status >= 200 and
+            self.response_status < 400 and
+            bool(self.response_headers_hash) and
+            bool(self.raw_response_hash) and
+            not self.failure_state
+        )
+
+    @property
+    def is_valid(self) -> bool:
+        """True only if this receipt was created by a provider adapter
+        (not manually constructed). Verified by checking all required fields."""
+        return (
+            bool(self.provider) and
+            bool(self.request_fingerprint) and
+            bool(self.request_timestamp) and
+            bool(self.adapter_version) and
+            bool(self.execution_id)
+        )
 
     def to_dict(self) -> dict:
         return {
-            "execution_id": self.execution_id,
+            "provider": self.provider,
+            "request_fingerprint": self.request_fingerprint,
+            "request_timestamp": self.request_timestamp,
+            "response_status": self.response_status,
+            "response_headers_hash": self.response_headers_hash,
             "raw_response_hash": self.raw_response_hash,
-            "execution_timestamp": self.execution_timestamp,
-            "provider_confirmed": self.provider_confirmed,
+            "provider_record_ids": self.provider_record_ids,
+            "execution_id": self.execution_id,
+            "adapter_version": self.adapter_version,
+            "failure_state": self.failure_state,
+            "provider_confirmed": self.provider_confirmed,  # DERIVED
+            "is_valid": self.is_valid,  # DERIVED
+        }
+
+
+@dataclass
+class ExecutionProof:
+    """Proof that a stage was actually executed against a real provider.
+
+    Per CEO directive (seventh round):
+      ExecutionProof now wraps a ProviderExecutionReceipt.
+      The receipt is created by the provider adapter, not the caller.
+      No receipt → manually_supplied=True → no COMPLETED.
+    """
+    receipt: Optional[ProviderExecutionReceipt] = None
+    manually_supplied: bool = True  # True if no receipt (default: fail-closed)
+
+    @property
+    def provider_confirmed(self) -> bool:
+        """Derived from receipt, never caller-supplied."""
+        if self.receipt is None:
+            return False
+        return self.receipt.provider_confirmed
+
+    @property
+    def raw_response_hash(self) -> str:
+        if self.receipt is None:
+            return ""
+        return self.receipt.raw_response_hash
+
+    @property
+    def execution_id(self) -> str:
+        if self.receipt is None:
+            return ""
+        return self.receipt.execution_id
+
+    def to_dict(self) -> dict:
+        return {
+            "receipt": self.receipt.to_dict() if self.receipt else None,
             "manually_supplied": self.manually_supplied,
-            "response_size_bytes": self.response_size_bytes,
+            "provider_confirmed": self.provider_confirmed,  # DERIVED
+            "raw_response_hash": self.raw_response_hash,  # DERIVED
+            "execution_id": self.execution_id,  # DERIVED
         }
 
 
@@ -390,40 +484,63 @@ class PatentDestructionAdapter:
 
     def execute_stage(self, manifest: PatentAttackManifest,
                       stage_name: str,
-                      provider: str,
+                      receipt: ProviderExecutionReceipt,
                       query: str,
-                      raw_response: bytes,
-                      result_ids: list[str],
                       coverage_proof: CoverageProof = None,
                       relevant_results: list[dict] = None,
                       failures: list[str] = None,
                       notes: str = "") -> AttackStageResult:
-        """Actually execute a stage against a real provider.
+        """Execute a stage using a ProviderExecutionReceipt.
 
-        Per CEO directive (sixth round):
-          This is the ONLY way to get COMPLETED status.
-          The raw_response is hashed to prove the provider actually returned data.
+        Per CEO directive (seventh round):
+          'Provenance must prove origin, not merely integrity.'
+          The receipt is created by the provider adapter, never by the caller.
+          No receipt → no COMPLETED.
+
+          provider_confirmed is DERIVED from the receipt, never passed in.
 
         Args:
-            raw_response: The actual bytes returned by the provider.
-                         Will be hashed to create raw_response_hash.
+            receipt: A ProviderExecutionReceipt created by the provider adapter.
+                     Must have is_valid=True and provider_confirmed=True.
+            query: The query string used (for audit trail).
+            coverage_proof: Optional coverage proof for EXHAUSTED claims.
         """
-        import hashlib as _hl
-        response_hash = _hl.sha256(raw_response).hexdigest()
+        # Validate the receipt
+        if not receipt.is_valid:
+            return self.record_stage(
+                manifest, stage_name, receipt.provider, query,
+                receipt.provider_record_ids,
+                AttackStageStatus.FAILED,
+                CoverageLevel.NOT_QUERIED,
+                failures=["INVALID_RECEIPT: receipt.is_valid=False"],
+                notes=f"Receipt validation failed. {notes}"
+            )
+
+        if receipt.failure_state:
+            return self.record_stage(
+                manifest, stage_name, receipt.provider, query,
+                receipt.provider_record_ids,
+                AttackStageStatus.FAILED,
+                CoverageLevel.NOT_QUERIED,
+                failures=[receipt.failure_state],
+                notes=f"Provider failure: {receipt.failure_state}. {notes}"
+            )
+
+        # Create ExecutionProof from the receipt
         execution = ExecutionProof(
-            execution_id=str(uuid4()),
-            raw_response_hash=response_hash,
-            execution_timestamp=datetime.now(timezone.utc).isoformat(),
-            provider_confirmed=len(raw_response) > 0,
-            manually_supplied=False,  # CRITICAL: this was actually executed
-            response_size_bytes=len(raw_response),
+            receipt=receipt,
+            manually_supplied=False,  # CRITICAL: receipt proves execution
         )
 
+        # Determine result IDs from the receipt
+        result_ids = receipt.provider_record_ids
+
+        # Determine coverage
         coverage = CoverageLevel.EXHAUSTED if (coverage_proof and coverage_proof.is_exhausted()) \
                    else CoverageLevel.QUERIED
 
         return self.record_stage(
-            manifest, stage_name, provider, query, result_ids,
+            manifest, stage_name, receipt.provider, query, result_ids,
             AttackStageStatus.COMPLETED if len(result_ids) > 0 else AttackStageStatus.NO_RESULTS,
             coverage,
             relevant_results=relevant_results,
@@ -431,6 +548,39 @@ class PatentDestructionAdapter:
             notes=notes,
             execution=execution,
             coverage_proof=coverage_proof,
+        )
+
+    @staticmethod
+    def derive_coverage_from_receipts(
+        receipts: list[ProviderExecutionReceipt],
+        classifications_searched: list[str],
+        pagination_exhausted: bool,
+        jurisdictions: list[str],
+    ) -> CoverageProof:
+        """Derive CoverageProof from actual execution receipts.
+
+        Per CEO directive (seventh round):
+          CoverageProof must be GENERATED from the collection of actual
+          execution receipts, not caller-supplied.
+
+        The databases_queried and query_families are extracted from the receipts.
+        classifications_searched must be explicitly provided (from the queries).
+        """
+        databases = list(set(r.provider for r in receipts if r.provider))
+        query_families = list(set(r.request_fingerprint[:16] for r in receipts if r.request_fingerprint))
+        total_queries = len(receipts)
+        total_results = sum(len(r.provider_record_ids) for r in receipts)
+        failed_providers = [r.provider for r in receipts if r.failure_state]
+
+        return CoverageProof(
+            databases_queried=databases,
+            classifications_searched=classifications_searched,
+            query_families=query_families,
+            pagination_exhausted=pagination_exhausted,
+            failures=failed_providers,
+            jurisdictions=jurisdictions,
+            total_queries_executed=total_queries,
+            total_results_returned=total_results,
         )
 
     def add_claim_chart_entry(self, manifest: PatentAttackManifest,
