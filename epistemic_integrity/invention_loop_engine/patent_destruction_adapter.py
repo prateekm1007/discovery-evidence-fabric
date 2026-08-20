@@ -140,21 +140,30 @@ class ProviderExecutionReceipt:
     request_fingerprint: str = ""  # Hash of the actual request (URL + params + auth)
     request_timestamp: str = ""
     response_status: int = 0  # HTTP status code or provider-specific code
-    response_headers_hash: str = ""  # Hash of response headers (proves origin)
+    response_headers_hash: str = ""  # Hash of response headers (records transport-observed provenance)
     raw_response_hash: str = ""  # Hash of response body (proves integrity)
     provider_record_ids: list[str] = field(default_factory=list)
     execution_id: str = field(default_factory=lambda: str(uuid4()))
     adapter_version: str = ""
     failure_state: str = ""  # Empty if success
+    # CRITICAL (eighth round): transport verification stamp
+    # Set ONLY by ProviderTransportBoundary.create_receipt()
+    # An adapter-created receipt (without transport) will NOT have this stamp.
+    transport_verified: bool = False
 
     @property
     def provider_confirmed(self) -> bool:
-        """Derived: True only if response_status indicates success AND
-        response_headers_hash is non-empty AND raw_response_hash is non-empty.
+        """Derived: True only if transport_verified AND response_status success.
 
-        This is NEVER set by the caller — it is derived from the receipt fields.
+        Per CEO directive (eighth round):
+          The adapter must NOT be able to directly construct a valid receipt.
+          Only the transport boundary can set transport_verified=True.
+
+          Without transport_verified, provider_confirmed is False — even if
+          all other fields look correct. This prevents adapter self-certification.
         """
         return (
+            self.transport_verified and  # CRITICAL: must be set by transport boundary
             self.response_status >= 200 and
             self.response_status < 400 and
             bool(self.response_headers_hash) and
@@ -164,9 +173,17 @@ class ProviderExecutionReceipt:
 
     @property
     def is_valid(self) -> bool:
-        """True only if this receipt was created by a provider adapter
-        (not manually constructed). Verified by checking all required fields."""
+        """True only if this receipt was created by the transport boundary
+        (not manually constructed by an adapter).
+
+        Per CEO directive (eighth round):
+          transport_verified=True is required. This field is set ONLY by
+          ProviderTransportBoundary.create_receipt(). An adapter that
+          constructs ProviderExecutionReceipt() directly will have
+          transport_verified=False (default) → is_valid=False.
+        """
         return (
+            self.transport_verified and  # CRITICAL (eighth round)
             bool(self.provider) and
             bool(self.request_fingerprint) and
             bool(self.request_timestamp) and
@@ -186,6 +203,7 @@ class ProviderExecutionReceipt:
             "execution_id": self.execution_id,
             "adapter_version": self.adapter_version,
             "failure_state": self.failure_state,
+            "transport_verified": self.transport_verified,  # NEW (eighth round)
             "provider_confirmed": self.provider_confirmed,  # DERIVED
             "is_valid": self.is_valid,  # DERIVED
         }

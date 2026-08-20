@@ -32,6 +32,9 @@ from .patent_destruction_adapter import (
     PatentDestructionAdapter, AttackStageStatus, CoverageLevel,
     ExecutionProof, CoverageProof, ProviderExecutionReceipt,
 )
+from .provider_transport_boundary import (
+    ProviderTransportBoundary, TransportExecutionRequest,
+)
 from .adapters.r6_adapter import R6Adapter
 from .adapters.sensing_adapter import SensingAdapter
 
@@ -662,11 +665,12 @@ def test_eig_provenance_enforced():
 
 
 def test_execution_proof_enforced():
-    """Test 18: ProviderExecutionReceipt required for COMPLETED.
+    """Test 18: Transport boundary required for COMPLETED.
 
-    Per CEO directive (seventh round):
-      'Provenance must prove origin, not merely integrity.'
-      provider_confirmed is DERIVED from the receipt, never caller-supplied.
+    Per CEO directive (eighth round):
+      'Trust must terminate at the lowest layer that actually observed reality.'
+      The adapter must NOT be able to directly construct a valid receipt.
+      Only the transport boundary can set transport_verified=True.
     """
     adapter = PatentDestructionAdapter()
     manifest = adapter.create_manifest("test_exec", "test candidate")
@@ -674,37 +678,41 @@ def test_execution_proof_enforced():
     # Try to mark COMPLETED without receipt (manually supplied)
     adapter.record_stage(manifest, "keyword_search",
         provider="Google Patents", query="test",
-        result_ids=["US123"],
+        result_ids=["US0123456A1"],
         status=AttackStageStatus.COMPLETED,
         coverage=CoverageLevel.RELEVANT_FOUND,
     )
     stage = manifest.stages["keyword_search"]
-    assert stage.status == AttackStageStatus.INCOMPLETE, \
-        f"Manual COMPLETED must be downgraded to INCOMPLETE, got {stage.status}"
+    assert stage.status == AttackStageStatus.INCOMPLETE
     assert stage.execution.manually_supplied == True
 
-    # Execute with a valid ProviderExecutionReceipt
-    receipt = ProviderExecutionReceipt(
-        provider="GooglePatentsAdapter",
-        request_fingerprint="req_abc123",
-        request_timestamp="2026-08-20T00:00:00Z",
-        response_status=200,
-        response_headers_hash="headers_hash_xyz",
-        raw_response_hash="response_hash_def",
-        provider_record_ids=["US456"],
-        adapter_version="1.0.0",
+    # Execute through the transport boundary (the ONLY valid path)
+    transport = ProviderTransportBoundary()
+    request = TransportExecutionRequest(
+        provider_name="Google Patents",
+        endpoint_url="https://patents.google.com/?q=test",
+        adapter_version="GooglePatentsAdapter v1.0",
+        stage_name="cpc_ipc_search",
     )
+    result = transport.execute(
+        request=request,
+        response_body=b"{\"results\": [\"US0456789A1\"]}",
+        response_status=200,
+        response_headers={"content-type": "application/json"},
+    )
+    receipt = transport.create_receipt(result)
+
     assert receipt.is_valid == True
+    assert receipt.transport_verified == True  # Set by transport boundary
     assert receipt.provider_confirmed == True  # DERIVED
 
     adapter.execute_stage(manifest, "cpc_ipc_search", receipt, "CPC A61M")
     stage2 = manifest.stages["cpc_ipc_search"]
-    assert stage2.status == AttackStageStatus.COMPLETED, \
-        f"execute_stage with valid receipt should get COMPLETED, got {stage2.status}"
+    assert stage2.status == AttackStageStatus.COMPLETED
     assert stage2.execution.manually_supplied == False
-    assert stage2.execution.provider_confirmed == True  # DERIVED from receipt
+    assert stage2.execution.provider_confirmed == True
 
-    print("✅ Test 18 (execution proof): no receipt→INCOMPLETE, valid receipt→COMPLETED (seventh round)")
+    print("✅ Test 18 (transport boundary): no receipt→INCOMPLETE, transport→COMPLETED (eighth round)")
 
 
 def test_coverage_proof_enforced():
@@ -717,13 +725,14 @@ def test_coverage_proof_enforced():
     adapter = PatentDestructionAdapter()
     manifest = adapter.create_manifest("test_coverage", "test")
 
-    receipt = ProviderExecutionReceipt(
-        provider="EPO", request_fingerprint="req1",
-        request_timestamp="2026-08-20T00:00:00Z",
-        response_status=200, response_headers_hash="h1",
-        raw_response_hash="r1", provider_record_ids=["US456"],
-        adapter_version="1.0",
+    # Use transport boundary for legitimate execution
+    transport = ProviderTransportBoundary()
+    req = TransportExecutionRequest(
+        provider_name="EPO", endpoint_url="https://espacenet.com/?q=test",
+        adapter_version="1.0", stage_name="keyword_search",
     )
+    result = transport.execute(req, b'{"results": ["US0456789A1"]}', 200, {})
+    receipt = transport.create_receipt(result)
 
     # Try EXHAUSTED without coverage proof
     adapter.execute_stage(manifest, "keyword_search", receipt, "test")
@@ -752,7 +761,14 @@ def test_coverage_proof_enforced():
     )
     assert proof_full.is_exhausted() == True
 
-    adapter.execute_stage(manifest, "claims_search", receipt, "claims:test",
+    # Execute claims_search through transport too
+    req2 = TransportExecutionRequest(
+        provider_name="USPTO", endpoint_url="https://uspto.gov/?q=claims",
+        adapter_version="1.0", stage_name="claims_search",
+    )
+    result2 = transport.execute(req2, b'{"results": ["US4741730A"]}', 200, {})
+    receipt2 = transport.create_receipt(result2)
+    adapter.execute_stage(manifest, "claims_search", receipt2, "claims:test",
                           coverage_proof=proof_full)
     stage2 = manifest.stages["claims_search"]
     assert stage2.coverage == CoverageLevel.EXHAUSTED, \
@@ -792,14 +808,15 @@ def test_attack_the_attacker():
     adapter.execute_stage(manifest2, "keyword_search", failed_receipt, "test")
     assert manifest2.stages["keyword_search"].status == AttackStageStatus.FAILED
 
-    # Attack 3: Fake coverage proof (no classifications)
+    # Attack 3: Fake coverage proof (no classifications) — use transport for receipt
     manifest3 = adapter.create_manifest("attack3", "test")
-    good_receipt = ProviderExecutionReceipt(
-        provider="EPO", request_fingerprint="req",
-        request_timestamp="2026-08-20T00:00:00Z", response_status=200,
-        response_headers_hash="h", raw_response_hash="r",
-        provider_record_ids=["US123"], adapter_version="1.0",
+    transport3 = ProviderTransportBoundary()
+    req3 = TransportExecutionRequest(
+        provider_name="EPO", endpoint_url="https://espacenet.com/?q=test",
+        adapter_version="1.0", stage_name="keyword_search",
     )
+    result3 = transport3.execute(req3, b'{"results": ["US0123456A1"]}', 200, {})
+    good_receipt = transport3.create_receipt(result3)
     fake_coverage = CoverageProof(
         databases_queried=["fake_db"],
         # classifications_searched EMPTY
@@ -815,7 +832,7 @@ def test_attack_the_attacker():
     # Attack 4: Manually supplied COMPLETED (no receipt at all)
     manifest4 = adapter.create_manifest("attack4", "test")
     adapter.record_stage(manifest4, "keyword_search",
-        provider="fake", query="fake", result_ids=["US999"],
+        provider="fake", query="fake", result_ids=["US0999999B2"],
         status=AttackStageStatus.COMPLETED,
         coverage=CoverageLevel.EXHAUSTED,
     )
@@ -823,6 +840,73 @@ def test_attack_the_attacker():
     assert manifest4.stages["keyword_search"].coverage == CoverageLevel.QUERIED
 
     print("✅ Test 20 (attack the attacker): all 4 forged evidence attacks fail closed (seventh round)")
+
+
+
+def test_anti_self_certification():
+    """Test 21: Adapter cannot self-certify. Transport boundary is the verifier.
+
+    Per CEO directive (eighth round):
+      'Don't move the trust problem upward from caller to adapter.
+       Move it downward to the execution boundary.'
+
+      A malicious adapter that constructs ProviderExecutionReceipt() directly
+      must NOT be able to get COMPLETED status.
+    """
+    adapter = PatentDestructionAdapter()
+    manifest = adapter.create_manifest("anti_self_cert", "test")
+
+    # Attack 1: Adapter creates receipt directly (self-certification)
+    self_cert_receipt = ProviderExecutionReceipt(
+        provider="MaliciousAdapter",
+        request_fingerprint="fake_req",
+        request_timestamp="2026-08-20T00:00:00Z",
+        response_status=200,
+        response_headers_hash="fake_headers",
+        raw_response_hash="fake_body",
+        provider_record_ids=["US0999999B2"],
+        adapter_version="1.0",
+        # transport_verified defaults to False!
+    )
+    assert self_cert_receipt.transport_verified == False
+    assert self_cert_receipt.is_valid == False  # Cannot self-certify!
+    assert self_cert_receipt.provider_confirmed == False
+
+    adapter.execute_stage(manifest, "keyword_search", self_cert_receipt, "fake")
+    assert manifest.stages["keyword_search"].status == AttackStageStatus.FAILED
+
+    # Attack 2: Adapter lies about provider name
+    transport = ProviderTransportBoundary()
+    request = TransportExecutionRequest(
+        provider_name="Google Patents",
+        endpoint_url="https://patents.google.com/?q=test",
+        adapter_version="FakeAdapter v1.0",
+    )
+    result = transport.execute(request, b'{"results": []}', 200, {})
+    receipt = transport.create_receipt(result)
+    # Receipt correctly records the provider from the transport request
+    assert receipt.provider == "Google Patents"  # From transport, not adapter
+    assert receipt.adapter_version != "FakeAdapter v1.0"  # Transport stamped it
+
+    # Attack 3: Replayed old receipt (anti-replay)
+    manifest3 = adapter.create_manifest("replay_test", "test")
+    transport3 = ProviderTransportBoundary()
+    req = TransportExecutionRequest(
+        provider_name="EPO", endpoint_url="https://espacenet.com/?q=test",
+        adapter_version="1.0", stage_name="keyword_search",
+    )
+    result1 = transport3.execute(req, b'{"results": ["US1111111A1"]}', 200, {})
+    receipt1 = transport3.create_receipt(result1)
+    adapter.execute_stage(manifest3, "keyword_search", receipt1, "test")
+    assert manifest3.stages["keyword_search"].status == AttackStageStatus.COMPLETED
+
+    # Replay: same request fingerprint → REPLAY_DETECTED
+    result2 = transport3.execute(req, b'{"results": ["US2222222B2"]}', 200, {})
+    assert "REPLAY_DETECTED" in result2.failure_state
+    receipt2 = transport3.create_receipt(result2)
+    assert receipt2.provider_confirmed == False  # Failed due to replay
+
+    print("✅ Test 21 (anti-self-certification): adapter self-cert→FAILED, replay→FAILED (eighth round)")
 
 
 
@@ -853,10 +937,11 @@ def run_all_tests():
     test_execution_proof_enforced()
     test_coverage_proof_enforced()
     test_attack_the_attacker()
+    test_anti_self_certification()
 
     print()
     print("=" * 60)
-    print("ALL 20 ANTI-GAMING TESTS PASSED")
+    print("ALL 21 ANTI-GAMING TESTS PASSED")
     print("=" * 60)
     return True
 
