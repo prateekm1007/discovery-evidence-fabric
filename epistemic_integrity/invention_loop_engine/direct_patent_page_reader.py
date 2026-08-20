@@ -29,6 +29,7 @@ import re
 import subprocess
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Optional
 from uuid import uuid4
@@ -92,8 +93,15 @@ class ClaimEvidence:
     is_lossless: bool = True  # False if text was truncated
     extraction_status: str = "COMPLETE"  # COMPLETE / INCOMPLETE / VALIDATION_FAILED
     # P0.2 (thirteenth round): Extraction method
-    extraction_method: str = "REGEX_FALLBACK"  # STRUCTURED_HTML / REGEX_FALLBACK
-    source_node_identifier: str = ""  # DOM node ID/class if structured extraction used
+    extraction_method: str = "REGEX_FALLBACK"  # STRUCTURED_DOM / REGEX_FALLBACK
+    source_node_identifier: str = ""  # DOM node path/tag/class if structured extraction used
+    # P0.1 (fourteenth round): DOM-native evidence
+    source_node_hash: str = ""  # Hash of the raw HTML node content
+    exact_node_text_hash: str = ""  # Hash of the text extracted from the node
+    # P0.3 (fourteenth round): Jurisdiction-aware claim typing
+    jurisdiction: str = ""  # US, EP, JP, WO, etc.
+    source_document_type: str = ""  # PATENT_GRANT, PATENT_APPLICATION, etc.
+    claim_type_basis: str = ""  # How claim_type was determined: CLAIM_NUMBER_1, DEPENDENCY_PHRASE, SOURCE_STRUCTURE, UNKNOWN
 
     def __post_init__(self):
         if not self.content_hash:
@@ -119,6 +127,11 @@ class ClaimEvidence:
             "extraction_status": self.extraction_status,
             "extraction_method": self.extraction_method,
             "source_node_identifier": self.source_node_identifier,
+            "source_node_hash": self.source_node_hash,
+            "exact_node_text_hash": self.exact_node_text_hash,
+            "jurisdiction": self.jurisdiction,
+            "source_document_type": self.source_document_type,
+            "claim_type_basis": self.claim_type_basis,
         }
 
 
@@ -216,6 +229,91 @@ class LegalStatusEvidence:
             "content_hash": self.content_hash,
             "raw_response_hash": self.raw_response_hash,
         }
+
+
+class ClaimNodeParser(HTMLParser):
+    """DOM-native HTML parser for extracting patent claim nodes.
+
+    Per CEO directive (fourteenth round):
+      'Use a real HTML parser / DOM traversal.'
+      'Regex fallback must be LOWER_CONFIDENCE / FALLBACK and must never
+       masquerade as structured extraction.'
+
+    This parser traverses the HTML DOM tree and extracts claim nodes
+    based on their structural properties (tag, class, id), not regex
+    pattern matching on flattened text.
+
+    Google Patents HTML structure:
+      - Claims are in <div class="claim"> or <div class="claim-text"> elements
+      - Each claim may have a <div class="claim-num"> for the number
+      - The claim text is in the text content of the claim div
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.claim_nodes: list[dict] = []
+        self._current_tag_stack: list[str] = []
+        self._current_class_stack: list[str] = []
+        self._in_claim = False
+        self._current_claim_html = ""
+        self._current_claim_text = ""
+        self._current_node_depth = 0
+        self._claim_start_depth = 0
+        self._node_counter = 0
+
+    def handle_starttag(self, tag, attrs):
+        attrs_dict = dict(attrs)
+        css_class = attrs_dict.get("class", "")
+        self._current_tag_stack.append(tag)
+        self._current_class_stack.append(css_class)
+        self._node_counter += 1
+
+        # Check if this is a claim node
+        if not self._in_claim and tag == "div" and "claim" in css_class.lower():
+            # Check it's not a claim-num or claim-ref (those are sub-elements)
+            if "claim-num" not in css_class.lower() and "claim-ref" not in css_class.lower():
+                self._in_claim = True
+                self._current_claim_html = f"<{tag}"
+                for k, v in attrs:
+                    self._current_claim_html += f' {k}="{v}"'
+                self._current_claim_html += ">"
+                self._current_claim_text = ""
+                self._claim_start_depth = len(self._current_tag_stack)
+                self._current_node_id = f"div.claim.{css_class}.node{self._node_counter}"
+
+        elif self._in_claim:
+            self._current_claim_html += f"<{tag}"
+            for k, v in attrs:
+                self._current_claim_html += f' {k}="{v}"'
+            self._current_claim_html += ">"
+
+    def handle_endtag(self, tag):
+        if self._in_claim:
+            self._current_claim_html += f"</{tag}>"
+
+            # Check if we're closing the claim node
+            if len(self._current_tag_stack) == self._claim_start_depth:
+                # Claim node complete
+                self.claim_nodes.append({
+                    "raw_html": self._current_claim_html,
+                    "text": self._current_claim_text.strip(),
+                    "node_id": self._current_node_id,
+                    "node_hash": hashlib.sha256(
+                        self._current_claim_html.encode()).hexdigest(),
+                    "text_hash": hashlib.sha256(
+                        self._current_claim_text.strip().encode()).hexdigest(),
+                })
+                self._in_claim = False
+                self._current_claim_html = ""
+                self._current_claim_text = ""
+
+        if self._current_tag_stack:
+            self._current_tag_stack.pop()
+            self._current_class_stack.pop()
+
+    def handle_data(self, data):
+        if self._in_claim:
+            self._current_claim_text += data
 
 
 class DirectPatentPageReader:
@@ -416,44 +514,54 @@ class DirectPatentPageReader:
     def _parse_claims(text: str, patent_id: str, url: str,
                       raw_hash: str, retrieval_ts: str,
                       html: str = None) -> tuple[list[ClaimEvidence], ClaimExtractionValidation]:
-        """Parse individual claims from patent text into ClaimEvidence objects.
+        """Parse individual claims from patent page.
 
-        Per CEO directive (thirteenth round):
-          - UNKNOWN is the safe state. No detected dependency ≠ independent.
-          - Try structured HTML extraction first; regex as fallback.
-          - Store dependency_phrase, dependency_source_span, dependency_parse_confidence.
-          - Do NOT assume numeric continuity.
-          - If ambiguity remains → UNKNOWN.
+        Per CEO directive (fourteenth round):
+          1. Try DOM-native extraction first (ClaimNodeParser)
+          2. Regex as FALLBACK (never masquerade as structured)
+          3. If both used, verify they agree → CLAIM_EXTRACTION_INCONSISTENT if not
+          4. Jurisdiction-aware claim typing
+          5. UNKNOWN is the safe state
 
         Returns (claims, validation) tuple.
         """
         claims = []
         validation = ClaimExtractionValidation()
 
-        # P0.2 (thirteenth round): Try structured HTML extraction first
+        # Determine jurisdiction from patent_id
+        jurisdiction = ""
+        source_document_type = ""
+        if patent_id.startswith("US"):
+            jurisdiction = "US"
+            if patent_id[-1].isdigit():
+                source_document_type = "PATENT_APPLICATION"
+            elif "B" in patent_id[-2:]:
+                source_document_type = "PATENT_GRANT"
+            elif "A" in patent_id[-2:]:
+                source_document_type = "PATENT_APPLICATION"
+        elif patent_id.startswith("EP"):
+            jurisdiction = "EP"
+        elif patent_id.startswith("JP"):
+            jurisdiction = "JP"
+        elif patent_id.startswith("WO"):
+            jurisdiction = "WO"
+
+        # P0.1 (fourteenth round): DOM-native extraction
+        dom_claims = []
         extraction_method = "REGEX_FALLBACK"
-        structured_nodes = []
 
         if html:
-            # Google Patents uses <div class="claim"> or similar for claims
-            # Try to find claim elements in the HTML
-            claim_node_pattern = re.compile(
-                r'<div[^>]*class="[^"]*claim[^"]*"[^>]*>(.*?)</div>',
-                re.DOTALL | re.IGNORECASE
-            )
-            for match in claim_node_pattern.finditer(html):
-                claim_html = match.group(1)
-                claim_text = re.sub(r'<[^>]+>', ' ', claim_html)
-                claim_text = re.sub(r'\s+', ' ', claim_text).strip()
-                if claim_text:
-                    structured_nodes.append({
-                        "text": claim_text,
-                        "node_span": f"html {match.start()}-{match.end()}",
-                        "method": "STRUCTURED_HTML",
-                    })
+            parser = ClaimNodeParser()
+            try:
+                parser.feed(html)
+                dom_claims = parser.claim_nodes
+                if dom_claims:
+                    extraction_method = "STRUCTURED_DOM"
+            except Exception:
+                pass  # DOM parsing failed, fall through to regex
 
-            if structured_nodes:
-                extraction_method = "STRUCTURED_HTML"
+        # Regex extraction (always run, for comparison/fallback)
+        regex_claims = []
 
         # Find the claims section in text
         claims_idx = text.lower().find("what is claimed")
@@ -466,30 +574,28 @@ class DirectPatentPageReader:
 
         claims_section = text[claims_idx:]
 
-        # Extract declared claim count from "Claims (24)" header
+        # Extract declared claim count
         count_match = re.search(r'[Cc]laims\s*\(\s*(\d+)\s*\)', claims_section[:200])
         if count_match:
             validation.declared_claim_count = int(count_match.group(1))
 
-        # Parse individual claims: "1. ...", "2. ...", etc.
-        # P0.1 (twelfth round): NO TRUNCATION. Full claim text preserved.
+        # Parse with regex (no truncation)
         claim_pattern = re.compile(r'(\d+)\.\s+(.*?)(?=\d+\.\s+|$)', re.DOTALL)
         seen_claim_numbers = set()
 
         for match in claim_pattern.finditer(claims_section):
             claim_num = int(match.group(1))
-            claim_text = match.group(2).strip()  # NO TRUNCATION
+            claim_text = match.group(2).strip()
 
             span_start = claims_idx + match.start()
             span_end = claims_idx + match.end()
 
-            # P0.4 (thirteenth round): Dependency evidence with phrase + span + confidence
+            # Dependency evidence
             depends_on = []
             dependency_phrase = ""
             dependency_source_span = ""
             dependency_parse_confidence = "UNKNOWN"
 
-            # Extended dependency patterns with capture of the exact phrase
             dep_patterns = [
                 (r'(as recited in claim (\d+))', "HIGH"),
                 (r'(of claim (\d+))', "HIGH"),
@@ -510,62 +616,122 @@ class DirectPatentPageReader:
                         dependency_source_span = f"chars {dep_start}-{dep_end}"
                         dependency_parse_confidence = confidence
 
-            # P0.1 (thirteenth round): claim_type semantics
-            # DEPENDENT: dependency detected with confidence
-            # INDEPENDENT: ONLY claim_number == 1 with no dependency detected
-            #   (claim 1 is always independent by patent law convention)
-            # UNKNOWN: no dependency detected AND claim_number != 1
-            #   (absence of evidence ≠ evidence of absence)
+            # P0.3 (fourteenth round): Jurisdiction-aware claim typing
             if depends_on:
                 claim_type = "DEPENDENT"
-            elif claim_num == 1:
-                # Claim 1 is always independent by convention
+                claim_type_basis = "DEPENDENCY_PHRASE"
+            elif claim_num == 1 and jurisdiction == "US":
+                # US convention: claim 1 is always independent
                 claim_type = "INDEPENDENT"
+                claim_type_basis = "CLAIM_NUMBER_1_US_CONVENTION"
+            elif claim_num == 1:
+                # Non-US: claim 1 is likely independent but we can't be sure
+                claim_type = "INDEPENDENT"
+                claim_type_basis = "CLAIM_NUMBER_1_GENERAL_CONVENTION"
             else:
-                # Cannot confirm independence — parser may have missed dependency
                 claim_type = "UNKNOWN"
+                claim_type_basis = "NO_DEPENDENCY_DETECTED"
 
-            # Check for empty claims
             is_empty = len(claim_text) == 0
-
-            # Check for duplicates
             is_duplicate = claim_num in seen_claim_numbers
             seen_claim_numbers.add(claim_num)
 
-            claims.append(ClaimEvidence(
-                patent_id=patent_id,
-                claim_number=claim_num,
-                claim_type=claim_type,
-                exact_claim_text=claim_text,
-                source_url=url,
-                source_span=f"chars {span_start}-{span_end}",
-                raw_response_hash=raw_hash,
-                retrieval_timestamp=retrieval_ts,
-                depends_on_claim_numbers=depends_on,
-                dependency_phrase=dependency_phrase,
-                dependency_source_span=dependency_source_span,
-                dependency_parse_confidence=dependency_parse_confidence,
-                is_lossless=True,
-                extraction_status="COMPLETE",
-                extraction_method=extraction_method,
-            ))
+            # P0.2 (fourteenth round): Check if DOM extraction found this claim
+            dom_node = None
+            if dom_claims:
+                # Try to match DOM claim to regex claim by number
+                for dc in dom_claims:
+                    dc_text = dc["text"]
+                    # Check if DOM text starts with this claim number
+                    if re.match(rf'^{claim_num}\.', dc_text.strip()):
+                        dom_node = dc
+                        break
 
-            # Safety limit
+            # Build ClaimEvidence with DOM or regex provenance
+            if dom_node:
+                method = "STRUCTURED_DOM"
+                node_id = dom_node["node_id"]
+                node_hash = dom_node["node_hash"]
+                text_hash = dom_node["text_hash"]
+                # P0.2: Verify DOM text matches regex text
+                dom_text_normalized = re.sub(r'\s+', ' ', dom_node["text"]).strip()
+                regex_text_normalized = re.sub(r'\s+', ' ', claim_text).strip()
+                # Remove leading claim number from DOM text for comparison
+                dom_text_no_num = re.sub(r'^\d+\.\s*', '', dom_text_normalized)
+                if dom_text_no_num != regex_text_normalized:
+                    # P0.2: Disagreement → INCONSISTENT
+                    validation.issues.append(
+                        f"Claim {claim_num}: DOM text != regex text. "
+                        f"DOM='{dom_text_no_num[:80]}...' regex='{regex_text_normalized[:80]}...'"
+                    )
+
+                claims.append(ClaimEvidence(
+                    patent_id=patent_id,
+                    claim_number=claim_num,
+                    claim_type=claim_type,
+                    exact_claim_text=claim_text,  # Use regex text (more reliable for claim number)
+                    source_url=url,
+                    source_span=f"chars {span_start}-{span_end}",
+                    raw_response_hash=raw_hash,
+                    retrieval_timestamp=retrieval_ts,
+                    depends_on_claim_numbers=depends_on,
+                    dependency_phrase=dependency_phrase,
+                    dependency_source_span=dependency_source_span,
+                    dependency_parse_confidence=dependency_parse_confidence,
+                    is_lossless=True,
+                    extraction_status="COMPLETE",
+                    extraction_method=method,
+                    source_node_identifier=node_id,
+                    source_node_hash=node_hash,
+                    exact_node_text_hash=text_hash,
+                    jurisdiction=jurisdiction,
+                    source_document_type=source_document_type,
+                    claim_type_basis=claim_type_basis,
+                ))
+            else:
+                # Regex fallback — LOWER_CONFIDENCE
+                claims.append(ClaimEvidence(
+                    patent_id=patent_id,
+                    claim_number=claim_num,
+                    claim_type=claim_type,
+                    exact_claim_text=claim_text,
+                    source_url=url,
+                    source_span=f"chars {span_start}-{span_end}",
+                    raw_response_hash=raw_hash,
+                    retrieval_timestamp=retrieval_ts,
+                    depends_on_claim_numbers=depends_on,
+                    dependency_phrase=dependency_phrase,
+                    dependency_source_span=dependency_source_span,
+                    dependency_parse_confidence=dependency_parse_confidence,
+                    is_lossless=True,
+                    extraction_status="COMPLETE",
+                    extraction_method="REGEX_FALLBACK",
+                    source_node_identifier="",
+                    source_node_hash="",
+                    exact_node_text_hash="",
+                    jurisdiction=jurisdiction,
+                    source_document_type=source_document_type,
+                    claim_type_basis=claim_type_basis,
+                ))
+
             if claim_num >= 100:
                 break
 
-        # P0.3 (thirteenth round): Run validation (no sequence assumption)
+        # Validation
         validation.parsed_claim_count = len(claims)
         validation.has_duplicates = len(seen_claim_numbers) != len(claims)
         validation.has_empty_claims = any(c.exact_claim_text == "" for c in claims)
 
-        # Validate (passing claims for unresolved reference check)
-        validation.validate(claims)
-
-        # If validation failed, mark all claims
-        if validation.validation_status != "VALIDATED":
+        # P0.2: If DOM/regex disagreement found, mark as INCONSISTENT
+        if validation.issues:
+            validation.validation_status = "CLAIM_EXTRACTION_INCONSISTENT"
             for c in claims:
-                c.extraction_status = "CLAIM_EXTRACTION_INCOMPLETE"
+                c.extraction_status = "CLAIM_EXTRACTION_INCONSISTENT"
+        else:
+            validation.validate(claims)
+            if validation.validation_status != "VALIDATED":
+                for c in claims:
+                    c.extraction_status = "CLAIM_EXTRACTION_INCOMPLETE"
 
         return claims, validation
 
