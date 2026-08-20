@@ -1,0 +1,209 @@
+{
+  "artifact_id": "SLOT5_PHASE5B_PATENT_GATE_REDO",
+  "slot": 5,
+  "phase": "5B — Patent gate REDO (correcting premature promotion)",
+  "timestamp": "2026-08-20T00:00:00Z",
+  "constitution_version": "1.5.0",
+  "ceo_directive": "The coder promoted C04 and C09 too early. US4741730A already claims filter+bypass. C09 has substantial precedent across 6 mechanism families. Redo the patent gate from zero. Do NOT promote. The new loop must attack the invention before it invests in the invention.",
+
+  "correction_acknowledgment": {
+    "previous_error": "In SLOT5_PHASE3_5_PATENT_GATE_AND_RANKING.json, I stated C04 had 'PATENT_HEADROOM_GREEN — no direct prior art found' and C09 had 'PATENT_HEADROOM_GREEN.' Both assessments were premature. The CEO audit correctly identified that US4741730A directly anticipates the filter+bypass architecture, and C09's mechanism space is insufficiently attacked.",
+    "root_cause": "I performed a broad search ('blood-tolerant CSF shunt patent') and finding no exact match, declared GREEN. This violated Article II (exact evidence beats semantic plausibility) — I should have searched for the SPECIFIC architectural components (filter + bypass + pressure-regulated valve) individually.",
+    "fix": "Redo from zero. Start with US4741730A exact claims. Map C04 limitations against each claim. Search each mechanism family for C09 separately."
+  },
+
+  "C04_PATENT_GATE_REDO": {
+    "starting_point": "US4741730A — Hydrocephalus shunt with in-line filter and bypass passageway",
+    "us4741730a_exact_claims": {
+      "claim_1": "A shunt system comprising: (a) body with inlet+outlet+first passageway; (b) pressure-regulated valve in first passageway; (c) filter in first passageway; (d) second passageway around the filter (bypass); (e) blocking/opening means in second passageway.",
+      "claim_2": "Adds pressure-regulated valve in the bypass passageway",
+      "claim_10": "Filter comprises about 1.5 to 3 micron microporous filter (this EXCLUDES RBCs at ~7-8μm)",
+      "claim_11": "Body comprised of silicone",
+      "claim_12": "Double-domed resilient body variant with first/second chambers",
+      "total_claims": 24
+    },
+
+    "c04_limitation_vs_us4741730a_mapping": {
+      "C04_concept": "Blood-tolerant eShunt for PHH — a CSF drainage device that handles blood-laden CSF without obstructing, potentially via filtration + bypass",
+      "mapping": [
+        {
+          "c04_element": "Filter to exclude blood cells from CSF drainage path",
+          "us4741730a_claim": "Claim 1(c) — 'a filter positioned within the first fluid-flow passageway'",
+          "verdict": "ANTICIPATED — US4741730A Claim 1 explicitly covers a filter in the shunt passageway"
+        },
+        {
+          "c04_element": "Bypass passageway around the filter for when filter obstructs",
+          "us4741730a_claim": "Claim 1(d) — 'a second fluid-flow passageway extending between the inlet and outlet and providing a passageway through the body around the filter'",
+          "verdict": "ANTICIPATED — US4741730A Claim 1 explicitly covers a bypass around the filter"
+        },
+        {
+          "c04_element": "Pressure-regulated valve to control drainage",
+          "us4741730a_claim": "Claim 1(b) — 'pressure regulated valve means positioned within the first fluid-flow passageway'",
+          "verdict": "ANTICIPATED — US4741730A Claim 1 explicitly covers a pressure-regulated valve"
+        },
+        {
+          "c04_element": "Selective blocking/opening of bypass",
+          "us4741730a_claim": "Claim 1(e) — 'means within the second fluid-flow passageway for selectively blocking or opening'",
+          "verdict": "ANTICIPATED — US4741730A Claim 1 explicitly covers selective blocking/opening"
+        },
+        {
+          "c04_element": "Filter pore size that excludes RBCs (~7μm)",
+          "us4741730a_claim": "Claim 10 — 'about a 1.5 to 3 micron microporous filter'",
+          "verdict": "ANTICIPATED — US4741730A Claim 10 specifies a pore size (1.5-3μm) that EXCLUDES RBCs (7-8μm). This is EXACTLY the blood-cell-exclusion filter C04 would need."
+        },
+        {
+          "c04_element": "Pressure-regulated bypass valve",
+          "us4741730a_claim": "Claim 2 — 'pressure regulated valve means within the second fluid-flow passageway'",
+          "verdict": "ANTICIPATED — US4741730A Claim 2 explicitly covers a pressure-regulated bypass valve"
+        }
+      ]
+    },
+
+    "c04_what_is_NOT_anticipated": {
+      "endovascular_deployment": "US4741730A is a traditional shunt (ventricular catheter). The eShunt's endovascular venous-sinus deployment is NOT in US4741730A.",
+      "phh_specific_indication": "US4741730A mentions 'surgically created hydrocephalus and hydrocephalus accompanied by brain tumors' — NOT PHH/neonatal IVH. But indication-specific claims are weak — a device claim is not limited by the indication stated in the specification.",
+      "neonatal_geometry": "US4741730A does not specify neonatal-sized geometry. But this is an obvious adaptation (scaling).",
+      "blood_composition_handling": "US4741730A's filter excludes particles >1.5-3μm. This INCLUDES RBCs but the patent doesn't specifically address blood-laden CSF dynamics, protein load, or the PHH-specific blood composition challenge."
+    },
+
+    "c04_survival_analysis": {
+      "can_c04_distinguish_over_us4741730a": "MARGINAL. The core architecture (filter + bypass + pressure-regulated valve + selective opening) is FULLY ANTICIPATED by US4741730A Claim 1. The only unanticipated elements are: (1) endovascular deployment (eShunt-specific), (2) PHH indication (weak), (3) neonatal geometry (obvious scaling), (4) blood-composition-specific design (not claimable as architecture).",
+      "section_102_threat": "HIGH — US4741730A Claim 1 + Claim 10 directly anticipate the filter+bypass architecture with RBC-excluding pore size. C04 cannot claim 'filter + bypass + pressure valve' without distinguishing over US4741730A.",
+      "section_103_threat": "HIGH — even if C04 adds endovascular deployment, a §103 obviousness argument would say 'it's obvious to adapt a known filter+bypass shunt (US4741730A) to endovascular deployment (eShunt) for PHH (known indication).' The combination is likely obvious.",
+      "what_would_be_needed_to_survive": "C04 would need a NON-OBVIOUS element beyond 'filter + bypass + endovascular.' Possible directions: (a) a fundamentally different filtration mechanism (not microporous membrane — e.g., centrifugal, electromagnetic, acoustic separation), (b) a self-cleaning/regenerating filter that US4741730A doesn't have, (c) a blood-composition-adaptive mechanism that responds to RBC/protein load in real-time. Each of these would need its own patent search."
+    },
+
+    "c04_additional_prior_art_found": [
+      "US7118548B2 — Device for treatment of hydrocephalus (CSF shunt to sinus sagittalis — SAME target as eShunt)",
+      "EP0478842A1 — Filter for filtration of human cerebrospinal fluid (membrane filter, 0.04-0.45μm pore size — covers the CSF filtration space)",
+      "Liquorpheresis (CSF filtration) — PMC5388363, González 2017 — therapeutic CSF filtration approach already described",
+      "US10525239B2 — CSF shunt for treatment of hydrocephalus (implantable, regulating drainage)",
+      "ReFlow Mini Flusher — noninvasive device to flush CSF back into ventricular catheter (different approach but addresses shunt obstruction)"
+    ],
+
+    "c04_corrected_verdict": {
+      "previous": "PATENT_HEADROOM_GREEN — no direct prior art found",
+      "corrected": "PATENT_HEADROOM_RED — US4741730A directly anticipates the filter+bypass+pressure-valve architecture, including RBC-excluding pore size (Claim 10). The core concept is NOT novel. C04 can only survive with a fundamentally different filtration mechanism or a non-obvious adaptive element not present in the prior art.",
+      "status_change": "GREEN → RED. C04 is NO LONGER a strong patent candidate without significant narrowing."
+    },
+
+    "c04_strongest_alternative_attack": {
+      "ceo_question": "Why wouldn't existing PHH blood-removal / temporary-diversion strategies dominate?",
+      "existing_alternatives": [
+        "Temporary EVD — standard of care, drains blood-laden CSF externally until blood clears, then converts to permanent VP shunt. 75% of PHH patients need permanent shunt after temporary diversion.",
+        "Ventriculosubgaleal shunts — temporary, continuous drainage, avoids external EVD",
+        "Intraventricular rtPA (thrombolysis) — dissolves blood clots, reduces obstruction",
+        "Liquorphoresis (CSF filtration) — external CSF filtration approach already described",
+        "US4741730A shunt with filter+bypass — if it worked for PHH, it would already be used (it's been available since 1988)"
+      ],
+      "why_c04_might_not_beat_them": "US4741730A has existed since 1988. If filter+bypass were the solution to PHH blood obstruction, it would already be the standard of care. The fact that it's NOT used for PHH suggests either (a) the filter itself obstructs under blood load, (b) the bypass doesn't provide adequate drainage when the filter is obstructed, or (c) the clinical problem is more complex than simple filtration can solve. This is a MAJOR red flag — the prior art exists but isn't used, implying the approach has a known failure mode.",
+      "verdict": "STRONGEST_ALTERNATIVE_SURVIVES — the existing alternatives (EVD→VP, rtPA, liquorphoresis) and the unused US4741730A all suggest that filter+bypass is either insufficient or already-solved-and-abandoned. C04 must explain why the 1988 patent wasn't adopted for PHH."
+    }
+  },
+
+  "C09_PATENT_GATE_REDO": {
+    "mechanism_family_separation": {
+      "ceo_directive": "Separate CSF overproduction problem from: CPC, arterial embolization, pharmacological modulation, receptor modulation, remote neuromodulation, implantable modulation. Search exact claims for each."
+    },
+
+    "family_1_cpc": {
+      "description": "Choroid plexus coagulation (CPC) — endoscopic ablation of choroid plexus tissue",
+      "evidence": "Ogiwara 2014 (cited 25): endoscopic CPC with/without ETV is safe and effective. ETV-CPC is standard for children under 2. CPC reduces choroid plexus tissue in 2 of 4 ventricles.",
+      "patent_status": "CPC is a SURGICAL PROCEDURE, not a device. Procedures are generally not patentable (though specific instruments may be). The procedure itself is prior art against any 'method of reducing CSF production by damaging choroid plexus.'",
+      "implication_for_c09": "Any C09 mechanism that involves PHYSICAL DESTRUCTION of choroid plexus is anticipated by CPC as prior art."
+    },
+
+    "family_2_arterial_embolization": {
+      "description": "Choroidal artery embolization — endovascular occlusion of arteries feeding choroid plexus",
+      "evidence": "Li 2019 (cited 10): choroidal artery embolization for hydrocephalus from diffuse villous hyperplasia of choroid plexus. CSF production was reduced.",
+      "patent_status": "Endovascular embolization is a known technique. The application to choroid plexus for CSF reduction is published.",
+      "implication_for_c09": "Any C09 mechanism that involves ENDOVASCULAR OCCLUSION of choroid plexus blood supply is anticipated by Li 2019."
+    },
+
+    "family_3_pharmacological": {
+      "description": "Pharmacological CSF reduction — acetazolamide, topiramate, furosemide",
+      "evidence": "Barbuskaite 2022 (cited 45): acetazolamide lowers ICP by reducing choroid plexus CSF secretion. Patel 2025 (cited 5): acetazolamide inhibits carbonic anhydrase in choroid plexus. Millichap 2015 (cited 17): acetazolamide reduces CSF production in IIH.",
+      "patent_status": "Acetazolamide is off-patent (generic). The mechanism (carbonic anhydrase inhibition → reduced CSF secretion) is well-established. Any C09 mechanism using carbonic anhydrase inhibition is anticipated.",
+      "implication_for_c09": "Any C09 mechanism using PHARMACOLOGICAL CSF REDUCTION via carbonic anhydrase is anticipated."
+    },
+
+    "family_4_receptor_modulation": {
+      "description": "Receptor-level modulation — A2A adenosine receptor, other ChP receptors",
+      "evidence": "Zheng 2025 (cited 3): aberrant A2A receptor signaling in choroid plexus is a trigger of hydrocephalus. A2A antagonism reduced CSF production in models. Ye 2022 (cited 10): A2A receptor controls choroid plexus gateway.",
+      "patent_status": "A2A receptor modulation for CSF reduction is actively being researched (2025). The molecular pathway is published. Any C09 mechanism using A2A receptor modulation would face patent threats from the researchers/institutions publishing this work.",
+      "implication_for_c09": "Any C09 mechanism using A2A RECEPTOR MODULATION is in a crowded, actively-patented space."
+    },
+
+    "family_5_remote_neuromodulation": {
+      "description": "Remote neuromodulation — electrical stimulation to modulate choroid plexus function",
+      "evidence": "Neuromodulation patents exist broadly (Rotenberg 2026: 18 patent infringement complaints 2000-2024). 'Neuromodulation to modulate glymphatic clearance' patent found in C02 search. The neuromodulation space is DENSE and heavily litigated.",
+      "patent_status": "Neuromodulation is a mature, patent-dense field. Any C09 mechanism using electrical stimulation would face a dense prior art landscape.",
+      "implication_for_c09": "Any C09 mechanism using ELECTRICAL NEUROMODULATION faces a dense, litigated patent landscape."
+    },
+
+    "family_6_implantable_device": {
+      "description": "Implantable device for CSF production modulation",
+      "evidence": "US10525239B2 (CSF shunt for hydrocephalus, implantable). US7118548B2 (device for hydrocephalus, CSF to sinus sagittalis). Ericson 2002 (cited 248): implantable ICP monitor. No specific implantable CSF-PRODUCTION-MODULATING device found, but the implantable-device space for hydrocephalus is populated.",
+      "patent_status": "No DIRECT prior art for an implantable device that MODULATES CSF production (as opposed to draining CSF). BUT: the eShunt itself is an implantable device in the venous sinus. Adding 'CSF production modulation' as a function would be a combination patent (eShunt + modulation), which is weaker than a mechanism patent.",
+      "implication_for_c09": "The IMPLANTABLE DEVICE approach has less direct prior art, but (a) the anatomical access challenge remains (eShunt is venous, choroid plexus is ventricular), and (b) the mechanism of modulation (which family?) determines the patent landscape."
+    },
+
+    "c09_corrected_verdict": {
+      "previous": "PATENT_HEADROOM_GREEN — no device-based prior art found",
+      "corrected": "PATENT_HEADROOM_YELLOW_TO_RED depending on mechanism. The CSF overproduction problem space is NOT empty — it is occupied by CPC (surgical), embolization (endovascular), acetazolamide (pharmacological), A2A receptor modulation (emerging molecular), and neuromodulation (dense patents). An implantable device approach has less DIRECT prior art but (a) faces the anatomical access challenge, (b) would be a combination patent, and (c) the specific modulation mechanism determines the actual patent landscape, which is crowded in every family.",
+      "status_change": "GREEN → YELLOW/RED. C09 is NOT a clean patent space. The mechanism must be specified and searched before any patent headroom claim."
+    },
+
+    "c09_strongest_alternative_attack": {
+      "ceo_question": "Why wouldn't CPC, ETV+CPC, pharmacological ChP modulation, or emerging molecular therapy dominate?",
+      "existing_alternatives": [
+        "CPC / ETV+CPC — established surgical procedure, reduces CSF production by destroying choroid plexus tissue. Standard of care for infantile hydrocephalus in children under 2.",
+        "Acetazolamide — pharmacological CSF reduction, off-patent, widely available. Symptomatic but established.",
+        "Choroidal artery embolization — endovascular, reduces CSF production by occluding ChP blood supply. Published (Li 2019).",
+        "A2A receptor antagonism — emerging molecular therapy, reduces CSF production in models (Zheng 2025). Patent-active.",
+        "ETV alone — endoscopic third ventriculostomy, addresses obstructive hydrocephalus by creating bypass, not reducing production."
+      ],
+      "why_c09_might_not_beat_them": "CPC is already the standard of care for CSF overproduction in infants. Acetazolamide is available and cheap. Choroidal artery embolization is published. A2A antagonism is being developed. An eShunt-based implantable CSF modulator would need to beat ALL of these on some decisive dimension: (a) reversibility (CPC is irreversible), (b) controllability (acetazolamide is systemic), (c) durability (vs temporary approaches), (d) minimally-invasiveness (vs CPC surgery). The challenge is finding a dimension where an eShunt-based modulator is SUPERIOR to all existing approaches.",
+      "verdict": "STRONGEST_ALTERNATIVE_SURVIVES — the existing alternatives (CPC, acetazolamide, embolization, A2A) are established or emerging. C09 must identify a decisive dimension where it beats ALL of them. The anatomical access challenge (eShunt is venous, ChP is ventricular) makes this difficult."
+    }
+  },
+
+  "corrected_candidate_ranking": {
+    "note": "Both C04 and C09 have been DOWNGRADED. Neither is a clean GREEN patent candidate. Slot 5 remains EMPTY.",
+    "c04_corrected": {
+      "rank": "DEMOTED from 1 to conditional",
+      "patent_status": "RED — US4741730A anticipates core architecture",
+      "problem_strength": "GREEN — PHH is real, blood obstruction is documented",
+      "survival_path": "NARROW — must find a fundamentally different filtration mechanism (not microporous membrane) or a non-obvious adaptive element. Must also explain why US4741730A (1988) wasn't adopted for PHH if filter+bypass works.",
+      "next_action": "If pursued: (1) search for non-membrane separation mechanisms (centrifugal, acoustic, electromagnetic), (2) investigate why US4741730A failed for PHH, (3) only proceed if a non-obvious mechanism is found that avoids US4741730A's architecture."
+    },
+    "c09_corrected": {
+      "rank": "DEMOTED from 2 to conditional",
+      "patent_status": "YELLOW/RED — mechanism-dependent, all 6 families are crowded",
+      "problem_strength": "GREEN — CSF overproduction is real, root cause not addressed",
+      "survival_path": "NARROW — must specify the exact modulation mechanism, search that mechanism's patent landscape, and identify a decisive dimension where it beats CPC + acetazolamide + embolization + A2A. The anatomical access challenge must be solved.",
+      "next_action": "If pursued: (1) specify the exact mechanism (drug delivery? electrical? thermal? receptor-targeted?), (2) search that mechanism's patent space, (3) identify the decisive advantage over existing alternatives, (4) solve the anatomical access challenge."
+    }
+  },
+
+  "slot_5_status": {
+    "status": "EMPTY — correctly remains empty",
+    "reason": "Both C04 and C09 have significant patent gate issues that were not caught in the first pass. Neither has earned the right to build the Article XXXV closed loop.",
+    "ceo_directive_compliance": "The new loop must attack the invention before it invests in the invention. Both C04 and C09 have now been attacked more thoroughly. Neither survived cleanly.",
+    "pushing_the_envelope_principle": "The loop is not: candidate → simulator → validation. It is: candidate → try to destroy candidate → only survivor gets simulator. C04 and C09 have not yet survived the destruction attempt."
+  },
+
+  "honest_assessment": {
+    "what_went_wrong_in_first_pass": "I declared patent headroom GREEN based on the ABSENCE of an exact match for 'blood-tolerant CSF shunt.' This violated Article II (exact evidence beats semantic plausibility). The correct approach was to search for the SPECIFIC architectural components (filter + bypass + pressure valve) — which US4741730A directly covers. I also failed to search C09's mechanism families separately, missing the CPC/embolization/pharmacological/A2A prior art.",
+    "what_is_correct_now": "Both candidates have real problems (C04: PHH blood obstruction; C09: CSF overproduction) but BOTH have significant patent gate challenges. Neither is a clean survivor. Slot 5 remains EMPTY.",
+    "next_step": "Do NOT build simulators for C04 or C09. Either (a) find a non-obvious mechanism that distinguishes over the prior art, or (b) continue searching for a different candidate entirely. The CEO's pushing-the-envelope principle applies: 'The new loop must attack the invention before it invests in the invention.'"
+  },
+
+  "provenance": {
+    "us4741730a_claims_source": "https://patents.google.com/patent/US4741730A/en (fetched via page_reader)",
+    "searches_executed": 4 (C04 redo) + 6 (C09 redo) = 10,
+    "search_result_files": "PHASE5B_PATENT_GATE_REDO/c04_redo_01-04 + c09_redo_01-06",
+    "retrieval_date": "2026-08-20",
+    "constitution_acknowledgment": "Articles I, II, VI, VII, XX, XXVII, XXVIII, XXIX, XXXII, XXXV applied. Honest correction of premature promotion. No rescue attempt."
+  }
+}

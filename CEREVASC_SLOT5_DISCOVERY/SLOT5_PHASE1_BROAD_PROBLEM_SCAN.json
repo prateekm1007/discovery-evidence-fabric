@@ -1,0 +1,190 @@
+{
+  "artifact_id": "SLOT5_PHASE1_BROAD_PROBLEM_SCAN",
+  "slot": 5,
+  "phase": "1 — Broad problem-space scan",
+  "timestamp": "2026-08-20T00:00:00Z",
+  "constitution_version": "1.4.0",
+  "ceo_directive": "Find problems where: (1) problem demonstrably exists, (2) buyer suffers, (3) existing solutions leave gap, (4) different causal mechanism may close gap, (5) patent headroom. Keep ≥5 serious candidates alive. Do NOT crown a winner.",
+
+  "search_scope": {
+    "dimensions_searched": 12,
+    "searches_executed": 20,
+    "search_result_files": "slot5_01 through slot5_20",
+    "source_universe": "z-ai web_search (existing source universe only)"
+  },
+
+  "candidate_problems_identified": [
+    {
+      "candidate_id": "S5-C01",
+      "problem_name": "CSF shunt over-drainage and slit ventricle syndrome",
+      "problem_description": "CSF shunts (both VP and eShunt) can drain too aggressively, causing ventricular collapse, slit ventricle syndrome, and chronic intracranial hypotension. The problem is especially severe in pediatric patients. Existing programmable valves require manual adjustment by clinicians and cannot respond to real-time postural/physiological changes.",
+      "problem_exists_evidence": {
+        "documented": true,
+        "evidence": "Panagopoulos 2021 (cited 31): 'Hydraulic and mechanical mismatching of CSF shunts to individual patients may lead to over-drainage of CSF, resulting in the development of slit ventricle syndrome.' Ros 2021 (cited 52): over-drainage leads to ventricular collapse onto catheter tip.",
+        "incidence": "Common complication; over/under-drainage affects significant fraction of shunt patients long-term",
+        "clinical_severity": "HIGH — chronic headaches, neurological deficits, requires revision"
+      },
+      "buyer_impact": "CereVasc positions eShunt as having reduced over-drainage vs VP (no siphon effect due to venous sinus pressure being higher than peritoneal). But eShunt is NOT immune — venous pressure fluctuates with posture, cough, Valsalva. Buyer value: if eShunt can SOLVE over-drainage that VP shunts cannot, it's a major differentiator.",
+      "existing_solutions_gap": "Programmable valves (Strata, Hakim, Polaris) allow clinician adjustment but NOT real-time adaptive control. Antisiphon devices exist but are passive and imperfect. No existing solution provides CLOSED-LOOP adaptive drainage based on real-time pressure.",
+      "causal_mechanism_direction": "Closed-loop adaptive drainage control — sensor measures ICP or CSF-venous pressure differential, actuator modulates drainage resistance in real-time. This is a FUNDAMENTALLY DIFFERENT causal mechanism from passive valves or manually-adjusted programmable valves.",
+      "patent_headroom": "UNKNOWN — need exact claim search. But Slot 4 (CV-T10, M1 ML predictive failure) was flagged for identifiability risk; this candidate may overlap. CRITICAL: must distinguish from CV-T04 (frozen — derivative/predictive controllers failed buyer boundaries) and CV-T08 (provisional — obstruction detection, not drainage control).",
+      "ce_cemetery_check": "CE-004 (CV-T04) killed derivative/predictive controllers for venous-aware regulation. This candidate is RISK: if it's just 'a better controller for the same problem,' it inherits CE-004's kill reason. Must demonstrate a DIFFERENT control variable or DIFFERENT buyer boundary.",
+      "physical_plausibility": "HIGH — MEMS pressure sensors + micro-actuators are mature technology. The challenge is biocompatibility and long-term reliability in CSF, not physics.",
+      "preliminary_score": "problem_strength=HIGH × unmet_need=HIGH × causal_novelty=MEDIUM (closed-loop is known concept, but eShunt-specific application may be novel) × patent_headroom=UNKNOWN × physical_plausibility=HIGH × buyer_value=HIGH",
+      "verdict": "SERIOUS CANDIDATE — but CE-004 overlap risk is significant. Must check whether the kill reason for CV-T04 applies."
+    },
+
+    {
+      "candidate_id": "S5-C02",
+      "problem_name": "Glymphatic system impairment in neurodegenerative disease",
+      "problem_description": "The glymphatic system clears amyloid-β and tau from the brain during sleep. Impairment is implicated in Alzheimer's disease and other neurodegenerative conditions. Current interventions (sleep improvement, acetazolamide) are systemic and non-targeted. An eShunt-based approach could modulate CSF flow dynamics to enhance glymphatic clearance.",
+      "problem_exists_evidence": {
+        "documented": true,
+        "evidence": "Kopeć 2025 (cited 17), Dagum 2026 (cited 47), Li 2024 (cited 27), Zheng 2026. Glymphatic impairment is strongly implicated in Alzheimer's. Multiple peer-reviewed papers confirm the causal link.",
+        "incidence": "Alzheimer's affects ~50M worldwide. NPH may cause 5% of dementia (Yale Medicine).",
+        "clinical_severity": "CATASTROPHIC — progressive neurodegeneration, death"
+      },
+      "buyer_impact": "If eShunt can enhance glymphatic clearance, it expands the indication from hydrocephalus to Alzheimer's/preventive neurology — a MASSIVE market expansion for CereVasc. But this is a long-term, high-risk play.",
+      "existing_solutions_gap": "No existing device-based therapy enhances glymphatic clearance. Sleep modulation (van Hattem 2025, cited 66) is noninvasive but indirect. Acetazolamide is systemic with side effects. A targeted, implantable approach to modulating CSF dynamics for glymphatic enhancement is a WHITE SPACE.",
+      "causal_mechanism_direction": "Modulate CSF flow patterns (pressure waveform, pulsatility) to enhance glymphatic clearance. The eShunt creates a CSF-venous anastomosis — by controlling the FLOW PATTERN through the eShunt (not just the rate), it may be possible to enhance glymphatic pulsations. This is a FUNDAMENTALLY DIFFERENT causal mechanism from drug-based or sleep-based approaches.",
+      "patent_headroom": "UNKNOWN — need exact claim search. The glymphatic-enhancement device space is likely sparse (the field is young, ~2012-2025).",
+      "ce_cemetery_check": "NO cemetery overlap. This is a new problem class not previously investigated in the portfolio.",
+      "physical_plausibility": "MEDIUM — the glymphatic system's dependence on CSF pulsatility is established (Reddy 2020, cited 401). But CONTROLLING glymphatic flow via an eShunt is hypothetical — requires evidence that eShunt flow modulation can affect glymphatic dynamics. Article XX problem-existence gate: does eShunt-mediated flow modulation actually enhance glymphatic clearance? This is YELLOW — plausible but unproven.",
+      "preliminary_score": "problem_strength=VERY HIGH × unmet_need=VERY HIGH × causal_novelty=HIGH × patent_headroom=LIKELY HIGH (new field) × physical_plausibility=MEDIUM (plausible but unproven) × buyer_value=VERY HIGH (market expansion)",
+      "verdict": "SERIOUS CANDIDATE — high novelty, high market potential, but physical plausibility is the key risk. The Article XX gate is YELLOW (glymphatic enhancement via eShunt is hypothetical)."
+    },
+
+    {
+      "candidate_id": "S5-C03",
+      "problem_name": "Repeated lumbar puncture burden for CSF biomarker monitoring",
+      "problem_description": "CSF biomarkers (amyloid-β, tau, p-tau, NfL, inflammatory markers) are critical for Alzheimer's diagnosis and monitoring. Currently sampled via repeated lumbar puncture (LP), which is invasive, painful, and has complications (post-LP headache, infection risk). Patients requiring longitudinal biomarker monitoring face repeated LPs.",
+      "problem_exists_evidence": {
+        "documented": true,
+        "evidence": "Xu 2024: LP itself alters CSF biomarker levels (Aβ and tau increase after LP). Shaw 2018 (cited 296): repeated CSF testing within 1-3 years has limited utility. The burden and complication risk of repeated LP is well-documented.",
+        "incidence": "Millions of LPs performed annually for diagnostic purposes. Post-LP headache affects ~10-30% of patients.",
+        "clinical_severity": "MODERATE — not life-threatening but significant quality-of-life impact and diagnostic delay"
+      },
+      "buyer_impact": "If eShunt can provide a PORT for repeated CSF sampling without LP, it solves a real clinical burden. But this overlaps with Slot 4 (CV-T09 biosensor platform). Buyer value depends on whether the sampling port is distinct from an integrated biosensor.",
+      "existing_solutions_gap": "Ommaya reservoirs provide CSF access but are intraventricular (invasive placement, infection risk). No endovascular CSF sampling port exists. eShunt's venous-sinus location could provide a novel access point — but sampling from the venous end (after CSF has mixed with blood) is NOT the same as sampling pure CSF.",
+      "causal_mechanism_direction": "An eShunt-integrated CSF sampling port or micro-dialysis probe that accesses pure CSF before it reaches the venous end. This is a DIFFERENT mechanism from Ommaya (intraventricular) or LP (lumbar) — it's a VENOUS-SINUS-ADJACENT access point.",
+      "patent_headroom": "UNKNOWN — Ommaya reservoirs are old art. The novelty would be in the eShunt-specific location and the endovascular deployment.",
+      "ce_cemetery_check": "NO direct cemetery overlap. But overlaps with Slot 4 (CV-T09 biosensor). Must distinguish: Slot 4 = integrated biosensor (continuous measurement); S5-C03 = sampling port (intermittent access for external analysis). These are DIFFERENT value propositions.",
+      "physical_plausibility": "HIGH — a sampling port is mechanically straightforward. The challenge is maintaining CSF purity (not contaminated with blood) and infection prevention.",
+      "preliminary_score": "problem_strength=HIGH × unmet_need=HIGH × causal_novelty=MEDIUM (sampling ports exist, eShunt location is novel) × patent_headroom=UNKNOWN × physical_plausibility=HIGH × buyer_value=MEDIUM (overlaps with Slot 4)",
+      "verdict": "SERIOUS CANDIDATE — but must clearly distinguish from Slot 4. If it's just 'Slot 4 minus the biosensor,' it's not a new invention."
+    },
+
+    {
+      "candidate_id": "S5-C04",
+      "problem_name": "Post-hemorrhagic hydrocephalus (PHH) blood obstruction",
+      "problem_description": "Intraventricular hemorrhage (IVH) causes blood to enter the ventricular system, obstructing CSF outflow and causing post-hemorrhagic hydrocephalus. Common in premature infants. Current treatment involves temporary EVD, fibrinolytics, and eventual shunt placement. The blood itself is the obstructing agent — a fundamentally different obstruction mode from tissue ingrowth or thrombosis.",
+      "problem_exists_evidence": {
+        "documented": true,
+        "evidence": "Shakeyeva 2024: 'Hydrocephalus after IVH can be caused by mechanical obstruction when blood clots physically block CSF outflow pathways.' Mazzola 2014 (cited 216): PHH management guidelines. Yang 2024 (cited 7): microthrombi worsen CSF outflow obstruction.",
+        "incidence": "PHH affects ~25% of premature infants with IVH. Significant clinical burden in neonatology.",
+        "clinical_severity": "HIGH — progressive hydrocephalus in infants, requires urgent intervention"
+      },
+      "buyer_impact": "CereVasc eShunt is currently designed for NPH (elderly). PHH (neonatal) is a DIFFERENT indication. But if the eShunt platform can be adapted for PHH — specifically, if it can handle blood-laden CSF without obstructing — it opens a new indication. Buyer value depends on whether CereVasc wants to pursue pediatric/neonatal markets.",
+      "existing_solutions_gap": "EVDs are temporary and infection-prone. VP shunts in neonates have high revision rates. Fibrinolytics (intraventricular rtPA) help dissolve clots but have hemorrhage risk. No existing solution provides a blood-tolerant permanent CSF drainage device.",
+      "causal_mechanism_direction": "A blood-tolerant eShunt design — either (a) a filter/separation mechanism that excludes cellular blood components while allowing CSF drainage, or (b) a self-clearing mechanism that prevents blood clot obstruction, or (c) a surface treatment that prevents clot adhesion. This is a DIFFERENT causal mechanism from standard anti-fouling (CE-005) because the fouling agent is BLOOD (high cellular, high protein), not thrombus or biofilm.",
+      "patent_headroom": "UNKNOWN — need exact claim search. Blood-tolerant CSF shunt designs are likely sparse.",
+      "ce_cemetery_check": "CE-005 (fouling/obstruction) is FAILURE_LESSON — does not hard-block. But V7 FDVBZ was killed for flow-direction dependency. A blood-tolerance mechanism that is NOT flow-direction-dependent is NOT in CE-005's blast radius. However, the T5 reopening found no survivor — the patent landscape is dense (US11525069B2). This candidate must distinguish from T5 candidates.",
+      "physical_plausibility": "MEDIUM — blood-tolerant filtration at the scale needed (CSF flow ~0.5 mL/min) without obstructing is mechanically challenging. Blood cells are ~7μm; filtering them while allowing CSF (water + small proteins) through requires a membrane or separator that doesn't itself foul.",
+      "preliminary_score": "problem_strength=HIGH × unmet_need=HIGH (neonatal, urgent) × causal_novelty=HIGH (blood-tolerance is new) × patent_headroom=LIKELY HIGH (new problem class) × physical_plausibility=MEDIUM (filtration challenge) × buyer_value=MEDIUM (new indication, but is CereVasc interested in neonatal?)",
+      "verdict": "SERIOUS CANDIDATE — high novelty, distinct problem class from T5. But physical plausibility is a risk, and it opens a new indication (pediatric) that CereVasc may not currently target."
+    },
+
+    {
+      "candidate_id": "S5-C05",
+      "problem_name": "MRI-induced shunt valve setting changes",
+      "problem_description": "Programmable CSF shunt valves (Strata, Hakim, Polaris) use magnetic mechanisms for non-invasive adjustment. MRI scans can inadvertently change the valve setting, causing over- or under-drainage. Patients with programmable valves must have settings verified and re-adjusted after every MRI. This is a recurring clinical burden.",
+      "problem_exists_evidence": {
+        "documented": true,
+        "evidence": "Ucisik 2022 (cited 12): 'MRI-related shunt valve setting changes are frequent with valves that lack a locking mechanism.' Davidson 2021: MRI-conditional valves are designed to minimize this but don't eliminate it.",
+        "incidence": "Patients with programmable valves need MRI for various indications (brain imaging, other body parts). The risk is recurring.",
+        "clinical_severity": "MODERATE — setting changes can cause over/under-drainage requiring clinical intervention"
+      },
+      "buyer_impact": "If eShunt uses a NON-MAGNETIC adjustment mechanism (or is inherently MRI-safe), it's a differentiator vs programmable VP valves. But eShunt is currently a fixed-pressure device — it doesn't have adjustable settings. This candidate is about ADDING adjustability that is MRI-safe.",
+      "existing_solutions_gap": "MRI-conditional valves exist (Strata NSC) but still require post-MRI verification. No valve is truly MRI-IMMUNE (guaranteed no setting change in any MRI field). The gap is for a valve whose setting is physically impossible to change via magnetic field.",
+      "causal_mechanism_direction": "A non-magnetic adjustment mechanism — e.g., hydraulic, mechanical (percutaneous), thermal, or piezoelectric. This is a FUNDAMENTALLY DIFFERENT causal mechanism from magnetic programmable valves.",
+      "patent_headroom": "UNKNOWN — need exact claim search. Non-magnetic adjustable valves may have prior art.",
+      "ce_cemetery_check": "NO cemetery overlap. This is a new problem class.",
+      "physical_plausibility": "HIGH — non-magnetic adjustment mechanisms are mechanically feasible (e.g., percutaneous mechanical adjustment like a hex screw, or hydraulic adjustment via a fill port).",
+      "preliminary_score": "problem_strength=MEDIUM (real but not catastrophic) × unmet_need=MEDIUM (recurring annoyance, not life-threatening) × causal_novelty=MEDIUM (non-magnetic adjustment is a known concept) × patent_headroom=UNKNOWN × physical_plausibility=HIGH × buyer_value=MEDIUM (differentiator but not a new indication)",
+      "verdict": "SERIOUS CANDIDATE — but lower problem strength than C01-C04. The buyer value is incremental (better than existing programmable valves) rather than transformative."
+    },
+
+    {
+      "candidate_id": "S5-C06",
+      "problem_name": "Venous sinus stent restenosis and recurrence in IIH",
+      "problem_description": "Venous sinus stenting (VSS) for idiopathic intracranial hypertension (IIH) has an 8.35% treatment failure rate with recurrent symptoms. Re-stenting is feasible but indicates the underlying stenosis recurs. The eShunt platform, which also deploys in the venous sinus, could address this recurrence.",
+      "problem_exists_evidence": {
+        "documented": true,
+        "evidence": "Venous sinus stenting for IIH: 8.35% failure rate, 5.35% complications (search result). Re-stenting is feasible but recurrence is common.",
+        "incidence": "IIH affects ~1-2 per 100,000. VSS is used in a subset. Recurrence rate ~8%.",
+        "clinical_severity": "HIGH — IIH causes vision loss, severe headaches"
+      },
+      "buyer_impact": "CereVasc eShunt and VSS both operate in the dural venous sinus. If eShunt can address IIH (by draining CSF to reduce ICP, addressing the root cause rather than stenting the sinus), it's a direct competitor/partner to VSS. Buyer value: IIH is a separate indication from NPH.",
+      "existing_solutions_gap": "VSS addresses venous stenosis (a downstream effect) but not CSF overproduction/under-absorption (the root cause). CSF shunting (VP, VA) addresses CSF volume but is invasive. eShunt could provide a minimally-invasive CSF drainage solution for IIH — but this is USING eShunt for a new indication, not a new invention.",
+      "causal_mechanism_direction": "This is NOT a new mechanism — it's applying the existing eShunt to a new indication (IIH). The CEO directive is to find a 'fundamentally different causal mechanism,' not a new indication for an existing device.",
+      "ce_cemetery_check": "NO cemetery overlap.",
+      "physical_plausibility": "HIGH — eShunt already drains CSF. Using it for IIH is an indication expansion.",
+      "preliminary_score": "problem_strength=HIGH × unmet_need=HIGH × causal_novelty=LOW (not a new mechanism, just a new indication) × patent_headroom=LOW (eShunt already patented) × physical_plausibility=HIGH × buyer_value=HIGH (new market)",
+      "verdict": "WEAK CANDIDATE for Slot 5 — this is an indication expansion, not a new invention. The CEO directive explicitly asks for a 'fundamentally different causal mechanism.' Keep as a reference but do NOT promote."
+    },
+
+    {
+      "candidate_id": "S5-C07",
+      "problem_name": "CSF shunt infection and biofilm formation",
+      "problem_description": "CSF shunt infection rate is 5-10% per procedure. Biofilm formation on shunt hardware is the primary cause. Antibiotic-impregnated catheters reduce but do not eliminate infection. Once biofilm forms, hardware removal is often required.",
+      "problem_exists_evidence": {
+        "documented": true,
+        "evidence": "Muram 2022 (cited 35), Kovács 2024 (cited 10), Podkovik 2024 (cited 7, BASICS trial). Antibiotic-impregnated catheters reduce infection but don't eliminate it.",
+        "incidence": "5-10% per shunt procedure",
+        "clinical_severity": "HIGH — requires hardware removal, long antibiotic courses, revision surgery"
+      },
+      "buyer_impact": "If eShunt can be designed to be inherently infection-resistant (beyond antibiotic coating), it's a major differentiator. But this overlaps significantly with T5 (fouling/obstruction) — biofilm IS a fouling mode.",
+      "existing_solutions_gap": "Antibiotic-impregnated catheters (BASICS trial). Silver-impregnated catheters. No existing solution provides PERMANENT biofilm resistance.",
+      "causal_mechanism_direction": "Anti-biofilm surface design, electrical surface potential to prevent bacterial adhesion, or a self-sterilizing mechanism. These overlap with T5 candidate classes (prevention, surface-state control).",
+      "ce_cemetery_check": "CE-005 (fouling/obstruction) — T5 reopening found no survivor. The patent landscape is dense (US11525069B2). This candidate is in CE-005's blast radius if it's surface-chemistry-based.",
+      "physical_plausibility": "MEDIUM — anti-biofilm surfaces are an active research area but permanent resistance is challenging.",
+      "preliminary_score": "problem_strength=HIGH × unmet_need=HIGH × causal_novelty=MEDIUM (overlaps T5) × patent_headroom=DENSE (T5 found US11525069B2) × physical_plausibility=MEDIUM × buyer_value=HIGH",
+      "verdict": "WEAK CANDIDATE — overlaps with T5 which was just investigated and found no survivor. The CEO directive: 'Do NOT reopen T5 merely to fill the slot.' This candidate is essentially T5 with an infection focus. FILTERED OUT."
+    }
+  ],
+
+  "candidate_filtering": {
+    "kept_alive": ["S5-C01 (over-drainage/slit ventricle)", "S5-C02 (glymphatic enhancement)", "S5-C03 (CSF sampling port)", "S5-C04 (PHH blood obstruction)", "S5-C05 (MRI-safe valve adjustment)"],
+    "filtered_out": [
+      "S5-C06 (IIH indication expansion) — not a new mechanism, just a new indication for existing eShunt",
+      "S5-C07 (infection/biofilm) — overlaps T5 which was just investigated with no survivor. CEO directive: do not reopen T5."
+    ],
+    "count_alive": 5,
+    "ceo_directive_compliance": "At least 5 serious candidates kept alive. No winner crowned. No T5 reopening."
+  },
+
+  "next_steps": {
+    "phase_2": "For each of the 5 surviving candidates, run the Article XX problem-existence gate: does the problem demonstrably exist in eShunt-specific context? Does the buyer (CereVasc) actually suffer from it?",
+    "phase_3": "For surviving candidates, run existing-solutions-gap analysis with exact patent claims.",
+    "phase_4": "For surviving candidates, identify the fundamentally different causal mechanism.",
+    "phase_5": "Patent headroom pre-check (exact claims, not abstract similarity).",
+    "phase_6": "Rank by problem×need×novelty×patent×physics×buyer. Do NOT optimize the score. Use only to prioritize attacks."
+  },
+
+  "preliminary_ranking": {
+    "note": "This is a PRIORITIZATION ranking for attack order, NOT a winner selection.",
+    "rank_1": "S5-C02 (glymphatic enhancement) — highest novelty + market expansion, but physical plausibility is the key risk",
+    "rank_2": "S5-C04 (PHH blood obstruction) — high novelty, distinct problem class, new indication",
+    "rank_3": "S5-C01 (over-drainage/slit ventricle) — high problem strength but CE-004 overlap risk",
+    "rank_4": "S5-C03 (CSF sampling port) — high feasibility but overlaps Slot 4",
+    "rank_5": "S5-C05 (MRI-safe valve) — real but incremental problem"
+  },
+
+  "provenance": {
+    "searches_executed": 20,
+    "search_result_files": "slot5_01 through slot5_20 in CEREVASC_SLOT5_DISCOVERY/",
+    "retrieval_date": "2026-08-20",
+    "search_provider": "z-ai web_search (existing source universe)",
+    "constitution_acknowledgment": "Articles I, II, XX, XXI, XXV, XXVII, XXVIII, XXIX, XXXII applied. CEO directive: ≥5 candidates alive, no winner, no T5 reopening."
+  }
+}
