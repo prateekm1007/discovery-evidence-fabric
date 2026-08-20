@@ -1,8 +1,8 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 1.4.0
+**Version:** 1.5.0
 **Ratified:** 2026-08-19
-**Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles)
+**Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself
 
@@ -956,3 +956,71 @@ It is enforced through:
 5. **CI verification** — GitHub Actions workflow verifies the constitution is present and acknowledged
 
 Given what we've seen from v1→v26, **"never optimize for the gate"** is the first principle the coder sees every single time.
+
+---
+
+## Article XXXV — Closed-Loop Epistemic Control as the Completion Standard
+
+Per CEO directive (2026-08-20 deep audit): a "completed invention" is NOT a promising mechanism that survived gates. It is a **closed-loop validated system** that can generate its own next falsification experiment from new evidence.
+
+### The completion loop
+
+An invention is complete ONLY when the full loop exists and is operational:
+
+```
+Discovery → hostile prior-art/evidence attack → mechanistic simulator →
+uncertainty/VVUQ → virtual patient/device cohort → experiment →
+automatic ingestion → model update → next experiment →
+buyer/regulatory dossier
+```
+
+This is aligned with:
+- FDA risk-informed credibility assessment for computational modeling
+- ASME V&V 40 (Verification & Validation in Computational Modeling)
+- FDA in-silico patient cohorts as potential supplement/replacement for some physical trials
+- Active-learning / Bayesian optimization for selecting informative experiments
+
+### The completion requirement
+
+> **An invention is not complete until it can generate its own next falsification experiment from new evidence.**
+
+The system must:
+1. **Propose** a candidate mechanism (AI proposes)
+2. **Attack** it with hostile prior-art and evidence search
+3. **Simulate** it with a mechanistic simulator that tries to kill it
+4. **Quantify uncertainty** with explicit VVUQ (not assertion-based credibility)
+5. **Test** it across a virtual patient/device cohort (adversarial physiological scenarios)
+6. **Experiment** physically to calibrate the simulator
+7. **Ingest** raw data automatically into the model
+8. **Update** the model from experimental evidence
+9. **Choose** the highest-information next experiment (active learning / Bayesian optimization)
+10. **Generate** the buyer/regulatory dossier from the validated system
+
+### What this means for each slot
+
+| Slot | Required system (not just mechanism) |
+|---|---|
+| R6 Passive Rescue | Validated rescue PLATFORM: geometry generator + flow/pressure simulator + uncertainty engine + virtual obstruction cohort + benchtop loop + automatic raw-data ingestion + DoE optimizer. VVUQ explicit, not asserted. |
+| Adaptive/Sensing eShunt | Patient/device DIGITAL TWIN: identifiability analysis + adversarial physiological scenarios + virtual patients + controller simulation + uncertainty propagation. AI generates the hardest missing physiological case. |
+| Controlled CNS Therapeutic | Closed-loop therapeutic DESIGN ENGINE: mechanism simulator + PK/transport model + virtual patient population + dosing/device optimization + experiment + recalibration. FDA CM&S framework. |
+| CNS/Lifecycle Intelligence | FAILURE-LEARNING ENGINE: scientific evidence + patents + clinical trials + MAUDE/recalls + engineering models → failure hypothesis → simulator → candidate intervention → experimental test → evidence update. Discovery machine as organizational memory. |
+| Slot 5 | Must be BORN with the same loop from day one. Do NOT retrofit the loop afterward. |
+
+### Anti-retrofit rule
+
+A candidate that is selected as a mechanism FIRST and then has a loop retrofitted afterward does NOT satisfy this article. The loop must be designed INTO the invention from the beginning, because the loop shapes what evidence is collected, what experiments are run, and what the dossier contains.
+
+### Relationship to Article XXXIV
+
+Article XXXIV says "stop coding when reality is the next bottleneck." Article XXXV extends this: the loop includes reality (experiment) as an integral component, not an afterthought. The loop is the bridge between software and reality — it does not replace physical experiment, it ORCHESTRATES it.
+
+### Current gap (honest assessment as of 2026-08-20)
+
+NONE of the 5 slots have this loop fully operational:
+- Slot 1 (R6): has frozen protocol + benchtop design, but NO simulator, NO VVUQ, NO virtual cohort, NO automatic ingestion, NO DoE optimizer
+- Slot 2: has provisional mechanism, NO digital twin, NO identifiability analysis at the slot level
+- Slot 3: has validation-ready package, NO closed-loop design engine
+- Slot 4: has discovery complete, NO failure-learning engine
+- Slot 5: EMPTY — must be born with the loop
+
+This gap is the honest current state. Closing it is the path from "0/5 world-class inventions" to "1+/5."
