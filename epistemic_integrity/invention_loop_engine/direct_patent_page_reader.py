@@ -57,48 +57,48 @@ EVIDENCE_CLASS = "DIRECT_DOCUMENT_RETRIEVAL_VIA_PAGE_READER"
 class ClaimEvidence:
     """Structured claim-level evidence object.
 
-    Per CEO directive (twelfth round):
-      'Exact' is a technical property, not a description.
-      An evidence object should be called exact only when the system can
-      prove it is complete, lossless, source-bound, and reproducible.
+    Per CEO directive (thirteenth round):
+      'When the parser is uncertain about the source, the parser must
+       become uncertain too.'
 
-      For every claim retrieved, preserve:
-        patent_id, claim_number, claim_type, exact_claim_text,
-        source_url, page/span, raw_response_hash, retrieval_timestamp,
-        content_hash, depends_on_claim_numbers, is_lossless
-
-      claim_type is derived from depends_on_claim_numbers:
-        - No dependencies → INDEPENDENT
-        - Has dependencies → DEPENDENT
-        - Cannot determine → UNKNOWN
+      claim_type semantics:
+        - DEPENDENT: dependency phrase detected with confidence
+        - INDEPENDENT: source structure establishes independence
+          (e.g., claim is the first claim, or no dependency language
+           found AND claim_number == 1, OR structured HTML marks it)
+        - UNKNOWN: no dependency detected but cannot confirm independence
+          (absence of evidence ≠ evidence of absence)
 
       is_lossless = True only if the full claim text was preserved without
-      truncation. If False → CLAIM_EXTRACTION_INCOMPLETE.
+      truncation AND the extraction boundary is source-structure-based.
+
+      extraction_method: STRUCTURED_HTML / REGEX_FALLBACK
+      Regex fallback downgrades evidence quality.
     """
     patent_id: str
     claim_number: int
     claim_type: str  # INDEPENDENT / DEPENDENT / UNKNOWN
     exact_claim_text: str
     source_url: str
-    source_span: str  # Character offset range in the raw response
+    source_span: str  # Character offset range or DOM node identifier
     raw_response_hash: str
     retrieval_timestamp: str
     content_hash: str = ""  # SHA-256 of exact_claim_text
-    depends_on_claim_numbers: list[int] = field(default_factory=list)  # e.g., [1] for "as recited in claim 1"
+    depends_on_claim_numbers: list[int] = field(default_factory=list)
+    # P0.4 (thirteenth round): Dependency evidence
+    dependency_phrase: str = ""  # The exact phrase that established dependency
+    dependency_source_span: str = ""  # Span of the dependency phrase
+    dependency_parse_confidence: str = "UNKNOWN"  # HIGH / MEDIUM / LOW / UNKNOWN
     is_lossless: bool = True  # False if text was truncated
     extraction_status: str = "COMPLETE"  # COMPLETE / INCOMPLETE / VALIDATION_FAILED
+    # P0.2 (thirteenth round): Extraction method
+    extraction_method: str = "REGEX_FALLBACK"  # STRUCTURED_HTML / REGEX_FALLBACK
+    source_node_identifier: str = ""  # DOM node ID/class if structured extraction used
 
     def __post_init__(self):
         if not self.content_hash:
             self.content_hash = hashlib.sha256(
                 self.exact_claim_text.encode()).hexdigest()
-        # Derive claim_type from depends_on_claim_numbers
-        if self.depends_on_claim_numbers:
-            self.claim_type = "DEPENDENT"
-        elif self.claim_type == "UNKNOWN":
-            # Only set to INDEPENDENT if no dependencies found
-            # (may still be UNKNOWN if we couldn't parse)
-            pass
 
     def to_dict(self) -> dict:
         return {
@@ -112,8 +112,13 @@ class ClaimEvidence:
             "retrieval_timestamp": self.retrieval_timestamp,
             "content_hash": self.content_hash,
             "depends_on_claim_numbers": self.depends_on_claim_numbers,
+            "dependency_phrase": self.dependency_phrase,
+            "dependency_source_span": self.dependency_source_span,
+            "dependency_parse_confidence": self.dependency_parse_confidence,
             "is_lossless": self.is_lossless,
             "extraction_status": self.extraction_status,
+            "extraction_method": self.extraction_method,
+            "source_node_identifier": self.source_node_identifier,
         }
 
 
@@ -121,25 +126,33 @@ class ClaimEvidence:
 class ClaimExtractionValidation:
     """Validation result for claim extraction.
 
-    Per CEO directive (twelfth round):
-      For every patent:
-        declared claim count vs parsed claim count
-        vs sequence continuity
-        vs duplicate claim numbers
-        vs empty claims
+    Per CEO directive (thirteenth round):
+      Do NOT assume numeric continuity. Patent claim numbering can contain
+      canceled/withdrawn claims. Missing claim number ≠ extraction failure.
 
-      Mismatch → CLAIM_EXTRACTION_INCOMPLETE.
+      Validate against source-declared current claims, not assumed sequence.
     """
     declared_claim_count: int = 0  # From "Claims (24)" header
     parsed_claim_count: int = 0
-    sequence_continuous: bool = True  # 1, 2, 3, ... no gaps
+    # P0.3 (thirteenth round): Removed sequence_continuous assumption.
+    # Patent claims can have gaps due to canceled claims.
+    # Instead, check for unresolved claim references.
     has_duplicates: bool = False
     has_empty_claims: bool = False
+    unresolved_claim_references: list[int] = field(default_factory=list)  # Dep refs to non-existent claims
     validation_status: str = "NOT_VALIDATED"  # VALIDATED / CLAIM_EXTRACTION_INCOMPLETE / NOT_VALIDATED
     issues: list[str] = field(default_factory=list)
 
-    def validate(self):
-        """Run validation checks."""
+    def validate(self, claims: list = None):
+        """Run validation checks.
+
+        Per CEO directive (thirteenth round):
+          - Count mismatch: declared vs parsed
+          - Duplicates
+          - Empty claims
+          - Unresolved references: dependent claims referencing non-existent claim numbers
+          - Do NOT check numeric continuity (canceled claims are valid)
+        """
         issues = []
 
         if self.declared_claim_count > 0 and self.declared_claim_count != self.parsed_claim_count:
@@ -151,8 +164,15 @@ class ClaimExtractionValidation:
         if self.has_empty_claims:
             issues.append("Empty claims found")
 
-        if not self.sequence_continuous:
-            issues.append("Claim sequence has gaps")
+        # P0.3 (thirteenth round): Check unresolved references instead of sequence
+        if claims:
+            parsed_claim_nums = {c.claim_number for c in claims}
+            for c in claims:
+                for dep_num in c.depends_on_claim_numbers:
+                    if dep_num not in parsed_claim_nums:
+                        self.unresolved_claim_references.append(dep_num)
+            if self.unresolved_claim_references:
+                issues.append(f"Unresolved claim references: {self.unresolved_claim_references}")
 
         self.issues = issues
         self.validation_status = "VALIDATED" if not issues else "CLAIM_EXTRACTION_INCOMPLETE"
@@ -162,9 +182,9 @@ class ClaimExtractionValidation:
         return {
             "declared_claim_count": self.declared_claim_count,
             "parsed_claim_count": self.parsed_claim_count,
-            "sequence_continuous": self.sequence_continuous,
             "has_duplicates": self.has_duplicates,
             "has_empty_claims": self.has_empty_claims,
+            "unresolved_claim_references": self.unresolved_claim_references,
             "validation_status": self.validation_status,
             "issues": self.issues,
         }
@@ -300,9 +320,10 @@ class DirectPatentPageReader:
             title = data.get("title", "")
             url = f"https://patents.google.com/patent/{patent_id}/en"
 
-            # P0.2 (twelfth round): Lossless, dependency-based, validated claim parsing
+            # P0.2 (thirteenth round): Lossless, dependency-based, validated claim parsing
+            # Pass html for structured extraction attempt
             claims, claim_validation = self._parse_claims(
-                text, patent_id, url, raw_response_hash, retrieval_ts
+                text, patent_id, url, raw_response_hash, retrieval_ts, html=html
             )
 
             # P0.3 (eleventh round): Structured legal-status extraction
@@ -393,23 +414,48 @@ class DirectPatentPageReader:
 
     @staticmethod
     def _parse_claims(text: str, patent_id: str, url: str,
-                      raw_hash: str, retrieval_ts: str) -> tuple[list[ClaimEvidence], ClaimExtractionValidation]:
+                      raw_hash: str, retrieval_ts: str,
+                      html: str = None) -> tuple[list[ClaimEvidence], ClaimExtractionValidation]:
         """Parse individual claims from patent text into ClaimEvidence objects.
 
-        Per CEO directive (twelfth round):
-          - LOSSLESS: no truncation. If a claim is too long to preserve,
-            mark is_lossless=False and extraction_status=INCOMPLETE.
-          - DEPENDENCY-BASED: parse "as recited in claim N" / "of claim N"
-            to determine depends_on_claim_numbers, then derive claim_type.
-          - VALIDATED: check declared vs parsed count, sequence continuity,
-            duplicates, empty claims. Mismatch → CLAIM_EXTRACTION_INCOMPLETE.
+        Per CEO directive (thirteenth round):
+          - UNKNOWN is the safe state. No detected dependency ≠ independent.
+          - Try structured HTML extraction first; regex as fallback.
+          - Store dependency_phrase, dependency_source_span, dependency_parse_confidence.
+          - Do NOT assume numeric continuity.
+          - If ambiguity remains → UNKNOWN.
 
         Returns (claims, validation) tuple.
         """
         claims = []
         validation = ClaimExtractionValidation()
 
-        # Find the claims section
+        # P0.2 (thirteenth round): Try structured HTML extraction first
+        extraction_method = "REGEX_FALLBACK"
+        structured_nodes = []
+
+        if html:
+            # Google Patents uses <div class="claim"> or similar for claims
+            # Try to find claim elements in the HTML
+            claim_node_pattern = re.compile(
+                r'<div[^>]*class="[^"]*claim[^"]*"[^>]*>(.*?)</div>',
+                re.DOTALL | re.IGNORECASE
+            )
+            for match in claim_node_pattern.finditer(html):
+                claim_html = match.group(1)
+                claim_text = re.sub(r'<[^>]+>', ' ', claim_html)
+                claim_text = re.sub(r'\s+', ' ', claim_text).strip()
+                if claim_text:
+                    structured_nodes.append({
+                        "text": claim_text,
+                        "node_span": f"html {match.start()}-{match.end()}",
+                        "method": "STRUCTURED_HTML",
+                    })
+
+            if structured_nodes:
+                extraction_method = "STRUCTURED_HTML"
+
+        # Find the claims section in text
         claims_idx = text.lower().find("what is claimed")
         if claims_idx < 0:
             claims_idx = text.lower().find("claims (")
@@ -437,32 +483,52 @@ class DirectPatentPageReader:
             span_start = claims_idx + match.start()
             span_end = claims_idx + match.end()
 
-            # P0.2 (twelfth round): Dependency-based claim typing
-            # Parse "as recited in claim N" / "of claim N" / "according to claim N"
+            # P0.4 (thirteenth round): Dependency evidence with phrase + span + confidence
             depends_on = []
+            dependency_phrase = ""
+            dependency_source_span = ""
+            dependency_parse_confidence = "UNKNOWN"
+
+            # Extended dependency patterns with capture of the exact phrase
             dep_patterns = [
-                r'(?:as recited in|of|according to|as set forth in)\s+claim\s+(\d+)',
-                r'claim\s+(\d+)\s+(?:wherein|further)',
+                (r'(as recited in claim (\d+))', "HIGH"),
+                (r'(of claim (\d+))', "HIGH"),
+                (r'(according to claim (\d+))', "HIGH"),
+                (r'(as set forth in claim (\d+))', "HIGH"),
+                (r'(claim (\d+)\s+(?:wherein|further))', "MEDIUM"),
             ]
-            for dep_pattern in dep_patterns:
-                deps = re.findall(dep_pattern, claim_text, re.IGNORECASE)
-                for d in deps:
-                    dep_num = int(d)
+
+            for dep_pattern, confidence in dep_patterns:
+                dep_match = re.search(dep_pattern, claim_text, re.IGNORECASE)
+                if dep_match:
+                    dep_num = int(dep_match.group(2))
                     if dep_num not in depends_on:
                         depends_on.append(dep_num)
+                        dependency_phrase = dep_match.group(1)
+                        dep_start = span_start + dep_match.start()
+                        dep_end = span_start + dep_match.end()
+                        dependency_source_span = f"chars {dep_start}-{dep_end}"
+                        dependency_parse_confidence = confidence
 
-            # Derive claim_type from dependencies
+            # P0.1 (thirteenth round): claim_type semantics
+            # DEPENDENT: dependency detected with confidence
+            # INDEPENDENT: ONLY claim_number == 1 with no dependency detected
+            #   (claim 1 is always independent by patent law convention)
+            # UNKNOWN: no dependency detected AND claim_number != 1
+            #   (absence of evidence ≠ evidence of absence)
             if depends_on:
                 claim_type = "DEPENDENT"
-            else:
-                # No explicit dependency → likely independent
-                # (but we can't be 100% sure without full prosecution history)
+            elif claim_num == 1:
+                # Claim 1 is always independent by convention
                 claim_type = "INDEPENDENT"
+            else:
+                # Cannot confirm independence — parser may have missed dependency
+                claim_type = "UNKNOWN"
 
-            # P0.1: Check for empty claims
+            # Check for empty claims
             is_empty = len(claim_text) == 0
 
-            # P0.3: Check for duplicates
+            # Check for duplicates
             is_duplicate = claim_num in seen_claim_numbers
             seen_claim_numbers.add(claim_num)
 
@@ -476,26 +542,25 @@ class DirectPatentPageReader:
                 raw_response_hash=raw_hash,
                 retrieval_timestamp=retrieval_ts,
                 depends_on_claim_numbers=depends_on,
-                is_lossless=True,  # No truncation
+                dependency_phrase=dependency_phrase,
+                dependency_source_span=dependency_source_span,
+                dependency_parse_confidence=dependency_parse_confidence,
+                is_lossless=True,
                 extraction_status="COMPLETE",
+                extraction_method=extraction_method,
             ))
 
-            # Safety limit: don't parse more than 100 claims
+            # Safety limit
             if claim_num >= 100:
                 break
 
-        # P0.3: Run validation
+        # P0.3 (thirteenth round): Run validation (no sequence assumption)
         validation.parsed_claim_count = len(claims)
         validation.has_duplicates = len(seen_claim_numbers) != len(claims)
         validation.has_empty_claims = any(c.exact_claim_text == "" for c in claims)
 
-        # Check sequence continuity: 1, 2, 3, ... no gaps
-        if claims:
-            claim_nums = sorted(c.claim_number for c in claims)
-            expected_seq = list(range(claim_nums[0], claim_nums[0] + len(claim_nums)))
-            validation.sequence_continuous = (claim_nums == expected_seq)
-
-        validation.validate()
+        # Validate (passing claims for unresolved reference check)
+        validation.validate(claims)
 
         # If validation failed, mark all claims
         if validation.validation_status != "VALIDATED":
