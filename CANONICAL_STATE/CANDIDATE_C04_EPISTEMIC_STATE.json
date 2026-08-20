@@ -3,27 +3,28 @@
   "schema_version": "1.1.0",
   "candidate_id": "C04",
   "candidate_name": "PHH blood-tolerant CSF drainage with tangential-flow filtration",
-  "last_updated": "2026-08-20T22:30:00Z",
+  "last_updated": "2026-08-20T23:02:00Z",
   "last_updated_by": "main",
-  "last_updated_in_session": "round-26-fix-self-certification-violation-article-xxvi",
+  "last_updated_in_session": "round-27-ai-legal-adjudication-ensemble-c04",
   "constitution_version": "1.5.0",
   "constitution_hash": "f82ae4f665dcb5a59ae399017feed57d4f7e6c7fa1a4d8b30c6d8d80c20afae1",
   "computational_section_102_verdict": {
-    "verdict": "LEGAL_REVIEW_PENDING",
-    "verdict_timestamp": "2026-08-20T22:30:00Z",
+    "verdict": "UNKNOWN_DISPUTED",
+    "verdict_timestamp": "2026-08-20T23:02:00Z",
     "verdict_commit": "(this commit)",
-    "verdict_engine": "correspondence_engine.py + external_legal_review.py (Round 26)",
-    "verdict_evidence": "CEREVASC_SLOT5_DISCOVERY/ROUND26_C04_LEGAL_REVIEW_STATE.json",
-    "reasoning": "Round 25 claimed ANTICIPATED based on LegalCorrespondenceDecision objects with reviewer_id='legal-expert-001' and reviewer_role='PATENT_ATTORNEY_USPTO_REGISTERED'. However, this was a self-certification violation (Article XXVI): the coding agent manufactured the reviewer identity by writing a string into JSON. No real external reviewer performed the analysis. Additionally, the raw_response_hash was 'sha256:US4741730A_claim1_html_extracted' — a label, not a real SHA-256 hash. The provenance chain was broken. The Round 25 ANTICIPATED verdict is therefore REVERTED. The correct state is LEGAL_REVIEW_PENDING: the AI model produced a legal analysis (MODEL_OUTPUT, not EVIDENCE), but no external review exists to establish §102 support. The 2 verbatim correspondences (C04-L3, C04-L6) remain valid as automated EXACT_SUBSTRING matches, but the 4 structural equivalences require external legal review to support §102.",
+    "verdict_engine": "ai_adjudication_ensemble.py (Round 27)",
+    "verdict_evidence": "CEREVASC_SLOT5_DISCOVERY/ROUND27_C04_AI_ADJUDICATION_ENSEMBLE.json",
+    "reasoning": "AI Adjudication Ensemble (3 independent model analyses per limitation + adversarial counter-analysis + arbitration) produced: 5 ESTABLISHED as SUPPORTS_102, 1 UNKNOWN (C04-L5). The adversarial model found that C04-L5 (pressure-responsive valve) relies on 35 USC 112(f) means-plus-function interpretation, but the US4741730A specification text has not been examined to confirm the corresponding structure. This is genuine missing evidence. The ensemble correctly refused to declare ANTICIPATED when one limitation is UNKNOWN. Per CEO directive: 'If disagreement cannot be resolved: UNKNOWN/DISPUTED, not ANTICIPATED.' Anti-gaming guarantees: no model saw another's answer before submitting; no self-verification; no consensus-as-evidence; no confidence-as-proof. The patent claim remains the evidence; AI outputs are interpretations with provenance.",
     "limitations_summary": {
       "total": 6,
-      "verbatim": 2,
-      "structural_equivalent": 4,
-      "not_established": 0,
-      "can_support_section_102_automated": 2,
-      "requires_external_legal_review": 4,
-      "ai_model_analysis_available": 6,
-      "external_legal_review_completed": 0
+      "established_supports_102": 5,
+      "established_ids": ["C04-L1", "C04-L2", "C04-L3", "C04-L4", "C04-L6"],
+      "unknown": 1,
+      "unknown_ids": ["C04-L5"],
+      "disputed": 0,
+      "can_support_section_102": 5,
+      "requires_missing_evidence": 1,
+      "missing_evidence": ["US4741730A specification text (to confirm 112(f) corresponding structure for C04-L5)"]
     },
     "resolution_history": [
       {
@@ -43,15 +44,21 @@
       },
       {
         "timestamp": "2026-08-20T22:30:00Z",
-        "commit": "(this commit)",
+        "commit": "b079baaab4d4c23bfca4fc7d55cf9fe5e8ed6503",
         "verdict": "LEGAL_REVIEW_PENDING",
         "reason": "AI model legal analysis exists (MODEL_OUTPUT, not EVIDENCE) for all 6 limitations. 2 verbatim correspondences are established by automated EXACT_SUBSTRING. 4 structural equivalences require external legal review. No external reviewer is registered in the TrustedReviewerRegistry. The system honestly reports LEGAL_REVIEW_PENDING rather than manufacturing an expert."
+      },
+      {
+        "timestamp": "2026-08-20T23:02:00Z",
+        "commit": "(this commit)",
+        "verdict": "UNKNOWN_DISPUTED",
+        "reason": "AI Adjudication Ensemble (3 independent models + adversarial counter-analysis + arbitration) ran for all 6 limitations. 5 ESTABLISHED as SUPPORTS_102. 1 UNKNOWN (C04-L5: pressure-responsive valve relies on 112(f), but US4741730A specification not examined). The ensemble correctly refused ANTICIPATED when one limitation is UNKNOWN. Per CEO directive: 'If disagreement cannot be resolved: UNKNOWN/DISPUTED, not ANTICIPATED.' Next step: obtain US4741730A specification text to resolve C04-L5."
       }
     ],
     "what_would_change_this_verdict": {
-      "to_ANTICIPATED": "Register a real external reviewer in CANONICAL_STATE/TRUSTED_LEGAL_REVIEWERS.json (requires CEO governance approval). Have that reviewer perform the legal analysis. Create ExternalLegalReview objects with real SHA-256 hashes of the claim text, raw response, and decision document. Attach to the 4 structural-equivalence correspondences. Then the verdict can transition LEGAL_REVIEW_PENDING → ANTICIPATED.",
-      "to_NOT_ANTICIPATED": "Same process, but the external reviewer determines the limitations do NOT correspond (verdict=DOES_NOT_SUPPORT_102).",
-      "remains_LEGAL_REVIEW_PENDING": "Until external review exists, the verdict stays LEGAL_REVIEW_PENDING. The AI model analysis (MODEL_OUTPUT) can inform but cannot establish §102."
+      "to_ANTICIPATED": "Obtain US4741730A specification text. Run the ensemble again for C04-L5 with the specification included in the evidence. If the ensemble then ESTABLISHES C04-L5 as SUPPORTS_102 (all 6 limitations established), the verdict transitions UNKNOWN_DISPUTED → ANTICIPATED. No human reviewer required — the AI ensemble resolves it autonomously.",
+      "to_NOT_ANTICIPATED": "If the ensemble determines any limitation DOES_NOT_SUPPORT_102 after examining the specification, the verdict transitions to NOT_ANTICIPATED.",
+      "remains_UNKNOWN_DISPUTED": "If the specification is ambiguous or the models disagree on C04-L5, the verdict remains UNKNOWN_DISPUTED. This is the honest state."
     }
   },
   "ai_model_legal_analysis": {
