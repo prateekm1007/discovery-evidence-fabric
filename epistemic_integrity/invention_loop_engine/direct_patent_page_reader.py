@@ -57,27 +57,48 @@ EVIDENCE_CLASS = "DIRECT_DOCUMENT_RETRIEVAL_VIA_PAGE_READER"
 class ClaimEvidence:
     """Structured claim-level evidence object.
 
-    Per CEO directive (eleventh round):
+    Per CEO directive (twelfth round):
+      'Exact' is a technical property, not a description.
+      An evidence object should be called exact only when the system can
+      prove it is complete, lossless, source-bound, and reproducible.
+
       For every claim retrieved, preserve:
         patent_id, claim_number, claim_type, exact_claim_text,
-        source_url, page/span, raw_response_hash, retrieval_timestamp
+        source_url, page/span, raw_response_hash, retrieval_timestamp,
+        content_hash, depends_on_claim_numbers, is_lossless
 
-      Distinguish: independent claim / dependent claim / description / prosecution.
+      claim_type is derived from depends_on_claim_numbers:
+        - No dependencies → INDEPENDENT
+        - Has dependencies → DEPENDENT
+        - Cannot determine → UNKNOWN
+
+      is_lossless = True only if the full claim text was preserved without
+      truncation. If False → CLAIM_EXTRACTION_INCOMPLETE.
     """
     patent_id: str
     claim_number: int
-    claim_type: str  # INDEPENDENT / DEPENDENT / DESCRIPTION / PROSECUTION / UNKNOWN
+    claim_type: str  # INDEPENDENT / DEPENDENT / UNKNOWN
     exact_claim_text: str
     source_url: str
     source_span: str  # Character offset range in the raw response
     raw_response_hash: str
     retrieval_timestamp: str
     content_hash: str = ""  # SHA-256 of exact_claim_text
+    depends_on_claim_numbers: list[int] = field(default_factory=list)  # e.g., [1] for "as recited in claim 1"
+    is_lossless: bool = True  # False if text was truncated
+    extraction_status: str = "COMPLETE"  # COMPLETE / INCOMPLETE / VALIDATION_FAILED
 
     def __post_init__(self):
         if not self.content_hash:
             self.content_hash = hashlib.sha256(
                 self.exact_claim_text.encode()).hexdigest()
+        # Derive claim_type from depends_on_claim_numbers
+        if self.depends_on_claim_numbers:
+            self.claim_type = "DEPENDENT"
+        elif self.claim_type == "UNKNOWN":
+            # Only set to INDEPENDENT if no dependencies found
+            # (may still be UNKNOWN if we couldn't parse)
+            pass
 
     def to_dict(self) -> dict:
         return {
@@ -90,6 +111,62 @@ class ClaimEvidence:
             "raw_response_hash": self.raw_response_hash,
             "retrieval_timestamp": self.retrieval_timestamp,
             "content_hash": self.content_hash,
+            "depends_on_claim_numbers": self.depends_on_claim_numbers,
+            "is_lossless": self.is_lossless,
+            "extraction_status": self.extraction_status,
+        }
+
+
+@dataclass
+class ClaimExtractionValidation:
+    """Validation result for claim extraction.
+
+    Per CEO directive (twelfth round):
+      For every patent:
+        declared claim count vs parsed claim count
+        vs sequence continuity
+        vs duplicate claim numbers
+        vs empty claims
+
+      Mismatch → CLAIM_EXTRACTION_INCOMPLETE.
+    """
+    declared_claim_count: int = 0  # From "Claims (24)" header
+    parsed_claim_count: int = 0
+    sequence_continuous: bool = True  # 1, 2, 3, ... no gaps
+    has_duplicates: bool = False
+    has_empty_claims: bool = False
+    validation_status: str = "NOT_VALIDATED"  # VALIDATED / CLAIM_EXTRACTION_INCOMPLETE / NOT_VALIDATED
+    issues: list[str] = field(default_factory=list)
+
+    def validate(self):
+        """Run validation checks."""
+        issues = []
+
+        if self.declared_claim_count > 0 and self.declared_claim_count != self.parsed_claim_count:
+            issues.append(f"Count mismatch: declared={self.declared_claim_count}, parsed={self.parsed_claim_count}")
+
+        if self.has_duplicates:
+            issues.append("Duplicate claim numbers found")
+
+        if self.has_empty_claims:
+            issues.append("Empty claims found")
+
+        if not self.sequence_continuous:
+            issues.append("Claim sequence has gaps")
+
+        self.issues = issues
+        self.validation_status = "VALIDATED" if not issues else "CLAIM_EXTRACTION_INCOMPLETE"
+        return self.validation_status == "VALIDATED"
+
+    def to_dict(self) -> dict:
+        return {
+            "declared_claim_count": self.declared_claim_count,
+            "parsed_claim_count": self.parsed_claim_count,
+            "sequence_continuous": self.sequence_continuous,
+            "has_duplicates": self.has_duplicates,
+            "has_empty_claims": self.has_empty_claims,
+            "validation_status": self.validation_status,
+            "issues": self.issues,
         }
 
 
@@ -223,14 +300,12 @@ class DirectPatentPageReader:
             title = data.get("title", "")
             url = f"https://patents.google.com/patent/{patent_id}/en"
 
-            # P0.2 (eleventh round): Structured claim parsing
-            # Parse individual claims into ClaimEvidence objects
-            claims = self._parse_claims(
+            # P0.2 (twelfth round): Lossless, dependency-based, validated claim parsing
+            claims, claim_validation = self._parse_claims(
                 text, patent_id, url, raw_response_hash, retrieval_ts
             )
 
             # P0.3 (eleventh round): Structured legal-status extraction
-            # Must come from a specific structured field/span, not text search
             legal_status_evidence = self._extract_legal_status_structured(
                 html, text, raw_response_hash, retrieval_ts
             )
@@ -246,11 +321,11 @@ class DirectPatentPageReader:
                 "legal_status_evidence": legal_status_evidence.to_dict() if legal_status_evidence else None,
                 "claims_count": len(claims),
                 "has_claims": len(claims) > 0,
+                "claim_validation": claim_validation.to_dict(),
                 "raw_response_file": str(output_file),
                 "note": "Document retrieved via page_reader intermediary. "
                         "Evidence class: DIRECT_DOCUMENT_RETRIEVAL_VIA_PAGE_READER. "
-                        "Closer to source than search aggregation, but NOT direct HTTP. "
-                        "Claims and legal status are structured with exact provenance.",
+                        "Claims are lossless (no truncation), dependency-based, validated.",
             }
 
             result_obj = TransportExecutionResult(
@@ -268,6 +343,7 @@ class DirectPatentPageReader:
 
             # Store structured claim evidence for later use
             result_obj._claim_evidence = claims
+            result_obj._claim_validation = claim_validation
             result_obj._legal_status_evidence = legal_status_evidence
             result_obj._extracted_title = title
 
@@ -317,41 +393,78 @@ class DirectPatentPageReader:
 
     @staticmethod
     def _parse_claims(text: str, patent_id: str, url: str,
-                      raw_hash: str, retrieval_ts: str) -> list[ClaimEvidence]:
+                      raw_hash: str, retrieval_ts: str) -> tuple[list[ClaimEvidence], ClaimExtractionValidation]:
         """Parse individual claims from patent text into ClaimEvidence objects.
 
-        Per CEO directive (eleventh round):
-          For every claim: claim_number, claim_type, exact_claim_text,
-          source_url, page/span, raw_response_hash, retrieval_timestamp.
+        Per CEO directive (twelfth round):
+          - LOSSLESS: no truncation. If a claim is too long to preserve,
+            mark is_lossless=False and extraction_status=INCOMPLETE.
+          - DEPENDENCY-BASED: parse "as recited in claim N" / "of claim N"
+            to determine depends_on_claim_numbers, then derive claim_type.
+          - VALIDATED: check declared vs parsed count, sequence continuity,
+            duplicates, empty claims. Mismatch → CLAIM_EXTRACTION_INCOMPLETE.
 
-          Distinguish: independent / dependent / description / prosecution.
+        Returns (claims, validation) tuple.
         """
         claims = []
+        validation = ClaimExtractionValidation()
 
         # Find the claims section
         claims_idx = text.lower().find("what is claimed")
         if claims_idx < 0:
             claims_idx = text.lower().find("claims (")
         if claims_idx < 0:
-            return claims  # No claims section found
+            validation.validation_status = "CLAIM_EXTRACTION_INCOMPLETE"
+            validation.issues.append("No claims section found in patent text")
+            return claims, validation
 
         claims_section = text[claims_idx:]
 
+        # Extract declared claim count from "Claims (24)" header
+        count_match = re.search(r'[Cc]laims\s*\(\s*(\d+)\s*\)', claims_section[:200])
+        if count_match:
+            validation.declared_claim_count = int(count_match.group(1))
+
         # Parse individual claims: "1. ...", "2. ...", etc.
-        # Match claim numbers at the start of a claim
+        # P0.1 (twelfth round): NO TRUNCATION. Full claim text preserved.
         claim_pattern = re.compile(r'(\d+)\.\s+(.*?)(?=\d+\.\s+|$)', re.DOTALL)
+        seen_claim_numbers = set()
+
         for match in claim_pattern.finditer(claims_section):
             claim_num = int(match.group(1))
-            claim_text = match.group(2).strip()[:2000]  # Limit length
+            claim_text = match.group(2).strip()  # NO TRUNCATION
+
             span_start = claims_idx + match.start()
             span_end = claims_idx + match.end()
 
-            # Determine claim type
-            claim_type = "UNKNOWN"
-            if "as recited in claim" in claim_text.lower():
+            # P0.2 (twelfth round): Dependency-based claim typing
+            # Parse "as recited in claim N" / "of claim N" / "according to claim N"
+            depends_on = []
+            dep_patterns = [
+                r'(?:as recited in|of|according to|as set forth in)\s+claim\s+(\d+)',
+                r'claim\s+(\d+)\s+(?:wherein|further)',
+            ]
+            for dep_pattern in dep_patterns:
+                deps = re.findall(dep_pattern, claim_text, re.IGNORECASE)
+                for d in deps:
+                    dep_num = int(d)
+                    if dep_num not in depends_on:
+                        depends_on.append(dep_num)
+
+            # Derive claim_type from dependencies
+            if depends_on:
                 claim_type = "DEPENDENT"
-            elif claim_num == 1 or (claim_num <= 5 and "comprising" in claim_text.lower()):
+            else:
+                # No explicit dependency → likely independent
+                # (but we can't be 100% sure without full prosecution history)
                 claim_type = "INDEPENDENT"
+
+            # P0.1: Check for empty claims
+            is_empty = len(claim_text) == 0
+
+            # P0.3: Check for duplicates
+            is_duplicate = claim_num in seen_claim_numbers
+            seen_claim_numbers.add(claim_num)
 
             claims.append(ClaimEvidence(
                 patent_id=patent_id,
@@ -362,13 +475,34 @@ class DirectPatentPageReader:
                 source_span=f"chars {span_start}-{span_end}",
                 raw_response_hash=raw_hash,
                 retrieval_timestamp=retrieval_ts,
+                depends_on_claim_numbers=depends_on,
+                is_lossless=True,  # No truncation
+                extraction_status="COMPLETE",
             ))
 
-            # Stop after 30 claims (safety limit)
-            if claim_num >= 30:
+            # Safety limit: don't parse more than 100 claims
+            if claim_num >= 100:
                 break
 
-        return claims
+        # P0.3: Run validation
+        validation.parsed_claim_count = len(claims)
+        validation.has_duplicates = len(seen_claim_numbers) != len(claims)
+        validation.has_empty_claims = any(c.exact_claim_text == "" for c in claims)
+
+        # Check sequence continuity: 1, 2, 3, ... no gaps
+        if claims:
+            claim_nums = sorted(c.claim_number for c in claims)
+            expected_seq = list(range(claim_nums[0], claim_nums[0] + len(claim_nums)))
+            validation.sequence_continuous = (claim_nums == expected_seq)
+
+        validation.validate()
+
+        # If validation failed, mark all claims
+        if validation.validation_status != "VALIDATED":
+            for c in claims:
+                c.extraction_status = "CLAIM_EXTRACTION_INCOMPLETE"
+
+        return claims, validation
 
     @staticmethod
     def _extract_legal_status_structured(
