@@ -20,8 +20,9 @@ from typing import Any
 
 from .engine import InventionLoopEngine
 from .schemas import (
-    Candidate, ClassifiedParameter, EpistemicClass, 
-    EvidenceType, LoopState, ParameterClassification, RawObservation,
+    Candidate, ClassifiedParameter, EpistemicClass, EvidencePredicate,
+    EvidenceType, FalsifiabilityStatus, LoopState, MechanismRefutationVerdict,
+    ParameterClassification, RawObservation,
 )
 from .adapters.r6_adapter import R6Adapter
 from .adapters.sensing_adapter import SensingAdapter
@@ -416,6 +417,160 @@ def test_data_driven_information_gain():
 
 
 
+def test_non_falsifiable_model_blocked():
+    """Test 13: A model with no falsifiable prediction must be BLOCKED.
+
+    Per CEO directive (P0.1 second round):
+      "I could not falsify this" ≠ "this is true."
+      NON_FALSIFIABLE is NOT a pass.
+    """
+    adapter = R6Adapter()
+    engine = InventionLoopEngine.__new__(InventionLoopEngine)
+    engine.adapter = adapter
+    engine.rng = __import__('random').Random(42)
+    engine.random_seed = 42
+    engine.state = LoopState.MODEL_UPDATE
+    engine.state_history = []
+    engine.candidate = Candidate(name="R6_nonfalsifiable", description="t",
+                                  problem_statement="t", proposed_mechanism="t")
+    # Model with NO numeric prediction (only string descriptions)
+    engine.mechanistic_model = adapter.build_simulator(engine.candidate, None)
+    # Don't set expected_drainage_restored_pct → it's a string "MODEL_DERIVED..."
+    engine.uncertainty_budget = adapter.run_vvuq(engine.mechanistic_model)
+    engine.experiment = adapter.design_experiments(
+        engine.candidate, engine.mechanistic_model, None, engine.uncertainty_budget)[0]
+    engine.observations = []
+    engine.model_updates = []
+    engine.falsification_proposal = None
+    engine.buyer_requirements = []
+    engine.regulatory_evidence = None
+    engine.dossier = None
+    engine.kill_reason = None
+
+    # Feed observation but model has no numeric prediction
+    engine.run_physical_experiment({"drainage_restored_pct": 80.0})
+    result = engine.run_model_update()
+
+    # Should be BLOCKED (NON_FALSIFIABLE → INSUFFICIENT_EVIDENCE)
+    assert result == False, "NON_FALSIFIABLE model should NOT proceed"
+    assert engine.state == LoopState.BLOCKED, \
+        f"Expected BLOCKED, got {engine.state}"
+    assert engine.model_updates[-1].falsifiability_status == FalsifiabilityStatus.NON_FALSIFIABLE
+
+    print("✅ Test 13 (non-falsifiable blocked): NON_FALSIFIABLE → BLOCKED (P0.1)")
+
+
+def test_inconclusive_data_blocked():
+    """Test 14: Missing observation must be BLOCKED, not treated as pass.
+
+    Per CEO directive: Missing observation ≠ model survival.
+    """
+    adapter = R6Adapter()
+    engine = InventionLoopEngine.__new__(InventionLoopEngine)
+    engine.adapter = adapter
+    engine.rng = __import__('random').Random(42)
+    engine.random_seed = 42
+    engine.state = LoopState.MODEL_UPDATE
+    engine.state_history = []
+    engine.candidate = Candidate(name="R6_inconclusive", description="t",
+                                  problem_statement="t", proposed_mechanism="t")
+    engine.mechanistic_model = adapter.build_simulator(engine.candidate, None)
+    engine.mechanistic_model.prediction["expected_drainage_restored_pct"] = 80.0
+    engine.uncertainty_budget = adapter.run_vvuq(engine.mechanistic_model)
+    engine.experiment = adapter.design_experiments(
+        engine.candidate, engine.mechanistic_model, None, engine.uncertainty_budget)[0]
+    engine.observations = []
+    engine.model_updates = []
+    engine.falsification_proposal = None
+    engine.buyer_requirements = []
+    engine.regulatory_evidence = None
+    engine.dossier = None
+    engine.kill_reason = None
+
+    # Feed observation WITHOUT the expected field
+    engine.run_physical_experiment({"some_other_field": 42})
+    result = engine.run_model_update()
+
+    # Should be BLOCKED (INCONCLUSIVE_DATA → INSUFFICIENT_EVIDENCE)
+    assert result == False, "INCONCLUSIVE_DATA should NOT proceed"
+    assert engine.state == LoopState.BLOCKED
+    assert engine.model_updates[-1].falsifiability_status == FalsifiabilityStatus.INCONCLUSIVE_DATA
+
+    print("✅ Test 14 (inconclusive data blocked): INCONCLUSIVE_DATA → BLOCKED")
+
+
+def test_tri_state_mechanism_verdict():
+    """Test 15: is_mechanism_refuted returns tri-state, not boolean.
+
+    Per CEO directive (P0.4 second round):
+      NOT_REFUTED ≠ PROVEN_SURVIVOR.
+      Default must NOT be "False, therefore mechanism survives."
+    """
+    adapter = R6Adapter()
+
+    candidate = Candidate(name="R6_tristate", description="t",
+                          problem_statement="t", proposed_mechanism="t")
+    model = adapter.build_simulator(candidate, None)
+    model.prediction["expected_drainage_restored_pct"] = 80.0
+
+    from epistemic_integrity.invention_loop_engine.schemas import RawObservation, ModelUpdate
+
+    # Test 1: observation with non-zero drainage → NOT_REFUTED
+    obs = RawObservation(experiment_id="test", raw_data={"drainage_restored_pct": 20.0})
+    verdict = adapter.is_mechanism_refuted(candidate, model, obs, [])
+    assert verdict == MechanismRefutationVerdict.NOT_REFUTED, \
+        f"Expected NOT_REFUTED, got {verdict}"
+
+    # Test 2: no observation → INSUFFICIENT_EVIDENCE
+    obs_empty = RawObservation(experiment_id="test", raw_data={})
+    verdict2 = adapter.is_mechanism_refuted(candidate, model, obs_empty, [])
+    assert verdict2 == MechanismRefutationVerdict.INSUFFICIENT_EVIDENCE, \
+        f"Expected INSUFFICIENT_EVIDENCE, got {verdict2}"
+
+    print("✅ Test 15 (tri-state verdict): NOT_REFUTED and INSUFFICIENT_EVIDENCE (P0.4)")
+
+
+def test_evidence_predicate_real():
+    """Test 16: EvidencePredicate checks real evidence, not just presence.
+
+    Per CEO directive (P0.3 second round):
+      A fake or placeholder object should not satisfy "stage complete."
+    """
+    from epistemic_integrity.invention_loop_engine.schemas import (
+        RawObservation, MechanisticModel, VirtualCohort, BuyerRequirement
+    )
+
+    # Test: tampered data hash → fails
+    obs = RawObservation(experiment_id="test", raw_data={"value": 42})
+    obs.data_hash = "fake_hash"  # Tampered
+    assert not EvidencePredicate.raw_data_integrity_verified(obs), \
+        "Tampered hash should fail"
+
+    # Test: correct hash → passes
+    obs2 = RawObservation(experiment_id="test", raw_data={"value": 42})
+    assert EvidencePredicate.raw_data_integrity_verified(obs2), \
+        "Correct hash should pass"
+
+    # Test: model with no numeric prediction → not falsifiable
+    model = MechanisticModel(
+        candidate_id="test", model_name="test", model_type="test",
+        prediction={"description": "a string, not numeric"}
+    )
+    assert not EvidencePredicate.model_is_falsifiable(model), \
+        "Model with string prediction should be NON_FALSIFIABLE"
+
+    # Test: model with numeric prediction → falsifiable
+    model2 = MechanisticModel(
+        candidate_id="test", model_name="test", model_type="test",
+        prediction={"value": 42.0}
+    )
+    assert EvidencePredicate.model_is_falsifiable(model2), \
+        "Model with numeric prediction should be falsifiable"
+
+    print("✅ Test 16 (evidence predicates): real checks, not presence (P0.3)")
+
+
+
 def run_all_tests():
     """Run all anti-gaming tests."""
     print("=" * 60)
@@ -435,10 +590,14 @@ def run_all_tests():
     test_parameter_classification_enforced()
     test_model_refuted_does_not_kill()
     test_data_driven_information_gain()
+    test_non_falsifiable_model_blocked()
+    test_inconclusive_data_blocked()
+    test_tri_state_mechanism_verdict()
+    test_evidence_predicate_real()
 
     print()
     print("=" * 60)
-    print("ALL 12 ANTI-GAMING TESTS PASSED")
+    print("ALL 16 ANTI-GAMING TESTS PASSED")
     print("=" * 60)
     return True
 

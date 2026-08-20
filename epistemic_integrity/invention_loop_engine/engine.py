@@ -31,10 +31,10 @@ from typing import Any, Optional
 
 from .schemas import (
     Assumption, BuyerRequirement, CausalEdge, CausalGraph, Candidate,
-    Dossier, EpistemicClass, EvidenceType, Experiment, FalsificationProposal,
-    LoopState, MechanisticModel, ModelUpdate, ProblemHypothesis,
-    Provenance, RawObservation, RegulatoryEvidence, UncertaintyBudget,
-    VirtualCohort, VirtualPatient, _hash_dict,
+    Dossier, EpistemicClass, EvidencePredicate, EvidenceType, Experiment,
+    FalsifiabilityStatus, FalsificationProposal, LoopState, MechanismRefutationVerdict,
+    MechanisticModel, ModelUpdate, ProblemHypothesis, Provenance, RawObservation,
+    RegulatoryEvidence, UncertaintyBudget, VirtualCohort, VirtualPatient, _hash_dict,
 )
 
 
@@ -271,20 +271,21 @@ class InventionLoopEngine:
     def run_model_update(self) -> bool:
         """Step 10: Update model from experimental evidence.
 
-        Per CEO directive (P0.1 — critical fix):
-          A model can be WRONG while the invention remains viable.
-          A model contradiction must NEVER automatically kill the candidate.
-          The adapter must explicitly establish the promotion rule:
-            MODEL_REFUTED → MODEL_REVISION / NEW_EXPERIMENT
-          unless an explicit causal rule establishes that the MECHANISM
-          itself is impossible.
+        Per CEO directive (P0.1 — second round):
+          "I could not falsify this" ≠ "this is true."
 
-        Per Article XXIX: separate implementation failure from mechanism failure.
-          prototype failure → embodiment failure → mechanism failure → invention failure
-          Each promotion requires separate evidence.
+          FalsifiabilityStatus replaces boolean:
+            SURVIVED — prediction matched → continue
+            REFUTED — prediction contradicted → ask adapter about mechanism
+            NON_FALSIFIABLE — no testable prediction → BLOCK (not a pass)
+            INCONCLUSIVE_DATA — observation missing → BLOCK (not a pass)
 
-        The loop must respond by CHANGING ITS NEXT EXPERIMENT, not by
-        adjusting its conclusion.
+          MechanismRefutationVerdict (tri-state) replaces boolean:
+            REFUTED → kill candidate
+            NOT_REFUTED → revise model, new experiment
+            INSUFFICIENT_EVIDENCE → BLOCK
+
+          NOT_REFUTED ≠ PROVEN_SURVIVOR.
         """
         if not self.mechanistic_model or not self.observations:
             raise RuntimeError("No model or observations")
@@ -292,50 +293,71 @@ class InventionLoopEngine:
         latest_obs = self.observations[-1]
         previous_hash = self.mechanistic_model.model_hash
 
-        did_survive = self.adapter.evaluate_model_prediction(
+        # Get falsifiability status (tri-state, not boolean)
+        falsifiability = self.adapter.evaluate_model_prediction(
             self.mechanistic_model, latest_obs)
+
+        # Determine mechanism verdict
+        if falsifiability == FalsifiabilityStatus.SURVIVED:
+            mechanism_verdict = MechanismRefutationVerdict.NOT_REFUTED
+            what_changed = "Model SURVIVED — prediction matched observation"
+        elif falsifiability == FalsifiabilityStatus.REFUTED:
+            # Model refuted — ask adapter if mechanism is refuted
+            mechanism_verdict = self.adapter.is_mechanism_refuted(
+                self.candidate, self.mechanistic_model, latest_obs,
+                self.model_updates)
+            what_changed = f"Model REFUTED. Mechanism verdict: {mechanism_verdict.value}"
+        elif falsifiability == FalsifiabilityStatus.NON_FALSIFIABLE:
+            # Model has no testable prediction — NOT a pass
+            mechanism_verdict = MechanismRefutationVerdict.INSUFFICIENT_EVIDENCE
+            what_changed = "NON_FALSIFIABLE — model has no testable numerical prediction. " \
+                          "NOT a pass. Must add falsifiable prediction before proceeding."
+        elif falsifiability == FalsifiabilityStatus.INCONCLUSIVE_DATA:
+            # Observation missing — NOT a pass
+            mechanism_verdict = MechanismRefutationVerdict.INSUFFICIENT_EVIDENCE
+            what_changed = "INCONCLUSIVE_DATA — observation missing. " \
+                          "NOT a pass. Must reacquire data or redesign experiment."
+        else:
+            mechanism_verdict = MechanismRefutationVerdict.INSUFFICIENT_EVIDENCE
+            what_changed = f"Unknown falsifiability status: {falsifiability}"
 
         update = ModelUpdate(
             candidate_id=self.candidate.name,
             observation_id=latest_obs.observation_id,
             previous_model_hash=previous_hash,
-            updated_model_hash=previous_hash,  # Will be updated if model changes
-            did_model_survive=did_survive,
-            what_changed="Model survived" if did_survive else "Model REFUTED by experiment",
+            updated_model_hash=previous_hash,
+            what_changed=what_changed,
+            falsifiability_status=falsifiability,
+            mechanism_verdict=mechanism_verdict,
         )
         update.provenance.epistemic_class = (
-            EpistemicClass.EXPERIMENTALLY_DEMONSTRATED if did_survive
-            else EpistemicClass.REFUTED)
+            EpistemicClass.EXPERIMENTALLY_DEMONSTRATED
+            if falsifiability == FalsifiabilityStatus.SURVIVED
+            else EpistemicClass.REFUTED if falsifiability == FalsifiabilityStatus.REFUTED
+            else EpistemicClass.INSUFFICIENT_EVIDENCE
+        )
         self.model_updates.append(update)
 
-        if not did_survive:
-            # CRITICAL FIX: Model refuted does NOT auto-kill candidate.
-            # Transition to MODEL_REFUTED, then ask adapter if mechanism is refuted.
-            self._record_transition(LoopState.MODEL_REFUTED,
-                                    f"Model refuted by experiment {latest_obs.observation_id[:8]}... "
-                                    f"— but candidate NOT auto-killed. "
-                                    f"Asking adapter if mechanism is refuted.")
-
-            # The adapter decides: is this a model error (revise model) or a
-            # mechanism impossibility (kill candidate)?
-            mechanism_refuted = self.adapter.is_mechanism_refuted(
-                self.candidate, self.mechanistic_model, latest_obs,
-                self.model_updates)
-
-            if mechanism_refuted:
-                self._kill(f"MECHANISM REFUTED: the causal mechanism is proven "
-                           f"impossible by experiment {latest_obs.observation_id[:8]}...")
-                return False
-            else:
-                # Model is wrong but mechanism may survive. Revise model / new experiment.
+        # Handle based on mechanism verdict
+        if mechanism_verdict == MechanismRefutationVerdict.REFUTED:
+            self._kill(f"MECHANISM REFUTED: the causal mechanism is proven "
+                       f"impossible by experiment {latest_obs.observation_id[:8]}...")
+            return False
+        elif mechanism_verdict == MechanismRefutationVerdict.INSUFFICIENT_EVIDENCE:
+            self._block(f"INSUFFICIENT_EVIDENCE: {what_changed}. "
+                        f"Cannot proceed without resolving the falsifiability gap.")
+            return False
+        elif mechanism_verdict == MechanismRefutationVerdict.NOT_REFUTED:
+            if falsifiability == FalsifiabilityStatus.SURVIVED:
                 self._record_transition(LoopState.INFORMATION_GAIN_RANKING,
-                                        f"Model refuted but mechanism survives. "
+                                        f"Model SURVIVED. Proceeding to next experiment selection.")
+            else:
+                self._record_transition(LoopState.INFORMATION_GAIN_RANKING,
+                                        f"Model REFUTED but mechanism NOT_REFUTED. "
                                         f"Revising model / selecting new experiment.")
-                return True  # Continue to next experiment selection
+            return True
 
-        self._record_transition(LoopState.INFORMATION_GAIN_RANKING,
-                                f"Model survived experiment. Proceeding to next experiment selection.")
-        return True
+        return False
 
     def run_information_gain_ranking(self) -> bool:
         """Step 11: Rank remaining uncertainties by information gain.
@@ -375,22 +397,14 @@ class InventionLoopEngine:
     def _check_completion_gate(self) -> dict:
         """Check whether all 11 stages required for completion have occurred.
 
-        Per CEO directive (P0.3): is_complete=True must be IMPOSSIBLE unless:
-          problem_proof = GREEN
-          destruction = PASSED
-          mechanistic_model = VALID
-          VVUQ = COMPLETE
-          virtual_cohort = EXECUTED
-          experiment = EXECUTED
-          raw_data = INGESTED + INTEGRITY_VERIFIED
-          model_update = COMPLETE
-          next_falsification = GENERATED
-          buyer_value = EVIDENCED
-          regulatory_dossier = COMPLETE
+        Per CEO directive (P0.3 — second round):
+          The completion gate needs EVIDENCE PREDICATES, not merely object presence.
+          A fake or placeholder object should not satisfy "stage complete."
 
-        Any missing stage → INCOMPLETE.
+          raw_data_integrity_verified = hash_match + schema_valid + provenance_valid
+          not simply a boolean written by the caller.
 
-        Completion must be EARNED BY STATE, not asserted by the code path.
+        Each stage now uses EvidencePredicate to verify REAL evidence.
         """
         stages = {
             "problem_proof_green": (
@@ -402,21 +416,31 @@ class InventionLoopEngine:
                 len(self.causal_graph.established_infeasible_edges) == 0 and
                 len(self.causal_graph.critical_unknowns) == 0
             ),
-            "mechanistic_model_valid": self.mechanistic_model is not None,
+            "mechanistic_model_valid": (
+                self.mechanistic_model is not None and
+                EvidencePredicate.model_is_falsifiable(self.mechanistic_model)
+            ),
             "vvuq_complete": self.uncertainty_budget is not None,
             "virtual_cohort_executed": (
-                self.virtual_cohort is not None and
-                len(self.virtual_cohort.patients) > 0
+                EvidencePredicate.virtual_cohort_executed(
+                    self.virtual_cohort, self.mechanistic_model)
             ),
             "experiment_executed": self.experiment is not None,
             "raw_data_ingested": len(self.observations) > 0,
-            "raw_data_integrity_verified": all(
-                o.data_hash != "" for o in self.observations
+            "raw_data_integrity_verified": (
+                len(self.observations) > 0 and
+                all(EvidencePredicate.raw_data_integrity_verified(o)
+                    for o in self.observations)
             ),
-            "model_update_complete": len(self.model_updates) > 0,
+            "model_update_complete": (
+                len(self.model_updates) > 0 and
+                all(u.falsifiability_status == FalsifiabilityStatus.SURVIVED
+                    for u in self.model_updates)
+            ),
             "next_falsification_generated": self.falsification_proposal is not None,
-            "buyer_value_evidenced": len(self.buyer_requirements) > 0 and
-                all(r.is_met is True for r in self.buyer_requirements),
+            "buyer_value_evidenced": (
+                EvidencePredicate.buyer_value_evidenced(self.buyer_requirements)
+            ),
             "regulatory_dossier_complete": self.regulatory_evidence is not None,
         }
         missing = [name for name, passed in stages.items() if not passed]

@@ -142,14 +142,18 @@ class InventionLoopAdapter(abc.ABC):
 
     @abc.abstractmethod
     def evaluate_model_prediction(self, model: MechanisticModel,
-                                   observation: RawObservation) -> bool:
+                                   observation: RawObservation) -> "FalsifiabilityStatus":
         """Evaluate whether the model prediction survived the experiment.
 
-        Returns True if the model survived (prediction matched observation).
-        Returns False if the model was REFUTED (prediction contradicted).
+        Per CEO directive (P0.1 — second round):
+          Returns a FalsifiabilityStatus, NOT a boolean:
+            SURVIVED — prediction matched observation within tolerance
+            REFUTED — prediction contradicted
+            NON_FALSIFIABLE — model made no testable numerical prediction
+            INCONCLUSIVE_DATA — observation data is missing
 
-        Per CEO directive: model predictions MUST remain distinguishable
-        from experimental observations.
+          "I could not falsify this" ≠ "this is true."
+          NON_FALSIFIABLE and INCONCLUSIVE_DATA are NOT passes.
         """
         pass
 
@@ -157,24 +161,18 @@ class InventionLoopAdapter(abc.ABC):
     def is_mechanism_refuted(self, candidate: Candidate,
                               model: MechanisticModel,
                               observation: RawObservation,
-                              updates: list[ModelUpdate]) -> bool:
+                              updates: list[ModelUpdate]) -> "MechanismRefutationVerdict":
         """Determine if a model refutation means the MECHANISM is impossible.
 
-        Per CEO directive (P0.1 — critical):
-          A model can be WRONG while the invention remains viable.
-          MODEL_REFUTED → MODEL_REVISION / NEW_EXPERIMENT
-          unless an explicit causal rule establishes that the MECHANISM
-          itself is impossible.
+        Per CEO directive (P0.4 — second round):
+          Must return a MechanismRefutationVerdict (tri-state):
+            REFUTED — mechanism is proven impossible → kill candidate
+            NOT_REFUTED — mechanism is NOT refuted (but NOT proven survivor)
+            INSUFFICIENT_EVIDENCE — cannot determine → BLOCK
 
-        This method implements the adapter-specific causal rule:
-          - If the model failure is due to a modeling assumption → return False
-            (revise model, try again)
-          - If the model failure is due to a physical impossibility of the
-            mechanism → return True (kill candidate)
-
-        Per Article XXIX: separate implementation failure from mechanism failure.
-          prototype failure → embodiment failure → mechanism failure → invention failure
-          Each promotion requires separate evidence.
+          NOT_REFUTED ≠ PROVEN_SURVIVOR.
+          The adapter must NOT default to "False, therefore mechanism survives."
+          Universal-survival defaults are forbidden.
         """
         pass
 

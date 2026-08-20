@@ -29,8 +29,12 @@ from .schemas import (
     VirtualCohort, VirtualPatient, Experiment, RawObservation,
     ModelUpdate, FalsificationProposal, BuyerRequirement,
     RegulatoryEvidence, Dossier,
+    # Falsifiability + evidence predicates
+    FalsifiablePrediction, FalsifiabilityStatus, MechanismRefutationVerdict,
+    EvidencePredicate,
     # Enums
-    EpistemicClass, EvidenceType, LoopState,
+    EpistemicClass, EvidenceType, LoopState, ParameterClassification,
+    ClassifiedParameter,
     # Provenance
     Provenance,
 )
