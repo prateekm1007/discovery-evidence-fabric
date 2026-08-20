@@ -557,6 +557,21 @@ class PatentDestructionAdapter:
         coverage = CoverageLevel.EXHAUSTED if (coverage_proof and coverage_proof.is_exhausted()) \
                    else CoverageLevel.QUERIED
 
+        # CRITICAL (ninth round): Reject SYNTHETIC_TEST_ONLY receipts for real verdicts
+        is_synthetic = (
+            "SYNTHETIC_TEST_ONLY" in (receipt.failure_state or "") or
+            "SYNTHETIC_TEST_ONLY" in (receipt.adapter_version or "")
+        )
+        if is_synthetic:
+            return self.record_stage(
+                manifest, stage_name, receipt.provider, query, result_ids,
+                AttackStageStatus.FAILED,
+                CoverageLevel.NOT_QUERIED,
+                failures=["SYNTHETIC_TEST_ONLY: Receipt is from synthetic transport. "
+                          "Cannot be used for real patent-destruction verdicts."],
+                notes=f"SYNTHETIC receipt rejected. {notes}"
+            )
+
         return self.record_stage(
             manifest, stage_name, receipt.provider, query, result_ids,
             AttackStageStatus.COMPLETED if len(result_ids) > 0 else AttackStageStatus.NO_RESULTS,

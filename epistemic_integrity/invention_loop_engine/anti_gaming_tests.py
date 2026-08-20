@@ -35,6 +35,10 @@ from .patent_destruction_adapter import (
 from .provider_transport_boundary import (
     ProviderTransportBoundary, TransportExecutionRequest,
 )
+from .live_vs_synthetic_transport import (
+    LiveProviderTransport, SyntheticProviderTransport,
+    TrustedProviderRegistry, TransportMode, is_eligible_for_real_verdict,
+)
 from .adapters.r6_adapter import R6Adapter
 from .adapters.sensing_adapter import SensingAdapter
 
@@ -910,6 +914,101 @@ def test_anti_self_certification():
 
 
 
+def test_synthetic_rejected_for_real_verdicts():
+    """Test 22: SYNTHETIC_TEST_ONLY receipts rejected by real patent-destruction.
+
+    Per CEO directive (ninth round):
+      'A simulator of reality must never be allowed to masquerade as
+       contact with reality.'
+    """
+    adapter = PatentDestructionAdapter()
+    manifest = adapter.create_manifest("synthetic_test", "test")
+
+    # Create a synthetic transport receipt
+    synthetic_transport = SyntheticProviderTransport()
+    req = TransportExecutionRequest(
+        provider_name="Google Patents",
+        endpoint_url="https://patents.google.com/?q=test",
+        adapter_version="1.0",
+        stage_name="keyword_search",
+    )
+    result = synthetic_transport.execute(req, b'{"results": ["US0456789A1"]}', 200, {})
+    receipt = synthetic_transport.create_receipt(result)
+
+    # Receipt has SYNTHETIC_TEST_ONLY stamp
+    assert "SYNTHETIC_TEST_ONLY" in receipt.adapter_version
+    assert "SYNTHETIC_TEST_ONLY" in receipt.failure_state
+
+    # is_eligible_for_real_verdict must be False
+    assert is_eligible_for_real_verdict(receipt) == False
+
+    # execute_stage must REJECT the synthetic receipt
+    adapter.execute_stage(manifest, "keyword_search", receipt, "test")
+    assert manifest.stages["keyword_search"].status == AttackStageStatus.FAILED
+    assert "SYNTHETIC_TEST_ONLY" in manifest.stages["keyword_search"].failures[0]
+
+    print("✅ Test 22 (synthetic rejected): SYNTHETIC_TEST_ONLY→FAILED (ninth round)")
+
+
+def test_live_transport_rejects_caller_supplied_response():
+    """Test 23: LIVE transport does NOT accept response_body from caller.
+
+    Per CEO directive (ninth round):
+      The caller must NOT supply response_body, response_status, response_headers.
+      Those must come from the actual HTTP client.
+
+      LiveProviderTransport.execute() takes only a request — no response params.
+    """
+    registry = TrustedProviderRegistry()
+
+    # Verify registry resolves providers
+    entry = registry.resolve("google_patents")
+    assert entry is not None
+    assert entry.provider_name == "Google Patents"
+    assert len(entry.approved_endpoints) > 0
+
+    # Verify endpoint validation
+    assert registry.validate_endpoint("google_patents", "https://patents.google.com/?q=test") == True
+    assert registry.validate_endpoint("google_patents", "https://evil.com/hack") == False
+    assert registry.validate_endpoint("unknown_provider", "https://anything.com") == False
+
+    # LiveProviderTransport.execute() signature does NOT accept response params
+    # It only accepts a TransportExecutionRequest — the response comes from HTTP
+    import inspect
+    live = LiveProviderTransport(registry)
+    sig = inspect.signature(live.execute)
+    params = list(sig.parameters.keys())
+    assert "response_body" not in params, \
+        "LiveProviderTransport.execute must NOT accept response_body"
+    assert "response_status" not in params, \
+        "LiveProviderTransport.execute must NOT accept response_status"
+    assert "response_headers" not in params, \
+        "LiveProviderTransport.execute must NOT accept response_headers"
+    assert params == ["request"], \
+        f"LiveProviderTransport.execute should take only 'request', got {params}"
+
+    # Unknown provider → FAILED
+    req_unknown = TransportExecutionRequest(
+        provider_name="FakeProvider",
+        endpoint_url="https://evil.com/",
+        adapter_version="1.0",
+    )
+    result = live.execute(req_unknown)
+    assert "UNKNOWN_PROVIDER" in result.failure_state or "PROVIDER_NOT_REGISTERED" in result.failure_state
+
+    # Unapproved endpoint → FAILED
+    req_bad_url = TransportExecutionRequest(
+        provider_name="Google Patents",
+        endpoint_url="https://evil.com/hack",
+        adapter_version="1.0",
+    )
+    result2 = live.execute(req_bad_url)
+    assert "ENDPOINT_NOT_APPROVED" in result2.failure_state
+
+    print("✅ Test 23 (live transport): no caller-supplied response, registry-validated (ninth round)")
+
+
+
 def run_all_tests():
     """Run all anti-gaming tests."""
     print("=" * 60)
@@ -938,10 +1037,12 @@ def run_all_tests():
     test_coverage_proof_enforced()
     test_attack_the_attacker()
     test_anti_self_certification()
+    test_synthetic_rejected_for_real_verdicts()
+    test_live_transport_rejects_caller_supplied_response()
 
     print()
     print("=" * 60)
-    print("ALL 21 ANTI-GAMING TESTS PASSED")
+    print("ALL 23 ANTI-GAMING TESTS PASSED")
     print("=" * 60)
     return True
 
