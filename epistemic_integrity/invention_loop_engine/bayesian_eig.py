@@ -39,43 +39,105 @@ from dataclasses import dataclass, field, asdict
 from typing import Any, Optional
 from uuid import uuid4
 from datetime import datetime, timezone
+from enum import Enum
+
+
+class EIGEpistemicClass(str, Enum):
+    """The epistemic class of EIG inputs (hypotheses, priors, likelihoods).
+
+    Per CEO directive (2026-08-20, fourth round):
+      'Mathematical sophistication does not upgrade the epistemic class of its inputs.'
+      A perfectly implemented Bayesian engine fed invented priors is still an
+      invention of the coder, not a discovery of reality.
+
+    Every prior probability, outcome likelihood, and hypothesis must carry
+    one of these classes. SYNTHETIC_TEST_ONLY cannot influence real experiment selection.
+    """
+    EVIDENCE_BOUND = "EVIDENCE_BOUND"                # Bound by external evidence (literature, IFU, measurement)
+    MODEL_DERIVED = "MODEL_DERIVED"                  # Derived from a physics/computational model
+    EXPERIMENTALLY_ESTIMATED = "EXPERIMENTALLY_ESTIMATED"  # Estimated from prior experiments
+    EXPERT_PRIOR = "EXPERT_PRIOR"                    # Expert judgment, explicitly labeled
+    SYNTHETIC_TEST_ONLY = "SYNTHETIC_TEST_ONLY"      # Synthetic/hypothetical — CANNOT influence real experiments
+
+
+@dataclass
+class EIGProvenance:
+    """Provenance for an EIG input (hypothesis, prior, or likelihood).
+
+    Every EIG input must carry:
+      source → provenance → epistemic class → uncertainty
+
+    This prevents semantic drift where invented numbers re-enter through
+    the Bayesian hypothesis model.
+    """
+    source: str = ""
+    epistemic_class: EIGEpistemicClass = EIGEpistemicClass.SYNTHETIC_TEST_ONLY
+    uncertainty: str = ""  # Description of uncertainty in this value
+    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+    def to_dict(self) -> dict:
+        return {
+            "source": self.source,
+            "epistemic_class": self.epistemic_class.value,
+            "uncertainty": self.uncertainty,
+            "created_at": self.created_at,
+        }
 
 
 @dataclass
 class Hypothesis:
     """A discrete hypothesis about the mechanism.
 
-    Example for R6:
-      h1: "bypass valve opens at 3 mmHg" (prior=0.2)
-      h2: "bypass valve opens at 5 mmHg" (prior=0.5)
-      h3: "bypass valve opens at 8 mmHg" (prior=0.2)
-      h4: "bypass valve never opens"    (prior=0.1)
+    Per CEO directive (P0.1 — fourth round):
+      Every hypothesis must carry provenance with epistemic class.
+      SYNTHETIC_TEST_ONLY hypotheses CANNOT influence real experiment selection.
+
+    For SYNTHETIC_TEST_ONLY hypotheses, use fictional labels (H1, H2, H3, H4),
+    NOT real-world values like "3 mmHg" or "5 mmHg" that imply evidence
+      the frozen protocol does not provide.
     """
     name: str
     description: str
     prior_probability: float  # Must sum to 1.0 across all hypotheses
+    provenance: EIGProvenance = field(default_factory=EIGProvenance)
+
+    def __post_init__(self):
+        if self.prior_probability < 0 or self.prior_probability > 1:
+            raise ValueError(f"Prior probability {self.prior_probability} out of [0,1] range")
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        return {
+            "name": self.name,
+            "description": self.description,
+            "prior_probability": self.prior_probability,
+            "provenance": self.provenance.to_dict(),
+        }
 
 
 @dataclass
 class ExperimentalOutcome:
     """A possible experimental outcome with its likelihood under each hypothesis.
 
-    Example for R6:
-      outcome: "measured opening pressure = 4.5 mmHg"
-      likelihoods: {h1: 0.8, h2: 0.15, h3: 0.01, h4: 0.0}
-      (h1 predicts ~3mmHg, so 4.5 is close; h2 predicts 5, so 4.5 is close too;
-       h3 predicts 8, so 4.5 is far; h4 predicts never, so 0.0)
+    Per CEO directive (P0.1 — fourth round):
+      Every likelihood P(outcome | hypothesis) must carry provenance.
+      Likelihoods are themselves models — they need source + epistemic class.
+
+    For SYNTHETIC_TEST_ONLY likelihoods, the entire calculation is labeled
+    as synthetic and CANNOT influence real experiment selection.
     """
     name: str
     description: str
     # Likelihood P(outcome | hypothesis) for each hypothesis
     likelihoods: dict[str, float]  # hypothesis_name -> probability
+    provenance: EIGProvenance = field(default_factory=EIGProvenance)
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        return {
+            "name": self.name,
+            "description": self.description,
+            "likelihoods": self.likelihoods,
+            "provenance": self.provenance.to_dict(),
+        }
 
 
 @dataclass
@@ -84,6 +146,11 @@ class EIGCalculationTrace:
 
     Per CEO directive: 'Keep the entire calculation auditable.'
     Every step is recorded so a human can verify the math.
+
+    Per CEO directive (P0.4 — fourth round):
+      The trace carries the MINIMUM epistemic class of all inputs.
+      If ANY input is SYNTHETIC_TEST_ONLY, the entire calculation is
+      SYNTHETIC_TEST_ONLY and CANNOT influence real experiment selection.
     """
     calculation_id: str = field(default_factory=lambda: str(uuid4()))
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
@@ -98,6 +165,9 @@ class EIGCalculationTrace:
     risk: float = 1.0
     feasibility: float = 1.0
     eig_per_cost: float = 0.0  # EIG / (cost * risk / feasibility)
+    # CRITICAL: the minimum epistemic class of all inputs
+    minimum_epistemic_class: EIGEpistemicClass = EIGEpistemicClass.SYNTHETIC_TEST_ONLY
+    can_influence_real_experiment: bool = False  # True only if ALL inputs are non-synthetic
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -255,6 +325,37 @@ class BayesianEIGCalculator:
         # Higher cost → lower value. Higher risk → lower value. Higher feasibility → higher value.
         denominator = (cost * risk) / max(feasibility, 0.001)  # Avoid div by zero
         trace.eig_per_cost = trace.eig / denominator if denominator > 0 else 0.0
+
+        # Step 6 (P0.4 — fourth round): Compute minimum epistemic class
+        # If ANY hypothesis or outcome is SYNTHETIC_TEST_ONLY, the entire
+        # calculation is SYNTHETIC_TEST_ONLY and CANNOT influence real experiments.
+        all_classes = []
+        for h in hypotheses:
+            all_classes.append(h.provenance.epistemic_class)
+        for o in outcomes:
+            all_classes.append(o.provenance.epistemic_class)
+
+        # Determine minimum epistemic class
+        # SYNTHETIC_TEST_ONLY is the lowest; EVIDENCE_BOUND is the highest
+        class_rank = {
+            EIGEpistemicClass.SYNTHETIC_TEST_ONLY: 0,
+            EIGEpistemicClass.EXPERT_PRIOR: 1,
+            EIGEpistemicClass.MODEL_DERIVED: 2,
+            EIGEpistemicClass.EXPERIMENTALLY_ESTIMATED: 3,
+            EIGEpistemicClass.EVIDENCE_BOUND: 4,
+        }
+        if all_classes:
+            min_rank = min(class_rank.get(c, 0) for c in all_classes)
+            trace.minimum_epistemic_class = next(
+                c for c, r in class_rank.items() if r == min_rank
+            )
+        else:
+            trace.minimum_epistemic_class = EIGEpistemicClass.SYNTHETIC_TEST_ONLY
+
+        # can_influence_real_experiment = True only if NO input is SYNTHETIC_TEST_ONLY
+        trace.can_influence_real_experiment = (
+            trace.minimum_epistemic_class != EIGEpistemicClass.SYNTHETIC_TEST_ONLY
+        )
 
         return trace
 

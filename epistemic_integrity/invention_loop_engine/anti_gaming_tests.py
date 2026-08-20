@@ -24,6 +24,10 @@ from .schemas import (
     EvidenceType, FalsifiabilityStatus, LoopState, MechanismRefutationVerdict,
     ParameterClassification, RawObservation,
 )
+from .bayesian_eig import (
+    BayesianEIGCalculator, Hypothesis, ExperimentalOutcome,
+    EIGEpistemicClass, EIGProvenance,
+)
 from .adapters.r6_adapter import R6Adapter
 from .adapters.sensing_adapter import SensingAdapter
 
@@ -592,6 +596,67 @@ def test_evidence_predicate_real():
 
 
 
+def test_eig_provenance_enforced():
+    """Test 17: SYNTHETIC_TEST_ONLY EIG cannot influence real experiments.
+
+    Per CEO directive (P0.4 — fourth round):
+      'Mathematical sophistication does not upgrade the epistemic class of its inputs.'
+      A perfectly implemented Bayesian engine fed invented priors is still
+      an invention of the coder, not a discovery of reality.
+    """
+    calc = BayesianEIGCalculator()
+
+    # SYNTHETIC_TEST_ONLY hypotheses
+    synthetic_prov = EIGProvenance(
+        source="SYNTHETIC_TEST_ONLY",
+        epistemic_class=EIGEpistemicClass.SYNTHETIC_TEST_ONLY,
+        uncertainty="fictional"
+    )
+    hypotheses = [
+        Hypothesis("H1", "synthetic A", 0.5, synthetic_prov),
+        Hypothesis("H2", "synthetic B", 0.5, synthetic_prov),
+    ]
+    outcomes = [
+        ExperimentalOutcome("O1", "synthetic outcome 1",
+            {"H1": 0.8, "H2": 0.2}, synthetic_prov),
+        ExperimentalOutcome("O2", "synthetic outcome 2",
+            {"H1": 0.2, "H2": 0.8}, synthetic_prov),
+    ]
+
+    trace = calc.calculate_eig(hypotheses, outcomes)
+
+    # SYNTHETIC_TEST_ONLY → cannot influence real experiments
+    assert trace.can_influence_real_experiment == False, \
+        "SYNTHETIC_TEST_ONLY EIG must NOT influence real experiments"
+    assert trace.minimum_epistemic_class == EIGEpistemicClass.SYNTHETIC_TEST_ONLY
+
+    # Now test with EVIDENCE_BOUND hypotheses
+    evidence_prov = EIGProvenance(
+        source="R6 frozen protocol measurement",
+        epistemic_class=EIGEpistemicClass.EVIDENCE_BOUND,
+        uncertainty="measured ±0.5 mmHg"
+    )
+    hypotheses_real = [
+        Hypothesis("H1", "measured A", 0.5, evidence_prov),
+        Hypothesis("H2", "measured B", 0.5, evidence_prov),
+    ]
+    outcomes_real = [
+        ExperimentalOutcome("O1", "measured outcome 1",
+            {"H1": 0.8, "H2": 0.2}, evidence_prov),
+        ExperimentalOutcome("O2", "measured outcome 2",
+            {"H1": 0.2, "H2": 0.8}, evidence_prov),
+    ]
+
+    trace_real = calc.calculate_eig(hypotheses_real, outcomes_real)
+
+    # EVIDENCE_BOUND → CAN influence real experiments
+    assert trace_real.can_influence_real_experiment == True, \
+        "EVIDENCE_BOUND EIG CAN influence real experiments"
+    assert trace_real.minimum_epistemic_class == EIGEpistemicClass.EVIDENCE_BOUND
+
+    print("✅ Test 17 (EIG provenance): SYNTHETIC→blocked, EVIDENCE_BOUND→allowed (P0.4)")
+
+
 def run_all_tests():
     """Run all anti-gaming tests."""
     print("=" * 60)
@@ -615,10 +680,11 @@ def run_all_tests():
     test_inconclusive_data_blocked()
     test_tri_state_mechanism_verdict()
     test_evidence_predicate_real()
+    test_eig_provenance_enforced()
 
     print()
     print("=" * 60)
-    print("ALL 16 ANTI-GAMING TESTS PASSED")
+    print("ALL 17 ANTI-GAMING TESTS PASSED")
     print("=" * 60)
     return True
 

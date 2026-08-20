@@ -1,5 +1,14 @@
 """
-R6 Vertical Slice — End-to-End Invention Loop Demonstration.
+R6 Synthetic Harness — Engine Mechanics Demonstration.
+
+Per CEO directive (fourth round):
+  This is NOT an operational R6 loop. The real R6 problem proof is YELLOW → BLOCKED.
+  This harness demonstrates the ENGINE MECHANICS using SYNTHETIC_TEST_ONLY inputs.
+  SYNTHETIC_TEST_ONLY EIG CANNOT influence real experiment selection.
+
+  The harness clearly separates:
+    Part 1: REAL GATE → BLOCK (the real R6 epistemic state)
+    Part 2: SYNTHETIC CONTINUATION (engine mechanics with fictional hypotheses)
 
 Per CEO directive (2026-08-20, third round):
   Build the R6 vertical slice with one real model.
@@ -36,11 +45,14 @@ from .schemas import (
     ProblemHypothesis, Provenance, RawObservation, UncertaintyBudget,
     VirtualCohort, VirtualPatient, BuyerRequirement,
 )
-from .bayesian_eig import BayesianEIGCalculator, Hypothesis, ExperimentalOutcome
+from .bayesian_eig import (
+    BayesianEIGCalculator, Hypothesis, ExperimentalOutcome,
+    EIGEpistemicClass, EIGProvenance,
+)
 from .adapters.r6_adapter import R6Adapter
 
 
-def run_r6_vertical_slice():
+def run_r6_synthetic_harness():
     """Run the complete R6 vertical slice end-to-end.
 
     This demonstrates:
@@ -59,7 +71,7 @@ def run_r6_vertical_slice():
     The R6 physical protocol remains immutable (frozen at e428a9c).
     """
     print("=" * 70)
-    print("R6 VERTICAL SLICE — END-TO-END INVENTION LOOP")
+    print("R6 SYNTHETIC HARNESS — ENGINE MECHANICS DEMONSTRATION")
     print("=" * 70)
     print()
 
@@ -172,26 +184,36 @@ def run_r6_vertical_slice():
     print(f"   EIG = E[H(prior) - H(posterior | outcome)]")
     print()
 
-    # Define R6 hypotheses about valve opening pressure
+    # SYNTHETIC_TEST_ONLY hypotheses — NOT real R6 values
+    # Per CEO directive (P0.2 — fourth round):
+    #   The frozen R6 protocol does NOT define opening-pressure targets.
+    #   Using "3mmHg" or "5mmHg" would be semantic drift (Article VII).
+    #   These are FICTIONAL labels for engine mechanics demonstration only.
     eig_calc = BayesianEIGCalculator()
+    synthetic_prov = EIGProvenance(
+        source="SYNTHETIC_TEST_ONLY — fictional hypothesis for engine demonstration",
+        epistemic_class=EIGEpistemicClass.SYNTHETIC_TEST_ONLY,
+        uncertainty="These hypotheses are entirely fictional. Real R6 hypotheses "
+                    "must come from the frozen protocol + actual measurement model."
+    )
     hypotheses = [
-        Hypothesis("h1", "valve opens at 3mmHg (low threshold)", 0.15),
-        Hypothesis("h2", "valve opens at 5mmHg (design point)", 0.40),
-        Hypothesis("h3", "valve opens at 8mmHg (high threshold)", 0.25),
-        Hypothesis("h4", "valve never opens (mechanism fails)", 0.10),
-        Hypothesis("h5", "valve opens variably (unreliable)", 0.10),
+        Hypothesis("H1", "SYNTHETIC: hypothesis A (fictional)", 0.15, synthetic_prov),
+        Hypothesis("H2", "SYNTHETIC: hypothesis B (fictional)", 0.40, synthetic_prov),
+        Hypothesis("H3", "SYNTHETIC: hypothesis C (fictional)", 0.25, synthetic_prov),
+        Hypothesis("H4", "SYNTHETIC: hypothesis D (fictional)", 0.10, synthetic_prov),
+        Hypothesis("H5", "SYNTHETIC: hypothesis E (fictional)", 0.10, synthetic_prov),
     ]
 
     # Define possible experiments with their outcome likelihoods
     experiments = [
         {
-            "name": "EXP-R6-01a: test at 5mmHg differential",
+            "name": "EXP-SYNTHETIC-01a: synthetic test A",
             "outcomes": [
-                ExperimentalOutcome("opens_below_5", "valve opens before 5mmHg",
+                ExperimentalOutcome("opens_below_5", "SYNTHETIC outcome: opens early",
                     {"h1": 0.9, "h2": 0.3, "h3": 0.01, "h4": 0.0, "h5": 0.3}),
-                ExperimentalOutcome("opens_5_to_8", "valve opens 5-8mmHg",
+                ExperimentalOutcome("opens_5_to_8", "SYNTHETIC outcome: opens mid-range",
                     {"h1": 0.1, "h2": 0.6, "h3": 0.2, "h4": 0.0, "h5": 0.3}),
-                ExperimentalOutcome("opens_above_8", "valve opens above 8mmHg",
+                ExperimentalOutcome("opens_above_8", "SYNTHETIC outcome: opens late",
                     {"h1": 0.0, "h2": 0.1, "h3": 0.7, "h4": 0.0, "h5": 0.2}),
                 ExperimentalOutcome("no_opening", "valve does not open",
                     {"h1": 0.0, "h2": 0.0, "h3": 0.09, "h4": 1.0, "h5": 0.2}),
@@ -201,11 +223,11 @@ def run_r6_vertical_slice():
             "feasibility": 1.0,
         },
         {
-            "name": "EXP-R6-01b: test at 3mmHg differential",
+            "name": "EXP-SYNTHETIC-01b: synthetic test B",
             "outcomes": [
-                ExperimentalOutcome("opens_at_3", "valve opens at 3mmHg",
+                ExperimentalOutcome("opens_at_3", "SYNTHETIC outcome: opens at test A",
                     {"h1": 0.9, "h2": 0.05, "h3": 0.0, "h4": 0.0, "h5": 0.2}),
-                ExperimentalOutcome("no_opening_at_3", "valve does not open at 3mmHg",
+                ExperimentalOutcome("no_opening_at_3", "SYNTHETIC outcome: does not open at test A",
                     {"h1": 0.1, "h2": 0.95, "h3": 1.0, "h4": 1.0, "h5": 0.8}),
             ],
             "cost": 1.0,
@@ -213,11 +235,11 @@ def run_r6_vertical_slice():
             "feasibility": 1.0,
         },
         {
-            "name": "EXP-R6-01c: test at 10mmHg differential",
+            "name": "EXP-SYNTHETIC-01c: synthetic test C",
             "outcomes": [
-                ExperimentalOutcome("opens_below_10", "valve opens before 10mmHg",
+                ExperimentalOutcome("opens_below_10", "SYNTHETIC outcome: opens at test C",
                     {"h1": 1.0, "h2": 1.0, "h3": 0.9, "h4": 0.0, "h5": 0.7}),
-                ExperimentalOutcome("no_opening_at_10", "valve does not open at 10mmHg",
+                ExperimentalOutcome("no_opening_at_10", "SYNTHETIC outcome: does not open at test C",
                     {"h1": 0.0, "h2": 0.0, "h3": 0.1, "h4": 1.0, "h5": 0.3}),
             ],
             "cost": 1.5,  # Higher cost (more pressure)
@@ -231,7 +253,11 @@ def run_r6_vertical_slice():
     prior_entropy = eig_calc.calculate_eig(hypotheses, experiments[0]["outcomes"]).prior_entropy
     print(f"   Prior entropy: H(prior) = {prior_entropy:.4f} bits")
     print()
-    print(f"   Ranked experiments (by EIG per cost):")
+    print(f"   ⚠️  ALL inputs are SYNTHETIC_TEST_ONLY — EIG CANNOT influence real experiments")
+    print(f"   can_influence_real_experiment = {ranked[0][1].can_influence_real_experiment}")
+    print(f"   minimum_epistemic_class = {ranked[0][1].minimum_epistemic_class.value}")
+    print()
+    print(f"   Ranked experiments (by EIG per cost — SYNTHETIC):")
     for name, trace in ranked:
         print(f"   {name}")
         print(f"     EIG = {trace.eig:.4f} bits")
@@ -360,7 +386,7 @@ def run_r6_vertical_slice():
     # Summary
     # ================================================================
     print("=" * 70)
-    print("R6 VERTICAL SLICE SUMMARY")
+    print("R6 SYNTHETIC HARNESS SUMMARY")
     print("=" * 70)
     print()
     print(f"  Candidate: {candidate.name}")
@@ -375,17 +401,20 @@ def run_r6_vertical_slice():
     print(f"  Posterior: entropy reduced {prior_entropy:.4f} → {posterior_entropy:.4f} bits")
     print(f"  Next experiment: {next_best[0]} (EIG={next_best[1].eig:.4f})")
     print()
-    print(f"  The loop is OPERATIONAL: evidence → model → uncertainty → cohort →")
+    print(f"  SYNTHETIC harness demonstrates: evidence → model → uncertainty → cohort →")
     print(f"  experiment → ingestion → update → posterior → next falsification.")
     print()
-    print(f"  When real R6 data arrives, the same loop consumes it without code changes.")
+    print("  When real R6 data arrives, the same ENGINE MECHANICS consume it.")
+    print("  But real hypotheses/likelihoods must come from the frozen protocol + measurements,")
+    print("  NOT from invented values.")
     print()
     print(f"  World-class inventions completed: 0 / 5")
-    print(f"  (R6 is operational as a LOOP but not yet VALIDATED — needs real data)")
+    print("  (Engine MECHANICS are operational. R6 is NOT operational — needs real data")
+    print("   AND real hypotheses with non-SYNTHETIC epistemic class.)")
     print()
 
     return engine
 
 
 if __name__ == "__main__":
-    run_r6_vertical_slice()
+    run_r6_synthetic_harness()
