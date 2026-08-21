@@ -1,0 +1,179 @@
+{
+  "round": 49,
+  "timestamp": "2026-08-21T09:30:00Z",
+  "type": "CAPABILITY_COLLISION_ATTACK",
+  "existing_landscape": [
+    {
+      "patent_or_concept": "Self-adjusting hydrocephalus valve using CSF pressure + intraparenchymal venous pressure",
+      "what_it_covers": "A valve that automatically adjusts drainage based on measured CSF pressure AND venous pressure. Explicitly covers pseudotumor cerebri/IIH treatment.",
+      "capability_layer": "State sensing + automatic intervention (layers 1 + 6)",
+      "what_it_DOES": "Measures both CSF and venous pressure; adjusts valve opening based on the differential",
+      "what_it_does_NOT_do": "Does NOT predict future failure; does NOT use pressure DISTRIBUTION (only scalar pressures); does NOT use waveform/pulsatility; does NOT have a feedback/recalibration loop; does NOT adapt to changing patient physiology over time (the adjustment is instantaneous, not learning-based)",
+      "collision_with_proposed_capability": "PARTIAL COLLISION — covers the basic concept of venous-pressure-informed valve adjustment. But does NOT cover prediction, distribution, pulsatility, or adaptive learning."
+    },
+    {
+      "patent_or_concept": "Jugular venous signals for continuous ICP estimation",
+      "what_it_covers": "Non-invasive ICP estimation from jugular venous waveform analysis (ultrasound, Doppler, or optical)",
+      "capability_layer": "State sensing (layer 1) — non-invasive measurement only",
+      "what_it_DOES": "Estimates ICP from jugular venous signals; provides continuous non-invasive monitoring",
+      "what_it_does_NOT_do": "Does NOT predict failure; does NOT trigger intervention; does NOT measure CVP directly (estimates ICP FROM venous signals); does NOT close the loop",
+      "collision_with_proposed_capability": "LOW COLLISION — covers measurement only, not prediction or intervention. Different variable (ICP estimation from venous signals, not CVP itself)."
+    },
+    {
+      "patent_or_concept": "Closed-loop intracranial pressure management with automated control",
+      "what_it_covers": "Systems that automatically adjust CSF drainage based on measured ICP, with feedback control",
+      "capability_layer": "State sensing + decision rule + automatic intervention + feedback (layers 1 + 4 + 6 + 7)",
+      "what_it_DOES": "Measures ICP; applies a control law; adjusts drainage; uses feedback to maintain target ICP",
+      "what_it_does_NOT_do": "Does NOT use VENOUS pressure as the state variable (uses ICP only); does NOT predict FUTURE failure (reacts to current state); does NOT use pressure DISTRIBUTION or PULSATILITY; does NOT distinguish between pressure-adequate and pressure-inadequate symptom recurrence; does NOT address the R2-C3 anomaly (headache despite normal ICP)",
+      "collision_with_proposed_capability": "PARTIAL COLLISION — covers the closed-loop concept but ONLY for ICP, not for venous pressure distribution or the non-pressure anomaly. The R2-C3 phenotype (headache despite normal ICP) is NOT addressed by any ICP-based closed loop."
+    },
+    {
+      "patent_or_concept": "Deep-learning ICP estimation and adaptive monitoring",
+      "what_it_covers": "ML-based ICP estimation from physiological signals; adaptive monitoring thresholds",
+      "capability_layer": "State sensing + patient-specific state estimation (layers 1 + 3)",
+      "what_it_DOES": "Uses ML to estimate ICP from non-invasive signals; adapts thresholds to individual patients",
+      "what_it_does_NOT_do": "Does NOT predict future failure (estimates current state); does NOT trigger intervention; does NOT use venous pressure distribution; does NOT address the R2-C3 anomaly",
+      "collision_with_proposed_capability": "LOW COLLISION — covers estimation, not prediction or intervention. Does not address the specific anomaly."
+    },
+    {
+      "patent_or_concept": "CereVasc's own patent portfolio (US11951270B2 — flow regulation with CSF-venous pressure gradient)",
+      "what_it_covers": "Flow regulation mechanism using the CSF-to-venous pressure gradient",
+      "capability_layer": "State sensing + automatic intervention (layers 1 + 6) — but PASSIVE (no prediction, no learning)",
+      "what_it_DOES": "Passive proportional valve that responds to the instantaneous CSF-venous pressure differential",
+      "what_it_does_NOT_do": "Does NOT predict future failure; does NOT adapt to changing patient physiology; does NOT use pressure distribution (only scalar gradient); does NOT use waveform/pulsatility; does NOT have a feedback/recalibration loop; does NOT address the R2-C3 anomaly (the passive valve maintains safe ICP but does not address headache that occurs DESPITE safe ICP)",
+      "collision_with_proposed_capability": "PARTIAL COLLISION — covers passive venous-pressure-informed drainage. But the R2-C3 anomaly shows that passive drainage is NOT SUFFICIENT — patients still have symptoms despite adequate drainage. The missing piece is NOT better drainage — it is addressing the NON-PRESSURE variable."
+    }
+  ],
+  "capability_layers": [
+    {
+      "layer": 1,
+      "name": "State sensing",
+      "description": "Measuring the physiological variable (CVP, ICP, sinus pressure, waveform)",
+      "already_exists": true,
+      "existing_examples": "Invasive manometry (CVP, sinus pressure), implanted ICP sensors, non-invasive jugular venous estimation, eShunt's passive gradient sensing",
+      "is_this_the_gap": false,
+      "reason": "Measurement EXISTS. Multiple modalities. The gap is NOT measurement."
+    },
+    {
+      "layer": 2,
+      "name": "Failure prediction",
+      "description": "Using the measured variable to PREDICT which patients will fail treatment BEFORE symptoms appear",
+      "already_exists": false,
+      "existing_examples": "NONE — no published system predicts post-VSS or post-eShunt failure from venous physiology. The 2026 study found ASSOCIATION, not a validated prediction model.",
+      "is_this_the_gap": true,
+      "reason": "NO existing patent or system PREDICTS failure from venous physiology. All existing systems REACT to current state (ICP too high → drain more). None PREDICT future failure from venous state trajectory."
+    },
+    {
+      "layer": 3,
+      "name": "Patient-specific state estimation",
+      "description": "Estimating the patient's individual physiological state (not just a scalar measurement, but a multi-variable state including CVP, sinus distribution, compliance, pulsatility)",
+      "already_exists": "PARTIALLY",
+      "existing_examples": "Deep-learning ICP estimation (patient-specific thresholds); but NO system estimates a MULTI-VARIABLE venous state (CVP + distribution + pulsatility + compliance)",
+      "is_this_the_gap": "PARTIALLY",
+      "reason": "Patient-specific estimation EXISTS for ICP. But NO system estimates a multi-variable VENOUS state. The gap is: a patient-specific venous physiological state MODEL (not just a scalar CVP)."
+    },
+    {
+      "layer": 4,
+      "name": "Decision rule",
+      "description": "A rule that translates the predicted state into a treatment decision (e.g., 'if CVP trajectory is rising AND ICP is stable → predict headache recurrence → modify treatment')",
+      "already_exists": false,
+      "existing_examples": "NONE — no published decision rule uses venous physiology to modify IIH treatment. Existing closed-loop systems use ICP thresholds only.",
+      "is_this_the_gap": true,
+      "reason": "NO existing decision rule uses VENOUS state (not just ICP) to predict and intervene. The R2-C3 anomaly (headache despite normal ICP) REQUIRES a non-ICP decision variable — but none exists."
+    },
+    {
+      "layer": 5,
+      "name": "Intervention selection",
+      "description": "Selecting WHICH intervention to apply based on the decision rule (e.g., adjust drainage rate, recommend weight loss, initiate CPAP, refer to headache specialist, repeat VSS)",
+      "already_exists": false,
+      "existing_examples": "NONE — no system automatically selects between different intervention types based on venous physiology. Existing systems only adjust drainage rate (single intervention type).",
+      "is_this_the_gap": true,
+      "reason": "NO system SELECTS between intervention types based on the physiological state. The R2-C3 anomaly may require DIFFERENT interventions for different causes (CPAP for OSA, migraine treatment for coexisting migraine, weight management for obesity-related CVP). No system makes this selection automatically."
+    },
+    {
+      "layer": 6,
+      "name": "Automatic intervention",
+      "description": "Automatically executing the selected intervention (e.g., adjusting a valve, activating a pump, triggering an alert)",
+      "already_exists": true,
+      "existing_examples": "Self-adjusting valves, closed-loop ICP control systems, eShunt's passive proportional valve",
+      "is_this_the_gap": false,
+      "reason": "Automatic intervention EXISTS. But it only adjusts DRAINAGE. The gap is NOT automatic intervention per se — it is the DECISION RULE and INTERVENTION SELECTION that determine WHAT intervention to apply."
+    },
+    {
+      "layer": 7,
+      "name": "Feedback / recalibration",
+      "description": "Learning from treatment outcomes to improve future predictions and interventions (closed-loop learning, not just closed-loop control)",
+      "already_exists": false,
+      "existing_examples": "NONE — no existing IIH system learns from outcomes to recalibrate its prediction model or decision rules. Existing systems use FIXED control laws.",
+      "is_this_the_gap": true,
+      "reason": "NO system LEARNS from the R2-C3 anomaly. If a patient has headache despite normal ICP, the system should LEARN that ICP-based control is insufficient and incorporate venous state into its model. No existing system does this."
+    }
+  ],
+  "irreducible_residual": {
+    "the_question": "What can competitors NOT obtain merely by adding a better sensor, better model, or better valve to their existing trajectory?",
+    "the_answer": "The irreducible residual is NOT:\n  - Better CVP measurement (layer 1 — already exists)\n  - Better drainage adjustment (layer 6 — already exists)\n  - Better ICP estimation (layer 3 — partially exists)\n\nThe irreducible residual IS:\n  Layer 2: FAILURE PREDICTION from venous physiology (does NOT exist)\n  Layer 4: DECISION RULE that uses non-ICP variables (does NOT exist)\n  Layer 5: INTERVENTION SELECTION across multiple types (does NOT exist)\n  Layer 7: FEEDBACK/RECALIBRATION that learns from the anomaly (does NOT exist)\n\nCompetitors can add sensors and valves, but they CANNOT obtain:\n  → A prediction model that foresees headache recurrence from venous state\n  → A decision rule that acts on non-ICP variables\n  → A multi-intervention selection logic\n  → A learning system that recalibrates from treatment failures\n\nThese are ALGORITHMIC/CONTROL capabilities, not hardware capabilities.\nThey require a different kind of invention: not a device, but a\nCONTROL ARCHITECTURE that turns venous physiology into adaptive treatment.",
+    "the_missing_primitive": "The missing causal/control primitive is:\n\n  A VENOUS-STATE-AWARE PREDICTION AND CONTROL LAW that:\n  (a) tracks a multi-variable venous physiological state (CVP + distribution + pulsatility)\n  (b) predicts treatment failure BEFORE symptoms appear\n  (c) selects the appropriate intervention (not just drainage adjustment)\n  (d) learns from outcomes to recalibrate\n\nThis is NOT a sensor. NOT a valve. NOT a stent.\nIt is a CONTROL ARCHITECTURE — the 'brain' that uses physiological\ndata to make treatment decisions that no current device makes.",
+    "why_competitors_cannot_easily_reach_this": [
+      "VSS manufacturers are focused on MECHANICAL stent improvement, not control architectures",
+      "eShunt is focused on PASSIVE valve optimization, not active prediction",
+      "Medical therapy is focused on PHARMACOLOGY, not physiological control",
+      "Monitoring companies are focused on MEASUREMENT, not intervention selection",
+      "The R2-C3 anomaly (headache despite normal ICP) is NOT recognized by any current system — it requires a CONTROL LAW that uses non-ICP variables, which is a fundamentally different approach"
+    ]
+  },
+  "variable_comparison": {
+    "the_question": "Which variable contains PREDICTIVE information unavailable from mean ICP alone?",
+    "comparison": [
+      {
+        "variable": "CVP (scalar central venous pressure)",
+        "predictive_beyond_ICP": "PARTIALLY — CVP reflects systemic venous state, which ICP does not capture. But CVP is a SCALAR; it loses spatial and temporal information.",
+        "collision_risk": "HIGH — existing patents cover venous pressure measurement for valve adjustment. CVP alone is likely occupied territory."
+      },
+      {
+        "variable": "Sinus pressure DISTRIBUTION (multi-point manometry)",
+        "predictive_beyond_ICP": "STRONGER — the DISTRIBUTION of pressure across the venous sinus (anterior SSS, posterior SSS, cavernous sinus, sigmoid sinus) contains SPATIAL information that neither ICP nor scalar CVP captures. The 2026 study found anterior SSS pressure (not just gradient) predicted outcomes.",
+        "collision_risk": "LOWER — no existing patent covers multi-point sinus pressure DISTRIBUTION for prediction or intervention. Existing systems measure gradient (2 points), not distribution (multiple points)."
+      },
+      {
+        "variable": "Pressure waveform / pulsatility",
+        "predictive_beyond_ICP": "STRONGEST — pulsatility captures DYNAMIC information (compliance, cardiac coupling, vascular reserve) that scalar pressures lose. The dural compliance hypothesis implies that pulsatility (not mean pressure) is the key discriminator. An earlier study showed VSS changes sinus-pressure pulsatility.",
+        "collision_risk": "LOWEST — no existing patent covers ICP or venous PULSATILITY-based prediction or intervention for IIH. This is the least crowded territory."
+      },
+      {
+        "variable": "Joint venous + ICP state (multi-variable)",
+        "predictive_beyond_ICP": "STRONGEST OVERALL — a multi-variable state (CVP + distribution + pulsatility + ICP) contains MORE information than any single variable. The COMBINATION may be what discriminates responders from non-responders.",
+        "collision_risk": "LOW — no existing patent covers a multi-variable venous+ICP state model for IIH treatment adaptation. The combination is novel because the field treats these variables INDEPENDENTLY."
+      }
+    ],
+    "ranking": [
+      "1st: Joint venous + ICP state (multi-variable) — STRONGEST predictive, LOWEST collision",
+      "2nd: Pressure waveform / pulsatility — STRONG predictive, LOWEST collision among single variables",
+      "3rd: Sinus pressure distribution — STRONGER than CVP, LOWER collision",
+      "4th: CVP (scalar) — PARTIALLY predictive, HIGHEST collision"
+    ],
+    "conclusion": "CVP (scalar) is the WEAKEST candidate because it has the highest patent collision and loses spatial/dynamic information. The strongest candidate is a MULTI-VARIABLE VENOUS STATE (distribution + pulsatility + CVP) because it contains predictive information unavailable from mean ICP alone, and has the LOWEST patent collision.\n\nThe missing primitive is NOT a CVP sensor. It is a multi-variable venous state model that PREDICTS failure and SELECTS intervention — using information that scalar measurements cannot capture."
+  },
+  "verdict": {
+    "the_missing_primitive": "A VENOUS-STATE-AWARE PREDICTION AND CONTROL ARCHITECTURE that uses multi-variable venous physiology (distribution + pulsatility, not just scalar CVP) to predict treatment failure before symptoms and select the appropriate intervention. This is NOT a sensor, NOT a valve, NOT a stent. It is a CONTROL ARCHITECTURE — layers 2, 4, 5, and 7 of the capability stack, which NO existing patent or system covers.",
+    "what_already_exists": [
+      "Layer 1 (state sensing) — CVP, ICP, sinus pressure measurement",
+      "Layer 6 (automatic intervention) — self-adjusting valves, closed-loop ICP control",
+      "Layer 3 (patient-specific estimation) — partially, for ICP only"
+    ],
+    "what_does_NOT_exist": [
+      "Layer 2 (failure prediction from venous physiology) — NO existing system predicts post-treatment failure from venous state",
+      "Layer 4 (decision rule using non-ICP variables) — NO existing rule uses venous state (not ICP) to make treatment decisions",
+      "Layer 5 (multi-intervention selection) — NO system selects between intervention types based on physiological state",
+      "Layer 7 (feedback/recalibration from outcomes) — NO system learns from treatment failures to improve future predictions"
+    ],
+    "the_right_variable": "Multi-variable venous state (distribution + pulsatility), NOT scalar CVP. CVP has the highest patent collision and loses spatial/dynamic information.",
+    "gate_status": "YELLOW → APPROACHING GREEN — the missing primitive is identified and competitor-resistant. But it requires clinical validation (does multi-variable venous state actually predict failure?) and addressability proof (can a control architecture built on this variable improve outcomes?).",
+    "mechanism_status": "UNPROPOSED — the missing primitive is a CONTROL ARCHITECTURE, not a specific device mechanism. The next step is to determine if this architecture is ADDRESSABLE — can it be implemented in a way that is clinically testable and patentable?",
+    "next_steps": [
+      "1. Validate that multi-variable venous state (distribution + pulsatility) predicts R2-C3 recurrence — prospective clinical study",
+      "2. If predictive: design the control architecture (prediction model + decision rule + intervention selection + learning loop)",
+      "3. Determine if the architecture is implementable as a patentable invention (not just a clinical protocol)",
+      "4. If implementable: generate specific mechanisms and attack with prior-art, physics, model-validity"
+    ]
+  }
+}
