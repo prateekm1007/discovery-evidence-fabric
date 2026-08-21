@@ -1,0 +1,180 @@
+{
+  "round": "56g",
+  "timestamp_utc": "2026-08-21T15:38:58.960601+00:00",
+  "task_id": "R2-C3-ROUND56G-HYPOTHESIS-ATTACK-AND-WEAK-LABELS",
+  "agent": "main (constitution-acknowledged, session 2026-08-21)",
+  "constitution_recertification": {
+    "version": "1.5.0",
+    "articles_applied": [
+      "IV (no fallback epistemology)",
+      "XXVIII (no silent semantic promotion)",
+      "XXXII (strongest alternative explanation)"
+    ],
+    "pre_session_check_acknowledged": true,
+    "key_principle": "Article XXVIII: hypothesis → evidence → model → validation → conclusion. Each promotion requires NEW evidence. The classifier hypothesis is at HYPOTHESIS stage only. No promotion permitted."
+  },
+  "frozen_scientific_claim": {
+    "canonical_statement": "No direct R2-C3 predictor has been demonstrated in open data.",
+    "classification": "FACT — supported by Round 56f predictor hierarchy showing 0 Tier-1 (DIRECT_R2C3) predictors.",
+    "what_this_does_NOT_establish": [
+      "Does NOT establish that R2-C3 is unmeasurable",
+      "Does NOT establish that no predictor could ever work",
+      "Does NOT establish that the headache-phenotype classifier hypothesis is correct",
+      "Does NOT establish that the headache-phenotype classifier hypothesis is incorrect"
+    ],
+    "use_rule": "This claim may be cited as the current evidence state. It may NOT be cited as evidence that the classifier hypothesis is the correct invention direction."
+  },
+  "hypothesis_attack": {
+    "hypothesis": "Pre-treatment headache phenotype (ICHD-3 classification) predicts post-VSS R2-C3 phenotype (headache despite normal ICP + improved papilledema + no restenosis).",
+    "attack_question_1": "Does baseline headache phenotype actually predict post-VSS phenotype after controlling for baseline ICP, gradient, migraine, BMI, stent type, and disease severity?",
+    "answer_1": "UNKNOWN — cannot be tested with current open data. No open cohort has both ICHD-3 headache phenotype classification AND post-VSS R2-C3 phenotype classification per-patient. The hypothesis CANNOT be confirmed or refuted at zero cost.",
+    "attack_question_2": "Does adding venous/CGRP features improve out-of-sample performance materially over headache phenotype alone?",
+    "answer_2": "UNKNOWN — cannot be tested. No open cohort has headache phenotype + venous manometry + CGRP + VSS outcome in the same patients.",
+    "strongest_alternative_explanation_per_article_xxxii": {
+      "alternative": "The 34.9% persistent headache rate after VSS (Intrapiromkul 2025) is NOT evidence that a pre-treatment classifier would work. The alternative explanation is that the persistent headache is HETEROGENEOUS — some patients have migraine, some have medication-overuse headache, some have persistent elevated ICP (R2-C1), some have unrecognized restenosis (R2-C2b), and some have true R2-C3. A classifier trained on this heterogeneous outcome (without phenotype labels) would learn noise, not signal.",
+      "test": "Would require per-patient phenotype classification to test whether the 34.9% is homogeneous (classifier could work) or heterogeneous (classifier would fail). Cannot be tested at zero cost.",
+      "implication": "The hypothesis may be WRONG. The 34.9% statistic does NOT establish that pre-treatment selection is the solution. The actual invention could be: better patient selection, a different diagnostic pathway, phenotype-specific treatment, a monitoring system, or nothing at all. We must let the evidence choose."
+    },
+    "attack_result": "The hypothesis SURVIVES the attack (it is not refuted), but it is NOT CONFIRMED. It remains a DISCOVERY HYPOTHESIS. Per Article XXVIII, no promotion to evidence/model/validation/conclusion is permitted without new evidence."
+  },
+  "weak_label_framework": {
+    "principle": "WEAK_LABEL ≠ R2-C3 ground truth. Every weak label must carry explicit noise model and corruption testing requirements.",
+    "weak_labels": [
+      {
+        "id": "WL-1",
+        "name": "Persistent headache despite patent stent",
+        "label_definition": "Patient-reported headache at 6+ months post-VSS, with confirmed patent stent on 6-month angiography (no restenosis).",
+        "label_noise_model": "MIXTURE — this label conflates: (a) true R2-C3 (headache + normal ICP + improved papilledema + no restenosis), (b) R2-C1 (headache + elevated ICP + papilledema recurrence + no restenosis — stent patent but ICP not controlled), (c) R2-C5 (headache + other symptoms, ICP/papilledema status unknown). The proportion of true R2-C3 in this weak label is UNKNOWN.",
+        "false_positive_risk": "HIGH — a patient classified as WL-1 may have R2-C1 (elevated ICP) rather than R2-C3 (normal ICP). Without ICP measurement, the false positive rate for R2-C3 is unbounded.",
+        "false_negative_risk": "MODERATE — a patient with true R2-C3 but WITHOUT angiographic confirmation of patent stent would be missed. This could happen if follow-up angiography was not performed or was not routine.",
+        "corruption_testing_requirement": "Any model trained on WL-1 must be tested under label corruption: (a) randomly flip 20% of labels, (b) measure performance degradation, (c) if degradation is severe, the model is learning label-specific noise, not signal. (d) Also test with simulated R2-C1 contamination: assume 30% of WL-1 positives are actually R2-C1, re-train, measure performance change.",
+        "defensibility": "LOW for R2-C3 specifically. MODERATE for 'persistent headache after VSS' as a broader outcome."
+      },
+      {
+        "id": "WL-2",
+        "name": "Persistent headache + no repeat intervention",
+        "label_definition": "ICD-10 R51 (headache) present at 1+ year post-VSS, with NO repeat CPT 37238/37239/1009323 (no re-stenting or shunt).",
+        "label_noise_model": "HIGH NOISE — TriNetX EHR data lacks ICP, papilledema grade, and angiographic restenosis data. The 'no repeat intervention' is a proxy for 'no symptomatic restenosis requiring treatment' but does NOT rule out asymptomatic restenosis. The headache could be: R2-C3, R2-C1 (if ICP elevated but no intervention offered), R2-C5 (other symptoms), or even unrelated to IIH.",
+        "false_positive_risk": "VERY HIGH — without any physiological measurements, the false positive rate for R2-C3 is unbounded. A patient with elevated ICP who was offered but declined shunt would be classified as WL-2.",
+        "false_negative_risk": "HIGH — patients with R2-C3 who had repeat intervention for OTHER reasons (e.g., stent for a different venous segment) would be excluded.",
+        "corruption_testing_requirement": "WL-2 is too noisy for meaningful corruption testing. Recommend: do NOT use WL-2 for any model training. Use only for GROUP-LEVEL descriptive statistics.",
+        "defensibility": "VERY LOW for R2-C3. Acceptable only for population-level descriptive epidemiology."
+      },
+      {
+        "id": "WL-3",
+        "name": "Headache despite normal pressures (Ahmed definition)",
+        "label_definition": "Persistent headache post-VSS with documented normal pressures (LP or continuous ICP monitoring showing normal ICP).",
+        "label_noise_model": "LOW NOISE — Ahmed 2011 confirmed ALL FOUR R2-C3 components for 3 cases: headache + normal ICP (Rickham reservoir) + resolved papilledema + no restenosis. This is GROUND TRUTH, not a weak label.",
+        "false_positive_risk": "ZERO for the 3 Ahmed cases (all 4 components confirmed).",
+        "false_negative_risk": "LOW for the 3 Ahmed cases (explicitly described as having persistent headache).",
+        "corruption_testing_requirement": "Not needed — these are ground truth labels. But n=3 is too small for model training.",
+        "defensibility": "HIGH — these are GROUND TRUTH R2-C3 cases, not weak labels.",
+        "reclassification": "WL-3 should be reclassified as GROUND_TRUTH, not WEAK_LABEL. The weak label framework applies to WL-1 and WL-2 only."
+      }
+    ],
+    "weak_label_use_rules": [
+      "1. Any model trained on WEAK_LABELS must report performance under label corruption (20% random flip).",
+      "2. Any model trained on WEAK_LABELS must report sensitivity to R2-C1 contamination (assume 30% of positives are R2-C1).",
+      "3. WEAK_LABEL results may NOT be reported as R2-C3 prevalence or R2-C3 prediction accuracy. They must be reported as 'WL-X accuracy' with explicit noise caveats.",
+      "4. GROUND_TRUTH (Ahmed n=3) may be used for validation only, not training (too small).",
+      "5. Any claim of 'R2-C3 predictor' requires GROUND_TRUTH validation, not WEAK_LABEL validation."
+    ]
+  },
+  "prior_art_attack": {
+    "hypothesis_under_attack": "Pre-treatment headache phenotype classifier for VSS response",
+    "searches_executed": 8,
+    "total_hits": 48,
+    "unique_urls": 30,
+    "most_relevant_prior_art": [
+      {
+        "source": "Kahan 2021 (PMID 32895320, n=79, J Neurointerv Surg)",
+        "title": "Predicting the need for retreatment in venous sinus stenting for idiopathic intracranial hypertension.",
+        "what_they_did": "Logistic regression: OP + age + sex + BMI → VSS retreatment (binary failure)",
+        "what_they_found": "OP predicts failure (OR=1.064, p=0.039) but POOR discrimination",
+        "what_they_did_NOT_do": [
+          "Did NOT use headache phenotype (ICHD-3)",
+          "Did NOT distinguish failure phenotypes (R2-C1 vs R2-C2 vs R2-C3)",
+          "Did NOT use CGRP or venous pressure distribution",
+          "Did NOT target R2-C3 specifically"
+        ],
+        "explicit_acknowledgment": "'Identifying which patients are likely to benefit most, and which are likely to require repeat procedures, is currently unclear.' — Calls for 'further studies'",
+        "anticipates_hypothesis": "PARTIALLY — anticipates the PROBLEM (predicting VSS response) but NOT the APPROACH (headache phenotype classifier) or the TARGET (R2-C3 specifically)"
+      },
+      {
+        "source": "El Mekabaty 2017 (cited 47x, J Neurointerv Surg)",
+        "title": "Predictors for venous sinus stent retreatment in patients with IIH",
+        "what_they_did": "Identified BMI as statistically significant predictor for recurrent symptoms after VSS",
+        "what_they_did_NOT_do": [
+          "Did NOT use headache phenotype",
+          "Did NOT distinguish failure phenotypes"
+        ],
+        "anticipates_hypothesis": "PARTIALLY — anticipates the general approach (find predictors of VSS failure) but NOT the specific classifier"
+      },
+      {
+        "source": "Goodwin 2014 (n=18, Clin Neurol Neurosurg)",
+        "title": "Risk factors for failed transverse sinus stenting in pseudotumor cerebri patients",
+        "what_they_did": "Compared 15 successes vs 3 failures; found OP 50 vs 37 cmH2O (p<0.05)",
+        "what_they_did_NOT_do": [
+          "Did NOT use headache phenotype",
+          "Did NOT distinguish failure phenotypes",
+          "Small sample (n=18)"
+        ],
+        "anticipates_hypothesis": "PARTIALLY — same problem, different predictor (OP only)"
+      },
+      {
+        "source": "Multiple studies (Aetna policy summary)",
+        "title": "Post-intervention pressure gradient as predictor of 6-month clinical outcome",
+        "what_they_did": "Used POST-treatment gradient to predict outcome",
+        "anticipates_hypothesis": "NO — this is post-treatment, not pre-treatment. Different clinical decision point."
+      },
+      {
+        "source": "NCT06833424 (ClinicalTrials.gov, NOT_YET_RECRUITING)",
+        "title": "Dural Venous Sinus Stent in Idiopathic Intracranial Hypertension",
+        "what_they_will_do": "'Identify clinical determinants and factors that predict outcome including primary outcome and secondary outcome'",
+        "anticipates_hypothesis": "UNKNOWN — trial not yet started. May or may not use headache phenotype. Primary outcomes: HIT-6 (headache impact), Frisén grade (papilledema), perimetry, tinnitus. If they collect ICHD-3 headache phenotype as a baseline variable, they MAY partially anticipate the hypothesis."
+      }
+    ],
+    "gap_analysis": {
+      "problem_recognized": "YES — Kahan 2021 explicitly states the problem is 'currently unclear' and calls for 'further studies'",
+      "approach_established": "PARTIALLY — logistic regression on baseline variables is established (Kahan, El Mekabaty, Goodwin). But NO study uses headache phenotype (ICHD-3) as a predictor.",
+      "target_distinguished": "NO — no prior study distinguishes R2-C3 from other failure phenotypes. All use binary success/failure or retreatment need.",
+      "specific_combination_absent": "YES — the specific combination of [headache phenotype + venous manometry + R2-C3 target] is NOT described in any open publication.",
+      "but": "The absence of a published combination does NOT mean it would work. It means it hasn't been tried. Per Article XXI (discovery evidence is not search activity), zero results is not novelty."
+    },
+    "attack_result": {
+      "hypothesis_survives_prior_art": "YES — the specific combination is not anticipated by prior art",
+      "hypothesis_survives_because": "No prior study uses ICHD-3 headache phenotype as a predictor of VSS response, and no prior study targets R2-C3 specifically",
+      "but_survival_is_NOT_evidence": "Per Article XXVIII, survival of prior-art attack is PERMISSION TO SEEK EVIDENCE, not evidence of invention. The hypothesis remains at DISCOVERY_HYPOTHESIS stage.",
+      "strongest_alternative": "The alternative explanation is that headache phenotype does NOT predict VSS response after controlling for confounders. This cannot be tested at zero cost.",
+      "next_attack": "Search for any patent or patent application that claims a method for selecting IIH patients for VSS based on headache phenotype. If found, the hypothesis may be anticipated by patent art (not just literature)."
+    }
+  },
+  "verdict": {
+    "scientific_claim_frozen": "No direct R2-C3 predictor has been demonstrated in open data.",
+    "classifier_hypothesis_status": "DISCOVERY HYPOTHESIS — survives prior-art attack but NOT promoted. Per Article XXVIII: hypothesis → evidence → model → validation → conclusion. Currently at HYPOTHESIS only.",
+    "weak_label_framework_established": true,
+    "weak_label_use_rules_enforced": true,
+    "prior_art_attack_executed": true,
+    "hypothesis_survives_prior_art": true,
+    "but_survival_is_NOT_evidence_of_invention": true,
+    "R2_C3_prevalence": "UNKNOWN (preserved per Article XXV)",
+    "mechanism_generation": "BLOCKED — no change",
+    "predictor_discovery_gate": "YELLOW / UNKNOWN — hypothesis identified, not demonstrated",
+    "human_correspondence_count": 0,
+    "world_class_inventions": "0 / 5 — unchanged",
+    "repository_state": {
+      "local_HEAD": "4e82245cedb279a15309e9014163569373ad40b4",
+      "remote_main": "4e82245cedb279a15309e9014163569373ad40b4",
+      "match": true,
+      "ci_status": "FAILURE (12/14 gates pass; G10/G13 fail)",
+      "certification": "NOT CERTIFIED — G10 requires evidence ledger repair (transition hash chain includes commit_sha)",
+      "scientific_work_isolated_from_certification": true
+    },
+    "next_moves": [
+      "1. Repair G10/G13 (separate from invention work) — investigate the transition hash computation that includes commit_sha",
+      "2. Search for PATENT prior art on IIH patient selection for VSS (not just literature)",
+      "3. If patent prior art is clean, the hypothesis remains a DISCOVERY HYPOTHESIS that could be pursued with new data",
+      "4. Do NOT promote to invention without: (a) per-patient data with headache phenotype + R2-C3 label, (b) out-of-sample validation, (c) decision-value analysis"
+    ]
+  }
+}
