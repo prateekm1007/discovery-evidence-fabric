@@ -1,0 +1,159 @@
+{
+  "round": 56,
+  "timestamp": "2026-08-21T13:00:00Z",
+  "type": "ZERO_COST_DATA_ACQUISITION",
+  "pseudo_estimate_correction": {
+    "what_was_wrong": "Round 55 estimated R2-C3 prevalence as ~40-50% based on the proportion of recurrent patients who did NOT require surgery (70% of 57%). But 'not requiring surgery' is NOT equivalent to 'no objective findings.' The coder itself acknowledged this, then carried the estimate forward anyway.",
+    "what_is_corrected": "R2-C3 prevalence = UNKNOWN. The number 40-50% is REMOVED from all downstream calculations. No sample-size calculation, power analysis, or study design uses this number.",
+    "why_this_matters": "An unsupported estimate turned into a parameter is exactly the kind of convenience assumption that makes results look better than reality. The machine needed a number for powering, so it manufactured one from non-equivalent data. This is FORBIDDEN.",
+    "what_replaces_it": "Two possibilities: (a) obtain patient-level data from existing studies to measure R2-C3 prevalence directly, or (b) if unavailable, design the study with a PREVALENCE SENSITIVITY ANALYSIS that reports required sample size across a RANGE of plausible prevalences (5%, 10%, 15%, 20%, 25%, 30%) — without assuming any single value.",
+    "status": "CORRECTED — R2-C3 prevalence = UNKNOWN"
+  },
+  "simulation_rename": {
+    "old_name": "Sample-Size Simulation / Power Analysis",
+    "new_name": "Algorithmic Recovery Stress Test (ARST)",
+    "what_it_IS": "A test of whether the DISCOVERY ALGORITHM can recover a KNOWN synthetic structure under varying noise, missingness, and site heterogeneity. It tests ALGORITHM ROBUSTNESS, not clinical adequacy.",
+    "what_it_is_NOT": "It is NOT proof that n=1000 is clinically sufficient. The synthetic structure is PLANTED by the simulator — the real clinical structure is UNKNOWN. The simulation cannot establish the sample size needed for an unknown phenotype.",
+    "correct_use": "Use ARST to verify the algorithm works under stress BEFORE applying it to real data. Do NOT use ARST output as the clinical sample size.",
+    "clinical_sample_size_status": "NOT YET ESTABLISHED — requires externally anchored prevalence and effect size, which require patient-level data (see Step 3)."
+  },
+  "data_acquisition_ladder": [
+    {
+      "rung": 1,
+      "source_type": "Clinical trial registries",
+      "specific_sources": [
+        "ClinicalTrials.gov — search for VSS + IIH trials with results",
+        "EU Clinical Trials Register — search for venous sinus stenting + IIH",
+        "ISRCTN registry — search for IIH intervention trials"
+      ],
+      "what_to_look_for": "Trial results tabs, outcome data tables, study protocols with endpoint definitions, supplementary appendices with patient-level data",
+      "data_sought": "Patient-level: headache status + ICP + papilledema + restenosis at follow-up",
+      "status": "TO_SEARCH",
+      "search_priority": "HIGH — registries may have results not in publications"
+    },
+    {
+      "rung": 2,
+      "source_type": "Supplementary tables and appendices",
+      "specific_sources": [
+        "178-patient VSS study (2025) — supplementary materials",
+        "2026 CVP/outcomes study — supplementary materials",
+        "2024 CGRP study — supplementary materials",
+        "Repeat-stenting series — supplementary materials",
+        "2026 VSS systematic review/meta-analysis — supplementary extraction tables"
+      ],
+      "what_to_look_for": "Patient-level cross-tabulations, baseline characteristics by outcome group, subgroup analyses that might report headache + ICP + papilledema + restenosis jointly",
+      "data_sought": "The specific cross-tabulation: (headache recurrence) × (ICP normal/abnormal) × (papilledema improved/not) × (restenosis yes/no)",
+      "status": "TO_SEARCH",
+      "search_priority": "CRITICAL — this is the data that would resolve Model D"
+    },
+    {
+      "rung": 3,
+      "source_type": "Institutional repositories and data-sharing platforms",
+      "specific_sources": [
+        "Dryad, Zenodo, Figshare — search for IIH/VSS datasets",
+        "Harvard Dataverse — search for neurosurgery datasets",
+        "Mendeley Data — search for hydrocephalus/IIH datasets",
+        "PubMed Commons / Open Science Framework — search for IIH data"
+      ],
+      "what_to_look_for": "Deidentified patient-level datasets from published IIH/VSS studies",
+      "data_sought": "Same cross-tabulation as rung 2",
+      "status": "TO_SEARCH",
+      "search_priority": "MODERATE — repositories may have deposited datasets"
+    },
+    {
+      "rung": 4,
+      "source_type": "Data-sharing statements in publications",
+      "specific_sources": [
+        "Check each of the 4 key publications for data-sharing statements",
+        "Some journals require authors to state whether data are available",
+        "If data are 'available upon reasonable request' — that is DATA_REQUESTABLE"
+      ],
+      "what_to_look_for": "Statements like 'data available upon reasonable request' or 'deidentified data deposited at [repository]'",
+      "data_sought": "Identification of whether patient-level data CAN be requested",
+      "status": "TO_SEARCH",
+      "search_priority": "HIGH — this determines whether we can request data"
+    },
+    {
+      "rung": 5,
+      "source_type": "Systematic review extraction tables",
+      "specific_sources": [
+        "2026 VSS systematic review/meta-analysis — may have extracted patient-level data from multiple studies",
+        "Cochrane reviews on IIH treatment — may have extraction tables",
+        "Other IIH systematic reviews — may contain cross-tabulated data"
+      ],
+      "what_to_look_for": "Extracted data tables that cross-tabulate headache outcomes with objective findings",
+      "data_sought": "Aggregate cross-tabulation that could partially answer Model D",
+      "status": "TO_SEARCH",
+      "search_priority": "MODERATE — reviews may have synthesized the needed data"
+    },
+    {
+      "rung": 6,
+      "source_type": "Author correspondence (zero-cost but requires human contact)",
+      "specific_sources": [
+        "Corresponding authors of the 178-patient study, CVP study, CGRP study, repeat-stenting series"
+      ],
+      "what_to_look_for": "Request for deidentified patient-level data: headache status + ICP + papilledema + restenosis at follow-up",
+      "data_sought": "Patient-level cross-tabulation",
+      "status": "DATA_REQUESTABLE — but requires identifying and contacting authors",
+      "search_priority": "HIGH if rungs 1-5 fail",
+      "note": "This is zero-cost but not zero-effort. It requires email correspondence with clinical researchers. The machine cannot do this autonomously — it requires a human to send the request. But the ANALYSIS of the data, once received, can be fully automated."
+    },
+    {
+      "rung": 7,
+      "source_type": "Public deidentified datasets (large registries)",
+      "specific_sources": [
+        "National Neurosurgery Quality Improvement Database (if it includes IIH)",
+        "National Inpatient Sample (NIS) — may have IIH admission data",
+        "State inpatient databases — may have IIH procedure data",
+        "MAUDE database — may have VSS device adverse event reports with headache data"
+      ],
+      "what_to_look_for": "Population-level data on IIH treatment outcomes, including headache and objective findings",
+      "data_sought": "Aggregate data on R2-C3 phenotype prevalence",
+      "status": "TO_SEARCH",
+      "search_priority": "LOW — registries are unlikely to have the detailed physiological measurements needed"
+    }
+  ],
+  "search_plan": {
+    "what_the_machine_can_do_NOW": [
+      "Search ClinicalTrials.gov for VSS + IIH trials with posted results",
+      "Search PubMed/Google Scholar for supplementary materials of the 4 key publications",
+      "Search Dryad/Zenodo/Figshare for deposited IIH/VSS datasets",
+      "Check the 4 key publications for data-sharing statements",
+      "Search for systematic reviews with extraction tables",
+      "Search MAUDE for VSS device adverse event reports"
+    ],
+    "what_requires_HUMAN_action": [
+      "Emailing corresponding authors to request patient-level data (if data-sharing statement says 'available upon request')",
+      "Negotiating data use agreements (if data are available but restricted)"
+    ],
+    "what_the_machine_can_do_once_data_arrives": [
+      "Run Model D test: cross-tabulate (headache + ICP + papilledema + restenosis) to determine R2-C3 prevalence",
+      "If R2-C3 prevalence is >10%: proceed with sample-size calculation using the MEASURED prevalence",
+      "If R2-C3 prevalence is <5%: KILL R2-C3 (the phenotype is too rare to be a high-value invention target)",
+      "If R2-C3 prevalence is 5-10%: borderline — proceed only if the clinical harm justifies the study cost"
+    ],
+    "the_decision_tree": {
+      "if_data_FOUND": "Run Model D → if R2-C3 exists and is prevalent → calculate clinical sample size → proceed to IRB",
+      "if_data_NOT_found": "R2-C3 prevalence = UNKNOWN. Design study with PREVALENCE SENSITIVITY ANALYSIS (sample size calculated across 5-30% prevalence range). Acknowledge that the study may be underpowered if true prevalence is <5%.",
+      "if_data_found_and_R2_C3_is_TINY": "KILL R2-C3. The 57% recurrence is mostly NOT the R2-C3 phenotype. Return to the phenotype decomposition and attack a different phenotype.",
+      "if_data_found_and_R2_C3_does_NOT_exist": "KILL R2-C3 AND the entire latent-state hypothesis. The 'anomaly' was an endpoint artifact (Model D wins). Move to a completely different problem."
+    },
+    "cost_so_far": "$0 — all searches are zero-cost",
+    "cost_of_next_step_if_data_not_found": "IRB + prospective study (expensive) — but ONLY after zero-cost options exhausted"
+  },
+  "verdict": {
+    "what_was_corrected": [
+      "1. Pseudo-estimate KILLED: R2-C3 prevalence = UNKNOWN (not 40-50%)",
+      "2. Sample-size simulation RENAMED: 'Algorithmic Recovery Stress Test' (not clinical proof)",
+      "3. Clinical sample size: NOT YET ESTABLISHED (requires externally anchored prevalence)",
+      "4. Zero-cost data acquisition ladder built (7 rungs, 0 cost)",
+      "5. Decision tree defined: if R2-C3 is tiny/nonexistent → KILL it; if found → proceed with measured prevalence",
+      "6. IRB / spending BLOCKED until zero-cost options exhausted"
+    ],
+    "the_principle": "Never pay for information that can still be obtained for free—and never turn an unsupported estimate into a parameter merely because the experiment needs a number.",
+    "immediate_action": "Execute the zero-cost search plan (rungs 1-5, 7). If data found → run Model D. If not → identify which authors to contact (rung 6, requires human).",
+    "gate_status": "YELLOW — R2-C3 prevalence is UNKNOWN, sample size is NOT established, zero-cost data search NOT yet executed",
+    "mechanism_status": "BLOCKED",
+    "spending_status": "BLOCKED — no IRB, no prospective study, no money spent until zero-cost evidence exhausted"
+  }
+}
