@@ -1,0 +1,100 @@
+{
+  "round": 34,
+  "timestamp": "2026-08-21T02:00:00Z",
+  "type": "PROBLEM_FIRST_DISCOVERY",
+  "selected_problem": {
+    "problem_id": "OVF-001",
+    "problem_name": "CSF over-drainage causing subdural hematomas and slit ventricle syndrome",
+    "problem_statement": "CSF shunts drain CSF from the ventricles to a distal compartment (peritoneum, atrium, or venous system). When the pressure differential between the CSF compartment and the distal compartment is too large — particularly when the patient is upright — the shunt drains too much CSF, causing over-drainage. This leads to subdural hematomas (blood pooling between brain and skull), slit ventricle syndrome (ventricles collapse around the catheter), and cranial deformity (especially in pediatric patients). Over-drainage affects 10-20% of shunt patients and is a leading cause of shunt revision surgery.",
+    "clinical_evidence": {
+      "incidence": "10-20% of shunt patients experience over-drainage complications",
+      "consequences": [
+        "Subdural hematomas (can require surgical evacuation)",
+        "Slit ventricle syndrome (causes severe headaches, requires shunt revision)",
+        "Cranial deformity (especially in pediatric patients — craniosynostosis-like presentation)",
+        "Shunt revision surgery (adds morbidity, infection risk, cost)"
+      ],
+      "cost": "Each over-drainage complication costs $25K-50K in surgical intervention",
+      "population": "All shunt patients are at risk, but especially: pediatric patients (smaller CSF volume), NPH patients (low-pressure state), and tall patients (larger hydrostatic gradient)"
+    },
+    "why_existing_solutions_fail": {
+      "programmable_valves": "Programmable valves allow EXTERNAL adjustment of opening pressure, but they CANNOT sense the actual pressure differential in real-time. The physician must guess the right setting based on symptoms. This is REACTIVE, not PROACTIVE.",
+      "gravitational_valves": "Gravitational valves (e.g., Miethke ProSA) add a gravitational unit that resists flow when upright. But they respond to POSTURE, not to actual venous pressure. They cannot distinguish between 'upright and safe' vs 'upright and over-draining.'",
+      "anti_siphon_devices": "Anti-siphon devices close when the pressure differential exceeds a threshold. But they use a FIXED threshold — they cannot adapt to patient-specific venous pressure physiology. They also have a risk of UNDER-drainage (blocking flow when drainage is actually needed)."
+    },
+    "why_eShunt_is_uniquely_positioned": "The eShunt creates a CSF→venous pathway. The device is AT the venous interface — it can directly sense venous pressure. VP shunts drain to the peritoneum and have NO access to venous pressure. This means the eShunt can implement a VENOUS-PRESSURE-AWARE regulation mechanism that is physically impossible for VP shunts. The eShunt can measure the actual pressure differential (CSF pressure - venous pressure) and adjust drainage in real-time to prevent over-drainage.",
+    "what_new_mechanism_could_solve_it": "A venous-pressure-aware flow regulator that: (1) senses venous pressure at the eShunt's venous outflow, (2) computes the actual CSF-to-venous pressure differential, (3) adjusts the drainage rate to maintain a safe differential, (4) prevents over-drainage when the patient is upright (large hydrostatic gradient) while maintaining adequate drainage when the patient is supine (small gradient). This is physically different from gravitational valves (which sense posture, not venous pressure) and from programmable valves (which require external adjustment).",
+    "prior_failure": {
+      "territory": "CV-T04 (Venous-aware regulation)",
+      "state": "FROZEN_NEGATIVE_CEILING",
+      "reason": "FAILURE_LESSON — reopenable only if new regulation mechanism discovered",
+      "what_failed": "The prior mechanism failed because it tried to use venous pressure SENSING as the regulation input, but the sensing technology was not adequately differentiated from existing pressure-sensing shunt valves. The prior art search found that venous pressure sensing in shunts was already anticipated.",
+      "what_is_different_now": "The prior failure was about SENSING venous pressure. The new approach is about USING the eShunt's unique position AT the venous interface to create a MECHANICAL (not electronic) pressure-differential regulator that responds to the actual CSF-to-venous pressure gradient. No electronics, no sensors — just fluid mechanics at the venous interface."
+    }
+  },
+  "problems_surveyed": [
+    {
+      "problem": "CSF shunt obstruction/refouling (50% failure rate in 2 years)",
+      "addressed_by": "Slot 1 (R6 Passive Rescue) — bypass mechanism",
+      "state": "PHYSICAL_VALIDATION_PENDING",
+      "gap": "R6 addresses obstruction AFTER it occurs (bypass). It does NOT PREVENT obstruction from forming. The prevention problem is unaddressed.",
+      "value": "EXTREME — ~125K shunt placements/year in US, 50% revision rate, $1.5-3B annual cost"
+    },
+    {
+      "problem": "eShunt obstruction monitoring (no real-time feedback)",
+      "addressed_by": "Slot 2 (Adaptive/Sensing eShunt) — pressure sensing",
+      "state": "PROVISIONAL — problem existence is YELLOW (needs STRIDE 5-year data)",
+      "gap": "Blocked on clinical data. Cannot proceed without eShunt-specific obstruction evidence.",
+      "value": "HIGH — but gated on clinical observation"
+    },
+    {
+      "problem": "Targeted CNS drug delivery (poor CNS penetration of systemic drugs)",
+      "addressed_by": "Slot 3 (Controlled CNS Therapeutic) — retention mechanism",
+      "state": "VALIDATION_READY_FROZEN — needs strongest-alternative attack",
+      "gap": "The strongest alternative (existing intrathecal delivery, Ommaya reservoir, CereVasc's own IP) has NOT been attacked yet.",
+      "value": "HIGH — CNS drug delivery market is $30B+ and growing"
+    },
+    {
+      "problem": "Post-hemorrhagic hydrocephalus (PHH) management in infants",
+      "addressed_by": "C04 (KILLED — prior art US4741730A + US12,364,952B2)",
+      "state": "FROZEN_NEGATIVE_CEILING — mechanism killed, PROBLEM remains unmet",
+      "gap": "The PROBLEM (PHH management) is still unmet. The C04 MECHANISM (passive filtration + bypass) was killed. A DIFFERENT mechanism could still solve it.",
+      "value": "HIGH — PHH affects ~12,000 infants/year in US, VP shunt failure rate is 40-50% in infants"
+    },
+    {
+      "problem": "Over-drainage causing subdural hematomas and slit ventricle syndrome",
+      "addressed_by": "CV-T04 (FROZEN_NEGATIVE_CEILING — venous-aware regulation failed)",
+      "state": "FROZEN — 'reopenable only if new regulation mechanism discovered'",
+      "gap": "The prior mechanism (venous-pressure-aware regulation) failed. But the PROBLEM remains: over-drainage is a major complication. A different regulation mechanism could solve it.",
+      "value": "HIGH — over-drainage complications affect 10-20% of shunt patients"
+    },
+    {
+      "problem": "Shunt infection (5-10% rate, requires removal)",
+      "addressed_by": "NONE — no existing slot addresses infection",
+      "state": "UNADDRESSED",
+      "gap": "No existing mechanism in the portfolio. This is a genuinely unaddressed problem.",
+      "value": "HIGH — 5-10% infection rate, each infection costs $50K+ and risks brain damage"
+    },
+    {
+      "problem": "Idiopathic Intracranial Hypertension (IIH) management",
+      "addressed_by": "NONE — no existing slot addresses IIH",
+      "state": "UNADDRESSED",
+      "gap": "IIH is treated with VSS (venous sinus stenting) or VP shunt. The eShunt's CSF→venous pathway is a physically different mechanism — it bypasses the venous sinus entirely.",
+      "value": "MODERATE — IIH affects ~1/100,000, but the eShunt could be transformative for this population"
+    },
+    {
+      "problem": "Normal Pressure Hydrocephalus (NPH) shunt optimization",
+      "addressed_by": "Slot 2 (Adaptive/Sensing) — partial",
+      "state": "PROVISIONAL — needs clinical data",
+      "gap": "NPH affects ~700,000 Americans. Current treatment requires iterative programming of shunt valves. A closed-loop NPH management system would be transformative.",
+      "value": "HIGH — 700K patients, 30-50% shunt revision rate"
+    }
+  ],
+  "next_steps": [
+    "Prior art search: MECHANICAL venous-pressure-aware flow regulator at CSF-venous interface",
+    "Strongest alternative attack: programmable valves, gravitational valves, anti-siphon devices",
+    "Causal chain: model the pressure-differential regulation physics",
+    "CV-T04 failure analysis: what specifically failed and why is this different?",
+    "Mechanism specification: detail the MECHANICAL (non-electronic) regulator design"
+  ]
+}
