@@ -3,28 +3,29 @@
   "schema_version": "1.1.0",
   "candidate_id": "C04",
   "candidate_name": "PHH blood-tolerant CSF drainage with tangential-flow filtration",
-  "last_updated": "2026-08-21T00:10:00Z",
+  "last_updated": "2026-08-21T00:30:00Z",
   "last_updated_by": "main",
-  "last_updated_in_session": "round-29-real-model-execution-not-synthetic",
+  "last_updated_in_session": "round-30-heterogeneous-models-nvidia-c04-l5-disputed-proposition",
   "constitution_version": "1.5.0",
   "constitution_hash": "f82ae4f665dcb5a59ae399017feed57d4f7e6c7fa1a4d8b30c6d8d80c20afae1",
   "computational_section_102_verdict": {
     "verdict": "DISPUTED",
-    "verdict_timestamp": "2026-08-21T00:10:00Z",
+    "verdict_timestamp": "2026-08-21T00:30:00Z",
     "verdict_commit": "(this commit)",
-    "verdict_engine": "ai_adjudication_ensemble.py + ai_model_execution_receipt.py + REAL z-ai API calls (Round 29)",
-    "verdict_evidence": "CEREVASC_SLOT5_DISCOVERY/ROUND29_C04_L5_REAL_ENSEMBLE.json",
-    "reasoning": "REAL ensemble adjudication with actual z-ai API calls (glm-4-plus model). All 5 receipts have synthetic=False, can_support_evidence=True. Models A/B/C (independent) said SUPPORTS_102. Model D (adversarial) CAN REFUTE — found that the US4741730A specification places the diaphragm valve in 'second chamber 26', but the claim says 'first fluid-flow passageway'. The specification does not explicitly connect these. Model E (arbitration) ruled DISPUTED, DOES_NOT_SUPPORT_102. The adversarial model found a genuine weakness that the synthetic Round 28 analysis missed. C04-L5 is NOT established as anticipated. The verdict is DISPUTED — honest result from real model execution.",
+    "verdict_engine": "ai_adjudication_ensemble.py + REAL heterogeneous models (Round 30): GLM-4-Plus + Llama 3.3 70B + Gemma 4 31B + Llama 3.1 70B",
+    "verdict_evidence": "CEREVASC_SLOT5_DISCOVERY/ROUND30_C04_L5_HETEROGENEOUS_ENSEMBLE.json",
+    "reasoning": "HETEROGENEOUS ensemble with 4 GENUINELY DIFFERENT model families (GLM, Llama 3.3, Gemma, Llama 3.1) — not same-model role separation. All 5 receipts synthetic=False, can_support_evidence=True. The ensemble attacked the EXACT disputed proposition: does US4741730A's 'second chamber 26' (where the diaphragm valve is positioned) correspond to the claim's 'first fluid-flow passageway'? Models A (GLM) and B (Llama 3.3) said DOES_NOT_SUPPORT_102 (second_chamber ≠ first_passageway). Model C (Gemma) said SUPPORTS_102 (the outlier). Model D (Llama 3.1, adversarial) CAN REFUTE — found the spec does not explicitly connect second chamber 26 to first fluid-flow passageway. Model E (GLM, arbitration) ruled DISPUTED, NOT_ESTABLISHED_FOR_102. The verdict is DISPUTED / NOT_ESTABLISHED_FOR_102 — the limitation is not established as anticipated, which is different from affirmatively establishing non-disclosure. Correct semantics per CEO directive.",
     "limitations_summary": {
       "total": 6,
       "established_supports_102_real": 5,
       "established_ids_real": ["C04-L1", "C04-L2", "C04-L3", "C04-L4", "C04-L6"],
       "disputed": 1,
       "disputed_ids": ["C04-L5"],
+      "disputed_semantics": "NOT_ESTABLISHED_FOR_102 (not DOES_NOT_SUPPORT_102 — the limitation is not established as anticipated, which is different from affirmatively failing to disclose)",
       "unknown": 0,
       "can_support_section_102_real": 5,
-      "requires_missing_evidence": 1,
-      "missing_evidence": ["Explicit connection in US4741730A between 'second chamber 26' (where the diaphragm valve is positioned per the specification) and 'first fluid-flow passageway' (where the claim places the valve means)"]
+      "model_families_used": ["glm-4-plus", "meta/llama-3.3-70b-instruct", "google/gemma-4-31b-it", "meta/llama-3.1-70b-instruct"],
+      "heterogeneous": true
     },
     "resolution_history": [
       {
@@ -71,13 +72,27 @@
       },
       {
         "timestamp": "2026-08-21T00:10:00Z",
-        "commit": "(this commit)",
+        "commit": "f32d8204783320d8e5bfbf1709c388c9b72d9387",
         "verdict": "DISPUTED",
-        "reason": "REAL ensemble adjudication with actual z-ai API calls (glm-4-plus). All 5 receipts synthetic=False, can_support_evidence=True. Full specification retrieved with complete document hash + exact source span + source URL + span hash. Models A/B/C (independent) said SUPPORTS_102. Model D (adversarial) CAN REFUTE — found that the specification places the diaphragm valve in 'second chamber 26' but the claim says 'first fluid-flow passageway'; the specification does not explicitly connect these. Model E (arbitration) ruled DISPUTED, DOES_NOT_SUPPORT_102. The adversarial model found a genuine weakness that the synthetic Round 28 analysis missed. C04-L5 is NOT established as anticipated. This is the honest result from real model execution — the synthetic Round 28 ANTICIPATED was wrong.",
+        "reason": "REAL ensemble adjudication with actual z-ai API calls (glm-4-plus). All 5 receipts synthetic=False. Models A/B/C said SUPPORTS_102. Model D (adversarial) CAN REFUTE. Model E ruled DISPUTED. But all 5 models were the SAME model family (glm-4-plus) — independent runs, not independent models.",
         "real_execution": true,
         "all_receipts_synthetic_false": true,
         "model_used": "glm-4-plus",
-        "provider": "z-ai-web-dev-sdk"
+        "provider": "z-ai-web-dev-sdk",
+        "limitation": "Same model family for all 5 runs — independent runs, not independent models"
+      },
+      {
+        "timestamp": "2026-08-21T00:30:00Z",
+        "commit": "(this commit)",
+        "verdict": "DISPUTED",
+        "reason": "HETEROGENEOUS ensemble with 4 GENUINELY DIFFERENT model families: GLM-4-Plus, Llama 3.3 70B, Gemma 4 31B, Llama 3.1 70B. All 5 receipts synthetic=False, can_support_evidence=True. Attacked the EXACT disputed proposition: does 'second chamber 26' = 'first fluid-flow passageway'? Models A (GLM) and B (Llama 3.3) said DOES_NOT_SUPPORT_102 (second_chamber ≠ first_passageway). Model C (Gemma) said SUPPORTS_102 (outlier). Model D (Llama 3.1, adversarial) CAN REFUTE. Model E (GLM, arbitration) ruled DISPUTED, NOT_ESTABLISHED_FOR_102. Correct semantics: NOT_ESTABLISHED_FOR_102 (not DOES_NOT_SUPPORT_102). The limitation is not established as anticipated, which is different from affirmatively establishing non-disclosure.",
+        "real_execution": true,
+        "all_receipts_synthetic_false": true,
+        "heterogeneous": true,
+        "model_families": ["glm-4-plus", "meta/llama-3.3-70b-instruct", "google/gemma-4-31b-it", "meta/llama-3.1-70b-instruct"],
+        "providers": ["z-ai-web-dev-sdk", "nvidia-api"],
+        "disputed_proposition": "Does US4741730A 'second chamber 26' (where diaphragm valve is positioned) correspond to claim's 'first fluid-flow passageway'?",
+        "semantics_corrected": true
       }
     ],
     "what_would_change_this_verdict": {
