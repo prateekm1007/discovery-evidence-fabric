@@ -1,0 +1,26 @@
+{
+  "test_name": "MODEL_INDUCED_INVENTION_HALLUCINATION_REGRESSION",
+  "version": "1.0.0",
+  "frozen_at": "2026-08-21T05:00:00Z",
+  "mandatory_for": "EVERY future invention campaign — no exceptions",
+  "source_case": "OVF-001 (Rounds 34-39): over-drainage prevention via venous-pressure-aware regulation",
+  "the_failure_sequence": [
+    "1. Problem-first discovery identifies a high-value unmet problem",
+    "2. A hydraulic/physical model of the existing system is constructed",
+    "3. The model predicts a dangerous phenomenon (e.g., over-drainage)",
+    "4. An invention opportunity appears to exist",
+    "5. BUT: the model was WRONG (wrong valve type, wrong parameters, inconsistent equations)",
+    "6. When the model is corrected (source-bound parameters, consistent equations), the phenomenon disappears",
+    "7. The invention opportunity was a MODEL ARTIFACT, not a real problem"
+  ],
+  "mandatory_questions_for_every_new_problem": [
+    "Q1: Is the model of the existing system source-bound (not assumed)?",
+    "Q2: Are the governing equations enforced at every time step (e.g., ΔP = ICP - P_venous)?",
+    "Q3: Are INITIAL / TRANSIENT / EQUILIBRIUM phases labeled and not mixed?",
+    "Q4: Is the valve/device characteristic curve source-bound from the actual specification (not a single performance point used as a full law)?",
+    "Q5: Could this apparent problem disappear because I used the wrong model of the existing system?",
+    "Q6: If the model is corrected with source-bound parameters, does the phenomenon still exist?"
+  ],
+  "anti_hallucination_rule": "A candidate problem must survive BOTH an existing-system attack AND a model-validity attack before mechanism generation. The model-validity attack asks: 'If I correct the model with source-bound parameters and consistent equations, does the problem still exist?' If the answer is NO, the problem is KILLED_BY_CORRECTED_MODEL — not promoted to mechanism generation.",
+  "canonical_lesson": "A model can kill a hypothesis inside its domain of validity. It cannot declare reality nonexistent outside that domain. But a WRONG model can CREATE an apparent problem that does not exist. The machine must verify the model before trusting the problem."
+}
