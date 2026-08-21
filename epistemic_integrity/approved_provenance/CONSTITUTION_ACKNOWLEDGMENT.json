@@ -1,9 +1,9 @@
 {
   "constitution_version": "1.5.0",
   "constitution_hash": "f82ae4f665dcb5a59ae399017feed57dd24f42fe35d98a897806d559064762a5",
-  "acknowledged_at": "2026-08-21T01:59:05.139526+00:00",
+  "acknowledged_at": "2026-08-21T02:10:05.041186+00:00",
   "acknowledged_by": "main",
-  "session": "round-38-fix-hydraulic-state-machine-enforce-dP-equations",
-  "intended_change": "Round 38: Fix the P0 arithmetic/modeling inconsistency. The pressure equations do not reconcile: supine ICP=26.7, Pvenous=8, but 26.7-8=18.7 not 7. Standing ICP=0.8, Pvenous=2, but 0.8-2=-1.2 not 13. Reconstruct the hydraulic state machine with time-dependent sequence: Pvenous(t) \u2192 ICP(t) \u2192 \u0394P(t) \u2192 valve(t) \u2192 Q(t). Enforce \u0394P(t) = ICP(t) - Pvenous(t) at EVERY time point. Label INITIAL/TRANSIENT/EQUILIBRIUM. Remove the 816 mL/day extrapolation. Source-bind the valve specification (~10 mL/h at \u22648 mmHg). Do NOT generate mechanism. Do NOT call OVF-RESIDUAL-001 GREEN.",
+  "session": "round-39-ovf-cemetery-record-then-next-problem",
+  "intended_change": "Round 39: Finalize OVF-001 cemetery record. Distinguish KILLED_BY_CORRECTED_HYDRAULIC_MODEL (computational conclusion) from NOT_ESTABLISHED (real-world conclusion). Do not claim the model disproved clinical reality. Preserve the failed model as a permanent adversarial regression case: Round-37 wrong binary model \u2192 apparent breakthrough; Round-38 corrected proportional model \u2192 kill. Then STOP OVF-001. Move to next problem-first discovery.",
   "pre_session_warning": "EPISTIC CONSTITUTION CHECK\n==========================\n\nBefore modifying the repository, reread the Epistemic Constitution.\n\nYou are an untrusted implementation agent.\n\n- Do not optimize for green gates.\n- Do not manufacture provenance.\n- Do not weaken verification to admit a desired claim.\n- Do not use weaker fallback evidence.\n- Do not mutate production state during certification.\n- Do not convert uncertainty into certainty.\n- Treat every failed test as information.\n- Attack your own implementation before declaring success.\n- If evidence is insufficient, BLOCK.\n- If history cannot be proven, say so.\n- If the gate is RED, research remains STOPPED.\n\n\"Never optimize for the gate\" is the first principle you see every time.\n\nConstitution file: EPISTEMIC_CONSTITUTION.md\nConstitution hash: f82ae4f665dcb5a5...\nConstitution version: 1.5.0\n\nTo acknowledge: call constitution_loader.acknowledge_constitution()"
 }
