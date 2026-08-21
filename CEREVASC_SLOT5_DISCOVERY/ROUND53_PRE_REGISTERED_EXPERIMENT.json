@@ -1,0 +1,183 @@
+{
+  "round": 53,
+  "timestamp": "2026-08-21T11:30:00Z",
+  "type": "PRE_REGISTERED_DATA_DISCOVERY_EXPERIMENT",
+  "experiment_architecture": {
+    "competing_hypotheses": {
+      "Model_A": "Venous congestion + compliance causes persistent headache",
+      "Model_B": "Migraine/CGRP biology causes persistent headache",
+      "Model_C": "Mixture — multiple causes coexist in the same population",
+      "Model_D": "Measurement artifact / endpoint misclassification — 'recurrence' is not a real physiological state"
+    },
+    "discovery_protocol": {
+      "Model_E": "Data-discovered latent structure — NOT a biological hypothesis. A PROCEDURE for letting the data reveal structure without pre-assuming the cause."
+    },
+    "key_correction": "Model E is NOT ranked against A-D. It is a DISCOVERY PROCEDURE that runs alongside the hypotheses. The data may confirm one of A-D, may reveal something none of them predicted, or may show that no latent structure exists (supporting Model D).",
+    "the_experiment": "Run A vs B vs C vs D vs DATA-DISCOVERED. Allow ALL to lose. The desired outcome is NOT 'Model C wins' — it is 'the data produce a structure that survives adversarial replication.'"
+  },
+  "pre_registered_experiment": {
+    "experiment_id": "R2C3-DISCOVERY-001",
+    "pre_registration_date": "2026-08-21",
+    "pre_registration_hash": "PRE-REGISTRATION FROZEN — no modifications after data collection begins",
+    "population": {
+      "inclusion_criteria": [
+        "Adult patients (≥18 years) diagnosed with IIH (Modified Dandy Criteria)",
+        "Treated with VSS (venous sinus stenting) for venous sinus stenosis",
+        "Post-VSS: mean ICP normalized (≤20 cm H2O or per site standard) AND papilledema improved/resolved (Frisén grade improvement ≥1)",
+        "Minimum 3 months post-VSS (to capture early recovery)"
+      ],
+      "exclusion_criteria": [
+        "In-stent restenosis confirmed on imaging (these are R2-C1/R2-C2, not R2-C3)",
+        "Renewed objective ICP elevation on lumbar puncture (R2-C1)",
+        "New/adjacent stenosis requiring repeat stenting (R2-C2)",
+        "Pregnant (pregnancy affects venous physiology — separate population)",
+        "Inability to provide informed consent"
+      ],
+      "target_sample_size": "Minimum 60 patients (based on detecting phenotype subgroups of ≥15% prevalence with 80% power at α=0.05, adjusted for multiple comparisons)",
+      "recruitment_sites": "Multicenter — at least 3 centers with VSS programs"
+    },
+    "candidate_signals": {
+      "venous_physiology": [
+        "x3: Central venous pressure (CVP) — via right heart catheterization during VSS procedure, then estimated via jugular venous pressure at follow-up",
+        "x4: Sigmoid sinus pressure — via venous manometry during VSS, then estimated via Doppler ultrasound at follow-up",
+        "x5: Anterior SSS pressure — via venous manometry during VSS (the 2026 study found this predicts outcomes)",
+        "x6: Venous sinus pressure gradient (pre/post stenosis) — during VSS procedure"
+      ],
+      "CSF_physiology": [
+        "x1: Mean ICP — via lumbar puncture at baseline + follow-up",
+        "x2: ICP pulse amplitude — via high-resolution ICP waveform during lumbar puncture (or implanted sensor if available)"
+      ],
+      "migraine_CGRP_biology": [
+        "x7: Serum CGRP level — blood draw at baseline + follow-up (2024 study found elevated CGRP in persistent headache)",
+        "x8: Migraine phenotype score — ICHD-3 criteria assessment by headache specialist",
+        "x9: Medication-overuse headache screen — per ICHD-3 criteria"
+      ],
+      "clinical_phenotype": [
+        "x10: Headache severity — HIT-6 score at baseline + follow-up",
+        "x11: Headache frequency — days per month",
+        "x12: Visual function — OCT, visual fields, Frisén grade",
+        "x13: Tinnitus severity — Tinnitus Handicap Inventory",
+        "x14: Quality of life — SF-36 or IIH-SL questionnaire"
+      ],
+      "confounders": [
+        "x15: BMI / weight trajectory",
+        "x16: Sleep apnea status (PSG if available, STOP-BANG if not)",
+        "x17: Medication use (acetazolamide dose, topiramate, pain medications)",
+        "x18: Time since VSS",
+        "x19: Stent type and position",
+        "x20: Comorbidities (hypertension, diabetes, etc.)"
+      ]
+    },
+    "acquisition_cadence": {
+      "baseline": "During VSS procedure (x1-x6, x7-x9, x14-x20) + pre-VSS clinical assessment (x10-x13)",
+      "follow_up_1": "3 months post-VSS (x7-x14, x15-x20; x1-x2 if lumbar puncture clinically indicated)",
+      "follow_up_2": "6 months post-VSS (x7-x14, x15-x20; x1-x2 if clinically indicated)",
+      "follow_up_3": "12 months post-VSS (x7-x14, x15-x20; x1-x6 if repeat venography clinically indicated)",
+      "rationale": "The 178-patient study found recurrence at mean ~390 days. 3/6/12-month cadence captures the trajectory."
+    },
+    "endpoint_definitions": {
+      "primary_endpoint": "Persistent headache at 12 months post-VSS, defined as HIT-6 ≥ 50 (moderate-to-severe impact) despite mean ICP ≤ 20 cm H2O AND improved/resolved papilledema",
+      "secondary_endpoints": [
+        "Headache recurrence (HIT-6 increase ≥ 6 points from 3-month nadir) despite normal ICP",
+        "Visual deterioration (new visual field defect or OCT worsening) despite normal ICP",
+        "Requirement for repeat VSS or shunt surgery"
+      ],
+      "endpoint_standardization": "All endpoints measured using the SAME instruments at ALL sites. HIT-6 is the primary headache instrument (validated, widely used). ICP measured via lumbar puncture (standardized technique). Papilledema graded by Frisén scale (certified graders)."
+    },
+    "missing_data_policy": {
+      "rule": "Multiple imputation by chained equations (MICE) for missing values, with sensitivity analysis using complete-case analysis",
+      "maximum_missingness": "Variables with >40% missingness excluded from primary analysis",
+      "sensitivity": "Results must be robust to both imputed and complete-case analyses"
+    },
+    "normalization": {
+      "rule": "All continuous variables z-scored within the analysis sample. No normalization that uses outcome information (no post-hoc transformation).",
+      "categorical": "Binary coded as 0/1. Ordinal variables kept as ordinal."
+    },
+    "candidate_model_families": {
+      "Model_A_venous_compliance": "Logistic regression: y ~ x3 + x4 + x5 + x2/x1 + x15 + x18 (venous + compliance + confounders)",
+      "Model_B_migraine_CGRP": "Logistic regression: y ~ x7 + x8 + x9 + x15 + x18 (CGRP + migraine phenotype + confounders)",
+      "Model_C_mixture": "Finite mixture model: y ~ mixture(x3+x4+x5, x7+x8+x9) + x15 + x18 (two-component mixture)",
+      "Model_D_artifact": "Descriptive analysis: what proportion of 'recurrence' has NO objective findings? Does the 'recurrence' correlate with medication-overuse (x9)?",
+      "Model_E_data_discovered": "Unsupervised: (1) k-means/gaussian mixture on standardized x3-x9; (2) hierarchical clustering; (3) PCA/factor analysis to identify latent dimensions; (4) stability selection via bootstrap"
+    },
+    "train_validation_split": {
+      "rule": "70/30 stratified split (stratified by site and by endpoint). Training set for model fitting. Validation set for out-of-sample prediction. No outcome information leaks from validation to training.",
+      "cross_validation": "5-fold cross-validation within training set for hyperparameter selection"
+    },
+    "clustering_criteria": {
+      "for_Model_E": [
+        "Number of clusters determined by: (1) silhouette score, (2) gap statistic, (3) BIC from Gaussian mixture — all three must agree within ±1 cluster",
+        "Minimum cluster size: 10% of sample (to avoid spurious small clusters)",
+        "Cluster stability: bootstrap resampling (1000 iterations) — a cluster is 'stable' if ≥80% of bootstrap samples produce a cluster with ≥80% overlap"
+      ]
+    },
+    "stability_criteria": {
+      "prediction_stability": "A model is 'stable' if its AUC on the validation set is within 0.05 of its cross-validated AUC on the training set",
+      "cluster_stability": "A cluster is 'stable' if it appears in ≥80% of bootstrap resamples with ≥80% member overlap",
+      "biological_plausibility": "A discovered cluster must be interpretable: the cluster's mean values on x3-x9 must form a physiologically coherent pattern (e.g., 'high CVP + high CGRP' is interpretable; 'high CVP + low CGRP + high BMI + low age' is not)"
+    },
+    "out_of_sample_test": {
+      "primary_test": "Does the best model (A, B, C, or E-discovered) predict the primary endpoint (persistent headache at 12 months) in the VALIDATION set with AUC ≥ 0.70?",
+      "falsification_threshold": "If NO model achieves AUC ≥ 0.70 out-of-sample, the hypothesis that a latent phenotype structure predicts R2-C3 is FALSIFIED. The problem may not be predictable from these signals.",
+      "comparison_test": "Does the best model SIGNIFICANTLY outperform a null model (baseline headache severity only) in the validation set? If not, the multi-signal approach adds no value."
+    },
+    "falsification_criteria": {
+      "overall_falsification": "If NO model (A, B, C, or E-discovered) predicts R2-C3 out-of-sample with AUC ≥ 0.70, the latent-state hypothesis is FALSIFIED. The R2-C3 anomaly may be unmeasurable, random, or attributable to causes not captured by these signals.",
+      "model_A_falsification": "If Model A (venous+compliance) does NOT predict better than null, venous physiology does NOT explain the anomaly.",
+      "model_B_falsification": "If Model B (migraine/CGRP) does NOT predict better than null, migraine biology does NOT explain the anomaly.",
+      "model_C_falsification": "If Model C (mixture) does NOT outperform Models A and B individually, the mixture adds no value — the causes are not mixed.",
+      "model_D_support": "If Model D shows that >50% of 'recurrence' has NO objective findings AND correlates with medication-overuse, the 'recurrence' is largely an endpoint problem, not a physiological state.",
+      "model_E_falsification": "If unsupervised clustering does NOT produce stable, interpretable clusters, no latent phenotype structure exists in these signals."
+    },
+    "confounder_adjustment": {
+      "mandatory_confounders": [
+        "x15 (BMI/weight)",
+        "x16 (OSA)",
+        "x17 (medications)",
+        "x18 (time since VSS)"
+      ],
+      "method": "All models adjusted for mandatory confounders. Sensitivity analysis without adjustment to check robustness.",
+      "site_effect": "Mixed-effects models with site as random effect"
+    },
+    "biological_plausibility_test": {
+      "rule": "Any discovered latent structure must be evaluated by an INDEPENDENT clinical panel (blinded to the model) for biological plausibility",
+      "criterion": "≥3 of 5 panel members must agree that the discovered structure is 'physiologically interpretable and clinically actionable'",
+      "purpose": "Prevents data-mined clusters from being presented as biological phenotypes without clinical validation"
+    },
+    "prospective_holdout": {
+      "rule": "The entire pre-registered analysis is run on the FIRST cohort (n≥60). Any structure that survives is then tested on a PROSPECTIVE HOLDOUT cohort (new patients, collected after the analysis is frozen).",
+      "purpose": "Prevents in-sample overfitting from being presented as discovery",
+      "threshold": "The holdout AUC must be within 0.05 of the original AUC for the structure to be 'confirmed'"
+    }
+  },
+  "discovery_intervention_separation": {
+    "phase_1_discovery": {
+      "goal": "Prove that a latent phenotype structure EXISTS and PREDICTS outcome",
+      "success_criterion": "A model (A, B, C, or E-discovered) predicts R2-C3 in the prospective holdout with AUC ≥ 0.70",
+      "failure_criterion": "No model predicts above threshold → latent structure does not exist or is not measurable",
+      "what_is_NOT_allowed": "No intervention recommendations are made based on the discovered structure. The structure is a PREDICTION, not a treatment."
+    },
+    "phase_2_intervention": {
+      "goal": "Prove that phenotype-guided intervention IMPROVES outcomes",
+      "prerequisite": "Phase 1 must succeed (a predictive structure exists)",
+      "design": "RCT: phenotype-guided intervention vs. standard care. The phenotype determines WHICH intervention (venous, migraine, combined, or reclassification). Standard care is current practice.",
+      "success_criterion": "Phenotype-guided group has ≥30% reduction in persistent headache at 12 months vs. standard care",
+      "failure_criterion": "No significant difference → knowing the phenotype does not change outcomes (the structure is predictive but not actionable)"
+    },
+    "why_separation_matters": "A predictive cluster is NOT automatically a treatment recommendation.\nThe cluster may predict outcome but changing the intervention based on it\nmay not improve outcome — because:\n  (a) the underlying cause may not be treatable\n  (b) the 'correct' intervention may not exist\n  (c) the cluster may be a marker, not a cause\n\nPhase 1 proves the structure EXISTS and PREDICTS.\nPhase 2 proves the structure is ACTIONABLE.\nOnly both phases succeeding justifies mechanism generation."
+  },
+  "verdict": {
+    "what_this_round_accomplished": "The machine has PRE-REGISTERED a data-discovery experiment that:\n  (a) treats A-D as competing hypotheses (not ranked against E)\n  (b) treats E as a discovery protocol (not a hypothesis)\n  (c) includes CGRP/migraine biology alongside venous physiology\n  (d) allows ALL models to lose (falsification criteria defined)\n  (e) requires out-of-sample validation + prospective holdout\n  (f) requires biological plausibility review by independent panel\n  (g) separates discovery (Phase 1) from intervention (Phase 2)\n  (h) is frozen BEFORE data collection (no outcome peeking)",
+    "the_key_principle": "Don't ask the data to confirm our best explanation.\nDesign the experiment so the data are free to make our best\nexplanation wrong.",
+    "gate_status": "YELLOW — the experiment is pre-registered but NOT yet run. The problem gate cannot reach GREEN until the data are collected and the structure is discovered (or falsified).",
+    "mechanism_status": "BLOCKED until Phase 1 (discovery) succeeds. Even then, mechanism generation requires Phase 2 (intervention) to prove the structure is actionable.",
+    "what_comes_next": [
+      "1. IRB approval and multicenter site activation for R2C3-DISCOVERY-001",
+      "2. Prospective data collection (3/6/12-month follow-up per patient)",
+      "3. Analysis per pre-registered protocol (no deviations)",
+      "4. If Phase 1 succeeds: design Phase 2 RCT (phenotype-guided intervention)",
+      "5. If Phase 1 fails: the R2-C3 anomaly is NOT predictable from these signals. Either park the problem or identify new signals."
+    ],
+    "honest_limitation": "The machine has reached the limit of computational discovery.\nFurther progress requires CLINICAL DATA that does not yet exist.\nThe machine has designed the cleanest possible experiment to\ncollect that data — but it cannot run the experiment itself.\n\nThis is the honest boundary between invention discovery\nand clinical research. The machine has done everything it can\ncomputationally. The next step is in the physical world."
+  }
+}
