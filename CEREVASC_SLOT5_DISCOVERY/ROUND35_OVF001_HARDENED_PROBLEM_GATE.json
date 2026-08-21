@@ -1,0 +1,148 @@
+{
+  "round": 35,
+  "timestamp": "2026-08-21T02:30:00Z",
+  "type": "PROBLEM_GATE_HARDENING",
+  "problem_hypothesis": {
+    "problem_id": "OVF-001",
+    "type": "PROBLEM_HYPOTHESIS",
+    "problem_name": "Residual over-drainage burden despite current anti-overdrainage technology",
+    "problem_statement": "CSF shunts drain CSF from the ventricles to a distal compartment. When the pressure differential is too large — particularly when the patient is upright — over-drainage can occur, causing subdural hematomas, slit ventricle syndrome, and cranial deformity. Multiple anti-overdrainage technologies exist (programmable valves, gravitational valves, anti-siphon devices, flow-regulated systems). The question is NOT whether over-drainage occurs (it does), but whether a clinically important RESIDUAL burden remains after all current anti-overdrainage mechanisms are applied.",
+    "NOT_claiming": [
+      "NOT claiming 'no existing shunt effectively prevents over-drainage' (too strong)",
+      "NOT claiming 'VP shunts cannot do this' (unsupported absolute)",
+      "NOT claiming a specific mechanism is novel (prior-art-threatened)",
+      "NOT proposing a mechanism at all (mechanism = UNPROPOSED)"
+    ],
+    "mechanism_status": "UNPROPOSED — mechanism will only be generated AFTER the problem gate passes"
+  },
+  "four_questions": [
+    {
+      "question_id": "Q1",
+      "question": "Does clinically important over-drainage actually occur?",
+      "status": "EVIDENCE_AVAILABLE_BUT_REQUIRES_SOURCE_BINDING",
+      "answer": "YES — over-drainage is a well-documented complication of CSF shunting. However, the exact incidence varies substantially by device type, patient population, outcome definition, and follow-up duration. The '10-20%' figure used in Round 34 was a rough estimate that must be source-bound before it can be used as a problem-existence fact.",
+      "evidence_needed": [
+        "Peer-reviewed meta-analysis of over-drainage incidence by device type",
+        "Source-bound incidence rates (not universal '10-20%' — varies by population)",
+        "Definition of 'clinically important' over-drainage (radiographic vs symptomatic vs requiring intervention)"
+      ],
+      "variance_acknowledged": "The literature shows substantial variation: incidence ranges from 5% to 30%+ depending on device, population (pediatric vs adult, NPH vs obstructive), and outcome measure (subdural hematoma on imaging vs symptomatic vs requiring surgical intervention). The problem-existence gate must use source-bound rates, not a universal average."
+    },
+    {
+      "question_id": "Q2",
+      "question": "How large is the residual burden DESPITE current anti-overdrainage technologies?",
+      "status": "CRITICAL_QUESTION — NOT YET ANSWERED",
+      "answer": "This is the KEY question. The problem is NOT 'does over-drainage occur' (it does). The problem is 'does a clinically important residual burden remain AFTER current anti-overdrainage technology is applied?' If programmable valves, gravitational valves, anti-siphon devices, and flow-regulated systems collectively reduce over-drainage to a clinically negligible level, then the problem does NOT pass the gate. If a residual burden remains, the problem passes — but only to the extent of the documented residual.",
+      "evidence_needed": [
+        "Studies comparing over-drainage rates WITH vs WITHOUT anti-siphon devices",
+        "Studies comparing over-drainage rates WITH vs WITHOUT gravitational valves",
+        "Studies of flow-regulated shunt systems (e.g., Orbis-Sigma) and their over-drainage rates",
+        "Meta-analyses that quantify the RESIDUAL over-drainage burden after best-available technology",
+        "Data on whether the residual burden is clinically important (not just statistically present)"
+      ],
+      "key_finding_from_ceo_audit": "A 2026 meta-analysis found anti-siphon devices reduced subdural hygroma/hematoma, although several other outcomes were not significantly different. This means anti-siphon devices HELP but do NOT ELIMINATE over-drainage. The residual burden is the actual problem — not the pre-treatment burden."
+    },
+    {
+      "question_id": "Q3",
+      "question": "Which patient populations remain poorly served by current anti-overdrainage technology?",
+      "status": "NOT_YET_ANALYZED",
+      "answer": "Different populations have different over-drainage risks and different responses to anti-overdrainage technology. Pediatric patients (small CSF volume, tall hydrostatic gradient when upright), NPH patients (low baseline pressure), and tall patients (large hydrostatic gradient) may be differentially affected. The problem gate must identify which specific populations have a RESIDUAL burden, not just which populations have over-drainage in general.",
+      "evidence_needed": [
+        "Pediatric-specific over-drainage rates with anti-overdrainage devices",
+        "NPH-specific over-drainage rates with anti-overdrainage devices",
+        "Patient-specific factors that predict failure of current anti-overdrainage technology",
+        "Whether any population has ZERO effective anti-overdrainage option"
+      ]
+    },
+    {
+      "question_id": "Q4",
+      "question": "What specific failure remains after existing anti-overdrainage mechanisms?",
+      "status": "NOT_YET_ANALYZED — THIS IS THE DECISIVE QUESTION",
+      "answer": "This is the question that determines whether OVF-001 passes the problem gate. The possible answers are:",
+      "possible_outcomes": [
+        "OUTCOME A: Current anti-overdrainage technology adequately addresses over-drainage for all populations → PROBLEM FAILS (no unmet need)",
+        "OUTCOME B: Current technology reduces but does not eliminate over-drainage, and the residual burden is clinically important for some populations → PROBLEM PASSES (residual unmet need exists)",
+        "OUTCOME C: Current technology has a specific failure mode (e.g., cannot adapt to patient-specific pressure dynamics, cannot distinguish safe vs unsafe drainage) → PROBLEM PASSES with a SPECIFIC failure to target",
+        "OUTCOME D: The eShunt's existing IP already addresses this residual failure → PROBLEM FAILS (already solved by eShunt IP)"
+      ],
+      "evidence_needed": [
+        "Failure-mode analysis of each anti-overdrainage technology",
+        "Existing eShunt IP analysis (2025 patent already describes CSF→venous drainage + flow regulation)",
+        "Clinical data on patients who experience over-drainage DESPITE having anti-overdrainage devices",
+        "Root-cause analysis: WHY does over-drainage still occur despite these devices?"
+      ]
+    }
+  ],
+  "strongest_alternative_attack": [
+    {
+      "alternative": "Programmable valves (e.g., Codman Hakim, Medtronic Strata)",
+      "mechanism": "Externally adjustable opening pressure — physician sets the pressure threshold",
+      "what_it_does_well": "Allows non-invasive adjustment of drainage pressure; widely adopted; long track record",
+      "specific_failure_mode": "REACTIVE not PROACTIVE — physician must guess the right setting based on symptoms. Cannot adapt in real-time to posture changes, venous pressure fluctuations, or patient-specific physiology. The patient still over-drains between adjustments.",
+      "residual_burden": "Over-drainage events occur BETWEEN adjustments. The patient must experience symptoms before the physician can respond. Subdural hematomas can form silently before symptoms appear.",
+      "does_this_solve_OVF_001": "PARTIALLY — reduces incidence but does not eliminate the residual real-time failure"
+    },
+    {
+      "alternative": "Gravitational valves (e.g., Miethke ProSA, ProGAV)",
+      "mechanism": "Adds a gravitational unit that resists flow when upright (posture-dependent resistance)",
+      "what_it_does_well": "Directly addresses the hydrostatic gradient problem (upright posture increases drainage pressure); reduces over-drainage in upright patients",
+      "specific_failure_mode": "Responds to POSTURE, not to actual pressure differential. Cannot distinguish 'upright and safe' from 'upright and over-draining.' Also has a risk of UNDER-drainage when the patient is upright but drainage is actually needed (e.g., elevated ICP). Fixed gravitational threshold — not patient-specific.",
+      "residual_burden": "Patients who are upright with elevated ICP may be under-drained (headache, papilledema). Patients who are upright with low venous pressure may still over-drain despite the gravitational resistance. The gravitational threshold is set at implantation and cannot adapt.",
+      "does_this_solve_OVF_001": "PARTIALLY — reduces upright over-drainage but introduces under-drainage risk and cannot adapt to patient-specific pressure dynamics"
+    },
+    {
+      "alternative": "Anti-siphon devices (e.g., Integra SiphonGuard)",
+      "mechanism": "Closes when the pressure differential exceeds a threshold (siphon-limiting)",
+      "what_it_does_well": "Directly limits siphon effect; 2026 meta-analysis shows reduced subdural hygroma/hematoma",
+      "specific_failure_mode": "Uses a FIXED threshold — cannot adapt to patient-specific venous pressure physiology. The threshold is set at manufacturing, not at implantation. Risk of UNDER-drainage (blocking flow when drainage is actually needed). The 2026 meta-analysis showed reduced subdural outcomes but 'several other outcomes were not significantly different' — meaning the device helps with SOME over-drainage consequences but not all.",
+      "residual_burden": "Over-drainage consequences OTHER than subdural hygroma/hematoma are not significantly reduced. The fixed threshold cannot adapt to patient-specific physiology. Some patients still experience over-drainage despite having an anti-siphon device.",
+      "does_this_solve_OVF_001": "PARTIALLY — reduces subdural outcomes but not all over-drainage consequences; fixed threshold cannot adapt"
+    },
+    {
+      "alternative": "Flow-regulated systems (e.g., Orbis-Sigma)",
+      "mechanism": "Regulates FLOW rate rather than pressure — maintains constant drainage rate regardless of pressure differential",
+      "what_it_does_well": "Directly addresses the siphon effect by limiting flow; less dependent on pressure differential; widely used in Europe",
+      "specific_failure_mode": "Fixed flow rate — cannot adapt to patient-specific CSF production rates or changing physiological needs. Risk of UNDER-drainage when CSF production exceeds the fixed flow rate. Risk of OVER-drainage when CSF production is below the fixed flow rate (the valve opens fully at low production). Also does not account for venous pressure dynamics.",
+      "residual_burden": "The fixed flow rate is a compromise that may be too high for some patients (over-drainage) and too low for others (under-drainage). Cannot adapt to patient-specific or time-varying needs.",
+      "does_this_solve_OVF_001": "PARTIALLY — reduces siphon effect but introduces fixed-flow-rate limitations"
+    },
+    {
+      "alternative": "Existing eShunt IP (CereVasc's own patents)",
+      "mechanism": "CSF→venous drainage with flow regulation — the 2025 patent already describes CSF-to-venous pressure gradient utilization and a flow-regulating mechanism",
+      "what_it_does_well": "Uses the favorable CSF-to-venous pressure gradient; the venous system is a low-pressure, compliant reservoir that naturally limits over-drainage compared to the peritoneum",
+      "specific_failure_mode": "The existing IP describes flow regulation but does NOT explicitly describe a PATIENT-SPECIFIC ADAPTIVE regulation mechanism that responds to real-time CSF-to-venous pressure dynamics. The existing flow-regulating mechanism may be a fixed-threshold or passive design — it does not necessarily ADAPT to patient-specific pressure physiology.",
+      "residual_burden": "UNKNOWN — this requires detailed analysis of the existing eShunt IP claims to determine what specific regulation mechanism is already claimed. If the existing IP already claims adaptive venous-pressure-aware regulation, then OVF-001 FAILS (already solved). If the existing IP claims only passive/fixed regulation, then the RESIDUAL failure is the inability to adapt to patient-specific dynamics.",
+      "does_this_solve_OVF_001": "UNKNOWN — requires detailed IP claim analysis. This is the MOST CRITICAL alternative to attack because it is CereVasc's own IP.",
+      "prior_art_threat": "The 2025 eShunt patent already describes: CSF→venous drainage, favorable CSF-venous pressure gradient, one-way/flow regulation, and a flow-regulating mechanism. Any proposed mechanism in this space is PRIOR-ART-THREATENED."
+    }
+  ],
+  "problem_gate_verdict": {
+    "problem_id": "OVF-001",
+    "gate_status": "YELLOW — problem-existence is PLAUSIBLE but NOT YET ESTABLISHED",
+    "what_is_established": [
+      "Over-drainage is a real complication (Q1 — YES, with source-binding needed)",
+      "Current anti-overdrainage technology PARTIALLY addresses it (Q2 — reduces but does not eliminate)",
+      "The residual burden is CLINICALLY PLAUSIBLE but not yet source-bound (Q2 — needs evidence)",
+      "A specific failure mode exists across all alternatives: INABILITY TO ADAPT to patient-specific, real-time CSF-to-venous pressure dynamics (Q4 — but this must be distinguished from what the eShunt IP already claims)"
+    ],
+    "what_is_NOT_established": [
+      "The EXACT SIZE of the residual burden (source-bound rates needed)",
+      "Which SPECIFIC POPULATIONS have the residual burden (Q3 — not yet analyzed)",
+      "Whether the existing eShunt IP already claims the adaptive regulation mechanism (Q4 — CRITICAL UNKNOWN)",
+      "Whether the residual failure is clinically important enough to justify a new invention (Q4 — OUTCOME D)"
+    ],
+    "what_must_happen_before_mechanism_generation": [
+      "1. Source-bind the incidence rates (not universal '10-20%')",
+      "2. Quantify the residual burden after best-available anti-overdrainage technology",
+      "3. Analyze the existing eShunt IP claims to determine what regulation is already claimed",
+      "4. Identify the SPECIFIC residual failure mode that no current technology (including eShunt IP) addresses",
+      "5. Determine whether that residual failure is clinically important"
+    ],
+    "mechanism_status": "UNPROPOSED — no mechanism will be generated until the above 5 steps are complete",
+    "unsupported_claims_removed": [
+      "'VP shunts cannot do this' — REMOVED (unsupported absolute)",
+      "'No existing shunt effectively prevents over-drainage' — CORRECTED to 'Current technology reduces but does not eliminate over-drainage'",
+      "'Mechanical pressure-differential regulator' — RETRACTED as a proposed mechanism (prior-art-threatened)"
+    ]
+  }
+}
