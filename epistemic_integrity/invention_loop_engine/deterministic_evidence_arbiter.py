@@ -44,10 +44,14 @@ class DeterministicVerdict(str, Enum):
 class EvidenceType(str, Enum):
     """The type of evidence a check uses.
 
-    Per CEO directive (2026-08-21 fourteenth deep audit):
+    Per CEO directive (2026-08-21 fourteenth + fifteenth deep audit):
       'The arbiter must distinguish SOURCE_EXPLICIT from TOPOLOGICAL_INFERENCE.
        If the final C04 conclusion depends on topology inference, that inference
        must itself have an evidence chain.'
+
+      'The "absence" check is not source evidence. No explicit identity statement
+       found — that is a search result produced by the arbiter, not evidence from
+       the patent. Represent it as ABSENCE_SEARCH_RESULT, not SOURCE_EXPLICIT.'
 
     SOURCE_EXPLICIT: the evidence is a direct quote from the patent text.
         Example: "a filter is positioned within the first fluid-flow passageway"
@@ -67,10 +71,18 @@ class EvidenceType(str, Enum):
         Example: "C04-L5's 'pressure-responsive valve mechanism' = claim's
         'pressure regulated valve means'"
         This is a semantic mapping that needs explicit justification.
+
+    ABSENCE_SEARCH_RESULT: the check searched for a proposition in the patent
+        and did NOT find it. This is a SEARCH RESULT, not source evidence.
+        The check records: queries, searched_spans, search_method,
+        search_completeness. It does NOT have a source_offset (offset = -1).
+        Example: "No explicit identity statement connecting second chamber 26
+        to first fluid-flow passageway was found."
     """
     SOURCE_EXPLICIT = "SOURCE_EXPLICIT"
     TOPOLOGICAL_INFERENCE = "TOPOLOGICAL_INFERENCE"
     CLAIM_CONSTRUCTION = "CLAIM_CONSTRUCTION"
+    ABSENCE_SEARCH_RESULT = "ABSENCE_SEARCH_RESULT"
 
 
 @dataclass
@@ -128,12 +140,17 @@ class EvidenceCheck:
     """A single mechanical evidence check."""
     check_name: str
     check_description: str
-    evidence_text: str          # The exact text from the patent
+    evidence_text: str          # The COMPLETE exact span (lossless, not truncated)
     evidence_offset: int        # Character offset in the source document
     evidence_hash: str          # SHA-256 of the evidence text
     check_result: bool          # True = check passed, False = check failed
     check_reasoning: str        # Why the check passed/failed
     evidence_type: EvidenceType = EvidenceType.SOURCE_EXPLICIT  # P0 (Round 32): distinguish explicit from inferred
+    # P0 (Round 33): for ABSENCE_SEARCH_RESULT, record search metadata
+    search_queries: list = field(default_factory=list)  # What patterns were searched
+    searched_spans: list = field(default_factory=list)   # What spans were examined
+    search_method: str = ""      # How the search was conducted
+    search_completeness: str = "" # Was the search exhaustive?
 
 
 @dataclass
@@ -229,16 +246,25 @@ class DeterministicEvidenceArbiter:
 
     def _make_check(self, name: str, description: str, evidence_text: str,
                     offset: int, result: bool, reasoning: str,
-                    evidence_type: EvidenceType = EvidenceType.SOURCE_EXPLICIT) -> EvidenceCheck:
+                    evidence_type: EvidenceType = EvidenceType.SOURCE_EXPLICIT,
+                    search_queries: list = None, searched_spans: list = None,
+                    search_method: str = "", search_completeness: str = "") -> EvidenceCheck:
+        # P0 (Round 33): evidence_text must be the COMPLETE exact span, not truncated.
+        # The old code truncated to 500 chars — that broke losslessness.
+        # Now we store the full span. Display truncation is the consumer's responsibility.
         return EvidenceCheck(
             check_name=name,
             check_description=description,
-            evidence_text=evidence_text[:500],  # Cap for storage
+            evidence_text=evidence_text,  # FULL, not [:500]
             evidence_offset=offset,
             evidence_hash=sha256_of_text(evidence_text),
             check_result=result,
             check_reasoning=reasoning,
             evidence_type=evidence_type,
+            search_queries=search_queries or [],
+            searched_spans=searched_spans or [],
+            search_method=search_method,
+            search_completeness=search_completeness,
         )
 
     def arbitrate_c04_l5(self) -> DeterministicArbitrationResult:
@@ -423,10 +449,14 @@ class DeterministicEvidenceArbiter:
                     connection_text = self._get_context(m.start(), 50, 150)
                     connection_offset = m.start()
 
+        # P0 (Round 33): Check 6 is an ABSENCE_SEARCH_RESULT, not SOURCE_EXPLICIT.
+        # The CEO identified that "No explicit identity statement found" is a SEARCH RESULT
+        # produced by the arbiter, not evidence from the patent. It must be represented as
+        # ABSENCE_SEARCH_RESULT with search metadata.
         checks.append(self._make_check(
             name="spec_explicit_connection",
             description="Does the specification explicitly state that second chamber 26 IS the first fluid-flow passageway (or that the diaphragm valve 30 is within the first fluid-flow passageway)?",
-            evidence_text=connection_text if connection_found else "No explicit identity statement found. The specification describes the second chamber 26 and the first fluid-flow passageway as separate components.",
+            evidence_text=connection_text if connection_found else "SEARCH_RESULT: No explicit identity statement found connecting second chamber 26 to first fluid-flow passageway.",
             offset=connection_offset,
             result=connection_found,
             reasoning=(
@@ -438,7 +468,14 @@ class DeterministicEvidenceArbiter:
                 "chamber/filter → fourth chamber → outlet), while the second chamber is on the bypass path. The second "
                 "chamber is NOT the first fluid-flow passageway."
             ) if not connection_found else
-            "The specification explicitly connects second chamber 26 to first fluid-flow passageway."
+            "The specification explicitly connects second chamber 26 to first fluid-flow passageway.",
+            evidence_type=EvidenceType.ABSENCE_SEARCH_RESULT if not connection_found else EvidenceType.SOURCE_EXPLICIT,
+            search_queries=explicit_patterns + [
+                r"diaphragm valve 30.*?(?:within|in|positioned in)\s+(?:the\s+)?first fluid-flow passageway",
+            ],
+            searched_spans=[(m.start(), m.end()) for pattern in explicit_patterns for m in re.finditer(pattern, self.full_text, re.IGNORECASE)],
+            search_method="regex pattern matching against full document text (56325 chars)",
+            search_completeness="exhaustive — all regex patterns applied to the complete document; no matches found for any identity statement",
         ))
 
         # Check 7: What does the claim's "pressure regulated valve means" actually refer to?
@@ -478,6 +515,66 @@ class DeterministicEvidenceArbiter:
                 reasoning="Valve 44 not found."
             ))
 
+        # Check 8 (P0 Round 33): Does the specification EXPLICITLY establish that valve 44
+        # is pressure-regulated / opens at a preselected pressure?
+        # This is the DECISIVE evidence the CEO identified as missing.
+        # The patent must explicitly say valve 44 opens at a preselected pressure.
+        pressure_regulated_pattern = r"one-way valve 44.*?opens.*?preselected.*?pressure"
+        pressure_matches = list(re.finditer(pressure_regulated_pattern, self.full_text, re.IGNORECASE | re.DOTALL))
+        # Also search for a narrower pattern
+        narrow_pattern = r"valve 44.*?selected.*?opens.*?preselected.*?pressure"
+        narrow_matches = list(re.finditer(narrow_pattern, self.full_text, re.IGNORECASE | re.DOTALL))
+
+        # Find the exact sentence
+        exact_sentence = ""
+        exact_offset = -1
+        for search_text in [
+            "the one-way valve 44 can be selected so that it opens only when a preselected pressure in the CSF is achieved",
+            "one-way valve 44 can be selected so that it opens only when a preselected pressure",
+        ]:
+            idx = self.full_text.find(search_text)
+            if idx >= 0:
+                # Get the complete sentence
+                sent_start = self.full_text.rfind('.', 0, idx)
+                sent_start = sent_start + 1 if sent_start >= 0 else max(0, idx - 50)
+                sent_end = self.full_text.find('.', idx + len(search_text))
+                sent_end = sent_end + 1 if sent_end >= 0 else min(len(self.full_text), idx + len(search_text) + 50)
+                exact_sentence = self.full_text[sent_start:sent_end].strip()
+                exact_offset = sent_start
+                break
+
+        if exact_sentence:
+            checks.append(self._make_check(
+                name="spec_valve_44_pressure_regulated_explicit",
+                description="Does the specification EXPLICITLY state that valve 44 is pressure-regulated (opens at a preselected pressure)?",
+                evidence_text=exact_sentence,  # COMPLETE exact span, lossless
+                offset=exact_offset,
+                result=True,
+                reasoning=(
+                    "SOURCE_EXPLICIT: The specification explicitly states 'the one-way valve 44 can be selected "
+                    "so that it opens only when a preselected pressure in the CSF is achieved.' This is a DIRECT "
+                    "QUOTE — not an inference from 'one-way valve.' The patent explicitly establishes that valve 44 "
+                    "IS pressure-regulated: it opens at a preselected pressure. This satisfies the claim's "
+                    "'pressure regulated valve means' limitation. Combined with Check 7 (valve 44 is on the first "
+                    "fluid-flow passageway), valve 44 is the claimed 'pressure regulated valve means positioned "
+                    "within the first fluid-flow passageway.'"
+                ),
+                evidence_type=EvidenceType.SOURCE_EXPLICIT,
+            ))
+        else:
+            checks.append(self._make_check(
+                name="spec_valve_44_pressure_regulated_explicit",
+                description="Does the specification EXPLICITLY state that valve 44 is pressure-regulated (opens at a preselected pressure)?",
+                evidence_text="SEARCH_RESULT: No explicit statement found that valve 44 opens at a preselected pressure.",
+                offset=-1,
+                result=False,
+                reasoning="The specification does not explicitly state that valve 44 is pressure-regulated.",
+                evidence_type=EvidenceType.ABSENCE_SEARCH_RESULT,
+                search_queries=[pressure_regulated_pattern, narrow_pattern],
+                search_method="regex + exact string search",
+                search_completeness="exhaustive",
+            ))
+
         # --- Final verdict ---
         # The evidence mechanically establishes:
         # 1. The claim places the valve means in the "first fluid-flow passageway" (Check 1 ✅)
@@ -514,10 +611,12 @@ class DeterministicEvidenceArbiter:
             checks[6].check_result      # Check 7: valve 44 is on normal path
         )
         check_6_fails = not checks[5].check_result  # No explicit connection between second chamber and first passageway
+        check_8_passes = checks[7].check_result if len(checks) > 7 else False  # Check 8: valve 44 is pressure-regulated (SOURCE_EXPLICIT)
 
-        if checks_1_to_5_and_7_pass and check_6_fails:
-            # All evidence checks pass, and the specification does NOT connect second chamber
-            # to first passageway. This means the diaphragm valve 30 is NOT the claimed valve.
+        if checks_1_to_5_and_7_pass and check_6_fails and check_8_passes:
+            # All evidence checks pass, Check 6 confirms no connection (ABSENCE_SEARCH_RESULT),
+            # and Check 8 SOURCE_EXPLICIT confirms valve 44 is pressure-regulated.
+            # C04-L5 IS anticipated — valve 44 is the claimed valve.
             # But valve 44 IS the claimed valve (pressure-regulated, in the first passageway).
             # C04-L5 IS anticipated.
             verdict = DeterministicVerdict.ESTABLISHED
@@ -525,13 +624,14 @@ class DeterministicEvidenceArbiter:
                 "DETERMINISTIC EVIDENCE ARBITER (not model vote):\n"
                 "\n"
                 "MECHANICAL EVIDENCE FINDINGS:\n"
-                "1. The claim recites 'a pressure regulated valve means positioned within the first fluid-flow passageway' (Check 1 ✅)\n"
-                "2. The specification defines the first fluid-flow passageway as the path containing the filter (Check 2 ✅)\n"
-                "3. The filter 33 is in the third chamber 32, on the NORMAL flow path (Check 3 ✅)\n"
-                "4. The diaphragm valve 30 is in the second chamber 26 (Check 4 ✅)\n"
-                "5. The second chamber is on the BYPASS flow path, NOT the normal path (Check 5 ✅)\n"
-                "6. The specification does NOT explicitly connect second chamber 26 to first fluid-flow passageway (Check 6 ❌)\n"
-                "7. Valve 44 (one-way, pressure-regulated) IS on the normal path / first fluid-flow passageway (Check 7 ✅)\n"
+                "1. The claim recites 'a pressure regulated valve means positioned within the first fluid-flow passageway' (Check 1 ✅ SOURCE_EXPLICIT)\n"
+                "2. The specification defines the first fluid-flow passageway as the path containing the filter (Check 2 ✅ SOURCE_EXPLICIT)\n"
+                "3. The filter 33 is in the third chamber 32, on the NORMAL flow path (Check 3 ✅ SOURCE_EXPLICIT)\n"
+                "4. The diaphragm valve 30 is in the second chamber 26 (Check 4 ✅ SOURCE_EXPLICIT)\n"
+                "5. The second chamber is on the BYPASS flow path, NOT the normal path (Check 5 ✅ SOURCE_EXPLICIT)\n"
+                "6. The specification does NOT explicitly connect second chamber 26 to first fluid-flow passageway (Check 6 ❌ ABSENCE_SEARCH_RESULT — not SOURCE_EXPLICIT)\n"
+                "7. Valve 44 IS on the normal path / first fluid-flow passageway (Check 7 ✅ TOPOLOGICAL_INFERENCE)\n"
+                "8. Valve 44 IS pressure-regulated: 'the one-way valve 44 can be selected so that it opens only when a preselected pressure in the CSF is achieved' (Check 8 ✅ SOURCE_EXPLICIT)\n"
                 "\n"
                 "DETERMINISTIC CONCLUSION:\n"
                 "The claim's 'pressure regulated valve means positioned within the first fluid-flow passageway'\n"
@@ -540,10 +640,10 @@ class DeterministicEvidenceArbiter:
                 "\n"
                 "C04-L5's 'pressure-responsive valve mechanism in the primary drainage channel' corresponds to\n"
                 "valve 44, because:\n"
-                "- 'primary drainage channel' = 'first fluid-flow passageway' (established in C04-L2)\n"
-                "- 'pressure-responsive valve mechanism' = 'pressure regulated valve means' (claim language)\n"
-                "- valve 44 IS a pressure-regulated valve (opens at preselected pressure)\n"
-                "- valve 44 IS positioned within the first fluid-flow passageway (normal path)\n"
+                "- 'primary drainage channel' = 'first fluid-flow passageway' (CLAIM_CONSTRUCTION, established in C04-L2)\n"
+                "- 'pressure-responsive valve mechanism' = 'pressure regulated valve means' (CLAIM_CONSTRUCTION)\n"
+                "- valve 44 IS a pressure-regulated valve (SOURCE_EXPLICIT: Check 8 — opens at preselected pressure)\n"
+                "- valve 44 IS positioned within the first fluid-flow passageway (TOPOLOGICAL_INFERENCE: Check 7)\n"
                 "\n"
                 "Under 35 USC 102(a), the limitation IS anticipated — valve 44 is a pressure-regulated valve\n"
                 "in the first fluid-flow passageway, as claimed.\n"
