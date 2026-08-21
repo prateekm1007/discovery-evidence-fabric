@@ -1,0 +1,293 @@
+{
+  "round": "56e",
+  "timestamp_utc": "2026-08-21T13:15:45.334773+00:00",
+  "task_id": "R2-C3-ROUND56E-ONTOLOGY-FREEZE-AND-PREDICTOR-DISCOVERY",
+  "agent": "main (constitution-acknowledged, session 2026-08-21)",
+  "constitution_recertification": {
+    "version": "1.5.0",
+    "articles_re_read_this_round": [
+      "XXIII",
+      "XXV",
+      "XXVI",
+      "XXVII",
+      "XXVIII",
+      "XXXII",
+      "XXXIV"
+    ],
+    "pre_session_check_acknowledged": true,
+    "key_principle_applied": "Article XXVII (no threshold invention) — the 3/149 number is descriptive, NOT a threshold or prevalence estimate."
+  },
+  "ontology_freeze": {
+    "freeze_event": "Round 56e — Canonical Phenotype Ontology v1.0 FROZEN",
+    "freeze_timestamp": "2026-08-21T13:15:45.334742+00:00",
+    "freeze_rationale": "Per Round 56e CEO directive: 'Do not keep redefining R2-C3. The ontology should become a stable primitive used across every future cohort.' The ontology was established in Round 56d and is now declared FROZEN. No further redefinition permitted without explicit CEO authorization and a version bump to v2.0.",
+    "frozen_ontology_version": "1.0",
+    "frozen_phenotypes": {
+      "R2-C1": {
+        "name": "Renewed objective ICP/IIH failure",
+        "definition": "Post-VSS recurrence of objectively elevated intracranial pressure (opening pressure >25 cmH2O on lumbar puncture, OR continuous ICP monitoring showing elevated pressures) requiring escalation.",
+        "required_components": [
+          "Post-VSS temporal sequence (improvement then recurrence)",
+          "Objective ICP elevation confirmed by lumbar puncture or continuous monitoring",
+          "NOT explained by stent-adjacent restenosis alone (R2-C2 takes precedence if restenosis present)"
+        ],
+        "frozen": true
+      },
+      "R2-C2": {
+        "name": "Recurrent/new stenosis",
+        "definition": "Post-VSS angiographic demonstration of new stenosis (in-stent OR stent-adjacent) on catheter venography, with or without symptoms.",
+        "required_components": [
+          "Post-VSS catheter venography (or MRV/CTV with confirmation)",
+          "Demonstrable new stenosis (in-stent OR adjacent)",
+          "Manometric gradient measurement preferred but not required if angiographic stenosis is clear"
+        ],
+        "subtypes": {
+          "R2-C2a": "Symptomatic stenosis",
+          "R2-C2b": "Asymptomatic stenosis"
+        },
+        "frozen": true
+      },
+      "R2-C3": {
+        "name": "Headache + normal ICP + improved papilledema + no restenosis",
+        "definition": "Post-VSS persistent or recurrent headache DESPITE objective ICP normalization AND papilledema improvement/resolution AND no angiographic restenosis.",
+        "required_components_ALL_FOUR_MUST_BE_PRESENT": [
+          "Post-VSS persistent or recurrent headache (patient-reported, ideally with phenotype classification per ICHD-3)",
+          "Objective ICP normalization (opening pressure ≤25 cmH2O on lumbar puncture, OR continuous ICP monitoring showing normal pressures)",
+          "Papilledema improvement or resolution (per Frisén grade or neuro-ophthalmology assessment)",
+          "No angiographic restenosis (confirmed by catheter venography or MRV/CTV)"
+        ],
+        "forbidden_inferences": [
+          "CANNOT infer normal ICP from 'no repeat lumbar puncture'",
+          "CANNOT infer improved papilledema from 'no repeat ophthalmology visit'",
+          "CANNOT infer no restenosis from 'no repeat stenting'",
+          "CANNOT infer R2-C3 from 'persistent headache' alone"
+        ],
+        "frozen": true
+      },
+      "R2-C4": {
+        "name": "Visual failure despite controlled pressure",
+        "definition": "Post-VSS progressive visual loss (perimetry, acuity, or color vision) DESPITE objectively normal ICP.",
+        "required_components": [
+          "Post-VSS progressive visual loss documented by perimetry or acuity testing",
+          "Objective ICP normalization (per R2-C3 criteria)",
+          "NOT explained by optic nerve damage from pre-VSS papilledema"
+        ],
+        "frozen": true
+      },
+      "R2-C5": {
+        "name": "Other persistent symptoms",
+        "definition": "Post-VSS persistent symptoms (tinnitus, visual obscurations, diplopia, cognitive complaints) that do not fit R2-C1 through R2-C4.",
+        "required_components": [
+          "Post-VSS persistent symptom (specified)",
+          "ICP status documented",
+          "Papilledema status documented",
+          "Restenosis status documented",
+          "Does not meet criteria for R2-C1, R2-C2, R2-C3, or R2-C4"
+        ],
+        "frozen": true
+      },
+      "UNKNOWN": {
+        "name": "Insufficient data to classify",
+        "definition": "One or more required components are not measured or not reported.",
+        "use_rule": "When any required component is missing or not measured, classify as UNKNOWN. Do NOT default to the closest-fitting phenotype.",
+        "frozen": true
+      }
+    },
+    "frozen_classification_rules": {
+      "rule_1_priority_order": "R2-C2 (angiographic) > R2-C1 (ICP measurement) > R2-C4 (visual testing) > R2-C3 (requires all four) > R2-C5 (catch-all) > UNKNOWN.",
+      "rule_2_no_inference": "NEVER infer a missing component. Classify as UNKNOWN if any component is missing.",
+      "rule_3_one_phenotype_per_case": "Each patient-case is classified into ONE phenotype.",
+      "rule_4_temporal_distinction": "R2-C1/C2/C3/C4/C5 are POST-VSS phenotypes only.",
+      "frozen": true
+    },
+    "freeze_declaration": "The ontology above is FROZEN as of Round 56e. Any future change requires: (a) explicit CEO authorization, (b) version bump to v2.0, (c) migration plan for existing classifications, (d) re-harmonization of all cohorts against the new ontology."
+  },
+  "predictor_discovery": {
+    "old_question_RETIRED": "Does R2-C3 exist? (Answered: YES, 3 confirmed per-patient cases in Ahmed 2011, 0 in D'Amato 2025, UNKNOWN in 4 other cohorts. Population prevalence UNKNOWN.)",
+    "old_question_status": "RETired — do not ask again. The existence question is settled at the level that zero-cost public evidence allows.",
+    "new_question": "Can pre-treatment or early-treatment variables predict which post-VSS failure phenotype a patient will develop?",
+    "new_question_rationale": "The original '57% recurrence anomaly' has been decomposed away from a single phenotype. We now have: broad symptomatic recurrence in Midtlien; explicitly documented pressure-independent headache cases in Ahmed; other cohorts where required fields are missing. The high-value opportunity is no longer 'R2-C3 is common.' It is: 'Can we determine which post-VSS patients have which failure phenotype, using information available BEFORE failure?' This is a hidden decision boundary problem — potentially much more valuable than another device.",
+    "candidate_predictors": {
+      "disclaimer": "These are CANDIDATE predictors to be tested, NOT assumptions. Each must be evaluated for: (a) availability in open data, (b) measurement before outcome, (c) independence from outcome measurement, (d) biological plausibility.",
+      "P1_baseline_pressure_gradient": {
+        "description": "Trans-stenosis venous pressure gradient measured at pre-VSS catheter venography.",
+        "biological_plausibility": "Higher gradient → more mechanical driver → stenting more likely to fully correct → lower R2-C3 rate. Lower gradient → mixed mechanical/non-mechanical → higher R2-C3 rate.",
+        "availability_in_open_data": "PARTIAL — D'Amato Supplemental Table 2 has per-patient gradient (mean 8.6 no-stenosis, 9.1 re-stenosis). Ahmed reports group mean 20 mmHg but per-patient data not in public PDF. Midtlien reports median 14 mmHg (group-level only).",
+        "testability": "Could be tested within D'Amato cohort (has gradient + outcome) but D'Amato has 0 R2-C3 cases — can only test gradient vs R2-C2 (restenosis), not gradient vs R2-C3."
+      },
+      "P2_baseline_ICP": {
+        "description": "Opening pressure on lumbar puncture before VSS.",
+        "biological_plausibility": "Higher baseline ICP → more severe disease → potentially different failure phenotype distribution.",
+        "availability_in_open_data": "PARTIAL — D'Amato has per-patient OP (mean 33.2 no-stenosis, 35.3 re-stenosis). Ahmed has group mean 322 mmH2O. Midtlien has median 31 cmH2O.",
+        "testability": "Same as P1 — D'Amato has data but 0 R2-C3 cases."
+      },
+      "P3_stent_anatomy": {
+        "description": "Stent location (unilateral vs bilateral transverse-sigmoid vs superior sagittal sinus), stent type, stent diameter/length.",
+        "biological_plausibility": "Bilateral stenting may have different hemodynamic effects than unilateral. Superior sagittal sinus stenting may affect different venous territory.",
+        "availability_in_open_data": "PARTIAL — D'Amato Table 3 has per-patient stent details for 10 re-stent patients. Ahmed describes stent placement technique. Intrapiromkul uses CPT codes (37238 initial vein, 37239 additional vein).",
+        "testability": "Could test stent anatomy vs outcome in D'Amato (per-patient) and Intrapiromkul (CPT-level)."
+      },
+      "P4_headache_phenotype": {
+        "description": "Pre-VSS headache classification per ICHD-3 (migraine, tension-type, medication-overuse, IIH-attributed).",
+        "biological_plausibility": "Patients with comorbid migraine may have a CGRP-driven headache component that persists despite VSS. Ahmed 2011 explicitly notes 'Up to 68% of patients with IIH have other definable pressure-independent headaches.'",
+        "availability_in_open_data": "NO — none of the open cohorts classify headache phenotype per ICHD-3. All use binary improved/not.",
+        "testability": "CANNOT be tested with current open data. Would require a new prospective study with ICHD-3 phenotyping."
+      },
+      "P5_CGRP_biomarker": {
+        "description": "Serum or CSF CGRP level before VSS.",
+        "biological_plausibility": "CGRP elevation in IIH is established (Brain 2024, Headache 2024, Neurology 2024/2026). Elevated CGRP may identify a CGRP-mediated headache subgroup that will develop R2-C3.",
+        "availability_in_open_data": "NO — no open VSS cohort has CGRP measurements. The CGRP-IIH papers measure CGRP in IIH patients but not in VSS-stented cohorts with outcome data.",
+        "testability": "CANNOT be tested with current open data. Would require a new biomarker study."
+      },
+      "P6_BMI": {
+        "description": "Body mass index at time of VSS.",
+        "biological_plausibility": "Higher BMI → more severe IIH → potentially different failure phenotype. Weight gain post-VSS is associated with recurrence (Ko 2011).",
+        "availability_in_open_data": "YES — D'Amato Supplemental Table 2 has per-patient BMI (mean 37.4 no-stenosis, 35.5 re-stenosis, p=0.37). Vienna IIH database has BMI data.",
+        "testability": "Could test BMI vs outcome in D'Amato (per-patient)."
+      },
+      "P7_venous_pressure_distribution": {
+        "description": "Multi-site venous manometry (superior sagittal sinus, torcula, transverse sinus, sigmoid sinus, jugular bulb) before VSS.",
+        "biological_plausibility": "Pressure DISTRIBUTION (not just gradient) may reveal which venous territory is the dominant driver. Diffuse venous hypertension vs focal stenosis may have different post-VSS trajectories.",
+        "availability_in_open_data": "PARTIAL — D'Amato describes the measurement protocol (7F Envoy MPC guide catheter, Phenom 27 microcatheter, measurements at SSS/torcula/TS/SS/JB). Per-patient distribution data not in the public supplement.",
+        "testability": "CANNOT be tested with current open data — per-patient distribution not extracted."
+      },
+      "P8_early_pressure_trajectory": {
+        "description": "ICP trajectory in the first days/weeks post-VSS (continuous monitoring or serial LPs).",
+        "biological_plausibility": "Early pressure trajectory may reveal whether the stent is 'working' (rapid normalization) or not (slow/partial normalization). Slow normalizers may be more likely to develop R2-C3.",
+        "availability_in_open_data": "NO — no open VSS cohort has early post-VSS continuous ICP monitoring. Ahmed used Rickham reservoir in select cases but only for the 3 confirmed R2-C3 cases (post-hoc, not predictive).",
+        "testability": "CANNOT be tested with current open data. Would require a prospective study with early post-VSS ICP monitoring."
+      }
+    },
+    "predictor_summary": {
+      "total_candidate_predictors": 8,
+      "available_in_open_data_PARTIAL_or_better": 5,
+      "available_in_open_data_YES": 1,
+      "available_in_open_data_NO": 2,
+      "testable_with_current_open_data": 3,
+      "testable_predictors": [
+        "P1_baseline_pressure_gradient (D'Amato only, 0 R2-C3 cases — can test vs R2-C2)",
+        "P3_stent_anatomy (D'Amato + Intrapiromkul)",
+        "P6_BMI (D'Amato)"
+      ],
+      "non_testable_predictors": [
+        "P4_headache_phenotype",
+        "P5_CGRP_biomarker",
+        "P8_early_pressure_trajectory"
+      ],
+      "key_gap": "The most biologically plausible predictors (P4 headache phenotype, P5 CGRP, P8 early pressure trajectory) are NOT available in any open VSS cohort. The predictors that ARE available (P1 gradient, P3 stent anatomy, P6 BMI) can only be tested in D'Amato, which has 0 R2-C3 cases — so we can test predictor vs R2-C2 (restenosis) but NOT predictor vs R2-C3."
+    }
+  },
+  "search_plan": {
+    "search_goal": "Find datasets that contain PHENOTYPE LABELS + PREDICTORS — specifically, datasets where baseline variables AND longitudinal outcome AND recurrence phenotype are all present for the same patients.",
+    "search_strategy": "NOT 'more VSS datasets.' Instead: datasets with the JOINT structure [baseline predictors + post-treatment outcome phenotype] that could support a predictive model.",
+    "search_queries": [
+      {
+        "id": "PD-01",
+        "query": "VSS venous sinus stenting IIH baseline predictors outcome phenotype longitudinal",
+        "rationale": "Direct search for predictor + outcome datasets in VSS IIH."
+      },
+      {
+        "id": "PD-02",
+        "query": "IIH venous sinus stent predictive model recurrence baseline gradient",
+        "rationale": "Search for predictive modeling studies in VSS IIH."
+      },
+      {
+        "id": "PD-03",
+        "query": "idiopathic intracranial hypertension machine learning prediction outcome stenting",
+        "rationale": "Search for ML-based prediction studies in IIH."
+      },
+      {
+        "id": "PD-04",
+        "query": "IIH cohort baseline variables longitudinal outcome recurrence phenotype public data",
+        "rationale": "Search for longitudinal IIH cohorts with baseline + outcome."
+      },
+      {
+        "id": "PD-05",
+        "query": "venous sinus stent IIH CGRP biomarker predictor outcome",
+        "rationale": "Search for CGRP biomarker + VSS outcome studies."
+      },
+      {
+        "id": "PD-06",
+        "query": "IIH headache phenotype ICHD-3 classification stenting outcome longitudinal",
+        "rationale": "Search for headache phenotype + VSS outcome."
+      },
+      {
+        "id": "PD-07",
+        "query": "IIH continuous ICP monitoring post-stenting early trajectory outcome",
+        "rationale": "Search for early post-VSS ICP trajectory studies."
+      },
+      {
+        "id": "PD-08",
+        "query": "IIH stenting multi-site venous manometry pressure distribution predictor",
+        "rationale": "Search for multi-site venous pressure distribution as predictor."
+      },
+      {
+        "id": "PD-09",
+        "query": "IIH BMI weight change stenting outcome recurrence predictor",
+        "rationale": "Search for BMI/weight as predictor of VSS outcome."
+      },
+      {
+        "id": "PD-10",
+        "query": "IIH stent anatomy bilateral unilateral outcome phenotype predictor",
+        "rationale": "Search for stent anatomy as predictor."
+      },
+      {
+        "id": "PD-11",
+        "query": "IIH VSS failure phenotype classification subtype recurrence",
+        "rationale": "Search for failure phenotype classification studies."
+      },
+      {
+        "id": "PD-12",
+        "query": "IIH post-stenting decision tree prediction model failure type",
+        "rationale": "Search for decision-tree models predicting failure type."
+      }
+    ],
+    "search_execution_plan": "Execute all 12 queries via z-ai web_search CLI. For each result, test: (a) does it contain BASELINE predictor data? (b) does it contain LONGITUDINAL outcome data? (c) does it contain PHENOTYPE LABELS (not just 'improved/not')? (d) is the data PUBLICLY ACCESSIBLE? Only datasets meeting ALL FOUR criteria advance to the predictor testing phase.",
+    "decision_rule": "If NO dataset with [baseline predictors + longitudinal outcome + phenotype labels + public access] is found, the predictor discovery pivot cannot proceed at zero cost. In that case, the honest conclusion is: the predictive invention question is REAL but UNTESTABLE at zero cost — same epistemic boundary as the R2-C3 existence question."
+  },
+  "descriptive_evidence_freeze": {
+    "number": "3/149 = 2.0%",
+    "classification": "DESCRIPTIVE ONLY — do NOT use as prevalence estimate",
+    "composition": "3 confirmed R2-C3 cases (Ahmed 2011) + 0 confirmed R2-C3 cases (D'Amato 2025) = 3 cases among 149 patients in two publicly accessible cohorts.",
+    "caveats": [
+      "Only 2 small single-center cohorts can classify R2-C3 per-patient",
+      "Different eras (Ahmed 2002-2010, D'Amato 2012-2023)",
+      "Different selection criteria (Ahmed strict high-gradient, D'Amato broad)",
+      "Different follow-up durations (Ahmed mean 2y, D'Amato 6mo)",
+      "Sample proportion, NOT population prevalence"
+    ],
+    "use_rule": "This number may be cited as '3 confirmed cases among 149 patients in two publicly accessible cohorts.' It may NOT be cited as 'R2-C3 prevalence is 2%' or 'R2-C3 prevalence is approximately 2%' or any other prevalence framing. Per Article XXV (unknown stays unknown) and Article XXVII (no threshold invention), the population prevalence remains UNKNOWN."
+  },
+  "repository_state_per_article_xxiii": {
+    "local_HEAD": "5fc30e604a1b1e9a6fe8fe6580d958e688d8d6a0",
+    "local_origin_main_ref": "d0b45c1e7bbe3e2bdd9b44698637b4fcf7cff8d1",
+    "ls_remote": "FAILED — no GitHub credentials available in this session",
+    "git_status": "CLEAN (working tree matches HEAD)",
+    "push_status": "FAILED — no GitHub PAT available",
+    "ci_status": "UNKNOWN — cannot verify without push",
+    "certification_status": "NOT REPOSITORY-CERTIFIED per Article XXVI",
+    "label": "STALE_LOCAL_CHECKOUT with NO_CREDENTIALS_FOR_REMOTE_VERIFICATION",
+    "what_is_needed_for_certification": [
+      "1. GitHub PAT with push access to prateekm1007/discovery-evidence-fabric",
+      "2. Set GITHUB_TOKEN environment variable",
+      "3. git push origin main",
+      "4. Wait for GitHub Actions CI",
+      "5. Verify CI capsule hash as independent certification"
+    ]
+  },
+  "verdict": {
+    "ontology_frozen": true,
+    "ontology_version": "1.0",
+    "predictor_discovery_pivot_initiated": true,
+    "candidate_predictors_identified": 8,
+    "predictors_testable_with_current_open_data": 3,
+    "predictors_NOT_testable_with_current_open_data": 5,
+    "predictor_search_queries_planned": 12,
+    "R2_C3_population_prevalence": "UNKNOWN (preserved per Article XXV)",
+    "descriptive_3_of_149": "FROZEN as descriptive only — NOT a prevalence estimate",
+    "mechanism_generation": "BLOCKED — no change",
+    "human_correspondence_count": 0,
+    "world_class_inventions": "0 / 5 — unchanged",
+    "next_move": "Execute the 12 predictor discovery search queries. If a dataset with [baseline predictors + longitudinal outcome + phenotype labels + public access] is found, proceed to predictor testing. If not, the predictive invention question is REAL but UNTESTABLE at zero cost — same epistemic boundary as R2-C3 existence."
+  }
+}

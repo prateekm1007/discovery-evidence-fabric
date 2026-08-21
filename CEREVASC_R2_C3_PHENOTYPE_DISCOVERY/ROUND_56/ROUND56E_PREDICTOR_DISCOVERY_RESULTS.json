@@ -1,0 +1,148 @@
+{
+  "round": "56e",
+  "timestamp_utc": "2026-08-21T13:19:48.558400+00:00",
+  "search_executed": {
+    "queries_executed": 12,
+    "pages_fetched": 6,
+    "total_hits": 84,
+    "unique_urls": 67
+  },
+  "datasets_with_predictor_structure_found": [
+    {
+      "dataset_id": "PD-DS-1",
+      "source": "Goodwin et al. 2014 (Duke, Clin Neurol Neurosurg, DOI 10.1016/j.clineuro.2014.09.015)",
+      "title": "Risk factors for failed transverse sinus stenting in pseudotumor cerebri patients",
+      "n": 18,
+      "study_design": "Retrospective case-control: 15 VSS successes vs 3 VSS failures (required shunt)",
+      "baseline_predictors_available": [
+        "pre-stent opening pressure (CSF-OP)",
+        "age",
+        "BMI",
+        "pressure gradient (MPG ≥4 mmHg inclusion)"
+      ],
+      "longitudinal_outcome_available": [
+        "need for shunt placement after stenting (binary: success vs failure)"
+      ],
+      "phenotype_labels_available": [
+        "PARTIAL — binary success/failure, NOT the canonical R2-C1/C2/C3/C4/C5 ontology. 'Failure' = needed shunt = likely R2-C1 (renewed ICP failure) but not classified per the frozen ontology."
+      ],
+      "key_finding": "Pre-stent OP 50 cmH2O (failures) vs 37 cmH2O (successes), p<0.05. Younger age (30 vs 40.7) and higher BMI (36.6 vs 33.3) showed non-significant trends.",
+      "public_accessibility": "Abstract publicly accessible via Duke Scholars. Full text paywalled. Per-patient data NOT in public supplement.",
+      "fits_canonical_ontology": "PARTIAL — outcome is binary success/failure, not the 6-category ontology. Could be re-classified as R2-C1 (failure=shunt=ICP failure) vs no-phenotype (success).",
+      "predictor_test_possible": "YES for R2-C1 (baseline OP predicts shunt need). NO for R2-C3 (no R2-C3 cases identifiable in this cohort — failure was defined as 'needed shunt' which is R2-C1, not R2-C3).",
+      "value_to_predictor_discovery": "HIGH — first dataset showing baseline OP predicts VSS failure phenotype (R2-C1). But n=18 is very small and only 3 failures."
+    },
+    {
+      "dataset_id": "PD-DS-2",
+      "source": "PMC12929161 (venous manometry diagnostic accuracy study, n=84)",
+      "title": "Diagnostic accuracy of venous manometry to predict elevated intracranial pressure",
+      "n": 84,
+      "study_design": "Retrospective: patients with venous sinus stenosis who underwent catheter venography with venous pressure recording AND fluoroscopy-guided LP with CSF-OP measurement in the same session.",
+      "baseline_predictors_available": [
+        "trans-stenotic gradient (TSG)",
+        "superior sagittal sinus (SSS) pressure",
+        "stenosis location (dominant vs codominant)",
+        "age",
+        "BMI"
+      ],
+      "longitudinal_outcome_available": [
+        "NO — this is a CROSS-SECTIONAL diagnostic study, not longitudinal. It predicts ICP at baseline, not post-VSS phenotype."
+      ],
+      "phenotype_labels_available": [
+        "NO — no post-VSS outcome data."
+      ],
+      "key_finding": "TSG ≥6 mmHg → sensitivity 0.86, specificity 0.80 for elevated ICP (CSF-OP ≥20 cmH2O). SSS pressure ≥15 mmHg → sensitivity 0.88, specificity 0.68. Combined AUC 0.94.",
+      "public_accessibility": "Open access via PMC. Data availability statement: 'included in the article/supplementary material, further inquiries can be directed to the corresponding authors.'",
+      "fits_canonical_ontology": "NO — no post-VSS outcome. Cannot classify any R2-C phenotype.",
+      "predictor_test_possible": "NO for R2-C3 (no outcome data). YES for DIAGNOSTIC question (can venous manometry predict ICP elevation at baseline? — answered: YES, AUC 0.94).",
+      "value_to_predictor_discovery": "MODERATE — establishes that baseline venous manometry (TSG, SSS pressure) strongly predicts baseline ICP. This is a building block for the predictor pipeline, but does NOT directly test predictor vs post-VSS phenotype. Could be combined with a longitudinal cohort to create the full predictor → phenotype test."
+    },
+    {
+      "dataset_id": "PD-DS-3",
+      "source": "PMC5572623 (IIH Prognostic Factors, n=79, 2001-2016)",
+      "title": "Idiopathic Intracranial Hypertension: Prognostic Factors and Multidisciplinary Management",
+      "n": 79,
+      "study_design": "Retrospective single-center, 2001-2016. 13 patients with poor outcome after 6 months underwent unilateral TSS stenting.",
+      "baseline_predictors_available": [
+        "BMI at diagnosis",
+        "weight change (gain ≥5%)",
+        "bilateral TSS on imaging",
+        "visual outcome at 6 months"
+      ],
+      "longitudinal_outcome_available": [
+        "visual outcome at 6 months (poor vs good)"
+      ],
+      "phenotype_labels_available": [
+        "PARTIAL — visual outcome (poor/good), NOT the canonical R2-C ontology."
+      ],
+      "key_finding": "Weight gain ≥5% since diagnosis → poor visual outcome (p<0.001). Bilateral TSS → poor outcome (OR 5.2, 95% CI 1.24-24.9, p=0.024). BMI at diagnosis NOT predictive.",
+      "public_accessibility": "Open access via PMC. Per-patient data NOT in public supplement.",
+      "fits_canonical_ontology": "PARTIAL — visual outcome could map to R2-C4 (visual failure despite controlled pressure) if ICP was controlled, but ICP status is not reported per-patient.",
+      "predictor_test_possible": "YES for R2-C4-adjacent (weight gain predicts poor visual outcome). NO for R2-C3 (no headache + ICP + papilledema + restenosis joint data).",
+      "value_to_predictor_discovery": "MODERATE — establishes weight gain as predictor of poor IIH outcome. But only 13 patients had VSS stenting; the rest were managed medically. The predictor (weight gain) is tested against medical-management outcome, not VSS-specific outcome."
+    }
+  ],
+  "predictor_summary_after_search": {
+    "datasets_with_predictor_structure": 3,
+    "datasets_testable_for_R2_C1": 1,
+    "datasets_testable_for_R2_C3": 0,
+    "datasets_testable_for_R2_C4_adjacent": 1,
+    "datasets_providing_diagnostic_building_block": 1,
+    "key_finding": "NO single open dataset contains [baseline predictors + longitudinal post-VSS outcome + canonical phenotype labels + public access]. The closest is Goodwin 2014 (predictor + binary failure outcome, n=18, no canonical phenotype labels). The predictor discovery pivot is REAL but UNTESTABLE for R2-C3 at zero cost — same epistemic boundary as R2-C3 existence.",
+    "what_WAS_found": [
+      "Baseline OP predicts VSS failure (Goodwin 2014, n=18, OP 50 vs 37 cmH2O, p<0.05) — but 'failure' = needed shunt = R2-C1, not R2-C3.",
+      "TSG and SSS pressure strongly predict baseline ICP elevation (PMC12929161, n=84, AUC 0.94) — diagnostic, not predictive of post-VSS phenotype.",
+      "Weight gain ≥5% predicts poor visual outcome in IIH (PMC5572623, n=79, p<0.001) — medical management cohort, not VSS-specific."
+    ],
+    "what_WAS_NOT_found": [
+      "No dataset with baseline predictors + post-VSS R2-C3 phenotype labels.",
+      "No dataset with headache phenotype (ICHD-3) + VSS outcome.",
+      "No dataset with CGRP biomarker + VSS outcome.",
+      "No dataset with early post-VSS ICP trajectory + long-term phenotype.",
+      "No dataset with multi-site venous pressure distribution + post-VSS phenotype."
+    ]
+  },
+  "predictor_hypotheses_generated": [
+    {
+      "hypothesis_id": "PH-1_HIGH_BASELINE_OP_PREDICTS_R2_C1",
+      "statement": "Pre-VSS opening pressure >40 cmH2O predicts R2-C1 (renewed ICP failure requiring shunt) after VSS.",
+      "evidence_support": "Goodwin 2014 (n=18): failures had mean OP 50 cmH2O vs successes 37 cmH2O (p<0.05). Threshold appears to be ~40-45 cmH2O.",
+      "testable_with_open_data": "PARTIAL — Goodwin 2014 has the data but n=18 (3 failures). D'Amato 2025 has per-patient OP but 0 R2-C1 cases (the 1 R2-C1 case had OP 40, borderline).",
+      "classification": "EXPLORATORY — supported by 1 small study. Needs replication in a larger cohort."
+    },
+    {
+      "hypothesis_id": "PH-2_TSG_PREDICTS_BASELINE_ICP",
+      "statement": "Trans-stenotic gradient (TSG) ≥6 mmHg predicts elevated ICP (CSF-OP ≥20 cmH2O) at baseline.",
+      "evidence_support": "PMC12929161 (n=84): TSG ≥6 mmHg → sensitivity 0.86, specificity 0.80. Combined with SSS ≥15 mmHg → AUC 0.94.",
+      "testable_with_open_data": "YES — PMC12929161 is open access and provides the full ROC analysis.",
+      "classification": "STRONG for diagnostic question. Does NOT address post-VSS phenotype prediction."
+    },
+    {
+      "hypothesis_id": "PH-3_WEIGHT_GAIN_PREDICTS_POOR_IIH_OUTCOME",
+      "statement": "Weight gain ≥5% after IIH diagnosis predicts poor visual outcome at 6 months.",
+      "evidence_support": "PMC5572623 (n=79): weight gain ≥5% → poor visual outcome (p<0.001).",
+      "testable_with_open_data": "YES — PMC5572623 is open access.",
+      "classification": "STRONG for medical-management cohort. Does NOT address VSS-specific outcome."
+    },
+    {
+      "hypothesis_id": "PH-4_BASELINE_GRADIENT_PREDICTS_R2_C3",
+      "statement": "Lower baseline venous pressure gradient predicts R2-C3 phenotype (headache despite ICP normalization).",
+      "evidence_support": "INDIRECT — Ahmed 2011 (mean gradient 20 mmHg) had 5.8% R2-C3; Midtlien 2025 (median 14 mmHg) had 57% group-level recurrence. But this is cross-cohort comparison, not within-cohort. Per Round 56d directive, this comparison is RETRACTED as it compares non-equivalent endpoints.",
+      "testable_with_open_data": "NO — no cohort has both per-patient gradient AND per-patient R2-C3 classification.",
+      "classification": "UNKNOWN — cannot be tested at zero cost."
+    }
+  ],
+  "verdict": {
+    "predictor_discovery_pivot_executed": true,
+    "datasets_with_predictor_structure_found": 3,
+    "datasets_testable_for_R2_C3_specifically": 0,
+    "predictor_hypotheses_generated": 4,
+    "strongest_predictor_hypothesis": "PH-2 (TSG predicts baseline ICP, AUC 0.94) — but this is diagnostic, not predictive of post-VSS phenotype.",
+    "strongest_post_VSS_predictor_hypothesis": "PH-1 (high baseline OP predicts R2-C1/shunt need) — supported by Goodwin 2014 (n=18, p<0.05) but small sample.",
+    "R2_C3_specific_predictor_hypothesis": "PH-4 (low baseline gradient predicts R2-C3) — UNKNOWN, cannot be tested at zero cost.",
+    "epistemic_boundary": "The predictor discovery pivot has reached the same epistemic boundary as R2-C3 existence: REAL question, UNTESTABLE at zero cost with current open data. The canonical phenotype ontology is FROZEN and ready for use when a suitable dataset becomes available.",
+    "mechanism_generation": "BLOCKED — no change. Predictor hypotheses are NOT mechanisms. They are candidate decision boundaries that would need to be validated before any mechanism work begins.",
+    "human_correspondence_count": 0,
+    "world_class_inventions": "0 / 5 — unchanged"
+  }
+}

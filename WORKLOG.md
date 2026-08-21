@@ -2883,3 +2883,82 @@ Stage Summary:
 - **Human correspondence count: 0.**
 - **World-class inventions: 0/5 (unchanged).**
 - All artifacts persisted to /home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ and /home/z/my-project/download/r2c3_round56/.
+
+---
+Task ID: R2-C3-ROUND56E-ONTOLOGY-FREEZE-AND-PREDICTOR-DISCOVERY
+Agent: main (constitution-acknowledged, session 2026-08-21)
+Task: Per Round 56e CEO directive — (1) reconcile and certify repository (push 5fc30e6, verify CI); (2) FREEZE canonical phenotype ontology v1.0; (3) pivot from "does R2-C3 exist?" to "can baseline variables predict which failure phenotype develops?"; (4) search for datasets with [predictors + outcome + phenotype labels + public access]; (5) 3/149 is descriptive only, NOT a prevalence estimate.
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0 Articles XXIII, XXV, XXVI, XXVII, XXVIII, XXXII, XXXIV.
+- Pre-session epistemic check acknowledged.
+
+REPOSITORY RECONCILIATION (Article XXIII):
+- Local HEAD (start of round): 5fc30e6 (Round 56d commit, unpushed)
+- Local origin/main ref: d0b45c1 (STALE — local ref behind actual remote)
+- ls-remote: FAILED — no GitHub credentials available in this session
+- Push attempt: FAILED — fatal: could not read Username for 'https://github.com'
+- CI status: UNKNOWN — cannot verify without push
+- Exhaustive credential search: .env (only DATABASE_URL), .env.keys (does not exist), CREDENTIALS_AND_MODELS.md (GITHUB_TOKEN redacted as [REDACTED:github_token]), env vars (none), git credential helper (none configured), gh CLI (not installed), SSH keys (none), .netrc (none).
+- Per Article XXV: Unknown stays unknown. Remote state = UNKNOWN. CI = UNKNOWN.
+- Per Article XXVI: Local commit is NOT independent certification. This round is NOT repository-certified.
+- WHAT IS NEEDED: A GitHub PAT with push access to prateekm1007/discovery-evidence-fabric. Set GITHUB_TOKEN env var, push, wait for CI, verify capsule.
+
+PHASE 26 — ONTOLOGY FREEZE:
+- Canonical Phenotype Ontology v1.0 declared FROZEN.
+- 6 phenotypes: R2-C1 (renewed ICP failure), R2-C2 (recurrent stenosis, subtypes 2a/2b), R2-C3 (headache + normal ICP + improved papilledema + no restenosis — ALL FOUR required), R2-C4 (visual failure despite controlled pressure), R2-C5 (other persistent symptoms), UNKNOWN (insufficient data).
+- No-inference rule enforced: cannot infer normal ICP from "no repeat LP"; cannot infer no restenosis from "no repeat stenting"; cannot infer R2-C3 from "persistent headache" alone.
+- Any future change requires CEO authorization + version bump to v2.0 + migration plan + re-harmonization.
+
+PHASE 27 — PREDICTOR DISCOVERY SEARCH:
+- 12 search queries executed via z-ai web_search (PD-01 through PD-12).
+- 84 total hits, 67 unique URLs.
+- 6 high-priority pages fetched via z-ai page_reader.
+- 3 datasets with predictor structure found:
+  * PD-DS-1: Goodwin 2014 (Duke, n=18) — baseline OP predicts VSS failure (R2-C1). OP 50 vs 37 cmH2O, p<0.05. Small sample, binary outcome (not canonical ontology).
+  * PD-DS-2: PMC12929161 (n=84) — TSG ≥6 mmHg + SSS ≥15 mmHg predicts baseline ICP elevation (AUC 0.94). Diagnostic, not predictive of post-VSS phenotype.
+  * PD-DS-3: PMC5572623 (n=79) — weight gain ≥5% predicts poor visual outcome (p<0.001). Medical management cohort, not VSS-specific.
+
+PHASE 28 — PREDICTOR HYPOTHESES:
+- 4 predictor hypotheses generated:
+  * PH-1: High baseline OP (>40 cmH2O) → R2-C1 (EXPLORATORY, supported by Goodwin n=18).
+  * PH-2: TSG ≥6 mmHg → baseline ICP elevation (STRONG, AUC 0.94, diagnostic only).
+  * PH-3: Weight gain ≥5% → poor visual outcome (STRONG, medical cohort).
+  * PH-4: Low baseline gradient → R2-C3 (UNKNOWN, untestable at zero cost — no cohort has both per-patient gradient AND per-patient R2-C3 classification).
+
+DESCRIPTIVE EVIDENCE FREEZE:
+- 3/149 = 2.0% is DESCRIPTIVE ONLY.
+- May be cited as "3 confirmed cases among 149 patients in two publicly accessible cohorts."
+- May NOT be cited as a prevalence estimate (per Article XXV — unknown stays unknown; Article XXVII — no threshold invention).
+
+KEY FINDINGS:
+1. NO single open dataset contains [baseline predictors + longitudinal post-VSS outcome + canonical phenotype labels + public access].
+2. The predictor discovery pivot is REAL but UNTESTABLE for R2-C3 at zero cost — same epistemic boundary as R2-C3 existence.
+3. The canonical phenotype ontology is FROZEN and ready for use when a suitable dataset becomes available.
+4. The closest predictor finding is PH-1 (Goodwin 2014: baseline OP predicts VSS failure) — but this predicts R2-C1 (shunt need), NOT R2-C3 (headache despite ICP normalization).
+5. The strongest diagnostic finding is PH-2 (PMC12929161: TSG predicts baseline ICP, AUC 0.94) — but this is diagnostic, not predictive of post-VSS phenotype.
+
+CONSTITUTION COMPLIANCE:
+- Article XXIII: COMPLIED — full repo state recorded honestly (local HEAD, origin/main, ls-remote FAILED, status, push FAILED).
+- Article XXV: COMPLIED — R2-C3 prevalence = UNKNOWN; remote state = UNKNOWN; CI = UNKNOWN.
+- Article XXVI: COMPLIED — explicit statement that local commit is NOT independent certification; NOT repository-certified.
+- Article XXVII: COMPLIED — 3/149 is descriptive, NOT a threshold; no threshold invented.
+- Article XXVIII: COMPLIED — predictor hypotheses are NOT promoted to mechanisms.
+- Article XXXII: COMPLIED — strongest alternative explanation stated (the predictor discovery question is real but untestable at zero cost; the boundary is the same as R2-C3 existence).
+
+Stage Summary:
+- **ONTOLOGY FROZEN v1.0.** No further redefinition permitted without CEO authorization + version bump.
+- **PREDICTOR DISCOVERY PIVOT EXECUTED.** Old question ("does R2-C3 exist?") RETIRED. New question ("can baseline variables predict which failure phenotype develops?") initiated.
+- **3 DATASETS WITH PREDICTOR STRUCTURE FOUND.** None testable for R2-C3 specifically. 4 predictor hypotheses generated (PH-1 through PH-4).
+- **EPISTEMIC BOUNDARY REACHED.** The predictor discovery pivot has hit the same wall as R2-C3 existence: REAL question, UNTESTABLE at zero cost with current open data.
+- **DESCRIPTIVE EVIDENCE FROZEN.** 3/149 = descriptive only, NOT a prevalence estimate.
+- **MECHANISM GENERATION: BLOCKED.** No change. Predictor hypotheses are NOT mechanisms.
+- **LOCAL COMMIT: e0e3bd4** (2 files: ROUND56E_ONTOLOGY_FREEZE_AND_PREDICTOR_SEARCH.json + ROUND56E_PREDICTOR_DISCOVERY_RESULTS.json; 441 insertions).
+- **PUSH STATUS: FAILED** — no GitHub credentials available in this session.
+- **CI STATUS: UNKNOWN** — cannot verify without push.
+- **NOT REPOSITORY-CERTIFIED** — explicit honest reporting per Article XXVI.
+- **Human correspondence count: 0.**
+- **World-class inventions: 0/5 (unchanged).**
+- All artifacts persisted to /home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ and /home/z/my-project/download/r2c3_round56/.
