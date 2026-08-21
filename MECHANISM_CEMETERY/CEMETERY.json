@@ -277,10 +277,10 @@
       "mechanism_name": "RES-4 narrow: adaptive transverse/sigmoid sinus stent for CSF absorption regulation via AG pressure gradient control",
       "proposed_version": "Round 56r-56t (V1)",
       "killed_at_version": "Round 56t",
-      "kill_reason": "INSUFFICIENT_CONTROL_AUTHORITY (PHYSICS_CEILING)",
+      "kill_reason": "KILLED_UNDER_MODEL_BOUNDED_PHYSICS (insufficient control authority under realistic post-stenting conditions)",
       "what_was_proposed": "An adaptive (variable-diameter) venous sinus stent that could regulate CSF absorption by modulating venous pressure at the arachnoid granulation site, producing a technical effect (CSF absorption regulation) that shunts and static stents cannot.",
       "why_it_failed": "Physics sensitivity model shows that changing stent diameter by ±2 mm (6mm → 10mm) in a patent venous sinus produces only 0.13-0.19 mmHg change in the AG pressure gradient — far below the pre-registered 1 mmHg kill threshold. Root cause: at venous flow rates (200-500 mL/min), the Poiseuille pressure drop across a 40mm patent segment (6-12mm diameter) is only 0.01-0.2 mmHg. The AG gradient (3-5 mmHg normal, 15-35 mmHg in IIH) is dominated by CSF pressure and downstream venous pressure, NOT by stent diameter. The stent maintains LUMEN PATENCY (prevents collapse), not FLOW REGULATION. Once patent, changing diameter has minimal hemodynamic effect.",
-      "reusable_lesson": "MODEL-BOUNDED NEGATIVE RESULT (validated by network model): Under realistic post-stenting conditions (D=5-10mm, Q=200-500 mL/min), adaptive diameter control of a venous sinus cannot materially change the AG pressure gradient (max 0.19 mmHg << 1 mmHg threshold). Control authority exists only in the stenotic+high-flow regime (D≤4mm, Q≥1200 mL/min), which is physiologically incompatible with a stented patient. The r^4 Poiseuille dependence is powerful for small diameters but the absolute pressure drop at venous flow rates is dominated by CSF and downstream venous pressure. The stent's role is patency maintenance, not flow regulation. Network model with 1323 configurations confirms: flow redistribution through contralateral sinus does NOT rescue control authority (dominance has no effect). NOT a universal invariant — based on Poiseuille model with specific assumptions.",
+      "reusable_lesson": "MODEL-BOUNDED NEGATIVE RESULT: Before inventing variable geometry, calculate absolute pressure-control authority at the actual operating point. Relative r^4 sensitivity is meaningless if the absolute pressure drop is tiny. Under realistic post-stenting conditions (D=5-10mm, Q=200-500 mL/min), adaptive diameter control of a venous sinus produces <0.2 mmHg change in AG gradient — 5x below the 1 mmHg pre-registered threshold. Control authority exists only in the stenotic+high-flow regime (D≤4mm, Q≥1200 mL/min), which is incompatible with a stented patient whose stent has normalized diameter to 7-10mm. The network model (1323 configs) confirms: flow redistribution through contralateral sinus does NOT rescue control authority (dominance has no effect). NOT a universal vascular invariant — based on Poiseuille model with specific assumptions about geometry, flow, and topology.",
       "what_to_avoid": [
         "Do not propose adaptive diameter control for patent (non-stenotic) vascular segments without first calculating the Poiseuille pressure drop at the operating flow rate.",
         "Do not assume that r^4 sensitivity at small diameters translates to authority at large diameters — the absolute pressure drop matters, not just the relative change.",
@@ -322,8 +322,10 @@
         "diameter_6plus_max_delta": 0.19,
         "dominance_effect": "NONE — same result for 50/50, 70/30, 90/10 split",
         "physiological_compatibility": "PASSING configs require D≤4mm AND Q≥1200 mL/min — incompatible with stented patient (D=7-10mm, Q=200-500)"
-      }
+      },
+      "engineering_lesson": "Diameter control has leverage where resistance is HIGH (small diameter, high flow), not where the vessel is already WIDELY PATENT. Future fluidic inventions must calculate absolute pressure-control authority at the actual operating point before proposing variable geometry. The useful invention space, if one exists, is unlikely to be 'adaptive diameter control of an already-patent stent.'",
+      "ceo_correction": "CEO Round 56v: CE-015 is NOT a universal impossibility theorem. It is a model-bounded negative result under specific assumptions. Real cerebral venous drainage is heterogeneous (variable dominance, collateral/epidural drainage). Phase-contrast MRI reports variable sinus flows (434±204 and 195±152 mL/min for R/L TS). The model strongly bounds the candidate but does not prove universal impossibility."
     }
   ],
-  "updated_at": "2026-08-21T23:15:00+00:00"
+  "updated_at": "2026-08-21T23:45:00+00:00"
 }
