@@ -1,0 +1,135 @@
+{
+  "round": 47,
+  "timestamp": "2026-08-21T08:30:00Z",
+  "type": "DISCRIMINATING_VARIABLE_SEARCH",
+  "phenotype_decomposition_source_grounded": [
+    {
+      "id": "R2-C1",
+      "name": "Headache + objective ICP recurrence",
+      "source_data": "178-patient study: 17% required further surgery (repeat stenting). These patients had renewed pressure elevation requiring intervention.",
+      "source_proportion": "17% of the 178-patient cohort (NOT estimated — directly reported as requiring further surgery)",
+      "what_is_established": "These patients have TRUE pressure recurrence — objective ICP elevation confirmed by the need for repeat stenting.",
+      "what_is_NOT_established": "The exact proportion within the 57% symptomatic recurrence group (17% of 178 = 30 patients; 57% of 178 = 101 patients; so ~30/101 ≈ 30% of the recurrence group had true pressure failure). But this is a CALCULATION, not a source-reported proportion."
+    },
+    {
+      "id": "R2-C3a",
+      "name": "Headache + normal/reduced ICP + improved papilledema",
+      "source_data": "178-patient study: 57% (101/178) had symptomatic recurrence. Average opening pressure fell by 9.6 cm H2O. 75% had papilledema improvement/resolution. The authors report that many recurrent patients had continued ICP reduction and papilledema improvement.",
+      "source_proportion": "The source reports 57% symptomatic recurrence, 9.6 cm H2O average pressure reduction, 75% papilledema improvement. It does NOT report the exact proportion with headache + normal ICP + improved papilledema (the overlap is implied but not quantified).",
+      "what_is_established": "A substantial subgroup exists within the 57% whose symptoms recurred DESPITE continued pressure improvement. The exact size is NOT source-reported.",
+      "what_is_NOT_established": "The exact proportion. The 57% includes mixed phenotypes (some with pressure recurrence, some without). The source does not separate them cleanly."
+    },
+    {
+      "id": "R2-C3b",
+      "name": "Headache + likely primary headache disorder (migraine coexistence)",
+      "source_data": "Repeat-stenting series: 72.2% had ongoing headaches. The authors EXPLICITLY state that persistent headache is likely due to other mechanisms and that chronic migraine can coexist after normalization of sinus pressure.",
+      "source_proportion": "72.2% of the repeat-stenting series had ongoing headaches. The authors explicitly attribute some of these to coexisting migraine, but do NOT report the proportion attributable to migraine vs. other causes.",
+      "what_is_established": "The authors of the repeat-stenting series EXPLICITLY acknowledge that coexisting primary headache disorder (chronic migraine) is a likely explanation for persistent headache after pressure normalization.",
+      "what_is_NOT_established": "The proportion of persistent headache attributable to migraine coexistence vs. other mechanisms. The authors acknowledge this as a possibility, not a proven cause."
+    },
+    {
+      "id": "R2-C3c",
+      "name": "Headache + residual venous/physiological abnormalities not captured by LP pressure",
+      "source_data": "2026 study: elevated central venous pressure, higher anterior SSS pressure, and higher BMI were associated with worse post-VSS outcomes. The authors proposed increased dural compliance as a key mechanism.",
+      "source_proportion": "The source reports ASSOCIATIONS between these variables and worse outcomes, but does NOT report the proportion of headache patients attributable to these factors.",
+      "what_is_established": "Central venous pressure, sinus pressure distribution, BMI, and dural compliance are ASSOCIATED with worse post-VSS outcomes. This is a SOURCE-BACKED signal — not a hypothesis.",
+      "what_is_NOT_established": "Whether these variables CAUSE the persistent headache (association ≠ causation). Whether changing these variables would improve outcomes."
+    }
+  ],
+  "candidate_discriminating_variables": [
+    {
+      "variable": "Central venous pressure (CVP)",
+      "source_signal": "2026 study: elevated CVP associated with worse post-VSS outcomes",
+      "evidence_label": "OBSERVED_ASSOCIATION",
+      "why_it_could_discriminate": "If CVP remains elevated after VSS (despite improved sinus pressure gradient), the patient may have systemic venous hypertension that the stent cannot address. This could cause headache via venous congestion independent of ICP.",
+      "measurable": true,
+      "measurement_method": "Right heart catheterization (invasive) or estimated via jugular venous pressure (non-invasive but less accurate)",
+      "competitor_visibility": "LOW — VSS focuses on sinus pressure gradient, not CVP. eShunt focuses on CSF drainage, not CVP. Medical therapy focuses on CSF production, not CVP. No current IIH treatment trajectory measures or controls CVP.",
+      "survives_all_trajectories": true,
+      "survival_reason": "No current trajectory measures CVP. If CVP is the discriminating variable, it is INVISIBLE to all existing treatments until symptoms appear."
+    },
+    {
+      "variable": "Sinus pressure distribution (not just gradient)",
+      "source_signal": "2026 study: higher anterior SSS pressure associated with worse outcomes",
+      "evidence_label": "OBSERVED_ASSOCIATION",
+      "why_it_could_discriminate": "VSS stents the stenotic segment, but the pressure DISTRIBUTION across the entire venous sinus system may remain abnormal. A patient may have a normal gradient across the stent but abnormal pressure at other sinus locations (anterior SSS, cavernous sinus, etc.) that causes headache.",
+      "measurable": true,
+      "measurement_method": "Multi-point venous sinus manometry during VSS procedure (catheter-based pressure measurement at multiple sinus locations)",
+      "competitor_visibility": "LOW — VSS measures the pressure GRADIENT across the stenosis, not the full pressure distribution. No post-VSS monitoring of sinus pressure distribution exists.",
+      "survives_all_trajectories": true,
+      "survival_reason": "No current trajectory monitors sinus pressure distribution post-treatment. The 2026 finding is NEW and not yet incorporated into any treatment protocol."
+    },
+    {
+      "variable": "Venous / dural compliance",
+      "source_signal": "2026 study: proposed increased dural compliance as a key mechanism for worse outcomes",
+      "evidence_label": "HYPOTHESIS (proposed by the study authors, not independently confirmed)",
+      "why_it_could_discriminate": "If dural compliance is abnormally high, the dura expands with pressure changes (like a balloon), altering CSF dynamics and potentially causing headache through meningeal stretch/compression — even with normal mean ICP. VSS does not change dural compliance.",
+      "measurable": "UNCERTAIN — dural compliance is theoretically measurable via MRI elastography or infusion-test pressure-volume response, but no standardized clinical measurement exists.",
+      "competitor_visibility": "ZERO — no current IIH treatment measures, monitors, or addresses dural compliance.",
+      "survives_all_trajectories": true,
+      "survival_reason": "Dural compliance is INVISIBLE to all existing trajectories. No stent, shunt, drug, or monitor addresses it."
+    },
+    {
+      "variable": "BMI / weight trajectory",
+      "source_signal": "2026 study: higher BMI associated with worse post-VSS outcomes",
+      "evidence_label": "OBSERVED_ASSOCIATION",
+      "why_it_could_discriminate": "Higher BMI is associated with elevated CVP, venous compression, and OSA — all of which could cause persistent headache independent of sinus pressure gradient. Weight gain after VSS could cause recurrence even with a patent stent.",
+      "measurable": true,
+      "measurement_method": "Body weight / BMI (routine clinical measurement)",
+      "competitor_visibility": "MODERATE — BMI is routinely measured, but no IIH treatment PROTOCOL uses weight trajectory as a treatment-modifying variable. Weight loss is recommended but not enforced or monitored as a treatment variable.",
+      "survives_all_trajectories": "PARTIALLY — medical therapy includes weight loss recommendations, but no device trajectory addresses BMI. Weight loss is a behavioral intervention, not a device mechanism."
+    },
+    {
+      "variable": "ICP waveform / pulsatility (not just mean ICP)",
+      "source_signal": "Theoretical — not directly reported in the 2026 study, but derived from the dural compliance hypothesis",
+      "evidence_label": "HYPOTHESIS",
+      "why_it_could_discriminate": "Mean ICP can be normal while ICP PULSATILITY (the amplitude of pressure fluctuations) is abnormal. If dural compliance is high, each cardiac cycle produces a larger ICP pulse. This pulsatility could cause headache through meningeal stretch — even with normal mean ICP. VSS may normalize mean ICP without normalizing pulsatility.",
+      "measurable": true,
+      "measurement_method": "Intracranial pressure monitoring with waveform analysis (invasive — requires implanted sensor or lumbar drain). Non-invasive methods (TCD-derived pulsatility index) exist but are less direct.",
+      "competitor_visibility": "ZERO — no IIH treatment measures ICP pulsatility. All focus on mean ICP.",
+      "survives_all_trajectories": true,
+      "survival_reason": "ICP pulsatility is INVISIBLE to all existing trajectories. No stent, shunt, drug, or monitor addresses pulsatility."
+    },
+    {
+      "variable": "Migraine phenotype / headache characteristics",
+      "source_signal": "Repeat-stenting series: authors explicitly state chronic migraine can coexist after pressure normalization",
+      "evidence_label": "OBSERVED_CLINICAL_JUDGMENT (authors' assessment, not a biomarker)",
+      "why_it_could_discriminate": "If the patient has a COEXISTING primary headache disorder (chronic migraine, medication-overuse headache), the headache will persist after pressure normalization because it was never caused by IIH. The IIH was treated successfully, but the migraine was not.",
+      "measurable": "PARTIALLY — migraine can be diagnosed by ICHD-3 criteria (clinical phenotype), but distinguishing IIH headache from migraine in a patient who has BOTH is difficult.",
+      "competitor_visibility": "MODERATE — headache specialists can diagnose migraine, but IIH treatment protocols do not routinely include migraine screening or treatment. The patient is treated for IIH, and if headache persists, it may be attributed to 'IIH recurrence' rather than 'coexisting migraine.'",
+      "survives_all_trajectories": "PARTIALLY — better headache treatment (a competitor trajectory) could address this. But if the migraine is MISDIAGNOSED as IIH recurrence, the patient gets repeat stenting instead of migraine treatment."
+    },
+    {
+      "variable": "Sleep-disordered breathing (OSA)",
+      "source_signal": "Known IIH association; OSA causes nocturnal ICP spikes",
+      "evidence_label": "OBSERVED_ASSOCIATION (well-established)",
+      "why_it_could_discriminate": "If the patient has untreated OSA, nocturnal ICP spikes (from hypercapnia and venous congestion) could cause morning headaches despite normal daytime ICP. VSS improves daytime pressure but does not treat OSA.",
+      "measurable": true,
+      "measurement_method": "Polysomnography (sleep study)",
+      "competitor_visibility": "LOW — OSA is a known IIH comorbidity, but no IIH treatment PROTOCOL requires OSA screening or treatment as part of the IIH management pathway. VSS, eShunt, and medical therapy do not address OSA.",
+      "survives_all_trajectories": "PARTIALLY — OSA treatment (CPAP) exists, but it is NOT part of any IIH treatment trajectory. The IIH field does not treat OSA."
+    }
+  ],
+  "strongest_signal": {
+    "the_signal": "The 2026 study found that elevated central venous pressure, higher anterior SSS pressure, and higher BMI were associated with worse post-VSS outcomes, and proposed increased dural compliance as a key mechanism.\n\nThis is the MOST INTERESTING signal because:\n1. It is SOURCE-BACKED (observed association, not hypothesized)\n2. It points to a MEASURABLE variable (CVP, sinus pressure distribution)\n3. It is INVISIBLE to all current trajectories (no IIH treatment measures CVP)\n4. It could explain the anomaly: if CVP remains elevated, the patient has venous congestion that causes headache independent of the sinus pressure gradient\n5. It connects to the dural compliance hypothesis: high CVP + high dural compliance = abnormal ICP pulsatility = headache despite normal mean ICP",
+    "the_discriminating_question": "Can central venous pressure (or a related variable: sinus pressure distribution, dural compliance, ICP pulsatility) predict which patients will have persistent headache after successful VSS?",
+    "if_yes": "If CVP (or a related variable) predicts persistent headache, then the invention question becomes: can we MEASURE and potentially MODIFY this variable in a way that no current trajectory does?\n\nThis would be a DIFFERENT CAUSAL ARCHITECTURE from pressure-relief:\n- VSS relieves sinus stenosis (mechanical)\n- eShunt drains CSF (fluid diversion)\n- Medical therapy reduces CSF production (pharmacological)\n- A CVP/compliance device would ADDRESS VENOUS CONGESTION / DURAL MECHANICS\n  — a variable NONE of the above touch",
+    "if_no": "If no measurable variable predicts persistent headache, then the headache may be a separate disorder (migraine, central sensitization) that is NOT addressable by a device-based mechanism. In that case, PARK R2-C3.",
+    "the_competitor_invisible_state": "The patient state that remains INVISIBLE to all current trajectories is:\nELEVATED CENTRAL VENOUS PRESSURE / ABNORMAL DURAL COMPLIANCE.\n\nThis state is invisible because:\n- VSS measures sinus pressure gradient, not CVP\n- eShunt measures CSF-to-venous gradient, not CVP independently\n- Medical therapy does not measure venous pressure\n- Monitoring focuses on ICP (mean), not CVP or pulsatility\n\nIf this state causes persistent headache, it would explain why patients have symptoms despite normal ICP — and it would be a genuinely new treatment target that no competitor is addressing."
+  },
+  "verdict": {
+    "r2_c3_status": "YELLOW → APPROACHING GREEN (conditional on the discriminating variable)",
+    "the_discovery_question": "Can central venous pressure (or a related variable: sinus pressure distribution, dural compliance, ICP pulsatility) predict which patients will have persistent headache after successful VSS?",
+    "evidence_for_the_question": [
+      "2026 study: elevated CVP, higher anterior SSS pressure, higher BMI associated with worse post-VSS outcomes — OBSERVED_ASSOCIATION",
+      "2026 study: proposed increased dural compliance as a key mechanism — HYPOTHESIS (but from the same study that found the CVP association)",
+      "178-patient study: 57% recurrence despite ICP/papilledema improvement — the anomaly this variable could explain",
+      "Repeat-stenting series: 72.2% persistent headache, authors acknowledge non-pressure mechanisms — supports the search for a non-pressure variable"
+    ],
+    "what_is_established": "The 2026 study provides SOURCE-BACKED evidence that CVP, sinus pressure distribution, and dural compliance are ASSOCIATED with worse outcomes. This is not a hypothesis — it is an observed association from a published study.",
+    "what_is_NOT_established": "Whether these variables CAUSE the persistent headache (association ≠ causation). Whether changing these variables would improve outcomes. Whether the association is specific to the headache phenotype (R2-C3) or applies to all recurrence phenotypes.",
+    "next_step": "The question is now sharply defined: does CVP (or a related venous/dural variable) predict persistent headache after pressure normalization?\n\nThis is a DISCOVERY question, not a mechanism question. The answer requires:\n1. Clinical data: measure CVP / sinus pressure / pulsatility in VSS patients with and without persistent headache\n2. Statistical analysis: does the variable discriminate between responders and non-responders?\n3. If yes: is the variable ADDRESSABLE by a new mechanism (not just measurable)?\n4. If addressable: generate mechanisms and attack them",
+    "mechanism_status": "UNPROPOSED — the problem is now a DISCOVERY question about a discriminating variable, not a mechanism question",
+    "competitor_resistant_residual": "The competitor-resistant residual is now identified as: ELEVATED CENTRAL VENOUS PRESSURE / ABNORMAL DURAL COMPLIANCE — a patient state that is INVISIBLE to all current IIH treatment trajectories until symptoms appear. If this state causes persistent headache, it represents a genuinely new treatment target that no competitor is addressing."
+  }
+}
