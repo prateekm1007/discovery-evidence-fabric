@@ -1,0 +1,154 @@
+{
+  "round": 46,
+  "timestamp": "2026-08-21T08:00:00Z",
+  "type": "PHENOTYPE_DECOMPOSITION",
+  "phenotypes": [
+    {
+      "id": "R2-C1",
+      "name": "Recurrence WITH renewed objective ICP elevation",
+      "definition": "Patient initially responded to VSS (ICP decreased, symptoms improved). At follow-up (~390 days), symptoms recurred AND objective ICP measurement showed renewed elevation. This is TRUE TREATMENT FAILURE — the device stopped working (restenosis or new stenosis causing ICP to rise again).",
+      "causal_chain": "VSS → initial response → restenosis/new stenosis → venous outflow obstruction returns → ICP rises → symptoms recur",
+      "is_this_a_treatment_failure": true,
+      "is_this_a_measurement_problem": false,
+      "evidence_support": "MODERATE — the 178-patient study found 17% required further surgery (repeat stenting), consistent with true restenosis causing renewed pressure elevation. The meta-analysis found 17.7% pooled restenosis. These likely overlap with R2-C1.",
+      "estimated_prevalence_within_57pct": "~30% (17/57 — the 17% requiring surgery are likely the true pressure-failure subgroup)",
+      "competitor_trajectory_solves_it": "PARTIALLY — next-gen stents may reduce restenosis from 17.7% to 5-10%, but not to zero. eShunt (if used for IIH) would bypass the sinus entirely, potentially eliminating this phenotype. Medical therapy does not address it.",
+      "survives_all_trajectories": false,
+      "survival_reason": "Next-gen stents + eShunt for IIH would substantially reduce this phenotype. It is NOT competitor-resistant."
+    },
+    {
+      "id": "R2-C2",
+      "name": "Recurrence WITH new/adjacent venous stenosis (but NOT in-stent)",
+      "definition": "Patient initially responded to VSS. At follow-up, symptoms recurred. Imaging shows NEW stenosis at a site ADJACENT to the stent (proximal or distal), not in-stent restenosis. The stent itself is patent, but venous outflow is obstructed at a new location.",
+      "causal_chain": "VSS → initial response → flow dynamics change → new stenosis develops adjacent to stent → venous outflow obstruction at new site → ICP rises → symptoms recur",
+      "is_this_a_treatment_failure": true,
+      "is_this_a_measurement_problem": false,
+      "evidence_support": "MODERATE — the 2025 re-stenting study found that 'new proximal/distal interface stenosis was common' among recurrent cases. This is a known phenomenon in vascular stenting (edge restenosis).",
+      "estimated_prevalence_within_57pct": "~15-20% (new stenosis at adjacent sites is documented but exact proportion within the 57% is not fully specified)",
+      "competitor_trajectory_solves_it": "PARTIALLY — longer stents or overlapping stents may cover adjacent segments. Better stent design may reduce edge effects. But new stenosis can develop beyond the stented segment.",
+      "survives_all_trajectories": false,
+      "survival_reason": "Next-gen stents with longer coverage + better edge design would reduce this. eShunt would bypass it entirely."
+    },
+    {
+      "id": "R2-C3",
+      "name": "Recurrence WITH persistent headache despite pressure/papilledema improvement",
+      "definition": "Patient initially responded to VSS (ICP decreased, papilledema improved/resolved). At follow-up, HEADACHE recurs or persists, BUT objective ICP measurement shows continued reduction AND papilledema remains improved. This is the ANOMALY: symptoms recur WITHOUT objective pressure failure.",
+      "causal_chain": "UNKNOWN — this is the causal contradiction. Possible explanations: central sensitization (chronic pain), migraine comorbidity, medication-overuse headache, non-IIH headache disorder, or a non-pressure IIH mechanism.",
+      "is_this_a_treatment_failure": "UNCERTAIN — this depends on whether the headache is truly IIH-related or is a SEPARATE headache disorder that was misattributed to IIH. If the headache is NOT IIH-related, the VSS did NOT fail — the diagnosis was wrong.",
+      "is_this_a_measurement_problem": "POSSIBLE — headache is a SUBJECTIVE endpoint. The 2026 review says outcome definitions are unresolved. 'Headache recurrence' may not be equivalent to 'IIH recurrence.' The patient may have a different headache disorder (migraine, tension-type, medication-overuse) that was present before and after VSS.",
+      "evidence_support": "MODERATE-STRONG — the 178-patient study found recurrence in 57% but also found ICP reduction and papilledema improvement in many recurrent patients. The repeat-stenting series found 72.2% still had headaches while only a minority required further surgery. This suggests a large subgroup with persistent headache WITHOUT objective pressure failure.",
+      "estimated_prevalence_within_57pct": "~40-50% (the majority of the 57% — patients with headache but no objective pressure failure. The 17% requiring surgery are R2-C1/R2-C2, leaving ~40% with headache-only recurrence)",
+      "competitor_trajectory_solves_it": "NO — no pressure-relief trajectory (stents, shunts, drugs) addresses headache that is NOT caused by pressure. If the headache is central sensitization, migraine, or medication-overuse, pressure relief is irrelevant.",
+      "survives_all_trajectories": true,
+      "survival_reason": "This phenotype survives ALL competitor trajectories because it is NOT a pressure problem. Better stents, better shunts, better drugs, and better monitoring all address PRESSURE. If the headache is non-pressure (sensitization, migraine, etc.), none of these trajectories can solve it. This is the COMPETITOR-RESISTANT RESIDUAL."
+    },
+    {
+      "id": "R2-C4",
+      "name": "Recurrence WITH visual deterioration despite pressure improvement",
+      "definition": "Patient initially responded to VSS (ICP decreased, papilledema improved). At follow-up, VISUAL SYMPTOMS recur or worsen, BUT ICP remains controlled AND papilledema remains improved. This suggests optic nerve damage that persists or progresses independent of pressure.",
+      "causal_chain": "chronic ICP elevation → optic nerve damage (axonal injury, demyelination) → VSS reduces pressure → papilledema improves → BUT nerve damage persists → visual symptoms continue/worsen despite pressure control",
+      "is_this_a_treatment_failure": "PARTIAL — the pressure treatment worked, but the CONSEQUENCE (nerve damage) was not addressed. The treatment was necessary but NOT SUFFICIENT.",
+      "is_this_a_measurement_problem": "NO — visual deterioration is an objective finding (visual fields, OCT). It is not a subjective endpoint like headache.",
+      "evidence_support": "MODERATE — optic nerve damage in IIH is well-documented. Persistent visual deficits after papilledema resolution are known. The 178-patient study may include patients with persistent visual symptoms despite pressure improvement, but the exact proportion is not fully specified.",
+      "estimated_prevalence_within_57pct": "~10-15% (visual deterioration despite pressure control is less common than headache recurrence but is documented)",
+      "competitor_trajectory_solves_it": "NO — no pressure-relief trajectory addresses optic nerve REPAIR. If the nerve is damaged, reducing pressure is necessary but not sufficient. The nerve needs to heal, which may require neuroprotective or regenerative therapy.",
+      "survives_all_trajectories": true,
+      "survival_reason": "This phenotype survives ALL competitor trajectories because it is a NERVE DAMAGE problem, not a pressure problem. No stent, shunt, drug, or monitor can repair an already-damaged optic nerve."
+    },
+    {
+      "id": "R2-C5",
+      "name": "Recurrence WITH tinnitus/other pain phenotype without objective pressure failure",
+      "definition": "Patient initially responded to VSS. At follow-up, tinnitus or other non-headache symptoms recur, BUT ICP remains controlled AND papilledema remains improved. This is similar to R2-C3 but involves non-headache symptoms.",
+      "causal_chain": "UNKNOWN — tinnitus in IIH may be vascular (venous turbulence), neural (auditory nerve), or central. If vascular, it could relate to venous flow changes from stenting. If neural/central, it could be independent of pressure.",
+      "is_this_a_treatment_failure": "UNCERTAIN — depends on whether the tinnitus is truly IIH-related or is a separate condition.",
+      "is_this_a_measurement_problem": "POSSIBLE — tinnitus is subjective and may not be directly related to IIH pathology.",
+      "evidence_support": "WEAK — tinnitus is a known IIH symptom but its persistence after pressure control is less well-characterized than headache.",
+      "estimated_prevalence_within_57pct": "~5-10% (less common than headache recurrence)",
+      "competitor_trajectory_solves_it": "PARTIALLY — if tinnitus is vascular (venous turbulence from stenting), better stent design may help. If neural/central, no pressure-relief trajectory helps.",
+      "survives_all_trajectories": "UNCERTAIN — depends on the causal mechanism of the tinnitus"
+    }
+  ],
+  "treatment_failure_vs_measurement": {
+    "key_question": "For each phenotype, is this actually a TREATMENT FAILURE, or is it a MEASUREMENT/ENDPOINT PROBLEM?",
+    "R2_C1": "TRUE TREATMENT FAILURE — objective ICP elevation confirms the device stopped working. Not a measurement problem.",
+    "R2_C2": "TRUE TREATMENT FAILURE — objective new stenosis confirms mechanical failure at a new site. Not a measurement problem.",
+    "R2_C3": "MEASUREMENT/ENDPOINT PROBLEM IS LIKELY — headache is a SUBJECTIVE endpoint. The 2026 review says outcome definitions are unresolved. 'Headache recurrence' may NOT be equivalent to 'IIH recurrence.' The patient may have a SEPARATE headache disorder (migraine, tension-type, medication-overuse) that was present before VSS and persists after VSS. If so, VSS did NOT fail — the headache was never caused by IIH in the first place. HOWEVER, even if the headache is a separate disorder, it is still a CLINICAL PROBLEM that no IIH treatment addresses.",
+    "R2_C4": "PARTIAL TREATMENT FAILURE — the pressure treatment worked, but the CONSEQUENCE (nerve damage) persists. This is not a measurement problem — visual deterioration is objective. The treatment was necessary but not sufficient.",
+    "R2_C5": "MEASUREMENT PROBLEM IS POSSIBLE — tinnitus is subjective. Its persistence after pressure control may indicate a separate condition, not IIH recurrence.",
+    "conclusion": "The most VALUABLE phenotype is R2-C3 (headache despite pressure improvement) BECAUSE it has the HIGHEST PREVALENCE (~40-50% of the 57%) AND it survives all competitor trajectories. Even if it is partly a measurement problem (headache ≠ IIH), the CLINICAL BURDEN is real — patients have persistent headache after successful pressure treatment, and no current trajectory addresses it.\n\nR2-C4 (visual deterioration despite pressure improvement) is also valuable but has LOWER PREVALENCE (~10-15%). It is the most objectively verifiable phenotype (visual fields, OCT) and has HIGH CLINICAL HARM (vision loss)."
+  },
+  "ranking": [
+    {
+      "rank": 1,
+      "phenotype": "R2-C3",
+      "name": "Headache despite pressure improvement",
+      "clinical_harm": "MODERATE-HIGH — chronic headache is disabling; affects quality of life, employment, medication use",
+      "prevalence": "~40-50% of the 57% recurrence = ~23-29% of all VSS patients. This is the LARGEST subgroup.",
+      "causal_uncertainty": "HIGH — the causal mechanism is UNKNOWN. Could be central sensitization, migraine comorbidity, medication-overuse, or a non-pressure IIH mechanism. This uncertainty is VALUABLE because it means the field does not understand or address this phenotype.",
+      "competitor_resistance": "HIGH — no pressure-relief trajectory addresses headache that is not caused by pressure",
+      "addressability": "UNCERTAIN — depends on the causal mechanism. If central sensitization, neuromodulation could help. If migraine comorbidity, migraine-specific therapy could help. If medication-overuse, detox could help. The ADDRESSABILITY depends on identifying the specific cause.",
+      "overall_assessment": "HIGHEST PRIORITY — largest subgroup, highest causal uncertainty, highest competitor resistance. The addressability is uncertain but that is exactly what the next step should determine."
+    },
+    {
+      "rank": 2,
+      "phenotype": "R2-C4",
+      "name": "Visual deterioration despite pressure improvement",
+      "clinical_harm": "HIGH — vision loss is the most feared IIH complication. Permanent visual deficit is disabling.",
+      "prevalence": "~10-15% of the 57% = ~6-9% of all VSS patients. LOWER than R2-C3 but higher HARM.",
+      "causal_uncertainty": "MODERATE — optic nerve damage persistence is a known phenomenon, but the exact mechanism (axonal vs demyelination vs vascular) is uncertain.",
+      "competitor_resistance": "HIGH — no pressure-relief trajectory addresses nerve repair",
+      "addressability": "UNCERTAIN — neuroprotective or regenerative therapy could potentially address this, but no such therapy exists for optic nerve damage in IIH.",
+      "overall_assessment": "SECOND PRIORITY — lower prevalence than R2-C3 but higher harm. Competitor-resistant. The addressability is uncertain (neuroprotection/regeneration is an emerging field)."
+    },
+    {
+      "rank": 3,
+      "phenotype": "R2-C1",
+      "name": "Recurrence with renewed ICP elevation (true restenosis)",
+      "clinical_harm": "HIGH — renewed intracranial hypertension risks vision loss",
+      "prevalence": "~30% of the 57% = ~17% of all VSS patients. Well-documented.",
+      "causal_uncertainty": "LOW — the causal mechanism (restenosis) is well-understood",
+      "competitor_resistance": "LOW — next-gen stents + eShunt for IIH would substantially reduce this",
+      "addressability": "HIGH — better stents, eShunt, or repeat stenting can address this",
+      "overall_assessment": "LOWER PRIORITY for INVENTION — well-understood, addressable by existing trajectories. NOT competitor-resistant."
+    },
+    {
+      "rank": 4,
+      "phenotype": "R2-C2",
+      "name": "New/adjacent stenosis",
+      "clinical_harm": "HIGH — same as R2-C1",
+      "prevalence": "~15-20% of the 57%",
+      "causal_uncertainty": "LOW — edge restenosis is well-understood",
+      "competitor_resistance": "LOW — longer/better stents + eShunt would address this",
+      "addressability": "HIGH",
+      "overall_assessment": "LOWER PRIORITY — addressable by existing trajectories. NOT competitor-resistant."
+    },
+    {
+      "rank": 5,
+      "phenotype": "R2-C5",
+      "name": "Tinnitus/pain without objective pressure failure",
+      "clinical_harm": "MODERATE — tinnitus is bothersome but not vision-threatening",
+      "prevalence": "~5-10% of the 57%",
+      "causal_uncertainty": "HIGH — mechanism unknown",
+      "competitor_resistance": "UNCERTAIN — depends on whether tinnitus is vascular or neural",
+      "addressability": "UNCERTAIN",
+      "overall_assessment": "LOWEST PRIORITY — low prevalence, uncertain everything."
+    }
+  ],
+  "selected_problem": {
+    "problem_id": "R2-C3",
+    "problem_statement": "Approximately 23-29% of VSS-treated IIH patients experience persistent or recurrent headache despite sustained ICP reduction and papilledema improvement. This phenotype is NOT explained by renewed pressure elevation (ICP is controlled), NOT explained by restenosis (the stent is patent), and NOT addressed by any existing treatment trajectory (stents, shunts, drugs, monitoring all target pressure). The causal mechanism is UNKNOWN — possible explanations include central sensitization, migraine comorbidity, medication-overuse headache, or a non-pressure IIH mechanism. No competitor trajectory naturally addresses this phenotype because it is, by definition, NOT a pressure problem.",
+    "falsifiable_hypothesis": "Among VSS-treated IIH patients with sustained ICP reduction and papilledema improvement, a clinically important subgroup experiences persistent headache that is NOT caused by intracranial hypertension and is NOT addressed by any existing IIH treatment. This subgroup represents a distinct clinical phenotype that requires a different causal architecture from pressure relief.",
+    "evidence_base": [
+      "57% symptomatic recurrence at ~390 days (178-patient prospective study)",
+      "Many recurrent patients showed continued ICP reduction and papilledema improvement",
+      "72.2% still had headaches in repeat-stenting series while only minority required surgery",
+      "2026 review: outcome definitions unresolved, evidence remains observational",
+      "17% required further surgery (true pressure failure) — leaving ~40% with headache WITHOUT objective pressure failure"
+    ],
+    "competitor_resistant": true,
+    "competitor_resistance_reason": "No pressure-relief trajectory addresses headache that is not caused by pressure. By definition, this phenotype survives all pressure-focused improvements.",
+    "gate_status": "YELLOW → APPROACHING GREEN — the problem is evidence-supported, competitor-resistant, and sharply defined. The next step is to determine if the headache phenotype is ADDRESSABLE by a new mechanism (not just 'understand the biology').",
+    "critical_caveat": "This phenotype may be partly a MEASUREMENT/ENDPOINT problem. 'Headache recurrence' may not be equivalent to 'IIH recurrence.' The patient may have a separate headache disorder (migraine, tension-type, medication-overuse) that was misattributed to IIH. Before mechanism generation, the machine must determine: is this a SINGLE disease (IIH with a non-pressure component) or TWO diseases (IIH + separate headache disorder)?",
+    "mechanism_status": "UNPROPOSED — the problem is sharply defined but the ADDRESSABILITY is uncertain. The next step is to determine if the headache phenotype can be addressed by a mechanism that is NOT a pressure-relief device."
+  }
+}
