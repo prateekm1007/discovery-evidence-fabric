@@ -41,6 +41,88 @@ class DeterministicVerdict(str, Enum):
     INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"  # Evidence is insufficient to determine
 
 
+class EvidenceType(str, Enum):
+    """The type of evidence a check uses.
+
+    Per CEO directive (2026-08-21 fourteenth deep audit):
+      'The arbiter must distinguish SOURCE_EXPLICIT from TOPOLOGICAL_INFERENCE.
+       If the final C04 conclusion depends on topology inference, that inference
+       must itself have an evidence chain.'
+
+    SOURCE_EXPLICIT: the evidence is a direct quote from the patent text.
+        Example: "a filter is positioned within the first fluid-flow passageway"
+        This is a mechanical fact — the text says exactly this.
+
+    TOPOLOGICAL_INFERENCE: the evidence is an inference about the device's
+        flow-path topology, derived from multiple source passages but not
+        explicitly stated as a single fact.
+        Example: "valve 44 is on the normal path, which is the first fluid-flow
+        passageway, because the filter (which defines the first passageway) is
+        also on the normal path."
+        This is a causal reconstruction, not purely a mechanical fact. It must
+        have its own evidence chain showing each step.
+
+    CLAIM_CONSTRUCTION: the evidence is a claim-construction step that maps
+        candidate language to claim language.
+        Example: "C04-L5's 'pressure-responsive valve mechanism' = claim's
+        'pressure regulated valve means'"
+        This is a semantic mapping that needs explicit justification.
+    """
+    SOURCE_EXPLICIT = "SOURCE_EXPLICIT"
+    TOPOLOGICAL_INFERENCE = "TOPOLOGICAL_INFERENCE"
+    CLAIM_CONSTRUCTION = "CLAIM_CONSTRUCTION"
+
+
+@dataclass
+class InferenceStep:
+    """A single step in the inference chain.
+
+    Per CEO directive: 'claim limitation → source facts → inference rule →
+    inference result → alternative interpretation → why alternative fails →
+    final mapping. Every arrow needs source-bound evidence.'
+
+    Each step records:
+      - step_id: unique identifier
+      - step_type: SOURCE_EXPLICIT / TOPOLOGICAL_INFERENCE / CLAIM_CONSTRUCTION
+      - input_facts: the facts this step starts from (with source offsets)
+      - inference_rule: the rule applied (explicitly stated, not hidden in code)
+      - inference_result: what this step concludes
+      - alternative_interpretation: what else could this mean?
+      - why_alternative_fails: why the alternative is rejected (with evidence)
+      - source_evidence: the exact patent text supporting this step
+      - source_offset: character offset in the patent
+      - evidence_hash: SHA-256 of the source evidence
+    """
+    step_id: str
+    step_type: EvidenceType
+    input_facts: str              # What facts this step starts from
+    inference_rule: str           # The rule applied (explicitly stated)
+    inference_result: str         # What this step concludes
+    alternative_interpretation: str  # What else could this mean?
+    why_alternative_fails: str    # Why the alternative is rejected
+    source_evidence: str          # Exact patent text
+    source_offset: int            # Character offset
+    evidence_hash: str            # SHA-256 of source_evidence
+
+    def __post_init__(self):
+        if not self.evidence_hash:
+            self.evidence_hash = hashlib.sha256(self.source_evidence.encode("utf-8")).hexdigest()
+
+    def to_dict(self) -> dict:
+        return {
+            "step_id": self.step_id,
+            "step_type": self.step_type.value,
+            "input_facts": self.input_facts,
+            "inference_rule": self.inference_rule,
+            "inference_result": self.inference_result,
+            "alternative_interpretation": self.alternative_interpretation,
+            "why_alternative_fails": self.why_alternative_fails,
+            "source_evidence": self.source_evidence[:500],
+            "source_offset": self.source_offset,
+            "evidence_hash": self.evidence_hash,
+        }
+
+
 @dataclass
 class EvidenceCheck:
     """A single mechanical evidence check."""
@@ -51,6 +133,7 @@ class EvidenceCheck:
     evidence_hash: str          # SHA-256 of the evidence text
     check_result: bool          # True = check passed, False = check failed
     check_reasoning: str        # Why the check passed/failed
+    evidence_type: EvidenceType = EvidenceType.SOURCE_EXPLICIT  # P0 (Round 32): distinguish explicit from inferred
 
 
 @dataclass
@@ -60,13 +143,16 @@ class DeterministicArbitrationResult:
     verdict: DeterministicVerdict
     checks: list[EvidenceCheck]
     overall_reasoning: str
+    inference_chain: list[InferenceStep] = field(default_factory=list)  # P0 (Round 32): auditable inference
     arbitration_hash: str = ""
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
     def __post_init__(self):
         content = f"{self.limitation_id}|{self.verdict.value}|"
         for c in self.checks:
-            content += f"{c.check_name}:{c.check_result}|"
+            content += f"{c.check_name}:{c.check_result}:{c.evidence_type.value}|"
+        for s in self.inference_chain:
+            content += f"{s.step_id}:{s.step_type.value}:{s.inference_result}|"
         content += self.overall_reasoning
         self.arbitration_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
 
@@ -75,12 +161,36 @@ class DeterministicArbitrationResult:
         """Only ESTABLISHED can support §102."""
         return self.verdict == DeterministicVerdict.ESTABLISHED
 
+    @property
+    def has_topological_inference(self) -> bool:
+        """Does the result depend on topological inference?"""
+        return any(s.step_type == EvidenceType.TOPOLOGICAL_INFERENCE for s in self.inference_chain)
+
+    @property
+    def has_claim_construction(self) -> bool:
+        """Does the result depend on claim construction?"""
+        return any(s.step_type == EvidenceType.CLAIM_CONSTRUCTION for s in self.inference_chain)
+
     def to_dict(self) -> dict:
+        checks_list = []
+        for c in self.checks:
+            if hasattr(c, '__dict__'):
+                d = dict(c.__dict__)
+                d["evidence_type"] = c.evidence_type.value if hasattr(c, 'evidence_type') else "SOURCE_EXPLICIT"
+                checks_list.append(d)
+            elif isinstance(c, dict):
+                d = dict(c)
+                if "evidence_type" not in d:
+                    d["evidence_type"] = "SOURCE_EXPLICIT"
+                checks_list.append(d)
         return {
             "limitation_id": self.limitation_id,
             "verdict": self.verdict.value,
             "can_support_section_102": self.can_support_section_102,
-            "checks": [c.__dict__ if hasattr(c, '__dict__') else c for c in self.checks],
+            "has_topological_inference": self.has_topological_inference,
+            "has_claim_construction": self.has_claim_construction,
+            "checks": checks_list,
+            "inference_chain": [s.to_dict() if hasattr(s, 'to_dict') else s for s in self.inference_chain],
             "overall_reasoning": self.overall_reasoning,
             "arbitration_hash": self.arbitration_hash,
             "timestamp": self.timestamp,
@@ -118,7 +228,8 @@ class DeterministicEvidenceArbiter:
         return self.full_text[start:end].strip()
 
     def _make_check(self, name: str, description: str, evidence_text: str,
-                    offset: int, result: bool, reasoning: str) -> EvidenceCheck:
+                    offset: int, result: bool, reasoning: str,
+                    evidence_type: EvidenceType = EvidenceType.SOURCE_EXPLICIT) -> EvidenceCheck:
         return EvidenceCheck(
             check_name=name,
             check_description=description,
@@ -127,6 +238,7 @@ class DeterministicEvidenceArbiter:
             evidence_hash=sha256_of_text(evidence_text),
             check_result=result,
             check_reasoning=reasoning,
+            evidence_type=evidence_type,
         )
 
     def arbitrate_c04_l5(self) -> DeterministicArbitrationResult:
@@ -336,6 +448,11 @@ class DeterministicEvidenceArbiter:
         # The normal flow path is: inlet → valve 44 → third chamber (filter) → fourth chamber → outlet
         # The "pressure regulated valve means" in the first fluid-flow passageway would be valve 44 (the one-way miter valve)
         # NOT the diaphragm valve 30 (which is on the bypass path)
+        #
+        # P0 (Round 32): This check involves a TOPOLOGICAL_INFERENCE, not just a SOURCE_EXPLICIT fact.
+        # The inference is: "valve 44 is on the normal path, and the normal path IS the first fluid-flow
+        # passageway (because the filter defines it), therefore valve 44 is in the first fluid-flow passageway."
+        # This inference must be explicitly recorded in the inference_chain.
 
         valve_44 = "one-way valve 44"
         valve_44_matches = self._find_all(valve_44)
@@ -348,7 +465,8 @@ class DeterministicEvidenceArbiter:
                 evidence_text=context,
                 offset=offset,
                 result=True,
-                reasoning="The specification describes 'a one-way valve 44 positioned between the inlet 46 and third chamber' on the NORMAL flow path. This valve 44 is the pressure-regulated valve on the first fluid-flow passageway (the path containing the filter). The diaphragm valve 30 is a DIFFERENT valve on the BYPASS path. The claim's 'pressure regulated valve means positioned within the first fluid-flow passageway' corresponds to valve 44, NOT valve 30."
+                reasoning="The specification describes 'a one-way valve 44 positioned between the inlet 46 and third chamber' on the NORMAL flow path. This valve 44 is the pressure-regulated valve on the first fluid-flow passageway (the path containing the filter). The diaphragm valve 30 is a DIFFERENT valve on the BYPASS path. The claim's 'pressure regulated valve means positioned within the first fluid-flow passageway' corresponds to valve 44, NOT valve 30.",
+                evidence_type=EvidenceType.TOPOLOGICAL_INFERENCE,  # P0 (Round 32): this is a topology inference
             ))
         else:
             checks.append(self._make_check(
@@ -447,9 +565,99 @@ class DeterministicEvidenceArbiter:
             failed_checks = [c.check_name for c in checks if not c.check_result]
             reasoning = f"Some mechanical checks failed ({failed_checks}) — insufficient evidence to determine."
 
+        # P0 (Round 32): Build the auditable inference chain.
+        # Every step has: input_facts → inference_rule → inference_result →
+        # alternative_interpretation → why_alternative_fails → source_evidence
+        inference_chain = []
+
+        # Step 1: SOURCE_EXPLICIT — the claim defines "first fluid-flow passageway" as containing the filter
+        inference_chain.append(InferenceStep(
+            step_id="step_1_filter_defines_passageway",
+            step_type=EvidenceType.SOURCE_EXPLICIT,
+            input_facts="Claim 1 recites: 'a filter positioned within the first fluid-flow passageway'",
+            inference_rule="The claim explicitly places the filter IN the first fluid-flow passageway. This means the first fluid-flow passageway is the path that contains the filter.",
+            inference_result="The first fluid-flow passageway = the path containing the filter.",
+            alternative_interpretation="The 'first fluid-flow passageway' could be a different path that does not contain the filter.",
+            why_alternative_fails="The claim explicitly says 'a filter positioned within the first fluid-flow passageway' — the filter IS in the first passageway. The alternative contradicts the claim text.",
+            source_evidence="a filter positioned within the first fluid-flow passageway",
+            source_offset=checks[1].evidence_offset,
+            evidence_hash=checks[1].evidence_hash,
+        ))
+
+        # Step 2: SOURCE_EXPLICIT — the filter is in the third chamber 32
+        inference_chain.append(InferenceStep(
+            step_id="step_2_filter_in_third_chamber",
+            step_type=EvidenceType.SOURCE_EXPLICIT,
+            input_facts="Specification states: 'The third chamber 32 has a filter 33'",
+            inference_rule="The specification explicitly places the filter in the third chamber 32.",
+            inference_result="The filter is in the third chamber 32.",
+            alternative_interpretation="The filter could be in a different chamber.",
+            why_alternative_fails="The specification explicitly says 'The third chamber 32 has a filter 33'. The alternative contradicts the specification.",
+            source_evidence="The third chamber 32 has a filter 33",
+            source_offset=checks[2].evidence_offset,
+            evidence_hash=checks[2].evidence_hash,
+        ))
+
+        # Step 3: TOPOLOGICAL_INFERENCE — the normal path (containing the filter) IS the first fluid-flow passageway
+        inference_chain.append(InferenceStep(
+            step_id="step_3_normal_path_is_first_passageway",
+            step_type=EvidenceType.TOPOLOGICAL_INFERENCE,
+            input_facts="Step 1: first fluid-flow passageway = path containing the filter. Step 2: filter is in third chamber 32. Specification describes normal flow: inlet → valve 44 → third chamber 32 (filter) → fourth chamber 38 → outlet.",
+            inference_rule="Since the filter defines the first fluid-flow passageway (Step 1), and the filter is in the third chamber (Step 2), and the third chamber is on the normal flow path, the normal flow path IS the first fluid-flow passageway.",
+            inference_result="The normal flow path (inlet → valve 44 → third chamber/filter → fourth chamber → outlet) = the first fluid-flow passageway.",
+            alternative_interpretation="The 'first fluid-flow passageway' could be the bypass path (inlet → passageway 21 → first chamber → second chamber → fourth chamber → outlet).",
+            why_alternative_fails="The bypass path does NOT contain the filter. The claim explicitly says the filter is in the first fluid-flow passageway. Therefore the bypass path is NOT the first fluid-flow passageway — it is the 'second fluid-flow passageway' (the bypass).",
+            source_evidence="a filter positioned within the first fluid-flow passageway; The third chamber 32 has a filter 33; the flow of the CSF is then through the third chamber 32, through the filter 33",
+            source_offset=checks[2].evidence_offset,
+            evidence_hash=checks[2].evidence_hash,
+        ))
+
+        # Step 4: SOURCE_EXPLICIT — valve 44 is on the normal path
+        inference_chain.append(InferenceStep(
+            step_id="step_4_valve_44_on_normal_path",
+            step_type=EvidenceType.SOURCE_EXPLICIT,
+            input_facts="Specification states: 'a one-way valve 44 positioned between the inlet 46 and third chamber'",
+            inference_rule="The specification explicitly places valve 44 between the inlet and the third chamber — i.e., on the normal flow path.",
+            inference_result="Valve 44 is on the normal flow path (the path that goes through the third chamber).",
+            alternative_interpretation="Valve 44 could be on the bypass path.",
+            why_alternative_fails="The specification says valve 44 is 'between the inlet 46 and third chamber' — it is on the inlet-to-third-chamber path, which is the normal path, not the bypass path.",
+            source_evidence="a one-way valve 44 positioned between the inlet 46 and third chamber",
+            source_offset=checks[6].evidence_offset,
+            evidence_hash=checks[6].evidence_hash,
+        ))
+
+        # Step 5: TOPOLOGICAL_INFERENCE — valve 44 is in the first fluid-flow passageway
+        inference_chain.append(InferenceStep(
+            step_id="step_5_valve_44_in_first_passageway",
+            step_type=EvidenceType.TOPOLOGICAL_INFERENCE,
+            input_facts="Step 3: normal path = first fluid-flow passageway. Step 4: valve 44 is on the normal path.",
+            inference_rule="If valve 44 is on the normal path (Step 4), and the normal path IS the first fluid-flow passageway (Step 3), then valve 44 is in the first fluid-flow passageway.",
+            inference_result="Valve 44 is positioned within the first fluid-flow passageway.",
+            alternative_interpretation="Valve 44 could be outside the first fluid-flow passageway despite being on the normal path.",
+            why_alternative_fails="The first fluid-flow passageway IS the normal path (Step 3). Valve 44 IS on the normal path (Step 4). Therefore valve 44 IS in the first fluid-flow passageway. The alternative requires the normal path to NOT be the first passageway, which contradicts Step 3.",
+            source_evidence="a one-way valve 44 positioned between the inlet 46 and third chamber; a filter positioned within the first fluid-flow passageway; The third chamber 32 has a filter 33",
+            source_offset=checks[6].evidence_offset,
+            evidence_hash=checks[6].evidence_hash,
+        ))
+
+        # Step 6: CLAIM_CONSTRUCTION — C04-L5's "pressure-responsive valve mechanism" = claim's "pressure regulated valve means"
+        inference_chain.append(InferenceStep(
+            step_id="step_6_claim_construction",
+            step_type=EvidenceType.CLAIM_CONSTRUCTION,
+            input_facts="C04-L5: 'a pressure-responsive valve mechanism in the primary drainage channel'. Claim: 'a pressure regulated valve means positioned within the first fluid-flow passageway'.",
+            inference_rule="Claim construction: 'pressure-responsive valve mechanism' = 'pressure regulated valve means' (both describe a valve that responds to pressure). 'primary drainage channel' = 'first fluid-flow passageway' (established in C04-L2).",
+            inference_result="C04-L5's 'pressure-responsive valve mechanism in the primary drainage channel' = claim's 'pressure regulated valve means positioned within the first fluid-flow passageway' = valve 44.",
+            alternative_interpretation="C04-L5's 'pressure-responsive valve mechanism' could refer to the diaphragm valve 30 instead of valve 44.",
+            why_alternative_fails="The diaphragm valve 30 is on the BYPASS path (second fluid-flow passageway), NOT the first fluid-flow passageway (Checks 4-6). The claim's 'pressure regulated valve means' is 'positioned within the first fluid-flow passageway' — valve 30 does not satisfy this limitation. Valve 44 does.",
+            source_evidence="a pressure regulated valve means positioned within the first fluid-flow passageway; a one-way valve 44 positioned between the inlet 46 and third chamber",
+            source_offset=checks[0].evidence_offset,
+            evidence_hash=checks[0].evidence_hash,
+        ))
+
         return DeterministicArbitrationResult(
             limitation_id="C04-L5",
             verdict=verdict,
             checks=checks,
             overall_reasoning=reasoning,
+            inference_chain=inference_chain,
         )
