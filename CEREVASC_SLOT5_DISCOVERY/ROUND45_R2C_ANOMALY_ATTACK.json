@@ -1,0 +1,150 @@
+{
+  "round": 45,
+  "timestamp": "2026-08-21T07:30:00Z",
+  "type": "R2C_ANOMALY_ATTACK",
+  "res2_decomposition": [
+    {
+      "id": "R2-A",
+      "problem": "True in-stent biological restenosis (intimal hyperplasia)",
+      "causal_chain": "stent implantation → foreign body response → intimal hyperplasia → in-stent narrowing → venous outflow obstruction → ICP elevation → symptom recurrence",
+      "evidence": "17.7% pooled restenosis (meta-analysis, 694 patients). Well-understood biological mechanism.",
+      "is_this_the_anomaly": false,
+      "notes": "This is the CONVENTIONAL restenosis story. Well-understood, well-studied. Not an anomaly."
+    },
+    {
+      "id": "R2-B",
+      "problem": "Stent-adjacent / new-site stenosis",
+      "causal_chain": "stent opens one segment → flow dynamics change → new stenosis develops adjacent to stent → venous outflow obstruction → ICP elevation → symptom recurrence",
+      "evidence": "Known phenomenon in vascular stenting. Less well-characterized in venous sinus stenting specifically.",
+      "is_this_the_anomaly": false,
+      "notes": "This is a MECHANICAL/flow-dynamics problem, not a biological anomaly."
+    },
+    {
+      "id": "R2-C",
+      "problem": "Symptom recurrence despite PERSISTENT pressure improvement",
+      "causal_chain": "VSS → venous pressure gradient improves → ICP reduces → papilledema improves → BUT symptoms (headache, visual symptoms, tinnitus) recur WITHOUT ICP elevation",
+      "evidence": "178-patient study: 57% symptomatic recurrence at ~390 days, with MANY patients showing continued ICP reduction and papilledema improvement. This is the ANOMALY.",
+      "is_this_the_anomaly": true,
+      "notes": "This DIRECTLY CONTRADICTS the standard causal model: stenosis → ICP → symptoms. If ICP is improved and papilledema is improved, but symptoms recur, the causal model is INCOMPLETE."
+    },
+    {
+      "id": "R2-D",
+      "problem": "Disease progression despite patent intervention",
+      "causal_chain": "VSS or eShunt treats the MECHANICAL problem → device remains patent → BUT underlying disease (obesity, hormonal, venous compliance) progresses → new physiology overwhelms the device → symptom recurrence",
+      "evidence": "IIH associated with obesity, hormonal changes. Disease progression is documented but not well-quantified.",
+      "is_this_the_anomaly": false,
+      "notes": "This is disease PROGRESSION — the device was right but the disease got worse. Different from R2-C where the device is STILL WORKING (ICP is still reduced) but symptoms recur."
+    },
+    {
+      "id": "R2-E",
+      "problem": "Failure to detect deterioration before vision damage",
+      "causal_chain": "device functions → deterioration begins → NO real-time monitoring → deterioration detected by symptoms/imaging → DELAYED detection → vision damage before intervention",
+      "evidence": "No existing device has integrated sensing. Clinical detection is delayed.",
+      "is_this_the_anomaly": false,
+      "notes": "This is a DETECTION gap, not a causal anomaly."
+    }
+  ],
+  "causal_contradiction": {
+    "standard_model": "stenosis → venous pressure gradient ↑ → ICP ↑ → papilledema → symptoms (headache, visual symptoms, tinnitus)",
+    "the_anomaly": "The 178-patient study found that 57% of VSS patients had symptomatic recurrence at ~390 days. CRITICALLY, many of these recurrent patients showed CONTINUED ICP reduction and papilledema improvement. This means:\n\n  - The venous pressure gradient was STILL improved (device was working)\n  - ICP was STILL reduced (the pressure variable was controlled)\n  - Papilledema was STILL improving (the objective sign was improving)\n  - BUT symptoms recurred (headache, visual symptoms, tinnitus)\n\nThis DIRECTLY CONTRADICTS the standard causal model. If stenosis → ICP → symptoms, and ICP is improved, symptoms should NOT recur. But they do.",
+    "the_question": "If venous pressure gradient and ICP improve, why do symptoms recur?",
+    "why_this_matters": "This is exactly the kind of anomaly from which breakthrough mechanisms emerge. The field may be solving the WRONG CAUSAL VARIABLE. If ICP is not the (only) cause of IIH symptoms, then ALL current treatments (VSS, eShunt, VP shunt, medical therapy) are addressing an incomplete causal model. The invention opportunity is NOT 'a better pressure-relief device' — it is addressing WHATEVER CAUSES SYMPTOMS INDEPENDENT OF ICP."
+  },
+  "possible_explanations": [
+    {
+      "id": "E1",
+      "domain": "Venous compliance",
+      "hypothesis": "VSS stents the stenosis but does not restore normal venous COMPLIANCE. The venous sinus becomes stiff (non-compliant) after stenting, altering venous pulse waveform and cerebral venous return dynamics. This could cause symptoms (headache, pulsatile tinnitus) even with normal mean ICP.",
+      "why_it_survives_all_competitors": "Stents are RIGID structures. River/BosSTENT aim for better anatomy matching but are still metal scaffolds. They cannot restore physiological venous COMPLIANCE. The eShunt bypasses the sinus but does not restore venous compliance either — it diverts CSF, not venous blood.",
+      "falsifiable": true,
+      "how_to_test": "Measure venous pulse waveform and compliance before/after VSS. Compare symptom recurrence in patients with restored compliance vs. those with persistent non-compliance."
+    },
+    {
+      "id": "E2",
+      "domain": "CSF absorption",
+      "hypothesis": "IIH may involve impaired CSF absorption (arachnoid granulations) independent of venous pressure. VSS improves venous outflow, which improves the PRESSURE GRADIENT for CSF absorption, but if the arachnoid granulations themselves are dysfunctional, CSF absorption remains impaired even with normal venous pressure.",
+      "why_it_survives_all_competitors": "No existing treatment (VSS, eShunt, VP shunt, medical therapy) addresses arachnoid granulation function. They all address PRESSURE (venous or CSF), not ABSORPTION CAPACITY. If absorption is impaired, draining CSF (eShunt/VP) or improving venous outflow (VSS) treats the CONSEQUENCE (elevated pressure) but not the CAUSE (impaired absorption).",
+      "falsifiable": true,
+      "how_to_test": "Measure CSF absorption capacity (infusion test) before/after VSS. Compare absorption capacity in recurrent vs. non-recurrent patients."
+    },
+    {
+      "id": "E3",
+      "domain": "Cerebral perfusion",
+      "hypothesis": "VSS improves venous outflow but may alter cerebral perfusion dynamics. Reduced venous pressure could change cerebral blood flow (CBF) autoregulation. If CBF is altered (too low or too high), symptoms (headache, visual symptoms) could occur despite normal ICP.",
+      "why_it_survives_all_competitors": "No existing IIH treatment monitors or controls cerebral perfusion. All focus on PRESSURE (venous or CSF). If perfusion is the missing variable, no current trajectory (better stents, better shunts, better drugs) naturally addresses it.",
+      "falsifiable": true,
+      "how_to_test": "Measure CBF (perfusion MRI/CT) before/after VSS. Compare CBF in recurrent vs. non-recurrent patients."
+    },
+    {
+      "id": "E4",
+      "domain": "Optic nerve injury persistence",
+      "hypothesis": "The initial period of elevated ICP causes optic nerve damage (axonal injury, demyelination). Even after ICP is normalized, the optic nerve does NOT fully recover. Symptoms (visual disturbance) persist or recur because the NERVE is damaged, not because the PRESSURE is elevated.",
+      "why_it_survives_all_competitors": "No existing treatment addresses optic nerve REPAIR. All focus on reducing pressure. If the nerve is already damaged, pressure reduction is necessary but NOT SUFFICIENT — the nerve needs to heal, which may require a different intervention (neuroprotective, regenerative).",
+      "falsifiable": true,
+      "how_to_test": "Measure optic nerve structure (OCT) and function (visual fields, VEP) longitudinally after VSS. Look for persistent nerve damage in patients with recurring visual symptoms despite normal ICP."
+    },
+    {
+      "id": "E5",
+      "domain": "Central sensitization",
+      "hypothesis": "Chronic IIH causes central sensitization (the brain's pain system becomes hyperactive). Even after ICP is normalized, the sensitized pain system continues to generate headache. This is analogous to medication-overuse headache or post-concussion syndrome — the original trigger is removed but the pain persists.",
+      "why_it_survives_all_competitors": "No existing IIH treatment addresses central pain sensitization. All focus on the TRIGGER (pressure). If the pain system is sensitized, removing the trigger is necessary but NOT SUFFICIENT — the sensitization requires a different treatment (neuromodulation, pain management).",
+      "falsifiable": true,
+      "how_to_test": "Measure pain thresholds, QST (quantitative sensory testing), and brain imaging (fMRI of pain networks) in recurrent vs. non-recurrent patients. Look for sensitization markers in patients with recurring headache despite normal ICP."
+    },
+    {
+      "id": "E6",
+      "domain": "Measurement mismatch",
+      "hypothesis": "ICP measurement may not capture the RELEVANT pressure variable. Mean ICP can be normal while PULSE PRESSURE (the amplitude of ICP fluctuations) is abnormal. VSS may reduce mean ICP but not normalize pulse pressure — and pulse pressure may be what drives symptoms.",
+      "why_it_survives_all_competitors": "No existing treatment targets ICP PULSE PRESSURE. All focus on mean ICP. If pulse pressure is the missing variable, none of the current trajectories (better stents, better shunts, better drugs) naturally addresses it — they all reduce MEAN pressure.",
+      "falsifiable": true,
+      "how_to_test": "Measure ICP pulse amplitude (via lumbar drain or implanted sensor) before/after VSS. Compare pulse amplitude in recurrent vs. non-recurrent patients."
+    },
+    {
+      "id": "E7",
+      "domain": "Disease biology (non-pressure)",
+      "hypothesis": "IIH may have a non-pressure component that causes symptoms directly. For example, elevated CSF levels of inflammatory mediators, vitamin A derivatives, or other molecules could cause headache and visual symptoms independent of pressure. VSS/eShunt reduce pressure but do not change CSF composition.",
+      "why_it_survives_all_competitors": "No existing treatment addresses CSF COMPOSITION. All focus on CSF PRESSURE. If CSF composition is the missing variable, none of the current trajectories naturally addresses it.",
+      "falsifiable": true,
+      "how_to_test": "Measure CSF biomarkers (inflammatory, metabolic) in recurrent vs. non-recurrent patients. Look for elevated molecules in patients with recurring symptoms despite normal ICP."
+    },
+    {
+      "id": "E8",
+      "domain": "Sleep-disordered breathing",
+      "hypothesis": "Many IIH patients have obstructive sleep apnea (OSA). OSA causes nocturnal ICP spikes (via hypercapnia and venous congestion). VSS may improve daytime ICP but NOT nocturnal ICP spikes from OSA. Symptoms recur because the patient is still experiencing nocturnal pressure spikes that the stent cannot prevent.",
+      "why_it_survives_all_competitors": "VSS and eShunt are mechanical devices that cannot treat OSA. Medical therapy (acetazolamide) does not treat OSA. If OSA is driving recurrence, the stent/shunt is working but the OSA is counteracting it at night. No IIH treatment trajectory naturally addresses OSA.",
+      "falsifiable": true,
+      "how_to_test": "Measure nocturnal ICP (via implanted sensor) in VSS patients with and without OSA. Compare symptom recurrence rates in OSA-treated vs. untreated patients."
+    }
+  ],
+  "corrected_competitor_frontier": {
+    "assumption": "Assume ALL of the following succeed:\n  - River/BosSTENT become excellent venous stents (restenosis drops to 5-10%)\n  - eShunt becomes an excellent CSF-diversion device (approved for NPH and IIH)\n  - Medical therapy improves (better acetazolamide alternatives)\n  - Monitoring improves (smart shunts, non-invasive ICP monitoring)\n\nWhat failure remains that NONE of those trajectories naturally solves?",
+    "the_answer": "R2-C: Symptom recurrence despite preserved pressure improvement.\n\nIf the standard model (stenosis → ICP → symptoms) is INCOMPLETE, then:\n  - Better stents solve the STENOSIS but not the non-pressure symptom cause\n  - Better shunts solve the ICP but not the non-pressure symptom cause\n  - Better drugs may or may not address the non-pressure cause\n  - Better monitoring DETECTS the recurrence but doesn't PREVENT it\n\nThe competitor-resistant residual is: the CAUSAL VARIABLE that drives symptoms INDEPENDENT of ICP. If this variable exists (and the 57% recurrence despite ICP improvement suggests it does), then NO pressure-relief trajectory can solve it — by definition, because it is NOT a pressure problem.",
+    "which_explanations_survive_all_trajectories": [
+      "E1 (venous compliance): stents are rigid, eShunt bypasses sinus — neither restores compliance",
+      "E2 (CSF absorption): no treatment addresses arachnoid granulation function",
+      "E3 (cerebral perfusion): no treatment monitors or controls CBF",
+      "E4 (optic nerve injury): no treatment addresses nerve repair",
+      "E5 (central sensitization): no treatment addresses pain system sensitization",
+      "E6 (measurement mismatch): no treatment targets pulse pressure",
+      "E7 (CSF composition): no treatment addresses CSF biomolecules",
+      "E8 (sleep-disordered breathing): no IIH treatment addresses OSA"
+    ],
+    "the_invention_territory": "The invention territory is NOT 'a better pressure-relief device.' It is: IDENTIFYING AND ADDRESSING THE NON-PRESSURE CAUSAL VARIABLE that drives IIH symptom recurrence despite adequate pressure control.\n\nThis is fundamentally different from all existing trajectories because it asks: what if the field has been solving the wrong variable?"
+  },
+  "verdict": {
+    "problem_id": "R2-C",
+    "problem": "Symptom recurrence in IIH patients despite sustained ICP improvement after VSS — an anomaly that contradicts the standard causal model (stenosis → ICP → symptoms)",
+    "evidence": "57% symptomatic recurrence at ~390 days, with many recurrent patients showing continued ICP reduction and papilledema improvement (178-patient prospective study)",
+    "anomaly_significance": "This suggests the field may be solving the WRONG CAUSAL VARIABLE. If ICP is not the (only) cause of symptoms, all pressure-relief devices (VSS, eShunt, VP shunt) are addressing an incomplete model.",
+    "competitor_resistant": true,
+    "competitor_resistance_reason": "No pressure-relief trajectory (better stents, better shunts, better drugs, better monitoring) can solve a non-pressure problem. The residual survives ALL trajectories BY DEFINITION if it is truly non-pressure.",
+    "gate_status": "YELLOW → APPROACHING GREEN — the anomaly is evidence-dense, competitor-resistant, and challenges the fundamental causal model. But the SPECIFIC non-pressure variable has not yet been identified.",
+    "next_steps": [
+      "1. Identify which of E1-E8 is the most plausible explanation for the anomaly",
+      "2. Source-bind evidence for that explanation (clinical data, biomarker studies, imaging studies)",
+      "3. Determine if the explanation is ADDRESSABLE by a new mechanism (not just 'understand the biology')",
+      "4. If yes → mechanism generation. If no → the anomaly is scientifically interesting but not an invention opportunity."
+    ],
+    "mechanism_status": "UNPROPOSED — but the problem is now SHARPLY DEFINED: what non-pressure variable causes IIH symptom recurrence despite adequate pressure control?"
+  }
+}
