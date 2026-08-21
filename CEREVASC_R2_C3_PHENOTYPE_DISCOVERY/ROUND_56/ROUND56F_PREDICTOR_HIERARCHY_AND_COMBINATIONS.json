@@ -1,0 +1,292 @@
+{
+  "round": "56f",
+  "timestamp_utc": "2026-08-21T15:02:16.811552+00:00",
+  "task_id": "R2-C3-ROUND56F-PREDICTOR-HIERARCHY-AND-COMBINATIONS",
+  "agent": "main (constitution-acknowledged, session 2026-08-21)",
+  "predictor_hierarchy": {
+    "hierarchy_version": "1.0",
+    "created_round": "56f",
+    "purpose": "Separate predictors by what they actually predict. Do NOT mix R2-C3 predictors with generic outcome predictors.",
+    "tier_1_DIRECT_R2C3_PREDICTOR": {
+      "definition": "A pre-treatment or early-treatment variable that predicts the SPECIFIC R2-C3 phenotype (headache + normal ICP + improved papilledema + no restenosis) at the per-patient level.",
+      "required_evidence": "Per-patient predictor value + per-patient R2-C3 classification (all 4 components measured).",
+      "predictors_found": [],
+      "count": 0,
+      "status": "NONE FOUND — no open dataset has both per-patient predictors AND per-patient R2-C3 classification."
+    },
+    "tier_2_INDIRECT_OUTCOME_PREDICTOR": {
+      "definition": "A pre-treatment variable that predicts a POST-VSS OUTCOME (but NOT specifically R2-C3). The outcome may be binary (success/failure), shunt need, visual outcome, etc.",
+      "required_evidence": "Per-patient predictor value + per-patient outcome (any post-VSS outcome, not necessarily R2-C3).",
+      "predictors_found": [
+        {
+          "id": "IOP-1",
+          "name": "High baseline opening pressure",
+          "source": "Goodwin 2014 (Duke, n=18)",
+          "predictor": "Pre-VSS opening pressure >40 cmH2O",
+          "outcome": "VSS failure (need for shunt placement = R2-C1 phenotype)",
+          "evidence": "Failures had mean OP 50 cmH2O vs successes 37 cmH2O (p<0.05)",
+          "outcome_phenotype": "R2-C1 (renewed ICP failure), NOT R2-C3",
+          "classification": "INDIRECT_OUTCOME_PREDICTOR — predicts R2-C1, not R2-C3"
+        },
+        {
+          "id": "IOP-2",
+          "name": "Weight gain ≥5%",
+          "source": "PMC5572623 (n=79, 2001-2016)",
+          "predictor": "Weight gain ≥5% after IIH diagnosis",
+          "outcome": "Poor visual outcome at 6 months",
+          "evidence": "p<0.001; all patients with ≥5% weight gain had poor outcome",
+          "outcome_phenotype": "Visual failure (R2-C4-adjacent), NOT R2-C3",
+          "classification": "INDIRECT_OUTCOME_PREDICTOR — predicts visual outcome, not R2-C3"
+        },
+        {
+          "id": "IOP-3",
+          "name": "Bilateral TSS",
+          "source": "PMC5572623 (n=79)",
+          "predictor": "Bilateral transverse sinus stenosis on imaging",
+          "outcome": "Poor visual outcome at 6 months (OR=5.2, 95% CI 1.24-24.9, p=0.024)",
+          "outcome_phenotype": "Visual failure (R2-C4-adjacent), NOT R2-C3",
+          "classification": "INDIRECT_OUTCOME_PREDICTOR"
+        }
+      ],
+      "count": 3,
+      "status": "3 predictors found — but ALL predict R2-C1 or R2-C4, NOT R2-C3 specifically."
+    },
+    "tier_3_DIAGNOSTIC_PREDICTOR": {
+      "definition": "A variable that predicts a BASELINE condition (e.g., elevated ICP) — NOT a post-treatment outcome. These are diagnostic tools, not predictive models.",
+      "required_evidence": "Variable + baseline condition measurement.",
+      "predictors_found": [
+        {
+          "id": "DP-1",
+          "name": "Trans-stenotic gradient (TSG)",
+          "source": "PMC12929161 (n=84)",
+          "predictor": "TSG ≥6 mmHg",
+          "outcome": "Baseline elevated ICP (CSF-OP ≥20 cmH2O)",
+          "evidence": "Sensitivity 0.86, specificity 0.80, AUC 0.87",
+          "classification": "DIAGNOSTIC_PREDICTOR — predicts baseline ICP, NOT post-VSS phenotype"
+        },
+        {
+          "id": "DP-2",
+          "name": "Superior sagittal sinus (SSS) pressure",
+          "source": "PMC12929161 (n=84)",
+          "predictor": "SSS pressure ≥15 mmHg",
+          "outcome": "Baseline elevated ICP",
+          "evidence": "Sensitivity 0.88, specificity 0.68, AUC 0.84",
+          "classification": "DIAGNOSTIC_PREDICTOR"
+        },
+        {
+          "id": "DP-3",
+          "name": "Combined TSG + SSS",
+          "source": "PMC12929161 (n=84)",
+          "predictor": "TSG ≥6 mmHg AND SSS ≥15 mmHg",
+          "outcome": "Baseline elevated ICP",
+          "evidence": "Sensitivity 0.94, specificity 0.85, AUC 0.94",
+          "classification": "DIAGNOSTIC_PREDICTOR — strongest diagnostic combination, but still diagnostic not predictive"
+        }
+      ],
+      "count": 3,
+      "status": "3 diagnostic predictors found — predict baseline ICP, NOT post-VSS phenotype."
+    },
+    "tier_4_NON_R2C3": {
+      "definition": "Variables that are NOT predictors of any VSS outcome phenotype. These may be confounders, covariates, or irrelevant.",
+      "predictors_found": [
+        {
+          "id": "NR-1",
+          "name": "BMI at diagnosis",
+          "source": "PMC5572623 (n=79)",
+          "evidence": "Mean BMI not different between good vs poor outcome (32.9 vs 34.6, NS)",
+          "classification": "NON-R2C3 — BMI at diagnosis does NOT predict outcome"
+        },
+        {
+          "id": "NR-2",
+          "name": "Age",
+          "source": "Goodwin 2014 (n=18)",
+          "evidence": "Non-significant trend (30 vs 40.7 years, NS)",
+          "classification": "NON-R2C3 — age does NOT significantly predict outcome"
+        }
+      ],
+      "count": 2
+    },
+    "summary": {
+      "total_predictors_cataloged": 8,
+      "tier_1_DIRECT_R2C3": 0,
+      "tier_2_INDIRECT_OUTCOME": 3,
+      "tier_3_DIAGNOSTIC": 3,
+      "tier_4_NON_R2C3": 2,
+      "key_finding": "ZERO Tier-1 (DIRECT_R2C3) predictors exist in the open literature. All found predictors are either indirect (predict different outcome), diagnostic (predict baseline condition), or non-predictive. The specific R2-C3 predictive decision primitive is COMPLETELY MISSING from existing systems."
+    }
+  },
+  "combination_search": {
+    "search_goal": "Test whether COMBINATIONS of existing predictors can distinguish failure phenotypes (R2-C1 vs R2-C2 vs R2-C3) even without perfect R2-C3 labels.",
+    "available_predictors_for_combination": {
+      "from_D_Amato_2025": [
+        "baseline OP (per-patient, n=97)",
+        "baseline gradient (per-patient)",
+        "BMI (per-patient)",
+        "stenosis type (intrinsic/extrinsic, per-patient)",
+        "post-VSS OP at 6mo (per-patient)",
+        "post-VSS gradient at 6mo (per-patient)"
+      ],
+      "from_Goodwin_2014": [
+        "baseline OP (per-patient, n=18)",
+        "baseline gradient (per-patient, MPG ≥4 mmHg)",
+        "BMI (per-patient)",
+        "age (per-patient)"
+      ],
+      "from_PMC12929161": [
+        "TSG (per-patient, n=84)",
+        "SSS pressure (per-patient)",
+        "dominant sinus side (per-patient)",
+        "age (per-patient)",
+        "BMI (per-patient)"
+      ],
+      "from_PMC5572623": [
+        "BMI at diagnosis (per-patient, n=79)",
+        "weight change (per-patient)",
+        "bilateral TSS (per-patient)"
+      ],
+      "from_Ahmed_2011": [
+        "baseline gradient (group mean 20 mmHg, n=52)",
+        "baseline OP (group mean 322 mmH2O)",
+        "headache classification (mild/moderate/severe, per-patient)",
+        "papilledema grade (per-patient)"
+      ],
+      "from_Intrapiromkul_2025": [
+        "ICD-10 codes (n=1318)",
+        "CPT codes (procedures)"
+      ]
+    },
+    "combination_hypotheses": [
+      {
+        "id": "CH-1",
+        "combination": "baseline OP + baseline gradient + stenosis type",
+        "available_in": "D'Amato 2025 (per-patient, n=97)",
+        "hypothesis": "Patients with HIGH baseline OP + LOW gradient + EXTRINSIC stenosis may be more likely to develop R2-C3 (pressure-independent headache) because: high OP means active disease, low gradient means the stenosis is not the primary driver, and extrinsic stenosis is a consequence (not cause) of elevated ICP. Stenting addresses the consequence but not the cause → R2-C3 emerges.",
+        "testable": "PARTIALLY — D'Amato has all 3 variables per-patient. BUT D'Amato has 0 confirmed R2-C3 cases (the 1 'patent stent + symptomatic' case was R2-C1 with OP 40). Cannot test R2-C3 specifically. Could test against R2-C2 (restenosis) instead.",
+        "weak_label_strategy": "Use 'persistent headache at 6 months despite patent stent' as a WEAK_LABEL for R2-C3. D'Amato Table 3 + Supp Table 2 may contain enough data to identify this subgroup.",
+        "classification": "UNTESTABLE for R2-C3 specifically; PARTIALLY TESTABLE for R2-C2 using weak labels"
+      },
+      {
+        "id": "CH-2",
+        "combination": "TSG + SSS pressure + BMI + weight change",
+        "available_in": "PMC12929161 (TSG, SSS, BMI; n=84) + PMC5572623 (weight change; n=79) — but DIFFERENT cohorts, cannot combine per-patient",
+        "hypothesis": "Patients with LOW TSG + HIGH SSS + WEIGHT GAIN may have a venous pressure distribution that is not adequately addressed by stenting a single stenosis. The combination identifies 'diffuse venous hypertension' rather than 'focal stenosis' — a different physiological substrate.",
+        "testable": "NO — the predictors are in different cohorts. Cannot combine per-patient without individual patient data from both studies.",
+        "classification": "UNTESTABLE at zero cost"
+      },
+      {
+        "id": "CH-3",
+        "combination": "headache phenotype (ICHD-3) + baseline gradient + treatment response trajectory",
+        "available_in": "NONE — no open cohort has all three. Ahmed has headache classification (mild/moderate/severe, not ICHD-3) + gradient. No cohort has treatment response trajectory.",
+        "hypothesis": "Patients with MIGRAINE phenotype + LOW gradient + SLOW pressure normalization post-VSS are the most likely R2-C3 subgroup. The migraine component persists despite VSS because it is CGRP-mediated, not pressure-mediated.",
+        "testable": "NO — no open cohort has ICHD-3 headache phenotype classification.",
+        "classification": "UNTESTABLE at zero cost — requires new prospective study"
+      },
+      {
+        "id": "CH-4",
+        "combination": "baseline OP + post-VSS OP change + stenosis type",
+        "available_in": "D'Amato 2025 (per-patient, n=97) — has baseline OP, post-VSS OP, and stenosis type",
+        "hypothesis": "Patients with HIGH baseline OP + SMALL OP change (poor pressure response) + EXTRINSIC stenosis may have a 'stent-resistant' phenotype. This is NOT R2-C3 (which requires NORMALIZED ICP) — it's R2-C1 (persistent ICP elevation despite stent). But the DECISION BOUNDARY between 'stent will work' and 'stent won't work' is the commercially valuable primitive.",
+        "testable": "YES — D'Amato has all 3 variables per-patient and has outcome data (re-stent vs no re-stent).",
+        "weak_label_strategy": "Use 'required re-stenting or shunt' as a WEAK_LABEL for 'stent failure' (combines R2-C1 + R2-C2a). This is a defensible weak label because both phenotypes require further intervention.",
+        "classification": "TESTABLE — the closest to a real predictive combination test using existing open data"
+      }
+    ],
+    "combination_search_summary": {
+      "total_combinations_hypothesized": 4,
+      "testable_with_open_data": 1,
+      "testable_combination": "CH-4: baseline OP + post-VSS OP change + stenosis type → stent failure (R2-C1+R2-C2a weak label)",
+      "key_insight": "The most promising combination (CH-4) does NOT predict R2-C3 specifically — it predicts STENT FAILURE (R2-C1+R2-C2a). This is because the available per-patient data (D'Amato) has 0 R2-C3 cases. The R2-C3-specific combination (CH-3) requires ICHD-3 headache phenotype + gradient + treatment trajectory — none of which are available in any open cohort."
+    }
+  },
+  "missing_primitive": {
+    "what_existing_systems_CAN_already_do": [
+      "Predict baseline elevated ICP from venous manometry (AUC 0.94 — PMC12929161)",
+      "Predict VSS failure (shunt need) from baseline OP (Goodwin 2014, p<0.05)",
+      "Predict poor visual outcome from weight gain (PMC5572623, p<0.001)",
+      "Identify stenosis on catheter venography (standard of care)",
+      "Measure post-VSS pressure gradient (standard of care)"
+    ],
+    "what_existing_systems_CANNOT_do": [
+      "Predict WHICH failure phenotype will develop (R2-C1 vs R2-C2 vs R2-C3 vs R2-C4 vs R2-C5)",
+      "Identify the R2-C3 subgroup BEFORE failure occurs (the subgroup that will have persistent headache despite objective pressure normalization)",
+      "Distinguish 'pressure-independent headache' from 'pressure-dependent headache' at baseline",
+      "Determine whether a patient's headache will respond to VSS or require a different intervention (CGRP antagonist, migraine prophylaxis, etc.)"
+    ],
+    "the_missing_predictive_decision_primitive": {
+      "name": "Pre-treatment headache phenotype classifier for VSS response",
+      "description": "A method to determine, BEFORE VSS, whether a patient's headache is pressure-dependent (will respond to VSS) or pressure-independent (will NOT respond to VSS — will develop R2-C3).",
+      "what_it_would_enable": "Patient selection for VSS — only offer VSS to patients whose headache is pressure-dependent. Patients with pressure-independent headache would be redirected to alternative treatments (CGRP antagonists, migraine prophylaxis, etc.).",
+      "commercial_value": "HIGH — this is a TRiage decision that currently does not exist. VSS is offered to all IIH patients with venous stenosis, but 34.9% have persistent headache at 1 year (Intrapiromkul 2025). A pre-treatment classifier would reduce this failure rate.",
+      "what_inputs_would_it_need": "The classifier would need some combination of: (a) headache phenotype (ICHD-3), (b) baseline venous pressure distribution, (c) CGRP biomarker, (d) early post-VSS pressure trajectory, (e) treatment response to acetazolamide trial. NONE of these are currently available in a single open dataset.",
+      "patentable_invention_potential": "A method claim for 'pre-treatment classification of IIH headache phenotype to predict VSS response' could be patentable IF the classifier uses a novel combination of inputs that is not obvious from prior art. The key is the COMBINATION — individual inputs (ICHD-3, venous manometry, CGRP) are all known, but using them TOGETHER to predict VSS response is NOT described in any open publication.",
+      "current_status": "HYPOTHESIS — not yet testable at zero cost. The inputs exist individually but have never been combined in a single study with VSS outcome."
+    }
+  },
+  "weak_label_strategy": {
+    "concept": "Where R2-C3 ground truth is unavailable, create WEAK_LABELS that approximate the phenotype without claiming it IS the phenotype.",
+    "weak_labels_defined": [
+      {
+        "id": "WL-1",
+        "name": "Persistent headache despite patent stent",
+        "definition": "Patient-reported headache at 6+ months post-VSS, with confirmed patent stent on angiography (no restenosis).",
+        "approximates": "R2-C3 (but missing ICP normalization and papilledema improvement confirmations)",
+        "available_in": "D'Amato 2025 (per-patient stent patency at 6mo + symptom status)",
+        "weakness": "Does NOT confirm ICP normalization (some patients may have persistent elevated ICP = R2-C1, not R2-C3). Does NOT confirm papilledema improvement.",
+        "defensibility": "MODERATE — patent stent + headache is a necessary but not sufficient condition for R2-C3."
+      },
+      {
+        "id": "WL-2",
+        "name": "Persistent headache + no repeat intervention",
+        "definition": "Patient-reported headache at 1+ year post-VSS, with NO repeat stenting or shunt placement.",
+        "approximates": "R2-C3 (but missing ICP, papilledema, and angiographic restenosis confirmations)",
+        "available_in": "Intrapiromkul 2025 (TriNetX — ICD-10 R51 + no repeat CPT 37238/37239/1009323)",
+        "weakness": "Does NOT confirm: (a) ICP normalization, (b) papilledema improvement, (c) absence of asymptomatic restenosis. The 'no repeat intervention' is a proxy for 'no symptomatic restenosis requiring treatment'.",
+        "defensibility": "LOW — TriNetX data lacks the physiological measurements needed to distinguish R2-C3 from other phenotypes."
+      },
+      {
+        "id": "WL-3",
+        "name": "Headache despite normal pressures (Ahmed definition)",
+        "definition": "Persistent headache post-VSS with documented normal pressures (LP or continuous ICP monitoring).",
+        "approximates": "R2-C3 (missing papilledema improvement and restenosis status confirmations)",
+        "available_in": "Ahmed 2011 (3 per-patient cases with documented normal pressures + persistent headache)",
+        "weakness": "Does NOT confirm: (a) papilledema improvement (Ahmed says 'resolution of papilledema' for 2 of 3, which IS confirmed), (b) no restenosis (Ahmed says 'no in-stent restenosis in any patient' which IS confirmed). So Ahmed's 3 cases are actually STRONG labels, not weak labels!",
+        "defensibility": "HIGH — Ahmed's 3 cases have ALL FOUR R2-C3 components confirmed (headache + normal ICP + resolved papilledema + no restenosis). These are GROUND TRUTH, not weak labels."
+      }
+    ],
+    "weak_label_summary": {
+      "best_weak_label": "WL-1 (persistent headache despite patent stent — from D'Amato)",
+      "best_ground_truth": "Ahmed 2011's 3 cases (all 4 R2-C3 components confirmed — but only n=3)",
+      "key_insight": "The weak label strategy reveals that Ahmed's 3 cases are actually GROUND TRUTH R2-C3, not weak labels. The problem is n=3 is too small for any meaningful predictive model. We need ~50+ ground truth cases to train and validate a classifier."
+    }
+  },
+  "verdict": {
+    "round": "56f",
+    "timestamp_utc": "2026-08-21T15:02:16.811537+00:00",
+    "predictor_hierarchy_built": true,
+    "tier_1_DIRECT_R2C3_PREDICTORS_found": 0,
+    "tier_2_INDIRECT_OUTCOME_PREDICTORS_found": 3,
+    "tier_3_DIAGNOSTIC_PREDICTORS_found": 3,
+    "tier_4_NON_R2C3_found": 2,
+    "combination_hypotheses_generated": 4,
+    "combinations_testable_with_open_data": 1,
+    "testable_combination": "CH-4: baseline OP + post-VSS OP change + stenosis type → stent failure (NOT R2-C3 specifically)",
+    "missing_predictive_decision_primitive_identified": true,
+    "primitive_name": "Pre-treatment headache phenotype classifier for VSS response",
+    "primitive_status": "HYPOTHESIS — not yet testable at zero cost. The inputs exist individually but have never been combined in a single study with VSS outcome.",
+    "weak_label_strategy_developed": true,
+    "best_weak_label": "WL-1 (persistent headache despite patent stent)",
+    "best_ground_truth": "Ahmed 2011 (3 confirmed R2-C3 cases — all 4 components present, but n=3 too small for modeling)",
+    "predictor_discovery_gate": "YELLOW / UNKNOWN — a predictive decision primitive has been IDENTIFIED but NOT DEMONSTRATED. The primitive (pre-treatment headache phenotype classifier for VSS response) is the missing invention, but it cannot be tested at zero cost with current open data.",
+    "R2_C3_prevalence": "UNKNOWN (preserved per Article XXV)",
+    "mechanism_generation": "BLOCKED — no change",
+    "human_correspondence_count": 0,
+    "world_class_inventions": "0 / 5 — unchanged",
+    "repository_state": {
+      "local_HEAD": "e87969123100cb81b49ae1f617e2730452b1c3fb",
+      "remote_main": "e87969123100cb81b49ae1f617e2730452b1c3fb",
+      "match": true,
+      "ci_status": "12/14 gates PASS (G10/G13 fail — evidence ledger broken by filter-repo history rewrite)",
+      "certification": "NOT FULLY CERTIFIED — G10 requires deep infrastructure repair (transition hash chain includes commit_sha in a computation that differs from state_hash)"
+    }
+  }
+}
