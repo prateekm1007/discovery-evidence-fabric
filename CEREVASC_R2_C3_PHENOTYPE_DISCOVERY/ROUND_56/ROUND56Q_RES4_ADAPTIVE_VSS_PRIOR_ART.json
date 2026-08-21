@@ -1,0 +1,174 @@
+{
+  "round": "56q",
+  "timestamp_utc": "2026-08-21T21:00:00+00:00",
+  "task_id": "RES4-ROUND56Q-ADAPTIVE-VSS-PRIOR-ART-AND-TECHNICAL-EFFECT",
+  "agent": "main (constitution-acknowledged, session 2026-08-21)",
+
+  "constitution_recertification": {
+    "version": "1.5.0",
+    "pre_session_check_acknowledged": true,
+    "articles_applied": ["V", "XXI", "XXVIII", "XXXII", "XXXIV"]
+  },
+
+  "repository_state_per_article_xxiii": {
+    "local_HEAD": "950ebaf365bb0a62489255ba2a0bed226b8f6a99",
+    "remote_main": "950ebaf365bb0a62489255ba2a0bed226b8f6a99",
+    "match": true,
+    "ci_status": "Coder-reported 12/14 GREEN, G10/G13 RED. NOT independently verified.",
+    "certification": "NOT CERTIFIED — RESEARCH STATE only"
+  },
+
+  "res4_variable_analysis": {
+    "question": "What dynamic physiological variable changes venous sinus stent behavior in a way a shunt CANNOT reproduce?",
+
+    "key_architectural_distinction": {
+      "shunt": "Controls CSF FLOW RATE by adjusting valve (CSF→venous drainage). Operates on CSF-venous pressure differential. Does NOT interact with venous outflow capacity.",
+      "static_vss": "Controls VENOUS OUTFLOW CAPACITY by maintaining lumen diameter (venous→venous). Fixed diameter → fixed max outflow capacity. Cannot adapt to changing demand.",
+      "adaptive_vss_hypothesis": "REGULATES venous outflow capacity by variable diameter/flow element. Can increase or decrease outflow in response to changing physiology."
+    },
+
+    "variables_assessed": [
+      {
+        "id": "V1",
+        "name": "Trans-stenotic gradient (venous-to-venous)",
+        "ce_013": "PARTIALLY independent — venous gradient is different from CSF-venous differential, but both are pressure measurements",
+        "ce_012_risk": "Measuring a different gradient is 'more of the same variable'",
+        "verdict": "WEAK — risks CE-012 (same variable, different location)"
+      },
+      {
+        "id": "V2",
+        "name": "Venous outflow RESERVE (capacity to increase flow when demand increases)",
+        "description": "The maximum venous outflow capacity of the stented sinus. A static stent has fixed capacity; if physiological demand exceeds capacity, ICP rises. A shunt CANNOT increase venous outflow — it bypasses the venous system entirely.",
+        "ce_013": "PASSES — venous outflow capacity is UPSTREAM of CSF pressure (venous outflow → venous pressure → CSF absorption → CSF pressure). Shunts measure the downstream consequence. VSS would regulate the upstream cause.",
+        "ce_012": "PARTIALLY PASSES — 'dynamic venous outflow regulation' is a technical effect that neither shunts (bypass venous system) nor static stents (fixed diameter) can achieve. BUT the mechanism (variable diameter) may face §103 from shape-memory or hydraulic stent art.",
+        "verdict": "STRONGEST — genuinely new technical effect (regulatable venous outflow)"
+      },
+      {
+        "id": "V3",
+        "name": "Sinus wall-stent interaction (mechanical coupling)",
+        "ce_013": "PASSES — this interaction is unique to VSS architecture; shunts do not contact sinus wall",
+        "ce_012": "Potentially new, but this is a DEVICE FAILURE mode (restenosis), not a physiological variable to be regulated",
+        "verdict": "MODERATE — relevant for monitoring but not for the core technical effect"
+      },
+      {
+        "id": "V4",
+        "name": "Pressure-flow hysteresis in venous sinus",
+        "ce_013": "UNKNOWN — need to check if downstream of ICP",
+        "verdict": "UNTESTED — insufficient information"
+      }
+    ],
+
+    "strongest_variable": "V2 (Venous outflow reserve / regulatable venous outflow capacity)"
+  },
+
+  "prior_art_attack": {
+    "searches_executed": 12,
+    "total_unique_urls": 62,
+    "patent_hits": 7,
+    "literature_hits": 55,
+
+    "patents_found": [
+      {
+        "patent_id": "US6053873A",
+        "title": "Pressure-sensing stent (2000)",
+        "relevance": "Sensing stent concept exists (arterial). Flow parameter sensor on stent. But ARTERIAL, not venous sinus. Not adaptive (senses but does not adjust)."
+      },
+      {
+        "patent_id": "AU2020207377A1",
+        "title": "Auxetic stents for managing venous stenosis",
+        "relevance": "Venous stent with special geometry (auxetic). But NOT adaptive — fixed after deployment."
+      },
+      {
+        "patent_id": "WO2004073796A2",
+        "title": "Device and method for regulating blood flow",
+        "relevance": "General vascular flow regulation. Not specific to venous sinus or IIH."
+      },
+      {
+        "patent_id": "DE102014115337A1",
+        "title": "Stent for splinting a vein",
+        "relevance": "Venous stent design. NOT adaptive — mechanical design improvement only."
+      },
+      {
+        "patent_id": "US8784355B2",
+        "title": "Retrograde carotid blood flow control",
+        "relevance": "Flow control in vascular context, but carotid, not venous sinus."
+      }
+    ],
+
+    "no_patent_found_for": "[adaptive venous sinus stent + sensing + flow regulation + IIH]",
+    "section_102": "NOT ANTICIPATED — no single patent teaches the full combination",
+    "section_103": "PARTIALLY CHALLENGED — components exist separately (sensing stent, venous stent, flow regulation, closed-loop IIH for shunts) but none combine them for VSS",
+    "overall": "INCONCLUSIVE — 12 keyword searches executed. Full 12-stage destruction (CPC, family, citations) NOT yet performed. But no direct anticipation found."
+  },
+
+  "ce_012_ce_013_gate_test": {
+    "ce_013_result": {
+      "question": "Is 'venous outflow capacity' causally independent of shunt-measured variables?",
+      "answer": "YES — venous outflow capacity is a property of the VENOUS SYSTEM. Shunts measure CSF pressure and CSF-venous differential (downstream consequences). Venous outflow capacity is UPSTREAM of CSF pressure: (venous outflow → venous pressure → CSF absorption → CSF pressure). VSS would regulate the UPSTREAM cause; shunts measure the DOWNSTREAM consequence.",
+      "verdict": "PASSES CE-013 — venous outflow capacity is causally independent of (upstream of) shunt-measured variables"
+    },
+    "ce_012_result": {
+      "question": "Does 'regulatable venous outflow capacity' produce a new technical effect that cannot be achieved by trivial recombination?",
+      "answer": "The new technical effect is 'DYNAMIC VENOUS OUTFLOW REGULATION' — the ability to increase or decrease venous outflow capacity in response to changing physiological demand. This is NOT achievable by: (a) shunts (they bypass the venous system — they drain CSF, not regulate venous outflow), (b) static stents (fixed diameter — cannot change capacity post-deployment), (c) Hakim's closed-loop shunt (controls CSF drainage valve, not venous patency). No existing stent can change diameter on demand post-deployment (balloon-expandable = fixed, self-expanding = fixed, bioresorbable = uncontrolled degradation).",
+      "but": "The MECHANISM (variable diameter stent) may face §103 from shape-memory alloy, hydraulic, or electromechanical stent art. The technical EFFECT is new, but the mechanism may not be.",
+      "verdict": "PARTIALLY PASSES CE-012 — the technical effect is genuinely new (not achievable by existing systems), but the mechanism requires novelty analysis"
+    }
+  },
+
+  "decision_value_test": {
+    "question": "What can the clinician/device do with adaptive VSS that static VSS or existing shunt CANNOT?",
+    "answers": [
+      "A1: Patient gains weight → venous compression increases → outflow demand increases → static stent insufficient → adaptive stent EXPANDS → prevents ICP rise. (Shunt CANNOT do this — it drains CSF but doesn't address venous outflow capacity.)",
+      "A2: Patient loses weight → venous compression decreases → over-drainage risk → adaptive stent CONSTRICTS → prevents low pressure. (Shunt can adjust valve, but stent currently CANNOT adjust.)",
+      "A3: Post-VSS monitoring → sensing stent detects restenosis BEFORE symptoms → clinician adjusts stent diameter or plans intervention. (Current practice: wait for symptoms → emergency re-stenting.)"
+    ],
+    "verdict": "MODERATE-HIGH decision value — enables preventive diameter adjustment, bidirectional flow regulation, and restenosis early detection. These are capabilities that NO existing device provides for venous sinus."
+  },
+
+  "honest_assessment": {
+    "what_is_strong": [
+      "The architectural distinction is REAL: shunts operate on CSF drainage, VSS operates on venous outflow. These are different physical systems.",
+      "The technical effect (dynamic venous outflow regulation) is NOT achievable by any existing device.",
+      "CE-013 PASSES: venous outflow is upstream of CSF pressure, not a downstream consequence.",
+      "Decision value is MODERATE-HIGH: enables preventive adjustment, bidirectional regulation, and early detection."
+    ],
+    "what_is_uncertain": [
+      "The MECHANISM (how to make a stent change diameter on demand) is NOT yet defined. Shape-memory, hydraulic, electromechanical are candidates, but each has failure modes (see CE-006 thermal window, CE-011 MRI safety).",
+      "§103 risk: combining sensing stent + venous stent + flow regulation + IIH may be argued as obvious by combination.",
+      "The prior-art search was keyword-based (12 queries). Full 12-stage destruction (CPC, family, citations) NOT yet performed.",
+      "No evidence that changing stent diameter post-deployment is physically feasible in venous sinus (different from arterial — venous wall is thinner, lower pressure, more compliant).",
+      "The problem (dynamic physiology) is REAL, but the solution (adaptive VSS) is a HYPOTHESIS, not a demonstrated capability."
+    ],
+    "classification": "DISCOVERY HYPOTHESIS — NOT promoted. The technical effect is potentially new, but the mechanism, feasibility, and full prior-art analysis are NOT complete."
+  },
+
+  "verdict": {
+    "round": "56q",
+    "res4_variable_identified": "V2 (venous outflow reserve / regulatable venous outflow capacity)",
+    "new_technical_effect": "Dynamic venous outflow regulation — ability to increase/decrease venous outflow in response to changing physiology",
+    "ce_013_gate": "PASSES — venous outflow is upstream of CSF pressure, not downstream",
+    "ce_012_gate": "PARTIALLY PASSES — technical effect is new, but mechanism needs novelty analysis",
+    "decision_value": "MODERATE-HIGH — preventive adjustment, bidirectional regulation, early detection",
+    "prior_art": "§102 NOT anticipated; §103 PARTIALLY CHALLENGED; full 12-stage NOT complete",
+    "classification": "DISCOVERY HYPOTHESIS — NOT promoted",
+
+    "R2_C3_prevalence": "UNKNOWN (Article XXV) — unchanged, R2-C3 branch closed",
+    "mechanism_generation": "BLOCKED — RES-4 is a discovery hypothesis, not a mechanism",
+    "world_class_inventions": "0 / 5",
+    "human_correspondence_count": 0,
+
+    "repository_state": {
+      "local_HEAD": "950ebaf365bb0a62489255ba2a0bed226b8f6a99 (will be updated after this commit)",
+      "ci_status": "FAILURE (12/14 coder-reported, G10/G13 RED, NOT independently verified)",
+      "certification": "NOT CERTIFIED — RESEARCH STATE only"
+    },
+
+    "next_moves": [
+      "1. Define the MECHANISM: how would a stent change diameter on demand post-deployment? Candidates: shape-memory alloy (CE-006 risk: thermal window), hydraulic (fluid-filled), electromechanical (CE-011 risk: MRI safety), mechanical (re-sheathable). Each has known failure modes from the cemetery.",
+      "2. Full 12-stage patent destruction on the MECHANISM + APPLICATION combination",
+      "3. Physics pre-check: is variable-diameter stenting feasible in venous sinus? (venous wall is thinner, lower pressure, more compliant than arterial)",
+      "4. Article XX problem-existence gate: does dynamic physiology ACTUALLY cause VSS failure? (Need evidence that weight gain/physiology change leads to VSS failure specifically, not just IIH recurrence in general)",
+      "5. Repair G10/G13 (separate from invention work)"
+    ]
+  }
+}
