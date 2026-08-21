@@ -335,7 +335,7 @@
       "kill_reason": "IDENTIFIABILITY_FAILURE + PRIOR_ART_OCCUPATION (3 layers all fail)",
       "what_was_proposed": "Three-layer invention: (A) sense clot-vessel adhesion as distinct force component, (B) break adhesion with new mechanism, (C) select retrieval strategy based on measured adhesion. Decomposed from the question: 'Can we know before the first pass which clot-vessel interaction will defeat the planned thrombectomy strategy?'",
       "why_it_failed": "All three layers fail: Layer A FAILS IDENTIFIABILITY — the force equation F_total = F_adhesion + F_friction + F_drag + F_deformation + F_device_vessel has 5 unknowns but observables provide at most 4 independent equations. Adhesion and friction both depend on contact surface properties; adhesion and deformation both depend on contact area. The inverse problem is mathematically underdetermined even with perfect sensors. Layer B MATERIALLY OCCUPIED — US11504151B2 (Stryker) explicitly claims expandable scraper that dislodges clot from vessel wall with controlled radial force. Layer C MATERIALLY OCCUPIED — US20260000423A1 claims sensor feedback → therapy mode selection (normal vs clog removal vs pulsed). Selecting between devices is obvious extension of selecting between modes.",
-      "reusable_lesson": "FROZEN THEOREM CE-016: 'Before proposing to measure a specific component of a multi-force system, test whether that component is MATHEMATICALLY IDENTIFIABLE from available observables. Causal independence (CE-013) is necessary but not sufficient. If the force equation has N unknown components and observables provide fewer than N independent equations, the target component cannot be uniquely estimated even with perfect sensors. This is a mathematical limitation (inverse problem underdetermination), not a measurement limitation. Replace CE-013 causal independence with identifiability test for multi-component force systems.'",
+      "reusable_lesson": "FROZEN THEOREM CE-016 (sharpened per CEO Round 57): Before claiming a latent component is measurable, explicitly formulate the observation/dynamics model and perform an identifiability analysis. A naive unknown-count (N unknowns vs M equations) is INSUFFICIENT — time-series observations can provide many equations, and controlled perturbations can make an otherwise underdetermined system identifiable. Must show rank/observability analysis or construct an explicit non-identifiability counterexample (two distinct latent states producing identical observations). The correct procedure: (1) define state variables, observables, inputs/perturbations, measurement noise, known/unknown params; (2) build measurement equations; (3) test whether the Jacobian of observations with respect to unknown parameters has full column rank; (4) if not, test whether controlled perturbations (varied velocity, traction profile, aspiration pressure) can increase rank.",
       "what_to_avoid": [
         "Do not propose to measure a specific force component without first testing identifiability",
         "Do not assume causal independence implies measurement identifiability",
@@ -349,8 +349,10 @@
         "EP4637580A1 (force sensor on thrombus — total force, not adhesion-specific)",
         "Identifiability analysis (force equation with 5 unknowns, ≤4 equations)"
       ],
-      "epistemic_class": "STRONG_CONSTRAINT"
+      "epistemic_class": "STRONG_CONSTRAINT",
+      "retraction_note": "CEO Round 57: The original CE-016 claim 'adhesion cannot be identified even with perfect sensors' is RETRACTED as too absolute. The correct statement is: 'The current five-component static force model does not establish identifiability.' A time-series with controlled perturbations may make the system identifiable. The naive unknown-count (5 unknowns, ≤4 equations) is insufficient to prove non-identifiability.",
+      "stroke_territory_status": "Stroke territory is NOT universally exhausted. Only the specific adhesion-isolation + strategy-selection implementation v1 is killed/blocked. The broader stroke problem remains open because the literature says mechanical contributions are incompletely characterized."
     }
   ],
-  "updated_at": "2026-08-22T02:15:00+00:00"
+  "updated_at": "2026-08-22T02:45:00+00:00"
 }
