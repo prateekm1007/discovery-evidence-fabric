@@ -1,0 +1,160 @@
+{
+  "round": "56x",
+  "timestamp_utc": "2026-08-22T01:00:00+00:00",
+  "task_id": "STROKE-ROUND56X-FAILURE-TAXONOMY-AND-GAP-IDENTIFICATION",
+  "agent": "main (constitution-acknowledged, session 2026-08-21)",
+
+  "constitution_recertification": {
+    "version": "1.5.0",
+    "pre_session_check_acknowledged": true,
+    "articles_applied": ["V", "XX", "XXI", "XXVIII", "XXXII"]
+  },
+
+  "repository_state_per_article_xxiii": {
+    "local_HEAD": "a16af4213f22715c8a28e2e5ad25694c41afb13d",
+    "remote_main": "a16af4213f22715c8a28e2e5ad25694c41afb13d",
+    "match": true,
+    "ci_status": "NOT independently verified. RESEARCH STATE only.",
+    "certification": "NOT CERTIFIED"
+  },
+
+  "recalcitrant_clot_failure_taxonomy": {
+    "F1_fibrin_rich_tough": {
+      "description": "Clot is stiff, resists deformation",
+      "current_solution": "NIMBUS geometric clot extractor (52.9% first-pass, 79.2% final with rescue)",
+      "still_fails": "20.8% of NIMBUS cases; aspiration fails because stiff clot doesn't deform into catheter",
+      "measurable_pre_intervention": "PARTIALLY — RBC/fibrin ratio correlates with FPR failure (Vandelanotte 2024) but measured POST-retrieval"
+    },
+    "F2_sticky_adherent": {
+      "description": "Clot adheres to vessel wall, high friction",
+      "current_solution": "Cyclic aspiration, super-bore catheters — address clot-CATHETER friction, NOT clot-VESSEL adhesion",
+      "still_fails": "Clots with high vessel adhesion that cannot be overcome by aspiration or stent engagement",
+      "measurable_pre_intervention": "NO — clot-vessel friction not measured pre-intervention; ex vivo studies only"
+    },
+    "F3_calcified_hard": {
+      "description": "Clot contains calcium deposits, very rigid",
+      "current_solution": "Balloon angioplasty (risky), rescue stenting (traps but doesn't remove)",
+      "still_fails": "Heavily calcified clots that cannot be compressed or retrieved",
+      "measurable_pre_intervention": "POTENTIALLY — NCCT can detect calcium, but calcified clot is rare"
+    },
+    "F4_fragmentable": {
+      "description": "Clot breaks apart during retrieval → distal emboli",
+      "current_solution": "Balloon guide catheters (flow arrest), distal filter devices",
+      "still_fails": "Micro-fragmentation that passes through filters",
+      "measurable_pre_intervention": "NO — clot cohesive strength not measured"
+    },
+    "F5_crossing_failure": {
+      "description": "Device cannot cross the occlusion to reach clot",
+      "current_solution": "Microcatheter-only technique, exchange techniques",
+      "still_fails": "Very dense/long occlusions that no device can cross",
+      "measurable_pre_intervention": "NO — occlusion density not measured"
+    },
+    "F6_large_long": {
+      "description": "Clot too large for single-pass retrieval",
+      "current_solution": "Super-bore aspiration, multi-pass, Y-stent technique",
+      "still_fails": "Very long clots in tortuous vessels",
+      "measurable_pre_intervention": "YES — clot length measurable on CTA/MRA"
+    }
+  },
+
+  "competitor_assessment": {
+    "NIMBUS": {
+      "mechanism": "Geometric clamping (different from stent struts)",
+      "solves": "Fibrin-rich/tough clots (F1)",
+      "still_fails": "20.8% of cases — sticky/fragmented/crossing failures"
+    },
+    "aspiration_including_super_bore_cyclic": {
+      "mechanism": "Negative pressure ingests clot; cyclic reduces clot-catheter friction",
+      "solves": "Soft/round clots; addresses clot-CATHETER friction (not clot-VESSEL adhesion)",
+      "still_fails": "Stiff clots that don't deform; sticky clots with high vessel adhesion"
+    },
+    "rescue_stenting_balloon": {
+      "mechanism": "Stent traps clot against wall; balloon compresses",
+      "solves": "Clots that cannot be retrieved but can be trapped/compressed",
+      "still_fails": "Leaves clot in place (re-occlusion risk); requires dual antiplatelet therapy"
+    },
+    "adjunct_thrombolysis": {
+      "mechanism": "Pharmacologic lysis",
+      "solves": "Residual micro-thrombi after macro-retrieval",
+      "still_fails": "Delayed action; hemorrhage risk; cannot lyse fibrin-rich clots quickly"
+    }
+  },
+
+  "last_unsolved_physical_failure": {
+    "primary_gap": "CLOT-VESSEL ADHESION (F2)",
+    "evidence": "No device measures or overcomes clot-VESSEL friction. Friction force review (SC-07) identifies this as 'critical'. All current devices address clot-DEVICE interaction (strut engagement, catheter ingestion, geometric clamping), NOT clot-VESSEL adhesion.",
+    "key_distinction": "Clot-CATHETER friction IS addressed (ROAR effect, cyclic aspiration). Clot-VESSEL adhesion is NOT addressed by any device.",
+
+    "secondary_gap": "PRE-INTERVENTION CLOT-VESSEL CHARACTERIZATION",
+    "evidence": "Clot composition measured POST-retrieval. No device characterizes clot type or adhesion BEFORE the first pass. Each failed pass INCREASES difficulty (SC-02: 'for every failed thrombectomy attempt, the clot became more difficult')."
+  },
+
+  "sharper_discovery_question": {
+    "question": "Can we know BEFORE the first pass which clot-vessel interaction is likely to defeat the planned thrombectomy strategy, and can we select a materially different physical action before causing additional passes and vessel injury?",
+    "decomposition": {
+      "P1_pre_intervention_adhesion_measurement": {
+        "description": "A device that PROBES clot-vessel adhesion before retrieval",
+        "ce_012": "PASSES — adhesion is a MECHANICAL property, not imaging recombination. Current imaging (CTA/MRI) shows location/size but NOT adhesion strength.",
+        "ce_013": "PASSES — clot-vessel adhesion is causally independent of existing measurements (function of clot composition + vessel wall + contact time)",
+        "ce_014": "APPLIED — searched 'clot adhesion', 'friction', 'vessel wall', 'separation'. No patent found for pre-intervention adhesion measurement.",
+        "ce_015": "NOT YET — needs force calculation"
+      },
+      "P2_adhesion_breaking_mechanism": {
+        "description": "A mechanism that SEPARATES clot from vessel wall before retrieval",
+        "ce_012": "PASSES — no existing device breaks clot-vessel adhesion as primary mechanism (all PULL or ASPIRATE)",
+        "ce_013": "PASSES — adhesion-breaking is a new physical action, not a recombination",
+        "ce_014": "APPLIED — no patent found for clot-vessel adhesion breaking. ROAR/cyclic address clot-catheter friction, not clot-vessel.",
+        "ce_015": "NOT YET — needs force calculation (what force to break adhesion vs what current devices apply)"
+      }
+    }
+  },
+
+  "patent_landscape_ce_014": {
+    "searches_executed": 10,
+    "total_unique_urls": 49,
+    "patent_hits": 30,
+    "key_patents_found": [
+      "US10722253B2: ROAR effect overcomes clot-CATHETER static friction (NOT clot-vessel)",
+      "US11464528B2: Waveform pressure reduces clot-CATHETER friction (NOT clot-vessel)",
+      "WO2017040681A1: Uses physiological adhesion to REMOVE clot (not break adhesion)",
+      "US20180344339A1: Friction stir treatment (different mechanism)",
+      "US20260102208A1: CT plaque characterization (imaging, not device-based adhesion)"
+    ],
+    "no_patent_found_for": [
+      "Pre-intervention clot-VESSEL adhesion measurement",
+      "Clot-VESSEL adhesion breaking as primary mechanism"
+    ],
+    "section_102": "NOT ANTICIPATED — no single patent teaches clot-vessel adhesion measurement or breaking",
+    "section_103": "NEEDS FULL ASSESSMENT — combination of friction studies + aspiration + imaging may be argued as obvious, but the specific step of SEPARATING clot from vessel wall before retrieval is not described in any combination"
+  },
+
+  "verdict": {
+    "round": "56x",
+    "failure_taxonomy_constructed": true,
+    "competitors_given_full_credit": true,
+    "last_unsolved_failure_identified": "CLOT-VESSEL ADHESION (F2) + pre-intervention characterization",
+    "sharper_question_decomposed": true,
+    "ce_012_ce_013": "BOTH PASS for P1 and P2",
+    "ce_014": "APPLIED — no direct patent hit for clot-vessel adhesion measurement/breaking",
+    "ce_015": "NOT YET — needs force calculation",
+    "classification": "DISCOVERY HYPOTHESIS — NOT promoted",
+
+    "next_steps": [
+      "1. Article XX problem-existence gate: does clot-vessel adhesion actually cause retrieval failure? (Need evidence that adhesion — not just stiffness — is the failure mechanism)",
+      "2. CE-015 physics authority: what force is needed to break clot-vessel adhesion? Can a catheter-delivered device generate that force?",
+      "3. Full 12-stage patent attack on 'clot-vessel adhesion breaking' and 'pre-intervention adhesion measurement'",
+      "4. Decision-value: if adhesion could be measured/broken, would it change which device clinicians use or how many passes they attempt?",
+      "5. Identify the specific new technical primitive (what physical mechanism separates clot from vessel wall?)"
+    ],
+
+    "world_class_inventions": "0 / 5",
+    "human_correspondence_count": 0,
+    "mechanism_generation": "BLOCKED — new domain identified but not yet explored",
+
+    "repository_state": {
+      "local_HEAD": "a16af4213f22715c8a28e2e5ad25694c41afb13d (will be updated after this commit)",
+      "ci_status": "NOT independently verified. RESEARCH STATE only.",
+      "certification": "NOT CERTIFIED"
+    }
+  }
+}
