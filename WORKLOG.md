@@ -3061,3 +3061,125 @@ Stage Summary:
 - **SECURITY ADVISORY:** User should revoke the exposed PAT immediately.
 - **NOT FULLY REPOSITORY-CERTIFIED** — G10/G13 must be fixed first.
 - All prior Round 56 scientific work (ontology, harmonization, predictor discovery) is committed and pushed. The scientific conclusions are unchanged. Only the certification status is incomplete.
+
+---
+Task ID: STROKE-ROUND58-CEO-VERDICT-AND-CANDIDATE-FREEZE
+Agent: main (constitution-acknowledged, session 2026-08-22)
+Task: Per CEO Round 58 deep audit directive — (1) read constitution first; (2) kill the Layer-A implementation v1 (NOT the scientific question); (3) sharpen CE-016 with model-uncertainty survival requirement; (4) create CE-017 as the new cross-cutting cemetery theorem; (5) freeze the candidate — forbid v2/AI/neural-network rescue; (6) extract the bigger lesson; (7) pivot the stroke territory rather than rescue the same measurement idea.
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION (per CEO directive: "READ THE CONSTITUTION FIRST"):
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0 Articles I-XXXV.
+- Articles applied this round: V (fail closed but not universal rejector), XXV (unknown stays unknown), XXVI (no self-certification), XXIX (separate implementation failure from mechanism failure), XXX (never optimize the evaluator), XXXI (every correction creates a memory artifact), XXXII (strongest alternative explanation).
+- Pre-session epistemic check acknowledged.
+
+CEO ROUND 58 DIRECTIVE INTERPRETATION:
+- The CEO accepted the +112% adhesion-estimation bias finding as legitimate evidence that the constant-tail estimator fails under the M3+M4 realistic perturbation model.
+- The CEO REJECTED three over-claims in the Round-58 file:
+  * P0-1: "16 unknowns, 3 observables" is NOT a proof by itself. It repeats the Round-56z mistake in elaborate form. Time-series structure, parameter constraints, controlled inputs, priors, imaging-derived states, and repeated experiments can increase information.
+  * P0-2: The +112% bias is model-dependent. It demonstrates "this particular estimator fails badly under this particular realistic perturbation model." It does NOT establish that every possible estimator or measurement protocol fails.
+  * P0-3: The patent landscape (EP4637580A1, US20260000423A1, US11504151B2) is actually stronger evidence against the proposed layer than the +112% bias, because it materially occupies the adjacent "force sensing + feedback" capability space.
+
+CORRECT BOUNDED STATEMENT (per CEO verdict):
+- "The proposed force-decomposition protocol is experimentally/model-wise unstable under realistic clot mechanics, and existing sensing/control prior art substantially occupies adjacent capabilities. The current Layer-A implementation is therefore KILLED."
+- This is strong enough to close this implementation WITHOUT claiming a universal impossibility theorem.
+- The broader scientific question — "is clot-vessel adhesion measurable by any protocol?" — REMAINS OPEN.
+
+OPERATIONS EXECUTED:
+
+STEP 1 — CE-016 SHARPENED (third time):
+- File: /home/z/my-project/discovery-evidence-fabric/MECHANISM_CEMETERY/CEMETERY.json
+- Old rule (Round 57): "perform an identifiability analysis; naive unknown-count is insufficient; must show rank/observability or construct an explicit non-identifiability counterexample."
+- New rule (Round 58): "A proposed latent quantity survives only when (1) identifiability is demonstrated under an EXPLICIT observation/dynamics model with full rank/observability analysis (not naive unknown-count), AND (2) identifiability REMAINS under plausible model uncertainty (each ideal assumption relaxed toward realistic physics and re-tested under the combined relaxed model). The burden is BIDIRECTIONAL: a single favorable rank calculation is INSUFFICIENT; a single unfavorable perturbation model is ALSO INSUFFICIENT to claim universal non-identifiability."
+- Amendment history recorded: 3 amendments (Round 56z original, Round 57 sharpen, Round 58 sharpen-again).
+- Retraction note updated: BOTH the original "cannot be identified even with perfect sensors" (Round 56z, retracted Round 57) AND "NOT IDENTIFIABLE under realistic physics" (Round 58, retracted this round) are recorded as too absolute.
+
+STEP 2 — CE-017 CREATED (new cross-cutting cemetery theorem):
+- Entry ID: CE-017
+- Territory: Cross-cutting (extracted from Stroke Round 58; applies to ALL latent-variable inventions)
+- Epistemic class: STRONG_CONSTRAINT
+- Theorem: "Structural identifiability under a convenient model is not enough — adversarial model-uncertainty and practical-operation survival are mandatory."
+- Reusable lesson: "A discovery engine earns trust when it attacks its own successful proof harder than its unsuccessful ideas. Structural identifiability under a convenient model is not enough. A candidate must survive adversarial model uncertainty AND practical operation (safety, timing, decision value, first-pass vs post-hoc). The burden is bidirectional: (a) the proposer must demonstrate identifiability survives realistic model relaxation; (b) the killer must demonstrate non-identifiability holds under EVERY plausible estimator and measurement protocol, not just the one they chose to attack. When in doubt, the implementation is killed; the scientific question stays open until either (a) a survivor is found or (b) an explicit non-identifiability counterexample is constructed (two physically distinct latent states producing indistinguishable observations under ALL measurement protocols)."
+- Evidence sources: Round 57 favorable model + Round 58 unfavorable model + Round 58 CEO verdict + CEO "pushing-the-envelope" principle.
+
+STEP 3 — ROUND 58 CORRECTION RECORD WRITTEN:
+- File: /home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND58_CEO_VERDICT_AND_CANDIDATE_FREEZE.json
+- Mirrored to: /home/z/my-project/download/r2c3_round56/ROUND58_CEO_VERDICT_AND_CANDIDATE_FREEZE.json
+- The original ROUND58_ADVERSARIAL_MODEL_AND_KILL.json is PRESERVED AS-IS for history. The over-claim is corrected in the new file, not erased from the original (per Article XI: history is evidence too).
+- The correction record contains: constitution recertification, CEO verdict summary with 3 P0 corrections, what is killed (bounded) vs what is NOT killed, candidate freeze directives, cemetery amendments, 5 pivot axes, portfolio status, strongest alternative explanations per Article XXXII, constitution compliance audit per article.
+
+STEP 4 — LAYER A CANDIDATE FREEZE:
+- Frozen candidate: "Layer A: clot-vessel adhesion sensing via controlled perturbation (force decomposition), v1"
+- FORBIDDEN RESCUE ATTEMPTS (per CEO directive):
+  * adhesion estimator v2 (any variant)
+  * smarter force classifier (any variant)
+  * AI force decomposition (any variant)
+  * neural-network adhesion inference (any variant)
+  * any other re-skin of the same force-decomposition idea
+- Rationale: per Article XXIX, a failed embodiment cannot kill the invention unless the design space is exhausted. Conversely, a failed embodiment cannot rescue the invention by re-skinning. If the scientific question is revisited, it must be via a fundamentally different sensing modality, not a dressed-up version of force decomposition.
+
+STEP 5 — PIVOT DIRECTIONS DEFINED (5 axes, NO rescue variants):
+- AXIS-1: Different physical signal — abandon force entirely. Consider OCT, Raman, near-infrared, acoustic emission, electrical bioimpedance. (UNEXPLORED)
+- AXIS-2: Different intervention paradigm — abandon adhesion-breaking. Consider pharmacological weakening (local tPA, GP IIb/IIIa), thermal, ultrasonic cavitation. (UNEXPLORED)
+- AXIS-3: Different decision-support target — abandon first-pass strategy selection. Consider post-hoc outcome prediction (symptomatic ICH, TICI 2c vs 3), device selection based on clot characterization. (UNEXPLORED)
+- AXIS-4: Different stroke sub-problem — abandon recalcitrant clots. Consider distal embolization prevention, no-reflow, neuroprotection during reperfusion. (UNEXPLORED)
+- AXIS-5: Exit stroke entirely — Slot 5 may remain EMPTY. CEO decision required: (a) explore a stroke axis, (b) propose a new medical device problem, (c) accept Slot 5 as empty. (AWAITING CEO DECISION)
+
+STEP 6 — EXPLICIT NON-PIVOT:
+- Any further attempt to measure adhesion via force decomposition (including v2, AI, neural network, "smarter" classifier, or any other re-skin) is FORBIDDEN by the candidate freeze directives.
+
+CONSTITUTION COMPLIANCE AUDIT (per Article XXXI — memory artifact):
+- Article V (fail closed but not universal rejector): COMPLIED — implementation killed, scientific question preserved as OPEN.
+- Article XXV (unknown stays unknown): COMPLIED — universal non-identifiability claim retracted; bounded to (estimator, model) pair.
+- Article XXVI (no self-certification): COMPLIED — explicitly NOT CERTIFIED; CI status reported as not independently verifiable this session.
+- Article XXIX (implementation vs mechanism): COMPLIED — implementation v1 killed; mechanism (force decomposition paradigm) noted as exhausted at this evidence boundary but NOT universally killed.
+- Article XXX (never optimize evaluator): COMPLIED — +112% bias explicitly recorded as model-conditional; the (estimator, model) pair was chosen by the same agent, which is a known weakness.
+- Article XXXI (memory artifact): COMPLIED — CE-017 created as the durable cross-cutting theorem; this correction record is the per-incident memory artifact.
+- Article XXXII (strongest alternative): COMPLIED — alternative explanations stated for both the +112% bias (a different estimator may perform differently under M3+M4) and the kill decision (bad implementation of a real idea, not a bad idea).
+
+REPOSITORY STATE (per Article XXIII):
+- Local HEAD (start of round): d1566a480696a41615f84f96719673dddf41b8f0 (Round 57 commit, unpushed-equivalent state per prior session)
+- Remote main: claimed by prior session as d1566a4... but NOT independently verifiable this session (no GitHub credentials).
+- CI status: NOT INDEPENDENTLY VERIFIED — prior session reported CI FAILURE with G10/G13 RED (git-filter-repo history rewrite broke evidence ledger commit_sha references).
+- Certification: NOT CERTIFIED — RESEARCH STATE only (per Article XXVI).
+- Git operations this round: NONE — no commit, no push. Files modified on local disk only.
+
+STRONGEST ALTERNATIVE EXPLANATIONS (per Article XXXII):
+- For the +112% bias: The strongest alternative explanation is that the constant-tail estimator was tested against a perturbation model (M3+M4) chosen by the same agent that designed the estimator. A different estimator (Stribeck-aware observer, Prony-series fitter with explicit contact-area state, Bayesian filter with informative priors on relaxation time constants) may perform differently under M3+M4. This does NOT rescue the implementation — the implementation is killed for additional reasons (clinical risk, timing failure, patent occupation). But the alternative explanation must be stated honestly: the +112% is a property of the (estimator, model) pair, not of the underlying physics.
+- For the kill decision: The strongest alternative explanation is that the candidate was a bad implementation of a real idea, not a bad idea. The kill is therefore implementation-level, not mechanism-level. This is consistent with Article XXIX. The broader scientific question (can adhesion be measured by ANY protocol?) remains open.
+
+PORTFOLIO STATUS POST ROUND 58:
+- Slot 1 (R6 Passive Rescue): PHYSICAL_VALIDATION_PENDING
+- Slot 2 (Adaptive/Sensing eShunt): PROVISIONAL
+- Slot 3 (Controlled CNS Therapeutic Platform): VALIDATION_READY_FROZEN
+- Slot 4 (CNS/Lifecycle Intelligence Platform): DISCOVERY_COMPLETE
+- Slot 5: EMPTY — 3 territories exhausted (IIH/VSS, RES-4, Stroke adhesion-isolation v1). 5 pivot axes available; CEO decision required.
+- World-class inventions: 0/5
+- Human correspondence: 0
+- Mechanism generation: BLOCKED
+- Cemetery size: 17 entries (CE-001 through CE-017)
+
+FILES MODIFIED:
+- /home/z/my-project/discovery-evidence-fabric/MECHANISM_CEMETERY/CEMETERY.json (CE-016 sharpened, CE-017 appended)
+- /home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND58_CEO_VERDICT_AND_CANDIDATE_FREEZE.json (new)
+- /home/z/my-project/download/r2c3_round56/ROUND58_CEO_VERDICT_AND_CANDIDATE_FREEZE.json (mirror)
+- /home/z/my-project/download/r2c3_round56/CEMETERY_round58.json (mirror)
+- /home/z/my-project/worklog.md (this entry)
+- /home/z/my-project/scripts/round58_ceo_verdict.py (persisted script per Rule 9)
+
+FILES NOT MODIFIED:
+- ROUND58_ADVERSARIAL_MODEL_AND_KILL.json — preserved as-is for history (the over-claim is corrected HERE, not erased from the original).
+
+Stage Summary:
+- **CE-016 SHARPENED (third time).** New bidirectional rule: a single favorable model is insufficient; a single unfavorable model is also insufficient. The burden is symmetric.
+- **CE-017 CREATED.** New cross-cutting cemetery theorem extracted from the Round-57/Round-58 stroke sequence: "Structural identifiability under a convenient model is not enough — adversarial model-uncertainty and practical-operation survival are mandatory." Epistemic class: STRONG_CONSTRAINT.
+- **LAYER A v1 IMPLEMENTATION KILLED.** Bounded kill: the constant-tail force-decomposition estimator fails under M3+M4 realistic model (+112% bias), is clinically risky (pause protocol), is intra-procedural not pre-procedural (timing failure), and is adjacent to materially-occupied prior art (EP4637580A1, US20260000423A1, US11504151B2).
+- **LAYER A v1 IMPLEMENTATION FROZEN.** Forbidden rescue variants: v2, AI classifier, neural-network inference, "smarter" force decomposition. Any further attempt to measure adhesion via force decomposition is FORBIDDEN.
+- **SCIENTIFIC QUESTION PRESERVED AS OPEN.** "Is clot-vessel adhesion measurable by any protocol?" is NOT closed. Only the specific force-decomposition v1 implementation is killed.
+- **STROKE TERRITORY NOT UNIVERSALLY EXHAUSTED.** 5 pivot axes defined for CEO decision: (1) different physical signal, (2) different intervention paradigm, (3) different decision-support target, (4) different stroke sub-problem, (5) exit stroke entirely.
+- **CEMETERY NOW 17 ENTRIES** (CE-001 through CE-017).
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: BLOCKED.
+- **REPOSITORY NOT CERTIFIED.** Local files modified; no commit, no push, no CI verification this session. RESEARCH STATE only.
+- **GIT OPERATIONS: NONE.** Per Articles XXIII and XXVI, repository state remains as prior session left it. To achieve certification: future session with GitHub PAT must (a) commit the Round 58 amendments, (b) push to origin/main, (c) wait for GitHub Actions CI to complete, (d) record the CI capsule hash as independent certification. The G10/G13 RED state from prior session persists.
+- **CEO "PUSHING-THE-ENVELOPE" PRINCIPLE RECORDED IN CE-017:** "A discovery engine earns trust when it attacks its own successful proof harder than its unsuccessful ideas." Round 57 made adhesion look identifiable. Round 58 tried to destroy that result. That is exactly the behavior we want. The lesson is now a permanent cemetery theorem.

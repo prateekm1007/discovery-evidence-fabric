@@ -328,31 +328,90 @@
     },
     {
       "entry_id": "CE-016",
-      "territory_id": "Stroke thrombectomy (Round 56w-56z)",
-      "mechanism_name": "Stroke: clot-vessel adhesion isolation + measurement + strategy selection",
-      "proposed_version": "Round 56x-56z (V1)",
-      "killed_at_version": "Round 56z",
-      "kill_reason": "IDENTIFIABILITY_FAILURE + PRIOR_ART_OCCUPATION (3 layers all fail)",
-      "what_was_proposed": "Three-layer invention: (A) sense clot-vessel adhesion as distinct force component, (B) break adhesion with new mechanism, (C) select retrieval strategy based on measured adhesion. Decomposed from the question: 'Can we know before the first pass which clot-vessel interaction will defeat the planned thrombectomy strategy?'",
-      "why_it_failed": "All three layers fail: Layer A FAILS IDENTIFIABILITY — the force equation F_total = F_adhesion + F_friction + F_drag + F_deformation + F_device_vessel has 5 unknowns but observables provide at most 4 independent equations. Adhesion and friction both depend on contact surface properties; adhesion and deformation both depend on contact area. The inverse problem is mathematically underdetermined even with perfect sensors. Layer B MATERIALLY OCCUPIED — US11504151B2 (Stryker) explicitly claims expandable scraper that dislodges clot from vessel wall with controlled radial force. Layer C MATERIALLY OCCUPIED — US20260000423A1 claims sensor feedback → therapy mode selection (normal vs clog removal vs pulsed). Selecting between devices is obvious extension of selecting between modes.",
-      "reusable_lesson": "FROZEN THEOREM CE-016 (sharpened per CEO Round 57): Before claiming a latent component is measurable, explicitly formulate the observation/dynamics model and perform an identifiability analysis. A naive unknown-count (N unknowns vs M equations) is INSUFFICIENT — time-series observations can provide many equations, and controlled perturbations can make an otherwise underdetermined system identifiable. Must show rank/observability analysis or construct an explicit non-identifiability counterexample (two distinct latent states producing identical observations). The correct procedure: (1) define state variables, observables, inputs/perturbations, measurement noise, known/unknown params; (2) build measurement equations; (3) test whether the Jacobian of observations with respect to unknown parameters has full column rank; (4) if not, test whether controlled perturbations (varied velocity, traction profile, aspiration pressure) can increase rank.",
+      "territory_id": "Stroke thrombectomy (Round 56w-58)",
+      "mechanism_name": "Stroke: clot-vessel adhesion isolation + measurement + strategy selection (Layer A: force-decomposition estimator v1)",
+      "proposed_version": "Round 56x-58 (V1 implementation)",
+      "killed_at_version": "Round 58 (CEO verdict: kill implementation, not scientific question)",
+      "kill_reason": "IMPLEMENTATION_KILLED (not universal impossibility). The force-decomposition adhesion estimator v1 is unstable under realistic clot mechanics, and adjacent prior art materially occupies the sensing-and-feedback space. The current Layer-A implementation is KILLED. The scientific question of whether adhesion is measurable by ANY protocol is NOT closed.",
+      "what_was_proposed": "Three-layer invention: (A) sense clot-vessel adhesion as a distinct force component via controlled perturbation (velocity sweep + relaxation pause), (B) break adhesion with new mechanism, (C) select retrieval strategy based on measured adhesion. Decomposed from: 'Can we know before the first pass which clot-vessel interaction will defeat the planned thrombectomy?'",
+      "why_it_failed": "Layer A implementation v1 (force decomposition) FAILS under realistic model perturbations: when contact area changes (M3) and adhesion grows with contact time (M4), the constant-tail estimator conflates adhesion growth with slow viscoelastic relaxation. Synthetic ground-truth test under M3+M4 produced +112% bias vs initial adhesion. The Round-57 structural identifiability result was conditional on ideal assumptions (constant adhesion, known contact area, truly static pause). Layer B MATERIALLY OCCUPIED — US11504151B2 (Stryker) claims expandable scraper that dislodges clot from vessel wall with controlled radial force. Layer C MATERIALLY OCCUPIED — US20260000423A1 claims sensor feedback -> therapy mode selection. EP4637580A1 describes force sensing on a thrombus including pulling force and attachment monitoring.",
+      "reusable_lesson": "FROZEN THEOREM CE-016 (sharpened per CEO Round 58): A proposed latent quantity survives only when (1) identifiability is demonstrated under an EXPLICIT observation/dynamics model with full rank/observability analysis (not naive unknown-count), AND (2) identifiability REMAINS under plausible model uncertainty (each ideal assumption relaxed toward realistic physics and re-tested). A single favorable rank calculation under a convenient model is INSUFFICIENT. A single unfavorable perturbation model is ALSO INSUFFICIENT to claim universal non-identifiability — it only kills the specific estimator tested under that specific perturbation model. The correct procedure: (a) define state, observables, inputs, noise, known/unknown params; (b) build measurement equations; (c) test rank of Jacobian wrt unknown params; (d) perform adversarial model-uncertainty test: relax each assumption toward realistic physics and re-test identifiability under the combined relaxed model; (e) only if BOTH the ideal-model rank AND the adversarial-model rank hold (or constructively fail) can a universal claim (measurable OR non-measurable) be recorded.",
       "what_to_avoid": [
         "Do not propose to measure a specific force component without first testing identifiability",
         "Do not assume causal independence implies measurement identifiability",
         "Do not propose 'select strategy based on measurement' if the measurement cannot be uniquely obtained",
-        "Do not assume 'selecting between devices' is patentably distinct from 'selecting between modes of same device' (US20260000423A1)"
+        "Do not assume 'selecting between devices' is patentably distinct from 'selecting between modes of same device' (US20260000423A1)",
+        "Do not prove identifiability by choosing the equations that make it identifiable (CEO Round 58 pushing-the-envelope principle)",
+        "Do not claim universal non-identifiability from a single unfavorable model — that is the symmetric error to naive identifiability",
+        "Do not rescue a killed implementation with v2 / AI classifier / neural-network inference / 'smarter' force decomposition — those are the same idea in a different dress"
       ],
-      "physical_constraint": "Force decomposition: F_total = F_adhesion + F_friction + F_drag + F_deformation + F_device_vessel. 5 unknowns, ≤4 independent observable equations. Adhesion and friction share contact-surface dependence; adhesion and deformation share contact-area dependence. Underdetermined even with all practical observables.",
+      "physical_constraint": "BOUNDED, NOT UNIVERSAL. Under the tested M3+M4 realistic model (changing contact area + time-varying adhesion), the constant-tail force-decomposition estimator exhibits +112% bias. This establishes that THIS estimator fails under THIS realistic perturbation model. It does NOT establish that adhesion is fundamentally unmeasurable by any protocol. The 5-component static force equation (F_total = F_adhesion + F_friction + F_drag + F_deformation + F_device_vessel) remains structurally identifiable under the ideal Round-57 model; the failure is model-conditional, not absolute.",
       "evidence_sources": [
         "US11504151B2 (Stryker expandable scraper — dislodges clot from vessel wall)",
-        "US20260000423A1 (sensor feedback → therapy mode selection)",
-        "EP4637580A1 (force sensor on thrombus — total force, not adhesion-specific)",
-        "Identifiability analysis (force equation with 5 unknowns, ≤4 equations)"
+        "US20260000423A1 (sensor feedback -> therapy mode selection)",
+        "EP4637580A1 (force sensor on thrombus — pulling force + attachment monitoring)",
+        "Round 57 formal identifiability analysis (favorable rank under ideal model)",
+        "Round 58 adversarial model-uncertainty test (+112% bias under M3+M4 realistic model)",
+        "Round 58 synthetic ground-truth test (model-conditional, NOT universal)"
       ],
       "epistemic_class": "STRONG_CONSTRAINT",
-      "retraction_note": "CEO Round 57: The original CE-016 claim 'adhesion cannot be identified even with perfect sensors' is RETRACTED as too absolute. The correct statement is: 'The current five-component static force model does not establish identifiability.' A time-series with controlled perturbations may make the system identifiable. The naive unknown-count (5 unknowns, ≤4 equations) is insufficient to prove non-identifiability.",
-      "stroke_territory_status": "Stroke territory is NOT universally exhausted. Only the specific adhesion-isolation + strategy-selection implementation v1 is killed/blocked. The broader stroke problem remains open because the literature says mechanical contributions are incompletely characterized."
+      "retraction_note": "CEO Round 57: original CE-016 'adhesion cannot be identified even with perfect sensors' RETRACTED as too absolute — naive unknown-count is insufficient.\nCEO Round 58: the Round-58 claim 'NOT IDENTIFIABLE under realistic physics' is ALSO RETRACTED as too absolute. The +112% bias establishes that the constant-tail estimator fails under the M3+M4 perturbation model chosen by the coder; it does NOT establish universal non-identifiability. The 16-unknowns-vs-3-observables count repeats the Round-56z mistake in elaborate form. The correct bounded statement is: 'The proposed force-decomposition protocol is experimentally/model-wise unstable under realistic clot mechanics, and existing sensing/control prior art substantially occupies adjacent capabilities. The current Layer-A implementation is therefore KILLED.' That is strong enough to close this implementation without claiming a universal impossibility theorem.",
+      "stroke_territory_status": "Stroke territory is NOT universally exhausted. The recalcitrant-clot problem remains real. ONLY the specific force-decomposition adhesion-isolation + strategy-selection implementation v1 is killed. Other approaches (clot composition imaging, device-clot interaction modeling, pharmacological weakening, alternative sensing modalities) have NOT been explored and remain open.",
+      "amendment_history": [
+        {
+          "round": "56z",
+          "action": "ORIGINAL — claimed universal non-identifiability by naive unknown-count (5 unknowns, <=4 equations)",
+          "verdict": "RETRACTED per CEO Round 57"
+        },
+        {
+          "round": "57",
+          "action": "SHARPENED — required formal rank/observability analysis; built favorable model showing structural identifiability",
+          "verdict": "Conditional on ideal assumptions; insufficient per CEO Round 58"
+        },
+        {
+          "round": "58",
+          "action": "SHARPENED AGAIN — model-uncertainty survival test required. Both directions bounded: one favorable model is not enough; one unfavorable model is not enough. Implementation v1 KILLED; scientific question NOT closed.",
+          "verdict": "CURRENT — this is the operative version."
+        }
+      ]
+    },
+    {
+      "entry_id": "CE-017",
+      "territory_id": "Cross-cutting (extracted from Stroke Round 58; applies to all latent-variable inventions)",
+      "mechanism_name": "Structural identifiability under a convenient model is not enough — adversarial model-uncertainty and practical-operation survival are mandatory",
+      "proposed_version": "Round 58 (extracted as reusable theorem)",
+      "killed_at_version": "N/A (this is a theorem, not a killed candidate)",
+      "kill_reason": "THEOREM_EXTRACTION",
+      "what_was_proposed": "Reusable rule: a candidate that depends on measuring or estimating a latent quantity (force component, physiological state, contact property, material parameter) must demonstrate identifiability in TWO layers, not one: (1) structural identifiability under an explicit observation/dynamics model with full rank analysis, AND (2) survival under an adversarial model-uncertainty test where each ideal assumption is relaxed toward realistic physics and identifiability is re-tested under the combined relaxed model. The test must be performed by an agent that is trying to DESTROY identifiability, not preserve it.",
+      "why_it_failed": "Originated from the Round-57 -> Round-58 sequence on stroke thrombectomy adhesion sensing. Round 57 built a favorable model and showed structural identifiability. Round 58 deliberately relaxed the assumptions (nonlinear friction, viscoelastic Prony relaxation, changing contact area, time-varying adhesion, nonzero velocity during pause, parameter drift) and showed the constant-tail estimator produced +112% bias under M3+M4. The Round-57 result was an artifact of simplified assumptions. The Round-58 result was an artifact of the coder's chosen perturbation model. The asymmetric lesson: BOTH a single favorable model AND a single unfavorable model are insufficient.",
+      "reusable_lesson": "FROZEN THEOREM CE-017: A discovery engine earns trust when it attacks its own successful proof harder than its unsuccessful ideas. Structural identifiability under a convenient model is not enough. A candidate must survive adversarial model uncertainty AND practical operation (safety, timing, decision value, first-pass vs post-hoc). The burden is bidirectional: (a) the proposer must demonstrate identifiability survives realistic model relaxation; (b) the killer must demonstrate non-identifiability holds under EVERY plausible estimator and measurement protocol, not just the one they chose to attack. When in doubt, the implementation is killed; the scientific question stays open until either (a) a survivor is found or (b) an explicit non-identifiability counterexample is constructed (two physically distinct latent states producing indistinguishable observations under ALL measurement protocols).",
+      "what_to_avoid": [
+        "Do not record 'X is unmeasurable' from a single unfavorable estimator/model pair",
+        "Do not record 'X is measurable' from a single favorable rank calculation",
+        "Do not rescue a killed implementation with v2 / AI / neural network / 'smarter' classifier — that is the same idea in a different dress",
+        "Do not let the coder choose the perturbation model — the model should be chosen adversarially by a separate role",
+        "Do not conflate model-conditional failure with mechanism failure (per Article XXIX)",
+        "Do not conflate model-conditional success with mechanism success (symmetric error)"
+      ],
+      "physical_constraint": "BOUNDED. The +112% bias observed in Round 58 is bounded to: (estimator = constant-tail force decomposition) x (model = M3+M4: changing contact area + time-varying adhesion). Outside this product, no claim is made. This is the operational form of Article XXX (never optimize the evaluator) applied to model-uncertainty testing.",
+      "evidence_sources": [
+        "Round 57 ROUND57_FORMAL_IDENTIFIABILITY_WITH_PERTURBATIONS.json (favorable model)",
+        "Round 58 ROUND58_ADVERSARIAL_MODEL_AND_KILL.json (unfavorable model, over-claim corrected)",
+        "Round 58 ROUND58_CEO_VERDICT_AND_CANDIDATE_FREEZE.json (this theorem's extraction record)",
+        "CEO Round 58 directive: 'A discovery engine earns trust when it attacks its own successful proof harder than its unsuccessful ideas.'"
+      ],
+      "epistemic_class": "STRONG_CONSTRAINT",
+      "amendment_history": [
+        {
+          "round": "58",
+          "action": "CREATED — extracted as cross-cutting theorem from the Round-57/Round-58 stroke sequence",
+          "verdict": "CURRENT"
+        }
+      ]
     }
   ],
-  "updated_at": "2026-08-22T02:45:00+00:00"
+  "updated_at": "2026-08-22T02:45:00+00:00",
+  "last_amended": "2026-08-21T22:58:37.531185+00:00",
+  "last_amendment_round": "Round 58 (CEO verdict)",
+  "entry_count": 17
 }
