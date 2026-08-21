@@ -1,0 +1,128 @@
+{
+  "round": "56s",
+  "timestamp_utc": "2026-08-21T22:00:00+00:00",
+  "task_id": "RES4-ROUND56S-CAUSAL-CHAIN-AND-SECTION-103-ATTACK",
+  "agent": "main (constitution-acknowledged, session 2026-08-21)",
+
+  "constitution_recertification": {
+    "version": "1.5.0",
+    "pre_session_check_acknowledged": true,
+    "articles_applied": ["V", "XX", "XXI", "XXVIII", "XXIX", "XXXII"]
+  },
+
+  "repository_state_per_article_xxiii": {
+    "local_HEAD": "0d045d858627ce3b79a9cdc9bdfb172a0554bb06",
+    "remote_main": "0d045d858627ce3b79a9cdc9bdfb172a0554bb06",
+    "match": true,
+    "ci_status": "GitHub returns no combined-status entries for this SHA. NOT independently verified.",
+    "certification": "NOT CERTIFIED — RESEARCH STATE only"
+  },
+
+  "causal_chain_analysis": {
+    "chain": "stent geometry → sinus pressure → AG transmural pressure → CSF absorption → ICP/clinical outcome",
+    
+    "arrow_1_stent_to_sinus_pressure": {
+      "evidence": "Ahmed 2011: 'stent placement immediately eliminated TSS pressure gradient'. Multiple VSS studies confirm gradient normalization.",
+      "verdict": "SUPPORTED — well-established in VSS literature"
+    },
+    "arrow_2_sinus_pressure_to_AG_transmural": {
+      "evidence": "Basic physics: transmural pressure at AG = P_CSF - P_sinus. If sinus pressure changes, transmural pressure changes.",
+      "verdict": "SUPPORTED — basic physics"
+    },
+    "arrow_3_AG_transmural_to_CSF_absorption": {
+      "evidence": [
+        "J Physiol 1998: 'CSF absorption across arachnoid villi is a PRESSURE-DRIVEN process that does not begin until CSF pressure is greater than sagittal sinus pressure (Pss).'",
+        "Sakka 2011: 'pressure gradient between subarachnoid spaces and venous sinus necessary to ensure CSF drainage is between 3 and 5 mmHg'",
+        "Bateman 2014: 'pressure gradient across the arachnoid granulations of 4.3 mmHg for CSF to flow'",
+        "StatPearls 2025: '3-5 mmHg gradient drives CSF into venous system'",
+        "Lalou 2019: 'coupling of CSF and sagittal sinus pressure'",
+        "Headache 2026: 'CSF pressure causes external compression of transverse sinuses, increasing venous outflow resistance'"
+      ],
+      "verdict": "SUPPORTED — CSF absorption is pressure-dependent; changing sinus pressure changes absorption"
+    },
+    "arrow_4_CSF_absorption_to_ICP": {
+      "evidence": "Basic IIH pathophysiology: impaired absorption → elevated ICP → headache, papilledema, vision loss",
+      "verdict": "SUPPORTED — textbook physiology"
+    },
+    "overall": "ALL FOUR ARROWS HAVE EVIDENCE. The causal chain is INTACT. But the chain exists for STATIC stents too — the question is what ADAPTIVE control adds."
+  },
+
+  "article_xx_problem_existence_gate": {
+    "Q1_does_failure_occur": {
+      "answer": "YES — recurrence after VSS is documented across multiple studies",
+      "evidence": [
+        "8.35% treatment failure rate (Azzam 2024 meta-analysis, n=1066)",
+        "22% symptom persistence/recurrence (Lim 2024)",
+        "54.3% had recurrence or persistent symptoms (Townsend 2021)",
+        "66.3% failure rate (Midtlien 2024, broader endpoint)",
+        "10/97 needed re-stenting (D'Amato 2025)"
+      ]
+    },
+    "Q2_does_it_matter_to_buyer": {
+      "answer": "YES — recurrence means symptoms return, vision risk, re-intervention needed"
+    },
+    "Q3_does_mechanism_change_quantity": {
+      "answer": "PARTIALLY — adaptive stent COULD prevent recurrence by expanding, but this is HYPOTHETICAL"
+    },
+    "Q4_is_change_large_enough": {
+      "answer": "UNKNOWN — magnitude of diameter change needed to prevent recurrence is not known"
+    },
+    "Q5_does_intervention_create_larger_failure": {
+      "answer": "UNKNOWN — adaptive mechanism could introduce new failure modes"
+    },
+    "verdict": "CONDITIONAL PASS — problem exists and matters. Solution is hypothetical."
+  },
+
+  "section_103_aggressive_attack": {
+    "question": "Would a skilled person have reason to move the adaptive cerebrospinal-vein concept (US11304793B2) into transverse/sigmoid sinus specifically to control CSF absorption?",
+
+    "arguments_FOR_obviousness": [
+      "1. US11304793B2 teaches adaptive stent in cerebrospinal vein (sensor + microprocessor + variable expansion + closed-loop)",
+      "2. VSS for IIH in transverse/sigmoid sinus is well-established (Ahmed 2011, Serenity River, multiple studies)",
+      "3. CSF absorption at AG is known to be pressure-dependent (textbook physiology, multiple studies)",
+      "4. The combination 'adaptive stent + transverse sinus + IIH' is a straightforward transfer of known architecture to known anatomy",
+      "5. Motivation: 8-66% recurrence after static VSS provides clear motivation to seek adaptive solution"
+    ],
+
+    "arguments AGAINST_obviousness": [
+      "1. US11304793B2 is for CCSVI/MS — a different disease with different pathophysiology (CCSVI theory is controversial/largely discredited)",
+      "2. Claim 1 specifies IJV, not transverse/sigmoid sinus — different anatomy",
+      "3. The PHYSIOLOGICAL EFFECT is different: IJV stent regulates extracranial venous RETURN; sinus stent regulates CSF ABSORPTION at AG site",
+      "4. The MECHANISM is different: IJV affects extracranial venous backpressure; sinus stent affects transmural pressure at AG"
+    ],
+
+    "net_assessment": {
+      "§103_risk": "HIGH",
+      "rationale": "The counterarguments (different disease, anatomy, physiological effect) are real but may not survive examiner scrutiny. An examiner could argue: 'The anatomy is different but the architecture (adaptive stent + sensor + closed-loop) is the same. Applying it to a different vein for a different disease is obvious because VSS for IIH is well-established and the pressure-dependence of CSF absorption is textbook physiology.'",
+      "strongest_counterargument": "The different PHYSIOLOGICAL EFFECT (CSF absorption regulation vs venous return regulation). But this may be argued as obvious because the pressure-absorption relationship is KNOWN.",
+      "weakest_counterargument": "Different disease (MS vs IIH) — examiners routinely combine references across disease boundaries"
+    }
+  },
+
+  "honest_verdict": {
+    "causal_chain": "INTACT — all 4 arrows supported by evidence",
+    "problem_existence": "ESTABLISHED — 8-66% VSS recurrence is documented",
+    "section_103": "HIGH RISK — US11304793B2 + VSS for IIH + known CSF absorption physiology = arguably obvious combination",
+    "mechanism": "NOT DEFINED — cemetery risks (CE-006 thermal, CE-011 MRI) apply",
+    "physics_feasibility": "NOT VERIFIED — dural sinus wall mechanics differ from IJV",
+    "decision_value": "NOT DEMONSTRATED — does adaptive VSS improve outcomes vs static VSS?",
+
+    "blocking_issue": "§103 risk is HIGH. The causal chain and problem existence are established, but the COMBINATION of [adaptive architecture (US11304793B2) + transverse/sigmoid sinus (known VSS) + IIH (known) + CSF absorption (known physiology)] may be obvious. The different physiological effect (CSF absorption vs venous return) is the strongest counterargument but may not survive examiner scrutiny because the pressure-absorption relationship is textbook knowledge.",
+
+    "classification": "DISCOVERY HYPOTHESIS with HIGH §103 RISK — NOT promoted",
+
+    "assessment": "The narrow gap survives the causal chain test and the Article XX problem-existence gate. But the §103 threat is serious: all four components (adaptive stent, transverse/sigmoid sinus, IIH, CSF absorption) are individually known, and combining them may be obvious. The candidate has NOT been killed because the §103 argument has not been definitively resolved — but the risk is high enough that promotion is BLOCKED.",
+
+    "world_class_inventions": "0 / 5",
+    "human_correspondence_count": 0,
+    "mechanism_generation": "BLOCKED — §103 risk too high for promotion",
+
+    "next_moves": [
+      "1. The §103 risk is the blocking issue. To resolve it, the machine would need to identify a SPECIFIC TECHNICAL FEATURE of adaptive transverse/sigmoid sinus stenting that is NOT obvious from combining US11304793B2 + VSS + CSF absorption physiology.",
+      "2. If no such feature can be identified → KILL RES-4 narrow gap and pivot to a different territory.",
+      "3. If a feature IS identified → full 12-stage patent destruction on that specific feature.",
+      "4. Per Article XXXIV: the machine is approaching the boundary of what zero-cost analysis can resolve. The §103 question may ultimately require patent attorney judgment.",
+      "5. Repair G10/G13 (separate from invention work)."
+    ]
+  }
+}
