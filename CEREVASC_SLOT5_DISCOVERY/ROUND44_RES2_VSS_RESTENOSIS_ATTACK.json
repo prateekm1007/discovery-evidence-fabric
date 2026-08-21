@@ -1,0 +1,186 @@
+{
+  "round": 44,
+  "timestamp": "2026-08-21T07:00:00Z",
+  "type": "RES2_EVIDENCE_DENSE_ATTACK",
+  "evidence_base": {
+    "problem": "VSS restenosis and symptomatic recurrence after initially successful venous sinus stenting for IIH",
+    "causal_chain_documented": "VSS → initial response → restenosis/recurrence → repeat stenting (clinically observed, not theoretical)",
+    "evidence_items": [
+      {
+        "finding": "Pooled VSS restenosis rate of 17.7%",
+        "source": "Meta-analysis of 694 patients (2026)",
+        "evidence_label": "OBSERVED",
+        "provenance": "Published meta-analysis, peer-reviewed"
+      },
+      {
+        "finding": "Symptomatic recurrence in 57% of VSS patients at mean ~390 days follow-up",
+        "source": "2025 study of 178 VSS patients",
+        "evidence_label": "OBSERVED",
+        "provenance": "Published prospective study, peer-reviewed"
+      },
+      {
+        "finding": "17% of recurrent patients required additional surgery (repeat stenting)",
+        "source": "Same 2025 study of 178 VSS patients",
+        "evidence_label": "OBSERVED",
+        "provenance": "Published prospective study, peer-reviewed"
+      },
+      {
+        "finding": "Repeat stenting for recurrent stenosis is already used clinically",
+        "source": "Clinical practice (multiple centers)",
+        "evidence_label": "OBSERVED",
+        "provenance": "Clinical practice confirms recurrence is a real failure mode, not theoretical"
+      },
+      {
+        "finding": "River Stent received FDA HDE approval (March 2026) — but FDA explicitly states effectiveness has NOT been demonstrated",
+        "source": "FDA HDE authorization + FDA patient guide",
+        "evidence_label": "OBSERVED",
+        "provenance": "FDA regulatory document"
+      },
+      {
+        "finding": "VSS evidence remains observational; standardization of outcome definitions unresolved",
+        "source": "2026 review of VSS literature",
+        "evidence_label": "OBSERVED",
+        "provenance": "Published review, peer-reviewed"
+      },
+      {
+        "finding": "STRIDE trial enrollment complete but eShunt remains investigational; safety/effectiveness not yet established",
+        "source": "CereVasc June 2026 release",
+        "evidence_label": "OBSERVED",
+        "provenance": "Company press release"
+      }
+    ],
+    "evidence_density": "HIGH — multiple independent peer-reviewed sources, meta-analysis, prospective study, FDA regulatory document. This is the most evidence-dense residual problem identified."
+  },
+  "frontier_evidence_model": {
+    "River_Stent": {
+      "OBSERVED": [
+        "FDA HDE approval (March 2026) for adult IIH patients with significant stenosis and specified pressure-gradient/anatomical criteria",
+        "FDA explicitly states effectiveness has NOT been demonstrated",
+        "Designed for flexible venous anatomy, variable radial force/diameter, reduced metal surface area"
+      ],
+      "ANNOUNCED": [
+        "Post-market surveillance as HDE condition",
+        "Platform expansion beyond IIH (company intent, not yet clinical)"
+      ],
+      "FORECAST": [
+        {
+          "prediction": "Lower restenosis than off-label arterial stents",
+          "confidence": "MODERATE — dedicated venous design should improve anatomy matching, but restenosis is BIOLOGICAL (intimal hyperplasia), not purely mechanical",
+          "reasoning": "Better stent mechanics can reduce malposition and improve wall apposition, but cannot prevent the biological response to a foreign body in the venous wall. Even dedicated coronary stents (with decades of optimization) still have 5-10% restenosis."
+        },
+        {
+          "prediction": "Standardized technique and outcomes",
+          "confidence": "MODERATE — a dedicated device enables standardization, but the 2026 review says outcome definitions remain unresolved",
+          "reasoning": "Standardization requires both device improvement AND clinical consensus on outcome measures. The device alone cannot solve the standardization problem."
+        }
+      ]
+    },
+    "BosSTENT_VIVA": {
+      "OBSERVED": [
+        "In prospective study targeting venous sinus disease",
+        "Earlier stage than River (no regulatory approval yet)"
+      ],
+      "ANNOUNCED": [
+        "Improved design over River — better anatomy matching, lower metal burden"
+      ],
+      "FORECAST": [
+        {
+          "prediction": "Further restenosis reduction vs River",
+          "confidence": "LOW-MODERATE — incremental design improvements, but same fundamental mechanism (mechanical stenting)",
+          "reasoning": "Design improvements can reduce mechanical failure modes (malposition, migration, poor apposition) but cannot address biological restenosis (intimal hyperplasia)."
+        }
+      ]
+    },
+    "eShunt": {
+      "OBSERVED": [
+        "STRIDE pivotal trial enrollment complete (230 patients, randomized vs VP shunt)",
+        "97% improvement in NPH symptoms (29/30 in FIH), 0 SAEs at 90 days",
+        "3-year IIH first-in-human case reported",
+        "Currently investigational — safety/effectiveness NOT established"
+      ],
+      "ANNOUNCED": [
+        "PMA pathway, FDA Breakthrough Device Designation",
+        "Platform expansion to IIH, PHH, pediatric (company intent, not yet clinical for these indications)"
+      ],
+      "FORECAST": [
+        {
+          "prediction": "eShunt could treat IIH by CSF diversion (bypassing the venous sinus entirely)",
+          "confidence": "LOW-MODERATE — FIH IIH case reported, but no IIH clinical trial",
+          "reasoning": "The eShunt creates a CSF→venous pathway that does NOT depend on sinus patency. This is a PHYSICALLY DIFFERENT mechanism from VSS. But it is not yet clinically validated for IIH."
+        }
+      ]
+    },
+    "VP_shunts": {
+      "OBSERVED": [
+        "Standard of care for hydrocephalus including IIH",
+        "High complication rate (30-50% revision in 2 years)",
+        "Antibiotic-impregnated catheters reduce infection",
+        "Programmable/gravitational/anti-siphon valves reduce over-drainage"
+      ],
+      "ANNOUNCED": [
+        "Smart shunts with pressure sensing (in development, not yet available)"
+      ],
+      "FORECAST": [
+        {
+          "prediction": "Incremental improvement in infection and over-drainage rates",
+          "confidence": "HIGH — well-established incremental improvement trajectory",
+          "reasoning": "VP shunt technology is mature; improvements are incremental, not transformational."
+        }
+      ]
+    }
+  },
+  "decisive_attack": {
+    "assumption": "Assume next-gen venous stents (River, BosSTENT, VIVA) achieve: (a) near-perfect anatomy matching, (b) minimal malposition/migration, (c) optimized radial force, (d) lowest achievable metal burden. Assume restenosis drops from 17.7% to 5-10% (consistent with coronary stent optimization).",
+    "residual_failures_that_survive_better_mechanics": [
+      {
+        "failure": "Biological restenosis (intimal hyperplasia) — the venous wall responds to the stent as a foreign body, growing tissue over it",
+        "why_mechanics_cannot_solve": "Intimal hyperplasia is a BIOLOGICAL response, not a mechanical failure. Better stent design can reduce the STIMULUS (better wall apposition, less trauma) but cannot eliminate the RESPONSE (the venous wall will still react to a metal foreign body). Even coronary stents — after 20+ years of optimization — still have 5-10% restenosis.",
+        "evidence": "Coronary stent restenosis: 5-10% even with drug-eluting stents (the gold standard). Venous stents are BEHIND coronary stents in design maturity.",
+        "persistence_after_competitor_success": "HIGH — even the best possible venous stent will have nonzero biological restenosis",
+        "competitor_resistant": true,
+        "competitor_resistance_reason": "No stent manufacturer can eliminate biological restenosis without changing from a MECHANICAL stent to a DIFFERENT causal architecture (e.g., biological coating, drug-eluting venous stent, or a non-stent approach like CSF diversion)."
+      },
+      {
+        "failure": "Disease progression — IIH physiology changes over time (weight gain, hormonal changes, pregnancy, sleep apnea) independent of stent patency",
+        "why_mechanics_cannot_solve": "The stent addresses the MECHANICAL obstruction (venous sinus stenosis). It does NOT address the underlying DISEASE (obesity-related venous compression, hormonal factors, venous compliance changes). A patent stent does not prevent the disease from progressing.",
+        "evidence": "IIH is strongly associated with obesity. Weight gain triggers recurrence. Pregnancy affects venous pressure. Sleep apnea causes nocturnal ICP elevation. These are well-documented IIH risk factors that stenting does not address.",
+        "persistence_after_competitor_success": "HIGH — disease progression is independent of stent mechanics",
+        "competitor_resistant": true,
+        "competitor_resistance_reason": "Stent manufacturers are solving the MECHANICAL problem (open the sinus). They are NOT solving the BIOLOGICAL problem (disease progression). This requires a different causal architecture — either drug therapy, monitoring + intervention, or a device that adapts to changing physiology."
+      },
+      {
+        "failure": "Patient selection — not all IIH patients have venous sinus stenosis, and selection methods are imperfect",
+        "why_mechanics_cannot_solve": "Even a perfect stent only works for patients WITH stenosis. ~20% of IIH patients have no stenosis to stent. Better stent design does not expand the treatable population.",
+        "evidence": "~80% of IIH patients have venous sinus stenosis. MRV/DSV selection has imperfect sensitivity.",
+        "persistence_after_competitor_success": "MODERATE — the 20% without stenosis remain untreated by VSS regardless of stent quality",
+        "competitor_resistant": true,
+        "competitor_resistance_reason": "VSS manufacturers are solving the STENOSIS problem. They are NOT solving the NON-STENOSIS IIH problem. This requires a different causal architecture — CSF diversion (eShunt) or medical therapy."
+      },
+      {
+        "failure": "Detection gap — no real-time monitoring of ICP or stent patency; deterioration detected clinically (after damage)",
+        "why_mechanics_cannot_solve": "A stent is a passive mechanical device. It cannot sense whether the sinus is re-narrowing or whether ICP is elevated. Better stent design does not add sensing capability.",
+        "evidence": "No existing venous stent has integrated pressure sensing. Deterioration is detected by symptoms (headache, vision changes) or imaging (MRV, papilledema) — all delayed.",
+        "persistence_after_competitor_success": "HIGH — the sensing gap is independent of stent mechanics",
+        "competitor_resistant": true,
+        "competitor_resistance_reason": "Stent manufacturers are solving the MECHANICAL problem. Adding sensing requires a DIFFERENT device architecture (integrated sensor + stent, or a separate monitoring device)."
+      }
+    ],
+    "the_competitor_resistant_residual": "The failure that competitors CANNOT eliminate without changing the underlying causal architecture is: BIOLOGICAL RESTENOSIS + DISEASE PROGRESSION.\n\nEven the best possible venous stent will have:\n1. Nonzero biological restenosis (intimal hyperplasia) — 5-10% minimum\n2. No adaptation to disease progression (weight gain, hormonal changes)\n3. No treatment for non-stenosis IIH patients (20%)\n4. No real-time monitoring of deterioration\n\nThese failures persist because they require a DIFFERENT CAUSAL ARCHITECTURE:\n- CSF diversion (bypasses the sinus entirely — eShunt approach)\n- Biological intervention (drug-eluting venous stent, medical therapy)\n- Sensing + monitoring (integrated pressure sensing)\n- Adaptive drainage (device that responds to changing physiology)\n\nThe eShunt's CSF→venous pathway is a PHYSICALLY DIFFERENT architecture that does NOT depend on sinus patency. It could address residuals #1, #2, and #3. BUT: the eShunt's passive valve cannot address #4 (monitoring) or adapt to changing physiology (#2) without additional capability."
+  },
+  "verdict": {
+    "problem_id": "RES-2",
+    "problem": "VSS restenosis and IIH recurrence after initially successful treatment — a failure that persists even after next-gen stents achieve their likely trajectory",
+    "evidence_density": "HIGH — 17.7% pooled restenosis (meta-analysis, 694 patients), 57% symptomatic recurrence (178 patients, prospective), 17% requiring repeat surgery, repeat stenting already clinical practice",
+    "competitor_resistant": true,
+    "competitor_resistance_reason": "Biological restenosis + disease progression cannot be eliminated by better stent mechanics. They require a different causal architecture.",
+    "eShunt_relevance": "HIGH — the eShunt bypasses the venous sinus entirely. It does not depend on sinus patency. This is a PHYSICALLY DIFFERENT mechanism from VSS.",
+    "gate_status": "YELLOW → APPROACHING GREEN — the problem is evidence-dense, competitor-resistant, and eShunt-relevant. But the eShunt's passive valve may not fully address the dynamic physiology aspect.",
+    "what_must_happen_before_mechanism": [
+      "1. Verify the eShunt is not already claimed for IIH in CereVasc's existing IP (prior-art check)",
+      "2. Model-validity attack: could the eShunt's proportional valve handle IIH physiology? (IIH has higher ICP than NPH — the pressure dynamics are different)",
+      "3. Determine whether the eShunt for IIH is a NEW INVENTION or just an INDICATION EXPANSION (if it's just indication expansion, it may not be a patentable invention)",
+      "4. Identify what SPECIFIC aspect of the IIH residual requires a NEW mechanism (not just 'use the existing eShunt for IIH')"
+    ],
+    "mechanism_status": "UNPROPOSED — but the problem gate is closer to GREEN than any previous candidate"
+  }
+}
