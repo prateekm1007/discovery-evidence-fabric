@@ -280,7 +280,7 @@
       "kill_reason": "INSUFFICIENT_CONTROL_AUTHORITY (PHYSICS_CEILING)",
       "what_was_proposed": "An adaptive (variable-diameter) venous sinus stent that could regulate CSF absorption by modulating venous pressure at the arachnoid granulation site, producing a technical effect (CSF absorption regulation) that shunts and static stents cannot.",
       "why_it_failed": "Physics sensitivity model shows that changing stent diameter by ±2 mm (6mm → 10mm) in a patent venous sinus produces only 0.13-0.19 mmHg change in the AG pressure gradient — far below the pre-registered 1 mmHg kill threshold. Root cause: at venous flow rates (200-500 mL/min), the Poiseuille pressure drop across a 40mm patent segment (6-12mm diameter) is only 0.01-0.2 mmHg. The AG gradient (3-5 mmHg normal, 15-35 mmHg in IIH) is dominated by CSF pressure and downstream venous pressure, NOT by stent diameter. The stent maintains LUMEN PATENCY (prevents collapse), not FLOW REGULATION. Once patent, changing diameter has minimal hemodynamic effect.",
-      "reusable_lesson": "FROZEN THEOREM CE-015: 'Adaptive diameter control of a patent venous sinus cannot materially change the AG pressure gradient because the Poiseuille pressure drop across a patent 6-12mm segment at venous flow rates is <0.2 mmHg. The stent's role is patency maintenance, not flow regulation. Control authority exists only in the stenotic regime (diameter <4mm), where the stent is already needed just to maintain patency. The r^4 Poiseuille dependence is powerful for STENOTIC segments but NOT for PATENT segments. Before proposing adaptive diameter control, calculate whether the operating point is in the stenotic regime (where r^4 matters) or the patent regime (where it doesn't).'",
+      "reusable_lesson": "MODEL-BOUNDED NEGATIVE RESULT (validated by network model): Under realistic post-stenting conditions (D=5-10mm, Q=200-500 mL/min), adaptive diameter control of a venous sinus cannot materially change the AG pressure gradient (max 0.19 mmHg << 1 mmHg threshold). Control authority exists only in the stenotic+high-flow regime (D≤4mm, Q≥1200 mL/min), which is physiologically incompatible with a stented patient. The r^4 Poiseuille dependence is powerful for small diameters but the absolute pressure drop at venous flow rates is dominated by CSF and downstream venous pressure. The stent's role is patency maintenance, not flow regulation. Network model with 1323 configurations confirms: flow redistribution through contralateral sinus does NOT rescue control authority (dominance has no effect). NOT a universal invariant — based on Poiseuille model with specific assumptions.",
       "what_to_avoid": [
         "Do not propose adaptive diameter control for patent (non-stenotic) vascular segments without first calculating the Poiseuille pressure drop at the operating flow rate.",
         "Do not assume that r^4 sensitivity at small diameters translates to authority at large diameters — the absolute pressure drop matters, not just the relative change.",
@@ -292,8 +292,38 @@
         "Sakka 2011: AG gradient = 3-5 mmHg (normal)",
         "J Physiol 1998: CSF absorption is pressure-driven"
       ],
-      "epistemic_class": "PROVEN_INVARIANT"
+      "epistemic_class": "MODEL_BOUNDED_NEGATIVE_RESULT",
+      "model_assumptions": {
+        "geometry": "single cylindrical segment (not network)",
+        "diameter_range": "6-12 mm (patent regime only; stenotic regime excluded)",
+        "length": "40 mm",
+        "viscosity": "3.5 cP",
+        "flow_range": "200-500 mL/min (published data reports up to 1582 mL/min)",
+        "network_topology": "NOT modeled — no collaterals, no contralateral sinus, no flow redistribution",
+        "AG_location": "ASSUMED downstream of stent; not mapped to specific AG-bearing regions",
+        "stenotic_regime": "EXCLUDED from analysis — circular dismissal (stent operates AT stenosis, not just in patent regime)"
+      },
+      "correction_note": "Downgraded from PROVEN_INVARIANT to MODEL_BOUNDED_NEGATIVE_RESULT per CEO Round 56u directive. The model's assumptions are too narrow to support a universal invariant.",
+      "network_model_results": {
+        "total_configs_tested": 1323,
+        "configs_with_control_authority": 81,
+        "passing_diameters": [
+          3,
+          4
+        ],
+        "passing_flows": [
+          1200,
+          1600
+        ],
+        "min_diameter_for_1mmHg": 3,
+        "min_flow_for_1mmHg": 1200,
+        "max_delta_AG": 1.9,
+        "diameter_5mm_max_delta": 0.67,
+        "diameter_6plus_max_delta": 0.19,
+        "dominance_effect": "NONE — same result for 50/50, 70/30, 90/10 split",
+        "physiological_compatibility": "PASSING configs require D≤4mm AND Q≥1200 mL/min — incompatible with stented patient (D=7-10mm, Q=200-500)"
+      }
     }
   ],
-  "updated_at": "2026-08-21T22:30:00+00:00"
+  "updated_at": "2026-08-21T23:15:00+00:00"
 }
