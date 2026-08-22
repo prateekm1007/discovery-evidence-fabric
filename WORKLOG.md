@@ -4604,3 +4604,111 @@ Stage Summary:
 - **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: BLOCKED.
 - **CI: FAILED (11/14). Research state, NOT certified.**
 - **The machine's job ends here. The next proof must come from the physical world.**
+
+
+---
+Task ID: ROUND70-CONTROLLED-AMENDMENT-BEFORE-EXECUTION
+Agent: main (CTO mode — controlled protocol amendment, final pre-execution artifact), session 2026-08-22
+Task: Per CEO Round 69 directive — issue 4 controlled amendments to the frozen Stage-0 protocol BEFORE data collection. Fix composition requirement, time-series multiplicity, threshold vs significance, and control interpretation. Then stop coding entirely.
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0. Articles I, V, XXV, XXVI, XXVII, XXVIII, XXIX, XXXI, XXXII, XXXIV applied. CE-012, CE-014, CE-017, CE-018 enforced.
+- Pre-session epistemic check acknowledged.
+- This is a CONTROLLED AMENDMENT round. No OX Alpha calls. No new invention work. The sole purpose is to fix 4 methodological problems identified by the CEO before any data is collected.
+
+CEO ROUND 69 AUDIT — 4 AMENDMENTS REQUIRED:
+1. COMPOSITION REQUIREMENT: Require signal in BOTH compositions (not just one) to advance general hypothesis.
+2. TIME-SERIES MULTIPLICITY: 15 features x Bonferroni is not enough — features evaluated over many time windows. Replace with frozen time-series block permutation procedure.
+3. THRESHOLD VS SIGNIFICANCE: 3-sigma is detection threshold, NOT inferential p-value. Define separately.
+4. CONTROL INTERPRETATION: Gelatin controls test instrumentation artifacts only, NOT biological specificity.
+
+AMENDMENT 1 — COMPOSITION REQUIREMENT:
+- Problem: Frozen criterion allowed signal in ONE composition only to advance. Contradicts cross-composition robustness objective.
+- Fix: Precursor must be observed in BOTH composition groups (>=60% of fragmenting clots in EACH group) to advance general hypothesis.
+- If signal in only ONE composition: COMPOSITION-SPECIFIC SIGNAL. Does NOT advance general candidate. Does NOT kill. Triggers Stage-1 design for that composition only.
+- Revised K0_4: If signal in NEITHER composition → KILL. If signal in ONE composition → composition-specific, does not advance general candidate.
+
+AMENDMENT 2 — TIME-SERIES MULTIPLICITY:
+- Problem: 15 features x ~100 time windows per trial = ~1500 tests. Simple Bonferroni across features does not control temporal multiplicity.
+- Fix: Replace with FROZEN TIME-SERIES INFERENCE PROCEDURE:
+  * Step 1: Compute feature time series (sliding 100ms window, 10ms step).
+  * Step 2: Define 'earliest deviation time' = first time feature crosses detection threshold. SINGLE event per feature per trial, not per-window test.
+  * Step 3: Unit of inference = earliest deviation event, NOT per-window crossing.
+  * Step 4: Block permutation test (1000 permutations, stratified by composition). Test whether earliest deviation time precedes t_fragmentation by >=1.0s.
+  * Step 5: Bonferroni correction across 15 features on PERMUTATION p-value (not on per-window crossings).
+  * Step 6: Report ALL 15 features with earliest deviation time, lead time, permutation p-value, Bonferroni-corrected significance, proportion significant per composition.
+- Key distinction: Detection threshold identifies WHEN. Permutation test determines WHETHER. These are separate.
+
+AMENDMENT 3 — THRESHOLD VS SIGNIFICANCE:
+- Problem: 3-sigma deviation was treated as statistical significance. Incorrect.
+- Fix: Define two separate concepts:
+  * DETECTION THRESHOLD: Pre-specified criterion for identifying when feature deviates from baseline (3-sigma for magnitude, 3x baseline for derivative/HF/stiffness). NOT a p-value. Can be crossed by chance (especially with autocorrelated data).
+  * INFERENTIAL TEST: Block permutation test (Amendment 2). THIS is the p-value. Significance threshold = Bonferroni-corrected p<0.0033.
+  * A feature must pass BOTH: (a) cross detection threshold before t_fragmentation, AND (b) permutation p-value <0.0033.
+
+AMENDMENT 4 — CONTROL INTERPRETATION:
+- Problem: Gelatin controls treated as testing biological specificity. They only test instrumentation artifacts.
+- Fix: State explicitly:
+  * Gelatin controls TEST: instrumentation artifacts (apparatus creates false signal when no biological material present).
+  * Gelatin controls DO NOT TEST: biological specificity, pre-fracture mechanical specificity, vessel-wall interaction, device engagement specificity, clinical realism.
+  * Revised K0_5: Fires if features deviate in gelatin (apparatus artifact). Does NOT fire if features deviate only in thrombus (expected). But positive thrombus-only signal must be interpreted narrowly: 'not an apparatus artifact, but biological specificity untested in Stage 0.'
+  * Additional controls recommended for Stage 1: non-fragmenting thrombus trials, different thrombus analogs, vessel-wall interaction tests.
+
+STAGE-0 FRAMING:
+- Stage 0 = SIGNAL-DISCOVERY PILOT, not validation.
+- 5 clots per composition (10 total) is sufficient for falsification pilot. If no signal in ANY clot → killed at minimal cost. If signal exists → pilot justifies spending on properly powered Stage-1 experiment.
+- Positive Stage-0 result earns the right to design Stage 1. Does NOT make Slot 5 an invention.
+- CEO principle: 'The experiment must be cheap enough to kill the idea before you become emotionally or financially committed to it.'
+
+WHAT IS NOT CHANGED:
+- Hypothesis: Does a measurable signal reliably precede clot fragmentation by >=1 second? UNCHANGED.
+- Samples, instrumentation, conditions, blinding, frozen features: ALL UNCHANGED.
+- Stop coding directive: UNCHANGED. No more predictors, neural networks, patent claims, mechanism variants.
+
+AMENDED KILL CONDITIONS:
+- K0_1: <3 fragmentations → inconclusive (re-design, not kill)
+- K0_2: No feature passes BOTH detection + permutation → KILL + CE-019
+- K0_3: Median lead time <1.0s → KILL + CE-019
+- K0_4: Signal in NEITHER composition → KILL + CE-019. Signal in ONE composition only → composition-specific, does not advance general candidate, triggers Stage-1 for that composition.
+- K0_5: Features deviate in gelatin → apparatus artifact → KILL + CE-019.
+
+AMENDED SUCCESS CRITERIA:
+- To advance general candidate to Stage 1: (a) >=1 feature passes detection + permutation, (b) median lead time >=1.0s, (c) signal in BOTH compositions (>=60% in EACH), (d) no gelatin deviation.
+- To generate composition-specific hypothesis: signal in ONE composition only. Does NOT advance general candidate. Triggers Stage-1 for that composition.
+- To kill: ANY of K0_2, K0_3, K0_5. OR K0_4 (neither composition).
+
+CONSTITUTION COMPLIANCE:
+- Article I: COMPLIED.
+- Article V: COMPLIED — candidate at DISCOVERY HYPOTHESIS, not promoted.
+- Article XXV: COMPLIED — physics untested = UNKNOWN.
+- Article XXVI: COMPLIED — NOT CERTIFIED. CI reports FAILURE.
+- Article XXVII: COMPLIED — all thresholds pre-registered, no post-hoc adjustment. The amendment itself is pre-execution.
+- Article XXVIII: COMPLIED.
+- Article XXIX: COMPLIED — 3 claims separated.
+- Article XXXI: COMPLIED — this Round 70 record is the memory artifact.
+- Article XXXII: COMPLIED — strongest alternative stated (no signal exists).
+- Article XXXIV: COMPLIED — STOP CODING. Next step is reality-bound.
+- CE-012: COMPLIED.
+- CE-014: COMPLIED.
+- CE-017: COMPLIED — Stage-0 is the adversarial model-uncertainty test.
+- CE-018 sharpened: COMPLIED.
+
+PORTFOLIO STATUS:
+- Slot 5: DISCOVERY HYPOTHESIS — Stage-0 protocol amended + frozen, NOT executed. §103 OPEN. Physics untested.
+- World-class inventions: 0/5.
+- Human correspondence: 0.
+- Mechanism generation: BLOCKED.
+- Cemetery: 18 entries (UNCHANGED).
+- CI: FAILED (11/14). G10/G12/G13 RED. Research state.
+
+Stage Summary:
+- **4 CONTROLLED AMENDMENTS ISSUED before data collection.** (1) Both compositions required for general advancement. (2) Time-series block permutation replaces simple Bonferroni. (3) Detection thresholds separated from inferential p-values. (4) Gelatin controls clarified as instrumentation-artifact tests only.
+- **STAGE 0 = SIGNAL-DISCOVERY PILOT, not validation.** Cheap enough to kill the idea. If positive, earns the right to design Stage 1. Does NOT make Slot 5 an invention.
+- **STOP CODING.** The protocol is now corrected and frozen. No further computational work. The machine's job is finished until physical evidence is produced.
+- **NEXT STEP: WET-LAB EXECUTION.** Execute the amended Stage-0 protocol. If ANY kill condition fires → KILL + CE-019 + Slot 5 EMPTY. If ALL pass → advance to Stage 1.
+- **CEMETERY UNCHANGED AT 18 ENTRIES.**
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: BLOCKED.
+- **CI: FAILED (11/14). Research state, NOT certified.**
+- **The machine's job ends here. The next proof must come from the physical world.**
