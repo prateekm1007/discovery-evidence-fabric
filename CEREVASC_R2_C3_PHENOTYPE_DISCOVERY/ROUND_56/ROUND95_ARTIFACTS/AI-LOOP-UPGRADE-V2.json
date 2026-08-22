@@ -1,0 +1,128 @@
+{
+  "record_type": "AI_LOOP_UPGRADE_V2",
+  "round": 95,
+  "date": "2026-08-23",
+  "authority": "CEO Round 94 directives: symmetric divergence, multidimensional cost, model-discrepancy gate",
+
+  "febio_visco_validation": {
+    "result": "PASS",
+    "max_diff_pct": 0.000470,
+    "description": "FEBio viscoelastic (100 steps, dt=0.1) matches corrected analytical reference to 0.0005% at all 6 sampled time points. Confirms Round 94 analytical correction was correct.",
+    "sample_points": [
+      {"t": 0.1, "febio": 0.140389, "analytical": 0.140390, "diff_pct": 0.000470},
+      {"t": 0.5, "febio": 0.125467, "analytical": 0.125467, "diff_pct": 0.000369},
+      {"t": 1.0, "febio": 0.113529, "analytical": 0.113529, "diff_pct": 0.000375},
+      {"t": 2.0, "febio": 0.101897, "analytical": 0.101897, "diff_pct": 0.000126},
+      {"t": 5.0, "febio": 0.095464, "analytical": 0.095464, "diff_pct": 0.000158},
+      {"t": 10.0, "febio": 0.095129, "analytical": 0.095129, "diff_pct": 0.000075}
+    ]
+  },
+
+  "chd_v2_symmetric_divergence": {
+    "ceo_directive": "One-directional KL is not enough. KL divergence is asymmetric. Use symmetric divergence or expected posterior information gain.",
+    "old_formula": "a(x) = D_KL(p(y|x,H_best) || p(y|x,H_alt)) / cost(x)",
+    "problem": "KL is asymmetric: D_KL(P||Q) ≠ D_KL(Q||P). Can prefer one model's representation while ignoring the reverse.",
+
+    "new_formula": "a(x) = D_JS(p(y|x,H_best), p(y|x,H_alt)) / cost(x)",
+    "where": {
+      "D_JS": "Jensen-Shannon divergence = (1/2)*D_KL(P||M) + (1/2)*D_KL(Q||M), where M = (P+Q)/2",
+      "properties": ["Symmetric: D_JS(P,Q) = D_JS(Q,P)", "Bounded: 0 <= D_JS <= log(2)", "Always finite (unlike KL)"]
+    },
+
+    "even_stronger_alternative": {
+      "name": "Expected Hypothesis Entropy Reduction (EHER)",
+      "formula": "a(x) = E_y[H(p(H|D)) - H(p(H|D,y,x))] / cost(x)",
+      "where": {
+        "H": "Shannon entropy of hypothesis posterior",
+        "E_y": "Expectation over predicted outcomes y ~ p(y|x,D)",
+        "interpretation": "How much does the experiment at x REDUCE uncertainty about which hypothesis is correct, averaged over possible outcomes?"
+      },
+      "advantage": "Directly measures epistemic value — reduction in hypothesis uncertainty. Not just divergence between two models, but expected posterior information gain.",
+      "implementation": "For each candidate x: (1) sample y from each model's prediction, (2) compute posterior update for each y, (3) measure entropy reduction, (4) average over y samples.",
+      "computational_cost": "O(n_models * n_samples * posterior_update_cost) per candidate"
+    },
+
+    "recommended_implementation": "Use EHER as primary acquisition, D_JS as fast approximation for candidate pre-filtering."
+  },
+
+  "cost_v2_multidimensional": {
+    "ceo_directive": "Cost cannot be only solver runtime. The real cost function needs compute + memory + solver failure probability + human review + physical experiment cost + elapsed time.",
+    "formula": "C(x) = C_compute(x) + C_validation(x) + C_human(x) + C_physical(x) + C_elapsed(x)",
+    "components": {
+      "C_compute": {
+        "description": "Computational cost (FEBio/SfePy solve time, in seconds or core-hours)",
+        "measurement": "Wall-clock time of simulation",
+        "typical_range": "1-3600 seconds for FEBio; 0.1-300 seconds for SfePy"
+      },
+      "C_validation": {
+        "description": "Cost of validating the simulation result (cross-solver comparison, CEAT-GATE audit, analytical comparison)",
+        "measurement": "Time to run CEAT-GATE + extract and compare outputs",
+        "typical_range": "10-60 seconds for L3-type; 60-300 seconds for L4+ with history"
+      },
+      "C_human": {
+        "description": "Human review cost (CTO review of results, interpretation, decision-making)",
+        "measurement": "Estimated human time to review and approve (in person-hours)",
+        "typical_range": "0.5-4 hours per non-trivial result"
+      },
+      "C_physical": {
+        "description": "Physical experiment cost (if this simulation is a precursor to physical testing)",
+        "measurement": "Dollar cost of equivalent physical experiment",
+        "typical_range": "$1,000-$100,000 per experiment",
+        "note": "Zero for pure simulation; non-zero when simulation informs physical experiment design"
+      },
+      "C_elapsed": {
+        "description": "Elapsed/wall-clock time (including queue wait, data transfer, etc.)",
+        "measurement": "Calendar time from request to result",
+        "typical_range": "1-48 hours depending on queue and data transfer"
+      }
+    },
+    "normalization": "Each component normalized to [0,1] via min-max scaling, then weighted: C = w1*C_compute + w2*C_validation + w3*C_human + w4*C_physical + w5*C_elapsed. Default weights: w1=0.3, w2=0.2, w3=0.2, w4=0.2, w5=0.1.",
+    "interpretation": "The acquisition function a(x) = EHER(x) / C(x) now balances epistemic value against TOTAL cost, not just compute time."
+  },
+
+  "escalation_gate_v2_model_discrepancy": {
+    "ceo_directive": "Low posterior uncertainty does not necessarily mean the hypothesis is correct. A model can be extremely confident and wrong because of model-form error. The escalation gate needs an explicit model-discrepancy/out-of-family test.",
+
+    "old_escalation": "escalate when EIG_sim/cost_sim < EIG_phys/cost_phys AND solver_disagreement < threshold AND posterior_uncertainty < threshold",
+    "problem": "Posterior uncertainty can be low while model-form error is high. All models can agree and be wrong.",
+
+    "new_escalation": {
+      "conditions": "ALL of the following must hold:",
+      "condition_1_posterior_uncertainty": "H[p(H|D)] < threshold_entropy (hypothesis is well-determined)",
+      "condition_2_solver_disagreement": "max|FEBio - SfePy| / |analytical| < threshold_disagreement (solvers agree)",
+      "condition_3_model_discrepancy": "MODEL_DISCREPANCY_TEST passes (out-of-family validation)",
+      "condition_4_cost_ratio": "EIG_sim / C_sim < EIG_phys / C_phys (simulations less informative than reality per unit cost)",
+
+      "model_discrepancy_test": {
+        "description": "Tests whether the model family itself might be wrong, not just whether parameters are uncertain.",
+        "method": "Compare the model's predictions against an OUT-OF-FAMILY reference (different physics model, different solver family, or analytical solution from different assumptions).",
+        "examples": [
+          "If validating FEBio+SfePy (both FE): compare against SPH/peridynamics (meshless) on same problem",
+          "If validating hyperelastic model: compare against viscoelastic model to check if time-dependence is being missed",
+          "If validating single-element: compare against multi-element to check if discretization error is hidden",
+          "If validating at 10% strain: compare against 20% strain to check if model extrapolation fails"
+        ],
+        "threshold": "Out-of-family prediction must agree with in-family prediction to within 2x the in-family tolerance. If out-of-family disagrees, model-form error is suspected and escalation is BLOCKED.",
+        "interpretation": "This catches the case where all in-family models agree but the entire family is wrong. The CEO's warning: 'A model can be extremely confident and wrong because of model-form error.'"
+      },
+
+      "decision_rule": "escalate_to_physical = condition_1 AND condition_2 AND condition_3 AND condition_4",
+      "rationale": "Only escalate when: (a) hypothesis is well-determined, (b) solvers agree, (c) model family is not suspected of form error, (d) simulations are less informative than reality. This is the TRUE Article XXXIV trigger."
+    }
+  },
+
+  "competing_hypothesis_engine_v2": {
+    "ceo_directive": "For every hypothesis, maintain at least: supporting model, strongest alternative model, null model, failure model. Then ask the AI to find the experiment that maximizes their separation.",
+
+    "models": {
+      "supporting_model": "Best-fitting model that supports the current hypothesis H_best",
+      "strongest_alternative_model": "Best-fitting model that supports a DIFFERENT hypothesis H_alt",
+      "null_model": "Model representing no effect / baseline behavior (e.g., linear elastic, zero relaxation)",
+      "failure_model": "Model representing the specific failure mode the hypothesis claims won't happen (e.g., fracture, instability)"
+    },
+
+    "acquisition_with_4_models": "For candidate x, compute predicted outcome distributions under all 4 models. The acquisition value is: a(x) = max_{i≠j} D_JS(p_i(y|x), p_j(y|x)) / C(x). This selects the simulation that maximally distinguishes ANY two competing explanations.",
+
+    "key_principle": "The ideal simulation is NOT 'most likely to kill my idea.' It IS 'the cheapest experiment whose possible outcomes would most strongly distinguish my best hypothesis from its strongest surviving alternative.' (CEO Round 93)"
+  }
+}
