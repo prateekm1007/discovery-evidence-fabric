@@ -4039,3 +4039,97 @@ Stage Summary:
 - **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: PARTIALLY UNBLOCKED.
 - **CREDENTIAL HYGIENE:** Both credentials inline via env var ONLY. NOT persisted.
 - **REMINDER FOR NEXT SESSION:** Two credentials needed (GitHub PAT, OpenRouter API key). Both inline only. Two mandatory verification steps remain computationally tractable.
+
+
+---
+Task ID: ROUND64-MANDATORY-ATTACKS-AND-FINAL-ASSESSMENT
+Agent: main (CTO mode, OX Alpha as engineer via OpenRouter stealth/ox-alpha, z-ai web_search + page_reader for patent fetching), session 2026-08-22
+Task: Per CEO Round 63 audit directive — execute 2 mandatory attacks with CEO's sharpened purpose: (1) US20250186070A1 full-text keyword sweep for prediction-related language; (2) traction-control prior art search. Isolate the true primitive. Pre-register kill conditions. Assess whether forward prediction of clot fragmentation survives.
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0 Articles I, V, XXV, XXVI, XXVII, XXVIII, XXIX, XXX, XXXI, XXXII, XXXIV.
+- Cemetery theorems applied: CE-012, CE-014, CE-016, CE-017, CE-018 (sharpened in Round 63).
+- Pre-session epistemic check acknowledged.
+
+REPOSITORY STATE (per Article XXIII):
+- Local HEAD at start of round: 2100af5 (Round 63 — pushed in prior session).
+- Remote main at start of round: 2100af5 (verified via ls-remote with PAT).
+- CI status at start of round: Run #175 on 2100af5 — completed, conclusion=FAILURE (G10/G13 RED; G12 PASS — pass_a_blobs=5166, pass_b_blobs=5166).
+
+ATTACK 1 — US20250186070A1 FULL-TEXT KEYWORD SWEEP:
+- Fetched full patent HTML (658K chars) via z-ai page_reader.
+- Extracted full description. Searched for 50+ prediction-related keywords.
+- KEY FINDINGS:
+  * 'prediction'/'predict'/'future'/'imminent'/'impending'/'anticipate'/'warning'/'pre-event'/'lead time'/'trend'/'rate of change'/'derivative'/'gradient': ZERO occurrences.
+  * 'fragment'/'fragments'/'fragmentation': 22 occurrences, BUT ALL in BACKGROUND descriptions of OTHER thrombectomy devices (rotational, rheolytic) that intentionally fragment clots. NONE describe predicting fragmentation as adverse event.
+  * 'fail'/'failure'/'failing': 22 occurrences, ALL current-state (failed clot removal as background problem, fail to detect signal, failing to satisfy threshold). NONE describe predicting future failure.
+  * 'threshold': 1 occurrence, for current-state force/pressure classification. NOT prediction.
+  * 'temporal': 2 occurrences, for 'temporal characteristics of the signal' (current-state). NOT temporal prediction.
+- VERDICT: DEFINITIVE NO — US20250186070A1 does NOT teach forward prediction of an imminent adverse event. High confidence. The positive content of the document actively contradicts forward prediction rather than merely omitting it.
+
+ATTACK 2 — TRACTION-CONTROL PRIOR ART SEARCH:
+- 7 CE-014-compliant queries using CEO's exact terms.
+- 18 patent URLs identified. Key findings:
+  * WO2018234887A1: motorized surgical instrument velocity control (staplers), NOT thrombectomy.
+  * US4812724A: injector speed control, NOT thrombectomy.
+  * US9402977B2: robotic catheter drive, general, NOT thrombectomy-specific.
+  * US10531883B1: vacuum/vent valve cycling (pressure), NOT traction speed.
+  * Rapidpulse: pulsed vacuum, NOT traction speed.
+  * WO2012114333A1: rotational atherectomy speed, NOT linear traction.
+  * US10743907B2, EP3823686B1: thrombectomy devices but no traction-speed teaching.
+- VERDICT: INCONCLUSIVE, leaning NOVEL-but-crowded-adjacent. None of 18 reviewed patents teach traction-VELOCITY modulation during thrombectomy based on force feedback. BUT: US11504151B2 (Stryker, cited by CEO) has NOT been full-text swept for velocity/rate/speed/retraction keywords. This is the single largest evidentiary gap.
+
+OX ALPHA FINAL ASSESSMENT:
+- Single call (~90s, ~8000 completion tokens).
+- Section 1 (Attack 1): NO, high confidence. Forward-predictive structure is a genuine gap.
+- Section 2 (Attack 2): INCONCLUSIVE, leaning novel. Traction-velocity vs aspiration-pressure distinction is partially genuine (different failure physics: strain rate vs pressure), partially semantic (both reduce load on clot). Distinction survives only if coupled to friability/strain-rate mechanism.
+- Section 3 (True Primitive): Link 3 (forward prediction) is the true primitive candidate. Not a re-skin of link 2 (friability index): F characterizes present state; prediction asserts time-to-event with usable lead window. The empirical claim that a pre-event signature exists at all is unproven and untaught.
+- Section 4 (Kill Conditions):
+  1. No pre-event signature: INCONCLUSIVE (highest-probability kill condition; requires ex vivo experiment; brittle fracture often abrupt with sub-100ms precursors, fatal to 1-10s window).
+  2. Lead time too short: INCONCLUSIVE (contingent on condition 1).
+  3. Existing systems equivalent warning: NOT MET (US20250186070A1 has zero predictive content).
+  4. Intervention not executable: NOT MET for tiers 1-2 (speed halt + aspiration ramp <2s); MET for tier 3 (abort+reposition needs >5s).
+  5. §103 reconstructs loop: INCONCLUSIVE (hinges on US11504151B2 sweep).
+- Section 5 (Final Verdict): CONDITIONAL SURVIVAL, gated on 2 mandatory next steps: LEGAL GATE (US11504151B2 sweep) + PHYSICS GATE (ex vivo pre-signature experiment).
+
+CTO AUDIT:
+- Article I: PASS — OX Alpha quoted actual keyword sweep findings and patent snippets. No fabrication.
+- Article XXV: PASS — multiple INCONCLUSIVE markers stated honestly.
+- Article XXVIII: PASS — OX Alpha explicitly tested traction-velocity vs aspiration-pressure distinction for CE-012 semantic-loophole risk. Verdict: partially genuine, partially semantic. Distinction survives only if coupled to friability/strain-rate mechanism.
+- Article XXXII: PASS — strongest alternative (predictable aggregation) stated first.
+- CE-012: PASS — no semantic re-skins.
+- CE-014: PASS — CEO's exact inventor vocabulary used.
+- CE-017: PASS — physics gate is the adversarial model-uncertainty test.
+- CE-018 sharpened: PASS — complete causal loop assessed link-by-link; true primitive isolated.
+
+CTO DECISION:
+- CONDITIONAL SURVIVAL_GATED — candidate survives at forward-prediction primitive (link 3), gated on 2 mandatory next steps.
+- LEGAL GATE: Full-text keyword sweep of US11504151B2 for velocity/rate/speed/retraction terms. If US11504151B2 discloses velocity control, actuator link collapses to crowded and §103 risk rises sharply.
+- PHYSICS GATE: Ex vivo pre-signature experiment (does any feature precede fracture by >=1-2s at usable sensitivity?). Highest-probability kill condition. If brittle fracture has sub-100ms precursors, the 1-10s window is fatal.
+- KILL CONDITION: If EITHER gate fails → KILL + CE-019 + Slot 5 EMPTY + pivot axes revisited.
+- SURVIVAL CONDITION: If BOTH gates pass → advance to designed validation program.
+
+PER ARTICLE XXXIV — REALITY BOUNDARY:
+- Computationally tractable: LEGAL GATE (US11504151B2 sweep — same method as Attack 1).
+- Reality-bound: PHYSICS GATE (ex vivo experiment — requires wet lab + thrombus analogs + high-sample-rate recording).
+
+PORTFOLIO STATUS POST ROUND 64:
+- Slot 5: CONDITIONAL_SURVIVAL_GATED — 2 gates pending (LEGAL + PHYSICS).
+- World-class inventions: 0/5.
+- Human correspondence: 0.
+- Mechanism generation: PARTIALLY UNBLOCKED — true primitive isolated; 2 gates pending.
+- Cemetery: 18 entries (UNCHANGED).
+
+Stage Summary:
+- **ATTACK 1 DEFINITIVE: US20250186070A1 does NOT teach forward prediction.** Zero prediction keywords; all fragment/failure occurrences are background or current-state. High confidence.
+- **ATTACK 2 INCONCLUSIVE: Traction-velocity modulation not found in 18 reviewed patents.** BUT US11504151B2 (Stryker) not yet full-text swept. Single largest evidentiary gap.
+- **TRUE PRIMITIVE: Forward prediction of fragmentation within 1-10s (link 3).** Not a re-skin of friability index (link 2). The empirical claim that a pre-event signature exists is unproven and untaught.
+- **5 KILL CONDITIONS ASSESSED:** Condition 3 NOT MET (US20250186070A1 has zero predictive content). Conditions 1, 2, 5 INCONCLUSIVE. Condition 4 NOT MET for tiers 1-2.
+- **CTO DECISION: CONDITIONAL_SURVIVAL_GATED.** 2 mandatory gates: LEGAL (US11504151B2 sweep) + PHYSICS (ex vivo pre-signature experiment). Either failing kills the candidate.
+- **HIGHEST-PROBABILITY KILL: PHYSICS GATE.** Brittle fracture is often abrupt with sub-100ms precursors. If no pre-event signature exists at 1-10s lead time, the entire loop collapses regardless of legal status.
+- **CEMETERY UNCHANGED AT 18 ENTRIES.**
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: PARTIALLY UNBLOCKED.
+- **CREDENTIAL HYGIENE:** Both credentials inline via env var ONLY. NOT persisted.
+- **REMINDER FOR NEXT SESSION:** Two credentials needed (GitHub PAT, OpenRouter API key). Both inline only. LEGAL GATE (US11504151B2 sweep) is computationally tractable and should be executed first; PHYSICS GATE requires external wet-lab resources.
