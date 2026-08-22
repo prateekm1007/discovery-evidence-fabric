@@ -1,0 +1,130 @@
+{
+  "round": "71",
+  "timestamp_utc": "2026-08-22T04:18:00+00:00",
+  "task_id": "ROUND71-FINAL-AMENDMENT-TEMPORAL-NULL-AND-PILOT-BOUNDARY",
+  "agent": "main (CTO mode — final amendment, terminal computational artifact)",
+  "constitution_version": "1.5.0",
+
+  "constitution_recertification": {
+    "version": "1.5.0",
+    "pre_session_check_acknowledged": true,
+    "articles_applied": ["I", "V", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXXI", "XXXII", "XXXIV", "CE-012", "CE-014", "CE-017", "CE-018"],
+    "note": "FINAL AMENDMENT round. No OX Alpha calls. No new invention work. This is the last computational artifact. After this amendment, all coding stops permanently. The only valid progress is physical execution of Stage 0."
+  },
+
+  "ceo_round_70_audit_summary": {
+    "ceo_verdict": "The controlled amendment is genuinely in the repository and makes the four methodological corrections. This is a much more defensible preregistration. But I see two remaining P0 problems.",
+    "ceo_p0_problems": [
+      "1. TEMPORAL NULL: The permutation null says 'earliest deviation time is equally likely to occur at any point in the trial.' This is a strong null assumption. The force trajectory is NOT exchangeable over time — traction begins at a known point, loading evolves systematically, and fragmentation probability increases as retrieval proceeds. Simply permuting deviation times relative to fragmentation generates an invalid null. A better approach: predefined within-trial time-respecting null (circular/block shifts within pre-fragmentation interval, permutation across matched trials with comparable retrieval duration, or pre-specified survival/time-to-event model with appropriate censoring).",
+      "2. PILOT INTERPRETATION: With n=5 per composition, 60% = 3/5. One event changing classification changes the conclusion by 20pp. Acceptable for pilot signal-discovery screen, but the artifact should say clearly: '3/5 + 3/5 is evidence of a repeatable pilot signal, not evidence of sensitivity or generalization.'"
+    ],
+    "ceo_composition_specific_handling": "A one-composition signal should NOT advance the general invention at all. It can be stored as a NEW hypothesis, but it should NOT inherit the current invention lineage automatically. Otherwise a failed general hypothesis can survive indefinitely by fragmenting into narrower versions.",
+    "ceo_pushing_the_envelope_principle": "A world-class experiment is one where even a positive result is tightly bounded. The machine should make it difficult to fool itself not only when it fails, but also when it succeeds.",
+    "ceo_final_directive": "Make the temporal null model robust. Freeze that final amendment. Then STOP all coding. No more feature engineering, no ML, no claims, no optimization. After that, the only valid progress is physical execution of Stage 0."
+  },
+
+  "final_amendment_5_temporal_null_model": {
+    "problem": "The Round 70 amendment (Amendment 2) specified a block permutation test where 'the earliest deviation time is equally likely to occur at any point in the trial.' This is an unrestricted random time permutation that assumes exchangeability of the force signal over time. This assumption is FALSE: (a) traction begins at a known point (t=0), (b) loading evolves systematically as the device engages and pulls the clot, (c) fragmentation probability increases as retrieval proceeds (cumulative stress accumulation), (d) the force signal is autocorrelated and non-stationary. An unrestricted permutation null does not preserve this temporal structure and can generate invalid p-values (inflated false positives or false negatives).",
+    "amendment": "Replace the unrestricted time permutation with a TEMPORAL-STRUCTURE-PRESERVING NULL. Three approaches are pre-specified; the experimenter must use the FIRST approach that is feasible given the data. All three must be reported if multiple are feasible.",
+    "approach_1_circular_block_shift_within_pre_fragmentation_interval": {
+      "description": "For each fragmenting trial, identify the pre-fragmentation interval [t_traction_onset, t_fragmentation]. Within this interval, apply a circular block shift to the feature time series: shift the entire feature series by a random integer number of blocks (block size = 100ms, matching the analysis window), wrapping around within the pre-fragmentation interval. This preserves the autocorrelation structure and the systematic loading progression within the trial while breaking the temporal association between feature deviation and fragmentation.",
+      "null_hypothesis": "Under H0, the earliest deviation time is uniformly distributed within the pre-fragmentation interval, conditional on the observed force trajectory shape.",
+      "permutation_procedure": "For each fragmenting trial: (1) extract the feature time series within [t_traction_onset, t_fragmentation], (2) apply a random circular block shift (block = 100ms, shift = random multiple of 100ms within the interval), (3) recompute the earliest deviation time on the shifted series, (4) compute the lead time (t_fragmentation - shifted_earliest_deviation). Repeat 1000 times per trial. Pool across trials within each composition group.",
+      "why_this_preserves_temporal_structure": "Circular block shifts preserve the autocorrelation within each 100ms block and the gross temporal trend (loading increases over time) because the entire series is shifted as a unit. What is broken is the precise timing relationship between feature deviation and fragmentation — which is exactly what the null hypothesis questions.",
+      "p_value_computation": "p = proportion of permuted lead times that are >= the observed lead time, pooled across trials within each composition group. Stratified by composition (separate p-values for RBC-rich and fibrin-rich)."
+    },
+    "approach_2_matched_trial_permutation": {
+      "description": "If circular block shifts are infeasible (e.g., very short pre-fragmentation intervals <2s making block shifts trivial), use cross-trial permutation among trials with comparable retrieval duration (matched within ±1s of total retrieval time).",
+      "null_hypothesis": "Under H0, the earliest deviation time in trial A is equally likely to be associated with the fragmentation time of any trial B with comparable retrieval duration.",
+      "permutation_procedure": "For each pair of matched-duration trials (A, B): swap the fragmentation label while keeping the feature time series fixed. Recompute the lead time. Repeat 1000 times across all matched pairs.",
+      "when_to_use": "Use if pre-fragmentation interval <2s for any trial (making circular block shifts trivial). Otherwise, use Approach 1."
+    },
+    "approach_3_survival_time_to_event_model": {
+      "description": "If both Approaches 1 and 2 are infeasible (e.g., too few matched pairs), use a pre-specified survival/time-to-event model with appropriate censoring.",
+      "model": "Cox proportional hazards model with feature deviation as time-varying covariate. Event = fragmentation. Censoring = trial end without fragmentation (non-fragmenting trials). Stratified by composition group.",
+      "test_statistic": "Wald test on the feature deviation coefficient.",
+      "when_to_use": "Use only if Approaches 1 and 2 are both infeasible. This is the fallback, not the primary analysis.",
+      "note": "This approach requires more statistical expertise and is less transparent. Prefer Approach 1 or 2."
+    },
+    "mandatory_reporting": "ALL feasible approaches must be reported. If Approach 1 is feasible, it is the primary analysis. If Approach 2 is also feasible, it is a sensitivity analysis. If Approach 3 is used, it is the primary analysis only if 1 and 2 are infeasible.",
+    "bonferroni_correction_unchanged": "Apply Bonferroni correction across 15 features on the primary approach's p-value (0.05/15 = 0.0033). The temporal-structure-preserving null replaces the unrestricted permutation; the multiple-comparison correction across features is unchanged."
+  },
+
+  "final_amendment_6_pilot_interpretation_boundary": {
+    "problem": "With n=5 per composition, the 60% success criterion means 3/5. One event changing classification changes the conclusion by 20 percentage points. This is acceptable for a pilot signal-discovery screen, but the artifact must state explicitly that this sample size cannot support claims about sensitivity, specificity, generalization, or clinical performance.",
+    "amendment": "Add explicit pilot interpretation boundary to the protocol:",
+    "explicit_boundary_statement": "Stage 0 can discover a candidate precursor. It CANNOT estimate sensitivity, specificity, generalization, or clinical performance. A result of 3/5 + 3/5 is evidence of a REPEATABLE PILOT SIGNAL, not evidence of sensitivity or generalization. The pilot is designed to answer ONE binary question: does ANY signal exist? It is NOT designed to quantify that signal's performance characteristics. If the answer is YES, the next step is a properly powered Stage-1 experiment with adequate sample size for sensitivity/specificity estimation. If the answer is NO, the candidate is killed.",
+    "what_stage_0_can_claim": [
+      "A candidate precursor signal exists (or does not exist) under simplified ex-vivo conditions",
+      "The signal precedes fragmentation by >=1 second (or does not)",
+      "The signal is observed in both clot compositions (or only one, or neither)",
+      "The signal is not an apparatus artifact (if gelatin controls are clean)"
+    ],
+    "what_stage_0_cannot_claim": [
+      "Sensitivity or specificity of the signal as a fragmentation predictor",
+      "Generalization across clot compositions, ages, lengths, or clinical conditions",
+      "Clinical utility or intervention effectiveness",
+      "Patentability (§103 remains OPEN regardless of Stage-0 outcome)",
+      "That the signal is biologically specific to pre-fracture state (gelatin controls do not test this)"
+    ]
+  },
+
+  "final_amendment_7_composition_specific_result_handling": {
+    "problem": "The Round 70 amendment allowed a one-composition signal to 'trigger Stage-1 design for that composition' without clearly stating that this does NOT carry the original Slot-5 candidate lineage forward. This risks the general hypothesis surviving indefinitely by fragmenting into narrower versions.",
+    "amendment": "Clarify composition-specific result handling:",
+    "both_compositions_positive": "GENERAL HYPOTHESIS SURVIVES to Stage 1. The original Slot-5 candidate lineage continues. Stage 1 is designed with adequate power for cross-composition validation.",
+    "one_composition_positive_only": "GENERAL HYPOTHESIS REMAINS UNPROVEN. The original Slot-5 candidate does NOT advance. Instead, a NEW composition-specific hypothesis is opened as a separate discovery track. This new hypothesis does NOT inherit the Slot-5 lineage, the prior-art analysis, or the §103 status of the general candidate. It starts as a fresh DISCOVERY_HYPOTHESIS with its own prior-art search and §103 assessment required before any Stage-1 design.",
+    "neither_composition_positive": "GENERAL HYPOTHESIS KILLED. Record CE-019. Slot 5 EMPTY. Pivot axes from Round 58 revisited. No composition-specific hypothesis is opened (no signal to base it on).",
+    "anti_fragmentation_principle": "A failed general hypothesis must NOT survive by fragmenting into narrower versions. Each narrower version is a NEW hypothesis requiring its own full discovery pipeline (prior-art search, §103 assessment, capability collision matrix, end-to-end decomposition). The original Slot-5 lineage ends when the general hypothesis is not supported.",
+    "practical_implication": "If Stage 0 produces a signal in only RBC-rich clots (for example), the result is: (a) the general cross-composition hypothesis is unproven, (b) a new 'RBC-rich clot fragmentation precursor' hypothesis is opened, (c) this new hypothesis requires its own prior-art search and §103 assessment before any further work, (d) the original Slot-5 candidate does NOT carry forward into this new hypothesis."
+  },
+
+  "what_is_NOT_changed_by_this_final_amendment": {
+    "hypothesis": "UNCHANGED — Does a measurable signal reliably precede clot fragmentation by >=1 second?",
+    "samples": "UNCHANGED — 6-10 fresh porcine clots, 2 compositions, 2 gelatin controls",
+    "instrumentation": "UNCHANGED — force + displacement + optical, no impedance/acoustic/OCT in Stage 0",
+    "conditions": "UNCHANGED — straight tube, static flow, 2 mm/s, fixed aspiration",
+    "blinding": "UNCHANGED — feature analyst blinded to fragmentation timing",
+    "frozen_features": "UNCHANGED — 15 features across 5 families, no additions",
+    "detection_thresholds": "UNCHANGED — 3-sigma/3x baseline (detection), permutation test (inference)",
+    "amendments_1_through_4": "UNCHANGED — composition requirement, time-series multiplicity (now with corrected null), threshold vs significance, control interpretation",
+    "stop_coding_directive": "UNCHANGED — no more predictors, neural networks, patent claims, mechanism variants, feature engineering, ML, claims, or optimization"
+  },
+
+  "terminal_state_declaration": {
+    "declaration": "This is the TERMINAL COMPUTATIONAL ARTIFACT. All amendments are now complete. The Stage-0 protocol is fully specified, corrected, and frozen. No further computational work is authorized. The machine's job is finished until physical evidence is produced.",
+    "complete_amendment_history": [
+      "Round 69: Protocol frozen (13 parameters, 15 features, 5 kill conditions, pre-registration)",
+      "Round 70: Amendment 1 (both compositions required), Amendment 2 (time-series permutation), Amendment 3 (threshold vs significance), Amendment 4 (gelatin control scope)",
+      "Round 71: Amendment 5 (temporal-structure-preserving null), Amendment 6 (pilot interpretation boundary), Amendment 7 (composition-specific result handling + anti-fragmentation principle)"
+    ],
+    "protocol_is_now": "FULLY SPECIFIED, CORRECTED, AND FROZEN. Ready for wet-lab execution.",
+    "no_further_amendments": "No further amendments are authorized. Any additional methodological concerns must be addressed by the experimenter in the wet lab (logged as deviations) or by a separate review process — NOT by more computational rounds.",
+    "ceo_principle_fulfilled": "Per CEO: 'A world-class experiment is one where even a positive result is tightly bounded. The machine should make it difficult to fool itself not only when it fails, but also when it succeeds.' The protocol now satisfies this principle: a positive result is bounded to 'a repeatable pilot signal under simplified ex-vivo conditions' and cannot be inflated to sensitivity, generalization, or clinical utility claims."
+  },
+
+  "cto_final_statement": {
+    "decision": "FINAL AMENDMENT COMPLETE. STOP ALL CODING. The Stage-0 protocol is fully corrected and frozen. The machine's job is finished.",
+    "amendment_summary": "3 final amendments: (5) temporal-structure-preserving null (circular block shifts within pre-fragmentation interval), (6) explicit pilot interpretation boundary (cannot estimate sensitivity/specificity/generalization), (7) composition-specific result handling (one-composition signal opens NEW hypothesis, does NOT carry Slot-5 lineage forward).",
+    "slot_5_status": "DISCOVERY HYPOTHESIS — Stage-0 protocol FULLY CORRECTED AND FROZEN, NOT executed. §103 OPEN. Physics untested. Next step: wet-lab execution ONLY.",
+    "next_step": "Execute the fully amended Stage-0 protocol in a wet lab. This is the terminal computational artifact. No further software work is authorized.",
+    "kill_conditions_final": "K0_1 (inconclusive if <3 fragmentations), K0_2 (kill if no feature passes detection+permutation), K0_3 (kill if median lead time <1s), K0_4 (kill if signal in NEITHER composition; composition-specific if ONE only — does NOT advance general candidate), K0_5 (kill if gelatin confound).",
+    "success_conditions_final": "To advance general candidate to Stage 1: (a) >=1 feature passes detection threshold + temporal-structure-preserving permutation (p<0.0033), (b) median lead time >=1.0s, (c) signal in BOTH compositions (>=60% = >=3/5 in EACH group), (d) no gelatin deviation. Stage 0 result = 'repeatable pilot signal under simplified ex-vivo conditions' — NOT sensitivity, NOT generalization, NOT clinical utility."
+  },
+
+  "portfolio_status_terminal": {
+    "slot_1_R6_passive_rescue": "PHYSICAL_VALIDATION_PENDING",
+    "slot_2_adaptive_sensing_eshunt": "PROVISIONAL",
+    "slot_3_controlled_CNS_therapeutic_platform": "VALIDATION_READY_FROZEN",
+    "slot_4_CNS_lifecycle_intelligence_platform": "DISCOVERY_COMPLETE",
+    "slot_5": "DISCOVERY HYPOTHESIS — Stage-0 protocol FULLY CORRECTED AND FROZEN, NOT executed. §103 OPEN. Physics untested. TERMINAL COMPUTATIONAL STATE.",
+    "world_class_inventions": "0 / 5",
+    "human_correspondence_count": 0,
+    "mechanism_generation": "BLOCKED — physics gate is reality-bound",
+    "cemetery_size": "18 entries (UNCHANGED)",
+    "ci_certification": "UNKNOWN for latest commit 2c4c72e (no combined-status entries visible). Historical: FAILED (G10/G12/G13 RED). Research state.",
+    "g10_status": "RED — infrastructure debt",
+    "g12_status": "RED — infrastructure debt (false-positive historical artifact)",
+    "g13_status": "RED — RESEARCH_BLOCKED"
+  }
+}

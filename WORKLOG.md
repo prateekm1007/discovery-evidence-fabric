@@ -4712,3 +4712,82 @@ Stage Summary:
 - **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: BLOCKED.
 - **CI: FAILED (11/14). Research state, NOT certified.**
 - **The machine's job ends here. The next proof must come from the physical world.**
+
+
+---
+Task ID: ROUND71-FINAL-AMENDMENT-TEMPORAL-NULL-AND-PILOT-BOUNDARY
+Agent: main (CTO mode — final amendment, terminal computational artifact), session 2026-08-22
+Task: Per CEO Round 70 directive — fix temporal null model, freeze pilot interpretation boundary, handle composition-specific results correctly. Then STOP all coding permanently.
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0. Articles I, V, XXV, XXVI, XXVII, XXVIII, XXIX, XXXI, XXXII, XXXIV applied. CE-012, CE-014, CE-017, CE-018 enforced.
+- This is the FINAL AMENDMENT round. No OX Alpha calls. After this, all coding stops permanently.
+
+CEO ROUND 70 AUDIT — 2 P0 PROBLEMS:
+1. TEMPORAL NULL: Unrestricted time permutation assumes exchangeability of force signal over time. This is FALSE — traction begins at known point, loading evolves systematically, fragmentation probability increases over time. Need temporal-structure-preserving null.
+2. PILOT INTERPRETATION: With n=5, 60% = 3/5. One event changes conclusion by 20pp. Must state explicitly that this is pilot signal-discovery, NOT sensitivity/specificity/generalization.
+
+CEO COMPOSITION-SPECIFIC HANDLING: One-composition signal should NOT advance general invention. Can be stored as NEW hypothesis but should NOT inherit current invention lineage. Otherwise failed general hypothesis survives indefinitely by fragmenting.
+
+FINAL AMENDMENT 5 — TEMPORAL-STRUCTURE-PRESERVING NULL:
+- Problem: Unrestricted permutation ('earliest deviation equally likely at any point') assumes exchangeability. Force signal is autocorrelated, non-stationary, systematically evolving.
+- Fix: Replace with temporal-structure-preserving null. Three approaches pre-specified; use FIRST feasible:
+  * Approach 1 (PRIMARY): Circular block shift within pre-fragmentation interval [t_traction_onset, t_fragmentation]. Shift entire feature series by random integer blocks (100ms), wrapping within interval. Preserves autocorrelation + gross temporal trend. Breaks precise timing relationship between deviation and fragmentation. p = proportion of permuted lead times >= observed, pooled across trials within composition group.
+  * Approach 2 (FALLBACK): Matched-trial permutation among trials with comparable retrieval duration (±1s). Swap fragmentation labels between matched pairs. Use if pre-fragmentation interval <2s making block shifts trivial.
+  * Approach 3 (LAST RESORT): Cox proportional hazards model with feature deviation as time-varying covariate. Use only if 1 and 2 infeasible.
+- MANDATORY REPORTING: All feasible approaches reported. Approach 1 is primary.
+- Bonferroni correction unchanged (0.05/15 = 0.0033 on primary approach p-value).
+
+FINAL AMENDMENT 6 — PILOT INTERPRETATION BOUNDARY:
+- Explicit boundary statement: 'Stage 0 can discover a candidate precursor. It CANNOT estimate sensitivity, specificity, generalization, or clinical performance. 3/5 + 3/5 is evidence of a REPEATABLE PILOT SIGNAL, not evidence of sensitivity or generalization.'
+- What Stage 0 CAN claim: precursor exists (or not), lead time >=1s (or not), observed in both compositions (or one, or neither), not an apparatus artifact (if gelatin clean).
+- What Stage 0 CANNOT claim: sensitivity/specificity, generalization, clinical utility, patentability, biological specificity.
+
+FINAL AMENDMENT 7 — COMPOSITION-SPECIFIC RESULT HANDLING:
+- BOTH compositions positive → general hypothesis SURVIVES to Stage 1. Original Slot-5 lineage continues.
+- ONE composition positive → general hypothesis UNPROVEN. Original Slot-5 candidate does NOT advance. NEW composition-specific hypothesis opened as SEPARATE discovery track — does NOT inherit Slot-5 lineage, prior-art analysis, or §103 status. Requires its own full discovery pipeline.
+- NEITHER composition positive → general hypothesis KILLED. CE-019. Slot 5 EMPTY.
+- ANTI-FRAGMENTATION PRINCIPLE: A failed general hypothesis must NOT survive by fragmenting into narrower versions. Each narrower version is a NEW hypothesis requiring its own full discovery pipeline.
+
+WHAT IS NOT CHANGED:
+- Hypothesis, samples, instrumentation, conditions, blinding, frozen features, detection thresholds, Amendments 1-4: ALL UNCHANGED.
+- Stop coding directive: UNCHANGED and now PERMANENT.
+
+TERMINAL STATE DECLARATION:
+- This is the TERMINAL COMPUTATIONAL ARTIFACT. All amendments complete. Protocol fully specified, corrected, and frozen.
+- Complete amendment history: Round 69 (frozen), Round 70 (Amendments 1-4), Round 71 (Amendments 5-7).
+- No further amendments authorized. Any additional concerns addressed by experimenter in wet lab (logged as deviations) or separate review — NOT more computational rounds.
+- CEO principle fulfilled: 'A world-class experiment is one where even a positive result is tightly bounded.' Protocol now satisfies this — positive result bounded to 'repeatable pilot signal under simplified ex-vivo conditions.'
+
+CONSTITUTION COMPLIANCE:
+- Article I: COMPLIED.
+- Article V: COMPLIED — candidate at DISCOVERY HYPOTHESIS, not promoted.
+- Article XXV: COMPLIED — physics untested = UNKNOWN.
+- Article XXVI: COMPLIED — NOT CERTIFIED. CI status UNKNOWN for latest commit.
+- Article XXVII: COMPLIED — all thresholds pre-registered, no post-hoc adjustment.
+- Article XXVIII: COMPLIED.
+- Article XXIX: COMPLIED — 3 claims separated.
+- Article XXXI: COMPLIED — this Round 71 record is the memory artifact.
+- Article XXXII: COMPLIED — strongest alternative stated (no signal exists).
+- Article XXXIV: COMPLIED — STOP ALL CODING. Next step is reality-bound.
+- CE-012 through CE-018: ALL COMPLIED.
+
+PORTFOLIO STATUS (TERMINAL):
+- Slot 5: DISCOVERY HYPOTHESIS — Stage-0 protocol FULLY CORRECTED AND FROZEN, NOT executed. §103 OPEN. Physics untested. TERMINAL COMPUTATIONAL STATE.
+- World-class inventions: 0/5.
+- Human correspondence: 0.
+- Mechanism generation: BLOCKED — physics gate is reality-bound.
+- Cemetery: 18 entries (UNCHANGED).
+- CI: UNKNOWN for latest commit 2c4c72e. Historical: FAILED (G10/G12/G13 RED).
+
+Stage Summary:
+- **FINAL AMENDMENT COMPLETE.** 3 final amendments: (5) temporal-structure-preserving null (circular block shifts), (6) pilot interpretation boundary (cannot estimate sensitivity/specificity/generalization), (7) composition-specific result handling (one-composition = NEW hypothesis, does NOT carry Slot-5 lineage).
+- **TERMINAL COMPUTATIONAL ARTIFACT.** All amendments complete (Rounds 69-71). Protocol fully specified, corrected, and frozen. No further computational work authorized.
+- **STOP ALL CODING.** No more feature engineering, no ML, no claims, no optimization. The machine's job is finished.
+- **NEXT STEP: WET-LAB EXECUTION ONLY.** Execute the fully amended Stage-0 protocol. If ANY kill condition fires → KILL + CE-019 + Slot 5 EMPTY. If ALL pass → advance to Stage 1 (properly powered, out-of-sample prediction).
+- **CEO PRINCIPLE FULFILLED:** 'A world-class experiment is one where even a positive result is tightly bounded. The machine should make it difficult to fool itself not only when it fails, but also when it succeeds.'
+- **CEMETERY UNCHANGED AT 18 ENTRIES.**
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: BLOCKED.
+- **The machine's job ends here. The next proof must come from the physical world.**
