@@ -3592,3 +3592,46 @@ CTO DECISION:
 - Next: L3 cross-solver with SfePy. Same problem, same observable, independent solver.
 - If L3 passes: Stage -1 can begin (virtual fragmentation experiment).
 - Slot 5: DISCOVERY HYPOTHESIS — FEBio L1+L2 PASS. L3 pending. §103 OPEN.
+
+
+---
+Task ID: ROUND82-L3-CROSS-SOLVER-FAIL
+Agent: main (CTO mode — L3 cross-solver attempt), session 2026-08-22
+Task: Per CEO Round 81 — L3 cross-solver: implement same problem in SfePy, compare avg stress_xx.
+
+Work Log:
+
+L3 CROSS-SOLVER ATTEMPT:
+- FEBio: neo-Hookean, E=1.0, nu=0.3, 8x4x4 mesh (128 elements)
+  → avg stress_xx = 0.126183, NORMAL TERMINATION
+- SfePy: neo-Hookean (deviatoric only), E=1.0, nu=0.3, 16x8x8 mesh (1024 elements)
+  → avg stress_xx = 0.168073, NONCONVERGED (residual 99.9% after 1 iteration)
+- Relative difference: 33.2%
+- Pre-registered tolerance: <10%
+- VERDICT: FAIL
+
+ROOT CAUSES (per CEO directive: investigate, don't tune):
+1. SfePy solve DID NOT CONVERGE — residual stayed at 99.9% after 1 Newton iteration. The solve 'completed' but the displacement field is not physically meaningful.
+2. Material model mismatch — SfePy used deviatoric neo-Hookean only (dw_tl_he_neohook). FEBio used full neo-Hookean (deviatoric + volumetric). Missing bulk term in SfePy.
+3. Mesh size mismatch — SfePy 1024 elements vs FEBio 128 elements.
+4. SfePy v2026.2 has bugs: (a) evaluate API broken (region parsing), (b) Term._check_variables tuple bug (patched locally).
+
+HONEST ASSESSMENT:
+This is a GENUINE cross-solver disagreement, not a hidden bug. Per CEO: "If they disagree, don't hide the disagreement — make the AI explain and exploit it."
+The disagreement IS explained: SfePy's solve didn't converge because the material model is incomplete (missing bulk term).
+
+NEXT STEPS:
+1. Add bulk term to SfePy (dw_tl_bulk_pressure or dw_tl_bulk_penalty)
+2. Use same mesh size in both solvers (8x4x4 = 128 elements)
+3. Fix Newton solver settings (increase max iterations, check convergence criteria)
+4. Re-run L3
+
+CONSTITUTION COMPLIANCE:
+- Article I: COMPLIED — honest reporting of disagreement.
+- Article XXIX: COMPLIED — implementation failure (SfePy nonconvergence) ≠ mechanism failure.
+- Article XXXII: COMPLIED — strongest alternative stated (material mismatch + nonconvergence).
+
+PORTFOLIO STATUS:
+- Slot 5: DISCOVERY HYPOTHESIS — FEBio L1+L2 PASS. L3 FAIL (cross-solver disagreement). §103 OPEN.
+- World-class inventions: 0/5.
+- Cemetery: 18 entries (UNCHANGED).
