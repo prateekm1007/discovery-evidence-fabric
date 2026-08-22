@@ -3787,3 +3787,161 @@ Stage Summary:
 - **REPOSITORY STATE:** Commit + push planned after this worklog entry. CI status will be checked after push and reported honestly per Article XXVI.
 - **CREDENTIAL HYGIENE:** OpenRouter API key + GitHub PAT both used inline via env var ONLY. NOT persisted. Will need to be re-provided next session.
 - **REMINDER FOR NEXT SESSION:** Two credentials will be needed: (1) GitHub PAT, (2) OpenRouter API key. Both inline only.
+
+
+---
+Task ID: ROUND62-CE012-RETRACTION-AND-CAPABILITY-COLLISION
+Agent: main (CTO mode, OX Alpha as engineer via OpenRouter stealth/ox-alpha, z-ai web_search + page_reader for patent fetching), session 2026-08-22
+Task: Per CEO Round 61 deep audit directive — retract the Round 61 'element (a) confirmed novel' conclusion; add 3 CEO-identified references to prior-art record; run capability collision matrix; identify residual capability if any; do NOT use 'retrieved-clot' or 'physical signature' as novelty loophole (CE-012 violation); test whether real innovation is outcome prediction.
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0 Articles I, V, XXV, XXVI, XXVII, XXVIII, XXIX, XXX, XXXI, XXXII, XXXIV.
+- Cemetery theorems applied: CE-012 (no semantic re-skins), CE-014 (no query-fragile search), CE-016, CE-017.
+- Pre-session epistemic check acknowledged.
+- CRITICAL: This round is a RETRACTION round. Article XXXI (every correction creates a memory artifact) is the primary corrective article. Article XXVIII (no silent semantic promotion) was VIOLATED in Round 61 by promoting 'retrieved-clot physical signature' as novel when it is a semantic re-skin of 'intravascular clot sensing' — a known CE-012 failure mode.
+
+REPOSITORY STATE (per Article XXIII):
+- Local HEAD at start of round: c3f343f (Round 61 — pushed in prior session).
+- Remote main at start of round: c3f343f (verified via ls-remote with PAT).
+- CI status at start of round: Run #173 on c3f343f — completed, conclusion=FAILURE (G10/G13 RED; G12 PASS).
+
+CEO ROUND 61 AUDIT — KEY FINDINGS:
+- CEO found 3 direct prior art references I missed in Round 60/61:
+  1. US20250186070A1 ('Clot engagement detection in thrombectomy systems') — sensor output analyzed to determine clot composition, texture, elasticity, fragility, hardness/stiffness, adherence and shape; characteristics influence aspiration state.
+  2. US20230062684A1 — ultrasonic/shear-wave thrombus composition sensing + AI/ML treatment modification.
+  3. EP3763305A1 — NIR/Raman analysis of clot material; physical properties including adhesion, morphology, permeability, modulus, deformation, fracture; device selection implications.
+- Plus Clotild/Sensome commercial frontier: smart guidewire performing in-situ clot characterization during thrombectomy, with first-in-human data.
+- CEO diagnosis: I searched for KEYWORD collisions ('retrieved-clot physical signature') instead of CAPABILITY collisions. The fact that nobody used my exact phrase proves almost nothing. The relevant question is whether someone already has the CAPABILITY.
+- CEO directive: Retract Round 61 novelty conclusion. Run capability collision matrix. Do NOT use 'retrieved-clot' as novelty loophole (CE-012). Test whether real innovation is outcome prediction.
+
+PHASE 1 — PATENT FETCH (6 patents):
+- Built persisted script /home/z/my-project/scripts/ce014_fetch_round62.py.
+- Fetched 6 patents via z-ai page_reader CLI: 3 CEO-identified (US20250186070A1, US20230062684A1, EP3763305A1) + 3 context (WO2021108783A1, US11955237B2, US10531883B1).
+- All 6 fetches succeeded. For the 3 CEO-identified patents, also extracted description (15K chars each).
+
+PHASE 2 — CEO CITATION VERIFICATION:
+- US20250186070A1: TITLE MATCHES CEO description. Claims confirm multi-modal sensing (optical, acoustic, OCT/LiDAR, force/pressure, impedance) and closed-loop aspiration-state control (claims 6, 13, 14). CONFIRMED P0 COLLISION on Capabilities 1 (intraprocedural clot sensing), 5 (real-time), 7 (treatment-mode adjustment). The CEO-quoted language about 'composition, texture, elasticity, fragility, adherence' was NOT in fetched 8000 chars of description but may exist deeper (INCONCLUSIVE).
+- US20230062684A1: LIKELY MIS-CITATION. CEO described 'ultrasonic/shear-wave thrombus composition sensing + AI/ML treatment modification' but fetched title is 'Intravascular thrombectomy device and process for treating acute ischemic stroke.' Description discusses composition via ex vivo CT imaging, NOT ultrasonic sensing. NO capability collision on fetched evidence.
+- EP3763305A1: LIKELY MIS-CITATION. CEO described 'NIR/Raman analysis of clot material' but fetched title is 'System for clot retriever cleaning for reinsertion.' NO NIR/Raman/spectroscopy language in fetched claims or first 8000 chars of description. CEO MIS-CITATION LIKELY.
+- HONEST ASSESSMENT (per Article XXV): 2 of 3 CEO-identified patents appear to be mis-citations. Stated honestly. HOWEVER, the broad candidate is STILL DEAD because US20250186070A1 alone (confirmed P0 collision) + Clotild/Sensome (independently verifiable commercial frontier) + WO2021108783A1 (Cap 6, 8 partial) collectively occupy the broad capability landscape.
+
+PHASE 3 — CAPABILITY COLLISION MATRIX (3 OX Alpha calls):
+- Built persisted script /home/z/my-project/scripts/ce014_round62_run.py.
+- 3 calls: (1) Batch A capability matrix for 3 CEO-identified patents, (2) Batch B capability matrix for 3 context patents, (3) Synthesis.
+- All 3 calls succeeded.
+
+AGGREGATED CAPABILITY COLLISION MATRIX:
+- Cap 1 (intraprocedural clot sensing): OCCUPIED — US20250186070A1 YES (multi-modal), Clotild/Sensome YES (impedance)
+- Cap 2 (composition classification): OCCUPIED — Clotild/Sensome YES (RBC vs fibrin/platelet)
+- Cap 3 (adherence characterization): INCONCLUSIVE — possible residual but UNVERIFIED
+- Cap 4 (physical-property characterization): INCONCLUSIVE — possible residual beyond composition but UNVERIFIED
+- Cap 5 (real-time sensing): OCCUPIED — US20250186070A1 YES (closed-loop), Clotild/Sensome YES
+- Cap 6 (AI/ML interpretation): OCCUPIED — WO2021108783A1 YES (CNN/ensemble on API maps), US11955237B2 YES (ML on clinical+imaging)
+- Cap 7 (treatment-mode adjustment): OCCUPIED — US20250186070A1 YES (closed-loop aspiration-state control)
+- Cap 8 (outcome prediction from clot sensor data): PARTIALLY OCCUPIED — WO2021108783A1 partial (imaging-based), US11955237B2 partial (pre-procedural); clot-sensor-specific outcome prediction UNVERIFIED
+
+MATRIX SUMMARY:
+- Fully OCCUPIED: Cap 1, 2, 5, 7
+- Partially OCCUPIED: Cap 6, 8
+- INCONCLUSIVE possible residual: Cap 3, 4
+- Genuinely UNOCCUPIED: NONE confirmed
+
+PHASE 4 — CLOTTILD/SENSOME COMPETITIVE FRONTIER:
+- Per OX Alpha training knowledge: Clotild (Sensome) is a smart thrombectomy guidewire with impedance-based sensing tip. Capabilities: (1) intraprocedural clot sensing YES, (2) composition classification YES (RBC vs fibrin/platelet vs mixed), (5) real-time sensing YES. First-in-human data reported. Specific patent numbers UNKNOWN (recommended search: CPC A61B5/0537 + A61B2576/02 + A61B8/12).
+- CTO assessment: Clotild/Sensome is independently verifiable commercial frontier occupying Capabilities 1, 2, 5. NOT patent evidence — competitive-frontier evidence that broad direction is being actively commercialized.
+
+PHASE 5 — RESIDUAL CAPABILITY ASSESSMENT (CEO outcome-prediction hint):
+- CEO hint: 'What will happen to this patient during/after this specific retrieval attempt, and can the device alter the procedure before the adverse outcome?'
+- OX Alpha assessment: Outcome prediction IS distinct from clot characterization (measurement claim vs predictive claim). NOT taught by analyzed patents FROM CLOT SENSOR DATA specifically (WO2021108783A1 teaches outcome prediction from angiographic imaging, not clot sensor).
+- Narrowed claim would need: (1) variables (real-time clot-sensor outputs + device state + patient/anatomic state), (2) prediction target (specific adverse event for THIS attempt — fragmentation, perforation, failed first-pass, hemorrhagic transformation), (3) intervention (closed-loop or alerting action before adverse event), (4) technical effect (measurable reduction in adverse event rate).
+- Strongest alternative explanation: Clotild-style sensing + standard predictive analytics is obvious aggregation. Residual is only specific prediction target + intervention pairing — narrow, crowded space.
+
+PHASE 6 — RETRACTION OF ROUND 61 NOVELTY CLAIM:
+- RETRACTED: 'Element (a) is confirmed novel across 20 analyzed patents.'
+- Retraction statement: The Round 61 'element (a) confirmed novel' conclusion is FALSE. The broad element (a) is materially occupied by US20250186070A1 (multi-modal intraprocedural clot sensing + closed-loop aspiration-state control), Clotild/Sensome (impedance-based smart guidewire with composition classification, first-in-human data), and the broader competitive frontier. The Round 60/61 CE-014 search found zero blocking prior art because it searched for KEYWORD collisions ('retrieved-clot physical signature') instead of CAPABILITY collisions ('intravascular clot sensing + treatment guidance').
+- Lesson per Article XXXI: Capability collision search is the correct test, not keyword collision search.
+- Failed assumption per Article XXXI: That 'retrieved-clot physical signature measurement by a sensor integrated with the retrieval system' is a novel capability distinct from 'intravascular clot sensing.' It is NOT — it is a semantic re-skin (CE-012 violation).
+- Affected artifacts per Article XXXI: ROUND60_CE014_PRIOR_ART_SEARCH.json (survival condition 1 PASS retracted to FAIL on capability collision), ROUND61_CE014_CLOSURE.json (FULLY SATISFIED retracted), ROUND59 refined candidate claim (element (a) KILLED as broad).
+- Tests added per Article XXXI: CE-018 (new cemetery theorem) — capability collision test mandatory before any novelty claim.
+
+PHASE 7 — CE-018 NEW CEMETERY THEOREM:
+- Entry ID: CE-018
+- Territory: Cross-cutting (applies to ALL novelty claims)
+- Epistemic class: STRONG_CONSTRAINT
+- Theorem: 'A novelty claim survives only when the candidate's CAPABILITY (what it can DO) is demonstrably absent from the prior art landscape — not when the candidate's KEYWORDS (what words it uses) are absent.'
+- Procedure: (1) decompose candidate into functional capabilities; (2) search prior art for each capability using prior art's own vocabulary; (3) build capability collision matrix; (4) only if at least one capability is genuinely UNOCCUPIED can novelty be claimed.
+- Semantic re-skins to avoid (CE-012 violations): 'retrieved-clot' vs 'in-situ clot'; 'physical signature' vs 'composition'; 'integrated sensor' vs 'catheter-mounted sensor.'
+
+CTO DECISION:
+- RETRACT Round 61 'element (a) confirmed novel' conclusion.
+- KILL the broad candidate (Round 59 refined claim).
+- Narrow residual (Capability 8: clot-sensor-derived outcome prediction for specific adverse event + pre-event intervention) is the only surviving thread, at DISCOVERY_PENDING status — NOT CONDITIONAL_SURVIVAL — because even this is threatened by WO2021108783A1 as obviousness reference.
+- Slot 5 status: BROAD CANDIDATE KILLED; NARROW RESIDUAL at DISCOVERY_PENDING.
+
+PER ARTICLE XXXIV — REALITY BOUNDARY:
+- Computationally tractable steps remaining:
+  * Full claim + description pull on US20250186070A1 (deeper than 8000 chars) to verify whether CEO-quoted 'composition, texture, elasticity, fragility, adherence' language exists deeper
+  * Sensome/Clotild patent family search via CPC A61B5/0537
+  * Focused novelty check on narrowed outcome-prediction pairing
+  * Search for correct NIR/Raman clot analysis patent if CEO mis-cited EP3763305A1
+- Requires external resources (unchanged): hardware team, clinical collaborator.
+
+CREDENTIAL HYGIENE:
+- OpenRouter API key + GitHub PAT both used inline via env var ONLY. NOT persisted to disk, NOT committed.
+- Verification: ran grep for credential patterns across all files about to be committed — 0 matches.
+
+CONSTITUTION COMPLIANCE AUDIT:
+- Article I: COMPLIED — retraction grounded in actual fetched claim text + OX Alpha capability analysis + Clotild/Sensome commercial frontier.
+- Article V: COMPLIED — broad candidate KILLED; narrow residual at DISCOVERY_PENDING (not killed, not promoted).
+- Article XXV: COMPLIED — 2 of 3 CEO-identified patents appear to be mis-citations; stated honestly.
+- Article XXVI: COMPLIED — explicitly NOT CERTIFIED.
+- Article XXVII: COMPLIED — no thresholds invented.
+- Article XXVIII: VIOLATED IN ROUND 61 (now corrected) — 'retrieved-clot physical signature' was silent semantic promotion of 'intravascular clot sensing.'
+- Article XXIX: COMPLIED — broad candidate mechanism killed; narrow residual mechanism distinguished.
+- Article XXX: COMPLIED — OX Alpha was explicitly adversarial.
+- Article XXXI: COMPLIED — this Round 62 record + CE-018 are the per-incident memory artifacts.
+- Article XXXII: COMPLIED — strongest alternative (capability collision) explicitly tested and confirmed.
+- Article XXXIV: COMPLIED — next steps include both computationally tractable searches and reality-bound external resources.
+- CE-012: VIOLATED IN ROUND 61 (now corrected) — 'retrieved-clot physical signature' was semantic re-skin.
+- CE-014: PARTIALLY COMPLIED — Round 60/61 was CE-014 compliant in vocabulary but FAILED in framing. CE-018 sharpens CE-014 to require capability-framed search.
+- CE-016: COMPLIED.
+- CE-017: COMPLIED.
+
+PORTFOLIO STATUS POST ROUND 62:
+- Slot 1 (R6 Passive Rescue): PHYSICAL_VALIDATION_PENDING
+- Slot 2 (Adaptive/Sensing eShunt): PROVISIONAL
+- Slot 3 (Controlled CNS Therapeutic Platform): VALIDATION_READY_FROZEN
+- Slot 4 (CNS/Lifecycle Intelligence Platform): DISCOVERY_COMPLETE
+- Slot 5: BROAD CANDIDATE KILLED — Round 59 refined claim materially occupied per Round 62 capability collision analysis. NARROW RESIDUAL at DISCOVERY_PENDING — possible path at Capability 8 (clot-sensor-derived outcome prediction for specific adverse event), but requires significant additional research.
+- World-class inventions: 0/5
+- Human correspondence: 0
+- Mechanism generation: BLOCKED — broad candidate killed; narrow residual at DISCOVERY_PENDING
+- Cemetery size: 18 entries (CE-001 through CE-018) — CE-018 added this round
+
+FILES MODIFIED THIS ROUND:
+- /home/z/my-project/scripts/ce014_fetch_round62.py (new)
+- /home/z/my-project/scripts/ce014_build_round62_prompt.py (new)
+- /home/z/my-project/scripts/ce014_round62_run.py (new)
+- /home/z/my-project/scripts/round62_update_cemetery_and_mirror.py (new)
+- /home/z/my-project/scripts/ce014_searches/patent_claims_round62/ (6 fetched patents)
+- /home/z/my-project/scripts/ox_alpha_prompts/axes/round62/ (3 prompts)
+- /home/z/my-project/scripts/ox_alpha_outputs/round62_batches/ (3 result .md files + summary)
+- /home/z/my-project/discovery-evidence-fabric/MECHANISM_CEMETERY/CEMETERY.json (CE-018 appended)
+- /home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND62_CE012_RETRACTION_AND_CAPABILITY_COLLISION.json (new)
+- /home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND62_CAPABILITY_COLLISION_ARTIFACTS/ (mirrored artifacts)
+- /home/z/my-project/discovery-evidence-fabric/WORKLOG.md (synced with outer worklog after Round 62 entry appended)
+- /home/z/my-project/worklog.md (this entry)
+
+Stage Summary:
+- **ROUND 61 'ELEMENT (a) CONFIRMED NOVEL' CONCLUSION RETRACTED.** The Round 60/61 CE-014 search found zero blocking prior art because it searched for KEYWORD collisions instead of CAPABILITY collisions. The broad element (a) is materially occupied by US20250186070A1 + Clotild/Sensome + WO2021108783A1.
+- **BROAD CANDIDATE (Round 59 refined claim) KILLED.** The capability collision matrix shows Capabilities 1, 2, 5, 7 fully occupied; Caps 6, 8 partially occupied; Caps 3, 4 INCONCLUSIVE; NONE genuinely unoccupied.
+- **CE-018 NEW CEMETERY THEOREM CREATED.** 'Capability collision test — keyword collision search is insufficient to establish novelty.' Cross-cutting STRONG_CONSTRAINT. Procedure: decompose candidate into functional capabilities, search prior art for each capability using prior art's own vocabulary, build capability collision matrix, only claim novelty if at least one capability is genuinely unoccupied.
+- **NARROW RESIDUAL at DISCOVERY_PENDING.** Possible path at Capability 8 (clot-sensor-derived outcome prediction for specific adverse event + pre-event intervention), but threatened by WO2021108783A1 as obviousness reference. Requires: (a) full claim pull on US20250186070A1 to verify CEO-quoted deeper-description language, (b) Sensome/Clotild patent family search, (c) focused novelty check on narrowed outcome-prediction pairing.
+- **2 OF 3 CEO-IDENTIFIED PATENTS APPEAR TO BE MIS-CITATIONS** (US20230062684A1, EP3763305A1). Stated honestly per Article XXV. Broad candidate STILL DEAD because US20250186070A1 alone (confirmed P0) + Clotild/Sensome + WO2021108783A1 collectively occupy the capability landscape.
+- **CEMETERY NOW 18 ENTRIES** (CE-001 through CE-018).
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: BLOCKED.
+- **REPOSITORY STATE:** Commit + push planned after this worklog entry.
+- **CREDENTIAL HYGIENE:** OpenRouter API key + GitHub PAT both inline via env var ONLY. NOT persisted.
+- **REMINDER FOR NEXT SESSION:** Two credentials needed (GitHub PAT, OpenRouter API key). Both inline only.
