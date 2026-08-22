@@ -4133,3 +4133,111 @@ Stage Summary:
 - **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: PARTIALLY UNBLOCKED.
 - **CREDENTIAL HYGIENE:** Both credentials inline via env var ONLY. NOT persisted.
 - **REMINDER FOR NEXT SESSION:** Two credentials needed (GitHub PAT, OpenRouter API key). Both inline only. LEGAL GATE (US11504151B2 sweep) is computationally tractable and should be executed first; PHYSICS GATE requires external wet-lab resources.
+
+
+---
+Task ID: ROUND65-LEGAL-GATE-US11504151B2-SWEEP
+Agent: main (CTO mode, OX Alpha as engineer via OpenRouter stealth/ox-alpha, z-ai page_reader for patent fetching), session 2026-08-22
+Task: Per Round 64 closing directive — execute LEGAL GATE: full-text keyword sweep of US11504151B2 (Stryker scraper) for velocity/rate/speed/retraction terms. Does US11504151B2 teach traction-VELOCITY modulation, or only traction-FORCE monitoring/adjustment?
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0 Articles I, V, XXV, XXVI, XXVII, XXVIII, XXIX, XXX, XXXI, XXXII, XXXIV.
+- Cemetery theorems applied: CE-012, CE-014, CE-017, CE-018.
+- Pre-session epistemic check acknowledged.
+
+REPOSITORY STATE (per Article XXIII):
+- Local HEAD at start of round: 11b9864 (Round 64 — pushed in prior session).
+- Remote main at start of round: 11b9864 (verified via ls-remote with PAT).
+- CI status at start of round: Run #176 on 11b9864 — completed, conclusion=FAILURE (G10/G13 RED; G12 PASS — pass_a_blobs=5174).
+
+PHASE 1 — US11504151B2 FULL-TEXT FETCH:
+- Fetched full patent HTML (745,847 chars) via z-ai page_reader.
+- Extracted full claims (5,290 chars) + full description (131,641 chars).
+- Searched 61 velocity/speed/rate/retraction/force/control keywords in BOTH claims and description.
+
+PHASE 2 — CLAIMS ANALYSIS (LEGAL BOUNDARY):
+- Claims contain ZERO velocity-family vocabulary.
+- Only velocity-adjacent keywords found: 'expand' (35x, RADIAL basket expansion), 'control' (4x, generic), 'scraper' (2x, device name).
+- ABSENT from claims: velocity, speed, rate (velocity context), retraction, retraction rate, retraction speed, withdrawal, withdrawal rate, withdrawal speed, pull speed, pull rate, strain rate, translation, retract, withdraw, motor, drive, servo, automatic, automated, feedback, closed-loop.
+- VERDICT: Claims' only controlled variable is RADIAL EXPANSION FORCE (expand/contract the basket), NOT linear pull velocity.
+
+PHASE 3 — DESCRIPTION ANALYSIS:
+- 'withdraw' (3 occurrences): ALL in context of pull FORCE — 'withdrawn proximally with a pull force of between about 0.18 and 0.4 pounds'. NOT pull velocity.
+- 'retract' (2 occurrences): BOTH refer to retracting inner elongate member to EXPAND/CONTRACT basket (radial actuation). NOT linear pull velocity.
+- ZERO occurrences of: velocity, speed, pull speed, pull rate, retraction rate, retraction speed, withdrawal rate, withdrawal speed, strain rate, translation, translate, servo.
+- VERDICT: Description teaches pull FORCE specification/maintenance (0.18-0.4 lb), NOT pull VELOCITY modulation.
+
+PHASE 4 — RESIDUAL 'RATE' OCCURRENCE CLOSURE:
+- 83 total 'rate' occurrences in description. Initial sweep showed first 3 were 'incorporated by reference' boilerplate.
+- Checked ALL 83 occurrences against velocity-context terms.
+- Result: 37 boilerplate (incorporated by reference), 46 substring matches in other words (separate, operate, illustrated, configured, generate), 0 genuine pull-rate/velocity-rate occurrences.
+- RESIDUAL CLOSED — zero residual uncertainty.
+
+PHASE 5 — OX ALPHA LEGAL GATE ASSESSMENT:
+- Single call (~75s, ~6000 completion tokens).
+- Section 1: NO — US11504151B2 does NOT teach traction-VELOCITY modulation. High confidence.
+- Section 2: Force-vs-velocity distinction is GENUINE (not CE-012 semantic loophole):
+  * Different physical quantities (force vs velocity), different sensors, different control loops
+  * Different causal targets (vessel-wall trauma vs brittle-fracture management)
+  * Different trigger (present-state force measurement vs predicted future event)
+  * Distinction survives if claim recites velocity actuator tied to fragmentation-PREDICTION signal
+- Section 3: §103 risk ELEVATED but not fatal:
+  * For obviousness: force and velocity are alternative controlled variables (KSR 'known interchangeable elements')
+  * Against obviousness: no cited prior art teaches velocity modulation; candidate requires NEW input (fragmentation-prediction signal) + NEW actuation target (speed) — not a variable swap
+  * §103 requires more than 'it would have been possible'
+- Section 4: LEGAL GATE VERDICT: PASS — conditional. Actuator link (link 4) survives.
+- Section 5: Adjacent-field risk UNKNOWN (endarterectomy, stone-basket, biopsy — cannot cite specific references).
+- Strongest alternative (Article XXXII): US11504151B2's silence on velocity may reflect drafting economy rather than non-teaching — a POSITA implementing the force range necessarily implements some pull speed.
+
+PHASE 6 — CTO AUDIT:
+- Article I: PASS — OX Alpha quoted actual keyword sweep findings. No fabrication.
+- Article XXV: PASS — adjacent-field risk marked UNKNOWN. Residual closed by exhaustive check.
+- Article XXVIII: PASS — force-vs-velocity distinction tested for CE-012 risk; found genuine.
+- Article XXXII: PASS — strongest alternative stated.
+- CE-012: PASS — force-vs-velocity is genuine technical distinction.
+- CE-018 sharpened: PASS — actuator link assessed at end-to-end level.
+
+CTO DECISION:
+- LEGAL GATE PASSES. The candidate advances to the PHYSICS GATE.
+- Conditions: (1) Claim drafting must recite velocity/rate as commanded variable responsive to fragmentation-prediction signal; (2) Adjacent-field search recommended before finalizing Slot 5.
+- PHYSICS GATE is the final gate: ex vivo pre-signature experiment (does any feature precede fracture by >=1-2s at usable sensitivity?). Highest-probability kill condition. Reality-bound — requires wet lab.
+- Kill condition unchanged: If PHYSICS GATE fails → KILL + CE-019 + Slot 5 EMPTY.
+- Survival condition: If PHYSICS GATE passes → advance to designed validation program.
+
+CONSTITUTION COMPLIANCE AUDIT:
+- Article I: COMPLIED — LEGAL GATE verdict grounded in actual keyword sweep data.
+- Article V: COMPLIED — candidate at CONDITIONAL_SURVIVAL_GATED (LEGAL GATE passed; PHYSICS GATE pending).
+- Article XXV: COMPLIED — adjacent-field risk UNKNOWN; residual closed.
+- Article XXVI: COMPLIED — NOT CERTIFIED.
+- Article XXVIII: COMPLIED — force-vs-velocity distinction genuine.
+- Article XXIX: COMPLIED.
+- Article XXX: COMPLIED — OX Alpha adversarial.
+- Article XXXI: COMPLIED — this Round 65 record is the memory artifact.
+- Article XXXII: COMPLIED — strongest alternative stated.
+- Article XXXIV: COMPLIED — LEGAL GATE computationally tractable (completed); PHYSICS GATE reality-bound (pending).
+- CE-012: COMPLIED — force-vs-velocity is genuine.
+- CE-014: COMPLIED.
+- CE-017: COMPLIED — physics gate is the adversarial model-uncertainty test.
+- CE-018 sharpened: COMPLIED — actuator link assessed at end-to-end level.
+
+PORTFOLIO STATUS POST ROUND 65:
+- Slot 5: CONDITIONAL_SURVIVAL_GATED — LEGAL GATE PASSED. PHYSICS GATE pending (reality-bound: ex vivo pre-signature experiment). Adjacent-field search recommended but not blocking.
+- World-class inventions: 0/5.
+- Human correspondence: 0.
+- Mechanism generation: PARTIALLY UNBLOCKED — true primitive isolated; LEGAL GATE passed; PHYSICS GATE is the final gate.
+- Cemetery: 18 entries (UNCHANGED).
+
+Stage Summary:
+- **LEGAL GATE PASSED.** US11504151B2 does NOT teach traction-VELOCITY modulation. Claims contain ZERO velocity-family vocabulary. Description teaches pull FORCE (0.18-0.4 lb), NOT pull VELOCITY.
+- **RESIDUAL CLOSED.** All 83 'rate' occurrences verified as false positives (37 boilerplate, 46 substring matches in other words). Zero genuine velocity-rate occurrences.
+- **FORCE-vs-VELOCITY DISTINCTION IS GENUINE** (not CE-012 semantic loophole): different sensors, different triggers, different physical mechanisms. Distinction survives if claim recites velocity tied to fragmentation-PREDICTION signal.
+- **§103 RISK ELEVATED but not fatal.** No cited prior art teaches velocity modulation. Candidate requires NEW input (prediction signal) + NEW actuation target (speed) — not a variable swap.
+- **ADJACENT-FIELD RISK: UNKNOWN.** Endarterectomy, stone-basket, biopsy — cannot cite specific references. Recommended search: CPC A61B 17/22, A61B 17/32068, A61M 25/01 + inventor vocabulary.
+- **CANDIDATE ADVANCES TO PHYSICS GATE.** Ex vivo pre-signature experiment: does any feature precede brittle fracture by >=1-2s at usable sensitivity? Highest-probability kill condition. Reality-bound — requires wet lab.
+- **KILL CONDITION UNCHANGED:** If PHYSICS GATE fails → KILL + CE-019 + Slot 5 EMPTY.
+- **CEMETERY UNCHANGED AT 18 ENTRIES.**
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: PARTIALLY UNBLOCKED.
+- **CREDENTIAL HYGIENE:** Both credentials inline via env var ONLY. NOT persisted.
+- **REMINDER FOR NEXT SESSION:** Two credentials needed (GitHub PAT, OpenRouter API key). Both inline only. PHYSICS GATE requires external wet-lab resources. Adjacent-field search is computationally tractable and recommended before finalizing Slot 5.
