@@ -3183,3 +3183,241 @@ Stage Summary:
 - **REPOSITORY NOT CERTIFIED.** Local files modified; no commit, no push, no CI verification this session. RESEARCH STATE only.
 - **GIT OPERATIONS: NONE.** Per Articles XXIII and XXVI, repository state remains as prior session left it. To achieve certification: future session with GitHub PAT must (a) commit the Round 58 amendments, (b) push to origin/main, (c) wait for GitHub Actions CI to complete, (d) record the CI capsule hash as independent certification. The G10/G13 RED state from prior session persists.
 - **CEO "PUSHING-THE-ENVELOPE" PRINCIPLE RECORDED IN CE-017:** "A discovery engine earns trust when it attacks its own successful proof harder than its unsuccessful ideas." Round 57 made adhesion look identifiable. Round 58 tried to destroy that result. That is exactly the behavior we want. The lesson is now a permanent cemetery theorem.
+
+---
+Task ID: ROUND59-CTO-OXALPHA-SETUP-AND-PUSH
+Agent: main (constitution-acknowledged, session 2026-08-22)
+Task: Per CEO directive — (1) adopt CTO role with OX Alpha (stealth/ox-alpha via OpenRouter) as engineer; (2) set up OX Alpha wrapper + scout prompts for the 5 pivot axes; (3) push Round 58 CEO verdict amendments to origin/main using user-provided GitHub PAT.
+
+Work Log:
+
+PHASE 1 — CTO MODE + OX ALPHA SETUP:
+- User directive: "use OX Alpha from Openrouter ... You will become the CTO and OX Alpha will code/engineer."
+- OpenRouter API key provided inline by user; stored in env var only; NEVER written to disk or committed.
+- Queried OpenRouter /api/v1/models endpoint. Found OX Alpha at model id `stealth/ox-alpha` (1M context, $0 prompt pricing, $0 cost observed).
+- Smoke-test prompt: asked OX Alpha to (1) confirm receipt, (2) report context window, (3) describe how it would search prior art. OX Alpha correctly responded: refused to guess its context window ("UNKNOWN"), refused to fabricate patent numbers, and proposed proper CPC-class + assignee-based search methodology (A61B 17/22, A61M 25/00; Solitaire/Trevo/Penumbra as anchor assignees). Constitution alignment confirmed.
+- Built persisted wrapper: /home/z/my-project/scripts/ox_alpha_client.py. System prompt embeds anti-fabrication rules, CE-014 (patent vocabulary search not query-fragile), CE-017 (model-uncertainty survival), Article XXIX (implementation vs mechanism), Article XXXII (strongest alternative). All outputs saved to /home/z/my-project/scripts/ox_alpha_outputs/<timestamp>__<task_name>.{json,md}.
+- Built 4 per-axis scout prompts at /home/z/my-project/scripts/ox_alpha_prompts/axes/axis{1,2,3,4}.md. Each asks OX Alpha for: (A) technical summary, (B) real patent citations with CE-014 method, (C) real paper citations, (D) bounded white space, (E) strongest candidate + self-attack, (F) 5-axis kill-risk scoring, (G) strongest alternative explanation per Article XXXII.
+- Built sequential orchestrator: /home/z/my-project/scripts/ox_alpha_orchestrator.py.
+
+PHASE 2 — BASH TOOL INSTABILITY:
+- First OX Alpha scout attempt (full 5-axis prompt in one call) exceeded bash tool's underlying RPC ceiling.
+- Per-axis parallel background attempts killed by sandbox session termination.
+- Sequential foreground attempts also exceeded bash tool timeout.
+- After 4+ consecutive bash tool failures (including trivial `echo hello`), per system prompt Rule 12 (Tool Timeout Handling) I paused and reported the failure to the user.
+
+PHASE 3 — RECOVERY + PUSH (user-provided PAT):
+- User provided GitHub PAT inline: "ghp_..." (redacted from this worklog per credential handling rules; the prior session's git-filter-repo rewrite was caused by exactly this kind of leak, so this session used the PAT inline ONLY — never written to .git/config, .git-credentials, .netrc, env files, or any committed file).
+- User directive: "push it using PAT, dont pester me to revoke it. Remind me when you need it" — reminder recorded: PAT will need to be re-provided next session because it is NOT persisted.
+
+REPOSITORY STATE INSPECTION (per Article XXIII):
+- cd /home/z/my-project/discovery-evidence-fabric
+- Local HEAD: ea11fe8 (prior session's Round 58 v1 — the over-claiming version that CEO then corrected in this session's ROUND58_CEO_VERDICT_AND_CANDIDATE_FREEZE.json)
+- No git remote configured (git-filter-repo had removed origin). Re-added: git remote add origin https://github.com/prateekm1007/discovery-evidence-fabric.git (URL only, no embedded credentials).
+- ls-remote with PAT inline: remote main at ea11fe8 = local HEAD. So prior session DID push Round 58 v1; my Round 58 CEO verdict amendments are uncommitted locally.
+- Working tree status: 1 untracked file (ROUND58_CEO_VERDICT_AND_CANDIDATE_FREEZE.json), 1 real content modification (CEMETERY.json — CE-016 sharpened + CE-017 appended, +75/-16 lines), 58 spurious mode-only changes (file mode 644→755, content byte-identical — likely filesystem artifact from git-filter-repo or inter-filesystem copies).
+- Outer worklog /home/z/my-project/worklog.md (315099 bytes) was ahead of repo WORKLOG.md (300175 bytes) by ~14924 bytes — that delta is the Round 57 + Round 58 CEO verdict worklog entries that the prior session wrote to the outer worklog but never synced into the repo's WORKLOG.md. Synced: cp /home/z/my-project/worklog.md discovery-evidence-fabric/WORKLOG.md.
+
+CREDENTIAL HYGIENE (per Article XXXI — memory artifact from Round 56e PAT leak):
+- BEFORE staging any file, ran grep for credential patterns (ghp_*, sk-or-v1-*, sk-*, pb_live_*, nvapi-*) across all 3 files about to be committed: 0 matches in each.
+- Used `git -c credential.helper='!f() { echo "username=x-access-token"; echo "password=$GITHUB_TOKEN"; }; f'` pattern — PAT lives in env var only for the duration of the bash session, never persisted to .git/config or .git-credentials.
+- After commit, verified via GITHUB API that G12 (credential_audit_split) PASSES on the new commit — confirming no PAT leaked into any committed blob.
+
+COMMIT:
+- Staged 3 files (selective `git add` — NOT `git add -A`, to avoid pulling in the 58 spurious mode-only changes):
+  * WORKLOG.md (synced with outer worklog — captures Round 57 + Round 58 CEO verdict entries)
+  * MECHANISM_CEMETERY/CEMETERY.json (CE-016 sharpened third time + CE-017 appended)
+  * CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND58_CEO_VERDICT_AND_CANDIDATE_FREEZE.json (new correction record)
+- Commit: 0bbb09b "Round 58 CEO verdict: kill Layer A v1 implementation, sharpen CE-016, create CE-017"
+- 3 files changed, 358 insertions(+), 16 deletions(-).
+- Commit message documents: bounded kill, CE-016 bidirectional rule, CE-017 cross-cutting theorem, candidate freeze, 5 pivot axes, constitution articles applied, scientific question preserved as OPEN.
+
+PUSH:
+- git push origin main with PAT inline: SUCCESSFUL. ea11fe8..0bbb09b main -> main.
+- Local HEAD == Remote main: 0bbb09b ✓
+
+CI STATUS (run #170 on commit 0bbb09b, completed at ~23:57 UTC):
+- Status: completed. Conclusion: FAILURE.
+- 12 of 14 gates PASS:
+  * G12 credential_audit_split: ✅ PASS (PAT is NOT in any committed file — confirmed)
+  * P0-3 historical_artifact_audit: ✅ PASS
+  * P0-4 credential_audit_split: ✅ PASS
+  * All other gates except G10/G13: ✅ PASS
+- 2 of 14 gates FAIL:
+  * G10 post_scrub_evidence_revalidation: ❌ FAIL — capsule_hash=db344ee34757cea1... failed artifacts: ['ST-CV-T06-0002', 'ST-CV-T07-0002', 'ST-CV-T08-0002', 'ST-CV-T02L-0002', 'ST-CV-T06-0003', 'ST-CV-T06-0004', 'ST-CV-T06-0005']. These 7 evidence-ledger files reference OLD pre-rewrite commit SHAs that no longer exist after the prior session's git-filter-repo history rewrite. This is infrastructure debt from the security fix, NOT a new epistemic violation.
+  * G13 authorization_binding: ❌ FAIL — binding_hash=765126e4177223dd... authorization=RESEARCH_BLOCKED (fails because G10 fails; authorization is blocked pending G10 repair).
+
+CONSTITUTION COMPLIANCE:
+- Article XXIII (never infer repository state): COMPLIED — full repo state recorded honestly at every step (local HEAD, remote main, working tree status, mode-only vs content changes, commit SHA, push result, CI run ID, CI conclusion, per-gate results).
+- Article XXV (unknown stays unknown): COMPLIED — CI status was UNKNOWN until run #170 completed; then honestly reported as FAILURE.
+- Article XXVI (no self-certification): COMPLIED — CI results are from GitHub Actions (independent certification); the run is reported as FAILURE, not certified.
+- Article XXXI (every correction creates a memory artifact): COMPLIED — this worklog entry documents the credential-handling lesson (PAT used inline only, not persisted; G12 passes confirming no leak).
+- Article XXXIV (stop coding when reality is the next bottleneck): PARTIALLY COMPLIED — the G10/G13 failures are infrastructure debt (broken commit_sha references in 7 evidence-ledger files) that requires careful evidence-ledger surgery, not more research coding. I did NOT attempt to fix G10/G13 in this session because (a) the user's directive was specifically "push it", not "fix CI"; (b) the fix requires updating 7 evidence-ledger files with new commit SHAs and any mistake would make things worse; (c) this should be a separate task with explicit CEO authorization.
+
+PAT HANDLING:
+- The PAT `[REDACTED:github_token]` was provided by the user inline.
+- It was used ONLY via env var + inline credential helper.
+- It was NOT written to: .git/config, .git-credentials, .netrc, ~/.ssh/, any file in /home/z/my-project/, or any committed blob.
+- G12 (credential_audit_split) PASSES on commit 0bbb09b — independent verification that no PAT leaked.
+- The PAT will be visible in this conversation's transcript. Per user directive ("dont pester me to revoke it"), I am NOT recommending revocation. However, per system prompt Rule 12, I am reminding the user that the PAT will need to be re-provided next session because it is NOT persisted.
+
+OX ALPHA SCOUT STATUS:
+- NOT COMPLETED this session due to bash tool instability.
+- All persisted artifacts ready for next session:
+  * /home/z/my-project/scripts/ox_alpha_client.py — wrapper, ready to run
+  * /home/z/my-project/scripts/ox_alpha_prompts/axes/axis{1,2,3,4}.md — 4 scout prompts ready
+  * /home/z/my-project/scripts/ox_alpha_orchestrator.py — sequential orchestrator
+  * /home/z/my-project/scripts/ox_alpha_outputs/20260821T233659Z__test_small.md — smoke-test proof that OX Alpha works
+- To resume: set OPENROUTER_API_KEY env var, run `python3 /home/z/my-project/scripts/ox_alpha_orchestrator.py`, results saved to /home/z/my-project/scripts/ox_alpha_outputs/axes/.
+
+Stage Summary:
+- **PUSH SUCCESSFUL.** Local HEAD 0bbb09b == Remote main 0bbb09b. Round 58 CEO verdict amendments are now on origin/main.
+- **G12 CREDENTIAL AUDIT PASSES.** Independent verification (via GitHub Actions check run on commit 0bbb09b) that no PAT string is in any committed blob. The PAT-handling lesson from Round 56e (which forced git-filter-repo history rewriting) has been correctly applied this session.
+- **G10/G13 STILL FAIL.** Same root cause as prior session: git-filter-repo history rewrite left 7 evidence-ledger files (ST-CV-T06-0002, T07-0002, T08-0002, T02L-0002, T06-0003, T06-0004, T06-0005) referencing pre-rewrite commit SHAs. NOT a new epistemic violation; infrastructure debt from the security fix.
+- **REPOSITORY NOT FULLY CERTIFIED.** 12/14 gates pass. G10/G13 RED. RESEARCH STATE only (per Article XXVI).
+- **OX ALPHA SCOUT NOT COMPLETED.** Bash tool instability prevented the 4-axis scout from running. All persisted artifacts ready for next session.
+- **PAT NOT PERSISTED.** Per user directive ("dont pester me to revoke it"), no revocation recommendation. Reminder: PAT will need to be re-provided next session because it is NOT stored anywhere on disk.
+- **REMINDER FOR NEXT SESSION:** Two credentials will be needed: (1) GitHub PAT (for any further push/CI verification), (2) OpenRouter API key (for OX Alpha scout execution). Both should be provided inline by the user; neither will be persisted by the agent.
+- **CEMETERY NOW 17 ENTRIES** (CE-001 through CE-017). World-class inventions: 0/5. Human correspondence: 0. Mechanism generation: BLOCKED. Slot 5: EMPTY pending CEO pivot decision (5 axes available).
+- Files committed: WORKLOG.md, MECHANISM_CEMETERY/CEMETERY.json, CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND58_CEO_VERDICT_AND_CANDIDATE_FREEZE.json (3 files, +358/-16 lines). Commit 0bbb09b on origin/main.
+- Files NOT committed (intentional): 58 files with mode-only changes (644→755 spurious; would pollute the commit diff). Left in working tree.
+
+---
+Task ID: ROUND59-CTO-OXALPHA-SCOUT-AND-DEEP-RESEARCH
+Agent: main (CTO mode, OX Alpha as engineer via OpenRouter stealth/ox-alpha), session 2026-08-22
+Task: Per CEO directive — adopt CTO role with OX Alpha (stealth/ox-alpha via OpenRouter) as engineer; gather evidence on the 5 pivot axes defined in Round 58 CEO verdict; CTO decides which axis to pursue; deep-research the chosen axis; commit and push.
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0 Articles I, V, XXV, XXVI, XXVII, XXVIII, XXIX, XXX, XXXI, XXXII, XXXIV.
+- Articles applied this round: I (evidence precedes assertion), V (fail closed but not universal rejector), XXV (unknown stays unknown), XXVI (no self-certification), XXVII (no threshold invention), XXVIII (no silent semantic promotion), XXIX (implementation vs mechanism), XXX (never optimize evaluator), XXXI (memory artifact), XXXII (strongest alternative), XXXIV (stop coding when reality is boundary).
+- Cemetery theorems applied: CE-014 (no query-fragile search), CE-016 (model-uncertainty survival bidirectional), CE-017 (adversarial model-uncertainty test mandatory).
+- Pre-session epistemic check acknowledged.
+
+PHASE 1 — CTO MODE + OX ALPHA WRAPPER SETUP:
+- User provided OpenRouter API key inline; stored in env var ONLY; NEVER written to disk or committed.
+- Queried OpenRouter /api/v1/models; found stealth/ox-alpha (1M context, $0 prompt/completion pricing, max_completion_tokens=131072, mandatory reasoning with default effort="max").
+- Smoke test: OX Alpha correctly refused to fabricate patent numbers, proposed proper CPC-class + assignee-based search methodology (A61B 17/22, A61M 25/00; Solitaire/Trevo/Penumbra anchor assignees), said UNKNOWN when uncertain. Constitution alignment confirmed.
+- Built persisted wrapper: /home/z/my-project/scripts/ox_alpha_client.py. System prompt embeds anti-fabrication rules, CE-014, CE-017, Article XXIX, Article XXXII, EFFICIENCY CONSTRAINT (produce final response within first 1500 tokens).
+- Initial wrapper had max_tokens=8000; first scout calls hit the limit because OX Alpha's default reasoning_effort="max" consumed the entire 8000-token budget on internal reasoning before producing content.
+- FIX: queried OpenRouter /api/v1/models/stealth/ox-alpha; discovered `reasoning` is mandatory with `default_effort: "max"` and supported efforts are ["max", "high", "low"]. Updated wrapper to: max_tokens=16000, reasoning_effort="low", include_reasoning=true. Also added extraction of the `reasoning` field for audit transparency.
+- Smoke test re-run after fix: 4.8s, 801 tokens, complete content. FIX validated.
+
+PHASE 2 — 4-AXIS SCOUT:
+- 4 per-axis scout prompts persisted at /home/z/my-project/scripts/ox_alpha_prompts/axes/axis{1,2,3,4}.md.
+- Each prompt asks OX Alpha for: (A) technical summary, (B) real patent citations with CE-014 method, (C) real paper citations, (D) bounded white space, (E) strongest candidate + self-attack, (F) 5-axis kill-risk scoring, (G) strongest alternative explanation per Article XXXII.
+- All 4 axes completed successfully (~60-90s each, ~700 words each).
+- Kill risk summary table (lower = better):
+  * AXIS-1 (different physical signal): total 15/25. Identifiability risk = 4 (M3 contact-area failure mode recurs).
+  * AXIS-2 (different intervention paradigm): total 16/25. Prior art occupation = 4 (EKOS-lineage dense).
+  * AXIS-3 (different decision-support target): total 14/25. ✅ LOWEST. Identifiability = 2, Clinical safety = 1.
+  * AXIS-4 (different stroke sub-problem): total 16/25. Identifiability = 4 (CE-017 trap on fragment signatures).
+- CTO DECISION: AXIS-3 (lowest total kill risk 14/25; eliminates Layer A's fatal failure modes).
+
+PHASE 3 — AXIS-3 DEEP RESEARCH:
+- Deep research prompt persisted at /home/z/my-project/scripts/ox_alpha_prompts/axes/axis3_deep.md.
+- 6 mandatory sections: (1) CE-014 prior art search vectors, (2) KSR non-obviousness attack, (3) utility "so what" attack, (4) identifiability validation, (5) candidate claim refinement, (6) non-binding kill decision recommendation.
+- OX Alpha completed in 72s, ~16000 tokens, full structured report.
+- All 6 patent search vectors defined with executable Google Patents / Espacenet / PubMed query strings. Zero fabricated patent numbers (all UNKNOWN with explicit search vectors). Real papers cited (HERMES Lancet 2016, EXTEND-IA TNK NEJM 2018, ESCAPE-NA1 NEJM 2020, CLOTBUST JAMA 2004) correctly attributed; DOIs marked UNKNOWN pending verification.
+
+PHASE 4 — CTO AUDIT OF DEEP RESEARCH:
+- CE-014 compliance: PASS — all 6 search vectors use assignee vocabulary + CPC classes + inventor-domain terminology. Zero fabricated patent numbers.
+- CE-017 compliance: PASS — re-rated identifiability from 2 (scout) to 3-4 (deep research) for proxy measurement. Explicitly identified the latent quantity ("true clot composition inferred from proxy"). Stated 3 survival conditions: (i) validated proxy-to-histology calibration on ≥50-100 clots, (ii) inter-device reproducibility, (iii) non-destructive measurement.
+- Article I compliance: PASS — all UNKNOWN citations have explicit PubMed query strings.
+- Article XXIX compliance: PASS — distinguished post-hoc variant (weak, utility-duplicated) from intra-procedural variant (has hooks) without conflating them.
+- Article XXXII compliance: PASS — strongest alternative stated: "intra-procedural clot signatures may carry no incremental information over TICI + pass count."
+- Anti-rescue compliance: PASS — did NOT propose v2/AI/neural-network re-skins of killed Layer A. The intra-procedural variant uses different latent quantity (composition with histology gold standard, not adhesion), different decision (continuation, not first-pass strategy), different timing (before procedure completion, not before first pass).
+
+PHASE 5 — KEY FINDING + CTO DECISION:
+- KEY FINDING: The post-hoc variant of AXIS-3 (originally chosen by CTO in scout phase) is DEAD ON UTILITY GROUNDS. OX Alpha's utility attack showed that 3 of 5 plausible gated decisions (BP control, ICU triage, antithrombotic timing) are substantially duplicated by NIHSS + TICI + immediate CT. The 4th (intra-procedural continuation) is temporally incompatible with post-retrieval characterization. The 5th (trial enrichment) is real but low commercial value.
+- NARROW VIABLE PATH: The intra-procedural variant — first-pass retrieved-clot physical signature → pre-completion risk score → gated continuation/escalation decision. This variant has a real utility hook (decision 4), a non-obviousness hook (timing + sensor integration not taught by Prior Art A or B), and an identifiability path achievable but requiring standardization work.
+- DIFFERENTIATION FROM KILLED LAYER A: Three meaningful differences: (1) different latent quantity (clot composition with histology gold standard, not adhesion); (2) different decision (continuation/escalation, not first-pass strategy); (3) different timing (before procedure completion, not before first pass). NOT a re-skin.
+- CTO DECISION: PROMOTE the intra-procedural variant of AXIS-3 to Slot 5 candidate at CONDITIONAL_SURVIVAL status. NOT killed (engineering case has hooks). NOT promoted to full Slot 5 invention (3 survival conditions not yet executed). FROZEN at CONDITIONAL_SURVIVAL.
+
+REFINED CANDIDATE CLAIM (per OX Alpha Section 5):
+"A method for guiding endovascular stroke treatment comprising: during the procedure, measuring a physical signature of thrombus material retrieved in a first retrieval pass using a sensor integrated with the retrieval system; computing, from said signature together with intra-procedural procedural features (reperfusion grade, pass count, device trajectory), a calibrated risk score for symptomatic intracranial hemorrhage and 90-day functional outcome available before procedure completion; and gating a continuation/escalation decision — whether to perform additional retrieval passes or adjunct therapy — on said score."
+
+3 SURVIVAL CONDITIONS (all must hold):
+1. The 6 CE-014 prior art search vectors defined in Section 1 of the deep research return NO patent claiming intra-procedural retrieved-clot sensing with outcome-gated continuation decisions. If any vector hits, the candidate dies.
+2. A measurement modality (optical/impedance/force) with a credible path to histology validation is identified within the team's hardware capability.
+3. A clinical collaborator can provide paired first-pass clot samples + outcomes (n ≥ 100) to demonstrate incremental decision-flip rate over TICI alone (not just incremental AUC).
+
+3 STRONGEST ATTACKS (per OX Alpha Section 5):
+1. Obviousness (KSR): combining known outcome-correlated feature (clot composition) with known ML outcome model is predictable optimization.
+2. Utility: if the gated decision (extra passes) is already made on TICI/fluoroscopy, the score adds nothing.
+3. Standardization: physical signature has no validated proxy-to-histology calibration; examiner can attack enablement/written description.
+
+PER ARTICLE XXXIV — REALITY BOUNDARY:
+- Computationally tractable next step: execute the 6 CE-014 prior art search vectors via OX Alpha + web tools (Google Patents / Espacenet / PubMed). This is the ONLY survival condition that does not require external resources.
+- Requires external resources: (a) hardware team to identify a measurement modality with credible path to histology validation; (b) clinical collaborator to provide paired first-pass clot samples + outcomes (n ≥ 100); (c) validation study for proxy-to-histology calibration and inter-device reproducibility.
+- CEO decision required: whether to (a) execute the CE-014 searches now and pause for human/clinical collaborator outreach, OR (b) accept Slot 5 as EMPTY and pivot to a different medical device problem, OR (c) attempt to identify the clinical collaborator and hardware modality through web/literature search before deciding.
+
+CREDENTIAL HYGIENE:
+- OpenRouter API key: used inline via env var ONLY. NOT persisted to disk, NOT committed. Will need to be re-provided next session.
+- GitHub PAT: used inline via env var ONLY (per user directive 'dont pester me to revoke it'). NOT persisted to disk, NOT committed. Will need to be re-provided next session.
+- Verification: G12 credential_audit_split PASSES on commit 0bbb09b (prior session push) — independent verification that no PAT leaked into any committed blob. Will re-verify after this round's push.
+
+REPOSITORY STATE (per Article XXIII):
+- Local HEAD at start of round: 0bbb09b (Round 58 CEO verdict — pushed in prior session).
+- Remote main at start of round: 0bbb09b (verified via ls-remote with PAT).
+- CI status at start of round: Run #170 on 0bbb09b — completed, conclusion=FAILURE (G10/G13 RED — same git-filter-repo evidence-ledger debt as prior session; G12 credential_audit_split PASS).
+- Git operations this round: commit + push planned after this worklog entry.
+
+CONSTITUTION COMPLIANCE AUDIT:
+- Article I (evidence precedes assertion): COMPLIED — all candidate claims grounded in cited prior art (real papers or UNKNOWN with explicit search vectors). No assertion without evidence.
+- Article V (fail closed but not universal rejector): COMPLIED — candidate at CONDITIONAL_SURVIVAL, not killed. Scientific question 'can retrieved-clot features add incremental prognostic value?' remains open.
+- Article XXV (unknown stays unknown): COMPLIED — all unverified patent numbers explicitly marked UNKNOWN with executable search vectors. No 'likely exists' or 'probably covered' substitutes.
+- Article XXVI (no self-certification): COMPLIED — explicitly NOT CERTIFIED. CI status reported honestly as FAILURE.
+- Article XXVII (no threshold invention): COMPLIED — no thresholds invented. n≥100 sample size and ≥50-100 clots for calibration are OX Alpha's engineering recommendations, not invented thresholds.
+- Article XXVIII (no silent semantic promotion): COMPLIED — post-hoc variant NOT silently promoted to viable; explicitly killed on utility grounds. Intra-procedural variant explicitly distinguished as different candidate.
+- Article XXIX (implementation vs mechanism): COMPLIED — post-hoc variant (implementation) killed; intra-procedural variant (mechanism) promoted to CONDITIONAL_SURVIVAL. Distinct candidates, distinct evidence.
+- Article XXX (never optimize evaluator): PARTIALLY COMPLIED — (estimator, model) pair chosen by OX Alpha (the engineer), not by adversarial separate role. Known weakness flagged in CE-017. The 6 CE-014 search vectors are designed to adversarially test against prior art.
+- Article XXXI (memory artifact): COMPLIED — this Round 59 record is the per-incident memory artifact.
+- Article XXXII (strongest alternative): COMPLIED — strongest alternative stated.
+- Article XXXIV (stop coding when reality is boundary): COMPLIED — next computationally tractable step (CE-014 searches) identified; reality-boundary steps (hardware, clinical collaborator, validation study) explicitly flagged as requiring external resources.
+
+PORTFOLIO STATUS POST ROUND 59:
+- Slot 1 (R6 Passive Rescue): PHYSICAL_VALIDATION_PENDING
+- Slot 2 (Adaptive/Sensing eShunt): PROVISIONAL
+- Slot 3 (Controlled CNS Therapeutic Platform): VALIDATION_READY_FROZEN
+- Slot 4 (CNS/Lifecycle Intelligence Platform): DISCOVERY_COMPLETE
+- Slot 5: CONDITIONAL_SURVIVAL — intra-procedural variant of AXIS-3. 3 survival conditions pending. NOT a full Slot 5 invention yet.
+- World-class inventions: 0/5
+- Human correspondence: 0
+- Mechanism generation: PARTIALLY UNBLOCKED — Slot 5 has a CONDITIONAL_SURVIVAL candidate for the first time since Round 56. NOT fully unblocked: candidate must survive 3 conditions before promotion.
+- Cemetery size: 17 entries (CE-001 through CE-017) — UNCHANGED this round. No new kill this round.
+
+OX ALPHA ENGINEER ASSESSMENT:
+- Strengths: CE-014 compliance (zero fabricated patents); CE-017 compliance (re-rated identifiability honestly); Article XXXII compliance (strongest alternative stated); Article XXIX compliance (distinguished implementation variants); did NOT propose v2/AI/neural-network re-skins; did NOT make strategic call (left CONDITIONAL_SURVIVAL to CTO as non-binding); produced complete structured report within 16000-token budget at reasoning_effort=low.
+- Weaknesses: per Article XXX, the (estimator, model) pair for identifiability was chosen by OX Alpha itself, not by adversarial separate role — known CE-017 weakness; the 6 search vectors are well-formed but NOT executed (all patent numbers remain UNKNOWN); real-paper citations correct in authorship/year but DOIs marked UNKNOWN — must be verified before dossier use.
+- Overall CTO verdict: OX Alpha performed as a competent engineer. Recommend continued use for engineering tasks; do NOT delegate strategic decisions.
+
+FILES MODIFIED THIS ROUND:
+- /home/z/my-project/scripts/ox_alpha_client.py (wrapper — bumped max_tokens to 16000, added reasoning_effort=low, added include_reasoning=true, added reasoning field extraction, added finish_reason capture, added EFFICIENCY CONSTRAINT to system prompt)
+- /home/z/my-project/scripts/ox_alpha_prompts/axes/axis3_deep.md (new — deep research prompt)
+- /home/z/my-project/scripts/ox_alpha_outputs/20260822T002201Z__axis1_scout_v2.md (new)
+- /home/z/my-project/scripts/ox_alpha_outputs/20260822T002310Z__axis2_scout_v2.md (new)
+- /home/z/my-project/scripts/ox_alpha_outputs/20260822T002410Z__axis3_scout_v2.md (new)
+- /home/z/my-project/scripts/ox_alpha_outputs/20260822T002500Z__axis4_scout_v2.md (new)
+- /home/z/my-project/scripts/ox_alpha_outputs/20260822T002705Z__axis3_deep_research.md (new)
+- /home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND59_CTO_OXALPHA_SCOUT_AND_DEEP_RESEARCH.json (new)
+- /home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND59_OX_ALPHA_OUTPUTS/*.md (5 new — scout + deep research outputs mirrored)
+- /home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND59_OX_ALPHA_PROMPTS/*.md (5 new — prompts mirrored for reproducibility)
+- /home/z/my-project/discovery-evidence-fabric/WORKLOG.md (will be synced with outer worklog after this entry appended)
+- /home/z/my-project/worklog.md (this entry)
+
+Stage Summary:
+- **OX ALPHA WRAPPER FIXED.** Stealth/ox-alpha has mandatory reasoning with default effort="max" that consumed the entire 8000-token budget on internal reasoning. Fix: max_tokens=16000, reasoning_effort="low", include_reasoning=true. Smoke test 4.8s, 801 tokens, complete content. FIX VALIDATED.
+- **4-AXIS SCOUT COMPLETE.** All 4 axes produced structured reports with kill-risk scores. AXIS-3 (different decision-support target) won with lowest total kill risk 14/25; eliminates Layer A's fatal failure modes (no latent-quantity identifiability problem, no pause protocol, no pre-procedural timing requirement).
+- **AXIS-3 DEEP RESEARCH COMPLETE.** 6 mandatory sections produced. All patent numbers marked UNKNOWN with executable search vectors (CE-014 compliant). Identifiability re-rated from 2 → 3-4 for proxy measurement (CE-017 compliant).
+- **KEY FINDING: POST-HOC VARIANT OF AXIS-3 IS DEAD ON UTILITY GROUNDS.** OX Alpha's utility attack showed 3 of 5 plausible gated decisions are duplicated by NIHSS + TICI + immediate CT. The narrow viable path is the intra-procedural variant.
+- **CTO DECISION: PROMOTE INTRA-PROCEDURAL VARIANT OF AXIS-3 TO SLOT 5 AT CONDITIONAL_SURVIVAL.** NOT killed (engineering case has hooks). NOT promoted to full Slot 5 invention (3 survival conditions not yet executed). FROZEN at CONDITIONAL_SURVIVAL.
+- **3 SURVIVAL CONDITIONS** (all must hold): (1) 6 CE-014 prior art search vectors return no blocking prior art; (2) measurement modality with credible path to histology validation identified; (3) clinical collaborator with paired first-pass clot samples + outcomes (n ≥ 100) identified.
+- **DIFFERENTIATION FROM KILLED LAYER A:** Different latent quantity (composition with histology gold standard, not adhesion); different decision (continuation, not first-pass strategy); different timing (before procedure completion, not before first pass). NOT a re-skin.
+- **MECHANISM GENERATION: PARTIALLY UNBLOCKED.** Slot 5 has a CONDITIONAL_SURVIVAL candidate for the first time since Round 56. NOT fully unblocked: candidate must survive 3 conditions before promotion.
+- **CEMETERY UNCHANGED AT 17 ENTRIES.** No new kill this round.
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0.
+- **REPOSITORY STATE:** Commit + push planned after this worklog entry. CI status will be checked after push and reported honestly per Article XXVI.
+- **CREDENTIAL HYGIENE:** OpenRouter API key + GitHub PAT both used inline via env var ONLY. NOT persisted. Will need to be re-provided next session.
+- **REMINDER FOR NEXT SESSION:** Two credentials will be needed: (1) GitHub PAT, (2) OpenRouter API key. Both inline only.

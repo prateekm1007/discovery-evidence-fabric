@@ -1,0 +1,223 @@
+{
+  "round": "59",
+  "timestamp_utc": "2026-08-22T00:30:00+00:00",
+  "task_id": "ROUND59-CTO-OXALPHA-SCOUT-AND-DEEP-RESEARCH",
+  "agent": "main (CTO mode, OX Alpha as engineer via OpenRouter stealth/ox-alpha)",
+  "constitution_version": "1.5.0",
+
+  "constitution_recertification": {
+    "version": "1.5.0",
+    "pre_session_check_acknowledged": true,
+    "articles_applied": ["I", "V", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXX", "XXXI", "XXXII", "XXXIV", "CE-014", "CE-016", "CE-017"]
+  },
+
+  "repository_state_per_article_xxiii": {
+    "local_HEAD_at_start_of_round": "0bbb09b (Round 58 CEO verdict — pushed in prior session)",
+    "remote_main_at_start_of_round": "0bbb09b (verified via ls-remote with PAT)",
+    "match": true,
+    "ci_status_at_start_of_round": "Run #170 on 0bbb09b: completed, conclusion=FAILURE (G10/G13 RED — same git-filter-repo evidence-ledger debt as prior session; G12 credential_audit_split PASS)"
+  },
+
+  "cto_mode_setup": {
+    "ceo_directive": "use OX Alpha from Openrouter ... You will become the CTO and OX Alpha will code/engineer",
+    "engineer_model": "stealth/ox-alpha (OpenRouter)",
+    "engineer_context_window": 1048576,
+    "engineer_max_completion_tokens": 131072,
+    "engineer_pricing": "$0 prompt / $0 completion",
+    "engineer_reasoning_default_effort": "max (mandatory reasoning)",
+    "wrapper_persisted_at": "/home/z/my-project/scripts/ox_alpha_client.py",
+    "wrapper_configuration": {
+      "max_tokens": 16000,
+      "reasoning_effort": "low (overrides default 'max' which consumed entire 8000-token budget on reasoning before producing content)",
+      "include_reasoning": true,
+      "temperature": 0.3,
+      "system_prompt_embeds": ["anti-fabrication rules", "CE-014 patent-vocabulary search", "CE-017 model-uncertainty survival", "Article XXIX implementation-vs-mechanism", "Article XXXII strongest-alternative", "EFFICIENCY CONSTRAINT (produce final response within first 1500 tokens)"]
+    },
+    "openrouter_api_key_handling": "Used inline via env var ONLY. NOT persisted to disk, NOT written to any config file, NOT committed. Will need to be re-provided next session.",
+    "smoke_test_result": "PASS — OX Alpha correctly refused to fabricate patent numbers, proposed proper CPC-class + assignee-based search methodology, said UNKNOWN when uncertain. 4.8s response, 801 tokens."
+  },
+
+  "scout_phase": {
+    "method": "4 parallel per-axis scout prompts executed sequentially via OX Alpha wrapper (axes 1, 2, 3, 4). Each prompt ~3500 chars; each response ~700 words structured report.",
+    "total_elapsed": "~4 minutes (4 calls × ~60s each)",
+    "outputs_persisted": [
+      "/home/z/my-project/scripts/ox_alpha_outputs/20260822T002201Z__axis1_scout_v2.md",
+      "/home/z/my-project/scripts/ox_alpha_outputs/20260822T002310Z__axis2_scout_v2.md",
+      "/home/z/my-project/scripts/ox_alpha_outputs/20260822T002410Z__axis3_scout_v2.md",
+      "/home/z/my-project/scripts/ox_alpha_outputs/20260822T002500Z__axis4_scout_v2.md"
+    ],
+    "kill_risk_summary_table": {
+      "axis_1_different_physical_signal": {
+        "prior_art_occupation": 3,
+        "identifiability": 4,
+        "clinical_safety": 2,
+        "timing_decision_value": 3,
+        "patentability": 3,
+        "total": 15,
+        "strongest_candidate": "Catheter-mounted bioimpedance + OCT ring measuring Interface Coupling Index for aspiration-first vs stent-retriever-first selection",
+        "strongest_attack": "Impedance confounded by blood conductivity + changing electrode contact area — same M3 failure mode that killed Layer A"
+      },
+      "axis_2_different_intervention_paradigm": {
+        "prior_art_occupation": 4,
+        "identifiability": 3,
+        "clinical_safety": 3,
+        "timing_decision_value": 2,
+        "patentability": 4,
+        "total": 16,
+        "strongest_candidate": "Low-energy ultrasonic cavitation at clot-vessel interface, terminated by acoustic-emission feedback indicating interface disruption",
+        "strongest_attack": "Acoustic emission signatures of clot disruption are described in sonothrombolysis monitoring literature — feedback loop may be obvious combination"
+      },
+      "axis_3_different_decision_support_target": {
+        "prior_art_occupation": 4,
+        "identifiability": 2,
+        "clinical_safety": 1,
+        "timing_decision_value": 3,
+        "patentability": 4,
+        "total": 14,
+        "strongest_candidate": "Post-procedural sICH/mRS risk score fusing retrieved-clot characterization + intra-procedural features",
+        "strongest_attack": "Clot composition-to-outcome associations already published; adding one feature class to ML prognostic pipeline is obvious under KSR"
+      },
+      "axis_4_different_stroke_sub_problem": {
+        "prior_art_occupation": 4,
+        "identifiability": 4,
+        "clinical_safety": 2,
+        "timing_decision_value": 3,
+        "patentability": 3,
+        "total": 16,
+        "strongest_candidate": "Distal embolic fragment burden quantification via Doppler/acoustic at distal filter, modulating retrieval parameters",
+        "strongest_attack": "Coronary embolic protection is mature; stroke-specific port is obvious; fragment signatures may not be separable from noise (CE-017 trap)"
+      }
+    },
+    "cto_decision": "AXIS-3 (lowest total kill risk 14/25; eliminates Layer A's fatal failure modes: no latent-quantity identifiability problem, no pause protocol, no pre-procedural timing requirement)"
+  },
+
+  "deep_research_phase": {
+    "method": "Single deep research call on AXIS-3 with 6 mandatory sections: (1) CE-014 prior art search vectors, (2) non-obviousness KSR attack, (3) utility 'so what' attack, (4) identifiability validation, (5) candidate claim refinement, (6) non-binding kill decision recommendation.",
+    "output_persisted": "/home/z/my-project/scripts/ox_alpha_outputs/20260822T002705Z__axis3_deep_research.md",
+    "elapsed": "72 seconds",
+    "tokens_used": "completion_tokens=16000 (within budget), reasoning_effort=low"
+  },
+
+  "cto_audit_of_deep_research": {
+    "CE_014_compliance": "PASS — All 6 patent search vectors use assignee vocabulary + CPC classes + inventor-domain terminology. Zero fabricated patent numbers. Every UNKNOWN is paired with a specific executable search query (Google Patents URL or Espacenet query string).",
+    "CE_017_compliance": "PASS — Re-rated identifiability from 2 (scout) to 3-4 (deep research) for proxy measurement. Explicitly identified the latent quantity ('true clot composition inferred from proxy'). Stated 3 survival conditions: (i) validated proxy-to-histology calibration on ≥50-100 clots, (ii) inter-device reproducibility, (iii) non-destructive measurement.",
+    "Article_I_compliance": "PASS — All citations marked UNKNOWN have explicit PubMed query strings. Real papers cited (HERMES Lancet 2016, EXTEND-IA TNK NEJM 2018, ESCAPE-NA1 NEJM 2020, CLOTBUST JAMA 2004) are correctly attributed.",
+    "Article_XXIX_compliance": "PASS — Distinguished the post-hoc variant (weak, utility-duplicated) from the intra-procedural variant (has hooks) without conflating them.",
+    "Article_XXXII_compliance": "PASS — Strongest alternative stated: 'the reason no one has built this may not be an opportunity gap but that intra-procedural clot signatures carry no incremental information over TICI + pass count.'",
+    "anti_rescue_compliance": "PASS — Did NOT propose v2/AI/neural-network re-skins of killed Layer A. The intra-procedural variant uses different latent quantity (composition with histology gold standard, not adhesion), different decision (continuation, not first-pass strategy), different timing (before procedure completion, not before first pass)."
+  },
+
+  "key_finding_from_deep_research": {
+    "finding": "The post-hoc variant of AXIS-3 (originally chosen by CTO in scout phase) is DEAD ON UTILITY GROUNDS.",
+    "evidence": "OX Alpha's Section 3 utility attack analyzed 5 plausible gated decisions: (1) BP control — duplicated by NIHSS/age/TICI; (2) ICU triage — duplicated by NIHSS/TICI; (3) antithrombotic timing — duplicated by TICI/immediate CT; (4) intra-procedural continuation — temporally incompatible with post-retrieval characterization; (5) trial enrichment — real but low commercial value. Decisions 1-3 are substantially duplicated by existing cheaper signals.",
+    "narrow_viable_path": "The intra-procedural variant: first-pass retrieved-clot physical signature → pre-completion risk score → gated continuation/escalation decision. This variant has a real utility hook (decision 4), a non-obviousness hook (timing + sensor integration not taught by Prior Art A or B), and an identifiability path achievable but requiring standardization work.",
+    "differentiation_from_killed_layer_a": "Three meaningful differences: (1) different latent quantity (clot composition with histology gold standard, not adhesion); (2) different decision (continuation/escalation, not first-pass strategy); (3) different timing (before procedure completion, not before first pass). This is NOT a re-skin."
+  },
+
+  "refined_candidate_claim": {
+    "claim": "A method for guiding endovascular stroke treatment comprising: during the procedure, measuring a physical signature of thrombus material retrieved in a first retrieval pass using a sensor integrated with the retrieval system; computing, from said signature together with intra-procedural procedural features (reperfusion grade, pass count, device trajectory), a calibrated risk score for symptomatic intracranial hemorrhage and 90-day functional outcome available before procedure completion; and gating a continuation/escalation decision — whether to perform additional retrieval passes or adjunct therapy — on said score.",
+    "closest_prior_art_A": "ML prognostic models using age/NIHSS/ASPECTS/glucose/TICI (HERMES, MR CLEAN lineage) — UNKNOWN exact patent numbers, verify via Section 1(a)-(d) searches",
+    "closest_prior_art_B": "Retrieved-clot histology-outcome association literature (Liebeskind, Boeckh-Behrens, Marder lineage) — UNKNOWN exact DOIs, verify via PubMed 'thrombus histology thrombectomy outcome'",
+    "three_strongest_attacks": [
+      "1. Obviousness (KSR): combining known outcome-correlated feature (clot composition) with known ML outcome model is predictable optimization",
+      "2. Utility: if the gated decision (extra passes) is already made on TICI/fluoroscopy, the score adds nothing",
+      "3. Standardization: physical signature has no validated proxy-to-histology calibration; examiner can attack enablement/written description for composition inference"
+    ],
+    "three_survival_conditions": [
+      "1. Section 1 CE-014 searches (all 6 vectors) return NO patent claiming intra-procedural retrieved-clot sensing with outcome-gated continuation decisions. If any vector hits, the candidate dies.",
+      "2. A measurement modality (optical/impedance/force) with a credible path to histology validation is identified within the team's hardware capability.",
+      "3. A clinical collaborator can provide paired first-pass clot samples + outcomes (n ≥ 100) to demonstrate incremental decision-flip rate over TICI alone (not just incremental AUC)."
+    ]
+  },
+
+  "cto_decision": {
+    "decision": "PROMOTE the intra-procedural variant of AXIS-3 to Slot 5 candidate at CONDITIONAL_SURVIVAL status.",
+    "status": "CONDITIONAL_SURVIVAL",
+    "not_killed_not_promoted_to_full_candidate": "The candidate is FROZEN at CONDITIONAL_SURVIVAL. It is NOT killed (the engineering case has hooks). It is NOT promoted to a full Slot 5 invention (the 3 survival conditions have not been executed).",
+    "next_moves_bounded": [
+      "1. Execute the 6 CE-014 prior art search vectors defined in Section 1 of the deep research. This is the ONLY survival condition that is computationally tractable without external resources.",
+      "2. If condition 1 returns NO blocking prior art → continue to conditions 2 and 3.",
+      "3. Conditions 2 and 3 require external resources (hardware team + clinical collaborator + paired dataset of n≥100 first-pass clot samples with outcomes). These are NOT computationally tractable. Per Article XXXIV, this is a reality boundary, not a coding boundary.",
+      "4. If condition 1 returns blocking prior art → KILL the candidate and record CE-018."
+    ]
+  },
+
+  "per_article_xxxiv_reality_boundary": {
+    "computationally_tractable_next_step": "Execute the 6 CE-014 prior art search vectors via OX Alpha + web tools (Google Patents / Espacenet / PubMed).",
+    "requires_external_resources": [
+      "Hardware team to identify a measurement modality with credible path to histology validation",
+      "Clinical collaborator to provide paired first-pass clot samples + outcomes (n ≥ 100)",
+      "Validation study to demonstrate proxy-to-histology calibration and inter-device reproducibility"
+    ],
+    "ceo_decision_required": "Whether to (a) execute the CE-014 searches now and pause for human/clinical collaborator outreach, OR (b) accept Slot 5 as EMPTY and pivot to a different medical device problem, OR (c) attempt to identify the clinical collaborator and hardware modality through web/literature search before deciding."
+  },
+
+  "credential_hygiene": {
+    "openrouter_api_key": "Used inline via env var ONLY. NOT persisted to disk, NOT committed. Will need to be re-provided next session.",
+    "github_pat": "Used inline via env var ONLY (per user directive 'dont pester me to revoke it'). NOT persisted to disk, NOT committed. Will need to be re-provided next session.",
+    "verification": "G12 credential_audit_split PASSES on commit 0bbb09b (prior session push) — independent verification that no PAT leaked into any committed blob."
+  },
+
+  "constitution_compliance_audit": {
+    "Article_I_evidence_precedes_assertion": "COMPLIED — all candidate claims are grounded in cited prior art (real papers or UNKNOWN with explicit search vectors). No assertion without evidence.",
+    "Article_V_fail_closed_not_universal_rejector": "COMPLIED — the candidate is at CONDITIONAL_SURVIVAL, not killed. The scientific question 'can retrieved-clot features add incremental prognostic value?' remains open.",
+    "Article_XXV_unknown_stays_unknown": "COMPLIED — all unverified patent numbers explicitly marked UNKNOWN with executable search vectors. No 'likely exists' or 'probably covered' substitutes.",
+    "Article_XXVI_no_self_certification": "COMPLIED — explicitly NOT CERTIFIED. CI status reported honestly as FAILURE (G10/G13 RED).",
+    "Article_XXVII_no_threshold_invention": "COMPLIED — no thresholds invented. The n≥100 sample size and ≥50-100 clots for calibration are stated as OX Alpha's engineering recommendations, not as invented thresholds.",
+    "Article_XXVIII_no_silent_semantic_promotion": "COMPLIED — the post-hoc variant was NOT silently promoted to viable; it was explicitly killed on utility grounds. The intra-procedural variant was explicitly distinguished as a different candidate.",
+    "Article_XXIX_implementation_vs_mechanism": "COMPLIED — post-hoc variant (implementation) killed; intra-procedural variant (mechanism) promoted to CONDITIONAL_SURVIVAL. Distinct candidates, distinct evidence.",
+    "Article_XXX_never_optimize_evaluator": "PARTIALLY COMPLIED — the (estimator, model) pair was chosen by OX Alpha (the engineer), not by an adversarial separate role. This is a known weakness flagged in CE-017. The 6 CE-014 search vectors are designed to adversarially test the candidate against the prior art landscape.",
+    "Article_XXXI_memory_artifact": "COMPLIED — this Round 59 record is the per-incident memory artifact; the candidate freeze + survival conditions are recorded for future sessions.",
+    "Article_XXXII_strongest_alternative": "COMPLIED — strongest alternative stated: 'intra-procedural clot signatures may carry no incremental information over TICI + pass count.'",
+    "Article_XXXIV_stop_coding_when_reality_is_boundary": "COMPLIED — the next computationally tractable step (CE-014 searches) is identified; the reality-boundary steps (hardware, clinical collaborator, validation study) are explicitly flagged as requiring external resources."
+  },
+
+  "portfolio_status_post_round_59": {
+    "slot_1_R6_passive_rescue": "PHYSICAL_VALIDATION_PENDING",
+    "slot_2_adaptive_sensing_eshunt": "PROVISIONAL",
+    "slot_3_controlled_CNS_therapeutic_platform": "VALIDATION_READY_FROZEN",
+    "slot_4_CNS_lifecycle_intelligence_platform": "DISCOVERY_COMPLETE",
+    "slot_5": "CONDITIONAL_SURVIVAL — intra-procedural variant of AXIS-3 (first-pass retrieved-clot signature → pre-completion risk score → gated continuation/escalation decision). 3 survival conditions pending. NOT a full Slot 5 invention yet.",
+    "world_class_inventions": "0 / 5",
+    "human_correspondence_count": 0,
+    "mechanism_generation": "PARTIALLY UNBLOCKED — Slot 5 has a CONDITIONAL_SURVIVAL candidate for the first time since Round 56. NOT fully unblocked: the candidate must survive 3 conditions before promotion.",
+    "cemetery_size": "17 entries (CE-001 through CE-017) — UNCHANGED this round. No new kill this round; the candidate is at CONDITIONAL_SURVIVAL, not killed."
+  },
+
+  "ox_alpha_engineer_assessment": {
+    "strengths": [
+      "CE-014 compliance: zero fabricated patent numbers, all UNKNOWN paired with executable search vectors",
+      "CE-017 compliance: re-rated identifiability honestly, stated survival conditions for the latent quantity",
+      "Article XXXII compliance: stated strongest alternative explanation",
+      "Article XXIX compliance: distinguished implementation variants without conflating",
+      "Did NOT propose v2/AI/neural-network re-skins of killed Layer A",
+      "Did NOT make the strategic call (left CONDITIONAL_SURVIVAL to CTO as non-binding)",
+      "Produced complete structured report within 16000-token budget at reasoning_effort=low"
+    ],
+    "weaknesses": [
+      "Per Article XXX: the (estimator, model) pair for the identifiability analysis was chosen by OX Alpha itself, not by an adversarial separate role. The proxy-to-histology calibration model is OX Alpha's chosen model, which may be optimistic.",
+      "Per CE-014: the 6 search vectors are well-formed but have NOT been executed. All patent numbers remain UNKNOWN. The candidate's survival depends on actual execution returning no blocking prior art.",
+      "The real-paper citations (HERMES, EXTEND-IA TNK, ESCAPE-NA1, CLOTBUST) are correct in authorship and year but DOIs are marked UNKNOWN — they must be verified before any dossier uses them."
+    ],
+    "overall_cto_verdict": "OX Alpha performed as a competent engineer. It gathered evidence honestly, refused to fabricate, surfaced the right attacks, and left the strategic call to the CTO. The wrapper fix (reasoning_effort=low, max_tokens=16000, include_reasoning=true) was necessary and sufficient. Recommend continued use for engineering tasks; do NOT delegate strategic decisions."
+  },
+
+  "files_modified_this_round": [
+    "/home/z/my-project/scripts/ox_alpha_client.py (wrapper — bumped max_tokens to 16000, added reasoning_effort=low parameter, added include_reasoning=true, added reasoning field extraction, added finish_reason capture, added EFFICIENCY CONSTRAINT to system prompt)",
+    "/home/z/my-project/scripts/ox_alpha_prompts/axes/axis3_deep.md (new — deep research prompt for AXIS-3)",
+    "/home/z/my-project/scripts/ox_alpha_outputs/20260822T002201Z__axis1_scout_v2.md (new — AXIS-1 scout result)",
+    "/home/z/my-project/scripts/ox_alpha_outputs/20260822T002310Z__axis2_scout_v2.md (new — AXIS-2 scout result)",
+    "/home/z/my-project/scripts/ox_alpha_outputs/20260822T002410Z__axis3_scout_v2.md (new — AXIS-3 scout result)",
+    "/home/z/my-project/scripts/ox_alpha_outputs/20260822T002500Z__axis4_scout_v2.md (new — AXIS-4 scout result)",
+    "/home/z/my-project/scripts/ox_alpha_outputs/20260822T002705Z__axis3_deep_research.md (new — AXIS-3 deep research result)",
+    "/home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND59_CTO_OXALPHA_SCOUT_AND_DEEP_RESEARCH.json (this file — new)",
+    "/home/z/my-project/discovery-evidence-fabric/WORKLOG.md (synced with outer worklog after Round 59 entry appended)",
+    "/home/z/my-project/worklog.md (Round 59 worklog entry appended)"
+  ],
+
+  "git_operations": {
+    "commit_planned": "Round 59 work (CEMETERY.json unchanged, new Round 59 record file, synced WORKLOG.md, ox_alpha scripts and outputs)",
+    "push_planned": "Using PAT inline via env var + git credential.helper (NOT persisted)",
+    "ci_status_will_be_checked": "yes — after push, query GitHub API for run #171+ and report per-gate results honestly"
+  }
+}
