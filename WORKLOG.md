@@ -4514,3 +4514,93 @@ Stage Summary:
 - **NEXT STEP: WET-LAB.** Not software. The physics gate design is documented in ROUND68_STAGE_ZERO_FALSIFICATION_DESIGN.json.
 - **CREDENTIAL HYGIENE:** Both credentials used inline via env var ONLY in prior rounds. NOT persisted.
 - **REMINDER FOR NEXT SESSION:** The next step is NOT software — it is a wet-lab experiment. If the user wants to proceed, they need to provide wet-lab resources (fresh thrombus, force sensor, high-speed camera, transparent vessel mockup). If the user wants to continue computationally, the only remaining task is G10/G12/G13 infrastructure repair (separate authorized task).
+
+
+---
+Task ID: ROUND69-STAGE-ZERO-PROTOCOL-FREEZE
+Agent: main (CTO mode — protocol freeze, final computational artifact), session 2026-08-22
+Task: Per CEO Round 68 directive — freeze the Stage-0 protocol before execution. Add multiple-testing safeguard. Stop coding.
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0. Articles I, V, XXV, XXVI, XXVII, XXVIII, XXIX, XXXI, XXXII, XXXIV applied. CE-012, CE-014, CE-017, CE-018 enforced.
+- Pre-session epistemic check acknowledged.
+- This is a PROTOCOL FREEZE round. No OX Alpha calls. No new invention work. The sole purpose is to freeze every parameter of the Stage-0 experiment so that no post-hoc optimization is possible.
+
+CEO ROUND 68 AUDIT:
+- CEO verdict: 'This is the right stopping point for the computational invention loop. The machine has stopped trying to reason its way past a physical uncertainty. This is the most mature state the discovery engine has reached so far.'
+- CEO P0 directives: (1) Stop invention coding. (2) Freeze Stage-0 protocol before execution. (3) Add multiple-testing safeguard (frozen feature registry, report ALL tested features). (4) Execute Stage 0 only.
+- CEO correction on multiple-testing: 'With multiple candidate features (force, dF/dt, high-frequency content, stiffness, irregularity), there is a multiple-testing / researcher-degrees-of-freedom problem. Before execution, freeze the candidate feature families and analysis windows.'
+- CEO correction on scope: 'A positive Stage-0 result must be interpreted narrowly: A precursor exists under this simplified ex-vivo condition. It does NOT establish clinical usefulness.'
+
+PROTOCOL FREEZE — 13 PARAMETERS FROZEN:
+
+1. PRIMARY SENSOR: Proximal axial force transducer (load cell, >=100Hz, range 0-50N, calibration with known weights)
+2. DISPLACEMENT SENSOR: Linear displacement encoder (>=100Hz, range 0-200mm, resolution <=0.1mm)
+3. ASPIRATION PRESSURE: Pressure transducer (>=10Hz, fixed -20 inHg, confound recording only)
+4. OPTICAL GROUND TRUTH: High-speed camera (>=500fps, >=1280x720), straight transparent tube (ID 4-6mm), fragmentation = first visible particle >0.5mm separating from main clot body, scored by 2 blinded reviewers + third adjudicator
+5. SYNCHRONIZATION: Hardware TTL trigger, all channels share common timebase, pre-experiment sync verification within 1 sample interval
+6. CANDIDATE FEATURE FAMILIES (FROZEN — 15 features across 5 families):
+   - Family 1: Force magnitude (F_baseline, F_peak, F_at_fragmentation)
+   - Family 2: Force derivative (dF/dt_baseline, dF/dt_peak, dF/dt_sign_change)
+   - Family 3: Force high-frequency >10Hz (HF_rms_baseline, HF_rms_peak, HF_spectral_centroid)
+   - Family 4: Force-displacement stiffness (k_baseline, k_change, k_at_fragmentation)
+   - Family 5: Displacement irregularity (v_std_baseline, v_std_peak, v_jerk)
+   - NO POST-HOC FEATURES: Any feature not listed may NOT be tested on Stage-0 data
+7. LEAD TIME DEFINITION: t_fragmentation - t_feature_deviation, minimum >=1.0s for survival
+8. SUCCESS/KILL THRESHOLDS: K0_1 (no fragmentation events), K0_2 (no signal after Bonferroni), K0_3 (lead time <1s), K0_4 (not reproducible — must be significant in >=60% of fragmenting clots in at least one composition), K0_5 (confounded by gelatin negative control)
+9. EXCLUSION RULES: device failure, sensor failure, sync failure, clot not engaged. NO post-hoc exclusion for unfavorable results.
+10. SAMPLE SPECIFICATIONS: Fresh porcine blood, 2 compositions (RBC-rich static stasis + fibrin-rich Chandler loop), 10-20mm length, min 5 per composition (10 total), 2 gelatin negative controls
+11. EXPERIMENTAL CONDITIONS: Straight tube, static flow, constant 2 mm/s, fixed -20 inHg, room temp, randomized trial order. Scope caveat: positive result = 'precursor exists under simplified ex-vivo condition' only.
+12. ANALYSIS PROTOCOL: 8 steps from data collection through kill condition evaluation. Blinded feature extraction (analyst does NOT see fragmentation timing). Third party merges by timestamp. Permutation test (1000 permutations, Bonferroni-corrected p<0.0033).
+13. PRE-REGISTRATION: This frozen protocol IS the pre-registration document. Timestamped, committed, cannot be modified after data collection begins. Deviations logged with timestamp, reason, signed authorization. Post-hoc prohibition: no new features, no threshold adjustments, no exclusion broadening, no analysis window changes.
+
+MULTIPLE-TESTING SAFEGUARD:
+- Frozen feature registry: 15 features, COMPLETE set, no additions allowed
+- Bonferroni correction: 0.05/15 = 0.0033 per feature
+- Report ALL 15 features: significant and non-significant, no selective reporting
+- No post-hoc optimization: no additional transforms, no window adjustments, no threshold changes, no data subsetting
+- Blinding: feature analyst does NOT have access to fragmentation timing
+- Discovery vs selection: frozen registry ensures any positive result is discovery, not selection artifact. If multiple features significant, report ALL — do not select 'best' for downstream.
+
+CTO FINAL STATEMENT:
+- PROTOCOL FROZEN. Stop coding. The Stage-0 experiment is fully specified and cannot be modified after data collection begins.
+- Slot 5: DISCOVERY HYPOTHESIS — Stage-0 protocol frozen, NOT executed. §103 OPEN. Physics untested. Next step is wet-lab execution.
+- All computational work is complete. The candidate has been narrowed from broad architecture (Round 59) through capability collision (Round 62), end-to-end decomposition (Round 63), prior-art attacks (Rounds 64-67), Stage-0 design (Round 68), to frozen protocol (Round 69). The machine has done everything it can.
+- The physics gate (does a reliable pre-fragmentation signal exist?) can ONLY be answered by executing the frozen protocol in a wet lab.
+- Per CEO: 'The machine's job ends where computation stops being evidence. At that boundary, it must hand reality a falsifiable experiment — not manufacture another layer of theory.'
+
+CONSTITUTION COMPLIANCE:
+- Article I: COMPLIED.
+- Article V: COMPLIED — candidate at DISCOVERY HYPOTHESIS, not promoted.
+- Article XXV: COMPLIED — physics untested = UNKNOWN.
+- Article XXVI: COMPLIED — NOT CERTIFIED. CI reports FAILURE.
+- Article XXVII: COMPLIED — all thresholds pre-registered, no post-hoc adjustment.
+- Article XXVIII: COMPLIED.
+- Article XXIX: COMPLIED — 3 claims separated.
+- Article XXXI: COMPLIED — this Round 69 record is the memory artifact.
+- Article XXXII: COMPLIED — strongest alternative stated (no signal exists).
+- Article XXXIV: COMPLIED — STOP CODING. Next step is reality-bound.
+- CE-012: COMPLIED.
+- CE-014: COMPLIED.
+- CE-017: COMPLIED — Stage-0 is the adversarial model-uncertainty test.
+- CE-018 sharpened: COMPLIED.
+
+PORTFOLIO STATUS (FINAL):
+- Slot 5: DISCOVERY HYPOTHESIS — Stage-0 protocol FROZEN, NOT executed. §103 OPEN. Physics untested. Next step: wet-lab execution.
+- World-class inventions: 0/5.
+- Human correspondence: 0.
+- Mechanism generation: BLOCKED — physics gate is reality-bound.
+- Cemetery: 18 entries (UNCHANGED).
+- CI: FAILED (11/14). G10/G12/G13 RED. Research state, NOT certified.
+
+Stage Summary:
+- **STAGE-0 PROTOCOL FROZEN.** 13 parameters frozen. 15 features across 5 families pre-registered. Bonferroni correction applied. Blinding protocol specified. 5 kill conditions pre-registered. Exclusion rules frozen. Pre-registration document committed to repository.
+- **MULTIPLE-TESTING SAFEGUARD IN PLACE.** Frozen feature registry (no additions). Report ALL features (no selective reporting). No post-hoc optimization. Discovery vs selection distinguished.
+- **STOP CODING.** Per CEO directive: 'No more new predictors, neural networks, patent claims, mechanism variants, additional architecture. The artifact is complete enough.'
+- **NEXT STEP: WET-LAB EXECUTION.** Execute the frozen Stage-0 protocol. If ANY kill condition fires → KILL + CE-019 + Slot 5 EMPTY. If ALL pass → advance to Stage 1.
+- **CEMETERY UNCHANGED AT 18 ENTRIES.**
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: BLOCKED.
+- **CI: FAILED (11/14). Research state, NOT certified.**
+- **The machine's job ends here. The next proof must come from the physical world.**

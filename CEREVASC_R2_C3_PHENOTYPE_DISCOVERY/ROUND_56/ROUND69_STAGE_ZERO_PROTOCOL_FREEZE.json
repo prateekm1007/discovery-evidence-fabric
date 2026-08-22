@@ -1,0 +1,198 @@
+{
+  "round": "69",
+  "timestamp_utc": "2026-08-22T04:00:00+00:00",
+  "task_id": "ROUND69-STAGE-ZERO-PROTOCOL-FREEZE",
+  "agent": "main (CTO mode — protocol freeze, final computational artifact)",
+  "constitution_version": "1.5.0",
+
+  "constitution_recertification": {
+    "version": "1.5.0",
+    "pre_session_check_acknowledged": true,
+    "articles_applied": ["I", "V", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXXI", "XXXII", "XXXIV", "CE-012", "CE-014", "CE-017", "CE-018"],
+    "note": "Protocol freeze round. No OX Alpha calls. No new invention work. The sole purpose is to freeze every parameter of the Stage-0 experiment before execution so that no post-hoc optimization is possible."
+  },
+
+  "ceo_round_68_audit_summary": {
+    "ceo_verdict": "This is the right stopping point for the computational invention loop. The machine has stopped trying to reason its way past a physical uncertainty. The Stage-0 question is appropriately narrow. The separation into three claims is excellent. This is the most mature state the discovery engine has reached so far.",
+    "ceo_p0_directives": [
+      "Stop invention coding. No new predictors, neural networks, patent claims, mechanism variants, additional architecture.",
+      "Freeze the Stage-0 protocol before execution: primary sensor, candidate feature families, synchronization method, fragmentation ground truth definition, lead-time definition, success/kill thresholds, exclusion rules. Do not change these after seeing results.",
+      "Add a multiple-testing safeguard: the analyst should not be allowed to test unlimited signal transforms and then retain the best one. Use a frozen feature registry and report ALL tested features, including failures.",
+      "Execute Stage 0 only. Do not jump to impedance, ML, intervention control, or embolization reduction until Stage 0 succeeds."
+    ],
+    "ceo_correction_on_success_rule": "The >=60% screening criterion is reasonable but not scientifically sacred. More importantly, the experiment should distinguish DISCOVERY of a precursor from SELECTION of a precursor after seeing the data. With multiple candidate features (force, dF/dt, high-frequency content, stiffness, irregularity), there is a multiple-testing / researcher-degrees-of-freedom problem. Before execution, freeze the candidate feature families and analysis windows.",
+    "ceo_correction_on_scope": "A positive Stage-0 result must be interpreted narrowly: 'A precursor exists under this simplified ex-vivo condition.' It does NOT establish clinical usefulness. That is why the staged architecture is correct.",
+    "ceo_pushing_the_envelope_principle": "The machine's job ends where computation stops being evidence. At that boundary, it must hand reality a falsifiable experiment — not manufacture another layer of theory."
+  },
+
+  "frozen_stage_zero_protocol": {
+    "freeze_declaration": "This protocol is FROZEN as of 2026-08-22T04:00:00+00:00. No parameter may be changed after data collection begins. Any deviation must be logged with timestamp, justification, and signed authorization. Per CEO directive and Article XXVII (no threshold invention), all thresholds are pre-registered and cannot be adjusted post-hoc.",
+
+    "frozen_parameter_1_primary_sensor": {
+      "sensor": "Proximal axial force transducer (load cell)",
+      "specification": "Sub-miniature load cell, range 0-50N (or 0-5 lb), sensitivity >=1mN, sampling rate >=100 Hz (recommended: 1000 Hz for high-frequency feature analysis)",
+      "placement": "At the proximal end of the retrieval device shaft, between the actuator and the catheter. Measures axial traction force transmitted through the shaft.",
+      "calibration": "Pre-experiment calibration with known weights (0, 0.1, 0.5, 1.0, 2.0, 5.0 N). Record calibration curve and zero offset before each session.",
+      "temperature_compensation": "Record ambient temperature. If temperature varies >2°C during experiment, recalibrate."
+    },
+
+    "frozen_parameter_2_displacement_sensor": {
+      "sensor": "Linear displacement encoder (optical or magnetic)",
+      "specification": "Range 0-200mm, resolution <=0.1mm, sampling rate >=100 Hz (synchronized with force sensor)",
+      "placement": "On the traction actuator (motorized linear stage or manual pull with encoder). Measures proximal displacement of the retrieval device.",
+      "calibration": "Pre-experiment calibration with known displacements (0, 10, 50, 100, 150 mm)."
+    },
+
+    "frozen_parameter_3_aspiration_pressure": {
+      "sensor": "Pressure transducer in aspiration line",
+      "specification": "Range -100 to 0 kPa (or -30 to 0 inHg), sampling >=10 Hz",
+      "purpose": "Confound recording (NOT primary analysis). Must be recorded to rule out alternative explanations for force signal changes.",
+      "setting": "Fixed vacuum at -20 inHg (-67.7 kPa) for all Stage-0 trials. No pressure sweep."
+    },
+
+    "frozen_parameter_4_optical_ground_truth": {
+      "camera": "High-speed digital camera",
+      "specification": ">=500 fps, resolution >=1280x720, field of view covers entire clot length + 20mm margin on each side",
+      "lighting": "Uniform diffuse backlight through transparent vessel (shadowgraph configuration) OR uniform front lighting with diffuser",
+      "vessel": "Straight transparent tube (borosilicate glass or acrylic), ID 4-6mm (representative of M1 MCA), wall thickness >=1mm (optical clarity), length >=100mm",
+      "fragmentation_ground_truth_definition": "t_fragmentation = the frame at which the first visible particle (>0.5mm diameter) separates from the main clot body, as determined by blinded video review. The main clot body is defined as the largest connected mass of clot material visible in the frame immediately before the separation event.",
+      "ground_truth_scoring_protocol": "Two independent reviewers, blinded to force/displacement data, independently score t_fragmentation for each trial. If their scores differ by >10 frames (20ms at 500fps), a third reviewer adjudicates. Final t_fragmentation = median of available scores.",
+      "recording_duration": "Continuous from 5 seconds before traction initiation to 5 seconds after clot removal or fragmentation or 60s elapsed."
+    },
+
+    "frozen_parameter_5_synchronization": {
+      "method": "Hardware trigger: a single TTL pulse starts force acquisition, displacement acquisition, pressure acquisition, and camera recording simultaneously. All channels share a common timebase (hardware clock, not software timestamps).",
+      "sync_verification": "Pre-experiment: trigger all channels and verify timestamp alignment within 1 sample interval (10ms at 100Hz, 2ms at 500fps).",
+      "post_experiment": "Verify sync by checking for known temporal markers (e.g., traction initiation should produce simultaneous force onset, displacement onset, and visible device motion in video)."
+    },
+
+    "frozen_parameter_6_candidate_feature_families": {
+      "freeze_principle": "These feature families are FROZEN before data collection. The analyst may NOT test additional feature families after seeing data. All features within these families will be reported, including those that show no signal.",
+      "feature_family_1_force_magnitude": {
+        "description": "Raw axial force magnitude F(t)",
+        "features": ["F_baseline (mean of first 1s after traction onset)", "F_peak (maximum force before fragmentation)", "F_at_fragmentation (force at t_fragmentation)"],
+        "lead_time_test": "Does F(t) deviate from F_baseline by >3 sigma before t_fragmentation?"
+      },
+      "feature_family_2_force_derivative": {
+        "description": "First derivative of force dF/dt",
+        "features": ["dF/dt_baseline (mean |dF/dt| in first 1s)", "dF/dt_peak (maximum |dF/dt| before fragmentation)", "dF/dt_sign_change (does dF/dt change sign before fragmentation?)"],
+        "lead_time_test": "Does |dF/dt| exceed 3x baseline before t_fragmentation?"
+      },
+      "feature_family_3_force_high_frequency": {
+        "description": "High-frequency content of force signal (>10 Hz, after subtracting low-frequency trend)",
+        "features": ["HF_rms_baseline (RMS of HF component in first 1s)", "HF_rms_peak (maximum RMS before fragmentation)", "HF_spectral_centroid (dominant frequency of HF component)"],
+        "lead_time_test": "Does HF_rms exceed 3x baseline before t_fragmentation?",
+        "analysis_window": "Sliding window of 100ms, stepped at 10ms intervals"
+      },
+      "feature_family_4_force_displacement_stiffness": {
+        "description": "Force-displacement slope (apparent stiffness k = dF/dx)",
+        "features": ["k_baseline (mean dF/dx in first 5mm of traction)", "k_change (does k decrease by >30% before fragmentation?)", "k_at_fragmentation (dF/dx at t_fragmentation)"],
+        "lead_time_test": "Does k decrease by >30% from k_baseline before t_fragmentation?"
+      },
+      "feature_family_5_displacement_irregularity": {
+        "description": "Irregularity in displacement velocity (deviations from commanded constant 2 mm/s)",
+        "features": ["v_std_baseline (std of displacement velocity in first 1s)", "v_std_peak (maximum std before fragmentation)", "v_jerk (max |dv/dt| before fragmentation)"],
+        "lead_time_test": "Does v_std exceed 3x baseline before t_fragmentation?"
+      },
+      "total_features": 15 across 5 families",
+      "multiple_testing_correction": "Bonferroni correction for 15 features: significance threshold = 0.05/15 = 0.0033 per feature. Report ALL 15 features' results, including non-significant ones.",
+      "no_post_hoc_features": "Any feature not listed above may NOT be tested on the Stage-0 data. If a new feature idea emerges during analysis, it must be tested on Stage-1 data (separate experiment), NOT retroactively applied to Stage-0 data."
+    },
+
+    "frozen_parameter_7_lead_time_definition": {
+      "definition": "Lead time = t_fragmentation - t_feature_deviation, where t_feature_deviation is the earliest time at which a feature crosses its significance threshold (3 sigma for force/displacement features, 3x baseline for derivative/HF features, 30% for stiffness).",
+      "minimum_lead_time_for_survival": ">=1.0 second (CEO specification: >=1-2s; using conservative 1s as minimum, with 2s as target)",
+      "measurement": "Per-clot lead time computed for each feature that shows a significant deviation. Median lead time reported across all fragmenting clots."
+    },
+
+    "frozen_parameter_8_success_kill_thresholds": {
+      "kill_K0_1_no_fragmentation": "If <3 clots fragment across all trials, experiment is inconclusive. Re-design with more friable compositions or more aggressive traction. NOT a kill of the hypothesis — a failure of the experimental setup.",
+      "kill_K0_2_no_signal": "If NO feature (across all 15 frozen features) shows significant deviation (after Bonferroni correction) before t_fragmentation in ANY fragmenting clot, the pre-fragmentation signal does not exist. KILL. Record CE-019.",
+      "kill_K0_3_lead_time_too_short": "If features deviate before fragmentation but median lead time across fragmenting clots is <1.0 second, the signal exists but is too early to act on. KILL. Record CE-019.",
+      "kill_K0_4_not_reproducible": "If a feature deviates before fragmentation in some trials but not others, AND the pattern does not correlate with clot composition (i.e., not systematic), the signal is not reproducible. KILL. Record CE-019. Criterion: the feature must show significant deviation in >=60% of fragmenting clots within at least ONE composition group.",
+      "kill_K0_5_confounded_by_motion": "If the same feature shows significant deviation in negative-control (gelatin) trials where NO fragmentation occurs, the signal reflects device motion or experimental artifact, not clot state. KILL. Record CE-019.",
+      "success_criteria": "ALL of the following must hold: (a) at least ONE of the 15 frozen features shows significant deviation (Bonferroni-corrected) before t_fragmentation, (b) median lead time >=1.0 second, (c) the feature deviates in >=60% of fragmenting clots within at least one composition group, (d) NO deviation in negative-control trials. If ALL hold → advance to Stage 1. If ANY kill condition fires → KILL + CE-019 + Slot 5 EMPTY."
+    },
+
+    "frozen_parameter_9_exclusion_rules": {
+      "exclusion_1_device_failure": "Trial excluded if the retrieval device malfunctions (device breaks, disengages from clot without traction, or fails to engage clot). Log reason. Excluded trial does NOT count toward n.",
+      "exclusion_2_sensor_failure": "Trial excluded if force sensor, displacement sensor, or camera fails during recording. Log reason. Excluded trial does NOT count toward n.",
+      "exclusion_3_sync_failure": "Trial excluded if synchronization verification fails (channels misaligned by >1 sample interval). Log reason. Excluded trial does NOT count toward n.",
+      "exclusion_4_clot_not_engaged": "Trial excluded if the retrieval device does not engage the clot (clot remains in original position after traction initiated). Log reason. Excluded trial does NOT count toward n.",
+      "exclusion_5_no_fragmentation_no_exclusion": "Trials where the clot is successfully engaged and removed WITHOUT fragmentation are NOT excluded. They are recorded as 'non-fragmenting trials' and serve as within-experiment negative controls (in addition to gelatin phantoms).",
+      "no_post_hoc_exclusion": "A trial may NOT be excluded because its result is unfavorable. All exclusions must be based on the 4 criteria above, logged with timestamp and reason BEFORE unblinding."
+    },
+
+    "frozen_parameter_10_sample_specifications": {
+      "material": "Fresh porcine blood collected within 6 hours of experiment. Anti-coagulated with sodium citrate (3.2%, 1:9 ratio). Clots formed by recalcification (CaCl2 25mM final) and thrombin (2 NIH U/mL) in silicone-coated tubes.",
+      "composition_1_rbc_rich": "Static stasis clot: recalcified blood placed in silicone tube, allowed to clot undisturbed at 37°C for 2 hours. Expected: high RBC content, soft, red.",
+      "composition_2_fibrin_rich": "Chandler loop flow-formed clot: recalcified blood placed in Chandler loop apparatus, rotated at 30 rpm for 1 hour at 37°C. Expected: high fibrin content, firm, white/pink.",
+      "aging": "All clots used within 6 hours of formation (fresh). No aged cohorts in Stage 0.",
+      "length": "All clots 10-20mm (measured before experiment). Clots outside this range are excluded and replaced.",
+      "n_per_composition": "Minimum 5 clots per composition (10 total). If resource-constrained: minimum 3 per composition (6 total). If <3 fragmentations across all trials, K0_1 fires (inconclusive).",
+      "negative_controls": "2 gelatin phantoms (5% gelatin in water, set in same tube geometry, 10-20mm length). These are known non-fragmenting under standard traction. Serves as device-motion confound check."
+    },
+
+    "frozen_parameter_11_experimental_conditions": {
+      "vessel": "Straight transparent tube, ID 4-6mm (nominal 5mm), borosilicate glass or acrylic, length >=100mm, wall thickness >=1mm.",
+      "flow": "Static (no flow). NO pulsatile flow in Stage 0. This is a simplification; clinical realism is deferred to Stage 1.",
+      "traction_velocity": "Constant 2.0 mm/s. Motorized linear stage (recommended) or manual pull with encoder (if motorized stage unavailable, must verify constant velocity from displacement data).",
+      "aspiration_pressure": "Fixed -20 inHg (-67.7 kPa). Applied continuously from 5s before traction to end of trial.",
+      "temperature": "Room temperature (20-25°C). Record ambient temperature. No heated bath in Stage 0.",
+      "trial_order": "Randomized. Interleave compositions (do NOT batch all RBC-rich then all fibrin-rich). Randomization seed recorded before experiment.",
+      "scope_caveat": "Per CEO correction: a positive Stage-0 result under these simplified conditions establishes ONLY that 'a precursor exists under this simplified ex-vivo condition.' It does NOT establish clinical usefulness. Robustness across flow/curvature/velocity/temperature is a Stage-1 question."
+    },
+
+    "frozen_parameter_12_analysis_protocol": {
+      "step_1_data_collection": "Collect all trials per randomized order. Log exclusions in real-time (before unblinding).",
+      "step_2_ground_truth_scoring": "Two blinded reviewers independently score t_fragmentation for each trial from optical video. Third reviewer adjudicates disagreements >10 frames.",
+      "step_3_feature_extraction_blinded": "Analyst extracts all 15 frozen features from force/displacement data WITHOUT access to t_fragmentation or optical video. Analyst sees only force and displacement time series.",
+      "step_4_unblinding": "Third party merges feature time series with t_fragmentation by synchronized timestamp. Computes lead time for each feature in each fragmenting trial.",
+      "step_5_statistical_analysis": "For each of the 15 features: (a) test whether feature deviates significantly before t_fragmentation (permutation test, 1000 permutations, Bonferroni-corrected threshold p<0.0033), (b) compute lead time if significant, (c) compute proportion of fragmenting clots where feature is significant.",
+      "step_6_negative_control_check": "Test whether the same features show significant deviation in gelatin phantom trials. If yes → K0_5 fires.",
+      "step_7_reporting": "Report ALL 15 features' results in a single table: feature name, significant (Y/N), median lead time, proportion significant, Bonferroni-corrected p-value. Include ALL features, including non-significant ones. No selective reporting.",
+      "step_8_kill_condition_evaluation": "Evaluate K0_1 through K0_5 against the pre-registered thresholds. If ANY fires → KILL. If ALL pass and success criteria met → advance to Stage 1."
+    },
+
+    "frozen_parameter_13_pre_registration": {
+      "pre_registration_document": "This frozen protocol (ROUND69_STAGE_ZERO_PROTOCOL_FREEZE.json) IS the pre-registration document. It is timestamped, committed to the repository, and cannot be modified after data collection begins.",
+      "deviation_logging": "Any deviation from this protocol during execution must be logged with: (a) timestamp, (b) parameter affected, (c) reason for deviation, (d) signed authorization (physical or digital signature). Deviations do NOT invalidate the experiment but must be transparently reported.",
+      "post_hoc_prohibition": "After data collection begins: NO new features may be added. NO thresholds may be adjusted. NO exclusion rules may be broadened. NO analysis windows may be changed. Any post-hoc analysis must be clearly labeled as exploratory and cannot be used to override a kill condition."
+    }
+  },
+
+  "multiple_testing_safeguard": {
+    "problem": "With 15 candidate features across 5 families, there is a multiple-testing / researcher-degrees-of-freedom problem. The analyst could test unlimited signal transforms and retain the best one, creating a false positive.",
+    "safeguard_1_frozen_feature_registry": "The 15 features listed in frozen_parameter_6 are the COMPLETE set. No additional features may be tested on Stage-0 data. Any new feature idea must be tested on Stage-1 data (separate experiment).",
+    "safeguard_2_bonferroni_correction": "Significance threshold = 0.05 / 15 = 0.0033 per feature. This is conservative but necessary given the exploratory nature of Stage 0.",
+    "safeguard_3_report_all_features": "ALL 15 features must be reported in the final table, including non-significant ones. No selective reporting. The report must show which features worked and which did not.",
+    "safeguard_4_no_post_hoc_optimization": "The analyst may NOT: (a) test additional transforms (wavelet, FFT, etc.) not in the frozen registry, (b) adjust analysis window parameters after seeing data, (c) try different threshold criteria, (d) subset the data and re-test. All of these are post-hoc optimization and are FORBIDDEN on Stage-0 data.",
+    "safeguard_5_blinding": "Feature extraction is performed by an analyst who does NOT have access to fragmentation timing. This prevents the analyst from unconsciously optimizing features toward the known outcome.",
+    "safeguard_6_discovery_vs_selection": "Per CEO correction: the experiment must distinguish DISCOVERY of a precursor (a feature that exists and was pre-registered) from SELECTION of a precursor (the best-performing feature chosen after seeing data). The frozen registry ensures that any positive result is a discovery, not a selection artifact. If multiple features are significant, report ALL of them — do not select the 'best' one for downstream stages."
+  },
+
+  "cto_final_statement": {
+    "decision": "PROTOCOL FROZEN. Stop coding. The Stage-0 experiment is fully specified and cannot be modified after data collection begins.",
+    "slot_5_status": "DISCOVERY HYPOTHESIS — Stage-0 protocol frozen, NOT executed. §103 OPEN. Physics untested. Next step is wet-lab execution of the frozen protocol.",
+    "what_is_complete": "All computational work is complete. The candidate has been narrowed from a broad architecture (Round 59) through capability collision (Round 62), end-to-end decomposition (Round 63), prior-art attacks (Rounds 64-67), and Stage-0 falsification design (Round 68) to a frozen experimental protocol (Round 69). The machine has done everything it can.",
+    "what_is_not_complete": "The physics gate. Does a reliable pre-fragmentation signal exist? This can ONLY be answered by executing the frozen Stage-0 protocol in a wet lab.",
+    "no_more_software": "Per CEO directive: no more predictors, neural networks, patent claims, mechanism variants, or additional architecture. The artifact is complete enough. The machine's job ends where computation stops being evidence.",
+    "next_step": "Execute the frozen Stage-0 protocol in a wet lab. If ANY of K0_1 through K0_5 fires → KILL + CE-019 + Slot 5 EMPTY. If ALL pass and success criteria met → advance to Stage 1 (out-of-sample prediction with held-out clots, impedance spectroscopy, robustness across flow/curvature/velocity)."
+  },
+
+  "portfolio_status_final": {
+    "slot_1_R6_passive_rescue": "PHYSICAL_VALIDATION_PENDING",
+    "slot_2_adaptive_sensing_eshunt": "PROVISIONAL",
+    "slot_3_controlled_CNS_therapeutic_platform": "VALIDATION_READY_FROZEN",
+    "slot_4_CNS_lifecycle_intelligence_platform": "DISCOVERY_COMPLETE",
+    "slot_5": "DISCOVERY HYPOTHESIS — Stage-0 protocol FROZEN, NOT executed. §103 OPEN. Physics untested. Next step: wet-lab execution.",
+    "world_class_inventions": "0 / 5",
+    "human_correspondence_count": 0,
+    "mechanism_generation": "BLOCKED — physics gate is reality-bound",
+    "cemetery_size": "18 entries (UNCHANGED)",
+    "ci_certification": "FAILED (11/14 gates pass; G10/G12/G13 RED). Research state, NOT certified infrastructure.",
+    "g10_status": "RED — infrastructure debt (7 evidence-ledger files with stale commit SHAs)",
+    "g12_status": "RED — infrastructure debt (false-positive historical artifact from Patsnap JSON-LD)",
+    "g13_status": "RED — RESEARCH_BLOCKED"
+  }
+}
