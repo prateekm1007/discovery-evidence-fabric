@@ -1,0 +1,87 @@
+{
+  "round": 86,
+  "benchmark": "L3-BENCHMARK-004 (CORRECT log-J formulation, supersedes Round 85 wrong formula)",
+  "material": {
+    "E": 1.0,
+    "nu": 0.3,
+    "mu": 0.3846153846153846,
+    "K": 0.8333333333333333
+  },
+  "volumetric_sed": "(K/2)(ln J)^2",
+  "volumetric_stress": "K * ln(J) * C^{-1}  [CORRECT, no 1/J factor]",
+  "tangent_definition": "d(sigma_zz)/d(lambda_z) at fixed lateral-contraction BC",
+  "method_analytical": "chain rule + implicit differentiation of f(J;lambda_z)=0",
+  "method_numerical": "scipy.misc.derivative (5-point stencil, dx=1e-6)",
+  "states": [
+    {
+      "state_label": "S0",
+      "lambda_z": 1.0,
+      "strain_zz_pct": 0.0,
+      "J": 1.0,
+      "lambda_t": 1.0,
+      "sigma_zz_analytical": 0.0,
+      "tangent_analytical": 0.9999989511123362,
+      "tangent_numerical_independent": 0.9999999999527991,
+      "tangent_diff_pct": 0.00010488415630419481
+    },
+    {
+      "state_label": "S1",
+      "lambda_z": 1.025,
+      "strain_zz_pct": 2.499999999999991,
+      "J": 1.0100202118941664,
+      "lambda_t": 0.9926658917176889,
+      "sigma_zz_analytical": 0.02467857155696017,
+      "tangent_analytical": 0.9745317685742767,
+      "tangent_numerical_independent": 0.974531768400521,
+      "tangent_diff_pct": -1.78296574946722e-08
+    },
+    {
+      "state_label": "S2",
+      "lambda_z": 1.05,
+      "strain_zz_pct": 5.000000000000004,
+      "J": 1.020085896997473,
+      "lambda_t": 0.9856522602281351,
+      "sigma_zz_analytical": 0.04873814193362506,
+      "tangent_analytical": 0.9504507975116928,
+      "tangent_numerical_independent": 0.9504507974033086,
+      "tangent_diff_pct": -1.1403450951396354e-08
+    },
+    {
+      "state_label": "S3",
+      "lambda_z": 1.075,
+      "strain_zz_pct": 7.499999999999996,
+      "J": 1.0302041180744073,
+      "lambda_t": 0.978943007617011,
+      "sigma_zz_analytical": 0.07221130981131517,
+      "tangent_analytical": 0.9275943510115016,
+      "tangent_numerical_independent": 0.9275943508857409,
+      "tangent_diff_pct": -1.3557717767425013e-08
+    },
+    {
+      "state_label": "S4",
+      "lambda_z": 1.1,
+      "strain_zz_pct": 10.000000000000009,
+      "J": 1.040381312430182,
+      "lambda_t": 0.9725231067272114,
+      "sigma_zz_analytical": 0.09512688292589994,
+      "tangent_analytical": 0.9058213352354324,
+      "tangent_numerical_independent": 0.9058213351342825,
+      "tangent_diff_pct": -1.1166646481599097e-08
+    }
+  ],
+  "small_strain_consistency_check": {
+    "expected_tangent_at_lambda_z_1": 1.0,
+    "actual_tangent_at_lambda_z_1": 0.9999989511123362,
+    "consistency": true
+  },
+  "analytical_vs_numerical_agreement": {
+    "max_diff_pct": 0.00010488415630419481,
+    "verdict": "PASS"
+  },
+  "comparison_with_round_85_wrong_formula": {
+    "round_85_sigma_zz_at_lambda_z_1.1": 0.094424,
+    "round_86_correct_sigma_zz_at_lambda_z_1.1": 0.09512688292589994,
+    "error_pct": 0.7443901189315661,
+    "note": "Round 85 used the wrong formula (K*ln(J)/J*C^-1 instead of K*ln(J)*C^-1). The error would have caused a 0.74% disagreement with FEBio, which uses the correct formula."
+  }
+}

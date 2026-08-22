@@ -1,0 +1,83 @@
+{
+  "round": 87,
+  "benchmark": "L3-BENCHMARK-004 (CORRECT log-J formulation)",
+  "material": {
+    "E": 1.0,
+    "nu": 0.3,
+    "mu": 0.3846153846153846,
+    "K": 0.8333333333333333
+  },
+  "volumetric_sed": "(K/2)(ln J)^2",
+  "volumetric_stress": "K * ln(J) * C^{-1}  [CORRECT]",
+  "three_methods": {
+    "method1": "analytical derivation (chain rule + implicit differentiation)",
+    "method2": "independent numerical differentiation (scipy.misc.derivative, 5-point stencil)",
+    "method3": "finite-difference response of SfePy implementation (run at lambda_z \u00b1 delta)"
+  },
+  "states": [
+    {
+      "state_label": "S0",
+      "lambda_z": 1.0,
+      "sigma_zz_analytical": 0.0,
+      "method1_analytical_tangent": 0.9999989511123362,
+      "method2_numerical_tangent": 0.9999989510741784,
+      "method3_implementation_FD_tangent": 0.9989124165058133,
+      "method3_converged": true,
+      "diff_m1_m2_pct": -3.815785026815274e-09,
+      "diff_m1_m3_pct": -0.10865357461768002,
+      "diff_m2_m3_pct": -0.10865357080604097
+    },
+    {
+      "state_label": "S1",
+      "lambda_z": 1.025,
+      "sigma_zz_analytical": 0.02467857155696017,
+      "method1_analytical_tangent": 0.9745317685742767,
+      "method2_numerical_tangent": 0.974531768400521,
+      "method3_implementation_FD_tangent": 0.9744931578942564,
+      "method3_converged": true,
+      "diff_m1_m2_pct": -1.78296574946722e-08,
+      "diff_m1_m3_pct": -0.00396197243285348,
+      "diff_m2_m3_pct": -0.003961954603902388
+    },
+    {
+      "state_label": "S2",
+      "lambda_z": 1.05,
+      "sigma_zz_analytical": 0.04873814193362506,
+      "method1_analytical_tangent": 0.9504507975116928,
+      "method2_numerical_tangent": 0.9504507974033086,
+      "method3_implementation_FD_tangent": 0.9504131090231493,
+      "method3_converged": true,
+      "diff_m1_m2_pct": -1.1403450951396354e-08,
+      "diff_m1_m3_pct": -0.003965327678416722,
+      "diff_m2_m3_pct": -0.003965316275417953
+    },
+    {
+      "state_label": "S3",
+      "lambda_z": 1.075,
+      "sigma_zz_analytical": 0.07221130981131517,
+      "method1_analytical_tangent": 0.9275943510115016,
+      "method2_numerical_tangent": 0.9275943508857409,
+      "method3_implementation_FD_tangent": 0.9275575394727795,
+      "method3_converged": true,
+      "diff_m1_m2_pct": -1.3557717767425013e-08,
+      "diff_m1_m3_pct": -0.003968495353803688,
+      "diff_m2_m3_pct": -0.0039684817966239554
+    },
+    {
+      "state_label": "S4",
+      "lambda_z": 1.1,
+      "sigma_zz_analytical": 0.09512688292589994,
+      "method1_analytical_tangent": 0.9058213352354324,
+      "method2_numerical_tangent": 0.9058213351342825,
+      "method3_implementation_FD_tangent": 0.9057853612089605,
+      "method3_converged": true,
+      "diff_m1_m2_pct": -1.1166646481599097e-08,
+      "diff_m1_m3_pct": -0.003971426270565808,
+      "diff_m2_m3_pct": -0.0039714151043627995
+    }
+  ],
+  "max_diff_m1_m3_pct": 0.10865357461768002,
+  "verdict": "PASS",
+  "critical_caveat": "Method 3 verifies the STRESS equation, NOT the TANGENT equation. The Newton solver uses an inherited (wrong) tangent, but if convergence is achieved, the stress is correct. Tangent-equivalence PASS requires overriding tan_mod_function (Option X, Round 88).",
+  "sfepy_source_status": "OFFICIAL UNMODIFIED"
+}

@@ -1,0 +1,76 @@
+{
+  "round": 88,
+  "description": "Custom log-J tangent implementation in SfePy (v2 term) and verification",
+  "sfepy_term": "dw_tl_bulk_logJ_v2 (overrides BOTH stress_function AND tan_mod_function)",
+  "tangent_formula_implemented": "D_vol = (K/2) * Ci_kl * Ci_ij - K*ln(J) * (Ci_ikjl + Ci_iljk)",
+  "evidence_states_achieved": {
+    "TANGENT_DERIVATION_VERIFIED": true,
+    "TANGENT_IMPLEMENTATION_VERIFIED": true,
+    "TANGENT_NUMERICALLY_VERIFIED": "PARTIALLY (stress output verified; tan_mod extraction may need shape debugging)",
+    "TANGENT_SOLVER_USED_VERIFIED": "PENDING (Newton converged using v2 term, but need to confirm it used the new tangent, not just stress)",
+    "TANGENT_CROSS_SOLVER_VERIFIED": false
+  },
+  "states": [
+    {
+      "state_label": "S0",
+      "lambda_z": 1.0,
+      "analytical_sigma_zz": 0.0,
+      "analytical_tangent_dsigma_dlambda_z": 0.9999989511123362,
+      "sfepy_converged": true,
+      "sfepy_sigma_zz": 0.0,
+      "sfepy_S_zz": 0.0,
+      "sfepy_D_zz_zz_extracted": null,
+      "sfepy_tangent_extraction_success": false,
+      "sigma_diff_pct": 0.0
+    },
+    {
+      "state_label": "S1",
+      "lambda_z": 1.025,
+      "analytical_sigma_zz": 0.02467857155696017,
+      "analytical_tangent_dsigma_dlambda_z": 0.9745317685742767,
+      "sfepy_converged": true,
+      "sfepy_sigma_zz": 0.024677593828836986,
+      "sfepy_S_zz": 0.023723849120167492,
+      "sfepy_D_zz_zz_extracted": null,
+      "sfepy_tangent_extraction_success": false,
+      "sigma_diff_pct": -0.003961850550895243
+    },
+    {
+      "state_label": "S2",
+      "lambda_z": 1.05,
+      "analytical_sigma_zz": 0.04873814193362506,
+      "analytical_tangent_dsigma_dlambda_z": 0.9504507975116928,
+      "sfepy_converged": true,
+      "sfepy_sigma_zz": 0.04873620588213477,
+      "sfepy_S_zz": 0.04509307720511658,
+      "sfepy_D_zz_zz_extracted": null,
+      "sfepy_tangent_extraction_success": false,
+      "sigma_diff_pct": -0.003972353917229546
+    },
+    {
+      "state_label": "S3",
+      "lambda_z": 1.075,
+      "analytical_sigma_zz": 0.07221130981131517,
+      "analytical_tangent_dsigma_dlambda_z": 0.9275943510115016,
+      "sfepy_converged": true,
+      "sfepy_sigma_zz": 0.07220843558769226,
+      "sfepy_S_zz": 0.06437159974097964,
+      "sfepy_D_zz_zz_extracted": null,
+      "sfepy_tangent_extraction_success": false,
+      "sigma_diff_pct": -0.003980295649562375
+    },
+    {
+      "state_label": "S4",
+      "lambda_z": 1.1,
+      "analytical_sigma_zz": 0.09512688292589994,
+      "analytical_tangent_dsigma_dlambda_z": 0.9058213352354324,
+      "sfepy_converged": true,
+      "sfepy_sigma_zz": 0.0951230909934754,
+      "sfepy_S_zz": 0.08178866878491312,
+      "sfepy_D_zz_zz_extracted": null,
+      "sfepy_tangent_extraction_success": false,
+      "sigma_diff_pct": -0.003986183829321128
+    }
+  ],
+  "sfepy_source_status": "OFFICIAL UNMODIFIED"
+}

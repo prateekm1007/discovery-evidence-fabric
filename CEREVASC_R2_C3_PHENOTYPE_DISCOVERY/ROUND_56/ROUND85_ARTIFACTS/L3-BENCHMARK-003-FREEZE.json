@@ -1,0 +1,148 @@
+{
+  "record_type": "L3_BENCHMARK_FREEZE",
+  "benchmark_id": "L3-BENCHMARK-003",
+  "lineage": "CALIBRATION BENCHMARK — derived from Round 83 Sanity 1 setup, but formally frozen as a distinct benchmark in Round 85. NOT a rename of L3-BENCHMARK-002. NOT a replacement for B002.",
+  "purpose": "Per CEO Round 84 P1 directive: 'Sanity 1 can become your solver calibration benchmark, not a replacement for the original L3 benchmark.' This benchmark is for SOLVER CALIBRATION (verify each solver against the analytical reference independently), not for cross-solver comparison. Cross-solver comparison still requires L3-BENCHMARK-002 (or a re-frozen successor).",
+  "supersedes": "NONE — this is a new benchmark, not a supersession",
+  "freeze_date": "2026-08-23",
+  "frozen_by": "CTO mode, Round 85 audit response",
+  "version": "1.0.0",
+
+  "field_1_geometry": {
+    "shape": "unit cube",
+    "dimensions_meters": [1.0, 1.0, 1.0],
+    "mesh_resolution": "1 hex8 element (8 nodes, 1 cell)",
+    "mesh_generation_method": "SfePy gen_block_mesh([1,1,1], [2,2,2], [0.5,0.5,0.5])",
+    "coordinate_system": "Cartesian, origin at (0,0,0)",
+    "reference_configuration": "undeformed cube, x in [0,1], y in [0,1], z in [0,1]",
+    "matches_B002": true,
+    "lineage_note": "Geometry is identical to L3-BENCHMARK-002. The benchmarks diverge in their PURPOSE, not their setup."
+  },
+
+  "field_2_material_equation": {
+    "constitutive_class": "compressible neo-Hookean hyperelasticity",
+    "formulation": "Total Lagrangian",
+    "strain_energy_density": "W(C, J) = W_dev + W_vol",
+    "W_dev": "(mu/2) * (I1_bar - 3)",
+    "W_vol": "(K/2) * (J - 1)^2",
+    "I1_bar_definition": "modified first invariant = J^(-2/3) * tr(C)",
+    "C_definition": "right Cauchy-Green tensor = F^T · F",
+    "F_definition": "deformation gradient = ∂x/∂X",
+    "J_definition": "Jacobian = det(F) = volume ratio",
+    "second_piola_kirchhoff_stress": "S = mu * J^(-2/3) * (I - (1/3) * tr(C) * C^-1) + K * (J - 1) * J * C^-1",
+    "cauchy_stress_pushforward": "sigma = (1/J) * F · S · F^T",
+    "volumetric_formulation_note": "QUADRATIC PENALTY (J-1)^2. This matches SfePy's dw_tl_bulk_penalty term. It does NOT match FEBio's default neo-Hookean material, which uses (ln J)^2.",
+    "matches_B002": true,
+    "lineage_note": "Material equation is identical to L3-BENCHMARK-002."
+  },
+
+  "field_3_material_parameters": {
+    "E_youngs_modulus": 1.0,
+    "nu_poissons_ratio": 0.3,
+    "mu_shear_modulus": 0.3846153846,
+    "K_bulk_modulus": 0.8333333333,
+    "parameter_mapping_formula": "mu = E / (2*(1+nu)), K = E / (3*(1-2*nu))",
+    "matches_B002": true
+  },
+
+  "field_4_boundary_conditions": {
+    "prescribed_displacement_face": "Top face (z = 1.0): u_z = 0.1 (10% z-strain)",
+    "lateral_contraction": "FREE in x and y on all faces except where pinned below",
+    "left_face_x_pin": "Left face (x = 0.0): u_x = 0.0",
+    "front_face_y_pin": "Front face (y = 0.0): u_y = 0.0",
+    "bottom_face_z_pin": "Bottom face (z = 0.0): u_z = 0.0",
+    "corner_full_pin": "Corner at origin (0,0,0) is implicitly fully pinned via the three face pins above",
+    "free_faces": "Right face (x=1), Back face (y=1) — fully free",
+    "matches_B002": true
+  },
+
+  "field_5_loading_path": {
+    "load_type": "prescribed displacement (Dirichlet)",
+    "prescribed_value_final": 0.1,
+    "load_ramp": "linear in pseudo-time, from 0.0 at t=0 to 0.1 at t=1",
+    "time_stepping_for_solve": "n_step = 2 (single load step from 0 to 1.0 in pseudo-time)",
+    "load_ramp_justification": "A/B experiment showed both n_step=2 and n_step=11 converge for this benchmark with identical residuals. Single step preferred for simplicity.",
+    "matches_B002": true
+  },
+
+  "field_6_observable": {
+    "observable_name": "sigma_zz_at_final_time",
+    "definition": "Cauchy stress zz-component at the single integration point of the single element, at the final pseudo-time t=1.0",
+    "extraction_method_for_sfepy": "evaluate('dw_tl_he_neohook.i.Omega(solid.mu, v, u)', mode='el_avg', term_mode='stress') + evaluate('dw_tl_bulk_penalty.i.Omega(solid.K, v, u)', mode='el_avg', term_mode='stress'), then push forward via sigma = (1/J) F S F^T",
+    "extraction_method_for_febio": "Read cell_data['stress'][:,2] from VTK output at final timestep. FEBio outputs Cauchy stress directly.",
+    "extraction_method_for_analytical": "Closed-form derivation (see field 7).",
+    "stress_measure": "Cauchy (true) stress",
+    "matches_B002": true
+  },
+
+  "field_7_analytical_reference": {
+    "derivation_independence_statement": "Derived from constitutive model and BCs alone. Does NOT use FEBio output or SfePy output as input. The SfePy Sanity 1 numerical output (0.0961) was used only as a post-hoc sanity check, not as input.",
+    "derivation_file": "../ROUND84_ARTIFACTS/L3-BENCHMARK-002-ANALYTICAL-DERIVATION.md (same derivation applies, since B003 setup is identical to B002 setup)",
+    "verification_file": "../ROUND84_ARTIFACTS/L3-BENCHMARK-002-ANALYTICAL-VERIFICATION.json",
+    "lambda_z_prescribed": 1.1,
+    "lambda_t_solved": 0.9716092013,
+    "J_solved": 1.0384268841,
+    "S_zz_analytical": 0.0824452675,
+    "sigma_zz_analytical": 0.0960672101,
+    "sigma_zz_analytical_precision": "verified to 0.022% by scipy brentq root-finding",
+    "linear_elastic_reference_for_context_only": 0.10000,
+    "finite_strain_correction_pct": -3.93,
+    "matches_B002": true,
+    "lineage_note": "Analytical reference is identical to L3-BENCHMARK-002 because the setups are identical. The benchmarks diverge only in their PURPOSE (B002 = cross-solver comparison target; B003 = solver calibration benchmark)."
+  },
+
+  "field_8_tolerance": {
+    "primary_tolerance_relative_pct": 5.0,
+    "secondary_tolerance_relative_pct": 1.0,
+    "tolerance_application": "For B003 (calibration): |solver - analytical| / |analytical| < 5% required for solver calibration pass. Cross-solver comparison NOT performed on B003 (that's B002's role).",
+    "matches_B002": true
+  },
+
+  "field_9_convergence_criterion": {
+    "sfepy_newton_settings": {
+      "i_max": 30, "eps_a": 1e-10, "eps_r": 1.0, "macheps": 1e-16,
+      "lin_red": 1e-2, "ls_red": 0.1, "ls_red_warp": 0.001,
+      "ls_on": 1.1, "ls_min": 1e-5, "check": 0, "delta": 1e-6
+    },
+    "sfepy_convergence_required": "final residual absolute < 1e-10 OR final residual relative < 1e-6",
+    "sfepy_time_stepping": "n_step = 2 (single load step)",
+    "febio_control_settings_REQUIRED_FOR_VALID_L3": {
+      "analysis": "static", "time_steps": 1, "step_size": 1.0,
+      "max_refs": 15, "max_ups": 10, "dtol": 0.001, "etol": 0.01,
+      "rtol": 0.001, "lstol": 0.9, "qnmethod": "BFGS", "rhoi": -1
+    },
+    "febio_convergence_required": "NORMAL TERMINATION (FEBio exit code 0)",
+    "febio_material_model_REQUIRED_FOR_VALID_L3": "MUST use a material whose volumetric SED is (K/2)(J-1)^2 to match this benchmark. FEBio's default 'neo-Hookean' uses (K/2)(ln J)^2 — does NOT match. Options: (a) use FEBio's 'uncoupled neo-Hookean' with custom volumetric law; (b) use FEBio user-defined material; (c) implement (K/2)(ln J)^2 in SfePy via custom term and re-freeze as B004.",
+    "matches_B002": true
+  },
+
+  "B003_specific_role": {
+    "is_calibration_benchmark": true,
+    "is_cross_solver_comparison_target": false,
+    "permitted_uses": [
+      "Verify SfePy numerical implementation against analytical reference (single-solver calibration)",
+      "Verify FEBio numerical implementation against analytical reference (single-solver calibration)",
+      "Verify any future solver (e.g., custom FEM code) against analytical reference"
+    ],
+    "forbidden_uses": [
+      "Cross-solver FEBio-vs-SfePy comparison (that requires B002 with constitutive equivalence, OR B004 with a formulation both natively support)",
+      "Declaring L3-PASS based on B003 alone (L3-PASS requires three-way Analytical ↔ Solver A ↔ Solver B comparison on the SAME benchmark)"
+    ],
+    "current_status": "SfePy calibration: PASS (0.034% agreement with analytical). FEBio calibration: NOT YET TESTED (FEBio binary was wiped; must be rebuilt)."
+  },
+
+  "freeze_signature": {
+    "method": "self-signed by CTO mode at freeze time",
+    "timestamp": "2026-08-23T00:00:00Z",
+    "constitution_version": "1.5.0",
+    "constitution_hash": "f82ae4f6",
+    "articles_governing_this_freeze": ["I", "II", "III", "IV", "VII", "IX", "XXIX", "XXX", "XXXII", "XXXIII"],
+    "key_invariants": [
+      "B003 is a NEW benchmark, not a rename of B002.",
+      "B003 is for calibration only; cross-solver comparison requires B002 or a re-frozen successor.",
+      "Analytical reference was derived BEFORE FEBio execution (Article I).",
+      "Tolerance was frozen BEFORE any B003 numerical comparison (Article VII).",
+      "All nine fields are immutable without an explicit re-freeze record."
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "record_type": "MIXED_VS_PENALTY_DECISION",
+  "round": 87,
+  "date": "2026-08-23",
+  "authority": "CEO Round 86 directive: 'You have two acceptable paths: A. prove that the FEBio mixed formulation and SfePy pure-displacement formulation produce mathematically equivalent continuum solutions under B002; or B. create a new benchmark lineage using a formulation both solvers implement identically. Do not modify B002 silently.'",
+
+  "decision": "OPTION B — Open a new benchmark lineage (L3-BENCHMARK-005)",
+
+  "rationale": "After careful analysis, Option A (proving mixed u-p ≡ pure displacement) is NOT feasible in the available timeframe. The mixed u-p formulation introduces a pressure unknown p that is solved alongside the displacement u. Proving mathematical equivalence requires showing that the mixed formulation's pressure variable converges to the value implied by the penalty formulation's volumetric stress. This is non-trivial: it requires analyzing the inf-sup (Babuška-Brezzi) stability condition, the function spaces for u and p, and the discretization error. The CEO's directive was correct: NO 'acceptable caveat' — either prove it or open a new lineage. I cannot prove it. Therefore I open a new lineage.",
+
+  "option_A_infeasibility_analysis": {
+    "what_would_be_required": [
+      "1. Identify FEBio's actual mixed u-p formulation (which pressure space, which stabilization)",
+      "2. Show that the mixed formulation reduces to the pure displacement formulation when the pressure space is restricted to the volumetric stress implied by the penalty",
+      "3. Verify the inf-sup (Babuška-Brezzi) condition is satisfied for the chosen spaces",
+      "4. Show that the discretization error of the mixed formulation converges to the same continuum solution as the pure displacement formulation"
+    ],
+    "why_infeasible_now": [
+      "FEBio's source code is not fully documented for its internal mixed formulation; the pressure space is implicit",
+      "The inf-sup analysis requires expertise in mixed finite element theory that exceeds the scope of the L3 benchmark",
+      "Even if the analysis were done, it would need to be peer-reviewed to be trustworthy — we cannot self-certify it",
+      "The CEO's directive was to NOT hand-wave this. Doing the analysis superficially would be exactly the 'acceptable caveat' that is forbidden"
+    ]
+  },
+
+  "option_B_implementation": {
+    "new_benchmark_id": "L3-BENCHMARK-005",
+    "lineage": "DERIVED FROM L3-BENCHMARK-004 (which uses (K/2)(ln J)^2 volumetric SED). B005 uses the SAME constitutive law as B004 but is explicitly designed for cross-solver comparison: BOTH FEBio and SfePy must use the SAME formulation type (either both pure displacement, or both mixed u-p).",
+    "formulation_choice": "PURE DISPLACEMENT with (K/2)(ln J)^2 volumetric SED for BOTH solvers",
+    "rationale_for_pure_displacement": [
+      "SfePy natively supports pure displacement with custom terms (we have dw_tl_bulk_logJ_correct)",
+      "FEBio can be configured to use pure displacement via its 'uncoupled neo-Hookean' material, OR via a user-defined material that implements the (K/2)(ln J)^2 volumetric SED directly",
+      "Pure displacement is simpler to verify (no inf-sup condition, no pressure space to analyze)",
+      "The (K/2)(ln J)^2 volumetric SED is the FEBio default, so we preserve the original scientific question"
+    ],
+    "febio_configuration_required": "Use FEBio's 'uncoupled neo-Hookean' material with a custom volumetric law that matches (K/2)(ln J)^2. If FEBio's uncoupled neo-Hookean does not natively support this volumetric law, use a user-defined material plugin.",
+    "sfepy_configuration": "Use dw_tl_he_neohook + dw_tl_bulk_logJ_correct (the custom term we built in Round 86). The custom term already implements the (K/2)(ln J)^2 volumetric SED in pure displacement form.",
+    "B005_freeze_pending": "B005 must be frozen with all 9 fields (geometry, material equation, parameters, BCs, load path, observable, analytical reference, tolerance, convergence criterion) BEFORE either solver is executed. The freeze will happen in Round 88 after the loading-path equivalence check is implemented for B004."
+  },
+
+  "what_this_means_for_L3": {
+    "B002_status": "ARCHIVED as L3-CHALLENGED-BENCHMARK (already done in Round 84). Not the active L3 target.",
+    "B003_status": "CALIBRATION BENCHMARK (Sanity 1, (K/2)(J-1)^2 volumetric). For single-solver calibration only, NOT cross-solver comparison.",
+    "B004_status": "ANALYTICAL DERIVATION BENCHMARK ((K/2)(ln J)^2 volumetric, correct formula). Contains the analytical reference and tangent at 5 states. NOT a cross-solver benchmark per se — it's the mathematical reference.",
+    "B005_status": "TO BE FROZEN in Round 88. This is the NEW cross-solver L3 target. Uses (K/2)(ln J)^2 volumetric SED in PURE DISPLACEMENT form for BOTH FEBio and SfePy.",
+    "lineage_integrity": "Each benchmark is a distinct entity. Results from one do NOT transfer to another. B005 is a NEW benchmark, not a silent modification of B002 or B004."
+  },
+
+  "honest_acknowledgment": "This decision means the original L3-BENCHMARK-002 (with its (K/2)(J-1)^2 volumetric SED) will NEVER be the cross-solver L3 target. That is acceptable — the CEO's directive was to either prove equivalence or open a new lineage, and I am opening a new lineage. The original B002 is preserved as an archived artifact (L3-CHALLENGED-BENCHMARK), not silently modified.",
+
+  "no_acceptable_caveat_compliance": "This decision does NOT introduce an 'acceptable caveat' for check #4 (compressibility_formulation). Instead, it explicitly chooses Option B (new benchmark lineage) over Option A (prove equivalence). Check #4 remains RED for B002/B004 (because mixed u-p vs pure displacement has NOT been proven equivalent). For B005, check #4 will be GREEN by construction (both solvers use pure displacement)."
+}

@@ -1,0 +1,182 @@
+{
+  "record_type": "L3_BENCHMARK_FREEZE",
+  "benchmark_id": "L3-BENCHMARK-005",
+  "lineage": "NEW BENCHMARK — pure displacement with (K/2)(ln J)^2 volumetric SED for BOTH FEBio and SfePy. Created in Round 88 per Option B of the mixed-vs-penalty decision (MIXED-VS-PENALTY-DECISION.json). NOT a silent modification of B002 or B004.",
+  "supersedes": "NONE — B004 remains the analytical reference benchmark; B005 is the cross-solver comparison target",
+  "freeze_date": "2026-08-23",
+  "frozen_by": "CTO mode, Round 88 audit response",
+  "version": "1.0.0",
+  "freeze_principle": "All 10 fields below are frozen BEFORE either solver is executed. The analytical reference is derived INDEPENDENTLY (same as B004, since B005 uses the same constitutive law). After freeze, no field may be modified without an explicit re-freeze record and version bump.",
+
+  "field_1_geometry": {
+    "shape": "unit cube",
+    "dimensions_meters": [1.0, 1.0, 1.0],
+    "mesh_resolution": "1 hex8 element (8 nodes, 1 cell)",
+    "mesh_generation_method": "SfePy gen_block_mesh([1,1,1], [2,2,2], [0.5,0.5,0.5]); FEBio equivalent mesh",
+    "coordinate_system": "Cartesian, origin at (0,0,0)",
+    "reference_configuration": "undeformed cube, x in [0,1], y in [0,1], z in [0,1]"
+  },
+
+  "field_2_material_equation": {
+    "constitutive_class": "compressible neo-Hookean hyperelasticity",
+    "formulation": "Total Lagrangian, PURE DISPLACEMENT (no mixed u-p)",
+    "strain_energy_density": "W(C, J) = (mu/2)(I1_bar - 3) + (K/2)(ln J)^2",
+    "W_dev": "(mu/2) * (I1_bar - 3)",
+    "W_vol": "(K/2) * (ln J)^2  [LOGARITHMIC, matches FEBio default]",
+    "second_piola_kirchhoff_stress": "S = mu*J^(-2/3)*(I - (1/3)*tr(C)*C^-1) + K*ln(J)*C^{-1}",
+    "cauchy_stress_pushforward": "sigma = (1/J) * F * S * F^T",
+    "material_tangent": "D_vol_ij_kl = K * [(1/2) C^{-1}_kl C^{-1}_ij - ln(J) * sym(C^{-1}_ik C^{-1}_jl)]",
+    "formulation_choice_rationale": "Both FEBio and SfePy can implement this formulation in pure displacement. FEBio via uncoupled neo-Hookean with custom volumetric law or user material; SfePy via dw_tl_he_neohook + dw_tl_bulk_logJ_v2 (custom term with correct stress AND tangent, verified Round 88c)."
+  },
+
+  "field_3_material_parameters": {
+    "E_youngs_modulus": 1.0,
+    "nu_poissons_ratio": 0.3,
+    "mu_shear_modulus": 0.3846153846,
+    "K_bulk_modulus": 0.8333333333,
+    "parameter_mapping_formula": "mu = E / (2*(1+nu)), K = E / (3*(1-2*nu))"
+  },
+
+  "field_4_boundary_conditions": {
+    "prescribed_displacement_face": "Top face (z = 1.0): u_z = 0.1 (10% z-strain)",
+    "lateral_contraction": "FREE in x and y on all faces except where pinned below",
+    "left_face_x_pin": "Left face (x = 0.0): u_x = 0.0",
+    "front_face_y_pin": "Front face (y = 0.0): u_y = 0.0",
+    "bottom_face_z_pin": "Bottom face (z = 0.0): u_z = 0.0",
+    "corner_full_pin": "Corner at origin (0,0,0) is implicitly fully pinned via the three face pins above",
+    "free_faces": "Right face (x=1), Back face (y=1) — fully free"
+  },
+
+  "field_5_loading_path": {
+    "load_type": "prescribed displacement (Dirichlet)",
+    "prescribed_value_final": 0.1,
+    "load_ramp": "linear in pseudo-time, from 0.0 at t=0 to 0.1 at t=1",
+    "time_stepping_for_solve": "n_step = 2 (single load step from 0 to 1.0 in pseudo-time)",
+    "no_body_forces": true,
+    "no_surface_tractions": true,
+    "no_initial_stress": true
+  },
+
+  "field_6_observable": {
+    "observable_name": "sigma_zz_at_final_time",
+    "definition": "Cauchy stress zz-component at the single integration point of the single element, at the final pseudo-time t=1.0",
+    "extraction_method_for_sfepy": "evaluate stress via term_mode='stress', push forward via sigma = (1/J) F S F^T",
+    "extraction_method_for_febio": "Read cell_data['stress'][:,2] from VTK output at final timestep. FEBio outputs Cauchy stress directly.",
+    "stress_measure": "Cauchy (true) stress",
+    "push_forward_transformation_documented": true,
+    "push_forward_formula": "sigma = (1/J) * F * S * F^T",
+    "push_forward_verified_at_5_states": true,
+    "push_forward_max_diff_pct": 0.004
+  },
+
+  "field_7_analytical_reference": {
+    "derivation_independence_statement": "Derived from constitutive model and BCs alone. Same derivation as B004 (since B005 uses the same constitutive law). The analytical reference is NOT derived from solver output.",
+    "derivation_file": "../ROUND86_ARTIFACTS/L3-BENCHMARK-004-LOG-J-DERIVATION.md",
+    "verification_file": "../ROUND86_ARTIFACTS/L3-BENCHMARK-004-TANGENT-VERIFICATION.json",
+    "lambda_z_prescribed": 1.1,
+    "lambda_t_solved": 0.9725231067,
+    "J_solved": 1.0403813124,
+    "S_zz_analytical": 0.0817886551,
+    "sigma_zz_analytical": 0.0951268829,
+    "sigma_zz_analytical_precision": "verified to 0.0001% by scipy brentq root-finding",
+    "linear_elastic_reference_for_context_only": 0.10000,
+    "finite_strain_correction_pct": -4.87
+  },
+
+  "field_8_tolerance": {
+    "primary_tolerance_relative_pct": 5.0,
+    "secondary_tolerance_relative_pct": 1.0,
+    "tolerance_application": "max(|FEBio - analytical| / |analytical|, |SfePy - analytical| / |analytical|, |FEBio - SfePy| / |analytical|) < primary_tolerance for L3-PASS-MINIMUM; < secondary_tolerance for L3-PASS-STRONG",
+    "tolerance_freeze_note": "Frozen BEFORE FEBio execution. Will NOT be relaxed if FEBio disagrees."
+  },
+
+  "field_9_convergence_criterion": {
+    "sfepy_newton_settings": {
+      "i_max": 50, "eps_a": 1e-10, "eps_r": 1.0, "macheps": 1e-16,
+      "lin_red": 1e-2, "ls_red": 0.1, "ls_red_warp": 0.001,
+      "ls_on": 1.1, "ls_min": 1e-5, "check": 0, "delta": 1e-6
+    },
+    "sfepy_convergence_required": "final residual absolute < 1e-10 OR final residual relative < 1e-6",
+    "sfepy_time_stepping": "n_step = 2 (single load step)",
+    "sfepy_custom_term": "dw_tl_bulk_logJ_v2 (overrides BOTH stress_function AND tan_mod_function with correct log-J formulas)",
+    "febio_control_settings_REQUIRED": {
+      "analysis": "static", "time_steps": 1, "step_size": 1.0,
+      "max_refs": 15, "max_ups": 10, "dtol": 0.001, "etol": 0.01,
+      "rtol": 0.001, "lstol": 0.9, "qnmethod": "BFGS", "rhoi": -1
+    },
+    "febio_convergence_required": "NORMAL TERMINATION (FEBio exit code 0)",
+    "febio_material_model_REQUIRED": "MUST use a pure-displacement material with (K/2)(ln J)^2 volumetric SED. Options: (a) FEBio uncoupled neo-Hookean with custom volumetric; (b) FEBio user-defined material plugin; (c) FEBio coupled neo-Hookean if it can be shown to reduce to pure displacement under these BCs (would require proof, not assumed).",
+    "convergence_criterion_freeze_note": "All solver settings frozen. Will NOT be tuned to make a failing solver pass."
+  },
+
+  "field_10_domain_path_coverage": {
+    "description": "Per CEO Round 87: 'the coder's five tangent states need to cover the actual deformation path and neighborhood used by the solver. Otherwise the machine could prove equivalence at five convenient points while missing a divergence between them.'",
+    "frozen_deformation_domain": "lambda_z in [1.000, 1.100] (closed interval, 10% z-strain range)",
+    "minimum_sample_count": 11,
+    "sampling_points": [1.000, 1.010, 1.020, 1.030, 1.040, 1.050, 1.060, 1.070, 1.080, 1.090, 1.100],
+    "trajectory_metrics": {
+      "max_normalized_trajectory_error": {
+        "definition": "max_t |sigma_solver(t) - sigma_analytical(t)| / |sigma_analytical(t)|",
+        "frozen_threshold_pct": 1.0,
+        "applies_to": "both FEBio and SfePy"
+      },
+      "integrated_normalized_trajectory_error": {
+        "definition": "integral of |sigma_solver(t) - sigma_analytical(t)| / |sigma_analytical(t)| dt, divided by total path length",
+        "frozen_threshold_pct": 0.5,
+        "applies_to": "both FEBio and SfePy"
+      },
+      "max_tangent_trajectory_error": {
+        "definition": "max_t |D_solver(t) - D_analytical(t)| / |D_analytical(t)|",
+        "frozen_threshold_pct": 2.0,
+        "applies_to": "both FEBio and SfePy"
+      },
+      "integrated_tangent_trajectory_error": {
+        "definition": "integral of |D_solver(t) - D_analytical(t)| / |D_analytical(t)| dt, divided by total path length",
+        "frozen_threshold_pct": 1.0,
+        "applies_to": "both FEBio and SfePy"
+      }
+    },
+    "trajectory_shape_checks": [
+      "Monotonicity: sigma_zz must be monotonically increasing in lambda_z",
+      "Curvature: d2(sigma_zz)/d(lambda_z)^2 must be negative (concave, i.e., stiffening decreases)",
+      "No spurious oscillations: solver trajectories must not oscillate around the analytical trajectory"
+    ],
+    "thresholds_frozen_before_solver_execution": true,
+    "thresholds_will_not_be_relaxed": true
+  },
+
+  "freeze_signature": {
+    "method": "self-signed by CTO mode at freeze time",
+    "timestamp": "2026-08-23T00:00:00Z",
+    "constitution_version": "1.5.0",
+    "constitution_hash": "f82ae4f6",
+    "articles_governing_this_freeze": ["I", "II", "III", "IV", "VII", "IX", "X", "XVII", "XVIII", "XIX", "XXIX", "XXX", "XXXI", "XXXII", "XXXIII"],
+    "key_invariants": [
+      "B005 is a NEW benchmark, not a silent modification of B002 or B004.",
+      "B005 uses pure displacement for BOTH solvers (no mixed u-p).",
+      "B005 uses (K/2)(ln J)^2 volumetric SED (matches FEBio default).",
+      "Analytical reference derived BEFORE any solver execution on B005.",
+      "All tolerance thresholds frozen BEFORE any solver execution on B005.",
+      "Domain coverage requires 11 sample points (not just 5).",
+      "All 10 fields immutable without explicit re-freeze record."
+    ]
+  },
+
+  "post_freeze_allowed_actions": [
+    "Run SfePy at 11 sample points along loading path",
+    "Rebuild FEBio binary",
+    "Configure FEBio with pure-displacement (K/2)(ln J)^2 volumetric SED material",
+    "Run FEBio at 11 sample points along loading path",
+    "Compute trajectory metrics (max error, integrated error) for both solvers",
+    "Three-way comparison: Analytical ↔ FEBio ↔ SfePy, at 11 points, for stress AND tangent"
+  ],
+
+  "post_freeze_forbidden_actions": [
+    "Modify any of the 10 fields without an explicit L3-BENCHMARK-005-v1.1.0 re-freeze record",
+    "Use FEBio output to retroactively adjust the analytical reference",
+    "Use SfePy output to retroactively adjust the analytical reference",
+    "Relax any tolerance threshold if a solver disagrees",
+    "Reduce the sample count from 11 to fewer points",
+    "Skip the trajectory shape checks (monotonicity, curvature, oscillation)"
+  ]
+}

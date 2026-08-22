@@ -1,0 +1,44 @@
+{
+  "round": 86,
+  "finding": "CRITICAL: Round 85 log-J formula was WRONG. Used (K*ln(J)/J)*C^{-1} instead of K*ln(J)*C^{-1}.",
+  "error_origin": "Forgot the chain rule cancellation: S = 2*(dW/dJ)*(dJ/dC) = 2*(K*ln(J)/J)*(J/2)*C^{-1} = K*ln(J)*C^{-1}",
+  "impact": "Round 85 SfePy+logJ and Round 85 analytical reference both used the wrong formula CONSISTENTLY, so they agreed (0.004% diff). But NEITHER would agree with FEBio, which uses the correct formula.",
+  "correction": "S_vol = K * ln(J) * C^{-1} (no 1/J factor)",
+  "correct_analytical_at_lambda_z_1.1": 0.09512688292589994,
+  "wrong_analytical_at_lambda_z_1.1": 0.0944243025000758,
+  "discrepancy_pct": 0.738571899145919,
+  "correct_multi_state_results": [
+    {
+      "lambda_z": 1.0,
+      "J": 1.0,
+      "lambda_t": 1.0,
+      "sigma_zz": 0.0
+    },
+    {
+      "lambda_z": 1.025,
+      "J": 1.0100202118941664,
+      "lambda_t": 0.9926658917176889,
+      "sigma_zz": 0.02467857155696017
+    },
+    {
+      "lambda_z": 1.05,
+      "J": 1.020085896997473,
+      "lambda_t": 0.9856522602281351,
+      "sigma_zz": 0.04873814193362506
+    },
+    {
+      "lambda_z": 1.075,
+      "J": 1.0302041180744073,
+      "lambda_t": 0.978943007617011,
+      "sigma_zz": 0.07221130981131517
+    },
+    {
+      "lambda_z": 1.1,
+      "J": 1.040381312430182,
+      "lambda_t": 0.9725231067272114,
+      "sigma_zz": 0.09512688292589994
+    }
+  ],
+  "lesson": "Stress equivalence between two implementations is NOT evidence of constitutive correctness. Both implementations can be wrong in the same way. The tangent-equivalence check would have caught this because the tangent of the wrong formula differs from the tangent of the correct formula.",
+  "cemetery_entry_candidate": "CE-023: Two wrong implementations can agree. Consistency is not correctness. The tangent-equivalence check is needed because it forces re-derivation of the stress from first principles, which catches errors that are invisible to stress-only comparison."
+}

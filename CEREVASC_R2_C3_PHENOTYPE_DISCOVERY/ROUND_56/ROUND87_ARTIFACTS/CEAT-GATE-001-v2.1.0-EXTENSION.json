@@ -1,0 +1,58 @@
+{
+  "record_type": "CEAT_GATE_EXTENSION",
+  "gate_id": "CEAT-GATE-001",
+  "version": "2.1.0",
+  "version_history": [
+    {"version": "1.0.0", "date": "2026-08-23", "round": 84, "change": "Initial 7-check gate"},
+    {"version": "1.1.0", "date": "2026-08-23", "round": 85, "change": "Added 8th check: tangent_equivalence"},
+    {"version": "2.0.0", "date": "2026-08-23", "round": 86, "change": "Renamed to CEAT-GATE. Added 'no acceptable caveat' rule. Multi-state verification required."},
+    {"version": "2.1.0", "date": "2026-08-23", "round": 87, "change": "Added 9th check: loading_path_equivalence. Per CEO Round 86 directive: 'Two constitutive implementations can agree at five isolated points but differ along the actual loading path. So the strongest validation becomes: W(F), P(F), C(F) plus F(t) -> P(t) -> sigma(t) across the complete prescribed load path.'"}
+  ],
+  "new_check_9_loading_path_equivalence": {
+    "description": "Two constitutive implementations can agree at five isolated deformation states but differ along the actual loading path. This check verifies that the stress AND tangent trajectories match across the complete prescribed load path, not just at isolated points.",
+    "audit_method": "Sample the loading path at >= 10 points (e.g., lambda_z = 1.000, 1.010, 1.020, ..., 1.100). At each point, compute: (a) analytical stress and tangent, (b) solver A stress and tangent, (c) solver B stress and tangent. The trajectories must agree to within tolerance at ALL sampled points, AND the trajectory SHAPE (monotonicity, curvature) must match.",
+    "trajectory_shape_checks": [
+      "Monotonicity: if analytical stress is monotonically increasing in lambda_z, both solvers must also be monotonically increasing",
+      "Curvature sign: if analytical stress has positive second derivative (convex), both solvers must also have positive second derivative",
+      "No spurious oscillations: solver trajectories must not oscillate around the analytical trajectory"
+    ],
+    "tolerance": "Same as check #3 (tangent): 1% relative at each sampled point",
+    "minimum_sample_count": 10,
+    "common_violations": [
+      "Solver A agrees at the 5 pre-registered states but disagrees at intermediate points (e.g., due to a discrete event like element inversion)",
+      "Solver trajectory has a different shape (e.g., non-monotonic where analytical is monotonic)",
+      "Solver tangent has a discontinuity that the analytical tangent does not"
+    ]
+  },
+
+  "updated_check_structure_v2_1_0": {
+    "check_count": 9,
+    "checks": [
+      "1_strain_energy_density",
+      "2_stress_law",
+      "3_tangent_equivalence",
+      "4_compressibility_formulation",
+      "5_parameter_mapping",
+      "6_stress_measure",
+      "7_quadrature",
+      "8_reference_configuration",
+      "9_loading_path_equivalence"
+    ],
+    "hard_invariant_extended": "W_A(F) = W_B(F), P_A(F) = P_B(F), C_A(F) = C_B(F) for all F in D, AND sigma_A(t) = sigma_B(t), C_A(t) = C_B(t) for all t in loading path T",
+    "no_acceptable_caveat_rule": "Still in effect. 'acceptable_caveat', 'similar_at_benchmark', 'documented_difference', 'partial' are ALL FAIL values.",
+    "multi_state_requirement": "Checks #2, #3, #6, #9 require verification at >= 5 deformation states (for #2, #3, #6) or >= 10 sampled points along the loading path (for #9). Single-state verification is INSUFFICIENT."
+  },
+
+  "implementation_notes": {
+    "gate_script_update": "The gate script constitutive_equivalence_gate.py must be updated to v2.1.0 to include check #9 in REQUIRED_CHECKS.",
+    "audit_schema_update": "Audit JSON files must include a 'loading_path_verification' block for check #9. Audits without it are REFUSED.",
+    "backward_compatibility": "Audits created under v2.0.0 (8 checks) are still acceptable for historical reference but must be re-evaluated under v2.1.0 before being used for any L3 attempt."
+  },
+
+  "round_87_status_of_check_9": {
+    "analytical_loading_path": "COMPUTED. The 5 pre-registered states (lambda_z = 1.000, 1.025, 1.050, 1.075, 1.100) are a subset of the loading path. The analytical stress and tangent at these 5 states are documented in L3-BENCHMARK-004-TANGENT-VERIFICATION.json. The trajectory is monotonically increasing in stress and monotonically decreasing in tangent (as expected for neo-Hookean: stiffening slows at large strain).",
+    "sfepy_loading_path": "PARTIALLY VERIFIED. The 3-way tangent verification (ROUND87-THREE-WAY-TANGENT-VERIFICATION.json) confirms SfePy agrees with analytical at all 5 states to <0.11%. Loading-path equivalence at intermediate points (e.g., lambda_z = 1.010, 1.020, etc.) has NOT yet been verified. Need to run SfePy at >= 10 sampled points and compare trajectories.",
+    "febio_loading_path": "NOT YET COMPUTED. FEBio binary was wiped. Must be rebuilt and run at >= 10 sampled points.",
+    "verdict": "INSUFFICIENT. Check #9 requires loading-path verification at >= 10 points for BOTH solvers. Currently only 5 points verified for SfePy, 0 for FEBio. Check #9 = FAIL until multi-point trajectory verification is complete."
+  }
+}

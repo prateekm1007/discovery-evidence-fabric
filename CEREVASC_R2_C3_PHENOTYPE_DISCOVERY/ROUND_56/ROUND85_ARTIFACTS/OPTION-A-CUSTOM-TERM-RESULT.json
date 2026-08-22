@@ -1,0 +1,25 @@
+{
+  "round": 85,
+  "option": "A (exact constitutive replication via custom SfePy term)",
+  "sfepy_term": "dw_tl_bulk_logJ (custom, registered at runtime)",
+  "sfepy_source_status": "OFFICIAL UNMODIFIED (no source patches)",
+  "volumetric_sed": "(K/2)(ln J)^2",
+  "volumetric_stress_S_vol": "K * ln(J) / J * C^{-1}",
+  "analytical_reference": {
+    "sigma_zz": 0.0944243025000758,
+    "J": 1.0418491129044514,
+    "lambda_t": 0.9732088969927601,
+    "lambda_z": 1.1
+  },
+  "sfepy_numerical": {
+    "sigma_zz": 0.09442052553848125
+  },
+  "sfepy_vs_analytical_diff_pct": -0.003999988874207416,
+  "l3_status": "L3-REFUSED (CE-GATE-001 audit must be re-run with log-J SfePy term)",
+  "next_steps": [
+    "Re-run CE-GATE-001 audit with SfePy using dw_tl_bulk_logJ",
+    "If gate PASSES (8 checks), rebuild FEBio binary",
+    "Run FEBio on L3-BENCHMARK-004 (re-frozen with (K/2)(ln J)^2 volumetric)",
+    "Three-way comparison: Analytical \u2194 FEBio \u2194 SfePy+logJ"
+  ]
+}

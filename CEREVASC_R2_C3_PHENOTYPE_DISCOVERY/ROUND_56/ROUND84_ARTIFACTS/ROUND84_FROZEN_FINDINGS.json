@@ -1,0 +1,68 @@
+{
+  "record_type": "ROUND84_FROZEN_FINDINGS",
+  "round": 84,
+  "date": "2026-08-23",
+  "context": "CEO Round 83-audit-response deep audit. Three findings must be recorded as SEPARATE conclusions, not blurred together.",
+
+  "finding_1": {
+    "label": "LOAD_STEPPING_HYPOTHESIS",
+    "claim_tested": "SfePy failed to converge on the L3 problem because the single load step was too large; SfePy's official hyperelastic example uses 11 incremental steps.",
+    "test_method": "A/B controlled experiment. Same model, same mesh, same BCs, same constitutive law, only n_step varied (n_step=2 single-step vs n_step=11 multi-step). Three problem configurations tested.",
+    "evidence": {
+      "sanity_1_1elem_cube_10pct_strain": {
+        "variant_A_n_step_2": "converged, final residual 7.59e-13",
+        "variant_B_n_step_11": "converged, final residual 7.59e-13",
+        "interpretation": "BOTH variants converge. Load stepping provides NO benefit at this strain level."
+      },
+      "sanity_2_8x4x4_cube_10pct_strain": {
+        "variant_A_n_step_2": "converged, final residual 1.49e-11",
+        "variant_B_n_step_11": "converged, final residual 1.49e-11",
+        "interpretation": "BOTH variants converge. Load stepping provides NO benefit at this strain level."
+      },
+      "sanity_3_8x4x4_block_12.5pct_strain": {
+        "variant_A_n_step_2": "FAILED, final residual 4.47e+00",
+        "variant_B_n_step_11": "FAILED, final residual 2.93e+00",
+        "interpretation": "BOTH variants fail. Load stepping does NOT rescue convergence."
+      }
+    },
+    "verdict": "RETRACTED / FALSIFIED",
+    "rationale": "The hypothesis predicts: A fails, B succeeds. Experiment shows: at 10% strain, A=B=PASS; at 12.5% strain on elongated block, A=B=FAIL. The prediction is contradicted by the data.",
+    "cemetery_entry": "CE-019",
+    "lesson": "Do not attribute a numerical failure to a plausible cause until a controlled experiment actually distinguishes that cause. A plausible-sounding root cause is not evidence."
+  },
+
+  "finding_2": {
+    "label": "SFEPY_OFFICIAL_EXAMPLE_FUNCTIONAL",
+    "claim_tested": "Unmodified SfePy 2026.2 release can solve its official hyperelastic.py example.",
+    "test_method": "SHA256 hash verification of installed terms.py against canonical SfePy 2026.2 sdist. Then execute official example with no source modifications.",
+    "evidence": {
+      "installed_terms_py_sha256": "f900fa14e31d82c0f9c10b7ad10736e575bb07830039b708b316f7842501f77f",
+      "expected_sha256_per_dist_info_RECORD": "f900fa14e31d82c0f9c10b7ad10736e575bb07830039b708b316f7842501f77f",
+      "hash_match": true,
+      "official_example_result": "11 time steps, all converged, final residual 1.19e-13",
+      "execution_time_seconds": 6.75
+    },
+    "verdict": "CONFIRMED",
+    "rationale": "The official SfePy 2026.2 release, unmodified, solves its own canonical hyperelastic example. The Round 83 local patch to terms.py was unnecessary for the standard dict-based API path. The patch was a workaround for our own non-standard Term.new() usage in sfepy_l3_compressible.py, not a defect in SfePy.",
+    "implication": "SfePy is a viable independent solver. The Round 83 patch is QUARANTINED at /home/z/my-project/scripts/sfepy_patches/terms_PATCHED_round83.py and is NOT in use."
+  },
+
+  "finding_3": {
+    "label": "ORIGINAL_L3_BENCHMARK_UNSUITABLE",
+    "claim_tested": "The original L3 benchmark (8x4x4 mesh of 8x4x4 block, 12.5% x-strain, prescribed u_x=1.0) is a valid cross-solver comparison problem.",
+    "test_method": "Attempt to solve with unmodified SfePy using both single-step and multi-step loading.",
+    "evidence": {
+      "original_benchmark_id": "L3-CHALLENGED-BENCHMARK (archive only, no longer the active L3 target)",
+      "sfepy_single_step_result": "FAILED, residual stuck at 97% over 31 iterations",
+      "sfepy_multi_step_result": "FAILED, residual stuck at 97% over 310 iterations across 11 steps",
+      "febio_historical_result_round_82": "converged (FEBio uses BFGS quasi-Newton, more robust than pure Newton)"
+    },
+    "verdict": "UNSUITABLE_FOR_VALID_L3_COMPARISON",
+    "rationale": "The benchmark is solver/setup-sensitive. SfePy (pure Newton + line search) cannot navigate the nonlinear landscape for this combination of 12.5% strain + elongated block geometry + face-constrained BCs, while FEBio (BFGS quasi-Newton) can. A cross-solver comparison where one solver cannot produce a converged result is not a meaningful comparison — it would compare FEBio physics against SfePy non-convergence, which is not a physics comparison.",
+    "secondary_issue": "Even if SfePy did converge, the volumetric SED formulations differ between FEBio ((K/2)(ln J)^2) and SfePy ((K/2)(J-1)^2). At J=1.125 (12.5% volume change), the volumetric stress differs by ~58%, which would dominate any comparison.",
+    "disposition": "ARCHIVED. Located at /home/z/my-project/scripts/stage_minus_1/round83_ab/ and referenced in ROUND82_L3_CROSS_SOLVER_FAIL.json. Will NOT be silently mutated. May be revived later as a solver-stress test, but is NOT the active L3 benchmark."
+  },
+
+  "no_other_findings_promoted_this_round": true,
+  "next_action_prerequisite": "L3-BENCHMARK-002 must be frozen BEFORE any FEBio or SfePy execution against it. See L3-BENCHMARK-002-FREEZE.json."
+}

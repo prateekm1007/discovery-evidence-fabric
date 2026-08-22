@@ -1,0 +1,99 @@
+{
+  "record_type": "CE_GATE_AUDIT",
+  "audit_version": "v1.1.0",
+  "audit_date": "2026-08-23",
+  "round": 85,
+  "benchmark_id": "L3-BENCHMARK-002 (re-audited with SfePy using custom dw_tl_bulk_logJ term)",
+  "solver_A": {
+    "name": "FEBio",
+    "version": "4.13 (default neo-Hookean material)",
+    "binary_status": "WIPED between sessions — must be rebuilt before any L3 attempt"
+  },
+  "solver_B": {
+    "name": "SfePy",
+    "version": "2026.2 (dw_tl_he_neohook + custom dw_tl_bulk_logJ)",
+    "binary_status": "INSTALLED, OFFICIAL UNMODIFIED (SHA256 verified: f900fa14...)",
+    "custom_term_status": "dw_tl_bulk_logJ registered at runtime via term_table plugin mechanism. NO source modifications. Term implementation in /home/z/my-project/scripts/round85_custom_logJ_term.py",
+    "validation_against_analytical": {
+      "analytical_sigma_zz": 0.094424,
+      "sfepy_sigma_zz": 0.094421,
+      "relative_diff_pct": 0.004,
+      "verdict": "SfePy+logJ term VERIFIED against analytical reference for the (K/2)(ln J)^2 volumetric SED"
+    }
+  },
+  "checks": {
+    "1_strain_energy_density": {
+      "solver_A": "(mu/2)(I1_bar - 3) + (K/2)(ln J)^2  [FEBio default neo-Hookean]",
+      "solver_B": "(mu/2)(I1_bar - 3) + (K/2)(ln J)^2  [SfePy dw_tl_he_neohook + custom dw_tl_bulk_logJ]",
+      "equivalent": true,
+      "notes": "Both solvers now use IDENTICAL strain-energy density. Deviatoric: (mu/2)(I1_bar-3). Volumetric: (K/2)(ln J)^2. Verified by comparing the actual mathematical expressions, not just material labels (CE-020)."
+    },
+    "2_stress_law": {
+      "solver_A": "S = mu*J^(-2/3)*(I - (1/3)*tr(C)*C^-1) + (K*ln(J)/J)*C^-1",
+      "solver_B": "S = mu*J^(-2/3)*(I - (1/3)*tr(C)*C^-1) + (K*ln(J)/J)*C^-1",
+      "equivalent": true,
+      "notes": "Both produce identical stress expressions because they share the same SED. The custom term's stress_function computes K*ln(J)/J*vecInvCS, which matches FEBio's S_vol = K*ln(J)/J * C^{-1}."
+    },
+    "3_tangent_equivalence": {
+      "solver_A_tangent_at_5_states": "NOT YET COMPUTED — FEBio binary wiped",
+      "solver_B_tangent_at_5_states": "NOT YET EXTRACTED — but SfePy+logJ converged in 12 Newton iterations on Sanity 1 setup, indicating the tangent is at least functional",
+      "analytical_reference_at_5_states": "Note: the frozen tangent reference in L3-BENCHMARK-003-TANGENT-VERIFICATION.json is for the (K/2)(J-1)^2 formulation, NOT the (K/2)(ln J)^2 formulation. A NEW tangent reference must be derived for the log-J formulation.",
+      "equivalent": false,
+      "notes": "CANNOT be verified as true until: (a) the log-J analytical tangent is derived at 5 deformation states (a re-derivation, similar to Round 85 L3-BENCHMARK-003-TANGENT-DERIVATION.md but for the log-J SED); (b) FEBio's material tangent is extracted; (c) SfePy+logJ's tangent is extracted. Until then, this check REFUSES."
+    },
+    "4_compressibility_formulation": {
+      "solver_A": "FEBio's neo-Hookean is implemented as a mixed u-p formulation internally, but with the volumetric SED (K/2)(ln J)^2 producing the penalty-like stress S_vol = K*ln(J)/J*C^{-1} when the pressure has converged",
+      "solver_B": "Pure displacement formulation with custom dw_tl_bulk_logJ term (analytical stress, finite-difference tangent). The stress is computed analytically; the tangent is approximated by SfePy's automatic differentiation framework applied to the inherited BulkPenaltyTLTerm structure.",
+      "equivalent": false,
+      "notes": "FEBio uses mixed u-p internally; SfePy uses pure displacement. The STRESS at convergence is identical (both produce S_vol = K*ln(J)/J*C^{-1}), but the TANGENT and the NEWTON PATH may differ. The mixed formulation has a different tangent structure. This is a known limitation of the current custom term — to fully match FEBio, we would need to implement the mixed u-p formulation in SfePy, which is a much larger undertaking. For L3 stress comparison, this is acceptable (stresses match). For L3 tangent comparison, this is a blocker."
+    },
+    "5_parameter_mapping": {
+      "solver_A": "E=1.0, nu=0.3 -> mu=0.3846, K=0.8333 (computed internally by FEBio)",
+      "solver_B": "mu=0.3846, K=0.8333 (input directly)",
+      "equivalent": true,
+      "notes": "Parameter values identical after mapping."
+    },
+    "6_stress_measure": {
+      "solver_A": "Cauchy stress (output in VTK cell_data['stress'])",
+      "solver_B": "2nd Piola-Kirchhoff stress (output via term_mode='stress')",
+      "equivalent": false,
+      "notes": "Different stress measures. Must push SfePy's 2nd PK forward to Cauchy via sigma = (1/J) F S F^T before comparison. This is a remediable post-processing issue. The push-forward transformation has been derived and applied successfully in Round 85 (SfePy+logJ result 0.094421 vs analytical 0.094424 after push-forward). The check is marked false because the SOLVERS do not natively output the same measure — the transformation must be applied by the comparison framework."
+    },
+    "7_quadrature": {
+      "solver_A": "2x2x2 Gauss (FEBio default for hex8)",
+      "solver_B": "2x2x2 Gauss (SfePy Integral order=2 for hex8)",
+      "equivalent": true,
+      "notes": "Same quadrature rule."
+    },
+    "8_reference_configuration": {
+      "solver_A": "Total Lagrangian (FEBio solid module default)",
+      "solver_B": "Total Lagrangian (SfePy dw_tl_* terms, including custom dw_tl_bulk_logJ which inherits from BulkPenaltyTLTerm)",
+      "equivalent": true,
+      "notes": "Both use TL formulation."
+    }
+  },
+  "audit_summary": {
+    "checks_passing": ["1_strain_energy_density", "2_stress_law", "5_parameter_mapping", "7_quadrature", "8_reference_configuration"],
+    "checks_failing": ["3_tangent_equivalence", "4_compressibility_formulation", "6_stress_measure"],
+    "checks_unknown": [],
+    "overall_verdict": "REFUSED",
+    "improvement_from_previous_audit": "Round 84 audit had 5 of 8 checks failing. Round 85 audit (with custom log-J term) has 3 of 8 checks failing. Improvement on checks #1 (SED) and #2 (stress_law), which are now both PASS.",
+    "remaining_blockers": [
+      "Check #3 (tangent_equivalence): requires deriving log-J analytical tangent at 5 states, and extracting both solvers' material tangents. The frozen tangent reference in L3-BENCHMARK-003-TANGENT-VERIFICATION.json is for the (K/2)(J-1)^2 formulation and MUST NOT be reused for the log-J formulation — a new derivation is needed.",
+      "Check #4 (compressibility_formulation): FEBio uses mixed u-p internally; SfePy uses pure displacement. Stresses match (S_vol = K*ln(J)/J*C^{-1} on both sides), but the tangent and Newton path may differ. To fully match, would need to implement mixed u-p in SfePy (major effort). For L3 stress comparison, this is acceptable; for L3 tangent comparison, this is a blocker.",
+      "Check #6 (stress_measure): FEBio outputs Cauchy; SfePy outputs 2nd PK. The push-forward transformation has been derived and applied successfully, but the check is marked false because the SOLVERS do not natively output the same measure. The comparison framework must apply the transformation explicitly."
+    ],
+    "path_to_L3_PASS": [
+      "STEP 1: Re-derive analytical tangent at 5 deformation states for the (K/2)(ln J)^2 volumetric SED (current frozen reference is for the (K/2)(J-1)^2 formulation). Save as L3-BENCHMARK-004-TANGENT-VERIFICATION.json.",
+      "STEP 2: Extract SfePy+logJ material tangent at the same 5 states (via term_mode='tan_mod' if available, or numerical finite-difference).",
+      "STEP 3: Rebuild FEBio binary.",
+      "STEP 4: Extract FEBio material tangent at the same 5 states (via finite-difference on FEBio output at two nearby deformation states).",
+      "STEP 5: Compare all three tangents. If relative diff < 1% at all 5 states, check #3 passes.",
+      "STEP 6: For check #4, either: (a) accept that stress matches and document that tangent may differ due to mixed vs pure displacement; OR (b) implement mixed u-p in SfePy (major effort, deferred).",
+      "STEP 7: For check #6, document that the push-forward transformation is applied by the comparison framework. Mark as accepted with caveat.",
+      "STEP 8: Once checks #1, #2, #3, #5, #6, #7, #8 all pass (with #4 documented as a known acceptable difference), L3 cross-solver comparison can proceed."
+    ]
+  },
+
+  "important_caveat": "This audit represents PROGRESS toward L3, not L3-PASS. The custom dw_tl_bulk_logJ term has been VERIFIED against the analytical reference (0.004% agreement), which is a major milestone. But the constitutive-equivalence gate is not yet fully passed, and FEBio has not yet been run. Do NOT declare L3-PASS based on this audit alone."
+}
