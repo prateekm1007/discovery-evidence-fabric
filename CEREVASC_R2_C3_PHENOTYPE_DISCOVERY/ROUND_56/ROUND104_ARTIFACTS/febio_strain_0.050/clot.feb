@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<febio_spec version="2.5">
+<Module type="solid"/>
+<Control>
+<analysis type="static"/>
+<time_steps>1</time_steps>
+<step_size>1.0</step_size>
+<max_refs>15</max_refs>
+<max_ups>10</max_ups>
+<dtol>0.001</dtol>
+<etol>0.01</etol>
+<rtol>0.001</rtol>
+<lstol>0.9</lstol>
+<qnmethod>BFGS</qnmethod>
+<rhoi>-1</rhoi>
+</Control>
+<Material>
+<material id="1" name="ClotDamage" type="damage neo-Hookean">
+<E>1.0</E>
+<v>0.3</v>
+<a>0.014</a>
+<b>0.34</b>
+</material>
+</Material>
+<Geometry>
+<Nodes>
+<node id="1">0.0, 0.0, 0.0</node>
+<node id="2">1.0, 0.0, 0.0</node>
+<node id="3">1.0, 1.0, 0.0</node>
+<node id="4">0.0, 1.0, 0.0</node>
+<node id="5">0.0, 0.0, 1.0</node>
+<node id="6">1.0, 0.0, 1.0</node>
+<node id="7">1.0, 1.0, 1.0</node>
+<node id="8">0.0, 1.0, 1.0</node>
+</Nodes>
+<Elements type="hex8" mat="1" elset="Part1">
+<elem id="1">1,2,3,4,5,6,7,8</elem>
+</Elements>
+<NodeSet name="bottom"><node id="1"/><node id="2"/><node id="3"/><node id="4"/></NodeSet>
+<NodeSet name="top"><node id="5"/><node id="6"/><node id="7"/><node id="8"/></NodeSet>
+<NodeSet name="left"><node id="1"/><node id="4"/><node id="5"/><node id="8"/></NodeSet>
+<NodeSet name="front"><node id="1"/><node id="2"/><node id="5"/><node id="6"/></NodeSet>
+</Geometry>
+<Boundary>
+<bc type="zero displacement" node_set="bottom"><z_dof>1</z_dof></bc>
+<bc type="zero displacement" node_set="left"><x_dof>1</x_dof></bc>
+<bc type="zero displacement" node_set="front"><y_dof>1</y_dof></bc>
+<bc type="prescribed displacement" node_set="top">
+<dof>z</dof>
+<value lc="1">0.05</value>
+<relative>0</relative>
+</bc>
+</Boundary>
+<LoadData>
+<loadcurve id="1">
+<loadpoint>0.0, 0.0</loadpoint>
+<loadpoint>1.0, 1.0</loadpoint>
+</loadcurve>
+</LoadData>
+<Output>
+<plotfile type="vtk">
+<var type="displacement"/>
+<var type="stress"/>
+</plotfile>
+</Output>
+</febio_spec>
