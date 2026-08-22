@@ -1,0 +1,5 @@
+{
+  "task": "FEBio viscoelastic .feb config",
+  "content": "```xml\n<Material>\n  <material id=\"1\" name=\"ViscoNeoHookean\" type=\"viscoelastic\">\n    <g0>1</g0>\n    <g1>0.5</g1>\n    <t1>1.0</t1>\n    <solid type=\"neo-Hookean\">\n      <G>0.3846</G>\n      <k>0.8333</k>\n    </solid>\n  </material>\n</Material>\n```",
+  "reasoning": "The user wants FEBio 4.x XML for a viscoelastic material with incompressible neo-Hookean base. In FEBio, the viscoelastic material is \"viscoelastic\" type with <g0>, <g1>, <t1> relaxation parameters and a nested neo-Hookean material with G (shear modulus) and k (bulk modulus).\n\nFEBio 4.x format:\n\n```xml\n<material id=\"1\" name=\"Visco\" type=\"viscoelastic\">\n  <g0>1</g0>\n  <g1>0.5</g1>\n  <t1>1.0</t1>\n  <solid type=\"neo-Hookean\">\n    <G>0.3846</G>\n    <k>0.8333</k>\n  </solid>\n</material>\n```\n\nIn FEBio 4.x, the material element uses attributes: id, name, type. The nested solid is specified via <solid> tag. For older versions it was different but 4.x uses this.\n\nKeep under 300 words, XML only per system prompt (\"Respond with XML only, no explanation\"). So just output the XML."
+}

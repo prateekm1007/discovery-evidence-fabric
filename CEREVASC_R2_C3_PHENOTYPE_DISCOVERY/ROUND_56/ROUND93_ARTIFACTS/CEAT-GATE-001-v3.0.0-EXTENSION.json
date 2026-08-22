@@ -1,0 +1,58 @@
+{
+  "record_type": "CEAT_GATE_EXTENSION",
+  "gate_id": "CEAT-GATE-001",
+  "version": "3.0.0",
+  "version_history": [
+    {
+      "version": "1.0.0",
+      "round": 84,
+      "change": "Initial 7-check gate"
+    },
+    {
+      "version": "1.1.0",
+      "round": 85,
+      "change": "Added check #8: tangent_equivalence"
+    },
+    {
+      "version": "2.0.0",
+      "round": 86,
+      "change": "Renamed to CEAT-GATE. Added 'no acceptable caveat' rule."
+    },
+    {
+      "version": "2.1.0",
+      "round": 87,
+      "change": "Added check #9: loading_path_equivalence"
+    },
+    {
+      "version": "3.0.0",
+      "round": 93,
+      "change": "Added checks #10 (time_integration_equivalence) and #11 (state_variable_evolution_equivalence) for L4+ viscoelasticity and beyond."
+    }
+  ],
+  "new_checks": {
+    "10_time_integration_equivalence": {
+      "description": "For time-dependent problems (viscoelasticity, dynamics, FSI), both solvers must use the SAME time integration scheme (e.g., implicit Euler, generalized-\u03b1, Newmark-\u03b2) with the SAME time step dt and SAME total duration.",
+      "audit_method": "Compare the time integration parameters from both solvers' input files. Verify: (a) same scheme type, (b) same dt, (c) same n_steps, (d) same t_final.",
+      "tolerance": "Exact match (dt must be identical to within machine precision)",
+      "common_violations": [
+        "Different dt (e.g., FEBio uses dt=0.1, SfePy uses dt=0.05) \u2014 introduces discretization error difference",
+        "Different integration scheme (e.g., FEBio uses implicit Euler, SfePy uses Crank-Nicolson) \u2014 different numerical properties",
+        "Different total duration (e.g., FEBio runs to t=10, SfePy runs to t=5) \u2014 incomplete trajectory comparison"
+      ],
+      "applies_to": "L4 (viscoelasticity), L7 (FSI), and any time-dependent benchmark"
+    },
+    "11_state_variable_evolution_equivalence": {
+      "description": "For materials with internal state variables (viscoelasticity, damage, plasticity), both solvers must track the SAME state variables with the SAME update formula and SAME initial conditions.",
+      "audit_method": "Compare: (a) number of state variables, (b) update formula for each, (c) initial values, (d) storage location (element vs integration point). Verify the state variable trajectories match at all sampled time points.",
+      "tolerance": "State variable trajectories must agree to within 1% relative at all sampled time points",
+      "common_violations": [
+        "Different number of state variables (e.g., FEBio tracks 6 Prony terms, SfePy tracks 1) \u2014 different model order",
+        "Different update formula (e.g., FEBio uses recursive update, SfePy uses hereditary integral) \u2014 mathematically equivalent but numerically different",
+        "Different initial conditions (e.g., FEBio initializes H=0, SfePy initializes H=Se) \u2014 wrong starting point"
+      ],
+      "applies_to": "L4 (viscoelasticity: Prony internal variables), L5 (damage: damage variable D), and any benchmark with internal state"
+    }
+  },
+  "updated_check_count": 11,
+  "hard_invariant_v3": "W_A=W_B, P_A=P_B, C_A=C_B for all F in D, AND sigma_A(t)=sigma_B(t) for all t in T, AND H_A(t)=H_B(t) for all state variables H and all t in T"
+}
