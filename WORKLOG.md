@@ -4419,3 +4419,98 @@ Stage Summary:
 - **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: BLOCKED.
 - **CREDENTIAL HYGIENE:** Both credentials inline via env var ONLY. NOT persisted.
 - **REMINDER FOR NEXT SESSION:** The next step is NOT software — it is a wet-lab experiment requiring external resources (fresh thrombus, high-sample-rate sensing, realistic phantom, blinded reviewers). The physics gate design is documented in ROUND67_PRIOR_ART_CLOSURE.json Section "physics_gate_design_adversarial".
+
+
+---
+Task ID: ROUND68-STAGE-ZERO-FALSIFICATION-DESIGN
+Agent: main (CTO mode — final computational output before wet-lab), session 2026-08-22
+Task: Per CEO Round 67 directive — stop invention-engine coding. Design the smallest falsification experiment capable of killing the hypothesis. Separate 3 claims (signal existence → prediction validity → intervention effectiveness). Record G12 honestly. Keep §103 OPEN. This is the FINAL computational round.
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0. Articles I, V, XXV, XXVI, XXVII, XXVIII, XXIX, XXXI, XXXII, XXXIV applied. CE-012, CE-014, CE-017, CE-018 enforced.
+- Pre-session epistemic check acknowledged.
+- CRITICAL: This is the FINAL computational round. Per CEO Round 67 directive: 'Stop invention-engine coding. Do not build more predictors, neural networks, claims, or software around the fragmentation hypothesis.' No OX Alpha calls this round — the CEO directive is to produce the Stage-0 falsification experiment design and stop.
+
+HONEST STATUS RECORD:
+- Slot 5: DISCOVERY HYPOTHESIS — NOT a patent-surviving invention. §103 OPEN. Physics untested. The candidate is a high-quality experimental hypothesis, not a world-class invention.
+- §103 gate: OPEN — partially closed but not resolved. Combination attack remains strong.
+- G10: RED — 7 evidence-ledger files with stale commit SHAs (infrastructure debt from prior git-filter-repo).
+- G12: RED — operationally failed due to suspected false-positive historical artifact. The Patsnap Eureka page content (fetched for CN122376206A analysis) contains JSON-LD structured data with URLs followed by @ symbols that the G12 credential audit heuristic misinterprets as URL-embedded credentials. NOT an actual credential leak — no PAT or API key in any committed file. Sanitizing HEAD does not fix the historical blob. Fix requires git-filter-repo (breaks G10) or heuristic update (infrastructure change). Separate authorized infrastructure task.
+- G13: RED — RESEARCH_BLOCKED (fails because G10/G12 fail).
+- CI: FAILED — 11/14 gates pass. Research state, NOT certified infrastructure.
+
+STAGE-0 FALSIFICATION EXPERIMENT DESIGN:
+- THE SINGLE QUESTION: Does any measurable signal reliably precede optically-confirmed clot fragmentation by >=1 second, across at least 2 clot compositions, in at least 2 independent trials per composition?
+- IF NO → KILL immediately. Record CE-019. Slot 5 EMPTY. No further software analysis.
+- IF YES → advance to Stage 1 (out-of-sample prediction validation). Do NOT advance directly to intervention testing.
+
+MINIMUM EXPERIMENT:
+- Samples: 6-10 fresh porcine blood clots, 2 compositions (RBC-rich + fibrin-rich), 10-20mm length, + 2 gelatin negative controls.
+- Instrumentation: proximal axial force (>=100Hz) + displacement encoder (>=100Hz) + aspiration pressure (>=10Hz) + high-speed optical camera (>=500fps, ground truth). NO impedance, NO acoustic, NO OCT, NO neural network, NO closed-loop in Stage 0.
+- Conditions: straight transparent tube, static/low flow, constant 2 mm/s traction, fixed -20 inHg aspiration. NO curvature, NO pulsatility, NO velocity sweep, NO pressure sweep in Stage 0.
+- Blinding: feature analyst does NOT see fragmentation timing; ground-truth scorer does NOT see force/displacement data; third party merges by timestamp.
+- 5 kill conditions: K0_1 (no fragmentation events), K0_2 (no signal), K0_3 (lead time <1s), K0_4 (not reproducible), K0_5 (confounded by device motion).
+- Success criteria: >=1 feature deviates >=1s before fragmentation in >=60% of fragmenting trials across BOTH compositions, with NO deviation in negative controls.
+- Estimated cost: ~$5,000-$10,000 equipment + ~$200-$500 consumables. 1-2 days experimental + 1-2 days analysis. No clinical collaborator, no IRB, no animal/human subjects (ex vivo only).
+
+THREE SEPARATED CLAIMS (per CEO directive — do NOT collapse):
+- Claim 1 (Signal Existence): A measurable physical signal deviates from baseline >=1s before optically-confirmed fragmentation. → Stage 0 question. If FALSE, candidate dies.
+- Claim 2 (Prediction Validity): The signal predicts fragmentation out-of-sample with clinically acceptable sensitivity/specificity. → Stage 1 question. If FALSE, candidate dies (signal exists but not predictive).
+- Claim 3 (Intervention Effectiveness): Acting on the prediction (modulating traction velocity) reduces distal embolization vs non-predictive control. → Stage 2 question. If FALSE, candidate dies (prediction works but intervention doesn't help).
+- SEPARATION PRINCIPLE: Each claim tested sequentially and independently. Positive Stage 0 does NOT justify claiming prediction validity. Positive Stage 1 does NOT justify claiming intervention effectiveness.
+
+OFFICIAL-SOURCE LEGAL VERIFICATION CAVEAT:
+- CN122376206A was analyzed through Patsnap Eureka (third-party mirror), not a primary patent-office source. For legal-grade provenance, the actual patent claims/official record should be authoritative. Impact on legal conclusion: LOW (CN122376206A was found non-teaching, which is conservative). Recommended: obtain official claims from CNIPA/Espacenet before any patent filing.
+
+G12 HONEST RECORD:
+- Status: RED — operationally failed.
+- Reason: Suspected false-positive historical artifact (JSON-LD structured data misidentified as URL-embedded credentials).
+- Is this an actual credential leak? NO. No PAT or API key in any committed file. Verified by grep.
+- Why it cannot be fixed without infrastructure change: historical blob in git history; sanitizing HEAD doesn't remove it; git-filter-repo breaks G10; heuristic update is infrastructure code change.
+- Honest statement: 'G12 operationally failed due to a suspected false-positive historical artifact. The repository's own security gate fails. This is infrastructure debt, not a research conclusion. Fix G10/G12/G13 later as a separate authorized infrastructure task.'
+
+CTO FINAL DECISION:
+- STOP CODING. The computational search boundary has been reached.
+- Slot 5: DISCOVERY HYPOTHESIS — NOT patent-surviving. §103 OPEN. Physics untested.
+- Next step: Stage-0 falsification experiment (wet-lab, reality-bound).
+- Kill condition: If ANY of K0_1 through K0_5 fires → KILL + CE-019 + Slot 5 EMPTY.
+- Survival condition: If ALL pass AND success criteria met → advance to Stage 1.
+- No more software: Per CEO directive, do not build more predictors, neural networks, claims, or software around the fragmentation hypothesis. The next proof must come from the physical world.
+
+CONSTITUTION COMPLIANCE:
+- Article I: COMPLIED.
+- Article V: COMPLIED — candidate at DISCOVERY HYPOTHESIS, not promoted.
+- Article XXV: COMPLIED — G12 false positive honestly recorded. Physics untested = UNKNOWN.
+- Article XXVI: COMPLIED — NOT CERTIFIED. CI reports FAILURE. Honest.
+- Article XXVII: COMPLIED — no thresholds invented (>=1s lead time is CEO's specification, not invented).
+- Article XXVIII: COMPLIED.
+- Article XXIX: COMPLIED — 3 claims separated (signal existence vs prediction vs intervention).
+- Article XXXI: COMPLIED — this Round 68 record is the memory artifact.
+- Article XXXII: COMPLIED — strongest alternative stated (no signal exists).
+- Article XXXIV: COMPLIED — STOP CODING. Next step is reality-bound.
+- CE-012: COMPLIED.
+- CE-014: COMPLIED.
+- CE-017: COMPLIED — Stage-0 is the adversarial model-uncertainty test.
+- CE-018 sharpened: COMPLIED.
+
+PORTFOLIO STATUS (FINAL COMPUTATIONAL):
+- Slot 5: DISCOVERY HYPOTHESIS — Stage-0 falsification experiment designed, NOT executed. §103 OPEN. Physics untested. Next step is wet-lab.
+- World-class inventions: 0/5.
+- Human correspondence: 0.
+- Mechanism generation: BLOCKED — physics gate is reality-bound.
+- Cemetery: 18 entries (UNCHANGED).
+- CI: FAILED (11/14). G10/G12/G13 RED. Research state, NOT certified.
+
+Stage Summary:
+- **STOP CODING.** The computational search boundary has been reached. Per CEO Round 67 directive: 'The machine has squeezed out the computational uncertainty; now physics must decide. The next proof cannot come from another model. It must come from the physical world.'
+- **STAGE-0 FALSIFICATION EXPERIMENT DESIGNED.** Smallest experiment capable of killing the hypothesis: Does any measurable signal reliably precede optically-confirmed clot fragmentation by >=1 second? 6-10 clots, 2 compositions, minimum multimodal instrumentation (force + displacement + optical), blinded feature selection, 5 kill conditions. Estimated cost: ~$5K-$10K + 2-4 days. No clinical collaborator or IRB required.
+- **THREE CLAIMS SEPARATED.** (1) Signal existence (Stage 0), (2) prediction validity (Stage 1), (3) intervention effectiveness (Stage 2). Each tested independently. Do NOT collapse.
+- **§103 GATE: OPEN.** Slot 5 is NOT patent-surviving. Current state: DISCOVERY HYPOTHESIS + promising narrow technical question + §103 OPEN + physics untested.
+- **G12 HONESTLY RECORDED.** 'G12 operationally failed due to suspected false-positive historical artifact.' NOT a credential leak. Infrastructure debt. Fix separately.
+- **CEMETERY UNCHANGED AT 18 ENTRIES.**
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: BLOCKED.
+- **NEXT STEP: WET-LAB.** Not software. The physics gate design is documented in ROUND68_STAGE_ZERO_FALSIFICATION_DESIGN.json.
+- **CREDENTIAL HYGIENE:** Both credentials used inline via env var ONLY in prior rounds. NOT persisted.
+- **REMINDER FOR NEXT SESSION:** The next step is NOT software — it is a wet-lab experiment. If the user wants to proceed, they need to provide wet-lab resources (fresh thrombus, force sensor, high-speed camera, transparent vessel mockup). If the user wants to continue computationally, the only remaining task is G10/G12/G13 infrastructure repair (separate authorized task).
