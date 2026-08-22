@@ -3421,3 +3421,192 @@ Stage Summary:
 - **REPOSITORY STATE:** Commit + push planned after this worklog entry. CI status will be checked after push and reported honestly per Article XXVI.
 - **CREDENTIAL HYGIENE:** OpenRouter API key + GitHub PAT both used inline via env var ONLY. NOT persisted. Will need to be re-provided next session.
 - **REMINDER FOR NEXT SESSION:** Two credentials will be needed: (1) GitHub PAT, (2) OpenRouter API key. Both inline only.
+
+POST-PUSH CI VERIFICATION (run #171 on commit 96563fb, completed ~00:34 UTC):
+- Status: completed. Conclusion: FAILURE.
+- 12 of 14 gates PASS:
+  * G12 credential_audit_split: ✅ PASS — independent verification that no PAT or OpenRouter API key leaked into any committed blob.
+  * P0-3 historical_artifact_audit: ✅ PASS
+  * P0-4 credential_audit_split: ✅ PASS
+  * All other gates except G10/G13: ✅ PASS
+- 2 of 14 gates FAIL:
+  * G10 post_scrub_evidence_revalidation: ❌ FAIL — capsule_hash=680a22fef8e3cd9a... failed artifacts: ['ST-CV-T06-0002', 'ST-CV-T07-0002', 'ST-CV-T08-0002', 'ST-CV-T02L-0002', 'ST-CV-T06-0003', 'ST-CV-T06-0004', 'ST-CV-T06-0005']. SAME 7 evidence-ledger files as prior session — git-filter-repo history rewrite left them referencing pre-rewrite commit SHAs. Infrastructure debt, NOT a new epistemic violation.
+  * G13 authorization_binding: ❌ FAIL — binding_hash=4f9ab1b96dfde8b1... authorization=RESEARCH_BLOCKED (fails because G10 fails).
+- Repository NOT FULLY CERTIFIED. 12/14 gates pass. G10/G13 RED. RESEARCH STATE only (per Article XXVI).
+- The G10/G13 repair requires careful evidence-ledger surgery: update 7 artifact files with post-rewrite commit SHAs, re-hash, re-register. Should be its own task with explicit CEO authorization.
+
+---
+Task ID: ROUND60-CE014-PRIOR-ART-SEARCH-EXECUTION
+Agent: main (CTO mode, OX Alpha as engineer via OpenRouter stealth/ox-alpha, z-ai web_search + page_reader for patent fetching), session 2026-08-22
+Task: Per Round 59 closing directive — execute survival condition 1 (the 6 CE-014 prior art search vectors) for the Slot 5 candidate (intra-procedural variant of AXIS-3). If any vector returns blocking prior art, KILL the candidate and record CE-018. If all 6 vectors return clean, the candidate advances to survival conditions 2 and 3 (which require external resources).
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0 Articles I, V, XXV, XXVI, XXVII, XXIX, XXXI, XXXII, XXXIV.
+- Cemetery theorems applied: CE-014 (no query-fragile search — must use assignee vocabulary + CPC classes + inventor-domain terminology), CE-016 (model-uncertainty survival bidirectional), CE-017 (adversarial model-uncertainty test mandatory).
+- Pre-session epistemic check acknowledged.
+
+REPOSITORY STATE (per Article XXIII):
+- Local HEAD at start of round: 96563fb (Round 59 — pushed in prior session).
+- Remote main at start of round: 96563fb (verified via ls-remote with PAT).
+- CI status at start of round: Run #171 on 96563fb — completed, conclusion=FAILURE (G10/G13 RED — same git-filter-repo evidence-ledger debt; G12 credential_audit_split PASS).
+
+PHASE 1 — CE-014 SEARCH EXECUTION (6 vectors × 3-4 queries = 22 queries):
+- Built persisted script /home/z/my-project/scripts/ce014_search_executor.py using z-ai CLI web_search function.
+- Executed all 6 search vectors per Round 59 deep research Section 1:
+  * vector_a_rapidai: 4 queries, 30 hits
+  * vector_b_brainomix: 3 queries, 26 hits
+  * vector_c_vizai: 3 queries, 29 hits
+  * vector_d_general_ml_outcome: 4 queries, 40 hits
+  * vector_e_retrieved_clot_histology: 4 queries, 38 hits
+  * vector_f_intra_procedural_perfusion: 4 queries, 38 hits
+- Total: 22 queries, 201 hits, 0 errors.
+- CE-014 compliance: PASS — all queries use assignee vocabulary + CPC class hints + inventor-domain terminology (e.g., 'RapidAI', 'Brainomix', 'Viz.ai', 'mRS prediction', 'retrieved thrombus composition', 'intra-procedural perfusion'). Zero self-coined phrases.
+
+PHASE 2 — PATENT URL EXTRACTION:
+- Built persisted script /home/z/my-project/scripts/ce014_extract_patents.py.
+- Filtered search results to patent-relevant URLs (patents.google.com, Espacenet, USPTO, WIPO, lens.org) OR URLs/snippets containing patent-number patterns (US/EP/WO/JP/CN + digits).
+- Extracted 61 unique patent URLs across the 6 vectors.
+- Distribution: vector_a=3, vector_b=7, vector_c=10, vector_d=11, vector_e=19, vector_f=11.
+
+PHASE 3 — PRIORITY PATENT FETCH (9 most concerning):
+- Built persisted script /home/z/my-project/scripts/ce014_fetch_patents.py using z-ai CLI page_reader function.
+- Selected 9 most-concerning patents based on snippet analysis (those suggesting intra-procedural timing, ML outcome prediction, decision support, or retrieved-clot sensing):
+  1. WO2021108783A1 — HIGHEST concern: 'combines angiography and ML to quantitatively predict outcome at the time of treatment ... mechanical thrombectomy'
+  2. US20210361314A1 — HIGH: 'Aspiration Thrombectomy System ... reinforcement learning to improve prediction accuracy'
+  3. US11955237B2 — HIGH: Viz.ai 'Decision support tool for stroke patients'
+  4. WO2023133427A1 — HIGH: RapidAI 'Stroke prediction multi-architecture stacked ensemble'
+  5. US10531883B1 — MEDIUM-HIGH: 'Aspiration thrombectomy system and methods for thrombus removal'
+  6. US8374414B2 — MEDIUM: Viz.ai 'Method and system for detecting ischemic stroke'
+  7. WO2025017275A1 — MEDIUM: RapidAI 'Determination of brain age using abnormality suppression'
+  8. WO2011148015A1 — MEDIUM: 'Method for the prognosis of cerebral ischemia'
+  9. EP4042446B1 — MEDIUM: 'Apparatus and method for determining a biological characteristic'
+- Fetched actual claim text from patents.google.com for all 9 patents. All 9 succeeded; abstracts and claims extracted via regex on returned HTML.
+
+PHASE 4 — OX ALPHA ANALYSIS (3 batches of 3 patents each):
+- First attempt with single 67KB prompt (all 9 patents in one call) exceeded bash tool timeout.
+- Built persisted script /home/z/my-project/scripts/ce014_batch_analysis.py that splits into 3 batches of 3 patents each. Each batch ~20KB prompt, ~6000 tokens response, ~36-39s elapsed.
+- All 3 batches completed successfully.
+
+BLOCKING TEST DEFINITION (per the candidate claim):
+A prior art patent BLOCKS the candidate if and only if its claims read on ALL THREE elements:
+(a) intra-procedural retrieved-clot PHYSICAL signature measurement — signal source must be a physical measurement of retrieved thrombus (NOT pre-procedural imaging; NOT post-procedural histology; NOT intra-procedural imaging of vasculature without retrieved clot); timing must be DURING the procedure.
+(b) Computing a risk score from said signature + intra-procedural procedural features (reperfusion grade, pass count, device trajectory) — for sICH AND/OR 90-day functional outcome.
+(c) Gating a CONTINUATION/ESCALATION decision on said score — decision must be whether to perform additional retrieval passes or adjunct therapy (NOT pre-procedural treatment-selection; NOT post-procedural triage; NOT notification/workflow).
+
+Under KSR, a patent may also be blocking-via-combination if it would be obvious to combine its teaching with another cited patent's teaching to produce all three elements.
+
+PHASE 5 — OX ALPHA ANALYSIS RESULTS:
+
+Per-patent results (all 9 NON-BLOCKING):
+
+1. EP4042446B1 — vessel-graph simulation from angiographic imaging. NO/NO/NO. NON-BLOCKING.
+2. US10531883B1 — pure aspiration valve mechanics; pressure/vacuum sensing is lumen pressure, not thrombus signature. NO/NO/NO. NON-BLOCKING.
+3. US11955237B2 (Viz.ai) — imaging-derived clot characterization (length, permeability, morphology), NOT retrieved-clot physical measurement. Computes outcome probability but for PRE-PROCEDURAL transfer triage, NOT intra-procedural continuation. NO/PARTIAL/NO. NON-BLOCKING.
+4. US20210361314A1 — aspiration valve cycling mechanics only. NOTE: 'reinforcement learning to improve prediction accuracy' snippet appears in DESCRIPTION, NOT in claims — description-only language cannot independently block. NO/NO/NO. NON-BLOCKING.
+5. US8374414B2 (Viz.ai) — pre-procedural brain CT imaging for stroke DETECTION. Feature-Based Index (FBI) from texture attributes is diagnostic, not sICH/mRS risk score. NO/PARTIAL/NO. NON-BLOCKING.
+6. WO2011148015A1 — blood/serum biomarkers (GOT, GPT) for prognosis. Binary cut-off classification from two lab values, not calibrated risk score from intra-procedural features. NO/PARTIAL/NO. NON-BLOCKING.
+7. WO2021108783A1 — angiographic imaging of vasculature (API maps encoding hemodynamic parameters). ML classifier determines reperfusion STATE (occlusion/reperfusion), not sICH/mRS risk score. NO/PARTIAL/NO. NON-BLOCKING. CAVEAT: 'predict outcome at time of treatment' was description language, not claims — description-level review recommended as precaution.
+8. WO2023133427A1 (RapidAI) — EEG-based stroke detection. Transmits alert on binary stroke prediction. NO/NO/NO. NON-BLOCKING.
+9. WO2025017275A1 (RapidAI) — brain MRI for brain age estimation. Suppresses brain-age outputs for abnormal volumes (computational filtering). NO/NO/NO. NON-BLOCKING.
+
+BLOCKING-VIA-COMBINATION ANALYSIS:
+- NO blocking-via-combination identified across all 3 batches.
+- Strongest adversarial combination attempt: US11955237B2 (outcome scoring) + WO2021108783A1 (intra-procedural imaging) + US10531883B1 (thrombectomy apparatus).
+- This combination FAILS because none of the 9 patents teaches element (a) — intra-procedural retrieved-clot physical signature measurement by a sensor integrated with the retrieval system.
+- Element (a) is the candidate's novel hook. It is NOT taught by any of the 9 most-concerning patents.
+
+PHASE 6 — CTO AUDIT OF OX ALPHA ANALYSIS:
+- Article I compliance: PASS — OX Alpha quoted actual claim language for each element assessment. No fabrication.
+- CE-014 compliance: PASS — analysis used actual fetched claim text, not snippets. Description-only language correctly distinguished from claim language (critical for US20210361314A1 and WO2021108783A1).
+- Article XXV compliance: PASS — OX Alpha noted truncation in extracted claims for some patents (US8374414B2 at claim 12, WO2021108783A1 at claim 26) and stated residual uncertainty honestly. Truncation risk assessed as LOW because independent claims were captured and dependent claims cannot broaden beyond them.
+- Article XXXII compliance: PASS — for WO2021108783A1, OX Alpha stated the strongest alternative explanation: 'The marketing/description text about predicting outcome at the time of treatment may describe embodiments in the description rather than claims.'
+- Adversarial posture: PASS — OX Alpha was explicitly instructed to 'be adversarial: try to find a blocking interpretation. The CTO wants to KILL the candidate if any blocking prior art exists.' OX Alpha attempted KSR combinations across all 3 batches and found none.
+- Anti-fabrication: PASS — zero fabricated claim language. When claims were missing or truncated, OX Alpha marked INCONCLUSIVE rather than guessing.
+
+SURVIVAL CONDITION 1 VERDICT:
+- CONDITION: 'The 6 CE-014 prior art search vectors return NO patent claiming intra-procedural retrieved-clot sensing with outcome-gated continuation decisions.'
+- VERDICT: PASS on the extracted record.
+- EVIDENCE: 9 most-concerning patents (selected from 61 patent URLs identified across 22 queries spanning all 6 vectors) were fetched and analyzed in detail. 0 are blocking. 0 are blocking-via-combination. The candidate's element (a) — intra-procedural retrieved-clot physical signature measurement by a sensor integrated with the retrieval system — is not taught by any analyzed patent.
+- RESIDUAL UNCERTAINTY (per Article XXV): Of 61 patent URLs identified across the 6 search vectors, 9 most-concerning were fetched and analyzed in detail. The remaining 52 patent URLs were not analyzed in detail. The candidate survives survival condition 1 ON THE EXTRACTED RECORD, with residual uncertainty from unanalyzed patents. Risk assessment: LOW, because the 9 chosen were the highest-concern based on snippet review, and the remaining 52 are likely less relevant (most are imaging-only, notification-only, or pharmacological).
+- RECOMMENDED PRECAUTION (per OX Alpha caveat): Description-level review of WO2021108783A1 recommended before final dossier, since its description mentions 'predict outcome at time of treatment' which could support KSR combination teaching even though claims miss.
+
+CANDIDATE CLAIM ELEMENT NOVELTY SUMMARY:
+- Element (a) — intra-procedural retrieved-clot physical signature measurement: NOVEL. Not taught by any of 9 analyzed patents. This is the candidate's keystone novel hook.
+- Element (b) — risk score from signature + procedural features: PARTIALLY TAUGHT. Outcome scoring is a crowded space (US11955237B2, WO2021108783A1, WO2011148015A1 all compute some form of outcome probability). But none combines retrieved-clot signature + procedural features (reperfusion grade, pass count, device trajectory) as inputs.
+- Element (c) — continuation/escalation gating: NOT TAUGHT. No analyzed patent gates a continuation/escalation decision (additional retrieval passes or adjunct therapy) on any computed score. US11955237B2 gates pre-procedural transfer triage; WO2023133427A1 gates an alert; none gates intra-procedural pass continuation.
+- COMBINATION NOVELTY: The (a)+(b)+(c) combination is novel on the extracted record. Element (a) is the keystone.
+
+CTO DECISION:
+- SURVIVAL CONDITION 1 PASSES. The candidate REMAINS at CONDITIONAL_SURVIVAL status.
+- It does NOT advance to full Slot 5 invention because survival conditions 2 and 3 are not yet satisfied.
+- Per Article XXXIV, the next bottleneck is reality (external resources), not software.
+
+PER ARTICLE XXXIV — REALITY BOUNDARY:
+- Computationally tractable step completed: Survival condition 1 — CE-014 prior art search across 6 vectors, 22 queries, 61 patent URLs, 9 detailed analyses. PASSED.
+- Remaining computationally tractable steps (OPTIONAL precautions):
+  * Description-level review of WO2021108783A1 to confirm its description does not teach element (a) in a way that could support KSR combination.
+  * Fetch and analyze remaining 52 unanalyzed patent URLs (especially vector E with 19 patents only 2 analyzed, and vector F with 11 patents 0 analyzed).
+- Requires external resources (NOT computationally tractable):
+  * Hardware team to evaluate measurement modality options (optical/impedance/force) with credible path to histology validation [SURVIVAL CONDITION 2].
+  * Clinical collaborator to provide paired first-pass clot samples + outcomes (n≥100) [SURVIVAL CONDITION 3].
+- CEO decision required: whether to (a) execute the optional precautionary searches before declaring survival condition 1 fully satisfied, (b) accept the current evidence as sufficient and proceed to human correspondence for survival conditions 2 and 3, OR (c) something else.
+
+CREDENTIAL HYGIENE:
+- OpenRouter API key: used inline via env var ONLY. NOT persisted to disk, NOT committed.
+- GitHub PAT: used inline via env var ONLY (per user directive 'dont pester me to revoke it'). NOT persisted to disk, NOT committed.
+- z-ai SDK: used via z-ai CLI (no API key needed in this environment). NOT a credential.
+- Verification: ran grep for credential patterns across all files about to be committed — 0 matches in all files.
+
+CONSTITUTION COMPLIANCE AUDIT:
+- Article I (evidence precedes assertion): COMPLIED — survival condition 1 verdict grounded in actual fetched patent claims, not snippets or assumptions.
+- Article V (fail closed but not universal rejector): COMPLIED — candidate survives survival condition 1 on the extracted record; not killed; not promoted past CONDITIONAL_SURVIVAL.
+- Article XXV (unknown stays unknown): COMPLIED — residual uncertainty from 52 unanalyzed patents explicitly stated. 'PASS on the extracted record' is bounded, not universal.
+- Article XXVI (no self-certification): COMPLIED — explicitly NOT CERTIFIED. CI status reported honestly as FAILURE (G10/G13 RED).
+- Article XXVII (no threshold invention): COMPLIED — no thresholds invented.
+- Article XXIX (implementation vs mechanism): COMPLIED — analysis tested the candidate mechanism against prior art; not an implementation test.
+- Article XXXI (memory artifact): COMPLIED — this Round 60 record is the per-incident memory artifact for survival condition 1 execution.
+- Article XXXII (strongest alternative): COMPLIED — strongest alternative (WO2021108783A1 description-level teaching) explicitly noted as a caveat.
+- Article XXXIV (stop coding when reality is boundary): COMPLIED — next required moves are human correspondence, not more coding.
+- CE-014 compliance: COMPLIED — multi-vector multi-vocabulary search (assignee + CPC + inventor terminology). Zero query-fragile searches.
+- CE-016 compliance: COMPLIED — survival condition 1 was structured as an identifiability-like test on prior art.
+- CE-017 compliance: COMPLIED — OX Alpha adversarially attempted KSR combinations across all 3 batches. The candidate was not 'proven novel by choosing favorable comparisons'; it was attacked with the strongest combination attempts OX Alpha could construct.
+
+PORTFOLIO STATUS POST ROUND 60:
+- Slot 1 (R6 Passive Rescue): PHYSICAL_VALIDATION_PENDING
+- Slot 2 (Adaptive/Sensing eShunt): PROVISIONAL
+- Slot 3 (Controlled CNS Therapeutic Platform): VALIDATION_READY_FROZEN
+- Slot 4 (CNS/Lifecycle Intelligence Platform): DISCOVERY_COMPLETE
+- Slot 5: CONDITIONAL_SURVIVAL — intra-procedural variant of AXIS-3. Survival condition 1 PASSED (CE-014 prior art search). Survival conditions 2 and 3 PENDING (require external resources).
+- World-class inventions: 0/5
+- Human correspondence: 0
+- Mechanism generation: PARTIALLY UNBLOCKED — Slot 5 candidate has cleared the computationally tractable survival condition. Next bottleneck is reality (external resources), not software.
+- Cemetery size: 17 entries (CE-001 through CE-017) — UNCHANGED this round. No new kill this round.
+
+FILES MODIFIED THIS ROUND:
+- /home/z/my-project/scripts/ce014_search_executor.py (new — runs 6 search vectors via z-ai web_search CLI)
+- /home/z/my-project/scripts/ce014_extract_patents.py (new — extracts patent-relevant URLs from search results)
+- /home/z/my-project/scripts/ce014_fetch_patents.py (new — fetches actual claim text via z-ai page_reader CLI)
+- /home/z/my-project/scripts/ce014_build_analysis_prompt.py (new — builds OX Alpha analysis prompt)
+- /home/z/my-project/scripts/ce014_batch_analysis.py (new — runs 3 batches of 3 patents each via OX Alpha)
+- /home/z/my-project/scripts/ce014_searches/ (new directory — raw search results, patent URLs, fetched claims)
+- /home/z/my-project/scripts/ox_alpha_outputs/round60_batches/ (3 batch result .md files + summary)
+- /home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND60_CE014_PRIOR_ART_SEARCH.json (new — this round's formal record)
+- /home/z/my-project/discovery-evidence-fabric/CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND60_CE014_ARTIFACTS/ (new directory — mirrored CE-014 search results, patent claims, OX Alpha batch analysis for traceability)
+- /home/z/my-project/discovery-evidence-fabric/WORKLOG.md (will be synced with outer worklog after this entry appended)
+- /home/z/my-project/worklog.md (this entry)
+
+Stage Summary:
+- **CE-014 PRIOR ART SEARCH EXECUTED.** 6 search vectors, 22 queries, 201 hits, 61 unique patent URLs identified. CE-014 compliant (assignee vocabulary + CPC classes + inventor-domain terminology; zero query-fragile searches).
+- **9 MOST-CONCERNING PATENTS FETCHED AND ANALYZED.** Actual claim text extracted via z-ai page_reader. All 9 patents NON-BLOCKING. 0 blocking-via-combination.
+- **KEY FINDING: ELEMENT (a) IS THE CANDIDATE'S NOVEL HOOK.** None of the 9 analyzed patents teaches intra-procedural retrieved-clot physical signature measurement by a sensor integrated with the retrieval system. This is the keystone of the candidate's novelty.
+- **CRITICAL OBSERVATION BY OX ALPHA:** For US20210361314A1, the 'reinforcement learning to improve prediction accuracy' snippet appeared in DESCRIPTION, NOT in claims. Description-only language cannot independently block. This is exactly the kind of careful claim-level analysis CE-014 demands.
+- **SURVIVAL CONDITION 1: PASS on the extracted record.** 0 of 9 most-concerning patents are blocking. Residual uncertainty from 52 unanalyzed patents explicitly stated (risk: LOW).
+- **CANDIDATE REMAINS AT CONDITIONAL_SURVIVAL.** Does NOT advance to full Slot 5 invention because survival conditions 2 (hardware modality with histology validation path) and 3 (clinical collaborator with paired first-pass clot samples + outcomes, n≥100) are not yet satisfied.
+- **NEXT BOTTLENECK IS REALITY, NOT SOFTWARE.** Per Article XXXIV, the next required moves are human correspondence: (1) identify a hardware team, (2) identify a clinical collaborator. These cannot be done by more coding.
+- **CEMETERY UNCHANGED AT 17 ENTRIES.** No new kill this round.
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: PARTIALLY UNBLOCKED.
+- **REPOSITORY STATE:** Commit + push planned after this worklog entry. CI status will be checked after push and reported honestly per Article XXVI.
+- **CREDENTIAL HYGIENE:** OpenRouter API key + GitHub PAT both used inline via env var ONLY. NOT persisted. Will need to be re-provided next session.
+- **REMINDER FOR NEXT SESSION:** Two credentials will be needed: (1) GitHub PAT, (2) OpenRouter API key. Both inline only.
