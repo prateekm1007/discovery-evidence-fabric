@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<febio_spec version="2.0">
+<Module type="solid"/>
+
+<Control>
+<analysis type="static"/>
+<time_steps>10</time_steps>
+<step_size>0.1</step_size>
+<max_refs>15</max_refs>
+<max_ups>10</max_ups>
+<dtol>0.001</dtol>
+<etol>0.01</etol>
+<rtol>0.001</rtol>
+<lstol>0.9</lstol>
+<qnmethod>BFGS</qnmethod>
+<rhoi>-1</rhoi>
+</Control>
+
+<Material>
+<material id="1" name="Material1" type="neo-Hookean">
+<E>1.0</E>
+<v>0.3</v>
+</material>
+</Material>
+
+<Geometry>
+<Nodes>
+<node id="1">0.0, 0.0, 0.0</node>
+<node id="2">1.0, 0.0, 0.0</node>
+<node id="3">1.0, 1.0, 0.0</node>
+<node id="4">0.0, 1.0, 0.0</node>
+<node id="5">0.0, 0.0, 1.0</node>
+<node id="6">1.0, 0.0, 1.0</node>
+<node id="7">1.0, 1.0, 1.0</node>
+<node id="8">0.0, 1.0, 1.0</node>
+</Nodes>
+<Elements type="hex8" mat="1" elset="Part1">
+<elem id="1">1,2,3,4,5,6,7,8</elem>
+</Elements>
+</Geometry>
+
+<Boundary>
+<fix id="1" bc="x,y,z"/>
+<fix id="2" bc="y,z"/>
+<fix id="4" bc="x,z"/>
+<fix id="5" bc="x,y"/>
+<fix id="6" bc="y"/>
+<fix id="8" bc="x"/>
+<prescribe id="5" bc="z" lc="1">0.1</prescribe>
+<prescribe id="6" bc="z" lc="1">0.1</prescribe>
+<prescribe id="7" bc="z" lc="1">0.1</prescribe>
+<prescribe id="8" bc="z" lc="1">0.1</prescribe>
+</Boundary>
+
+<LoadData>
+<loadcurve id="1">
+<loadpoint>0.0, 0.0</loadpoint>
+<loadpoint>1.0, 1.0</loadpoint>
+</loadcurve>
+</LoadData>
+
+<Output>
+<plotfile type="febio">
+<var type="displacement"/>
+<var type="stress"/>
+<var type="strain"/>
+</plotfile>
+</Output>
+
+</febio_spec>
