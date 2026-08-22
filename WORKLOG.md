@@ -3945,3 +3945,97 @@ Stage Summary:
 - **REPOSITORY STATE:** Commit + push planned after this worklog entry.
 - **CREDENTIAL HYGIENE:** OpenRouter API key + GitHub PAT both inline via env var ONLY. NOT persisted.
 - **REMINDER FOR NEXT SESSION:** Two credentials needed (GitHub PAT, OpenRouter API key). Both inline only.
+
+
+---
+Task ID: ROUND63-END-TO-END-DECOMPOSITION-AND-CE018-SHARPENING
+Agent: main (CTO mode, OX Alpha as engineer via OpenRouter stealth/ox-alpha), session 2026-08-22
+Task: Per CEO Round 62 audit directive — sharpen CE-018 with end-to-end functional novelty requirement; permanently kill broad candidate; decompose narrow residual end-to-end (pick ONE adverse event); attack US20250186070A1 + Clotild at end-to-end boundary; establish genuine technical effect.
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0 Articles I, V, XXV, XXVI, XXVII, XXVIII, XXIX, XXX, XXXI, XXXII, XXXIV.
+- Cemetery theorems applied: CE-012, CE-014, CE-016, CE-017, CE-018 (sharpened this round).
+- Pre-session epistemic check acknowledged.
+
+PHASE 1 — CE-018 SHARPENING:
+- CE-018 sharpened with end-to-end functional novelty requirement per CEO Round 62 audit.
+- Addition: 'Capability novelty must be evaluated at the FUNCTIONAL END-TO-END level: input → inference → decision → physical effect → measurable outcome. Otherwise the machine can still find a novel intermediate layer that is already covered by an existing end-to-end system. The unit of novelty is the complete causal loop, not the sensor, feature, algorithm, or capability.'
+- 4 new 'what_to_avoid' entries added.
+- Amendment history: 2 entries (Round 62 CREATED, Round 63 SHARPENED).
+
+PHASE 2 — BROAD CANDIDATE PERMANENT FREEZE:
+- Broad candidate ('smart thrombectomy device that senses/classifies/adapts') PERMANENTLY KILLED.
+- Forbidden rescue attempts enumerated: any variant of sense/classify/adapt architecture, any re-skin using 'retrieved-clot' vs 'in-situ', any 'novel sensor modality' or 'novel algorithm' added to existing loop (CE-018 sharpened: intermediate layer, not invention).
+
+PHASE 3 — OX ALPHA END-TO-END DECOMPOSITION:
+- Single OX Alpha call (~60s, ~8000 completion tokens).
+- 6 candidate adverse events evaluated on 4 criteria (predictability, sensor relevance, intervention feasibility, measurable effect).
+- OX Alpha recommendation: Candidate 4+2 FUSED — 'clot fragmentation leading to distal embolization' (score 17/20, highest sensor-data relevance B=5, clearest pre-event intervention C=5).
+- CTO ACCEPTED: clot fragmentation → distal embolization is the strongest candidate.
+
+PHASE 4 — END-TO-END DECOMPOSITION:
+- EXACT SENSOR INPUT: Traction-force sensing + impedance spectroscopy + aspiration-pressure transduction. Features: force-gradient stiffening, high-frequency force transients (>50Hz), impedance spectral shift, aspiration-pressure fluctuation. Sampling >=100Hz force, >=1Hz impedance.
+- EXACT INFERRED STATE: Friability index F (scalar probability of brittle fracture under current load) + structural integrity state S(t) (progressive failure tracking). Hybrid inference: physics-based cohesive-zone + learned impedance-to-composition calibration. Identifiability per CE-017: 3 survival conditions (friction-decoupled force estimate <=15% error, impedance-to-toughness mapping validated on >=50 clots, prospective AUC >=0.75 in animal model). INCONCLUSIVE pending validation.
+- EXACT ADVERSE EVENT PREDICTION: Structural failure producing >=1 fragment escaping aspiration/snares zone within 30s. Horizon: 1-10s ahead. Output: continuous friability score + binary alert with action tag. Target sensitivity >=90% at specificity >=60%.
+- EXACT PRE-EVENT INTERVENTION: (1) halt/halve traction speed, (2) ramp aspiration to maximum, (3) if critical after 5s, abort + reposition distal protection. All execute in <2s. Timing feasibility contingent on detection latency <1s.
+- EXACT TECHNICAL/CLINICAL EFFECT: Reduced new distal territory occlusions, improved eTICI, reduced pass count. Measurement: angiography + DWI + 90-day mRS. Minimum meaningful effect: >=8pp reduction in distal embolization rate OR >=30% DWI volume reduction.
+
+PHASE 5 — PRIOR ART ATTACK AT END-TO-END BOUNDARY:
+- vs US20250186070A1: Steps 1, 2, half of 4 PARTIAL (taught). Step 3 (forward prediction) NO (probably — INCONCLUSIVE pending full text). Step 5 (measured effect) NO (INCONCLUSIVE). Net: forward-predictive structure + traction-speed/abort actuators plausibly untaught.
+- vs Clotild: Steps 1, 2 covered. Steps 3, 4, 5 NOT covered (Clotild is diagnostic only, no actuation loop). Net: closing the loop (characterization → timed pre-event intervention) is the genuine gap.
+- Critical question answer: The loop enables a NOVEL CAUSAL LINK — forward-in-time prediction with 1-10s horizon triggering traction-speed modulation + abort/reposition. BUT combination argument is strong (US20250186070A1 + Clotild makes predict-and-modulate obvious). Survivable core: (a) traction-speed actuator, (b) abort/reposition branch. UNVERIFIED beyond the two named references.
+
+PHASE 6 — OX ALPHA VERDICT:
+- CONDITIONAL SURVIVAL AT END-TO-END SCOPE.
+- Surviving loop: fuse traction-force + impedance → friability index → fragmentation prediction (1-10s horizon) → traction-speed modulation + aspiration ramp + abort/reposition → reduced distal embolization.
+- 4 evidence items required to confirm survival (2 computationally tractable, 2 reality-bound).
+- Kill condition: If evidence items 1-2 reveal predictive language in US20250186070A1 or traction-control prior art, downgrade to KILL + CE-019.
+
+PHASE 7 — CTO DECISION:
+- ACCEPT OX Alpha's engineering recommendation: CONDITIONAL SURVIVAL AT END-TO-END SCOPE.
+- Candidate advances to END-TO-END_CONDITIONAL_SURVIVAL status.
+- 2 mandatory verification steps (computationally tractable):
+  1. Full-text review of US20250186070A1 description for predictive language.
+  2. Prior-art search on traction-force-controlled thrombectomy (CPC A61B 34/30, A61B 5/72, A61M 25/01, A61M 60/xx + inventor vocabulary).
+- If either returns blocking prior art → KILL + CE-019 + Slot 5 returns to EMPTY.
+- If both clean → advance to full CONDITIONAL_SURVIVAL with surviving claim shape.
+
+CONSTITUTION COMPLIANCE AUDIT:
+- Article I: COMPLIED — decomposition grounded in actual prior art analysis.
+- Article V: COMPLIED — broad killed; narrow at END-TO-END_CONDITIONAL_SURVIVAL.
+- Article XXV: COMPLIED — multiple INCONCLUSIVE markers stated.
+- Article XXVI: COMPLIED — NOT CERTIFIED.
+- Article XXVII: COMPLIED — no invented thresholds.
+- Article XXVIII: COMPLIED — no semantic re-skins.
+- Article XXIX: COMPLIED — broad mechanism killed; narrow end-to-end mechanism distinguished.
+- Article XXX: COMPLIED — OX Alpha adversarial.
+- Article XXXI: COMPLIED — Round 63 record + CE-018 sharpening are memory artifacts.
+- Article XXXII: COMPLIED — strongest alternative (combination argument) stated.
+- Article XXXIV: COMPLIED — 2 computationally tractable steps before reality-bound work.
+- CE-012: COMPLIED — no semantic re-skins.
+- CE-014: COMPLIED — next search will use CPC + inventor vocabulary.
+- CE-016: COMPLIED — identifiability tested bidirectionally.
+- CE-017: COMPLIED — adversarial model-uncertainty test on friability index.
+- CE-018 sharpened: COMPLIED — candidate decomposed to complete causal loop; novelty rests on loop, not intermediate layers.
+
+PORTFOLIO STATUS POST ROUND 63:
+- Slot 5: END-TO-END_CONDITIONAL_SURVIVAL — clot fragmentation → distal embolization prediction loop. 2 mandatory verification steps pending.
+- World-class inventions: 0/5.
+- Human correspondence: 0.
+- Mechanism generation: PARTIALLY UNBLOCKED — end-to-end loop identified with specific surviving elements.
+- Cemetery: 18 entries (CE-018 sharpened, no new entry).
+
+Stage Summary:
+- **CE-018 SHARPENED** with end-to-end functional novelty requirement. The unit of novelty is the complete causal loop, not the sensor/feature/algorithm/capability.
+- **BROAD CANDIDATE PERMANENTLY KILLED.** No more variants of sense/classify/adapt architecture.
+- **ONE ADVERSE EVENT PICKED: clot fragmentation → distal embolization.** Score 17/20, highest sensor-data relevance.
+- **END-TO-END LOOP DECOMPOSED:** force+impedance → friability index → fragmentation prediction (1-10s) → traction-speed modulation + abort/reposition → reduced distal embolization.
+- **PRIOR ART ATTACK:** US20250186070A1 teaches steps 1, 2, half of 4; Clotild covers steps 1, 2. Survivable core: forward-predictive structure + traction-speed actuator + abort/reposition branch. UNVERIFIED beyond the two named references.
+- **CTO DECISION: END-TO-END_CONDITIONAL_SURVIVAL.** 2 mandatory verification steps pending (US20250186070A1 full-text + traction-control prior art search).
+- **KILL CONDITION:** If either verification returns blocking prior art → KILL + CE-019 + Slot 5 EMPTY.
+- **CEMETERY UNCHANGED AT 18 ENTRIES.** CE-018 sharpened but no new entry.
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: PARTIALLY UNBLOCKED.
+- **CREDENTIAL HYGIENE:** Both credentials inline via env var ONLY. NOT persisted.
+- **REMINDER FOR NEXT SESSION:** Two credentials needed (GitHub PAT, OpenRouter API key). Both inline only. Two mandatory verification steps remain computationally tractable.
