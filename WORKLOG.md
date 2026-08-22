@@ -4241,3 +4241,76 @@ Stage Summary:
 - **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: PARTIALLY UNBLOCKED.
 - **CREDENTIAL HYGIENE:** Both credentials inline via env var ONLY. NOT persisted.
 - **REMINDER FOR NEXT SESSION:** Two credentials needed (GitHub PAT, OpenRouter API key). Both inline only. PHYSICS GATE requires external wet-lab resources. Adjacent-field search is computationally tractable and recommended before finalizing Slot 5.
+
+
+---
+Task ID: ROUND66-ADJACENT-SPEED-CONTROL-ATTACK-AND-LEGAL-DOWNGRADE
+Agent: main (CTO mode, OX Alpha as engineer via OpenRouter stealth/ox-alpha, z-ai web_search + page_reader), session 2026-08-22
+Task: Per CEO Round 65 audit directive — downgrade legal conclusion (§103 gate OPEN, not PASS); execute adjacent automated-speed-control prior-art attack; pre-register 6 physics gate kill conditions; separate prediction from intervention.
+
+Work Log:
+
+CONSTITUTION RE-CERTIFICATION:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0 Articles I, V, XXV, XXVI, XXVII, XXVIII, XXIX, XXX, XXXI, XXXII, XXXIV.
+- Cemetery theorems applied: CE-012, CE-014, CE-017, CE-018.
+- CRITICAL ACKNOWLEDGMENT: Round 65 committed a CE-012-adjacent error — promoted a narrow keyword finding ('velocity' absent from US11504151B2) into a broad legal conclusion ('LEGAL GATE PASSES definitively'). This conflated a narrow factual win with the broader §103 question. Corrected this round.
+
+PHASE 1 — ADJACENT AUTOMATED-SPEED-CONTROL PRIOR ART SEARCH:
+- 10 CE-014-compliant queries using CEO's exact terms + adjacent vocabulary.
+- 10 patent hits + 32 non-patent hits identified.
+- Most concerning: EP3806757B1 (sensor→controller→automatic flow-rate modulation), US11096712B2 (valve cycling), EP3823686B1 (valve cycling), CN122376206A (2026, algorithm→detection→actuation — claims not fetched).
+- Competitive frontier: Rapidpulse (real-time controller), Patsnap ML clot engagement detection, Stephen Pons 2025 sensor-controlled thrombectomy.
+
+PHASE 2 — PATENT CLAIMS FETCH:
+- 3 of 5 patents fetched successfully (US10226263B2 and CN122376206A failed — rate-limited/blocked).
+- EP3806757B1 KEY FINDING: Claims teach sensing unit (differential pressure, magnetic/acoustic/optical/thermal flow sensors) + controller configured to AUTOMATICALLY CLOSE valve to stop flow when signal indicates unrestricted flow. This is SENSOR → CONTROLLER → AUTOMATIC FLOW-RATE MODULATION in thrombectomy. 45 'flow', 30 'control', 13 'sensor', 4 'automatic' in claims.
+- US11096712B2 and EP3823686B1: valve cycling pressure/flow control. NOT traction-speed modulation.
+
+PHASE 3 — OX ALPHA §103 ASSESSMENT:
+- Section 1: EP3806757B1 teaches sensor→controller→automatic flow-rate modulation (YES). But FLOW-RATE ≠ TRACTION-VELOCITY (different actuators, different physics). Full loop (sensor→forward prediction→pre-event intervention) NOT taught — all identified loops are REACTIVE.
+- Section 2: §103 combination attack is STRONG. Reconstruction: EP3806757B1 + US11504151B2 + US20250186070A1 + general predictive control → candidate's loop is arguably obvious. What blocks full reconstruction: (a) no reference teaches predicting fragmentation as future event, (b) no reference ties adjustment to embolization-prevention via strain-rate reduction, (c) motivation is generic. Residual non-obviousness lives in 2 empirical questions: specific friability-precursor signal + velocity-specific actuation.
+- Section 3: Force/flow/velocity distinction is GENUINE at physics level but NOT a safe harbor at claim-construction level (CE-012 trap). A POSITA would regard all three as alternative actuators in the same control space. Claim survives ONLY IF it recites traction-velocity driven specifically by forward-prediction signal.
+- Section 4: LEGAL CONCLUSION DOWNGRADED per CEO directive: 'US11504151B2 velocity-language check: PASS; §103 gate: OPEN.' Legal novelty NOT established.
+- Section 5: 6 physics gate kill conditions pre-registered with specific measurement protocols.
+- Section 6: CONDITIONAL SURVIVAL — PHYSICS GATE BLOCKED. §103 OPEN. Physics gate is decisive test.
+
+CTO DECISION:
+- CONDITIONAL SURVIVAL — PHYSICS GATE BLOCKED. Legal conclusion downgraded.
+- Corrected legal status: 'US11504151B2 velocity-language check: PASS; §103 gate: OPEN.'
+- Slot 5 status: CONDITIONAL_SURVIVAL — PHYSICS GATE BLOCKED. Not killed (physics gate not yet executed). Not promoted (§103 OPEN, physics unproven).
+- Next moves: (1) OPTIONAL targeted follow-up search for direct traction-velocity prior art; (2) REQUIRED physics gate experiment with 6 pre-registered kill conditions; (3) If ALL 6 pass → advance to validation program; (4) If ANY fires → KILL + CE-019 + Slot 5 EMPTY.
+
+CONSTITUTION COMPLIANCE:
+- Article I: COMPLIED.
+- Article V: COMPLIED — candidate at CONDITIONAL_SURVIVAL (not killed, not promoted).
+- Article XXV: COMPLIED — INCONCLUSIVE markers stated (CN122376206A, Rapidpulse citation IDs, experimental study IDs).
+- Article XXVI: COMPLIED — NOT CERTIFIED.
+- Article XXVIII: COMPLIED — legal conclusion downgraded; no semantic promotion.
+- Article XXIX: COMPLIED.
+- Article XXX: COMPLIED — OX Alpha adversarial.
+- Article XXXI: COMPLIED — this Round 66 record + legal downgrade are memory artifacts.
+- Article XXXII: COMPLIED — strongest alternative stated (query selection artifact; INCONCLUSIVE on direct traction-velocity prior art).
+- Article XXXIV: COMPLIED — physics gate is reality-bound.
+- CE-012: COMPLIED — force/flow/velocity distinction honestly assessed as not a safe harbor at claim level.
+- CE-014: COMPLIED.
+- CE-017: COMPLIED — physics gate is the adversarial model-uncertainty test.
+- CE-018 sharpened: COMPLIED — complete causal loop assessed.
+
+PORTFOLIO STATUS POST ROUND 66:
+- Slot 5: CONDITIONAL_SURVIVAL — PHYSICS GATE BLOCKED. §103 OPEN. Legal novelty not established. Physics gate is decisive.
+- World-class inventions: 0/5.
+- Human correspondence: 0.
+- Mechanism generation: BLOCKED — physics gate is reality-bound.
+- Cemetery: 18 entries (UNCHANGED).
+
+Stage Summary:
+- **LEGAL CONCLUSION DOWNGRADED per CEO directive.** 'US11504151B2 velocity-language check: PASS; §103 gate: OPEN.' The narrow keyword finding does not establish legal novelty.
+- **ADJACENT ART ATTACK EXECUTED.** EP3806757B1 teaches sensor→controller→automatic flow-rate modulation in thrombectomy. Combined with US11504151B2 + US20250186070A1 + general predictive control, the candidate's loop is arguably obvious under §103.
+- **§103 GATE IS OPEN.** Combination attack is STRONG. Residual non-obviousness lives in 2 empirical questions: (a) specific friability-precursor signal, (b) velocity-specific actuation. Both are PHYSICS questions, not legal ones.
+- **FORCE/FLOW/VELOCITY DISTINCTION IS NOT A SAFE HARBOR** at claim-construction level (CE-012 trap). Claim survives ONLY IF it recites traction-velocity driven specifically by forward-prediction signal.
+- **6 PHYSICS GATE KILL CONDITIONS PRE-REGISTERED:** (1) median lead time <1s, (2) high FP rate, (3) precursor disappears under realistic conditions, (4) signal varies with device motion not clot state, (5) intervention cannot execute, (6) intervention fails to reduce embolization. Each has specific measurement protocol.
+- **CTO DECISION: CONDITIONAL_SURVIVAL — PHYSICS GATE BLOCKED.** Not killed (physics not yet executed). Not promoted (§103 OPEN, physics unproven). Physics gate is the decisive test.
+- **CEMETERY UNCHANGED AT 18 ENTRIES.**
+- **WORLD-CLASS INVENTIONS: 0/5.** Human correspondence: 0. Mechanism generation: BLOCKED.
+- **CREDENTIAL HYGIENE:** Both credentials inline via env var ONLY. NOT persisted.
+- **REMINDER FOR NEXT SESSION:** Two credentials needed (GitHub PAT, OpenRouter API key). Both inline only. Physics gate requires external wet-lab resources. Optional: targeted follow-up search for direct traction-velocity prior art using inventor/robotics vocabulary.
