@@ -1,0 +1,90 @@
+{
+  "round": "72",
+  "timestamp_utc": "2026-08-22T04:40:00+00:00",
+  "task_id": "ROUND72-SIMULATION-SUBSTRATE-AND-ENGINE-REGISTRY",
+  "agent": "main (CTO mode, OX Alpha as engineer via OpenRouter stealth/ox-alpha, z-ai web_search + page_reader for research)",
+  "constitution_version": "1.5.0",
+  "constitution_recertification": {
+    "version": "1.5.0",
+    "pre_session_check_acknowledged": true,
+    "articles_applied": ["I", "V", "XXV", "XXVI", "XXVII", "XXVIII", "XXIX", "XXXI", "XXXII", "XXXIV", "CE-012", "CE-014", "CE-017", "CE-018"]
+  },
+  "ceo_round_71_audit_summary": {
+    "ceo_verdict": "The coder declared the computational loop finished and handed the problem to a wet lab. That contradicts the end-to-end AI discovery loop requirement. The correct architecture includes multiphysics simulation, adversarial virtual experiments, and AI surrogates BEFORE wet-lab spend.",
+    "ceo_key_finding": "InSteps is the closest existing end-to-end thrombectomy simulation platform (4 modules: AI synthetic anatomy, FEM simulation, generative AI emulator, virtual trial outcome model; 4,500 patients; INSIST H2020 origin). Do NOT reinvent from scratch. Treat as benchmark.",
+    "ceo_simulation_stack": "10 engines: InSteps, SimVascular, OpenFOAM, LS-DYNA, FEBio, COMSOL, Abaqus, CFD-Peridynamics, FEA-SPH, NVIDIA Modulus",
+    "ceo_directive": "Do not spend $5-10k on wet lab yet. Build zero/low-cost virtual physics gate first. Build Simulation Engine Registry + Physics Orchestrator. Do NOT build another simulator — be the ORCHESTRATOR."
+  },
+  "key_references_researched": {
+    "insteps": {
+      "url": "https://www.insteps.com",
+      "description": "World's first high-fidelity In-Silico Thrombectomy Digital Twin Platform. 4 modules: AI synthetic anatomy, FEM simulation, generative AI emulator (geometric deep learning), virtual trial outcome model. 4,500 patients. EUR 450K funding (July 2026). INSIST H2020 origin.",
+      "accessibility": "Commercial SaaS. Not installable. API/pricing UNKNOWN."
+    },
+    "insist_h2020": {
+      "url": "https://insist-h2020.eu",
+      "cordis": "https://cordis.europa.eu/project/id/777072",
+      "description": "EU H2020 project. In-silico trials for acute ischemic stroke. Simulates stent deployment, clot interaction, retrieval, fragmentation, embolization, recanalization."
+    },
+    "fea_sph_2021": {
+      "pmid": "PMC8672072",
+      "title": "Realistic computer modelling of stent retriever thrombectomy: a hybrid FEA-SPH approach",
+      "year": 2021,
+      "finding": "Coupling FEA + SPH can realistically model stent retriever thrombectomy including fragmentation. Direct precedent for our mechanism class."
+    },
+    "cfd_peridynamics_2026": {
+      "doi": "S0045782526003221",
+      "title": "Fluid-Thrombus Interactions Through a Coupled CFD-Peridynamics Framework",
+      "year": 2026,
+      "finding": "Models cohesive/adhesive thrombus fracture under fluid-induced forces. Extremely relevant to fragmentation hypothesis."
+    }
+  },
+  "simulation_engine_registry_summary": {
+    "installable_today_zero_cost": ["OpenFOAM (GPL, apt install)", "FEBio (open source, binary/source build)", "SimVascular (BSD, AppImage)", "DualSPHysics (GPL, SPH replication path)", "gmsh + ParaView + Python scientific stack"],
+    "not_installable_commercial": ["LS-DYNA (ANSYS)", "Abaqus (Dassault)", "COMSOL", "InSteps"],
+    "conditional": ["NVIDIA Modulus (open source, requires CUDA GPU — local GPU availability UNKNOWN)"],
+    "minimum_viable_stage_minus_1_stack": "OpenFOAM (fluid) + FEBio (clot solid) + Python orchestrator + ParaView + Optional: DualSPHysics for SPH replication"
+  },
+  "physics_orchestrator_architecture": {
+    "principle": "Orchestrator is a thin, auditable control plane over interchangeable solvers. It owns: experiment specification, solver dispatch, provenance, observable extraction, falsification verdicts. It NEVER contains physics.",
+    "core_abstractions": ["ExperimentSpec (JSON/YAML)", "SolverAdapter (interface per engine)", "ObservableExtractor (raw fields to scalar time series)", "ProvenanceStore (append-only, content-addressed)", "Verdict module (pre-registered falsification criteria)"],
+    "minimum_viable_v0": "~500-1000 lines Python. Two SolverAdapters (OpenFOAM, FEBio). Parameter sweep driver (Latin Hypercube). Results table (pandas/parquet). Provenance manifests. Report generator.",
+    "ai_surrogate_boundary": "Truth generator = OpenFOAM/FEBio. Surrogate = accelerator only. Surrogate must state training domain and refuse extrapolation. NEVER reverse (per CEO principle).",
+    "strongest_alternative": "Orchestration is a commodity — InSteps already owns the integrated platform. Our survival: orchestrator must encode adversarial falsification of a specific mechanism (pre-fragmentation signal), not generic virtual trials."
+  },
+  "stage_minus_1_virtual_falsification_design": {
+    "question": "Can a pre-fragmentation signal >=1s before fracture exist under realistic simulated conditions?",
+    "engines": "OpenFOAM (pulsatile flow) + FEBio (viscoelastic/poroelastic clot). Two independent paths: Path A (one-way FSI), Path B (SPH replication via DualSPHysics).",
+    "parameters_to_vary": ["Clot stiffness/viscoelasticity (RBC-rich vs fibrin-rich)", "Clot size / vessel occlusion ratio", "Flow waveform (mean pressure, pulsatility)", "Clot-vessel adhesion strength"],
+    "observables": ["Max principal stress/strain at clot neck", "Strain energy density rate", "Surface traction variance", "Damage variable / bond-breakage count (Path B)", "Pre-fragmentation candidate signal: any observable with >=1s lead-time separability"],
+    "virtual_experiment_count": "200-500 runs (4-parameter Latin Hypercube). Feasible in days-weeks of wall clock on CPU.",
+    "kill_condition": "If NO observable shows >=1s lead-time separability (AUC <0.7) across the full DOE under ANY realistic parameter combination, the mechanism hypothesis is falsified IN SILICO. Stage 0 wet-lab spend is BLOCKED.",
+    "relationship_to_stage_0": "Stage -1 output = parameter envelope + ranked observables. Stage 0 protocol remains FROZEN. Stage -1 cannot modify Stage 0, only inform which observables get sensor priority.",
+    "strongest_alternative_explanation": "The 'signal' is an artifact of the assumed clot constitutive model. Mitigation: require signal in BOTH Path A (continuum damage) and Path B (peridynamics/SPH) — two fracture formalisms with different artifacts."
+  },
+  "relationship_to_insteps": {
+    "ox_alpha_recommendation": "Hybrid: use own open-source stack for falsification physics (Stage -1, needs transparency); approach InSteps for virtual-population/outcome layer (Steps 12-14, needs data advantage). Contact cost: an email; zero engineering cost.",
+    "trade_off": "Physics falsification needs transparency (favors open-source). Population/outcome modeling needs data (favors InSteps). Minimum viable stack remains OpenFOAM + FEBio + orchestrator regardless of InSteps decision."
+  },
+  "concrete_next_actions": {
+    "A4_1": "Install OpenFOAM, FEBio, gmsh, ParaView, DualSPHysics. Verify each runs a canonical benchmark case.",
+    "A4_2": "Build idealized vessel+clot geometry (analytic, gmsh). Defer SimVascular to image-derived stage.",
+    "A4_3": "Source clot material parameters from cited literature with verifiable references. Mark UNKNOWN where unverifiable.",
+    "A5_1": "Implement orchestrator v0 (~500-1000 lines Python: spec, adapters, sweep, provenance, verdict).",
+    "A5_2": "Pre-register kill condition and observables BEFORE running the sweep.",
+    "A5_3": "Run 200-500-run DOE, Paths A and B.",
+    "immediate_cto_approval_needed": "Authorize A4.1-A4.3 and orchestrator v0 (A5.1). Zero dollars, zero wet-lab spend, fully reversible."
+  },
+  "cto_decision": {
+    "decision": "RETRACT 'terminal computational state'. Begin building the simulation substrate. The Stage-0 wet-lab protocol remains frozen and unchanged. Stage -1 virtual falsification is the next step — it is zero-cost and fully reversible.",
+    "slot_5_status": "DISCOVERY HYPOTHESIS — Stage-0 protocol frozen (unchanged). Stage -1 virtual falsification design ready. §103 OPEN. Physics untested (virtual + physical).",
+    "next_step": "Install OpenFOAM + FEBio + gmsh + ParaView + DualSPHysics. Build orchestrator v0. Run Stage -1 virtual falsification. If virtual kill condition fires → KILL + CE-019 + Slot 5 EMPTY (no wet-lab spend). If virtual signal exists → proceed to Stage 0 wet-lab with ranked observables."
+  },
+  "portfolio_status": {
+    "slot_5": "DISCOVERY HYPOTHESIS — Stage-0 protocol frozen (unchanged). Stage -1 virtual falsification design ready. §103 OPEN.",
+    "world_class_inventions": "0 / 5",
+    "mechanism_generation": "PARTIALLY UNBLOCKED — Stage -1 virtual falsification is computationally tractable and zero-cost.",
+    "cemetery": "18 entries (UNCHANGED)",
+    "ci_certification": "FAILED (G10/G12/G13 RED). Research state."
+  }
+}
