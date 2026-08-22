@@ -1,0 +1,82 @@
+{
+  "round": "74",
+  "timestamp_utc": "2026-08-22T05:48:00+00:00",
+  "task_id": "ROUND74-SOLVER-AGNOSTIC-ORCHESTRATOR-AND-VALIDATION-LADDER",
+  "agent": "main (CTO mode — per CEO Round 73 directive)",
+  "constitution_version": "1.5.0",
+  "ceo_round_73_audit_summary": {
+    "ceo_verdict": "The coder has built a promising orchestration skeleton, not a world-class simulation engine. Stage -1 is not 'in progress' yet — the current result is a numerical/model-validation failure. The real Stage -1 begins when at least one validated multiphysics backend can produce physically credible trajectories.",
+    "ceo_p0_directives": [
+      "Retract 'Stage -1 physics result' framing. Rename toy model: REDUCED_ORDER_TOY_MECHANICS, not PHYSICS_BACKEND.",
+      "Make the orchestrator solver-agnostic. Create formal SolverAdapter interface for all engines.",
+      "Implement Validation Ladder: L0 (dimensional sanity) through L5 (real-world validation). No invention claim on L0/L1 alone.",
+      "Reframe Stage -1 question: Can any precursor survive across multiple plausible physics models? Not 'does the toy bar fragment?'",
+      "Use AI for hypothesis/parameter/surrogate/adversary — NOT for pretending to be the physics solver.",
+      "Solver plurality: never kill a candidate because one simulator says 'no'. Record all solver results and check cross-solver robustness."
+    ],
+    "ceo_strategic_correction": "Do not build a new simulation engine. Build the AI layer above existing engines. InSteps is the benchmark. Your differentiator: AI-driven invention discovery + adversarial destruction + multiphysics virtual experiments + autonomous evidence/provenance."
+  },
+  "phase_1_toy_model_rename": {
+    "action": "Renamed: REDUCED_ORDER_TOY_MECHANICS (was: SimplifiedClotModel / 'physics backend')",
+    "rationale": "Per CEO: 'The orchestrator must never represent a toy reduced-order model as a higher-fidelity physical model.' The 1D Kelvin-Voigt bar with manual explicit integration is a toy, not a physics backend.",
+    "validation_level": "L0_DIMENSIONAL_SANITY only"
+  },
+  "phase_2_solver_agnostic_orchestrator": {
+    "architecture": "PhysicsOrchestratorV1 with 8 registered SolverAdapter implementations",
+    "solvers_registered": [
+      {"name": "REDUCED_ORDER_TOY_MECHANICS", "available": true, "validation": "L0", "note": "Toy model, NOT physics. Output is meaningless."},
+      {"name": "SfePy", "available": true, "validation": "L1", "note": "Pure Python FEM. Installed. Can reach L2 with convergence study. READY_FOR_MODEL_DEFINITION."},
+      {"name": "OpenFOAM", "available": false, "validation": "L4 (if installed)", "note": "NOT installed. Requires sudo/apt or Docker."},
+      {"name": "FEBio", "available": false, "validation": "L4 (if installed)", "note": "NOT installed. Binary download from febio.org."},
+      {"name": "DualSPHysics", "available": false, "validation": "L2 (if installed)", "note": "NOT installed. GPU SPH."},
+      {"name": "LS-DYNA", "available": false, "validation": "L4", "note": "Commercial. NOT accessible."},
+      {"name": "SimVascular", "available": false, "validation": "L4", "note": "NOT installed. AppImage from simvascular.org."},
+      {"name": "Project Chrono", "available": false, "validation": "L2", "note": "NOT installed. Multibody/FSI."}
+    ],
+    "available_count": 2,
+    "available_at_l2_plus": 0,
+    "cross_solver_capable": false,
+    "design_principle": "Orchestrator never knows the equations. SolverAdapter is the interface. Cross-solver agreement is the validation standard."
+  },
+  "phase_3_validation_ladder": {
+    "levels": {
+      "L0": "Dimensional sanity — units check, order-of-magnitude",
+      "L1": "Analytic benchmark — compare to known closed-form solution",
+      "L2": "Solver convergence — mesh/time-step independence",
+      "L3": "Cross-solver agreement — two independent solvers agree",
+      "L4": "Experimental benchmark — compare to benchtop data",
+      "L5": "Real-world validation — compare to clinical data"
+    },
+    "invention_claim_rule": "No invention claim can advance based on L0/L1 alone. Minimum L3 (cross-solver agreement) required.",
+    "current_max_validation": "L1 (SfePy, if model is defined and benchmarked)",
+    "gap_to_invention_claim": "Need L3 — requires at least 2 independent solvers at L2+"
+  },
+  "phase_4_stage_minus_1_reframed": {
+    "old_question": "Does the toy bar fragment? (MEANINGLESS)",
+    "new_question": "Can any candidate physical precursor to clot fragmentation survive across multiple plausible physics models?",
+    "requirement": "At least 2 independent solvers at L2+ validation",
+    "current_status": "NOT_READY — only 2 solvers available (toy at L0 + SfePy at L1). Need OpenFOAM or FEBio at L2+.",
+    "next_action": "Install OpenFOAM (via Docker or apt with sudo) OR FEBio (binary download) to enable cross-solver validation"
+  },
+  "phase_5_engine_installation_attempts": {
+    "docker": "NOT AVAILABLE — docker command not found",
+    "sudo_apt": "NOT AVAILABLE — no sudo access",
+    "conda": "NOT AVAILABLE — not installed",
+    "pip_installable": ["SfePy (installed)", "scikit-fem (installed)", "gmsh (installed but libGLU missing)", "pyvista (installed)", "meshio (installed)"],
+    "febio_binary": "Available from febio.org but requires registration + manual download. NOT attempted this round.",
+    "openfoam_binary": "Available via apt but requires sudo. NOT attempted this round.",
+    "assessment": "Without Docker or sudo, the full simulation stack (OpenFOAM + FEBio) cannot be installed in this environment. SfePy is the only validated FEM available. Options: (a) request sudo/Docker access, (b) download FEBio binary manually (registration needed), (c) use SfePy alone at L1-L2 (cannot reach L3 cross-solver alone)."
+  },
+  "cto_decision": {
+    "decision": "Orchestrator v1 is solver-agnostic and ready for cross-solver validation. BUT Stage -1 CANNOT proceed — only 2 solvers available (toy at L0 + SfePy at L1), and cross-solver requires 2 solvers at L2+. The bottleneck is engine installation (no Docker, no sudo).",
+    "slot_5_status": "DISCOVERY HYPOTHESIS — Stage-0 frozen. Stage -1 BLOCKED on engine installation (need OpenFOAM or FEBio at L2+). §103 OPEN.",
+    "next_step": "Install at least one validated solver at L2+: either OpenFOAM (needs Docker or sudo) or FEBio (needs manual binary download from febio.org). Alternatively: develop SfePy model to L2 (convergence study) and pair with a second independent method (e.g., analytical or SPH) for cross-solver check.",
+    "honest_statement": "Stage -1 is NOT in progress. The real Stage -1 begins when at least one validated multiphysics backend can produce physically credible trajectories. Current state: orchestrator architecture ready, physics backends NOT ready."
+  },
+  "portfolio_status": {
+    "slot_5": "DISCOVERY HYPOTHESIS — Stage-0 frozen. Stage -1 BLOCKED on engine installation. §103 OPEN.",
+    "world_class_inventions": "0 / 5",
+    "mechanism_generation": "BLOCKED — need validated physics solvers",
+    "cemetery": "18 entries (UNCHANGED)"
+  }
+}
