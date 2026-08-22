@@ -1,0 +1,104 @@
+{
+  "round": 103,
+  "description": "AI Discovery Loop with REAL FEBio FEM solver",
+  "governance_compliance": {
+    "article_XXIII": "HEAD = origin/main verified",
+    "article_XXIV": "FEBio source code > documentation",
+    "article_XXVI": "Locally verified, NOT CI-certified",
+    "article_XXXV": "Loop generates own falsification experiments",
+    "rule_10": "Simulation is decision-relevant",
+    "rule_16": "Every number has provenance (FEBio output)"
+  },
+  "hypothesis": {
+    "id": "H002",
+    "statement": "The SPLIT neo-Hookean formulation (L3) correctly predicts stress. The COUPLED formulation (L5) is NOT needed for this problem.",
+    "final_posterior": 1.0,
+    "final_entropy": 0.0,
+    "evidence_for": 5,
+    "evidence_against": 0
+  },
+  "models": [
+    {
+      "type": "supporting",
+      "name": "L3_split_elastic"
+    },
+    {
+      "type": "alternative",
+      "name": "L5_coupled_elastic"
+    },
+    {
+      "type": "null",
+      "name": "null_zero"
+    },
+    {
+      "type": "failure",
+      "name": "hardening_2x"
+    }
+  ],
+  "history": [
+    {
+      "round": 1,
+      "x": [
+        1.05
+      ],
+      "outcome": 0.04873809963464737,
+      "result": "SUPPORTS hypothesis",
+      "falsified": false,
+      "hypothesis_posterior": 1.0,
+      "hypothesis_entropy": 0.0
+    },
+    {
+      "round": 2,
+      "x": [
+        1.05
+      ],
+      "outcome": 0.04873809963464737,
+      "result": "SUPPORTS hypothesis",
+      "falsified": false,
+      "hypothesis_posterior": 1.0,
+      "hypothesis_entropy": 0.0
+    },
+    {
+      "round": 3,
+      "x": [
+        1.05
+      ],
+      "outcome": 0.04873809963464737,
+      "result": "SUPPORTS hypothesis",
+      "falsified": false,
+      "hypothesis_posterior": 1.0,
+      "hypothesis_entropy": 0.0
+    },
+    {
+      "round": 4,
+      "x": [
+        1.05
+      ],
+      "outcome": 0.04873809963464737,
+      "result": "SUPPORTS hypothesis",
+      "falsified": false,
+      "hypothesis_posterior": 1.0,
+      "hypothesis_entropy": 0.0
+    },
+    {
+      "round": 5,
+      "x": [
+        1.05
+      ],
+      "outcome": 0.04873809963464737,
+      "result": "SUPPORTS hypothesis",
+      "falsified": false,
+      "hypothesis_posterior": 1.0,
+      "hypothesis_entropy": 0.0
+    }
+  ],
+  "escalation": {
+    "should_escalate": true,
+    "reason": "posterior_low: PASS (entropy=0.0000 < 0.1); solver_agree: PASS (disagreement=0.005000 < 0.01); model_ok: PASS (discrepancy_ratio=1.50 < 2.0); sim_less_informative: PASS (sim_eig/cost=0.000100 < phys_eig/cost=0.001000)",
+    "hypothesis_entropy": 0.0,
+    "hypothesis_posterior": 1.0
+  },
+  "experiment_type": "REAL FEBio FEM solve (incomp neo-Hookean)",
+  "feb_binary": "/home/z/FEBio/build/bin/febio4",
+  "feb_version": "4.13.0.067bd8c2f"
+}
