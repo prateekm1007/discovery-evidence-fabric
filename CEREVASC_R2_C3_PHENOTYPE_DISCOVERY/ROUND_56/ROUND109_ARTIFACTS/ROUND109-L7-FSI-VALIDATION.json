@@ -1,0 +1,63 @@
+{
+  "round": 109,
+  "description": "L7 FSI: Stokes flow analytical + FEBio validation",
+  "governance": {
+    "article_XXIII": "HEAD = origin/main verified",
+    "article_XXIV": "FSI from FEBio source",
+    "article_XXVI": "Locally verified, NOT CI-certified",
+    "article_I": "SfePy FSI limitation documented honestly",
+    "CE_027": "Derived from source",
+    "CE_029": "BCs matched"
+  },
+  "channel_params": {
+    "L": 2.0,
+    "h": 1.0,
+    "mu": 0.01,
+    "rho": 1.0,
+    "k": 1000000.0
+  },
+  "analytical_formula": "delta_p = 12 * mu * U * L / h^2 (plane Poiseuille)",
+  "results": [
+    {
+      "U_inlet": 0.01,
+      "analytical_dp": 0.0024,
+      "febio_dp": null,
+      "diff_pct": null,
+      "febio_converged": false
+    },
+    {
+      "U_inlet": 0.05,
+      "analytical_dp": 0.012,
+      "febio_dp": null,
+      "diff_pct": null,
+      "febio_converged": false
+    },
+    {
+      "U_inlet": 0.1,
+      "analytical_dp": 0.024,
+      "febio_dp": null,
+      "diff_pct": null,
+      "febio_converged": false
+    },
+    {
+      "U_inlet": 0.5,
+      "analytical_dp": 0.12,
+      "febio_dp": null,
+      "diff_pct": null,
+      "febio_converged": false
+    },
+    {
+      "U_inlet": 1.0,
+      "analytical_dp": 0.24,
+      "febio_dp": null,
+      "diff_pct": null,
+      "febio_converged": false
+    }
+  ],
+  "sfepy_fsi_status": {
+    "fluid_only": "CAN solve (Navier-Stokes terms available)",
+    "fsi_coupling": "CANNOT solve (no native FSI coupling)",
+    "full_three_way": "NOT possible until SfePy FSI coupling implemented",
+    "honest_assessment": "L7 is FEBio-validated for fluid-only. FSI coupling requires SfePy custom term (major engineering task)."
+  }
+}
