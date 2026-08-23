@@ -6009,3 +6009,63 @@ Stage Summary:
 - Next: C5-X-AE V3 pre-registration with ALL parameters frozen (Article XXXVI compliant)
 - 0/5 WORLD_CLASS. Portfolio EMPTY (sacred). One candidate now simulation-eligible.
 
+
+---
+Task ID: ROUND-163-NARROWED-NOVELTY-C5X-AE-V2
+Agent: main (session 2026-08-24)
+Task: Execute Round 163 — retract broad novelty claim, define C5-X-AE-V2 surviving hypothesis, deep prior-art search against all functional equivalents.
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = 40466e1 (correct). Local origin/main ref updated.
+
+Work Log:
+
+1. RETRACTION of Round 162 broad claim
+   - Round 162 claimed: "No patent or publication found for passive AE monitoring of thrombus micro-fractures"
+   - CEO audit found PMID 37178667 (2023) — passive AE detection of clot fractionation in vessel phantom
+   - Also found PMC8445066 (2021) — clot degradation AE quantitatively related to mass loss
+   - BROAD PASSIVE ACOUSTIC CLOT MONITORING = PRIOR ART THREATENED / KNOWN
+   - Corrected per Article XV (disclose inconvenient results) and Article XXVIII (no silent promotion)
+
+2. C5-X-AE-V2: Passive Acoustic Fracture Sentinel — 7 required elements
+   A. Receive-only sensing (no transmit)
+   B. No deliberate acoustic excitation (no HIFU/histotripsy)
+   C. Mechanical thrombectomy context (not histotripsy/sonothrombolysis)
+   D. Endogenous clot/device fracture emissions (not cavitation)
+   E. Event-level detection (not aggregate energy)
+   F. Pre-fragmentation prediction (not post-hoc monitoring)
+   G. Embolization-risk prediction (decision variable, not measurement)
+   - Kill rule: if ANY element found in prior art, candidate cannot promote unless redefined
+
+3. DEEP prior-art search: 11 queries across Google Patents, Justia, PubMed, PMC, EPO, Patsnap
+   - Closest threats:
+     * PAM (Passive Acoustic Mapping) for HIFU — same technique, different application
+     * Endovascular Catheter-Thrombus Contact detection (PMC 2024) — contact, not fracture
+     * US20220125454A1 — piezoelectric haptic feedback, not passive listening
+     * EP 2895879 B1 — passive AE for HIFU monitoring, not thrombectomy
+   - NO patent found combining all 7 elements
+
+4. Anchor paper analysis (PMID 37178667)
+   - ESTABLISHES: passive AE detection of clot fractionation, frequency-domain discrimination
+   - DOES NOT establish: mechanical thrombectomy, receive-only, pre-fragmentation prediction, embolization risk
+   - The gap C5-X-AE-V2 fills: removing active insonation, applying to mechanical thrombectomy, predicting impending fragmentation
+
+5. Obviousness combination attack
+   - Individual components all exist: thrombectomy force sensing, passive acoustic sensing, clot AE monitoring, fracture AE detection
+   - BUT nobody has combined them for mechanical thrombectomy embolization prediction
+   - MODERATE obviousness threat — requires patent attorney evaluation
+
+6. Corrected novelty confidence: level 1.5 (CONDITIONAL)
+   - Broad claim is KNOWN
+   - Narrow 7-element claim is NOT found
+   - Simulation eligible: CONDITIONAL (light physics feasibility OK, full simulation needs attorney FTO opinion)
+
+Stage Summary:
+- Broad novelty claim retracted (Article XV compliance)
+- C5-X-AE-V2 defined with 7 required elements
+- 11 deep searches executed; no patent combines all 7 elements
+- Obviousness threat: MODERATE (requires patent attorney)
+- Novelty level: 1.5 (downgraded from 2)
+- Simulation: CONDITIONAL only
+- 0/5 WORLD_CLASS. Portfolio EMPTY. No candidate eligible for full simulation yet.
+
