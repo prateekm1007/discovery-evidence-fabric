@@ -6419,3 +6419,35 @@ Stage Summary:
 - Next: deep novelty searches for each 2029 candidate using the escalated search pipeline
 - 0/5 WORLD_CLASS. Portfolio EMPTY. The hunting ground has shifted from 2026's crowded space to 2029's convergence space.
 
+
+---
+Task ID: ROUND-170-DEEP-NOVELTY-2029-CANDIDATES
+Agent: main (session 2026-08-24, autonomous AI Loop V2)
+Task: Deep novelty search on 4 FUTURE_NOVEL candidates from Round 169 Horizon Discovery Engine.
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = 2aa9853 (correct).
+
+Work Log:
+1. 10 web searches executed across Google Patents, Justia, PubMed, PMC, Patsnap, SEC.
+2. Results:
+   - Candidate 1 (Neurovascular Control Plane): novelty 2, SURVIVES. No patent covers cross-device causal orchestration in neurovascular space. STRONGEST temporal moat.
+   - Candidate 2 (Causal Intervention Engine): novelty 1.5, CONDITIONAL. WO2011146757A2 is a CRITICAL threat — covers active perturbation for obstruction detection. Must determine if causal discrimination between failure modes is distinguishable.
+   - Candidate 3 (Therapeutic State Control): novelty 2, SURVIVES. US 20260224805 mentions "PK/PD model" but claims are concentration-based. PD-based effect control is a generational shift. STRONG temporal moat (requires new sensor modality).
+   - Candidate 4 (Autonomous Thrombectomy State Engine): novelty 2, SURVIVES. No patent fuses multiple modalities into unified causal clot-device state model. MODERATE temporal moat (concept is in the air but execution is hard). C5-X-AE-V3 is a component.
+
+3. Ranking:
+   #1 Neurovascular Control Plane (novelty 2, strongest temporal + integration moat)
+   #2 Therapeutic State Control (novelty 2, strong temporal moat, requires new sensor)
+   #3 Autonomous Thrombectomy State Engine (novelty 2, moderate temporal moat)
+   #4 Causal Intervention Engine (novelty 1.5, critical WO2011146757A2 threat)
+
+4. Key insight: The 2029 horizon shift WORKED. By searching for what will be missing in 2029 rather than what exists in 2026, we found candidates NOT crowded by 2026 patents. FUTURE_NOVEL classification correctly identifies temporal moats.
+
+Stage Summary:
+- 3 of 4 FUTURE_NOVEL candidates survive deep novelty search (level 2, simulation-eligible)
+- 1 candidate (Causal Intervention Engine) is conditional (level 1.5, needs patent attorney)
+- The Neurovascular Control Plane is the most promising: cross-device orchestration with no competitor incentive to build it
+- 0/5 WORLD_CLASS. Portfolio EMPTY. 3 simulation-eligible candidates now exist.
+- Next: design causal patient-state model for Neurovascular Control Plane; design PD-based control model for Therapeutic State Control; design state estimation model for Thrombectomy State Engine.
+

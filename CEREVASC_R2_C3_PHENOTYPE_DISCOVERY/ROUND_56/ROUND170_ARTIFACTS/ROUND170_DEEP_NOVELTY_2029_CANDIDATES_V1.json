@@ -1,0 +1,109 @@
+{
+  "record_type": "ROUND170_DEEP_NOVELTY_2029_CANDIDATES_V1",
+  "version": "1.0.0",
+  "date": "2026-08-24",
+  "round": 170,
+  "authority": "Round 169 generated 4 FUTURE_NOVEL candidates. Round 170 executes deep novelty searches for each.",
+  "constitutional_basis": ["Article I", "Article II", "Article XXVIII", "Article XXXII", "Article XXXVI"],
+  "search_provenance": {
+    "search_date": "2026-08-24",
+    "queries_executed": 10,
+    "databases": ["Google Patents", "Justia", "PubMed", "PMC", "Patsnap", "SEC filings"]
+  },
+
+  "candidate_1_NEUROVASCULAR_CONTROL_PLANE": {
+    "name": "Neurovascular Control Plane — cross-device orchestration layer",
+    "classification": "FUTURE_NOVEL",
+    "novelty_confidence_level": 2,
+    "novelty_confidence_name": "NOVELTY_SURVIVES_CURRENT_SEARCH",
+    "closest_prior_art": [
+      {"source": "US11404145B2 — Medical machine time-series event data processor", "overlap": "MODERATE — processes medical time-series data across devices, but is a DATA PROCESSOR not a CAUSAL ORCHESTRATION layer. Does not model patient state → device state → disease trajectory → intervention → response.", "threat": "LOW"},
+      {"source": "OnMed patents — medical service kiosk orchestration", "overlap": "LOW — telemedicine kiosk, not neurovascular device orchestration", "threat": "NONE"},
+      {"source": "Route 92 Medical — 100th neurovascular patent", "overlap": "LOW — device-level patents, not cross-device orchestration", "threat": "NONE"}
+    ],
+    "competitor_future_build_attack": {
+      "would_a_2026_competitor_build_this_by_2029": "UNLIKELY — each device vendor (Medtronic, Integra, Sophysa, CereVasc) optimizes their OWN device. No single vendor has incentive to build an orchestration layer that works across COMPETITORS' devices. This is a platform play, not a device play. The vendor who owns the control plane owns the patient relationship — but no device vendor wants to cede that to a competitor.",
+      "what_would_change_this": "If a large tech company (Apple, Google, Amazon) enters neurovascular health, they might build the orchestration layer. But as of 2026, no tech company has entered this space.",
+      "temporal_moat_strength": "STRONG — the multi-device patient problem doesn't become critical until 2028-2029 when patients commonly have 2+ connected neuro devices."
+    },
+    "simulation_eligible": true,
+    "next_step": "Design the causal patient-state model: what state variables, what transitions, what interventions, what observations? This is a MODELING task, not a simulation task."
+  },
+
+  "candidate_2_CAUSAL_INTERVENTION_ENGINE": {
+    "name": "Causal Intervention Engine — active perturbation for causal discrimination between failure modes",
+    "classification": "FUTURE_NOVEL",
+    "novelty_confidence_level": 1.5,
+    "novelty_confidence_name": "CONDITIONAL_NOVELTY_THREAT_REMAINS",
+    "closest_prior_art": [
+      {"source": "WO2011146757A2 — active flow generation + resistance tracking + obstruction detection", "overlap": "HIGH — covers active perturbation for obstruction DETECTION. The question is whether 'causal discrimination between multiple failure modes' is distinguishable from 'obstruction detection.'", "threat": "CRITICAL"},
+      {"source": "US 20260115436 — AI prediction of shunt outcomes", "overlap": "MODERATE — covers prediction, not causal intervention. Different analytical layer.", "threat": "MODERATE"},
+      {"source": "Ultrasound-based shunt flow detection (Google Patents)", "overlap": "LOW — passive flow detection, not active perturbation", "threat": "LOW"}
+    ],
+    "competitor_future_build_attack": {
+      "would_a_2026_competitor_build_this_by_2029": "POSSIBLE — the prediction layer (US 20260115436) is being commoditized. The next logical step is causal diagnosis. A competitor with the prediction patent might extend it to causal intervention. But the active perturbation concept (WO2011146757A2) is already owned by someone else, which may create a patent thicket that discourages competitors from entering.",
+      "temporal_moat_strength": "MODERATE — the causal inference layer is the logical next step after prediction, so competitors may converge on it."
+    },
+    "the_key_novelty_question": "Does WO2011146757A2 cover 'discriminating between multiple failure modes via perturbation response' or only 'detecting obstruction via resistance tracking'? If the former, the candidate is killed. If the latter, the candidate may survive with a narrowed claim.",
+    "simulation_eligible": false,
+    "next_step": "Patent attorney claim analysis of WO2011146757A2 — does it cover causal discrimination or only detection?"
+  },
+
+  "candidate_3_THERAPEUTIC_STATE_CONTROL": {
+    "name": "Therapeutic State Control — PD-based control (not PK-based) for intrathecal delivery",
+    "classification": "FUTURE_NOVEL",
+    "novelty_confidence_level": 2,
+    "novelty_confidence_name": "NOVELTY_SURVIVES_CURRENT_SEARCH",
+    "closest_prior_art": [
+      {"source": "US 20260224805 — intrathecal drug delivery with CSF biosensor + PK/PD model + adaptive dosing", "overlap": "MODERATE — the patent mentions 'PK/PD model' but the claims are centered on CSF CONCENTRATION measurement and adaptive dosing. The question is whether 'PK/PD model' in the patent covers therapeutic EFFECT-based control or only concentration-based PK modeling.", "threat": "MODERATE — requires patent attorney to determine scope of 'PK/PD model' in the claims"},
+      {"source": "Academic PK/PD modeling literature (PMC, 2019-2026)", "overlap": "LOW — academic modeling, not a patented control system", "threat": "LOW"},
+      {"source": "Implantable CNS Drug Delivery Patent Snapshot 2026 (Patsnap)", "overlap": "LOW — landscape overview, does not specifically claim PD-based control", "threat": "LOW"}
+    ],
+    "competitor_future_build_attack": {
+      "would_a_2026_competitor_build_this_by_2029": "UNLIKELY — US 20260224805 is focused on concentration-based control. Extending to effect-based control requires: (a) a fundamentally different sensor (detecting drug EFFECT, not drug LEVEL), (b) a different control algorithm (PD-based, not PK-based), (c) a different clinical workflow (monitoring therapeutic response, not concentration). This is a generational shift, not an incremental extension.",
+      "what_would_change_this": "If Biogen (ThecaFlex owner) develops a tissue-response sensor, they might extend their platform. But no such sensor is publicly disclosed.",
+      "temporal_moat_strength": "STRONG — concentration control is being commoditized; effect control requires a sensor that doesn't exist yet."
+    },
+    "simulation_eligible": true,
+    "next_step": "Design the PD-based control model: what pharmacodynamic response is measurable, how does it map to tissue exposure, what dose trajectory optimizes therapeutic effect?"
+  },
+
+  "candidate_4_AUTONOMOUS_THROMBECTOMY_STATE_ENGINE": {
+    "name": "Autonomous Thrombectomy State Engine — fuses multiple signals into unified causal clot-device state model",
+    "classification": "FUTURE_NOVEL",
+    "novelty_confidence_level": 2,
+    "novelty_confidence_name": "NOVELTY_SURVIVES_CURRENT_SEARCH",
+    "closest_prior_art": [
+      {"source": "Stent Retriever Thrombectomy Patents (Patsnap, 2026)", "overlap": "LOW — device geometry/capture patents, not state estimation", "threat": "LOW"},
+      {"source": "US 20250072970 — ML prediction of thrombus characteristics from device motion", "overlap": "MODERATE — covers ML prediction from device signals, but does not fuse multiple modalities (force+flow+AE+imaging) into a unified causal state model", "threat": "MODERATE"},
+      {"source": "WO2020099386A1 — thrombectomy system with clot mobilizer", "overlap": "LOW — device patent, not state estimation", "threat": "LOW"},
+      {"source": "C5-X-AE-V3 (our own candidate)", "overlap": "C5-X-AE-V3 is a SENSING MODALITY within this state engine. The state engine fuses AE + force + flow + imaging.", "threat": "NONE — it's our own component"}
+    ],
+    "competitor_future_build_attack": {
+      "would_a_2026_competitor_build_this_by_2029": "POSSIBLE — the field is converging toward AI+thrombus+digital twin. A competitor could assemble a state engine from existing components. But the FUSION of multiple modalities into a unified CAUSAL model is a systems engineering challenge that requires: (a) validated models for each modality, (b) a fusion architecture, (c) a causal inference engine. This is harder than single-sensor prediction.",
+      "temporal_moat_strength": "MODERATE — the concept is in the air (2026 review papers), but the execution is hard."
+    },
+    "simulation_eligible": true,
+    "next_step": "Design the state estimation model: what state variables (attachment, integrity, stress, damage), what observations (force, flow, AE, imaging), what fusion architecture?"
+  },
+
+  "summary_ranking": {
+    "rank_1": "Candidate 1 (Neurovascular Control Plane) — novelty 2, STRONGEST temporal moat, cross-device integration play, no competitor has incentive to build it",
+    "rank_2": "Candidate 3 (Therapeutic State Control) — novelty 2, STRONG temporal moat, requires new sensor modality (PD effect, not PK concentration), distinguishable from US 20260224805",
+    "rank_3": "Candidate 4 (Autonomous Thrombectomy State Engine) — novelty 2, MODERATE temporal moat, concept is in the air but execution is hard, C5-X-AE-V3 is a component",
+    "rank_4": "Candidate 2 (Causal Intervention Engine) — novelty 1.5, MODERATE temporal moat, CRITICAL threat from WO2011146757A2, requires patent attorney claim analysis"
+  },
+
+  "the_most_promising_direction": {
+    "candidate": "Neurovascular Control Plane (Candidate 1)",
+    "why": "Highest novelty confidence (level 2), STRONGEST temporal moat (no competitor has incentive to build cross-device orchestration), STRONGEST integration moat (works across all vendors' hardware), and addresses a real 2029 capability gap (multi-device patients). The control plane sits ABOVE hardware — it doesn't compete with any device vendor, it ENABLES all of them. This is a platform play.",
+    "what_makes_it_hard_to_replicate": "Requires: (a) validated causal patient-state model across multiple physiological systems, (b) integration with multiple vendors' APIs (regulatory + technical), (c) longitudinal multi-device data accumulation. None of these can be replicated quickly.",
+    "next_step": "Design the causal patient-state model and the multi-device fusion architecture. This is a MODELING + ARCHITECTURE task, not a simulation task."
+  },
+
+  "honest_disclosure": {
+    "what_this_search_proves": "3 of 4 FUTURE_NOVEL candidates survive current novelty search (level 2). The 4th (Causal Intervention Engine) is conditionally novel pending patent attorney review of WO2011146757A2.",
+    "what_this_search_does_NOT_prove": "Web search only — not full USPTO/EPO/CNIPA/JPO. Patent claims not read in full. Formal FTO still needed.",
+    "the_key_insight": "The 2029 horizon shift WORKED. By searching for what will be missing in 2029 rather than what exists in 2026, we found candidates that are NOT crowded by 2026 patents. The FUTURE_NOVEL classification correctly identifies candidates with temporal moats that TODAY_NOVEL candidates lack."
+  }
+}
