@@ -1,0 +1,192 @@
+{
+  "record_type": "PHYSICAL_OBSERVABLE_CONTRACT_V2",
+  "version": "2.0.0",
+  "date": "2026-08-23",
+  "round": 133,
+  "authority": "CEO Round 133: 'Replace common D with common predicted observable. The correct architecture is: solver_internal_state → model_to_observable_mapping → physical_observable Ψ. Then compare Ψ, not the internal state variables.'",
+
+  "supersedes": "CROSS_WORLD_OBSERVABLE_CONTRACT.json (Round 132) — that contract normalized internal D variables to [0,1], which is scale normalization, not semantic equivalence.",
+
+  "problem_statement": "Round 132's common Phi(t)∈[0,1] was epistemically invalid. FEBio's CDM damage, peridynamics' bond-breakage density, flow's eroded fraction, CalculiX's plastic strain, and SfePy's elastic strain are DIFFERENT physical quantities. Mapping them all to [0,1] and comparing dPhi/dstrain is comparing non-commensurate variables. This is H9_INTERNAL_STATE_NON_EQUIVALENCE.",
+
+  "the_key_distinction": {
+    "model_internal_state": {
+      "definition": "A solver-specific variable that the solver uses internally to track failure progression.",
+      "examples": "FEBio D_CDM, peridynamics bond_density, flow eroded_fraction, CalculiX plastic_strain, SfePy elastic_strain",
+      "problem": "These are NOT the same physical quantity. They have different units, different definitions, different causal relationships to fragmentation. Comparing them directly is meaningless."
+    },
+    "physical_observable": {
+      "definition": "A quantity that can be measured by a physical instrument external to the model.",
+      "examples": "Force (N), displacement (mm), pressure (Pa), stiffness (N/mm), acceleration (m/s²)",
+      "advantage": "Physical observables are world-independent. Every solver can predict them from its internal state. Comparing predicted physical observables IS meaningful."
+    },
+    "the_mapping": {
+      "architecture": "solver_internal_state → model_to_observable_mapping → physical_observable_Ψ",
+      "requirement": "Every world MUST define a mapping from its internal state to the SAME physical observable. No mapping → no cross-world evidence."
+    }
+  },
+
+  "c5_physical_observable_definition": {
+    "primary_observable": {
+      "name": "Force-curvature sign change",
+      "symbol": "Ψ_force",
+      "definition": "The second derivative of the reaction force with respect to displacement (d²F/dδ²) changes sign from positive to negative before fragmentation onset.",
+      "units": "N/mm² (force per displacement squared)",
+      "measurement_method": "Physical: load cell at ≥100Hz + LVDT at ≥100Hz, synchronized. Computational: extract reaction force at the prescribed-displacement boundary at each timestep.",
+      "causal_relationship_to_fragmentation": "Force curvature sign change indicates that the specimen's tangent stiffness is decreasing — the structure is losing load-bearing capacity. This is a physical precursor to fracture.",
+      "validity_domain": "Quasi-static loading. Under dynamic loading, inertial effects may mask the curvature signal.",
+      "uncertainty": "Measurement noise (force sensor), discretization (computational), timestep resolution.",
+      "provenance": "PEP-SLOT5-001-a2 frozen protocol (Round 123). This is the FROZEN physical endpoint."
+    },
+
+    "secondary_observable": {
+      "name": "Stiffness degradation rate",
+      "symbol": "Ψ_stiffness",
+      "definition": "dK/dδ (rate of change of tangent stiffness K = dF/dδ with respect to displacement) decelerates (peaks then declines) before fragmentation.",
+      "units": "(N/mm)/mm = N/mm²",
+      "measurement_method": "Computed from force-displacement curve: K = dF/dδ at each point, then dK/dδ.",
+      "causal_relationship_to_fragmentation": "Stiffness degradation is a direct measure of structural damage. Its deceleration indicates approaching loss of integrity.",
+      "validity_domain": "Same as primary.",
+      "uncertainty": "Sensitive to numerical differentiation noise. Requires careful smoothing protocol (frozen in PEP-SLOT5-001-a2)."
+    },
+
+    "fragmentation_onset": {
+      "name": "Fragmentation onset",
+      "symbol": "t_f",
+      "definition": "The displacement at which visible fragmentation first occurs (physical: camera-confirmed; computational: first element deletion or first bond breakage reaching critical density).",
+      "units": "mm (displacement) or dimensionless (strain)",
+      "measurement_method": "Physical: high-speed camera at ≥500fps, blind review by 2+ observers. Computational: first timestep at which D_CDM ≥ D_critical (FEBio), bond_breakage_density ≥ 0.9 (peridynamics), eroded_fraction ≥ 0.9 (flow), plastic_strain ≥ yield (CalculiX), max_strain ≥ failure_strain (SfePy).",
+      "cross_world_note": "Fragmentation onset IS world-specific in its detection method, but the PHYSICAL event (visible crack/fragment) is the same. The computational methods are predictions of when this physical event would occur."
+    },
+
+    "lead_time": {
+      "name": "Lead time",
+      "symbol": "Δt",
+      "definition": "t_fragmentation - t_Ψ_onset (time between precursor signal and fragmentation).",
+      "units": "seconds (at frozen strain rate 0.01 s⁻¹) or strain (dimensionless)",
+      "threshold": "≥1.0s (clinically useful, per PEP-SLOT5-001-a2)"
+    }
+  },
+
+  "model_to_observable_mapping_per_world": {
+    "WORLD_A_FEBIO": {
+      "internal_state": "D_CDM (continuum damage variable, [0,1])",
+      "mapping_to_force": "F = ∫ σ(I-D_CDM) : dε dV — reaction force at boundary integrates the damaged stress tensor. FEBio outputs reaction force directly.",
+      "mapping_to_stiffness": "K = dF/dδ computed from FEBio force-displacement output at each timestep.",
+      "computable": true,
+      "frozen": true,
+      "provenance": "FEBio outputs reaction force in .log file. Already extracted in Round 129-131.",
+      "assumptions": "Quasi-static. Damage reduces stress proportionally (Simo CDF). Element deletion does not affect force extraction.",
+      "validity_domain": "Small strain (< 50%). Neo-Hookean + CDM regime."
+    },
+    "WORLD_B_CUSTOM_PERIDYNAMIC_FORMULATION": {
+      "internal_state": "bond_breakage_density (fraction of broken bonds)",
+      "mapping_to_force": "F = Σ_bonds k_bond × (current_length - original_length) for intact bonds — total bond force at boundary. Currently NOT computed in the custom implementation.",
+      "mapping_to_stiffness": "K = dF/dδ — requires computing F first, then differentiating. Currently NOT computed.",
+      "computable": true,
+      "frozen": false,
+      "next_action": "Add force computation to the peridynamics solver: sum bond forces at boundary particles. This is a straightforward code addition.",
+      "assumptions": "Bond forces are linear (prototype microelastic). Boundary particles represent the loading surface.",
+      "validity_domain": "Small strain. Bond-based peridynamics regime."
+    },
+    "WORLD_C_CUSTOM_FLOW_FORMULATION": {
+      "internal_state": "eroded_fraction (fraction of eroded clot volume)",
+      "mapping_to_force": "F = flow_pressure × remaining_clot_area — hydrodynamic force on clot. Currently NOT computed.",
+      "mapping_to_stiffness": "K = dF/dδ — requires force computation. Currently NOT computed.",
+      "computable": true,
+      "frozen": false,
+      "next_action": "Add force computation: F = pressure × area at each timestep. The flow model currently tracks erosion but not force.",
+      "assumptions": "Uniform pressure. No viscous effects. Simplified hydrodynamics.",
+      "validity_domain": "Laminar flow. Low Reynolds number.",
+      "critical_note": "The custom flow model's 'precursor detection' was based on eroded_fraction evolution, NOT on force curvature. The physical observable (force) has NOT been computed. The detected 'precursor' may be an artifact of the erosion model, not a physical force-curvature signal."
+    },
+    "WORLD_D_CALCULIX": {
+      "internal_state": "equivalent_plastic_strain",
+      "mapping_to_force": "F = Σ_elements σ_plastic : dε dV — CalculiX outputs reaction force in .frd file.",
+      "mapping_to_stiffness": "K = dF/dδ from CalculiX force-displacement output.",
+      "computable": true,
+      "frozen": true,
+      "provenance": "CalculiX outputs reaction forces. Already partially extracted in Round 131 (max displacement parsed).",
+      "assumptions": "Small strain plasticity. von Mises yield. J2 flow theory.",
+      "validity_domain": "Plastic regime. Before necking."
+    },
+    "WORLD_E_SFEPY": {
+      "internal_state": "elastic_strain",
+      "mapping_to_force": "F = E × ε × A (Hooke's law, linear elastic) — force at boundary.",
+      "mapping_to_stiffness": "K = E × A / L (constant for linear elastic). No stiffness degradation possible.",
+      "computable": true,
+      "frozen": true,
+      "provenance": "SfePy outputs displacement field. Force computed from constitutive law.",
+      "assumptions": "Linear elastic. No damage. No plasticity. Constant stiffness.",
+      "validity_domain": "Elastic regime only. Cannot predict failure (no failure model).",
+      "limitation": "SfePy's linear elastic model CANNOT produce a stiffness-degradation precursor because stiffness is constant by construction. SfePy can only contribute to the elastic-regime baseline, not to precursor detection."
+    }
+  },
+
+  "what_this_changes": {
+    "old_approach_Round_132": "Normalize all D variables to [0,1], compute dPhi/dstrain, compare. INVALID because D variables are non-commensurate.",
+    "new_approach_Round_133": "Each world computes the SAME physical observable (force, stiffness) from its internal state. Compare predicted force-curvature and stiffness-degradation across worlds. VALID because force is a physical quantity measured in Newtons, not a solver-internal variable.",
+    "implication_for_C5": "The custom World C's 'precursor detection' was based on eroded_fraction, NOT on force curvature. It has NOT computed the physical observable. The 'positive result' is therefore NOT evidence for the C5 precursor hypothesis — it is evidence that the erosion model produces a certain D evolution, which is a different claim entirely."
+  },
+
+  "h9_addition": {
+    "hypothesis_id": "H9",
+    "name": "INTERNAL_STATE_NON_EQUIVALENCE",
+    "description": "The apparent world disagreement is caused by comparing solver-specific internal failure variables (CDM damage, bond density, eroded fraction, plastic strain, elastic strain) rather than a common physical observable. Even perfectly extracted values would not be commensurate because the variables represent different physical constructs.",
+    "posterior_probability": 0.40,
+    "rationale_for_high_posterior": "This is now the HIGHEST-probability explanation because Round 132's cross-world comparison was based on non-equivalent internal variables. The 'discrepancy' may be an artifact of comparing apples to oranges. Until each world computes the same physical observable (force curvature), no cross-world comparison is valid.",
+    "discriminating_experiment": "C5-CONTRA-E03-V2: compute force-curvature (d²F/dδ²) in ALL 5 worlds. If the discrepancy disappears when comparing force (physical) instead of D (internal), H9 is confirmed and the original discrepancy was an artifact."
+  },
+
+  "revised_experiment_ranking": {
+    "acquisition_formula": "EIG × contradiction_impact × independence_exposure ÷ cost",
+    "experiments": [
+      {
+        "experiment_id": "C5-CONTRA-E03-V2",
+        "name": "Compute physical observable (force curvature) in all 5 worlds",
+        "targets_hypothesis": "H9, H6, H1",
+        "description": "Add force computation to each world (some already have it: FEBio, CalculiX). Compute d²F/dδ² in all worlds. Compare force-curvature precursor — NOT internal D.",
+        "eig": 0.95,
+        "contradiction_impact": 1.0,
+        "independence_exposure": 0.8,
+        "cost": 10,
+        "acquisition_score": "0.95 × 1.0 × 0.8 / 10 = 0.076",
+        "status": "EXECUTABLE_NOW — requires code addition to custom Worlds B and C; FEBio and CalculiX already output force",
+        "priority": 1
+      },
+      {
+        "experiment_id": "C5-CONTRA-E01",
+        "name": "Actual clotFoam reproduction",
+        "targets_hypothesis": "H2",
+        "description": "Replace custom World C with actual clotFoam. Compute force, not just erosion.",
+        "eig": 0.95,
+        "contradiction_impact": 1.0,
+        "independence_exposure": 1.0,
+        "cost": 100,
+        "acquisition_score": "0.95 × 1.0 × 1.0 / 100 = 0.0095",
+        "status": "BLOCKED — clotFoam not installed",
+        "priority": 2
+      },
+      {
+        "experiment_id": "C5-CONTRA-E02",
+        "name": "Actual Peridigm cross-form test",
+        "targets_hypothesis": "H1, H5",
+        "description": "Replace custom World B with actual Peridigm. Compute force.",
+        "eig": 0.90,
+        "contradiction_impact": 0.8,
+        "independence_exposure": 1.0,
+        "cost": 100,
+        "acquisition_score": "0.90 × 0.8 × 1.0 / 100 = 0.0072",
+        "status": "BLOCKED — Peridigm build failed (Trilinos 16 API)",
+        "priority": 3
+      }
+    ],
+    "next_best_experiment": "C5-CONTRA-E03-V2 — compute force curvature in all 5 worlds. This is the HIGHEST acquisition score (0.076) and is executable now. It directly tests H9 (the highest-posterior hypothesis at 0.40)."
+  },
+
+  "hard_evidence_rule": {
+    "rule": "CUSTOM_FORMULATION → MODEL_FORM_DIVERSITY (allowed). CUSTOM_FORMULATION → EXTERNAL_INDEPENDENT_CONFIRMATION (FORBIDDEN).",
+    "enforcement": "The machine must automatically reject any claim of external independent confirmation from a custom in-repository formulation. Custom models can show that a different mathematical formulation produces a different result (model-form diversity), but they cannot substitute for external solver evidence.",
+    "implementation": "In the G18 evaluator, worlds with classification=INTERNAL_CUSTOM_FORMULATION contribute to FORMULATION_DIVERSITY but NOT to EVIDENCE_SOURCE_INDEPENDENCE. Only worlds with classification=EXTERNAL_SOLVER or EXTERNAL_PACKAGE contribute to EVIDENCE_SOURCE_INDEPENDENCE."
+  }
+}

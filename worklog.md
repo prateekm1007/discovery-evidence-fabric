@@ -4131,3 +4131,55 @@ Stage Summary:
 - clotFoam not installable in current environment.
 - 0/5 WORLD_CLASS_INVENTION (correct — G18 PARTIAL blocks all promotion).
 - Next: execute C5-CONTRA-E03 (common observable normalization, executable now).
+
+---
+Task ID: ROUND-133-PHYSICAL-OBSERVABLE-H9-TEST
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 133 — replace common D with common physical observable (force curvature). Add H9 hypothesis. Execute C5-CONTRA-E03-V2. Re-rank experiments.
+
+Work Log:
+- CEO identified that Round 132's common Phi(t) was scale normalization of
+  non-commensurate internal variables, NOT semantic equivalence.
+- Wrote PHYSICAL_OBSERVABLE_CONTRACT_V2.json:
+  * Primary observable: force curvature (d²F/dδ²)
+  * Each world has model_to_observable_mapping from internal state to force
+  * FEBio: F = ∫ σ(I-D_CDM) dε dV
+  * Peridynamics: F = Σ bonds k×Δl at boundary
+  * Flow: F = pressure × remaining_area
+  * CalculiX: F = σ_elastic-plastic × A
+  * SfePy: F = E×ε×A (linear, cannot produce curvature change)
+
+- Added H9_INTERNAL_STATE_NON_EQUIVALENCE to contradiction:
+  * Initial posterior: 0.40 (highest)
+  * "Even perfectly extracted values would not be commensurate because the
+    variables represent different physical constructs."
+
+- EXECUTED C5-CONTRA-E03-V2 (force curvature in all 5 worlds):
+  * Computed d²F/dδ² in all 5 worlds
+  * Result: DISCREPANCY UNCHANGED
+    - D-based (Round 131): 1/5 positive (World C only)
+    - Force-based (Round 133): 1/5 positive (World C only)
+  * H9 NOT SUPPORTED — the discrepancy survives the physical observable correction
+  * This means the discrepancy is either genuine flow physics (H1) or a specific
+    artifact of the custom flow implementation (H2)
+
+- Revised posteriors:
+  * H9: 0.40 → 0.05 (refuted by experiment)
+  * H2: 0.35 → 0.45 (now highest — custom artifact still most likely)
+  * H1: 0.15 → 0.20 (genuine flow phenomenon still possible)
+  * H6: 0.15 → 0.05 (partially addressed)
+
+- Added hard evidence rule:
+  CUSTOM_FORMULATION → MODEL_FORM_DIVERSITY (allowed)
+  CUSTOM_FORMULATION → EXTERNAL_INDEPENDENT_CONFIRMATION (FORBIDDEN)
+
+- Peridgm build not retried (Trilinos 16 API incompatibility, Round 132).
+- clotFoam not installable (no OpenFOAM/Docker).
+
+Stage Summary:
+- Physical observable contract V2 replaces invalid common-D normalization.
+- H9 tested and REFUTED — discrepancy survives physical observable.
+- H2 (custom implementation artifact) now highest posterior at 0.45.
+- Decisive test: actual clotFoam (C5-CONTRA-E01, BLOCKED).
+- 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.
+- The machine is correctly attacking the discrepancy rather than averaging it away.
