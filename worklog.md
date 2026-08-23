@@ -5075,3 +5075,57 @@ Stage Summary:
 - Key insight: advantage comes from sensor mismatch cancellation + low coupling.
 - C2 NOT killed. Needs perturbation attack on the rescue regime.
 - 0/5 WORLD_CLASS_INVENTION. C2 = RESCUED (needs further attack).
+
+---
+Task ID: ROUND-149-RESCUE-SEPARATION-AND-NEW-HYPOTHESES
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 149 — separate C2 rescue mechanisms (physiological vs cancellation), attack rescue regime, generate new invention hypotheses, rank globally.
+
+Work Log:
+- PART I: C2 rescue mechanism separation test
+  * Tested 8 regimes: original (with sensor_mismatch) vs mismatch=0
+  * KEY FINDING: sensor_mismatch has ZERO effect on ΔAUROC
+    - best_original ΔAUC=+0.0317 (mismatch=2.0) vs best_R1_test ΔAUC=+0.0317 (mismatch=0.0)
+    - Drop = 0.0000 in ALL 4 pairs
+  * VERDICT: H-C2-R2 (common-mode cancellation) NOT SUPPORTED
+    The advantage is NOT from sensor mismatch cancellation.
+  * H-C2-R1 (physiological) IS the actual mechanism:
+    The advantage comes from LOW IPS coupling creating independent venous information.
+  * At HIGH coupling (0.7): differential is WORSE (-0.014)
+  * At LOW coupling (0.3): differential is modestly better (+0.032, below 0.05 threshold)
+  * The rescue advantage depends entirely on whether IPS coupling is low enough.
+    Literature suggests eShunt IPS has HIGH coupling (0.4-0.95).
+    The rescue regime (coupling=0.3) is at the LOW end of physiological plausibility.
+
+- PART II: Generated 7 new invention hypotheses from C1/C2/C5 failure analyses:
+  1. C1-X: Predictive Shunt Failure Engine (failure prediction + classification)
+  2. C1-Y: Closed-Loop Adaptive Drainage (adaptive control toward physiological target)
+  3. C2-X: CSF Dynamics Fingerprint (patient-specific temporal state model)
+  4. C2-Y: Physiological Perturbation Identification (active system identification)
+  5. C5-X: Predictive Embolic-Risk Engine (fragmentation probability + time-to-event)
+  6. C5-Y: Intervention Optimizer (prediction → treatment recommendation)
+  7. C3-X: Closed-Loop CNS Delivery (sense → infer → decide → deliver → monitor)
+
+- PART III: Global ranking by novelty × falsifiability × strategic value × IP defensibility × difficulty_to_design_around ÷ validation_cost:
+  1. C5-X (embolic risk engine) — highest value, low prior-art, very high falsifiability
+  2. C2-Y (perturbation ID) — novel concept, low prior-art, very high falsifiability
+  3. C1-X (predictive failure) — high value, moderate prior-art
+  4. C5-Y (intervention optimizer) — depends on C5-X
+  5. C3-X (closed-loop delivery) — high cost, high value
+  6. C2-X (dynamics fingerprint) — high prior-art risk
+  7. C1-Y (adaptive drainage) — high prior-art risk (adjustable valves exist)
+
+- C2 RESCUE VERDICT:
+  * The advantage is PHYSIOLOGICAL (low coupling), not signal-processing
+  * But the advantage is modest (+0.032, below 0.05 WIN threshold in this test)
+  * The rescue regime requires LOW coupling (0.3), which is at the edge of physiological plausibility for eShunt IPS
+  * C2 remains UNDER_ATTACK — the mechanism is physiological but weak and anatomy-dependent
+
+- OpenFOAM: running in background.
+
+Stage Summary:
+- C2 rescue mechanism: PHYSIOLOGICAL (not cancellation). Sensor mismatch irrelevant.
+- Advantage depends on LOW IPS coupling (0.3), which may not match eShunt anatomy.
+- 7 new invention hypotheses generated and ranked globally.
+- C5-X (embolic risk) and C2-Y (perturbation ID) are highest-priority new candidates.
+- 0/5 WORLD_CLASS_INVENTION. C2 = MECHANISM WEAK (physiological but anatomy-dependent).
