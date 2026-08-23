@@ -1,0 +1,222 @@
+{
+  "record_type": "AI_LOOP_ARCHITECTURE_V1",
+  "version": "1.0.0",
+  "date": "2026-08-24",
+  "round": 166,
+  "authority": "CEO Round 166: 'Create an end to end AI Loop. No human involved.'",
+  "constitutional_basis": [
+    "Article I — evidence precedes assertion",
+    "Article IV — no fallback epistemology",
+    "Article V — fail closed, but do not become a universal rejector",
+    "Article VII — never weaken the verifier to rescue a claim",
+    "Article XIV — no research proceeds through a red gate",
+    "Article XV — disclose inconvenient results",
+    "Article XVII — every control must have an attempted bypass",
+    "Article XIX — never optimize for the gate; optimize for truth",
+    "Article XXVIII — no silent semantic promotion",
+    "Article XXIX — separate implementation failure from mechanism failure",
+    "Article XXXII — state strongest alternative explanation",
+    "Article XXXIV — stop coding when reality is the next bottleneck",
+    "Article XXXV — closed-loop epistemic control as the completion standard",
+    "Article XXXVI — Experiment Validity Gate (ratified Round 160)"
+  ],
+
+  "purpose": "The AI Loop is the autonomous execution engine for the discovery-evidence-fabric program. It replaces the human-directed round-by-round process with a self-running loop that: (1) reads governance files at the start of each cycle, (2) assesses portfolio state, (3) selects the next action, (4) executes it, (5) records results with full provenance, (6) adversarially self-attacks, (7) updates portfolio state, (8) commits and pushes, (9) checks termination conditions, (10) loops. NO HUMAN INVOLVED between cycles.",
+
+  "the_ten_step_cycle": {
+    "step_1_READ_GOVERNANCE": {
+      "description": "At the start of each cycle, read: EPISTEMIC_CONSTITUTION.md (v1.6.0), EXPERIMENT_VALIDITY_GATE_V1.json, NOVELTY_FIRST_DISCOVERY_ENGINE_V1.json, SIMULATION_BUDGET_FOLLOWS_NOVELTY_CONFIDENCE_V1.json, and the current portfolio state.",
+      "constitutional_anchor": "Article XIX — the coder MUST read the constitution before every coding session",
+      "implementation": "Load all governance JSON files into memory. Verify their hashes match the pinned values. If any hash mismatches → BLOCK (Article VII)."
+    },
+    "step_2_ASSESS_PORTFOLIO": {
+      "description": "Read the current portfolio state from the latest round's corrected portfolio artifact. Determine each candidate's: novelty_confidence_level, simulation_eligibility, experiment_validity_state, and position in the discovery chain.",
+      "implementation": "Parse the latest ROUND*_CORRECTED_PORTFOLIO_STATE*.json. Build a candidate state table."
+    },
+    "step_3_SELECT_ACTION": {
+      "description": "Based on the portfolio state, select the highest-priority action using the action selection logic (see below).",
+      "implementation": "Apply the action selection decision tree. Output: (action_type, target_candidate, parameters)."
+    },
+    "step_4_EXECUTE_ACTION": {
+      "description": "Execute the selected action. This may involve: web search (novelty), code writing (pre-registration), code execution (simulation), or analysis (adversarial attack).",
+      "implementation": "Dispatch to the appropriate action handler. Each handler produces a results artifact with full provenance."
+    },
+    "step_5_RECORD_RESULTS": {
+      "description": "Write the results to a round artifact with: timestamp, action taken, parameters used, results observed, provenance chain, and hash links to pre-registration/governance files.",
+      "constitutional_anchor": "Article XII — every important conclusion needs provenance custody",
+      "implementation": "Write JSON artifact to ROUND_NNN_ARTIFACTS/. Include SHA-256 of all referenced files."
+    },
+    "step_6_ADVERSARIAL_SELF_ATTACK": {
+      "description": "For every result, ask: 'What would make this pass while the underlying system is wrong?' (Article XXX). Document attacks and countermeasures.",
+      "constitutional_anchor": "Article XVII + Article XXX",
+      "implementation": "Generate ADVERSARIAL_SELF_ATTACK section in the results artifact."
+    },
+    "step_7_UPDATE_PORTFOLIO": {
+      "description": "Based on the results and adversarial self-attack, update the candidate's state. Apply the four epistemic states: VALIDATED_POSITIVE, VALIDATED_NEGATIVE, EXPERIMENT_INVALID, INFRASTRUCTURE_BLOCKED.",
+      "constitutional_anchor": "Article XXXVI — Experiment Validity Gate",
+      "implementation": "Update the portfolio state JSON. If a candidate is KILLED, add to cemetery. If a candidate is PROMOTED, add to portfolio (sacred)."
+    },
+    "step_8_COMMIT_PUSH": {
+      "description": "Commit all new artifacts to git with a descriptive message. Push to GitHub. Verify local = remote (Article XXIII).",
+      "implementation": "git add → git commit → git push → git ls-remote verification."
+    },
+    "step_9_CHECK_TERMINATION": {
+      "description": "Check if the loop should terminate. Termination conditions: (a) a candidate reaches World-Class (portfolio slot filled), (b) all candidates killed and no new hypotheses available, (c) infrastructure permanently blocked with no path forward, (d) maximum round count reached (safety limit).",
+      "implementation": "Evaluate termination conditions. If none met, continue to step 10."
+    },
+    "step_10_LOOP": {
+      "description": "Increment round counter. Go to step 1.",
+      "implementation": "round_number += 1. Goto step_1."
+    }
+  },
+
+  "action_selection_logic": {
+    "description": "The decision tree for selecting the next action. Priority order: novelty search > pre-registration > validity audit > simulation > adversarial attack > independent reproduction > competitor comparison > buyer/moat > promote.",
+    "the_decision_tree": [
+      {
+        "condition": "ANY candidate has novelty_confidence < 2 AND has not been searched deeply",
+        "action": "NOVELTY_SEARCH",
+        "rationale": "Simulation budget follows novelty confidence. No simulation until novelty >= 2."
+      },
+      {
+        "condition": "ANY candidate has novelty_confidence >= 2 AND no pre-registration exists",
+        "action": "CREATE_PREREGISTRATION",
+        "rationale": "Article XIX — all parameters must be frozen before execution."
+      },
+      {
+        "condition": "Pre-registration exists AND validity gate not yet checked",
+        "action": "VALIDITY_AUDIT",
+        "rationale": "Article XXXVI — 7 conditions must pass before results can update belief."
+      },
+      {
+        "condition": "Validity gate passes AND experiment not yet executed",
+        "action": "EXECUTE_EXPERIMENT",
+        "rationale": "Run the pre-registered experiment with frozen parameters."
+      },
+      {
+        "condition": "Experiment executed AND adversarial self-attack not yet done",
+        "action": "ADVERSARIAL_ATTACK",
+        "rationale": "Article XVII — every control must have an attempted bypass."
+      },
+      {
+        "condition": "Adversarial attack passes AND independent reproduction not yet done",
+        "action": "INDEPENDENT_REPRODUCTION",
+        "rationale": "Article XXVIII — no silent semantic promotion without independent solver."
+      },
+      {
+        "condition": "Independent reproduction passes AND competitor comparison not yet done",
+        "action": "COMPETITOR_COMPARISON",
+        "rationale": "COMPETITIVE_BASELINE_SUPERIORITY — must beat strongest publicly demonstrated alternative."
+      },
+      {
+        "condition": "Competitor comparison passes AND buyer/moat analysis not yet done",
+        "action": "BUYER_MOAT_ANALYSIS",
+        "rationale": "Four Hostile Questions — Q3 (beats alternative) and Q4 (buyer cannot reproduce)."
+      },
+      {
+        "condition": "ALL gate conditions pass (8 conditions + 4 hostile questions)",
+        "action": "PROMOTE_TO_WORLD_CLASS",
+        "rationale": "Sacred portfolio slot filled."
+      },
+      {
+        "condition": "ANY step fails (KILL threshold met)",
+        "action": "KILL_CANDIDATE",
+        "rationale": "Record cemetery entry with full provenance of why the candidate failed."
+      },
+      {
+        "condition": "Candidate KILLED and discovery queue not empty",
+        "action": "GENERATE_NEW_HYPOTHESIS",
+        "rationale": "Information bottleneck approach: find clinical failure where current tech is structurally incapable."
+      },
+      {
+        "condition": "ALL candidates killed AND no new hypotheses available",
+        "action": "TERMINATE",
+        "rationale": "No path forward. Report final state."
+      },
+      {
+        "condition": "Infrastructure blocked with no resolution path",
+        "action": "TERMINATE_WITH_BLOCKER",
+        "rationale": "Article XXXIV — reality is the bottleneck, not code."
+      }
+    ]
+  },
+
+  "governance_rules_encoded": {
+    "rule_1_novelty_first": "NO simulation until novelty_confidence >= 2 (level 2 = NOVELTY_SURVIVES_CURRENT_SEARCH). Broad searches are insufficient; deep searches required.",
+    "rule_2_validity_gate": "NO result updates candidate belief unless ALL 7 validity conditions pass (Article XXXVI). Invalid results → EXPERIMENT_INVALID → candidate unchanged.",
+    "rule_3_four_epistemic_states": "Every result is classified as VALIDATED_POSITIVE, VALIDATED_NEGATIVE, EXPERIMENT_INVALID, or INFRASTRUCTURE_BLOCKED. Only VALIDATED results can change candidate state.",
+    "rule_4_sacred_portfolio": "Portfolio slots are SACRED. No slot filled unless ALL 8 gate conditions + 4 hostile questions pass. No compensation between dimensions.",
+    "rule_5_adversarial_self_attack": "Every result must be self-attacked (Article XVII + XXX). 'What would make this pass while the system is wrong?'",
+    "rule_6_provenance_custody": "Every conclusion traces to evidence_id → artifact_pointer → SHA256SUMS → git commit → hash (Article XII).",
+    "rule_7_no_silent_promotion": "'Beat reproduction' ≠ 'beat real product'. 'No prior art found' ≠ 'novel'. 'Solver works' ≠ 'required world validated' (Article XXVIII).",
+    "rule_8_information_bottleneck": "New hypotheses are generated around information bottlenecks, not product features. 'Find clinical failure where current tech is structurally incapable of obtaining needed information.'",
+    "rule_9_threshold_provenance": "Every threshold (WIN/KILL/MMD) has explicit provenance (CLINICAL/ENGINEERING/MODEL_DERIVED/etc.) per Article XXVII. No threshold invented without source.",
+    "rule_10_stop_coding_when_reality_is_bottleneck": "Article XXXIV — if the next step requires physical experiment, external verification, or data acquisition (not code), the loop MUST pause and report the blocker."
+  },
+
+  "termination_conditions": {
+    "condition_1_world_class_achieved": "At least one candidate promoted to World-Class (portfolio slot filled). Loop reports success.",
+    "condition_2_all_killed": "All candidates killed and no new hypotheses available. Loop reports final state.",
+    "condition_3_infrastructure_blocked": "Infrastructure permanently blocked with no resolution path identified. Loop reports blocker.",
+    "condition_4_max_rounds": "Safety limit: 200 rounds. Loop reports state and stops to prevent infinite loop.",
+    "condition_5_human_override": "If a human sends a stop signal (commit message containing 'STOP_AI_LOOP'), the loop terminates."
+  },
+
+  "safety_mechanisms": {
+    "hash_verification": "At the start of each cycle, verify all governance file hashes. If any mismatch → BLOCK.",
+    "constitutional_acknowledgment": "Each cycle's artifact MUST include a constitution acknowledgment section.",
+    "provenance_chain": "Every result artifact MUST include SHA-256 of all referenced files (pre-registration, governance, prior results).",
+    "git_verification": "After each push, verify local HEAD = remote via ls-remote (Article XXIII).",
+    "adversarial_self_attack_mandatory": "No result may update candidate state without an adversarial self-attack section.",
+    "no_threshold_drift": "Thresholds are frozen at pre-registration. Any change requires V2 pre-registration with explicit PCP rationale.",
+    "cemetery_immutability": "Killed candidates (cemetery entries) are PERMANENT. They cannot be resurrected without a fundamentally different mechanism + new novelty search."
+  },
+
+  "the_discovery_chain_executed_by_the_loop": {
+    "chain": "IDEA → PRIOR_ART_ATTACK → COMPETITOR_ATTACK → NOVELTY_SEARCH → PRE_REGISTERED_EXPERIMENT → VALIDITY_AUDIT → EXECUTION → ADVERSARIAL_ANALYSIS → INDEPENDENT_REPRODUCTION → COMPETITOR_SUPERIORITY → BUYER_MOAT → WORLD_CLASS",
+    "broken_link_rule": "Any broken link means 'not ready'. The loop does NOT advance the candidate past a broken link. It either: (a) fixes the link (e.g., deepens novelty search), (b) kills the candidate, or (c) reports the blocker.",
+    "no_shortcut_rule": "The loop CANNOT skip steps. Even if a candidate 'obviously works', it must pass through the full chain. This prevents epistemic inflation."
+  },
+
+  "current_state_as_of_round_166": {
+    "candidates": {
+      "C2_Y_active_probing": {"state": "CLOSED", "cemetery": "CE-015", "novelty": 0},
+      "C3_X_tissue_exposure": {"state": "PRIOR_ART_HIGHLY_THREATENED", "novelty": 0.5, "simulation_eligible": false},
+      "C5_X_AE_V3": {"state": "CONDITIONAL_NOVELTY", "novelty": 1.5, "simulation_eligible": "conditional"},
+      "C1": {"state": "INFRASTRUCTURE_BLOCKED", "blocker": "STRIDE data"},
+      "C3": {"state": "INVESTIGATION", "blocker": "mechanism validation"},
+      "C5": {"state": "INFRASTRUCTURE_BLOCKED", "blocker": "clotFoam v9"}
+    },
+    "next_action_selected_by_loop": "NOVELTY_SEARCH — C5-X-AE-V3 requires patent attorney FTO (real-world action). C3-X-TE requires patent attorney claim analysis (real-world action). Both are blocked on HUMAN actions. The loop MUST report this as a blocker per Article XXXIV (stop coding when reality is the next bottleneck). The loop CANNOT resolve patent attorney evaluations autonomously.",
+    "the_honest_truth": "The loop CANNOT be fully autonomous yet because two candidates require patent attorney FTO opinions — a real-world action that cannot be performed by code. The loop will run autonomously for all CODABLE actions (novelty search, simulation, adversarial attack) but will REPORT BLOCKERS for actions requiring human intervention (patent attorney, physical experiment, buyer engagement)."
+  },
+
+  "what_the_loop_CAN_do_autonomously": [
+    "Read governance files and verify hashes",
+    "Assess portfolio state",
+    "Execute web searches for novelty",
+    "Assign novelty confidence levels",
+    "Create pre-registrations",
+    "Run validity gate checks",
+    "Execute simulations (Python scripts)",
+    "Run adversarial self-attacks",
+    "Update portfolio state",
+    "Commit and push to GitHub",
+    "Generate new hypothesis directions (information bottleneck approach)",
+    "Report blockers when human actions are required"
+  ],
+
+  "what_the_loop_CANNOT_do_autonomously": [
+    "Patent attorney freedom-to-operate analysis (requires legal expertise)",
+    "Physical experiments (requires lab equipment)",
+    "Buyer engagement (requires human negotiation)",
+    "EPO/CNIPA/JPO full-text patent search (requires professional patent databases)",
+    "FDA regulatory pathway analysis (requires regulatory expertise)"
+  ],
+
+  "the_loop_design_principle": {
+    "principle": "The loop is autonomous for all CODABLE actions. For REAL-WORLD actions (patent attorney, physical experiment, buyer engagement), the loop REPORTS THE BLOCKER and continues with other candidates. The loop NEVER blocks indefinitely on a single candidate — it moves to the next actionable candidate.",
+    "article_XXXIV_compliance": "When reality is the next bottleneck (patent attorney, physical experiment), the loop stops coding for that candidate and reports the blocker. It does NOT attempt to substitute code for reality.",
+    "the_loop_motto": "Search before simulation. Simulate before assuming. Prove before promoting. Kill quickly. Report honestly."
+  }
+}
