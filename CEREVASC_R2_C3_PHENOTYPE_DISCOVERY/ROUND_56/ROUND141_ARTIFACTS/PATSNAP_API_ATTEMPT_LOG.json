@@ -1,0 +1,25 @@
+{
+  "record_type": "PATSNAP_API_ATTEMPT_LOG",
+  "date": "2026-08-23",
+  "round": 141,
+  "api_key_provided": "[REDACTED:patsnap_key]",
+  "attempts": [
+    {"endpoint": "https://api.patsnap.com/v3/balance", "result": "DNS resolution failed — api.patsnap.com does not resolve"},
+    {"endpoint": "https://api.patsnap.com/v3/search/patent", "result": "DNS resolution failed — api.patsnap.com does not resolve"},
+    {"endpoint": "https://api.patsnap.com/api/balance", "result": "DNS resolution failed"},
+    {"endpoint": "https://openapi.patsnap.com/v3/search", "result": "DNS resolution failed — openapi.patsnap.com does not resolve"},
+    {"endpoint": "https://www.patsnap.com/api/v3/search/patent", "result": "404 — web server returns HTML, not API"},
+    {"endpoint": "https://www.patsnap.com/search", "result": "Redirected to login — requires browser authentication"}
+  ],
+  "dns_check": {
+    "patsnap.com": "RESOLVES (web server accessible)",
+    "api.patsnap.com": "DOES NOT RESOLVE (no DNS answer)",
+    "openapi.patsnap.com": "DOES NOT RESOLVE",
+    "developer.patsnap.com": "DOES NOT RESOLVE",
+    "api.zhihuiya.com": "DOES NOT RESOLVE",
+    "openapi.zhihuiya.com": "DOES NOT RESOLVE"
+  },
+  "conclusion": "PatSnap API is not reachable from this environment. The API key may be valid but the API subdomains do not resolve in this DNS. The PatSnap web interface requires browser-based authentication (cookie/session) which cannot be done via curl. The key should be used from an environment with DNS access to api.patsnap.com or openapi.patsnap.com.",
+  "alternative": "Continue using Google Patents (individual patent fetches work) and PubMed for prior-art search. PatSnap search remains BLOCKED until API DNS is accessible.",
+  "key_stored": "Key stored in environment variable PATSNAP_API_KEY for future use if DNS becomes available."
+}
