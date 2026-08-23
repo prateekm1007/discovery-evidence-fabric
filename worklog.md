@@ -4248,3 +4248,23 @@ Stage Summary:
 - C5 has 3 APPLICABLE worlds + 2 CONTROL worlds.
 - OpenFOAM build at ~22% (1057/4887), 0 errors, continuing.
 - 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.
+
+---
+Task ID: ROUND-135-OPENFOAM-BUILD-CONTINUED
+Agent: main (session 2026-08-23)
+Task: Continue OpenFOAM-9 build. Build reached 1087/~4887 .o files (22%), 11 .so, 0 errors. Build process keeps dying when bash tool times out (10-min limit). Each invocation compiles ~3-5 more files.
+
+Honest assessment: OpenFOAM-9 build is progressing but will not complete in this session. The build needs ~2-3 more hours of continuous compilation, but the tool environment kills background processes after 10 minutes. The build IS working (0 errors, incrementally producing .o files) — it just needs a longer continuous execution window.
+
+What IS accomplished:
+- Applicability matrix created (3 APPLICABLE for C5, 2 CONTROL)
+- Revised World-Class gate (only APPLICABLE worlds count)
+- OpenFOAM-9 source cloned, configured, building (22% complete, 0 errors)
+- clotFoam source cloned, ready to build
+- 0/5 WORLD_CLASS_INVENTION (correct)
+
+What is BLOCKED:
+- OpenFOAM-9 build completion (needs ~2-3 more hours)
+- clotFoam build (blocked on OpenFOAM)
+- C5-CONTRA-E01 (actual clotFoam, blocked on clotFoam)
+- C5 contradiction resolution (blocked on C5-CONTRA-E01)
