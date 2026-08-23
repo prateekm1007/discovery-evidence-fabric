@@ -6536,3 +6536,46 @@ Results:
   Evidence: Level 3
   ALL 3 FUTURE_NOVEL CANDIDATES NOW TESTED.
   World-Class: 0/5
+
+---
+Task ID: ROUND-177-FAILURE-ANALYSIS-NEW-HYPOTHESES
+Agent: autonomous_ai_loop_v3.py (FULLY AUTONOMOUS)
+Task: All 3 FUTURE_NOVEL candidates killed. Generate new 2029 hypotheses from failures.
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = 6fced39 (correct).
+
+Work Log:
+1. FAILURE ANALYSIS
+   - All 3 candidates shared a common failure pattern: signal fusion provides NO incremental value because all signals derive from the same underlying physical state (correlated by construction)
+   - Lesson: Signal fusion is NOT a moat. If signal B is derivable from signal A, adding B adds no new information.
+   - A genuine moat requires an observable NOT derivable from any combination of existing signals.
+
+2. NEW MOAT REQUIREMENT
+   - What does NOT work: fusing more signals, better ML on existing signals, controlling on proxy of hidden state
+   - What MIGHT work: new physical observable, causal intervention (not just prediction), temporal advantage (earlier in causal chain)
+
+3. THREE NEW 2029 HYPOTHESES GENERATED
+   H1: Temporal Observable Lead — detect biofouling (CAUSE) before hydraulic resistance change (EFFECT)
+     * Physical moat: STRONGEST (new sensor modality — optical/impedance/ultrasound backscatter)
+     * Temporal moat: STRONGEST (days/weeks lead over existing signals)
+     * Novelty: NOT YET SEARCHED
+   
+   H2: Causal Intervention — not predicting failure but CHANGING trajectory via closed-loop intervention
+     * Model moat: STRONGEST (validated causal model of intervention→outcome)
+     * Workflow moat: STRONGEST (changes from 'predict then human intervenes' to 'detect then system intervenes')
+     * Novelty: NOT YET SEARCHED
+   
+   H3: Device-Free Observable — non-invasive CSF dynamics monitoring (wearable/external)
+     * Physical moat: STRONGEST (fundamentally new non-invasive sensing modality)
+     * Workflow moat: STRONGEST (changes from 'surgery + implant' to 'wearable + AI')
+     * Novelty: NOT YET SEARCHED
+
+4. KEY INSIGHT: The new hypotheses all have PHYSICAL moats (new sensor, new control loop, new non-invasive approach), not algorithmic moats. The failures proved algorithmic improvements on existing signals do not create moats.
+
+Stage Summary:
+- 3 candidates killed, 3 new hypotheses generated from the failures
+- The loop is LEARNING: failure pattern (signal fusion = no moat) incorporated into hypothesis generation
+- Next: deep novelty search for all 3 new hypotheses
+- 0/5 WORLD_CLASS. Portfolio EMPTY. Loop continues autonomously.
+

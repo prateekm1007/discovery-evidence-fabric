@@ -1,0 +1,131 @@
+{
+  "record_type": "ROUND177_FAILURE_ANALYSIS_AND_NEW_HYPOTHESES_V1",
+  "version": "1.0.0",
+  "date": "2026-08-24",
+  "round": 177,
+  "authority": "AI Loop V3 — FULLY AUTONOMOUS. All 3 FUTURE_NOVEL candidates killed. Loop generates new 2029 hypotheses from failures.",
+  "constitutional_basis": ["Article I", "Article V", "Article XIX", "Article XXIX", "Article XXXII", "Article XXXV", "Article XXXVI"],
+
+  "failure_analysis": {
+    "summary": "All 3 FUTURE_NOVEL candidates (Neurovascular Control Plane, Therapeutic State Control, Autonomous Thrombectomy State Engine) were KILLED by light simulation. The failures share a common pattern.",
+    "the_common_pattern": "All three candidates proposed to improve prediction/control by FUSING multiple existing signals. In every case, the fusion provided NO incremental value over the best single signal. This is because all signals derive from the same underlying physical state — they are correlated by construction.",
+    "the_lesson": "Signal fusion is NOT a moat. If signal B is derivable from signal A (even partially), adding B to A provides no new information. A genuine moat requires an observable that is NOT derivable from any combination of existing signals.",
+    "per_candidate_lessons": {
+      "NCP_killed": "ICP alone predicts disease trajectory as well as ICP+flow+drug+activity+posture. The additional signals are correlated with ICP through the shared causal variable (device degradation). Adding them introduces noise without new information.",
+      "TSC_killed": "PD-based control (effect) is worse than PK-based control (concentration) because the effect signal is noisier and the control path is indirect. Controlling on a noisy proxy of a hidden state is worse than controlling on a direct measurement of an observable state.",
+      "TSE_killed": "Force alone predicts fragmentation as well as force+flow+AE. AE is redundant because micro-fractures that produce AE also change force/flow. The signals are causally linked — measuring the same event through different modalities."
+    }
+  },
+
+  "the_new_moat_requirement": {
+    "rule": "A candidate can only survive if it provides an observable that is NOT derivable from any combination of existing signals.",
+    "what_does_NOT_work": [
+      "Fusing more signals (correlated signals add no information)",
+      "Better ML on existing signals (the information bottleneck is in the SIGNALS, not the algorithm)",
+      "Controlling on a proxy of a hidden state (noise amplification exceeds information gain)"
+    ],
+    "what_MIGHT_work": [
+      "A genuinely new PHYSICAL observable that measures a different aspect of the system",
+      "A CAUSAL intervention that changes the system state (not just observes it)",
+      "A TEMPORAL advantage — detecting something earlier that existing signals cannot detect because they measure a LATER stage of the causal chain"
+    ]
+  },
+
+  "new_2029_hypotheses": {
+    "authority": "CEO Round 169: 'Find an information bottleneck that the best existing technology cannot resolve.' Round 177 applies this lesson: the bottleneck must be PHYSICAL, not algorithmic.",
+
+    "hypothesis_1_TEMPORAL_OBSERVABLE_LEAD": {
+      "name": "Temporal Observable Lead — detecting the causal chain at an EARLIER stage than any existing signal",
+      "the_insight": "Existing signals (ICP, force, flow, AE) all measure EFFECTS of device degradation. The CAUSE is biological fouling of the shunt (protein accumulation, cell adhesion, tissue ingrowth). This fouling occurs BEFORE it affects hydraulic resistance, BEFORE it changes ICP, and BEFORE it produces symptoms. If we could observe fouling directly, we would have a temporal lead that no existing signal can match.",
+      "what_exists_2026": "ICP sensors, flow sensors, AI prediction — all measure downstream effects",
+      "what_is_commoditized_by_2028": "Prediction from downstream signals (ICP, flow)",
+      "the_2029_gap": "Direct observation of the CAUSE (biofouling) rather than the EFFECT (pressure/flow change)",
+      "information_bottleneck": "Biofouling is not observable with current implantable sensors. It requires either: (a) a new sensor modality (e.g., optical, impedance, ultrasound backscatter) that can measure surface deposition on the shunt, or (b) an indirect observable that precedes hydraulic resistance change",
+      "why_competitor_wont_build_by_2029": "Device vendors optimize hydraulic performance, not biological interface monitoring. The fouling problem is known but nobody has a sensor for it.",
+      "why_they_will_want_it": "Biofouling is the #1 cause of shunt failure. Predicting it before hydraulic symptoms would eliminate 50%+ of shunt revisions.",
+      "moat_analysis": {
+        "physical": "STRONGEST — requires a new sensor modality (optical/impedance/ultrasound backscatter) that no existing shunt has",
+        "temporal": "STRONGEST — observes the CAUSE days/weeks before any EFFECT is detectable",
+        "data": "STRONG — longitudinal fouling progression data is proprietary",
+        "model": "MODERATE — fouling→resistance→ICP causal model",
+        "workflow": "STRONG — changes from 'treat after symptoms' to 'intervene before symptoms'",
+        "integration": "MODERATE — works with existing shunt hardware but needs new sensor",
+        "ip": "STRONG — the sensor modality + causal model can be patented"
+      },
+      "novelty_confidence": "NOT YET SEARCHED — requires deep novelty search for biofouling sensors in shunt systems",
+      "classification": "FUTURE_NOVEL (pending search)"
+    },
+
+    "hypothesis_2_CAUSAL_INTERVENTION_NOT_PREDICTION": {
+      "name": "Causal Intervention — not predicting failure but CHANGING the trajectory",
+      "the_insight": "All killed candidates tried to PREDICT better. But prediction without intervention is just a warning. The 2029 invention could be: a system that not only detects degradation but ACTIVELY INTERVENES to slow or reverse it. For example: automatically adjusting shunt valve settings to redistribute flow and reduce fouling at the obstruction site, or triggering a localized drug release to dissolve early biofouling.",
+      "what_exists_2026": "Adjustable valves (passive), drug pumps (open-loop), AI prediction (passive)",
+      "what_is_commoditized_by_2028": "Prediction-based alerts",
+      "the_2029_gap": "CLOSED-LOOP intervention — detect early degradation → adjust device parameters → slow/reverse degradation → verify improvement",
+      "information_bottleneck": "No system currently forms a closed loop from early degradation detection to device parameter adjustment to outcome verification. The loop is always human-mediated (doctor sees alert → doctor adjusts → patient returns for checkup).",
+      "why_competitor_wont_build_by_2029": "Closed-loop intervention requires regulatory approval for autonomous device adjustment — a higher bar than prediction. Competitors focus on prediction because it's lower risk.",
+      "why_they_will_want_it": "Autonomous intervention eliminates the latency between detection and treatment. For shunt failure, this latency is currently days to weeks.",
+      "moat_analysis": {
+        "physical": "MODERATE — uses existing adjustable valves + drug pumps but adds the control loop",
+        "temporal": "STRONG — intervenes BEFORE symptoms, not after",
+        "data": "STRONG — intervention outcome data is proprietary",
+        "model": "STRONGEST — requires validated causal model of intervention→outcome",
+        "workflow": "STRONGEST — changes from 'predict then human intervenes' to 'detect then system intervenes'",
+        "integration": "MODERATE — requires regulatory approval for autonomous adjustment",
+        "ip": "STRONG — the closed-loop control method can be patented"
+      },
+      "novelty_confidence": "NOT YET SEARCHED — requires deep novelty search for closed-loop shunt intervention",
+      "classification": "FUTURE_NOVEL (pending search)"
+    },
+
+    "hypothesis_3_DEVICE_FREE_OBSERVABLE": {
+      "name": "Device-Free Physiological Observable — measuring patient state without any implanted device",
+      "the_insight": "All killed candidates assumed the patient has an implanted device (shunt, pump, sensor). But what if the 2029 invention is a NON-INVASIVE observable that replaces the need for device-based sensing? For example: a wearable or external sensor that measures a physiological signal (e.g., transcranial ultrasound, ocular parameters, gait analysis) that correlates with CSF dynamics well enough to predict shunt failure without ANY implanted sensor.",
+      "what_exists_2026": "Implantable sensors (invasive), imaging (expensive, non-continuous)",
+      "what_is_commoditized_by_2028": "Implantable sensor data",
+      "the_2029_gap": "Continuous, non-invasive, home-use monitoring of CSF dynamics",
+      "information_bottleneck": "No non-invasive, continuous, home-use technology can currently measure CSF dynamics. Existing methods (CT, MRI, lumbar puncture) are episodic and invasive.",
+      "why_competitor_wont_build_by_2029": "Device vendors sell implanted hardware. A non-invasive solution competes with their own products. No vendor has incentive to cannibalize their implant business.",
+      "why_they_will_want_it": "Non-invasive monitoring eliminates surgical risk, enables screening, and expands the addressable market to patients who don't yet need a shunt.",
+      "moat_analysis": {
+        "physical": "STRONGEST — requires a fundamentally new non-invasive sensing modality",
+        "temporal": "MODERATE — may not detect as early as implanted sensors",
+        "data": "STRONG — longitudinal non-invasive data is proprietary",
+        "model": "STRONG — mapping non-invasive signal to CSF dynamics requires validated model",
+        "workflow": "STRONGEST — changes from 'surgery + implant' to 'wearable + AI'",
+        "integration": "LOW — does NOT require existing implanted hardware (this is the point)",
+        "ip": "STRONG — the non-invasive sensing method + mapping model can be patented"
+      },
+      "novelty_confidence": "NOT YET SEARCHED — requires deep novelty search for non-invasive CSF monitoring",
+      "classification": "FUTURE_NOVEL (pending search)"
+    }
+  },
+
+  "the_generation_principle": {
+    "old_approach": "Fuse more signals → better prediction (FAILED — signals are correlated)",
+    "new_approach": "Find a NEW observable that measures a DIFFERENT stage of the causal chain, or find a way to INTERVENE rather than just predict",
+    "the_three_directions": [
+      "1. Temporal Lead: observe the CAUSE (biofouling) before the EFFECT (ICP change)",
+      "2. Causal Intervention: not prediction but CLOSED-LOOP intervention to change trajectory",
+      "3. Device-Free: non-invasive observable that replaces implanted sensors entirely"
+    ],
+    "why_these_are_stronger": "Each has a PHYSICAL moat (new sensor modality, new control loop, or new non-invasive approach) — not just an algorithmic moat. The failures proved that algorithmic improvements on existing signals do not create moats."
+  },
+
+  "next_autonomous_actions": [
+    "1. Deep novelty search for hypothesis 1 (biofouling sensor in shunt systems)",
+    "2. Deep novelty search for hypothesis 2 (closed-loop autonomous shunt intervention)",
+    "3. Deep novelty search for hypothesis 3 (non-invasive CSF dynamics monitoring)",
+    "4. If any survives at novelty level 2: light simulation to test the physical moat",
+    "5. If all fail: the loop has exhausted the current hypothesis space and must report to the CEO"
+  ],
+
+  "state": {
+    "world_class": "0/5",
+    "portfolio": "EMPTY",
+    "candidates_killed_by_light_simulation": ["Neurovascular Control Plane", "Therapeutic State Control", "Autonomous Thrombectomy State Engine"],
+    "new_hypotheses_generated": 3,
+    "next_action": "Deep novelty search for the 3 new hypotheses",
+    "the_loop_is_learning": "The failure pattern (signal fusion = no moat) has been incorporated into the hypothesis generation. New candidates have PHYSICAL moats, not algorithmic ones."
+  }
+}
