@@ -1,0 +1,141 @@
+{
+  "record_type": "ROUND158_INVALID_EXPERIMENT_OBJECT_V1",
+  "version": "1.0.0",
+  "date": "2026-08-24",
+  "round": 159,
+  "authority": "CEO Round 159: 'Round 158 produced invalid experiments, not negative scientific evidence. Do not enter either KILL into the cemetery. Create ROUND158_INVALID_EXPERIMENT_OBJECT with epistemic_update_allowed = FALSE.'",
+  "constitutional_basis": [
+    "Article I — evidence precedes assertion (invalid evidence cannot support assertion)",
+    "Article VII — never weaken the verifier to rescue a claim (cannot weaken protocol to admit results)",
+    "Article XIX — never optimize for the gate (parameters must be frozen BEFORE execution)",
+    "Article XXVIII — no silent semantic promotion (cannot promote 'invalid experiment' to 'validated negative')",
+    "Article XXIX — separate implementation failure from mechanism failure (implementation bugs do not kill mechanisms)",
+    "Article XXXIII — no irreversible action on unresolved evidence (invalid evidence cannot drive irreversible kills)"
+  ],
+
+  "purpose": "Round 158 executed C2-Y-R1 and C3-X-R1 experiments. The adversarial self-attack identified 3 Article XIX violations. Per the CEO Round 159 directive, these results CANNOT enter the cemetery and CANNOT change candidate belief. This object formally freezes the Round 158 results as INVALID EXPERIMENTAL EVIDENCE — they remain historical evidence about implementation behavior, but cannot update candidate state.",
+
+  "the_four_epistemic_states": {
+    "introduced_in_round": 159,
+    "authority": "CEO Round 159: 'The system now has to distinguish four states, not two: VALIDATED_POSITIVE, VALIDATED_NEGATIVE, EXPERIMENT_INVALID, INFRASTRUCTURE_BLOCKED.'",
+    "definitions": {
+      "VALIDATED_POSITIVE": "Experiment passed validity gate AND results support candidate promotion. Evidence can INCREASE belief.",
+      "VALIDATED_NEGATIVE": "Experiment passed validity gate AND results support candidate demotion/killing. Evidence can DECREASE belief.",
+      "EXPERIMENT_INVALID": "Experiment FAILED validity gate (protocol violation, implementation bug, etc.). Evidence CANNOT update candidate belief. Candidate state UNCHANGED.",
+      "INFRASTRUCTURE_BLOCKED": "Experiment cannot be executed due to infrastructure dependency (external solver, real-world data, etc.). No epistemic update. Candidate remains in prior state."
+    },
+    "transition_rules": {
+      "VALIDATED_POSITIVE": "May trigger candidate promotion IF all other World-Class gate conditions are met",
+      "VALIDATED_NEGATIVE": "May trigger candidate demotion/killing per pre-registered KILL thresholds",
+      "EXPERIMENT_INVALID": "Candidate state UNCHANGED. Experiment must be re-run with valid protocol (V2 pre-registration). The invalid experiment's results are preserved as historical evidence about implementation behavior, NOT as scientific evidence about the candidate.",
+      "INFRASTRUCTURE_BLOCKED": "Candidate state UNCHANGED. No epistemic update. Infrastructure must be resolved before experiment can run."
+    }
+  },
+
+  "c2_y_r1_invalidity_declaration": {
+    "experiment_id": "C2-Y-R1",
+    "round_executed": 158,
+    "results_file": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND158_ARTIFACTS/C2_Y_R1_RESULTS_V1.json",
+    "reported_verdict": "KILL",
+    "epistemic_state": "EXPERIMENT_INVALID",
+    "epistemic_update_allowed": false,
+    "violations": [
+      {
+        "violation_id": "C2Y-XIX-1",
+        "article": "XIX (never optimize for the gate)",
+        "description": "Alarm thresholds (UISB_THRESHOLD_MMHG=27, NAIVE_THRESHOLD_MMHG=30, C2Y_MANIFOLD_DEVIATION_THRESHOLD_MMHG=8), alarm latch (ALARM_LATCH_S=7d), and drift compensation (95%) were tuned during debugging across ~13 iterations of the experiment script. These parameters were NOT in the C2_Y_R1_PREREGISTRATION_V1.json file. They were chosen before verdict examination, but after the pre-registration was written.",
+        "evidence": "The pre-registration specified FROZEN parameters (Kp, Ki, threshold levels 15/20/25 mmHg, sensor noise, drift rate, etc.) but did NOT specify the alarm operating point, latch duration, or drift compensation coefficient. The actual values used differ from the pre-registered threshold levels (pre-registered: 15/20/25; actual: 27/30/8).",
+        "severity": "HIGH — the alarm threshold directly determines the false-alarm rate, which is a primary endpoint. Tuning this parameter after writing the pre-registration (even before seeing results) violates Article XIX.",
+        "remediation": "C2-Y V2 pre-registration must include ALL numerical parameters, including alarm thresholds, latch, drift compensation. V2 must be frozen BEFORE V2 execution."
+      }
+    ],
+    "candidate_state_change": "NONE — C2-Y remains in INVESTIGATION. The KILL verdict is NOT entered into the cemetery. C2-Y is not promoted, not killed, not demoted. It remains exactly where it was before Round 158.",
+    "what_the_results_DO_tell_us": "The results tell us about IMPLEMENTATION BEHAVIOR of the specific C2-Y-R1 script. They suggest that response-manifold deviation may detect some failure modes (overdrainage, posture_artifact) earlier than threshold-based alarms. This is a hypothesis for V2 testing, NOT a validated finding.",
+    "what_the_results_DO_NOT_tell_us": "The results do NOT tell us whether C2-Y (the invention) provides clinically meaningful lead-time advantage. The threshold tuning means the false-alarm rate comparison is not fair. The V2 experiment is required."
+  },
+
+  "c3_x_r1_invalidity_declaration": {
+    "experiment_id": "C3-X-R1",
+    "round_executed": 158,
+    "results_file": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND158_ARTIFACTS/C3_X_R1_RESULTS_V1.json",
+    "reported_verdict": "KILL",
+    "epistemic_state": "EXPERIMENT_INVALID",
+    "epistemic_update_allowed": false,
+    "violations": [
+      {
+        "violation_id": "C3X-XIX-1",
+        "article": "XIX (never optimize for the gate)",
+        "description": "The MPC adjustment gain (adjustment = 0.5 * error) was NOT in the C3_X_R1_PREREGISTRATION_V1.json file. The pre-registration specified lambda=0.01 (dose penalty) but not the proportional gain. The 0.5 value was chosen during implementation.",
+        "evidence": "The pre-registration's C3-X candidate parameters section specifies UKF + MPC with 4-hour horizon, target 250 ng/mL, lambda=0.01, max 8 doses/day. It does NOT specify the MPC proportional gain. The actual gain (0.5) caused oscillation, producing CV=0.525 (worse than baselines).",
+        "severity": "HIGH — the MPC gain directly determines controller aggressiveness, which directly determines CV. Tuning this parameter after writing the pre-registration violates Article XIX.",
+        "remediation": "C3-X V2 pre-registration must include the MPC gain (and all other controller parameters). V2 must be frozen BEFORE V2 execution."
+      },
+      {
+        "violation_id": "C3X-XIX-2",
+        "article": "XIX + XXIX (implementation must match protocol)",
+        "description": "The pre-registration specified 'Unscented Kalman Filter (UKF) on continuous CSF drug concentration signal' with state variables [central_concentration, peripheral_concentration, CSF_flow_rate_estimate], process noise Q, measurement noise R. The actual implementation used EXPONENTIAL SMOOTHING (0.95/0.05 weighted average), NOT a UKF. This is a specification violation — the implementation does not match the protocol.",
+        "evidence": "The script c3_x_r1_experiment.py line 216: 'ukf_Cc_estimate = 0.95 * ukf_Cc_estimate + 0.05 * Cc  # exponential smoothing'. The pre-registration specified a full UKF with process/measurement noise covariance. The implementation is a simple low-pass filter.",
+        "severity": "CRITICAL — the UKF is a core component of the C3-X invention. Replacing it with exponential smoothing means the experiment did NOT test the C3-X invention; it tested a degraded substitute. Per Article XXIX, an implementation failure does not kill the mechanism — but it does invalidate the experiment.",
+        "remediation": "C3-X V2 must implement a proper UKF with: (a) state vector [Cc, Cp, CSF_flow_rate], (b) process noise covariance Q, (c) measurement noise covariance R, (d) sigma point generation, (e) state prediction + update. The UKF parameters must be pre-registered."
+      }
+    ],
+    "candidate_state_change": "NONE — C3-X remains in INVESTIGATION. The KILL verdict is NOT entered into the cemetery. The 'CV=0.525 is worse than baselines' finding reflects the DEGRADED IMPLEMENTATION, not the C3-X mechanism.",
+    "what_the_results_DO_tell_us": "The results tell us that a poorly-tuned MPC with exponential smoothing (instead of UKF) produces oscillation and high CV. This is an implementation finding, not a mechanism finding.",
+    "what_the_results_DO_NOT_tell_us": "The results do NOT tell us whether C3-X (with proper UKF + properly-tuned MPC) provides tighter therapeutic exposure than baselines. The V2 experiment with proper implementation is required."
+  },
+
+  "c5_x_r1_infrastructure_blocked_declaration": {
+    "experiment_id": "C5-X-R1",
+    "round_executed": "NOT YET (blocked since Round 156)",
+    "epistemic_state": "INFRASTRUCTURE_BLOCKED",
+    "epistemic_update_allowed": false,
+    "blocker": "OpenFOAM-9 build incomplete (31% = 1529/~4900 .o files). Build process repeatedly dies after ~30s. clotFoam solver cannot be built without OpenFOAM libraries.",
+    "constitutional_basis": "Article XXXIV — stop coding when reality is the next bottleneck. The external solver IS the bottleneck. But per CEO Round 159: 'C5 should remain BLOCKED_BY_EXTERNAL_SOLVER — not killed.'",
+    "candidate_state_change": "NONE — C5-X remains in INVESTIGATION (specifically: BLOCKED_ON_INFRASTRUCTURE). No epistemic update.",
+    "remediation": "Round 159 creates C5-ENV-E02: environment-selection experiment to compare (a) source build continuation, (b) container, (c) HPC, (d) other validated route. The AI decides whether continuing the current build is rational or whether an alternative route is better."
+  },
+
+  "summary_table": {
+    "candidate": "C2-Y",
+    "round_158_verdict": "KILL (reported)",
+    "epistemic_state": "EXPERIMENT_INVALID",
+    "candidate_state_change": "NONE",
+    "cemetery_entry": "NONE — not entered",
+    "next_action": "C2-Y V2 pre-registration + re-run with frozen parameters"
+  },
+  "summary_table_C3_X": {
+    "candidate": "C3-X",
+    "round_158_verdict": "KILL (reported)",
+    "epistemic_state": "EXPERIMENT_INVALID",
+    "candidate_state_change": "NONE",
+    "cemetery_entry": "NONE — not entered",
+    "next_action": "C3-X V2 pre-registration + proper UKF implementation + re-run"
+  },
+  "summary_table_C5_X": {
+    "candidate": "C5-X",
+    "round_158_verdict": "N/A (not executed)",
+    "epistemic_state": "INFRASTRUCTURE_BLOCKED",
+    "candidate_state_change": "NONE",
+    "cemetery_entry": "NONE",
+    "next_action": "C5-ENV-E02 environment-selection experiment"
+  },
+
+  "portfolio_state_after_round_159": {
+    "world_class_count": 0,
+    "portfolio_filled": 0,
+    "portfolio_capacity": 5,
+    "killed_permanent": 2,
+    "killed_permanent_list": ["C2 (CE-014, Round 150)", "C4 (CE-012, Round 62)"],
+    "in_investigation": 3,
+    "in_investigation_list": ["C1 (BLOCKED on STRIDE data)", "C3 (BLOCKED on mechanism validation)", "C5 (BLOCKED on OpenFOAM)"],
+    "in_discovery_queue": 7,
+    "in_discovery_queue_list": ["C1-X", "C1-Y", "C2-X", "C2-Y", "C3-X", "C5-X", "C5-Y"],
+    "experiment_invalid_count": 2,
+    "experiment_invalid_list": ["C2-Y-R1 (Round 158)", "C3-X-R1 (Round 158)"],
+    "infrastructure_blocked_count": 1,
+    "infrastructure_blocked_list": ["C5-X-R1 (OpenFOAM-9 build)"],
+    "world_class_score": "0/5 — CORRECT"
+  },
+
+  "the_key_lesson": "Round 158 exposed the difference between a FAILED EXPERIMENT and a FAILED INVENTION. The C2-Y and C3-X experiments failed the validity gate (Article XIX violations), NOT the scientific question. The candidates remain in INVESTIGATION. This is the correct epistemic discipline: invalid evidence cannot update belief, even if the invalid evidence 'looks bad' for the candidate. Round 159 builds the EXPERIMENT_VALIDITY_GATE to make this discipline mechanical, not procedural."
+}

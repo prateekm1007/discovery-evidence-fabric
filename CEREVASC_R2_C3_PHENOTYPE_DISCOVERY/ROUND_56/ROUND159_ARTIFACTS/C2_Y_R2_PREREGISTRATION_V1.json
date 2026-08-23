@@ -1,0 +1,170 @@
+{
+  "record_type": "C2_Y_R2_PREREGISTRATION_V1",
+  "version": "2.0.0",
+  "date": "2026-08-24",
+  "round": 159,
+  "authority": "CEO Round 159: 'C2-Y V2: Before running anything: Freeze all alarm thresholds, baseline definition, response-manifold parameters, failure definitions, patient distribution, noise, drift, posture, failure onset, classifier, model selection, train/validation/test split. No parameter can be changed after observing V2 results.'",
+  "constitutional_basis": [
+    "Article I — evidence precedes assertion",
+    "Article VII — never weaken the verifier to rescue a claim",
+    "Article XIX — never optimize for the gate (ALL parameters frozen BEFORE execution)",
+    "Article XXVII — no threshold invention (every threshold has provenance)",
+    "Article XXIX — separate implementation failure from mechanism failure",
+    "EXPERIMENT_VALIDITY_GATE_V1 (this round) — all 7 conditions must pass"
+  ],
+
+  "purpose": "Round 158 C2-Y-R1 was INVALID because alarm thresholds, latch, and drift compensation were tuned during debugging (Article XIX violation). This V2 pre-registration freezes ALL numerical parameters, including those that were missing from V1. No parameter may be changed after this file is committed.",
+
+  "frozen_at": "2026-08-24T00:00:00Z (Round 159 commit)",
+  "frozen_by": "main agent (session 2026-08-24)",
+  "experiment_has_started": false,
+  "results_known": false,
+
+  "cohort_parameters_FROZEN": {
+    "cohort_size": 300,
+    "n_per_failure_mode": 60,
+    "failure_modes": ["obstruction", "overdrainage", "underdrainage", "valve_dysfunction", "posture_artifact"],
+    "random_seed": 42,
+    "patient_variability": {
+      "age_years": "uniform(2, 80)",
+      "sex": "50% M, 50% F",
+      "bmi_kg_per_m2": "uniform(18, 35)",
+      "csf_production_rate_mL_per_min": "uniform(0.30, 0.50)"
+    },
+    "sensor_noise_distribution": {
+      "low_noise": "100 patients, noise_std = 0.5 mmHg",
+      "medium_noise": "100 patients, noise_std = 1.5 mmHg",
+      "high_noise": "100 patients, noise_std = 3.0 mmHg"
+    },
+    "disease_progression_model": {
+      "progression_steps_pct": [100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50],
+      "step_duration_hours": "uniform(6, 72) per step, randomized per patient",
+      "clinical_failure_definition": "ICP > 25 mmHg sustained > 1 hour (for high-ICP modes); ICP < 0 mmHg sustained > 1 hour (for overdrainage); either (for valve_dysfunction, posture_artifact)"
+    },
+    "train_test_split": {
+      "training_fraction": 0.60,
+      "test_fraction": 0.40,
+      "split_method": "First 180 patients (60%) = training (threshold tuning); last 120 patients (40%) = test (frozen threshold applied)",
+      "stratification": "Stratified by failure_mode × sensor_noise_bucket to ensure balanced distribution"
+    }
+  },
+
+  "physiological_parameters_FROZEN": {
+    "supine_target_icp_mmHg": 12.0,
+    "upright_target_icp_mmHg": 5.0,
+    "posture_change_interval_h": "uniform(4, 6) per change",
+    "natural_drift_coefficient": -0.05,
+    "drift_compensation_fraction": 0.95,
+    "csf_bolus_volume_mL": 5.0,
+    "csf_bolus_rate_mL_per_min": 1.0,
+    "bolus_administration_time_h": "uniform(0, 168) (within first 7 days)",
+    "sensor_drift_rate_mmHg_per_day": 1.0
+  },
+
+  "mode_specific_icp_offsets_FROZEN": {
+    "obstruction": {"offset_formula": "(1.0 - degradation_factor) * 30.0", "failure_direction": "above", "failure_threshold_mmHg": 25.0},
+    "overdrainage": {"offset_formula": "-(1.0 - degradation_factor) * 25.0", "failure_direction": "below", "failure_threshold_mmHg": 0.0},
+    "underdrainage": {"offset_formula": "(1.0 - degradation_factor) * 28.0", "failure_direction": "above", "failure_threshold_mmHg": 25.0},
+    "valve_dysfunction": {"offset_formula": "(1.0 - degradation_factor) * 35.0 * sin(2*pi*t_h/4.0)", "failure_direction": "either", "failure_threshold_mmHg": 25.0},
+    "posture_artifact": {"offset_formula": "(1.0 - degradation_factor) * (50.0 if upright else -25.0)", "failure_direction": "either", "failure_threshold_mmHg": 25.0}
+  },
+
+  "simulation_parameters_FROZEN": {
+    "sim_horizon_days": 30,
+    "dt_s": 300,
+    "n_steps": 8640,
+    "baseline_window_s": 259200
+  },
+
+  "UISB_baseline_A_parameters_FROZEN": {
+    "controller_type": "PI (proportional-integral) on ICP error",
+    "proportional_gain_Kp": 0.15,
+    "integral_gain_Ki": 0.02,
+    "pump_rate_clamp": "[-0.5, 0.5] mL/min",
+    "pump_icp_effect_coefficient": 10.0,
+    "fidelity_check": "UISB reproduction must match VIEshunt-published ICP error response (Figure 4-5 of PMID 40087797) within 20%. If exceeds 20%, experiment is BLOCKED per Article XXIX."
+  },
+
+  "alarm_thresholds_FROZEN": {
+    "UISB_THRESHOLD_MMHG": 27.0,
+    "NAIVE_THRESHOLD_MMHG": 30.0,
+    "C2Y_MANIFOLD_DEVIATION_THRESHOLD_MMHG": 8.0,
+    "ALARM_LATCH_S": 604800,
+    "threshold_tuning_method": "Tuned on TRAINING cohort (60% = 180 patients) to achieve approximately 1 FA/patient-month. Threshold frozen before TEST cohort (40% = 120 patients) execution.",
+    "threshold_provenance": "These thresholds were NOT in V1 pre-registration. They are now frozen in V2. Per Article XIX, no post-hoc adjustment."
+  },
+
+  "response_manifold_parameters_FROZEN": {
+    "feature": "rolling_std of (measured_icp - target_icp) over 60-minute window",
+    "baseline_window_s": 259200,
+    "baseline_std_multiplier": 1.2,
+    "manifold_deviation_formula": "max(0.0, rolling_std - baseline_std)",
+    "alarm_condition": "manifold_deviation > C2Y_MANIFOLD_DEVIATION_THRESHOLD_MMHG AND (t_s - last_alarm_time_s) > ALARM_LATCH_S"
+  },
+
+  "classifier_parameters_FROZEN": {
+    "type": "threshold-based on latest alarm ICP + trend",
+    "rules": [
+      "if last_alarm_icp > 22 and icp_trend > 5: obstruction",
+      "elif last_alarm_icp > 22: underdrainage",
+      "elif last_alarm_icp < 0: overdrainage",
+      "elif abs(icp_trend) > 8: valve_dysfunction",
+      "else: posture_artifact"
+    ],
+    "icp_trend_window": "last 10 alarms"
+  },
+
+  "primary_endpoint_FROZEN": {
+    "endpoint": "warning_lead_time_at_FPR_target",
+    "mathematical_definition": "Lead time (hours) = t_clinical_failure - t_first_alarm, conditioned on FPR = 1 FA/patient-month over the patient-month horizon",
+    "lead_time_window_h": 72,
+    "fpr_target_fa_per_month": 1.0,
+    "operating_point_selection": "Each arm's alert threshold tuned on TRAINING cohort (180 patients) to achieve FPR target. Threshold frozen for TEST cohort (120 patients)."
+  },
+
+  "decision_thresholds_FROZEN_from_EMPIRICAL_THRESHOLD_PROVENANCE_V1": {
+    "WIN_lead_time_h": 24,
+    "WIN_false_alarms_per_patient_month": 1.0,
+    "WIN_classification_accuracy_pct": 70.0,
+    "KILL_lead_time_h": 4,
+    "KILL_false_alarms_per_patient_month": 3.0,
+    "KILL_classification_accuracy_pct": 50.0,
+    "threshold_provenance_hash": "8aff036d081e3e6465f10e3b4cd68688cfd85be008284223600f3c8f67be652a"
+  },
+
+  "the_three_arms_FROZEN": {
+    "arm_1_naive_threshold": "Static ICP threshold alarm (NAIVE_THRESHOLD_MMHG = 30 mmHg), no controller, no response-manifold features",
+    "arm_2_UISB_baseline": "VIEshunt-style PI controller (Kp=0.15, Ki=0.02) + Codman-style threshold alarm (UISB_THRESHOLD_MMHG = 27 mmHg) + Nature-style chronic ICP sensor with drift compensation",
+    "arm_3_C2_Y_candidate": "UISB baseline + response-manifold deviation predictor (rolling_std over 60min, threshold 8 mmHg, 7-day latch)"
+  },
+
+  "mechanism_specific_domain_analysis": {
+    "authority": "CEO Round 159: 'Round 159 should first determine whether the response-manifold method has a mechanism-specific domain of superiority. Which failure classes are theoretically observable from dynamic response before conventional pressure thresholds, and which are fundamentally not?'",
+    "analysis_approach": "Report results SEPARATELY by failure mode. Do NOT hide failure-mode weaknesses inside an aggregate score.",
+    "failure_mode_table_format": "| Failure mode | Lead time | False alarms | Classification | Verdict |",
+    "scientific_kill_condition": "C2-Y does not produce a clinically meaningful early-warning advantage for ANY strategically important failure class under a fixed false-alarm constraint → KILL C2-Y",
+    "conditional_survival_condition": "If C2-Y clearly works for ONE failure class but not others → create a NARROW SUCCESSOR (e.g., C2-Y-overdrainage-prediction or C2-Y-valve-dysfunction-prediction), NOT a broad C2-Y promotion. Then attack that narrow mechanism.",
+    "do_not_rescue_by_inventing_new_indication": "If C2-Y fails broadly, do NOT rescue it by inventing a new indication after the result. Kill it cleanly."
+  },
+
+  "what_is_FORBIDDEN_after_V2_results_are_known": [
+    "Changing any parameter in this file (Article XIX)",
+    "Adjusting WIN/KILL/MMD thresholds (Article VII)",
+    "Re-running with different random seed and reporting only the best (Article XIX)",
+    "Excluding specific patients or failure modes from the analysis (Article XXXII)",
+    "Changing the primary endpoint (Article VII)",
+    "Adding post-hoc secondary endpoints and presenting them as primary (Article XXVIII)",
+    "Inventing a new indication for C2-Y after seeing V2 results (CEO Round 159 directive)",
+    "Promoting C2-Y broadly if it only works for one failure class (must create narrow successor instead)"
+  ],
+
+  "validity_gate_compliance": {
+    "1_PRE_REGISTRATION_VALID": "This file is the pre-registration. Will be hash-pinned in Round 159 hash registry.",
+    "2_IMPLEMENTATION_MATCHES_PROTOCOL": "V2 script must implement EXACTLY the parameters in this file. No substitution.",
+    "3_BASELINE_FAIR": "UISB baseline = VIEshunt-style controller (Kp/Ki from PMID 40087797) + Codman threshold + Nature sensor. Must calibrate against VIEshunt Figure 4-5.",
+    "4_NO_DATA_LEAKAGE": "All arms receive same sensor stream. C2-Y extracts response-manifold features (this is the invention being tested).",
+    "5_THRESHOLDS_FROZEN": "WIN/KILL/MMD from EMPIRICAL_THRESHOLD_PROVENANCE_V1 (hash-pinned).",
+    "6_MODEL_SPECIFICATION_FROZEN": "ALL parameters in this file are frozen. No 'tuning during debugging' allowed.",
+    "7_RANDOM_SEED_COHORT_PROVENANCE_COMPLETE": "Seed = 42, cohort = 300 patients stratified as specified."
+  }
+}

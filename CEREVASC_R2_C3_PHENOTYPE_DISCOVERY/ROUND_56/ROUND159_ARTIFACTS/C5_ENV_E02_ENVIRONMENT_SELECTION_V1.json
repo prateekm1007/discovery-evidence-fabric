@@ -1,0 +1,132 @@
+{
+  "record_type": "C5_ENV_E02_ENVIRONMENT_SELECTION_V1",
+  "version": "1.0.0",
+  "date": "2026-08-24",
+  "round": 159,
+  "authority": "CEO Round 159: 'C5 must be treated as an infrastructure experiment. Create C5-ENV-E02 and let the scheduler compare: source build continuation, compatible reproducible environment, container, HPC, other validated route — using probability_of_success × solver_fidelity × reproducibility × independence ÷ (time + compute + engineering friction). The AI decides whether continuing the current build is rational. Do not let sunk-cost bias control the research program.'",
+  "constitutional_basis": [
+    "Article XXXIV — stop coding when reality is the next bottleneck (but the external solver IS the bottleneck, and we must choose HOW to acquire it)",
+    "Article XXXII — state strongest alternative (the current build route may not be the best)",
+    "EXPERIMENT_VALIDITY_GATE_V1 — infrastructure blocked is a legitimate state, but the blockage itself should be optimized"
+  ],
+
+  "purpose": "OpenFOAM-9 build has been stuck at 31% (1529/~4900 .o files) for multiple rounds. The build process repeatedly dies after ~30s. This is now a system-level risk. Rather than continuing to restart the same failing build (sunk-cost bias), Round 159 treats the environment acquisition as an experiment itself: compare multiple routes to a certified clotFoam environment and select the best.",
+
+  "the_target": {
+    "what_we_need": "A working clotFoam solver built on OpenFOAM v9 libraries",
+    "why_we_need_it": "C5-X-R1 requires independent reproduction via clotFoam (Article XXVIII — no silent semantic promotion). Our internal World C flow simulator is custom Python; clotFoam is an external, widely-validated CFD solver. Without clotFoam, C5-X cannot be validated.",
+    "scientific_legitimacy": "The external clotFoam project explicitly targets OpenFOAM v9 (per /home/z/clotFoam/README.md). The scientific target is legitimate.",
+    "current_route": "Source build of OpenFOAM-9 from /home/z/OpenFOAM-9.tar.gz + MPICH from conda env 'sim' + system GCC. Build has been failing for 4+ rounds."
+  },
+
+  "the_five_routes_compared": {
+
+    "route_A_source_build_continuation": {
+      "description": "Continue the current route: build OpenFOAM-9 from source with MPICH + system GCC. Fix the build-dies-after-30s issue.",
+      "probability_of_success": 0.40,
+      "solver_fidelity": 1.00,
+      "reproducibility": 0.80,
+      "independence": 1.00,
+      "time_hours_estimated": 8,
+      "compute_cost": "LOW (local CPU)",
+      "engineering_friction": "HIGH (build keeps dying, root cause unknown — likely OOM killer or signal handling)",
+      "score": "(0.40 × 1.00 × 0.80 × 1.00) / (8 + 0 + 8) = 0.020",
+      "pros": "Full source control; maximum independence; matches scientific target exactly",
+      "cons": "Has been failing for 4 rounds; sunk-cost bias risk; root cause of build death unknown",
+      "diagnosis_of_failure": "Build process receives SIGTERM or OOM kill after ~30s. Possible causes: (a) memory pressure (4GB system, build uses ~2GB), (b) setsid/nohup not properly detaching from parent shell, (c) bash subshell exiting on signal. Need to diagnose before continuing."
+    },
+
+    "route_B_prebuilt_openfoam_docker": {
+      "description": "Use a prebuilt OpenFOAM v9 Docker image (e.g., opencfd/openfoam-default:9 or community images). Run clotFoam inside the container.",
+      "probability_of_success": 0.80,
+      "solver_fidelity": 1.00,
+      "reproducibility": 0.95,
+      "independence": 0.95,
+      "time_hours_estimated": 2,
+      "compute_cost": "LOW (local CPU, container overhead minimal)",
+      "engineering_friction": "LOW (Docker handles dependencies)",
+      "score": "(0.80 × 1.00 × 0.95 × 0.95) / (2 + 0 + 2) = 0.090",
+      "pros": "High probability of success; fast; reproducible; Docker isolates dependencies",
+      "cons": "Requires Docker installed (may not have it); slightly less independence than source build (but Docker images are open-source)",
+      "prerequisite_check_needed": "Is Docker installed on this system?"
+    },
+
+    "route_C_conda_openfoam": {
+      "description": "Install OpenFOAM via conda-forge (openfoam-org channel or community builds).",
+      "probability_of_success": 0.60,
+      "solver_fidelity": 0.95,
+      "reproducibility": 0.90,
+      "independence": 0.90,
+      "time_hours_estimated": 1,
+      "compute_cost": "LOW",
+      "engineering_friction": "MEDIUM (conda packaging of OpenFOAM is less official)",
+      "score": "(0.60 × 0.95 × 0.90 × 0.90) / (1 + 0 + 3) = 0.128",
+      "pros": "Fast if it works; integrates with existing conda env 'sim'",
+      "cons": "OpenFOAM is not officially on conda-forge; community builds may be outdated or incomplete; clotFoam may not compile against conda OpenFOAM"
+    },
+
+    "route_D_system_package_apt": {
+      "description": "Install OpenFOAM via apt (Ubuntu/Debian package). The OpenFOAM Foundation provides apt repositories for v9.",
+      "probability_of_success": 0.30,
+      "solver_fidelity": 1.00,
+      "reproducibility": 0.95,
+      "independence": 1.00,
+      "time_hours_estimated": 0.5,
+      "compute_cost": "LOW",
+      "engineering_friction": "LOW if sudo available, BLOCKED if not",
+      "score": "(0.30 × 1.00 × 0.95 × 1.00) / (0.5 + 0 + 0.5) = 0.285 — BUT requires sudo",
+      "pros": "Official route; fastest if sudo available; fully reproducible",
+      "cons": "Requires sudo (we don't have it); apt package may not match v9 exactly",
+      "prerequisite_check_needed": "Do we have sudo? (Earlier checks showed: NO — 'sudo: a password is required')"
+    },
+
+    "route_E_alternative_solver_substitution": {
+      "description": "If clotFoam cannot be acquired, use a DIFFERENT external CFD solver for independent reproduction. The constitutional requirement (Article XXVIII) is INDEPENDENT reproduction, not clotFoam specifically. Alternatives: SimVascular, ANSYS Fluent (if available), or a second independent OpenFOAM build.",
+      "probability_of_success": 0.50,
+      "solver_fidelity": 0.85,
+      "reproducibility": 0.80,
+      "independence": 0.95,
+      "time_hours_estimated": 4,
+      "compute_cost": "LOW-MEDIUM",
+      "engineering_friction": "MEDIUM (need to port clotFoam's physics to alternative solver)",
+      "score": "(0.50 × 0.85 × 0.80 × 0.95) / (4 + 0 + 6) = 0.032",
+      "pros": "Maintains independence requirement; avoids OpenFOAM build entirely",
+      "cons": "Requires porting clotFoam's platelet aggregation model to a different solver; may introduce new bugs; deviates from published clotFoam methodology"
+    }
+  },
+
+  "route_ranking": {
+    "rank_1": "Route D (apt) — score 0.285 — BUT BLOCKED on sudo",
+    "rank_2": "Route C (conda) — score 0.128 — viable if conda package exists",
+    "rank_3": "Route B (Docker) — score 0.090 — viable if Docker installed",
+    "rank_4": "Route E (alternative solver) — score 0.032 — fallback if OpenFOAM routes all fail",
+    "rank_5": "Route A (source build continuation) — score 0.020 — lowest score, sunk-cost bias risk",
+    "recommendation": "Try Route C (conda) first. If conda package doesn't exist or fails, try Route B (Docker). If Docker not available, try Route E (alternative solver). Route A (continue source build) is the WORST option — do not continue out of sunk-cost bias.",
+    "executive_decision": "CEASE source build restarts. The current route has the lowest expected value. Investigate Routes C and B in Round 160."
+  },
+
+  "sunk_cost_analysis": {
+    "sunk_cost": "~4 rounds of build attempts, ~2 hours of coder time, ~1529 .o files compiled",
+    "sunk_cost_fallacy": "Continuing to restart the failing build because 'we've already invested so much' is the sunk-cost fallacy. The CEO Round 159 directive explicitly warns against this.",
+    "rational_decision": "The 1529 .o files are NOT wasted — they represent partial progress. But the BUILD PROCESS is broken. The rational decision is to abandon the build process (not the partial progress) and switch to a route with higher probability of success.",
+    "what_to_preserve": "The /home/z/OpenFOAM-9/ directory with 1529 .o files. If Route C or B succeeds, we may still use the partial build. If not, the partial build is harmless.",
+    "what_to_abandon": "The restart_openfoam_R157_v2.sh script and the persistent wrapper. These have failed repeatedly."
+  },
+
+  "infrastructure_blocked_status": {
+    "candidate": "C5-X",
+    "experiment": "C5-X-R1",
+    "epistemic_state": "INFRASTRUCTURE_BLOCKED",
+    "epistemic_update_allowed": false,
+    "blocker": "No working clotFoam environment",
+    "blocker_since_round": 156,
+    "rounds_blocked": 4,
+    "deadline_for_resolution": "Round 162 (3 more rounds). If no route succeeds by Round 162, escalate to CEO for resource decision (e.g., HPC allocation, external collaboration)."
+  },
+
+  "honest_disclosure": {
+    "what_this_analysis_does": "Treats the environment acquisition as an experiment, not a sunk cost. Compares 5 routes on 4 dimensions. Identifies the current route as the WORST option.",
+    "what_this_analysis_does_NOT_do": "Does not guarantee any route will succeed. Probability estimates are subjective (coder judgment, not calibrated). The actual success depends on system state we haven't verified (Docker installed? conda package exists?).",
+    "next_step": "Round 160: (1) check if Docker is installed, (2) check if conda-forge has OpenFOAM v9, (3) if neither, attempt Route E (alternative solver). Route A (source build) is DEFERRED — only resume if all other routes fail AND the build-death root cause is diagnosed."
+  }
+}

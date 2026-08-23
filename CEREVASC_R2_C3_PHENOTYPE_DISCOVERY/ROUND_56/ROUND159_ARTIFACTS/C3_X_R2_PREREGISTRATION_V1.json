@@ -1,0 +1,207 @@
+{
+  "record_type": "C3_X_R2_PREREGISTRATION_V1",
+  "version": "2.0.0",
+  "date": "2026-08-24",
+  "round": 159,
+  "authority": "CEO Round 159: 'C3-X V2: Implement the actual pre-registered UKF, not exponential smoothing. Freeze UKF process noise, measurement noise, MPC objective, MPC gain, constraints, target trajectory, adaptation rate, simulation duration, patient pharmacokinetic variation.'",
+  "constitutional_basis": [
+    "Article I — evidence precedes assertion",
+    "Article IV — no fallback epistemology (no weak baselines)",
+    "Article VII — never weaken the verifier to rescue a claim",
+    "Article XIX — never optimize for the gate (ALL parameters frozen)",
+    "Article XXVII — no threshold invention",
+    "Article XXIX — separate implementation failure from mechanism failure (V1 used exponential smoothing, not UKF — implementation failure, not mechanism failure)",
+    "EXPERIMENT_VALIDITY_GATE_V1 — all 7 conditions must pass"
+  ],
+
+  "purpose": "Round 158 C3-X-R1 was INVALID because: (a) MPC gain was not pre-registered, (b) UKF was specified but exponential smoothing was implemented. This V2 pre-registration freezes ALL parameters AND specifies the UKF implementation in full detail. No parameter may be changed after this file is committed.",
+
+  "frozen_at": "2026-08-24T00:00:00Z (Round 159 commit)",
+  "experiment_has_started": false,
+  "results_known": false,
+
+  "model_drug_FROZEN": {
+    "drug": "intrathecal baclofen",
+    "therapeutic_window_lower_ng_per_mL": 100.0,
+    "therapeutic_window_upper_ng_per_mL": 400.0,
+    "toxicity_threshold_ng_per_mL": 500.0,
+    "subtherapeutic_threshold_ng_per_mL": 100.0
+  },
+
+  "cohort_parameters_FROZEN": {
+    "cohort_size": 200,
+    "random_seed": 42,
+    "stratification": {
+      "clearance_phenotype": {"fast": 50, "intermediate": 100, "slow": 50},
+      "age": {"pediatric_2_to_18": 67, "adult_18_to_65": 67, "elderly_65_plus": 66},
+      "weight_kg": {"40": 67, "70": 67, "100": 66},
+      "csf_flow_rate_mL_per_min": {"0.30": 67, "0.40": 67, "0.50": 66}
+    },
+    "patient_specific_pk_variability": "20% CV on each PK parameter (Vc, CL, Q, Vp)",
+    "dosing_horizon_days": 90,
+    "steady_state_exclusion_days": 14
+  },
+
+  "two_compartment_PK_model_FROZEN": {
+    "central_volume_Vc_L": 0.15,
+    "clearance_CL_L_per_h": 0.024,
+    "intercompartmental_Q_L_per_h": 0.008,
+    "peripheral_volume_Vp_L": 0.5,
+    "bioavailability_F": 1.0,
+    "dynamics": "dCc/dt = (Q/Vp)*(Cp - Cc) - (CL/Vc)*Cc; dCp/dt = (Q/Vc)*(Cc - Cp)"
+  },
+
+  "Baseline_A_ThecaFlex_open_loop_FROZEN": {
+    "initial_bolus_ug_per_kg": 50.0,
+    "maintenance_ug_per_kg_per_day": 5.0,
+    "dose_frequency_per_day": 4,
+    "dose_interval_h": 6.0,
+    "delivery_lag_min": 7.5,
+    "no_feedback": true,
+    "fidelity_check": "Baseline A must produce concentration time-course matching published ThecaFlex PK data within 15%. If exceeds 15%, experiment BLOCKED per Article XXIX."
+  },
+
+  "Baseline_B_Bayesian_adaptive_TDM_FROZEN": {
+    "PK_model": "Two-compartment mammillary (same as patient)",
+    "Bayesian_prior": {
+      "distribution": "Log-normal",
+      "prior_mean": "Published PK parameters (Vc=0.15, CL=0.024, Q=0.008, Vp=0.5)",
+      "prior_CV": 0.30
+    },
+    "Bayesian_update": {
+      "sampling_frequency": "Once per week",
+      "sampling_time": "Trough (just before next dose)",
+      "measurement_noise_CV": 0.10,
+      "update_method": "Full NONMEM-style posterior update using Kalman filter on linearized PK model (NOT simplified tracking)",
+      "implementation_requirement": "Must implement actual Bayesian posterior update with: (a) prior covariance matrix, (b) likelihood from measurement noise, (c) posterior update via Bayes' rule. The V1 simplification (just tracking measured value) is FORBIDDEN."
+    },
+    "dose_adjustment_algorithm": {
+      "if_trough_below_therapeutic_window": "Increase dose by 20%",
+      "if_trough_above_therapeutic_window": "Decrease dose by 20%",
+      "if_trough_in_therapeutic_window": "Maintain current dose",
+      "max_daily_dose_ug_per_kg": 15.0,
+      "min_effective_dose_ug_per_kg_per_day": 1.0
+    },
+    "fidelity_check": "Baseline B must produce concentration stability matching published intrathecal baclofen TDM data within 15%. If exceeds 15%, experiment BLOCKED per Article XXIX."
+  },
+
+  "C3_X_candidate_UKF_specification_FROZEN": {
+    "authority": "CEO Round 159: 'Implement the actual pre-registered UKF, not exponential smoothing.'",
+    "state_vector": ["Cc (central concentration, ng/mL)", "Cp (peripheral concentration, ng/mL)", "CSF_flow_rate_estimate (mL/min)"],
+    "process_model": "Two-compartment PK + CSF flow variation",
+    "process_noise_covariance_Q": {
+      "Cc_process_noise": 5.0,
+      "Cp_process_noise": 5.0,
+      "CSF_flow_process_noise": 0.01,
+      "off_diagonal": 0.0
+    },
+    "measurement_noise_covariance_R": {
+      "Cc_measurement_noise": 10.0,
+      "measurement_CV": 0.10
+    },
+    "UKF_parameters": {
+      "alpha": 0.001,
+      "beta": 2.0,
+      "kappa": 0.0,
+      "lambda": "alpha^2 * (n + kappa) - n where n=3 (state dimension)"
+    },
+    "UKF_implementation_requirements": [
+      "Generate 2n+1 = 7 sigma points",
+      "Predict sigma points through process model",
+      "Compute predicted state mean and covariance",
+      "Transform sigma points through measurement function",
+      "Compute predicted measurement mean and covariance",
+      "Compute Kalman gain",
+      "Update state with measurement"
+    ],
+    "update_frequency": "Continuous (every time step = 30 min)",
+    "FORBIDDEN_simplifications": [
+      "Exponential smoothing (0.95/0.05) — this is NOT a UKF",
+      "Simple tracking of measured value — this is NOT a UKF",
+      "Moving average — this is NOT a UKF",
+      "Any implementation that does not generate sigma points and compute Kalman gain"
+    ]
+  },
+
+  "C3_X_candidate_MPC_specification_FROZEN": {
+    "controller_type": "Model Predictive Control (MPC) with 4-hour prediction horizon",
+    "objective_function": "minimize integral of (Cc - target)^2 + lambda * dose_change^2 over prediction horizon",
+    "target_concentration_ng_per_mL": 250.0,
+    "lambda_dose_penalty": 0.01,
+    "MPC_gain_K_mpc": 0.3,
+    "MPC_gain_provenance": "Pre-registered at 0.3 (V1 used 0.5 which caused oscillation). The 0.3 value is chosen to be less aggressive, reducing oscillation. Per Article XIX, this value is frozen BEFORE V2 execution.",
+    "prediction_horizon_h": 4.0,
+    "control_interval_h": 2.0,
+    "constraints": {
+      "max_daily_dose_ug_per_kg": 15.0,
+      "max_dose_change_per_cycle_pct": 30.0,
+      "min_dose_interval_h": 1.0,
+      "max_dose_frequency_per_day": 8
+    }
+  },
+
+  "multi_objective_endpoint_FROZEN": {
+    "authority": "CEO Round 159: 'Do not optimize concentration CV alone. Use a multi-objective endpoint: therapeutic exposure + overdose exposure + underdose exposure + time outside therapeutic window + control oscillation + adaptation latency.'",
+    "endpoints": {
+      "primary_therapeutic_exposure": "fraction of patient-time in [100, 400] ng/mL",
+      "secondary_overdose_exposure": "count of patient-time where Cc > 500 ng/mL",
+      "secondary_underdose_exposure": "count of patient-time where Cc < 100 ng/mL",
+      "secondary_time_outside_window": "fraction of patient-time where Cc < 100 OR Cc > 400",
+      "secondary_control_oscillation": "standard deviation of dose changes (proxy for controller stability)",
+      "secondary_adaptation_latency": "time from dosing start to first sustained (24h) period in therapeutic window"
+    },
+    "oscillation_penalty": "A controller that reduces overdose but oscillates violently is not a World-Class invention. If control_oscillation > threshold, C3-X cannot WIN even if other endpoints pass."
+  },
+
+  "the_three_arms_FROZEN": {
+    "arm_1_Baseline_A": "ThecaFlex-style open-loop fixed-dose (no feedback, no adaptation)",
+    "arm_2_Baseline_B": "Bayesian adaptive TDM (weekly sampling, full NONMEM-style posterior update, dose adjustment ±20%)",
+    "arm_3_C3_X": "UKF (full implementation, not exponential smoothing) + MPC (gain=0.3, horizon=4h, lambda=0.01)"
+  },
+
+  "information_equivalence_rule": {
+    "rule": "All arms operate on equivalent information. No unfair information advantage.",
+    "Baseline_A_receives": "Initial patient covariates only (age, weight, CSF flow). No feedback after dosing starts.",
+    "Baseline_B_receives": "Weekly CSF drug concentration measurement + patient covariates. Updates Bayesian posterior weekly.",
+    "C3_X_receives": "Continuous CSF drug concentration estimate (from UKF) + patient covariates. Updates dose recommendation continuously.",
+    "constraint": "C3-X's continuous feedback is restricted to the SAME drug concentration signal that Baseline B samples weekly. C3-X does NOT receive additional sensor data. The only difference is sampling frequency and the model architecture (UKF + MPC vs Bayesian TDM)."
+  },
+
+  "decision_thresholds_FROZEN": {
+    "WIN_vs_Baseline_A": {
+      "cv_ratio": "< 0.50",
+      "overdosing_reduction_pct": ">= 60",
+      "oscillation_threshold": "control_oscillation < 0.5 (proxy)"
+    },
+    "WIN_vs_Baseline_B": {
+      "cv_ratio": "< 0.70",
+      "overdosing_reduction_pct": ">= 30 (additional improvement over Baseline B)"
+    },
+    "KILL_vs_Baseline_B": {
+      "cv_ratio": "> 0.80",
+      "oscillation_threshold": "control_oscillation > 1.0 (proxy for violent oscillation)"
+    },
+    "KILL_vs_Baseline_A": "No significant overdosing reduction (p > 0.05)"
+  },
+
+  "what_is_FORBIDDEN_after_V2_results_are_known": [
+    "Changing any parameter in this file (Article XIX)",
+    "Substituting exponential smoothing for UKF (Article XXIX)",
+    "Weakening Baseline B (e.g., using simplified posterior) (Article IV)",
+    "Giving C3-X additional sensor data beyond what Baseline B receives (information equivalence rule)",
+    "Letting C3-X exceed dose constraints to win",
+    "Cherry-picking patient phenotypes",
+    "Reporting CV alone without multi-objective endpoints (CEO Round 159 directive)",
+    "Declaring WIN if controller oscillates violently even if CV passes"
+  ],
+
+  "validity_gate_compliance": {
+    "1_PRE_REGISTRATION_VALID": "This file. Will be hash-pinned.",
+    "2_IMPLEMENTATION_MATCHES_PROTOCOL": "V2 script MUST implement full UKF (sigma points, Kalman gain) — NOT exponential smoothing. This is the critical V1 violation being remediated.",
+    "3_BASELINE_FAIR": "Baseline B must use full NONMEM-style Bayesian update, NOT simplified tracking. Baseline calibration against published TDM data required.",
+    "4_NO_DATA_LEAKAGE": "All arms receive same drug concentration signal. C3-X samples continuously, Baseline B samples weekly. This is the invention being tested.",
+    "5_THRESHOLDS_FROZEN": "WIN/KILL from EMPIRICAL_THRESHOLD_PROVENANCE_V1 (hash-pinned).",
+    "6_MODEL_SPECIFICATION_FROZEN": "ALL parameters frozen, including MPC gain (0.3), UKF parameters (alpha, beta, kappa, Q, R).",
+    "7_RANDOM_SEED_COHORT_PROVENANCE_COMPLETE": "Seed = 42, cohort = 200 patients stratified as specified."
+  }
+}
