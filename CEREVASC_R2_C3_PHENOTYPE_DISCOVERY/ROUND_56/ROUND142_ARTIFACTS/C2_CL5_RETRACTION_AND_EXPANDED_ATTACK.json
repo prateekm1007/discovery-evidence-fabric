@@ -1,0 +1,152 @@
+{
+  "record_type": "C2_CL5_RETRACTION_AND_EXPANDED_ATTACK",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 142,
+  "authority": "CEO Round 142: 'CL5 survives should now be considered overturned by stronger external evidence. The correct state is: C2 = high prior-art threat, novel remainder not yet established.'",
+
+  "epistemic_correction": {
+    "old_claim": "CL5 (temporal signature classification) SURVIVES — no prior art found teaching temporal pressure classification for shunt obstruction (Round 141)",
+    "new_claim": "CL5 BROAD FORM = PRIOR_ART_THREATENED — temporal pressure-signal processing for shunt dysfunction predates C2 and requires claim-specific differentiation",
+    "rationale": "CEO external search found US20060047201A1 which explicitly teaches continuous pressure-signal processing with temporal parameters (TS.x) that provide information about suspected shunt malfunction including over/under-drainage. This directly attacks C2's broad temporal classification moat.",
+    "version_rule": "Old result preserved (not deleted). Versioned epistemic update per Article XI (history is evidence too)."
+  },
+
+  "new_references_analyzed": {
+    "US20060047201A1": {
+      "title": "Processing of continuous pressure-related signals derivable from a human or animal body or body cavity",
+      "inventor": "Per Eide",
+      "assignee": "dPCom AS / Sensometrics AS",
+      "filing_date": "2004-07-21",
+      "granted_as": "US7635338B2 (2009-12-22)",
+      "status": "Active",
+      "abstract": "A method for processing pressure signals derived from locations inside or outside a human or animal body cavity. Different aspects relate to differentiating between cardiac beat- and artifact-induced pressure waves, obtaining new information from pressure signals, and predicting pressures inside a body cavity. Devices and a system for sensing continuous pressure signals and displaying output. Other features relate to draining fluid from a brain or spinal fluid cavity.",
+      "classification": "A61M27/006 — Cerebrospinal drainage",
+      "key_disclosure": "The patent explicitly states: 'in case of suspected shunt dysfunction, computation of said TS.x parameters provides new information whether suspected shunt malfunction includes over- or under-drainage.' This DIRECTLY teaches temporal pressure-signal processing for shunt malfunction diagnosis.",
+      "what_it_teaches": [
+        "Continuous pressure signal processing from body cavities including intracranial",
+        "Temporal parameters (TS.x) computed from pressure time-series",
+        "Differentiating cardiac beat-induced pressure waves from artifacts",
+        "Assessing pressure signal quality (good vs bad)",
+        "Determining whether suspected shunt malfunction includes over- or under-drainage",
+        "Pressure monitoring related to CSF drainage from brain/spinal fluid cavity",
+        "Sensor drift compensation (addresses atmospheric pressure changes and sensor drift)"
+      ],
+      "C2_limitations_addressed": {
+        "CL5a_continuous_pressure_acquisition": "ADDRESSED — teaches continuous pressure signal acquisition from body cavities",
+        "CL5b_temporal_feature_extraction": "ADDRESSED — teaches TS.x temporal parameters from pressure time-series",
+        "CL5c_obstruction_vs_confounder_classification": "PARTIALLY ADDRESSED — teaches distinguishing shunt malfunction (over/under-drainage) but does NOT specifically teach distinguishing obstruction from posture/cough/drift",
+        "CL5d_drift_compensation": "ADDRESSED — explicitly addresses sensor drift and atmospheric pressure changes",
+        "CL5e_continuous_obstruction_decision": "PARTIALLY ADDRESSED — provides information about shunt malfunction but does not describe a continuous automated obstruction decision algorithm"
+      },
+      "what_it_does_NOT_teach": [
+        "Endovascular eShunt-specific anatomy (CL2, CL3) — patent is about traditional ICP monitoring",
+        "Differential CSF-venous pressure (CL4) — teaches absolute pressure, not differential",
+        "Specific classification of obstruction vs posture vs cough vs drift as distinct temporal signatures (CL5c) — teaches over/under-drainage distinction but not the specific confounder discrimination C2 proposes",
+        "eShunt-specific integration (CL3) — traditional ICP monitoring context"
+      ]
+    },
+    "US9668663B2": {
+      "title": "Implantable dual sensor bio-pressure transponder and method of calibration",
+      "inventor": "Chad Eric Seaver",
+      "assignee": "Arkis Bioscience Inc",
+      "filing_date": "2015-03-24",
+      "status": "Active (2035-04-01 expiration)",
+      "abstract": "A bio-pressure sensor system comprising a first sensor for reference pressure measurement and a second sensor for fluid pressure within a human body, with shared reference element and independent output signals.",
+      "classification": "A61B5/031 — Intracranial pressure",
+      "key_disclosure": "Dual implantable pressure sensors with reference calibration, designed for CSF pressure measurement. Teaches: (1) dual-sensor architecture with reference element, (2) calibration method using known reference pressures, (3) drift compensation, (4) CSF pressure applications, (5) shunt context (7 mentions).",
+      "keyword_counts": {"shunt": 7, "differential": 6, "drift": 7, "calibration": 22, "continuous": 1},
+      "C2_limitations_addressed": {
+        "CL4_differential_pressure": "PARTIALLY ADDRESSED — dual sensor with reference measurement is architecturally similar to differential measurement, but patent focuses on calibration rather than CSF-venous differential",
+        "CL5d_drift_compensation": "ADDRESSED — 7 mentions of drift, 22 of calibration. Teaches drift compensation via reference sensor."
+      },
+      "what_it_does_NOT_teach": [
+        "Temporal signature classification for obstruction detection (CL5c)",
+        "Endovascular eShunt anatomy (CL2, CL3)",
+        "Specific CSF-venous differential pressure (CL4 — uses reference sensor, not venous pressure)"
+      ]
+    },
+    "2025_Neurology_waveform_study": {
+      "source": "American Academy of Neurology, 2025",
+      "title": "Non-Invasive Intracranial Pressure Waveform Monitoring of Asymptomatic Patients with CSF Shunts Versus Patients with Shunt Dysfunction (P2-2.007)",
+      "finding": "ICP waveform analysis (P2/P1 ratio, time-to-peak) is actively used to distinguish shunted patients with dysfunction from asymptomatic shunted patients",
+      "evidence_class": "SCIENTIFIC_PRIOR_ART_CONTEXT",
+      "impact_on_C2": "Demonstrates that temporal waveform analysis for shunt dysfunction is not merely theoretical — it is being used clinically. This makes it harder to argue that applying temporal analysis to shunt pressure is non-obvious.",
+      "what_it_does_NOT_teach": [
+        "Endovascular eShunt-specific implementation",
+        "Differential CSF-venous pressure",
+        "Automated continuous obstruction decision algorithm",
+        "Specific drift-compensation in an implanted endovascular sensor"
+      ]
+    }
+  },
+
+  "CL5_decomposition": {
+    "old_CL5": "Temporal signature classification (too broad — now threatened by US20060047201A1)",
+    "decomposed": {
+      "CL5a": {"description": "Continuous pressure time-series acquisition", "prior_art_status": "KNOWN — US20060047201A1 teaches this"},
+      "CL5b": {"description": "Extraction of temporal features from pressure signal", "prior_art_status": "KNOWN — US20060047201A1 teaches TS.x parameters"},
+      "CL5c": {"description": "Classification of obstruction vs specific physiological confounders (posture, cough, drift)", "prior_art_status": "PARTIALLY NOVEL — US20060047201A1 teaches over/under-drainage distinction but not specific obstruction-vs-posture/cough/drift classification. 2025 Neurology study shows waveform analysis for dysfunction but not specific confounder discrimination."},
+      "CL5d": {"description": "Use of CSF-venous differential waveform features", "prior_art_status": "POTENTIALLY NOVEL — no reference teaches using CSF-venous DIFFERENTIAL pressure waveform (as opposed to absolute ICP) for obstruction classification"},
+      "CL5e": {"description": "Continuous automated obstruction decision from signatures in eShunt", "prior_art_status": "POTENTIALLY NOVEL — US20060047201A1 provides information about malfunction but does not describe a continuous automated decision algorithm integrated into an eShunt"},
+      "CL5f": {"description": "Drift-compensation/calibration architecture for endovascular implanted sensor", "prior_art_status": "PARTIALLY KNOWN — US9668663B2 teaches drift compensation for implantable CSF pressure sensors, but not specifically for endovascular eShunt differential measurement"}
+    },
+    "surviving_novel_elements": ["CL5c (specific confounder discrimination)", "CL5d (CSF-venous differential waveform)", "CL5e (continuous automated eShunt-integrated decision)"],
+    "threatened_elements": ["CL5a (continuous acquisition — KNOWN)", "CL5b (temporal feature extraction — KNOWN)", "CL5f (drift compensation — PARTIALLY KNOWN)"]
+  },
+
+  "expanded_section_103_attack": {
+    "combination": "US8870787B2 (CSF shunt + pressure sensor) + US10413710B2 (differential pressure in body fluid drainage) + US10806352B2 (vascular implant) + US20060047201A1 (continuous pressure signal processing + temporal parameters + shunt malfunction) + US9668663B2 (dual sensor + drift compensation + CSF) + eShunt anatomy",
+    "references_count": 6,
+    "C2_limitations_addressed_by_combination": {
+      "CL1_continuous_sensing": "ADDRESSED by US8870787 + US20060047201A1",
+      "CL2_endovascular": "PARTIALLY ADDRESSED by US10806352 (vascular implant)",
+      "CL3_eShunt_anatomy": "ADDRESSED by CereVasc eShunt patent",
+      "CL4_differential_pressure": "ADDRESSED by US10413710 (differential pressure in body fluid drainage)",
+      "CL5a_continuous_acquisition": "ADDRESSED by US20060047201A1",
+      "CL5b_temporal_features": "ADDRESSED by US20060047201A1 (TS.x parameters)",
+      "CL5c_confounder_discrimination": "PARTIALLY ADDRESSED — US20060047201A1 teaches over/under-drainage distinction; 2025 clinical evidence shows waveform analysis for dysfunction. But specific obstruction-vs-posture/cough/drift classification not explicitly taught.",
+      "CL5d_CSF_venous_differential_waveform": "NOT ADDRESSED — no reference teaches using CSF-venous DIFFERENTIAL pressure waveform specifically",
+      "CL5e_continuous_eShunt_decision": "NOT ADDRESSED — no reference teaches continuous automated obstruction decision integrated into eShunt",
+      "CL5f_drift_compensation": "ADDRESSED by US9668663B2 (drift compensation for implantable CSF pressure sensors)",
+      "CL6_obstruction_algorithm": "PARTIALLY ADDRESSED by US20060047201A1 (malfunction information) but not a specific obstruction decision algorithm"
+    },
+    "missing_elements": ["CL5d (CSF-venous differential waveform features)", "CL5e (continuous automated eShunt-integrated obstruction decision)"],
+    "motivation_to_combine": "STRONG — a POSITA working on CSF shunt monitoring would be motivated to combine: (1) shunt pressure sensing (US8870787), (2) differential pressure (US10413710), (3) vascular placement (US10806352), (4) temporal signal processing for malfunction diagnosis (US20060047201A1), (5) drift compensation (US9668663B2), and (6) eShunt anatomy. All are in the same or adjacent fields.",
+    "reasonable_expectation_of_success": "MODERATE TO HIGH for CL1-CL5b, CL5f, CL6. MODERATE for CL5c. LOW for CL5d and CL5e — using CSF-venous DIFFERENTIAL pressure waveform (not just absolute ICP) for obstruction classification is a specific technical insight not taught by the combination."
+  },
+
+  "new_hypotheses": {
+    "H_C2_8": {
+      "name": "TEMPORAL_PROCESSING_ALREADY_KNOWN",
+      "description": "Continuous pressure signals, waveform features and temporal analysis were already used to diagnose or characterize shunt dysfunction before C2 (US20060047201A1 + 2025 clinical evidence).",
+      "posterior": 0.65,
+      "evidence": "US20060047201A1 explicitly teaches TS.x temporal parameters for shunt malfunction diagnosis. 2025 Neurology study shows clinical use of waveform analysis for shunt dysfunction.",
+      "implication": "C2 cannot claim 'temporal pressure analysis for shunt obstruction' as novel. Must narrow to specific technical contribution."
+    },
+    "H_C2_9": {
+      "name": "ONLY_SPECIFIC_COMBINATION_NOVEL",
+      "description": "Individual components are known, but the claimed combination of eShunt-specific differential CSF/venous pressure + temporal confounder discrimination + continuous obstruction inference is non-obvious.",
+      "posterior": 0.25,
+      "evidence_for": "No reference teaches CSF-venous DIFFERENTIAL pressure waveform for obstruction classification (CL5d). No reference teaches continuous automated eShunt-integrated obstruction decision (CL5e).",
+      "evidence_against": "The combination motivation is strong (all in same field). The 2025 clinical evidence shows the field is actively developing waveform analysis for shunt dysfunction. The gap between 'ICP waveform analysis' and 'CSF-venous differential waveform analysis' may be narrow.",
+      "implication": "C2's defensible novelty is now VERY NARROW: specifically CL5d (differential CSF-venous waveform features) and CL5e (continuous eShunt-integrated decision). If these are found to be obvious modifications, C2 may not survive."
+    }
+  },
+
+  "updated_C2_assessment": {
+    "old": "SURVIVAL PLAUSIBLE — CL5 survives (Round 141)",
+    "new": "HIGH PRIOR-ART THREAT — CL5 broad form is prior-art-threatened by US20060047201A1. Novel remainder narrows to CL5d (CSF-venous differential waveform) and CL5e (continuous eShunt-integrated decision). The combination motivation is strong. C2's survival depends on whether these two elements are non-obvious.",
+    "gate_state": "YELLOW → YELLOW_WITH_HIGH_PRIOR_ART_THREAT",
+    "defensible_novelty": "VERY NARROW: (1) CSF-venous DIFFERENTIAL pressure waveform features for obstruction classification (not absolute ICP waveform), (2) continuous automated obstruction decision integrated into eShunt anatomy. Everything else is taught by the 6-reference combination.",
+    "what_would_kill_C2": "Finding prior art teaching differential CSF-venous pressure waveform analysis (not just absolute ICP) for shunt obstruction. OR: finding that a POSITA would naturally apply differential measurement to the waveform analysis taught by US20060047201A1.",
+    "what_would_save_C2": "Proving that CSF-venous DIFFERENTIAL waveform features provide materially better obstruction discrimination than absolute ICP waveform features alone (scientific test). AND: confirming no prior art teaches this specific differential waveform approach."
+  },
+
+  "scientific_attack_required": {
+    "experiment": "Compare obstruction classification performance: absolute ICP waveform vs CSF-venous DIFFERENTIAL waveform",
+    "hypothesis": "If differential waveform provides materially better discrimination (sensitivity/specificity) than absolute ICP waveform, CL5d is strengthened. If not, CL5d collapses and C2 likely dies.",
+    "method": "Simulate both signals under obstruction, posture, cough, drift conditions. Compare classification accuracy. This is the SCIENTIFIC test that determines whether C2's narrowest defensible novelty (CL5d) is technically meaningful.",
+    "connection_to_patent": "This is the patent-physics loop: prior-art search narrows novelty to CL5d → scientific test determines if CL5d provides technical advantage → result updates patent assessment."
+  }
+}

@@ -4591,3 +4591,68 @@ Stage Summary:
 - C2 CL5 (temporal signature classification) SURVIVES PatentBear search.
 - PatSnap API will be retried when DNS resolves.
 - 0/5 WORLD_CLASS_INVENTION. C5 UNRESOLVED. C2 CL5 survives.
+
+---
+Task ID: ROUND-142-CL5-RETRACTION-EXPANDED-ATTACK
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 142 — retract 'CL5 survives', add US20060047201A1 and US9668663B2, add 2025 Neurology waveform study, decompose CL5, build 6-reference §103 attack, add H-C2-8/H-C2-9.
+
+Work Log:
+- RETRACTED 'CL5 SURVIVES' — replaced with 'CL5 BROAD FORM = PRIOR_ART_THREATENED'
+  Old result preserved (versioned epistemic update per Article XI).
+
+- Analyzed US20060047201A1 (Per Eide, dPCom AS):
+  * Title: "Processing of continuous pressure-related signals"
+  * Explicitly teaches: continuous pressure signal processing, TS.x temporal parameters,
+    shunt malfunction diagnosis (over/under-drainage), sensor drift compensation
+  * Key quote: "in case of suspected shunt dysfunction, computation of said TS.x
+    parameters provides new information whether suspected shunt malfunction includes
+    over- or under-drainage"
+  * This DIRECTLY attacks C2's broad temporal classification moat
+  * Addresses: CL5a (continuous acquisition), CL5b (temporal features), CL5f (drift)
+
+- Analyzed US9668663B2 (Arkis Bioscience):
+  * Title: "Implantable dual sensor bio-pressure transponder"
+  * Teaches: dual-sensor architecture, reference calibration, drift compensation (7 mentions),
+    CSF pressure applications, shunt context (7 mentions), differential measurement (6 mentions)
+  * Addresses: CL4 (partially — reference sensor, not venous), CL5f (drift compensation)
+
+- Added 2025 Neurology waveform study as scientific prior-art context:
+  * ICP waveform analysis (P2/P1 ratio, time-to-peak) actively used to distinguish
+    shunt dysfunction from asymptomatic patients
+  * Makes "temporal analysis for shunt dysfunction is novel" indefensible
+
+- Decomposed CL5 into 6 sub-elements (CL5a-CL5f):
+  * CL5a (continuous acquisition): KNOWN (US20060047201A1)
+  * CL5b (temporal features): KNOWN (US20060047201A1 TS.x)
+  * CL5c (confounder discrimination): PARTIALLY NOVEL
+  * CL5d (CSF-venous differential waveform): POTENTIALLY NOVEL — key remaining moat
+  * CL5e (continuous eShunt decision): POTENTIALLY NOVEL
+  * CL5f (drift compensation): KNOWN (US9668663B2)
+
+- Built 6-reference §103 attack:
+  US8870787 + US10413710 + US10806352 + US20060047201A1 + US9668663B2 + eShunt
+  Addresses CL1, CL2(partial), CL3, CL4, CL5a, CL5b, CL5c(partial), CL5f, CL6(partial)
+  MISSING: CL5d (CSF-venous differential waveform) and CL5e (continuous eShunt decision)
+  Motivation: STRONG — all in same/adjacent fields
+
+- Added H-C2-8 (temporal processing already known, posterior 0.65)
+  and H-C2-9 (only specific combination novel, posterior 0.25)
+
+- Updated C2 assessment: HIGH PRIOR-ART THREAT
+  Defensible novelty VERY NARROW: CL5d (differential CSF-venous waveform) + CL5e (eShunt decision)
+  Next scientific test: compare absolute ICP waveform vs CSF-venous DIFFERENTIAL waveform
+  for obstruction discrimination. If differential is materially better → CL5d strengthened.
+  If not → C2 likely dies.
+
+- OpenFOAM: restarted in background.
+
+Stage Summary:
+- CL5 SURVIVES → RETRACTED → CL5 BROAD FORM = PRIOR_ART_THREATENED.
+- US20060047201A1 directly teaches temporal pressure processing for shunt malfunction.
+- US9668663B2 teaches dual-sensor drift compensation for CSF pressure.
+- 2025 clinical evidence shows waveform analysis is actively used for shunt dysfunction.
+- 6-reference §103 attack addresses all but CL5d and CL5e.
+- C2's defensible novelty narrows to: CSF-venous DIFFERENTIAL waveform features + continuous eShunt decision.
+- Next: scientific test comparing absolute vs differential waveform discrimination.
+- 0/5 WORLD_CLASS_INVENTION. C2 = HIGH PRIOR-ART THREAT.
