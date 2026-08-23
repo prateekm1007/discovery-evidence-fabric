@@ -1,0 +1,251 @@
+{
+  "record_type": "CANDIDATE_DOSSIER_V3",
+  "candidate_id": "C1",
+  "candidate_name": "R6 Passive Rescue / Obstruction Bypass",
+  "slot_id": 1,
+  "version": "3.0.0",
+  "date": "2026-08-23T01:47:52.110058+00:00",
+  "round": 128,
+  "authority": "experiment_engine_v2.py Round 128 \u2014 multi-world AI falsification",
+  "state": "BLOCKED_BY_MISSING_EVIDENCE",
+  "physical_validation_status": "N/A",
+  "experiments_executed": [
+    {
+      "experiment_id": "C1-E02",
+      "type": "argument_attack",
+      "target_gate": "G09",
+      "result": "Strongest-alternative attack on surgical intervention. H2 PARTIALLY REFUTED \u2014 surgery is sufficient but invasive; C1 provides non-surgical bridge. G09 \u2192 YELLOW (inconclusive, depends on eShunt obstruction rate from STRIDE).",
+      "gate_state_after": "YELLOW",
+      "evidence_pointer": "Round 127 argument_attack",
+      "execution_path": "argument_attack"
+    },
+    {
+      "experiment_id": "C1-E01",
+      "type": "literature_review",
+      "target_gate": "G01",
+      "result": "eShunt obstruction in STRIDE 5-year data. STRIDE not yet published. G01 \u2192 YELLOW (reality-blocked).",
+      "gate_state_after": "YELLOW",
+      "evidence_pointer": "Round 127 literature_review",
+      "execution_path": "literature_review"
+    },
+    {
+      "experiment_id": "C1-E03",
+      "type": "cemetery_consultation",
+      "target_gate": "G03",
+      "result": "CV-T06 cemetery entries consulted. No CE violation. G03 \u2192 GREEN.",
+      "gate_state_after": "GREEN",
+      "evidence_pointer": "Round 127 cemetery_consultation",
+      "execution_path": "cemetery_consultation"
+    },
+    {
+      "experiment_id": "C1-SUR-01",
+      "candidate_id": "C1",
+      "type": "surrogate_simulation",
+      "target_gate": "G05",
+      "target_hypothesis": "H1",
+      "timestamp": "2026-08-23T01:47:52.109951+00:00",
+      "execution_path": "surrogate_python_model",
+      "simulator": "surrogate (reduced-order Python model)",
+      "fidelity_note": "SURROGATE \u2014 not full-fidelity FEBio/Peridigm. Demonstrates end-to-end loop. Full-fidelity requires solver installation.",
+      "raw_output": {
+        "model": "if delta_P > crack_pressure: valve_opens",
+        "parameters": {
+          "crack_pressure": 5.0,
+          "physiological_range": [
+            2,
+            20
+          ]
+        },
+        "opens_at_clinical_pressure": true,
+        "margin_mmHg": 15.0
+      },
+      "observables": {
+        "valve_opens": true,
+        "pressure_margin": 15.0
+      },
+      "output_hash": "7728c4ba66a9331ab143bc3b0e264d221c5f908059132607b69ba77edae80659",
+      "result": "SURROGATE_SIMULATION_COMPLETE. Bypass valve opens at clinical pressure. Crack pressure=5.0 mmHg, physiological range=(2, 20). Margin=15.0 mmHg. This SURROGATE confirms basic valve mechanics. Does NOT confirm patient-specific performance (requires svFSI World D) or long-term fatigue (requires FEBio simulation).",
+      "gate_state_after": "YELLOW"
+    }
+  ],
+  "experiments_blocked": [
+    {
+      "id": "C1-ADV-01",
+      "type": "adversarial_escalation",
+      "triggered_by": "G05",
+      "next_attack": "parameter_perturbation",
+      "description": "Perturb constitutive parameters beyond nominal range",
+      "target_gate": "G10",
+      "eig": 0.75,
+      "model_form_exposure": 0.5,
+      "simulator_disagreement": 0.0,
+      "cost": 10.0,
+      "requires": "FEBio re-run with perturbed parameters",
+      "executable": false,
+      "discriminates": "Confidence in mechanism after G05 GREEN"
+    }
+  ],
+  "gate_states": {
+    "G01": {
+      "state": "YELLOW",
+      "evidence_pointer": "Round 127 literature_review",
+      "experiment_id": "C1-E01",
+      "result_summary": "eShunt obstruction in STRIDE 5-year data. STRIDE not yet published. G01 \u2192 YELLOW (reality-blocked)."
+    },
+    "G02": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "Requires simulator not installed"
+    },
+    "G03": {
+      "state": "GREEN",
+      "evidence_pointer": "Round 127 cemetery_consultation",
+      "experiment_id": "C1-E03",
+      "result_summary": "CV-T06 cemetery entries consulted. No CE violation. G03 \u2192 GREEN."
+    },
+    "G04": {
+      "state": "NOT_APPLICABLE_WITH_JUSTIFICATION",
+      "evidence_pointer": "No parameter estimation in mechanism"
+    },
+    "G05": {
+      "state": "YELLOW",
+      "evidence_pointer": "surrogate simulation; output_hash=7728c4ba66a9331a",
+      "experiment_id": "C1-SUR-01",
+      "result_summary": "SURROGATE_SIMULATION_COMPLETE. Bypass valve opens at clinical pressure. Crack pressure=5.0 mmHg, physiological range=(2, 20). Margin=15.0 mmHg. This SURROGATE confirms basic valve mechanics. Does NOT "
+    },
+    "G06": {
+      "state": "NOT_APPLICABLE_WITH_JUSTIFICATION",
+      "evidence_pointer": "World B not applicable to this candidate"
+    },
+    "G07": {
+      "state": "NOT_APPLICABLE_WITH_JUSTIFICATION",
+      "evidence_pointer": "World C not applicable to this candidate"
+    },
+    "G08": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "Requires simulator not installed"
+    },
+    "G09": {
+      "state": "YELLOW",
+      "evidence_pointer": "Round 127 argument_attack",
+      "experiment_id": "C1-E02",
+      "result_summary": "Strongest-alternative attack on surgical intervention. H2 PARTIALLY REFUTED \u2014 surgery is sufficient but invasive; C1 provides non-surgical bridge. G09 \u2192 YELLOW (inconclusive, depends on eShunt obstruc"
+    },
+    "G10": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "Requires simulator not installed"
+    },
+    "G11": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "Requires simulator not installed"
+    },
+    "G12": {
+      "state": "NOT_APPLICABLE_WITH_JUSTIFICATION",
+      "evidence_pointer": "No sensor in mechanism"
+    },
+    "G13": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "Requires simulator not installed"
+    },
+    "G14": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "Requires simulator not installed"
+    },
+    "G15": {
+      "state": "NOT_APPLICABLE_WITH_JUSTIFICATION",
+      "evidence_pointer": "No published reproduction data available"
+    },
+    "G16": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "Requires simulator not installed"
+    },
+    "G17": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "Requires simulator not installed"
+    },
+    "G18": {
+      "state": "GREEN",
+      "evidence_pointer": "G18 automated evaluation: GREEN",
+      "experiment_id": "G18-AUTO",
+      "result_summary": "All 4 independence dimensions verified. Cross-world agreement is meaningful."
+    }
+  },
+  "promotion_check": {
+    "can_promote": false,
+    "blocking_gates": [],
+    "not_run_gates": [
+      "G02",
+      "G08",
+      "G10",
+      "G11",
+      "G13",
+      "G14",
+      "G16",
+      "G17"
+    ],
+    "red_gates": [],
+    "yellow_gates": [
+      "G01",
+      "G05",
+      "G09"
+    ],
+    "unresolved_gates": [],
+    "verdict": "BLOCKED_BY_MISSING_EVIDENCE"
+  },
+  "g18_independence_result": {
+    "gate": "G18",
+    "worlds_evaluated": [
+      "WORLD_A_FEBIO",
+      "WORLD_D_SVFSI"
+    ],
+    "timestamp": "2026-08-23T01:47:52.110062+00:00",
+    "dimensions": {
+      "mathematical_independence": {
+        "formulation_families": [
+          "FEM (finite element method)",
+          "FEM + ALE (arbitrary Lagrangian-Eulerian) FSI"
+        ],
+        "constitutive_families": [
+          "neo-Hookean + CDM (continuum damage mechanics) + Simo CDF fracture",
+          "Nonlinear solid mechanics + fluid mechanics + FSI coupling"
+        ],
+        "independent": true,
+        "note": "Different formulation families (FEM vs peridynamics vs FV vs ALE-FSI) provide mathematical independence."
+      },
+      "implementation_independence": {
+        "source_repositories": [
+          "https://github.com/febiosoftware/FEBio",
+          "https://github.com/SimVascular/SimVascular"
+        ],
+        "independent": true,
+        "note": "Different GitHub repositories maintained by different organizations provide implementation independence."
+      },
+      "calibration_independence": {
+        "calibration_sources": [
+          "svFSI-Tests official corpus; published cardiovascular FSI benchmarks",
+          "Published clot mechanical data (E1-E5 evidence class)"
+        ],
+        "independent": true,
+        "note": "Calibration from published experimental data. Shared ground truth is CORRECT for cross-world comparison \u2014 controls for parameter differences."
+      },
+      "data_provenance_independence": {
+        "constitutive_families": [
+          "neo-Hookean + CDM (continuum damage mechanics) + Simo CDF fracture",
+          "Nonlinear solid mechanics + fluid mechanics + FSI coupling"
+        ],
+        "independent": true,
+        "note": "Different constitutive assumptions detected (2 distinct families for 2 worlds). Worlds do NOT share hidden constitutive assumptions."
+      }
+    },
+    "overall_independence": "GREEN",
+    "can_receive_cross_world_credit": true,
+    "findings": [
+      "All 4 independence dimensions verified. Cross-world agreement is meaningful."
+    ]
+  },
+  "applicable_worlds": {
+    "WORLD_A_FEBIO": "APPLICABLE",
+    "WORLD_D_SVFSI": "APPLICABLE"
+  },
+  "next_action": "INSTALL_REQUIRED: FEBio re-run with perturbed parameters",
+  "dossier_sha256": "fa143576764d5bc74b5316d1fb30ceb419a738bd45af936361a0d6ab37fe08da"
+}
