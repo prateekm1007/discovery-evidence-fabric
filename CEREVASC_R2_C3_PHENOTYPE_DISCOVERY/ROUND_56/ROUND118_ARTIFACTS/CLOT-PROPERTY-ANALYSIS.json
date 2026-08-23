@@ -1,0 +1,82 @@
+{
+  "record_type": "CLOT_PROPERTY_ANALYSIS",
+  "date": "2026-08-23",
+  "round": 118,
+  "governance_compliance": {
+    "article_XXIII": "HEAD = origin/main = 2558738 (verified)",
+    "article_XXVI": "Locally verified, NOT CI-certified",
+    "rule_6": "OX Alpha output is MODEL_DERIVED, not primary evidence",
+    "rule_9": "Property values from literature are APPROXIMATE — need primary source verification",
+    "rule_16": "Every number has provenance"
+  },
+
+  "validity_domain": {
+    "alpha_range": [0.002, 0.500],
+    "beta_range": [0.010, 0.095],
+    "constraint": "beta < 0.1 for fracture (D_max = 1-beta > 0.9)"
+  },
+
+  "published_clot_properties": {
+    "source": "OX Alpha knowledge recall (MODEL_DERIVED per Rule 6)",
+    "limitation": "Approximate values from literature memory — NOT primary source verification. Need to read actual papers.",
+    "references": [
+      {
+        "author": "Chueh et al. (2011)",
+        "title": "Mechanical characterization of thrombi retrieved with stent retriever devices",
+        "journal": "American Journal of Neuroradiology",
+        "properties": "Clot stiffness in 0.5-2 kPa range; tested human stroke clot samples",
+        "relevance": "Direct mechanical testing of retrieved thrombi — closest to our application"
+      },
+      {
+        "author": "Fereidoonnezhad et al. (2017)",
+        "title": "Blood clot fracture: mechanical characterization and constitutive modelling",
+        "journal": "Journal of the Mechanical Behavior of Biomedical Materials",
+        "properties": "Used continuum damage mechanics with hyperelastic-damage model; porcine blood clots; uniaxial tension tests; Ogden-type SED with damage variables",
+        "relevance": "DIRECTLY relevant — uses CDM for clot fracture. Their damage parameters need to be compared to our (alpha, beta) domain."
+      },
+      {
+        "author": "Gasser et al. (2008)",
+        "title": "Failure properties of intraluminal thrombus in abdominal aortic aneurysm",
+        "journal": "Journal of Biomechanics",
+        "properties": "ILT failure stress 20-100 kPa; fiber-reinforced model",
+        "relevance": "Different clot type (ILT vs acute stroke clot) but relevant failure properties"
+      },
+      {
+        "author": "Sugerman et al. (2020/2021)",
+        "title": "Modeling mechanical behavior of whole blood clots; thrombus material response in ischemic stroke",
+        "properties": "Computational modeling of thrombus including damage; microstructural information",
+        "relevance": "Directly relevant — computational thrombus damage modeling"
+      },
+      {
+        "author": "Malcolm et al. (2018)",
+        "title": "High strain rate testing of bovine thrombus",
+        "journal": "Annals of Biomedical Engineering",
+        "properties": "High strain rate behavior (relevant to endovascular procedures)",
+        "relevance": "Strain rate dependent properties — relevant to L4 viscoelasticity"
+      }
+    ]
+  },
+
+  "domain_mapping": {
+    "question": "Do published clot damage parameters fall within our validity domain (alpha [0.002, 0.500], beta [0.010, 0.095])?",
+    "analysis": "Fereidoonnezhad et al. (2017) is the most relevant — they used CDM for clot fracture. Their damage model parameters need to be mapped to our Simo CDF (alpha, beta) formulation. This requires reading the actual paper (per Rule 6: primary evidence required).",
+    "preliminary_assessment": "Blood clots are SOFT biological tissues (E ~ 0.5-2 kPa for acute stroke clots, higher for chronic). Their damage behavior depends on composition (RBC-rich vs fibrin-rich). RBC-rich clots are softer and more fragile (lower alpha, lower beta → more likely in our domain). Fibrin-rich clots are stiffer and tougher (higher alpha, higher beta → may be outside domain).",
+    "key_insight": "The validity domain (beta < 0.1) corresponds to materials with VERY LOW residual strength — i.e., BRITTLE materials that lose almost all strength when damaged. Blood clots, especially RBC-rich acute stroke clots, ARE brittle (they fragment during retrieval). This is consistent with our domain.",
+    "risk": "Fibrin-rich clots may have beta > 0.1 (tougher, more residual strength) and would be OUTSIDE our domain. The invention claim must specify that it applies to BRITTLE clot types (RBC-rich), not all clots.",
+    "per_rule_9": "SEARCH_INCOMPLETE — need to read Fereidoonnezhad et al. (2017) for actual parameter values"
+  },
+
+  "conclusion": {
+    "preliminary": "Based on OX Alpha knowledge (MODEL_DERIVED, per Rule 6), blood clots — particularly RBC-rich acute stroke clots — are likely BRITTLE with low residual strength (beta < 0.1), placing them WITHIN our validity domain. However, fibrin-rich clots may be tougher (beta > 0.1) and OUTSIDE the domain.",
+    "next_step": "Read Fereidoonnezhad et al. (2017) for actual damage parameter values. Map their parameters to our Simo CDF (alpha, beta) formulation.",
+    "bounded_claim_revision": "The invention claim should be revised to specify: 'For BRITTLE clot types (beta < 0.1, typically RBC-rich acute stroke clots), the dD/dstrain deceleration predicts fragmentation.' This is a more honest, clinically-relevant bound.",
+    "per_article_I": "Claim bounded to clot types where the signal is valid"
+  },
+
+  "honest_caveats": {
+    "rule_6": "OX Alpha knowledge is MODEL_DERIVED. Need primary literature (actual papers).",
+    "rule_9": "SEARCH_INCOMPLETE — specific clot damage parameters not yet verified.",
+    "article_I": "Claim must be bounded to clot types where parameters fall in validity domain.",
+    "article_XXIX": "If fibrin-rich clots have beta > 0.1, the signal won't work for them — this is a domain limitation, not a mechanism failure."
+  }
+}
