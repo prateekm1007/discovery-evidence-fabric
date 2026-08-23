@@ -1,0 +1,98 @@
+{
+  "record_type": "ROUND189_DEEP_NOVELTY_4_DIRECTIONS_V1",
+  "version": "1.0.0",
+  "date": "2026-08-24",
+  "round": 189,
+  "authority": "AI Loop V3 — FULLY AUTONOMOUS. Deep novelty search for 4 new directions from Round 188.",
+  "constitutional_basis": ["Article I","Article II","Article XXVIII","Article XXXII","Article XXXVI"],
+
+  "direction_1_SPATIAL_DEGRADATION_LOCALIZATION": {
+    "name": "Spatial Degradation Localization — WHERE along the catheter?",
+    "queries_executed": 2,
+    "closest_prior_art": [
+      {"source": "US20260151090A1 — Catheter Sensor Array (Patsnap, 2026)", "overlap": "MODERATE — catheter with multiple sensor elements at distal end. BUT: designed for endovascular surgery, not shunt catheters. Different application.", "threat": "MODERATE"},
+      {"source": "Flexible catheter-based sensor array for upper airway (PMC, 2025)", "overlap": "MODERATE — multi-point sensing array on catheter for obstruction localization. BUT: airway, not CSF shunt. Different physiology.", "threat": "LOW-MODERATE"},
+      {"source": "Smart Catheters review (PMC, 2025)", "overlap": "LOW — general review of smart catheters with embedded sensors. No specific spatial localization for shunt.", "threat": "LOW"},
+      {"source": "US5983126A — Catheter location system (electrode position mapping)", "overlap": "LOW — maps catheter POSITION in body, not degradation LOCATION along catheter.", "threat": "LOW"}
+    ],
+    "novelty_confidence": 2,
+    "novelty_name": "NOVELTY_SURVIVES_CURRENT_SEARCH",
+    "rationale": "No patent found for a MULTI-POINT sensing array along a CSF SHUNT catheter that LOCALIZES degradation to a specific segment. Existing multi-point arrays are for airway or endovascular. The specific application (spatial degradation localization along shunt catheter) is NOT found.",
+    "simulation_eligible": true,
+    "the_key_differentiator": "Existing sensors measure AGGREGATE state. This measures SPATIAL DISTRIBUTION. The spatial pattern reveals the cause (proximal=choroid plexus, distal=peritoneal, valve=mechanical wear)."
+  },
+
+  "direction_2_CAUSAL_ROOT_CAUSE_DIAGNOSIS": {
+    "name": "Causal Root-Cause Diagnosis — WHY is failure rising?",
+    "queries_executed": 2,
+    "closest_prior_art": [
+      {"source": "Methods and systems for personalized treatments via causal inference (Google Patents)", "overlap": "MODERATE — causal inference for treatment recommendation. BUT: general medical, not shunt-specific. Does not use active perturbation.", "threat": "MODERATE — establishes causal inference in medicine is known"},
+      {"source": "Improving medical diagnosis with causal ML (2020)", "overlap": "LOW — academic paper on causal ML for diagnosis. Not patented, not shunt-specific.", "threat": "LOW"},
+      {"source": "WO2011146757A2 — active flow generation + resistance tracking", "overlap": "HIGH — covers active perturbation for obstruction DETECTION. The key question: does 'causal discrimination between multiple failure modes via perturbation response' fall within WO2011146757A2's claims?", "threat": "HIGH — same active perturbation concept"}
+    ],
+    "novelty_confidence": 1,
+    "novelty_name": "POTENTIAL_NOVELTY_PRIOR_ART_THREAT_REMAINS",
+    "rationale": "The active perturbation concept is already patented (WO2011146757A2). While that patent covers DETECTION (binary: obstructed or not), the question is whether MULTI-CLASS CAUSAL DISCRIMINATION (which of 5 failure modes) via perturbation is distinguishable. The threat is HIGH. Causal inference in medicine is known (general). The specific combination (active perturbation + multi-class causal discrimination in shunt) is NOT found, but the obviousness threat from WO2011146757A2 is significant.",
+    "simulation_eligible": false,
+    "the_key_distinction": "WO2011146757A2 detects obstruction (binary). D2 discriminates between 5 failure modes (multi-class). But a person of ordinary skill might extend binary detection to multi-class discrimination — this is a natural extension."
+  },
+
+  "direction_3_LATENT_MECHANICAL_STATE_ESTIMATION": {
+    "name": "Latent Mechanical State — Infer hidden state from NATURAL perturbations",
+    "queries_executed": 2,
+    "closest_prior_art": [
+      {"source": "CSF Physiologic Controller (patent)", "overlap": "LOW — implantable active device with microprocessor control. Does NOT estimate latent mechanical state.", "threat": "LOW"},
+      {"source": "Patient-specific Hardware-in-the-Loop testing (Gehlen 2016)", "overlap": "LOW — in vitro test bed for shunt testing. Not a sensing/estimation system.", "threat": "LOW"},
+      {"source": "State estimation of physical system with unknown equations (2023)", "overlap": "LOW — general state estimation theory. Not shunt-specific.", "threat": "LOW"},
+      {"source": "VIEshunt — posture-dependent ICP regulation", "overlap": "LOW-MODERATE — uses posture as input for control, but does NOT use posture response to ESTIMATE latent mechanical state.", "threat": "LOW-MODERATE"}
+    ],
+    "novelty_confidence": 2,
+    "novelty_name": "NOVELTY_SURVIVES_CURRENT_SEARCH",
+    "rationale": "No patent found for estimating LATENT MECHANICAL STATE (hydraulic resistance distribution, compliance, valve hysteresis) from NATURALLY OCCURRING physiological perturbations (posture changes, coughing, CSF pulsation) in shunt systems. This sidesteps WO2011146757A2 because it uses PASSIVE natural perturbations, not ACTIVE vibration. The concept of system identification from natural excitation is known in engineering but NOT applied to shunt mechanical state estimation.",
+    "simulation_eligible": true,
+    "the_key_differentiator": "WO2011146757A2 uses ACTIVE vibration (patented). D3 uses NATURAL physiological perturbations (posture, cough, CSF pulsation) as the excitation signal. This is a fundamentally different approach that sidesteps the active-perturbation patent."
+  },
+
+  "direction_4_INTERVENTION_OUTCOME_PREDICTION": {
+    "name": "Intervention Outcome Prediction — WHICH intervention will work?",
+    "queries_executed": 2,
+    "closest_prior_art": [
+      {"source": "Digital twin for brain tumor treatment outcomes (Michigan, 2026)", "overlap": "MODERATE — digital twin predicts treatment outcomes for brain tumors. BUT: tumor, not hydrocephalus/shunt. Different disease, different interventions.", "threat": "LOW-MODERATE"},
+      {"source": "Neurotwin — digital twins of brain for treatment prediction (CORDIS, 2025)", "overlap": "MODERATE — digital twin for neurological disorder treatment prediction. BUT: general neurology, not shunt-specific.", "threat": "LOW-MODERATE"},
+      {"source": "Digital Twins in Life Sciences patent strategy (2025)", "overlap": "LOW — patent strategy article, not a specific patent for shunt intervention prediction.", "threat": "LOW"},
+      {"source": "LSTM models for hydrocephalus disease progression (2026)", "overlap": "MODERATE — predicts disease progression, not intervention outcome. Different prediction target.", "threat": "LOW-MODERATE"}
+    ],
+    "novelty_confidence": 2,
+    "novelty_name": "NOVELTY_SURVIVES_CURRENT_SEARCH",
+    "rationale": "No patent found for INTERVENTION OUTCOME PREDICTION in shunt systems. Digital twins exist for brain tumors and general neurology, but NOT for predicting which shunt intervention (valve adjustment vs catheter replacement vs shunt revision) will produce the best outcome. The specific application (shunt intervention selection via outcome simulation) is NOT found.",
+    "simulation_eligible": true,
+    "the_key_differentiator": "All existing systems predict FAILURE (will the shunt fail?). D4 predicts INTERVENTION OUTCOME (which intervention will restore function?). This is a fundamentally different question — therapeutic decision, not diagnostic prediction."
+  },
+
+  "summary_ranking": {
+    "rank_1": "D3 (Latent Mechanical State from Natural Perturbations) — novelty 2, SURVIVES, sidesteps WO2011146757A2, genuine new observable",
+    "rank_2": "D1 (Spatial Degradation Localization) — novelty 2, SURVIVES, new spatial observable, no shunt-specific multi-point array found",
+    "rank_3": "D4 (Intervention Outcome Prediction) — novelty 2, SURVIVES, different question (which intervention, not will it fail)",
+    "rank_4": "D2 (Causal Root-Cause Diagnosis) — novelty 1, THREATENED by WO2011146757A2 (active perturbation concept is patented)"
+  },
+
+  "the_most_promising_direction": {
+    "candidate": "D3: Latent Mechanical State Estimation from Natural Perturbations",
+    "why": "Three reasons: (1) novelty 2 (survives search), (2) sidesteps the most threatening patent (WO2011146757A2 uses ACTIVE vibration, D3 uses NATURAL perturbations), (3) addresses a genuine information bottleneck (hidden mechanical state is NOT observable with any existing sensor). The concept of using natural physiological perturbations as excitation for system identification is known in engineering but NOT applied to shunt mechanical state estimation.",
+    "the_physical_moat": "Requires a state estimation algorithm that can infer resistance distribution, compliance, and valve hysteresis from naturally occurring ICP/flow responses to posture changes, coughing, and CSF pulsation. This is a MODEL + ALGORITHM moat — the sensor hardware already exists (ICP sensor, flow sensor), but the estimation algorithm does NOT.",
+    "the_temporal_moat": "In 2026, nobody estimates latent mechanical state in shunts. By 2029, as sensor data accumulates, the patient-specific mechanical state model becomes a data moat that competitors cannot replicate without years of longitudinal data.",
+    "next_step": "Light simulation: can latent mechanical state (resistance, compliance, hysteresis) be inferred from natural perturbation response? Model: natural perturbations (posture, cough, pulsation) → ICP/flow response → state estimator → inferred mechanical state."
+  },
+
+  "state": {
+    "world_class": "0/5",
+    "portfolio": "EMPTY",
+    "killed": ["C2","C4","C2-Y-AP","H1-V2"],
+    "new_directions_searched": 4,
+    "surviving": 3 (D1, D3, D4 at novelty 2),
+    "threatened": 1 (D2 at novelty 1, WO2011146757A2),
+    "simulation_eligible": 3 (D1, D3, D4),
+    "most_promising": "D3 (Latent Mechanical State from Natural Perturbations)",
+    "next_action": "Light simulation for D3 — can latent mechanical state be inferred from natural perturbation response?"
+  }
+}
