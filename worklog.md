@@ -6504,3 +6504,21 @@ Results:
   AE verdict: AE_INCONCLUSIVE
   Evidence: Level 3
   World-Class: 0/5 (unchanged)
+
+---
+Task ID: AI-LOOP-V3-CYCLE-4-R175
+Agent: autonomous_ai_loop_v3.py (FULLY AUTONOMOUS)
+Task: Thrombectomy State Engine (FIXED — damage params corrected)
+
+Results:
+  force_only: AUROC=0.574
+  flow_only: AUROC=0.539
+  ae_only: AUROC=0.565
+  force_plus_flow: AUROC=0.557
+  combined: AUROC=0.562
+  Incremental (multimodal): -0.0127
+  Incremental (AE): 0.0042
+  Verdict: KILL
+  AE verdict: AE_REDUNDANT
+  Evidence: Level 3
+  World-Class: 0/5
