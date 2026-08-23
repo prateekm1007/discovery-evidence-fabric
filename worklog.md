@@ -4715,3 +4715,74 @@ Stage Summary:
 - Rationale: prior art teaches the components + scientific test shows no technical advantage
   from the proposed differentiator = no inventive step.
 - 0/5 WORLD_CLASS_INVENTION. C2 = KILL RECOMMENDED. C5 UNRESOLVED.
+
+---
+Task ID: ROUND-144-C2-INCREMENTAL-INFORMATION-TEST
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 144 — rebuild C2 decisive experiment with identical features/classifier/training/evaluation. Three models (A=absolute, B=differential, C=combined). Virtual cohort with patient-level variation. Experiment self-attack.
+
+Work Log:
+- RETRACTED C2 KILL from Round 143:
+  Old: C2 = KILLED_BY_EVIDENCE
+  New: C2 = FALSIFICATION_ATTEMPT_INCONCLUSIVE_EXPERIMENTAL_VALIDITY
+  Rationale: Round 143 used hand-coded thresholds, unequal classifiers, no held-out test.
+  Per CEO: 'Experiment falsification ≠ mechanism falsification.'
+
+- Built C2-R144-INCREMENTAL-INFORMATION-TEST:
+  * Virtual cohort: 500 patients with patient-level variation
+    (baseline ICP, venous pressure, compliance, shunt resistance, pulse morphology,
+    posture/cough/resp response, sensor bias, sensor drift, venous coupling)
+  * Train/val/test split: 60%/20%/20% (patient-level, no leakage)
+  * 3 models with IDENTICAL architecture:
+    A = absolute ICP features only (8 features)
+    B = differential CSF-venous features only (8 features)
+    C = combined absolute + differential (16 features)
+  * Same classifier: LogisticRegression(L2, C=0.01 selected on val)
+  * Same feature family: mean, pulse_amp, P2/P1, time-to-peak, temporal_var,
+    sustained_change, slope, spectral_entropy
+  * Same scaler: StandardScaler
+  * Same evaluation: held-out test set, AUROC, AUPRC, sensitivity@90%specificity
+
+- RESULT: H-C SUPPORTED — Differential adds MODEST information.
+  Model A (absolute): AUROC 0.9539, AUPRC 0.8745
+  Model B (differential): AUROC 0.9923, AUPRC 0.9773 — BETTER than A!
+  Model C (combined): AUROC 0.9890, AUPRC 0.9696
+  Incremental (C-A): +0.0351 AUROC, +0.0951 AUPRC
+
+- KEY FINDING: Differential-only (Model B) OUTPERFORMS absolute-only (Model A)!
+  This is surprising — in Round 143, differential was WORSE. With proper
+  feature extraction and matched classifier, differential is actually BETTER.
+  However, combined (Model C) does not outperform differential-only (Model B),
+  suggesting the information is largely redundant (differential captures most
+  of what absolute provides, plus additional venous-decoupling information).
+
+- EXPERIMENT SELF-ATTACK:
+  * Threshold selection: NO — same C for all, selected on val only
+  * Synthetic data: PARTIALLY — venous_coupling Uniform(0.1, 0.5) is a model
+    assumption. If real coupling is higher, differential provides less info.
+  * Unequal capacity: NO — identical LogisticRegression
+  * Leakage: NO — patient-level split
+  * Benchmark fairness: NO — same features, scaler, classifier, evaluation
+  * KEY LIMITATION: venous_coupling assumption is load-bearing. Needs validation
+    against published CSF/venous pressure data.
+
+- C2 ASSESSMENT: FALSIFICATION_ATTEMPT_INCONCLUSIVE
+  * Differential provides MODEST incremental information (+0.035 AUROC)
+  * Not enough to confidently promote (advantage is small)
+  * Not enough to kill (differential does add information)
+  * Key uncertainty: venous_coupling assumption needs physiological validation
+  * H-C2-9 (only specific combination novel): WEAKENED but not refuted
+  * H-C2-10 (differential is obvious substitution): WEAKENED — differential
+    provides unexpected information advantage, which argues against "obvious"
+
+- OpenFOAM: running in background.
+
+Stage Summary:
+- C2 kill RETRACTED. Round 143 experiment was insufficiently controlled.
+- New experiment (Round 144): identical features/classifier/evaluation.
+- Result: H-C SUPPORTED — differential adds modest information (+0.035 AUROC).
+- Differential-only actually OUTPERFORMS absolute-only (surprising).
+- But advantage is small and depends on venous_coupling assumption.
+- C2 = FALSIFICATION_ATTEMPT_INCONCLUSIVE (not killed, not promoted).
+- The patent-physics loop is now more rigorous: experiment self-attack included.
+- 0/5 WORLD_CLASS_INVENTION. C2 INCONCLUSIVE. C5 UNRESOLVED.
