@@ -5887,3 +5887,59 @@ Stage Summary:
 - The system avoided epistemic inflation by catching the patent threats before simulation
 - Next: Stage 0 novelty searches for redesign directions (information bottleneck approach)
 
+
+---
+Task ID: ROUND-161-NOVELTY-SEARCH-NOT-SIMULATION
+Agent: main (session 2026-08-24)
+Task: Execute Round 161 — NOVELTY SEARCH round, not simulation round. Apply simulation-budget-follows-novelty-confidence rule. Search for information-bottleneck redirects for C2-Y, C3-X, C5-X. Download OpenFOAM v9 source.
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = 5964dec (correct). Local origin/main ref updated.
+
+Work Log:
+
+1. SIMULATION_BUDGET_FOLLOWS_NOVELTY_CONFIDENCE_V1.json
+   - The rule: NOVELTY < MEDIUM → NO_SIMULATION; NOVELTY ≥ MEDIUM → MECHANISM_SIMULATION; NOVELTY_SURVIVES_STRONGEST_ATTACK → INDEPENDENT_VALIDATION; INDEPENDENT + COMPETITOR_SUPERIORITY → WORLD_CLASS_REVIEW
+   - Current eligibility: C2-Y (level 1, INELIGIBLE), C3-X (level 0, INELIGIBLE), C5-X (level 1, INELIGIBLE)
+   - ALL THREE candidates are SIMULATION_INELIGIBLE. Round 161 is a novelty search round.
+   - The invention-generation reframe: FROM product-feature approach TO information-bottleneck approach
+
+2. ROUND161_NOVELTY_SEARCH_RESULTS_V1.json
+   - Executed 10 web searches across Google Patents, Justia, PubMed, NIH/PMC, PatentBuddy
+   - C2-Y redirected to C2-Y-active-probing (ACTIVE perturbation for hidden hydraulic resistance)
+     * Novelty level: 1 (POTENTIAL_NOVELTY, threat remains)
+     * Key differentiator: ACTIVE perturbation vs PASSIVE prediction
+     * Simulation INELIGIBLE — needs deeper search
+   
+   - C3-X redirected to C3-X-tissue-exposure (infer LOCAL TISSUE exposure from multimodal CSF response)
+     * Novelty level: 1 (POTENTIAL_NOVELTY, threat remains)
+     * Key differentiator: Tissue exposure (hidden state) vs CSF concentration (observable)
+     * Simulation INELIGIBLE — needs deeper search
+   
+   - C5-X redirected to C5-X-acoustic-emission (detect micro-fracture acoustic emissions from thrombus)
+     * Novelty level: 2 (NOVELTY_SURVIVES_CURRENT_SEARCH) — THE MOST PROMISING
+     * Key differentiator: Acoustic emission (direct fracture measurement) vs imaging/CFD (proxy)
+     * Simulation ELIGIBLE — first candidate to qualify under new rule
+     * Established in adjacent fields (bone, rock, LVAD thrombosis)
+     * NOT covered by threatening patents (which use imaging, CFD, device motion)
+     * CAVEAT: search was BROAD not DEEP; must search IVUS, intravascular acoustic emission
+
+3. OpenFOAM v9 source download
+   - Downloaded from https://dl.openfoam.org/source/9 (45MB)
+   - Extracted to /home/z/openfoam9/OpenFOAM-9/
+   - Source includes Allwmake, wmake, etc/bashrc — all present
+   - Build NOT yet started (MPI wrapper configuration needed — mpicc.openmpi needs OPAL_PREFIX)
+   - This is the CORRECT version for clotFoam (v9, not v1912)
+   - World C-clotFoam remains INFRASTRUCTURE_BLOCKED
+   - World C-control (icoFoam v1912) still working
+
+Stage Summary:
+- Simulation budget rule enforced: NO candidate with novelty < 2 receives simulation
+- C5-X-acoustic-emission is the FIRST candidate to reach novelty level 2 (survives current search)
+- C2-Y and C3-X redirected to information-bottleneck approaches but need deeper search
+- OpenFOAM v9 source downloaded (correct version); build pending MPI configuration
+- ALL THREE original candidates (C2-Y, C3-X, C5-X) are prior-art threatened as originally defined
+- The information-bottleneck reframe produced one promising direction (C5-X-acoustic-emission)
+- 0/5 WORLD_CLASS. Portfolio EMPTY (sacred). No candidate eligible for simulation yet.
+- Next: Deep novelty search on C5-X-acoustic-emission (IVUS, intravascular AE)
+
