@@ -5238,3 +5238,58 @@ Stage Summary:
 - Global scheduler selected: C5 (OpenFOAM build) + C2-Y (parallel test).
 - Portfolio: 0/5 WORLD_CLASS. 2 KILLED. 3 INVESTIGATION. 7 in discovery queue.
 - Next: C2-Y perturbation identification test (executable now) + C5 OpenFOAM build (background).
+
+---
+Task ID: ROUND-152-C2Y-PRIOR-ART-AND-SCHEDULER-FIX
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 152 — fix scheduler ranking semantics, C2-Y prior-art attack, define C2-Y novelty hypothesis, C5-X strategic reinforcement.
+
+Work Log:
+- Fixed scheduler ranking semantics:
+  * Separated RAW_SCORE from EXECUTABILITY from POLICY_PRIORITY
+  * No more contradictory numerical ranking (C5 rank 1 with lower score than C2-Y rank 2)
+  * Blocked high-EIG can outrank executable lower-EIG in strategic importance, but executable is selected for execution
+
+- C2-Y prior-art attack (PubMed search):
+  * "patient-specific shunt system identification": 33 results
+  * "perturbation response shunt diagnostics": 13 results
+  * "dynamic shunt testing pressure response": 43 results
+  * "hardware-in-the-loop shunt testing": 5 results
+  * Analyzed PMID 26208258 (patient-specific hardware-in-loop, 2015) and PMID 27203135 (virtual ICP/CSF models, 2016)
+
+- KEY FINDING: Perturbation testing is KNOWN:
+  * PMID 26208258: Real-time hardware-in-loop test bed with patient-specific model, posture, cardiovascular modulation, 24h test cycle
+  * PMID 27203135: Dynamic testing with cardiac/respiratory oscillations, posture, cough, Valsalva
+  * Both are BENCH-TOP, not in-vivo
+  * Neither tracks LONGITUDINAL degradation
+  * Neither uses RESPONSE KINETICS (rise time, recovery, hysteresis, settling)
+  * Neither does FAILURE-MODE CLASSIFICATION
+  * Neither detects LATENT DEGRADATION before conventional thresholds
+
+- Defined C2-Y novelty hypotheses (H-Y1 through H-Y5):
+  * H-Y1: Perturbation testing is known → SUPPORTED
+  * H-Y2: Existing systems cannot detect latent degradation → PLAUSIBLE (bench-top only)
+  * H-Y3: Response-manifold model produces lead-time advantage → UNTESTED (key question)
+  * H-Y4: Response signature distinguishes failure modes → UNTESTED
+  * H-Y5: Result too sensitive to model uncertainty → UNTESTED (adversarial)
+
+- Refined C2-Y concept: "Active Shunt System Identification for Latent Degradation Detection"
+  * Core: response-manifold deviation from patient-specific baseline
+  * Moat: patient-specific baseline → response library → longitudinal drift → failure-state classifier
+  * What must be proven: lead-time advantage, failure-mode classification, robustness, clinical practicality
+
+- C5-X strategic reinforcement:
+  * PMID 42508673 (2026 review): physics-informed digital twins + AI for thrombus fragmentation
+  * PMID 33812070 (2021): clot fracture properties depend on composition, predictive models possible
+  * Implication: C5-X is scientifically active, novelty must be specific
+
+- OpenFOAM: restarted in background.
+
+Stage Summary:
+- Scheduler fixed: RAW_SCORE / EXECUTABILITY / POLICY_PRIORITY separated.
+- C2-Y prior-art: perturbation testing is KNOWN. Potential novelty in: in-vivo continuous,
+  longitudinal baseline, response kinetics, failure-mode classification, latent degradation.
+- C2-Y refined: "response-manifold deviation for latent degradation detection"
+- 5 hypotheses defined (H-Y1 through H-Y5). H-Y1 supported (known), H-Y2 plausible, H-Y3-H-Y5 untested.
+- Next: C2-Y virtual cohort test (does response-manifold detect degradation before static threshold?).
+- 0/5 WORLD_CLASS. 2 KILLED. 3 INVESTIGATION. 7 in discovery queue.
