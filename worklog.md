@@ -6112,3 +6112,72 @@ Stage Summary:
 - 0/5 WORLD_CLASS. Portfolio EMPTY. No candidate eligible for full simulation.
 - All three redirected candidates require patent attorney evaluation — this is now the critical path
 
+
+---
+Task ID: ROUND-165-C2Y-AP-CLOSURE-C3X-TE-OBVIOUSNESS-C5X-AE-V3
+Agent: main (session 2026-08-24)
+Task: Execute Round 165 — close C2-Y-active-probing, deepen C3-X-tissue-exposure obviousness attack, reframe C5-X-AE as V3, attack 2023 anchor paper element-by-element, define scientific question + baselines + kill/win thresholds.
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = c2ed1c6 (correct). Local origin/main ref updated.
+
+Work Log:
+
+1. C2-Y-active-probing CLOSURE (CE-015)
+   - WO2011146757A2 explicitly covers: vibrating shunt valve to generate CSF flow + tracking shunt resistance + obstruction detection + partial/complete occlusion assessment
+   - C2-Y-active-probing's core mechanism is occupied
+   - CEO directive: do not rescue by making vibration more sophisticated
+   - Cemetery entry CE-015 created
+   - Simulation budget: ZERO
+   - Lesson: the information bottleneck (hidden hydraulic resistance) is addressable by active perturbation, but that approach is patented. A genuinely different mechanism would need to observe the hidden state WITHOUT active perturbation.
+
+2. C3-X-tissue-exposure OBVIOUSNESS ATTACK (4 queries)
+   - US 20260224805 already mentions: PK/PD model, additional physiological sensors, NIR sensing, patient-specific calibration
+   - These elements provide the tools AND motivation for tissue exposure inference
+   - A person of ordinary skill would find it obvious to extend concentration monitoring to tissue exposure estimation
+   - Novelty DOWNGRADED: level 1 → level 0.5 (PRIOR_ART_HIGHLY_THREATENED_BY_OBVIOUSNESS)
+   - Simulation INELIGIBLE
+   - Requires patent attorney to determine if tissue-exposure-inference is distinguishable from the patent's broad PK/PD + physiological sensors language
+
+3. C5-X-AE-V3 REFRAME (7 required elements)
+   - A. Receive-only sensing (no transmit)
+   - B. No intentional acoustic excitation (no HIFU/histotripsy)
+   - C. Mechanical thrombectomy context
+   - D. Naturally generated mechanical fracture (not cavitation)
+   - E. Event-level acoustic detection
+   - F. Pre-macroscopic-fragmentation prediction
+   - G. Embolization-risk output (decision variable)
+
+4. C5-X-AE-V3 ATTACK vs 2023 anchor paper (PMC10206501)
+   - Element-by-element mapping shows C5-X-AE-V3 differs on ALL 7 elements
+   - Critical differentiators: no active excitation, mechanical thrombectomy context, naturally generated fracture, pre-failure prediction
+   - The 2023 paper proves passive AE of clot is FEASIBLE but does NOT teach endogenous fracture prediction during mechanical thrombectomy
+   - Remaining obviousness threat: MODERATE (would a skilled person combine the 2023 paper with mechanical thrombectomy?)
+   - Requires patent attorney FTO evaluation
+
+5. Scientific question + baselines + thresholds for C5-X-AE-V3
+   - Question: Can passive endogenous AE predict macroscopic fragmentation EARLIER than existing signals?
+   - NOT the question: Can AE detect clot damage? (established)
+   - Baselines: force/torque, flow/aspiration, imaging, passive AE, multimodal combination
+   - Decisive metric: INCREMENTAL predictive value (AE added to existing signals)
+   - WIN: incremental AUROC >= 0.05, lead time >= 2s, false alert <= 1/procedure, phenotype robust 4/5, independent model survives
+   - KILL: no incremental info, lead time < 0.5s, phenotype fails < 3/5, requires active ultrasound, independent model fails
+   - All thresholds frozen BEFORE simulation (Article XIX + XXXVI)
+
+6. Updated portfolio:
+   - Killed: C2, C4, C2-Y-active-probing (CE-015)
+   - Prior-art highly threatened: C3-X-tissue-exposure (obviousness)
+   - Conditional novelty: C5-X-AE-V3 (7-element, moderate obviousness)
+   - Simulation eligible: NONE (all require patent attorney evaluation)
+   - 0/5 WORLD_CLASS. Portfolio EMPTY.
+
+Stage Summary:
+- C2-Y-active-probing CLOSED (CE-015) — WO2011146757A2 occupies the core mechanism
+- C3-X-tissue-exposure downgraded to novelty 0.5 — obviousness threat from US 20260224805 is HIGH
+- C5-X-AE-V3 reframed with 7 elements; differs from 2023 anchor paper on ALL 7; moderate obviousness remains
+- Pre-registered kill/win thresholds for C5-X-AE-V3 (frozen before simulation)
+- Three attractive ideas entered the queue; one killed by 2011 patent, one threatened by 2026 patent, one narrowed by 2023 literature
+- The machine asks the right question: what is the smallest genuinely unoccupied piece?
+- 0/5 WORLD_CLASS. Portfolio EMPTY. No candidate eligible for full simulation.
+- Patent attorney evaluation is the critical path for all surviving candidates.
+
