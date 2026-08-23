@@ -1,0 +1,171 @@
+{
+  "record_type": "C3_X_REBUILT_BASELINE_V1",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 156,
+  "authority": "CEO Round 156: 'Compare against ThecaFlex-style open loop AND a best-practicable adaptive control baseline. Do not use a weak open-loop strawman. The key scientific question should become: Does feedback control produce a materially tighter therapeutic exposure/response envelope than the strongest feasible open-loop and adaptive baselines?'",
+  "constitutional_basis": [
+    "Article IV — no fallback epistemology (cannot use weak open-loop strawman)",
+    "Article XIX — never optimize for the gate (baseline parameters frozen BEFORE C3-X runs)",
+    "Article XXVII — no threshold invention (CV + overdosing thresholds have provenance from EMPIRICAL_THRESHOLD_PROVENANCE_V1.json)",
+    "Article XXVIII — no silent semantic promotion ('beat ThecaFlex' is NOT 'beat Biogen's internal R&D')",
+    "Article XXIX — separate implementation from mechanism (TDM reproduction failure is implementation failure)",
+    "Article XXXII — state strongest alternative (Biogen may have undisclosed closed-loop work)"
+  ],
+
+  "the_two_baselines": {
+    "rule": "C3-X must beat BOTH baselines. Either alone is insufficient.",
+    "baseline_A": {
+      "name": "ThecaFlex-style open-loop fixed-dose intrathecal delivery",
+      "epistemic_status": "DEMONSTRATED (Biogen SEC filings, clinical studies, FDA filings for ThecaFlex DRx)",
+      "what_it_does": "Clinician programs a fixed dose → device delivers at fixed intervals → no feedback, no adjustment",
+      "what_we_will_implement": "Fixed dose per ThecaFlex-published protocols. Dose selected per patient using population-average PK parameters. No mid-course adjustment.",
+      "fidelity_class": "HIGH — open-loop is methodologically simple",
+      "calibration_plan": "Validate Baseline A drug concentration time-course against published ThecaFlex PK data. If reproduction differs from published by >15%, baseline is INCOMPLETE (Article XXIX)."
+    },
+    "baseline_B": {
+      "name": "Best-practicable adaptive control: Bayesian population PK with patient-specific posterior update",
+      "epistemic_status": "DEMONSTRATED in adjacent therapeutic areas (intrathecal baclofen TDM, ziconotide TDM, methotrexate TDM)",
+      "what_it_does": [
+        "Population PK model with patient-specific posterior (Bayesian update from observed drug levels)",
+        "Dose adjustment based on observed plasma/CSF drug concentration at sampled timepoints (e.g., weekly)",
+        "Population-level covariate adjustment (weight, age, CSF flow rate)",
+        "Therapeutic window targeting with target concentration intervention (TDM standard of care)"
+      ],
+      "what_we_will_implement": "NONMEM-style Bayesian population PK. Patient-specific posterior update from observed CSF drug concentration at sampled timepoints (weekly). Dose adjustment based on posterior-predicted concentration trajectory. Pre-registered PK parameters from published intrathecal baclofen literature.",
+      "fidelity_class": "HIGH — Bayesian TDM is methodologically mature",
+      "calibration_plan": "Validate Baseline B against published intrathecal baclofen PK data. If reproduction differs from published by >15%, baseline is INCOMPLETE (Article XXIX).",
+      "why_this_is_not_a_strawman": "TDM with Bayesian adjustment is the standard-of-care adaptive approach. If C3-X cannot beat this, the closed-loop CSF-state-aware advantage is illusory. Using only ThecaFlex-style fixed-dose as the baseline would be the strawman the CEO explicitly warned against."
+    },
+    "alternative_explanation_to_state_explicitly": "Biogen has NOT publicly disclosed closed-loop intelligence for ThecaFlex. We must NOT assume 'ThecaFlex is open-loop' = 'Biogen cannot do closed-loop'. The correct language: 'NO_PUBLIC_EVIDENCE of closed-loop development' (Article XXV). If Biogen has internal closed-loop R&D, our Baseline B is the strongest publicly plausible adaptive approach, but the true incumbent may be stronger."
+  },
+
+  "experiment_design": {
+    "experiment_id": "C3-X-R1",
+    "pre_registration": "This design is pre-registered BEFORE any C3-X code runs. Per Article XIX, no parameter may be tuned after C3-X results are known.",
+
+    "patient_population": {
+      "virtual_cohort_size": 200,
+      "stratification": {
+        "clearance_phenotype": "Fast / Intermediate / Slow metabolizers (per CYP enzyme phenotype distribution)",
+        "age": "Pediatric (2-18) / Adult (18-65) / Elderly (65+)",
+        "weight": "40 kg / 70 kg / 100 kg",
+        "CSF_flow_rate": "Low (0.3 mL/min) / Normal (0.4 mL/min) / High (0.5 mL/min)"
+      },
+      "therapeutic_target": "Intrathecal baclofen for severe spasticity (chosen because PK is well-published, allowing Baseline B calibration)",
+      "therapeutic_window": "100-400 ng/mL CSF concentration (published intrathecal baclofen therapeutic range)",
+      "why_this_population": "Stratification by clearance phenotype + age + weight + CSF flow rate captures the major sources of inter-patient PK variability. C3-X must demonstrate advantage across the full variability space, not just average patients."
+    },
+
+    "physiological_perturbations": {
+      "perturbations_applied_to_all_arms": [
+        "CSF flow rate variation (posture-dependent, diurnal)",
+        "Patient-specific drug clearance (population distribution)",
+        "Delivery lag (catheter dead-volume, ~5-10 min)",
+        "Sensor noise on drug concentration measurement (CV 5-15%, realistic for sampled CSF analysis)",
+        "Dose constraints (max 1 mg/kg per dose, max 4 doses per day)",
+        "Toxicity constraints (concentration >500 ng/mL = overdose alert)",
+        "Model uncertainty (PK parameters with 20% coefficient of variation)"
+      ],
+      "why_these_perturbations": "Per CEO directive: 'The experiment must include: patient variability, drug clearance variation, delivery lag, sensor noise, dose constraints, toxicity constraints, model uncertainty.'"
+    },
+
+    "measurement_availability": {
+      "rule": "All arms receive the same measurement data stream.",
+      "measurement_stream": {
+        "Baseline_A": "Receives only the initial patient covariates (age, weight, CSF flow). No feedback after dosing starts.",
+        "Baseline_B": "Receives weekly CSF drug concentration measurement + patient covariates. Updates Bayesian posterior weekly.",
+        "C3_X_candidate": "Receives continuous CSF state estimate (drug concentration + flow rate + posture) + patient covariates. Updates dose recommendation continuously."
+      },
+      "why_C3_X_gets_more_data": "C3-X's hypothesis is that continuous CSF-state feedback provides value over weekly sampled TDM. To test this hypothesis, C3-X must be allowed to use continuous feedback. This is NOT unfair — it is the invention being tested. If C3-X cannot demonstrate value from continuous feedback despite having more data, the invention is falsified.",
+      "constraint_to_prevent_unfair_advantage": "C3-X's continuous feedback is restricted to the SAME drug concentration signal that Baseline B samples weekly. C3-X does not receive any additional sensor data. The only difference is sampling frequency and the model architecture."
+    },
+
+    "computational_budget": {
+      "rule": "All arms have the same computational budget per week: max 1000 FLOPs/week (equivalent to weekly TDM calculation).",
+      "C3_X_exception": "C3-X may use more frequent computation (up to 1 FLOP/s avg) IF it can justify that the additional computation is clinically practical (i.e., does not require impractical battery/hardware).",
+      "rationale": "If C3-X requires a desktop GPU to compute dose recommendations, it is not clinically practical. The budget constraint forces C3-X to be efficient."
+    },
+
+    "dose_constraint": {
+      "rule": "All arms operate under the same dose constraints: max 1 mg/kg per dose, max 4 doses per day, max cumulative daily dose per FDA label.",
+      "rationale": "C3-X cannot win by exceeding the labeled dose. The advantage must come from BETTER TIMING of doses within constraints, not from MORE drug."
+    },
+
+    "primary_endpoint": {
+      "endpoint": "drug_concentration_stability_in_therapeutic_window",
+      "mathematical_definition": "Fraction of patient-time that CSF drug concentration is within [100, 400] ng/mL therapeutic window. Also reported: CV of CSF drug concentration over the dosing horizon.",
+      "why_this_endpoint": "Per CEO directive: 'Does feedback control produce a materially tighter therapeutic exposure/response envelope than the strongest feasible open-loop and adaptive baselines?' The 'tighter envelope' is operationalized as higher fraction-in-window + lower CV."
+    },
+
+    "secondary_endpoints": [
+      "overdosing_events (concentration >500 ng/mL = overdose)",
+      "underdosing_events (concentration <100 ng/mL = subtherapeutic)",
+      "time_to_therapeutic_window after dose initiation",
+      "patient_specific_optimization_benefit (per-patient improvement vs population-optimal fixed dose)"
+    ]
+  },
+
+  "pre_registered_outcomes_table": {
+    "outcome": "WIN | KILL | INCONCLUSIVE per baseline × endpoint",
+    "rows": [
+      "vs Baseline A (ThecaFlex open-loop) on concentration CV",
+      "vs Baseline A on overdosing events",
+      "vs Baseline B (Bayesian adaptive TDM) on concentration CV",
+      "vs Baseline B on overdosing events",
+      "vs Baseline B on patient-specific optimization benefit"
+    ],
+    "decision_rule": "C3-X is WIN only if ALL rows achieve WIN. C3-X is KILL if ANY row achieves KILL. Otherwise C3-X is INCONCLUSIVE.",
+    "why_beat_both_baselines": "Per CEO directive: 'A 50% reduction in concentration CV sounds impressive, but it is meaningless if the baseline was deliberately weak.' If C3-X beats Baseline A but not Baseline B, the invention provides no advantage over standard-of-care adaptive TDM. The CEO directive explicitly forbids declaring success against a weak baseline."
+  },
+
+  "falsification_paths": [
+    {
+      "path": "C3-X concentration CV > 80% of Baseline B CV → KILL",
+      "evidence_required": "Per-arm CV comparison",
+      "rationale": "Below 20% additional improvement over best-practicable adaptive TDM is within typical PK variability. C3-X provides no material advantage over standard of care."
+    },
+    {
+      "path": "C3-X does not significantly reduce overdosing events vs Baseline A (p > 0.05) → KILL",
+      "evidence_required": "Per-arm overdosing event comparison",
+      "rationale": "If C3-X cannot demonstrate safety advantage over open-loop, the regulatory and clinical case for closed-loop collapses."
+    },
+    {
+      "path": "Baseline B (Bayesian TDM) implementation underperforms published TDM results by >15% → BASELINE INCOMPLETE → experiment BLOCKED",
+      "evidence_required": "Comparison of Baseline B performance to published intrathecal baclofen TDM data",
+      "constitutional_basis": "Article XXIX — separate implementation from mechanism. A Baseline B reproduction failure is NOT a C3-X failure."
+    },
+    {
+      "path": "C3-X achieves 50-70% of Baseline B CV → INCONCLUSIVE",
+      "evidence_required": "Per-arm CV in [50%, 70%] range vs Baseline B",
+      "next_step": "Tighten experiment design OR public KILL with rationale (Article XXVIII)"
+    }
+  ],
+
+  "adversarial_self_attack": {
+    "attack_1_weak_Baseline_B": "An adversary would implement Baseline B with a poor PK model or insufficient patient data to make C3-X look better. Counter: PK model pre-registered from published intrathecal baclofen literature; parameters frozen BEFORE C3-X runs. Any post-hoc weakening of Baseline B is forbidden (Article XIX).",
+    "attack_2_easy_cohort": "An adversary would test on patients with low PK variability. Counter: cohort is stratified by clearance phenotype + age + weight + CSF flow rate; C3-X must win across the full variability space.",
+    "attack_3_unfair_data": "An adversary would give C3-X additional sensor data that the baselines do not have. Counter: C3-X receives only the SAME drug concentration signal as Baseline B, but at higher sampling frequency. The invention being tested is whether continuous feedback provides value over weekly sampling, NOT whether additional sensors provide value.",
+    "attack_4_high_dose": "An adversary would let C3-X exceed dose constraints. Counter: all arms operate under identical dose constraints. C3-X cannot win by exceeding the labeled dose.",
+    "attack_5_metric_gaming": "An adversary would report CV alone without overdosing events. Counter: CV is reported TOGETHER with overdosing events. Both must achieve WIN threshold.",
+    "attack_6_silent_promotion": "An adversary would silently promote 'beat ThecaFlex' to 'beat Biogen's internal R&D'. Counter: explicit naming 'ThecaFlex-style open-loop baseline (Baseline A)' and 'best-practicable adaptive TDM (Baseline B)'. Article XXVIII forbids silent semantic promotion."
+  },
+
+  "what_this_experiment_does_NOT_prove": [
+    "Does NOT prove C3-X beats the real ThecaFlex — ThecaFlex internal intelligence is UNKNOWN",
+    "Does NOT prove C3-X beats Biogen's internal closed-loop R&D — Article XXXII alternative stated",
+    "Does NOT prove C3-X is clinically practical — virtual cohort only; real clinical trial required for that (Article XXXIV)",
+    "DOES prove: C3-X beats the strongest publicly plausible combination of open-loop + best-practicable adaptive TDM, on a stratified virtual cohort, under realistic noise/constraints."
+  ],
+
+  "buyer_value_proposition": {
+    "buyer": "Biogen",
+    "context": "Biogen paid $85M for ThecaFlex (Alcyone acquisition). ThecaFlex is currently an open-loop port.",
+    "if_C3_X_wins": "ThecaFlex becomes a closed-loop therapy system with safety advantage. The acquisition thesis strengthens dramatically: ThecaFlex is no longer just a port — it is a therapy platform.",
+    "if_C3_X_loses": "ThecaFlex remains an open-loop port. Biogen's $85M thesis is unchanged. C3-X's value proposition to Biogen collapses."
+  },
+
+  "next_step_if_WIN": "Proceed to independent reproduction (Article XXVIII): re-run on external PK solver (e.g., different pharmacokinetic library). If independent reproduction fails, C3-X is KILLED retroactively.",
+  "next_step_if_KILL": "C3-X is added to the cemetery. The 7-successor discovery queue is updated.",
+  "next_step_if_INCONCLUSIVE": "C3-X remains in INVESTIGATION. A tightened experiment design is proposed. Public KILL preferred over indefinite INCONCLUSIVE (Article XXXIII)."
+}

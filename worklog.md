@@ -5441,3 +5441,101 @@ Stage Summary:
 - 3 competitor-baseline experiment specs with pre-registered thresholds.
 - World-Class gate v3: 8 conditions including COMPETITIVE_BASELINE_SUPERIORITY.
 - 0/5 WORLD_CLASS. Portfolio EMPTY (sacred). 2 KILLED. 3 INVESTIGATION. 7 in queue.
+
+---
+Task ID: ROUND-156-COMPETITIVE-BASELINE-CONTRACTS-AND-HOSTILE-QUESTIONS
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 156 — read constitution first, add COMPETITIVE_BASELINE_CONTRACT 11-field object, empirically calibrate WIN/KILL thresholds with provenance, rebuild C2-Y against strongest plausible incumbent, C3-X vs ThecaFlex + best-practicable adaptive control, C5-X reproduce three public baselines (physics-only + data-driven + physics+ML), build Competitive Reproduction Layer moat loop, generate competitor-derived experiments (C2-Y-R1, C3-X-R1, C5-X-R1), add Four Hostile Questions overlay, update World-Class gate to V4.
+
+Work Log:
+- Pre-session constitution acknowledgment: read EPISTEMIC_CONSTITUTION.md v1.5.0 in full (Articles I–XXXV). Explicitly engaged Articles I, IV, V, VII, XIV, XV, XVII, XIX, XXV, XXVIII, XXIX, XXXII, XXXIV, XXXV per CEO directive.
+- Read worklog Round 155 state (commit d39a060): COMPETITOR_CAPABILITY_EPISTEMOLOGY + 3 baseline experiment specs (loose) + 8-condition COMPETITIVE_BASELINE_SUPERIORITY gate.
+- Created ROUND156_ARTIFACTS/ directory with 8 artifacts:
+
+  1. COMPETITIVE_BASELINE_CONTRACTS_V1.json
+     - New 11-field object: baseline_system, baseline_capabilities, best_public_evidence, implementation_fidelity, known_uncertainty, metric_definition, clinical_decision, minimum_meaningful_difference, statistical_power_requirement, win_threshold_provenance, kill_threshold_provenance
+     - C2-Y contract: UISB baseline (VIEshunt+Nature+Codman), 3 evidence sources, HIGH/MEDIUM/MODEL_DERIVED fidelity, 4 known uncertainties
+     - C3-X contract: TWO baselines (ThecaFlex open-loop + Bayesian adaptive TDM), must beat BOTH
+     - C5-X contract: THREE baselines (physics-only + data-driven + physics+ML), must beat ALL THREE
+
+  2. EMPIRICAL_THRESHOLD_PROVENANCE_V1.json
+     - Provenance chain for every threshold: 24h lead time, 1 FA/month, 70% classification, 50% CV, 60% overdosing reduction, 0.85 AUROC, 10% decision benefit, clotFoam survival
+     - Each threshold has explicit class (CLINICAL/INCUMBENT/REGULATORY/ENGINEERING/MODEL_DERIVED/TRANSFERRED/BUYER_DEFINED/CONSTITUTIONAL)
+     - Each threshold has explicit uncertainty (LOW/MEDIUM/HIGH) + rationale + alternative_explanation (Art. XXXII)
+     - honest_disclosure_of_threshold_weakness section: 5 explicit weaknesses acknowledged
+
+  3. C2_Y_REBUILT_BASELINE_V1.json
+     - UISB = strongest plausible combined incumbent (VIEshunt+Nature+Codman), explicitly HYPOTHETICAL
+     - Same patient population (300 virtual, stratified by 5 failure modes × patient variability × sensor noise)
+     - Same physiological perturbations (posture + CSF bolus + Valsalva + sleep/wake + drift + noise)
+     - Same measurement availability (all arms receive same sensor stream)
+     - Same computational budget (1 FLOP/s avg)
+     - Same false-alarm constraint (1 FA/patient-month, frozen operating point)
+     - Primary endpoint: warning_lead_time_at_FPR_target (NOT lead time alone — per CEO)
+     - WIN requires ALL 6 rows (5 modes + aggregate) achieve WIN
+     - 6 adversarial self-attacks documented
+
+  4. C3_X_REBUILT_BASELINE_V1.json
+     - TWO baselines: ThecaFlex open-loop (Baseline A) + Bayesian adaptive TDM (Baseline B)
+     - C3-X must beat BOTH (no strawman)
+     - Same patient population (200 virtual, stratified by clearance phenotype × age × weight × CSF flow)
+     - Same perturbations (CSF flow variation, clearance, delivery lag, sensor noise, dose+toxicity constraints, model uncertainty)
+     - Same measurement stream (C3-X gets continuous, Baseline B gets weekly — this is the invention being tested)
+     - Same dose constraints (max 1 mg/kg, max 4 doses/day)
+     - 6 adversarial self-attacks
+
+  5. C5_X_THREE_BASELINE_REPRODUCTIONS_V1.json
+     - THREE baselines: physics-only (FEBio+CalculiX+SfePy), data-driven (XGBoost+Dense NN), physics+ML hybrid
+     - C5-X must beat ALL THREE
+     - 500 virtual patients × 3 clot geometries × 3 flow conditions = 4500 cases
+     - Primary endpoint: decision_benefit_under_intervention_budget (NOT AUROC alone — per CEO)
+     - Independent reproduction via clotFoam REQUIRED (Art. XXVIII constitutional)
+     - BLOCKED on OpenFOAM-9 build completion (currently 28%)
+     - 6 adversarial self-attacks
+
+  6. COMPETITIVE_REPRODUCTION_LAYER_V1.json
+     - The moat loop: WHO→WHAT→REPRODUCE→BEAT→DESIGN-AROUND→BUY
+     - Full evaluation for C2-Y, C3-X, C5-X
+     - Strongest moat definition: 'a technical capability that an incumbent can buy but cannot cheaply reproduce'
+     - Moat strength assessment per candidate (WEAK-TO-MODERATE for C2-Y, MODERATE for C3-X, MODERATE-TO-STRONG for C5-X)
+
+  7. COMPETITOR_DERIVED_EXPERIMENTS_V1.json
+     - Translates competitor intelligence gaps into experiments
+     - C2-Y-R1: longest-horizon latent-degradation experiment (READY_TO_EXECUTE)
+     - C3-X-R1: adaptive dosing under patient variability (READY_TO_EXECUTE)
+     - C5-X-R1: cross-world reproducibility + intervention benefit (BLOCKED on OpenFOAM-9)
+     - Additional R2/R3 experiments queued for if R1 succeeds: independent reproduction, design-around attacks, clinical validation, buyer engagement
+
+  8. FOUR_HOSTILE_QUESTIONS_V1.json
+     - Q1: Does it work? | Q2: Was it already obvious? | Q3: Does it beat the best alternative? | Q4: Can the buyer reproduce it without us?
+     - All four must be FAVORABLE for World-Class promotion
+     - Currently ALL UNKNOWN for all three candidates (C2-Y, C3-X, C5-X) — no candidate can be promoted
+
+  9. WORLD_CLASS_GATE_V4.json
+     - 8 conditions + 4 hostile questions overlay
+     - Condition 8 (COMPETITIVE_BASELINE_SUPERIORITY) now requires the full 11-field contract, not just a comparison
+     - World-Class count: 0/5 (unchanged — correct state)
+     - Portfolio: EMPTY (sacred)
+
+  10. ROUND156_ADVERSARIAL_SELF_ATTACK_V1.json
+      - Art. XVII + Art. XXX self-attack of all 9 artifacts above
+      - 17 attacks identified, all with countermeasures
+      - 12 residual weaknesses (mostly procedural enforcement gaps)
+      - Pattern: artifacts are STRUCTURALLY STRONG but ENFORCEMENT-WEAK
+      - Next round recommendations: hash-pin artifact files in CONSTITUTION_REGISTRY.json; add pre-commit hooks for threshold changes
+
+Stage Summary:
+- 8 substantive artifacts + 1 self-attack artifact, all committed to ROUND156_ARTIFACTS/
+- COMPETITIVE_BASELINE_CONTRACT is now a formal 11-field object (was loose spec in R155)
+- Every threshold has provenance chain with explicit class + uncertainty (Art. XXVII compliant)
+- C2-Y baseline upgraded from "VIEshunt alone" to "UISB = VIEshunt + Nature ICP + Codman threshold" (strongest plausible incumbent)
+- C3-X baseline upgraded from "ThecaFlex alone" to "ThecaFlex + Bayesian adaptive TDM" (no strawman)
+- C5-X baseline upgraded from "best public thrombus prediction" to "THREE baselines: physics-only + data-driven + physics+ML"
+- Competitive Reproduction Layer (moat loop) built: WHO→WHAT→REPRODUCE→BEAT→DESIGN-AROUND→BUY
+- Competitor intelligence now generates experiments: C2-Y-R1, C3-X-R1, C5-X-R1 (plus queued R2/R3 if R1 succeeds)
+- Four Hostile Questions overlay added: Does it work / Was it obvious / Does it beat best alternative / Can buyer reproduce without us
+- World-Class gate V4: 8 conditions + 4 hostile questions, all required, no compensation
+- 17 adversarial self-attacks identified and countermeasured; 12 residual weaknesses explicitly disclosed
+- 0/5 WORLD_CLASS. Portfolio EMPTY (sacred). 2 KILLED. 3 INVESTIGATION. 7 in discovery queue.
+- Round 156 is STRUCTURALLY COMPLETE; execution of C2-Y-R1 and C3-X-R1 is READY_TO_EXECUTE (pending pre-registration); C5-X-R1 BLOCKED on OpenFOAM-9 build.
+

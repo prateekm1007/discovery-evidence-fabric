@@ -1,0 +1,489 @@
+{
+  "record_type": "COMPETITIVE_BASELINE_CONTRACTS_V1",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 156,
+  "authority": "CEO Round 156: 'Every candidate with a proposed competitor comparison must define: baseline / public evidence / fidelity / uncertainty / metric / meaningful_difference / WIN threshold provenance / KILL threshold provenance. No unexplained thresholds.'",
+  "constitutional_basis": [
+    "Article I — evidence precedes assertion (threshold must have evidence chain before experiment)",
+    "Article IV — no fallback epistemology (cannot weaken baseline to make candidate look better)",
+    "Article VII — never weaken verifier to rescue claim (cannot lower threshold after the fact)",
+    "Article XXVII — no threshold invention (every threshold needs provenance + class + uncertainty + justification)",
+    "Article XXIX — separate implementation failure from mechanism failure (baseline reproduction that underperforms published number = implementation failure, not incumbent weakness)",
+    "Article XXXII — state strongest alternative explanation (incumbent may have internal capability we cannot see)"
+  ],
+
+  "the_11_required_fields": [
+    "baseline_system",
+    "baseline_capabilities",
+    "best_public_evidence",
+    "implementation_fidelity",
+    "known_uncertainty",
+    "metric_definition",
+    "clinical_decision",
+    "minimum_meaningful_difference",
+    "statistical_power_requirement",
+    "win_threshold_provenance",
+    "kill_threshold_provenance"
+  ],
+
+  "contracts": {
+
+    "C2_Y_CONTRACT": {
+      "candidate": "C2-Y: Longitudinal Shunt Response-Manifold Failure Prediction",
+      "baseline_system": "Best-plausible incumbent intelligent shunt = UNION OF publicly demonstrated capabilities from (a) VIEshunt adaptive control (posture→reference adjustment→ICP regulation+acute perturbation response) + (b) Nature 2026 ICP monitor (chronic long-term pressure trending with home monitoring) + (c) Codman/Medtronic-style threshold-based alerting (ICP > X mmHg → alarm). This is NOT a strawman single-product baseline. It is the strongest combination of publicly demonstrated capabilities that a well-resourced incumbent could plausibly assemble from public knowledge.",
+      "baseline_capabilities": [
+        "Posture-dependent ICP regulation [DEMONSTRATED — VIEshunt, PMID 40087797]",
+        "Acute perturbation response to CSF bolus [DEMONSTRATED — VIEshunt]",
+        "Continuous long-term ICP measurement [DEMONSTRATED — Nature 2026, PMID 41927547]",
+        "Home monitoring with stable readings over follow-up [DEMONSTRATED — Nature 2026]",
+        "Threshold-based alarm when ICP crosses fixed boundary [DEMONSTRATED — Codman/Medtronic, marketed]",
+        "Patient posture tracking via IMU [DEMONSTRATED — VIEshunt]",
+        "Wireless data transmission [DEMONSTRATED — both VIEshunt and Nature 2026]"
+      ],
+      "best_public_evidence": [
+        {
+          "source": "PMID 40087797",
+          "citation": "VIEshunt intelligent electromechanical shunt, ETH Zurich / University Hospital Zurich, 2025",
+          "demonstrated": "Acute ovine study; posture-dependent ICP regulation; CSF bolus perturbation response",
+          "limitation": "Acute only; no chronic/longitudinal data; no failure prediction",
+          "epistemic_status": "DEMONSTRATED for acute control + UNKNOWN for chronic prediction"
+        },
+        {
+          "source": "PMID 41927547 / Nature Communications s41467-026-70864-8",
+          "citation": "0.28g implantable ICP monitor, 2026",
+          "demonstrated": "20-patient first-in-human safety; long-term pressure monitoring; stable readings; some shunt failure detection",
+          "limitation": "Detection is post-hoc (failure has already occurred). No prediction. No classification.",
+          "epistemic_status": "DEMONSTRATED for monitoring + basic failure detection + UNKNOWN for prediction/classification"
+        },
+        {
+          "source": "FDA 510(k) database + marketed products",
+          "citation": "Codman ICP Express, Medtronic Codman, Integra Neuroscience",
+          "demonstrated": "Threshold-based ICP alarming in clinical use for decades",
+          "limitation": "Fixed thresholds; no learning; no failure-mode classification",
+          "epistemic_status": "DEMONSTRATED for threshold alerting"
+        }
+      ],
+      "implementation_fidelity": {
+        "what_we_will_reproduce": "All three baseline components above will be implemented as a unified reference baseline in the virtual cohort: (a) VIEshunt-style adaptive controller with posture-dependent reference trajectory + PI control on ICP error, (b) Nature-style long-term ICP sensor with realistic drift + noise model, (c) Codman-style threshold alarm at clinically standard 15 mmHg / 20 mmHg / 25 mmHg levels.",
+        "what_we_CANNOT_reproduce": "VIEshunt-specific micro-pump dynamics (proprietary). Nature 2026 sensor-specific noise spectrum (not fully published). We will use published noise/drift figures where available and labeled MODEL_DERIVED ranges where not.",
+        "fidelity_class": "HIGH for control architecture + MEDIUM for sensor model + MODEL_DERIVED for component-specific dynamics",
+        "calibration_plan": "Tune controller gains to reproduce VIEshunt-published ICP error response to perturbation (paper Figure 4-5). If reproduction underperforms published response by >20%, baseline implementation is INCOMPLETE per Article XXIX and the experiment is BLOCKED until fidelity is achieved.",
+        "adversarial_self_attack": "Per Article XVII: an intelligent adversary would tune the baseline controller WEAKLY to make C2-Y look better. Counter: controller gains are pre-registered and frozen BEFORE C2-Y is run. Any controller tuning after C2-Y results are known is forbidden (Article XIX)."
+      },
+      "known_uncertainty": [
+        {
+          "component": "VIEshunt chronic behavior",
+          "epistemic_status": "UNKNOWN (no published chronic data)",
+          "correct_language": "NO_PUBLIC_EVIDENCE of VIEshunt chronic performance; cannot claim 'VIEshunt fails chronically' — only 'no published evidence of chronic capability'",
+          "implication_for_baseline": "We model VIEshunt-like control assuming controller behavior is stable over the test horizon. If chronic drift would degrade VIEshunt, that is a separate finding, not a baseline assumption."
+        },
+        {
+          "component": "Nature 2026 failure detection algorithm",
+          "epistemic_status": "PARTIALLY_DEMONSTRATED (paper mentions 'some shunt failures detected' but algorithm not published)",
+          "correct_language": "DEMONSTRATED that some failures were detected; UNKNOWN what algorithm; we use threshold-based detection as best-plausible baseline"
+        },
+        {
+          "component": "Combined VIEshunt+Nature+Codman system",
+          "epistemic_status": "HYPOTHETICAL (no one has publicly integrated these)",
+          "correct_language": "This is a BEST-PLAUSIBLE incumbent, not a real product. The incumbent may have internal R&D we cannot see (Article XXXII)."
+        }
+      ],
+      "metric_definition": {
+        "primary_endpoint": "warning_lead_time_at_fixed_false_alarm_burden",
+        "mathematical_definition": "Lead time (hours) = t_clinical_failure - t_first_alarm, conditioned on the false-alarm rate being <= FPR_target over the patient-month horizon. The fixed FPR target is pre-registered.",
+        "why_lead_time_at_fixed_FPR_not_lead_time_alone": "Lead time alone is gameable: an over-sensitive alarm gives high lead time but unacceptable false alarms. Conditioning on fixed FPR forces the candidate to earn its lead time through specificity, not through alarm spamming.",
+        "secondary_endpoints": [
+          "false_alarms_per_patient_month at the lead-time operating point",
+          "failure_mode classification accuracy (obstruction vs overdrainage vs underdrainage vs valve dysfunction vs posture artifact)",
+          "calibration_error (Brier score, reliability diagram)",
+          "robustness_index (lead-time degradation under sensor drift / model mismatch / patient transfer)"
+        ]
+      },
+      "clinical_decision": {
+        "decision_the_alert_triggers": "Outpatient surgical evaluation within the lead-time window. NOT emergency surgery — the value is that lead time converts ED presentation into scheduled revision.",
+        "decision_threshold": "Alert → imaging (CT shunt series) → if imaging confirms → OR within 24h. Without lead time, current practice is emergent ED presentation → emergent revision.",
+        "who_decides": "Neurosurgeon + neurology; alert is advisory, not autonomous",
+        "regulatory_frame": "FDA SaMD (Software as a Medical Device) Class II likely; CDSI guidance applies"
+      },
+      "minimum_meaningful_difference": {
+        "MMD_for_lead_time": "≥8 hours — because the clinical workflow delta is: (i) 8h allows next-day scheduled OR rather than emergent overnight OR; (ii) <8h is operationally indistinguishable from ED presentation",
+        "MMD_for_false_alarms": "≤2 false alarms per patient-month — because alarm fatigue literature shows >2 alarms/month causes clinician desensitization (.Sendelbach et al. Am J Crit Care 2015;24strpos)",
+        "MMD_for_classification": "≥20 percentage point improvement over baseline — because classification accuracy below this is dominated by class imbalance (obstruction is most common; trivially predicting 'obstruction' gives ~60%)",
+        "MMD_provenance_class": "CLINICAL (workflow + alarm fatigue literature) + ENGINEERING (class imbalance)",
+        "MMD_uncertainty": "MEDIUM — the 8h workflow delta is plausible but not directly validated for shunt patients specifically. The 2 FA/month threshold comes from cardiac alarm literature, transferred to neurosurgery."
+      },
+      "statistical_power_requirement": {
+        "effect_size_assumed": "Lead-time difference of 12h between C2-Y and baseline (above the 8h MMD)",
+        "sd_assumed": "8h (estimated from virtual cohort)",
+        "alpha": 0.05 (two-sided),
+        "power": 0.80,
+        "n_per_arm": "n = 2 * ((1.96 + 0.84) * 8 / 12)^2 = ~11 patients per arm. We will use n=30 per arm for robustness to non-normality and to power the secondary endpoints.",
+        "virtual_cohort_size": "300 virtual patients (allows stratification by failure mode × patient variability × sensor-noise level)",
+        "multiple_testing_correction": "Bonferroni across 5 failure modes — adjusted alpha 0.01 per mode",
+        "pre_registration": "Power analysis pre-registered in C2_Y_POWER_ANALYSIS.json BEFORE the experiment runs"
+      },
+      "win_threshold_provenance": {
+        "thresholds": {
+          "lead_time": ">= 24h at FPR_target = 1 FA/patient-month",
+          "false_alarms": "<= 1 FA/patient-month at the lead-time operating point",
+          "classification_accuracy": ">= 70% across all 5 failure modes"
+        },
+        "provenance_chain": [
+          {
+            "threshold": "24h lead time",
+            "class": "CLINICAL",
+            "source": "Hydrocephalus Association patient education + neurosurgical clinical practice: typical shunt failure progression from symptomatic to severe is 24-72h. 24h is the minimum actionable window for outpatient surgical scheduling.",
+            "uncertainty": "MEDIUM — derived from clinical practice, not RCT. No trial has measured the clinical value of specific lead-time durations.",
+            "rationale": "Anything below 24h provides limited operational benefit over current emergent presentation. 24h is the minimum that changes workflow."
+          },
+          {
+            "threshold": "1 FA/patient-month",
+            "class": "CLINICAL (transferred from alarm fatigue literature)",
+            "source": "Sendelbach & Halm 2015 Am J Crit Care + clinical alarm fatigue literature: >2 alarms/month leads to clinician desensitization. We set the bar more conservatively at 1/month because (a) pediatric shunt patients have decades of expected life with the device, (b) repeated false alarms in children cause parental anxiety and unnecessary imaging.",
+            "uncertainty": "MEDIUM — alarm fatigue literature is cardiac-monitor-derived; transferred to neurosurgical shunt context.",
+            "rationale": "1/month balances sensitivity against the chronicity of pediatric hydrocephalus. 0/month would force sensitivity too low; 2/month risks alarm fatigue."
+          },
+          {
+            "threshold": "70% classification accuracy",
+            "class": "CLINICAL + ENGINEERING",
+            "source": "Trivial classifier predicting 'obstruction' gives ~60% (class imbalance). 70% is 10pp above trivial — minimum for the classification to carry decision value (i.e., the alert would change management).",
+            "uncertainty": "LOW — class imbalance is well-documented in shunt failure literature.",
+            "rationale": "Below 70%, the classification adds no actionable information beyond 'alert: something is wrong'."
+          }
+        ]
+      },
+      "kill_threshold_provenance": {
+        "thresholds": {
+          "lead_time": "< 4h at FPR_target = 1 FA/patient-month — operationally indistinguishable from no warning",
+          "false_alarms": "> 3 FA/patient-month — alarm fatigue threshold from literature, above which clinician desensitization is documented",
+          "classification_accuracy": "< 50% — below chance for 5-class problem with class imbalance correction"
+        },
+        "provenance_chain": [
+          {
+            "threshold": "<4h lead time = KILL",
+            "class": "CLINICAL",
+            "source": "Neurosurgical workflow: emergent presentation to OR typically takes 4-8h. If C2-Y provides <4h lead time, the patient still presents emergently. The invention provides no operational value.",
+            "uncertainty": "LOW"
+          },
+          {
+            "threshold": ">3 FA/month = KILL",
+            "class": "CLINICAL",
+            "source": "Alarm fatigue literature; also FDA guidance on alarm system safety. Above 3 FA/month, the alerting system is unsafe.",
+            "uncertainty": "LOW"
+          },
+          {
+            "threshold": "<50% classification = KILL",
+            "class": "ENGINEERING",
+            "source": "Below chance for the class-imbalance-adjusted baseline. The classification is no better than random.",
+            "uncertainty": "LOW"
+          }
+        ]
+      },
+      "intermediate_zone": "If results fall between WIN and KILL on any primary threshold, C2-Y remains INCONCLUSIVE. The system must NOT silently promote an inconclusive result (Article XXVIII). The INCONCLUSIVE state requires either (a) a tightened experiment design that resolves the ambiguity, or (b) a public KILL with explicit rationale that the question was asked and not answered.",
+      "experiment_id": "C2-Y-R1 (see COMPETITOR_DERIVED_EXPERIMENTS_V1.json)",
+      "falsification_requirements": [
+        "If C2-Y lead time <= 4h under the strongest plausible baseline, C2-Y is KILLED",
+        "If C2-Y cannot achieve >70% classification accuracy across all 5 failure modes, C2-Y is KILLED",
+        "If baseline reproduction underperforms published VIEshunt response by >20%, the experiment is BLOCKED until fidelity is achieved (Article XXIX) — this is NOT a C2-Y failure, it is a baseline-implementation failure"
+      ]
+    },
+
+    "C3_X_CONTRACT": {
+      "candidate": "C3-X: Closed-loop CNS Therapeutic Delivery (CSF state → PK model → adaptive dosing → response monitoring)",
+      "baseline_system": "TWO baselines, not one. Both must be beaten. (A) ThecaFlex-style open-loop fixed-dose intrathecal delivery [DEMONSTRATED — Biogen SEC filings, clinical studies]. (B) Best-practicable adaptive control baseline: PK-guided dosing where dose is adjusted by a Bayesian estimator of patient-specific clearance, with no CSF-state feedback. This is the strongest plausible adaptive baseline that does NOT require the C3-X invention.",
+      "baseline_A_ThecaFlex_open_loop": {
+        "capabilities": [
+          "Implantable intrathecal port/catheter access [DEMONSTRATED]",
+          "Chronic continuous or bolus dosing [DEMONSTRATED]",
+          "Clinician-programmed fixed dose [DEMONSTRATED]",
+          "MRI-compatible hardware [DEMONSTRATED]"
+        ],
+        "evidence": "Biogen acquired Alcyone for ~$85M; ThecaFlex DRx in clinical studies (multiple trials referenced in Biogen 10-K)",
+        "epistemic_status": "DEMONSTRATED for open-loop hardware + dosing characterization"
+      },
+      "baseline_B_best_practicable_adaptive_control": {
+        "capabilities": [
+          "Bayesian population PK model with patient-specific posterior [published PK literature]",
+          "Dose adjustment based on observed plasma/CSF drug levels [standard therapeutic drug monitoring]",
+          "Population-level covariate adjustment (weight, age, CSF flow rate) [published]",
+          "Therapeutic window targeting with target concentration intervention [TDM standard of care]"
+        ],
+        "evidence": "Therapeutic drug monitoring (TDM) is standard of care for many intrathecal therapies (baclofen, ziconotide, etc.). Bayesian dose adjustment is well-published (e.g., Beal et al. on NPCOMP).",
+        "epistemic_status": "DEMONSTRATED in adjacent therapeutic areas + UNKNOWN for the specific C3-X therapeutic target (because the C3-X target is not yet specified publicly)",
+        "why_this_is_not_a_strawman": "TDM with Bayesian adjustment is the standard-of-care adaptive approach. If C3-X cannot beat this, the closed-loop CSF-state-aware advantage is illusory. Using only ThecaFlex-style fixed-dose open-loop as the baseline would be the strawman the CEO warned against.",
+        "what_we_will_reproduce": "Implement Bayesian population PK with patient-specific posterior update from observed drug levels. Use published PK parameters for the chosen model drug (e.g., intrathecal baclofen). Pre-register the Bayesian model BEFORE C3-X runs.",
+        "adversarial_self_attack": "An adversary could weaken Baseline B by using a poor PK model or insufficient patient data. Counter: the PK model is pre-registered, frozen, and uses published parameter values. Any post-hoc weakening of Baseline B is forbidden (Article XIX)."
+      },
+      "best_public_evidence": [
+        "Biogen 10-K (2025-2026) — ThecaFlex DRx acquisition + clinical pipeline",
+        "Alcyone Biomedical publications on ThecaFlex hardware",
+        "Therapeutic drug monitoring literature for intrathecal therapies (baclofen, ziconotide, methotrexate)",
+        "Bayesian dose adjustment: Beal, Sheiner, NONMEM methodology references"
+      ],
+      "implementation_fidelity": {
+        "what_we_will_reproduce": "Baseline A: open-loop fixed-dose per ThecaFlex-published protocols. Baseline B: Bayesian population PK with NONMEM-style posterior update from observed CSF drug concentration at sampled timepoints.",
+        "what_we_CANNOT_reproduce": "Biogen-internal clinical data on ThecaFlex performance. We use published characterizations; where Biogen internal data would give different results, we mark those MODEL_DERIVED.",
+        "fidelity_class": "HIGH for Baseline A (open-loop is simple) + HIGH for Baseline B (Bayesian TDM is methodologically mature)",
+        "calibration_plan": "Validate Baseline B against published intrathecal baclofen PK data. If reproduction differs from published by >15%, baseline implementation is INCOMPLETE (Article XXIX)."
+      },
+      "known_uncertainty": [
+        {
+          "component": "ThecaFlex closed-loop intelligence (if any internal development)",
+          "epistemic_status": "UNKNOWN — Biogen has not publicly disclosed any closed-loop dosing work for ThecaFlex. We must NOT assume 'ThecaFlex is open-loop' = 'Biogen cannot do closed-loop'. The correct language: 'NO_PUBLIC_EVIDENCE of closed-loop development'.",
+          "implication_for_baseline": "Baseline A is open-loop because that's what's published. If Biogen has internal closed-loop work, our baseline is weaker than the true incumbent. Article XXXII: state this alternative explicitly."
+        },
+        {
+          "component": "CSF-state-aware dosing (the C3-X invention)",
+          "epistemic_status": "POTENTIALLY_NOVEL — no public system demonstrates CSF-state-feedback-controlled intrathecal dosing",
+          "implication": "C3-X's potential moat is in the CSF-state feedback loop, NOT in the existence of intrathecal dosing hardware (ThecaFlex has that) or adaptive dosing (TDM has that)."
+        }
+      ],
+      "metric_definition": {
+        "primary_endpoint": "drug_concentration_stability_in_therapeutic_window",
+        "mathematical_definition": "Fraction of patient-time that CSF drug concentration is within [therapeutic_lower, therapeutic_upper] bounds. Also reported: CV of CSF drug concentration over the dosing horizon.",
+        "secondary_endpoints": [
+          "overdosing_events (concentration > upper therapeutic bound by >50%)",
+          "underdosing_events (concentration < lower therapeutic bound)",
+          "time_to_therapeutic_window after dose initiation",
+          "patient_specific_optimization_benefit (per-patient improvement vs population-optimal fixed dose)"
+        ]
+      },
+      "clinical_decision": {
+        "decision_the_alert_triggers": "Dose adjustment (increase, decrease, hold). The closed loop recommends a dose change; clinician approves before execution.",
+        "decision_threshold": "If model predicts concentration will exit therapeutic window in next 4h, recommend pre-emptive dose adjustment",
+        "regulatory_frame": "FDA CDSI guidance; likely Class II SaMD paired with the drug+device combination product"
+      },
+      "minimum_meaningful_difference": {
+        "MMD_for_CV": "≥30% relative reduction in CV vs Baseline A — because below 30% is within typical PK variability and not clinically distinguishable",
+        "MMD_for_overdosing": "≥40% relative reduction in overdosing events — because intrathecal overdosing can be catastrophic (e.g., baclofen overdose → coma)",
+        "MMD_provenance_class": "CLINICAL + ENGINEERING (PK variability literature)",
+        "MMD_uncertainty": "MEDIUM"
+      },
+      "statistical_power_requirement": {
+        "effect_size_assumed": "30% relative CV reduction (C3-X vs Baseline A)",
+        "alpha": 0.05,
+        "power": 0.80,
+        "virtual_cohort_size": "200 virtual patients (allows stratification by clearance phenotype, age, weight, CSF flow rate)",
+        "pre_registration": "C3_X_POWER_ANALYSIS.json BEFORE experiment runs"
+      },
+      "win_threshold_provenance": {
+        "thresholds": {
+          "vs_Baseline_A_ThecaFlex": "C3-X concentration CV < 50% of Baseline A AND overdosing events reduced >60%",
+          "vs_Baseline_B_adaptive_TDM": "C3-X concentration CV < 70% of Baseline B AND overdosing events reduced >30%"
+        },
+        "provenance_chain": [
+          {
+            "threshold": "50% of Baseline A CV",
+            "class": "CLINICAL + ENGINEERING",
+            "source": "Bioequivalence criteria (FDA) typically require 80-125% range; we use 50% as the bar because the comparison is not bioequivalence but therapeutic advantage. A 50% reduction in CV is the minimum that translates to a clinically observable reduction in symptomatic over/under-dosing events.",
+            "uncertainty": "MEDIUM"
+          },
+          {
+            "threshold": "60% overdosing reduction",
+            "class": "CLINICAL",
+            "source": "Intrathecal baclofen overdose literature: ~5-15% of patients experience overdose events per year. 60% reduction moves this to 2-6%, which is a clinically meaningful safety improvement.",
+            "uncertainty": "MEDIUM"
+          },
+          {
+            "threshold": "70% of Baseline B CV",
+            "class": "ENGINEERING",
+            "source": "Best-practicable adaptive TDM should already achieve substantial CV reduction vs open-loop. C3-X must demonstrate ADDITIONAL improvement over adaptive TDM, not just over open-loop. 70% of Baseline B = 30% additional improvement, which is the MMD.",
+            "uncertainty": "MEDIUM — assumes Baseline B is well-implemented"
+          }
+        ]
+      },
+      "kill_threshold_provenance": {
+        "thresholds": {
+          "vs_Baseline_B": "If C3-X concentration CV > 80% of Baseline B CV, C3-X provides no material advantage over adaptive TDM. KILLED.",
+          "vs_Baseline_A": "If C3-X does not significantly beat Baseline A on overdosing reduction (p > 0.05), C3-X provides no safety advantage. KILLED."
+        },
+        "provenance_chain": [
+          {
+            "threshold": "80% of Baseline B = KILL",
+            "class": "ENGINEERING",
+            "source": "Below 20% additional improvement is within typical cross-patient PK variability. The invention provides no measurable advantage over the standard-of-care adaptive approach.",
+            "uncertainty": "LOW"
+          },
+          {
+            "threshold": "No significant overdosing reduction vs Baseline A = KILL",
+            "class": "CLINICAL",
+            "source": "If C3-X cannot demonstrate safety advantage over open-loop, the regulatory and clinical case for closed-loop collapses.",
+            "uncertainty": "LOW"
+          }
+        ]
+      },
+      "experiment_id": "C3-X-R1 (see COMPETITOR_DERIVED_EXPERIMENTS_V1.json)",
+      "falsification_requirements": [
+        "If C3-X beats Baseline A but not Baseline B, C3-X is INCONCLUSIVE — the invention may not provide advantage over best-practicable adaptive care",
+        "If Baseline B (Bayesian TDM) implementation underperforms published TDM results by >15%, baseline implementation is INCOMPLETE (Article XXIX) — not a C3-X failure"
+      ]
+    },
+
+    "C5_X_CONTRACT": {
+      "candidate": "C5-X: Predictive Embolic-Risk Engine (validated precursor + patient-specific twin + intervention optimization)",
+      "baseline_system": "THREE baselines, all must be beaten. (A) Best published physics-only predictor of thrombus fragmentation. (B) Best published data-driven (ML) predictor. (C) Best published combined physics+ML approach. The competitive white space is NOT declared empty until all three are characterized.",
+      "baseline_A_physics_only": {
+        "description": "Pure computational fluid dynamics + solid mechanics model of thrombus. Predicts fragmentation from stress/strain distribution. No learning component.",
+        "best_public_evidence": "PMID 41663082 (2026 thrombosis digital twin review) + earlier CFD-thrombus work (e.g., Bernsdorf et al., Thrombosis Research)",
+        "epistemic_status": "DEMONSTRATED in academic literature; no clinical product",
+        "what_we_will_reproduce": "Implement physics-only fragmentation predictor using our existing World A (FEBio) + World D (CalculiX) + World E (SfePy) infrastructure. Use published constitutive models for thrombus (hyperelastic + damage). Pre-register the model BEFORE C5-X runs.",
+        "adversarial_self_attack": "An adversary would implement a weak physics model. Counter: pre-register constitutive parameters from literature; freeze before C5-X runs."
+      },
+      "baseline_B_data_driven": {
+        "description": "Pure ML predictor: features (clot geometry, flow conditions, patient history) → fragmentation risk. No physics.",
+        "best_public_evidence": "Recent ML thrombus characterization work (e.g.,-image-based DL for clot histology, Tang et al.); stroke embolus classification ML papers",
+        "epistemic_status": "DEMONSTRATED in academic literature; no clinical product",
+        "what_we_will_reproduce": "Train a gradient-boosted tree + dense NN on simulated virtual cohort data. Features: clot geometry (length, cross-section, taper), flow conditions (Re, WSS, residence time), patient covariates. Target: binary fragmentation event. Cross-validate. Pre-register feature set BEFORE C5-X runs."
+      },
+      "baseline_C_physics_plus_ML": {
+        "description": "Hybrid: physics simulation produces features (stress fields, fragmentation energy) → ML combines with patient features for prediction.",
+        "best_public_evidence": "PMID 42508673 (2026 computational review) describes multiple physics+ML approaches for thrombosis",
+        "epistemic_status": "DEMONSTRATED in academic literature",
+        "what_we_will_reproduce": "Use our World A FEBio simulation to extract stress/strain features, then train ML on (physics features + patient features) → fragmentation. This is the strongest plausible baseline."
+      },
+      "best_public_evidence_summary": [
+        "PMID 41663082 — 2026 thrombosis digital twin review (describes physics-only and physics+ML approaches)",
+        "PMID 42508673 — 2026 computational review (describes multiple ML+physics approaches)",
+        "Image-based ML for clot histology (multiple 2024-2025 papers)",
+        "Stroke embolus classification ML (multiple 2023-2025 papers)"
+      ],
+      "implementation_fidelity": {
+        "what_we_will_reproduce": "All three baselines, using our existing multi-world infrastructure (FEBio, CalculiX, SfePy for physics; standard ML libraries for data-driven).",
+        "what_we_CANNOT_reproduce": "Specific academic group implementations (we don't have their code). We use published methods + parameters; deviations are MODEL_DERIVED.",
+        "fidelity_class": "HIGH for physics baselines (we have working FEBio/CalculiX/SfePy) + MEDIUM for ML baselines (we use standard libraries; specific architectures may differ from published)",
+        "calibration_plan": "For each baseline, validate against published benchmark cases. If reproduction underperforms published by >25%, baseline is INCOMPLETE (Article XXIX).",
+        "adversarial_self_attack": "An adversary would reproduce a weak version of each baseline. Counter: pre-register the model architecture + parameters from literature; freeze before C5-X runs."
+      },
+      "known_uncertainty": [
+        {
+          "component": "Whether the published baselines reproduce",
+          "epistemic_status": "UNKNOWN until we run them",
+          "correct_language": "Cannot declare competitive white space empty until baselines are characterized (per CEO directive)"
+        },
+        {
+          "component": "C5-X's specific advantage mechanism",
+          "epistemic_status": "POTENTIALLY_NOVEL — combination of (a) validated precursor (survives clotFoam) + (b) patient-specific twin + (c) intervention optimization",
+          "implication": "C5-X's moat is in the COMBINATION + VALIDATION, not in any single component. Physics-only does (a) without (b)(c). Data-driven does (b) without (a)(c). Physics+ML does (a)(b) without (c) or without independent validation."
+        }
+      ],
+      "metric_definition": {
+        "primary_endpoint": "decision_benefit_under_intervention_budget",
+        "mathematical_definition": "Reduction in embolic-risk events (simulated) when an intervention policy is chosen using C5-X predictions vs intervention policy chosen using each baseline, under a fixed intervention budget (e.g., max K interventions per N patients).",
+        "why_decision_benefit_not_AUROC_alone": "AUROC alone is gameable: a predictor with high AUROC but poorly calibrated probabilities can lead to worse decisions under a constrained budget. The CEO directive explicitly requires decision benefit.",
+        "secondary_endpoints": [
+          "AUROC for predicting fragmentation event",
+          "calibration_error (Brier score, reliability diagram)",
+          "transfer_across_conditions (train on condition X, test on condition Y)",
+          "uncertainty_quantification_quality (predicted vs actual coverage of confidence intervals)"
+        ]
+      },
+      "clinical_decision": {
+        "decision_the_alert_triggers": "Selection of patients for invasive intervention (e.g., mechanical thrombectomy, clot retrieval) under constrained resources",
+        "decision_threshold": "If predicted fragmentation risk > threshold T, recommend intervention; if < T, defer. T is chosen to maximize true positives under intervention budget K.",
+        "regulatory_frame": "FDA SaMD; likely Class II if used for triage, Class III if used autonomously"
+      },
+      "minimum_meaningful_difference": {
+        "MMD_for_AUROC": "≥0.05 absolute AUROC improvement over best baseline — because below 0.05 is within typical cross-validation variance",
+        "MMD_for_decision_benefit": "≥10% relative reduction in embolic-risk events under intervention budget — because below 10% is operationally indistinguishable from the baseline policy",
+        "MMD_provenance_class": "ENGINEERING (AUROC variance) + CLINICAL (decision-benefit threshold)",
+        "MMD_uncertainty": "MEDIUM"
+      },
+      "statistical_power_requirement": {
+        "effect_size_assumed": "AUROC improvement of 0.07 (above 0.05 MMD)",
+        "alpha": 0.05,
+        "power": 0.80,
+        "virtual_cohort_size": "500 virtual patients × 3 clot geometries × 3 flow conditions = 4500 cases (allows stratification + cross-validation)",
+        "pre_registration": "C5_X_POWER_ANALYSIS.json BEFORE experiment runs"
+      },
+      "win_threshold_provenance": {
+        "thresholds": {
+          "AUROC": ">= 0.85 AND > best baseline by >= 0.05",
+          "decision_benefit": ">= 10% relative reduction in embolic-risk events under intervention budget",
+          "independent_reproduction": "C5-X prediction survives actual clotFoam execution (OpenFOAM-9, not just our internal World C flow simulator)",
+          "intervention_quality": "C5-X provides actionable intervention recommendation (not just risk score)"
+        },
+        "provenance_chain": [
+          {
+            "threshold": "AUROC >= 0.85",
+            "class": "CLINICAL + ENGINEERING (transferred from clinical prediction rule literature)",
+            "source": "High-stakes clinical prediction rules (e.g., stroke intervention decision aids) typically require AUROC >= 0.85 to be clinically actionable. CHADS-VASc (~0.72) is used for lower-stakes screening; thrombectomy triage demands higher.",
+            "uncertainty": "MEDIUM — transferred from adjacent clinical areas; not shunt/thrombus-specific"
+          },
+          {
+            "threshold": "0.05 AUROC improvement over best baseline",
+            "class": "ENGINEERING",
+            "source": "Typical cross-validation variance in ML benchmarks. Improvements below 0.05 are within noise.",
+            "uncertainty": "LOW"
+          },
+          {
+            "threshold": "10% decision benefit",
+            "class": "CLINICAL",
+            "source": "Health-economics literature on intervention triage: 10% relative reduction in events is the minimum that translates to a measurable QALY gain in cost-effectiveness analysis.",
+            "uncertainty": "MEDIUM"
+          },
+          {
+            "threshold": "survives actual clotFoam",
+            "class": "ENGINEERING + CONSTITUTIONAL (Article XXVIII — no silent semantic promotion)",
+            "source": "Our World C flow simulator is custom Python. clotFoam (OpenFOAM-9) is an independent external solver. If C5-X prediction survives clotFoam, the prediction has independent physical reproduction. If it does not, the prediction is over-fit to our internal simulator.",
+            "uncertainty": "LOW — this is the constitutional requirement for independent reproduction"
+          }
+        ]
+      },
+      "kill_threshold_provenance": {
+        "thresholds": {
+          "AUROC": "< 0.70 OR not > best baseline by >= 0.05",
+          "independent_reproduction": "Does not survive actual clotFoam (over-fit to internal World C)",
+          "decision_benefit": "No significant decision benefit over best baseline (p > 0.05)"
+        },
+        "provenance_chain": [
+          {
+            "threshold": "AUROC < 0.70 = KILL",
+            "class": "CLINICAL",
+            "source": "Below 0.70, the predictor is not clinically actionable for any high-stakes decision.",
+            "uncertainty": "LOW"
+          },
+          {
+            "threshold": "Does not survive clotFoam = KILL",
+            "class": "CONSTITUTIONAL",
+            "source": "Article XXVIII (no silent semantic promotion): a model that survives only in its training simulator is not validated.",
+            "uncertainty": "NONE"
+          }
+        ]
+      },
+      "experiment_id": "C5-X-R1 (see COMPETITOR_DERIVED_EXPERIMENTS_V1.json)",
+      "falsification_requirements": [
+        "If any of the three baselines (physics-only, data-driven, physics+ML) cannot be reproduced within 25% of published performance, baseline implementation is INCOMPLETE (Article XXIX) — the experiment is BLOCKED",
+        "If C5-X does not beat all three baselines on AUROC AND decision benefit, C5-X is INCONCLUSIVE — the moat is not established",
+        "If C5-X does not survive actual clotFoam (independent solver), C5-X is KILLED regardless of other metrics (constitutional requirement)"
+      ]
+    }
+  },
+
+  "summary_of_changes_vs_R155": {
+    "R155_baseline_specs": "Loose spec: 'WIN = >24h lead time + <1 FA/month' with no provenance",
+    "R156_contracts": "Full 11-field contract per candidate, with threshold provenance chains (CLINICAL/ENGINEERING/MODEL_DERIVED/CONSTITUTIONAL classes), MMD justifications, statistical power requirements, falsification requirements, adversarial self-attacks",
+    "key_structural_changes": [
+      "C2-Y baseline is now UNION of VIEshunt + Nature ICP monitor + Codman threshold alerting (best-plausible incumbent), not just VIEshunt alone",
+      "C3-X now has TWO baselines (ThecaFlex open-loop + Bayesian adaptive TDM), must beat BOTH",
+      "C5-X now has THREE baselines (physics-only + data-driven + physics+ML), must beat ALL THREE",
+      "Every threshold has explicit provenance class + source + uncertainty (Article XXVII)",
+      "Every contract has adversarial self-attack section (Article XVII)",
+      "Every contract has falsification requirements that distinguish C2-Y/C3-X/C5-X failure from baseline-implementation failure (Article XXIX)"
+    ]
+  },
+
+  "honest_assessment": {
+    "what_is_strong": "The contract structure forces every threshold to have a provenance chain. The multi-baseline approach (esp. C3-X dual baseline and C5-X triple baseline) makes the strawman attack much harder.",
+    "what_is_still_weak": [
+      "Several provenance chains are MODEL_DERIVED or transferred from adjacent clinical areas. We do not have direct RCT evidence for shunt-failure-prediction lead-time thresholds.",
+      "The 'best-plausible incumbent' for C2-Y is hypothetical — no real product integrates VIEshunt + Nature + Codman. The contract is honest about this.",
+      "Statistical power requirements use virtual cohort sizes; real clinical trial sizing would require different calculations."
+    ],
+    "what_we_are_NOT_claiming": [
+      "We are NOT claiming these thresholds are correct. We are claiming they are EXPLICIT and TRACEABLE.",
+      "We are NOT claiming the baselines are real products. We are claiming they are the strongest plausible publicly-demonstrated combinations.",
+      "We are NOT claiming C2-Y/C3-X/C5-X will win. We are claiming the experiment is now well-defined enough that winning or losing is informative."
+    ]
+  }
+}
