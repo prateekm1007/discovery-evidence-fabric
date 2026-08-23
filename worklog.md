@@ -6349,3 +6349,32 @@ Stage Summary:
 - 0/5 WORLD_CLASS. Portfolio EMPTY. Discovery engine operational.
 - Next autonomous action: test H5 (incremental prediction vs force/flow)
 
+
+---
+Task ID: ROUND-168-AI-LOOP-V2-CYCLE-2-H5-INCREMENTAL-PREDICTION
+Agent: main (session 2026-08-24, autonomous AI Loop V2)
+Task: AI Loop V2 Cycle 2 — autonomously selected H5 test from uncertainty ledger. Question: Does AE add incremental prediction beyond force/flow?
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = 583378b (correct). Ref updated.
+
+Work Log:
+1. The V2 discovery engine's uncertainty ledger (from Round 167) identified H5 as the next discriminator: "Do force/flow signals already contain the same information as AE?"
+2. The loop autonomously designed and executed the experiment: 200 virtual thrombectomy procedures, force/flow/AE signals generated simultaneously, AUROC comparison.
+3. Results: All AUROCs ~0.499 (random chance). Incremental AUROC from AE = 0.0000.
+4. H5 appears SUPPORTED (AE appears redundant) — BUT this is likely an artifact of the crude AUROC method (score = mean of features), not a real finding.
+5. Adversarial self-attack correctly predicted this risk: "The 'score = mean of features' approach is very crude. It may underestimate AE's value."
+6. Honest assessment: INCONCLUSIVE due to methodological limitation. The simplified AUROC cannot capture the non-linear relationships that AE-specific features (event rate, frequency, temporal patterns) provide.
+7. Candidate state UNCHANGED (correctly). Evidence strength remains Level 3 (not Level 5).
+8. Next step: implement a proper ML-based AUROC (logistic regression or random forest) that can exploit AE-specific features.
+
+Stage Summary:
+- H5 test executed but INCONCLUSIVE (crude AUROC method)
+- All signals show ~0.5 AUROC (random) with the simplified method
+- This is a METHODOLOGICAL failure, not a scientific finding
+- Per Article XXIX: separate implementation failure from mechanism failure
+- C5-X-AE-V3 evidence strength: Level 3 (unchanged)
+- Candidate state: WAITING_FOR_EXTERNAL_EVIDENCE (unchanged)
+- 0/5 WORLD_CLASS. Portfolio EMPTY.
+- The discovery engine correctly identified, designed, and executed the experiment. The result was inconclusive due to method limitation, which the adversarial self-attack predicted.
+
