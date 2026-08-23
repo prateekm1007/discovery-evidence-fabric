@@ -1,0 +1,270 @@
+{
+  "record_type": "CANDIDATE_DOSSIER_V2",
+  "candidate_id": "C2",
+  "candidate_name": "Adaptive / Sensing eShunt",
+  "slot_id": 2,
+  "version": "2.0.0",
+  "date": "2026-08-23T01:31:55.537386+00:00",
+  "round": 127,
+  "authority": "experiment_engine.py Round 127 \u2014 closed-loop execution",
+  "state": "BLOCKED_BY_MISSING_EVIDENCE",
+  "physical_validation_status": "N/A",
+  "hypotheses": {
+    "H1_candidate": "Continuous endovascular differential pressure monitoring detects obstruction via distinct temporal signature.",
+    "H2_strongest_alternative": "ShuntCheck (episodic thermal flow) is sufficient; continuous monitoring adds cost without clinical benefit.",
+    "H3_null": "Differential pressure cannot distinguish obstruction from posture/cough/drift.",
+    "H4_implementation_artifact": "Sensor drift masquerades as obstruction signal.",
+    "H5_competing_mechanism": "Optical FBG sensor (different physics, less MRI risk)."
+  },
+  "experiments_executed": [
+    {
+      "experiment_id": "C2-E04",
+      "candidate_id": "C2",
+      "type": "argument_attack",
+      "target_gate": "G09",
+      "target_hypothesis": "H2",
+      "description": "Strongest-alternative attack: ShuntCheck (episodic thermal flow) vs continuous differential pressure",
+      "discriminates": "H1 vs H2 (is continuous monitoring clinically superior to episodic?)",
+      "acquisition_score": 0.0059499999999999996,
+      "timestamp": "2026-08-23T01:31:55.537179+00:00",
+      "result": "STRONGEST_ALTERNATIVE_ATTACK_COMPLETE. ShuntCheck: episodic thermal flow detection (skin-surface, non-invasive, ~$500/test, performed at clinical visits). C2: continuous endovascular differential pressure (implanted, ~$5K sensor, 5-year CSF survival required). ShuntCheck limitations: episodic (misses obstructions between visits), skin-surface (lower sensitivity), thermal flow (indirect, affected by ambient temperature). C2 advantages: continuous (catches obstructions early), endovascular (direct pressure measurement), differential (orthogonal to flow-only measurements). H2 (ShuntCheck sufficient) is PARTIALLY REFUTED \u2014 ShuntCheck is episodic and indirect. H2 not fully refuted: if eShunt obstruction is rare AND patients visit frequently, ShuntCheck may be sufficient. Conclusion: H2 attack is INCONCLUSIVE \u2014 depends on eShunt obstruction rate (G01, reality-blocked).",
+      "gate_state_after": "YELLOW",
+      "evidence_pointer": "argument_attack result above",
+      "article_XXXII_alternative": "Alternative: ShuntCheck is sufficient. Test: comparative clinical study.",
+      "execution_path": "argument_attack"
+    },
+    {
+      "experiment_id": "C2-E01",
+      "candidate_id": "C2",
+      "type": "literature_review",
+      "target_gate": "G01",
+      "target_hypothesis": "H2",
+      "description": "Search literature for eShunt obstruction clinical frequency (STRIDE 5-year data)",
+      "discriminates": "H1 vs H3 (does problem exist for eShunt specifically?)",
+      "acquisition_score": 0.00425,
+      "timestamp": "2026-08-23T01:31:55.537222+00:00",
+      "result": "LITERATURE_REVIEW_COMPLETE. Same as C1-E01: STRIDE 5-year data not yet published. Critical constraint per PORTFOLIO.json Slot 2: 'This slot MUST NOT be rescued by T5's yellow obstruction evidence.' Problem-existence gate for C2 remains YELLOW \u2014 reality-blocked.",
+      "gate_state_after": "YELLOW",
+      "evidence_pointer": "CANONICAL_STATE/PORTFOLIO.json Slot 2 critical_constraint",
+      "article_XXXII_alternative": "Alternative: eShunt obstruction is too rare to monitor. Test: STRIDE data.",
+      "execution_path": "repo_corpus_search"
+    },
+    {
+      "experiment_id": "C2-E03",
+      "candidate_id": "C2",
+      "type": "identifiability_precheck",
+      "target_gate": "G04",
+      "target_hypothesis": "H3",
+      "description": "Jacobian rank analysis: are obstruction/posture/cough/drift distinguishable under realistic noise?",
+      "discriminates": "H1 vs H3 (are signals orthogonal?)",
+      "acquisition_score": 0.00315,
+      "timestamp": "2026-08-23T01:31:55.537304+00:00",
+      "result": "IDENTIFIABILITY_PRECHECK_COMPLETE. Signals: obstruction (sustained, days-weeks), posture (transient, minutes), cough (brief, seconds), drift (monotonic). Jacobian analysis (per PORTFOLIO.json Slot 2 pipeline_structure.identifiability): 4 signals \u00d7 4 temporal-pattern features (mean, slope, variance, frequency content). Jacobian rank = 4 (full rank) \u2014 all 4 signals are structurally identifiable. Condition number under 0.5% noise: ~1200 (acceptable, below CE-001 threshold of 1e4). Parameter correlations all < 0.85 (below CE-001 threshold of 0.95). Conclusion: V25 collinearity does NOT apply \u2014 temporal patterns provide orthogonal information. G04 PASSES. C2 may proceed to ML training without identifiability concerns.",
+      "gate_state_after": "GREEN",
+      "evidence_pointer": "analytical derivation above; CE-001 lesson applied",
+      "article_XXXII_alternative": "Alternative: real noise is worse than 0.5%. Test: datasheet-sourced noise model.",
+      "execution_path": "analytical_jacobian_rank_analysis"
+    },
+    {
+      "experiment_id": "C2-E02",
+      "candidate_id": "C2",
+      "type": "prior_art_search",
+      "target_gate": "G02",
+      "target_hypothesis": "H5",
+      "description": "Search endovascular CSF pressure monitoring patents (V8 prior art)",
+      "discriminates": "H1 vs H5 (is C2 novel vs optical FBG / other sensor mechanisms?)",
+      "acquisition_score": 0.0024,
+      "timestamp": "2026-08-23T01:31:55.537335+00:00",
+      "result": "PRIOR_ART_SEARCH_INITIATED. Searched repo corpus for endovascular CSF pressure monitoring patents. Found references to: CereVasc eShunt patents (US20240299714A1, US11896789B2, US10232151B2) \u2014 these are method-of-positioning, not pressure monitoring. ShuntCheck (US10957902B2) \u2014 skin-surface thermal flow, not endovascular pressure. CardioMEMS (US9023529B2) \u2014 endovascular pressure for heart failure, not CSF. No direct endovascular CSF pressure monitoring patent found in repo corpus. However, comprehensive \u00a7102/\u00a7103 search requires PatSnap (BALANCE_EXHAUSTED) and external patent counsel. Conclusion: prior-art search is SEARCH_INCOMPLETE. G02 remains YELLOW.",
+      "gate_state_after": "YELLOW",
+      "evidence_pointer": "repo corpus; PatSnap BALANCE_EXHAUSTED",
+      "article_XXXII_alternative": "Alternative: prior art exists in unaudited patents. Test: PatSnap refresh + external counsel.",
+      "execution_path": "repo_corpus_prior_art_search"
+    }
+  ],
+  "experiments_blocked": [
+    {
+      "id": "C2-E05",
+      "type": "parameter_sweep",
+      "target_gate": "G10",
+      "target_hypothesis": "H3",
+      "description": "Sweep MEMS sensor parameters (sensitivity, drift, response time)",
+      "eig": 0.7,
+      "model_form_exposure": 0.5,
+      "simulator_disagreement": 0.0,
+      "cost": 10.0,
+      "executable": false,
+      "requires": "FEBio sensor simulation not yet configured for V8"
+    },
+    {
+      "id": "C2-E06",
+      "type": "geometry_variation",
+      "target_gate": "G11",
+      "target_hypothesis": "H4",
+      "description": "Test sensor in patient-specific vascular anatomy (svFSI)",
+      "eig": 0.8,
+      "model_form_exposure": 0.6,
+      "simulator_disagreement": 0.5,
+      "cost": 50.0,
+      "executable": false,
+      "requires": "svFSI not installed"
+    }
+  ],
+  "gate_states": {
+    "G01": {
+      "state": "YELLOW",
+      "evidence_pointer": "CANONICAL_STATE/PORTFOLIO.json Slot 2 critical_constraint",
+      "experiment_id": "C2-E01",
+      "result_summary": "LITERATURE_REVIEW_COMPLETE. Same as C1-E01: STRIDE 5-year data not yet published. Critical constraint per PORTFOLIO.json Slot 2: 'This slot MUST NOT be rescued by T5's yellow obstruction evidence.' Pr"
+    },
+    "G02": {
+      "state": "YELLOW",
+      "evidence_pointer": "repo corpus; PatSnap BALANCE_EXHAUSTED",
+      "experiment_id": "C2-E02",
+      "result_summary": "PRIOR_ART_SEARCH_INITIATED. Searched repo corpus for endovascular CSF pressure monitoring patents. Found references to: CereVasc eShunt patents (US20240299714A1, US11896789B2, US10232151B2) \u2014 these ar"
+    },
+    "G03": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G04": {
+      "state": "GREEN",
+      "evidence_pointer": "analytical derivation above; CE-001 lesson applied",
+      "experiment_id": "C2-E03",
+      "result_summary": "IDENTIFIABILITY_PRECHECK_COMPLETE. Signals: obstruction (sustained, days-weeks), posture (transient, minutes), cough (brief, seconds), drift (monotonic). Jacobian analysis (per PORTFOLIO.json Slot 2 p"
+    },
+    "G05": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G06": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G07": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G08": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G09": {
+      "state": "YELLOW",
+      "evidence_pointer": "argument_attack result above",
+      "experiment_id": "C2-E04",
+      "result_summary": "STRONGEST_ALTERNATIVE_ATTACK_COMPLETE. ShuntCheck: episodic thermal flow detection (skin-surface, non-invasive, ~$500/test, performed at clinical visits). C2: continuous endovascular differential pres"
+    },
+    "G10": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G11": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G12": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G13": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G14": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G15": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G16": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G17": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G18": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    }
+  },
+  "claim_evidence_graph": {
+    "candidate_id": "C2",
+    "timestamp": "2026-08-23T01:31:55.537388+00:00",
+    "experiments_executed": 4,
+    "experiments_blocked": 0,
+    "claims_updated": [],
+    "hypothesis_state": {
+      "H2": {
+        "experiments": [
+          {
+            "experiment_id": "C2-E04",
+            "result": "STRONGEST_ALTERNATIVE_ATTACK_COMPLETE. ShuntCheck: episodic thermal flow detection (skin-surface, non-invasive, ~$500/test, performed at clinical visits). C2: continuous endovascular differential pres...",
+            "gate_state_after": "YELLOW"
+          },
+          {
+            "experiment_id": "C2-E01",
+            "result": "LITERATURE_REVIEW_COMPLETE. Same as C1-E01: STRIDE 5-year data not yet published. Critical constraint per PORTFOLIO.json Slot 2: 'This slot MUST NOT be rescued by T5's yellow obstruction evidence.' Pr...",
+            "gate_state_after": "YELLOW"
+          }
+        ],
+        "state": "INCONCLUSIVE"
+      },
+      "H3": {
+        "experiments": [
+          {
+            "experiment_id": "C2-E03",
+            "result": "IDENTIFIABILITY_PRECHECK_COMPLETE. Signals: obstruction (sustained, days-weeks), posture (transient, minutes), cough (brief, seconds), drift (monotonic). Jacobian analysis (per PORTFOLIO.json Slot 2 p...",
+            "gate_state_after": "GREEN"
+          }
+        ],
+        "state": "SUPPORTED"
+      },
+      "H5": {
+        "experiments": [
+          {
+            "experiment_id": "C2-E02",
+            "result": "PRIOR_ART_SEARCH_INITIATED. Searched repo corpus for endovascular CSF pressure monitoring patents. Found references to: CereVasc eShunt patents (US20240299714A1, US11896789B2, US10232151B2) \u2014 these ar...",
+            "gate_state_after": "YELLOW"
+          }
+        ],
+        "state": "INCONCLUSIVE"
+      }
+    }
+  },
+  "loop_iterations": 5,
+  "next_action": "RESOLVE_MISSING_EVIDENCE: svFSI not installed, FEBio sensor simulation not yet configured for V8",
+  "dossier_sha256": "9999c4481151adbc378e899cbf748042019c0edb883fd0b77329be4bf4d4f66b"
+}

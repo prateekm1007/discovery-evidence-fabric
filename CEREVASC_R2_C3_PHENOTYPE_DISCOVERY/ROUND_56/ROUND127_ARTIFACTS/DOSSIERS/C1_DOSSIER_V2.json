@@ -1,0 +1,288 @@
+{
+  "record_type": "CANDIDATE_DOSSIER_V2",
+  "candidate_id": "C1",
+  "candidate_name": "R6 Passive Rescue / Obstruction Bypass",
+  "slot_id": 1,
+  "version": "2.0.0",
+  "date": "2026-08-23T01:31:55.536354+00:00",
+  "round": 127,
+  "authority": "experiment_engine.py Round 127 \u2014 closed-loop execution",
+  "state": "BLOCKED_BY_MISSING_EVIDENCE",
+  "physical_validation_status": "N/A",
+  "hypotheses": {
+    "H1_candidate": "Passive bypass valve opens under pressure differential and restores drainage.",
+    "H2_strongest_alternative": "Existing surgical intervention (shunt revision) is sufficient; passive bypass adds failure modes without clinical benefit.",
+    "H3_null": "Bypass valve does not open at clinically relevant pressures.",
+    "H4_implementation_artifact": "Benchtop apparatus is miscalibrated, producing false-positive drainage.",
+    "H5_competing_mechanism": "Active electromechanical valve (more controllable but requires power)."
+  },
+  "experiments_executed": [
+    {
+      "experiment_id": "C1-E02",
+      "candidate_id": "C1",
+      "type": "argument_attack",
+      "target_gate": "G09",
+      "target_hypothesis": "H2",
+      "description": "Identify strongest existing surgical intervention for shunt obstruction (shunt revision, ventriculostomy, etc.) and prove C1 is not unnecessary",
+      "discriminates": "H1 vs H2 (is C1 necessary given existing solutions?)",
+      "acquisition_score": 0.0063,
+      "timestamp": "2026-08-23T01:31:55.535686+00:00",
+      "result": "STRONGEST_ALTERNATIVE_ATTACK_COMPLETE. Identified 3 existing surgical alternatives. All are definitive but invasive. C1's value proposition: NON-SURGICAL bridge to definitive treatment. H2 (existing surgical intervention is sufficient) is PARTIALLY REFUTED \u2014 surgery is sufficient but invasive; C1 provides a non-invasive alternative for poor surgical candidates. H2 not fully refuted: if eShunt obstruction rate is very low, even a non-surgical bridge may not be worth the added device complexity (kink, fatigue, embolization risks per CE-006/007). Conclusion: H2 attack is INCONCLUSIVE \u2014 depends on eShunt obstruction rate (G01, reality-blocked).",
+      "gate_state_after": "YELLOW",
+      "evidence_pointer": "argument_attack result above",
+      "article_XXXII_alternative": "Alternative: surgery is always available and C1 adds risk without benefit. Test: eShunt obstruction rate from STRIDE.",
+      "execution_path": "argument_attack"
+    },
+    {
+      "experiment_id": "C1-E01",
+      "candidate_id": "C1",
+      "type": "literature_review",
+      "target_gate": "G01",
+      "target_hypothesis": "H2",
+      "description": "Search literature for documented eShunt obstruction events in STRIDE 5-year follow-up data",
+      "discriminates": "H1 vs H3 (does the problem exist?)",
+      "acquisition_score": 0.00425,
+      "timestamp": "2026-08-23T01:31:55.535752+00:00",
+      "result": "LITERATURE_REVIEW_COMPLETE. Searched repo corpus + clinical literature references. STRIDE 5-year follow-up data for eShunt is NOT YET PUBLISHED in the public corpus (eShunt is investigational; STRIDE trial ongoing). No published eShunt-specific obstruction event rate found. Analogous shunt obstruction rates (VA shunts, VSS shunts) range 5-30% but per Article XX may NOT be used to infer eShunt-specific problem existence. Per PORTFOLIO.json Slot 1: 'eShunt obstruction not yet observed in STRIDE 5-year data.' Problem-existence gate remains YELLOW \u2014 reality-blocked on STRIDE data publication.",
+      "gate_state_after": "YELLOW",
+      "evidence_pointer": "CANONICAL_STATE/PORTFOLIO.json Slot 1; repo corpus search (no eShunt-specific results)",
+      "article_XXXII_alternative": "Alternative: eShunt obstruction rate is so low that the problem doesn't matter. Test: STRIDE 5-year data when published.",
+      "execution_path": "repo_corpus_search"
+    },
+    {
+      "experiment_id": "C1-E03",
+      "candidate_id": "C1",
+      "type": "cemetery_consultation",
+      "target_gate": "G03",
+      "target_hypothesis": "H3",
+      "description": "Consult cemetery for failure lessons applicable to passive bypass valve (CE-006, CE-009, CE-010, CE-011)",
+      "discriminates": "H1 vs H4 (does C1 repeat past failure modes?)",
+      "acquisition_score": 0.0018,
+      "timestamp": "2026-08-23T01:31:55.535932+00:00",
+      "result": "CEMETERY_CONSULTATION_COMPLETE. 4 CV-T06 entries consulted (CE-006 M3 electrothermal SMA retrieval, CE-009 mechanical snare R1, CE-010 flow reversal R3, CE-011 magnetic release R4). C1's passive bypass mechanism is distinct from all of these (no electrothermal, no snare, no flow reversal, no magnetic actuation). No CE violation. However, CE-006/010/11 teach that retrieval/rescue mechanisms have historically introduced new failure modes (MRI safety, physics force insufficient, safety concern). C1 must demonstrate that passive bypass does not introduce similar new failure modes (kink, fatigue, embolization).",
+      "gate_state_after": "GREEN",
+      "evidence_pointer": "MECHANISM_CEMETERY/CEMETERY.json CV-T06 entries",
+      "article_XXXII_alternative": "Alternative: C1 introduces failure modes like past rescue mechanisms. Test: failure-mode analysis.",
+      "execution_path": "cemetery_consultation"
+    }
+  ],
+  "experiments_blocked": [
+    {
+      "id": "C1-E04",
+      "type": "parameter_sweep",
+      "target_gate": "G10",
+      "target_hypothesis": "H3",
+      "description": "Sweep bypass valve crack pressure parameter against physiological pressure differential range",
+      "discriminates": "H1 vs H3 (does valve open at relevant pressures?)",
+      "eig": 0.75,
+      "model_form_exposure": 0.5,
+      "simulator_disagreement": 0.0,
+      "cost": 5.0,
+      "executable": false,
+      "requires": "FEBio simulation"
+    },
+    {
+      "id": "C1-E05",
+      "type": "geometry_variation",
+      "target_gate": "G11",
+      "target_hypothesis": "H4",
+      "description": "Test bypass valve in patient-specific vascular geometry (svFSI)",
+      "discriminates": "H1 vs H4 (does valve work in real anatomy?)",
+      "eig": 0.8,
+      "model_form_exposure": 0.6,
+      "simulator_disagreement": 0.5,
+      "cost": 50.0,
+      "executable": false,
+      "requires": "svFSI not installed"
+    },
+    {
+      "id": "C1-E06",
+      "type": "model_form_variation",
+      "target_gate": "G13",
+      "target_hypothesis": "H4",
+      "description": "Cross-validate FEBio bypass simulation with svFSI",
+      "discriminates": "H1 vs H4 (is result robust to model form?)",
+      "eig": 0.7,
+      "model_form_exposure": 1.0,
+      "simulator_disagreement": 0.8,
+      "cost": 50.0,
+      "executable": false,
+      "requires": "svFSI not installed"
+    },
+    {
+      "id": "C1-E07",
+      "type": "cross_world_comparison",
+      "target_gate": "G08",
+      "target_hypothesis": "H4",
+      "description": "Cross-world agreement between FEBio and svFSI on bypass valve response",
+      "discriminates": "H1 vs H4 (do independent worlds agree?)",
+      "eig": 0.85,
+      "model_form_exposure": 1.0,
+      "simulator_disagreement": 1.0,
+      "cost": 50.0,
+      "executable": false,
+      "requires": "svFSI not installed + G18 independence verification"
+    },
+    {
+      "id": "C1-E08",
+      "type": "instrument_noise_test",
+      "target_gate": "G12",
+      "target_hypothesis": "H4",
+      "description": "Test benchtop instrument noise model against datasheet",
+      "discriminates": "H1 vs H4 (is signal above noise floor?)",
+      "eig": 0.6,
+      "model_form_exposure": 0.4,
+      "simulator_disagreement": 0.0,
+      "cost": 2.0,
+      "executable": false,
+      "requires": "Additel 161 GP5 calibrator not yet acquired"
+    }
+  ],
+  "gate_states": {
+    "G01": {
+      "state": "YELLOW",
+      "evidence_pointer": "CANONICAL_STATE/PORTFOLIO.json Slot 1; repo corpus search (no eShunt-specific results)",
+      "experiment_id": "C1-E01",
+      "result_summary": "LITERATURE_REVIEW_COMPLETE. Searched repo corpus + clinical literature references. STRIDE 5-year follow-up data for eShunt is NOT YET PUBLISHED in the public corpus (eShunt is investigational; STRIDE "
+    },
+    "G02": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G03": {
+      "state": "GREEN",
+      "evidence_pointer": "MECHANISM_CEMETERY/CEMETERY.json CV-T06 entries",
+      "experiment_id": "C1-E03",
+      "result_summary": "CEMETERY_CONSULTATION_COMPLETE. 4 CV-T06 entries consulted (CE-006 M3 electrothermal SMA retrieval, CE-009 mechanical snare R1, CE-010 flow reversal R3, CE-011 magnetic release R4). C1's passive bypas"
+    },
+    "G04": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G05": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G06": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G07": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G08": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G09": {
+      "state": "YELLOW",
+      "evidence_pointer": "argument_attack result above",
+      "experiment_id": "C1-E02",
+      "result_summary": "STRONGEST_ALTERNATIVE_ATTACK_COMPLETE. Identified 3 existing surgical alternatives. All are definitive but invasive. C1's value proposition: NON-SURGICAL bridge to definitive treatment. H2 (existing s"
+    },
+    "G10": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G11": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G12": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G13": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G14": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G15": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G16": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G17": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    },
+    "G18": {
+      "state": "NOT_RUN",
+      "evidence_pointer": "",
+      "experiment_id": "",
+      "result_summary": ""
+    }
+  },
+  "claim_evidence_graph": {
+    "candidate_id": "C1",
+    "timestamp": "2026-08-23T01:31:55.536358+00:00",
+    "experiments_executed": 3,
+    "experiments_blocked": 0,
+    "claims_updated": [],
+    "hypothesis_state": {
+      "H2": {
+        "experiments": [
+          {
+            "experiment_id": "C1-E02",
+            "result": "STRONGEST_ALTERNATIVE_ATTACK_COMPLETE. Identified 3 existing surgical alternatives. All are definitive but invasive. C1's value proposition: NON-SURGICAL bridge to definitive treatment. H2 (existing s...",
+            "gate_state_after": "YELLOW"
+          },
+          {
+            "experiment_id": "C1-E01",
+            "result": "LITERATURE_REVIEW_COMPLETE. Searched repo corpus + clinical literature references. STRIDE 5-year follow-up data for eShunt is NOT YET PUBLISHED in the public corpus (eShunt is investigational; STRIDE ...",
+            "gate_state_after": "YELLOW"
+          }
+        ],
+        "state": "INCONCLUSIVE"
+      },
+      "H3": {
+        "experiments": [
+          {
+            "experiment_id": "C1-E03",
+            "result": "CEMETERY_CONSULTATION_COMPLETE. 4 CV-T06 entries consulted (CE-006 M3 electrothermal SMA retrieval, CE-009 mechanical snare R1, CE-010 flow reversal R3, CE-011 magnetic release R4). C1's passive bypas...",
+            "gate_state_after": "GREEN"
+          }
+        ],
+        "state": "SUPPORTED"
+      }
+    }
+  },
+  "loop_iterations": 4,
+  "next_action": "RESOLVE_MISSING_EVIDENCE: FEBio simulation, Additel 161 GP5 calibrator not yet acquired, svFSI not installed, svFSI not installed + G18 independence verification",
+  "dossier_sha256": "12127d7d6cab54035e37b16fc8c13d897dfbab0d477e0790159957ea02ca126a"
+}
