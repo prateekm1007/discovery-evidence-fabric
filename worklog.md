@@ -4454,3 +4454,48 @@ Stage Summary:
 - C2 prior-art: 4 references now analyzed (CardioMEMS, ShuntCheck, CereVasc eShunt, US8870787).
   All 4 do NOT anticipate. PROBABLE survival. SEARCH_INCOMPLETE.
 - 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.
+
+---
+Task ID: ROUND-140-SECTION-103-ATTACK-AND-LIMITATION-TAXONOMY
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 140 — fix C2 limitation taxonomy (separate claim/eng/val/impl), construct strongest §103 combination attack using US8870787 citation network, search patent families.
+
+Work Log:
+- Corrected C2 limitation taxonomy:
+  * CLAIM_LIMITATIONS: CL1 continuous sensing, CL2 endovascular, CL3 eShunt anatomy, CL4 differential pressure, CL5 temporal signature, CL6 obstruction algorithm
+  * ENGINEERING_REQUIREMENTS: ER1 form factor, ER2 signal processing
+  * VALIDATION_REQUIREMENTS: VR1 5yr biocompatibility, VR2 clinical validation
+  * IMPLEMENTATION_OPTIONS: IO1 MEMS (NOT a claim limitation — was previously L4)
+  * Key correction: MEMS and 5yr biocompatibility removed from novelty limitations
+
+- Searched US8870787B2 citation network:
+  * 106 backward citations found
+  * 4 analyzed in detail (US8870787, US10413710, US10806352, US10166375)
+  * 102 remaining unanalyzed
+
+- Key findings from citation analysis:
+  * US10413710B2: "Pressure reference assembly for body fluid drainage system" — teaches DIFFERENTIAL PRESSURE measurement using two reference lines in body fluid drainage context. This DIRECTLY addresses C2's CL4.
+  * US10806352B2: "Wireless vascular monitoring implant" — teaches endovascular pressure sensor deployment in vena cava. Addresses C2's CL2.
+  * These references are MUCH more relevant than CardioMEMS/ShuntCheck from Round 138.
+
+- Constructed strongest §103 combination attack:
+  * US8870787 (CSF shunt pressure sensor) + US10413710 (differential pressure) + US10806352 (vascular/venous implant) + eShunt anatomy
+  * Addresses CL1-CL4 with moderate motivation
+  * MISSING: CL5 (temporal signature classification) — no reference teaches this
+  * C2's defensible novelty narrows to: temporal signature algorithm + specific combination
+  * Assessment: SURVIVAL PLAUSIBLE, ATTACK INCOMPLETE (4/106 citations analyzed)
+
+- Updated scheduler policy:
+  * Promotion: scientific truth mandatory (truth-first)
+  * Scheduling: when SCIENTIFIC_AQ within 20%, choose higher DECISION_AQ
+  * Never: "commercially valuable therefore mechanism confidence rises"
+
+- OpenFOAM: restarted in background (1394 .o files).
+
+Stage Summary:
+- C2 limitation taxonomy corrected (MEMS is implementation option, not novelty limitation).
+- §103 attack: 4-reference combination addresses CL1-CL4. CL5 (temporal signature) is C2's
+  most defensible novelty. 102/106 citations remain unanalyzed.
+- C2 assessment: SURVIVAL PLAUSIBLE, PRIOR-ART ATTACK INCOMPLETE.
+- Scheduler: truth-first for promotion, balanced for scheduling.
+- 0/5 WORLD_CLASS_INVENTION. C5 UNRESOLVED. OpenFOAM building.
