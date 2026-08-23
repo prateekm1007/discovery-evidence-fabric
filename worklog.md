@@ -5211,3 +5211,30 @@ Stage Summary:
 - 7 successor hypotheses in discovery queue (no portfolio status).
 - Portfolio: 0/5 WORLD_CLASS. 2 KILLED (C2 + C4). 3 INVESTIGATION (C1, C3, C5).
 - The machine spent 13 rounds attacking C2 from every angle. It died honestly.
+
+---
+Task ID: ROUND-151-C2-CLOSURE-AND-GLOBAL-SCHEDULER
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 151 — freeze C2 cemetery entry CE-014 with complete provenance, run global scheduler to select next target, promote no successor automatically.
+
+Work Log:
+- Froze C2 cemetery entry CE-014:
+  * Complete R138-R150 provenance (13 rounds of attack)
+  * Corrected language: "For the C2 mechanism as defined, the physiologically constrained model space did not produce the required advantage" (NOT "Starling resistor is an invariant that no engineering can overcome")
+  * Reopen condition: new empirical physiology, new independent solver, or genuinely different mechanism only. Parameter sweeps cannot reopen.
+  * Historical states preserved (R138 PROBABLE SURVIVAL → R143 KILL → R144 RETRACTION → R147 KILL → R148 RESCUE → R150 PERMANENT KILL)
+  * Cemetery lesson: "A rescue regime is not evidence of invention. A candidate earns promotion only if its advantage survives the most physiologically credible adversarial envelope."
+
+- Ran global scheduler to select next target:
+  * Formula: P(World-Class) × strategic_value × scientific_info_gain × defensibility ÷ validation_cost
+  * Ranked 5 candidates (C1, C3, C5, C2-Y, C5-X)
+  * AI DECISION: C5 (continue OpenFOAM) + C2-Y (test in parallel)
+  * Rationale: C5 has highest scientific info gain (0.95). C2-Y is highest-scored executable candidate (0.0149). C1 is reality-blocked. C3 needs mechanism validation. C5-X depends on C5.
+
+- OpenFOAM: restarted in background.
+
+Stage Summary:
+- C2 PERMANENTLY KILLED. CE-014 frozen with complete provenance.
+- Global scheduler selected: C5 (OpenFOAM build) + C2-Y (parallel test).
+- Portfolio: 0/5 WORLD_CLASS. 2 KILLED. 3 INVESTIGATION. 7 in discovery queue.
+- Next: C2-Y perturbation identification test (executable now) + C5 OpenFOAM build (background).

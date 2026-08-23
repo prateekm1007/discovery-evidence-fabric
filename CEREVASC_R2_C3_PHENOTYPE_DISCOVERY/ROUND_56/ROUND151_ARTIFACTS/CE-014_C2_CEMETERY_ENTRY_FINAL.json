@@ -1,0 +1,91 @@
+{
+  "record_type": "CEMETERY_ENTRY",
+  "entry_id": "CE-014",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 151,
+  "authority": "CEO Round 151: 'Freeze C2 conclusion with complete provenance. Do not delete earlier failed/rescued states. Reopen condition must require new evidence.'",
+
+  "candidate_id": "C2",
+  "slot_id": 2,
+  "candidate_name": "Adaptive / Sensing eShunt — Continuous endovascular CSF-venous differential pressure monitoring",
+  "territory_id": "CV-T08",
+
+  "kill_reason": "MECHANISM_FAILURE — For the C2 mechanism as defined (using CSF-to-inferior-petrosal-sinus differential pressure for obstruction detection), the physiologically constrained model space tested did not produce the required incremental diagnostic advantage over absolute ICP.",
+
+  "epistemic_class": "STRONG_CONSTRAINT",
+
+  "corrected_language": {
+    "too_broad": "The Starling resistor is a physical invariant that no engineering can overcome.",
+    "correct": "For the C2 mechanism as defined—using CSF-to-IPS differential pressure for obstruction detection—the physiologically constrained model space tested (IPS coupling 0.4-0.95, per literature on Starling-resistor-mediated CSF-venous coupling) did not produce the required incremental diagnostic advantage (ΔAUROC > 0.05). 0/80 tested regimes met the pre-registered WIN threshold. The mean ΔAUROC was -0.0186 (differential was worse than absolute on average).",
+    "rationale": "The literature shows the venous system is more complicated than one universal coupling constant: cortical, deep/periventricular, and sinus pressures can behave differently, and posture changes venous outflow (PMID 8194060, 39029117). The candidate is killed, but the entire scientific question of CSF-venous pressure dynamics is not killed."
+  },
+
+  "reusable_lesson": "Do not pursue CSF-inferior-petrosal-sinus differential pressure as an obstruction-detection differentiator unless new empirical evidence demonstrates a materially different physiological regime or a new mechanism. The Starling resistor creates HIGH coupling (literature-supported range 0.4-0.95) between CSF and eShunt-accessible IPS pressure, making the differential uninformative across the physiologically credible range.",
+
+  "what_to_avoid": "Do not propose CSF-dural sinus differential pressure for obstruction detection without first demonstrating that the specific venous compartment accessed has LOW coupling (< 0.3) to CSF pressure during obstruction. The Starling resistor makes this unlikely for cortical/sinus compartments but does not rule out periventricular venous compartments (which eShunt cannot access).",
+
+  "physical_constraint": "Starling resistor coupling between CSF and dural sinus pressure: 0.4-0.95 (literature-supported). At these coupling levels, CSF-sinus differential does not carry independent diagnostic information beyond absolute CSF pressure.",
+
+  "evidence_sources": [
+    "R138: C2 claim-level prior-art analysis (6 limitations mapped)",
+    "R139: US8870787B2 analysis (CSF shunt + pressure sensor + wireless interrogation)",
+    "R140: US20060047201A1 analysis (temporal pressure processing for shunt malfunction is KNOWN)",
+    "R140: US9668663B2 analysis (dual-sensor CSF pressure with drift compensation)",
+    "R142: CL5 broad form = PRIOR_ART_THREATENED → narrowed to CL5d (differential waveform)",
+    "R142: 6-reference §103 combination attack (US8870787 + US10413710 + US10806352 + US20060047201A1 + US9668663B2 + eShunt anatomy)",
+    "R143: First falsification (FLAWED: hand-coded thresholds, unequal classifiers) → kill recommended → retracted",
+    "R144: Rebuilt experiment with matched classifiers → differential adds MODEST information (+0.035 AUROC) → kill retracted",
+    "R145: Venous-coupling phase diagram → load-bearing assumption exposed (venous_coupling Uniform(0.1,0.5))",
+    "R145: PubMed literature search: PMID 26767844 (tight CSF-venous coupling), PMID 8194060 (cortical vs periventricular), PMID 39029117 (posture-dependent outflow)",
+    "R146: Compartmental physiology model (4 compartments: CSF, IPS, cortical, periventricular) → ceiling effect (AUROC=1.0)",
+    "R147: Hard-case falsification → ceiling destroyed (AUROC=0.974) → eShunt IPS differential WORSE (-0.030 AUROC) → kill recommended (pre-registered threshold met)",
+    "R148: Adversarial rescue search → 26/100 regimes meet WIN threshold (but at LOW coupling 0.1-0.5, physiologically questionable)",
+    "R149: Mechanism separation test → sensor_mismatch has ZERO effect → advantage is PHYSIOLOGICAL (not common-mode cancellation)",
+    "R150: Physiologically-constrained final rescue → IPS coupling constrained to [0.4, 0.95] → 0/80 regimes meet WIN threshold → PERMANENT KILL"
+  ],
+
+  "evidence_limitations": [
+    "The compartmental physiology model is simplified — real venous physiology is more complex (collaterals, autoregulation, nonlinear Starling, posture-dependent outflow shifts)",
+    "The starling_gain range (0.4-0.95) is literature-INFORMED but not literature-VALIDATED for the specific IPS anatomy",
+    "The experiment uses synthetic data, not clinical measurements",
+    "The periventricular venous compartment was modeled but not accessible by eShunt — a different device architecture could potentially access it",
+    "The model assumes a single scalar coupling; real physiology may have state-dependent, posture-dependent, and pathology-dependent coupling"
+  ],
+
+  "reopen_condition": {
+    "rule": "C2 can ONLY reopen if one of these appears:",
+    "conditions": [
+      "NEW EMPIRICAL PHYSIOLOGY: Published clinical or experimental evidence demonstrating that the IPS-CSF coupling during shunt obstruction is materially lower than 0.4 (e.g., direct pressure measurements showing IPS pressure does not track CSF during obstruction)",
+      "NEW INDEPENDENT SOLVER EVIDENCE: An independent computational model (not built by this team) demonstrating that CSF-IPS differential carries diagnostic information under physiologically credible parameters",
+      "A GENUINELY DIFFERENT MECHANISM: A new sensing architecture that accesses a DIFFERENT venous compartment (e.g., periventricular veins) where coupling is known to be LOW, or a different signal-processing approach that does not rely on differential pressure"
+    ],
+    "cannot_reopen_with": "A new parameter sweep inside the current model. The current model has been thoroughly explored (R145-R150, 200+ parameter combinations). Additional sweeps cannot overturn the physiological constraint."
+  },
+
+  "successor_hypotheses_generated": [
+    "C2-Y: Physiological Perturbation Identification — uses active perturbation instead of passive differential, avoiding the coupling dependency entirely",
+    "C2-X: CSF Dynamics Fingerprint — uses absolute ICP waveform features (not differential), leveraging known temporal processing but with patient-specific baseline",
+    "C2-R2: Common-mode noise rejection — tested and NOT SUPPORTED (R149 showed sensor mismatch has zero effect)"
+  ],
+
+  "historical_states_preserved": {
+    "note": "Per Article XI (history is evidence too), all intermediate states are preserved in the repository:",
+    "states": [
+      "R138: CL5 identified as surviving novelty → PROBABLE SURVIVAL",
+      "R142: CL5 threatened by US20060047201A1 → PRIOR_ART_THREATENED",
+      "R143: First kill recommended → FLAWED (hand-coded thresholds)",
+      "R144: Kill retracted → modest advantage found (+0.035)",
+      "R147: Kill recommended again → ceiling destroyed, eShunt WORSE",
+      "R148: Rescue succeeded → 26/100 regimes win (but LOW coupling)",
+      "R149: Mechanism = physiological (not cancellation)",
+      "R150: Constrained to credible coupling → 0/80 win → PERMANENT KILL"
+    ],
+    "interpretation": "The history shows the machine spent 13 rounds trying to save C2, including one flawed experiment, one retraction, one rescue, and one final constrained search. The candidate died honestly — not from a single experiment, but from accumulated evidence across multiple independent attacks."
+  },
+
+  "cemetery_lesson_for_constitution": {
+    "proposed_rule": "A rescue regime is not evidence of invention. A candidate earns promotion only if its advantage survives the most physiologically credible adversarial envelope, not if favorable parameter combinations can be found.",
+    "rationale": "Round 148 found 26/100 favorable parameter combinations. Round 150 showed that NONE of these survive when constrained to the physiologically credible IPS coupling range. The rescue was an artifact of exploring an implausible parameter region."
+  }
+}
