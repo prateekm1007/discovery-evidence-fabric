@@ -4183,3 +4183,44 @@ Stage Summary:
 - Decisive test: actual clotFoam (C5-CONTRA-E01, BLOCKED).
 - 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.
 - The machine is correctly attacking the discrepancy rather than averaging it away.
+
+---
+Task ID: ROUND-134-ATTACK-H2-OPENFOAM-BUILD
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 134 — attack H2 directly by installing actual OpenFOAM-9 + clotFoam. Tighten H9 language. Upgrade acquisition formula.
+
+Work Log:
+- CEO identified that H9 should be "strongly disfavored" not "refuted" because
+  force mappings remain model-specific.
+- Upgraded acquisition formula:
+  EIG × P(resolving_highest_posterior) × independence × decision_impact ÷ cost
+  C5-CONTRA-E01 (actual clotFoam) is now the highest-acquisition experiment (0.00855).
+
+- OPENFOAM-9 INSTALLATION:
+  * conda-forge openfoam 2412 available but install timed out (too large)
+  * Cloned OpenFOAM-9 source from github.com/OpenFOAM/OpenFOAM-9 ✅
+  * Installed flex, bison via conda-forge ✅
+  * MPI headers available (MPICH via conda-forge) ✅
+  * First build attempt failed: --showme:compile is OpenMPI syntax, not MPICH
+  * Reconfigured with WM_MPLIB and direct MPI paths
+  * Build NOW RUNNING (g++ compiling .o files successfully)
+  * Estimated 30-60 minutes to complete
+
+- CLOTFoAM SOURCE:
+  * Cloned from github.com/ElsevierSoftwareX/SOFTX-D-23-00244 ✅
+  * README confirms: requires OpenFOAM v9, build with wclean && wmake
+  * Ready to build once OpenFOAM-9 completes
+
+- H9 language tightened: "strongly disfavored by E03-V2; not eliminated"
+- Anti-self-deception rule: "Custom implementation can generate hypothesis.
+  Cannot certify its own novelty."
+
+- Peridgm: not retried this round (Trilinos 16 API incompatibility, Round 132).
+
+Stage Summary:
+- OpenFOAM-9 building from source (real progress, g++ producing .o files).
+- clotFoam source ready to build after OpenFOAM.
+- C5-CONTRA-E01 (actual clotFoam) is the decisive experiment.
+- If OpenFOAM builds → clotFoam builds → run with 3 controls →
+  discriminate H2 (custom artifact, 0.45) vs H1 (genuine flow, 0.20).
+- 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.

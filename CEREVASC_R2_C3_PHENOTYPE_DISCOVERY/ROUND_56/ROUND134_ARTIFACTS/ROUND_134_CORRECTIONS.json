@@ -1,0 +1,68 @@
+{
+  "record_type": "ROUND_134_CORRECTIONS",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 134,
+  "authority": "CEO Round 134 deep audit",
+
+  "correction_1_H9_language": {
+    "old_statement": "H9 NOT supported — the discrepancy survives the physical observable correction.",
+    "new_statement": "H9 strongly disfavored by E03-V2; not eliminated as a general possibility.",
+    "rationale": "Force curvature is much closer to a physical observable, but the mappings remain model-specific: FEBio derives force from damaged stress, peridynamics sums bond forces, flow derives from pressure, CalculiX maps elastic-plastic stress, SfePy uses linear elastic. These are not automatically equivalent measurement operators. E03-V2 is powerful evidence against H9, but not absolute proof that semantic equivalence is perfect.",
+    "posterior_update": "H9: 0.05 (strongly disfavored, but not zero)"
+  },
+
+  "correction_2_upgraded_acquisition": {
+    "old_formula": "EIG × model_form_exposure × simulator_disagreement ÷ cost",
+    "new_formula": "EIG × P(resolving_highest_posterior_hypothesis) × independence_exposure × decision_impact ÷ cost",
+    "rationale": "The acquisition should explicitly favor experiments that discriminate the highest-posterior hypothesis. Currently H2=0.45 is highest. The experiment that most directly discriminates H2 is actual clotFoam (replaces custom implementation with external solver).",
+    "applied_to_C5_contradiction": {
+      "C5_CONTRA_E01_actual_clotfoam": {
+        "EIG": 0.95,
+        "P_resolving_H2": 0.90,
+        "independence_exposure": 1.0,
+        "decision_impact": 1.0,
+        "cost": 100,
+        "acquisition_score": "0.95 × 0.90 × 1.0 × 1.0 / 100 = 0.00855",
+        "rationale": "Directly tests H2 (custom artifact, posterior 0.45) by replacing custom implementation with actual external solver. If precursor disappears → H2 confirmed, C5 likely artifact. If precursor survives → H1 strengthened, C5 may be genuine."
+      },
+      "C5_CONTRA_E02_actual_peridigm": {
+        "EIG": 0.90,
+        "P_resolving_H2": 0.30,
+        "independence_exposure": 1.0,
+        "decision_impact": 0.8,
+        "cost": 100,
+        "acquisition_score": "0.90 × 0.30 × 1.0 × 0.8 / 100 = 0.00216",
+        "rationale": "Tests H1/H5 (does precursor survive different fracture math). Less directly targeted at H2. BLOCKED on Peridgm build."
+      },
+      "C5_CONTRA_E03_V2_observable": {
+        "EIG": 0.95,
+        "P_resolving_H2": 0.10,
+        "independence_exposure": 0.3,
+        "decision_impact": 0.5,
+        "cost": 10,
+        "acquisition_score": "0.95 × 0.10 × 0.3 × 0.5 / 10 = 0.00143",
+        "rationale": "Already EXECUTED (Round 133). H9 strongly disfavored. Does not directly resolve H2."
+      }
+    },
+    "ranking": "C5_CONTRA_E01 (actual clotFoam) is the highest-acquisition experiment. BLOCKED on installation."
+  },
+
+  "correction_3_openfoam_installation_attempt": {
+    "status": "IN_PROGRESS",
+    "route": "conda-forge openfoam 2412 (latest, not v9 specifically)",
+    "note": "clotFoam requires OpenFOAM v9. OpenFOAM 2412 is the latest release. clotFoam may or may not build against 2412 due to API changes between v9 and v2412. This is a risk — if clotFoam doesn't build against 2412, we need v9 specifically.",
+    "alternative_routes": [
+      "Download OpenFOAM 9 source from openfoam.org and build in user space",
+      "Download OpenFOAM 9 .deb and extract without sudo",
+      "Use conda-forge openfoam 2412 and patch clotFoam for compatibility"
+    ],
+    "honest_assessment": "OpenFOAM is a large package (~500MB). conda install is timing out. May need to run in background or use source build."
+  },
+
+  "correction_4_anti_self_deception_rule": {
+    "rule": "A custom implementation can generate a hypothesis. It cannot certify its own novelty.",
+    "implication": "The custom World C generated the C5 precursor hypothesis. But only actual clotFoam can confirm whether the precursor is real or an artifact. The machine must not promote C5 based on custom-world evidence alone.",
+    "enforcement": "WORLD_C_CUSTOM_FLOW_FORMULATION evidence contributes to MODEL_FORM_DIVERSITY but NOT to EXTERNAL_INDEPENDENT_CONFIRMATION. The C5 positive result in World C is a HYPOTHESIS, not a FINDING."
+  }
+}
