@@ -6069,3 +6069,46 @@ Stage Summary:
 - Simulation: CONDITIONAL only
 - 0/5 WORLD_CLASS. Portfolio EMPTY. No candidate eligible for full simulation yet.
 
+
+---
+Task ID: ROUND-164-DEEP-NOVELTY-C2Y-AP-AND-C3X-TE
+Agent: main (session 2026-08-24)
+Task: Execute Round 164 — deep novelty search on C2-Y-active-probing and C3-X-tissue-exposure to determine if either can reach simulation-eligible novelty level 2.
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = 9332a0a (correct). Local origin/main ref updated.
+
+Work Log:
+
+1. C2-Y-active-probing DEEP search (7 queries)
+   - CRITICAL FINDING: WO2011146757A2 explicitly covers "active flow generation + shunt resistance tracking + obstruction detection"
+   - This patent covers vibrating the shunt/tubing/valve to generate flow, then tracking resistance to detect obstruction
+   - This is VERY CLOSE to C2-Y-active-probing's core concept
+   - Novelty downgraded: level 1 → level 0 (PRIOR_ART_THREATENED)
+   - Simulation INELIGIBLE
+   - Next step: patent attorney claim analysis of WO2011146757A2
+   - Potential narrowing: spatial localization, impending failure prediction, or specific perturbation type not covered
+
+2. C3-X-tissue-exposure DEEP search (6 queries)
+   - No patent found that specifically claims tissue exposure INFERENCE from multimodal CSF response
+   - US 20260224805 covers PK/PD modeling (adjacent but not identical)
+   - Academic literature covers CSF dynamics modeling and tissue penetration modeling
+   - Novelty remains: level 1 (POTENTIAL_NOVELTY, threat remains)
+   - Simulation INELIGIBLE
+   - The surviving white space: state estimation (multimodal response → tissue exposure estimate) vs control (concentration → dose)
+   - Next step: patent attorney evaluation of distinguishability from US 20260224805
+
+3. Updated candidate eligibility:
+   - C2-Y-active-probing: NOVELTY 0, INELIGIBLE (WO2011146757A2 threat)
+   - C3-X-tissue-exposure: NOVELTY 1, INELIGIBLE (obviousness threat)
+   - C5-X-AE-V2: NOVELTY 1.5, CONDITIONAL (from Round 163)
+   - NO candidate eligible for full simulation
+   - ALL require patent attorney evaluation before further investment
+
+Stage Summary:
+- C2-Y-active-probing is MORE threatened than Round 161 thought — WO2011146757A2 is a critical prior-art threat
+- C3-X-tissue-exposure is less threatened but still requires attorney evaluation
+- The system continues to produce FEWER claims, STRONGER claims
+- 0/5 WORLD_CLASS. Portfolio EMPTY. No candidate eligible for full simulation.
+- All three redirected candidates require patent attorney evaluation — this is now the critical path
+
