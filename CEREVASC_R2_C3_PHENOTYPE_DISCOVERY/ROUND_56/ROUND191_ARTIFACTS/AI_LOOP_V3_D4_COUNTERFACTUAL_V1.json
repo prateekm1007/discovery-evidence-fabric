@@ -1,0 +1,91 @@
+{
+  "record_type": "AI_LOOP_V3_CYCLE_13_D4_COUNTERFACTUAL_V1",
+  "version": "1.0.0",
+  "date": "2026-08-23T20:52:08.470267+00:00",
+  "round": 191,
+  "authority": "AI Loop V3 \u2014 FULLY AUTONOMOUS, Cycle 13",
+  "constitutional_basis": [
+    "Article I",
+    "Article XVII",
+    "Article XIX",
+    "Article XXIX",
+    "Article XXXVI"
+  ],
+  "constitution_acknowledgment": "I am an untrusted implementation agent. I will not optimize for green gates.",
+  "scientific_question": "Can a patient-specific counterfactual model predict which shunt intervention produces the best outcome?",
+  "the_2029_vision": "Transform shunt management from reactive trial-and-error to proactive simulation-guided decision-making. Instead of 'adjust valve \u2192 wait \u2192 see', the clinician simulates 5 interventions, ranks by predicted outcome, and chooses the best.",
+  "experiment_design": {
+    "n_patients": 300,
+    "n_interventions": 5,
+    "horizon_days": 90,
+    "interventions": [
+      "keep_current",
+      "raise_valve_2",
+      "lower_valve_2",
+      "replace_catheter",
+      "adjust_flow_15pct"
+    ],
+    "method": "RF Regressor predicts outcome score from patient features + intervention. Recommend intervention with lowest predicted score. Compare vs random (trial-and-error) and optimal.",
+    "outcome_metric": "composite score: |mean_ICP - target| + overdrainage_penalty + underdrainage_penalty + variability_penalty",
+    "win_threshold": "accuracy > 50% AND improvement > 20%"
+  },
+  "results": {
+    "question": "Can a patient-specific counterfactual model predict which shunt intervention produces the best outcome?",
+    "n_patients": 300,
+    "n_interventions": 5,
+    "chance_level": 0.2,
+    "method": "Random Forest Regressor, 5-fold CV. Patient features \u2192 predicted outcome score for each intervention \u2192 recommend best.",
+    "outcome_prediction": {
+      "r2_score": 0.8629660684549142,
+      "mae": 1.660067430366175,
+      "interpretation": "The model predicts intervention outcome scores with R\u00b2=0.863 (explains 86.3% of variance)"
+    },
+    "recommendation_accuracy": 0.5333333333333333,
+    "improvement_over_trial_and_error": 0.1441262201603626,
+    "distance_from_optimal": 0.08922410183917404,
+    "score_comparison": {
+      "trial_and_error_mean": 10.587180366484693,
+      "engine_mean": 9.061290078107252,
+      "optimal_mean": 8.31903192631076
+    },
+    "verdict": "INCONCLUSIVE",
+    "evidence_strength_level": 4,
+    "win_threshold": "recommendation accuracy > 50% AND improvement over random > 20%",
+    "kill_threshold": "accuracy < 30% OR improvement < 5%",
+    "key_finding": "Counterfactual engine picks the right intervention 53.3% of the time (chance=20%), improving outcomes by 14.4% over trial-and-error.",
+    "candidate_state_change": "NONE \u2014 light simulation. But result determines whether D4 advances to full pre-registered experiment."
+  },
+  "adversarial_self_attack": {
+    "attacks": [
+      {
+        "attack": "The outcome model is synthetic \u2014 real patient outcomes are messier and harder to predict.",
+        "countermeasure": "First-order simulation. Real validation is Level 7.",
+        "residual_risk": "HIGH"
+      },
+      {
+        "attack": "The model is trained and tested on the same data (no train/test split for recommendation evaluation).",
+        "countermeasure": "The outcome R\u00b2 uses 5-fold CV. The recommendation accuracy uses a model trained on ALL data (in-practice deployment). A proper train/test split for recommendation would be more rigorous.",
+        "residual_risk": "MEDIUM \u2014 may inflate accuracy"
+      },
+      {
+        "attack": "The 5 interventions are simplified \u2014 real interventions are more complex (specific valve models, catheter types, surgical approaches).",
+        "countermeasure": "The 5 interventions represent the major decision classes. Real implementation would have more.",
+        "residual_risk": "MEDIUM"
+      },
+      {
+        "attack": "Candidate state NOT changed.",
+        "countermeasure": "Correct \u2014 light simulation.",
+        "residual_risk": "LOW"
+      }
+    ]
+  },
+  "uncertainty_ledger_update": {
+    "d4_counterfactual_prediction": "INCONCLUSIVE \u2014 accuracy=53.3%, improvement=14.4%",
+    "evidence_strength_level": 4,
+    "next_discriminator": "If WIN: full pre-registered experiment (Article XXXVI) + independent reproduction + Gate 2 deep obviousness search. If KILL: generate new hypotheses."
+  },
+  "execution_state": "COMPLETED",
+  "epistemic_state": "INCONCLUSIVE",
+  "candidate_level_epistemic_state": "INVESTIGATION",
+  "world_class_score": "0/5 \u2014 UNCHANGED"
+}
