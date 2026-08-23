@@ -1,0 +1,111 @@
+{
+  "record_type": "REFINED_APPLICABILITY_MATRIX_V2",
+  "version": "2.0.0",
+  "date": "2026-08-23",
+  "round": 136,
+  "authority": "CEO Round 136: 'C5 does not currently have three applicable external worlds. It has 1 applicable external world + 2 applicable internal model-form worlds + 2 control worlds.'",
+
+  "supersedes": "CANDIDATE_WORLD_APPLICABILITY_MATRIX.json (Round 135) — that version did not distinguish external from internal within APPLICABLE.",
+
+  "refined_classification": {
+    "FULLY_APPLICABLE_EXTERNAL": "The world is BOTH (a) capable of testing the candidate's mechanism AND (b) an externally maintained, independently developed solver. Only these count toward promotion-grade evidence.",
+    "FULLY_APPLICABLE_INTERNAL": "The world can test the candidate's mechanism BUT is a custom in-repository implementation. Provides model-form diversity but NOT external independent confirmation. Can generate hypotheses but cannot certify them.",
+    "CONTROL": "The world lacks the mechanism-specific physics. Provides baseline/null test. Must be resolved but does not count as mechanism pass.",
+    "NOT_APPLICABLE": "The world cannot meaningfully constrain the mechanism. Excluded with justification."
+  },
+
+  "C5_refined_matrix": {
+    "mechanism": "dD/dstrain deceleration precursor signal before thrombus fragmentation.",
+    "worlds": {
+      "WORLD_A_FEBIO": {
+        "classification": "FULLY_APPLICABLE_EXTERNAL",
+        "external": true,
+        "binary": "/home/z/FEBio/build/bin/febio4",
+        "version": "4.13.0",
+        "source": "C++ from University of Utah (github.com/febiosoftware/FEBio)",
+        "justification": "FEM + CDM + Simo CDF fracture. Externally maintained. Directly tests whether continuum damage produces the precursor. This is the primary mechanism world.",
+        "counts_for_promotion": true,
+        "current_result": "GREEN — no precursor detected (negative result)"
+      },
+      "WORLD_B_PERIDIGM_REQUIRED": {
+        "classification": "FULLY_APPLICABLE_EXTERNAL",
+        "external": true,
+        "status": "NOT_INSTALLED — Trilinos 16 API incompatibility",
+        "source": "C++ from Sandia (github.com/peridigm/peridigm)",
+        "justification": "Bond breakage via critical stretch. Fundamentally different fracture formulation. Tests load-bearing assumption A1 (is precursor a CDM artifact?).",
+        "counts_for_promotion": true,
+        "current_result": "BLOCKED — solver not built"
+      },
+      "WORLD_B_CUSTOM_PERIDYNAMIC_FORMULATION": {
+        "classification": "FULLY_APPLICABLE_INTERNAL",
+        "external": false,
+        "implementation": "Custom Python bond-based peridynamics (Silling 2000 theory)",
+        "justification": "Provides model-form diversity (bond breakage vs CDM). Can generate hypothesis about precursor survival in nonlocal formulation. CANNOT certify — same coder, same repository.",
+        "counts_for_promotion": false,
+        "current_result": "GREEN — no precursor detected (consistent with FEBio)"
+      },
+      "WORLD_C_CLOTFORM_REQUIRED": {
+        "classification": "FULLY_APPLICABLE_EXTERNAL",
+        "external": true,
+        "status": "NOT_INSTALLED — OpenFOAM-9 build at 24% (1176/~4887 .o files)",
+        "source": "C++ OpenFOAM v9 framework (github.com/ElsevierSoftwareX/SOFTX-D-23-00244)",
+        "justification": "Flow-driven platelet/coagulation dynamics. Tests load-bearing assumption A2 (does precursor survive flow-driven failure?). This is the DECISIVE test for H2.",
+        "counts_for_promotion": true,
+        "current_result": "BLOCKED — solver not built"
+      },
+      "WORLD_C_CUSTOM_FLOW_FORMULATION": {
+        "classification": "FULLY_APPLICABLE_INTERNAL",
+        "external": false,
+        "implementation": "Custom Python finite-volume flow model",
+        "justification": "Provides model-form diversity (flow vs mechanical). Generated the C5 precursor hypothesis (ONLY world with positive result). CANNOT certify — same coder, same repository. The positive result is a HYPOTHESIS, not a FINDING.",
+        "counts_for_promotion": false,
+        "current_result": "GREEN — PRECURSOR DETECTED (positive result — but suspect because custom implementation)"
+      },
+      "WORLD_D_CALCULIX": {
+        "classification": "CONTROL",
+        "external": true,
+        "binary": "/home/z/miniconda/envs/sim/bin/ccx",
+        "version": "2.23",
+        "justification": "Elastic-plastic FEM. NO fracture model. Cannot test fracture precursor. Useful as non-fracture baseline: if CalculiX shows 'precursor', it would be an artifact of elastic-plastic response.",
+        "counts_for_promotion": false,
+        "current_result": "GREEN — no precursor (correct for non-fracture model)"
+      },
+      "WORLD_E_SFEPY": {
+        "classification": "CONTROL",
+        "external": true,
+        "package": "sfepy 2026.2 (conda-forge)",
+        "justification": "Linear elastic FEM. NO damage, NO fracture, NO plasticity. d²F/dδ² = 0 everywhere by construction. Cannot detect any precursor. Null/control confirming signal requires damage physics.",
+        "counts_for_promotion": false,
+        "current_result": "GREEN — no precursor (correct for no-damage model)"
+      }
+    },
+    "summary": {
+      "fully_applicable_external": 1,
+      "fully_applicable_external_required_but_not_installed": 2,
+      "fully_applicable_internal": 2,
+      "control": 2,
+      "not_applicable": 0,
+      "promotion_grade_worlds_green": 1,
+      "promotion_grade_worlds_blocked": 2,
+      "model_form_diversity_worlds_green": 2,
+      "control_worlds_resolved": 2,
+      "honest_statement": "C5 has 1 applicable external world (FEBio, negative result) + 2 required-but-uninstalled external worlds (Peridigm, clotFoam) + 2 internal model-form worlds (custom peridynamics negative, custom flow positive — CONTRADICTION) + 2 control worlds (both correctly negative). The positive result exists ONLY in an internal custom world. G18 = PARTIAL. No promotion possible until external worlds are installed and the contradiction is resolved."
+    }
+  },
+
+  "revised_world_class_gate_v3": {
+    "rule": "WORLD_CLASS_INVENTION only when ALL of:",
+    "conditions": [
+      "all_required_research_gates = GREEN",
+      "all_FULLY_APPLICABLE_EXTERNAL_worlds = GREEN (not just INTERNAL)",
+      "all_CONTROL_worlds = resolved",
+      "G18_external_independence = GREEN (requires external worlds, not custom)",
+      "VVUQ = COMPLETE",
+      "contradictions = EMPTY",
+      "adversarial_attacks = EXHAUSTED",
+      "provenance = COMPLETE (solver commit, compiler, MPI, benchmark, raw output hashes)"
+    ],
+    "key_correction": "A custom (INTERNAL) world CANNOT substitute for an external world. Custom worlds provide model-form diversity and hypothesis generation. Only external worlds provide independent confirmation.",
+    "C5_status": "1/3 external applicable worlds GREEN. 2/3 BLOCKED. Contradiction UNRESOLVED. G18 PARTIAL. C5 = BLOCKED."
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "record_type": "LONG_RUNNING_EXPERIMENT_ORCHESTRATION_SPEC",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 136,
+  "authority": "CEO Round 136: 'clotFoam simulations can take upwards of a day. The experiment engine must support QUEUED→RUNNING→CHECKPOINTED→RESUMED→COMPLETED→FAILED→ABORTED. A tool timeout must never become EXPERIMENT_FAILED unless the solver itself failed.'",
+
+  "problem": "The current experiment engine assumes experiments complete within a single tool invocation (~10 minutes). clotFoam simulations can take hours to days. The engine must support long-running, resumable, provenance-preserving simulations.",
+
+  "experiment_lifecycle": {
+    "states": ["QUEUED", "RUNNING", "CHECKPOINTED", "RESUMED", "COMPLETED", "FAILED", "ABORTED"],
+    "transitions": {
+      "QUEUED→RUNNING": "Experiment selected by acquisition function, solver invoked",
+      "RUNNING→CHECKPOINTED": "Tool timeout or explicit checkpoint. Solver state saved.",
+      "CHECKPOINTED→RESUMED": "Next tool invocation resumes from checkpoint",
+      "RESUMED→CHECKPOINTED": "Another timeout. State saved again.",
+      "RESUMED→COMPLETED": "Solver finishes normally. Output collected.",
+      "RUNNING→FAILED": "Solver returns non-zero exit code or produces invalid output",
+      "any→ABORTED": "Human or AI explicitly aborts (e.g., solver diverged)"
+    },
+    "critical_rule": "A tool timeout is NOT a solver failure. It produces CHECKPOINTED, not FAILED. Only solver-level errors produce FAILED."
+  },
+
+  "checkpoint_protocol": {
+    "checkpoint_data": {
+      "experiment_id": "string",
+      "solver_name": "string",
+      "solver_version": "string",
+      "solver_commit": "string",
+      "input_manifest_hash": "SHA-256 of input files",
+      "parameter_manifest_hash": "SHA-256 of parameters",
+      "environment_manifest": "compiler, MPI, library versions",
+      "last_timestep_completed": "integer",
+      "checkpoint_file_hash": "SHA-256 of checkpoint file",
+      "cumulative_runtime_seconds": "float",
+      "state": "CHECKPOINTED | RESUMED | COMPLETED"
+    },
+    "checkpoint_storage": "Each experiment gets a directory under SOLVER_OUTPUT/{experiment_id}/ containing: input files, checkpoint files, partial output, and a state.json with the checkpoint data above.",
+    "resume_procedure": "On resume: (1) read state.json, (2) verify checkpoint hash, (3) invoke solver with resume flag, (4) continue from last_timestep_completed."
+  },
+
+  "provenance_chain": {
+    "required_for_completion": [
+      "solver_name + version + commit",
+      "compiler + MPI + library versions (environment manifest)",
+      "input_manifest_hash (all input files hashed)",
+      "parameter_manifest_hash",
+      "raw_output_hash (all output files hashed)",
+      "checkpoint_hash (if resumed)",
+      "cumulative_runtime (sum of all sessions)",
+      "benchmark_verification (tutorial case passes)"
+    ],
+    "purpose": "Evidence must be transferable to buyer, patent counsel, scientific reviewer, or diligence team. A world-class invention cannot depend on 'the coder happened to have a locally modified solver.'"
+  },
+
+  "resource_aware_scheduling": {
+    "acquisition_formula": "EIG × P(resolving_highest_posterior) × independence_gain × decision_impact ÷ (compute_hours + installation_friction + validation_cost)",
+    "example_C5_CONTRA_E01": {
+      "EIG": 0.95,
+      "P_resolving_H2": 0.90,
+      "independence_gain": 1.0,
+      "decision_impact": 1.0,
+      "compute_hours": 12,
+      "installation_friction": 3,
+      "validation_cost": 1,
+      "score": 0.053,
+      "interpretation": "High acquisition despite high cost — no cheaper experiment can resolve H2 with external independence."
+    },
+    "comparison_with_C5_CONTRA_E04": {
+      "EIG": 0.70,
+      "P_resolving_H2": 0.10,
+      "independence_gain": 0.0,
+      "decision_impact": 0.3,
+      "compute_hours": 0.01,
+      "installation_friction": 0,
+      "validation_cost": 0,
+      "score": 2.1,
+      "interpretation": "Cheap but low decision impact — mesh refinement in custom world doesn't resolve the core H2 question."
+    },
+    "ai_decision": "The AI should run E04 first (cheap, executable now) while E01 (expensive, requires installation) is being prepared. But E01 is the DECISIVE experiment — its completion is required for contradiction resolution."
+  }
+}

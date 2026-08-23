@@ -4268,3 +4268,39 @@ What is BLOCKED:
 - clotFoam build (blocked on OpenFOAM)
 - C5-CONTRA-E01 (actual clotFoam, blocked on clotFoam)
 - C5 contradiction resolution (blocked on C5-CONTRA-E01)
+
+---
+Task ID: ROUND-136-ENVIRONMENT-SELECTION-AND-REFINED-APPLICABILITY
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 136 — refine applicability matrix (external vs internal), build environment-selection experiment, long-running experiment orchestration spec, continue OpenFOAM build.
+
+Work Log:
+- Created REFINED_APPLICABILITY_MATRIX_V2.json:
+  * Distinguishes FULLY_APPLICABLE_EXTERNAL from FULLY_APPLICABLE_INTERNAL
+  * C5: 1 external applicable (FEBio, negative) + 2 required-external-uninstalled (Peridgm, clotFoam)
+    + 2 internal model-form (custom peridynamics negative, custom flow positive)
+    + 2 control (CalculiX, SfePy, both correctly negative)
+  * Only EXTERNAL worlds count for promotion. Custom worlds = hypothesis generation only.
+  * Revised World-Class gate v3: requires FULLY_APPLICABLE_EXTERNAL worlds GREEN
+
+- Created ENVIRONMENT_SELECTION_EXPERIMENT.json:
+  * Evaluated 4 routes: source build, conda 2412, Docker, prebuilt .deb
+  * AI selected: try .deb extraction first (fast, full fidelity), fall back to source build
+  * .deb download failed (OpenFOAM Foundation uses Ubuntu repo, not direct .deb URL)
+  * Source build is the working route (24% → 25% this session, 0 errors)
+  * Resource-aware acquisition formula: EIG × P(resolve) × independence × impact ÷ (compute + friction + validation)
+
+- Created LONG_RUNNING_EXPERIMENT_ORCHESTRATION_SPEC.json:
+  * States: QUEUED→RUNNING→CHECKPOINTED→RESUMED→COMPLETED→FAILED→ABORTED
+  * Tool timeout = CHECKPOINTED (NOT FAILED)
+  * Checkpoint protocol with hash verification
+  * Provenance chain for transferability
+
+- OpenFOAM-9 build: 1241/~4887 .o files (25%), 16 .so, 0 errors. Running in background.
+
+Stage Summary:
+- Refined applicability: C5 has 1 external applicable (not 3). 2 required-external are NOT INSTALLED.
+- Environment selection: source build is the working route. .deb/Docker/conda alternatives failed.
+- Long-running experiment spec: checkpoint/resume protocol designed.
+- OpenFOAM build at 25%, continuing.
+- 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.
