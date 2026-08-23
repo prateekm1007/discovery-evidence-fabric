@@ -4410,3 +4410,47 @@ Stage Summary:
 - C3 buyer-value chain: mapped (unmet need → advantage → economic consequence).
 - 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED (OpenFOAM still building).
 - The AI loop is now a discovery SCHEDULER, not a pipeline.
+
+---
+Task ID: ROUND-139-DUAL-SCORE-US8870787
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 139 — split scheduler into SCIENTIFIC_AQ and DECISION_AQ. Fetch and analyze US8870787B2 against C2's 7 limitations. Expand prior-art search.
+
+Work Log:
+- Created DUAL_SCORE_SCHEDULER_SPEC.json:
+  * SCIENTIFIC_AQ = EIG × hypothesis_discrimination × independence ÷ scientific_cost
+  * DECISION_AQ = P(decision_change) × consequence ÷ decision_cost
+  * Policy: SCIENTIFIC_FIRST (truth before commerce)
+  * Calibration protocol: track predicted vs actual for each experiment class
+  * Key correction: C5 parameter_independence has SCIENTIFIC_AQ=0 (internal custom, no independence)
+    but DECISION_AQ=4.5 (cheap). Under SCIENTIFIC_FIRST policy, it ranks LOW for science.
+
+- Fetched US8870787B2 claims from Google Patents:
+  * Title: "Ventricular shunt system and method"
+  * 74 claims, 5 independent claims analyzed
+  * Key claim 1: VP shunt with passive LC resonant circuit pressure sensor for
+    absolute ventricular pressure monitoring (external RF interrogation)
+  * This is MUCH more relevant than CardioMEMS — it's specifically CSF shunt pressure monitoring
+
+- Performed 7-limitation mapping against US8870787B2:
+  * L1 (continuous endovascular differential): PARTIAL — absolute ventricular, not differential; passive/external, not continuous
+  * L2 (temporal signature analysis): NO — entirely absent
+  * L3 (eShunt anatomy): NO — traditional VP shunt, not endovascular
+  * L4 (MEMS sensor): PARTIAL — passive LC circuit, not MEMS
+  * L5 (CSF-venous differential): NO — absolute ventricular only
+  * L6 (obstruction algorithm): PARTIAL — pressure monitoring but no specific algorithm
+  * L7 (5yr biocompatibility): PARTIAL — implantable but no duration specified
+  * Anticipation: NO — 0/7 fully disclosed, 3 partial, 4 absent
+  * Obviousness: WEAK TO MODERATE — combination requires cross-specialty synthesis
+  * Teaching away: PARTIAL — passive/external architecture teaches away from continuous/internal
+  * Final: PROBABLE survival, SEARCH_INCOMPLETE
+
+- OpenFOAM build restarted (1394 .o files, 28%).
+
+Stage Summary:
+- Dual-score scheduler: SCIENTIFIC_AQ separated from DECISION_AQ.
+- US8870787B2 analyzed: does NOT anticipate C2 (0/7 limitations fully disclosed).
+  But proves CSF-shunt pressure-monitoring art exists beyond Round 138 reference set.
+- C2 prior-art: 4 references now analyzed (CardioMEMS, ShuntCheck, CereVasc eShunt, US8870787).
+  All 4 do NOT anticipate. PROBABLE survival. SEARCH_INCOMPLETE.
+- 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.

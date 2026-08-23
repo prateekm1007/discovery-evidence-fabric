@@ -1,0 +1,81 @@
+{
+  "record_type": "C2_CLAIM_LEVEL_PRIOR_ART_US8870787B2",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 139,
+  "authority": "CEO Round 139: 'Add US8870787B2 to the C2 prior-art evidence set. Perform a seven-limitation claim mapping. Then perform the real attack: anticipation? obviousness? motivation to combine? teaching away?'",
+
+  "patent": {
+    "number": "US8870787B2",
+    "title": "Ventricular shunt system and method",
+    "source": "Google Patents (fetched 2026-08-23)",
+    "claim_count": 74,
+    "key_claim": "Claim 1: A ventricular shunt system comprising a catheter assembly with a valve, ventricular catheter, drainage catheter, and at least one pressure sensor mountable on a portion of the catheter assembly comprising a passive electrical resonant circuit (LC resonant circuit) configured to be electromagnetically coupled to an ex-vivo RF source, wherein the resonant circuit generates an output signal indicative of pressure in the patient's ventricle, and a sealed reservoir with non-compressible fluid."
+  },
+
+  "c2_limitations_mapping": {
+    "L1_continuous_endovascular_differential_pressure": {
+      "c2_definition": "Continuous endovascular differential pressure monitoring",
+      "us8870787_disclosure": "PARTIAL. The patent discloses a pressure sensor on a shunt catheter assembly that monitors ventricular pressure. However: (1) it monitors ABSOLUTE ventricular pressure, not DIFFERENTIAL (CSF - venous) pressure; (2) the sensor is a PASSIVE resonant circuit read by an EX-VIVO RF source (not continuous implantable monitoring — it requires external interrogation); (3) the sensor is on the catheter assembly, not specifically endovascular in the eShunt sense (the patent describes a traditional VP shunt with ventricular catheter + drainage catheter, not an endovascular transvenous approach).",
+      "anticipated": false,
+      "gap": "C2 requires DIFFERENTIAL pressure (CSF - venous) and CONTINUOUS monitoring. US8870787 monitors ABSOLUTE ventricular pressure and requires EXTERNAL RF interrogation (episodic, not continuous)."
+    },
+    "L2_temporal_signature_analysis": {
+      "c2_definition": "Temporal signature analysis (obstruction vs posture vs cough vs drift)",
+      "us8870787_disclosure": "NO. The patent does not describe any temporal pattern analysis. It discloses a pressure sensor that outputs a frequency indicative of pressure, but there is no mention of distinguishing obstruction from posture, cough, or drift based on temporal signatures.",
+      "anticipated": false,
+      "gap": "C2's temporal signature analysis (the core novelty — distinguishing obstruction from confounders by temporal pattern) is entirely absent from US8870787."
+    },
+    "L3_eShunt_specific_anatomy": {
+      "c2_definition": "eShunt-specific anatomy (endovascular CSF shunt)",
+      "us8870787_disclosure": "NO. The patent describes a traditional VP (ventriculoperitoneal) shunt with ventricular catheter + drainage catheter + valve. It does NOT describe an endovascular transvenous approach (eShunt anatomy where the shunt goes from the venous sinus to the subarachnoid space).",
+      "anticipated": false,
+      "gap": "C2 is specific to eShunt's endovascular anatomy. US8870787 is a traditional VP shunt."
+    },
+    "L4_implantable_MEMS_sensor_in_CSF": {
+      "c2_definition": "Implantable MEMS sensor in CSF environment",
+      "us8870787_disclosure": "PARTIAL. The patent discloses an implantable pressure sensor on the shunt, but it is a PASSIVE LC RESONANT CIRCUIT (inductor + capacitor), NOT a MEMS sensor. The sensing mechanism is electromagnetic resonance, not MEMS piezoresistive/capacitive. However, it IS implantable and it IS in the CSF/shunt environment.",
+      "anticipated": false,
+      "gap": "C2 uses MEMS technology; US8870787 uses passive LC resonant circuit. Different sensing technology. C2's MEMS approach enables active signal processing; US8870787's passive circuit requires external interrogation."
+    },
+    "L5_CSF_venous_differential_pressure": {
+      "c2_definition": "Differential pressure calculation (P_CSF - P_venous)",
+      "us8870787_disclosure": "NO. The patent monitors ventricular pressure (absolute). There is no mention of venous pressure, differential pressure, or any reference to the venous system. The sensor measures pressure at the ventricular catheter tip.",
+      "anticipated": false,
+      "gap": "C2's differential (CSF - venous) measurement is entirely absent. US8870787 measures absolute ventricular pressure only."
+    },
+    "L6_obstruction_detection_algorithm": {
+      "c2_definition": "Obstruction detection algorithm",
+      "us8870787_disclosure": "PARTIAL. The patent discloses monitoring pressure in a shunt system, which implicitly relates to shunt function. However, it does not describe a specific algorithm for detecting obstruction. It monitors pressure but does not describe how to interpret the pressure signal to detect obstruction vs other conditions.",
+      "anticipated": false,
+      "gap": "US8870787 provides the raw pressure data but no obstruction detection algorithm. C2's temporal signature analysis IS the obstruction detection algorithm."
+    },
+    "L7_long_term_CSF_biocompatibility": {
+      "c2_definition": "5-year CSF biocompatibility",
+      "us8870787_disclosure": "PARTIAL. The patent describes an implantable sensor in the shunt/CSF environment, which implies some biocompatibility. However, it does not specify 5-year duration or specific biocompatibility testing requirements.",
+      "anticipated": false,
+      "gap": "Biocompatibility is implied by the implantable design but not specifically claimed as a 5-year requirement."
+    }
+  },
+
+  "anticipation_assessment": {
+    "anticipated": false,
+    "rationale": "US8870787B2 does NOT anticipate C2. It discloses a VP shunt with a passive LC resonant pressure sensor for absolute ventricular pressure monitoring. C2 requires: (1) DIFFERENTIAL pressure (CSF-venous) — absent; (2) TEMPORAL SIGNATURE ANALYSIS for obstruction detection — absent; (3) eShunt ENDOVASCULAR anatomy — absent; (4) MEMS sensor — absent (uses LC circuit); (5) CONTINUOUS monitoring — absent (requires external interrogation). Of 7 limitations, 0 are fully disclosed, 3 are partial, 4 are absent."
+  },
+
+  "obviousness_assessment": {
+    "obvious": "WEAK TO MODERATE",
+    "rationale": "A POSITA working on CSF shunt pressure monitoring (the field of US8870787) could potentially be motivated to add temporal analysis and differential measurement. However: (1) the motivation to move from ABSOLUTE ventricular pressure to DIFFERENTIAL CSF-venous pressure is not obvious — it requires recognizing that venous pressure compensation is the key insight, which is C2's novel contribution; (2) the motivation to move from PASSIVE LC circuit (external interrogation) to ACTIVE MEMS (continuous monitoring) involves a fundamental architecture change; (3) the motivation to move from VP shunt to endovascular eShunt anatomy requires the eShunt-specific clinical insight. The combination would require combining US8870787 + CardioMEMS (differential) + ShuntCheck (obstruction detection) + eShunt (anatomy) — a 4-way combination with weak motivation across different clinical specialties.",
+    "motivation_to_combine": "WEAK — the key insight (differential CSF-venous pressure as the obstruction signal) is not taught by any single reference and requires cross-specialty synthesis (neurosurgery + endovascular + sensor engineering).",
+    "teaching_away": "PARTIAL — US8870787's use of passive LC circuit (requiring external interrogation) teaches AWAY from C2's continuous implantable monitoring approach. The patent's architecture is fundamentally episodic/external, while C2 is continuous/internal."
+  },
+
+  "final_verdict": {
+    "anticipated": "NO",
+    "obvious": "WEAK TO MODERATE (not clearly obvious)",
+    "survives": "PROBABLE — C2's novel contribution (continuous endovascular DIFFERENTIAL pressure with TEMPORAL SIGNATURE analysis) is not anticipated by US8870787 and the combination motivation is weak due to cross-specialty synthesis requirements.",
+    "search_status": "SEARCH_INCOMPLETE — US8870787 proves that CSF-shunt pressure-monitoring art exists beyond the Round 138 reference set. Additional references may exist in EPO, USPTO, and PatSnap databases. The search must continue.",
+    "gate_state_after": "YELLOW (PROBABLE survival, SEARCH_INCOMPLETE, new reference analyzed but not eliminating C2)",
+    "evidence_class": "SCIENTIFIC_EVIDENCE"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "record_type": "DUAL_SCORE_SCHEDULER_SPEC",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 139,
+  "authority": "CEO Round 139: 'Replace the single portfolio score with SCIENTIFIC_AQ and DECISION_AQ. The global scheduler can then choose using a documented policy rather than hiding two distinct concepts inside one number.'",
+
+  "problem": "Round 138's single portfolio score mixed scientific information gain with buyer impact and cost into one scalar. A commercially interesting experiment could outrank a scientifically decisive falsification test and distort the discovery engine.",
+
+  "dual_score_architecture": {
+    "SCIENTIFIC_AQ": {
+      "formula": "EIG × hypothesis_discrimination × independence ÷ scientific_cost",
+      "definition": "How much does this experiment change our belief about whether the mechanism is real?",
+      "inputs": {
+        "EIG": "Expected information gain about the hypothesis (entropy reduction)",
+        "hypothesis_discrimination": "Probability that this experiment discriminates the highest-posterior hypothesis from alternatives",
+        "independence": "Does this experiment use an independent source/solver/world? (0=internal, 1=external)",
+        "scientific_cost": "Compute hours + installation friction + validation cost"
+      },
+      "what_it_measures": "Scientific epistemic progress — can we trust the mechanism more after this experiment?",
+      "what_it_does_NOT_measure": "Commercial viability, buyer willingness-to-pay, market size"
+    },
+    "DECISION_AQ": {
+      "formula": "P(decision_change) × consequence ÷ decision_cost",
+      "definition": "How much does this experiment change the decision to continue/invest/sell/abandon?",
+      "inputs": {
+        "P_decision_change": "Probability that this experiment changes a go/no-go/invest/abandon decision",
+        "consequence": "Economic/strategic consequence of the decision change (dollars, time, competitive position)",
+        "decision_cost": "Cost of running the experiment (research hours, engagement effort)"
+      },
+      "what_it_measures": "Commercial/strategic decision progress — should we invest more in this candidate?",
+      "what_it_does_NOT_measure": "Whether the mechanism is physically real"
+    }
+  },
+
+  "scheduling_policy": {
+    "rule": "The scheduler records BOTH scores for every experiment. It then selects using a documented policy:",
+    "policy_options": [
+      "SCIENTIFIC_FIRST: Always execute the highest SCIENTIFIC_AQ experiment first. DECISION_AQ breaks ties.",
+      "DECISION_FIRST: Always execute the highest DECISION_AQ experiment first. SCIENTIFIC_AQ breaks ties.",
+      "BALANCED: Execute the experiment with the highest product SCIENTIFIC_AQ × DECISION_AQ.",
+      "PORTFOLIO_BALANCED: Ensure that at least one scientific and one decision experiment are always in progress."
+    ],
+    "default_policy": "SCIENTIFIC_FIRST — the discovery engine's primary purpose is finding truth, not maximizing commercial return. Scientific falsification takes priority. Decision-value experiments run in parallel or when scientific experiments are blocked.",
+    "rationale": "Per Article I (evidence precedes assertion): scientific evidence must come before commercial claims. Per Article XXVIII (no silent semantic promotion): buyer-value assumptions cannot increase mechanism confidence."
+  },
+
+  "applied_to_current_portfolio": {
+    "C2_claim_level_prior_art": {
+      "SCIENTIFIC_AQ": "0.85 × 0.40 × 0.5 ÷ 0.2 = 0.850",
+      "DECISION_AQ": "0.40 × 0.6 ÷ 0.2 = 1.200",
+      "policy_note": "High SCIENTIFIC (prior-art survival is a science gate) and high DECISION (affects IP strategy)"
+    },
+    "C5_actual_clotfoam": {
+      "SCIENTIFIC_AQ": "0.95 × 0.90 × 1.0 ÷ 16 = 0.0534",
+      "DECISION_AQ": "0.90 × 1.0 ÷ 16 = 0.0563",
+      "policy_note": "Highest SCIENTIFIC per independence but high cost. BLOCKED on OpenFOAM."
+    },
+    "C5_parameter_independence": {
+      "SCIENTIFIC_AQ": "0.75 × 0.15 × 0.0 ÷ 0.01 = 0.000 (independence=0, custom world)",
+      "DECISION_AQ": "0.15 × 0.3 ÷ 0.01 = 4.500",
+      "policy_note": "Low SCIENTIFIC (internal custom world, no independence) but high DECISION (cheap, fast). Under SCIENTIFIC_FIRST policy, this ranks LOW."
+    },
+    "C1_reality_blocker_stride": {
+      "SCIENTIFIC_AQ": "0.95 × 0.80 × 1.0 ÷ 999 = ~0 (BLOCKED, infinite cost)",
+      "DECISION_AQ": "0.80 × 1.0 ÷ 999 = ~0 (BLOCKED)",
+      "policy_note": "Highest EIG but REALITY-BLOCKED. Scheduler should not attempt to execute."
+    },
+    "C3_buyer_value_chain": {
+      "SCIENTIFIC_AQ": "0.0 (buyer-value is DECISION class, not SCIENTIFIC)",
+      "DECISION_AQ": "0.35 × 0.9 ÷ 0.1 = 3.150",
+      "policy_note": "Pure DECISION experiment. Under SCIENTIFIC_FIRST policy, runs only when scientific experiments are blocked."
+    }
+  },
+
+  "calibration_requirement": {
+    "rule": "Do not permanently hard-code P(success) or P(decision_change) without calibration.",
+    "calibration_protocol": {
+      "for_each_completed_experiment": [
+        "Record: predicted_EIG, actual_epistemic_change, predicted_decision_impact, actual_decision_change, resource_cost, surprise",
+        "Update: if predicted > actual consistently for an experiment class, lower future predictions for that class",
+        "Learn: which experiment classes systematically outperform their forecasts"
+      ],
+      "calibration_metrics": [
+        "EIG_calibration: predicted_EIG / actual_epistemic_change (should approach 1.0)",
+        "decision_calibration: predicted_decision_change / actual_decision_change",
+        "cost_calibration: predicted_cost / actual_cost",
+        "surprise_rate: fraction of experiments whose outcome was outside the predicted distribution"
+      ]
+    },
+    "current_status": "NOT YET CALIBRATED — all probabilities are model-assigned. The scheduler is a useful prioritization tool but not yet a learning system. Calibration begins when enough experiments have been completed to form a statistical baseline."
+  }
+}
