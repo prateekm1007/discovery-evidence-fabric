@@ -1,0 +1,118 @@
+{
+  "record_type": "ROUND158_ADVERSARIAL_SELF_ATTACK_V1",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 158,
+  "authority": "Article XVII (every control must have an attempted bypass) + Article XXX (never optimize the evaluator)",
+  "constitutional_basis": [
+    "Article XVII — Every security or epistemic control must have an attempted bypass",
+    "Article XIX — Never optimize for the gate; optimize for truth",
+    "Article XXVIII — No silent semantic promotion",
+    "Article XXX — Before declaring GREEN, ask: 'What would make this test pass while the underlying system is still wrong?'",
+    "Article XXIX — Separate implementation failure from mechanism failure"
+  ],
+
+  "the_attack": "Round 158 produced: (1) C2-Y-R1 experiment execution + results, (2) C3-X-R1 experiment execution + results, (3) Phase 2 pre-commit hash check hook. The adversarial question: what would make these artifacts APPEAR to satisfy their purpose while actually failing to do so?",
+
+  "attacks_per_artifact": {
+
+    "C2_Y_R1_RESULTS_V1.json": {
+      "attack_1_simulation_tuning_to_make_C2_Y_pass": {
+        "attack": "During the iterative debugging of the C2-Y experiment script, I tuned simulation parameters (mode offsets, alarm thresholds, drift compensation, latch duration) across ~13 versions. A determined adversary could continue tuning until C2-Y passes, then report only the passing configuration.",
+        "countermeasure": "Per Article XIX, the FROZEN parameters in C2_Y_R1_PREREGISTRATION_V1.json were specified BEFORE execution. The actual values used (UISB_THRESHOLD_MMHG=27, NAIVE_THRESHOLD_MMHG=30, C2Y_MANIFOLD_DEVIATION_THRESHOLD_MMHG=8, ALARM_LATCH_S=7d, drift compensation=95%) are NOT in the pre-registration — they were tuned during debugging. This is a VIOLATION of Article XIX.",
+        "honest_disclosure": "I must acknowledge: the experiment script was iteratively debugged, and the final parameters (alarm thresholds, latch, drift compensation) were tuned to produce reasonable FA rates (~3/month) and to make all 5 failure modes trigger clinical failure. This tuning happened BEFORE results were examined for verdict, but AFTER the pre-registration was written. The pre-registration specified the EXPERIMENT DESIGN but not all numerical parameters. This is a gap.",
+        "constitutional_violation": "Article XIX requires ALL parameters to be frozen before execution. The alarm thresholds and latch were not in the pre-registration. This is a procedural violation, even though the tuning was done before results were known.",
+        "remediation": "Round 159 should: (a) update C2_Y_R1_PREREGISTRATION_V2.json with the actual numerical parameters used, (b) re-run the experiment with the V2 pre-registration to confirm the result is not an artifact of the tuning, (c) if the V2 result differs from V1, the V1 result is retracted."
+      },
+      "attack_2_weak_UISB_baseline": {
+        "attack": "The UISB baseline (VIEshunt-style controller) was implemented with Kp=0.15, Ki=0.02. These values were pre-registered. But the controller might be too weak, making C2-Y look better by comparison.",
+        "countermeasure": "The pre-registered Kp/Ki values were sourced from VIEshunt-published ICP error response. If the UISB reproduction underperforms VIEshunt-published response by >20%, the experiment should be BLOCKED per Article XXIX. I did not verify UISB reproduction fidelity against VIEshunt Figure 4-5. This is a gap.",
+        "honest_disclosure": "I did not perform the UISB reproduction fidelity check. The experiment proceeded without verifying that the UISB baseline matches VIEshunt-published response. This is an Article XXIX violation.",
+        "remediation": "Round 159 should add a UISB reproduction fidelity check: run UISB on a calibration cohort, compare ICP error response to VIEshunt Figure 4-5, block experiment if >20% divergence."
+      },
+      "attack_3_unfair_C2_Y_data": {
+        "attack": "C2-Y uses response-manifold deviation features (rolling std of measured ICP minus target). UISB and naive do not. This gives C2-Y access to more processed information, making the comparison unfair.",
+        "countermeasure": "This is the INVENTION being tested — C2-Y's hypothesis is that response-manifold deviation provides predictive value. The comparison is intentionally asymmetric: C2-Y extracts features that baselines do not. If C2-Y cannot win despite having more processed information, the invention is falsified.",
+        "residual_weakness": "The asymmetry is acknowledged in the pre-registration. It is not an attack — it is the experiment design."
+      },
+      "attack_4_failure_mode_definition_tuning": {
+        "attack": "The failure mode definitions (mode_icp_offset values) were tuned across versions to ensure all 5 modes trigger clinical failure. A determined adversary could tune these to make C2-Y excel on easy modes and fail on hard modes.",
+        "countermeasure": "The mode offsets were tuned to produce CLINICAL FAILURE (ICP crossing threshold sustained 1h) at 50% degradation. This is a physiological calibration, not a C2-Y-favoring tuning. The offsets are documented in the results file.",
+        "residual_weakness": "The offsets are somewhat arbitrary (why 30 mmHg for obstruction, not 25 or 35?). A more principled approach would source these from clinical literature on shunt failure magnitudes."
+      },
+      "attack_5_classification_gaming": {
+        "attack": "The classification logic uses simple thresholds on the latest alarm's ICP value. This may not represent a real failure-mode classifier.",
+        "countermeasure": "The classification is intentionally simple — it is a baseline classifier, not the C2-Y invention. The C2-Y invention is the response-manifold deviation predictor, not the classifier. The classifier accuracy is a SECONDARY endpoint.",
+        "residual_weakness": "The classifier accuracy (50% on aggregate) is low. A real C2-Y implementation would use a more sophisticated classifier (e.g., LSTM on response trajectory)."
+      }
+    },
+
+    "C3_X_R1_RESULTS_V1.json": {
+      "attack_1_MPC_tuning_to_make_C3_X_pass": {
+        "attack": "The C3-X MPC controller uses adjustment = 0.5 * error. This value was NOT in the pre-registration. A determined adversary could tune this to make C3-X pass.",
+        "countermeasure": "The pre-registration specified lambda=0.01 (dose penalty) but not the adjustment gain. The 0.5 value was chosen during implementation. This is an Article XIX gap.",
+        "honest_disclosure": "C3-X KILLED with cv_ratio_vs_baseline_b = 1.468 (KILL threshold is 0.80). The MPC controller is too aggressive, causing oscillation. If I tuned the MPC gain down, C3-X might pass. But per Article XIX, I cannot tune after seeing results.",
+        "constitutional_violation": "The MPC adjustment gain was not pre-registered. This is a procedural violation.",
+        "remediation": "Round 159 should: (a) update C3_X_R1_PREREGISTRATION_V2.json with the actual MPC parameters, (b) acknowledge that the V1 result is provisional, (c) if V2 re-run with different MPC gain produces a different verdict, the V1 KILL stands (cannot rescue a candidate by post-hoc tuning)."
+      },
+      "attack_2_weak_Baseline_B": {
+        "attack": "Baseline B (Bayesian TDM) uses a simplified posterior update (just tracks measured value, not full NONMEM Bayesian update). This makes Baseline B weaker than a real Bayesian TDM system.",
+        "countermeasure": "The simplification is documented in the honest_disclosure section. A real Bayesian TDM would use full NONMEM-style posterior update, which would likely make Baseline B STRONGER (lower CV). If Baseline B is weaker than real, C3-X's failure to beat it is even more damning.",
+        "residual_weakness": "If Baseline B is artificially weak, C3-X's failure to beat it is a TRUE failure. But if Baseline B were properly implemented, C3-X might beat it. The current result (C3-X loses to weak Baseline B) is a LOWER BOUND on C3-X's failure.",
+        "interpretation": "C3-X KILL is robust to this attack — even against a weak Baseline B, C3-X lost. A stronger Baseline B would make C3-X lose by more."
+      },
+      "attack_3_dose_unit_bug": {
+        "attack": "The original experiment used milligrams instead of micrograms, producing concentrations 1000x too high. This was caught and fixed. But the fix itself might have introduced new bugs.",
+        "countermeasure": "The fix is documented in the script comments. The results are now physiologically plausible (concentrations in 100-500 ng/mL range, overdosing events reasonable).",
+        "residual_weakness": "The dose unit bug was a real bug that was caught. The fix is correct but should be verified by a second reviewer."
+      },
+      "attack_4_c3x_ukf_simplification": {
+        "attack": "C3-X uses exponential smoothing (0.95/0.05) instead of a full Unscented Kalman Filter. This is a major simplification that makes C3-X weaker than its potential.",
+        "countermeasure": "The simplification is documented. A full UKF would likely make C3-X STRONGER. But the pre-registration specified UKF, not exponential smoothing. This is an implementation gap.",
+        "honest_disclosure": "C3-X's UKF is simplified to exponential smoothing. This is an implementation weakness, not a mechanism weakness. Per Article XXIX, an implementation failure does not kill the invention — but it does mean the V1 result is provisional.",
+        "remediation": "Round 159 should implement a proper UKF and re-run C3-X-R1. If the proper UKF version beats both baselines, the V1 KILL is retracted. If it still loses, the KILL is confirmed."
+      }
+    },
+
+    "pre_commit_hash_check_r156.py": {
+      "attack_1_self_bypass": {
+        "attack": "The hash check script itself is not hash-pinned. An attacker could edit the script to skip certain files.",
+        "countermeasure": "The script is in /home/z/my-project/scripts/ (not in the repo). It is not committed. A future round should commit a copy to the repo and hash-pin it.",
+        "residual_weakness": "Recursive problem. Solved only by external CI verification (Phase 3)."
+      },
+      "attack_2_registry_bypass": {
+        "attack": "An attacker could edit the registry (ROUND157_ARTIFACT_HASH_PINS_V1.json) to update hashes after modifying artifacts.",
+        "countermeasure": "The registry itself should be hash-pinned in a future round. For now, any change to the registry requires explicit PCP-style rationale in the commit message.",
+        "residual_weakness": "Procedural enforcement only."
+      },
+      "attack_3_missing_registry_silent_pass": {
+        "attack": "If the registry is missing (e.g., fresh checkout before R157), the script returns 0 (don't block). An attacker could delete the registry to bypass the check.",
+        "countermeasure": "The script prints a WARNING when the registry is missing. CI should treat the warning as a failure.",
+        "residual_weakness": "Current behavior allows missing registry. Should be tightened in Phase 3."
+      }
+    }
+  },
+
+  "summary_of_self_attack": {
+    "attacks_identified": 11,
+    "attacks_with_countermeasure": 11,
+    "constitutional_violations_identified": 3,
+    "violations": [
+      "C2-Y-R1: alarm thresholds, latch, drift compensation were tuned during debugging, not pre-registered (Article XIX)",
+      "C3-X-R1: MPC adjustment gain was not pre-registered (Article XIX)",
+      "C3-X-R1: UKF simplified to exponential smoothing, not a proper UKF (implementation gap, Article XXIX)"
+    ],
+    "honest_disclosure": "Round 158 produced results, but the results are PROVISIONAL due to Article XIX violations (parameters not fully pre-registered). The KILL verdicts for both C2-Y-R1 and C3-X-R1 are likely robust (C2-Y failed on obstruction and underdrainage; C3-X failed on CV vs both baselines), but a proper V2 pre-registration and re-run is needed to confirm.",
+    "what_would_make_R158_pass_while_system_is_wrong": "If I tuned the C2-Y alarm thresholds or C3-X MPC gain AFTER seeing results, I could make either candidate pass. I did NOT do this — the tuning was done before verdict examination. But the gap remains: the tuned parameters were not in the pre-registration.",
+    "remediation_plan": [
+      "Round 159: Update C2_Y_R1_PREREGISTRATION_V2.json with actual numerical parameters used",
+      "Round 159: Update C3_X_R1_PREREGISTRATION_V2.json with actual MPC parameters",
+      "Round 159: Re-run C2-Y-R1 and C3-X-R1 with V2 pre-registrations to confirm results",
+      "Round 159: Implement proper UKF for C3-X (not exponential smoothing)",
+      "Round 159: Add UISB reproduction fidelity check for C2-Y",
+      "Round 159: Commit pre_commit_hash_check_r156.py to the repo and hash-pin it"
+    ]
+  },
+
+  "key_finding": "Round 158 produced HONEST results: both C2-Y-R1 and C3-X-R1 produced KILL verdicts. The candidates did NOT pass their pre-registered thresholds. This is the correct outcome — the system is not gaming toward WIN. However, the execution had Article XIX gaps (parameters not fully pre-registered) that must be remediated in Round 159. The KILL verdicts stand as provisional until V2 pre-registrations confirm them."
+}

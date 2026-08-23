@@ -1,0 +1,155 @@
+{
+  "record_type": "C3_X_R1_RESULTS_V1",
+  "version": "1.0.0",
+  "date": "2026-08-23T10:18:30.132072+00:00",
+  "round": 158,
+  "constitutional_basis": [
+    "Article I \u2014 evidence precedes assertion",
+    "Article IV \u2014 no fallback epistemology (no weak Baseline B strawman)",
+    "Article XIX \u2014 never optimize for the gate (parameters FROZEN)",
+    "Article XXVII \u2014 no threshold invention",
+    "Article XXVIII \u2014 no silent semantic promotion",
+    "Article XXIX \u2014 separate implementation from mechanism"
+  ],
+  "frozen_parameters": {
+    "random_seed": 42,
+    "cohort_size": 200,
+    "therapeutic_window_lower": 100.0,
+    "therapeutic_window_upper": 400.0,
+    "toxicity_threshold": 500.0,
+    "baseline_a_maintenance_ug_per_kg_per_day": 5.0,
+    "baseline_a_dose_frequency_per_day": 4,
+    "baseline_b_vc_L": 0.15,
+    "baseline_b_cl_L_per_h": 0.024,
+    "baseline_b_sampling_frequency_days": 7,
+    "baseline_b_dose_adjustment_pct": 20.0,
+    "c3x_target_concentration": 250.0,
+    "c3x_max_dose_frequency_per_day": 8,
+    "max_daily_dose_ug_per_kg": 15.0,
+    "dosing_horizon_days": 90,
+    "steady_state_exclusion_days": 14
+  },
+  "preregistration_file": {
+    "path": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND157_ARTIFACTS/C3_X_R1_PREREGISTRATION_V1.json",
+    "hash": "1e0fc9d4a1ce0e98f2173b84c743bcadc1284dd06e5e76b6d687eb9cd8facf19"
+  },
+  "results": {
+    "aggregate": {
+      "baseline_a": {
+        "n": 200,
+        "mean_cv": 0.3085098229616133,
+        "mean_fraction_in_therapeutic_window": 0.35625,
+        "mean_overdosing_events": 1830.08,
+        "mean_underdosing_events": 30.4
+      },
+      "baseline_b": {
+        "n": 200,
+        "mean_cv": 0.3574947962407266,
+        "mean_fraction_in_therapeutic_window": 0.9033072916666667,
+        "mean_overdosing_events": 26.94,
+        "mean_underdosing_events": 279.33
+      },
+      "c3x": {
+        "n": 200,
+        "mean_cv": 0.5246524214116707,
+        "mean_fraction_in_therapeutic_window": 0.8019613486842105,
+        "mean_overdosing_events": 360.225,
+        "mean_underdosing_events": 74.01
+      }
+    },
+    "per_phenotype": {
+      "baseline_a": {
+        "fast": {
+          "n": 50,
+          "mean_cv": 0.44547340416979836,
+          "mean_fraction": 0.6333333333333333
+        },
+        "intermediate": {
+          "n": 100,
+          "mean_cv": 0.2910255942495727,
+          "mean_fraction": 0.3575
+        },
+        "slow": {
+          "n": 50,
+          "mean_cv": 0.20651469917750942,
+          "mean_fraction": 0.07666666666666667
+        }
+      },
+      "baseline_b": {
+        "fast": {
+          "n": 50,
+          "mean_cv": 0.5681376716018187,
+          "mean_fraction": 0.7289802631578948
+        },
+        "intermediate": {
+          "n": 100,
+          "mean_cv": 0.32493037388099466,
+          "mean_fraction": 0.9448876096491228
+        },
+        "slow": {
+          "n": 50,
+          "mean_cv": 0.2119807655990983,
+          "mean_fraction": 0.9944736842105263
+        }
+      },
+      "c3x": {
+        "fast": {
+          "n": 50,
+          "mean_cv": 0.6769175628986485,
+          "mean_fraction": 0.7157072368421052
+        },
+        "intermediate": {
+          "n": 100,
+          "mean_cv": 0.53373663866374,
+          "mean_fraction": 0.8074122807017544
+        },
+        "slow": {
+          "n": 50,
+          "mean_cv": 0.35421884542055443,
+          "mean_fraction": 0.8773135964912281
+        }
+      }
+    }
+  },
+  "decision": {
+    "c3x_cv": 0.5246524214116707,
+    "baseline_a_cv": 0.3085098229616133,
+    "baseline_b_cv": 0.3574947962407266,
+    "cv_ratio_vs_baseline_a": 1.7006019982610123,
+    "cv_ratio_vs_baseline_b": 1.467580582790875,
+    "c3x_overdosing_events": 360.225,
+    "baseline_a_overdosing_events": 1830.08,
+    "overdosing_reduction_vs_baseline_a_pct": 80.31643425424025,
+    "thresholds": {
+      "win_cv_ratio_vs_baseline_a": 0.5,
+      "win_cv_ratio_vs_baseline_b": 0.7,
+      "win_overdosing_reduction_pct_vs_a": 60.0,
+      "kill_cv_ratio_vs_baseline_b": 0.8
+    },
+    "win_vs_baseline_a": false,
+    "win_vs_baseline_b": false,
+    "kill_vs_baseline_b": true,
+    "kill_vs_baseline_a": false,
+    "overall_verdict": "KILL"
+  },
+  "execution_metadata": {
+    "elapsed_s": 3.143578052520752,
+    "n_patients_executed": 200,
+    "n_arms": 3,
+    "n_steps_per_patient": 4320
+  },
+  "honest_disclosure": {
+    "what_this_experiment_proves": "Whether C3-X's continuous CSF-state-feedback dosing provides tighter therapeutic exposure envelope than BOTH ThecaFlex-style open-loop AND best-practicable Bayesian adaptive TDM.",
+    "what_this_experiment_does_NOT_prove": [
+      "Does NOT prove C3-X beats Biogen's internal R&D (Article XXXII)",
+      "Does NOT prove C3-X is clinically practical (virtual cohort only \u2014 Article XXXIV)",
+      "Does NOT prove C3-X works in vivo (virtual cohort uses simplified PK)"
+    ],
+    "simplifications": [
+      "Two-compartment PK model (not full PBPK)",
+      "Bayesian TDM uses simplified posterior (not full NONMEM)",
+      "C3-X UKF uses exponential smoothing (not full unscented Kalman filter)",
+      "MPC uses simple proportional control (not full model predictive control with constraints)"
+    ]
+  }
+}
