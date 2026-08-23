@@ -3841,3 +3841,41 @@ Stage Summary:
 - **Next move:** Install Peridgm to enable cross-world comparison for C5. Implement
   full VTK parsing for damage field observables. Implement G18 file-hash comparison
   using FEBio source at /home/z/FEBio/.
+
+---
+Task ID: ROUND-130-COMPLETE-SCIENTIFIC-LOOP
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 130 directives — complete the real scientific loop. Fix experiment identity (canonical hash). Replace fake EIG with outcome-based EIG. Implement real C5 observable (damage field → dD/dstrain → precursor). Run all 5 candidates. G18 file-hash comparison.
+
+Work Log:
+- Checked for Peridigm/clotFoam/svFSI: NOT installable. Trilinos (Peridigm dependency), OpenFOAM, Docker all unavailable. Honestly reported as BLOCKED.
+
+- Implemented experiment_engine_v4.py with P0 fixes:
+  1. CANONICAL EXPERIMENT IDENTITY: compute_canonical_experiment_hash() over 12 dimensions (candidate, hypothesis, gate, world, solver, formulation, parameters, geometry, BCs, ICs, seed, protocol). Same hash = repeat, not new experiment. is_duplicate_experiment() check prevents counting duplicates as new evidence.
+  2. REAL EIG: compute_real_eig() implements outcome-based EIG. Enumerates outcomes (signal/no_signal), computes P(outcome|hyp), posterior for each outcome, entropy, expected posterior entropy, EIG = prior_entropy - expected_posterior_entropy. No more 50% assumption.
+  3. MULTI-STEP FEBIO: create_multi_step_feb() generates 50-timestep .feb with <var type="damage"/> output. Prescribed displacement ramps to max_strain=0.5.
+  4. C5 OBSERVABLE: parse_febio_damage_evolution() parses VTK/log for D_values, computes dD/dstrain, finds precursor onset (peak), D_critical crossing, lead time. (Parser finds limited data from single-element model — honest limitation documented.)
+  5. G18 FILE-HASH: compute_g18_file_hash_independence() hashes actual FEBio source files at /home/z/FEBio/. Result: BLOCKED (only 1 world installed).
+  6. ALL 5 CANDIDATES: C1, C2, C3 executed with 3 distinct experiments each. C4 carried as CARRIED_FORWARD_TERMINAL_STATE. C5 executed with 3 distinct experiments.
+
+- Executed engine v4. Results:
+  * C1: 3 distinct FEBio simulations. BLOCKED_BY_MISSING_EVIDENCE.
+  * C2: 3 distinct FEBio simulations. BLOCKED_BY_MISSING_EVIDENCE.
+  * C3: 3 distinct FEBio simulations. BLOCKED_BY_MISSING_EVIDENCE.
+  * C4: CARRIED_FORWARD_TERMINAL_STATE. KILLED_BY_EVIDENCE. Not re-run.
+  * C5: 3 distinct FEBio simulations. BLOCKED_BY_MISSING_EVIDENCE.
+  * Total: 12 distinct real FEBio simulations across 4 non-terminal candidates.
+  * All 5 candidates processed: True.
+
+- Honest limitations:
+  * Peridgm/clotFoam/svFSI NOT installable (dependencies unavailable).
+  * C5 damage parser finds limited data (single-element model reaches D=1.0 quickly).
+  * G18 BLOCKED (only 1 world installed).
+  * Physical experiments NOT executed.
+  * CI NOT done.
+
+Stage Summary:
+- All 5 candidates processed with distinct experiment identity and real EIG.
+- 12 distinct real FEBio simulations.
+- C4 correctly carried as terminal (CARRIED_FORWARD_TERMINAL_STATE).
+- 0/5 WORLD_CLASS_INVENTION. 1/5 KILLED. 4/5 BLOCKED.
