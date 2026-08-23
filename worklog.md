@@ -5399,3 +5399,45 @@ Stage Summary:
 - C5 competitor map: thrombectomy + digital twin landscape identified.
 - Moat taxonomy: 6 moat types defined (technical, data, model, workflow, integration, IP).
 - 0/5 WORLD_CLASS. Portfolio EMPTY. 2 KILLED. 3 INVESTIGATION. 7 in discovery queue.
+
+---
+Task ID: ROUND-155-COMPETITOR-EPISTEMOLOGY-AND-BASELINE-SPECS
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 155 — competitor capability epistemology (DEMONSTRATED/INFERRED/UNKNOWN), competitor-baseline experiment specs, COMPETITIVE_BASELINE_SUPERIORITY gate.
+
+Work Log:
+- Added COMPETITOR_CAPABILITY_EPISTEMOLOGY:
+  * 4 statuses: DEMONSTRATED, DISCLOSED_IN_DEVELOPMENT, INFERRED, UNKNOWN
+  * Rule: never convert UNKNOWN to CANNOT_DO. Use 'NO_PUBLIC_EVIDENCE_OF_CAPABILITY'.
+  * Corrected R154 claims:
+    - VIEshunt 'cannot predict failure' → 'NO_PUBLIC_EVIDENCE of prediction (UNKNOWN)'
+    - ThecaFlex 'is open-loop' → 'DEMONSTRATED open-loop + UNKNOWN internal intelligence'
+    - Nature ICP monitor 'cannot interpret' → 'DEMONSTRATED basic failure detection + UNKNOWN prediction'
+
+- Built 3 competitor-baseline experiment specs:
+  1. C2-Y vs VIEshunt: lead-time advantage test
+     - Baseline: VIEshunt-like adaptive control (DEMONSTRATED)
+     - WIN: >24h lead time + <1 FA/month + >70% failure-mode accuracy
+     - KILL: <4h lead time OR >3 FA/month
+  2. C3-X vs ThecaFlex: closed-loop advantage test
+     - Baseline: ThecaFlex-like open-loop (DEMONSTRATED)
+     - WIN: concentration CV <50% of open-loop + >60% overdosing reduction
+     - KILL: CV >80% of open-loop OR no significant reduction
+  3. C5-X vs best-public-thrombus-prediction: prediction accuracy test
+     - Baseline: best public computational approach (DEMONSTRATED academic)
+     - WIN: AUROC >0.85 + survives clotFoam + actionable intervention
+     - KILL: AUROC <0.70 OR does not survive clotFoam
+
+- Added COMPETITIVE_BASELINE_SUPERIORITY to World-Class gate:
+  * Now 8 conditions (was 7)
+  * New: must demonstrate material advantage over strongest publicly demonstrated alternative
+  * 'Why does the world need this if the best existing system does almost the same thing?'
+  * All 8 required, no compensation between dimensions
+
+- OpenFOAM: restarted in background (1394 .o files, 28%).
+
+Stage Summary:
+- Competitor epistemology: DEMONSTRATED/INFERRED/UNKNOWN — no false CANNOT_DO claims.
+- 3 competitor-baseline experiment specs with pre-registered thresholds.
+- World-Class gate v3: 8 conditions including COMPETITIVE_BASELINE_SUPERIORITY.
+- 0/5 WORLD_CLASS. Portfolio EMPTY (sacred). 2 KILLED. 3 INVESTIGATION. 7 in queue.
