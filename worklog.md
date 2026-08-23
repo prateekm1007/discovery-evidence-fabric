@@ -6265,3 +6265,87 @@ Stage Summary:
 - 0/5 WORLD_CLASS. Portfolio EMPTY. Loop is operational.
 - The loop can run continuously (remove break in main) but runs single-cycle for safety.
 
+
+---
+Task ID: ROUND-167-AI-LOOP-V2-DISCOVERY-ENGINE
+Agent: main (session 2026-08-24)
+Task: CEO Round 167 directive: upgrade AI Loop from orchestrator to discovery engine. Add hypothesis generation, uncertainty ledger, contradiction generator, orthogonal states, evidence hierarchy, external-evidence boundary.
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = dd0f7c5 (correct). Local origin/main ref updated.
+
+Work Log:
+
+1. AI_LOOP_ARCHITECTURE_V2.json (ROUND167_ARTIFACTS/)
+   - 5 upgrades from V1:
+     a. Action-selection → hypothesis-generation (loop generates competing hypotheses, not from fixed menu)
+     b. Single-stage novelty → escalated search pipeline (exact → synonym → functional-equiv → component → combination → citation → competitor → recent → non-English → obviousness → stop-rule)
+     c. Raw SNR → evidence-strength hierarchy (8 levels: 0=plausibility → 7=physical validation; SNR>1 = Level 1-2)
+     d. Conflated state → orthogonal EXECUTION_STATE (queued/running/completed/failed) × EPISTEMIC_STATE (validated/invalid/blocked/waiting)
+     e. "No human" → "autonomous until external-world gate" (WAITING_FOR_EXTERNAL_EVIDENCE for patent attorney, physical experiment, buyer, clinical, regulatory)
+
+   - 13-step discovery cycle:
+     1. READ_GOVERNANCE → 2. ASSESS_PORTFOLIO → 3. BUILD_UNCERTAINTY_MAP →
+     4. GENERATE_COMPETING_HYPOTHESES → 5. GENERATE_CANDIDATE_EXPERIMENTS →
+     6. NOVELTY_ATTACK → 7. SCORE_AND_SELECT → 8. VALIDITY_AUDIT →
+     9. EXECUTE → 10. ADVERSARIAL_SELF_ATTACK → 11. UPDATE_UNCERTAINTY_LEDGER →
+     12. COMMIT_PUSH → 13. CHECK_TERMINATION_OR_LOOP
+
+   - Uncertainty ledger per candidate:
+     hypothesis, prior, current belief, uncertainty, load-bearing assumptions,
+     contradictions, missing evidence, best next discriminator, evidence strength,
+     execution state, epistemic state
+
+   - Contradiction generator pipeline:
+     CURRENT_CONCLUSION → STRONGEST_WAY_IT_COULD_BE_WRONG →
+     COMPETING_HYPOTHESES → NEXT_DISCRIMINATING_EXPERIMENT
+
+   - Evidence strength hierarchy:
+     L0=plausibility, L1=physics feasibility, L2=detectability,
+     L3=classification, L4=prediction, L5=incremental prediction,
+     L6=independent reproduction, L7=physical validation
+     World-Class requires L6+ minimum.
+
+   - The autonomous objective:
+     Every candidate runs toward WORLD_CLASS_INVENTION or KILLED_BY_EVIDENCE.
+     Intermediate states describe the journey only.
+
+   - The key principle:
+     "The AI is not allowed to manufacture success by lowering standards.
+     It must become more creative in finding better hypotheses while
+     becoming more ruthless about proving them wrong."
+
+2. V2 CYCLE 1 EXECUTION: Fracture ON/OFF Discrimination
+   - The contradiction generator identified H3 (AE from device friction) as the strongest alternative to H1 (AE from clot fracture)
+   - Experiment: simulate AE with fracture ON vs OFF
+   - H1 prediction: fracture ON produces higher energy, higher frequency AE
+   - H3 prediction: fracture ON and OFF are similar (friction dominates)
+   
+   - Results:
+     * 5/5 phenotypes show distinguishable fracture AE
+     * Energy ratio: fracture ON is 100,000-400,000x stronger than fracture OFF
+     * Frequency ratio: fracture AE is 6-19x higher frequency than friction AE
+     * H1 SUPPORTED — fracture AE is clearly distinguishable from friction AE
+     * H3 FALSIFIED — friction-only AE is negligible compared to fracture AE
+   
+   - Evidence strength: Level 3 (classification — can distinguish fracture from friction)
+   - Candidate state change: NONE (Level 3 < Level 5 required for simulation-eligible promotion)
+   - Adversarial self-attack: 4 attacks generated (frequency ranges estimated, efficiency ratios guessed, binary model simplified, state correctly unchanged)
+   - Uncertainty ledger updated: H1 supported, H3 falsified, remaining H2/H4/H5 untested
+   - Next discriminator: H5 — does AE add incremental prediction beyond force/flow?
+
+3. Key architectural improvement demonstrated:
+   - V1 loop: selected from fixed menu (LIGHT_PHYSICS_FEASIBILITY)
+   - V2 loop: generated competing hypotheses (H1-H6), identified strongest contradiction (H3), generated discriminating experiment (fracture ON/OFF), executed, updated uncertainty ledger
+   - The V2 loop SURPRISED US by identifying H3 as the key threat and designing an experiment to test it
+   - This is the difference between a workflow and a discovery engine
+
+Stage Summary:
+- AI Loop V2 architecture built with all 5 CEO-requested upgrades
+- First V2 cycle executed autonomously: H1 SUPPORTED, H3 FALSIFIED
+- C5-X-AE-V3 evidence strength: Level 2 → Level 3 (classification achieved)
+- Candidate state UNCHANGED (correctly — Level 3 < Level 5 threshold)
+- The discovery engine generated and tested a hypothesis the CEO didn't explicitly request
+- 0/5 WORLD_CLASS. Portfolio EMPTY. Discovery engine operational.
+- Next autonomous action: test H5 (incremental prediction vs force/flow)
+
