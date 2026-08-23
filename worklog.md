@@ -5943,3 +5943,69 @@ Stage Summary:
 - 0/5 WORLD_CLASS. Portfolio EMPTY (sacred). No candidate eligible for simulation yet.
 - Next: Deep novelty search on C5-X-acoustic-emission (IVUS, intravascular AE)
 
+
+---
+Task ID: ROUND-162-DEEP-NOVELTY-SEARCH-C5X-ACOUSTIC-EMISSION
+Agent: main (session 2026-08-24)
+Task: Execute Round 162 — DEEP novelty search on C5-X-acoustic-emission. The Round 161 broad search reached novelty level 2; Round 162 must search DEEPLY (IVUS, intravascular AE, micro-fracture soft tissue) before C5-X-AE can enter simulation.
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = 3244f9d (correct). Local origin/main ref updated.
+
+Work Log:
+
+1. ROUND162_DEEP_NOVELTY_SEARCH_C5X_AE_V1.json
+   - 8 web searches executed across Google Patents, Justia, PubMed, PatentBuddy, ScienceDirect, Patsnap, OSTI, Patexia
+   - Search queries specifically targeted:
+     * IVUS clot characterization (the most likely threat)
+     * Acoustic emission during thrombectomy
+     * Passive acoustic monitoring of blood clot fracture
+     * Acoustic emission in biological soft tissue
+     * Sound from clot fragmentation
+     * Intravascular acoustic sensor catheter
+     * Piezoelectric sensor thrombectomy force feedback
+
+   - KEY FINDING: C5-X-acoustic-emission SURVIVES the deep search
+     * No patent found for passive AE monitoring of thrombus micro-fractures during thrombectomy
+     * No academic publication found for this specific application
+     * The key distinction: ALL existing intravascular acoustic technologies are ACTIVE (send signal)
+     * C5-X-AE is PASSIVE (listen for fracture-generated emissions)
+     * This is a fundamentally different physical mechanism
+
+   - Prior art found but DIFFERENT mechanism:
+     * IVUS: active imaging → NOT passive AE
+     * Sonothrombolysis: active therapy → NOT passive monitoring
+     * Actuated thrombectomy (US20220125454A1): piezoelectric for vibration → NOT passive listening
+     * AE for bone fracture: same mechanism but different tissue → establishes feasibility
+     * Academic clot fracture modeling: computational, NOT acoustic detection
+
+   - Novelty confidence level: 2 (NOVELTY_SURVIVES_CURRENT_SEARCH)
+   - Simulation ELIGIBLE: YES (first candidate to qualify under simulation-budget rule)
+
+   - The information bottleneck addressed:
+     Current systems CANNOT observe the internal damage state of the clot.
+     They image surface (IVUS), measure bulk (force), or model computationally.
+     But they CANNOT directly measure micro-fracture accumulation.
+     Acoustic emission IS that direct measurement.
+
+   - The structural moat:
+     An incumbent cannot replicate by adding software to existing IVUS or force-sensing.
+     Passive AE requires a DIFFERENT sensor (AE transducer, not ultrasound)
+     and DIFFERENT signal processing (event detection, not imaging).
+     This is a hardware + algorithm moat.
+
+   - Caveats (honestly disclosed):
+     * Web search only, not full USPTO/EPO/CNIPA/JPO
+     * Patent claims NOT read in full
+     * Formal freedom-to-operate analysis still needed
+     * Broad "passive acoustic" patents could potentially be extended
+     * CNIPA/JPO NOT directly searched
+
+Stage Summary:
+- C5-X-acoustic-emission SURVIVES deep novelty search (novelty level 2 confirmed)
+- This is the FIRST candidate eligible for simulation under the new novelty-first rule
+- The candidate has earned the right to consume simulation budget
+- It has NOT earned portfolio entry — that requires simulation + independent reproduction + competitor superiority + buyer moat
+- Next: C5-X-AE V3 pre-registration with ALL parameters frozen (Article XXXVI compliant)
+- 0/5 WORLD_CLASS. Portfolio EMPTY (sacred). One candidate now simulation-eligible.
+
