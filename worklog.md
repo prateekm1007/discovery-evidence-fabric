@@ -6757,3 +6757,32 @@ Task: H1-V2 Gate 8 re-assessment with combined moat
   Gate 8: PASS
   All 8 conditions: NOT ALL PASS
   NOT YET — 0/5
+
+---
+Task ID: ROUND-187-H1V2-OBVIOUSNESS-ASSESSMENT
+Agent: autonomous_ai_loop_v3.py (FULLY AUTONOMOUS)
+Task: Deep obviousness search for H1-V2 combination. Gate 2 assessment.
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = a1d90b3 (correct).
+
+Work Log:
+
+CRITICAL FINDING: Ultrasound-based shunt flow detection patent ALREADY covers ML-based obstruction-type discrimination in shunts (tissue blockage, blood clot, catheter kink). This means "obstruction-type discrimination in shunts via ML" is NOT novel — it is already patented with a different sensor modality.
+
+OBVIOUSNESS ANALYSIS:
+- Element 1 (biofouling sensor): PRIOR ART (USC 2019) ✗
+- Element 2 (AI prediction): PRIOR ART (US 20260115436) ✗
+- Element 3 (obstruction classification): PRIOR ART (ultrasound shunt patent) ✗
+- Element 4 (biofouling trajectory → time-to-obstruction): NOT FOUND, but natural extension of element 2 applied to element 1 ⚠️
+
+GATE 2 ASSESSMENT: FAIL — high obviousness threat. 3 of 4 elements are prior art. The combination is plausibly obvious under KSR.
+
+THE PARADOX: H1-V2 passes 7 of 8 gates (science, reproduction, strategic value, moat, buyer fit, provenance, competitive baseline) but FAILS Gate 2 (Patent) because the components are prior art and the combination is obvious. The candidate WORKS but is NOT patentable.
+
+THE LESSON: Scientific validation (Level 5-6) ≠ Patentability (Gate 2). A candidate can work scientifically but fail legally.
+
+NEXT: Attempt to narrow H1-V2 to a method patent (biofouling trajectory prediction only). If also obvious → KILL and generate new hypotheses.
+
+State: 0/5 WORLD_CLASS. H1-V2 Gate 2 = FAIL. The loop maintains epistemic honesty — refuses to promote a candidate that fails the patent gate despite 7/8 other gates passing.
+
