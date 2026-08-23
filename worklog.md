@@ -6834,3 +6834,25 @@ Most promising: D3 — sidesteps the most threatening patent, addresses genuine 
 3 simulation-eligible candidates. Next: light simulation for D3.
 
 State: 0/5 WORLD_CLASS. Portfolio EMPTY. 4 killed. 3 simulation-eligible.
+
+---
+Task ID: ROUND-190-D4-DEEP-NOVELTY-D1-D3-DOWNGRADE
+Agent: autonomous_ai_loop_v3.py (FULLY AUTONOMOUS)
+Task: CEO Round 190 — Downgrade D1/D3, deep search D4 (Counterfactual Shunt Engine).
+
+D1 DOWNGRADED: novelty 2→0 (PRIOR_ART_THREATENED). Multi-sensor shunt localization already exists (CN103491862A, US20180000421A1, ResearchGate 2016).
+D3 DOWNGRADED: novelty 2→0.5 (PRIOR_ART_THREATENED). CSF system identification for resistance/compliance estimation is established research (PMID 24010973, PMC7999679).
+
+D4 DEEP SEARCH (8 queries): The specific concept of 'counterfactual intervention ranking for shunt management' is NOT found. Building blocks exist (CSFsim, BrainFlow, counterfactual AI, digital twins) but nobody combines them into a system that answers 'which intervention should I choose for THIS patient?' The question itself is novel.
+
+D4 SURVIVES at novelty 2. Simulation-eligible.
+
+The candidate: Patient-Specific Counterfactual Shunt Engine
+- Input: patient physiology + shunt state + candidate interventions
+- Output: predicted trajectory + outcome ranking + recommendation
+- Key distinction: predicts INTERVENTION OUTCOME, not FAILURE
+- All existing systems answer 'will it fail?' This answers 'what should I DO about it?'
+
+State: 0/5 WORLD_CLASS. Portfolio EMPTY. 4 killed, 2 downgraded, 1 alive (D4).
+Next: light simulation for D4.
+
