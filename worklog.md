@@ -4363,3 +4363,50 @@ Stage Summary:
 - OpenFOAM: 28% built, continuing in background.
 - 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.
 - The AI loop is now parallelized — not stalling on one infrastructure blocker.
+
+---
+Task ID: ROUND-138-PORTFOLIO-SCHEDULER
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 138 — turn parallelization into a scientific scheduler. Portfolio-level acquisition. Separate scientific from decision-value evidence. C1 reality blocker. C2 claim-level prior art. C3 buyer-value chain.
+
+Work Log:
+- Built portfolio-level acquisition scheduler:
+  * Enumerated 12 candidate×hypothesis×experiment×world combinations
+  * Scored each by: EIG × P(decision_change) × independence × buyer_impact ÷ cost
+  * Selected globally highest-value executable actions (not round-robin)
+  * Top 3: C2 claim-level prior art (0.51), C5 parameter independence (0.34), C5 mesh refinement (0.32)
+
+- Separated evidence classes:
+  * SCIENTIFIC_EVIDENCE: mechanism, physics, prior art, reproduction, model validation
+  * DECISION_VALUE_EVIDENCE: market size, buyer WTP, cost savings, strategic fit
+  * Rule: buyer-value assumptions CANNOT increase mechanism confidence
+
+- C1: Created REALITY_BLOCKER_STRIDE_DATA_REQUIRED object
+  * G01 YELLOW — eShunt obstruction not yet observed in STRIDE 5-year data
+  * AI action: do NOT repeatedly estimate obstruction frequency. Create blocker and work elsewhere.
+  * STRIDE enrollment complete (32 sites), topline data not yet public.
+
+- C2: Executed claim-level prior-art analysis (C2-R138-PA-02):
+  * 7 C2 limitations mapped against 3 prior-art references
+  * CardioMEMS: does NOT anticipate (missing L2/L3/L5/L6; different body system)
+  * ShuntCheck: does NOT anticipate (missing L1/L4/L5/L7; different sensing modality)
+  * CereVasc eShunt: does NOT anticipate (teaches anatomy, not sensing)
+  * Assessment: PROBABLE survival. SEARCH_INCOMPLETE (PatSnap still needed).
+  * G02 → YELLOW (PROBABLE)
+
+- C3: Executed buyer-value chain (C3-R138-BV-02):
+  * Mapped: unmet need → current alternatives → limitations → C3 advantage → economic consequence
+  * Cost avoidance: $30K pump + $15K revision vs $500-1000/puncture avoided
+  * Market size is CONTEXT, not PROOF (per CEO: numbers are definition-sensitive)
+  * G14 → YELLOW (value chain mapped, buyer WTP unknown)
+
+- OpenFOAM build: continued in background (1394 .o files, building)
+
+Stage Summary:
+- Portfolio scheduler operational: globally ranks all experiments, not round-robin.
+- Evidence classes separated: scientific ≠ decision-value.
+- C1 reality blocker formalized: STRIDE data is the gate, stop estimating.
+- C2 claim-level prior art: PROBABLE survival (7 limitations, 3 references, none anticipates).
+- C3 buyer-value chain: mapped (unmet need → advantage → economic consequence).
+- 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED (OpenFOAM still building).
+- The AI loop is now a discovery SCHEDULER, not a pipeline.
