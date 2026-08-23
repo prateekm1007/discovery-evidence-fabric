@@ -1,0 +1,162 @@
+{
+  "record_type": "APPLICABLE_WORLD_SET_REGISTRY",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 125,
+  "authority": "CEO Round 125 P0 directive: 'A drug-delivery invention should not be forced through a venous FSI simulator. A fracture invention should not be judged by a thrombosis-formation model. Instead define: APPLICABLE_WORLD_SET(candidate) and require: all materially relevant independent physics worlds pass. Otherwise the engine becomes a bureaucracy rather than a discovery machine.'",
+  "status": "SPECIFICATION. The applicable-world sets are defined per candidate. They are NOT yet wired into the portfolio controller.",
+
+  "governance_compliance": {
+    "article_I":    "Each NOT_APPLICABLE_TO_WORLD classification is supported by an evidence-grounded justification, not by convenience.",
+    "article_IV":   "No fallback — a candidate may NOT mark a world NOT_APPLICABLE_TO_WORLD merely because the world would expose a load-bearing assumption.",
+    "article_V":    "Fail closed — if a world's applicability is uncertain, mark APPLICABILITY_UNRESOLVED, not NOT_APPLICABLE_TO_WORLD.",
+    "article_VII":  "A NOT_APPLICABLE_TO_WORLD classification is corrected by adding evidence — never by removing the world to make a candidate pass.",
+    "article_XV":   "Disclosure of every NOT_APPLICABLE_TO_WORLD classification with the rationale.",
+    "article_XVII": "Each NOT_APPLICABLE_TO_WORLD classification has an adversarial test: what evidence would force re-classification to APPLICABLE?",
+    "article_XXV":  "APPLICABILITY_UNRESOLVED is a legitimate state. Cannot be aggregated as APPLICABLE or NOT_APPLICABLE.",
+    "article_XXVII":"Each classification has explicit class (PHYSICAL / MECHANISM / ENGINEERING) and justification.",
+    "article_XXVIII":"Marking a world NOT_APPLICABLE_TO_WORLD does NOT weaken the candidate's claim — it bounds the claim's domain.",
+    "article_XXIX": "A candidate marked NOT_APPLICABLE_TO_WORLD in a simulator where it would have failed is suspicious — the classification must be auditable.",
+    "article_XXX":  "Before approving any NOT_APPLICABLE_TO_WORLD classification, ask 'what would make this classification convenient rather than correct?'",
+    "article_XXXII":"State the strongest alternative explanation for the classification: the candidate is being protected from a falsifying world.",
+    "anti_bureaucracy_principle": "The engine must NOT become a bureaucracy. APPLICABLE_WORLD_SET is a precision tool for focusing experiments, not a loophole for skipping hard tests."
+  },
+
+  "applicability_classes": {
+    "APPLICABLE": "The world is materially relevant to the candidate's mechanism. The candidate MUST be tested in this world. Failure to test (or failure in test) blocks promotion.",
+    "NOT_APPLICABLE_TO_WORLD": "The world is NOT materially relevant to the candidate's mechanism. The candidate is NOT required to be tested in this world. Requires evidence-grounded justification.",
+    "APPLICABILITY_UNRESOLVED": "It is unclear whether the world is materially relevant. The candidate CANNOT be promoted until this is resolved to APPLICABLE or NOT_APPLICABLE_TO_WORLD with evidence.",
+    "CONDITIONALLY_APPLICABLE": "The world becomes applicable only under specific conditions (e.g., a drug-delivery invention becomes FSI-applicable if flow affects drug transport). Conditions must be explicit."
+  },
+
+  "world_definitions": {
+    "WORLD_A_FEBIO": "Nonlinear biomechanics: hyperelasticity, viscoelasticity, damage (CDM), contact, fracture (Simo CDF). Status: VALIDATED L1-L8.",
+    "WORLD_B_PERIDIGM": "Independent fracture universe — bond breakage, nonlocal. Status: NOT INSTALLED.",
+    "WORLD_C_CLOTFORM_OPENFOAM": "Flow + transport + clot formation. Status: NOT INSTALLED. Initial role: flow/transport only, NOT fracture oracle.",
+    "WORLD_D_SVFSI_SIMVASCULAR": "Patient-specific cardiovascular FSI + tissue mechanics. Status: NOT INSTALLED."
+  },
+
+  "candidate_world_sets": {
+
+    "C1_R6_PASSIVE_RESCUE": {
+      "applicable_worlds": ["WORLD_A_FEBIO", "WORLD_D_SVFSI_SIMVASCULAR"],
+      "not_applicable_worlds": [
+        {
+          "world": "WORLD_B_PERIDIGM",
+          "classification": "NOT_APPLICABLE_TO_WORLD",
+          "justification": "C1 is a passive bypass valve mechanism. No fracture is involved — the valve opens under pressure differential. Peridynamics is a fracture/fragmentation simulator; its mathematical foundation (bond breakage) is irrelevant to a non-fracturing fluid-structure interaction problem.",
+          "evidence_grounding": "C1 mechanism is documented in CANONICAL_STATE/PORTFOLIO.json Slot 1: 'Passive bypass lumen in CSF shunt — when primary lumen obstructs, bypass valve opens under pressure differential.' No fracture element.",
+          "adversarial_test": "What evidence would force re-classification to APPLICABLE? If the bypass valve is shown to fatigue-fracture under chronic cyclic loading, Peridgm becomes applicable for fatigue fracture analysis.",
+          "article_XXXII_alternative": "Strongest alternative explanation for the N/A classification: C1 is being protected from a falsifying fracture test. Refutation: C1's mechanism does not depend on fracture surviving or not surviving — fracture is not part of the mechanism at all.",
+          "classification_class": "MECHANISM"
+        },
+        {
+          "world": "WORLD_C_CLOTFORM_OPENFOAM",
+          "classification": "NOT_APPLICABLE_TO_WORLD",
+          "justification": "C1 is a passive bypass valve. No flow-driven clot formation or transport is involved in the mechanism. The relevant fluid is CSF (not blood); the relevant phenomenon is drainage restoration, not clotting.",
+          "evidence_grounding": "C1 mechanism operates in CSF (cerebrospinal fluid), not blood. clotFoam's platelet aggregation/coagulation model is specific to blood.",
+          "adversarial_test": "What evidence would force re-classification? If the bypass lumen is shown to clot (CSF protein aggregation, fibrin formation in CSF), clotFoam-like simulation may become relevant. Currently CSF clots are not part of the mechanism.",
+          "article_XXXII_alternative": "Alternative: C1 is being protected from a flow-driven failure test. Refutation: the failure mode of interest is valve stiction and lumen kink, not flow-driven occlusion.",
+          "classification_class": "MECHANISM"
+        }
+      ],
+      "applicability_unresolved": [],
+      "summary": "C1 needs World A (valve mechanics) + World D (patient-specific vascular context). 2 of 4 worlds applicable."
+    },
+
+    "C2_ADAPTIVE_SENSING_ESHUNT": {
+      "applicable_worlds": ["WORLD_A_FEBIO", "WORLD_D_SVFSI_SIMVASCULAR"],
+      "not_applicable_worlds": [
+        {
+          "world": "WORLD_B_PERIDIGM",
+          "classification": "NOT_APPLICABLE_TO_WORLD",
+          "justification": "C2 is a differential pressure sensor for obstruction detection. No fracture mechanics involved.",
+          "evidence_grounding": "C2 mechanism is sensing (differential pressure → temporal signature → obstruction detection). Fracture is not part of the mechanism.",
+          "adversarial_test": "What evidence would force re-classification? If sensor diaphragm is shown to fracture under chronic pressure cycling, Peridgm may become applicable for diaphragm fatigue analysis.",
+          "article_XXXII_alternative": "Alternative: C2 is being protected from fracture test. Refutation: sensor diaphragm fracture is an engineering failure mode, not the candidate mechanism. Diaphragm failure kills the candidate, but does not validate it.",
+          "classification_class": "MECHANISM"
+        },
+        {
+          "world": "WORLD_C_CLOTFORM_OPENFOAM",
+          "classification": "NOT_APPLICABLE_TO_WORLD",
+          "justification": "C2 is a pressure sensor. clotFoam's platelet aggregation model is irrelevant to pressure sensing in CSF.",
+          "evidence_grounding": "C2 senses pressure in CSF. clotFoam models blood clotting. Different fluid, different phenomenon.",
+          "adversarial_test": "What evidence would force re-classification? If eShunt obstruction is driven by clot formation (not mechanical obstruction), clotFoam may become relevant for obstruction mechanism analysis. Currently, the obstruction mechanism is undetermined (Slot 2 problem-existence gate is YELLOW).",
+          "article_XXXII_alternative": "Alternative: C2 is being protected from flow-driven obstruction analysis. Refutation: if obstruction is clot-driven, C2's mechanism is still pressure sensing; clotFoam would inform the obstruction MECHANISM, not the sensing mechanism.",
+          "classification_class": "MECHANISM"
+        }
+      ],
+      "applicability_unresolved": [],
+      "summary": "C2 needs World A (sensor mechanics) + World D (patient-specific pressure waveforms). 2 of 4 worlds applicable."
+    },
+
+    "C3_CONTROLLED_CNS_THERAPEUTIC": {
+      "applicable_worlds": ["WORLD_A_FEBIO", "WORLD_C_CLOTFORM_OPENFOAM", "WORLD_D_SVFSI_SIMVASCULAR"],
+      "not_applicable_worlds": [
+        {
+          "world": "WORLD_B_PERIDIGM",
+          "classification": "NOT_APPLICABLE_TO_WORLD",
+          "justification": "C3 is a therapeutic retention / CNS delivery mechanism. No fracture mechanics involved. The relevant physics is mass transport (drug concentration vs CSF turnover) and material biocompatibility.",
+          "evidence_grounding": "C3 mechanism is retention + delivery. CE-003 lesson: CSF turnover rate (2.88x/day) makes membrane retention impossible — this is a transport/physics ceiling, not a fracture problem.",
+          "adversarial_test": "What evidence would force re-classification? If the retention mechanism relies on a fracturing membrane (release-on-demand), Peridgm may become applicable for membrane fracture analysis. Currently mechanism is V8.8 frozen; check if fracture is in the mechanism.",
+          "article_XXXII_alternative": "Alternative: C3 is being protected from fracture test. Refutation: the V8.8 mechanism does not rely on fracture; CSF turnover is the load-bearing physics, not bond breakage.",
+          "classification_class": "MECHANISM"
+        }
+      ],
+      "applicability_unresolved": [],
+      "summary": "C3 needs World A (retention mechanism mechanics) + World C (drug transport under CSF flow) + World D (patient-specific CSF geometry). 3 of 4 worlds applicable."
+    },
+
+    "C4_CNS_LIFECYCLE_INTELLIGENCE": {
+      "applicable_worlds": ["WORLD_A_FEBIO", "WORLD_C_CLOTFORM_OPENFOAM", "WORLD_D_SVFSI_SIMVASCULAR"],
+      "not_applicable_worlds": [
+        {
+          "world": "WORLD_B_PERIDIGM",
+          "classification": "NOT_APPLICABLE_TO_WORLD",
+          "justification": "C4 is a sensor + biosensor + ML platform. No fracture mechanics involved. The relevant physics is sensor signal propagation, biosensor transport, and ML predictive modeling.",
+          "evidence_grounding": "C4 mechanism is multi-sensor data fusion + ML. Fracture is not part of the mechanism.",
+          "adversarial_test": "What evidence would force re-classification? If the platform's predictive failure detection targets device fracture as a failure mode, Peridgm may become applicable for fracture prediction. Currently the failure mode is obstruction (not fracture).",
+          "article_XXXII_alternative": "Alternative: C4 is being protected from fracture test. Refutation: C4's value is multi-sensor fusion; fracture is not the predicted failure mode.",
+          "classification_class": "MECHANISM"
+        }
+      ],
+      "applicability_unresolved": [],
+      "summary": "C4 needs World A (sensor mechanics) + World C (biosensor transport) + World D (patient-specific context). 3 of 4 worlds applicable."
+    },
+
+    "C5_ESHUNT_CLOT_FRAGMENTATION_PRECURSOR": {
+      "applicable_worlds": ["WORLD_A_FEBIO", "WORLD_B_PERIDIGM", "WORLD_C_CLOTFORM_OPENFOAM", "WORLD_D_SVFSI_SIMVASCULAR"],
+      "not_applicable_worlds": [],
+      "applicability_unresolved": [],
+      "summary": "C5 is the only candidate with ALL FOUR worlds applicable. Fracture (World A CDM + World B peridynamics), flow (World C), and patient geometry (World D) are all materially relevant to a clot-fragmentation precursor. C5 is the most demanding candidate to validate — and the most informative if it survives.",
+      "load_bearing_assumption_per_world": {
+        "WORLD_A_FEBIO": "A1_smooth_CDM_damage (CDM accumulates damage smoothly) — TESTED, GREEN for the model variable, but per Article XXVIII model GREEN does NOT promote to physical GREEN.",
+        "WORLD_B_PERIDIGM": "A1_smooth_CDM_damage (if precursor disappears when CDM is replaced by bond breakage, A1 is exposed as artifact). NOT YET TESTED — World B uninstalled.",
+        "WORLD_C_CLOTFORM_OPENFOAM": "A2_quasi_static (precursor exists under prescribed displacement, but does it exist under flow-driven loading?). NOT YET TESTED — World C uninstalled.",
+        "WORLD_D_SVFSI_SIMVASCULAR": "A4_patient_geometry (precursor exists in idealized geometry, but does it survive patient-specific vascular geometry with FSI?). NOT YET TESTED — World D uninstalled."
+      },
+      "note": "C5 is the only candidate requiring all four worlds. The other candidates' NOT_APPLICABLE_TO_WORLD classifications are NOT a weakness — they are precision. Forcing C1-C4 through all four worlds would be bureaucracy, not science."
+    }
+  },
+
+  "applicability_invariants": {
+    "evidence_required_for_NA": "Every NOT_APPLICABLE_TO_WORLD classification MUST have: (a) evidence grounding from the candidate's mechanism documentation, (b) adversarial test (what evidence would force re-classification), (c) Article XXXII alternative explanation and refutation, (d) classification class (PHYSICAL / MECHANISM / ENGINEERING).",
+    "no_protection_from_falsification": "A world may NOT be marked NOT_APPLICABLE_TO_WORLD if marking it applicable would expose a load-bearing assumption. If the world tests a load-bearing assumption, it is APPLICABLE by definition.",
+    "no_bureaucratic_skip": "A world may NOT be marked NOT_APPLICABLE_TO_WORLD merely because it is expensive or uninstalled. Cost is a SEPARATE axis (see AI Loop V3 cost term).",
+    "reclassification_permissible": "If new evidence shows a previously-N/A world is relevant, reclassify to APPLICABLE. Per Article XI, the reclassification is an epistemic event — record it explicitly.",
+    "audit_trigger": "If a candidate has >2 worlds marked NOT_APPLICABLE_TO_WORLD, audit the classifications. Per anti-bureaucracy principle, the engine must NOT become a mechanism for skipping hard tests."
+  },
+
+  "summary_table": {
+    "headers": ["Candidate", "World A (FEBio)", "World B (Peridgm)", "World C (clotFoam)", "World D (svFSI)", "Applicable Count"],
+    "rows": [
+      ["C1 R6 Passive Rescue", "APPLICABLE", "NOT_APPLICABLE (no fracture)", "NOT_APPLICABLE (CSF not blood)", "APPLICABLE", "2/4"],
+      ["C2 Adaptive Sensing eShunt", "APPLICABLE", "NOT_APPLICABLE (no fracture)", "NOT_APPLICABLE (CSF not blood)", "APPLICABLE", "2/4"],
+      ["C3 Controlled CNS Therapeutic", "APPLICABLE", "NOT_APPLICABLE (no fracture)", "APPLICABLE (drug transport under CSF flow)", "APPLICABLE", "3/4"],
+      ["C4 CNS Lifecycle Intelligence", "APPLICABLE", "NOT_APPLICABLE (no fracture)", "APPLICABLE (biosensor transport)", "APPLICABLE", "3/4"],
+      ["C5 eShunt Clot Fragmentation Precursor", "APPLICABLE", "APPLICABLE (load-bearing A1)", "APPLICABLE (load-bearing A2)", "APPLICABLE (load-bearing A4)", "4/4"]
+    ]
+  },
+
+  "honest_status": "SPECIFICATION ONLY. The applicable-world sets are defined. They have NOT yet been wired into the portfolio controller. The classifications will be auditable when the portfolio execution engine is implemented."
+}

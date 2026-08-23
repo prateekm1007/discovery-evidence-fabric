@@ -1,0 +1,85 @@
+{
+  "record_type": "ROUND_126_AUDIT_CORRECTIONS",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 126,
+  "authority": "CEO Round 126 deep audit — 5 corrections to Round 125 specifications before portfolio controller execution",
+
+  "correction_1_G18_INDEPENDENCE": {
+    "audit_finding": "The 17-gate architecture is directionally right but one gate is missing conceptually: G18 — Independence of evidence. Must prove that Model A and Model B aren't secretly using the same constitutive assumptions, calibration data, or generated training data. Round-85/86 experience demonstrated two implementations can agree for the wrong reason.",
+    "correction": {
+      "gate_id": "G18",
+      "gate_name": "Independence of evidence",
+      "definition": "Where the candidate's evidence rests on multi-world agreement, the worlds must be independently grounded in: (a) independent mathematics, (b) independent implementation, (c) independent calibration, (d) independent data provenance.",
+      "evidence_required": [
+        "Independent mathematics: World A uses FEM+CDM; World B uses peridynamic bond breakage; different mathematical foundations documented.",
+        "Independent implementation: World A is FEBio (C++ from University of Utah); World B is Peridgm (C++ from Sandia); different code bases verified at file level (no shared source files).",
+        "Independent calibration: World A's material parameters sourced from independent experimental data; World B's parameters sourced from independent experimental data; calibration data sets disjoint.",
+        "Independent data provenance: training data (if any surrogate model is used) sourced from independent simulations/experiments; no shared training sets across worlds."
+      ],
+      "acceptance_for_GREEN": "All 4 independence dimensions verified at file/data level. No shared source code, no shared calibration data, no shared training data, no shared mathematical foundation.",
+      "acceptance_for_YELLOW": "Some independence dimensions verified; others not yet audited.",
+      "acceptance_for_RED": "Independence claim is false — worlds secretly share assumptions/calibration/data. Cross-world agreement is circular (CE-023 lesson).",
+      "adversarial_test": "What would make this gate GREEN while independence is fake? Answer: file-level comparison missed a shared assumption (e.g., both worlds use the same neo-Hookean parameterization from the same textbook). Mitigation: require analytical derivation of equivalence (CE-020 lesson) AND file-level source comparison AND calibration-data hash comparison.",
+      "article_XXXII_alternative": "Strongest alternative explanation: both worlds agree because they share the same hidden error (circular validation). Test: deliberately violate one independence dimension and confirm results change.",
+      "machine_enforcement": "GREEN requires 4 independence verifications: source-file hash comparison, calibration-data hash comparison, training-data hash comparison (if applicable), mathematical-foundation documentation. Auto-RED if any hash collision.",
+      "applies_to_candidates_with_multi_world_agreement": "NOT_APPLICABLE for single-world candidates (e.g., C1 with only World A + World D — but World A and World D must still be independent if both contribute to evidence)."
+    }
+  },
+
+  "correction_2_NA_VS_NOT_RUN": {
+    "audit_finding": "The gate must distinguish NOT APPLICABLE from NOT TESTED. These cannot be interchangeable. A candidate gets N/A only when there is an explicit physical justification that a world cannot meaningfully constrain the claimed mechanism. Otherwise NOT_RUN = RED.",
+    "correction": {
+      "new_gate_state": "NOT_RUN",
+      "definition": "The gate has not been evaluated. The candidate has not been tested in this world. NOT_RUN = RED for promotion purposes.",
+      "distinction_from_NOT_APPLICABLE": "NOT_APPLICABLE requires explicit physical justification (per APPLICABLE_WORLD_SET_REGISTRY). NOT_RUN means the engine has not yet executed the test.",
+      "machine_enforcement": "NOT_RUN gates count as RED for promotion. The engine MUST refuse promotion if any applicable gate is NOT_RUN. Only NOT_APPLICABLE_WITH_JUSTIFICATION gates may be excluded from the promotion check.",
+      "anti_escape_hatch": "The engine may NOT mark a gate NOT_APPLICABLE to avoid running it. If the world is applicable (per APPLICABLE_WORLD_SET_REGISTRY), the gate is either GREEN/YELLOW/RED/NOT_RUN — never NOT_APPLICABLE.",
+      "audit_reference": "CEO Round 126: 'This prevents the engine from escaping difficult physics by declaring a simulator irrelevant.'"
+    }
+  },
+
+  "correction_3_PROMOTION_STATE_CLARIFICATION": {
+    "audit_finding": "No need to weaken the internal promotion rule. Just don't confuse it with regulatory or physical confirmation. The record must carry: PHYSICAL_VALIDATION_STATUS = NOT_ESTABLISHED.",
+    "correction": {
+      "internal_promotion_rule": "WORLD_CLASS_INVENTION (internal) = all mandatory computational gates pass across every applicable independent virtual-world family, all adversarial attacks are exhausted, and no unresolved computational contradiction remains.",
+      "additional_required_field": "PHYSICAL_VALIDATION_STATUS",
+      "values": [
+        "NOT_ESTABLISHED — no physical experiment has confirmed the computational prediction (default for newly promoted WORLD_CLASS_INVENTION)",
+        "PARTIALLY_ESTABLISHED — some physical experiments confirm; others pending",
+        "ESTABLISHED — physical experiment confirms computational prediction within pre-registered tolerance",
+        "CONTRADICTED — physical experiment contradicts computational prediction (triggers REALITY_KILLED)"
+      ],
+      "regulatory_grounding": "FDA's current framework explicitly treats CM&S credibility as risk/context dependent. Computational models can support in-silico trials and virtual cohorts, while insufficient experimental/clinical data remains a major credibility gap. ASME V&V 40 says credibility must be commensurate with how much the model is relied upon and the consequences of an incorrect decision.",
+      "machine_enforcement": "Every WORLD_CLASS_INVENTION record carries PHYSICAL_VALIDATION_STATUS. Default is NOT_ESTABLISHED. The internal promotion rule is NOT weakened — but the record is honest about what computational evidence does and does not establish.",
+      "audit_reference": "CEO Round 126: 'That is a legitimate internal invention-discovery state. But the record must also carry: PHYSICAL_VALIDATION_STATUS = NOT_ESTABLISHED.'"
+    }
+  },
+
+  "correction_4_ANTI_SUSPICIOUS_SURVIVOR_RULE_FIX": {
+    "audit_finding": "The 5→4→2→1→0 rule must NOT kill a candidate because too many candidates survive. Five genuine survivors are possible. The correct behavior is: if ≥3 candidates survive, trigger a portfolio-independence audit. Not: 'five survivors = suspicious = suppress.'",
+    "correction": {
+      "old_rule_name": "5→4→2→1→0 anti-suspicious-survivor rule",
+      "new_rule_name": "portfolio-independence audit trigger",
+      "trigger": "≥3 candidates reach WORLD_CLASS_INVENTION (internal)",
+      "action": "Trigger PORTFOLIO_INDEPENDENCE_AUDIT. Audit questions: (a) Do survivors share load-bearing assumptions? (b) Do survivors share competing hypotheses NOT tested? (c) Do survivors share NOT_APPLICABLE_TO_WORLD classifications protecting them from the same world? (d) Do survivors share parameter-space regions not adversarially swept? (e) Do survivors share virtual-instrument noise models too clean? (f) Do survivors share calibration data (per G18)?",
+      "outcome_if_shared_assumptions_found": "Quarantine the affected survivors' dossiers. The shared assumption must be explicitly tested (Article XVII). Only after the shared assumption is tested and survives does quarantine lift.",
+      "outcome_if_no_shared_assumptions": "Survivors remain promoted. Five genuine survivors is a legitimate outcome if independence is established.",
+      "explicit_NOT_action": "The audit does NOT kill candidates. It does NOT manufacture scarcity. It tests independence. If independence holds, five survivors stand.",
+      "audit_reference": "CEO Round 126: 'The engine should attack the independence between survivors, not manufacture scarcity.'"
+    }
+  },
+
+  "correction_5_SLOT_5_GENERATION_NOT_INVENTION": {
+    "audit_finding": "C5 must be generated by AI using the same discovery machinery, not manually invented. When C1-C4 finish, the AI must search the remaining opportunity space and generate a fifth candidate from the same discovery mechanism. Then C5 enters the same pipeline. No manual rescue candidate.",
+    "correction": {
+      "rule": "C5 is generated by the discovery engine, not by a human. The discovery engine searches the opportunity space (cemetery lessons, unmet buyer pain, unexplored mechanism classes) and proposes C5. The proposed C5 then enters the identical 12-stage per-candidate loop.",
+      "generation_method": "Discovery engine queries: (a) cemetery for failure lessons that suggest alternative mechanisms; (b) buyer pain registry for unmet needs; (c) mechanism class taxonomy for unexplored classes; (d) prior-art registry for white space. Proposes C5 with documented generation provenance.",
+      "no_manual_rescue": "If the discovery engine proposes no valid C5, Slot 5 remains EMPTY. Per anti-fabrication rule: an empty fifth slot is infinitely better than a fabricated fifth invention.",
+      "c5_then_loops": "Once C5 is generated, it enters the same 12-stage loop as C1-C4. No special treatment. No relaxed gates.",
+      "audit_reference": "CEO Round 126: 'Make the machine earn C5.'"
+    }
+  },
+
+  "summary": "5 corrections applied. G18 added (independence of evidence). NOT_RUN state added (NOT_RUN = RED for promotion). PHYSICAL_VALIDATION_STATUS field added to WORLD_CLASS_INVENTION records. 5→4→2→1→0 rule renamed to portfolio-independence audit trigger (no suppression). C5 generation rule enforced (AI generates, not human). All corrections are wired into the portfolio controller implementation."
+}

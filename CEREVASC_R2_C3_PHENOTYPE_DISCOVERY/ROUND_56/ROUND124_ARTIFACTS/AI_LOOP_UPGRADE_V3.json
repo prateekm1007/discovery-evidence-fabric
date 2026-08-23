@@ -1,0 +1,165 @@
+{
+  "record_type": "AI_LOOP_UPGRADE",
+  "version": "3.0.0",
+  "date": "2026-08-23",
+  "round": 124,
+  "authority": "CEO Round 124 P0 directive: 'The AI should select the next virtual experiment based on expected hypothesis discrimination, but it must also ask: Which model assumption is responsible for the current uncertainty? That means acquisition over: hypothesis × model-form uncertainty × parameter uncertainty × simulator disagreement × cost.'",
+  "status": "SPECIFICATION. The acquisition function is specified; its implementation in the discovery engine is the next phase.",
+
+  "governance_compliance": {
+    "article_I":    "The loop selects experiments to discriminate hypotheses — not to confirm them.",
+    "article_IV":   "No fallback acquisition — if the highest-information experiment is expensive, do not silently substitute a cheaper lower-information one without recording the trade-off.",
+    "article_V":    "Fail closed but do not become a universal rejector — the loop must propose experiments even when uncertainty is high.",
+    "article_VII":  "Loop output is corrected by improving the model — never by weakening the acquisition function.",
+    "article_VIII": "The loop adversarially proposes experiments IT would prefer to avoid (per Article XVII — attempted bypass).",
+    "article_XIV":  "RED = STOP — if a critical experiment is unaffordable, the loop halts and reports to human, not silently substitutes.",
+    "article_XV":   "Disclosure of any acquisition-function change or threshold drift.",
+    "article_XVII": "Each proposed experiment has an adversarial frame: 'What result of this experiment would I most dislike?'",
+    "article_XXVII":"Acquisition thresholds (information gain required, cost ceiling) have explicit class and provenance.",
+    "article_XXVIII":"Acquisition must distinguish hypothesis discrimination from model-form discrimination — passing one does not grant credit at the other.",
+    "article_XXIX": "Implementation failure (simulator misconfigured) is separated from mechanism failure (precursor absent) in loop's interpretation of results.",
+    "article_XXX":  "Before approving any acquisition output, ask 'what would make this experiment look informative while actually being useless?'",
+    "article_XXXII":"Before each proposed experiment, state the strongest alternative explanation it would NOT discriminate.",
+    "article_XXXV": "This is the closed-loop epistemic control system required for completion — the loop generates its own next falsification experiment from new evidence.",
+    "pushing_the_envelope_principle": "Don't ask 'does the precursor survive?' Ask: 'which physical assumption would have to be wrong for the precursor to disappear, and which simulation is cheapest for exposing that assumption?'"
+  },
+
+  "v2_to_v3_upgrade": {
+    "v2_acquisition": "Select next virtual experiment by expected hypothesis discrimination (Bayesian EIG — expected information gain about the precursor hypothesis).",
+    "v3_acquisition": "Select next virtual experiment by expected discrimination across a 5-dimensional uncertainty space: hypothesis × model-form × parameter × simulator-disagreement × cost. The loop asks not only 'does this experiment reduce uncertainty about the precursor?' but also 'which model assumption is responsible for the current uncertainty?'",
+    "v3_advantage": "V2 would spend many experiments reducing parameter uncertainty within a single model form. V3 recognizes that parameter uncertainty within one model form is much less important than model-form uncertainty across multiple simulators. V3 directs experiments at the load-bearing assumption, not the cheapest-to-vary parameter.",
+    "audit_reference": "CEO Round 124: 'That is much stronger than ordinary active learning.'"
+  },
+
+  "acquisition_function_v3": {
+    "formal_definition": "next_experiment = argmax over candidate experiments e of: EIG(e, hypothesis) × model_form_exposure(e) × parameter_sweep_coverage(e) × simulator_disagreement_surface(e) / cost(e)",
+    "term_definitions": {
+
+      "EIG_e_hypothesis": {
+        "name": "Expected Information Gain about the precursor hypothesis",
+        "definition": "Expected reduction in entropy of P(precursor_exists) given the experiment's possible outcomes.",
+        "computation": "Bayesian: sum over possible outcomes o of P(o) * [H(Precursor|prior) - H(Precursor|outcome=o)].",
+        "range": "[0, 1] — normalized.",
+        "article_XXVII_note": "No threshold tuning. EIG is a computed quantity, not a tuned threshold."
+      },
+
+      "model_form_exposure_e": {
+        "name": "Model-form uncertainty exposure",
+        "definition": "Does this experiment expose a model-form assumption that could be wrong? Score: 1.0 if it tests an assumption not tested by any previous experiment; 0.5 if it tests an assumption partially tested; 0.0 if it tests an assumption already tested.",
+        "computation": "Maintain a registry of tested assumptions. Each new experiment's score is the fraction of its tested-assumption set that is NEW.",
+        "range": "[0, 1].",
+        "purpose": "Prevents the loop from running 100 variations of the same model-form test (which V2 would do because parameter sweeps are cheap)."
+      },
+
+      "parameter_sweep_coverage_e": {
+        "name": "Parameter sweep coverage",
+        "definition": "Does this experiment cover new regions of parameter space? Score: 1.0 if it samples an unsampled region; 0.5 if it densifies a sampled region; 0.0 if it duplicates existing samples.",
+        "computation": "Latin Hypercube coverage metric: fraction of LHS cells containing the new sample's parameter combination.",
+        "range": "[0, 1].",
+        "purpose": "Ensures parameter sweeps are coverage-driven, not convenience-driven."
+      },
+
+      "simulator_disagreement_surface_e": {
+        "name": "Simulator disagreement surface",
+        "definition": "Does this experiment test the precursor in a NEW simulator (World A/B/C/D) where it has not been tested before? Score: 1.0 if it tests in a simulator where precursor has not been tested; 0.5 if it tests in a partially-tested simulator; 0.0 if it tests in a fully-tested simulator.",
+        "computation": "Per-claim, per-simulator state matrix from the Claim-Evidence Graph.",
+        "range": "[0, 1].",
+        "purpose": "Directs experiments at the LEAST-tested simulator for each claim — not the most-tested. This is the dominant V3 contribution."
+      },
+
+      "cost_e": {
+        "name": "Cost of the experiment",
+        "definition": "Computational cost (CPU-hours) OR physical cost (dollars + calendar time) OR both, normalized to a common scale.",
+        "computation": "For virtual: CPU-hours predicted by mesh size × timestep × total time. For physical: dollars for materials + labor + calendar time. Both reported.",
+        "range": "[1, ∞). Lower is better.",
+        "purpose": "Pushing-the-envelope: the cheapest experiment that exposes a load-bearing assumption is preferred over an expensive one."
+      }
+    },
+
+    "normalization": "Each term is normalized to [0, 1] (cost inverted). The product gives a single acquisition score in [0, 1].",
+    "decision_rule": "Select the experiment with the highest acquisition score. If multiple experiments tie, prefer the one with the LOWEST cost (cheapest falsification opportunity)."
+  },
+
+  "pushing_the_envelope_decision_rule": {
+    "principle": "For each load-bearing assumption behind the precursor hypothesis, ask: 'Which physical assumption would have to be wrong for the precursor to disappear, and which simulation is cheapest for exposing that assumption?'",
+    "operationalization": {
+      "step_1": "List all load-bearing assumptions (e.g., 'precursor exists because CDM accumulates damage smoothly').",
+      "step_2": "For each assumption, identify which simulator would expose it most cheaply (e.g., 'peridynamics with bond breakage would expose CDM-specific smoothness').",
+      "step_3": "Run that simulator FIRST (cheapest falsification opportunity).",
+      "step_4": "If the precursor survives, narrow the assumption list (the CDM-smoothness assumption is now tested). If the precursor disappears, the assumption is EXPOSED — record in cemetery with epistemic_class.",
+      "step_5": "Repeat with the next load-bearing assumption."
+    },
+    "audit_reference": "CEO Round 124: 'Don't build four simulators. Build four independent opportunities for the same hypothesis to die.'"
+  },
+
+  "load_bearing_assumptions_registry": {
+    "assumption_A1_smooth_damage": {
+      "assumption": "The precursor exists because CDM accumulates damage smoothly, producing a dD/dstrain signal that decelerates before fracture.",
+      "if_wrong_precursor_disappears": "TRUE — if damage accumulates discretely (bond-by-bond), no smooth deceleration signal exists.",
+      "cheapest_simulator_to_expose": "Peridigm (World B) — non-ordinary state-based peridynamics with bond-failure threshold.",
+      "cost_estimate": "Medium — Peridgm P1-P5 certification, then precursor test on simplified geometry. ~100 CPU-hours for the precursor test alone.",
+      "expected_information_gain": "VERY HIGH — this is the load-bearing assumption. Falsifying it kills the hypothesis (per Article XXIX, after disagreement classification).",
+      "currently_tested": false,
+      "next_action": "Peridgm certification → VLB-001 → precursor test in Peridgm."
+    },
+    "assumption_A2_quasi_static": {
+      "assumption": "The precursor exists under quasi-static loading (prescribed displacement), which is the regime tested in FEBio.",
+      "if_wrong_precursor_disappears": "PARTIALLY — precursor may exist quasi-statically but not under flow. C-004 claim.",
+      "cheapest_simulator_to_expose": "clotFoam (World C) — flow-driven clot failure. But clotFoam is NOT a fracture oracle initially — so use clotFoam for flow field + Peridgm for fracture, coupled.",
+      "cost_estimate": "HIGH — requires World B + World C certified + coupling infrastructure. ~500 CPU-hours.",
+      "expected_information_gain": "HIGH — directly tests C-004 (least-supported claim).",
+      "currently_tested": false,
+      "next_action": "After Peridgm certification, install clotFoam, reproduce its published examples, then couple."
+    },
+    "assumption_A3_homogeneous": {
+      "assumption": "The precursor exists in homogeneous clots (the FEBio model assumed uniform material).",
+      "if_wrong_precursor_disappears": "POSSIBLY — heterogeneity (defects, fibrin-alignment variations) may produce fracture at stress concentrators without smooth damage phase.",
+      "cheapest_simulator_to_expose": "Peridgm with heterogeneous bond-failure thresholds — straightforward in peridynamics (each bond can have its own threshold).",
+      "cost_estimate": "LOW once Peridgm is certified — just change input file. ~50 CPU-hours per heterogeneity pattern.",
+      "expected_information_gain": "MEDIUM — directly tests C-003 (composition/microstructure).",
+      "currently_tested": false,
+      "next_action": "After Peridgm precursor test (homogeneous), immediately run heterogeneous variations."
+    },
+    "assumption_A4_patient_geometry": {
+      "assumption": "The precursor exists in idealized clot geometry (cylinder, cube).",
+      "if_wrong_precursor_disappears": "POSSIBLY — patient-specific vascular geometry may introduce flow features that mask the precursor.",
+      "cheapest_simulator_to_expose": "svFSI (World D) — patient-specific FSI.",
+      "cost_estimate": "VERY HIGH — requires World D certified + patient-specific geometry + FSI. ~2000 CPU-hours per case.",
+      "expected_information_gain": "MEDIUM — tests C-007 (clinical utility) indirectly.",
+      "currently_tested": false,
+      "next_action": "After World B + C certification. Long-pole."
+    },
+    "assumption_A5_constitutive_equivalence": {
+      "assumption": "Peridgm's material model can be made equivalent to FEBio's neo-Hookean + CDM in the pre-failure regime (so that any disagreement is due to FRACTURE formulation, not constitutive mismatch).",
+      "if_wrong_precursor_disappears": "ARTIFACTUAL — if constitutive equivalence fails, cross-simulator comparison is meaningless (CE-020 lesson).",
+      "cheapest_simulator_to_expose": "Cross-world comparison benchmark (P7 of Peridgm protocol).",
+      "cost_estimate": "MEDIUM — ~100 CPU-hours.",
+      "expected_information_gain": "HIGH — gates all multi-simulator conclusions.",
+      "currently_tested": false,
+      "next_action": "After Peridgm P5 certification, before precursor test."
+    }
+  },
+
+  "loop_iteration_protocol": {
+    "step_1_state": "Read Claim-Evidence Graph state vector. Identify YELLOW/RED claims with cheapest available next experiment.",
+    "step_2_assumptions": "Identify which load-bearing assumption (A1-A5) is currently untested AND has the cheapest simulator-to-expose.",
+    "step_3_acquisition": "Compute acquisition function over candidate experiments targeting that assumption.",
+    "step_4_propose": "Propose the highest-acquisition experiment to human (or auto-execute if cost below threshold).",
+    "step_5_execute": "Execute the experiment. Record raw output. Per Article IX (certification is observational), do not modify the simulator state mid-experiment.",
+    "step_6_classify": "If result disagrees with prior simulator results, CLASSIFY per disagreement classification (PHYSICS_DISAGREEMENT → MATHEMATICAL_MODEL_DISAGREEMENT → PHYSICAL_CONTRADIICTION → HYPOTHESIS_KILLED). Do NOT auto-promote.",
+    "step_7_update": "Update Claim-Evidence Graph: add evidence to the affected claim(s). Per Article XXVIII, only NEW evidence promotes state (RED → YELLOW or YELLOW → GREEN).",
+    "step_8_learn": "Update the load_bearing_assumptions_registry — mark assumption as tested, record outcome. Per Article XXXI, create a memory artifact for any correction.",
+    "step_9_iterate": "Return to step_1. Continue until all load-bearing assumptions are tested OR all claims are GREEN OR all affordable experiments are exhausted (then physical experiment is the next bottleneck per Article XXXIV)."
+  },
+
+  "anti_gaming_safeguards": {
+    "safeguard_1_no_metric_optimization": "The acquisition function is computed, not optimized against. Per Article XIX, the loop must NOT ask 'what change makes the loop look productive?' but 'what failure in reality did this experiment expose?'",
+    "safeguard_2_no_experiment_duplication": "Parameter sweep coverage term prevents running the same experiment 100 times with cosmetic variations.",
+    "safeguard_3_no_simulator_preference": "Simulator disagreement surface term prevents the loop from always running FEBio (cheapest, most familiar). It MUST test the least-tested simulator.",
+    "safeguard_4_adversarial_self_audit": "Each proposed experiment must include the answer to: 'What result of this experiment would I most dislike?' If the answer is 'any result that disagrees with FEBio', the loop is gaming — it should propose experiments that maximize the chance of disagreement, not minimize it.",
+    "safeguard_5_cost_disclosure": "Cost is reported transparently. No silent substitution of expensive experiment for cheap one without recording the trade-off.",
+    "safeguard_6_no_promotion_by_aggregation": "Per Article XXV, unresolved evidence cannot be aggregated. 10 YELLOW experiments do NOT promote to GREEN."
+  },
+
+  "honest_status": "SPECIFICATION ONLY. The acquisition function is specified; its implementation in the discovery engine's experiment selector is the next phase. No load-bearing assumption has been tested yet (A1-A5 all currently_tested=false). The loop is the design; execution requires Peridgm certification first."
+}

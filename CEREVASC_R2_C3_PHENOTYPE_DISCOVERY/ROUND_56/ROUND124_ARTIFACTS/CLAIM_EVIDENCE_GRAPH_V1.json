@@ -1,0 +1,313 @@
+{
+  "record_type": "CLAIM_EVIDENCE_GRAPH",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 124,
+  "authority": "CEO Round 124 deep audit directive: 'replace Reality Gap Score with a Claim-Evidence Graph'",
+
+  "governance_compliance": {
+    "article_I":   "Each claim binds to required observations and evidence sources before any assertion is made.",
+    "article_IV":  "No fallback epistemology — a RED claim cannot be promoted by aggregating YELLOW evidence.",
+    "article_VII": "A failed claim is corrected by correcting the claim or adding evidence — never by weakening the graph.",
+    "article_XII": "Every claim has provenance custody down to artifact + commit.",
+    "article_XVII":"Every claim lists its attempted bypass (falsification_path).",
+    "article_XXV": "Unknown remains unknown — UNRESOLVED evidence is not aggregated as positive or negative.",
+    "article_XXVIII": "Passing one simulator does NOT grant credit at the next simulator or at physical experiment.",
+    "article_XXIX": "A simulator failure is classified as PHYSICS_DISAGREEMENT or MATHEMATICAL_MODEL_DISAGREEMENT before being promoted to HYPOTHESIS_KILLED.",
+    "article_XXXII": "Each claim lists its strongest alternative explanation and the test that would discriminate it.",
+    "article_XXXIII": "No irreversible action (kill/promote) on unresolved evidence.",
+    "replaces": "reality_gap_score (v1.0 scalar '1 - E3_coverage / total_evidence_needed') — rejected by Round 124 audit as treating evidence as interchangeable percentage"
+  },
+
+  "design_principle": "Evidence is NOT interchangeable. One highly relevant experiment with synchronized force + fragmentation timing is worth more than ten unrelated publications about clot composition. The graph encodes per-claim evidence state, not an aggregate percentage.",
+
+  "claim_schema": {
+    "claim_id": "string — stable identifier",
+    "claim_text": "string — the assertion being made",
+    "required_observations": "array — what MUST be observed for this claim to hold",
+    "evidence_state": "RED | YELLOW | GREEN — current state",
+    "supporting_evidence": "array — resolved evidence that strengthens the claim",
+    "contradicting_evidence": "array — resolved evidence that weakens the claim",
+    "unresolved_evidence": "array — evidence that is SEARCH_INCOMPLETE / TIMEOUT / IDENTITY_INSUFFICIENT — per Article XXV cannot be aggregated",
+    "simulator_coverage": "object — per-simulator state (World A FEBio / World B Peridigm / World C clotFoam / World D svFSI)",
+    "uncertainty_breakdown": "object — model_form / parameter / numerical / simulator_disagreement / measurement",
+    "remaining_gap": "string — what specifically remains unknowable without new evidence",
+    "falsification_path": "string — what observation would kill this claim",
+    "strongest_alternative_explanation": "string — per Article XXXII",
+    "alternative_test": "string — the test that would discriminate the alternative",
+    "epistemic_class": "PROVEN | STRONG | PROVISIONAL | HYPOTHESIS | UNRESOLVED"
+  },
+
+  "claims": [
+    {
+      "claim_id": "C-001",
+      "claim_text": "A raw mechanical precursor signal exists in the force-displacement curve of a clot before visible fragmentation.",
+      "required_observations": [
+        "Force-displacement curve acquired at >=100 Hz with synchronized high-speed video at >=500 fps",
+        "Curvature (d2F/ddelta2) sign change detected before camera-confirmed fragmentation onset",
+        "Curvature change persists for >=0.1s (10 consecutive samples at 100 Hz) — not single-sample noise",
+        "Curvature amplitude >=0.1 * max(|d2F/ddelta2|) in undamaged regime — physically significant",
+        "Phenomenon reproduced across >=7/10 samples in at least one measured-composition group"
+      ],
+      "evidence_state": "RED",
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "unresolved_evidence": [
+        {"id": "E3-PUB-001", "type": "published_data", "description": "Chueh et al. 2011 clot mechanical properties — not directly about precursor", "state": "AVAILABLE_BUT_NOT_YET_INGESTED"},
+        {"id": "E3-PUB-002", "type": "published_data", "description": "Fereidoonnezhad et al. 2017 CDM clot fracture — model-side, not raw force precursor", "state": "AVAILABLE_BUT_NOT_YET_INGESTED"},
+        {"id": "E3-PUB-003", "type": "published_data", "description": "Nature s41598-023-41825-8 clot embolization — relevant to fragmentation but not to precursor signal", "state": "AVAILABLE_BUT_NOT_YET_INGESTED"}
+      ],
+      "simulator_coverage": {
+        "world_A_febio": "GREEN at model level (dD/dstrain deceleration demonstrated in L5/L8) — but this is a MODEL variable, not the raw force observable. Per Article XXVIII, model GREEN does NOT promote to physical GREEN.",
+        "world_B_peridigm": "NOT_INSTALLED — independent fracture mathematics not yet exercised",
+        "world_C_clotfoam": "NOT_INSTALLED — flow-driven failure not yet exercised",
+        "world_d_svfsi": "NOT_INSTALLED — patient-specific geometry not yet exercised"
+      },
+      "uncertainty_breakdown": {
+        "model_form": "HIGH — only one constitutive family (neo-Hookean + CDM) tested for the model-side precursor",
+        "parameter": "MEDIUM — α∈[0.002, 0.500], β∈[0.010, 0.095] swept; 82% parameter space coverage but only within one model form",
+        "numerical": "LOW — L1/L2 verification passed with <0.005% deviation",
+        "simulator_disagreement": "UNKNOWN — no second simulator exercised; this is the dominant unknown",
+        "measurement": "HIGH — no physical measurement yet"
+      },
+      "remaining_gap": "No physical measurement of raw force precursor exists. The model variable dD/dstrain deceleration is a PREDICTION, not an observation. The mapping between dD/dstrain and force curvature is a hypothesis, not an established equivalence (per PEP-SLOT5-001-a2 P0_4).",
+      "falsification_path": "Physical experiment (PEP-SLOT5-001-a2) yields <7/10 samples with SIGNAL_CONFIRMED → claim C-001 is FALSIFIED for that clot composition. Per Article XXIX, this is a PHYSICAL_CONTRADICTION (not merely a model failure) because the experiment tests reality, not the model.",
+      "strongest_alternative_explanation": "The dD/dstrain deceleration observed in FEBio is a numerical artifact of element deletion / damage localization in CDM, not a physical precursor signal.",
+      "alternative_test": "Reproduce the same loading in Peridigm (World B), where fracture emerges from bond breakage without element deletion. If the precursor disappears, the alternative explanation is supported. If it survives, the alternative is weakened.",
+      "epistemic_class": "HYPOTHESIS"
+    },
+
+    {
+      "claim_id": "C-002",
+      "claim_text": "The precursor signal precedes fragmentation by a clinically or practically useful lead time (>=1.0s at 0.01 s^-1 strain rate).",
+      "required_observations": [
+        "Per-sample lead_time = strain(t_fragmentation) - strain(t_signal_onset) >= 1.0s",
+        "Lead time measured under the frozen PEP-SLOT5-001-a2 endpoint pipeline (8 steps, no analyst discretion)",
+        "Reproduced across >=7/10 samples in at least one measured-composition group",
+        "Lead time is NOT a post-hoc narrative — first eligible sign change is the signal onset"
+      ],
+      "evidence_state": "RED",
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "unresolved_evidence": [],
+      "simulator_coverage": {
+        "world_A_febio": "YELLOW — model predicts ~2.5 strain lead (≈2.5s at 0.01 s^-1) for nominal parameters; survives 2% noise; but per Article XXVIII model prediction ≠ physical confirmation",
+        "world_B_peridigm": "NOT_INSTALLED",
+        "world_C_clotfoam": "NOT_INSTALLED",
+        "world_d_svfsi": "NOT_INSTALLED"
+      },
+      "uncertainty_breakdown": {
+        "model_form": "HIGH",
+        "parameter": "MEDIUM — lead time varies with α, β but stays >1.0s across 82% of parameter space (in FEBio)",
+        "numerical": "LOW",
+        "simulator_disagreement": "UNKNOWN",
+        "measurement": "HIGH"
+      },
+      "remaining_gap": "Model predicts useful lead time; physical measurement does not yet exist to confirm.",
+      "falsification_path": "Physical experiment yields 0 samples with lead_time >= 1.0s OR all samples fall in INTERMEDIATE zone (0.5-1.0s) → claim C-002 FALSIFIED.",
+      "strongest_alternative_explanation": "The model-side 2.5 strain lead is an artifact of how CDM accumulates damage smoothly; physical fracture may be abrupt with no deceleration phase.",
+      "alternative_test": "Peridigm reproduction (World B) — if peridynamic fracture is abrupt and the model-side lead disappears, the alternative is supported.",
+      "epistemic_class": "HYPOTHESIS"
+    },
+
+    {
+      "claim_id": "C-003",
+      "claim_text": "The precursor works across clinically relevant clot types (varied composition).",
+      "required_observations": [
+        "Clot composition measured by histology (RBC fraction, fibrin density, platelet density) — NOT inferred from recipe",
+        "Precursor detected in >=1 sample from each of >=3 composition groups (RBC-rich, fibrin-rich, mixed)",
+        "Composition-dependent variation in lead time quantified, not hidden",
+        "Domain of validity explicitly bounded (per Article I — claim is bounded to where evidence supports it)"
+      ],
+      "evidence_state": "RED",
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "unresolved_evidence": [
+        {"id": "E3-PUB-004", "type": "published_data", "description": "PubMed 39754893 human clot analogue mechanical data — heterogeneous composition", "state": "AVAILABLE_BUT_NOT_YET_INGESTED"},
+        {"id": "E3-PUB-005", "type": "published_data", "description": "Gasser et al. 2008 ILT failure properties — different tissue class", "state": "AVAILABLE_BUT_NOT_YET_INGESTED"}
+      ],
+      "simulator_coverage": {
+        "world_A_febio": "YELLOW at parameter level — α/β variations proxy for composition variation; but this is a model proxy, not measured composition",
+        "world_B_peridigm": "NOT_INSTALLED",
+        "world_C_clotfoam": "NOT_INSTALLED — composition-driven clot formation is clotFoam's native domain",
+        "world_d_svfsi": "NOT_INSTALLED"
+      },
+      "uncertainty_breakdown": {
+        "model_form": "HIGH",
+        "parameter": "MEDIUM — 82% parameter space coverage in FEBio",
+        "numerical": "LOW",
+        "simulator_disagreement": "UNKNOWN",
+        "measurement": "HIGH"
+      },
+      "remaining_gap": "Composition was modeled via parameter variation, not measured. Real clots have microstructure (fibrin alignment, defects, heterogeneity) not captured by α/β.",
+      "falsification_path": "Physical experiment shows precursor exists only in one composition group and absent in others → claim C-003 NARROWED to that composition; broad claim FALSIFIED.",
+      "strongest_alternative_explanation": "The precursor is an artifact of homogeneous neo-Hookean + CDM assumptions; real heterogeneous clots fracture at stress concentrators without a smooth damage phase.",
+      "alternative_test": "Peridigm with heterogeneous bond-failure thresholds (defects) — does the precursor survive microstructural heterogeneity?",
+      "epistemic_class": "HYPOTHESIS"
+    },
+
+    {
+      "claim_id": "C-004",
+      "claim_text": "The precursor survives under physiological flow conditions (FSI), not just quasi-static prescribed displacement.",
+      "required_observations": [
+        "Flow field applied during clot loading (pulsatile arterial or venous waveform)",
+        "Pressure and shear stress measured at clot surface during loading",
+        "Precursor signal detected under flow with lead time >=1.0s",
+        "Flow does not introduce noise that masks the precursor"
+      ],
+      "evidence_state": "RED",
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "unresolved_evidence": [],
+      "simulator_coverage": {
+        "world_A_febio": "PARTIAL — L7 FSI analytic derivation complete but not numerically certified (Article XXXIV honest disclosure)",
+        "world_B_peridigm": "NOT_INSTALLED",
+        "world_C_clotfoam": "NOT_INSTALLED — flow is clotFoam's native strength; would be the natural World for this claim",
+        "world_d_svfsi": "NOT_INSTALLED — patient-specific FSI is svFSI's native strength"
+      },
+      "uncertainty_breakdown": {
+        "model_form": "HIGH",
+        "parameter": "HIGH",
+        "numerical": "HIGH",
+        "simulator_disagreement": "UNKNOWN",
+        "measurement": "HIGH"
+      },
+      "remaining_gap": "No FSI simulation has exercised the precursor. No physical flow experiment exists. This claim is the LEAST supported of all claims.",
+      "falsification_path": "Flow experiment shows flow-induced noise or stochastic failure mode masks precursor → claim C-004 FALSIFIED for in-vivo use; claim NARROWED to quasi-static / aspiration-only scenarios.",
+      "strongest_alternative_explanation": "Under flow, clot failure is dominated by surface erosion and embolization, not bulk damage accumulation; the quasi-static precursor does not survive the failure-mode transition.",
+      "alternative_test": "clotFoam flow-driven clot failure simulation — does any precursor signal emerge when the loading is flow rather than displacement?",
+      "epistemic_class": "UNRESOLVED"
+    },
+
+    {
+      "claim_id": "C-005",
+      "claim_text": "The precursor is detectable by a real sensor with realistic noise, sampling rate, and latency.",
+      "required_observations": [
+        "Sensor model with realistic noise floor, sampling rate, response time, drift",
+        "Precursor signal still detectable after sensor degradation applied",
+        "No false positives in negative controls (clots that do not fragment)",
+        "Anti-noise test: 2% measurement noise does not destroy signal (FEBio-only result, not physical)"
+      ],
+      "evidence_state": "YELLOW",
+      "supporting_evidence": [
+        {"id": "FEBio-NOISE-001", "type": "simulation_result", "description": "FEBio L5/L8 results show precursor survives 2% noise in 10/10 adversarial cases", "epistemic_class": "MODEL_DERIVED"}
+      ],
+      "contradicting_evidence": [],
+      "unresolved_evidence": [],
+      "simulator_coverage": {
+        "world_A_febio": "YELLOW at virtual-instrument level (virtual force sensor with 2% noise tested)",
+        "world_B_peridigm": "NOT_INSTALLED",
+        "world_C_clotfoam": "NOT_INSTALLED",
+        "world_d_svfsi": "NOT_INSTALLED"
+      },
+      "uncertainty_breakdown": {
+        "model_form": "HIGH",
+        "parameter": "MEDIUM",
+        "numerical": "LOW",
+        "simulator_disagreement": "UNKNOWN",
+        "measurement": "HIGH — virtual instrument noise is NOT real sensor noise"
+      },
+      "remaining_gap": "Virtual instrument validation only. Real sensor validation requires physical instrument prototype tested against physical clot surrogate with known fragmentation timing.",
+      "falsification_path": "Real sensor with calibrated noise floor cannot detect the curvature change above its own noise → claim C-005 FALSIFIED for that sensor class.",
+      "strongest_alternative_explanation": "The 2% virtual noise is too clean; real sensors have 1/f drift, quantization, and EMI that destroy narrow curvature signals.",
+      "alternative_test": "Build a virtual instrument with 1/f drift + quantization + EMI spectra from a real force sensor datasheet — does the precursor still survive?",
+      "epistemic_class": "PROVISIONAL"
+    },
+
+    {
+      "claim_id": "C-006",
+      "claim_text": "Detecting the precursor and intervening (e.g., reducing aspiration force, pausing) prevents clinically significant embolization.",
+      "required_observations": [
+        "Intervention experiment: clots loaded to precursor onset, then either (a) intervention applied or (b) control continued loading",
+        "Primary endpoint: embolization volume (sum of fragment volumes that detach) — measured by particle tracking or filter capture",
+        "Intervention group shows statistically significant reduction in embolization volume vs control",
+        "Pre-registered threshold for 'clinically significant reduction' (e.g., >=50% reduction in embolization volume)"
+      ],
+      "evidence_state": "RED",
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "unresolved_evidence": [],
+      "simulator_coverage": {
+        "world_A_febio": "NOT_YET_AT_INTERVENTION_LEVEL — FEBio model shows precursor exists but intervention experiment has not been simulated",
+        "world_B_peridigm": "NOT_INSTALLED — peridynamics is the natural World for fragmentation/embolization tracking",
+        "world_C_clotfoam": "NOT_INSTALLED — clotFoam can track embolization transport downstream",
+        "world_d_svfsi": "NOT_INSTALLED — patient-specific geometry for embolization destination"
+      },
+      "uncertainty_breakdown": {
+        "model_form": "HIGH",
+        "parameter": "HIGH",
+        "numerical": "MEDIUM",
+        "simulator_disagreement": "UNKNOWN",
+        "measurement": "HIGH"
+      },
+      "remaining_gap": "No intervention experiment (virtual or physical). The precursor's CLINICAL UTILITY depends on this claim, and it is entirely unsupported by current evidence.",
+      "falsification_path": "Intervention experiment shows no statistically significant embolization reduction → claim C-006 FALSIFIED; the precursor may exist (C-001) but be clinically useless (C-006).",
+      "strongest_alternative_explanation": "By the time the precursor is detectable, fragmentation is already mechanically inevitable; intervention at that point does not change the embolization outcome.",
+      "alternative_test": "Peridigm intervention simulation — detect precursor onset, modify loading, compare fragmentation outcome vs control.",
+      "epistemic_class": "UNRESOLVED"
+    },
+
+    {
+      "claim_id": "C-007",
+      "claim_text": "The precursor-based intervention is clinically useful in real thrombectomy procedures.",
+      "required_observations": [
+        "Clinical study (retrospective or prospective) showing precursor-detectable clots occur in real thrombectomy cases",
+        "Clinical study showing intervention triggered by precursor reduces distal embolization rate vs standard care",
+        "Clinical study showing no new complications introduced by the intervention (e.g., extended procedure time, increased attempts)",
+        "Regulatory clearance or formal clinical opinion supporting the use case"
+      ],
+      "evidence_state": "RED",
+      "supporting_evidence": [],
+      "contradicting_evidence": [],
+      "unresolved_evidence": [],
+      "simulator_coverage": {
+        "world_A_febio": "NOT_APPLICABLE — clinical claims require clinical data, not simulation",
+        "world_B_peridigm": "NOT_APPLICABLE",
+        "world_C_clotfoam": "NOT_APPLICABLE",
+        "world_d_svfsi": "NOT_APPLICABLE — but patient-specific svFSI can support clinical-trial design via in-silico cohort"
+      },
+      "uncertainty_breakdown": {
+        "model_form": "NOT_APPLICABLE",
+        "parameter": "NOT_APPLICABLE",
+        "numerical": "NOT_APPLICABLE",
+        "simulator_disagreement": "NOT_APPLICABLE",
+        "measurement": "TOTAL — no clinical data exists"
+      },
+      "remaining_gap": "This claim requires E5 (human/clinical reality) evidence. No simulator can support or refute it. It is the long-pole claim in the graph.",
+      "falsification_path": "Clinical study fails to show benefit OR introduces new complications → claim C-007 FALSIFIED; invention is not clinically useful regardless of physical mechanism validity.",
+      "strongest_alternative_explanation": "Real thrombectomy has too much procedural variability (operator skill, clot location, anatomy) for the precursor to be reliably actionable.",
+      "alternative_test": "In-silico clinical cohort using svFSI + patient-specific anatomy → does the precursor remain detectable across the cohort, or does procedural variability dominate?",
+      "epistemic_class": "UNRESOLVED"
+    }
+  ],
+
+  "graph_invariants": {
+    "no_aggregate_score": "The graph is NOT reduced to a scalar. The honest summary is the per-claim state vector (RED, RED, RED, RED, YELLOW, RED, RED). Any scalar reduction would re-introduce the rejected Reality Gap Score.",
+    "non_interchangeability": "Evidence for C-001 does NOT count toward C-006. Each claim's evidence is independently tracked.",
+    "simulator_independence_required": "A claim that is GREEN in World A only is NOT cross-validated. Per the audit: 'Multi-simulator cross-validation is stronger than single-simulator validation ONLY when the simulators are genuinely independent AND benchmarked.' World A only — single-simulator — does not constitute cross-validation.",
+    "promotion_requires_new_evidence": "Per Article XXVIII, a claim moving from RED to YELLOW or YELLOW to GREEN requires NEW evidence — not re-interpretation of existing evidence.",
+    "unresolved_evidence_is_neutral": "Per Article XXV, unresolved evidence cannot be aggregated as supporting or contradicting. The claim's state reflects only resolved evidence."
+  },
+
+  "honest_state_vector": {
+    "C-001_raw_precursor_exists": "RED",
+    "C-002_useful_lead_time": "RED",
+    "C-003_works_across_clot_types": "RED",
+    "C-004_works_under_flow": "RED",
+    "C-005_detectable_by_real_sensor": "YELLOW",
+    "C-006_prevents_embolization": "RED",
+    "C-007_clinically_useful": "RED",
+    "summary": "1 of 7 claims at YELLOW, 6 of 7 at RED, 0 of 7 at GREEN. No claim is supported by physical evidence. The single YELLOW claim (C-005) rests on virtual-instrument simulation only.",
+    "no_silent_promotion": "This state vector does NOT support any claim that the invention is 'validated' or 'working'. Per Article XXVIII, simulation results are PROVISIONAL evidence, not confirmation."
+  },
+
+  "next_actions_by_claim": {
+    "C-001": "Execute PEP-SLOT5-001-a2 (frozen physical protocol) for the nominal composition group.",
+    "C-002": "Same physical experiment; apply the 8-step endpoint pipeline without analyst discretion.",
+    "C-003": "Execute PEP-SLOT5-001-a2 across 3+ measured-composition groups; histology required.",
+    "C-004": "Install World C (clotFoam) and World D (svFSI); run flow-driven clot failure simulations BEFORE physical flow experiment.",
+    "C-005": "Upgrade virtual instrument to include 1/f drift + quantization + EMI from a real sensor datasheet; then physical sensor validation.",
+    "C-006": "Install World B (Peridigm); simulate intervention vs control. Requires C-001 in World B first.",
+    "C-007": "Long-pole. Requires C-001 through C-006 to be at least YELLOW. Begin scoping in-silico clinical cohort with svFSI."
+  }
+}

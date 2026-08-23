@@ -1,0 +1,178 @@
+{
+  "record_type": "WORLD_CLASS_PROMOTION_STATE_SPEC",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 125,
+  "authority": "CEO Round 125 deep audit directive: 'Do not call that \"world-class invention\" in the permanent epistemic state. Create this internal promotion state: WORLD_CLASS_VIRTUAL_SURVIVOR. Then WORLD_CLASS_INVENTION only after the reality gate is satisfied.'",
+  "status": "SPECIFICATION. The two-tier state is defined; it is NOT yet wired into the portfolio controller.",
+
+  "governance_compliance": {
+    "article_I":    "A promotion state is granted only after the evidence supporting it exists.",
+    "article_IV":   "No fallback — failure of reality gate does NOT promote a virtual survivor to invention.",
+    "article_V":    "Fail closed — a candidate that fails reality gate remains a virtual survivor (or is killed), never auto-promoted.",
+    "article_VII":  "A failed reality gate is corrected by improving the experiment or narrowing the claim — never by weakening the promotion state.",
+    "article_IX":   "The promotion state machine is observational — promoting a candidate does not modify the candidate's evidence.",
+    "article_X":    "Canonical state has one authority — promotion_state is recorded in CANONICAL_STATE/PORTFOLIO.json and propagated to the portfolio scoreboard; nowhere else.",
+    "article_XIV":  "RED = STOP — a red gate blocks promotion regardless of other green gates.",
+    "article_XV":   "Disclosure of any state transition, with the evidence supporting it.",
+    "article_XVII": "Adversarial test: what would make a virtual survivor look like a real invention?",
+    "article_XXV":  "Unresolved evidence cannot promote state.",
+    "article_XXVI": "Locally verified ≠ CI-certified. A virtual survivor promoted by a local run is NOT a CI-certified virtual survivor.",
+    "article_XXVII":"Promotion thresholds (which gates must be green) are explicit, not drift-adjustable.",
+    "article_XXVIII":"Virtual survivor is NOT a confirmed invention — passing the virtual campaign does NOT grant credit at the reality gate.",
+    "article_XXIX": "A reality-gate failure is a PHYSICAL_CONTRADIICTION, not an implementation failure — separated from simulator misconfiguration.",
+    "article_XXXII":"Strongest alternative explanation for a virtual survivor: the virtual worlds share a hidden assumption (circular validation). Test via cross-world adversarial variation.",
+    "article_XXXIII":"No irreversible promotion on unresolved evidence.",
+    "article_XXXIV":"Reality gate is the explicit trigger for moving from virtual survivor to invention.",
+    "article_XXXV": "The two-tier state preserves the closed-loop epistemic control system: virtual survivor = loop produced its own next falsification experiment; invention = loop includes physical reality."
+  },
+
+  "regulatory_grounding": {
+    "FDA_computational_modeling_framework": {
+      "position": "FDA explicitly treats computational Modeling & Simulation (CM&S) as evidence that can complement traditional testing, including virtual cohorts.",
+      "caveat": "FDA emphasizes that credibility depends on verification, validation, context of use, and available evidence. Credibility is NOT a universal binary property.",
+      "implication_for_promotion_state": "A virtual survivor has FDA-recognized credibility WITHIN ITS CONTEXT OF USE. It does NOT have the credibility of a validated physical device. The two-tier state reflects this distinction.",
+      "source": "FDA Risk-Informed Credibility Assessment framework for computational modeling (referenced in EPISTEMIC_CONSTITUTION.md Article XXXV)."
+    },
+    "ASME_VV_40": {
+      "position": "ASME V&V 40 frames credibility as risk- and context-dependent, not as a universal binary property.",
+      "implication_for_promotion_state": "The 'world-class' label cannot be universally applied. It must be earned relative to the context (virtual survivor in computational context; invention in physical/clinical context).",
+      "source": "ASME V&V 40-2018, Verification & Validation in Computational Modeling of Medical Devices (referenced in Article XXXV)."
+    },
+    "synthesis": "Both frameworks distinguish computational credibility from physical/clinical validation. The two-tier state encodes this distinction explicitly in the epistemic record."
+  },
+
+  "promotion_states": {
+
+    "STATE_1_DISCOVERY": {
+      "label": "DISCOVERY",
+      "definition": "Candidate has been identified and entered into the portfolio. No gates have been passed yet.",
+      "permission": "Run the AI loop against this candidate.",
+      "next_state_on_success": "VIRTUAL_SURVIVOR_CANDIDATE (intermediate, when ≥1 gate is green but not all required gates).",
+      "next_state_on_failure": "KILLED (with documented reason and cemetery entry)."
+    },
+
+    "STATE_2_VIRTUAL_SURVIVOR_CANDIDATE": {
+      "label": "VIRTUAL_SURVIVOR_CANDIDATE",
+      "definition": "Candidate is progressing through the virtual campaign. Some required gates are green; not all are green yet.",
+      "permission": "Continue the AI loop. Acquire next experiment per the V3 acquisition function.",
+      "next_state_on_success": "WORLD_CLASS_VIRTUAL_SURVIVOR (when ALL required virtual gates are green).",
+      "next_state_on_failure": "KILLED (with documented reason and cemetery entry).",
+      "honest_caveat": "This is an intermediate state. It must NOT be reported as 'survivor' or 'validated' externally. Only WORLD_CLASS_VIRTUAL_SURVIVOR is reportable."
+    },
+
+    "STATE_3_WORLD_CLASS_VIRTUAL_SURVIVOR": {
+      "label": "WORLD_CLASS_VIRTUAL_SURVIVOR",
+      "definition": "The candidate survived the complete adversarial computational campaign across all applicable independent physics worlds. Earned promotion out of the discovery queue.",
+      "permission": "Freeze virtual dossier. Move to next candidate. Begin reality-gate preparation (physical experiment protocol).",
+      "next_state_on_success": "WORLD_CLASS_INVENTION (only after reality gate satisfied).",
+      "next_state_on_failure": "REALITY_KILLED (reality gate contradicted virtual prediction; cemetery entry with epistemic_class=STRONG_CONSTRAINT).",
+      "required_gates": "All 17 gates in PROMOTION_GATE_SPEC_V1.json green (or justified NOT_APPLICABLE_TO_WORLD).",
+      "what_this_state_does_NOT_mean": [
+        "Does NOT mean the candidate is a validated invention.",
+        "Does NOT mean the candidate is clinically useful.",
+        "Does NOT mean the candidate will survive physical experiment.",
+        "Does NOT mean FDA will accept the computational evidence as sufficient.",
+        "Does NOT mean the candidate can be marketed, sold, or implanted."
+      ],
+      "what_this_state_DOES_mean": [
+        "The candidate survived every applicable virtual world.",
+        "The candidate's load-bearing assumptions have been tested across independent simulators.",
+        "The candidate's competing hypotheses have been discriminated.",
+        "The candidate's parameter space has been adversarially swept.",
+        "The candidate's claim-evidence graph is GREEN for all virtual-supported claims.",
+        "The candidate is the highest-priority candidate for physical experiment resource allocation."
+      ],
+      "article_XXVIII_note": "Per Article XXVIII (no silent semantic promotion), WORLD_CLASS_VIRTUAL_SURVIVOR is NOT a partial invention. It is a different epistemic class — computational credibility, not physical validation."
+    },
+
+    "STATE_4_WORLD_CLASS_INVENTION": {
+      "label": "WORLD_CLASS_INVENTION",
+      "definition": "The candidate survived both the virtual campaign AND the reality gate. Physical experiment confirmed the virtual prediction. The candidate is a closed-loop validated system per Article XXXV.",
+      "permission": "Move to buyer/regulatory dossier preparation. Slot is 'filled' in the portfolio.",
+      "required_gates": "All 17 virtual gates green + reality_gate green + closed_loop_operational green (Article XXXV).",
+      "reality_gate_requirements": [
+        "Physical experiment executed per frozen protocol (e.g., PEP-SLOT5-001-a2 for Slot 5).",
+        "Physical experiment result confirms virtual prediction within pre-registered tolerance.",
+        "Physical experiment was pre-registered BEFORE execution (no post-hoc threshold adjustment).",
+        "Physical experiment data ingested into model; model updated; updated model still predicts the phenomenon.",
+        "No new failure modes introduced by physical experiment that were not anticipated virtually."
+      ],
+      "what_this_state_means": [
+        "The candidate is a world-class invention per the constitution.",
+        "The candidate has earned its slot in the portfolio permanently.",
+        "The candidate can move to regulatory submission (subject to FDA/CE requirements)."
+      ],
+      "article_XXXV_note": "Per Article XXXV, the invention is complete ONLY when the closed loop is operational: discovery → hostile attack → simulator → VVUQ → virtual cohort → experiment → automatic ingestion → model update → next experiment → dossier. WORLD_CLASS_INVENTION requires this loop, not just a single physical experiment."
+    },
+
+    "STATE_5_KILLED": {
+      "label": "KILLED",
+      "definition": "The candidate failed a virtual gate and was killed. Recorded in the mechanism cemetery with the kill reason and reusable lesson.",
+      "permission": "Cemetery entry created. Slot may be reopened for a replacement candidate (Slot 5 pattern) OR closed permanently if the kill reason is PROVEN_INVARIANT.",
+      "epistemic_class_options": [
+        "PROVEN_INVARIANT — hard block, cannot be reopened",
+        "STRONG_CONSTRAINT — reopenable only with new evidence that overturns the constraint",
+        "MODEL_SPECIFIC — reopenable in a different model form",
+        "FAILURE_LESSON — reopenable if the failure mode is addressed",
+        "UNRESOLVED_WARNING — yellow-gate kill, reopenable if the unresolved evidence resolves"
+      ]
+    },
+
+    "STATE_6_REALITY_KILLED": {
+      "label": "REALITY_KILLED",
+      "definition": "The candidate was a WORLD_CLASS_VIRTUAL_SURVIVOR but the reality gate contradicted the virtual prediction. A particularly informative kill — the virtual campaign was wrong.",
+      "permission": "Cemetery entry with epistemic_class=STRONG_CONSTRAINT. Trigger a virtual-campaign audit: what hidden assumption did all virtual worlds share that reality exposed?",
+      "article_XXIX_note": "This is a PHYSICAL_CONTRADIICTION, not an implementation failure. The virtual worlds were not misconfigured — they were wrong about reality. This is the most informative outcome possible.",
+      "lesson_value": "Extremely high. A reality kill teaches the virtual campaign what to test differently next time."
+    }
+  },
+
+  "state_transition_diagram": {
+    "DISCOVERY": {
+      "via_virtual_pass": "→ VIRTUAL_SURVIVOR_CANDIDATE",
+      "via_virtual_fail": "→ KILLED"
+    },
+    "VIRTUAL_SURVIVOR_CANDIDATE": {
+      "via_all_virtual_gates_green": "→ WORLD_CLASS_VIRTUAL_SURVIVOR",
+      "via_virtual_fail": "→ KILLED"
+    },
+    "WORLD_CLASS_VIRTUAL_SURVIVOR": {
+      "via_reality_gate_pass": "→ WORLD_CLASS_INVENTION",
+      "via_reality_gate_fail": "→ REALITY_KILLED"
+    },
+    "WORLD_CLASS_INVENTION": {
+      "terminal": true,
+      "slot_permanently_filled": true
+    },
+    "KILLED": {
+      "terminal_for_this_candidate": true,
+      "slot_may_be_reopened": "conditional on epistemic_class"
+    },
+    "REALITY_KILLED": {
+      "terminal_for_this_candidate": true,
+      "triggers_virtual_campaign_audit": true
+    }
+  },
+
+  "machine_enforcement_rules": {
+    "rule_1_no_skipping_reality_gate": "The engine MUST refuse to transition from WORLD_CLASS_VIRTUAL_SURVIVOR to WORLD_CLASS_INVENTION without a green reality_gate entry backed by physical experiment data.",
+    "rule_2_no_aggregate_promotion": "Multiple virtual worlds agreeing does NOT promote to invention. Reality gate is a separate, mandatory gate.",
+    "rule_3_no_silent_state_change": "Every state transition is recorded with: previous state, new state, triggering gate, evidence hash, commit hash, timestamp.",
+    "rule_4_no_reality_gate_self_certification": "The agent that ran the virtual campaign CANNOT be the same agent that certifies the reality gate. Independent review required.",
+    "rule_5_no_partial_reality_gate": "Reality gate is BINARY: the physical experiment either confirms the virtual prediction within pre-registered tolerance OR it does not. No partial credit.",
+    "rule_6_reality_gate_pre_registration_required": "The physical experiment protocol (e.g., PEP-SLOT5-001-a2) must be frozen BEFORE execution. No post-hoc threshold adjustment.",
+    "rule_7_closed_loop_required_for_invention": "Per Article XXXV, WORLD_CLASS_INVENTION requires the closed loop to be operational: physical data ingested, model updated, updated model still predicts the phenomenon."
+  },
+
+  "anti_gaming_safeguards": {
+    "safeguard_1_no_label_inflation": "WORLD_CLASS_VIRTUAL_SURVIVOR may NOT be externally reported as 'world-class invention' or 'validated invention'. External reporting must use the full label including 'VIRTUAL'.",
+    "safeguard_2_no_circular_promotion": "A candidate cannot promote itself by re-interpreting its own virtual evidence. New evidence (physical) is required for reality-gate promotion.",
+    "safeguard_3_no_quota_pressure": "Five slots is a CEILING, not a quota. Zero world-class inventions is an acceptable outcome. Five simultaneous virtual survivors is suspicious, not celebratory (per audit pushing-the-envelope principle).",
+    "safeguard_4_no_reality_gate_shortcut": "The reality gate cannot be skipped because 'the virtual evidence is overwhelming'. Per Article XXVIII, virtual evidence does NOT confirm physical reality.",
+    "safeguard_5_no_state_drift": "Once WORLD_CLASS_VIRTUAL_SURVIVOR is granted, the candidate's virtual dossier is FROZEN. Subsequent virtual changes do not affect the survivor state — only the reality gate can promote further.",
+    "safeguard_6_no_cemetery_circumvention": "A killed candidate cannot re-enter the portfolio as a 'new' candidate without explicit reopen justification per Article XXIX."
+  },
+
+  "honest_status": "SPECIFICATION ONLY. The two-tier state is defined. CANONICAL_STATE/PORTFOLIO.json currently reports 0/5 world-class inventions — this remains accurate. The portfolio scoreboard (PORTFOLIO_SCOREBOARD_V1.json) reports 0/5 WORLD_CLASS_VIRTUAL_SURVIVORS and 0/5 WORLD_CLASS_INVENTIONS. No candidate has yet been run through the full virtual campaign; the two-tier state is the framework, not a populated record."
+}

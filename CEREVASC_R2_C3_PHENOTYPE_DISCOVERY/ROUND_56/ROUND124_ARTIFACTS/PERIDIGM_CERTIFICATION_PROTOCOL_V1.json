@@ -1,0 +1,190 @@
+{
+  "record_type": "PERIDIGM_CERTIFICATION_PROTOCOL",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 124,
+  "authority": "CEO Round 124 P0 directive: 'World B: Peridigm — 1. install; 2. run official examples; 3. reproduce an analytical tensile/fracture benchmark; 4. establish convergence; 5. certify.'",
+  "status": "SPECIFICATION — NOT CERTIFICATION. This document specifies HOW Peridigm will be certified. It is NOT a certification. Per Article I (evidence precedes assertion) and Article XXVI (no self-certification), no certification exists until the protocol is executed.",
+
+  "governance_compliance": {
+    "article_I":   "Certification is granted only after the corresponding evidence exists. P1 (install) must succeed before P2 (examples) is attempted.",
+    "article_V":    "Fail closed — a failed P-level BLOCKS all higher P-levels. P3 fail means P4-P8 do not proceed.",
+    "article_VI":   "Never manufacture provenance — Peridigm version, build hash, dependency versions must be independently verified, not asserted.",
+    "article_VII":  "A failed P-level is corrected by fixing the install/example/benchmark — never by weakening the acceptance criterion.",
+    "article_VIII": "Each P-level includes an adversarial test (intentionally corrupted input, malformed mesh, wrong horizon) that must be REJECTED.",
+    "article_XIV":  "RED = STOP. A red P-level halts the certification ladder.",
+    "article_XV":   "Disclosure: any deviation from this protocol during execution MUST be reported honestly, not silently absorbed.",
+    "article_XVII": "Each P-level has an attempted bypass — what would make this P-level pass while the underlying system is wrong?",
+    "article_XXVI": "Locally verified ≠ CI-certified. Each P-level must be re-runnable from a clean environment by a third party.",
+    "article_XXVII":"Every numerical threshold in this protocol has explicit class (PHYSIOLOGICAL / ANALYTICAL / ENGINEERING / MODEL_DERIVED) and provenance.",
+    "article_XXVIII":"Passing a P-level grants credit ONLY at that P-level. It does NOT promote to physical validation or to precursor claim support.",
+    "article_XXIX": "Implementation failure (Peridigm misconfigured) is separated from mechanism failure (precursor absent).",
+    "article_XXX":  "Before declaring each P-level GREEN, ask 'what would make this test pass while the underlying system is still wrong?' Then construct the adversarial test.",
+    "cemetery_lessons_applied": [
+      "CE-019 — Do not attribute Peridigm failure to a plausible cause without A/B test.",
+      "CE-020 — Material label ≠ constitutive equivalence. Peridigm's 'elastic' material must be matched to FEBio's neo-Hookean by parameter equivalence, not label.",
+      "CE-023 — Two implementations can agree and both be wrong. Peridgm agreement with FEBio is necessary but not sufficient.",
+      "CE-025 — Three-method verification (analytical + FEBio + Peridigm) catches bugs that two-method cannot.",
+      "CE-027 — Derive analytical solutions from source code, not textbook formulas.",
+      "CE-029 — Analytical solutions must match Peridigm's boundary conditions, not generic textbook BCs."
+    ]
+  },
+
+  "independence_argument": {
+    "code_independence": "Peridigm is a separate C++ codebase maintained by Sandia National Laboratories. No shared source with FEBio. No shared author with this project.",
+    "discretization_independence": "Peridigm uses meshfree discretization (no element connectivity required). FEBio uses FEM (element connectivity required). Fundamentally different numerical methods.",
+    "fracture_formulation_independence": "Peridigm: fracture emerges from bond breakage between material points. FEBio: fracture imposed via CDM + element deletion (Simo CDF). Different mathematical representations of fracture.",
+    "verification_independence": "Peridigm has its own test suite (Peridigm/test/). FEBio has its own verification suite. The two suites were authored independently.",
+    "attempted_bypass_of_independence_claim": "Could Peridgm and FEBio secretly share assumptions? Yes — both could share (a) neo-Hookean material model parameterization, (b) plane-strain assumptions, (c) timestep heuristics. To test: deliberately introduce mismatched material parameterizations and confirm results change predictably. If results do NOT change, the independence claim is weakened."
+  },
+
+  "protocol_ladder": {
+
+    "P1_INSTALLATION": {
+      "description": "Peridigm is installed, builds from source, and the executable runs in a clean environment.",
+      "acceptance_criteria": [
+        "Peridigm builds from source on a clean Linux environment (Ubuntu 22.04+ or equivalent)",
+        "All dependencies (Trilinos, MPI, Boost) are at versions specified in Peridigm README",
+        "Peridigm executable responds to --help and --version",
+        "Build provenance recorded: Peridigm git commit hash, Trilinos version, MPI distribution, compiler version",
+        "Docker image built and tagged (Peridigm ships Docker support per audit)"
+      ],
+      "adversarial_test": "Plant a fake 'peridigm' binary in PATH that silently exits 0. The protocol must detect the substitution (version string mismatch, binary hash mismatch).",
+      "what_would_make_this_pass_while_wrong": "Peridigm builds but the wrong version (e.g., a forked branch with non-standard modifications). Mitigation: pin to official master branch at a specific commit, record hash.",
+      "epistemic_class_on_pass": "ENGINEERING — install only; no physics validated yet."
+    },
+
+    "P2_OFFICIAL_EXAMPLES": {
+      "description": "All official Peridigm examples run and produce expected output.",
+      "acceptance_criteria": [
+        "Tensile bar example runs to completion",
+        "Fragmentation example (e.g., notched cylinder impact) runs and produces visible fracture pattern",
+        "Kalthoff-Winkler impact example runs and crack path matches published pattern",
+        "Each example output compared against Peridigm's own test/baseline (regression test)",
+        "Output file format (ExodusII) is readable by Paraview"
+      ],
+      "adversarial_test": "Corrupt one input file (e.g., negative Young's modulus). Peridigm must FAIL with a clear error message, not silently produce garbage.",
+      "what_would_make_this_pass_while_wrong": "Examples pass but Peridigm is using a single CPU silently (MPI broken). Mitigation: verify mpirun -np 4 produces different timing than -np 1 and correct partitioning.",
+      "epistemic_class_on_pass": "ENGINEERING — Peridgm's own tests pass; no independent ground truth established yet."
+    },
+
+    "P3_ANALYTICAL_TENSILE_BENCHMARK": {
+      "description": "Reproduce an analytical tensile bar solution. Analogous to FEBio L3 (analytical neo-Hookean verification).",
+      "acceptance_criteria": [
+        "Analytical solution DERIVED FROM Peridigm source code, not textbook (CE-027 lesson). Specifically: derive the constitutive response for the 'Prototypical Peridynamic Material' (or equivalent elastic model) under uniaxial tension.",
+        "Analytical solution matches Peridigm boundary conditions (CE-029 lesson). Peridigm uses horizon δ, family of bonds, no fixed nodes in the FEM sense. The analytical solution must reflect this.",
+        "Peridgm simulation of tensile bar matches analytical solution to <=1% in stress-strain for small strains (< 10%).",
+        "Deviation decreases monotonically with horizon refinement (δ → 0)",
+        "Convergence rate matches theoretical prediction (Peridigm should converge to classical continuum in the δ → 0 limit for ordinary state-based)"
+      ],
+      "adversarial_test": "Use a horizon δ larger than the bar dimension. Peridgm should fail or produce meaningless output — not silently run.",
+      "what_would_make_this_pass_while_wrong": "Analytical solution derived incorrectly but happens to match a degenerate Peridgm case. Mitigation: derive analytical solution INDEPENDENTLY (two authors, two methods) before comparison.",
+      "epistemic_class_on_pass": "ANALYTICAL — Peridgm reproduces known continuum mechanics in the small-strain limit. Strong but not fracture-relevant yet.",
+      "thresholds": {
+        "small_strain_deviation_threshold": {"value": 0.01, "class": "ENGINEERING", "justification": "1% is the FEBio L3 acceptance threshold; matched for consistency"},
+        "convergence_rate_threshold": {"value": "monotonic decrease with δ refinement", "class": "ANALYTICAL", "justification": "theoretical prediction; not a numerical threshold"}
+      }
+    },
+
+    "P4_CONVERGENCE_STUDY": {
+      "description": "Establish spatial and temporal convergence for Peridigm on a non-trivial problem (not just tensile bar). Analogous to FEBio L2.",
+      "acceptance_criteria": [
+        "Horizon convergence: δ = {2h, 3h, 4h} with mesh refinement h → 0 at fixed δ/h ratio. Observed convergence rate matches theory.",
+        "Mesh convergence: h refined at fixed δ. Convergence to nonlocal solution (not classical continuum).",
+        "Time-step convergence: explicit time integration with dt = {0.5*dt_CFL, 0.25*dt_CFL, 0.125*dt_CFL}. Solution stable and convergent.",
+        "All three convergence studies on the SAME problem (e.g., Mode I crack propagation in a pre-notched plate).",
+        "Results plotted with error bars and convergence rates reported with confidence intervals"
+      ],
+      "adversarial_test": "Run with dt > dt_CFL (CFL violation). Peridigm should produce unstable results (energy non-conservation), not silently damp.",
+      "what_would_make_this_pass_while_wrong": "Convergence appears OK because the problem is too easy (linear elastic, no fracture). Mitigation: include fracture in the convergence problem (pre-notched plate with crack growth).",
+      "epistemic_class_on_pass": "ANALYTICAL + NUMERICAL — Peridgm's numerical machinery is verified."
+    },
+
+    "P5_FRACTURE_BENCHMARK": {
+      "description": "Reproduce a published analytical or experimental fracture benchmark. This is where Peridgm's fracture formulation is independently validated.",
+      "acceptance_criteria": [
+        "Benchmark: Kalthoff-Winkler impact experiment (peridynamics' canonical fracture benchmark).",
+        "Crack propagation angle matches published experimental value (~70° from impact direction) within ±5°.",
+        "Crack speed matches published experimental value within ±20%.",
+        "OR: Mode I crack propagation in pre-notched plate. Stress intensity factor matches analytical (LEFM) prediction within ±5% in small-scale yielding regime.",
+        "Result is reproducible across multiple mesh refinements (not a single-mesh artifact)."
+      ],
+      "adversarial_test": "Set bond-failure threshold to a value that would prevent any fracture. Peridgm should produce elastic response with no cracks — not silently introduce numerical fracture.",
+      "what_would_make_this_pass_while_wrong": "Crack angle matches because of mesh-bias (pre-notched plate with mesh aligned to expected crack path). Mitigation: use UNALIGNED mesh or random mesh perturbation.",
+      "epistemic_class_on_pass": "ANALYTICAL + EXPERIMENTAL — Peridgm's fracture formulation is validated against published physical data.",
+      "thresholds": {
+        "crack_angle_tolerance": {"value": 5, "unit": "degrees", "class": "EXPERIMENTAL", "justification": "typical experimental uncertainty in Kalthoff-Winkler"},
+        "crack_speed_tolerance": {"value": 20, "unit": "percent", "class": "EXPERIMENTAL", "justification": "experimental crack speed measurements vary widely"}
+      }
+    },
+
+    "P6_INDEPENDENT_PUBLISHED_DATA_REPRODUCTION": {
+      "description": "Reproduce a published computational result that uses peridynamics for a biological/soft-tissue problem. This bridges Peridgm from hard-materials fracture to soft-tissue biomechanics.",
+      "acceptance_criteria": [
+        "Benchmark: 2026 CFD+peridynamics thrombus embolization paper (PubMed 42367319) — see VIRTUAL_LAB_BENCHMARK_1_SPEC.json",
+        "Reproduce the published embolization timing within ±15% of reported value",
+        "Reproduce the published fragment size distribution within Kolmogorov-Smirnov distance 0.2",
+        "Reproduce the published threshold pressure for embolization onset within ±20%",
+        "All material parameters sourced from the published paper, not re-fit"
+      ],
+      "adversarial_test": "Use parameters OUTSIDE the published range (e.g., 10x stiffer clot). Peridgm should produce qualitatively different behavior (no embolization or much higher threshold) — not silently reproduce the published result.",
+      "what_would_make_this_pass_while_wrong": "Reproduction succeeds because of overfitting (re-fit parameters under the guise of 'calibration'). Mitigation: parameters from the paper, no re-fit. If reproduction fails with paper parameters, FAIL P6 — do not re-fit.",
+      "epistemic_class_on_pass": "EXPERIMENTAL — Peridgm reproduces published biological/soft-tissue fracture data. This is the gateway to using Peridgm for the precursor.",
+      "thresholds": {
+        "embolization_timing_tolerance": {"value": 15, "unit": "percent", "class": "ENGINEERING", "justification": "computational reproduction tolerance; smaller than experimental variation"},
+        "ks_distance_fragment_distribution": {"value": 0.2, "class": "ENGINEERING", "justification": "standard KS distance for distributional similarity"}
+      }
+    },
+
+    "P7_CROSS_WORLD_COMPARISON": {
+      "description": "Run the SAME simplified clot-loading benchmark in BOTH FEBio and Peridgm. Compare results. This is the FIRST point at which multi-simulator cross-validation becomes meaningful.",
+      "acceptance_criteria": [
+        "Benchmark: simplified clot cylinder under uniaxial compression, with damage/fracture allowed. Same geometry, same loading, same material parameters (where constitutive equivalence is meaningful).",
+        "Force-displacement curve compared between FEBio and Peridgm in the pre-failure regime. Required: <=5% deviation in stiffness, <=10% deviation in peak force.",
+        "Failure mode compared qualitatively. Both should show damage localization in the same region (or document disagreement and explain).",
+        "Disagreement, if any, is CLASSIFIED per the simulator_disagreement_classification (PHYSICS_DISAGREEMENT / MATHEMATICAL_MODEL_DISAGREEMENT / etc.) — NOT automatically promoted to HYPOTHESIS_KILLED.",
+        "The disagreement classification is supported by A/B testing (CE-019 lesson) — e.g., if disagreement is attributed to CDM vs. bond-breakage, run Peridgm with a CDM-like correspondence model to test the attribution."
+      ],
+      "adversarial_test": "Run FEBio and Peridgm with deliberately mismatched material parameters (e.g., 2x stiffer in Peridgm). Both should produce different results — not silently agree. If they agree despite parameter mismatch, the comparison is meaningless.",
+      "what_would_make_this_pass_while_wrong": "Forced agreement by re-parameterizing one simulator to match the other post-hoc. Mitigation: parameters set INDEPENDENTLY from material characterization, not re-fit to each other.",
+      "epistemic_class_on_pass": "ANALYTICAL + EXPERIMENTAL — cross-simulator agreement (or classified disagreement) on a simplified problem.",
+      "thresholds": {
+        "stiffness_deviation_threshold": {"value": 5, "unit": "percent", "class": "ENGINEERING", "justification": "FEBio L3 acceptance threshold matched"},
+        "peak_force_deviation_threshold": {"value": 10, "unit": "percent", "class": "ENGINEERING", "justification": "wider than stiffness due to fracture sensitivity"}
+      }
+    },
+
+    "P8_INDEPENDENCE_CERTIFICATION": {
+      "description": "Formal certification that Peridgm satisfies the independence requirements for cross-validation. Without this, P7 results cannot be claimed as 'multi-simulator validation.'",
+      "acceptance_criteria": [
+        "Code independence: Peridgm git commit hash != FEBio git commit hash; no shared source files",
+        "Discretization independence: meshfree vs. FEM (documented)",
+        "Fracture formulation independence: bond breakage vs. CDM + element deletion (documented)",
+        "Author independence: Peridigm developers != FEBio developers != this project's authors (verified by author metadata in source repositories)",
+        "Benchmark independence: Peridigm test suite != FEBio verification suite (verified by file-level comparison)",
+        "Constitutive equivalence: where Peridgm and FEBio use the SAME material model (e.g., neo-Hookean in correspondence formulation), parameters are matched by ANALYTICAL EQUIVALENCE, not label (CE-020 lesson). The 1/J factor error (CE-023 lesson) is checked.",
+        "All independence claims VERIFIED BY FILE-LEVEL COMPARISON, not asserted."
+      ],
+      "adversarial_test": "For each independence claim, ask: 'What shared assumption could Peridgm and FEBio secretly have?' Test by deliberately violating the assumption and confirming results change.",
+      "what_would_make_this_pass_while_wrong": "Independence claimed but Peridgm secretly imported FEBio's material model. Mitigation: file-level grep for shared code, parameter-file structural comparison.",
+      "epistemic_class_on_pass": "INDEPENDENCE_CERTIFIED — Peridgm is genuinely independent of FEBio. Cross-simulator comparison is now MEANINGFUL."
+    }
+  },
+
+  "ladder_invariants": {
+    "no_skipping": "P-levels may not be skipped. P3 requires P2 GREEN. P4 requires P3 GREEN. Etc.",
+    "no_retroactive_amendment": "Once a P-level is GREEN, its acceptance criteria may not be retroactively weakened. If a higher P-level reveals a P-level bug, the lower P-level is RE-CERTIFIED, not grandfathered.",
+    "no_self_certification": "P-levels must be verified by running the protocol in a clean environment, not by the agent who installed Peridgm. CI artifact required.",
+    "evidence_custody": "Each P-level pass produces an artifact (log, plot, output file) committed to the repository with provenance (Peridigm version, input file, output hash, commit hash).",
+    "honest_failure": "If any P-level fails, the failure is recorded with the failure mode, the suspected cause, and the A/B test that would confirm or refute the cause (CE-019)."
+  },
+
+  "what_this_protocol_does_NOT_certify": {
+    "not_clot_physics": "P1-P8 certify Peridgm as a peridynamics solver. They do NOT certify that peridynamics is the right physics for clots. That requires the precursor test (after P8).",
+    "not_precursor_existence": "P1-P8 do NOT test whether the precursor exists in Peridgm. That is the next phase after certification.",
+    "not_physical_validation": "P1-P8 are virtual certification. They do NOT replace physical experiment (E4/E5).",
+    "not_replacement_for_FEBio": "Peridgm is INDEPENDENT of FEBio, not a REPLACEMENT. FEBio remains the validated L1-L8 stack. Peridgm adds an independent cross-validation universe."
+  },
+
+  "honest_status": "SPECIFICATION ONLY. Zero P-levels executed. Peridgm not installed. No certification exists. This protocol is the design artifact; execution is the next phase."
+}

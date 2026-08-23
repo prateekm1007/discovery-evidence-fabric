@@ -1,0 +1,271 @@
+{
+  "record_type": "VIRTUAL_WET_LAB_ARCHITECTURE",
+  "version": "2.0.0",
+  "date": "2026-08-23",
+  "round": 124,
+  "authority": "CEO Round 124 deep audit — supersedes v1.0; corrects coder overreach, tightens independence requirement, replaces Reality Gap Score with Claim-Evidence Graph",
+  "supersedes": "VIRTUAL-WET-LAB-ARCHITECTURE-v1.json (same round, same date)",
+
+  "governance_compliance": {
+    "article_I":     "Each simulator's role is bounded to what it can actually evidence. clotFoam is NOT a fracture oracle.",
+    "article_IV":    "No fallback epistemology — failure of one simulator does NOT promote another simulator's result.",
+    "article_V":     "Fail closed but do not become a universal rejector — disagreement is classified before promotion to falsification.",
+    "article_VII":   "A claim failing in one simulator is corrected by adding evidence or improving the model — never by weakening the disagreement classifier.",
+    "article_VIII":  "Each simulator must attack itself (adversarial benchmark) before entering cross-simulator comparison.",
+    "article_XIV":   "RED = STOP. A RED simulator does not contribute to claim promotion.",
+    "article_XVII":  "Each simulator independence claim has an attempted bypass (shared code, shared discretization, shared author).",
+    "article_XXIII": "HEAD = origin/main (current commit recorded at execution time, NOT asserted from memory)",
+    "article_XXIV":  "When summary conflicts with artifact, artifact wins. v1.0 summary said 'World B peridynamics NOT INSTALLED'; v2.0 makes this the binding state.",
+    "article_XXV":   "Unknown remains unknown — simulator-not-installed is NOT evidence that the simulator would agree with FEBio.",
+    "article_XXVI":  "Locally verified ≠ CI-certified. The v1.0 claim 'CI status of a3f716c4 has no status entries' is preserved and addressed.",
+    "article_XXVIII":"Simulator agreement is NOT physical confirmation. Cross-simulator GREEN does not promote to E4/E5 GREEN.",
+    "article_XXIX":  "Implementation failure (simulator misconfigured) is separated from mechanism failure (precursor does not exist).",
+    "article_XXXII": "Before each simulator result, state the strongest alternative explanation for it.",
+    "article_XXXIII":"No irreversible action (kill precursor) on unresolved simulator disagreement.",
+    "article_XXXIV": "Revised interpretation (per v1.0) PRESERVED but BOUNDED — does not weaken Article XXXIV; expands what counts as computational evidence without replacing physical reality.",
+    "article_XXXV":  "The multi-simulator loop is part of the closed-loop epistemic control system required for completion."
+  },
+
+  "v1_to_v2_corrections": {
+    "correction_1_reality_gap_score": {
+      "v1_defect": "v1.0 used a scalar Reality Gap Score: 1 - E3_coverage / total_evidence_needed. This treats evidence as interchangeable percentage.",
+      "v2_correction": "REPLACED with Claim-Evidence Graph (CLAIM_EVIDENCE_GRAPH_V1.json). Evidence is non-interchangeable. Each claim has its own state vector.",
+      "audit_reference": "CEO Round 124: 'I would not accept that metric... You need a claim-by-claim evidence graph, not an evidence percentage.'"
+    },
+
+    "correction_2_independence_overreach": {
+      "v1_defect": "v1.0 implied multi-simulator cross-validation is automatically stronger than single-simulator. Worlds B/C/D were described as if their existence would strengthen the precursor claim.",
+      "v2_correction": "Multi-simulator cross-validation is stronger ONLY when (a) simulators are genuinely independent (no shared code, no shared discretization, no shared author), AND (b) each simulator is independently benchmarked against analytical/experimental ground truth BEFORE entering cross-comparison. Currently only World A (FEBio) is validated. Worlds B/C/D are HYPOTHESES about infrastructure, not evidence.",
+      "audit_reference": "CEO Round 124: 'Multi-simulator cross-validation is stronger than single-simulator validation is true only when the simulators are genuinely independent and benchmarked.'"
+    },
+
+    "correction_3_disagreement_classification": {
+      "v1_defect": "v1.0 success_criterion was 'Precursor survives across >=3 independent physics worlds AND matches published experimental observations. If it fails in any world, the signal is falsified for that physics representation.' This is too simplistic — failure in one simulator does NOT automatically falsify the physical hypothesis.",
+      "v2_correction": "Simulator disagreement is now classified through a 4-stage pipeline BEFORE any promotion to HYPOTHESIS_KILLED: PHYSICS_DISAGREEMENT → MATHEMATICAL_MODEL_DISAGREEMENT → PHYSICAL_CONTRADICTION → HYPOTHESIS_KILLED. See simulator_disagreement_classification below.",
+      "audit_reference": "CEO Round 124: 'Failure in one simulator does not automatically falsify the physical hypothesis. It may reveal: different constitutive assumptions; different fracture regularization; different numerical scales; different model domains. Your own cemetery already teaches this.'"
+    },
+
+    "correction_4_world_B_specificity": {
+      "v1_defect": "v1.0 said 'Install peridynamics solver (World B) — independent fracture universe' without specifying which implementation.",
+      "v2_correction": "World B = Peridigm (primary, mature code with MPI/Docker/implicit-quasi-static-explicit integration + official examples). MOOSE NOSPD (secondary, INDEPENDENT second peridynamic implementation — only after Peridigm is certified). This gives three distinct mathematical worlds: FEBio FEM/CDM, Peridigm nonlocal fracture, MOOSE NOSPD.",
+      "audit_reference": "CEO Round 124: 'P0 — World B should be Peridigm or MOOSE, not an arbitrary peridynamics implementation. I would prioritize Peridigm first... Then use MOOSE Peridynamics as an independent second peridynamic implementation later if needed.'"
+    },
+
+    "correction_5_world_C_role": {
+      "v1_defect": "v1.0 listed clotFoam as World C with role 'Blood flow + clot formation + flow-induced failure (different axis: mechanics → flow → clot → failure)' — implying it could be a fracture oracle.",
+      "v2_correction": "World C (clotFoam/OpenFOAM-v9) is initially a FLOW/TRANSPORT/FORMATION simulator only. clotFoam's published formulation is a continuum platelet/coagulation model, not a validated thrombectomy fracture engine. clotFoam may NOT be claimed as a fracture oracle until a benchmark establishes the relevant mechanics. Its initial role: flow field / clot formation / embolization transport — NOT fracture oracle.",
+      "audit_reference": "CEO Round 124: 'clotFoam is excellent for blood/clot formation and flow, but its published formulation is a continuum platelet/coagulation model, not a validated thrombectomy fracture engine... Its correct role initially is: flow field / clot formation / transport — not: fracture oracle.'"
+    },
+
+    "correction_6_world_D_benchmarking": {
+      "v1_defect": "v1.0 implied svFSI would be used for patient-specific thrombectomy digital twin without acknowledging svFSI already has a verification test corpus.",
+      "v2_correction": "World D (svFSI) installation must FIRST use its official svFSI-Tests corpus: pipe flow, pipe prestress, vein-graft FSI, pressure pulse in aorta. Do NOT invent cardiovascular benchmarks. Use upstream verification first; only after verification does svFSI enter the clot/thrombectomy campaign.",
+      "audit_reference": "CEO Round 124: 'svFSI already has verification cases. So your coder should not start inventing cardiovascular benchmarks. Use the upstream test corpus first.'"
+    },
+
+    "correction_7_CI_status_honesty": {
+      "v1_defect": "v1.0 governance_compliance asserted 'article_XXVI: Locally verified, NOT CI-certified' but did not address the specific finding that commit a3f716c4 has no combined CI status entries.",
+      "v2_correction": "The architecture record itself is NOT a CI artifact. The commit a3f716c4 finding (no combined CI status entries) is recorded as an OPEN infrastructure debt: the Virtual Lab architecture is an architectural plan, not a CI-certified deliverable. Independent CI certification requires the work to be committed and the workflow to run; this record is a design artifact in the discovery campaign, not a code deliverable requiring CI.",
+      "audit_reference": "CEO Round 124: 'GitHub confirms the architecture record is in the repository; its combined CI status currently has no status entries, so the infrastructure is not independently CI-certified.'"
+    },
+
+    "correction_8_benchmark_first": {
+      "v1_defect": "v1.0 listed 'Reproduce published clot embolization experiments computationally (E3)' as step 2 of Virtual Lab Round 1, but did not enforce the principle that the FIRST benchmark must be a published phenomenon, not the invention.",
+      "v2_correction": "Virtual Lab Benchmark #1 is the published 2026 CFD+peridynamics thrombus-embolization paper. Reproduce a published phenomenon FIRST. Only after the simulator stack reproduces a known phenomenon does the precursor enter the new fracture world. Same principle as FEBio L1/L2/L3: 'never let the machine create its own oracle.'",
+      "audit_reference": "CEO Round 124: 'The new 2026 CFD-peridynamics paper is extremely relevant... That should become Virtual Lab Benchmark #1. Do not start with your invention. First reproduce a published phenomenon.'"
+    }
+  },
+
+  "simulator_disagreement_classification": {
+    "principle": "When two simulators disagree on the precursor, the disagreement is classified through a 4-stage pipeline before any promotion to HYPOTHESIS_KILLED. The cemetery (CE-019 through CE-032) teaches that two implementations can agree and both be wrong, and that failure attribution requires A/B testing — not assumption.",
+
+    "stage_1_PHYSICS_DISAGREEMENT": {
+      "definition": "Simulators use different physical formulations (e.g., FEM + CDM vs. peridynamic bond failure). Disagreement is EXPECTED because the mathematical representation of fracture differs.",
+      "interpretation": "If precursor survives FEBio (CDM) but not Peridigm (bond breakage), this is NOT a hypothesis falsification — it is a hint that the precursor is tied to CDM's smooth damage accumulation, not to physical fracture.",
+      "next_action": "Investigate which constitutive assumption is responsible. Run a correspondence formulation (MOOSE NOSPD with FEM-like material model) to isolate the cause."
+    },
+
+    "stage_2_MATHEMATICAL_MODEL_DISAGREEMENT": {
+      "definition": "Simulators use the SAME physical formulation but different mathematical representations (e.g., ordinary vs. non-ordinary state-based peridynamics; implicit vs. explicit time integration).",
+      "interpretation": "Disagreement here means the result is sensitive to mathematical formulation, not physical reality. The hypothesis is WEAKENED but not killed.",
+      "next_action": "Identify which mathematical choice drives the disagreement. Re-run with matched formulations."
+    },
+
+    "stage_3_PHYSICAL_CONTRADIICTION": {
+      "definition": "Two independently validated simulators, with the SAME physical formulation and SAME mathematical representation, disagree on the precursor AND physical experiment agrees with one of them.",
+      "interpretation": "The simulator that disagrees with physical experiment is INVALIDATED for this domain. The hypothesis's status depends on the agreeing simulator + physical experiment.",
+      "next_action": "Quarantine the invalidated simulator for this claim. Re-examine its benchmark history."
+    },
+
+    "stage_4_HYPOTHESIS_KILLED": {
+      "definition": "Two or more independently validated simulators AGREE that the precursor does NOT exist, AND physical experiment confirms absence.",
+      "interpretation": "Only at this stage is the precursor hypothesis falsified. Per Article XXIX, a single simulator failure does NOT kill the hypothesis.",
+      "next_action": "Record in mechanism cemetery with epistemic_class=PROVEN_INVARIANT or STRONG_CONSTRAINT."
+    },
+
+    "rule": "NO disagreement may be promoted past stage 1 without explicit A/B testing of the suspected cause (CE-019 lesson: do not attribute failure to a plausible cause without A/B test)."
+  },
+
+  "multi_simulator_ecosystem_v2": {
+    "world_A_febio": {
+      "role": "Nonlinear biomechanics: hyperelasticity, viscoelasticity, damage (CDM), contact, fracture (Simo CDF).",
+      "status": "VALIDATED — L1/L2 verification, L3-L6 constitutive/contact, L8 fracture, all certified with <0.005% deviation.",
+      "independence_class": "FEM + continuum damage mechanics + element-deletion fracture.",
+      "strength": "Large deformation, mature CDM, contact mechanics, deterministic convergence.",
+      "limitation": "FEM fracture requires element deletion / crack path tracking. The dD/dstrain signal is tied to CDM's smooth damage accumulation — this is the load-bearing assumption to test in World B.",
+      "official_benchmarks_passed": ["L1 Uniaxial (SfePy)", "L2 Convergence", "L3 Analytical neo-Hookean", "L4 Prony viscoelastic", "L5 Coupled damage", "L6 Penalty contact", "L8 Simo CDF fracture"]
+    },
+
+    "world_B_peridigm_PRIMARY": {
+      "role": "Independent fracture universe — fragmentation emerges from bond breakage, NOT imposed through element deletion.",
+      "status": "NOT INSTALLED — NEXT PRIORITY (per audit P0 directive)",
+      "independence_class": "Bond-based / ordinary-state-based / non-ordinary-state-based peridynamics. NO shared code with FEBio. NO shared discretization. NO shared author.",
+      "strength": "Fracture and fragmentation are emergent. Different mathematical foundation than FEM. Cohesive + adhesive fracture supported. Heterogeneous material properties supported.",
+      "literature_support": [
+        "PubMed 42367319 (2026) — CFD + non-ordinary state-based peridynamics for thrombus embolization; reproduces reported experimental behavior",
+        "PubMed 41249110 (2025) — peridynamic blood-clot calibration",
+        "Peridigm official examples (tensile bar, fragmentation, Kalthoff-Winkler)"
+      ],
+      "key_question_for_precursor": "Does the dD/dstrain deceleration precursor survive when the mathematical representation of fracture changes from CDM (smooth) to peridynamic bond breakage (discrete)?",
+      "certification_path": "See PERIDIGM_CERTIFICATION_PROTOCOL_V1.json — P1 through P8 ladder analogous to FEBio L1-L8.",
+      "alternative_explanation_to_test": "The precursor is an artifact of CDM's smooth damage variable. Peridynamics, with discrete bond failure, may not exhibit any precursor."
+    },
+
+    "world_B_prime_moose_nospd_SECONDARY": {
+      "role": "Independent SECOND peridynamic implementation — only after Peridigm is certified. Used to test whether peridynamics-as-a-class agrees, or whether Peridigm specifically agrees.",
+      "status": "NOT INSTALLED — FUTURE (after Peridigm P8 certification)",
+      "independence_class": "MOOSE framework + bond-based / ordinary-state / non-ordinary-state peridynamics. Different code base from Peridgm. Can reuse continuum material models in correspondence formulations.",
+      "key_question": "If Peridgm and FEBio disagree on the precursor, does MOOSE NOSPD agree with Peridgm (suggesting peridynamics-as-a-class) or with FEBio (suggesting Peridgm-specific)?",
+      "deferred_reason": "Per audit: 'Then use MOOSE Peridynamics as an independent second peridynamic implementation later if needed.' Not a Round 124 deliverable."
+    },
+
+    "world_C_clotfoam_openfoam_v9": {
+      "role": "INITIAL: Blood flow + clot FORMATION + embolization TRANSPORT. NOT fracture oracle (per audit).",
+      "status": "NOT INSTALLED",
+      "independence_class": "OpenFOAM-v9 finite volume + continuum platelet/coagulation model. Different physics axis (flow → clot formation) from FEBio (mechanics → fracture).",
+      "strength": "Addresses the FLOW side that FEBio cannot (L7 FSI only partially certified). Platelet transport, aggregation, coagulation under flow.",
+      "limitation": "Published clotFoam formulation is a continuum platelet/coagulation model. clotFoam's own authors report that simulations did NOT exactly reproduce experiments. clotFoam is NOT a validated thrombectomy fracture engine.",
+      "permitted_initial_uses": [
+        "Reproduce clotFoam published 2D/3D examples (verification)",
+        "Flow field generation for downstream fracture simulation",
+        "Embolization transport modeling (where fragments go after detachment)"
+      ],
+      "forbidden_initial_uses": [
+        "Claiming clotFoam validates the precursor",
+        "Using clotFoam as a fracture oracle before a benchmark establishes the relevant mechanics",
+        "Modifying clotFoam into a thrombectomy simulator before reproducing its published examples"
+      ],
+      "key_question_for_precursor": "Does the precursor survive when clot failure is driven by flow forces rather than prescribed displacement? (Long-pole — C-004 is the least supported claim.)"
+    },
+
+    "world_D_svfsi_simvascular": {
+      "role": "Patient-specific cardiovascular FSI + tissue mechanics. The eventual thrombectomy digital twin host.",
+      "status": "NOT INSTALLED",
+      "independence_class": "SimVascular svFSI — finite element + ALE FSI. Different code base from FEBio and OpenFOAM. Native cardiovascular focus.",
+      "strength": "Patient-specific geometry, vascular CFD, large-deformation FSI coupling.",
+      "official_benchmark_corpus_required_first": [
+        "svFSI-Tests: pipe flow",
+        "svFSI-Tests: pipe prestress",
+        "svFSI-Tests: vein-graft FSI",
+        "svFSI-Tests: pressure pulse in aorta"
+      ],
+      "rule": "Do NOT invent cardiovascular benchmarks. Use upstream test corpus first. Only after verification does svFSI enter the clot/thrombectomy campaign.",
+      "key_question_for_precursor": "Does the precursor survive in realistic patient-specific vascular geometry with FSI? (C-007 long-pole claim.)"
+    }
+  },
+
+  "virtual_lab_benchmark_1_pointer": {
+    "spec": "VIRTUAL_LAB_BENCHMARK_1_SPEC.json (this round)",
+    "principle": "Reproduce a published phenomenon FIRST. Do not start with the invention. Same principle as FEBio L1/L2/L3: 'never let the machine create its own oracle.'",
+    "source_paper": "2026 CFD + non-ordinary state-based peridynamics thrombus embolization paper (PubMed 42367319)",
+    "purpose": "Certify that the simulator stack (Peridigm + CFD) can reproduce a known experimental phenomenon BEFORE testing the precursor hypothesis. If the stack cannot reproduce a known phenomenon, any precursor result is meaningless."
+  },
+
+  "claim_evidence_graph_pointer": {
+    "spec": "CLAIM_EVIDENCE_GRAPH_V1.json (this round)",
+    "principle": "Replaces scalar Reality Gap Score. Evidence is non-interchangeable. Per-claim state vector.",
+    "current_state_vector": "(RED, RED, RED, RED, YELLOW, RED, RED) — 1 of 7 claims at YELLOW (virtual-instrument only), 0 of 7 at GREEN, 6 of 7 at RED. No claim is supported by physical evidence."
+  },
+
+  "virtual_clot_population_v2": {
+    "concept": "Generate a virtual clot cohort with varied genome. Per v1.0 genome preserved. v2.0 adds: NOT 10,000-1,000,000 yet — start with a small designed cohort after Peridigm is certified.",
+    "staged_rollout": {
+      "stage_1": "N=10 — designed cohort covering the corners of the genome space (after World B P8 certification). Verify precursor exists in Peridigm at all before scaling.",
+      "stage_2": "N=100 — Latin Hypercube Sampling across genome (after stage 1 shows precursor survives).",
+      "stage_3": "N=1,000-10,000 — adversarial sampling near failure boundary (after stage 2 maps the precursor domain).",
+      "stage_4": "N=10,000+ — only after physical experiment validates the simulator's prediction (E3 → E4 bridge)."
+    },
+    "anti_skipping_rule": "Do NOT jump to stage 4. Per audit: 'Do not jump to 10,000 virtual clots yet. First make Peridigm the next certified physics world, reproduce the published 2026 thrombus-embolization benchmark, and create the Claim-Evidence Graph. Then bring the precursor into the new fracture world.'"
+  },
+
+  "virtual_instruments_v2": {
+    "concept": "Virtual versions of real measurement devices with realistic noise/limitations. v1.0 preserved. v2.0 adds: noise model must be sourced from REAL sensor datasheets, not assumed Gaussian.",
+    "noise_model_required_sources": [
+      "Force sensor datasheet (1/f drift, quantization, EMI spectrum, response time)",
+      "Displacement sensor datasheet (resolution, hysteresis)",
+      "High-speed camera datasheet (motion blur, lighting noise, frame-rate aliasing)"
+    ],
+    "forbidden_noise_models": [
+      "Pure Gaussian noise (assumed std without datasheet source)",
+      "Noise floor assumed to be 'small'",
+      "Sampling rate assumed adequate without Nyquist analysis"
+    ]
+  },
+
+  "adversarial_attack_matrix_v2": {
+    "physics_attack": "Change constitutive law, solver, discretization, fracture model, timestep, mesh. Per disagreement classification, the result is classified before being promoted.",
+    "parameter_attack": "Search outside nominal range. Per Article XXVII, parameter thresholds must have provenance.",
+    "geometry_attack": "Introduce holes, defects, asymmetry, heterogeneous regions.",
+    "instrument_attack": "Add realistic measurement noise from datasheets. Per Article XXX, ask 'what would make this test pass while the underlying system is still wrong?'",
+    "model_attack": "Train competing surrogate; check if it disagrees.",
+    "simulator_attack": "Run same hypothesis through World A + World B + World C + World D. Per disagreement classification: disagreement is investigated, not automatically falsified.",
+    "new_pushing_the_envelope_attack": "For each assumption that could kill the precursor, ask: 'Which simulation is CHEAPEST for exposing that assumption?' Run that simulation FIRST (cheapest falsification opportunity)."
+  },
+
+  "reality_anchoring_v2": {
+    "layer_1_published_data": {
+      "concept": "Use published experimental data as first reality layer (E3). Per audit: published reproduction is the bridge to reality.",
+      "sources": [
+        "Chueh et al. (2011) — clot mechanical properties from retrieved thrombi",
+        "Fereidoonnezhad et al. (2017) — CDM clot fracture parameters",
+        "Nature s41598-023-41825-8 — clot embolization experiments",
+        "PubMed 39754893 — human clot analogue mechanical data",
+        "Gasser et al. (2008) — ILT failure properties",
+        "PubMed 42367319 (2026) — CFD+peridynamics thrombus embolization (PRIMARY benchmark source)"
+      ],
+      "process": "Calibrate virtual worlds against published data → verify predictions match published observations → identify reality gap (per claim, not aggregate)."
+    },
+    "layer_2_new_experiment": {
+      "concept": "Physical experiment (PEP-SLOT5-001-a2) as sparse calibration/validation. Triggered only when expected information gain exceeds best achievable virtual experiment.",
+      "role": "Measurement oracle, not primary search engine.",
+      "honest_status": "Protocol frozen v3.0.0. NOT executed. Trigger condition for execution is NOT met until Claim-Evidence Graph shows virtual evidence has saturated (per Article XXXIV revised)."
+    },
+    "layer_3_clinical": {
+      "concept": "Human/clinical reality (E5). Future — requires clinical trial or retrospective data. C-007 long-pole claim.",
+      "in_silico_precursor": "Patient-specific svFSI cohort can support clinical-trial design but cannot replace clinical evidence."
+    }
+  },
+
+  "revised_article_XXXIV_interpretation_v2": {
+    "v1_interpretation_preserved": "v1.0 expanded 'decisive information from computation' to include (a) published experimental reproduction, (b) multi-simulator cross-validation, (c) virtual population coverage. v2.0 PRESERVES this expansion.",
+    "v2_correction": "v2.0 BOUNDS the expansion: (a) published reproduction must reproduce a known phenomenon FIRST, not the invention (Benchmark #1 principle); (b) multi-simulator cross-validation requires simulator independence AND benchmarking, not just running multiple simulators; (c) virtual population coverage is staged (10 → 100 → 1000 → 10000), not jumped to.",
+    "constraint_reaffirmed": "This revision does NOT weaken Article XXXIV. It does NOT claim virtual experiments replace physical reality. It makes physical reality more efficient by constraining millions of virtual experiments — but only after virtual evidence is itself certified."
+  },
+
+  "honest_caveats_v2": {
+    "article_I": "Virtual experiments are NOT physical reality. A model can be internally perfect and still be wrong about biology. CE-023 lesson: two implementations can agree and both be wrong.",
+    "article_XXVIII": "No silent promotion — virtual results strengthen hypothesis but do NOT confirm it. Cross-simulator agreement is still virtual evidence.",
+    "article_XXIX": "Implementation failure (simulator misconfigured) is separated from mechanism failure (precursor does not exist). Per disagreement classification.",
+    "FDA_framework": "FDA computational modeling credibility framework explicitly requires validation evidence. Virtual experiments can supplement but not replace physical validation where model credibility demands it.",
+    "audit_pushing_the_envelope_principle": "Don't build four simulators. Build four independent opportunities for the same hypothesis to die. For each assumption, ask: which simulation is cheapest for exposing that assumption? Run that one first.",
+    "CI_status_honesty": "The architecture record itself is NOT independently CI-certified (audit finding on a3f716c4). This is an architectural plan in a discovery campaign, not a code deliverable. CI certification applies to infrastructure commits, not to research design artifacts."
+  },
+
+  "next_move_per_audit": {
+    "step_1": "Make Peridigm the next certified physics world (P1-P8 certification protocol).",
+    "step_2": "Reproduce the published 2026 thrombus-embolization benchmark (Virtual Lab Benchmark #1).",
+    "step_3": "Maintain the Claim-Evidence Graph (this artifact).",
+    "step_4": "Bring the precursor into the new fracture world (Peridigm) — only after step 1 + step 2.",
+    "explicit_NOT_step_1": "Do NOT jump to 10,000 virtual clots. Do NOT install all four simulators in parallel. Do NOT modify clotFoam into a thrombectomy simulator. Do NOT invent cardiovascular benchmarks for svFSI."
+  }
+}
