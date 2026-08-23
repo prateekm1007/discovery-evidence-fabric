@@ -1,0 +1,79 @@
+{
+  "record_type": "AI_LOOP_V3_CYCLE_14_D4_REFINED_V1",
+  "version": "1.0.0",
+  "date": "2026-08-23T20:57:43.432739+00:00",
+  "round": 192,
+  "authority": "AI Loop V3 \u2014 FULLY AUTONOMOUS, Cycle 14 (D4 refinement \u2014 ONE allowed by SUCCESSOR_REQUIRED rule)",
+  "constitutional_basis": [
+    "Article I",
+    "Article XVII",
+    "Article XIX",
+    "Article XXIX",
+    "Article XXXVI"
+  ],
+  "constitution_acknowledgment": "I am an untrusted implementation agent. I will not optimize for green gates.",
+  "scientific_question": "Can a patient-specific counterfactual model predict the best shunt intervention? (PROPER train/test split)",
+  "fixes": "1. Proper 80/20 train/test split (no data leakage). 2. 8 interventions (was 5). 3. 5 patient phenotypes. 4. Recommendation on TEST set only.",
+  "results": {
+    "question": "Can a patient-specific counterfactual model predict the best shunt intervention? (PROPER train/test split)",
+    "n_patients": 400,
+    "n_train": 320,
+    "n_test": 80,
+    "n_interventions": 8,
+    "chance_level": 0.125,
+    "method": "Random Forest (100 trees, depth 10). Train on 80%, evaluate recommendations on 20% (no data leakage).",
+    "fixes_from_R191": "1. Proper 80/20 train/test split. 2. 8 interventions (was 5). 3. 5 patient phenotypes (different failure modes). 4. Recommendation evaluated on TEST set only.",
+    "outcome_prediction": {
+      "r2_test": 0.8978368850421099,
+      "interpretation": "R\u00b2=0.898 on test set"
+    },
+    "recommendation_accuracy": 0.2,
+    "improvement_over_random": 0.06633600695888336,
+    "gap_to_optimal": 0.22010310038694647,
+    "score_comparison": {
+      "random": 13.75919524845151,
+      "engine": 12.846465176701596,
+      "optimal": 10.528999698982354
+    },
+    "phenotype_accuracy": {
+      "overdrainage": 0.23809523809523808,
+      "underdrainage": 0.125,
+      "catheter_fouling": 0.07142857142857142,
+      "valve_wear": 0.26666666666666666,
+      "stable": 0.2857142857142857
+    },
+    "verdict": "KILL",
+    "evidence_strength_level": 3,
+    "key_finding": "PROPER train/test: accuracy=20.0% (chance=12%), improvement=6.6%, R\u00b2=0.898. FAILS.",
+    "candidate_state_change": "NONE \u2014 light simulation (refined)."
+  },
+  "adversarial_self_attack": {
+    "attacks": [
+      {
+        "attack": "R\u00b2 is still high (0.86+) \u2014 the synthetic model may be too predictable.",
+        "countermeasure": "The R\u00b2 is on the TEST set with proper train/test split. The high R\u00b2 reflects that the underlying CSF model is deterministic + noise. Real patient outcomes are messier.",
+        "residual_risk": "HIGH \u2014 synthetic data"
+      },
+      {
+        "attack": "The phenotype labels directly determine the best intervention \u2014 the model may be learning phenotype identity.",
+        "countermeasure": "The phenotype one-hot is in the features, but the model predicts OUTCOME SCORE (a continuous value), not phenotype. The recommendation is argmin(predicted_score), which requires accurate outcome prediction, not phenotype classification.",
+        "residual_risk": "MEDIUM"
+      },
+      {
+        "attack": "If INCONCLUSIVE again, D4 should be CLOSED per the SUCCESSOR_REQUIRED rule.",
+        "countermeasure": "Correct \u2014 this is the ONE allowed refinement. If still INCONCLUSIVE, D4 is CLOSED.",
+        "residual_risk": "LOW"
+      }
+    ]
+  },
+  "successor_rule_check": {
+    "rule": "One redefinition/refinement per candidate. If V2 still fails/inconclusive \u2192 CLOSE.",
+    "R191_result": "INCONCLUSIVE (accuracy=53.3%, improvement=14.4%)",
+    "R192_result": "KILL (accuracy=20.0%, improvement=6.6%)",
+    "action_if_inconclusive": "CLOSE D4. Generate new hypotheses from the information bottleneck.",
+    "action_if_win": "Proceed to full pre-registered experiment + Gate 2 deep obviousness search."
+  },
+  "execution_state": "COMPLETED",
+  "epistemic_state": "VALIDATED_NEGATIVE",
+  "world_class_score": "0/5 \u2014 UNCHANGED"
+}
