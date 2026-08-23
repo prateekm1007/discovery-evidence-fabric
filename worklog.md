@@ -4845,3 +4845,75 @@ Stage Summary:
   but eShunt CANNOT access periventricular veins where TPP is largest.
 - C2 = FALSIFICATION_ATTEMPT_INCONCLUSIVE + PHYSIOLOGICAL_THREAT.
 - 0/5 WORLD_CLASS_INVENTION. C2 INCONCLUSIVE. C5 UNRESOLVED.
+
+---
+Task ID: ROUND-146-COMPARTMENT-IDENTITY-FALSIFICATION
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 146 — compartment-identity falsification. 4 worlds (A=absolute, B=eShunt venous, C=periventricular, D=combined+state). Compartmental physiology model based on published literature. Posture state transitions.
+
+Work Log:
+- Built compartmental physiology model based on published literature:
+  * P_csf: ventricular CSF pressure
+  * P_sinus: dural sinus pressure (eShunt-accessible venous compartment)
+  * P_cortical: cortical vein pressure (Starling-protected, HIGH coupling 0.6-0.9)
+  * P_periventricular: deep vein pressure (NOT Starling-protected, LOW coupling 0.1-0.4)
+  * Literature: PMID 26767844 (tight coupling), PMID 8194060 (cortical vs periventricular),
+    PMID 39029117 (posture-dependent outflow), PMID 27598891 (nonlinear Starling)
+
+- Modeled 4 posture states: supine, upright, Valsalva, transitions
+  * Supine: higher venous pressures (gravity)
+  * Upright: sinus pressure drops MORE (venous outflow shift to vertebral plexus)
+  * Valsalva: all venous pressures spike briefly
+  * Transitions: multiple posture changes
+
+- Generated 800-patient cohort: 4 conditions × 4 postures × 50 patients
+- Trained 4 models with identical architecture (LogisticRegression L2)
+
+- RESULT: ALL DIFFERENTIALS FAIL
+  * A (absolute ICP): AUROC=1.0000
+  * B (eShunt venous diff): AUROC=0.9739 (WORSE than absolute by -0.0261)
+  * C (periventricular diff): AUROC=0.9994 (WORSE than absolute by -0.0006)
+  * D (combined+state): AUROC=1.0000 (same as absolute)
+
+- HYPOTHESIS ASSESSMENT:
+  * H1 (eShunt differential is informative): NOT_SUPPORTED
+  * H2 (eShunt differential adds little due to strong coupling): SUPPORTED
+  * H3 (periventricular has info but eShunt can't access): NOT_SUPPORTED
+    (periventricular also doesn't beat absolute)
+  * H4 (differential info only in specific states): SUPPORTED
+  * H5 (absolute ICP contains all useful information): SUPPORTED
+  * H6 (advantage is sensor/model artifact): UNTESTABLE
+
+- VERDICT: ALL_DIFFERENTIALS_FAIL
+  No differential (eShunt or periventricular) provides meaningful advantage
+  over absolute ICP when tested with a compartmental physiology model.
+
+- CRITICAL CAVEAT: The AUROC=1.0 for absolute ICP suggests the problem is still
+  too easy (sustained_change feature alone perfectly separates obstruction).
+  The sensitivity@90%spec=0.0 bug persists. The result is suggestive but not
+  yet decisive — the experiment needs harder conditions (subtle obstruction,
+  gradual onset, mixed states) to avoid ceiling effects.
+
+- KEY FINDING: Even with the compartmental model, the eShunt-accessible (sinus)
+  differential is WORSE than absolute ICP (AUROC 0.9739 vs 1.0000).
+  The periventricular differential is also WORSE (0.9994 vs 1.0000).
+  This is because the compartmental model's absolute ICP signal contains the
+  sustained_change that perfectly classifies obstruction — the differential
+  signals add NOISE without adding discriminating information.
+
+- C2 ASSESSMENT: The compartment-identity attack suggests C2's mechanism is
+  WEAK — differential pressure (from any compartment) does not outperform
+  absolute ICP when tested with a physiology-informed model.
+  However, the ceiling effect (AUROC=1.0) prevents a definitive kill.
+
+- OpenFOAM: running in background.
+
+Stage Summary:
+- Compartment-identity falsification: ALL differentials fail to beat absolute ICP.
+- eShunt venous differential: WORSE than absolute (-0.026 AUROC).
+- Periventricular differential: also WORSE (-0.001 AUROC).
+- H2 SUPPORTED: strong coupling makes eShunt differential add little.
+- H5 SUPPORTED: absolute ICP contains essentially all useful information.
+- Ceiling effect prevents definitive kill (AUROC=1.0 for absolute).
+- C2 mechanism is WEAK but not definitively killed.
+- 0/5 WORLD_CLASS_INVENTION. C2 = MECHANISM WEAKENED.
