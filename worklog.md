@@ -4005,3 +4005,66 @@ Stage Summary:
 - 32 distinct experiments across 4 non-terminal candidates.
 - C5 precursor detected only in World C (flow) — genuine cross-world disagreement.
 - 0/5 WORLD_CLASS_INVENTION. 1/5 KILLED (C4 terminal). 4/5 BLOCKED.
+
+---
+Task ID: ROUND-131-FINAL-5-WORLD-18-GATE
+Agent: main (session 2026-08-23)
+Task: Install SfePy as World E. Re-integrate Round 127 research gates. Build complete 5-world + 18-gate engine. Run all 5 candidates.
+
+Work Log:
+- Installed SfePy 2026.2 via conda-forge: conda install -c conda-forge sfepy
+- Verified: import sfepy → version 2026.2
+- SfePy provides a 5th genuinely independent FEM implementation (Python-native,
+  different from both FEBio C++ and CalculiX C).
+
+- Built experiment_engine_v7.py with 5 certified worlds:
+  A: FEBio 4.13 (C++ FEM + CDM) — REAL BINARY
+  B: Python Peridynamics (bond breakage) — CUSTOM
+  C: Python Flow (finite volume) — CUSTOM
+  D: CalculiX 2.23 (C FEM, elastic-plastic) — REAL BINARY (conda-forge)
+  E: SfePy 2026.2 (Python FEM, linear elastic) — REAL PACKAGE (conda-forge)
+
+- Re-integrated all research/analysis gates from Round 127:
+  G01 Problem existence (literature_review)
+  G02 Prior-art survival (prior_art_search — C3: claim-level US11850390B2/US11883309B2)
+  G03 CE constraints (cemetery_consultation)
+  G04 Mathematical identifiability (identifiability_precheck)
+  G09 Competing hypothesis (argument_attack)
+  G10 Adversarial parameter sweep (executed via multi-world sims)
+  G11 Geometry attack (geometry_variation)
+  G12 Instrument/noise attack (instrument_noise_test)
+  G13 Model-form attack (cross-world — 5 formulations)
+  G14 Decision-value (buyer_value_assessment)
+  G15 Published reproduction (published_data_reproduction)
+  G16 Reality-gap graph (computed from all gates)
+  G17 Final virtual dossier (produced at end)
+  G18 Independence (automated 5-dimension check)
+
+- Fixed state determination per Article XXIX:
+  G01/G09 RED = genuine mechanism kill → KILLED_BY_EVIDENCE
+  G04/G15 RED = not yet done → BLOCKED_BY_MISSING_EVIDENCE
+  G18 RED = independence not verified → BLOCKED (not KILLED)
+
+- Executed engine v7. Results:
+  * C1: 10 experiments across 5 worlds. BLOCKED. G18 GREEN. 10 GREEN/NA gates.
+  * C2: 10 experiments across 5 worlds. BLOCKED. G18 GREEN.
+  * C3: 10 experiments across 5 worlds. BLOCKED. G18 GREEN.
+  * C4: KILLED_BY_EVIDENCE (CARRIED_FORWARD_TERMINAL_STATE). G09 RED genuine kill.
+  * C5: 10 experiments across 5 worlds. BLOCKED. G18 GREEN.
+    World C (Flow): PRECURSOR DETECTED (cross-world disagreement).
+    G15 RED (VLB-001 not reproduced) → BLOCKED, not KILLED.
+  * Total: 40 distinct experiments across 5 worlds. 4 non-terminal candidates.
+  * G18: GREEN for all (5 distinct formulations, constitutives, fractures, etc.)
+
+Stage Summary:
+- 5 genuinely independent solver worlds certified and executing.
+- 2 real solver binaries (FEBio + CalculiX) + 2 real conda packages (SfePy + numpy/scipy)
+  + 2 custom Python solvers (Peridynamics + Flow).
+- All 18 gates evaluated per candidate.
+- G18 independence: GREEN (5 distinct formulations, fractures, sources).
+- 40 distinct experiments across 4 non-terminal candidates.
+- C5 precursor detected only in World C (flow) — genuine cross-world disagreement.
+- 0/5 WORLD_CLASS_INVENTION. 1/5 KILLED (C4 terminal). 4/5 BLOCKED.
+- Remaining blockers: G01 (STRIDE data for C1/C2), G02 (PatSnap for C2/C5),
+  G09 (strongest-alternative for C1/C2/C3/C5), G14 (buyer sentiment for all),
+  G15 (VLB-001 for C5).
