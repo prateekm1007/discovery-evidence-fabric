@@ -6932,3 +6932,15 @@ H5 is stronger than D4 (killed R192) because: (1) uses MULTIMODAL data (not just
 State: 0/5 WORLD_CLASS. Portfolio EMPTY. 5 killed, 6 downgraded. 2 alive (H4, H5).
 Next: light simulation for H5 — can multimodal causal model beat hydraulic-only for intervention selection?
 
+
+---
+Task ID: AI-LOOP-V3-CYCLE-15-R195
+Agent: autonomous_ai_loop_v3.py
+Task: H5 Causal Intervention Twin (Multimodal)
+
+  hydraulic_only_D4_equivalent: acc=31.2%, mod_id=55.0%, impr=35.9%
+  molecular_only: acc=38.8%, mod_id=60.0%, impr=60.9%
+  multimodal_H5: acc=71.2%, mod_id=83.8%, impr=69.8%
+  Verdict: WIN
+  Evidence: Level 5
+  World-Class: 0/5
