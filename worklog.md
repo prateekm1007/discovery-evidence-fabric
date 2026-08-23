@@ -6786,3 +6786,34 @@ NEXT: Attempt to narrow H1-V2 to a method patent (biofouling trajectory predicti
 
 State: 0/5 WORLD_CLASS. H1-V2 Gate 2 = FAIL. The loop maintains epistemic honesty — refuses to promote a candidate that fails the patent gate despite 7/8 other gates passing.
 
+
+---
+Task ID: ROUND-188-H1V2-CLOSURE-AND-NEW-DIRECTIONS
+Agent: autonomous_ai_loop_v3.py (FULLY AUTONOMOUS)
+Task: CEO Round 188 — Close H1-V2. Generate successors from information bottleneck. Add anti-iteration rule.
+
+H1-V2 CLOSED (CE-016): KILLED_BY_EVIDENCE (INSUFFICIENT INVENTIVE STEP)
+- 3/4 elements are prior art (biofouling sensor, AI prediction, obstruction classification)
+- The 4th (biofouling trajectory prediction) is a natural extension
+- The combination is plausibly obvious under KSR
+- Scientific results PRESERVED (R²=0.691, 90.7% discrimination, 147-day lead, 3/3 reproduction)
+- Lesson: Scientifically validated ≠ inventively differentiated
+
+NEW LOOP RULE: SUCCESSOR_REQUIRED_WHEN_MARGINAL_NOVELTY_REMAINS_LOW
+- If Level 5+ science + strong commercial value + Gate 2 FAILS after ONE deep search
+- Then: CLOSE candidate, PRESERVE results, GENERATE new mechanism
+- One redefinition max (V1→V2). If V2 fails Gate 2, CLOSED. No V3.
+
+INFORMATION BOTTLENECK ANALYSIS:
+- Observable in 2026: pressure, flow, biofouling, obstruction_type, ICP_trend, device_state, posture
+- STILL UNOBSERVABLE: spatial_distribution, causal_root_cause, latent_mechanical_state, intervention_outcome
+
+FOUR NEW DIRECTIONS:
+1. Spatial Degradation Localization — WHERE is degradation occurring along the catheter?
+2. Causal Root-Cause Diagnosis — WHY is failure rising? Active causal inference via safe perturbation
+3. Latent Mechanical State Estimation — Infer hidden mechanical quantities from NATURAL perturbations (sidesteps WO2011146757A2)
+4. Intervention Outcome Prediction — WHICH intervention will work? (not just WILL it fail)
+
+State: 0/5 WORLD_CLASS. Portfolio EMPTY. 4 new directions to search.
+Killed: C2, C4, C2-Y-AP, H1-V2. The machine is learning: don't mistake engineering for invention.
+
