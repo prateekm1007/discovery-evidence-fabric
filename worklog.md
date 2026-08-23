@@ -5013,3 +5013,65 @@ Stage Summary:
 - Complete patent-physics-physiology loop executed.
 - Cemetery entry CE-013 proposed.
 - 0/5 WORLD_CLASS_INVENTION. C2 = KILLED. C4 = KILLED. C1/C3/C5 = BLOCKED.
+
+---
+Task ID: ROUND-148-ADVERSARIAL-RESCUE-SEARCH
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 148 — final C2 execution. Adversarial rescue search: maximize ΔAUROC across physiological envelope. If best regime cannot achieve WIN threshold (ΔAUROC > 0.05), C2 is killed.
+
+Work Log:
+- Built adversarial rescue search:
+  * 4,374 parameter combinations in full grid
+  * 100 sampled combinations evaluated
+  * Parameters swept: ips_coupling (0.1-0.9), starling_nonlin (0-0.4),
+    venous_offset (1-5), obs_severity (subtle/classic), posture (3 states),
+    sensor_mismatch (0-2), noise (0.3-0.6)
+
+- RESULT: C2 RESCUE SUCCEEDED
+  * Best ΔAUROC = +0.1799 (well above WIN threshold of 0.05)
+  * 26 out of 100 regimes met the WIN threshold
+  * Best regime: ips_coupling=0.3, starling_nonlin=0.0, venous_offset=5.0,
+    obs_severity=subtle (2-4 mmHg), posture=supine, sensor_mismatch=2.0, noise=0.3
+  * In best regime: Absolute AUROC=0.7513, Differential AUROC=0.9312
+
+- ANALYSIS: The rescue search found that differential pressure CAN outperform
+  absolute ICP under specific conditions:
+  1. LOW IPS coupling (0.3) — when venous pressure doesn't track CSF closely
+  2. HIGH sensor mismatch (2.0) — when the two-sensor differential provides
+     cancellation of common-mode noise that absolute ICP cannot
+  3. SUBTLE obstruction (2-4 mmHg) — when the signal is near threshold
+  4. SUPINE posture — less venous outflow variability
+
+- KEY INSIGHT: The differential advantage comes from SENSOR MISMATCH CANCELLATION,
+  not from independent venous pressure information. When sensor_mismatch is high
+  (different bias on each sensor), the differential signal cancels common-mode
+  drift/bias that affects both sensors similarly, while preserving the differential
+  physiological signal. This is a legitimate but DIFFERENT mechanism than originally
+  proposed — it's a signal-processing advantage, not a venous-physiology advantage.
+
+- CAVEAT: The rescue regime requires LOW ips_coupling (0.3). Literature suggests
+  eShunt-accessible IPS has HIGH coupling (0.4-0.95). The rescue succeeds in a
+  regime that may not be physiologically realistic for the eShunt anatomy.
+  However, 26/100 regimes met the threshold, suggesting the advantage is not
+  limited to one extreme parameter set.
+
+- VERDICT: RESCUE SUCCEEDED — C2 is NOT killed.
+  Per CEO Round 148: 'If rescue succeeds, attack the rescue.'
+  Next step: perturb the rescue regime to test fragility.
+
+- C2 ASSESSMENT: MECHANISM WEAKENED BUT NOT KILLED
+  * The differential CAN provide advantage under specific conditions
+  * The advantage is partly from signal processing (sensor mismatch cancellation)
+    rather than pure venous physiology
+  * The rescue regime may not match the actual eShunt anatomy (low coupling)
+  * Further attack needed: perturb the rescue regime
+
+- OpenFOAM: running in background.
+
+Stage Summary:
+- Adversarial rescue search: 100 parameter combinations tested.
+- RESCUE SUCCEEDED: 26/100 regimes met WIN threshold (ΔAUROC > 0.05).
+- Best ΔAUROC = +0.1799 (differential AUROC 0.9312 vs absolute 0.7513).
+- Key insight: advantage comes from sensor mismatch cancellation + low coupling.
+- C2 NOT killed. Needs perturbation attack on the rescue regime.
+- 0/5 WORLD_CLASS_INVENTION. C2 = RESCUED (needs further attack).
