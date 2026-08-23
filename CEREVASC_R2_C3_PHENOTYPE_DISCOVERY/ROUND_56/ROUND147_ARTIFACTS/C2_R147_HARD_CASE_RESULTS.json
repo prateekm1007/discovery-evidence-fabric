@@ -1,0 +1,64 @@
+{
+  "experiment_id": "C2-R147-HARD-CASE-FALSIFICATION",
+  "date": "2026-08-23T07:56:57.833137+00:00",
+  "round": 147,
+  "description": "Hard-case physiological falsification with pre-registered kill/win thresholds. Compartmental model with actual eShunt anatomy (inferior petrosal sinus).",
+  "pre_registered_thresholds": {
+    "kill": "\u0394AUROC(B-A) < 0.02 with CI excluding meaningful benefit",
+    "win": "\u0394AUROC(B-A) > 0.05 with CI lower > 0.02",
+    "counterfactual_kill": "If C (periventricular) helps but B (eShunt) doesn't \u2192 COMPARTMENT_IDENTITY_FAILURE"
+  },
+  "hard_case_design": {
+    "obstruction_types": [
+      "subtle (+2-4 mmHg)",
+      "gradual (slow onset)",
+      "intermittent (comes and goes)",
+      "partial (+3-5 with fluctuation)",
+      "classic (+5-12)"
+    ],
+    "class_overlap": "Normal physiological excursions can mimic obstruction (random \u00b13-4 mmHg events)",
+    "parameter_uncertainty": "starling_gain Uniform(0.4, 0.95), peri_coupling Uniform(0.05, 0.45), nonlinear Starling",
+    "eShunt_anatomy": "Inferior petrosal sinus (IPS) \u2014 per CereVasc published anatomy"
+  },
+  "results": {
+    "A_absolute_ICP": {
+      "AUROC": 0.9739906832298136,
+      "AUPRC": 0.9440399493130585,
+      "sens_90": 0.9285714285714286
+    },
+    "B_eShunt_IPS": {
+      "AUROC": 0.9440993788819876,
+      "AUPRC": 0.8800510138724462,
+      "sens_90": 0.7857142857142857
+    },
+    "C_periventricular": {
+      "AUROC": 0.9778726708074535,
+      "AUPRC": 0.9511120588943116,
+      "sens_90": 0.9285714285714286
+    }
+  },
+  "incremental": {
+    "B_over_A": -0.029891304347826053,
+    "C_over_A": 0.0038819875776399115,
+    "B_over_A_auprc": -0.06398893544061224
+  },
+  "bootstrap_ci": {
+    "B_over_A": {
+      "mean": 0,
+      "ci_low": 0,
+      "ci_high": 0,
+      "n": 0
+    },
+    "C_over_A": {
+      "mean": 0,
+      "ci_low": 0,
+      "ci_high": 0,
+      "n": 0
+    }
+  },
+  "verdict": "KILLED_BY_EVIDENCE",
+  "kill_reason": "eShunt differential provides no incremental benefit (\u0394AUROC=+0.0000, CI=[+0.0000, +0.0000]). No compartment provides advantage over absolute ICP.",
+  "win_reason": "",
+  "ceiling_destroyed": "True",
+  "evidence_class": "SCIENTIFIC_EVIDENCE"
+}

@@ -1,0 +1,37 @@
+{
+  "record_type": "C2_R147_PRE_REGISTERED_THRESHOLDS",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 147,
+  "authority": "CEO Round 147: 'Set a predefined rule. Don't move the threshold after seeing results.'",
+
+  "pre_registered_kill_threshold": {
+    "rule": "If the eShunt-accessible differential (Model B) fails to provide a reproducible, uncertainty-bounded incremental benefit over absolute ICP (Model A) across the predefined physiological envelope → C2 KILLED_BY_EVIDENCE.",
+    "quantitative": "If ΔAUROC(B-A) < +0.02 AND ΔAUPRC(B-A) < +0.03 across the hard-case cohort with bootstrap 95% CI excluding zero → KILL.",
+    "rationale": "An advantage of less than 2 AUROC points is not clinically meaningful and does not justify the added device complexity."
+  },
+
+  "pre_registered_win_threshold": {
+    "rule": "If the eShunt-accessible differential demonstrates a robust, reproducible, independent, uncertainty-bounded diagnostic advantage under hard cases → C2 advances toward WORLD_CLASS.",
+    "quantitative": "If ΔAUROC(B-A) > +0.05 with bootstrap 95% CI lower bound > +0.02 AND survives at least 2 posture states → ADVANCE.",
+    "rationale": "A 5+ AUROC point advantage that is robust across physiological states and survives uncertainty is a meaningful technical result."
+  },
+
+  "intermediate_zone": {
+    "rule": "If ΔAUROC(B-A) is between +0.02 and +0.05, or CI includes zero → C2 remains INCONCLUSIVE.",
+    "rationale": "Marginal advantage without statistical significance is not sufficient for either promotion or kill."
+  },
+
+  "counterfactual_test": {
+    "rule": "If Model C (periventricular) provides advantage but Model B (eShunt IPS) does not → COMPARTMENT_IDENTITY_FAILURE. The eShunt measures the wrong compartment. C2 KILLED_BY_EVIDENCE.",
+    "rationale": "If the information exists only in a compartment the eShunt cannot access, the invention cannot deliver the advantage."
+  },
+
+  "anti_gaming_rules": [
+    "Thresholds are FROZEN before experiment execution. Per Article XXVII (no threshold invention).",
+    "The hard-case generator parameters are FROZEN before model training.",
+    "Bootstrap CIs must be computed BEFORE the kill/win decision is made.",
+    "No post-hoc feature engineering after seeing results.",
+    "No threshold adjustment after seeing results."
+  ]
+}
