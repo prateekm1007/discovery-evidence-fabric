@@ -5823,3 +5823,67 @@ Stage Summary:
 - C3-X: INVESTIGATION (V2 pre-registration ready, execution pending)
 - C5-X: INFRASTRUCTURE_BLOCKED (partial — icoFoam works, clotFoam compilation needed)
 
+
+---
+Task ID: ROUND-160-NOVELTY-FIRST-DISCOVERY-ENGINE-AND-C5-CORRECTION
+Agent: main (session 2026-08-24)
+Task: Execute Round 160 — ratify Article XXXVI via PCP-002, correct C5 environment (v1912 ≠ v9), build Novelty-First Discovery Engine, execute novelty search for C2-Y/C3-X/C5-X, reclassify candidates based on 2026 patent landscape.
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = 342210a (correct). Local origin/main ref was stale; updated to match remote.
+
+Work Log:
+
+1. PCP_002_RATIFY_ARTICLE_XXXVI.json
+   - Ratification chain: PROPOSED (R159) → REVIEWED (R160 CEO audit) → RATIFIED (R160) → ACTIVE (R160)
+   - Article XXXVI (Experiment Validity Gate) is now a CONSTITUTIONAL ARTICLE
+   - Constitution version: v1.5.0 → v1.6.0
+   - 7-condition validity gate is now mechanically enforced, not just procedurally encouraged
+   - Four epistemic states formalized: VALIDATED_POSITIVE, VALIDATED_NEGATIVE, EXPERIMENT_INVALID, INFRASTRUCTURE_BLOCKED
+   - The full discovery chain: IDEA → PRIOR_ART → COMPETITOR → PRE_REG → VALIDITY_AUDIT → EXECUTION → ADVERSARIAL → INDEPENDENT_REPRO → TECHNICAL_ADVANTAGE → BUYER_ADVANTAGE → WORLD_CLASS
+
+2. C5_ENVIRONMENT_CORRECTION_V1.json
+   - CRITICAL CORRECTION: OpenFOAM v1912 ≠ OpenFOAM v9
+   - clotFoam target: OpenFOAM v9 (Foundation, 2021)
+   - Round 159 installed: OpenFOAM v1912 (ESI, 2019) — WRONG VERSION
+   - icoFoam working ≠ clotFoam environment validated
+   - icoFoam validation = fluid solver control, NOT clotFoam validation
+   - WORLD_C_CLOTFOM remains INFRASTRUCTURE_BLOCKED
+   - Corrected environment scores: Route C (apt v1912) score = 0.000 (solver_fidelity=0)
+   - New preferred route: Route D (openfoam.org v9 download) score = 0.090
+   - Intelligent use: World C-control (icoFoam, fluid-only) vs World C-clotFoam (full physics)
+   - Decomposition question: does precursor exist in pure fluid mechanics or require coagulation mechanism?
+
+3. NOVELTY_FIRST_DISCOVERY_ENGINE_V1.json
+   - Stage 0 white-space kill test: search 10 domains, 7-level search hierarchy
+   - Obviousness neighborhood search: 9-step search tree (components → combinations → adjacent → same problem/different impl → etc.)
+   - 5 novelty confidence levels (0=NO_PRIOR_ART_FOUND → 4=WORLD_CLASS_CANDIDATE)
+   - Search provenance: 12 required fields (date, databases, queries, synonyms, patent families, closest refs, combination attacks, competitor products, 2025-2026 material, coverage limitations, unsearched areas, novelty level)
+   - The critical distinction: NO_PRIOR_ART_FOUND ≠ NOVELTY_SURVIVES_STRONGEST_ATTACK
+   - Information bottleneck approach: find clinical failure where current tech is structurally incapable of obtaining needed information
+   - The three epistemic distinctions: invalid experiment ≠ valid evidence; solver success ≠ required world; no prior art found ≠ clean white space
+
+4. ROUND160_NOVELTY_SEARCH_RESULTS_V1.json
+   - C3-X: PRIOR_ART_THREATENED by US 20260224805 (Aug 2026) — implantable intrathecal pump + CSF biosensor + adaptive infusion + PK/PD. C3-X concept is essentially disclosed. Must KILL or REDESIGN.
+   - C2-Y: PRIOR_ART_THREATENED by US 20260115436 (Apr 2026) — AI algorithms predicting physiological outcomes, shunt obstruction alerts. C2-Y's response-manifold may be specific implementation of broad AI claim. Must KILL or NARROW.
+   - C5-X: NOT_YET_CLEAN_WHITE_SPACE — PMID 42508673 review + US 20250072970 + WO2025122780A1 + WO2025038507A1 + US20250228588A1. The field is crowded. Must discover genuinely new mechanistic observable.
+   - Search provenance documented (databases, coverage limitations, unsearched areas)
+
+5. ROUND160_CORRECTED_PORTFOLIO_STATE_V1.json
+   - World-Class: 0/5 (correct)
+   - Killed permanent: C2, C4
+   - Prior-art threatened: C2-Y, C3-X, C5-X — ALL THREE 'promising' successors are threatened
+   - Discovery queue: C1-X, C1-Y, C2-X, C5-Y — NOT yet novelty-searched
+   - Honest assessment: ZERO viable World-Class candidates. This is BETTER than falsely believing we have three inventions.
+   - Information bottleneck reframe: C1 → latent states not observable from pressure; C3 → upstream/downstream from concentration; C5 → pre-failure observables
+
+Stage Summary:
+- Article XXXVI ratified via PCP-002 (constitution v1.5.0 → v1.6.0)
+- C5 environment corrected: v1912 is NOT v9; icoFoam is NOT clotFoam; WORLD_C_CLOTFOM remains INFRASTRUCTURE_BLOCKED
+- Novelty-First Discovery Engine built: Stage 0 kill test + obviousness neighborhood + 5 confidence levels
+- ALL THREE 'promising' candidates (C2-Y, C3-X, C5-X) are PRIOR_ART_THREATENED by 2026 patents
+- C3-X is the most threatened — US 20260224805 essentially claims the C3-X concept
+- The system has ZERO viable World-Class candidates — this is the correct epistemic state
+- The system avoided epistemic inflation by catching the patent threats before simulation
+- Next: Stage 0 novelty searches for redesign directions (information bottleneck approach)
+
