@@ -5129,3 +5129,85 @@ Stage Summary:
 - 7 new invention hypotheses generated and ranked globally.
 - C5-X (embolic risk) and C2-Y (perturbation ID) are highest-priority new candidates.
 - 0/5 WORLD_CLASS_INVENTION. C2 = MECHANISM WEAK (physiological but anatomy-dependent).
+
+---
+Task ID: ROUND-150-PORTFOLIO-SANCTITY-AND-C2-FINAL-KILL
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 150 — portfolio sanctity rule (only WORLD_CLASS occupies a slot), C2 final physiologically-constrained rescue search (IPS coupling 0.4-0.95), successor discovery queue.
+
+Work Log:
+- Implemented PORTFOLIO SANCTITY RULE:
+  * ACTIVE_PORTFOLIO_SLOT = WORLD_CLASS_INVENTION only
+  * C1/C2/C3/C5 = INVESTIGATION (not portfolio)
+  * C4 = KILLED
+  * Portfolio slots filled: 0/5 (all empty)
+  * Three-test rule: scientific + novelty + strategic (all three must pass)
+
+- Created SUCCESSOR DISCOVERY QUEUE (7 hypotheses, no portfolio status):
+  1. C5-X (embolic risk engine) — highest priority
+  2. C2-Y (perturbation ID) — novel, testable immediately
+  3. C1-X (predictive failure) — high value
+  4. C5-Y (intervention optimizer) — depends on C5-X
+  5. C3-X (closed-loop delivery) — high cost
+  6. C2-X (dynamics fingerprint) — prior-art risk
+  7. C1-Y (adaptive drainage) — prior-art risk
+
+- C2 FINAL PHYSIOLOGICALLY-CONSTRAINED RESCUE SEARCH:
+  * Constrained IPS coupling to [0.4, 0.95] (literature-supported)
+  * 80 parameter combinations tested
+  * RESULT: 0/80 regimes achieve ΔAUROC > 0.05
+  * Best ΔAUROC = +0.0429 (below threshold)
+  * Mean ΔAUROC = -0.0186 (negative — differential is WORSE on average)
+  * Only 8/80 regimes had any positive ΔAUROC
+  * Maximum positive: +0.0429 (at coupling=0.8, high nonlinearity, subtle obstruction)
+
+- VERDICT: C2 KILLED_BY_EVIDENCE
+  No physiologically credible regime achieves the pre-registered WIN threshold.
+  The Starling resistor coupling (0.4-0.95) makes the eShunt IPS differential
+  uninformative across the physiologically credible range.
+
+- C2 KILL CHAIN (complete, 13 rounds):
+  R138: prior art → narrowed to CL5
+  R139: US8870787B2 → CSF shunt pressure monitoring exists
+  R140: US20060047201A1 → temporal processing is KNOWN
+  R142: CL5 threatened → narrowed to CL5d (differential waveform)
+  R143: first kill (FLAWED) → retracted
+  R144: rebuilt → modest advantage (+0.035)
+  R145: coupling phase diagram → load-bearing assumption exposed
+  R146: compartment model → ceiling effect
+  R147: hard cases → ceiling destroyed → eShunt WORSE → kill (pre-registered)
+  R148: adversarial rescue → 26/100 regimes win (but at LOW coupling 0.1-0.5)
+  R149: mechanism separation → advantage is PHYSIOLOGICAL (not cancellation)
+  R150: physiologically-constrained search → 0/80 regimes win at coupling 0.4-0.95
+  → C2 KILLED_BY_EVIDENCE (permanent)
+
+- C2 CEMETERY ENTRY (CE-014):
+  * entry_id: CE-014
+  * candidate_id: C2 (Adaptive/Sensing eShunt — differential pressure)
+  * mechanism_name: Continuous endovascular CSF-venous differential pressure monitoring
+  * kill_reason: MECHANISM_FAILURE — Starling resistor creates HIGH coupling (0.4-0.95)
+    between CSF and eShunt-accessible IPS pressure. The differential does not provide
+    incremental diagnostic information over absolute ICP across the physiologically
+    credible coupling range.
+  * epistemic_class: PROVEN_INVARIANT
+  * reusable_lesson: The Starling resistor is a PHYSICAL INVARIANT that prevents
+    endovascular dural-sinus differential pressure from carrying independent diagnostic
+    information. This is not a technology limitation — it is a physiological constraint.
+    Any future candidate proposing CSF-dural sinus differential for obstruction detection
+    must address this constraint.
+  * what_to_avoid: Do not propose CSF-dural sinus differential pressure for obstruction
+    detection. The Starling resistor makes this differential uninformative at physiologically
+    credible coupling levels (0.4-0.95).
+  * successor_hypotheses_generated: C2-Y (perturbation ID — avoids coupling dependency),
+    C2-X (dynamics fingerprint — uses absolute ICP waveform, not differential)
+  * kill_chain_rounds: 138-150 (13 rounds of hostile attack)
+
+- OpenFOAM: running in background.
+
+Stage Summary:
+- PORTFOLIO SANCTITY: Only WORLD_CLASS occupies a slot. All 5 slots EMPTY.
+- C2 KILLED_BY_EVIDENCE (permanent). 0/80 physiologically credible regimes meet threshold.
+- CE-014 cemetery entry: PROVEN_INVARIANT (Starling resistor constraint).
+- 7 successor hypotheses in discovery queue (no portfolio status).
+- Portfolio: 0/5 WORLD_CLASS. 2 KILLED (C2 + C4). 3 INVESTIGATION (C1, C3, C5).
+- The machine spent 13 rounds attacking C2 from every angle. It died honestly.
