@@ -4224,3 +4224,27 @@ Stage Summary:
 - If OpenFOAM builds → clotFoam builds → run with 3 controls →
   discriminate H2 (custom artifact, 0.45) vs H1 (genuine flow, 0.20).
 - 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.
+
+---
+Task ID: ROUND-135-APPLICABILITY-MATRIX-OPENFOAM-PROGRESS
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 135 — finish OpenFOAM+clotFoam, add applicability classification, redefine World-Class gate.
+
+Work Log:
+- Created CANDIDATE_WORLD_APPLICABILITY_MATRIX.json:
+  * FULLY_APPLICABLE / CONTROL / NOT_APPLICABLE per candidate×world
+  * C5: only 3 APPLICABLE (FEBio, Peridynamics, Flow); 2 CONTROL (CalculiX, SfePy)
+  * CalculiX has NO fracture model → CONTROL for C5
+  * SfePy has NO damage/fracture → CONTROL for C5 (d²F/dδ² = 0 by construction)
+  * Previous "5 worlds passed" was misleading — only 3 test the C5 mechanism
+- Revised World-Class gate: only FULLY_APPLICABLE worlds count toward promotion
+- OpenFOAM-9 build: 1057/~4887 .o files, 11 .so, 0 errors. Build running with setsid.
+  Process keeps dying when bash tool times out. Resumed multiple times.
+- clotFoam source ready, blocked on OpenFOAM completion.
+- Peridgm: not retried (Trilinos 16 API incompatibility).
+
+Stage Summary:
+- Applicability matrix corrects the "5 worlds" overcount.
+- C5 has 3 APPLICABLE worlds + 2 CONTROL worlds.
+- OpenFOAM build at ~22% (1057/4887), 0 errors, continuing.
+- 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.
