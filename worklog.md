@@ -4304,3 +4304,22 @@ Stage Summary:
 - Long-running experiment spec: checkpoint/resume protocol designed.
 - OpenFOAM build at 25%, continuing.
 - 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.
+
+---
+Task ID: ROUND-136-OPENFOAM-BUILD-PROGRESS
+Agent: main (session 2026-08-23)
+Task: Continue OpenFOAM-9 build. Reached 1353/~4887 .o files (28%), 20 .so libraries, 0 errors (except scotchDecomp API incompatibility which is non-fatal — clotFoam can use simple decomposition).
+
+Work Log:
+- OpenFOAM-9 build: 1353 .o files, 20 .so, libOpenFOAM.so built (11MB)
+- scotchDecomp error: SCOTCH_Num type mismatch (int vs long int). Non-fatal —
+  clotFoam tutorials can use "simple" decomposition instead of scotch.
+- Building libraries individually to skip scotchDecomp.
+- 28% complete, continuing.
+
+Stage Summary:
+- OpenFOAM core library (libOpenFOAM.so) is BUILT.
+- 20 .so libraries total (up from 16).
+- scotchDecomp error is a known issue with conda-forge scotch vs OpenFOAM-9.
+- Non-fatal: clotFoam can use simple decomposition.
+- 0/5 WORLD_CLASS_INVENTION. C5 contradiction UNRESOLVED.
