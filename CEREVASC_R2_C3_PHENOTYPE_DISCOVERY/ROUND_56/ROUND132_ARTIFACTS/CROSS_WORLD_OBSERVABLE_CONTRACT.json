@@ -1,0 +1,73 @@
+{
+  "record_type": "CROSS_WORLD_OBSERVABLE_CONTRACT",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 132,
+  "authority": "CEO Round 132: 'Before comparing worlds, freeze one common observable contract. The implementation must distinguish model variable from predicted physical observable.'",
+
+  "problem_statement": "Each of the 5 worlds defines 'D' (the damage/failure variable) differently. FEBio uses CDM damage [0,1]. Custom peridynamics uses bond-breakage density. Custom flow uses eroded fraction. CalculiX uses plastic strain. SfePy uses elastic strain. These are NOT the same physical quantity. Comparing 'precursor detected' across worlds with non-equivalent D definitions is epistemically meaningless. This is the core of H6 in the contradiction object.",
+
+  "observable_contract": {
+    "name": "C5_precursor_signal",
+    "frozen_before_execution": true,
+    "definition": "A precursor signal exists when the rate of change of the normalized failure progression variable decelerates (peaks then declines) before the failure variable reaches its critical threshold.",
+
+    "common_progression_variable": {
+      "name": "Phi(t)",
+      "definition": "Normalized failure progression, mapped to [0, 1] for ALL worlds.",
+      "mapping_per_world": {
+        "WORLD_A_FEBIO": "Phi = D_CDM (already in [0,1])",
+        "WORLD_B_CUSTOM_PERIDYNAMIC": "Phi = broken_bonds / total_bonds (already in [0,1])",
+        "WORLD_C_CUSTOM_FLOW": "Phi = eroded_volume / initial_clot_volume (already in [0,1])",
+        "WORLD_D_CALCULIX": "Phi = equivalent_plastic_strain / yield_strain (must be normalized; capped at 1.0)",
+        "WORLD_E_SFEPY": "Phi = max_strain / failure_strain (must be defined; SfePy has no failure model, so Phi is elastic strain / 0.1)"
+      },
+      "critical_threshold": "Phi_critical = 0.9 (same for all worlds)"
+    },
+
+    "derivative_definition": {
+      "name": "dPhi/dstrain",
+      "computation": "Central finite difference of Phi with respect to strain (or strain-equivalent progression variable for flow world).",
+      "smoothing": "NONE. Raw derivative. No smoothing or filtering. Per PEP-SLOT5-001-a2: raw second derivative is the signal."
+    },
+
+    "precursor_onset_definition": {
+      "name": "precursor_onset_strain",
+      "definition": "The strain at which dPhi/dstrain reaches its maximum value (peak) BEFORE Phi reaches Phi_critical.",
+      "requirement": "The peak must occur at strain < D_critical_strain. If the peak occurs after D_critical, there is no precursor."
+    },
+
+    "fragmentation_onset_definition": {
+      "name": "fragmentation_onset_strain",
+      "definition": "The strain at which Phi first reaches Phi_critical (0.9).",
+      "cross_world_note": "For FEBio: D=0.9. For peridynamics: 90% bonds broken. For flow: 90% eroded. For CalculiX: plastic strain at 0.9 yield. For SfePy: strain at 0.9 × failure_strain."
+    },
+
+    "lead_time_definition": {
+      "name": "lead_strain",
+      "formula": "lead_strain = fragmentation_onset_strain - precursor_onset_strain",
+      "lead_time": "lead_strain / strain_rate (strain_rate = 0.01 s^-1, frozen per PEP-SLOT5-001-a2)",
+      "precursor_detected": "lead_strain > 0 (precursor occurs before fragmentation)",
+      "precursor_absent": "lead_strain <= 0 OR no peak found before Phi_critical"
+    },
+
+    "anti_gaming_rules": {
+      "no_post_hoc_observable_change": "The observable definition is FROZEN. If a world produces no precursor under this definition, the world produces no precursor. Do not change the definition to manufacture a precursor.",
+      "no_world_specific_thresholds": "Phi_critical = 0.9 for ALL worlds. No world-specific adjustment.",
+      "no_smoothing": "Raw dPhi/dstrain. Smoothing can manufacture or destroy precursor signals.",
+      "no_observable_substitution": "If a world does not produce Phi (e.g., SfePy has no failure model), that world reports Phi = elastic_strain / 0.1. This is a proxy, clearly labeled. It cannot confirm or deny the precursor — it can only report whether the proxy shows the pattern."
+    }
+  },
+
+  "model_variable_vs_physical_observable": {
+    "distinction": "The model variable (D_CDM, bond_breakage_density, eroded_fraction, plastic_strain, elastic_strain) is a MODEL-SIDE quantity. The physical observable (force curvature, displacement, pressure) is a MEASUREMENT-SIDE quantity. The precursor hypothesis claims a physical observable exists before fragmentation. The model variable is a PREDICTION of when that physical observable would appear.",
+    "per_article_I": "The physical experiment (PEP-SLOT5-001-a2) tests the PHYSICAL OBSERVABLE (force curvature), not the model variable. The model variable is a prediction. Reality is the judge.",
+    "implication_for_cross_world": "Even if all 5 worlds agree on the model variable, that does NOT confirm the physical precursor exists. It only confirms the models agree. Physical confirmation requires physical experiment."
+  },
+
+  "re_analysis_required": {
+    "action": "Re-run all 5 worlds with this common observable contract. Re-compute precursor detection using the normalized Phi.",
+    "expected_outcome": "The custom World C positive result may disappear when the observable is properly normalized. Or it may survive, strengthening H1. Either way, the comparison becomes epistemically meaningful.",
+    "status": "QUEUED — C5-CONTRA-E03 (highest acquisition score among executable experiments)"
+  }
+}

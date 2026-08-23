@@ -1,0 +1,36 @@
+{
+  "record_type": "PERIDIGM_BUILD_ATTEMPT_LOG",
+  "date": "2026-08-23",
+  "round": 132,
+
+  "attempt_summary": {
+    "trilinos_installed": "YES — Trilinos 16.2.0 via conda-forge",
+    "mpich_installed": "YES — MPICH 4.2.3 via conda-forge (mpirun, mpicxx available)",
+    "gfortran_installed": "YES — gfortran 15.2.0 via conda-forge",
+    "peridgm_source_cloned": "YES — https://github.com/peridigm/peridigm.git to /home/z/Peridigm/",
+    "cmake_configure": "SUCCESS — with -DCMAKE_POLICY_VERSION_MINIMUM=3.5 and OpenMP flags",
+    "make_build": "FAILED — linker errors: undefined references to Epetra_MpiComm, Teuchos::RCPNodeHandle, etc.",
+    "root_cause": "Peridgm was designed for Trilinos 12-14. Trilinos 16.2.0 has API changes that break Peridgm's linker. The libraries exist but symbol names have changed."
+  },
+
+  "errors_encountered": [
+    "Kokkos OpenMP support requires -fopenmp compiler flag (fixed by adding CMAKE_CXX_FLAGS=-fopenmp)",
+    "Linker undefined references to Epetra_MpiComm, Teuchos::RCPNodeHandle — Trilinos 16 API incompatibility with Peridgm's codebase",
+    "Peridgm's CMakeLists.txt uses cmake_minimum_required(VERSION 2.8) — requires -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+  ],
+
+  "routes_not_yet_tried": [
+    "Install older Trilinos (12.x or 14.x) — may not be available on conda-forge",
+    "Use Peridgm Docker image — Docker not available in this environment",
+    "Patch Peridgm source for Trilinos 16 compatibility — would require deep C++ expertise in both codebases",
+    "Build Trilinos 12.x from source — multi-hour build"
+  ],
+
+  "epistemic_status": "BLOCKED_BY_MISSING_EVIDENCE — Peridgm cannot be built with currently available Trilinos. This is an implementation obstacle, not an epistemic conclusion. The custom Python peridynamics formulation remains as a mathematical model-form diversity world, but must NOT be called 'Peridgm' or treated as external solver evidence.",
+
+  "what_IS_available": {
+    "external_solvers": ["FEBio 4.13", "CalculiX 2.23", "SfePy 2026.2"],
+    "custom_formulations": ["Python bond-based peridynamics (Silling 2000 theory)", "Python finite-volume flow (clotFoam-inspired)"],
+    "g18_state": "PARTIAL_INSUFFICIENT_FOR_PROMOTION — 3 external + 2 custom"
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "record_type": "CONTRADICTION_OBJECT",
+  "contradiction_id": "C5-PRECURSOR-WORLD-DIVERGENCE-001",
+  "date": "2026-08-23",
+  "round": 132,
+  "authority": "CEO Round 132: 'Call it C5-PRECURSOR-WORLD-DIVERGENCE-001. The AI loop should now switch from coverage mode to contradiction-resolution mode.'",
+
+  "contradiction_summary": {
+    "candidate_id": "C5",
+    "claim": "dD/dstrain deceleration is a precursor signal predicting thrombus fragmentation, detectable ~2.5 strain before D_critical=0.9.",
+    "discrepancy": "The precursor signal was detected ONLY in World C (custom flow formulation). It was NOT detected in Worlds A (FEBio), B (custom peridynamics), D (CalculiX), or E (SfePy).",
+    "world_results_table": {
+      "WORLD_A_FEBIO": {"precursor_detected": false, "classification": "EXTERNAL_SOLVER", "note": "FEBio CDM + Simo CDF fracture. No precursor in 2 runs."},
+      "WORLD_B_CUSTOM_PERIDYNAMIC_FORMULATION": {"precursor_detected": false, "classification": "INTERNAL_CUSTOM", "note": "Bond breakage via critical stretch. No precursor in 2 runs."},
+      "WORLD_C_CUSTOM_FLOW_FORMULATION": {"precursor_detected": true, "classification": "INTERNAL_CUSTOM", "note": "Flow-driven erosion. PRECURSOR DETECTED in 1 of 2 runs. This is the ONLY positive result, and it exists in a custom non-external implementation."},
+      "WORLD_D_CALCULIX": {"precursor_detected": false, "classification": "EXTERNAL_SOLVER", "note": "Elastic-plastic FEM. No precursor in 2 runs."},
+      "WORLD_E_SFEPY": {"precursor_detected": false, "classification": "EXTERNAL_PACKAGE", "note": "Linear elastic FEM. No precursor in 2 runs."}
+    },
+    "severity": "HIGH — the positive result exists only in a custom implementation. This is exactly the scenario where G18 PARTIAL matters most.",
+    "resolution_state": "UNRESOLVED — contradiction requires hostile investigation"
+  },
+
+  "observable_definition": {
+    "name": "C5_precursor_signal",
+    "definition": "dD/dstrain deceleration — the rate of change of the damage/failure variable peaks then declines before D reaches D_critical (0.9).",
+    "components": [
+      "D(t): damage/failure variable at each timestep",
+      "dD/dstrain: first derivative of D with respect to strain",
+      "precursor_onset: strain at which dD/dstrain peaks",
+      "D_critical_crossing: strain at which D reaches 0.9",
+      "lead_strain: D_critical_crossing - precursor_onset",
+      "lead_time: lead_strain / strain_rate (0.01 s^-1 frozen)"
+    ],
+    "cross_world_invariance_problem": "Each world defines 'D' differently: FEBio uses CDM damage variable [0,1]; peridynamics uses bond-breakage density; flow uses eroded fraction; CalculiX uses plastic strain; SfePy uses elastic strain. These are NOT the same physical quantity. The observable must be normalized before cross-world comparison is meaningful.",
+    "frozen": false,
+    "next_action": "Freeze a common observable contract before any further cross-world comparison. See CROSS_WORLD_OBSERVABLE_CONTRACT.json."
+  },
+
+  "common_assumptions_across_worlds": {
+    "A1_geometry": "All worlds use a 1x1x1 cube or equivalent 2D domain. No world uses patient-specific geometry.",
+    "A2_loading": "All worlds apply monotonic loading (displacement-controlled or flow-rate-controlled). No cyclic loading.",
+    "A3_parameters": "Parameters are mapped from FEBio's alpha/beta to each world's equivalents. The mapping may not be physically equivalent.",
+    "A4_observable_extraction": "Each world extracts D using its own native field. No common observable extraction pipeline.",
+    "A5_single_element_or_coarse_mesh": "Most worlds use coarse meshes (1-8 elements or 5x5x5 particles). Precursor may require finer resolution."
+  },
+
+  "world_specific_assumptions": {
+    "WORLD_A_FEBIO": "CDM damage accumulation is smooth by construction (Simo CDF). dD/dstrain is mathematically smooth. If precursor requires smooth D, FEBio should show it — but it doesn't.",
+    "WORLD_B_CUSTOM": "Bond breakage is discrete. D = broken/total bonds changes in steps. dD/dstrain may be noisy. Precursor may be hidden by discreteness.",
+    "WORLD_C_CUSTOM": "Flow-driven erosion produces a different D evolution. The precursor detected here may be an artifact of the simple erosion model (linear in flow rate).",
+    "WORLD_D_CALCULIX": "Elastic-plastic with von Mises. No damage variable. D is a plastic-strain proxy. Precursor concept doesn't directly apply.",
+    "WORLD_E_SFEPY": "Linear elastic. No damage, no plasticity. D is a strain proxy. Precursor concept doesn't apply."
+  },
+
+  "possible_explanations": {
+    "H1": {
+      "hypothesis": "The precursor is a genuinely flow-dependent phenomenon.",
+      "description": "The precursor only exists when flow-driven dynamics are the dominant failure mode. Mechanical-only loading (FEBio, CalculiX, SfePy) and bond-breakage (peridynamics) do not produce it because they lack the flow physics. This would be a POSITIVE finding for C5 if confirmed by actual clotFoam.",
+      "posterior_probability": 0.15,
+      "discriminating_experiment": "Run actual clotFoam with same parameters. If precursor survives, H1 is supported. If not, H1 is refuted.",
+      "independence_concern": "Currently tested only in custom World C. Must be reproduced in actual clotFoam."
+    },
+    "H2": {
+      "hypothesis": "The custom World C implementation creates the precursor artifactually.",
+      "description": "The Python flow model uses a simple linear erosion rule (erosion = flow_rate * 0.1 / (1 + adhesion)). This linear rule may produce a smooth D evolution that looks like a precursor but is actually a numerical artifact of the simplified physics.",
+      "posterior_probability": 0.35,
+      "discriminating_experiment": "Replace custom World C with actual clotFoam. If precursor disappears, H2 is confirmed.",
+      "independence_concern": "This is the highest-probability explanation because the positive result exists ONLY in the custom implementation."
+    },
+    "H3": {
+      "hypothesis": "Numerical discretization creates the precursor.",
+      "description": "The finite-volume grid (30x30) may produce discretization-dependent D evolution. The precursor may disappear with mesh refinement or different discretization.",
+      "posterior_probability": 0.10,
+      "discriminating_experiment": "Run custom World C with 60x60 and 15x15 grids. If precursor is mesh-dependent, H3 is supported."
+    },
+    "H4": {
+      "hypothesis": "Parameterization creates the precursor.",
+      "description": "The mapping from FEBio's alpha/beta to flow_rate/adhesion may produce parameters that happen to generate a precursor-like signal in the flow world only.",
+      "posterior_probability": 0.10,
+      "discriminating_experiment": "Run parameter sweep in custom World C with independently-sourced flow parameters (not mapped from FEBio)."
+    },
+    "H5": {
+      "hypothesis": "The other worlds omit the relevant physics.",
+      "description": "FEBio (CDM), CalculiX (plasticity), and SfePy (elastic) do not model flow. If the precursor is flow-dependent, these worlds cannot detect it by construction. This is the complement of H1.",
+      "posterior_probability": 0.10,
+      "discriminating_experiment": "Add flow coupling to FEBio (FSI) and check if precursor appears. Requires World D (svFSI) which is not installed."
+    },
+    "H6": {
+      "hypothesis": "Observable extraction differs between worlds.",
+      "description": "Each world extracts 'D' using its own native field. The flow world's 'eroded fraction' may evolve differently from FEBio's 'CDM damage' even if the underlying physics is equivalent. The precursor may be an artifact of comparing non-equivalent observables.",
+      "posterior_probability": 0.15,
+      "discriminating_experiment": "Implement a common observable extraction pipeline that normalizes D across worlds. See CROSS_WORLD_OBSERVABLE_CONTRACT.json.",
+      "independence_concern": "This is a serious epistemic concern. Comparing non-equivalent observables is meaningless."
+    },
+    "H7": {
+      "hypothesis": "The precursor exists only in a restricted validity domain.",
+      "description": "The precursor may require specific conditions (flow rate, adhesion, geometry) that happen to be met in the custom World C run but not in the other worlds.",
+      "posterior_probability": 0.05,
+      "discriminating_experiment": "Sweep the parameter space in ALL worlds to map where the precursor exists."
+    },
+    "H8": {
+      "hypothesis": "The precursor is a numerical artifact of the flow formulation itself.",
+      "description": "The finite-volume erosion model uses an explicit time-stepping scheme that may introduce numerical diffusion or instability that looks like a precursor. This is distinct from H2 (which is about the physics) — H8 is about the numerics.",
+      "posterior_probability": 0.05,
+      "discriminating_experiment": "Run with implicit time-stepping and compare. Run with different timestep sizes."
+    }
+  },
+
+  "posterior_summary": {
+    "H1_genuine_flow_phenomenon": 0.15,
+    "H2_custom_implementation_artifact": 0.35,
+    "H3_discretization_artifact": 0.10,
+    "H4_parameterization_artifact": 0.10,
+    "H5_other_worlds_missing_physics": 0.10,
+    "H6_observable_inconsistency": 0.15,
+    "H7_restricted_validity_domain": 0.05,
+    "H8_numerical_artifact": 0.05,
+    "interpretation": "H2 (custom implementation artifact) has the highest posterior because the positive result exists ONLY in a custom, non-external implementation. This is exactly the scenario G18 PARTIAL is designed to catch.",
+    "epistemic_rule": "Per Article XXVIII: a positive result in a single non-independent world does NOT promote the hypothesis. Per Article XXIX: the discrepancy must be investigated before any conclusion."
+  },
+
+  "experiments": [
+    {
+      "experiment_id": "C5-CONTRA-E01",
+      "name": "Actual clotFoam reproduction",
+      "targets_hypothesis": "H2",
+      "description": "Replace custom World C with actual clotFoam. Run same parameters. If precursor disappears, H2 confirmed.",
+      "eig": 0.95,
+      "contradiction_impact": 1.0,
+      "independence_exposure": 1.0,
+      "cost": 100,
+      "acquisition_score": "0.95 × 1.0 × 1.0 / 100 = 0.0095",
+      "status": "QUEUED — requires actual clotFoam installation",
+      "prerequisite": "Install OpenFOAM v9 + clotFoam"
+    },
+    {
+      "experiment_id": "C5-CONTRA-E02",
+      "name": "Actual Peridgm cross-form test",
+      "targets_hypothesis": "H1, H5",
+      "description": "Replace custom World B with actual Peridgm. If precursor appears in Peridgm (bond breakage), H1 is strengthened. If not, H5 is strengthened.",
+      "eig": 0.90,
+      "contradiction_impact": 0.8,
+      "independence_exposure": 1.0,
+      "cost": 100,
+      "acquisition_score": "0.90 × 0.8 × 1.0 / 100 = 0.0072",
+      "status": "QUEUED — requires actual Peridgm installation",
+      "prerequisite": "Install Trilinos + MPI + Peridgm"
+    },
+    {
+      "experiment_id": "C5-CONTRA-E03",
+      "name": "Common observable normalization",
+      "targets_hypothesis": "H6",
+      "description": "Implement a common observable extraction pipeline. Normalize D across all 5 worlds. Re-check if precursor is still World-C-only.",
+      "eig": 0.85,
+      "contradiction_impact": 0.9,
+      "independence_exposure": 0.5,
+      "cost": 10,
+      "acquisition_score": "0.85 × 0.9 × 0.5 / 10 = 0.038",
+      "status": "EXECUTABLE_NOW — no new solver needed",
+      "prerequisite": "None"
+    },
+    {
+      "experiment_id": "C5-CONTRA-E04",
+      "name": "Mesh refinement in custom World C",
+      "targets_hypothesis": "H3",
+      "description": "Run custom World C with 15x15, 30x30, 60x60, 120x120 grids. Check if precursor is mesh-dependent.",
+      "eig": 0.70,
+      "contradiction_impact": 0.7,
+      "independence_exposure": 0.3,
+      "cost": 5,
+      "acquisition_score": "0.70 × 0.7 × 0.3 / 5 = 0.029",
+      "status": "EXECUTABLE_NOW",
+      "prerequisite": "None"
+    },
+    {
+      "experiment_id": "C5-CONTRA-E05",
+      "name": "Parameter independence test",
+      "targets_hypothesis": "H4",
+      "description": "Run custom World C with flow parameters sourced from published clotFoam literature (not mapped from FEBio).",
+      "eig": 0.75,
+      "contradiction_impact": 0.6,
+      "independence_exposure": 0.4,
+      "cost": 5,
+      "acquisition_score": "0.75 × 0.6 × 0.4 / 5 = 0.036",
+      "status": "EXECUTABLE_NOW",
+      "prerequisite": "Published clotFoam parameter values"
+    }
+  ],
+
+  "next_best_experiment": {
+    "experiment_id": "C5-CONTRA-E03",
+    "name": "Common observable normalization",
+    "rationale": "Highest acquisition score among EXECUTABLE_NOW experiments (0.038). Targets H6 (observable inconsistency) which has 0.15 posterior — the third-highest. This is the cheapest experiment that could resolve whether the discrepancy is real or an artifact of comparing non-equivalent observables. No new solver installation needed.",
+    "acquisition_formula": "EIG × contradiction_impact × independence_exposure ÷ cost"
+  },
+
+  "second_priority": {
+    "experiment_id": "C5-CONTRA-E01",
+    "name": "Actual clotFoam reproduction",
+    "rationale": "Highest EIG (0.95) and highest independence_exposure (1.0). This is the DECISIVE experiment — it directly tests H2 (custom implementation artifact, posterior 0.35) by replacing the custom implementation with the actual external solver. BLOCKED on clotFoam installation."
+  },
+
+  "resolution_state": "UNRESOLVED",
+  "stopping_rule": "Contradiction is resolved when: (a) H2 is confirmed (precursor disappears in actual clotFoam → C5 is an artifact, KILLED_BY_EVIDENCE), OR (b) H1 is confirmed (precursor survives in actual clotFoam AND actual Peridgm → C5 is a genuine flow-dependent phenomenon, promoted toward WORLD_CLASS_INVENTION), OR (c) H6 is confirmed (observable normalization resolves the discrepancy → re-evaluate all worlds with common observable).",
+
+  "epistemic_governance": {
+    "article_I": "Evidence precedes assertion. The contradiction is recorded but NOT concluded.",
+    "article_IV": "No fallback. The discrepancy is not averaged away.",
+    "article_V": "Fail closed but not universal rejector. C5 is BLOCKED, not KILLED.",
+    "article_VII": "Failed experiment corrected by adding evidence, not weakening the contradiction.",
+    "article_XVII": "Each hypothesis has an attempted bypass (discriminating experiment).",
+    "article_XXV": "Unresolved evidence (the contradiction) is not aggregated as positive or negative.",
+    "article_XXVIII": "Positive result in custom world does NOT promote the hypothesis.",
+    "article_XXIX": "The discrepancy must be investigated before any conclusion. NOT_RUN external solvers = BLOCKED, not KILLED.",
+    "article_XXXII": "Strongest alternative (H2: custom artifact) explicitly stated and tested.",
+    "article_XXXV": "The contradiction-resolution loop IS the closed-loop epistemic control system."
+  }
+}

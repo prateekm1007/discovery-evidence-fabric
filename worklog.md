@@ -4068,3 +4068,66 @@ Stage Summary:
 - Remaining blockers: G01 (STRIDE data for C1/C2), G02 (PatSnap for C2/C5),
   G09 (strongest-alternative for C1/C2/C3/C5), G14 (buyer sentiment for all),
   G15 (VLB-001 for C5).
+
+---
+Task ID: ROUND-132-HONEST-RECLASSIFICATION-AND-CONTRADICTION
+Agent: main (session 2026-08-23)
+Task: Execute CEO Round 132 — revoke G18=GREEN, rename custom worlds honestly, create contradiction object for C5 cross-world discrepancy, freeze observable contract, attempt actual Peridigm/clotFoam installation, switch to contradiction-resolution mode.
+
+Work Log:
+- CEO correctly identified that custom Python Worlds B/C are NOT external solver evidence.
+- Wrote ROUND_132_HONEST_RECLASSIFICATION.json:
+  * WORLD_B_PERIDYNAMICS → WORLD_B_CUSTOM_PERIDYNAMIC_FORMULATION (INTERNAL_CUSTOM)
+  * WORLD_C_FLOW_CLOT → WORLD_C_CUSTOM_FLOW_FORMULATION (INTERNAL_CUSTOM)
+  * G18: GREEN → PARTIAL_INSUFFICIENT_FOR_PROMOTION
+  * 3 external (FEBio, CalculiX, SfePy) + 2 custom = G18 PARTIAL
+  * No candidate can promote to WORLD_CLASS_INVENTION until B/C are replaced
+    with actual external solvers.
+
+- Created CONTRADICTION_OBJECT_C5_PRECURSOR_DIVERGENCE.json:
+  * C5 precursor detected ONLY in custom World C (non-external)
+  * 8 competing hypotheses (H1-H8) with posteriors:
+    H2 (custom artifact): 0.35 (highest — positive result only in custom impl)
+    H1 (genuine flow): 0.15
+    H6 (observable inconsistency): 0.15
+    H3 (discretization): 0.10
+    H4 (parameterization): 0.10
+    H5 (other worlds missing physics): 0.10
+    H7 (restricted domain): 0.05
+    H8 (numerical artifact): 0.05
+  * 5 contradiction-resolution experiments ranked by EIG×impact×independence÷cost
+  * Next best: C5-CONTRA-E03 (common observable normalization, score 0.038, executable now)
+  * Decisive: C5-CONTRA-E01 (actual clotFoam, score 0.0095, BLOCKED)
+
+- Created CROSS_WORLD_OBSERVABLE_CONTRACT.json:
+  * Common progression variable Phi(t) ∈ [0,1] for ALL worlds
+  * Per-world mapping: FEBio D_CDM, peridynamics bond density, flow eroded fraction,
+    CalculiX plastic strain, SfePy elastic strain
+  * Phi_critical = 0.9 for all worlds
+  * Raw dPhi/dstrain (no smoothing)
+  * Distinguishes model variable from physical observable (per Article I)
+
+- Attempted actual Peridigm installation:
+  * Trilinos 16.2.0 installed via conda-forge ✅
+  * MPICH 4.2.3 installed (mpirun, mpicxx) ✅
+  * gfortran 15.2.0 installed ✅
+  * Peridigm source cloned from GitHub ✅
+  * CMake configuration succeeded ✅
+  * Make build FAILED ❌ — Trilinos 16 API incompatibility with Peridgm
+    (undefined references to Epetra_MpiComm, Teuchos::RCPNodeHandle)
+  * Peridgm designed for Trilinos 12-14; Trilinos 16 has breaking API changes
+  * Status: BLOCKED_BY_MISSING_EVIDENCE (implementation obstacle, not epistemic conclusion)
+
+- OpenFOAM/clotFoam: NOT installable (no conda package, no Docker, no sudo)
+
+- No git operations. Artifacts in ROUND132_ARTIFACTS/.
+
+Stage Summary:
+- G18 honestly downgraded to PARTIAL_INSUFFICIENT_FOR_PROMOTION.
+- 3 external solvers + 2 custom formulations (honestly labeled).
+- C5 contradiction formalized with 8 hypotheses and 5 resolution experiments.
+- Observable contract frozen for cross-world comparison.
+- Peridgm build attempted genuinely but failed (Trilinos 16 API).
+- clotFoam not installable in current environment.
+- 0/5 WORLD_CLASS_INVENTION (correct — G18 PARTIAL blocks all promotion).
+- Next: execute C5-CONTRA-E03 (common observable normalization, executable now).
