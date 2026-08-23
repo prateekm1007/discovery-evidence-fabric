@@ -1,0 +1,190 @@
+{
+  "record_type": "C2_Y_R1_PREREGISTRATION_V1",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 157,
+  "authority": "Article XIX (never optimize for the gate; optimize for truth) — pre-registration of all numerical parameters BEFORE C2-Y-R1 experiment runs. Any parameter change after results are known is a constitutional violation.",
+  "constitutional_basis": [
+    "Article I — evidence precedes assertion (parameters frozen before evidence is generated)",
+    "Article VII — never weaken the verifier to rescue a claim (cannot tune parameters post-hoc)",
+    "Article XIX — never optimize for the gate (cannot adjust parameters to make C2-Y pass)",
+    "Article XXVII — no threshold invention (every numerical value has explicit source)",
+    "Article XXIX — separate implementation from mechanism (baseline reproduction failure is implementation failure, not candidate failure)"
+  ],
+
+  "purpose": "Round 156 specified the C2-Y-R1 experiment DESIGN (UISB baseline, cohort stratification, measurement availability, compute budget, FA constraint, primary endpoint, decision rule). Round 157 specifies the NUMERICAL PARAMETERS that will be used in execution. These parameters are now FROZEN. Any change requires a V2 pre-registration with explicit rationale.",
+
+  "frozen_at": "2026-08-23T00:00:00Z (Round 157 commit)",
+  "frozen_by": "main agent (session 2026-08-23)",
+  "hash_of_this_file": "TO_BE_COMPUTED_AFTER_WRITE (will be recorded in ROUND157_ARTIFACT_HASH_PINS_V2 if needed)",
+  "experiment_has_started": false,
+  "results_known": false,
+
+  "UISB_baseline_A_VIEshunt_style_controller_parameters": {
+    "source": "PMID 40087797 (VIEshunt, ETH Zurich / University Hospital Zurich, 2025) — Figure 4-5 ICP error response to CSF bolus perturbation",
+    "controller_type": "PI (proportional-integral) on ICP error",
+    "proportional_gain_Kp": {
+      "value": 0.15,
+      "unit": "mL/min per mmHg",
+      "source": "Tuned to reproduce VIEshunt-published ICP error response (Figure 4 of PMID 40087797). If reproduction underperforms published by >20%, baseline is INCOMPLETE (Article XXIX).",
+      "uncertainty": "MEDIUM — exact VIEshunt gain not published; inferred from response shape",
+      "sensitivity_range_to_test": "[0.10, 0.20] — 5 values spanning the plausible range",
+      "if_reproduction_fails_at_Kp_0_15": "Try Kp in {0.10, 0.12, 0.18, 0.20} BEFORE any C2-Y run. If NONE of these reproduce VIEshunt response within 20%, baseline implementation is INCOMPLETE; experiment BLOCKED."
+    },
+    "integral_gain_Ki": {
+      "value": 0.02,
+      "unit": "mL/min per (mmHg·min)",
+      "source": "Tuned to reproduce VIEshunt steady-state ICP recovery (Figure 5 of PMID 40087797)",
+      "uncertainty": "MEDIUM",
+      "sensitivity_range_to_test": "[0.01, 0.04]"
+    },
+    "posture_dependent_reference": {
+      "supine_target_ICP": 12,
+      "upright_target_ICP": 5,
+      "transition_dwell_time_s": 30,
+      "source": "Standard neurophysiological values; VIEshunt uses posture-dependent reference per PMID 40087797",
+      "uncertainty": "LOW — these are well-established clinical values"
+    },
+    "ICP_sensor_model": {
+      "type": "Gaussian noise + linear drift",
+      "noise_std_mmHg": {
+        "low": 0.5,
+        "medium": 1.5,
+        "high": 3.0,
+        "source": "Estimated from Nature 2026 ICP monitor published figures; low/medium/high span realistic chronic implant sensor noise range",
+        "uncertainty": "MEDIUM — Nature 2026 published figures are graphical, not numerical"
+      },
+      "drift_rate_mmHg_per_day": 1.0,
+      "drift_source": "Realistic for chronic implantable pressure sensor (based on Codman ICP Express published drift spec of <1 mmHg/day)",
+      "drift_uncertainty": "LOW"
+    },
+    "CSF_bolus_perturbation": {
+      "volume_mL": 5,
+      "injection_rate_mL_per_min": 1,
+      "timing": "Random within ±2h of scheduled perturbation time",
+      "source": "VIEshunt published protocol (PMID 40087797)"
+    }
+  },
+
+  "UISB_baseline_C_Codman_threshold_alarm_parameters": {
+    "source": "FDA 510(k) database + marketed products (Codman ICP Express, Medtronic Codman, Integra Neuroscience)",
+    "threshold_levels_mmHg": [15, 20, 25],
+    "alarm_logic": "Trigger if ICP > threshold for > 30 seconds (debounce)",
+    "operating_point_selection": "Threshold tuned on training cohort to achieve exactly 1 false alarm per patient-month (per FA constraint in C2_Y_REBUILT_BASELINE_V1.json)",
+    "threshold_uncertainty": "LOW — these are clinically standard values"
+  },
+
+  "virtual_cohort_parameters": {
+    "cohort_size": 300,
+    "failure_mode_distribution": {
+      "obstruction": 60,
+      "overdrainage": 60,
+      "underdrainage": 60,
+      "valve_dysfunction": 60,
+      "posture_artifact": 60
+    },
+    "patient_variability_distribution": {
+      "age_years": {
+        "pediatric": "uniform(2, 18), 33% of cohort",
+        "adult": "uniform(18, 65), 34% of cohort",
+        "elderly": "uniform(65, 80), 33% of cohort"
+      },
+      "sex": "50% male, 50% female",
+      "BMI_kg_per_m2": "uniform(18, 35)",
+      "CSF_production_rate_mL_per_min": "uniform(0.30, 0.50) — published physiological range"
+    },
+    "sensor_noise_distribution": {
+      "low_noise": "100 patients, noise_std = 0.5 mmHg",
+      "medium_noise": "100 patients, noise_std = 1.5 mmHg",
+      "high_noise": "100 patients, noise_std = 3.0 mmHg"
+    },
+    "disease_progression_model": {
+      "healthy_baseline_function_pct": 100,
+      "failure_threshold_function_pct": 50,
+      "progression_steps_pct": [100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50],
+      "step_duration_hours": "uniform(6, 72) per step, randomized per patient",
+      "clinical_failure_definition": "ICP > 25 mmHg sustained > 1 hour OR neurological symptom score > threshold (per standardized hydrocephalus symptom inventory)"
+    },
+    "random_seed": 42,
+    "random_seed_source": "Fixed seed for reproducibility. Article IX (certification is observational) — the seed is recorded; any re-run with the same seed must produce the same cohort."
+  },
+
+  "primary_endpoint_parameters": {
+    "FPR_target_false_alarms_per_patient_month": 1.0,
+    "FPR_target_source": "EMPIRICAL_THRESHOLD_PROVENANCE_V1.json — TRANSFERRED from cardiac alarm fatigue literature (Sendelbach & Halm 2015)",
+    "lead_time_window_hours": 72,
+    "lead_time_window_source": "Maximum plausible lead time — if C2-Y predicts failure >72h in advance, the prediction is not clinically actionable (patient may not yet be deteriorating)",
+    "operating_point_selection_method": "Each arm's alert threshold is tuned on TRAINING cohort (60% of patients) to achieve exactly 1 FA/patient-month. Threshold is then frozen and applied to TEST cohort (40% of patients). No post-hoc threshold adjustment (Article XIX)."
+  },
+
+  "decision_thresholds_FROZEN_from_EMPIRICAL_THRESHOLD_PROVENANCE_V1": {
+    "WIN_lead_time_hours": 24,
+    "WIN_false_alarms_per_patient_month": 1,
+    "WIN_classification_accuracy_pct": 70,
+    "KILL_lead_time_hours": 4,
+    "KILL_false_alarms_per_patient_month": 3,
+    "KILL_classification_accuracy_pct": 50,
+    "MMD_lead_time_hours": 8,
+    "MMD_false_alarms_per_patient_month": 2,
+    "MMD_classification_accuracy_pp": 20,
+    "provenance_file_hash": "8aff036d081e3e6465f10e3b4cd68688cfd85be008284223600f3c8f67be652a",
+    "provenance_file_path": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND156_ARTIFACTS/EMPIRICAL_THRESHOLD_PROVENANCE_V1.json"
+  },
+
+  "computational_budget": {
+    "max_FLOP_per_second_avg_over_1h_window": 1.0,
+    "budget_monitoring": "Computational cost logged per arm per hour. Exceeding budget is a CI failure.",
+    "rationale": "Real shunt implants are battery-powered. A predictor requiring a GPU is not clinically practical."
+  },
+
+  "statistical_analysis_plan": {
+    "primary_analysis": "Per-arm median lead time at FPR=1/month, with 95% confidence interval via bootstrap (n=1000 resamples)",
+    "secondary_analysis": "Per-arm failure-mode classification accuracy with 95% CI",
+    "multiple_testing_correction": "Bonferroni across 5 failure modes — adjusted alpha = 0.01 per mode",
+    "per_protocol_vs_intent_to_treat": "Per-protocol analysis only (no dropouts in virtual cohort)",
+    "missing_data_handling": "No missing data in virtual cohort; if any patient fails to complete the simulation, that patient is excluded with explicit rationale"
+  },
+
+  "FROZEN_artifacts_chain": {
+    "experiment_design": "C2_Y_REBUILT_BASELINE_V1.json (hash d88902c4ef83c616c18b8ebbff82032f2a490840226451fb3cb6b4bfeafd85aa, frozen in Round 156)",
+    "threshold_provenance": "EMPIRICAL_THRESHOLD_PROVENANCE_V1.json (hash 8aff036d081e3e6465f10e3b4cd68688cfd85be008284223600f3c8f67be652a, frozen in Round 156)",
+    "baseline_contract": "COMPETITIVE_BASELINE_CONTRACTS_V1.json (hash d396b0d7d813458324a1c40e7263bf142dc4f0dfeb10ce6511fb92ea0a42ba98, frozen in Round 156)",
+    "preregistration_THIS_FILE": "C2_Y_R1_PREREGISTRATION_V1.json (this file, hash to be recorded after write)"
+  },
+
+  "post_execution_procedure": {
+    "step_1": "Run experiment with FROZEN parameters above",
+    "step_2": "Record results in C2_Y_R1_RESULTS_V1.json with full provenance (random seed, parameter values, output data hashes)",
+    "step_3": "Compare results to FROZEN thresholds (WIN/KILL/INCONCLUSIVE)",
+    "step_4": "If WIN: proceed to C2-Y-R2 (independent reproduction via external solver — Article XXVIII)",
+    "step_5": "If KILL: add C2-Y to cemetery with explicit rationale; update discovery queue",
+    "step_6": "If INCONCLUSIVE: tighten experiment design OR public KILL (Article XXXIII — no irreversible action on unresolved evidence, but no permanent limbo either)"
+  },
+
+  "what_is_FORBIDDEN_after_results_are_known": [
+    "Changing Kp, Ki, threshold levels, cohort size, random seed, or any other parameter (Article XIX)",
+    "Adjusting the WIN/KILL/MMD thresholds (Article VII)",
+    "Re-running with different parameters and reporting only the best result (Article XIX — multiple testing without correction)",
+    "Excluding specific patients or failure modes from the analysis (Article XXXII — must report strongest alternative explanation, including modes where C2-Y failed)",
+    "Changing the primary endpoint (Article VII)",
+    "Adding post-hoc secondary endpoints and presenting them as primary (Article XXVIII — silent semantic promotion)"
+  ],
+
+  "adversarial_self_attack": {
+    "attack_1": "Coder sees C2-Y scores 22h lead time (between MMD=8h and WIN=24h = INCONCLUSIVE). Coder is tempted to lower WIN threshold to 20h to declare WIN. COUNTER: WIN threshold is hash-pinned in EMPIRICAL_THRESHOLD_PROVENANCE_V1.json (hash 8aff036d...). Pre-commit hook (Phase 2) blocks any edit to that file without V2 + PCP rationale. Article VII violation if attempted.",
+    "attack_2": "Coder sees C2-Y excels on obstruction but fails on valve dysfunction. Coder is tempted to drop valve_dysfunction from the failure mode list. COUNTER: failure mode list is in C2_Y_REBUILT_BASELINE_V1.json (hash d88902c4...). Hash-pinned. Decision rule requires ALL 6 rows WIN.",
+    "attack_3": "Coder sees UISB baseline underperforms VIEshunt-published response by 25%. Coder is tempted to retune UISB parameters to make it match better. COUNTER: Kp=0.15 is frozen in THIS file. If UISB reproduction fails, the experiment is BLOCKED per Article XXIX — not a C2-Y failure, but a baseline implementation failure. The BLOCKED state requires either (a) fixing the baseline implementation with explicit V2 pre-registration, or (b) acknowledging that the baseline cannot be reproduced and the experiment cannot proceed.",
+    "attack_4": "Coder runs experiment multiple times with different random seeds and reports only the best. COUNTER: random seed is frozen at 42 in THIS file. Any re-run with a different seed is a separate experiment that must be reported as such, not silently substituted.",
+    "attack_5": "Coder adds a 6th failure mode where C2-Y excels and removes one where it fails. COUNTER: failure mode list is hash-pinned. Adding a 6th mode requires V2 pre-registration with explicit rationale BEFORE re-running."
+  },
+
+  "honest_disclosure": {
+    "what_is_strong": "Every numerical parameter is now frozen with explicit source. The FROZEN_artifacts_chain links this pre-registration to the hash-pinned Round 156 artifacts. Any post-hoc change is detectable via hash mismatch.",
+    "what_is_still_weak": [
+      "The Kp=0.15 value is itself MODEL_DERIVED (inferred from VIEshunt-published response shape, not directly published). The sensitivity_range_to_test [0.10, 0.20] is the pre-registered range — but if NONE of these values reproduce VIEshunt response, we must either (a) acknowledge baseline reproduction failure and BLOCK, or (b) expand the range with V2 pre-registration. Option (b) is allowed only BEFORE results are known.",
+      "The random seed (42) is arbitrary. Different seeds may give different results. We pre-register ONE seed; the result is what it is. We do NOT run multiple seeds and report the best.",
+      "The disease progression model (uniform 6-72h per step) is a simplification of real clinical progression. Real shunt failure progression is highly variable."
+    ],
+    "what_we_are_NOT_claiming": "We are NOT claiming these parameters are correct. We are claiming they are FROZEN. The experiment will produce whatever result it produces. The pre-registration ensures the result is interpretable."
+  }
+}

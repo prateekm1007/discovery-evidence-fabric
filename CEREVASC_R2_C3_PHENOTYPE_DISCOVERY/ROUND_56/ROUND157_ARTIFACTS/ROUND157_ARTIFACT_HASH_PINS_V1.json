@@ -1,0 +1,142 @@
+{
+  "record_type": "ROUND157_ARTIFACT_HASH_PINS_V1",
+  "version": "1.0.0",
+  "date": "2026-08-23",
+  "round": 157,
+  "authority": "Round 156 adversarial self-attack recommendation: 'Pin WORLD_CLASS_GATE_V4.json, COMPETITIVE_BASELINE_CONTRACTS_V1.json, EMPIRICAL_THRESHOLD_PROVENANCE_V1.json in CONSTITUTION_REGISTRY.json — same pattern as the constitution hash-pin'",
+  "constitutional_basis": [
+    "Article VII — never weaken the verifier to rescue a claim (hash-pin detects threshold drift)",
+    "Article XIX — never optimize for the gate (hash-pin detects post-hoc parameter changes)",
+    "Article XXVII — no threshold invention (hash-pin protects threshold provenance)",
+    "Article XXXI — every correction creates a memory artifact (this hash-pin is a memory of the Round 156 enforcement gap)"
+  ],
+
+  "purpose": "Round 156 identified 12 residual weaknesses in its own artifacts, of which the dominant pattern was PROCEDURAL ENFORCEMENT GAPS — the artifacts specify what is forbidden, but the enforcement requires either hash-pinning or pre-commit hooks. This artifact closes that gap for the 9 critical Round 156 artifacts by recording their SHA-256 hashes in a single registry. Any future edit to these files MUST be detected via hash comparison; any change MUST be accompanied by a version increment (V1 → V2) with explicit rationale recorded in this registry.",
+
+  "the_pinned_artifacts": [
+    {
+      "artifact_id": "R156-CBC",
+      "name": "COMPETITIVE_BASELINE_CONTRACTS_V1.json",
+      "path": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND156_ARTIFACTS/COMPETITIVE_BASELINE_CONTRACTS_V1.json",
+      "sha256": "d396b0d7d813458324a1c40e7263bf142dc4f0dfeb10ce6511fb92ea0a42ba98",
+      "frozen_at_commit": "0cf1524",
+      "frozen_at_round": 156,
+      "what_it_protects": "The 11-field COMPETITIVE_BASELINE_CONTRACT structure for C2-Y, C3-X, C5-X. Protects against: (a) silent baseline weakening (Art. IV), (b) silent threshold drift (Art. VII), (c) silent semantic promotion ('beat UISB' → 'beat VIEshunt') (Art. XXVIII).",
+      "edit_policy": "Any edit requires V2 file (e.g., COMPETITIVE_BASELINE_CONTRACTS_V2.json) with explicit PCP-style rationale. The V1 file is preserved per Section 9.11 of INVENTION_PROTOCOL_V1_1.md.",
+      "hash_check_enforcement": "Pre-commit hook (to be implemented in pre_commit_constitution_check.py extension) MUST verify all 9 pinned hashes. A mismatch blocks commit and writes the specific mismatch to a pre_commit_hash_check_report.json."
+    },
+    {
+      "artifact_id": "R156-ETP",
+      "name": "EMPIRICAL_THRESHOLD_PROVENANCE_V1.json",
+      "path": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND156_ARTIFACTS/EMPIRICAL_THRESHOLD_PROVENANCE_V1.json",
+      "sha256": "8aff036d081e3e6465f10e3b4cd68688cfd85be008284223600f3c8f67be652a",
+      "frozen_at_commit": "0cf1524",
+      "frozen_at_round": 156,
+      "what_it_protects": "The provenance chain for every threshold (24h, 1 FA/month, 70% classification, 50% CV, 60% overdosing reduction, 0.85 AUROC, 10% decision benefit, clotFoam survival). Protects against retroactive threshold justification (Art. XXVII).",
+      "edit_policy": "Any edit requires V2 with explicit rationale. If a threshold value itself changes (e.g., 24h → 18h), the V2 file MUST include: (a) the new value, (b) the new provenance, (c) explicit acknowledgment that the old provenance was either wrong or insufficient, (d) a PCP-style approval record.",
+      "hash_check_enforcement": "Pre-commit hook verifies hash. Mismatch blocks commit."
+    },
+    {
+      "artifact_id": "R156-C2Y",
+      "name": "C2_Y_REBUILT_BASELINE_V1.json",
+      "path": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND156_ARTIFACTS/C2_Y_REBUILT_BASELINE_V1.json",
+      "sha256": "d88902c4ef83c616c18b8ebbff82032f2a490840226451fb3cb6b4bfeafd85aa",
+      "frozen_at_commit": "0cf1524",
+      "frozen_at_round": 156,
+      "what_it_protects": "The C2-Y-R1 experiment design: UISB baseline, cohort stratification, measurement availability, compute budget, FA constraint, primary endpoint (lead time at fixed FPR), decision rule (WIN requires ALL 6 rows).",
+      "edit_policy": "Any edit requires V2. The C2-Y-R1 PREREGISTRATION (Round 157) extends but does NOT modify this file — pre-registration is an additive artifact that pins the actual numerical parameters.",
+      "hash_check_enforcement": "Pre-commit hook verifies hash."
+    },
+    {
+      "artifact_id": "R156-C3X",
+      "name": "C3_X_REBUILT_BASELINE_V1.json",
+      "path": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND156_ARTIFACTS/C3_X_REBUILT_BASELINE_V1.json",
+      "sha256": "31a9fac789937c8df8cd9f4110a337a3d112992ce61d58bd48279777d218125a",
+      "frozen_at_commit": "0cf1524",
+      "frozen_at_round": 156,
+      "what_it_protects": "The C3-X-R1 experiment design: TWO baselines (ThecaFlex open-loop + Bayesian adaptive TDM), cohort, perturbations, dose constraints, primary endpoint (concentration stability in therapeutic window).",
+      "edit_policy": "Any edit requires V2.",
+      "hash_check_enforcement": "Pre-commit hook verifies hash."
+    },
+    {
+      "artifact_id": "R156-C5X",
+      "name": "C5_X_THREE_BASELINE_REPRODUCTIONS_V1.json",
+      "path": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND156_ARTIFACTS/C5_X_THREE_BASELINE_REPRODUCTIONS_V1.json",
+      "sha256": "69c40e75b647ae15473a349154f85be3e2ec0787fb35e371963380f18a6c401c",
+      "frozen_at_commit": "0cf1524",
+      "frozen_at_round": 156,
+      "what_it_protects": "The C5-X-R1 experiment design: THREE baselines (physics-only + data-driven + physics+ML), independent reproduction via clotFoam REQUIRED (Art. XXVIII), primary endpoint (decision benefit under intervention budget).",
+      "edit_policy": "Any edit requires V2.",
+      "hash_check_enforcement": "Pre-commit hook verifies hash."
+    },
+    {
+      "artifact_id": "R156-GATE",
+      "name": "WORLD_CLASS_GATE_V4.json",
+      "path": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND156_ARTIFACTS/WORLD_CLASS_GATE_V4.json",
+      "sha256": "a48fcff3fa6cf41120fb25879aa92d555b444dd40841eee23e63ba22dcfa995c",
+      "frozen_at_commit": "0cf1524",
+      "frozen_at_round": 156,
+      "what_it_protects": "The 8-condition + 4-hostile-question World-Class gate. Protects against silent gate weakening (V5 proposed with fewer conditions, etc.).",
+      "edit_policy": "Any edit requires V5 file with explicit PCP-style rationale. The V4 file is preserved per Section 9.11.",
+      "hash_check_enforcement": "Pre-commit hook verifies hash."
+    },
+    {
+      "artifact_id": "R156-4HQ",
+      "name": "FOUR_HOSTILE_QUESTIONS_V1.json",
+      "path": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND156_ARTIFACTS/FOUR_HOSTILE_QUESTIONS_V1.json",
+      "sha256": "710b7d84b18f99014abc289db8968967d5a749dc5b2753b837333e109ce7e5eb",
+      "frozen_at_commit": "0cf1524",
+      "frozen_at_round": 156,
+      "what_it_protects": "The Four Hostile Questions overlay (Q1 work / Q2 obvious / Q3 beats alternative / Q4 buyer cannot reproduce). Protects against the questions being silently re-interpreted as lenient.",
+      "edit_policy": "Any edit requires V2.",
+      "hash_check_enforcement": "Pre-commit hook verifies hash."
+    },
+    {
+      "artifact_id": "R156-CRL",
+      "name": "COMPETITIVE_REPRODUCTION_LAYER_V1.json",
+      "path": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND156_ARTIFACTS/COMPETITIVE_REPRODUCTION_LAYER_V1.json",
+      "sha256": "af4f9212be433cf842554dd10bfef2902feb1cd3688820540dc64eb609fcec50",
+      "frozen_at_commit": "0cf1524",
+      "frozen_at_round": 156,
+      "what_it_protects": "The moat loop (WHO→WHAT→REPRODUCE→BEAT→DESIGN-AROUND→BUY) and the strongest-moat definition ('incumbent can buy but cannot cheaply reproduce').",
+      "edit_policy": "Any edit requires V2.",
+      "hash_check_enforcement": "Pre-commit hook verifies hash."
+    },
+    {
+      "artifact_id": "R156-CDE",
+      "name": "COMPETITOR_DERIVED_EXPERIMENTS_V1.json",
+      "path": "CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND156_ARTIFACTS/COMPETITOR_DERIVED_EXPERIMENTS_V1.json",
+      "sha256": "c107a6cc87dbf70c5c783436614a5a7c0904d622ca9b2433ad8f0283e3b6338f",
+      "frozen_at_commit": "0cf1524",
+      "frozen_at_round": 156,
+      "what_it_protects": "The competitor-intelligence-to-experiment translation (C2-Y-R1, C3-X-R1, C5-X-R1, plus queued R2/R3). Protects against experiments being silently skipped or redefined.",
+      "edit_policy": "Any edit requires V2.",
+      "hash_check_enforcement": "Pre-commit hook verifies hash."
+    }
+  ],
+
+  "enforcement_plan": {
+    "phase_1_manual_check_R157": "This artifact records the hashes. Manual verification: `sha256sum <file>` and compare to the recorded hash. Done now in Round 157.",
+    "phase_2_pre_commit_hook_R158": "Extend protocol/scripts/pre_commit_constitution_check.py (or create a sibling pre_commit_hash_check.py) to read this registry and verify all 9 hashes on every commit. Mismatch blocks commit.",
+    "phase_3_ci_integration_R159": "Add the hash check to GitHub Actions CI so even local hook bypass is caught at PR time.",
+    "phase_4_version_increment_discipline": "When a Round 156 artifact legitimately needs revision (e.g., EMPIRICAL_THRESHOLD_PROVENANCE_V2.json with a corrected threshold), the new file is created alongside the V1, the registry is updated to record the V2 hash, and the V1 hash remains in the registry as historical record. Per Section 9.11, V1 is preserved forever."
+  },
+
+  "honest_disclosure": {
+    "what_this_does_NOT_protect_against": [
+      "An attacker with commit access who edits BOTH the artifact AND this registry in the same commit. The hash check would pass because the registry is updated to match. Counter: require registry edits to be in a SEPARATE commit from artifact edits, with explicit PCP-style rationale in the commit message.",
+      "An attacker who edits the artifact and then edits the hash check script to skip that file. Counter: the hash check script itself should be hash-pinned (recursive problem — solved by external CI verification, not local hooks).",
+      "An attacker who replaces the entire Round 156 artifacts directory with a different version. Counter: the registry records paths AND hashes; path changes are detected by the preflight check."
+    ],
+    "what_this_DOES_protect_against": [
+      "Accidental threshold drift (coder edits a threshold value without realizing it has provenance)",
+      "Silent gate weakening (coder removes a gate condition to make a candidate pass)",
+      "Silent baseline weakening (coder tunes baseline parameters after seeing candidate results — Art. XIX violation)",
+      "Silent semantic promotion (coder edits 'UISB-like' to 'VIEshunt' to make a claim look stronger)",
+      "History rewriting (git history is immutable on the remote; local rewrites detected via Article XXIII ls-remote check)"
+    ],
+    "residual_risk": "The hash-pin protects against accidental and most adversarial changes. A determined adversary with commit access can still bypass via the recursive problem (edit artifact + registry + hash-check script in coordinated commits). Full protection requires external CI verification, which is Phase 3."
+  },
+
+  "verification_command": "To verify all 9 hashes: cd /home/z/my-project/discovery-evidence-fabric && for entry in $(jq -r '.the_pinned_artifacts[] | \"\\(.path) \\(.sha256)\"' CEREVASC_R2_C3_PHENOTYPE_DISCOVERY/ROUND_56/ROUND157_ARTIFACTS/ROUND157_ARTIFACT_HASH_PINS_V1.json); do path=$(echo $entry | awk '{print $1}'); expected=$(echo $entry | awk '{print $2}'); actual=$(sha256sum $path | awk '{print $1}'); if [ \"$expected\" = \"$actual\" ]; then echo \"OK: $path\"; else echo \"MISMATCH: $path (expected $expected, got $actual)\"; fi; done"
+}

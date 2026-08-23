@@ -5539,3 +5539,94 @@ Stage Summary:
 - 0/5 WORLD_CLASS. Portfolio EMPTY (sacred). 2 KILLED. 3 INVESTIGATION. 7 in discovery queue.
 - Round 156 is STRUCTURALLY COMPLETE; execution of C2-Y-R1 and C3-X-R1 is READY_TO_EXECUTE (pending pre-registration); C5-X-R1 BLOCKED on OpenFOAM-9 build.
 
+
+---
+Task ID: ROUND-157-HASH-PINS-AND-PREREGISTRATIONS
+Agent: main (session 2026-08-23)
+Task: Execute Round 157 — continuation of Round 156 queue: (1) hash-pin Round 156 critical artifacts to close procedural enforcement gap identified in R156 self-attack, (2) build C2-Y-R1 PREREGISTRATION with frozen numerical parameters, (3) build C3-X-R1 PREREGISTRATION with frozen numerical parameters, (4) restart OpenFOAM-9 build with proper MPICH configuration to unblock C5-X-R1, (5) adversarial self-attack of Round 157 artifacts.
+
+Pre-Session Constitution Check:
+- Re-read EPISTEMIC_CONSTITUTION.md v1.5.0 (Articles I-XXXV).
+- Article XXIII compliance: verified local HEAD = origin/main = remote (commit 0cf1524). No stale checkout.
+- Article XXIV: confirmed worklog summary matches underlying artifacts.
+- Article XXVII: every threshold has provenance (carried over from R156).
+
+Work Log:
+- Created ROUND157_ARTIFACTS/ directory with 5 artifacts:
+
+  1. ROUND157_ARTIFACT_HASH_PINS_V1.json
+     - Pins SHA-256 of 9 Round 156 critical artifacts (CBC, ETP, C2Y, C3X, C5X, GATE, 4HQ, CRL, CDE)
+     - Each entry records: artifact_id, name, path, sha256, frozen_at_commit (0cf1524), frozen_at_round (156), what_it_protects, edit_policy, hash_check_enforcement
+     - Enforcement plan: Phase 1 (manual check, R157), Phase 2 (pre-commit hook, R158), Phase 3 (CI integration, R159), Phase 4 (version increment discipline)
+     - Honest disclosure: protects against accidental/silent changes; does NOT protect against determined adversary with commit access (recursive problem)
+
+  2. /home/z/my-project/scripts/verify_r156_hashes.py
+     - Python script that reads the hash registry and verifies all 9 pinned hashes
+     - Exit 0 = all OK; exit 1 = mismatch (BLOCKS commit per Article VII); exit 2 = registry unreadable
+     - VERIFIED: all 9 hashes match (output: "Summary: 9 OK, 0 mismatches, 0 missing")
+
+  3. C2_Y_R1_PREREGISTRATION_V1.json
+     - Frozen numerical parameters for C2-Y-R1 experiment (BEFORE execution — Article XIX)
+     - UISB baseline A (VIEshunt controller): Kp=0.15 mL/min/mmHg, Ki=0.02, posture targets (supine 12, upright 5 mmHg), ICP sensor noise (0.5/1.5/3.0 mmHg std), drift 1 mmHg/day, CSF bolus 5 mL
+     - UISB baseline C (Codman threshold): 15/20/25 mmHg, 30s debounce
+     - Virtual cohort: 300 patients, 60 per failure mode × 5 modes, stratified by age/sex/BMI/CSF production, sensor noise low/medium/high (100 each), random seed 42
+     - Primary endpoint: lead time at FPR=1/month, lead time window 72h
+     - Decision thresholds FROZEN from EMPIRICAL_THRESHOLD_PROVENANCE_V1: WIN 24h, KILL 4h, MMD 8h
+     - Statistical plan: Bonferroni across 5 modes (alpha=0.01), bootstrap CI (n=1000)
+     - Computational budget: 1 FLOP/s avg per arm
+     - 5 adversarial self-attacks documented (parameter substitution, seed substitution, failure mode exclusion, threshold drift via V2, baseline reproduction failure disguised)
+
+  4. C3_X_R1_PREREGISTRATION_V1.json
+     - Frozen numerical parameters for C3-X-R1 experiment
+     - Model drug: intrathecal baclofen (therapeutic window 100-400 ng/mL, toxicity 500 ng/mL)
+     - Baseline A (ThecaFlex open-loop): initial bolus 0.05 mg/kg, maintenance 0.3 mg/kg/day, 4 doses/day, delivery lag 7.5 min
+     - Baseline B (Bayesian adaptive TDM): two-compartment PK model (Vc=0.15L, CL=0.024 L/h, Q=0.008 L/h, Vp=0.5L), log-normal prior 30% CV, weekly trough sampling, 10% measurement noise CV, MAP estimation via Kalman filter, dose adjustment ±20% based on trough
+     - C3-X candidate: UKF on continuous CSF drug concentration, MPC with 4-hour horizon, target 250 ng/mL, lambda=0.01, max 8 doses/day (vs Baseline A's 4/day), max daily 0.8 mg/kg
+     - Virtual cohort: 200 patients, stratified by clearance phenotype (fast/intermediate/slow), age (pediatric/adult/elderly), weight (40/70/100 kg), CSF flow rate (0.30/0.40/0.50 mL/min)
+     - Dosing horizon: 90 days (first 14 days excluded for steady-state equilibration)
+     - 6 adversarial self-attacks documented
+
+  5. ROUND157_ADVERSARIAL_SELF_ATTACK_V1.json
+     - 18 attacks identified across 4 artifact groups (hash pins, C2-Y prereg, C3-X prereg, OpenFOAM build)
+     - All 18 have countermeasures; 14 have residual weaknesses (mostly procedural enforcement gaps)
+     - Pattern: same as R156 — procedural enforcement gaps; hash-pin closes SOME gaps but not recursive attacks
+     - Next round recommendations: Phase 2 (pre-commit hook), Phase 3 (CI integration), hash-pin preregistration files, smoke test for clotFoam
+
+OpenFOAM-9 Build Restart:
+- Diagnosed prior build failures:
+  * MPICH was in conda env 'sim' but x86_64-conda-linux-gnu-cc wrapper was broken
+  * Solution: set MPICH_CC=gcc MPICH_CXX=g++ to use system gcc via mpicc wrapper
+  * scotchDecomp failed because ThirdParty-9 not installed (scotch.h missing)
+  * Solution: patched Allwmake to skip scotchDecomp; created stub scotchDecomp.C; fixed dummyScotchDecomp.C signature (added `const` qualifier)
+  * WM_MPLIB was being auto-set to SYSTEMOPENMPI by bashrc
+  * Solution: created /home/z/.OpenFOAM/prefs.sh with WM_MPLIB=MPICH; override MPI_ARCH_PATH after sourcing bashrc
+
+- Build configuration (verified):
+  * WM_COMPILER=Gcc (system Debian 14.2.0)
+  * WM_MPLIB=MPICH
+  * MPI_ARCH_PATH=/home/z/miniconda/envs/sim
+  * WM_OPTIONS=linux64GccDPInt32Opt
+  * WM_NCOMPPROCS=2
+  * MPICH_CC=gcc, MPICH_CXX=g++
+  * mpicc test: PASS (compiled test program links -lmpich)
+
+- Build progress:
+  * Before R157: 1394 .o files (28%, dead)
+  * After R157 restart: 1488 .o files (30%, actively compiling thermophysicalModels)
+  * Build rate: ~30 .o files/min
+  * Estimated remaining: ~3400 files / 30/min = ~113 min = ~1.9 hours
+  * Build is running via setsid (durable against parent shell exit)
+
+Stage Summary:
+- Round 157 closes the procedural enforcement gap identified in Round 156 self-attack via hash-pinning
+- 9 Round 156 critical artifacts now have SHA-256 hashes recorded in ROUND157_ARTIFACT_HASH_PINS_V1.json
+- Verification script verify_r156_hashes.py confirms all 9 hashes match (Article VII enforcement)
+- C2-Y-R1 PREREGISTRATION frozen: all numerical parameters locked BEFORE experiment runs (Article XIX)
+- C3-X-R1 PREREGISTRATION frozen: all numerical parameters locked BEFORE experiment runs
+- OpenFOAM-9 build restarted with proper MPICH config; actively compiling; ~1.9 hours to completion
+- 18 adversarial self-attacks identified and countermeasured; 14 residual weaknesses explicitly disclosed
+- 0/5 WORLD_CLASS. Portfolio EMPTY (sacred). 2 KILLED. 3 INVESTIGATION. 7 in discovery queue.
+- C2-Y-R1: READY_TO_EXECUTE (pre-registration complete)
+- C3-X-R1: READY_TO_EXECUTE (pre-registration complete)
+- C5-X-R1: BLOCKED on OpenFOAM-9 build completion (~1.9 hours remaining)
+
