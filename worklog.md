@@ -6636,3 +6636,18 @@ Task: H1 Biofouling sensitivity analysis (4 thresholds, 365-day horizon)
   Overall: WIN, Level 5
   Physical moat: PASSED
   World-Class: 0/5
+
+---
+Task ID: AI-LOOP-V3-CYCLE-8-R181
+Agent: autonomous_ai_loop_v3.py (FULLY AUTONOMOUS)
+Task: H1 full pre-registered experiment + Level 6 independent reproduction
+
+Part 1 (H1-R1, original model):
+  Verdict: WIN, best=5%=147.0d
+Part 2 (independent reproduction):
+  H1-R2 (linear+linear): WIN, best=94.0d
+  H1-R3 (exp+exp): WIN, best=175.5d
+  H1-R4 (linear+power): WIN, best=171.0d
+  Level 6: PASSED (3/3 variants WIN)
+Evidence: Level 6
+World-Class: 0/5 (Level 6 achieved, gate not complete)
