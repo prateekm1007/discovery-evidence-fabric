@@ -6378,3 +6378,44 @@ Stage Summary:
 - 0/5 WORLD_CLASS. Portfolio EMPTY.
 - The discovery engine correctly identified, designed, and executed the experiment. The result was inconclusive due to method limitation, which the adversarial self-attack predicted.
 
+
+---
+Task ID: ROUND-169-HORIZON-DISCOVERY-ENGINE
+Agent: main (session 2026-08-24)
+Task: CEO Round 169 directive — shift from "is this novel in 2026?" to "what will be missing from the 2029 product stack?" Build the 2028/2029 Horizon Discovery Engine.
+
+Pre-Session Constitution Check:
+- Article XXIII: local HEAD = remote = 386351e (correct).
+
+Work Log:
+
+1. HORIZON_DISCOVERY_ENGINE_V1.json (ROUND169_ARTIFACTS/)
+   - The paradigm shift: FROM "is this novel now?" TO "what will be missing from the 2029 product stack?"
+   - New discovery pipeline: 2026 frontier → convergence map → 2029 gap → information bottleneck → generate invention → novelty → future-build attack → physics → independent validation → competitive superiority → buyer fit → World-Class
+   - FUTURE_NOVEL classification: TODAY_NOVEL / EMERGING_NOVEL / FUTURE_NOVEL / SPECULATIVE
+     * World-Class queue favors FUTURE_NOVEL — capabilities built from converged technologies that nobody has operationalized yet
+   - 7-dimensional moat: physical, data, model, workflow, integration, IP, TEMPORAL (new — competitors don't realize they need it until 2028-2029)
+   - Technology convergence map for 4 spaces:
+     * C1 hydrocephalus shunt: 2026 has ICP sensors + AI prediction + adaptive control → 2029 gap: Patient-Specific Physiological OS, Causal Intervention Engine, Active Physiological Interrogation
+     * C3 intrathecal delivery: 2026 has CSF biosensor + adaptive dosing (US 20260224805) → 2029 gap: Therapeutic State Control, Tissue Exposure Inference, Causal PD State Estimation
+     * C5 thrombectomy: 2026 has digital twins + AI + force/flow → 2029 gap: Autonomous Thrombectomy State Engine, real-time causal state estimation of clot-device system
+     * Cross-device: 2026 has separate devices → 2029 gap: Neurovascular Control Plane (orchestration layer across multiple devices/vendors)
+   - 4 new 2029 candidates generated:
+     1. Neurovascular Control Plane — FUTURE_NOVEL — cross-device orchestration layer (STRONGEST integration moat)
+     2. Causal Intervention Engine — FUTURE_NOVEL — active perturbation for causal discrimination (not just obstruction detection)
+     3. Therapeutic State Control — FUTURE_NOVEL — PD-based control (not PK-based) for intrathecal delivery
+     4. Autonomous Thrombectomy State Engine — FUTURE_NOVEL — fuses multiple signals into unified causal clot-device state model
+   - Each candidate answers the 7 mandatory questions: what exists, what's commoditized by 2028, what convergence is possible, what information is unavailable, what capability unlocks, why competitor won't build it, why they'll want it in 2029
+   - Relationship to existing candidates:
+     * C5-X-AE-V3 is a SENSING MODALITY within the Autonomous Thrombectomy State Engine (candidate 4)
+     * C3-X-TE is a STEP TOWARD Therapeutic State Control (candidate 3)
+     * C2-Y-AP is CLOSED but Causal Intervention Engine (candidate 2) is the 2029 successor with a different claim (causal discrimination, not obstruction detection)
+
+Stage Summary:
+- Horizon Discovery Engine built — searches for 2029 capability gaps, not 2026 novelty
+- 4 FUTURE_NOVEL candidates generated, each with 7-dimensional moat analysis
+- The temporal moat is the key new concept: competitors don't realize they need it until 2028-2029
+- Existing candidates (C5-X-AE-V3, C3-X-TE) are recontextualized as components of larger 2029 inventions
+- Next: deep novelty searches for each 2029 candidate using the escalated search pipeline
+- 0/5 WORLD_CLASS. Portfolio EMPTY. The hunting ground has shifted from 2026's crowded space to 2029's convergence space.
+
