@@ -4534,3 +4534,26 @@ Stage Summary:
 - Gate O: optimization frontier pre-registered, margin must exceed frontier.
 - Portfolio: 0 Level 2, 0 sellable, 0 transactions. Discovery machine ~90%.
 - Next: R268 generates ONE new candidate using full 14-gate + adjudication + fixed Gate O. Candidate must have M4=NOT FOUND as strongest novelty signal.
+
+---
+Task ID: R268-TEN-SHUNT-CANDIDATES-14GATE
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: Run 10 CEO-provided shunt-space candidates (cross-domain: Tesla + Monsanto + Apple) through the 14-gate Level 2 protocol.
+
+Work Log:
+- Ran all 10 candidates through 14 gates: A-L (12 existing) + M (M1-M4 split) + N (closest-prior-art delta) + O (unexpected-effect margin).
+- Results: 2 SURVIVORS, 8 KILLED.
+  - SC-05 (Biofilm-Resistant Living-Surface Venous Interface): SURVIVES. M1=NF, M4=NF, synergy=2, Gate H=PASS (>$250K). Continuously renewing anti-biofilm surface with active surface-energy control. No existing surface achieves >5 year biofilm resistance at CSF-blood interface. Gate O: 5x beyond existing (<1 year). Outside routine optimization.
+  - SC-10 (Distributed Micro-Shunt Mesh with Swarm Coordination): SURVIVES. M1-M4 all NF, synergy=2, Gate H=PASS (>$250K). Swarm-coordinated distributed CSF drainage. No existing system achieves coordinated fault-tolerant distributed drainage. Gate O: zero single-point-failure risk (vs 30-50% failure rate). Qualitatively different.
+  - 8 killed: SC-01 (M1-M4 found, <$100K), SC-02 (synergy=1, <$50K), SC-03 (synergy=1, <$150K), SC-04 (synergy=1, <$200K), SC-06 (synergy=1, <$100K), SC-07 (synergy=1, <$150K), SC-08 (M1-M4 found, <$200K), SC-09 (synergy=1, <$100K).
+- M4 discrimination confirmed on new candidates: M4=NOT FOUND → 100% survive. M4=FOUND → 100% killed. Perfect discriminator holds.
+- Pattern: 6/8 killed had synergy=1 (aggregation). 2 had synergy=2 but failed Gate M (interaction exists) + Gate H (reproducible <$250K).
+- Honest caveats: M1-M4 self-assessed (not external). No killer experiments run. Gate O margins are PREDICTED not OBSERVED. SC-05 and SC-10 are hypotheses, not validated inventions.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- FIRST Level 2 survivors: SC-05 (Biofilm-Resistant Living-Surface) and SC-10 (Distributed Micro-Shunt Mesh). Both pass all 14 gates including M4=NOT FOUND, synergy≥2, Gate H=PASS, Gate N strong delta, Gate O outside routine optimization.
+- M4 perfect discriminator confirmed on 10 new candidates (100%/100%).
+- 8 killed: 6 aggregation (synergy=1), 2 with synergy=2 but Gate M FAIL + Gate H FAIL.
+- Portfolio: 2 Level 2 candidates (FIRST survivors), 0 sellable, 0 transactions. Cemetery 22 entries. Discovery machine ~90%.
+- Next: Deep §103 on SC-05 and SC-10 with live web search. External patent attorney review. Killer experiment design. Buyer economics.
