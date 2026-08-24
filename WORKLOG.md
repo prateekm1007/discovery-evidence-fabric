@@ -4266,3 +4266,23 @@ Stage Summary:
 - First Level 2 candidate: IB-03. Provides access to genuinely new information (direct measurement of a variable previously only computable from models).
 - Portfolio: 0/5 world-class. 1 Level 2 candidate (IB-03, pending deeper §103). 2 Level 1 RESET. 3 NOVELTY_THREATENED. 10 RESET. 1 commercial tool candidate (CC-04). 0 sellable. 0 transactions.
 - Next: R258 deeper §103 on IB-03 (search direct shear measurement across ALL fields). Determine if transduction mechanism is novel. Only then: economics, build-vs-buy, killer experiment.
+
+---
+Task ID: R258-IB03-CORRECTION-COLLISION-ENGINE
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 correct IB-03 (6 prior-art sources). P1 functional-equivalence search. P2 old-art shock test. P3 cross-domain collision protocol.
+
+Work Log:
+- P0 — IB-03 DOWNGRADED from Level 2 to PRIOR_ART_THREATENED. CEO found 6 prior-art sources: (1) US 11,918,495 shear-responsive endovascular implant with telemetry, (2) US 2009/0105799 telemetric shear-stress sensor implanted against vessel wall, (3) US 2008/0210543 MEMS vascular shear-stress sensing, (4) PMC2777988 in-vivo vascular shear measurement demonstrated, (5) Nature 2026 IVUS WSS imaging in stented arteries, (6) US 2024/0068892 "Wall shear stress sensor" patent. The claim "wall shear stress is NOT directly measurable today" is contradicted by public record. R257's collision search was too narrow — used medical terminology only, missed 5+ alternative names.
+- P1 — Added mandatory functional-equivalence search. Before Level 2: generate 10+ alternative names across 5 domains. 6-step expansion: exact mechanism → physical equivalent → same transduction → same information under another name → same architecture → same functional result. For IB-03, should have searched: skin friction sensor, flow gradient sensor, near-wall velocity sensor, hot-film anemometer, MEMS shear sensor, telemetric stent sensor, endothelial force sensor, fluid shear detector, etc.
+- P2 — Added old-art shock test. Before Level 2: search back 20-30 years in underlying physical technology. IB-03's transduction principle (surface shear measurement) is 60+ years old in aerospace (1950s-60s hot-wire/hot-film anemometry). MEMS shear sensors demonstrated in 1990s (Stanford, MIT). Medical adaptation in 2000s (US 2008/0210543). FAIL — not novel.
+- P3 — Added cross-domain collision protocol. 5 mandatory domains: medical, engineering, aerospace, semiconductor/MEMS, industrial sensing. All must be clear before Level 2. Protocol: generate 10+ terms, search patents + literature in each domain, apply old-art shock test, if ANY domain has prior art → Level 0-1, only if ALL 5 clear → Level 2.
+- Pattern identified: 3 false Level 2 candidates produced (NC-05, IB-03, CC-04). Common failure: searching medical-domain name only, without functional-equivalence expansion across aerospace/MEMS/industrial. The fix is structural: 3 new mandatory tests before Level 2.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- IB-03 downgraded to PRIOR_ART_THREATENED. 6 prior-art sources. No simulation.
+- Collision engine UPGRADED with 3 mandatory tests: functional-equivalence search, old-art shock test, cross-domain collision protocol.
+- Portfolio: 0 Level 2 candidates. 4 PRIOR_ART_THREATENED. 12 RESET. 1 commercial tool candidate (CC-04). 0 sellable. 0 transactions.
+- Key insight: "apply existing technology to medical devices" is almost always prior-art threatened because the underlying physical capability exists in aerospace, MEMS, or industrial sensing. The engine must search ALL domains, not just medical.
+- Next: validate the upgraded engine on a NEW candidate. Do NOT reuse existing structures. Generate one genuinely new information-bottleneck structure and run through full 3-test protocol.
