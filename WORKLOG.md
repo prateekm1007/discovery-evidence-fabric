@@ -4685,3 +4685,24 @@ Stage Summary:
 - CM-01 and CM-03 are first candidates with genuinely new causal paradigms (not known-principle + medical application).
 - Portfolio: 2 INVEST-PENDING (CM-01, CM-03), 15 WATCH, 1 BLOCKED, 23 cemetery. 0 Level 2. 0 sellable. 0 transactions.
 - Next: Deep collision on CM-01 (osmotic valve) first — genuinely new causal chain. Then CM-03 (feed-forward drainage) — new control paradigm. Both need feasibility analysis.
+
+---
+Task ID: R274-GATE-Q-UPGRADE-KILLS
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 kill false causal paradigm claims (CM-01, CM-03). P1 upgrade Gate Q to functional equivalence. P2 add recent-art shock. P3 add negative-search provenance.
+
+Work Log:
+- P0 — CM-01 DOWNGRADED to WATCH. CEO found US20020087111 (osmotic valve for glaucoma drainage — osmotic pressure controls valve opening pressure). Functional equivalent: "osmotic pressure → chamber pressure → mechanical displacement → valve opening → hydraulic control" = FOUND. The "new causal paradigm" was a novel DESCRIPTION of a known mechanism. Also US20040267187A1 (self-adjusting CSF valve). Rescue requires CSF-specific chemistry + unexpected control behavior.
+- P0 — CM-03 PRIOR_ART_THREATENED / LIKELY KILL. CEO found US12636471 (May 2026 — programmable CSF metering shunt that measures/estimates CSF production rate and uses it to adjust drainage). Functional equivalent: "production measurement/estimation → control parameter → drainage adjustment" = FOUND. The "new control paradigm" (feed-forward) is directly claimed. Also US20220265974 (2022 application). Only survives if "real-time direct measurement" vs "estimation from ICP recovery" is a material distinction not covered by the patent.
+- P1 — Gate Q upgraded. Old: "has this exact causal chain been demonstrated?" New: "has any functionally equivalent causal transformation been demonstrated?" Expansion rule: write causal chain in specific terminology → replace each term with functional equivalent (what it DOES, not what it's CALLED) → search functional equivalent across all fields. Brings Gate Q into alignment with Gates D and M.
+- P2 — Recent-art shock test added. Mandatory 2024-2026 search before Level 1. CM-03 was killed by a May 2026 patent that old-art shock (20-30 year search) missed. Both shock tests now mandatory: old-art (20-30 years) AND recent-art (24 months).
+- P3 — Negative-search provenance required. For every "NOT FOUND" claim: record queries → databases → date → returned → excluded → retained → exclusion reason. Without this, "0/10 domains found" is not auditable. The CEO repeatedly found prior art the engine missed because searches were too narrow. Negative-search provenance makes searches verifiable.
+- The repeated pattern (R268→R274): engine generates novel-SOUNDING candidates that are functionally equivalent to existing art. Functional-equivalence search keeps missing because it searches specific terminology, not functional equivalents of the causal chain. Gate Q upgrade + recent-art shock + negative-search provenance address this root cause.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- CM-01 DOWNGRADED to WATCH (osmotic valve US20020087111). CM-03 PRIOR_ART_THREATENED / LIKELY KILL (US12636471 May 2026).
+- Gate Q upgraded to functional equivalence. Recent-art shock (2024-2026) added. Negative-search provenance required.
+- Root cause identified: engine searches specific terminology, not functional equivalents. "Osmolarity valve" ≠ "osmotic pressure valve" in engine's search but functionally identical.
+- Portfolio: 0 INVEST. 16 WATCH. 2 PRIOR_ART_THREATENED. 1 BLOCKED. 23 cemetery. 0 Level 2. 0 sellable. 0 transactions.
+- Next: Apply upgraded Gate Q (functional equivalence) + recent-art shock + negative-search provenance to the NEXT candidate. The candidate generator must: (1) write causal chain, (2) expand to functional equivalent, (3) search functional equivalent across 10 domains, (4) search 2024-2026 recent art, (5) record negative-search provenance, (6) only proceed if ALL clear.
