@@ -472,13 +472,35 @@
         "R251_MSVED_R1_PREREGISTERED_AND_EXECUTED.json"
       ],
       "epistemic_class": "VALIDATED_NEGATIVE"
+    },
+    {
+      "entry_id": "CE-020",
+      "territory_id": "CV-COMMERCIAL",
+      "mechanism_name": "Automated Sufficiency Proof Generator (CC-04 / MSES theorem) — formal proof that a specific evidence set E is sufficient to establish modification-specific clinical risk envelope R(Δ)",
+      "proposed_version": "R249 (discovery) → R251 (§103 conditional) → R252 (theorem + killer + IP)",
+      "killed_at_version": "R252",
+      "kill_reason": "VALIDATED_NEGATIVE — TWO independent kill signals: (1) Killer test FAIL: system correctly rejects insufficient evidence (E1) but cannot demonstrate correct acceptance of sufficient evidence for a SAFE modification (E2 was rejected because the synthetic modification was genuinely unsafe on P1/P2). (2) IP attack KILL: the MSES theorem is an INTEGRATION of known statistical methods (NI testing + coverage argument + Bonferroni correction + sensitivity analysis), not a novel mathematical result. Under KSR v. Teleflex, combining known methods to solve a problem FDA explicitly asks for is likely obvious.",
+      "what_was_proposed": "A formal mathematical proof that a specific selected evidence set E is sufficient to establish that a model modification Δ remains within a clinical risk envelope R, under frozen assumptions A. Output: E ⊢_A R(Δ), a machine-checkable proof obligation.",
+      "why_it_failed": "The theorem decomposed into 4 components: (a) per-property NI test (standard, ICH E9), (b) coverage argument (marginal, concept exists in software testing), (c) Bonferroni correction (standard, 1936), (d) assumption-violation analysis (marginal, concept exists). Each component is standard. The integration is engineering, not invention. No novel mathematical bound, no tight bound on minimum evidence size, no proof technique connecting pathway coverage to statistical sufficiency. The killer test also revealed that the system only detects unsafe modifications but cannot certify safe ones — detection is necessary but not sufficient for a sufficiency proof.",
+      "reusable_lesson": "FROZEN THEOREM CE-020: A sufficiency proof that is merely an integration of known statistical methods (NI testing + coverage + multiple-testing correction + sensitivity analysis) is NOT a novel mathematical result. Under §103, combining known methods to solve a problem the market explicitly asks for is likely obvious (KSR v. Teleflex). The frontier is a NEW MATHEMATICAL BOUND — e.g., a tight bound on minimum evidence set size that is better than what existing methods give individually, or a proof technique that connects clinical pathway coverage to statistical sufficiency in a way that is not derivable from existing theory. Additionally: killer tests for sufficiency proofs must include a TRUE POSITIVE case (sufficient evidence for a SAFE modification that the system correctly accepts), not just a true negative (insufficient evidence that the system correctly rejects).",
+      "what_to_avoid": [
+        "Do not claim a theorem is novel if it decomposes into standard statistical methods.",
+        "Do not confuse integration of known methods with a new mathematical result.",
+        "Do not design killer tests with only true-negative cases — include true positives.",
+        "Do not assume that machine-checkable = mathematically novel. A JSON proof obligation with standard statistical components is still standard statistics."
+      ],
+      "physical_constraint": null,
+      "evidence_sources": [
+        "R252_CC04_THEOREM_AND_KILLER_TEST.json"
+      ],
+      "epistemic_class": "VALIDATED_NEGATIVE"
     }
   ],
   "updated_at": "2026-08-22T02:45:00+00:00",
   "last_amended": "2026-08-22T02:10:00+00:00",
   "last_amendment_round": "Round 63 (CE-018 sharpened with end-to-end functional novelty requirement)",
   "entry_count": 18,
-  "total_entries": 19,
-  "last_updated": "2026-08-24T19:05:50.852844+00:00",
-  "last_update_round": "R251"
+  "total_entries": 20,
+  "last_updated": "2026-08-24T19:12:01.217177+00:00",
+  "last_update_round": "R252"
 }

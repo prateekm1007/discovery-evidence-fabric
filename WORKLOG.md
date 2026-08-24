@@ -4078,3 +4078,41 @@ Stage Summary:
 - CC-04 §103: CONDITIONAL_SURVIVE. Depends on whether sufficiency proof is a novel theorem.
 - Portfolio: 0/5 world-class. 9 remaining commercial hypotheses (CC-01 killed, CC-02..CC-10 remain). 0 sellable.
 - Next: CEO decision on CC-04 — does the sufficiency proof require a novel theorem? If yes → implement + killer experiment. If no → kill CC-04, move to next candidate.
+
+---
+Task ID: R252-CC04-THEOREM-KILLER-IP
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: Execute CEO R252 — CC-04 theorem definition + killer test + IP attack. If proof is merely structured explanation assembled from existing guarantees → KILL.
+
+Work Log:
+- Read Constitution v1.5.0. Confirmed canonical state: git c27502c, cemetery 19 entries.
+- P1 — Defined MSES theorem (Modification-Specific Evidence Sufficiency) BEFORE implementation.
+  - Formal statement: E ⊢_A R(Δ) — under assumptions A, evidence E is sufficient to establish risk envelope R for modification Δ.
+  - Inputs: Δ (model modification), R (clinical risk envelope = set of properties), E (selected evidence set), A (frozen statistical assumptions).
+  - Output: machine-checkable proof obligation with 4 elements: (a) per-property NI test, (b) coverage argument, (c) Bonferroni correction, (d) assumption-violation analysis.
+  - Established differences from GSN (statistical vs narrative), PAC/conformal (modification-specific vs population-level), NI (composite vs single test), formal verification (evidential vs deductive), risk-based testing (proves sufficiency vs selects tests), BOED (proves sufficiency vs optimizes info gain).
+- P2 — Killer test. E1 (5 tests, no subgroup) vs E2 (15 tests, with subgroup).
+  - E1 correctly REJECTED: INSUFFICIENT (P1 FAILS, P2 FAILS, P3 UNCOVERED).
+  - E2 incorrectly REJECTED: INSUFFICIENT (P1 FAILS, P2 FAILS, P3 HOLDS).
+  - E2 was rejected because the synthetic M_new has a genuine subgroup regression — the modification IS unsafe on P1/P2. The system correctly detected this.
+  - Killer test FAIL: condition 2 (accept E2 as SUFFICIENT) failed. The test design is flawed — E2 was not actually "sufficient evidence for a SAFE modification." But per Article XXX, did NOT redesign the test to get a pass.
+  - Honest assessment: the system detects unsafe modifications but cannot demonstrate it certifies safe ones. Detection is necessary but not sufficient for a sufficiency proof.
+- P3 — IP attack on the theorem. Decomposed MSES into 4 components:
+  - (a) Per-property NI test: STANDARD (ICH E9, conformal, PAC). No novelty.
+  - (b) Coverage argument: MARGINAL (concept exists in software testing). Likely obvious.
+  - (c) Bonferroni correction: STANDARD (1936). No novelty.
+  - (d) Assumption-violation analysis: MARGINAL (concept exists in sensitivity analysis). Likely obvious.
+  - VERDICT: KILL. The MSES theorem is an INTEGRATION of known methods, not a novel mathematical result. Under KSR v. Teleflex, combining known methods to solve a problem FDA explicitly asks for is likely obvious.
+  - What would make it novel: a NEW MATHEMATICAL BOUND (e.g., tight bound on minimum evidence size better than Bonferroni+NI individually, or a proof technique connecting pathway coverage to statistical sufficiency). The current MSES has NONE of these.
+- FINAL VERDICT: CC-04 KILLED. Two independent kill signals: (1) killer test FAIL, (2) IP attack KILL. Per CEO directive: "If the proof is merely a structured explanation assembled from existing guarantees, KILL CC-04." CC-04 is exactly that.
+- Added CC-04 to cemetery as CE-020. Cemetery: 20 entries.
+- Reusable lesson: sufficiency proofs that integrate known statistical methods are NOT novel. The frontier is a new mathematical bound, not integration. Killer tests for sufficiency proofs must include true-positive cases (safe modification correctly accepted), not just true negatives.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- CC-04 MSES theorem defined, killer-tested, IP-attacked. KILLED.
+- Killer test: system detects unsafe modifications but cannot demonstrate certifying safe ones. Test design also flawed (E2 not actually sufficient for a safe mod).
+- IP attack: MSES = NI + coverage + Bonferroni + sensitivity analysis. Integration, not invention. Obvious under KSR.
+- Cemetery: 20 entries (CE-019 MSVED, CE-020 CC-04). Two kills in two rounds.
+- Portfolio: 0/5 world-class. 8 remaining candidates in discovery queue (CC-02, CC-03, CC-05, CC-06, CC-07, CC-08, CC-09, CC-10). 0 sellable.
+- Pattern emerging: candidates that are integrations of known methods are being killed. The frontier requires a novel mathematical bound, not engineering integration.
