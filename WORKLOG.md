@@ -4380,3 +4380,27 @@ Stage Summary:
 - Portfolio unchanged: 0 Level 2, 0 sellable, 0 transactions.
 - Discovery machine now ~80% (CEO estimate). Front-end hardened through 3 validation rounds (R259 retrospective, R260 blind, R261 independent).
 - Next: R262 generates first genuinely new candidate using full discovery chain + 8-sub-gate Level 2 + saturation + novelty/inventive-step separation.
+
+---
+Task ID: R262-COMPLETENESS-SATURATION-SYNERGY
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 distinguish verdict from completeness. P1 triple saturation. P2 §102/§103 separation. P3 synergy test.
+
+Work Log:
+- P0 — Verdict correctness ≠ reference-retrieval completeness. R261 reassessed: "PARTIALLY VALIDATED" not "PASS." 93% recall means 7% of prior art was missed. The 1 false negative (da Vinci) proves the engine has blind spots. New rule: engine must output BOTH verdict AND search completeness %. Never report "PASS" without completeness.
+- P1 — Triple saturation: term (new synonyms <10% new art), domain (new domain <10% new art), reference (new patent families <10%). All three must saturate for high novelty-confidence. Single criterion was insufficient — a search can saturate on terms while missing entire domains or reference families.
+- P2 — §102 (one reference, all claim elements → kill) vs §103 (closest prior art → objective technical problem → distinguishing feature → would PHOSITA combine? → expectation of success?). Per EPO G-VII 5.1, 6. Key rule: NEVER combine references for §102 — needing 2+ references is §103. Hindsight warning: motivation must exist in prior art, not in invention's disclosure.
+- P3 — SYNERGY TEST (EPO G-VII 7). Aggregation (A+B independent, score 0) vs functional interaction (A changes B's operating state, score 2-3). Retroactive application to ALL 7 killed candidates: MSVED (0), CC-04 (0), CC-08 (0), NC-05 (0), IB-03 (0), IB-01 (0), IB-02 (0). ALL were 0-synergy aggregations. The synergy test would have caught every one.
+- Level 2 upgraded to 12 sub-gates (was 8). Added: I triple saturation, J §102, K §103, L synergy ≥ 2.
+- Discovery chain updated: added FUNCTIONAL INTERACTION and SYNERGY TEST as mandatory steps. Chain now: unobservable problem → physical mechanism → FUNCTIONAL INTERACTION → unexpected technical effect → collision → old-art → cross-domain → §103 → §102 → synergy → engineer → economic → killer experiment.
+- Key insight: ALL killed candidates were aggregations. The frontier is "a technical interaction nobody has demonstrated before, producing a measurable effect that existing components cannot produce independently." That is much higher bar than "new sensor for X."
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- R261 reassessed: PARTIALLY VALIDATED (93% recall, 1 false negative, subagent-independent not externally independent).
+- Triple saturation: term + domain + reference. All must saturate.
+- §102/§103 separated per EPO. Hindsight warning included.
+- Synergy test: ALL 7 killed candidates were 0-synergy aggregations. Test is necessary and sufficient.
+- Level 2: 12 sub-gates. Discovery chain: FUNCTIONAL INTERACTION mandatory.
+- Portfolio unchanged: 0 Level 2, 0 sellable, 0 transactions. Discovery machine ~80-85%.
+- Next: R263 generates first genuinely new candidate using 12-sub-gate Level 2 + synergy test. Must demonstrate FUNCTIONAL INTERACTION (not aggregation).

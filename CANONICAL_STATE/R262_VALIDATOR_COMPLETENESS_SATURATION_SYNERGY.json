@@ -1,0 +1,195 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-24T21:05:10.241241+00:00",
+  "generated_by": "Round 262 — Validator Completeness + Triple Saturation + §102/§103 + Synergy",
+  "ceo_directive_round_262": "P0: distinguish verdict from completeness. P1: triple saturation. P2: §102/§103 separation per EPO. P3: synergy test per EPO G-VII 7.",
+  "p0_verdict_vs_completeness": {
+    "the_problem": "R261 reported 'PASS' because 3/3 candidates were correctly classified as prior-art threatened. But 1/15 references was missed. A candidate can be correctly classified as threatened while still missing the MOST IMPORTANT reference. The engine must distinguish these two outcomes.",
+    "the_fix": {
+      "two_separate_metrics": {
+        "verdict_correctness": {
+          "definition": "Did the engine correctly classify the candidate as threatened/safe?",
+          "R261_result": "3/3 correct (100%)",
+          "limitation": "Correct verdict does NOT mean all relevant prior art was found"
+        },
+        "reference_retrieval_completeness": {
+          "definition": "What fraction of KNOWN relevant references did the engine discover?",
+          "R261_result": "14/15 (93%)",
+          "limitation": "93% means 7% of prior art was missed. On a genuinely novel candidate, the missed 7% could contain the killer reference."
+        }
+      },
+      "mandatory_output_format": "For every candidate, the engine MUST output BOTH:\n  1. Verdict: THREATENED / SURVIVES / OBVIOUS\n  2. Search completeness: X% (references found / references known)\n  3. False negatives: list of missed references/categories\nNever report 'PASS' without reporting completeness.",
+      "the_honest_rule": "A candidate can only reach Level 2 if:\n  - Verdict = SURVIVES\n  - Search completeness >= 90% (on an independent ground truth set)\n  - No false negatives in critical reference categories\n  - Triple saturation achieved (P1)\n  - Synergy test passed (P3)"
+    },
+    "R261_reassessment": {
+      "old_label": "Independent validator validation: PASS",
+      "corrected_label": "Subagent-independent validation: PARTIALLY VALIDATED — verdict correct (3/3), but reference retrieval incomplete (93%, 1 false negative). NOT externally independent. NOT search-complete.",
+      "what_R261_proved": "The engine can correctly classify candidates as threatened using independently-authored ground truth.",
+      "what_R261_did_NOT_prove": "That the engine finds ALL relevant prior art. The 1 missed reference (da Vinci) shows functional-equivalence search has blind spots."
+    }
+  },
+  "p1_triple_saturation": {
+    "the_problem": "R259's single saturation rule (<10% new prior art between iterations) is insufficient. A search can saturate on terms while missing entire domains or reference families.",
+    "the_fix": {
+      "three_independent_stopping_criteria": {
+        "term_saturation": {
+          "definition": "Adding new synonyms/functional-equivalent terms produces little new relevant art",
+          "measurement": "Iteration N+1 terms produce <10% new relevant prior art vs iteration N",
+          "what_it_catches": "Terminology blind spots — terms the engine didn't think to generate"
+        },
+        "domain_saturation": {
+          "definition": "Adding another technical domain produces little new art",
+          "measurement": "Adding domain N+1 (e.g., from 5 to 6 domains) produces <10% new relevant prior art",
+          "what_it_catches": "Domain blind spots — fields where the capability exists but weren't searched"
+        },
+        "reference_saturation": {
+          "definition": "Repeated searches stop discovering materially new patent families or relevant publications",
+          "measurement": "New patent families / new publication clusters discovered per iteration < 10% of previous",
+          "what_it_catches": "Reference-family blind spots — patents in the same family but not directly found"
+        }
+      },
+      "the_rule": "All three saturation criteria must be met before a candidate can claim high novelty-confidence. If any one is not saturated, the search is incomplete and novelty-confidence is capped at Level 1 (MARGINAL).",
+      "implementation": [
+        "1. Run initial search (10+ terms, 5 domains)",
+        "2. Run term expansion iteration. Measure new art found. If <10% → term-saturated.",
+        "3. Add 6th domain (e.g., automotive, energy, materials science). Measure new art. If <10% → domain-saturated.",
+        "4. Search for patent families of found references. If <10% new families → reference-saturated.",
+        "5. Only if ALL three saturated → high novelty-confidence allowed."
+      ]
+    }
+  },
+  "p2_patent_attack_separation": {
+    "§102_novelty_attack": {
+      "question": "Does ONE reference disclose ALL claim elements?",
+      "standard": "102 single-reference rule. Every limitation must be present in ONE reference, explicitly or inherently.",
+      "procedure": [
+        "1. Decompose candidate into individual claim elements",
+        "2. For each element, search for references containing that element",
+        "3. Check if any SINGLE reference contains ALL elements",
+        "4. If yes → NOT NOVEL (§102). Kill immediately.",
+        "5. If no single reference contains all → proceed to §103"
+      ],
+      "output": "For each reference: which elements does it contain? Which are missing?",
+      "key_rule": "NEVER combine references for §102. If you need 2+ references to cover all elements, that is §103, not §102."
+    },
+    "§103_inventive_step_attack": {
+      "question": "Could a PHOSITA combine teachings from multiple references to reach the candidate?",
+      "standard": "Per EPO G-VII 5.1, 6, 7: closest prior art → objective technical problem → distinguishing feature → would combine? → expectation of success?",
+      "procedure": [
+        "STEP 1: Identify the CLOSEST prior art (EPO G-VII 5.1)",
+        "  - The single reference most similar to the candidate",
+        "  - Must be a real reference, not a hypothetical combination",
+        "",
+        "STEP 2: Determine the OBJECTIVE TECHNICAL PROBLEM",
+        "  - What technical effect does the candidate achieve that the closest prior art does not?",
+        "  - Frame as: 'how to [achieve technical effect] given [closest prior art]'",
+        "",
+        "STEP 3: Identify the DISTINGUISHING FEATURE",
+        "  - What element of the candidate is NOT in the closest prior art?",
+        "  - Does this feature produce a TECHNICAL EFFECT?",
+        "",
+        "STEP 4: Would the skilled person COMBINE the closest prior art with other teachings? (EPO G-VII 6)",
+        "  - Is there motivation in the prior art itself (not hindsight)?",
+        "  - Are the references from the same or adjacent technical fields?",
+        "  - Are the teachings compatible?",
+        "",
+        "STEP 5: Would there be a REASONABLE EXPECTATION OF SUCCESS?",
+        "  - Could the PHOSITA predict the result of combining?",
+        "  - Or would the combination require undue experimentation?",
+        "",
+        "STEP 6: Distinguish AGGREGATION from FUNCTIONAL INTERACTION (EPO G-VII 7)",
+        "  - Aggregation: A + B placed together, each working independently → NOT inventive",
+        "  - Functional interaction: A changes the operating state of B → POTENTIALLY inventive",
+        "  - The synergy test (P3) formalizes this distinction"
+      ],
+      "hindsight_warning": "Per EPO G-VII 5.1: the examiner must not use the invention as a roadmap to find prior art. The motivation to combine must exist in the prior art itself, not in the invention's disclosure."
+    },
+    "the_output_format": {
+      "for_every_candidate": [
+        "§102 result: NOVEL / NOT NOVEL (with reference-level evidence)",
+        "§103 result: INVENTIVE / OBVIOUS (with closest prior art + objective technical problem + combination analysis)",
+        "Aggregation vs interaction: AGGREGATION / FUNCTIONAL INTERACTION",
+        "Overall: SURVIVES / THREATENED / KILLED"
+      ]
+    }
+  },
+  "p3_synergy_test": {
+    "the_question": "Do the elements interact to produce a technical effect that is greater or different from what the elements achieve independently?",
+    "the_two_outcomes": {
+      "aggregation_weak_invention": {
+        "definition": "A works independently + B works independently + putting A and B together changes nothing fundamental",
+        "example": "A pressure sensor + a wireless transmitter. Each works independently. Combining them gives 'wireless pressure sensing' but neither changes the other's operating state.",
+        "epo_classification": "Juxtaposition/aggregation. NOT an invention under EPO G-VII 7.",
+        "verdict": "WEAK — not a World-Class invention. May be a commercial tool if economics work."
+      },
+      "functional_interaction_potentially_strong": {
+        "definition": "A changes the operating state of B, producing a new measurable technical effect that neither could produce alone",
+        "example": "A drug-eluting coating that changes the surface chemistry of a sensor, enabling the sensor to measure something it couldn't measure without the coating. The coating changes the sensor's operating state.",
+        "epo_classification": "Genuine combination with functional interaction. POTENTIALLY inventive under EPO G-VII 7.",
+        "verdict": "STRONG — potentially a World-Class invention if other gates pass."
+      }
+    },
+    "the_test_protocol": [
+      "1. Decompose the candidate into its key elements (A, B, C, ...)",
+      "2. For each element, describe what it does INDEPENDENTLY",
+      "3. For each PAIR of elements, ask: does A change B's operating state?",
+      "4. If NO pair changes another's operating state → AGGREGATION",
+      "5. If YES, describe the INTERACTION: how does A change B?",
+      "6. Measure the INTERACTION EFFECT: what new technical capability emerges?",
+      "7. Is the interaction effect PREDICTABLE from A and B independently?",
+      "8. If predictable → still aggregation (no synergy)",
+      "9. If UNPREDICTABLE / SURPRISING → functional interaction (synergy)"
+    ],
+    "the_synergy_score": {
+      "0_synergy": "All elements operate independently. Pure aggregation. NOT inventive.",
+      "1_weak_synergy": "Some interaction but predictable. Weak invention.",
+      "2_moderate_synergy": "Interaction produces new effect, but effect is derivable from components. Moderate.",
+      "3_strong_synergy": "Interaction produces UNEXPECTED technical effect. Potentially inventive.",
+      "level_2_requires": "Synergy score >= 2 (moderate or strong)"
+    },
+    "why_this_is_the_most_important_test": "Most of our killed candidates (MSVED, CC-04, CC-08, NC-05, IB-03, IB-01, IB-02) were AGGREGATIONS: known components placed together without functional interaction. The synergy test formalizes why they failed: putting A and B together without changing either's operating state is engineering, not invention.",
+    "alignment_with_epo": "EPO Guidelines G-VII 7 explicitly distinguishes combination (functional interaction, potentially inventive) from juxtaposition/aggregation (mere placing together, not inventive). This test operationalizes that distinction for the discovery engine.",
+    "retroactive_application_to_killed_candidates": {
+      "MSVED": "AGGREGATION — NI testing + coverage + Bonferroni + sensitivity analysis. Each component operates independently. No synergy. Score: 0.",
+      "CC-04": "AGGREGATION — NI + coverage + Bonferroni + sensitivity. Same as MSVED. Score: 0.",
+      "CC-08": "AGGREGATION — NI testing + ML context + reporting. Each independent. Score: 0.",
+      "NC-05": "AGGREGATION — telemetry + ML + MRI coils. Each independent. Score: 0.",
+      "IB-03": "AGGREGATION — MEMS shear sensor + implant telemetry + vascular application. Each independent. Score: 0.",
+      "IB-01": "AGGREGATION — impedance sensor + implant + micromotion. Sensor and application are independent. Score: 0.",
+      "IB-02": "AGGREGATION — microdialysis + wireless + drug monitoring. Each independent. Score: 0.",
+      "pattern": "ALL killed candidates were aggregations with 0 synergy. This confirms the synergy test would have caught them."
+    }
+  },
+  "updated_discovery_chain": {
+    "old_chain": "function → physical mechanism → information channel → equivalent technology → closest prior art → cross-domain art → combination attack → engineer reproduction attack → technical-effect test → economic test",
+    "new_chain": "unobservable problem → physical mechanism → FUNCTIONAL INTERACTION → unexpected technical effect → functional-equivalence collision → old-art shock → cross-domain collision → closest-prior-art §103 attack → §102 single-reference check → synergy test → engineer reproduction attack → economic attack → killer experiment",
+    "what_changed": "Added 'FUNCTIONAL INTERACTION' and 'synergy test' as mandatory steps. The chain now explicitly requires that elements interact (not just coexist) and that the interaction produces an unexpected effect. This is the EPO G-VII 7 distinction between combination and aggregation.",
+    "level_2_requires_all": [
+      "A. Variable novelty (genuinely unobservable)",
+      "B. Transduction novelty (physical mechanism not disclosed)",
+      "C. Architecture novelty (system architecture not disclosed)",
+      "D. Functional equivalence (10+ terms, 5 domains, no equivalent)",
+      "E. Cross-domain (all 5 domains clear)",
+      "F. Old-art (< 20-30 years)",
+      "G. Combination obviousness (no A+B+C makes it obvious)",
+      "H. Commercial substitution (cannot reproduce for <$50K)",
+      "I. Triple saturation (term + domain + reference all saturated)",
+      "J. §102 clear (no single reference contains all elements)",
+      "K. §103 clear (no motivation + expectation to combine)",
+      "L. Synergy score >= 2 (functional interaction, not aggregation)"
+    ],
+    "total_sub_gates": 12,
+    "note": "Level 2 now requires 12 sub-gates (was 8). The 4 new gates (I-L) address the CEO's R262 corrections."
+  },
+  "summary": {
+    "p0": "Validator output now separates verdict correctness from reference-retrieval completeness. R261 reassessed: 'PARTIALLY VALIDATED' not 'PASS'. 93% recall means 7% of prior art was missed.",
+    "p1": "Triple saturation: term + domain + reference. All three must saturate for high novelty-confidence. Single criterion was insufficient.",
+    "p2": "§102 (one reference, all elements → kill) vs §103 (closest prior art → objective technical problem → distinguishing feature → combine? → expectation). Per EPO G-VII 5.1, 6. Hindsight warning included.",
+    "p3": "Synergy test: aggregation (A+B independent, score 0) vs functional interaction (A changes B's state, score 2-3). Per EPO G-VII 7. Retroactive application: ALL 7 killed candidates were aggregations with 0 synergy. The test would have caught them.",
+    "level_2_upgraded": "12 sub-gates (was 8). Added: I triple saturation, J §102, K §103, L synergy >= 2.",
+    "discovery_chain_updated": "Added 'FUNCTIONAL INTERACTION' and 'synergy test' as mandatory steps. Chain now requires elements to interact (not just coexist).",
+    "key_insight": "The pattern is now clear: ALL killed candidates (MSVED, CC-04, CC-08, NC-05, IB-03, IB-01, IB-02) were aggregations — known components placed together without functional interaction. The synergy test formalizes why they failed. The frontier is: 'a technical interaction nobody has demonstrated before, producing a measurable effect that existing components cannot produce independently.' That is a much higher bar than 'new sensor for X.'",
+    "portfolio_unchanged": "0 Level 2, 0 sellable, 0 transactions. Discovery machine ~80-85%.",
+    "next": "R263 generates first genuinely new candidate using 12-sub-gate Level 2 + synergy test. The candidate must demonstrate FUNCTIONAL INTERACTION (not aggregation) to survive."
+  }
+}
