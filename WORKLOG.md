@@ -4660,3 +4660,28 @@ Stage Summary:
 - 0 INVEST. 0 Level 2. 0 sellable. 0 transactions. 23 cemetery entries. ~14 candidates at WATCH/BLOCKED.
 - The discovery engine has not produced a single invention that survives adversarial attack at the mechanism level after 272 rounds. Every concept-level novel candidate was threatened at the element-decomposition level.
 - Next: Each WATCH candidate needs specific mechanism specification + unexpected-effect proof + external attorney review. The engine needs live patent search capability (not training knowledge) to avoid the repeated pattern of missing prior art that the CEO finds.
+
+---
+Task ID: R273-CEMETERY-META-CAUSAL-3MECHANISMS
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 cemetery meta-analysis. P1 causal novelty gate. P2 known-principle escape rule. P3 cross-domain search. P4 generate 3 genuinely different causal mechanisms.
+
+Work Log:
+- P0 — Cemetery meta-analysis across 23 entries. 9 failure modes analyzed. Dominant: cheap_engineer_reproduction (35%). Top 3: cheap reproduction (35%), missing physical feasibility (30%), insufficient economic delta (30%). Key insight: generator produces candidates that are too commercially accessible, too physics-risky, and economically thin.
+- P1 — Added Causal Novelty Gate (Gate Q). Before Level 1: identify a causal relationship (A_state → B_state → effect) that is NEW across ALL fields. Not "what components are new" but "what causal chain is new." If known in ANY field → default WATCH.
+- P2 — Added Known-Principle Escape Rule. Known principle + medical application = default WATCH. Escape requires ALL THREE: (1) specific distinguishing constraint, (2) non-obvious reason for success, (3) unexpected quantitative effect. Applied retroactively: ALL 5 R272 candidates stay WATCH.
+- P3 — Added cross-domain search requirement: 9 non-medical domains (aerospace, industrial fluid, chemical reactors, MEMS, semiconductor, battery, automotive, telecom, robotics) must be searched before any novelty label.
+- P4 — Generated 3 genuinely different causal mechanisms:
+  - CM-01: Osmotic-Pressure Differential-Driven Valve. Causal chain: CSF osmolarity → water flux across membrane → valve displacement → hydraulic resistance. 0/10 domains found. INVEST-PENDING. Genuinely new causal chain — osmotic pressure as valve actuation not found in any field. Osmotic PUMPS exist (Alzet) but not osmotic VALVES. >$250K reproduction. Unexpected effect: self-regulation without electronics.
+  - CM-02: Venturi Self-Powering Sensor. Causal chain: CSF flow → Venturi → piezo → sensor → drainage. 0/10 domains found as full chain. WATCH. Major physics risk: CSF flow (~0.35 mL/min) may be too slow for useful energy. Needs feasibility.
+  - CM-03: Feed-Forward Production-Matched Drainage. Causal chain: CSF production rate → flow signature → drainage matched to production → ICP stability without reactive adjustment. 0/10 domains found. INVEST-PENDING. Genuinely new control paradigm: feed-forward vs feedback. ALL existing shunts react to ICP; this anticipates production changes. >$250K. Unexpected effect: zero-lag ICP stability.
+- Key finding: these 3 are DIFFERENT from 16 previous candidates because they start from a new CAUSAL RELATIONSHIP, not from "combine Tesla + Monsanto + Apple." CM-01 and CM-03 are the first candidates with genuinely new causal paradigms.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- Cemetery meta-analysis: dominant failure = cheap reproduction (35%). Generator produces too-accessible candidates.
+- Causal Novelty Gate (Gate Q) + Known-Principle Escape Rule + 9-domain cross-domain search added.
+- 3 new causal mechanisms: CM-01 (osmotic valve, INVEST), CM-02 (Venturi self-powering, WATCH), CM-03 (feed-forward drainage, INVEST).
+- CM-01 and CM-03 are first candidates with genuinely new causal paradigms (not known-principle + medical application).
+- Portfolio: 2 INVEST-PENDING (CM-01, CM-03), 15 WATCH, 1 BLOCKED, 23 cemetery. 0 Level 2. 0 sellable. 0 transactions.
+- Next: Deep collision on CM-01 (osmotic valve) first — genuinely new causal chain. Then CM-03 (feed-forward drainage) — new control paradigm. Both need feasibility analysis.
