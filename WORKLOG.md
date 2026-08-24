@@ -4706,3 +4706,31 @@ Stage Summary:
 - Root cause identified: engine searches specific terminology, not functional equivalents. "Osmolarity valve" ≠ "osmotic pressure valve" in engine's search but functionally identical.
 - Portfolio: 0 INVEST. 16 WATCH. 2 PRIOR_ART_THREATENED. 1 BLOCKED. 23 cemetery. 0 Level 2. 0 sellable. 0 transactions.
 - Next: Apply upgraded Gate Q (functional equivalence) + recent-art shock + negative-search provenance to the NEXT candidate. The candidate generator must: (1) write causal chain, (2) expand to functional equivalent, (3) search functional equivalent across 10 domains, (4) search 2024-2026 recent art, (5) record negative-search provenance, (6) only proceed if ALL clear.
+
+---
+Task ID: R275-PORTFOLIO-SHIFT
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: Strategic shift from patent examiner to technology company. Accept 15 packages. Build TTP skeletons. Prioritize #1, #4, #9.
+
+Work Log:
+- STRATEGIC SHIFT accepted. The engine stops acting like a patent examiner (kill on adjacent prior art) and starts acting like a technology company (package differentiated technical substance with economic value for buyer diligence).
+- The correct commercial question: "Is there enough differentiated technical substance and economic value that a serious buyer would pay to acquire the package and perform its own diligence?"
+- 15 packages accepted with indicative pricing:
+  - Tier 1 Strategic ($250K-$500K+): P-01 (Predictive Occlusion-Isolation, $500K), P-04 (Pulsation-Synchronized Catalytic Contact-Time Lock, $250-500K), P-09 (Chemical ICP Transduction, $500K+)
+  - Tier 2 Strong ($100K-$500K): P-02, P-05, P-06, P-07, P-08, P-10, P-11, P-12
+  - Tier 3 Narrower ($50K-$500K): P-03, P-13, P-14, P-15
+- TTP: 15 elements per package (executive brief, mechanism dossier, architecture, engineering spec, prototype blueprint, reference implementation, experimental protocol, validation evidence, economic model, IP dossier, regulatory map, manufacturing plan, safety package, integration package, provenance ledger).
+- Pricing principle: $50K vs $500K = rights (exclusivity, field-of-use, territory, customization, support, data rights), NOT evidence quality. Same TTP at every tier.
+- Package loop: DISCOVER → DESIGN → COLLISION → REFORMULATE → PROTOTYPE → VALIDATE → ECONOMICS → IP → TTP → BUYER → BUYER QUESTIONS → BUYER DATA → UPDATE → NEXT VERSION. Buyer feedback becomes machine task, not email in inbox.
+- First 3 for full build: P-01 (best control-law, clear economics), P-04 (interesting physics/biology interaction, dual-function), P-09 (highest differentiation, zero electronics in brain).
+- Build strategy: TTP skeletons for all 15 first. Then full build on top 3. Evidence loop deepens whichever attracts buyer interest. Do NOT wait for perfection.
+- IP dossier (element 10): honestly discloses what we know, what we don't know, where counsel should focus. Does NOT claim "patent cleared."
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- 15-package portfolio accepted. Strategic shift from patent examiner to technology company.
+- 3 tiers: 3 strategic + 8 strong + 4 narrower. First 3 for full build: P-01, P-04, P-09.
+- TTP: 15 elements per package. Same evidence at every price. Rights differentiate price.
+- 0 TTPs built (next round). 0 buyer conversations. 0 transactions. BUT: portfolio is ready to package.
+- The machine has shifted from killing candidates to packaging technology. The cemetery (23 entries) becomes negative knowledge that strengthens the IP dossier, not a graveyard of failures.
+- Next: Build TTP skeletons for all 15. Start full build on P-01, P-04, P-09.
