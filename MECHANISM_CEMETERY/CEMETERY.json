@@ -449,10 +449,36 @@
           "verdict": "CURRENT (supersedes Round 62 version)"
         }
       ]
+    },
+    {
+      "entry_id": "CE-019",
+      "territory_id": "CV-COMMERCIAL",
+      "mechanism_name": "Minimum Sufficient Validation Evidence Derivation (MSVED) — 4-link chain: ML change → clinical pathway → risk envelope → minimum sufficient evidence → sufficiency proof",
+      "proposed_version": "R249 (discovery) → R250 (first killer) → R251 (conformal redesign)",
+      "killed_at_version": "R251 (pre-registered conformal risk control redesign)",
+      "kill_reason": "VALIDATED_NEGATIVE — killer experiment failed twice. R250: 87% assurance, 26% false rejection, dominated by BOED. R251: conformal risk control improved to 97.86% assurance, 4% false rejection, but still failed 3 of 5 pre-registered conditions (assurance <98%, tests >BOED, false reject >BOED). Mechanism core claim (minimum sufficient evidence) not achieved — MSVED selected MORE evidence than BOED while delivering WORSE assurance.",
+      "what_was_proposed": "Automatically derive the minimum sufficient validation evidence for an ML model modification, proving sufficiency via a 4-link chain from ML change through clinical pathways, risk envelope, to minimum evidence and sufficiency proof.",
+      "why_it_failed": "The clinical-pathway bridge (link 1) did not produce a smaller evidence set than BOED (information-maximizing selection). MSVED used 16.5 tests vs BOED 15.0. The sufficiency mechanism (min-score in R250, conformal risk control in R251) could not achieve 100% assurance with fewer tests than BOED. The mechanism is WORSE than the BOED baseline on all metrics.",
+      "reusable_lesson": "FROZEN THEOREM CE-019: A clinical-pathway-aware evidence selector must demonstrate that the clinical-pathway bridge produces a MATERIALLY DIFFERENT and BETTER evidence set than information-maximizing selection (BOED). If the pathway-aware selector uses MORE tests while achieving WORSE assurance, the clinical-pathway bridge adds complexity without value. The minimum-evidence claim must be validated by showing tests_required < BOED, not just tests_required < conventional. The killer experiment must compare against the STRONGEST available baseline (BOED), not just conventional full-validation.",
+      "what_to_avoid": [
+        "Do not claim minimum sufficient evidence without comparing against BOED (information-maximizing selection), not just conventional full-validation.",
+        "Do not use union-bound sufficiency rules (min-score for ALL tests) — they are exponentially conservative.",
+        "Do not assume the clinical-pathway bridge produces fewer tests — it may produce MORE tests due to pathway-coverage requirements.",
+        "Do not propose MSVED-R2 — the pre-registered kill rule was binding."
+      ],
+      "physical_constraint": "The conformal risk control mechanism (R251) improved false rejection from 26% to 4% but could not reduce test count below BOED. The pathway-coverage requirement (selecting tests covering 80% of affected-pathway risk mass) inherently uses more tests than BOED population-level selection.",
+      "evidence_sources": [
+        "R250_MSVED_KILLER_EXPERIMENT_RESULTS.json",
+        "R251_MSVED_R1_PREREGISTERED_AND_EXECUTED.json"
+      ],
+      "epistemic_class": "VALIDATED_NEGATIVE"
     }
   ],
   "updated_at": "2026-08-22T02:45:00+00:00",
   "last_amended": "2026-08-22T02:10:00+00:00",
   "last_amendment_round": "Round 63 (CE-018 sharpened with end-to-end functional novelty requirement)",
-  "entry_count": 18
+  "entry_count": 18,
+  "total_entries": 19,
+  "last_updated": "2026-08-24T19:05:50.852844+00:00",
+  "last_update_round": "R251"
 }

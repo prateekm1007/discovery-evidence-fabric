@@ -4043,3 +4043,38 @@ Stage Summary:
 - P2 Killer: FAIL. MSVED has 87% assurance (vs 100% for BOED) and 26% false rejection. Dominated by BOED. Implementation may be too conservative (min-score threshold), but per Article XXX did not tune to pass.
 - P3: 10 candidates ranked. CC-01 top by EV but just failed killer. CC-04 (Sufficiency Proof Generator) is #2 and may be the pivot target.
 - Portfolio: 0/5 world-class. 10 hypotheses (0 sellable). MSVED failed killer experiment. CEO decision required: kill, redesign, or pivot.
+
+---
+Task ID: R251-MSVED-R1-KILLED-CC04-103
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: Execute CEO R251 — ONE successor experiment (MSVED-R1) with genuinely different sufficiency mechanism, pre-registered BEFORE execution. If ANY condition fails → MSVED KILLED. No R2. Parallel: §103 on CC-04.
+
+Work Log:
+- Read Constitution v1.5.0. Confirmed canonical state: git 4d45ed1, constitution hash f82ae4f6, cemetery 18 entries.
+- Pre-registered MSVED-R1 BEFORE execution. Chosen mechanism: Conformal Risk Control (Angelopoulos et al. 2024). NOT a threshold adjustment — replaced the entire sufficiency RULE (min-score union bound) with a calibrated mean-score threshold τ derived from held-out calibration set.
+- Mathematical reason stated in advance: R250's min-score rule has false rejection ~1-p^k (exponentially conservative). Conformal risk control controls P(reject|safe) <= α=0.05 directly.
+- Frozen parameters: α=0.05, calibration 30%, seed=251 for split, seed=250 for data (identical to R250).
+- Pre-registered decision rule: 5 conditions (assurance>=98%, tests<=BOED, false_reject<=BOED, no post-hoc, robustness>=95% under 0.3 misspec). If ANY fail → KILL. No R2.
+- EXECUTED (no parameter changes after seeing results):
+  - Calibration: 60 modifications, 25 safe. τ=0.7420 (5th percentile of safe mean scores).
+  - Evaluation: 140 modifications. MSVED-R1: 16.5 tests, 0% false accept, 4% false reject, 97.86% assurance.
+  - BOED on same eval set: 15.0 tests, 0% false accept, 0% false reject, 100% assurance.
+  - Robustness: 95.00% under 0.3 misspecification.
+- DECISION: 3 of 5 conditions FAILED.
+  - condition_1_assurance: 97.86% < 98% → FAIL (missed by 0.14%)
+  - condition_2_tests: 16.5 > 15.0 → FAIL (10% over BOED)
+  - condition_3_false_reject: 4% > 0% → FAIL
+  - condition_4_no_post_hoc: PASS
+  - condition_5_robustness: 95% >= 95% → PASS
+- VERDICT: MSVED KILLED. No R2.
+- The conformal mechanism improved things (87%→97.86% assurance, 26%→4% false reject) but could not beat BOED on any metric. The clinical-pathway bridge uses MORE tests than BOED while delivering WORSE assurance. This is a MECHANISM failure, not just implementation.
+- Added MSVED to cemetery as CE-019. Cemetery now 19 entries. Reusable lesson: clinical-pathway-aware selector must demonstrate tests < BOED, not just tests < conventional.
+- Parallel §103 on CC-04 (Automated Sufficiency Proof Generator): searched 8 domains (assurance cases, formal verification, conformal/PAC, regulatory frameworks, safety-case tools, automated test selection, formal methods ML, clinical evidence synthesis). VERDICT: CONDITIONAL_SURVIVE. The automation + ML-specificity + tie to derived minimum evidence is the novelty. Survival depends on whether the sufficiency proof is a novel THEOREM or just GSN template integration.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- MSVED-R1 pre-registered conformal risk control redesign: FAIL. 3/5 conditions failed. MSVED KILLED. No R2.
+- MSVED added to cemetery as CE-019 (VALIDATED_NEGATIVE). Cemetery: 19 entries.
+- CC-04 §103: CONDITIONAL_SURVIVE. Depends on whether sufficiency proof is a novel theorem.
+- Portfolio: 0/5 world-class. 9 remaining commercial hypotheses (CC-01 killed, CC-02..CC-10 remain). 0 sellable.
+- Next: CEO decision on CC-04 — does the sufficiency proof require a novel theorem? If yes → implement + killer experiment. If no → kill CC-04, move to next candidate.

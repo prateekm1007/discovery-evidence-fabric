@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-24T19:04:49.507390+00:00",
+  "generated_by": "Round 251 — MSVED-R1 Pre-registered + CC-04 §103",
+  "ceo_directive_round_251": "One-and-only-one successor experiment. MSVED-R1 with genuinely different sufficiency mechanism (conformal risk control, not threshold adjustment). Pre-register decision rule. If ANY condition fails → MSVED KILLED. No R2. Parallel: §103 on CC-04.",
+  "preregistration": {
+    "experiment_id": "R251-MSVED-R1",
+    "timestamp_frozen": "2026-08-24T19:04:49.494267+00:00",
+    "predecessor": "R250-MSVED (FAILED: 87% assurance, 26% false rejection, dominated by BOED)",
+    "ceo_directive": "One-and-only-one successor experiment. Create MSVED-R1 with a genuinely different sufficiency mechanism, not a threshold adjustment. Choose ONE mechanism, freeze all parameters, state the mathematical reason it should fix the failure BEFORE running.",
+    "chosen_mechanism": "Conformal Risk Control (Angelopoulos et al. 2024)",
+    "why_this_is_not_threshold_adjustment": "R250's MSVED used min-score > 0.5 for ALL selected tests — a union-bound approach requiring every test to pass. This is a sufficiency RULE, not a threshold. MSVED-R1 replaces the entire sufficiency RULE with conformal risk control: a calibrated mean-score threshold derived from a held-out calibration set, guaranteeing bounded expected false rejection rate at level α. This is a different MATHEMATICAL FRAMEWORK, not a parameter change.",
+    "mathematical_reason_it_should_fix_the_failure": "R250's min-score rule rejects if ANY of k selected tests has score < 0.5. Under independence, P(all pass) = p^k, so the false rejection rate grows as 1 - p^k. For k=16.5 tests with p=0.95 per test, P(all pass) = 0.95^16.5 ≈ 0.43, giving ~57% false rejection — consistent with the observed 26% (tests are correlated, so actual is lower). Conformal risk control replaces this with: accept if mean score >= τ, where τ is calibrated on a held-out set to ensure P(reject | safe) <= α = 0.05. This controls the EXPECTED false rejection rate directly, rather than bounding it via a conservative union bound.",
+    "frozen_parameters": {
+      "alpha": 0.05,
+      "calibration_fraction": 0.3,
+      "calibration_seed": 251,
+      "evaluation_seed": 250,
+      "n_modifications": 200,
+      "n_safe": 100,
+      "n_unsafe": 100,
+      "n_tests": 50,
+      "data_generation_seed": 250,
+      "pathway_relevance_threshold": 0.5,
+      "risk_coverage_threshold": 0.8,
+      "min_tests": 5
+    },
+    "decision_rule": {
+      "condition_1_assurance": "Assurance >= 98% (conformal calibration may lose ~2%)",
+      "condition_2_tests": "Tests <= BOED mean (<= 15.0)",
+      "condition_3_false_reject": "False reject <= BOED (<= 0%)",
+      "condition_4_no_post_hoc": "α = 0.05 frozen, calibration split frozen, no adjustment after seeing results",
+      "condition_5_robustness": "Under model misspecification 0.3 (perturb test scores by 30% noise), assurance >= 95%",
+      "kill_rule": "If ANY condition fails → MSVED KILLED. No R2."
+    },
+    "what_is_NOT_allowed": [
+      "Changing α after seeing results",
+      "Changing the calibration split after seeing results",
+      "Changing the data generation seed",
+      "Adding more tests if assurance is too low",
+      "Removing the conformal calibration and reverting to min-score",
+      "Any modification to the decision rule after execution"
+    ]
+  },
+  "execution_results": {
+    "calibration": {
+      "n_safe_cal": 25,
+      "alpha": 0.05,
+      "tau_calibrated": 0.7419956089805607,
+      "cal_mean_scores_safe_range": [
+        0.7385825544785812,
+        0.859081919578338
+      ]
+    },
+    "evaluation": {
+      "n_eval": 140,
+      "msved_r1": {
+        "tests_mean": 16.478571428571428,
+        "false_acceptance": 0.0,
+        "false_rejection": 0.04,
+        "assurance": 0.9785714285714285
+      },
+      "boed_comparison": {
+        "tests_mean": 15.0,
+        "false_acceptance": 0.0,
+        "false_rejection": 0.0,
+        "assurance": 1.0
+      }
+    },
+    "robustness": {
+      "misspecification_level": 0.3,
+      "msved_r1_perturbed_assurance": 0.95
+    }
+  },
+  "decision": {
+    "conditions": {
+      "condition_1_assurance": {
+        "required": ">= 98%",
+        "actual": "97.86%",
+        "pass": false
+      },
+      "condition_2_tests": {
+        "required": "<= BOED (15.0)",
+        "actual": "16.5",
+        "pass": false
+      },
+      "condition_3_false_reject": {
+        "required": "<= BOED (0.00%)",
+        "actual": "4.00%",
+        "pass": false
+      },
+      "condition_4_no_post_hoc": {
+        "required": "α=0.05 frozen, calibration split frozen",
+        "actual": "α=0.05, seed=251, no adjustment",
+        "pass": true
+      },
+      "condition_5_robustness": {
+        "required": ">= 95% under misspecification 0.3",
+        "actual": "95.00%",
+        "pass": true
+      }
+    },
+    "all_pass": false,
+    "verdict": "MSVED-R1 FAILS. Conditions failed: ['condition_1_assurance', 'condition_2_tests', 'condition_3_false_reject']. MSVED is KILLED. No R2.",
+    "msved_killed": true
+  },
+  "cc04_section_103_attack": {
+    "candidate": "CC-04: Automated Sufficiency Proof Generator",
+    "mechanism": "Automated, modification-specific, clinical-risk-aware sufficiency proof — proving why a chosen minimal evidence set is sufficient for a modification-specific clinical safety claim.",
+    "components_searched": [
+      "Assurance cases / Goal Structuring Notation (GSN) — DO-178C, ISO 26262",
+      "Formal verification (SACM, AdvoCate, Resolute)",
+      "Conformal prediction / PAC bounds (Angelopoulos, Bates, Vovk)",
+      "Regulatory evidence frameworks (FDA least burdensome, ISO 14971)",
+      "Safety-case generation tools (GSN2, AdvoCate, ACM)",
+      "Automated test selection (active testing, BOED)",
+      "Formal methods for ML (ERAN, Marabou, α-β-CROWN)",
+      "Clinical evidence synthesis (GRADE, Cochrane)"
+    ],
+    "what_exists": {
+      "assurance_cases_GSN": "Manual, not ML-specific, not tied to derived minimum evidence. Hawkins, Graydon, Matsuno.",
+      "formal_verification": "Proves network properties (robustness, safety) for input perturbations, NOT for evidence-set sufficiency of a modification.",
+      "conformal_PAC": "Population-level coverage guarantees, NOT modification-specific evidence-set sufficiency proofs.",
+      "safety_case_tools": "GSN2, AdvoCate help AUTHOR assurance cases but do not AUTOMATICALLY DERIVE the sufficiency argument from a selected evidence set.",
+      "automated_test_selection": "Selects tests but does not PROVE sufficiency of the selection.",
+      "formal_methods_ML": "Proves input-robustness properties, not evidence-sufficiency properties.",
+      "clinical_evidence_synthesis": "GRADE/Cochrane synthesize clinical evidence but do not derive minimum sufficient sets for ML modifications."
+    },
+    "the_gap": "No existing tool AUTOMATICALLY generates a modification-specific, clinical-risk-aware sufficiency proof that is tied to a DERIVED minimum evidence set. Assurance cases are manual. Conformal/PAC are population-level. Formal methods prove model properties, not evidence-sufficiency. The integration of 'derive minimum evidence' + 'prove sufficiency of that specific set for this specific modification' is the gap.",
+    "verdict": {
+      "novelty": "MARGINAL — the CONCEPT of sufficiency proof exists (assurance cases). The AUTOMATION + ML-specificity + tie to derived minimum evidence is the novelty.",
+      "obviousness_risk": "MODERATE — a PHOSITA in assurance cases + ML would be motivated to automate the proof generation. The question is whether the automation requires a non-obvious technical step.",
+      "what_might_survive": "If the sufficiency proof requires a novel THEOREM (e.g., 'a formal bound connecting the selected evidence set to the clinical risk envelope'), that theorem is the inventive step. If it's just 'feed evidence into GSN template,' it's obvious.",
+      "kill_or_survive": "CONDITIONAL_SURVIVE — depends on whether the proof technique is a novel theorem or just integration.",
+      "survival_condition": "CC-04 must demonstrate a FORMAL MATHEMATICAL BOUND connecting the selected evidence set to the clinical risk envelope — not just a GSN template filled with evidence references. If the 'proof' is just structured documentation, it is obvious. If it is a theorem, it may survive."
+    }
+  },
+  "summary": {
+    "preregistration": "FROZEN before execution. All parameters locked.",
+    "mechanism_change": "Conformal risk control (NOT threshold adjustment). Replaced min-score union bound with calibrated mean-score threshold.",
+    "msved_r1_verdict": "KILLED",
+    "msved_r1_results": "Assurance=97.9%, Tests=16.5, FalseReject=4.0%",
+    "boed_comparison": "BOED: Assurance=100.0%, Tests=15.0, FalseReject=0.0%",
+    "robustness": "Under 0.3 misspecification: assurance=95.0%",
+    "cc04_103": "CONDITIONAL_SURVIVE — depends on whether sufficiency proof is a novel theorem or just GSN template integration.",
+    "key_finding": "MSVED-R1 is KILLED. The conformal risk control mechanism did NOT restore assurance to acceptable levels. MSVED is killed per pre-registered rule. No R2."
+  }
+}
