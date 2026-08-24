@@ -4158,3 +4158,23 @@ Stage Summary:
 - CC-04 can potentially be a $50K commercial tool (trade-secret IP, not patent) if buyer economics work
 - Portfolio: 0/5 world-class. CC-04 = commercial tool candidate. 8 other candidates in discovery. 0 sellable.
 - Key lesson: implementation bugs can masquerade as mechanism failures. The CEO's insistence on a valid positive control prevented a false kill.
+
+---
+Task ID: R254-PROVENANCE-CC04-RANKING-IP
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 fix provenance. P1 record CC-04 as COMMERCIAL_TOOL_NOT_INVENTION. P2 rank 8 candidates. P3 commercial IP distinction.
+
+Work Log:
+- P0 — Provenance VERIFIED. CEO reported GitHub search could not find d6ecc41. Verified via GitHub API: commit d6ecc41 EXISTS on remote. All R253 artifacts confirmed in git tree. CE-020 r253_correction annotation present. Discrepancy was likely GitHub search indexing delay.
+- P1 — Recorded CC-04 as COMMERCIAL_TOOL_NOT_INVENTION. Gate A pass (mechanism works with bug fix). Gate B fail (no novel math). Pending: independent validation on real PCCP data, buyer-specific economics, IP/know-how diligence, complete 14-element TTP. Potential price: $50K T1. IP position: trade-secret/know-how (must be demonstrated, not asserted).
+- P2 — Ranked 8 remaining candidates by buyer_pain × economic_value × evidence_feasibility × build_vs_buy × defensible_knowhow − validation_cost. ALL scores negative (validation cost exceeds expected value for all at current evidence levels). Top: CC-08 (NI Statistical Engine, -0.1356) — highest evidence feasibility, lowest validation cost. Bottom: CC-03 (Safety-Sufficient Subset Selector, -0.3259) — highest collision risk, MSVED already tested similar concept.
+- P3 — Defined commercial IP distinction. Three outcomes: WORLD_CLASS_INVENTION (novel theorem + patent), COMMERCIAL_TOOL (working mechanism + trade-secret/know-how + economics), KILL (mechanism fails or IP indefensible). For commercial tools, defensible IP = trade secrets + proprietary datasets + validated workflows + reference implementations + calibration libraries + integration know-how + reproducibility infrastructure. Must be DEMONSTRATED, not asserted. CC-04's commercial IP is currently WEAK — no proprietary data, no calibration library, no validated workflows. Must be built through real paid engagements.
+- Attack plan for R255: CC-08 (NI Statistical Engine). Deep prior-art → §103 → smallest mechanism → killer experiment → Gate A/B independently. High collision risk (NI testing is standard ICH E9). The novelty question: is automating NI testing for ML modifications obvious under KSR?
+
+Stage Summary:
+- Provenance: VERIFIED via GitHub API. Commit d6ecc41 is real.
+- CC-04: COMMERCIAL_TOOL_NOT_INVENTION. Gate A pass, Gate B fail. Pending validation + economics + IP diligence.
+- 8 candidates ranked. All negative EV. Top: CC-08 (cheapest to test). Bottom: CC-03 (highest collision risk).
+- Commercial IP: 7 components defined. CC-04's IP position is WEAK — must be built through flywheel.
+- Three outcomes: World-Class (0/5), Commercial Tool (CC-04 candidate), Kill (MSVED killed).
+- Next: R255 attacks CC-08 (NI Statistical Engine). High collision risk — NI testing is standard. The key question: is there ANY non-obvious element in automating NI testing for ML modifications?
