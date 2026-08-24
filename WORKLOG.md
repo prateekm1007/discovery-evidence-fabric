@@ -4439,3 +4439,24 @@ Stage Summary:
 - The next candidate needs: functional interaction AND components that are NOT commercially available (custom material, novel transduction) OR interaction model so non-obvious that escape clause clearly applies.
 - Portfolio: 0 Level 2, 0 sellable, 0 transactions. First synergy-2 candidate (killed but progress). Discovery machine ~85%.
 - Next: CEO decision. Options: (A) reclassify SGET as commercial tool (if escape clause), (B) generate next candidate with harder-to-reproduce interaction, (C) further validate engine.
+
+---
+Task ID: R264-SGET-KILL-INTERACTION-GATE
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 accept SGET kill (synergy≠novelty). P1 add interaction-prior-art gate. P2 add unexpected-effect proof.
+
+Work Log:
+- P0 — SGET KILLED/CLOSED. CEO found 5 prior-art sources: (1) electrochemical impedance depth profiling of tissue (ScienceDirect), (2) vibratory actuator+strain sensor for 1-8mm depth tissue (PubMed 34045731), (3) stretchable electrochemical sensors on deformed tissue (PubMed 32632992), (4) implantable mechanical+chemical+neural platform (Nature Materials 2026), (5) orthopedic implant mechanical/electrochemical patent (CN121647794A). The interaction (strain+electrochemistry for tissue depth sensing) and the emergent effect (depth-resolved chemistry) both already exist. Synergy score 2 was genuine but synergy ≠ novelty. Added to cemetery as CE-022.
+- P1 — Added INTERACTION-PRIOR-ART GATE (Gate M). 7 mandatory searches: A alone, B alone, A+B, interaction law, emergent effect, same effect via different mechanism, same interaction cross-domain. The INTERACTION ITSELF must survive all 7. Retroactive on SGET: FAIL (5/7 found interaction or effect). This gate would have caught SGET before R263's 12-gate test.
+- P2 — Added unexpected-effect proof. Must pre-register: (1) quantitative effect NOT predictable from A+B independently, (2) strongest baseline identified, (3) predicted advantage, (4) why not derivable from components. Then prove via killer experiment vs strongest baseline. SGET's failure: did not identify the strongest baseline (vibratory tissue characterization at 1-8mm, PubMed 34045731) and did not quantify the advantage.
+- Level 2 upgraded to 13 sub-gates (was 12). Gate M: interaction-prior-art. Discovery chain updated: added interaction collision (7 searches) + unexpected-effect proof (quantified prediction vs strongest baseline).
+- Key lesson: the invention problem has a new layer. A changes B → unexpected effect → the INTERACTION ITSELF survives prior art → reproducible advantage → cannot be cheaply reproduced → buyer value. Synergy is necessary but not sufficient.
+- The progression: new application ❌ → new information channel ❌ → new component ❌ → component combination ❌ → functional interaction ✅ but ❌ killed (interaction not novel). Next frontier: previously unknown functional interaction with quantitatively unexpected effect that survives functional-equivalence prior art.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- SGET KILLED/CLOSED (CE-022). Synergy without novelty. Cemetery: 22 entries.
+- Gate M (INTERACTION-PRIOR-ART) added. 7 searches on the interaction itself. Level 2: 13 sub-gates.
+- Unexpected-effect proof added. Quantified prediction vs strongest baseline. Then prove it.
+- Portfolio: 0 Level 2, 0 sellable, 0 transactions. Discovery machine ~85%.
+- Next frontier: previously unknown functional interaction + quantitatively unexpected effect + survives functional-equivalence prior art.
