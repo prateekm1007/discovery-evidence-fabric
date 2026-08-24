@@ -4557,3 +4557,23 @@ Stage Summary:
 - 8 killed: 6 aggregation (synergy=1), 2 with synergy=2 but Gate M FAIL + Gate H FAIL.
 - Portfolio: 2 Level 2 candidates (FIRST survivors), 0 sellable, 0 transactions. Cemetery 22 entries. Discovery machine ~90%.
 - Next: Deep §103 on SC-05 and SC-10 with live web search. External patent attorney review. Killer experiment design. Buyer economics.
+
+---
+Task ID: R269-DEEP-COLLISION-SC05-SC10
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 deep collision SC-05 (CEO found 3 sources). P1 deep collision SC-10 (CEO found multi-catheter). P2 kill false M4. P3 control-law novelty.
+
+Work Log:
+- P0 — SC-05 KILLED. CEO found 3 prior-art sources: US12419998B2 (dynamic surface deformation, vascular implant), ACS self-replenishing vascularized surfaces (2014), US-11648374-B2 (magnetic micro-pillars for biofilm removal). Deep decomposition: continuous renewal (ACS), dynamic topography (US12419998B2), surface-energy modulation (general concept), CSF-blood application (engineering adaptation), plant cuticle chemistry (unspecified). Each element individually occupied. No specific mechanism specified. Control law (sense fouling → adjust surface) = functionally equivalent to existing anti-fouling approaches. CE-023 added. Cemetery: 23.
+- P1 — SC-10 DOWNGRADED to CONDITIONAL. CEO found US6913589B2 (multi-catheter hydrocephalus shunt). Distributed drainage topology is NOT new. Deep decomposition: topology (occupied), flow restrictors (occupied), local sensors (engineering), communication (engineering), coordination law (POTENTIALLY NOVEL but UNSPECIFIED), load redistribution (concept known, specific law unspecified), failure isolation (concept known, specific mechanism unspecified). Cross-domain: microfluidics, dialysis, vascular, distributed pumping, aerospace fault-tolerant, industrial fluid networks all have related concepts. The surviving claim is the SPECIFIC HYDRAULIC CONTROL LAW, which must be defined before assessment.
+- P2 — M4 'perfect discriminator' KILLED. It was selection bias: 10 candidates generated and classified by same framework. 2 had M4=NOT FOUND, survived. CEO found prior art the M4 assessment missed for BOTH survivors (SC-05: 3 sources; SC-10: multi-catheter patent). M4=NOT FOUND now means 'one unresolved question requiring saturation evidence,' not 'survivor.' The machine must NEVER turn a post-hoc correlation into a constitutional principle.
+- P3 — Gate P (Control-Law Novelty Test) added. For control/coordination candidates: (1) state variable, (2) control action, (3) transition rule, (4) stability/safety invariant, (5) equivalent in other field. SC-05 FAILS (control law = sense fouling → adjust surface = existing). SC-10 FAILS (control law unspecified). Level 2: 15 gates (A-O + P).
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- SC-05 KILLED (CE-023). Concept not mechanism. 3 prior-art sources. Each element occupied.
+- SC-10 DOWNGRADED to CONDITIONAL. Architecture occupied. Control law UNSPECIFIED. Must define state/action/rule/invariant and prove novelty.
+- M4 'perfect discriminator' KILLED. Selection bias. M4=NOT FOUND = unresolved question, not survivor.
+- Gate P (Control-Law Novelty) added. Level 2: 15 gates.
+- Portfolio: 0 Level 2, 1 conditional (SC-10), 0 sellable, 0 transactions. Cemetery: 23 entries. Discovery machine ~90%.
+- Next: SC-10 must specify the exact hydraulic control law. Then attack via §103 + cross-domain control-law search + Gate P. Only if the specific control law survives → return to Level 2.

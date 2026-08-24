@@ -1,0 +1,377 @@
+"""
+Round 269 — Deep Collision Attack SC-05 and SC-10 + Kill False M4 + Control-Law Novelty
+
+CEO R269 directive:
+  P0: Deep collision SC-05. CEO found US12419998B2 (dynamic surface deformation),
+      self-replenishing vascularized surfaces (ACS), magnetic micro-pillars (US-11648374-B2).
+      What remains after removing these?
+  P1: Deep collision SC-10. CEO found US6913589B2 (multi-catheter). Attack the
+      specific control law, not "many shunts."
+  P2: Kill false M4 conclusion. "M4 not found" = one unresolved question, not survivor.
+  P3: Add control-law novelty test.
+
+Output:
+  CANONICAL_STATE/R269_DEEP_COLLISION_SC05_SC10.json
+"""
+import json
+from pathlib import Path
+from datetime import datetime, timezone
+
+OUTPUT_PATH = Path(
+    "/home/z/my-project/discovery-evidence-fabric/CANONICAL_STATE/"
+    "R269_DEEP_COLLISION_SC05_SC10.json"
+)
+
+
+# ===========================================================================
+# P0 — Deep Collision Attack SC-05
+# ===========================================================================
+
+SC05_DEEP_COLLISION = {
+    "candidate": "SC-05: Biofilm-Resistant, Living-Surface Venous Interface",
+    "original_claim": "Continuously renewing anti-biofilm surface with active surface-energy control at CSF-blood interface",
+    
+    "ceo_found_prior_art": [
+        {
+            "source": "US12419998B2",
+            "title": "Tuning adhesion at contacting device interfaces: geometric tools for minimizing surface fouling",
+            "what_it_covers": "Vascular implant surface whose topography is repeatedly actuated between smooth and deformed states to reduce fouling/thrombus formation. Dynamic reversible surface deformation. Continuous actuation from blood-pressure pulsation.",
+            "url": "https://patents.google.com/patent/US12419998B2/en",
+            "threatens": "The 'dynamic surface actuation for anti-fouling' concept AND the 'vascular implant' application",
+        },
+        {
+            "source": "ACS Applied Materials & Interfaces (2014)",
+            "title": "Self-Replenishing Vascularized Fouling-Release Surfaces",
+            "what_it_covers": "Embedded vascular network continuously renews a lubricant interface, reducing biofilm adhesion. Self-replenishing surface for biofilm prevention.",
+            "url": "https://pubs.acs.org/doi/10.1021/am503150y",
+            "threatens": "The 'continuously renewing anti-biofilm surface' concept",
+        },
+        {
+            "source": "US-11648374-B2",
+            "title": "Surface topography with ferromagnetic polymer pillars capable of movement in response to magnetic fields",
+            "what_it_covers": "Magnetically actuated micro-pillars for repeated biofilm removal. Active surface topography for biofilm prevention.",
+            "url": "https://mtec-sc.org/patents/US-11648374-B2",
+            "threatens": "The 'active surface-energy modulation for biofilm prevention' concept",
+        },
+    ],
+    
+    "decomposition_and_attack": {
+        "element_1_continuous_surface_renewal": {
+            "what_SC05_claims": "Continuously renewing surface (plant cuticle-inspired)",
+            "prior_art": "ACS self-replenishing vascularized surfaces (2014). The concept of a surface that continuously renews itself to prevent biofilm is DIRECTLY disclosed.",
+            "remains_after_removal": "NO — the renewal concept is occupied.",
+        },
+        "element_2_dynamic_topography": {
+            "what_SC05_claims": "Active surface modulation for anti-fouling",
+            "prior_art": "US12419998B2 — dynamic reversible surface deformation for fouling reduction. US-11648374-B2 — magnetically actuated micro-pillars for biofilm removal.",
+            "remains_after_removal": "NO — dynamic topography for anti-fouling is occupied.",
+        },
+        "element_3_surface_energy_modulation": {
+            "what_SC05_claims": "Active surface-energy control maintaining anti-biofilm properties",
+            "prior_art": "Surface-energy modulation for anti-fouling is a known concept (electrowetting, responsive surfaces). US12419998B2 covers geometric surface actuation. The general principle (modulate surface energy → reduce fouling) is known.",
+            "remains_after_removal": "MARGINAL — the specific surface-energy modulation mechanism (which energy source, which material, which control law) could be novel, but the CONCEPT is occupied.",
+        },
+        "element_4_csF_blood_interface": {
+            "what_SC05_claims": "Application at CSF-blood interface (shunt venous outflow)",
+            "prior_art": "US12419998B2 is for vascular implants generally. CSF-blood interface is a specific application, but applying anti-fouling surface technology to a shunt venous outflow is an engineering adaptation, not an invention.",
+            "remains_after_removal": "WEAK — the application is specific but the adaptation from vascular implant to shunt outflow is predictable.",
+        },
+        "element_5_plant_cuticle_chemistry": {
+            "what_SC05_claims": "Plant cuticle-inspired surface chemistry",
+            "prior_art": "Biomimetic surfaces inspired by plant cuticles exist (superhydrophobic surfaces, Lotus effect). The specific chemistry would need to be identified — SC-05 does not specify a particular chemistry.",
+            "remains_after_removal": "UNSPECIFIED — SC-05 is too vague about the actual chemistry to assess novelty. Without a specific material, this is a concept, not a mechanism.",
+        },
+    },
+    
+    "what_remains_after_removing_occupied_elements": (
+        "After removing: (1) continuous surface renewal (ACS), (2) dynamic topography "
+        "(US12419998B2), (3) magnetic micro-pillars (US-11648374-B2), and (4) "
+        "surface-energy modulation (general concept)... what remains?\n\n"
+        "SC-05 claimed 'plant cuticle-inspired continuously renewing surface with "
+        "active surface-energy control.' But:\n"
+        "- Continuous renewal = ACS self-replenishing surfaces\n"
+        "- Active surface control = US12419998B2 dynamic topography\n"
+        "- Magnetic actuation = US-11648374-B2\n"
+        "- CSF-blood application = engineering adaptation\n"
+        "- Plant cuticle chemistry = unspecified (no specific material identified)\n\n"
+        "NOTHING remains that is both specific AND novel. SC-05 is a CONCEPT "
+        "('living surface for biofilm resistance') not a MECHANISM (specific "
+        "chemistry + specific renewal mechanism + specific control law)."
+    ),
+    
+    "verdict": "KILLED — SC-05's broad concept is occupied by 3 prior-art sources. The potentially interesting part (specific surface chemistry + renewal mechanism under chronic CSF/blood conditions) has NOT been specified. SC-05 is a product aspiration, not a patentable mechanism. The CEO is correct: 'What exact surface chemistry + renewal mechanism + CSF/blood interface condition produces a demonstrably superior long-term technical effect?' has not been demonstrated.",
+    
+    "lesson": (
+        "SC-05 failed because it was assessed at the CONCEPT level ('continuously "
+        "renewing anti-biofilm surface') not the MECHANISM level (specific chemistry "
+        "+ specific renewal mechanism + specific control law). The 14-gate protocol "
+        "passed it because M4 was assessed against the concept, not against the "
+        "decomposed elements. The deep collision reveals that each element is "
+        "individually occupied, and the combination is an aggregation of known "
+        "anti-fouling approaches."
+    ),
+}
+
+
+# ===========================================================================
+# P1 — Deep Collision Attack SC-10
+# ===========================================================================
+
+SC10_DEEP_COLLISION = {
+    "candidate": "SC-10: Distributed Micro-Shunt Mesh with Swarm Coordination",
+    "original_claim": "Multiple micro-drainage elements communicating and coordinating total drainage as a swarm",
+    
+    "ceo_found_prior_art": [
+        {
+            "source": "US6913589B2",
+            "title": "Multi-catheter insertion device and method",
+            "what_it_covers": "Hydrocephalus shunts with multiple secondary catheters, multiple drainage pathways, multiple flow restrictors, drainage to multiple regions.",
+            "url": "https://patents.google.com/patent/US6913589B2/en",
+            "threatens": "The 'distributed drainage topology' claim — multiple catheters/drainage paths in hydrocephalus is NOT new",
+        },
+    ],
+    
+    "decomposition_and_attack": {
+        "element_1_distributed_drainage_topology": {
+            "what_SC10_claims": "Multiple micro-scale drainage elements in different CSF compartments",
+            "prior_art": "US6913589B2 — multi-catheter hydrocephalus shunt. Multiple drainage pathways exist. The TOPOLOGY (distributed drainage) is NOT novel.",
+            "remains_after_removal": "NO — distributed drainage in hydrocephalus is occupied.",
+        },
+        "element_2_individual_flow_restrictors": {
+            "what_SC10_claims": "Each element has its own drainage control",
+            "prior_art": "Multiple flow restrictors in shunt systems exist (US6913589B2 mentions multiple flow restrictors). Adjustable valves exist (Codman Hakim, Sophysa). Individual flow control per catheter is known.",
+            "remains_after_removal": "NO — individual flow restrictors in multi-catheter systems are occupied.",
+        },
+        "element_3_local_sensors": {
+            "what_SC10_claims": "Local pressure/flow sensing at each element",
+            "prior_art": "Implantable pressure sensors exist. Multiple sensor implants exist. Local sensing at each drainage point is an engineering integration.",
+            "remains_after_removal": "WEAK — the integration is engineering, not invention.",
+        },
+        "element_4_communication": {
+            "what_SC10_claims": "Inter-element communication",
+            "prior_art": "Implant communication exists (BLE, NFC, inductive). Mesh networking exists in IoT. Implant mesh communication is an engineering integration.",
+            "remains_after_removal": "WEAK — communication between implants is known.",
+        },
+        "element_5_coordination_law": {
+            "what_SC10_claims": "Swarm coordination of drainage elements",
+            "prior_art": "Swarm coordination exists in robotics (Tesla fleet), drone swarms, distributed sensor networks. BUT: swarm coordination of HYDRAULIC drainage elements in CSF management is NOT directly disclosed. The specific CONTROL LAW (how drainage is redistributed based on local state) is the potentially novel element.",
+            "remains_after_removal": "POTENTIALLY NOVEL — the specific hydraulic control law for distributed CSF drainage may be novel. But it must be specified, tested, and attacked.",
+        },
+        "element_6_load_redistribution": {
+            "what_SC10_claims": "Dynamically distributing drainage load",
+            "prior_art": "Load balancing exists in distributed computing, power grids, fluid networks. The CONCEPT of load redistribution is known. The specific hydraulic implementation for CSF drainage is the question.",
+            "remains_after_removal": "POTENTIALLY NOVEL — but only if the specific redistribution law is non-obvious.",
+        },
+        "element_7_failure_isolation": {
+            "what_SC10_claims": "Isolating failed elements while maintaining drainage",
+            "prior_art": "Fault-tolerant systems exist in aerospace, computing, power grids. The CONCEPT of failure isolation is known. The specific implementation for CSF drainage is the question.",
+            "remains_after_removal": "POTENTIALLY NOVEL — but only if the specific isolation mechanism is non-obvious.",
+        },
+    },
+    
+    "cross_domain_search": {
+        "hydrocephalus": "FOUND — US6913589B2 multi-catheter. Distributed drainage topology is NOT new.",
+        "microfluidics": "FOUND — microfluidic networks with distributed flow control exist (lab-on-chip, microfluidic routing).",
+        "dialysis": "PARTIAL — multi-catheter dialysis exists but is not coordinated.",
+        "vascular_devices": "PARTIAL — multi-stent deployments exist but are not coordinated.",
+        "distributed_pumping": "FOUND — distributed pumping systems exist in industrial fluid management, HVAC, water distribution.",
+        "aerospace_fault_tolerant": "FOUND — fault-tolerant distributed systems extensively studied in aerospace (redundant flight control, distributed avionics).",
+        "industrial_fluid_networks": "FOUND — smart water networks with distributed sensors and coordinated pumping exist (SCADA, smart water grids).",
+    },
+    
+    "what_remains_after_removing_occupied_elements": (
+        "After removing: (1) distributed drainage topology (US6913589B2), "
+        "(2) individual flow restrictors, (3) local sensors, (4) communication, "
+        "(5) swarm coordination concept, (6) load balancing concept, "
+        "(7) failure isolation concept...\n\n"
+        "What remains is the SPECIFIC HYDRAULIC CONTROL LAW: a distributed "
+        "fluid-control network in which local drainage elements autonomously "
+        "reallocate flow in response to local hydraulic state and predicted "
+        "obstruction, maintaining a target global intracranial pressure while "
+        "isolating failed elements.\n\n"
+        "This is a CONTROL LAW, not a device architecture. The architecture "
+        "(multi-catheter + sensors + communication) is known. The invention "
+        "MUST be in the specific control law — the state variable, control "
+        "action, transition rule, and stability/safety invariant."
+    ),
+    
+    "verdict": "DOWNGRADED FROM LEVEL 2 TO CONDITIONAL — SC-10's architecture (distributed drainage) is occupied. The surviving claim is the SPECIFIC CONTROL LAW, which has NOT been specified. SC-10 is NOT Level 2 until the control law is defined, attacked, and proven to produce an unexpected technical effect. The CEO is correct: 'The invention cannot be many shunts. It must be the specific distributed control law.'",
+    
+    "what_SC10_must_become_to_survive": (
+        "SC-10 must specify:\n"
+        "1. State variable: what does each element measure? (local pressure, flow, obstruction probability)\n"
+        "2. Control action: what does each element adjust? (drainage rate, valve opening)\n"
+        "3. Transition rule: how does element i's state change based on neighbors' states?\n"
+        "4. Stability/safety invariant: what does the controller guarantee? (global ICP < threshold, no element overdrains, failed elements isolated within X seconds)\n"
+        "5. Has this specific control law been used in another field? (aerospace redundant control, smart water grids, distributed HVAC)\n"
+        "Only if the specific control law survives §103 can SC-10 return to Level 2."
+    ),
+}
+
+
+# ===========================================================================
+# P2 — Kill False M4 Conclusion
+# ===========================================================================
+
+M4_CORRECTION = {
+    "the_false_claim": (
+        "R268 claimed 'M4 is a perfect discriminator: when M4=NOT FOUND → 100% "
+        "survival.' This is SELECTION BIAS, not a discovered law."
+    ),
+    "why_it_is_selection_bias": (
+        "The 10 CEO candidates were generated with the new framework, then "
+        "classified by that same framework. Two happened to have M4=NOT FOUND, "
+        "so naturally those two survived. That does not establish M4 as a "
+        "'perfect discriminator.' It establishes that the framework is "
+        "internally consistent — it classifies candidates the same way it "
+        "generated them."
+    ),
+    "the_correction": {
+        "old_rule": "M4 = NOT FOUND → survivor",
+        "new_rule": "M4 = NOT FOUND → one unresolved question. The question is: 'does comparable performance under comparable constraints actually not exist, or has the search not found it yet?'",
+        "requirement": (
+            "M4=NOT FOUND requires SATURATION EVIDENCE specifically around "
+            "comparable-performance systems. The search must demonstrate that "
+            "it has looked for comparable performance across all relevant "
+            "domains and found none. 'I didn't find any' is not the same as "
+            "'none exists.'"
+        ),
+    },
+    "retroactive_application": {
+        "SC-05": "M4 was assessed as NOT FOUND (no comparable >5 year biofilm resistance). But CEO found US12419998B2, ACS self-replenishing surfaces, US-11648374-B2. The search was NOT saturated — comparable-performance systems WERE found by the CEO. M4 should have been FOUND. The 'perfect discriminator' failed here because the search was incomplete.",
+        "SC-10": "M4 was assessed as NOT FOUND (no comparable coordinated distributed drainage). But CEO found US6913589B2 (multi-catheter). The search missed this. M4 assessment was based on 'coordinated' qualifier — but comparable PERFORMANCE (multi-site drainage) exists even if coordination doesn't. The 'perfect discriminator' is less perfect than claimed.",
+    },
+    "the_lesson": (
+        "The machine must NEVER turn a post-hoc correlation into a "
+        "constitutional principle. M4 may be a useful diagnostic, but "
+        "'M4=NOT FOUND → survivor' is not a law — it is a hypothesis that "
+        "requires saturation evidence for each individual case."
+    ),
+}
+
+
+# ===========================================================================
+# P3 — Control-Law Novelty Test
+# ===========================================================================
+
+CONTROL_LAW_NOVELTY = {
+    "gate_name": "Control-Law Novelty Test (Gate P)",
+    "position": "Gate 15 of 15",
+    "applicability": "For any candidate involving control, coordination, or adaptive behavior",
+    "the_test": {
+        "mandatory_questions": [
+            "1. What is the actual STATE VARIABLE? (what does the controller measure/estimate?)",
+            "2. What is the CONTROL ACTION? (what does the controller adjust?)",
+            "3. What is the TRANSITION RULE? (how does the controller update based on state?)",
+            "4. What STABILITY/SAFETY INVARIANT does the controller guarantee? (what property always holds?)",
+            "5. Has this specific control law — or a functionally equivalent one — been used in another field?",
+        ],
+        "the_rule": (
+            "The control law itself must be the inventive step, not the "
+            "device architecture. 'Swarm coordination' is not a control law. "
+            "'Distributed drainage' is not a control law. The specific "
+            "mathematical relationship between state, action, and invariant "
+            "is the control law — and THAT is what must survive §103."
+        ),
+        "why_this_matters": (
+            "Tesla's value is not 'swarm' as branding — it is specific control "
+            "invariants (e.g., collision avoidance guarantee, fleet-level "
+            "optimization). Similarly, SC-10's value must be a specific "
+            "hydraulic control invariant, not 'swarm coordination' as a concept."
+        ),
+    },
+    "applied_to_SC10": {
+        "state_variable": "UNSPECIFIED — SC-10 does not define what each element measures",
+        "control_action": "UNSPECIFIED — SC-10 does not define what each element adjusts",
+        "transition_rule": "UNSPECIFIED — SC-10 does not define how elements update",
+        "stability_invariant": "UNSPECIFIED — SC-10 does not define what the controller guarantees",
+        "equivalent_in_other_field": "UNTESTED — has not been searched",
+        "verdict": "FAIL — SC-10's control law is unspecified. Cannot assess novelty of an unspecified law. SC-10 must specify the control law before it can be assessed.",
+    },
+    "applied_to_SC05": {
+        "state_variable": "Surface fouling state (biofilm coverage/thickness)",
+        "control_action": "Surface-energy modulation (adjust surface properties)",
+        "transition_rule": "If fouling detected → increase renewal rate / adjust surface energy",
+        "stability_invariant": "Biofilm coverage < threshold for >5 years",
+        "equivalent_in_other_field": "FOUND — US12419998B2 (dynamic surface deformation for fouling control), ACS (self-replenishing surfaces). The control law (sense fouling → adjust surface) is the same as existing anti-fouling control approaches.",
+        "verdict": "FAIL — the control law (sense fouling → adjust surface) is functionally equivalent to existing anti-fouling surface control. No novel control invariant.",
+    },
+}
+
+
+# ===========================================================================
+# Updated Portfolio State
+# ===========================================================================
+
+PORTFOLIO = {
+    "SC-05": {
+        "r268_status": "Level 2 (FIRST survivor)",
+        "r269_status": "KILLED — broad concept occupied by 3 prior-art sources. No specific mechanism specified. Control law (sense fouling → adjust surface) is functionally equivalent to existing approaches.",
+        "cemetery_entry": "CE-023",
+    },
+    "SC-10": {
+        "r268_status": "Level 2 (FIRST survivor)",
+        "r269_status": "DOWNGRADED to CONDITIONAL — architecture (distributed drainage) occupied. Control law UNSPECIFIED. Must define specific state variable, control action, transition rule, stability invariant, and prove the control law is novel.",
+        "next_steps": "Specify the exact hydraulic control law. Then attack it via §103 + cross-domain control-law search.",
+    },
+    "level_2_candidates": 0,
+    "conditional_candidates": 1,  # SC-10, if control law is specified and survives
+    "sellable": 0,
+    "transactions": "$0",
+}
+
+
+# ===========================================================================
+# Assemble output
+# ===========================================================================
+
+output = {
+    "schema_version": "1.0.0",
+    "generated_at": datetime.now(timezone.utc).isoformat(),
+    "generated_by": "Round 269 — Deep Collision SC-05/SC-10 + Kill False M4 + Control-Law Novelty",
+    "ceo_directive_round_269": (
+        "P0: deep collision SC-05 (CEO found 3 prior-art sources). "
+        "P1: deep collision SC-10 (CEO found multi-catheter patent). "
+        "P2: kill false M4 conclusion (selection bias). "
+        "P3: add control-law novelty test."
+    ),
+    "p0_sc05_deep_collision": SC05_DEEP_COLLISION,
+    "p1_sc10_deep_collision": SC10_DEEP_COLLISION,
+    "p2_m4_correction": M4_CORRECTION,
+    "p3_control_law_novelty": CONTROL_LAW_NOVELTY,
+    "portfolio": PORTFOLIO,
+    "summary": {
+        "p0": "SC-05 KILLED. Broad concept (continuously renewing anti-biofilm surface) occupied by US12419998B2 (dynamic surface deformation), ACS self-replenishing surfaces, US-11648374-B2 (magnetic micro-pillars). Each element individually occupied. No specific mechanism specified. Control law (sense fouling → adjust surface) is functionally equivalent to existing approaches. Added to cemetery as CE-023.",
+        "p1": "SC-10 DOWNGRADED to CONDITIONAL. Architecture (distributed drainage) occupied by US6913589B2 (multi-catheter). The surviving claim is the SPECIFIC CONTROL LAW, which is UNSPECIFIED. SC-10 must define: state variable, control action, transition rule, stability/safety invariant. Then prove the control law is novel.",
+        "p2": "M4 'perfect discriminator' claim KILLED. It was selection bias, not a discovered law. M4=NOT FOUND now means 'one unresolved question' requiring saturation evidence, not 'survivor.' The CEO found prior art that the M4 assessment missed for both SC-05 and SC-10.",
+        "p3": "Control-Law Novelty Test (Gate P) added. For control/coordination candidates: state variable, control action, transition rule, stability invariant, equivalent in other field. SC-05 FAILS (control law = sense fouling → adjust surface = existing). SC-10 FAILS (control law unspecified).",
+        "key_finding": (
+            "Both R268 'survivors' were false positives. SC-05 was a concept "
+            "not a mechanism. SC-10 was an architecture not a control law. "
+            "The 14-gate protocol passed them because M4 was assessed at the "
+            "concept level, not the element-decomposition level. The deep "
+            "collision reveals that each element is individually occupied, "
+            "and the combination is an aggregation of known approaches. "
+            "The lesson: 'M4 not found' means 'the search hasn't found it yet,' "
+            "not 'it doesn't exist.'"
+        ),
+        "level_2": "0 (both survivors downgraded/killed). 1 conditional (SC-10, if control law specified and survives).",
+        "sellable": "0",
+        "transactions": "$0",
+        "next": "SC-10 must specify the exact hydraulic control law (state variable, control action, transition rule, stability invariant). Then attack via §103 + cross-domain control-law search + control-law novelty test (Gate P). Only if the specific control law survives → return to Level 2.",
+    },
+}
+
+OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+    json.dump(output, f, indent=2, ensure_ascii=False)
+
+if OUTPUT_PATH.exists():
+    print(f"[OK] Output: {OUTPUT_PATH} ({OUTPUT_PATH.stat().st_size} bytes)")
+
+print("\n=== R269 SUMMARY ===")
+print("SC-05: KILLED. 3 prior-art sources. Concept not mechanism. CE-023.")
+print("SC-10: DOWNGRADED to CONDITIONAL. Architecture occupied. Control law UNSPECIFIED.")
+print("M4 'perfect discriminator': KILLED. Selection bias, not a law.")
+print("Gate P (Control-Law Novelty): added. State/action/rule/invariant/field-equivalence.")
+print("Level 2: 0. Conditional: 1 (SC-10, if control law specified). 0 sellable. 0 transactions.")
