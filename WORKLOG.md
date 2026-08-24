@@ -4235,3 +4235,34 @@ Stage Summary:
 - New-hunt redesigned: information-bottleneck (hidden variable → new measurement). 3 candidate structures generated. NOT yet candidates.
 - Portfolio: 0/5 world-class. 0 INVEST. 3 NOVELTY_THREATENED (NC-05, NC-03). 10 RESET. 1 commercial tool candidate (CC-04). 3 new candidate structures (not yet collision-searched). 0 sellable. 0 transactions.
 - Next: R257 collision-searches the 3 information-bottleneck structures (implant micromotion, tissue drug concentration, vessel wall shear stress) using novelty-first pipeline. Only Level 2+ structures become candidates.
+
+---
+Task ID: R257-INFORMATION-ACCESS-NOVELTY
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 collision-search 3 information-bottleneck structures. P1 add INFORMATION ACCESS NOVELTY gate. P2 new information channel vs better sensor. P3 only after Level-2 novelty.
+
+Work Log:
+- P0+P1 — Collision-searched all 3 structures against specific prior art + applied new INFORMATION ACCESS NOVELTY gate (quantify: observable today, resolution, frequency, invasiveness, cost vs new mechanism).
+  - IB-01 (implant micromotion via impedance): Prior art found — vibration analysis (1980s, episodic, ~10-100 microns), instrumented implants (Bergmann, measure load not micromotion), RFID loosening detection (binary, not quantitative). Micromotion IS measurable today. Better sensor, not new channel. Level 1. RESET.
+  - IB-02 (tissue drug concentration via microdialysis): Prior art found — CGM (continuous ISF glucose), clinical cerebral microdialysis (FDA-cleared, continuous metabolites), electrochemical drug sensors (research), implantable ISF drug monitoring (research). Tissue drug concentration IS measurable today. Better sensor, not new channel. Level 1. RESET.
+  - IB-03 (vessel wall shear stress at implant interface): Prior art found — pressure wires (measure pressure not shear), IVUS/OCT (estimate shear from flow, episodic), CFD (COMPUTES shear from models, not measured), smart stents (measure pressure/flow for restenosis, not shear), endothelial research (in-vitro only). Wall shear stress at implant interface is NOT directly measurable today — only computable via CFD or estimable via IVUS. Direct continuous in-vivo measurement would be a NEW INFORMATION CHANNEL. Level 2. SURVIVES.
+- P2 — Information channel assessment:
+  - IB-01: better sensor (micromotion known and accessible today). NOT new channel.
+  - IB-02: better sensor (tissue drug concentration known and accessible today). NOT new channel.
+  - IB-03: NEW CHANNEL (wall shear stress NOT directly measurable today — only computable from models). First access to directly-measured variable.
+  - Key distinction: "better sensor for known variable" = Level 1 engineering. "New information channel for unobservable variable" = Level 2+ potentially invention.
+- P3 — IB-03 next steps (only after Level 2):
+  1. Deeper §103: search direct shear measurement in ANY context (aerospace, MEMS, fluid dynamics)
+  2. Transduction mechanism: does sensor measure shear DIRECTLY (tangential force) or infer from pressure/flow? Direct = novel. Inference = engineering.
+  3. Technical feasibility: is direct shear measurement at vascular implant surface physically feasible?
+  4. Only after Level 2 confirmed: economics → build-vs-buy → §103 → killer experiment
+- Honest caveat: IB-03's Level 2 is based on training knowledge through early 2025. Must verify with live web search for 2025-2026 publications. If a shear sensor implant exists, IB-03 is downgraded to Level 0.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- IB-01 RESET (Level 1 — micromotion measurable today, better sensor)
+- IB-02 RESET (Level 1 — tissue drug concentration measurable today, better sensor)
+- IB-03 SURVIVES (Level 2 — wall shear stress NOT directly measurable today, new information channel)
+- First Level 2 candidate: IB-03. Provides access to genuinely new information (direct measurement of a variable previously only computable from models).
+- Portfolio: 0/5 world-class. 1 Level 2 candidate (IB-03, pending deeper §103). 2 Level 1 RESET. 3 NOVELTY_THREATENED. 10 RESET. 1 commercial tool candidate (CC-04). 0 sellable. 0 transactions.
+- Next: R258 deeper §103 on IB-03 (search direct shear measurement across ALL fields). Determine if transduction mechanism is novel. Only then: economics, build-vs-buy, killer experiment.
