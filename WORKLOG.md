@@ -4205,3 +4205,33 @@ Stage Summary:
 - CC-04 preserved as COMMERCIAL_TOOL_CANDIDATE_NOT_SELLABLE.
 - Portfolio: 0/5 world-class. 1 commercial tool candidate (CC-04). 1 INVEST candidate (NC-05). 4 WATCH candidates. 7 RESET candidates. 0 sellable. 0 transactions.
 - Next: R256 attacks NC-05 (MRI Coil Failure Predictor) with §103 + killer experiment. First positive-EV candidate. Physical mechanism. Diversified domain.
+
+---
+Task ID: R256-NC05-KILL-OPTIMIZER-COLLISION-NEWHUNT
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 kill NC-05 (5 prior-art patents). P1 repair optimizer (novelty-first). P2 collision attack NC-01..NC-04. P3 new-hunt using information bottleneck.
+
+Work Log:
+- P0 — NC-05 DOWNGRADED to NOVELTY_THREATENED. CEO found 5 prior-art patents covering the exact mechanism: (1) US 12,386,345 Siemens predicting MRI module failure, (2) US 2024/0241197 embedded diagnostic module with AI, (3) US 2025/0199104 coil monitoring with cloud AI, (4) US 2026/0122134 Siemens cloud abnormality prediction, (5) US 2024/0103112 ML coil fault detection. The claim "No tool uses telemetry to predict failure" was NOT supportable. No simulation.
+- P1 — Optimizer repaired. Pipeline: NOVELTY FIRST → COMMERCIAL EV SECOND. INVEST requires novelty >= Level 2 AND EV > 0. effective_EV = raw_EV × novelty_confidence. States: INVEST/WATCH/NOVELTY_THREATENED/RESET. Novelty levels: 0 (threatened), 1 (marginal), 2 (survives), 3 (strong). The R255 mistake (choosing positive-EV candidate without novelty check) is now structurally prevented.
+- P2 — Collision attack on NC-01..NC-04. ALL FAILED:
+  - NC-01 (Sterilization Dose Auditor): RESET. Level 1. ISO 11137 itself provides the method. Optimization is engineering.
+  - NC-02 (Implant Fatigue Predictor): RESET. Level 1. Monte Carlo + FEA is standard (SmartUQ, nCode).
+  - NC-03 (Adaptive Trial Futility): NOVELTY_THREATENED. Level 0. Commercial tools (East/Cytel, PASS) + FDA guidance cover this exactly.
+  - NC-04 (IVD Cross-Reactivity Predictor): RESET. Level 1. Standard computational chemistry (RDKit, Schrodinger).
+  - The entire NC-01..NC-05 batch failed. The R255 new-hunt engine was backwards: commercial EV before novelty.
+- P3 — New-hunt engine redesigned around information-bottleneck structure: hidden variable → inability to observe → expensive workaround → new measurement/inference → technical effect → economics. 3 candidate structures generated:
+  1. Implant micromotion measurement (implant-integrated impedance sensor, orthopedic, $50K-$150K per avoided revision)
+  2. Tissue drug concentration (implantable microdialysis, oncology/CNS, $10K-$100K per avoided toxicity)
+  3. Vessel wall shear stress (implant-surface pressure sensors, vascular, $5K-$50K per avoided thrombosis)
+  These are NOT yet candidates — must be collision-searched first using novelty-first pipeline.
+- Key insight: the information-bottleneck structure produces candidates with genuine technical novelty (new measurement capability of hidden variables), not commercial packaging of existing technology. This is the correct starting point for invention discovery.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- NC-05 downgraded to NOVELTY_THREATENED (5 prior-art patents). No simulation.
+- Optimizer repaired: NOVELTY FIRST → EV SECOND. INVEST requires Level 2+ novelty AND positive EV.
+- NC-01..NC-04 all collision-searched: 2 RESET (Level 1), 1 NOVELTY_THREATENED (Level 0), 1 RESET (Level 1). Entire NC batch failed.
+- New-hunt redesigned: information-bottleneck (hidden variable → new measurement). 3 candidate structures generated. NOT yet candidates.
+- Portfolio: 0/5 world-class. 0 INVEST. 3 NOVELTY_THREATENED (NC-05, NC-03). 10 RESET. 1 commercial tool candidate (CC-04). 3 new candidate structures (not yet collision-searched). 0 sellable. 0 transactions.
+- Next: R257 collision-searches the 3 information-bottleneck structures (implant micromotion, tissue drug concentration, vessel wall shear stress) using novelty-first pipeline. Only Level 2+ structures become candidates.
