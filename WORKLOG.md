@@ -4613,3 +4613,27 @@ Stage Summary:
 - Combined portfolio: 20 CEO candidates total (10 R268 + 10 R270). 12 conditional (2 from R268 + 10 from R270). 1 killed (SC-05/CE-023). 0 Level 2 confirmed. 0 sellable. 0 transactions.
 - PAT revocation: noted, requires CEO action via GitHub web UI.
 - Next: Deep collision on SC-A (strongest) first. If it survives element-level + live search → first genuine Level 2 candidate.
+
+---
+Task ID: R271-CONSOLIDATED-16-CANDIDATE-REGISTER
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: Consolidate 16 candidates (6 NC-A-F + 10 SC-A-J) into single register with mechanism fingerprints. Apply deduplication. Generate 16 required fields per candidate. No simulation. Rank by surviving mechanism.
+
+Work Log:
+- Consolidated 16 candidates with unique mechanism fingerprints. Applied deduplication: 6 potential collision pairs analyzed, 0 duplicates found, all independently patentable. 1 merge recommended (NC-C + SC-10).
+- Generated all 16 required fields for each candidate: A/B components, interaction law, emergent effect, functional-equivalence vocab, old-art domains, closest prior art, §102, §103, Gate M1-M4, Gate N, Gate O, Engineer-in-a-Weekend, strongest baseline, buyer economics, reproduction cost, verdict.
+- Applied R269 lessons: M4=NOT FOUND = unresolved question. Gate P (control-law novelty) applied. SC-05 lesson (unspecified chemistry = concept). Element-level collision needed.
+- Verdicts: 5 INVEST, 9 WATCH, 2 KILL.
+  - INVEST: SC-A (phase-change valve, strongest), SC-F (chemical molecular signaling, most novel), SC-D (bacteriophage defense), SC-H (enzymatic clearance), NC-C (predictive occlusion-isolation controller).
+  - WATCH: NC-B (geometric guarantee membrane), NC-D (pulsation micro-pump, physics risk), NC-E (drainage-synchronized release, <$150K), SC-B (UWB, physics risk), SC-C (living cell valve, tissue-engineered exists), SC-E (autonomous navigation, Gate P standard), SC-G (neuromorphic, Gate P standard), SC-I (photovoltaic, active research), SC-J (glycan, unspecified).
+  - KILL: NC-A (pressure-compensating valves exist, <$100K), NC-F (R6 passive bypass exists, <$50K).
+- Merge recommendation: NC-C + SC-10 → "Distributed Micro-Shunt Mesh with Predictive Occlusion-Isolation Control." NC-C IS the control law SC-10 was missing (R269 downgraded SC-10 for unspecified control law).
+- Combined portfolio: 26 total candidates (10 R268 + 10 R270 + 6 R271). After deduplication: ~14 unique (5 INVEST + 9 WATCH). Aligns with 10-15 target.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- 16 candidates consolidated with 16-field assessment. 5 INVEST, 9 WATCH, 2 KILL.
+- SC-A (phase-change valve) remains strongest — fundamentally different physics, specific materials, >$250K, outside routine optimization.
+- NC-C + SC-10 should merge — NC-C is the control law specification SC-10 needed.
+- Combined portfolio after dedup: ~14 unique candidates. 0 confirmed Level 2. 0 sellable. 0 transactions.
+- Next: Deep collision on SC-A (strongest) first. Then merge NC-C+SC-10 and deep-collision the merged candidate. Then SC-F (needs molecule), SC-D, SC-H.
