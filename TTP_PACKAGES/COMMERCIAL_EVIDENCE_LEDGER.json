@@ -1,8 +1,16 @@
 {
-  "description": "Every economic statement in every TTP must have full provenance.",
-  "format": "claim → source → date → calculation → uncertainty → buyer-specific dependency → status",
+  "description": "Every economic statement in every TTP must have full provenance. R277 upgrade: structured buyer questionnaire schema added. The first real buyer response becomes part of this ledger as a new entry with status=BUYER_VERIFIED.",
+  "format": "claim → source → date → calculation → uncertainty → buyer-specific dependency → status. R277 adds: buyer_questionnaire_link → buyer_response → buyer_verified_date",
+  "constitutional_basis": "Article XXVIII — modelled economics cannot be silently promoted to economic proof. The buyer questionnaire is the gate.",
+  "buyer_proof_machinery": {
+    "template": "COMMERCIAL_LOOP/BUYER_ECONOMIC_QUESTIONNAIRE_TEMPLATE.json",
+    "intake_schema": "COMMERCIAL_LOOP/BUYER_FEEDBACK_INTAKE_SCHEMA.json",
+    "outreach_tracker": "COMMERCIAL_LOOP/BUYER_OUTREACH_TRACKER.json",
+    "rule": "Every MODELLED or BUYER_UNVERIFIED entry below MUST have a corresponding question in the buyer questionnaire. When a buyer responds, the entry is duplicated with status=BUYER_VERIFIED and the original entry is preserved as the 'pre-verification' state."
+  },
   "entries": [
     {
+      "entry_id": "EC-001",
       "package": "P-01",
       "claim": "30-50% of shunts fail from obstruction",
       "source": "Hydrocephalus Association, NIH NINDS statistics",
@@ -11,9 +19,13 @@
       "uncertainty": "±10% (varies by shunt type, patient age, follow-up duration)",
       "buyer_dependency": "Buyer's specific patient population and shunt model may differ",
       "buyer_verification": "PENDING",
+      "buyer_questionnaire_link": "Q-01 (current_failure_rate)",
+      "buyer_response": null,
+      "buyer_verified_date": null,
       "status": "EXTERNAL_SOURCE"
     },
     {
+      "entry_id": "EC-002",
       "package": "P-01",
       "claim": "$30K-$50K per avoided revision",
       "source": "Industry estimates for shunt revision surgery (hospital + surgeon + imaging + follow-up)",
@@ -22,9 +34,44 @@
       "uncertainty": "±30% (varies by country, insurance, complication rate)",
       "buyer_dependency": "Buyer's actual cost structure, reimbursement rates, complication rates",
       "buyer_verification": "PENDING",
+      "buyer_questionnaire_link": "Q-02 (current_cost_per_failure)",
+      "buyer_response": null,
+      "buyer_verified_date": null,
       "status": "BUYER_UNVERIFIED"
     },
     {
+      "entry_id": "EC-003",
+      "package": "P-01",
+      "claim": "P-01 prevents 50% of predicted obstructions (modelled)",
+      "source": "R277 simulator — graceful degradation confirmed, but obstruction prevention rate is HYPOTHESIS pending bench validation",
+      "date": "2026-08-25",
+      "calculation": "Simulator confirms system survives 24h under multi-segment failure. Whether this translates to clinical obstruction prevention is unverified.",
+      "uncertainty": "UNKNOWN — requires bench validation AND clinical trial",
+      "buyer_dependency": "Buyer's actual obstruction timecourse, patient physiology",
+      "buyer_verification": "PENDING",
+      "buyer_questionnaire_link": "Q-05 (measured_difference)",
+      "buyer_response": null,
+      "buyer_verified_date": null,
+      "status": "HYPOTHESIS"
+    },
+    {
+      "entry_id": "EC-004",
+      "package": "P-01",
+      "claim": "$12M/year avoided cost per 1000 patients (base case)",
+      "source": "MODELLED — derived from EC-001 × EC-002 × EC-003",
+      "date": "2026-08-25",
+      "calculation": "30% obstruction × $40K/revision × 50% prevention × 1000 patients = $6M/year (REVISED — original $12M assumed 100% prevention, simulator showed 50% is more realistic)",
+      "uncertainty": "±50% (compounding uncertainty from EC-001, EC-002, EC-003)",
+      "buyer_dependency": "All three input claims are buyer-dependent",
+      "buyer_verification": "PENDING",
+      "buyer_questionnaire_link": "Q-07 (verified_savings)",
+      "buyer_response": null,
+      "buyer_verified_date": null,
+      "status": "MODELLED",
+      "honest_label": "MODELLED SCENARIO — NOT ECONOMIC PROOF"
+    },
+    {
+      "entry_id": "EC-005",
       "package": "P-04",
       "claim": ">60% of NPH patients have Alzheimer's comorbidity",
       "source": "Literature on NPH-Alzheimer's overlap",
@@ -33,9 +80,13 @@
       "uncertainty": "±15% (varies by diagnostic criteria, population)",
       "buyer_dependency": "Buyer's patient population demographics",
       "buyer_verification": "PENDING",
+      "buyer_questionnaire_link": "Q-01 (analogous — current patient population)",
+      "buyer_response": null,
+      "buyer_verified_date": null,
       "status": "EXTERNAL_SOURCE"
     },
     {
+      "entry_id": "EC-006",
       "package": "P-04",
       "claim": "Leqembi cost $50K-$200K/patient/year",
       "source": "Leqembi (lecanemab) pricing 2024",
@@ -44,9 +95,29 @@
       "uncertainty": "±30% (varies by country, insurance, dosing)",
       "buyer_dependency": "Buyer's market and reimbursement landscape",
       "buyer_verification": "PENDING",
+      "buyer_questionnaire_link": "Q-02 (analogous — current standard of care cost)",
+      "buyer_response": null,
+      "buyer_verified_date": null,
       "status": "EXTERNAL_SOURCE"
     },
     {
+      "entry_id": "EC-007",
+      "package": "P-04",
+      "claim": "P-04 clears 20% of Aβ → $10K-$40K/patient/year value (modelled)",
+      "source": "MODELLED — depends on enzyme engineering program success",
+      "date": "2026-08-25",
+      "calculation": "20% × $50K-$200K Leqembi cost = $10K-$40K/patient/year",
+      "uncertainty": "EXTREME — biology is unfrozen, 20% clearance is HYPOTHESIS",
+      "buyer_dependency": "All of biology + buyer's market",
+      "buyer_verification": "PENDING",
+      "buyer_questionnaire_link": "Q-05 (analogous — do you believe 20% clearance is plausible?)",
+      "buyer_response": null,
+      "buyer_verified_date": null,
+      "status": "MODELLED_HIGHLY_SPECULATIVE",
+      "honest_label": "MODELLED SCENARIO — NOT ECONOMIC PROOF. If biology fails, value = $0."
+    },
+    {
+      "entry_id": "EC-008",
       "package": "P-09",
       "claim": "Battery replacement surgery $15K-$30K",
       "source": "Industry estimates for implantable battery replacement",
@@ -55,9 +126,29 @@
       "uncertainty": "±30%",
       "buyer_dependency": "Buyer's actual surgery cost",
       "buyer_verification": "PENDING",
+      "buyer_questionnaire_link": "Q-02 (analogous)",
+      "buyer_response": null,
+      "buyer_verified_date": null,
       "status": "BUYER_UNVERIFIED"
     },
     {
+      "entry_id": "EC-009",
+      "package": "P-09",
+      "claim": "$267M/year avoided cost (base case, IF molecule is found)",
+      "source": "MODELLED — depends on entire research program success",
+      "date": "2026-08-25",
+      "calculation": "100K patients × $20K/surgery ÷ 7.5 years = $267M/year",
+      "uncertainty": "EXTREME — molecule is unspecified, may not exist",
+      "buyer_dependency": "All of chemistry + buyer's market",
+      "buyer_verification": "PENDING",
+      "buyer_questionnaire_link": "Q-07 (analogous — verified savings, IF research succeeds)",
+      "buyer_response": null,
+      "buyer_verified_date": null,
+      "status": "MODELLED_HIGHLY_SPECULATIVE",
+      "honest_label": "MODELLED SCENARIO — NOT ECONOMIC PROOF. If molecule research fails, value = $0."
+    },
+    {
+      "entry_id": "EC-010",
       "package": "P-01/P-04/P-09",
       "claim": "Package price $50K-$500K+",
       "source": "CEO indicative pricing (R275)",
@@ -66,7 +157,25 @@
       "uncertainty": "±50% (market-dependent, buyer-dependent)",
       "buyer_dependency": "Buyer's budget, perceived value, competitive alternatives",
       "buyer_verification": "PENDING (no buyer conversations yet)",
+      "buyer_questionnaire_link": "Q-08 (buyer_wtp)",
+      "buyer_response": null,
+      "buyer_verified_date": null,
       "status": "HYPOTHESIS"
     }
-  ]
+  ],
+
+  "summary_R277": {
+    "total_economic_claims": 10,
+    "verified": 0,
+    "external_source": 3,
+    "buyer_unverified": 2,
+    "modelled": 2,
+    "modelled_highly_speculative": 2,
+    "hypothesis": 1,
+    "buyer_conversations_started": 0,
+    "buyer_responses_received": 0,
+    "buyer_verified_claims": 0,
+    "transactions": 0,
+    "honest_label": "ALL economics are MODELLED or UNVERIFIED. NONE are economically proven. The buyer questionnaire is the gate."
+  }
 }

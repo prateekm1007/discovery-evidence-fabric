@@ -1,0 +1,84 @@
+{
+  "package_id": "P-01",
+  "artifact": "reproducibility_check",
+  "version": "1.0.0",
+  "status": "PRE_REGISTERED",
+  "purpose": "Sanity checks the external lab runs BEFORE formal validation, to verify their setup matches ours.",
+
+  "checks": [
+    {
+      "id": "RC-01",
+      "name": "Simulator reproducibility",
+      "method": "Run `python 05_simulator.py --all-scenarios` on lab's machine. Compare to p01_simulator_results_ALLSCENARIOS.json.",
+      "pass_criterion": "All metrics within ±5% of pre-registered values. Specifically: P_ICP peaks within ±1 mmHg, isolation counts within ±1, survival verdict matches.",
+      "on_fail": "Investigate Python version, random seed handling. Do not proceed with bench validation until simulator reproduces."
+    },
+    {
+      "id": "RC-02",
+      "name": "Bench pump calibration",
+      "method": "Measure pump output volume over 1 hour. Compare to setpoint (0.30 mL/min).",
+      "pass_criterion": "Measured flow within ±5% of setpoint (0.285 - 0.315 mL/min).",
+      "on_fail": "Recalibrate pump. CSF production rate is the most critical parameter — cannot proceed without accurate flow."
+    },
+    {
+      "id": "RC-03",
+      "name": "Pressure sensor calibration",
+      "method": "Apply known hydrostatic pressure (water column of known height). Compare to sensor reading.",
+      "pass_criterion": "Sensor reading within ±0.5 mmHg of known pressure across range 0-30 mmHg.",
+      "on_fail": "Recalibrate or replace sensor."
+    },
+    {
+      "id": "RC-04",
+      "name": "Flow sensor calibration",
+      "method": "Pump known flow rate through sensor. Compare to sensor reading.",
+      "pass_criterion": "Sensor reading within ±0.05 mL/min of known flow across range 0-0.5 mL/min.",
+      "on_fail": "Recalibrate or replace sensor."
+    },
+    {
+      "id": "RC-05",
+      "name": "Valve response time",
+      "method": "Command valve from 0% to 100%. Measure time to reach 95% of commanded opening.",
+      "pass_criterion": "Response time < 1 second (per spec).",
+      "on_fail": "Replace valve driver or valve."
+    },
+    {
+      "id": "RC-06",
+      "name": "Valve linearity",
+      "method": "Command valve to 25%, 50%, 75%, 100%. Measure effective conductance at each.",
+      "pass_criterion": "Conductance scales linearly with command (R^2 > 0.95).",
+      "on_fail": "Recalibrate valve command mapping. If non-linear, fit a calibration curve."
+    },
+    {
+      "id": "RC-07",
+      "name": "Leak test",
+      "method": "Pressurize system to 20 mmHg with all valves closed. Monitor for 1 hour.",
+      "pass_criterion": "Pressure drop < 1 mmHg over 1 hour.",
+      "on_fail": "Locate and fix leak. Cannot proceed with validation if system leaks."
+    },
+    {
+      "id": "RC-08",
+      "name": "Temperature stability",
+      "method": "Monitor water bath temperature over 24 hours.",
+      "pass_criterion": "Temperature stable at 37°C ± 0.5°C for 24 hours.",
+      "on_fail": "Service water bath heater."
+    },
+    {
+      "id": "RC-09",
+      "name": "Data acquisition sync",
+      "method": "Generate known signal (1 Hz sine wave) on all sensor channels. Verify timestamps align.",
+      "pass_criterion": "All channels sample within ±10 ms of each other.",
+      "on_fail": "Fix data acquisition timing."
+    },
+    {
+      "id": "RC-10",
+      "name": "Software environment snapshot",
+      "method": "Record Python version, OS, library versions. Compare to package owner's environment.",
+      "pass_criterion": "Python 3.8+. No external library dependencies. Should run anywhere.",
+      "on_fail": "Document environment differences. May or may not affect results."
+    }
+  ],
+
+  "all_checks_must_pass": "Formal validation cannot begin until RC-01 through RC-10 all pass. Any failure must be documented and resolved before proceeding.",
+
+  "check_log_required": "Lab must record date, technician, pass/fail status, and any deviations for each check. Log is part of validation package."
+}

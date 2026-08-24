@@ -1,0 +1,38 @@
+{
+  "package_id": "P-04",
+  "freeze_item": "08_pulsation_sync_mechanism",
+  "status": "FROZEN",
+  "rationale": "Pulsation synchronization mechanism is engineering, not biology. Frozen based on off-the-shelf components.",
+
+  "frozen_specification": {
+    "sensor": {
+      "type": "Flow sensor at proximal catheter (existing P-01 sensor)",
+      "sample_rate_hz": 100,
+      "rationale": "Need 100 Hz to resolve cardiac pulsation (0.5-2 Hz fundamental, plus harmonics up to ~10 Hz)"
+    },
+    "phase_detector": {
+      "algorithm": "Bandpass filter 0.5-5 Hz + zero-crossing detector + phase-locked loop",
+      "outputs": "Current phase angle (0-360 deg), instantaneous flow rate, predicted next-diastole timestamp",
+      "implementation": "Software on controller MCU, runs at 100 Hz"
+    },
+    "actuator": {
+      "type": "Variable orifice valve (existing P-01 valve, repurposed)",
+      "synchronization_strategy": "Open valve wider during diastole (low-flow phase, tau extended), close partially during systole (high-flow phase, drainage maintained).",
+      "command_rate_hz": 10,
+      "rationale": "10 Hz valve update is sufficient to track 2 Hz pulsation (5x oversampling)"
+    },
+    "controller_tuning": {
+      "phase_lead_sec": 0.05,
+      "rationale": "Compensate for actuator delay (1 sec per spec) and fluid transport delay (~50 ms).",
+      "status": "MODEL_DERIVED — bench tuning required"
+    }
+  },
+
+  "frozen_at_date": "2026-08-25",
+  "frozen_at_round": "R277",
+
+  "what_is_frozen": "The mechanism architecture (sensor -> phase detector -> synchronized actuator). Reuses P-01 hardware.",
+  "what_is_NOT_frozen": "Phase lead tuning constant. Must be measured on bench.",
+
+  "constitutional_basis": "Article XXVII — phase lead is MODEL_DERIVED with explicit provenance. Article XXVIII — frozen architecture does not promote to VALIDATED."
+}

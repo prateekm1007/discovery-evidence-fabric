@@ -1,0 +1,51 @@
+{
+  "package_id": "P-09",
+  "spec_step": "06_external_sensor",
+  "status": "BLOCKED — depends on step 1 (molecule)",
+  "purpose": "Specify the wearable biosensor that detects the molecule at the body surface (scalp, lumbar, or wrist).",
+
+  "specification": {
+    "detection_limit_nm": "<= 10",
+    "selectivity_ratio": ">= 100x against common interferents (glucose, lactate, Na+, K+, Ca2+, urea, creatinine)",
+    "response_time_sec": "<= 30",
+    "form_factor": "Wearable patch (similar to CGM), <50g, <5cm x 5cm",
+    "power_consumption_mw": "<= 5 (must run for 7+ days on a coin cell)",
+    "drift_percent_per_day": "<= 1",
+    "operating_temperature_c": "30-40 (skin temperature)"
+  },
+
+  "candidate_sensor_technologies": [
+    {
+      "name": "Electrochemical aptamer-based sensor",
+      "principle": "Aptamer specific to molecule, immobilized on electrode, binding changes electron transfer",
+      "commercial_reference": "Similar to existing continuous glucose monitors (Abbott Freestyle Libre uses glucose oxidase electrochemistry)",
+      "evidence_for": "Highly selective. Tunable to any molecule by aptamer selection.",
+      "evidence_against": "Aptamer selection is 6-12 month process per molecule. Chronic stability unproven for non-glucose targets.",
+      "status": "PROMISING but requires per-molecule aptamer development"
+    },
+    {
+      "name": "Optical fluorescence sensor",
+      "principle": "If molecule is fluorescent, wearable LED + photodetector measures fluorescence through skin",
+      "evidence_for": "Highly sensitive. Existing CGMs use similar optical approaches.",
+      "evidence_against": "Requires molecule to be fluorescent (constrains step 1). Skin autofluorescence interferes.",
+      "status": "PROMISING if molecule is fluorescent"
+    },
+    {
+      "name": "Mass-sensitive (QCM, SAW)",
+      "principle": "Molecule binds to surface, changes resonant frequency",
+      "evidence_against": "Likely not sensitive enough at nM concentrations in complex biological matrix",
+      "status": "LIKELY UNSUITABLE"
+    },
+    {
+      "name": "Lateral flow (single-use)",
+      "principle": "Capillary flow strip with antibody-antigen reaction",
+      "evidence_against": "Single-use, not continuous. P-09 requires continuous monitoring.",
+      "status": "UNSUITABLE"
+    }
+  ],
+
+  "what_unfreezes_this": "Step 1 (molecule). Sensor selection depends on molecule properties (fluorescent? antigenic? electroactive?).",
+
+  "estimated_time_to_unblock": "6-12 months after molecule selected (aptamer development or optical sensor optimization)",
+  "status_provenance": "MODEL_DERIVED from biosensor engineering"
+}

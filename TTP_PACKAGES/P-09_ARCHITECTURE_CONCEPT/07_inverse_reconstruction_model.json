@@ -1,0 +1,32 @@
+{
+  "package_id": "P-09",
+  "spec_step": "07_inverse_reconstruction_model",
+  "status": "BLOCKED — depends on steps 1-6",
+  "purpose": "Specify the algorithm that converts wearable sensor readings back to estimated ICP.",
+
+  "specification": {
+    "model_form": "Bayesian inverse model. P(ICP_t | C_t, C_{t-1}, C_{t-2}, ...) where C = measured concentration",
+    "must_account_for": [
+      "Release kinetics (step 3) — forward model R(P)",
+      "Transport delay (step 4) — convolution with transport kernel",
+      "Clearance (step 5) — exponential decay convolution",
+      "Sensor noise (step 8) — Gaussian measurement noise",
+      "Patient-specific parameters — calibrated at baseline (initial implant)"
+    ],
+    "calibration_procedure": "On implantation, perform controlled ICP challenge (e.g., head-up tilt test). Measure sensor response. Fit patient-specific transport delay and clearance rate.",
+    "accuracy_target_mmhg": "+/- 3 (so that clinically meaningful ICP changes of >5 mmHg are detectable)",
+    "update_rate_hz": "0.1 (one ICP estimate every 10 seconds — sufficient for clinical decisions)"
+  },
+
+  "what_unfreezes_this": "Steps 1-6 fully resolved (molecule, release kinetics, transport, clearance, sensor).",
+
+  "implementation_required": [
+    "Forward model implementation (Python or C)",
+    "Bayesian inverse solver (e.g., particle filter, extended Kalman filter, or variational inference)",
+    "Patient calibration algorithm",
+    "Validation against gold-standard invasive ICP measurement (intraventricular catheter)"
+  ],
+
+  "estimated_time_to_unblock": "3-6 months after steps 1-6 resolved",
+  "status_provenance": "MODEL_DERIVED from signal processing + Bayesian inference"
+}

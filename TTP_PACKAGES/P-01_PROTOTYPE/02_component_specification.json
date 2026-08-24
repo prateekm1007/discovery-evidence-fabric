@@ -1,0 +1,98 @@
+{
+  "package_id": "P-01",
+  "artifact": "02_component_specification",
+  "version": "1.1.0",
+  "status": "SPECIFIED_COMMERCIAL_OFF_THE_SHELF_FOR_BENCH",
+  "constitutional_basis": "Article XXVII — every threshold has provenance. Component specs cite commercial part numbers where possible.",
+
+  "segments": [
+    {
+      "component": "Proximal catheter (ventricular)",
+      "function": "CSF access from ventricle to manifold",
+      "spec": "Medical-grade silicone, ID 1.2 mm, OD 2.5 mm, length 8-12 cm (patient-specific)",
+      "commercial_reference": "Medtronic Codman Certas standard proximal catheter (similar dimensions)",
+      "status": "EXTERNAL_SOURCE",
+      "notes": "Existing component. No new development needed for bench prototype."
+    },
+    {
+      "component": "Multi-lumen manifold",
+      "function": "Splits CSF from proximal catheter into N=4 segment channels",
+      "spec": "Bench: machined acrylic block with 4 outlets, each with variable-orifice valve seat. Implantable: medical-grade silicone multi-lumen extrusion.",
+      "commercial_reference": "Bench: custom machined. Implantable: none — custom extrusion required.",
+      "status": "BENCH_READY (acrylic); HYPOTHESIS (implantable extrusion)",
+      "notes": "Manifold design is bench-trivial; implantable extrusion is a 6-12 month development task."
+    },
+    {
+      "component": "Variable-orifice valve (per segment)",
+      "function": "Modulates segment flow 0-100%",
+      "spec_bench": "Solenoid-actuated pinch valve, N=4, response time <500 ms, 0-100% open in 32 steps",
+      "commercial_reference_bench": "Takasago RK-1 pinch valve, or equivalent; ~$200/unit, $800 for 4",
+      "spec_implantable": "MEMS variable orifice, <100 uL volume, <1 mW actuation power, 5-year fatigue life",
+      "commercial_reference_implantable": "None — custom MEMS development required",
+      "status": "BENCH_READY (pinch valve); HYPOTHESIS (MEMS implantable)",
+      "notes": "Bench valve is COTS. Implantable MEMS valve is the single biggest engineering risk."
+    },
+    {
+      "component": "Distal catheter (peritoneal)",
+      "function": "Drainage from manifold to peritoneum",
+      "spec": "Medical-grade silicone, ID 1.5 mm, OD 3.0 mm, length 30-50 cm",
+      "commercial_reference": "Standard distal shunt catheter (Medtronic, Integra, Sophysa)",
+      "status": "EXTERNAL_SOURCE"
+    }
+  ],
+
+  "electronics": [
+    {
+      "component": "Microcontroller",
+      "function": "Runs control algorithm at 1 Hz",
+      "spec": "ARM Cortex-M0+ class, <1 mW active, 32 kB flash, 8 kB RAM, hardware FPU preferred",
+      "commercial_reference": "STM32L011, NXP LPC802, or equivalent",
+      "status": "EXTERNAL_SOURCE"
+    },
+    {
+      "component": "Sensor ADC",
+      "function": "Digitizes pressure and flow sensor signals",
+      "spec": "16-bit, 8-channel, 100 Hz sample rate per channel",
+      "commercial_reference": "TI ADS1115 (bench) or integrated in MCU (implantable)",
+      "status": "EXTERNAL_SOURCE"
+    },
+    {
+      "component": "Valve driver",
+      "function": "Drives solenoid/MEMS valves",
+      "spec": "H-bridge per channel, 100 mA drive, current-limited",
+      "commercial_reference": "TI DRV8833 (bench); implantable: custom IC",
+      "status": "EXTERNAL_SOURCE (bench); HYPOTHESIS (implantable IC)"
+    },
+    {
+      "component": "Power (bench)": 
+        "spec": "USB power, 5V/500mA",
+        "status": "EXTERNAL_SOURCE"
+    },
+    {
+      "component": "Power (implantable)",
+      "spec": "Primary cell, 3V, 200 mAh, 5-year life at 1 mW average load = 43.8 mWh/year consumed vs 600 mWh capacity. Margin: 13.7x.",
+      "commercial_reference": "Saft LM-175 (lithium thionyl chloride)",
+      "status": "EXTERNAL_SOURCE (cell); HYPOTHESIS (hermetic packaging for chronic implant)"
+    }
+  ],
+
+  "software": [
+    {
+      "component": "Control firmware",
+      "spec": "C on Cortex-M0+, runs 1 Hz loop, implements dual_invariant_allocator (see 04_control_algorithm.json)",
+      "status": "MODELLED (Python reference impl in 05_simulator.py); PORT_TO_C required for implantable"
+    },
+    {
+      "component": "Telemetry",
+      "spec": "Bench: USB serial. Implantable: MICS-band RF telemetry (402-405 MHz), 30 cm range.",
+      "status": "EXTERNAL_SOURCE (bench); HYPOTHESIS (implantable RF — requires FCC/ETSI compliance)"
+    }
+  ],
+
+  "bill_of_materials_bench_v1": {
+    "summary": "4x pressure sensors + 4x flow sensors + 4x pinch valves + MCU + ADC + manifold + catheters + bench frame",
+    "estimated_cost_usd": "3000-5000",
+    "estimated_build_time_months": "3-6",
+    "status": "ESTIMATE"
+  }
+}

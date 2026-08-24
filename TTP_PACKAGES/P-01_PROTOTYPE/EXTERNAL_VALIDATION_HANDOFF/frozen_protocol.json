@@ -1,0 +1,49 @@
+{
+  "package_id": "P-01",
+  "artifact": "frozen_protocol",
+  "version": "1.0.0",
+  "status": "FROZEN",
+  "protocol_steps": [
+    {
+      "step": 1,
+      "action": "Verify frozen_design.json hashes match files received",
+      "pass_criterion": "All SHA-256 hashes match. If any mismatch, STOP and contact package owner."
+    },
+    {
+      "step": 2,
+      "action": "Reproduce simulator results on lab's own machine",
+      "command": "python 05_simulator.py --all-scenarios",
+      "expected_output_file": "p01_simulator_results_ALLSCENARIOS.json",
+      "pass_criterion": "Lab's results match our pre-registered results within +/- 5% on all metrics. If not, lab's Python environment differs from ours — investigate before proceeding."
+    },
+    {
+      "step": 3,
+      "action": "Build V0 bench prototype per 06_bench_prototype_design.json",
+      "estimated_time_months": "3-6",
+      "estimated_cost_usd": "3000-5000"
+    },
+    {
+      "step": 4,
+      "action": "Run reproducibility checks (see reproducibility_check.json)",
+      "pass_criterion": "All reproducibility checks pass before formal validation begins."
+    },
+    {
+      "step": 5,
+      "action": "Run formal validation: 6 scenarios × 5 seeds = 30 bench runs",
+      "scenarios": ["healthy", "mild_1_of_4", "adversarial_2_of_4", "catastrophic_4_of_4", "sensor_failure", "actuator_failure"],
+      "duration_per_run_hours": 24,
+      "total_bench_hours": 720
+    },
+    {
+      "step": 6,
+      "action": "Submit results using result_submission_schema.json",
+      "format": "JSON file with per-run metrics, uploaded to shared repository"
+    },
+    {
+      "step": 7,
+      "action": "Independent analysis: lab computes whether pre-registered acceptance criteria (08_acceptance_criteria.json) are met",
+      "rule": "Lab does NOT consult package owner during analysis. Results are reported as PASS/FAIL against each AC."
+    }
+  ],
+  "blinding": "See blind_evaluation.md for blinding protocol. Lab should not know which seed produced which result until after analysis is complete."
+}

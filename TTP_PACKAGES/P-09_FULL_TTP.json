@@ -1,73 +1,84 @@
 {
   "package_id": "P-09",
   "name": "Chemical ICP Transduction Platform",
-  "version": "1.0.0",
-  "evidence_loop_state": "DESIGNED",
-  "indicative_price": "$500K+",
-  "target_buyer": "Neuro-monitoring company (Raumedic, Codman, Integra)",
+  "version": "1.2.0",
+  "evidence_loop_state": "ARCHITECTURE_CONCEPT",
+  "previous_state_R276": "DESIGNED",
+  "downgrade_R277_rationale": "CEO directive R277: 'Do not call it full-build ready yet. First solve: What molecule encodes ICP?' The molecule is UNSPECIFIED. Per constitution Articles XXV and XXVIII, cannot promote 'architecture' to 'prototype' or 'buildable' without the molecule. P-09 is now correctly labeled ARCHITECTURE_CONCEPT.",
+  "indicative_price": "$500K+ (HONEST RE-ASSESSMENT: this is the price of an architecture + research direction, NOT a buildable technology. Buyer is funding research.)",
+  "target_buyer": "Neuro-monitoring company (Raumedic, Codman, Integra) willing to fund research, not acquire a product",
+  "the_decisive_question": "What molecule encodes ICP?",
+  "answer": "UNRESOLVED. 0 of 9 specification steps resolved. All blocked on step 1 (molecule design). See P-09_ARCHITECTURE_CONCEPT/ for the 9-step path.",
   "1_executive_technology_brief": {
     "what_it_does": "Converts intracranial pressure (ICP) into a chemical molecular signal in CSF, detectable by a wearable biosensor — eliminating all electronics, batteries, and RF from the intracranial implant.",
     "why_it_matters": "Current ICP monitors require batteries (replacement surgery) and electronics in the brain (infection risk, RF interference). This platform eliminates all intracranial electronics.",
     "technical_differentiator": "Genuinely new communication channel: chemical molecular signaling through CSF. No prior implant uses chemistry instead of electronics for ICP monitoring.",
-    "status": "HYPOTHESIS"
+    "honest_disclosure_R277": "This is the HIGHEST-RISK, HIGHEST-DIFFERENTIATION package. The architecture is novel and defensible. But the molecule is UNSPECIFIED. The 9-step specification path (P-09_ARCHITECTURE_CONCEPT/) is blocked on step 1 (molecule design). The buyer is purchasing an architecture + research direction + 9-step specification path, NOT a buildable technology. There is a non-trivial probability that NO viable molecule exists.",
+    "status": "ARCHITECTURE_CONCEPT"
   },
   "2_mechanism_dossier": {
     "causal_chain": "ICP changes → mechanical deformation of implant transducer → release rate of synthetic molecule changes proportionally → molecule transported through CSF → wearable biosensor detects concentration → ICP reconstructed remotely",
     "operating_states": "Normal ICP: baseline release. Elevated ICP: increased release (proportional to pressure). Decreased ICP: decreased release.",
-    "status": "HYPOTHESIS"
+    "9_step_specification_path": "See P-09_ARCHITECTURE_CONCEPT/architecture_concept_status.json. 0 of 9 steps resolved. All blocked on step 1 (molecule).",
+    "status": "ARCHITECTURE_CONCEPT"
   },
   "3_system_architecture": {
     "subsystems": [
-      "ICP-responsive molecular release transducer (implant, zero electronics)",
-      "CSF transport medium (existing physiology)",
-      "Wearable biosensor (external, detects molecule)",
-      "Signal reconstruction algorithm (converts concentration to ICP)"
+      "ICP-responsive molecular release transducer (implant, zero electronics) — BLOCKED on molecule design",
+      "CSF transport medium (existing physiology) — MODELLED, requires molecule-specific simulation",
+      "Wearable biosensor (external, detects molecule) — BLOCKED on molecule (sensor depends on what it's sensing)",
+      "Signal reconstruction algorithm (converts concentration to ICP) — BLOCKED on forward model"
     ],
-    "status": "HYPOTHESIS"
+    "status": "ARCHITECTURE_CONCEPT"
   },
   "4_engineering_specification": {
-    "molecule": "UNSPECIFIED — requires medicinal chemistry program to design: ICP-proportional release, CSF biocompatibility, wearable-detectable specificity, metabolic inertness, clearance half-life suitable for ICP monitoring (minutes-hours). Status: MISSING.",
-    "transducer": "Mechanical-to-chemical transducer. ICP deforms a membrane, changing release rate. Status: HYPOTHESIS.",
-    "sensor": "Wearable biosensor detecting target molecule at nanomolar concentration in CSF-equilibrated interstitial fluid. Status: HYPOTHESIS.",
-    "status": "MISSING"
+    "molecule": "UNSPECIFIED — see P-09_ARCHITECTURE_CONCEPT/01_molecule_design_requirements.json for the 7 functional requirements (FR-01 through FR-07) and 5 candidate molecule classes. Requires 12-24 months of medicinal chemistry research to resolve.",
+    "transducer": "Mechanical-to-chemical transducer. Three options: deformable porous membrane (ENGINEERABLE), phase-change (RESEARCH), mechanophore (RESEARCH). See P-09_ARCHITECTURE_CONCEPT/03_release_kinetics.json.",
+    "sensor": "Wearable biosensor detecting target molecule at nanomolar concentration. Three candidates: electrochemical aptamer (PROMISING), optical fluorescence (PROMISING if molecule fluorescent), mass-sensitive (LIKELY UNSUITABLE). See P-09_ARCHITECTURE_CONCEPT/06_external_sensor.json.",
+    "status": "ARCHITECTURE_CONCEPT"
   },
   "5_prototype_blueprint": {
-    "v1_prototype": "Bench-top: pressure chamber + molecular release device + sampling + concentration assay. Prove ICP-to-concentration relationship.",
-    "what_to_build_first": "Design the molecule. Without a specific molecule, no prototype is possible. This is a medicinal chemistry task, not an engineering task.",
-    "status": "MISSING"
+    "v1_prototype": "BLOCKED. Cannot specify prototype until molecule is designed. Without molecule, no prototype is possible.",
+    "what_to_build_first": "Molecule design. This is a medicinal chemistry research task, NOT an engineering task. See P-09_ARCHITECTURE_CONCEPT/01_molecule_design_requirements.json.",
+    "estimated_build_time": "12-24 months to molecule decision (may conclude 'no viable molecule'). Then 12-24 months for transducer + sensor development. Then 24-48 months pre-clinical. Then 36-60 months clinical. Then 24 months PMA. Total: 8-14 years to market IF molecule is found.",
+    "status": "BLOCKED"
   },
   "6_reference_implementation": {
-    "status": "MISSING"
+    "status": "BLOCKED — cannot build simulator without molecule and forward model"
   },
   "7_experimental_protocol": {
-    "test_1": "Bench: prove ICP-to-molecule-release proportional relationship.",
-    "test_2": "CSF transport: prove molecule reaches detectable concentration at lumbar/subcutaneous site within clinically useful time.",
-    "test_3": "Wearable sensor: prove detection at target concentration with required specificity.",
-    "test_4": "Chronic: prove molecule is biocompatible, metabolically inert, and stable over >5 years.",
-    "status": "MISSING"
+    "test_1_to_test_4": "ALL BLOCKED. No molecule, no prototype, no test protocol.",
+    "what_can_be_done_now": "Expert architecture concept review (4-8 weeks, $10-50K). Literature feasibility study (8-12 weeks, $30-80K). See P-09_ARCHITECTURE_CONCEPT/EXTERNAL_VALIDATION_HANDOFF/.",
+    "status": "BLOCKED"
   },
   "8_validation_evidence": {
     "existing_evidence": [
       {
-        "claim": "Genuinely new communication channel",
-        "status": "HYPOTHESIS"
+        "claim": "Genuinely new communication channel (chemical molecular signaling for ICP)",
+        "status": "HYPOTHESIS — architecture is novel, implementation is unproven"
       },
       {
         "claim": "No prior art found for molecular ICP signaling",
         "source": "R270/R272 assessment (training-knowledge-based, NOT live search)",
-        "status": "HYPOTHESIS"
+        "status": "HYPOTHESIS — must be confirmed by live patent search"
+      },
+      {
+        "claim": "9-step specification path defined",
+        "source": "R277 P-09_ARCHITECTURE_CONCEPT/",
+        "status": "VERIFIED — path is specified, but 0 of 9 steps resolved"
       }
     ],
     "missing_evidence": [
-      "Specific molecule design",
+      "Specific molecule design (BLOCKING)",
       "Bench prototype",
-      "CSF transport modeling",
-      "Wearable sensor development",
+      "CSF transport modeling (blocked on molecule)",
+      "Wearable sensor development (blocked on molecule)",
       "Chronic biocompatibility",
       "Independent validation",
       "Live patent search"
     ],
-    "status": "MISSING"
+    "independent_validation_plan": "Send P-09_ARCHITECTURE_CONCEPT/EXTERNAL_VALIDATION_HANDOFF/ to expert consultant for architecture concept review and literature feasibility study. Full technical validation requires molecule design first.",
+    "status": "ARCHITECTURE_REVIEW_READY_TECHNICAL_VALIDATION_BLOCKED"
   },
   "9_economic_model": {
     "cost_removed": {
@@ -75,16 +86,18 @@
       "amount": "$15K-$30K per surgery, every 5-10 years",
       "source": "Industry estimates for implantable battery replacement",
       "status": "BUYER_UNVERIFIED",
-      "buyer_verification": "PENDING"
+      "buyer_verification": "PENDING — see COMMERCIAL_LOOP/BUYER_ECONOMIC_QUESTIONNAIRE_TEMPLATE.json"
     },
     "sensitivity_analysis": {
+      "honest_label": "MODELLED SCENARIO — NOT ECONOMIC PROOF. Highly speculative because molecule is unresolved. If molecule is found AND system works: $267M/year avoided cost. If molecule is NOT found: $0.",
       "base_case": "100K patients × $20K/surgery ÷ 7.5 years = $267M/year avoided cost. Package $500K = 0.002x annual avoided cost.",
-      "status": "MODELLED"
+      "critical_caveat": "This entire model assumes the molecule research program succeeds. Probability of success is unknown — could be 5%, could be 50%. Buyer must treat this as a research investment with uncertain return.",
+      "status": "MODELLED_HIGHLY_SPECULATIVE"
     },
-    "status": "MODELLED"
+    "status": "MODELLED_HIGHLY_SPECULATIVE"
   },
   "10_ip_differentiation_dossier": {
-    "what_we_believe_is_distinctive": "Chemical molecular communication channel for ICP monitoring. Zero electronics in brain.",
+    "what_we_believe_is_distinctive": "Chemical molecular communication channel for ICP monitoring. Zero electronics in brain. ARCHITECTURE is novel and defensible. Implementation depends on molecule — patentability of the molecule and the transducer will depend on what is selected.",
     "known_adjacent_technology": [
       "RF telemetry ICP implants (Raumedic, Codman)",
       "Molecular communication in synthetic biology (research)",
@@ -92,22 +105,24 @@
     ],
     "where_counsel_should_investigate": [
       "Is chemical molecular ICP signaling patentable as a communication method?",
-      "Is the specific molecule patentable once designed?"
+      "Is the specific molecule patentable once designed?",
+      "Is the transducer mechanism patentable?"
     ],
-    "honest_disclosure": "This is the HIGHEST-RISK, HIGHEST-DIFFERENTIATION package. The molecule is UNSPECIFIED. The architecture is novel but UNVALIDATED. The buyer is purchasing a concept + architecture + design path, NOT a validated product.",
-    "status": "HYPOTHESIS"
+    "honest_disclosure": "This is the HIGHEST-RISK, HIGHEST-DIFFERENTIATION package. The molecule is UNSPECIFIED. The architecture is novel but UNVALIDATED. The buyer is purchasing a concept + architecture + 9-step design path + research direction, NOT a validated product.",
+    "status": "ARCHITECTURE_CONCEPT"
   },
   "11_regulatory_standards_map": {
     "likely_classification": "Class III (implantable). Novel mechanism — likely requires De Novo or PMA.",
     "unresolved_questions": [
       "How does FDA classify a chemical-signaling implant?",
-      "What safety data is needed for chronic molecular release into CSF?"
+      "What safety data is needed for chronic molecular release into CSF?",
+      "If molecule is novel, does it require NDA (new drug application) in addition to device PMA?"
     ],
     "status": "HYPOTHESIS"
   },
   "12_manufacturing_transfer_plan": {
-    "estimated_development_path": "Molecule design (12-24mo) → Bench prototype (6-12mo) → Pre-clinical (24-48mo) → Clinical (36-60mo) → PMA (24mo). Total: 8-14 years to market.",
-    "status": "HYPOTHESIS"
+    "estimated_development_path": "Molecule design (12-24mo, $1-5M) → Bench prototype (6-12mo) → Pre-clinical (24-48mo) → Clinical (36-60mo) → PMA (24mo). Total: 8-14 years to market. Probability of reaching market: UNKNOWN.",
+    "status": "BLOCKED"
   },
   "13_safety_package": {
     "hazards": [
@@ -116,11 +131,11 @@
       "Sensor failure (no data — fallback to standard external ICP measurement)"
     ],
     "safe_states": "If system fails → patient has NO ICP monitoring (same as no implant). Must NOT interfere with standard shunt drainage.",
-    "status": "MISSING"
+    "status": "BLOCKED"
   },
   "14_integration_package": {
     "how_it_plugs_in": "Transducer integrated into shunt reservoir. Wearable sensor is separate device. No modification to shunt drainage function.",
-    "status": "HYPOTHESIS"
+    "status": "ARCHITECTURE_CONCEPT"
   },
   "15_provenance_ledger": {
     "claims": [
@@ -136,23 +151,38 @@
       },
       {
         "claim": "Molecule unspecified",
-        "source": "R270/R272 audit",
+        "source": "R270/R272 audit + R277 downgrade",
+        "status": "VERIFIED — molecule is genuinely unspecified"
+      },
+      {
+        "claim": "9-step specification path defined",
+        "source": "R277 P-09_ARCHITECTURE_CONCEPT/",
         "status": "VERIFIED"
+      },
+      {
+        "claim": "0 of 9 specification steps resolved",
+        "source": "R277",
+        "status": "VERIFIED — honestly blocked"
       },
       {
         "claim": "Battery replacement cost $15K-$30K",
         "source": "Industry estimates",
         "status": "BUYER_UNVERIFIED"
+      },
+      {
+        "claim": "P-09 is ARCHITECTURE_CONCEPT, not PROTOTYPE_READY",
+        "source": "R277 downgrade per CEO directive",
+        "status": "VERIFIED"
       }
     ],
     "status": "VERIFIED"
   },
   "buyer_executable": {
-    "engineer_build_first": "Design the molecule. This is a medicinal chemistry task. Without the molecule, nothing else can be built.",
-    "scientist_run_experiment": "Test 1: ICP-to-release proportional relationship in bench pressure chamber. Test 2: CSF transport to wearable detection site.",
-    "cfo_economics": "Eliminates battery replacement surgery ($15K-$30K, every 5-10 years). If 100K patients: $267M/year avoided cost. Package $500K = 0.002x annual value.",
+    "engineer_build_first": "BLOCKED. Nothing can be built until molecule is designed. This is a medicinal chemistry research task.",
+    "scientist_run_experiment": "BLOCKED. No experiment can be run without molecule.",
+    "cfo_economics": "HONEST: modelled economics are highly speculative. If molecule research succeeds: $267M/year avoided cost. If molecule research fails: $0. Buyer must treat this as research investment with uncertain return.",
     "ip_counsel_uncertainties": "Is chemical molecular ICP signaling patentable? Is the specific molecule patentable once designed? What is the FTO landscape for molecular communication implants?",
-    "regulatory_team": "Novel mechanism — De Novo or PMA. Chronic molecular release safety data needed. No existing regulatory precedent for chemical-signaling implant.",
-    "procurement_team": "Architecture specification + molecule design requirements + test protocol + IP dossier + economic model. This is a RESEARCH PACKAGE, not a validated product. The buyer is purchasing a differentiated architecture and design path."
+    "regulatory_team": "Novel mechanism — De Novo or PMA. Chronic molecular release safety data needed. No existing regulatory precedent for chemical-signaling implant. If molecule is novel, may require NDA + PMA (combination product).",
+    "procurement_team": "Architecture specification + 9-step molecule design requirements + research program plan + IP dossier + economic model (highly speculative). This is a RESEARCH PACKAGE, not a buildable technology. The buyer is funding research."
   }
 }

@@ -1,0 +1,53 @@
+{
+  "package_id": "P-04",
+  "freeze_item": "01_enzyme_identity",
+  "status": "BLOCKED",
+  "rationale": "Cannot freeze enzyme identity without biological/chemical feasibility work. The 'enzyme cocktail' (neprilysin + BACE2 + tau-kinase inhibitor) is currently a HYPOTHESIS, not a design choice.",
+
+  "candidate_enzymes": [
+    {
+      "name": "Neprilysin (NEP)",
+      "target_substrate": "Amyloid-beta (Aβ)",
+      "evidence_for": "Well-characterized zinc metalloprotease. Recombinant human NEP is commercially available. Decades of literature on Aβ clearance.",
+      "evidence_against": "NEP is a membrane-bound enzyme. Soluble/recombinant forms have reduced activity. Chronic CSF stability unknown.",
+      "key_question": "Can recombinant NEP maintain >50% activity after 30 days in synthetic CSF at 37°C?",
+      "status": "CANDIDATE — requires in vitro stability testing"
+    },
+    {
+      "name": "Insulin-degrading enzyme (IDE)",
+      "target_substrate": "Amyloid-beta (Aβ)",
+      "evidence_for": "Alternative Aβ-degrading enzyme. Broad substrate specificity.",
+      "evidence_against": "Less specific than NEP. May degrade unintended substrates in CSF.",
+      "key_question": "What off-target substrates does IDE degrade in CSF, and are any of them clinically important?",
+      "status": "CANDIDATE — requires specificity profiling"
+    },
+    {
+      "name": "BACE2 (beta-site APP-cleaving enzyme 2)",
+      "target_substrate": "APP processing (alternative cleavage)",
+      "evidence_for": "BACE2 (not BACE1) has been reported to cleave APP at a non-amyloidogenic site.",
+      "evidence_against": "BACE2 physiology is less well understood than BACE1. The 'BACE2 as Aβ-reducing' hypothesis is contested in recent literature.",
+      "key_question": "Does BACE2 actually reduce Aβ in CSF, or does it have the opposite effect under some conditions?",
+      "status": "CONTESTED HYPOTHESIS — requires literature review and possibly in vitro confirmation"
+    },
+    {
+      "name": "Tau-kinase inhibitor (small molecule, not enzyme)",
+      "target_substrate": "Tau phosphorylation",
+      "evidence_against": "This is a SMALL MOLECULE, not an enzyme. The original P-04 spec conflated enzyme with inhibitor. A small-molecule inhibitor has very different immobilization chemistry, kinetics, and regulatory pathway.",
+      "key_question": "Should P-04 include small-molecule tau-kinase inhibition at all? If yes, this is a combination product (device + drug), not just device + biologic.",
+      "status": "DESIGN CONFLICT — original spec is chemically inconsistent"
+    }
+  ],
+
+  "decision_required": "Select ONE primary enzyme (likely NEP based on current evidence). Drop or descoped others. This is a medicinal chemistry decision, not a software decision.",
+
+  "blocking_work_required": [
+    "Literature review: NEP stability in CSF-like conditions (saline, 37°C, 30+ days)",
+    "In vitro test: recombinant NEP activity assay in synthetic CSF",
+    "Specificity test: confirm NEP does not degrade unintended CSF proteins",
+    "Decision: single-enzyme P-04 (NEP only) vs triple-enzyme (requires 3x more testing)"
+  ],
+
+  "estimated_time_to_unblock": "3-6 months for single-enzyme path. 12-18 months for triple-enzyme path.",
+  "estimated_cost_to_unblock": "$50K-$150K (single-enzyme); $300K-$1M (triple-enzyme)",
+  "constitutional_basis": "Article XXXIV — stop coding when reality is the next bottleneck. The enzyme identity is a biology question. Code cannot answer it."
+}

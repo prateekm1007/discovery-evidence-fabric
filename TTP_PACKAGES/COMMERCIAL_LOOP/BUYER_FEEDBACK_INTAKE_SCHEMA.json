@@ -1,0 +1,113 @@
+{
+  "package_id": "ALL",
+  "artifact": "BUYER_FEEDBACK_INTAKE_SCHEMA",
+  "version": "1.0.0",
+  "purpose": "Structure buyer feedback so it becomes a machine-actionable task, not an email in an inbox. Every piece of feedback enters the evidence loop.",
+  "constitutional_basis": "Article XXXV — closed-loop epistemic control. Buyer feedback is the 'reality' input to the loop. Without it, the loop is software-only.",
+
+  "feedback_categories": [
+    {
+      "category": "TECHNICAL_QUESTION",
+      "description": "Buyer asks a technical question about the package (e.g., 'How did you derive K_p=0.020?')",
+      "intake_format": "question + context + buyer_id + package_id",
+      "machine_action": "Generate a detailed technical response. If the question reveals a gap in the TTP, create a TTP update task. If the question reveals a falsifiable claim, add it to the test queue.",
+      "examples": [
+        "How does the controller behave if the lesion decay rate is 10x faster than modelled?",
+        "What is the implications of the simulator's falsification of the strict dual-invariant claim?",
+        "Can the predictor be replaced with a Kalman filter?"
+      ]
+    },
+    {
+      "category": "ECONOMIC_CHALLENGE",
+      "description": "Buyer challenges an economic assumption (e.g., 'Our revision cost is actually $15K, not $30K')",
+      "intake_format": "challenged_claim + buyer_value + evidence + buyer_id",
+      "machine_action": "Update COMMERCIAL_EVIDENCE_LEDGER.json with buyer-verified value. Re-run sensitivity analysis. If the package's value proposition is significantly weakened, escalate to TTP revision.",
+      "examples": [
+        "Our average revision cost is $15K, not $30K — your economic model is too optimistic",
+        "Our obstruction rate is 15%, not 30% — your market size is overstated",
+        "We use prophylactic replacement at 5 years, so your 'avoided revision' framing doesn't apply"
+      ]
+    },
+    {
+      "category": "DESIGN_SUGGESTION",
+      "description": "Buyer suggests a design change (e.g., 'Use 6 segments instead of 4')",
+      "intake_format": "suggestion + rationale + buyer_id + package_id",
+      "machine_action": "Add to design_revision_queue.json. If suggestion aligns with simulator's identified design limit (e.g., 4 segments insufficient), prioritize for next iteration.",
+      "examples": [
+        "Use 6 segments instead of 4 — gives more redundancy",
+        "Add an accumulator buffer to handle pulsation peaks",
+        "Replace MEMS valve with shape-memory alloy — simpler"
+      ]
+    },
+    {
+      "category": "PROTOTYPE_REQUEST",
+      "description": "Buyer expresses willingness to evaluate a prototype (the gold signal — 'send me the prototype')",
+      "intake_format": "buyer_id + package_id + prototype_type + timeline + evaluation_plan",
+      "machine_action": "This is the highest-priority signal. Immediately package the EXTERNAL_VALIDATION_HANDOFF folder, ship to buyer, begin formal validation engagement. Update state machine: PROTOTYPE_READY → PILOT.",
+      "examples": [
+        "Send us the V0 bench prototype spec — we'll build it in our lab",
+        "We want to run the simulator on our hardware first, then decide",
+        "Send the V1 implantable prototype — we have animal model ready"
+      ]
+    },
+    {
+      "category": "REGULATORY_INSIGHT",
+      "description": "Buyer's regulatory team provides insight (e.g., 'FDA would require PCCP for the predictive algorithm')",
+      "intake_format": "insight + source + buyer_id + package_id",
+      "machine_action": "Update TTP element 11 (regulatory map). Add to regulatory_questions.json. May trigger pre-submission meeting planning.",
+      "examples": [
+        "FDA Q-Submission program would be ideal for early feedback on this novel approach",
+        "PCCP (Predetermined Change Control Plan) likely required for the predictive algorithm",
+        "Animal model requirement is 6 months chronic, not 3 months acute"
+      ]
+    },
+    {
+      "category": "IP_INSIGHT",
+      "description": "Buyer's IP counsel provides FTO insight (e.g., 'US12636471 may cover your predictive redistribution')",
+      "intake_format": "insight + patent_reference + buyer_id + package_id",
+      "machine_action": "Update TTP element 10 (IP dossier). Add to IP_questions.json. May trigger design-around exploration.",
+      "examples": [
+        "US12636471 (2026 CSF metering) claims may cover your redistribution algorithm",
+        "Your dual-invariant formulation is similar to a 1998 aerospace patent — need to check",
+        "The enzyme cocktail combination may be patentable as a composition of matter"
+      ]
+    },
+    {
+      "category": "REJECTION",
+      "description": "Buyer explicitly rejects the package (e.g., 'Too risky for our portfolio')",
+      "intake_format": "rejection_reason + buyer_id + package_id + date",
+      "machine_action": "Update state machine: PILOT → FEEDBACK. Do NOT delete the package — feed the rejection reason into next iteration. The reason may indicate a fixable problem (e.g., 'too risky' might be addressable by adding independent validation).",
+      "examples": [
+        "Too risky for our portfolio — we only acquire validated products",
+        "P-09 is too research-stage for us — come back when molecule is designed",
+        "P-04 enzyme engineering is outside our capability — we don't have a bio team"
+      ]
+    },
+    {
+      "category": "ALTERNATIVE_USE_CASE",
+      "description": "Buyer suggests an alternative use case not in our original TTP (e.g., 'Could this be used for spinal cord injury patients?')",
+      "intake_format": "alternative_use_case + rationale + buyer_id + package_id",
+      "machine_action": "Evaluate alternative use case. If viable, may create a new package (P-16, P-17, etc.) or expand existing package scope.",
+      "examples": [
+        "Could P-01 be used for spinal cord injury patients with multi-level drainage?",
+        "Could P-09 be used for glucose monitoring instead of ICP?",
+        "Could P-04 be used for non-NPH amyloid clearance (e.g., early AD)?"
+      ]
+    }
+  ],
+
+  "feedback_intake_format": {
+    "feedback_id": "FB-YYYYMMDD-NNN",
+    "timestamp": "ISO 8601",
+    "buyer_id": "anonymized identifier (e.g., BUYER-001, BUYER-002)",
+    "package_id": "P-01, P-04, P-09, etc.",
+    "category": "one of the 8 categories above",
+    "content": "structured per category",
+    "buyer_engagement_level": "informal_inquiry / technical_evaluation / pilot_negotiation / prototype_request / rejection",
+    "machine_action_taken": "TBD by package owner",
+    "evidence_ledger_updated": "true/false",
+    "ttp_update_triggered": "true/false + which element"
+  },
+
+  "the_loop": "Discovery → Collision → TTP → Buyer Outreach → Buyer Feedback (this schema) → TTP Update → Next Version → Buyer Outreach (re-enter loop)"
+}

@@ -1,0 +1,26 @@
+{
+  "package_id": "P-09",
+  "spec_step": "09_time_resolution",
+  "status": "BLOCKED — depends on steps 1-6",
+  "purpose": "Specify the time resolution of ICP estimates — how quickly can the system detect a clinically meaningful ICP change?",
+
+  "specification": {
+    "time_resolution_target_sec": "60 (1-minute resolution is sufficient for clinical decisions; faster is better but not required)",
+    "rationale": "ICP changes that require urgent intervention (e.g., acute herniation) develop over minutes-to-hours, not seconds. 60-sec resolution captures all clinically meaningful dynamics.",
+    "constraint_chain": [
+      "Sensor sampling rate: 0.1-1 Hz (fast enough)",
+      "Transport delay: 10-180 min (slowest stage — dominates time resolution)",
+      "Clearance: 30-180 min (limits how quickly concentration reflects new release rate)",
+      "Inverse model: 10-sec updates (fast enough)"
+    ],
+    "bottleneck": "Transport + clearance. The system CANNOT be faster than the molecule's journey from brain to sensor. This is a PHYSICAL LIMIT, not an engineering one.",
+    "implication": "P-09 is NOT a real-time monitor for acute events (e.g., seizure, acute herniation). It is a TREND monitor for chronic ICP management (similar to CGM for chronic glucose management)."
+  },
+
+  "what_unfreezes_this": "Steps 1-6 fully resolved.",
+
+  "clinical_use_case_clarification": "P-09 is suited for: (a) chronic hydrocephalus management (adjustable shunt tuning over days-weeks), (b) post-operative monitoring (trends over hours-days), (c) home monitoring (daily ICP trends). NOT suited for: (a) acute trauma monitoring (need real-time, invasive catheter remains gold standard), (b) intraoperative monitoring (need real-time).",
+
+  "estimated_time_to_unblock": "Immediately after steps 1-6 resolved (just analysis)",
+  "status_provenance": "MODEL_DERIVED from physiology + signal processing"
+}

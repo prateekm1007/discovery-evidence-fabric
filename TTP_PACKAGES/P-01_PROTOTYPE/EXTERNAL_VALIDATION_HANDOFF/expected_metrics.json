@@ -1,0 +1,67 @@
+{
+  "package_id": "P-01",
+  "artifact": "expected_metrics",
+  "version": "1.0.0",
+  "status": "PRE_REGISTERED",
+  "constitutional_basis": "Article XXXII — before every major conclusion, state the strongest alternative explanation. Expected metrics force us to commit to a prediction BEFORE the lab reports back.",
+
+  "predictions_for_bench_validation": [
+    {
+      "scenario": "healthy",
+      "expected_P_ICP_peak_mmhg": "12.0 +/- 0.5",
+      "expected_P_ICP_min_mmhg": "11.5 +/- 0.5",
+      "expected_INV2_violations": 0,
+      "expected_isolations": 0,
+      "expected_survival": true,
+      "status": "PRE_REGISTERED"
+    },
+    {
+      "scenario": "mild_1_of_4",
+      "expected_P_ICP_peak_mmhg": "20-22",
+      "expected_INV2_violations": 0,
+      "expected_isolations": 1,
+      "expected_predictor_lead_time_min": "30-60",
+      "expected_survival": true,
+      "status": "PRE_REGISTERED",
+      "honest_note": "Strict INV-1 (<=20) expected to be violated in some seeds. Graceful-degradation ceiling 22 expected to hold."
+    },
+    {
+      "scenario": "adversarial_2_of_4",
+      "expected_P_ICP_peak_mmhg": "22-25",
+      "expected_INV2_violations": 0,
+      "expected_isolations": 2,
+      "expected_predictor_lead_time_min": "30-60",
+      "expected_survival": true,
+      "status": "PRE_REGISTERED"
+    },
+    {
+      "scenario": "catastrophic_4_of_4",
+      "expected_P_ICP_peak_mmhg": "30+ (fail-safe ceiling)",
+      "expected_INV2_violations": 0,
+      "expected_isolations": 4,
+      "expected_survival": false,
+      "honest_note": "Catastrophic failure expected. System enters fail-safe (all valves open). Patient-equivalent requires emergency revision. Same outcome as current standard of care."
+    },
+    {
+      "scenario": "sensor_failure",
+      "expected_fail_safe_time_sec": "<= 10",
+      "expected_inv_violations_post_failure": 0,
+      "status": "PRE_REGISTERED"
+    },
+    {
+      "scenario": "actuator_failure",
+      "expected_isolation_time_sec": "<= 60",
+      "expected_inv_violations_post_failure": 0,
+      "status": "PRE_REGISTERED"
+    }
+  ],
+
+  "what_constitutes_refutation_of_our_claim": [
+    "If bench P_ICP peak > 25 mmHg in mild scenario — claim of graceful degradation is FALSE",
+    "If any INV-2 violation in any scenario — claim of dual-invariant policy is FALSE",
+    "If predictor lead time < 15 min in mild scenario — predictor is too slow",
+    "If system does not survive 24h in mild/adversarial — design is not viable"
+  ],
+
+  "what_constitutes_corroboration": "All pre-registered predictions matched within stated tolerance across 5 seeds per scenario."
+}
