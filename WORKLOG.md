@@ -4577,3 +4577,39 @@ Stage Summary:
 - Gate P (Control-Law Novelty) added. Level 2: 15 gates.
 - Portfolio: 0 Level 2, 1 conditional (SC-10), 0 sellable, 0 transactions. Cemetery: 23 entries. Discovery machine ~90%.
 - Next: SC-10 must specify the exact hydraulic control law. Then attack via §103 + cross-domain control-law search + Gate P. Only if the specific control law survives → return to Level 2.
+
+---
+Task ID: R270-TEN-2035-CANDIDATES-15GATE
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: Add 10 CEO-provided 2035-horizon candidates (SC-A through SC-J). Run through 15-gate protocol. Revoke and rotate PAT.
+
+Work Log:
+- CEO provided 10 new candidates with 2035 technology horizon (SC-A: phase-change valve, SC-B: UWB position mapper, SC-C: biohybrid endothelial interface, SC-D: bacteriophage defense, SC-E: autonomous catheter navigation, SC-F: chemical molecular ICP signaling, SC-G: neuromorphic failure predictor, SC-H: enzymatic protein clearance, SC-I: NIR photovoltaic therapeutic, SC-J: glycan immune tolerance).
+- PAT revocation: CEO directed. NOTE: PAT revocation requires GitHub web UI (Settings > Developer settings > Personal access tokens). Cannot be done from CLI. CEO must revoke [REDACTED:github_pat] via GitHub web UI and provide new PAT.
+- Ran all 10 through 15-gate protocol with R269 lessons applied:
+  - M4=NOT FOUND = unresolved question, NOT survival guarantee
+  - Element-level collision needed, not concept-level
+  - Gate P (control-law novelty) applied to control candidates
+  - Self-assessment caveat: all M1-M4 self-authored based on training knowledge
+- Results: 10/10 pass initial 15-gate (all M1-M4=NOT FOUND, synergy≥2). BUT per R269, this means 10 unresolved questions, NOT 10 survivors. Each needs deep collision + external verification.
+- Ranking by strength (coder's honest assessment):
+  #1 SC-A (phase-change valve) — STRONGEST. Fundamentally different physical mechanism. Specific materials. Not an application.
+  #2 SC-F (chemical molecular signaling) — STRONG CONCEPT. Genuinely new information channel. BUT molecule unspecified (SC-05 lesson).
+  #3 SC-D (bacteriophage defense) — STRONG. Self-amplifying + targeted + triggered. BUT phage implants may exist.
+  #4 SC-H (enzymatic clearance) — STRONG. Specific enzyme cocktail. BUT enzymatic membranes exist in industry.
+  #5 SC-C (biohybrid endothelial) — MODERATE. Living surface. BUT tissue-engineered implants exist.
+  #6 SC-B (UWB position mapper) — MODERATE. BUT major physics risk (UWB through skull).
+  #7 SC-I (NIR photovoltaic) — MODERATE. BUT active research at MIT/Stanford (not white space).
+  #8 SC-E (autonomous navigation) — WEAKER. Gate P: control law = gradient-following = standard.
+  #9 SC-J (glycan immune tolerance) — WEAKER. SC-05's smarter sibling. Glycan unspecified.
+  #10 SC-G (neuromorphic predictor) — WEAKEST. Gate P: control law = standard predictive maintenance.
+- Key insight: CEO designed all 10 to pass M4. That is design, not discovery. The real test is deep collision (element-level) + external verification (live patent search). SC-05 passed M4 in R268 and was killed in R269. Same could happen to any of these 10.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- 10 CEO 2035-horizon candidates added (SC-A through SC-J). All pass initial 15-gate but ALL conditional on deep collision.
+- SC-A (phase-change valve) ranked #1 — strongest because fundamentally different physical mechanism, not an application.
+- SC-G (neuromorphic predictor) ranked #10 — weakest because Gate P reveals standard predictive maintenance.
+- Combined portfolio: 20 CEO candidates total (10 R268 + 10 R270). 12 conditional (2 from R268 + 10 from R270). 1 killed (SC-05/CE-023). 0 Level 2 confirmed. 0 sellable. 0 transactions.
+- PAT revocation: noted, requires CEO action via GitHub web UI.
+- Next: Deep collision on SC-A (strongest) first. If it survives element-level + live search → first genuine Level 2 candidate.
