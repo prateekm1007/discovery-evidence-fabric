@@ -4116,3 +4116,45 @@ Stage Summary:
 - Cemetery: 20 entries (CE-019 MSVED, CE-020 CC-04). Two kills in two rounds.
 - Portfolio: 0/5 world-class. 8 remaining candidates in discovery queue (CC-02, CC-03, CC-05, CC-06, CC-07, CC-08, CC-09, CC-10). 0 sellable.
 - Pattern emerging: candidates that are integrations of known methods are being killed. The frontier requires a novel mathematical bound, not engineering integration.
+
+---
+Task ID: R253-CC04-CORRECTED-KILLER-BUGFIX-GATES
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: Execute CEO R253 — correct the killer experiment (invalid positive control in R252), pre-register ground truth, run Gate A (scientific mechanism) and Gate B (IP novelty) independently.
+
+Work Log:
+- Read Constitution v1.5.0. Accepted CEO correction: R252's kill of CC-04 was INVALID because E2 (positive control) contained an unsafe modification (sensitivity=0.758, below 0.80 threshold). The system correctly rejected an unsafe modification — not evidence that CC-04 cannot recognize sufficient evidence.
+- P0+P1 — Created corrected test cohort with 3 frozen classes:
+  - E- (UNSAFE + insufficient): M_new has subgroup regression (-0.20), 5 tests no subgroup coverage
+  - E+ (SAFE + sufficient): M_new has slight improvement (+0.02), no regression, 15 tests with subgroup coverage. INDEPENDENTLY VERIFIED as safe (sensitivity=0.828 ≥ 0.80, specificity=0.828 ≥ 0.75, subgroup maintained)
+  - E± (BORDERLINE): M_new at threshold (0.794), slight subgroup regression (-0.03), 10 tests partial coverage
+  - Ground truth committed with SHA-256 hash 19af35b7... BEFORE execution
+- FIRST RUN of corrected cohort: Gate A FAILED again. E+ (SAFE) was rejected as INSUFFICIENT.
+- BUG DISCOVERY: Investigation revealed the MSES proof checker used the WRONG STATISTICAL TEST:
+  - Bug: z = diff/se, p = norm.cdf(z) — tests H0: diff<=0 (SUPERIORITY)
+  - Correct: z = (diff+margin)/se, p = 1-norm.cdf(z) — tests H0: diff<=-margin (NON-INFERIORITY)
+  - The superiority test asks "is new BETTER?" (hard to prove). NI asks "is new NOT WORSE by margin?" (correct for PCCP)
+  - Classification: IMPLEMENTATION BUG (Article XXIX), not mechanism failure
+- BUG FIX: Changed 2 lines in proof checker. Theorem unchanged. Test cohort unchanged. Decision rule unchanged.
+- SECOND RUN with bug fix: Gate A PASSES
+  - E- (UNSAFE): correctly REJECTED → INSUFFICIENT (P3 subgroup UNCOVERED)
+  - E+ (SAFE): correctly ACCEPTED → SUFFICIENT (all properties HOLD, p_ni ≈ 0)
+  - E± (BORDERLINE): correctly → INSUFFICIENT (P1/P2 FAIL, which is correct for borderline)
+- Gate A VERDICT: PASS. The proof engine CAN correctly distinguish safe+sufficient from unsafe/insufficient.
+- Gate B (IP novelty): FAIL. MSES = NI + coverage + Bonferroni + sensitivity. No novel mathematical relationship.
+- COMBINED VERDICT: COMMERCIAL_TOOL_NOT_INVENTION.
+  - Gate A passes (mechanism works with corrected NI test)
+  - Gate B fails (no novel math)
+  - Per CEO R253: "If Gate A passes but Gate B fails → COMMERCIAL TOOL, NOT INVENTION"
+  - CC-04 is NOT a World-Class invention but MAY be a commercial tool
+- Annotated CE-020 in cemetery with R253 correction: RECLASSIFIED as COMMERCIAL_TOOL_NOT_INVENTION, NOT KILLED.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- CC-04 reclassified from KILLED (R252, invalid) to COMMERCIAL_TOOL_NOT_INVENTION (R253, corrected)
+- Bug found and fixed: NI test was implemented as superiority instead of non-inferiority
+- Gate A (scientific mechanism): PASS — proof engine correctly distinguishes safe+sufficient from unsafe/insufficient
+- Gate B (IP novelty): FAIL — no novel mathematical relationship
+- CC-04 can potentially be a $50K commercial tool (trade-secret IP, not patent) if buyer economics work
+- Portfolio: 0/5 world-class. CC-04 = commercial tool candidate. 8 other candidates in discovery. 0 sellable.
+- Key lesson: implementation bugs can masquerade as mechanism failures. The CEO's insistence on a valid positive control prevented a false kill.

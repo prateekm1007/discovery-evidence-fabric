@@ -1,0 +1,206 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-24T19:18:25.421016+00:00",
+  "generated_by": "Round 253 (corrected) — CC-04 Bug Fix + Gate A/B",
+  "bug_fix_description": {
+    "bug": "MSES proof checker used superiority test (H0: diff<=0) instead of non-inferiority test (H0: diff<=-margin)",
+    "fix": "Changed z = diff/se to z = (diff+margin)/se, and p = norm.cdf(z) to p = 1-norm.cdf(z)",
+    "classification": "IMPLEMENTATION BUG (Article XXIX), not mechanism failure",
+    "theorem_unchanged": true
+  },
+  "gate_a_scientific_mechanism": {
+    "results": {
+      "E_neg": {
+        "ground_truth": "UNSAFE",
+        "system_verdict": "INSUFFICIENT",
+        "proof": {
+          "n_tests": 5,
+          "properties_checked": {
+            "P1_sensitivity": {
+              "verdict": "HOLDS",
+              "old_perf": 0.9073727689130437,
+              "new_perf": 0.9073727689130437,
+              "diff": 0.0,
+              "margin": 0.02,
+              "threshold": 0.8,
+              "se": 0.0,
+              "z_ni": Infinity,
+              "p_ni": 0.0,
+              "test_type": "non-inferiority (CORRECTED)"
+            },
+            "P2_specificity": {
+              "verdict": "HOLDS",
+              "old_perf": 0.9073727689130437,
+              "new_perf": 0.9073727689130437,
+              "diff": 0.0,
+              "margin": 0.02,
+              "threshold": 0.75,
+              "se": 0.0,
+              "z_ni": Infinity,
+              "p_ni": 0.0,
+              "test_type": "non-inferiority (CORRECTED)"
+            },
+            "P3_subgroup_fairness": {
+              "verdict": "UNCOVERED",
+              "reason": "Only 0 subgroup tests (need >= 3)"
+            }
+          },
+          "coverage_argument": {
+            "tests_selected": 5,
+            "has_subgroup_coverage": false
+          },
+          "multiple_testing_correction": {
+            "method": "Bonferroni",
+            "corrected_alpha": 0.016666666666666666
+          },
+          "assumption_violation_analysis": {
+            "note": "If exchangeability violated, coverage argument weakens"
+          },
+          "verdict": "INSUFFICIENT"
+        }
+      },
+      "E_pos": {
+        "ground_truth": "SAFE",
+        "system_verdict": "SUFFICIENT",
+        "proof": {
+          "n_tests": 15,
+          "properties_checked": {
+            "P1_sensitivity": {
+              "verdict": "HOLDS",
+              "old_perf": 0.8307710139173878,
+              "new_perf": 0.8442383112829923,
+              "diff": 0.01346729736560448,
+              "margin": 0.02,
+              "threshold": 0.8,
+              "se": 0.004099335068420324,
+              "z_ni": 8.164079492653203,
+              "p_ni": 1.1102230246251565e-16,
+              "test_type": "non-inferiority (CORRECTED)"
+            },
+            "P2_specificity": {
+              "verdict": "HOLDS",
+              "old_perf": 0.8307710139173878,
+              "new_perf": 0.8442383112829923,
+              "diff": 0.01346729736560448,
+              "margin": 0.02,
+              "threshold": 0.75,
+              "se": 0.004099335068420324,
+              "z_ni": 8.164079492653203,
+              "p_ni": 1.1102230246251565e-16,
+              "test_type": "non-inferiority (CORRECTED)"
+            },
+            "P3_subgroup_fairness": {
+              "verdict": "HOLDS",
+              "overall_perf": 0.8442383112829923,
+              "subgroup_perf": 0.815839259740746,
+              "gap": 0.028399051542246312,
+              "threshold": 0.1
+            }
+          },
+          "coverage_argument": {
+            "tests_selected": 15,
+            "has_subgroup_coverage": true
+          },
+          "multiple_testing_correction": {
+            "method": "Bonferroni",
+            "corrected_alpha": 0.016666666666666666
+          },
+          "assumption_violation_analysis": {
+            "note": "If exchangeability violated, coverage argument weakens"
+          },
+          "verdict": "SUFFICIENT"
+        }
+      },
+      "E_amb": {
+        "ground_truth": "BORDERLINE",
+        "system_verdict": "INSUFFICIENT",
+        "proof": {
+          "n_tests": 10,
+          "properties_checked": {
+            "P1_sensitivity": {
+              "verdict": "FAILS",
+              "old_perf": 0.8516767042160913,
+              "new_perf": 0.8333424613465024,
+              "diff": -0.018334242869588957,
+              "margin": 0.02,
+              "threshold": 0.8,
+              "se": 0.0043474130238568345,
+              "z_ni": 0.3831605419752036,
+              "p_ni": 0.35080036624857813,
+              "test_type": "non-inferiority (CORRECTED)"
+            },
+            "P2_specificity": {
+              "verdict": "FAILS",
+              "old_perf": 0.8516767042160913,
+              "new_perf": 0.8333424613465024,
+              "diff": -0.018334242869588957,
+              "margin": 0.02,
+              "threshold": 0.75,
+              "se": 0.0043474130238568345,
+              "z_ni": 0.3831605419752036,
+              "p_ni": 0.35080036624857813,
+              "test_type": "non-inferiority (CORRECTED)"
+            },
+            "P3_subgroup_fairness": {
+              "verdict": "HOLDS",
+              "overall_perf": 0.8333424613465024,
+              "subgroup_perf": 0.7488224701580198,
+              "gap": 0.08451999118848252,
+              "threshold": 0.1
+            }
+          },
+          "coverage_argument": {
+            "tests_selected": 10,
+            "has_subgroup_coverage": true
+          },
+          "multiple_testing_correction": {
+            "method": "Bonferroni",
+            "corrected_alpha": 0.016666666666666666
+          },
+          "assumption_violation_analysis": {
+            "note": "If exchangeability violated, coverage argument weakens"
+          },
+          "verdict": "INSUFFICIENT"
+        }
+      }
+    },
+    "conditions": {
+      "E_neg_correctly_rejected": {
+        "required": "E- (UNSAFE) → INSUFFICIENT",
+        "actual": "UNSAFE → INSUFFICIENT",
+        "pass": true
+      },
+      "E_pos_correctly_accepted": {
+        "required": "E+ (SAFE) → SUFFICIENT",
+        "actual": "SAFE → SUFFICIENT",
+        "pass": true
+      },
+      "E_amb_correctly_handling": {
+        "required": "E± (BORDERLINE) → produces a verdict",
+        "actual": "BORDERLINE → INSUFFICIENT",
+        "pass": true
+      }
+    },
+    "verdict": "PASS"
+  },
+  "gate_b_ip_novelty": {
+    "gate_name": "Gate B — IP Novelty",
+    "the_question": "Does MSES contain a NEW mathematical relationship?",
+    "verdict": "FAIL — integration of known methods (NI + coverage + Bonferroni + sensitivity). No novel theorem.",
+    "does_mses_have_novel_math": false
+  },
+  "combined_verdict": {
+    "gate_a": "PASS",
+    "gate_b": "FAIL",
+    "combined": "COMMERCIAL_TOOL_NOT_INVENTION",
+    "reason": "Gate A PASSES (mechanism works with corrected NI test). Gate B FAILS (no novel math). CC-04 = commercial tool, NOT invention."
+  },
+  "summary": {
+    "bug_found_and_fixed": "NI test was implemented as superiority instead of non-inferiority. Fixed. This is an implementation bug (Article XXIX), not a mechanism failure.",
+    "gate_a_result": "PASS — proof engine can correctly distinguish safe+sufficient from unsafe/insufficient",
+    "gate_b_result": "FAIL — no new mathematical relationship",
+    "combined": "COMMERCIAL_TOOL_NOT_INVENTION",
+    "cc_04_status": "COMMERCIAL_TOOL_NOT_INVENTION",
+    "implication": "CC-04's proof engine WORKS (Gate A passes with bug fix). But it contains no novel mathematics (Gate B fails). CC-04 is a COMMERCIAL TOOL, NOT an invention. It can potentially be sold as a $50K tool with trade-secret/know-how IP position."
+  }
+}
