@@ -4286,3 +4286,30 @@ Stage Summary:
 - Portfolio: 0 Level 2 candidates. 4 PRIOR_ART_THREATENED. 12 RESET. 1 commercial tool candidate (CC-04). 0 sellable. 0 transactions.
 - Key insight: "apply existing technology to medical devices" is almost always prior-art threatened because the underlying physical capability exists in aerospace, MEMS, or industrial sensing. The engine must search ALL domains, not just medical.
 - Next: validate the upgraded engine on a NEW candidate. Do NOT reuse existing structures. Generate one genuinely new information-bottleneck structure and run through full 3-test protocol.
+
+---
+Task ID: R259-ENGINE-VALIDATION-LEVEL2-UPGRADE
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 validate collision engine on 3 dead candidates. P1 upgrade Level 2 (8 sub-gates). P2 Engineer-in-a-Weekend. P3 Combination Obviousness. P4 acknowledge constitution.
+
+Work Log:
+- P4 — Acknowledged 10 constitution articles governing this round. Honest caveat: this is self-validation (Article XXVI). I am claimant AND verifier.
+- P0 — Collision engine validation on 3 known-dead candidates (NC-05, IB-03, CC-08). For each: generated 14-15 functional-equivalence terms across 5 domains, ran cross-domain search, applied old-art shock test.
+  - NC-05: 14 terms, 4/5 domains found prior art, old-art FAIL (40+ years). Engine: PRIOR_ART_THREATENED. Matches known answer. PASS.
+  - IB-03: 15 terms, 5/5 domains found prior art, old-art FAIL (60+ years). Engine: PRIOR_ART_THREATENED. Matches known answer. PASS.
+  - CC-08: 14 terms, 5/5 domains found prior art, old-art FAIL (25+ years). Engine: OBVIOUS. Matches known answer. PASS.
+  - Result: 3/3 PASSED. Engine retroactively identifies all known-dead candidates.
+  - HONEST CAVEAT (Article XXVI): self-validation only. Proves search procedure would find known prior art. Does NOT prove engine will find ALL prior art on a genuinely novel candidate. Does NOT prove engine can distinguish genuine survivor from another IB-03.
+- P1 — Level 2 upgraded with 8 sub-gates: A (variable novelty), B (transduction novelty), C (architecture novelty), D (functional equivalence), E (cross-domain), F (old-art), G (combination obviousness), H (commercial substitution). ALL 8 must pass. Substantially harder than old Level 2.
+- P2 — Engineer-in-a-Weekend attack: 3 thresholds (<$50K, <$250K, <6 months). Escape clause: unexpected technical effect. Stronger than patent collision — asks "could someone do this tomorrow?" not "has someone done this before?"
+- P3 — Combination Obviousness attack: construct best A+B+C argument against own candidate. Must survive self-attack. Example: IB-03 = MEMS shear (A) + implantable telemetry (B) + vascular application (C). Motivated + expected + predictable = OBVIOUS.
+- Key insight from CEO: "do not celebrate that the engine killed IB-03. The important milestone is whether the machine can now reliably distinguish a genuine survivor from another IB-03. We have not demonstrated that yet."
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- Collision engine VALIDATED (retrospectively, 3/3). Self-validation caveat applies.
+- Level 2 upgraded: 8 sub-gates. ALL must pass.
+- Two new attacks added: Engineer-in-a-Weekend + Combination Obviousness.
+- Portfolio unchanged: 0 Level 2, 0 sellable, 0 transactions.
+- CEO assessment acknowledged: discovery machine ~75%, invention discovery ~25%, commercial portfolio ~5-10%, validation ~0-10%, IP ~10-20%, TTPs ~0%, transactions $0.
+- Next: R260 generates ONE genuinely new candidate using upgraded discovery grammar. Runs through full 8-sub-gate + Engineer-in-a-Weekend + Combination Obviousness protocol. Only if ALL pass → first genuine Level 2 candidate.
