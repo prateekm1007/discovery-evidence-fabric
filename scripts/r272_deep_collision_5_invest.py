@@ -1,0 +1,511 @@
+"""
+Round 272 — Reclassify INVEST → INVEST-PENDING-DEEP-COLLISION + Deep Collision on 5 Candidates
+
+CEO R272 directive:
+  P0: Reclassify 5 INVEST as INVEST-PENDING-DEEP-COLLISION
+  Attack in order: NC-C → SC-D → SC-H → SC-F → SC-A
+  Make each claim MECHANISM-SPECIFIC before searching
+  No simulations
+
+CEO found prior art for ALL 5:
+  SC-A: liquid metal phase transitions already biomedical (PubMed 38145958, 2024)
+  SC-D: phage tethered to catheters (NIH tech transfer tab-3312) + phage implant infections (EP4132552A2)
+  SC-H: CSF protein filtration (US20090131850A1) + Aβ/tau shunt (US11529443)
+  NC-C: powered obstruction-clearing shunt (US11291809B2)
+  SC-F: needs molecule specification (architecture diagram, not invention)
+
+Output:
+  CANONICAL_STATE/R272_DEEP_COLLISION_5_INVEST_CANDIDATES.json
+"""
+import json
+from pathlib import Path
+from datetime import datetime, timezone
+
+OUTPUT_PATH = Path(
+    "/home/z/my-project/discovery-evidence-fabric/CANONICAL_STATE/"
+    "R272_DEEP_COLLISION_5_INVEST_CANDIDATES.json"
+)
+
+
+# ===========================================================================
+# Reclassification
+# ===========================================================================
+
+RECLASSIFICATION = {
+    "old_label": "INVEST",
+    "new_label": "INVEST-PENDING-DEEP-COLLISION",
+    "reason": (
+        "INVEST means 'spend the next unit of evidence budget attacking this,' "
+        "NOT 'this is probably patentable.' The CEO found prior art for ALL 5 "
+        "INVEST candidates. Each needs mechanism-specific deep collision before "
+        "any Level 2 assignment."
+    ),
+    "the_5_candidates": ["NC-C", "SC-D", "SC-H", "SC-F", "SC-A"],
+    "attack_order": ["NC-C", "SC-D", "SC-H", "SC-F", "SC-A"],
+}
+
+
+# ===========================================================================
+# Deep Collision: NC-C (Predictive Occlusion-Isolation Controller)
+# ===========================================================================
+
+NC_C_DEEP = {
+    "candidate": "NC-C: Predictive Occlusion-Isolation Controller",
+    "old_verdict": "INVEST",
+    "new_status": "INVEST-PENDING-DEEP-COLLISION",
+    "attack_order": 1,
+    
+    "mechanism_specific_claim": (
+        "A distributed fluid-control network in which local drainage elements "
+        "autonomously reallocate flow in response to predicted (not current) "
+        "occlusion, maintaining a target global intracranial pressure while "
+        "preventing overload of surviving paths. The dual safety invariant "
+        "(global ICP preservation AND surviving-path overload prevention) is "
+        "the potentially novel element."
+    ),
+    
+    "frozen_control_law": {
+        "state_variables": [
+            "Local flow rate per segment (q_i)",
+            "Local pressure per segment (p_i)",
+            "Segment occlusion probability (P_occl_i, from flow/pressure trend)",
+            "Global ICP (measured at ventricular catheter)",
+        ],
+        "prediction_window": "2-6 hours ahead (trend-based, not real-time)",
+        "occlusion_probability_calculation": (
+            "Bayesian update from flow decline rate + pressure gradient change. "
+            "P(occlusion within 6h | current trends) = posterior from "
+            "exponential failure model with flow-decline covariate."
+        ),
+        "transition_rule": (
+            "IF P_occl_i > threshold THEN: (1) reduce q_i to 50% (prevent "
+            "overload of segment i), (2) redistribute (q_i * 0.5) to "
+            "neighboring segments j where P_occl_j < threshold AND "
+            "p_j < p_max (overload invariant), (3) maintain sum(q_j) = "
+            "Q_target (global ICP invariant)."
+        ),
+        "flow_redistribution_rule": (
+            "Greedy: assign excess flow to lowest-pressure, lowest-risk "
+            "neighbor first. Respect p_j < p_max for all j."
+        ),
+        "global_ICP_invariant": "sum(q_i) >= Q_target at all times",
+        "surviving_path_overload_invariant": "p_j < p_max for all active segments j at all times",
+        "dual_safety_invariant": "Global ICP maintained AND no surviving path overloaded. BOTH must hold simultaneously.",
+    },
+    
+    "ceo_found_prior_art": {
+        "US11291809B2": {
+            "title": "Implantable shunt system and method",
+            "what_it_covers": "Shunt system with powered obstruction-clearing (periodic pump activation to clear obstruction). Multi-path fluid control.",
+            "url": "https://patents.google.com/patent/US11291809B2",
+            "threatens": "The 'powered obstruction management in shunt' concept. BUT: US11291809B2 is REACTIVE (clear obstruction after it occurs), not PREDICTIVE (redistribute before occlusion).",
+        },
+    },
+    
+    "deep_collision_search": {
+        "hydraulic_networks": "FOUND — smart water grids with predictive redistribution exist (SCADA, smart water networks). The CONCEPT of predictive flow redistribution in fluid networks is known.",
+        "aerospace_fault_isolation": "FOUND — fault-tolerant flight control with predictive load redistribution extensively studied. The CONCEPT of dual safety invariants (mission completion + structural protection) is known.",
+        "dialysis": "PARTIAL — multi-catheter dialysis exists but is not coordinated or predictive.",
+        "microfluidics": "FOUND — microfluidic routing with predictive flow control exists (lab-on-chip).",
+        "ventricular_shunts": "FOUND — US11291809B2 (powered obstruction-clearing). Multi-catheter shunts (US6913589B2).",
+        "distributed_pumping": "FOUND — distributed pumping with load balancing exists in industrial fluid management.",
+        "fault_tolerant_control": "FOUND — dual-invariant control (meet performance target + protect hardware) is standard in safety-critical control (aerospace, nuclear).",
+    },
+    
+    "element_decomposition": {
+        "predictive_occlusion": {"known": True, "where": "Industrial predictive maintenance, HUMS"},
+        "preemptive_redistribution": {"known": True, "where": "Smart water grids, fault-tolerant computing"},
+        "global_ICP_invariant": {"known": False, "where": "CSF-specific — not found in other fields"},
+        "surviving_path_overload_invariant": {"known": True, "where": "Aerospace structural protection, power grid line limits"},
+        "dual_invariant_combination": {"known": False, "where": "The SPECIFIC combination (global ICP + path overload) for CSF drainage is not found"},
+    },
+    
+    "what_survives": (
+        "The dual safety invariant (global ICP preservation AND surviving-path "
+        "overload prevention) for CSF drainage is NOT found in prior art. "
+        "Individual elements (predictive occlusion, flow redistribution, path "
+        "overload protection) are all known. The COMBINATION applied to CSF "
+        "drainage with the specific dual invariant may be novel.\n\n"
+        "BUT: the combination is potentially obvious — a PHOSITA in "
+        "fault-tolerant control + neurosurgery would be motivated to combine "
+        "known predictive maintenance with known flow redistribution. The "
+        "dual invariant is standard safety-critical control practice "
+        "(performance + protection)."
+    ),
+    
+    "gate_P_assessment": {
+        "state_variable": "Flow, pressure, occlusion probability per segment",
+        "control_action": "Reduce flow on high-risk segment, redistribute to low-risk neighbors",
+        "transition_rule": "Bayesian occlusion prediction + greedy redistribution",
+        "stability_invariant": "sum(q) >= Q_target AND p_j < p_max for all j",
+        "equivalent_in_other_field": "YES — fault-tolerant flight control (mission + structural protection), smart water grids (demand + pipe pressure limits), nuclear safety (power + temperature limits)",
+        "verdict": "WEAK — the control law is standard fault-tolerant control with dual safety invariants. The CSF application is specific but the control law itself is an obvious application of known safety-critical control principles.",
+    },
+    
+    "verdict": "DOWNGRADED to WATCH — the dual invariant is standard safety-critical control applied to CSF. Gate P reveals the control law is functionally equivalent to fault-tolerant flight control / smart water grid management. The invention is the APPLICATION, not the control law. §103 risk: HIGH (motivated combination of known principles).",
+    
+    "what_would_make_it_survive": (
+        "If the CSF-specific occlusion prediction model produces an UNEXPECTED "
+        "result — e.g., the optimal redistribution strategy is COUNTERINTUITIVE "
+        "(not greedy, not proportional, but following a non-obvious pattern "
+        "discovered through CSF-specific modeling). That would be an unexpected "
+        "technical effect. Without that, it's standard fault-tolerant control "
+        "applied to a new domain."
+    ),
+}
+
+
+# ===========================================================================
+# Deep Collision: SC-D (Phage Defense)
+# ===========================================================================
+
+SC_D_DEEP = {
+    "candidate": "SC-D: On-Demand Bacteriophage CSF Infection Defense",
+    "old_verdict": "INVEST",
+    "new_status": "INVEST-PENDING-DEEP-COLLISION",
+    "attack_order": 2,
+    
+    "mechanism_specific_claim": (
+        "A closed-loop architecture: (1) implant biosensor detects pre-clinical "
+        "biofilm formation, (2) secure controller selects species-specific "
+        "phage cocktail from multi-compartment reservoir, (3) phage released "
+        "into CSF, (4) phage self-amplify by lysing pathogen, (5) biosensor "
+        "confirms clearance. The SELF-AMPLIFYING + SPECIES-SELECTIVE + "
+        "DETECTION-TRIGGERED closed loop is the claim."
+    ),
+    
+    "ceo_found_prior_art": {
+        "NIH_tech_transfer_tab_3312": {
+            "title": "Methods to Regulate Biofilm Development to Prevent Infection on Indwelling or Implantable Medical Devices",
+            "what_it_covers": "Bacteriophages tethered to hydrogel-coated catheters, explicitly suggesting use on shunts and other implanted devices.",
+            "url": "https://www.techtransfer.nih.gov/tech/tab-3312",
+            "threatens": "The 'phage on catheter/implant for infection prevention' concept. BUT: NIH technology is PASSIVE (phage tethered to surface), not ACTIVE (biosensor-triggered release from reservoir).",
+        },
+        "EP4132552A2": {
+            "title": "Method for treating implantable device infections",
+            "what_it_covers": "Patent literature covering phage-based treatment/prevention of infections associated with implantable devices.",
+            "url": "https://patents.google.com/patent/EP4132552A2",
+            "threatens": "The 'phage for implant infection' concept broadly. Need to check if it covers biosensor-triggered release.",
+        },
+    },
+    
+    "element_decomposition": {
+        "phage_on_implant": {"known": True, "where": "NIH tab-3312 (tethered phage on catheter), EP4132552A2"},
+        "biosensor_biofilm_detection": {"known": True, "where": "Biofilm biosensors exist in research (impedance, metabolite-based)"},
+        "multi_compartment_reservoir": {"known": True, "where": "MicroCHIPS (Langer, MIT) — multi-compartment drug delivery"},
+        "secure_controller_drug_release": {"known": True, "where": "Apple Secure Enclave concept; drug delivery controllers exist"},
+        "self_amplifying_therapy": {"known": True, "where": "Phage self-amplification is fundamental phage biology"},
+        "species_specific_selection": {"known": True, "where": "Phage specificity is fundamental phage biology"},
+        "closed_loop_detection_to_release": {"known": True, "where": "Biosensor-triggered drug release exists (closed-loop insulin, research)"},
+        "COMBINATION_all_seven": {"known": False, "where": "The specific 7-element combination for CSF shunt infection defense is not found as a single reference"},
+    },
+    
+    "what_survives": (
+        "The 7-element combination (phage + implant + biosensor + multi-compartment "
+        "+ secure controller + self-amplification + species selection) is not "
+        "found in a single reference. BUT: each element is individually known. "
+        "The combination is potentially obvious — a PHOSITA in phage therapy + "
+        "implantable drug delivery would be motivated to combine them.\n\n"
+        "The NIH technology (phage tethered to catheter) is PASSIVE. SC-D is "
+        "ACTIVE (biosensor-triggered release). That's a distinction. But "
+        "EP4132552A2 may cover the broader 'phage for implant infection' claim."
+    ),
+    
+    "gate_P_assessment": {
+        "state_variable": "Biofilm detection signal (impedance/metabolite)",
+        "control_action": "Select phage compartment + release dose",
+        "transition_rule": "IF biofilm_detected THEN select_phage(species) AND release",
+        "stability_invariant": "Biofilm cleared within X hours; no excessive phage release",
+        "equivalent_in_other_field": "YES — closed-loop drug delivery (artificial pancreas: sense glucose → release insulin). Same control architecture, different payload.",
+        "verdict": "WEAK — the control law (sense pathogen → select treatment → release → confirm clearance) is standard closed-loop therapeutic control. Same architecture as artificial pancreas. The novelty is the PAYLOAD (phage vs insulin), not the control law.",
+    },
+    
+    "verdict": "DOWNGRADED to WATCH — the broad phage+implant concept is occupied (NIH, EP4132552A2). The closed-loop architecture is standard (sense → select → release). The self-amplifying property is fundamental phage biology, not an invention. §103 risk: HIGH (motivated combination of known phage therapy + known closed-loop delivery).",
+    
+    "what_would_make_it_survive": (
+        "If the phage selection + release architecture produces an UNEXPECTED "
+        "pre-clinical benefit — e.g., the self-amplifying property enables a "
+        "dose reduction of >100x vs antibiotic elution, OR the species-specific "
+        "selection prevents microbiome disruption in a way that is not "
+        "predictable from phage biology alone. That would be an unexpected "
+        "technical effect. Without that, it's standard closed-loop delivery "
+        "with a phage payload."
+    ),
+}
+
+
+# ===========================================================================
+# Deep Collision: SC-H (Enzymatic Clearance)
+# ===========================================================================
+
+SC_H_DEEP = {
+    "candidate": "SC-H: Enzymatic In-Line CSF Protein Clearance",
+    "old_verdict": "INVEST",
+    "new_status": "INVEST-PENDING-DEEP-COLLISION",
+    "attack_order": 3,
+    
+    "mechanism_specific_claim": (
+        "Flow-controlled catalytic contact-time optimization: the micro-valve "
+        "dynamically adjusts CSF flow rate to maximize enzymatic clearance "
+        "efficiency (Aβ/tau) while maintaining therapeutic drainage. The "
+        "hydraulic contact-time control law is the claim, not the enzymes "
+        "or the membrane."
+    ),
+    
+    "ceo_found_prior_art": {
+        "US20090131850A1": {
+            "title": "Method and apparatus for removing harmful proteins from a mammalian's ventricular cerebrospinal fluid",
+            "what_it_covers": "CSF cleansing by implanted pump/filter systems. Enzymatic degradation of toxic CSF proteins disclosed for many years.",
+            "url": "https://patents.google.com/patent/US20090131850A1",
+            "threatens": "The 'enzymatic CSF protein clearance' concept broadly. The basic idea of treating CSF with enzymes is established.",
+        },
+        "US11529443": {
+            "title": "Apparatus and method for cerebral microdialysis to treat neurological disease, including Alzheimer's, Parkinson's or multiple sclerosis",
+            "what_it_covers": "Molecular-recognition membranes for Aβ/tau placed within or associated with a shunt.",
+            "url": "https://patents.google.com/patent/US11529443",
+            "threatens": "The 'Aβ/tau clearance via shunt-associated membrane' concept. The application to Alzheimer's via shunt is directly disclosed.",
+        },
+    },
+    
+    "element_decomposition": {
+        "enzymatic_CSF_clearance": {"known": True, "where": "US20090131850A1 — enzymatic degradation of CSF proteins"},
+        "Aβ_tau_shunt_membrane": {"known": True, "where": "US11529443 — molecular-recognition membrane for Aβ/tau in shunt"},
+        "immobilized_enzymes": {"known": True, "where": "Industrial catalysis, medical device research"},
+        "flow_rate_modulation": {"known": True, "where": "Adjustable valves (Codman Hakim, Sophysa)"},
+        "contact_time_optimization": {"known": True, "where": "Chemical reaction engineering (residence time optimization)"},
+        "COMBINATION_contact_time_control_for_catalytic_clearance": {"known": False, "where": "The specific dynamic contact-time optimization for enzymatic clearance during CSF drainage is not found as a single reference"},
+    },
+    
+    "what_survives": (
+        "Only the specific dynamic contact-time optimization (flow modulation "
+        "to maximize catalytic clearance while maintaining drainage) may "
+        "survive. BUT: this is standard chemical reaction engineering "
+        "(residence time optimization) applied to CSF drainage. A PHOSITA "
+        "in chemical engineering + neurosurgery would predict that longer "
+        "contact time = better clearance. The optimization is routine."
+    ),
+    
+    "gate_P_assessment": {
+        "state_variable": "CSF flow rate, enzyme activity, substrate concentration",
+        "control_action": "Adjust valve opening (flow rate)",
+        "transition_rule": "IF clearance_efficiency < target THEN reduce flow rate (increase contact time); IF drainage_insufficient THEN increase flow rate",
+        "stability_invariant": "Clearance >= target AND drainage >= target (dual constraint)",
+        "equivalent_in_other_field": "YES — chemical reactor residence time optimization (standard chemical engineering). The dual constraint (clearance + drainage) is standard multi-objective optimization.",
+        "verdict": "WEAK — the control law (optimize contact time for catalytic efficiency while maintaining flow) is standard reaction engineering. The dual constraint is standard multi-objective control.",
+    },
+    
+    "verdict": "DOWNGRADED to WATCH — enzymatic CSF clearance is established (US20090131850A1). Aβ/tau shunt membranes exist (US11529443). The contact-time optimization is standard chemical engineering. §103 risk: HIGH (motivated combination of known enzymatic clearance + known flow optimization).",
+    
+    "what_would_make_it_survive": (
+        "If the flow-cleared CSF produces an UNEXPECTED therapeutic benefit — "
+        "e.g., the dual-function (drainage + clearance) enables a NEW clinical "
+        "indication (NPH + Alzheimer's co-treatment) that is not predictable "
+        "from the individual functions. OR if the contact-time optimization "
+        "produces a non-linear clearance improvement (e.g., 10x contact time "
+        "gives 100x clearance, not 10x) that is unexpected from enzyme kinetics."
+    ),
+}
+
+
+# ===========================================================================
+# Deep Collision: SC-F (Molecular ICP Signaling)
+# ===========================================================================
+
+SC_F_DEEP = {
+    "candidate": "SC-F: Chemical Molecular ICP Signaling Through CSF",
+    "old_verdict": "INVEST",
+    "new_status": "INVEST-PENDING-DEEP-COLLISION (NEEDS MOLECULE SPECIFICATION)",
+    "attack_order": 4,
+    
+    "mechanism_specific_claim": "CANNOT BE ASSESSED — molecule is UNSPECIFIED",
+    
+    "why_cannot_assess": (
+        "SC-F is an architecture diagram, not an invention. Without specifying: "
+        "(1) the actual molecule, (2) release kinetics, (3) concentration range, "
+        "(4) transport distance, (5) sensor, (6) specificity, (7) background "
+        "concentration, (8) clearance kinetics — the candidate cannot be "
+        "collision-searched at the mechanism level.\n\n"
+        "This is the SC-05 lesson: a concept without a specific mechanism "
+        "cannot survive deep collision because each element can be found "
+        "individually in prior art."
+    ),
+    
+    "ceo_found_prior_art": "None specific — CEO noted this is the most unusual candidate but needs molecule specification.",
+    
+    "what_is_known": {
+        "molecular_communication": "Research field exists (synthetic biology, molecular communication in nanonetworks)",
+        "chemical_sensing_implants": "Electrochemical biosensors exist (CGM, research)",
+        "ICP_monitoring": "RF telemetry implants exist (Raumedic, Codman)",
+        "CSF_chemistry_monitoring": "Microdialysis exists (clinical cerebral microdialysis)",
+    },
+    
+    "what_must_be_specified_before_assessment": [
+        "1. The actual molecule (synthetic? endogenous analog? what structure?)",
+        "2. Release kinetics (how does ICP modulate release rate? what physical mechanism?)",
+        "3. Concentration range (what levels are detectable? what is background?)",
+        "4. Transport distance (how far does molecule travel in CSF? diffusion? bulk flow?)",
+        "5. Sensor (what biosensor detects the molecule? electrochemical? optical? what specificity?)",
+        "6. Background concentration (is the molecule already present in CSF? at what level?)",
+        "7. Clearance kinetics (how is the molecule cleared? what is the half-life?)",
+        "8. Safety (is chronic release safe? what are metabolites?)",
+    ],
+    
+    "verdict": "BLOCKED — cannot assess without molecule specification. SC-05 lesson applies: concept without mechanism = cannot survive deep collision. The architecture (chemical channel vs RF) is novel, but without a specific molecule, the invention is unspecified. MUST be specified before any collision search can be meaningful.",
+    
+    "potential": "HIGH — if a specific molecule is designed that meets all 8 specifications, this could be the most novel candidate (genuinely new information channel). But until then, it's an architecture diagram.",
+}
+
+
+# ===========================================================================
+# Deep Collision: SC-A (Phase-Change Valve)
+# ===========================================================================
+
+SC_A_DEEP = {
+    "candidate": "SC-A: Phase-Change Passive Adaptive Valve",
+    "old_verdict": "INVEST (ranked #1 strongest)",
+    "new_status": "INVEST-PENDING-DEEP-COLLISION",
+    "attack_order": 5,
+    
+    "mechanism_specific_claim": (
+        "Patient-CSF-composition-controlled phase-transition threshold of "
+        "encapsulated gallium-indium alloy producing a specific hydraulic "
+        "response (valve opening pressure change) without electronics. The "
+        "protein-regulated phase-transition shift is the specific interaction."
+    ),
+    
+    "ceo_found_prior_art": {
+        "US8231563B2": {
+            "title": "Electrokinetic actuator to titrate fluid flow",
+            "what_it_covers": "Actively actuated solid-state shunt valves and electrokinetic actuation specifically for CSF flow regulation.",
+            "url": "https://patents.google.com/patent/US8231563B2",
+            "threatens": "The 'non-mechanical actuation for CSF valve' concept. BUT: electrokinetic (electronic) vs phase-change (passive, no electronics).",
+        },
+        "PubMed_38145958_2024": {
+            "title": "Phase Transition Liquid Metal Enabled Emerging Biomedical Technologies and Applications",
+            "what_it_covers": "2024 review describing gallium-based liquid metals with body-temperature-tunable phase transitions used for biomedical actuators, sensors, implantable electrodes, and therapeutic devices.",
+            "url": "https://pubmed.ncbi.nlm.nih.gov/38145958",
+            "threatens": "The 'phase-transition liquid metal for biomedical applications' concept broadly. The material class is established biomedical technology.",
+        },
+    },
+    
+    "element_decomposition": {
+        "gallium_indium_alloy": {"known": True, "where": "PubMed 38145958 (2024 review) — Ga-based liquid metals are established biomedical materials"},
+        "phase_transition_valve": {"known": False, "where": "No reference found using phase-change as CSF valve mechanism specifically. BUT: liquid metal actuators exist (PubMed 38145958)."},
+        "protein_regulated_transition": {"known": False, "where": "The specific interaction (CSF protein ratio → apoprotein conformational change → phase-transition shift) is not found. BUT: protein-responsive materials exist in drug delivery."},
+        "passive_no_electronics": {"known": True, "where": "Passive shunt valves exist (slit, ball, diaphragm). Passive = no electronics is standard for shunt valves."},
+        "self_calibrating": {"known": False, "where": "No passive valve self-calibrates to patient physiology via CSF composition. BUT: the concept of self-calibration is known in control systems."},
+        "zero_fatigue_zero_calcification": {"known": False, "where": "No existing valve achieves zero fatigue + zero calcification. BUT: this is a PROPERTY claim, not a mechanism claim. The mechanism (phase-change) is what must be novel."},
+    },
+    
+    "what_survives": (
+        "The SPECIFIC interaction (CSF protein ratio → apoprotein → phase "
+        "transition → hydraulic resistance) is not found as a single reference. "
+        "BUT: each element is known:\n"
+        "- Ga-In liquid metals: established biomedical (PubMed 2024)\n"
+        "- Phase-transition actuators: known (PubMed 2024)\n"
+        "- Protein-responsive materials: known (drug delivery)\n"
+        "- Passive valves: known (existing shunts)\n"
+        "- Non-mechanical actuation for CSF: known (US8231563B2 electrokinetic)\n\n"
+        "The COMBINATION (protein-regulated phase-change valve for CSF) may "
+        "be novel as a single reference, but is potentially obvious — a "
+        "PHOSITA in liquid metal biomaterials + shunt design would be "
+        "motivated to use phase-change as a valve mechanism."
+    ),
+    
+    "gate_P_assessment": {
+        "state_variable": "CSF protein composition (albumin/IgG ratio)",
+        "control_action": "Phase-transition temperature shift → viscosity change → flow resistance",
+        "transition_rule": "Protein concentration → apoprotein conformation → phase-transition T → alloy state (solid/liquid) → viscosity",
+        "stability_invariant": "Flow resistance within therapeutic band despite ICP variation",
+        "equivalent_in_other_field": "PARTIAL — phase-change materials for thermal regulation (Tesla Megapack), protein-responsive hydrogels (drug delivery). The specific chain (protein → phase transition → hydraulic resistance) is not found, but each link is known.",
+        "verdict": "MODERATE — the specific interaction chain is not found as a single reference, but each link is individually known. The combination is potentially obvious but the emergent effect (zero-fatigue + zero-calcification + self-calibration) is not predictable from the individual components.",
+    },
+    
+    "verdict": "DOWNGRADED from #1 to WATCH — liquid metal phase transitions are established biomedical technology (PubMed 2024). Non-mechanical CSF actuation exists (US8231563B2). The protein-regulated transition is the only potentially novel element. BUT: this element is UNSPECIFIED (which apoprotein? which conformational change? what sensitivity?). SC-05 lesson: unspecified mechanism = concept. Needs specific protein + specific Ga-In composition + specific phase-transition calibration before collision can be completed.",
+    
+    "what_would_make_it_survive": (
+        "If the specific protein-Ga-In interaction produces an UNEXPECTED "
+        "hydraulic response — e.g., the phase-transition threshold shifts "
+        "by >10°C per unit change in CSF protein ratio (much larger than "
+        "predictable from protein-lipid binding thermodynamics), OR the "
+        "valve exhibits hysteresis-free behavior that is not expected from "
+        "phase-change physics. Without a specific protein and specific "
+        "calibration data, this is a concept."
+    ),
+}
+
+
+# ===========================================================================
+# Summary
+# ===========================================================================
+
+ALL_RESULTS = [NC_C_DEEP, SC_D_DEEP, SC_H_DEEP, SC_F_DEEP, SC_A_DEEP]
+
+verdicts = {}
+for r in ALL_RESULTS:
+    v = r["verdict"].split(" —")[0] if " —" in r["verdict"] else r["verdict"].split(".")[0]
+    key = v[:20]
+    verdicts[key] = verdicts.get(key, 0) + 1
+
+print("=== R272: DEEP COLLISION ON 5 INVEST CANDIDATES ===\n")
+print(f"{'Order':<6} {'ID':<7} {'Candidate':<50} {'Old':<8} {'New Status':<30} {'Verdict'}")
+print("-" * 130)
+for r in ALL_RESULTS:
+    print(f"{r['attack_order']:<6} {r['candidate'].split(':')[0]:<7} {r['candidate'].split(': ')[1][:48]:<50} INVEST   {r['new_status'][:28]:<30} {r['verdict'][:40]}")
+
+print(f"\n=== VERDICT SUMMARY ===")
+for v, count in verdicts.items():
+    print(f"  {v}: {count}")
+print(f"\n  ALL 5 INVEST candidates downgraded or blocked.")
+print(f"  0 candidates remain at INVEST after deep collision.")
+print(f"  0 confirmed Level 2.")
+print(f"  0 sellable.")
+print(f"  0 transactions.")
+
+output = {
+    "schema_version": "1.0.0",
+    "generated_at": datetime.now(timezone.utc).isoformat(),
+    "generated_by": "Round 272 — Deep Collision on 5 INVEST Candidates",
+    "ceo_directive_round_272": (
+        "Reclassify INVEST → INVEST-PENDING-DEEP-COLLISION. Attack in order: "
+        "NC-C → SC-D → SC-H → SC-F → SC-A. Make mechanism-specific. No simulation."
+    ),
+    "reclassification": RECLASSIFICATION,
+    "deep_collision_results": {
+        "NC-C": NC_C_DEEP,
+        "SC-D": SC_D_DEEP,
+        "SC-H": SC_H_DEEP,
+        "SC-F": SC_F_DEEP,
+        "SC-A": SC_A_DEEP,
+    },
+    "summary": {
+        "total_attacked": 5,
+        "all_downgraded": True,
+        "nc_c": "DOWNGRADED to WATCH — dual invariant is standard safety-critical control. Gate P: control law = fault-tolerant flight control applied to CSF.",
+        "sc_d": "DOWNGRADED to WATCH — phage+implant occupied (NIH, EP4132552A2). Closed-loop = standard therapeutic control. Novelty is payload, not architecture.",
+        "sc_h": "DOWNGRADED to WATCH — enzymatic CSF clearance established (US20090131850A1). Aβ/tau shunt exists (US11529443). Contact-time optimization = standard reaction engineering.",
+        "sc_f": "BLOCKED — molecule unspecified (SC-05 lesson). Architecture diagram, not invention. Needs 8 specifications before collision can be meaningful.",
+        "sc_a": "DOWNGRADED from #1 to WATCH — liquid metal phase transitions are established biomedical technology (PubMed 2024). Non-mechanical CSF actuation exists (US8231563B2). Protein-regulated transition is UNSPECIFIED.",
+        "key_finding": (
+            "ALL 5 INVEST candidates were downgraded or blocked by deep collision. "
+            "The CEO found prior art for ALL 5. The pattern is now extremely "
+            "clear: every candidate that sounded novel at the concept level "
+            "was threatened at the mechanism level. The discovery engine's "
+            "M4=NOT FOUND assessments were based on training knowledge, not "
+            "live search. The CEO's live searches found prior art the engine "
+            "missed for every single candidate.\n\n"
+            "The lesson: INVEST means 'spend the next evidence budget attacking "
+            "this,' NOT 'this is probably patentable.' No candidate has survived "
+            "deep collision. The portfolio has 0 confirmed Level 2 candidates."
+        ),
+        "portfolio": "0 INVEST, 0 Level 2, 0 sellable, 0 transactions. 5 candidates at WATCH (need unexpected-effect proof to survive). 1 BLOCKED (SC-F, needs molecule). Cemetery: 23 entries.",
+        "next": "Each WATCH candidate needs: (1) specific mechanism specification, (2) unexpected-effect proof (quantitative advantage outside routine optimization), (3) live patent search by external attorney. Only if ALL three pass → return to INVEST → killer experiment → Level 2.",
+    },
+}
+
+OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+    json.dump(output, f, indent=2, ensure_ascii=False)
+
+if OUTPUT_PATH.exists():
+    print(f"\n[OK] Output: {OUTPUT_PATH} ({OUTPUT_PATH.stat().st_size} bytes)")

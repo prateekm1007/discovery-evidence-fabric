@@ -4637,3 +4637,26 @@ Stage Summary:
 - NC-C + SC-10 should merge — NC-C is the control law specification SC-10 needed.
 - Combined portfolio after dedup: ~14 unique candidates. 0 confirmed Level 2. 0 sellable. 0 transactions.
 - Next: Deep collision on SC-A (strongest) first. Then merge NC-C+SC-10 and deep-collision the merged candidate. Then SC-F (needs molecule), SC-D, SC-H.
+
+---
+Task ID: R272-DEEP-COLLISION-5-INVEST
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: Reclassify 5 INVEST → INVEST-PENDING-DEEP-COLLISION. Deep collision in CEO order: NC-C → SC-D → SC-H → SC-F → SC-A. Make mechanism-specific. No simulation.
+
+Work Log:
+- Reclassified all 5 INVEST candidates as INVEST-PENDING-DEEP-COLLISION. INVEST = "spend next evidence budget attacking," NOT "probably patentable."
+- Deep collision on NC-C (attack order 1): Frozen control law (state variables, prediction window, occlusion probability, transition rule, redistribution rule, dual safety invariant). CEO found US11291809B2 (powered obstruction-clearing shunt). Cross-domain search: hydraulic networks, aerospace fault isolation, dialysis, microfluidics, ventricular shunts, distributed pumping, fault-tolerant control — ALL found related art. Gate P: control law = standard fault-tolerant control with dual safety invariants (equivalent to flight control, water grids, nuclear safety). DOWNGRADED to WATCH.
+- Deep collision on SC-D (attack order 2): CEO found NIH tab-3312 (phage tethered to hydrogel catheters for shunts) + EP4132552A2 (phage implant infection treatment). Element decomposition: phage on implant (known), biosensor (known), multi-compartment (known), secure controller (known), self-amplification (known phage biology), species selection (known), closed-loop (known). The 7-element combination is not found as single reference but each element known. Gate P: control law = standard closed-loop therapeutic control (same as artificial pancreas). DOWNGRADED to WATCH.
+- Deep collision on SC-H (attack order 3): CEO found US20090131850A1 (CSF protein filtration/degradation) + US11529443 (Aβ/tau molecular-recognition membrane in shunt). Element decomposition: enzymatic CSF clearance (known), Aβ/tau shunt membrane (known), immobilized enzymes (known), flow modulation (known), contact-time optimization (known reaction engineering). Gate P: control law = standard residence time optimization with dual constraint. DOWNGRADED to WATCH.
+- Deep collision on SC-F (attack order 4): BLOCKED. Molecule is UNSPECIFIED. SC-05 lesson: concept without mechanism cannot survive deep collision. Needs 8 specifications (molecule, release kinetics, concentration, transport, sensor, specificity, background, clearance) before any collision search is meaningful.
+- Deep collision on SC-A (attack order 5): CEO found PubMed 38145958 (2024 review — Ga-based liquid metals with body-temperature-tunable phase transitions for biomedical actuators/sensors/implants) + US8231563B2 (electrokinetic actuation for CSF flow regulation). Element decomposition: Ga-In alloy (known biomedical), phase-transition actuator (known), protein-responsive materials (known), passive valve (known), non-mechanical CSF actuation (known). The protein-regulated transition is the only potentially novel element but is UNSPECIFIED. DOWNGRADED from #1 to WATCH.
+- ALL 5 INVEST candidates downgraded or blocked. 0 remain at INVEST. 0 confirmed Level 2.
+- Pattern: CEO found prior art the engine missed for EVERY candidate. The functional-equivalence search (15 terms) was insufficient — CEO used different terminology. The engine's M4=NOT FOUND assessments were based on training knowledge, not live search.
+- Each WATCH candidate needs: (1) specific mechanism specification, (2) unexpected-effect proof (quantitative advantage outside routine optimization), (3) live patent search by external attorney.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- ALL 5 INVEST candidates downgraded: NC-C WATCH (standard fault-tolerant control), SC-D WATCH (phage+implant occupied, standard closed-loop), SC-H WATCH (CSF clearance established, standard optimization), SC-F BLOCKED (molecule unspecified), SC-A WATCH (liquid metal biomedical established, protein interaction unspecified).
+- 0 INVEST. 0 Level 2. 0 sellable. 0 transactions. 23 cemetery entries. ~14 candidates at WATCH/BLOCKED.
+- The discovery engine has not produced a single invention that survives adversarial attack at the mechanism level after 272 rounds. Every concept-level novel candidate was threatened at the element-decomposition level.
+- Next: Each WATCH candidate needs specific mechanism specification + unexpected-effect proof + external attorney review. The engine needs live patent search capability (not training knowledge) to avoid the repeated pattern of missing prior art that the CEO finds.
