@@ -4313,3 +4313,38 @@ Stage Summary:
 - Portfolio unchanged: 0 Level 2, 0 sellable, 0 transactions.
 - CEO assessment acknowledged: discovery machine ~75%, invention discovery ~25%, commercial portfolio ~5-10%, validation ~0-10%, IP ~10-20%, TTPs ~0%, transactions $0.
 - Next: R260 generates ONE genuinely new candidate using upgraded discovery grammar. Runs through full 8-sub-gate + Engineer-in-a-Weekend + Combination Obviousness protocol. Only if ALL pass → first genuine Level 2 candidate.
+
+---
+Task ID: R260-BLIND-VALIDATOR-VALIDATION
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: Validate the validator. Hide known prior art, have engine independently discover, measure what it MISSED. Attack with adversarial terminology.
+
+Work Log:
+- Test design: BLIND DISCOVERY (different from R259 retrospective). Engine NOT told the answer. Must independently generate functional equivalents, cross-domain searches, old-art searches. Then scored against hidden ground truth. Then attacked with deliberately adversarial terminology.
+- Blind search results (3 dead candidates, known prior art hidden):
+  - NC-05: 17 terms generated, 4/5 domains found prior art, old-art FAIL (40+ years). Verdict: PRIOR_ART_THREATENED. Correct.
+  - IB-03: 19 terms generated, 5/5 domains found prior art, old-art FAIL (60+ years). Verdict: PRIOR_ART_THREATENED. Correct.
+  - CC-08: 16 terms generated, 5/5 domains found prior art, old-art FAIL (25+ years). Verdict: OBVIOUS. Correct.
+  - 3/3 correct verdicts without being told the answer.
+- Known-category coverage (what it MISSED):
+  - NC-05: 5/6 categories covered (83%). Missed: "embedded diagnostic module with AI/cloud" (specific patent detail, broader search still catches the category).
+  - IB-03: 8/8 categories covered (100%). No misses.
+  - CC-08: 5/6 categories covered (83%). Missed: "Bonferroni correction 1936" (specific reference, broader search still catches the category).
+  - Average coverage: 89%.
+- Adversarial terminology attack (deliberately obscure alternative names):
+  - NC-05: 4/5 covered (80%). Missed: "remaining useful life estimation for MR accessories."
+  - IB-03: 4/5 covered (80%). Missed: "fluid-structure interaction sensor on endoluminal device."
+  - CC-08: 5/5 covered (100%). No misses.
+  - Average adversarial coverage: 87%.
+- Overall validator verdict: PASS. 3/3 correct verdicts, 89% known coverage (≥70% threshold), 87% adversarial coverage (≥50% threshold).
+- Honest caveat (Article XXVI): STILL self-validation. I wrote both the search function AND the ground truth. A real external auditor would write independent ground truth. The blind test proves the search procedure is sufficient to discover known threats — but does NOT prove it will discover ALL threats on a genuinely novel candidate.
+- Full candidate chain defined for next candidate: function → physical mechanism → information channel → equivalent technology → closest prior art → cross-domain art → combination attack → engineer reproduction attack → technical-effect test → economic test. Aligned with USPTO (search by function/utility) and EPO (closest prior-art + combination analysis, no hindsight).
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- Validator VALIDATED (blind, 3/3, 89% coverage, 87% adversarial). Self-validation caveat applies.
+- The engine can independently discover prior art without being told the answer.
+- 2 known-category misses are specific patent details, not entire categories — broader search still catches them.
+- 2 adversarial misses are highly specialized phrasings — known limitation, functional-equivalence expansion is good but not exhaustive.
+- Portfolio unchanged: 0 Level 2, 0 sellable, 0 transactions.
+- Next: R261 generates ONE genuinely new candidate using information-bottleneck grammar + full 8-sub-gate Level 2 + Engineer-in-a-Weekend + Combination Obviousness. Only if ALL pass → first genuine Level 2 candidate.
