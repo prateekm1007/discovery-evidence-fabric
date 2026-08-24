@@ -4481,3 +4481,30 @@ Stage Summary:
 - Level 2: 13 sub-gates with Gate M now having 4 sub-questions.
 - Portfolio: 0 Level 2, 0 sellable, 0 transactions. Discovery machine ~85-88%.
 - Next: R266 generates ONE new candidate using corrected Gate M. Must have novel interaction law OR materially different constraints/performance.
+
+---
+Task ID: R266-BALANCED-GATE-M-VALIDATION
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 validate Gate M both directions (5 dead + 5 surviving). P1 decouple Gate M from verdict. P2 closest-prior-art delta. P3 unexpected-effect margin.
+
+Work Log:
+- P0 — Balanced validation with 5 dead + 5 surviving mechanisms. Surviving cases independently authored by subagent with real patent numbers: S1 wired-enzyme glucose biosensor (Heller US 5,593,852), S2 Toyota HSD e-CVT (US 5,934,395), S3 DMD (Hornbeck US 5,061,049), S4 self-healing polymer (White Nature 2001/US 6,261,538), S5 turbo codes (Berrou US 5,446,747).
+  - Dead cases: 5/5 correctly FAIL (all M1-M4 found).
+  - Surviving cases: 5/5 correctly PASS (all M1-M4 NOT found).
+  - Sensitivity: 100%. Specificity: 100%. Accuracy: 100%. False kills: 0. False survivors: 0.
+  - Balanced validation: PASS (≥80% sensitivity AND ≥80% specificity).
+  - Key insight: all 5 surviving inventions share signature — A and B individually known, interaction law NOT disclosed, emergent effect NOT achieved by any prior system. Novelty lives in the interaction, not the components.
+  - Honest caveat: surviving cases authored by subagent (same system). True independence requires external patent attorney. Surviving cases are well-known granted patents — engine may perform differently on genuinely novel candidate.
+- P1 — Gate M decoupled from final verdict. Now outputs diagnostic vector (M1-M4 known/unknown). §103 makes inventive-step decision using vector. Known interaction + surprising effect can survive (EPO G-VII 8). Novel-looking interaction may still be obvious. Gate M diagnoses; §103 decides.
+- P2 — Gate N (closest-prior-art delta) added. Requires: closest prior art → distinguishing features → objective technical problem → technical effect → reason PHOSITA would NOT arrive. Per EPO G-VII 5.1.
+- P3 — Gate O (unexpected-effect margin) added. Requires: pre-registered expected magnitude vs strongest baseline vs observed magnitude. Must be OUTSIDE routine optimization range. Per EPO G-VII 8.
+- Level 2: 14 sub-gates (A-L + M split + N + O).
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- Gate M balanced-validated: 100% sensitivity, 100% specificity, 0 false kills, 0 false survivors. First balanced validation.
+- 5 surviving inventions correctly preserved: Heller, Toyota, Hornbeck, White, Berrou. All share signature: known components + novel interaction + unexpected effect.
+- Gate M decoupled: diagnostic vector, §103 decides.
+- Gate N (closest-prior-art delta) + Gate O (unexpected-effect margin) added. Level 2: 14 gates.
+- Portfolio: 0 Level 2, 0 sellable, 0 transactions. Discovery machine ~88-90%.
+- Next: R267 generates ONE new candidate using full 14-gate protocol with balanced-validated Gate M.
