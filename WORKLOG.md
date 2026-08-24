@@ -4734,3 +4734,26 @@ Stage Summary:
 - 0 TTPs built (next round). 0 buyer conversations. 0 transactions. BUT: portfolio is ready to package.
 - The machine has shifted from killing candidates to packaging technology. The cemetery (23 entries) becomes negative knowledge that strengthens the IP dossier, not a graveyard of failures.
 - Next: Build TTP skeletons for all 15. Start full build on P-01, P-04, P-09.
+
+---
+Task ID: R276-TTP-BUILD-EVIDENCE-LOOP
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 build 15 TTP skeletons. P1 fully build P-01, P-04, P-09. P2 make buyer-executable. P3 evidence loop state machine. P4 commercial evidence ledger.
+
+Work Log:
+- P0 — 15 TTP skeletons created in TTP_PACKAGES/ directory. Each has 15 elements with status labels (VERIFIED/EXTERNAL_SOURCE/MODELLED/HYPOTHESIS/BUYER_UNVERIFIED/MISSING). No blank claims. 3 fully built, 12 skeleton-only.
+- P1 — Full TTPs built for P-01 (Predictive Occlusion-Isolation, $500K, TECHNICALLY_SPECIFIED), P-04 (Pulsation-Synchronized Catalytic Contact-Time Lock, $250-500K, TECHNICALLY_SPECIFIED), P-09 (Chemical ICP Transduction, $500K+, DESIGNED — molecule needed).
+  - P-01: 15 elements complete. Mechanism dossier with causal chain + operating states. System architecture with 4 subsystems. Engineering spec with sensors/actuators/electronics/software. Prototype blueprint (bench-top 4-segment hydraulic simulator). Test protocol (4 tests including strongest baseline). Economic model with sensitivity analysis (base: $12M/year avoided cost per 1000 patients). IP dossier honestly disclosing US11291809B2, US6913589B2, US12636471, aerospace fault-tolerant control. Regulatory map (Class III, PMA, IEC 62304). Manufacturing plan (5-10 years to market). Safety package (fail-safe to standard shunt). Integration package (control law for existing valve systems). Provenance ledger (9 claims traced).
+  - P-04: 15 elements complete. Enzyme cocktail specified (neprilysin + BACE2 + τ-kinase). Pulsation-synchronized flow modulation. Dual-function (drainage + amyloid clearance). IP dossier disclosing US20090131850A1, US11529443. Economic model (Leqembi comparison: $50K-$200K/year vs CSF-integrated clearance).
+  - P-09: 15 elements complete but molecule UNSPECIFIED. Architecture for zero-electronics ICP monitoring. Highest differentiation, highest risk. Honest disclosure: "buyer is purchasing a concept + architecture + design path, NOT a validated product."
+- P2 — All 3 full TTPs answer 6 buyer questions: (1) engineer: what to build first, (2) scientist: what experiment to run, (3) CFO: how does it make/save money, (4) IP counsel: where are legal uncertainties, (5) regulatory: what must be demonstrated, (6) procurement: what exactly am I purchasing.
+- P3 — Evidence loop state machine: 13 states from DISCOVERED to VERSION_2. Current: P-01/P-04 at TECHNICALLY_SPECIFIED, P-09 at DESIGNED, all others at DISCOVERED.
+- P4 — Commercial evidence ledger: 6 economic claims with full provenance (claim → source → date → calculation → uncertainty → buyer_dependency → status). All BUYER_UNVERIFIED or HYPOTHESIS until buyer confirms.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- 3 full buyer-executable TTPs built (P-01, P-04, P-09). 15/15 skeletons created.
+- Each TTP answers 6 buyer questions. Every economic claim has provenance.
+- Evidence loop state machine operational. Commercial evidence ledger established.
+- 0 buyer conversations. 0 transactions. BUT: 3 packages are BUYER_READY-adjacent (need prototype + validation to reach BUYER_READY).
+- Next: Build prototypes for P-01 and P-04 (bench-top). Design molecule for P-09. Begin buyer outreach.
