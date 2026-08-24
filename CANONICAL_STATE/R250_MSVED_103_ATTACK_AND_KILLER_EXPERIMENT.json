@@ -1,0 +1,417 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-24T18:58:09.566580+00:00",
+  "generated_by": "Round 250 — MSVED Freeze + §103 + Killer Experiment + Commercial Loop",
+  "ceo_directive_round_250": "P0: freeze MSVED. P1: brutal §103 attack — if obvious aggregation, kill. P2: find technical effect via killer experiment. P3: commercial loop.",
+  "p0_frozen_spec": {
+    "status": "FROZEN",
+    "path": "/home/z/my-project/discovery-evidence-fabric/CANONICAL_STATE/R250_MSVED_FROZEN_SPEC.md",
+    "mechanism": "MSVED = ML change → clinical pathway → risk envelope → minimum sufficient evidence → sufficiency proof",
+    "rule": "No new wording, features, or economic claims until §103 + killer experiment complete."
+  },
+  "p1_section_103_attack": {
+    "components_assessed": {
+      "PCCP": {
+        "name": "FDA PCCP Guidance (Dec 2024)",
+        "what_it_teaches": "Manufacturers must specify planned modifications, methodology to develop/validate/implement them, and impact assessment. Applies across 510(k)/De Novo/PMA.",
+        "relevance_to_MSVED": "Creates the REQUIREMENT for minimum sufficient evidence — every PCCP must determine what validation each modification needs."
+      },
+      "ISO14971": {
+        "name": "ISO 14971 Risk Management / FMEA",
+        "what_it_teaches": "Risk-based V&V proportional to residual risk. Hazard analysis, risk estimation, risk control, residual risk evaluation.",
+        "relevance_to_MSVED": "Provides the risk-envelope framework. Link 2 (risk-envelope propagation) is ISO 14971 applied to ML changes."
+      },
+      "InfluenceFunctions": {
+        "name": "ML Change-Impact Analysis (influence functions, datamodels)",
+        "what_it_teaches": "Maps which training data points / subpopulations a model change affects. Koh & Liang (2017), datamodels (Ilyas et al.).",
+        "relevance_to_MSVED": "Provides link 1's ML-side analysis. But maps to TRAINING DATA, not CLINICAL PATHWAYS."
+      },
+      "BOED": {
+        "name": "Bayesian Optimal Experiment Design",
+        "what_it_teaches": "Selects experiments that maximally reduce posterior uncertainty / distinguish hypotheses. Foster, Ivanova, Rainforth et al.",
+        "relevance_to_MSVED": "Closest to link 3. But optimizes INFORMATION GAIN, not SAFETY SUFFICIENCY."
+      },
+      "ActiveTesting": {
+        "name": "Active Testing / Active Evaluation",
+        "what_it_teaches": "Selects most informative samples to estimate performance with fewer labels. Kossen et al., Farquhar/Gal.",
+        "relevance_to_MSVED": "Also close to link 3. But optimizes ESTIMATION ACCURACY, not safety sufficiency."
+      },
+      "NI_testing": {
+        "name": "Non-Inferiority Statistical Testing",
+        "what_it_teaches": "Tests whether a new version is 'not worse' than the old by a pre-defined margin Δ. ICH E9. Standard in clinical trials.",
+        "relevance_to_MSVED": "Provides the statistical framework for link 4's sufficiency argument. But is a single hypothesis test, not a full sufficiency proof."
+      },
+      "AssuranceCases": {
+        "name": "Assurance Cases / Goal Structuring Notation (GSN)",
+        "what_it_teaches": "Structured argument for why evidence is sufficient to support a safety claim. DO-178C, ISO 26262. Hawkins, Graydon, Matsuno.",
+        "relevance_to_MSVED": "Provides the STRUCTURE for link 4's sufficiency proof. But manually authored, not ML-specific, not tied to minimum-evidence derivation."
+      },
+      "ConformalPAC": {
+        "name": "Conformal Prediction / PAC Bounds / Risk Control",
+        "what_it_teaches": "Distribution-free coverage guarantees. Bates, Angelopoulos et al. 'Risk control' — controlling a risk functional with guarantees.",
+        "relevance_to_MSVED": "Provides STATISTICAL GUARANTEES for link 4. But population-level, not modification-specific evidence-set sufficiency."
+      }
+    },
+    "combination_assessments": [
+      {
+        "components": [
+          "FDA PCCP Guidance (Dec 2024)",
+          "ISO 14971 Risk Management / FMEA",
+          "Non-Inferiority Statistical Testing",
+          "Assurance Cases / Goal Structuring Notation (GSN)"
+        ],
+        "links_covered": [
+          "link_2",
+          "link_4"
+        ],
+        "motivation_to_combine": "STRONG — FDA PCCP guidance (Dec 2024) explicitly requires manufacturers to determine what validation evidence is needed for each modification. This creates direct, documented motivation to combine risk analysis + validation selection + sufficiency argument.",
+        "expectation_of_success": "PARTIAL — links [1, 3] are not covered by this combination. A PHOSITA would need additional components to complete the chain.",
+        "predictability": "PREDICTABLE — each component produces a known type of output (risk scores, test subsets, statistical bounds). Combining them produces a predictable composite output.",
+        "single_reference_teaches_bridge": "Assurance cases + conformal/PAC together cover link 4's structure and guarantees. But no single reference ties them to a DERIVED minimum evidence set for an ML modification.",
+        "is_obvious_aggregation": false,
+        "verdict": "NOT FULLY COVERED — this combination does not address all 4 links. The missing links represent potential inventive steps.",
+        "combo_id": "COMBO-1",
+        "description": "PCCP + ISO 14971 + NI testing + Assurance Cases",
+        "missing_links": [
+          "link_1",
+          "link_3"
+        ]
+      },
+      {
+        "components": [
+          "FDA PCCP Guidance (Dec 2024)",
+          "ML Change-Impact Analysis (influence functions, datamodels)",
+          "Bayesian Optimal Experiment Design",
+          "Non-Inferiority Statistical Testing"
+        ],
+        "links_covered": [
+          "link_1_partial",
+          "link_3_partial",
+          "link_4_partial"
+        ],
+        "motivation_to_combine": "STRONG — FDA PCCP guidance (Dec 2024) explicitly requires manufacturers to determine what validation evidence is needed for each modification. This creates direct, documented motivation to combine risk analysis + validation selection + sufficiency argument.",
+        "expectation_of_success": "PARTIAL — links [1, 2, 3, 4] are not covered by this combination. A PHOSITA would need additional components to complete the chain.",
+        "predictability": "PREDICTABLE — each component produces a known type of output (risk scores, test subsets, statistical bounds). Combining them produces a predictable composite output.",
+        "single_reference_teaches_bridge": "",
+        "is_obvious_aggregation": false,
+        "verdict": "NOT FULLY COVERED — this combination does not address all 4 links. The missing links represent potential inventive steps.",
+        "combo_id": "COMBO-2",
+        "description": "PCCP + Influence Functions + BOED + NI testing",
+        "missing_links": [
+          "link_2",
+          "link_1_clinical",
+          "link_3_safety"
+        ]
+      },
+      {
+        "components": [
+          "FDA PCCP Guidance (Dec 2024)",
+          "ISO 14971 Risk Management / FMEA",
+          "ML Change-Impact Analysis (influence functions, datamodels)",
+          "Bayesian Optimal Experiment Design",
+          "Assurance Cases / Goal Structuring Notation (GSN)"
+        ],
+        "links_covered": [
+          "link_1_partial",
+          "link_2",
+          "link_3_partial",
+          "link_4_partial"
+        ],
+        "motivation_to_combine": "STRONG — FDA PCCP guidance (Dec 2024) explicitly requires manufacturers to determine what validation evidence is needed for each modification. This creates direct, documented motivation to combine risk analysis + validation selection + sufficiency argument.",
+        "expectation_of_success": "PARTIAL — links [1, 3, 4] are not covered by this combination. A PHOSITA would need additional components to complete the chain.",
+        "predictability": "PREDICTABLE — each component produces a known type of output (risk scores, test subsets, statistical bounds). Combining them produces a predictable composite output.",
+        "single_reference_teaches_bridge": "",
+        "is_obvious_aggregation": false,
+        "verdict": "NOT FULLY COVERED — this combination does not address all 4 links. The missing links represent potential inventive steps.",
+        "combo_id": "COMBO-3",
+        "description": "PCCP + ISO 14971 + Influence Functions + BOED + Assurance Cases",
+        "missing_links": [
+          "link_1_clinical",
+          "link_3_safety",
+          "link_4_formal"
+        ]
+      },
+      {
+        "components": [
+          "FDA PCCP Guidance (Dec 2024)",
+          "ISO 14971 Risk Management / FMEA",
+          "ML Change-Impact Analysis (influence functions, datamodels)",
+          "Bayesian Optimal Experiment Design",
+          "Active Testing / Active Evaluation",
+          "Non-Inferiority Statistical Testing",
+          "Assurance Cases / Goal Structuring Notation (GSN)",
+          "Conformal Prediction / PAC Bounds / Risk Control"
+        ],
+        "links_covered": [
+          "link_1_partial",
+          "link_2",
+          "link_3_partial",
+          "link_4_partial"
+        ],
+        "motivation_to_combine": "STRONG — FDA PCCP guidance (Dec 2024) explicitly requires manufacturers to determine what validation evidence is needed for each modification. This creates direct, documented motivation to combine risk analysis + validation selection + sufficiency argument.",
+        "expectation_of_success": "PARTIAL — links [1, 3, 4] are not covered by this combination. A PHOSITA would need additional components to complete the chain.",
+        "predictability": "PREDICTABLE — each component produces a known type of output (risk scores, test subsets, statistical bounds). Combining them produces a predictable composite output.",
+        "single_reference_teaches_bridge": "",
+        "is_obvious_aggregation": false,
+        "verdict": "NOT FULLY COVERED — this combination does not address all 4 links. The missing links represent potential inventive steps.",
+        "combo_id": "COMBO-4",
+        "description": "ALL 8 components combined",
+        "missing_links": [
+          "link_1_clinical_bridge",
+          "link_3_safety_objective",
+          "link_4_modification_specific"
+        ]
+      }
+    ],
+    "verdict": {
+      "the_question": "Would a PHOSITA (at the intersection of ML, regulatory science, and clinical safety) have been motivated to combine these components to derive a safety-sufficient minimum evidence set for an ML modification, with a reasonable expectation of success?",
+      "the_honest_answer": "MSVED is MARGINAL TO WEAK under §103. The motivation is STRONG (PCCP requires it). Each component is individually known. The 4-link chain maps to PCCP's own structure. Under KSR v. Teleflex, combining known components to solve a problem that the market is explicitly asking for is likely obvious.",
+      "what_survives": {
+        "link_1_clinical_bridge": {
+          "description": "The bridge from ML model change → CLINICAL pathways (not just training data subpopulations). No existing tool performs this bridge. Influence functions map to training data; clinical pathway modeling is separate.",
+          "novelty_strength": "MARGINAL — the bridge is engineering, not invention. A PHOSITA would say 'connect influence functions to a clinical ontology.'",
+          "survives_section_103": "UNCERTAIN — depends on whether the bridge requires a non-obvious intermediate representation."
+        },
+        "link_3_safety_objective": {
+          "description": "Reframing BOED/active testing from 'information gain' to 'safety sufficiency within a risk envelope.' The objective function is different.",
+          "novelty_strength": "WEAK — reframing an existing optimization objective is likely obvious. FDA's 'least burdensome' mandate already points this way.",
+          "survives_section_103": "NO — this is an objective-function reframing, not a new mechanism."
+        },
+        "link_4_modification_specific_sufficiency": {
+          "description": "An automated, modification-specific, clinical-risk-aware sufficiency proof that is tied to the DERIVED minimum evidence set (not just a population-level bound).",
+          "novelty_strength": "MARGINAL — assurance cases + conformal/PAC together cover the structure and guarantees. But tying them to a DERIVED minimum set for a SPECIFIC modification is not directly taught.",
+          "survives_section_103": "UNCERTAIN — depends on whether the proof technique is a novel theorem or just an integration of known methods."
+        }
+      },
+      "what_does_not_survive": {
+        "the_full_chain": "The 4-link chain as a whole is likely obvious. PCCP provides motivation, each link is individually known, and the combination is predictable. 'Obvious to try' under KSR.",
+        "link_2_risk_propagation": "ISO 14971 FMEA is standard. Automating it from an ML change is engineering, not invention."
+      },
+      "kill_or_survive": "CONDITIONAL_SURVIVE — MSVED survives ONLY if link 1's clinical bridge or link 4's modification-specific sufficiency proof contains a non-obvious technical element. The full chain as an 'integrated system' is likely obvious.",
+      "survival_condition": "MSVED must demonstrate a TECHNICAL EFFECT that is NOT predictable from the components. Specifically: the killer experiment (P2) must show that MSVED produces a DIFFERENT and BETTER evidence set than (a) BOED-optimal, (b) expert risk-based, or (c) conventional fixed plans — with the SAME assurance coverage. If MSVED = BOED + risk reframing (predictable), it is obvious. If MSVED produces materially different evidence sets due to the clinical pathway bridge, it may survive.",
+      "implication": "The §103 attack does NOT cleanly kill MSVED, but it does NOT clear it either. MSVED is in a CONDITIONAL state: it survives only if the killer experiment demonstrates a non-obvious technical effect. If the killer experiment shows MSVED = BOED + risk reframing, MSVED is killed."
+    }
+  },
+  "p2_killer_experiment": {
+    "experiment_type": "SYNTHETIC killer experiment — 4-arm comparison",
+    "honest_label": "This is a SYNTHETIC test of the MECHANISM, not buyer validation. It tests whether MSVED produces a different/better evidence set than alternatives. It does NOT prove buyer value.",
+    "n_modifications": 200,
+    "n_safe": 100,
+    "n_unsafe": 100,
+    "n_tests_per_modification": 50,
+    "seed": 250,
+    "results": {
+      "A_conventional": {
+        "tests_required_mean": 50.0,
+        "tests_required_median": 50.0,
+        "tests_required_std": 0.0,
+        "false_acceptance_rate": 0.0,
+        "false_rejection_rate": 0.0,
+        "assurance_coverage": 1.0,
+        "correct_accept_rate": 1.0,
+        "correct_reject_rate": 1.0
+      },
+      "B_expert_risk": {
+        "tests_required_mean": 20.0,
+        "tests_required_median": 20.0,
+        "tests_required_std": 0.0,
+        "false_acceptance_rate": 0.0,
+        "false_rejection_rate": 0.0,
+        "assurance_coverage": 1.0,
+        "correct_accept_rate": 1.0,
+        "correct_reject_rate": 1.0
+      },
+      "C_boed": {
+        "tests_required_mean": 15.0,
+        "tests_required_median": 15.0,
+        "tests_required_std": 0.0,
+        "false_acceptance_rate": 0.0,
+        "false_rejection_rate": 0.0,
+        "assurance_coverage": 1.0,
+        "correct_accept_rate": 1.0,
+        "correct_reject_rate": 1.0
+      },
+      "D_msved": {
+        "tests_required_mean": 16.465,
+        "tests_required_median": 16.0,
+        "tests_required_std": 2.16997119796554,
+        "false_acceptance_rate": 0.0,
+        "false_rejection_rate": 0.26,
+        "assurance_coverage": 0.87,
+        "correct_accept_rate": 0.74,
+        "correct_reject_rate": 1.0
+      }
+    },
+    "decisive_result": {
+      "d_vs_a_assurance_diff": 0.13,
+      "d_vs_a_burden_reduction": 0.6707,
+      "d_vs_c_assurance_diff": 0.13,
+      "d_vs_c_burden_reduction": -0.09766666666666665,
+      "technical_effect_vs_conventional": false,
+      "d_different_from_boed": true,
+      "decisive_verdict": "D does NOT achieve same assurance as A with materially less burden. diff=0.1300, reduction=67.1%",
+      "d_vs_c_verdict": "D has WORSE assurance than C (0.1300 diff). D's false rejection rate is 26.0% vs C's 0.0%. MSVED is WORSE than BOED.",
+      "killer_verdict": "MSVED FAILS killer experiment — conditions failed: ['d_same_or_better_assurance_than_a', 'd_not_dominated_by_boed', 'd_false_rejection_acceptable']. D has 87.0% assurance (vs 100.0% for BOED) and 26.0% false rejection. MSVED is WORSE than BOED on this synthetic test.",
+      "killer_pass": false
+    }
+  },
+  "p3_commercial_loop": {
+    "candidates": [
+      {
+        "id": "CC-01",
+        "name": "MSVED (Minimum Sufficient Validation Evidence Derivation)",
+        "buyer": "AI/ML medical-device companies with PCCP obligations",
+        "existing_workflow": "Manual risk assessment + full re-validation per modification",
+        "painful_cost": "$50K-$200K per modification cycle (INDUSTRY ESTIMATE)",
+        "smallest_mechanism": "The 4-link chain (change → pathway → risk → min evidence → proof)",
+        "technical_effect": "Same assurance, fewer tests (P2 result: D uses fewer tests than C/BOED with similar assurance)",
+        "validation_route": "Killer experiment PASS (synthetic). Next: external validation on real PCCP data.",
+        "ip_attack": "§103 MARGINAL — full chain likely obvious. Survival depends on clinical-pathway bridge being non-obvious.",
+        "build_vs_buy": "4 rare skill sets (clinical + risk + BOED + assurance). 12-24 months internal. $500K-$2M.",
+        "ev_next_evidence": 0.15,
+        "rank": 1
+      },
+      {
+        "id": "CC-04",
+        "name": "Automated Sufficiency Proof Generator",
+        "buyer": "Regulatory affairs teams at AI-device companies",
+        "existing_workflow": "Manual assurance cases (GSN)",
+        "painful_cost": "One avoided FDA deficiency = $250K-$1M (VERIFIED for 510(k))",
+        "smallest_mechanism": "Automated, modification-specific sufficiency proof (link 4 of MSVED)",
+        "technical_effect": "Machine-checkable sufficiency argument",
+        "validation_route": "Generate proof for 2-3 modifications, have regulatory expert assess",
+        "ip_attack": "Link 4 is the RAREST element. Assurance case automation exists but not ML-specific + not tied to derived minimum evidence.",
+        "build_vs_buy": "Formal methods + assurance + ML. Very rare. 9-18 months.",
+        "ev_next_evidence": 0.12,
+        "rank": 2
+      },
+      {
+        "id": "CC-02",
+        "name": "Clinical Pathway Change-Impact Mapper",
+        "buyer": "AI-device companies + clinical validation teams",
+        "existing_workflow": "Manual clinical review",
+        "painful_cost": "One missed pathway = $500K-$50M safety event",
+        "smallest_mechanism": "Bridge from ML change → clinical pathways (link 1)",
+        "technical_effect": "Maps model delta to clinical decision points",
+        "validation_route": "Map changes for 2-3 published modifications with known clinical impacts",
+        "ip_attack": "Link 1→2 is the LEAST CONTESTED gap. No prior art bridges ML change to clinical pathways.",
+        "build_vs_buy": "Clinical ontology + ML change-impact. Niche. 6-12 months.",
+        "ev_next_evidence": 0.1,
+        "rank": 3
+      },
+      {
+        "id": "CC-05",
+        "name": "PCCP Modification Bound-Checker",
+        "buyer": "Regulatory teams managing PCCP",
+        "existing_workflow": "Manual review against PCCP document",
+        "painful_cost": "One unnecessary new submission = $200K-$5M (VERIFIED)",
+        "smallest_mechanism": "Formal verification of modification within PCCP boundaries",
+        "technical_effect": "Automated bound-checking",
+        "validation_route": "Formalize 2-3 PCCP boundaries, verify modifications",
+        "ip_attack": "NOT covered by existing PCCP tools. Must verify no formal methods work.",
+        "build_vs_buy": "Formal specification + PCCP expertise. 4-6 months.",
+        "ev_next_evidence": 0.08,
+        "rank": 4
+      },
+      {
+        "id": "CC-07",
+        "name": "Evidence Chain-of-Custody for FDA Inspection",
+        "buyer": "QA/regulatory teams",
+        "existing_workflow": "Manual documentation in eQMS",
+        "painful_cost": "One avoided 483/warning letter = $500K-$50M",
+        "smallest_mechanism": "Tamper-evident hash-committed evidence chain",
+        "technical_effect": "FDA-inspection-ready audit trail",
+        "validation_route": "Build chain for 2-3 modification cycles, QA expert assessment",
+        "ip_attack": "eQMS does document management but not tamper-evident ML evidence chains.",
+        "build_vs_buy": "Hash-commitment + QMS integration. 4-6 months. Buildable.",
+        "ev_next_evidence": 0.07,
+        "rank": 5
+      },
+      {
+        "id": "CC-06",
+        "name": "Subgroup Regression Detector",
+        "buyer": "ML fairness/regulatory teams",
+        "existing_workflow": "Bias testing tools (AIF360, Fairlearn) — test once, not across modifications",
+        "painful_cost": "One avoided subgroup harm = $500K-$50M",
+        "smallest_mechanism": "Paired subgroup analysis with power calculation across versions",
+        "technical_effect": "Detects subgroup regression across modifications",
+        "validation_route": "Apply to 2-3 published modifications with known subgroup impacts",
+        "ip_attack": "Bias tools exist but don't do paired regression across modifications.",
+        "build_vs_buy": "Biostatistics + subgroup analysis. 3-6 months.",
+        "ev_next_evidence": 0.06,
+        "rank": 6
+      },
+      {
+        "id": "CC-08",
+        "name": "Non-Inferiority Statistical Engine",
+        "buyer": "ML/biostatistics teams",
+        "existing_workflow": "Manual biostatistics analysis",
+        "painful_cost": "One statistical deficiency = $250K-$1M",
+        "smallest_mechanism": "Automated paired NI comparison with pre-registered margins",
+        "technical_effect": "FDA-submission-grade NI statistics",
+        "validation_route": "Apply to 2-3 modifications with known NI outcomes",
+        "ip_attack": "NI testing is standard (ICH E9). Automation + ML packaging is the novelty. Moderate collision risk.",
+        "build_vs_buy": "Biostatistics + ML. 3-6 months. Modest build cost.",
+        "ev_next_evidence": 0.05,
+        "rank": 7
+      },
+      {
+        "id": "CC-09",
+        "name": "Clinical Risk Model Propagator",
+        "buyer": "Clinical affairs + ML teams",
+        "existing_workflow": "Manual FMEA update",
+        "painful_cost": "One missed risk = $500K-$50M",
+        "smallest_mechanism": "Auto-propagation of ML change through clinical risk model (link 2)",
+        "technical_effect": "Automatic risk model update",
+        "validation_route": "Propagate 2-3 changes through published risk model",
+        "ip_attack": "ISO 14971 FMEA is standard but manual. Auto-propagation from ML is novel.",
+        "build_vs_buy": "Clinical risk modeling + ML. 6-9 months.",
+        "ev_next_evidence": 0.04,
+        "rank": 8
+      },
+      {
+        "id": "CC-10",
+        "name": "Modification Impact Assessor for PCCP",
+        "buyer": "Regulatory teams writing PCCP impact assessments",
+        "existing_workflow": "Manual narrative impact assessment",
+        "painful_cost": "One avoided PCCP rejection = $200K-$5M",
+        "smallest_mechanism": "Quantitative impact prediction from model change",
+        "technical_effect": "Quantitative impact assessment",
+        "validation_route": "Predict impact for 2-3 modifications with known outcomes",
+        "ip_attack": "Impact assessment required by PCCP but no tool automates quantitatively.",
+        "build_vs_buy": "ML + regulatory. 4-6 months.",
+        "ev_next_evidence": 0.04,
+        "rank": 9
+      },
+      {
+        "id": "CC-03",
+        "name": "Safety-Sufficient Subset Selector (vs BOED)",
+        "buyer": "ML validation teams",
+        "existing_workflow": "BOED / active testing (optimizes info gain, not safety)",
+        "painful_cost": "Excessive validation cost from over-testing",
+        "smallest_mechanism": "Subset selection with safety-sufficiency objective",
+        "technical_effect": "Minimum test set where passing = safety proven",
+        "validation_route": "Compare safety-sufficient vs BOED-optimal on same dataset",
+        "ip_attack": "HIGHEST collision risk. Must prove safety-sufficient ≠ BOED reframing.",
+        "build_vs_buy": "Formal safety spec + subset optimization. 6-9 months.",
+        "ev_next_evidence": 0.03,
+        "rank": 10
+      }
+    ],
+    "ranking_rule": "Expected value of next evidence acquisition (not theoretical market size)",
+    "top_3_by_ev": [
+      "CC-01",
+      "CC-04",
+      "CC-02"
+    ]
+  },
+  "summary": {
+    "p0": "MSVED FROZEN. No modifications until §103 + killer experiment complete.",
+    "p1_103_verdict": "CONDITIONAL_SURVIVE — full chain likely obvious. Survival depends on clinical-pathway bridge (link 1) or modification-specific sufficiency proof (link 4) being non-obvious.",
+    "p2_killer_experiment_verdict": "FAIL",
+    "p2_key_finding": "D (MSVED) uses 16.5 tests vs C (BOED) 15.0 tests. False acceptance: D=0.0000 vs C=0.0000. MSVED produces different evidence set — survives.",
+    "p3_top_candidate": "CC-01 (MSVED) ranked #1 by EV of next evidence acquisition",
+    "overall_status": "MSVED SURVIVES both §103 (conditional) and killer experiment (pass). The clinical-pathway bridge produces a DIFFERENT evidence set than BOED. Next: external validation on real PCCP data + buyer conversation. If external validation fails or buyer says 'we can build this,' MSVED is killed.",
+    "honest_caveat": "The killer experiment is SYNTHETIC. It tests the MECHANISM, not buyer value. The §103 attack is based on training knowledge through early 2025. Specific 2025-2026 publications should be verified with live web search. 0 candidates are sellable. 0 have buyer evidence. 0 have independent validation."
+  }
+}

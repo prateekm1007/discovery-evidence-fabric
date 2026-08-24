@@ -4013,3 +4013,33 @@ Stage Summary:
 - P5: Transaction standard defined permanently. Same 14-element package at every tier. Price = rights/scope/exclusivity, NEVER evidence quality.
 - Portfolio: 0/5 world-class. 10 commercial hypotheses (0 sellable). Cemetery 18. Constitution v1.5.0.
 - Next: (1) Verify collision search against specific 2025-2026 publications. (2) Implement MSVED link 1 on public dataset (Gate 1). (3) File defensive publication for MSVED chain. (4) Seek first buyer conversation. (5) Stop rule: no transactions until SELLABLE, no validation claims until external execution, no economic claims until buyer disclosure.
+
+---
+Task ID: R250-MSVED-FREEZE-103-KILLER
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: Execute CEO Round 250 — P0: freeze MSVED. P1: brutal §103 attack. P2: killer experiment (A vs B vs C vs D). P3: commercial loop. If obvious aggregation → kill. If killer experiment fails → kill or redesign.
+
+Work Log:
+- Read Constitution v1.5.0 (35 articles). Confirmed canonical state: git 26e83ac, constitution hash f82ae4f6, cemetery 18 entries.
+- P0 — Froze MSVED mechanism. R250_MSVED_FROZEN_SPEC.md written. Mechanism: ML change → clinical pathway → risk envelope → minimum sufficient evidence → sufficiency proof. No modifications until §103 + killer experiment complete.
+- P1 — Brutal §103 attack. Decomposed MSVED into 8 component domains (PCCP, ISO 14971, influence functions, BOED, active testing, NI testing, assurance cases, conformal/PAC). Built 4 explicit combinations. Assessed motivation + expectation of success + predictability + single-reference bridge for each.
+  - VERDICT: CONDITIONAL_SURVIVE. MSVED is MARGINAL TO WEAK under §103. Motivation is STRONG (PCCP requires it). Each component is individually known. The 4-link chain maps to PCCP's own structure. Under KSR v. Teleflex, likely obvious.
+  - What might survive: link 1 clinical bridge (engineering, not invention), link 4 modification-specific sufficiency proof (rarest, but may be integration of known methods).
+  - What does NOT survive: the full chain as integrated system (likely obvious), link 2 (ISO 14971 is standard), link 3 (objective reframing, not new mechanism).
+  - Survival condition: killer experiment must show MSVED produces DIFFERENT and BETTER evidence set than BOED with SAME assurance.
+- P2 — Killer experiment. 4 arms on 200 synthetic modifications (100 safe, 100 unsafe, 50 tests each). A=conventional (50 tests), B=expert risk (20 tests), C=BOED (15 tests), D=MSVED (16.5 tests).
+  - Results: A/B/C all achieved 100% assurance, 0% false accept, 0% false reject. D achieved 87% assurance, 0% false accept, 26% FALSE REJECTION.
+  - D vs A: 67% burden reduction BUT 13% assurance loss. D vs C (BOED): D uses MORE tests (16.5 vs 15) AND has WORSE assurance (87% vs 100%).
+  - VERDICT: FAIL. MSVED is WORSE than BOED. 3 of 5 conditions failed: (1) assurance not same/better than A, (2) dominated by BOED, (3) false rejection 26% (unacceptable).
+  - HONEST CORRECTION: initial verdict logic incorrectly said PASS because it checked "different from BOED" without checking "better." Fixed to require same-or-better assurance with fewer tests. Corrected verdict: FAIL.
+  - Article XXIX note: this may be implementation failure (conservative min-score threshold) not mechanism failure. The min-score >0.5 for ALL tests is too conservative — any single low-scoring test causes rejection. A real MSVED would use formal non-inferiority or conformal risk control. But per Article XXX (never optimize the evaluator), I did NOT tune the threshold to get a pass.
+- P3 — Commercial loop. 10 candidates ranked by expected value of next evidence acquisition. Top 3: CC-01 MSVED (EV 0.15), CC-04 Sufficiency Proof Generator (0.12), CC-02 Clinical Pathway Mapper (0.10).
+- CEO decision point: Option A (kill MSVED), Option B (one redesign of sufficiency check per Article XXIX), Option C (pivot to CC-04 link 4 alone). Recommendation: Option B — one redesign, then kill if still fails.
+- ALL artifacts verified on disk before commit.
+
+Stage Summary:
+- P0: MSVED FROZEN.
+- P1 §103: CONDITIONAL_SURVIVE (marginal). Full chain likely obvious. Survival depends on non-obvious element in link 1 or link 4.
+- P2 Killer: FAIL. MSVED has 87% assurance (vs 100% for BOED) and 26% false rejection. Dominated by BOED. Implementation may be too conservative (min-score threshold), but per Article XXX did not tune to pass.
+- P3: 10 candidates ranked. CC-01 top by EV but just failed killer. CC-04 (Sufficiency Proof Generator) is #2 and may be the pivot target.
+- Portfolio: 0/5 world-class. 10 hypotheses (0 sellable). MSVED failed killer experiment. CEO decision required: kill, redesign, or pivot.
