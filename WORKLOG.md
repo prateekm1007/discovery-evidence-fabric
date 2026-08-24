@@ -4460,3 +4460,24 @@ Stage Summary:
 - Unexpected-effect proof added. Quantified prediction vs strongest baseline. Then prove it.
 - Portfolio: 0 Level 2, 0 sellable, 0 transactions. Discovery machine ~85%.
 - Next frontier: previously unknown functional interaction + quantitatively unexpected effect + survives functional-equivalence prior art.
+
+---
+Task ID: R265-GATE-M-SPLIT-VALIDATION
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 split Gate M into M1-M4. P1 strengthen unexpected-effect test. P2 same-effect-is-not-the-same-invention rule. P3 validate Gate M against 3 known cases.
+
+Work Log:
+- P0 — Gate M split into 4 sub-questions: M1 (interaction law disclosed?), M2 (emergent effect achieved by any mechanism?), M3 (comparable mechanism exists?), M4 (comparable performance under comparable constraints?). Kill only when ALL 4 found. Known outcome alone does NOT auto-kill. A patent can be novel even when the outcome is known, if the mechanism/constraints/performance are materially different.
+- P1 — Unexpected-effect test strengthened. 7 mandatory pre-registration fields: A baseline, B baseline, predicted A+B, strongest alternative, alternative performance, predicted advantage, why not derivable. Must be quantitative, not qualitative. If predictable from A+B independently → NOT unexpected.
+- P2 — Same-effect-is-not-the-same-invention rule. Known outcome via different mechanism with different constraints/performance may still be patentable. Auto-kill ONLY when mechanism AND constraints AND performance are ALL substantially the same. 6-step test: identify outcome, identify mechanism, compare constraints, compare performance, check material difference, verdict.
+- P3 — Gate M validation: 3/3 passed. SGET (all M1-M4 found → FAIL, correct), IB-03 (all found → FAIL, correct), X-ray 1895 (all found → FAIL, correct). The split Gate M produces correct verdicts with CORRECT reasoning (all 4 sub-questions found, not just "effect exists"). Limitation: only tested cases that SHOULD fail — did not test a case that should PASS.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- Gate M corrected: split into M1-M4. Kill only when ALL 4 found. Known outcome alone does NOT auto-kill.
+- Unexpected-effect test: 7 quantitative pre-registration fields. Must prove NOT predictable from A+B.
+- Same-effect rule: different mechanism/constraints/performance may survive despite known outcome.
+- Gate M validation: 3/3 (SGET, IB-03, X-ray). All correctly FAIL.
+- Level 2: 13 sub-gates with Gate M now having 4 sub-questions.
+- Portfolio: 0 Level 2, 0 sellable, 0 transactions. Discovery machine ~85-88%.
+- Next: R266 generates ONE new candidate using corrected Gate M. Must have novel interaction law OR materially different constraints/performance.
