@@ -4348,3 +4348,35 @@ Stage Summary:
 - 2 adversarial misses are highly specialized phrasings — known limitation, functional-equivalence expansion is good but not exhaustive.
 - Portfolio unchanged: 0 Level 2, 0 sellable, 0 transactions.
 - Next: R261 generates ONE genuinely new candidate using information-bottleneck grammar + full 8-sub-gate Level 2 + Engineer-in-a-Weekend + Combination Obviousness. Only if ALL pass → first genuine Level 2 candidate.
+
+---
+Task ID: R261-INDEPENDENT-VALIDATOR-VALIDATION
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 attack engine with independently-authored ground truth. P1 measure false negatives at reference level. P2 search saturation criterion. P3 separate novelty from inventive step.
+
+Work Log:
+- P0 — INDEPENDENT ground truth authored by subagent (NOT main agent). 3 test cases across 3 domains:
+  - Case 1: Boronate hydrogel resonant implantable glucose sensor (implantable biosensors). 5 references (Senseonics Eversense, Holtz/Asher Nature 1997, Alexeev 2004, Kitano 1991, Ong/Grimes 2001).
+  - Case 2: AI-compressed MRI with neural-prior reconstruction (medical imaging). 5 references (Lustig CS-MRI 2007, Zhu AUTOMAP 2018, fastMRI 2020, Yang ADMM-Net 2016, Sriram 2020).
+  - Case 3: Continuum neurosurgical teleoperator with haptic feedback (surgical robotics). 5 references (Webster concentric-tube, Simaan snake, da Vinci, Berkelman/Tholey haptics, transnasal endoscopic surgery).
+  - Main agent ran blind search WITHOUT seeing subagent's ground truth.
+- Blind search results: 3/3 correct verdicts (all PRIOR_ART_THREATENED). 19-21 terms generated per case. 3-4/5 domains with prior art found. Old-art shock test FAILED for all (15-110+ years).
+- P1 — FALSE NEGATIVE MEASUREMENT at reference level:
+  - References: 14/15 discovered (93%). 1 missed: Case 3 missed da Vinci patent reference (specific reference text didn't match engine terms, but broader search still identifies candidate as threatened).
+  - Functional equivalents: 21/21 discovered (100%).
+  - Adversarial terms: 12/12 discovered (100%).
+  - Old-art: all 3 principles correctly identified with age.
+- Overall validator: PASS. 3/3 correct verdicts, 93% ref discovery (≥60%), 100% FE (≥70%), 100% adversarial (≥50%).
+- Honest caveat: subagent is still part of same system. True independence requires external patent attorney. This is closest to independence achievable within current system.
+- P2 — Search saturation criterion defined: <10% new prior art between successive iterations = saturated. Required for Level 2. Prevents premature search termination.
+- P3 — Novelty (§102: one reference, all elements) vs inventive step (§103: combination, motivation, expectation of success) separated. Engine must not conflate aggregation (A+B independent) with functional interaction (A+B synergistic). Hindsight warning per EPO G-VII 5.1.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- Validator VALIDATED on independently-authored ground truth. 3/3 correct, 93% reference discovery, 100% FE, 100% adversarial.
+- 1 false negative (da Vinci reference in Case 3) — specific reference missed but broader search catches the candidate.
+- Search saturation criterion added: <10% new prior art between iterations = saturated.
+- Novelty vs inventive step separated: §102 (single reference) vs §103 (combination + motivation + no hindsight).
+- Portfolio unchanged: 0 Level 2, 0 sellable, 0 transactions.
+- Discovery machine now ~80% (CEO estimate). Front-end hardened through 3 validation rounds (R259 retrospective, R260 blind, R261 independent).
+- Next: R262 generates first genuinely new candidate using full discovery chain + 8-sub-gate Level 2 + saturation + novelty/inventive-step separation.
