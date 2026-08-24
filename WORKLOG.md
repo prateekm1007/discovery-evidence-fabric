@@ -4178,3 +4178,30 @@ Stage Summary:
 - Commercial IP: 7 components defined. CC-04's IP position is WEAK — must be built through flywheel.
 - Three outcomes: World-Class (0/5), Commercial Tool (CC-04 candidate), Kill (MSVED killed).
 - Next: R255 attacks CC-08 (NI Statistical Engine). High collision risk — NI testing is standard. The key question: is there ANY non-obvious element in automating NI testing for ML modifications?
+
+---
+Task ID: R255-CC08-KILL-OPTIMIZER-NEWHUNT
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: P0 attack CC-08 (if standard NI + ML + reporting → KILL). P1 fix optimizer (INVEST/WATCH/RESET, all negative → NEW-HUNT). P2 diversify across 10 domains. P3 preserve CC-04.
+
+Work Log:
+- P0 — CC-08 §103 attack. Decomposed into 5 components: (1) NI testing (ICH E9, standard), (2) ML modification context (taught by FDA PCCP guidance), (3) automated reporting (standard in SAS/R/Python), (4) Bonferroni (1936), (5) pre-registered margins (standard practice). Every component is standard. No inventive step. Under KSR: obvious to try. KILLED immediately — no simulation, no killer experiment. Added to cemetery as CE-021.
+- P1 — Fixed portfolio optimizer. Three states: INVEST (EV>0), WATCH (EV≈0), RESET (all EV<-0.05). When all candidates in RESET → invoke NEW-HUNT MODE automatically. The R254 mistake was choosing the "least negative" candidate — that is still choosing a bad option. All 7 remaining CC candidates are in RESET.
+- P2 — NEW-HUNT MODE. Searched across 10 diversified domains (not 8 PCCP variations). Found 5 new candidates:
+  - NC-05: MRI Coil Failure Predictor (hospital capital equipment, EV=+0.0047) — INVEST
+  - NC-03: Adaptive Trial Futility Calculator (clinical trials, EV=-0.0373) — WATCH
+  - NC-01: Sterilization Validation Dose Auditor (manufacturing/QC, EV=-0.0634) — WATCH
+  - NC-04: Assay Cross-Reactivity Predictor (IVD, EV=-0.0816) — WATCH
+  - NC-02: Implant Fatigue Life Predictor (implant lifecycle, EV=-0.0822) — WATCH
+  - NC-05 is the FIRST positive-EV candidate in the portfolio. Physical mechanism (MRI coil failure) with measurable economic effect (downtime avoided). Different domain, different buyer (hospitals + MRI service companies), different mechanism (predictive maintenance from telemetry).
+- P3 — CC-04 preserved as COMMERCIAL_TOOL_CANDIDATE_NOT_SELLABLE. Not killed (mechanism works), not promoted (not novel). Needs validation + economics + know-how + TTP. Does not block new candidate discovery.
+- Key insight: the portfolio was stuck in a PCCP regulatory software loop. NEW-HUNT MODE breaks the loop by searching across diversified physical domains. The new candidates have higher EV because they address physical mechanisms with measurable technical effects, not documentation automation.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- CC-08 KILLED (§103 obvious — standard NI testing, no inventive step). CE-021 added. Cemetery: 21 entries.
+- Portfolio optimizer fixed: INVEST/WATCH/RESET. All 7 remaining CC candidates in RESET.
+- NEW-HUNT MODE invoked. 5 diversified candidates discovered. NC-05 (MRI Coil Failure Predictor) is first INVEST candidate (EV=+0.0047).
+- CC-04 preserved as COMMERCIAL_TOOL_CANDIDATE_NOT_SELLABLE.
+- Portfolio: 0/5 world-class. 1 commercial tool candidate (CC-04). 1 INVEST candidate (NC-05). 4 WATCH candidates. 7 RESET candidates. 0 sellable. 0 transactions.
+- Next: R256 attacks NC-05 (MRI Coil Failure Predictor) with §103 + killer experiment. First positive-EV candidate. Physical mechanism. Diversified domain.
