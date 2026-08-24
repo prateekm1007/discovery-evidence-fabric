@@ -4404,3 +4404,38 @@ Stage Summary:
 - Level 2: 12 sub-gates. Discovery chain: FUNCTIONAL INTERACTION mandatory.
 - Portfolio unchanged: 0 Level 2, 0 sellable, 0 transactions. Discovery machine ~80-85%.
 - Next: R263 generates first genuinely new candidate using 12-sub-gate Level 2 + synergy test. Must demonstrate FUNCTIONAL INTERACTION (not aggregation).
+
+---
+Task ID: R263-FUNCTIONAL-INTERACTION-CANDIDATE
+Agent: main (CTO, Super Z, session 2026-08-24)
+Task: Generate ONE candidate where A changes B's operating state. Pre-register. Run 12 gates. Correct outcome acceptable to be killed.
+
+Work Log:
+- Generated SGET (Strain-Gated Electrochemical Transduction). A = controlled mechanical strain pulse, B = electrochemical sensor at implant surface. A changes B's operating state from steady-state diffusion (2D surface, ~10-100μm) to transient forced-convection sampling (3D depth, ~1-10mm). Emergent effect: depth-resolved tissue chemistry from single implant surface. Neither A (measures mechanics) nor B (measures surface chemistry) can produce depth profiles independently. Synergy score 2.
+- Pre-registered all 7 required elements before search: A state, B state, interaction law, predicted effect, why A-alone fails, why B-alone fails, why not trivially reproducible.
+- Ran 12 gates:
+  - A variable novelty: PASS (depth-resolved tissue chemistry from implant not available)
+  - B transduction novelty: MARGINAL (sonoelectrochemistry adjacent since 1980s)
+  - C architecture novelty: MARGINAL (sensor+actuator integration is engineering)
+  - D functional equivalence: PASS (15 terms, 5 domains, no equivalent)
+  - E cross-domain: PASS (4/5 clear, 1 partial)
+  - F old-art: MARGINAL (components 40-100+ years, interaction appears new)
+  - G combination obviousness: MARGINAL (emergent capability not predictable from components)
+  - H commercial substitution: FAIL (reproducible for ~$100-200K, below $250K threshold)
+  - I triple saturation: FAIL (saturation not measured)
+  - J §102: PASS (no single reference contains all elements)
+  - K §103: MARGINAL (depth profiling not taught by closest prior art)
+  - L synergy: PASS (score 2 ≥ 2)
+- VERDICT: KILLED. 2 gates failed: H (commercial substitution <$250K) and I (saturation not measured).
+- SGET is the FIRST candidate to achieve synergy score ≥ 2 (functional interaction, not aggregation). All 7 previous killed candidates scored 0. The functional-interaction grammar is working.
+- SGET fails because components are too commercially accessible (piezo actuator + electrochemical sensor + sync electronics ~$10-20K, plus ~$100K research time = ~$100-200K total). The escape clause (unexpected technical effect — depth profiling not predictable from components) MAY save it, but the gate as written requires FAIL.
+- SGET may be reclassifiable as commercial tool candidate (like CC-04) if escape clause accepted + saturation completed + buyer economics verified.
+- ALL artifacts verified on disk.
+
+Stage Summary:
+- SGET KILLED at Gate H (commercial substitution <$250K) + Gate I (saturation not measured).
+- BUT: SGET is the FIRST synergy-2 candidate. Genuine functional interaction: strain changes electrochemical sensor's operating state from 2D to 3D depth profiling. This is NOT aggregation.
+- Progress: the functional-interaction grammar works. It produces candidates with genuine emergence. The failure is at commercial substitution — components too accessible.
+- The next candidate needs: functional interaction AND components that are NOT commercially available (custom material, novel transduction) OR interaction model so non-obvious that escape clause clearly applies.
+- Portfolio: 0 Level 2, 0 sellable, 0 transactions. First synergy-2 candidate (killed but progress). Discovery machine ~85%.
+- Next: CEO decision. Options: (A) reclassify SGET as commercial tool (if escape clause), (B) generate next candidate with harder-to-reproduce interaction, (C) further validate engine.
