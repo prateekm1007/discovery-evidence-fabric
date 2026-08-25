@@ -1,0 +1,39 @@
+{
+  "candidate_id": "P-16",
+  "candidate_name": "NIR Photovoltaic (940nm)",
+  "R308_state": "BUYER_TESTABLE (744 μW at 940nm, PASS, MCX cross-check pending)",
+  "R308_evidence_summary": "Reported 744 μW at 940nm. Internal model uses diffusion approximation. R308 audit found 60-70% disagreement between diffusion approximation and Kubelka-Munk. Both are internal approximations — NOT independent verification.",
+  "R309_phase": "B",
+  "R309_role": "P-16 is the canonical case for Article XXXVI §6 (standard simulator registry) and §7 (independent verification). The R308 disagreement is exactly why the standard engine mandate exists.",
+  "R308_disagreement_diagnosis": {
+    "model_A": "Diffusion approximation — predicts ~744 μW (flattering)",
+    "model_B": "Kubelka-Munk — predicts ~250-300 μW (60-70% lower)",
+    "root_cause_hypothesis": "Diffusion approximation is valid only when scattering >> absorption and source is far from detector. At 940nm in CSF/brain tissue, neither condition may hold strongly, so the diffusion approximation over-estimates fluence at the PV cell.",
+    "R309_resolution": "Use MCX (Monte Carlo gold standard for tissue optics) + PyTissueOptics (independent Python implementation) + published 940nm tissue-transmission measurements (Jacques 2013 or equivalent). MCX is the tiebreaker. Published measurement is ground truth."
+  },
+  "R309_protocol": {
+    "step_1_preregistration": {
+      "engine_id": "SIM_MCX",
+      "secondary_engine_id": "SIM_PYTISSOPT",
+      "reference_case": "Published NIR 940nm transmission through 5mm tissue phantom (Jacques 2013)",
+      "metric": "fluence_at_detector_mW_per_cm2",
+      "frozen_tolerance_relative": 0.10,
+      "frozen_tolerance_absolute": "0.05 mW/cm^2",
+      "preregistration_timestamp": "MUST be recorded BEFORE any MCX run"
+    },
+    "step_2_run_our_implementation": "Diffusion approximation model on reference case (5mm tissue, 940nm source). Record fluence at detector position.",
+    "step_3_run_MCX": "Same phantom geometry, same source, same optical properties (μa, μs, g, n at 940nm). MCX Monte Carlo simulation. Record fluence at detector.",
+    "step_4_run_PyTissueOptics": "Same phantom. Independent Python Monte Carlo. Record fluence at detector.",
+    "step_5_compare_to_published": "Jacques 2013 (or equivalent) measured 940nm transmission through 5mm tissue phantom. Compare all three model outputs to the published measurement.",
+    "step_6_verdict": {
+      "MODEL_VERIFIED": "If our implementation, MCX, PyTissueOptics, and published measurement all agree within 10% relative / 0.05 mW/cm² absolute. P-16 progresses with VERIFIED power output (likely the lower number, not 744 μW).",
+      "MODEL_DISAGREEMENT": "If our implementation disagrees with MCX/PyTissueOptics/published. Root cause analysis (likely: diffusion approximation invalid for this geometry). Resolution: upgrade our model to Monte Carlo (use MCX output as our model), re-preregister, re-verify."
+    },
+    "step_7_final_economic_claim": "Use the VERIFIED power output, NOT the attractive 744 μW. If verified output is 300 μW, P-16's economic claim is based on 300 μW. Article XXXVI §8: central value claim must use verified number."
+  },
+  "R309_anti_pattern_forbidden": {
+    "choosing_the_attractive_result": "If diffusion approximation gives 744 μW but MCX gives 300 μW, the answer is 300 μW (or whatever the published measurement supports). Choosing 744 μW because it is more attractive is a constitutional violation under Article XV (must disclose inconvenient results) and Article XXVIII (no silent semantic promotion)."
+  },
+  "R309_target_state": "TECHNOLOGY_TRANSFER_READY with VERIFIED power output (whatever it is)",
+  "success_criterion": "P-16 becomes the demonstration that the standard simulator registry works. If P-16 cannot be verified, the entire Article XXXVI §6 framework needs review."
+}

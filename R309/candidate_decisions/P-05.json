@@ -1,0 +1,24 @@
+{
+  "candidate_id": "P-05",
+  "candidate_name": "Wash-Out Gated Drug Release",
+  "R308_state": "FAIL — model structure invalid (tautology)",
+  "R308_evidence_summary": "R308 found the model was tautological: the wash-out gate was defined to equal the drug-release trigger. Real pharmacokinetic model needed. Article XXIX §1: mechanism failure (model structure invalid), not parameter bug.",
+  "R309_phase": "C",
+  "R309_role": "REPAIR CANDIDATE — one repair attempt per Article XXXVI §4. Replace tautological model with real PK model (COPASI). If real-PK model fails pre-registered criterion, P-05 → cemetery. No V3.",
+  "remaining_gaps_against_Article_XXXVI": [
+    "ALL criteria pending repair."
+  ],
+  "R309_action_plan": [
+    "Step 1: Replace tautological model with real PK model using COPASI (Standard Simulator Registry). Use published CSF pharmacokinetic parameters (e.g., published gentamicin CSF PK data).",
+    "Step 2: Re-preregister falsification criterion: drug concentration at target tissue must exceed therapeutic threshold for ≥ X hours per week.",
+    "Step 3: Re-run model against new criterion.",
+    "Step 4: If PASS: proceed through completion pipeline. If FAIL: P-05 → cemetery (Article XXXVI §4: second failure is terminal)."
+  ],
+  "R309_target_state": "EITHER TECHNOLOGY_TRANSFER_READY (if repair succeeds) OR CEMETERY (if repair fails)",
+  "machine_blockers": [
+    "Repair budget = 1 (Article XXXVI §4). Real PK model must produce therapeutic drug levels."
+  ],
+  "CEO_blockers": [],
+  "special_note": "R308 provenance chain (already documented, exemplar for Article XXXVI §10): tautology → mechanism invalid → real PK → fail → no value (if real-PK repair fails).",
+  "replacement_from_reservoir_if_killed": "TBD — search existing-candidate reservoir for credible replacement"
+}

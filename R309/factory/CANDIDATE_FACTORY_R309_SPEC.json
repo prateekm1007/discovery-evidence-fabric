@@ -1,0 +1,297 @@
+{
+  "spec_version": "R309",
+  "spec_date": "2026-08-25",
+  "authority": "Article XXXVI (TECHNOLOGY_TRANSFER_READY)",
+  "objective": "15 working technology assets, not 15 permanent hypotheses. Each candidate must reach TECHNOLOGY_TRANSFER_READY (20-criterion finish line) or be moved to the cemetery.",
+
+  "manufacturing_pipeline": {
+    "description": "The 14-stage candidate factory pipeline (R304–R308). Produces executable models. Does NOT produce finished technology packages.",
+    "stages": [
+      "01_CandidateSpec",
+      "02_MechanismModel",
+      "03_ArchitectureDesign",
+      "04_ReferenceImplementation",
+      "05_StrongestComparator",
+      "06_AttackSuite",
+      "07_PreRegisteredFalsificationCriterion",
+      "08_ExecutedResult",
+      "09_IndependentVerification",
+      "10_KnownLimitations",
+      "11_ReproductionPackage",
+      "12_EconomicModel",
+      "13_DifferentiationDossier",
+      "14_BuyerFeedbackSchema",
+      "15_RequirementGenerator"
+    ],
+    "manufacturing_finish_state": "EXECUTABLE_MODEL_PRESENT",
+    "manufacturing_finish_state_is_NOT": "TECHNOLOGY_TRANSFER_READY",
+    "manufacturing_finish_state_R308_actual": "15/15 EXECUTABLE_MODEL_PRESENT, 0/15 TECHNOLOGY_TRANSFER_READY"
+  },
+
+  "completion_pipeline": {
+    "description": "The R309 completion pipeline. Maps each manufactured candidate to the 20-criterion finish line. Runs AFTER manufacturing; does NOT replace it.",
+    "stages": [
+      {
+        "id": "C01",
+        "name": "Mechanism specification",
+        "category": "Technical",
+        "input_artifact": "02_MechanismModel",
+        "output_artifact": "technology/mechanism.md",
+        "completion_test": "Document exists, defines the mechanism (not just the intervention), references the model.",
+        "constitutional_basis": "Article I (evidence precedes assertion)"
+      },
+      {
+        "id": "C02",
+        "name": "Architecture / design",
+        "category": "Technical",
+        "input_artifact": "03_ArchitectureDesign",
+        "output_artifact": "technology/architecture.md + technology/engineering_spec.md",
+        "completion_test": "Documents exist, define components, geometry, control law, and engineering tolerances.",
+        "constitutional_basis": "Article XXXV (closed-loop epistemic control)"
+      },
+      {
+        "id": "C03",
+        "name": "Working reference implementation",
+        "category": "Technical",
+        "input_artifact": "04_ReferenceImplementation",
+        "output_artifact": "technology/prototype_blueprint.md + executable code",
+        "completion_test": "Code runs end-to-end. Outputs are reproducible from seed. README exists.",
+        "constitutional_basis": "Article XVI (never confuse implementation with proof)"
+      },
+      {
+        "id": "C04",
+        "name": "Strongest comparator",
+        "category": "Technical",
+        "input_artifact": "05_StrongestComparator",
+        "output_artifact": "evidence/comparator/",
+        "completion_test": "Best publicly known alternative explicitly named and cited. No strawman. Comparator model runs and produces output.",
+        "constitutional_basis": "Article VIII (certification must attack itself)"
+      },
+      {
+        "id": "C05",
+        "name": "Attack suite",
+        "category": "Technical",
+        "input_artifact": "06_AttackSuite",
+        "output_artifact": "evidence/attacks/",
+        "completion_test": "At least 3 hostile attacks: functional-equivalence, prior-art, mechanism-failure. Each attack runs and produces a verdict.",
+        "constitutional_basis": "Article VIII (certification must attack itself), Article XVII (every control must have an attempted bypass)"
+      },
+      {
+        "id": "C06",
+        "name": "Pre-registered falsification criterion",
+        "category": "Technical",
+        "input_artifact": "07_PreRegisteredFalsificationCriterion",
+        "output_artifact": "evidence/primary_results/preregistration.json",
+        "completion_test": "Quantitative threshold declared BEFORE the executed result was observed. Timestamped. Frozen.",
+        "constitutional_basis": "Article VIII (certification must attack itself), Article XXVII (no threshold invention)"
+      },
+      {
+        "id": "C07",
+        "name": "Executed result",
+        "category": "Technical",
+        "input_artifact": "08_ExecutedResult",
+        "output_artifact": "evidence/primary_results/result.json + raw outputs",
+        "completion_test": "Actual measurement preserved. Seeds, configs, raw outputs all stored. Timestamped AFTER preregistration.",
+        "constitutional_basis": "Article I (evidence precedes assertion)"
+      },
+      {
+        "id": "C08",
+        "name": "Independent verification / cross-check",
+        "category": "Technical",
+        "input_artifact": "09_IndependentVerification",
+        "output_artifact": "evidence/independent_verification/",
+        "completion_test": "Second implementation from STANDARD_SIMULATOR_REGISTRY (or justified alternative). Frozen tolerance declared BEFORE comparison. Result: MODEL_VERIFIED or MODEL_DISAGREEMENT with root-cause analysis.",
+        "constitutional_basis": "Article XXVI (no self-certification), Article XXXVI §7"
+      },
+      {
+        "id": "C09",
+        "name": "Known limitations",
+        "category": "Technical",
+        "input_artifact": "10_KnownLimitations",
+        "output_artifact": "technology/known_limitations.md",
+        "completion_test": "Document explicitly states what the model does not capture, what was approximated, and where the uncertainty lives.",
+        "constitutional_basis": "Article XV (coder must disclose inconvenient results)"
+      },
+      {
+        "id": "C10",
+        "name": "Reproduction package",
+        "category": "Technical",
+        "input_artifact": "11_ReproductionPackage",
+        "output_artifact": "transfer/reproduction.md + transfer/installation.md",
+        "completion_test": "A competent third party can reproduce the executed result without our assistance. All dependencies, seeds, data, and steps documented.",
+        "constitutional_basis": "Article XXXV (closed-loop epistemic control)"
+      },
+      {
+        "id": "C11",
+        "name": "Economic model with sourced inputs",
+        "category": "Commercial",
+        "input_artifact": "12_EconomicModel",
+        "output_artifact": "economics/value_model.md + economics/assumptions.json",
+        "completion_test": "Current cost, intervention cost, deployment cost, development cost — each tied to a public or buyer-specific source. No decorative price tags.",
+        "constitutional_basis": "Article I (evidence precedes assertion), Article XXXVI §8"
+      },
+      {
+        "id": "C12",
+        "name": "Counterfactual value calculation",
+        "category": "Commercial",
+        "input_artifact": "12_EconomicModel",
+        "output_artifact": "economics/value_model.md (counterfactual section)",
+        "completion_test": "Quantifies the buyer's annual value of adopting this vs. the strongest comparator. Model is reproducible. Inputs are evidence-tier labeled (MODELLED / PUBLICLY_VERIFIED / BUYER_VERIFIED).",
+        "constitutional_basis": "Article XXXVI §8"
+      },
+      {
+        "id": "C13",
+        "name": "Buyer integration path",
+        "category": "Commercial",
+        "input_artifact": "13_DifferentiationDossier",
+        "output_artifact": "commercial/integration_case.md + transfer/buyer_protocol.md",
+        "completion_test": "Concrete steps a buyer would take to integrate, validate, and deploy. Specific to a buyer archetype, not generic.",
+        "constitutional_basis": "Article XXXV (closed-loop includes the dossier)"
+      },
+      {
+        "id": "C14",
+        "name": "Transaction scope / options",
+        "category": "Commercial",
+        "input_artifact": "13_DifferentiationDossier",
+        "output_artifact": "commercial/transaction_options.md",
+        "completion_test": "What is being offered, at what rights level, with what exclusivity and field-of-use boundaries. Same evidence at every price tier; rights differentiate price, not evidence.",
+        "constitutional_basis": "R275 STRATEGIC SHIFT (rights differentiate price, not evidence)"
+      },
+      {
+        "id": "C15",
+        "name": "Complete TTP",
+        "category": "Commercial",
+        "input_artifact": "All of the above",
+        "output_artifact": "Full §5 folder structure with manifest.json",
+        "completion_test": "All folders and files exist. manifest.json links each artifact by path and SHA-256. No missing files.",
+        "constitutional_basis": "Article XXXVI §5"
+      },
+      {
+        "id": "C16",
+        "name": "Prior-art landscape",
+        "category": "Differentiation / IP",
+        "input_artifact": "13_DifferentiationDossier",
+        "output_artifact": "differentiation/prior_art.md",
+        "completion_test": "Closest published art cited. What each reference teaches is summarized. Search provenance preserved (queries → databases → results → exclusions, per R274).",
+        "constitutional_basis": "Article XI (history is evidence too), R274 (negative-search provenance required)"
+      },
+      {
+        "id": "C17",
+        "name": "Argument for technical differentiation",
+        "category": "Differentiation / IP",
+        "input_artifact": "13_DifferentiationDossier",
+        "output_artifact": "differentiation/technical_delta.md",
+        "completion_test": "States what our system adds, framed as a technical effect (not a patent claim). Explicitly tied to the mechanism specification (C01).",
+        "constitutional_basis": "Article XXXVI §9 (not a patent judgment)"
+      },
+      {
+        "id": "C18",
+        "name": "Known third-party claims / patents that could matter",
+        "category": "Differentiation / IP",
+        "input_artifact": "13_DifferentiationDossier",
+        "output_artifact": "differentiation/prior_art.md (threats section)",
+        "completion_test": "Includes threats against us, not just favorable art. Disclosure is mandatory.",
+        "constitutional_basis": "Article XV (coder must disclose inconvenient results)"
+      },
+      {
+        "id": "C19",
+        "name": "Trade-secret / know-how components",
+        "category": "Differentiation / IP",
+        "input_artifact": "13_DifferentiationDossier",
+        "output_artifact": "differentiation/know_how.md",
+        "completion_test": "Parts of the package that are not in the public artifacts but are necessary to practice the invention are explicitly listed.",
+        "constitutional_basis": "Article XXXVI §2"
+      },
+      {
+        "id": "C20",
+        "name": "Explicit legal-diligence questions for buyer counsel",
+        "category": "Differentiation / IP",
+        "input_artifact": "13_DifferentiationDossier",
+        "output_artifact": "differentiation/counsel_questions.md",
+        "completion_test": "Open questions, not advocacy. Designed for buyer's counsel to examine, not for us to render a patentability verdict.",
+        "constitutional_basis": "Article XXXVI §9 (buyer's counsel handles legal diligence)"
+      }
+    ],
+    "completion_finish_state": "TECHNOLOGY_TRANSFER_READY",
+    "completion_finish_state_requires": "All 20 criteria (C01–C20) have output_artifacts present and audited.",
+    "completion_finish_state_R309_target": "15/15 TECHNOLOGY_TRANSFER_READY",
+    "completion_finish_state_R309_baseline": "0/15 TECHNOLOGY_TRANSFER_READY (R308 actual)"
+  },
+
+  "repair_pipeline": {
+    "description": "For candidates in FAIL or CONDITIONAL state. Finite budget. Not endless iteration.",
+    "states": [
+      "FAIL",
+      "DIAGNOSE",
+      "REPAIR_IF_CREDIBLE",
+      "RETEST",
+      "SUCCESS_or_FAIL_AGAIN",
+      "TECHNOLOGY_TRANSFER_READY_or_REPLACEMENT_or_CEMETERY"
+    ],
+    "repair_budget_per_candidate": 1,
+    "second_failure_is_terminal": true,
+    "diagnosis_required_separation": "Mechanism failure (Article XXIX §1) vs. implementation failure (Article XXIX §2). The repair path differs.",
+    "documented_examples": {
+      "P-05_R308": "tautology → mechanism invalid → real PK → fail → no value (Article XXIX §1: mechanism failure, not implementation bug)",
+      "P-06_historical": "r⁴ physical constraint → V1+V2 both fail → cemetery (mechanism infeasible, no repair attempted)",
+      "P-08_historical": "CSF energy harvesting 0.62 nW → physics measurement falsifies → cemetery (mechanism infeasible)"
+    }
+  },
+
+  "portfolio_discipline": {
+    "active_count_target": 15,
+    "cemetery_is_append_only": true,
+    "replacement_permitted_only_when": [
+      "Candidate's repair budget exhausted",
+      "Credible replacement exists in existing-candidate reservoir",
+      "Replacement is not merely invented to inflate count"
+    ],
+    "cemetery_revival_requires": "Constitutional waiver (Article XXXVI §11)",
+    "R308_state": "15 active + 2 cemetery (P-06 r⁴ constraint, P-08 CSF energy physics)",
+    "R309_target": "Maintain 15 active; replace failures from reservoir where credible; cemetery grows only when no credible replacement exists"
+  },
+
+  "phase_plan": {
+    "description": "Per CEO directive R309 §10. Prioritize by remaining completion cost × technical uncertainty, not by inventing new products.",
+    "phase_A": {
+      "name": "Reference implementation",
+      "candidates": ["P-01"],
+      "goal": "P-01 reaches TECHNOLOGY_TRANSFER_READY first. Becomes the template for all subsequent completions.",
+      "remaining_gaps_R308": [
+        "Independent verification (0/15)",
+        "Economic proof with evidence-tier labels (0/15)",
+        "Complete TTP folder structure (partial only)",
+        "Differentiation dossier completion (partial only)"
+      ]
+    },
+    "phase_B": {
+      "name": "Highest-confidence completions",
+      "candidates": ["P-02", "P-04", "P-11", "P-15", "P-16"],
+      "goal": "5 candidates reach TECHNOLOGY_TRANSFER_READY.",
+      "notes": {
+        "P-16": "MCX + PyTissueOptics cross-check REQUIRED (Article XXXVI §6, §7). Resolve R308 diffusion-vs-Kubelka–Munk 60–70% disagreement before completion.",
+        "P-15": "Energy budget physics must be cross-checked against P-08 cemetery entry (CSF harvesting 0.62 nW falsified). P-15 partial recovery in R297 must be re-verified independently."
+      }
+    },
+    "phase_C": {
+      "name": "Remaining 9 candidates",
+      "candidates": ["P-03", "P-05", "P-07", "P-09", "P-10", "P-12", "P-13", "P-14", "P-17"],
+      "goal": "Each candidate either reaches TECHNOLOGY_TRANSFER_READY, is repaired within budget, or is replaced from the reservoir.",
+      "special_handling": {
+        "P-03": "R308 admits 'passes, but model may be too simple to show the difference.' This is NOT a pass — it is an uninformative experiment. Next experiment must create conditions under which the floor mechanism actually distinguishes itself from the comparator. Otherwise P-03 does not progress.",
+        "P-05": "R308 FAIL: tautology → mechanism invalid. Repair path: real PK model. If real-PK model still fails the pre-registered criterion, P-05 → cemetery. No V3.",
+        "P-10": "R308 FAIL (5.04s vs 5s limit). Diagnose: mechanism failure (phase-change physics too slow) vs. implementation failure (parameters wrong). If mechanism failure, P-10 → cemetery. If implementation failure, one repair attempt.",
+        "P-14": "R308 FAIL (16.5% vs 30%, estimator noise). Diagnose: mechanism failure (yield matching fundamentally noisy) vs. implementation failure (estimator design). One repair attempt.",
+        "P-17": "R308 FAIL. Biohybrid endothelial monolayer. Diagnose mechanism vs. implementation before any repair attempt."
+      }
+    }
+  },
+
+  "machine_enforcement": {
+    "pre_commit_hook": "Blocks commits claiming TECHNOLOGY_TRANSFER_READY without §5 folder structure and §2 criteria manifest.",
+    "dashboard_generator": "Canonical report (§12) produced from artifacts, not from claims.",
+    "constitution_loader": "Surfaces Article XXXVI before every coding session.",
+    "cemetery_log": "Append-only. Replacements auditable.",
+    "violation_handling": "False claim of TECHNOLOGY_TRANSFER_READY treated as constitutional violation under Article XV (must disclose inconvenient results) and Article XXXI (every correction creates a memory artifact)."
+  }
+}
