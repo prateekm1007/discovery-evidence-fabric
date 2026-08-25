@@ -1,0 +1,55 @@
+{
+  "round": 298,
+  "date": "2026-08-25",
+  "type": "CANONICAL_SORT_ENGINE_CI_ASSERTIONS_P15_POWER_TREE",
+  "previous_round": 297,
+  "previous_commit": "439e125",
+  "ceo_directive": "P0 fix optimizer mechanically (canonical sort + CI assertions). P1 reclassify P-08/P-15 honestly. P2 P-01 to Miethke. P3 P-11 binary evidence. P4 portfolio information gain score.",
+
+  "headline": "Portfolio ranking engine FIXED with CI assertions. Canonical sort function (r298_canonical_sort_engine.py) generates all three rankings (TEV/EROI/Strategic) from single underlying records. CI assertions enforce: all 15 present, no duplicates, mathematically sorted, score matches displayed score. Machine STRUCTURALLY CANNOT emit inconsistent rankings. P-08 reclassified as ARCHITECTURE_INFEASIBLE_UNDER_CURRENT_POWER_BUDGET. P-15 labeled same but NOT killed — Power Architecture Tree (A/B/C/D/E) under evaluation. P-01 is CLEAR #1 by TEV ($82K). P-11 is #2 by TEV ($31.25K). P-15 TEV corrected from $12.5K to $10.5K (canonical computation: 0.10 × 0.50 × $250K − $2K = $10.5K).",
+
+  "what_changed_R298": {
+    "P0_canonical_sort_engine": {
+      "status": "COMPLETE — CI assertions pass",
+      "what_it_fixes": "R297's TEV ranking was not sorted (P-12 $17.5K was ranked #7 after P-15 $12.5K at #6). Now structurally impossible.",
+      "ci_assertions": ["All 15 candidates present in every ranking", "No duplicates", "Every ranking mathematically sorted by score", "Every displayed score matches computed score"],
+      "key_artifact": "TTP_PACKAGES/P-01_PROTOTYPE/r298_canonical_sort_engine.py + CANONICAL_PORTFOLIO_RANKINGS_R298.json"
+    },
+    "P1_P08_P15_reclassification": {
+      "P-08": "ARCHITECTURE_INFEASIBLE_UNDER_CURRENT_POWER_BUDGET. CSF flow provides 0.8 μW vs 100 μW needed (125x short). No further spend unless alternative architecture changes energy equation.",
+      "P-15": "ARCHITECTURE_INFEASIBLE_UNDER_CURRENT_POWER_BUDGET but NOT killed. Cardiac motion provides 10 μW vs 100 μW needed (10x short). Power Architecture Tree under evaluation: A (fully autonomous — INFEASIBLE), B (intermittent sensing + local storage — needs analysis), C (passive sensing + external interrogation — needs analysis), D (RF-powered implant — needs analysis), E (hybrid harvested + RF — needs analysis). P-15 killed only after ALL plausible architectures fail."
+    }
+  },
+
+  "canonical_rankings_R298": {
+    "TEV_top_5": [
+      {"rank": 1, "id": "P-01", "tev": 82000},
+      {"rank": 2, "id": "P-11", "tev": 31250},
+      {"rank": 3, "id": "P-03", "tev": 24000, "note": "bundled with P-01"},
+      {"rank": 4, "id": "P-07", "tev": 20000, "note": "bundled with P-04"},
+      {"rank": 5, "id": "P-06", "tev": 19062}
+    ],
+    "EROI_top_5": [
+      {"rank": 1, "id": "P-03", "eroi": "INFINITE_COST_FREE", "tev": 24000, "note": "bundled, $0 cost"},
+      {"rank": 2, "id": "P-07", "eroi": "INFINITE_COST_FREE", "tev": 20000, "note": "bundled, $0 cost"},
+      {"rank": 3, "id": "P-13", "eroi": "INFINITE_COST_FREE", "tev": 15000, "note": "$0 cost but small TEV"},
+      {"rank": 4, "id": "P-01", "eroi": 10.25, "tev": 82000, "note": "best EROI among paid actions"},
+      {"rank": 5, "id": "P-15", "eroi": 5.25, "tev": 10500}
+    ],
+    "Strategic_top_5": [
+      {"rank": 1, "id": "P-08", "strategic": 4.50, "tev": 1750, "note": "highest strategic but INFEASIBLE by physics"},
+      {"rank": 2, "id": "P-15", "strategic": 4.50, "tev": 10500, "note": "highest strategic, Power Architecture Tree under evaluation"},
+      {"rank": 3, "id": "P-11", "strategic": 3.75, "tev": 31250},
+      {"rank": 4, "id": "P-13", "strategic": 3.75, "tev": 15000},
+      {"rank": 5, "id": "P-06", "strategic": 3.50, "tev": 19062}
+    ]
+  },
+
+  "next_round_R299_directives": [
+    "P-01: Send Buyer Evaluation Kit to Miethke. 'Would your engineering team run this 80-run blinded B-vs-V2.1 evaluation?' This is the first external buyer signal.",
+    "P-11: Execute phage anti-biofilm literature review. Binary go/no-go: phage identified? surface identified? immobilization feasible? activity retained?",
+    "P-15: Evaluate Power Architecture Tree alternatives B/C/D/E. Only kill after all fail.",
+    "P-08: ARCHITECTURE_INFEASIBLE. No further spend unless alternative energy source identified.",
+    "DO NOT generate new candidates. 15 frozen."
+  ]
+}
