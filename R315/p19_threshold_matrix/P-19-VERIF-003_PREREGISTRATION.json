@@ -1,0 +1,51 @@
+{
+  "verification_id": "P-19-VERIF-003",
+  "candidate_id": "P-19",
+  "preregistration_timestamp": "2026-08-25T23:00:00Z",
+  "constitutional_basis": [
+    "Article XXVII (threshold provenance)",
+    "Article XXX (metric validity)"
+  ],
+  "R314_violation": "25 mmHg was misattributed as 'CLINICAL threshold, AANS Brain Trauma Foundation'. This is WRONG. BTF 22 mmHg is for severe TBI, not hydrocephalus.",
+  "R315_correction": "25 mmHg = MODELLED ENGINEERING THRESHOLD pending hydrocephalus-specific clinical justification. BTF recommendation documented as TBI evidence only.",
+  "threshold_provenance": {
+    "15_mmHg": {
+      "class": "MODELLED",
+      "rationale": "Conservative lower bound — mild ICP elevation"
+    },
+    "18_mmHg": {
+      "class": "MODELLED",
+      "rationale": "Moderate lower bound"
+    },
+    "20_mmHg": {
+      "class": "MODELLED",
+      "rationale": "Common upper limit of normal ICP (5-15 mmHg resting, up to 20 with postural changes)"
+    },
+    "22_mmHg": {
+      "class": "TBI_CLINICAL",
+      "rationale": "BTF severe TBI treatment threshold. NOT hydrocephalus-specific.",
+      "source": "Brain Trauma Foundation Guidelines 4th Edition"
+    },
+    "25_mmHg": {
+      "class": "MODELLED",
+      "rationale": "Moderate engineering threshold. R314 default. NOT clinically validated for hydrocephalus."
+    },
+    "30_mmHg": {
+      "class": "MODELLED",
+      "rationale": "Conservative upper bound — severe ICP elevation requiring intervention"
+    }
+  },
+  "frozen_criterion": {
+    "metric": "survival_time_at_threshold_hours",
+    "thresholds_tested": [
+      15,
+      18,
+      20,
+      22,
+      25,
+      30
+    ],
+    "pass_condition_per_threshold": "Distributed >= 24h AND single < 24h in >= 8/10 scenarios",
+    "robustness_requirement": "P-19 advantage must persist across >= 4 of 6 thresholds to be considered robust"
+  }
+}

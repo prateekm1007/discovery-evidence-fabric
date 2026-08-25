@@ -1,0 +1,27 @@
+{
+  "update_round": "R315",
+  "authority": "CEO R315 §P2; Article XXIII; Article XXV",
+  "previous_blocker": "R314 documented svFSI cannot install (no root, no Docker, no build toolchain)",
+  "R315_progress": {
+    "cmake": "NOW AVAILABLE — pip install cmake succeeded (v4.4.2 at /home/z/.local/bin/cmake)",
+    "mpi4py": "INSTALLED but NOT FUNCTIONAL — wheel installed but libmpi.so system library missing. Needs `apt install libopenmpi-dev` (requires root).",
+    "PETSc": "STILL NOT AVAILABLE — massive C library, cannot pip install. Needs system build or apt package.",
+    "Trilinos": "STILL NOT AVAILABLE",
+    "HYPRE": "STILL NOT AVAILABLE"
+  },
+  "exact_missing_dependencies": [
+    "libopenmpi-dev (system MPI runtime + headers — needs root: `apt install libopenmpi-dev`)",
+    "libpetsc-dev (PETSc development package — needs root: `apt install libpetsc-dev`)",
+    "Optional: libtrilinos-dev, libhypre-dev"
+  ],
+  "what_works": "cmake is now available. The build toolchain is closer but still incomplete.",
+  "what_still_blocks": "MPI runtime and PETSc. These are system-level packages that require root/apt access. Cannot be pip-installed.",
+  "ceo_unblock_options_unchanged_from_R314": [
+    "Option A: Install Docker → `docker pull simvascular/solver:latest`",
+    "Option B: Provide root access → `apt install libopenmpi-dev libpetsc-dev cmake`",
+    "Option C: Run svFSI externally and provide outputs",
+    "Option D: Accept parameter-matched cross-check as best available alternative"
+  ],
+  "honest_label": "svFSI EXECUTION BLOCKED — cmake now available, MPI+PETSc still missing. Hard environment constraint persists.",
+  "article_basis": "Article XXV (unknown must remain unknown), Article XXIII (never infer repo state from local)"
+}
