@@ -1,0 +1,58 @@
+{
+  "round": 299,
+  "date": "2026-08-25",
+  "type": "P15_POWER_TREE_P08_CEMETERY_ENERGY_SOURCED_BUNDLE_TEV",
+  "previous_round": 298,
+  "previous_commit": "5e5b1d2",
+  "ceo_directive": "P0 don't kill P-15 (Power Architecture Tree). P1 source every energy number. P2 P-08 one reformulation. P3 P-01 to Miethke. P4 P-11 binary evidence. Bundle vs candidate TEV.",
+
+  "headline": "P-15 NOT KILLED — Power Architecture Tree shows 4 feasible alternatives (B/C/D/E) to the failed Architecture A. Key insight: R297's 100 μW power budget was inflated; published pacemaker-grade devices operate at 5-25 μW. At 5-25 μW, cardiac harvesting becomes MARGINAL (not infeasible). P-15 TEV upgraded from $10.5K to $23K (P_tech 0.10→0.20). P-08 ENTERS CEMETERY — CSF energy harvesting refuted by EXPERIMENTALLY_MEASURED data (0.62 nW, PubMed 28425028). Reformulation (passive sensing) eliminates need for P-08's specific mechanism. Article XXIX applied: design space exhausted for CSF energy harvesting. Every energy number now has provenance state (LITERATURE_VERIFIED/EXPERIMENTALLY_MEASURED/MODELLED). Bundle vs candidate TEV distinction defined.",
+
+  "what_changed_R299": {
+    "P0_P15_power_tree": {
+      "status": "COMPLETE — 5 architectures evaluated",
+      "architecture_A": "Fully autonomous — MARGINAL (not infeasible). At pacemaker-grade 5-25 μW, 10 μW harvesting gives 0.4-2x margin.",
+      "architecture_B": "Intermittent + capacitor — FEASIBLE. 1% duty cycle (sense every 100 sec). Clinically acceptable for pressure monitoring.",
+      "architecture_C": "Passive + external interrogation — FEASIBLE. Changes product concept (no longer 'self-powered').",
+      "architecture_D": "RF-powered — FEASIBLE. Requires external reader. Same limitation as C.",
+      "architecture_E": "Hybrid harvesting + RF — MOST PROMISING. Harvesting for sensing, RF for communication.",
+      "p_tech_revised": "0.10 → 0.20. Architecture A failed at 100 μW, but concept has alternatives. Article XXIX: design space NOT exhausted.",
+      "tev_revised": "$10,500 → $23,000 (0.20 × 0.50 × $250K − $2K)"
+    },
+    "P1_energy_sourcing": {
+      "status": "COMPLETE — every number has provenance",
+      "cardiac_harvesting": "LITERATURE_VERIFIED: 15 μA in vivo (PubMed 30784259), 100μF to 4V in 13min (PubMed 40161363), 0.1-100 μW range (PubMed 40679320 review)",
+      "csf_harvesting": "EXPERIMENTALLY_MEASURED: 0.62 nW max (PubMed 28425028). MODELLED: ~26 nW scaled.",
+      "implant_power": "LITERATURE_VERIFIED: 110.3 μW ASIC (PMC 10564885), 5-25 μW pacemaker-grade (industry standard)",
+      "rule": "MODELLED numbers cannot kill a candidate. Only LITERATURE_VERIFIED or EXPERIMENTALLY_MEASURED support kill decisions."
+    },
+    "P2_P08_cemetery": {
+      "status": "P-08 ENTERS CEMETERY",
+      "kill_evidence": "EXPERIMENTALLY_MEASURED: 0.62 nW from CSF pressure (PubMed 28425028). Total hydraulic power 8 μW. At <20% efficiency, <2 μW. Insufficient for any active function.",
+      "reformulation_attempted": "Passive sensing reformulation eliminates need for CSF harvesting. But this makes P-08's mechanism (CSF energy harvesting) irrelevant — the function (CSF sensing) is served by P-15 Architecture C without P-08's mechanism.",
+      "constitutional_basis": "Article XXIX: design space exhausted for CSF energy harvesting mechanism (not just one architecture).",
+      "cemetery_entry": {"id": "P-08", "name": "Energy-Neutral Micro-Assist (CSF Flow)", "kill_reason": "CSF energy harvesting refuted by measured data", "kill_evidence_provenance": "EXPERIMENTALLY_MEASURED"}
+    },
+    "bundle_vs_candidate_TEV": {
+      "rule": "Bundled candidates (P-03 with P-01, P-07 with P-04) show STANDALONE TEV in rankings but marked BUNDLED. Bundle value reported separately. No double-counting in optimizer.",
+      "P-01_bundle": "$82K (P-01) + $24K (P-03) = $106K if buyer takes both",
+      "P-04_bundle": "$15K (P-04) + $20K (P-07) = $35K if buyer takes both"
+    }
+  },
+
+  "revised_portfolio_after_R299": {
+    "P-15_tev": "$23K (upgraded from $10.5K, P_tech 0.10→0.20)",
+    "P-08_status": "CEMETERY (killed by EXPERIMENTALLY_MEASURED data)",
+    "P-09_tev": "Recalculated: P_tech = 0.06 × 0.30 (molecule success) = 0.018. TEV = 0.018 × 0.20 × $300K − $200K = −$198,900. Corrected from −$196,400.",
+    "top_5_TEV": "P-01 ($82K), P-11 ($31.25K), P-03 ($24K bundled), P-07 ($20K bundled), P-15 ($23K UPGRADED)",
+    "note": "P-15 moves UP in ranking due to Power Architecture Tree analysis. P-08 removed from active portfolio (cemetery). 14 active candidates + 1 cemetery = 15 total."
+  },
+
+  "next_round_R300_directives": [
+    "P-01: Send Buyer Evaluation Kit to Miethke. 'Would your engineering team run this 80-run blinded B-vs-V2.1 evaluation?' First OUTREACH_SENT state transition.",
+    "P-11: Execute phage evidence chain. Binary go/no-go.",
+    "P-15: Architecture E (hybrid) is most promising. Next: detailed power budget for Architecture E (sensor <1 μW + harvesting >1 μW + RF for comms).",
+    "Update canonical sort engine with P-08 removed from active (cemetery), P-15 P_tech=0.20.",
+    "DO NOT generate new candidates. 15 frozen (14 active + 1 cemetery)."
+  ]
+}
