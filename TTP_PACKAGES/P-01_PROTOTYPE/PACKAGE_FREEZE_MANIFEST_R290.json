@@ -1,0 +1,153 @@
+{
+  "freeze_id": "P-01-FREEZE-R290",
+  "freeze_timestamp": "2026-08-25T07:28:08.814523+00:00",
+  "freeze_reason": "Per CEO R290 P0: hash-pin all frozen artifacts. Implements NASA SE configuration management + FDA design control.",
+  "frozen_parameters": {
+    "rate_limit_max_per_sec": 0.02,
+    "alpha_min": 0.05,
+    "drainage_floor_fraction": 0.5,
+    "hysteresis_deadband": 0.03,
+    "sensor_health_threshold_mmhg": 0.5,
+    "sensor_health_recovery_consecutive": 3,
+    "P_MIN_MMHG": 5.0,
+    "P_MAX_MMHG": 20.0,
+    "P_TARGET_MMHG": 12.0,
+    "F_MAX_PER_SEG": 0.3,
+    "Q_PRODUCTION_ML_MIN": 0.3,
+    "G_HEALTHY": 0.06,
+    "DT_SEC": 1.0,
+    "N_STEPS": 86400,
+    "K_OCCL_DEFAULT": "1.0/3600.0",
+    "SEEDS": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "ATTACK_MODES": [
+      "none",
+      "noise_3x",
+      "sensor_dropout",
+      "fast_occlusion",
+      "slow_occlusion",
+      "wrong_model",
+      "multi_failure",
+      "actuator_saturation",
+      "controller_delay"
+    ],
+    "B_COMPARATOR": "V1.2 Arm D logic (predictive closed-loop, no rate limiting)",
+    "V2_1_CONTROLLER": "V2 + sensor-health detector + safe fallback"
+  },
+  "acceptance_criteria": {
+    "primary_endpoint": "time_to_critical_failure under noise_3x",
+    "primary_threshold": "V2.1/B >= 2.0x AND V2.1 wins >= 4/5 seeds",
+    "bench_falsification": "\u00b130% tolerance. If bench differs >30%, simulator is WRONG.",
+    "multi_failure_boundary": "Known catastrophic (peak 69.8 mmHg). Disclosed, not hidden."
+  },
+  "frozen_files": {
+    "controller_V2": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/10_V2_comparison.py",
+      "sha256": "fb399cb2f65ed0e7bde01f463efce47a7717093dfcf3696e6fd3b0207ba942d0",
+      "size_bytes": 29243,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "controller_V2_full": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/12_V2_full_validation.py",
+      "sha256": "1e1a3cd0a527a2ed8098a22ee04f1dd018d3a7d50818dced30e9522e0822702d",
+      "size_bytes": 25114,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "controller_V2_1": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/14_V2_1_validation.py",
+      "sha256": "8e868010f2fceeb3f8b7139abbbe7a8ef8ba2ca6cf018d20896a39cb96abeeaf",
+      "size_bytes": 14727,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "frozen_mechanism": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/FROZEN_MECHANISM_R287.md",
+      "sha256": "7d7d26587ba5015818fe9f2ec48ed776e53ba8e266d593d5784c895bd86493b8",
+      "size_bytes": 7367,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "frozen_commercial_mechanism": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/FROZEN_COMMERCIAL_MECHANISM_R289.json",
+      "sha256": "197fb8fd80d5310270353ac11269ea1e7759ebefb29044fc061be6cbbd18eead",
+      "size_bytes": 5546,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "preregistration_R282": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/PRE_REGISTERED_SUCCESS_CRITERION_R282.json",
+      "sha256": "1e1c1c4229b6877bc78742c341f7c3b38174782a3f5e24f8ec024e9a4cf9365e",
+      "size_bytes": 5758,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "preregistration_V2_1": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/V2_1_PRE_REGISTRATION.json",
+      "sha256": "895fdea841e702cf9c6252bc19ddcdaa2de84a849e9c038d3de2b5e4eba1f0dc",
+      "size_bytes": 4925,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "provenance_manifest": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/DATASET_PROVENANCE_MANIFEST.json",
+      "sha256": "3845ae429fe3904fe9e49c4e57209bc6203cb5aebca4079362b17e4c63dad100",
+      "size_bytes": 7480,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "canonical_180run": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/p01_R285_CANONICAL_decisive_comparison.json",
+      "sha256": "927b4e779fbe4e1d3ce5016e6df78647ea0e177e66473ea40f053a6efffd64bb",
+      "size_bytes": 87819,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "ablation_225run": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/p01_R282_ablation_5seeds.json",
+      "sha256": "36f71f223b7ce9524b6aa8a63e7d71cf8295262c09cedc1af0b7f816d97092bc",
+      "size_bytes": 100263,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "prior_art_landscape": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/PRIOR_ART_LANDSCAPE_R287.json",
+      "sha256": "896a2068eaa2975bf3fd31c7239efbe699b6f8b4535306993ce522865dafc381",
+      "size_bytes": 7365,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "bench_protocol_R284": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/PHYSICAL_BENCH_PROTOCOL_R284_COMMERCIAL.json",
+      "sha256": "bf8271f519d6d303aebe4a72749905105f60ccd1e695a95f646cfac78338affa",
+      "size_bytes": 4243,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "bench_package_R283": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/PHYSICAL_BENCH_COMPLETE_PACKAGE_R283.json",
+      "sha256": "154b1372476f5c0b53201dd3668b6a981c2d1e2dc449d52d661d10e61403d1e6",
+      "size_bytes": 7901,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "prototype_BOM": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/PROTOTYPE_BOM_R289_BUILDABLE.json",
+      "sha256": "29fdfe777288c5961eed64ac2b14c8f68f7cb71203462dd692510284259813f2",
+      "size_bytes": 11158,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "commercial_TTP": {
+      "path": "TTP_PACKAGES/P-01_PROTOTYPE/COMMERCIAL_TTP_R289.md",
+      "sha256": "626296e09d36d72c47d314a94589c5e3686dc53efa87c327b489ee791a33e613",
+      "size_bytes": 6240,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "buyer_package_R286": {
+      "path": "TTP_PACKAGES/COMMERCIAL_LOOP/BUYER_OUTREACH_PACKAGE_R286.json",
+      "sha256": "5699da7a5719626ad687560dbcca86f0963695697f069d8499ec92601a6a8f13",
+      "size_bytes": 4152,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    },
+    "five_buyers": {
+      "path": "TTP_PACKAGES/COMMERCIAL_LOOP/FIVE_SPECIFIC_TECHNICAL_BUYERS.json",
+      "sha256": "920d86d5b3aae6ffdc9ff916be22fa212ea77fb3c6eb82282f3e657218d8705f",
+      "size_bytes": 11000,
+      "frozen_at": "2026-08-25T07:28:08.814523+00:00"
+    }
+  },
+  "freeze_rule": "Any change to any frozen file or parameter invalidates this freeze. A new freeze (P-01-FREEZE-R291) must be created with documented rationale. This implements NASA configuration control."
+}
