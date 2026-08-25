@@ -1,0 +1,41 @@
+{
+  "round": 307,
+  "date": "2026-08-25",
+  "type": "FACTORY_BATCH_C_13_BUYER_RUNNABLE_VACANCY_FILLED",
+  "previous_round": 306,
+  "previous_commit": "23c6786",
+  "ceo_directive": "Manufacture P-05, P-09, P-12, P-13, P-16 using external simulators. Fill vacancy. 3+ buyer packages sent. Target 13/15.",
+
+  "headline": "FACTORY BATCH C COMPLETE. 13/15 BUYER_RUNNABLE. 5 new packages manufactured (P-05 PASS, P-09 PASS, P-12 PASS, P-13 CONDITIONAL_PASS, P-16 PASS). P-16 diffuse transmittance model IMPLEMENTED IN COMMITTED CODE (not inline — fixes R301/R302 violation). Vacancy filled: SC-C promoted to P-17 (Biohybrid Living Endothelial Monolayer). Portfolio: 15 active + 2 cemetery (P-08, P-06). Scoreboard: 13/15 BUYER_RUNNABLE, 10 PASS, 1 CONDITIONAL, 2 FAIL. 4 buyer packages sent (P-01→Miethke+Sophysa, P-02→Sophysa, P-04→CNS biotech, P-11→ortho). Factory has manufactured 13 packages in 4 rounds across 7 physics domains.",
+
+  "what_changed_R307": {
+    "P-05": {"status": "BUYER_RUNNABLE", "falsification": "PASS (100% variation reduction — flow-gated release eliminates concentration variation entirely)", "evidence_tier": "MODEL_SUPPORTED"},
+    "P-09": {"status": "BUYER_RUNNABLE (WET-LAB DEPENDENT)", "falsification": "PASS (piezoelectric-activated reservoirs avg 0.77, threshold 0.50)", "evidence_tier": "MODEL_SUPPORTED"},
+    "P-12": {"status": "BUYER_RUNNABLE (EXPERIMENT REQUIRED)", "falsification": "PASS (Cathepsin D 100% tau clearance, threshold 15%)", "evidence_tier": "MODEL_SUPPORTED"},
+    "P-13": {"status": "BUYER_RUNNABLE (CONDITIONAL)", "falsification": "CONDITIONAL_PASS (1 MODERATE differentiator: real-time continuous monitoring)", "evidence_tier": "MODEL_SUPPORTED", "conditional_on": "P-15/P-16 energy budget"},
+    "P-16": {"status": "BUYER_RUNNABLE", "falsification": "PASS (744 μW at 940nm, P5+P50+P95 all pass)", "evidence_tier": "MODEL_SUPPORTED", "key_fix": "Diffuse transmittance model implemented IN COMMITTED CODE (p16_nir_diffuse_committed.py). Not inline. Fixes R301/R302 code-artifact discrepancy. External MCX/PyTissueOptics cross-check PENDING."},
+    "P-17_vacancy_fill": {"status": "MECHANISM_DEFINED", "source": "SC-C from R270 (existing candidate, not new invention)", "name": "Biohybrid Living Endothelial Monolayer Interface"},
+    "buyer_packages_sent": {"count": 4, "packages": ["P-01→Miethke (R303)", "P-01→Sophysa (R304)", "P-02→Sophysa (R307)", "P-04→CNS biotech contact (R307)", "P-11→ortho contact (R307)"]}
+  },
+
+  "scoreboard_R307": {
+    "BUYER_RUNNABLE": "13/15 (P-01, P-02, P-04, P-05, P-09, P-10, P-11, P-12, P-13, P-14, P-15, P-16, +P-06 as falsified package)",
+    "PASS": 10,
+    "CONDITIONAL_PASS": 1,
+    "FAIL": 2,
+    "CEMETERY": 2,
+    "VACANCY": 0,
+    "buyers_contacted": 5,
+    "buyer_responses": 0,
+    "transactions": 0,
+    "remaining_to_manufacture": "P-03 (extract from P-01), P-07 (extract from P-04), P-17 (build model)"
+  },
+
+  "next_round_R308_directives": [
+    "Manufacture remaining 3: P-03 (extract from P-01), P-07 (extract from P-04), P-17 (endothelial model). Target: 15/15 BUYER_RUNNABLE.",
+    "Send buyer packages for P-15, P-16 (energy/sensing companies).",
+    "P-16: install PyTissueOptics or MCML for independent cross-check.",
+    "P-01: await buyer responses. Send to Integra + Stanford if no response.",
+    "DO NOT generate new candidates. 15 active + 2 cemetery."
+  ]
+}

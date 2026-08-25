@@ -1,0 +1,73 @@
+{
+  "artifact": "P-13",
+  "timestamp": "2026-08-25T12:16:59.991183+00:00",
+  "existing_art": [
+    {
+      "source": "PubMed 39884035 (2025)",
+      "what": "Hip prosthesis failure prediction, radiographic deep sequence learning, 1454 patients, external validation",
+      "implication": "AI implant failure prediction with external validation ALREADY EXISTS"
+    },
+    {
+      "source": "PubMed 37393891 (2023)",
+      "what": "Shunt complication prediction, 33,248 patients, ROC AUC 0.733, independently validated",
+      "implication": "AI shunt failure prediction ALREADY EXISTS and is validated"
+    },
+    {
+      "source": "US20260115436A1 (2026)",
+      "what": "Hydrocephalus system with AI/ML possibilities",
+      "implication": "Patent landscape already contemplates AI/ML in shunts"
+    }
+  ],
+  "differentiators": [
+    {
+      "dimension": "On-device inference (no cloud)",
+      "test": "Is on-device prediction materially better than cloud for any clinical scenario?",
+      "moat_strength": "WEAK",
+      "rationale": "Most implant monitoring already uses cloud upload. On-device is a feature, not a moat.",
+      "published_evidence": "Cloud-based implant monitoring is standard (Medtronic CareLink, Abbott Merlin.net)"
+    },
+    {
+      "dimension": "Ultra-low-power (neuromorphic)",
+      "test": "Does neuromorphic enable prediction at <1mW where conventional ML cannot?",
+      "moat_strength": "CONDITIONAL",
+      "rationale": "IF power budget is truly constraining (<100\u03bcW), neuromorphic may be the only option. Depends on P-15/P-16 energy results.",
+      "published_evidence": "Intel Loihi 2: ~1W typical. Not yet <1mW for real prediction tasks. SpiNNaker: similar. Neuromorphic hardware is NOT yet at implantable power levels.",
+      "conditional_on": "P-15 (cardiac harvesting) or P-16 (NIR PV) must provide enough power for a neuromorphic chip"
+    },
+    {
+      "dimension": "Real-time continuous monitoring",
+      "test": "Does continuous event-driven sensing detect failure earlier than periodic cloud upload?",
+      "moat_strength": "MODERATE",
+      "rationale": "IF failure develops over minutes (not hours/days), continuous matters. But most implant failures develop over days-weeks.",
+      "published_evidence": "Shunt failure typically develops over hours-days. Cardiac device failure can be minutes-hours. Application-dependent."
+    },
+    {
+      "dimension": "Privacy (no data leaves patient)",
+      "test": "Is there a clinical/regulatory scenario where data cannot leave the device?",
+      "moat_strength": "WEAK",
+      "rationale": "HIPAA-compliant cloud upload is standard practice. No clinical scenario currently requires on-device-only processing.",
+      "published_evidence": "FDA allows cloud-connected implantable devices with proper cybersecurity (FDA guidance 2018)"
+    },
+    {
+      "dimension": "Offline operation (no connectivity)",
+      "test": "Is there a clinical scenario where patient has no connectivity for extended periods?",
+      "moat_strength": "WEAK",
+      "rationale": "Most patients in developed markets have connectivity. Rural/developing markets may benefit, but this is a niche.",
+      "published_evidence": "Medtronic CareLink requires periodic connectivity but buffers data locally"
+    }
+  ],
+  "falsification": {
+    "criterion": "1+ MODERATE differentiator",
+    "verdict": "CONDITIONAL_PASS"
+  },
+  "buyer_runnable": true,
+  "evidence_tier": "MODEL_SUPPORTED",
+  "conditional": true,
+  "conditional_on": "P-15 or P-16 must provide enough power for neuromorphic chip",
+  "limitations": [
+    "Neuromorphic hardware not at implantable power",
+    "AI prediction is crowded",
+    "Differentiator is conditional",
+    "No dataset validated"
+  ]
+}
