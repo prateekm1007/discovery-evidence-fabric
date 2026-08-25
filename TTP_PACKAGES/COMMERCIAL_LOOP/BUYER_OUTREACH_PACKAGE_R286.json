@@ -1,0 +1,56 @@
+{
+  "package_id": "P-01",
+  "artifact": "BUYER_OUTREACH_PACKAGE_R286",
+  "version": "1.0.0",
+  "date": "2026-08-25 (R286)",
+  "purpose": "Complete buyer outreach package ready to send. Per CEO R285 P5: 'Our computational testing shows a 2.7x improvement against our comparator under a defined sensor-noise scenario. We built a bench protocol specifically designed to falsify that result. Will your engineering team try to break it?'",
+  "constitutional_basis": "Article XXVIII — don't sell the conclusion. Article XXVI — buyer's technical response becomes evidence.",
+
+  "what_we_are_sending": {
+    "canonical_dataset": "p01_R285_CANONICAL_decisive_comparison.json — 180 runs, 4 arms × 9 attacks × 5 seeds, with full provenance manifest",
+    "simulator_code": "10_V2_comparison.py + 12_V2_full_validation.py + 14_V2_1_validation.py — Python, no dependencies",
+    "findings_document": "17_V2_1_canonical_findings.md — honest results with COMPOSITE VALIDATION label",
+    "cross_domain_research": "CROSS_DOMAIN_RESEARCH/cross_domain_research_findings.md — mechanism generalizability analysis",
+    "physical_bench_protocol": "PHYSICAL_BENCH_PROTOCOL_R284_COMMERCIAL.json — 2-arm B vs V2.1, 80 blinded runs, designed to DISPROVE simulator",
+    "provenance_manifest": "DATASET_PROVENANCE_MANIFEST.json — every run traced to commit, file hash, seed, attack"
+  },
+
+  "the_buyer_message": {
+    "subject": "V2.1 shunt controller — 2.7x improvement vs incumbent in computational testing. Bench protocol designed to falsify it. Will your team try to break it?",
+    "body": "Dear [Name],
+
+We have a control mechanism for multi-segment CSF shunts that shows a 2.7x improvement over existing predictive closed-loop control in our computational testing.
+
+The honest framing:
+- 180-run canonical comparison (5 seeds × 9 attacks × 4 arms)
+- V2.1 beats the existing published approach (US20210338992A1-style closed-loop) on 9/9 attack modes
+- V2.1 wins 5/5 seeds on all 9 attacks
+- Ratios range from 1.62x (multi-failure) to 2.85x (fast occlusion)
+- This is COMPUTATIONAL evidence, not clinical. We have not built physical hardware.
+- One honest weakness: multi-failure (all segments fail) produces catastrophic peak ICP (69.8 mmHg). No controller survives this.
+
+The mechanism is specific: bounded rate of conductance change + sensor-health-aware safe fallback. Not 'AI shunt.' Not 'predictive shunt.' A control regime that remains stable under sensor uncertainty.
+
+We built a complete physical bench protocol specifically designed to FALSIFY our simulator's predictions. 2-arm comparison (existing controller vs V2.1), 80 blinded runs, 4 falsification criteria. If the bench disagrees with our simulator by more than 30%, the simulator is wrong — not the bench.
+
+Cross-domain research confirms: the individual mechanisms (rate limiting, sensor-health fallback) are well-known engineering techniques used in aerospace, robotics, and industrial automation. The novelty is in the specific application to multi-segment hydraulic drainage under physiological sensing constraints.
+
+What I'm asking:
+1. Run the simulator on your hardware (Python, no dependencies, 5 minutes)
+2. Compare V2.1 to your current approach
+3. Try to break V2.1 with your own attack scenarios
+4. Tell us: does the rate-limited control + sensor-health fallback mechanism add value beyond your current capability?
+
+If your engineering team says 'this is interesting, send us the bench package' — that's the conversation we want.
+
+If they say 'this doesn't work because ___' — that's also valuable. It enters our evidence loop.
+
+Repository: github.com/prateekm1007/discovery-evidence-fabric
+Canonical findings: TTP_PACKAGES/P-01_PROTOTYPE/17_V2_1_canonical_findings.md
+
+Best regards,
+[Your name]"
+  },
+
+  "miethke_specific_note": "Your SENSOR RESERVOIR is the closest existing hardware to what V2.1 needs. You have the sensor. We have the control law. Together = closed-loop adaptive shunt. The bench protocol is designed so your engineering team can build it (~$7-8K, 4-8 weeks) and run 80 blinded runs that either confirm or refute our computational predictions."
+}

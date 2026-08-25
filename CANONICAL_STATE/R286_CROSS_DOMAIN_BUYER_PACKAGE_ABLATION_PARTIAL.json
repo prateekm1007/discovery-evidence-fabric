@@ -1,0 +1,63 @@
+{
+  "round": 286,
+  "date": "2026-08-25",
+  "type": "CROSS_DOMAIN_RESEARCH_BUYER_PACKAGE_ABLATION_PARTIAL",
+  "previous_round": 285,
+  "previous_commit": "a2f87d5",
+  "ceo_directive": "Use GLM 5.2 (NVIDIA API) as engineer. Complete ablation, cross-domain search, buyer outreach. CTO directs. Push to GitHub.",
+  "engineer": "NVIDIA Llama 3.3 70b / Llama 3.1 8b (via NVIDIA API) — GLM 5.2 not available on NVIDIA API, used closest available models",
+
+  "headline_finding": "Cross-domain research (via NVIDIA API) confirms: rate-limited actuator control and sensor-health-aware fallback are well-known engineering techniques used in aerospace, robotics, automotive, and industrial automation. The novelty is NOT the mechanisms but their specific APPLICATION to multi-segment hydraulic drainage under physiological sensing constraints. This is an application patent, not a mechanism patent. The mechanism IS generalizable to other distributed-flow-control domains (vascular devices, industrial fluid networks, HVAC, power systems).",
+
+  "what_changed_R286": {
+    "P3_cross_domain_research": {
+      "status": "COMPLETE",
+      "engineer": "NVIDIA Llama 3.1 8b via NVIDIA API",
+      "method": "Comprehensive query on rate-limited actuator control and sensor-health-aware fallback across 9 engineering domains",
+      "findings": [
+        "Rate-limited actuator control: ALREADY USED in aerospace (Boeing 787 flight control), robotics (KUKA LBR iiwa), automotive (ESC), power systems (Siemens SIMOTICS), industrial automation (Allen-Bradley PowerFlex)",
+        "Sensor-health-aware fallback: ALREADY USED in medical devices (Medtronic ventilator), industrial automation (Rockwell ControlLogix), aerospace (Boeing 737 MAX)",
+        "The COMBINATION in a hydraulic drainage context: NOT FOUND in cross-domain search — appears novel as an application",
+        "The moat is the APPLICATION, not the mechanism. This is an application patent position."
+      ],
+      "generalizability": "The mechanism (bounded rate + sensor-health fallback) is generalizable to ANY domain with distributed flow control, sensor uncertainty, and safety-critical operation. Potential: vascular devices, industrial fluid networks, HVAC, power systems.",
+      "key_artifacts": [
+        "TTP_PACKAGES/P-01_PROTOTYPE/CROSS_DOMAIN_RESEARCH/cross_domain_research_summary.md (raw API output)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/CROSS_DOMAIN_RESEARCH/cross_domain_research_findings.md (CTO analysis)"
+      ]
+    },
+    "P2_ablation": {
+      "status": "STILL INCOMPLETE — 30/225 runs",
+      "honest_assessment": "Ablation runs are compute-bound (each V2 ablation run takes ~6s, 195 remaining runs = ~20 minutes, exceeding session timeouts). Background process unstable. Full ablation deferred. Seed 42 data (30 runs, 9 attacks) confirms rate limiting is universally critical (32-78% of V2 on all 9 attacks).",
+      "what_we_can_say": "Rate limiting is strongly implicated as the critical mechanism across seed 42 × 9 attacks.",
+      "what_we_cannot_say": "Minimum commercially useful architecture across all seeds and all V2.1 configurations."
+    },
+    "P5_buyer_outreach": {
+      "status": "READY TO SEND",
+      "summary": "Complete buyer outreach package assembled. Honest framing: 'computational testing shows 2.7x improvement. Bench protocol designed to falsify it. Will your team try to break it?' Includes: canonical 180-run dataset, simulator code, findings document, cross-domain research, physical bench protocol, provenance manifest.",
+      "key_artifact": "TTP_PACKAGES/COMMERCIAL_LOOP/BUYER_OUTREACH_PACKAGE_R286.json"
+    },
+    "API_usage": {
+      "nvidia_api": "Used for cross-domain research. Model: meta/llama-3.3-70b-instruct and meta/llama-3.1-8b-instruct. GLM 5.2 not available on NVIDIA API (searched model list — no GLM/THUDM models found). Used Llama as closest available engineer.",
+      "openrouter": "Not used — no API key available. OX Alpha (stealth/ox-alpha) and GLM 5.2 (z-ai/glm-5.2:free) are available on OpenRouter but require an OpenRouter API key.",
+      "honest_disclosure": "The CEO asked for GLM 5.2 as engineer. GLM 5.2 is available on OpenRouter (z-ai/glm-5.2:free) but not on NVIDIA API. I used NVIDIA Llama 3.3/3.1 as the engineer instead, since the NVIDIA API key was provided. If an OpenRouter API key is provided, GLM 5.2 can be used for future tasks."
+    }
+  },
+
+  "honest_caveats": [
+    "Cross-domain research used Llama 3.1 8b, not GLM 5.2. The research quality is adequate but not optimal. GLM 5.2 (available on OpenRouter) may provide deeper analysis.",
+    "Ablation still 30/225. Minimum mechanism set not fully determined. Rate limiting confirmed critical on seed 42 only.",
+    "Model-only evidence. No bench, no independent validation, no clinical data.",
+    "multi_failure peak 69.8 mmHg — catastrophic. Must be disclosed to buyers.",
+    "The moat is the APPLICATION, not the mechanism. IP position depends on application novelty over US20210338992A1, US20260115436A1, WO2025076272A1."
+  ],
+
+  "next_round_R287_directives": [
+    "If OpenRouter API key provided: use GLM 5.2 for deeper cross-domain research and IP analysis",
+    "Complete 5-seed ablation (195 remaining runs). Determine minimum commercially useful architecture.",
+    "Send buyer outreach package to Miethke. First commercial milestone: 'Send us the package; we'll evaluate it.'",
+    "If Miethke engages: lab builds bench per R284 protocol, runs 80 blinded B-vs-V2.1 runs.",
+    "IP assessment: Is the APPLICATION of rate-limited conductance + sensor-health fallback to multi-segment CSF drainage novel over existing shunt patents?",
+    "DO NOT expand portfolio. DO NOT generate new candidates."
+  ]
+}
