@@ -1,0 +1,82 @@
+{
+  "package_id": "P-01",
+  "artifact": "FROZEN_COMMERCIAL_MECHANISM_R289",
+  "version": "1.0.0",
+  "date": "2026-08-25 (R289)",
+  "purpose": "Per CEO R289 P0: Freeze the commercial mechanism. Sensor-health fallback becomes implementation module, not central invention claim, because 2026 prior art (US20260115436A1) is already strong in sensor-failure handling.",
+  "constitutional_basis": "Article XXVIII — no silent semantic promotion. Article X — honest disclosure of what is and isn't novel.",
+
+  "frozen_commercial_mechanism": {
+    "name": "Rate-Limited Physiologic Conductance Control for Multi-Segment CSF Drainage",
+    "central_claim": "A bounded-rate conductance-control regime that, in computational tests, produces a materially different robustness envelope under sensor uncertainty compared to existing predictive closed-loop approaches.",
+    "what_is_frozen": "The bounded-rate conductance slew (2%/sec max) applied to multi-segment continuous redistribution is the central commercial mechanism.",
+    "what_is_demoted": "Sensor-health fallback is an implementation module, NOT the central invention claim. US20260115436A1 (2026) already covers sensor failure handling and fallback. We do not claim the fallback as our invention — we claim the BOUNDED RATE + MULTI-SEGMENT REDISTRIBUTION combination."
+  },
+
+  "buyer_facing_technical_story": {
+    "the_story": "physiologic sensing → desired conductance → bounded conductance slew → continuous redistribution → hydraulic response",
+    "NOT_the_story": "AI → prediction → smart valve",
+    "rationale": "The technical story focuses on the TRANSFERABLE ENGINEERING PRINCIPLE (bounded-rate conductance control), not on marketing language (AI/predictive/smart). The buyer's engineers can evaluate the principle; they cannot evaluate marketing language."
+  },
+
+  "the_commercial_argument": {
+    "existing_technology_provides": [
+      "Physiologic feedback (US20210338992A1, Miethke SENSOR RESERVOIR)",
+      "Closed-loop regulation (US20210338992A1, US20260115436A1)",
+      "Obstruction detection (US20260115436A1)",
+      "Flow regulation (US20260027334A1 — 2026 flow-regulating shunt valve)",
+      "Sensor-failure handling and fallback (US20260115436A1)",
+      "Pressure/flow sensing with drift compensation (WO2025076272A1)"
+    ],
+    "our_proposed_contribution": "A particular bounded-rate multi-segment conductance-control regime that, in our computational tests (225-run ablation, 5 seeds, 9 attacks), appears to produce a materially different robustness envelope under sensor uncertainty.",
+    "evidence_for_our_argument": [
+      "V2.1 beats existing closed-loop approach by 2.1-2.9x on time-to-failure across 9 attack modes (5 seeds each)",
+      "Rate limiting is the dominant mechanism (41/45 ablation runs confirm criticality)",
+      "The advantage holds under sensor noise, dropout, fast/slow occlusion, model error, controller delay, actuator saturation",
+      "Multi_failure is the known catastrophic boundary (peak 69.8 mmHg — disclosed honestly)"
+    ],
+    "what_we_are_NOT_arguing": [
+      "NOT arguing we invented closed-loop shunt control",
+      "NOT arguing we invented sensor-failure fallback",
+      "NOT arguing we invented flow regulation",
+      "NOT arguing we invented physiologic sensing"
+    ]
+  },
+
+  "implementation_modules": {
+    "module_1_core": {
+      "name": "Bounded-Rate Conductance Controller",
+      "status": "CENTRAL COMMERCIAL MECHANISM",
+      "parameters": "max alpha change = 2%/sec, continuous redistribution (no hard isolation)",
+      "ablation_evidence": "Critical on 41/45 runs. Mean ratio 0.65 without it."
+    },
+    "module_2_implementation": {
+      "name": "Sensor-Health Fallback",
+      "status": "IMPLEMENTATION MODULE (not central claim)",
+      "rationale": "US20260115436A1 already covers sensor failure handling. We use it as engineering hygiene, not as the invention.",
+      "parameters": "freeze alpha when p_obs ≤ 0.5 or all-flow-zero, recover after 3 consecutive good samples"
+    },
+    "module_3_optional": {
+      "name": "Hysteresis Deadband",
+      "status": "OPTIONAL (conditionally useful under high controller latency)",
+      "ablation_evidence": "Critical only on controller_delay (0.70 ratio). Non-critical on 8/9 attacks."
+    },
+    "module_4_optional": {
+      "name": "Drainage Floor",
+      "status": "OPTIONAL (V2.2 should relax during sensor dropout)",
+      "ablation_evidence": "Non-critical overall (1.22 ratio). Actually HELPS on sensor_dropout (2.98x). V2.2 design insight: relax floor during dropout."
+    },
+    "module_5_optional": {
+      "name": "Alpha Floor (5% minimum)",
+      "status": "OPTIONAL (marginal impact)",
+      "ablation_evidence": "Non-critical (1.00 ratio, critical on only 1/45 runs)"
+    }
+  },
+
+  "why_this_freeze_matters": {
+    "simpler_TTP": "The TTP now leads with ONE principle (bounded-rate conductance control) instead of four interacting features. Easier for buyer to evaluate.",
+    "honest_IP_position": "We don't claim sensor-health fallback as our invention (US20260115436A1 covers it). We claim the bounded-rate + multi-segment combination.",
+    "transferable": "The bounded-rate principle is transferable to other fluidic medical systems (vascular, dialysis, infusion, respiratory). The sensor-health fallback is application-specific.",
+    "defensible": "The 225-run ablation provides quantitative evidence that rate limiting is the dominant mechanism. This is a technical argument, not a marketing claim."
+  }
+}

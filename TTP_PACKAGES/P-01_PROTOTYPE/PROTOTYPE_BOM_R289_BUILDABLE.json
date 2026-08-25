@@ -1,0 +1,296 @@
+{
+  "package_id": "P-01",
+  "artifact": "PROTOTYPE_BOM_R289_BUILDABLE",
+  "version": "1.0.0",
+  "date": "2026-08-25 (R289)",
+  "purpose": "Per CEO R289 P2: 'The TTP needs to cross from design into buildable hardware. The buyer should be able to hand the package to an engineering technician and start assembling the bench.'",
+  "constitutional_basis": "Article XXXIV — stop coding when reality is the next bottleneck. Article XXXV — the bench is the 'experiment' slot of the closed-loop.",
+
+  "design_principle": "Every component is commercial off-the-shelf (COTS). No custom fabrication except the acrylic manifold. An engineering technician can procure, assemble, calibrate, and run this bench in 4-8 weeks.",
+
+  "bom_categories": [
+    "1_pressure_sensors",
+    "2_flow_sensors",
+    "3_hydraulic_segments",
+    "4_variable_resistance_valves",
+    "5_occlusion_actuators",
+    "6_controller_hardware",
+    "7_data_acquisition",
+    "8_tubing",
+    "9_reservoir",
+    "10_pressure_source",
+    "11_calibration_equipment",
+    "12_software",
+    "13_assembly_instructions",
+    "14_test_fixture"
+  ],
+
+  "1_pressure_sensors": [
+    {
+      "item": "Proximal pressure sensor (ICP simulation)",
+      "spec": "Range 0-50 mmHg, accuracy ±0.5 mmHg, bandwidth 10 Hz, analog output 0-5V",
+      "vendor": "Honeywell",
+      "part_number": "ABP2 series (e.g., ABP2LANTG060PG2A3)",
+      "qty": 1,
+      "unit_cost_usd": 200,
+      "total_cost_usd": 200,
+      "datasheet_url": "https://sps.honeywell.com/us/en/products/pressure/sensors/board-mount-pressure-sensors/abp2-series"
+    }
+  ],
+
+  "2_flow_sensors": [
+    {
+      "item": "Per-segment flow sensor (CSF flow measurement)",
+      "spec": "Range 0-1.0 mL/min, accuracy ±0.05 mL/min, bandwidth 10 Hz, digital I2C output",
+      "vendor": "Sensirion",
+      "part_number": "SLF3S-0600F (liquid flow sensor, 0-40 mL/min range, but usable at low end)",
+      "qty": 4,
+      "unit_cost_usd": 300,
+      "total_cost_usd": 1200,
+      "datasheet_url": "https://www.sensirion.com/en/flow-sensors/liquid-flow-sensors/slf3s-0600f/",
+      "alternative": "Bronkhorst mini-CORI-FLOW M12 (higher accuracy, ~$2000/unit, total $8000)"
+    }
+  ],
+
+  "3_hydraulic_segments": [
+    {
+      "item": "4-segment acrylic manifold",
+      "spec": "Acrylic block, 1 inlet, 4 outlets, machined channels ID 2mm, overall ~100mm × 60mm × 20mm",
+      "vendor": "Protolabs (CNC machining) or PCBWay (3D printing)",
+      "part_number": "Custom (provide CAD file)",
+      "qty": 1,
+      "unit_cost_usd": 500,
+      "total_cost_usd": 500,
+      "cad_file": "TO BE PRODUCED — Fusion 360 or SolidWorks file with channel geometry"
+    }
+  ],
+
+  "4_variable_resistance_valves": [
+    {
+      "item": "Proportional pinch valve (variable orifice)",
+      "spec": "Pinches silicone tubing to vary flow 0-100%, response <1s, 32-step resolution, 12VDC",
+      "vendor": "Takasago",
+      "part_number": "RK-1 series (e.g., RK-1P-2-12VDC)",
+      "qty": 4,
+      "unit_cost_usd": 200,
+      "total_cost_usd": 800,
+      "datasheet_url": "https://www.takasago-fluidics.com/en/products/pinchvalve/",
+      "alternative": "Festo VEAB-LS-B (proportional valve, ~$400/unit, total $1600)"
+    }
+  ],
+
+  "5_occlusion_actuators": [
+    {
+      "item": "Programmable occlusion resistor (lesion simulator)",
+      "spec": "Stepper motor driving screw clamp on silicone tubing, 0-100% occlusion in 256 steps, computer-controlled via USB",
+      "vendor": "Custom build (stepper motor + clamp + Arduino)",
+      "part_number": "Custom — NEMA 17 stepper + T-slot clamp + Arduino Uno",
+      "qty": 4,
+      "unit_cost_usd": 150,
+      "total_cost_usd": 600,
+      "components": [
+        "NEMA 17 stepper motor (4×, $15 each = $60)",
+        "A4988 stepper driver (4×, $5 each = $20)",
+        "Arduino Uno ($25)",
+        "T-slot aluminum extrusion + clamp mechanism ($200)",
+        "12V power supply ($30)",
+        "Wiring + connectors ($65)"
+      ]
+    }
+  ],
+
+  "6_controller_hardware": [
+    {
+      "item": "Controller PC (runs V2.1 algorithm)",
+      "spec": "Any laptop or desktop, Python 3.8+, USB ports, Windows/Mac/Linux",
+      "vendor": "Any (use existing lab computer)",
+      "qty": 1,
+      "unit_cost_usd": 0,
+      "total_cost_usd": 0,
+      "note": "No special hardware needed. Controller is pure Python."
+    }
+  ],
+
+  "7_data_acquisition": [
+    {
+      "item": "DAQ interface (sensor input + valve output)",
+      "spec": "16-bit ADC, 8 analog inputs, 4 analog outputs, 100 Hz sample rate, USB",
+      "vendor": "National Instruments or LabJack",
+      "part_number": "NI USB-6210 OR LabJack T7",
+      "qty": 1,
+      "unit_cost_usd": 500,
+      "total_cost_usd": 500,
+      "datasheet_url": "https://www.ni.com/en-us/shop/model/usb-6210.html",
+      "alternative": "LabJack T7 ($500, pro-grade, Python API: https://labjack.com/products/t7)"
+    }
+  ],
+
+  "8_tubing": [
+    {
+      "item": "Medical-grade silicone tubing (segment lines)",
+      "spec": "ID 1.5mm, OD 3mm, medical-grade silicone, 4 × 30cm lengths",
+      "vendor": "VWR or McMaster-Carr",
+      "part_number": "McMaster-Carr 51135K2 (silicone tubing, ID 1.5mm)",
+      "qty": "4 × 30cm + spare",
+      "unit_cost_usd": 25,
+      "total_cost_usd": 100,
+      "note": "Order 2m total for spares and replacements"
+    },
+    {
+      "item": "Proximal/distal tubing (reservoir connections)",
+      "spec": "ID 3mm, OD 5mm, silicone, 2 × 50cm",
+      "vendor": "McMaster-Carr",
+      "qty": "2 × 50cm",
+      "total_cost_usd": 30
+    }
+  ],
+
+  "9_reservoir": [
+    {
+      "item": "CSF simulant reservoir (heated, 37°C)",
+      "spec": "500 mL glass beaker, heated water bath, magnetic stirrer, 37°C ± 0.5°C",
+      "vendor": "VWR or Fisher Scientific",
+      "part_number": "VWR 89000-220 (heated magnetic stirrer)",
+      "qty": 1,
+      "total_cost_usd": 300,
+      "components": [
+        "Heated magnetic stirrer ($250)",
+        "500 mL glass beaker ($20)",
+        "Thermocouple for temperature monitoring ($30)"
+      ]
+    },
+    {
+      "item": "Distal reservoir (drainage collection)",
+      "spec": "500 mL glass beaker, graduated, atmospheric pressure",
+      "vendor": "VWR",
+      "qty": 1,
+      "total_cost_usd": 20
+    }
+  ],
+
+  "10_pressure_source": [
+    {
+      "item": "Pulsatile CSF production pump",
+      "spec": "Programmable peristaltic pump, 0.1-1.0 mL/min mean, 0.5-2 Hz pulsation, 10-50% amplitude modulation",
+      "vendor": "Harvard Apparatus",
+      "part_number": "PHD Ultra syringe pump (with pulsatile programming) OR Cole-Parmer Masterflex L/S (peristaltic)",
+      "qty": 1,
+      "unit_cost_usd": 3000,
+      "total_cost_usd": 3000,
+      "alternative": "Cole-Parmer Masterflex L/S 07551-00 ($1500, peristaltic, programmable via analog input)",
+      "note": "Most expensive single component. Can be rented from some lab equipment suppliers."
+    }
+  ],
+
+  "11_calibration_equipment": [
+    {
+      "item": "Water column calibration rig (pressure sensor calibration)",
+      "spec": "Adjustable water column 0-50 cm H2O (0-37 mmHg), known height increments",
+      "vendor": "Custom build (graduated cylinder + tubing + ruler)",
+      "qty": 1,
+      "total_cost_usd": 50
+    },
+    {
+      "item": "Graduated cylinder (flow sensor calibration)",
+      "spec": "10 mL graduated cylinder, ±0.1 mL accuracy",
+      "vendor": "VWR",
+      "qty": 1,
+      "total_cost_usd": 20
+    },
+    {
+      "item": "Stopwatch (calibration timing)",
+      "spec": "Digital stopwatch, 0.1s resolution",
+      "vendor": "Any",
+      "qty": 1,
+      "total_cost_usd": 10
+    },
+    {
+      "item": "LAL endotoxin test kit (CSF simulant QC)",
+      "spec": "Limulus Amebocyte Lysate assay, 0.5 EU/mL sensitivity",
+      "vendor": "Lonza",
+      "part_number": "QCL-1000",
+      "qty": 1,
+      "total_cost_usd": 300
+    }
+  ],
+
+  "12_software": [
+    {
+      "item": "Controller software (V2.1 algorithm)",
+      "spec": "Python 3.8+, no external dependencies, reads sensors from DAQ, outputs valve commands",
+      "vendor": "Open source (this repository)",
+      "files": [
+        "TTP_PACKAGES/P-01_PROTOTYPE/12_V2_full_validation.py (V2 controller + attack modes)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/14_V2_1_validation.py (V2.1 controller with sensor-health fallback)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/10_V2_comparison.py (B arm: existing predictive closed-loop)"
+      ],
+      "qty": 1,
+      "total_cost_usd": 0,
+      "note": "Software is free and open source. Buyer's technician installs Python and runs."
+    },
+    {
+      "item": "Bench DAQ software (data acquisition + logging)",
+      "spec": "Python script that reads DAQ at 100 Hz, logs to CSV, interfaces with controller",
+      "vendor": "Open source (to be written — ~200 lines Python)",
+      "status": "TO BE WRITTEN (template provided in repository)",
+      "qty": 1,
+      "total_cost_usd": 0
+    }
+  ],
+
+  "13_assembly_instructions": {
+    "overview": "1. Mount manifold on bench frame. 2. Connect proximal tubing from reservoir to manifold. 3. Connect 4 segment lines (flow sensor → pinch valve → occlusion resistor → distal). 4. Wire sensors to DAQ. 5. Wire valves to DAQ outputs. 6. Install software. 7. Calibrate. 8. Run.",
+    "estimated_assembly_time": "2-3 days for a technician with basic lab skills",
+    "tools_required": "Screwdriver, wrench, tubing cutter, cable ties, multimeter",
+    "safety_notes": "No high voltage. No biohazard (uses synthetic CSF, not real). No cleanroom needed."
+  },
+
+  "14_test_fixture": [
+    {
+      "item": "Bench frame (mounting structure)",
+      "spec": "Aluminum extrusion frame, 60cm × 40cm × 30cm, mounts all components",
+      "vendor": "McMaster-Carr or 80/20 Inc",
+      "part_number": "80/20 T-slot aluminum extrusion (1515-series)",
+      "qty": 1,
+      "total_cost_usd": 200
+    }
+  ],
+
+  "total_cost_summary": {
+    "pressure_sensors": 200,
+    "flow_sensors": 1200,
+    "hydraulic_manifold": 500,
+    "variable_valves": 800,
+    "occlusion_actuators": 600,
+    "controller_pc": 0,
+    "daq": 500,
+    "tubing": 130,
+    "reservoirs": 320,
+    "pressure_source_pump": 3000,
+    "calibration_equipment": 380,
+    "software": 0,
+    "test_fixture": 200,
+    "consumables_misc": 170,
+    "total_usd": 8000,
+    "total_range": "$7000-10000 (depending on pump choice and flow sensor accuracy)",
+    "build_time_weeks": "4-8 (including procurement lead time)"
+  },
+
+  "what_buyer_technician_receives": [
+    "This BOM (all components with vendor links and part numbers)",
+    "Assembly instructions (step-by-step)",
+    "Controller software (Python, open source)",
+    "Calibration procedure (8 steps with pass criteria)",
+    "Test protocol (80-run blinded protocol from R284)",
+    "Data submission schema (JSON format for results)"
+  ],
+
+  "what_buyer_technician_does": [
+    "1. Procure components (~$8K, 2-4 weeks lead time)",
+    "2. Assemble bench (2-3 days)",
+    "3. Calibrate sensors and valves (1 day)",
+    "4. Run 80 blinded B-vs-V2.1 tests (80 × 24h = 1920 bench-hours)",
+    "5. Submit results in JSON format",
+    "6. Unblind and compare to simulator predictions"
+  ]
+}
