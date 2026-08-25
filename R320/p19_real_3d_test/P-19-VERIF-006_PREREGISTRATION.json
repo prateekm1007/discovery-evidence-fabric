@@ -1,0 +1,33 @@
+{
+  "verification_id": "P-19-VERIF-006",
+  "authority": "CEO R320 §2 — REAL decisive 3D test",
+  "constitutional_basis": "Article VIII (frozen criterion), Article XXVI (ACTUAL external solver), Article XXVIII (no semantic promotion)",
+  "timestamp": "2026-08-26T03:10:00Z",
+
+  "experimental_design": {
+    "thesis": "P-19's distributed micro-shunt swarm maintains safer ICP than single-segment under obstruction because obstructing one of N channels reduces total conductance by 1/N, not to zero.",
+    "test_method": "Use svMultiPhysics to simulate obstruction by increasing outlet resistance. Compare: (A) distributed (10 channels, 1 obstructed = 90% conductance remaining) vs (B) single (1 channel, obstructed = 10% conductance remaining). The flow rates represent the per-channel flow after obstruction.",
+    "frozen_metric": "Inlet pressure (proxy for ICP). Distributed inlet pressure < single inlet pressure under obstruction.",
+    "frozen_threshold": "Distributed inlet < 50% of single inlet under obstruction. Frozen BEFORE execution.",
+    "frozen_before": "2026-08-26T03:10:00Z"
+  },
+
+  "obstruction_modeling": {
+    "distributed_obstructed": "10 channels, 1 fully obstructed. Effective flow = 9/10 of total. Each remaining channel carries 1/9 of total flow. Run svMultiPhysics at 0.111x flow (representing 1/9 per channel).",
+    "single_obstructed": "1 channel, 90% obstructed. Effective conductance = 10%. Run svMultiPhysics at 0.1x flow BUT with 10x outlet resistance (simulating partial obstruction).",
+    "note": "The key difference: distributed loses 1/10 of channels (90% capacity), single loses 90% of one channel (10% capacity). The distributed architecture is supposed to maintain drainage while single collapses."
+  },
+
+  "execution_plan": [
+    {"run": "distributed_10ch_1obstructed", "flow": "0.111x (9/10 channels active)", "outlet_R": "100 (normal)", "expected": "Low pressure — 9 channels still draining"},
+    {"run": "single_1ch_90pct_obstructed", "flow": "0.1x (10% capacity)", "outlet_R": "1000 (10x resistance = 90% obstruction)", "expected": "High pressure — near-total blockage"},
+    {"run": "single_1ch_unobstructed_baseline", "flow": "1.0x", "outlet_R": "100", "expected": "Baseline pressure for comparison"}
+  ],
+
+  "frozen_acceptance_criterion": {
+    "pass": "Distributed (9/10 channels) inlet pressure < 50% of single-obstructed (90% blocked) inlet pressure",
+    "fail": "Distributed inlet >= 50% of single-obstructed",
+    "model_disagreement": "If 3D result disagrees with 1D prediction by > 25%",
+    "insufficient_resolution": "If solver does not converge or mesh too coarse"
+  }
+}
