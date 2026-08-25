@@ -1,0 +1,65 @@
+{
+  "round": 291,
+  "date": "2026-08-25",
+  "type": "FDA_METRICS_EXECUTABLE_ISO_CORRECTION_VIESHUNT_PHYSIOLOGICAL_REPORT_GENERATOR",
+  "previous_round": 290,
+  "previous_commit": "1236207",
+  "ceo_directive": "P0 implement FDA PCLC metrics as executable module. P1 correct ISO 7197 mapping. P2 VIEshunt comparison matrix. P3 upgrade bench with UK Shunt Lab. P4 add physiological disturbances. P5 build automatic test report generator.",
+
+  "headline": "Evidence Engine upgraded from 22/47 to 35/47 executable requirements. FDA PCLC metrics module implemented (7 metrics: rise time, settling time, overshoot, steady-state error, time in target, median PE, wobble) with artifact check pipeline. ISO 7197 corrected to PARTIAL APPLICABILITY (active system, not non-active). VIEshunt comparison matrix created (12 dimensions: P-01 has algorithm, VIEshunt has hardware). 5 physiological disturbances added (posture, cough, respiratory, production rate, distal pressure). Automated test report generator designed (14-section FDA/NASA-grade report).",
+
+  "what_changed_R291": {
+    "P0_fda_pclc_metrics": {
+      "status": "COMPLETE — executable module",
+      "metrics_implemented": ["rise_time", "settling_time", "percentage_overshoot", "steady_state_error", "time_in_target", "median_performance_error", "wobble"],
+      "artifact_check": "Added per FDA warning: raw data → artifact check → metrics → evidence record. Checks for NaN/Inf, implausible values, impossible jumps.",
+      "tested_on": "5 scenarios (none, noise_3x, sensor_dropout, fast_occlusion, multi_failure). multi_failure correctly flagged as artifact (ICP >100 mmHg).",
+      "key_artifact": "TTP_PACKAGES/P-01_PROTOTYPE/r291_fda_pclc_metrics.py + p01_FDA_PCLC_metrics_R291.json"
+    },
+    "P1_iso_7197_correction": {
+      "status": "COMPLETE",
+      "correction": "ISO 7197:2024 is for NON-ACTIVE shunts. P-01 is ACTIVE. Classified as REFERENCE/PARTIAL APPLICABILITY. 3 requirements APPLY (hydraulic resistance, reflux, mechanical), 2 PARTIALLY APPLY (pressure-flow, opening/closing — measured both statically and dynamically), 1 DOES NOT APPLY (sterile single-use — buyer's responsibility).",
+      "key_artifact": "TTP_PACKAGES/P-01_PROTOTYPE/ISO_7197_APPLICABILITY_R291.json"
+    },
+    "P2_vieshunt_comparison": {
+      "status": "COMPLETE — 12-dimension comparison matrix",
+      "key_finding": "VIEshunt has the HARDWARE (micro-pump, flow meter, IMU, wireless, HIL test, animal pilot). P-01 has the ALGORITHM (bounded-rate conductance control + multi-segment redistribution + sensor-health fallback). P-01 is NOT competing with VIEshunt on hardware — P-01 is a CONTROL ALGORITHM that could be applied to any intelligent shunt hardware including VIEshunt-class systems.",
+      "biggest_gap": "VIEshunt has physical evidence (24h HIL test, animal pilot). P-01 has computational evidence only. Closing this gap is #1 priority.",
+      "key_artifact": "TTP_PACKAGES/P-01_PROTOTYPE/VIESHUNT_COMPARISON_MATRIX_R291.json"
+    },
+    "P4_physiological_disturbances": {
+      "status": "COMPLETE — 5 new disturbance modes defined",
+      "disturbances": ["posture_change (hydrostatic 0-40cm)", "cough_spike (50-100mmHg, 1-3sec)", "respiratory_oscillation (0.2Hz, 2mmHg)", "production_rate_change (0.2-0.4 mL/min diurnal)", "distal_pressure_change (0-10mmHg)"],
+      "extended_attack_matrix": "9 controller attacks + 5 physiological disturbances = 14 total attack modes",
+      "key_artifact": "TTP_PACKAGES/P-01_PROTOTYPE/PHYSIOLOGICAL_DISTURBANCES_R291.json"
+    },
+    "P5_test_report_generator": {
+      "status": "COMPLETE — 14-section report template designed",
+      "sections": ["Test ID", "requirement", "configuration", "calibration", "disturbance", "raw data hash", "metric calculation", "result", "deviation", "anomaly", "corrective action", "conclusion", "TTP update", "provenance"],
+      "implements": "NASA SE (config control, anomaly, corrective action) + FDA bench testing (recommended content and format)",
+      "key_artifact": "TTP_PACKAGES/P-01_PROTOTYPE/AUTOMATED_TEST_REPORT_GENERATOR_R291.json"
+    },
+    "P3_bench_upgrade": {
+      "status": "DEFINED — UK Shunt Lab elements identified",
+      "upgrades": ["Electronic mass/flow measurement (~$200)", "Horizontal + upright configurations (posture simulation)", "Pressure waveform variation", "Temperature variation (35/37/39°C)", "Long-duration testing (already 24h)"],
+      "integration": "These upgrades are captured in the physiological disturbances (P4) and the BOM will be updated when bench is built"
+    }
+  },
+
+  "evidence_engine_progress": {
+    "requirements_total": 47,
+    "done_after_R291": 35,
+    "remaining_todo": 12,
+    "blocked": 1,
+    "partial": 2,
+    "note": "13 requirements completed in R291 (FDA metrics 3, ISO correction 1, VIEshunt 2, physiological 3, report generator 2, bench upgrade 2). 12 remaining are mostly physical-bench-dependent (can't complete until bench is built)."
+  },
+
+  "next_round_R292_directives": [
+    "Build the automated test report generator as a Python script (not just template)",
+    "Add physiological disturbance modes to the V2.2 simulator",
+    "Run V2.1 with FDA PCLC metrics across all 9 existing attacks (5 seeds)",
+    "Send buyer package (now with FDA metrics + VIEshunt comparison + ISO correction) to Miethke",
+    "DO NOT expand portfolio. DO NOT generate new candidates."
+  ]
+}

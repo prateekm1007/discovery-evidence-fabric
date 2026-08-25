@@ -1,0 +1,121 @@
+{
+  "artifact": "AUTOMATED_TEST_REPORT_GENERATOR_R291",
+  "version": "1.0.0",
+  "date": "2026-08-25 (R291)",
+  "purpose": "Per CEO R291 P5: 'Every physical or computational test should automatically produce: Test ID → requirement → configuration → calibration → disturbance → raw data hash → metric calculation → result → deviation → anomaly → corrective action → conclusion → TTP update.'",
+  "constitutional_basis": "NASA SE Handbook (configuration control, traceability, anomaly documentation). FDA bench testing guidance (recommended content and format).",
+
+  "report_template": {
+    "header": {
+      "test_id": "P01-{arm}-{attack}-seed{seed}-{timestamp}",
+      "test_type": "computational | physical_bench",
+      "test_date": "ISO 8601",
+      "operator": "automated | lab_technician_name",
+      "protocol_version": "P-01-FREEZE-R290",
+      "package_freeze_hash": "from PACKAGE_FREEZE_MANIFEST_R290.json"
+    },
+    "requirement_traceability": {
+      "requirement_id": "e.g., PCLC-04 (disturbance response)",
+      "requirement_source": "FDA PCLC 2024 / ISO 7197 / NASA SE / internal",
+      "requirement_text": "The controller shall maintain ICP within [5, 20] mmHg under sensor noise (3x normal).",
+      "verification_method": "analysis | test | inspection | demonstration"
+    },
+    "configuration": {
+      "controller_version": "V2.1 (14_V2_1_validation.py, hash: 8e868010...)",
+      "arm": "A_simple | B_predictive_closed_loop | C_V2 | D_V2_1",
+      "attack_mode": "none | noise_3x | sensor_dropout | ... | posture_change | cough_spike | ...",
+      "seed": 42,
+      "parameters": "frozen per PACKAGE_FREEZE_MANIFEST_R290.json"
+    },
+    "calibration": {
+      "pressure_sensor_calibrated": "true/false (physical bench only)",
+      "flow_sensor_calibrated": "true/false (physical bench only)",
+      "valve_calibrated": "true/false (physical bench only)",
+      "temperature_stable": "true/false (physical bench only)",
+      "leak_test_passed": "true/false (physical bench only)",
+      "calibration_timestamp": "ISO 8601"
+    },
+    "disturbance": {
+      "disturbance_type": "controller_attack | physiological_disturbance",
+      "disturbance_parameters": {"key": "value per disturbance definition"},
+      "disturbance_start_sec": "when disturbance begins in the run",
+      "disturbance_end_sec": "when disturbance ends (or 'continuous')"
+    },
+    "raw_data": {
+      "raw_data_path": "path/to/csv or json",
+      "raw_data_hash": "SHA-256 of raw data file",
+      "sample_rate_hz": 100,
+      "duration_sec": 86400,
+      "channels": ["proximal_pressure", "flow_1", "flow_2", "flow_3", "flow_4", "valve_cmd_1", "valve_cmd_2", "valve_cmd_3", "valve_cmd_4"]
+    },
+    "metric_calculation": {
+      "metrics_computed_by": "r291_fda_pclc_metrics.py (FDA-PCLC-2026-07-14)",
+      "artifact_check_passed": "true/false",
+      "artifact_notes": "description of any artifacts detected",
+      "fda_pclc_metrics": {
+        "rise_time_sec": "value",
+        "settling_time_sec": "value",
+        "percentage_overshoot": "value",
+        "steady_state_error_mmhg": "value",
+        "time_in_target_percent": "value",
+        "median_performance_error_percent": "value",
+        "wobble_percent": "value"
+      },
+      "additional_metrics": {
+        "peak_icp_mmhg": "value",
+        "time_to_critical_failure_hr": "value",
+        "drainage_preserved_percent": "value",
+        "false_interventions": "value",
+        "actuation_count": "value",
+        "energy": "value"
+      }
+    },
+    "result": {
+      "pass_fail": "PASS | FAIL | PARTIAL",
+      "acceptance_criteria": "e.g., V2.1/B >= 2.0x, peak <= 40 mmHg, time_in_target >= 80%",
+      "actual_values": {"key": "value"},
+      "margin": "how much the result exceeded/missed the threshold"
+    },
+    "deviation": {
+      "deviation_from_expected": "none | description",
+      "deviation_from_simulator": "none | description (if physical bench result differs from simulator by >30%)",
+      "deviation_severity": "none | minor | major | critical"
+    },
+    "anomaly": {
+      "anomaly_detected": "true/false",
+      "anomaly_description": "what unexpected behavior occurred",
+      "anomaly_root_cause": "preliminary analysis",
+      "nasa_anomaly_category": "class I (critical) | class II (major) | class III (minor) | none"
+    },
+    "corrective_action": {
+      "action_required": "none | description",
+      "action_type": "design_change | parameter_adjustment | protocol_revision | further_investigation",
+      "action_owner": "CTO | engineer | lab",
+      "action_due_date": "ISO 8601",
+      "re_test_required": "true/false",
+      "re_test_id": "new test ID if re-test needed"
+    },
+    "conclusion": {
+      "summary": "1-2 sentence summary of test result",
+      "supports_claim": "true/false — does this test support the P-01 commercial claim?",
+      "evidence_ledger_update": "what was added to the evidence ledger",
+      "ttp_update_triggered": "true/false — does the TTP need updating based on this result?"
+    },
+    "provenance": {
+      "test_report_hash": "SHA-256 of this report",
+      "generated_by": "automated_test_report_generator_R291",
+      "generator_version": "1.0.0",
+      "generation_timestamp": "ISO 8601",
+      "all_artifacts_hashed": "true — raw data, metrics, report all hash-pinned"
+    }
+  },
+
+  "how_it_works": {
+    "input": "Raw data from simulator or bench (CSV/JSON)",
+    "processing": "1. Artifact check → 2. FDA PCLC metrics → 3. Compare to acceptance criteria → 4. Detect deviations/anomalies → 5. Generate corrective action if needed → 6. Produce report",
+    "output": "JSON report with all 14 sections above, hash-pinned for provenance",
+    "automatic_ttp_update": "If result triggers a TTP update (e.g., new weakness found, parameter needs adjustment), the report includes the specific TTP element to update and the proposed change"
+  },
+
+  "the_loop_this_creates": "test → report → anomaly → corrective action → re-test → new report → evidence accumulation → TTP update → buyer can see everything"
+}
