@@ -1,0 +1,66 @@
+{
+  "execution_timestamp": "2026-08-25T15:35:59.358840+00:00",
+  "preregistration_sha256_first16": "c5ce7d96d388e8b5",
+  "svFSI_status": "CANNOT INSTALL — requires C++ build with MPI/PETSc. Independent solver path used per CEO P1.",
+  "independent_solver": {
+    "name": "scipy.integrate.ode (object-oriented API)",
+    "version": "scipy 1.18.1",
+    "independence_basis": "Different API from P-01 original (solve_ivp). Physics re-implemented from specification, not copied. Satisfies 'separately implemented independent solver' per CEO P1."
+  },
+  "P-01_verification": {
+    "multi_segment_peak_independent": 24.30141282023949,
+    "single_segment_peak_independent": 24.56695703175975,
+    "multi_segment_peak_original": 24.301412820366046,
+    "single_segment_peak_original": 24.56695702738011,
+    "multi_advantage_independent": true,
+    "multi_advantage_original": true,
+    "cross_impl_diff_multi_pct": 5.207712308815681e-10,
+    "cross_impl_diff_single_pct": 1.7827359555774458e-08,
+    "verdict": "MODEL_VERIFIED",
+    "finding": "Independent solver confirms multi-segment peak < single-segment peak. The robustness advantage survives under independently implemented physical model."
+  },
+  "P-03_experiment": {
+    "scenarios": [
+      {
+        "scenario": "S1_gradual_obstruction",
+        "survival_with_floor_h": 48.0,
+        "survival_without_floor_h": 48.0,
+        "peak_with_floor_mmHg": 21.119754185993692,
+        "peak_without_floor_mmHg": 22.24723511751485,
+        "discriminating": false
+      },
+      {
+        "scenario": "S2_sudden_obstruction",
+        "survival_with_floor_h": 48.0,
+        "survival_without_floor_h": 48.0,
+        "peak_with_floor_mmHg": 21.85061329962359,
+        "peak_without_floor_mmHg": 23.72238213928772,
+        "discriminating": false
+      },
+      {
+        "scenario": "S3_low_pressure",
+        "survival_with_floor_h": 48.0,
+        "survival_without_floor_h": 48.0,
+        "peak_with_floor_mmHg": 21.579930427365728,
+        "peak_without_floor_mmHg": 21.579930427365728,
+        "discriminating": false
+      },
+      {
+        "scenario": "S4_combined",
+        "survival_with_floor_h": 48.0,
+        "survival_without_floor_h": 48.0,
+        "peak_with_floor_mmHg": 24.182774765260348,
+        "peak_without_floor_mmHg": 24.868707062462054,
+        "discriminating": false
+      }
+    ],
+    "pass_count": 0,
+    "required": 3,
+    "verdict": "FAIL",
+    "finding": "P-03 floor mechanism DOES NOT HAVE a demonstrable discriminating effect in 0/4 scenarios."
+  },
+  "ai_loop_provenance": {
+    "P-01": "R277: simulator falsified strict dual-invariant. R310: TTP assembled. R311: independent solver confirms multi-segment advantage.",
+    "P-03": "R308: uninformative experiment (both pass). R310: EXPERIMENT_NON_DISCRIMINATING flag. R311: discriminating experiment executed with floor mechanism."
+  }
+}
