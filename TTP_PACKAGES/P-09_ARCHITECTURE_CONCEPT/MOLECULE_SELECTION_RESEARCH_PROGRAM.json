@@ -1,0 +1,174 @@
+{
+  "package_id": "P-09",
+  "artifact": "MOLECULE_SELECTION_RESEARCH_PROGRAM",
+  "version": "1.0.0",
+  "date": "2026-08-25 (R278)",
+  "purpose": "Generate a molecule-selection research program — NOT pretend the molecule exists. Per CEO R278 directive: 'The machine should generate a molecule-selection research program, not pretend the molecule exists.'",
+  "constitutional_basis": "Article XXV — unknown must remain unknown. Article XXXIV — chemistry is the next bottleneck, not code.",
+
+  "the_decisive_question": "What molecule encodes ICP?",
+
+  "program_structure": {
+    "step_1": "candidate_molecular_mechanisms",
+    "step_2": "feasibility_screen",
+    "step_3": "transport_model",
+    "step_4": "detectability_assessment",
+    "step_5": "safety_constraints",
+    "step_6": "shortlist_and_experimental_plan"
+  },
+
+  "step_1_candidate_molecular_mechanisms": {
+    "duration_months": 1,
+    "method": "Literature survey + computational chemistry screening",
+    "output": "Structured list of candidate molecule CLASSES with pressure-responsive properties",
+    "candidates": [
+      {
+        "class": "Molecular rotors (fluorogenic)",
+        "mechanism": "Molecular rotation rate changes with viscosity/pressure, modulating fluorescence quantum yield",
+        "examples": "DCVJ, julolidine derivatives, BODIPY molecular rotors",
+        "pressure_sensitivity_estimate": "0.01-0.1% per mmHg (literature range)",
+        "detection_method": "Optical fluorescence through skin",
+        "key_advantage": "Direct optical readout — no aptamer or electrochemical sensor needed",
+        "key_disadvantage": "Sensitivity may be too low for ICP range (kPa, not MPa)",
+        "status": "CANDIDATE — requires feasibility screen"
+      },
+      {
+        "class": "Mechanophores (mechanochemical release)",
+        "mechanism": "Mechanical strain cleaves a covalent bond, releasing a small molecule",
+        "examples": "Cyclobutane, benzocyclobutene, spiropyran",
+        "pressure_sensitivity_estimate": "Threshold-based (not proportional) — releases only above threshold strain",
+        "detection_method": "Released small molecule detected by wearable sensor",
+        "key_advantage": "Direct pressure-to-molecule transduction (no electronics in brain)",
+        "key_disadvantage": "Most mechanophores require MPa strain, not kPa. ICP range is 0-50 mmHg = 0-7 kPa. May be 100x too low.",
+        "status": "HIGH RISK — requires novel mechanophore design with kPa threshold"
+      },
+      {
+        "class": "Pressure-sensitive liposomes",
+        "mechanism": "Lipid bilayer permeability changes with pressure, releasing encapsulated contents",
+        "examples": "Pegylated DSPC/cholesterol liposomes with tunable transition temperature",
+        "pressure_sensitivity_estimate": "Threshold-based but potentially tunable to ICP range",
+        "detection_method": "Encapsulated fluorescent dye or electroactive molecule detected externally",
+        "key_advantage": "Biocompatible. Tunable. Existing pharmaceutical manufacturing infrastructure.",
+        "key_disadvantage": "Threshold behavior (not proportional). Hysteresis. Chronic stability unknown.",
+        "status": "CANDIDATE — requires feasibility screen to assess proportional release"
+      },
+      {
+        "class": "Piezoelectric-activated reservoirs",
+        "mechanism": "Piezoelectric material deforms under pressure, mechanically expelling molecule from reservoir",
+        "examples": "PZT or PVDF piezoelectric membrane with drug reservoir",
+        "pressure_sensitivity_estimate": "Potentially proportional (piezoelectric response is linear in pressure)",
+        "detection_method": "Released molecule detected by wearable sensor",
+        "key_advantage": "Proportional response. Established physics. No chemistry breakthrough needed.",
+        "key_disadvantage": "Contains a PIEZOELECTRIC MATERIAL — this is arguably 'electronics in brain', which contradicts P-09's zero-electronics premise. May undermine the core value proposition.",
+        "status": "PHILOSOPHICAL CONFLICT — may not satisfy 'zero electronics' claim"
+      },
+      {
+        "class": "Phase-change materials",
+        "mechanism": "Solid-liquid phase transition temperature shifts with pressure, modulating release rate",
+        "examples": "Long-chain fatty acids (C16-C20), waxes",
+        "pressure_sensitivity_estimate": "Clapeyron slope: ~0.01-0.1 °C/mmHg. At 37°C, a 1°C shift = 10-100 mmHg. Potentially usable.",
+        "detection_method": "Released molecule (dye or marker) detected by wearable sensor",
+        "key_advantage": "Pure physics/chemistry — no electronics. Tunable by chain length.",
+        "key_disadvantage": "Hysteresis between melting and solidification. Not proportional (threshold behavior at phase transition). Chronic stability unknown.",
+        "status": "CANDIDATE — requires feasibility screen to assess hysteresis and proportionality"
+      }
+    ]
+  },
+
+  "step_2_feasibility_screen": {
+    "duration_months": 3,
+    "method": "Computational chemistry (DFT, MD simulations) + literature deep-dive on each candidate",
+    "questions_per_candidate": [
+      "Can the pressure sensitivity reach 0.1%/mmHg across the 5-40 mmHg range?",
+      "Is the response proportional (linear) or threshold-based?",
+      "What is the expected hysteresis?",
+      "Is the candidate synthetically accessible?",
+      "Has anyone demonstrated this class in a physiological pressure range (kPa, not MPa)?"
+    ],
+    "go_no_go_gate": "At least ONE candidate class must have computational evidence of proportional response in the kPa range with < 10% hysteresis. If none, P-09 is DEAD.",
+    "output": "Feasibility matrix. Top 2-3 candidate classes advance to Step 3."
+  },
+
+  "step_3_transport_model": {
+    "duration_months": 3,
+    "method": "In silico CSF flow simulation + diffusion modeling",
+    "questions": [
+      "Does the candidate molecule reach a wearable-detectable site (lumbar subcutaneous, scalp) within 10-180 minutes?",
+      "What is the attenuation factor (concentration at detection site vs concentration at release site)?",
+      "How does patient-specific ventricular anatomy affect transport time?"
+    ],
+    "simulation_setup": {
+      "anatomy": "Anatomically accurate ventricular + spinal canal geometry from ITK-SNAP segmentation atlas",
+      "flow_model": "Navier-Stokes with pulsatile boundary conditions (cardiac-driven CSF oscillation)",
+      "diffusion_model": "Stokes-Einstein with CSF viscosity 1.0 cP, temperature 37°C",
+      "patient_cohort": "10 virtual patients with varying ventricular size, spinal canal length, body habitus"
+    },
+    "go_no_go_gate": "At least ONE candidate must reach detectable concentration (>= 10 nM) at a wearable site within 180 minutes in >= 8/10 virtual patients.",
+    "output": "Transport feasibility assessment per candidate. Top 1-2 candidates advance."
+  },
+
+  "step_4_detectability_assessment": {
+    "duration_months": 3,
+    "method": "Sensor technology assessment + bench-top detection limit measurement",
+    "questions": [
+      "Can an electrochemical aptamer sensor detect the candidate at 10 nM in synthetic interstitial fluid?",
+      "Can an optical fluorescence sensor detect it through skin?",
+      "What is the sensor's selectivity against common interferents?",
+      "What is the sensor's drift over 7 days?"
+    ],
+    "sensor_candidates": [
+      "Electrochemical aptamer (requires 6-12 month aptamer development per molecule)",
+      "Optical fluorescence (requires molecule to be fluorescent, or labeled with fluorophore)",
+      "Lateral flow (single-use, not continuous — unsuitable)"
+    ],
+    "go_no_go_gate": "At least ONE sensor technology must demonstrate 10 nM detection limit with > 100x selectivity in synthetic interstitial fluid.",
+    "output": "Sensor-molecule pairing. 1 candidate molecule + 1 sensor technology advances."
+  },
+
+  "step_5_safety_constraints": {
+    "duration_months": 3,
+    "method": "Literature review + computational toxicity prediction (QSAR, Derek Nexus)",
+    "questions": [
+      "What is the known toxicity profile of the candidate molecule?",
+      "What is the maximum safe chronic CSF concentration?",
+      "Does the molecule have any known immunogenicity?",
+      "What is the metabolic/clearance pathway?",
+      "Are there any structural alerts (mutagenicity, carcinogenicity)?"
+    ],
+    "go_no_go_gate": "Candidate must have no structural alerts for mutagenicity/carcinogenicity. Maximum safe chronic concentration must be >= 100x the detection limit (safety margin).",
+    "output": "Safety profile. If GO, candidate advances to experimental plan."
+  },
+
+  "step_6_shortlist_and_experimental_plan": {
+    "duration_months": 1,
+    "method": "Integrate results from Steps 1-5. If any candidate survived all gates, write the experimental plan.",
+    "output_if_GO": "Specific molecule identity + synthesis route + transducer design + sensor specification + in vitro test protocol + in vivo (animal) test protocol",
+    "output_if_NO_GO": "P-09 is DEAD. The architecture is novel but no viable molecule exists with current technology. Record in cemetery. The finding 'chemical molecular ICP signaling is not currently feasible' is itself a valuable negative result.",
+    "experimental_plan_if_GO": {
+      "phase_a_synthesis": "3-6 months. Synthesize the molecule. Confirm structure by NMR/MS.",
+      "phase_b_bench_test": "3-6 months. Build pressure chamber. Measure pressure-to-release curve. Confirm 0.1%/mmHg sensitivity, < 10% hysteresis.",
+      "phase_c_csf_stability": "6 months. 180-day in vitro stability test in synthetic CSF at 37°C.",
+      "phase_d_sensor_integration": "3-6 months. Build wearable sensor. Measure detection limit, selectivity, drift.",
+      "phase_e_animal_model": "12-24 months. Implant in animal model. Measure ICP-to-concentration-to-sensor end-to-end transfer function.",
+      "total_if_GO": "Additional 24-48 months after Step 6. Total from now: 36-60 months to know if P-09 is clinically viable."
+    }
+  },
+
+  "program_summary": {
+    "total_duration_months_to_shortlist": 14,
+    "total_cost_to_shortlist_usd": "200K-500K",
+    "probability_of_finding_viable_molecule_estimate": "20-40%",
+    "honest_disclosure": "This program may conclude that NO viable molecule exists with current technology. That is a valid outcome. If so, the architecture concept dies — but the finding 'chemical molecular ICP signaling is not currently feasible' is itself a contribution to the field.",
+    "what_we_do_NOT_do": "We do NOT pretend the molecule exists. We do NOT build TTPs around an unspecified molecule. We do NOT claim P-09 is prototype-ready. We generate the research program and let the chemistry answer the question."
+  },
+
+  "collaborator_requirements": {
+    "step_1": "Computational chemist (any university chemistry department)",
+    "step_2": "Computational chemist + literature reviewer",
+    "step_3": "CFD engineer with anatomical flow modeling experience",
+    "step_4": "Biosensor engineer (electrochemistry or fluorescence)",
+    "step_5": "Toxicologist / medicinal chemist",
+    "step_6": "Program lead (the package owner) + all of above",
+    "ideal_collaborator": "A medicinal chemistry program at a research university or contract research organization. Examples: Broad Institute, Scripps Research, UCSF School of Pharmacy, WuXi AppTec (CRO)."
+  }
+}

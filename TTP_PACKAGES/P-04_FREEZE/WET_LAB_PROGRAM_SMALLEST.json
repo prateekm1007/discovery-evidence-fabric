@@ -1,0 +1,122 @@
+{
+  "package_id": "P-04",
+  "artifact": "WET_LAB_PROGRAM_SMALLEST",
+  "version": "1.0.0",
+  "date": "2026-08-25 (R278)",
+  "purpose": "The smallest wet-lab program capable of answering the three decisive biology questions that block P-04. NOT documentation — experimental plan with go/no-go gates.",
+  "constitutional_basis": "Article XXXIV — stop coding when reality is the next bottleneck. The enzyme is a biology question. This program confronts it directly.",
+
+  "the_three_questions": [
+    {"id": "Q1", "question": "Which enzyme actually works in CSF?",          "phase": 1},
+    {"id": "Q2", "question": "Can it remain active when immobilized?",       "phase": 2},
+    {"id": "Q3", "question": "Does pulsation-synchronized contact time materially improve catalytic clearance?", "phase": 3}
+  ],
+
+  "design_principle": "Each phase has a GO/NO-GO gate. If a phase fails, the program stops. No documentation is written around a failed phase. This is the opposite of the R276 pattern where we built TTPs around an unresolved enzyme.",
+
+  "phase_1_which_enzyme": {
+    "duration_months": 3,
+    "cost_usd": "30K-60K",
+    "question": "Which enzyme actually works in CSF?",
+    "method": "In vitro activity assay of candidate enzymes in synthetic CSF at 37°C over 30 days",
+    "candidates": [
+      {"name": "Neprilysin (NEP)",                       "rationale": "Best-characterized Aβ-degrading enzyme. Recombinant human NEP commercially available."},
+      {"name": "Insulin-degrading enzyme (IDE)",          "rationale": "Alternative Aβ-degrading enzyme. Broader specificity."},
+      {"name": "Matrix metalloproteinase-9 (MMP-9)",      "rationale": "Degrades Aβ in vitro. Less specific than NEP but more stable as recombinant protein."}
+    ],
+    "synthetic_csf_recipe": {
+      "base": "Phosphate-buffered saline, pH 7.33, 37°C",
+      "protein_content": "0.5 g/L bovine serum albumin (mimics CSF protein load)",
+      "ion_content": "Na+ 150 mM, K+ 3 mM, Ca2+ 1 mM, Mg2+ 1 mM, Cl- 150 mM",
+      "glucose": "3 mM (physiological CSF glucose)",
+      "lactate": "2 mM",
+      "sterility": "Filter-sterilized, antibiotic-free"
+    },
+    "assay_protocol": {
+      "day_0": "Add recombinant enzyme to synthetic CSF at 1 μM final concentration. Split into 30 aliquots.",
+      "daily_days_1_30": "Assay one aliquot per day for Aβ-degradation activity. Method: incubate with 100 nM Aβ42 for 1 hour, measure remaining Aβ42 by ELISA.",
+      "metric": "Activity retention (%) = (day_N activity) / (day_0 activity) × 100"
+    },
+    "go_no_go_gate": {
+      "go_criterion": "At least ONE candidate retains >= 50% activity at day 30",
+      "no_go_action": "If no candidate retains >= 50% at day 30, P-04 is DEAD. No Phase 2. No documentation. Record in cemetery.",
+      "decision_date": "Month 3"
+    },
+    "outputs": [
+      "Activity retention curve (30 days) for each candidate",
+      "GO/NO-GO decision for Phase 2",
+      "If GO: winning enzyme identity, optimal concentration, activity decay rate"
+    ]
+  },
+
+  "phase_2_immobilized_activity": {
+    "duration_months": 3,
+    "cost_usd": "50K-100K",
+    "question": "Can the winning enzyme from Phase 1 remain active when immobilized?",
+    "prerequisite": "Phase 1 GO",
+    "method": "Immobilize winning enzyme using 2 strategies. Measure activity retention over 30 days in synthetic CSF.",
+    "immobilization_strategies": [
+      {"name": "Covalent EDC/NHS coupling", "substrate": "Carboxylated cellulose membrane", "rationale": "Well-established chemistry. Stable covalent bond."},
+      {"name": "PEG hydrogel entrapment",   "substrate": "4-arm PEG-maleimide hydrogel",  "rationale": "Biocompatible. Gentle on enzyme. Tunable mesh size."}
+    ],
+    "assay_protocol": "Same as Phase 1 but on immobilized enzyme membranes. Flow synthetic CSF across membrane at 0.30 mL/min, 37°C, pulsatile (1 Hz, 40% amplitude). Daily Aβ degradation assay.",
+    "go_no_go_gate": {
+      "go_criterion": "At least ONE immobilization strategy retains >= 30% activity at day 30 (lower threshold than Phase 1 because immobilization always loses some activity)",
+      "no_go_action": "If no strategy retains >= 30% at day 30, try one more strategy (sol-gel silica). If that also fails, P-04 is DEAD.",
+      "decision_date": "Month 6"
+    },
+    "outputs": [
+      "Immobilized activity retention curve (30 days) for each strategy",
+      "GO/NO-GO decision for Phase 3",
+      "If GO: winning enzyme + immobilization combination, measured Km and kcat"
+    ]
+  },
+
+  "phase_3_pulsation_sync_benefit": {
+    "duration_months": 2,
+    "cost_usd": "20K-40K",
+    "question": "Does pulsation-synchronized contact time materially improve catalytic clearance?",
+    "prerequisite": "Phase 2 GO",
+    "method": "Bench flow cell with winning enzyme+immobilization membrane. Compare clearance under fixed-flow vs pulsation-synchronized flow.",
+    "experimental_design": {
+      "setup": "Bench-top flow cell per P-04_FREEZE/EXTERNAL_VALIDATION_HANDOFF/frozen_protocol_engineering_only.json, but with REAL enzymatic membrane from Phase 2",
+      "conditions": [
+        {"name": "fixed_flow",      "Q_mean": "0.30 mL/min", "pulsation": "none",        "valve_mode": "constant open"},
+        {"name": "pulsatile_nosync", "Q_mean": "0.30 mL/min", "pulsation": "1 Hz, 40% amp", "valve_mode": "constant open"},
+        {"name": "pulsatile_sync",   "Q_mean": "0.30 mL/min", "pulsation": "1 Hz, 40% amp", "valve_mode": "synchronized to diastole"}
+      ],
+      "substrate": "Synthetic CSF spiked with 100 nM Aβ42 (physiological range)",
+      "measurement": "Aβ42 concentration proximal and distal to membrane. Clearance = (C_proximal - C_distal) / C_proximal."
+    },
+    "go_no_go_gate": {
+      "go_criterion": "Pulsatile_sync clearance >= 1.3x fixed_flow clearance (the hypothesis predicts 1.3-1.5x). Material improvement.",
+      "no_go_action": "If pulsation sync does NOT improve clearance by >= 1.3x, the P-04 differentiator (pulsation-synchronized contact time lock) is NOT supported. P-04 becomes 'enzymatic CSF clearance membrane' without the pulsation sync feature. Value proposition weakens but does not die.",
+      "decision_date": "Month 8"
+    },
+    "outputs": [
+      "Clearance comparison: fixed vs pulsatile-nosync vs pulsatile-sync",
+      "GO/NO-GO decision for P-04 as a whole",
+      "If GO: P-04 has a validated differentiator. Proceed to pre-clinical.",
+      "If PARTIAL: P-04 becomes enzymatic clearance without pulsation sync. Reduced value proposition."
+    ]
+  },
+
+  "program_summary": {
+    "total_duration_months": 8,
+    "total_cost_usd": "100K-200K",
+    "kill_probability_estimate": "30-50% (enzyme may not survive 30 days in CSF; immobilization may lose too much activity; pulsation sync may not improve clearance)",
+    "honest_disclosure": "This program may conclude that P-04 is not viable. That is a valid outcome. If so, the finding enters the cemetery and we stop spending money on P-04. This is the opposite of the R276 pattern where we built documentation around an unresolved enzyme."
+  },
+
+  "what_happens_after_phase_3_GO": {
+    "if_all_three_phases_pass": "P-04 has: (1) a specific enzyme that works in CSF, (2) an immobilization strategy that retains activity, (3) evidence that pulsation sync improves clearance. The package promotes from TECHNICALLY_SPECIFIED_DESIGN_FREEZE_PARTIAL to PROTOTYPE_READY. Then: pre-clinical animal model, then clinical trial.",
+    "if_phase_3_fails_but_1_2_pass": "P-04 becomes 'enzymatic CSF clearance membrane' without pulsation sync. Reduced but still viable value proposition. Package promotes to PROTOTYPE_READY with revised claims."
+  },
+
+  "collaborator_requirements": {
+    "phase_1": "Biochemistry lab with enzyme assay capability. Any university biochem lab can do this.",
+    "phase_2": "Biomaterials lab with immobilization expertise. Slightly more specialized.",
+    "phase_3": "Bioengineering lab with flow cell + pulsatile pump capability. Same as P-01 bench prototype lab.",
+    "ideal_collaborator": "A single lab that can do all three phases. E.g., a bioengineering department with a biomaterials subgroup. Examples: MIT BME, Stanford BME, Rice BME, Northwestern BME."
+  }
+}

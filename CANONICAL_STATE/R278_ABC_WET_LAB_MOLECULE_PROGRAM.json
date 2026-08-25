@@ -1,0 +1,83 @@
+{
+  "round": 278,
+  "date": "2026-08-25",
+  "type": "ABC_COMPARISON_WET_LAB_PROGRAM_MOLECULE_PROGRAM",
+  "previous_round": 277,
+  "previous_commit": "5e7cae7",
+  "ceo_directive": "Do not expand the portfolio. P-01: turn the falsification into the product (A/B/C comparison). P-04: smallest wet-lab program. P-09: molecule-selection research program. Commercial loop: BUYER_READY_FOR_TECHNICAL_EVALUATION, not TRANSACTION.",
+
+  "what_changed_R278": {
+    "P-01": {
+      "from": "PROTOTYPE_READY",
+      "to": "BUYER_READY_FOR_TECHNICAL_EVALUATION (V1.1)",
+      "summary": "Built V1.1 A/B/C comparison simulator. Fixed the V1.0 'noprediction' bug (was still using trend predictor for isolation). V1.1 'B_reactive' correctly isolates on actual failure (G < 10% of healthy). A/B/C comparison across 5 seeds produced three honest findings: (1) Reactive redundancy (B) is WORSE than single-path (A) — fails 35% faster because sudden isolation causes ICP spikes. (2) Predictive isolation (C) extends survival 7-9x (7.66h vs 0.84-1.29h) and reduces peak ICP by 60-70% (22 mmHg vs 37-59 mmHg). (3) C's controller energy is 4380 alpha-changes/hour — real engineering concern for battery/wear. Central buyer question answered: YES, prediction materially outperforms redundancy. But neither system meets 24h survival.",
+      "key_artifacts": [
+        "TTP_PACKAGES/P-01_PROTOTYPE/06_ABC_comparison.py (V1.1 simulator, 280 lines)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/p01_v1_1_ABC_comparison_results.json (15 runs)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/07_ABC_findings.md (findings document)",
+        "TTP_PACKAGES/COMMERCIAL_LOOP/P-01_BUYER_TECHNICAL_BRIEFING_ONE_PAGER.md",
+        "TTP_PACKAGES/COMMERCIAL_LOOP/OUTREACH_EMAIL_TEMPLATES.json (5 templates)"
+      ]
+    },
+    "P-04": {
+      "from": "TECHNICALLY_SPECIFIED_DESIGN_FREEZE_PARTIAL",
+      "to": "same state + wet-lab program defined",
+      "summary": "Built WET_LAB_PROGRAM_SMALLEST.json: 3-phase, 8-month, $100-200K program with go/no-go gates. Phase 1: which enzyme works in CSF (30-day stability test, 3 candidates: NEP, IDE, MMP-9). Phase 2: can it remain active when immobilized (2 strategies: EDC/NHS covalent, PEG hydrogel). Phase 3: does pulsation sync improve clearance (1.3x target). Each phase has a GO/NO-GO gate — if Phase 1 fails, P-04 DIES. This is the opposite of the R276 pattern where we built documentation around an unresolved enzyme.",
+      "key_artifact": "TTP_PACKAGES/P-04_FREEZE/WET_LAB_PROGRAM_SMALLEST.json"
+    },
+    "P-09": {
+      "from": "ARCHITECTURE_CONCEPT",
+      "to": "same state + molecule-selection research program defined",
+      "summary": "Built MOLECULE_SELECTION_RESEARCH_PROGRAM.json: 6-step, 14-month, $200-500K program. Step 1: candidate molecular mechanisms (5 classes: molecular rotors, mechanophores, pressure-sensitive liposomes, piezoelectric-activated reservoirs, phase-change materials). Step 2: feasibility screen (computational chemistry). Step 3: transport model (CFD). Step 4: detectability (sensor assessment). Step 5: safety constraints. Step 6: shortlist + experimental plan. Each step has GO/NO-GO gate. Probability of viable molecule: 20-40%. If no molecule found, architecture dies — negative result is itself valuable.",
+      "key_artifact": "TTP_PACKAGES/P-09_ARCHITECTURE_CONCEPT/MOLECULE_SELECTION_RESEARCH_PROGRAM.json"
+    },
+    "commercial_loop": {
+      "from": "infrastructure built, 0 outreach sent",
+      "to": "buyer materials + email templates ready, ready to send",
+      "summary": "Created P-01 buyer technical briefing one-pager with honest framing per CEO directive: 'Here is the mechanism, here is the simulator, here is the falsification result, here is what worked, here is what failed, and here is exactly what we need to test next.' Created 5 outreach email templates: P-01 to shunt OEMs, P-04 to biotech, P-09 to research funders, P-01 to academic labs, portfolio to VCs. State machine clarified: BUYER_READY_FOR_TECHNICAL_EVALUATION ≠ BUYER_READY_FOR_TRANSACTION.",
+      "key_artifacts": [
+        "TTP_PACKAGES/COMMERCIAL_LOOP/P-01_BUYER_TECHNICAL_BRIEFING_ONE_PAGER.md",
+        "TTP_PACKAGES/COMMERCIAL_LOOP/OUTREACH_EMAIL_TEMPLATES.json"
+      ]
+    },
+    "state_machine": {
+      "from": "16 states (R277)",
+      "to": "16 states, clarified BUYER_READY_FOR_TECHNICAL_EVALUATION vs BUYER_READY_FOR_TRANSACTION distinction",
+      "key_artifact": "TTP_PACKAGES/EVIDENCE_LOOP_STATE_MACHINE.json (R278 version)"
+    }
+  },
+
+  "constitutional_articles_invoked": [
+    "Article XXX — never optimize the evaluator. A/B/C simulator NOT tuned to make C win.",
+    "Article XXXI — self-correction creates memory artifact. V1.0 preserved at commit 5e7cae7; V1.1 documents what changed.",
+    "Article XXVIII — no silent semantic promotion. P-01 is BUYER_READY_FOR_TECHNICAL_EVALUATION, NOT BUYER_READY_FOR_TRANSACTION.",
+    "Article XXXIV — stop coding when reality is the next bottleneck. P-04 wet-lab and P-09 chemistry are reality bottlenecks."
+  ],
+
+  "what_did_NOT_change_R278": [
+    "15-package portfolio — unchanged (zero new candidates per CEO directive)",
+    "15 TTP skeletons — unchanged",
+    "Constitution (v1.5.0, 35 articles) — unchanged",
+    "Cemetery (23 entries) — unchanged",
+    "Discovery engine — unchanged",
+    "R277 simulator (05_simulator.py V1.0) — preserved as-is; V1.1 is a separate file (06_ABC_comparison.py)"
+  ],
+
+  "honest_status_assessment": {
+    "P-01": "BUYER_READY_FOR_TECHNICAL_EVALUATION. A/B/C comparison shows prediction outperforms redundancy 7-9x. Buyer materials ready. 0 outreach sent. Next: send outreach, engage buyer engineering teams.",
+    "P-04": "TECHNICALLY_SPECIFIED_DESIGN_FREEZE_PARTIAL. Wet-lab program defined (3 phases, 8 months, $100-200K). Ready to engage enzyme engineering collaborator. Next: identify and engage lab.",
+    "P-09": "ARCHITECTURE_CONCEPT. Molecule-selection research program defined (6 steps, 14 months, $200-500K). Ready to engage medicinal chemistry collaborator. Next: identify and engage lab/CRO.",
+    "buyer_conversations": 0,
+    "transactions": 0,
+    "honest_summary": "R278 focused entirely on execution quality, not portfolio expansion. Three flagship packages now each have a clear next action: P-01 → buyer outreach, P-04 → wet-lab collaborator, P-09 → chemistry collaborator. The self-correcting loop (discovery → falsification → reformulation → buyer feedback) is now structurally real."
+  },
+
+  "next_round_R279_directives": [
+    "Send outreach emails from OUTREACH_EMAIL_TEMPLATES.json (10 emails across 5 segments)",
+    "Receive 2+ responses, log in BUYER_OUTREACH_TRACKER.json",
+    "Engage enzyme engineering collaborator for P-04 Phase 1",
+    "Engage medicinal chemistry consultant for P-09 Step 1-2",
+    "Apply buyer feedback via BUYER_FEEDBACK_INTAKE_SCHEMA.json",
+    "DO NOT expand portfolio. DO NOT generate new candidates. Focus on execution."
+  ]
+}
