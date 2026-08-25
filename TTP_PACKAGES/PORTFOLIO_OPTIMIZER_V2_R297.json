@@ -1,0 +1,135 @@
+{
+  "artifact": "PORTFOLIO_OPTIMIZER_V2_R297_THREE_SCORES",
+  "version": "2.0.0",
+  "date": "2026-08-25 (R297)",
+  "purpose": "Per CEO R297 P0: 'Create three explicit portfolio scores. Do not mix EV with evidence cost and strategic value silently. Show three rankings, not one fake EV ranking.'",
+  "constitutional_basis": "Article XXVII (no threshold invention — every number has provenance). Article XXVIII (no silent semantic promotion — MODELLED EV is not buyer evidence).",
+
+  "score_definitions": {
+    "score_1_TEV": {
+      "name": "Total Expected Transaction Value",
+      "formula": "TEV = P_technical × P_buyer × transaction_value − evidence_cost",
+      "answers": "Which candidate is worth the most?",
+      "unit": "USD",
+      "can_be_negative": true,
+      "probability_state_required": "Each probability has explicit state (MODELLED/CALIBRATED/BUYER_VERIFIED)"
+    },
+    "score_2_EROI": {
+      "name": "Evidence Return on Investment",
+      "formula": "EROI = TEV / evidence_cost",
+      "answers": "Which candidate gives the most expected value per dollar of evidence?",
+      "unit": "ratio (dimensionless)",
+      "zero_cost_handling": "If evidence_cost = $0, EROI is labeled INFINITE_COST_FREE (not infinity). The action is free, so any positive TEV means infinite ROI. But the ABSOLUTE TEV may be small. Both numbers must be shown.",
+      "can_be_negative": true (if TEV < 0, EROI < 0)
+    },
+    "score_3_strategic": {
+      "name": "Strategic Value Score",
+      "formula": "Qualitative 1-5 score based on: platform potential + cross-market applicability + buyer density + time-to-revenue",
+      "answers": "Which candidate deserves parallel strategic attention even if immediate EV is lower?",
+      "unit": "1-5 scale",
+      "factors": {
+        "platform_potential": "Can the mechanism apply to multiple markets/products? (1=single product, 5=platform)",
+        "cross_market_applicability": "Does the technology transfer to other medical domains? (1=single domain, 5=multi-domain)",
+        "buyer_density": "How many potential buyers exist? (1=<5, 5=>50)",
+        "time_to_revenue": "How fast can a transaction close? (1=>12 months, 5=<3 months)"
+      }
+    }
+  },
+
+  "canonical_economics_records": {
+    "rule": "Every candidate has EXACTLY ONE canonical economics record. If multiple artifacts reference different EV values, the canonical record wins. Conflicting values are automatically flagged as INCONSISTENCY.",
+    "provenance_per_record": ["candidate_id", "calculation_version", "input_probabilities", "probability_states", "transaction_value_tier", "evidence_cost", "TEV", "EROI", "strategic_score", "timestamp", "source_commit", "external_evidence_references"]
+  },
+
+  "three_rankings_R297": [
+    {
+      "ranking_name": "TEV RANKING (Total Expected Transaction Value)",
+      "question": "Which candidate is worth the most?",
+      "sorted_by": "TEV descending",
+      "entries": [
+        {"rank": 1, "id": "P-01", "TEV": 82000, "P_tech": 0.80, "P_tech_state": "CALIBRATED", "P_buyer": 0.30, "P_buyer_state": "MODELLED", "value": 375000, "cost": 8000},
+        {"rank": 2, "id": "P-15", "TEV": 41500, "P_tech": 0.35, "P_tech_state": "MODELLED", "P_buyer": 0.50, "P_buyer_state": "MODELLED", "value": 250000, "cost": 2000},
+        {"rank": 3, "id": "P-08", "TEV": 35500, "P_tech": 0.30, "P_tech_state": "MODELLED", "P_buyer": 0.50, "P_buyer_state": "MODELLED", "value": 250000, "cost": 2000},
+        {"rank": 4, "id": "P-11", "TEV": 31250, "P_tech": 0.25, "P_tech_state": "MODELLED", "P_buyer": 0.60, "P_buyer_state": "MODELLED", "value": 275000, "cost": 10000},
+        {"rank": 5, "id": "P-13", "TEV": 15000, "P_tech": 0.40, "P_tech_state": "MODELLED", "P_buyer": 0.25, "P_buyer_state": "MODELLED", "value": 150000, "cost": 0, "note": "DOWNGRADED from $36K after collision attack. P_buyer reduced from 0.40 to 0.25 because AI prediction is crowded. P_tech reduced from 0.60 to 0.40 because differentiator is conditional on P-08/P-15."},
+        {"rank": 6, "id": "P-06", "TEV": 19125, "P_tech": 0.50, "P_tech_state": "MODELLED", "P_buyer": 0.35, "P_buyer_state": "MODELLED", "value": 137500, "cost": 5000},
+        {"rank": 7, "id": "P-10", "TEV": 19000, "P_tech": 0.40, "P_tech_state": "MODELLED", "P_buyer": 0.30, "P_buyer_state": "MODELLED", "value": 200000, "cost": 5000},
+        {"rank": 8, "id": "P-12", "TEV": 17500, "P_tech": 0.25, "P_tech_state": "MODELLED", "P_buyer": 0.40, "P_buyer_state": "MODELLED", "value": 275000, "cost": 10000},
+        {"rank": 9, "id": "P-04", "TEV": 15000, "P_tech": 0.40, "P_tech_state": "MODELLED", "P_buyer": 0.50, "P_buyer_state": "MODELLED", "value": 375000, "cost": 60000},
+        {"rank": 10, "id": "P-02", "TEV": 11000, "P_tech": 0.35, "P_tech_state": "MODELLED", "P_buyer": 0.30, "P_buyer_state": "MODELLED", "value": 200000, "cost": 10000},
+        {"rank": 11, "id": "P-05", "TEV": 11000, "P_tech": 0.30, "P_tech_state": "MODELLED", "P_buyer": 0.35, "P_buyer_state": "MODELLED", "value": 200000, "cost": 10000},
+        {"rank": 12, "id": "P-14", "TEV": 5000, "P_tech": 0.30, "P_tech_state": "MODELLED", "P_buyer": 0.25, "P_buyer_state": "MODELLED", "value": 200000, "cost": 10000},
+        {"rank": 13, "id": "P-09", "TEV": -176400, "P_tech": 0.06, "P_tech_state": "MODELLED", "P_buyer": 0.20, "P_buyer_state": "MODELLED", "value": 300000, "cost": 200000, "note": "NEGATIVE EV. Research investment. P_tech = 0.20 × 0.30 (molecule success probability)."},
+        {"rank": 14, "id": "P-03", "TEV": "BUNDLED_WITH_P01", "note": "No standalone calculation"},
+        {"rank": 15, "id": "P-07", "TEV": "BUNDLED_WITH_P04", "note": "No standalone calculation"}
+      ]
+    },
+    {
+      "ranking_name": "EROI RANKING (Evidence Return on Investment)",
+      "question": "Which candidate gives the most expected value per dollar of evidence?",
+      "sorted_by": "EROI descending",
+      "zero_cost_rule": "If cost=$0, label INFINITE_COST_FREE. Show absolute TEV alongside.",
+      "entries": [
+        {"rank": 1, "id": "P-13", "EROI": "INFINITE_COST_FREE", "TEV": 15000, "cost": 0, "note": "Free action (MAUDE search). But TEV is small ($15K). Infinite ROI ≠ high value."},
+        {"rank": 2, "id": "P-15", "EROI": 20.75, "TEV": 41500, "cost": 2000, "note": "$41.5K return on $2K investment. Best ratio among paid actions."},
+        {"rank": 3, "id": "P-08", "EROI": 17.75, "TEV": 35500, "cost": 2000},
+        {"rank": 4, "id": "P-06", "EROI": 3.83, "TEV": 19125, "cost": 5000},
+        {"rank": 5, "id": "P-10", "EROI": 3.80, "TEV": 19000, "cost": 5000},
+        {"rank": 6, "id": "P-01", "EROI": 10.25, "TEV": 82000, "cost": 8000, "note": "Highest absolute TEV. Good ROI but not highest ratio."},
+        {"rank": 7, "id": "P-11", "EROI": 3.13, "TEV": 31250, "cost": 10000},
+        {"rank": 8, "id": "P-12", "EROI": 1.75, "TEV": 17500, "cost": 10000},
+        {"rank": 9, "id": "P-02", "EROI": 1.10, "TEV": 11000, "cost": 10000},
+        {"rank": 10, "id": "P-05", "EROI": 1.10, "TEV": 11000, "cost": 10000},
+        {"rank": 11, "id": "P-14", "EROI": 0.50, "TEV": 5000, "cost": 10000, "note": "EROI < 1. Evidence costs more than expected return. Deprioritize."},
+        {"rank": 12, "id": "P-04", "EROI": 0.25, "TEV": 15000, "cost": 60000, "note": "EROI < 1. High cost relative to near-term EV. Strategic investment."},
+        {"rank": 13, "id": "P-09", "EROI": -0.88, "TEV": -176400, "cost": 200000, "note": "Negative ROI. Pure research investment."},
+        {"rank": 14, "id": "P-03", "EROI": "BUNDLED"},
+        {"rank": 15, "id": "P-07", "EROI": "BUNDLED"}
+      ]
+    },
+    {
+      "ranking_name": "STRATEGIC VALUE RANKING",
+      "question": "Which candidate deserves parallel strategic attention even if immediate EV is lower?",
+      "sorted_by": "Strategic score descending (1-5 scale)",
+      "entries": [
+        {"rank": 1, "id": "P-01", "strategic_score": 4.5, "platform": 3, "cross_market": 3, "buyer_density": 2, "time_to_revenue": 3, "rationale": "Deepest evidence (225-run ablation). Control mechanism transferable to other fluidic systems. But narrow buyer base (shunt companies only). Bench protocol ready."},
+        {"rank": 2, "id": "P-11", "strategic_score": 4.3, "platform": 4, "cross_market": 3, "buyer_density": 5, "time_to_revenue": 3, "rationale": "Orthopedic market has 1000+ buyers and >50% asset acquisition rate. Anti-biofilm coating is a PLATFORM (applies to ALL implants). Highest buyer density in portfolio."},
+        {"rank": 3, "id": "P-08", "strategic_score": 4.0, "platform": 5, "cross_market": 5, "buyer_density": 4, "time_to_revenue": 4, "rationale": "Energy harvesting is a PLATFORM technology. Applies to ANY implantable device. Cardiac, neuro, ortho, IVD all need battery elimination."},
+        {"rank": 4, "id": "P-15", "strategic_score": 4.0, "platform": 5, "cross_market": 5, "buyer_density": 4, "time_to_revenue": 4, "rationale": "Self-powered sensing is a PLATFORM. Same breadth as P-08."},
+        {"rank": 5, "id": "P-06", "strategic_score": 3.5, "platform": 4, "cross_market": 3, "buyer_density": 4, "time_to_revenue": 3, "rationale": "Fail-operational membrane applies to filtration broadly. IVD + implant markets."},
+        {"rank": 6, "id": "P-04", "strategic_score": 3.5, "platform": 3, "cross_market": 2, "buyer_density": 3, "time_to_revenue": 2, "rationale": "Catalytic clearance is novel but biology-dependent. CNS-specific. Long timeline."},
+        {"rank": 7, "id": "P-13", "strategic_score": 3.3, "platform": 4, "cross_market": 4, "buyer_density": 4, "time_to_revenue": 3, "rationale": "Neuromorphic prediction is a platform IF power budget works. Conditional on P-08/P-15."},
+        {"rank": 8, "id": "P-10", "strategic_score": 3.0, "platform": 3, "cross_market": 3, "buyer_density": 3, "time_to_revenue": 3, "rationale": "Phase-change valve is a component technology. Moderate breadth."},
+        {"rank": 9, "id": "P-12", "strategic_score": 2.8, "platform": 2, "cross_market": 2, "buyer_density": 3, "time_to_revenue": 2, "rationale": "Enzymatic CSF clearance is CNS-specific. Similar to P-04 but less developed."},
+        {"rank": 10, "id": "P-09", "strategic_score": 2.5, "platform": 3, "cross_market": 2, "buyer_density": 2, "time_to_revenue": 1, "rationale": "Chemical ICP transduction is novel but high-risk. Research only. 12-24 month timeline."},
+        {"rank": 11, "id": "P-02", "strategic_score": 2.5, "platform": 2, "cross_market": 2, "buyer_density": 2, "time_to_revenue": 3, "rationale": "Adaptive valve is shunt-specific. Incremental over existing."},
+        {"rank": 12, "id": "P-05", "strategic_score": 2.5, "platform": 2, "cross_market": 2, "buyer_density": 2, "time_to_revenue": 3},
+        {"rank": 13, "id": "P-14", "strategic_score": 2.0, "platform": 2, "cross_market": 2, "buyer_density": 2, "time_to_revenue": 2},
+        {"rank": 14, "id": "P-03", "strategic_score": "BUNDLED_WITH_P01"},
+        {"rank": 15, "id": "P-07", "strategic_score": "BUNDLED_WITH_P04"}
+      ]
+    }
+  ],
+
+  "P5_portfolio_level_information_gain": {
+    "principle": "One experiment can affect multiple candidates. The optimizer should calculate portfolio-level information gain, not just candidate-level EV.",
+    "cross_candidate_dependencies": [
+      {"experiment": "P-15 energy budget (cardiac motion)", "affects": ["P-15 (direct)", "P-08 (shared power architecture)", "P-13 (neuromorphic feasibility depends on power budget)", "P-09 (chemical transduction may need power for sensor)"], "information_gain": "If cardiac energy harvesting is feasible → P-15, P-08, P-13 all improve. If infeasible → P-15, P-08, P-13 all degrade. One $2K experiment affects 4 candidates."},
+      {"experiment": "P-08 energy budget (CSF flow)", "affects": ["P-08 (direct)", "P-15 (cross-validation of energy harvesting approach)", "P-13 (neuromorphic on-implant feasibility)", "P-01 (self-powered shunt sensor possible?)"], "information_gain": "If CSF energy harvesting is feasible → P-01 could become self-powered, P-13 becomes more viable. One $2K experiment affects 4 candidates."},
+      {"experiment": "P-01 physical bench", "affects": ["P-01 (direct)", "P-03 (bundled module)", "P-14 (production estimator could be P-01 module)", "P-02 (adaptive profiling could use P-01 hardware)"], "information_gain": "P-01 bench validation affects 4 candidates."},
+      {"experiment": "P-11 phage literature", "affects": ["P-11 (direct)"], "information_gain": "P-11 is relatively independent. Low cross-candidate information gain."}
+    ],
+    "portfolio_level_optimization": "When choosing the next experiment, the machine should ask: 'Which experiment changes the most candidates' probabilities?' not just 'Which candidate has the highest EV?' P-15/P-08 energy budgets affect 4 candidates each for $2K. P-11 phage literature affects 1 candidate for $10K. The portfolio optimizer should favor P-15/P-08 partly because of cross-candidate information gain."
+  },
+
+  "P1_canonical_record_for_P13": {
+    "candidate_id": "P-13",
+    "calculation_version": "R297-v2.0",
+    "previous_conflict": "R296 had P-13 EV as both $15K (canonical state) and ~$20K (dataset artifact). This was an inconsistency.",
+    "resolved_value": 15000,
+    "resolution": "P-13 TEV = $15,000. P_technical = 0.40 (downgraded from 0.60 after collision attack). P_buyer = 0.25 (downgraded from 0.40 because AI prediction is crowded). Value = $150,000 (reduced from $250,000 midpoint because differentiator is narrower). Cost = $0. TEV = 0.40 × 0.25 × $150,000 − $0 = $15,000. This is the SINGLE canonical value. Any artifact referencing $20K is superseded.",
+    "timestamp": "2026-08-25T07:00:00Z",
+    "source_commit": "R297 (this commit)",
+    "inconsistency_check": "Machine automatically flags any future artifact that references P-13 EV != $15,000 without a documented calculation change."
+  }
+}
