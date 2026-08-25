@@ -1,0 +1,57 @@
+{
+  "round": 288,
+  "date": "2026-08-25",
+  "type": "ABLATION_COMPLETE_225_RUNS_RATE_LIMITING_CONFIRMED",
+  "previous_round": 287,
+  "previous_commit": "c239e1c",
+  "ceo_directive": "P0 finish ablation (129 remaining runs). P1 physical bench as primary gate. P2 send to buyer. Report as confirmed/weakened/rejected. We are not a patent office — we create arguments for prior art in our favour.",
+
+  "headline_finding": "ABLATION COMPLETE — 225/225 runs. Rate limiting finding CONFIRMED across all 5 seeds. Removing rate limiting degrades V2 on 41/45 runs (mean ratio 0.65, critical on 8/9 attacks). The minimum transferable mechanism is bounded rate of conductance change. Other 3 mechanisms are non-critical engineering refinements. Hysteresis conditionally critical under controller_delay. Drainage floor HELPS on sensor_dropout (V2.2 design insight).",
+
+  "what_changed_R288": {
+    "P0_ablation_COMPLETE": {
+      "status": "COMPLETE — 225/225 runs (5 seeds × 5 arms × 9 attacks)",
+      "verdict": "CONFIRMED — rate limiting is the critical mechanism across all 5 seeds",
+      "key_numbers": {
+        "rate_limiting": "mean ratio 0.65, critical on 41/45 runs, critical on 8/9 attacks",
+        "hysteresis": "mean ratio 0.97, critical on 3/45 runs (controller_delay only)",
+        "drainage_floor": "mean ratio 1.22, critical on 0/45 runs (HELPS on sensor_dropout: 2.98x)",
+        "alpha_floor": "mean ratio 1.00, critical on 1/45 runs"
+      },
+      "minimum_mechanism": "Bounded rate of conductance change (rate limiting at 2%/second)",
+      "conditional_findings_preserved": [
+        "Hysteresis important under controller delay (0.70 ratio) — add if latency > 1s",
+        "Drainage floor behaves differently under dropout (2.98x — removing it HELPS) — V2.2 design insight: relax drainage floor during dropout",
+        "Alpha floor marginally matters under multi_failure (0.88 ratio) — not critical but slightly helps"
+      ],
+      "key_artifact": "TTP_PACKAGES/P-01_PROTOTYPE/19_ablation_COMPLETE_findings_R288.md"
+    },
+    "P1_physical_bench": {
+      "status": "READY — protocol from R284, now with confirmed mechanism",
+      "summary": "2-arm B vs V2.1, 80 blinded runs. 7 critical measurements: ICP trajectory, flow trajectory, time-to-critical state, sensor dropout response, controller actuation rate, overshoot, recovery time. Designed to DISPROVE the 2-3x computational advantage. If bench confirms, package jumps in value."
+    },
+    "P2_buyer_loop": {
+      "status": "READY — with confirmed ablation, the package is stronger",
+      "message": "We aren't asking you to believe us. We have a reproducible computational result (225-run ablation confirming rate limiting as the critical mechanism), a documented weakness (multi_failure catastrophic), and a bench protocol designed to break the result. Will your engineering team evaluate it?"
+    },
+    "prior_art_positioning_correction": {
+      "ceo_directive": "We are NOT a patent office. We create arguments for prior art in our favour.",
+      "our_position": "US20260115436A1 covers sensor failure handling and fallback. Our argument: P-01's contribution is the BOUNDED RATE of conductance change (not just fallback) + multi-segment continuous redistribution (not single-valve). The combination produces a measurable robustness advantage (2-3x across 9 attacks) that the prior art does not teach. This is an argument FOR our position, not a patent office judgment."
+    }
+  },
+
+  "honest_caveats": [
+    "Ablation is model-only. 225 runs across 5 seeds = strong simulation evidence, NOT independent validation.",
+    "multi_failure peak 69.8 mmHg — catastrophic. Disclosed as known boundary condition.",
+    "The minimum mechanism (rate limiting) is a known engineering technique. Commercial value is in the APPLICATION.",
+    "Bench validation has not been done. The 2-3x advantage is computational, not physical."
+  ],
+
+  "next_round_R289_directives": [
+    "Physical bench is now the PRIMARY development gate. Stop polishing simulations.",
+    "Send buyer package to Miethke. First commercial milestone: 'Will your engineering team evaluate it?'",
+    "If Miethke engages: lab builds bench per R284 protocol, runs 80 blinded B-vs-V2.1 runs.",
+    "V2.2 design: relax drainage floor during sensor dropout (ablation insight).",
+    "DO NOT expand portfolio. DO NOT generate new candidates."
+  ]
+}
