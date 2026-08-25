@@ -1,0 +1,57 @@
+{
+  "package_id": "P-01",
+  "artifact": "PRE_REGISTERED_SUCCESS_CRITERION_R282",
+  "version": "1.0.0",
+  "date": "2026-08-25 (R282)",
+  "purpose": "Per CEO R282 P0: 'The primary endpoint must be pre-registered. The exact threshold should be frozen BEFORE running the expanded matrix.' This document is written and committed BEFORE any 5-seed runs are executed.",
+  "constitutional_basis": "Article XXVII (no threshold invention — thresholds must have provenance, not be invented after seeing results). Article XXX (never optimize the evaluator — cannot adjust the bar to make V2 pass). Article XXVIII (no silent semantic promotion — cannot redefine success after the fact).",
+
+  "pre_registration_timestamp": "2026-08-25T02:30:00Z (BEFORE any 5-seed runs)",
+
+  "primary_endpoint": {
+    "name": "time_to_critical_failure_under_sensor_noise",
+    "definition": "Mean time-to-critical-failure (hours) across 5 seeds under the noise_3x attack mode",
+    "rationale": "Sensor noise is the most realistic operating condition for an implanted device. Time-to-critical-failure is the clinically meaningful outcome (how long until the patient needs emergency intervention).",
+    "metric_id": "metric_3_time_to_critical_failure_hr",
+    "attack": "noise_3x"
+  },
+
+  "secondary_endpoints": [
+    {"name": "peak_icp", "metric": "metric_1_peak_icp_mmhg", "attack": "noise_3x", "direction": "lower_is_better"},
+    {"name": "time_above_threshold", "metric": "metric_2_time_above_threshold_sec", "attack": "noise_3x", "direction": "lower_is_better"},
+    {"name": "drainage_preserved", "metric": "metric_4_drainage_preserved_percent", "attack": "noise_3x", "direction": "higher_is_better"},
+    {"name": "false_interventions", "metric": "metric_5_false_interventions", "attack": "noise_3x", "direction": "lower_is_better"},
+    {"name": "actuation_count", "metric": "metric_6_actuation_count", "attack": "noise_3x", "direction": "lower_is_better"},
+    {"name": "energy", "metric": "metric_7_energy_arbitrary_units", "attack": "noise_3x", "direction": "lower_is_better"}
+  ],
+
+  "frozen_success_criterion": {
+    "rule": "V2 must outperform B (existing predictive closed-loop) on the primary endpoint across the MAJORITY of seeds, with NO catastrophic regression outside the predefined failure envelope.",
+    "quantified_thresholds": {
+      "primary_threshold": "V2 mean t_fail under noise_3x >= 2.0x B mean t_fail under noise_3x (across 5 seeds). R281 1-seed showed 4.3x. Threshold 2.0x is conservative — allows V2 to degrade by >50% from 1-seed performance and still pass.",
+      "majority_of_seeds": "V2 t_fail > B t_fail in >= 4 of 5 seeds under noise_3x. (4/5 = 80%, well above chance.)",
+      "no_catastrophic_regression": "V2 must NOT have peak ICP > 40 mmHg under noise_3x in any seed. (40 mmHg = 2x the 20 mmHg hard limit. R281 showed 19.8 mmHg. If any seed shows >40 mmHg, that is a catastrophic regression even if the mean passes.)",
+      "secondary_endpoints_check": "V2 must outperform B on >= 4 of 6 secondary endpoints under noise_3x (mean across 5 seeds)."
+    },
+    "what_passes": "ALL THREE conditions met: (1) V2/B ratio >= 2.0x on primary, (2) V2 > B in >= 4/5 seeds, (3) no V2 seed with peak > 40 mmHg, AND (4) V2 wins >= 4/6 secondary endpoints.",
+    "what_fails": "ANY of: (1) V2/B ratio < 2.0x, (2) V2 > B in < 4/5 seeds, (3) any V2 seed with peak > 40 mmHg, OR (4) V2 wins < 4/6 secondary endpoints.",
+    "what_happens_on_pass": "Proceed to physical bench validation. Send V2 materials + PHYSICAL_BENCH_PACKAGE.json to Miethke. The 5-seed result becomes the first statistical evidence in the package.",
+    "what_happens_on_fail": "P-01 V2 does NOT proceed to bench validation. The failure mode is documented. Options: (a) revise V2 parameters (NOT the mechanism — CEO directive: do not modify V2 mechanism), (b) close P-01. The decision is deferred to CEO."
+  },
+
+  "ablation_success_criterion": {
+    "rule": "Determine the SMALLEST mechanism that preserves the benefit.",
+    "method": "For each ablation arm (V2_no_rate_limit, V2_no_hysteresis, V2_no_drainage_floor, V2_no_alpha_floor), compare to full V2 across 5 seeds × 9 attacks.",
+    "threshold": "An ablation arm is 'non-critical' if its mean t_fail across 5 seeds × 9 attacks is >= 80% of full V2's mean t_fail. An ablation arm is 'critical' if its mean t_fail is < 80% of full V2.",
+    "what_we_expect_based_on_R281_1seed": "Rate limiting will be critical (< 80% of V2). Hysteresis, drainage floor, alpha floor will be non-critical (>= 80% of V2). BUT: this is a HYPOTHESIS based on 1 seed × 2 attacks. The 5-seed × 9-attack ablation may reveal different results under different attack modes.",
+    "what_we_do_NOT_do": "We do NOT pre-decide which mechanism is critical. The ablation data determines it. If all 4 mechanisms turn out to be critical under some attacks, V2 stays as a 4-feature system. If only rate limiting is critical across all 9 attacks, the commercial package becomes 'rate-limited conductance control' (1 feature)."
+  },
+
+  "anti_gaming_rules": [
+    "This document is committed BEFORE any 5-seed runs. Git timestamp verifies this.",
+    "The thresholds are chosen based on R281 1-seed results, but with CONSERVATIVE margins (2.0x ratio vs R281's 4.3x; 40 mmHg ceiling vs R281's 19.8 mmHg). This allows V2 to degrade significantly and still pass — it is not a rubber stamp.",
+    "If V2 fails, I will NOT adjust the thresholds. I will report the failure honestly and defer to CEO.",
+    "If V2 passes on a technicality (e.g., ratio 2.01x), I will note the margin and recommend bench validation with caution.",
+    "The ablation 'critical' threshold (80%) is arbitrary but pre-registered. It cannot be changed after seeing results."
+  ]
+}
