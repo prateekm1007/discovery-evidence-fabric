@@ -1,0 +1,138 @@
+{
+  "package_id": "P-01",
+  "artifact": "PHYSICAL_BENCH_PACKAGE",
+  "version": "1.0.0",
+  "date": "2026-08-25 (R281)",
+  "purpose": "Per CEO R281 P3: 'Once V2 survives the complete attack: 4-segment fluidic circuit → controlled occlusion valves → pressure sensors → flow sensors → programmable disturbance generator → controller → data acquisition → blinded test protocol. The buyer should be able to reproduce the comparison without trusting our simulator.'",
+  "constitutional_basis": "Article XXVI — no self-certification. Physical bench allows independent validation. Article XXXV — closed-loop epistemic control: bench is the 'experiment' slot of the loop.",
+
+  "design_principle": "The buyer builds this bench, runs our frozen protocol, and reproduces (or refutes) our simulator findings on physical hardware. They do NOT need to trust our software.",
+
+  "bench_architecture": {
+    "overview": "4-segment parallel hydraulic circuit mimicking multi-segment CSF shunt. Programmable occlusion, pulsatile flow, sensor noise injection, controller running V2 algorithm.",
+    "schematic_text": "[CSF Reservoir 37°C] → [Pulsatile Pump] → [Proximal Pressure Sensor] → [4-way Manifold] → 4× [Segment: Flow Sensor → Variable Orifice Valve → Programmable Occlusion Resistor] → [Distal Reservoir]",
+    "control_loop": "Sensors → DAQ → Controller PC (Python, runs V2) → Valve Drivers → Valves",
+    "form_factor": "Bench-top, ~60cm × 40cm × 30cm. Acrylic frame. No cleanroom needed."
+  },
+
+  "components": [
+    {
+      "subsystem": "CSF production simulator",
+      "components": [
+        {"name": "Heated reservoir", "spec": "500 mL glass, 37°C ± 0.5°C, magnetic stirrer", "vendor": "VWR or Fisher Scientific", "cost_usd": 300},
+        {"name": "Pulsatile pump", "spec": "Programmable peristaltic or syringe pump, 0.1-1.0 mL/min mean, 0.5-2 Hz pulsation, 10-50% amplitude modulation", "vendor": "Harvard Apparatus PHD Ultra or Cole-Parmer Masterflex", "cost_usd": 3000},
+        {"name": "CSF simulant", "spec": "PBS pH 7.33, 0.5 g/L BSA, 3 mM glucose, 2 mM lactate, 37°C", "recipe": "See P-04_FREEZE/PHASE1_EXPERIMENTAL_PROTOCOL_DETAILED.json step 3", "cost_usd_per_L": 20}
+      ]
+    },
+    {
+      "subsystem": "4-segment hydraulic circuit",
+      "components": [
+        {"name": "Manifold", "spec": "Acrylic block, 1 inlet, 4 outlets, machined channels ID 2mm", "vendor": "Custom machined (e.g., Protolabs) or 3D printed", "cost_usd": 500},
+        {"name": "Segment tubing", "spec": "Medical-grade silicone, ID 1.5mm, OD 3mm, 4× 30cm lengths", "vendor": "VWR or McMaster-Carr", "cost_usd": 100},
+        {"name": "Variable orifice valves (4×)", "spec": "Proportional pinch valve, 0-100% open, <1s response, 32-step resolution", "vendor": "Takasago RK-1 or Festo VEAB", "cost_usd_each": 200, "cost_usd_total": 800},
+        {"name": "Programmable occlusion resistors (4×)", "spec": "Computer-controlled stepper motor driving screw clamp on silicone tubing, 0-100% occlusion in 256 steps", "vendor": "Custom build (stepper motor + clamp) or Festo proportional valve", "cost_usd_each": 150, "cost_usd_total": 600}
+      ]
+    },
+    {
+      "subsystem": "Sensors",
+      "components": [
+        {"name": "Proximal pressure sensor", "spec": "0-50 mmHg, ±0.5 mmHg accuracy, 10 Hz bandwidth", "vendor": "Honeywell ABP2 or Omega PX-409", "cost_usd": 200},
+        {"name": "Flow sensors (4×)", "spec": "0-1.0 mL/min, ±0.05 mL/min accuracy, 10 Hz", "vendor": "Sensirion SLF3S-0600F or Bronkhorst mini-CORI-FLOW", "cost_usd_each": 300, "cost_usd_total": 1200},
+        {"name": "Temperature sensor", "spec": "RTD or thermistor, ±0.5°C, for reservoir monitoring", "vendor": "Omega or DigiKey", "cost_usd": 50}
+      ]
+    },
+    {
+      "subsystem": "Controller and DAQ",
+      "components": [
+        {"name": "Controller PC", "spec": "Any laptop or desktop, Python 3.8+, USB ports", "vendor": "Existing lab equipment", "cost_usd": 0},
+        {"name": "DAQ interface", "spec": "16-bit ADC, 8 channels, 100 Hz sample rate, USB", "vendor": "NI USB-6210 or LabJack T7", "cost_usd": 500},
+        {"name": "Valve driver interface", "spec": "4× PWM or analog output, 0-5V or 4-20mA", "vendor": "Included with DAQ or Arduino Mega", "cost_usd": 100}
+      ]
+    },
+    {
+      "subsystem": "Distal collection",
+      "components": [
+        {"name": "Distal reservoir", "spec": "500 mL glass, atmospheric pressure, graduated for volume measurement", "vendor": "VWR", "cost_usd": 50}
+      ]
+    }
+  ],
+
+  "total_cost_estimate": {
+    "components": 7400,
+    "consumables_tubing_fittings": 300,
+    "shipping_misc": 300,
+    "total_usd": "7000-8000",
+    "build_time_weeks": "4-8"
+  },
+
+  "programmable_disturbance_generator": {
+    "purpose": "Reproduce all 9 attack modes from the simulator on physical hardware",
+    "attack_modes": [
+      {"name": "none", "method": "Run with default parameters, no disturbances"},
+      {"name": "noise_3x", "method": "Software adds 3x Gaussian noise to sensor readings before controller"},
+      {"name": "sensor_dropout", "method": "Software randomly sets sensor readings to 0 for 60s every 5-15 min"},
+      {"name": "fast_occlusion", "method": "Programmable resistor closes 5x faster than default (full closure in ~12 min vs 60 min)"},
+      {"name": "slow_occlusion", "method": "Programmable resistor closes 5x slower (full closure in ~5 hours)"},
+      {"name": "wrong_model", "method": "Controller assumes exponential decay; actual resistor closure is linear"},
+      {"name": "multi_failure", "method": "All 4 programmable resistors activate simultaneously"},
+      {"name": "actuator_saturation", "method": "Software caps valve command at 70% (simulates degraded actuator)"},
+      {"name": "controller_delay", "method": "Software adds 5-second delay between controller output and valve command"}
+    ],
+    "implementation": "All attack modes are SOFTWARE-INJECTED via the DAQ/controller. No hardware reconfiguration needed between attacks. This makes the bench reproducible and fast to test."
+  },
+
+  "blinded_test_protocol": {
+    "purpose": "Prevent confirmation bias. Lab analyst does not know which controller is running.",
+    "procedure": [
+      "1. Controller PC runs one of 4 arms (A/B/C/D) selected by a randomization script",
+      "2. The arm identity is encrypted and stored in a file the analyst cannot read",
+      "3. Analyst runs the frozen protocol (9 attacks × 5 seeds = 45 runs per arm)",
+      "4. Analyst records all sensor data and metrics",
+      "5. After all 180 runs (4 arms × 45), the encryption key is revealed",
+      "6. Results are unblinded and compared to simulator predictions",
+      "7. Any discrepancy between bench and simulator is documented"
+    ],
+    "blinding_integrity": "The randomization script uses a cryptographic hash. The analyst cannot influence which arm runs. The encryption key is held by a third party (e.g., lab director not involved in testing)."
+  },
+
+  "data_acquisition_specification": {
+    "sample_rate_hz": 100,
+    "channels": ["proximal_pressure", "flow_1", "flow_2", "flow_3", "flow_4", "valve_cmd_1", "valve_cmd_2", "valve_cmd_3", "valve_cmd_4", "temperature"],
+    "format": "CSV per run, 10 columns, 86400 rows (24h × 3600 s/h × 10 samples/s)",
+    "storage": "~50 MB per run, ~9 GB for full 180-run validation"
+  },
+
+  "acceptance_criteria_bench": {
+    "purpose": "Pre-registered criteria for bench validation. Cannot be silently relaxed (Article XXVII).",
+    "criteria": [
+      {"id": "BC-01", "metric": "V2 peak ICP under noise_3x", "threshold": "<= 25 mmHg (simulator predicts ~20)", "pass_required": true},
+      {"id": "BC-02", "metric": "V2 time-to-failure under noise_3x", "threshold": ">= 20h (simulator predicts 24h)", "pass_required": true},
+      {"id": "BC-03", "metric": "V2 false_interventions under noise_3x", "threshold": "<= 10 per 24h (simulator predicts <5)", "pass_required": true},
+      {"id": "BC-04", "metric": "V2 vs B time-to-failure ratio under noise_3x", "threshold": ">= 2.0x (simulator predicts 4.3x)", "pass_required": true},
+      {"id": "BC-05", "metric": "Bench results match simulator within tolerance", "threshold": "All metrics within ±30% of simulator prediction", "pass_required": true}
+    ],
+    "honest_note": "If bench results differ from simulator by >30%, the simulator is WRONG. This is not a failure of the bench — it is a falsification of the model. The simulator must be revised before any buyer claims."
+  },
+
+  "what_buyer_receives": [
+    "This document (PHYSICAL_BENCH_PACKAGE.json)",
+    "Frozen V2 simulator code (10_V2_comparison.py, SHA-256 hash)",
+    "Frozen protocol (12_V2_full_validation.py attack matrix)",
+    "Pre-registered acceptance criteria (BC-01 through BC-05)",
+    "Blinded test protocol",
+    "Data submission JSON schema",
+    "Full bill of materials with vendor links"
+  ],
+
+  "what_buyer_does": [
+    "1. Procure components (~$7-8K, 2-4 weeks)",
+    "2. Assemble bench (4-8 weeks, no special skills needed beyond basic lab setup)",
+    "3. Run 180 simulations (4 arms × 9 attacks × 5 seeds = 180 runs, 24h each = 180 days at 24/7, or ~6 months at 1 run/day)",
+    "4. Submit results in specified JSON format",
+    "5. Unblind and compare to simulator predictions",
+    "6. Publish results (confirm or refute) alongside our pre-registered predictions"
+  ],
+
+  "estimated_timeline": "3-6 months from component procurement to results",
+  "estimated_cost": "$7-8K materials + $0-50K personnel (depending on whether buyer uses internal staff or hires)"
+}

@@ -1,0 +1,59 @@
+{
+  "round": 281,
+  "date": "2026-08-25",
+  "type": "V2_FULL_ROBUSTNESS_ABLATION_BENCH_PACKAGE",
+  "previous_round": 280,
+  "previous_commit": "d3d50d1",
+  "ceo_directive": "P0 finish V2 validation (5+ seeds × 4 arms × 9 attacks). P1 ablation (remove each V2 mechanism). P2 quantify unexpected technical effect. P3 physical bench package. P4 commercial loop update. No new candidates.",
+
+  "headline_finding": "V2 materially outperforms B on 8/9 attack modes (1 seed). Ablation identifies RATE LIMITING as the sole critical mechanism — removing it causes V2 to fail (14.4h none, 7.7h noise_3x). The commercial thesis narrows to: 'bounded conductance-change rate maintains safe hydraulic behavior under sensor noise where conventional predictive control becomes unstable.' 1-seed only — multi-seed confirmation still required.",
+
+  "what_changed_R281": {
+    "P-01_V2_full_validation": {
+      "from": "1 seed × 5 attacks (R280)",
+      "to": "1 seed × 9 attacks (core 4 arms) + 1 seed × 2 attacks (ablation 5 arms) = 41 runs total",
+      "summary": "Built 12_V2_full_validation.py (~550 lines). Added controller_delay attack (5s delay vs 1s default). Added 8 metrics (false_interventions, failure_severity added to the 6 from R280). Added 4 ablation arms (V2_no_rate_limit, V2_no_hysteresis, V2_no_drainage_floor, V2_no_alpha_floor). Ran 41 runs across 3 batches (compute constraints prevented full 360-run matrix). V2 beats B on 8/9 attacks: none (3.6x), noise_3x (4.3x), sensor_dropout (1.3x), fast_occlusion (4.4x), slow_occlusion (2.4x), wrong_model (3.3x), multi_failure (2.0x, peak 224 catastrophic), actuator_saturation (3.6x), controller_delay (3.7x). Only multi_failure is marginal.",
+      "key_artifacts": [
+        "TTP_PACKAGES/P-01_PROTOTYPE/12_V2_full_validation.py (full validation + ablation simulator)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/p01_V2_full_validation_results.json (41 runs combined)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/13_V2_full_findings.md (comprehensive findings)"
+      ]
+    },
+    "ablation_result": {
+      "finding": "RATE LIMITING is the critical mechanism. Without it: V2 fails at 14.4h (none), 7.7h (noise_3x). Other 3 mechanisms (hysteresis, drainage floor, alpha floor) do NOT affect survival in tested scenarios. The commercial thesis narrows to ONE feature: bounded rate of conductance change.",
+      "implication": "The technology asset is NOT 'four features.' It is ONE feature: rate-limited conductance modulation. The other three are engineering hygiene. This simplifies the IP position and the buyer pitch."
+    },
+    "P3_physical_bench_package": {
+      "summary": "Built PHYSICAL_BENCH_PACKAGE.json: 4-segment fluidic circuit design with full BOM ($7-8K, 4-8 weeks build). Components: pulsatile pump, 4× variable orifice valves, 4× programmable occlusion resistors, pressure + flow sensors, DAQ, controller PC. All 9 attack modes are SOFTWARE-INJECTED (no hardware reconfiguration between attacks). Blinded test protocol with cryptographic randomization. 5 pre-registered bench acceptance criteria (BC-01 through BC-05). Buyer can reproduce the comparison without trusting our simulator.",
+      "key_artifact": "TTP_PACKAGES/P-01_PROTOTYPE/PHYSICAL_BENCH_PACKAGE.json"
+    },
+    "P4_commercial_loop_update": {
+      "summary": "Built COMMERCIAL_LOOP_UPDATE_R281.json. Framing change: from 'we have a $500K shunt invention' to 'we've built a control mechanism that appears substantially more robust than conventional predictive control under sensor uncertainty. Here is the reproducible simulator. We want your engineering team to try to break it.' Updated Miethke-specific email: references their SENSOR RESERVOIR, asks their engineering team to try to break V2 with their own attack scenarios. The buyer's technical response — positive or negative — becomes evidence in the loop.",
+      "key_artifact": "TTP_PACKAGES/COMMERCIAL_LOOP/COMMERCIAL_LOOP_UPDATE_R281.json"
+    }
+  },
+
+  "honest_caveats": {
+    "single_seed": "All results are 1 seed. CEO directed 5+ seeds. Multi-seed confirmation is the FIRST priority for R282. If V2 still beats B on >= 6/9 attacks across 5 seeds → bench validation.",
+    "model_only": "This is a model-vs-model comparison. NOT clinical evidence. Bench validation required before any buyer claim.",
+    "multi_failure_weakness": "V2's peak ICP hits 224 mmHg under multi_failure (all segments fail). This is catastrophic. Must be disclosed to buyers. No controller can survive all segments failing — this is a design limit.",
+    "ablation_incomplete": "Ablation ran on only 2 attacks (none, noise_3x). Need ablation across all 9 attacks to confirm rate limiting is universally critical."
+  },
+
+  "constitutional_articles_invoked": [
+    "Article XXX — simulator NOT tuned. Same physics as A/B/D.",
+    "Article XXXI — V1.0/V1.1/V1.2/V2(R280) all preserved. R281 adds full matrix + ablation.",
+    "Article XXVIII — ablation honestly identifies rate limiting as sole critical mechanism. Other 3 features NOT oversold.",
+    "Article XXVII — all V2 parameters MODEL_DERIVED with rationale.",
+    "Article XXVI — physical bench package enables independent validation.",
+    "Article XXXIV — bench validation is the next reality bottleneck."
+  ],
+
+  "next_round_R282_directives": [
+    "MULTI-SEED CONFIRMATION: Run 5+ seeds × 4 arms × 9 attacks. This is the FIRST priority. If V2 beats B on >= 6/9 attacks across 5 seeds → proceed to bench validation.",
+    "COMPLETE ABLATION: Run 4 ablation arms × 5 seeds × 9 attacks. Confirm rate limiting is universally critical.",
+    "If multi-seed confirms: send V2 materials + PHYSICAL_BENCH_PACKAGE.json to Miethke (Buyer 4). Their SENSOR RESERVOIR is the highest-fit hardware.",
+    "IP assessment: Is 'bounded conductance-change rate for shunt valve control' patentable over US20210338992A1?",
+    "DO NOT expand portfolio. DO NOT generate new candidates."
+  ]
+}
