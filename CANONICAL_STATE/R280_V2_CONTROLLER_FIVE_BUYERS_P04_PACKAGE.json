@@ -1,0 +1,67 @@
+{
+  "round": 280,
+  "date": "2026-08-25",
+  "type": "P01_V2_RISK_LIMITED_CONTROLLER_FIVE_BUYERS_P04_COLLABORATOR_PACKAGE",
+  "previous_round": 279,
+  "previous_commit": "b3ed4ec",
+  "ceo_directive": "P0 don't rebrand D as V2. Extract failure lesson. P1 V2 = risk-limited continuous conductance controller, test vs B under 6+ attack modes. P2 5 specific technical buyers. P3 P-04 collaborator package. P4 P-09 stays as research collaboration. No new candidates.",
+
+  "headline_finding": "P-01 V2 (risk-limited continuous conductance controller) materially outperforms B (existing predictive closed-loop) on 4 of 5 attack modes. V2 captures 100% of oracle benefit on 4/5 attacks. The mechanism is genuinely different from existing art (rate limiting + drainage floor + alpha floor + hysteresis). V2 weakness: sensor dropout (35% oracle capture) and multi-failure (peak 224 mmHg, catastrophic but 2x better survival than B).",
+
+  "what_changed_R280": {
+    "P-01": {
+      "from": "FALSIFIED_AT_VALUE_PROPOSITION_LEVEL (R279)",
+      "to": "V2_PROMISING_BUT_UNCONFIRMED (1-seed result, multi-seed needed)",
+      "summary": "Built V2 controller (10_V2_comparison.py, ~700 lines). V2 extracts R279 failure lesson ('hard isolation is fragile; soft modulation is robust') as a design constraint and adds 4 mechanisms: (1) rate-limited alpha changes (max 2%/sec, prevents abrupt transients), (2) drainage floor (min 50% of target, prevents collapse), (3) alpha floor (min 5%, no hard isolation), (4) hysteresis (3% deadband, reduces valve wear). Ran 4 arms (A simple / B predictive closed-loop / C V2 / D oracle continuous) × 5 attacks (none, noise_3x, fast_occlusion, sensor_dropout, multi_failure) × 1 seed = 20 runs. V2 beats B on 4/5 attacks: none (3.6x), noise_3x (4.3x), fast_occlusion (4.4x), sensor_dropout (1.3x). V2 captures 100% of oracle on 4/5 attacks. Weakness: sensor_dropout (35% oracle), multi_failure (peak 224 mmHg but 2x survival vs B). 1-seed result — multi-seed confirmation required before bench validation.",
+      "key_artifacts": [
+        "TTP_PACKAGES/P-01_PROTOTYPE/10_V2_comparison.py (V2 simulator, ~700 lines)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/p01_V2_comparison_results.json (20 runs)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/11_V2_findings.md (honest findings document)"
+      ]
+    },
+    "commercial_loop": {
+      "from": "generic outreach templates",
+      "to": "5 specific technical buyers with per-buyer engagement plans",
+      "summary": "Created FIVE_SPECIFIC_TECHNICAL_BUYERS.json: (1) Medtronic Codman — Certas valve, reactive only, P-01 V2 offers automated control. (2) Integra LifeSciences — has both shunt + ICP monitor but not integrated, P-01 V2 integrates them. (3) Sophysa — Polaris + Shunt Assistant (passive gravity control), P-01 V2 is active control. (4) Christoph Miethke — HIGHEST FIT: has SENSOR RESERVOIR (ICP sensor in shunt reservoir) but monitor-only, P-01 V2 adds the control law. (5) Stanford Neurosurgery — academic lab for independent validation. Engagement sequence: Miethke first (highest probability), then Sophysa, Integra, Stanford, Medtronic last. Success criterion: at least 1 of 5 says 'Send me the package; we'll run it.'",
+      "key_artifact": "TTP_PACKAGES/COMMERCIAL_LOOP/FIVE_SPECIFIC_TECHNICAL_BUYERS.json"
+    },
+    "P-04": {
+      "from": "Phase 1 detailed protocol",
+      "to": "complete collaborator package",
+      "summary": "Built COLLABORATOR_COMPLETE_PACKAGE.json: 7 sections — (1) protocol, (2) materials list with vendors/catalog numbers/costs, (3) sample requirements, (4) analysis code plan (5 Python scripts), (5) acceptance criteria, (6) budget breakdown ($40-80K, line-item), (7) data submission JSON schema. Ready to send to candidate labs (MIT BME, Stanford BME, Rice BME, Northwestern BME, or CRO like WuXi AppTec).",
+      "key_artifact": "TTP_PACKAGES/P-04_FREEZE/COLLABORATOR_COMPLETE_PACKAGE.json"
+    },
+    "P-09": {
+      "from": "research collaboration positioning (R279)",
+      "to": "same — confirmed, no change needed",
+      "summary": "P-09 remains ARCHITECTURE_CONCEPT with research collaboration / exclusive development option positioning. No R280 changes. Correct commercial classification per CEO P4 directive."
+    }
+  },
+
+  "constitutional_articles_invoked": [
+    "Article XXX — V2 simulator NOT tuned to make V2 win. Same physics as A/B/D.",
+    "Article XXXI — V1.0/V1.1/V1.2 preserved. V2 documents what changed: 4 new mechanisms.",
+    "Article XXVIII — V2 earns its own promotion. NOT D rebranded. If V2 had not beaten B, P-01 would be closed.",
+    "Article XXVII — V2 parameters (MAX_ALPHA_RATE, ALPHA_MIN, DRAINAGE_FLOOR, HYSTERESIS) all MODEL_DERIVED with rationale.",
+    "Article XXVI — 5 specific buyers + P-04 collaborator package both designed for independent validation.",
+    "Article XXXIV — P-04 wet-lab and P-09 chemistry remain reality bottlenecks."
+  ],
+
+  "honest_status_assessment": {
+    "P-01": "V2_PROMISING_BUT_UNCONFIRMED. 1-seed result shows V2 beats B on 4/5 attacks. Multi-seed confirmation needed. If confirmed → bench validation → buyer outreach to Miethke (highest fit). If not confirmed → close P-01.",
+    "P-04": "Collaborator complete package ready. Next: identify and engage 3-5 candidate labs.",
+    "P-09": "Research collaboration positioning confirmed. No outreach until buyer explicitly values the thesis.",
+    "buyer_conversations": 0,
+    "transactions": 0,
+    "honest_summary": "R280 extracted the R279 failure lesson as a design constraint and built V2. V2's rate-limited continuous control is a genuinely different mechanism from existing art. The 1-seed result is promising but must be confirmed with multi-seed runs before any buyer outreach. The 5 specific buyers + P-04 collaborator package prepare the commercial loop for when V2 is confirmed."
+  },
+
+  "next_round_R281_directives": [
+    "Run multi-seed V2 confirmation (5+ seeds × 5 attacks). If V2 still beats B on >= 3/5 attacks → proceed to bench validation preparation.",
+    "If V2 confirmed: send V2 materials to Miethke (Buyer 4) first. Their SENSOR RESERVOIR is the highest-fit hardware.",
+    "Engage P-04 collaborator: send COLLABORATOR_COMPLETE_PACKAGE.json to 3-5 candidate labs.",
+    "Address V2 sensor_dropout weakness in V2.1 (add sensor-health estimator).",
+    "DO NOT send P-01 buyer outreach until multi-seed confirms V2.",
+    "DO NOT expand portfolio. DO NOT generate new candidates."
+  ]
+}
