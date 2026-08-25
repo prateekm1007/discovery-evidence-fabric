@@ -1,0 +1,36 @@
+{
+  "correction_id": "R311-LABEL-CORRECTION",
+  "correction_date": "2026-08-25T18:00:00Z",
+  "authority": "CEO R312 §P0 directive; Article XV; Article XXVIII",
+  "problem": "R311 reported 3 'independently verified' candidates. CEO audit corrected: only 1 used actual external software. The other 2 were independent reimplementations (same author, different code paths). NOT the same thing.",
+  "corrected_labels": {
+    "P-01": {
+      "R311_label": "MODEL_VERIFIED",
+      "R312_corrected_label": "INDEPENDENTLY_REIMPLEMENTED — EXTERNAL SOLVER CROSS-CHECK PENDING",
+      "what_was_done": "scipy.integrate.ode vs solve_ivp. Different APIs, same author, same physics.",
+      "what_is_NOT_done": "Actual svFSI execution.",
+      "article_basis": "Article XXVI (no self-certification)"
+    },
+    "P-15": {
+      "R311_label": "MODEL_VERIFIED",
+      "R312_corrected_label": "INDEPENDENTLY_REIMPLEMENTED — EXTERNAL/PHYSICAL CROSS-CHECK PENDING",
+      "what_was_done": "Euler vs implicit. Same author, same assumptions.",
+      "what_is_NOT_done": "Independent energy model with harvest/load/duty cycle profiles + external reference cross-check.",
+      "article_basis": "Article XXVI"
+    },
+    "P-16": {
+      "R311_label": "MODEL_DISAGREEMENT",
+      "R312_corrected_label": "EXTERNAL-MC VERIFIED-PARTIAL — MCX CROSS-CHECK PENDING",
+      "what_was_done": "ACTUAL PyTissueOptics v2.0.1 executed (20k photons). Genuinely external.",
+      "what_is_NOT_done": "MCX (CUDA blocked). Convergence ladder. Uncertainty bars.",
+      "article_basis": "Article XXVI satisfied for PyTissueOptics. Article VIII needs uncertainty comparison."
+    }
+  },
+  "corrected_R311_scoreboard": {
+    "external_scientific_software_actually_executed": "1 candidate (P-16)",
+    "independent_reimplementation": "2 candidates (P-01, P-15)",
+    "fully_independent_verification": "1/13 active",
+    "TECHNOLOGY_TRANSFER_READY": 0
+  },
+  "no_semantic_promotion": "Per Article XXVIII, labels corrected retroactively. R311 overclaimed. Article XXXI memory artifact preserved."
+}
