@@ -1,0 +1,55 @@
+{
+  "round": 292,
+  "date": "2026-08-25",
+  "type": "EVIDENCE_SEMANTICS_FIX_PORTFOLIO_CONTROL_BOARD_BUYER_KIT",
+  "previous_round": 291,
+  "previous_commit": "f8a585b",
+  "ceo_directive": "P0 fix evidence failure semantics (artifact vs catastrophic). P1 finish 12 remaining requirements. P2 P-01 reference end-to-end loop. P3 15-candidate portfolio control board. P4 no new candidates. P5 Buyer Evaluation Kit reusable across all 15.",
+
+  "headline": "Evidence engine failure semantics FIXED: 5-category classifier (DATA_CORRUPTION, SENSOR_ARTIFACT, MODEL_DOMAIN_VIOLATION, CATASTROPHIC_RESULT, ORDINARY_VALID). Catastrophic results (150 mmHg) are now REPORTED as safety failures, not discarded as artifacts. 15-candidate portfolio control board created: P-01 is PHYSICAL_VALIDATION_READY, P-04 is WET_LAB_READY, P-09 is ARCHITECTURE_CONCEPT, P-02/03/05-08/10-15 are DISCOVERED. Buyer Evaluation Kit designed (9 reusable components). The loop: BUYER_FEEDBACK → REQUIREMENT → TEST → RESULT → TTP_UPDATE → VERSION_2.",
+
+  "what_changed_R292": {
+    "P0_evidence_semantics_fix": {
+      "status": "COMPLETE — 5-category classifier implemented and tested",
+      "categories": ["DATA_CORRUPTION (NaN/Inf → block metrics)", "SENSOR_MEASUREMENT_ARTIFACT (impossible jump → block metrics)", "MODEL_DOMAIN_VIOLATION (G_sum=0 placeholder → flag, don't compute)", "CATASTROPHIC_TECHNICAL_RESULT (real P>40mmHg → REPORT, compute metrics WITH warning)", "ORDINARY_VALID_RESULT (normal → compute normally)"],
+      "key_correction": "Catastrophic results (150 mmHg) are now REPORTED as 'Safety failure detected: 150 mmHg. Data integrity valid.' NOT discarded as 'artifact detected.' The buyer sees the failure, not a masked metric.",
+      "tested": "6 test cases. Gradual rise to 45 mmHg correctly classified as CATASTROPHIC_TECHNICAL_RESULT with data_valid=True, compute_metrics=True, safety_failure=True.",
+      "key_artifact": "TTP_PACKAGES/P-01_PROTOTYPE/r292_evidence_semantics_fix.py"
+    },
+    "P3_portfolio_control_board": {
+      "status": "COMPLETE — 15 candidates with state/evidence/test/economics/buyer",
+      "summary": "P-01: PHYSICAL_VALIDATION_READY (full TTP, 35/47 evidence engine, 225-run ablation, bench protocol ready). P-04: WET_LAB_READY (partial TTP, Phase 1 protocol ready, biology blocked). P-09: ARCHITECTURE_CONCEPT (9-step molecule program ready, research only). P-02/03/05-08/10-15: DISCOVERED (skeleton TTP, evidence engine not started).",
+      "propagation_plan": "Phase 1: P-01 is reference. Phase 2: Apply to P-04 and P-09 (defined next actions). Phase 3: Apply to P-02/03/05-08/10-15. Phase 4: 15 candidates × 15 Evidence Engines × 15 Buyer Kits.",
+      "key_artifact": "TTP_PACKAGES/PORTFOLIO_CONTROL_BOARD_R292.json"
+    },
+    "P5_buyer_evaluation_kit": {
+      "status": "COMPLETE — 9 reusable components",
+      "components": ["1-page brief", "complete TTP", "known limitations", "test protocol", "raw-data submission format", "buyer feedback form (8 categories)", "economic questionnaire (8 questions)", "IP/counsel handoff", "version-update mechanism"],
+      "automatic_loop": "BUYER_FEEDBACK → REQUIREMENT → TEST → RESULT → TTP_UPDATE → VERSION_2 → BUYER_RE_EVALUATION. Buyer's objection becomes the next experiment.",
+      "key_artifact": "TTP_PACKAGES/COMMERCIAL_LOOP/BUYER_EVALUATION_KIT_R292.json"
+    }
+  },
+
+  "portfolio_status": {
+    "total_candidates": 15,
+    "full_ttp": 1,
+    "partial_ttp": 2,
+    "skeleton_ttp": 12,
+    "evidence_engine_active": 1,
+    "technical_test_ready": 2,
+    "buyer_targeted": 1,
+    "physical_validation": 0,
+    "buyer_evaluation": 0,
+    "transactions": 0,
+    "portfolio_rule": "Portfolio optimizer chooses which of the 15 gets the next evidence dollar/hour. P-01 is reference. Once P-01 loop works end-to-end, same machinery applies to P-02 through P-15."
+  },
+
+  "next_round_R293_directives": [
+    "Build automated test report generator as actual Python script (not just template)",
+    "Add physiological disturbance modes to V2.2 simulator",
+    "Run V2.1 with FDA PCLC metrics + 5-category classifier across all 9 existing attacks",
+    "Apply Evidence Engine template to P-04 (next candidate with defined next action)",
+    "Send P-01 Buyer Evaluation Kit to Miethke",
+    "DO NOT generate new candidates. 15 is the target. 15 is what we have."
+  ]
+}
