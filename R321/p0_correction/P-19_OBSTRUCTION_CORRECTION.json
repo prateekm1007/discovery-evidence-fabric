@@ -1,0 +1,27 @@
+{
+  "correction_id": "R321-P-19-OBSTRUCTION-CORRECTION",
+  "authority": "CEO R321 §P0; Article XXVIII (no semantic promotion), Article XXXI (corrections become permanent machine memory)",
+  "timestamp": "2026-08-26T04:10:00Z",
+
+  "R320_result_preserved": {
+    "claim": "P-19 MECHANISM_VERIFIED through svMultiPhysics obstruction test",
+    "evidence": "Distributed (9/10 channels, 1 obstructed = 10% capacity loss): inlet 1.10 mmHg. Single (90% obstructed = 90% capacity loss): inlet 3.13 mmHg. Ratio 35%.",
+    "R320_label": "MECHANISM_VERIFIED"
+  },
+
+  "R321_correction": {
+    "problem": "The R320 comparison is NOT a controlled equal-obstruction experiment. The distributed system lost 10% of capacity (1 of 10 channels). The single system lost 90% of capacity (90% obstruction of 1 channel). These are DIFFERENT obstruction fractions. The distributed system wins partly because it retained more open conductance — not because the distributed architecture is inherently safer at matched obstruction levels.",
+    "correct_classification": {
+      "EXTERNAL_SOLVER_OBSTRUCTION_CROSSCHECK": "PASS — svMultiPhysics ran and produced physically meaningful results",
+      "DECISIVE_MECHANISM_COMPARISON": "INCOMPLETE — obstruction fractions were not matched. The comparison confounds architecture effect with capacity-retention effect."
+    },
+    "what_R320_actually_proved": "The solver can model obstruction scenarios. The distributed system with 10% capacity loss has lower pressure than single with 90% capacity loss. This is trivially true (more open channels = more drainage) and does NOT prove the distributed ARCHITECTURE is superior to a single channel with equivalent capacity retention.",
+    "what_R320_did_NOT_prove": "That distributed architecture is superior to single-channel at MATCHED obstruction fractions (e.g., 50% capacity loss in both configurations)."
+  },
+
+  "R321_action": "Run matched-obstruction experiments (P1): 50%/50% and 90%/90% comparisons. Only if distributed wins at matched obstruction can we claim MECHANISM_VERIFIED.",
+
+  "permanent_memory": "This correction is permanent. Future P-19 claims must reference this correction. The R320 result is NOT deleted — it is reclassified. Per Article XXXI: the lesson (match obstruction fractions in comparative experiments) becomes a machine rule for all future comparative tests.",
+
+  "machine_rule_added": "COMPARATIVE_OBSTRUCTION_MATCHING: When comparing distributed vs single architectures, obstruction fractions MUST be matched. Distributed (k of N channels obstructed) must be compared against single (k/N fraction obstructed). Confounding architecture with capacity retention is forbidden."
+}
