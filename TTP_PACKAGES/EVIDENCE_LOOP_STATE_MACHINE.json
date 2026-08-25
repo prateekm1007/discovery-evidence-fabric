@@ -7,6 +7,7 @@
     "TECHNICALLY_SPECIFIED_DESIGN_FREEZE_PARTIAL",
     "PROTOTYPE_READY",
     "BUYER_READY_FOR_TECHNICAL_EVALUATION",
+    "FALSIFIED_AT_VALUE_PROPOSITION_LEVEL",
     "VALIDATION_READY",
     "INDEPENDENTLY_VALIDATED",
     "ECONOMICALLY_PROVEN",
@@ -24,28 +25,29 @@
     "TECHNICALLY_SPECIFIED": "→ PROTOTYPE_READY (prototype blueprint + reference implementation + simulator + falsification attempted)",
     "TECHNICALLY_SPECIFIED_DESIGN_FREEZE_PARTIAL": "→ PROTOTYPE_READY (when ALL freeze items resolved)",
     "PROTOTYPE_READY": "→ BUYER_READY_FOR_TECHNICAL_EVALUATION (external validation handoff ready, buyer outreach can begin)",
-    "BUYER_READY_FOR_TECHNICAL_EVALUATION": "→ PILOT (buyer agrees to evaluate) OR → FEEDBACK (buyer rejects with structured feedback) OR → VALIDATION_READY (academic lab validation path)",
-    "VALIDATION_READY": "→ INDEPENDENTLY_VALIDATED (external party confirms results)",
-    "INDEPENDENTLY_VALIDATED": "→ ECONOMICALLY_PROVEN (buyer-specific economics verified via buyer questionnaire)",
-    "ECONOMICALLY_PROVEN": "→ IP_KNOWHOW_DILIGENCE_COMPLETE (IP dossier + FTO assessment done)",
-    "IP_KNOWHOW_DILIGENCE_COMPLETE": "→ BUYER_READY_FOR_TRANSACTION (TTP complete, buyer can transact)",
-    "BUYER_READY_FOR_TRANSACTION": "→ PILOT (buyer evaluating) OR → FEEDBACK",
-    "PILOT": "→ TRANSACTION (buyer purchases) OR → FEEDBACK",
-    "TRANSACTION": "→ FEEDBACK (post-transaction buyer data feeds next version)",
-    "FEEDBACK": "→ VERSION_2 (package updated based on buyer feedback)",
-    "VERSION_2": "→ BUYER_READY_FOR_TECHNICAL_EVALUATION (re-enter loop with improved package)"
+    "BUYER_READY_FOR_TECHNICAL_EVALUATION": "→ PILOT (buyer agrees to evaluate) OR → FEEDBACK (buyer rejects) OR → VALIDATION_READY (academic lab) OR → FALSIFIED_AT_VALUE_PROPOSITION_LEVEL (strongest-baseline test fails)",
+    "FALSIFIED_AT_VALUE_PROPOSITION_LEVEL": "→ VERSION_2 (reformulate: drop mechanism, reposition, or kill) OR → cemetery (if no viable reformulation)",
+    "VALIDATION_READY": "→ INDEPENDENTLY_VALIDATED",
+    "INDEPENDENTLY_VALIDATED": "→ ECONOMICALLY_PROVEN",
+    "ECONOMICALLY_PROVEN": "→ IP_KNOWHOW_DILIGENCE_COMPLETE",
+    "IP_KNOWHOW_DILIGENCE_COMPLETE": "→ BUYER_READY_FOR_TRANSACTION",
+    "BUYER_READY_FOR_TRANSACTION": "→ PILOT OR → FEEDBACK",
+    "PILOT": "→ TRANSACTION OR → FEEDBACK",
+    "TRANSACTION": "→ FEEDBACK",
+    "FEEDBACK": "→ VERSION_2",
+    "VERSION_2": "→ BUYER_READY_FOR_TECHNICAL_EVALUATION (re-enter loop)"
   },
-  "key_R278_clarification": "BUYER_READY_FOR_TECHNICAL_EVALUATION ≠ BUYER_READY_FOR_TRANSACTION. Per CEO R278: 'P-01 can now legitimately enter technical conversations. The buyer can be told: here is the mechanism, here is the simulator, here is the falsification result, here is what worked, here is what failed, and here is exactly what we need to test next. That is much more credible than pretending the product is finished.'",
-  "current_states_R278": {
-    "P-01": "BUYER_READY_FOR_TECHNICAL_EVALUATION (V1.1 A/B/C comparison complete, buyer materials ready)",
+  "key_R279_clarification": "Added FALSIFIED_AT_VALUE_PROPOSITION_LEVEL state. This is distinct from FALSIFIED (which means a specific claim failed). FALSIFIED_AT_VALUE_PROPOSITION_LEVEL means the core commercial thesis is not supported by the strongest-baseline test. The package enters strategic reformulation: drop the mechanism, reposition it, or kill it.",
+  "current_states_R279": {
+    "P-01": "FALSIFIED_AT_VALUE_PROPOSITION_LEVEL. V1.2 A/B/C/D/E comparison shows isolation mechanism does NOT outperform predictive closed-loop modulation (Arm D). Original value proposition not supported. Awaiting CEO strategic decision: Path 1 (drop isolation, become D), Path 2 (reposition isolation for infection/maintenance), or Path 3 (kill).",
     "P-02": "DISCOVERED",
     "P-03": "DISCOVERED",
-    "P-04": "TECHNICALLY_SPECIFIED_DESIGN_FREEZE_PARTIAL (wet-lab program defined, ready to engage collaborator)",
+    "P-04": "TECHNICALLY_SPECIFIED_DESIGN_FREEZE_PARTIAL. Phase 1 detailed experimental protocol defined (7 steps, 3 months, $40-80K). Ready to engage wet-lab collaborator.",
     "P-05": "DISCOVERED",
     "P-06": "DISCOVERED",
     "P-07": "DISCOVERED",
     "P-08": "DISCOVERED",
-    "P-09": "ARCHITECTURE_CONCEPT (molecule-selection research program defined, ready to engage collaborator)",
+    "P-09": "ARCHITECTURE_CONCEPT. Molecule-selection research program defined. R279 positioning: research collaboration / exclusive development option only. NOT $500K technology.",
     "P-10": "DISCOVERED",
     "P-11": "DISCOVERED",
     "P-12": "DISCOVERED",
@@ -53,9 +55,9 @@
     "P-14": "DISCOVERED",
     "P-15": "DISCOVERED"
   },
-  "R278_changes_from_R277": {
-    "P-01": "PROTOTYPE_READY → BUYER_READY_FOR_TECHNICAL_EVALUATION. V1.1 A/B/C comparison built. Key finding: prediction outperforms redundancy by 7-9x on time to failure. Original strict claim FALSIFIED (already done in R277). Buyer technical briefing one-pager + 5 outreach email templates ready.",
-    "P-04": "TECHNICALLY_SPECIFIED_DESIGN_FREEZE_PARTIAL → same state, but now has WET_LAB_PROGRAM_SMALLEST.json (3-phase, 8-month, $100-200K program with go/no-go gates). Ready to engage enzyme engineering collaborator.",
-    "P-09": "ARCHITECTURE_CONCEPT → same state, but now has MOLECULE_SELECTION_RESEARCH_PROGRAM.json (6-step, 14-month, $200-500K program with go/no-go gates). Ready to engage medicinal chemistry collaborator."
+  "R279_changes_from_R278": {
+    "P-01": "BUYER_READY_FOR_TECHNICAL_EVALUATION → FALSIFIED_AT_VALUE_PROPOSITION_LEVEL. V1.2 A/B/C/D/E comparison (with strongest baseline D and oracle E) showed C's isolation mechanism does NOT outperform D's closed-loop modulation. Under sensor noise, C is dramatically worse (3.5h vs 8.9h). P-01 needs strategic reformulation.",
+    "P-04": "Same state, but Phase 1 now has a detailed 7-step experimental protocol (enzyme → concentration → CSF matrix → stability → catalytic → toxicity → acceptance).",
+    "P-09": "Same state, but R279 positioning update: NOT a $500K technology product. Research collaboration / exclusive development option only."
   }
 }

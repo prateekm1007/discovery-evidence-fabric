@@ -1,0 +1,79 @@
+{
+  "round": 279,
+  "date": "2026-08-25",
+  "type": "STRONGEST_BASELINE_ORACLE_P01_FALSIFICATION",
+  "previous_round": 278,
+  "previous_commit": "44d5513",
+  "ceo_directive": "P0 freeze P-01 claim. P1 add Arm D (strongest published baseline). P2 add Arm E (oracle upper bound). P3 P-04 Phase 1 detailed protocol. P4 P-09 positioning update. No new candidates.",
+
+  "headline_finding": "P-01 FALSIFIED AT VALUE PROPOSITION LEVEL. The isolation mechanism does NOT outperform predictive closed-loop modulation (Arm D). Under sensor noise, C is dramatically worse than D (3.5h vs 8.9h). P-01 needs strategic reformulation: drop isolation (become D), reposition isolation for infection/maintenance, or kill.",
+
+  "what_changed_R279": {
+    "P-01": {
+      "from": "BUYER_READY_FOR_TECHNICAL_EVALUATION",
+      "to": "FALSIFIED_AT_VALUE_PROPOSITION_LEVEL",
+      "summary": "Built V1.2 A/B/C/D/E comparison. Added Arm D (strongest published baseline: US20210338992A1 closed-loop shunt + 2023 ML study, reproduced as 4-segment predictive closed-loop modulation WITHOUT isolation) and Arm E (oracle: perfect knowledge, isolate at lesion onset). Ran 3 attack modes: none, misspecification (2x faster occlusion), sensor-noise (3x noise). KEY FINDING: C (predictive isolation) does NOT outperform D (predictive closed-loop) on time-to-failure. Under normal conditions: D wins 8.9h vs 7.7h (14% longer). Under sensor noise: D wins 8.9h vs 3.5h (61% longer). C only wins on peak ICP under low-noise conditions (22 vs 30 mmHg). Under noise, they're equal (~29 mmHg). The isolation mechanism is FRAGILE under realistic sensor noise because the trend predictor fires false positives, causing premature isolation. P-01's original value proposition is NOT supported.",
+      "corrected_overclaims": [
+        "R278 called 59 mmHg 'current standard of care' — CORRECTED: it's the simulator's single-segment baseline, NOT clinical data",
+        "R278 called 7-9x a 'clinical benefit' — CORRECTED: it's a model-vs-model comparison vs the weakest baseline (Arm A)",
+        "R278 implied P-01 outperforms existing approaches — CORRECTED: Arm D (our reproduction of US20210338992A1) outperforms C"
+      ],
+      "key_artifacts": [
+        "TTP_PACKAGES/P-01_PROTOTYPE/08_ABCDE_comparison.py (V1.2, ~350 lines)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/p01_v1_2_ABCDE_comparison_results_none.json (25 runs)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/p01_v1_2_ABCDE_comparison_results_misspecification.json (25 runs)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/p01_v1_2_ABCDE_comparison_results_sensor-noise.json (25 runs)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/09_ABCDE_findings.md (honest findings document)",
+        "TTP_PACKAGES/P-01_PROTOTYPE/FROZEN_CLAIM_R279.json (frozen claim with explicit do-NOT-claim list)",
+        "TTP_PACKAGES/COMMERCIAL_LOOP/P-01_BUYER_TECHNICAL_BRIEFING_ONE_PAGER.md (updated with honest R279 finding)"
+      ]
+    },
+    "P-04": {
+      "from": "same state",
+      "to": "same state + Phase 1 detailed protocol",
+      "summary": "Built PHASE1_EXPERIMENTAL_PROTOCOL_DETAILED.json: 7-step protocol (enzyme → concentration → CSF matrix → stability → catalytic → toxicity → acceptance). 3 candidate enzymes (NEP, IDE, MMP-9). 5 concentrations tested. Synthetic CSF recipe fully specified. 30-day stability test. Michaelis-Menten kinetics. ISO 10993-5 cytotoxicity, ISO 10993-4 hemocompatibility, CSF cell compatibility. Explicit go/no-go criteria with MODEL_DERIVED thresholds and provenance. 3 months, $40-80K.",
+      "key_artifact": "TTP_PACKAGES/P-04_FREEZE/PHASE1_EXPERIMENTAL_PROTOCOL_DETAILED.json"
+    },
+    "P-09": {
+      "from": "same state",
+      "to": "same state + R279 positioning update",
+      "summary": "POSITIONING_UPDATE_R279.json: P-09 is NOT a $500K technology product. Offered only as: (1) research collaboration (buyer funds $200-500K program, receives results + right of first refusal), or (2) exclusive development option ($50-100K option fee for 18-24 months, converts to $200-500K IF molecule found). Updated outreach template with buyer screener: 'Do you explicitly value the research thesis?' If no, don't pursue.",
+      "key_artifact": "TTP_PACKAGES/P-09_ARCHITECTURE_CONCEPT/POSITIONING_UPDATE_R279.json"
+    },
+    "state_machine": {
+      "from": "16 states",
+      "to": "17 states (added FALSIFIED_AT_VALUE_PROPOSITION_LEVEL)",
+      "rationale": "Need to distinguish between 'a specific claim failed' (FALSIFIED) and 'the core commercial thesis is not supported by strongest-baseline test' (FALSIFIED_AT_VALUE_PROPOSITION_LEVEL). The latter requires strategic reformulation, not just claim revision.",
+      "key_artifact": "TTP_PACKAGES/EVIDENCE_LOOP_STATE_MACHINE.json (R279 version)"
+    }
+  },
+
+  "constitutional_articles_invoked": [
+    "Article XXX — never optimize the evaluator. V1.2 NOT tuned to make C win.",
+    "Article XXXI — self-correction creates memory artifact. V1.0/V1.1 preserved; V1.2 documents what changed.",
+    "Article XXVIII — no silent semantic promotion. P-01 falsified at value-proposition level, not silently retained.",
+    "Article XXVII — every threshold has provenance. P-04 Phase 1 thresholds all MODEL_DERIVED with explicit rationale.",
+    "Article XXXIV — reality is the next bottleneck. P-04 wet-lab and P-09 chemistry remain the bottlenecks.",
+    "Article XXV — unknown must remain unknown. P-09 molecule remains honestly unspecified."
+  ],
+
+  "honest_status_assessment": {
+    "P-01": "FALSIFIED AT VALUE PROPOSITION LEVEL. Twice now: (1) R277 strict dual-invariant falsified, (2) R279 isolation mechanism doesn't beat closed-loop modulation. Three paths: drop isolation (become D), reposition isolation for infection/maintenance, or kill. CEO strategic decision required.",
+    "P-04": "TECHNICALLY_SPECIFIED_DESIGN_FREEZE_PARTIAL. Phase 1 detailed protocol ready (7 steps, 3 months, $40-80K). Ready to engage wet-lab collaborator.",
+    "P-09": "ARCHITECTURE_CONCEPT. Research program defined. R279 positioning: research collaboration / exclusive development option only. NOT $500K technology.",
+    "buyer_conversations": 0,
+    "transactions": 0,
+    "honest_summary": "R279 forced P-01 to compete against the strongest published baseline. It lost. This is the self-correcting loop working as designed — the machine caught that its '7-9x improvement' was only against the weakest baseline, not against existing art. P-01 needs strategic reformulation before any buyer outreach."
+  },
+
+  "next_round_R280_directives": [
+    "CEO strategic decision on P-01: Path 1 (drop isolation, become D), Path 2 (reposition for infection/maintenance), or Path 3 (kill)",
+    "If Path 1: update P-01 TTP to Arm D configuration, assess IP vs US20210338992A1, update buyer materials",
+    "If Path 2: build new simulator for infection/biofilm scenarios, test whether isolation helps infection control",
+    "If Path 3: P-01 enters cemetery with documented findings (negative results as knowledge)",
+    "Engage P-04 wet-lab collaborator using Phase 1 detailed protocol",
+    "DO NOT send P-01 buyer outreach until strategic decision is made (R278 one-pager is now stale)",
+    "P-09 outreach only to buyers who explicitly value the research thesis",
+    "DO NOT expand portfolio. DO NOT generate new candidates."
+  ]
+}

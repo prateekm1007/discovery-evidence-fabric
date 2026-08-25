@@ -1,0 +1,55 @@
+{
+  "package_id": "P-01",
+  "artifact": "FROZEN_CLAIM_R279",
+  "version": "1.3.0",
+  "date": "2026-08-25 (R279)",
+  "purpose": "Freeze the P-01 claim per CEO R279 P0 directive. Remove all overclaim language. State only what the simulator actually shows.",
+  "constitutional_basis": "Article XXVIII — no silent semantic promotion. Article XXXI — self-correction creates memory artifact.",
+
+  "frozen_claim": "Predictive isolation + redistribution improves shunt-failure trajectory relative to reactive redundancy (Arm B) and conventional single-path (Arm A) in the current model. However, it does NOT outperform predictive closed-loop modulation without isolation (Arm D) on time-to-failure, and under realistic sensor noise it performs dramatically worse than D. The isolation mechanism's only advantage is lower peak ICP under low-noise conditions.",
+
+  "what_we_do_NOT_claim": [
+    "Prevents shunt failure — FALSE, system breaks at ~7.7h (C) or ~8.9h (D) under 2-segment progressive occlusion",
+    "Guarantees ICP safety — FALSE, peak ICP 22 mmHg exceeds 20 mmHg hard limit",
+    "Represents current standard of care — FALSE, 59 mmHg is the simulator's single-segment baseline, NOT a measured clinical benchmark",
+    "Provides 7-9x clinical benefit — FALSE, 7-9x is a model-vs-model comparison vs Arm A (weakest baseline), NOT clinical evidence",
+    "Outperforms existing predictive closed-loop approaches — FALSE, Arm D (our reproduction of US20210338992A1 + 2023 ML approach) outperforms C on time-to-failure"
+  ],
+
+  "what_we_DO_claim": [
+    "Multi-segment hardware + predictive control (C or D) outperforms single-path (A) and reactive redundancy (B) in the model",
+    "Reactive redundancy (B) is WORSE than single-path (A) — sudden isolation of dead segments causes harmful ICP transients",
+    "Prediction (C or D) extends time-to-failure ~6-7x vs A in the model (7.7-8.9h vs 1.3h)",
+    "The isolation mechanism (C vs D) does NOT add value on time-to-failure and is FRAGILE under sensor noise",
+    "The isolation mechanism (C vs D) provides lower peak ICP under low-noise conditions only (22 vs 30 mmHg)"
+  ],
+
+  "R279_reassessment_of_value_proposition": {
+    "original_V1_0_claim": "Strict dual-invariant holds (prevents failure) — FALSIFIED in R277",
+    "R278_V1_1_claim": "Prediction outperforms redundancy 7-9x — TRUE vs A/B, but MISLEADING because it implied clinical benefit and ignored stronger baselines",
+    "R279_V1_2_finding": "Isolation mechanism does NOT outperform closed-loop modulation (D). P-01's original value proposition is NOT supported.",
+    "honest_assessment": "P-01 has been falsified twice: (1) strict dual-invariant failed (R277), (2) isolation mechanism doesn't beat closed-loop modulation (R279). The package needs strategic reformulation."
+  },
+
+  "two_paths_forward": {
+    "path_1_drop_isolation": {
+      "description": "P-01 becomes 'predictive closed-loop multi-segment shunt controller' (Arm D). Drop the isolation mechanism entirely.",
+      "value_proposition": "Multi-segment hardware + predictive closed-loop valve modulation. Outperforms conventional single-path by ~7x on time-to-failure.",
+      "differentiation_concern": "Arm D is close to US20210338992A1 (closed-loop shunt with sensors + controller + valve). IP position needs careful assessment. Differentiation narrows to 'multi-segment hardware' + 'specific control law.'",
+      "honest_label": "INCREMENTAL over existing art. Weaker commercial position."
+    },
+    "path_2_reposition_isolation": {
+      "description": "Keep the isolation mechanism but reposition it for infection control / biofilm management / maintenance — NOT ICP management.",
+      "value_proposition": "Multi-segment shunt where segments can be isolated for localized treatment, biofilm control, or non-surgical replacement (if physically possible).",
+      "research_required": "Build new simulator for infection/biofilm scenarios. Test whether isolation helps infection control. This is a new research direction — NOT validated.",
+      "honest_label": "NEW DIRECTION. Requires fundamental rework. Not ready for buyer evaluation."
+    },
+    "path_3_kill_P01": {
+      "description": "If neither path is commercially viable, P-01 enters the cemetery. The findings (reactive redundancy is harmful, isolation doesn't beat modulation) are negative results that inform future candidates.",
+      "honest_label": "VALID OUTCOME. The cemetery is not a failure — it's negative knowledge."
+    }
+  },
+
+  "decision_required": "Strategic decision by CEO: Path 1, Path 2, or Path 3. This is NOT a coding decision — it's a commercial strategy decision."
+
+}
