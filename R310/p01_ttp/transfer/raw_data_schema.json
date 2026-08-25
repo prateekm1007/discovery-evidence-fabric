@@ -1,0 +1,88 @@
+{
+  "$schema": "raw_data_schema_v1",
+  "candidate_id": "P-01",
+  "description": "Schema for all raw data inputs and outputs in the P-01 TTP",
+
+  "simulator_inputs": {
+    "type": "object",
+    "required": ["scenarios", "seeds", "parameters"],
+    "properties": {
+      "scenarios": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {"type": "string"},
+            "lesion_onset_hours": {"type": "number"},
+            "lesion_severity": {"type": "number"},
+            "disturbance_type": {"type": "string"}
+          }
+        }
+      },
+      "seeds": {"type": "array", "items": {"type": "integer"}},
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "n_segments": {"type": "integer", "default": 4},
+          "Q_production_mL_per_min": {"type": "number", "default": 0.30},
+          "P_TARGET_mmHg": {"type": "number", "default": 12},
+          "P_MIN_mmHg": {"type": "number", "default": 5},
+          "P_MAX_mmHg": {"type": "number", "default": 20},
+          "F_MAX_PER_SEG_mL_per_min": {"type": "number", "default": 0.30},
+          "k_occl_per_hr": {"type": "number", "default": 1.0}
+        }
+      }
+    }
+  },
+
+  "simulator_outputs": {
+    "type": "object",
+    "required": ["scenario", "seed", "time_series", "summary"],
+    "properties": {
+      "scenario": {"type": "string"},
+      "seed": {"type": "integer"},
+      "time_series": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "t_hours": {"type": "number"},
+            "P_ICP_mmHg": {"type": "number"},
+            "Q_total_mL_per_min": {"type": "number"},
+            "Q_per_segment": {"type": "array", "items": {"type": "number"}},
+            "G_per_segment": {"type": "array", "items": {"type": "number"}},
+            "occlusion_prob_per_segment": {"type": "array", "items": {"type": "number"}},
+            "INV_1_holds": {"type": "boolean"},
+            "INV_2_holds": {"type": "boolean"}
+          }
+        }
+      },
+      "summary": {
+        "type": "object",
+        "properties": {
+          "peak_ICP_mmHg": {"type": "number"},
+          "survival_time_hours": {"type": "number"},
+          "INV_1_violation_magnitude_mmHg": {"type": "number"},
+          "INV_2_preserved": {"type": "boolean"}
+        }
+      }
+    }
+  },
+
+  "ablation_outputs": {
+    "type": "object",
+    "properties": {
+      "ablation_id": {"type": "string"},
+      "ablated_component": {"type": "string"},
+      "original_peak_ICP": {"type": "number"},
+      "ablated_peak_ICP": {"type": "number"},
+      "delta_peak_ICP": {"type": "number"},
+      "critical_mechanism": {"type": "boolean"}
+    }
+  },
+
+  "evidence_tier_labels": {
+    "type": "string",
+    "enum": ["MODELLED", "PUBLICLY_VERIFIED", "BUYER_VERIFIED"]
+  }
+}

@@ -1,0 +1,86 @@
+# AI Loop Provenance — P-01
+
+**Candidate:** P-01 — Predictive Occlusion-Isolation Controller
+**Authority:** Article XXXVI §10
+
+---
+
+## The full HYPOTHESIS → READY chain, with transition rationales
+
+### L01 HYPOTHESIS
+- **Timestamp:** R276 (2026-08-24)
+- **Description:** Multi-segment CSF shunt with predictive redistribution can maintain dual safety invariants (INV-1: ICP in band; INV-2: no path overload) and reduce shunt failure.
+- **Artifact:** `TTP_PACKAGES/P-01_FULL_TTP.json` §1, §2
+
+### L02 MODEL
+- **Timestamp:** R276-R277
+- **Description:** Python simulator built (~650 lines). 4-segment parallel drainage, Bayesian occlusion prediction, proportional redistribution with INV-2 cap. 5 scenarios × 5 seeds = 25 runs.
+- **Artifact:** `TTP_PACKAGES/P-01_PROTOTYPE/05_simulator.py`
+
+### L03 EXTERNAL_SIMULATOR
+- **Timestamp:** R310 (this round)
+- **Description:** SimVascular/svFSI cross-check NOT YET EXECUTED. Preregistered in `R309/verification/VERIFICATION_LEDGER.jsonl`. Per Article XXXVI §6, P-01 should be cross-checked against SIM_SVFSI on patient-specific aortic flow benchmark. Deviation: not yet run.
+- **Artifact:** `R309/verification/VERIFICATION_LEDGER.jsonl` (P-01-VERIF-001 entry)
+- **Status:** PENDING_EXECUTION (R311 priority)
+
+### L04 STRONGEST_COMPARATOR
+- **Timestamp:** R277
+- **Description:** Single-segment standard of care (Medtronic Strata, Integra Certas, Sophysa Polaris). Modeled as single-segment drainage in the same simulator.
+- **Artifact:** `TTP_PACKAGES/P-01_PROTOTYPE/p01_simulator_results_ALLSCENARIOS.json` (single-segment baseline runs)
+
+### L05 ATTACK
+- **Timestamp:** R277-R288
+- **Description:** 5 hostile attacks executed: (1) INV-2 attacker (fast lesion), (2) INV-1 attacker (slow all-segment), (3) predictor false-positive (noise spikes), (4) predictor false-negative (very slow lesion), (5) communication failure. Plus 225 ablations + 180 comparisons (R288).
+- **Artifact:** `TTP_PACKAGES/P-01_PROTOTYPE/07_test_fixtures.json`
+
+### L06 FAIL
+- **Timestamp:** R277
+- **Description:** First iteration FAILED. Strict dual-invariant violated (peak ICP 22 mmHg > 20 mmHg target). 24h survival failed (both designs break at ~14h).
+- **Artifact:** `TTP_PACKAGES/P-01_PROTOTYPE/p01_simulator_results_ALLSCENARIOS.json`
+- **Transition rationale (L05→L06):** Attacks revealed the strict dual-invariant cannot hold under worst-case multi-segment progressive failure.
+
+### L07 AI_DIAGNOSIS
+- **Timestamp:** R277
+- **Description:** Article XXIX diagnosis: MECHANISM failure (the dual-invariant is too strict for this physical configuration), NOT implementation failure. The simulator is correct; the claim was too strong.
+- **Transition rationale (L06→L07):** Article XXIX requires separating implementation bugs from mechanism limitations. Simulator was verified by re-analysis (R277 self-correction).
+
+### L08 REPAIR
+- **Timestamp:** R282-R283
+- **Description:** V2.1 repair: (1) added sensor-dropout handling (R283 fixed the dropout weakness), (2) re-framed the claim from "strict dual-invariant" to "partial improvement with INV-2 preservation and lower peak ICP". 5-seed preregistration passed (R282).
+- **Transition rationale (L07→L08):** Mechanism failure cannot be "fixed" by code changes, but the claim can be honestly re-framed. V2.1 fixes the implementation weaknesses (sensor dropout) and the claim is restated honestly.
+
+### L09 RETEST
+- **Timestamp:** R288
+- **Description:** 225 ablations + 180 comparisons. Rate-limiting confirmed as critical mechanism in 41/45 runs. Partial improvement (peak 22 vs 59 mmHg) reproducible. INV-2 preserved 5/5. 24h survival still 0/5 (honest).
+- **Artifact:** `TTP_PACKAGES/P-01_PROTOTYPE/p01_simulator_results_ALLSCENARIOS.json`
+- **Transition rationale (L08→L09):** Repaired model re-tested under same pre-registered criterion. Partial improvement confirmed.
+
+### L10 INDEPENDENT_VERIFICATION
+- **Timestamp:** R310 (this round) — NOT YET EXECUTED
+- **Description:** Per Article XXXVI §7, P-01 needs independent verification against SIM_SVFSI. Preregistered but not yet run.
+- **Status:** PENDING_EXECUTION (R311 priority)
+- **Transition rationale (L09→L10):** Simulator re-test is not independent verification (Article XXVI). External solver cross-check required.
+
+### L11 ECONOMIC_PROOF
+- **Timestamp:** R310 (this round)
+- **Description:** Economic model built with evidence-tier labels. 4 MODELLED claims, 5 PUBLICLY_VERIFIED claims, 0 BUYER_VERIFIED claims. Central value claim (30% revision rate reduction) is MODELLED with documented path to PUBLICLY_VERIFIED (V0 bench + clinical trial).
+- **Artifact:** `economics/value_model.md`, `economics/sensitivity.md`, `economics/assumptions.json`
+
+### L12 TTP
+- **Timestamp:** R310 (this round)
+- **Description:** Complete TTP folder assembled per Article XXXVI §5. 19 files across 6 directories + this manifest.
+- **Artifact:** This folder (`R310/p01_ttp/`)
+
+### L13 TECHNOLOGY_TRANSFER_READY
+- **Timestamp:** NOT YET
+- **Description:** P-01 is NOT YET TECHNOLOGY_TRANSFER_READY. Blocking items:
+  - L10 (independent verification) not yet executed
+  - L03 (external simulator cross-check) not yet executed
+  - V0 bench prototype not yet built (Article XXXIV — reality is the next bottleneck)
+- **Transition rationale (L12→L13):** Per Article XXXVI §2, all 20 criteria must be present. C08 (independent verification) is NOT_PRESENT. P-01 is at "TTP assembled, verification pending" state.
+
+## Summary
+
+P-01 has progressed from HYPOTHESIS (R276) through MODEL, ATTACK, FAIL, DIAGNOSIS, REPAIR, RETEST, ECONOMIC_PROOF, and TTP assembly (R310). The remaining gap is L10 (independent verification) and L03 (external simulator cross-check), both pending SIM_SVFSI execution.
+
+**R311 priority for P-01:** Execute SIM_SVFSI cross-check. If MODEL_VERIFIED, P-01 becomes the first TECHNOLOGY_TRANSFER_READY candidate.

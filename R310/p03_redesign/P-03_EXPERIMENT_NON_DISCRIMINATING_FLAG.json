@@ -1,0 +1,73 @@
+{
+  "candidate_id": "P-03",
+  "candidate_name": "Residual Conductance Floor",
+  "R308_state": "PASS but uninformative",
+  "R308_finding": "P-03's with-floor and without-floor cases both produce 100% in-bounds. The model may be too simple to show the difference.",
+  "R310_classification": "EXPERIMENT_NON_DISCRIMINATING",
+  "classification_authority": "CEO directive R310 §P3",
+  "classification_rationale": "An experiment where the comparator and the candidate both 'pass' the same criterion does not establish that the candidate's mechanism contributes anything. This is NOT a PASS. It is an uninformative experiment. The factory must flag it automatically.",
+
+  "auto_flag_rule": {
+    "rule_name": "EXPERIMENT_NON_DISCRIMINATING",
+    "trigger": "Both candidate AND comparator pass the same pre-registered criterion, OR both fail it, in the same scenarios.",
+    "consequence": "Candidate does NOT progress to TECHNOLOGY_TRANSFER_READY. Must redesign the falsification criterion to create conditions under which the mechanism can actually distinguish itself.",
+    "constitutional_basis": "Article VIII (certification must attack itself — a test that cannot fail is not a test), Article XXVII (no threshold invention — a threshold that everything passes is not a threshold)"
+  },
+
+  "P-03_specific_diagnosis": {
+    "current_criterion": "Both with-floor and without-floor produce 100% in-bounds drainage",
+    "why_non_discriminating": "The current test scenarios do not exercise the regime where the residual conductance floor matters. The floor only matters when the primary drainage path is compromised (partial obstruction, low pressure differential). In normal-flow scenarios, the floor is irrelevant because the primary path handles everything.",
+    "what_the_floor_is_for": "The residual conductance floor is a SAFETY mechanism. It activates when the primary drainage path fails or is compromised. In normal operation, it should be dormant. Testing it in normal-flow scenarios is like testing a parachute indoors — it doesn't tell you whether the parachute works."
+  },
+
+  "redesigned_criterion": {
+    "criterion_id": "P-03-VERIF-001-V2",
+    "metric": "survival_time_under_partial_obstruction_hours",
+    "threshold": 24.0,
+    "unit": "hours",
+    "definition": "Time until ICP exceeds 25 mmHg (sustained for > 5 minutes) under a 70% partial obstruction of the primary drainage path, starting from steady-state normal operation.",
+    "scenarios": [
+      {
+        "name": "S1_gradual_obstruction",
+        "description": "Primary drainage path obstructs linearly from 0% to 70% over 6 hours, then held at 70%.",
+        "expected_with_floor": "ICP rises slowly, floor activates, ICP stabilizes below 25 mmHg for > 24h",
+        "expected_without_floor": "ICP rises rapidly, exceeds 25 mmHg within 6-12h"
+      },
+      {
+        "name": "S2_sudden_obstruction",
+        "description": "Primary drainage path suddenly 70% obstructed at t=0 (mimics catheter kink).",
+        "expected_with_floor": "ICP spikes but floor absorbs, ICP returns to < 25 mmHg within 1h and stays there",
+        "expected_without_floor": "ICP spikes and stays > 25 mmHg indefinitely"
+      },
+      {
+        "name": "S3_low_pressure_differential",
+        "description": "Pressure differential across shunt drops to 2 mmHg (mimics upright posture / low ICP).",
+        "expected_with_floor": "Floor maintains minimum drainage, ICP stays in normal range",
+        "expected_without_floor": "Drainage drops to zero, ICP slowly climbs"
+      },
+      {
+        "name": "S4_obstruction_plus_low_pressure",
+        "description": "S1 + S3 combined: gradual obstruction AND low pressure differential. The worst case.",
+        "expected_with_floor": "Floor activates, maintains minimum drainage, ICP stays < 25 mmHg for > 24h",
+        "expected_without_floor": "Drainage drops to near-zero, ICP exceeds 25 mmHg within 3-6h"
+      }
+    ],
+    "pass_condition": "In >= 3 of 4 scenarios, with-floor survives >= 24h AND without-floor fails (< 24h). This establishes that the floor mechanism contributes a discriminating technical effect.",
+    "fail_consequence": "If with-floor and without-floor both survive all 4 scenarios, the floor mechanism has no demonstrable effect. P-03 does NOT progress. Replacement from reservoir or cemetery.",
+    "frozen_before_execution": true,
+    "preregistration_timestamp": "2026-08-25T15:00:00Z"
+  },
+
+  "what_changes_from_R308": {
+    "R308_criterion": "Both pass in normal-flow scenarios -> PASS (WRONG: uninformative)",
+    "R310_criterion": "Discriminating test in obstruction/low-pressure scenarios -> only counts as PASS if with-floor survives AND without-floor fails"
+  },
+
+  "next_step": "Execute P-03-VERIF-001-V2 using SIM_SVFSI (Standard Simulator Registry, Article XXXVI §6) on the 4 scenarios above. This is R311 work; R310 classifies the issue and redesigns the criterion.",
+
+  "ai_loop_provenance": {
+    "R308": "Criterion non-discriminating. Both with-floor and without-floor pass.",
+    "R310": "Flagged EXPERIMENT_NON_DISCRIMINATING. Redesigned criterion to test the floor in its design regime (obstruction / low-pressure). Preregistered.",
+    "transition_rationale": "CEO R310 P3 directive. A test that cannot fail is not a test (Article VIII). The new criterion creates conditions where the floor mechanism can actually separate from the comparator."
+  }
+}

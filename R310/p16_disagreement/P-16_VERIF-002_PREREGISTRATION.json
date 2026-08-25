@@ -1,0 +1,52 @@
+{
+  "verification_id": "P-16-VERIF-002",
+  "candidate_id": "P-16",
+  "candidate_name": "NIR Photovoltaic (940nm)",
+  "preregistration_timestamp": "2026-08-25T14:45:00Z",
+  "preregistration_author": "autonomous_ai_loop_v4 (R310)",
+  "constitutional_basis": [
+    "Article XXXVI §6 (simulator registry; MCX/PyTissueOptics deviation justified)",
+    "Article XXXVI §7 (independent verification framework)",
+    "Article XXXVI §8 (economics must use verified number)",
+    "Article VIII (certification must attack itself)",
+    "Article XV (coder must disclose inconvenient results)",
+    "Article XXVI (no self-certification — 4 independent implementations)"
+  ],
+  "R308_history": "P-16 reported 744 uW at 940nm. Diffusion approximation vs Kubelka-Munk disagreed 60-70%. Neither independently verified.",
+  "R310_protocol": "4-model comparison: diffusion approx + Kubelka-Munk + Monte Carlo (MCX-style) + Monte Carlo (PyTissueOptics-style). Compare to published Jacques 2013 measurements.",
+  "frozen_phantom_geometry": {
+    "tissue_thickness_mm": 5.0,
+    "tissue_lateral_extent_mm": 50.0,
+    "source_wavelength_nm": 940,
+    "source_power_mW": 1.0,
+    "source_type": "isotropic point source at tissue surface (z=0)",
+    "detector_type": "PV cell at z=5mm, 1 cm^2 active area, centered on source x-y position",
+    "detector_z_mm": 5.0,
+    "detector_radius_mm": 5.64
+  },
+  "frozen_optical_properties_940nm": {
+    "source": "Jacques 2013, Phys Med Biol 58:R37-R61, brain tissue surrogate",
+    "mu_a_per_cm": 0.05,
+    "mu_s_per_cm": 8.0,
+    "g": 0.9,
+    "n": 1.4,
+    "mu_s_prime_per_cm": 0.8
+  },
+  "metric": "fluence_at_detector_mW_per_cm2",
+  "frozen_tolerance_relative": 0.1,
+  "frozen_tolerance_absolute": "0.05 mW/cm^2",
+  "tolerance_may_not_be_widened_after_run": true,
+  "anti_patterns_forbidden": [
+    "Choosing the attractive 744 uW result if Monte Carlo disagrees (Article XV)",
+    "Widening tolerance after the comparison run (Article VIII)",
+    "Skipping the published measurement comparison (Article XXVI)",
+    "Treating any single model as infallible (Article XXVI)"
+  ],
+  "n_monte_carlo_photons_per_model": 200000,
+  "random_seed": 20260825,
+  "published_reference": {
+    "citation": "Jacques SL, Optical properties of biological tissues: a review, Phys Med Biol 58:R37-R61 (2013)",
+    "expected_fluence_range_mW_per_cm2": "0.5 to 2.0 mW/cm^2 (estimated from Fig 11 + 940nm tissue penetration depth ~5mm)",
+    "note": "Exact published value at 940nm/5mm depends on tissue type. We use the Jacques 2013 review's brain/soft tissue surrogate. The CONVERGED Monte Carlo result should fall in this range if the optical properties are correct."
+  }
+}

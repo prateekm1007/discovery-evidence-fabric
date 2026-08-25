@@ -1,0 +1,59 @@
+{
+  "cemetery_entry_id": "CE-024",
+  "candidate_id": "P-05",
+  "candidate_name": "Wash-Out Gated Drug Release",
+  "round_killed": "R310",
+  "kill_timestamp": "2026-08-25T14:35:00Z",
+  "cause_of_death": "V3 mechanistic repair FAILED pre-registered criterion. 79.0% of virtual patients achieved therapeutic CSF drug concentration (>= 50 ug/L for >= 12 h/week), vs 80% required. Article XXXVI §4: repair budget = 1, second failure is terminal. No V4.",
+  "constitutional_basis": [
+    "Article VIII (certification must attack itself) — preregistered criterion frozen, not widened after result",
+    "Article XXIX (separate implementation from mechanism failure) — V3 failure is mechanistic, not implementation",
+    "Article XXXVI §4 (repair budget = 1, second failure terminal)",
+    "Article XV (coder must disclose inconvenient results) — near-miss disclosed honestly",
+    "Article XXXI (every correction creates a memory artifact)"
+  ],
+  "history": {
+    "V1_R308": "Tautological model. Wash-out gate defined to equal drug-release trigger. Mechanism failure (Article XXIX §1). Model structure invalid.",
+    "V2_R308": "Real PK model. Failed at -2.3%. Drug concentration insufficient.",
+    "V3_R310": "Full mechanistic PK model per CEO directive R310 P4. Compartment volume, clearance, release kinetics, transport delay, flow removal, parameter uncertainty, patient variability, noise. 200 virtual patients via LHS. Result: 79.0% pass (158/200), threshold 80%. FAIL by 1 percentage point."
+  },
+  "reusable_negative_knowledge": {
+    "headline": "Wash-out-gated drug release in CSF is patient-population-dependent: works for 79% of virtual patients but fails for 21% with low CSF outflow or high wash-out threshold.",
+    "detailed_finding": "The mechanism is NOT fundamentally broken. Mean therapeutic hours/week across 200 patients was 80.6 hours (well above the 12h threshold). Mean peak concentration was 6935 ug/L (well above the 50 ug/L therapeutic threshold). The mechanism delivers drug effectively WHEN the wash-out gate opens. The 21% of patients who failed had parameter combinations where Q_csf_out (CSF outflow) did not exceed Q_threshold (wash-out gate threshold) enough hours per day, OR V_csf (CSF volume) was large enough to dilute the released drug below therapeutic concentration.",
+    "root_cause": "The wash-out gate depends on physiological CSF flow variability. Patients with low/variable CSF flow get insufficient drug release. This is a patient-selection problem, not a mechanism-design problem.",
+    "implication_for_future_candidates": [
+      "Any CSF drug-delivery mechanism that gates on physiological flow will have patient-population dependence. Future candidates must either (a) target only patients with verified sufficient CSF flow, or (b) use a different gating mechanism that does not depend on physiological flow variability.",
+      "CSF bulk flow clearance (~20 mL/hr) is the dominant drug-removal mechanism. Reservoir dose (5 mg) is sufficient for the average patient but insufficient for patients with large V_csf or high Q_csf_out.",
+      "The 12 h/week therapeutic time threshold may be too aggressive for a flow-gated mechanism. Future candidates should consider continuous-release mechanisms (not flow-gated) if therapeutic time is the metric."
+    ],
+    "quantitative_summary": {
+      "n_virtual_patients": 200,
+      "fraction_passing": 0.79,
+      "threshold_required": 0.80,
+      "mean_therapeutic_hours_per_week": 80.6,
+      "median_therapeutic_hours_per_week": 87.9,
+      "std_therapeutic_hours_per_week": 49.3,
+      "min_therapeutic_hours_per_week": 0.0,
+      "max_therapeutic_hours_per_week": 163.7,
+      "mean_peak_concentration_ugL": 6935.3,
+      "therapeutic_threshold_ugL": 50.0,
+      "interpretation": "Bimodal distribution: 79% of patients get strong therapeutic exposure (median 88 h/week), 21% get near-zero (min 0 h/week)."
+    },
+    "what_would_have_worked": "If the criterion had been 'mean therapeutic hours/week >= 12 across the population' (rather than '>= 80% of patients individually pass'), V3 would have passed (mean 80.6 h/week). But that criterion would have hidden the 21% who get no benefit, which is clinically unacceptable for an implantable drug delivery system. The preregistered criterion was correct."
+  },
+  "artifacts_preserved": [
+    "R310/p05_repair/P-05_V3_PREREGISTRATION.json (frozen before execution)",
+    "R310/p05_repair/P-05_V3_RESULT.json (full results + verdict)",
+    "R310/p05_repair/P-05_V3_RAW_PATIENT_DATA.json (per-patient data, 200 patients)",
+    "scripts/r310/p05_v3_preregistration.py (executable reproduction script)"
+  ],
+  "ai_loop_provenance": {
+    "V1": "Tautological model (R308). Mechanism failure.",
+    "V2": "Real PK model (R308). Failed at -2.3%.",
+    "V3": "Full mechanistic PK (R310). Failed at 79.0% vs 80% required.",
+    "transition_rationale_V2_to_V3": "V2 failed due to insufficient drug concentration. V3 added mechanistic detail per CEO R310 P4 to test whether realistic PK allows therapeutic levels. NOT a threshold adjustment.",
+    "transition_rationale_V3_to_cemetery": "Article XXXVI §4: repair budget = 1, second failure terminal. V3 was the one repair attempt. No V4."
+  },
+  "what_this_demonstrates_about_the_system": "The R309 framework works. P-05 went through the full repair pipeline: preregistration (frozen) -> mechanistic repair (not threshold adjustment) -> execution across 200 virtual patients -> honest verdict (FAIL by 1%) -> cemetery with reusable negative knowledge. The CEO's R310 directive P4 was executed exactly as specified. The near-miss is disclosed honestly (Article XV); the threshold is not widened (Article VIII); the negative knowledge is preserved for future candidate generation.",
+  "revival_requires": "Constitutional waiver (Article XXXVI §11). None anticipated. P-05 is closed."
+}
