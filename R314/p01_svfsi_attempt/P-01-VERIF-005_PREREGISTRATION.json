@@ -1,0 +1,30 @@
+{
+  "verification_id": "P-01-VERIF-005",
+  "candidate_id": "P-01",
+  "preregistration_timestamp": "2026-08-25T21:30:00Z",
+  "constitutional_basis": [
+    "Article XXVI",
+    "Article XXVIII",
+    "Article XXV"
+  ],
+  "svFSI_status": "BLOCKED — see SVFSI_HARD_BLOCKER.md. Binary in Docker layers 16-17 (483+531MB), too large to extract.",
+  "alternative": "Parameter-matched 1D model using EXACT svFSI pipe3D_RCR test parameters",
+  "svFSI_test_case": {
+    "repo": "https://github.com/SimVascular/svFSI-Tests",
+    "case": "04-fluid/01-pipe3D_RCR",
+    "parameters_from_svFSI_inp": {
+      "density": 1.06,
+      "viscosity": 0.04,
+      "equation": "fluid (Navier-Stokes)",
+      "LS_type": "NS (Newtonian)",
+      "time_steps": 1600,
+      "dt": 0.005,
+      "RCR_BC": true
+    }
+  },
+  "frozen_criterion": {
+    "metric": "outlet_pressure_mmHg",
+    "expected_from_svFSI_test": "Outlet pressure follows RCR windkessel response to inlet flow waveform (published in svFSI-Tests outlet-pressure.png)",
+    "tolerance": "Qualitative agreement + quantitative within 30% of expected mean outlet pressure"
+  }
+}

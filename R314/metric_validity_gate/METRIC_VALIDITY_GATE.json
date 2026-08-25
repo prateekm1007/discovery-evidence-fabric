@@ -1,0 +1,82 @@
+{
+  "gate_name": "METRIC_VALIDITY",
+  "authority": "CEO R314 §P7 (new factory gate)",
+  "constitutional_basis": "Article XXX (never optimize the evaluator), Article VIII (certification must attack itself)",
+  "purpose": "Prevent another P-05 tautology and another P-19 misleading metric. The machine must establish metric validity BEFORE using a metric in an acceptance decision.",
+
+  "gate_requirements": {
+    "1_physical_meaning": {
+      "requirement": "The metric must have a clear physical meaning tied to the candidate's mechanism.",
+      "failure_mode": "P-19 'drainage_capacity_pct' — preserves flow by allowing dangerous ICP. Physical meaning was drainage volume, but the actual engineering objective was safety.",
+      "test": "State the physical quantity being measured. State why this quantity matters for the candidate's purpose."
+    },
+    "2_clinical_engineering_relevance": {
+      "requirement": "The metric must measure something the buyer/end-user actually cares about.",
+      "failure_mode": "P-05 'wash-out gate coincidence' — measured tautological coincidence, not therapeutic effect.",
+      "test": "Connect the metric to a clinical endpoint (for medical) or engineering spec (for non-medical). Cite the source (AANS guidelines, FDA guidance, engineering standard)."
+    },
+    "3_comparator_sensitivity": {
+      "requirement": "The metric must distinguish the candidate from the comparator.",
+      "failure_mode": "P-03 'drainage in-bounds' — both with-floor and without-floor produce 100% in-bounds. Metric does not distinguish.",
+      "test": "Identify the comparator. Show that the metric produces different values for candidate vs comparator under the same conditions."
+    },
+    "4_failure_sensitivity": {
+      "requirement": "The metric must capture the actual failure mode, not a proxy.",
+      "failure_mode": "P-19 'drainage_capacity' — system 'passes' by allowing ICP to reach dangerous levels. Metric captures drainage, not safety failure.",
+      "test": "Identify the actual failure mode. Show that the metric goes bad when the failure mode occurs."
+    }
+  },
+
+  "gate_enforcement": {
+    "before_metric_use": "All 4 requirements must be documented in the preregistration BEFORE any execution.",
+    "adversarial_test": "Construct a scenario where the candidate 'passes' the metric but the underlying system is wrong (Article XXX). If the adversarial test passes the metric, the metric is INVALID.",
+    "blocking": "A metric that fails METRIC_VALIDITY cannot be used in the falsification criterion. The candidate cannot progress until a valid metric is defined."
+  },
+
+  "applied_examples": {
+    "P-01": {
+      "metric": "peak_ICP_under_multi_segment_failure_mmHg",
+      "physical_meaning": "Maximum intracranial pressure during worst-case obstruction scenario",
+      "clinical_relevance": "ICP > 25 mmHg = intracranial hypertension (AANS threshold)",
+      "comparator_sensitivity": "Multi-segment produces lower peak than single-segment (validated R313)",
+      "failure_sensitivity": "Peak ICP rises when drainage fails — captures actual failure mode",
+      "METRIC_VALIDITY": "PASS"
+    },
+    "P-19_R313": {
+      "metric": "drainage_capacity_pct",
+      "physical_meaning": "Drainage volume maintained under obstruction",
+      "clinical_relevance": "INDIRECT — drainage volume does not directly map to patient safety",
+      "comparator_sensitivity": "Yes (95.4% vs 0%)",
+      "failure_sensitivity": "FAIL — system preserves drainage by allowing dangerous ICP. Metric does not capture safety failure.",
+      "METRIC_VALIDITY": "FAIL — replaced in R314"
+    },
+    "P-19_R314": {
+      "metric": "time_until_ICP_exceeds_25_mmHg",
+      "physical_meaning": "Time until intracranial pressure crosses safety threshold",
+      "clinical_relevance": "Direct clinical endpoint (AANS Brain Trauma Foundation: ICP > 22 mmHg requires treatment)",
+      "comparator_sensitivity": "Distributed: 48h, Single: 6.5-8.9h — clearly distinguishes",
+      "failure_sensitivity": "Captures actual failure mode (dangerous ICP, not low flow)",
+      "METRIC_VALIDITY": "PASS — 9/10 scenarios discriminating"
+    },
+    "P-15": {
+      "metric": "uptime_pct_at_P50",
+      "physical_meaning": "Percentage of time sensing functions at typical cardiac harvest",
+      "clinical_relevance": "INDIRECT — uptime doesn't directly map to clinical outcome, but is necessary for monitoring",
+      "comparator_sensitivity": "99.9% (P-15) vs ~0% (battery-dependent, 5-year replacement)",
+      "failure_sensitivity": "Uptime drops when harvest < load — captures power failure mode",
+      "METRIC_VALIDITY": "PASS (with caveat: indirect clinical relevance)"
+    }
+  },
+
+  "retroactive_application": {
+    "P-05_V1": {"metric": "wash-out_gate_drug_release_correlation", "METRIC_VALIDITY": "FAIL (tautology)"},
+    "P-03_R308": {"metric": "drainage_in_bounds_pct", "METRIC_VALIDITY": "FAIL (non-discriminating)"},
+    "P-16": {"metric": "fluence_at_detector_mW_per_cm2", "METRIC_VALIDITY": "PASS (direct physical measurement, comparator-sensitive)"}
+  },
+
+  "integration_with_Article_XXX": {
+    "article_XXX_test": "Before accepting a metric, ask: 'What would make this metric PASS while the underlying system is wrong?'",
+    "P-19_R313_example": "A controller that opens all drainage paths at maximum conductance would PASS drainage_capacity_pct while allowing ICP to spike. This is the exact failure mode the metric missed.",
+    "gate_addition": "METRIC_VALIDITY is now a mandatory preregistration field for all candidates. No metric, no execution."
+  }
+}
