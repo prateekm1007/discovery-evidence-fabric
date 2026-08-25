@@ -1,0 +1,76 @@
+{
+  "round": 282,
+  "date": "2026-08-25",
+  "type": "V2_5SEED_PRE_REGISTERED_VALIDATION_PASSED",
+  "previous_round": 281,
+  "previous_commit": "c622490",
+  "ceo_directive": "P0 finish statistics (5 seeds × V2 × B × 9 attacks) with pre-registered criterion. P1 complete ablation (5 seeds × 5 arms × 9 attacks). P2 physical bench protocol mirroring computational comparison. P3 start buyer loop. No new candidates.",
+
+  "headline_finding": "V2 PASSED the pre-registered 5-seed validation. Primary endpoint (t_fail under noise_3x): V2/B ratio = 2.73x (threshold 2.0x), V2 wins 5/5 seeds (threshold 4/5), V2 max peak 19.8 mmHg (threshold <40), V2 wins 4/6 secondary endpoints (threshold 4/6). ALL 4 PRE-REGISTERED CONDITIONS MET. V2 materially outperforms B on 7/9 attack modes across 5 seeds. NEW weakness found: sensor_dropout (V2 WORSE than B, 0.80x) — not visible in 1-seed run. Ablation (1 seed, 9 attacks): rate limiting universally critical (32-78% of V2 on all 9 attacks). Mechanism interactions found: hysteresis critical under controller_delay, drainage floor critical under sensor_dropout.",
+
+  "pre_registration_provenance": {
+    "committed_at": "79e2aff",
+    "timestamp": "2026-08-25T02:30:00Z",
+    "committed_BEFORE": "any 5-seed runs",
+    "article": "XXVII (no threshold invention — thresholds frozen before seeing results)"
+  },
+
+  "what_changed_R282": {
+    "P01_V2_5seed_primary": {
+      "status": "COMPLETE — 90 runs (2 arms × 9 attacks × 5 seeds)",
+      "result": "PASSED all 4 pre-registered conditions",
+      "key_metrics": {
+        "primary_ratio": "2.73x (threshold 2.0x)",
+        "seeds_won": "5/5 (threshold 4/5)",
+        "max_peak": "19.8 mmHg (threshold <40)",
+        "secondary_wins": "4/6 (threshold 4/6)",
+        "attacks_won": "7/9 (sensor_dropout LOST, multi_failure marginal)"
+      }
+    },
+    "P01_V2_5seed_ablation": {
+      "status": "PARTIAL — 30/225 runs (seed 42 only, 4 of 5 arms)",
+      "result": "Rate limiting universally critical on all 9 attacks (32-78% of V2). Mechanism interactions: hysteresis critical under controller_delay, drainage floor critical under sensor_dropout.",
+      "honest_scope": "1 seed only. Full 5-seed ablation PENDING compute budget. But rate limiting criticality is consistent across all 9 attacks on seed 42."
+    },
+    "P2_physical_bench_protocol": {
+      "status": "COMPLETE",
+      "summary": "Built PHYSICAL_BENCH_PROTOCOL_R282.json: 3-arm physical bench (A conventional / B predictive closed-loop / C rate-limited) with blinded randomized attack sequences. 135 runs (3 arms × 9 attacks × 5 seeds). Designed to DISPROVE the simulator (4 falsification criteria SF-01 through SF-04). Buyer can reproduce without trusting our software.",
+      "key_artifact": "TTP_PACKAGES/P-01_PROTOTYPE/PHYSICAL_BENCH_PROTOCOL_R282.json"
+    },
+    "P3_buyer_loop": {
+      "status": "READY TO ENGAGE",
+      "summary": "Built BUYER_LOOP_R282_FIRST_MILESTONE.json. First commercial milestone: get a real engineer to say 'Send us the package; we'll evaluate it.' Updated buyer message with 5-seed result + honest weakness disclosure. Miethke outreach ready to send.",
+      "key_artifact": "TTP_PACKAGES/COMMERCIAL_LOOP/BUYER_LOOP_R282_FIRST_MILESTONE.json"
+    }
+  },
+
+  "new_findings_not_in_R281": {
+    "sensor_dropout_weakness": "V2 is WORSE than B under sensor_dropout (0.80x ratio, V2 wins only 2/5 seeds). The rate limiter that makes V2 robust to noise makes it fragile to dropout — it can't recover fast enough when sensors return. This was NOT visible in the 1-seed R281 run. This is why multi-seed validation matters.",
+    "mechanism_interactions": "R281 ablation (2 attacks) suggested only rate limiting mattered. R282 ablation (9 attacks) reveals hysteresis becomes critical under controller_delay, drainage floor becomes critical under sensor_dropout. The 4 mechanisms are NOT independent — they interact under different attack modes.",
+    "multi_failure_peak_reduced": "R281 1-seed showed 224 mmHg peak under multi_failure. R282 5-seed shows 103.5 mmHg mean (lower, but still catastrophic). The 1-seed result was a worst-case seed."
+  },
+
+  "honest_caveats": [
+    "Ablation is 1 seed only (30/225 runs). Full 5-seed ablation PENDING.",
+    "Model-only, NOT clinical evidence. Bench validation required.",
+    "sensor_dropout weakness must be disclosed to buyers — V2 is worse than B under dropout.",
+    "multi_failure peak (103.5 mmHg) is still catastrophic — no controller survives all segments failing.",
+    "V2.1 needed to address sensor_dropout (sensor-health detector + stronger drainage floor)."
+  ],
+
+  "constitutional_articles_invoked": [
+    "Article XXVII — pre-registered criterion committed BEFORE runs (commit 79e2aff)",
+    "Article XXX — simulator NOT tuned. Same physics as R281.",
+    "Article XXVIII — result determines claim. Pre-registered threshold met → proceed to bench.",
+    "Article XXXI — R281 1-seed results preserved. R282 5-seed corrects R281's sensor_dropout blind spot.",
+    "Article XXVI — physical bench protocol designed for independent validation (can disprove simulator)."
+  ],
+
+  "next_round_R283_directives": [
+    "Complete 5-seed ablation (195 remaining runs). Confirm rate limiting universally critical across seeds.",
+    "Send V2 materials + 5-seed results to Miethke (Buyer 4). First commercial milestone: get 'Send us the package; we'll evaluate it.'",
+    "If Miethke engages: ship PHYSICAL_BENCH_PROTOCOL_R282.json. Lab builds bench, runs 135-run blinded protocol.",
+    "Design V2.1 to address sensor_dropout weakness (sensor-health detector + stronger drainage floor under dropout).",
+    "DO NOT expand portfolio. DO NOT generate new candidates."
+  ]
+}
