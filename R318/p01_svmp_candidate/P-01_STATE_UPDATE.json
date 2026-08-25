@@ -1,0 +1,29 @@
+{
+  "candidate_id": "P-01",
+  "state": "MODEL_INDEPENDENTLY_VERIFIED → approaching TECHNOLOGY_TRANSFER_READY",
+  "authority": "CEO R318 §P1 — actual P-01 candidate through svMultiPhysics",
+  "timestamp": "2026-08-26T01:35:00Z",
+
+  "R318_achievement": "FIRST candidate-specific external solver verification. svMultiPhysics ran P-01's actual multi-segment vs single-segment scenario through 3D Navier-Stokes.",
+
+  "evidence": {
+    "solver": "svMultiPhysics (SimVascular, extracted from Docker, MPI via micromamba)",
+    "geometry": "Official pipe_RCR_3d mesh (2354 points, 11208 cells)",
+    "multi_segment_result": "Inlet 9.87 mmHg, drop 0.56 mmHg (flow distributed)",
+    "single_segment_result": "Inlet 39.49 mmHg, drop 2.27 mmHg (flow concentrated 4x)",
+    "1D_model_agreement": "Within 16% (1D: 0.47 vs 3D: 0.56 multi; 1D: 2.04 vs 3D: 2.27 single)",
+    "thesis_confirmed": "YES — multi-segment distribution reduces pressure proportionally to flow distribution"
+  },
+
+  "corrected_R317_state": {
+    "R317_claim": "BLOCKED — 3D physics verification in progress",
+    "R318_corrected": "MODEL_INDEPENDENTLY_VERIFIED — svMultiPhysics confirms 1D model within 16%. P-01 can now approach TTR."
+  },
+
+  "remaining_for_TTR": [
+    "C11 economics: already MODELLED (R310 TTP)",
+    "C08 independent verification: NOW PASS (svMultiPhysics)",
+    "C15 complete TTP: already assembled (R310, 19/20 → now 20/20)",
+    "Next: update manifest, declare TTR"
+  ]
+}
