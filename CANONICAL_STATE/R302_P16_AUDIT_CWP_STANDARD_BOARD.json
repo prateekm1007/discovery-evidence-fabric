@@ -1,0 +1,51 @@
+{
+  "round": 302,
+  "date": "2026-08-25",
+  "type": "P16_MODEL_AUDIT_DOWNGRADE_CWP_STANDARD_15_CANDIDATE_BOARD",
+  "previous_round": 301,
+  "previous_commit": "f89db75",
+  "ceo_directive": "P0 audit R301 discrepancy (code vs claim). P1-P4 Monte Carlo + thermal + experimental calibration. P5 Candidate Working Package standard. P6 15-candidate board.",
+
+  "headline": "R301 CONSTITUTIONAL VIOLATION CAUGHT AND CORRECTED. Committed code (r301_p16_nir_power_transfer.py) uses ballistic Beer-Lambert giving ZERO. JSON artifact claims diffuse model giving 744 μW. Code and artifact DISAGREE. Article XXIV (summary outranks artifact) and Article XXVIII (silent semantic promotion) both violated. P-16 DOWNGRADED from FEASIBLE (P_tech=0.45) to PHYSICS_MODEL_REQUIRES_VALIDATION (P_tech=0.25, TEV back to $29,125). The 744 μW figure is a PRELIMINARY ESTIMATE from an uncommitted calculation — NOT an established result. Candidate Working Package standard defined (10 executable components). Machine-readable 15-candidate board built: only 3/15 have anything a buyer can run. The real moat is the pipeline, not any single candidate.",
+
+  "what_changed_R302": {
+    "P0_P16_model_audit": {
+      "status": "COMPLETE — discrepancy documented honestly",
+      "finding": "Committed code uses ballistic Beer-Lambert (line 114-118: exp(-mu_total * d)). JSON artifact claims diffuse model (mu_eff = sqrt(3*mu_a*(mu_a+mu_s'))). The diffuse calculation was performed inline and pasted into JSON — never implemented in the committed Python file. Code gives ZERO. JSON claims 744 μW. They disagree.",
+      "constitutional_violations": ["Article XXIV (summary outranks artifact)", "Article XXVIII (silent semantic promotion — P-16 called FEASIBLE based on uncommitted calculation)", "Article VI (provenance manufactured — JSON claims model that code doesn't implement)"],
+      "P16_correction": "P_tech 0.45→0.25 (back to R300 level). TEV $56,875→$29,125. State: PHYSICS_MODEL_REQUIRES_VALIDATION.",
+      "key_artifact": "TTP_PACKAGES/P16_MODEL_AUDIT_R302.json"
+    },
+    "P5_candidate_working_package_standard": {
+      "status": "COMPLETE — 10 executable components defined",
+      "components": ["Mechanism", "Reference Implementation (executable)", "Strongest Comparator", "Attack Suite", "Falsification Criterion (pre-registered)", "Evidence Ledger (provenance)", "Reproduction Package", "Buyer Evaluation Protocol", "Feedback Ingestion", "Version Loop"],
+      "rule": "No candidate can be called BUYER_READY until the buyer can actually execute or independently evaluate something."
+    },
+    "P6_machine_readable_board": {
+      "status": "COMPLETE — 15 candidates assessed",
+      "buyer_can_run_YES": 3,
+      "buyer_can_run_NO": 12,
+      "with_working_artifact": 4,
+      "without_working_artifact": 11,
+      "honest_assessment": "Only P-01 (simulator+bench), P-03 (via P-01), P-07 (via P-04), and P-04 (collaborator package) have anything executable. 11 candidates are descriptions, not working packages.",
+      "key_artifact": "TTP_PACKAGES/CANDIDATE_WORKING_PACKAGE_STANDARD_R302.json"
+    }
+  },
+
+  "what_is_needed_for_P16_before_FEASIBLE": [
+    "1. Implement diffuse transmittance model in committed Python file (not inline command)",
+    "2. Cross-check with Monte Carlo simulation (MCX or PyTissueOptics)",
+    "3. Validate against published experimental data (ScienceDirect 2025: 750/940nm through cadaver heads)",
+    "4. Add thermal simulation (FDA guidance on tissue heating — not just generic mW/cm² safety limit)",
+    "5. Parameter sweep (P5/P50/P95 across anatomical variation, skull thickness 5-15mm, scalp 3-6mm)",
+    "6. All committed to repository with CI assertions matching code to claims"
+  ],
+
+  "next_round_R303_directives": [
+    "P-01: SEND Buyer Evaluation Kit to Miethke. This has been the #1 priority for 7 ROUNDS. The external loop is EMPTY. Stop all internal work until this happens.",
+    "P-16: Install PyTissueOptics or MCML. Implement diffuse model in committed code. Validate against published cadaver head data. Add thermal simulation. This is a multi-round task.",
+    "P-11: Execute phage evidence chain. Binary go/no-go.",
+    "Build working artifacts for P-02, P-06, P-10, P-12 (candidates with defined next experiments but no executable artifact).",
+    "DO NOT generate new candidates. 15 active + 1 cemetery."
+  ]
+}
