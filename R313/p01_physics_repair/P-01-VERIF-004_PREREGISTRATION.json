@@ -1,0 +1,24 @@
+{
+  "verification_id": "P-01-VERIF-004",
+  "candidate_id": "P-01",
+  "preregistration_timestamp": "2026-08-25T20:00:00Z",
+  "constitutional_basis": [
+    "Article XXIX",
+    "Article VIII"
+  ],
+  "R312_finding": "Simplified 1D model: 2.19 mmHg vs published 8-15 mmHg. 80% underprediction.",
+  "missing_physics_identified": [
+    "Sudden contraction loss (inlet→throat): K_c = 0.5*(1-A_throat/A_inlet) = 0.42",
+    "Turbulent friction (Re_throat ~2700, transitional): Blasius f = 0.316/Re^0.25",
+    "Sudden expansion loss (throat→outlet): K_e = (1-A_throat/A_outlet)^2 = 0.31",
+    "Entrance length effects (developing flow)"
+  ],
+  "minimum_upgrade": "Add minor losses (contraction + expansion) + turbulent friction factor (Blasius). Keep 1D structure.",
+  "frozen_criterion": {
+    "metric": "pressure_drop_inlet_to_throat_mmHg",
+    "published_range": "8-15 mmHg at 5 L/min",
+    "tolerance": "within published range (8-15 mmHg)",
+    "pass_condition": "Upgraded model predicts within 8-15 mmHg"
+  },
+  "sequence": "benchmark validity FIRST → then rerun P-01 candidate experiment"
+}
