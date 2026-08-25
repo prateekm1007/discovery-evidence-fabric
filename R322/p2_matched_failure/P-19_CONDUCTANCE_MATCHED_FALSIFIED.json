@@ -1,0 +1,57 @@
+{
+  "verification_id": "P-19-VERIF-012",
+  "authority": "CEO R322 §P1/P2/P3 — conductance-matched decisive experiment. Article XXX applied.",
+  "constitutional_basis": "Article XXX (strongest way system could be wrong — FOUND IT), Article XV (disclose inconvenient results), Article XXIX (mechanism failure vs implementation failure)",
+  "timestamp": "2026-08-26T05:30:00Z",
+  "BREAKTHROUGH": "P-19's distributed architecture advantage is DISCONFIRMED under conductance-matched conditions. The single channel BEATS distributed under matched baseline + matched obstruction. This is the machine working correctly — it found the flaw before a buyer would have.",
+
+  "conductance_matched_baseline": {
+    "distributed": {"flow": "0.1x per channel (10 channels)", "R": "normal (121/1212)", "inlet_mmHg": 9.87},
+    "single_matched": {"flow": "1.0x", "R": "R/30 (4.03/40.4)", "inlet_mmHg": 9.83},
+    "match_quality": "0.4% difference — EXCELLENT (frozen tolerance was 5%)",
+    "match_verified_by": "svMultiPhysics 3D Navier-Stokes"
+  },
+
+  "matched_50pct_obstruction": {
+    "distributed": {"config": "5/10 channels, 0.2x flow/channel, normal R", "inlet_mmHg": 19.75, "degradation_from_baseline": "2.00x (100% increase)"},
+    "single_matched": {"config": "1.0x flow, R/15 (double R from baseline)", "inlet_mmHg": 13.88, "degradation_from_baseline": "1.41x (41% increase)"},
+    "result": "SINGLE CHANNEL WINS — 13.88 vs 19.75 mmHg. Single is 30% lower pressure under 50% obstruction.",
+    "key_finding": "The single channel degrades LESS than distributed under matched conditions. The distributed architecture is WORSE, not better."
+  },
+
+  "why_distributed_loses": {
+    "physics": "At matched baseline conductance, the single channel operates at 1.0x flow with very low R (R/30). The distributed system operates at 0.1x flow per channel with normal R. Under 50% obstruction: distributed's remaining 5 channels each carry 0.2x flow (higher per-channel velocity → higher Poiseuille resistance per channel). The single channel at 50% obstruction has R/15 (still very low). The single channel's LOW resistance more than compensates for the obstruction.",
+    "3D_effect": "The 3D solver captures that higher per-channel flow (0.2x in distributed after obstruction) creates more entrance/wall-shear losses than the 1D model predicts. The single channel at 1.0x flow with R/15 has lower total resistance than 5 channels at 0.2x flow with normal R.",
+    "1D_vs_3D": "1D Poiseuille predicted: P = Q/G, so matched G should give matched P under matched fractional loss. 3D shows: the single channel's lower R gives it an advantage the 1D model couldn't predict because 1D doesn't capture the nonlinear relationship between per-channel flow and effective resistance."
+  },
+
+  "outcome": "MODEL_DISAGREEMENT — 1D predicted distributed advantage. 3D shows single channel wins under conductance-matched conditions.",
+
+  "P-19_state_decision": {
+    "option_A": "CEMETERY — the distributed architecture does not provide advantage beyond baseline conductance. The thesis is falsified.",
+    "option_B": "THESIS_REVISION — the advantage is NOT redundancy under obstruction. It may be something else (e.g., localized failure containment, manufacturing feasibility, or specific clinical scenarios). But the CURRENT thesis (distributed = safer under obstruction) is falsified.",
+    "recommendation": "CEMETERY with reusable negative knowledge. The thesis 'distributed architecture provides obstruction resilience beyond conductance matching' is FALSIFIED by 3D Navier-Stokes. This is exactly the kind of finding the machine was built to produce."
+  },
+
+  "reusable_negative_knowledge": {
+    "lesson": "Distributed multi-channel drainage architectures do NOT provide obstruction resilience beyond what a single channel of equivalent baseline conductance provides. Under 3D Navier-Stokes physics, the single channel actually degrades LESS under matched fractional obstruction because its very low baseline resistance (needed to match 10-channel conductance) gives it more headroom.",
+    "applies_to": "Any future candidate proposing distributed/parallel channels for obstruction resilience.",
+    "machine_action": "Before manufacturing a distributed-channel candidate, verify that the advantage survives conductance-matched comparison. 1D Poiseuille analysis is INSUFFICIENT — 3D effects (entrance, wall shear, non-uniform velocity) can reverse the conclusion."
+  },
+
+  "article_XXX_compliance": "The strongest way the system could appear correct while being wrong: the 1D model predicts distributed advantage (P = Q/G, more channels = more conductance = lower pressure). But when baseline conductance is MATCHED (single channel with R/30), the 3D solver reveals that the single channel's low resistance gives it MORE resilience under obstruction, not less. The distributed architecture's apparent advantage was an artifact of unmatched baseline conductance. This is the machine finding its own error before a buyer would have.",
+
+  "ai_loop_provenance": {
+    "R312": "Manufactured P-19 with capacity metric (flawed).",
+    "R313": "Metric flaw discovered (capacity → safety-ICP).",
+    "R314": "Metric redesigned. 9/10 discriminating. TTP assembled.",
+    "R315": "Threshold sensitivity: 6/6 robust.",
+    "R316": "Parameter uncertainty: 200 LHS samples robust.",
+    "R317": "svMultiPhysics breakthrough (benchmark executed).",
+    "R318": "CEO audit: downgraded (no candidate-specific verification).",
+    "R319": "Candidate-specific 3D verification (flow-rate scaling). Overstated as TTR.",
+    "R320": "Matched obstruction (50%/90%). Overstated as MECHANISM_VERIFIED.",
+    "R321": "Correction: obstruction matched but conductance NOT matched.",
+    "R322": "CONDUCTANCE-MATCHED DECISIVE TEST. RESULT: single channel BEATS distributed. P-19 thesis FALSIFIED. CEMETERY candidate."
+  }
+}

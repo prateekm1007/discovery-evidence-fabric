@@ -1,0 +1,50 @@
+{
+  "authority": "CEO R322 §P6 — machine-auditable knowledge causality",
+  "timestamp": "2026-08-26T05:40:00Z",
+
+  "knowledge_atom_causality": {
+    "knowledge_atom_id": "KA-005",
+    "prior_round": "R313",
+    "prior_failure": "P-19 drainage_capacity metric was FLAWED — controller preserves flow by allowing dangerous ICP. 1/10 discriminating.",
+    "decision_rule": "METRIC_VALIDITY: all candidates must pass physical meaning, clinical relevance, comparator sensitivity, failure sensitivity before execution",
+    "affected_candidate": "P-19",
+    "old_design": "drainage_capacity_pct metric (R313)",
+    "new_design": "safety-ICP metric: time until P_ICP > threshold (R314)",
+    "reason_for_change": "Article XXX: the old metric could pass while the system was wrong (dangerous ICP preserved drainage volume)",
+    "commit_sha": "2ed2520 (R314)",
+    "test_id": "P-19-VERIF-002",
+    "result": "9/10 discriminating (was 1/10)",
+    "downstream_state_change": "P-19 promoted to TECHNICALLY_EVALUABLE → TTR_PROVISIONAL (R319) → TTR (R320) → CORRECTED (R321) → FALSIFIED (R322)",
+
+    "full_causal_chain": [
+      {"round": "R313", "event": "Metric flaw discovered", "artifact": "R313/p19_full_package/P-19_FULL_PACKAGE.json", "commit": "c353abc"},
+      {"round": "R314", "event": "KA-005 created + metric redesigned", "artifact": "R314/p19_safety_metric/P-19_TTP_MANIFEST.json", "commit": "2ed2520"},
+      {"round": "R315", "event": "Threshold sensitivity (triggered by KA-005's validity requirement)", "artifact": "R315/p19_threshold_matrix/P-19-VERIF-003_RESULT.json", "commit": "81b8eb5"},
+      {"round": "R316", "event": "Parameter uncertainty (triggered by KA-005's failure-sensitivity requirement)", "artifact": "R316/p19_uncertainty/P-19-VERIF-004_RESULT.json", "commit": "c353abc"},
+      {"round": "R317", "event": "svMultiPhysics breakthrough", "artifact": "R317/svfsi_exhaustive/SVMULTIPHYSICS_EXECUTED.json", "commit": "0bac247"},
+      {"round": "R319", "event": "Candidate-specific 3D verification", "artifact": "R319/p19_3d_verification/P-19-VERIF-005_RESULT.json", "commit": "6022960"},
+      {"round": "R320", "event": "Matched obstruction (CEO audit triggered correction)", "artifact": "R320/p19_real_3d_test/P-19-VERIF-006_RESULT.json", "commit": "a5dfba3"},
+      {"round": "R321", "event": "Obstruction fraction matched (CEO audit: conductance NOT matched)", "artifact": "R321/p1_matched_obstruction/P-19-VERIF-008_RESULT.json", "commit": "cf67362"},
+      {"round": "R322", "event": "CONDUCTANCE MATCHED — P-19 FALSIFIED", "artifact": "R322/p2_matched_failure/P-19_CONDUCTANCE_MATCHED_FALSIFIED.json", "commit": "R322 pending"}
+    ],
+
+    "machine_answer_to_question": {
+      "question": "Which prior failure caused this experiment to exist?",
+      "answer": "R313 metric flaw (KA-005) caused: metric redesign → threshold sensitivity → parameter uncertainty → external solver → matched obstruction → conductance matching → FALSIFICATION. The R313 failure to properly measure safety (capacity metric) set off a chain of increasingly rigorous experiments that ultimately FALSIFIED the candidate. This is the machine learning from failure to produce stronger experiments.",
+      "mechanically_auditable": true,
+      "artifact_chain_complete": true
+    }
+  },
+
+  "R322_new_knowledge_atom": {
+    "knowledge_atom_id": "KA-009",
+    "lesson": "Distributed multi-channel drainage does NOT provide obstruction resilience beyond baseline conductance matching. Under 3D Navier-Stokes with matched baseline, single channel BEATS distributed.",
+    "prior_failure": "P-19 R312-R321: distributed architecture appeared superior in 1D model and unmatched 3D tests. R322 conductance-matched test FALSIFIED the thesis.",
+    "decision_rule": "BASELINE_CONDUCTANCE_MATCHING: all comparative hydraulic experiments must match baseline conductance before applying obstruction. 1D Poiseuille is insufficient — 3D effects can reverse the conclusion.",
+    "affected_future_decisions": [
+      "Any future distributed/parallel channel candidate must pass conductance-matched 3D verification",
+      "1D models cannot be trusted for comparative hydraulic experiments — 3D solver required",
+      "The METRIC_VALIDITY gate (KA-005) must be extended to include CONDUCTANCE_MATCHING validity"
+    ]
+  }
+}
