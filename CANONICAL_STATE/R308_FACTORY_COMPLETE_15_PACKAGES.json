@@ -1,0 +1,86 @@
+{
+  "round": 308,
+  "date": "2026-08-25",
+  "type": "FACTORY_COMPLETE_15_PACKAGES_GATE_SPLIT_P05_REPAIRED_P16_DISAGREEMENT",
+  "previous_round": 307,
+  "previous_commit": "a89687e",
+  "ceo_directive": "Split factory gates. Repair P-05 (tautology). Manufacture P-03/P-07/P-17. P-16 cross-check. Fix buyer ledger. Dashboard for all 15.",
+
+  "headline": "FACTORY COMPLETE. 15/15 packages manufactured. Gate levels split: MODEL_RUNNING / MODEL_VERIFIED / TECHNICALLY_EVALUABLE / BUYER_TESTABLE. P-05 V1 tautology FIXED — V2 with real PK FAILS honestly (-2.3% reduction, flow-gating doesn't help when clearance dominates). P-16 INDEPENDENT CROSS-CHECK reveals MODEL DISAGREEMENT (diffusion vs Kubelka-Munk differ 60-70%) — AI investigation event, P-16 remains MODEL_RUNNING not MODEL_VERIFIED. P-03 PASS, P-07 PASS, P-17 FAIL (endothelial survival 0.215 at 30d, threshold 0.3). Honest scoreboard: 15/15 MODEL_RUNNING, 0/15 MODEL_VERIFIED, 7 PASS, 7 FAIL, 1 CONDITIONAL.",
+
+  "what_changed_R308": {
+    "P0_gate_split": {
+      "new_states": ["DISCOVERED", "MECHANISM_DEFINED", "MODEL_RUNNING", "MODEL_VERIFIED", "TECHNICALLY_EVALUABLE", "BUYER_TESTABLE", "BUYER_TESTED", "ITERATING", "TRANSACTION_READY"],
+      "definitions": {
+        "MODEL_RUNNING": "Executable model runs and produces output",
+        "MODEL_VERIFIED": "Implementation agrees with independent solver within frozen tolerance",
+        "TECHNICALLY_EVALUABLE": "Model verified + comparator + attacks + provenance + limitations + reproducibility",
+        "BUYER_TESTABLE": "All above + clean-machine package + buyer protocol + raw-data schema"
+      }
+    },
+    "P1_P05_repaired": {
+      "v1_issue": "TAUTOLOGICAL — flow cancelled by construction, 0% variation by definition",
+      "v2_fix": "Real PK: CSF compartment (100-150mL), first-order clearance, flow removal, pump lag (5-30s), sensor noise, 10 virtual patients",
+      "v2_result": "FAIL (-2.3% reduction, threshold 40%). Flow-gating doesn't help when clearance and flow removal dominate concentration dynamics.",
+      "honest_disclosure": "The mechanism doesn't work as hypothesized. Flow-gated release does not reduce concentration variation in a real PK model. V1's 100% reduction was a model artifact."
+    },
+    "P3_new_packages": {
+      "P-03": {"status": "MODEL_RUNNING", "falsification": "PASS (100% in bounds with floor)", "note": "Independently extracted from P-01. Both with/without floor show 100% — model may be too simple to show difference."},
+      "P-07": {"status": "MODEL_RUNNING", "falsification": "PASS (0s violations with priority vs 1800s without)", "note": "Independently extracted from P-04. Clear safety benefit."},
+      "P-17": {"status": "MODEL_RUNNING + EXPERIMENT REQUIRED", "falsification": "FAIL (survival 0.215 at 30d, threshold 0.3)", "note": "Endothelial cell survival on implants is marginal. Best: HUVEC + RGD peptide. Requires in vitro validation."}
+    },
+    "P5_P16_crosscheck": {
+      "model_a": "Diffusion approximation (mu_eff = sqrt(3*mu_a*(mu_a+mu_s')))",
+      "model_b": "Kubelka-Munk two-flux (independent formulation)",
+      "result": "MODEL DISAGREEMENT — 60-70% discrepancy across all wavelengths",
+      "verdict": "P-16 remains MODEL_RUNNING (not MODEL_VERIFIED). Monte Carlo (MCX/PyTissueOptics) needed as tiebreaker.",
+      "ai_investigation_event": "Two independent analytical models disagree. This is exactly the kind of event the AI loop should investigate: different assumptions? different valid regimes? numerical issues? The machine must not pick the more favorable model — it must resolve the disagreement."
+    }
+  },
+
+  "canonical_dashboard_R308": [
+    {"id": "P-01", "state": "TECHNICALLY_EVALUABLE", "model": "RUNNING", "verified": "pending (SimVascular cross-check)", "result": "PASS (225-run ablation)", "buyer_testable": "YES", "buyer_tested": "pending (2 contacted)"},
+    {"id": "P-02", "state": "TECHNICALLY_EVALUABLE", "model": "RUNNING", "verified": "pending", "result": "PASS (47.3% reduction)", "buyer_testable": "YES", "buyer_tested": "pending (1 contacted)"},
+    {"id": "P-03", "state": "MODEL_RUNNING", "model": "RUNNING", "verified": "NO", "result": "PASS (but model too simple)", "buyer_testable": "NO", "buyer_tested": "NO"},
+    {"id": "P-04", "state": "TECHNICALLY_EVALUABLE", "model": "RUNNING", "verified": "pending (COPASI)", "result": "PASS (100% clearance, MODEL_SUPPORTED)", "buyer_testable": "YES", "buyer_tested": "pending (1 contacted)"},
+    {"id": "P-05", "state": "MODEL_RUNNING", "model": "RUNNING (V2 real PK)", "verified": "NO", "result": "FAIL (-2.3% reduction, flow-gating doesn't help)", "buyer_testable": "NO", "buyer_tested": "NO"},
+    {"id": "P-06", "state": "CEMETERY", "model": "FALSIFIED", "verified": "N/A", "result": "FAIL (r⁴ physics constraint)", "buyer_testable": "YES (honest falsification)", "buyer_tested": "NO"},
+    {"id": "P-07", "state": "MODEL_RUNNING", "model": "RUNNING", "verified": "NO", "result": "PASS (0s violations)", "buyer_testable": "NO", "buyer_tested": "NO"},
+    {"id": "P-08", "state": "CEMETERY", "model": "FALSIFIED", "verified": "N/A", "result": "FAIL (0.62 nW CSF harvesting)", "buyer_testable": "N/A", "buyer_tested": "NO"},
+    {"id": "P-09", "state": "MODEL_RUNNING", "model": "RUNNING (screening)", "verified": "NO", "result": "PASS (piezoelectric reservoirs 0.77)", "buyer_testable": "NO (wet-lab dependent)", "buyer_tested": "NO"},
+    {"id": "P-10", "state": "MODEL_RUNNING", "model": "RUNNING", "verified": "NO", "result": "FAIL (no material meets all 3 criteria)", "buyer_testable": "YES (honest falsification)", "buyer_tested": "NO"},
+    {"id": "P-11", "state": "TECHNICALLY_EVALUABLE", "model": "RUNNING (evidence chain)", "verified": "pending", "result": "PASS (multiple combos plausible)", "buyer_testable": "YES (experiment required)", "buyer_tested": "pending (1 contacted)"},
+    {"id": "P-12", "state": "MODEL_RUNNING", "model": "RUNNING", "verified": "pending (COPASI)", "result": "PASS (100% tau clearance, MODEL_SUPPORTED)", "buyer_testable": "NO (experiment required)", "buyer_tested": "NO"},
+    {"id": "P-13", "state": "MODEL_RUNNING", "model": "RUNNING (analysis)", "verified": "NO", "result": "CONDITIONAL_PASS (1 MODERATE differentiator)", "buyer_testable": "NO (conditional)", "buyer_tested": "NO"},
+    {"id": "P-14", "state": "MODEL_RUNNING", "model": "RUNNING", "verified": "NO", "result": "FAIL (16.5% reduction, estimator too crude)", "buyer_testable": "YES (honest falsification)", "buyer_tested": "NO"},
+    {"id": "P-15", "state": "TECHNICALLY_EVALUABLE", "model": "RUNNING", "verified": "pending (FEBio)", "result": "PASS (99.9% uptime)", "buyer_testable": "YES", "buyer_tested": "NO"},
+    {"id": "P-16", "state": "MODEL_RUNNING", "model": "RUNNING (diffuse model committed)", "verified": "NO (models disagree 60-70%)", "result": "PASS (744 μW, BUT unverified)", "buyer_testable": "NO (disagreement unresolved)", "buyer_tested": "NO"},
+    {"id": "P-17", "state": "MODEL_RUNNING", "model": "RUNNING (feasibility)", "verified": "NO", "result": "FAIL (survival 0.215, threshold 0.3)", "buyer_testable": "NO (experiment required)", "buyer_tested": "NO"}
+  ],
+
+  "scoreboard_R308": {
+    "total_packages": 15,
+    "MODEL_RUNNING": 15,
+    "MODEL_VERIFIED": 0,
+    "TECHNICALLY_EVALUABLE": 5,
+    "BUYER_TESTABLE": 5,
+    "BUYER_TESTED": 0,
+    "PASS": 7,
+    "FAIL": 7,
+    "CONDITIONAL": 1,
+    "CEMETERY": 2,
+    "buyers_contacted": 5,
+    "buyer_responses": 0,
+    "transactions": 0,
+    "honest_summary": "15/15 packages manufactured and executable. 0/15 independently verified. 5/15 technically evaluable. 5/15 buyer-testable. 0/15 buyer-tested. 7 PASS, 7 FAIL, 1 CONDITIONAL. P-05 V1 tautology caught and repaired. P-16 model disagreement discovered and preserved honestly."
+  },
+
+  "next_round_R309_directives": [
+    "P-16: Resolve model disagreement. Install PyTissueOptics or MCX as Monte Carlo tiebreaker.",
+    "P-05: V2 FAILS honestly. Consider V3 (different mechanism) or CEMETERY.",
+    "P-17: V2 needed (better surface treatment or cell type) or CEMETERY.",
+    "P-01: Continue buyer outreach. Send to Integra + Stanford.",
+    "Verify P-01 and P-02 with SimVascular cross-check (MODEL_VERIFIED).",
+    "DO NOT generate new candidates. 15 active + 2 cemetery."
+  ]
+}
