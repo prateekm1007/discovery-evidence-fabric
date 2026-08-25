@@ -1,0 +1,153 @@
+{
+  "authority": "CEO R325 §P1/§P2 — bidirectional buyer protocol + simulated buyer return",
+  "timestamp": "2026-08-26T07:10:00Z",
+
+  "protocol_structure": {
+    "OUTBOUND": {
+      "claim": "The hypothesis being tested",
+      "current_evidence": "What the computational model shows",
+      "unknown": "What is NOT known",
+      "protocol": "Exact experimental procedure",
+      "sample_size": "Number of runs/samples",
+      "endpoint": "Measured quantity",
+      "pass": "Pre-registered pass threshold",
+      "fail": "Pre-registered fail threshold",
+      "ambiguous": "Pre-registered ambiguous zone",
+      "cost": "Estimated cost",
+      "timeline": "Estimated duration"
+    },
+    "INBOUND": {
+      "experiment_id": "Unique ID for this experiment execution",
+      "buyer_id": "Who ran it",
+      "protocol_version": "Which version of the protocol",
+      "raw_data_hash": "SHA-256 of raw data file",
+      "raw_data": "Actual measurement data",
+      "analysis_script": "Script used to analyze raw data",
+      "analysis_version": "Version of analysis script",
+      "result": "Numeric result (e.g., mean ICP excursion)",
+      "uncertainty": "Standard error or 95% CI",
+      "protocol_deviation": "Any deviations from protocol",
+      "blinding_status": "Was the evaluator blinded?",
+      "comparator_result": "Result for the comparator arm",
+      "pass_fail_ambiguous": "Machine-determined verdict",
+      "evidence_class": "PHYSICALLY_VALIDATED / FALSIFIED / INSUFFICIENT_RESOLUTION",
+      "provenance": "Full chain: who, when, what equipment, what calibration"
+    },
+    "PROCESSING": "RAW_DATA → INGEST → PROVENANCE_CHECK → EVIDENCE_CLASSIFICATION → CLAIM_UPDATE → STATE_TRANSITION → KNOWLEDGE_ATOM → NEXT_EXPERIMENT"
+  },
+
+  "simulated_buyer_return_P-02": {
+    "experiment": "Bench: adaptive valve vs fixed valve in mock CSF loop",
+    "protocol_version": "P-02-CONTRACT-v1",
+    "outbound": {
+      "claim": "Adaptive valve reduces ICP excursion by 47.3% vs fixed",
+      "pass": "Adaptive < 60% of fixed (≥40% reduction)",
+      "fail": "Adaptive ≥ 80% of fixed (<20% reduction)",
+      "ambiguous": "20-40% reduction"
+    },
+
+    "case_A_PASS": {
+      "synthetic_data": {
+        "adaptive_mean_excursion_mmHg": 8.2,
+        "adaptive_std": 1.1,
+        "fixed_mean_excursion_mmHg": 15.1,
+        "fixed_std": 1.8,
+        "n_runs": 10,
+        "reduction_pct": 45.7
+      },
+      "machine_ingest": {
+        "raw_data_hash": "sha256:simulated_pass_8.2_15.1",
+        "result": "adaptive=8.2±1.1, fixed=15.1±1.8, reduction=45.7%",
+        "uncertainty": "95% CI: [37.2%, 54.2%]",
+        "protocol_deviation": "NONE",
+        "blinding_status": "BLINDED",
+        "pass_fail_ambiguous": "PASS (45.7% reduction, >40% threshold, CI excludes <37%)",
+        "evidence_class": "PHYSICALLY_VALIDATED"
+      },
+      "state_transition": {
+        "from": "EXPERIMENT_READY",
+        "to": "TECHNICALLY_EVALUABLE",
+        "rationale": "Physical bench validation confirms the 47.3% computational prediction within confidence interval (45.7% measured vs 47.3% predicted, well within CI)"
+      },
+      "knowledge_atom_created": {
+        "id": "KA-010",
+        "lesson": "Adaptive valve profile achieves ~46% ICP excursion reduction in bench validation (confirmed computational prediction within CI)",
+        "trigger": "cardiovascular_valve_candidate",
+        "action": "Adaptive valve profile is validated for pre-clinical development"
+      },
+      "next_experiment_selected": {
+        "rationale": "P-02 now TECHNICALLY_EVALUABLE. Next highest-information experiment: P-20 (IL-10 release, $5-10K, 6-8 weeks, HIGH info gain — validates anti-fibrotic mechanism)",
+        "selected": "P-20 IL-10 release assay"
+      }
+    },
+
+    "case_B_FAIL": {
+      "synthetic_data": {
+        "adaptive_mean_excursion_mmHg": 13.8,
+        "adaptive_std": 2.1,
+        "fixed_mean_excursion_mmHg": 15.1,
+        "fixed_std": 1.8,
+        "n_runs": 10,
+        "reduction_pct": 8.6
+      },
+      "machine_ingest": {
+        "result": "adaptive=13.8±2.1, fixed=15.1±1.8, reduction=8.6%",
+        "uncertainty": "95% CI: [-5.2%, 22.4%]",
+        "pass_fail_ambiguous": "FAIL (8.6% reduction, <20% threshold, CI includes 0%)",
+        "evidence_class": "FALSIFIED"
+      },
+      "state_transition": {
+        "from": "EXPERIMENT_READY",
+        "to": "CEMETERY",
+        "rationale": "Physical bench validation contradicts the 47.3% computational prediction. Only 8.6% reduction measured. CI includes 0% (no effect). The computational model was wrong about the valve dynamics."
+      },
+      "knowledge_atom_created": {
+        "id": "KA-011",
+        "lesson": "Adaptive valve profile computational model (47.3% prediction) was falsified by bench measurement (8.6% actual). The model overestimated the valve's ability to track ICP changes in real hardware.",
+        "trigger": "computational_valve_model",
+        "action": "Future valve candidates must include hardware latency in the computational model (real valve response time, not idealized)"
+      },
+      "next_experiment_selected": {
+        "rationale": "P-02 CEMETERY. Next highest-information: P-20 (IL-10 release, still pending, HIGH info gain)",
+        "selected": "P-20 IL-10 release assay"
+      }
+    },
+
+    "case_C_AMBIGUOUS": {
+      "synthetic_data": {
+        "adaptive_mean_excursion_mmHg": 11.2,
+        "adaptive_std": 2.8,
+        "fixed_mean_excursion_mmHg": 15.1,
+        "fixed_std": 1.8,
+        "n_runs": 10,
+        "reduction_pct": 25.8
+      },
+      "machine_ingest": {
+        "result": "adaptive=11.2±2.8, fixed=15.1±1.8, reduction=25.8%",
+        "uncertainty": "95% CI: [8.1%, 43.5%]",
+        "pass_fail_ambiguous": "AMBIGUOUS (25.8% reduction, in 20-40% zone. CI spans both fail and pass thresholds)",
+        "evidence_class": "INSUFFICIENT_RESOLUTION"
+      },
+      "state_transition": {
+        "from": "EXPERIMENT_READY",
+        "to": "EXPERIMENT_READY (repeated with higher n)",
+        "rationale": "Insufficient statistical separation. CI [8.1%, 43.5%] spans both fail (<20%) and pass (>40%) zones. Need more data."
+      },
+      "knowledge_atom_created": {
+        "id": "KA-012",
+        "lesson": "P-02 adaptive valve showed 25.8% reduction but CI was too wide to determine PASS/FAIL. Initial n=10 insufficient for this effect size.",
+        "trigger": "experiment_with_CI_spanning_pass_and_fail",
+        "action": "Calculate required n from observed effect size and variance before repeating. For 25.8% effect with σ=2.8, need n≥30 for 80% power at α=0.05."
+      },
+      "next_experiment_selected": {
+        "rationale": "P-02 AMBIGUOUS → repeat with n=30 (calculated from observed effect size). But P-02 repeat costs $10-20K. Compare to P-20 ($5-10K, HIGH info gain, untested). EIG analysis: P-20 has higher EIG/cost ratio.",
+        "selected": "P-20 IL-10 release assay (higher EIG/cost, then return to P-02 with n=30)",
+        "eign_calculation": {
+          "P-02_repeat": {"cost": "$15K", "info_gain": "MEDIUM (resolves ambiguous, but effect is modest)", "eig_per_cost": "0.4"},
+          "P-20_first": {"cost": "$7.5K", "info_gain": "HIGH (validates completely untested mechanism)", "eig_per_cost": "1.3"},
+          "winner": "P-20"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "manifest_version": "R325-CANONICAL",
+  "authority": "CEO R325 §P0 — frozen portfolio manifest. No prose dashboard may override.",
+  "timestamp": "2026-08-26T07:00:00Z",
+  "source_commit": "1234b78 (R324)",
+
+  "P-01": {
+    "identity": "P-01 — Predictive Occlusion-Isolation Controller",
+    "mechanism": "Multi-segment CSF shunt with Bayesian occlusion prediction and pre-emptive flow redistribution maintaining dual safety invariants (INV-1: ICP in band, INV-2: no path overload)",
+    "current_state": "TECHNOLOGY_TRANSFER_READY",
+    "evidence_classes": ["INSPECTABLE", "REPRODUCIBLE", "INDEPENDENTLY_COMPUTATIONALLY_VALIDATED", "MECHANISM_EXTERNALLY_VERIFIED"],
+    "executable_artifact": "TTP_PACKAGES/P-01_PROTOTYPE/05_simulator.py",
+    "external_solver": "svMultiPhysics (3D Navier-Stokes, candidate-specific execution R318)",
+    "verification_status": "1D model agrees with 3D solver within 16% (frozen 25% criterion). Computationally verified; physical prototype validation outstanding.",
+    "known_failures": ["Strict dual-invariant FALSIFIED (peak 22>20 mmHg)", "24h survival not achieved (both designs break ~14h)", "FDA nozzle benchmark 72% disagreement (but P-01 straight-pipe geometry agrees 16%)"],
+    "unknowns": ["Implantable CSF flow sensor does not exist commercially", "No clinical data", "Real valve dynamics vs simulation"],
+    "buyer_action": "YES — reproduce now. Clone repo, run svMultiPhysics on candidate geometry, compare to 1D model.",
+    "real_world_experiment": "V0 bench prototype: 4-segment shunt + COTS sensors + Arduino ($3-5K, 3-6 months)",
+    "expected_information_gain": "HIGH — directly tests whether multi-segment advantage survives real hardware",
+    "decision_consequences": {"PASS": "Pre-clinical animal study", "FAIL": "REPAIR (increase F_MAX or N_SEGMENTS)", "AMBIGUOUS": "V2 with accumulator buffer"},
+    "knowledge_atoms_consumed": ["KA-001 (1D vs 3D geometry selection)"],
+    "knowledge_atoms_created": [],
+    "next_machine_action": "Await buyer bench result → ingest → state transition"
+  },
+
+  "P-15": {
+    "identity": "P-15 — Self-Powered Sensing (cardiac harvesting + capacitor)",
+    "mechanism": "Cardiac motion energy harvesting (1-40 μW) + 100μF capacitor + duty-cycled sensing (99.9% uptime at P50)",
+    "current_state": "TECHNOLOGY_TRANSFER_READY",
+    "evidence_classes": ["INSPECTABLE", "REPRODUCIBLE"],
+    "executable_artifact": "TTP_PACKAGES/P-15_SELF_POWERED_SENSING/p15_architecture_e.py",
+    "external_solver": "Published reference cross-check (Zurbuchen 2013, 16.7 μW in-vivo). Not external solver execution.",
+    "verification_status": "Computational model reproducible (deterministic, seed=42). Published cross-check confirms harvest assumption. Computational robustness confirmed; physical validation outstanding.",
+    "known_failures": ["Zero-harvest death in 0.1h (no backup battery)"],
+    "unknowns": ["Actual cardiac harvesting in target implant location", "Arrhythmia model (70% reduction) more aggressive than published (10-30%)"],
+    "buyer_action": "YES — reproduce now. Clone, run script, get 99.9% uptime. Then bench-measure cardiac harvesting.",
+    "real_world_experiment": "Bench: cardiac harvesting measurement in target implant geometry ($5-10K)",
+    "expected_information_gain": "HIGH — validates the core energy assumption",
+    "decision_consequences": {"PASS": "Pre-clinical implant", "FAIL": "REPAIR (add backup battery or increase harvest area)", "AMBIGUOUS": "Measure at multiple implant locations"},
+    "knowledge_atoms_consumed": ["KA-005 (metric validity)"],
+    "knowledge_atoms_created": [],
+    "next_machine_action": "Await buyer bench result → ingest → state transition"
+  },
+
+  "P-16": {
+    "identity": "P-16 — NIR Photovoltaic (940nm transcranial power)",
+    "mechanism": "940nm NIR light through scalp/skull to implanted GaAs PV cell. Verified fluence 1.0-1.4 mW/cm² (~1000-1400 μW)",
+    "current_state": "TECHNOLOGY_TRANSFER_READY",
+    "evidence_classes": ["INSPECTABLE", "REPRODUCIBLE", "INDEPENDENTLY_COMPUTATIONALLY_VALIDATED", "MECHANISM_EXTERNALLY_VERIFIED"],
+    "executable_artifact": "scripts/r311/p16_actual_pytissueoptics.py",
+    "external_solver": "ACTUAL PyTissueOptics v2.0.1 (DCC-Lab, pip-installed, CPU Monte Carlo). MCX (GPU) not executed (CUDA constraint).",
+    "verification_status": "Independent Monte Carlo (PyTissueOptics) confirms fluence range. CIs overlap with internal MC. Published Jacques 2013 range confirmed. Computationally verified; experimental tissue measurement outstanding.",
+    "known_failures": ["R308 diffusion approximation (744 μW) was conservative — verified is ~1050 μW", "R310 inter-MC disagreement 35% (explained by Poisson variance, CIs overlap)"],
+    "unknowns": ["MCX GPU verification not executed", "No experimental 940nm tissue measurement in shunt patients", "PyTissueOptics uses Henyey-Greenstein scattering approximation"],
+    "buyer_action": "YES — reproduce now. pip install pytissueoptics, run script, get ~1.4 mW/cm². Then bench: 940nm LED + tissue phantom + PV cell.",
+    "real_world_experiment": "Bench: 940nm LED + 5mm tissue phantom + GaAs PV cell ($2-5K)",
+    "expected_information_gain": "HIGH — validates the optical power budget",
+    "decision_consequences": {"PASS": "Pre-clinical implant design", "FAIL": "REPAIR (different wavelength or PV technology)", "AMBIGUOUS": "Test multiple tissue thicknesses"},
+    "knowledge_atoms_consumed": ["KA-004 (MC required, not analytical)", "KA-005 (metric validity)"],
+    "knowledge_atoms_created": ["KA-004 (analytical optical approximations can disagree 60-70%)"],
+    "next_machine_action": "Await buyer bench result → ingest → state transition"
+  },
+
+  "P-02": {
+    "identity": "P-02 — Adaptive Valve Profile",
+    "mechanism": "Valve that adapts opening profile to ICP trends, reducing ICP excursion",
+    "current_state": "EXPERIMENT_READY",
+    "evidence_classes": ["INSPECTABLE", "REPRODUCIBLE"],
+    "executable_artifact": "R308 model (47.3% ICP offset reduction, MODELLED)",
+    "external_solver": "None (bench experiment is decisive)",
+    "verification_status": "Computational model only. No external solver. No physical validation.",
+    "known_failures": [],
+    "unknowns": ["Real valve dynamics", "Whether 47.3% reduction survives hardware"],
+    "buyer_action": "YES — commission the decisive experiment. Bench: adaptive vs fixed valve in mock CSF loop.",
+    "real_world_experiment": "Bench: adaptive vs fixed valve, 10 runs × 5 postural scenarios ($10-20K, 2-4 weeks)",
+    "expected_information_gain": "HIGH — directly tests the 47.3% claim",
+    "decision_consequences": {"PASS": "TECHNICALLY_EVALUABLE → pre-clinical", "FAIL": "REPAIR (redesign profile) → if fails CEMETERY", "AMBIGUOUS": "Repeat with 20 runs for statistical power"},
+    "knowledge_atoms_consumed": ["KA-005 (metric validity)"],
+    "knowledge_atoms_created": [],
+    "next_machine_action": "SIMULATED BUYER RETURN DEMONSTRATED IN R325 P2"
+  },
+
+  "P-04": {"identity": "P-04 — Catalytic Contact-Time Lock (NEP enzyme)", "current_state": "EXPERIMENT_READY", "evidence_classes": ["INSPECTABLE", "REPRODUCIBLE"], "buyer_action": "YES — commission: in vitro NEP Aβ clearance ($15-30K)", "next_machine_action": "Await buyer result"},
+  "P-07": {"identity": "P-07 — Drainage-Priority Safety Floor", "current_state": "EXPERIMENT_READY", "evidence_classes": ["INSPECTABLE", "REPRODUCIBLE"], "buyer_action": "YES — commission: bench obstruction test ($5-10K)", "next_machine_action": "Await buyer result"},
+  "P-09": {"identity": "P-09 — Chemical ICP Transduction", "current_state": "EVALUATION_READY", "evidence_classes": ["INSPECTABLE"], "buyer_action": "YES — inspect but molecule not designed. Chemistry program needed ($1-5M, 12-24 months)", "next_machine_action": "Await molecule design"},
+  "P-10": {"identity": "P-10 — Phase-Change Valve (n-octadecane)", "current_state": "EXPERIMENT_READY", "evidence_classes": ["INSPECTABLE", "REPRODUCIBLE"], "buyer_action": "YES — commission: bench valve response time ($5-10K)", "next_machine_action": "Await buyer result"},
+  "P-11": {"identity": "P-11 — Phage Anti-Biofilm", "current_state": "EXPERIMENT_READY", "evidence_classes": ["INSPECTABLE", "REPRODUCIBLE"], "buyer_action": "YES — commission: in vitro biofilm assay ($10-20K)", "next_machine_action": "Await buyer result"},
+  "P-12": {"identity": "P-12 — Enzymatic Tau Clearance (Cathepsin D)", "current_state": "EXPERIMENT_READY", "evidence_classes": ["INSPECTABLE", "REPRODUCIBLE"], "buyer_action": "YES — commission: in vitro tau assay ($15-25K)", "next_machine_action": "Await buyer result"},
+  "P-13": {"identity": "P-13 — Neuromorphic Shunt Failure Predictor", "current_state": "EXPERIMENT_READY", "evidence_classes": ["INSPECTABLE", "REPRODUCIBLE"], "buyer_action": "YES — commission: retrospective clinical data ($5-15K)", "next_machine_action": "Await buyer result"},
+  "P-20": {"identity": "P-20 — Adaptive Glycan Immune Tolerance Surface", "current_state": "EXPERIMENT_READY", "evidence_classes": ["INSPECTABLE", "REPRODUCIBLE"], "buyer_action": "YES — commission: in vitro IL-10 release 30 days ($5-10K)", "next_machine_action": "Await buyer result"},
+
+  "P-14": {"identity": "P-14 — Yield-Matched Drainage (CEMETERY)", "current_state": "CEMETERY", "cause": "CSF flow noise limits yield estimation to ~18% (SNR<2)", "negative_knowledge": "Future yield-matching candidates must calculate SNR before manufacturing", "future_prohibition": "Do not manufacture yield-matching candidates with SNR<2"},
+  "P-17": {"identity": "P-17 — Biohybrid Endothelial Monolayer (CEMETERY)", "current_state": "CEMETERY", "cause": "Endothelial cells cannot survive in CSF (no blood perfusion, insufficient nutrients)", "negative_knowledge": "Future biohybrid surfaces must use CSF-adapted cell types or synthetic alternatives", "future_prohibition": "Do not manufacture cellular surfaces for CSF without verifying cell viability in CSF-like conditions"},
+  "P-19": {"identity": "P-19 — Distributed Micro-Shunt Swarm (CEMETERY)", "current_state": "CEMETERY", "cause": "Distributed architecture falsified under conductance-matched 3D Navier-Stokes. Single channel BEATS distributed at matched baseline.", "negative_knowledge": "Distributed channels do NOT provide resilience beyond conductance matching. 1D Poiseuille insufficient for this comparison.", "future_prohibition": "Do not manufacture distributed-channel candidates without conductance-matched 3D verification (KA-009)"},
+
+  "VACANCY": {"slot": 15, "status": "EXPLICIT VACANCY", "rationale": "Reservoir exhausted. No credible replacement. 14 active with honest states > 15 with weak candidate."}
+}
