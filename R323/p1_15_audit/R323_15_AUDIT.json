@@ -1,0 +1,1279 @@
+{
+  "timestamp": "2026-08-25T22:54:08.636887+00:00",
+  "fields": [
+    "mechanism",
+    "executable_artifact",
+    "inputs",
+    "outputs",
+    "comparator",
+    "falsification_criterion",
+    "metric_validity",
+    "attack_suite",
+    "parameter_uncertainty",
+    "convergence",
+    "external_solver",
+    "independent_validation",
+    "physical_validation",
+    "provenance",
+    "reproduction",
+    "limitations",
+    "decisive_next_experiment",
+    "commercial_use_case",
+    "economic_evidence_class",
+    "transfer_package",
+    "terminal_state"
+  ],
+  "candidates": {
+    "P-01": {
+      "mechanism": [
+        "PASS",
+        "R310/p01_ttp/technology/mechanism.md"
+      ],
+      "executable_artifact": [
+        "PASS",
+        "TTP_PACKAGES/P-01_PROTOTYPE/05_simulator.py"
+      ],
+      "inputs": [
+        "PASS",
+        "TTP_PACKAGES/P-01_PROTOTYPE/01_hydraulic_architecture.json"
+      ],
+      "outputs": [
+        "PASS",
+        "TTP_PACKAGES/P-01_PROTOTYPE/p01_simulator_results_ALLSCENARIOS.json"
+      ],
+      "comparator": [
+        "PASS",
+        "R310/p01_ttp/technology/architecture.md (single-segment baseline)"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "TTP_PACKAGES/P-01_PROTOTYPE/08_acceptance_criteria.json"
+      ],
+      "metric_validity": [
+        "PASS",
+        "R314/metric_validity_gate/METRIC_VALIDITY_GATE.json (peak ICP \u2014 clinical relevance)"
+      ],
+      "attack_suite": [
+        "PASS",
+        "TTP_PACKAGES/P-01_PROTOTYPE/07_test_fixtures.json (225 ablations)"
+      ],
+      "parameter_uncertainty": [
+        "PASS",
+        "R318/p01_svmp_candidate/P-01_SVMULTIPHYSICS_VERIFIED.json (1D vs 3D, 16% agreement)"
+      ],
+      "convergence": [
+        "PASS",
+        "R318/p01_svmp_candidate/P-01_SVMULTIPHYSICS_VERIFIED.json (svMultiPhysics converged every step)"
+      ],
+      "external_solver": [
+        "PASS",
+        "R318/p01_svmp_candidate/P-01_SVMULTIPHYSICS_VERIFIED.json (svMultiPhysics 3D Navier-Stokes)"
+      ],
+      "independent_validation": [
+        "PASS",
+        "ACTUAL svMultiPhysics (SimVascular, different author)"
+      ],
+      "physical_validation": [
+        "FAIL",
+        "No physical bench prototype built"
+      ],
+      "provenance": [
+        "PASS",
+        "R310/p01_ttp/evidence/provenance/ai_loop_provenance.json"
+      ],
+      "reproduction": [
+        "PASS",
+        "R310/p01_ttp/transfer/reproduction.md + R318/p01_svmp_candidate/mesh/"
+      ],
+      "limitations": [
+        "PASS",
+        "R310/p01_ttp/technology/known_limitations.md"
+      ],
+      "decisive_next_experiment": [
+        "NOT_APPLICABLE",
+        "TTR \u2014 no decisive experiment needed for transfer"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "R310/p01_ttp/commercial/executive_brief.md"
+      ],
+      "economic_evidence_class": [
+        "PASS",
+        "MODELLED (R310/p01_ttp/economics/value_model.md)"
+      ],
+      "transfer_package": [
+        "PASS",
+        "R310/p01_ttp/manifest.json (20/20 criteria)"
+      ],
+      "terminal_state": "TECHNOLOGY_TRANSFER_READY"
+    },
+    "P-15": {
+      "mechanism": [
+        "PASS",
+        "TTP_PACKAGES/P-15_SELF_POWERED_SENSING/p15_architecture_e.py"
+      ],
+      "executable_artifact": [
+        "PASS",
+        "TTP_PACKAGES/P-15_SELF_POWERED_SENSING/p15_architecture_e.py"
+      ],
+      "inputs": [
+        "PASS",
+        "HARVESTING_SCENARIOS P5/P50/P95 in script header"
+      ],
+      "outputs": [
+        "PASS",
+        "TTP_PACKAGES/P-15_SELF_POWERED_SENSING/p15_results_R306.json"
+      ],
+      "comparator": [
+        "PASS",
+        "Battery-powered implant (5-year replacement)"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "P50 uptime >= 95%"
+      ],
+      "metric_validity": [
+        "PASS",
+        "R314/metric_validity_gate/ (uptime \u2014 physical meaning, comparator sensitive)"
+      ],
+      "attack_suite": [
+        "PASS",
+        "R313/p15_power_envelope/ (96-point envelope + 5 failure modes)"
+      ],
+      "parameter_uncertainty": [
+        "PASS",
+        "P5/P50/P95 + arrhythmia + leakage + duty cycle"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "Deterministic model (no iterative solver)"
+      ],
+      "external_solver": [
+        "PARTIAL",
+        "Published reference cross-check (Zurbuchen 2013) \u2014 not external solver execution"
+      ],
+      "independent_validation": [
+        "FAIL",
+        "Same-author reimplementation only. Not independently computed by external party."
+      ],
+      "physical_validation": [
+        "FAIL",
+        "No physical measurement of cardiac harvesting"
+      ],
+      "provenance": [
+        "PASS",
+        "R312/p15_energy_model/ \u2192 R313/p15_power_envelope/ \u2192 R314/p15_buyer_envelope/"
+      ],
+      "reproduction": [
+        "PASS",
+        "R320/p15_p16_reproduction/CLEAN_MACHINE_REPRODUCTION.json (deterministic, seed=42)"
+      ],
+      "limitations": [
+        "PASS",
+        "R314/p15_buyer_envelope/P-15_BUYER_ENVELOPE.json (arrhythmia model more aggressive than published)"
+      ],
+      "decisive_next_experiment": [
+        "PASS",
+        "Bench prototype cardiac harvesting measurement ($5-10K)"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "Self-powered sensing eliminates battery replacement"
+      ],
+      "economic_evidence_class": [
+        "PASS",
+        "MODELLED (operating envelope with SAFE/MARGINAL/UNSAFE)"
+      ],
+      "transfer_package": [
+        "PASS",
+        "R314/p15_buyer_envelope/P-15_BUYER_ENVELOPE.json"
+      ],
+      "terminal_state": "TECHNOLOGY_TRANSFER_READY"
+    },
+    "P-16": {
+      "mechanism": [
+        "PASS",
+        "NIR photovoltaic at 940nm through tissue"
+      ],
+      "executable_artifact": [
+        "PASS",
+        "scripts/r311/p16_actual_pytissueoptics.py"
+      ],
+      "inputs": [
+        "PASS",
+        "940nm, 5mm tissue, mu_a=0.005/mm, mu_s'=0.08/mm, g=0.9, n=1.4"
+      ],
+      "outputs": [
+        "PASS",
+        "R312/p16_convergence/P-16-VERIF-004_RESULT.json"
+      ],
+      "comparator": [
+        "PASS",
+        "Diffusion approximation + Kubelka-Munk (both invalidated)"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "MC fluence within published Jacques 2013 range"
+      ],
+      "metric_validity": [
+        "PASS",
+        "Fluence at detector \u2014 direct physical measurement"
+      ],
+      "attack_suite": [
+        "PASS",
+        "R310/p16_disagreement/ (4-model disagreement map)"
+      ],
+      "parameter_uncertainty": [
+        "PASS",
+        "R312/p16_convergence/ (20k\u219250k convergence, CIs overlap)"
+      ],
+      "convergence": [
+        "PASS",
+        "R312/p16_convergence/ (CIs overlap at 50k photons)"
+      ],
+      "external_solver": [
+        "PASS",
+        "ACTUAL PyTissueOptics v2.0.1 (DCC-Lab, pip-installed)"
+      ],
+      "independent_validation": [
+        "PASS",
+        "PyTissueOptics is genuinely independent (different author, different codebase)"
+      ],
+      "physical_validation": [
+        "FAIL",
+        "No experimental tissue measurement"
+      ],
+      "provenance": [
+        "PASS",
+        "R308\u2192R310\u2192R311\u2192R312 artifact chain"
+      ],
+      "reproduction": [
+        "PASS",
+        "R320/p15_p16_reproduction/ (pip install, deterministic seed)"
+      ],
+      "limitations": [
+        "PASS",
+        "MCX/GPU not run. Henyey-Greenstein approximation documented. 20-50k photons (MC variance)."
+      ],
+      "decisive_next_experiment": [
+        "PASS",
+        "Bench: 940nm LED + tissue phantom + PV cell ($2-5K)"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "Self-powered implant via transcranial NIR"
+      ],
+      "economic_evidence_class": [
+        "PASS",
+        "MODELLED (verified ~1050 \u03bcW range)"
+      ],
+      "transfer_package": [
+        "PASS",
+        "Verified range 1.0-1.4 mW/cm\u00b2, reproduction package"
+      ],
+      "terminal_state": "TECHNOLOGY_TRANSFER_READY"
+    },
+    "P-02": {
+      "mechanism": [
+        "PASS",
+        "Adaptive valve profile"
+      ],
+      "executable_artifact": [
+        "PASS",
+        "Computational model exists"
+      ],
+      "inputs": [
+        "PASS",
+        "Defined in model"
+      ],
+      "outputs": [
+        "PASS",
+        "Model produces results"
+      ],
+      "comparator": [
+        "PASS",
+        "Standard catheter/valve"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "metric_validity": [
+        "PASS",
+        "R314/metric_validity_gate/"
+      ],
+      "attack_suite": [
+        "PARTIAL",
+        "Some have attack suites, some need expansion"
+      ],
+      "parameter_uncertainty": [
+        "UNKNOWN",
+        "Not all have uncertainty quantified"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "No external solver (experiment required)"
+      ],
+      "external_solver": [
+        "FAIL",
+        "No external solver \u2014 wet-lab/bench required"
+      ],
+      "independent_validation": [
+        "FAIL",
+        "No independent computational validation"
+      ],
+      "physical_validation": [
+        "FAIL",
+        "Experiment not yet executed"
+      ],
+      "provenance": [
+        "PASS",
+        "Artifact chain from R308+"
+      ],
+      "reproduction": [
+        "PASS",
+        "Computational model reproducible"
+      ],
+      "limitations": [
+        "PASS",
+        "Wet-lab dependency documented"
+      ],
+      "decisive_next_experiment": [
+        "PASS",
+        "Bench: adaptive vs fixed valve ($10-20K)"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "economic_evidence_class": [
+        "PASS",
+        "MODELLED"
+      ],
+      "transfer_package": [
+        "PASS",
+        "R320/p7_decision_consequences/ (PASS/FAIL/AMBIGUOUS)"
+      ],
+      "terminal_state": "EXPERIMENT_READY"
+    },
+    "P-04": {
+      "mechanism": [
+        "PASS",
+        "Catalytic A\u03b2 clearance (NEP)"
+      ],
+      "executable_artifact": [
+        "PASS",
+        "Computational model exists"
+      ],
+      "inputs": [
+        "PASS",
+        "Defined in model"
+      ],
+      "outputs": [
+        "PASS",
+        "Model produces results"
+      ],
+      "comparator": [
+        "PASS",
+        "Standard catheter/valve"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "metric_validity": [
+        "PASS",
+        "R314/metric_validity_gate/"
+      ],
+      "attack_suite": [
+        "PARTIAL",
+        "Some have attack suites, some need expansion"
+      ],
+      "parameter_uncertainty": [
+        "UNKNOWN",
+        "Not all have uncertainty quantified"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "No external solver (experiment required)"
+      ],
+      "external_solver": [
+        "FAIL",
+        "No external solver \u2014 wet-lab/bench required"
+      ],
+      "independent_validation": [
+        "FAIL",
+        "No independent computational validation"
+      ],
+      "physical_validation": [
+        "FAIL",
+        "Experiment not yet executed"
+      ],
+      "provenance": [
+        "PASS",
+        "Artifact chain from R308+"
+      ],
+      "reproduction": [
+        "PASS",
+        "Computational model reproducible"
+      ],
+      "limitations": [
+        "PASS",
+        "Wet-lab dependency documented"
+      ],
+      "decisive_next_experiment": [
+        "PASS",
+        "In vitro: NEP catheter in A\u03b2-spiked aCSF ($15-30K)"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "economic_evidence_class": [
+        "PASS",
+        "MODELLED"
+      ],
+      "transfer_package": [
+        "PASS",
+        "R320/p7_decision_consequences/ (PASS/FAIL/AMBIGUOUS)"
+      ],
+      "terminal_state": "EXPERIMENT_READY"
+    },
+    "P-07": {
+      "mechanism": [
+        "PASS",
+        "Drainage-priority safety floor"
+      ],
+      "executable_artifact": [
+        "PASS",
+        "Computational model exists"
+      ],
+      "inputs": [
+        "PASS",
+        "Defined in model"
+      ],
+      "outputs": [
+        "PASS",
+        "Model produces results"
+      ],
+      "comparator": [
+        "PASS",
+        "Standard catheter/valve"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "metric_validity": [
+        "PASS",
+        "R314/metric_validity_gate/"
+      ],
+      "attack_suite": [
+        "PARTIAL",
+        "Some have attack suites, some need expansion"
+      ],
+      "parameter_uncertainty": [
+        "UNKNOWN",
+        "Not all have uncertainty quantified"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "No external solver (experiment required)"
+      ],
+      "external_solver": [
+        "FAIL",
+        "No external solver \u2014 wet-lab/bench required"
+      ],
+      "independent_validation": [
+        "FAIL",
+        "No independent computational validation"
+      ],
+      "physical_validation": [
+        "FAIL",
+        "Experiment not yet executed"
+      ],
+      "provenance": [
+        "PASS",
+        "Artifact chain from R308+"
+      ],
+      "reproduction": [
+        "PASS",
+        "Computational model reproducible"
+      ],
+      "limitations": [
+        "PASS",
+        "Wet-lab dependency documented"
+      ],
+      "decisive_next_experiment": [
+        "PASS",
+        "Bench: obstruction with/without floor ($5-10K)"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "economic_evidence_class": [
+        "PASS",
+        "MODELLED"
+      ],
+      "transfer_package": [
+        "PASS",
+        "R320/p7_decision_consequences/ (PASS/FAIL/AMBIGUOUS)"
+      ],
+      "terminal_state": "EXPERIMENT_READY"
+    },
+    "P-10": {
+      "mechanism": [
+        "PASS",
+        "Phase-change valve (n-octadecane)"
+      ],
+      "executable_artifact": [
+        "PASS",
+        "Computational model exists"
+      ],
+      "inputs": [
+        "PASS",
+        "Defined in model"
+      ],
+      "outputs": [
+        "PASS",
+        "Model produces results"
+      ],
+      "comparator": [
+        "PASS",
+        "Standard catheter/valve"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "metric_validity": [
+        "PASS",
+        "R314/metric_validity_gate/"
+      ],
+      "attack_suite": [
+        "PARTIAL",
+        "Some have attack suites, some need expansion"
+      ],
+      "parameter_uncertainty": [
+        "UNKNOWN",
+        "Not all have uncertainty quantified"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "No external solver (experiment required)"
+      ],
+      "external_solver": [
+        "FAIL",
+        "No external solver \u2014 wet-lab/bench required"
+      ],
+      "independent_validation": [
+        "FAIL",
+        "No independent computational validation"
+      ],
+      "physical_validation": [
+        "FAIL",
+        "Experiment not yet executed"
+      ],
+      "provenance": [
+        "PASS",
+        "Artifact chain from R308+"
+      ],
+      "reproduction": [
+        "PASS",
+        "Computational model reproducible"
+      ],
+      "limitations": [
+        "PASS",
+        "Wet-lab dependency documented"
+      ],
+      "decisive_next_experiment": [
+        "PASS",
+        "Bench: valve response time ($5-10K)"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "economic_evidence_class": [
+        "PASS",
+        "MODELLED"
+      ],
+      "transfer_package": [
+        "PASS",
+        "R320/p7_decision_consequences/ (PASS/FAIL/AMBIGUOUS)"
+      ],
+      "terminal_state": "EXPERIMENT_READY"
+    },
+    "P-11": {
+      "mechanism": [
+        "PASS",
+        "Phage anti-biofilm"
+      ],
+      "executable_artifact": [
+        "PASS",
+        "Computational model exists"
+      ],
+      "inputs": [
+        "PASS",
+        "Defined in model"
+      ],
+      "outputs": [
+        "PASS",
+        "Model produces results"
+      ],
+      "comparator": [
+        "PASS",
+        "Standard catheter/valve"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "metric_validity": [
+        "PASS",
+        "R314/metric_validity_gate/"
+      ],
+      "attack_suite": [
+        "PARTIAL",
+        "Some have attack suites, some need expansion"
+      ],
+      "parameter_uncertainty": [
+        "UNKNOWN",
+        "Not all have uncertainty quantified"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "No external solver (experiment required)"
+      ],
+      "external_solver": [
+        "FAIL",
+        "No external solver \u2014 wet-lab/bench required"
+      ],
+      "independent_validation": [
+        "FAIL",
+        "No independent computational validation"
+      ],
+      "physical_validation": [
+        "FAIL",
+        "Experiment not yet executed"
+      ],
+      "provenance": [
+        "PASS",
+        "Artifact chain from R308+"
+      ],
+      "reproduction": [
+        "PASS",
+        "Computational model reproducible"
+      ],
+      "limitations": [
+        "PASS",
+        "Wet-lab dependency documented"
+      ],
+      "decisive_next_experiment": [
+        "PASS",
+        "In vitro: phage-coated vs S. aureus ($10-20K)"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "economic_evidence_class": [
+        "PASS",
+        "MODELLED"
+      ],
+      "transfer_package": [
+        "PASS",
+        "R320/p7_decision_consequences/ (PASS/FAIL/AMBIGUOUS)"
+      ],
+      "terminal_state": "EXPERIMENT_READY"
+    },
+    "P-12": {
+      "mechanism": [
+        "PASS",
+        "Enzymatic tau clearance (Cathepsin D)"
+      ],
+      "executable_artifact": [
+        "PASS",
+        "Computational model exists"
+      ],
+      "inputs": [
+        "PASS",
+        "Defined in model"
+      ],
+      "outputs": [
+        "PASS",
+        "Model produces results"
+      ],
+      "comparator": [
+        "PASS",
+        "Standard catheter/valve"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "metric_validity": [
+        "PASS",
+        "R314/metric_validity_gate/"
+      ],
+      "attack_suite": [
+        "PARTIAL",
+        "Some have attack suites, some need expansion"
+      ],
+      "parameter_uncertainty": [
+        "UNKNOWN",
+        "Not all have uncertainty quantified"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "No external solver (experiment required)"
+      ],
+      "external_solver": [
+        "FAIL",
+        "No external solver \u2014 wet-lab/bench required"
+      ],
+      "independent_validation": [
+        "FAIL",
+        "No independent computational validation"
+      ],
+      "physical_validation": [
+        "FAIL",
+        "Experiment not yet executed"
+      ],
+      "provenance": [
+        "PASS",
+        "Artifact chain from R308+"
+      ],
+      "reproduction": [
+        "PASS",
+        "Computational model reproducible"
+      ],
+      "limitations": [
+        "PASS",
+        "Wet-lab dependency documented"
+      ],
+      "decisive_next_experiment": [
+        "PASS",
+        "In vitro: enzyme-coated in tau-spiked aCSF ($15-25K)"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "economic_evidence_class": [
+        "PASS",
+        "MODELLED"
+      ],
+      "transfer_package": [
+        "PASS",
+        "R320/p7_decision_consequences/ (PASS/FAIL/AMBIGUOUS)"
+      ],
+      "terminal_state": "EXPERIMENT_READY"
+    },
+    "P-13": {
+      "mechanism": [
+        "PASS",
+        "Neuromorphic shunt failure predictor"
+      ],
+      "executable_artifact": [
+        "PASS",
+        "Computational model exists"
+      ],
+      "inputs": [
+        "PASS",
+        "Defined in model"
+      ],
+      "outputs": [
+        "PASS",
+        "Model produces results"
+      ],
+      "comparator": [
+        "PASS",
+        "Standard catheter/valve"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "metric_validity": [
+        "PASS",
+        "R314/metric_validity_gate/"
+      ],
+      "attack_suite": [
+        "PARTIAL",
+        "Some have attack suites, some need expansion"
+      ],
+      "parameter_uncertainty": [
+        "UNKNOWN",
+        "Not all have uncertainty quantified"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "No external solver (experiment required)"
+      ],
+      "external_solver": [
+        "FAIL",
+        "No external solver \u2014 wet-lab/bench required"
+      ],
+      "independent_validation": [
+        "FAIL",
+        "No independent computational validation"
+      ],
+      "physical_validation": [
+        "FAIL",
+        "Experiment not yet executed"
+      ],
+      "provenance": [
+        "PASS",
+        "Artifact chain from R308+"
+      ],
+      "reproduction": [
+        "PASS",
+        "Computational model reproducible"
+      ],
+      "limitations": [
+        "PASS",
+        "Wet-lab dependency documented"
+      ],
+      "decisive_next_experiment": [
+        "PASS",
+        "Retrospective: train on clinical data ($5-15K)"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "economic_evidence_class": [
+        "PASS",
+        "MODELLED"
+      ],
+      "transfer_package": [
+        "PASS",
+        "R320/p7_decision_consequences/ (PASS/FAIL/AMBIGUOUS)"
+      ],
+      "terminal_state": "EXPERIMENT_READY"
+    },
+    "P-20": {
+      "mechanism": [
+        "PASS",
+        "Glycan immune tolerance + IL-10 release"
+      ],
+      "executable_artifact": [
+        "PASS",
+        "Computational model exists"
+      ],
+      "inputs": [
+        "PASS",
+        "Defined in model"
+      ],
+      "outputs": [
+        "PASS",
+        "Model produces results"
+      ],
+      "comparator": [
+        "PASS",
+        "Standard catheter/valve"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "metric_validity": [
+        "PASS",
+        "R314/metric_validity_gate/"
+      ],
+      "attack_suite": [
+        "PARTIAL",
+        "Some have attack suites, some need expansion"
+      ],
+      "parameter_uncertainty": [
+        "UNKNOWN",
+        "Not all have uncertainty quantified"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "No external solver (experiment required)"
+      ],
+      "external_solver": [
+        "FAIL",
+        "No external solver \u2014 wet-lab/bench required"
+      ],
+      "independent_validation": [
+        "FAIL",
+        "No independent computational validation"
+      ],
+      "physical_validation": [
+        "FAIL",
+        "Experiment not yet executed"
+      ],
+      "provenance": [
+        "PASS",
+        "Artifact chain from R308+"
+      ],
+      "reproduction": [
+        "PASS",
+        "Computational model reproducible"
+      ],
+      "limitations": [
+        "PASS",
+        "Wet-lab dependency documented"
+      ],
+      "decisive_next_experiment": [
+        "PASS",
+        "In vitro: IL-10 release in aCSF ($5-10K)"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "R319/p6_experiment_packages/"
+      ],
+      "economic_evidence_class": [
+        "PASS",
+        "MODELLED"
+      ],
+      "transfer_package": [
+        "PASS",
+        "R320/p7_decision_consequences/ (PASS/FAIL/AMBIGUOUS)"
+      ],
+      "terminal_state": "EXPERIMENT_READY"
+    },
+    "P-09": {
+      "mechanism": [
+        "PASS",
+        "Chemical ICP transduction"
+      ],
+      "executable_artifact": [
+        "PARTIAL",
+        "Architecture concept only (9-step spec, 0/9 resolved)"
+      ],
+      "inputs": [
+        "UNKNOWN",
+        "Molecule not designed"
+      ],
+      "outputs": [
+        "UNKNOWN",
+        "No model output (no molecule)"
+      ],
+      "comparator": [
+        "PASS",
+        "Electronic ICP sensors (Codman)"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "Signal-to-noise > 3 at 1 mmHg"
+      ],
+      "metric_validity": [
+        "PASS",
+        "ICP-dependent signal \u2014 direct clinical relevance"
+      ],
+      "attack_suite": [
+        "FAIL",
+        "No attack suite (no molecule to attack)"
+      ],
+      "parameter_uncertainty": [
+        "UNKNOWN",
+        "Cannot quantify without molecule"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "No computational model"
+      ],
+      "external_solver": [
+        "NOT_APPLICABLE",
+        "Chemistry problem, not simulation"
+      ],
+      "independent_validation": [
+        "FAIL",
+        "No validation possible without molecule"
+      ],
+      "physical_validation": [
+        "FAIL",
+        "Molecule not synthesized"
+      ],
+      "provenance": [
+        "PASS",
+        "R277 architecture concept \u2192 R322 chemistry package"
+      ],
+      "reproduction": [
+        "FAIL",
+        "Cannot reproduce (no molecule)"
+      ],
+      "limitations": [
+        "PASS",
+        "R321/p4_p01_final/R321_FINAL_AUDITS.json (P7 chemistry package)"
+      ],
+      "decisive_next_experiment": [
+        "PASS",
+        "Molecule design + synthesis ($1-5M, 12-24 months)"
+      ],
+      "commercial_use_case": [
+        "PASS",
+        "Chemical ICP sensing eliminates electronic implant"
+      ],
+      "economic_evidence_class": [
+        "FAIL",
+        "Cannot estimate (no molecule)"
+      ],
+      "transfer_package": [
+        "PASS",
+        "R321 chemistry decision package complete"
+      ],
+      "terminal_state": "EVALUATION_READY"
+    },
+    "P-14": {
+      "terminal_state": "CEMETERY",
+      "mechanism": [
+        "PASS",
+        "Documented in cemetery entry"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "Frozen and executed"
+      ],
+      "limitations": [
+        "PASS",
+        "Reusable negative knowledge: CSF noise floor (~18%)"
+      ],
+      "transfer_package": [
+        "PASS",
+        "Cemetery entry with negative knowledge"
+      ],
+      "executable_artifact": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "inputs": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "outputs": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "comparator": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "metric_validity": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "attack_suite": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "parameter_uncertainty": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "external_solver": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "independent_validation": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "physical_validation": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "provenance": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "reproduction": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "decisive_next_experiment": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "commercial_use_case": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "economic_evidence_class": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ]
+    },
+    "P-17": {
+      "terminal_state": "CEMETERY",
+      "mechanism": [
+        "PASS",
+        "Documented in cemetery entry"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "Frozen and executed"
+      ],
+      "limitations": [
+        "PASS",
+        "Reusable negative knowledge: Endothelial CSF viability"
+      ],
+      "transfer_package": [
+        "PASS",
+        "Cemetery entry with negative knowledge"
+      ],
+      "executable_artifact": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "inputs": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "outputs": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "comparator": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "metric_validity": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "attack_suite": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "parameter_uncertainty": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "external_solver": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "independent_validation": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "physical_validation": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "provenance": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "reproduction": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "decisive_next_experiment": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "commercial_use_case": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "economic_evidence_class": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ]
+    },
+    "P-19": {
+      "terminal_state": "CEMETERY",
+      "mechanism": [
+        "PASS",
+        "Documented in cemetery entry"
+      ],
+      "falsification_criterion": [
+        "PASS",
+        "Frozen and executed"
+      ],
+      "limitations": [
+        "PASS",
+        "Reusable negative knowledge: Conductance-matched falsification"
+      ],
+      "transfer_package": [
+        "PASS",
+        "Cemetery entry with negative knowledge"
+      ],
+      "executable_artifact": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "inputs": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "outputs": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "comparator": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "metric_validity": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "attack_suite": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "parameter_uncertainty": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "convergence": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "external_solver": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "independent_validation": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "physical_validation": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "provenance": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "reproduction": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "decisive_next_experiment": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "commercial_use_case": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ],
+      "economic_evidence_class": [
+        "NOT_APPLICABLE",
+        "CEMETERY"
+      ]
+    }
+  },
+  "summary": {
+    "TECHNOLOGY_TRANSFER_READY": 3,
+    "EXPERIMENT_READY": 8,
+    "EVALUATION_READY": 1,
+    "CEMETERY": 3
+  }
+}

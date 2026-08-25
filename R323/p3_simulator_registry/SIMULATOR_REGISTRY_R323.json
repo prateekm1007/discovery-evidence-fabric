@@ -1,0 +1,57 @@
+{
+  "authority": "CEO R323 §P3 — simulator registry with evidence classes",
+  "timestamp": "2026-08-26T06:10:00Z",
+
+  "domains": {
+    "cardiovascular_CFD": {
+      "best_external_solver": "svMultiPhysics (SimVascular)",
+      "why": "Open-source parallel FEM solver for incompressible Navier-Stokes, FSI, RCR boundary conditions. Official test suite with reference cases. Extracted and executed in this environment (R317-R322).",
+      "unavailable": "NO — successfully installed via Docker layer extraction + micromamba MPI",
+      "fallback": "1D scipy ODE (INSUFFICIENT for comparative experiments — P-19 falsification showed 1D can reverse conclusion)",
+      "evidence_class": "INDEPENDENT_COMPUTATIONALLY_VALIDATED when executed on candidate geometry",
+      "applies_to": ["P-01", "P-02", "P-07", "P-10", "P-14 (cemetery)", "P-19 (cemetery)"]
+    },
+    "tissue_optics": {
+      "best_external_solver": "PyTissueOptics + MCX",
+      "why": "PyTissueOptics: 3D Monte Carlo, pip-installable, CPU mode. MCX: GPU Monte Carlo gold standard.",
+      "unavailable": "PARTIAL — PyTissueOptics available (R311+). MCX blocked (no CUDA GPU).",
+      "fallback": "Analytical approximations (diffusion, Kubelka-Munk) — INSUFFICIENT (R310 showed 60-70% disagreement)",
+      "evidence_class": "INDEPENDENTLY_VALIDATED (PyTissueOptics is genuinely independent). MCX would strengthen to MECHANISM_EXTERNALLY_VERIFIED.",
+      "applies_to": ["P-16"]
+    },
+    "biomechanics_FEA": {
+      "best_external_solver": "FEBio",
+      "why": "Open-source biomechanics FEA with 140+ verification problems. Soft tissue, porous media, contact mechanics.",
+      "unavailable": "YES — cannot install (no Docker image found, no pip, no build toolchain for C++/MPI/PETSc)",
+      "fallback": "scipy ODE for simplified mechanics (INSUFFICIENT for full FEA verification)",
+      "evidence_class": "EXTERNAL_SOLVER_UNAVAILABLE",
+      "applies_to": ["P-10", "P-17 (cemetery)"]
+    },
+    "biochemical_kinetics": {
+      "best_external_solver": "COPASI",
+      "why": "Open-source ODE/SDE/Gillespie biochemical simulator with parameter estimation.",
+      "unavailable": "YES — not installed (would need pip or binary). COPASI 4.46 available for download.",
+      "fallback": "scipy.solve_ivp with LSODA (mathematically equivalent for ODE systems, but not the established external engine)",
+      "evidence_class": "EXTERNAL_SOLVER_UNAVAILABLE (scipy fallback used for P-05, documented as deviation)",
+      "applies_to": ["P-04", "P-05 (cemetery)", "P-12", "P-20"]
+    },
+    "statistical_ML": {
+      "best_external_solver": "scikit-learn + reproducible seed protocol",
+      "why": "Established ML library with cross-validation, reproducible seeds.",
+      "unavailable": "NO — available",
+      "fallback": "N/A",
+      "evidence_class": "INDEPENDENTLY_COMPUTATIONALLY_VALIDATED when cross-validated with frozen seed",
+      "applies_to": ["P-01 (ablation stats)", "P-13", "P-15"]
+    },
+    "energy_harvesting": {
+      "best_external_solver": "Published reference cross-check (Zurbuchen 2013)",
+      "why": "No dedicated external simulator for cardiac energy harvesting. Published in-vivo measurements are the strongest external evidence.",
+      "unavailable": "NO — published references available",
+      "fallback": "N/A",
+      "evidence_class": "PUBLISHED_REFERENCE_CROSSCHECK (not INDEPENDENTLY_VALIDATED, not PHYSICALLY_VALIDATED)",
+      "applies_to": ["P-15"]
+    }
+  },
+
+  "selection_rule": "The machine selects the simulator from the physical mechanism. It does NOT select because it produces a favorable result. When the best external solver is unavailable, the machine states EXTERNAL_SOLVER_UNAVAILABLE and uses the documented fallback with explicit evidence class degradation."
+}
