@@ -1,0 +1,67 @@
+{
+  "authority": "CEO R324 §P3/§P4 — executable knowledge atoms + factory inheritance",
+  "timestamp": "2026-08-26T06:45:00Z",
+
+  "executable_knowledge_atoms": {
+    "KA-001": {
+      "lesson": "1D hydraulic models adequate for straight pipe, inadequate for sudden contractions",
+      "trigger_condition": "candidate_geometry == 'straight_pipe' OR candidate_geometry == 'nozzle' OR candidate_geometry == 'sudden_contraction'",
+      "affected_candidate_class": "cardiovascular_hydraulic",
+      "changed_design_rule": "IF geometry has sudden area changes THEN require 3D solver (svMultiPhysics) from start. IF straight pipe THEN 1D acceptable.",
+      "changed_experiment": "For P-01 (straight pipe): 1D was sufficient (16% agreement). For FDA benchmark (nozzle): 1D failed (72% disagreement).",
+      "changed_simulator": "straight_pipe → scipy.ode (1D). contraction/nozzle → svMultiPhysics (3D).",
+      "machine_executable": true
+    },
+    "KA-004": {
+      "lesson": "Analytical optical approximations disagree 60-70% outside valid regime; MC required",
+      "trigger_condition": "candidate_domain == 'tissue_optics' AND source_detector_distance < 10 * transport_mean_free_path",
+      "affected_candidate_class": "optical",
+      "changed_design_rule": "IF source-detector distance < 10*MFP THEN require Monte Carlo (PyTissueOptics or MCX). Analytical approximations (diffusion, Kubelka-Munk) are INSUFFICIENT.",
+      "changed_experiment": "P-16: switched from diffusion approximation to PyTissueOptics MC after R310 showed 60-70% disagreement.",
+      "changed_simulator": "optical → PyTissueOptics (CPU) or MCX (GPU). Never analytical alone.",
+      "machine_executable": true
+    },
+    "KA-005": {
+      "lesson": "Metric validity (safety-ICP) matters more than raw drainage capacity",
+      "trigger_condition": "candidate_has_safety_implication == true",
+      "affected_candidate_class": "ALL candidates with safety implications",
+      "changed_design_rule": "METRIC_VALIDITY gate mandatory before any execution. Check: physical_meaning, clinical_relevance, comparator_sensitivity, failure_sensitivity. If any fails, redesign metric.",
+      "changed_experiment": "P-19 R313: drainage_capacity metric (1/10 discriminating) → R314: safety-ICP metric (9/10 discriminating).",
+      "changed_simulator": "N/A (metric selection, not simulator)",
+      "machine_executable": true
+    },
+    "KA-009": {
+      "lesson": "Distributed channels do NOT provide resilience beyond conductance matching",
+      "trigger_condition": "candidate_architecture == 'distributed' OR candidate_architecture == 'parallel_channels'",
+      "affected_candidate_class": "distributed_hydraulic",
+      "changed_design_rule": "BASELINE_CONDUCTANCE_MATCHING: IF comparing distributed vs single THEN must match baseline hydraulic conductance BEFORE applying obstruction. 1D Poiseuille matching is INSUFFICIENT — must verify through 3D solver.",
+      "changed_experiment": "P-19 R322: conductance-matched test showed single channel BEATS distributed. All future distributed candidates must pass this control.",
+      "changed_simulator": "distributed_vs_single comparison → svMultiPhysics (3D) mandatory. 1D cannot be trusted for this comparison.",
+      "machine_executable": true
+    }
+  },
+
+  "factory_inheritance_rules": {
+    "hydraulic_candidates": {
+      "inherits": ["KA-001 (1D vs 3D based on geometry)", "KA-005 (metric validity gate)", "KA-009 (conductance matching for distributed)"],
+      "enforcement": "Candidate factory checks trigger_conditions before allowing experiment execution. If trigger matches, the corresponding design_rule is enforced as a prerequisite."
+    },
+    "optical_candidates": {
+      "inherits": ["KA-004 (MC required, not analytical)", "KA-005 (metric validity gate)"],
+      "enforcement": "Optical candidates cannot use analytical approximations alone. MC (PyTissueOptics or MCX) is mandatory."
+    },
+    "all_candidates_with_thresholds": {
+      "inherits": ["KA-005 (threshold provenance + sensitivity test)"],
+      "enforcement": "Every threshold must have: provenance (source + class), sensitivity test (frozen threshold varied across range), METRIC_VALIDITY gate."
+    },
+    "all_candidates": {
+      "inherits": ["KA-005 (METRIC_VALIDITY gate mandatory)"],
+      "enforcement": "No candidate may execute without passing METRIC_VALIDITY gate."
+    }
+  },
+
+  "how_inheritance_compounds": {
+    "description": "Each knowledge atom adds a prerequisite that future candidates must satisfy. The factory becomes stricter with every failure. P-19's falsification (KA-009) means no future distributed-channel candidate can skip conductance matching. P-16's analytical disagreement (KA-004) means no future optical candidate can use analytical approximations alone. P-19's metric flaw (KA-005) means no candidate can use an unvalidated metric.",
+    "compound_effect": "The 9 knowledge atoms collectively prevent the specific failure modes that were discovered. The factory is now harder to fool than it was at R312."
+  }
+}
