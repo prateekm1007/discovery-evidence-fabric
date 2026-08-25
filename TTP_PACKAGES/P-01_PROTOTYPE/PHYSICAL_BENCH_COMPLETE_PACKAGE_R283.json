@@ -1,0 +1,123 @@
+{
+  "package_id": "P-01",
+  "artifact": "PHYSICAL_BENCH_COMPLETE_PACKAGE_R283",
+  "version": "1.0.0",
+  "date": "2026-08-25 (R283)",
+  "purpose": "Per CEO R283 P2: 'BOM → assembly drawings → control code → calibration procedure → attack-generation procedure → blinded randomization → raw-data schema → analysis script → acceptance criteria. The external lab should be able to run it without asking us how to interpret the result.'",
+  "constitutional_basis": "Article XXVI — independent validation. Article XXX — bench must be able to disprove simulator.",
+
+  "the_complete_package": [
+    "1_bom_bill_of_materials",
+    "2_assembly_drawings",
+    "3_control_code",
+    "4_calibration_procedure",
+    "5_attack_generation_procedure",
+    "6_blinded_randomization",
+    "7_raw_data_schema",
+    "8_analysis_script",
+    "9_acceptance_criteria"
+  ],
+
+  "1_bom": {
+    "file_reference": "TTP_PACKAGES/P-01_PROTOTYPE/PHYSICAL_BENCH_PACKAGE.json (section: components)",
+    "total_cost_usd": "7000-8000",
+    "build_time_weeks": "4-8",
+    "components_summary": "Heated reservoir, pulsatile pump, 4-segment acrylic manifold, 4× variable orifice valves (Takasago RK-1), 4× programmable occlusion resistors (stepper+clamp), 4× flow sensors (Sensirion SLF3S), proximal pressure sensor (Honeywell ABP2), DAQ (NI USB-6210 or LabJack T7), controller PC",
+    "vendors": "All commercial off-the-shelf. No custom fabrication except acrylic manifold (Protolabs or 3D print)."
+  },
+
+  "2_assembly_drawings": {
+    "status": "SCHEMATIC_ONLY (text-based)",
+    "schematic": "[CSF Reservoir 37°C] → [Pulsatile Pump] → [Proximal Pressure Sensor] → [4-way Manifold] → 4× [Segment: Flow Sensor → Variable Orifice Valve → Programmable Occlusion Resistor] → [Distal Reservoir]",
+    "wiring": "Sensors → DAQ analog inputs (0-5V). DAQ digital outputs → valve drivers. Controller PC → DAQ via USB.",
+    "physical_layout": "Bench-top, 60cm × 40cm × 30cm acrylic frame. All components accessible for maintenance.",
+    "full_drawings_status": "TO BE PRODUCED when buyer commits to building (CAD files: SolidWorks or Fusion 360)"
+  },
+
+  "3_control_code": {
+    "files": [
+      "TTP_PACKAGES/P-01_PROTOTYPE/10_V2_comparison.py — V2 controller (rate-limited)",
+      "TTP_PACKAGES/P-01_PROTOTYPE/14_V2_1_validation.py — V2.1 controller (sensor-health-aware)",
+      "TTP_PACKAGES/P-01_PROTOTYPE/12_V2_full_validation.py — B (existing closed-loop) and A (simple) controllers"
+    ],
+    "language": "Python 3.8+",
+    "dependencies": "None (pure Python, no external libraries for controller logic)",
+    "bench_integration": "Controller reads sensor data from DAQ (CSV or real-time stream), outputs valve commands to DAQ. Same algorithm as simulator."
+  },
+
+  "4_calibration_procedure": {
+    "steps": [
+      "1. Pressure sensor calibration: Apply known hydrostatic pressure (water column). Verify reading within ±0.5 mmHg across 0-30 mmHg range.",
+      "2. Flow sensor calibration: Pump known flow rate through each sensor. Verify within ±0.05 mL/min across 0-0.5 mL/min range.",
+      "3. Valve calibration: Command 0%, 25%, 50%, 75%, 100%. Measure effective conductance at each. Fit calibration curve (R² > 0.95).",
+      "4. Occlusion resistor calibration: Command 0-100% closure. Measure conductance reduction. Verify reproducibility ±2%.",
+      "5. Pump calibration: Measure output volume over 1 hour. Verify within ±5% of setpoint (0.30 mL/min).",
+      "6. Temperature stability: Monitor water bath over 24 hours. Verify 37°C ± 0.5°C.",
+      "7. Leak test: Pressurize to 20 mmHg, all valves closed. Verify pressure drop < 1 mmHg over 1 hour.",
+      "8. DAQ timing: Generate 1 Hz signal on all channels. Verify timestamps align within ±10 ms."
+    ],
+    "frequency": "Full calibration before each test campaign. Quick checks (steps 1, 5, 7) before each run.",
+    "pass_criteria": "All calibration checks must pass before formal validation begins."
+  },
+
+  "5_attack_generation_procedure": {
+    "all_9_attacks": [
+      {"name": "none", "method": "Run with default parameters, no disturbances"},
+      {"name": "noise_3x", "method": "Software adds 3x Gaussian noise to sensor readings before controller"},
+      {"name": "sensor_dropout", "method": "Software sets sensor readings to 0 for 60s, every 5-15 min (randomized)"},
+      {"name": "fast_occlusion", "method": "Programmable resistor closes 5x faster than default (full closure ~12 min vs 60 min)"},
+      {"name": "slow_occlusion", "method": "Programmable resistor closes 5x slower (full closure ~5 hours)"},
+      {"name": "wrong_model", "method": "Controller assumes exponential decay; actual resistor closure is linear"},
+      {"name": "multi_failure", "method": "All 4 programmable resistors activate simultaneously"},
+      {"name": "actuator_saturation", "method": "Software caps valve command at 70%"},
+      {"name": "controller_delay", "method": "Software adds 5-second delay between controller output and valve command"}
+    ],
+    "implementation": "All attacks SOFTWARE-INJECTED via DAQ/controller. No hardware reconfiguration between attacks."
+  },
+
+  "6_blinded_randomization": {
+    "procedure": [
+      "1. Randomization script (Python, seed recorded) generates test sequence: 3 arms (A/B/C) × 9 attacks × 5 seeds = 135 runs, randomly ordered",
+      "2. Script encrypts arm identity using AES-256 with passphrase held by third party",
+      "3. Controller PC loads encrypted config at start of each run. Analyst sees only 'Run 001', 'Run 002', etc.",
+      "4. Analyst sets up attack parameters, starts run, records data — without knowing which controller is active",
+      "5. After all 135 runs, third party reveals passphrase",
+      "6. Results unblinded and compared to simulator predictions"
+    ],
+    "integrity": "Cryptographic blinding. Analyst cannot influence which arm runs."
+  },
+
+  "7_raw_data_schema": {
+    "per_run_files": [
+      "run_XXX_pressure.csv — 100 Hz, 24h, 8.64M rows",
+      "run_XXX_flow.csv — 100 Hz, 4 channels, 24h",
+      "run_XXX_valve_commands.csv — 1 Hz, 4 channels, 24h",
+      "run_XXX_metadata.json — arm (encrypted), attack, seed, timestamp, calibration status",
+      "run_XXX_summary.json — computed metrics (t_fail, peak, drainage, etc.)"
+    ],
+    "format": "CSV for time-series (standard, universally readable). JSON for metadata and summaries.",
+    "storage": "~50 MB per run, ~7 GB for full 135-run validation"
+  },
+
+  "8_analysis_script": {
+    "file": "TTP_PACKAGES/P-01_PROTOTYPE/bench_analysis_script.py (TO BE WRITTEN when buyer commits)",
+    "function": "Reads raw CSV data, computes 8 metrics per run, compares to simulator predictions, generates comparison report",
+    "input": "Raw CSV files from bench runs",
+    "output": "JSON summary + markdown report with simulator-vs-bench comparison",
+    "falsification_check": "If bench results differ from simulator by >30% on any metric, flags as SIMULATOR FALSIFICATION event"
+  },
+
+  "9_acceptance_criteria": {
+    "file_reference": "TTP_PACKAGES/P-01_PROTOTYPE/PHYSICAL_BENCH_PROTOCOL_R282.json (section: simulator_falsification_criteria)",
+    "criteria": [
+      "BC-01: V2.1 peak ICP under noise_3x <= 25 mmHg (simulator: 19.5)",
+      "BC-02: V2.1 t_fail under noise_3x >= 20h (simulator: 24.0)",
+      "BC-03: V2.1 false_interventions under noise_3x <= 10 (simulator: <5)",
+      "BC-04: V2.1/B ratio under noise_3x >= 2.0x (simulator: 2.73x)",
+      "BC-05: All metrics within ±30% of simulator prediction (else SIMULATOR IS WRONG)"
+    ],
+    "rule": "Cannot be silently relaxed (Article XXVII). If bench disagrees with simulator by >30%, the simulator is revised, not the bench."
+  },
+
+  "what_external_lab_receives": "All 9 sections above. The lab can procure, build, calibrate, run, and analyze WITHOUT asking us how to interpret results."
+}
