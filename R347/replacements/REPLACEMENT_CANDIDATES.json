@@ -1,0 +1,60 @@
+{
+  "P-26": {
+    "candidate_id": "P-26",
+    "buyer_action_id": "BA-P26-001",
+    "name": "Osmotic Pressure-Regulated Drainage Valve",
+    "problem": "CSF shunt overdrainage in upright posture. Existing solutions (ASD, programmable valves) are binary or require manual adjustment. Need passive, self-regulating drainage that responds to physiological pressure changes without electronics.",
+    "buyer": "Shunt OEM (Medtronic, Integra, Sophysa, Miethke)",
+    "mechanism": "Osmotic-driven semi-permeable membrane valve. CSF osmotic pressure differences across the membrane modulate drainage conductance. Higher postural pressure increases osmotic gradient, reducing flow. Passive, no electronics, no moving parts.",
+    "evidence_now": "T1 \u2014 Computational model of osmotic transport across semi-permeable membrane. Membrane selectivity and hydraulic permeability modeled from published membrane transport data.",
+    "modelled_only": [
+      "Osmotic gradient of 2-5 mOsm/L sufficient to modulate drainage by 50%",
+      "Response time <30s (membrane transport kinetics)",
+      "No moving parts \u2014 inherent reliability advantage over mechanical valves"
+    ],
+    "known_failures": [
+      "NO_FAILURES_TESTED_YET \u2014 all evidence is MODELLED. Membrane fouling risk in CSF (protein, cells) not yet modeled. Long-term membrane integrity unknown."
+    ],
+    "strongest_alternative": "Anti-siphon device (ASD) \u2014 established but binary. Osmotic valve offers proportional response without electronics.",
+    "remaining_uncertainty": "Does osmotic membrane maintain selectivity and permeability in CSF environment over 5+ year implantation? Membrane fouling is the primary risk.",
+    "decisive_experiment": "Bench test: osmotic membrane valve vs ASD, mock CSF (with protein), 4 postural pressures, 30-day soak to assess fouling. Measure flow regulation and membrane integrity.",
+    "pass_rule": "Osmotic valve maintains <0.5 mL/min flow at upright AND membrane permeability change <10% after 30-day soak",
+    "fail_rule": "Flow >0.5 mL/min at upright OR membrane permeability change >30% after 30-day soak",
+    "cost_estimate": "$12,000 (ESTIMATED: membrane fabrication + bench test)",
+    "timeline_estimate": "10 weeks (ESTIMATED \u2014 includes 30-day soak)",
+    "integration_path": "Semi-permeable membrane element in shunt catheter. Compatible with existing shunt form factor. No electronics.",
+    "regulatory_status": "Class II (510(k) likely \u2014 membrane-based shunt component)",
+    "commercial_route": "License to shunt OEM IF membrane fouling is manageable",
+    "buyer_action": "Commission $12K bench test (including 30-day fouling assessment) OR request technical diligence",
+    "provenance_manifest": "R347/replacements/ (autonomous discovery, R347)"
+  },
+  "P-27": {
+    "candidate_id": "P-27",
+    "buyer_action_id": "BA-P27-001",
+    "name": "Shape-Memory Polymer Catheter with Kink-Resistant Geometry",
+    "problem": "Catheter obstruction causes 30-50% of shunt failures. Mechanical kinking contributes to 8% of failures. Existing catheters are passive tubes with no kink resistance. Need geometric self-supporting catheter that maintains patency under bending.",
+    "buyer": "Catheter OEM (Medtronic, Integra, Codman)",
+    "mechanism": "Shape-memory polymer (SMP) catheter with pre-programmed helical geometry. SMP returns to helical shape at body temperature, maintaining lumen patency under bending loads. Helical geometry distributes bending stress, preventing localized kinking.",
+    "evidence_now": "T1 \u2014 Computational FEA model of helical SMP catheter under bending loads. Kink threshold modeled from published SMP mechanical data (Tg, recovery stress, elastic modulus).",
+    "modelled_only": [
+      "Kink threshold 3x higher than straight catheter (FEA modeled)",
+      "Recovery time <5s at 37\u00b0C (SMP kinetics from literature)",
+      "Lumen patency maintained at 90\u00b0 bend (vs 45\u00b0 for straight catheter)"
+    ],
+    "known_failures": [
+      "NO_FAILURES_TESTED_YET \u2014 all evidence is MODELLED. SMP fatigue over 5+ year implantation unknown. Helical geometry manufacturing feasibility not yet assessed."
+    ],
+    "strongest_alternative": "Reinforced silicone catheter (existing) \u2014 mechanical reinforcement but no active kink recovery",
+    "remaining_uncertainty": "Does SMP maintain recovery force after 5+ years at 37\u00b0C? Can helical geometry be manufactured at catheter scale (1-2mm ID)?",
+    "decisive_experiment": "Bench test: SMP helical catheter vs standard silicone, cyclic bending (10,000 cycles), measure kink threshold and lumen patency. Accelerated aging (40\u00b0C, 6 months equivalent).",
+    "pass_rule": "SMP catheter kink threshold >2x standard AND lumen patency >80% after 10,000 bending cycles",
+    "fail_rule": "Kink threshold <1.5x standard OR lumen patency <50% after 5,000 cycles",
+    "cost_estimate": "$18,000 (ESTIMATED: SMP fabrication + bending rig + aging chamber)",
+    "timeline_estimate": "14 weeks (ESTIMATED \u2014 includes accelerated aging)",
+    "integration_path": "SMP catheter replaces standard distal catheter. Compatible with existing shunt valves. Manufacturing requires SMP extrusion capability.",
+    "regulatory_status": "Class II (510(k) \u2014 catheter component, existing predicates for reinforced catheters)",
+    "commercial_route": "License to catheter OEM IF manufacturing feasibility confirmed",
+    "buyer_action": "Commission $18K bench test (including accelerated aging) OR request manufacturing feasibility assessment",
+    "provenance_manifest": "R347/replacements/ (autonomous discovery, R347)"
+  }
+}

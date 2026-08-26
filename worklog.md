@@ -7573,3 +7573,54 @@ Stage Summary:
 - Independently QA-validated (15/15 passed, 0 errors, 0 warnings).
 - Not a patent court. Not a regulatory authority. Not a valuation firm.
 - 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data.
+
+---
+Task ID: R347-PORTFOLIO-REBALANCING
+Agent: main (coder, session 2026-08-26)
+Task: Execute CEO R347 directive — move P-10/P-25 to cemetery (T1-FAIL, internal learning), generate 2 replacements, tier portfolio A/B, no artificial T-level promotion.
+
+Pre-Session Constitution Check:
+- Read EPISTEMIC_CONSTITUTION.md v1.7.0.
+- Acknowledged Article XXIX (separate implementation failure from mechanism failure).
+- Acknowledged Article XXVII (no threshold invention — no artificial T-level promotion).
+- Verified remote HEAD = 0d0bcc2 (R346).
+
+Work Log:
+- Created R347/ directory with audit/, cemetery/, replacements/, final_portfolio/.
+- Wrote R347/r347_rebalance.py with 6 gates.
+- Gate 1 (Cemetery): Moved P-10 (phase-change valve, T1-FAIL) and P-25 (self-referencing sensor, T1-FAIL) from buyer portfolio to Internal Knowledge Cemetery. Created cemetery entries with: reason_for_cemetery, what_failed, lesson_learned, knowledge_atom_created, discovery_constraint. Total cemetery now 11 entries (P-14, P-17, P-19, P-05, P-06, P-08, P-18, P-23, CE-029 + P-10, P-25).
+- Gate 2 (Replacements): Generated 2 new candidates from autonomous discovery engine:
+  - P-26: Osmotic Pressure-Regulated Drainage Valve — semi-permeable membrane modulates drainage via osmotic gradient. Passive, no electronics. T1. Decisive experiment: $12K bench test including 30-day fouling assessment.
+  - P-27: Shape-Memory Polymer Catheter with Kink-Resistant Geometry — helical SMP returns to shape at body temp, preventing kinking. T1. Decisive experiment: $18K bending + accelerated aging test.
+  Both pass all cemetery rules (including new rules from P-10/P-25 lessons: no phase-change valve with failing thermal response, no self-referencing sensor without non-common-mode drift analysis).
+- Gate 3 (Rebuild): Buyer portfolio rebuilt at 15 = 13 survivors (P-01, P-02, P-04, P-07, P-11, P-12, P-13, P-15, P-16, P-20, P-21, P-22, P-24) + 2 replacements (P-26, P-27). No failing mechanisms in buyer portfolio.
+- Gate 4 (Tiering): Tier A Flagship (5): P-16 (T2-CONFIRMED), P-01 (T2-CONDITIONAL), P-24 (T1), P-21 (T1), P-13 (T1). Tier B Evaluation (10): P-02, P-04, P-07, P-11, P-12, P-15, P-20, P-22, P-26, P-27 (all T1).
+- Gate 5 (Maturity ladder): Documented T0→T5 ladder. NO artificial promotion. T2-CONFIRMED requires external verification. Realistic path per package documented (e.g., P-24: T1→T2 after bench experiment; P-16: T2-CONFIRMED→T3 with physical validation).
+- Gate 6 (Final portfolio): Generated R347/final_portfolio/ with:
+  - TIER_A_FLAGSHIP/ (5 folders, each with BUYER_DECISION_CARD.md + FULL_DOSSIER.json)
+  - TIER_B_EVALUATION/ (10 folders)
+  - CEMETERY_INTERNAL_KNOWLEDGE/ (P-10, P-25 + earlier entries)
+  - BUYER_TRANSFER_PORTFOLIO_FINAL_INDEX.md
+
+R347 Results:
+- Buyer-facing portfolio: 15 (0 failing mechanisms)
+- Tier A Flagship: 5 (P-16, P-01, P-24, P-21, P-13)
+- Tier B Evaluation: 10
+- Cemetery (internal): 11 (P-10, P-25 moved + 9 earlier)
+- No artificial T-level promotion
+- The valuable claim: "An AI system that continuously creates, kills, validates, and packages technologies into buyer-ready opportunities."
+
+CEO directive compliance:
+- ✅ P-10 and P-25 moved to cemetery (internal learning assets, not buyer lead assets)
+- ✅ 2 replacement candidates generated (P-26 Osmotic Valve, P-27 SMP Catheter)
+- ✅ Portfolio kept at 15
+- ✅ No artificial T-level promotion
+- ✅ Tiered: Tier A (5 flagship) + Tier B (10 evaluation)
+
+Stage Summary:
+- Buyer portfolio: 15 opportunities, all T1+, no failing mechanisms
+- Cemetery: 11 internal knowledge assets (improve discovery engine)
+- Tier A: 5 flagship assets to lead with
+- Tier B: 10 evaluation opportunities with compressed uncertainty
+- The moat is the system, not any single technology
+- 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data.
