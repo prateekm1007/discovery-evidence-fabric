@@ -1,0 +1,176 @@
+{
+  "authority": "CEO R328 — 14 BUYER_SENDABLE functional technology packages + 1 honest vacancy",
+  "constitution_hash": "f82ae4f665dcb5a59ae399017feed57dd24f42fe35d98a897806d559064762a5",
+  "timestamp": "2026-08-26T08:40:00Z",
+  "principle": "A BUYER_SENDABLE package tells a company: WHAT the technology is, WHAT evidence exists, WHAT is uncertain, WHAT would prove it, WHAT would kill it, and WHAT it costs to find out.",
+
+  "packages": {
+    "P-01": {
+      "title": "Predictive Multi-Segment Shunt with Occlusion-Isolation Control",
+      "what_it_is": "A control law for a multi-segment CSF shunt that predicts impending catheter obstruction and pre-emptively redistributes drainage to healthy segments.",
+      "what_works": "Computational model (225 ablations, 5-seed preregistration). External 3D verification via svMultiPhysics: 1D model agrees with 3D Navier-Stokes within 16%.",
+      "what_doesnt_work": "Strict dual-invariant (peak ICP 22 > 20 mmHg target). 24h survival not achieved by either design (~14h). FDA nozzle benchmark disagrees (72%) because nozzle geometry ≠ shunt geometry.",
+      "what_is_uncertain": "Real valve dynamics. Implantable flow sensor (doesn't exist commercially). Clinical benefit (30% revision reduction is MODELLED).",
+      "what_would_prove_it": "V0 bench prototype: 4-segment shunt + COTS sensors + Arduino. Run 30 obstruction scenarios. If multi-segment peak ICP < single-segment in ≥80% of scenarios.",
+      "what_would_kill_it": "If multi-segment shows no advantage over single-segment in bench testing. If implantable flow sensor cannot be developed.",
+      "cost_to_find_out": "$3-5K, 3-6 months for V0 bench prototype",
+      "buyer_action": "Reproduce the computation (clone, run svMultiPhysics). Then build V0 bench prototype and test."
+    },
+    "P-02": {
+      "title": "Adaptive ICP-Responsive Valve Profile",
+      "what_it_is": "A shunt valve that adapts its opening profile to ICP trends, reducing pressure excursions during postural changes.",
+      "what_works": "Computational model predicts 47.3% ICP excursion reduction vs fixed valve.",
+      "what_doesnt_work": "Nothing falsified yet — but the 47.3% is entirely computational. No bench validation.",
+      "what_is_uncertain": "Real valve dynamics. Whether adaptive profile tracks ICP fast enough in hardware.",
+      "what_would_prove_it": "Bench: adaptive vs fixed valve in mock CSF loop, 10 runs × 5 postural scenarios. If adaptive excursion < 60% of fixed (≥40% reduction).",
+      "what_would_kill_it": "If reduction < 20% (FAIL). If 20-40% (AMBIGUOUS → repeat with n=30).",
+      "cost_to_find_out": "$10-20K, 2-4 weeks",
+      "buyer_action": "Build mock CSF loop. Run the protocol. Compare adaptive vs fixed."
+    },
+    "P-04": {
+      "title": "Catalytic Aβ Clearance via NEP-Immobilized Catheter",
+      "what_it_is": "Neprilysin enzyme immobilized on catheter wall clears amyloid-β from CSF via mass-transport-limited contact time.",
+      "what_works": "Computational model predicts 100% Aβ42 clearance. 4/8 engineering parameters frozen. Enzyme identity (NEP) selected.",
+      "what_doesnt_work": "4/8 biology parameters blocked (enzyme stability, CSF kinetics). V2 with enzyme is BLOCKED on wet-lab.",
+      "what_is_uncertain": "Enzyme kinetics in CSF. Whether mass-transport limit holds in real geometry. Enzyme stability over 30 days.",
+      "what_would_prove_it": "In vitro: NEP-coated catheter in Aβ42-spiked aCSF, 72h. If ≥80% Aβ42 cleared; control <10%.",
+      "what_would_kill_it": "If <50% clearance. If enzyme deactivates in CSF within 24h.",
+      "cost_to_find_out": "$15-30K, 4-6 weeks",
+      "buyer_action": "Procure NEP, coat catheters, run Aβ42 ELISA at 0/24/72h."
+    },
+    "P-07": {
+      "title": "Drainage-Priority Safety Floor Module",
+      "what_it_is": "A passive safety mechanism that maintains minimum drainage when primary paths are obstructed.",
+      "what_works": "Mechanism defined (extracted from P-04 safety module). Drainage model exists.",
+      "what_doesnt_work": "Not independently tested. P-03's safety floor was falsified (floor too small, 0.001 mL/min/mmHg).",
+      "what_is_uncertain": "Whether P-07's floor design avoids P-03's failure. Real drainage through floor under obstruction.",
+      "what_would_prove_it": "Bench: catheter with/without floor, 70% obstruction. If drainage > 0.1 mL/min with floor.",
+      "what_would_kill_it": "If drainage < 0.05 mL/min. If floor cannot be manufactured at required diameter.",
+      "cost_to_find_out": "$5-10K, 2-3 weeks",
+      "buyer_action": "Build obstruction rig. Test with/without floor. Measure flow rate."
+    },
+    "P-09": {
+      "title": "Chemical ICP Transduction (Molecule Design Required)",
+      "what_it_is": "A chemical system that transduces ICP changes to measurable optical/electrochemical signals, eliminating electronic implants.",
+      "what_works": "Architecture concept (9-step specification). Screening model identified piezoelectric reservoir as best mechanism.",
+      "what_doesnt_work": "0/9 specification steps resolved. No molecule designed. No model output.",
+      "what_is_uncertain": "Everything downstream of molecule design. This is a research direction, not a tested technology.",
+      "what_would_prove_it": "Design and synthesize a molecule with: sensitivity >1 mmHg, response <0.1s, CSF stability >30 days.",
+      "what_would_kill_it": "No molecule found after 12 months of medicinal chemistry. CSF destroys all candidate transduction mechanisms.",
+      "cost_to_find_out": "$1-5M, 12-24 months (medicinal chemistry program)",
+      "buyer_action": "Evaluate as a research direction. Commission a medicinal chemistry team to search the design space."
+    },
+    "P-10": {
+      "title": "Phase-Change Valve (n-Octadecane Repair)",
+      "what_it_is": "A shunt valve actuated by phase-change material. n-eicosane failed (5.04s vs 5s limit); n-octadecane predicted to pass (0.34s from 15x ΔT speedup).",
+      "what_works": "Computational repair: n-octadecane (melting point 28°C) provides 9°C temperature differential vs n-eicosane's 0.6°C. Predicted response 0.34s.",
+      "what_doesnt_work": "n-eicosane (R308 original) FAILED at 5.04s. Repair budget = 1 (used on n-octadecane). If n-octadecane also fails → CEMETERY.",
+      "what_is_uncertain": "Real phase-change dynamics in valve assembly. Thermal mass of full valve. Heat transfer in CSF.",
+      "what_would_prove_it": "Bench: n-octadecane valve, pressure step 10→30 mmHg. If response < 5.0s (frozen threshold).",
+      "what_would_kill_it": "If response ≥ 6.0s. Repair budget exhausted — no V3.",
+      "cost_to_find_out": "$5-10K, 3-4 weeks",
+      "buyer_action": "Fabricate n-octadecane valve prototype. Apply pressure step. Measure response time."
+    },
+    "P-11": {
+      "title": "Phage Anti-Biofilm Coating (S. aureus Phage K + Ti)",
+      "what_it_is": "Bacteriophage K immobilized on electrospun Ti-coated catheter surface to prevent S. aureus biofilm formation.",
+      "what_works": "Evidence chain (phage K identified, Ti substrate selected, electrospun coating). Computational model.",
+      "what_doesnt_work": "No physical validation. Phage stability on Ti in CSF unknown.",
+      "what_is_uncertain": "Phage viability on Ti surface. Biofilm prevention in realistic bacterial challenge.",
+      "what_would_prove_it": "In vitro: phage-coated vs uncoated Ti in S. aureus biofilm assay, 7 days. If biofilm <20% of control.",
+      "what_would_kill_it": "If biofilm ≥50% of control. If phage deactivates in CSF within 24h.",
+      "cost_to_find_out": "$10-20K, 3-4 weeks",
+      "buyer_action": "Coat Ti catheters with phage K. Challenge with S. aureus. Measure biofilm (crystal violet, CFU)."
+    },
+    "P-12": {
+      "title": "Enzymatic Tau Clearance (Cathepsin D)",
+      "what_it_is": "Cathepsin D enzyme immobilized on catheter wall to clear tau protein from CSF.",
+      "what_works": "Computational model predicts 100% tau clearance. Enzyme (Cathepsin D) selected.",
+      "what_doesnt_work": "No physical validation. Enzyme kinetics in CSF unknown.",
+      "what_is_uncertain": "Enzyme stability in CSF. Tau substrate accessibility. Whether 100% model prediction survives real conditions.",
+      "what_would_prove_it": "In vitro: Cathepsin D-coated catheter in tau-spiked aCSF, 72h. If ≥80% tau cleared.",
+      "what_would_kill_it": "If <50% clearance. If enzyme deactivates in CSF.",
+      "cost_to_find_out": "$15-25K, 4-6 weeks",
+      "buyer_action": "Procure Cathepsin D, coat catheters, run tau ELISA at 0/24/72h."
+    },
+    "P-13": {
+      "title": "Neuromorphic Shunt Failure Predictor",
+      "what_it_is": "An ML-based predictor that forecasts shunt failure 24h before clinical symptoms using ICP + flow trends.",
+      "what_works": "Computational model (conditional PASS, depends on P-15/P-16 energy). Algorithm designed.",
+      "what_doesnt_work": "No real patient data tested. Energy dependency on P-15/P-16 (if those fail, P-13 fails).",
+      "what_is_uncertain": "Prediction accuracy on real clinical data. Lead time in clinical setting. Whether P-15/P-16 energy is sufficient.",
+      "what_would_prove_it": "Retrospective: train on 100+ patient-years of shunt data. If AUC ≥0.80, lead time ≥12h on held-out cohort.",
+      "what_would_kill_it": "If AUC < 0.70. If P-15/P-16 energy harvesting is insufficient (P-13 is dead without power).",
+      "cost_to_find_out": "$5-15K, 2-4 weeks (compute + data access)",
+      "buyer_action": "Obtain shunt patient dataset (ICP + flow + outcomes). Train predictor. Test on held-out cohort."
+    },
+    "P-15": {
+      "title": "Self-Powered Sensing (Cardiac Harvesting + Capacitor)",
+      "what_it_is": "Implantable sensing system powered by cardiac motion energy harvesting (1-40 μW) + capacitor storage. Eliminates battery replacement.",
+      "what_works": "99.9% uptime at P50 (10 μW harvest). 96-point operating envelope (SAFE/MARGINAL/UNSAFE). Published cross-check (Zurbuchen 2013, 16.7 μW in-vivo). Deterministic reproduction (seed=42).",
+      "what_doesnt_work": "Zero-harvest death in 0.1h (no backup battery). Arrhythmia model (70% reduction) more aggressive than published (10-30%).",
+      "what_is_uncertain": "Actual cardiac harvesting in target implant location. Whether 10 μW P50 is achievable in shunt geometry.",
+      "what_would_prove_it": "Bench: cardiac harvesting measurement in target implant geometry. If measured ≥ 5 μW (P5 threshold).",
+      "what_would_kill_it": "If measured < 1 μW (insufficient for any sensing). If cardiac motion in shunt location is too weak.",
+      "cost_to_find_out": "$5-10K, 2-4 weeks",
+      "buyer_action": "Reproduce the computation (clone, run script). Then measure cardiac harvesting in target geometry."
+    },
+    "P-16": {
+      "title": "Transcranial NIR Photovoltaic Power (940nm)",
+      "what_it_is": "940nm NIR light through scalp/skull to implanted GaAs PV cell. Verified fluence 1.0-1.4 mW/cm² (~1000-1400 μW).",
+      "what_works": "ACTUAL PyTissueOptics v2.0.1 executed (independent external software). MC convergence documented (CIs overlap). Published Jacques 2013 range confirmed. Reproducible (pip install).",
+      "what_doesnt_work": "R308 diffusion approximation (744 μW) was conservative. MCX (GPU) not run (CUDA constraint). No experimental tissue measurement.",
+      "what_is_uncertain": "Actual 940nm tissue transmission in shunt patients. Whether 1000+ μW is sufficient for target load. PV cell efficiency in vivo.",
+      "what_would_prove_it": "Bench: 940nm LED + 5mm tissue phantom + GaAs PV cell. If measured power ≥ 500 μW.",
+      "what_would_kill_it": "If measured < 100 μW (insufficient for any useful load). If tissue absorption is much higher than Jacques 2013.",
+      "cost_to_find_out": "$2-5K, 1-2 weeks",
+      "buyer_action": "pip install pytissueoptics, run script (get ~1.4 mW/cm²). Then bench: LED + phantom + PV cell."
+    },
+    "P-20": {
+      "title": "Adaptive Glycan Immune Tolerance Surface (Anti-Fibrotic)",
+      "what_it_is": "Dual anti-fibrotic surface: CD47-mimetic glycan (immune tolerance) + IL-10 analog released from PLGA (active inflammation suppression).",
+      "what_works": "Computational model: IL-10 release 2468 ng/cm²/day at day 30 (24,680x above threshold). 4/4 attacks survived. Glycan density 5x above threshold. Buyer decision tree (PASS/FAIL/AMBIGUOUS).",
+      "what_doesnt_work": "No physical validation. PLGA kinetics are MODELLED from published data. Glycan stability unknown.",
+      "what_is_uncertain": "Actual IL-10 release in CSF. Glycan surface density degradation. In vivo fibrosis reduction.",
+      "what_would_prove_it": "In vitro: PLGA-IL-10 catheter in aCSF, 30 days. If IL-10 ≥0.1 ng/cm²/day at day 30 AND glycan ≥10¹²/cm² AND total <10 µmol/cm² (toxicity).",
+      "what_would_kill_it": "If IL-10 <0.1 at day 30. If toxicity exceeded. If glycan sheds rapidly.",
+      "cost_to_find_out": "$5-10K, 6-8 weeks",
+      "buyer_action": "Coat catheters with PLGA-IL-10 + glycan. Incubate in aCSF 30 days. Measure IL-10 (ELISA) and glycan (SPR)."
+    },
+    "P-14": {
+      "title": "CEMETERY: Yield-Matched Drainage — Negative Knowledge",
+      "what_it_is": "A falsified approach to CSF drainage that tried to match drainage yield to CSF production.",
+      "what_failed": "CSF flow variability (posture, activity, circadian) creates noise that limits yield estimation to ~18%. Target was 30%. Mechanism failure (SNR < 2).",
+      "buyer_value": "A company can inspect this to AVOID the yield-matching approach. Reusable rule: calculate SNR before manufacturing any yield-matching candidate. If SNR < 2, kill before investing.",
+      "buyer_action": "Read the cemetery package. Understand why yield-matching fails in CSF. Do not pursue this approach."
+    },
+    "P-17": {
+      "title": "CEMETERY: Biohybrid Endothelial Monolayer — Negative Knowledge",
+      "what_it_is": "A falsified approach that used living endothelial cells on catheter surface to create anti-thrombogenic lining.",
+      "what_failed": "Endothelial cells cannot survive in CSF (no blood perfusion, insufficient nutrients). Survival rate 0.215 vs 0.3 threshold. Biological mechanism failure.",
+      "buyer_value": "A company can inspect this to AVOID cellular surfaces in CSF. Reusable rule: use CSF-adapted cell types (ependymal) or synthetic alternatives (P-20 glycan). Do not use endothelial cells in CSF.",
+      "buyer_action": "Read the cemetery package. Understand why cells die in CSF. Do not pursue cellular approaches for CSF-contacting surfaces."
+    },
+    "P-19": {
+      "title": "CEMETERY: Distributed Micro-Shunt Swarm — Negative Knowledge",
+      "what_it_is": "A falsified approach that used 10 parallel micro-channels for distributed drainage with claimed obstruction resilience.",
+      "what_failed": "Under conductance-matched 3D Navier-Stokes testing (svMultiPhysics), the single channel BEATS the distributed architecture. At 50% matched obstruction: single 13.88 mmHg vs distributed 19.75 mmHg. The distributed advantage was an artifact of unmatched baseline conductance.",
+      "buyer_value": "A company can inspect the 11-round falsification chain (R312-R322). Reusable rule: conductance-matched 3D verification required for any distributed-vs-single hydraulic comparison. 1D Poiseuille is insufficient — 3D effects can reverse the conclusion.",
+      "buyer_action": "Read the cemetery package. Understand why distributed channels don't provide resilience beyond conductance matching. Do not pursue distributed drainage without matched controls."
+    }
+  },
+
+  "vacancy": {
+    "slot": 15,
+    "status": "EXPLICIT VACANCY",
+    "rationale": "Reservoir exhausted. No credible replacement. 14 honest packages > 15 with weak candidate. Per CEO R323 §P6: 'A weak 15th asset damages the portfolio more than an explicit vacancy.'"
+  },
+
+  "buyer_sendable_count": {
+    "active_packages": 11,
+    "cemetery_packages": 3,
+    "total": 14,
+    "vacancy": 1,
+    "note": "14 packages can leave the repository and go to real companies. 11 are active technologies with defined decisive experiments. 3 are negative-knowledge packages that prevent costly mistakes. The vacancy is honest."
+  }
+}
