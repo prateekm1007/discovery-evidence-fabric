@@ -7165,3 +7165,33 @@ Stage Summary:
 - Honest scorecard unchanged: SYNTHETIC_LOOP_VERIFIED=1 (P-24), REAL_LOOP_VERIFIED=0, NONE=14, REAL_LOOP_PENDING_AUDITOR_CONFIRMATION=0.
 - 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data files ingested.
 - PAT: not used in R341 (will be needed for push). CEO should revoke after R341 push.
+
+---
+Task ID: PORTFOLIO-COMMERCIAL-STATE-INIT
+Agent: main (coder, session 2026-08-26)
+Task: Create the one CEO-managed data artifact the CEO's R341 audit asked for: a portfolio commercial-state axis, separate from technical state. NOT a round. NOT code. NOT a subsystem.
+
+CEO Directive (R341 audit):
+- "for each of the 15 packages, you should now have: Technical state (T0–T5) and separately: Commercial state (UNCONTACTED → TARGETED → EVALUATING → DILIGENCE → EXPERIMENT → NEGOTIATION → LICENSE/ACQUISITION)"
+- "But you control that commercial state manually. The machine may record it when you give it information; it must never infer technical readiness from it."
+
+Work Log:
+- Verified remote HEAD = 062e1d9 (R341). Local HEAD matches. R341 is the frozen state.
+- Created PORTFOLIO_COMMERCIAL_STATE.json at repo root. This is a DATA FILE, not code.
+  - NOT a round (no R342).
+  - NOT a software subsystem (no Python, no functions, no logic).
+  - NOT machine-managed (CEO updates manually).
+  - Records three independent quantities: portfolio_occupancy (15/15), article_XXXV_real_world_completion (0/15), buyer_sendable (13/15).
+  - Records per-candidate commercial_state (all 15 = UNCONTACTED) alongside technical_state.
+  - Explicit rule: machine may read for reporting but NEVER infers technical readiness from commercial state, NEVER auto-promotes commercial state, NEVER auto-generates buyer outreach.
+  - Identifies P-24 as first real-world candidate with honest proposition.
+- NO new code written. NO new functions. NO new dataclasses. NO new pipelines. NO new dashboards. NO new constitution articles. NO round number.
+- This is the LAST repository modification until real external data arrives.
+
+Stage Summary:
+- Portfolio commercial-state axis: CREATED (CEO-managed data file).
+- Software expansion: FROZEN PERMANENTLY. NO R342. NO R343.
+- Machine state: frozen at R341 (062e1d9) + this one data file.
+- Next action: CEO manually contacts a buyer and sends the P-24 package. NOT a machine action.
+- Next machine action: ONLY when CEO delivers real external experimental data file + IV artifact to ingest_external_data_v2(AdmissibilityBundle). Then the machine processes reality.
+- 0 buyers contacted. 0 transactions. 0 real external data. Honest scorecard: SYNTHETIC=1, REAL=0, NONE=14.
