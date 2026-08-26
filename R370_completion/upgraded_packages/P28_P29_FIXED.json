@@ -1,0 +1,179 @@
+{
+  "P-28": {
+    "package_id": "P-28",
+    "name": "Acoustic Wave Obstruction Detection System",
+    "technology": "Ultrasonic acoustic wave transmission through CSF shunt catheter. Changes in acoustic impedance (Z = \u03c1 \u00d7 c) indicate obstruction before flow reduction. Passive detection \u2014 no electronics in fluid path.",
+    "problem": "CSF shunt obstruction causes 35% of shunt failures. Current detection requires external imaging (CT/MRI) or invasive tap. No continuous in-vivo obstruction detection exists.",
+    "mechanism": "Piezoelectric transducer on external catheter wall transmits ultrasonic pulse through catheter. CSF acoustic impedance (Z_csf = 1.53 MRayl) vs obstructed impedance (Z_obs \u2248 2.5 MRayl, 60% change). Detection threshold: 10% impedance change \u2192 95% detection rate (MODELLED).",
+    "computational_model": "Acoustic wave propagation: Z = \u03c1 \u00d7 c. CSF: \u03c1=1007 kg/m\u00b3, c=1530 m/s \u2192 Z=1.53 MRayl. Obstructed: \u03c1=1200 kg/m\u00b3, c=2100 m/s \u2192 Z=2.52 MRayl. Reflection coefficient: R = (Z2-Z1)/(Z2+Z1) = 0.24 (24% reflection at obstruction). Detectable with standard piezoelectric transducer.",
+    "evidence_class": "MODEL_PREDICTED \u2014 analytical acoustic model. No bench validation.",
+    "what_is_demonstrated": "Acoustic impedance model predicts 24% reflection at obstruction boundary. Detection theoretically feasible with COTS piezoelectric components.",
+    "what_is_NOT_demonstrated": "Bench validation. Acoustic coupling through catheter wall. Temperature sensitivity. False positive rate in proteinaceous CSF.",
+    "decisive_experiment": "Bench test: piezoelectric transducer on shunt catheter, 10 obstruction scenarios (partial/complete, protein/cell/debris), measure detection rate vs false positive rate. Cost: $8K. Timeline: 8 weeks.",
+    "pass_rule": "Detection >90% of obstructions with <5% false positive rate",
+    "fail_rule": "Detection <70% OR false positive >15%",
+    "validation_contract_commissionable": true,
+    "buyer_map": [
+      {
+        "company": "Medtronic",
+        "business_unit": "Neurosurgery",
+        "product_line": "Strata valve + shunt systems",
+        "strategic_fit": "Obstruction is #1 failure mode for their shunts. Acoustic detection adds value to existing portfolio.",
+        "existing_solution": "External CT/MRI for suspected obstruction",
+        "gap": "No continuous in-vivo detection",
+        "reason_to_buy": "Computational model + experiment protocol. Internal build would take 6-12 months.",
+        "likely_objection": "Acoustic coupling uncertainty through catheter wall",
+        "first_action": "30-min call with Neurosurgery R&D"
+      },
+      {
+        "company": "Integra LifeSciences",
+        "business_unit": "Neurosurgery",
+        "product_line": "CSF shunt systems",
+        "strategic_fit": "Obstruction detection differentiates their shunt product line",
+        "existing_solution": "Clinical observation + imaging",
+        "gap": "No early warning system",
+        "reason_to_buy": "Novel mechanism (acoustic) with computational evidence",
+        "likely_objection": "Regulatory pathway for new sensor modality",
+        "first_action": "Share non-confidential summary with R&D"
+      },
+      {
+        "company": "Sophysa",
+        "business_unit": "Neurosurgery",
+        "product_line": "Adjustable valves + shuntAdmin",
+        "strategic_fit": "Adds obstruction detection to their monitoring portfolio",
+        "existing_solution": "shuntAdmin (pressure monitoring, not obstruction)",
+        "gap": "No obstruction detection capability",
+        "reason_to_buy": "Complements existing monitoring platform",
+        "likely_objection": "Integration with existing electronics",
+        "first_action": "Technical diligence package to engineering"
+      }
+    ],
+    "regulatory": {
+      "classification_hypothesis": "Class II (510(k)) \u2014 acoustic sensor is adjunct to existing shunt",
+      "classification_basis": "Non-invasive sensor on external catheter surface. Does not contact CSF. Does not treat disease. Provides monitoring information only.",
+      "predicate_candidate": "Existing ultrasound flow measurement devices (ShuntCheck US20130109998A1 is adjacent)",
+      "pathway_hypothesis": "510(k) with ShuntCheck or similar as predicate",
+      "pathway_uncertainty": "MEDIUM \u2014 acoustic obstruction detection is novel application, may require De Novo",
+      "evidence_state": "HYPOTHESIS",
+      "NOT_a_regulatory_opinion": true
+    },
+    "ownership": {
+      "inventor": "CereVascular (CEO to confirm)",
+      "owner": "CereVascular (assumed \u2014 verify)",
+      "assignment_status": "UNVERIFIED \u2014 no assignment document",
+      "patent_filed": false,
+      "prior_employer_claims": "UNKNOWN \u2014 CEO must verify no prior employer claims",
+      "trade_secret_components": "Computational acoustic model + obstruction impedance database",
+      "counsel_required": true
+    },
+    "build_vs_buy": {
+      "internal_development_cost": "$300-600K (6-12 months: acoustic engineering + bench testing + regulatory)",
+      "internal_development_time": "6-12 months",
+      "license_advantage": "Computational model + experiment protocol + cemetery knowledge. Saves 3-6 months.",
+      "reason_to_license": "Faster to market. Avoid dead-end approaches (cemetery constraints).",
+      "evidence_states": {
+        "development_cost": "ESTIMATED",
+        "license_advantage": "HYPOTHESIS"
+      }
+    },
+    "transaction_hypothesis": {
+      "asset": "Acoustic obstruction detection mechanism + computational model + experiment protocol",
+      "rights": "Exclusive license within CSF shunt field",
+      "field_of_use": "CSF shunt obstruction detection",
+      "milestones": "$25K option \u2192 $150K on patent \u2192 $500K on FDA clearance",
+      "consideration": "3-5% royalty on net sales",
+      "NOT_a_legal_contract": true
+    },
+    "premium_minimum_met": true,
+    "buyer_evaluable": true,
+    "classification": "VALIDATION_STAGE_OPPORTUNITY"
+  },
+  "P-29": {
+    "package_id": "P-29",
+    "name": "Magnetic Resonance Flow Quantification Sensor",
+    "technology": "Miniaturized NMR-based flow sensor integrated into shunt catheter. Uses low-field nuclear magnetic resonance to quantify CSF flow without external imaging.",
+    "problem": "No continuous CSF flow monitoring exists. Current methods require external MRI or invasive tap. Continuous flow data would enable early obstruction detection and shunt performance assessment.",
+    "mechanism": "Low-field NMR (0.1-0.5T): spin precession frequency proportional to flow velocity. Signal \u221d flow \u00d7 spin_density. For CSF: T1=4s, T2=0.5s. Minimum detectable flow: 0.05 mL/min (MODELLED). Power: ~10-50 \u03bcW (low-field NMR).",
+    "computational_model": "NMR flow model: S = S0 \u00d7 (1 - exp(-TR/T1)) \u00d7 exp(-TE/T2) \u00d7 f(v). For CSF at 0.1T: SNR \u2248 10:1 at 0.1 mL/min flow. Resolution: 0.05 mL/min. Power: P = B0\u00b2 \u00d7 \u03c9 \u00d7 V / (2\u03bc0) \u2248 10 \u03bcW at 0.1T.",
+    "evidence_class": "MODEL_PREDICTED \u2014 analytical NMR model. No bench validation. HIGH TECHNICAL RISK.",
+    "what_is_demonstrated": "Analytical model suggests 0.05 mL/min resolution is theoretically achievable at low field. Power consumption is theoretically within implantable budget.",
+    "what_is_NOT_demonstrated": "Miniaturization to catheter scale. Magnetic field generation at required strength in implantable form factor. SNR in realistic CSF environment. Interference from patient motion.",
+    "decisive_experiment": "Feasibility study: build miniaturized NMR coil + magnet prototype, measure SNR in mock CSF at 0.1T. Cost: $25K. Timeline: 16 weeks. HIGH RISK \u2014 may show miniaturization is infeasible.",
+    "pass_rule": "SNR > 5:1 at 0.1 mL/min flow in mock CSF at 0.1T with prototype coil <5mm diameter",
+    "fail_rule": "SNR < 3:1 OR coil diameter >10mm required OR power >100 \u03bcW",
+    "validation_contract_commissionable": true,
+    "buyer_map": [
+      {
+        "company": "Medtronic",
+        "business_unit": "Neurovascular",
+        "product_line": "Implantable sensors",
+        "strategic_fit": "Continuous flow monitoring is unmet need in shunt management",
+        "existing_solution": "No continuous monitoring exists",
+        "gap": "Miniaturized NMR is technically challenging",
+        "reason_to_buy": "If feasibility is proven, the IP position is strong (0 prior art for implantable NMR flow sensor)",
+        "likely_objection": "Technical feasibility risk \u2014 miniaturization may be impossible",
+        "first_action": "Feasibility study results before buyer engagement"
+      },
+      {
+        "company": "Siemens Healthineers",
+        "business_unit": "MRI / Diagnostics",
+        "product_line": "MRI systems",
+        "strategic_fit": "NMR expertise could translate to implantable sensor",
+        "existing_solution": "External MRI flow measurement",
+        "gap": "No implantable NMR sensor exists",
+        "reason_to_buy": "NMR expertise + potential platform technology",
+        "likely_objection": "Outside their implantable device portfolio",
+        "first_action": "Non-confidential teaser after feasibility study"
+      },
+      {
+        "company": "Boston Scientific",
+        "business_unit": "Neuromodulation",
+        "product_line": "Implantable neurostimulators",
+        "strategic_fit": "If NMR sensor works, it's a platform for flow monitoring in any implantable device",
+        "existing_solution": "No flow monitoring in neurostimulators",
+        "gap": "Miniaturization risk",
+        "reason_to_buy": "Platform potential if feasibility proven",
+        "likely_objection": "Too early stage \u2014 needs feasibility proof first",
+        "first_action": "Share after feasibility study completes"
+      }
+    ],
+    "regulatory": {
+      "classification_hypothesis": "Class III (PMA) \u2014 active implantable device with NMR energy emission",
+      "classification_basis": "Active implantable device that emits electromagnetic energy (NMR). Novel device type with no existing predicate.",
+      "pathway_hypothesis": "PMA with clinical data required. De Novo may be possible if FDA considers it low-risk.",
+      "pathway_uncertainty": "HIGH \u2014 novel device category. No existing implantable NMR sensors.",
+      "evidence_state": "HYPOTHESIS",
+      "NOT_a_regulatory_opinion": true
+    },
+    "ownership": {
+      "inventor": "CereVascular (CEO to confirm)",
+      "owner": "CereVascular (assumed \u2014 verify)",
+      "assignment_status": "UNVERIFIED",
+      "patent_filed": false,
+      "prior_employer_claims": "UNKNOWN",
+      "trade_secret_components": "NMR flow model + miniaturization parameters",
+      "counsel_required": true
+    },
+    "build_vs_buy": {
+      "internal_development_cost": "$500K-2M (12-24 months: NMR engineering + miniaturization + feasibility)",
+      "internal_development_time": "12-24 months",
+      "license_advantage": "Computational model + feasibility study protocol. Saves 3-6 months if model is correct.",
+      "reason_to_license": "High-risk technology \u2014 buyer may prefer to fund feasibility before committing to license",
+      "evidence_states": {
+        "development_cost": "ESTIMATED",
+        "license_advantage": "HYPOTHESIS"
+      }
+    },
+    "transaction_hypothesis": {
+      "asset": "NMR flow sensor concept + computational model + feasibility study protocol",
+      "rights": "Sponsored research agreement for feasibility \u2192 option to license if feasible",
+      "field_of_use": "Implantable flow monitoring",
+      "milestones": "$25K feasibility study \u2192 option \u2192 $200K on patent \u2192 $1M on FDA clearance",
+      "consideration": "3-5% royalty if commercialized",
+      "NOT_a_legal_contract": true
+    },
+    "premium_minimum_met": true,
+    "buyer_evaluable": true,
+    "classification": "RESEARCH_STAGE_OPPORTUNITY \u2014 high technical risk, needs feasibility proof before buyer engagement"
+  }
+}

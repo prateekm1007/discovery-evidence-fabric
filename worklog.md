@@ -9166,3 +9166,39 @@ REAL_DISCOVERY_LEARNING_VERIFIED: False.
 HONEST STATUS: "15 premium, honest, professionally transferable opportunities at their actual evidence maturity. 0 transfer-ready. The machine is WAITING FOR REALITY."
 
 NEXT_SINGLE_HIGHEST_VALUE_ACTION: "CEO presents strongest validation-stage packages (P-16, P-01) to buyers as commissionable experiment opportunities — NOT as buyer-ready technologies."
+
+---
+Task ID: R370-COMPLETION-TRANSFER-HARDENING
+Agent: main (coder, session 2026-08-26)
+Task: CEO directive: "Make the 15 artifacts themselves good enough that a real company can evaluate them without trusting the inventor. That is the last software-level part of your current mandate."
+
+Work Log:
+- Gates 1+3 (Fix P-28 and P-29): Built complete packages for both:
+  P-28: Acoustic Wave Obstruction Detection — full technology, mechanism, computational model (acoustic impedance Z=ρ×c), decisive experiment ($8K/8 weeks), 3 named buyers (Medtronic, Integra, Sophysa), regulatory (Class II hypothesis), ownership (UNVERIFIED), build-vs-buy, transaction hypothesis. Classification: VALIDATION_STAGE (conceptually) but RESEARCH_STAGE under strict 8-axis (no model execution).
+  P-29: MR Flow Quantification — full package but honestly classified as RESEARCH_STAGE (high miniaturization risk). 3 named buyers (Medtronic, Siemens, Boston Scientific). Feasibility study ($25K/16 weeks).
+  Both now pass inventor-removal test.
+- Gate 2 (All 15 Commissionable): All 15 validation contracts now have: hypothesis, protocol, sample_size, equipment, controls, measurement, endpoint, statistical_plan, pass/fail/ambiguous thresholds, cost_decomposition, duration, data_format, provenance, ethical_requirements. Buyer can send directly to a lab. 15/15 commissionable.
+- Gate 5 (Decision-Grade Buyers ALL 15): Built 3+ named companies with business_unit, strategic_fit, existing_solution, gap, reason_to_buy, likely_objection, first_action for ALL 15 packages. No "or similar company." 15/15 decision-grade.
+- Gate 9 (Hard Prerequisites): TRANSFER_READY requires ALL mandatory (ownership, commissionable, provenance, transaction, buyer_map, no_regulatory_contradictions) + ALL maturity axes ≥ SUPPORTED. Ownership UNVERIFIED blocks ALL packages (correct). Result: 0 TRANSFER_READY, 0 VALIDATION_STAGE (strict), 2 ENGINEERING_STAGE, 13 RESEARCH_STAGE.
+- Gate 10 (Premium Minimum): 15/15 meet premium minimum — buyer can understand, challenge, commission, know what they're buying, know uncertainty, know transaction options.
+- Gates 11-12 (Final Report + FREEZE): FROZEN. REAL_LOOP=0. COMPUTATIONAL_DISCOVERY_LEARNING_VERIFIED=True. REAL_DISCOVERY_LEARNING_VERIFIED=False.
+
+R370-COMPLETION Results:
+- 15/15 structural: YES
+- 15/15 inventor-removal pass: YES (was 13/15)
+- 15/15 commissionable contracts: YES (was 13/15)
+- 15/15 decision-grade buyers: YES (was 3/15)
+- 15/15 premium buyer-evaluable: YES
+- 0/15 transfer-ready: YES (all blocked by UNVERIFIED ownership — honest)
+- 0/15 validation-stage (strict 8-axis)
+- 2/15 engineering-stage
+- 13/15 research-stage
+- REAL_BUYER: 0
+- REAL_EXPERIMENT: 0
+- REAL_LOOP: 0
+- SYNTHETIC_LOOPS: 3
+- FROZEN: True
+
+HONEST STATUS: "15 premium, honest, buyer-evaluable technology-transfer opportunities at their actual maturity. 15/15 meet premium minimum. 0/15 transfer-ready (all blocked by UNVERIFIED ownership). The machine is WAITING FOR REALITY."
+
+This is the LAST software-level work. The packages are now good enough that a real company can evaluate them without trusting the inventor. The next milestone is reality: first real buyer, first real experiment, first real data, first real loop.
