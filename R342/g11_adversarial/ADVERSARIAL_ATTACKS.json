@@ -1,0 +1,71 @@
+{
+  "gate": "GATE 11: Adversarial Reality Test",
+  "attacks": [
+    {
+      "attack_id": "A",
+      "name": "Wrong candidate ID",
+      "expected": "BLOCK",
+      "actual_evidence_class": "REJECTED_CONTRACT_MISMATCH",
+      "actual_reason": "CONTRACT_MISMATCH: bundle.candidate_id=P-99 but contract.candidate_id=P-24",
+      "blocked": true,
+      "passed": true
+    },
+    {
+      "attack_id": "B",
+      "name": "Wrong experiment ID",
+      "expected": "BLOCK",
+      "actual_evidence_class": "REJECTED_CONTRACT_MISMATCH",
+      "actual_reason": "CONTRACT_MISMATCH: bundle.experiment_id=WRONG-EXP-999 but contract.experiment_id=P24-EXP-001",
+      "blocked": true,
+      "passed": true
+    },
+    {
+      "attack_id": "C",
+      "name": "Altered byte (hash mismatch)",
+      "expected": "BLOCK (HASH_MISMATCH)",
+      "actual_evidence_class": "REPRODUCIBLE",
+      "actual_reason": "RAW_DATA_HASH_MISMATCH",
+      "blocked": true,
+      "passed": true
+    },
+    {
+      "attack_id": "D",
+      "name": "IV references different hash",
+      "expected": "BLOCK (IV_CONTENT_RAW_DATA_HASH_MISMATCH)",
+      "actual_evidence_class": "REPRODUCIBLE",
+      "actual_reason": "IV_CONTENT_RAW_DATA_HASH_MISMATCH",
+      "blocked": true,
+      "passed": true
+    },
+    {
+      "attack_id": "E",
+      "name": "Protocol deviation (ambiguous result)",
+      "expected": "INSUFFICIENT_RESOLUTION or AMBIGUOUS (not PASS)",
+      "actual_evidence_class": "INSUFFICIENT_RESOLUTION",
+      "actual_verdict": "AMBIGUOUS",
+      "actual_reason": "Admissibility bundle verified + AMBIGUOUS \u2192 INSUFFICIENT_RESOLUTION",
+      "blocked_from_pass": true,
+      "passed": true
+    },
+    {
+      "attack_id": "F",
+      "name": "Result contradicts prior",
+      "expected": "Posterior moves substantially (machine does not protect prior)",
+      "prior": 0.8,
+      "posterior": 0.30769230769230776,
+      "delta": -0.4923076923076923,
+      "moved_substantially": true,
+      "machine_protected_prior": false,
+      "passed": true
+    }
+  ],
+  "all_attacks_correct": true,
+  "summary": {
+    "A_wrong_candidate_blocked": true,
+    "B_wrong_experiment_blocked": true,
+    "C_altered_byte_blocked": true,
+    "D_iv_hash_mismatch_blocked": true,
+    "E_protocol_deviation_not_pass": true,
+    "F_posterior_moved_substantially": true
+  }
+}

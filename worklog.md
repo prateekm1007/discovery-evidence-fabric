@@ -7195,3 +7195,78 @@ Stage Summary:
 - Next action: CEO manually contacts a buyer and sends the P-24 package. NOT a machine action.
 - Next machine action: ONLY when CEO delivers real external experimental data file + IV artifact to ingest_external_data_v2(AdmissibilityBundle). Then the machine processes reality.
 - 0 buyers contacted. 0 transactions. 0 real external data. Honest scorecard: SYNTHETIC=1, REAL=0, NONE=14.
+
+---
+Task ID: R342-REALITY-DRIVEN-LEARNING-LOOP
+Agent: main (coder, session 2026-08-26)
+Task: Execute CEO R342 directive — build the first executable production path in which genuine external experimental data changes the machine. 15 gates. REAL DATA → PROVENANCE → ANALYSIS → CLASSIFICATION → BELIEF → KNOWLEDGE → EIG → NEXT EXPERIMENT → PACKAGE V3.
+
+Pre-Session Constitution Check:
+- Read EPISTEMIC_CONSTITUTION.md v1.7.0 (Articles I–XXXVII).
+- Acknowledged Article III (verifier must never trust claimant).
+- Acknowledged Article XXXIV (stop coding when reality is bottleneck).
+- Acknowledged Article XXXVII (synthetic vs real loop).
+- Verified remote HEAD = ab2f6b2 (R341 + commercial-state file).
+
+CRITICAL HONEST CONSTRAINT:
+- I do not have genuinely external experimental data. The CEO owns buyer relationships.
+- R342 builds and tests the production pathway. The first REAL_LOOP_VERIFIED transition requires genuinely external data.
+- DEMONSTRATION fixtures used for unit testing are clearly labeled IS_DEMONSTRATION_FIXTURE=true. NOT labeled as external. NOT classified as REAL_LOOP_VERIFIED.
+- Resulting state is DEMONSTRATION_LOOP_EXECUTED, NOT REAL_LOOP_VERIFIED.
+
+Work Log:
+- Created R342/ directory with 16 subdirectories (audit + g1–g15).
+- Wrote R342/r342_reality_loop.py — the production pathway code.
+- Imports R341's ingest_external_data_v2 (NO new ingestion framework).
+- Gate 0: Constitution check. 13 articles acknowledged.
+- Gate 1: Real-data admission path = R341 ingest_external_data_v2(). 16 checks. No new framework.
+- Gate 2: Three classes preserved: SIMULATED_TEST_FIXTURE, EXTERNAL_DATA, DEMONSTRATION_FIXTURE. No fake external data manufactured.
+- Gate 3: P-24 experiment contract pre-registered (P24-EXP-001). Two endpoints: response_time_damper_ms, proportional_error_pct. Frozen before result.
+- Gate 4: Decision rule frozen. Endpoint 1: pass<200ms, fail>1000ms. Endpoint 2: pass<15%, fail>30%. 95% two-sided CI. Hash-pinned. Cannot be modified after result.
+- Gates 5-10: Learning loop DEMONSTRATION (hardcoded fixture, NOT from damper_flow()):
+  - Gate 5: Belief update. Prior 0.6 → posterior 0.8947. Bayesian. Δbelief=+0.2947.
+  - Gate 6: Knowledge atom KA-P24-REAL-001 auto-created. Points to evidence hash. No hand-authored conclusion.
+  - Gate 7: EIG changed. Before 0.3760, after 0.1570. ΔEIG=-0.2190 (less to learn).
+  - Gate 8: Next experiment changed. Before: [P-16, P-24, P-11, P-04]. After: [P-16, P-11, P-04, P-24]. P-24 dropped to #4.
+  - Gate 9: Package v3 generated. loop_verification_state=DEMONSTRATION_LOOP_EXECUTED. Supersedes v2.1. Posterior 0.6→0.8947. Next experiment=P-16.
+  - Gate 10: Package diff auto-generated. 10/10 fields changed. No hand-written explanation.
+- Gate 11: 6 adversarial attacks. BUG FOUND during first run: attacks A (wrong candidate) and B (wrong experiment) passed because R341 verifier checks internal consistency (bundle↔custody↔IV agree with each other) but NOT conformance with the pre-registered experiment contract. FIX: added check_contract_conformance() pre-ingest validation step. Re-ran: all 6 attacks correct (A blocked, B blocked, C blocked by hash mismatch, D blocked by IV content mismatch, E AMBIGUOUS not PASS, F posterior moved substantially).
+- Gate 12: Kill path demonstrated. FAIL result → posterior 0.6→0.1429 (below kill threshold 0.15) → killed → negative KA-P24-FAIL-001 created → discovery constraint DC-P24-FAIL-001 created.
+- Gate 13: Discovery constraint test. Same-mechanism candidate (n=2, P_max=40) BLOCKED. Different-mechanism candidate (serial orifice) EVALUATED. Machine became different because (demo) reality happened.
+- Gate 14: No manual interpretation. 4 human activities (all CEO-owned). 12 machine activities (all automatic). No developer edits JSON between steps.
+- Gate 15: Provenance graph complete (DEMONSTRATION). Every arrow has auditable artifact. IS_DEMONSTRATION=true. NOT_REAL_LOOP_VERIFIED=true.
+
+R342 GATE Results:
+- Gate 0: Constitution read. ✅
+- Gate 1: Admission path = R341. ✅
+- Gate 2: Three classes preserved. No fake external data. ✅
+- Gate 3: Experiment contract pre-registered. ✅
+- Gate 4: Decision rule frozen (hash-pinned). ✅
+- Gate 5: Belief update (Bayesian, Δ=+0.2947). ✅
+- Gate 6: Knowledge atom auto-created. ✅
+- Gate 7: EIG changed (Δ=-0.2190). ✅
+- Gate 8: Next experiment changed (ranking reordered). ✅
+- Gate 9: Package v3 generated. ✅
+- Gate 10: Package diff auto-generated (10/10 fields changed). ✅
+- Gate 11: 6/6 adversarial attacks correct (after contract conformance fix). ✅
+- Gate 12: Kill path demonstrated. ✅
+- Gate 13: Discovery constraint demonstrated. ✅
+- Gate 14: All machine activities automatic. ✅
+- Gate 15: Provenance graph complete (DEMONSTRATION). ✅
+
+BUG FOUND AND FIXED:
+- R341's ingest_external_data_v2() checks internal consistency (bundle ↔ custody ↔ IV) but does NOT check conformance with the pre-registered experiment contract.
+- Attack A (wrong candidate ID) and Attack B (wrong experiment ID) initially PASSED because the bundle, custody, and IV all agreed with EACH OTHER (all said P-99 or WRONG-EXP-999), but none matched the pre-registered contract (P-24, P24-EXP-001).
+- Fix: added check_contract_conformance() as a pre-ingest validation step. This is NOT a new ingestion framework — it's a wrapper that checks the bundle against the pre-registered contract before passing to the existing R341 ingest path.
+- After fix: all 6 attacks correct.
+
+Stage Summary:
+- Production pathway: READY. Every arrow in the causal chain is executable and auditable.
+- 15/15 gates executed.
+- 6/6 adversarial attacks correct.
+- Contract conformance bug found and fixed.
+- DEMONSTRATION_LOOP_EXECUTED: 1 (P-24, pathway mechanism verified).
+- REAL_LOOP_VERIFIED: 0 (NOT claimed — no genuinely external data).
+- Honest scorecard: SYNTHETIC=1, REAL=0, DEMONSTRATION=1, NONE=14.
+- What CEO needs to deliver for first REAL_LOOP_VERIFIED: raw external data file + SHA-256 + custody chain + JSON IV artifact. The machine handles everything else automatically.
+- 0 buyers contacted. 0 transactions. 0 real external data.
