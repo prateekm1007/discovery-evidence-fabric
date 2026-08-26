@@ -1,0 +1,534 @@
+{
+  "timestamp": "2026-08-26T03:11:47.391350+00:00",
+  "engine_version": "R336-autonomous",
+  "domain": "CSF shunt technology",
+  "candidates_generated": 5,
+  "mechanism_families": [
+    "biochemical",
+    "material_science",
+    "mechanical",
+    "electrical",
+    "control_architecture"
+  ],
+  "candidates_killed": 1,
+  "candidates_survived": 4,
+  "packages_generated": 4,
+  "candidates": [
+    {
+      "candidate": {
+        "id": "CAND-001",
+        "mechanism_family": "mechanical",
+        "name": "Gravity-Compensating Hydraulic Damper",
+        "mechanism": "Passive hydraulic damper that increases flow resistance proportionally to postural pressure changes, preventing overdrainage in upright position without electronics",
+        "problem_addressed": "Overdrainage (15% of failures, $25K each)",
+        "physical_variable": "Postural pressure differential",
+        "causal_path": "Posture change \u2192 pressure differential \u2192 damper compresses \u2192 resistance increases \u2192 flow limited",
+        "key_assumption": "Hydraulic damper response time < postural pressure change rate",
+        "strongest_alternative": "Anti-siphon device (ASD) \u2014 passive but fixed threshold, doesn't adapt to individual patient",
+        "killer_experiment": "Bench: damper in mock CSF loop, apply postural pressure steps, measure flow regulation",
+        "buyer": "Shunt OEM",
+        "physics_feasible": true,
+        "manufacturable": true
+      },
+      "attack_result": {
+        "candidate_id": "CAND-001",
+        "candidate_name": "Gravity-Compensating Hydraulic Damper",
+        "attacks": [
+          {
+            "attack": "cemetery_inheritance",
+            "result": "PASS",
+            "verdict": "No cemetery rules violated"
+          },
+          {
+            "attack": "problem_existence",
+            "result": "PASS",
+            "verdict": "Problem: Overdrainage (15% of failures, $25K each)"
+          },
+          {
+            "attack": "physics_feasibility",
+            "result": "PASS",
+            "verdict": "Physics feasible"
+          },
+          {
+            "attack": "strongest_alternative",
+            "result": "PASS",
+            "verdict": "Alternative: Anti-siphon device (ASD) \u2014 passive but fixed threshold, doesn't adapt to individual patient"
+          },
+          {
+            "attack": "manufacturing",
+            "result": "PASS",
+            "verdict": "Manufacturable"
+          },
+          {
+            "attack": "mechanism_diversity",
+            "result": "PASS",
+            "verdict": "Mechanism is distinct from existing portfolio"
+          }
+        ],
+        "survived": true,
+        "kill_reason": null
+      }
+    },
+    {
+      "candidate": {
+        "id": "CAND-002",
+        "mechanism_family": "material_science",
+        "name": "Self-Referencing Piezoresistive Pressure Sensor with Zero-Drift Compensation",
+        "mechanism": "Dual-element piezoresistive sensor where one element measures pressure and the other is sealed at reference pressure, enabling real-time zero-drift compensation through differential measurement",
+        "problem_addressed": "Sensor drift/failure (3% of failures, $50K each)",
+        "physical_variable": "Pressure sensor zero offset",
+        "causal_path": "Temperature drift \u2192 both elements drift equally \u2192 differential cancels \u2192 drift-free measurement",
+        "key_assumption": "Both sensor elements have matched temperature coefficients",
+        "strongest_alternative": "Periodic recalibration (requires clinical visit) or optical pressure sensor (P-09, molecule not designed)",
+        "killer_experiment": "Bench: dual-element sensor in temperature chamber, measure drift vs single-element over 30 days",
+        "buyer": "Sensor company / shunt OEM",
+        "physics_feasible": true,
+        "manufacturable": true
+      },
+      "attack_result": {
+        "candidate_id": "CAND-002",
+        "candidate_name": "Self-Referencing Piezoresistive Pressure Sensor with Zero-Drift Compensation",
+        "attacks": [
+          {
+            "attack": "cemetery_inheritance",
+            "result": "PASS",
+            "verdict": "No cemetery rules violated"
+          },
+          {
+            "attack": "problem_existence",
+            "result": "PASS",
+            "verdict": "Problem: Sensor drift/failure (3% of failures, $50K each)"
+          },
+          {
+            "attack": "physics_feasibility",
+            "result": "PASS",
+            "verdict": "Physics feasible"
+          },
+          {
+            "attack": "strongest_alternative",
+            "result": "PASS",
+            "verdict": "Alternative: Periodic recalibration (requires clinical visit) or optical pressure sensor (P-09, molecule not designed)"
+          },
+          {
+            "attack": "manufacturing",
+            "result": "PASS",
+            "verdict": "Manufacturable"
+          },
+          {
+            "attack": "mechanism_diversity",
+            "result": "PASS",
+            "verdict": "Mechanism is distinct from existing portfolio"
+          }
+        ],
+        "survived": true,
+        "kill_reason": null
+      }
+    },
+    {
+      "candidate": {
+        "id": "CAND-003",
+        "mechanism_family": "control_architecture",
+        "name": "Adaptive Drainage Rate Controller with CSF Production Estimation",
+        "mechanism": "Closed-loop controller that estimates CSF production rate from drainage/ICP trends and adjusts valve setting to match production, preventing both over and under-drainage",
+        "problem_addressed": "Underdrainage (12% of failures, $30K each) AND Overdrainage (15%)",
+        "physical_variable": "CSF production rate (estimated)",
+        "causal_path": "Measure drainage+ICP \u2192 estimate CSF production \u2192 adjust valve \u2192 match production \u2192 stable ICP",
+        "key_assumption": "CSF production can be estimated from drainage/ICP measurements within useful timescale",
+        "strongest_alternative": "Fixed programmable valve (doesn't adapt), P-01 (predicts obstruction, doesn't match production)",
+        "killer_experiment": "Simulation: virtual patient cohort with varying CSF production, compare adaptive vs fixed valve ICP stability",
+        "buyer": "Shunt OEM with electronic valve capability",
+        "physics_feasible": true,
+        "manufacturable": true
+      },
+      "attack_result": {
+        "candidate_id": "CAND-003",
+        "candidate_name": "Adaptive Drainage Rate Controller with CSF Production Estimation",
+        "attacks": [
+          {
+            "attack": "cemetery_inheritance",
+            "result": "PASS",
+            "verdict": "No cemetery rules violated"
+          },
+          {
+            "attack": "problem_existence",
+            "result": "PASS",
+            "verdict": "Problem: Underdrainage (12% of failures, $30K each) AND Overdrainage (15%)"
+          },
+          {
+            "attack": "physics_feasibility",
+            "result": "PASS",
+            "verdict": "Physics feasible"
+          },
+          {
+            "attack": "strongest_alternative",
+            "result": "PASS",
+            "verdict": "Alternative: Fixed programmable valve (doesn't adapt), P-01 (predicts obstruction, doesn't match production)"
+          },
+          {
+            "attack": "manufacturing",
+            "result": "PASS",
+            "verdict": "Manufacturable"
+          },
+          {
+            "attack": "mechanism_diversity",
+            "result": "PASS",
+            "verdict": "Mechanism is distinct from existing portfolio"
+          }
+        ],
+        "survived": true,
+        "kill_reason": null
+      }
+    },
+    {
+      "candidate": {
+        "id": "CAND-004",
+        "mechanism_family": "biochemical",
+        "name": "Quorum-Sensing Inhibitor Coating (QSI)",
+        "mechanism": "Catheter surface coated with quorum-sensing inhibitor molecules that prevent bacterial communication, blocking biofilm formation before it starts without killing bacteria (no resistance pressure)",
+        "problem_addressed": "Infection (10% of failures, $60K each)",
+        "physical_variable": "Bacterial quorum-sensing signal molecule concentration",
+        "causal_path": "Bacteria attach \u2192 attempt quorum sensing \u2192 QSI blocks signal \u2192 no biofilm formation \u2192 no infection",
+        "key_assumption": "QSI molecules remain active on catheter surface in CSF for >30 days",
+        "strongest_alternative": "P-11 (phage \u2014 kills bacteria, resistance possible), P-20 (glycan \u2014 immune tolerance, different mechanism), antibiotic coating (resistance emerging)",
+        "killer_experiment": "In vitro: QSI-coated vs uncoated catheter in S. aureus quorum-sensing assay, 7 days",
+        "buyer": "Shunt OEM / anti-infection company",
+        "physics_feasible": true,
+        "manufacturable": true
+      },
+      "attack_result": {
+        "candidate_id": "CAND-004",
+        "candidate_name": "Quorum-Sensing Inhibitor Coating (QSI)",
+        "attacks": [
+          {
+            "attack": "cemetery_inheritance",
+            "result": "PASS",
+            "verdict": "No cemetery rules violated"
+          },
+          {
+            "attack": "problem_existence",
+            "result": "PASS",
+            "verdict": "Problem: Infection (10% of failures, $60K each)"
+          },
+          {
+            "attack": "physics_feasibility",
+            "result": "PASS",
+            "verdict": "Physics feasible"
+          },
+          {
+            "attack": "strongest_alternative",
+            "result": "PASS",
+            "verdict": "Alternative: P-11 (phage \u2014 kills bacteria, resistance possible), P-20 (glycan \u2014 immune tolerance, different mechanism), antibiotic coating (resistance emerging)"
+          },
+          {
+            "attack": "manufacturing",
+            "result": "PASS",
+            "verdict": "Manufacturable"
+          },
+          {
+            "attack": "mechanism_diversity",
+            "result": "PASS",
+            "verdict": "Mechanism is distinct from existing portfolio"
+          }
+        ],
+        "survived": true,
+        "kill_reason": null
+      }
+    },
+    {
+      "candidate": {
+        "id": "CAND-005",
+        "mechanism_family": "electrical",
+        "name": "Thermoelectric CSF Temperature Gradient Harvester",
+        "mechanism": "Thermoelectric generator exploiting the temperature differential between CSF (37\u00b0C core) and subcutaneous tissue (~35\u00b0C), generating microwatts for implantable sensing without batteries",
+        "problem_addressed": "Battery depletion (5% of failures in active shunts, $45K each)",
+        "physical_variable": "Temperature differential (core vs subcutaneous)",
+        "causal_path": "Core CSF at 37\u00b0C \u2192 thermoelectric generator \u2192 subcutaneous at 35\u00b0C \u2192 2\u00b0C gradient \u2192 \u03bcW power",
+        "key_assumption": "2\u00b0C temperature gradient is maintained in chronic implant and produces useful power (>1 \u03bcW)",
+        "strongest_alternative": "P-15 (cardiac motion harvesting, 10 \u03bcW P50), P-16 (NIR photovoltaic, ~1050 \u03bcW), battery (finite life)",
+        "killer_experiment": "Bench: thermoelectric generator in 37\u00b0C/35\u00b0C gradient, measure power output",
+        "buyer": "Implantable sensor company",
+        "physics_feasible": true,
+        "manufacturable": true
+      },
+      "attack_result": {
+        "candidate_id": "CAND-005",
+        "candidate_name": "Thermoelectric CSF Temperature Gradient Harvester",
+        "attacks": [
+          {
+            "attack": "cemetery_inheritance",
+            "result": "PASS",
+            "verdict": "No cemetery rules violated"
+          },
+          {
+            "attack": "problem_existence",
+            "result": "PASS",
+            "verdict": "Problem: Battery depletion (5% of failures in active shunts, $45K each)"
+          },
+          {
+            "attack": "physics_feasibility",
+            "result": "FAIL",
+            "verdict": "Thermoelectric power: 0.16 nW (need >1000 nW = 1 \u03bcW). 2\u00b0C gradient insufficient."
+          },
+          {
+            "attack": "strongest_alternative",
+            "result": "PASS",
+            "verdict": "Alternative: P-15 (cardiac motion harvesting, 10 \u03bcW P50), P-16 (NIR photovoltaic, ~1050 \u03bcW), battery (finite life)"
+          },
+          {
+            "attack": "manufacturing",
+            "result": "PASS",
+            "verdict": "Manufacturable"
+          },
+          {
+            "attack": "mechanism_diversity",
+            "result": "PASS",
+            "verdict": "Mechanism is distinct from existing portfolio"
+          }
+        ],
+        "survived": false,
+        "kill_reason": "Thermoelectric power: 0.16 nW (need >1000 nW = 1 \u03bcW). 2\u00b0C gradient insufficient."
+      }
+    }
+  ],
+  "packages": [
+    {
+      "buyer_action_id": "P24-EXP-001",
+      "problem": "Overdrainage (15% of failures, $25K each)",
+      "buyer": "Shunt OEM",
+      "mechanism": "Passive hydraulic damper that increases flow resistance proportionally to postural pressure changes, preventing overdrainage in upright position without electronics",
+      "evidence_now": "T0 \u2014 hypothesis generated by autonomous discovery engine. No computational model yet.",
+      "modelled_only": [
+        "All claims are hypothetical at this stage"
+      ],
+      "known_failures": [],
+      "strongest_alternative": "Anti-siphon device (ASD) \u2014 passive but fixed threshold, doesn't adapt to individual patient",
+      "remaining_uncertainty": "Hydraulic damper response time < postural pressure change rate",
+      "decisive_experiment": "Bench: damper in mock CSF loop, apply postural pressure steps, measure flow regulation",
+      "pass_rule": "To be defined after computational model",
+      "fail_rule": "To be defined after computational model",
+      "cost_estimate": "TBD (ESTIMATED)",
+      "timeline_estimate": "TBD (ESTIMATED)",
+      "integration_path": "TBD",
+      "regulatory_status": "TBD",
+      "commercial_route": "License to Shunt OEM",
+      "buyer_action": "EVALUATE \u2014 review mechanism, commission computational model",
+      "provenance_manifest": "R336/m2_discovery_engine/ \u2014 generated 2026-08-26T03:11:47.391157+00:00",
+      "mechanism_family": "mechanical",
+      "physical_variable": "Postural pressure differential",
+      "causal_path": "Posture change \u2192 pressure differential \u2192 damper compresses \u2192 resistance increases \u2192 flow limited",
+      "attack_results": [
+        {
+          "attack": "cemetery_inheritance",
+          "result": "PASS",
+          "verdict": "No cemetery rules violated"
+        },
+        {
+          "attack": "problem_existence",
+          "result": "PASS",
+          "verdict": "Problem: Overdrainage (15% of failures, $25K each)"
+        },
+        {
+          "attack": "physics_feasibility",
+          "result": "PASS",
+          "verdict": "Physics feasible"
+        },
+        {
+          "attack": "strongest_alternative",
+          "result": "PASS",
+          "verdict": "Alternative: Anti-siphon device (ASD) \u2014 passive but fixed threshold, doesn't adapt to individual patient"
+        },
+        {
+          "attack": "manufacturing",
+          "result": "PASS",
+          "verdict": "Manufacturable"
+        },
+        {
+          "attack": "mechanism_diversity",
+          "result": "PASS",
+          "verdict": "Mechanism is distinct from existing portfolio"
+        }
+      ],
+      "discovery_method": "AUTONOMOUS \u2014 generated by R336 discovery engine, not human-supplied"
+    },
+    {
+      "buyer_action_id": "P25-EXP-001",
+      "problem": "Sensor drift/failure (3% of failures, $50K each)",
+      "buyer": "Sensor company / shunt OEM",
+      "mechanism": "Dual-element piezoresistive sensor where one element measures pressure and the other is sealed at reference pressure, enabling real-time zero-drift compensation through differential measurement",
+      "evidence_now": "T0 \u2014 hypothesis generated by autonomous discovery engine. No computational model yet.",
+      "modelled_only": [
+        "All claims are hypothetical at this stage"
+      ],
+      "known_failures": [],
+      "strongest_alternative": "Periodic recalibration (requires clinical visit) or optical pressure sensor (P-09, molecule not designed)",
+      "remaining_uncertainty": "Both sensor elements have matched temperature coefficients",
+      "decisive_experiment": "Bench: dual-element sensor in temperature chamber, measure drift vs single-element over 30 days",
+      "pass_rule": "To be defined after computational model",
+      "fail_rule": "To be defined after computational model",
+      "cost_estimate": "TBD (ESTIMATED)",
+      "timeline_estimate": "TBD (ESTIMATED)",
+      "integration_path": "TBD",
+      "regulatory_status": "TBD",
+      "commercial_route": "License to Sensor company / shunt OEM",
+      "buyer_action": "EVALUATE \u2014 review mechanism, commission computational model",
+      "provenance_manifest": "R336/m2_discovery_engine/ \u2014 generated 2026-08-26T03:11:47.391303+00:00",
+      "mechanism_family": "material_science",
+      "physical_variable": "Pressure sensor zero offset",
+      "causal_path": "Temperature drift \u2192 both elements drift equally \u2192 differential cancels \u2192 drift-free measurement",
+      "attack_results": [
+        {
+          "attack": "cemetery_inheritance",
+          "result": "PASS",
+          "verdict": "No cemetery rules violated"
+        },
+        {
+          "attack": "problem_existence",
+          "result": "PASS",
+          "verdict": "Problem: Sensor drift/failure (3% of failures, $50K each)"
+        },
+        {
+          "attack": "physics_feasibility",
+          "result": "PASS",
+          "verdict": "Physics feasible"
+        },
+        {
+          "attack": "strongest_alternative",
+          "result": "PASS",
+          "verdict": "Alternative: Periodic recalibration (requires clinical visit) or optical pressure sensor (P-09, molecule not designed)"
+        },
+        {
+          "attack": "manufacturing",
+          "result": "PASS",
+          "verdict": "Manufacturable"
+        },
+        {
+          "attack": "mechanism_diversity",
+          "result": "PASS",
+          "verdict": "Mechanism is distinct from existing portfolio"
+        }
+      ],
+      "discovery_method": "AUTONOMOUS \u2014 generated by R336 discovery engine, not human-supplied"
+    },
+    {
+      "buyer_action_id": "P26-EXP-001",
+      "problem": "Underdrainage (12% of failures, $30K each) AND Overdrainage (15%)",
+      "buyer": "Shunt OEM with electronic valve capability",
+      "mechanism": "Closed-loop controller that estimates CSF production rate from drainage/ICP trends and adjusts valve setting to match production, preventing both over and under-drainage",
+      "evidence_now": "T0 \u2014 hypothesis generated by autonomous discovery engine. No computational model yet.",
+      "modelled_only": [
+        "All claims are hypothetical at this stage"
+      ],
+      "known_failures": [],
+      "strongest_alternative": "Fixed programmable valve (doesn't adapt), P-01 (predicts obstruction, doesn't match production)",
+      "remaining_uncertainty": "CSF production can be estimated from drainage/ICP measurements within useful timescale",
+      "decisive_experiment": "Simulation: virtual patient cohort with varying CSF production, compare adaptive vs fixed valve ICP stability",
+      "pass_rule": "To be defined after computational model",
+      "fail_rule": "To be defined after computational model",
+      "cost_estimate": "TBD (ESTIMATED)",
+      "timeline_estimate": "TBD (ESTIMATED)",
+      "integration_path": "TBD",
+      "regulatory_status": "TBD",
+      "commercial_route": "License to Shunt OEM with electronic valve capability",
+      "buyer_action": "EVALUATE \u2014 review mechanism, commission computational model",
+      "provenance_manifest": "R336/m2_discovery_engine/ \u2014 generated 2026-08-26T03:11:47.391321+00:00",
+      "mechanism_family": "control_architecture",
+      "physical_variable": "CSF production rate (estimated)",
+      "causal_path": "Measure drainage+ICP \u2192 estimate CSF production \u2192 adjust valve \u2192 match production \u2192 stable ICP",
+      "attack_results": [
+        {
+          "attack": "cemetery_inheritance",
+          "result": "PASS",
+          "verdict": "No cemetery rules violated"
+        },
+        {
+          "attack": "problem_existence",
+          "result": "PASS",
+          "verdict": "Problem: Underdrainage (12% of failures, $30K each) AND Overdrainage (15%)"
+        },
+        {
+          "attack": "physics_feasibility",
+          "result": "PASS",
+          "verdict": "Physics feasible"
+        },
+        {
+          "attack": "strongest_alternative",
+          "result": "PASS",
+          "verdict": "Alternative: Fixed programmable valve (doesn't adapt), P-01 (predicts obstruction, doesn't match production)"
+        },
+        {
+          "attack": "manufacturing",
+          "result": "PASS",
+          "verdict": "Manufacturable"
+        },
+        {
+          "attack": "mechanism_diversity",
+          "result": "PASS",
+          "verdict": "Mechanism is distinct from existing portfolio"
+        }
+      ],
+      "discovery_method": "AUTONOMOUS \u2014 generated by R336 discovery engine, not human-supplied"
+    },
+    {
+      "buyer_action_id": "P27-EXP-001",
+      "problem": "Infection (10% of failures, $60K each)",
+      "buyer": "Shunt OEM / anti-infection company",
+      "mechanism": "Catheter surface coated with quorum-sensing inhibitor molecules that prevent bacterial communication, blocking biofilm formation before it starts without killing bacteria (no resistance pressure)",
+      "evidence_now": "T0 \u2014 hypothesis generated by autonomous discovery engine. No computational model yet.",
+      "modelled_only": [
+        "All claims are hypothetical at this stage"
+      ],
+      "known_failures": [],
+      "strongest_alternative": "P-11 (phage \u2014 kills bacteria, resistance possible), P-20 (glycan \u2014 immune tolerance, different mechanism), antibiotic coating (resistance emerging)",
+      "remaining_uncertainty": "QSI molecules remain active on catheter surface in CSF for >30 days",
+      "decisive_experiment": "In vitro: QSI-coated vs uncoated catheter in S. aureus quorum-sensing assay, 7 days",
+      "pass_rule": "To be defined after computational model",
+      "fail_rule": "To be defined after computational model",
+      "cost_estimate": "TBD (ESTIMATED)",
+      "timeline_estimate": "TBD (ESTIMATED)",
+      "integration_path": "TBD",
+      "regulatory_status": "TBD",
+      "commercial_route": "License to Shunt OEM / anti-infection company",
+      "buyer_action": "EVALUATE \u2014 review mechanism, commission computational model",
+      "provenance_manifest": "R336/m2_discovery_engine/ \u2014 generated 2026-08-26T03:11:47.391329+00:00",
+      "mechanism_family": "biochemical",
+      "physical_variable": "Bacterial quorum-sensing signal molecule concentration",
+      "causal_path": "Bacteria attach \u2192 attempt quorum sensing \u2192 QSI blocks signal \u2192 no biofilm formation \u2192 no infection",
+      "attack_results": [
+        {
+          "attack": "cemetery_inheritance",
+          "result": "PASS",
+          "verdict": "No cemetery rules violated"
+        },
+        {
+          "attack": "problem_existence",
+          "result": "PASS",
+          "verdict": "Problem: Infection (10% of failures, $60K each)"
+        },
+        {
+          "attack": "physics_feasibility",
+          "result": "PASS",
+          "verdict": "Physics feasible"
+        },
+        {
+          "attack": "strongest_alternative",
+          "result": "PASS",
+          "verdict": "Alternative: P-11 (phage \u2014 kills bacteria, resistance possible), P-20 (glycan \u2014 immune tolerance, different mechanism), antibiotic coating (resistance emerging)"
+        },
+        {
+          "attack": "manufacturing",
+          "result": "PASS",
+          "verdict": "Manufacturable"
+        },
+        {
+          "attack": "mechanism_diversity",
+          "result": "PASS",
+          "verdict": "Mechanism is distinct from existing portfolio"
+        }
+      ],
+      "discovery_method": "AUTONOMOUS \u2014 generated by R336 discovery engine, not human-supplied"
+    }
+  ],
+  "discovery_method": "AUTONOMOUS \u2014 no human candidate selection",
+  "cemetery_rules_applied": 8,
+  "vacancy_fillable": 2
+}
