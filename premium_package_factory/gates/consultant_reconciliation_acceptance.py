@@ -428,6 +428,17 @@ def run_adversarial_tests():
     found2 = discover_packages_iterative({"comment": "Related to P-16 and P-24", "type": "analysis"})
     results.append(("text_mention_false_positive", len(found2) == 0))
 
+    # 9. Deep traversal (depth 100) → FOUND
+    # Build a deeply nested structure (100 levels deep) with a package at the bottom
+    deep_data = {"name": "root", "child": {"name": "level1", "child": {"name": "level2"}}}
+    current = deep_data
+    for i in range(3, 100):
+        current["child"] = {"name": f"level{i}", "child": {}}
+        current = current["child"]
+    current["child"] = {"P-100": {"name": "deep_package", "value": "found_at_depth_100"}}
+    found_deep = discover_packages_iterative(deep_data)
+    results.append(("deep_traversal", "P-100" in found_deep))
+
     return results
 
 
@@ -454,6 +465,54 @@ def scan_self_authorship():
             if line.strip().startswith('#') or '"""' in line:
                 continue
             violations.append({"pattern": pat, "msg": msg, "line": line.strip()[:100]})
+    return violations
+
+
+def scan_hardcoded_acceptance_values():
+    """Scan THIS verifier file for hard-coded acceptance results.
+
+    Prohibited patterns in CERTIFICATION LOGIC (not test fixtures):
+    - variable = True  (where variable is used as a gate pass/fail)
+    - variable = False (same)
+    - "PASS" or "FAIL" assigned directly as acceptance result
+
+    Allowed:
+    - Boolean values in test fixture data (e.g., test expectations)
+    - Boolean values computed from conditions (e.g., x == y)
+    - Boolean values from function returns
+
+    The scan looks for lines where a variable is directly assigned True/False
+    AND the variable name suggests it's an acceptance gate (contains 'pass').
+    """
+    violations = []
+    with open(_THIS_FILE) as f:
+        code = f.read()
+        lines = code.split('\n')
+
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+        # Skip comments and docstrings
+        if stripped.startswith('#') or stripped.startswith('"""') or stripped.startswith("'''"):
+            continue
+        # Skip test fixture data (lines with 'expected' or 'results.append')
+        if 'expected' in stripped or 'results.append' in stripped:
+            continue
+        # Check for: variable_pass = True  or  variable_pass = False
+        # where the variable name contains 'pass' (indicating a gate result)
+        match = re.match(r'(\w*pass\w*)\s*=\s*(True|False)\s*(?:#.*)?$', stripped, re.IGNORECASE)
+        if match:
+            var_name = match.group(1)
+            value = match.group(2)
+            # Check if this is a direct assignment (not derived from a condition)
+            # If the line is just 'var = True' or 'var = False' with no condition, it's hard-coded
+            violations.append({
+                "line_number": i,
+                "line": stripped[:100],
+                "variable": var_name,
+                "hardcoded_value": value,
+                "reason": f"Gate variable '{var_name}' assigned literal {value} instead of derived from test result"
+            })
+
     return violations
 
 
@@ -588,13 +647,15 @@ def run_final():
 
     # Self-authorship
     self_auth = scan_self_authorship()
+    hardcoded_acceptance = scan_hardcoded_acceptance_values()
     print(f"SELF_AUTHORED: {len(self_auth)} violations")
+    print(f"HARDCODED_ACCEPTANCE: {len(hardcoded_acceptance)} violations")
 
     # STRUCTURAL_DISCOVERY — derived from adversarial test results
     structural_pass = all(r[1] for r in adv if r[0] in ("nested_arrays", "text_mention_false_positive"))
 
-    # UNLIMITED_TRAVERSAL — derived from deep nesting test
-    traversal_pass = True  # Tested via nested_arrays adversarial test (which uses iterative BFS with no depth limit)
+    # UNLIMITED_TRAVERSAL — derived from deep_traversal adversarial test (depth 100)
+    traversal_pass = any(r[0] == "deep_traversal" and r[1] for r in adv)
 
     # R1_LINEAGE — derived from adversarial test results
     r1_pass = all(r[1] for r in adv if r[0] in ("r1_no_lineage", "r1_with_lineage"))
@@ -644,7 +705,8 @@ def run_final():
         mi["pass"] and ah["pass"] and ns["pass"] and rc["pass"] and
         hi["pass"] and ap["pass"] and cd["pass"] and adv_pass and
         tamper_pass and structural_pass and traversal_pass and r1_pass and
-        malformed_pass and len(self_auth) == 0 and false_detections == 0
+        malformed_pass and len(self_auth) == 0 and false_detections == 0 and
+        len(hardcoded_acceptance) == 0
     )
 
     if n_current > 0:
@@ -675,6 +737,7 @@ def run_final():
         "CONFLICTING_AUTHORITATIVE_SOURCES": cd["conflicting_sources"],
         "FALSE_PACKAGE_DETECTIONS": false_detections,
         "SELF_AUTHORED_FACTUAL_PAYLOADS": len(self_auth),
+        "HARDCODED_ACCEPTANCE_RESULTS": len(hardcoded_acceptance),
         "FIXED": n_fixed,
         "CURRENT": n_current,
         "UNRESOLVED": n_unresolved,
@@ -696,6 +759,7 @@ def run_final():
         "adversarial_tests": [{"test": n, "pass": p} for n, p in adv],
         "tamper_tests": [{"test": n, "pass": p} for n, p in tamper],
         "self_authored": self_auth,
+        "hardcoded_acceptance_scan": hardcoded_acceptance,
         "findings": findings,
         "summary": summary,
         "honest_state_retained": {"TRANSFER_READY":"0/15","REAL_BUYER":"0","REAL_EXPERIMENT":"0","REAL_LOOP":"0"}
@@ -726,7 +790,7 @@ def run_final():
     print(f"  {n_fixed} FIXED, {n_current} CURRENT, {n_unresolved} UNRESOLVED")
     print(f"  manifest_integrity: {mi['pass']}, authority_hierarchy: {ah['pass']}")
     print(f"  conflict_detection: {cd['pass']}, adversarial: {adv_pass}")
-    print(f"  self_authored: {len(self_auth)}, false_detections: {false_detections}")
+    print(f"  self_authored: {len(self_auth)}, hardcoded_acceptance: {len(hardcoded_acceptance)}, false_detections: {false_detections}")
     return report
 
 
