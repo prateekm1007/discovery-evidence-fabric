@@ -7814,3 +7814,44 @@ Stage Summary:
 - P-24 (22/25 TRS, $15K validation) is the highest-ROI T1 conversion opportunity.
 - 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data.
 - This is the last engineering round. The next step is CEO buyer outreach.
+
+---
+Task ID: R351-EVIDENCE-ACCELERATION-PROGRAM
+Agent: main (coder, session 2026-08-26)
+Task: Execute CEO R351 directive — evidence acceleration program. Build T1→T2 conversion engine. Optimize buyer confidence per dollar of validation. 4 deliverables. NO fake promotions.
+
+Pre-Session Constitution Check:
+- Read EPISTEMIC_CONSTITUTION.md v1.7.0.
+- Acknowledged: "Not building a patent court. Not creating fake validation. Objective is 15 transferable assets, not 15 T2 claims."
+- Verified remote HEAD = 530c18d (R350).
+
+Work Log:
+- Created R351/ directory with audit/, acceleration_portfolio/, t2_roadmap/, buyer_covalidation/.
+- Wrote R351/r351_evidence_acceleration.py with 4 deliverables.
+- Built ACCELERATION_DATA dict for all 15 packages with: current_maturity, target_maturity, missing_evidence, required_experiment, external_party_required, estimated_cost, cost_numeric, timeline, probability_of_conversion, maturity_increase, buyer_who_benefits, commercial_upside_after_validation, buyer_covalidation_strategy.
+- Deliverable 1 (EVIDENCE_ACCELERATION_PORTFOLIO): 15 packages fully documented. Each has 9 fields per CEO directive (current maturity, missing evidence, required experiment, external party, cost, timeline, probability, buyer, commercial upside).
+- Deliverable 2 (ECE Ranking): All 15 ranked by Evidence Conversion Efficiency = maturity_increase / cost × probability. Top 5 by adjusted ECE: #1 P-13 (0.36), #2 P-21 (0.29), #3 P-16 (0.24), #4 P-07 (0.15), #5 P-15 (0.13). P-13 ranks highest because $0-5K cost × 45% probability / 2 maturity increase = best ROI.
+- Deliverable 3 (T2_ROADMAP): Current state: T2-CONFIRMED=1, T2-CONDITIONAL=1, T1=13 (2 T2+ total). Target state: T3=1 (P-16), T2-CONFIRMED=1 (P-01 upgraded), T2-CONDITIONAL=12 (T1s that convert), T1=1 (P-22 remains — 4 unresolved control problems, lowest probability). Total T2+: 2→14. Realistic conversions: 12 (all T1 except P-22). Total investment: $161K.
+- Deliverable 4 (Buyer Co-Validation Strategy): 15 strategies. Flow: buyer funds experiment → receives evaluation rights + first refusal → external party executes → if PASS, T2 upgrade → license/acquisition discussion → if FAIL, buyer walks (only lost validation cost). Average validation cost: $15.1K. Total if all funded: $226K.
+
+R351 Results:
+- 4 deliverables produced
+- ECE ranking identifies P-13, P-21, P-16, P-07, P-15 as top 5 conversion priorities
+- T2 roadmap: 2→14 T2+ packages with $161K investment
+- Buyer co-validation: 15 strategies showing how buyer funds de-risk ownership
+- NO fake promotions — all pathways require actual external evidence
+
+CEO directive compliance:
+- ✅ EVIDENCE_ACCELERATION_PORTFOLIO (9 fields per package)
+- ✅ Rank by Evidence Conversion Efficiency (maturity increase / cost)
+- ✅ T2_ROADMAP (target maximum realistic T2 upgrades)
+- ✅ Buyer co-validation strategy (buyer funds → evaluation rights → license)
+- ✅ No new discovery, no new candidates, no new scoring systems beyond ECE
+- ✅ No fake validation — T2 requires external evidence
+
+Stage Summary:
+- 15 evidence acceleration pathways defined with experiments, costs, timelines, probabilities, buyers, co-validation strategies.
+- Current: 2 T2+ packages. Target: 14 T2+ packages with $161K investment.
+- The moat: "An AI system that turns uncertain inventions into validated, transferable technology assets through continuous buyer-driven evidence acquisition."
+- Next action: CEO sends buyer meeting packs (R350) + co-validation strategies (R351) to ideal buyers. When data returns, machine processes reality → T2 upgrade.
+- 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data. 0 T2 conversions executed (pathways defined, not executed).
