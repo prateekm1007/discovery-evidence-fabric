@@ -1,0 +1,83 @@
+{
+  "gate": "GATE 9 (Capstone): External Ingest Path Hardened",
+  "objective": "Machine can receive a genuinely external experimental file without changing the code path or epistemic semantics.",
+  "method": "Run synthetic fixture, external fixture, and attack (synthetic relabeled as real) through the SAME ingest_buyer_submission() function. Verify only metadata differs.",
+  "test_fixtures": {
+    "synthetic_fixture": {
+      "path": "R339/g9_external_ingest_path/test_fixtures/synthetic_bench_result.json",
+      "sha256": "745bc38a76340e1a26f636b5d73c752afb5ffd60ef926df08c2cc4e32bac7da8",
+      "label": "SYNTHETIC \u2014 internal fixture"
+    },
+    "external_fixture": {
+      "path": "R339/g9_external_ingest_path/test_fixtures/external_bench_result.json",
+      "sha256": "a81da659b31da0fc32be084288eae2046b82e1c2d13b06215559a0acf66de87b",
+      "label": "EXTERNAL_BENCH_RESULT \u2014 would-be external file"
+    }
+  },
+  "test_1_synthetic_submission": {
+    "input": "is_synthetic=True, no custody chain, data_source_verified=False",
+    "expected_evidence_class": "SIMULATED_TEST_FIXTURE",
+    "actual_evidence_class": "SIMULATED_TEST_FIXTURE",
+    "actual_verdict": "AMBIGUOUS",
+    "actual_state_transition": {
+      "from": "EXPERIMENT_READY",
+      "to": "EXPERIMENT_READY",
+      "reason": "AMBIGUOUS \u2192 EXPERIMENT_READY (repeat with higher n)",
+      "real_transition_executed": false
+    },
+    "loop_verification_state_mapping": "SYNTHETIC_LOOP_VERIFIED",
+    "passed": true
+  },
+  "test_2_external_submission_with_custody": {
+    "input": "is_synthetic=False, valid custody chain, data_source_verified=True",
+    "expected_evidence_class": "PHYSICALLY_VALIDATED",
+    "actual_evidence_class": "PHYSICALLY_VALIDATED",
+    "actual_verdict": "PASS",
+    "actual_state_transition": {
+      "from": "EXPERIMENT_READY",
+      "to": "TECHNICALLY_EVALUABLE",
+      "reason": "PASS + PHYSICALLY_VALIDATED \u2192 TECHNICALLY_EVALUABLE",
+      "real_transition_executed": true
+    },
+    "loop_verification_state_mapping": "REAL_LOOP_VERIFIED",
+    "passed": true,
+    "external_provenance": {
+      "external_data_source": "External Partner Lab (mock) \u2014 in production this would be a real lab URI/DOI/NDA ref",
+      "external_artifact_hash": "a81da659b31da0fc32be084288eae2046b82e1c2d13b06215559a0acf66de87b",
+      "external_observation_timestamp": "2026-08-26T12:00:00Z",
+      "independent_reproduction_path": "Re-run ingest_buyer_submission() with the same file + custody chain",
+      "ingest_pipeline_unchanged": true
+    }
+  },
+  "test_3_attack_synthetic_relabeled_as_real": {
+    "input": "is_synthetic=False BUT no custody chain AND data_source_verified=False",
+    "expected": "MUST NOT be PHYSICALLY_VALIDATED \u2014 attack must be blocked",
+    "actual_evidence_class": "REPRODUCIBLE",
+    "actual_state_transition": {
+      "from": "EXPERIMENT_READY",
+      "to": "VERIFICATION_PENDING",
+      "reason": "Unexpected verdict Verdict.PASS",
+      "real_transition_executed": false
+    },
+    "loop_verification_state_mapping": "BLOCKED",
+    "attack_blocked": true,
+    "passed": true
+  },
+  "verification": {
+    "same_code_path_for_synthetic_and_external": true,
+    "synthetic_classified_correctly": true,
+    "external_classified_correctly": true,
+    "attack_blocked": true,
+    "all_tests_passed": true,
+    "ingest_function_used": "R327/b1_verify/hardened_buyer_pipeline.py::ingest_buyer_submission()",
+    "no_semantic_fork": "The function takes is_synthetic, custody_chain, and data_source_verified as parameters. Synthetic and external go through the SAME function. No if-else fork in the code path \u2014 only the metadata differs.",
+    "epistemic_semantics_preserved": "Article XXXVII alignment: synthetic \u2192 SIMULATED_TEST_FIXTURE \u2192 SYNTHETIC_LOOP_VERIFIED. External + custody + verified \u2192 PHYSICALLY_VALIDATED \u2192 REAL_LOOP_VERIFIED. Attack (synthetic relabeled) blocked."
+  },
+  "ceo_handoff": {
+    "what_ceo_needs_to_do": "When a real buyer or partner delivers an experimental data file, place it at any path, compute its SHA-256, and call ingest_buyer_submission() with is_synthetic=False, custody_chain=<filled CustodyChain>, data_source_verified=True. The machine will handle the rest.",
+    "what_machine_does": "Ingest \u2192 classify evidence \u2192 update posterior \u2192 recompute EIG \u2192 select next experiment \u2192 generate package v3 with loop_verification_state=REAL_LOOP_VERIFIED.",
+    "what_machine_does_NOT_do": "Identify buyers, send emails, negotiate deals, manage relationships. All CEO-owned."
+  },
+  "honest_one_line": "The machine can receive a genuinely external experimental file through the same R327 ingest_buyer_submission() function used for synthetic fixtures. Same code path. Same epistemic semantics. Only metadata differs. Synthetic \u2192 SIMULATED_TEST_FIXTURE (Article XXXVII SYNTHETIC_LOOP_VERIFIED). External + custody \u2192 PHYSICALLY_VALIDATED (Article XXXVII REAL_LOOP_VERIFIED). Attack (synthetic relabeled as real) is blocked. The machine is ready for its first real external dataset.",
+  "loop_verification_state_note": "This gate VERIFIES the path is ready. It does NOT promote any candidate to REAL_LOOP_VERIFIED \u2014 that requires CEO-delivered external data."
+}

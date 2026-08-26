@@ -1,0 +1,85 @@
+{
+  "gate": "GATE 8: Architecture Check",
+  "expected_architecture": "DISCOVERY_ENGINE \u2192 TECHNOLOGY_FABRIC \u2192 BUYER_PACKAGE \u2192 CEO \u2192 BUYER \u2192 BUYER_EXPERIMENT \u2192 INBOUND_PIPELINE \u2192 LEARNING_ENGINE \u2192 NEW_DISCOVERY",
+  "layers_present": {
+    "DISCOVERY_ENGINE": {
+      "implementation": "R336/m2_discovery_engine/autonomous_discovery_engine.py",
+      "exists": true,
+      "role": "Generate candidates from problem space + cemetery constraints"
+    },
+    "TECHNOLOGY_FABRIC": {
+      "implementation": "R332/g3_all13_canonical/CANONICAL_BUYER_PACKAGES.json + per-candidate TTP folders",
+      "exists": true,
+      "role": "Mechanism, model, evidence, economics, differentiation, transfer"
+    },
+    "BUYER_PACKAGE": {
+      "implementation": "R339/g2_p24_buyer_package/P-24_BUYER_PACKAGE.json (and 14 others)",
+      "exists": true,
+      "role": "What the CEO hands to the buyer"
+    },
+    "CEO": {
+      "implementation": "Human (not machine)",
+      "exists": true,
+      "role": "Owns buyer relationship. Manual handoff."
+    },
+    "BUYER": {
+      "implementation": "External organization",
+      "exists": false,
+      "role": "Evaluates package, runs experiment, returns data"
+    },
+    "BUYER_EXPERIMENT": {
+      "implementation": "External (CEO-orchestrated)",
+      "exists": false,
+      "role": "Physical bench test / clinical study / wet lab"
+    },
+    "INBOUND_PIPELINE": {
+      "implementation": "R327/b1_verify/hardened_buyer_pipeline.py + R333/g1_all13_interface/production_buyer_interface.py",
+      "exists": true,
+      "role": "Ingest external experimental data with provenance + custody chain"
+    },
+    "LEARNING_ENGINE": {
+      "implementation": "R339/g6_eig_posterior_dependency/EIG_POSTERIOR_DEPENDENCY.json + Article XXXVII transition rules",
+      "exists": true,
+      "role": "Update posterior from external evidence \u2192 recompute EIG \u2192 select next experiment"
+    },
+    "NEW_DISCOVERY": {
+      "implementation": "R336/m2_discovery_engine + KA constraints (KA-014)",
+      "exists": true,
+      "role": "Generate next candidate set informed by what was learned"
+    }
+  },
+  "crm_layer_check": {
+    "R334_commercial_layer_present": true,
+    "crm_artifacts_found": [],
+    "crm_artifacts_count": 0,
+    "verdict": "NO CRM CREEP"
+  },
+  "forbidden_machine_functions": [
+    "buyer_outreach_automation",
+    "buyer_email_sending",
+    "buyer_pipeline_tracking",
+    "deal_value_negotiation",
+    "buyer_relationship_management",
+    "salesforce_integration",
+    "hubspot_integration",
+    "lead_scoring"
+  ],
+  "verification_method": "Searched R334/ for CRM-indicator fields (buyer_contact_email, sales_pipeline_stage, deal_value, crm_record_id, salesforce_id, hubspot_id, etc.).",
+  "verdict": "ARCHITECTURE CLEAN",
+  "ceo_owned_functions": [
+    "Buyer identification",
+    "Buyer outreach",
+    "Negotiation",
+    "Deal closing",
+    "Buyer relationship management"
+  ],
+  "machine_automated_functions": [
+    "Discovery (candidate generation)",
+    "Technology fabric (model, evidence, economics)",
+    "Buyer package generation",
+    "Inbound pipeline (external data ingestion)",
+    "Learning engine (posterior update, EIG, next experiment)",
+    "New discovery (informed by what was learned)"
+  ],
+  "honest_one_line": "Architecture verified clean. No CRM creep. Machine automates everything before and after CEO's buyer interaction. CEO remains the human bridge."
+}

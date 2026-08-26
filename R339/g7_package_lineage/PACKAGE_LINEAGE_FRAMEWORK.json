@@ -1,0 +1,19 @@
+{
+  "framework": "PACKAGE_LINEAGE_FRAMEWORK",
+  "applies_to": "all 15 active candidates",
+  "rules": [
+    "Every package version is preserved as a separate artifact (e.g., P-24_package_v1.json, P-24_package_v2.json, P-24_package_v2.1.json)",
+    "Versioning: v1, v2, v2.1, v2.2, ... v3 (major version change requires constitutional event)",
+    "Every transition logged in candidate's lineage.json with: from, to, trigger, evidence_pointer, ka_created, constitutional_event, note",
+    "Supersession \u2260 deletion. v1 remains in repository even after v2 supersedes it.",
+    "Buyer can reconstruct the full evidence\u2192state\u2192knowledge\u2192posterior\u2192EIG\u2192next\u2192package chain for any candidate.",
+    "Constitutional events (state transitions like SYNTHETIC\u2192REAL, kills, promotions) require explicit constitutional_event=true flag.",
+    "Pre-commit hook rejects commits that delete a prior package version."
+  ],
+  "machine_enforcement": [
+    "Pre-commit hook: reject deletion of P-*_package_v*.json files",
+    "Lineage validator: every candidate's lineage.json must include all versions and transitions",
+    "Dashboard: show current version + count of prior versions per candidate"
+  ],
+  "buyer_visible": "Buyer package includes a 'lineage' section showing: current version, prior versions count, last transition trigger, last transition evidence pointer."
+}

@@ -1,0 +1,129 @@
+{
+  "gate": "GATE 2: P-24 Buyer-Grade Package (honest rewrite)",
+  "candidate_id": "P-24",
+  "name": "Gravity-Compensating Hydraulic Damper",
+  "package_version": "v2.1",
+  "supersedes": "v2 (R338 \u2014 contained internal inconsistencies)",
+  "loop_verification_state": "SYNTHETIC_LOOP_VERIFIED",
+  "loop_verification_state_note": "Article XXXVII. The 11-step Article XXXV loop ran with synthetic observations. Posterior is NOT reality-informed.",
+  "timestamp": "2026-08-26T03:54:09.528673+00:00",
+  "what_p24_has": {
+    "computational_model": "Analytical Poiseuille + compressible element. Committed: R338/g1_p24_evidence/p24_p25_models.py",
+    "vvuq": {
+      "n_samples": 1000,
+      "parameters_varied": [
+        "G_max (\u00b112%)",
+        "P_threshold (\u00b120%)",
+        "P_max (\u00b112%)",
+        "n_exponent (\u00b115%)",
+        "CSF_viscosity (\u00b114%)",
+        "P_upright (\u00b117%)"
+      ],
+      "P_flow_below_0.5_mL_per_min": 78.8,
+      "mean_upright_flow": 0.3604,
+      "p5_upright_flow": 0.0,
+      "p95_upright_flow": 0.6187,
+      "label": "COMPUTATIONALLY_SUPPORTED_BUT_UNCERTAINTY_SENSITIVE \u2014 78.8% of the modeled parameter ensemble meets target. 21.2% violates target. Do not call this 'robust' without qualification."
+    },
+    "lower_nominal_upright_flow_than_standard_shunt": true,
+    "faster_modeled_response_than_asd": {
+      "damper_response_time_s": 0.1,
+      "asd_response_time_s": 0.5,
+      "advantage_s": 0.4,
+      "clinical_materiality": "UNESTABLISHED \u2014 postural transitions take seconds, not 0.5s. The 0.4s advantage may be immaterial. See GATE 3."
+    },
+    "proportional_response": true,
+    "survives_initial_physics_attack": true
+  },
+  "what_p24_does_NOT_have": {
+    "superiority_over_asd": "FALSE \u2014 ASD is closer to target flow in 3/4 postures. P-24 is closer in 1/4 (sitting only).",
+    "physical_bench_validation": "OUTSTANDING \u2014 no bench data exists",
+    "clinical_validation": "OUTSTANDING \u2014 no clinical data exists",
+    "demonstrated_manufacturability": "OUTSTANDING \u2014 no manufacturing tolerance study exists",
+    "demonstrated_long_term_reliability": "OUTSTANDING \u2014 no fatigue / creep / aging study exists",
+    "external_data": "OUTSTANDING \u2014 Article XXXVII blocks promotion to REAL_LOOP_VERIFIED until external data ingested"
+  },
+  "asd_comparison_table": {
+    "supine": {
+      "pressure_mmHg": 10,
+      "damper_flow_mL_per_min": 0.25,
+      "asd_flow_mL_per_min": 0.25,
+      "standard_flow_mL_per_min": 0.25,
+      "target_mL_per_min": 0.3,
+      "damper_overdrainage": false,
+      "damper_underdrainage": false,
+      "asd_overdrainage": false,
+      "asd_underdrainage": false,
+      "damper_closer_to_target": false
+    },
+    "sitting": {
+      "pressure_mmHg": 20,
+      "damper_flow_mL_per_min": 0.4444,
+      "asd_flow_mL_per_min": 0.5,
+      "standard_flow_mL_per_min": 0.5,
+      "target_mL_per_min": 0.3,
+      "damper_overdrainage": false,
+      "damper_underdrainage": false,
+      "asd_overdrainage": false,
+      "asd_underdrainage": false,
+      "damper_closer_to_target": true
+    },
+    "standing": {
+      "pressure_mmHg": 30,
+      "damper_flow_mL_per_min": 0.4167,
+      "asd_flow_mL_per_min": 0.225,
+      "standard_flow_mL_per_min": 0.75,
+      "target_mL_per_min": 0.3,
+      "damper_overdrainage": false,
+      "damper_underdrainage": false,
+      "asd_overdrainage": false,
+      "asd_underdrainage": false,
+      "damper_closer_to_target": false
+    },
+    "extreme": {
+      "pressure_mmHg": 40,
+      "damper_flow_mL_per_min": 0.0,
+      "asd_flow_mL_per_min": 0.3,
+      "standard_flow_mL_per_min": 1.0,
+      "target_mL_per_min": 0.3,
+      "damper_overdrainage": false,
+      "damper_underdrainage": true,
+      "asd_overdrainage": false,
+      "asd_underdrainage": false,
+      "damper_closer_to_target": false
+    }
+  },
+  "asymmetric_advantage_summary": {
+    "postures_damper_closer_to_target": 1,
+    "postures_asd_closer_to_target": 3,
+    "total_postures": 4,
+    "honest_finding": "ASD is BETTER than P-24 at target-flow matching in 3/4 postures. P-24's advantage is proportional response and faster modeled dynamics \u2014 neither yet established as clinically material.",
+    "underdrainage_at_extreme": "P=40 mmHg \u2192 damper flow = 0.0 mL/min (underdrainage). ASD flow = 0.3 (on target)."
+  },
+  "buyer_proposition": "A computationally supported proportional hydraulic regulation architecture whose differentiating hypothesis is faster response and controllable flow behavior. Current modeling does NOT establish superiority over existing ASD architectures. ASD outperforms P-24 in target-flow matching across 3/4 modeled postures. P-24 has underdrainage risk at extreme pressure (P=40 mmHg). The decisive bench test is defined.",
+  "decisive_experiment": {
+    "experiment_id": "P24-EXP-001",
+    "type": "Physical bench test (NOT yet executed)",
+    "protocol": "Mock CSF loop, damper vs ASD vs standard, 4 postural pressures (10/20/30/40 mmHg), 10 runs each, blinded analysis",
+    "pass_rule": "Damper prevents overdrainage (flow < 0.5 mL/min) at supine/sitting/standing AND underdrainage (flow > 0.1 mL/min) at extreme. OR damper demonstrates quantified clinical advantage over ASD on a pre-declared metric (response time, proportional smoothness, etc.).",
+    "fail_rule": "Damper produces underdrainage at any non-extreme posture, OR overdrainage at any posture, OR no quantified clinical advantage over ASD emerges.",
+    "cost_estimate_USD": 15000,
+    "timeline_weeks": 8,
+    "external_data_required": true,
+    "upon_pass": "Candidate becomes eligible for REAL_LOOP_VERIFIED (Article XXXVII \u00a76). Posterior updated by external observation.",
+    "upon_fail": "Candidate enters repair pipeline (Article XXXVI \u00a74). Repair budget = 1. Second failure = cemetery."
+  },
+  "technical_limitations": [
+    "Computationally modeled only \u2014 no physical bench data",
+    "ASD is closer to target in 3/4 postures",
+    "Underdrainage at extreme pressure (P=40 mmHg)",
+    "Manufacturing tolerances not yet characterized",
+    "Long-term fatigue/creep of compressible element not studied",
+    "Posterior not yet informed by external reality"
+  ],
+  "posterior": 0.6,
+  "posterior_note": "Held at prior 0.6. R338 reported posterior=0.895, but that update was driven by a SYNTHETIC observation. Article XXXVII requires posterior updates from synthetic observations to be labeled as 'synthetic posterior' \u2014 not promoted to the buyer-facing posterior. The buyer-facing posterior remains 0.6 until external data arrives.",
+  "synthetic_posterior": 0.895,
+  "synthetic_posterior_label": "Synthetic-only. Not buyer-facing. Article XXXVII.",
+  "honest_one_line": "P-24 is a computationally supported proportional damper that does NOT beat ASD in 3/4 postures and has underdrainage at extreme pressure. The decisive bench test is defined. Loop verification state: SYNTHETIC_LOOP_VERIFIED (not REAL)."
+}

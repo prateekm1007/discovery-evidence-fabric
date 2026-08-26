@@ -1,8 +1,10 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 1.5.0
+**Version:** 1.7.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
+**Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
+**Amended:** 2026-08-26 (Article XXXVII — Synthetic Loop vs Real Loop Verification; see R339/constitution/ARTICLE_XXXVII_SYNTHETIC_VS_REAL_LOOP.md)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself
 
@@ -1024,3 +1026,55 @@ NONE of the 5 slots have this loop fully operational:
 - Slot 5: EMPTY — must be born with the loop
 
 This gap is the honest current state. Closing it is the path from "0/5 world-class inventions" to "1+/5."
+
+---
+
+## Article XXXVII — Synthetic Loop vs Real Loop Verification
+
+**Ratified:** 2026-08-26 (Round 339)
+**Amends:** Constitution v1.6.0 → v1.7.0
+**Full text:** `R339/constitution/ARTICLE_XXXVII_SYNTHETIC_VS_REAL_LOOP.md`
+**Sponsor:** CEO directive R339 — "Freeze the distinction between synthetic and real."
+
+### The correction this article makes
+
+R338 closed with the repository reporting "Article XXXV loop demonstrated with SYNTHETIC data." The label was honest. But **nothing in the machinery prevented a future session from quietly dropping that label**. This article makes the distinction machine-enforced.
+
+### The two loop-verification states
+
+Every candidate carries a `loop_verification_state` field, valued exactly one of:
+
+- **`NONE`** — Article XXXV loop has not been executed end-to-end.
+- **`SYNTHETIC_LOOP_VERIFIED`** — Loop executed with internal-only synthetic observations. Proves the *machinery* works. Does NOT prove the technology learned something about reality.
+- **`REAL_LOOP_VERIFIED`** — Loop executed with at least one observation derived from external reality. Proves the *machinery* works AND the technology's posterior was updated by reality.
+
+### Forbidden transitions
+
+- `SYNTHETIC_LOOP_VERIFIED → REAL_LOOP_VERIFIED` requires: external observation with verifiable provenance chain, ingest through SAME code path as synthetic, posterior updated by external observation (not by coder narrative), transition recorded as constitutional event.
+- `REAL_LOOP_VERIFIED → SYNTHETIC_LOOP_VERIFIED` — FORBIDDEN. Demotion requires cemetery entry.
+- `ANY → NONE` — FORBIDDEN. Loop history is append-only.
+
+### Machine-enforcement points
+
+1. Every package MUST declare `loop_verification_state`.
+2. Every dashboard MUST show counts of each state separately — never collapsed.
+3. Every API response referencing learning/posterior/evidence MUST carry the field.
+4. Every narrative MUST qualify "learning" as "from synthetic evidence" or "from real external evidence."
+5. Pre-commit hook rejects commits that drop or rename the field.
+6. `constitution_loader.py` surfaces this article before every coding session.
+
+### Honest scorecard after R339
+
+```
+SYNTHETIC_LOOP_VERIFIED: 1   (P-24)
+REAL_LOOP_VERIFIED:      0
+NONE:                   14
+```
+
+The next true milestone is moving ONE candidate to `REAL_LOOP_VERIFIED` — which requires the CEO to deliver an external experimental dataset through the inbound interface. The machine's job is to be ready for that dataset. R339 GATE 9 verified the readiness.
+
+### Relationship to Article XXXV
+
+Article XXXV defines the closed loop as the completion standard. Article XXXVII refines it: the loop has two distinct verification states, and only `REAL_LOOP_VERIFIED` satisfies the spirit of Article XXXV.
+
+See the full text at `R339/constitution/ARTICLE_XXXVII_SYNTHETIC_VS_REAL_LOOP.md` for the complete transition rules, anti-gaming clauses, and CEO-owned path to REAL_LOOP_VERIFIED.

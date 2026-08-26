@@ -1,0 +1,73 @@
+{
+  "gate": "GATE 5: KA-014 Stress Test",
+  "ka_under_test": {
+    "ka_id": "KA-014",
+    "lesson": "Non-common-mode drift (biofouling, asymmetric creep) defeats simple self-referencing compensation.",
+    "narrower_statement": "Self-referencing ALONE does not eliminate non-common-mode drift. A self-referencing sensor is BLOCKED unless it explicitly addresses non-common-mode drift via one of: anti-fouling mechanism, independent recalibration protocol, or different sensing modality not subject to the same drift.",
+    "trigger_keywords": [
+      "self-referencing",
+      "differential",
+      "common-mode",
+      "dual-element",
+      "common mode cancellation"
+    ],
+    "repair_keywords": [
+      "anti-fouling",
+      "antifouling",
+      "recalibration",
+      "self-calibration",
+      "periodic calibration",
+      "different modality",
+      "redundant sensing"
+    ]
+  },
+  "candidates_tested": [
+    {
+      "candidate_id": "CAND-A",
+      "candidate_name": "Differential Capacitive Pressure Sensor (no repair)",
+      "mechanism_excerpt": "Dual capacitive plates where one measures pressure and one is sealed at reference, cancelling common-mode drift through differential measurement....",
+      "trigger_match": true,
+      "repair_keywords_present": [],
+      "expected_action": "BLOCK",
+      "actual_action": "BLOCK",
+      "reason": "KA-014 triggered: candidate relies on self-referencing without an explicit non-common-mode drift repair mechanism. BLOCKED until anti-fouling, independent recalibration, or different sensing modality is added.",
+      "correctly_evaluated": true
+    },
+    {
+      "candidate_id": "CAND-B",
+      "candidate_name": "Differential Capacitive Pressure Sensor + Anti-fouling coating",
+      "mechanism_excerpt": "Dual capacitive plates with differential measurement, plus a zwitterionic anti-fouling coating on the sensing element that addresses the biofouling component of non-common-mode drift....",
+      "trigger_match": true,
+      "repair_keywords_present": [
+        "anti-fouling"
+      ],
+      "expected_action": "EVALUATE",
+      "actual_action": "EVALUATE",
+      "reason": "KA-014 triggered but candidate explicitly addresses non-common-mode drift via: ['anti-fouling']. Proceed to standard admission pipeline. Repair mechanism must be validated during candidate evaluation.",
+      "correctly_evaluated": true
+    },
+    {
+      "candidate_id": "CAND-C",
+      "candidate_name": "Differential Capacitive Pressure Sensor + Independent recalibration",
+      "mechanism_excerpt": "Dual capacitive plates with differential measurement, plus a magnetic-triggered periodic recalibration protocol that re-zeroes both elements against an external reference standard every 30 days....",
+      "trigger_match": true,
+      "repair_keywords_present": [
+        "recalibration",
+        "self-calibration",
+        "periodic calibration"
+      ],
+      "expected_action": "EVALUATE",
+      "actual_action": "EVALUATE",
+      "reason": "KA-014 triggered but candidate explicitly addresses non-common-mode drift via: ['recalibration', 'self-calibration', 'periodic calibration']. Proceed to standard admission pipeline. Repair mechanism must be validated during candidate evaluation.",
+      "correctly_evaluated": true
+    }
+  ],
+  "all_correctly_evaluated": true,
+  "overfitting_check": {
+    "would_R338_implementation_have_blocked_B": true,
+    "would_R338_implementation_have_blocked_C": true,
+    "R338_bug": "R338 triggered on keyword match alone \u2014 'self-referencing' or 'differential' or 'common-mode' in the mechanism keywords. This would have BLOCKED candidates B and C, which is overgeneralization. The lesson from P-25 is narrower: self-referencing ALONE does not eliminate non-common-mode drift. B and C explicitly address non-common-mode drift.",
+    "R339_fix": "Add repair-keyword detection. If trigger matches AND repair is present, EVALUATE (not BLOCK). If trigger matches AND no repair, BLOCK. This implements the narrower learned statement."
+  },
+  "honest_one_line": "KA-014 correctly BLOCKS candidate A (no repair) and correctly EVALUATES candidates B (anti-fouling) and C (recalibration). Negative knowledge is now a scientific learning system, not a blunt censorship engine."
+}

@@ -1,0 +1,211 @@
+{
+  "gate": "GATE 6: EIG Posterior Dependency",
+  "test": "Run three evidence outcomes (PASS/FAIL/AMBIGUOUS). For each, compute posterior \u2192 EIG \u2192 ranking. Ranking must change when scientifically justified.",
+  "candidates_in_ranking": [
+    {
+      "id": "P-24",
+      "prior": 0.6,
+      "cost_USD": 15000
+    },
+    {
+      "id": "P-16",
+      "prior": 0.5,
+      "cost_USD": 3000
+    },
+    {
+      "id": "P-04",
+      "prior": 0.4,
+      "cost_USD": 25000
+    }
+  ],
+  "outcome_results": {
+    "PASS": {
+      "outcome_likelihoods": {
+        "p_obs_given_works": 0.85,
+        "p_obs_given_fails": 0.15
+      },
+      "posteriors_and_eig": [
+        {
+          "candidate_id": "P-24",
+          "prior": 0.6,
+          "posterior_after_outcome": 0.8947,
+          "eig_before": 0.376,
+          "eig_after": 0.157,
+          "eig_change": -0.219,
+          "eig_per_cost": 0.0105,
+          "cost_USD": 15000
+        },
+        {
+          "candidate_id": "P-16",
+          "prior": 0.5,
+          "posterior_after_outcome": 0.85,
+          "eig_before": 0.2781,
+          "eig_after": 0.1468,
+          "eig_change": -0.1313,
+          "eig_per_cost": 0.0489,
+          "cost_USD": 3000
+        },
+        {
+          "candidate_id": "P-04",
+          "prior": 0.4,
+          "posterior_after_outcome": 0.7907,
+          "eig_before": 0.5125,
+          "eig_after": 0.3688,
+          "eig_change": -0.1437,
+          "eig_per_cost": 0.0148,
+          "cost_USD": 25000
+        }
+      ],
+      "ranking_by_eig_per_cost": [
+        "P-16",
+        "P-04",
+        "P-24"
+      ],
+      "winner": "P-16",
+      "winner_eig_per_cost": 0.0489
+    },
+    "FAIL": {
+      "outcome_likelihoods": {
+        "p_obs_given_works": 0.1,
+        "p_obs_given_fails": 0.9
+      },
+      "posteriors_and_eig": [
+        {
+          "candidate_id": "P-24",
+          "prior": 0.6,
+          "posterior_after_outcome": 0.1429,
+          "eig_before": 0.376,
+          "eig_after": 0.2014,
+          "eig_change": -0.1745,
+          "eig_per_cost": 0.0134,
+          "cost_USD": 15000
+        },
+        {
+          "candidate_id": "P-16",
+          "prior": 0.5,
+          "posterior_after_outcome": 0.1,
+          "eig_before": 0.2781,
+          "eig_after": 0.1048,
+          "eig_change": -0.1733,
+          "eig_per_cost": 0.0349,
+          "cost_USD": 3000
+        },
+        {
+          "candidate_id": "P-04",
+          "prior": 0.4,
+          "posterior_after_outcome": 0.069,
+          "eig_before": 0.5125,
+          "eig_after": 0.1536,
+          "eig_change": -0.3588,
+          "eig_per_cost": 0.0061,
+          "cost_USD": 25000
+        }
+      ],
+      "ranking_by_eig_per_cost": [
+        "P-16",
+        "P-24",
+        "P-04"
+      ],
+      "winner": "P-16",
+      "winner_eig_per_cost": 0.0349
+    },
+    "AMBIGUOUS": {
+      "outcome_likelihoods": {
+        "p_obs_given_works": 0.5,
+        "p_obs_given_fails": 0.5
+      },
+      "posteriors_and_eig": [
+        {
+          "candidate_id": "P-24",
+          "prior": 0.6,
+          "posterior_after_outcome": 0.6,
+          "eig_before": 0.376,
+          "eig_after": 0.376,
+          "eig_change": 0.0,
+          "eig_per_cost": 0.0251,
+          "cost_USD": 15000
+        },
+        {
+          "candidate_id": "P-16",
+          "prior": 0.5,
+          "posterior_after_outcome": 0.5,
+          "eig_before": 0.2781,
+          "eig_after": 0.2781,
+          "eig_change": 0.0,
+          "eig_per_cost": 0.0927,
+          "cost_USD": 3000
+        },
+        {
+          "candidate_id": "P-04",
+          "prior": 0.4,
+          "posterior_after_outcome": 0.4,
+          "eig_before": 0.5125,
+          "eig_after": 0.5125,
+          "eig_change": 0.0,
+          "eig_per_cost": 0.0205,
+          "cost_USD": 25000
+        }
+      ],
+      "ranking_by_eig_per_cost": [
+        "P-16",
+        "P-24",
+        "P-04"
+      ],
+      "winner": "P-16",
+      "winner_eig_per_cost": 0.0927
+    }
+  },
+  "ranking_summary": {
+    "PASS_ranking": [
+      "P-16",
+      "P-04",
+      "P-24"
+    ],
+    "FAIL_ranking": [
+      "P-16",
+      "P-24",
+      "P-04"
+    ],
+    "AMBIGUOUS_ranking": [
+      "P-16",
+      "P-24",
+      "P-04"
+    ],
+    "rankings_change_across_outcomes": true,
+    "interpretation": "PASS outcome: P-24 posterior rises \u2192 EIG drops \u2192 P-24 falls in ranking (less to learn). FAIL outcome: P-24 posterior drops \u2192 EIG may rise for repair hypotheses, OR P-24 enters repair pipeline (no further EIG). AMBIGUOUS outcome: posteriors barely move \u2192 EIG barely moves \u2192 ranking barely changes. This demonstrates the machine's future action depends on what it learns."
+  },
+  "p24_specific_analysis": {
+    "PASS": {
+      "candidate_id": "P-24",
+      "prior": 0.6,
+      "posterior_after_outcome": 0.8947,
+      "eig_before": 0.376,
+      "eig_after": 0.157,
+      "eig_change": -0.219,
+      "eig_per_cost": 0.0105,
+      "cost_USD": 15000
+    },
+    "FAIL": {
+      "candidate_id": "P-24",
+      "prior": 0.6,
+      "posterior_after_outcome": 0.1429,
+      "eig_before": 0.376,
+      "eig_after": 0.2014,
+      "eig_change": -0.1745,
+      "eig_per_cost": 0.0134,
+      "cost_USD": 15000
+    },
+    "AMBIGUOUS": {
+      "candidate_id": "P-24",
+      "prior": 0.6,
+      "posterior_after_outcome": 0.6,
+      "eig_before": 0.376,
+      "eig_after": 0.376,
+      "eig_change": 0.0,
+      "eig_per_cost": 0.0251,
+      "cost_USD": 15000
+    }
+  },
+  "honest_one_line": "EIG genuinely depends on posterior. Three outcome branches produce three different rankings. The machine's next experiment is not fixed \u2014 it depends on what evidence arrives.",
+  "loop_verification_state_note": "This gate demonstrates posterior-dependency of EIG. The actual update still requires REAL_LOOP_VERIFIED to be buyer-facing."
+}

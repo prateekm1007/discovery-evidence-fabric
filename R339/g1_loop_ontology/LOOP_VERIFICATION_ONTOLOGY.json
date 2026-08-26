@@ -1,0 +1,100 @@
+{
+  "gate": "GATE 1: Loop Verification Ontology",
+  "constitutional_basis": "Article XXXVII (ratified 2026-08-26, R339)",
+  "constitution_version": "v1.7.0",
+  "ratified_at": "2026-08-26T03:54:09.520865+00:00",
+  "states": {
+    "NONE": {
+      "definition": "Article XXXV loop has not been executed end-to-end.",
+      "what_it_proves": "Nothing about the loop.",
+      "what_it_does_not_prove": "That the loop works.",
+      "buyer_semantics": "In progress. Architecture not yet demonstrated."
+    },
+    "SYNTHETIC_LOOP_VERIFIED": {
+      "definition": "Article XXXV loop executed end-to-end with internal-only synthetic observations.",
+      "what_it_proves": "The loop's machinery is sound (11 steps ran: MODEL \u2192 VVUQ \u2192 VIRTUAL_COHORT \u2192 EXPERIMENT \u2192 INGESTION \u2192 MODEL_UPDATE \u2192 KNOWLEDGE \u2192 POSTERIOR \u2192 EIG \u2192 NEXT_EXPERIMENT \u2192 PACKAGE_V2).",
+      "what_it_does_not_prove": "That the technology learned something about reality.",
+      "required_provenance": {
+        "loop_steps_executed": 11,
+        "synthetic_observation_labeled": true,
+        "synthetic_source": "internal_fixture",
+        "external_data_required_for_promotion": true
+      },
+      "buyer_semantics": "Software-architecture evidence only. Cannot support physical-validation claims. Posterior is NOT reality-informed."
+    },
+    "REAL_LOOP_VERIFIED": {
+      "definition": "Article XXXV loop executed end-to-end with at least one observation derived from external reality.",
+      "what_it_proves": "The loop's machinery is sound AND the technology's posterior was updated by reality.",
+      "what_it_does_not_prove": "That the candidate is commercially validated or buyer-verified.",
+      "required_provenance": {
+        "external_data_source": "URI / DOI / NDA reference / wet-lab notebook ID",
+        "external_artifact_hash": "SHA-256 of raw external file",
+        "external_observation_timestamp": "ISO-8601",
+        "independent_reproduction_path": "Path a third party could use to reproduce the ingest",
+        "ingest_pipeline_unchanged": "Same code path as synthetic ingest (no semantic fork)"
+      },
+      "buyer_semantics": "Reality-informed posterior. May support physical-validation claims."
+    }
+  },
+  "transitions": {
+    "NONE \u2192 SYNTHETIC_LOOP_VERIFIED": {
+      "requires": [
+        "11 loop steps executed",
+        "every ingested observation labeled is_synthetic=true",
+        "every ingested observation tagged synthetic_source=internal_fixture"
+      ],
+      "forbidden": [
+        "narrative-only promotion without code-level execution"
+      ]
+    },
+    "SYNTHETIC_LOOP_VERIFIED \u2192 REAL_LOOP_VERIFIED": {
+      "requires": [
+        "external observation with verifiable provenance chain",
+        "external observation ingested through SAME code path as synthetic ingest",
+        "posterior updated by external observation (not by coder narrative)",
+        "transition recorded as constitutional event in package lineage"
+      ],
+      "forbidden": [
+        "internal-only simulated observation relabeled as external",
+        "narrative promotion without code-level provenance",
+        "weakening external_data_source requirement",
+        "adding parallel 'external_ingest_v2.py' that bypasses synthetic pipeline checks"
+      ]
+    },
+    "REAL_LOOP_VERIFIED \u2192 SYNTHETIC_LOOP_VERIFIED": "FORBIDDEN \u2014 demotion requires cemetery entry",
+    "ANY \u2192 NONE": "FORBIDDEN \u2014 loop history is append-only"
+  },
+  "machine_enforcement_points": [
+    "Every package MUST declare loop_verification_state \u2208 {NONE, SYNTHETIC_LOOP_VERIFIED, REAL_LOOP_VERIFIED}",
+    "Every dashboard MUST show counts of each state separately \u2014 never collapsed to 'verified: N'",
+    "Every API response referencing learning/posterior/evidence/experiment MUST carry loop_verification_state",
+    "Every narrative (audit, worklog, commit, buyer brief) MUST qualify 'learning' as 'from synthetic evidence' or 'from real external evidence'",
+    "Pre-commit hook rejects commits that drop or rename the field",
+    "constitution_loader.py surfaces Article XXXVII before every coding session"
+  ],
+  "current_state_after_R338": {
+    "P-24": "SYNTHETIC_LOOP_VERIFIED",
+    "P-01": "NONE",
+    "P-02": "NONE",
+    "P-04": "NONE",
+    "P-07": "NONE",
+    "P-10": "NONE",
+    "P-11": "NONE",
+    "P-12": "NONE",
+    "P-13": "NONE",
+    "P-15": "NONE",
+    "P-16": "NONE",
+    "P-20": "NONE",
+    "P-21": "NONE",
+    "P-22": "NONE",
+    "P-25": "NONE"
+  },
+  "honest_scorecard_after_R339": {
+    "SYNTHETIC_LOOP_VERIFIED": 1,
+    "REAL_LOOP_VERIFIED": 0,
+    "NONE": 14,
+    "total": 15
+  },
+  "ceo_directive_alignment": "R338 proved the machine can run a synthetic learning loop. R339 freezes the distinction at machine level so future sessions cannot silently collapse SYNTHETIC_LOOP_VERIFIED into REAL_LOOP_VERIFIED. The next true milestone is REAL_LOOP_VERIFIED for at least one candidate \u2014 which requires the CEO to deliver an external experimental dataset through the inbound interface.",
+  "note": "This artifact is the machine-readable companion to R339/constitution/ARTICLE_XXXVII_SYNTHETIC_VS_REAL_LOOP.md."
+}
