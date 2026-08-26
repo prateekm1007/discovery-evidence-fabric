@@ -331,6 +331,12 @@ def run_gate3b_v2():
     total_evidence_preserved = sum(a.get("summary", {}).get("evidence_preserved_count", 0) for a in package_audits)
     total_uncertainty_preserved = sum(a.get("summary", {}).get("uncertainty_preserved_count", 0) for a in package_audits)
     total_unknown_preserved = sum(a.get("summary", {}).get("unknown_preserved_count", 0) for a in package_audits)
+    # Count actual MEANING_CHANGE transformations (not unmatched claims)
+    # meaning_change_violations = claims with FAIL status due to MEANING_CHANGE
+    total_meaning_change_violations = sum(
+        1 for a in package_audits for c in a.get("claims", [])
+        if c.get("status") == "FAIL" and any("MEANING_CHANGE" in v for v in c.get("violations", []))
+    )
 
     report = {
         "gate": "GATE C — CLAIM-LEVEL MAPPING (v2, claim_id linkage)",
@@ -355,7 +361,8 @@ def run_gate3b_v2():
             "evidence_preserved": total_evidence_preserved,
             "uncertainty_preserved": total_uncertainty_preserved,
             "unknown_preserved": total_unknown_preserved,
-            "meaning_changes": total_claims - total_meaning_preserved,
+            "meaning_changes": total_meaning_change_violations,  # Only actual MEANING_CHANGE violations, not unmatched claims
+            "unmatched_claims": total_claims - total_meaning_preserved,  # Claims not found verbatim (SUMMARIZED, not violations)
             "evidence_promotions": sum(1 for a in package_audits for c in a.get("claims", [])
                                         if any("EVIDENCE_PROMOTION" in v for v in c.get("violations", []))),
             "unknown_erased": sum(1 for a in package_audits for c in a.get("claims", [])

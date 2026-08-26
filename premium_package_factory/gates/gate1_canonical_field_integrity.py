@@ -36,6 +36,7 @@ R370_CLAIMS_PATH = os.path.join(REPO_ROOT, "R370/claim_level/ALL_CLAIMS.json")
 
 RESOLVED_PATH = "/home/z/my-project/canonical_data/canonical_15_packages_r370_resolved.json"
 ADAPTED_PATH = "/home/z/my-project/canonical_data/canonical_15_packages_r370_adapted.json"
+REGISTRY_PATH = "/home/z/my-project/canonical_data/MATERIAL_FIELD_REGISTRY.json"
 GATE_OUTPUT_DIR = "/home/z/my-project/premium_package_factory/output/_gates"
 os.makedirs(GATE_OUTPUT_DIR, exist_ok=True)
 
@@ -64,39 +65,21 @@ def _get_commit_hash():
         return "UNKNOWN"
 
 
-# All material fields that must be accounted for
-MATERIAL_FIELDS = [
-    # Core identification
-    "id",
-    # Technical
-    "mechanism",
-    "problem",
-    "evidence_now",
-    "evidence_tier",
-    "modelled_only",
-    "known_failures",
-    "strongest_alternative",
-    "remaining_uncertainty",
-    # Validation
-    "decisive_experiment",
-    "pass_rule",
-    "fail_rule",
-    # Economic
-    "cost_estimate",
-    "timeline_estimate",
-    # Commercial
-    "buyer",
-    "buyer_action",
-    "commercial_route",
-    # Regulatory
-    "regulatory_status",
-    "integration_path",
-    # Provenance
-    "provenance_manifest",
-    "buyer_action_id",
-    # Maturity
-    "maturity",
-]
+def load_material_field_registry():
+    """Load the frozen MATERIAL_FIELD_REGISTRY.json.
+
+    Gate 1 derives its field universe from this file — if a new field is added
+    to the canonical without being registered here, Gate 1 will flag it as
+    UNREGISTERED_MATERIAL_FIELD.
+    """
+    with open(REGISTRY_PATH) as f:
+        registry = json.load(f)
+    return registry
+
+
+def get_registered_fields(registry):
+    """Get the list of registered material field names."""
+    return [f["field_name"] for f in registry["fields"]]
 
 
 def load_all_sources():
@@ -327,8 +310,13 @@ def classify_transformation(r370_value, resolved_value, adapted_value):
     return "FAIL"
 
 
-def audit_package_fields(pkg_id, sources):
+def audit_package_fields(pkg_id, sources, material_fields=None):
     """Audit all material fields for a single package."""
+    if material_fields is None:
+        # Load from registry if not passed
+        registry = load_material_field_registry()
+        material_fields = get_registered_fields(registry)
+
     resolved = sources["resolved"]
     adapted = sources["adapted"]
 
@@ -339,7 +327,7 @@ def audit_package_fields(pkg_id, sources):
     n_unknown = 0
     n_fail = 0
 
-    for field in MATERIAL_FIELDS:
+    for field in material_fields:
         # Get R370 source value
         r370_result = get_r370_source_value(pkg_id, field, sources)
         if r370_result:
@@ -383,7 +371,7 @@ def audit_package_fields(pkg_id, sources):
         "package_id": pkg_id,
         "field_audits": field_audits,
         "summary": {
-            "total_fields": len(MATERIAL_FIELDS),
+            "total_fields": len(material_fields),
             "EXACT_MATCH": n_exact,
             "APPROVED_SUMMARY": n_summary,
             "APPROVED_RESTRUCTURE": n_restructure,
@@ -402,14 +390,48 @@ def run_gate1_field_integrity():
     commit = _get_commit_hash()
     print(f"Repo commit: {commit}")
 
+    # Load the frozen material field registry
+    registry = load_material_field_registry()
+    MATERIAL_FIELDS = get_registered_fields(registry)
+    registry_version = registry.get("registry_invariants", {}).get("version", "UNKNOWN")
+    registry_total = registry.get("registry_invariants", {}).get("total_material_fields", 0)
+    print(f"Material field registry: {registry_version} ({registry_total} fields, SHA-256: {_sha256_file(REGISTRY_PATH)[:16]}...)")
+    print(f"Registered fields: {MATERIAL_FIELDS}")
+
     sources = load_all_sources()
     r370_axes = sources["R370_axes"]
     r370_pkg_ids = list(r370_axes.keys())
     print(f"Auditing {len(r370_pkg_ids)} packages × {len(MATERIAL_FIELDS)} fields = {len(r370_pkg_ids) * len(MATERIAL_FIELDS)} field checks")
 
+    # Check for unregistered material fields in the adapted canonical
+    adapted = sources["adapted"]
+    adapted_pkgs = adapted.get("packages", {})
+    unregistered_fields_found = set()
+    # Fields that are internal metadata (start with _) or derived presentation fields
+    INTERNAL_FIELDS = {"_field_provenance", "_r370_axes", "_r370_transaction", "_buyers_full",
+                        "_killed_in_later_round", "_superseded_by_r1", "_r1_repair",
+                        "name", "subtitle", "value_proposition", "target_application",
+                        "transfer_posture", "buyer_action_short", "domain", "evidence_summary",
+                        "patent_landscape", "risk_level", "buyers", "known", "unknown",
+                        "kill_condition", "next_question", "key_metrics", "manufacturing_known",
+                        "manufacturing_unknown", "next_engineering_step", "know_how",
+                        "regulatory_pathway_hypothesis", "regulatory_unknowns", "ip_diligence_questions",
+                        "transaction_paths", "primary_action", "physical_validation_count",
+                        "computational_validation_count", "diagram_kind", "diagram_components",
+                        "diagram_edges", "evidence_ladder_position"}
+    for pkg_id, pkg in adapted_pkgs.items():
+        for field_name in pkg.keys():
+            if field_name not in MATERIAL_FIELDS and field_name not in INTERNAL_FIELDS:
+                unregistered_fields_found.add(field_name)
+
+    if unregistered_fields_found:
+        print(f"  WARNING: Unregistered material fields found: {unregistered_fields_found}")
+    else:
+        print(f"  ✓ All material fields are registered in MATERIAL_FIELD_REGISTRY {registry_version}")
+
     package_audits = []
     for pkg_id in r370_pkg_ids:
-        audit = audit_package_fields(pkg_id, sources)
+        audit = audit_package_fields(pkg_id, sources, MATERIAL_FIELDS)
         package_audits.append(audit)
         s = audit["summary"]
         print(f"  {pkg_id}: {audit['overall']} "
@@ -429,15 +451,24 @@ def run_gate1_field_integrity():
     total_fields = sum(a["summary"]["total_fields"] for a in package_audits)
 
     report = {
-        "gate": "GATE 1 — TRUE CANONICAL FIELD INTEGRITY (upgraded)",
+        "gate": "GATE 1 — TRUE CANONICAL FIELD INTEGRITY (registry-driven)",
         "generated_at": _now_iso(),
         "repo_commit": commit,
         "description": (
             "For every package, compare EVERY material canonical field across: "
             "R370 source artifact → resolved canonical → adapted canonical. "
-            "Each field classified as EXACT_MATCH / APPROVED_SUMMARY / APPROVED_RESTRUCTURE / "
-            "GENUINE_UNKNOWN / FAIL. Zero FAIL required for PASS."
+            "Field universe is derived from frozen MATERIAL_FIELD_REGISTRY.json — "
+            "unregistered fields are flagged. Each field classified as "
+            "EXACT_MATCH / APPROVED_SUMMARY / APPROVED_RESTRUCTURE / GENUINE_UNKNOWN / FAIL."
         ),
+        "material_field_registry": {
+            "version": registry_version,
+            "path": REGISTRY_PATH,
+            "sha256": _sha256_file(REGISTRY_PATH),
+            "total_registered_fields": registry_total,
+            "unregistered_fields_found": list(unregistered_fields_found),
+            "unregistered_field_count": len(unregistered_fields_found)
+        },
         "material_fields_audited": MATERIAL_FIELDS,
         "allowed_statuses": ["EXACT_MATCH", "APPROVED_SUMMARY", "APPROVED_RESTRUCTURE", "GENUINE_UNKNOWN"],
         "forbidden_status": "FAIL",
@@ -466,9 +497,10 @@ def run_gate1_field_integrity():
             "FAIL": total_fail,
             "material_field_loss": total_fail,
             "source_mismatches": total_fail,
-            "required_for_pass": "15/15 packages with 0 FAIL fields (all material fields accounted for)",
-            "actual_result": f"{pass_count}/{len(package_audits)} packages PASS, {total_fail}/{total_fields} fields FAIL",
-            "gate_verdict": "PASS" if fail_count == 0 and total_fail == 0 else "FAIL"
+            "unregistered_material_fields": len(unregistered_fields_found),
+            "required_for_pass": "15/15 packages with 0 FAIL fields + 0 unregistered material fields",
+            "actual_result": f"{pass_count}/{len(package_audits)} packages PASS, {total_fail}/{total_fields} fields FAIL, {len(unregistered_fields_found)} unregistered",
+            "gate_verdict": "PASS" if (fail_count == 0 and total_fail == 0 and len(unregistered_fields_found) == 0) else "FAIL"
         }
     }
 
