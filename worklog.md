@@ -7674,3 +7674,71 @@ Stage Summary:
 - 5 flagship (Tier A) + 10 evaluation (Tier B) + 11 cemetery (internal learning).
 - Premium QA: 15/15 passed (independent validator).
 - 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data.
+
+---
+Task ID: R349-EVIDENCE-CONVERSION-PROGRAM
+Agent: main (coder, session 2026-08-26)
+Task: Execute CEO R349 directive — evidence conversion program. Rank T1 packages by T2 conversion ROI, select top 5, create T2 validation contracts, show evidence ladder path. NO fake promotions.
+
+Pre-Session Constitution Check:
+- Read EPISTEMIC_CONSTITUTION.md v1.7.0.
+- Acknowledged: "We are not manufacturing confidence. T2 requires evidence."
+- Acknowledged Article XXVIII (no silent semantic promotion).
+- Acknowledged Article XXXIV (stop coding when reality is the bottleneck).
+- Verified remote HEAD = bcb5678 (R348).
+
+Work Log:
+- Created R349/ directory with audit/, priority_matrix/, validation_contracts/, evidence_ladder/.
+- Wrote R349/r349_evidence_conversion.py with 6 gates.
+- Loaded R348 premium dossiers (15 packages: 1 T2-CONFIRMED, 1 T2-CONDITIONAL, 13 T1).
+- Gate 1 (Priority Matrix): Scored all 13 T1 packages on 5 criteria (buyer_value, validation_cost inverse, time_to_evidence, probability_of_success, strategic_buyer_interest — each 0-5, max 25). Ranking:
+  #1 P-24: 23/25 (clear bench experiment, $15K, 8 weeks, identified buyer)
+  #2 P-21: 20/25 (low cost RF test, $2-5K, Brainlab/Medtronic)
+  #3 P-13: 20/25 (fast if dataset available, $0-5K, medical AI)
+  #4 P-02: 19/25 (external CFD reproduction, $10-20K)
+  #5 P-15: 19/25 (physical harvesting test, $5-10K)
+  #6-13: P-07, P-26, P-27, P-11, P-04, P-12, P-20, P-22 (remain T1 evaluation)
+- Gate 2 (Top 5 Selection): Selected P-24, P-21, P-13, P-02, P-15. EXACTLY matches CEO's expected candidates.
+- Gate 3 (Validation Contracts): Created T2_VALIDATION_CONTRACT.json for each of the 5 selected. Each contract specifies:
+  - current_state (T1) → target_state (T2-CONDITIONAL)
+  - experiment_required (detailed protocol)
+  - independent_party_required (external lab/buyer/partner)
+  - success_threshold, failure_threshold, ambiguous_threshold
+  - estimated_cost, timeline
+  - evidence_required_for_T2 (must be ingested via R341 ingest_external_data_v2 with AdmissibilityBundle)
+  - what_T2_means AND what_T2_does_NOT_mean (honest scope)
+  - no_fake_promotion clause
+- Gate 4 (Buyer-Facing Upgrade): Each package now shows "Current T1 → $X experiment → T2-CONDITIONAL path" instead of just "this is T1." Example: P-24: "Current evidence: T1. A defined $15,000 experiment upgrades this to T2. Timeline: 8 weeks. Here is the exact path."
+- Gate 5 (No Fake Promotions): Documented what's missing for T2 per package. Every package states:
+  - what_is_missing_for_T2 (external evidence not yet ingested)
+  - current_state_honest (T1 — computationally supported only)
+  - what_would_constitute_fake_promotion (claiming T2 without external data)
+  - article_XXVIII_compliance (no silent semantic promotion)
+  - estimated_T2_arrival (CEO-dependent)
+- Gate 6 (Portfolio Index): Generated EVIDENCE_CONVERSION_PORTFOLIO_INDEX.md showing:
+  - 5 climbers on the evidence ladder
+  - Current maturity: T2-CONFIRMED=1, T2-CONDITIONAL=1, T1=13 (5 climbing + 8 evaluation)
+  - Target maturity after conversion: T2-CONFIRMED=1, T2-CONDITIONAL=6, T1=8
+  - The valuable claim: "5 actively climbing the evidence ladder toward investable/licensable assets"
+
+R349 Results:
+- Top 5 T1→T2 conversion pathways identified (matches CEO expectation exactly)
+- 5 validation contracts created with detailed experiments, costs, timelines, thresholds
+- NO fake promotions — T2 requires external evidence ingested through R341 pipeline
+- Buyer-facing upgrade: shows the path from T1 to T2, not just the current state
+- Target: convert 5 T1 → T2-CONDITIONAL, resulting in 1 T2-CONFIRMED + 6 T2-CONDITIONAL + 8 T1
+
+CEO directive compliance:
+- ✅ Ranked T1 packages by T2 conversion ROI (5 criteria, 0-5 each)
+- ✅ Selected top 5 (P-24, P-21, P-13, P-02, P-15 — matches CEO expected)
+- ✅ Created T2_VALIDATION_CONTRACT.json per package
+- ✅ Buyer-facing upgrade shows evidence ladder path
+- ✅ NO fake promotions (T2 requires external evidence, documented what's missing)
+- ✅ No more packaging rounds (R348 was the last)
+
+Stage Summary:
+- 5 T1 packages have defined T2 conversion pathways with experiments, costs, timelines, thresholds.
+- NO package fake-promoted. T2 requires external evidence.
+- The valuable claim: "15 opportunities, with 5 actively climbing the evidence ladder toward investable/licensable assets."
+- Next action: CEO identifies buyers/partners to commission the 5 experiments. When data returns, machine processes reality → T2-CONDITIONAL.
+- 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data. 0 T2 conversions executed (contracts defined, not executed).
