@@ -7914,3 +7914,95 @@ Stage Summary:
 - The moat: "An AI system that turns uncertain inventions into validated, transferable technology assets through continuous buyer-driven evidence acquisition."
 - 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data. 0 T2 conversions executed.
 - THIS IS THE LAST SOFTWARE ROUND.
+
+---
+Task ID: R353-INSTITUTIONAL-GRADE-ENGINE
+Agent: main (coder, session 2026-08-26)
+Task: Execute CEO's 9-phase R352-R360 roadmap from consultant audit. Convert system from "AI-generated invention portfolio" to "institutional-grade technology transfer engine." Focus: evidence conversion, IP defensibility, buyer validation.
+
+Pre-Session Constitution Check:
+- Read EPISTEMIC_CONSTITUTION.md v1.7.0.
+- Acknowledged: "Not running a patent court. Not manufacturing confidence."
+- Verified remote HEAD = 884c556 (R352).
+
+Consultant Audit Key Finding: "The architecture is stronger than the current commercialization layer. The invention packages are not yet Fortune-500 transfer-ready because they lack external validation, IP clearance depth, and buyer proof."
+
+Work Log:
+- Created R353/ directory with audit/, buyer_trust_layer/, patent_engine/, validation_network/, buyer_simulation/, premium_portfolio/.
+- Wrote R353/r353_institutional_engine.py executing all 9 phases in one comprehensive build.
+- Phase 1 (Buyer Trust Layer): For all 15 packages:
+  - External Evidence Boundary Layer (6 tiers: INTERNAL_SIMULATION, MODEL_PREDICTED, LITERATURE_SUPPORTED, EXTERNAL_REVIEWED, EXPERIMENTALLY_VALIDATED, BUYER_VALIDATED). Package is "buyer ready" only if EXTERNAL_REVIEWED or EXPERIMENTALLY_VALIDATED. Result: 2/15 buyer ready (P-16, P-01).
+  - Buyer Skeptic Mode: 4 hostile reviewer perspectives (Corporate R&D Director, IP Counsel, Regulatory Affairs, Licensing/BD) generating structured objections with severity, evidence_required, resolution_path. Plus package-specific objection from known failures.
+  - Build-vs-Buy Analysis: internal_build_time_months, external_license_advantage, strategic_reason_to_buy, build_risk, recommendation.
+- Phase 2 (T2 Conversion): REUSED from R349/R351 — validation contracts and ECE ranking already exist.
+- Phase 3 (Patent Defensibility Engine): For all 15 packages:
+  - Closest prior art identified (from R336 discovery + patent landscape)
+  - Novelty basis, obviousness risk per package
+  - 6-component score: novelty, obviousness_resistance, combination_attack_resistance, design_around_risk, fto_score, know_how_defensibility
+  - Patent readiness score (0-100), threshold 80
+  - Result: 0/15 pass threshold. Best: P-11 (78/100), P-20 (78/100). Worst: P-22 (55/100). P-24 = 56/100 (HIGH obviousness — compressible elements known).
+  - Cemetery knowledge (11 entries) contributes to combination_attack_resistance — failed approaches support non-obviousness.
+  - NOT legal opinions. Buyer counsel must perform formal patent search.
+- Phase 4 (Dossiers): REUSED from R345/R346 — 15-section elite dossiers already exist.
+- Phase 5 (External Validation Network): For all 15 packages:
+  - Recommended partner TYPE based on experiment (CRO, university lab, CFD lab, RF testing house, clinical data partner, etc.)
+  - Cost range and timeline per partner type
+  - Note: machine recommends TYPE, not specific organizations. CEO identifies specific partners.
+- Phase 6 (Buyer Simulation Engine): For all 15 packages:
+  - Simulated review from 4 company perspectives: Medtronic, Boston Scientific, Johnson & Johnson, Pharma BD
+  - Each simulation: NDA likelihood, fund validation likelihood, license likelihood, simulated decision
+  - Most receptive buyer identified per package
+  - Overall buyer score (average NDA likelihood across 4 companies)
+  - Result: Most receptive = Medtronic for most packages. Overall scores range 26-46/100 (BUYER_CAUTIOUS to BUYER_SKEPTICAL).
+- Phase 7 (Portfolio Restructuring): 5/7/3 split based on combined patent + buyer simulation score:
+  - Acquisition (5): P-16, P-01, P-11, P-20, P-04 — highest combined scores
+  - Validation (7): P-12, P-21, P-02, P-07, P-15, P-26, P-27
+  - Research (3): P-24, P-13, P-22 — lowest patent scores (HIGH obviousness risk)
+  - NOTE: P-24 landed in Research (not Validation) because its HIGH obviousness risk (compressible elements known, proportional regulation may be obvious) dragged patent score to 56/100. This is HONEST — the consultant was right that IP clearance depth is a gap.
+- Phase 8 (Commercial Deal Engine): Formalized deal structures per portfolio type:
+  - Acquisition: sponsored validation + option → exclusive license with milestones → asset acquisition ($500K-$5M)
+  - Validation: buyer funds experiment → evaluation rights + first refusal → if PASS license, if FAIL walk away
+  - Research: joint research agreement → milestone-based development → if met, exclusive license or spin-out
+- Phase 9 (Final Premium Portfolio): Generated R353/premium_portfolio/ with 15 folders. Each has:
+  - PREMIUM_PACKAGE_CARD.md (one-page summary with all scores)
+  - BUYER_TRUST_LAYER.json
+  - BUYER_OBJECTIONS.json
+  - BUILD_VS_BUY.json
+  - PATENT_DEFENSIBILITY.json
+  - VALIDATION_PARTNER.json
+  - BUYER_SIMULATION.json
+  - DEAL_STRUCTURE.json
+  Plus EXECUTIVE_PORTFOLIO_INDEX.md with 5/7/3 structure and success checklist.
+
+R353 Results:
+- 9 phases executed
+- Patent passes: 0/15 (honest — no FTO search performed, obviousness risk varies)
+- Buyer ready (evidence boundary): 2/15 (P-16, P-01 — only ones with EXTERNAL_REVIEWED)
+- Portfolio: 5 Acquisition / 7 Validation / 3 Research
+- P-16: Patent 67/100, Buyer Sim 46/100, most receptive = Medtronic, buyer ready = YES
+- P-24: Patent 56/100, Research portfolio (HIGH obviousness risk — honest)
+- All 15 have: buyer objections, build-vs-buy, patent score, validation partner, buyer simulation, deal structure
+
+Key Honest Finding:
+The consultant was correct: "unresolved 103 prior-art risk" is the biggest weakness. 0/15 packages pass the 80/100 patent readiness threshold. The primary gap is FTO (no patent search performed, score=5/20) and obviousness risk (varies by package). This is NOT fixable by more software — it requires actual patent attorney engagement.
+
+CEO Success Checklist:
+✅ 15 packages exist
+✅ Every package has buyer memo (R350)
+✅ Every package has evidence ledger (R344)
+✅ Every package has validation plan (R349)
+✅ Every package has IP score (R353 Phase 3)
+✅ Every package has buyer objections (R353 Phase 1)
+✅ Every package has deal structure (R353 Phase 8)
+✅ Every package has build-vs-buy (R353 Phase 1)
+✅ Every package has buyer simulation (R353 Phase 6)
+✅ Every package has validation partner (R353 Phase 5)
+
+Stage Summary:
+- 15 premium packages with institutional-grade analysis (patent, buyer simulation, objections, deal structures).
+- Portfolio restructured 5/7/3 (Acquisition/Validation/Research).
+- 0/15 pass patent threshold — honest gap requiring patent attorney engagement.
+- 2/15 buyer-ready (evidence boundary) — requires external experiments.
+- The Discovery Evidence Fabric (the system itself) is identified as the primary strategic asset.
+- Next actions: (1) CEO engages patent attorney for top 5 Acquisition packages, (2) CEO sends outreach to ideal buyers, (3) when data returns, machine processes reality → T2 upgrade.
+- 0 buyers contacted. 0 transactions. 0 real external data. 0 patent searches performed.
