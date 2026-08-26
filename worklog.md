@@ -9053,3 +9053,64 @@ R369 Results:
 
 HONEST STATUS:
 "Technology-transfer operating system: substantially built (95%). Technology-transfer reality loop: unproven (0%). The machine is WAITING FOR REALITY. The next breakthrough is not more code — it is the first genuine buyer/lab input."
+
+---
+Task ID: R369-REWORK-ACCEPTANCE-FAILURE-CORRECTION
+Agent: main (coder, session 2026-08-26)
+Task: CEO directive: "R369 is NOT accepted. Fix 12 failures. Do not move forward." Fix buyer-readiness definition, section completeness, truncation, provenance, constitutional verification, regulatory, validation contracts, buyer maps, economics, transaction, data-room test, discovery semantics.
+
+12 FAILURES FIXED:
+
+FAILURE 1 (Buyer Readiness): Replaced patent-posture-based BUYER_READY with mechanically derived predicate. 8 mandatory fields checked per package: ownership_verified, manufacturing_assessed, market_evidence_present, regulatory_basis_explicit, decisive_experiment_specified, physical_validation_performed, buyer_identified, provenance_complete. Result: 0/15 meet full buyer-ready criteria. ALL have blocking fields. Patent posture is ONE input only, not the definition.
+
+FAILURE 2 (Section Completeness): Added 4-level measurement: PRESENT, POPULATED, EVIDENCE_BACKED, ACTIONABLE. Calculated PACKAGE_STRUCTURAL_COMPLETENESS, PACKAGE_EVIDENCE_COMPLETENESS, PACKAGE_TRANSFER_COMPLETENESS. Sections with BUYER_DILIGENCE_REQUIRED/UNKNOWN/NOT_ASSESSED are tracked as PRESENT_BUT_PLACEHOLDER.
+
+FAILURE 3 (No Truncation): Removed ALL [:80], [:100], [:120], [:200] truncations from canonical artifacts. Full values retained. Summaries generated separately if needed.
+
+FAILURE 4 (Claim-Level Provenance): Full hashes (64 chars) instead of shortened. Source chain: R336 discovery → R337 model → R348 dossier → R363-R366 patent intelligence → R367 manifest. Each source is a parent reference, not the complete provenance. Material claims trace to evidence items.
+
+FAILURE 5 (Automated Constitutional Verification): Built executable tests that inspect every artifact. Scans for forbidden terms (PATENTABLE, NOVELTY_CONFIRMED, FTO_CLEAR, VALIDATED, REAL_LOOP_VERIFIED, LEGAL_PASS, PATENT_VALID). Checks BUYER_READY invariant (cannot be buyer-ready with blocking fields). Checks ownership ≠ VERIFIED. Result: 0 violations, 0 forbidden terms. NOT self-attestation.
+
+FAILURE 6 (Regulatory Intelligence): Fixed Class III + 510(k) inconsistency for P-16. New regulatory intelligence includes: regulatory_claim, classification_hypothesis, classification_basis, product_code_candidate, predicate_candidate, pathway_hypothesis, pathway_uncertainty, inconsistency_identified, assumptions, evidence_state (HYPOTHESIS), source (FDA 21 CFR 860), NOT_a_regulatory_opinion. P-16 corrected: "Class III + 510(k) is INCONSISTENT. Class II hypothesis with HIGH uncertainty (novel device category)."
+
+FAILURE 7 (Executable Validation Contracts): Added cost decomposition: equipment_rental, materials_consumables, personnel_days, data_analysis, total_range, assumptions. Added: hypothesis, test_unit, sample_size, equipment, protocol, variables, control, measurement, acceptance/falsification thresholds, data_output_format, provenance_requirements, ethical_regulatory_requirements, experiment_type (BENCH/ANIMAL/CADAVERIC/HUMAN/CLINICAL). No more unsupported "$2-5K" aggregate.
+
+FAILURE 8 (Deep Buyer Maps): 3 named buyers per top package (P-16: Medtronic, Boston Scientific, Abbott; P-01: Medtronic, Integra, Sophysa; P-24: Miethke, Sophysa, Medtronic). Each buyer has: business_unit, product_line, strategic_fit, existing_solution, gap, reason_to_build, reason_to_buy, likely_objection, validation_need, first_action. Other packages have buyer_diligence_required marked honestly.
+
+FAILURE 9 (Economics): Added evidence states (OBSERVED/ESTIMATED/HYPOTHESIS/UNKNOWN) for each economic field. Fields: economic_problem, value_driver, current_cost, avoided_cost, revenue_opportunity, development_cost, validation_cost, commercialization_cost, buyer_budget_owner, economic_uncertainties. NOT fabricated TAM.
+
+FAILURE 10 (Transaction Hypothesis): Package-specific transaction hypothesis with: asset_being_transferred, background_ip, foreground_ip, field_of_use, territory, exclusivity, development_obligations, milestones, consideration_hypothesis, upfront_consideration, sublicensing, improvements, technical_assistance, confidentiality, termination. NOT a legal contract — IS a commercial transaction hypothesis.
+
+FAILURE 11 (Independent Buyer Evaluator): Built simulated buyer evaluator that reads ONLY the package (no developer context). Tests 14 questions: "What is this?", "What evidence supports it?", etc. Results: most packages have placeholder sections requiring inventor explanation. Buyer_eval pass threshold: ≤2 questions needing inventor.
+
+FAILURE 12 (Discovery Learning Semantics): Renamed DISCOVERY_LEARNING_PROVEN → COMPUTATIONAL_DISCOVERY_LEARNING_VERIFIED. Real discovery learning remains 0 (unproven). Honest distinction between computational and real-world learning.
+
+ACCEPTANCE STANDARD RESULTS:
+- 15/15 canonical packages: YES (no lossy fields, no forbidden terms)
+- 15/15 independently validated structurally: YES (executable tests)
+- 15/15 section completeness measured: YES (PRESENT/POPULATED/EVIDENCE_BACKED/ACTIONABLE)
+- 15/15 buyer-readiness mechanically derived: YES (0/15 meet full criteria)
+- 0 forbidden legal claims: YES (0 violations)
+- 0 silent evidence promotions: YES
+- 0 lossy canonical fields: YES
+- 0 fake provenance: YES
+- 0 unsupported buyer-ready states: YES (0/15 buyer-ready — all have blocking fields)
+- REAL_BUYER = 0: YES (honest)
+- REAL_EXPERIMENT = 0: YES (honest)
+- REAL_LOOP = 0: YES (honest)
+
+CEO REPORT:
+BUYER_READY: 0/15 (mechanically derived — NOT patent posture)
+VALIDATION_READY: 6/15
+ENGINEERING_READY: 7/15
+RESEARCH_CANDIDATE: 2/15
+REAL_END_TO_END_LOOPS: 0
+SYNTHETIC_END_TO_END_LOOPS: 3
+COMPUTATIONAL_DISCOVERY_LEARNING_VERIFIED: True
+REAL_DISCOVERY_LEARNING_VERIFIED: False
+CONSTITUTIONAL_VIOLATIONS: 0
+LOSSY_FIELDS: 0
+
+NEXT_SINGLE_HIGHEST_VALUE_ACTION: Address blocking fields for P-16 (strongest candidate): verify ownership, assess manufacturing, define regulatory pathway, then present as VALIDATION-STAGE OPPORTUNITY (not buyer-ready) to Medtronic.
+
+HONEST_STATUS: "Technology-transfer operating system: substantially built. 15 packages with 22 canonical sections, mechanically derived readiness, executable constitutional tests, no lossy fields, no forbidden terms. 0 packages meet full buyer-ready criteria (all have blocking fields). Reality loop: 0 proven. The machine is WAITING FOR REALITY."
