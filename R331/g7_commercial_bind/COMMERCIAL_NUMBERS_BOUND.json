@@ -1,0 +1,70 @@
+{
+  "authority": "CEO R331 Gate 7 — evidence-bind all commercial numbers",
+  "timestamp": "2026-08-26T11:20:00Z",
+
+  "classification_system": {
+    "OBSERVED": "Directly measured from real experiment or transaction",
+    "SOURCE_DERIVED": "Calculated from a cited published source (e.g., HCUP surgery cost data)",
+    "MODELLED": "Output of our computational model (e.g., 30% revision reduction)",
+    "ESTIMATED": "Rough calculation based on component costs, expert opinion, or analogy",
+    "ASSUMED": "Stated assumption with no derivation"
+  },
+
+  "commercial_numbers_reclassified": {
+    "P-01": {
+      "30% revision reduction": "MODELLED",
+      "$124M/yr value": "MODELLED (composite of MODELLED reduction + SOURCE_DERIVED surgery cost)",
+      "$35-50K revision surgery cost": "SOURCE_DERIVED (HCUP/AHRQ published US healthcare cost data)",
+      "30-50% obstruction failure rate": "SOURCE_DERIVED (Drake et al., Hanif et al. published clinical outcomes)",
+      "$3-5K V0 bench prototype": "ESTIMATED (COTS component cost summation)",
+      "3-6 months timeline": "ESTIMATED"
+    },
+    "P-02": {
+      "47.3% ICP reduction": "MODELLED",
+      "$10-20K bench experiment": "ESTIMATED (mock CSF loop + sensors + valves)",
+      "2-4 weeks timeline": "ESTIMATED"
+    },
+    "P-04": {
+      "100% Aβ clearance": "MODELLED",
+      "$15-30K in vitro": "ESTIMATED (NEP enzyme + ELISA + catheters + aCSF)",
+      "4-6 weeks timeline": "ESTIMATED"
+    },
+    "P-15": {
+      "99.9% uptime": "MODELLED",
+      "10 μW P50 harvest": "MODELLED (within published range 5-50 μW, SOURCE_DERIVED from Zurbuchen 2013)",
+      "16.7 μW published (Zurbuchen)": "OBSERVED (published in-vivo measurement)",
+      "$5-10K bench measurement": "ESTIMATED"
+    },
+    "P-16": {
+      "1.0-1.4 mW/cm² fluence": "MODELLED (MC computation, verified by independent MC)",
+      "~1050 μW power": "MODELLED (derived from fluence × PV area × efficiency)",
+      "$2-5K bench test": "ESTIMATED",
+      "Jacques 2013 range 0.5-2.0 mW/cm²": "OBSERVED (published tissue optics measurements)"
+    },
+    "P-20": {
+      "2468 ng/cm²/day IL-10 release": "MODELLED (PLGA kinetics from published degradation data)",
+      "$5-10K in vitro": "ESTIMATED"
+    },
+    "P-21": {
+      "38.5 dB link margin": "MODELLED (simplified homogeneous tissue attenuation)",
+      "0.046 mW/cm² power density": "MODELLED (NOT SAR — corrected in R331 Gate 4)",
+      "$0 commission (computational)": "OBSERVED (computational model already exists)"
+    },
+    "P-22": {
+      "2700x force margin (Stokes)": "MODELLED (over-simplified, corrected in R330 — buckling is real limit)",
+      "0.039 N effective force": "MODELLED (Euler buckling calculation)",
+      "30s actuation delay": "ESTIMATED (from published SMP response times)"
+    }
+  },
+
+  "naked_precision_removed": {
+    "before": "Every cost was stated as a range ($5-10K, $10-20K, etc.) without evidence classification",
+    "after": "Every number classified as OBSERVED / SOURCE_DERIVED / MODELLED / ESTIMATED / ASSUMED",
+    "examples_corrected": [
+      "$35-50K surgery cost → SOURCE_DERIVED (HCUP/AHRQ)",
+      "47.3% reduction → MODELLED",
+      "99.9% uptime → MODELLED",
+      "16.7 μW Zurbuchen → OBSERVED (published measurement)"
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "authority": "CEO R331 Gate 4 — P-21 regulatory metric correction",
+  "timestamp": "2026-08-26T11:10:00Z",
+
+  "R330_error": {
+    "claim": "SAR = 0.046 mW/cm², 21.7x below FCC limit, 'No regulatory concern'",
+    "problem": "Power density (mW/cm²) is NOT the same as SAR (Specific Absorption Rate, W/kg). The R330 file conflated two different regulatory quantities. Power density is an incident-field quantity. SAR is a tissue-absorbed quantity requiring electromagnetic simulation of tissue dielectric properties. The conclusion 'No regulatory concern' is UNVERIFIED."
+  },
+
+  "corrected_regulatory_analysis": {
+    "quantity_simulated": "incident power density at tissue surface",
+    "units": "mW/cm²",
+    "value": 0.046,
+    "regulatory_standard": "FCC 47 CFR §1.1310 (RF exposure limits for portable devices)",
+    "applicable_frequency_band": "6.5 GHz (Ultra-Wideband, 3.1-10.6 GHz)",
+    "device_configuration": "UWB transmitter external to body, receiver implanted intracranially",
+    "regulatory_threshold": {
+      "FCC_power_density_limit_mW_per_cm2": 1.0,
+      "FCC_SAR_limit_W_per_kg": 1.6 (head, 1g averaged),
+      "note": "FCC limits for UWB are defined in terms of EIRP (equivalent isotropically radiated power), not directly as power density. The UWB EIRP limit is -41.3 dBm/MHz. The power density calculation is a DERIVED quantity, not the regulatory metric itself."
+    },
+    "equation_required": "SAR = σ|E|² / (2ρ) where σ=tissue conductivity, E=electric field, ρ=tissue density. This requires electromagnetic FDTD simulation of tissue layers. Our simplified attenuation model does NOT produce SAR.",
+    "current_status": "UNRESOLVED — power density estimated but SAR not computed. Regulatory conclusion UNVERIFIED."
+  },
+
+  "corrected_label": "REGULATORY = UNRESOLVED. Power density (0.046 mW/cm²) is below FCC power density limit (1.0 mW/cm²), but SAR has NOT been computed. 'No regulatory concern' is REMOVED. The correct statement is: 'Power density appears low; SAR computation required before regulatory conclusion.'",
+
+  "real_bottleneck": "Localization accuracy (10mm UWB resolution vs 5mm clinical requirement). This is more important than regulatory — if localization can't achieve 5mm, the regulatory question is moot."
+}
