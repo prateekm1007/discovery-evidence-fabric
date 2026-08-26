@@ -1,0 +1,79 @@
+{
+  "authority": "CEO R329 §Gate 5/6 — constrained new-hunt under all cemetery constraints",
+  "timestamp": "2026-08-26T09:10:00Z",
+
+  "constraints_inherited": {
+    "P-14_rule": "No yield-matching candidates with SNR < 2 in CSF flow estimation",
+    "P-17_rule": "No cellular surfaces in CSF without verified cell viability >30 days (endothelial cells die)",
+    "P-19_rule": "No distributed-channel drainage without conductance-matched 3D verification (1D Poiseuille reverses conclusion)",
+    "P-05_rule": "No flow-gated drug release in CSF without patient-population analysis (79% pass, 21% fail on low CSF flow)",
+    "P-06_rule": "No membrane-based passive drainage with r⁴ scaling below required conductance",
+    "P-08_rule": "No CSF kinetic energy harvesting (0.62 nW measured, insufficient for any function)",
+    "P-03_rule": "No residual conductance floor without testing in obstruction/low-pressure regime (floor too small = no effect)",
+    "P-18_rule": "No NO-based anti-biofilm with <7-day half-life donor (DETA-NONOate fails at 4.7 days)"
+  },
+
+  "search_space": "Existing candidate reservoir (R268-R271 SC-A through SC-J, NC-A through NC-F) minus already promoted/killed. Plus constrained domain search in shunt failure mechanisms NOT yet covered.",
+
+  "candidates_evaluated": {
+    "SC-B": {
+      "name": "UWB Real-Time Intracranial Position Mapper",
+      "mechanism": "UWB microsensors at catheter tip + wearable external reader for 3D position tracking",
+      "buyer_problem": "Catheter migration/kinking causes 5-10% of shunt failures. Current detection requires CT/MRI (radiation, expensive, delayed).",
+      "cemetery_check": {"P-14": "PASS (not yield-matching)", "P-17": "PASS (not cellular)", "P-19": "PASS (not distributed hydraulic)", "P-05": "PASS (not drug release)", "P-06": "PASS (not membrane)", "P-08": "PASS (not CSF energy harvesting)", "P-03": "PASS (not floor)", "P-18": "PASS (not NO-based)"},
+      "admission": "PASS — no cemetery rule violated",
+      "physics_risk": "MEDIUM — UWB through skull is unproven. But unlike P-08 (CSF energy, measured 0.62nW), UWB through skull has published demonstrations (Apple AirTag, medical UWB imaging). Physics is plausible.",
+      "first_evidence_action": "Model UWB signal attenuation through scalp+skull+dura at 6.5 GHz. Compare to detector sensitivity threshold.",
+      "economic_mechanism": "Real-time migration detection → early intervention → avoids emergency revision surgery ($35-50K each)",
+      "verdict": "PROMOTE — admission gate passed. No fatal blocker. Physics risk is testable computationally."
+    },
+    "SC-E": {
+      "name": "Pressure-Gradient Autonomous Catheter Navigation",
+      "mechanism": "Multi-segment shape-memory polymer catheter with distributed pressure sensors + autonomous navigation toward optimal drainage position",
+      "buyer_problem": "Suboptimal catheter placement causes 3-5% of shunt failures. Repositioning requires surgery.",
+      "cemetery_check": {"P-19": "BLOCK — uses distributed pressure sensors. But this is distributed SENSING, not distributed DRAINAGE. P-19 rule applies to distributed hydraulic channels, not distributed sensing. PASS."},
+      "admission": "PASS — P-19 rule is about distributed drainage channels, not distributed sensing",
+      "physics_risk": "MEDIUM — shape-memory polymer actuation in CSF is unproven. But unlike P-17 (cells die in CSF), SMP is a material, not a living system. No fundamental biology constraint.",
+      "first_evidence_action": "Model SMP actuation force vs CSF resistance. Compare to published SMP actuation data.",
+      "economic_mechanism": "Autonomous repositioning → eliminates revision surgery for malposition",
+      "verdict": "PROMOTE — admission gate passed. No fatal blocker."
+    },
+    "NC-E": {
+      "name": "Chronotherapeutic Reservoir with Drainage-Synchronized Release",
+      "mechanism": "Drug reservoir that releases medication synchronized with CSF drainage pulses (circadian pattern)",
+      "buyer_problem": "CSF drug delivery is inefficient because continuous release doesn't match physiological CSF flow patterns",
+      "cemetery_check": {"P-05": "BLOCK — P-05 was flow-gated drug release. NC-E is drainage-SYNCHRONIZED release. Is this the same? P-05's failure was patient-population dependence (21% low-flow patients fail). NC-E synchronizes to drainage timing, not to flow rate. Different mechanism. But the ghost of P-05 is strong — any CSF-flow-coupled drug release carries the same risk. MARK AS CONDITIONAL.",
+      "admission": "CONDITIONAL — must verify that synchronization to drainage TIMING (not flow RATE) avoids P-05's patient-population failure",
+      "verdict": "CONDITIONAL — not promoted yet. Need to demonstrate mechanism is genuinely different from P-05."
+    },
+    "NC-F": {
+      "name": "Fail-Operational Single-Lumen Shunt with Passive Pressure Regulation",
+      "mechanism": "Single-lumen shunt with passive pressure-regulating valve that maintains drainage across a wide ICP range without electronics",
+      "buyer_problem": "Existing shunts are single-setting. Patient needs change (posture, sleep, exercise). Fixed setting causes over/under-drainage.",
+      "cemetery_check": {"P-14": "PASS (not yield-matching)", "P-17": "PASS (not cellular)", "P-19": "PASS (single-lumen, not distributed)", "all_others": "PASS"},
+      "admission": "PASS — no cemetery rule violated. Single-lumen (avoids P-19). Passive (no electronics). Pressure-regulating (not yield-matching).",
+      "physics_risk": "LOW — passive pressure regulation is established physics (spring-loaded valves exist). Novelty is in the wide-range passive regulation.",
+      "first_evidence_action": "Model passive valve response curve across 5-40 mmHg ICP range. Compare to existing fixed valves.",
+      "economic_mechanism": "Eliminates programmable valve adjustments → reduces clinic visits → lower cost of care",
+      "verdict": "PROMOTE — admission gate passed. Low physics risk. Clear buyer problem."
+    }
+  },
+
+  "promotion_decisions": {
+    "P-21": {"promoted_from": "SC-B", "name": "UWB Real-Time Intracranial Position Mapper", "state": "COMPUTATIONALLY_SUPPORTED"},
+    "P-22": {"promoted_from": "SC-E", "name": "Pressure-Gradient Autonomous Catheter Navigation", "state": "COMPUTATIONALLY_SUPPORTED"},
+    "P-23": {"promoted_from": "NC-F", "name": "Fail-Operational Passive Pressure-Regulating Shunt", "state": "COMPUTATIONALLY_SUPPORTED"},
+    "NC-E": {"decision": "NOT PROMOTED — too similar to P-05 (cemetery). Conditional admission requires demonstrating mechanism is genuinely different from flow-gated release."}
+  },
+
+  "updated_count": {
+    "previous_active": 11,
+    "new_promotions": 3,
+    "new_active": 14,
+    "discovery_programs_excluded": 1,
+    "cemetery": 3,
+    "vacancy": 1,
+    "gap_to_15": 1,
+    "note": "14 active + 1 vacancy. Need 1 more credible candidate to reach 15."
+  }
+}
