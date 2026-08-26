@@ -1,0 +1,20 @@
+{
+  "gate": "GATE 1: Freeze Acknowledgment",
+  "ceo_directive": "R341 Gate 1 \u2014 No new software subsystem. The software-expansion freeze from R340 GATE 5 remains in force.",
+  "what_R341_does_NOT_add": [
+    "No new dataclasses (IndependentVerification and AdmissibilityBundle are reused from R340)",
+    "No new pipelines (ingest_external_data_v2 is reused, only verify() body grows)",
+    "No new dashboards",
+    "No new metrics",
+    "No new candidate factories",
+    "No new CRM features",
+    "No new constitution articles"
+  ],
+  "what_R341_ADDS": [
+    "7 new content-level checks inside AdmissibilityBundle.verify() (checks 10\u201316)",
+    "Option B fallback state: REAL_LOOP_PENDING_AUDITOR_CONFIRMATION (only used if IV artifact is non-JSON)",
+    "Replay of B/C/D/E attacks against the patched verifier"
+  ],
+  "scope_discipline": "The patch is surgical. Same dataclasses, same function signatures, same entry point. Only the body of verify() grows from 9 checks to 16 checks. This is the minimum change required to close the B/C gap identified in the CEO's R340 audit.",
+  "verdict": "FREEZE RESPECTED. Narrow patch only."
+}

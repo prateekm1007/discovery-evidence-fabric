@@ -7113,3 +7113,55 @@ Stage Summary:
 - 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data files ingested.
 - PAT used inline, single use, NOT persisted. URL reset to clean form. CEO must revoke PAT at https://github.com/settings/tokens.
 - Next true milestone: First REAL_LOOP_VERIFIED transition. NOT another round number.
+
+---
+Task ID: R341-IV-CONTENT-CROSS-CHECK
+Agent: main (coder, session 2026-08-26)
+Task: Execute CEO R341 directive (narrow). Close the IV-artifact content cross-check gap (Option A preferred). No new software subsystem. Re-run B/C/D/E attacks. STOP after.
+
+Pre-Session Constitution Check:
+- Read EPISTEMIC_CONSTITUTION.md v1.7.0 (Articles I–XXXVII).
+- Acknowledged Article III: "The verifier must never trust the claimant. The claim cannot define what its evidence supposedly says."
+- Acknowledged Article XXXIV: "Stop coding when reality is the next bottleneck."
+- Verified remote HEAD = 4b9e126 (R340). Local HEAD matches. Not stale.
+
+Work Log:
+- Read CEO R341 directive. Three gates: (1) no new subsystem, (2) close IV content cross-check gap via Option A (parse IV artifact) or Option B (human auditor gate), (3) STOP.
+- Created R341/ directory with 5 subdirectories (audit, g1_freeze, g2_iv_content_cross_check, g3_attack_replay, g4_stop_directive).
+- Wrote R341/r341_gates.py — surgical patch to R340's AdmissibilityBundle.verify(). NO new dataclasses. NO new pipelines. Same function signatures. Only the body of verify() grows from 9 checks to 16 checks.
+- GATE 1 (Freeze): Documented that R341 adds only 7 new content-level checks inside verify() and one new fallback state (REAL_LOOP_PENDING_AUDITOR_CONFIRMATION). No new subsystems.
+- GATE 2 (IV Content Cross-Check): Implemented Option A. The verifier now:
+  - Check 10: reads the IV artifact file at verification_artifact_path
+  - Check 11: computes its SHA-256 and verifies it matches verification_artifact_hash
+  - Check 12: attempts to JSON-parse the artifact. If not JSON, falls back to Option B (REAL_LOOP_PENDING_AUDITOR_CONFIRMATION)
+  - Check 13: cross-checks iv_contents["raw_data_sha256"] against bundle.raw_data_hash (CLOSES ATTACK B)
+  - Check 14: cross-checks iv_contents["candidate_id"] against bundle.candidate_id
+  - Check 15: cross-checks iv_contents["experiment_id"] against bundle.experiment_id
+  - Check 16: cross-checks iv_contents["protocol_version"] against bundle.protocol_version
+  - Additional defense-in-depth: cross-checks acquisition_location, operator_id, equipment_id (CLOSES ATTACK C)
+- GATE 3 (Attack Replay): Re-ran all 5 attacks against R341 patched verifier:
+  - Attack B (real metadata + synthetic payload + IV hash mismatch): BLOCKED ✓ — Check 13 caught iv_content_raw_data_hash_mismatch (IV declared real_hash, bundle declared synthetic_hash)
+  - Attack C (valid hash + fabricated custody + IV location mismatch): BLOCKED ✓ — additional check caught iv_content_acquisition_location_mismatch (IV declared "External Partner Lab", bundle declared "FABRICATED LAB")
+  - Attack D (no IV): BLOCKED ✓ — Python dataclass enforces required field (R340 fix holds)
+  - Attack E (real + complete bundle + honest IV): PASS ✓ — 21 details passed (9 structural + 7 content + 5 additional), REAL_LOOP_VERIFIED
+  - Attack F (NEW — non-JSON IV artifact): OPTION B ✓ — Check 12 failed JSON parse, state became REAL_LOOP_PENDING_AUDITOR_CONFIRMATION (NOT REAL_LOOP_VERIFIED)
+- GATE 4 (STOP Directive Final): NO R342. Software expansion halted. Provenance boundary defensible. Next milestone is REALITY, not another round.
+
+R341 GATE Results:
+- GATE 1 (Freeze): Respected. Surgical patch only.
+- GATE 2 (IV Content Cross-Check): Option A implemented. 7 new content-level checks. Article III compliance fully restored — verifier inspects CONTENTS, not just existence.
+- GATE 3 (Attack Replay): All 5 attacks correct. B/C gap CLOSED. D still blocked. E legit path still works. F Option B fallback works.
+- GATE 4 (STOP): FINAL. NO R342. Awaiting reality.
+
+Stage Summary:
+- B/C provenance gap: CLOSED. The IV artifact's internal contents are now parsed and reconciled against the bundle's fields. An attacker cannot supply an IV artifact that internally attests to a different dataset.
+- Option B fallback: Non-JSON IV artifacts (e.g., PDF auditor letters) route to REAL_LOOP_PENDING_AUDITOR_CONFIRMATION. Human auditor must manually confirm. NOT REAL_LOOP_VERIFIED.
+- Article III compliance: FULLY RESTORED. The verifier never trusts the claimant. It inspects the IV artifact's contents and reconciles every field.
+- Honest remaining limitations (documented in GATE 4):
+  1. R341 Option A requires JSON IV artifact with expected schema. Non-JSON → Option B (human gate). This is correct behavior, not a bug.
+  2. R341 does not prevent fraud. A real auditor signing a false attestation commits fraud. System makes fraud DETECTABLE, not impossible.
+  3. R341 validates provenance, not scientific validity. The result's scientific validity is a separate question for the buyer/auditor.
+- SOFTWARE EXPANSION HALTED. NO R342. Next milestone: First REAL_LOOP_VERIFIED transition. Requires CEO-delivered external experimental data file + JSON IndependentVerification artifact.
+- Honest scorecard unchanged: SYNTHETIC_LOOP_VERIFIED=1 (P-24), REAL_LOOP_VERIFIED=0, NONE=14, REAL_LOOP_PENDING_AUDITOR_CONFIRMATION=0.
+- 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data files ingested.
+- PAT: not used in R341 (will be needed for push). CEO should revoke after R341 push.
