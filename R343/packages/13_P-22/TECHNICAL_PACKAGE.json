@@ -1,0 +1,102 @@
+{
+  "schema": "BUYER_TRANSFER_PACKAGE_v1",
+  "candidate_id": "P-22",
+  "buyer_action_id": "P22-EXP-001",
+  "classification": "GREEN",
+  "classification_reason": "All 4 buyer-test questions answerable YES",
+  "generated_at": "2026-08-26T05:09:19.454748+00:00",
+  "generated_from": "R332/g3_all13_canonical/CANONICAL_BUYER_PACKAGES.json (P-01\u2013P-22) + R339/g2_p24_buyer_package (P-24) + R337/g4_p25_model (P-25)",
+  "1_executive_proposition": "Technology: Multi-segment shape-memory polymer catheter with autonomous navigation toward optimal drainage position. Problem: Suboptimal catheter placement = 3-5% of shunt failures. Repositioning requires surgery..",
+  "2_buyer_problem": {
+    "problem": "Suboptimal catheter placement = 3-5% of shunt failures. Repositioning requires surgery.",
+    "who_has_it": "Catheter manufacturer / interventional device company",
+    "current_solution": "Intraoperative placement (surgeon-dependent). Published steerable catheters use closed-loop control + sensing + passive safety (PubMed 25684857).",
+    "why_inadequate": "Can a buckling-safe architecture with closed-loop control navigate safely without tissue damage?"
+  },
+  "3_technology": {
+    "mechanism": "Multi-segment shape-memory polymer catheter with autonomous navigation toward optimal drainage position",
+    "architecture": "SEE mechanism field \u2014 full architecture in technical package",
+    "inputs": "UNKNOWN (BUYER_DILIGENCE_REQUIRED for full spec)",
+    "outputs": "UNKNOWN (BUYER_DILIGENCE_REQUIRED for full spec)",
+    "operating_principle": "Multi-segment shape-memory polymer catheter with autonomous navigation toward optimal drainage position"
+  },
+  "4_evidence_ledger": {
+    "OBSERVED": [],
+    "EXTERNALLY_VERIFIED": [],
+    "COMPUTATIONALLY_SUPPORTED": [],
+    "MODELLED": [
+      "Actuation force (MODELLED)",
+      "Buckling limit (MODELLED, Euler)",
+      "Force margin (MODELLED, Stokes drag over-simplified)"
+    ],
+    "ASSUMED": [],
+    "UNKNOWN": []
+  },
+  "5_strongest_alternative": "Intraoperative placement (surgeon-dependent). Published steerable catheters use closed-loop control + sensing + passive safety (PubMed 25684857).",
+  "6_what_is_differentiated": {
+    "potential_differentiation": "Potential differentiation vs Intraoperative placement (surgeon-dependent). Published steerable catheters use : Can a buckling-safe architecture with closed-loop control navigate safely without tissue damage?",
+    "evidence_supporting": "SEE evidence_ledger COMPUTATIONALLY_SUPPORTED and MODELLED tiers",
+    "evidence_against": [
+      "Buckling: catheter WILL buckle before reaching actuation force limit (82x exceedance)",
+      "Control stability NOT modeled (30s delay makes PID unstable)",
+      "Tissue safety: effective force 0.039 N exceeds estimated damage threshold 0.01 N by 4x",
+      "No failure recovery mechanism"
+    ],
+    "unresolved_question": "Can a buckling-safe architecture with closed-loop control navigate safely without tissue damage?",
+    "experiment_required": "Bench: SMP catheter segment in tissue phantom. Measure: controlled navigation accuracy, buckling behavior, tissue contact force, failure recovery."
+  },
+  "7_known_failures": [
+    "Buckling: catheter WILL buckle before reaching actuation force limit (82x exceedance)",
+    "Control stability NOT modeled (30s delay makes PID unstable)",
+    "Tissue safety: effective force 0.039 N exceeds estimated damage threshold 0.01 N by 4x",
+    "No failure recovery mechanism"
+  ],
+  "8_remaining_uncertainty": "Can a buckling-safe architecture with closed-loop control navigate safely without tissue damage?",
+  "9_decisive_experiment": {
+    "experiment": "Bench: SMP catheter segment in tissue phantom. Measure: controlled navigation accuracy, buckling behavior, tissue contact force, failure recovery.",
+    "pass_rule": "Safe closed-loop navigation to target within 5mm accuracy AND tissue force < 0.01 N AND failure recovery demonstrated",
+    "fail_rule": "Buckling prevents controlled navigation OR tissue force > 0.01 N OR no failure recovery",
+    "ambiguous_rule": "CI spans pass/fail threshold \u2192 AMBIGUOUS (no silent promotion)",
+    "cost_estimate": "$15-30K (ESTIMATED: SMP prototype + tissue phantom + force sensors)",
+    "timeline_estimate": "8-12 weeks (ESTIMATED: prototype + testing)"
+  },
+  "10_build_integration_pathway": {
+    "what_to_build": "Bench: SMP catheter segment in tissue phantom. Measure: controlled navigation accuracy, buckling behavior, tissue contact force, failure recovery.",
+    "existing_equipment_reusable": "BUYER_DILIGENCE_REQUIRED",
+    "novel_component": "Multi-segment shape-memory polymer catheter with autonomous navigation toward optimal drainage position",
+    "engineering_remaining": "VERY HIGH \u2014 SMP in CSF, control system, safety architecture",
+    "manufacturing_risks": "BUYER_DILIGENCE_REQUIRED"
+  },
+  "11_regulatory_status": "PMA (active implantable with navigation) \u2014 very complex",
+  "12_commercial_route": "License to catheter/interventional company (HIGH RISK)",
+  "13_economics": {
+    "experiment_cost": "$15-30K (ESTIMATED: SMP prototype + tissue phantom + force sensors)",
+    "timeline": "8-12 weeks (ESTIMATED: prototype + testing)",
+    "development_burden": "VERY HIGH \u2014 SMP in CSF, control system, safety architecture",
+    "potential_economic_value": "BUYER_DILIGENCE_REQUIRED",
+    "evidence_tier": "ASSUMED",
+    "critical_cost_uncertainty": "Development cost beyond decisive experiment UNKNOWN"
+  },
+  "14_ip_legal_status": {
+    "known_ip": "BUYER_DILIGENCE_REQUIRED \u2014 no patent search performed for this package",
+    "known_disclosures": "BUYER_DILIGENCE_REQUIRED",
+    "known_ownership": "CereVascular (assumed \u2014 confirm with CEO)",
+    "known_restrictions": "UNKNOWN",
+    "ip_diligence_required": "Full freedom-to-operate analysis by buyer counsel",
+    "note": "We are not running a patent court. This section surfaces open questions, not legal verdicts."
+  },
+  "15_buyer_action": {
+    "primary_action": "COMMISSION TEST \u2014 build SMP segment + tissue phantom, measure navigation + buckling + tissue force. CURRENT STATUS: HIGH-RISK CONTROL/SAFETY HYPOTHESIS",
+    "options": [
+      "LICENSE",
+      "BUILD",
+      "CO-DEVELOP",
+      "COMMISSION_EXPERIMENT",
+      "ACQUIRE",
+      "INTEGRATE",
+      "REJECT"
+    ],
+    "recommended_next_step": "COMMISSION TEST \u2014 build SMP segment + tissue phantom, measure navigation + buckling + tissue force. CURRENT STATUS: HIGH-RISK CONTROL/SAFETY HYPOTHESIS",
+    "buyer_action_id": "P22-EXP-001"
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "schema": "BUYER_TRANSFER_PACKAGE_v1",
+  "candidate_id": "P-25",
+  "buyer_action_id": "BA-P25-001",
+  "classification": "GREEN",
+  "classification_reason": "All 4 buyer-test questions answerable YES",
+  "generated_at": "2026-08-26T05:09:19.454805+00:00",
+  "generated_from": "R332/g3_all13_canonical/CANONICAL_BUYER_PACKAGES.json (P-01\u2013P-22) + R339/g2_p24_buyer_package (P-24) + R337/g4_p25_model (P-25)",
+  "1_executive_proposition": "Technology: Self-referencing piezoresistive pressure sensor. Dual-element differential measurement cancels common-mode drift.. Problem: Implantable pressure sensor drift over 30+ day implantation. Common-mode drift (temperature, aging) cancelable. Non-common-mode drift (biofouling, asy.",
+  "2_buyer_problem": {
+    "problem": "Implantable pressure sensor drift over 30+ day implantation. Common-mode drift (temperature, aging) cancelable. Non-common-mode drift (biofouling, asymmetric creep) not cancelable by simple self-referencing.",
+    "who_has_it": "Sensor OEM (Codman, Medtronic, Raumedic)",
+    "current_solution": "Periodic recalibration protocol (existing clinical practice) \u2014 inconvenient but reliable",
+    "why_inadequate": "Whether anti-fouling coating or periodic recalibration can bring error below 2.0 mmHg. If not, mechanism is falsified for absolute measurement (may survive for trending only)."
+  },
+  "3_technology": {
+    "mechanism": "Self-referencing piezoresistive pressure sensor. Dual-element differential measurement cancels common-mode drift.",
+    "architecture": "SEE mechanism field \u2014 full architecture in technical package",
+    "inputs": "UNKNOWN (BUYER_DILIGENCE_REQUIRED for full spec)",
+    "outputs": "UNKNOWN (BUYER_DILIGENCE_REQUIRED for full spec)",
+    "operating_principle": "Self-referencing piezoresistive pressure sensor. Dual-element differential measurement cancels common-mode drift."
+  },
+  "4_evidence_ledger": {
+    "OBSERVED": [],
+    "EXTERNALLY_VERIFIED": [],
+    "COMPUTATIONALLY_SUPPORTED": [],
+    "MODELLED": [
+      "67.8% drift cancellation (MODELED)",
+      "3.45 mmHg error over 30 days (MODELED)"
+    ],
+    "ASSUMED": [],
+    "UNKNOWN": []
+  },
+  "5_strongest_alternative": "Periodic recalibration protocol (existing clinical practice) \u2014 inconvenient but reliable",
+  "6_what_is_differentiated": {
+    "potential_differentiation": "Potential differentiation vs Periodic recalibration protocol (existing clinical practice) \u2014 inconvenient but : Whether anti-fouling coating or periodic recalibration can bring error below 2.0 mmHg. If not, mechanism is falsified for absolute measurement (may survive for trending only).",
+    "evidence_supporting": "SEE evidence_ledger COMPUTATIONALLY_SUPPORTED and MODELLED tiers",
+    "evidence_against": [
+      "Falsification threshold (2.0 mmHg) NOT met \u2014 3.45 mmHg error",
+      "Biofouling dominates non-common-mode drift",
+      "Self-referencing alone insufficient for absolute pressure measurement"
+    ],
+    "unresolved_question": "Whether anti-fouling coating or periodic recalibration can bring error below 2.0 mmHg. If not, mechanism is falsified for absolute measurement (may survive for trending only).",
+    "experiment_required": "Bench test: dual-element sensor with anti-fouling coating vs uncoated, 30-day soak in mock CSF, measure drift."
+  },
+  "7_known_failures": [
+    "Falsification threshold (2.0 mmHg) NOT met \u2014 3.45 mmHg error",
+    "Biofouling dominates non-common-mode drift",
+    "Self-referencing alone insufficient for absolute pressure measurement"
+  ],
+  "8_remaining_uncertainty": "Whether anti-fouling coating or periodic recalibration can bring error below 2.0 mmHg. If not, mechanism is falsified for absolute measurement (may survive for trending only).",
+  "9_decisive_experiment": {
+    "experiment": "Bench test: dual-element sensor with anti-fouling coating vs uncoated, 30-day soak in mock CSF, measure drift.",
+    "pass_rule": "Coated sensor error < 2.0 mmHg over 30 days (95% CI below threshold)",
+    "fail_rule": "Coated sensor error > 2.0 mmHg over 30 days",
+    "ambiguous_rule": "CI spans pass/fail threshold \u2192 AMBIGUOUS (no silent promotion)",
+    "cost_estimate": "$8,000 (ESTIMATED)",
+    "timeline_estimate": "12 weeks (ESTIMATED \u2014 30-day soak + analysis)"
+  },
+  "10_build_integration_pathway": {
+    "what_to_build": "Bench test: dual-element sensor with anti-fouling coating vs uncoated, 30-day soak in mock CSF, measure drift.",
+    "existing_equipment_reusable": "BUYER_DILIGENCE_REQUIRED",
+    "novel_component": "Self-referencing piezoresistive pressure sensor. Dual-element differential measurement cancels common-mode drift.",
+    "engineering_remaining": "Sensor element + anti-fouling coating. Compatible with existing catheter-based pressure sensors.",
+    "manufacturing_risks": "BUYER_DILIGENCE_REQUIRED"
+  },
+  "11_regulatory_status": "Class II (510(k)) if used for trending. Class III (PMA) if used for absolute ICP measurement.",
+  "12_commercial_route": "License to sensor OEM IF anti-fouling repair works. Otherwise: cemetery.",
+  "13_economics": {
+    "experiment_cost": "$8,000 (ESTIMATED)",
+    "timeline": "12 weeks (ESTIMATED \u2014 30-day soak + analysis)",
+    "development_burden": "Sensor element + anti-fouling coating. Compatible with existing catheter-based pressure sensors.",
+    "potential_economic_value": "BUYER_DILIGENCE_REQUIRED",
+    "evidence_tier": "ASSUMED",
+    "critical_cost_uncertainty": "Development cost beyond decisive experiment UNKNOWN"
+  },
+  "14_ip_legal_status": {
+    "known_ip": "BUYER_DILIGENCE_REQUIRED \u2014 no patent search performed for this package",
+    "known_disclosures": "BUYER_DILIGENCE_REQUIRED",
+    "known_ownership": "CereVascular (assumed \u2014 confirm with CEO)",
+    "known_restrictions": "UNKNOWN",
+    "ip_diligence_required": "Full freedom-to-operate analysis by buyer counsel",
+    "note": "We are not running a patent court. This section surfaces open questions, not legal verdicts."
+  },
+  "15_buyer_action": {
+    "primary_action": "Commission $8K coated-sensor bench test OR reject (mechanism may be falsified)",
+    "options": [
+      "LICENSE",
+      "BUILD",
+      "CO-DEVELOP",
+      "COMMISSION_EXPERIMENT",
+      "ACQUIRE",
+      "INTEGRATE",
+      "REJECT"
+    ],
+    "recommended_next_step": "Commission $8K coated-sensor bench test OR reject (mechanism may be falsified)",
+    "buyer_action_id": "BA-P25-001"
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "schema": "BUYER_TRANSFER_PACKAGE_v1",
+  "candidate_id": "P-16",
+  "buyer_action_id": "P16-EXP-001",
+  "classification": "GREEN",
+  "classification_reason": "All 4 buyer-test questions answerable YES",
+  "generated_at": "2026-08-26T05:09:19.454685+00:00",
+  "generated_from": "R332/g3_all13_canonical/CANONICAL_BUYER_PACKAGES.json (P-01\u2013P-22) + R339/g2_p24_buyer_package (P-24) + R337/g4_p25_model (P-25)",
+  "1_executive_proposition": "Technology: 940nm NIR through scalp/skull to implanted GaAs PV cell. Verified fluence 1.0-1.4 mW/cm\u00b2 (~1000-1400 \u03bcW).. Problem: Transcranial power for implanted devices. Current solution (inductive coupling) is alignment-critical and depth-limited..",
+  "2_buyer_problem": {
+    "problem": "Transcranial power for implanted devices. Current solution (inductive coupling) is alignment-critical and depth-limited.",
+    "who_has_it": "Neurotech / implantable device company",
+    "current_solution": "Inductive coupling (Medtronic SynchroMed) \u2014 alignment-critical, depth-limited",
+    "why_inadequate": "Actual 940nm tissue transmission in shunt patients. PV cell efficiency in vivo."
+  },
+  "3_technology": {
+    "mechanism": "940nm NIR through scalp/skull to implanted GaAs PV cell. Verified fluence 1.0-1.4 mW/cm\u00b2 (~1000-1400 \u03bcW).",
+    "architecture": "SEE mechanism field \u2014 full architecture in technical package",
+    "inputs": "UNKNOWN (BUYER_DILIGENCE_REQUIRED for full spec)",
+    "outputs": "UNKNOWN (BUYER_DILIGENCE_REQUIRED for full spec)",
+    "operating_principle": "940nm NIR through scalp/skull to implanted GaAs PV cell. Verified fluence 1.0-1.4 mW/cm\u00b2 (~1000-1400 \u03bcW)."
+  },
+  "4_evidence_ledger": {
+    "OBSERVED": [],
+    "EXTERNALLY_VERIFIED": [],
+    "COMPUTATIONALLY_SUPPORTED": [
+      "T2-CONFIRMED. ACTUAL PyTissueOptics v2.0.1 (DCC-Lab, independent) executed. MC convergence documented (CIs overlap). Published Jacques 2013 range confirmed. Reproducible (pip install)."
+    ],
+    "MODELLED": [
+      "~1050 \u03bcW power output (derived from fluence \u00d7 area \u00d7 efficiency, MODELLED)"
+    ],
+    "ASSUMED": [],
+    "UNKNOWN": []
+  },
+  "5_strongest_alternative": "Inductive coupling (Medtronic SynchroMed) \u2014 alignment-critical, depth-limited",
+  "6_what_is_differentiated": {
+    "potential_differentiation": "Potential differentiation vs Inductive coupling (Medtronic SynchroMed) \u2014 alignment-critical, depth-limited: Actual 940nm tissue transmission in shunt patients. PV cell efficiency in vivo.",
+    "evidence_supporting": "SEE evidence_ledger COMPUTATIONALLY_SUPPORTED and MODELLED tiers",
+    "evidence_against": [
+      "R308 diffusion approximation (744 \u03bcW) was conservative \u2014 verified is higher",
+      "MCX GPU not run (CUDA constraint)"
+    ],
+    "unresolved_question": "Actual 940nm tissue transmission in shunt patients. PV cell efficiency in vivo.",
+    "experiment_required": "Bench: 940nm LED + 5mm tissue phantom + GaAs PV cell. Measure power output."
+  },
+  "7_known_failures": [
+    "R308 diffusion approximation (744 \u03bcW) was conservative \u2014 verified is higher",
+    "MCX GPU not run (CUDA constraint)"
+  ],
+  "8_remaining_uncertainty": "Actual 940nm tissue transmission in shunt patients. PV cell efficiency in vivo.",
+  "9_decisive_experiment": {
+    "experiment": "Bench: 940nm LED + 5mm tissue phantom + GaAs PV cell. Measure power output.",
+    "pass_rule": "Measured power >= 500 \u03bcW",
+    "fail_rule": "Measured power < 100 \u03bcW (insufficient for useful load)",
+    "ambiguous_rule": "CI spans pass/fail threshold \u2192 AMBIGUOUS (no silent promotion)",
+    "cost_estimate": "$2-5K (ESTIMATED: LED + phantom + PV cell)",
+    "timeline_estimate": "1-2 weeks (ESTIMATED)"
+  },
+  "10_build_integration_pathway": {
+    "what_to_build": "Bench: 940nm LED + 5mm tissue phantom + GaAs PV cell. Measure power output.",
+    "existing_equipment_reusable": "BUYER_DILIGENCE_REQUIRED",
+    "novel_component": "940nm NIR through scalp/skull to implanted GaAs PV cell. Verified fluence 1.0-1.4 mW/cm\u00b2 (~1000-1400 \u03bcW).",
+    "engineering_remaining": "MEDIUM \u2014 PV cell + LED + tissue interface",
+    "manufacturing_risks": "BUYER_DILIGENCE_REQUIRED"
+  },
+  "11_regulatory_status": "PMA (optical implant)",
+  "12_commercial_route": "License to neurotech company",
+  "13_economics": {
+    "experiment_cost": "$2-5K (ESTIMATED: LED + phantom + PV cell)",
+    "timeline": "1-2 weeks (ESTIMATED)",
+    "development_burden": "MEDIUM \u2014 PV cell + LED + tissue interface",
+    "potential_economic_value": "BUYER_DILIGENCE_REQUIRED",
+    "evidence_tier": "ASSUMED",
+    "critical_cost_uncertainty": "Development cost beyond decisive experiment UNKNOWN"
+  },
+  "14_ip_legal_status": {
+    "known_ip": "BUYER_DILIGENCE_REQUIRED \u2014 no patent search performed for this package",
+    "known_disclosures": "BUYER_DILIGENCE_REQUIRED",
+    "known_ownership": "CereVascular (assumed \u2014 confirm with CEO)",
+    "known_restrictions": "UNKNOWN",
+    "ip_diligence_required": "Full freedom-to-operate analysis by buyer counsel",
+    "note": "We are not running a patent court. This section surfaces open questions, not legal verdicts."
+  },
+  "15_buyer_action": {
+    "primary_action": "LICENSE \u2014 pip install pytissueoptics, run script (get ~1.4 mW/cm\u00b2), then bench: LED + phantom + PV",
+    "options": [
+      "LICENSE",
+      "BUILD",
+      "CO-DEVELOP",
+      "COMMISSION_EXPERIMENT",
+      "ACQUIRE",
+      "INTEGRATE",
+      "REJECT"
+    ],
+    "recommended_next_step": "LICENSE \u2014 pip install pytissueoptics, run script (get ~1.4 mW/cm\u00b2), then bench: LED + phantom + PV",
+    "buyer_action_id": "P16-EXP-001"
+  }
+}
