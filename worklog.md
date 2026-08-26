@@ -7406,3 +7406,99 @@ Stage Summary:
 - 15/15 packages VALID (independently validated, not self-certified)
 - 0 RED / NOT_TRANSFERABLE packages
 - 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data.
+
+---
+Task ID: R345-ELITE-DOSSIER-LAYER
+Agent: main (coder, session 2026-08-26)
+Task: Execute CEO R345 directive — upgrade R344's 6-file package to elite 15-section technology-transfer dossier. Two layers: Layer 1 buyer-facing markdown (readable by CTO/VP R&D in 10 min), Layer 2 diligence data room (structured JSON). Reference: WIPO, Stanford OTL.
+
+Pre-Session Constitution Check:
+- Read EPISTEMIC_CONSTITUTION.md v1.7.0.
+- Acknowledged: "We are not running a patent court."
+- Acknowledged Article XXV (unknown must remain unknown).
+- Acknowledged Article XXVI (no self-certification).
+- Verified remote HEAD = 0fb8354 (R344).
+
+Work Log:
+- Created R345/ directory with audit/, schema/, dossier_portfolio/.
+- Wrote R345/r345_elite_dossiers.py — 15-section elite dossier generator.
+- Schema: ELITE_TECHNOLOGY_TRANSFER_DOSSIER_v1. 15 sections:
+  01. Buyer Decision Card (one-page handoff)
+  02. Executive Technology Brief (2-min read)
+  03. Customer/Industrial Problem
+  04. Technology Description
+  05. What Is Actually New (known prior → limitation → our mechanism → difference → expected advantage)
+  06. Competitive Alternatives (table including where we lose)
+  07. Evidence & Validation Ledger (structured atoms, 6 tiers)
+  08. Technical Readiness & Risk (risk register: risk/probability/impact/evidence/mitigation/experiment)
+  09. Failure & Falsification Record
+  10. Remaining Decisive Question (decision tree: PASS/AMBIGUOUS/FAIL)
+  11. Development & Experiment Plan (5 phases: bench → prototype → relevant env → regulatory → commercial)
+  12. Manufacturing & Integration
+  13. Regulatory Diligence
+  14. IP/Ownership/FTO Diligence (BUYER_DILIGENCE_REQUIRED — not a patent court)
+  15. Commercialization/Deal Path (LICENSE/CO_DEVELOP/BUILD/ACQUIRE/COMMISSION/REJECT)
+- Two-layer structure per package:
+  Layer 1 (buyer-facing markdown): 00_BUYER_DECISION_CARD.md, 01_EXECUTIVE_TECHNOLOGY_BRIEF.md, 02_FULL_DOSSIER.md
+  Layer 2 (diligence data room JSON): 05_EVIDENCE_LEDGER.json, 06_PROVENANCE_MANIFEST.json, 07_FULL_DOSSIER.json, 08_EXPERIMENT_PROTOCOL.json, 09_RISK_REGISTER.json, 10_COMPETITIVE_ANALYSIS.json, 11_REGULATORY_DILIGENCE.json, 12_IP_DILIGENCE.json, 13_COMMERCIALIZATION_DEAL_PATH.json, 14_BUYER_ACTION.json, 15_PACKAGE_MANIFEST.json
+- Reused R344's evidence-ledger fix (structured atoms, not strings) and independent validation.
+- Reused R344's three independent axes: TECHNICAL_READINESS / TRANSFER_POSTURE / COMMERCIAL_STATE.
+- Generated 15 elite dossiers, 14 files each = 210 files + 1 index = 211 total files.
+- Generated DOSSIER_PORTFOLIO_INDEX.md with per-package summary table.
+
+R345 Results:
+- P-01: T2-CONDITIONAL / READY_FOR_TECHNICAL_EVALUATION
+- P-02: T1 / TECHNICAL_DILIGENCE_REQUIRED
+- P-04: T1 / DECISIVE_EXPERIMENT_REQUIRED
+- P-07: T1 / DECISIVE_EXPERIMENT_REQUIRED
+- P-10: T1-FAIL / CO_DEVELOPMENT_REQUIRED
+- P-11: T1 / TECHNICAL_DILIGENCE_REQUIRED
+- P-12: T1 / TECHNICAL_DILIGENCE_REQUIRED
+- P-13: T1 / DECISIVE_EXPERIMENT_REQUIRED
+- P-15: T1 / DECISIVE_EXPERIMENT_REQUIRED
+- P-16: T2-CONFIRMED / READY_FOR_TECHNICAL_EVALUATION
+- P-20: T1 / TECHNICAL_DILIGENCE_REQUIRED
+- P-21: T1 / DECISIVE_EXPERIMENT_REQUIRED
+- P-22: T1 / DECISIVE_EXPERIMENT_REQUIRED
+- P-24: T1 / DECISIVE_EXPERIMENT_REQUIRED
+- P-25: T1-FAIL / CO_DEVELOPMENT_REQUIRED
+
+Validation: 15/15 VALID (independently validated, Article XXVI compliant).
+
+Honest gaps documented (per CEO directive — no inflation):
+- Manufacturing & Integration: BUYER_DILIGENCE_REQUIRED (all 15)
+- Regulatory Diligence: BUYER_DILIGENCE_REQUIRED (all 15)
+- IP/FTO: BUYER_DILIGENCE_REQUIRED (all 15 — not a patent court)
+- Economics potential value: BUYER_DILIGENCE_REQUIRED (all 15)
+
+10-minute readability test:
+- BUYER_DECISION_CARD (1 page) + EXECUTIVE_BRIEF (2 min) answer all 9 questions a CTO/VP R&D would ask:
+  1. What is this?
+  2. Why could it matter?
+  3. What evidence supports it?
+  4. Where does it lose?
+  5. What remains unknown?
+  6. What would it cost us to find out?
+  7. What would we have to build?
+  8. What rights could we obtain?
+  9. What exactly are you asking us to do?
+
+P-24 Buyer Decision Card verified:
+- Technology: Gravity-compensating hydraulic damper
+- Why you may care: "A computationally specified P-24 concept plus a preregistered decisive experiment — not a validated technology."
+- Current evidence: T1 / NONE / DECISIVE_EXPERIMENT_REQUIRED
+- What is not proven: ASD outperforms in 3/4 postures; underdrainage at extreme; 0 established advantages
+- Strongest alternative: ASD
+- Decisive question: Does proportional regulation + faster dynamic response create meaningful advantage over ASD?
+- Cost: $15K. Time: 8 weeks.
+- What we're asking: Commission $15K bench experiment OR request technical diligence OR request license discussion
+- BUYER_ACTION_ID: P24-EXP-001
+
+Stage Summary:
+- 15 elite technology-transfer dossiers generated (14 files each, 211 total files).
+- Two-layer structure: buyer-facing markdown + diligence data room JSON.
+- 15/15 independently validated.
+- Three independent axes preserved (TECHNICAL_READINESS / TRANSFER_POSTURE / COMMERCIAL_STATE).
+- No inflation. No patent-court claims. No fake precision.
+- Reference frameworks: WIPO technology-transfer, Stanford OTL, DOE ARL.
+- 0 buyers contacted (CEO-owned). 0 transactions. 0 real external data.
