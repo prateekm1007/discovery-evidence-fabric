@@ -1,0 +1,85 @@
+{
+  "gate": "GATE 3: Capstone Attacks",
+  "objective": "Attack the R339 capstone with 5 adversarial tests. Identify which attacks breach R327 code, then fix them in GATE 4.",
+  "attacks": [
+    {
+      "attack_id": "A",
+      "name": "Synthetic data + false external declaration",
+      "attack_description": "Caller sets is_synthetic=False on a synthetic fixture, hoping to obtain PHYSICALLY_VALIDATED. No custody chain, no independent verification.",
+      "expected": "BLOCK from PHYSICALLY_VALIDATED",
+      "actual_evidence_class": "REPRODUCIBLE",
+      "actual_state_transition": {
+        "from": "EXPERIMENT_READY",
+        "to": "VERIFICATION_PENDING",
+        "reason": "Unexpected verdict Verdict.PASS",
+        "real_transition_executed": false
+      },
+      "blocked": true,
+      "passed": true,
+      "defense_mechanism": "Article III (verifier must never trust claimant) + Article XXXVII \u00a73 (no custody chain \u2192 cannot be physical). The caller's is_synthetic=False is necessary but not sufficient."
+    },
+    {
+      "attack_id": "B",
+      "name": "Real-looking metadata + synthetic payload",
+      "attack_description": "Caller fills a valid-looking custody chain pointing at a synthetic file, then sets data_source_verified=True. The CEO identified this as a Article III violation: data_source_verified is an INPUT, not an OUTPUT of verification.",
+      "expected": "BLOCK from PHYSICALLY_VALIDATED (in R340 fixed version \u2014 see GATE 4)",
+      "actual_evidence_class_with_R327_code": "PHYSICALLY_VALIDATED",
+      "actual_state_transition_with_R327_code": {
+        "from": "EXPERIMENT_READY",
+        "to": "TECHNICALLY_EVALUABLE",
+        "reason": "PASS + PHYSICALLY_VALIDATED \u2192 TECHNICALLY_EVALUABLE",
+        "real_transition_executed": true
+      },
+      "blocked_with_R327_code": false,
+      "verdict_on_R327_code": "BREACH \u2014 R327 code grants PHYSICALLY_VALIDATED because data_source_verified=True is trusted as input. This is the bug R340 GATE 4 fixes.",
+      "passed_with_R327_code": false,
+      "passed_with_R340_fix": null
+    },
+    {
+      "attack_id": "C",
+      "name": "Valid hash + fabricated custody",
+      "attack_description": "Hash matches file (cryptographic integrity OK). Custody chain passes structural validation but is fabricated (made-up operator/location). Caller sets data_source_verified=True.",
+      "expected": "BLOCK from PHYSICALLY_VALIDATED (in R340 fixed version)",
+      "actual_evidence_class_with_R327_code": "PHYSICALLY_VALIDATED",
+      "blocked_with_R327_code": false,
+      "verdict_on_R327_code": "BREACH \u2014 R327 trusts data_source_verified=True even though custody is fabricated. R340 GATE 4 fixes by requiring independent verification.",
+      "passed_with_R327_code": false,
+      "passed_with_R340_fix": null
+    },
+    {
+      "attack_id": "D",
+      "name": "Valid custody + no independent verifier",
+      "attack_description": "Custody chain is real and structurally valid. But no independent third party has attested to the data's provenance. Caller still sets data_source_verified=True.",
+      "expected": "BLOCK from PHYSICALLY_VALIDATED (in R340 fixed version \u2014 requires independent_verification record)",
+      "actual_evidence_class_with_R327_code": "PHYSICALLY_VALIDATED",
+      "blocked_with_R327_code": false,
+      "verdict_on_R327_code": "BREACH \u2014 R327 trusts data_source_verified=True without requiring an independent_verification record. R340 GATE 4 fixes by requiring an IndependentVerification object.",
+      "passed_with_R327_code": false,
+      "passed_with_R340_fix": null
+    },
+    {
+      "attack_id": "E",
+      "name": "Real external + complete provenance + independent verification",
+      "attack_description": "The legitimate path. Real external file, valid custody chain, independent verification record (would be a DOI, NDA reference, or third-party attestation in production).",
+      "expected": "PHYSICALLY_VALIDATED (the only valid path to REAL_LOOP_VERIFIED)",
+      "actual_evidence_class_with_R327_code": "PHYSICALLY_VALIDATED",
+      "passes_with_R327_code": true,
+      "verdict_on_R327_code": "PASS \u2014 R327 correctly grants PHYSICALLY_VALIDATED when all conditions are met. The bug is not that the legit path fails; it's that the attack paths (B, C, D) also succeed.",
+      "passed_with_R327_code": true,
+      "passed_with_R340_fix": null
+    }
+  ],
+  "R327_assessment": {
+    "attack_A_synthetic_plus_false_external": "BLOCKED \u2713 (R327 correctly blocks because no custody chain)",
+    "attack_B_real_metadata_synthetic_payload": "BREACHED \u2717 \u2014 R327 trusts caller-supplied data_source_verified=True",
+    "attack_C_valid_hash_fabricated_custody": "BREACHED \u2717 \u2014 R327 trusts caller-supplied data_source_verified=True",
+    "attack_D_valid_custody_no_verifier": "BREACHED \u2717 \u2014 R327 trusts caller-supplied data_source_verified=True",
+    "attack_E_real_complete_bundle": "PASS \u2713 \u2014 legit path works",
+    "summary": "R327 has 0 breach(es) of the Article III (verifier must never trust claimant) principle. The CEO's audit correctly identified this. R340 GATE 4 fixes by introducing an AdmissibilityBundle and deriving data_source_verified from independent verification."
+  },
+  "ceo_directive_alignment": {
+    "ceo_identified_bug": "data_source_verified=True is currently a caller-supplied input parameter (R327/b1_verify/hardened_buyer_pipeline.py line 132, 164). This violates Article III.",
+    "ceo_correction": "The production API should determine verification from the evidence bundle. The caller should not be able to simply provide data_source_verified=True and thereby influence evidence classification. That Boolean should be an OUTPUT of verification, not an input supplied by the submitter.",
+    "r340_fix": "GATE 4 introduces AdmissibilityBundle dataclass + verify_admissibility() function. data_source_verified becomes a derived property, not a parameter. See GATE 4 for the refactor."
+  }
+}
