@@ -1,0 +1,175 @@
+{
+  "registry_id": "CONSULTANT_FINDING_REGISTRY_V1",
+  "frozen_at": "2026-08-26T22:30:00Z",
+  "description": "Registry of all 11 consultant findings with strict acceptance conditions. A finding is FIXED only if EVERY required condition passes. Missing evidence = UNRESOLVED, never FIXED.",
+
+  "findings": [
+    {
+      "finding_id": "CF-001",
+      "finding": "P-16 regulatory pathway — no Class III/510(k) contradiction",
+      "package": "P-16",
+      "consultant_assertion": "P-16 must not contain mutually contradictory regulatory pathways (e.g., Class III PMA AND 510(k) simultaneously)",
+      "required_evidence": [
+        "device_class explicitly stated",
+        "regulatory_pathway explicitly stated (PMA, 510(k), or De_Novo)",
+        "no contradictory pathway present in same package"
+      ],
+      "acceptance_condition": "ALL: device_class present AND regulatory_pathway present AND no contradiction between them",
+      "disqualifying_condition": "ANY: device_class missing OR pathway missing OR contradictory pathways found (e.g., PMA + 510(k) in same package)",
+      "missing_evidence_classification": "UNRESOLVED"
+    },
+    {
+      "finding_id": "CF-002",
+      "finding": "P-01 falsification — documented repair pathway exists or package is downgraded",
+      "package": "P-01",
+      "consultant_assertion": "The falsified dual-invariant must have a structured repair record, not just a keyword mention",
+      "required_evidence": [
+        "failed_requirement explicitly documented",
+        "failure_evidence documented",
+        "repair_description documented",
+        "new_mechanism or new_design documented",
+        "new_model or new_test documented",
+        "new_threshold or new_acceptance_criterion documented",
+        "repair_result documented"
+      ],
+      "acceptance_condition": "ALL 7 fields present in a structured repair record. A keyword like 'graceful degradation' is NOT sufficient.",
+      "disqualifying_condition": "ANY of the 7 fields missing OR repair is only acknowledged via keyword without structured record",
+      "missing_evidence_classification": "UNRESOLVED"
+    },
+    {
+      "finding_id": "CF-003",
+      "finding": "P-04 '100% clearance' — clearly MODELLED/ideal-condition statement everywhere",
+      "package": "P-04",
+      "consultant_assertion": "The '100% clearance' claim must be explicitly labelled MODELLED in every place it appears",
+      "required_evidence": [
+        "modelled_only field contains '100%' with 'MODELLED' label",
+        "R370 claims evidence_class is MODEL_PREDICTED or HYPOTHESIS (not PHYSICALLY_VALIDATED)",
+        "no instance of '100% clearance' without MODELLED qualifier"
+      ],
+      "acceptance_condition": "ALL: modelled_only has 100%+MODELLED AND R370 evidence_class is MODEL_PREDICTED AND no unqualified '100% clearance'",
+      "disqualifying_condition": "ANY: 100% appears without MODELLED OR evidence_class is PHYSICALLY_VALIDATED",
+      "missing_evidence_classification": "UNRESOLVED"
+    },
+    {
+      "finding_id": "CF-004",
+      "finding": "P-13 buyer data dependency — buyer and dataset partner are explicit",
+      "package": "P-13",
+      "consultant_assertion": "A named data partner with dataset type, relevance, and access status must be explicit — not just a keyword 'data'",
+      "required_evidence": [
+        "named_data_partner (specific organization name)",
+        "dataset_type (what kind of data)",
+        "dataset_relevance (why this dataset matters)",
+        "dataset_availability (is it available?)",
+        "access_status (how would access work?)",
+        "data_owner (who owns the data?)"
+      ],
+      "acceptance_condition": "ALL 6 fields present. A phrase containing 'data' is NOT sufficient.",
+      "disqualifying_condition": "ANY of the 6 fields missing OR only keyword 'data' present without structured partner record",
+      "missing_evidence_classification": "UNRESOLVED"
+    },
+    {
+      "finding_id": "CF-005",
+      "finding": "P-21-R1 SAR — status clearly visible",
+      "package": "P-21-R1",
+      "consultant_assertion": "SAR (Specific Absorption Rate) must have an explicit status field, not inferred from 'regulatory pathway unknown'",
+      "required_evidence": [
+        "explicit SAR_STATUS field with value ASSESSED, UNKNOWN, or NOT_ASSESSED",
+        "SAR is explicitly mentioned by name (not just 'regulatory pathway')"
+      ],
+      "acceptance_condition": "ALL: SAR explicitly named AND SAR_STATUS field present with explicit value",
+      "disqualifying_condition": "SAR not explicitly named OR SAR_STATUS inferred from generic 'regulatory pathway unknown'",
+      "missing_evidence_classification": "UNRESOLVED"
+    },
+    {
+      "finding_id": "CF-006",
+      "finding": "P-22-R1 four control problems — all four explicitly documented with resolution paths",
+      "package": "P-22-R1",
+      "consultant_assertion": "All four control problems (buckling, control stability, tissue safety, failure recovery) must be documented with resolution paths. 3/4 is NOT sufficient.",
+      "required_evidence": [
+        "buckling: problem documented + evidence + resolution_path",
+        "control_stability: problem documented + evidence + resolution_path",
+        "tissue_safety: problem documented + evidence + resolution_path",
+        "failure_recovery: problem documented + evidence + resolution_path"
+      ],
+      "acceptance_condition": "ALL 4 problems documented (4/4, not >=3) with each having problem+evidence+resolution_path",
+      "disqualifying_condition": "ANY of the 4 problems missing OR missing resolution_path for any problem",
+      "missing_evidence_classification": "UNRESOLVED"
+    },
+    {
+      "finding_id": "CF-007",
+      "finding": "P-24 protocol — complete step-by-step experiment, not merely hypothesis/cost/threshold",
+      "package": "P-24",
+      "consultant_assertion": "P-24 must have a complete step-by-step experiment protocol",
+      "required_evidence": [
+        "protocol field is present and not UNKNOWN",
+        "protocol contains step-by-step procedure (not just hypothesis/cost/threshold)",
+        "sample_size specified",
+        "measurement specified",
+        "variables specified",
+        "control specified"
+      ],
+      "acceptance_condition": "ALL: protocol present AND not UNKNOWN AND step-by-step AND sample_size+measurement+variables+control present",
+      "disqualifying_condition": "protocol is UNKNOWN OR missing OR only hypothesis/cost/threshold without steps",
+      "missing_evidence_classification": "UNRESOLVED"
+    },
+    {
+      "finding_id": "CF-008",
+      "finding": "P-28 protocol — complete step-by-step experiment",
+      "package": "P-28",
+      "consultant_assertion": "P-28 must have a complete step-by-step experiment protocol",
+      "required_evidence": [
+        "protocol field is present and not UNKNOWN",
+        "protocol contains step-by-step procedure",
+        "sample_size specified",
+        "measurement specified"
+      ],
+      "acceptance_condition": "ALL: protocol present AND not UNKNOWN AND step-by-step",
+      "disqualifying_condition": "protocol is UNKNOWN OR missing",
+      "missing_evidence_classification": "UNRESOLVED"
+    },
+    {
+      "finding_id": "CF-009",
+      "finding": "P-28 prior-art proximity to ShuntCheck — explicitly mapped",
+      "package": "P-28",
+      "consultant_assertion": "P-28's relationship to ShuntCheck (US20130109998A1) must be explicitly mapped",
+      "required_evidence": [
+        "ShuntCheck or US20130109998 explicitly named in a regulatory or patent field",
+        "predicate_candidate or prior_art field references ShuntCheck",
+        "pathway_hypothesis mentions ShuntCheck or similar predicate"
+      ],
+      "acceptance_condition": "ALL: ShuntCheck explicitly named AND predicate_candidate references it AND pathway_hypothesis mentions it",
+      "disqualifying_condition": "ShuntCheck not found OR only generic prior-art mention without specific reference",
+      "missing_evidence_classification": "UNRESOLVED"
+    },
+    {
+      "finding_id": "CF-010",
+      "finding": "Ownership/IP/Section 39 — clearly marked as unresolved/counsel-required, never represented as legal clearance",
+      "package": "ALL (15 packages)",
+      "consultant_assertion": "Ownership must be explicitly marked as unresolved/counsel-required for every package",
+      "required_evidence": [
+        "every package has Ownership in material_unknowns",
+        "ownership unknown states 'No IP assignment verified' or equivalent",
+        "no package represents ownership as legal clearance or FTO"
+      ],
+      "acceptance_condition": "ALL 15 packages have Ownership UNKNOWN AND none represent legal clearance",
+      "disqualifying_condition": "ANY package missing Ownership unknown OR any package claims legal clearance/FTO",
+      "missing_evidence_classification": "UNRESOLVED"
+    },
+    {
+      "finding_id": "CF-011",
+      "finding": "P-25 and killed assets — must not appear in buyer-facing portfolio",
+      "package": "P-25 + all killed",
+      "consultant_assertion": "Killed packages must not appear in any active buyer-facing artifact",
+      "required_evidence": [
+        "P-25 not in R370 axes",
+        "P-25 not in R370 claims",
+        "P-25 not in R370 buyer maps",
+        "P-09 not in R370 axes/claims/buyers",
+        "all killed packages (P-03, P-05, P-06, P-08, P-09, P-10, P-12, P-14, P-17, P-19, P-20, P-23, P-25) not in active artifacts"
+      ],
+      "acceptance_condition": "ALL killed packages absent from ALL active R370 artifacts (axes, claims, buyers)",
+      "disqualifying_condition": "ANY killed package found in ANY active artifact",
+      "missing_evidence_classification": "UNRESOLVED"
+    }
+  ]
+}
