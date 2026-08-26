@@ -1,0 +1,36 @@
+{
+  "authority": "CEO R335-C — structured numeric thresholds. No more heuristic text extraction.",
+  "timestamp": "2026-08-26T14:10:00Z",
+
+  "problem": "R333 used re.findall(r'[\\d.]+', rule_text) and took the last number. This is unsafe — rules contain multiple numbers (pass threshold, control threshold, sample size, percentages). R333 integration test failed on P-04 because pass_rule='>=80% Aβ42 in 72h; control <10%' has two numbers (80 and 10).",
+
+  "fix": "Add structured threshold fields to every canonical experiment contract. The prose rule remains for humans. The structured fields control deterministic execution.",
+
+  "structured_threshold_schema": {
+    "metric": "Name of the measured quantity (e.g., 'ICP_excursion_reduction_pct', 'Aβ42_clearance_pct', 'valve_response_time_s')",
+    "units": "Unit of measurement (e.g., '%', 'mmHg', 'seconds', 'mL/min')",
+    "direction": "HIGHER_IS_BETTER or LOWER_IS_BETTER",
+    "pass_threshold": "Numeric value above (or below) which the experiment PASSES",
+    "fail_threshold": "Numeric value above (or below) which the experiment FAILS",
+    "confidence_level": "Required confidence level (e.g., 0.95 for 95% CI)",
+    "statistical_test": "How to compute the CI (e.g., 'normal_approximation', 'bootstrap', 'exact_binomial')",
+    "threshold_provenance": "Why this threshold (e.g., 'Published clinical threshold (AANS)', 'Engineering design spec', 'FDA guidance')",
+    "threshold_evidence_class": "OBSERVED / SOURCE_DERIVED / MODELLED / ESTIMATED / ASSUMED"
+  },
+
+  "all_13_structured_thresholds": {
+    "P01-EXP-001": {"metric": "multi_segment_advantage_rate_pct", "units": "%", "direction": "HIGHER_IS_BETTER", "pass_threshold": 80.0, "fail_threshold": 50.0, "confidence_level": 0.95, "statistical_test": "normal_approximation", "threshold_provenance": "Engineering design spec (>=80% of scenarios show advantage)", "threshold_evidence_class": "ESTIMATED"},
+    "P02-EXP-001": {"metric": "ICP_excursion_reduction_pct", "units": "%", "direction": "HIGHER_IS_BETTER", "pass_threshold": 40.0, "fail_threshold": 20.0, "confidence_level": 0.95, "statistical_test": "normal_approximation", "threshold_provenance": "Modelled improvement target", "threshold_evidence_class": "MODELLED"},
+    "P04-EXP-001": {"metric": "Aβ42_clearance_pct", "units": "%", "direction": "HIGHER_IS_BETTER", "pass_threshold": 80.0, "fail_threshold": 50.0, "confidence_level": 0.95, "statistical_test": "normal_approximation", "threshold_provenance": "Therapeutic efficacy threshold (published enzyme kinetics)", "threshold_evidence_class": "SOURCE_DERIVED"},
+    "P07-EXP-001": {"metric": "drainage_rate_mL_per_min", "units": "mL/min", "direction": "HIGHER_IS_BETTER", "pass_threshold": 0.1, "fail_threshold": 0.05, "confidence_level": 0.95, "statistical_test": "normal_approximation", "threshold_provenance": "Minimum drainage for physiological CSF production (0.3 mL/min)", "threshold_evidence_class": "SOURCE_DERIVED"},
+    "P10-EXP-001": {"metric": "valve_response_time_s", "units": "seconds", "direction": "LOWER_IS_BETTER", "pass_threshold": 5.0, "fail_threshold": 6.0, "confidence_level": 0.95, "statistical_test": "normal_approximation", "threshold_provenance": "Frozen from R308 original criterion (unchanged)", "threshold_evidence_class": "ESTIMATED"},
+    "P11-EXP-001": {"metric": "biofilm_reduction_pct", "units": "%", "direction": "HIGHER_IS_BETTER", "pass_threshold": 80.0, "fail_threshold": 50.0, "confidence_level": 0.95, "statistical_test": "normal_approximation", "threshold_provenance": "Anti-biofilm efficacy threshold (comparator: <20% of control for PASS)", "threshold_evidence_class": "ESTIMATED"},
+    "P12-EXP-001": {"metric": "tau_clearance_pct", "units": "%", "direction": "HIGHER_IS_BETTER", "pass_threshold": 80.0, "fail_threshold": 50.0, "confidence_level": 0.95, "statistical_test": "normal_approximation", "threshold_provenance": "Therapeutic efficacy threshold", "threshold_evidence_class": "ESTIMATED"},
+    "P13-EXP-001": {"metric": "AUC", "units": "area_under_ROC", "direction": "HIGHER_IS_BETTER", "pass_threshold": 0.80, "fail_threshold": 0.70, "confidence_level": 0.95, "statistical_test": "DeLong_test", "threshold_provenance": "Clinical prediction model benchmark (published ML literature)", "threshold_evidence_class": "SOURCE_DERIVED"},
+    "P15-EXP-001": {"metric": "harvested_power_uW", "units": "μW", "direction": "HIGHER_IS_BETTER", "pass_threshold": 5.0, "fail_threshold": 1.0, "confidence_level": 0.95, "statistical_test": "normal_approximation", "threshold_provenance": "P5 threshold for sensing duty cycle", "threshold_evidence_class": "MODELLED"},
+    "P16-EXP-001": {"metric": "PV_power_output_uW", "units": "μW", "direction": "HIGHER_IS_BETTER", "pass_threshold": 500.0, "fail_threshold": 100.0, "confidence_level": 0.95, "statistical_test": "normal_approximation", "threshold_provenance": "Minimum power for useful load", "threshold_evidence_class": "ESTIMATED"},
+    "P20-EXP-001": {"metric": "IL10_release_rate_ng_per_cm2_per_day", "units": "ng/cm²/day", "direction": "HIGHER_IS_BETTER", "pass_threshold": 0.1, "fail_threshold": 0.01, "confidence_level": 0.95, "statistical_test": "normal_approximation", "threshold_provenance": "Published therapeutic immune suppression threshold", "threshold_evidence_class": "SOURCE_DERIVED"},
+    "P21-EXP-001": {"metric": "localization_error_mm", "units": "mm", "direction": "LOWER_IS_BETTER", "pass_threshold": 5.0, "fail_threshold": 10.0, "confidence_level": 0.95, "statistical_test": "bootstrap", "threshold_provenance": "Clinical migration detection threshold (5mm = clinically significant)", "threshold_evidence_class": "SOURCE_DERIVED"},
+    "P22-EXP-001": {"metric": "navigation_accuracy_mm", "units": "mm", "direction": "LOWER_IS_BETTER", "pass_threshold": 5.0, "fail_threshold": 15.0, "confidence_level": 0.95, "statistical_test": "bootstrap", "threshold_provenance": "Catheter placement accuracy requirement", "threshold_evidence_class": "ESTIMATED"}
+  }
+}
