@@ -236,9 +236,14 @@ def generate_buyer_card(package_data, output_path=None):
 
     # ----- WHY YOU (top buyer) -----
     if top_buyer:
-        why_you = (f"<b>{top_buyer['name']}</b> — {top_buyer['why']} "
-                   f"<i>Gap:</i> {top_buyer['gap']} "
-                   f"<i>First action:</i> {top_buyer['first_technical_action']}")
+        # R370 buyer field names: company, strategic_fit, gap, first_action
+        company = top_buyer.get("company", "UNKNOWN")
+        strategic_fit = top_buyer.get("strategic_fit", "UNKNOWN")
+        gap = top_buyer.get("gap", "UNKNOWN")
+        first_action = top_buyer.get("first_action", "UNKNOWN")
+        why_you = (f"<b>{company}</b> — {strategic_fit} "
+                   f"<i>Gap:</i> {gap} "
+                   f"<i>First action:</i> {first_action}")
     else:
         why_you = buyer
     story.append(_make_field_box(

@@ -212,9 +212,9 @@ def step_8_copy_to_download():
     # Copy canonical source (the adapted version used by the factory)
     shutil.copy(CANONICAL_PATH,
                 os.path.join(PREMIUM_PACKAGES_DIR, "canonical_15_packages_r370_adapted.json"))
-    # Also copy the honest source (with full provenance)
-    shutil.copy("/home/z/my-project/canonical_data/canonical_15_packages_honest.json",
-                os.path.join(PREMIUM_PACKAGES_DIR, "canonical_15_packages_honest.json"))
+    # Also copy the resolved source (with full provenance)
+    shutil.copy("/home/z/my-project/canonical_data/canonical_15_packages_r370_resolved.json",
+                os.path.join(PREMIUM_PACKAGES_DIR, "canonical_15_packages_r370_resolved.json"))
 
     _log(f"  Deliverables copied to {PREMIUM_PACKAGES_DIR}")
     return PREMIUM_PACKAGES_DIR

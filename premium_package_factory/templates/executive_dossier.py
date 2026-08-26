@@ -268,54 +268,27 @@ def build_why_care(package_data):
 
 
 def _infer_limitation(pkg):
-    """Infer the limitation of the existing solution."""
+    """Honest limitation — derived ONLY from canonical strongest_alternative field.
+
+    Does NOT invent marketing language. Returns the strongest_alternative verbatim,
+    or honestly states if unavailable.
+    """
     alt = pkg.get("strongest_alternative", "")
-    if "reactive" in alt.lower():
-        return f"{alt} — operates reactively (after failure or symptoms), not proactively. Cannot prevent obstruction or excursion events."
-    elif "fixed" in alt.lower():
-        return f"{alt} — fixed setting cannot adapt to patient-specific or postural variability."
-    elif "antibiotic" in alt.lower() or "coating" in alt.lower():
-        return f"{alt} — contributes to antibiotic resistance; efficacy against emerging resistant strains uncertain."
-    elif "inductive" in alt.lower() or "alignment" in alt.lower():
-        return f"{alt} — alignment-critical and depth-limited; patient compliance burden."
-    elif "MRI" in alt or "CT" in alt:
-        return f"{alt} — radiation exposure, expensive, intermittent; not real-time detection."
-    elif "no" in alt.lower() and "exists" in alt.lower():
-        return "No comparable solution exists in market. The category itself is unmet."
-    else:
-        return f"{alt} — incremental improvement only; no fundamental mechanism advantage."
+    if alt and not str(alt).startswith("UNKNOWN"):
+        return alt
+    return "UNKNOWN — no strongest_alternative in canonical R370 data"
 
 
 def _infer_advantage(pkg):
-    """Infer the potential advantage of the proposed mechanism."""
+    """Honest potential advantage — derived ONLY from canonical mechanism field.
+
+    Does NOT invent marketing language. Returns the mechanism verbatim with
+    a MODELLED evidence label, or honestly states if unavailable.
+    """
     mech = pkg.get("mechanism", "")
-    name = pkg.get("name", "")
-    if "multi-segment" in mech.lower() or "predict" in mech.lower():
-        return "Proactive (predictive) failure prevention, not reactive response. Multi-segment architecture provides graceful degradation when individual paths fail."
-    elif "adaptive" in mech.lower():
-        return "Patient-specific adaptation — learns postural / physiologic context and adjusts response. No factory-fixed operating point."
-    elif "enzyme" in mech.lower() or "catalytic" in mech.lower():
-        return "Active biochemical clearance of pathology (Aβ42, tau) — addresses root cause, not just symptom management."
-    elif "phage" in mech.lower():
-        return "Mechanism-specific anti-biofilm — does not contribute to antibiotic resistance. Targeted lysis of S. aureus."
-    elif "940" in mech or "optical" in mech.lower() or "PV" in mech:
-        return "Alignment-insensitive transcutaneous power — eliminates the alignment-critical pain point of inductive coupling."
-    elif "RFID" in mech or "UWB" in mech:
-        return "Real-time non-invasive localization — eliminates radiation exposure and enables continuous monitoring."
-    elif "hydraulic" in mech.lower():
-        return "Buckling-free navigation — hydraulic architecture eliminates the compressive-load failure mode of shape-memory polymer."
-    elif "gravity" in mech.lower():
-        return "Passive postural compensation — zero electronics, zero actuation, fails safe by design."
-    elif "osmotic" in mech.lower():
-        return "Passive self-regulation — responds to CSF composition changes without electronics or external intervention."
-    elif "metal" in mech.lower() or "piezoresistive" in mech.lower():
-        return "Drift-compensated long-term sensing — vacuum reference enables stable measurement without recalibration surgery."
-    elif "acoustic" in mech.lower():
-        return "Non-invasive external detection — no implanted electronics, no radiation, low regulatory burden."
-    elif "NMR" in mech or "MR " in name:
-        return "Direct flow quantification — provides ground truth that current monitoring lacks."
-    else:
-        return "Mechanism advantage — see technical data room for detailed comparison."
+    if mech and not str(mech).startswith("UNKNOWN"):
+        return f"Proposed mechanism (MODELLED): {mech}. This advantage is HYPOTHETICAL until the decisive experiment is commissioned."
+    return "UNKNOWN — no mechanism in canonical R370 data"
 
 
 def build_evidence_architecture(package_data):
@@ -788,15 +761,27 @@ def build_buyer_fit(package_data):
 
     buyers = package_data.get("buyers", [])
     for i, buyer in enumerate(buyers[:3]):
-        # Buyer card
+        # Buyer card — uses R370 buyer map field names
+        company = buyer.get("company", "UNKNOWN")
+        business_unit = buyer.get("business_unit", "UNKNOWN")
+        strategic_fit = buyer.get("strategic_fit", "UNKNOWN")
+        existing_solution = buyer.get("existing_solution", "UNKNOWN")
+        gap = buyer.get("gap", "UNKNOWN")
+        reason_to_buy = buyer.get("reason_to_buy", "UNKNOWN")
+        reason_to_build = buyer.get("reason_to_build", "UNKNOWN")
+        objection = buyer.get("objection", "UNKNOWN")
+        first_action = buyer.get("first_action", "UNKNOWN")
+
         buyer_data = [
-            [Paragraph(f"<b>BUYER {i+1}  ·  {buyer['name']}</b>", S["CardTitle"])],
-            [Paragraph(f"<b>Why them:</b> {buyer['why']}", S["CardBody"])],
-            [Paragraph(f"<b>Existing product:</b> {buyer['existing_product']}", S["CardBody"])],
-            [Paragraph(f"<b>Gap:</b> {buyer['gap']}", S["CardBody"])],
-            [Paragraph(f"<b>Why buy instead of build:</b> {buyer['build_vs_buy']}", S["CardBody"])],
-            [Paragraph(f"<b>Likely objection:</b> {buyer['likely_objection']}", S["CardBody"])],
-            [Paragraph(f"<b>First technical action:</b> {buyer['first_technical_action']}", S["CardBody"])],
+            [Paragraph(f"<b>BUYER {i+1}  ·  {company}</b> ({business_unit})", S["CardTitle"])],
+            [Paragraph(f"<b>Strategic fit:</b> {strategic_fit}", S["CardBody"])],
+            [Paragraph(f"<b>Existing product:</b> {existing_solution}", S["CardBody"])],
+            [Paragraph(f"<b>Gap:</b> {gap}", S["CardBody"])],
+            [Paragraph(f"<b>Reason to buy:</b> {reason_to_buy}", S["CardBody"])],
+            [Paragraph(f"<b>Reason to build (internal):</b> {reason_to_build}", S["CardBody"])],
+            [Paragraph(f"<b>Likely objection:</b> {objection}", S["CardBody"])],
+            [Paragraph(f"<b>First action:</b> {first_action}", S["CardBody"])],
+            [Paragraph(f"<i>Source: R370/decision_grade_buyers/ALL_BUYER_MAPS.json</i>", S["BodyCaption"])],
         ]
         buyer_table = Table(buyer_data, colWidths=[CONTENT_W])
         buyer_table.setStyle(TableStyle([
