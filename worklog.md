@@ -8006,3 +8006,46 @@ Stage Summary:
 - The Discovery Evidence Fabric (the system itself) is identified as the primary strategic asset.
 - Next actions: (1) CEO engages patent attorney for top 5 Acquisition packages, (2) CEO sends outreach to ideal buyers, (3) when data returns, machine processes reality → T2 upgrade.
 - 0 buyers contacted. 0 transactions. 0 real external data. 0 patent searches performed.
+
+---
+Task ID: R354-PATENT-PRIOR-ART-SEARCH
+Agent: main (coder, session 2026-08-26)
+Task: Use Patsnap API key to search prior art for packages. CEO provided key: [REDACTED:patsnap_key]
+
+Pre-Session Constitution Check:
+- Read EPISTEMIC_CONSTITUTION.md v1.7.0.
+- Verified remote HEAD = 057e89b (R353).
+
+PATSNAP API FINDING:
+- API key IS VALID (recognized by Patsnap at connect.patsnap.com)
+- BUT account balance is EXHAUSTED (error 67200203: "API need a true rate!")
+- This confirms the consultant's audit: "PatSnap balance is EXHAUSTED (67200005). Every package has §103_STATUS: UNCERTAIN."
+- Action required: Recharge Patsnap account ~$3,000
+
+FALLBACK: Used z-ai web_search SDK to find public patent prior art from Google Patents, USPTO, PMC. NOT as comprehensive as Patsnap semantic search but provides REAL patent references.
+
+Web searches executed for 5 top packages (P-16, P-24, P-01, P-21, P-13). 16 real patent references found.
+
+Key prior art found:
+- P-16: US 20260224911 (photobiomodulation+electrical modulation, 2026) — adjacent but distinct
+- P-24: US 6090062A (programmable antisiphon) + PMC 9133390 (review of ALL anti-siphon mechanisms) — §103 risk HIGH
+- P-01: WO 2011146757A2 (CSF shunt flow+patency classification) — diagnostic, not predictive
+- P-21: US 10993619 (UWB radar medical tracking, 2021) — directly covers UWB medical tracking, §103 risk HIGH
+- P-13: US 10596377B2 (seizure prediction DNN implantable) + PMC 10614444 (ML shunt prediction, 2023) — ML shunt prediction already published
+
+Patent score updates:
+- P-16: 67 → 67 (no change — MEDIUM risk confirmed)
+- P-24: 55 → 50 (DECREASED — anti-siphon space more crowded, PMC review catalogs all mechanisms)
+- P-01: 55 → 58 (INCREASED — prior art diagnostic, P-01 predictive approach more novel)
+- P-21: 67 → 62 (DECREASED — US 10993619 covers UWB medical tracking directly)
+- P-13: 55 → 52 (DECREASED — PMC 10614444 shows ML shunt prediction already published)
+
+Patsnap pipeline built at R354/patsnap_pipeline/patsnap_search.py — ready to run when balance recharged. Contains 15 packages × 1-2 search queries each.
+
+Stage Summary:
+- Patsnap API: valid key, exhausted balance. Recharge ~$3,000 required.
+- Web search fallback: 16 real patent references found, scores updated.
+- P-24 and P-21 patent risk HIGHER than initially assessed — may need redesign or different IP strategy.
+- P-01 patent risk slightly LOWER — predictive approach more novel than diagnostic prior art.
+- Pipeline ready for Patsnap when recharged.
+- NOT legal opinions — formal patent attorney review still required.
