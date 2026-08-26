@@ -1,0 +1,32 @@
+{
+  "artifact_type": "BUYER_RESPONSE_LOOP_TEMPLATE",
+  "NOT_CRM": true,
+  "purpose": "Capture buyer feedback as structured commercial knowledge. CEO fills manually. Machine reads for learning.",
+  "rule": "Machine may record buyer feedback when CEO provides it. Machine NEVER auto-generates buyer outreach, NEVER infers technical readiness from commercial state.",
+  "fields_per_buyer_interaction": {
+    "candidate_id": "Which package the buyer is responding about",
+    "buyer_name": "Which company",
+    "contact_date": "When the outreach was sent",
+    "response_date": "When the buyer responded (or 'NO_RESPONSE')",
+    "buyer_interest_level": "HIGH / MEDIUM / LOW / NOT_INTERESTED / NO_RESPONSE",
+    "technical_objections": [
+      "List of technical concerns raised by buyer"
+    ],
+    "commercial_objections": [
+      "List of commercial concerns (cost, timeline, risk, fit)"
+    ],
+    "requested_evidence": [
+      "What evidence the buyer wants before proceeding"
+    ],
+    "validation_willingness": "BUYER_WILLING_TO_FUND / BUYER_WANTS_SELLER_TO_FUND / NOT_DISCUSSED / BUYER_REJECTS",
+    "validation_amount_offered": "$X or NONE",
+    "next_step_agreed": "What was agreed as next action",
+    "nda_status": "NOT_REQUESTED / REQUESTED / EXECUTED / REJECTED",
+    "commercial_state_after": "UNCONTACTED / TARGETED / EVALUATING / DILIGENCE / EXPERIMENT / NEGOTIATION / LICENSED / ACQUIRED / REJECTED",
+    "learning_for_machine": "What the machine should learn from this interaction (e.g., 'buyer P-24 values response speed over proportional control \u2014 adjust messaging')",
+    "ceo_notes": "Free text for CEO observations"
+  },
+  "template_instances": "One per buyer interaction. Stored in R352/response_loop/INTERACTIONS/",
+  "how_machine_uses_this": "When CEO fills an interaction record, the machine: (1) updates commercial_state in PORTFOLIO_COMMERCIAL_STATE.json, (2) if buyer funds experiment and data returns, processes via R341 pipeline, (3) creates commercial knowledge atom if learning is significant",
+  "what_machine_does_NOT_do": "Never auto-emails buyers. Never auto-schedules meetings. Never infers technical readiness from buyer interest. Never promotes T-level based on commercial enthusiasm."
+}
