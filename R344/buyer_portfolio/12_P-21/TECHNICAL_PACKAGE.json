@@ -1,0 +1,147 @@
+{
+  "schema": "BUYER_TRANSFER_PACKAGE_v2",
+  "candidate_id": "P-21",
+  "buyer_action_id": "P21-EXP-001",
+  "generated_at": "2026-08-26T05:18:53.920496+00:00",
+  "generated_from": "R332/g3_all13_canonical/ (P-01\u2013P-22) + R339 (P-24) + R337 (P-25)",
+  "schema_version_note": "v2 fixes R343 evidence-ledger serialization bug (string\u2192characters). Evidence atoms are now structured objects.",
+  "1_executive_proposition": "Technology: UWB microsensors at catheter tip + wearable external reader for 3D position tracking. Problem: Catheter migration/kinking = 5-10% of shunt failures. Current detection requires CT/MRI (radiation, expensive, delayed)..",
+  "2_buyer_problem": {
+    "problem": "Catheter migration/kinking = 5-10% of shunt failures. Current detection requires CT/MRI (radiation, expensive, delayed).",
+    "who_has_it": "Shunt OEM / medical imaging company",
+    "current_solution": "CT/MRI (radiation, expensive, not real-time). Published UWB implant work is plausible but tissue propagation challenging (PubMed 25571604).",
+    "why_inadequate": "Can the system localize catheter to <5mm through realistic head tissue while satisfying RF-exposure constraints?"
+  },
+  "3_technology": {
+    "mechanism": "UWB microsensors at catheter tip + wearable external reader for 3D position tracking",
+    "architecture": "SEE technical package \u2014 full architecture in mechanism field",
+    "inputs": "BUYER_DILIGENCE_REQUIRED",
+    "outputs": "BUYER_DILIGENCE_REQUIRED",
+    "operating_principle": "UWB microsensors at catheter tip + wearable external reader for 3D position tracking"
+  },
+  "4_evidence_ledger": {
+    "OBSERVED": [],
+    "EXTERNALLY_VERIFIED": [],
+    "COMPUTATIONALLY_SUPPORTED": [],
+    "MODELLED": [
+      {
+        "claim": "Link margin (MODELLED, simplified homogeneous tissue)",
+        "class": "MODELLED",
+        "source_artifact": "R329/g5_constrained_hunt/P-21_MANUFACTURING.json + R330/g4_p21_harden/P-21_HARDENED.json + R331/g4_p21_regulatory/P-21_REGULATORY_CORRECTED.json",
+        "artifact_hash": "3c51d7759e3222da",
+        "scope": "internal computational model",
+        "limitation": "model prediction \u2014 not experimentally verified",
+        "is_structured_evidence_atom": true
+      },
+      {
+        "claim": "Localization accuracy (10mm UWB resolution vs 5mm clinical requirement \u2014 MARGINAL)",
+        "class": "MODELLED",
+        "source_artifact": "R329/g5_constrained_hunt/P-21_MANUFACTURING.json + R330/g4_p21_harden/P-21_HARDENED.json + R331/g4_p21_regulatory/P-21_REGULATORY_CORRECTED.json",
+        "artifact_hash": "3c51d7759e3222da",
+        "scope": "internal computational model",
+        "limitation": "model prediction \u2014 not experimentally verified",
+        "is_structured_evidence_atom": true
+      }
+    ],
+    "ASSUMED": [
+      {
+        "claim": "FAILED ASSUMPTION: Localization accuracy is MARGINAL (10mm vs 5mm requirement)",
+        "class": "ASSUMED",
+        "source_artifact": "R329/g5_constrained_hunt/P-21_MANUFACTURING.json + R330/g4_p21_harden/P-21_HARDENED.json + R331/g4_p21_regulatory/P-21_REGULATORY_CORRECTED.json",
+        "artifact_hash": "3c51d7759e3222da",
+        "scope": "hostile attack or model test",
+        "limitation": "this assumption broke \u2014 buyer must not rely on it",
+        "is_structured_evidence_atom": true
+      }
+    ],
+    "UNKNOWN": []
+  },
+  "5_strongest_alternative": "CT/MRI (radiation, expensive, not real-time). Published UWB implant work is plausible but tissue propagation challenging (PubMed 25571604).",
+  "6_what_is_differentiated": {
+    "potential_differentiation": "Can the system localize catheter to <5mm through realistic head tissue while satisfying RF-exposure constraints?",
+    "evidence_supporting": "SEE evidence_ledger MODELLED and COMPUTATIONALLY_SUPPORTED tiers",
+    "evidence_against": [
+      "Localization accuracy is MARGINAL (10mm vs 5mm requirement)"
+    ],
+    "unresolved_question": "Can the system localize catheter to <5mm through realistic head tissue while satisfying RF-exposure constraints?",
+    "experiment_required": "Skull/scalp phantom with known catheter positions. Measure: position error, detection probability, false localization, sensitivity to anatomy/orientation/frequency/exposure."
+  },
+  "7_known_failures": [
+    "Localization accuracy is MARGINAL (10mm vs 5mm requirement)"
+  ],
+  "8_remaining_uncertainty": "Can the system localize catheter to <5mm through realistic head tissue while satisfying RF-exposure constraints?",
+  "9_decisive_experiment": {
+    "experiment": "Skull/scalp phantom with known catheter positions. Measure: position error, detection probability, false localization, sensitivity to anatomy/orientation/frequency/exposure.",
+    "pass_rule": "Median localization error <= 5mm AND 95th percentile <= predefined limit AND detection reliability >= threshold AND RF exposure requirement satisfied (SAR computed, not assumed)",
+    "fail_rule": "Median error > 10mm OR RF exposure exceeds limit",
+    "ambiguous_rule": "CI spans pass/fail threshold \u2192 AMBIGUOUS (no silent promotion)",
+    "cost_estimate": "$10-20K (ESTIMATED: phantom + UWB hardware + measurement)",
+    "timeline_estimate": "4-8 weeks (ESTIMATED: phantom fabrication + testing)"
+  },
+  "10_build_integration_pathway": {
+    "what_to_build": "Skull/scalp phantom with known catheter positions. Measure: position error, detection probability, false localization, sensitivity to anatomy/orientation/frequency/exposure.",
+    "existing_equipment_reusable": "BUYER_DILIGENCE_REQUIRED",
+    "novel_component": "UWB microsensors at catheter tip + wearable external reader for 3D position tracking",
+    "engineering_remaining": "HIGH \u2014 UWB through skull unproven, regulatory complex",
+    "manufacturing_risks": "BUYER_DILIGENCE_REQUIRED"
+  },
+  "11_regulatory_status": "UNRESOLVED \u2014 SAR not computed. Power density appears low but regulatory metric not verified.",
+  "12_commercial_route": "License to imaging or shunt OEM",
+  "13_economics": {
+    "experiment_cost": "$10-20K (ESTIMATED: phantom + UWB hardware + measurement)",
+    "timeline": "4-8 weeks (ESTIMATED: phantom fabrication + testing)",
+    "development_burden": "HIGH \u2014 UWB through skull unproven, regulatory complex",
+    "potential_economic_value": "BUYER_DILIGENCE_REQUIRED",
+    "evidence_tier": "MODELLED",
+    "critical_cost_uncertainty": "Development cost beyond decisive experiment UNKNOWN"
+  },
+  "14_ip_legal_status": {
+    "known_ip": "BUYER_DILIGENCE_REQUIRED \u2014 no patent search performed",
+    "known_disclosures": "BUYER_DILIGENCE_REQUIRED",
+    "known_ownership": "CereVascular (assumed \u2014 confirm with CEO)",
+    "known_restrictions": "UNKNOWN",
+    "ip_diligence_required": "Full freedom-to-operate analysis by buyer counsel",
+    "note": "We are not running a patent court."
+  },
+  "15_buyer_action": {
+    "primary_action": "COMMISSION TEST \u2014 build skull phantom, measure localization accuracy + RF exposure",
+    "options": [
+      "LICENSE",
+      "BUILD",
+      "CO-DEVELOP",
+      "COMMISSION_EXPERIMENT",
+      "ACQUIRE",
+      "INTEGRATE",
+      "REJECT"
+    ],
+    "recommended_next_step": "COMMISSION TEST \u2014 build skull phantom, measure localization accuracy + RF exposure",
+    "buyer_action_id": "P21-EXP-001"
+  },
+  "validation": {
+    "valid": true,
+    "errors": [],
+    "warnings": [],
+    "q1_send_without_verbal": "PASS",
+    "q2_identify_next_step": "PASS",
+    "q3_distinguish_facts_from_hypotheses": "PASS",
+    "q4_challenge_without_trusting_us": "PASS",
+    "technical_readiness": "T1",
+    "transfer_posture": "DECISIVE_EXPERIMENT_REQUIRED",
+    "commercial_state": "UNCONTACTED",
+    "buyer_truth": "A computationally specified P-21 concept plus a preregistered decisive experiment \u2014 not a validated technology.",
+    "claim_evidence_chain": [
+      {
+        "claim": "Link margin (MODELLED, simplified homogeneous tissue)",
+        "evidence": [
+          "R329/g5_constrained_hunt/P-21_MANUFACTURING.json + R330/g4_p21_harden/P-21_HARDENED.json + R331/g4_p21_regulatory/P-21_REGULATORY_CORRECTED.json",
+          "R329/g5_constrained_hunt/P-21_MANUFACTURING.json + R330/g4_p21_harden/P-21_HARDENED.json + R331/g4_p21_regulatory/P-21_REGULATORY_CORRECTED.json"
+        ],
+        "limitation": "model prediction \u2014 not experimentally verified",
+        "falsifier": "Median error > 10mm OR RF exposure exceeds limit",
+        "experiment": "Skull/scalp phantom with known catheter positions. Measure: position error, detection probability, false localization, sensitivity to anatomy/orientation/frequency/exposure."
+      }
+    ],
+    "validator_independent_from_generator": true,
+    "article_XXVI_compliance": "No self-certification \u2014 validator is separate logic"
+  }
+}
