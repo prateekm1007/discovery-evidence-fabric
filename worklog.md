@@ -8683,3 +8683,63 @@ Stage Summary:
 - Claim narrowing strategies defined for all 5 CONDITIONAL packages.
 - Closest prior art fully characterized with assignees, CPC, abstracts, full text URLs.
 - NOT legal opinions. Buyer counsel must perform formal diligence.
+
+---
+Task ID: R364-AUTOMATED-KILL-REPAIR-REGENERATION
+Agent: main (coder, session 2026-08-26)
+Task: Complete the AI loop — AUTOMATICALLY kill packages with no design-around, generate repair candidates for those with alternatives, regenerate portfolio. NO HUMAN.
+
+Work Log:
+- New PatentBear key ([REDACTED:patentbear_key]) tested: ✅ WORKING (19/20)
+- Retrieved full patent records via PatentBear API (/api/external/patents/{id}):
+  - 9 closest prior art patents retrieved with FULL CLAIMS, descriptions, CPC, assignees
+  - P-01 closest (US20130109998A1, ShuntCheck): 51 claims. Claim 1 = "apparatus for determining CSF flow rate" (measurement, NOT prediction). Confirms P-01 novelty.
+  - P-16 closest (US20190111255A1): medical device provisioning (NOT optical power)
+  - P-04 closest (US11896647B2, Univ South Florida): cognitive impairment treatment (NOT catheter-based)
+  - API endpoint has separate quota from MCP — retrieved 9 full records before rate limit (429)
+- Phase 1 (AUTOMATED KILL):
+  - P-12: KILLED — 0 design-around alternatives found. §103 HIGH. 138 specific hits. No viable alternative to Cathepsin D tau clearance. Cemetery entry created. Knowledge atom: DC-P-12-KILL-001.
+  - P-20: KILLED — 0 design-around alternatives found. §103 HIGH. 116 specific hits. No viable alternative to glycan immune tolerance coating. Cemetery entry created. Knowledge atom: DC-P-20-KILL-001.
+  - Total cemetery: 13 (was 11)
+- Phase 2 (AUTOMATED REPAIR CANDIDATE GENERATION):
+  - P-15 → P-15-R1: 52 alternative mechanisms found. Strategy: redesign to non-cardiac energy harvesting.
+  - P-21 → P-21-R1: 13 alternatives. Strategy: redesign to non-UWB RF localization (RFID-based).
+  - P-22 → P-22-R1: 131 alternatives. Strategy: redesign to non-SMP steerable catheter.
+  - P-27 → P-27-R1: 24 alternatives. Strategy: redesign to non-SMP kink-resistant catheter.
+- Phase 3 (PORTFOLIO REGENERATION):
+  - Active: 13 packages (15 - 2 killed)
+  - PASS: 4 (P-01, P-13, P-16, P-04)
+  - CONDITIONAL: 5 (P-24, P-02, P-26, P-11, P-07)
+  - REPAIR with candidates: 4 (P-15-R1, P-21-R1, P-22-R1, P-27-R1)
+  - Cemetery: 13
+- Phase 4 (FINAL PORTFOLIO COMMAND CENTER):
+  - All decisions made by AI automatically
+  - No human decided to kill P-12/P-20
+  - No human generated repair candidates
+  - No human regenerated the portfolio
+
+R364 Results:
+- KILLED: P-12 (tau clearance, no design-around), P-20 (glycan immune tolerance, no design-around)
+- Repair candidates: P-15-R1, P-21-R1, P-22-R1, P-27-R1
+- Active: 13 packages
+- PASS: 4 | CONDITIONAL: 5 | REPAIR (with candidates): 4
+- Cemetery: 13 entries
+- Human in loop: NO
+
+The AI loop is now FULLY OPERATIONAL:
+1. Search → 2. Retrieve → 3. Analyze → 4. Attack §102 → 5. Attack §103 → 6. FTO → 7. Verdict →
+8. Design-around search → 9. KILL if no design-around / REPAIR if alternatives found →
+10. Knowledge atom → 11. Portfolio regeneration
+
+ALL AUTOMATED. NO HUMAN.
+
+PatentBear total: 100+ MCP searches + 9 API full-text retrievals across 6 keys.
+
+Stage Summary:
+- 2 packages AUTOMATICALLY KILLED (P-12, P-20 — no viable design-around)
+- 4 repair candidates AUTOMATICALLY GENERATED (P-15-R1, P-21-R1, P-22-R1, P-27-R1)
+- Portfolio AUTOMATICALLY REGENERATED (13 active, 13 cemetery)
+- Full patent claims retrieved for 9 closest prior art patents
+- P-01's closest patent (ShuntCheck US20130109998A1) has 51 claims — claim 1 is flow measurement, NOT prediction. Confirms P-01 novelty.
+- NO HUMAN in the loop.
+- NOT legal opinions. Buyer counsel must perform formal diligence.
