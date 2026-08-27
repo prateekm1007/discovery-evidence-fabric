@@ -1,0 +1,1131 @@
+{
+  "package_id": "P-04",
+  "dossier_version": "ENG-V9-R370E-INTEGRITY_FREEZE",
+  "generated_at": "2026-08-27T01:15:37Z",
+  "design_status": "CONCEPTUAL — NOT RELEASED FOR MANUFACTURING",
+  "engineering_status": "ENGINEERING_DEFINITION",
+  "transfer_ready": false,
+  "loop_verification_state": "NONE",
+  "warning": "Package-specific engineering dossier. Technology-specific content (not generic template). External evidence has evidence->decision chains. No fabrication. No truncation. Constitution Article XXV: unknown stays unknown. Article XXVII: thresholds have provenance. Article XXVIII: EXTERNAL_PRECEDENT != INVENTION_VALIDATION.",
+  "engineering_content": {
+    "technology_domain": "Enzymatic Catalysis + Mass Transport",
+    "engineering_disciplines": [
+      "Enzyme kinetics",
+      "Mass transport (diffusion + convection)",
+      "Surface chemistry (enzyme immobilization)",
+      "Biomaterials (catheter coatings)"
+    ],
+    "system_architecture": {
+      "description": "Catheter with immobilized neprilysin (NEP) enzyme on inner lumen wall; CSF flows past, Aβ42 in CSF contacts enzyme for sufficient time (contact-time lock) to undergo catalytic cleavage",
+      "subsystems": [
+        {
+          "id": "SS-01",
+          "name": "Catheter body (substrate)",
+          "function": "Carries CSF flow + supports enzyme coating",
+          "status": "MODELLED",
+          "evidence_source": "R332 mechanism"
+        },
+        {
+          "id": "SS-02",
+          "name": "NEP-immobilized coating on inner lumen",
+          "function": "Catalytic surface cleaves Aβ42 peptides via NEP activity",
+          "status": "PROPOSED",
+          "evidence_class": "PROPOSED",
+          "evidence_source": "R332 mechanism + external NEP literature"
+        },
+        {
+          "id": "SS-03",
+          "name": "Contact-time control geometry",
+          "function": "Catheter length and flow rate engineered so Aβ42 residence time exceeds critical contact time for catalytic cleavage",
+          "status": "MODELLED",
+          "evidence_class": "MODELLED",
+          "evidence_source": "R332 mechanism"
+        },
+        {
+          "id": "SS-04",
+          "name": "Stabilization matrix for enzyme",
+          "function": "Preserves NEP activity over implantation lifetime (likely PEGylation or trehalose stabilization)",
+          "status": "PROPOSED",
+          "evidence_class": "PROPOSED"
+        }
+      ],
+      "enzyme_kinetics": {
+        "key_equations": [
+          "v = (Vmax * [S]) / (Km + [S])         [enzyme kinetics]",
+          "J = -D * dC/dx                        [diffusive flux]",
+          "Da = (k * L) / D                      [reaction vs transport]"
+        ],
+        "mass_transport_regime": "Convection-diffusion in CSF lumen: Pe = (v*L)/D; for catheter ID ~1 mm at 0.3 mL/min, Pe ~100 (convection-dominated)",
+        "critical_parameter": "Damköhler number Da = (k_cat * Gamma * L) / (v * d), where Gamma = enzyme surface density, v = flow velocity, d = lumen diameter. Da > 1 required for transport-limited clearance.",
+        "clearance_target": "Reduce Aβ42 concentration by >= 30% per catheter pass (MODELLED, NOT verified)",
+        "evidence_class": "MODELLED"
+      }
+    },
+    "mechanism_architecture": {
+      "physical_changes": "Aβ42 peptides in CSF contact immobilized NEP during catheter transit; NEP catalyzes proteolytic cleavage of Aβ42 into inactive fragments, reducing CSF Aβ42 burden",
+      "key_physics": "Mass-transport-limited enzyme catalysis: rate v = min(Vmax·[S]/(Km+[S]), J_conv), where J_conv is convective delivery of Aβ42 to the enzyme surface",
+      "kinetic_model": {
+        "input": "CSF Aβ42 concentration (typical range 100-1000 pg/mL in AD patients, per external literature)",
+        "model": "1D advection-diffusion-reaction: d(Aβ)/dt = -v·d(Aβ)/dx + D·d²(Aβ)/dx² - k_cat·Γ·(Aβ)/(Km+Aβ)",
+        "prediction_horizon": "Steady-state clearance per pass; long-term Aβ reduction requires chronic use",
+        "status": "MODELLED — no in vitro verification of clearance magnitude yet"
+      }
+    },
+    "engineering_core": {
+      "governing_model": {
+        "summary": "Mass-transport-limited enzyme catalysis in catheter lumen. Reaction rate is bounded by either enzyme kinetics (Michaelis-Menten) or convective delivery of substrate to enzyme surface, whichever is smaller.",
+        "equations": [
+          "v = (Vmax * [S]) / (Km + [S])         [enzyme kinetics]",
+          "J = -D * dC/dx                        [diffusive flux]",
+          "Da = (k * L) / D                      [reaction vs transport]",
+          "Pe = (v * L) / D   [Péclet number, convective vs diffusive transport]",
+          "k_cat_obs = k_cat * (1 - deactivation(t))   [enzyme deactivation over time]"
+        ],
+        "assumptions": [
+          "NEP retains activity when immobilized (external precedent, NOT verified for this coating)",
+          "Aβ42 is the rate-limiting substrate (other peptides may compete; UNKNOWN)",
+          "CSF Aβ42 concentration in catheter inlet matches published ranges",
+          "Enzyme surface density Gamma is uniform (process-dependent)",
+          "No significant product inhibition (UNKNOWN for Aβ fragments)"
+        ],
+        "boundary_conditions": [
+          "Inlet: Aβ42 = 100-1000 pg/mL (pathological range, per literature)",
+          "Outlet: Aβ42 reduced by clearance fraction",
+          "Wall: enzyme-bound reaction sink (Robin BC)",
+          "Lumen: CSF flow at 0.3 mL/min typical"
+        ],
+        "input_variables": [
+          "CSF flow rate Q",
+          "Inlet Aβ42 concentration",
+          "Catheter length L",
+          "Lumen diameter d",
+          "Enzyme surface density Gamma"
+        ],
+        "output_variables": [
+          "Outlet Aβ42 concentration",
+          "Clearance fraction per pass"
+        ],
+        "parameter_sensitivities": [
+          "k_cat (turnover number) — directly scales Vmax; literature values vary 10-100 s^-1 for NEP depending on assay",
+          "Gamma (surface density) — scales Vmax; UNKNOWN achievable density on catheter surface",
+          "L (catheter length) — linear increase in contact time and clearance",
+          "Q (flow rate) — inverse: lower Q = longer contact time = more clearance, but less total CSF processed",
+          "Enzyme deactivation rate — most critical unknown for chronic implantation"
+        ],
+        "failure_regimes": [
+          "Da << 1 (transport-limited) — clearance is limited by delivery to enzyme; increasing Gamma does NOT help",
+          "Da >> 1 (kinetics-limited) — clearance is limited by enzyme activity; increasing L does NOT help",
+          "Gamma_t << Gamma_initial (enzyme deactivation) — activity falls below useful threshold over time",
+          "Competitive inhibition by other CSF peptides — UNKNOWN magnitude"
+        ]
+      },
+      "critical_parameters": [
+        {
+          "name": "NEP k_cat",
+          "value": "EXTERNAL_PRECEDENT (published values 10-100 s^-1, varies by assay)",
+          "unit": "s^-1",
+          "basis": "Published NEP kinetics literature",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "verification_requirement": "Independent assay on immobilized form"
+        },
+        {
+          "name": "NEP Km for Aβ42",
+          "value": "EXTERNAL_PRECEDENT (published ~5-20 μM range)",
+          "unit": "μM",
+          "basis": "Published NEP kinetics literature",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "verification_requirement": "Independent assay on immobilized form"
+        },
+        {
+          "name": "Enzyme surface density Gamma",
+          "value": "UNKNOWN",
+          "unit": "mol/m^2",
+          "basis": "Design choice + coating process capability",
+          "evidence_class": "UNKNOWN",
+          "verification_requirement": "Surface assay (e.g., fluorescent labeling, activity assay)"
+        },
+        {
+          "name": "Catheter length L",
+          "value": "UNKNOWN",
+          "unit": "m",
+          "basis": "Design choice balancing clearance vs anatomy",
+          "evidence_class": "UNKNOWN",
+          "verification_requirement": "Geometric specification"
+        },
+        {
+          "name": "Lumen diameter d",
+          "value": "UNKNOWN",
+          "unit": "m",
+          "basis": "Standard shunt catheter ~1-1.5 mm ID",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "verification_requirement": "Specification"
+        },
+        {
+          "name": "Contact time tau",
+          "value": "UNKNOWN",
+          "unit": "s",
+          "basis": "Derived: tau = L/v",
+          "evidence_class": "MODELLED",
+          "verification_requirement": "Flow visualization"
+        },
+        {
+          "name": "Enzyme half-life t_1/2",
+          "value": "UNKNOWN",
+          "unit": "days",
+          "basis": "UNKNOWN for immobilized NEP in CSF",
+          "evidence_class": "UNKNOWN",
+          "verification_requirement": "Aging study in CSF-mimicking fluid"
+        }
+      ],
+      "external_precedent": "EXTERNAL_PRECEDENT ≠ INVENTION_VALIDATION — published NEP kinetics and immobilization chemistry establish that NEP can cleave Aβ42 in solution and that NEP can be immobilized on surfaces. They do NOT establish that the proposed catheter achieves clinically meaningful Aβ42 clearance in CSF.",
+      "proposed_design": {
+        "input": "CSF containing Aβ42 at pathological concentrations",
+        "mechanism": "NEP-immobilized catheter surface catalyzes Aβ42 cleavage during CSF transit",
+        "transformation": "Aβ42 (substrate) -> Aβ fragments (inactive products) + clearance",
+        "output": "CSF with reduced Aβ42 concentration at catheter outlet",
+        "component_architecture": "Catheter body -> enzyme coating on inner lumen -> CSF flow path -> outlet"
+      },
+      "failure_modes": [
+        {
+          "mode": "Enzyme deactivation",
+          "mechanism": "Protein denaturation, proteolysis, or surface desorption over time",
+          "design_feature": "NEP coating",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available (PMC11651204 NEP review)",
+          "mitigation": "Stabilization matrix (PEGylation, trehalose) + spare activity margin",
+          "verification_test": "Chronic aging study in CSF-mimicking fluid",
+          "residual_uncertainty": "UNKNOWN achievable half-life"
+        },
+        {
+          "mode": "Mass transport limit",
+          "mechanism": "If Da < 1, clearance limited by delivery, not enzyme",
+          "design_feature": "Catheter geometry + flow rate",
+          "evidence": "MODELLED via Pe and Da analysis",
+          "mitigation": "Lengthen L or reduce Q (with clinical tradeoffs)",
+          "verification_test": "Da measurement",
+          "residual_uncertainty": "UNKNOWN actual Da in vivo"
+        },
+        {
+          "mode": "Immune response to enzyme",
+          "mechanism": "Host immune system recognizes NEP as foreign",
+          "design_feature": "NEP coating",
+          "evidence": "UNKNOWN for NEP specifically; general implantable-protein concern",
+          "mitigation": "PEGylation or immunosuppressive coating",
+          "verification_test": "In vivo biocompatibility study",
+          "residual_uncertainty": "UNKNOWN immunogenicity"
+        },
+        {
+          "mode": "Substrate competition",
+          "mechanism": "Other CSF peptides compete for NEP active site",
+          "design_feature": "NEP specificity",
+          "evidence": "NEP is known to cleave multiple substrates (substance P, bradykinin, etc.)",
+          "mitigation": "UNKNOWN — specificity engineering may be required",
+          "verification_test": "Competition assay in CSF",
+          "residual_uncertainty": "UNKNOWN competitive magnitude"
+        },
+        {
+          "mode": "Coating delamination",
+          "mechanism": "Mechanical or chemical degradation of coating-catheter bond",
+          "design_feature": "Enzyme-catheter interface",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available mode",
+          "mitigation": "Covalent immobilization chemistry + mechanical testing",
+          "verification_test": "ASTM D3359 adhesion + fatigue",
+          "residual_uncertainty": "UNKNOWN long-term adhesion"
+        }
+      ],
+      "verification": [
+        {
+          "id": "VER-001",
+          "requirement": "NEP coating activity per unit area",
+          "method": "In vitro activity assay with fluorescent substrate",
+          "acceptance": "Achievable Gamma * k_cat meets model requirement",
+          "evidence_class": "PROPOSED",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        },
+        {
+          "id": "VER-002",
+          "requirement": "Clearance per catheter pass",
+          "method": "Bench flow loop with Aβ42-spiked mock CSF",
+          "acceptance": ">=30% reduction per pass (MODEL_DERIVED target)",
+          "evidence_class": "PROPOSED",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        },
+        {
+          "id": "VER-003",
+          "requirement": "Enzyme activity over simulated implantation lifetime",
+          "method": "Aging study in CSF-mimicking fluid at 37°C",
+          "acceptance": "Activity retained > 50% at target lifetime (UNKNOWN target lifetime)",
+          "evidence_class": "PROPOSED",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        },
+        {
+          "id": "VER-004",
+          "requirement": "Biocompatibility per ISO 10993",
+          "method": "Standard ISO 10993 series tests",
+          "acceptance": "Pass all applicable ISO 10993 endpoints",
+          "evidence_class": "PROPOSED",
+          "standard": "ISO_10993",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        }
+      ],
+      "validation": [
+        {
+          "id": "VAL-001",
+          "requirement": "CSF Aβ42 reduction in patient cohort",
+          "method": "Clinical trial (IDE required) measuring CSF Aβ42 before/after shunt",
+          "acceptance": "Statistically significant Aβ42 reduction vs control shunt",
+          "evidence_class": "UNKNOWN",
+          "criterion_type": "UNKNOWN"
+        },
+        {
+          "id": "VAL-002",
+          "requirement": "Clinical benefit (cognitive, functional)",
+          "method": "Long-term clinical trial",
+          "acceptance": "Unknown — no established clinical endpoint for chronic Aβ42 reduction",
+          "evidence_class": "UNKNOWN",
+          "criterion_type": "UNKNOWN"
+        }
+      ],
+      "remaining_unknowns": [
+        "Achievable enzyme surface density Gamma on catheter inner lumen — UNKNOWN",
+        "Enzyme half-life in CSF environment — UNKNOWN",
+        "In vivo clearance per pass — UNKNOWN",
+        "Immunogenicity of immobilized NEP — UNKNOWN",
+        "Substrate competition magnitude — UNKNOWN",
+        "Clinical endpoint for chronic Aβ42 reduction — UNKNOWN (no established surrogate)",
+        "Regulatory pathway — UNKNOWN (likely Class III PMA; no predicate for enzymatic catheter)"
+      ]
+    },
+    "design_inputs": [
+      {
+        "id": "DI-001",
+        "input": "Clinical need",
+        "value": "Aβ accumulation in CSF of Alzheimer's/NPH patients with shunts; no enzymatic clearance exists (R332 problem)",
+        "evidence_class": "VERIFIED",
+        "source": "R332"
+      },
+      {
+        "id": "DI-002",
+        "input": "Functional requirement",
+        "value": "NEP enzyme immobilized on catheter wall clears Aβ42 via mass-transport-limited contact time",
+        "evidence_class": "MODELLED",
+        "source": "R332"
+      },
+      {
+        "id": "DI-003",
+        "input": "CSF Aβ42 range (pathological)",
+        "value": "100-1000 pg/mL (external literature, AD patients)",
+        "evidence_class": "EXTERNAL_PRECEDENT"
+      },
+      {
+        "id": "DI-004",
+        "input": "Clearance target per pass",
+        "value": ">= 30% (MODEL_DERIVED, R332)",
+        "evidence_class": "MODELLED",
+        "source": "R332"
+      },
+      {
+        "id": "DI-005",
+        "input": "Enzyme kinetics (k_cat, Km)",
+        "value": "EXTERNAL_PRECEDENT (published values, varies by assay)",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "External NEP literature"
+      },
+      {
+        "id": "DI-006",
+        "input": "Flow rate (CSF through shunt)",
+        "value": "~0.3 mL/min typical (R332)",
+        "evidence_class": "VERIFIED"
+      },
+      {
+        "id": "DI-007",
+        "input": "Biocompatibility (ISO 10993)",
+        "value": "UNKNOWN",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "ISO 10993 series for enzyme coating + catheter material + ISO 7197 (CSF shunt device requirements)",
+        "applicability": "APPLICABLE"
+      },
+      {
+        "id": "DI-008",
+        "input": "Sterilization",
+        "value": "UNKNOWN — enzyme incompatible with gamma; likely EtO or aseptic assembly",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "Sterilization validation per ISO 11135 (EtO); aseptic processing if EtO incompatible"
+      },
+      {
+        "id": "DI-009",
+        "input": "Enzyme source / manufacturing",
+        "value": "UNKNOWN — recombinant NEP needed",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "Recombinant protein manufacturing + lot release criteria"
+      },
+      {
+        "id": "DI-010",
+        "input": "Coating uniformity / quality",
+        "value": "UNKNOWN",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "Coating process development + QC specs"
+      },
+      {
+        "id": "DI-011",
+        "input": "Shelf life (with active enzyme)",
+        "value": "UNKNOWN — likely cold-chain dependent",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "Stability study per ICH Q1A"
+      }
+    ],
+    "design_outputs": [
+      {
+        "id": "DO-001",
+        "description": "Catheter with NEP coating (length, ID, coating density)",
+        "status": "ABSENT",
+        "design_status": "CAD_BLOCKED",
+        "missing_inputs": [
+          "Final length L",
+          "Coating process Gamma spec",
+          "Coating uniformity spec"
+        ]
+      },
+      {
+        "id": "DO-002",
+        "description": "NEP coating process specification",
+        "status": "ABSENT",
+        "design_status": "PROCESS_DEVELOPMENT_BLOCKED",
+        "missing_inputs": [
+          "Covalent vs adsorption chemistry",
+          "Curing protocol",
+          "QC release criteria"
+        ]
+      },
+      {
+        "id": "DO-003",
+        "description": "Recombinant NEP production process",
+        "status": "ABSENT",
+        "design_status": "PROCESS_DEVELOPMENT_BLOCKED",
+        "missing_inputs": [
+          "Expression system (E. coli vs CHO)",
+          "Purification protocol",
+          "Lot release criteria"
+        ]
+      },
+      {
+        "id": "DO-004",
+        "description": "Clearance verification test method",
+        "status": "CONCEPTUAL",
+        "design_status": "PROTOCOL_DEVELOPMENT",
+        "note": "Bench protocol sketched in R332; not validated"
+      }
+    ],
+    "verification_matrix": [
+      {
+        "id": "V-001",
+        "requirement": "NEP coating activity per unit area",
+        "method": "Fluorescent substrate assay",
+        "acceptance": "Gamma * k_cat meets model requirement",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      },
+      {
+        "id": "V-002",
+        "requirement": "Clearance per pass >= 30%",
+        "method": "Bench flow loop with Aβ42 mock CSF",
+        "acceptance": ">= 30% reduction",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      },
+      {
+        "id": "V-003",
+        "requirement": "Enzyme stability over implantation lifetime",
+        "method": "Aging study at 37°C in CSF mimic",
+        "acceptance": "Activity retained > 50% at target lifetime",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      },
+      {
+        "id": "V-004",
+        "requirement": "Biocompatibility ISO 10993",
+        "method": "Standard ISO 10993 series",
+        "acceptance": "Pass",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      }
+    ],
+    "validation_matrix": [
+      {
+        "id": "VAL-001",
+        "requirement": "CSF Aβ42 reduction in patient cohort",
+        "method": "Clinical trial (IDE required)",
+        "acceptance": "Statistically significant vs control",
+        "result": "NOT_PERFORMED",
+        "evidence_class": "UNKNOWN",
+        "criterion_type": "UNKNOWN"
+      },
+      {
+        "id": "VAL-002",
+        "requirement": "Clinical benefit",
+        "method": "Long-term trial",
+        "acceptance": "Unknown — no established endpoint",
+        "result": "NOT_PERFORMED",
+        "evidence_class": "UNKNOWN",
+        "criterion_type": "UNKNOWN"
+      }
+    ],
+    "bom": [
+      {
+        "item": "01",
+        "description": "Catheter body (substrate)",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "ENGINEERING_PROPOSED (from mechanism)",
+        "material": "UNKNOWN — likely silicone/polyurethane (external precedent)",
+        "supplier": "UNKNOWN",
+        "criticality": "CRITICAL",
+        "verification": "Bench + biocompatibility"
+      },
+      {
+        "item": "02",
+        "description": "Recombinant NEP enzyme",
+        "qty": "Micrograms per catheter",
+        "component_type": "CUSTOM_BIOLOGIC",
+        "source_basis": "EXTERNAL_PRECEDENT for recombinant NEP",
+        "material": "Protein",
+        "supplier": "UNKNOWN — recombinant protein manufacturer",
+        "criticality": "CRITICAL",
+        "verification": "Activity assay + purity + sterility"
+      },
+      {
+        "item": "03",
+        "description": "Coating chemistry reagents",
+        "qty": "Process-scale",
+        "component_type": "CONSUMABLE",
+        "source_basis": "ENGINEERING_PROPOSED",
+        "material": "EDC/NHS or similar coupling chemistry",
+        "supplier": "Multiple (Sigma, Thermo Fisher)",
+        "criticality": "HIGH",
+        "verification": "Coating QC"
+      },
+      {
+        "item": "04",
+        "description": "Stabilization matrix (e.g., PEG, trehalose)",
+        "qty": "Process-scale",
+        "component_type": "CONSUMABLE",
+        "source_basis": "EXTERNAL_PRECEDENT for protein stabilization",
+        "material": "PEG or trehalose",
+        "supplier": "Multiple",
+        "criticality": "HIGH",
+        "verification": "Stability study"
+      }
+    ],
+    "materials": [
+      {
+        "component": "Catheter body",
+        "candidate_material": "Silicone elastomer",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "Standard CSF shunt material",
+        "verification_required": "ISO 10993 + coating adhesion",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Catheter body",
+        "candidate_material": "Polyurethane",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "Some shunts use polyurethane",
+        "verification_required": "ISO 10993 + coating adhesion",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Enzyme coating",
+        "candidate_material": "Recombinant human NEP (neprilysin)",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "Published NEP literature (PMC11651204, PLOS ONE 0229850)",
+        "verification_required": "Activity assay + stability + immunogenicity",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Immobilization chemistry",
+        "candidate_material": "Covalent EDC/NHS coupling",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "Standard protein immobilization chemistry",
+        "verification_required": "Coupling efficiency + leachability",
+        "status": "CANDIDATE"
+      }
+    ],
+    "manufacturing": {
+      "candidate_processes": [
+        {
+          "process": "Recombinant NEP production (E. coli or CHO expression)",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "source": "Standard recombinant protein manufacturing",
+          "tolerance_implication": "Lot-to-lot activity variation typically 10-30%",
+          "note": "Requires GMP manufacturer partnership"
+        },
+        {
+          "process": "Covalent enzyme immobilization on catheter inner lumen",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "source": "Standard protein immobilization chemistry",
+          "tolerance_implication": "Surface density variation depends on process control",
+          "note": "Custom process development required"
+        },
+        {
+          "process": "Aseptic assembly (likely; enzyme incompatible with terminal sterilization)",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "source": "Standard aseptic processing",
+          "tolerance_implication": "ISO Class 7 cleanroom required",
+          "note": "EtO may be evaluated but enzyme sensitivity UNKNOWN"
+        }
+      ],
+      "status": "ENGINEERING_CANDIDATE — no process validated for chronic enzyme-active catheter"
+    },
+    "failure_analysis": [
+      {
+        "failure_mode": "Enzyme deactivation (chronic)",
+        "mechanism": "Protein denaturation, proteolysis, surface desorption",
+        "design_feature_affected": "NEP coating",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Stabilization matrix + spare activity margin",
+        "verification_test": "Aging study in CSF mimic",
+        "residual_uncertainty": "UNKNOWN achievable half-life"
+      },
+      {
+        "failure_mode": "Mass transport limit (Da < 1)",
+        "mechanism": "Clearance limited by Aβ42 delivery, not enzyme",
+        "design_feature_affected": "Catheter geometry",
+        "evidence": "MODELLED via Pe/Da analysis",
+        "mitigation": "Lengthen L or reduce Q (clinical tradeoff)",
+        "verification_test": "Da measurement in bench",
+        "residual_uncertainty": "UNKNOWN actual Da in vivo"
+      },
+      {
+        "failure_mode": "Immune response to NEP",
+        "mechanism": "Host recognizes NEP as foreign",
+        "design_feature_affected": "NEP coating",
+        "evidence": "General protein implant concern",
+        "mitigation": "PEGylation or immunosuppressive coating",
+        "verification_test": "In vivo immunogenicity study",
+        "residual_uncertainty": "UNKNOWN NEP-specific immunogenicity"
+      },
+      {
+        "failure_mode": "Substrate competition",
+        "mechanism": "Other CSF peptides compete for NEP",
+        "design_feature_affected": "NEP specificity",
+        "evidence": "NEP known to cleave multiple substrates",
+        "mitigation": "UNKNOWN — specificity engineering may be required",
+        "verification_test": "Competition assay",
+        "residual_uncertainty": "UNKNOWN competitive magnitude"
+      },
+      {
+        "failure_mode": "Coating delamination",
+        "mechanism": "Mechanical/chemical bond failure",
+        "design_feature_affected": "Coating-catheter interface",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Covalent immobilization + mechanical testing",
+        "verification_test": "ASTM D3359 adhesion + fatigue",
+        "residual_uncertainty": "UNKNOWN long-term adhesion in vivo"
+      },
+      {
+        "failure_mode": "Catheter obstruction (separate from P-01 mechanism)",
+        "mechanism": "Debris, tissue ingrowth, or protein aggregation blocks lumen",
+        "design_feature_affected": "Catheter body",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available mode (30-50% per R332)",
+        "mitigation": "Standard shunt obstruction mitigation + enzyme coating may affect biocompatibility",
+        "verification_test": "Obstruction bench test",
+        "residual_uncertainty": "UNKNOWN whether enzyme coating affects obstruction rate"
+      }
+    ],
+    "engineering_build_plan": [
+      {
+        "work_package": "WP-01",
+        "test_article": "Recombinant NEP enzyme lot",
+        "equipment": "Activity assay (fluorescent substrate), HPLC, SDS-PAGE",
+        "design_work": "Expression + purification protocol",
+        "measurement": "k_cat, Km, purity, sterility",
+        "acceptance_criterion": "Activity within target range; purity > 95%; endotoxin < limit",
+        "dependency": "Recombinant protein manufacturer",
+        "deliverable": "NEP lot release report",
+        "estimated_effort": "12 weeks"
+      },
+      {
+        "work_package": "WP-02",
+        "test_article": "NEP-coated catheter coupons",
+        "equipment": "Surface assay (fluorescent labeling), activity assay",
+        "design_work": "Coating process development",
+        "measurement": "Surface density Gamma, activity per area",
+        "acceptance_criterion": "Gamma meets model requirement; activity stable",
+        "dependency": "WP-01",
+        "deliverable": "Coating process spec",
+        "estimated_effort": "8 weeks"
+      },
+      {
+        "work_package": "WP-03",
+        "test_article": "NEP-coated catheter segment",
+        "equipment": "Bench flow loop, Aβ42 ELISA",
+        "design_work": "Flow loop protocol",
+        "measurement": "Clearance per pass at various Q",
+        "acceptance_criterion": ">= 30% reduction per pass at design Q",
+        "dependency": "WP-02",
+        "deliverable": "Bench clearance report",
+        "estimated_effort": "6 weeks"
+      },
+      {
+        "work_package": "WP-04",
+        "test_article": "NEP-coated catheter in CSF mimic at 37°C",
+        "equipment": "Aging chamber, activity assay",
+        "design_work": "Aging protocol",
+        "measurement": "Activity vs time",
+        "acceptance_criterion": "Activity > 50% at target lifetime",
+        "dependency": "WP-02",
+        "deliverable": "Stability report",
+        "estimated_effort": "12-24 weeks (chronic)"
+      },
+      {
+        "work_package": "WP-05",
+        "test_article": "NEP-coated specimens",
+        "equipment": "ISO 10993 test lab",
+        "design_work": "Material selection frozen",
+        "measurement": "Cytotoxicity, sensitization, irritation, systemic toxicity",
+        "acceptance_criterion": "ISO 10993 pass",
+        "dependency": "Material selection frozen",
+        "deliverable": "ISO 10993 report",
+        "estimated_effort": "12 weeks (external lab)"
+      },
+      {
+        "work_package": "WP-06",
+        "test_article": "Coating adhesion specimens",
+        "equipment": "Mechanical test frame",
+        "design_work": "Adhesion test protocol",
+        "measurement": "ASTM D3359 adhesion + fatigue",
+        "acceptance_criterion": "Adhesion passes ASTM; fatigue lifetime > target",
+        "dependency": "WP-02",
+        "deliverable": "Adhesion report",
+        "estimated_effort": "6 weeks"
+      }
+    ],
+    "transfer_boundary": {
+      "buyer_receives": [
+        "Conceptual design + governing equation (Michaelis-Menten + Damköhler)",
+        "Mechanism description (immobilized NEP on catheter lumen)",
+        "Bench test protocol (clearance per pass, stability)",
+        "External precedent catalog (NEP kinetics, immobilization chemistry)",
+        "This engineering dossier with failure analysis + build plan"
+      ],
+      "buyer_must_create": [
+        "Recombinant NEP production process (GMP-grade)",
+        "Coating process specification + QC",
+        "Final catheter geometry (length, diameter, coating density)",
+        "Manufacturing process for enzyme-active catheter (aseptic assembly)",
+        "Regulatory submission (likely Class III PMA — no predicate for enzymatic catheter)",
+        "Clinical validation (CSF Aβ42 reduction + clinical benefit endpoint)",
+        "Long-term stability and reliability data"
+      ]
+    },
+    "external_engineering_precedent": [
+      {
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11651204",
+        "source_title": "Neprilysin-Mediated Amyloid Beta Clearance and Its Therapeutic",
+        "source_snippet": "Neprilysin (NEP) is a neutral endopeptidase, important for the degradation of amyloid beta (Aβ) cerebrospinal fluid (CSF) that is aimed at removing excess Aβ ...",
+        "source_hash": "ced8ecda90f7a8fc910ebf995bf833f517e1e501f8d1a63a65e9a49629f98d51",
+        "raw_content_sha256": "cc3266c6e7d1febac5fca5cd910f8c071456d5f75eb0b0a16442755df291c830",
+        "artifact_path": "external_evidence/pubmed_p04_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://uu.diva-portal.org/smash/get/diva2:1651329/FULLTEXT01.pdf",
+        "source_title": "[PDF] Blood–brain barrier penetrating neprilysin degrades monomeric",
+        "source_snippet": "Neprilysin (NEP) is a membrane-bound metallopeptidase and one of the major Aβ-degrading enzymes. position of amyloid plaques. Neprilysin-2 is an important β- ...",
+        "source_hash": "65cda411e5c875efb267ce29879ccbf7da97d88a6a6b5c3090f334cba328bd88",
+        "raw_content_sha256": "cc3266c6e7d1febac5fca5cd910f8c071456d5f75eb0b0a16442755df291c830",
+        "artifact_path": "external_evidence/pubmed_p04_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0229850",
+        "source_title": "Brain Shuttle Neprilysin reduces central Amyloid-β levels | PLOS One",
+        "source_snippet": "Mar 10, 2020 · As previously shown, NEP was highly effective at degrading Aβ in blood but not in the CSF compartment after systemic administration. In contrast ...",
+        "source_hash": "dbe4c0f6a45b389214959b745ce50120a2b82f77805b70cf95a91be43cb379d1",
+        "raw_content_sha256": "cc3266c6e7d1febac5fca5cd910f8c071456d5f75eb0b0a16442755df291c830",
+        "artifact_path": "external_evidence/pubmed_p04_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://www.alzforum.org/news/research-news/inhibiting-neprilysin-good-heart-what-about-brain",
+        "source_title": "Inhibiting Neprilysin Is Good for the Heart: What About the Brain?",
+        "source_snippet": "Sep 12, 2014 · LCZ696 contains an inhibitor of neprilysin, an enzyme that breaks down the Aβ peptide that forms amyloid plaques in the brain.",
+        "source_hash": "f5fe5be9ba385311b167a55f99f13284708d6a670c73f96e6ea983864b0a0c18",
+        "raw_content_sha256": "cc3266c6e7d1febac5fca5cd910f8c071456d5f75eb0b0a16442755df291c830",
+        "artifact_path": "external_evidence/pubmed_p04_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://www.en-journal.org/journal/view.html?uid=633",
+        "source_title": "Advances in Amyloid-β Clearance in the Brain and Periphery",
+        "source_snippet": "Aug 31, 2023 · The clearance of amyloid-β can occur through enzymatic or non-enzymatic pathways in the brain, including neuronal and glial cells, blood-brain ...",
+        "source_hash": "7f5d893c5eae75524db9e32dcec700452b545af015f50d4a705585844a42de3d",
+        "raw_content_sha256": "cc3266c6e7d1febac5fca5cd910f8c071456d5f75eb0b0a16442755df291c830",
+        "artifact_path": "external_evidence/pubmed_p04_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      }
+    ]
+  },
+  "source_universe": {
+    "registry": "AUTHORITATIVE_SOURCE_REGISTRY_V2",
+    "manifest_integrity_verified": true
+  },
+  "engineering_artifact_status": {
+    "communication_diagram": {
+      "status": "CONCEPTUAL",
+      "basis": "R332 mechanism description exists as text/JSON; not engineering-grade communication diagram",
+      "transferable_now": true,
+      "format": "JSON description",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "conceptual_drawing": {
+      "status": "ABSENT",
+      "basis": "No conceptual engineering drawings created",
+      "transferable_now": false,
+      "buyer_must_create": "Conceptual engineering drawings from mechanism description",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "preliminary_cad": {
+      "status": "ABSENT",
+      "basis": "No CAD models created; all design outputs marked ABSENT or CONCEPTUAL",
+      "transferable_now": false,
+      "buyer_must_create": "Preliminary CAD from design inputs (which include UNKNOWNs)",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "engineering_review": {
+      "status": "ABSENT",
+      "basis": "No independent engineer has reviewed the engineering content; AI-generated only",
+      "transferable_now": false,
+      "buyer_must_create": "Independent engineer review per Article XXVI (no self-certification)",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "prototype_release": {
+      "status": "ABSENT",
+      "basis": "No physical prototype built; no prototype release documentation",
+      "transferable_now": false,
+      "buyer_must_create": "Prototype build per engineering_build_plan",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "manufacturing_release": {
+      "status": "ABSENT",
+      "basis": "No manufacturing process developed; no manufacturing release",
+      "transferable_now": false,
+      "buyer_must_create": "Manufacturing process development + validation",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "honest_summary": "All 15 packages are at CONCEPTUAL or ABSENT engineering artifact status. No CAD, no drawings, no prototypes, no manufacturing. This is an engineering-development dossier, NOT a complete engineering technology-transfer asset.",
+    "release_state_schema": {
+      "allowed_states": [
+        "CONCEPTUAL",
+        "PRELIMINARY",
+        "ENGINEERING_REVIEW",
+        "VERIFIED",
+        "RELEASED_FOR_PROTOTYPE",
+        "RELEASED_FOR_MANUFACTURING"
+      ],
+      "definitions": {
+        "CONCEPTUAL": "AI-generated concept only; no engineering review",
+        "PRELIMINARY": "Preliminary engineering work; not yet reviewed",
+        "ENGINEERING_REVIEW": "Under formal engineering review",
+        "VERIFIED": "Verified by independent engineer",
+        "RELEASED_FOR_PROTOTYPE": "Released for prototype build",
+        "RELEASED_FOR_MANUFACTURING": "Released for manufacturing (production)"
+      },
+      "current_state_all_artifacts": "CONCEPTUAL or ABSENT (all 15 packages)",
+      "note": "No artifact has progressed beyond CONCEPTUAL. All require independent engineer review before advancing (Article XXVI)."
+    }
+  },
+  "transfer_manifest": {
+    "package_id": "P-04",
+    "manifest_version": "R370D-2.0",
+    "generated_at": "2026-08-27T02:19:04Z",
+    "transferable_now": [
+      {
+        "artifact": "engineering_dossier_json",
+        "description": "Complete engineering dossier with governing model, design inputs/outputs, V&V matrix, failure analysis, build plan",
+        "revision": "ENG-V8-R370D-FINAL_HARDENING",
+        "sha256": "41957b60c954095691d90700718d0dd16d6adc8888cd85c30f4518b850fcaa4d",
+        "format": "JSON",
+        "status": "AI_GENERATED"
+      },
+      {
+        "artifact": "r332_mechanism_description",
+        "description": "Mechanism description + computational model results from R332",
+        "revision": "R332",
+        "sha256": "see R332 canonical source",
+        "format": "JSON + model",
+        "status": "MODELLED"
+      },
+      {
+        "artifact": "external_evidence_governed",
+        "description": "Governed external evidence with SHA-verified sources (PubMed, FDA, ISO catalogs)",
+        "revision": "R341/R342",
+        "sha256": "see external_evidence/MANIFEST.json",
+        "format": "JSON",
+        "status": "EXTERNAL_PRECEDENT"
+      },
+      {
+        "artifact": "engineering_number_register",
+        "description": "All numerical values with full provenance (49 numbers registered)",
+        "revision": "R370C-1.0",
+        "sha256": "see ENGINEERING_NUMBER_REGISTER.json",
+        "format": "JSON",
+        "status": "VERIFIED"
+      },
+      {
+        "artifact": "engineering_standard_register",
+        "description": "All cited standards with applicability verification (29 standards)",
+        "revision": "R370D-1.0",
+        "sha256": "see ENGINEERING_STANDARD_REGISTER.json",
+        "format": "JSON",
+        "status": "VERIFIED"
+      },
+      {
+        "artifact": "experiment_protocol_conceptual",
+        "description": "Conceptual experiment protocol (decisive experiment design from R332)",
+        "revision": "R332",
+        "sha256": "see R332 decisive_experiment",
+        "format": "JSON + protocol",
+        "status": "CONCEPTUAL"
+      }
+    ],
+    "buyer_must_develop": [
+      {
+        "artifact": "conceptual_engineering_drawing",
+        "description": "Conceptual engineering drawings from mechanism description",
+        "blocked_on": "Independent engineer review of AI-generated content",
+        "estimated_effort": "4-8 weeks"
+      },
+      {
+        "artifact": "preliminary_cad",
+        "description": "Preliminary CAD (blocked on resolving UNKNOWN design inputs)",
+        "blocked_on": "Design input resolution (material selection, geometry, tolerances)",
+        "estimated_effort": "8-16 weeks"
+      },
+      {
+        "artifact": "production_cad",
+        "description": "Production CAD (blocked on prototype validation)",
+        "blocked_on": "Prototype build + verification",
+        "estimated_effort": "16-32 weeks"
+      },
+      {
+        "artifact": "qualified_materials",
+        "description": "Qualified materials with supplier validation",
+        "blocked_on": "Material selection freeze + supplier qualification + Cpk study",
+        "estimated_effort": "12-24 weeks"
+      },
+      {
+        "artifact": "manufacturing_process",
+        "description": "Manufacturing process specification + validation",
+        "blocked_on": "Process development + Cpk study + validation",
+        "estimated_effort": "16-32 weeks"
+      },
+      {
+        "artifact": "physical_verification",
+        "description": "Physical verification testing (bench + biocompatibility + EMC)",
+        "blocked_on": "Prototype build + test lab partnership",
+        "estimated_effort": "12-24 weeks"
+      },
+      {
+        "artifact": "clinical_validation",
+        "description": "Clinical validation evidence (IDE trial)",
+        "blocked_on": "Preclinical safety + IDE approval + clinical site partnership",
+        "estimated_effort": "12-24 months"
+      },
+      {
+        "artifact": "regulatory_submission",
+        "description": "Regulatory submission (510(k)/PMA/De Novo as applicable)",
+        "blocked_on": "Clinical validation + quality system + pre-submission",
+        "estimated_effort": "6-18 months"
+      },
+      {
+        "artifact": "independent_engineer_review",
+        "description": "Independent engineer review of all AI-generated engineering content (Article XXVI)",
+        "blocked_on": "Engineering firm partnership",
+        "estimated_effort": "4-8 weeks"
+      }
+    ],
+    "not_available": [
+      {
+        "artifact": "physical_prototype",
+        "description": "No physical prototype exists",
+        "reason": "All 15 packages are at CONCEPT_DEFINED or ENGINEERING_DEFINITION maturity"
+      },
+      {
+        "artifact": "clinical_data",
+        "description": "No clinical data exists for any package",
+        "reason": "REAL_LOOP_VERIFIED = 0/15 per Article XXXVII"
+      },
+      {
+        "artifact": "validated_supplier",
+        "description": "No suppliers qualified for any package",
+        "reason": "Manufacturing process not yet developed"
+      },
+      {
+        "artifact": "granted_ip",
+        "description": "No granted IP for any package",
+        "reason": "Patent applications may exist but not granted; check with IP counsel"
+      },
+      {
+        "artifact": "independent_engineer_evaluation",
+        "description": "No independent engineer has reviewed the dossiers",
+        "reason": "AI-generated only; STRUCTURAL_ENGINEER_READINESS test passed but no real engineer review (Article XXVI)"
+      }
+    ],
+    "transfer_summary": {
+      "transferable_now_count": 6,
+      "buyer_must_develop_count": 10,
+      "not_available_count": 5,
+      "honest_status": "TRANSFER_READY = False. Package is an engineering-development dossier, not a complete engineering technology-transfer asset. Buyer receives AI-generated engineering analysis + R332 mechanism + governed external evidence + number/standard registers. Buyer must develop all engineering artifacts (drawings, CAD, prototype, manufacturing) and clinical evidence. Independent engineer review required per Article XXVI."
+    }
+  },
+  "domain_qa_expectations": {
+    "package_id": "P-04",
+    "expected_disciplines": [
+      "enzyme kinetics",
+      "mass transport",
+      "surface chemistry",
+      "biomaterials"
+    ],
+    "expected_equations": [
+      "enzyme kinetics",
+      "diffusive flux",
+      "reaction vs transport"
+    ],
+    "expected_failure_modes": [
+      "enzyme deactivation",
+      "mass transport",
+      "immune",
+      "substrate competition",
+      "delamination"
+    ],
+    "domain_summary": "Enzymatic Aβ42 clearance via immobilized NEP",
+    "verification_method": "Domain QA gate checks that dossier contains these expected disciplines/equations/failure modes"
+  }
+}

@@ -1,0 +1,1181 @@
+{
+  "package_id": "P-11",
+  "dossier_version": "ENG-V9-R370E-INTEGRITY_FREEZE",
+  "generated_at": "2026-08-27T01:15:37Z",
+  "design_status": "CONCEPTUAL — NOT RELEASED FOR MANUFACTURING",
+  "engineering_status": "ENGINEERING_DEFINITION",
+  "transfer_ready": false,
+  "loop_verification_state": "NONE",
+  "warning": "Package-specific engineering dossier. Technology-specific content (not generic template). External evidence has evidence->decision chains. No fabrication. No truncation. Constitution Article XXV: unknown stays unknown. Article XXVII: thresholds have provenance. Article XXVIII: EXTERNAL_PRECEDENT != INVENTION_VALIDATION.",
+  "engineering_content": {
+    "technology_domain": "Microbiology + Surface Science + Biomaterials",
+    "engineering_disciplines": [
+      "Microbiology (phage-bacteria kinetics)",
+      "Surface science (biofilm formation, anti-biofouling)",
+      "Biomaterials (titanium coatings, electrospinning)",
+      "Sterilization and stability (phage viability)"
+    ],
+    "system_architecture": {
+      "description": "CSF shunt catheter with S. aureus phage K immobilized on electrospun titanium-coated surface; phages prevent biofilm formation by infecting and lysing S. aureus before biofilm establishes",
+      "subsystems": [
+        {
+          "id": "SS-01",
+          "name": "Catheter body (substrate)",
+          "function": "Carries CSF flow + supports electrospun Ti coating",
+          "status": "MODELLED",
+          "evidence_source": "R332 mechanism"
+        },
+        {
+          "id": "SS-02",
+          "name": "Electrospun titanium coating",
+          "function": "High-surface-area substrate for phage immobilization; Ti has known antibacterial properties",
+          "status": "PROPOSED",
+          "evidence_class": "PROPOSED",
+          "evidence_source": "R332 mechanism + external Ti coating literature"
+        },
+        {
+          "id": "SS-03",
+          "name": "Phage K immobilization layer",
+          "function": "S. aureus phage K bound to Ti surface; infects and lyses S. aureus on contact",
+          "status": "PROPOSED",
+          "evidence_class": "PROPOSED",
+          "evidence_source": "R332 mechanism + external phage K literature (PMC6693497)"
+        },
+        {
+          "id": "SS-04",
+          "name": "Stabilization matrix for phage viability",
+          "function": "Preserves phage infectivity over implantation lifetime (likely trehalose or lyoprotectant)",
+          "status": "PROPOSED",
+          "evidence_class": "PROPOSED"
+        }
+      ],
+      "microbiological_model": {
+        "key_equations": [
+          "dP/dt = -k_ads * [Phage] * [Bacteria] [phage-bacteria binding kinetics]",
+          "mu = mu_max * S / (Ks + S)            [Monod specific growth rate]",
+          "dN_phage/dt = -k_decay * N_phage   [phage decay over time]"
+        ],
+        "phage_bacteria_kinetics": "Phage adsorbs to S. aureus cell surface at rate k_ads * [Phage] * [Bacteria]; infection leads to lysis and release of new phages",
+        "biofilm_prevention_target": "Prevent biofilm establishment in first 24-48h (critical window for shunt infection)",
+        "critical_parameter": "Phage surface density Gamma_phage (PFU/cm^2); must exceed threshold for prophylactic lysis",
+        "safety_invariants": {
+          "INV-1": "Phage K specifically infects S. aureus (host range specificity)",
+          "INV-2": "Phage remains viable over target implantation lifetime",
+          "INV-3": "No phage-mediated adverse effects on host tissue",
+          "evidence_class": "MODELLED"
+        }
+      }
+    },
+    "mechanism_architecture": {
+      "physical_changes": "S. aureus cells contacting phage-coated surface adsorb phages, become infected, and lyse before establishing biofilm",
+      "key_physics": "Phage adsorption kinetics: dP/dt = -k_ads * [Phage_surface] * [Bacteria]. At sufficient phage surface density, bacterial colonization rate < lysis rate, preventing biofilm establishment.",
+      "kinetic_model": {
+        "input": "Bacterial challenge load (CFU/mL) over time",
+        "model": "Surface colonization: dN_bact/dt = k_attach * [Bact] - k_lysis * [Phage] * [Bact_surface]; net growth or decay depends on phage density",
+        "prediction_horizon": "48-72h prophylactic window (critical for shunt infection prevention)",
+        "status": "MODELLED — based on published phage kinetics; no in vitro verification on this coating"
+      }
+    },
+    "engineering_core": {
+      "governing_model": {
+        "summary": "Phage-bacteria adsorption kinetics on immobilized phage surface. Surface phage density must exceed threshold such that bacterial lysis rate exceeds colonization rate during the critical 24-48h post-implantation window.",
+        "equations": [
+          "dP/dt = -k_ads * [Phage] * [Bacteria] [phage-bacteria binding kinetics]",
+          "mu = mu_max * S / (Ks + S)            [Monod specific growth rate]",
+          "Gamma_phage(t) = Gamma_0 * exp(-k_decay * t)   [phage surface density decay]",
+          "Threshold: k_lysis * Gamma_phage(t) > k_attach * [Bact]_challenge   for t in [0, t_critical]"
+        ],
+        "assumptions": [
+          "Phage K host range limited to S. aureus (literature-supported)",
+          "Phage retains infectivity when immobilized (UNKNOWN — depends on immobilization chemistry)",
+          "Biofilm establishment requires minimum bacterial colonization (literature-supported)",
+          "CSF environment supports phage stability (UNKNOWN — CSF composition may affect phage)",
+          "No host immune response to phages (UNKNOWN for chronic exposure)"
+        ],
+        "boundary_conditions": [
+          "Bacterial challenge: S. aureus at 10^2-10^5 CFU/mL (typical perioperative contamination)",
+          "Surface: phage-coated Ti on catheter inner and outer lumen",
+          "Time: 0-72h post-implantation (critical window)"
+        ],
+        "input_variables": [
+          "Bacterial challenge load",
+          "Phage surface density Gamma_0",
+          "Phage decay rate k_decay"
+        ],
+        "output_variables": [
+          "Bacterial colonization rate",
+          "Biofilm establishment probability"
+        ],
+        "parameter_sensitivities": [
+          "k_ads (phage-bacteria binding rate) — published ~10^-9 to 10^-8 mL/(PFU·min)",
+          "Gamma_0 (initial phage density) — directly scales lysis rate",
+          "k_decay (phage inactivation rate) — UNKNOWN in CSF environment",
+          "Immobilization chemistry — affects phage receptor availability"
+        ],
+        "failure_regimes": [
+          "Gamma_0 < threshold — phage density insufficient; biofilm establishes",
+          "k_decay too high — phage inactivated before critical window ends",
+          "Immobilization blocks phage receptor — phage cannot bind bacteria",
+          "Bacterial challenge exceeds phage capacity — overwhelming infection",
+          "Host immune response clears phages prematurely"
+        ]
+      },
+      "critical_parameters": [
+        {
+          "name": "Phage K titer (initial)",
+          "value": "UNKNOWN achievable surface density",
+          "unit": "PFU/cm^2",
+          "basis": "Coating process-dependent",
+          "evidence_class": "UNKNOWN",
+          "verification_requirement": "Surface titer assay"
+        },
+        {
+          "name": "Phage-bacteria adsorption rate k_ads",
+          "value": "EXTERNAL_PRECEDENT (~10^-9 to 10^-8 mL/(PFU·min) per published phage kinetics)",
+          "unit": "mL/(PFU·min)",
+          "basis": "Published phage K literature",
+          "evidence_class": "EXTERNAL_PRECEDENT"
+        },
+        {
+          "name": "Phage decay rate k_decay",
+          "value": "UNKNOWN in CSF environment",
+          "unit": "1/h",
+          "basis": "UNKNOWN for chronic CSF exposure",
+          "evidence_class": "UNKNOWN",
+          "verification_requirement": "Aging study in CSF mimic"
+        },
+        {
+          "name": "Electrospun Ti coating thickness",
+          "value": "UNKNOWN",
+          "unit": "μm",
+          "basis": "Electrospinning process parameters",
+          "evidence_class": "UNKNOWN",
+          "verification_requirement": "SEM cross-section"
+        },
+        {
+          "name": "Ti coating surface area multiplier",
+          "value": "UNKNOWN — electrospinning increases surface area 10-1000x vs flat",
+          "unit": "dimensionless",
+          "basis": "Electrospinning process",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "verification_requirement": "BET surface area measurement"
+        },
+        {
+          "name": "Bacterial challenge (worst case)",
+          "value": "EXTERNAL_PRECEDENT (~10^2-10^5 CFU/mL perioperative contamination)",
+          "unit": "CFU/mL",
+          "basis": "Published surgical contamination literature",
+          "evidence_class": "EXTERNAL_PRECEDENT"
+        }
+      ],
+      "external_precedent": "EXTERNAL_PRECEDENT ≠ INVENTION_VALIDATION — published literature (PMC6693497) establishes that phage K can prevent S. aureus biofilm on Ti surfaces in vitro. It does NOT establish that the proposed catheter coating achieves clinically meaningful infection reduction in CSF shunt patients.",
+      "proposed_design": {
+        "input": "S. aureus challenge during perioperative period",
+        "mechanism": "Immobilized phage K infects and lyses S. aureus on contact",
+        "transformation": "Viable S. aureus -> lysed cells (no biofilm establishment)",
+        "output": "Catheter surface resistant to S. aureus colonization",
+        "component_architecture": "Catheter body -> electrospun Ti coating -> phage K immobilization layer -> stabilization matrix"
+      },
+      "failure_modes": [
+        {
+          "mode": "Phage inactivation",
+          "mechanism": "Protein denaturation, desiccation, or chemical degradation of phage particles",
+          "design_feature": "Phage K layer",
+          "evidence": "UNKNOWN — failure mechanism requires investigation challenge",
+          "mitigation": "Stabilization matrix (trehalose, lyoprotectant)",
+          "verification_test": "Aging study with periodic titer measurement",
+          "residual_uncertainty": "UNKNOWN achievable half-life in CSF"
+        },
+        {
+          "mode": "Immobilization blocks receptor",
+          "mechanism": "Covalent coupling occludes phage receptor binding protein",
+          "design_feature": "Immobilization chemistry",
+          "evidence": "UNKNOWN — depends on chemistry choice",
+          "mitigation": "Optimize coupling chemistry (orient phage receptor outward)",
+          "verification_test": "Infectivity assay post-immobilization",
+          "residual_uncertainty": "UNKNOWN achievable activity retention"
+        },
+        {
+          "mode": "Bacterial challenge exceeds capacity",
+          "mechanism": "High contamination load overwhelms phage density",
+          "design_feature": "Phage density Gamma_0",
+          "evidence": "MODELLED via threshold analysis",
+          "mitigation": "Maximize Gamma_0 + combine with antibiotics",
+          "verification_test": "High-challenge bench test",
+          "residual_uncertainty": "UNKNOWN clinical contamination distribution"
+        },
+        {
+          "mode": "Host immune clearance of phage",
+          "mechanism": "Immune system inactivates phages before critical window ends",
+          "design_feature": "Phage layer",
+          "evidence": "UNKNOWN for phage K specifically",
+          "mitigation": "PEGylation or immunosuppressive coating",
+          "verification_test": "In vivo phage persistence study",
+          "residual_uncertainty": "UNKNOWN immune response magnitude"
+        },
+        {
+          "mode": "Phage-resistant S. aureus",
+          "mechanism": "Bacteria evolve phage resistance",
+          "design_feature": "Single-phage approach",
+          "evidence": "UNKNOWN — failure mechanism requires investigation to phage therapy",
+          "mitigation": "Phage cocktail (multiple phages)",
+          "verification_test": "Resistance evolution assay",
+          "residual_uncertainty": "UNKNOWN resistance rate in vivo"
+        },
+        {
+          "mode": "Ti coating delamination",
+          "mechanism": "Mechanical bond failure between Ti and catheter substrate",
+          "design_feature": "Ti-catheter interface",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+          "mitigation": "Surface activation + adhesion testing",
+          "verification_test": "ASTM D3359 + fatigue",
+          "residual_uncertainty": "UNKNOWN chronic adhesion"
+        }
+      ],
+      "verification": [
+        {
+          "id": "VER-001",
+          "requirement": "Phage K surface density meets model requirement",
+          "method": "Surface titer assay (PFU/cm^2)",
+          "acceptance": "Gamma_0 above threshold for prophylactic lysis",
+          "evidence_class": "PROPOSED",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        },
+        {
+          "id": "VER-002",
+          "requirement": "Antibacterial efficacy against S. aureus",
+          "method": "ASTM E2180 surface antimicrobial test",
+          "acceptance": "Log reduction >= 3 (99.9% reduction) at 24h",
+          "evidence_class": "PROPOSED",
+          "standard": "ASTM_E2180",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        },
+        {
+          "id": "VER-003",
+          "requirement": "Antibacterial efficacy per ISO 22196",
+          "method": "ISO 22196",
+          "acceptance": "Pass criteria",
+          "evidence_class": "PROPOSED",
+          "standard": "ISO_22196",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        },
+        {
+          "id": "VER-004",
+          "requirement": "Phage viability over simulated implantation",
+          "method": "Aging in CSF mimic at 37°C",
+          "acceptance": "Titer retained > 50% at target lifetime",
+          "evidence_class": "PROPOSED",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        },
+        {
+          "id": "VER-005",
+          "requirement": "Biocompatibility ISO 10993",
+          "method": "Standard ISO 10993 series",
+          "acceptance": "Pass",
+          "evidence_class": "PROPOSED",
+          "standard": "ISO_10993",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        }
+      ],
+      "validation": [
+        {
+          "id": "VAL-001",
+          "requirement": "Reduced infection rate in animal model",
+          "method": "In vivo contamination challenge study",
+          "acceptance": "Statistically significant infection reduction vs control catheter",
+          "evidence_class": "UNKNOWN",
+          "criterion_type": "UNKNOWN"
+        },
+        {
+          "id": "VAL-002",
+          "requirement": "Reduced infection rate in patient cohort",
+          "method": "Clinical trial (IDE required)",
+          "acceptance": "Statistically significant reduction in shunt infection rate",
+          "evidence_class": "UNKNOWN",
+          "criterion_type": "UNKNOWN"
+        }
+      ],
+      "remaining_unknowns": [
+        "Achievable phage surface density Gamma_0 on electrospun Ti coating — UNKNOWN",
+        "Phage K half-life in CSF environment at 37°C — UNKNOWN",
+        "Infectivity retention after immobilization chemistry — UNKNOWN",
+        "In vivo phage persistence and immune response — UNKNOWN",
+        "Phage resistance evolution rate in clinical use — UNKNOWN",
+        "Regulatory pathway for phage-containing device — UNKNOWN (FDA phage guidance evolving; likely complex combination product)",
+        "Manufacturing scale-up for phage-coated catheter — UNKNOWN",
+        "Clinical endpoint (infection rate reduction magnitude) — UNKNOWN until trial"
+      ]
+    },
+    "design_inputs": [
+      {
+        "id": "DI-001",
+        "input": "Clinical need",
+        "value": "Infection = 8-12% of shunt failures, $40-80K per case. Antibiotic resistance emerging (R332)",
+        "evidence_class": "VERIFIED",
+        "source": "R332"
+      },
+      {
+        "id": "DI-002",
+        "input": "Functional requirement",
+        "value": "S. aureus phage K immobilized on electrospun Ti-coated catheter surface; prevents biofilm formation",
+        "evidence_class": "MODELLED",
+        "source": "R332"
+      },
+      {
+        "id": "DI-003",
+        "input": "Target organism",
+        "value": "Staphylococcus aureus (primary shunt pathogen, per literature)",
+        "evidence_class": "EXTERNAL_PRECEDENT"
+      },
+      {
+        "id": "DI-004",
+        "input": "Critical prophylactic window",
+        "value": "24-48h post-implantation (infection establishment window)",
+        "evidence_class": "EXTERNAL_PRECEDENT"
+      },
+      {
+        "id": "DI-005",
+        "input": "Bacterial challenge (worst case)",
+        "value": "10^2-10^5 CFU/mL perioperative contamination",
+        "evidence_class": "EXTERNAL_PRECEDENT"
+      },
+      {
+        "id": "DI-006",
+        "input": "Antimicrobial efficacy target",
+        "value": "Log reduction >= 3 (99.9%) at 24h vs S. aureus (ASTM E2180)",
+        "evidence_class": "MODELLED",
+        "source": "R332 + external literature"
+      },
+      {
+        "id": "DI-007",
+        "input": "Biocompatibility (ISO 10993)",
+        "value": "UNKNOWN",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "ISO 10993 series for phage coating + Ti + catheter + ISO 7197 (CSF shunt device requirements)"
+      },
+      {
+        "id": "DI-008",
+        "input": "Sterilization",
+        "value": "UNKNOWN — phages incompatible with gamma; aseptic processing or EtO with viability validation",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "Sterilization validation + aseptic processing"
+      },
+      {
+        "id": "DI-009",
+        "input": "Phage K source",
+        "value": "UNKNOWN — research-grade available; cGMP-grade requires manufacturer",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "Identify cGMP phage manufacturer"
+      },
+      {
+        "id": "DI-010",
+        "input": "Electrospun Ti process",
+        "value": "UNKNOWN achievable coating parameters on catheter geometry",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "Electrospinning process development"
+      },
+      {
+        "id": "DI-011",
+        "input": "Shelf life (phage viability)",
+        "value": "UNKNOWN — likely cold-chain dependent",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "Stability study per ICH Q1A"
+      }
+    ],
+    "design_outputs": [
+      {
+        "id": "DO-001",
+        "description": "Ti-coated catheter body with phage K layer",
+        "status": "ABSENT",
+        "design_status": "CAD_BLOCKED",
+        "missing_inputs": [
+          "Ti coating process parameters",
+          "Phage immobilization chemistry",
+          "Phage surface density target"
+        ]
+      },
+      {
+        "id": "DO-002",
+        "description": "Electrospun Ti coating process specification",
+        "status": "ABSENT",
+        "design_status": "PROCESS_DEVELOPMENT_BLOCKED",
+        "missing_inputs": [
+          "Electrospinning parameters",
+          "Adhesion to catheter substrate",
+          "Thickness uniformity"
+        ]
+      },
+      {
+        "id": "DO-003",
+        "description": "Phage K immobilization process specification",
+        "status": "ABSENT",
+        "design_status": "PROCESS_DEVELOPMENT_BLOCKED",
+        "missing_inputs": [
+          "Immobilization chemistry",
+          "Phage stock quality",
+          "QC release criteria"
+        ]
+      },
+      {
+        "id": "DO-004",
+        "description": "Antimicrobial efficacy test protocol",
+        "status": "CONCEPTUAL",
+        "design_status": "PROTOCOL_DEVELOPMENT",
+        "note": "ASTM E2180 + ISO 22196 protocols"
+      }
+    ],
+    "verification_matrix": [
+      {
+        "id": "V-001",
+        "requirement": "Phage K surface density Gamma_0",
+        "method": "Surface titer assay",
+        "acceptance": "Above model threshold",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      },
+      {
+        "id": "V-002",
+        "requirement": "Log reduction >= 3 vs S. aureus at 24h",
+        "method": "ASTM E2180",
+        "acceptance": "Log reduction >= 3",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "standard": "ASTM_E2180",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      },
+      {
+        "id": "V-003",
+        "requirement": "ISO 22196 antibacterial activity",
+        "method": "ISO 22196",
+        "acceptance": "Pass",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "standard": "ISO_22196",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      },
+      {
+        "id": "V-004",
+        "requirement": "Phage viability over lifetime",
+        "method": "Aging in CSF mimic",
+        "acceptance": "Titer > 50% at target lifetime",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      },
+      {
+        "id": "V-005",
+        "requirement": "Biocompatibility ISO 10993",
+        "method": "ISO 10993 series",
+        "acceptance": "Pass",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "standard": "ISO_10993",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      }
+    ],
+    "validation_matrix": [
+      {
+        "id": "VAL-001",
+        "requirement": "Reduced infection rate in animal model",
+        "method": "In vivo challenge study",
+        "acceptance": "Statistically significant reduction vs control",
+        "result": "NOT_PERFORMED",
+        "evidence_class": "UNKNOWN",
+        "criterion_type": "UNKNOWN"
+      },
+      {
+        "id": "VAL-002",
+        "requirement": "Reduced infection rate in patient cohort",
+        "method": "Clinical trial (IDE)",
+        "acceptance": "Statistically significant reduction",
+        "result": "NOT_PERFORMED",
+        "evidence_class": "UNKNOWN",
+        "criterion_type": "UNKNOWN"
+      }
+    ],
+    "bom": [
+      {
+        "item": "01",
+        "description": "Catheter body (substrate)",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "Standard CSF catheter",
+        "material": "UNKNOWN — silicone/polyurethane (external precedent)",
+        "supplier": "Multiple",
+        "criticality": "CRITICAL",
+        "verification": "Bench + biocompatibility"
+      },
+      {
+        "item": "02",
+        "description": "Titanium target / precursor for electrospinning",
+        "qty": "Process-scale",
+        "component_type": "CONSUMABLE",
+        "source_basis": "EXTERNAL_PRECEDENT for Ti coatings",
+        "material": "Titanium (Ti-6Al-4V or pure Ti)",
+        "supplier": "Multiple (medical-grade Ti suppliers)",
+        "criticality": "HIGH",
+        "verification": "Coating QC + adhesion"
+      },
+      {
+        "item": "03",
+        "description": "S. aureus phage K stock (cGMP-grade)",
+        "qty": "Process-scale",
+        "component_type": "CUSTOM_BIOLOGIC",
+        "source_basis": "EXTERNAL_PRECEDENT (research-grade available)",
+        "material": "Phage particles in buffer",
+        "supplier": "UNKNOWN — cGMP manufacturer required",
+        "criticality": "CRITICAL",
+        "verification": "Titer + purity + sterility + endotoxin"
+      },
+      {
+        "item": "04",
+        "description": "Stabilization matrix (trehalose or lyoprotectant)",
+        "qty": "Process-scale",
+        "component_type": "CONSUMABLE",
+        "source_basis": "EXTERNAL_PRECEDENT for phage stabilization",
+        "material": "Trehalose or sucrose",
+        "supplier": "Multiple (Sigma, etc.)",
+        "criticality": "HIGH",
+        "verification": "Stability study"
+      }
+    ],
+    "materials": [
+      {
+        "component": "Catheter body",
+        "candidate_material": "Silicone elastomer",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "Standard CSF shunt material",
+        "verification_required": "ISO 10993 + Ti coating adhesion",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Antimicrobial coating",
+        "candidate_material": "Electrospun titanium",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "Published Ti coating literature (PMC6693497)",
+        "verification_required": "Coating process + adhesion + biocompatibility",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Antimicrobial agent",
+        "candidate_material": "S. aureus phage K",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "Published phage K literature",
+        "verification_required": "Host range confirmation + activity + stability + immunogenicity",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Stabilization matrix",
+        "candidate_material": "Trehalose",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "Standard phage lyoprotectant",
+        "verification_required": "Stability + biocompatibility",
+        "status": "CANDIDATE"
+      }
+    ],
+    "manufacturing": {
+      "candidate_processes": [
+        {
+          "process": "Electrospinning of Ti coating on catheter",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "source": "Published electrospinning literature",
+          "tolerance_implication": "Coating thickness ±10-20% typical",
+          "note": "Custom process development for cylindrical catheter geometry"
+        },
+        {
+          "process": "Phage K propagation and purification",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "source": "Standard phage manufacturing",
+          "tolerance_implication": "UNKNOWN — titer lot-to-lot variation to be established with phage manufacturer; Cpk study required",
+          "note": "cGMP manufacturer required for clinical-grade"
+        },
+        {
+          "process": "Phage immobilization on Ti surface",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "source": "Standard phage immobilization chemistry",
+          "tolerance_implication": "Surface density variation depends on process",
+          "note": "Custom process development required"
+        },
+        {
+          "process": "Aseptic assembly (terminal sterilization likely incompatible with phage)",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "source": "Standard aseptic processing",
+          "tolerance_implication": "ISO Class 7 cleanroom required",
+          "note": "Phage viability under EtO UNKNOWN"
+        }
+      ],
+      "status": "ENGINEERING_CANDIDATE — no process validated for phage-active catheter"
+    },
+    "failure_analysis": [
+      {
+        "failure_mode": "Phage inactivation over time",
+        "mechanism": "Protein denaturation, desiccation, chemical degradation",
+        "design_feature_affected": "Phage K layer",
+        "evidence": "UNKNOWN — failure mechanism requires investigation challenge",
+        "mitigation": "Stabilization matrix (trehalose) + spare density margin",
+        "verification_test": "Aging study with periodic titer",
+        "residual_uncertainty": "UNKNOWN achievable half-life"
+      },
+      {
+        "failure_mode": "Immobilization blocks phage receptor",
+        "mechanism": "Coupling chemistry occludes receptor binding protein",
+        "design_feature_affected": "Immobilization chemistry",
+        "evidence": "UNKNOWN — chemistry-dependent",
+        "mitigation": "Optimize coupling (orient receptor outward)",
+        "verification_test": "Infectivity post-immobilization",
+        "residual_uncertainty": "UNKNOWN achievable retention"
+      },
+      {
+        "failure_mode": "Bacterial challenge exceeds capacity",
+        "mechanism": "High contamination load overwhelms phage density",
+        "design_feature_affected": "Phage density Gamma_0",
+        "evidence": "MODELLED",
+        "mitigation": "Maximize Gamma_0 + antibiotics adjunct",
+        "verification_test": "High-challenge bench test",
+        "residual_uncertainty": "UNKNOWN clinical contamination distribution"
+      },
+      {
+        "failure_mode": "Host immune clearance of phage",
+        "mechanism": "Immune system inactivates phages",
+        "design_feature_affected": "Phage layer",
+        "evidence": "UNKNOWN for phage K",
+        "mitigation": "PEGylation or immunosuppressive coating",
+        "verification_test": "In vivo persistence study",
+        "residual_uncertainty": "UNKNOWN immune response magnitude"
+      },
+      {
+        "failure_mode": "Phage-resistant S. aureus emergence",
+        "mechanism": "Bacteria evolve phage resistance",
+        "design_feature_affected": "Single-phage approach",
+        "evidence": "UNKNOWN — failure mechanism requires investigation challenge",
+        "mitigation": "Phage cocktail (multiple phages)",
+        "verification_test": "Resistance evolution assay",
+        "residual_uncertainty": "UNKNOWN resistance rate in vivo"
+      },
+      {
+        "failure_mode": "Ti coating delamination",
+        "mechanism": "Mechanical bond failure",
+        "design_feature_affected": "Ti-catheter interface",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Surface activation + adhesion testing",
+        "verification_test": "ASTM D3359 + fatigue",
+        "residual_uncertainty": "UNKNOWN chronic adhesion"
+      },
+      {
+        "failure_mode": "Non-S. aureus pathogens",
+        "mechanism": "Phage K host range limited to S. aureus; other pathogens (S. epidermidis, etc.) unaffected",
+        "design_feature_affected": "Single-phage approach",
+        "evidence": "Phage K host range known (literature)",
+        "mitigation": "Multi-phage cocktail for broader coverage",
+        "verification_test": "Host range confirmation + efficacy vs other pathogens",
+        "residual_uncertainty": "UNKNOWN coverage of full pathogen spectrum"
+      }
+    ],
+    "engineering_build_plan": [
+      {
+        "work_package": "WP-01",
+        "test_article": "Ti-coated catheter coupons (various electrospinning parameters)",
+        "equipment": "Electrospinning setup, SEM, surface profiler",
+        "design_work": "Electrospinning process development for cylindrical geometry",
+        "measurement": "Coating thickness, surface area, adhesion",
+        "acceptance_criterion": "Coating uniform + adherent + target thickness",
+        "dependency": "Electrospinning equipment",
+        "deliverable": "Ti coating process spec",
+        "estimated_effort": "12 weeks"
+      },
+      {
+        "work_package": "WP-02",
+        "test_article": "Phage K stock (research-grade)",
+        "equipment": "Phage propagation, purification, titer assay",
+        "design_work": "Phage K propagation protocol",
+        "measurement": "Titer (PFU/mL), purity, host range",
+        "acceptance_criterion": "Titer meets target; host range confirmed S. aureus-only",
+        "dependency": "Phage K seed stock",
+        "deliverable": "Phage K stock report",
+        "estimated_effort": "6 weeks"
+      },
+      {
+        "work_package": "WP-03",
+        "test_article": "Phage-coated Ti coupons",
+        "equipment": "Surface titer assay, infectivity assay",
+        "design_work": "Immobilization chemistry selection + optimization",
+        "measurement": "Gamma_0 (surface PFU/cm^2), infectivity retention",
+        "acceptance_criterion": "Gamma_0 above threshold; infectivity > 50% retention",
+        "dependency": "WP-01 + WP-02",
+        "deliverable": "Immobilization process spec",
+        "estimated_effort": "10 weeks"
+      },
+      {
+        "work_package": "WP-04",
+        "test_article": "Phage-coated catheter segments",
+        "equipment": "ASTM E2180 test setup, S. aureus culture",
+        "design_work": "ASTM E2180 protocol",
+        "measurement": "Log reduction at 24h vs control",
+        "acceptance_criterion": "Log reduction >= 3",
+        "dependency": "WP-03",
+        "deliverable": "Antimicrobial efficacy report",
+        "estimated_effort": "6 weeks"
+      },
+      {
+        "work_package": "WP-05",
+        "test_article": "Phage-coated specimens in CSF mimic at 37°C",
+        "equipment": "Aging chamber, titer assay",
+        "design_work": "Aging protocol",
+        "measurement": "Titer vs time",
+        "acceptance_criterion": "Titer > 50% at target lifetime",
+        "dependency": "WP-03",
+        "deliverable": "Stability report",
+        "estimated_effort": "12-24 weeks (chronic)"
+      },
+      {
+        "work_package": "WP-06",
+        "test_article": "Biocompatibility specimens (Ti-coated catheter coupons + phage K stabilization matrix)",
+        "equipment": "ISO 10993 test lab",
+        "design_work": "Material selection frozen",
+        "measurement": "ISO 10993 series",
+        "acceptance_criterion": "ISO 10993 pass",
+        "dependency": "Material selection",
+        "deliverable": "ISO 10993 report",
+        "estimated_effort": "12 weeks (external lab)"
+      },
+      {
+        "work_package": "WP-07",
+        "test_article": "Animal model contamination challenge",
+        "equipment": "Animal facility, microbiology lab",
+        "design_work": "In vivo protocol (IACUC required)",
+        "measurement": "Infection rate vs control catheter",
+        "acceptance_criterion": "Statistically significant reduction",
+        "dependency": "WP-04 + WP-05",
+        "deliverable": "In vivo efficacy report",
+        "estimated_effort": "16 weeks"
+      }
+    ],
+    "transfer_boundary": {
+      "buyer_receives": [
+        "Phage K + Ti coating concept + mechanism description",
+        "Phage adsorption + Monod biofilm governing equations",
+        "Bench test protocol (ASTM E2180, ISO 22196, titer assay)",
+        "External precedent catalog (phage K, Ti coatings)",
+        "Critical UNKNOWN disclosure (phage stability, immune response, resistance)",
+        "This engineering dossier with failure analysis + build plan"
+      ],
+      "buyer_must_create": [
+        "cGMP-grade phage K manufacturing process",
+        "Electrospun Ti coating process for catheter geometry",
+        "Phage immobilization chemistry + QC specs",
+        "Aseptic assembly process (terminal sterilization likely incompatible)",
+        "Regulatory submission (likely combination product — biologics + device; complex pathway)",
+        "Clinical validation (infection rate endpoint)",
+        "Long-term stability + resistance evolution monitoring"
+      ]
+    },
+    "external_engineering_precedent": [
+      {
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6693497",
+        "source_title": "Preventing S. aureus biofilm formation on titanium surfaces by",
+        "source_snippet": "by ALR López · 2019 · Cited by 72 — β-peptide-containing films fabricated on rough titanium substrate surfaces can release sufficient quantities of β-peptide to prevent S . aureus biofilm ...",
+        "source_hash": "4291639d544f40cd42097329aa1aaac54de33eb63a3a624b9907e264e43bc9cd",
+        "raw_content_sha256": "63e8f3fe63ef2438ccc4ba96444bbaad4809347af46e68ddc82d2489c515b12d",
+        "artifact_path": "external_evidence/pubmed_p11_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://www.sciencedirect.com/science/article/abs/pii/S0142961210010537",
+        "source_title": "Staphylococcus aureus resistance on titanium coated with",
+        "source_snippet": "by X Khoo · 2010 · Cited by 79 — TBP4–PEG forms a serum-resistant surface coating capable of preventing S. aureus colonization and subsequent biofilm formation.",
+        "source_hash": "6ac833adeb38b8e8afe8d52926f7d769b5ad5fc46a0b0f257652e03506f7309c",
+        "raw_content_sha256": "63e8f3fe63ef2438ccc4ba96444bbaad4809347af46e68ddc82d2489c515b12d",
+        "artifact_path": "external_evidence/pubmed_p11_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://pubs.aip.org/aip/bmf/article/18/5/051506/3316469/Recent-developments-in-preventing-catheter-related",
+        "source_title": "Recent developments in preventing catheter-related infections",
+        "source_snippet": "Oct 11, 2024 — Under static conditions, PU catheters coated with oil-infused PDMS surface layers inhibited E. coli and S . aureus biofilm formation.",
+        "source_hash": "c08ea541b973efbb41723bc94de475e47a9595c00f91a045a4c2c6540f6090cf",
+        "raw_content_sha256": "63e8f3fe63ef2438ccc4ba96444bbaad4809347af46e68ddc82d2489c515b12d",
+        "artifact_path": "external_evidence/pubmed_p11_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://link.springer.com/chapter/10.1007/978-3-031-04484-7_21",
+        "source_title": "Antibiotic-Free Solutions for the Development of Biofilm",
+        "source_snippet": "by B Costa · 2022 · Cited by 1 — All coatings showed antibacterial and antifungal properties, Staphylococcus aureus (MRSA)",
+        "source_hash": "5895276366bf24a648149d0fb5dfdbac6214a4aeb5d65cfbeac1f11e761f0d3a",
+        "raw_content_sha256": "63e8f3fe63ef2438ccc4ba96444bbaad4809347af46e68ddc82d2489c515b12d",
+        "artifact_path": "external_evidence/pubmed_p11_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2022.825828/full",
+        "source_title": "Bacteriophage-Mediated Control of Biofilm: A Promising",
+        "source_snippet": "by C Chang · 2022 · Cited by 177 — catheter -associated biofilm clearance may involve phage is used as a gel-like coating on the catheter to reduce the bacterial adhesion to the  ...",
+        "source_hash": "2f3c1bb1b7d84dcc3d307fbf1c6fd232ed2911897f257dac422a2ea2a460e227",
+        "raw_content_sha256": "63e8f3fe63ef2438ccc4ba96444bbaad4809347af46e68ddc82d2489c515b12d",
+        "artifact_path": "external_evidence/pubmed_p11_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      }
+    ]
+  },
+  "source_universe": {
+    "registry": "AUTHORITATIVE_SOURCE_REGISTRY_V2",
+    "manifest_integrity_verified": true
+  },
+  "engineering_artifact_status": {
+    "communication_diagram": {
+      "status": "CONCEPTUAL",
+      "basis": "R332 mechanism description exists as text/JSON; not engineering-grade communication diagram",
+      "transferable_now": true,
+      "format": "JSON description",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "conceptual_drawing": {
+      "status": "ABSENT",
+      "basis": "No conceptual engineering drawings created",
+      "transferable_now": false,
+      "buyer_must_create": "Conceptual engineering drawings from mechanism description",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "preliminary_cad": {
+      "status": "ABSENT",
+      "basis": "No CAD models created; all design outputs marked ABSENT or CONCEPTUAL",
+      "transferable_now": false,
+      "buyer_must_create": "Preliminary CAD from design inputs (which include UNKNOWNs)",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "engineering_review": {
+      "status": "ABSENT",
+      "basis": "No independent engineer has reviewed the engineering content; AI-generated only",
+      "transferable_now": false,
+      "buyer_must_create": "Independent engineer review per Article XXVI (no self-certification)",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "prototype_release": {
+      "status": "ABSENT",
+      "basis": "No physical prototype built; no prototype release documentation",
+      "transferable_now": false,
+      "buyer_must_create": "Prototype build per engineering_build_plan",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "manufacturing_release": {
+      "status": "ABSENT",
+      "basis": "No manufacturing process developed; no manufacturing release",
+      "transferable_now": false,
+      "buyer_must_create": "Manufacturing process development + validation",
+      "release_state": "CONCEPTUAL",
+      "release_state_trajectory": {
+        "current": "CONCEPTUAL",
+        "next_step": "PRELIMINARY (requires engineer review + preliminary CAD)",
+        "path_to_manufacturing": [
+          "CONCEPTUAL (current)",
+          "PRELIMINARY (engineer review + preliminary CAD)",
+          "ENGINEERING_REVIEW (formal design review)",
+          "VERIFIED (independent verification)",
+          "RELEASED_FOR_PROTOTYPE (prototype build)",
+          "RELEASED_FOR_MANUFACTURING (production)"
+        ],
+        "blocked_on": "Independent engineer review per Article XXVI"
+      }
+    },
+    "honest_summary": "All 15 packages are at CONCEPTUAL or ABSENT engineering artifact status. No CAD, no drawings, no prototypes, no manufacturing. This is an engineering-development dossier, NOT a complete engineering technology-transfer asset.",
+    "release_state_schema": {
+      "allowed_states": [
+        "CONCEPTUAL",
+        "PRELIMINARY",
+        "ENGINEERING_REVIEW",
+        "VERIFIED",
+        "RELEASED_FOR_PROTOTYPE",
+        "RELEASED_FOR_MANUFACTURING"
+      ],
+      "definitions": {
+        "CONCEPTUAL": "AI-generated concept only; no engineering review",
+        "PRELIMINARY": "Preliminary engineering work; not yet reviewed",
+        "ENGINEERING_REVIEW": "Under formal engineering review",
+        "VERIFIED": "Verified by independent engineer",
+        "RELEASED_FOR_PROTOTYPE": "Released for prototype build",
+        "RELEASED_FOR_MANUFACTURING": "Released for manufacturing (production)"
+      },
+      "current_state_all_artifacts": "CONCEPTUAL or ABSENT (all 15 packages)",
+      "note": "No artifact has progressed beyond CONCEPTUAL. All require independent engineer review before advancing (Article XXVI)."
+    }
+  },
+  "transfer_manifest": {
+    "package_id": "P-11",
+    "manifest_version": "R370D-2.0",
+    "generated_at": "2026-08-27T02:19:04Z",
+    "transferable_now": [
+      {
+        "artifact": "engineering_dossier_json",
+        "description": "Complete engineering dossier with governing model, design inputs/outputs, V&V matrix, failure analysis, build plan",
+        "revision": "ENG-V8-R370D-FINAL_HARDENING",
+        "sha256": "9a67b30e0e4f2af384d9579bc80d9e54b68e4c043f9d2bd8961df3b8f58addb1",
+        "format": "JSON",
+        "status": "AI_GENERATED"
+      },
+      {
+        "artifact": "r332_mechanism_description",
+        "description": "Mechanism description + computational model results from R332",
+        "revision": "R332",
+        "sha256": "see R332 canonical source",
+        "format": "JSON + model",
+        "status": "MODELLED"
+      },
+      {
+        "artifact": "external_evidence_governed",
+        "description": "Governed external evidence with SHA-verified sources (PubMed, FDA, ISO catalogs)",
+        "revision": "R341/R342",
+        "sha256": "see external_evidence/MANIFEST.json",
+        "format": "JSON",
+        "status": "EXTERNAL_PRECEDENT"
+      },
+      {
+        "artifact": "engineering_number_register",
+        "description": "All numerical values with full provenance (49 numbers registered)",
+        "revision": "R370C-1.0",
+        "sha256": "see ENGINEERING_NUMBER_REGISTER.json",
+        "format": "JSON",
+        "status": "VERIFIED"
+      },
+      {
+        "artifact": "engineering_standard_register",
+        "description": "All cited standards with applicability verification (29 standards)",
+        "revision": "R370D-1.0",
+        "sha256": "see ENGINEERING_STANDARD_REGISTER.json",
+        "format": "JSON",
+        "status": "VERIFIED"
+      },
+      {
+        "artifact": "experiment_protocol_conceptual",
+        "description": "Conceptual experiment protocol (decisive experiment design from R332)",
+        "revision": "R332",
+        "sha256": "see R332 decisive_experiment",
+        "format": "JSON + protocol",
+        "status": "CONCEPTUAL"
+      }
+    ],
+    "buyer_must_develop": [
+      {
+        "artifact": "conceptual_engineering_drawing",
+        "description": "Conceptual engineering drawings from mechanism description",
+        "blocked_on": "Independent engineer review of AI-generated content",
+        "estimated_effort": "4-8 weeks"
+      },
+      {
+        "artifact": "preliminary_cad",
+        "description": "Preliminary CAD (blocked on resolving UNKNOWN design inputs)",
+        "blocked_on": "Design input resolution (material selection, geometry, tolerances)",
+        "estimated_effort": "8-16 weeks"
+      },
+      {
+        "artifact": "production_cad",
+        "description": "Production CAD (blocked on prototype validation)",
+        "blocked_on": "Prototype build + verification",
+        "estimated_effort": "16-32 weeks"
+      },
+      {
+        "artifact": "qualified_materials",
+        "description": "Qualified materials with supplier validation",
+        "blocked_on": "Material selection freeze + supplier qualification + Cpk study",
+        "estimated_effort": "12-24 weeks"
+      },
+      {
+        "artifact": "manufacturing_process",
+        "description": "Manufacturing process specification + validation",
+        "blocked_on": "Process development + Cpk study + validation",
+        "estimated_effort": "16-32 weeks"
+      },
+      {
+        "artifact": "physical_verification",
+        "description": "Physical verification testing (bench + biocompatibility + EMC)",
+        "blocked_on": "Prototype build + test lab partnership",
+        "estimated_effort": "12-24 weeks"
+      },
+      {
+        "artifact": "clinical_validation",
+        "description": "Clinical validation evidence (IDE trial)",
+        "blocked_on": "Preclinical safety + IDE approval + clinical site partnership",
+        "estimated_effort": "12-24 months"
+      },
+      {
+        "artifact": "regulatory_submission",
+        "description": "Regulatory submission (510(k)/PMA/De Novo as applicable)",
+        "blocked_on": "Clinical validation + quality system + pre-submission",
+        "estimated_effort": "6-18 months"
+      },
+      {
+        "artifact": "independent_engineer_review",
+        "description": "Independent engineer review of all AI-generated engineering content (Article XXVI)",
+        "blocked_on": "Engineering firm partnership",
+        "estimated_effort": "4-8 weeks"
+      }
+    ],
+    "not_available": [
+      {
+        "artifact": "physical_prototype",
+        "description": "No physical prototype exists",
+        "reason": "All 15 packages are at CONCEPT_DEFINED or ENGINEERING_DEFINITION maturity"
+      },
+      {
+        "artifact": "clinical_data",
+        "description": "No clinical data exists for any package",
+        "reason": "REAL_LOOP_VERIFIED = 0/15 per Article XXXVII"
+      },
+      {
+        "artifact": "validated_supplier",
+        "description": "No suppliers qualified for any package",
+        "reason": "Manufacturing process not yet developed"
+      },
+      {
+        "artifact": "granted_ip",
+        "description": "No granted IP for any package",
+        "reason": "Patent applications may exist but not granted; check with IP counsel"
+      },
+      {
+        "artifact": "independent_engineer_evaluation",
+        "description": "No independent engineer has reviewed the dossiers",
+        "reason": "AI-generated only; STRUCTURAL_ENGINEER_READINESS test passed but no real engineer review (Article XXVI)"
+      }
+    ],
+    "transfer_summary": {
+      "transferable_now_count": 6,
+      "buyer_must_develop_count": 10,
+      "not_available_count": 5,
+      "honest_status": "TRANSFER_READY = False. Package is an engineering-development dossier, not a complete engineering technology-transfer asset. Buyer receives AI-generated engineering analysis + R332 mechanism + governed external evidence + number/standard registers. Buyer must develop all engineering artifacts (drawings, CAD, prototype, manufacturing) and clinical evidence. Independent engineer review required per Article XXVI."
+    }
+  },
+  "domain_qa_expectations": {
+    "package_id": "P-11",
+    "expected_disciplines": [
+      "microbiology",
+      "surface science",
+      "biomaterials",
+      "sterilization"
+    ],
+    "expected_equations": [
+      "phage adsorption",
+      "monod",
+      "decay"
+    ],
+    "expected_failure_modes": [
+      "phage inactivation",
+      "immobilization",
+      "immune",
+      "resistance",
+      "delamination",
+      "non-staph"
+    ],
+    "domain_summary": "Microbiology anti-biofilm surface",
+    "verification_method": "Domain QA gate checks that dossier contains these expected disciplines/equations/failure modes"
+  }
+}
