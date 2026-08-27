@@ -36,8 +36,8 @@ EXTERNAL_EVIDENCE_MANIFEST = os.path.join(EXTERNAL_EVIDENCE_DIR, "MANIFEST.json"
 OUTPUT_DIR = os.path.join(os.path.dirname(_THIS_DIR), "output", "engineering_dossiers_governed")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Scopus API key (provided by CEO)
-SCOPUS_API_KEY = "[REDACTED:scopus_key]"
+# Scopus API key (loaded from environment variable, not hardcoded)
+SCOPUS_API_KEY = os.environ.get("SCOPUS_API_KEY", "")  # Set SCOPUS_API_KEY env var to enable
 
 
 def _now(): return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
