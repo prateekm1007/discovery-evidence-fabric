@@ -165,6 +165,7 @@ class LLMCallResult:
     error: Optional[str] = None
     substituted_from: Optional[str] = None   # provider the policy wanted first
     selection_ledger: Dict[str, Any] = field(default_factory=dict)
+    retry_notes: Optional[List[str]] = None  # recorded same-provider retries
 
     @property
     def ok(self) -> bool:
@@ -180,6 +181,7 @@ class LLMCallResult:
             "latency_ms": self.latency_ms,
             "substituted_from": self.substituted_from,
             "status": self.status,
+            "retry_notes": list(self.retry_notes or []),
         }
 
 
@@ -285,10 +287,25 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
         err = data["error"]
         msg = err.get("message", str(err)) if isinstance(err, dict) else str(err)
         raise RuntimeError(f"{spec.provider_id} API error: {msg[:300]}")
-    content = (data.get("choices") or [{}])[0].get("message", {}).get("content", "")
+    choice = (data.get("choices") or [{}])[0]
+    content = choice.get("message", {}).get("content", "") or ""
     if not content:
-        raise RuntimeError(f"{spec.provider_id} returned empty content")
+        finish = choice.get("finish_reason", "unknown")
+        raise EmptyContentWithFinish(
+            f"{spec.provider_id} returned empty content "
+            f"(finish_reason={finish}, max_tokens={max_tokens})",
+            finish_reason=finish)
     return content
+
+
+class EmptyContentWithFinish(RuntimeError):
+    """Empty completion with the API's finish_reason carried for retry "
+    policy (reasoning models can spend the entire cap on hidden reasoning
+    tokens; a larger cap on the SAME provider/model is not a downgrade)."""
+
+    def __init__(self, message: str, finish_reason: str = "unknown"):
+        super().__init__(message)
+        self.finish_reason = finish_reason
 
 
 def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
@@ -355,6 +372,14 @@ def generate(prompt: str, system: str = "",
             selection_ledger=ledger)
 
     messages: List[dict] = []
+    # Constitutional transport contract: engine LLM output is ENGLISH ONLY
+    # (CEO standing rule) and must follow the requested format exactly.
+    # Callers may pass a richer system prompt; this directive is PREPENDED,
+    # never substituted.
+    system_directive = ("RESPOND IN ENGLISH ONLY. Follow the requested "
+                        "output format exactly; no preamble, no markdown "
+                        "fences.")
+    system = f"{system_directive}{(' ' + system) if system else ''}"
     if system:
         messages.append({"role": "system", "content": system})
     body = prompt
@@ -366,22 +391,38 @@ def generate(prompt: str, system: str = "",
     messages.append({"role": "user", "content": body})
 
     last_err = None
+    attempt_budget = max_tokens
+    retry_notes: List[str] = []
     for attempt in range(max_retries + 1):
         t0 = time.time()
         try:
             if spec.flavor == "anthropic":
                 content = _call_anthropic_flavor(spec, messages, timeout,
-                                                 max_tokens)
+                                                 attempt_budget)
             else:
                 content = _call_openai_flavor(spec, messages, timeout,
-                                              max_tokens)
+                                              attempt_budget)
             return LLMCallResult(
                 status=ST_OK, content=content,
                 provider_id=spec.provider_id, model=spec.model_for_call(),
                 prompt_hash=_sha(body), output_hash=_sha(content),
                 latency_ms=int((time.time() - t0) * 1000),
                 substituted_from=ledger.get("substituted_from"),
-                selection_ledger=ledger)
+                selection_ledger=ledger,
+                retry_notes=retry_notes)
+        except EmptyContentWithFinish as exc:
+            last_err = f"{type(exc).__name__}: {exc}"
+            # reasoning-token exhaustion: SAME provider/model, larger cap
+            # (recorded in retry_notes — never a silent change)
+            if attempt_budget < 2048:
+                attempt_budget = min(2048, attempt_budget * 4)
+                retry_notes.append(
+                    f"attempt {attempt + 1}: empty content "
+                    f"(finish_reason={exc.finish_reason}); same "
+                    f"provider/model retried with max_tokens="
+                    f"{attempt_budget}")
+            if attempt < max_retries:
+                time.sleep(2 * (attempt + 1))
         except Exception as exc:  # noqa: BLE001 — recorded, retried, explicit
             last_err = f"{type(exc).__name__}: {exc}"
             if attempt < max_retries:
@@ -389,7 +430,8 @@ def generate(prompt: str, system: str = "",
     return LLMCallResult(
         status=ST_CALL_FAILED, error=last_err,
         provider_id=spec.provider_id, model=spec.model_for_call(),
-        prompt_hash=_sha(body), selection_ledger=ledger)
+        prompt_hash=_sha(body), selection_ledger=ledger,
+        retry_notes=retry_notes)
 
 
 def availability_statement() -> Dict[str, Any]:

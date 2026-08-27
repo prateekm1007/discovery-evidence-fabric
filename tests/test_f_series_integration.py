@@ -481,6 +481,12 @@ D6_SOURCE_FILES = [
     "discovery_fabric/engine/maturity.py",
     "discovery_fabric/engine/release.py",
     "discovery_fabric/engine/fields.py",
+    # A-series authoritative-content modules (CEO A2-A7) — same rule
+    "discovery_fabric/engine/reasoning_chain.py",
+    "discovery_fabric/engine/design_outputs.py",
+    "discovery_fabric/engine/depth_contract.py",
+    "discovery_fabric/engine/benchmark_corpus.py",
+    "discovery_fabric/engine/package_registry.py",
 ]
 SLICE_RE = re.compile(r"\[:\d+\]")
 
@@ -605,10 +611,11 @@ def test_d7_maturity_climbs_only_with_real_artifact_state():
     assert base["technology_maturity"] == "ENGINEERING_DEFINITION"
     # simulate completed design work on the actual artifacts
     for d in eng["design_outputs"]:
-        d["status"] = "GEOMETRY_COMPLETE"
+        d["geometry_status"] = "COMPLETE (design work recorded)"
     for p in eng["engineering_core"]["critical_parameters"]:
         p["value"] = "sourced example value"
         p["status"] = "SOURCE_FACT"
+        p["value_status"] = "SOURCE_FACT"
     for b in eng["bom"]:
         b["qty"] = "100"
     better = compute_maturity(spec, eng, env=env)

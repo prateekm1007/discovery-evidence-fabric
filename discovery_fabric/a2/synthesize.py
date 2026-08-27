@@ -74,9 +74,13 @@ def llm_chat(prompt, system="", max_retries=2, timeout=240):
             preferred_providers=["openrouter", "deepseek", "anthropic",
                                  "openai", "gemini", "qwen", "nvidia"],
             purpose="synthesis")
+    # max_tokens=512: the FIELD-line protocol needs ~150-250 tokens; wall
+    # time on the deepseek reasoning endpoint scales with the cap (measured
+    # 2026-08-27). Empty-content (reasoning exhaustion) retries bump the cap
+    # inside llm_registry automatically and are recorded in retry_notes.
     res = reg.generate(prompt, system=system, timeout=timeout,
                        max_retries=max_retries, policy=policy,
-                       max_tokens=1024)
+                       max_tokens=512)
     _LAST_PROVIDER_META = res.to_meta()
     _LAST_PROVIDER_META["selection_ledger"] = res.selection_ledger
     if res.ok:

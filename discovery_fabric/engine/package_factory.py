@@ -50,6 +50,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from .candidate import Candidate, sha256_obj, utc_now
+from .depth_contract import assert_depth_contract, evaluate_depth_contract
 from .engineering_spec import build_engineering_spec
 from .fields import (DisplayRegister, PackageBuildError, build_display_view)
 from .invention_spec import SPEC_FIELDS, build_invention_spec, tagged
@@ -157,8 +158,16 @@ def survivor_to_canonical_package(
                               "verified (Art. II)",
             "epistemic_class": "EXTERNAL_PRECEDENT_CANDIDATE"})
 
-    # pi: the per-package identity the v4 builders expect
-    n = run_ctx.get("package_number") or "90"
+    # pi: the per-package identity the v4 builders expect.
+    # CEO A1: NO hardcoded default number exists. The caller resolves the
+    # portfolio number through package_registry.allocate() (post-survivor);
+    # a missing number is a build error, never a silent constant.
+    n = run_ctx.get("package_number")
+    if not n:
+        raise PackageBuildError(
+            "no package_number in run_ctx — allocate through "
+            "package_registry.allocate() (CEO A1: hardcoded production "
+            "numbers are forbidden)")
     pi = {
         "num": n,
         "pkg_id": invention_id,
@@ -210,11 +219,18 @@ def build_traceability(spec: Dict[str, Any], eng: Dict[str, Any],
     """
     graph = eng.get("design_graph") or {}
     ev_index = (spec.get("_evidence_index") or {})
+    # CEO A11: EVERY generated claim carries its owning identities
+    invention_id = (spec.get("invention_id") or {}).get("value", "unknown")
+    candidate_id = ((env.candidate_id or
+                     (env.mechanism_map or {}).get("raw_candidate", {})
+                     .get("candidate_id")) if env else None) or "unknown"
     chains: List[Dict[str, Any]] = []
     # design-input chains
     for d in eng.get("design_inputs", []):
         chains.append({
             "chain_type": "DESIGN_INPUT",
+            "invention_id": invention_id,
+            "candidate_id": candidate_id,
             "node_id": d["id"],
             "invention_field": "problem" if "problem.json" in
                                (d.get("evidence_refs") or []) else "mechanism",
@@ -227,7 +243,10 @@ def build_traceability(spec: Dict[str, Any], eng: Dict[str, Any],
     # design-output chains
     for d in eng.get("design_outputs", []):
         chains.append({
-            "chain_type": "DESIGN_OUTPUT", "node_id": d["id"],
+            "chain_type": "DESIGN_OUTPUT",
+            "invention_id": invention_id,
+            "candidate_id": candidate_id,
+            "node_id": d["id"],
             "invention_field": "engineering_parameters",
             "candidate_stage": d.get("basis", "ENGINEERING_PROPOSED"),
             "evidence_ids": [],
@@ -245,6 +264,8 @@ def build_traceability(spec: Dict[str, Any], eng: Dict[str, Any],
             "NOT_LINKED", None, "")
         chains.append({
             "chain_type": "FAILURE_MODE",
+            "invention_id": invention_id,
+            "candidate_id": candidate_id,
             "node_id": f.get("graph_id", f"FM-?{i}"),
             "invention_field": "failure_modes",
             "candidate_stage": basis,
@@ -252,10 +273,26 @@ def build_traceability(spec: Dict[str, Any], eng: Dict[str, Any],
             "hash": sha256_obj(f),
             "linked": linked,
             "untraceable": not origin_known})
+    # reasoning-chain claims (A3) — each chain is a claim with provenance
+    rc = eng.get("engineering_reasoning_chains") or {}
+    for c in rc.get("chains", []):
+        chains.append({
+            "chain_type": "REASONING_CHAIN",
+            "invention_id": invention_id,
+            "candidate_id": candidate_id,
+            "node_id": c["chain_id"],
+            "invention_field": c["subject"],
+            "candidate_stage": "ENGINEERING_SPEC",
+            "evidence_ids": [],
+            "hash": sha256_obj(c),
+            "linked": bool(c.get("nodes"))})
     # verification chains
     for v in eng.get("verification_matrix", []):
         chains.append({
-            "chain_type": "VERIFICATION", "node_id": v["id"],
+            "chain_type": "VERIFICATION",
+            "invention_id": invention_id,
+            "candidate_id": candidate_id,
+            "node_id": v["id"],
             "invention_field": "killer_experiment",
             "candidate_stage": "KILLER_EXPERIMENT",
             "evidence_ids": [],
@@ -363,8 +400,15 @@ def generate_buyer_package(
     Reuses the frozen v4 builders through a registered display view
     (Directive 6) and emits computed maturity (Directive 7). Returns a
     report with every file+hash and an explicit fail list (missing link =
-    loud failure, E11 contract)."""
+    loud failure, E11 contract).
+    CEO A2: the ENGINEERING_DEPTH_CONTRACT is a HARD GATE — an engineering
+    specification below benchmark depth or without invention-tied content
+    aborts the build (PackageBuildError) before any file is written."""
     out = Path(out_dir)
+    # CEO A2 hard gate — before ANY file exists
+    depth = evaluate_depth_contract(spec, eng)
+    if not depth["passed"]:
+        assert_depth_contract(spec, eng)  # raises with the failed sections
     register = DisplayRegister()
     pkg = survivor_to_canonical_package(spec, eng, env, run_ctx,
                                         rehearsal=rehearsal)
@@ -421,6 +465,10 @@ def generate_buyer_package(
     trace_path = folder / "ENGINEERING_TRACEABILITY.json"
     trace_path.write_text(json.dumps(trace, indent=2, ensure_ascii=False))
 
+    # CEO A2: the depth-contract evaluation ships INSIDE the package
+    depth_path = folder / "DEPTH_CONTRACT_EVALUATION.json"
+    depth_path.write_text(json.dumps(depth, indent=2, ensure_ascii=False))
+
     maturity = build_maturity_basis(spec, eng, data, pkg, env=env,
                                     package_report=None)
     maturity_path = folder / "MATURITY_BASIS.json"
@@ -461,6 +509,13 @@ def generate_buyer_package(
             "candidate_stages": [e["stage"] for e in
                                  (env.stage_log if env else [])]},
         "files": rendered,
+        "depth_contract": {
+            "passed": depth["passed"],
+            "sections_satisfied": depth["sections_satisfied"],
+            "sections_total": depth["sections_total"],
+            "evaluation_file": "DEPTH_CONTRACT_EVALUATION.json"},
+        "engineering_reasoning_chains": (eng.get(
+            "engineering_reasoning_chains", {}) or {}).get("counts"),
         "traceability_passed": trace["passed"],
         "untraceable_engineering_fields":
             trace["untraceable_engineering_fields"],
@@ -482,10 +537,11 @@ def generate_buyer_package(
     # E11 contract: report missing links loudly
     expected = PACKAGE_FILES + ["PACKAGE_MANIFEST.json",
                                 "ENGINEERING_TRACEABILITY.json",
+                                "DEPTH_CONTRACT_EVALUATION.json",
                                 "MATURITY_BASIS.json"]
     present = {r["file"] for r in rendered} | {
         "PACKAGE_MANIFEST.json", "ENGINEERING_TRACEABILITY.json",
-        "MATURITY_BASIS.json"}
+        "DEPTH_CONTRACT_EVALUATION.json", "MATURITY_BASIS.json"}
     missing = [f for f in expected if f not in present]
     if not missing and not failed and zip_path.exists():
         zip_ok = True
@@ -505,5 +561,6 @@ def generate_buyer_package(
         "maturity": maturity["technology_maturity"],
         "posture": data["posture"],
         "traceability_passed": trace["passed"],
+        "depth_contract_passed": depth["passed"],
         "display_register": register.to_json(),
     }

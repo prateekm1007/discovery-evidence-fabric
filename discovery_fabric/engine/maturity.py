@@ -127,8 +127,13 @@ def compute_maturity(spec: Dict[str, Any], eng: Dict[str, Any],
     ]
 
     # ---------------- rung 3: PROTOTYPE_DESIGN_READY ----------------
+    # A7 vocabulary: DO 'status' records design maturity (CONCEPTUAL/
+    # PROPOSED/UNKNOWN); geometry presence is tracked by 'geometry_status'
+    # (ABSENT until a real geometry definition exists — Art. XXVIII: a
+    # concept does not promote itself to a design).
     absent_dos = [d.get("id") for d in d_outputs
-                  if d.get("status") == "ABSENT"]
+                  if str(d.get("geometry_status", "ABSENT"))
+                  .startswith("ABSENT")]
     params_without_values = [p.get("parameter") for p in
                              (core.get("critical_parameters", []) or [])
                              if "UNKNOWN" in str(p.get("value", "UNKNOWN"))

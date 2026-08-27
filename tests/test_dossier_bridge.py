@@ -198,9 +198,13 @@ def test_e3_e8_engineering_spec_and_structural_graph():
     di_ids = {d["id"] for d in eng["design_inputs"]}
     for d in eng["design_outputs"]:
         assert set(d["parent_ids"]) & di_ids
-    # honest statuses: DOs absent, verifications not tested
+    # honest statuses (A7 vocabulary): DOs are CONCEPTUAL/PROPOSED/UNKNOWN
+    # with geometry_status ABSENT (no geometry exists yet); verifications
+    # not tested
     for d in eng["design_outputs"]:
-        assert d["status"] == "ABSENT"
+        assert d["status"] in ("CONCEPTUAL", "PROPOSED", "UNKNOWN"), \
+            d["status"]
+        assert str(d.get("geometry_status", "")).startswith("ABSENT")
     for v in eng["verification_matrix"]:
         assert v["result"] == "NOT_TESTED"
     # every numeric emission is forbidden: governing model has no numbers

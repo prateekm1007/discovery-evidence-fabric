@@ -48,8 +48,15 @@ class EngineRun:
                  disabled_stages: Optional[List[str]] = None,
                  run_id: Optional[str] = None,
                  with_package: bool = True,
-                 package_number: str = "90",
+                 package_number: Optional[str] = None,
+                 package_registry_path: Optional[str] = None,
                  resume: bool = False):
+        # CEO A1: there is NO default package number. Production numbers are
+        # allocated ATOMICALLY from PACKAGE_ID_REGISTRY.json only after the
+        # survivor gate passes. `package_number` exists solely as an explicit
+        # test/sandbox override; `package_registry_path` redirects the
+        # registry for the same reason (canonical state is never touched by
+        # tests, Art. IX).
         self.problem = problem
         self.problem_id = problem.get("problem_id", "custom")
         self.run_id = run_id or f"engrun:{self.problem_id}:{utc_now()[:19]}"
@@ -62,6 +69,7 @@ class EngineRun:
         # loader by patching adapters.load_credentials (a from-import binding
         # would bypass the patch and leak live .env.keys into offline runs)
         self.credentials_loaded = _adapters.load_credentials(credentials_path)
+        self.package_registry_path = package_registry_path
         self._spec: Optional[Dict[str, Any]] = None
         self._eng: Optional[Dict[str, Any]] = None
         # Resume support: continue a killed/interrupted REAL run from the
@@ -98,7 +106,9 @@ class EngineRun:
         kwargs = dict(problem=problem, out_dir=str(d), run_id=run_id,
                       disabled_stages=disabled,
                       with_package=manifest.get("with_package", True),
-                      package_number=manifest.get("package_number", "90"),
+                      package_number=manifest.get("package_number"),
+                      package_registry_path=manifest.get(
+                          "package_registry_path"),
                       resume=True)
         kwargs.update(overrides)
         return cls(**kwargs)
@@ -122,6 +132,7 @@ class EngineRun:
             "disabled_stages": sorted(self.disabled),
             "with_package": self.with_package,
             "package_number": self.package_number,
+            "package_registry_path": self.package_registry_path,
             "credentials_loaded": self.credentials_loaded,
             "resumed": bool(self.resume),
             "started_at": utc_now(),
@@ -289,10 +300,25 @@ class EngineRun:
             self._persist("ENGINEERING_SPECIFICATION.json", eng)
             self._persist("DECISIVE_EXPERIMENT.json",
                           select_decisive_experiment(self.env))
+            # CEO A1: resolve the package identity through the canonical
+            # registry — AFTER the survivor gate, so non-survivor runs burn
+            # no number. An explicit self.package_number is a test-only
+            # override; production allocation is registry-driven.
+            invention_id = (spec.get("invention_id") or {}).get("value")
+            if self.package_number is None:
+                from .package_registry import allocate
+                row = allocate(
+                    invention_id, self.run_id,
+                    parent_invention_id=run_ctx.get("parent_invention_id"),
+                    registry_path=self.package_registry_path)
+                pkg_number = row["portfolio_number"]
+                run_ctx = dict(run_ctx, package_registry_row=row)
+            else:
+                pkg_number = self.package_number
             self.package_report = generate_buyer_package(
                 str(self.out), spec, eng, self.env,
                 {"run_id": self.run_id,
-                 "package_number": self.package_number},
+                 "package_number": pkg_number},
                 rehearsal=self.rehearsal)
             self._persist("PACKAGE_REPORT.json",
                           {k: v for k, v in self.package_report.items()
@@ -304,6 +330,12 @@ class EngineRun:
                     "package incomplete: "
                     f"missing={self.package_report.get('missing_links')} "
                     f"failed={self.package_report.get('failed')}")
+            elif self.package_number is None:
+                # the allocated identity is now a RELEASED package
+                # (registry is append-only; the transition is recorded)
+                from .package_registry import mark_released
+                mark_released(invention_id,
+                              registry_path=self.package_registry_path)
         except Exception as exc:  # noqa: BLE001 — explicit, never fabricated
             self.package_failure = f"{type(exc).__name__}: {exc}"
             self._persist("PACKAGE_FAILED.json", {
@@ -418,8 +450,10 @@ def main():
     ap.add_argument("--resume", action="store_true",
                     help="resume an interrupted run from its persisted "
                          "stage snapshots (completed stages are NOT re-run)")
-    ap.add_argument("--package-number", default="90",
-                    help="portfolio number prefix for the generated package")
+    ap.add_argument("--package-registry", default=None,
+                    help="redirect the PACKAGE_ID_REGISTRY path (sandbox/"
+                         "testing only; production uses the canonical "
+                         "registry — CEO A1 forbids hardcoded numbers)")
     args = ap.parse_args()
 
     problem: Dict[str, Any]
@@ -440,13 +474,13 @@ def main():
             raise SystemExit("--resume requires --out <run dir>")
         run = EngineRun.from_run_dir(args.out,
                                      with_package=not args.no_package,
-                                     package_number=args.package_number)
+                                     package_registry_path=args.package_registry)
     else:
         out = args.out or str(REPO_ROOT / "ENGINE_RUNS"
                               / f"{problem.get('problem_id','custom')}_{utc_now()[:19].replace(':','')}")
         run = EngineRun(problem, out, disabled_stages=disabled,
                         with_package=not args.no_package,
-                        package_number=args.package_number)
+                        package_registry_path=args.package_registry)
     manifest = run.run()
     print(canonical_json(manifest))
     return 0

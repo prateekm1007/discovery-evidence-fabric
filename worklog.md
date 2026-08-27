@@ -5540,6 +5540,7 @@ Stage Summary:
 - Acceptance table: F_SERIES_ACCEPTANCE.json (all AUTOMATED_* = PASS; all ZERO_* = 0).
 - Remaining honest gaps (unchanged): REAL_LOOP_VERIFIED=FALSE (needs gated external reality event through learning_loop), real buyer, physical experiment — the machine is ready for that data (Art. XXXVII/XXXVIII posture).
 
+
 ---
 Task ID: ONBOARDING-R1
 Agent: main (new coder, Super Z)
@@ -5558,3 +5559,28 @@ Work Log:
 Stage Summary:
 - New session fully onboarded: dev repo healthy at 162ca5d, portfolio frozen at 2e96b27 with 0 drift, suite baseline reproduced identically.
 - Awaiting CEO direction per handoff section 13 step 4 (do NOT start coding without explicit direction). Known live options: (a) real buyer engagement / feedback ingestion loop (handoff section 11), (b) V3 mutation on real external evidence, (c) re-provision LLM keys to unblock live E2E (F_SMOKE pattern), (d) STOP CODING posture remains default per Art. XXXIV.
+
+---
+Task ID: 7
+Agent: main (new coder, Super Z)
+Task: CEO A-SERIES DIRECTIVE (A1-A12) — prove automatic DOSSIER-GRADE generation at scale: quality equivalence with the frozen 15, not mere plumbing.
+
+Work Log:
+- Constitution v1.8.0 re-read in full FIRST; git state verified per Art. XXII/XXIII (HEAD=162ca5d=ls-remote; sandbox mode-flip artifact neutralized via core.fileMode=false, zero content drift).
+- A1 package_registry.py: canonical PACKAGE_ID_REGISTRY.json (rows 01-15 seeded FROZEN_EXTERNAL), atomic flock+os.replace allocation, unique/never-reused portfolio_number/package_id/invention_id, exact CEO row contract, allocation post-survivor-gate only, mark_released transition, sandbox path injection for tests. ALL hardcoded "90" defaults removed from run.py/package_factory (signature default None; no default number exists; CLI --package-number removed, --package-registry sandbox flag added).
+- A2 depth_contract.py: ENGINEERING_DEPTH_CONTRACT — all 20 CEO sections, per-section {item_count>=minimum, invention_tied (mechanical: token hits / explicit linkage records / spec-derived), tie_evidence}; HARD GATE in generate_buyer_package (below-benchmark or untied content => PackageBuildError BEFORE any file); DEPTH_CONTRACT_EVALUATION.json ships inside every package. New eng blocks: interfaces/regulatory/kill_condition/buyer_diligence/investment_ladder.
+- A3 reasoning_chain.py: CLAIM->ENGINEERING_PRINCIPLE->EQUATION_MODEL->INPUT->ASSUMPTION->OUTPUT->FAILURE_MODE->VERIFICATION chains for every major statement (equations+parameters+failure modes); every node carries epistemic_class+provenance(origin_stage,evidence_ids,refs); 24 chains/192 nodes on the capstone package.
+- A4: domains.py modules extended (why_this_domain_basis, model_applicability, model_assumptions, structured failure_mode_detail, manufacturing_routes); equations.select_equations now judges APPLICABLE/CONDITIONAL/REJECTED per equation against THE ACTUAL invention (variable engagement + assumption violation scan); REJECTED equations excluded from governing model, recorded with reasons (Poiseuille correctly rejected for a turbulent non-newtonian invention). detect_domain: word-boundary matching for short signals (kills 'sar'-in-'sarcoma' false positives), EMC/EMI vocabulary added (rf_wireless), all 11 domains now carry >=3 sourced textbook equations (energy_harvesting ENH-001..003 added, no invented numbers).
+- A5: critical parameters are full 12-field records (parameter_id..verification_method) with 5 value statuses, deterministic parameter->equation symbol/unit linkage, invention_tie records; no naked numbers.
+- A6: failure analysis is invention-specific — domain modules contribute physical {mode, physical_mechanism, trigger, detectability, severity_basis, design_control_direction, applicability_signals}; each row TIED/NOT_ESTABLISHED via exact-token evaluation; attack dimensions keep verdicts with honest NOT ESTABLISHED physical mechanisms; 9-field CEO shape incl. validation NOT_PERFORMED + kill_condition.
+- A7 design_outputs.py: compiler emitting all 8 kinds (architecture_block/component_relationship/interface/geometry_requirement/parameter_range/control_logic/data_flow/test_fixture) with CONCEPTUAL/PROPOSED/UNKNOWN vocabulary + geometry_status=ABSENT honesty invariant; every DO keeps a parent DI (E8 structural rule preserved).
+- A8 benchmark_corpus.py: the frozen 15 reduced to 12 measurable dimensions (floor=min, target=median, per-file sha256 provenance) -> canonical BENCHMARK_DEPTH_CONTRACT.json committed.
+- A9/A10/A11 tests/test_a_series_integration.py: 15 distinct survivors -> 15 complete packages (registry-allocated unique ids), 15/15 meet EVERY benchmark floor (same meters both sides), zero cross-package contamination, every traceability claim row stamped invention_id+candidate_id+evidence_ids, REASONING_CHAIN claims included in traceability.
+- A12 REAL CAPSTONE scripts/a12_capstone_run.py: p01 (Cardiac Pacemaker battery depletion) through the ENTIRE system with zero manual intervention: real EuropePMC retrieval (5 custodied) -> real LLM synthesis -> VERIFY -> PRIOR_ART -> ATTACK -> SURVIVOR -> INVENTION_SPEC -> ENGINEERING_SPEC -> DOSSIER (frozen v4 builders) -> BUYER_PACKAGE+ZIP -> DISCOVERY_RELEASE. Package 35 RELEASED (canonical registry): depth 20/20, benchmark floors PASS, A12 reader-readiness 9/9 (what/why/engineering/failures/measurements/kill/receives/builds/next-experiment). A_SERIES_ACCEPTANCE.json committed: 5x AUTOMATIC_*=PASS, REAL_AUTONOMOUS_RUN=DISCOVERY+INVENTION+ENGINEERING+DOSSIER+BUYER_PACKAGE.
+- Honest kills recorded: mistral-small synthesis candidates for p01-p08 REJECTED by the attack (unsupported_mechanism/weak_transfer) — cemetery-grade negative knowledge; their allocated numbers stay consumed (no reuse, A1). LLM transport hardened: ENGLISH-ONLY system directive (CEO rule), EmptyContentWithFinish(finish_reason) same-provider retry with recorded retry_notes (no silent substitution).
+- Suite: 839 passed / 2 skipped live-gated / 2 pre-existing environmental failures (patSnap rate-limit NO_KEY; secret-scanning hits in historical CANONICAL_STATE/R354/R358/worklog files — none in changed files, verified pre-existing).
+- Pushed via scripted git ops; ls-remote verified. Portfolio repo untouched (frozen 2e96b27). Quarantine intact. No keys committed (.env.keys untracked).
+
+Stage Summary:
+- ACCEPTANCE MET: AUTOMATIC_DISCOVERY_TO_INVENTION / AUTOMATIC_INVENTION_TO_ENGINEERING / AUTOMATIC_ENGINEERING_TO_DOSSIER / AUTOMATIC_DOSSIER_TO_BUYER_PACKAGE / AUTOMATIC_PACKAGE_TO_ZIP = PASS; 15/15 benchmark depth; 15/15 package isolation; 15/15 traceability; 0 fabricated facts / 0 unsupported numbers / 0 material truncation / 0 cross-package contamination / 0 orphan critical design inputs / 0 untraceable claims. REAL_AUTONOMOUS_RUN = DISCOVERY+INVENTION+ENGINEERING+DOSSIER+BUYER_PACKAGE, proven end-to-end.
+- Honest remaining gaps unchanged: REAL_LOOP_VERIFIED=FALSE (needs a gated external reality event), real buyer signature, physical experiment data.
