@@ -1,0 +1,66 @@
+{
+  "audit_type": "AI_ENGINEERING_ATTACK",
+  "instructions": "The consultant must attack the AI-generated engineering content itself. These questions determine whether the engineering is genuine or AI-generated filler.",
+  "questions": [
+    {
+      "id": "AEQ-01",
+      "question": "Which engineering statements are genuinely source-backed?",
+      "what_to_check": "Each claim should trace to an external source (FDA, PubMed, ISO standard, published literature). Statements without source backing should be classified AI_INFERENCE or UNKNOWN.",
+      "expected_failure": "Some statements may claim EXTERNAL_PRECEDENT without actual source URL or citation"
+    },
+    {
+      "id": "AEQ-02",
+      "question": "Which are external precedent?",
+      "what_to_check": "External precedent should cite specific FDA-cleared devices, published papers, or patent documents — not generic 'standard practice'",
+      "expected_failure": "Some citations may be too generic (e.g., 'published literature' without specific reference)"
+    },
+    {
+      "id": "AEQ-03",
+      "question": "Which are model-derived?",
+      "what_to_check": "Model-derived values should reference R332 or specific computational model with documented parameters",
+      "expected_failure": "Some MODELLED values may lack derivation documentation"
+    },
+    {
+      "id": "AEQ-04",
+      "question": "Which are engineering proposals?",
+      "what_to_check": "ENGINEERING_PROPOSED values should have basis_ids and derivation fields per R370D",
+      "expected_failure": "Some proposals may lack basis_ids (required by R370D evidence class schema)"
+    },
+    {
+      "id": "AEQ-05",
+      "question": "Which appear unsupported?",
+      "what_to_check": "Any numerical value without evidence_class or with UNKNOWN evidence_class but containing numbers",
+      "expected_failure": "R370C should have caught these, but consultant should independently verify"
+    },
+    {
+      "id": "AEQ-06",
+      "question": "Which numbers cannot be independently traced?",
+      "what_to_check": "Every number in the dossier should be in ENGINEERING_NUMBER_REGISTER.json or explicitly UNKNOWN. Consultant should spot-check 5-10 numbers per package.",
+      "expected_failure": "Some numbers may be in the dossier but not in the register"
+    },
+    {
+      "id": "AEQ-07",
+      "question": "Which standards are wrongly applied?",
+      "what_to_check": "Each standard should be in ENGINEERING_STANDARD_REGISTER.json with correct applicability. Consultant should verify ISO 7197 (not ISO 7437), ISO 10993 series, IEC 60601, etc.",
+      "expected_failure": "Some standards may have wrong applicability_basis (e.g., IEC 60601 applied to passive device)"
+    },
+    {
+      "id": "AEQ-08",
+      "question": "Which CAD/drawings are merely illustrations?",
+      "what_to_check": "All packages should have engineering_artifact_status = CONCEPTUAL or ABSENT. No package should claim RELEASED_FOR_PROTOTYPE or higher without actual artifact.",
+      "expected_failure": "All should be CONCEPTUAL — any higher is a fabrication"
+    },
+    {
+      "id": "AEQ-09",
+      "question": "Which BOM items are speculative?",
+      "what_to_check": "BOM items with 'UNKNOWN' material or 'UNKNOWN' supplier are speculative. Consultant should count how many BOM items are fully specified vs UNKNOWN.",
+      "expected_failure": "Most BOM items likely have UNKNOWN material/supplier (correct honest state)"
+    },
+    {
+      "id": "AEQ-10",
+      "question": "Which manufacturing statements are generic?",
+      "what_to_check": "Manufacturing statements should NOT contain '±0.05mm typical' or 'Standard X process'. All should say 'UNKNOWN — process capability to be established'.",
+      "expected_failure": "R370C should have caught these, but consultant should independently verify"
+    }
+  ]
+}

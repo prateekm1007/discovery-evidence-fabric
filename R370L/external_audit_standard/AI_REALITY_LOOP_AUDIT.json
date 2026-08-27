@@ -1,0 +1,122 @@
+{
+  "audit_type": "AI_REALITY_LOOP_AUDIT",
+  "instructions": "The consultant must inspect the AI reality-loop infrastructure and distinguish: IMPLEMENTED (code exists) / REHEARSED (controlled test passed) / REAL (actual real-world event). Never award REAL merely because the software path exists.",
+  "loop_stages_to_audit": [
+    {
+      "stage": "REALITY_EVENT_INGESTION",
+      "implemented": true,
+      "rehearsed": true,
+      "real": false,
+      "evidence_implemented": "R370H: 4 ingestion methods (FILE_UPLOAD, OBJECT_STORAGE, API_PAYLOAD, SFTP_TRANSFER)",
+      "evidence_rehearsed": "R370H gate: ingestion test passed",
+      "evidence_real": "None — 0 real events ingested",
+      "consultant_must_verify": "Check that ingestion boundary exists and works"
+    },
+    {
+      "stage": "PROVENANCE_VALIDATION",
+      "implemented": true,
+      "rehearsed": true,
+      "real": false,
+      "evidence_implemented": "R370H: validate_provenance() with 6-step validation chain",
+      "evidence_rehearsed": "R370H gate: provenance derivation test passed",
+      "evidence_real": "None — 0 real events to validate",
+      "consultant_must_verify": "Check that provenance_valid is derived, not input"
+    },
+    {
+      "stage": "EVIDENCE_CLASSIFICATION",
+      "implemented": true,
+      "rehearsed": true,
+      "real": false,
+      "evidence_implemented": "R370F: 5-layer evidence classification (SOURCE_FACT / EXTERNAL_PRECEDENT / AI_INFERENCE / COMPUTATIONAL_RESULT / PHYSICAL_OBSERVATION)",
+      "evidence_rehearsed": "R370F gate: evidence class validation passed",
+      "evidence_real": "None — 0 PHYSICAL_OBSERVATION entries",
+      "consultant_must_verify": "Check that AI cannot create PHYSICAL_OBSERVATION"
+    },
+    {
+      "stage": "BELIEF_UPDATE",
+      "implemented": true,
+      "rehearsed": true,
+      "real": false,
+      "evidence_implemented": "R370I: capture_loop_snapshot() with before/after state hashes",
+      "evidence_rehearsed": "R370I gate: state diff test passed",
+      "evidence_real": "None — no real events to trigger belief update",
+      "consultant_must_verify": "Check that belief update requires state change (no silent mutation)"
+    },
+    {
+      "stage": "KNOWLEDGE_ATOM",
+      "implemented": true,
+      "rehearsed": true,
+      "real": false,
+      "evidence_implemented": "R370I: prove_knowledge_causality() distinguishes CAUSAL vs NON_CAUSAL",
+      "evidence_rehearsed": "R370I gate: knowledge causality test passed",
+      "evidence_real": "None — 0 real knowledge atoms",
+      "consultant_must_verify": "Check that KNOWLEDGE_NON_CAUSAL is possible (not all knowledge claims learning)"
+    },
+    {
+      "stage": "EIG_CHANGE",
+      "implemented": true,
+      "rehearsed": true,
+      "real": false,
+      "evidence_implemented": "R370I: record_experiment_priority_diff() with EIG before/after",
+      "evidence_rehearsed": "R370I gate: experiment priority diff test passed",
+      "evidence_real": "None — no real EIG changes",
+      "consultant_must_verify": "Check that EIG change links to triggering knowledge atom"
+    },
+    {
+      "stage": "EXPERIMENT_CHANGE",
+      "implemented": true,
+      "rehearsed": true,
+      "real": false,
+      "evidence_implemented": "R370I: experiment_priority_diff with rank change",
+      "evidence_rehearsed": "R370I gate: experiment mutation test passed",
+      "evidence_real": "None — no real experiment changes",
+      "consultant_must_verify": "Check that experiment change has reason_for_change"
+    },
+    {
+      "stage": "PACKAGE_V2",
+      "implemented": true,
+      "rehearsed": true,
+      "real": false,
+      "evidence_implemented": "R370I: package_mutation_hash in REAL_LOOP_CERTIFICATE",
+      "evidence_rehearsed": "R370I gate: package mutation test passed",
+      "evidence_real": "None — no real package mutations (HUMAN_AUTHORIZATION_REQUIRED)",
+      "consultant_must_verify": "Check that package mutation requires human authorization"
+    },
+    {
+      "stage": "DISCOVERY_CHANGE",
+      "implemented": true,
+      "rehearsed": true,
+      "real": false,
+      "evidence_implemented": "R370I: prove_discovery_mutation() with candidate set diff",
+      "evidence_rehearsed": "R370I gate: discovery mutation test passed",
+      "evidence_real": "None — no real discovery changes",
+      "consultant_must_verify": "Check that discovery change has causal link to knowledge atom"
+    },
+    {
+      "stage": "REAL_LOOP_CERTIFICATE",
+      "implemented": true,
+      "rehearsed": true,
+      "real": false,
+      "evidence_implemented": "R370I: generate_r370i_real_loop_certificate() with 10-stage acceptance",
+      "evidence_rehearsed": "R370I gate: certificate generation test passed; controlled rehearsal: SYNTHETIC_REHEARSAL=TRUE, REAL_LOOP_VERIFIED=FALSE",
+      "evidence_real": "None — REAL_LOOP_VERIFIED = FALSE (derived; 0 real events)",
+      "consultant_must_verify": "Check that REAL_LOOP_CERTIFICATE cannot be created for CONTROLLED_REHEARSAL"
+    },
+    {
+      "stage": "INDEPENDENT_REPLAY",
+      "implemented": true,
+      "rehearsed": true,
+      "real": false,
+      "evidence_implemented": "R370I: independent_replay_r370i() reconstructs from certificate without narrative",
+      "evidence_rehearsed": "R370I gate: independent replay test passed; tampered certificate rejected",
+      "evidence_real": "None — no real certificates to replay",
+      "consultant_must_verify": "Check that replay rejects tampered certificates"
+    }
+  ],
+  "summary": {
+    "IMPLEMENTED": 11,
+    "REHEARSED": 11,
+    "REAL": 0,
+    "note": "All loop stages are implemented and rehearsed. None are real. REAL_LOOP_VERIFIED = FALSE."
+  }
+}
