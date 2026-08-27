@@ -1,0 +1,120 @@
+{
+  "calculation_type": "INDEPENDENT_REVIEW_CALCULATIONS",
+  "generated_at": "2026-08-27T09:26:37Z",
+  "calculations": {
+    "P-15-R1": {
+      "calculation_type": "PIEZOELECTRIC_POWER_BUDGET",
+      "consultant_claim": "25.6 nW for 0.5 cm3 PVDF at 50 microstrain — kill condition (100 nW) likely triggered",
+      "independent_review": {
+        "inputs": {
+          "material": "PVDF",
+          "d33": "33 pC/N (published — confirmed)",
+          "g33": "0.24 Vm/N (published — confirmed)",
+          "epsilon_r": "12 (published — confirmed)",
+          "strain_assumption": "50 microstrain — NOT INDEPENDENTLY SOURCED",
+          "volume": "0.5 cm3 — assumed implant volume",
+          "stress_derivation": "sigma = E * strain where E = 2-3 GPa for PVDF. At 50 microstrain: sigma = 100-150 kPa. Consultant used 100 kPa — within range.",
+          "power_density_formula": "P = (d33^2 * sigma^2 * omega * V) / (2 * epsilon) — frequency-dependent",
+          "missing_parameters": [
+            "frequency of CSF pulsation",
+            "electrical loading condition",
+            "coupling coefficient under load",
+            "rectification efficiency"
+          ]
+        },
+        "assessment": "The consultant's calculation is arithmetically consistent with the stated inputs, but the key input (50 microstrain) is not independently sourced. CSF pulsation strain at the catheter wall depends on anatomical location, CSF pulse pressure amplitude, and catheter wall compliance. Published measurements of catheter-wall strain in vivo are not readily available in the report.",
+        "classification": "PLAUSIBLE_BUT_NOT_INDEPENDENTLY_REPRODUCIBLE",
+        "what_is_needed": "Published in-vivo catheter strain measurements or finite-element simulation with sourced boundary conditions. Without this, the kill-condition conclusion is a hypothesis, not a proven fact.",
+        "consultant_conclusion_review": "The consultant's conclusion 'kill condition likely triggered' is directionally reasonable but stated with more confidence than the calculation supports. The correct disposition is: 'PVDF power budget is marginal at assumed strain levels; empirical strain measurement required before kill-condition determination.'"
+      }
+    },
+    "P-16": {
+      "calculation_type": "NIR_TISSUE_TRANSMISSION_AND_POWER_TARGET",
+      "consultant_claim": "500 mW is a unit error; 28-61% tissue transmission at 5mm; correct target likely 500 microW",
+      "independent_review": {
+        "tissue_transmission": {
+          "formula": "Beer-Lambert: T = exp(-mu_eff * d)",
+          "mu_eff_range": "1.0-2.5 cm-1 for soft tissue at 940nm (Jacques 2013 — confirmed)",
+          "at_5mm_mu_eff_1": "T = exp(-0.5) = 60.7% — CONFIRMED",
+          "at_5mm_mu_eff_2_5": "T = exp(-1.25) = 28.7% — CONFIRMED",
+          "caveat": "Skull bone has higher scattering coefficient. If the 5mm path includes skull, transmission is significantly lower. The dossier should specify tissue composition."
+        },
+        "power_target_assessment": {
+          "dossier_claim": ">=500 mW",
+          "incident_irradiance": "~1-1.4 mW/cm2 at PV surface (per dossier)",
+          "pv_efficiency": "~30% (PMC5646820 — confirmed for GaAs at 850nm)",
+          "area_for_500mW": "500 mW / (1 mW/cm2 * 30%) = 1667 cm2 — physically impossible",
+          "area_for_500_microW": "500 microW / (1 mW/cm2 * 30%) = 1.67 cm2 — physically plausible for a catheter-scale PV cell",
+          "classification": "500 mW = CONFIRMED_AS_UNIT_ERROR. 500 microW = PLAUSIBLE_HYPOTHESIS but NOT ESTABLISHED from original source.",
+          "consultant_error": "The consultant correctly identified the unit error but then asserted '500 microW is almost certainly correct' — this is speculation. The correct value must be confirmed from the original dossier source or experimental specification."
+        }
+      }
+    },
+    "P-21-R1": {
+      "calculation_type": "UWB_TOA_ACCURACY_VS_SAR",
+      "consultant_claim": "sigma_TOA = 21.4mm, position error = 42.7mm — kill condition (<5mm) triggered",
+      "independent_review": {
+        "crlb_formula": "sigma_TOA >= c / (2*pi*beta*sqrt(2*SNR)) — CORRECT (Cramer-Rao Lower Bound)",
+        "at_beta_500MHz_SNR_10dB": "sigma_TOA = 3e8 / (2*pi*5e8*sqrt(20)) = 3e8 / (2*pi*5e8*4.47) = 3e8 / 1.404e10 = 0.0214 m = 21.4 mm — CONFIRMED",
+        "position_error_GDOP_2": "42.7 mm — CONFIRMED",
+        "snr_assessment": "SNR=10dB is assumed, not independently derived. Actual SNR depends on: transmit power (SAR-constrained), tissue attenuation (60-80 dB at 5-10 GHz through 5+ cm), receiver sensitivity, processing gain, antenna efficiency. The SNR assumption is the critical unverified input.",
+        "classification": "ARITHMETICALLY_CORRECT_BUT_SNR_UNVERIFIED",
+        "what_is_needed": "Complete link budget with sourced tissue attenuation, SAR-constrained transmit power, receiver noise figure, and processing gain. Without this, the kill-condition conclusion is a hypothesis based on an assumed SNR."
+      }
+    },
+    "P-28": {
+      "calculation_type": "ACOUSTIC_IMPEDANCE_CONTRAST",
+      "consultant_claim": "Z ratio 1.039-1.072 for tissue/CSF — kill condition (<1.1) triggered",
+      "independent_review": {
+        "impedance_values": {
+          "CSF": "1.52 MRayl — published, confirmed",
+          "brain_tissue": "1.58 MRayl — published, confirmed",
+          "fibrous_debris": "~1.63 MRayl — estimated, not independently sourced",
+          "air": "0.0004 MRayl — published, confirmed",
+          "bone": "7.8 MRayl — published, confirmed"
+        },
+        "ratio_calculation": {
+          "brain_to_CSF": "1.58/1.52 = 1.039 — CONFIRMED",
+          "debris_to_CSF": "1.63/1.52 = 1.072 — CONFIRMED (if debris Z is correct)"
+        },
+        "reflection_coefficient": {
+          "formula": "R = (Z2-Z1)/(Z2+Z1)",
+          "brain_CSF": "R = (1.58-1.52)/(1.58+1.52) = 0.06/3.10 = 0.019 = 1.9% — very low reflection",
+          "debris_CSF": "R = (1.63-1.52)/(1.63+1.52) = 0.11/3.15 = 0.035 = 3.5% — very low reflection"
+        },
+        "assessment": "The impedance values and ratio calculations are arithmetically correct. However, the conclusion 'kill condition triggered' is too strong because: (1) the dossier's kill condition may not be defined solely by impedance ratio; (2) acoustic detection depends on frequency, transducer geometry, coupling, scattering, attenuation, interface geometry, signal processing, clutter, and placement; (3) the reflection coefficient (1.9-3.5%) is low but not zero — detectability depends on system noise floor and signal processing.",
+        "classification": "PARTIALLY_CONFIRMED — impedance contrast is low but kill-condition determination requires the dossier's actual detection model, not just impedance ratio.",
+        "corrected_framing": "The current simplified model provides insufficient contrast evidence for tissue obstruction. A frequency-dependent phantom experiment is required. Do not automatically classify as 'killed.'"
+      }
+    },
+    "P-29": {
+      "calculation_type": "MR_SNR_AT_CATHETER_SCALE",
+      "consultant_claim": "SNR ~4.2 at 0.5T — kill condition (SNR>10) triggered",
+      "independent_review": {
+        "snr_scaling": "SNR proportional to B0 * sqrt(N_avg * V_voxel) / sqrt(BW) — first-order approximation, CONFIRMED as a scaling relationship",
+        "calculation": {
+          "B0_ratio": "0.5T/3T = 0.167 — CONFIRMED",
+          "voxel_ratio": "62.8 mm3 / 1000 mm3 = 0.0628; sqrt = 0.251 — CONFIRMED",
+          "SNR_ratio": "0.167 * 0.251 = 0.042 — CONFIRMED",
+          "SNR_catheter": "0.042 * 100 = 4.2 — CONFIRMED (given the assumed clinical SNR of 100)"
+        },
+        "missing_parameters": [
+          "receive-coil geometry (solenoid vs saddle vs surface)",
+          "filling factor (coil-to-sample coupling)",
+          "Q factor (coil quality factor)",
+          "sequence (spin echo, gradient echo, phase contrast)",
+          "bandwidth",
+          "relaxation (T1, T2 of CSF at catheter-scale B0)",
+          "flow-encoding parameters",
+          "gradient strength",
+          "reconstruction algorithm",
+          "susceptibility artifacts at catheter material interfaces",
+          "actual measurement voxel (may differ from anatomical voxel)"
+        ],
+        "assessment": "The SNR scaling is a first-order approximation. The actual SNR could differ by an order of magnitude in either direction depending on coil design and sequence optimization. The consultant's conclusion 'kill condition triggered' is too strong.",
+        "classification": "PARTIALLY_CONFIRMED — scaling relationship is correct but the simplified model ignores multiple material parameters that could change the outcome.",
+        "corrected_framing": "The simplified SNR model indicates significant feasibility risk. An empirical benchtop SNR experiment is required before committing to catheter-scale development."
+      }
+    }
+  }
+}

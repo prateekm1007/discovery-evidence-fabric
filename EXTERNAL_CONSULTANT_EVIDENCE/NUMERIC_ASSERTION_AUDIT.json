@@ -1,0 +1,138 @@
+{
+  "audit_type": "NUMERIC_ASSERTION_AUDIT",
+  "generated_at": "2026-08-27T09:26:37Z",
+  "assertions": [
+    {
+      "number": "30-50% obstruction failure rate",
+      "consultant_usage": "P01, P04 — foundational problem statement",
+      "source_claimed": "HCUP/AHRQ",
+      "source_verified": false,
+      "literature_check": {
+        "adult_systematic_review": "Reddy et al. (2023) found obstruction accounted for ~23.2% of adult shunt failures (PubMed 37004137)",
+        "pediatric_trial": "Randomized trial reported obstruction in ~31.4% of children reaching shunt endpoint",
+        "overall_failure_rate": "40-50% at 1-2 years (PubMed 42490332)",
+        "consultant_conflation": "Consultant appears to have blurred total shunt-failure incidence (40-50%) with the fraction attributable to obstruction (~23-31%)"
+      },
+      "classification": "INCORRECT_AS_STATED",
+      "corrected_statement": "Obstruction is a major cause of shunt failure, accounting for approximately 23% (adult) to 31% (pediatric) of failures. Overall shunt failure rates are 40-50% at 1-2 years. The 30-50% figure conflates these two distinct statistics.",
+      "evidence_sources": [
+        "PubMed 37004137 (adult systematic review)",
+        "PubMed 42490332 (imaging review)"
+      ]
+    },
+    {
+      "number": "25.6 nW (PVDF piezoelectric power)",
+      "consultant_usage": "P07 — kill condition calculation",
+      "source_claimed": "Independent calculation",
+      "source_verified": false,
+      "calculation_inputs": {
+        "d33": "33 pC/N (PVDF)",
+        "g33": "0.24 Vm/N",
+        "strain": "50 microstrain (estimated)",
+        "volume": "0.5 cm3",
+        "stress_derived": "100 kPa",
+        "power_density": "51.3 microW/cm3"
+      },
+      "classification": "PLAUSIBLE_BUT_UNVERIFIED",
+      "issue": "Calculation inputs (50 microstrain, stress derivation, coupling efficiency, electrical loading) are not independently sourced. The strain estimate is stated as 'conservative physiologic' without citation. The calculation is not reproducible from the report alone.",
+      "corrected_statement": "The PVDF power calculation is directionally plausible but requires an auditable calculation sheet with sourced strain measurements, coupling assumptions, and electrical loading before the kill-condition conclusion can be accepted."
+    },
+    {
+      "number": "3.8 microW (PZT piezoelectric power)",
+      "consultant_usage": "P07 — alternative material calculation",
+      "source_claimed": "Linear scaling from PVDF",
+      "source_verified": false,
+      "classification": "UNSUPPORTED",
+      "issue": "PZT power may not scale linearly from PVDF merely because d33 is larger. Coupling coefficient, dielectric constant, and mechanical compliance all differ. The 150x scaling factor is not justified.",
+      "corrected_statement": "PZT power estimate requires independent calculation, not linear scaling from PVDF."
+    },
+    {
+      "number": "500 mW (P-16 power target)",
+      "consultant_usage": "P08 — unit error finding",
+      "source_claimed": "Dossier DI-003",
+      "source_verified": true,
+      "classification": "CONFIRMED_AS_UNIT_CONCERN",
+      "issue": "500 mW is physically inconsistent with the cited irradiance (~1 mW/cm2) and catheter-scale PV area. However, the consultant's claim that '500 microW is almost certainly correct' is itself speculation — the correct value has not been established from the original source.",
+      "corrected_statement": "500 mW = UNSUPPORTED / LIKELY UNIT ERROR. 500 microW = HYPOTHESIS TO BE CONFIRMED FROM ORIGINAL DOSSIER SOURCE. Do not silently replace one number with another."
+    },
+    {
+      "number": "$5-15M (P-13 clinical program cost)",
+      "consultant_usage": "P06 — economic estimate",
+      "source_claimed": "Consultant estimate",
+      "source_verified": false,
+      "classification": "UNSUPPORTED",
+      "issue": "No basis provided. May be directionally plausible depending on study design, patient population, implantable sensors, duration, site count, and event rate. This is precisely the type of false precision the system was designed to prevent.",
+      "corrected_statement": "PRELIMINARY_ECONOMIC_ESTIMATE — basis required, range assumptions required, quote required. Not a canonical fact."
+    },
+    {
+      "number": "42.7mm (P-21-R1 UWB position error)",
+      "consultant_usage": "P09 — CRLB calculation",
+      "source_claimed": "Independent CRLB calculation",
+      "source_verified": false,
+      "calculation_inputs": {
+        "formula": "sigma_TOA >= c / (2*pi*beta*sqrt(2*SNR))",
+        "beta": "500 MHz",
+        "SNR": "10 dB",
+        "GDOP": "2",
+        "sigma_TOA_result": "21.4 mm",
+        "position_error_result": "42.7 mm"
+      },
+      "classification": "REPRODUCIBLE",
+      "issue": "The CRLB formula is correct and the arithmetic is reproducible. However, the SNR=10dB assumption is not independently justified — actual SNR depends on tissue attenuation, transmit power, receiver sensitivity, and processing gain, none of which are independently sourced.",
+      "corrected_statement": "CRLB calculation is arithmetically correct but depends on unverified SNR assumption. The kill-condition conclusion requires a complete link budget with sourced tissue attenuation and SAR-constrained transmit power."
+    },
+    {
+      "number": "Z ratio 1.039-1.072 (P-28 acoustic impedance)",
+      "consultant_usage": "P14 — kill condition calculation",
+      "source_claimed": "Published acoustic impedance data",
+      "source_verified": false,
+      "calculation_inputs": {
+        "Z_CSF": "1.52 MRayl",
+        "Z_brain": "1.58 MRayl",
+        "Z_debris": "~1.63 MRayl",
+        "ratio_brain": "1.039",
+        "ratio_debris": "1.072",
+        "kill_threshold": "1.1"
+      },
+      "classification": "PARTIALLY_CONFIRMED",
+      "issue": "The impedance values are from published literature and the ratios are arithmetically correct. However, the conclusion 'kill condition triggered' is too strong. Acoustic detection depends on frequency, transducer geometry, coupling, scattering, attenuation, interface geometry, reflection coefficient, signal processing, clutter, and placement — not just impedance ratio. The dossier's kill condition may not be defined solely by impedance ratio.",
+      "corrected_statement": "The simplified impedance model provides insufficient contrast evidence for tissue obstruction. A frequency-dependent phantom experiment is required. Do not automatically classify as 'killed' — reframe as 'feasibility risk requiring empirical test.'"
+    },
+    {
+      "number": "SNR ~4.2 at 0.5T (P-29 MR flow sensor)",
+      "consultant_usage": "P15 — kill condition calculation",
+      "source_claimed": "Independent SNR scaling calculation",
+      "source_verified": false,
+      "calculation_inputs": {
+        "formula": "SNR proportional to B0 * sqrt(V_voxel)",
+        "B0_catheter": "0.5T",
+        "B0_clinical": "3T",
+        "V_catheter": "62.8 mm3",
+        "V_clinical": "1000 mm3",
+        "SNR_clinical_ref": "100",
+        "SNR_catheter_result": "4.2"
+      },
+      "classification": "PARTIALLY_CONFIRMED",
+      "issue": "The SNR scaling formula is a first-order approximation but ignores receive-coil geometry, filling factor, Q factor, sequence, bandwidth, relaxation, flow-encoding parameters, gradient strength, reconstruction, susceptibility, catheter material, and actual measurement voxel. The kill-condition conclusion is too strong.",
+      "corrected_statement": "The simplified SNR model indicates significant feasibility risk. An empirical benchtop SNR experiment is required before committing to catheter-scale development. Do not classify as 'killed' — classify as 'high-risk requiring decisive experiment.'"
+    },
+    {
+      "number": "16% (P-01 svMultiPhysics error)",
+      "consultant_usage": "P01 — model accuracy assessment",
+      "source_claimed": "Dossier text",
+      "source_verified": true,
+      "classification": "CONFIRMED_BUT_UNDERCONTEXTUALIZED",
+      "issue": "16% error is noted but not contextualized. Error relative to what measurement range? For what output variable? A model can have 16% error on one variable and still be useful for another decision.",
+      "corrected_statement": "16% model error requires specification of: validation variable, reference experiment, N, error metric, confidence interval, operating range, and decision sensitivity before it can be used as evidence against the technology."
+    },
+    {
+      "number": "$5K / $25K / $100K (investment ladder)",
+      "consultant_usage": "Portfolio-wide — transaction recommendations",
+      "source_claimed": "Dossier investment ladder",
+      "source_verified": true,
+      "classification": "CONFIRMED_AS_DOSSIER_VALUES",
+      "issue": "These are the dossier's own investment ladder values. The consultant's recommendation to adjust P-13 from $5K to $25K-$50K (MEMS foundry) is a consultant estimate.",
+      "corrected_statement": "$5K/$25K/$100K are dossier-defined investment tiers. P-13 adjustment to $25K-$50K is CONSULTANT_ESTIMATE — basis required."
+    }
+  ]
+}

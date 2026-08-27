@@ -1,0 +1,62 @@
+{
+  "loop_type": "EXTERNAL_EVIDENCE_INGESTION",
+  "generated_at": "2026-08-27T09:26:37Z",
+  "pipeline": "EXTERNAL_OBSERVATION -> EVIDENCE_CLASSIFICATION -> BELIEF_UPDATE -> KNOWLEDGE_ATOM -> EIG_CHANGE -> NEXT_EXPERIMENT -> PACKAGE_V2",
+  "rule": "The AI may not silently modify the consultant's original finding. It must retain ORIGINAL_EXTERNAL_FINDING and separately create AI_RECONCILIATION.",
+  "external_observations": [
+    {
+      "observation_id": "EO-001",
+      "original_finding_id": "CF-013",
+      "original_finding": "PVDF 25.6 nW — kill condition likely triggered",
+      "evidence_classification": "PARTIALLY_CONFIRMED — calculation plausible but inputs unsourced",
+      "belief_update": "P-15-R1 power budget is marginal at assumed strain levels. Prior probability of kill-condition triggered: increased from 0.3 to 0.5. Not confirmed — requires empirical strain measurement.",
+      "knowledge_atom": {
+        "atom_id": "KA-001",
+        "content": "PVDF piezoelectric power harvesting at 50 microstrain CSF pulsation yields ~25.6 nW for 0.5 cm3, below the 100 nW kill threshold. This is a hypothesis based on estimated strain, not measured strain.",
+        "evidence_class": "COMPUTATIONAL_RESULT",
+        "source": "consultant calculation + independent review"
+      },
+      "eig_change": "P-15-R1 Expected Information Gain for strain measurement experiment: INCREASED. Priority of empirical strain measurement: RAISED.",
+      "next_experiment": "Measure in-vivo catheter-wall strain in animal model at CSF pulsation frequencies. If strain >200 microstrain, PVDF calculation changes.",
+      "package_v2_trigger": "PENDING — experiment required before dossier V2"
+    },
+    {
+      "observation_id": "EO-002",
+      "original_finding_id": "CF-016",
+      "original_finding": "500 mW is unit error; likely 500 microW",
+      "evidence_classification": "PARTIALLY_CONFIRMED — unit error confirmed; 500 microW is hypothesis",
+      "belief_update": "P-16 power target is likely a unit error. 500 mW is physically impossible. 500 microW is plausible but not established.",
+      "knowledge_atom": {
+        "atom_id": "KA-002",
+        "content": "P-16 dossier states '>=500 mW' power target. At 1 mW/cm2 irradiance and 30% PV efficiency, 500 mW requires 1667 cm2 — physically impossible. 500 microW requires 1.67 cm2 — plausible. Original source must be checked.",
+        "evidence_class": "COMPUTATIONAL_RESULT",
+        "source": "consultant calculation + independent review"
+      },
+      "eig_change": "P-16 Expected Information Gain for source verification: HIGH. Priority of checking original power specification: RAISED.",
+      "next_experiment": "Verify intended power target from original dossier source. Do NOT auto-change 500 mW to 500 microW. Mark as UNKNOWN pending source verification.",
+      "package_v2_trigger": "PENDING — source verification required before dossier V2"
+    },
+    {
+      "observation_id": "EO-003",
+      "original_finding_id": "CF-001",
+      "original_finding": "30-50% obstruction failure rate",
+      "evidence_classification": "CONTESTED — literature does not support 30-50% as obstruction fraction",
+      "belief_update": "The 30-50% obstruction claim is incorrect as stated. Obstruction is ~23-31% of failures. The problem is still real but the magnitude is overstated.",
+      "knowledge_atom": {
+        "atom_id": "KA-003",
+        "content": "CSF shunt obstruction accounts for approximately 23% (adult systematic review, N=38095) to 31% (pediatric) of shunt failures. Overall failure rate is 40-50% at 1-2 years. The 30-50% figure conflates these statistics.",
+        "evidence_class": "SOURCE_FACT",
+        "source": "PubMed 37004137, PubMed 42490332"
+      },
+      "eig_change": "Problem magnitude for P-01 and P-07: REVISED DOWNWARD. Still significant but not as large as stated.",
+      "next_experiment": "Update dossier references to use the corrected obstruction rate with proper citations.",
+      "package_v2_trigger": "YES — factual correction required in next dossier version"
+    }
+  ],
+  "rule_enforcement": {
+    "original_finding_preserved": true,
+    "ai_reconciliation_separate": true,
+    "no_silent_modifications": true,
+    "p08_example": "CONSULTANT: 500 mW appears physically inconsistent. AI: SOURCE_CHECK=CONFIRMED_AS_UNIT_CONCERN. AI: 500 microW=NOT_ESTABLISHED. AI: NEXT_ACTION=verify intended power target from original package specification. AI did NOT automatically change 500mW to 500microW."
+  }
+}
