@@ -122,7 +122,7 @@ def check_1_admission_record_derived():
     finally:
         os.unlink(test_file)
 
-    return {"requirement": "1_admission_record_derived", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "1_admission_record_derived", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_2_real_source_adapters():
@@ -172,7 +172,7 @@ def check_2_real_source_adapters():
     except Exception as e:
         issues.append(f"API_PAYLOAD adapter failed: {e}")
 
-    return {"requirement": "2_real_source_adapters", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "2_real_source_adapters", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_3_before_after_snapshots():
@@ -208,7 +208,7 @@ def check_3_before_after_snapshots():
     if "belief" not in diff["changes"]:
         issues.append("State diff did not detect belief change")
 
-    return {"requirement": "3_before_after_snapshots", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "3_before_after_snapshots", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_4_knowledge_causality():
@@ -241,7 +241,7 @@ def check_4_knowledge_causality():
     if non_causal["causality_verdict"] != "KNOWLEDGE_NON_CAUSAL":
         issues.append(f"Non-causal knowledge marked as {non_causal['causality_verdict']}")
 
-    return {"requirement": "4_knowledge_causality", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "4_knowledge_causality", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_5_experiment_priority_diff():
@@ -269,7 +269,7 @@ def check_5_experiment_priority_diff():
     if not record["triggering_knowledge_atom"]:
         issues.append("Missing triggering_knowledge_atom")
 
-    return {"requirement": "5_experiment_priority_diff", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "5_experiment_priority_diff", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_6_discovery_mutation():
@@ -300,7 +300,7 @@ def check_6_discovery_mutation():
     if not record["causal_link"]["DISCOVERY_CHANGE"]:
         issues.append("Causal link missing DISCOVERY_CHANGE")
 
-    return {"requirement": "6_discovery_mutation", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "6_discovery_mutation", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_7_buyer_feedback_mutation():
@@ -331,7 +331,7 @@ def check_7_buyer_feedback_mutation():
     if not chain["package_v2_hash"]:
         issues.append("Missing package_v2_hash")
 
-    return {"requirement": "7_buyer_feedback_mutation", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "7_buyer_feedback_mutation", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_8_real_loop_certificate():
@@ -404,7 +404,7 @@ def check_8_real_loop_certificate():
     finally:
         os.unlink(test_file)
 
-    return {"requirement": "8_real_loop_certificate", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "8_real_loop_certificate", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_9_independent_replay():
@@ -415,7 +415,7 @@ def check_9_independent_replay():
     cert_files = [f for f in os.listdir(R370I_CERTIFICATES_DIR) if f.endswith(".json")]
     if not cert_files:
         issues.append("No certificates found to replay")
-        return {"requirement": "9_independent_replay", "passed": False, "issues": issues[:3]}
+        return {"requirement": "9_independent_replay", "passed": False, "issues": issues  # R370U-U6: no truncation}
 
     # Use the most recent certificate
     cert_path = os.path.join(R370I_CERTIFICATES_DIR, sorted(cert_files)[-1])
@@ -431,7 +431,7 @@ def check_9_independent_replay():
     if cert.get("acceptance_checklist", {}).get("INDEPENDENT_REPLAY") != "PASS":
         issues.append("INDEPENDENT_REPLAY not updated to PASS after replay")
 
-    return {"requirement": "9_independent_replay", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "9_independent_replay", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_10_all_acceptance_criteria():
@@ -457,7 +457,7 @@ def check_10_all_acceptance_criteria():
             if stage not in checklist:
                 issues.append(f"Acceptance checklist missing stage: {stage}")
 
-    return {"requirement": "10_all_acceptance_criteria", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "10_all_acceptance_criteria", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================

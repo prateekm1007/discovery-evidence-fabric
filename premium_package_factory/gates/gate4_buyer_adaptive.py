@@ -247,7 +247,7 @@ def derive_buyer_framing(buyer_name, pkg):
     # Derive gap: buyer's existing products don't have our mechanism
     mechanism = pkg.get("mechanism", "")
     gap = f"{buyer_name}'s existing portfolio does not include this mechanism. " \
-          f"Their capabilities ({profile['capabilities']}) are adjacent but do not cover: {mechanism[:80]}."
+          f"Their capabilities ({profile['capabilities']}) are adjacent but do not cover: {mechanism}."  # R370U-U6: no truncation
 
     # Derive reason to buy: license is faster than internal R&D
     reason_to_buy = (

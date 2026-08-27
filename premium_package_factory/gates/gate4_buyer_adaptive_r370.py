@@ -153,7 +153,7 @@ def generate_buyer_adaptive_card_r370(pkg, buyer_data, output_path):
         textColor=INK_900, spaceAfter=2,
     )
     story.append(Paragraph(f"{pkg_name} — for {company}", title_style))
-    story.append(Paragraph(mechanism[:120] + ("..." if len(mechanism) > 120 else ""),
+    story.append(Paragraph(mechanism,  # R370U-U6: no truncation
                             S["CoverSubtitle"]))
 
     label_style = ParagraphStyle("FL", parent=S["BodySmall"],

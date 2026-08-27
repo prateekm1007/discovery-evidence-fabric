@@ -195,7 +195,7 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
 
     for label, value in decision_items:
         story.append(Paragraph(f"<b>{label}</b>", styles['SubHead']))
-        val_str = str(value)[:500]
+        val_str = str(value)  # R370U-U6: no truncation
         story.append(Paragraph(val_str, styles['BodyText']))
 
     story.append(PageBreak())
@@ -248,8 +248,8 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
     if dis:
         di_data = [["ID", "Input", "Value", "Origin Type"]]
         for di in dis:
-            val = str(di.get('value', 'UNKNOWN'))[:60]
-            di_data.append([di.get('id', '?'), di.get('input', '?')[:30], val, di.get('evidence_class', 'UNKNOWN')])
+            val = str(di.get('value', 'UNKNOWN'))  # R370U-U6: no truncation
+            di_data.append([di.get('id', '?'), di.get('input', '?'), val, di.get('evidence_class', 'UNKNOWN')])  # R370U-U6: no truncation
 
         di_table = Table(di_data, colWidths=[0.6*inch, 1.8*inch, 2.8*inch, 1.2*inch])
         di_table.setStyle(TableStyle([
@@ -271,7 +271,7 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
     if dos:
         do_data = [["ID", "Description", "Status"]]
         for do in dos:
-            do_data.append([do.get('id', '?'), do.get('description', '?')[:50], do.get('status', 'UNKNOWN')])
+            do_data.append([do.get('id', '?'), do.get('description', '?'), do.get('status', 'UNKNOWN')])  # R370U-U6: no truncation
 
         do_table = Table(do_data, colWidths=[0.6*inch, 4*inch, 1.8*inch])
         do_table.setStyle(TableStyle([
@@ -292,8 +292,8 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
     if cps:
         cp_data = [["Name", "Value", "Unit", "Origin Type"]]
         for cp in cps:
-            val = str(cp.get('value', 'UNKNOWN'))[:40]
-            cp_data.append([cp.get('name', '?')[:25], val, cp.get('unit', '?')[:15], cp.get('evidence_class', 'UNKNOWN')])
+            val = str(cp.get('value', 'UNKNOWN'))  # R370U-U6: no truncation
+            cp_data.append([cp.get('name', '?'), val, cp.get('unit', '?'), cp.get('evidence_class', 'UNKNOWN')])  # R370U-U6: no truncation
 
         cp_table = Table(cp_data, colWidths=[1.5*inch, 2*inch, 1*inch, 1.9*inch])
         cp_table.setStyle(TableStyle([
@@ -315,10 +315,10 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
         fm_data = [["Failure Mode", "Mechanism", "Mitigation", "Residual Uncertainty"]]
         for fm in fms:
             fm_data.append([
-                fm.get('mode', '?')[:20],
-                fm.get('mechanism', '?')[:30],
-                fm.get('mitigation', '?')[:30],
-                fm.get('residual_uncertainty', '?')[:30]
+                fm.get('mode', '?'),  # R370U-U6: no truncation
+                fm.get('mechanism', '?'),  # R370U-U6: no truncation
+                fm.get('mitigation', '?'),  # R370U-U6: no truncation
+                fm.get('residual_uncertainty', '?')
             ])
 
         fm_table = Table(fm_data, colWidths=[1.3*inch, 1.7*inch, 1.7*inch, 1.7*inch])
@@ -341,10 +341,10 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
         fa_data = [["Failure Mode", "Mechanism", "Mitigation", "Residual Uncertainty"]]
         for fm in fa:
             fa_data.append([
-                fm.get('failure_mode', '?')[:20],
-                fm.get('mechanism', '?')[:30],
-                fm.get('mitigation', '?')[:30],
-                fm.get('residual_uncertainty', '?')[:30]
+                fm.get('failure_mode', '?'),
+                fm.get('mechanism', '?'),  # R370U-U6: no truncation
+                fm.get('mitigation', '?'),  # R370U-U6: no truncation
+                fm.get('residual_uncertainty', '?')
             ])
 
         fa_table = Table(fa_data, colWidths=[1.3*inch, 1.7*inch, 1.7*inch, 1.7*inch])
@@ -368,10 +368,10 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
         for v in vm:
             vm_data.append([
                 v.get('id', '?'),
-                v.get('requirement', '?')[:30],
-                v.get('method', '?')[:30],
-                v.get('acceptance', '?')[:25],
-                v.get('result', '?')[:15]
+                v.get('requirement', '?'),
+                v.get('method', '?'),
+                v.get('acceptance', '?'),
+                v.get('result', '?')
             ])
 
         vm_table = Table(vm_data, colWidths=[0.6*inch, 1.5*inch, 1.5*inch, 1.3*inch, 1*inch])
@@ -395,10 +395,10 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
         for v in valm:
             val_data.append([
                 v.get('id', '?'),
-                v.get('requirement', '?')[:30],
-                v.get('method', '?')[:30],
-                v.get('acceptance', '?')[:25],
-                v.get('result', '?')[:15]
+                v.get('requirement', '?'),
+                v.get('method', '?'),
+                v.get('acceptance', '?'),
+                v.get('result', '?')
             ])
 
         val_table = Table(val_data, colWidths=[0.6*inch, 1.5*inch, 1.5*inch, 1.3*inch, 1*inch])
@@ -420,7 +420,7 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
     if mats:
         mat_data = [["Component", "Candidate Material", "Status"]]
         for m in mats:
-            mat_data.append([m.get('component', '?')[:25], m.get('candidate_material', '?')[:30], m.get('status', '?')[:25]])
+            mat_data.append([m.get('component', '?'), m.get('candidate_material', '?'), m.get('status', '?')])
 
         mat_table = Table(mat_data, colWidths=[1.8*inch, 2.5*inch, 2*inch])
         mat_table.setStyle(TableStyle([
@@ -441,7 +441,7 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
     if bom:
         bom_data = [["Item", "Description", "Material", "Criticality"]]
         for b in bom:
-            bom_data.append([b.get('item', '?'), b.get('description', '?')[:25], b.get('material', '?')[:25], b.get('criticality', '?')[:15]])
+            bom_data.append([b.get('item', '?'), b.get('description', '?'), b.get('material', '?'), b.get('criticality', '?')])
 
         bom_table = Table(bom_data, colWidths=[0.5*inch, 2*inch, 2*inch, 1.5*inch])
         bom_table.setStyle(TableStyle([
@@ -473,10 +473,10 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
     story.append(Paragraph("14. External Evidence", styles['SectionHead']))
     ext = ec.get('external_engineering_precedent', [])
     if ext:
-        for i, e in enumerate(ext[:10]):
+        for i, e in enumerate(ext):  # R370U-U6: no truncation
             story.append(Paragraph(f"<b>Source {i+1}:</b> {e.get('source_title', e.get('source', '?'))[:80]}", styles['SubHead']))
             story.append(Paragraph(f"URL: {e.get('source', '?')}", styles['MonoText']))
-            snippet = str(e.get('source_snippet', ''))[:200]
+            snippet = str(e.get('source_snippet', ''))  # R370U-U6: no truncation
             story.append(Paragraph(f"Excerpt: {snippet}", styles['BodyText']))
             story.append(Spacer(1, 0.1*inch))
     else:
@@ -518,11 +518,11 @@ def build_engineering_dossier_pdf(pkg_info, dossier_data, output_path):
         bp_data = [["Work Package", "Test Article", "Measurement", "Acceptance", "Effort"]]
         for wp in bp[:6]:
             bp_data.append([
-                wp.get('work_package', '?')[:15],
-                wp.get('test_article', '?')[:20],
-                wp.get('measurement', '?')[:20],
-                wp.get('acceptance_criterion', '?')[:20],
-                wp.get('estimated_effort', '?')[:15]
+                wp.get('work_package', '?'),
+                wp.get('test_article', '?'),
+                wp.get('measurement', '?'),
+                wp.get('acceptance_criterion', '?'),
+                wp.get('estimated_effort', '?')
             ])
 
         bp_table = Table(bp_data, colWidths=[1*inch, 1.3*inch, 1.3*inch, 1.3*inch, 1*inch])
@@ -605,7 +605,7 @@ def build_buyer_card_pdf(pkg_info, dossier_data, output_path):
 
     items = [
         ("Technology Domain", ec.get('technology_domain', 'NOT ESTABLISHED')),
-        ("Mechanism", ec.get('system_architecture', {}).get('description', 'NOT ESTABLISHED')[:200] if isinstance(ec.get('system_architecture'), dict) else 'NOT ESTABLISHED'),
+        ("Mechanism", ec.get('system_architecture', {}).get('description', 'NOT ESTABLISHED') if isinstance(ec.get('system_architecture'), dict) else 'NOT ESTABLISHED'),
         ("Current State", "CONCEPTUAL — No physical prototype. Computational model exists."),
         ("Key Risk", _get_first_failure(ec) or "See failure analysis"),
         ("Next Experiment", _get_first_build_plan_item(ec, 'test_article') or "See build plan"),
@@ -828,10 +828,10 @@ def build_master_portfolio_pdf(all_dossiers, output_path):
     for pkg_info in PACKAGE_MAP:
         dossier = all_dossiers.get(pkg_info['pkg_id'], {})
         ec = dossier.get("engineering_content", {})
-        domain = ec.get('technology_domain', '?')[:25]
-        mech = ec.get('system_architecture', {}).get('description', '?')[:40] if isinstance(ec.get('system_architecture'), dict) else '?'
+        domain = ec.get('technology_domain', '?')
+        mech = ec.get('system_architecture', {}).get('description', '?') if isinstance(ec.get('system_architecture'), dict) else '?'
         bp = ec.get('engineering_build_plan', [])
-        next_action = bp[0].get('test_article', '?')[:30] if bp and isinstance(bp[0], dict) else '?'
+        next_action = bp[0].get('test_article', '?') if bp and isinstance(bp[0], dict) else '?'
 
         map_data.append([pkg_info['num'], pkg_info['tech_name'][:30], domain, mech, "CONCEPTUAL", next_action])
 
@@ -856,7 +856,7 @@ def build_master_portfolio_pdf(all_dossiers, output_path):
         story.append(Paragraph(f"#{pkg_info['num']}: {pkg_info['tech_name']}", styles['SectionHead']))
         story.append(Paragraph(f"<b>Domain:</b> {ec.get('technology_domain', 'NOT ESTABLISHED')}", styles['BodyText']))
         sa = ec.get('system_architecture', {})
-        story.append(Paragraph(f"<b>Architecture:</b> {sa.get('description', 'NOT ESTABLISHED')[:150] if isinstance(sa, dict) else 'NOT ESTABLISHED'}", styles['BodyText']))
+        story.append(Paragraph(f"<b>Architecture:</b> {sa.get('description', 'NOT ESTABLISHED') if isinstance(sa, dict) else 'NOT ESTABLISHED'}", styles['BodyText']))
         story.append(Paragraph(f"<b>Current State:</b> CONCEPTUAL — No physical prototype.", styles['BodyText']))
 
         tb = ec.get('transfer_boundary', {})
@@ -922,8 +922,8 @@ def build_portfolio_index_pdf(all_dossiers, output_path):
 
         items = [
             ("Technology", pkg_info['tech_name']),
-            ("Domain", ec.get('technology_domain', '?')[:60]),
-            ("Mechanism", ec.get('system_architecture', {}).get('description', '?')[:100] if isinstance(ec.get('system_architecture'), dict) else '?'),
+            ("Domain", ec.get('technology_domain', '?')),
+            ("Mechanism", ec.get('system_architecture', {}).get('description', '?') if isinstance(ec.get('system_architecture'), dict) else '?'),  # R370U-U6: no truncation
             ("Current State", "CONCEPTUAL"),
             ("Key Risk", _get_first_failure(ec) or "See dossier"),
             ("Next Experiment", _get_first_build_plan_item(ec, 'test_article') or "See build plan"),

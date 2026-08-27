@@ -139,7 +139,7 @@ def reconcile_p16_regulatory_strict(state):
         "finding": "P-16 regulatory pathway — no Class III/510(k) contradiction",
         "package": "P-16",
         "consultant_state": "No Class III/510(k) contradiction",
-        "current_state": f"regulatory_fields={json.dumps(regulatory_fields)[:200]}. contradiction={contradiction}",
+        "current_state": f"regulatory_fields={json.dumps(regulatory_fields)}. contradiction={contradiction}"  # R370U-U6: no truncation,
         "classification": classification,
         "evidence": f"R332 regulatory_status='{r332_reg}'. PMA={has_pma}, 510(k)={has_510k}, De_Novo={has_de_novo}. Contradiction={contradiction}.",
         "required_action": required_action,
@@ -434,7 +434,7 @@ def reconcile_p22_four_problems_strict(state):
         "finding": "P-22-R1 four control problems — all four explicitly documented with resolution paths",
         "package": "P-22-R1",
         "consultant_state": "4/4 problems with problem+evidence+resolution_path",
-        "current_state": f"n_documented={n_documented}/4. n_complete={n_complete}/4. problems={json.dumps(problems)[:200]}",
+        "current_state": f"n_documented={n_documented}/4. n_complete={n_complete}/4. problems={json.dumps(problems)}"  # R370U-U6: no truncation,
         "classification": classification,
         "evidence": f"R332 known_failures: {failures}. R370 unknowns: {len(unknowns)} generic unknowns. Resolution paths inferred from R1 repair, not explicitly mapped per-problem.",
         "required_action": required_action,
@@ -777,7 +777,7 @@ def run_reconciliation_v2():
         f.write("| # | Finding | Package | Classification | Disqualifying |\n")
         f.write("|---|---------|---------|----------------|---------------|\n")
         for i, fnd in enumerate(findings, 1):
-            f.write(f"| {i} | {fnd['finding'][:50]} | {fnd['package']} | **{fnd['classification']}** | {fnd.get('disqualifying_condition_met', '?')} |\n")
+            f.write(f"| {i} | {fnd['finding']} | {fnd['package']} | **{fnd['classification']}** | {fnd.get('disqualifying_condition_met', '?')} |\n")
         f.write("\n## Detailed Findings\n\n")
         for i, fnd in enumerate(findings, 1):
             f.write(f"### {fnd['finding_id']}: {fnd['finding']}\n\n")

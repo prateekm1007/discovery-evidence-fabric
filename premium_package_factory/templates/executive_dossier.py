@@ -86,7 +86,7 @@ def _inside_page(canvas_obj, doc, pkg_id="", pkg_name=""):
     canvas_obj.setFillColor(BRAND_700)
     canvas_obj.setFont("BodySans-Bold", 7)
     canvas_obj.drawString(MARGIN_L, PAGE_H - MARGIN_T + 9,
-                          f"{pkg_id}  ·  {pkg_name}"[:100])
+                          f"{pkg_id}  ·  {pkg_name}")  # R370U-U6: no truncation
     canvas_obj.setFillColor(INK_500)
     canvas_obj.setFont("BodySans-Italic", 7)
     canvas_obj.drawRightString(PAGE_W - MARGIN_R, PAGE_H - MARGIN_T + 9,
@@ -434,15 +434,15 @@ def build_failure_uncertainty(package_data):
     # Risk dimensions table
     risk_data = [
         ["Risk Dimension", "Level", "Mitigation / Next Action"],
-        ["Technical risk", risk_level, package_data.get("next_engineering_step", "—")[:80]],
+        ["Technical risk", risk_level, package_data.get("next_engineering_step", "—")],  # R370U-U6: no truncation
         ["Biology risk", "HIGH" if "biology" in package_data.get("known_failures", [{}])[:1].__str__().lower()
                           or any("biology" in str(k).lower() or "enzyme" in str(k).lower() for k in package_data.get("known_failures", []))
                           else "MEDIUM",
          "Resolve biology blockers before V2 build" if any("biology" in str(k).lower() or "enzyme" in str(k).lower() for k in package_data.get("known_failures", [])) else "Decisive experiment resolves"],
         ["IP risk", "MEDIUM", "FTO analysis required — see page 10"],
         ["Regulatory risk", "MEDIUM" if "510" in package_data.get("regulatory_status", "") else "HIGH",
-         package_data.get("regulatory_status", "—")[:80]],
-        ["Manufacturing risk", "MEDIUM", package_data.get("manufacturing_unknown", ["—"])[0][:80] if package_data.get("manufacturing_unknown") else "—"],
+         package_data.get("regulatory_status", "—")],  # R370U-U6: no truncation,
+        ["Manufacturing risk", "MEDIUM", package_data.get("manufacturing_unknown", ["—"])[0] if package_data.get("manufacturing_unknown") else "—"  # R370U-U6: no truncation],
     ]
     risk_table = Table(risk_data, colWidths=[55*mm, 25*mm, CONTENT_W - 80*mm])
     risk_table.setStyle(TableStyle([
@@ -562,10 +562,10 @@ def build_development_roadmap(package_data):
     milestones = [
         {"stage": "TODAY", "deliverable": "Computational model + this dossier",
          "cost": "—", "time": "—", "gate": "N/A (current state)"},
-        {"stage": "BENCH", "deliverable": package_data.get("decisive_experiment", "—")[:50],
-         "cost": package_data.get("cost_estimate", "—")[:30],
-         "time": package_data.get("timeline_estimate", "—")[:30],
-         "gate": package_data.get("pass_rule", "—")[:50]},
+        {"stage": "BENCH", "deliverable": package_data.get("decisive_experiment", "—"),  # R370U-U6: no truncation
+         "cost": package_data.get("cost_estimate", "—"),  # R370U-U6: no truncation
+         "time": package_data.get("timeline_estimate", "—"),  # R370U-U6: no truncation
+         "gate": package_data.get("pass_rule", "—")},  # R370U-U6: no truncation
         {"stage": "PROTOTYPE", "deliverable": "Engineering prototype + integration test",
          "cost": "$50-150K est.", "time": "3-6 months", "gate": "Functional integration"},
         {"stage": "RELEVANT ENV", "deliverable": "Animal model + biocompatibility",

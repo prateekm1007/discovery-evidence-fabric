@@ -300,6 +300,8 @@ def _p13_ml_predictor(r332, contract, claims, axes, external_ev):
             {"id": "DI-005", "input": "Training data", "value": "100+ patient-years of shunt data (held-out 20%)", "evidence_class": "UNKNOWN", "source": "R332 decisive_experiment", "resolution_plan": "Obtain retrospective shunt patient dataset from hospital system", "applicability": "APPLICABLE — CRITICAL BLOCKER"},
             {"id": "DI-006", "input": "Power source", "value": "CONDITIONAL on P-15-R1 or P-16", "evidence_class": "MODELLED", "source": "R332 known_failures", "applicability": "APPLICABLE"},
             {"id": "DI-007", "input": "SaMD classification", "value": "UNKNOWN", "evidence_class": "UNKNOWN", "resolution_plan": "FDA SaMD classification (510(k) or De Novo)", "applicability": "APPLICABLE"},
+            {"id": "DI-008", "input": "Software V&V (IEC 62304)", "value": "UNKNOWN", "evidence_class": "UNKNOWN", "resolution_plan": "IEC 62304 software V&V lifecycle — production software not yet developed", "applicability": "APPLICABLE"},
+            {"id": "DI-009", "input": "Regulatory pathway (SaMD)", "value": "UNKNOWN", "evidence_class": "UNKNOWN", "resolution_plan": "FDA SaMD framework likely applies — determine 510(k) vs De Novo vs PMA pathway", "applicability": "APPLICABLE"},
         ],
         "design_outputs": [
             {"id": "DO-001", "description": "ML model architecture", "status": "MODELLED", "design_status": "ARCHITECTURE_DEFINED", "note": "Gradient boosting on rolling features. 0 prior-art hits. Architecture specified but not trained on real data."},

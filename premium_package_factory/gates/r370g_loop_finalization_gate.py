@@ -84,7 +84,7 @@ def check_1_reality_event_schema():
         if not fields:
             issues.append(f"No type-specific fields for {event_type}")
 
-    return {"requirement": "1_reality_event_schema", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "1_reality_event_schema", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_2_acquisition_separated():
@@ -114,7 +114,7 @@ def check_2_acquisition_separated():
     except ValueError:
         pass  # Expected — validation caught it
 
-    return {"requirement": "2_acquisition_separated", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "2_acquisition_separated", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_3_computational_provenance():
@@ -140,7 +140,7 @@ def check_3_computational_provenance():
     # Verify a computational result without execution log is rejected
     # (This is enforced by the schema — COMPUTATIONAL_EXECUTION requires execution_log_ref)
 
-    return {"requirement": "3_computational_provenance", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "3_computational_provenance", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_4_acquisition_attestation():
@@ -174,7 +174,7 @@ def check_4_acquisition_attestation():
     except Exception as e:
         issues.append(f"Failed to create acquisition attestation: {e}")
 
-    return {"requirement": "4_acquisition_attestation", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "4_acquisition_attestation", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_5_causal_mutation_engine():
@@ -217,7 +217,7 @@ def check_5_causal_mutation_engine():
     except ValueError:
         pass  # Expected
 
-    return {"requirement": "5_causal_mutation_engine", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "5_causal_mutation_engine", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_6_real_loop_derived():
@@ -242,7 +242,7 @@ def check_6_real_loop_derived():
     if result["real_loop_verified"]:
         issues.append("REAL_LOOP_VERIFIED is TRUE without real events — derivation logic is wrong")
 
-    return {"requirement": "6_real_loop_derived", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "6_real_loop_derived", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_7_buyer_feedback_reality_bound():
@@ -282,7 +282,7 @@ def check_7_buyer_feedback_reality_bound():
     except ValueError:
         pass  # Expected
 
-    return {"requirement": "7_buyer_feedback_reality_bound", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "7_buyer_feedback_reality_bound", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_8_engineer_review_external():
@@ -307,7 +307,7 @@ def check_8_engineer_review_external():
     except ValueError:
         pass  # Expected
 
-    return {"requirement": "8_engineer_review_external", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "8_engineer_review_external", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_9_article_xxxviii_ratified():
@@ -335,7 +335,7 @@ def check_9_article_xxxviii_ratified():
         if "Article XXXVIII" not in constitution:
             issues.append("Article XXXVIII not referenced in EPISTEMIC_CONSTITUTION.md")
 
-    return {"requirement": "9_article_xxxviii_ratified", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "9_article_xxxviii_ratified", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_10_controlled_rehearsal():
@@ -367,7 +367,7 @@ def check_10_controlled_rehearsal():
     except Exception as e:
         issues.append(f"Controlled rehearsal failed: {e}")
 
-    return {"requirement": "10_controlled_rehearsal", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "10_controlled_rehearsal", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================

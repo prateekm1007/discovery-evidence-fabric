@@ -156,7 +156,7 @@ def check_1_evidence_class_valid(dossier):
                 _check(v, f"{path}[{i}]")
 
     _check(ec, "engineering_content")
-    return {"check": "evidence_class_valid", "passed": len(issues) == 0, "issues": issues[:10]}
+    return {"check": "evidence_class_valid", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_2_criterion_type_valid(dossier):
@@ -183,7 +183,7 @@ def check_2_criterion_type_valid(dossier):
             elif ct not in ALLOWED_CRITERION_TYPES:
                 issues.append(f"engineering_core.{matrix_name}[{i}].criterion_type = '{ct}' (not in allowed set)")
 
-    return {"check": "criterion_type_valid", "passed": len(issues) == 0, "issues": issues[:10]}
+    return {"check": "criterion_type_valid", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_3_no_forbidden_promotions(dossier):
@@ -207,7 +207,7 @@ def check_3_no_forbidden_promotions(dossier):
                 _check(v, f"{path}[{i}]")
 
     _check(ec, "engineering_content")
-    return {"check": "no_forbidden_promotions", "passed": len(issues) == 0, "issues": issues[:10]}
+    return {"check": "no_forbidden_promotions", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_4_standards_verified(dossier):
@@ -239,7 +239,7 @@ def check_4_standards_verified(dossier):
     matches = standard_pattern.findall(dossier_str_without_corrections)
     # This is a soft check — we don't fail just because a standard appears, only if ISO 7437 specifically misused
 
-    return {"check": "standards_verified", "passed": len(issues) == 0, "issues": issues[:10]}
+    return {"check": "standards_verified", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_5_no_unsupported_tolerances(dossier):
@@ -252,7 +252,7 @@ def check_5_no_unsupported_tolerances(dossier):
         if matches:
             issues.append(f"Unsupported tolerance claim: '{matches[0]}' (pattern: {pattern})")
 
-    return {"check": "no_unsupported_tolerances", "passed": len(issues) == 0, "issues": issues[:10]}
+    return {"check": "no_unsupported_tolerances", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_6_no_generic_evidence(dossier):
@@ -275,7 +275,7 @@ def check_6_no_generic_evidence(dossier):
                 _check(v, f"{path}[{i}]")
 
     _check(ec, "engineering_content")
-    return {"check": "no_generic_evidence", "passed": len(issues) == 0, "issues": issues[:10]}
+    return {"check": "no_generic_evidence", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_7_engineering_artifact_status_present(dossier):
@@ -293,7 +293,7 @@ def check_7_engineering_artifact_status_present(dossier):
             elif not isinstance(eas[field], dict) or "status" not in eas[field]:
                 issues.append(f"engineering_artifact_status.{field}.status MISSING")
 
-    return {"check": "engineering_artifact_status_present", "passed": len(issues) == 0, "issues": issues[:10]}
+    return {"check": "engineering_artifact_status_present", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_8_transfer_manifest_present(dossier):
@@ -331,7 +331,7 @@ def check_8_transfer_manifest_present(dossier):
         else:
             issues.append("transfer_manifest has neither R370C (artifacts) nor R370D (transferable_now/buyer_must_develop/not_available) format")
 
-    return {"check": "transfer_manifest_present", "passed": len(issues) == 0, "issues": issues[:10]}
+    return {"check": "transfer_manifest_present", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_9_numerical_provenance(dossier):
@@ -361,7 +361,7 @@ def check_9_numerical_provenance(dossier):
                 if cp.get("evidence_class") == "UNKNOWN" and "UNKNOWN" not in val:
                     issues.append(f"critical_parameters[{i}]: numerical value '{val[:40]}' with evidence_class=UNKNOWN (Article XXVII)")
 
-    return {"check": "numerical_provenance", "passed": len(issues) == 0, "issues": issues[:10]}
+    return {"check": "numerical_provenance", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_10_threshold_typing(dossier):
@@ -378,7 +378,7 @@ def check_10_threshold_typing(dossier):
             # The forbidden promotion check (#3) catches MODEL_DERIVED -> REGULATORY
             # Here we just verify criterion_type exists
 
-    return {"check": "threshold_typing", "passed": len(issues) == 0, "issues": issues[:10]}
+    return {"check": "threshold_typing", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================

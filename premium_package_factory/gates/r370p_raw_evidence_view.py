@@ -318,7 +318,7 @@ def build_audit_bundle_content_certificate(export_dir, dossiers):
             "destructive_redactions": redaction_count,
             "missing_engineering_fields": 0,
             "anti_anchoring_violations": len(all_violations),
-            "violation_details": all_violations[:10]
+            "violation_details": all_violations  # R370U-U6: no truncation
         },
         "verdicts": {
             "CONSULTANT_VIEW_SCHEMA": "PASS" if len(all_violations) == 0 else "FAIL",

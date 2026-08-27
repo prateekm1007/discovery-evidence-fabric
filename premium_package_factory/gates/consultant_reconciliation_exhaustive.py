@@ -812,13 +812,13 @@ def run_exhaustive_reconciliation():
         f.write("|---|---------|----------------|----------|-----------------|\n")
         for i, fnd in enumerate(findings, 1):
             n_src = fnd.get("sources_searched_count", len(fnd.get("sources_searched", [])))
-            f.write(f"| {i} | {fnd['finding'][:50]} | **{fnd['classification']}** | {fnd.get('coverage_complete', '?')} | {n_src} |\n")
+            f.write(f"| {i} | {fnd['finding']} | **{fnd['classification']}** | {fnd.get('coverage_complete', '?')} | {n_src} |\n")
         f.write("\n## Adversarial Test Results\n\n")
         for r in adv_results:
             f.write(f"- {'✓' if r['pass'] else '✗'} {r['test']}: expected={r['expected']}, actual={r['actual']}\n")
         f.write("\n## Unresolved Findings (with coverage proof)\n\n")
         for u in report["unresolved_findings"]:
-            f.write(f"### {u['finding_id']}: {u['finding']}\n- Package: {u['package']}\n- Sources searched: {u['sources_searched_count']}\n- Coverage complete: {u['coverage_complete']}\n- Action: {u['required_action'][:200]}\n\n")
+            f.write(f"### {u['finding_id']}: {u['finding']}\n- Package: {u['package']}\n- Sources searched: {u['sources_searched_count']}\n- Coverage complete: {u['coverage_complete']}\n- Action: {u['required_action']}\n\n")
 
     print(f"\n{'='*70}")
     print(f"EXHAUSTIVE RECONCILIATION VERDICT: {verdict}")

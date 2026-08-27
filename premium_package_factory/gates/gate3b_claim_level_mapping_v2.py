@@ -269,8 +269,8 @@ def audit_package_claims_v2(pkg_id, canonical_pkg, pdf_path, r370_claims):
             "claim_id": claim["claim_id"],
             "claim_type": claim.get("claim_type", ""),
             "field_name": claim.get("field_name", ""),
-            "canonical_value": canon_str[:100],
-            "display_value": display_text[:100] if display_present else "(not found in PDF)",
+            "canonical_value": canon_str,  # R370U-U6: no truncation
+            "display_value": display_text if display_present else "(not found in PDF)",  # R370U-U6: no truncation
             "display_present_in_pdf": display_present,
             "evidence_class": claim["evidence_class"],
             "transformation_type": transformation,

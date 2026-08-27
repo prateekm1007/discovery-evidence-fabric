@@ -171,7 +171,7 @@ def audit_package_semantics(pkg_id, canonical_pkg, pdf_path):
             "field": field_name,
             "status": status,
             "detail": detail,
-            "canonical_value_preview": str(canonical_value)[:80] if canonical_value else "(empty)"
+            "canonical_value": str(canonical_value) if canonical_value else "(empty)"  # R370U-U6: no truncation
         })
 
         if status == "PASS":

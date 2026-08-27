@@ -421,7 +421,7 @@ def build_eng_kit_v2(pkg_id, state, source_meta):
         "drawing_id": f"{pkg_id}-ENG-007", "revision": "A", "status": "CONCEPTUAL",
         "source_claim_ids": claim_ids, "evidence_class": "MODELLED",
         "characteristics": [
-            {"characteristic": str(c)[:80], "current_knowledge": "MODELLED",
+            {"characteristic": str(c), "current_knowledge": "MODELLED",  # R370U-U6: no truncation
              "source": build_source_pointer(claims_source_id or primary_source_id, source_meta, "material_claims", c)}
             for c in modelled_only if c
         ] or [{"characteristic": "UNKNOWN", "current_knowledge": "UNKNOWN",
@@ -500,20 +500,20 @@ def build_eng_kit_v2(pkg_id, state, source_meta):
     if decisive_experiment and decisive_experiment != "UNKNOWN":
         verif_items.append({
             "requirement": "Mechanism performance", "design_output": "Bench prototype",
-            "verification_method": decisive_experiment[:80],
-            "acceptance_criterion": pass_rule[:80] if pass_rule else "UNKNOWN",
+            "verification_method": decisive_experiment,  # R370U-U6: no truncation
+            "acceptance_criterion": pass_rule if pass_rule else "UNKNOWN",  # R370U-U6: no truncation
             "result": "NOT_TESTED",
             "source": build_source_pointer(primary_source_id, source_meta, "decisive_experiment", decisive_experiment),
         })
     for claim in modelled_only:
         verif_items.append({
-            "requirement": str(claim)[:60], "design_output": "Computational model",
+            "requirement": str(claim), "design_output": "Computational model",  # R370U-U6: no truncation
             "verification_method": "Bench test (protocol UNKNOWN)",
             "acceptance_criterion": "UNKNOWN", "result": "MODELLED",
         })
     for failure in known_failures:
         verif_items.append({
-            "requirement": str(failure)[:60], "design_output": "Computational model",
+            "requirement": str(failure), "design_output": "Computational model",  # R370U-U6: no truncation
             "verification_method": "Computational analysis",
             "acceptance_criterion": "UNKNOWN",
             "result": "FALSIFIED" if "FALSIFIED" in str(failure).upper() else "MODELLED",
@@ -662,7 +662,7 @@ def build_eng_kit_v2(pkg_id, state, source_meta):
         "generated_at": _now(),
         "source_manifest_version": "AUTHORITATIVE_SOURCE_REGISTRY_V2",
         "source_manifest_hash_verified": True,
-        "invention_identity": mechanism[:100] if mechanism else "UNKNOWN",
+        "invention_identity": mechanism if mechanism else "UNKNOWN",  # R370U-U6: no truncation
         "design_status": "CONCEPTUAL — NOT RELEASED FOR MANUFACTURING",
         "evidence_status": axes.get("DERIVED_TRANSFER_POSTURE", "UNKNOWN"),
         "owner_ip_status": "UNKNOWN — Ownership not verified. No patent filed. Counsel required.",

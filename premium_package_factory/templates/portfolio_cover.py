@@ -565,7 +565,7 @@ def build_top_opportunities(canonical):
                 f"<b>Evidence tier:</b> {pkg.get('evidence_tier', '—')}<br/>"
                 f"<b>Maturity:</b> {pkg.get('maturity', '—')}<br/>"
                 f"<b>Patent landscape:</b> {pkg.get('patent_landscape', '—')}<br/>"
-                f"<b>Decisive experiment:</b> {pkg.get('decisive_experiment', '—')[:120]}<br/>"
+                f"<b>Decisive experiment:</b> {pkg.get('decisive_experiment', '—')}<br/>"  # R370U-U6: no truncation
                 f"<b>Cost:</b> {pkg.get('cost_estimate', '—')}  ·  <b>Time:</b> {pkg.get('timeline_estimate', '—')}<br/>"
                 f"<b>Primary action:</b> {pkg.get('primary_action', '—')}")
         card = InfoCard(f"{pkg_id}  ·  {pkg['name']}", body,

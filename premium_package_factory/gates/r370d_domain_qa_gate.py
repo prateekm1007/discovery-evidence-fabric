@@ -167,7 +167,7 @@ def check_domain_disciplines(dossier, expectations):
         if not _fuzzy_match(expected, disciplines_str):
             issues.append(f"Expected discipline '{expected}' not found in engineering_disciplines: {disciplines}")
 
-    return {"check": "domain_disciplines", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"check": "domain_disciplines", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_domain_equations(dossier, expectations):
@@ -182,7 +182,7 @@ def check_domain_equations(dossier, expectations):
         if not _fuzzy_match(expected, equations_str):
             issues.append(f"Expected equation '{expected}' not found in governing_model.equations")
 
-    return {"check": "domain_equations", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"check": "domain_equations", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_domain_failure_modes(dossier, expectations):
@@ -205,7 +205,7 @@ def check_domain_failure_modes(dossier, expectations):
     if found / len(expectations["expected_failure_modes"]) < required_ratio:
         issues.append(f"Only {found}/{len(expectations['expected_failure_modes'])} expected failure modes found (need >= {required_ratio*100:.0f}%). Missing: {missing[:3]}")
 
-    return {"check": "domain_failure_modes", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"check": "domain_failure_modes", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_domain_technology_domain(dossier, expectations):
@@ -226,7 +226,7 @@ def check_domain_technology_domain(dossier, expectations):
     if matches < 1:
         issues.append(f"technology_domain '{td}' does not match expected domain '{expectations['domain_summary']}' (no keyword matches)")
 
-    return {"check": "domain_technology_domain", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"check": "domain_technology_domain", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_build_plan_completeness(dossier):
@@ -276,7 +276,7 @@ def check_build_plan_completeness(dossier):
                 if "tbd" in val_lower and "blocked" not in val_lower:
                     issues.append(f"build_plan[{i}].{field} contains 'TBD' without 'blocked on' context: '{wp[field][:60]}'")
 
-    return {"check": "build_plan_completeness", "passed": len(issues) == 0, "issues": issues[:5]}
+    return {"check": "build_plan_completeness", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_structural_engineer_readiness_label(dossier):
@@ -292,7 +292,7 @@ def check_structural_engineer_readiness_label(dossier):
         if er.get("current_state", "").startswith("INDEPENDENT"):
             issues.append("engineer_readiness.current_state incorrectly claims independent evaluation")
 
-    return {"check": "structural_engineer_readiness_label", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"check": "structural_engineer_readiness_label", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_transfer_manifest_separation(dossier):
@@ -310,7 +310,7 @@ def check_transfer_manifest_separation(dossier):
         if "transfer_summary" not in tm:
             issues.append("transfer_manifest.transfer_summary MISSING")
 
-    return {"check": "transfer_manifest_separation", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"check": "transfer_manifest_separation", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_artifact_release_states(dossier):
@@ -331,7 +331,7 @@ def check_artifact_release_states(dossier):
         if "release_state_schema" not in eas:
             issues.append("engineering_artifact_status.release_state_schema MISSING")
 
-    return {"check": "artifact_release_states", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"check": "artifact_release_states", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def run_all_domain_checks(dossier):

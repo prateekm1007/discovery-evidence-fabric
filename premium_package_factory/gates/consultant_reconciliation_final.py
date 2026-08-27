@@ -248,7 +248,7 @@ def reconcile_p22_structural(state):
         "finding": "P-22-R1 four control problems — all four explicitly documented with resolution paths",
         "package": "P-22-R1",
         "consultant_state": "4/4 independent records with problem+evidence+resolution_path+experiment+threshold+status",
-        "current_state": f"n_complete={n_complete}/4. control_records={json.dumps(control_records, indent=2)[:500]}",
+        "current_state": f"n_complete={n_complete}/4. control_records={json.dumps(control_records, indent=2)}"  # R370U-U6: no truncation,
         "classification": classification,
         "evidence": f"4 independent control records built. Each has 6 fields. Complete: {n_complete}/4. Incomplete fields: {[k for k, r in control_records.items() if not r['fields_complete']]}",
         "required_action": required_action,
@@ -369,7 +369,7 @@ def reconcile_p16_structured(state):
         "finding": "P-16 regulatory pathway — no Class III/510(k) contradiction",
         "package": "P-16",
         "consultant_state": "No Class III/510(k) contradiction",
-        "current_state": f"regulatory_record={json.dumps(regulatory_record, indent=2)[:500]}",
+        "current_state": f"regulatory_record={json.dumps(regulatory_record, indent=2)}"  # R370U-U6: no truncation,
         "classification": classification,
         "evidence": f"classification={regulatory_record['classification_hypothesis']}, pathway={regulatory_record['pathway_hypothesis']}, contradictions={regulatory_record['contradictions']}, unknowns={len(regulatory_record['unknowns'])}",
         "required_action": required_action,
@@ -811,12 +811,12 @@ def run_final_reconciliation():
         for u in report["unresolved_findings_prominent"]:
             f.write(f"### {u['finding_id']}: {u['finding']}\n")
             f.write(f"- **Package:** {u['package']}\n")
-            f.write(f"- **Required action:** {u['required_action'][:200]}\n\n")
+            f.write(f"- **Required action:** {u['required_action']}\n\n")
         f.write("## Per-Finding Results\n\n")
         f.write("| # | Finding | Package | Classification | Disqualifying |\n")
         f.write("|---|---------|---------|----------------|---------------|\n")
         for i, fnd in enumerate(findings, 1):
-            f.write(f"| {i} | {fnd['finding'][:50]} | {fnd['package']} | **{fnd['classification']}** | {fnd.get('disqualifying_condition_met', '?')} |\n")
+            f.write(f"| {i} | {fnd['finding']} | {fnd['package']} | **{fnd['classification']}** | {fnd.get('disqualifying_condition_met', '?')} |\n")
 
     print(f"\n{'='*70}")
     print(f"CONSULTANT RECONCILIATION FINAL VERDICT: {verdict}")

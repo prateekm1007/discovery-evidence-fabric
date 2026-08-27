@@ -464,7 +464,7 @@ def scan_self_authorship():
             line = code[ls:code.find('\n', m.end())]
             if line.strip().startswith('#') or '"""' in line:
                 continue
-            violations.append({"pattern": pat, "msg": msg, "line": line.strip()[:100]})
+            violations.append({"pattern": pat, "msg": msg, "line": line.strip()})  # FULL line — R370U-U6 no truncation
     return violations
 
 
@@ -507,7 +507,7 @@ def scan_hardcoded_acceptance_values():
             # If the line is just 'var = True' or 'var = False' with no condition, it's hard-coded
             violations.append({
                 "line_number": i,
-                "line": stripped[:100],
+                "line": stripped,  # FULL line — R370U-U6 no truncation
                 "variable": var_name,
                 "hardcoded_value": value,
                 "reason": f"Gate variable '{var_name}' assigned literal {value} instead of derived from test result"
@@ -780,7 +780,7 @@ def run_final():
         f.write(f"\n## Findings: {summary['FIXED']} FIXED, {summary['CURRENT']} CURRENT, {summary['UNRESOLVED']} UNRESOLVED\n\n")
         f.write("| # | Finding | Classification | Sources |\n|---|---------|----------------|---------|\n")
         for i, fnd in enumerate(findings, 1):
-            f.write(f"| {i} | {fnd['finding'][:50]} | **{fnd['classification']}** | {fnd.get('sources_searched_count',0)} |\n")
+            f.write(f"| {i} | {fnd['finding']} | **{fnd['classification']}** | {fnd.get('sources_searched_count',0)} |\n")
         f.write("\n## Adversarial Tests\n\n")
         for n, p in adv:
             f.write(f"- {'✓' if p else '✗'} {n}\n")

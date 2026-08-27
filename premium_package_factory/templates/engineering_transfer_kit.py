@@ -531,7 +531,7 @@ def _infer_data_flow(mechanism, pkg_id):
     """Infer data flow from mechanism."""
     if not mechanism:
         return "UNKNOWN"
-    return f"Data flow derived from mechanism: {mechanism[:100]}"
+    return f"Data flow derived from mechanism: {mechanism}"  # R370U-U6: no truncation
 
 
 def _infer_physical_changes(mechanism, pkg_id):
@@ -656,7 +656,7 @@ def _build_critical_to_function(pkg_id, mechanism, modelled_only, known_failures
     for claim in modelled_only:
         if claim and "MODELLED" in str(claim).upper():
             characteristics.append({
-                "characteristic": str(claim)[:80],
+                "characteristic": str(claim),  # R370U-U6: no truncation
                 "why_critical": "Modelled performance claim — requires physical verification",
                 "failure_mode": "UNKNOWN — requires FMEA",
                 "current_knowledge": "MODELLED",
@@ -666,9 +666,9 @@ def _build_critical_to_function(pkg_id, mechanism, modelled_only, known_failures
     # From known failures
     for failure in known_failures:
         characteristics.append({
-            "characteristic": str(failure)[:80],
+            "characteristic": str(failure),  # R370U-U6: no truncation
             "why_critical": "Known failure mode",
-            "failure_mode": str(failure)[:80],
+            "failure_mode": str(failure),  # R370U-U6: no truncation
             "current_knowledge": "OBSERVED" if "FALSIFIED" in str(failure).upper() else "MODELLED",
             "required_verification": "Design modification + re-test"
         })
@@ -714,26 +714,26 @@ def _build_design_inputs(pkg_id, r332, contract, claims):
     # Problem as clinical need
     problem = r332.get("problem", "")
     if problem:
-        inputs.append({"input": "Clinical need", "value": problem[:100], "evidence_class": "VERIFIED"})
+        inputs.append({"input": "Clinical need", "value": problem, "evidence_class": "VERIFIED"})  # R370U-U6: no truncation
 
     # Mechanism as functional requirement
     mechanism = r332.get("mechanism", "")
     if mechanism:
-        inputs.append({"input": "Functional requirement", "value": mechanism[:100], "evidence_class": "MODELLED"})
+        inputs.append({"input": "Functional requirement", "value": mechanism, "evidence_class": "MODELLED"})  # R370U-U6: no truncation
 
     # Decisive experiment as performance requirement
     exp = r332.get("decisive_experiment", "")
     if exp and exp != "UNKNOWN":
-        inputs.append({"input": "Performance requirement", "value": exp[:100], "evidence_class": "MODELLED"})
+        inputs.append({"input": "Performance requirement", "value": exp, "evidence_class": "MODELLED"})  # R370U-U6: no truncation
 
     # Pass/fail rules as acceptance criteria
     pass_rule = r332.get("pass_rule", "")
     if pass_rule:
-        inputs.append({"input": "Acceptance criterion (pass)", "value": pass_rule[:100], "evidence_class": "MODELLED"})
+        inputs.append({"input": "Acceptance criterion (pass)", "value": pass_rule, "evidence_class": "MODELLED"})  # R370U-U6: no truncation
 
     fail_rule = r332.get("fail_rule", "")
     if fail_rule:
-        inputs.append({"input": "Acceptance criterion (fail)", "value": fail_rule[:100], "evidence_class": "MODELLED"})
+        inputs.append({"input": "Acceptance criterion (fail)", "value": fail_rule, "evidence_class": "MODELLED"})  # R370U-U6: no truncation
 
     # Unknown inputs
     inputs.extend([
@@ -807,7 +807,7 @@ def _build_prototype_steps(pkg_id, contract):
     if test_unit and test_unit != "UNKNOWN":
         steps.append({"step": 1, "action": f"Acquire/build {test_unit}", "evidence_class": "PROPOSED"})
     if equipment and equipment != "UNKNOWN":
-        steps.append({"step": 2, "action": f"Procure equipment: {equipment[:60]}", "evidence_class": "PROPOSED"})
+        steps.append({"step": 2, "action": f"Procure equipment: {equipment}", "evidence_class": "PROPOSED"})  # R370U-U6: no truncation
     if exp_type and exp_type != "UNKNOWN":
         steps.append({"step": 3, "action": f"Execute {exp_type} test", "evidence_class": "PROPOSED"})
 

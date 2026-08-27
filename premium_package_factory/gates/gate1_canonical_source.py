@@ -181,14 +181,14 @@ def audit_package_against_repo(pkg_id, factory_pkg, repo_pkg, repo_sources, pack
                     mismatches.append({
                         "field": f,
                         "issue": "R1_VERBATIM_FIELD_MODIFIED",
-                        "base_value": str(base_pkg[f])[:80],
-                        "factory_value": str(factory_pkg[f])[:80]
+                        "base_value": str(base_pkg[f]),  # R370U-U6: no truncation
+                        "factory_value": str(factory_pkg[f])  # R370U-U6: no truncation
                     })
             elif f in base_pkg and f not in factory_pkg:
                 mismatches.append({
                     "field": f,
                     "issue": "MISSING_IN_FACTORY",
-                    "base_value": str(base_pkg[f])[:80],
+                    "base_value": str(base_pkg[f]),  # R370U-U6: no truncation
                     "factory_value": None
                 })
 
@@ -237,7 +237,7 @@ def audit_package_against_repo(pkg_id, factory_pkg, repo_pkg, repo_sources, pack
         mismatches.append({
             "field": f,
             "issue": "MISSING_IN_FACTORY",
-            "repo_value": str(repo_pkg[f])[:100],
+            "repo_value": str(repo_pkg[f]),  # R370U-U6: no truncation
             "factory_value": None
         })
 
@@ -251,15 +251,15 @@ def audit_package_against_repo(pkg_id, factory_pkg, repo_pkg, repo_sources, pack
                 mismatches.append({
                     "field": f,
                     "issue": "VALUE_MISMATCH",
-                    "repo_value": repo_val[:100],
-                    "factory_value": factory_val[:100]
+                    "repo_value": repo_val,  # R370U-U6: no truncation
+                    "factory_value": factory_val  # R370U-U6: no truncation
                 })
         elif repo_val != factory_val:
             mismatches.append({
                 "field": f,
                 "issue": "VALUE_MISMATCH",
-                "repo_value": str(repo_val)[:100],
-                "factory_value": str(factory_val)[:100]
+                "repo_value": str(repo_val),  # R370U-U6: no truncation
+                "factory_value": str(factory_val)  # R370U-U6: no truncation
             })
 
     verdict = "PASS" if not mismatches else "FAIL"

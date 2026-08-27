@@ -102,7 +102,7 @@ def check_1_immutable_observation_ledger():
                     except json.JSONDecodeError:
                         issues.append(f"Observation ledger line {i} is not valid JSON")
 
-    return {"requirement": "1_immutable_observation_ledger", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "1_immutable_observation_ledger", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_2_experiment_registry():
@@ -122,7 +122,7 @@ def check_2_experiment_registry():
             except json.JSONDecodeError:
                 issues.append("Experiment registry is not valid JSON")
 
-    return {"requirement": "2_experiment_registry", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "2_experiment_registry", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_3_raw_data_provenance():
@@ -138,7 +138,7 @@ def check_3_raw_data_provenance():
                 if "raw_data_hash" not in entry:
                     issues.append(f"Observation {entry.get('observation_id', i)} missing raw_data_hash")
 
-    return {"requirement": "3_raw_data_provenance", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "3_raw_data_provenance", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_4_revision_binding():
@@ -156,7 +156,7 @@ def check_4_revision_binding():
                     if rev not in entry:
                         issues.append(f"Observation {entry.get('observation_id', i)} missing {rev}")
 
-    return {"requirement": "4_revision_binding", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "4_revision_binding", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_5_evidence_classes():
@@ -171,7 +171,7 @@ def check_5_evidence_classes():
     if EVIDENCE_LAYERS["PHYSICAL_OBSERVATION"]["ai_can_create"]:
         issues.append("PHYSICAL_OBSERVATION allows AI creation (violation of central invariant)")
 
-    return {"requirement": "5_evidence_classes", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "5_evidence_classes", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_6_design_decision_ledger():
@@ -182,7 +182,7 @@ def check_6_design_decision_ledger():
         with open(DESIGN_DECISION_LEDGER_PATH, "w") as f:
             pass
 
-    return {"requirement": "6_design_decision_ledger", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "6_design_decision_ledger", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_7_causal_graph():
@@ -202,7 +202,7 @@ def check_7_causal_graph():
                         if field not in entry:
                             issues.append(f"Decision {entry.get('decision_id', i)} missing {field}")
 
-    return {"requirement": "7_causal_graph", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "7_causal_graph", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_8_dossier_revision_history():
@@ -225,7 +225,7 @@ def check_8_dossier_revision_history():
                             if field not in revision:
                                 issues.append(f"Revision {f} missing {field}")
 
-    return {"requirement": "8_dossier_revision_history", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "8_dossier_revision_history", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_9_engineer_review_gate():
@@ -236,7 +236,7 @@ def check_9_engineer_review_gate():
         with open(ENGINEER_REVIEWS_PATH, "w") as f:
             pass
 
-    return {"requirement": "9_engineer_review_gate", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "9_engineer_review_gate", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_10_buyer_feedback_ingestion():
@@ -246,7 +246,7 @@ def check_10_buyer_feedback_ingestion():
         with open(BUYER_FEEDBACK_PATH, "w") as f:
             pass
 
-    return {"requirement": "10_buyer_feedback_ingestion", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "10_buyer_feedback_ingestion", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_11_reality_boundary_enforcement():
@@ -260,7 +260,7 @@ def check_11_reality_boundary_enforcement():
     if len(FORBIDDEN_EVIDENCE_TRANSITIONS) == 0:
         issues.append("No forbidden transitions defined")
 
-    return {"requirement": "11_reality_boundary_enforcement", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "11_reality_boundary_enforcement", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_12_automatic_knowledge_update():
@@ -270,7 +270,7 @@ def check_12_automatic_knowledge_update():
     if not callable(trigger_package_re_evaluation):
         issues.append("trigger_package_re_evaluation not callable")
 
-    return {"requirement": "12_automatic_knowledge_update", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "12_automatic_knowledge_update", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_13_package_re_evaluation():
@@ -280,7 +280,7 @@ def check_13_package_re_evaluation():
     if not callable(trigger_package_re_evaluation):
         issues.append("trigger_package_re_evaluation not callable")
 
-    return {"requirement": "13_package_re_evaluation", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "13_package_re_evaluation", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_14_no_self_generated_physical_evidence():
@@ -291,7 +291,7 @@ def check_14_no_self_generated_physical_evidence():
     if allowed:
         issues.append("AI was allowed to create PHYSICAL_OBSERVATION (violation of central invariant)")
 
-    return {"requirement": "14_no_self_generated_physical_evidence", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "14_no_self_generated_physical_evidence", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_15_no_modelled_to_verified():
@@ -308,7 +308,7 @@ def check_15_no_modelled_to_verified():
     if not has_modelled_to_verified:
         issues.append("Missing forbidden transition for modelled → verified")
 
-    return {"requirement": "15_no_modelled_to_verified", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "15_no_modelled_to_verified", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_16_no_precedent_to_fact():
@@ -321,7 +321,7 @@ def check_16_no_precedent_to_fact():
     if not has_precedent_to_fact:
         issues.append("Missing forbidden transition for EXTERNAL_PRECEDENT → SOURCE_FACT")
 
-    return {"requirement": "16_no_precedent_to_fact", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "16_no_precedent_to_fact", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_17_no_overwriting_observations():
@@ -340,7 +340,7 @@ def check_17_no_overwriting_observations():
                 except json.JSONDecodeError:
                     issues.append(f"Observation ledger line {i} is not valid JSON (may have been corrupted)")
 
-    return {"requirement": "17_no_overwriting_observations", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "17_no_overwriting_observations", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_18_causal_trace():
@@ -350,7 +350,7 @@ def check_18_causal_trace():
     if not callable(get_causal_trace):
         issues.append("get_causal_trace not callable")
 
-    return {"requirement": "18_causal_trace", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"requirement": "18_causal_trace", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================
@@ -361,7 +361,7 @@ def adversarial_1_ai_creates_physical_observation():
     """A1: AI attempts to create PHYSICAL_OBSERVATION → must be BLOCKED."""
     allowed, reason = enforce_reality_boundary("PHYSICAL_OBSERVATION", "AI", {"test": True})
     if not allowed:
-        return {"test": "A1_ai_creates_physical_observation", "passed": True, "details": f"Correctly blocked: {reason[:80]}"}
+        return {"test": "A1_ai_creates_physical_observation", "passed": True, "details": f"Correctly blocked: {reason}"}
     return {"test": "A1_ai_creates_physical_observation", "passed": False, "details": "AI was allowed to create PHYSICAL_OBSERVATION — CRITICAL FAILURE"}
 
 
@@ -369,7 +369,7 @@ def adversarial_2_ai_creates_computational_without_log():
     """A2: AI attempts COMPUTATIONAL_RESULT without computation log → must be BLOCKED."""
     allowed, reason = enforce_reality_boundary("COMPUTATIONAL_RESULT", "AI", {"test": True})  # no computation_log
     if not allowed:
-        return {"test": "A2_ai_computational_without_log", "passed": True, "details": f"Correctly blocked: {reason[:80]}"}
+        return {"test": "A2_ai_computational_without_log", "passed": True, "details": f"Correctly blocked: {reason}"}
     return {"test": "A2_ai_computational_without_log", "passed": False, "details": "AI created COMPUTATIONAL_RESULT without log — CRITICAL FAILURE"}
 
 
@@ -377,7 +377,7 @@ def adversarial_3_forbidden_transition_ai_to_physical():
     """A3: Forbidden transition AI_INFERENCE → PHYSICAL_OBSERVATION → must be BLOCKED."""
     allowed, reason = enforce_reality_boundary("PHYSICAL_OBSERVATION", "EXPERIMENT", {"from_class": "AI_INFERENCE", "test": True})
     if not allowed:
-        return {"test": "A3_forbidden_ai_to_physical", "passed": True, "details": f"Correctly blocked: {reason[:80]}"}
+        return {"test": "A3_forbidden_ai_to_physical", "passed": True, "details": f"Correctly blocked: {reason}"}
     return {"test": "A3_forbidden_ai_to_physical", "passed": False, "details": "Forbidden transition allowed — CRITICAL FAILURE"}
 
 
@@ -385,7 +385,7 @@ def adversarial_4_forbidden_transition_computational_to_physical():
     """A4: Forbidden transition COMPUTATIONAL_RESULT → PHYSICAL_OBSERVATION → must be BLOCKED."""
     allowed, reason = enforce_reality_boundary("PHYSICAL_OBSERVATION", "EXPERIMENT", {"from_class": "COMPUTATIONAL_RESULT", "test": True})
     if not allowed:
-        return {"test": "A4_forbidden_computational_to_physical", "passed": True, "details": f"Correctly blocked: {reason[:80]}"}
+        return {"test": "A4_forbidden_computational_to_physical", "passed": True, "details": f"Correctly blocked: {reason}"}
     return {"test": "A4_forbidden_computational_to_physical", "passed": False, "details": "Forbidden transition allowed — CRITICAL FAILURE"}
 
 

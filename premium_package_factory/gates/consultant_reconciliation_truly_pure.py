@@ -841,10 +841,10 @@ def run_truly_pure_reconciliation():
         f.write("| # | Finding | Classification | Verification Method |\n")
         f.write("|---|---------|----------------|---------------------|\n")
         for i, fnd in enumerate(findings, 1):
-            f.write(f"| {i} | {fnd['finding'][:50]} | **{fnd['classification']}** | {fnd.get('verification_method', '?')} |\n")
+            f.write(f"| {i} | {fnd['finding']} | **{fnd['classification']}** | {fnd.get('verification_method', '?')} |\n")
         f.write("\n## Unresolved Findings\n\n")
         for u in report["unresolved_findings"]:
-            f.write(f"### {u['finding_id']}: {u['finding']}\n- **Package:** {u['package']}\n- **Action:** {u['required_action'][:200]}\n\n")
+            f.write(f"### {u['finding_id']}: {u['finding']}\n- **Package:** {u['package']}\n- **Action:** {u['required_action']}\n\n")
 
     print(f"\n{'='*70}")
     print(f"TRULY PURE VERDICT: {verdict}")

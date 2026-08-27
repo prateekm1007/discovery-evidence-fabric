@@ -120,7 +120,7 @@ def gate_1_manifest_filesystem_integrity(dossier):
         if not reason:
             issues.append(f"not_available[{i}].{artifact_name}: missing 'reason' field")
 
-    return {"gate": "manifest_filesystem_integrity", "passed": len(issues) == 0, "issues": issues[:5]}
+    return {"gate": "manifest_filesystem_integrity", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================
@@ -178,7 +178,7 @@ def gate_2_design_output_state_integrity(dossier):
         if status == "ABSENT" and release_state not in ["CONCEPTUAL", ""]:
             issues.append(f"{artifact_name}: status=ABSENT but release_state={release_state} (must be CONCEPTUAL)")
 
-    return {"gate": "design_output_state_integrity", "passed": len(issues) == 0, "issues": issues[:5]}
+    return {"gate": "design_output_state_integrity", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================
@@ -301,7 +301,7 @@ def gate_3_domain_reasoning_depth(dossier):
     if not has_package_specific_test:
         issues.append("No package-specific test article found (build plan is generic)")
 
-    return {"gate": "domain_reasoning_depth", "passed": len(issues) == 0, "issues": issues[:5]}
+    return {"gate": "domain_reasoning_depth", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================
@@ -354,7 +354,7 @@ def gate_4_number_provenance_regression(dossier):
                 if "UNKNOWN" not in val.upper():
                     issues.append(f"design_inputs[{i}]: numerical value '{val[:40]}' with evidence_class=UNKNOWN")
 
-    return {"gate": "number_provenance_regression", "passed": len(issues) == 0, "issues": issues[:5]}
+    return {"gate": "number_provenance_regression", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================
@@ -399,7 +399,7 @@ def gate_5_standard_applicability(dossier):
         if "ISO 7197" not in dossier_str and "ISO_7197" not in dossier_str:
             issues.append(f"CSF shunt package {pkg_id} does not cite ISO 7197 (the correct CSF shunt standard)")
 
-    return {"gate": "standard_applicability", "passed": len(issues) == 0, "issues": issues[:5]}
+    return {"gate": "standard_applicability", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================
@@ -456,7 +456,7 @@ def gate_6_transfer_boundary_integrity(dossier):
             issues.append(f"Duplicate artifact across manifest sections: '{name}'")
         seen.add(name)
 
-    return {"gate": "transfer_boundary_integrity", "passed": len(issues) == 0, "issues": issues[:5]}
+    return {"gate": "transfer_boundary_integrity", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================
@@ -479,7 +479,7 @@ def gate_7_portable_root_verification(dossier):
     except Exception as e:
         issues.append(f"Cannot run r370_portable self_test: {e}")
 
-    return {"gate": "portable_root_verification", "passed": len(issues) == 0, "issues": issues[:5]}
+    return {"gate": "portable_root_verification", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================

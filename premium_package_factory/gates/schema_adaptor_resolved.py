@@ -168,11 +168,11 @@ def adapt_package(pkg_id, resolved_pkg):
     # Derive presentation fields (deterministic, non-inventing)
     mechanism = adapted.get("mechanism", "") or ""
     adapted["name"] = pkg_id  # Package ID is the name (honest, no marketing)
-    adapted["subtitle"] = mechanism[:120] + ("..." if len(mechanism) > 120 else "")
+    adapted["subtitle"] = mechanism  # R370U-U6: no truncation
     adapted["value_proposition"] = (
         f"Problem: {adapted.get('problem', '—')} | "
-        f"Mechanism: {mechanism[:80]} | "
-        f"Uncertainty: {adapted.get('remaining_uncertainty', '—')[:80]}"
+        f"Mechanism: {mechanism} | "  # R370U-U6: no truncation
+        f"Uncertainty: {adapted.get('remaining_uncertainty', '—')}"  # R370U-U6: no truncation
     )
     adapted["target_application"] = adapted.get("buyer", "")
     adapted["transfer_posture"] = adapted.get("buyer_action", "")
@@ -209,7 +209,7 @@ def adapt_package(pkg_id, resolved_pkg):
         if m and not str(m).startswith("UNKNOWN"):
             adapted["key_metrics"].append({
                 "metric": "Modelled claim",
-                "value": str(m)[:80],
+                "value": str(m),  # R370U-U6: no truncation
                 "tier": "MODELLED",
                 "evidence": "From R370 claims"
             })

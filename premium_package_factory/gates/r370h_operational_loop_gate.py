@@ -135,7 +135,7 @@ def check_1_real_event_ingestion():
     except Exception as e:
         issues.append(f"Ingestion test failed: {e}")
 
-    return {"criterion": "1_real_event_ingestion", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"criterion": "1_real_event_ingestion", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_2_provenance_derivation():
@@ -149,7 +149,7 @@ def check_2_provenance_derivation():
     ingestion_ledger = os.path.join(REALITY_LOOP_DIR, "INGESTION_LEDGER.jsonl")
     if not os.path.exists(ingestion_ledger):
         issues.append("No ingestion records to validate")
-        return {"criterion": "2_provenance_derivation", "passed": False, "issues": issues[:3]}
+        return {"criterion": "2_provenance_derivation", "passed": False, "issues": issues  # R370U-U6: no truncation}
 
     last_ingestion_id = None
     with open(ingestion_ledger) as f:
@@ -160,7 +160,7 @@ def check_2_provenance_derivation():
 
     if not last_ingestion_id:
         issues.append("No ingestion ID found")
-        return {"criterion": "2_provenance_derivation", "passed": False, "issues": issues[:3]}
+        return {"criterion": "2_provenance_derivation", "passed": False, "issues": issues  # R370U-U6: no truncation}
 
     # Validate provenance (this is a DERIVED operation)
     try:
@@ -181,7 +181,7 @@ def check_2_provenance_derivation():
     except Exception as e:
         issues.append(f"Provenance validation failed: {e}")
 
-    return {"criterion": "2_provenance_derivation", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"criterion": "2_provenance_derivation", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_3_computational_reproducibility():
@@ -222,7 +222,7 @@ def check_3_computational_reproducibility():
     except Exception as e:
         issues.append(f"Computational reproducibility test failed: {e}")
 
-    return {"criterion": "3_computational_reproducibility", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"criterion": "3_computational_reproducibility", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_4_causal_mutation():
@@ -251,7 +251,7 @@ def check_4_causal_mutation():
     if CAUSAL_CHAIN_STAGES != expected:
         issues.append(f"Causal chain stages mismatch")
 
-    return {"criterion": "4_causal_mutation", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"criterion": "4_causal_mutation", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_5_real_loop_certificate():
@@ -269,7 +269,7 @@ def check_5_real_loop_certificate():
     else:
         issues.append("Certificate was allowed for CONTROLLED_REHEARSAL (should be blocked)")
 
-    return {"criterion": "5_real_loop_certificate", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"criterion": "5_real_loop_certificate", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_6_candidate_set_mutation():
@@ -305,7 +305,7 @@ def check_6_candidate_set_mutation():
     except Exception as e:
         issues.append(f"Candidate set mutation failed: {e}")
 
-    return {"criterion": "6_candidate_set_mutation", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"criterion": "6_candidate_set_mutation", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_7_buyer_feedback_causality():
@@ -325,7 +325,7 @@ def check_7_buyer_feedback_causality():
     if automation != "HUMAN_AUTHORIZATION_REQUIRED":
         issues.append(f"PACKAGE_MUTATION should be HUMAN_AUTHORIZATION_REQUIRED, got {automation}")
 
-    return {"criterion": "7_buyer_feedback_causality", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"criterion": "7_buyer_feedback_causality", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 def check_8_independent_replay():
@@ -346,7 +346,7 @@ def check_8_independent_replay():
     except Exception as e:
         issues.append(f"Independent replay failed unexpectedly: {e}")
 
-    return {"criterion": "8_independent_replay", "passed": len(issues) == 0, "issues": issues[:3]}
+    return {"criterion": "8_independent_replay", "passed": len(issues) == 0, "issues": issues  # R370U-U6: no truncation}
 
 
 # ============================================================================
@@ -423,7 +423,7 @@ def adversarial_3_certificate_for_rehearsal():
 
     if cert and cert.get("eligible") == False:
         return {"test": "A3_certificate_for_rehearsal", "passed": True,
-                "details": f"Correctly blocked: {cert.get('reason', '')[:80]}"}
+                "details": f"Correctly blocked: {cert.get('reason', '')}"  # R370U-U6: no truncation}
     return {"test": "A3_certificate_for_rehearsal", "passed": False,
             "details": "Certificate was allowed for CONTROLLED_REHEARSAL"}
 
@@ -464,7 +464,7 @@ def adversarial_4_incomplete_chain_certificate():
 
     if cert and cert.get("eligible") == False:
         return {"test": "A4_incomplete_chain", "passed": True,
-                "details": f"Correctly blocked: {cert.get('reason', '')[:80]}"}
+                "details": f"Correctly blocked: {cert.get('reason', '')}"  # R370U-U6: no truncation}
     return {"test": "A4_incomplete_chain", "passed": False,
             "details": "Certificate was allowed with incomplete causal chain"}
 

@@ -306,12 +306,12 @@ def check_4_generic_phrases(all_dossiers):
                     if phrase == "tbd" or phrase == "to be determined":
                         # Only flag if it's a CRITICAL field, not just a sub-detail
                         if any(crit in path.lower() for crit in ["acceptance_criterion", "value", "critical_parameter"]):
-                            found.append({"package": pkg_id, "path": path, "phrase": phrase, "context": s[:80]})
+                            found.append({"package": pkg_id, "path": path, "phrase": phrase, "context": s})  # R370U-U6: no truncation
                     elif phrase in ["engineering analysis required", "package-specific engineering analysis required"]:
                         # This was the OLD generic content; should be GONE now
-                        found.append({"package": pkg_id, "path": path, "phrase": phrase, "context": s[:80]})
+                        found.append({"package": pkg_id, "path": path, "phrase": phrase, "context": s})  # R370U-U6: no truncation
                     elif phrase in ["todo", "fixme", "placeholder", "lorem ipsum", "generic template"]:
-                        found.append({"package": pkg_id, "path": path, "phrase": phrase, "context": s[:80]})
+                        found.append({"package": pkg_id, "path": path, "phrase": phrase, "context": s})  # R370U-U6: no truncation
 
     if found:
         print(f"  FAIL: {len(found)} generic phrases found")

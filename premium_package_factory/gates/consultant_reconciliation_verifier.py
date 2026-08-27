@@ -906,7 +906,7 @@ def run_final():
         f.write(f"\n## Findings: {s['FIXED']} FIXED, {s['CURRENT']} CURRENT, {s['UNRESOLVED']} UNRESOLVED\n\n")
         f.write("| # | Finding | Classification | Sources |\n|---|---------|----------------|---------|\n")
         for i, fnd in enumerate(findings, 1):
-            f.write(f"| {i} | {fnd['finding'][:50]} | **{fnd['classification']}** | {fnd.get('sources_searched_count', 0)} |\n")
+            f.write(f"| {i} | {fnd['finding']} | **{fnd['classification']}** | {fnd.get('sources_searched_count', 0)} |\n")
         f.write("\n## Adversarial Tests\n\n")
         for r in adv_results:
             f.write(f"- {'✓' if r['pass'] else '✗'} {r['test']}: {r['actual']}\n")

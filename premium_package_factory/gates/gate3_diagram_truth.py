@@ -556,7 +556,7 @@ def run_gate3():
         for a in package_audits:
             n_mech = len(a.get("canonical_mechanism_elements", []))
             n_forbidden = len(a.get("forbidden_visual_claims", []))
-            callout = a.get("honest_state_callout", "—")[:40]
+            callout = a.get("honest_state_callout", "—")  # R370U-U6: no truncation
             f.write(f"| {a['package_id']} | {a['overall']} | {n_mech} | {n_forbidden} rules | {callout}... |\n")
         f.write(f"\n## Summary\n\n")
         f.write(f"- **PASS:** {pass_count}/{len(package_audits)}\n")

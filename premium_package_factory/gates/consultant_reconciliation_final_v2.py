@@ -617,7 +617,7 @@ def run_final():
         f.write("| # | Finding | Classification | Sources Searched | Duplicates |\n")
         f.write("|---|---------|----------------|-----------------|------------|\n")
         for i, fnd in enumerate(findings, 1):
-            f.write(f"| {i} | {fnd['finding'][:50]} | **{fnd['classification']}** | {fnd.get('sources_searched_count', 0)} | {fnd.get('duplicate_sources', [])} |\n")
+            f.write(f"| {i} | {fnd['finding']} | **{fnd['classification']}** | {fnd.get('sources_searched_count', 0)} | {fnd.get('duplicate_sources', [])} |\n")
         f.write("\n## Adversarial Tests\n\n")
         for r in adv_results:
             f.write(f"- {'✓' if r['pass'] else '✗'} {r['test']}: {r['actual']}\n")

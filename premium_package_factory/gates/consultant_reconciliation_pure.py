@@ -150,7 +150,7 @@ def source_backed_evidence(source_name, source_hashes, evidence_pointer, value):
         "source_artifact": EXPECTED_SOURCES.get(source_name, "UNKNOWN"),
         "source_hash": source_hashes.get(source_name, "UNKNOWN"),
         "evidence_pointer": evidence_pointer,
-        "source_value": str(value)[:100] if value else "NONE",
+        "source_value": str(value) if value else "NONE",  # R370U-U6: no truncation
         "acceptance_result": "PASS" if value else "FAIL"
     }
 
@@ -290,7 +290,7 @@ def reconcile_p22_pure(state, source_hashes):
         "consultant_state": "4/4 independent source records with problem+evidence+resolution_path+experiment+threshold+status",
         "current_state": f"n_complete_in_source={n_complete}/4. source_has_structured_control_records={source_has_structured_control_records}",
         "classification": classification,
-        "evidence": f"R332 known_failures: {len(failures)} problems documented. R370 source does NOT contain per-control resolution/experiment/threshold/status fields. evidence_records={json.dumps(evidence_records, indent=2)[:500]}",
+        "evidence": f"R332 known_failures: {len(failures)} problems documented. R370 source does NOT contain per-control resolution/experiment/threshold/status fields. evidence_records={json.dumps(evidence_records, indent=2)}"  # R370U-U6: no truncation,
         "required_action": required_action,
         "acceptance_condition": "4/4 control records with ALL 6 fields present in AUTHORITATIVE SOURCE (not auditor-constructed)",
         "disqualifying_condition_met": n_complete < 4,
@@ -776,7 +776,7 @@ def run_pure_reconciliation():
         "findings": findings,
         "unresolved_findings_prominent": [
             {"finding_id": f["finding_id"], "finding": f["finding"], "package": f["package"],
-             "required_action": f["required_action"][:200]}
+             "required_action": f["required_action"]}  # R370U-U6: no truncation
             for f in unresolved_list
         ],
         "summary": {
@@ -831,7 +831,7 @@ def run_pure_reconciliation():
         f.write("| # | Finding | Package | Classification | Self-Authored |\n")
         f.write("|---|---------|---------|----------------|---------------|\n")
         for i, fnd in enumerate(findings, 1):
-            f.write(f"| {i} | {fnd['finding'][:50]} | {fnd['package']} | **{fnd['classification']}** | {fnd.get('self_authored_evidence', '?')} |\n")
+            f.write(f"| {i} | {fnd['finding']} | {fnd['package']} | **{fnd['classification']}** | {fnd.get('self_authored_evidence', '?')} |\n")
 
     print(f"\n{'='*70}")
     print(f"PURE RECONCILIATION VERDICT: {verdict}")

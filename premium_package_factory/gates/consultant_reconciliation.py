@@ -89,7 +89,7 @@ def reconcile_p16_regulatory(state):
         "consultant_state": "Concern about Class III/510(k) contradiction in regulatory pathway",
         "current_state": current_state,
         "classification": classification,
-        "evidence": f"R332 regulatory_status='{r332_reg}'. R370 claims consistent. P-28/P-29 fixed file: {json.dumps(p16_completion.get('P-16', {}))[:100]}",
+        "evidence": f"R332 regulatory_status='{r332_reg}'. R370 claims consistent. P-28/P-29 fixed file: {json.dumps(p16_completion.get('P-16', {}))}"  # R370U-U6: no truncation,
         "required_action": "None — no contradiction found. PMA (Class III) is consistently stated."
     }
 
@@ -442,7 +442,7 @@ def run_reconciliation():
     for f in findings:
         print(f"\n  [{f['classification']}] {f['finding']}")
         print(f"    Package: {f['package']}")
-        print(f"    Current: {f['current_state'][:100]}")
+        print(f"    Current: {f['current_state']}")
 
     # Classify counts
     classification_counts = {}
@@ -533,8 +533,8 @@ def run_reconciliation():
         f.write("| # | Finding | Package | Classification | Required Action |\n")
         f.write("|---|---------|---------|----------------|-----------------|\n")
         for i, fnd in enumerate(findings, 1):
-            action = fnd["required_action"][:60] + "..." if len(fnd["required_action"]) > 60 else fnd["required_action"]
-            f.write(f"| {i} | {fnd['finding'][:50]} | {fnd['package']} | **{fnd['classification']}** | {action} |\n")
+            action = fnd["required_action"]  # R370U-U6: no truncation — full required_action
+            f.write(f"| {i} | {fnd['finding']} | {fnd['package']} | **{fnd['classification']}** | {action} |\n")
         f.write("\n## Detailed Findings\n\n")
         for i, fnd in enumerate(findings, 1):
             f.write(f"### Finding {i}: {fnd['finding']}\n\n")

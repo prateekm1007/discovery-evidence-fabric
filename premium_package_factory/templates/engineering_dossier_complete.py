@@ -166,7 +166,7 @@ def build_design_input_register(pkg_id, pkg_data, external_evidence):
         inputs.append({
             "id": f"DI-{di_id:03d}",
             "design_input": "Clinical need",
-            "value": problem[:100],
+            "value": problem,  # R370U-U6: no truncation
             "unit": "N/A",
             "basis": "R332 problem field",
             "source": "R332",
@@ -182,7 +182,7 @@ def build_design_input_register(pkg_id, pkg_data, external_evidence):
         inputs.append({
             "id": f"DI-{di_id:03d}",
             "design_input": "Functional requirement",
-            "value": mechanism[:100],
+            "value": mechanism,  # R370U-U6: no truncation
             "unit": "N/A",
             "basis": "R332 mechanism field",
             "source": "R332",
@@ -198,7 +198,7 @@ def build_design_input_register(pkg_id, pkg_data, external_evidence):
         inputs.append({
             "id": f"DI-{di_id:03d}",
             "design_input": "Performance acceptance criterion",
-            "value": pass_rule[:100],
+            "value": pass_rule,  # R370U-U6: no truncation
             "unit": "N/A",
             "basis": "R332 pass_rule field",
             "source": "R332",
@@ -214,7 +214,7 @@ def build_design_input_register(pkg_id, pkg_data, external_evidence):
         inputs.append({
             "id": f"DI-{di_id:03d}",
             "design_input": "Safety/failure criterion",
-            "value": fail_rule[:100],
+            "value": fail_rule,  # R370U-U6: no truncation
             "unit": "N/A",
             "basis": "R332 fail_rule field",
             "source": "R332",
@@ -247,7 +247,7 @@ def build_design_input_register(pkg_id, pkg_data, external_evidence):
             inputs.append({
                 "id": f"DI-{di_id:03d}",
                 "design_input": "Regulatory classification precedent",
-                "value": ev["source_snippet"][:100],
+                "value": ev["source_snippet"],  # R370U-U6: no truncation
                 "unit": "N/A",
                 "basis": "External FDA database search",
                 "source": ev["source_url"],

@@ -128,7 +128,7 @@ def classify_design_input(di, ec, ecc):
     return {
         "di_id": di_id,
         "input": di.get("input", ""),
-        "value": di_value[:100],
+        "value": di_value,  # FULL VALUE — NO TRUNCATION (R370U-U6 fix)
         "criticality": "CRITICAL" if is_critical else ("MAJOR" if not is_compliance else "INFORMATIONAL"),
         "traceability_class": traceability_class,
         "reason": reason,
@@ -196,11 +196,11 @@ def audit_package(pkg_info, dossier):
 
         eq_audits.append({
             "equation_id": f"EQ-{i+1}",
-            "equation": eq_str[:120],
+            "equation": eq_str,  # FULL equation — R370U-U6 no truncation
             "has_variables": has_variables,
             "has_operators": has_operators,
             "has_description": has_description,
-            "variables": re.findall(r'[a-zA-Z_]+', eq_str)[:10],
+            "variables": re.findall(r'[a-zA-Z_]+', eq_str),  # FULL list — R370U-U6 no truncation
             "valid": has_variables and has_operators,
         })
 
