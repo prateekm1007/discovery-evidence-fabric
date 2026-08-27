@@ -5447,3 +5447,23 @@ Stage Summary:
 - The new chat session should read this document completely before any action.
 - The system is FROZEN at portfolio HEAD 2e96b27 and dev HEAD bf97cdf.
 - STOP CODING. Next phase: real buyer engagement.
+
+---
+Task ID: AUDIT-D1-D3
+Agent: main (new coder, Super Z)
+Task: CEO-authorized runtime participation audit (D1-D3) of discovery-evidence-fabric. Enumerate which modules actually participate in the live discovery path vs dormant machinery; rank plug-in candidates. Portfolio repo NOT touched (frozen at 2e96b27).
+
+Work Log:
+- Read EPISTEMIC_CONSTITUTION.md v1.8.0 first (per CEO order), ACTIVE_PATH.md, ORCHESTRATOR_SPEC_V4_FINAL.json, canonical worklog tail.
+- Static AST analysis over curated code roots at HEAD 9b0e760: 358 Python modules parsed, 455 IMPORT/EXEC edges resolved (absolute + relative imports + subprocess/exec string references), BFS reachability from seed discovery_fabric/a2/run.py.
+- VERDICT: live engine = exactly 8 modules: a2/{run,retrieve,synthesize,verify,prior_art,adversarial,classify} + v4_corrections.py (2.2% of inventory). Everything else is not invoked at runtime.
+- Classification: ACTIVE_RUNTIME=8, TEST_ONLY=43 (regression-covered but unwired, e.g., calibration_v3_9, patsnap_claim_attack, invention_rescue, rescue_v2), SUPERSEDED=30 (old version families), UNPROVEN=180 (no runtime path, no tests), HISTORICAL=95 round scripts, QUARANTINED=1 (providers/simulation.py), SPEC_ONLY=6 (ORCHESTRATOR_SPEC V1..V4 + scoreboard/corrections JSONs), IMPORTED_BUT_UNUSED=1 (R364 automated kill/repair loop).
+- Key finding: AUTOMATED_RESEARCH_ORCHESTRATOR exists BOTH as specs (V4 hardened doctrine incl. hostility escalation, NEXT_BEST_ACTION with DECISION_CHANGE_PROBABILITY, 4-axis evidence independence) AND as an implementing package orchestrator/ (multi_source_discovery 4-direction search, triangulation_engine, next_best_action, contradiction_queue, coverage_engine, territory_discovery, mechanism_cemetery, portfolio, evidence_graph, providers: patsnap/lens/scopus/espacenet/google_patents/patentbear/simulation). Package has ZERO importers outside itself, ZERO tests -> nothing wires the conductor.
+- Historical collision/validator/attack machinery lives as one-shot scripts under scripts/r250-r272 + validated state artifacts in CANONICAL_STATE/R258-R262 (collision engine validation, blind validator, independent validator, completeness/saturation/synergy). Code proven historically; packaged nowhere; integrated nowhere.
+- No executable code exists at all for TEE extraction / knowledge-graph / invention-corpus generation -> quarantine holds by absence; only providers/simulation.py required explicit quarantine flagging.
+- Artifacts written at repo root: RUNTIME_MODULE_PARTICIPATION_AUDIT.json, DISCOVERY_RUNTIME_GRAPH.json, DORMANT_HIGH_VALUE_MODULES.json (350 dormant modules ranked by deterministic composite).
+- Commit 769c09c pushed to origin/main; ls-remote verified equal (Art. XXIII).
+
+Stage Summary:
+- Audit answers CEO question: yes, there are large unplugged subsystems; the biggest is the orchestrator conductor layer (spec+code, unwired), then the multi-direction attack/novelty machinery (historical-but-validated), then the TEST_ONLY prior-art elite stack, then invention_loop_engine adjudication/EIG components, then R364 recursive kill-repair.
+- Next legal moves per directive: D4 wire ONE loop (a2 -> orchestrator conductor -> collision/novelty -> attack -> killer experiment -> classify -> rank) + D9 end-to-end smoke test. Quarantine stays until promotion gates exist (D8).
