@@ -1,0 +1,226 @@
+"""
+p27r1.py — P-27-R1 Self-referencing Piezoresistive Sensor engineering core.
+Domain: tubing mechanics / kink resistance / fatigue / patency.
+
+Governing model: piezoresistance + Wheatstone bridge + mechanical stress in tubing.
+External precedent: MEMS pressure sensor + catheter tip pressure sensor literature.
+"""
+from .constants import EQUATIONS, STANDARDS
+
+
+def get_data():
+    return {
+        "technology_domain": "Piezoresistive Sensing + Tubing Mechanics + Drift Compensation",
+        "engineering_disciplines": [
+            "MEMS engineering (piezoresistive sensors)",
+            "Tubing mechanics (kink, fatigue, patency)",
+            "Circuit design (Wheatstone bridge, signal conditioning)",
+            "Calibration and drift compensation"
+        ],
+        "system_architecture": {
+            "description": "Catheter-integrated piezoresistive pressure sensor with self-referencing architecture for drift compensation. R1 fix: original P-27 suffered from chronic drift; R1 redesign adds self-referencing bridge for drift correction.",
+            "subsystems": [
+                {"id": "SS-01", "name": "Piezoresistive sensing element (MEMS)", "function": "Converts mechanical stress to resistance change via piezoresistive effect", "status": "PROPOSED", "evidence_class": "PROPOSED", "evidence_source": "R332 + external piezoresistive sensor literature (PMC4279503)"},
+                {"id": "SS-02", "name": "Self-referencing bridge (R1 fix)", "function": "Compensates for thermal and temporal drift by referencing active sensor to dummy/passive element", "status": "PROPOSED", "evidence_class": "PROPOSED", "evidence_source": "R1 fix + external drift compensation literature (sciencedirect S0924424724006095)"},
+                {"id": "SS-03", "name": "Catheter integration (mechanical protection)", "function": "Mounts sensor in catheter wall; protects from mechanical damage while transmitting pressure", "status": "PROPOSED", "evidence_class": "PROPOSED"},
+                {"id": "SS-04", "name": "Signal conditioning + telemetry", "function": "Amplifies, filters, digitizes sensor signal; transmits to external reader", "status": "PROPOSED", "evidence_class": "PROPOSED"}
+            ],
+            "sensor_model": {
+                "key_equations": [
+                    EQUATIONS["piezoresistance"],
+                    EQUATIONS["wheatstone"]
+                ],
+                "sensing_principle": "dR/R = pi_L * sigma_L + pi_T * sigma_T (piezoresistive effect in silicon); Wheatstone bridge converts resistance change to voltage",
+                "self_referencing_architecture": "Active sensor exposed to pressure; dummy sensor shielded from pressure but exposed to same temperature; bridge output cancels thermal drift",
+                "critical_parameter": "Gauge factor GF, bridge excitation V_ex, drift rate",
+                "R1_correction": "Original P-27 used single-element sensor with chronic drift; R1 redesign adds dummy element for differential measurement",
+                "evidence_class": "MODELLED"
+            }
+        },
+        "mechanism_architecture": {
+            "physical_changes": "Pressure on catheter deforms MEMS diaphragm; piezoresistive elements on diaphragm change resistance; Wheatstone bridge outputs voltage proportional to pressure",
+            "key_physics": "Piezoresistive effect: dR/R = pi * sigma, where pi is piezoresistive coefficient (typically 10^-11 to 10^-10 Pa^-1 for silicon, much higher than metal strain gauges). Wheatstone bridge: V_out = (dR / (4R + 2*dR)) * V_ex ≈ (dR / (4R)) * V_ex for small dR.",
+            "self_referencing_model": {
+                "input": "Pressure P + temperature T",
+                "model": "V_out = (R_active(T,P) - R_dummy(T)) / (4*R) * V_ex; thermal drift in R_dummy cancels with R_active",
+                "drift_compensation_target": "Reduce drift from typical 1-10 mmHg/month to < 0.5 mmHg/month (MODEL_DERIVED target)",
+                "status": "MODELLED — no hardware validation of drift performance"
+            }
+        },
+        "engineering_core": {
+            "governing_model": {
+                "summary": "Piezoresistive pressure sensing with Wheatstone bridge and self-referencing drift compensation. Bridge output proportional to pressure-induced resistance change; dummy element cancels thermal drift.",
+                "equations": [
+                    EQUATIONS["piezoresistance"],
+                    EQUATIONS["wheatstone"],
+                    "V_out = ((R_active - R_dummy) / (4*R)) * V_ex   [self-referencing bridge]",
+                    "P_measured = V_out / (S * V_ex)   [pressure from voltage, S = sensitivity]"
+                ],
+                "assumptions": [
+                    "Piezoresistive coefficients stable over implantation lifetime (UNKNOWN for chronic)",
+                    "Bridge elements matched to within tolerance",
+                    "Diaphragm deformation linear with pressure",
+                    "Self-referencing architecture cancels thermal drift (UNKNOWN — depends on matching)",
+                    "Sensor packaged to survive catheter environment (UNKNOWN)"
+                ],
+                "boundary_conditions": [
+                    "Pressure range: 0-40 mmHg (ICP range)",
+                    "Temperature: 37°C constant (CSF environment)",
+                    "Bridge excitation: typically 1-5 V",
+                    "Sensor size: constrained by catheter geometry"
+                ],
+                "input_variables": ["Pressure P", "Temperature T", "Bridge excitation V_ex"],
+                "output_variables": ["Bridge output V_out", "Drift-corrected pressure P_corrected"],
+                "parameter_sensitivities": [
+                    "pi (piezoresistive coefficient) — varies with doping and crystal orientation; typical Si pi ~ 10^-11 to 10^-10 Pa^-1",
+                    "V_ex (excitation voltage) — linear scaling of output; higher V_ex = better SNR but more power",
+                    "R (bridge element resistance) — affects power consumption and noise",
+                    "Matching between R_active and R_dummy — affects drift cancellation quality"
+                ],
+                "failure_regimes": [
+                  "Drift exceeds self-referencing capability — sensor output unreliable",
+                  "Mechanical damage to diaphragm — sensor fails",
+                  "Bridge element mismatch — thermal drift not cancelled",
+                  "Packaging failure — CSF ingress damages electronics",
+                  "Catheter kink damages sensor — mechanical failure"
+                ]
+            },
+            "critical_parameters": [
+                {"name": "Piezoresistive coefficient pi", "value": "EXTERNAL_PRECEDENT (Si: 10^-11 to 10^-10 Pa^-1 depending on doping)", "unit": "Pa^-1", "basis": "Published MEMS sensor literature", "evidence_class": "EXTERNAL_PRECEDENT"},
+                {"name": "Bridge excitation V_ex", "value": "UNKNOWN — design choice (likely 1-5 V)", "unit": "V", "basis": "Power budget vs SNR tradeoff", "evidence_class": "UNKNOWN"},
+                {"name": "Bridge element matching (R_active vs R_dummy)", "value": "UNKNOWN — process-dependent", "unit": "%", "basis": "MEMS process capability", "evidence_class": "UNKNOWN"},
+                {"name": "Diaphragm thickness", "value": "UNKNOWN — design choice", "unit": "μm", "basis": "Sensitivity vs pressure range tradeoff", "evidence_class": "UNKNOWN"},
+                {"name": "Sensor size", "value": "UNKNOWN — constrained by catheter geometry", "unit": "mm", "basis": "Catheter integration constraint", "evidence_class": "UNKNOWN"},
+                {"name": "Drift rate (target)", "value": "MODELLED (< 0.5 mmHg/month via self-referencing, R1 fix)", "unit": "mmHg/month", "basis": "R1 redesign target", "evidence_class": "MODELLED"},
+                {"name": "Sensor accuracy", "value": "UNKNOWN — clinical target ~1-2 mmHg", "unit": "mmHg", "basis": "Clinical measurement requirement", "evidence_class": "UNKNOWN"}
+            ],
+            "external_precedent": "EXTERNAL_PRECEDENT ≠ INVENTION_VALIDATION — published chronically implanted pressure sensor literature (PMC4279503) establishes that piezoresistive sensors can be implanted and that drift is a major challenge. Published drift compensation literature (sciencedirect S0924424724006095) establishes that self-referencing architectures can compensate thermal drift. They do NOT establish that the proposed catheter-integrated sensor achieves target drift performance in CSF.",
+            "proposed_design": {
+                "input": "ICP pressure + body temperature",
+                "mechanism": "Piezoresistive MEMS sensor + Wheatstone bridge with self-referencing dummy element",
+                "transformation": "Pressure -> diaphragm stress -> resistance change -> bridge voltage -> pressure reading",
+                "output": "Drift-corrected pressure measurement transmitted wirelessly",
+                "component_architecture": "MEMS sensor (active + dummy) -> Wheatstone bridge -> amplifier -> ADC -> wireless transmitter"
+            },
+            "failure_modes": [
+                {"mode": "Chronic drift exceeds self-referencing", "mechanism": "Long-term drift mechanisms (e.g., charge trapping, diffusion) not cancelled by self-referencing", "design_feature": "Self-referencing architecture", "evidence": "Standard sensor challenge (PMC4279503)", "mitigation": "Periodic recalibration protocol + spare capacity", "verification_test": "Chronic aging study with periodic calibration", "residual_uncertainty": "UNKNOWN achievable drift rate"},
+                {"mode": "Diaphragm mechanical damage", "mechanism": "Pressure overload or mechanical impact damages diaphragm", "design_feature": "MEMS diaphragm", "evidence": "Standard MEMS failure", "mitigation": "Overpressure protection + mechanical design margin", "verification_test": "Overpressure test", "residual_uncertainty": "UNKNOWN in vivo mechanical environment"},
+                {"mode": "Bridge element mismatch", "mechanism": "R_active and R_dummy have different temperature coefficients", "design_feature": "Self-referencing bridge", "evidence": "Standard MEMS process variation", "mitigation": "Tight process control + laser trimming", "verification_test": "Temperature cycle test", "residual_uncertainty": "UNKNOWN achievable matching"},
+                {"mode": "Packaging failure (CSF ingress)", "mechanism": "Hermetic encapsulation fails, CSF damages electronics", "design_feature": "Sensor packaging", "evidence": "Standard implantable device failure", "mitigation": "Hermetic packaging (e.g., parylene-C, Ti canister) + leak test", "verification_test": "Hermeticity test per MIL-STD-883", "residual_uncertainty": "UNKNOWN long-term hermeticity"},
+                {"mode": "Catheter kink damages sensor", "mechanism": "Catheter bending exceeds sensor mechanical limit", "design_feature": "Catheter integration", "evidence": "Standard catheter failure", "mitigation": "Sensor placement away from high-bend regions; mechanical protection", "verification_test": "Kink test per ISO 10555-1", "residual_uncertainty": "UNKNOWN sensor survival in vivo"},
+                {"mode": "EMC interference", "mechanism": "External EM fields affect sensor signal", "design_feature": "Signal conditioning + telemetry", "evidence": "Standard active implant concern", "mitigation": "Shielding + filtering + IEC 60601-1-2 compliance", "verification_test": "EMC test per IEC 60601-1-2", "residual_uncertainty": "UNKNOWN specific interferences"},
+                {"mode": "Battery depletion (if active telemetry)", "mechanism": "Battery exhausted before target lifetime", "design_feature": "Power supply", "evidence": "Standard active implant concern", "mitigation": "Low-power design + duty cycling + energy harvesting (P-15)", "verification_test": "Battery life test", "residual_uncertainty": "UNKNOWN achievable battery life"}
+            ],
+            "verification": [
+                {"id": "VER-001", "requirement": "Sensor accuracy within target", "method": "Calibration vs reference pressure sensor", "acceptance": "Accuracy within ~1-2 mmHg across pressure range", "evidence_class": "PROPOSED"},
+                {"id": "VER-002", "requirement": "Drift rate < 0.5 mmHg/month (R1 target)", "method": "Chronic aging study with periodic calibration", "acceptance": "Drift < 0.5 mmHg/month", "evidence_class": "PROPOSED"},
+                {"id": "VER-003", "requirement": "Hermeticity per MIL-STD-883", "method": "Helium leak test", "acceptance": "Leak rate < 10^-8 atm·cc/s", "evidence_class": "PROPOSED"},
+                {"id": "VER-004", "requirement": "Kink resistance per ISO 10555-1", "method": "ISO 10555-1 kink test", "acceptance": "No damage at specified bend radius", "evidence_class": "PROPOSED", "standard": "ISO_10555_1"},
+                {"id": "VER-005", "requirement": "Biocompatibility ISO 10993", "method": "ISO 10993 series", "acceptance": "Pass", "evidence_class": "PROPOSED", "standard": "ISO_10993"},
+                {"id": "VER-006", "requirement": "EMC IEC 60601-1-2", "method": "EMC test", "acceptance": "Pass", "evidence_class": "PROPOSED", "standard": "IEC_60601_1_2"}
+            ],
+            "validation": [
+                {"id": "VAL-001", "requirement": "In vivo pressure measurement accuracy", "method": "Animal study comparing to reference measurement", "acceptance": "Clinically acceptable accuracy over target duration", "evidence_class": "UNKNOWN"},
+                {"id": "VAL-002", "requirement": "Clinical measurement accuracy", "method": "Clinical study vs standard ICP measurement", "acceptance": "Non-inferior to clinical standard", "evidence_class": "UNKNOWN"}
+            ],
+            "remaining_unknowns": [
+                "Achievable drift rate with self-referencing — UNKNOWN (critical for clinical utility)",
+                "MEMS process capability for bridge matching — UNKNOWN",
+                "Long-term hermeticity in CSF environment — UNKNOWN",
+                "Sensor survival in catheter mechanical environment — UNKNOWN",
+                "Power budget for active telemetry — UNKNOWN",
+                "Regulatory pathway (active implantable, ISO 14708-1) — UNKNOWN specifics",
+                "Clinical accuracy requirement — UNKNOWN"
+            ]
+        },
+        "design_inputs": [
+            {"id": "DI-001", "input": "Clinical need", "value": "Chronic ICP monitoring enables early detection of shunt failure; current standard requires lumbar puncture or external transducer (R332)", "evidence_class": "VERIFIED", "source": "R332"},
+            {"id": "DI-002", "input": "Functional requirement", "value": "Catheter-integrated piezoresistive pressure sensor with self-referencing drift compensation (R1 fix)", "evidence_class": "MODELLED", "source": "R332 + R1 correction"},
+            {"id": "DI-003", "input": "Pressure range", "value": "EXTERNAL_PRECEDENT (0-40 mmHg ICP range)", "evidence_class": "EXTERNAL_PRECEDENT"},
+            {"id": "DI-004", "input": "Piezoresistive coefficient", "value": "EXTERNAL_PRECEDENT (Si: 10^-11 to 10^-10 Pa^-1)", "evidence_class": "EXTERNAL_PRECEDENT"},
+            {"id": "DI-005", "input": "Drift target", "value": "MODELLED (< 0.5 mmHg/month via self-referencing, R1 fix)", "evidence_class": "MODELLED"},
+            {"id": "DI-006", "input": "Sensor size constraint", "value": "Constrained by catheter diameter ~2 mm", "evidence_class": "VERIFIED"},
+            {"id": "DI-007", "input": "Biocompatibility (ISO 10993)", "value": "UNKNOWN", "evidence_class": "UNKNOWN", "resolution_plan": "ISO 10993 series for sensor + packaging + catheter"},
+            {"id": "DI-008", "input": "Sterilization", "value": "UNKNOWN — MEMS may be gamma-sensitive; aseptic or EtO", "evidence_class": "UNKNOWN", "resolution_plan": "Sterilization validation"},
+            {"id": "DI-009", "input": "EMC", "value": "UNKNOWN — required IEC 60601-1-2 if active telemetry", "evidence_class": "UNKNOWN", "resolution_plan": "IEC 60601-1-2 test"},
+            {"id": "DI-010", "input": "Hermeticity (MIL-STD-883)", "value": "UNKNOWN — required for chronic implant", "evidence_class": "UNKNOWN", "resolution_plan": "Hermeticity test"},
+            {"id": "DI-011", "input": "Battery life (if active)", "value": "UNKNOWN", "evidence_class": "UNKNOWN", "resolution_plan": "Battery life test + duty cycling"}
+        ],
+        "design_outputs": [
+            {"id": "DO-001", "description": "MEMS sensor design (diaphragm, piezoresistors, geometry)", "status": "ABSENT", "design_status": "CAD_BLOCKED", "missing_inputs": ["Diaphragm thickness", "Piezoresistor geometry", "Process selection"]},
+            {"id": "DO-002", "description": "Self-referencing bridge architecture", "status": "CONCEPTUAL", "design_status": "ARCHITECTURE_DEFINED", "note": "Architecture proposed (R1 fix); not validated"},
+            {"id": "DO-003", "description": "Catheter integration design", "status": "ABSENT", "design_status": "CAD_BLOCKED", "missing_inputs": ["Sensor mounting", "Mechanical protection", "Catheter geometry"]},
+            {"id": "DO-004", "description": "Signal conditioning + telemetry circuit", "status": "CONCEPTUAL", "design_status": "CIRCUIT_DEVELOPMENT", "note": "Architecture proposed; not validated"}
+        ],
+        "verification_matrix": [
+            {"id": "V-001", "requirement": "Sensor accuracy within target", "method": "Calibration vs reference", "acceptance": "~1-2 mmHg", "result": "NOT_TESTED", "evidence_class": "PROPOSED"},
+            {"id": "V-002", "requirement": "Drift < 0.5 mmHg/month", "method": "Chronic aging with calibration", "acceptance": "< 0.5 mmHg/month", "result": "NOT_TESTED", "evidence_class": "PROPOSED"},
+            {"id": "V-003", "requirement": "Hermeticity MIL-STD-883", "method": "Helium leak test", "acceptance": "< 10^-8 atm·cc/s", "result": "NOT_TESTED", "evidence_class": "PROPOSED"},
+            {"id": "V-004", "requirement": "Kink resistance ISO 10555-1", "method": "ISO 10555-1", "acceptance": "No damage at bend radius", "result": "NOT_TESTED", "evidence_class": "PROPOSED", "standard": "ISO_10555_1"},
+            {"id": "V-005", "requirement": "Biocompatibility ISO 10993", "method": "ISO 10993", "acceptance": "Pass", "result": "NOT_TESTED", "evidence_class": "PROPOSED", "standard": "ISO_10993"},
+            {"id": "V-006", "requirement": "EMC IEC 60601-1-2", "method": "EMC test", "acceptance": "Pass", "result": "NOT_TESTED", "evidence_class": "PROPOSED", "standard": "IEC_60601_1_2"}
+        ],
+        "validation_matrix": [
+            {"id": "VAL-001", "requirement": "In vivo accuracy", "method": "Animal study vs reference", "acceptance": "Clinically acceptable", "result": "NOT_PERFORMED", "evidence_class": "UNKNOWN"},
+            {"id": "VAL-002", "requirement": "Clinical measurement accuracy", "method": "Clinical study vs standard", "acceptance": "Non-inferior", "result": "NOT_PERFORMED", "evidence_class": "UNKNOWN"}
+        ],
+        "bom": [
+            {"item": "01", "description": "MEMS sensor die (custom)", "qty": "1", "component_type": "CUSTOM_COMPONENT", "source_basis": "EXTERNAL_PRECEDENT for MEMS pressure sensors", "material": "Silicon (Si) wafer", "supplier": "UNKNOWN — MEMS foundry", "criticality": "CRITICAL", "verification": "Calibration + drift + hermeticity"},
+            {"item": "02", "description": "Signal conditioning IC", "qty": "1", "component_type": "COTS_CANDIDATE", "source_basis": "Standard sensor signal conditioning ICs", "material": "N/A (COTS)", "supplier": "Multiple (TI, ADI, Maxim)", "criticality": "HIGH", "verification": "Circuit simulation + bench"},
+            {"item": "03", "description": "Wireless transmitter (if active)", "qty": "1", "component_type": "COTS_CANDIDATE", "source_basis": "Standard low-power RF (e.g., MICS band)", "material": "N/A (COTS)", "supplier": "Multiple", "criticality": "HIGH", "verification": "Range + EMC"},
+            {"item": "04", "description": "Hermetic packaging (parylene-C or Ti canister)", "qty": "1", "component_type": "CUSTOM_COMPONENT", "source_basis": "Standard implantable packaging", "material": "Parylene-C or titanium", "supplier": "Multiple", "criticality": "CRITICAL", "verification": "Hermeticity + biocompatibility"},
+            {"item": "05", "description": "Catheter body with sensor mount", "qty": "1", "component_type": "CUSTOM_COMPONENT", "source_basis": "Standard catheter + custom sensor integration", "material": "UNKNOWN — silicone or polyurethane", "supplier": "UNKNOWN — custom", "criticality": "HIGH", "verification": "Mechanical + biocompatibility"}
+        ],
+        "materials": [
+            {"component": "MEMS sensor die", "candidate_material": "Silicon (single-crystal Si wafer)", "evidence_class": "EXTERNAL_PRECEDENT", "source": "Standard MEMS material", "verification_required": "Process + packaging + biocompatibility of final assembly", "status": "CANDIDATE — industry standard"},
+            {"component": "Hermetic packaging", "candidate_material": "Parylene-C", "evidence_class": "EXTERNAL_PRECEDENT", "source": "Standard implantable polymer coating", "verification_required": "Hermeticity + ISO 10993 + adhesion", "status": "CANDIDATE — preferred for thin coating"},
+            {"component": "Hermetic packaging", "candidate_material": "Titanium canister", "evidence_class": "EXTERNAL_PRECEDENT", "source": "Standard implantable hermetic packaging", "verification_required": "Hermeticity + ISO 10993", "status": "CANDIDATE — preferred for long-term hermeticity"},
+            {"component": "Catheter body", "candidate_material": "Silicone elastomer", "evidence_class": "EXTERNAL_PRECEDENT", "source": "Standard CSF shunt material", "verification_required": "ISO 10993 + sensor integration", "status": "CANDIDATE"}
+        ],
+        "manufacturing": {
+            "candidate_processes": [
+                {"process": "MEMS fabrication (photolithography, etching, doping)", "evidence_class": "EXTERNAL_PRECEDENT", "source": "Standard MEMS foundry process", "tolerance_implication": "Sub-micron feature tolerance", "note": "Requires MEMS foundry partnership"},
+                {"process": "Wafer dicing + die attach", "evidence_class": "EXTERNAL_PRECEDENT", "source": "Standard semiconductor assembly", "tolerance_implication": "±5 μm placement", "note": "Custom for catheter integration"},
+                {"process": "Parylene-C coating (or Ti canister sealing)", "evidence_class": "EXTERNAL_PRECEDENT", "source": "Standard implantable packaging", "tolerance_implication": "Coating thickness ±5%", "note": "Hermeticity test required"},
+                {"process": "Catheter extrusion + sensor integration", "evidence_class": "EXTERNAL_PRECEDENT", "source": "Standard catheter manufacturing", "tolerance_implication": "±0.05 mm typical", "note": "Custom for sensor mounting"}
+            ],
+            "status": "ENGINEERING_CANDIDATE — no catheter-integrated MEMS sensor with self-referencing process validated"
+        },
+        "failure_analysis": [
+            {"failure_mode": "Chronic drift exceeds self-referencing", "mechanism": "Long-term drift not cancelled", "design_feature_affected": "Self-referencing bridge", "evidence": "Standard sensor challenge", "mitigation": "Periodic recalibration + spare capacity", "verification_test": "Chronic aging", "residual_uncertainty": "UNKNOWN achievable drift rate"},
+            {"failure_mode": "Diaphragm mechanical damage", "mechanism": "Overpressure or impact", "design_feature_affected": "MEMS diaphragm", "evidence": "Standard MEMS failure", "mitigation": "Overpressure protection + margin", "verification_test": "Overpressure test", "residual_uncertainty": "UNKNOWN in vivo mechanical environment"},
+            {"failure_mode": "Bridge element mismatch", "mechanism": "R_active vs R_dummy temperature coefficients differ", "design_feature_affected": "Self-referencing bridge", "evidence": "Standard MEMS process variation", "mitigation": "Tight process control + laser trimming", "verification_test": "Temperature cycle test", "residual_uncertainty": "UNKNOWN achievable matching"},
+            {"failure_mode": "Packaging failure (CSF ingress)", "mechanism": "Hermetic encapsulation fails", "design_feature_affected": "Packaging", "evidence": "Standard implantable failure", "mitigation": "Hermetic packaging + leak test", "verification_test": "Hermeticity test", "residual_uncertainty": "UNKNOWN long-term hermeticity"},
+            {"failure_mode": "Catheter kink damages sensor", "mechanism": "Bending exceeds sensor limit", "design_feature_affected": "Catheter integration", "evidence": "Standard catheter failure", "mitigation": "Sensor placement + mechanical protection", "verification_test": "Kink test per ISO 10555-1", "residual_uncertainty": "UNKNOWN sensor survival"},
+            {"failure_mode": "EMC interference", "mechanism": "External EM fields affect signal", "design_feature_affected": "Signal conditioning + telemetry", "evidence": "Standard active implant concern", "mitigation": "Shielding + filtering + IEC 60601-1-2", "verification_test": "EMC test", "residual_uncertainty": "UNKNOWN specific interferences"},
+            {"failure_mode": "Battery depletion (if active)", "mechanism": "Battery exhausted", "design_feature_affected": "Power supply", "evidence": "Standard active implant concern", "mitigation": "Low-power design + duty cycling + energy harvesting", "verification_test": "Battery life test", "residual_uncertainty": "UNKNOWN achievable life"}
+        ],
+        "engineering_build_plan": [
+            {"work_package": "WP-01", "test_article": "MEMS sensor prototypes (various diaphragm thicknesses)", "equipment": "MEMS foundry, pressure calibration bench", "design_work": "Diaphragm + piezoresistor geometry", "measurement": "Sensitivity, linearity, hysteresis", "acceptance_criterion": "Sensitivity meets target; linearity > 99%", "dependency": "MEMS foundry partnership", "deliverable": "MEMS sensor spec", "estimated_effort": "16 weeks (foundry cycle)"},
+            {"work_package": "WP-02", "test_article": "Self-referencing bridge circuit", "equipment": "Bench circuit, temperature chamber", "design_work": "Bridge architecture + signal conditioning", "measurement": "Thermal drift compensation performance", "acceptance_criterion": "Thermal drift reduced > 90%", "dependency": "WP-01", "deliverable": "Bridge circuit spec", "estimated_effort": "10 weeks"},
+            {"work_package": "WP-03", "test_article": "Packaged sensor (parylene or Ti canister)", "equipment": "Hermeticity test equipment", "design_work": "Packaging design", "measurement": "Hermeticity per MIL-STD-883", "acceptance_criterion": "Leak rate < 10^-8 atm·cc/s", "dependency": "WP-01", "deliverable": "Packaging spec", "estimated_effort": "8 weeks"},
+            {"work_package": "WP-04", "test_article": "Catheter-integrated sensor", "equipment": "Mechanical test frame, kink test rig", "design_work": "Sensor mounting + catheter integration", "measurement": "Kink resistance per ISO 10555-1; sensor survival after bending", "acceptance_criterion": "No damage at specified bend radius", "dependency": "WP-01 + WP-03", "deliverable": "Integration spec", "estimated_effort": "10 weeks"},
+            {"work_package": "WP-05", "test_article": "Chronic aging specimens", "equipment": "Aging chamber at 37°C in CSF mimic, periodic calibration bench", "design_work": "Aging protocol", "measurement": "Drift rate over time", "acceptance_criterion": "Drift < 0.5 mmHg/month", "dependency": "WP-04", "deliverable": "Drift report", "estimated_effort": "24-52 weeks (chronic)"},
+            {"work_package": "WP-06", "test_article": "Biocompatibility specimens", "equipment": "ISO 10993 lab", "design_work": "Material selection frozen", "measurement": "ISO 10993 series", "acceptance_criterion": "Pass", "dependency": "Material selection", "deliverable": "ISO 10993 report", "estimated_effort": "12 weeks (external)"},
+            {"work_package": "WP-07", "test_article": "EMC test articles", "equipment": "EMC lab", "design_work": "Protocol per IEC 60601-1-2", "measurement": "EMC emissions + immunity", "acceptance_criterion": "Pass", "dependency": "Production-equivalent prototype", "deliverable": "EMC report", "estimated_effort": "8 weeks (external)"}
+        ],
+        "transfer_boundary": {
+            "buyer_receives": [
+                "Self-referencing sensor concept + R1 correction (drift compensation architecture)",
+                "Piezoresistive + Wheatstone bridge governing equations",
+                "Bench test protocols (calibration, drift, hermeticity, kink, EMC)",
+                "External precedent catalog (MEMS pressure sensors, drift compensation)",
+                "Critical UNKNOWN disclosure (achievable drift, hermeticity, sensor survival)",
+                "This engineering dossier with failure analysis + build plan"
+            ],
+            "buyer_must_create": [
+                "Production MEMS sensor design (diaphragm, piezoresistors, geometry)",
+                "Self-referencing bridge architecture + signal conditioning",
+                "Hermetic packaging process",
+                "Catheter integration manufacturing",
+                "Regulatory submission (active implantable, ISO 14708-1, IEC 60601-1-2)",
+                "Clinical validation (accuracy + drift over implantation duration)",
+                "Long-term reliability testing"
+            ]
+        }
+    }
