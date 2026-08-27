@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World-Class Engineering TT Audit + 9/10 Roadmap — R370</title>
+<style>
+:root{
+  --ink:#0f0f0f;--paper:#f5f3ee;--white:#fff;--rule:#ccc8b8;--mid:#e4e0d4;
+  --navy:#0c1e38;--navy2:#163050;--red:#b91c1c;--amber:#b45309;--green:#166534;
+  --gold:#92400e;--blue:#1e3a8a;--purple:#5b21b6;
+  --mono:'Courier New',monospace;--sans:system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.65}
+
+/* ─── HERO ─── */
+.hero{background:var(--navy);color:#fff;padding:36px 40px 28px}
+.htag{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;opacity:.45;margin-bottom:8px}
+.hero h1{font-size:25px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:6px}
+.hero-sub{opacity:.7;font-size:13px;max-width:700px;line-height:1.7}
+.hero-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.1)}
+.hs-item .sv{font-family:var(--mono);font-size:20px;font-weight:700;color:#fbbf24;display:block}
+.hs-item .sl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;opacity:.5;margin-top:2px}
+
+/* ─── VERDICT ─── */
+.verdict{padding:24px 40px;border-left:6px solid var(--amber);background:white;border-bottom:1px solid var(--rule)}
+.vl{font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#888;margin-bottom:5px}
+.vt{font-size:22px;font-weight:700;margin-bottom:10px;color:var(--navy)}
+.vb{font-size:14px;line-height:1.8;max-width:820px}
+
+/* ─── SECTION ─── */
+.sec{padding:28px 40px;border-bottom:1px solid var(--rule)}
+.sn{font-family:var(--mono);font-size:9px;color:#aaa;letter-spacing:.1em;margin-bottom:3px;text-transform:uppercase}
+.st{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:16px;padding-bottom:7px;border-bottom:2px solid var(--navy)}
+
+h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin:18px 0 7px;color:#333}
+p{margin-bottom:11px;line-height:1.7}
+ul,ol{margin:7px 0 12px 18px}
+li{margin-bottom:5px;line-height:1.6}
+
+/* ─── SCORECARD ─── */
+.sc-wrap{overflow-x:auto;margin:12px 0}
+.sc{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;min-width:1000px}
+.sc th{background:var(--navy);color:#fff;padding:6px 9px;text-align:right;font-size:9px;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+.sc th:first-child,.sc th:nth-child(2),.sc th:last-child{text-align:left}
+.sc td{padding:6px 9px;border-bottom:1px solid var(--mid);text-align:right;vertical-align:top}
+.sc td:first-child{text-align:left;font-weight:700}
+.sc td:nth-child(2){text-align:left;font-size:10px;opacity:.75;max-width:170px}
+.sc td:last-child{text-align:left}
+.sc tr:nth-child(even) td{background:#eeebe2}
+.sc .tot{font-weight:700;font-size:13px}
+.keep{color:var(--green);font-weight:700}
+.repair{color:var(--amber);font-weight:700}
+.remove{color:var(--red);font-weight:700}
+.hold{color:#777;font-weight:700}
+
+/* ─── PILL ─── */
+.p{display:inline-block;padding:2px 7px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:.05em;white-space:nowrap;font-family:var(--mono)}
+.pr{background:#fee2e2;color:var(--red)}.pa{background:#fef3c7;color:var(--amber)}
+.pg{background:#d1fae5;color:var(--green)}.pb{background:#dbeafe;color:var(--blue)}
+.pgy{background:var(--mid);color:#555}.pn{background:var(--navy);color:#fff}
+
+/* ─── PKG CARD ─── */
+.pkg{border:1px solid var(--rule);margin:14px 0;background:#fff;overflow:hidden}
+.phdr{padding:9px 15px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--mid)}
+.phdr.a{background:#f0f9ff;border-left:4px solid var(--blue)}
+.phdr.b{background:#f5fdf0;border-left:4px solid var(--green)}
+.phdr.c{background:#fffbf0;border-left:4px solid var(--amber)}
+.phdr.d{background:#fff5f5;border-left:4px solid var(--red)}
+.pname{font-weight:700;font-size:13px}
+.pbody{padding:14px 16px;font-size:13px;line-height:1.65}
+.pg4{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:9px 0}
+.pitem{background:var(--paper);padding:9px 11px;border:1px solid var(--mid)}
+.pil{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#888;margin-bottom:2px;font-family:var(--mono)}
+.piv{font-size:12px;line-height:1.5}
+
+/* ─── FINDING ─── */
+.f{border-left:3px solid var(--rule);padding:9px 13px;margin:10px 0;background:#fff;font-size:13px;line-height:1.6}
+.f.kill{border-color:var(--red);background:#fff5f5}
+.f.warn{border-color:var(--amber);background:#fffbf0}
+.f.ok{border-color:var(--green);background:#f0fff4}
+.f.info{border-color:var(--blue);background:#f0f7ff}
+.fl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+.f.kill .fl{color:var(--red)}.f.warn .fl{color:var(--amber)}
+.f.ok .fl{color:var(--green)}.f.info .fl{color:var(--blue)}
+
+/* ─── DEFECT TABLE ─── */
+.dt{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.dt th{background:var(--navy2);color:#fff;padding:7px 11px;text-align:left;font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.dt td{padding:7px 11px;border-bottom:1px solid var(--mid);vertical-align:top}
+.dt tr:nth-child(even) td{background:#f6f4ef}
+
+/* ─── BUYER SIM ─── */
+.bsim{border:1px solid var(--rule);background:#fff;margin:12px 0;overflow:hidden}
+.bshdr{background:var(--navy2);color:#fff;padding:10px 16px;display:flex;gap:12px;align-items:center}
+.bsn{font-family:var(--mono);font-size:18px;font-weight:700;color:#fbbf24;min-width:30px}
+.bstitle{font-size:14px;font-weight:700}
+.bsbody{padding:14px 16px;font-size:13px;line-height:1.65}
+.bs3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:10px 0}
+.bsitem{background:var(--paper);padding:10px 12px;border:1px solid var(--mid)}
+.bsl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#888;margin-bottom:4px;font-family:var(--mono)}
+
+/* ─── ROADMAP ─── */
+.rm-hero{background:#1a2f4a;color:#fff;padding:32px 40px}
+.rm-hero h2{font-size:22px;font-weight:700;margin-bottom:8px}
+.rm-phase{border:1px solid var(--rule);margin:14px 0;background:#fff;overflow:hidden}
+.rp-hdr{padding:11px 16px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--mid)}
+.rp-badge{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:2px;white-space:nowrap;letter-spacing:.07em}
+.b0{background:#ef4444;color:#fff}.b1{background:#f97316;color:#fff}
+.b2{background:#eab308;color:#333}.b3{background:#22c55e;color:#fff}
+.b4{background:#3b82f6;color:#fff}.b5{background:#8b5cf6;color:#fff}
+.b6{background:#fbbf24;color:#1a2f4a}
+.rp-title{font-size:15px;font-weight:700;flex:1}
+.rp-time{font-family:var(--mono);font-size:11px;color:#888;white-space:nowrap}
+.rp-body{padding:16px}
+.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.act-card{background:var(--paper);border:1px solid var(--mid);padding:10px 12px}
+.act-tag{font-size:9px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:3px;font-family:var(--mono)}
+.act-title{font-weight:600;font-size:13px;margin-bottom:3px}
+.act-detail{font-size:12px;color:#555;line-height:1.5}
+.act-cost{margin-top:7px;font-family:var(--mono);font-size:10px;color:#888;border-top:1px solid var(--mid);padding-top:5px}
+
+/* ─── GATE PROGRESS ─── */
+.gate-wrap{background:var(--navy);padding:20px 40px}
+.gate-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;margin-top:12px}
+.gate-col .gc-name{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.5);margin-bottom:6px;font-family:var(--mono)}
+.phase-bar{height:5px;border-radius:3px;margin-bottom:3px}
+.pbar-now{background:#ef4444}
+.pbar-p1{background:#f97316}
+.pbar-p2{background:#eab308}
+.pbar-p3{background:#22c55e}
+.pbar-p4{background:#3b82f6}
+.pbar-p5{background:#8b5cf6}
+.gc-score{font-family:var(--mono);font-size:10px;color:#fff;margin-top:2px}
+
+/* ─── FINAL ─── */
+.final{background:var(--navy);color:#fff;padding:30px 40px}
+.ftag{font-family:var(--mono);font-size:9px;opacity:.4;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+.ft{font-size:21px;font-weight:700;color:#fbbf24;margin-bottom:12px}
+.fb{font-size:13px;line-height:1.75;opacity:.87;max-width:800px}
+.acts{margin-top:18px;display:flex;flex-direction:column;gap:7px}
+.act-row{display:flex;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:9px 13px}
+.ar-n{font-family:var(--mono);font-size:16px;font-weight:700;color:#fbbf24;min-width:26px}
+.ar-t{font-size:13px;line-height:1.5}
+.ar-t strong{color:#fbbf24}
+
+.footer{padding:12px 40px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:9px;color:#aaa;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+
+@media(max-width:640px){
+  .hero,.sec,.rm-hero,.gate-wrap,.final,.verdict{padding:20px 16px}
+  .hero-strip,.act-grid,.pg4,.bs3{grid-template-columns:1fr 1fr}
+  .gate-grid{grid-template-columns:repeat(6,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="htag">World-Class Engineering Technology-Transfer Audit · Adversarial Mandate · WIPO / MIT / FDA Standard</div>
+  <h1>Discovery Evidence Fabric R370<br>Engineering Audit + 9/10 Roadmap</h1>
+  <div class="hero-sub">Independent hostile engineering-diligence audit of all 15 technology-transfer dossiers against WIPO technology-transfer lifecycle, MIT licensing expectations, and FDA QMSR design-development framework. Grounded in direct repository access, HEAD frozen 2026-08-26T09:59:45Z. Evidence hierarchy strictly enforced. No self-certification accepted.</div>
+  <div class="hero-strip">
+    <div class="hs-item"><span class="sv">0 / 15</span><span class="sl">World-class dossiers</span></div>
+    <div class="hs-item"><span class="sv">1 / 15</span><span class="sl">Running simulator</span></div>
+    <div class="hs-item"><span class="sv">3 / 15</span><span class="sl">Full TTP built</span></div>
+    <div class="hs-item"><span class="sv">0</span><span class="sl">CAD files</span></div>
+    <div class="hs-item"><span class="sv">0</span><span class="sl">Physical experiments</span></div>
+    <div class="hs-item"><span class="sv">0</span><span class="sl">Patents filed</span></div>
+  </div>
+</div>
+
+<!-- PART I: EXECUTIVE VERDICT -->
+<div class="verdict">
+  <div class="vl">Executive Verdict — Sections 33A, 36, 37, 38</div>
+  <div class="vt">CONDITIONALLY — Not World-Class Today. One Package (P-01) Approaching Engineering-Definition Standard.</div>
+  <div class="vb">
+    <strong>Direct answer: No, these are not 15 world-class engineering technology-transfer dossiers. They are an impressive early-stage research-to-package system that has produced 1 genuinely engineered asset (P-01), 2 computationally supported assets (P-16, P-24), and 12 concept-to-skeleton packages that are not meaningfully different from well-structured research proposals.</strong>
+    <br><br>
+    The distinction matters because WIPO's technology-transfer lifecycle requires technical, IP, and commercial evaluation, development and de-risking, prototyping/testing, and commercialization. MIT's licensing standard requires further testing, manufacturability, durability, benchmarking, and a credible development plan. FDA's QMSR requires risk, inputs, outputs, verification, validation, transfer, and change control. Against these three frameworks:
+    <br><br>
+    <em>P-01</em> meets the engineering-definition stage: a running Python simulator (650 lines, 25 scenarios), self-corrected double falsification, an external validation handoff folder, control algorithm, bench prototype design, and hostile test matrix. This is real engineering work product, not documentation of the intention to do engineering work. It should be classified as ENGINEERING_DEFINITION with a clear path to PROTOTYPE_BUILD_READY.
+    <br><br>
+    <em>P-16</em> has genuine PyTissueOptics execution (COMPUTATIONALLY EXECUTED — the strongest evidence class in the portfolio), but contains a fatal regulatory contradiction (Class III + 510(k)) that disqualifies it for buyer contact in current state.
+    <br><br>
+    <em>12 of 15 packages</em> are TTP_SKELETON_ONLY with all elements labeled "HYPOTHESIS or MISSING — to be filled in next iteration." They are CONCEPT_DEFINED, not ENGINEERING_DEFINITION. Sending them to buyers as a portfolio would misrepresent their maturity and damage the credibility of the 3 that have real content.
+    <br><br>
+    <strong>Final portfolio metrics:</strong><br>
+    WORLD_CLASS_DOSSIERS: 0/15 · BUYER_EVALUABLE: 3/15 · ENGINEERING_DEVELOPMENT_READY: 1/15 · PROTOTYPE_READY: 0/15 · VALIDATION_READY: 0/15 · TRANSFER_READY: 0/15
+  </div>
+</div>
+
+<!-- SCORECARD -->
+<div class="sec">
+  <div class="sn">Section 27 · 100-Point Scorecard</div>
+  <div class="st">15-Package Engineering Scorecard</div>
+  <p style="font-size:12px;margin-bottom:10px;">Scores based on direct artifact evidence only. A section heading scores 0 until its content scores above 0. TTP_SKELETON_ONLY packages capped at 30/100 regardless of canonical package completeness. Protocol=UNKNOWN applies −3 to Verification for all. Ownership=UNVERIFIED caps IP/Regulatory at 3/10.</p>
+  <div class="sc-wrap">
+  <table class="sc">
+    <thead>
+      <tr><th>Pkg</th><th>Technology</th><th>Tech<br>5</th><th>Eng<br>10</th><th>D-In<br>5</th><th>D-Out<br>10</th><th>Evid<br>10</th><th>Verif<br>10</th><th>Valid<br>10</th><th>Risk<br>10</th><th>Mfg<br>10</th><th>IP/Reg<br>10</th><th>Txfr<br>5</th><th>Comm<br>5</th><th class="tot">Total</th><th>Class</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>P-01</td><td>Multi-seg Bayesian occlusion control</td><td>5</td><td>7</td><td>3</td><td>6</td><td>5</td><td>3</td><td>1</td><td>8</td><td>2</td><td>3</td><td>4</td><td>4</td><td class="tot">51</td><td><span class="p pb">C→B</span></td><td class="keep">KEEP · Upgrade</td></tr>
+      <tr><td>P-16</td><td>NIR 940nm through-skull photovoltaic</td><td>4</td><td>7</td><td>3</td><td>4</td><td>5</td><td>2</td><td>1</td><td>6</td><td>2</td><td>2</td><td>3</td><td>4</td><td class="tot">43</td><td><span class="p pa">C</span></td><td class="repair">REPAIR regulatory · Then send</td></tr>
+      <tr><td>P-24</td><td>Proportional flow vs ASD (first contact)</td><td>4</td><td>5</td><td>3</td><td>4</td><td>4</td><td>2</td><td>0</td><td>7</td><td>2</td><td>3</td><td>3</td><td>5</td><td class="tot">42</td><td><span class="p pa">C</span></td><td class="keep">KEEP · First contact now</td></tr>
+      <tr><td>P-28</td><td>Acoustic wave obstruction detection</td><td>4</td><td>6</td><td>3</td><td>3</td><td>3</td><td>2</td><td>0</td><td>5</td><td>2</td><td>3</td><td>3</td><td>4</td><td class="tot">38</td><td><span class="p pa">C</span></td><td class="keep">KEEP · Complete protocol</td></tr>
+      <tr><td>P-04</td><td>Pulsation-synced amyloid clearance</td><td>4</td><td>5</td><td>3</td><td>4</td><td>3</td><td>1</td><td>0</td><td>5</td><td>2</td><td>3</td><td>3</td><td>3</td><td class="tot">36</td><td><span class="p pa">C</span></td><td class="repair">REPAIR 100% clearance claim</td></tr>
+      <tr><td>P-11</td><td>Phage anti-biofilm (evidence chain PASS)</td><td>3</td><td>5</td><td>2</td><td>3</td><td>3</td><td>2</td><td>0</td><td>5</td><td>2</td><td>2</td><td>3</td><td>3</td><td class="tot">33</td><td><span class="p pa">C</span></td><td class="repair">REPAIR buyer map · Upgrade</td></tr>
+      <tr><td>P-09</td><td>Chemical ICP transduction</td><td>3</td><td>4</td><td>2</td><td>3</td><td>2</td><td>1</td><td>0</td><td>4</td><td>1</td><td>2</td><td>2</td><td>3</td><td class="tot">27</td><td><span class="p pr">D</span></td><td class="hold">HOLD · Specify molecule</td></tr>
+      <tr><td>P-21-R1</td><td>UWB intracranial position mapping</td><td>3</td><td>4</td><td>2</td><td>3</td><td>2</td><td>1</td><td>0</td><td>4</td><td>2</td><td>2</td><td>2</td><td>2</td><td class="tot">27</td><td><span class="p pr">D</span></td><td class="hold">HOLD · SAR unresolved</td></tr>
+      <tr><td>P-13</td><td>Neuromorphic failure predictor</td><td>3</td><td>4</td><td>2</td><td>3</td><td>2</td><td>1</td><td>0</td><td>4</td><td>1</td><td>2</td><td>2</td><td>2</td><td class="tot">26</td><td><span class="p pr">D</span></td><td class="repair">REPAIR buyer map + dataset</td></tr>
+      <tr><td>P-22-R1</td><td>Autonomous catheter navigation</td><td>3</td><td>3</td><td>2</td><td>2</td><td>2</td><td>1</td><td>0</td><td>3</td><td>2</td><td>2</td><td>2</td><td>2</td><td class="tot">24</td><td><span class="p pr">D</span></td><td class="hold">HOLD · 4 unresolved control probs</td></tr>
+      <tr><td>P-02,03,05-08,<br>P-10,12,14,15,17</td><td>Various (skeleton-only TTP)</td><td>2</td><td>2</td><td>1</td><td>1</td><td>2</td><td>1</td><td>0</td><td>3</td><td>1</td><td>2</td><td>2</td><td>2</td><td class="tot">19–25</td><td><span class="p pr">D</span></td><td class="hold">HOLD all — skeleton only</td></tr>
+      <tr><td>P-25</td><td>Self-ref piezoresistive sensor (FAIL)</td><td>1</td><td>1</td><td>1</td><td>1</td><td>3</td><td>1</td><td>0</td><td>4</td><td>1</td><td>1</td><td>1</td><td>1</td><td class="tot">16</td><td><span class="p pr">D</span></td><td class="remove">REMOVE — explicit fail</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="font-size:11px;color:#777;margin-top:6px;">Score ≥ 70: approaching buyer-ready development asset (Class A/B). 50–69: strong transfer opportunity (Class B/C). 30–49: research/option value (Class C). &lt;30: not credible for transfer (Class D). No package reaches 70 today.</p>
+</div>
+
+<!-- ENGINEERING ANALYSIS: KEY PACKAGES -->
+<div class="sec">
+  <div class="sn">Sections 5–20 · Engineering Core Audit — Key Packages</div>
+  <div class="st">Package-by-Package Engineering Assessment</div>
+
+  <!-- P-01 -->
+  <div class="pkg">
+    <div class="phdr b">
+      <span class="pname">P-01 — Predictive Occlusion-Isolation Controller</span>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <span class="p pb">51/100</span><span class="p pg">SIMULATOR EXECUTED</span><span class="p pg">SELF-CORRECTED</span><span class="p pa">ENGINEERING_DEFINITION</span>
+      </div>
+    </div>
+    <div class="pbody">
+      <div class="pg4">
+        <div class="pitem"><div class="pil">Technology identity (5/5)</div><div class="piv">A distributed multi-segment CSF shunt control system predicting impending catheter obstruction from flow/pressure trends and pre-emptively redistributing drainage. Dual safety invariant: (1) global ICP maintained, (2) no path overloaded. A control law, not a new device architecture. COMPUTATIONALLY EXECUTED via Python simulator (~650 lines, 25 scenarios).</div></div>
+        <div class="pitem"><div class="pil">Engineering core (7/10)</div><div class="piv">Hydraulic physics: P_ICP = Q_production / ΣG_active. Bayesian occlusion probability from conductance decline. Control algorithm: proportional + INV-2-cap redistribution. Reference implementation COMPLETE AND RUN. Physics basis documented in hydraulic_architecture.json. Deduction: implantable flow sensor doesn't exist commercially — BLOCKING UNKNOWN for the physical implementation.</div></div>
+        <div class="pitem"><div class="pil">What is actually proven (evidence class)</div><div class="piv">COMPUTATIONALLY EXECUTED: simulator runs 25 scenarios (5 seeds × 5 scenarios). FALSIFICATION ON RECORD (highest epistemics): strict dual-invariant FAILS at peak 22 mmHg > 20 limit. SURVIVAL: 0/5 in ALL scenarios for BOTH multi-segment AND single-segment baseline. SELF-CORRECTED: initial R277 overclaimed survival=5/5; corrected after re-analyzing actual JSON data (Article XXXI). PARTIAL IMPROVEMENT: peak 22 vs 59 mmHg — statistically meaningful but doesn't solve the core problem.</div></div>
+        <div class="pitem"><div class="pil">What has been engineered / transferable NOW</div><div class="piv">Python simulator code (P-01_PROTOTYPE/05_simulator.py). Control algorithm specification (04_control_algorithm.json). Sensor specification (03_sensor_specification.json). Bench prototype design (06_bench_prototype_design.json). External validation handoff folder (EXTERNAL_VALIDATION_HANDOFF/frozen_protocol.json). Hostile test matrix (07_test_fixtures.json). These are REAL transferable artifacts.</div></div>
+        <div class="pitem"><div class="pil">Design outputs (6/10)</div><div class="piv">Architecture: defined. Algorithm: specified and implemented. System interfaces: documented. API spec: defined (inputs p_obs, F_obs[N], history → outputs alpha_cmd[N], isolate[N]). Missing: CAD/drawings (none). C port of Python algorithm (not yet done — required for implantable MCU). FMEA: NOT PERFORMED.</div></div>
+        <div class="pitem"><div class="pil">Manufacturing (2/10)</div><div class="piv">V0 bench ($3-5K, 3-6 months): defined and plausible. V1 implantable ($200-500K, 12-18 months): specified at component-category level only. BOM: HYPOTHESIS for all non-COTS elements. CRITICAL BLOCKER: miniaturized variable orifice for chronic implantation = HYPOTHESIS (no commercial source). No tolerance analysis. No supplier identified. 5-10 years to market stated honestly.</div></div>
+        <div class="pitem"><div class="pil">IP/Regulatory (3/10)</div><div class="piv">PatentBear 100+ searches. §103 VERY LOW. Honest: known adjacent (US11291809B2, US12636471 — May 2026 — potential threat). No patent filed. No FTO opinion. Ownership UNVERIFIED. Regulatory: Class III / PMA hypothesis (correctly identified, NOT contradictory unlike P-16). FMEA not done. ISO 14708-1, IEC 62304 referenced but applicability not verified.</div></div>
+        <div class="pitem"><div class="pil">Failure analysis (8/10)</div><div class="piv">EXEMPLARY: double falsification documented (strict invariant + survival both FAIL). Self-corrected self-assessment. Hostile test matrix designed: INV-2 attacker, INV-1 attacker, predictor FP/FN, comm failure. 5 operating states defined including graceful_degradation and fail_safe. Gateway: FMEA not performed — required for any regulatory submission or serious buyer.</div></div>
+      </div>
+      <div class="f ok"><div class="fl">Strongest Feature in Portfolio — Self-Corrected Double Falsification</div>P-01's self-correction (Article XXXI) — discovering that initial R277 audit overclaimed survival=5/5, re-analyzing the actual JSON data, and correcting to survival=0/5 for BOTH systems — is the highest-quality epistemic act in the entire repository. A buyer's technical diligence team reviewing this will find it credible precisely because it documents failure honestly. The external validation handoff folder (frozen_protocol.json ready for an academic lab) puts P-01 one step closer to PROTOTYPE_BUILD_READY than any other package.</div>
+      <div class="f warn"><div class="fl">Killer Question — Implantable Flow Sensor Does Not Exist</div>The P-01 mechanism requires per-segment flow sensing. The package honestly states: "No chronic implantable CSF flow sensor exists commercially. Options: (a) custom ultrasonic, (b) infer from pressure drop, (c) eliminate per-segment flow sensing." Option (b) — infer from pressure drop — changes the algorithm fundamentally. Option (c) eliminates the core monitoring architecture. The buyer must understand that V1 implantable is not a 12-18 month engineering task; it's a 5-10 year development program starting from zero on the flow sensor alone.</div>
+      <div class="f info"><div class="fl">Recommended Classification: Approve with Conditions — Sponsored Bench Validation</div>Send P-01 to one academic neurosurgery lab (MIT Neural Engineering, Stanford, Johns Hopkins) for independent bench validation of the simulator findings. Cost: $3-5K lab setup + 3-6 months. This converts COMPUTATIONALLY_EXECUTED to INDEPENDENTLY_VERIFIED — the single most important evidence upgrade available.</div>
+    </div>
+  </div>
+
+  <!-- P-16 -->
+  <div class="pkg">
+    <div class="phdr c">
+      <span class="pname">P-16 — 940nm NIR Through-Skull Photovoltaic</span>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <span class="p pb">43/100</span><span class="p pg">T2-CONFIRMED (PyTissueOptics)</span><span class="p pr">CLASS III + 510(k) FATAL ERROR</span>
+      </div>
+    </div>
+    <div class="pbody">
+      <div class="pg4">
+        <div class="pitem"><div class="pil">Evidence (strongest in portfolio)</div><div class="piv">COMPUTATIONALLY_EXECUTED: ACTUAL PyTissueOptics execution. Validation range 1.0-1.4 mW/cm² at implant. Fluence model executed with real tissue parameters. This is not a spreadsheet formula — it is a Monte Carlo photon transport simulation. Reproducible with PyTissueOptics (open-source, verifiable). Strongest computational evidence in the portfolio.</div></div>
+        <div class="pitem"><div class="pil">Physics concern</div><div class="piv">940nm window is real (tissue optical window). BUT: PyTissueOptics uses assumed tissue parameters. In-vivo tissue absorption/scattering varies ±30-50% across individuals (scalp thickness, pigmentation, hair density, adipose layer). The nominal 1.0-1.4 mW/cm² range is a point estimate, not a population distribution. Minimum experiment: optical phantom across population-representative tissue parameters.</div></div>
+        <div class="pitem"><div class="pil">Fatal regulatory error</div><div class="piv">Section 13: "Device classified as Class III" + "pathway: 510(k) with optical safety documentation." Class III devices require PMA (Premarket Approval). 510(k) requires substantial equivalence to a Class II predicate. These are mutually exclusive. A regulatory diligence lead stops reading here. Must be resolved: either Class II with a named predicate + De Novo if needed, or Class III/PMA. COUNSEL REVIEW REQUIRED.</div></div>
+        <div class="pitem"><div class="pil">GaAs biocompatibility</div><div class="piv">GaAs contains arsenic. Chronic subcutaneous exposure requires ISO 10993 full panel including genotoxicity, systemic toxicity, implantation, and carcinogenicity for 5+ year devices. Package does not address GaAs-specific toxicology. This is a MAJOR regulatory and materials gap that any buyer's regulatory team will flag.</div></div>
+      </div>
+      <div class="f kill"><div class="fl">Fatal — Regulatory Contradiction Blocks All Buyer Contact</div>Do not send P-16 to any buyer with a regulatory function until the Class III / 510(k) contradiction is resolved. Even sending a non-confidential teaser will damage credibility if a regulatory person on the buyer side reads section 13. Fix takes 2-4 hours: consult a regulatory strategist and pick one pathway.</div>
+      <div class="f warn"><div class="fl">GaAs Toxicology Must Be Addressed</div>GaAs-specific biocompatibility program must be added to section 13 and the risk register before any clinical or regulatory discussion. This is not a minor gap — arsenic-containing compounds have a specific toxicology burden that differentiates from standard device materials.</div>
+      <div><strong>Buyer action (after fixes):</strong> <span class="p pg">YES — $2-5K optical phantom test</span> — Cheapest decisive experiment in portfolio. Fix regulatory first. Then approach Boston Scientific Neuromodulation, not a shunt company (P-16 is a platform technology, not a shunt accessory).</div>
+    </div>
+  </div>
+
+  <!-- P-24, P-28, P-04, others condensed -->
+  <div class="pkg">
+    <div class="phdr c">
+      <span class="pname">P-24 — Proportional Flow vs ASD | P-28 — Acoustic Obstruction Detection</span>
+      <div style="display:flex;gap:5px;flex-wrap:wrap"><span class="p pa">42/100</span><span class="p pa">38/100</span><span class="p pg">FIRST CONTACT CANDIDATES</span></div>
+    </div>
+    <div class="pbody">
+      <div class="pg4">
+        <div class="pitem"><div class="pil">P-24 engineering verdict</div><div class="piv">SYNTHETIC LOOP VERIFIED. Most honest proposition in portfolio: "0 established advantages over ASD. 2 unestablished differentiators (response speed, proportional control) = decisive bench endpoints." $15K / 8 weeks experiment. Pass/fail defined. ASD outperforms in 3/4 postures — this is documented, not hidden. Correct maturity: ENGINEERING_DEFINITION (light), not PROTOTYPE_READY. Status as "first real-world candidate" is correct and appropriate.</div></div>
+        <div class="pitem"><div class="pil">P-28 engineering verdict</div><div class="piv">Acoustic impedance model analytically credible: Z_csf=1.53 MRayl vs Z_obs≈2.52 MRayl = 24% reflection. This is physics-backed engineering inference (not measurement). $8K bench test is most straightforward experiment in portfolio. KEY RISK: acoustic coupling through catheter wall in proteinaceous CSF — unknown FPR in high-protein conditions. ShuntCheck proximity requires careful FTO analysis (US20130109998A1).</div></div>
+        <div class="pitem"><div class="pil">Missing for both</div><div class="piv">Protocol = UNKNOWN for both. This is the primary commissioning blocker. P-28 protocol could be written in &lt;1 day — the experiment is well-specified except for the step-by-step procedure. P-24 is similar. Both need ownership verification and India provisional filing before external contact.</div></div>
+        <div class="pitem"><div class="pil">Recommended action</div><div class="piv">P-24 → Integra Lifesciences or Sophysa (not Medtronic — too large for first contact). P-28 → Medtronic Neurosurgery Strata team. Send BOTH simultaneously, one week after protocols are completed and ownership verified. Target: one $10-15K sponsored validation conversation in 60 days.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skeleton packages -->
+  <div class="pkg">
+    <div class="phdr d">
+      <span class="pname">P-02, P-03, P-05–P-08, P-10, P-12, P-14, P-15, P-17 — TTP_SKELETON_ONLY (12 packages)</span>
+      <div style="display:flex;gap:5px;flex-wrap:wrap"><span class="p pr">19–25/100 each</span><span class="p pr">CONCEPT_DEFINED ONLY</span></div>
+    </div>
+    <div class="pbody">
+      <div class="f kill"><div class="fl">TTP_SKELETON_ONLY = Not Engineering-Definition Maturity</div>The TTP_SKELETONS_ALL_15.json file explicitly labels all 12 remaining packages: "elements: HYPOTHESIS or MISSING — to be filled in next iteration." These packages have a canonical 22-section JSON structure, but the engineering substance (BOM, manufacturing, tolerance, verification, validation, drawings) is not present. Sending these as part of a "15-package portfolio" to buyers would misrepresent their maturity. None should be in any external outreach until at minimum 3 TTP elements are filled with actual engineering content — not HYPOTHESIS placeholders. These should be developed in priority order starting with P-11 (phage anti-biofilm — evidence chain PASS) and P-10 (phase-change valve — different from all others and manufacturable at bench scale).</div>
+    </div>
+  </div>
+</div>
+
+<!-- FATAL DEFECTS -->
+<div class="sec">
+  <div class="sn">Section 34 · Fatal Defects</div>
+  <div class="st">Classified Defect Register</div>
+  <table class="dt">
+    <thead><tr><th>Severity</th><th>Defect</th><th>Package(s)</th><th>Evidence Required</th></tr></thead>
+    <tbody>
+      <tr><td><span class="p pr">FATAL</span></td><td>Protocol = UNKNOWN on all commissionable contracts. Cannot commission any experiment as written.</td><td>All 15</td><td>Step-by-step protocol for each experiment. 1-3 days per package to write.</td></tr>
+      <tr><td><span class="p pr">FATAL</span></td><td>Ownership UNVERIFIED for all 15. No assignment document. Prior employer claims UNKNOWN. No patent filed. No license rights available.</td><td>All 15</td><td>IP attorney + assignment document + India provisional filing. 2-4 weeks, $500-2,000 + ₹65K per filing.</td></tr>
+      <tr><td><span class="p pr">FATAL</span></td><td>P-16: Class III device + 510(k) pathway stated simultaneously — mutually exclusive regulatory pathways.</td><td>P-16</td><td>Regulatory strategist consultation. Choose one pathway. COUNSEL REVIEW REQUIRED.</td></tr>
+      <tr><td><span class="p pr">FATAL</span></td><td>India Section 39 not addressed in any package or protocol. International buyer contact without FFL clearance is a legal risk for inventor.</td><td>All 15</td><td>Indian patent agent consultation. FFL application or India-first filing. 2-3 weeks, ₹10-15K.</td></tr>
+      <tr><td><span class="p pr">FATAL</span></td><td>P-25 (explicit fail: 3.45 mmHg &gt; 2.0 threshold) included in portfolio. A failed package damages credibility of all others.</td><td>P-25</td><td>Remove from portfolio. Move to cemetery. Reference KA-014 in related packages as negative constraint.</td></tr>
+      <tr><td><span class="p pa">MAJOR</span></td><td>P-01: PROTOTYPE_READY label in evidence_loop_state. Actual state: simulator ready, hardware NOT built, no lab engaged. Premature promotion.</td><td>P-01</td><td>Change label to ENGINEERING_DEFINITION. Hardware at PROTOTYPE_DESIGN_READY. No external lab engaged yet.</td></tr>
+      <tr><td><span class="p pa">MAJOR</span></td><td>P-04: "100% Aβ clearance (MODELLED)" is a claim no scientific reviewer would accept without qualification. Kills package credibility.</td><td>P-04</td><td>Reframe: "MODEL-PREDICTED under ideal conditions: no competitive inhibition, no enzyme deactivation, ideal substrate accessibility. Real clearance fraction to be determined by in-vitro enzyme kinetics."</td></tr>
+      <tr><td><span class="p pa">MAJOR</span></td><td>P-09: Molecule unspecified. Mechanism is unevaluable without a named compound with predicted release kinetics.</td><td>P-09</td><td>Specify at least one candidate molecule. Run pharmacokinetic model for ICP-proportional release. Otherwise HOLD.</td></tr>
+      <tr><td><span class="p pa">MAJOR</span></td><td>P-13 buyer map contains an unfinished sentence: "Medical AI company (e.g." — incomplete.</td><td>P-13</td><td>Complete buyer map. Identify a specific company with a shunt monitoring dataset. Otherwise HOLD.</td></tr>
+      <tr><td><span class="p pa">MAJOR</span></td><td>P-21-R1: SAR (Specific Absorption Rate) compliance for chronic UWB implant = UNRESOLVED. Not optional for FDA regulatory pathway.</td><td>P-21-R1</td><td>SAR analysis (computational EM simulation, e.g., SEMCAD or Sim4Life). COUNSEL REVIEW REQUIRED. Until done, HOLD.</td></tr>
+      <tr><td><span class="p pa">MAJOR</span></td><td>FMEA not performed for any package. Required for any clinical or regulatory pathway. Required before any serious buyer can discuss acquisition.</td><td>All 15</td><td>Failure Mode and Effects Analysis per ISO 14971. P-01 has the closest precursor (hostile test matrix + hazard register). Build FMEA starting from P-01.</td></tr>
+      <tr><td><span class="p pgy">MODERATE</span></td><td>DECISION_GRADE_BUYERS: only 3/15 packages have complete buyer maps. 12/15 have DILIGENCE_REQUIRED in key buyer fields.</td><td>P-02–P-15 (except P-24, P-28)</td><td>Complete buyer maps to decision-grade for all buyer-facing packages before external outreach.</td></tr>
+      <tr><td><span class="p pgy">MODERATE</span></td><td>GaAs biocompatibility not addressed for P-16 chronic subcutaneous implantation. Arsenic-containing compound with a specific toxicology burden.</td><td>P-16</td><td>ISO 10993 full panel including genotoxicity. Add to risk register and manufacturing plan.</td></tr>
+      <tr><td><span class="p pgy">MODERATE</span></td><td>No engineering drawings (CAD, communication diagrams, schematic drawings) for any of 15 packages. Zero drawing artifacts in repository.</td><td>All physical packages</td><td>Minimum: hand-drawn communication diagram for top 5 physical packages. Scanned and committed to repo. This is the fastest evidence gap to close.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- AI/PROVENANCE AUDIT -->
+<div class="sec">
+  <div class="sn">Section 24 · AI / Provenance Audit</div>
+  <div class="st">Adversarial Provenance Attack — Where Evidence Boundaries Are Soft</div>
+
+  <div class="f kill"><div class="fl">AI-Generated Tolerances Presented Without Source</div>Every package specifies manufacturing tolerances as "BUYER_DILIGENCE_REQUIRED." This is honest. But where numbers do appear in engineering specifications (e.g., sensor accuracy ±0.5 mmHg for P-01), the source is "EXTERNAL_SOURCE (sensors exist commercially)" without naming a specific sensor model, part number, or datasheet. An engineering diligence team will ask: which commercial sensor? What is its chronic drift specification? What is its biocompatibility certification? "EXTERNAL_SOURCE" without a named artifact is not external source — it is engineering inference that a class of sensors exists.</div>
+
+  <div class="f kill"><div class="fl">Variable Orifice Actuator for Chronic Implantation — HYPOTHESIS Presented as Engineering Design</div>P-01's section 4 engineering specification states: "Variable orifice mechanisms per segment (0-100% open). Response time &lt;1 second. Status: HYPOTHESIS (miniaturized variable orifice for chronic implantation needs development)." This is correctly labeled HYPOTHESIS. However, the 15-element TTP's section 5 (Prototype Blueprint) then proceeds to specify V1 implantable with "MEMS variable-orifice valves" as if MEMS variable orifice for chronic CSF implant is a procurement question rather than a 5-10 year development program. A buyer reading the V0/V1 progression could misinterpret the path from $3-5K bench to $200-500K implantable as a shorter distance than it actually is.</div>
+
+  <div class="f warn"><div class="fl">Model Outputs Labeled as Computational Execution — Accuracy Varies</div>P-16's PyTissueOptics execution is genuine COMPUTATIONALLY_EXECUTED (open-source tool, reproducible, real output). P-01's simulator is also genuine (Python, 650 lines, runs). P-04's "100% Aβ clearance" is labeled MODEL_PREDICTED but appears in the commercial state without explicit uncertainty bounds — MODEL_PREDICTED can sound close to verified in commercial context. The portfolio's evidence discipline is generally good but the 100% figure requires explicit qualification before any buyer contact.</div>
+
+  <div class="f ok"><div class="fl">Evidence Discipline Generally Strong — Generic Prose Check: 0 Violations</div>The R370 GENERIC_PROSE_CHECK.json reports 0 violations. The Epistemic Constitution's Article XXXI (self-correction) is enforced — P-01's double self-correction is documented in the canonical package, the TTP, and the provenance ledger. The cemetery (23+ entries) is genuine negative knowledge. The FALSIFIED/SELF-CORRECTED status in P-01's evidence matrix is the gold standard for epistemic honesty. These are genuine portfolio strengths that a sophisticated buyer will recognize.</div>
+</div>
+
+<!-- BUYER SIMULATIONS -->
+<div class="sec">
+  <div class="sn">Section 35 · Buyer Simulation</div>
+  <div class="st">Simulated Review — Top 3 Packages · Three Buyer Archetypes</div>
+
+  <div class="bsim">
+    <div class="bshdr"><span class="bsn">P-01</span><span class="bstitle">Predictive Occlusion-Isolation Controller — Medtronic Strata Team</span></div>
+    <div class="bsbody">
+      <div class="bs3">
+        <div class="bsitem">
+          <div class="bsl">CTO / VP Engineering</div>
+          <p><strong>Initial:</strong> "This is more sophisticated than I expected. A running simulator with self-corrected falsification? That's unusual."</p>
+          <p><strong>First objection:</strong> "Why does the simulator show both multi-segment AND single-segment fail 24h survival? If neither solves the problem, what exactly are we licensing?"</p>
+          <p><strong>Second objection:</strong> "An implantable flow sensor doesn't exist commercially. That's not a 12-18 month risk — that's a 5-year R&D program we'd be committing to."</p>
+          <p><strong>Info required:</strong> Variable orifice design (any concept drawing?). FMEA. The exact parameter change that would push survival from 0/5 to &gt;3/5.</p>
+          <p><strong>Trigger for next meeting:</strong> Bench prototype runs 6 of the 30 pre-registered scenarios with positive result. Even 30% validation converts this to a funding discussion.</p>
+          <p><strong>Walk away:</strong> If the bench prototype shows the same 0/5 survival rate as the simulator. The partial improvement (peak 22 vs 59) alone doesn't justify a licensing conversation.</p>
+          <p><strong>Decision: <span class="p pa">MAYBE — send to bench lab first</span></strong></p>
+        </div>
+        <div class="bsitem">
+          <div class="bsl">Corporate Development</div>
+          <p><strong>Initial:</strong> "The $500K indicative price with a 0/5 survival result is disconnected. The honest falsification is credible but it changes the valuation basis."</p>
+          <p><strong>First objection:</strong> "IP ownership UNVERIFIED. I can't take this to committee. What's the assignment status? Has any attorney looked at this?"</p>
+          <p><strong>Second objection:</strong> "If both multi-segment and standard shunt fail 24h survival in the simulator, the baseline might be wrong rather than the mechanism being validated."</p>
+          <p><strong>Info required:</strong> Ownership documentation. One independent validation of the simulator (even another lab running the Python code). Market size with cited source (not BUYER_UNVERIFIED).</p>
+          <p><strong>Walk away:</strong> If ownership is unresolved in 30 days. If the bench fails to show any improvement over the single-segment baseline.</p>
+          <p><strong>Decision: <span class="p pr">NO until ownership verified + bench data exists</span></strong></p>
+        </div>
+        <div class="bsitem">
+          <div class="bsl">IP / Legal</div>
+          <p><strong>Initial:</strong> "PatentBear 100+ searches with §103 VERY LOW. The patent screen is the most thorough I've seen from a pre-filing inventor. The honest IP disclosure (adjacent art identified, no FTO claimed) is appropriate."</p>
+          <p><strong>First objection:</strong> "US12636471 — May 2026 patent (very recent, within our review period). What does it cover exactly? Is predictive redistribution inside its claims?"</p>
+          <p><strong>Second objection:</strong> "No patent filed. No ownership document. Even if we want to diligence this, what are we diligencing? Know-how + algorithm + simulator code — that's licensable but much weaker than a patent."</p>
+          <p><strong>Info required:</strong> Full text + claim-by-claim analysis of US12636471. Ownership assignment document. Inventor's employment history (prior employer IP release check).</p>
+          <p><strong>Walk away:</strong> If prior employer has any IP claim. If US12636471 covers the core redistribution mechanism.</p>
+          <p><strong>Decision: <span class="p pa">CONDITIONAL — resolve ownership + US12636471 analysis first</span></strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bsim">
+    <div class="bshdr"><span class="bsn">P-24</span><span class="bstitle">Proportional Flow vs ASD — Integra Lifesciences</span></div>
+    <div class="bsbody">
+      <div class="bs3">
+        <div class="bsitem">
+          <div class="bsl">CTO / VP Engineering</div>
+          <p><strong>Initial:</strong> "I appreciate the honesty — 0 established advantages, 2 unestablished differentiators. That's a refreshingly candid starting point."</p>
+          <p><strong>First objection:</strong> "The protocol says UNKNOWN. I'd need an actual test procedure before I could budget this. How do I know $15K gets me a useful answer?"</p>
+          <p><strong>Info required:</strong> Protocol (step-by-step). One reference to a published ASD performance benchmark we can compare against. What measurement instrument confirms response speed advantage?</p>
+          <p><strong>Trigger:</strong> Send me the completed protocol. If the experimental design is clean, I'll schedule a call with our fluidics team.</p>
+          <p><strong>Decision: <span class="p pg">YES — complete protocol, then call</span></strong></p>
+        </div>
+        <div class="bsitem">
+          <div class="bsl">Corporate Development</div>
+          <p><strong>Initial:</strong> "At $15K experiment, this is worth a conversation if the protocol is solid. The risk of the conversation is low."</p>
+          <p><strong>First objection:</strong> "Ownership UNVERIFIED again. What am I buying if results are positive? Who owns this algorithm?"</p>
+          <p><strong>Decision: <span class="p pa">MAYBE — after ownership + protocol</span></strong></p>
+        </div>
+        <div class="bsitem">
+          <div class="bsl">IP / Legal</div>
+          <p><strong>Initial:</strong> "ASD is prior art. Proportional control law needs to be specific enough to not be a trivial extension. I'd want to see the claim draft before engaging."</p>
+          <p><strong>Decision: <span class="p pa">CONDITIONAL — ownership first</span></strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bsim">
+    <div class="bshdr"><span class="bsn">P-16</span><span class="bstitle">NIR Photovoltaic — Boston Scientific Neuromodulation</span></div>
+    <div class="bsbody">
+      <div class="bs3">
+        <div class="bsitem">
+          <div class="bsl">CTO / VP Engineering</div>
+          <p><strong>Initial:</strong> "PyTissueOptics execution is credible. The 1.0-1.4 mW/cm² range is physically plausible for 940nm at that depth."</p>
+          <p><strong>First objection:</strong> "Tissue variability. That's a model result with assumed parameters. What's the range across a realistic patient population? Scalp thickness alone varies 3-10mm across adults."</p>
+          <p><strong>Second objection:</strong> "GaAs. Our toxicology team will stop this immediately without an ISO 10993 plan. Arsenic-containing compound in chronic subcutaneous — that's a multi-year biocompatibility program."</p>
+          <p><strong>Decision: <span class="p pr">NO until regulatory contradiction fixed + GaAs toxicology addressed</span></strong></p>
+        </div>
+        <div class="bsitem">
+          <div class="bsl">Corporate Development</div>
+          <p><strong>First objection:</strong> "Your regulatory section says Class III AND 510(k). That's a fundamental error. Did a regulatory person review this package? I can't take something with a basic regulatory mistake to our acquisition team."</p>
+          <p><strong>Decision: <span class="p pr">NO — regulatory error blocks</span></strong></p>
+        </div>
+        <div class="bsitem">
+          <div class="bsl">IP / Legal</div>
+          <p><strong>Initial:</strong> "§103 VERY LOW per screen. US20190111255A1 as closest — I'd want our team to do a limitation mapping against their claims."</p>
+          <p><strong>Decision: <span class="p pa">CONDITIONAL — willing to look after regulatory fix</span></strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI LOOP -->
+<div class="sec">
+  <div class="sn">Section 25 · Reality-Loop Audit</div>
+  <div class="st">Software vs Synthetically Rehearsed vs Real-World Loop</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:12px 0">
+    <div style="background:white;border:1px solid var(--rule);padding:14px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--green);text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px">SOFTWARE IMPLEMENTED ✓</div>
+      <p style="font-size:13px;font-weight:600;margin-bottom:6px">DISCOVERY → PACKAGE</p>
+      <p style="font-size:12px;color:#555">370 rounds. Adversarial gates. Cemetery (23+). Evidence loop state machine. Claim-level provenance. Self-correction via Article XXXI. P-01 simulator executed (COMPUTATIONALLY_EXECUTED). External validation handoff prepared. REAL.</p>
+    </div>
+    <div style="background:white;border:1px solid var(--rule);padding:14px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px">SYNTHETICALLY REHEARSED ⚠</div>
+      <p style="font-size:13px;font-weight:600;margin-bottom:6px">PACKAGE → BUYER_FEEDBACK</p>
+      <p style="font-size:12px;color:#555">3 synthetic loops confirmed. Buyer feedback states, requirements, experiment triggers, belief updates all architected. BUYER_ECONOMIC_QUESTIONNAIRE_TEMPLATE.json ready. No real buyer has engaged. 0 real meetings. 0 real feedback.</p>
+    </div>
+    <div style="background:white;border:1px solid var(--rule);padding:14px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px">REAL-WORLD: ZERO ✗</div>
+      <p style="font-size:13px;font-weight:600;margin-bottom:6px">BUYER → REAL DATA</p>
+      <p style="font-size:12px;color:#555">REAL_BUYER: 0. REAL_EXPERIMENT: 0. REAL_DATA: 0. REAL_END_TO_END_LOOPS: 0. The exact missing transition: PACKAGE → FIRST BUYER CONTACT. Machine is FROZEN (Article XXXIV). CEO must act.</p>
+    </div>
+  </div>
+  <div class="f kill"><div class="fl">REAL_LOOP_VERIFIED: NOT DEMONSTRATED</div>The portfolio correctly labels this. The machine is waiting for reality. This is not a critique — it is the correct state for a system that has built a sophisticated inference loop but not yet fed real data into it. The transition from SYNTHETICALLY_REHEARSED to REAL_WORLD_PROVEN requires exactly one action: the CEO sends the P-24 and P-28 teasers to the named buyers. The entire loop becomes real from that point.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PART II: ROADMAP TO 9/10 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="rm-hero">
+  <div class="htag">Part II — Roadmap to 9/10 on Every Benchmark</div>
+  <h2>From 51/100 (Best Today) to 90/100 (World-Class)<br>Per-Category Gate Progression</h2>
+  <div class="hero-sub">Sequenced phase plan to reach ≥9/10 on all 12 scoring dimensions. Based on gap analysis from the engineering audit above. Every action tied to a specific artifact, cost, and gate score delta. No shortcuts — only the sequential closure of every open evidence boundary.</div>
+</div>
+
+<!-- GATE PROGRESS BARS -->
+<div class="gate-wrap">
+  <div style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Gate Score Trajectories — P-01 (Lead Package)</div>
+  <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:14px;font-family:var(--mono)">Each bar = one phase. Red = now. Orange = P0. Yellow = P1. Green = P2. Blue = P3. Purple = P4. Gold = P5 (90+ target)</div>
+  <div class="gate-grid">
+    <div class="gate-col"><div class="gc-name">Tech<br>Clarity<br>/5</div><div class="phase-bar pbar-now" style="width:100%"></div><div class="phase-bar pbar-p1" style="width:100%"></div><div class="phase-bar pbar-p2" style="width:100%"></div><div class="phase-bar pbar-p3" style="width:100%"></div><div class="gc-score">Now: 5 Target: 5 ✓</div></div>
+    <div class="gate-col"><div class="gc-name">Eng<br>Core<br>/10</div><div class="phase-bar pbar-now" style="width:70%"></div><div class="phase-bar pbar-p1" style="width:75%"></div><div class="phase-bar pbar-p2" style="width:82%"></div><div class="phase-bar pbar-p3" style="width:88%"></div><div class="phase-bar pbar-p4" style="width:94%"></div><div class="gc-score">7→9 (bench + sensor)</div></div>
+    <div class="gate-col"><div class="gc-name">Design<br>Inputs<br>/5</div><div class="phase-bar pbar-now" style="width:60%"></div><div class="phase-bar pbar-p1" style="width:70%"></div><div class="phase-bar pbar-p2" style="width:86%"></div><div class="phase-bar pbar-p3" style="width:100%"></div><div class="gc-score">3→5 (source all inputs)</div></div>
+    <div class="gate-col"><div class="gc-name">Design<br>Outputs<br>/10</div><div class="phase-bar pbar-now" style="width:60%"></div><div class="phase-bar pbar-p1" style="width:65%"></div><div class="phase-bar pbar-p2" style="width:75%"></div><div class="phase-bar pbar-p3" style="width:84%"></div><div class="phase-bar pbar-p4" style="width:94%"></div><div class="gc-score">6→9 (drawings + C port)</div></div>
+    <div class="gate-col"><div class="gc-name">Evidence<br>Quality<br>/10</div><div class="phase-bar pbar-now" style="width:50%"></div><div class="phase-bar pbar-p1" style="width:55%"></div><div class="phase-bar pbar-p2" style="width:70%"></div><div class="phase-bar pbar-p3" style="width:82%"></div><div class="phase-bar pbar-p4" style="width:92%"></div><div class="gc-score">5→9 (bench data)</div></div>
+    <div class="gate-col"><div class="gc-name">Verif<br>/10</div><div class="phase-bar pbar-now" style="width:30%"></div><div class="phase-bar pbar-p1" style="width:40%"></div><div class="phase-bar pbar-p2" style="width:65%"></div><div class="phase-bar pbar-p3" style="width:80%"></div><div class="phase-bar pbar-p4" style="width:93%"></div><div class="gc-score">3→9 (execute protocol)</div></div>
+    <div class="gate-col"><div class="gc-name">Valid<br>/10</div><div class="phase-bar pbar-now" style="width:10%"></div><div class="phase-bar pbar-p1" style="width:10%"></div><div class="phase-bar pbar-p2" style="width:30%"></div><div class="phase-bar pbar-p3" style="width:55%"></div><div class="phase-bar pbar-p4" style="width:70%"></div><div class="phase-bar pbar-p5" style="width:92%"></div><div class="gc-score">1→9 (ISO 10993 + bench)</div></div>
+    <div class="gate-col"><div class="gc-name">Risk<br>/10</div><div class="phase-bar pbar-now" style="width:80%"></div><div class="phase-bar pbar-p1" style="width:84%"></div><div class="phase-bar pbar-p2" style="width:90%"></div><div class="phase-bar pbar-p3" style="width:96%"></div><div class="gc-score">8→9+ (FMEA)</div></div>
+    <div class="gate-col"><div class="gc-name">Mfg<br>/10</div><div class="phase-bar pbar-now" style="width:20%"></div><div class="phase-bar pbar-p1" style="width:25%"></div><div class="phase-bar pbar-p2" style="width:45%"></div><div class="phase-bar pbar-p3" style="width:65%"></div><div class="phase-bar pbar-p4" style="width:80%"></div><div class="phase-bar pbar-p5" style="width:93%"></div><div class="gc-score">2→9 (BOM + prototype)</div></div>
+    <div class="gate-col"><div class="gc-name">IP/Reg<br>/10</div><div class="phase-bar pbar-now" style="width:30%"></div><div class="phase-bar pbar-p1" style="width:45%"></div><div class="phase-bar pbar-p2" style="width:60%"></div><div class="phase-bar pbar-p3" style="width:75%"></div><div class="phase-bar pbar-p4" style="width:88%"></div><div class="gc-score">3→9 (patent + FTO + reg)</div></div>
+    <div class="gate-col"><div class="gc-name">Txfr<br>/5</div><div class="phase-bar pbar-now" style="width:80%"></div><div class="phase-bar pbar-p1" style="width:85%"></div><div class="phase-bar pbar-p2" style="width:90%"></div><div class="phase-bar pbar-p3" style="width:96%"></div><div class="gc-score">4→5 (artifacts)</div></div>
+    <div class="gate-col"><div class="gc-name">Comm<br>/5</div><div class="phase-bar pbar-now" style="width:80%"></div><div class="phase-bar pbar-p1" style="width:86%"></div><div class="phase-bar pbar-p2" style="width:90%"></div><div class="phase-bar pbar-p3" style="width:96%"></div><div class="gc-score">4→5 (buyer meeting)</div></div>
+  </div>
+</div>
+
+<!-- PHASES -->
+<div class="sec">
+  <div class="sn">Roadmap — 6 Phases to 9/10</div>
+  <div class="st">Phase-by-Phase Engineering Actions</div>
+
+  <div class="rm-phase">
+    <div class="rp-hdr"><span class="rp-badge b0">PHASE 0</span><span class="rp-title">Emergency Engineering Fixes — Week 1 (Zero to 3 Days Each)</span><span class="rp-time">Wk 1</span></div>
+    <div class="rp-body">
+      <p style="font-size:13px;color:#555;margin-bottom:12px">Seven actions. None require external funding. Four take less than a day. All are prerequisites for everything else.</p>
+      <div class="act-grid">
+        <div class="act-card"><div class="act-tag" style="color:var(--red)">⚖ Legal — Day 1</div><div class="act-title">Section 39 FFL Consultation</div><div class="act-detail">Engage Indian patent agent. Confirm FFL requirement for all 15 inventions. Establish whether India-first filing + 6-week wait or explicit FFL. No international disclosure before this is resolved.</div><div class="act-cost">₹10,000 · 1 consultation call · PREREQUISITE for all international contact</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--red)">📋 Admin — Day 1</div><div class="act-title">Verify IP Ownership for All 15</div><div class="act-detail">IP attorney confirms: (1) no prior employer claim, (2) assignment document to a named entity, (3) inventorship documented. Until this is done: ZERO buyer contact, ZERO licensing discussion. Cost is the lowest of any action; stakes are the highest.</div><div class="act-cost">$500–2,000 attorney · 2-4 weeks to complete · UNIVERSAL PREREQUISITE</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--red)">❌ Portfolio — Day 1</div><div class="act-title">Remove P-25 from Portfolio</div><div class="act-detail">P-25 is an explicit computational fail (3.45 mmHg &gt; 2.0 threshold). Move to cemetery. Add KA-014 constraint to P-01, P-21, P-22. Do not include in any buyer communication.</div><div class="act-cost">₹0 · 30 minutes</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--amber)">📐 Reg — Day 2</div><div class="act-title">Fix P-16 Regulatory Contradiction</div><div class="act-detail">Remove the Class III + 510(k) contradiction. Consult a regulatory strategist (1-hour call). Decide: Class II with De Novo or Class III PMA. Update section 13 and risk register. Add GaAs ISO 10993 biocompatibility requirement to safety plan.</div><div class="act-cost">$500 regulatory consultant · 1 day</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--amber)">📝 Protocol — Days 1-3</div><div class="act-title">Write Step-by-Step Protocols: P-24, P-28</div><div class="act-detail">P-28: 10 obstruction scenarios (5 protein-based, 5 cellular/debris), acoustic coupling verification, detection threshold calibration, FPR measurement. P-24: 4 posture conditions × 4 flow scenarios, ASD comparator blinded, response time measurement. Each protocol needs: materials list, equipment, step sequence, data format, acceptance decision rule.</div><div class="act-cost">₹0 · 1-2 days per protocol · CONVERTS COMMISSIONABLE TO EXECUTABLE</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--blue)">🖊 Drawing — Day 2-3</div><div class="act-title">Communication Diagrams: P-01, P-16, P-28</div><div class="act-detail">Hand-drawn or CAD-lite communication diagrams. P-01: multi-segment catheter + sensor + controller block diagram. P-16: scalp cross-section showing PV cell position + photon path. P-28: catheter + transducer mounting schematic. Scan and commit to repo. Zero budget. First drawing artifact in entire portfolio.</div><div class="act-cost">₹0 · 1 day · Design outputs: +2 points each</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--amber)">📊 Claim Fix — Day 2</div><div class="act-title">Reframe P-04 "100% Clearance" Claim</div><div class="act-detail">Replace "100% Aβ clearance (MODELLED)" with: "MODEL-PREDICTED clearance fraction under ideal kinetic conditions (no competitive inhibition, no enzyme deactivation, ideal substrate accessibility). Actual clearance to be determined by in-vitro assay. Enzyme kinetics assumptions: neprilysin Km=12μM, kcat=45s⁻¹ (from literature)." Also fix P-09 molecule — specify one candidate (e.g., synthetic auxin analog) with predicted release-pressure curve.</div><div class="act-cost">₹0 · 1 day · Removes #1 credibility risk for P-04 and P-09</div></div>
+      </div>
+      <div style="background:#f0fff4;border:1px solid #a7f3d0;padding:10px 13px;margin-top:10px;font-size:12px;font-family:var(--mono)">Phase 0 exit: P-25 removed. Ownership investigation started. Section 39 cleared. P-16 regulatory fixed. Protocols for P-24 and P-28 written. Communication drawings committed. Score delta: P-01: 51→54. P-16: 43→47. P-28: 38→42. P-24: 42→46.</div>
+    </div>
+  </div>
+
+  <div class="rm-phase">
+    <div class="rp-hdr"><span class="rp-badge b1">PHASE 1</span><span class="rp-title">Patent + Evidence Foundation — Months 1-2</span><span class="rp-time">Mo 1–2</span></div>
+    <div class="rp-body">
+      <div class="act-grid">
+        <div class="act-card"><div class="act-tag" style="color:var(--red)">🔍 Patent — Critical</div><div class="act-title">File India Provisional: P-01, P-24, P-28</div><div class="act-detail">India-first filing (Section 39 compliant). ₹1,600 government fee each for natural person rate. Professional agent drafting: ₹15,000–60,000 each. File these 3 before any external disclosure. Within 12 months: file PCT claiming Indian priority for international coverage.</div><div class="act-cost">₹20,000–65,000 per filing · 2-3 weeks · IP/Reg gate: +4 each</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--amber)">🔍 Patent — US12636471</div><div class="act-title">Full Claim Analysis: May 2026 Threat Patent</div><div class="act-detail">US12636471 (May 2026) is a potential threat to P-01 (flagged in the TTP). Get full claim text. Have patent agent do claim-by-claim limitation mapping against P-01's specific redistribution mechanism. This is non-optional before any P-01 buyer contact. If it covers predictive redistribution → major redesign needed.</div><div class="act-cost">₹50,000–1,50,000 · 3-4 weeks · RESOLVES CRITICAL IP UNCERTAINTY</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--purple)">📋 Evidence</div><div class="act-title">Source All Design Inputs: P-01 Sensor Specs</div><div class="act-detail">Replace "EXTERNAL_SOURCE (sensors exist commercially)" with named sensor model (e.g., Millar Mikro-Tip SPR-524 for ICP, specific part number for flow). Extract actual published specs: accuracy, drift rate, operating range, chronic performance data from manufacturer datasheet or peer-reviewed literature. Do this for every sensor spec in P-01, P-16, P-28.</div><div class="act-cost">₹0 (research time) · Design inputs: 3→4.5 each</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--blue)">🖊 Engineering</div><div class="act-title">C Port of P-01 Control Algorithm</div><div class="act-detail">The Python reference implementation (05_simulator.py) needs a C port for the implantable MCU (ARM Cortex-M0+). This is an engineering output that makes P-01 genuinely more transferable — a buyer's firmware team can integrate C directly into their MCU development environment. Estimated 2-4 weeks for a skilled embedded engineer. Increases design outputs and transferability significantly.</div><div class="act-cost">₹2-4L (embedded engineer, 2-4 weeks) · Design outputs: +1, Transferability: +1</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--amber)">💼 Commercial</div><div class="act-title">Send First Non-Confidential Teasers</div><div class="act-detail">P-24 → Integra Lifesciences R&D Director (LinkedIn). P-28 → Medtronic Neurosurgery Engineering (LinkedIn). One paragraph: problem, mechanism, experiment cost, ask ($15K/$8K sponsored test conversation). NDA before full dossier. Track: open / read / reply. One reply = EXTERNAL_BUYER_EVIDENCE status. Timeline: 2-4 weeks for reply cycle.</div><div class="act-cost">₹0 · P(first reply): 30-45% · Commercialization: 4→5 on first reply</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--red)">⚖ Risk</div><div class="act-title">FMEA: P-01 (Start)</div><div class="act-detail">The P-01 hostile test matrix + hazard register is the closest thing to an FMEA in the portfolio. Formalize it to ISO 14971 standard: risk ID, hazard, cause, severity, probability, detectability, initial risk, mitigation, residual risk, verification method. Even a partial FMEA for the 5 primary hazards (algorithm failure, actuator failure, sensor drift, infection, ICP overshoot) significantly increases IP/regulatory score.</div><div class="act-cost">₹50,000-1,50,000 (risk engineering consultant, 4-6 weeks) · Risk: 8→9, IP/Reg: +1</div></div>
+      </div>
+      <div style="background:#fffbf0;border:1px solid #fcd34d;padding:10px 13px;margin-top:10px;font-size:12px;font-family:var(--mono)">Phase 1 exit: 3 India provisionals filed. US12636471 threat resolved. All sensor specs sourced to named datasheets. C port complete. First buyer teaser sent. FMEA started. Score delta: P-01: 54→63. P-16: 47→52. P-24/P-28: +3 each. FIRST EXTERNAL BUYER CONTACT achieved.</div>
+    </div>
+  </div>
+
+  <div class="rm-phase">
+    <div class="rp-hdr"><span class="rp-badge b2">PHASE 2</span><span class="rp-title">Physical Experiments — Months 2-4 (The Most Important Phase)</span><span class="rp-time">Mo 2–4</span></div>
+    <div class="rp-body">
+      <p style="font-size:13px;color:#555;margin-bottom:12px">This is where MODEL_PREDICTED becomes EXPERIMENTALLY_VERIFIED. The most capital-intensive phase. Target: BIRAC BIG grant (₹50 lakh, non-dilutive) filed during Phase 1 to fund Phase 2. Alternatively: first buyer funds the P-24/$15K experiment as a sponsored validation agreement.</p>
+      <div class="act-grid">
+        <div class="act-card"><div class="act-tag" style="color:var(--red)">⚗ Critical Experiment 1</div><div class="act-title">Execute P-01 External Validation Handoff</div><div class="act-detail">The EXTERNAL_VALIDATION_HANDOFF/ folder is ready with frozen_protocol.json. Send to an academic neurosurgery lab (MIT BioInstrumentation Lab, Stanford Biomechanics, Johns Hopkins Neurosurgery). Lab runs 6 of 30 pre-registered scenarios using only the handoff folder — no inventor contact. Submit results per result_submission_schema.json. Target: at minimum reproduce the simulator's partial improvement finding (peak 22 vs 59 mmHg) in hardware. This is the highest-value single action in the entire roadmap.</div><div class="act-cost">$3-5K lab setup + 3-6 months · Evidence: 5→7, Verification: 3→6</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--amber)">⚗ Experiment 2</div><div class="act-title">Execute P-28 Acoustic Bench Test</div><div class="act-detail">10 obstruction scenarios (5 protein-based, 5 cellular/debris). COTS piezoelectric transducer + mock CSF loop + shunt catheter. Measure: detection rate, false positive rate, acoustic coupling through catheter wall. Pass: &gt;90% detection, &lt;5% FPR. This is the cheapest decisive experiment in the portfolio. Run simultaneously with P-01 external validation.</div><div class="act-cost">$8K · 8 weeks · Evidence: 3→6, Verification: 2→6 for P-28</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--amber)">⚗ Experiment 3</div><div class="act-title">Execute P-24 ASD Comparison Bench</div><div class="act-detail">4 posture conditions × 4 flow scenarios. Proportional regulation vs ASD blinded comparison. Measure: response speed, target-flow accuracy, ICP overshoot. Pass if proportional control shows &gt;20% response time advantage in ≥2 postures. This is P-24's decisive differentiation test. Sponsor it with the buyer if possible ($15K from Integra).</div><div class="act-cost">$15K · 8 weeks · Evidence: 4→7, Verification: 2→6 for P-24</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--amber)">⚗ Experiment 4</div><div class="act-title">P-16 Optical Phantom Test</div><div class="act-detail">940nm LED + tissue-equivalent phantom (varying scalp thickness: 3mm, 5mm, 8mm, 10mm, 12mm; varying pigmentation). Measure: mW/cm² at implant depth across 5 tissue parameter sets. Validates PyTissueOptics population range. Pass: &gt;0.8 mW/cm² at 10mm in all 5 conditions. Fail: any condition &lt;0.5 mW/cm². Cheapest experiment in portfolio ($2-5K). Run this FIRST as it costs the least and fixes the most credibility.</div><div class="act-cost">$2-5K · 4 weeks · Evidence: 5→7.5 for P-16</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--blue)">🏥 Regulatory</div><div class="act-title">ISO 10993 In-Vitro: P-01 Contact Materials</div><div class="act-detail">Minimum ISO 10993 panel for P-01 catheter contact materials: cytotoxicity (10993-5), hemocompatibility (10993-4), protein adsorption. NABL-accredited Indian lab (SITRA, CSIR-IICT). This is the first safety data point in the portfolio. Converts Safety Gate from HYPOTHESIS to IN-VITRO_SUPPORTED. Required for any regulatory pathway discussion with a buyer.</div><div class="act-cost">₹3-8L · NABL lab · 8-12 weeks · Validation: 1→4 for P-01</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--amber)">💼 Commercial</div><div class="act-title">Apply: BIRAC BIG Grant (₹50L Non-Dilutive)</div><div class="act-detail">Biotechnology Ignition Grant: up to ₹50 lakh, non-dilutive, proof-of-concept healthcare innovation. Requires DPIIT-recognized startup entity. If not incorporated, incorporate now. Application covers: P-01 bench validation + P-16 phantom test + ISO 10993. This single grant funds all of Phase 2 with zero equity dilution.</div><div class="act-cost">₹0 application · ₹50L potential · 3-6 months review · Funds Phase 2 entirely</div></div>
+      </div>
+      <div style="background:#f0f9ff;border:1px solid #7dd3fc;padding:10px 13px;margin-top:10px;font-size:12px;font-family:var(--mono)">Phase 2 exit: P-01 external validation complete (INDEPENDENTLY_VERIFIED first time). P-28 acoustic bench done. P-24 ASD bench done (ideally buyer-sponsored = first commercial transaction). P-16 phantom done. ISO 10993 in-vitro for P-01. Score delta: P-01: 63→72. P-16: 52→61. P-28: 42→56. P-24: 46→57. FIRST EXPERIMENTAL DATA IN PORTFOLIO.</div>
+    </div>
+  </div>
+
+  <div class="rm-phase">
+    <div class="rp-hdr"><span class="rp-badge b3">PHASE 3</span><span class="rp-title">Engineering Definition Complete — Months 3-6</span><span class="rp-time">Mo 3–6</span></div>
+    <div class="rp-body">
+      <div class="act-grid">
+        <div class="act-card"><div class="act-tag" style="color:var(--blue)">🖊 Drawing</div><div class="act-title">Preliminary Engineering Drawings: P-01, P-28</div><div class="act-detail">Hire an engineering drafter (mechanical engineering student or freelancer). For P-01: multi-segment catheter geometry, sensor mounting positions, controller housing concept, fail-safe flow path. For P-28: acoustic transducer mounting on catheter wall, coupling layer geometry, cable routing to external reader. These reach "Preliminary Engineering Drawing" level — enough for engineering review. Not CAD-precise, but geometry-coherent.</div><div class="act-cost">₹50,000-1,50,000 (drafter) · 4 weeks · Design outputs: +2 each</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--blue)">📦 BOM</div><div class="act-title">Component BOM: P-01 V0 Bench Prototype</div><div class="act-detail">The bench prototype design (06_bench_prototype_design.json) lists subsystems. Now: for each subsystem, identify the exact COTS component (manufacturer, part number, cost, datasheet). Acrylic manifold → specify: standard lab acrylic sheet, ¼" bore tubing fittings, specific model. Pinch valves → specify: Cole-Parmer EW-98302-02 or equivalent with part number. This converts "BOM: BUYER_DILIGENCE_REQUIRED" to "BOM: SOURCE_DERIVED" for V0.</div><div class="act-cost">₹0 (research time) + component ordering ($500-1K) · Manufacturing: 2→5 for V0</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--purple)">🔬 Variable Orifice</div><div class="act-title">Variable Orifice Feasibility Study</div><div class="act-detail">Commission a mechanical engineering feasibility study on miniaturized variable orifice mechanisms for chronic CSF implantation. Survey: MEMS micro-valves (commercialization status), SMA-actuated valves, piezo-actuated valves, magnetically-actuated valves. For each: chronic compatibility, available manufacturers, TRL. This converts the BIGGEST UNKNOWN in P-01 from HYPOTHESIS to ENGINEERING_INFERENCE or EXTERNAL_PRECEDENT. Cost: 4-6 weeks engineering consultant.</div><div class="act-cost">₹2-5L · 4-6 weeks · Engineering core: +1 for P-01</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--green)">🤝 Commercial</div><div class="act-title">First Buyer Meeting → NDA → Full Dossier</div><div class="act-detail">Following Phase 1 teaser outreach, NDA with first interested buyer. Share full 22-section canonical package + TTP for P-24 or P-28. Present bench results if Phase 2 is complete. Target: buyer funds next phase of validation ($25K-$75K sponsored option). The first commercial transaction changes the portfolio's status from UNCONTACTED to EVALUATING. Every subsequent buyer treats you differently.</div><div class="act-cost">₹1-2L (legal, NDA) · Target revenue: $25-75K option · Commercialization: 4→5 both packages</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--red)">📋 FMEA Complete</div><div class="act-title">ISO 14971 FMEA: P-01 and P-28</div><div class="act-detail">Complete the FMEA started in Phase 1. Cover all hazards to ISO 14971 standard. Include: algorithm failure, actuator failure, sensor drift, infection (P-01); acoustic false positives (P-28); acoustic coupling failure (P-28). For each: cause, severity, probability, detectability, initial risk, mitigation, residual risk, verification. This is required for any buyer acquisition discussion.</div><div class="act-cost">₹1-2L · 6-8 weeks · IP/Reg: 3→5 for P-01</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--purple)">📋 Regulatory</div><div class="act-title">Regulatory Strategy Document: P-01</div><div class="act-detail">Engage a US FDA regulatory consultant (can work via a US firm's India partnership) to produce a Regulatory Strategy Document: confirm Class III / PMA, identify predicate/comparator, outline pre-IDE meeting strategy, estimate clinical trial requirements. This converts regulatory classification from PRELIMINARY_HYPOTHESIS to EXTERNAL_REGULATORY_OPINION. Required for any serious acquisition discussion.</div><div class="act-cost">$5,000-15,000 (regulatory consultant) · 4-6 weeks · IP/Reg: +2 for P-01</div></div>
+      </div>
+      <div style="background:#d1fae5;border:1px solid #6ee7b7;padding:10px 13px;margin-top:10px;font-size:12px;font-family:var(--mono)">Phase 3 exit: P-01 reaches 78/100 (approaches Class B). First sponsored validation agreement signed (first revenue). BOM complete for V0 bench. FMEA complete. Regulatory strategy confirmed. Engineering drawings at preliminary level. SCORE: P-01: 72→78. P-28: 56→65. P-24: 57→64.</div>
+    </div>
+  </div>
+
+  <div class="rm-phase">
+    <div class="rp-hdr"><span class="rp-badge b4">PHASE 4</span><span class="rp-title">Prototype + Pre-Clinical — Months 6-12</span><span class="rp-time">Mo 6–12</span></div>
+    <div class="rp-body">
+      <div class="act-grid">
+        <div class="act-card"><div class="act-tag" style="color:var(--blue)">🔧 Prototype</div><div class="act-title">P-01 V0 Bench Prototype Build</div><div class="act-detail">Execute the 06_bench_prototype_design.json specification. Acrylic manifold + 4× COTS flow sensors + 4× COTS pinch valves + peristaltic pump + Arduino/RPi running C port of control algorithm. Target: reproduce simulator's peak ICP result (22 vs 59 mmHg) in physical hardware. Run 30 pre-registered scenarios. This is the first physical prototype in the entire portfolio. TRL moves from T2-CONDITIONAL to T3.</div><div class="act-cost">$3-5K materials + 3-6 months build + test · Evidence: 7→8.5, Verification: 6→8</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--amber)">🏥 Safety</div><div class="act-title">ISO 10993 Extended Panel: In-Vivo Rodent (P-01)</div><div class="act-detail">30-day subcutaneous implant in rodent model with key P-01 materials (catheter material + sensor housing). Standard histopathology. GLP-compliant CRO (Advinus, Vivo Bio Tech). This is the first in-vivo safety data. Converts Safety Gate from IN-VITRO_SUPPORTED to IN-VIVO_SUPPORTED. Required before any clinical feasibility study.</div><div class="act-cost">₹10-25L · GLP CRO · 12-16 weeks · Validation: 4→7</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--blue)">🔧 CAD</div><div class="act-title">Preliminary CAD: P-01 V0 Bench</div><div class="act-detail">Commission a mechanical CAD engineer to produce a preliminary CAD model of the V0 bench prototype (not the implantable — that's Phase 5). SolidWorks or FreeCAD. This provides: geometry for manufacturing review, assembly drawing, interference check, and a visual that buyers and clinical collaborators can understand. Not manufacturing-release quality — engineering-review quality.</div><div class="act-cost">₹1-3L (CAD contractor, 2-4 weeks) · Design outputs: 9→9.5, Manufacturing: 5→7</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--green)">💼 MedTech Innovator</div><div class="act-title">Apply to MedTech Innovator 2027 Cohort</div><div class="act-detail">With T3 prototype and external buyer evidence, portfolio becomes eligible for MedTech Innovator's global accelerator: zero equity, $800K prize pool, J&J Innovation + Medtronic network access. 2027 application cycle opens ~6-8 months ahead. Apply with P-01 as lead package.</div><div class="act-cost">₹0 application · P(acceptance with T3 prototype + buyer evidence): 15-25%</div></div>
+      </div>
+      <div style="background:#dbeafe;border:1px solid #93c5fd;padding:10px 13px;margin-top:10px;font-size:12px;font-family:var(--mono)">Phase 4 exit: P-01 has a physical prototype (T3). In-vivo safety data. CAD model. MedTech Innovator application submitted. SCORE: P-01: 78→85. First LICENSING CONVERSATION. Portfolio has external experimental data across 4 packages.</div>
+    </div>
+  </div>
+
+  <div class="rm-phase">
+    <div class="rp-hdr"><span class="rp-badge b5">PHASE 5</span><span class="rp-title">World-Class Threshold — Months 12-24</span><span class="rp-time">Mo 12–24</span></div>
+    <div class="rp-body">
+      <p style="font-size:13px;color:#555;margin-bottom:12px">The phase where P-01 crosses 90/100 (world-class) and the first licensing transaction closes. This is funded by Phase 3-4 commercial revenue (sponsored validation) + BIRAC grant + potentially a first option agreement payment.</p>
+      <div class="act-grid">
+        <div class="act-card"><div class="act-tag" style="color:var(--purple)">🔬 IP</div><div class="act-title">PCT Filing + National Phase Entry: P-01, P-28</div><div class="act-detail">12 months after India provisional → PCT filing claiming Indian priority. At 30/31 months → national phase entry in US, EU, and any market where buyer is located. Full FTO opinion from US patent counsel after national phase. This converts the IP position from SCREENED to FORMALLY_FILED for the two best packages.</div><div class="act-cost">$8,000-15,000 PCT + national phase · IP/Reg: +2.5 each · FULL_PATENT_PENDING</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--blue)">🔧 Engineering</div><div class="act-title">Manufacturing Engineering Study: P-01 Implantable</div><div class="act-detail">Commission a medical device contract manufacturer (Resonant Medical, Integer Holdings, Greatbatch) for a manufacturing feasibility study on P-01's implantable components. Deliverables: tolerance analysis for variable orifice (or selected alternative), supplier identification for key components, scale-up risk assessment, preliminary BOM for V1 implantable. This is the key Manufacturing gate item preventing 9/10.</div><div class="act-cost">$10,000-30,000 CMO · 8-12 weeks · Manufacturing: 7→9</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--green)">💼 Transaction</div><div class="act-title">First Licensing/Co-Development Agreement</div><div class="act-detail">Convert the Phase 3 sponsored validation into a formal license or co-development agreement. Structure: $200K-$1M upfront + milestone payments ($500K at prototype, $1M at clinical clearance) + 3-5% running royalty. This is the first commercial transaction. The portfolio changes from "zero revenue" to "active commercial program." Every subsequent buyer conversation is materially different.</div><div class="act-cost">₹2-5L (legal) · Target revenue: $200K-1M upfront · FIRST REAL TRANSACTION</div></div>
+        <div class="act-card"><div class="act-tag" style="color:var(--amber)">📊 Validation</div><div class="act-title">Performance Benchmarking vs Incumbent (P-01, P-28)</div><div class="act-detail">MIT licensing standard requires durability testing and benchmarking. For P-01: compare V0 bench performance against Medtronic Strata and Sophysa adjustable valves under same obstruction scenarios. For P-28: compare detection rate against ShuntCheck (Doppler) acoustic in same 10 obstruction scenarios. Benchmarking data is the strongest commercial argument and the last major evidence gap.</div><div class="act-cost">$5,000-15,000 · 12-16 weeks · Evidence: 8.5→9+, Commercialization: 5→5</div></div>
+      </div>
+      <div style="background:#fef3c7;border:1px solid #fcd34d;padding:10px 13px;margin-top:10px;font-size:12px;font-family:var(--mono)">Phase 5 exit: P-01 crosses 90/100. WORLD_CLASS_DOSSIERS: 1/15. BUYER_EVALUABLE: 5/15. ENGINEERING_DEVELOPMENT_READY: 3/15. PROTOTYPE_READY: 1/15. FIRST TRANSACTION CLOSED. Patent pending in 2+ jurisdictions. Benchmarking data against incumbents completed. SCORE: P-01: 85→92. P-16: 65→78 (after GaAs toxicology). P-28: 65→80.</div>
+    </div>
+  </div>
+</div>
+
+<!-- RESOURCE TABLE -->
+<div class="sec">
+  <div class="sn">Resource Summary</div>
+  <div class="st">Total Investment Required to Reach 9/10</div>
+  <table class="dt">
+    <thead><tr><th>Phase</th><th>Timeline</th><th>Cash Required</th><th>Key Deliverable</th><th>Score Delta (P-01)</th><th>Funding Source</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Phase 0</strong> — Emergency</td><td>Week 1</td><td>$500–2,000<br>(₹3L)</td><td>Ownership verified, Section 39, P-16 reg fixed, protocols written, drawings</td><td>51→54</td><td>Founder</td></tr>
+      <tr><td><strong>Phase 1</strong> — Patent + Evidence</td><td>Mo 1-2</td><td>$5,000–18,000<br>(₹8-12L)</td><td>3 India provisionals, US12636471 analysis, C port, first buyer teaser, FMEA start</td><td>54→63</td><td>Founder</td></tr>
+      <tr><td><strong>Phase 2</strong> — Experiments</td><td>Mo 2-4</td><td>₹15-45L<br>($18-55K)</td><td>P-01 external validation, P-28/P-24/P-16 bench tests, ISO 10993 in-vitro</td><td>63→72</td><td>BIRAC BIG grant + sponsored validation</td></tr>
+      <tr><td><strong>Phase 3</strong> — Eng Definition</td><td>Mo 3-6</td><td>₹5-12L<br>($6-15K)</td><td>Drawings, BOM, FMEA complete, regulatory strategy, first commercial agreement</td><td>72→78</td><td>Phase 2 revenue + BIRAC</td></tr>
+      <tr><td><strong>Phase 4</strong> — Prototype</td><td>Mo 6-12</td><td>₹20-50L<br>($25-60K)</td><td>V0 bench prototype (T3), in-vivo safety, preliminary CAD, MedTech Innovator</td><td>78→85</td><td>Licensing revenue + BIRAC</td></tr>
+      <tr><td><strong>Phase 5</strong> — World-Class</td><td>Mo 12-24</td><td>₹15-40L/yr<br>($18-50K/yr)</td><td>PCT + national, mfg study, benchmarking, first licensing transaction</td><td>85→92</td><td>Licensing revenue + PCT fees</td></tr>
+      <tr style="background:#f0fff4;font-weight:700"><td>TOTAL</td><td>24 months</td><td>₹65-165L<br>($80-200K)</td><td>P-01 at 92/100 (world-class). First transaction closed. 3 packages at ≥70/100.</td><td>51→92</td><td>BIRAC + sponsored validation self-funds after Phase 2</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- FINAL ENGINEERING VERDICT -->
+<div class="final">
+  <div class="ftag">Final Engineering + Commercial Verdict</div>
+  <div class="ft">APPROVE WITH CONDITIONS — 3 Packages, Sponsored Validation Only</div>
+  <div class="fb">
+    Against the engineering standard of WIPO, MIT, and FDA: 0/15 packages are world-class today. 1/15 (P-01) is approaching Engineering-Definition maturity with genuine transferable artifacts. 2/15 (P-16, P-24) are credible research-stage opportunities. 12/15 are skeleton-only and should not be sent to buyers.<br><br>
+    <strong style="color:#fbbf24;">The three conditions for approving buyer outreach:</strong><br>
+    1. Ownership verified + India provisional filed for P-24 and P-28.<br>
+    2. Protocols written for P-24 and P-28 (not UNKNOWN).<br>
+    3. P-25 removed and P-16 regulatory contradiction fixed.<br><br>
+    Once those conditions are met: send P-24 and P-28 as sponsored-validation opportunities only. Do not frame as "licensing" or "acquisition" at this stage. The honest pitch is: "We have a $8-15K bench test. Here is the frozen protocol. Here is the pass/fail rule. Would you fund it?" That is defensible, honest, and executable.
+  </div>
+  <div class="acts">
+    <div class="act-row"><span class="ar-n">1</span><div class="ar-t"><strong>This week:</strong> Verify ownership (attorney). Section 39 consultation. Remove P-25. Fix P-16 regulatory. Write protocols for P-24/P-28. Draw communication diagrams for P-01/P-16/P-28.</div></div>
+    <div class="act-row"><span class="ar-n">2</span><div class="ar-t"><strong>Month 1:</strong> File India provisionals P-01, P-24, P-28. Analyze US12636471 threat. Send teasers to Integra (P-24) and Medtronic Neurosurgery (P-28). Start FMEA for P-01.</div></div>
+    <div class="act-row"><span class="ar-n">3</span><div class="ar-t"><strong>Month 2-4:</strong> Execute P-01 external validation handoff (academic lab). Run P-28 $8K bench. Run P-16 $2-5K phantom. ISO 10993 in-vitro P-01. Apply for BIRAC BIG grant.</div></div>
+    <div class="act-row"><span class="ar-n">4</span><div class="ar-t"><strong>Month 3-6:</strong> Preliminary engineering drawings. V0 bench BOM. Complete FMEA. Regulatory strategy document. First sponsored validation agreement (target: $25K-75K). Convert P-04 and P-11 to full TTP (skeleton → engineering definition).</div></div>
+    <div class="act-row"><span class="ar-n">5</span><div class="ar-t"><strong>Month 6-12:</strong> V0 bench prototype. In-vivo safety. Preliminary CAD. MedTech Innovator 2027 application. Variable orifice feasibility study. Begin PCT filing process.</div></div>
+    <div class="act-row"><span class="ar-n">6</span><div class="ar-t"><strong>Month 12-24:</strong> PCT national phase. Manufacturing feasibility study. Benchmarking vs incumbents. First licensing transaction. P-01 crosses 90/100. <strong style="color:#fbbf24;">First world-class dossier achieved.</strong></div></div>
+  </div>
+  <div style="margin-top:22px;padding-top:14px;border-top:1px solid rgba(255,255,255,.15);font-size:13px;font-style:italic;opacity:.8;">
+    "Can these dossiers survive review by a competent external engineering organization?"<br><br>
+    <strong style="color:#fbbf24;">Documentally: Yes (P-01, P-16). Technically: Conditionally (P-01, P-24). Engineering-wise: No (no drawings, no BOM sourced, no tolerance). Manufacturing-wise: No (all BUYER_DILIGENCE_REQUIRED). Regulatorily: No (PRELIMINARY_HYPOTHESIS everywhere; P-16 has a fatal error). Commercially: Conditionally (P-24, P-28 can be pitched as sponsored validations).</strong><br><br>
+    The system has built a sophisticated epistemic machine. The machine has produced one genuinely engineered asset (P-01) and two credible early-stage opportunities (P-16, P-24). The gap from here to a world-class portfolio is 24 months and approximately $80-200K, mostly spent on experiments and legal fees. The architecture to support that journey is already built and working. The CEO must now start the clock.
+  </div>
+</div>
+
+<div class="footer">
+  <span>World-Class Engineering TT Audit + 9/10 Roadmap — Discovery Evidence Fabric R370 — August 27, 2026</span>
+  <span>Evidence basis: live repo HEAD 2026-08-26T09:59:45Z · TTP + Canonical packages + PORTFOLIO_COMMERCIAL_STATE</span>
+</div>
+
+</body>
+</html>
