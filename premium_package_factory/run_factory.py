@@ -172,6 +172,48 @@ def step_5c_r370c_factual_integrity():
     }
 
 
+def step_5d_r370d_final_hardening():
+    """Step 5d — R370D Final Hardening.
+
+    Runs the R370D pipeline:
+      1. Save rebuilt standard register with applicability + correction history separation
+      2. Apply final hardening (evidence class schema, transfer manifest rebuild,
+         artifact release states, structural engineer readiness label, domain QA expectations)
+      3. Run domain-specific QA gate (8 checks × 15 packages = 120 checks)
+
+    Constitution: Articles I, II, VI, XXV, XXVII, XXVIII, XXX, XXXI.
+    """
+    _log("STEP 5d — R370D Final Hardening...")
+
+    sys.path.insert(0, os.path.join(FACTORY_ROOT, "gates"))
+    sys.path.insert(0, os.path.join(FACTORY_ROOT, "templates"))
+
+    # 1. Save rebuilt standard register with applicability
+    _log("  [5d.1] Saving rebuilt standard register with applicability + correction history...")
+    from r370d_standard_register import save_registers as save_standard_registers
+    save_standard_registers()
+
+    # 2. Apply final hardening
+    _log("  [5d.2] Applying R370D final hardening (directives #4-#9)...")
+    from r370d_final_hardening import main as hardening_main
+    hardening_main()
+
+    # 3. Run domain QA gate
+    _log("  [5d.3] Running domain-specific QA gate (8 checks × 15 packages)...")
+    from r370d_domain_qa_gate import main as domain_qa_main
+    domain_exit = domain_qa_main()
+    if domain_exit != 0:
+        _log(f"    CRITICAL: Domain QA gate FAILED (exit {domain_exit})")
+        raise RuntimeError("Domain QA gate failed")
+    _log("    Domain QA gate: 15/15 PASS")
+
+    return {
+        "standard_register_rebuilt": True,
+        "final_hardening_applied": True,
+        "domain_qa_gate": "15/15 PASS"
+    }
+
+
 def step_6_qa():
     """Step 6 — Run QA gate."""
     _log("STEP 6 — Running QA gate...")
@@ -550,6 +592,7 @@ def main():
     step_5_data_rooms(canonical)
     r370b_results = step_5b_r370b_engineering_dossiers()  # R370B: package-specific engineering cores
     r370c_results = step_5c_r370c_factual_integrity()  # R370C: factual integrity hardening
+    r370d_results = step_5d_r370d_final_hardening()  # R370D: final hardening (domain QA, transfer manifest, release states)
     qa_results = step_6_qa()
     step_7_render_pdf_pages_to_png()
     deliverables_dir = step_8_copy_to_download()

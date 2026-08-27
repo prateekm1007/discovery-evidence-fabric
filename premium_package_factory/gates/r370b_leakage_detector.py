@@ -24,8 +24,24 @@ import sys
 import re
 from collections import defaultdict
 from datetime import datetime, timezone
+# Portable repo-root discovery (R370D: replaces hardcoded paths)
+# Try multiple import strategies for portability
+try:
+    from gates.r370_portable import find_repo_root, get_output_dir, get_external_evidence_dir, setup_python_path
+except ImportError:
+    try:
+        from r370_portable import find_repo_root, get_output_dir, get_external_evidence_dir, setup_python_path
+    except ImportError:
+        import os, sys
+        _this_dir = os.path.dirname(os.path.abspath(__file__))
+        _gates_dir = os.path.join(_this_dir, "..", "gates") if "templates" in _this_dir else _this_dir
+        _gates_dir = os.path.abspath(_gates_dir)
+        if _gates_dir not in sys.path:
+            sys.path.insert(0, _gates_dir)
+        from r370_portable import find_repo_root, get_output_dir, get_external_evidence_dir, setup_python_path
 
-REPO_ROOT = "/home/z/my-project/discovery-evidence-fabric"
+REPO_ROOT = find_repo_root()
+
 OUTPUT_DIR = os.path.join(REPO_ROOT, "premium_package_factory", "output", "engineering_dossiers_artifact_rich")
 
 # Phrases that indicate GENERIC content (CEO directive #13)
