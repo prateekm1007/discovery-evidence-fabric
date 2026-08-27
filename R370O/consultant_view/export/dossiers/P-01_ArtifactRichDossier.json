@@ -1,0 +1,746 @@
+{
+  "engineering_status": "ENGINEERING_DEFINITION",
+  "engineering_content": {
+    "bom": [
+      {
+        "item": "01",
+        "description": "Multi-segment catheter body",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "ENGINEERING_PROPOSED (from mechanism)",
+        "material": "UNKNOWN — likely silicone/polyurethane (external precedent only)",
+        "supplier": "UNKNOWN",
+        "criticality": "CRITICAL",
+        "verification": "Bench flow test + biocompatibility"
+      },
+      {
+        "item": "02",
+        "description": "Per-segment flow sensor",
+        "qty": "4 (V0)",
+        "component_type": "COTS_CANDIDATE",
+        "source_basis": "R332 decisive_experiment (Transonic)",
+        "material": "N/A (COTS)",
+        "supplier": "Transonic (identified)",
+        "criticality": "HIGH",
+        "verification": "Calibration + integration test"
+      },
+      {
+        "item": "03",
+        "description": "Microcontroller (Arduino V0)",
+        "qty": "1",
+        "component_type": "COTS_CANDIDATE",
+        "source_basis": "R332 decisive_experiment",
+        "material": "N/A (COTS)",
+        "supplier": "Arduino (identified)",
+        "criticality": "MEDIUM",
+        "verification": "Software validation + EMC"
+      }
+    ],
+    "engineering_build_plan": [
+      {
+        "work_package": "WP-01",
+        "test_article": "V0 bench prototype (4-segment catheter + COTS sensors + Arduino)",
+        "equipment": "Bench flow loop, Transonic flow sensors, pressure transducer, Arduino",
+        "design_work": "V0 prototype assembly per R332 decisive_experiment",
+        "measurement": "Per-segment flow + ICP under obstruction scenarios",
+        "acceptance_criterion": "Multi-segment peak ICP < single-segment in >= 80% of scenarios",
+        "dependency": "COTS components (Transonic, Arduino)",
+        "deliverable": "V0 bench prototype report",
+        "estimated_effort": "8 weeks"
+      },
+      {
+        "work_package": "WP-02",
+        "test_article": "Bayesian predictor algorithm",
+        "equipment": "Compute + V0 data",
+        "design_work": "Algorithm refinement from R332 baseline",
+        "measurement": "Prediction lead time on bench data",
+        "acceptance_criterion": "Achieve >= 24h lead time (target; currently ~14h)",
+        "dependency": "WP-01 data",
+        "deliverable": "Predictor performance report",
+        "estimated_effort": "10 weeks"
+      },
+      {
+        "work_package": "WP-03",
+        "test_article": "Controller with graceful degradation",
+        "equipment": "Real-time controller + V0 prototype",
+        "design_work": "Graceful degradation protocol implementation",
+        "measurement": "Closed-loop performance under dual-invariant conflict",
+        "acceptance_criterion": "Multi-segment survival > single-segment (per R332 graceful degradation claim)",
+        "dependency": "WP-01 + WP-02",
+        "deliverable": "Controller performance report",
+        "estimated_effort": "8 weeks"
+      },
+      {
+        "work_package": "WP-04",
+        "test_article": "Multi-segment extrusion specimens",
+        "equipment": "Extrusion line, dimensional inspection",
+        "design_work": "Multi-lumen die design + extrusion parameters",
+        "measurement": "Dimensional accuracy + Cpk",
+        "acceptance_criterion": "Cpk >= 1.33 for critical dimensions",
+        "dependency": "Extrusion vendor selection",
+        "deliverable": "Extrusion process spec",
+        "estimated_effort": "12 weeks"
+      },
+      {
+        "work_package": "WP-05",
+        "test_article": "Biocompatibility specimens (multi-segment silicone catheter + COTS sensor encapsulation)",
+        "equipment": "ISO 10993 test lab",
+        "design_work": "Material selection frozen",
+        "measurement": "ISO 10993 series",
+        "acceptance_criterion": "ISO 10993 pass",
+        "dependency": "Material selection",
+        "deliverable": "ISO 10993 report",
+        "estimated_effort": "12 weeks (external lab)"
+      },
+      {
+        "work_package": "WP-06",
+        "test_article": "Implantable-grade sensor (COTS to implantable transition)",
+        "equipment": "Sensor test bench, aging chamber",
+        "design_work": "Sensor selection + encapsulation",
+        "measurement": "Sensor accuracy + drift + reliability",
+        "acceptance_criterion": "Sensor meets chronic implant requirements",
+        "dependency": "Sensor vendor partnership",
+        "deliverable": "Sensor spec",
+        "estimated_effort": "16 weeks"
+      }
+    ],
+    "system_architecture": {
+      "description": "Multi-segment CSF shunt catheter with per-segment flow sensors, Bayesian occlusion predictor, and alpha-distribution controller",
+      "subsystems": [
+        {
+          "id": "SS-01",
+          "name": "Multi-segment catheter",
+          "function": "Distribute CSF flow across N segments",
+          "status": "MODELLED",
+          "evidence_source": "R332 mechanism"
+        },
+        {
+          "id": "SS-02",
+          "name": "Per-segment flow sensors",
+          "function": "Measure flow rate F_i per segment",
+          "status": "MODELLED",
+          "evidence_source": "R332 decisive_experiment (COTS sensors)"
+        },
+        {
+          "id": "SS-03",
+          "name": "Bayesian occlusion predictor",
+          "function": "Compute P(occlude_i | F_obs) per segment",
+          "status": "MODELLED",
+          "evidence_source": "R332 mechanism + 225 ablations"
+        },
+        {
+          "id": "SS-04",
+          "name": "Alpha-distribution controller",
+          "function": "Redistribute flow alpha_i based on P(occlude_i)",
+          "status": "MODELLED",
+          "evidence_source": "R332 mechanism + dual-invariant FALSIFIED → graceful degradation"
+        }
+      ],
+      "fluid_mechanics": {
+        "flow_regime": "Laminar (CSF flow rates ~0.3-0.5 mL/min, Reynolds number << 2300)",
+        "pressure_range": "ICP 5-20 mmHg (normal), up to 40 mmHg (pathological)",
+        "key_equation": "Hagen-Poiseuille: Q = πr⁴ΔP / (8ηL) — flow proportional to radius⁴",
+        "critical_parameter": "Segment conductance G_i = F_i / P_ICP",
+        "dual_invariants": {
+          "INV-1": "P_ICP <= 20 mmHg (intracranial pressure safety)",
+          "INV-2": "F_i <= F_MAX per segment (flow safety, prevents tissue damage)",
+          "FALSIFICATION": "Strict dual-invariant FALSIFIED (peak 22 > 20 mmHg). Graceful degradation: controller prioritizes INV-2 when conflict arises.",
+          "evidence_class": "OBSERVED"
+        }
+      }
+    },
+    "design_outputs": [
+      {
+        "id": "DO-001",
+        "description": "Multi-segment catheter geometry",
+        "status": "ABSENT",
+        "design_status": "CAD_BLOCKED",
+        "missing_inputs": [
+          "Catheter diameter",
+          "Segment length",
+          "Segment count (production)",
+          "Lumen configuration"
+        ]
+      },
+      {
+        "id": "DO-002",
+        "description": "Flow sensor specifications",
+        "status": "CONCEPTUAL",
+        "design_status": "COTS_IDENTIFIED",
+        "note": "Transonic flow sensors identified in R332 decisive_experiment"
+      },
+      {
+        "id": "DO-003",
+        "description": "Bayesian predictor algorithm",
+        "status": "MODELLED",
+        "design_status": "COMPUTATIONALLY_DEFINED",
+        "note": "225 ablation runs, 41/45 confirmed rate-limiting. Algorithm specified but not production-implemented."
+      },
+      {
+        "id": "DO-004",
+        "description": "Alpha-distribution controller",
+        "status": "MODELLED",
+        "design_status": "COMPUTATIONALLY_DEFINED",
+        "note": "Graceful degradation protocol specified. Strict dual-invariant FALSIFIED."
+      }
+    ],
+    "transfer_boundary": {
+      "buyer_receives": [
+        "Multi-segment catheter concept + mechanism description",
+        "Bayesian predictor algorithm (225 ablation runs, rate-limiting confirmed)",
+        "Alpha-distribution controller with graceful degradation protocol",
+        "Dual-invariant falsification record (honest failure disclosure)",
+        "V0 bench prototype BOM (COTS sensors + Arduino)",
+        "Computational model (svMultiPhysics verified 1D within 16%)",
+        "This engineering dossier with external precedent"
+      ],
+      "buyer_must_create": [
+        "Production catheter design (dimensioned drawings, tolerances)",
+        "Implantable-grade flow sensor (COTS → implantable transition)",
+        "Production controller (Arduino → medical-grade MCU)",
+        "Manufacturing process for multi-segment catheter",
+        "Regulatory submission (PMA Class III)",
+        "Clinical validation evidence"
+      ]
+    },
+    "design_inputs": [
+      {
+        "id": "DI-001",
+        "input": "Clinical need",
+        "value": "Catheter obstruction causes 30-50% of shunt failures. $35-50K per revision surgery (SOURCE_DERIVED: HCUP/AHRQ).",
+        "evidence_class": "VERIFIED",
+        "source": "R332"
+      },
+      {
+        "id": "DI-002",
+        "input": "Functional requirement",
+        "value": "Multi-segment CSF shunt with Bayesian occlusion prediction and pre-emptive flow redistribution maintaining dual safety invariants",
+        "evidence_class": "MODELLED",
+        "source": "R332"
+      },
+      {
+        "id": "DI-003",
+        "input": "Performance acceptance",
+        "value": "Multi-segment peak ICP < single-segment in >=80% of scenarios",
+        "evidence_class": "MODELLED",
+        "source": "R332"
+      },
+      {
+        "id": "DI-004",
+        "input": "Falsification criterion",
+        "value": "Multi-segment shows no advantage over single-segment",
+        "evidence_class": "MODELLED",
+        "source": "R332"
+      },
+      {
+        "id": "DI-005",
+        "input": "ICP safety threshold",
+        "value": "P_ICP <= 20 mmHg (INV-1)",
+        "evidence_class": "MODELLED",
+        "source": "R332 mechanism",
+        "note": "Strict dual-invariant FALSIFIED — graceful degradation claim replaces strict invariant"
+      },
+      {
+        "id": "DI-006",
+        "input": "Per-segment flow safety",
+        "value": "F_i <= F_MAX (INV-2)",
+        "evidence_class": "MODELLED",
+        "source": "R332 mechanism"
+      },
+      {
+        "id": "DI-007",
+        "input": "Prediction lead time",
+        "value": ">= 24h before symptoms",
+        "evidence_class": "MODELLED",
+        "source": "R332 modelled_only",
+        "note": "NOT achieved — both designs fail ~14h"
+      },
+      {
+        "id": "DI-008",
+        "input": "Revision rate reduction",
+        "value": "30%",
+        "evidence_class": "MODELLED",
+        "source": "R332 modelled_only"
+      },
+      {
+        "id": "DI-009",
+        "input": "Number of segments",
+        "value": "4 (V0 prototype)",
+        "evidence_class": "MODELLED",
+        "source": "R332 decisive_experiment"
+      },
+      {
+        "id": "DI-010",
+        "input": "Biocompatibility (ISO 10993)",
+        "value": "UNKNOWN",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "ISO 10993 series testing for catheter materials (likely silicone or polyurethane based on external precedent) + ISO 7197 (CSF shunt device requirements)",
+        "applicability": "APPLICABLE"
+      },
+      {
+        "id": "DI-011",
+        "input": "Sterilization compatibility",
+        "value": "UNKNOWN",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "EtO or gamma sterilization validation per ISO 11135/11137",
+        "applicability": "APPLICABLE"
+      },
+      {
+        "id": "DI-012",
+        "input": "EMC",
+        "value": "UNKNOWN",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "IEC 60601-1-2 if active electronic components included",
+        "applicability": "APPLICABLE (Arduino controller in V0 prototype)"
+      }
+    ],
+    "failure_analysis": [
+      {
+        "failure_mode": "Dual-invariant conflict (FALSIFIED)",
+        "mechanism": "P_ICP > 20 AND F_i > F_max simultaneously",
+        "design_feature_affected": "Safety system",
+        "evidence": "OBSERVED in R332 (peak 22 mmHg)",
+        "mitigation": "Graceful degradation protocol",
+        "verification_test": "R332 simulation",
+        "residual_uncertainty": "UNKNOWN if graceful degradation suffices in vivo"
+      },
+      {
+        "failure_mode": "Prediction lead time insufficient",
+        "mechanism": "24h target not achieved (~14h)",
+        "design_feature_affected": "Bayesian predictor",
+        "evidence": "MODELLED in R332",
+        "mitigation": "Better sensors + algorithm refinement",
+        "verification_test": "Bench obstruction simulation",
+        "residual_uncertainty": "UNKNOWN achievable lead time"
+      },
+      {
+        "failure_mode": "Multiple simultaneous segment occlusions",
+        "mechanism": "Multi-segment redundancy exhausted",
+        "design_feature_affected": "Multi-segment catheter",
+        "evidence": "Not tested in R332",
+        "mitigation": "Increase N; rapid detection",
+        "verification_test": "Multi-occlusion bench",
+        "residual_uncertainty": "UNKNOWN multi-occlusion rate"
+      },
+      {
+        "failure_mode": "Sensor failure",
+        "mechanism": "Per-segment flow sensor fails",
+        "design_feature_affected": "Per-segment sensing",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Sensor redundancy + fault detection",
+        "verification_test": "Sensor failure simulation",
+        "residual_uncertainty": "UNKNOWN sensor failure rate"
+      },
+      {
+        "failure_mode": "Catheter obstruction",
+        "mechanism": "Debris/tissue blocks lumen",
+        "design_feature_affected": "Multi-segment catheter body",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available (30-50%)",
+        "mitigation": "Multi-segment redundancy + obstruction detection",
+        "verification_test": "Obstruction bench",
+        "residual_uncertainty": "UNKNOWN whether multi-segment reduces overall rate"
+      },
+      {
+        "failure_mode": "Manufacturing complexity",
+        "mechanism": "Multi-segment extrusion complex",
+        "design_feature_affected": "Multi-segment catheter",
+        "evidence": "Manufacturing assessment",
+        "mitigation": "Process development + vendor qualification",
+        "verification_test": "Cpk study",
+        "residual_uncertainty": "UNKNOWN achievable Cpk"
+      }
+    ],
+    "validation_matrix": [
+      {
+        "id": "VAL-001",
+        "requirement": "30% revision rate reduction in clinical use",
+        "method": "Clinical trial (IDE required)",
+        "acceptance": ">=30% reduction vs standard shunt",
+        "result": "NOT_PERFORMED",
+        "evidence_class": "UNKNOWN",
+        "criterion_type": "UNKNOWN"
+      }
+    ],
+    "technology_domain": "Hydraulics + Control Systems",
+    "verification_matrix": [
+      {
+        "id": "V-001",
+        "requirement": "Multi-segment peak ICP < single-segment in >=80% of scenarios",
+        "method": "V0 bench: 4-segment shunt + COTS sensors + Arduino, 30 obstruction scenarios",
+        "acceptance": ">=80% scenarios",
+        "result": "NOT_TESTED",
+        "evidence_class": "MODELLED",
+        "criterion_type": "MODEL_DERIVED"
+      },
+      {
+        "id": "V-002",
+        "requirement": "Strict dual-invariant (P_ICP<=20 AND F_i<=F_MAX)",
+        "method": "Computational simulation",
+        "acceptance": "Both invariants maintained",
+        "result": "FALSIFIED (peak 22>20 mmHg)",
+        "evidence_class": "OBSERVED",
+        "criterion_type": "EXTERNAL_PRECEDENT"
+      },
+      {
+        "id": "V-003",
+        "requirement": "Graceful degradation",
+        "method": "Computational simulation",
+        "acceptance": "Multi-segment survival > single-segment",
+        "result": "MODELLED (peak 22 vs 59 mmHg, survival 5/5 vs 0/5)",
+        "evidence_class": "MODELLED",
+        "criterion_type": "MODEL_DERIVED"
+      }
+    ],
+    "external_engineering_precedent": [
+      {
+        "source": "https://www.federalregister.gov/documents/2021/12/29/2021-28157/medical-devices-neurological-devices-classification-of-the-cerebrospinal-fluid-shunt-system",
+        "source_title": "Classification of the Cerebrospinal Fluid Shunt System",
+        "source_snippet": "Dec 29, 2021 — The Food and Drug Administration ( FDA or we) is classifying the cerebrospinal fluid shunt system into class II (special controls).",
+        "source_hash": "9bd92172d5f2ea422b9b10a008a3a5bccda65a92f90da93352ea7bce99f28967",
+        "raw_content_sha256": "35a18f4725aea734fe856e4ee1e69bf0eccb9acc937ae091b51f17fdf1977704",
+        "artifact_path": "external_evidence/fda_shunt_search_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://www.accessdata.fda.gov/cdrh_docs/pdf6/K062009.pdf",
+        "source_title": "Miethke proGAV® Shunt - accessdata.fda.gov",
+        "source_snippet": "Jan 12, 2007 — The Miethke proGAV® Programmable Shunt System is intended to shunt cerebrospinal fluid . (CSF) from the lateral ventricles of the brain into the ... Read more",
+        "source_hash": "6e65e011e374ca7da592f5af34fd5293156f29ea0ed1c91b6f7b24e1f64a4b3a",
+        "raw_content_sha256": "35a18f4725aea734fe856e4ee1e69bf0eccb9acc937ae091b51f17fdf1977704",
+        "artifact_path": "external_evidence/fda_shunt_search_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://www.neurologyadvisor.com/news/fda-warns-of-potential-complications-between-csf-shunts-and-implantable-devices",
+        "source_title": "FDA Warns of Potential Complications Between CSF",
+        "source_snippet": "Jul 17, 2019 — The FDA warned close proximity between such devices and programmable CSF shunts may lead to unintended changes in valve settings and, in turn, ...",
+        "source_hash": "b316c8cdfa8503bfcff6e68022c853e9a7fd8ed28f4f9179a8505a151beb1b21",
+        "raw_content_sha256": "35a18f4725aea734fe856e4ee1e69bf0eccb9acc937ae091b51f17fdf1977704",
+        "artifact_path": "external_evidence/fda_shunt_search_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://fda.innolitics.com/device/K895524",
+        "source_title": "HYDROCEPHALUS SHUNT SYSTEM, LOW/MEDIUM/",
+        "source_snippet": "Apr 10, 1990 — FDA 510(k) clearance ・ shunt is a device or combination of devices used to divert fluid from the brain ・ valved catheters, valves, ...",
+        "source_hash": "4253cc5c2019b5f038b0f9b9e747a2ab4b54c20a444f48aaa777ea6083913f05",
+        "raw_content_sha256": "35a18f4725aea734fe856e4ee1e69bf0eccb9acc937ae091b51f17fdf1977704",
+        "artifact_path": "external_evidence/fda_shunt_search_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7965480",
+        "source_title": "Programmable CSF Shunt Valves: Radiographic Identification",
+        "source_snippet": "by SS Lollis · 2010 · Cited by 75 — SUMMARY: The programmable CSF shunt valve has become an important tool in hydrocephalus treatment, particularly in the NPH population and in pediatric patients ... Read more",
+        "source_hash": "89fabb1d6a0a4ffa3c362cf73a68bb6aa884f9351b1315fdfecdd5d54f91c0a8",
+        "raw_content_sha256": "35a18f4725aea734fe856e4ee1e69bf0eccb9acc937ae091b51f17fdf1977704",
+        "artifact_path": "external_evidence/fda_shunt_search_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      }
+    ],
+    "materials": [
+      {
+        "component": "Catheter body",
+        "candidate_material": "Silicone elastomer",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "External: FDA-cleared shunts use silicone (K062009 Miethke proGAV)",
+        "verification_required": "ISO 10993 biocompatibility + CSF compatibility + long-term stability",
+        "status": "CANDIDATE — not selected, not verified"
+      },
+      {
+        "component": "Catheter body",
+        "candidate_material": "Polyurethane",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "External: some CSF shunt catheters use polyurethane",
+        "verification_required": "ISO 10993 + mechanical testing",
+        "status": "CANDIDATE — not selected, not verified"
+      }
+    ],
+    "engineering_core": {
+      "governing_model": {
+        "summary": "Multi-segment CSF shunt catheter with Bayesian occlusion prediction and alpha-distribution controller. Flow redistribution across N segments maintains drainage when one segment occludes.",
+        "equations": [
+          "Q = (pi * r^4 * dP) / (8 * eta * L)   [Hagen-Poiseuille per segment]",
+          "G_total = sum(G_i)   [parallel conductance across segments]",
+          "P(occlude_i | F_obs) updated via Bayesian inference on conductance trend dG_i/dt",
+          "alpha_i = controller(P(occlude_i))   [flow redistribution policy]"
+        ],
+        "assumptions": [
+          "Multi-segment catheter with N parallel lumens (N=4 in V0 prototype)",
+          "Per-segment flow sensors provide observable F_obs(t)",
+          "Bayesian predictor can infer occlusion probability from conductance trend",
+          "Controller can redistribute flow via alpha_i adjustment",
+          "CSF is Newtonian at shunt flow rates"
+        ],
+        "boundary_conditions": [
+          "ICP 5-40 mmHg",
+          "Per-segment flow 0.05-0.5 mL/min",
+          "N segments in parallel"
+        ],
+        "input_variables": [
+          "Per-segment flow F_obs(t)",
+          "ICP",
+          "Controller policy"
+        ],
+        "output_variables": [
+          "Per-segment alpha_i",
+          "Predicted occlusion probability P(occlude_i)",
+          "Total drainage Q"
+        ],
+        "parameter_sensitivities": [
+          "Number of segments N — affects redundancy and complexity",
+          "Sensor accuracy — directly affects Bayesian inference quality",
+          "Controller policy — affects drainage distribution and safety",
+          "Sensor sampling rate — affects prediction lead time"
+        ],
+        "failure_regimes": [
+          "Multiple simultaneous occlusions (system redundancy exhausted)",
+          "Sensor failure on multiple segments",
+          "Controller instability under rapid pressure changes",
+          "Dual-invariant conflict (peak ICP exceeds 20 mmHg — already FALSIFIED in R332)"
+        ]
+      },
+      "critical_parameters": [
+        {
+          "name": "Number of segments N",
+          "value": "MODELLED (4 in V0 prototype)",
+          "unit": "count",
+          "basis": "R332 decisive experiment",
+          "evidence_class": "MODELLED"
+        },
+        {
+          "name": "Per-segment flow safety F_max",
+          "value": "MODELLED (INV-2)",
+          "unit": "mL/min",
+          "basis": "R332 mechanism",
+          "evidence_class": "MODELLED"
+        },
+        {
+          "name": "ICP safety threshold",
+          "value": "MODELLED (P_ICP <= 20 mmHg, INV-1) — FALSIFIED strict dual-invariant; graceful degradation claim replaces",
+          "unit": "mmHg",
+          "basis": "R332 mechanism",
+          "evidence_class": "OBSERVED_FALSIFICATION"
+        },
+        {
+          "name": "Prediction lead time",
+          "value": "MODELLED target 24h; achieved ~14h (FAILS target)",
+          "unit": "hours",
+          "basis": "R332 modelled_only",
+          "evidence_class": "MODELLED"
+        },
+        {
+          "name": "Revision rate reduction",
+          "value": "MODELLED 30% target",
+          "unit": "%",
+          "basis": "R332 modelled_only",
+          "evidence_class": "MODELLED"
+        },
+        {
+          "name": "Segment geometry (r, L)",
+          "value": "UNKNOWN production dimensions",
+          "unit": "mm",
+          "basis": "Design choice",
+          "evidence_class": "UNKNOWN"
+        }
+      ],
+      "external_precedent": "EXTERNAL_PRECEDENT ≠ INVENTION_VALIDATION — see external_engineering_precedent field for FDA-cleared CSF shunt systems (Miethke proGAV, Medtronic Strata). These establish that CSF shunt valves are manufacturable. They do NOT validate the multi-segment architecture proposed here.",
+      "proposed_design": {
+        "input": "Per-segment flow observations + ICP",
+        "mechanism": "Multi-segment parallel catheter with Bayesian occlusion prediction + alpha-distribution controller",
+        "transformation": "F_obs(t) -> P(occlude_i) -> alpha_i -> flow redistribution",
+        "output": "Maintained drainage despite single-segment occlusion",
+        "component_architecture": "Multi-segment catheter + per-segment flow sensors + Bayesian predictor + alpha controller + dual-invariant graceful degradation"
+      },
+      "failure_modes": [
+        {
+          "mode": "Dual-invariant conflict",
+          "mechanism": "P_ICP > 20 mmHg AND F_i > F_max simultaneously",
+          "design_feature": "Dual-invariant safety system",
+          "evidence": "OBSERVED FALSIFICATION in R332 (peak 22 mmHg > 20 mmHg)",
+          "mitigation": "Graceful degradation protocol — controller prioritizes F_max (INV-2) when conflict arises",
+          "verification_test": "R332 simulation (225 ablations)",
+          "residual_uncertainty": "UNKNOWN whether graceful degradation suffices in vivo"
+        },
+        {
+          "mode": "Prediction lead time insufficient",
+          "mechanism": "Predictor fails to provide 24h lead time (achieved only ~14h)",
+          "design_feature": "Bayesian predictor",
+          "evidence": "MODELLED in R332 (both designs fail ~14h)",
+          "mitigation": "Improved sensor sensitivity + algorithm refinement",
+          "verification_test": "Bench obstruction simulation with realistic progression",
+          "residual_uncertainty": "UNKNOWN achievable lead time with improved sensors"
+        },
+        {
+          "mode": "Multiple simultaneous occlusions",
+          "mechanism": "Multiple segments occlude faster than controller can compensate",
+          "design_feature": "Multi-segment redundancy",
+          "evidence": "MODELLED — not tested in R332",
+          "mitigation": "Increase N; rapid detection + intervention",
+          "verification_test": "Multi-segment obstruction bench test",
+          "residual_uncertainty": "UNKNOWN multi-occlusion rate"
+        },
+        {
+          "mode": "Sensor failure",
+          "mechanism": "Per-segment flow sensor fails",
+          "design_feature": "Per-segment sensing",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+          "mitigation": "Sensor redundancy + fault detection",
+          "verification_test": "Sensor failure simulation",
+          "residual_uncertainty": "UNKNOWN sensor failure rate"
+        },
+        {
+          "mode": "Catheter obstruction (separate from sensor/predictor)",
+          "mechanism": "Debris or tissue blocks lumen",
+          "design_feature": "Multi-segment catheter body",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available (30-50%)",
+          "mitigation": "Multi-segment redundancy + obstruction detection",
+          "verification_test": "Obstruction bench test",
+          "residual_uncertainty": "UNKNOWN whether multi-segment reduces overall obstruction rate"
+        },
+        {
+          "mode": "Manufacturing complexity",
+          "mechanism": "Multi-segment extrusion + sensor integration complex",
+          "design_feature": "Multi-segment catheter",
+          "evidence": "Manufacturing assessment",
+          "mitigation": "Process development + vendor qualification",
+          "verification_test": "Cpk study on multi-segment extrusion",
+          "residual_uncertainty": "UNKNOWN achievable Cpk"
+        }
+      ],
+      "verification": [
+        {
+          "id": "V-001",
+          "requirement": "Multi-segment peak ICP < single-segment in >=80% of scenarios",
+          "method": "V0 bench: 4-segment shunt + COTS sensors + Arduino, 30 obstruction scenarios",
+          "acceptance": ">=80% scenarios",
+          "result": "NOT_TESTED",
+          "evidence_class": "MODELLED",
+          "criterion_type": "MODEL_DERIVED"
+        },
+        {
+          "id": "V-002",
+          "requirement": "Strict dual-invariant (P_ICP<=20 AND F_i<=F_MAX)",
+          "method": "Computational simulation",
+          "acceptance": "Both invariants maintained",
+          "result": "FALSIFIED (peak 22>20 mmHg)",
+          "evidence_class": "OBSERVED",
+          "criterion_type": "EXTERNAL_PRECEDENT"
+        },
+        {
+          "id": "V-003",
+          "requirement": "Graceful degradation",
+          "method": "Computational simulation",
+          "acceptance": "Multi-segment survival > single-segment",
+          "result": "MODELLED (peak 22 vs 59 mmHg, survival 5/5 vs 0/5)",
+          "evidence_class": "MODELLED",
+          "criterion_type": "MODEL_DERIVED"
+        }
+      ],
+      "validation": [
+        {
+          "id": "VAL-001",
+          "requirement": "30% revision rate reduction in clinical use",
+          "method": "Clinical trial (IDE required)",
+          "acceptance": ">=30% reduction vs standard shunt",
+          "result": "NOT_PERFORMED",
+          "evidence_class": "UNKNOWN",
+          "criterion_type": "UNKNOWN"
+        }
+      ],
+      "remaining_unknowns": [
+        "Achievable prediction lead time with production-grade sensors — UNKNOWN",
+        "Multi-segment obstruction rate in vivo — UNKNOWN",
+        "Sensor failure rate in chronic implant — UNKNOWN",
+        "Multi-segment extrusion process capability (Cpk) — UNKNOWN",
+        "Regulatory pathway (Class II 510(k) with substantial equivalence, or Class III PMA) — UNKNOWN",
+        "Clinical benefit magnitude (30% revision reduction is MODEL_DERIVED, not validated) — UNKNOWN until trial",
+        "Cost vs single-segment catheter — UNKNOWN (likely higher cost; needs value analysis)"
+      ]
+    },
+    "engineering_disciplines": [
+      "Fluid mechanics",
+      "Control engineering",
+      "Bayesian statistics",
+      "Embedded systems"
+    ],
+    "mechanism_architecture": {
+      "physical_changes": "Flow redistribution: alpha values change per-segment flow rates to maintain drainage when one segment occludes",
+      "key_physics": "Multi-segment parallel conductance: G_total = Σ G_i. When G_j decreases (occlusion), controller increases alpha_i for surviving segments.",
+      "bayesian_predictor": {
+        "input": "Per-segment flow observations F_obs(t)",
+        "model": "Bayesian update of P(occlude_i | F_obs) using conductance trend dG_i/dt",
+        "prediction_horizon": "24h before clinical symptoms (target)",
+        "status": "MODELLED — 225 ablation runs confirmed rate-limiting as critical mechanism in 41/45 runs"
+      }
+    },
+    "manufacturing": {
+      "candidate_processes": [
+        {
+          "process": "Silicone extrusion",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "source": "Standard CSF catheter manufacturing method",
+          "tolerance_implication": "UNKNOWN — extrusion tolerance to be established with medical tubing supplier; Cpk study required",
+          "note": "Multi-segment design may require modified extrusion or assembly"
+        },
+        {
+          "process": "Injection molding (valve components)",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "source": "Standard valve manufacturing",
+          "tolerance_implication": "UNKNOWN — molding tolerance to be established with molder; Cpk study required"
+        }
+      ],
+      "status": "ENGINEERING_CANDIDATE — no process validated for multi-segment design"
+    }
+  },
+  "warning": "Package-specific engineering dossier. Technology-specific content (not generic template). External evidence has evidence→decision chains. No fabrication. No truncation.",
+  "dossier_version": "ENG-V9-R370E-INTEGRITY_FREEZE",
+  "design_status": "CONCEPTUAL — NOT RELEASED FOR MANUFACTURING",
+  "package_id": "P-01",
+  "transfer_ready": false
+}

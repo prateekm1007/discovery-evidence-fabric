@@ -1,0 +1,703 @@
+{
+  "engineering_status": "ENGINEERING_DEFINITION",
+  "engineering_content": {
+    "bom": [
+      {
+        "item": "01",
+        "description": "Multi-lumen catheter body",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "ENGINEERING_PROPOSED",
+        "material": "UNKNOWN — silicone or polyurethane (external precedent)",
+        "supplier": "UNKNOWN — extrusion vendor required",
+        "criticality": "CRITICAL",
+        "verification": "Dimensional + flow + kink"
+      },
+      {
+        "item": "02",
+        "description": "Inlet (ventricular) catheter connector",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "Standard CSF shunt component",
+        "material": "UNKNOWN — likely radiopaque polymer",
+        "supplier": "Multiple",
+        "criticality": "HIGH",
+        "verification": "Dimensional + biocompatibility"
+      },
+      {
+        "item": "03",
+        "description": "Outlet (peritoneal) catheter",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "Standard CSF shunt component",
+        "material": "UNKNOWN",
+        "supplier": "Multiple",
+        "criticality": "HIGH",
+        "verification": "Dimensional + biocompatibility"
+      }
+    ],
+    "engineering_build_plan": [
+      {
+        "work_package": "WP-01",
+        "test_article": "Multi-lumen extruded samples (various d_floor/d_primary ratios)",
+        "equipment": "Extrusion line, microscope, flow bench",
+        "design_work": "Multi-lumen die design + extrusion parameters",
+        "measurement": "G_floor, G_primary, dimensional accuracy",
+        "acceptance_criterion": "G_ratio within design range; Cpk >= 1.33",
+        "dependency": "Extrusion vendor selection",
+        "deliverable": "Extrusion process spec + samples",
+        "estimated_effort": "10 weeks"
+      },
+      {
+        "work_package": "WP-02",
+        "test_article": "Bench obstruction rig",
+        "equipment": "Obstruction simulator, flow sensors, pressure transducers",
+        "design_work": "Test fixture + protocol",
+        "measurement": "Q_total vs obstruction level",
+        "acceptance_criterion": "Q_floor >= Q_min when primary obstructed",
+        "dependency": "WP-01",
+        "deliverable": "Obstruction bench report",
+        "estimated_effort": "6 weeks"
+      },
+      {
+        "work_package": "WP-03",
+        "test_article": "Kink test specimens",
+        "equipment": "ISO 10555-1 kink test rig",
+        "design_work": "Test protocol",
+        "measurement": "Flow vs bend radius",
+        "acceptance_criterion": "No occlusion at specified bend radius",
+        "dependency": "WP-01",
+        "deliverable": "Kink test report",
+        "estimated_effort": "4 weeks"
+      },
+      {
+        "work_package": "WP-04",
+        "test_article": "Comparative obstruction specimens (primary vs floor)",
+        "equipment": "Obstruction rig, debris/tissue proxy",
+        "design_work": "Comparative protocol",
+        "measurement": "Differential obstruction susceptibility",
+        "acceptance_criterion": "Floor obstructs slower/differently than primary",
+        "dependency": "WP-02",
+        "deliverable": "Common-cause obstruction report",
+        "estimated_effort": "8 weeks"
+      },
+      {
+        "work_package": "WP-05",
+        "test_article": "Biocompatibility specimens",
+        "equipment": "ISO 10993 test lab",
+        "design_work": "Material selection frozen",
+        "measurement": "Standard ISO 10993 series",
+        "acceptance_criterion": "ISO 10993 pass",
+        "dependency": "Material selection",
+        "deliverable": "ISO 10993 report",
+        "estimated_effort": "12 weeks (external lab)"
+      }
+    ],
+    "system_architecture": {
+      "description": "CSF shunt with passive safety floor: a secondary drainage path with lower conductance that maintains minimum drainage when the primary path obstructs. Differential pressure thresholds activate the floor path.",
+      "subsystems": [
+        {
+          "id": "SS-01",
+          "name": "Primary drainage lumen",
+          "function": "Primary CSF drainage path with higher conductance G_primary",
+          "status": "MODELLED",
+          "evidence_source": "R332 mechanism"
+        },
+        {
+          "id": "SS-02",
+          "name": "Secondary (safety floor) lumen",
+          "function": "Lower-conductance path that opens when primary obstructs (pressure threshold or mechanical backup)",
+          "status": "PROPOSED",
+          "evidence_class": "PROPOSED",
+          "evidence_source": "R332 mechanism"
+        },
+        {
+          "id": "SS-03",
+          "name": "Pressure-activated switch (optional)",
+          "function": "Mechanical switch that activates floor path when primary path dP exceeds threshold",
+          "status": "PROPOSED",
+          "evidence_class": "PROPOSED"
+        },
+        {
+          "id": "SS-04",
+          "name": "Outlet catheter (common)",
+          "function": "Drains CSF to peritoneal/atrial/pleural destination",
+          "status": "MODELLED"
+        }
+      ],
+      "hydraulic_model": {
+        "key_equations": [
+          "Q = (pi * r^4 * dP) / (8 * eta * L)  [laminar flow, circular conduit]",
+          "Q_total = Q_primary + Q_floor",
+          "G_total = G_primary + G_floor (parallel conductance)"
+        ],
+        "flow_regime": "Laminar (Re << 2300 at CSF flow rates)",
+        "critical_parameter": "G_floor / G_primary ratio — sets drainage floor fraction when primary is patent; sets minimum drainage when primary obstructs",
+        "safety_invariants": {
+          "INV-1": "Q_floor >= Q_min when primary obstructs (minimum drainage floor)",
+          "INV-2": "Q_total <= Q_max when primary patent (prevents over-drainage)",
+          "evidence_class": "MODELLED"
+        }
+      }
+    },
+    "design_outputs": [
+      {
+        "id": "DO-001",
+        "description": "Multi-lumen catheter geometry (primary + floor lumen diameters, length, layout)",
+        "status": "ABSENT",
+        "design_status": "CAD_BLOCKED",
+        "missing_inputs": [
+          "G_floor target",
+          "G_primary target",
+          "Multi-lumen layout"
+        ]
+      },
+      {
+        "id": "DO-002",
+        "description": "Extrusion process specification",
+        "status": "ABSENT",
+        "design_status": "PROCESS_DEVELOPMENT_BLOCKED",
+        "missing_inputs": [
+          "Vendor selection",
+          "Tolerance requirements",
+          "Material selection frozen"
+        ]
+      },
+      {
+        "id": "DO-003",
+        "description": "Bench test protocol for obstruction",
+        "status": "CONCEPTUAL",
+        "design_status": "PROTOCOL_DEVELOPMENT",
+        "note": "Protocol sketched in R332"
+      }
+    ],
+    "transfer_boundary": {
+      "buyer_receives": [
+        "Passive floor concept + mechanism description",
+        "Parallel conductance governing equation",
+        "Bench test protocol (obstruction, kink, Cpk)",
+        "Critical common-cause obstruction UNKNOWN disclosure",
+        "This engineering dossier with failure analysis + build plan"
+      ],
+      "buyer_must_create": [
+        "Production multi-lumen catheter design (dimensioned, toleranced)",
+        "Multi-lumen extrusion process + vendor qualification",
+        "Common-cause obstruction validation evidence",
+        "Regulatory submission (510(k) or De Novo)",
+        "Clinical validation (revision rate endpoint)",
+        "Manufacturing scale-up"
+      ]
+    },
+    "design_inputs": [
+      {
+        "id": "DI-001",
+        "input": "Clinical need",
+        "value": "Obstruction causes 30-50% of shunt failures; no passive safety floor exists (R332)",
+        "evidence_class": "VERIFIED",
+        "source": "R332"
+      },
+      {
+        "id": "DI-002",
+        "input": "Functional requirement",
+        "value": "Passive safety mechanism maintaining minimum drainage when primary paths obstructed",
+        "evidence_class": "MODELLED",
+        "source": "R332"
+      },
+      {
+        "id": "DI-003",
+        "input": "Flow regime",
+        "value": "Laminar, Re << 2300 (multi-lumen parallel flow; per-lumen Re << 2300)",
+        "evidence_class": "COMPUTATIONALLY_SUPPORTED"
+      },
+      {
+        "id": "DI-004",
+        "input": "ICP range",
+        "value": "ICP 5-40 mmHg (floor activation threshold range; passive safety engages at high ICP)",
+        "evidence_class": "VERIFIED"
+      },
+      {
+        "id": "DI-005",
+        "input": "Q_min target (minimum drainage)",
+        "value": "UNKNOWN — MODEL_DERIVED candidate ~0.05 mL/min (per R332)",
+        "evidence_class": "MODELLED",
+        "source": "R332 mechanism"
+      },
+      {
+        "id": "DI-006",
+        "input": "Q_max target (over-drainage limit)",
+        "value": "UNKNOWN",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "Clinical literature review + clinical input"
+      },
+      {
+        "id": "DI-007",
+        "input": "Biocompatibility (ISO 10993)",
+        "value": "UNKNOWN",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "ISO 10993 series + ISO 7197 (CSF shunt device requirements)"
+      },
+      {
+        "id": "DI-008",
+        "input": "Sterilization",
+        "value": "UNKNOWN — likely EtO or gamma",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "ISO 11135 or 11137"
+      },
+      {
+        "id": "DI-009",
+        "input": "Multi-lumen extrusion tolerance",
+        "value": "UNKNOWN",
+        "evidence_class": "UNKNOWN",
+        "resolution_plan": "Process capability study with extrusion vendor"
+      },
+      {
+        "id": "DI-010",
+        "input": "Catheter body material",
+        "value": "UNKNOWN — likely silicone or polyurethane (external precedent)",
+        "evidence_class": "EXTERNAL_PRECEDENT"
+      }
+    ],
+    "failure_analysis": [
+      {
+        "failure_mode": "Common-cause obstruction (CRITICAL)",
+        "mechanism": "Same obstruction mechanism affects both lumens",
+        "design_feature_affected": "Floor lumen",
+        "evidence": "UNKNOWN — no published data",
+        "mitigation": "Different geometry, material, or surface treatment",
+        "verification_test": "Comparative obstruction bench test",
+        "residual_uncertainty": "CRITICAL UNKNOWN — may invalidate concept"
+      },
+      {
+        "failure_mode": "Over-drainage when primary patent",
+        "mechanism": "G_floor too high",
+        "design_feature_affected": "Conductance ratio",
+        "evidence": "MODELLED",
+        "mitigation": "Tune ratio",
+        "verification_test": "Bench flow test",
+        "residual_uncertainty": "UNKNOWN optimal ratio"
+      },
+      {
+        "failure_mode": "Under-drainage when primary obstructed",
+        "mechanism": "G_floor too low",
+        "design_feature_affected": "Floor lumen diameter",
+        "evidence": "MODELLED",
+        "mitigation": "Increase d_floor",
+        "verification_test": "Obstruction bench",
+        "residual_uncertainty": "UNKNOWN optimal d_floor"
+      },
+      {
+        "failure_mode": "Manufacturing tolerance violation",
+        "mechanism": "Tolerance > margin",
+        "design_feature_affected": "Multi-lumen geometry",
+        "evidence": "UNKNOWN — process capability not established",
+        "mitigation": "Cpk study + tolerance stack analysis",
+        "verification_test": "Cpk measurement",
+        "residual_uncertainty": "UNKNOWN Cpk"
+      },
+      {
+        "failure_mode": "Kink-induced occlusion",
+        "mechanism": "Mechanical deformation closes lumen",
+        "design_feature_affected": "Catheter body",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Reinforcement or larger diameter",
+        "verification_test": "ISO 10555-1",
+        "residual_uncertainty": "UNKNOWN kink resistance of multi-lumen"
+      }
+    ],
+    "validation_matrix": [
+      {
+        "id": "VAL-001",
+        "requirement": "Reduced revision rate vs standard shunt",
+        "method": "Clinical trial",
+        "acceptance": "Statistically significant reduction",
+        "result": "NOT_PERFORMED",
+        "evidence_class": "UNKNOWN",
+        "criterion_type": "UNKNOWN"
+      }
+    ],
+    "technology_domain": "Hydraulic Passive Safety + Multi-Lumen Valve Mechanics",
+    "verification_matrix": [
+      {
+        "id": "V-001",
+        "requirement": "Q_floor >= Q_min when primary obstructed",
+        "method": "Bench obstruction test",
+        "acceptance": "Q_floor >= Q_min target",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      },
+      {
+        "id": "V-002",
+        "requirement": "Q_total within bounds when primary patent",
+        "method": "Bench flow test",
+        "acceptance": "Q_total within safety range",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      },
+      {
+        "id": "V-003",
+        "requirement": "Process capability Cpk >= 1.33",
+        "method": "Cpk study",
+        "acceptance": "Cpk >= 1.33",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      },
+      {
+        "id": "V-004",
+        "requirement": "Kink resistance per ISO 10555-1",
+        "method": "ISO 10555-1 kink test",
+        "acceptance": "Pass",
+        "result": "NOT_TESTED",
+        "evidence_class": "PROPOSED",
+        "criterion_type": "ENGINEERING_PROVISIONAL"
+      }
+    ],
+    "external_engineering_precedent": [
+      {
+        "source": "https://www.youtube.com/watch?v=ZrEt0fsOcEc",
+        "source_title": "PurSafe Passive Safety IV Catheter - YouTube",
+        "source_snippet": "Nov 29, 2024 · Featuring: A passive fail-safe safety clip compliant with NSPA standard The MedSource triple-facet back-cut needle tip An optimized catheter ...",
+        "source_hash": "030958825f71c3d1d5851a8e74aba9d7708b2a22828abdf876d1bd2707ddeb60",
+        "raw_content_sha256": "7ec9530337470e2e5706cf8da840a3e63ec1d0f2f6a354fa0b0375d738533c77",
+        "artifact_path": "external_evidence/pubmed_p07_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://pubmed.ncbi.nlm.nih.gov/18635482",
+        "source_title": "A prospective randomized trial of two safety peripheral intravenous",
+        "source_snippet": "Needle withdrawal was more difficult with the passive safety catheter. Safety catheters are not superior with regard to failure rate in the catheter's ...",
+        "source_hash": "3ce1624547922bab915cad4b905af9943493ba9056a211dcf28320bd7ded1470",
+        "raw_content_sha256": "7ec9530337470e2e5706cf8da840a3e63ec1d0f2f6a354fa0b0375d738533c77",
+        "artifact_path": "external_evidence/pubmed_p07_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://www.instagram.com/reel/DWODBMJj5XP",
+        "source_title": "Catheter & Drain Care Safety focuses on the safe handling, maintenance",
+        "source_snippet": "Mar 23, 2026 · Catheter and drain care safety focuses on safe handling, maintenance, and continuous monitoring of urinary catheters and surgical drains to ...",
+        "source_hash": "e7775bbf7d3f84c2874e96e5802742fd5c573dee956dc7fd5ae10f8857d3eca6",
+        "raw_content_sha256": "7ec9530337470e2e5706cf8da840a3e63ec1d0f2f6a354fa0b0375d738533c77",
+        "artifact_path": "external_evidence/pubmed_p07_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://www.urotoday.com/library-resources/indwelling-catheters/133482-indwelling-urinary-catheter-related-problems.html",
+        "source_title": "Indwelling Urinary Catheter-related Problems - UroToday",
+        "source_snippet": "In this study, CAUTIs were marginally associated with catheter blockage but other catheter-related problems reported included blockage (34%), accidental ...",
+        "source_hash": "c087726488c4dfe516f6997a58a79168081e64b1dce9ee96e1760050180aad40",
+        "raw_content_sha256": "7ec9530337470e2e5706cf8da840a3e63ec1d0f2f6a354fa0b0375d738533c77",
+        "artifact_path": "external_evidence/pubmed_p07_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      },
+      {
+        "source": "https://www.starship.org.nz/guidelines/urinary-catheter-management",
+        "source_title": "Urinary catheter management - Starship Hospital",
+        "source_snippet": "Feb 19, 2026 · Over inflation of the balloon can cause occlusion of drainage eyes, irritate the bladder wall, and lead to bladder spasms, patient discomfort ...",
+        "source_hash": "66861e69074bb7665714a03d1e40c50a3902c3c21ddb80903bee81d65f8e5401",
+        "raw_content_sha256": "7ec9530337470e2e5706cf8da840a3e63ec1d0f2f6a354fa0b0375d738533c77",
+        "artifact_path": "external_evidence/pubmed_p07_GOVERNED.json",
+        "what_it_establishes": "External engineering reference",
+        "what_it_does_not_establish": "Does NOT validate this specific invention",
+        "design_implication": [
+          {
+            "implication": "External precedent for comparable technology",
+            "status": "EXTERNALLY_REFERENCED"
+          }
+        ],
+        "verification_requirement": "Engineering review of applicability",
+        "evidence_class": "EXTERNAL_ENGINEERING_REFERENCE"
+      }
+    ],
+    "materials": [
+      {
+        "component": "Multi-lumen catheter body",
+        "candidate_material": "Silicone elastomer (radiopaque)",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "Standard CSF shunt material",
+        "verification_required": "ISO 10993 + multi-lumen extrusion capability",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Multi-lumen catheter body",
+        "candidate_material": "Polyurethane (radiopaque)",
+        "evidence_class": "EXTERNAL_PRECEDENT",
+        "source": "Some shunts use polyurethane",
+        "verification_required": "ISO 10993 + multi-lumen extrusion capability",
+        "status": "CANDIDATE"
+      }
+    ],
+    "engineering_core": {
+      "governing_model": {
+        "summary": "Parallel hydraulic conductance model. Two drainage paths in parallel: primary (high conductance) and floor (lower conductance). When primary obstructs, floor maintains minimum drainage.",
+        "equations": [
+          "Q = (pi * r^4 * dP) / (8 * eta * L)  [P-07 multi-lumen floor conductance — laminar flow per lumen]",
+          "Q_total = Q_primary + Q_floor",
+          "G_total = G_primary + G_floor   [parallel conductance]   [P-07 parallel floor conductance — passive safety floor mechanism]",
+          "Q_floor_min = G_floor * dP_max   [minimum drainage at worst-case pressure]"
+        ],
+        "assumptions": [
+          "Both paths laminar (Re < 2300)",
+          "Paths are hydraulically independent (no cross-talk)",
+          "Outlet pressure identical for both paths",
+          "Floor path is immune to the same obstruction mechanism (CRITICAL ASSUMPTION — may not hold)"
+        ],
+        "boundary_conditions": [
+          "Inlet: ICP 5-40 mmHg",
+          "Outlet: peritoneal pressure ~5-15 mmHg",
+          "dP across shunt: 0-35 mmHg"
+        ],
+        "input_variables": [
+          "ICP",
+          "Primary obstruction state",
+          "Outlet pressure"
+        ],
+        "output_variables": [
+          "Q_primary",
+          "Q_floor",
+          "Q_total"
+        ],
+        "parameter_sensitivities": [
+          "G_floor / G_primary ratio — determines drainage distribution",
+          "Floor lumen diameter d_floor (scales as d^4 per Hagen-Poiseuille)",
+          "Floor lumen length L_floor (inverse)",
+          "Obstruction mode of primary — must NOT affect floor"
+        ],
+        "failure_regimes": [
+          "Floor lumen obstructs by same mechanism as primary (common-cause failure)",
+          "G_floor too high -> over-drainage when primary patent",
+          "G_floor too low -> under-drainage when primary obstructed",
+          "Floor lumen too small -> manufacturing tolerance dominates"
+        ]
+      },
+      "critical_parameters": [
+        {
+          "name": "G_floor (floor conductance)",
+          "value": "UNKNOWN",
+          "unit": "mL/(min·mmHg)",
+          "basis": "Design choice balancing Q_min vs over-drainage",
+          "evidence_class": "UNKNOWN",
+          "verification_requirement": "Bench flow measurement"
+        },
+        {
+          "name": "G_primary (primary conductance)",
+          "value": "UNKNOWN",
+          "unit": "mL/(min·mmHg)",
+          "basis": "Standard shunt catheter geometry",
+          "evidence_class": "UNKNOWN",
+          "verification_requirement": "Bench flow measurement"
+        },
+        {
+          "name": "Floor lumen diameter d_floor",
+          "value": "UNKNOWN",
+          "unit": "mm",
+          "basis": "Derived from G_floor target via Hagen-Poiseuille",
+          "evidence_class": "MODELLED",
+          "verification_requirement": "Geometric inspection"
+        },
+        {
+          "name": "Q_min (minimum drainage floor)",
+          "value": "UNKNOWN",
+          "unit": "mL/min",
+          "basis": "Clinical need (prevents over-drainage collapse)",
+          "evidence_class": "UNKNOWN",
+          "verification_requirement": "Clinical literature review"
+        },
+        {
+          "name": "Obstruction resistance threshold",
+          "value": "UNKNOWN",
+          "unit": "mmHg/(mL/min)",
+          "basis": "Pressure at which floor dominates",
+          "evidence_class": "UNKNOWN",
+          "verification_requirement": "Obstruction bench test"
+        }
+      ],
+      "external_precedent": "EXTERNAL_PRECEDENT ≠ INVENTION_VALIDATION — existing CSF shunts (Codman Hakim, Medtronic Strata, Miethke proGAV) establish that fixed-pressure and programmable valves are manufacturable. None implement a true passive drainage floor with parallel lumen. The proposed mechanism is distinct from existing anti-siphon or gravitational devices.",
+      "proposed_design": {
+        "input": "ICP and primary lumen obstruction state",
+        "mechanism": "Parallel multi-lumen catheter with differential conductance",
+        "transformation": "ICP -> (Q_primary + Q_floor) depending on obstruction state",
+        "output": "Total drainage with guaranteed minimum",
+        "component_architecture": "Multi-lumen extruded catheter -> inlet (ventricular) -> primary lumen + floor lumen -> outlet (peritoneal)"
+      },
+      "failure_modes": [
+        {
+          "mode": "Common-cause obstruction",
+          "mechanism": "Same debris/tissue that obstructs primary also obstructs floor",
+          "design_feature": "Floor lumen",
+          "evidence": "Critical UNKNOWN — no published data on differential obstruction susceptibility",
+          "mitigation": "Different lumen geometry, material, or surface treatment",
+          "verification_test": "Comparative obstruction bench test",
+          "residual_uncertainty": "UNKNOWN whether floor is genuinely independent"
+        },
+        {
+          "mode": "Over-drainage when primary patent",
+          "mechanism": "G_floor too high relative to G_primary",
+          "design_feature": "Conductance ratio",
+          "evidence": "MODELLED via Hagen-Poiseuille",
+          "mitigation": "Tune ratio to maintain Q_total within safety bounds",
+          "verification_test": "Bench flow test",
+          "residual_uncertainty": "UNKNOWN optimal ratio"
+        },
+        {
+          "mode": "Under-drainage when primary obstructed",
+          "mechanism": "G_floor too low",
+          "design_feature": "Floor lumen diameter",
+          "evidence": "MODELLED",
+          "mitigation": "Increase d_floor",
+          "verification_test": "Obstruction bench test",
+          "residual_uncertainty": "UNKNOWN optimal G_floor"
+        },
+        {
+          "mode": "Manufacturing tolerance violation",
+          "mechanism": "Floor lumen too small -> tolerance dominates",
+          "design_feature": "Floor lumen diameter",
+          "evidence": "UNKNOWN — process capability not established",
+          "mitigation": "Process capability study (Cpk >= 1.33)",
+          "verification_test": "Cpk measurement",
+          "residual_uncertainty": "UNKNOWN Cpk for multi-lumen extrusion"
+        },
+        {
+          "mode": "Floor lumen collapse (kink)",
+          "mechanism": "Mechanical deformation closes floor lumen",
+          "design_feature": "Catheter body",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+          "mitigation": "Reinforcement or larger diameter",
+          "verification_test": "Kink test per ISO 10555-1",
+          "residual_uncertainty": "UNKNOWN kink resistance of multi-lumen design"
+        }
+      ],
+      "verification": [
+        {
+          "id": "VER-001",
+          "requirement": "Q_floor >= Q_min when primary obstructed",
+          "method": "Bench obstruction test: occlude primary, measure Q_floor",
+          "acceptance": "Q_floor >= Q_min target",
+          "evidence_class": "PROPOSED",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        },
+        {
+          "id": "VER-002",
+          "requirement": "Q_total <= Q_max when primary patent",
+          "method": "Bench flow test",
+          "acceptance": "Q_total within safety bounds",
+          "evidence_class": "PROPOSED",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        },
+        {
+          "id": "VER-003",
+          "requirement": "Multi-lumen extrusion process capability",
+          "method": "Cpk study on production-equivalent samples",
+          "acceptance": "Cpk >= 1.33 for critical dimensions",
+          "evidence_class": "PROPOSED",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        },
+        {
+          "id": "VER-004",
+          "requirement": "Kink resistance",
+          "method": "ISO 10555-1 kink test",
+          "acceptance": "No flow occlusion at specified bend radius",
+          "evidence_class": "PROPOSED",
+          "standard": "ISO_10555_1",
+          "criterion_type": "ENGINEERING_PROVISIONAL"
+        }
+      ],
+      "validation": [
+        {
+          "id": "VAL-001",
+          "requirement": "Reduced revision rate vs standard shunt",
+          "method": "Clinical trial (IDE required)",
+          "acceptance": "Statistically significant reduction in obstruction-related revisions",
+          "evidence_class": "UNKNOWN",
+          "criterion_type": "UNKNOWN"
+        }
+      ],
+      "remaining_unknowns": [
+        "Achievable G_floor / G_primary ratio given manufacturing constraints — UNKNOWN",
+        "Whether floor is genuinely immune to common-cause obstruction — UNKNOWN (critical)",
+        "Optimal Q_min for clinical safety — UNKNOWN (clinical literature gap)",
+        "Multi-lumen extrusion process capability — UNKNOWN",
+        "Regulatory pathway (510(k) with substantial equivalence to existing shunts, or De Novo if no predicate for multi-lumen floor) — UNKNOWN",
+        "Clinical benefit magnitude for passive safety floor — reduction in obstruction-related revision rate vs standard shunt — UNKNOWN until trial"
+      ]
+    },
+    "engineering_disciplines": [
+      "Hydraulic conductance engineering",
+      "Multi-lumen catheter design",
+      "Failure mode analysis (FMEA)",
+      "Polymer extrusion"
+    ],
+    "mechanism_architecture": {
+      "physical_changes": "When primary lumen obstructs (debris, tissue ingrowth, protein aggregation), pressure upstream rises; secondary lumen either passively continues to drain (always open, lower conductance) or opens via pressure-activated switch.",
+      "key_physics": "Parallel hydraulic conductance: G_total = G_primary + G_floor. When G_primary -> 0 (obstruction), G_total -> G_floor. Floor conductance sized to maintain minimum drainage Q_min = G_floor * dP.",
+      "activation_model": {
+        "input": "Primary lumen conductance G_primary(t)",
+        "model": "Two-mode operation: (1) normal: G_primary >> G_floor, primary dominates; (2) obstructed: G_primary -> 0, floor dominates",
+        "transition_mechanism": "Either always-open floor (passive) OR pressure-threshold-activated floor (semi-active)",
+        "status": "MODELLED — no hardware validation"
+      }
+    },
+    "manufacturing": {
+      "candidate_processes": [
+        {
+          "process": "Multi-lumen extrusion",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "source": "Standard medical tubing process (multiple lumens achievable)",
+          "tolerance_implication": "UNKNOWN — process capability to be established with multi-lumen extrusion supplier; Cpk study required",
+          "note": "Requires custom extrusion die; vendor capability varies"
+        },
+        {
+          "process": "Radiopaque compound compounding",
+          "evidence_class": "EXTERNAL_PRECEDENT",
+          "source": "Barium sulfate or bismuth trioxide loading",
+          "tolerance_implication": "UNKNOWN — radiopaque loading percentage to be established with compounder; needs mechanical testing",
+          "note": "Affects mechanical properties"
+        }
+      ],
+      "status": "ENGINEERING_CANDIDATE — no multi-lumen floor process validated for this specific design"
+    }
+  },
+  "warning": "Package-specific engineering dossier. Technology-specific content (not generic template). External evidence has evidence->decision chains. No fabrication. No truncation. Constitution Article XXV: unknown stays unknown. Article XXVII: thresholds have provenance. Article XXVIII: EXTERNAL_PRECEDENT != INVENTION_VALIDATION.",
+  "loop_verification_state": "NONE",
+  "dossier_version": "ENG-V9-R370E-INTEGRITY_FREEZE",
+  "design_status": "CONCEPTUAL — NOT RELEASED FOR MANUFACTURING",
+  "package_id": "P-07",
+  "transfer_ready": false
+}
