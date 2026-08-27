@@ -214,6 +214,43 @@ def step_5d_r370d_final_hardening():
     }
 
 
+def step_5e_r370e_integrity_freeze():
+    """Step 5e — R370E Integrity Freeze.
+
+    Runs the R370E pipeline:
+      1. Apply integrity fixes (manifest hashes, transfer boundary duplicates,
+         number provenance, standard applicability, domain reasoning depth)
+      2. Run R370E integrity gates (7 gates × 15 packages = 105 checks)
+
+    Constitution: Articles I, II, IV, VI, XXIII, XXV, XXVI, XXVII, XXVIII, XXX.
+    """
+    _log("STEP 5e — R370E Integrity Freeze...")
+
+    sys.path.insert(0, os.path.join(FACTORY_ROOT, "gates"))
+    sys.path.insert(0, os.path.join(FACTORY_ROOT, "templates"))
+
+    # 1. Apply integrity fixes (2 passes)
+    _log("  [5e.1] Applying R370E integrity fixes (2 passes)...")
+    from r370e_integrity_fix import main as fix1_main
+    fix1_main()
+    from r370e_integrity_fix_2 import main as fix2_main
+    fix2_main()
+
+    # 2. Run R370E integrity gates
+    _log("  [5e.2] Running R370E integrity gates (7 gates × 15 packages)...")
+    from r370e_integrity_gates import main as integrity_main
+    integrity_exit = integrity_main()
+    if integrity_exit != 0:
+        _log(f"    CRITICAL: R370E integrity gates FAILED (exit {integrity_exit})")
+        raise RuntimeError("R370E integrity gates failed")
+    _log("    R370E integrity gates: 15/15 PASS")
+
+    return {
+        "integrity_fixes_applied": True,
+        "integrity_gates": "15/15 PASS (7 gates × 15 = 105 checks)"
+    }
+
+
 def step_6_qa():
     """Step 6 — Run QA gate."""
     _log("STEP 6 — Running QA gate...")
@@ -593,6 +630,7 @@ def main():
     r370b_results = step_5b_r370b_engineering_dossiers()  # R370B: package-specific engineering cores
     r370c_results = step_5c_r370c_factual_integrity()  # R370C: factual integrity hardening
     r370d_results = step_5d_r370d_final_hardening()  # R370D: final hardening (domain QA, transfer manifest, release states)
+    r370e_results = step_5e_r370e_integrity_freeze()  # R370E: integrity freeze (manifest-filesystem, design-output state, domain reasoning depth)
     qa_results = step_6_qa()
     step_7_render_pdf_pages_to_png()
     deliverables_dir = step_8_copy_to_download()
