@@ -1,0 +1,1154 @@
+{
+  "package_id": "P-11",
+  "view_type": "INDEPENDENT_TECHNICAL_AUDIT_VIEW",
+  "engineering_content": {
+    "technology_domain": "Microbiology + Surface Science + Biomaterials",
+    "engineering_disciplines": [
+      "Microbiology (phage-bacteria kinetics)",
+      "Surface science (biofilm formation, anti-biofouling)",
+      "Biomaterials (titanium coatings, electrospinning)",
+      "Sterilization and stability (phage viability)"
+    ],
+    "system_architecture": {
+      "description": "CSF shunt catheter with S. aureus phage K immobilized on electrospun titanium-coated surface; phages prevent biofilm formation by infecting and lysing S. aureus before biofilm establishes",
+      "subsystems": [
+        {
+          "id": "SS-01",
+          "name": "Catheter body (substrate)",
+          "function": "Carries CSF flow + supports electrospun Ti coating",
+          "status": "MODELLED",
+          "evidence_source": "R332 mechanism"
+        },
+        {
+          "id": "SS-02",
+          "name": "Electrospun titanium coating",
+          "function": "High-surface-area substrate for phage immobilization; Ti has known antibacterial properties",
+          "status": "PROPOSED",
+          "evidence_source": "R332 mechanism + external Ti coating literature"
+        },
+        {
+          "id": "SS-03",
+          "name": "Phage K immobilization layer",
+          "function": "S. aureus phage K bound to Ti surface; infects and lyses S. aureus on contact",
+          "status": "PROPOSED",
+          "evidence_source": "R332 mechanism + external phage K literature (PMC6693497)"
+        },
+        {
+          "id": "SS-04",
+          "name": "Stabilization matrix for phage viability",
+          "function": "Preserves phage infectivity over implantation lifetime (likely trehalose or lyoprotectant)",
+          "status": "PROPOSED"
+        }
+      ],
+      "microbiological_model": {
+        "key_equations": [
+          "dP/dt = -k_ads * [Phage] * [Bacteria] [phage-bacteria binding kinetics]",
+          "mu = mu_max * S / (Ks + S) [Monod specific growth rate]",
+          "dN_phage/dt = -k_decay * N_phage [phage decay over time]"
+        ],
+        "phage_bacteria_kinetics": "Phage adsorbs to S. aureus cell surface at rate k_ads * [Phage] * [Bacteria]; infection leads to lysis and release of new phages",
+        "biofilm_prevention_target": "Prevent biofilm establishment in first 24-48h (critical window for shunt infection)",
+        "critical_parameter": "Phage surface density Gamma_phage (PFU/cm^2); must exceed threshold for prophylactic lysis",
+        "safety_invariants": {
+          "INV-1": "Phage K specifically infects S. aureus (host range specificity)",
+          "INV-2": "Phage remains viable over target implantation lifetime",
+          "INV-3": "No phage-mediated adverse effects on host tissue"
+        }
+      }
+    },
+    "mechanism_architecture": {
+      "physical_changes": "S. aureus cells contacting phage-coated surface adsorb phages, become infected, and lyse before establishing biofilm",
+      "key_physics": "Phage adsorption kinetics: dP/dt = -k_ads * [Phage_surface] * [Bacteria]. At sufficient phage surface density, bacterial colonization rate < lysis rate, preventing biofilm establishment.",
+      "kinetic_model": {
+        "input": "Bacterial challenge load (CFU/mL) over time",
+        "model": "Surface colonization: dN_bact/dt = k_attach * [Bact] - k_lysis * [Phage] * [Bact_surface]; net growth or decay depends on phage density",
+        "prediction_horizon": "48-72h prophylactic window (critical for shunt infection prevention)",
+        "status": "MODELLED — based on published phage kinetics; no in vitro verification on this coating"
+      }
+    },
+    "design_inputs": [
+      {
+        "id": "DI-001",
+        "input": "Clinical need",
+        "value": "Infection = 8-12% of shunt failures, $40-80K per case. Antibiotic resistance emerging (R332)",
+        "source": "R332"
+      },
+      {
+        "id": "DI-002",
+        "input": "Functional requirement",
+        "value": "S. aureus phage K immobilized on electrospun Ti-coated catheter surface; prevents biofilm formation",
+        "source": "R332"
+      },
+      {
+        "id": "DI-003",
+        "input": "Target organism",
+        "value": "Staphylococcus aureus (primary shunt pathogen, per literature)"
+      },
+      {
+        "id": "DI-004",
+        "input": "Critical prophylactic window",
+        "value": "24-48h post-implantation (infection establishment window)"
+      },
+      {
+        "id": "DI-005",
+        "input": "Bacterial challenge (worst case)",
+        "value": "10^2-10^5 CFU/mL perioperative contamination"
+      },
+      {
+        "id": "DI-006",
+        "input": "Antimicrobial efficacy target",
+        "value": "Log reduction >= 3 (99.9%) at 24h vs S. aureus (ASTM E2180)",
+        "source": "R332 + external literature"
+      },
+      {
+        "id": "DI-007",
+        "input": "Biocompatibility (ISO 10993)",
+        "value": "UNKNOWN",
+        "resolution_plan": "ISO 10993 series for phage coating + Ti + catheter + ISO 7197 (CSF shunt device requirements)"
+      },
+      {
+        "id": "DI-008",
+        "input": "Sterilization",
+        "value": "UNKNOWN — phages incompatible with gamma; aseptic processing or EtO with viability validation",
+        "resolution_plan": "Sterilization validation + aseptic processing"
+      },
+      {
+        "id": "DI-009",
+        "input": "Phage K source",
+        "value": "UNKNOWN — research-grade available; cGMP-grade requires manufacturer",
+        "resolution_plan": "Identify cGMP phage manufacturer"
+      },
+      {
+        "id": "DI-010",
+        "input": "Electrospun Ti process",
+        "value": "UNKNOWN achievable coating parameters on catheter geometry",
+        "resolution_plan": "Electrospinning process development"
+      },
+      {
+        "id": "DI-011",
+        "input": "Shelf life (phage viability)",
+        "value": "UNKNOWN — likely cold-chain dependent",
+        "resolution_plan": "Stability study per ICH Q1A"
+      }
+    ],
+    "design_outputs": [
+      {
+        "id": "DO-001",
+        "description": "Ti-coated catheter body with phage K layer",
+        "status": "ABSENT",
+        "missing_inputs": [
+          "Ti coating process parameters",
+          "Phage immobilization chemistry",
+          "Phage surface density target"
+        ]
+      },
+      {
+        "id": "DO-002",
+        "description": "Electrospun Ti coating process specification",
+        "status": "ABSENT",
+        "missing_inputs": [
+          "Electrospinning parameters",
+          "Adhesion to catheter substrate",
+          "Thickness uniformity"
+        ]
+      },
+      {
+        "id": "DO-003",
+        "description": "Phage K immobilization process specification",
+        "status": "ABSENT",
+        "missing_inputs": [
+          "Immobilization chemistry",
+          "Phage stock quality",
+          "QC release criteria"
+        ]
+      },
+      {
+        "id": "DO-004",
+        "description": "Antimicrobial efficacy test protocol",
+        "status": "CONCEPTUAL",
+        "note": "ASTM E2180 + ISO 22196 protocols"
+      }
+    ],
+    "external_engineering_precedent": [
+      {
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6693497",
+        "source_title": "Preventing S. aureus biofilm formation on titanium surfaces by",
+        "source_snippet": "by ALR López · 2019 · Cited by 72 — β-peptide-containing films fabricated on rough titanium substrate surfaces can release sufficient quantities of β-peptide to prevent S . aureus biofilm ...",
+        "source_hash": "4291639d544f40cd42097329aa1aaac54de33eb63a3a624b9907e264e43bc9cd",
+        "raw_content_sha256": "63e8f3fe63ef2438ccc4ba96444bbaad4809347af46e68ddc82d2489c515b12d",
+        "artifact_path": "external_evidence/pubmed_p11_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://www.sciencedirect.com/science/article/abs/pii/S0142961210010537",
+        "source_title": "Staphylococcus aureus resistance on titanium coated with",
+        "source_snippet": "by X Khoo · 2010 · Cited by 79 — TBP4–PEG forms a serum-resistant surface coating capable of preventing S. aureus colonization and subsequent biofilm formation.",
+        "source_hash": "6ac833adeb38b8e8afe8d52926f7d769b5ad5fc46a0b0f257652e03506f7309c",
+        "raw_content_sha256": "63e8f3fe63ef2438ccc4ba96444bbaad4809347af46e68ddc82d2489c515b12d",
+        "artifact_path": "external_evidence/pubmed_p11_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://pubs.aip.org/aip/bmf/article/18/5/051506/3316469/Recent-developments-in-preventing-catheter-related",
+        "source_title": "Recent developments in preventing catheter-related infections",
+        "source_snippet": "Oct 11, 2024 — Under static conditions, PU catheters coated with oil-infused PDMS surface layers inhibited E. coli and S . aureus biofilm formation.",
+        "source_hash": "c08ea541b973efbb41723bc94de475e47a9595c00f91a045a4c2c6540f6090cf",
+        "raw_content_sha256": "63e8f3fe63ef2438ccc4ba96444bbaad4809347af46e68ddc82d2489c515b12d",
+        "artifact_path": "external_evidence/pubmed_p11_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://link.springer.com/chapter/10.1007/978-3-031-04484-7_21",
+        "source_title": "Antibiotic-Free Solutions for the Development of Biofilm",
+        "source_snippet": "by B Costa · 2022 · Cited by 1 — All coatings showed antibacterial and antifungal properties, Staphylococcus aureus (MRSA)",
+        "source_hash": "5895276366bf24a648149d0fb5dfdbac6214a4aeb5d65cfbeac1f11e761f0d3a",
+        "raw_content_sha256": "63e8f3fe63ef2438ccc4ba96444bbaad4809347af46e68ddc82d2489c515b12d",
+        "artifact_path": "external_evidence/pubmed_p11_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2022.825828/full",
+        "source_title": "Bacteriophage-Mediated Control of Biofilm: A Promising",
+        "source_snippet": "by C Chang · 2022 · Cited by 177 — catheter -associated biofilm clearance may involve phage is used as a gel-like coating on the catheter to reduce the bacterial adhesion to the ...",
+        "source_hash": "2f3c1bb1b7d84dcc3d307fbf1c6fd232ed2911897f257dac422a2ea2a460e227",
+        "raw_content_sha256": "63e8f3fe63ef2438ccc4ba96444bbaad4809347af46e68ddc82d2489c515b12d",
+        "artifact_path": "external_evidence/pubmed_p11_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      }
+    ],
+    "bom": [
+      {
+        "item": "01",
+        "description": "Catheter body (substrate)",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "Standard CSF catheter",
+        "material": "UNKNOWN — silicone/polyurethane (external precedent)",
+        "supplier": "Multiple",
+        "criticality": "CRITICAL",
+        "verification": "Bench + biocompatibility"
+      },
+      {
+        "item": "02",
+        "description": "Titanium target / precursor for electrospinning",
+        "qty": "Process-scale",
+        "component_type": "CONSUMABLE",
+        "source_basis": "EXTERNAL_PRECEDENT for Ti coatings",
+        "material": "Titanium (Ti-6Al-4V or pure Ti)",
+        "supplier": "Multiple (medical-grade Ti suppliers)",
+        "criticality": "HIGH",
+        "verification": "Coating QC + adhesion"
+      },
+      {
+        "item": "03",
+        "description": "S. aureus phage K stock (cGMP-grade)",
+        "qty": "Process-scale",
+        "component_type": "CUSTOM_BIOLOGIC",
+        "source_basis": "EXTERNAL_PRECEDENT (research-grade available)",
+        "material": "Phage particles in buffer",
+        "supplier": "UNKNOWN — cGMP manufacturer required",
+        "criticality": "CRITICAL",
+        "verification": "Titer + purity + sterility + endotoxin"
+      },
+      {
+        "item": "04",
+        "description": "Stabilization matrix (trehalose or lyoprotectant)",
+        "qty": "Process-scale",
+        "component_type": "CONSUMABLE",
+        "source_basis": "EXTERNAL_PRECEDENT for phage stabilization",
+        "material": "Trehalose or sucrose",
+        "supplier": "Multiple (Sigma, etc.)",
+        "criticality": "HIGH",
+        "verification": "Stability study"
+      }
+    ],
+    "materials": [
+      {
+        "component": "Catheter body",
+        "candidate_material": "Silicone elastomer",
+        "source": "Standard CSF shunt material",
+        "verification_required": "ISO 10993 + Ti coating adhesion",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Antimicrobial coating",
+        "candidate_material": "Electrospun titanium",
+        "source": "Published Ti coating literature (PMC6693497)",
+        "verification_required": "Coating process + adhesion + biocompatibility",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Antimicrobial agent",
+        "candidate_material": "S. aureus phage K",
+        "source": "Published phage K literature",
+        "verification_required": "Host range confirmation + activity + stability + immunogenicity",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Stabilization matrix",
+        "candidate_material": "Trehalose",
+        "source": "Standard phage lyoprotectant",
+        "verification_required": "Stability + biocompatibility",
+        "status": "CANDIDATE"
+      }
+    ],
+    "manufacturing": {
+      "candidate_processes": [
+        {
+          "process": "Electrospinning of Ti coating on catheter",
+          "source": "Published electrospinning literature",
+          "tolerance_implication": "Coating thickness ±10-20% typical",
+          "note": "Custom process development for cylindrical catheter geometry"
+        },
+        {
+          "process": "Phage K propagation and purification",
+          "source": "Standard phage manufacturing",
+          "tolerance_implication": "UNKNOWN — titer lot-to-lot variation to be established with phage manufacturer; Cpk study required",
+          "note": "cGMP manufacturer required for clinical-grade"
+        },
+        {
+          "process": "Phage immobilization on Ti surface",
+          "source": "Standard phage immobilization chemistry",
+          "tolerance_implication": "Surface density variation depends on process",
+          "note": "Custom process development required"
+        },
+        {
+          "process": "Aseptic assembly (terminal sterilization likely incompatible with phage)",
+          "source": "Standard aseptic processing",
+          "tolerance_implication": "ISO Class 7 cleanroom required",
+          "note": "Phage viability under EtO UNKNOWN"
+        }
+      ],
+      "status": "ENGINEERING_CANDIDATE — no process validated for phage-active catheter"
+    },
+    "transfer_boundary": {
+      "buyer_receives": [
+        "Phage K + Ti coating concept + mechanism description",
+        "Phage adsorption + Monod biofilm governing equations",
+        "Bench test protocol (ASTM E2180, ISO 22196, titer assay)",
+        "External precedent catalog (phage K, Ti coatings)",
+        "Critical UNKNOWN disclosure (phage stability, immune response, resistance)",
+        "This engineering dossier with failure analysis + build plan"
+      ],
+      "buyer_must_create": [
+        "cGMP-grade phage K manufacturing process",
+        "Electrospun Ti coating process for catheter geometry",
+        "Phage immobilization chemistry + QC specs",
+        "Aseptic assembly process (terminal sterilization likely incompatible)",
+        "Regulatory submission (likely combination product — biologics + device; complex pathway)",
+        "Clinical validation (infection rate endpoint)",
+        "Long-term stability + resistance evolution monitoring"
+      ]
+    },
+    "engineering_core": {
+      "governing_model": {
+        "summary": "Phage-bacteria adsorption kinetics on immobilized phage surface. Surface phage density must exceed threshold such that bacterial lysis rate exceeds colonization rate during the critical 24-48h post-implantation window.",
+        "equations": [
+          "dP/dt = -k_ads * [Phage] * [Bacteria] [phage-bacteria binding kinetics]",
+          "mu = mu_max * S / (Ks + S) [Monod specific growth rate]",
+          "Gamma_phage(t) = Gamma_0 * exp(-k_decay * t) [phage surface density decay]",
+          "Threshold: k_lysis * Gamma_phage(t) > k_attach * [Bact]_challenge for t in [0, t_critical]"
+        ],
+        "assumptions": [
+          "Phage K host range limited to S. aureus (literature-supported)",
+          "Phage retains infectivity when immobilized (UNKNOWN — depends on immobilization chemistry)",
+          "Biofilm establishment requires minimum bacterial colonization (literature-supported)",
+          "CSF environment supports phage stability (UNKNOWN — CSF composition may affect phage)",
+          "No host immune response to phages (UNKNOWN for chronic exposure)"
+        ],
+        "boundary_conditions": [
+          "Bacterial challenge: S. aureus at 10^2-10^5 CFU/mL (typical perioperative contamination)",
+          "Surface: phage-coated Ti on catheter inner and outer lumen",
+          "Time: 0-72h post-implantation (critical window)"
+        ],
+        "input_variables": [
+          "Bacterial challenge load",
+          "Phage surface density Gamma_0",
+          "Phage decay rate k_decay"
+        ],
+        "output_variables": [
+          "Bacterial colonization rate",
+          "Biofilm establishment probability"
+        ],
+        "parameter_sensitivities": [
+          "k_ads (phage-bacteria binding rate) — published ~10^-9 to 10^-8 mL/(PFU·min)",
+          "Gamma_0 (initial phage density) — directly scales lysis rate",
+          "k_decay (phage inactivation rate) — UNKNOWN in CSF environment",
+          "Immobilization chemistry — affects phage receptor availability"
+        ],
+        "failure_regimes": [
+          "Gamma_0 < threshold — phage density insufficient; biofilm establishes",
+          "k_decay too high — phage inactivated before critical window ends",
+          "Immobilization blocks phage receptor — phage cannot bind bacteria",
+          "Bacterial challenge exceeds phage capacity — overwhelming infection",
+          "Host immune response clears phages prematurely"
+        ]
+      },
+      "critical_parameters": [
+        {
+          "name": "Phage K titer (initial)",
+          "value": "UNKNOWN achievable surface density",
+          "unit": "PFU/cm^2",
+          "basis": "Coating process-dependent",
+          "verification_requirement": "Surface titer assay"
+        },
+        {
+          "name": "Phage-bacteria adsorption rate k_ads",
+          "value": "EXTERNAL_PRECEDENT (~10^-9 to 10^-8 mL/(PFU·min) per published phage kinetics)",
+          "unit": "mL/(PFU·min)",
+          "basis": "Published phage K literature"
+        },
+        {
+          "name": "Phage decay rate k_decay",
+          "value": "UNKNOWN in CSF environment",
+          "unit": "1/h",
+          "basis": "UNKNOWN for chronic CSF exposure",
+          "verification_requirement": "Aging study in CSF mimic"
+        },
+        {
+          "name": "Electrospun Ti coating thickness",
+          "value": "UNKNOWN",
+          "unit": "μm",
+          "basis": "Electrospinning process parameters",
+          "verification_requirement": "SEM cross-section"
+        },
+        {
+          "name": "Ti coating surface area multiplier",
+          "value": "UNKNOWN — electrospinning increases surface area 10-1000x vs flat",
+          "unit": "dimensionless",
+          "basis": "Electrospinning process",
+          "verification_requirement": "BET surface area measurement"
+        },
+        {
+          "name": "Bacterial challenge (worst case)",
+          "value": "EXTERNAL_PRECEDENT (~10^2-10^5 CFU/mL perioperative contamination)",
+          "unit": "CFU/mL",
+          "basis": "Published surgical contamination literature"
+        }
+      ],
+      "external_precedent": "EXTERNAL_PRECEDENT ≠ INVENTION_VALIDATION — published literature (PMC6693497) establishes that phage K can prevent S. aureus biofilm on Ti surfaces in vitro. It does NOT establish that the proposed catheter coating achieves clinically meaningful infection reduction in CSF shunt patients.",
+      "proposed_design": {
+        "input": "S. aureus challenge during perioperative period",
+        "mechanism": "Immobilized phage K infects and lyses S. aureus on contact",
+        "transformation": "Viable S. aureus -> lysed cells (no biofilm establishment)",
+        "output": "Catheter surface resistant to S. aureus colonization",
+        "component_architecture": "Catheter body -> electrospun Ti coating -> phage K immobilization layer -> stabilization matrix"
+      },
+      "failure_modes": [
+        {
+          "mode": "Phage inactivation",
+          "mechanism": "Protein denaturation, desiccation, or chemical degradation of phage particles",
+          "design_feature": "Phage K layer",
+          "evidence": "UNKNOWN — failure mechanism requires investigation challenge",
+          "mitigation": "Stabilization matrix (trehalose, lyoprotectant)",
+          "verification_test": "Aging study with periodic titer measurement",
+          "residual_uncertainty": "UNKNOWN achievable half-life in CSF"
+        },
+        {
+          "mode": "Immobilization blocks receptor",
+          "mechanism": "Covalent coupling occludes phage receptor binding protein",
+          "design_feature": "Immobilization chemistry",
+          "evidence": "UNKNOWN — depends on chemistry choice",
+          "mitigation": "Optimize coupling chemistry (orient phage receptor outward)",
+          "verification_test": "Infectivity assay post-immobilization",
+          "residual_uncertainty": "UNKNOWN achievable activity retention"
+        },
+        {
+          "mode": "Bacterial challenge exceeds capacity",
+          "mechanism": "High contamination load overwhelms phage density",
+          "design_feature": "Phage density Gamma_0",
+          "evidence": "MODELLED via threshold analysis",
+          "mitigation": "Maximize Gamma_0 + combine with antibiotics",
+          "verification_test": "High-challenge bench test",
+          "residual_uncertainty": "UNKNOWN clinical contamination distribution"
+        },
+        {
+          "mode": "Host immune clearance of phage",
+          "mechanism": "Immune system inactivates phages before critical window ends",
+          "design_feature": "Phage layer",
+          "evidence": "UNKNOWN for phage K specifically",
+          "mitigation": "PEGylation or immunosuppressive coating",
+          "verification_test": "In vivo phage persistence study",
+          "residual_uncertainty": "UNKNOWN immune response magnitude"
+        },
+        {
+          "mode": "Phage-resistant S. aureus",
+          "mechanism": "Bacteria evolve phage resistance",
+          "design_feature": "Single-phage approach",
+          "evidence": "UNKNOWN — failure mechanism requires investigation to phage therapy",
+          "mitigation": "Phage cocktail (multiple phages)",
+          "verification_test": "Resistance evolution assay",
+          "residual_uncertainty": "UNKNOWN resistance rate in vivo"
+        },
+        {
+          "mode": "Ti coating delamination",
+          "mechanism": "Mechanical bond failure between Ti and catheter substrate",
+          "design_feature": "Ti-catheter interface",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+          "mitigation": "Surface activation + adhesion testing",
+          "verification_test": "ASTM D3359 + fatigue",
+          "residual_uncertainty": "UNKNOWN chronic adhesion"
+        }
+      ],
+      "verification": [
+        {
+          "id": "VER-001",
+          "requirement": "Phage K surface density meets model requirement",
+          "method": "Surface titer assay (PFU/cm^2)",
+          "acceptance": "Gamma_0 above threshold for prophylactic lysis"
+        },
+        {
+          "id": "VER-002",
+          "requirement": "Antibacterial efficacy against S. aureus",
+          "method": "ASTM E2180 surface antimicrobial test",
+          "acceptance": "Log reduction >= 3 (99.9% reduction) at 24h",
+          "standard": "ASTM_E2180"
+        },
+        {
+          "id": "VER-003",
+          "requirement": "Antibacterial efficacy per ISO 22196",
+          "method": "ISO 22196",
+          "acceptance": "Pass criteria",
+          "standard": "ISO_22196"
+        },
+        {
+          "id": "VER-004",
+          "requirement": "Phage viability over simulated implantation",
+          "method": "Aging in CSF mimic at 37°C",
+          "acceptance": "Titer retained > 50% at target lifetime"
+        },
+        {
+          "id": "VER-005",
+          "requirement": "Biocompatibility ISO 10993",
+          "method": "Standard ISO 10993 series",
+          "acceptance": "Pass",
+          "standard": "ISO_10993"
+        }
+      ],
+      "validation": [
+        {
+          "id": "VAL-001",
+          "requirement": "Reduced infection rate in animal model",
+          "method": "In vivo contamination challenge study",
+          "acceptance": "Statistically significant infection reduction vs control catheter"
+        },
+        {
+          "id": "VAL-002",
+          "requirement": "Reduced infection rate in patient cohort",
+          "method": "Clinical trial (IDE required)",
+          "acceptance": "Statistically significant reduction in shunt infection rate"
+        }
+      ],
+      "remaining_unknowns": [
+        "Achievable phage surface density Gamma_0 on electrospun Ti coating — UNKNOWN",
+        "Phage K half-life in CSF environment at 37°C — UNKNOWN",
+        "Infectivity retention after immobilization chemistry — UNKNOWN",
+        "In vivo phage persistence and immune response — UNKNOWN",
+        "Phage resistance evolution rate in clinical use — UNKNOWN",
+        "Regulatory pathway for phage-containing device — UNKNOWN (FDA phage guidance evolving; likely complex combination product)",
+        "Manufacturing scale-up for phage-coated catheter — UNKNOWN",
+        "Clinical endpoint (infection rate reduction magnitude) — UNKNOWN until trial"
+      ]
+    },
+    "failure_analysis": [
+      {
+        "failure_mode": "Phage inactivation over time",
+        "mechanism": "Protein denaturation, desiccation, chemical degradation",
+        "design_feature_affected": "Phage K layer",
+        "evidence": "UNKNOWN — failure mechanism requires investigation challenge",
+        "mitigation": "Stabilization matrix (trehalose) + spare density margin",
+        "verification_test": "Aging study with periodic titer",
+        "residual_uncertainty": "UNKNOWN achievable half-life"
+      },
+      {
+        "failure_mode": "Immobilization blocks phage receptor",
+        "mechanism": "Coupling chemistry occludes receptor binding protein",
+        "design_feature_affected": "Immobilization chemistry",
+        "evidence": "UNKNOWN — chemistry-dependent",
+        "mitigation": "Optimize coupling (orient receptor outward)",
+        "verification_test": "Infectivity post-immobilization",
+        "residual_uncertainty": "UNKNOWN achievable retention"
+      },
+      {
+        "failure_mode": "Bacterial challenge exceeds capacity",
+        "mechanism": "High contamination load overwhelms phage density",
+        "design_feature_affected": "Phage density Gamma_0",
+        "evidence": "MODELLED",
+        "mitigation": "Maximize Gamma_0 + antibiotics adjunct",
+        "verification_test": "High-challenge bench test",
+        "residual_uncertainty": "UNKNOWN clinical contamination distribution"
+      },
+      {
+        "failure_mode": "Host immune clearance of phage",
+        "mechanism": "Immune system inactivates phages",
+        "design_feature_affected": "Phage layer",
+        "evidence": "UNKNOWN for phage K",
+        "mitigation": "PEGylation or immunosuppressive coating",
+        "verification_test": "In vivo persistence study",
+        "residual_uncertainty": "UNKNOWN immune response magnitude"
+      },
+      {
+        "failure_mode": "Phage-resistant S. aureus emergence",
+        "mechanism": "Bacteria evolve phage resistance",
+        "design_feature_affected": "Single-phage approach",
+        "evidence": "UNKNOWN — failure mechanism requires investigation challenge",
+        "mitigation": "Phage cocktail (multiple phages)",
+        "verification_test": "Resistance evolution assay",
+        "residual_uncertainty": "UNKNOWN resistance rate in vivo"
+      },
+      {
+        "failure_mode": "Ti coating delamination",
+        "mechanism": "Mechanical bond failure",
+        "design_feature_affected": "Ti-catheter interface",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Surface activation + adhesion testing",
+        "verification_test": "ASTM D3359 + fatigue",
+        "residual_uncertainty": "UNKNOWN chronic adhesion"
+      },
+      {
+        "failure_mode": "Non-S. aureus pathogens",
+        "mechanism": "Phage K host range limited to S. aureus; other pathogens (S. epidermidis, etc.) unaffected",
+        "design_feature_affected": "Single-phage approach",
+        "evidence": "Phage K host range known (literature)",
+        "mitigation": "Multi-phage cocktail for broader coverage",
+        "verification_test": "Host range confirmation + efficacy vs other pathogens",
+        "residual_uncertainty": "UNKNOWN coverage of full pathogen spectrum"
+      }
+    ],
+    "engineering_build_plan": [
+      {
+        "work_package": "WP-01",
+        "test_article": "Ti-coated catheter coupons (various electrospinning parameters)",
+        "equipment": "Electrospinning setup, SEM, surface profiler",
+        "design_work": "Electrospinning process development for cylindrical geometry",
+        "measurement": "Coating thickness, surface area, adhesion",
+        "acceptance_criterion": "Coating uniform + adherent + target thickness",
+        "dependency": "Electrospinning equipment",
+        "deliverable": "Ti coating process spec",
+        "estimated_effort": "12 weeks"
+      },
+      {
+        "work_package": "WP-02",
+        "test_article": "Phage K stock (research-grade)",
+        "equipment": "Phage propagation, purification, titer assay",
+        "design_work": "Phage K propagation protocol",
+        "measurement": "Titer (PFU/mL), purity, host range",
+        "acceptance_criterion": "Titer meets target; host range confirmed S. aureus-only",
+        "dependency": "Phage K seed stock",
+        "deliverable": "Phage K stock report",
+        "estimated_effort": "6 weeks"
+      },
+      {
+        "work_package": "WP-03",
+        "test_article": "Phage-coated Ti coupons",
+        "equipment": "Surface titer assay, infectivity assay",
+        "design_work": "Immobilization chemistry selection + optimization",
+        "measurement": "Gamma_0 (surface PFU/cm^2), infectivity retention",
+        "acceptance_criterion": "Gamma_0 above threshold; infectivity > 50% retention",
+        "dependency": "WP-01 + WP-02",
+        "deliverable": "Immobilization process spec",
+        "estimated_effort": "10 weeks"
+      },
+      {
+        "work_package": "WP-04",
+        "test_article": "Phage-coated catheter segments",
+        "equipment": "ASTM E2180 test setup, S. aureus culture",
+        "design_work": "ASTM E2180 protocol",
+        "measurement": "Log reduction at 24h vs control",
+        "acceptance_criterion": "Log reduction >= 3",
+        "dependency": "WP-03",
+        "deliverable": "Antimicrobial efficacy report",
+        "estimated_effort": "6 weeks"
+      },
+      {
+        "work_package": "WP-05",
+        "test_article": "Phage-coated specimens in CSF mimic at 37°C",
+        "equipment": "Aging chamber, titer assay",
+        "design_work": "Aging protocol",
+        "measurement": "Titer vs time",
+        "acceptance_criterion": "Titer > 50% at target lifetime",
+        "dependency": "WP-03",
+        "deliverable": "Stability report",
+        "estimated_effort": "12-24 weeks (chronic)"
+      },
+      {
+        "work_package": "WP-06",
+        "test_article": "Biocompatibility specimens (Ti-coated catheter coupons + phage K stabilization matrix)",
+        "equipment": "ISO 10993 test lab",
+        "design_work": "Material selection frozen",
+        "measurement": "ISO 10993 series",
+        "acceptance_criterion": "ISO 10993 pass",
+        "dependency": "Material selection",
+        "deliverable": "ISO 10993 report",
+        "estimated_effort": "12 weeks (external lab)"
+      },
+      {
+        "work_package": "WP-07",
+        "test_article": "Animal model contamination challenge",
+        "equipment": "Animal facility, microbiology lab",
+        "design_work": "In vivo protocol (IACUC required)",
+        "measurement": "Infection rate vs control catheter",
+        "acceptance_criterion": "Statistically significant reduction",
+        "dependency": "WP-04 + WP-05",
+        "deliverable": "In vivo efficacy report",
+        "estimated_effort": "16 weeks"
+      }
+    ],
+    "verification_matrix": [
+      {
+        "id": "V-001",
+        "requirement": "Phage K surface density Gamma_0",
+        "method": "Surface titer assay",
+        "acceptance": "Above model threshold",
+        "result": "NOT_TESTED"
+      },
+      {
+        "id": "V-002",
+        "requirement": "Log reduction >= 3 vs S. aureus at 24h",
+        "method": "ASTM E2180",
+        "acceptance": "Log reduction >= 3",
+        "result": "NOT_TESTED",
+        "standard": "ASTM_E2180"
+      },
+      {
+        "id": "V-003",
+        "requirement": "ISO 22196 antibacterial activity",
+        "method": "ISO 22196",
+        "acceptance": "Pass",
+        "result": "NOT_TESTED",
+        "standard": "ISO_22196"
+      },
+      {
+        "id": "V-004",
+        "requirement": "Phage viability over lifetime",
+        "method": "Aging in CSF mimic",
+        "acceptance": "Titer > 50% at target lifetime",
+        "result": "NOT_TESTED"
+      },
+      {
+        "id": "V-005",
+        "requirement": "Biocompatibility ISO 10993",
+        "method": "ISO 10993 series",
+        "acceptance": "Pass",
+        "result": "NOT_TESTED",
+        "standard": "ISO_10993"
+      }
+    ],
+    "validation_matrix": [
+      {
+        "id": "VAL-001",
+        "requirement": "Reduced infection rate in animal model",
+        "method": "In vivo challenge study",
+        "acceptance": "Statistically significant reduction vs control",
+        "result": "NOT_PERFORMED"
+      },
+      {
+        "id": "VAL-002",
+        "requirement": "Reduced infection rate in patient cohort",
+        "method": "Clinical trial (IDE)",
+        "acceptance": "Statistically significant reduction",
+        "result": "NOT_PERFORMED"
+      }
+    ]
+  },
+  "claim_reconstruction": {
+    "package_id": "P-11",
+    "total_claims": 22,
+    "claims": [
+      {
+        "claim_id": "C-P-11-001",
+        "claim_text": "Phage K titer (initial): UNKNOWN achievable surface density",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "Coating process-dependent"
+        ],
+        "source_hashes": [],
+        "source_locations": [
+          "Surface titer assay"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN achievable surface density",
+        "units": "PFU/cm^2",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-002",
+        "claim_text": "Phage-bacteria adsorption rate k_ads: EXTERNAL_PRECEDENT (~10^-9 to 10^-8 mL/(PFU·min) per published phage kinetics)",
+        "origin_type": "EXTERNAL_PRECEDENT",
+        "source_ids": [
+          "Published phage K literature"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "EXTERNAL_PRECEDENT (~10^-9 to 10^-8 mL/(PFU·min) per published phage kinetics)",
+        "units": "mL/(PFU·min)",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-003",
+        "claim_text": "Phage decay rate k_decay: UNKNOWN in CSF environment",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "UNKNOWN for chronic CSF exposure"
+        ],
+        "source_hashes": [],
+        "source_locations": [
+          "Aging study in CSF mimic"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN in CSF environment",
+        "units": "1/h",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-004",
+        "claim_text": "Electrospun Ti coating thickness: UNKNOWN",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "Electrospinning process parameters"
+        ],
+        "source_hashes": [],
+        "source_locations": [
+          "SEM cross-section"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN",
+        "units": "μm",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-005",
+        "claim_text": "Ti coating surface area multiplier: UNKNOWN — electrospinning increases surface area 10-1000x vs flat",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "Electrospinning process"
+        ],
+        "source_hashes": [],
+        "source_locations": [
+          "BET surface area measurement"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN — electrospinning increases surface area 10-1000x vs flat",
+        "units": "dimensionless",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-006",
+        "claim_text": "Bacterial challenge (worst case): EXTERNAL_PRECEDENT (~10^2-10^5 CFU/mL perioperative contamination)",
+        "origin_type": "EXTERNAL_PRECEDENT",
+        "source_ids": [
+          "Published surgical contamination literature"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "EXTERNAL_PRECEDENT (~10^2-10^5 CFU/mL perioperative contamination)",
+        "units": "CFU/mL",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-007",
+        "claim_text": "Preventing S. aureus biofilm formation on titanium surfaces by",
+        "origin_type": "SOURCE_NATIVE",
+        "source_ids": [
+          "https://pmc.ncbi.nlm.nih.gov/articles/PMC6693497"
+        ],
+        "source_hashes": [
+          "4291639d544f40cd42097329aa1aaac54de33eb63a3a624b9907e264e43bc9cd"
+        ],
+        "source_locations": [
+          "external_evidence/pubmed_p11_GOVERNED.json"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "by ALR López · 2019 · Cited by 72 — β-peptide-containing films fabricated on rough titanium substrate surfaces can release sufficient quantities of β-peptide to prevent S . aureus biofilm ...",
+        "units": "",
+        "reconstructible": true,
+        "source_native_text": "by ALR López · 2019 · Cited by 72 — β-peptide-containing films fabricated on rough titanium substrate surfaces can release sufficient quantities of β-peptide to prevent S . aureus biofilm ..."
+      },
+      {
+        "claim_id": "C-P-11-008",
+        "claim_text": "Staphylococcus aureus resistance on titanium coated with",
+        "origin_type": "SOURCE_NATIVE",
+        "source_ids": [
+          "https://www.sciencedirect.com/science/article/abs/pii/S0142961210010537"
+        ],
+        "source_hashes": [
+          "6ac833adeb38b8e8afe8d52926f7d769b5ad5fc46a0b0f257652e03506f7309c"
+        ],
+        "source_locations": [
+          "external_evidence/pubmed_p11_GOVERNED.json"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "by X Khoo · 2010 · Cited by 79 — TBP4–PEG forms a serum-resistant surface coating capable of preventing S. aureus colonization and subsequent biofilm formation.",
+        "units": "",
+        "reconstructible": true,
+        "source_native_text": "by X Khoo · 2010 · Cited by 79 — TBP4–PEG forms a serum-resistant surface coating capable of preventing S. aureus colonization and subsequent biofilm formation."
+      },
+      {
+        "claim_id": "C-P-11-009",
+        "claim_text": "Recent developments in preventing catheter-related infections",
+        "origin_type": "SOURCE_NATIVE",
+        "source_ids": [
+          "https://pubs.aip.org/aip/bmf/article/18/5/051506/3316469/Recent-developments-in-preventing-catheter-related"
+        ],
+        "source_hashes": [
+          "c08ea541b973efbb41723bc94de475e47a9595c00f91a045a4c2c6540f6090cf"
+        ],
+        "source_locations": [
+          "external_evidence/pubmed_p11_GOVERNED.json"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "Oct 11, 2024 — Under static conditions, PU catheters coated with oil-infused PDMS surface layers inhibited E. coli and S . aureus biofilm formation.",
+        "units": "",
+        "reconstructible": true,
+        "source_native_text": "Oct 11, 2024 — Under static conditions, PU catheters coated with oil-infused PDMS surface layers inhibited E. coli and S . aureus biofilm formation."
+      },
+      {
+        "claim_id": "C-P-11-010",
+        "claim_text": "Antibiotic-Free Solutions for the Development of Biofilm",
+        "origin_type": "SOURCE_NATIVE",
+        "source_ids": [
+          "https://link.springer.com/chapter/10.1007/978-3-031-04484-7_21"
+        ],
+        "source_hashes": [
+          "5895276366bf24a648149d0fb5dfdbac6214a4aeb5d65cfbeac1f11e761f0d3a"
+        ],
+        "source_locations": [
+          "external_evidence/pubmed_p11_GOVERNED.json"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "by B Costa · 2022 · Cited by 1 — All coatings showed antibacterial and antifungal properties, Staphylococcus aureus (MRSA)",
+        "units": "",
+        "reconstructible": true,
+        "source_native_text": "by B Costa · 2022 · Cited by 1 — All coatings showed antibacterial and antifungal properties, Staphylococcus aureus (MRSA)"
+      },
+      {
+        "claim_id": "C-P-11-011",
+        "claim_text": "Bacteriophage-Mediated Control of Biofilm: A Promising",
+        "origin_type": "SOURCE_NATIVE",
+        "source_ids": [
+          "https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2022.825828/full"
+        ],
+        "source_hashes": [
+          "2f3c1bb1b7d84dcc3d307fbf1c6fd232ed2911897f257dac422a2ea2a460e227"
+        ],
+        "source_locations": [
+          "external_evidence/pubmed_p11_GOVERNED.json"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "by C Chang · 2022 · Cited by 177 — catheter -associated biofilm clearance may involve phage is used as a gel-like coating on the catheter to reduce the bacterial adhesion to the  ...",
+        "units": "",
+        "reconstructible": true,
+        "source_native_text": "by C Chang · 2022 · Cited by 177 — catheter -associated biofilm clearance may involve phage is used as a gel-like coating on the catheter to reduce the bacterial adhesion to the  ..."
+      },
+      {
+        "claim_id": "C-P-11-012",
+        "claim_text": "Clinical need: Infection = 8-12% of shunt failures, $40-80K per case. Antibiotic resistance emerging (R332)",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "R332"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "Infection = 8-12% of shunt failures, $40-80K per case. Antibiotic resistance emerging (R332)",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-013",
+        "claim_text": "Functional requirement: S. aureus phage K immobilized on electrospun Ti-coated catheter surface; prevents biofilm formation",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "R332"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "S. aureus phage K immobilized on electrospun Ti-coated catheter surface; prevents biofilm formation",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-014",
+        "claim_text": "Target organism: Staphylococcus aureus (primary shunt pathogen, per literature)",
+        "origin_type": "UNKNOWN",
+        "source_ids": [],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "Staphylococcus aureus (primary shunt pathogen, per literature)",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-015",
+        "claim_text": "Critical prophylactic window: 24-48h post-implantation (infection establishment window)",
+        "origin_type": "UNKNOWN",
+        "source_ids": [],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "24-48h post-implantation (infection establishment window)",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-016",
+        "claim_text": "Bacterial challenge (worst case): 10^2-10^5 CFU/mL perioperative contamination",
+        "origin_type": "UNKNOWN",
+        "source_ids": [],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "10^2-10^5 CFU/mL perioperative contamination",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-017",
+        "claim_text": "Antimicrobial efficacy target: Log reduction >= 3 (99.9%) at 24h vs S. aureus (ASTM E2180)",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "R332 + external literature"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "Log reduction >= 3 (99.9%) at 24h vs S. aureus (ASTM E2180)",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-018",
+        "claim_text": "Biocompatibility (ISO 10993): UNKNOWN",
+        "origin_type": "UNKNOWN",
+        "source_ids": [],
+        "source_hashes": [],
+        "source_locations": [
+          "ISO 10993 series for phage coating + Ti + catheter + ISO 7197 (CSF shunt device requirements)"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-019",
+        "claim_text": "Sterilization: UNKNOWN — phages incompatible with gamma; aseptic processing or EtO with viability validation",
+        "origin_type": "UNKNOWN",
+        "source_ids": [],
+        "source_hashes": [],
+        "source_locations": [
+          "Sterilization validation + aseptic processing"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN — phages incompatible with gamma; aseptic processing or EtO with viability validation",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-020",
+        "claim_text": "Phage K source: UNKNOWN — research-grade available; cGMP-grade requires manufacturer",
+        "origin_type": "UNKNOWN",
+        "source_ids": [],
+        "source_hashes": [],
+        "source_locations": [
+          "Identify cGMP phage manufacturer"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN — research-grade available; cGMP-grade requires manufacturer",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-021",
+        "claim_text": "Electrospun Ti process: UNKNOWN achievable coating parameters on catheter geometry",
+        "origin_type": "UNKNOWN",
+        "source_ids": [],
+        "source_hashes": [],
+        "source_locations": [
+          "Electrospinning process development"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN achievable coating parameters on catheter geometry",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-11-022",
+        "claim_text": "Shelf life (phage viability): UNKNOWN — likely cold-chain dependent",
+        "origin_type": "UNKNOWN",
+        "source_ids": [],
+        "source_hashes": [],
+        "source_locations": [
+          "Stability study per ICH Q1A"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN — likely cold-chain dependent",
+        "units": "",
+        "reconstructible": true
+      }
+    ]
+  },
+  "source_adequacy": {
+    "package_id": "P-11",
+    "baseline_sources": [
+      "EPO Espacenet (150M+ patents, FREE)",
+      "Europe PMC (millions of publications, FREE)",
+      "PubMed/NCBI (biomedical literature, FREE)",
+      "ClinicalTrials.gov (clinical trials, FREE)",
+      "FDA openFDA (510(k), PMA, MAUDE, FREE)",
+      "PubChem (chemical properties, FREE)",
+      "Materials Project (material properties, FREE)"
+    ],
+    "consultant_addable_sources": true,
+    "source_coverage_limitations": "These 7 sources form the BASELINE verification set. They do NOT represent an exhaustive universe. The consultant may add domain-specific sources when warranted. Source coverage depends on the technology domain.",
+    "patent_snap_dependency": "NONE — PatSnap is NOT a dependency"
+  }
+}

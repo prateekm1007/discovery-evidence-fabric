@@ -1,0 +1,92 @@
+{
+  "brief_type": "INDEPENDENT_AUDIT_BRIEF",
+  "mandate": "Assume the inventor disappears tomorrow. Based solely on the materials provided, determine which of these 15 technologies constitute world-class engineering technology-transfer dossiers for their stated maturity, which can credibly be taken into engineering development or validation, which deserve a licensing/co-development conversation, and which should be rejected.",
+  "anti_anchoring_rule": "Produce your RAW_EXTERNAL_VERDICT before receiving any comparative assessment. The system will not provide internal scores until your verdict is sealed.",
+  "what_you_receive": [
+    "15 independent technical audit views (engineering content + claim traceability)",
+    "Claim reconstruction chains with ORIGIN_TYPE for every material claim",
+    "Source-adequacy metadata (7 baseline free sources, consultant can add more)",
+    "Engineering number register (provenance for values)",
+    "Engineering standard register (verified standards)",
+    "External evidence (governed, SHA-verified sources)",
+    "Package registry (15 active packages)",
+    "Consultant inspection protocol (minimum 20 items per package)"
+  ],
+  "what_you_do_NOT_receive": [
+    "Internal maturity scores",
+    "Internal evidence classifications",
+    "Internal QA assertions",
+    "Developer explanations",
+    "Previous audit results",
+    "CEO preferences",
+    "Any internal pass/fail results"
+  ],
+  "inspection_protocol": {
+    "protocol_type": "CONSULTANT_INSPECTION",
+    "per_package_minimum": {
+      "material_claims": 10,
+      "highest_risk_claims": 3,
+      "key_engineering_artifacts": 3,
+      "standards_regulatory_assertions": 2,
+      "external_evidence_sources": 2,
+      "total_minimum": 20
+    },
+    "expansion_rule": "Consultant can expand sampling when risk warrants it",
+    "per_item": {
+      "item_id": "Unique identifier",
+      "item_type": "CLAIM / ARTIFACT / STANDARD / SOURCE",
+      "description": "What is being inspected",
+      "consultant_finding": "CONFIRMED / PARTIALLY_CONFIRMED / NOT_FOUND / CONTRADICTED / FABRICATED",
+      "falsification_attempt": "How the consultant tried to verify/falsify",
+      "notes": "Consultant observations"
+    }
+  },
+  "free_source_protocol": {
+    "baseline_sources": 7,
+    "consultant_addable": true,
+    "patent_snap_dependency": "NONE"
+  },
+  "external_verdict_schema": {
+    "verdict_type": "EXTERNAL_HUMAN_ASSESSMENT",
+    "rules": [
+      "The system may record RAW_EXTERNAL_VERDICT but cannot modify it",
+      "The external verdict becomes evidence object EXTERNAL_HUMAN_ASSESSMENT",
+      "It is NOT an internal score — it enters the reality loop as external evidence",
+      "The system cannot override or reinterpret the consultant's verdict",
+      "The verdict is immutable once sealed"
+    ],
+    "schema": {
+      "consultant_id": "Identity of the external consultant",
+      "session_id": "Blind audit session ID",
+      "package_verdicts": {
+        "per_package": {
+          "DOSSIER_QUALITY": "WORLD_CLASS / ADEQUATE / INSUFFICIENT",
+          "TECHNICAL_CREDIBILITY": "PASS / CONDITIONAL / FAIL / UNKNOWN",
+          "ENGINEERING_MATURITY": "EARLY / ENGINEERING_DEFINITION / PROTOTYPE_DESIGN / PROTOTYPE_BUILD / VALIDATED / TRANSFER_READY",
+          "EVIDENCE_QUALITY": "PASS / CONDITIONAL / FAIL / UNKNOWN",
+          "MANUFACTURING_READINESS": "PASS / CONDITIONAL / FAIL / UNKNOWN",
+          "REGULATORY_READINESS": "PASS / CONDITIONAL / FAIL / UNKNOWN",
+          "IP_READINESS": "PASS / CONDITIONAL / FAIL / UNKNOWN",
+          "BUYER_EVALUABILITY": "PASS / CONDITIONAL / FAIL / UNKNOWN",
+          "TRANSFERABILITY": "PASS / CONDITIONAL / FAIL / UNKNOWN",
+          "COMMERCIALIZATION": "PASS / CONDITIONAL / FAIL / UNKNOWN",
+          "WORLD_CLASS_DOSSIER": "YES / CONDITIONAL / NO",
+          "TRANSACTION_RECOMMENDATION": "REJECT / HOLD / SPONSORED_VALIDATION / CO_DEVELOPMENT / LICENSE_DISCUSSION / ACQUISITION_DILIGENCE",
+          "justification": "Consultant's reasoning",
+          "blockers": "List of identified blockers",
+          "next_actions": "Recommended next actions"
+        }
+      },
+      "portfolio_assessment": {
+        "TOP_5": "Ranked top 5 packages",
+        "FASTEST_TO_VALIDATE": "Package ID",
+        "MOST_COMPELLING_TECHNOLOGY": "Package ID",
+        "MOST_LIKELY_TO_GET_A_MEETING": "Package ID",
+        "MOST_LIKELY_TO_BE_REJECTED": "Package ID"
+      },
+      "consultant_signature": "Cryptographic signature",
+      "verdict_hash": "SHA-256 of verdict",
+      "sealed_at": "Timestamp"
+    }
+  }
+}

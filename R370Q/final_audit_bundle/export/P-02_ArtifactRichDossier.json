@@ -1,0 +1,988 @@
+{
+  "package_id": "P-02",
+  "view_type": "INDEPENDENT_TECHNICAL_AUDIT_VIEW",
+  "engineering_content": {
+    "technology_domain": "Fluid Mechanics + Adaptive Valve Design",
+    "engineering_disciplines": [
+      "Computational fluid dynamics (CFD)",
+      "Valve mechanics",
+      "Control systems",
+      "Polymer actuator engineering"
+    ],
+    "system_architecture": {
+      "description": "CSF shunt valve whose opening pressure profile adapts to ICP trend rather than fixed cracking pressure; reduces postural pressure excursions",
+      "subsystems": [
+        {
+          "id": "SS-01",
+          "name": "Adaptive valve seat",
+          "function": "Variable-area flow orifice whose area A(P, dP/dt) depends on pressure and pressure trend",
+          "status": "MODELLED",
+          "evidence_source": "R332 mechanism"
+        },
+        {
+          "id": "SS-02",
+          "name": "Pressure-trend sensor",
+          "function": "Measures ICP(t) and computes dP/dt for controller input",
+          "status": "PROPOSED",
+          "evidence_source": "R332 mechanism"
+        },
+        {
+          "id": "SS-03",
+          "name": "Actuator (candidate: MEMS electrothermal or shape-memory polymer)",
+          "function": "Adjusts valve seat area based on controller signal",
+          "status": "PROPOSED",
+          "evidence_source": "External precedent for MEMS valves"
+        },
+        {
+          "id": "SS-04",
+          "name": "Controller (P or PI)",
+          "function": "Maps (P, dP/dt) -> actuator command to track target opening profile",
+          "status": "MODELLED",
+          "evidence_source": "R332 model"
+        }
+      ],
+      "fluid_mechanics": {
+        "flow_regime": "Laminar (CSF Re << 2300 at shunt flow rates ~0.3 mL/min in 1-1.5 mm ID catheter)",
+        "pressure_range": "ICP 5-20 mmHg normal, postural transients to 40 mmHg reported",
+        "key_equations": [
+          "Q = (pi * r^4 * dP) / (8 * eta * L) [laminar flow through circular conduit]",
+          "Q = Cd * A * sqrt(2 * dP / rho) [turbulent/orifice flow]",
+          "Re = (rho * v * D) / eta [laminar if Re < 2300]"
+        ],
+        "critical_parameter": "Valve conductance G(P, dP/dt) = Q / dP, intentionally variable vs fixed",
+        "dual_invariants": {
+          "INV-1": "P_ICP <= 20 mmHg (intracranial pressure safety; same threshold class as P-01 — MODEL_DERIVED per R332)",
+          "INV-2": "Q_drainage >= 0.05 mL/min (minimum drainage floor; prevents overdrainage-induced collapse AND underdrainage)",
+          "FALSIFICATION": "Unknown — not tested in hardware"
+        }
+      }
+    },
+    "mechanism_architecture": {
+      "physical_changes": "Valve orifice area A adapts: when dP/dt indicates postural transient (positive trend with postural change), the valve reduces conductance briefly to attenuate over-drainage; when ICP rises monotonically, conductance increases to maintain drainage.",
+      "key_physics": "Variable-area orifice: Q = Cd * A(dP, dP/dt) * sqrt(2 dP / rho). The 'adaptive' component is the A(dP, dP/dt) dependence — a non-linear feedback on the orifice equation.",
+      "trend_estimator": {
+        "input": "ICP(t) sampled at 1-10 Hz",
+        "model": "Discrete derivative dP/dt with low-pass filter (cutoff < 0.1 Hz to reject pulsatile cardiac component)",
+        "prediction_horizon": "Not applicable — adaptive response is reactive, not predictive",
+        "status": "MODELLED — controller architecture specified; hardware transfer function UNKNOWN"
+      }
+    },
+    "design_inputs": [
+      {
+        "id": "DI-001",
+        "input": "Clinical need",
+        "value": "ICP excursions during postural changes cause patient symptoms and possible complications (R332 problem statement)",
+        "source": "R332"
+      },
+      {
+        "id": "DI-002",
+        "input": "Functional requirement",
+        "value": "Valve opening profile adapts to ICP trends to reduce postural pressure excursions",
+        "source": "R332"
+      },
+      {
+        "id": "DI-003",
+        "input": "Flow regime",
+        "value": "Laminar, Re << 2300 at typical CSF flow rates",
+        "source": "Hagen-Poiseuille + CSF rheology literature"
+      },
+      {
+        "id": "DI-004",
+        "input": "Pressure range",
+        "value": "ICP 5-20 mmHg normal, postural transients up to 40 mmHg",
+        "source": "R332 + external literature"
+      },
+      {
+        "id": "DI-005",
+        "input": "ICP safety threshold",
+        "value": "P_ICP <= 20 mmHg (INV-1, MODEL_DERIVED)",
+        "source": "R332 mechanism"
+      },
+      {
+        "id": "DI-006",
+        "input": "Minimum drainage floor",
+        "value": "Q >= 0.05 mL/min (INV-2, MODEL_DERIVED)",
+        "source": "R332 mechanism"
+      },
+      {
+        "id": "DI-007",
+        "input": "Biocompatibility (ISO 10993)",
+        "value": "UNKNOWN",
+        "resolution_plan": "ISO 10993 series testing for valve materials (likely silicone/silicone-steel composite based on external precedent)",
+        "applicability": "APPLICABLE"
+      },
+      {
+        "id": "DI-008",
+        "input": "Sterilization compatibility",
+        "value": "UNKNOWN",
+        "resolution_plan": "EtO or gamma sterilization validation per ISO 11135/11137",
+        "applicability": "APPLICABLE"
+      },
+      {
+        "id": "DI-009",
+        "input": "EMC",
+        "value": "UNKNOWN",
+        "resolution_plan": "IEC 60601-1-2 if active components",
+        "applicability": "APPLICABLE if active"
+      },
+      {
+        "id": "DI-010",
+        "input": "Response time",
+        "value": "Target < 5 s (postural transient timescale)",
+        "source": "R332 model"
+      },
+      {
+        "id": "DI-011",
+        "input": "Controller type",
+        "value": "PI controller with trend feedback (proposed)",
+        "source": "R332 mechanism"
+      }
+    ],
+    "design_outputs": [
+      {
+        "id": "DO-001",
+        "description": "Valve seat geometry (variable-area orifice)",
+        "status": "ABSENT",
+        "missing_inputs": [
+          "A_max",
+          "A_min",
+          "valve seat profile",
+          "actuator mechanism"
+        ]
+      },
+      {
+        "id": "DO-002",
+        "description": "Pressure sensor specification",
+        "status": "CONCEPTUAL",
+        "note": "COTS implantable-grade pressure sensors exist (e.g., similar to Codman ICP Express)"
+      },
+      {
+        "id": "DO-003",
+        "description": "Controller firmware",
+        "status": "MODELLED",
+        "note": "Algorithm specified in R332; not production-implemented"
+      },
+      {
+        "id": "DO-004",
+        "description": "Actuator specification",
+        "status": "ABSENT",
+        "missing_inputs": [
+          "Actuator technology choice",
+          "force/displacement requirement",
+          "power budget"
+        ]
+      }
+    ],
+    "external_engineering_precedent": [
+      {
+        "source": "https://pubmed.ncbi.nlm.nih.gov/15458593",
+        "source_title": "Relationship between valve opening pressure, body",
+        "source_snippet": "by M Bergsneider · 2004 · Cited by 77 — This study indicates that very high valve opening pressure settings may be optimal for the initial treatment of normal pressure hydrocephalus .",
+        "source_hash": "d8f9c3a6687da31c65dfab29693f8a6165b3b65be4deb19e41d80822ca6de70a",
+        "raw_content_sha256": "3bbb2debcfef6f42a0f237046fd9ba1c334e5d86615a7a4f92201b772ba5684a",
+        "artifact_path": "external_evidence/pubmed_p02_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://link.springer.com/article/10.1007/s00701-020-04462-y",
+        "source_title": "Paradoxical response of intracranial pressure to shunt valve",
+        "source_snippet": "by L D’Antona · 2020 · Cited by 3 — This study describes the effect of adjusting the shunt valve setting on ICP in a cohort of patients with complex symptom management.",
+        "source_hash": "6ac70be554daa6d77bf7167057e5082195c9fb6809488b8b7825952f82753d0e",
+        "raw_content_sha256": "3bbb2debcfef6f42a0f237046fd9ba1c334e5d86615a7a4f92201b772ba5684a",
+        "artifact_path": "external_evidence/pubmed_p02_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://www.hydroassoc.org/shunt-systems",
+        "source_title": "Understanding Shunt Systems",
+        "source_snippet": "Adjustable (programmable) valves regulate the ICP based on a pressure setting, like the fixed pressure valve, but the setting can be adjusted by your doctor",
+        "source_hash": "8c7353d40415c9c1931b7a9a892b45a2ca9b52a530a92b22852262e732621551",
+        "raw_content_sha256": "3bbb2debcfef6f42a0f237046fd9ba1c334e5d86615a7a4f92201b772ba5684a",
+        "artifact_path": "external_evidence/pubmed_p02_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://www.researchgate.net/publication/263394882_Intracranial_pressure_in_hydrocephalus_Impact_of_shunt_adjustments_and_body_positions",
+        "source_title": "Impact of shunt adjustments and body positions",
+        "source_snippet": "Noninvasive manipulation of programmable shunt valves may allow customization of intracranial pressure ( ICP ) dynamics in individual shunted patients. Read more",
+        "source_hash": "388c145acf3496bcdd371d377c7881513d32057c4c6ad9ef4e90accdb519faff",
+        "raw_content_sha256": "3bbb2debcfef6f42a0f237046fd9ba1c334e5d86615a7a4f92201b772ba5684a",
+        "artifact_path": "external_evidence/pubmed_p02_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://www.semanticscholar.org/paper/fcd155029dbc7fa5a82915822f2289055da96164",
+        "source_title": "Intracranial Pressure Sensor and Valve to Control",
+        "source_snippet": "This work is working to develop an implantable pressure sensor that will open a valve to relieve the intracranial pressure ( ICP )",
+        "source_hash": "ec19936649659def04e94268a59eb1d4398f782141eb52eb749c35500f42a9f4",
+        "raw_content_sha256": "3bbb2debcfef6f42a0f237046fd9ba1c334e5d86615a7a4f92201b772ba5684a",
+        "artifact_path": "external_evidence/pubmed_p02_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      }
+    ],
+    "bom": [
+      {
+        "item": "01",
+        "description": "Valve body housing",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "ENGINEERING_PROPOSED",
+        "material": "UNKNOWN — likely silicone/Titanium composite (external precedent)",
+        "supplier": "UNKNOWN",
+        "criticality": "CRITICAL",
+        "verification": "Bench flow + biocompatibility"
+      },
+      {
+        "item": "02",
+        "description": "Pressure sensor",
+        "qty": "1",
+        "component_type": "COTS_CANDIDATE",
+        "source_basis": "External precedent (Codman ICP Express)",
+        "material": "N/A (COTS)",
+        "supplier": "UNKNOWN — to be evaluated",
+        "criticality": "HIGH",
+        "verification": "Calibration + drift test"
+      },
+      {
+        "item": "03",
+        "description": "Actuator (MEMS or shape-memory)",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "ENGINEERING_PROPOSED",
+        "material": "UNKNOWN — depends on technology choice",
+        "supplier": "UNKNOWN",
+        "criticality": "CRITICAL",
+        "verification": "Lifetime + force calibration"
+      },
+      {
+        "item": "04",
+        "description": "Microcontroller",
+        "qty": "1",
+        "component_type": "COTS_CANDIDATE",
+        "source_basis": "Standard medical-grade MCU",
+        "material": "N/A (COTS)",
+        "supplier": "Multiple (TI, STM, NXP)",
+        "criticality": "MEDIUM",
+        "verification": "Software validation + EMC"
+      }
+    ],
+    "materials": [
+      {
+        "component": "Valve body",
+        "candidate_material": "Silicone elastomer",
+        "source": "Standard CSF shunt material (K062009 Miethke proGAV)",
+        "verification_required": "ISO 10993 + mechanical fatigue",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Valve seat (variable-area mechanism)",
+        "candidate_material": "Shape-memory polymer (SMP)",
+        "source": "Published SMP valve literature",
+        "verification_required": "ISO 10993 + fatigue + activation temperature range",
+        "status": "CANDIDATE — not selected"
+      },
+      {
+        "component": "Pressure sensor diaphragm",
+        "candidate_material": "Silicon (MEMS)",
+        "source": "Standard MEMS pressure sensor material",
+        "verification_required": "ISO 10993 + drift characterization",
+        "status": "CANDIDATE"
+      }
+    ],
+    "manufacturing": {
+      "candidate_processes": [
+        {
+          "process": "Silicone injection molding",
+          "source": "Standard CSF valve manufacturing",
+          "tolerance_implication": "UNKNOWN — process capability to be established with supplier; Cpk study required",
+          "note": "Variable-area mechanism may require modified process"
+        },
+        {
+          "process": "MEMS fabrication (if actuator is MEMS)",
+          "source": "Standard MEMS foundry process",
+          "tolerance_implication": "Sub-micron feature tolerance",
+          "note": "Requires foundry partnership"
+        },
+        {
+          "process": "Laser welding (housing assembly)",
+          "source": "Standard implantable device assembly",
+          "tolerance_implication": "UNKNOWN — weld positioning capability to be established with assembly vendor",
+          "note": "Hermetic seal required"
+        }
+      ],
+      "status": "ENGINEERING_CANDIDATE — no process validated"
+    },
+    "transfer_boundary": {
+      "buyer_receives": [
+        "Adaptive valve concept + mechanism description",
+        "Controller algorithm specification (MODELLED, not production-firmware)",
+        "Variable-area orifice governing equation + sensitivity analysis",
+        "V0 bench prototype BOM (COTS sensor + custom valve body + candidate actuators)",
+        "This engineering dossier with external precedent + failure analysis + build plan"
+      ],
+      "buyer_must_create": [
+        "Production valve design (dimensioned drawings, tolerances, material selection frozen)",
+        "Actuator technology selection and validation",
+        "Production controller firmware + software V&V per IEC 62304",
+        "Manufacturing process for variable-area valve",
+        "Regulatory submission (likely 510(k) with substantial equivalence, or De Novo if no predicate)",
+        "Clinical validation evidence (IDE trial)",
+        "Long-term reliability testing (ISO 14708-1 for active implants)"
+      ]
+    },
+    "engineering_core": {
+      "governing_model": {
+        "summary": "Variable-area hydraulic orifice with trend-feedback control. The valve is modeled as a non-linear orifice whose area A is a function of measured pressure and its time-derivative.",
+        "equations": [
+          "Q = Cd * A * sqrt(2 * dP / rho) [turbulent/orifice flow]",
+          "Q = (pi * r^4 * dP) / (8 * eta * L) [laminar flow through circular conduit]",
+          "Re = (rho * v * D) / eta [laminar if Re < 2300]",
+          "A_actuator(P, dP/dt) = A0 + k_p * (P - P0) + k_d * dP/dt [proposed controller law, MODELLED]"
+        ],
+        "assumptions": [
+          "CSF is Newtonian (valid at low shear rates in shunt flow)",
+          "Flow is quasi-steady (valve response time > flow timescale)",
+          "Catheter geometry is rigid (compliance UNKNOWN)",
+          "No cavitation (validated by Re and pressure range)"
+        ],
+        "boundary_conditions": [
+          "Inlet: ICP in [5, 40] mmHg",
+          "Outlet: intra-abdominal pressure ~5-15 mmHg supine, lower upright",
+          "Postural head differential: 0-50 cm H2O (~0-37 mmHg)"
+        ],
+        "input_variables": [
+          "ICP(t)",
+          "postural state",
+          "ambient pressure"
+        ],
+        "output_variables": [
+          "drainage rate Q(t)",
+          "valve area A(t)"
+        ],
+        "parameter_sensitivities": [
+          "Cd (discharge coefficient) ± 0.1 -> ±15% flow error",
+          "A_actuator gain k_p -> directly controls response amplitude",
+          "Filter cutoff frequency -> determines pulsatile rejection vs response lag"
+        ],
+        "failure_regimes": [
+          "Actuator saturation (max area reached) -> reverts to fixed-valve behavior",
+          "Filter lag > postural transient duration -> adaptation ineffective",
+          "Sensor noise > dP/dt signal -> controller unstable"
+        ]
+      },
+      "critical_parameters": [
+        {
+          "name": "Cracking pressure P_crack",
+          "value": "UNKNOWN",
+          "unit": "mmHg",
+          "basis": "Design choice",
+          "verification_requirement": "Bench measurement per ISO 7197"
+        },
+        {
+          "name": "Maximum valve area A_max",
+          "value": "UNKNOWN",
+          "unit": "mm^2",
+          "basis": "Design choice",
+          "verification_requirement": "Geometric inspection + flow bench"
+        },
+        {
+          "name": "Response time tau_valve",
+          "value": "UNKNOWN",
+          "unit": "s",
+          "basis": "Actuator-dependent",
+          "verification_requirement": "Step response test"
+        },
+        {
+          "name": "Controller gains k_p, k_d",
+          "value": "UNKNOWN",
+          "unit": "dimensionless, mm^2·s/mmHg",
+          "basis": "Tuned via simulation",
+          "verification_requirement": "Closed-loop stability test"
+        }
+      ],
+      "external_precedent": "EXTERNAL_PRECEDENT ≠ INVENTION_VALIDATION — see external_engineering_precedent field for FDA-cleared comparable valves (Miethke proGAV, Medtronic Strata). These establish that programmable shunt valves are manufacturable. They do NOT establish that the adaptive profile proposed here achieves clinical benefit.",
+      "proposed_design": {
+        "input": "ICP sensor + postural sensor (accelerometer or external tilt indicator)",
+        "mechanism": "Trend-feedback controller modulates valve seat area",
+        "transformation": "(P, dP/dt) -> A_actuator -> Q(P, A) -> drainage rate",
+        "output": "Drainage rate that attenuates postural excursions while maintaining minimum floor",
+        "component_architecture": "Pressure sensor -> controller (MCU) -> actuator -> variable valve seat -> outlet catheter"
+      },
+      "failure_modes": [
+        {
+          "mode": "Actuator jam",
+          "mechanism": "Mechanical obstruction or electrical failure of actuator",
+          "design_feature": "Valve seat becomes fixed",
+          "evidence": "Known failure mode of programmable valves (FDA MAUDE reports exist)",
+          "mitigation": "Fail-safe fixed-pressure mode (fallback)",
+          "verification_test": "Induce jam, verify fallback behavior",
+          "residual_uncertainty": "UNKNOWN whether fallback meets clinical need"
+        },
+        {
+          "mode": "Sensor drift",
+          "mechanism": "Long-term pressure sensor drift",
+          "design_feature": "Controller receives biased input",
+          "evidence": "Known for implantable pressure sensors (PMC4279503)",
+          "mitigation": "Periodic recalibration protocol (UNKNOWN specifics)",
+          "verification_test": "Aging study",
+          "residual_uncertainty": "Drift magnitude in CSF environment UNKNOWN"
+        },
+        {
+          "mode": "Postural misclassification",
+          "mechanism": "Controller misclassifies postural transient",
+          "design_feature": "Adaptive response inappropriate",
+          "evidence": "MODELLED — sensitivity to filter cutoff",
+          "mitigation": "Multi-sensor fusion (postural + pressure)",
+          "verification_test": "Bench postural simulation",
+          "residual_uncertainty": "Classifier accuracy UNKNOWN"
+        }
+      ],
+      "verification": [
+        {
+          "id": "VER-001",
+          "requirement": "Valve opening pressure tracks target profile within tolerance",
+          "method": "Bench flow loop with programmable pressure source",
+          "acceptance": "Steady-state error < 2 mmHg"
+        },
+        {
+          "id": "VER-002",
+          "requirement": "Response time to postural step < 5 s",
+          "method": "Step input test",
+          "acceptance": "10-90% rise time < 5 s"
+        },
+        {
+          "id": "VER-003",
+          "requirement": "Minimum drainage maintained during adaptation",
+          "method": "Worst-case flow measurement",
+          "acceptance": "Q >= 0.05 mL/min at all valid inputs"
+        }
+      ],
+      "validation": [
+        {
+          "id": "VAL-001",
+          "requirement": "Reduced ICP excursion vs fixed valve in patient cohort",
+          "method": "Clinical trial (IDE required)",
+          "acceptance": "Statistically significant reduction in ICP excursion amplitude"
+        }
+      ],
+      "remaining_unknowns": [
+        "Actuator technology choice (MEMS electrothermal vs shape-memory polymer vs electromagnetic) — UNKNOWN",
+        "Long-term drift of pressure sensor in CSF environment — UNKNOWN",
+        "Controller gains in vivo — UNKNOWN until clinical data",
+        "Biocompatibility of actuator materials in CSF — UNKNOWN (ISO 10993 testing required)",
+        "Battery life if active (or energy harvesting if passive) — UNKNOWN",
+        "Regulatory pathway (Class II with special controls vs Class III PMA) — UNKNOWN until pre-submission to FDA"
+      ]
+    },
+    "failure_analysis": [
+      {
+        "failure_mode": "Actuator jam",
+        "mechanism": "Mechanical obstruction or electrical failure",
+        "design_feature_affected": "Variable-area mechanism",
+        "evidence": "Known for programmable valves (FDA MAUDE)",
+        "mitigation": "Fail-safe fixed-pressure fallback",
+        "verification_test": "Jam simulation bench test",
+        "residual_uncertainty": "UNKNOWN fallback efficacy"
+      },
+      {
+        "failure_mode": "Pressure sensor drift",
+        "mechanism": "Long-term offset drift",
+        "design_feature_affected": "Controller input",
+        "evidence": "PMC4279503 chronically implanted sensors",
+        "mitigation": "Recalibration protocol (UNKNOWN specifics)",
+        "verification_test": "Aging study",
+        "residual_uncertainty": "Drift magnitude in CSF UNKNOWN"
+      },
+      {
+        "failure_mode": "Battery depletion (if active)",
+        "mechanism": "Energy source exhausted",
+        "design_feature_affected": "Controller + actuator",
+        "evidence": "UNKNOWN — failure mechanism requires investigation implants",
+        "mitigation": "Low-power design + indicator",
+        "verification_test": "Battery life test",
+        "residual_uncertainty": "UNKNOWN battery life given duty cycle"
+      },
+      {
+        "failure_mode": "Postural misclassification",
+        "mechanism": "dP/dt filter misclassifies transient",
+        "design_feature_affected": "Adaptive response",
+        "evidence": "MODELLED sensitivity to filter cutoff",
+        "mitigation": "Multi-sensor fusion (postural + pressure)",
+        "verification_test": "Bench postural simulation",
+        "residual_uncertainty": "Classifier accuracy UNKNOWN"
+      },
+      {
+        "failure_mode": "Mechanical fatigue of valve seat",
+        "mechanism": "Cyclic actuation causes material fatigue",
+        "design_feature_affected": "Valve seat",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Material selection + lifetime derating",
+        "verification_test": "ASTM F466 fatigue characterization",
+        "residual_uncertainty": "Cycle count to failure UNKNOWN"
+      }
+    ],
+    "engineering_build_plan": [
+      {
+        "work_package": "WP-01",
+        "test_article": "Variable-area valve prototype (passive, no actuator)",
+        "equipment": "Bench flow loop, Transonic flow sensor, pressure transducer",
+        "design_work": "CAD + 3D printed valve seat",
+        "measurement": "Q vs dP characterization",
+        "acceptance_criterion": "Demonstrate variable conductance over pressure range",
+        "dependency": "None",
+        "deliverable": "Passive flow characterization report",
+        "estimated_effort": "4 weeks"
+      },
+      {
+        "work_package": "WP-02",
+        "test_article": "Actuator-integrated valve",
+        "equipment": "Bench flow loop + actuator driver",
+        "design_work": "Actuator selection + integration",
+        "measurement": "Step response of A(t)",
+        "acceptance_criterion": "10-90% rise < 5 s",
+        "dependency": "WP-01 + actuator procurement",
+        "deliverable": "Active valve step-response report",
+        "estimated_effort": "8 weeks"
+      },
+      {
+        "work_package": "WP-03",
+        "test_article": "Closed-loop controller",
+        "equipment": "Real-time controller (e.g., dSPACE or STM32)",
+        "design_work": "Controller firmware",
+        "measurement": "Closed-loop tracking error",
+        "acceptance_criterion": "Steady-state error < 2 mmHg",
+        "dependency": "WP-02",
+        "deliverable": "Closed-loop performance report",
+        "estimated_effort": "6 weeks"
+      },
+      {
+        "work_package": "WP-04",
+        "test_article": "Postural simulator",
+        "equipment": "Programmable pressure source mimicking postural transients",
+        "design_work": "Test fixture",
+        "measurement": "ICP excursion attenuation vs fixed valve",
+        "acceptance_criterion": "Excursion amplitude reduced by >=30% vs fixed valve (MODEL_DERIVED target)",
+        "dependency": "WP-03",
+        "deliverable": "Adaptive performance report",
+        "estimated_effort": "6 weeks"
+      },
+      {
+        "work_package": "WP-05",
+        "test_article": "Biocompatibility specimens",
+        "equipment": "ISO 10993 test lab",
+        "design_work": "Material selection frozen",
+        "measurement": "Cytotoxicity, sensitization, irritation",
+        "acceptance_criterion": "ISO 10993 pass",
+        "dependency": "Material selection frozen",
+        "deliverable": "ISO 10993 report",
+        "estimated_effort": "12 weeks (external lab)"
+      }
+    ],
+    "verification_matrix": [
+      {
+        "id": "V-001",
+        "requirement": "Valve tracks target opening profile",
+        "method": "Bench flow loop",
+        "acceptance": "Steady-state error < 2 mmHg",
+        "result": "NOT_TESTED"
+      },
+      {
+        "id": "V-002",
+        "requirement": "Response time < 5 s to postural step",
+        "method": "Step input test",
+        "acceptance": "10-90% rise < 5 s",
+        "result": "NOT_TESTED"
+      },
+      {
+        "id": "V-003",
+        "requirement": "Minimum drainage floor maintained",
+        "method": "Worst-case flow measurement",
+        "acceptance": "Q >= 0.05 mL/min",
+        "result": "NOT_TESTED"
+      }
+    ],
+    "validation_matrix": [
+      {
+        "id": "VAL-001",
+        "requirement": "Reduced ICP excursion vs fixed valve in patient cohort",
+        "method": "Clinical trial (IDE required)",
+        "acceptance": "Statistically significant reduction",
+        "result": "NOT_PERFORMED"
+      }
+    ]
+  },
+  "claim_reconstruction": {
+    "package_id": "P-02",
+    "total_claims": 20,
+    "claims": [
+      {
+        "claim_id": "C-P-02-001",
+        "claim_text": "Cracking pressure P_crack: UNKNOWN",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "Design choice"
+        ],
+        "source_hashes": [],
+        "source_locations": [
+          "Bench measurement per ISO 7197"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN",
+        "units": "mmHg",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-002",
+        "claim_text": "Maximum valve area A_max: UNKNOWN",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "Design choice"
+        ],
+        "source_hashes": [],
+        "source_locations": [
+          "Geometric inspection + flow bench"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN",
+        "units": "mm^2",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-003",
+        "claim_text": "Response time tau_valve: UNKNOWN",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "Actuator-dependent"
+        ],
+        "source_hashes": [],
+        "source_locations": [
+          "Step response test"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN",
+        "units": "s",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-004",
+        "claim_text": "Controller gains k_p, k_d: UNKNOWN",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "Tuned via simulation"
+        ],
+        "source_hashes": [],
+        "source_locations": [
+          "Closed-loop stability test"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN",
+        "units": "dimensionless, mm^2·s/mmHg",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-005",
+        "claim_text": "Relationship between valve opening pressure, body",
+        "origin_type": "SOURCE_NATIVE",
+        "source_ids": [
+          "https://pubmed.ncbi.nlm.nih.gov/15458593"
+        ],
+        "source_hashes": [
+          "d8f9c3a6687da31c65dfab29693f8a6165b3b65be4deb19e41d80822ca6de70a"
+        ],
+        "source_locations": [
+          "external_evidence/pubmed_p02_GOVERNED.json"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "by M Bergsneider · 2004 · Cited by 77 — This study indicates that very high valve opening pressure settings may be optimal for the initial treatment of normal pressure hydrocephalus .",
+        "units": "",
+        "reconstructible": true,
+        "source_native_text": "by M Bergsneider · 2004 · Cited by 77 — This study indicates that very high valve opening pressure settings may be optimal for the initial treatment of normal pressure hydrocephalus ."
+      },
+      {
+        "claim_id": "C-P-02-006",
+        "claim_text": "Paradoxical response of intracranial pressure to shunt valve",
+        "origin_type": "SOURCE_NATIVE",
+        "source_ids": [
+          "https://link.springer.com/article/10.1007/s00701-020-04462-y"
+        ],
+        "source_hashes": [
+          "6ac70be554daa6d77bf7167057e5082195c9fb6809488b8b7825952f82753d0e"
+        ],
+        "source_locations": [
+          "external_evidence/pubmed_p02_GOVERNED.json"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "by L D’Antona · 2020 · Cited by 3 — This study describes the effect of adjusting the shunt valve setting on ICP in a cohort of patients with complex symptom management.",
+        "units": "",
+        "reconstructible": true,
+        "source_native_text": "by L D’Antona · 2020 · Cited by 3 — This study describes the effect of adjusting the shunt valve setting on ICP in a cohort of patients with complex symptom management."
+      },
+      {
+        "claim_id": "C-P-02-007",
+        "claim_text": "Understanding Shunt Systems",
+        "origin_type": "SOURCE_NATIVE",
+        "source_ids": [
+          "https://www.hydroassoc.org/shunt-systems"
+        ],
+        "source_hashes": [
+          "8c7353d40415c9c1931b7a9a892b45a2ca9b52a530a92b22852262e732621551"
+        ],
+        "source_locations": [
+          "external_evidence/pubmed_p02_GOVERNED.json"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "Adjustable (programmable) valves regulate the ICP based on a pressure setting, like the fixed pressure valve, but the setting can be adjusted by your doctor",
+        "units": "",
+        "reconstructible": true,
+        "source_native_text": "Adjustable (programmable) valves regulate the ICP based on a pressure setting, like the fixed pressure valve, but the setting can be adjusted by your doctor"
+      },
+      {
+        "claim_id": "C-P-02-008",
+        "claim_text": "Impact of shunt adjustments and body positions",
+        "origin_type": "SOURCE_NATIVE",
+        "source_ids": [
+          "https://www.researchgate.net/publication/263394882_Intracranial_pressure_in_hydrocephalus_Impact_of_shunt_adjustments_and_body_positions"
+        ],
+        "source_hashes": [
+          "388c145acf3496bcdd371d377c7881513d32057c4c6ad9ef4e90accdb519faff"
+        ],
+        "source_locations": [
+          "external_evidence/pubmed_p02_GOVERNED.json"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "Noninvasive manipulation of programmable shunt valves may allow customization of intracranial pressure ( ICP ) dynamics in individual shunted patients. Read more",
+        "units": "",
+        "reconstructible": true,
+        "source_native_text": "Noninvasive manipulation of programmable shunt valves may allow customization of intracranial pressure ( ICP ) dynamics in individual shunted patients. Read more"
+      },
+      {
+        "claim_id": "C-P-02-009",
+        "claim_text": "Intracranial Pressure Sensor and Valve to Control",
+        "origin_type": "SOURCE_NATIVE",
+        "source_ids": [
+          "https://www.semanticscholar.org/paper/fcd155029dbc7fa5a82915822f2289055da96164"
+        ],
+        "source_hashes": [
+          "ec19936649659def04e94268a59eb1d4398f782141eb52eb749c35500f42a9f4"
+        ],
+        "source_locations": [
+          "external_evidence/pubmed_p02_GOVERNED.json"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "This work is working to develop an implantable pressure sensor that will open a valve to relieve the intracranial pressure ( ICP )",
+        "units": "",
+        "reconstructible": true,
+        "source_native_text": "This work is working to develop an implantable pressure sensor that will open a valve to relieve the intracranial pressure ( ICP )"
+      },
+      {
+        "claim_id": "C-P-02-010",
+        "claim_text": "Clinical need: ICP excursions during postural changes cause patient symptoms and possible complications (R332 problem statement)",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "R332"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "ICP excursions during postural changes cause patient symptoms and possible complications (R332 problem statement)",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-011",
+        "claim_text": "Functional requirement: Valve opening profile adapts to ICP trends to reduce postural pressure excursions",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "R332"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "Valve opening profile adapts to ICP trends to reduce postural pressure excursions",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-012",
+        "claim_text": "Flow regime: Laminar, Re << 2300 at typical CSF flow rates",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "Hagen-Poiseuille + CSF rheology literature"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "Laminar, Re << 2300 at typical CSF flow rates",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-013",
+        "claim_text": "Pressure range: ICP 5-20 mmHg normal, postural transients up to 40 mmHg",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "R332 + external literature"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "ICP 5-20 mmHg normal, postural transients up to 40 mmHg",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-014",
+        "claim_text": "ICP safety threshold: P_ICP <= 20 mmHg (INV-1, MODEL_DERIVED)",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "R332 mechanism"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "P_ICP <= 20 mmHg (INV-1, MODEL_DERIVED)",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-015",
+        "claim_text": "Minimum drainage floor: Q >= 0.05 mL/min (INV-2, MODEL_DERIVED)",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "R332 mechanism"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "Q >= 0.05 mL/min (INV-2, MODEL_DERIVED)",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-016",
+        "claim_text": "Biocompatibility (ISO 10993): UNKNOWN",
+        "origin_type": "UNKNOWN",
+        "source_ids": [],
+        "source_hashes": [],
+        "source_locations": [
+          "ISO 10993 series testing for valve materials (likely silicone/silicone-steel composite based on external precedent)"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-017",
+        "claim_text": "Sterilization compatibility: UNKNOWN",
+        "origin_type": "UNKNOWN",
+        "source_ids": [],
+        "source_hashes": [],
+        "source_locations": [
+          "EtO or gamma sterilization validation per ISO 11135/11137"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-018",
+        "claim_text": "EMC: UNKNOWN",
+        "origin_type": "UNKNOWN",
+        "source_ids": [],
+        "source_hashes": [],
+        "source_locations": [
+          "IEC 60601-1-2 if active components"
+        ],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "UNKNOWN",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-019",
+        "claim_text": "Response time: Target < 5 s (postural transient timescale)",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "R332 model"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "Target < 5 s (postural transient timescale)",
+        "units": "",
+        "reconstructible": true
+      },
+      {
+        "claim_id": "C-P-02-020",
+        "claim_text": "Controller type: PI controller with trend feedback (proposed)",
+        "origin_type": "UNKNOWN",
+        "source_ids": [
+          "R332 mechanism"
+        ],
+        "source_hashes": [],
+        "source_locations": [],
+        "inputs": [],
+        "transformation": "",
+        "assumptions": [],
+        "derived_value": "PI controller with trend feedback (proposed)",
+        "units": "",
+        "reconstructible": true
+      }
+    ]
+  },
+  "source_adequacy": {
+    "package_id": "P-02",
+    "baseline_sources": [
+      "EPO Espacenet (150M+ patents, FREE)",
+      "Europe PMC (millions of publications, FREE)",
+      "PubMed/NCBI (biomedical literature, FREE)",
+      "ClinicalTrials.gov (clinical trials, FREE)",
+      "FDA openFDA (510(k), PMA, MAUDE, FREE)",
+      "PubChem (chemical properties, FREE)",
+      "Materials Project (material properties, FREE)"
+    ],
+    "consultant_addable_sources": true,
+    "source_coverage_limitations": "These 7 sources form the BASELINE verification set. They do NOT represent an exhaustive universe. The consultant may add domain-specific sources when warranted. Source coverage depends on the technology domain.",
+    "patent_snap_dependency": "NONE — PatSnap is NOT a dependency"
+  }
+}
