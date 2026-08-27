@@ -1,0 +1,1004 @@
+{
+  "package_id": "P-29",
+  "engineering_content": {
+    "technology_domain": "Magnetic Resonance (MRI/NMR) + Flow Quantification + Miniaturization",
+    "engineering_disciplines": [
+      "MRI/NMR physics",
+      "RF coil engineering (miniaturized)",
+      "Signal processing (phase-contrast flow)",
+      "Magnetic field engineering (portable magnets)"
+    ],
+    "system_architecture": {
+      "description": "Implantable MR flow sensor that quantifies CSF flow rate in shunt catheter using phase-contrast MRI principles. Miniaturized magnet + RF coil integrated into catheter or external patch.",
+      "subsystems": [
+        {
+          "id": "SS-01",
+          "name": "Miniaturized permanent magnet (B0 source)",
+          "function": "Provides static magnetic field B0 for nuclear spin polarization",
+          "status": "PROPOSED",
+          "evidence_source": "R332 + external miniaturized NMR literature (Nature s41598-019-47634-2)"
+        },
+        {
+          "id": "SS-02",
+          "name": "RF coil (transmit/receive)",
+          "function": "Excites spins at Larmor frequency; receives echo signal",
+          "status": "PROPOSED"
+        },
+        {
+          "id": "SS-03",
+          "name": "Gradient coil (bipolar)",
+          "function": "Applies bipolar gradient for phase-contrast velocity encoding",
+          "status": "PROPOSED"
+        },
+        {
+          "id": "SS-04",
+          "name": "Signal processing (phase extraction + flow calc)",
+          "function": "Extracts phase shift; computes velocity from phase difference",
+          "status": "MODELLED"
+        }
+      ],
+      "mr_model": {
+        "key_equations": [
+          "omega = gamma * B0 [Larmor precession]",
+          "dphi = gamma * M1 * v [phase-contrast MRI velocity encoding]",
+          "SNR = signal / sqrt(signal + noise) [Poisson-limited SNR]"
+        ],
+        "larmor_frequency": "omega = gamma * B0; for proton at 1 T, f = 42.58 MHz",
+        "phase_contrast_principle": "Bipolar gradient encodes velocity as phase shift: dphi = gamma * M1 * v, where M1 is first gradient moment and v is velocity",
+        "snr_scaling": "SNR proportional to B0 (higher field = more polarization); also proportional to sqrt(N) (averaging); voxel volume affects SNR",
+        "critical_parameter": "B0 field strength, gradient amplitude, coil sensitivity, voxel size",
+        "miniaturization_challenge": "Standard MRI uses 1.5-3 T magnets (room-size); miniaturized NMR uses 0.1-1 T permanent magnets (palm-size); catheter-scale is unprecedented"
+      }
+    },
+    "mechanism_architecture": {
+      "physical_changes": "Protons in flowing CSF experience phase shift under bipolar gradient; static protons have zero net phase; flowing protons have phase proportional to velocity",
+      "key_physics": "Phase-contrast MRI: stationary tissue has zero phase accumulation under bipolar gradient; moving spins accumulate phase dphi = gamma * M1 * v. Two acquisitions (bipolar polarities) yield phase difference proportional to velocity.",
+      "flow_measurement_model": {
+        "input": "CSF flow velocity through catheter",
+        "model": "dphi_measured = gamma * M1 * v; v = dphi / (gamma * M1); Q = v * A_cross_section",
+        "velocity_encoding_target": "VENC = pi / (gamma * M1) — gradient moment chosen for expected velocity range",
+        "status": "MODELLED — no hardware validation at catheter scale"
+      }
+    },
+    "design_inputs": [
+      {
+        "id": "DI-001",
+        "input": "Clinical need",
+        "value": "Chronic CSF flow monitoring enables shunt function assessment; current standard requires imaging or invasive measurement (R332)",
+        "source": "R332"
+      },
+      {
+        "id": "DI-002",
+        "input": "Functional requirement",
+        "value": "MR flow quantification sensor using phase-contrast MRI principles at miniaturized scale",
+        "source": "R332"
+      },
+      {
+        "id": "DI-003",
+        "input": "Larmor frequency",
+        "value": "EXTERNAL_PRECEDENT (42.58 MHz/T for proton)"
+      },
+      {
+        "id": "DI-004",
+        "input": "CSF flow range",
+        "value": "EXTERNAL_PRECEDENT (~0.1-10 cm/s typical in shunt)"
+      },
+      {
+        "id": "DI-005",
+        "input": "B0 target",
+        "value": "UNKNOWN — design choice (likely 0.1-1 T for miniaturization)",
+        "resolution_plan": "SNR analysis + magnet selection"
+      },
+      {
+        "id": "DI-006",
+        "input": "VENC target",
+        "value": "MODELLED (matches CSF flow range ~1-10 cm/s)"
+      },
+      {
+        "id": "DI-007",
+        "input": "Form factor",
+        "value": "UNKNOWN — implantable catheter-integrated or external patch"
+      },
+      {
+        "id": "DI-008",
+        "input": "Biocompatibility (ISO 10993)",
+        "value": "UNKNOWN (for implantable components)",
+        "resolution_plan": "ISO 10993 series"
+      },
+      {
+        "id": "DI-009",
+        "input": "Sterilization",
+        "value": "UNKNOWN",
+        "resolution_plan": "Sterilization validation"
+      },
+      {
+        "id": "DI-010",
+        "input": "EMC",
+        "value": "UNKNOWN — required IEC 60601-1-2",
+        "resolution_plan": "IEC 60601-1-2 test"
+      },
+      {
+        "id": "DI-011",
+        "input": "MRI safety (if implantable magnet)",
+        "value": "UNKNOWN — MRI-contraindicated labeling may be required",
+        "resolution_plan": "MRI safety assessment"
+      },
+      {
+        "id": "DI-012",
+        "input": "Power budget",
+        "value": "UNKNOWN",
+        "resolution_plan": "Power budget analysis"
+      }
+    ],
+    "design_outputs": [
+      {
+        "id": "DO-001",
+        "description": "Miniaturized magnet design (B0, geometry, material)",
+        "status": "ABSENT",
+        "missing_inputs": [
+          "B0 target",
+          "Magnet material (NdFeB, SmCo)",
+          "Geometry constraint"
+        ]
+      },
+      {
+        "id": "DO-002",
+        "description": "RF coil design (frequency, geometry, sensitivity)",
+        "status": "ABSENT",
+        "missing_inputs": [
+          "Larmor frequency (depends on B0)",
+          "Coil geometry",
+          "Sensitivity target"
+        ]
+      },
+      {
+        "id": "DO-003",
+        "description": "Gradient coil design (amplitude, linearity)",
+        "status": "ABSENT",
+        "missing_inputs": [
+          "Gradient amplitude target",
+          "Coil geometry",
+          "Power budget"
+        ]
+      },
+      {
+        "id": "DO-004",
+        "description": "Signal processing + flow calculation",
+        "status": "MODELLED",
+        "note": "Algorithm specified; not validated"
+      }
+    ],
+    "external_engineering_precedent": [
+      {
+        "source": "https://www.nature.com/articles/s41598-019-47634-2",
+        "source_title": "A miniaturized spectrometer for NMR relaxometry under",
+        "source_snippet": "by Y Tang · 2019 · Cited by 24 — In this work, we extend NMR relaxometry on a minute sample below 20 μL to challenging environment of 150 °C in temperature and 900 bar in ...",
+        "source_hash": "c3307cfdfeeadf148fa026ab9bd529bdf8fe6d3abe2eb7b6ac584dce2030cb99",
+        "raw_content_sha256": "b1eed57e142a88e07c5c217f307747a486360525a42f08c734ce8bb8dee71690",
+        "artifact_path": "external_evidence/pubmed_p29_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://www.mdpi.com/2227-9040/12/12/248",
+        "source_title": "µ-NMR Technology for Biomedical Applications: A Review",
+        "source_snippet": "by B Sequeira-Antunes · 2024 · Cited by 5 — By miniaturizing NMR systems, micro- NMR (μ- NMR ) devices overcome the limitations of traditional bulky NMR instruments , making them more ...",
+        "source_hash": "2d5b747780db9a462bc5b8992940177b3365c54c034c1af93e397a6ccdf85e20",
+        "raw_content_sha256": "b1eed57e142a88e07c5c217f307747a486360525a42f08c734ce8bb8dee71690",
+        "artifact_path": "external_evidence/pubmed_p29_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://www.researchgate.net/publication/262183456_Miniaturised_NMR_sensor",
+        "source_title": "(PDF) Miniaturised NMR sensor",
+        "source_snippet": "Realisation of a miniaturised NMR sensor | … picoSpin-45 proton NMR spectrometer that weight less than 5 kg costing around $20,000. Such a device is able to ...",
+        "source_hash": "3c776924463daab680cc8ae98fc76ee7ef521d14a81156ece82eb9a49aa6a27f",
+        "raw_content_sha256": "b1eed57e142a88e07c5c217f307747a486360525a42f08c734ce8bb8dee71690",
+        "artifact_path": "external_evidence/pubmed_p29_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://pubmed.ncbi.nlm.nih.gov/26177607",
+        "source_title": "Miniaturized, biopsy-implantable chemical sensor with",
+        "source_snippet": "by CC Vassiliou · 2015 · Cited by 21 — Here we demonstrate a miniaturized wireless sensor that can be implanted during a biopsy procedure and return chemical information from within ... Read more",
+        "source_hash": "dd5c7112fd9c80ad6930da52e6e0c49ad72a1c0f817e9ddd712e4162a58e104b",
+        "raw_content_sha256": "b1eed57e142a88e07c5c217f307747a486360525a42f08c734ce8bb8dee71690",
+        "artifact_path": "external_evidence/pubmed_p29_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      },
+      {
+        "source": "https://innuscreen.ist-ag.com/en/medical-devices",
+        "source_title": "Sensors for medical devices | IST AG",
+        "source_snippet": "Biosensors, flow , temperature or conductivity sensors combined with viral RNA extraction kits complete IST AG's medical product portfolio.",
+        "source_hash": "da0eba48a7387a0b8d294a57ab97a3f1b7067485088a2e1e3c19a7ce4880d8d3",
+        "raw_content_sha256": "b1eed57e142a88e07c5c217f307747a486360525a42f08c734ce8bb8dee71690",
+        "artifact_path": "external_evidence/pubmed_p29_GOVERNED.json",
+        "verification_requirement": "Engineering review of applicability"
+      }
+    ],
+    "bom": [
+      {
+        "item": "01",
+        "description": "Miniaturized permanent magnet (B0 source)",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "EXTERNAL_PRECEDENT for miniaturized NMR",
+        "material": "NdFeB or SmCo (rare-earth magnets)",
+        "supplier": "Multiple (magnet manufacturers)",
+        "criticality": "CRITICAL",
+        "verification": "Field mapping + stability + safety"
+      },
+      {
+        "item": "02",
+        "description": "RF coil (transmit/receive)",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "Standard RF coil design",
+        "material": "Copper or silver wire / PCB trace",
+        "supplier": "UNKNOWN — custom fabrication",
+        "criticality": "CRITICAL",
+        "verification": "Tuning + matching + sensitivity"
+      },
+      {
+        "item": "03",
+        "description": "Gradient coil",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "Standard gradient coil design",
+        "material": "Copper wire / PCB trace",
+        "supplier": "UNKNOWN — custom",
+        "criticality": "HIGH",
+        "verification": "Linearity + amplitude"
+      },
+      {
+        "item": "04",
+        "description": "RF transceiver + signal processor",
+        "qty": "1",
+        "component_type": "COTS_CANDIDATE",
+        "source_basis": "Standard SDR or custom RF IC",
+        "material": "N/A (COTS or custom)",
+        "supplier": "Multiple",
+        "criticality": "HIGH",
+        "verification": "Calibration + EMC"
+      },
+      {
+        "item": "05",
+        "description": "Power supply (battery or energy harvesting)",
+        "qty": "1",
+        "component_type": "CUSTOM_COMPONENT",
+        "source_basis": "Standard implantable power",
+        "material": "Li-ion battery or piezo harvester (P-15)",
+        "supplier": "Multiple",
+        "criticality": "HIGH",
+        "verification": "Lifetime + safety"
+      }
+    ],
+    "materials": [
+      {
+        "component": "Permanent magnet",
+        "candidate_material": "NdFeB (neodymium iron boron)",
+        "source": "Standard high-field permanent magnet",
+        "verification_required": "Field stability + temperature coefficient + biocompatibility (if implantable) + MRI safety",
+        "status": "CANDIDATE — preferred for high B0/T"
+      },
+      {
+        "component": "Permanent magnet",
+        "candidate_material": "SmCo (samarium cobalt)",
+        "source": "High-temperature-stable permanent magnet",
+        "verification_required": "Field stability + biocompatibility + MRI safety",
+        "status": "CANDIDATE — preferred for temperature stability"
+      },
+      {
+        "component": "RF coil",
+        "candidate_material": "Copper wire / trace",
+        "source": "Standard RF coil material",
+        "verification_required": "Biocompatibility (if implantable) + coil performance",
+        "status": "CANDIDATE"
+      },
+      {
+        "component": "Housing (if implantable)",
+        "candidate_material": "Titanium or polymer",
+        "source": "Standard implantable housing",
+        "verification_required": "ISO 10993 + hermeticity + MR compatibility",
+        "status": "CANDIDATE — note: metal housing affects B0"
+      }
+    ],
+    "manufacturing": {
+      "candidate_processes": [
+        {
+          "process": "Magnet machining + magnetization",
+          "source": "Standard magnet manufacturing",
+          "tolerance_implication": "UNKNOWN — process capability to be established with supplier; Cpk study required",
+          "note": "Custom for catheter-scale size"
+        },
+        {
+          "process": "RF coil winding or PCB fabrication",
+          "source": "Standard coil manufacturing",
+          "tolerance_implication": "±5% inductance",
+          "note": "Custom for catheter-scale size"
+        },
+        {
+          "process": "Hybrid assembly (magnet + coils + electronics)",
+          "source": "Standard hybrid assembly",
+          "tolerance_implication": "SMT tolerance",
+          "note": "Miniaturization required"
+        },
+        {
+          "process": "Hermetic encapsulation (if implantable)",
+          "source": "Standard implantable packaging",
+          "tolerance_implication": "Encapsulation affects B0 and RF",
+          "note": "Tradeoff between encapsulation and MR performance"
+        }
+      ],
+      "status": "ENGINEERING_CANDIDATE — no catheter-scale MR flow sensor process validated. Miniaturization feasibility is a critical UNKNOWN."
+    },
+    "transfer_boundary": {
+      "buyer_receives": [
+        "MR flow quantification concept + mechanism description",
+        "Larmor + phase-contrast + SNR governing equations",
+        "Bench test protocols (SNR, flow accuracy, susceptibility, stability, EMC)",
+        "External precedent catalog (miniaturized NMR, phase-contrast MRI)",
+        "Critical UNKNOWN disclosure (miniaturization feasibility, SNR at catheter scale, susceptibility artifacts)",
+        "This engineering dossier with failure analysis + build plan",
+        "Honest assessment: miniaturization to catheter scale may be physically blocked (high-risk concept)"
+      ],
+      "buyer_must_create": [
+        "Production magnet design (B0, material, miniaturization)",
+        "Production RF + gradient coil design",
+        "Production signal processing + flow calculation",
+        "Manufacturing process for catheter-scale MR sensor",
+        "Regulatory submission (likely Class III — novel MRI device)",
+        "Clinical validation (flow accuracy vs standard)",
+        "Miniaturization feasibility proof (may be blocked)",
+        "MRI safety assessment + labeling"
+      ]
+    },
+    "engineering_core": {
+      "governing_model": {
+        "summary": "Phase-contrast MRI flow measurement: bipolar gradient encodes velocity as phase shift; two acquisitions with opposite gradient polarities yield phase difference proportional to velocity.",
+        "equations": [
+          "omega = gamma * B0 [Larmor frequency for P-29 miniaturized magnet at catheter scale]",
+          "dphi = gamma * M1 * v [phase encoding of CSF flow velocity in P-29 catheter-scale MR sensor]",
+          "VENC = pi / (gamma * M1) [velocity encoding]",
+          "Q = v * A [volumetric flow from velocity]",
+          "SNR ~ B0 * sqrt(N * voxel_volume) / sqrt(BW) [SNR scaling]"
+        ],
+        "assumptions": [
+          "CSF protons behave as in bulk water (valid approximation)",
+          "B0 field stable over measurement period",
+          "Gradient coil produces linear gradient",
+          "RF coil sensitivity uniform over measurement volume",
+          "Phase wraparound managed (VENC chosen correctly)",
+          "Motion artifacts (patient motion, physiologic motion) separable from flow"
+        ],
+        "boundary_conditions": [
+          "B0: 0.1-1 T typical for miniaturized permanent magnets (vs 1.5-3 T clinical MRI)",
+          "Larmor frequency: 4-43 MHz at 0.1-1 T",
+          "Flow velocity: 0.1-10 cm/s typical in shunt catheter",
+          "Measurement volume: catheter lumen (~1-2 mm diameter, ~1-5 cm length)"
+        ],
+        "input_variables": [
+          "B0 field strength",
+          "Gradient amplitude + duration",
+          "RF pulse parameters",
+          "CSF flow velocity"
+        ],
+        "output_variables": [
+          "Phase shift",
+          "Flow velocity",
+          "Volumetric flow rate Q"
+        ],
+        "parameter_sensitivities": [
+          "B0 — SNR scales linearly; higher B0 = better SNR but harder to miniaturize",
+          "M1 (gradient first moment) — determines VENC and velocity sensitivity",
+          "Coil sensitivity — affects SNR; miniaturized coils have lower sensitivity",
+          "Voxel volume — larger voxel = better SNR but lower spatial resolution",
+          "N (averaging) — sqrt(N) improvement in SNR at cost of acquisition time"
+        ],
+        "failure_regimes": [
+          "B0 too low -> SNR insufficient for phase measurement",
+          "Gradient coil too weak -> VENC too high for slow CSF flow",
+          "RF coil sensitivity too low -> SNR insufficient",
+          "Susceptibility artifacts (catheter material) -> phase errors",
+          "Motion artifacts overwhelm flow signal",
+          "Phase wraparound (velocity > VENC) -> ambiguous measurement"
+        ]
+      },
+      "critical_parameters": [
+        {
+          "name": "B0 field strength",
+          "value": "UNKNOWN — design choice (likely 0.1-1 T for miniaturization)",
+          "unit": "T",
+          "basis": "Miniaturization tradeoff",
+          "verification_requirement": "Field mapping",
+          "basis_ids": [
+            "engineering_judgment"
+          ],
+          "derivation": "Engineering judgment based on typical device parameters",
+          "review_required": true
+        },
+        {
+          "name": "Gradient amplitude G",
+          "value": "UNKNOWN",
+          "unit": "mT/m",
+          "basis": "Coil design + power budget"
+        },
+        {
+          "name": "Gradient duration (for M1)",
+          "value": "UNKNOWN",
+          "unit": "ms",
+          "basis": "Sequence design"
+        },
+        {
+          "name": "VENC (velocity encoding)",
+          "value": "UNKNOWN — target matches CSF flow range (~1-10 cm/s)",
+          "unit": "cm/s",
+          "basis": "Flow range"
+        },
+        {
+          "name": "RF coil size",
+          "value": "UNKNOWN — constrained by catheter ~2 mm or external patch",
+          "unit": "mm",
+          "basis": "Form factor",
+          "basis_ids": [
+            "anatomical_constraint"
+          ],
+          "derivation": "Anatomical constraint from standard catheter dimensions",
+          "review_required": true,
+          "verification_requirement": "Geometric verification with catheter vendor"
+        },
+        {
+          "name": "RF coil sensitivity",
+          "value": "UNKNOWN",
+          "unit": "dimensionless",
+          "basis": "Coil design"
+        },
+        {
+          "name": "SNR",
+          "value": "UNKNOWN — must be sufficient for phase measurement",
+          "unit": "dimensionless",
+          "basis": "Derived from B0, coil, voxel, averaging"
+        }
+      ],
+      "external_precedent": "EXTERNAL_PRECEDENT ≠ INVENTION_VALIDATION — published miniaturized NMR literature (Nature s41598-019-47634-2) establishes that portable NMR is feasible at low field. Published phase-contrast MRI literature establishes that flow quantification is feasible in clinical MRI. They do NOT establish that the proposed catheter-scale MR flow sensor achieves clinically useful SNR or accuracy.",
+      "proposed_design": {
+        "input": "CSF flow + B0 + gradient + RF pulse",
+        "mechanism": "Phase-contrast MRI with miniaturized magnet + RF coil + gradient coil",
+        "transformation": "Flow velocity -> phase shift -> signal -> flow rate",
+        "output": "Volumetric CSF flow rate",
+        "component_architecture": "Miniaturized magnet (B0) + RF coil (TX/RX) + gradient coil + signal processor + flow calculator"
+      },
+      "failure_modes": [
+        {
+          "mode": "SNR insufficient at low B0",
+          "mechanism": "Miniaturized magnet provides insufficient polarization",
+          "design_feature": "Magnet + coil",
+          "evidence": "UNKNOWN — failure mechanism requires investigation scaling",
+          "mitigation": "Higher B0 (harder to miniaturize); signal averaging (longer acquisition); better coil",
+          "verification_test": "SNR measurement at target B0",
+          "residual_uncertainty": "UNKNOWN achievable SNR at catheter scale"
+        },
+        {
+          "mode": "Gradient coil insufficient",
+          "mechanism": "Weak gradient can't encode slow flow",
+          "design_feature": "Gradient coil",
+          "evidence": "UNKNOWN — failure mechanism requires investigation",
+          "mitigation": "Stronger gradient + longer duration",
+          "verification_test": "VENC measurement",
+          "residual_uncertainty": "UNKNOWN achievable gradient strength"
+        },
+        {
+          "mode": "Susceptibility artifacts",
+          "mechanism": "Catheter material distorts B0",
+          "design_feature": "Catheter integration",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+          "mitigation": "MR-compatible catheter materials; artifact correction",
+          "verification_test": "Phantom test with catheter",
+          "residual_uncertainty": "UNKNOWN artifact magnitude"
+        },
+        {
+          "mode": "Motion artifacts",
+          "mechanism": "Patient motion or physiologic motion corrupts phase",
+          "design_feature": "Signal processing",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+          "mitigation": "Gating + motion correction + averaging",
+          "verification_test": "Motion simulation test",
+          "residual_uncertainty": "UNKNOWN motion magnitude in vivo"
+        },
+        {
+          "mode": "Phase wraparound",
+          "mechanism": "Velocity > VENC causes ambiguous phase",
+          "design_feature": "VENC selection",
+          "evidence": "UNKNOWN — failure mechanism requires investigation-contrast MRI challenge",
+          "mitigation": "Adaptive VENC; multi-VENC acquisition",
+          "verification_test": "Variable flow test",
+          "residual_uncertainty": "UNKNOWN flow range in vivo"
+        },
+        {
+          "mode": "Magnet instability (drift)",
+          "mechanism": "Permanent magnet field drifts with temperature or age",
+          "design_feature": "Magnet",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+          "mitigation": "Temperature compensation; field monitoring; calibration",
+          "verification_test": "Temperature cycle + aging",
+          "residual_uncertainty": "UNKNOWN drift rate"
+        },
+        {
+          "mode": "EMC interference",
+          "mechanism": "External EM affects RF measurement",
+          "design_feature": "RF coil + electronics",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+          "mitigation": "Shielding + IEC 60601-1-2",
+          "verification_test": "EMC test",
+          "residual_uncertainty": "UNKNOWN interference environment"
+        },
+        {
+          "mode": "Power consumption (active gradient + RF)",
+          "mechanism": "Gradient + RF pulses consume power",
+          "design_feature": "Power supply",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+          "mitigation": "Low-power design + duty cycling + energy harvesting",
+          "verification_test": "Power budget test",
+          "residual_uncertainty": "UNKNOWN achievable battery life"
+        },
+        {
+          "mode": "Magnet safety (projectiles)",
+          "mechanism": "Permanent magnet attracts ferromagnetic objects",
+          "design_feature": "Magnet",
+          "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+          "mitigation": "Shielding + warnings + MRI-contraindicated labeling",
+          "verification_test": "Safety assessment",
+          "residual_uncertainty": "UNKNOWN safety profile"
+        }
+      ],
+      "verification": [
+        {
+          "id": "VER-001",
+          "requirement": "Flow measurement accuracy in phantom",
+          "method": "Phantom with known flow rates + MR flow measurement",
+          "acceptance": "Accuracy within ~10-20% of true flow (MODEL_DERIVED target)"
+        },
+        {
+          "id": "VER-002",
+          "requirement": "SNR sufficient for phase measurement",
+          "method": "Bench SNR measurement at target B0",
+          "acceptance": "SNR > threshold for phase measurement (typically > 10:1)"
+        },
+        {
+          "id": "VER-003",
+          "requirement": "VENC appropriate for CSF flow range",
+          "method": "Variable flow bench test",
+          "acceptance": "VENC matches expected CSF flow range"
+        },
+        {
+          "id": "VER-004",
+          "requirement": "Susceptibility artifact management",
+          "method": "Phantom with catheter + artifact measurement",
+          "acceptance": "Artifacts within correction capability"
+        },
+        {
+          "id": "VER-005",
+          "requirement": "Biocompatibility ISO 10993 (for implantable components)",
+          "method": "ISO 10993 series",
+          "acceptance": "Pass",
+          "standard": "ISO_10993"
+        },
+        {
+          "id": "VER-006",
+          "requirement": "EMC IEC 60601-1-2",
+          "method": "EMC test",
+          "acceptance": "Pass",
+          "standard": "IEC_60601_1_2"
+        }
+      ],
+      "validation": [
+        {
+          "id": "VAL-001",
+          "requirement": "Clinical flow measurement accuracy",
+          "method": "Clinical study comparing to standard flow measurement (e.g., clinical MRI phase-contrast)",
+          "acceptance": "Clinically useful accuracy"
+        }
+      ],
+      "remaining_unknowns": [
+        "Achievable SNR at catheter-scale B0 — UNKNOWN (critical for feasibility)",
+        "Miniaturization limit for magnet + coils — UNKNOWN",
+        "Susceptibility artifact magnitude — UNKNOWN",
+        "Motion artifact magnitude in vivo — UNKNOWN",
+        "Magnet stability over implantation lifetime — UNKNOWN",
+        "Power budget for active operation — UNKNOWN",
+        "Regulatory pathway (likely Class III — novel MRI device) — UNKNOWN",
+        "Clinical accuracy requirement for shunt flow monitoring — UNKNOWN",
+        "Whether concept is physically plausible at device scale — UNKNOWN (may be blocked by miniaturization)"
+      ]
+    },
+    "failure_analysis": [
+      {
+        "failure_mode": "SNR insufficient at low B0",
+        "mechanism": "Miniaturized magnet provides insufficient polarization",
+        "design_feature_affected": "Magnet + coil",
+        "evidence": "UNKNOWN — failure mechanism requires investigation scaling",
+        "mitigation": "Higher B0 (harder to miniaturize); averaging; better coil",
+        "verification_test": "SNR measurement",
+        "residual_uncertainty": "UNKNOWN achievable SNR"
+      },
+      {
+        "failure_mode": "Gradient coil insufficient",
+        "mechanism": "Weak gradient can't encode slow flow",
+        "design_feature_affected": "Gradient coil",
+        "evidence": "UNKNOWN — failure mechanism requires investigation",
+        "mitigation": "Stronger gradient + longer duration",
+        "verification_test": "VENC measurement",
+        "residual_uncertainty": "UNKNOWN achievable gradient"
+      },
+      {
+        "failure_mode": "Susceptibility artifacts",
+        "mechanism": "Catheter material distorts B0",
+        "design_feature_affected": "Catheter integration",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "MR-compatible materials + correction",
+        "verification_test": "Phantom with catheter",
+        "residual_uncertainty": "UNKNOWN artifact magnitude"
+      },
+      {
+        "failure_mode": "Motion artifacts",
+        "mechanism": "Patient/physiologic motion corrupts phase",
+        "design_feature_affected": "Signal processing",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Gating + motion correction + averaging",
+        "verification_test": "Motion simulation",
+        "residual_uncertainty": "UNKNOWN motion magnitude"
+      },
+      {
+        "failure_mode": "Phase wraparound",
+        "mechanism": "Velocity > VENC",
+        "design_feature_affected": "VENC selection",
+        "evidence": "UNKNOWN — failure mechanism requires investigation-contrast MRI challenge",
+        "mitigation": "Adaptive VENC; multi-VENC",
+        "verification_test": "Variable flow test",
+        "residual_uncertainty": "UNKNOWN flow range"
+      },
+      {
+        "failure_mode": "Magnet drift",
+        "mechanism": "Permanent magnet field drifts with temperature/age",
+        "design_feature_affected": "Magnet",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Temperature compensation + monitoring + calibration",
+        "verification_test": "Temperature cycle + aging",
+        "residual_uncertainty": "UNKNOWN drift rate"
+      },
+      {
+        "failure_mode": "EMC interference",
+        "mechanism": "External EM affects RF",
+        "design_feature_affected": "RF coil + electronics",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Shielding + IEC 60601-1-2",
+        "verification_test": "EMC test",
+        "residual_uncertainty": "UNKNOWN interference environment"
+      },
+      {
+        "failure_mode": "Power consumption",
+        "mechanism": "Gradient + RF consume power",
+        "design_feature_affected": "Power supply",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Low-power design + duty cycling + energy harvesting",
+        "verification_test": "Power budget test",
+        "residual_uncertainty": "UNKNOWN achievable battery life"
+      },
+      {
+        "failure_mode": "Magnet safety (projectiles)",
+        "mechanism": "Permanent magnet attracts ferromagnetic objects",
+        "design_feature_affected": "Magnet",
+        "evidence": "UNKNOWN — failure mechanism requires investigation; no sourced evidence available",
+        "mitigation": "Shielding + warnings + MRI-contraindicated labeling",
+        "verification_test": "Safety assessment",
+        "residual_uncertainty": "UNKNOWN safety profile"
+      }
+    ],
+    "engineering_build_plan": [
+      {
+        "work_package": "WP-01",
+        "test_article": "SNR feasibility test (magnet + coil + phantom)",
+        "equipment": "Bench NMR setup, spectrometer, phantom",
+        "design_work": "Magnet + coil selection",
+        "measurement": "SNR at target B0",
+        "acceptance_criterion": "SNR > 10:1 sufficient for phase measurement",
+        "dependency": "Magnet + coil procurement",
+        "deliverable": "SNR feasibility report",
+        "estimated_effort": "12 weeks"
+      },
+      {
+        "work_package": "WP-02",
+        "test_article": "Gradient coil prototypes",
+        "equipment": "Bench gradient characterization",
+        "design_work": "Gradient coil design",
+        "measurement": "Gradient amplitude + linearity",
+        "acceptance_criterion": "Gradient strength sufficient for VENC = 1-10 cm/s",
+        "dependency": "WP-01 (B0)",
+        "deliverable": "Gradient coil spec",
+        "estimated_effort": "10 weeks"
+      },
+      {
+        "work_package": "WP-03",
+        "test_article": "Flow phantom with known flow rates",
+        "equipment": "Phantom, pump, MR flow measurement system",
+        "design_work": "Phantom + flow protocol",
+        "measurement": "Flow measurement accuracy vs true flow",
+        "acceptance_criterion": "Accuracy within ~10-20%",
+        "dependency": "WP-01 + WP-02",
+        "deliverable": "Flow accuracy report",
+        "estimated_effort": "10 weeks"
+      },
+      {
+        "work_package": "WP-04",
+        "test_article": "Susceptibility artifact phantom",
+        "equipment": "Phantom with catheter materials",
+        "design_work": "Artifact characterization protocol",
+        "measurement": "Phase error vs material",
+        "acceptance_criterion": "Artifacts within correction capability",
+        "dependency": "WP-01 + WP-02",
+        "deliverable": "Artifact report",
+        "estimated_effort": "8 weeks"
+      },
+      {
+        "work_package": "WP-05",
+        "test_article": "Magnet stability specimens",
+        "equipment": "Temperature chamber, field probe",
+        "design_work": "Stability protocol",
+        "measurement": "B0 drift vs temperature + time",
+        "acceptance_criterion": "Drift < 10 ppm over operating range",
+        "dependency": "WP-01",
+        "deliverable": "Stability report",
+        "estimated_effort": "12 weeks"
+      },
+      {
+        "work_package": "WP-06",
+        "test_article": "Biocompatibility specimens (if implantable)",
+        "equipment": "ISO 10993 lab",
+        "design_work": "Material selection frozen",
+        "measurement": "ISO 10993 series",
+        "acceptance_criterion": "Pass",
+        "dependency": "Material selection",
+        "deliverable": "ISO 10993 report",
+        "estimated_effort": "12 weeks (external)"
+      },
+      {
+        "work_package": "WP-07",
+        "test_article": "EMC test articles (miniaturized magnet + RF coil + gradient coil + transceiver)",
+        "equipment": "EMC lab",
+        "design_work": "Protocol per IEC 60601-1-2",
+        "measurement": "EMC emissions + immunity",
+        "acceptance_criterion": "Pass",
+        "dependency": "Production-equivalent prototype",
+        "deliverable": "EMC report",
+        "estimated_effort": "8 weeks (external)"
+      },
+      {
+        "work_package": "WP-08",
+        "test_article": "Miniaturization feasibility prototype",
+        "equipment": "Custom fabrication, characterization bench",
+        "design_work": "Catheter-scale integration design",
+        "measurement": "B0 + coil + gradient performance at catheter scale",
+        "acceptance_criterion": "Catheter-scale prototype achieves target B0 + SNR",
+        "dependency": "WP-01 + WP-02",
+        "deliverable": "Miniaturization feasibility report (may be blocked)",
+        "estimated_effort": "16 weeks (high risk)"
+      }
+    ],
+    "verification_matrix": [
+      {
+        "id": "V-001",
+        "requirement": "Flow measurement accuracy in phantom",
+        "method": "Phantom with known flow",
+        "acceptance": "~10-20% accuracy",
+        "result": "NOT_TESTED"
+      },
+      {
+        "id": "V-002",
+        "requirement": "SNR > threshold",
+        "method": "Bench SNR measurement",
+        "acceptance": "SNR > 10:1",
+        "result": "NOT_TESTED"
+      },
+      {
+        "id": "V-003",
+        "requirement": "VENC appropriate",
+        "method": "Variable flow test",
+        "acceptance": "VENC matches flow range",
+        "result": "NOT_TESTED"
+      },
+      {
+        "id": "V-004",
+        "requirement": "Susceptibility artifact management",
+        "method": "Phantom with catheter",
+        "acceptance": "Artifacts correctable",
+        "result": "NOT_TESTED"
+      },
+      {
+        "id": "V-005",
+        "requirement": "Biocompatibility ISO 10993",
+        "method": "ISO 10993",
+        "acceptance": "Pass",
+        "result": "NOT_TESTED",
+        "standard": "ISO_10993"
+      },
+      {
+        "id": "V-006",
+        "requirement": "EMC IEC 60601-1-2",
+        "method": "EMC test",
+        "acceptance": "Pass",
+        "result": "NOT_TESTED",
+        "standard": "IEC_60601_1_2"
+      }
+    ],
+    "validation_matrix": [
+      {
+        "id": "VAL-001",
+        "requirement": "Clinical flow measurement accuracy",
+        "method": "Clinical study vs standard flow measurement",
+        "acceptance": "Clinically useful accuracy",
+        "result": "NOT_PERFORMED"
+      }
+    ]
+  },
+  "claim_traceability": {
+    "package_id": "P-29",
+    "total_claims": 12,
+    "claims": [
+      {
+        "claim_id": "C-P-29-001",
+        "claim_text": "B0 field strength: UNKNOWN — design choice (likely 0.1-1 T for miniaturization)",
+        "evidence_origin": "UNKNOWN",
+        "source_artifact": "Miniaturization tradeoff",
+        "source_hash": "",
+        "source_location": "Field mapping",
+        "source_native_text": "",
+        "transformation": "Engineering judgment based on typical device parameters",
+        "inputs": [],
+        "derived_value": "UNKNOWN — design choice (likely 0.1-1 T for miniaturization)",
+        "assumptions": []
+      },
+      {
+        "claim_id": "C-P-29-002",
+        "claim_text": "Gradient amplitude G: UNKNOWN",
+        "evidence_origin": "UNKNOWN",
+        "source_artifact": "Coil design + power budget",
+        "source_hash": "",
+        "source_location": "",
+        "source_native_text": "",
+        "transformation": "",
+        "inputs": [],
+        "derived_value": "UNKNOWN",
+        "assumptions": []
+      },
+      {
+        "claim_id": "C-P-29-003",
+        "claim_text": "Gradient duration (for M1): UNKNOWN",
+        "evidence_origin": "UNKNOWN",
+        "source_artifact": "Sequence design",
+        "source_hash": "",
+        "source_location": "",
+        "source_native_text": "",
+        "transformation": "",
+        "inputs": [],
+        "derived_value": "UNKNOWN",
+        "assumptions": []
+      },
+      {
+        "claim_id": "C-P-29-004",
+        "claim_text": "VENC (velocity encoding): UNKNOWN — target matches CSF flow range (~1-10 cm/s)",
+        "evidence_origin": "UNKNOWN",
+        "source_artifact": "Flow range",
+        "source_hash": "",
+        "source_location": "",
+        "source_native_text": "",
+        "transformation": "",
+        "inputs": [],
+        "derived_value": "UNKNOWN — target matches CSF flow range (~1-10 cm/s)",
+        "assumptions": []
+      },
+      {
+        "claim_id": "C-P-29-005",
+        "claim_text": "RF coil size: UNKNOWN — constrained by catheter ~2 mm or external patch",
+        "evidence_origin": "UNKNOWN",
+        "source_artifact": "Form factor",
+        "source_hash": "",
+        "source_location": "Geometric verification with catheter vendor",
+        "source_native_text": "",
+        "transformation": "Anatomical constraint from standard catheter dimensions",
+        "inputs": [],
+        "derived_value": "UNKNOWN — constrained by catheter ~2 mm or external patch",
+        "assumptions": []
+      },
+      {
+        "claim_id": "C-P-29-006",
+        "claim_text": "RF coil sensitivity: UNKNOWN",
+        "evidence_origin": "UNKNOWN",
+        "source_artifact": "Coil design",
+        "source_hash": "",
+        "source_location": "",
+        "source_native_text": "",
+        "transformation": "",
+        "inputs": [],
+        "derived_value": "UNKNOWN",
+        "assumptions": []
+      },
+      {
+        "claim_id": "C-P-29-007",
+        "claim_text": "SNR: UNKNOWN — must be sufficient for phase measurement",
+        "evidence_origin": "UNKNOWN",
+        "source_artifact": "Derived from B0, coil, voxel, averaging",
+        "source_hash": "",
+        "source_location": "",
+        "source_native_text": "",
+        "transformation": "",
+        "inputs": [],
+        "derived_value": "UNKNOWN — must be sufficient for phase measurement",
+        "assumptions": []
+      },
+      {
+        "claim_id": "C-P-29-008",
+        "claim_text": "External engineering reference",
+        "evidence_origin": "SOURCE_NATIVE",
+        "source_artifact": "https://www.nature.com/articles/s41598-019-47634-2",
+        "source_hash": "c3307cfdfeeadf148fa026ab9bd529bdf8fe6d3abe2eb7b6ac584dce2030cb99",
+        "source_location": "external_evidence/pubmed_p29_GOVERNED.json",
+        "source_native_text": "by Y Tang · 2019 · Cited by 24 — In this work, we extend NMR relaxometry on a minute sample below 20 μL to challenging environment of 150 °C in temperature and 900 bar in ...",
+        "transformation": "",
+        "inputs": [],
+        "derived_value": "",
+        "assumptions": []
+      },
+      {
+        "claim_id": "C-P-29-009",
+        "claim_text": "External engineering reference",
+        "evidence_origin": "SOURCE_NATIVE",
+        "source_artifact": "https://www.mdpi.com/2227-9040/12/12/248",
+        "source_hash": "2d5b747780db9a462bc5b8992940177b3365c54c034c1af93e397a6ccdf85e20",
+        "source_location": "external_evidence/pubmed_p29_GOVERNED.json",
+        "source_native_text": "by B Sequeira-Antunes · 2024 · Cited by 5 — By miniaturizing NMR systems, micro- NMR (μ- NMR ) devices overcome the limitations of traditional bulky NMR instruments , making them more ...",
+        "transformation": "",
+        "inputs": [],
+        "derived_value": "",
+        "assumptions": []
+      },
+      {
+        "claim_id": "C-P-29-010",
+        "claim_text": "External engineering reference",
+        "evidence_origin": "SOURCE_NATIVE",
+        "source_artifact": "https://www.researchgate.net/publication/262183456_Miniaturised_NMR_sensor",
+        "source_hash": "3c776924463daab680cc8ae98fc76ee7ef521d14a81156ece82eb9a49aa6a27f",
+        "source_location": "external_evidence/pubmed_p29_GOVERNED.json",
+        "source_native_text": "Realisation of a miniaturised NMR sensor | … picoSpin-45 proton NMR spectrometer that weight less than 5 kg costing around $20,000. Such a device is able to ...",
+        "transformation": "",
+        "inputs": [],
+        "derived_value": "",
+        "assumptions": []
+      },
+      {
+        "claim_id": "C-P-29-011",
+        "claim_text": "External engineering reference",
+        "evidence_origin": "SOURCE_NATIVE",
+        "source_artifact": "https://pubmed.ncbi.nlm.nih.gov/26177607",
+        "source_hash": "dd5c7112fd9c80ad6930da52e6e0c49ad72a1c0f817e9ddd712e4162a58e104b",
+        "source_location": "external_evidence/pubmed_p29_GOVERNED.json",
+        "source_native_text": "by CC Vassiliou · 2015 · Cited by 21 — Here we demonstrate a miniaturized wireless sensor that can be implanted during a biopsy procedure and return chemical information from within ... Read more",
+        "transformation": "",
+        "inputs": [],
+        "derived_value": "",
+        "assumptions": []
+      },
+      {
+        "claim_id": "C-P-29-012",
+        "claim_text": "External engineering reference",
+        "evidence_origin": "SOURCE_NATIVE",
+        "source_artifact": "https://innuscreen.ist-ag.com/en/medical-devices",
+        "source_hash": "da0eba48a7387a0b8d294a57ab97a3f1b7067485088a2e1e3c19a7ce4880d8d3",
+        "source_location": "external_evidence/pubmed_p29_GOVERNED.json",
+        "source_native_text": "Biosensors, flow , temperature or conductivity sensors combined with viral RNA extraction kits complete IST AG's medical product portfolio.",
+        "transformation": "",
+        "inputs": [],
+        "derived_value": "",
+        "assumptions": []
+      }
+    ]
+  }
+}
