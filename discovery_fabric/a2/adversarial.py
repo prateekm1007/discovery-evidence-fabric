@@ -33,10 +33,15 @@ from discovery_fabric.v4_corrections import (
     KILL_PRIOR_ART_STATES,
 )
 
-# Evaluator routing: NVIDIA primary (fast, available), OpenRouter fallback
+# Evaluator routing: NVIDIA primary (hosts the frozen synthesis model since
+# 2026-08-27 — the legacy llama-3.1-8b fast evaluator was retired from the
+# NVIDIA catalog, HTTP 410 verified), OpenRouter/DeepSeek next, Mistral last
+# (EXPLICIT recorded fast-evaluator fallback, ~1 s measured; mistral-large
+# timed out at 240 s on this account). No silent substitution: every call's
+# provider/model travels in _LAST_ATTACK_PROVIDER_META.
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
 NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
-NVIDIA_MODEL = "meta/llama-3.1-8b-instruct"
+NVIDIA_MODEL = "deepseek-ai/deepseek-v4-flash-0731"
 
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -81,12 +86,15 @@ def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
 # Art. VI: populated only from real registry call results.
 _LAST_ATTACK_PROVIDER_META: dict = {"status": "NEVER_CALLED"}
 
-def llm_chat(prompt, system="", max_retries=1, timeout=30):
+def llm_chat(prompt, system="", max_retries=1, timeout=240):
     """E1: transport delegated to the provider registry. The legacy preference
     (NVIDIA primary, OpenRouter fallback) is preserved as an explicit
     preferred_providers policy — substitution stays recorded in the result
     ledger, never silent (Art. IV/XXVII). Returns content or None as before;
-    _LAST_ATTACK_PROVIDER_META carries the transport provenance."""
+    _LAST_ATTACK_PROVIDER_META carries the transport provenance.
+    timeout=240: the frozen deepseek-v4-flash evaluator measured 140-151 s
+    end-to-end on NVIDIA (verified live 2026-08-27); the previous 30 s
+    default produced systematic timeouts after the 8b model retirement."""
     global _LAST_ATTACK_PROVIDER_META
     try:
         from discovery_fabric.engine import llm_registry as reg
@@ -94,10 +102,19 @@ def llm_chat(prompt, system="", max_retries=1, timeout=30):
         _LAST_ATTACK_PROVIDER_META = {"status": "CALL_FAILED",
                                       "error": f"registry import failed: {exc}"}
         return None
-    policy = reg.SelectionPolicy(
-        preferred_providers=["nvidia", "openrouter", "deepseek", "gemini",
-                             "qwen", "openai", "anthropic"],
-        purpose="attack")
+    override = os.environ.get("ENGINE_ATTACK_PROVIDER", "").strip()
+    if override:
+        print(f"  [adversarial] OPERATOR OVERRIDE: attack evaluator pinned "
+              f"to '{override}' (fallback forbidden; recorded in meta)")
+        policy = reg.SelectionPolicy(
+            preferred_providers=[override], max_preference_fallback=0,
+            purpose="attack")
+    else:
+        policy = reg.SelectionPolicy(
+            preferred_providers=["nvidia", "openrouter", "deepseek",
+                                 "gemini", "qwen", "openai", "anthropic",
+                                 "mistral"],
+            purpose="attack")
     res = reg.generate(prompt, system=system, timeout=timeout,
                        max_retries=max_retries, policy=policy)
     _LAST_ATTACK_PROVIDER_META = res.to_meta()

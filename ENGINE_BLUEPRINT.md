@@ -156,3 +156,54 @@ PY
 5. **Physical reality loop** remains open by design: it starts when the first
    validated REALITY_EVENT arrives through `learning_loop.ingest_external_event`
    — the machine is ready for that dataset (Art. XXXVII/R339 GATE 9 posture).
+
+---
+
+## F-SERIES UPDATE (CEO FINAL INTEGRATION DIRECTIVE, 2026-08-27)
+
+The bridge is no longer optional. Directives 1-10 are implemented and
+proven by `tests/test_f_series_integration.py` (22 tests) on top of the
+E-suite (40 tests in dossier_bridge + engine_integration):
+
+1. **AUTOMATIC survivor -> package** (Directive 1): `EngineRun` default is
+   `with_package=True`; the only opt-out is the test-only `--no-package`
+   CLI flag / explicit constructor argument. A surviving RANK ALWAYS
+   produces INVENTION_SPECIFICATION -> ENGINEERING_SPECIFICATION ->
+   DECISIVE_EXPERIMENT -> BUYER_PACKAGE (6 PDFs + 3 JSONs + zip).
+2. **DISCOVERY_RELEASE.json** (Directive 2): written for EVERY run by
+   `engine/release.py`; binds run/candidate/invention/problem ids to
+   evidence/candidate/spec/manifest/zip SHA-256 hashes with an explicit
+   status vocabulary (RELEASED / NOT_A_SURVIVOR / PIPELINE_FAILED /
+   PACKAGE_INCOMPLETE / DISCOVERY_INCOMPLETE / DISABLED_BY_CONFIG).
+3. **Proven dossier reuse unchanged** (Directive 3): the same frozen
+   build_portfolio_v4 builders render every generated package.
+4. **ENGINEERING_DOMAIN_REGISTRY.json** (Directive 4): 11 domains + UNKNOWN,
+   each with governing_models, critical_parameters, failure_modes,
+   design_input/output_patterns, verification/validation_methods,
+   manufacturing_patterns; sync-pinned to domains.py by test.
+5. **No fabricated depth** (Directive 5): epistemic classes verified to
+   survive INTO the rendered dossier PDF (pypdf text extraction asserts
+   SOURCE_FACT / MODELLED / ENGINEERING_PROPOSED / UNKNOWN / ABSENT /
+   NOT_TESTED / NOT ESTABLISHED / NOT_PERFORMED).
+6. **Zero material truncation** (Directive 6): `_short`/`_shorten` removed;
+   full text everywhere in authoritative artifacts; display summaries only
+   through the DisplayRegister (serialized into PACKAGE_MANIFEST.json);
+   static guard test scans the authoritative sources for slice patterns.
+7. **Computed maturity** (Directive 7): `engine/maturity.py` evaluates the
+   six-rung ladder from actual artifact state; blockers are the evaluated
+   unsatisfied conditions of the next rung with evidence pointers; the
+   injected generic blocker list is gone.
+8. **Automatic package test** (Directive 8): fixture survivor ->
+   9 files + zip + hashes + release, failing on any missing stage.
+9. **Scale test** (Directive 9): 15 survivors (11 domains) -> 15 invention
+   specs, 15 engineering specs, 15 full dossier sets, 15 zips; unique ids,
+   unique hashes, each manifest bound only to its own run.
+10. **Ablation** (Directive 10): collision/attack/killer-experiment/
+    next-best-action/engineering-domain-module disabled one at a time;
+    downstream artifacts proven to change where each module feeds them.
+
+Credential state changed 2026-08-27: CEO provisioned NVIDIA + Mistral keys
+(`.env.keys`, gitignored). NVIDIA now hosts the FROZEN synthesis model
+`deepseek-ai/deepseek-v4-flash-0731` (verified live, ~150 s/call); the
+legacy NVIDIA default llama-3.1-8b-instruct is retired (HTTP 410). The
+first REAL end-to-end autonomous run is no longer credential-blocked.

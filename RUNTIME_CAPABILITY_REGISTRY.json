@@ -386,14 +386,16 @@
    "capability_id": "LLM_PROVIDER_REGISTRY",
    "module_path": "discovery_fabric/engine/llm_registry.py",
    "canonical_function": "generate(prompt, system, schema, policy) -> LLMCallResult",
-   "purpose": "E1 credential-independent transport over seven providers (openrouter/nvidia/anthropic/gemini/openai/qwen/deepseek); selection policy availability->quality->cost->latency with explicit, recorded substitution; PROVIDER_UNAVAILABLE is an infrastructure state, never NO_INVENTION and never silent (Art. IV/XXVII).",
-   "current_status": "NEW_E1",
+   "purpose": "E1 credential-independent transport over EIGHT providers (openrouter/nvidia/anthropic/gemini/openai/qwen/deepseek/mistral); selection policy availability->quality->cost->latency with explicit, recorded substitution; PROVIDER_UNAVAILABLE is an infrastructure state, never NO_INVENTION and never silent (Art. IV/XXVII). 2026-08-27: CEO provisioned NVIDIA + Mistral keys; NVIDIA default moved to the frozen synthesis model deepseek-ai/deepseek-v4-flash-0731 (legacy llama-3.1-8b retired from catalog, HTTP 410 verified); mistral-large timed out at 240s so the recorded mistral default is mistral-small (explicit tier-3 choice, MISTRAL_MODEL overridable).",
+   "current_status": "LIVE_KEYS_2026_08_27",
    "adapter": "transport-only bridge inside a2/synthesize.llm_chat and a2/adversarial.llm_chat (business logic untouched)",
    "input_contract": "prompt str, optional system/schema/evidence, SelectionPolicy(preferred_providers, max_preference_fallback, purpose)",
    "output_contract": "LLMCallResult{status: OK|PROVIDER_UNAVAILABLE|CALL_FAILED, content, provider_id, model, prompt_hash, output_hash, latency_ms, substituted_from, selection_ledger}",
    "provenance_contract": "real call metadata only (Art. VI); availability matrix + decision ledger in every result",
    "tests": [
-    "tests/test_dossier_bridge.py::test_e1_* (4 offline)"
+    "tests/test_dossier_bridge.py::test_e1_* (4 offline)",
+    "tests/test_dossier_bridge.py::test_e1_nvidia_hosts_frozen_synthesis_model",
+    "tests/test_dossier_bridge.py::test_e1_registry_has_eight_providers"
    ],
    "historical_validation": "preserves frozen A2 behaviors: synthesis model deepseek/deepseek-v4-flash-0731, attack NVIDIA-first routing",
    "promotion_status": "PROMOTED_E1",
@@ -537,6 +539,90 @@
     "parallel event schema (would fragment the reality boundary)",
     "LLM-scored feedback (untrusted component must not grade reality)"
    ]
+  },
+  {
+   "capability_id": "DISCOVERY_RELEASE",
+   "module_path": "discovery_fabric/engine/release.py",
+   "canonical_function": "build_discovery_release(run_dir, run_id, problem_id, env, spec, eng, package_report) -> dict; write_discovery_release",
+   "purpose": "CEO Directive 2: canonical DISCOVERY_RELEASE.json binding discovery to the transfer artifact (run_id, candidate_id, invention_id, problem_id, evidence_hash, candidate_hash, invention_spec_hash, engineering_spec_hash, dossier_manifest_hash, buyer_package_hash, status). Written for EVERY run; non-survivors get honest non-RELEASED statuses (Art. XXV).",
+   "current_status": "NEW_F",
+   "adapter": "conductor-level (run.py always emits it after the loop)",
+   "input_contract": "run artifacts (envelope, spec, eng, package report)",
+   "output_contract": "release record; all hashes SHA-256 over actual on-disk artifacts, reproducible from the run dir alone (Art. XXVI)",
+   "provenance_contract": "hashes recomputable by a third party; failure_reason explicit; code_commit recorded",
+   "tests": [
+    "tests/test_f_series_integration.py::test_d2_* (2)"
+   ],
+   "historical_validation": "hash equality verified against PACKAGE_MANIFEST.json and zip bytes in tests",
+   "promotion_status": "PROMOTED_F",
+   "canonical_choice_rationale": "one binding record stops the discovery/transfer seam from drifting",
+   "rejected_alternatives": [
+    "keeping --with-package style opt-in reporting (Directive 1 violation)",
+    "hashes computed from memory (not reproducible from artifacts)"
+   ]
+  },
+  {
+   "capability_id": "DISPLAY_REGISTER",
+   "module_path": "discovery_fabric/engine/fields.py",
+   "canonical_function": "DisplayRegister.display(field_path, full, limit); build_display_view(obj, register, table_bound)",
+   "purpose": "CEO Directive 6: AUTHORITATIVE VALUE -> PRESERVE EXACTLY -> DISPLAY SUMMARY. Authoritative spec/artifacts carry full text (slicing forbidden by guard test); only fixed-width-PDF-table-bound strings are shortened, always through the register, which preserves the full value and proves the display is a pure prefix derivation. Register serialized into PACKAGE_MANIFEST.json; violations fail the build.",
+   "current_status": "NEW_F",
+   "adapter": "package_factory.generate_buyer_package builds the builder view through it",
+   "input_contract": "authoritative object + table_bound display limits",
+   "output_contract": "display view + register{field, full, display, truncated, limit}; violations() mechanical audit",
+   "provenance_contract": "full values preserved in register (package) and in the spec JSONs",
+   "tests": [
+    "tests/test_f_series_integration.py::test_d6_* (4)"
+   ],
+   "historical_validation": "0 MATERIAL_TRUNCATION proven statically (source scan) and dynamically (long-text end-to-end)",
+   "promotion_status": "PROMOTED_F",
+   "canonical_choice_rationale": "mechanical, inspectable derivation replaces ad-hoc _short/_shorten helpers (removed)",
+   "rejected_alternatives": [
+    "keeping _shorten in the authoritative spec (the audited defect)",
+    "regex-only static audit (runtime register proves the actual package)"
+   ]
+  },
+  {
+   "capability_id": "MATURITY_ENGINEERING",
+   "module_path": "discovery_fabric/engine/maturity.py",
+   "canonical_function": "compute_maturity(spec, eng, env, package_report) -> ladder evaluation",
+   "purpose": "CEO Directive 7: maturity computed from the ACTUAL artifact state over CONCEPT_DEFINED -> ENGINEERING_DEFINITION -> PROTOTYPE_DESIGN_READY -> PROTOTYPE_BUILD_READY -> VALIDATION_READY -> TRANSFER_READY, each rung with exact evaluated conditions and artifact evidence. The generic injected blocker list is gone; blockers are the unsatisfied conditions of the next rung.",
+   "current_status": "NEW_F",
+   "adapter": "package_factory.build_maturity_basis emits MATURITY_BASIS.json from it",
+   "input_contract": "invention spec, engineering spec, envelope, package report",
+   "output_contract": "technology_maturity, rung_evaluations (all six, each condition evaluated), known_blockers with evidence pointers, counts; transfer_ready derived never assigned",
+   "provenance_contract": "every blocker cites the artifact location that justifies it",
+   "tests": [
+    "tests/test_f_series_integration.py::test_d7_* (3)"
+   ],
+   "historical_validation": "level climbs only when artifacts actually change (test simulates design completion)",
+   "promotion_status": "PROMOTED_F",
+   "canonical_choice_rationale": "single canonical maturity source consistent with the frozen portfolio's has_eq/has_fm/has_bp/has_di rule",
+   "rejected_alternatives": [
+    "keeping the injected generic blocker list (the audited defect)",
+    "clone-level single integer without rung evidence (not auditable)"
+   ]
+  },
+  {
+   "capability_id": "ENGINEERING_DOMAIN_REGISTRY",
+   "module_path": "discovery_fabric/engine/domains.py + ENGINEERING_DOMAIN_REGISTRY.json",
+   "canonical_function": "get_domain_module(domain_id); export_registry_json(); detect_domain(text)",
+   "purpose": "CEO Directive 4: canonical registry mapping evidence/mechanism characteristics (signals) to engineering modules (governing_models, critical_parameters, failure_modes, design_input_patterns, design_output_patterns, verification_methods, validation_methods, manufacturing_patterns) across 11 domains + honest UNKNOWN. Lets a new invention reach 15-dossier depth automatically; all module content ENGINEERING_PROPOSED with UNKNOWN values (Art. XXVII).",
+   "current_status": "NEW_F",
+   "adapter": "engineering_spec consumes the module (critical parameters, candidate FMs, validation methods, DI/DO patterns)",
+   "input_contract": "candidate mechanism/problem text",
+   "output_contract": "published JSON artifact pinned to code by sync test",
+   "provenance_contract": "detection recorded MODEL_DERIVED with matched signals",
+   "tests": [
+    "tests/test_f_series_integration.py::test_d4_* (3)"
+   ],
+   "historical_validation": "domain-adaptive depth proven across fluidics/ml/RF; ablation changes engineering content",
+   "promotion_status": "PROMOTED_F",
+   "canonical_choice_rationale": "one code authority (domains.py) with one published canonical artifact, sync-pinned",
+   "rejected_alternatives": [
+    "hand-writing per-invention engineering content (does not scale, fabrication risk)",
+    "registry JSON without code authority (drift)"
+   ]
   }
  ],
  "conductor": {
@@ -570,5 +656,6 @@
    "real_loop_verified": false,
    "transfer_ready": false
   }
- }
+ },
+ "last_updated_directive": "CEO FINAL INTEGRATION DIRECTIVE (F-series) 2026-08-27"
 }

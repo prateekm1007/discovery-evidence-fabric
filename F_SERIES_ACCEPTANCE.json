@@ -1,0 +1,89 @@
+{
+ "artifact": "F_SERIES_ACCEPTANCE",
+ "directive": "CEO FINAL INTEGRATION DIRECTIVE (Directives 1-10)",
+ "date": "2026-08-27",
+ "acceptance": {
+  "AUTOMATED_DISCOVERY_TO_DOSSIER": "PASS",
+  "AUTOMATED_ENGINEERING_SPEC": "PASS",
+  "AUTOMATED_BUYER_PACKAGE": "PASS",
+  "AUTOMATED_ZIP": "PASS",
+  "ONE_SURVIVOR_ONE_COMPLETE_PACKAGE": "PASS (test_d8 + real run)",
+  "FIFTEEN_SURVIVORS_FIFTEEN_COMPLETE_PACKAGES": "PASS (test_d9_scale: 15 specs, 15 dossier sets, 15 zips, unique ids/hashes)",
+  "ZERO_MATERIAL_TRUNCATION": "PASS (static source guard + display register violations=[])",
+  "ZERO_FABRICATED_FACTS": "PASS (no-fact-promotion integrity passed; all values UNKNOWN until sourced)",
+  "ZERO_SOURCE_FACT_PROMOTION": "PASS (spec._integrity.passed=true; mechanism stays MODELLED)",
+  "ZERO_PACKAGE_CROSS_CONTAMINATION": "PASS (unique invention ids/spec hashes/zips; manifests bound to own runs)",
+  "ZERO_UNTRACEABLE_ENGINEERING_FIELDS": "PASS (untraceable_engineering_fields=[]; 22 structural chains)"
+ },
+ "real_end_to_end_run": {
+  "run_dir": "/home/z/my-project/discovery-evidence-fabric/ENGINE_RUNS/F_SMOKE_REAL_P01",
+  "problem": "p01 Cardiac Pacemaker — battery depletion",
+  "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+  "smoke_verdict": "PASS",
+  "links_verified": "33/33",
+  "release_status": "RELEASED",
+  "invention_id": "inv:p01:b94e494e1d19",
+  "evidence_items_frozen": 5,
+  "resumed": true,
+  "resumed_from_stage": "FREEZE",
+  "package": {
+   "folder": "/home/z/my-project/discovery-evidence-fabric/ENGINE_RUNS/F_SMOKE_REAL_P01/DOWNLOAD/90_cardiac_pacemaker",
+   "zip": "/home/z/my-project/discovery-evidence-fabric/ENGINE_RUNS/F_SMOKE_REAL_P01/DOWNLOAD/90_cardiac_pacemaker.zip",
+   "files": [
+    "00_PACKAGE_README.pdf",
+    "01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf",
+    "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf",
+    "03_BUYER_DECISION_CARD.pdf",
+    "04_EVIDENCE_SUMMARY.pdf",
+    "05_TRANSFER_MANIFEST.pdf",
+    "ENGINEERING_TRACEABILITY.json",
+    "MATURITY_BASIS.json",
+    "PACKAGE_MANIFEST.json"
+   ],
+   "buyer_package_hash": "42cbd5a4b0166849c5698a4b29e44756daafd4611b5fecabacd66924f226068e",
+   "dossier_manifest_hash": "2268166a754493b411cc8a9a37d0fb38246539f62b25dee240338575b917be37"
+  },
+  "computed_maturity": {
+   "level": "ENGINEERING_DEFINITION",
+   "next_rung": "PROTOTYPE_DESIGN_READY",
+   "blockers_computed_from_artifacts": [
+    "D-01: every design output carries a complete geometry definition (",
+    "D-02: every critical parameter has a sourced or computed value (no",
+    "D-03: bill of materials has established quantities"
+   ],
+   "no_injected_blocker_list": true
+  },
+  "display_register": {
+   "entries": 145,
+   "truncated_display_only": 3,
+   "violations": []
+  },
+  "traceability": {
+   "passed": true,
+   "chains": 22,
+   "untraceable_fields": []
+  }
+ },
+ "transport_disclosure": {
+  "frozen_model_path": "synthesis default policy is the frozen model family (deepseek/deepseek-v4-flash-0731 via openrouter; NVIDIA hosts deepseek-ai/deepseek-v4-flash-0731) — verified LIVE earlier on 2026-08-27 (2 successful calls, 140-151 s each)",
+  "degradation_observed": "during the real run the NVIDIA endpoint was degraded (504 gateway timeouts, wall time 300-575 s per call); attempts could not complete inside operating windows",
+  "operator_override_used": "ENGINE_SYNTHESIS_PROVIDER=mistral and ENGINE_ATTACK_PROVIDER=mistral were set EXPLICITLY by the operator; each call printed the override, forbidden fallback, and recorded provider/model in the candidate provenance (mistral/mistral-small-latest/OK)",
+  "substitution_classification": "explicit, logged, reversible operator override — NOT a silent substitution; the frozen-model path remains the default policy"
+ },
+ "new_capabilities": [
+  "automatic survivor->package (no --with-package; --no-package is test-only)",
+  "DISCOVERY_RELEASE.json binding (every run; hashes reproduce from disk)",
+  "ENGINEERING_DOMAIN_REGISTRY.json (11 domains + UNKNOWN, sync-pinned)",
+  "DisplayRegister (AUTHORITATIVE -> PRESERVE EXACTLY -> DISPLAY SUMMARY)",
+  "computed six-rung maturity ladder (blockers derived, never injected)",
+  "resumable real runs (persisted stage snapshots; no stage re-runs)",
+  "operator provider override (explicit, logged, meta-recorded)",
+  "hermetic offline test suite (tests/conftest.py, ENGINE_LIVE gate)"
+ ],
+ "suite": "2 failed, 824 passed, 2 skipped in 16.47s",
+ "known_pre_existing_failures": [
+  "tests/test_patsnap_claims_regression.py::TestPatentBearRateLimit::test_rate_limit_status (PATENT_BEAR NO_KEY — credential scrub, pre-existing)",
+  "tests/test_secret_scanning.py::TestSecretScanning::test_no_hardcoded_secrets (historical R354/R358/CANONICAL_STATE key material — pre-existing baseline)"
+ ],
+ "code_commit": "770ff66f93baa2ffe1b77684ccad636fb70540c9"
+}

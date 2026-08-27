@@ -10,6 +10,18 @@ VERIFICATION -> VALIDATION graph uses explicit IDs and STRUCTURAL links
 (parent_id references), not keyword matching (the R370 audit demonstrated
 keyword-only traceability is dangerous).
 
+CEO Directive 4: engineering depth is DOMAIN-ADAPTIVE — the domain module
+from the canonical ENGINEERING_DOMAIN_REGISTRY contributes governing models,
+critical parameters, candidate failure modes, DI/DO patterns, verification,
+validation and manufacturing patterns, all tagged ENGINEERING_PROPOSED with
+UNKNOWN values (no threshold invention, Art. XXVII).
+
+CEO Directive 6 (NO MATERIAL TRUNCATION): this artifact is AUTHORITATIVE.
+NO string in it may be shortened — full text everywhere. Presentation-level
+shortening happens ONLY later, via the DisplayRegister in fields.py, after
+this authoritative artifact has been preserved. (The former `_shorten`
+helper is deliberately GONE; a guard test scans this file to keep it gone.)
+
 The output `engineering_content` mirrors the ArtifactRichDossier schema that
 premium_package_factory/templates/build_portfolio_v4.py consumes — so the
 existing dossier factory renders it unchanged (E4 reuse, no template
@@ -17,20 +29,15 @@ recreation).
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from .candidate import Candidate, sha256_obj, utc_now
-from .domains import detect_domain, domain_label
+from .domains import detect_domain, domain_label, get_domain_module
 from .equations import select_equations
 from .invention_spec import tagged
 
 # Epistemic gate for engineering: DO results are ABSENT until reality
 # produces them (Art. XXXVIII: COMPUTATIONAL_RESULT != PHYSICAL_OBSERVATION).
-
-
-def _shorten(s: str, n: int = 180) -> str:
-    s = (s or "").strip()
-    return s if len(s) <= n else s[: n - 3].rstrip() + "..."
 
 
 # --------------------------------------------------------------------------
@@ -45,6 +52,7 @@ def build_design_graph(spec: Dict[str, Any], env: Optional[Candidate],
       - every VF names >=1 parent FM
       - every VA names >=1 parent VF or is explicitly justification-gated
     Unlinkable content becomes a recorded GAP — never silently dropped.
+    Full text everywhere (Directive 6): no label/value is shortened.
     """
     problem = ((spec.get("problem") or {}).get("value") or {})
     mech = ((spec.get("mechanism") or {}).get("value") or {})
@@ -59,8 +67,8 @@ def build_design_graph(spec: Dict[str, Any], env: Optional[Candidate],
     uin_id = "UIN-001"
     nodes.append({
         "id": uin_id, "type": "USER_NEED", "parent_ids": [],
-        "label": _shorten(problem.get("failure") or
-                          (problem.get("device", "") + " reliability"), 200),
+        "label": problem.get("failure") or
+                 (problem.get("device", "") + " reliability"),
         "basis": "SOURCE_FACT (operator problem statement, problem.json)",
         "evidence_refs": ["problem.json"],
     })
@@ -76,7 +84,7 @@ def build_design_graph(spec: Dict[str, Any], env: Optional[Candidate],
         di_counter += 1
         did = f"DI-{di_counter:03d}"
         d_inputs.append({"id": did, "parent_ids": parents, "label": label,
-                         "value": _shorten(value, 220), "basis": basis,
+                         "value": value, "basis": basis,
                          "evidence_refs": refs})
         return did
 
@@ -102,13 +110,13 @@ def build_design_graph(spec: Dict[str, Any], env: Optional[Candidate],
         do_counter += 1
         d_outputs.append({
             "id": f"DO-{do_counter:03d}", "parent_ids": parents,
-            "description": _shorten(label, 200),
+            "description": label,
             "status": "ABSENT",
             "missing_inputs": missing_inputs, "basis": basis})
 
     if di_m:
         _do(f"Intervention architecture realizing the proposed mechanism: "
-            f"{_shorten(mech.get('intervention', ''), 120)}",
+            f"{mech.get('intervention', '')}",
             ["geometry/setpoints (must be proposed and justified)",
              "materials selection", "interface dimensions"],
             [di_m], "ENGINEERING_PROPOSED (architecture named; parameters absent)")
@@ -135,7 +143,7 @@ def build_design_graph(spec: Dict[str, Any], env: Optional[Candidate],
             "id": f"FM-{fm_counter:03d}",
             "parent_ids": [parent_of_first_fm],
             "mode": f"adversarial dimension: {item.get('dimension')}",
-            "mechanism": _shorten(str(item.get("attack_verdict")), 160),
+            "mechanism": str(item.get("attack_verdict")),
             "basis": "COMPUTED (attack engine verdict)",
             "evidence_refs": []})
     dev_failure = problem.get("failure_mode") or problem.get("failure")
@@ -144,7 +152,7 @@ def build_design_graph(spec: Dict[str, Any], env: Optional[Candidate],
         f_modes.insert(0, {
             "id": f"FM-{fm_counter:03d}",
             "parent_ids": [d_outputs[0]["id"]] if d_outputs else [uin_id],
-            "mode": _shorten(dev_failure, 160),
+            "mode": dev_failure,
             "mechanism": "the device failure that motivates the invention",
             "basis": "SOURCE_FACT (problem.json)", "evidence_refs": ["problem.json"]})
     if not f_modes:
@@ -162,17 +170,17 @@ def build_design_graph(spec: Dict[str, Any], env: Optional[Candidate],
         verifications.append({
             "id": f"VF-{vf_counter:03d}",
             "parent_ids": [f_modes[0]["id"]],
-            "method": _shorten(fals, 220),
+            "method": fals,
             "basis": "MODELLED (candidate falsification test)",
             "result": "NOT_TESTED"})
     ke_sel_name = ke.get("selected") if isinstance(ke.get("selected"), str) \
         else (ke.get("selected") or {}).get("name", "UNKNOWN") if ke.get(
             "selected") else ""
-    if ke_sel_name and f_modes:
+    if ke_sel_name and ke_sel_name != "UNKNOWN" and f_modes:
         vf_counter += 1
         verifications.append({
             "id": f"VF-{vf_counter:03d}",
-            "parent_ids": [fm["id"] for fm in f_modes[:2]],
+            "parent_ids": [fm["id"] for fm in f_modes],
             "method": f"run killer experiment: {ke_sel_name} "
                       f"(EIG/cost {ke.get('eig_per_cost')})",
             "basis": "COMPUTED (Bayesian EIG over MODEL_DERIVED priors)",
@@ -235,9 +243,9 @@ def _graph_integrity(di, do, fm, vf, va) -> Dict[str, Any]:
 # --------------------------------------------------------------------------
 def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                            run_ctx: Dict[str, Any]) -> Dict[str, Any]:
-    """Produce the full engineering content (E3), shaped for the existing
-    dossier factory. Every block is explicitly classed; nothing claims
-    physical existence."""
+    """Produce the full engineering content (E3 + Directive 4), shaped for
+    the existing dossier factory. Every block is explicitly classed; nothing
+    claims physical existence; NOTHING is truncated (Directive 6)."""
     mech_text = " ".join(str(((spec.get("mechanism") or {}).get("value") or {}).get(k, ""))
                          for k in ("mechanism", "intervention",
                                    "expected_effect", "falsification_test"))
@@ -245,8 +253,9 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
 
     detection = detect_domain(mech_text + " " + " ".join(
         str(problem.get(k, "")) for k in ("device", "failure", "constraint")))
-    tpl = detection["template"]
     domain = detection["domain"]
+    module = get_domain_module(domain)
+    tpl = module  # merged Directive-4 module view (base + depth)
 
     graph = build_design_graph(spec, env)
     equations = select_equations(spec, domain)
@@ -263,6 +272,12 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
              "assumptions": eq["equation"]["assumptions"],
              "selection_rationale": eq["selection_rationale"]}
             for eq in (equations.get("value") or [])],
+        "domain_governing_models": [
+            {"model": m.get("model"),
+             "registry_equation_ids": m.get("equation_ids", []),
+             "applicability": m.get("applicability",
+                                    m.get("note", "ENGINEERING_PROPOSED"))}
+            for m in module.get("governing_models", [])],
         "assumptions": [a for eq in (equations.get("value") or [])
                         for a in eq["equation"]["assumptions"]],
         "boundary_conditions": ["to be established by the first bench "
@@ -280,13 +295,78 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "parameter_sensitivities": [],
         "failure_regimes": [
             {"regime": f["mode"], "basis": f["basis"]}
-            for f in graph["f_modes"][:4]],
+            for f in graph["f_modes"]],
     }
 
+    # Directive 4: domain-adaptive critical parameters (candidate names only;
+    # every VALUE stays UNKNOWN — the registry proposes WHAT matters, never
+    # WHAT its value is, Art. XXVII)
+    critical_parameters = [
+        {"parameter": p,
+         "name": p,
+         "value": "UNKNOWN (no sourced value)",
+         "unit": "UNKNOWN",
+         "basis": "ENGINEERING_PROPOSED (domain registry candidate)",
+         "verification_requirement":
+             "to be assigned a sourced target value and a verification "
+             "method before any build decision",
+         "status": "ENGINEERING_PROPOSED / VALUE UNKNOWN",
+         "reason": "domain candidate parameter; no measurement exists"}
+        for p in module.get("critical_parameters", [])]
+    critical_parameters += [
+        {"parameter": f"DO response for {d['description']}",
+         "name": f"DO response for {d['description']}",
+         "value": "UNKNOWN (no sourced value)",
+         "unit": "UNKNOWN",
+         "basis": "ENGINEERING_PROPOSED",
+         "verification_requirement":
+             "to be defined with the DO geometry design work",
+         "status": "ENGINEERING_PROPOSED / VALUE UNKNOWN",
+         "reason": "no sourced target value exists"}
+        for d in graph["d_outputs"]]
+
+    # Directive 4: domain candidate failure modes are appended AFTER the
+    # candidate's own recorded failure modes (never replacing them), each
+    # explicitly tagged as domain-generic ENGINEERING_PROPOSED candidates.
     ke = (spec.get("killer_experiment") or {}).get("value") or {}
     ke_name = ke.get("selected") if isinstance(ke.get("selected"), str) \
-        else (ke.get("selected") or {}).get("name", "UNKNOWN")
+        else (ke.get("selected") or {}).get("name", "UNKNOWN") if \
+        ke.get("selected") else ""
     ke_def = ke.get("definition", "")
+    if ke_name == "UNKNOWN":
+        ke_name = ""   # no killer experiment was selected: no WP is claimed
+
+    def _fm_out(fm_id: str, mode: str, mechanism: str, basis: str,
+                verification: str) -> Dict[str, Any]:
+        return {
+            "graph_id": fm_id,
+            "mode": mode, "failure_mode": mode,
+            "mechanism": mechanism,
+            "design_feature": "NOT ESTABLISHED",
+            "evidence": basis,
+            "mitigation": "NOT ESTABLISHED (requires design work)",
+            "verification": verification,
+            "verification_test": verification,
+            "residual_uncertainty":
+                "UNKNOWN — untested candidate failure mode (Art. XXV)",
+            "epistemic_class": basis.split(" (")[0] or "UNKNOWN",
+        }
+
+    failure_modes_out: List[Dict[str, Any]] = []
+    for f in graph["f_modes"]:
+        failure_modes_out.append(_fm_out(
+            f["id"], f["mode"], f.get("mechanism", ""), f["basis"],
+            next((v["id"] for v in graph["verifications"]
+                  if f["id"] in v["parent_ids"]), "NOT_LINKED")))
+    for j, dfm in enumerate(module.get("failure_modes", [])):
+        failure_modes_out.append(_fm_out(
+            f"FM-DOM-{j+1:03d}", dfm,
+            "domain-generic candidate failure mode from the engineering "
+            "domain registry — applicability to THIS invention NOT "
+            "established",
+            "ENGINEERING_PROPOSED (domain registry candidate)",
+            "NOT_LINKED"))
+
     build_plan: List[Dict[str, Any]] = []
     if ke_name:
         build_plan.append({
@@ -297,11 +377,16 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             "equipment": "domain bench equipment per verification methods",
             "design_work": "complete DO-001 geometry from proposal to "
                            "manufacturable definition",
-            "measurement": _shorten(str(ke_def), 200)
-                           or "killer-experiment measurement protocol",
+            "measurement": str(ke_def) or "killer-experiment measurement "
+                          "protocol",
             "acceptance": "pre-registered pass/fail from the killer "
                           "experiment (threshold NOT YET JUSTIFIED — no "
                           "sourced value exists)",
+            "acceptance_criterion": "pre-registered pass/fail from the "
+                                    "killer experiment (NOT YET JUSTIFIED)",
+            "deliverable": "killer-experiment report with pass/fail vs "
+                           "pre-registered criterion",
+            "estimated_effort": "NOT ESTABLISHED (to be quoted)",
             "basis": "COMPUTED (killer experiment selection)"})
     build_plan.append({
         "work_package": f"WP-{len(build_plan)+1:02d}",
@@ -311,6 +396,9 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                        "verification matrix",
         "measurement": "constraint-compliance characterization",
         "acceptance": "NOT ESTABLISHED (no sourced acceptance values)",
+        "acceptance_criterion": "NOT ESTABLISHED (no sourced values)",
+        "deliverable": "constraint-compliance characterization report",
+        "estimated_effort": "NOT ESTABLISHED (to be quoted)",
         "basis": "ENGINEERING_PROPOSED"})
     for vf in graph["verifications"]:
         build_plan.append({
@@ -320,22 +408,10 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             "design_work": "method definition to measurable protocol",
             "measurement": vf["method"],
             "acceptance": "NOT_TESTED",
+            "acceptance_criterion": "NOT ESTABLISHED",
+            "deliverable": f"{vf['id']} verification report",
+            "estimated_effort": "NOT ESTABLISHED (to be quoted)",
             "basis": vf["basis"]})
-
-    critical_parameters = [
-        {"parameter": f"DO response for {d['description'][:80]}",
-         "status": "UNKNOWN",
-         "reason": "no sourced target value exists"} for d in graph["d_outputs"]]
-
-    failure_modes_out = [
-        {"mode": f["mode"], "mechanism": f.get("mechanism", ""),
-         "design_feature": "NOT ESTABLISHED",
-         "evidence": f["basis"],
-         "mitigation": "NOT ESTABLISHED (requires design work)",
-         "verification": next(
-             (v["id"] for v in graph["verifications"]
-              if f["id"] in v["parent_ids"]), "NOT_LINKED")}
-        for f in graph["f_modes"]]
 
     return {
         "technology_domain": domain if domain != "UNKNOWN" else "NOT ESTABLISHED",
@@ -344,26 +420,28 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             "matched_signals": detection["matched_signals"],
             "note": detection["note"],
             "label": domain_label(domain)},
-        "engineering_disciplines": tpl["disciplines"],
+        "engineering_disciplines": module["disciplines"],
         "system_architecture": {
             "description": (
                 "PROPOSED architecture (no physical system exists): "
-                + "; ".join(tpl["architecture_blocks"])),
+                + "; ".join(module["architecture_blocks"])),
             "subsystems": [
                 {"name": b, "status": "ENGINEERING_PROPOSED",
                  "detail": "NOT ESTABLISHED (requires design work)"}
-                for b in tpl["architecture_blocks"]],
+                for b in module["architecture_blocks"]],
         },
         "mechanism_architecture": {
             "physical_changes": "PROPOSED: "
-                + _shorten(((spec.get("mechanism") or {}).get("value") or {})
-                           .get("intervention", ""), 240),
+                + ((spec.get("mechanism") or {}).get("value") or {})
+                .get("intervention", ""),
             "key_physics": governing["summary"],
             "status": "MODELLED",
         },
         "design_inputs": [
             {"id": d["id"], "input": d["label"], "value": d["value"],
-             "source": d["basis"], "parent_ids": d["parent_ids"],
+             "source": d["basis"],
+             "evidence_class": d["basis"].split(" (")[0],
+             "parent_ids": d["parent_ids"],
              "evidence_refs": d["evidence_refs"]}
             for d in graph["d_inputs"]],
         "design_outputs": [
@@ -371,26 +449,44 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
              "status": "ABSENT", "missing_inputs": d["missing_inputs"],
              "parent_ids": d["parent_ids"], "basis": d["basis"]}
             for d in graph["d_outputs"]],
+        "domain_design_input_patterns": list(
+            module.get("design_input_patterns", [])),
+        "domain_design_output_patterns": list(
+            module.get("design_output_patterns", [])),
         "external_engineering_precedent": [
             {"precedent": s["standard"], "class": "EXTERNAL_PRECEDENT_CANDIDATE",
              "verify_applicability": True}
-            for s in tpl["standards_candidates"]],
+            for s in module.get("standards_candidates", [])],
         "bom": [
             {"item": m["material"], "qty": "NOT ESTABLISHED",
+             "description": "domain candidate material (no sourced spec)",
+             "material": m["material"], "supplier": "NOT ESTABLISHED",
+             "component_type": "NOT ESTABLISHED",
+             "criticality": "NOT ESTABLISHED",
+             "verification": "applicability verification required",
              "status": "ENGINEERING_PROPOSED"}
-            for m in tpl["materials_candidates"]] or
+            for m in module.get("materials_candidates", [])] or
             [{"item": "NOT ESTABLISHED (no domain materials template hit)",
               "qty": "NOT ESTABLISHED", "status": "UNKNOWN"}],
         "materials": [
             {"material": m["material"],
+             "component": "domain candidate material",
+             "candidate_material": m["material"],
+             "source": m.get("precedent", ""),
              "precedent_basis": m.get("precedent", ""),
+             "verification_required": True,
              "status": "ENGINEERING_PROPOSED",
              "verify_applicability": True}
-            for m in tpl["materials_candidates"]],
+            for m in module.get("materials_candidates", [])],
         "manufacturing": {
             "candidate_processes": [
-                {"process": p["process"], "status": p["status"]}
-                for p in tpl["manufacturing_candidates"]] or
+                {"process": p.get("process", p)
+                 if isinstance(p, dict) else str(p),
+                 "status": p.get("status", "ENGINEERING_PROPOSED")
+                 if isinstance(p, dict) else "ENGINEERING_PROPOSED",
+                 "source": "domain registry manufacturing pattern",
+                 "note": "candidate only; no process qualification exists"}
+                for p in module.get("manufacturing_patterns", [])] or
                 [{"process": "NOT ESTABLISHED", "status": "UNKNOWN"}],
             "status": "NO MANUFACTURING ANALYSIS POSSIBLE — no design exists; "
                       "processes are candidates only",
@@ -416,19 +512,17 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             "governing_model": governing,
             "critical_parameters": critical_parameters,
             "external_precedent": (
-                f"domain template {domain_label(domain)}; standards listed as "
+                f"domain module {domain_label(domain)}; standards listed as "
                 "candidates requiring applicability verification"),
             "proposed_design": {
-                "input": _shorten(problem.get("constraint", "")
-                                  or "NOT ESTABLISHED", 160),
-                "mechanism": _shorten(
-                    ((spec.get("mechanism") or {}).get("value") or {})
-                    .get("mechanism", ""), 240),
-                "transformation": _shorten(
-                    ((spec.get("mechanism") or {}).get("value") or {})
-                    .get("expected_effect", ""), 240),
+                "input": problem.get("constraint", "") or "NOT ESTABLISHED",
+                "mechanism": ((spec.get("mechanism") or {}).get("value") or {})
+                .get("mechanism", ""),
+                "transformation": ((spec.get("mechanism") or {})
+                                   .get("value") or {}).get("expected_effect", ""),
                 "output": "NOT ESTABLISHED (no measured output exists)",
-                "component_architecture": "; ".join(tpl["architecture_blocks"]),
+                "component_architecture": "; ".join(
+                    module["architecture_blocks"]),
                 "status": "MODELLED / ENGINEERING_PROPOSED"},
             "failure_modes": failure_modes_out,
             "verification": [
@@ -451,14 +545,21 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "engineering_build_plan": build_plan,
         "verification_matrix": [
             {"id": v["id"],
-             "requirement": _shorten(v["method"], 200),
+             "requirement": v["method"],
              "method": v["method"],
              "acceptance": "NOT ESTABLISHED (needs sourced threshold)",
              "result": "NOT_TESTED"}
             for v in graph["verifications"]],
         "validation_matrix": [
-            {"id": v["id"], "status": v["status"], "basis": v["basis"],
-             "reason": v["reason"]} for v in graph["validations"]],
+            {"id": v["id"],
+             "requirement": "end-use validation of verified design",
+             "method": "NOT ESTABLISHED (defined after verification passes)",
+             "acceptance": "NOT ESTABLISHED",
+             "result": "NOT_PERFORMED",
+             "status": v["status"], "basis": v["basis"],
+             "reason": v["reason"]}
+            for v in graph["validations"]],
+        "domain_validation_methods": list(module.get("validation_methods", [])),
         "design_graph": {
             "counts": graph["counts"],
             "integrity": graph["graph_integrity"],
@@ -478,7 +579,9 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             "MODELLED_fields": ["mechanism", "causal chain",
                                 "distinguishing features"],
             "ENGINEERING_PROPOSED_fields": ["architecture blocks", "materials",
-                                            "manufacturing candidates"],
+                                            "manufacturing candidates",
+                                            "domain critical parameters",
+                                            "domain candidate failure modes"],
             "UNKNOWN_fields": ["all parameter values", "all acceptance "
                               "thresholds", "all validation results"],
             "rule": "the generator may not turn a model into a fact "

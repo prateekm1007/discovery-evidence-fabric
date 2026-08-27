@@ -45,22 +45,38 @@ MECHANISM_SOURCE_SPAN: <verbatim substring from abstract supporting MECHANISM>
 
 def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
 
-def llm_chat(prompt, system="", max_retries=2, timeout=60):
+def llm_chat(prompt, system="", max_retries=2, timeout=240):
     """E1: delegate transport to the provider registry. Returns content or
     None exactly as before; _LAST_PROVIDER_META records what happened
-    (OK / PROVIDER_UNAVAILABLE / CALL_FAILED) for the provenance chain."""
+    (OK / PROVIDER_UNAVAILABLE / CALL_FAILED) for the provenance chain.
+    timeout=240: the frozen synthesis model measured 140-151 s end-to-end on
+    NVIDIA (verified live 2026-08-27); 60 s produced systematic timeouts.
+    OPERATOR OVERRIDE: ENGINE_SYNTHESIS_PROVIDER=<provider_id> pins the
+    transport to one provider with fallback forbidden — an EXPLICIT,
+    logged, meta-recorded substitution for degraded-endpoint situations
+    (never silent: the override is echoed here and travels in the
+    candidate provenance). Default remains the frozen-model policy."""
     global _LAST_PROVIDER_META
     try:
         from discovery_fabric.engine import llm_registry as reg
     except Exception as exc:  # registry import broken -> explicit, not silent
         _LAST_PROVIDER_META = {"status": "CALL_FAILED", "error": f"registry import failed: {exc}"}
         return None
-    policy = reg.SelectionPolicy(
-        preferred_providers=["openrouter", "deepseek", "anthropic", "openai",
-                             "gemini", "qwen", "nvidia"],
-        purpose="synthesis")
+    override = os.environ.get("ENGINE_SYNTHESIS_PROVIDER", "").strip()
+    if override:
+        print(f"  [synthesize] OPERATOR OVERRIDE: synthesis provider pinned "
+              f"to '{override}' (fallback forbidden; recorded in meta)")
+        policy = reg.SelectionPolicy(
+            preferred_providers=[override], max_preference_fallback=0,
+            purpose="synthesis")
+    else:
+        policy = reg.SelectionPolicy(
+            preferred_providers=["openrouter", "deepseek", "anthropic",
+                                 "openai", "gemini", "qwen", "nvidia"],
+            purpose="synthesis")
     res = reg.generate(prompt, system=system, timeout=timeout,
-                       max_retries=max_retries, policy=policy)
+                       max_retries=max_retries, policy=policy,
+                       max_tokens=1024)
     _LAST_PROVIDER_META = res.to_meta()
     _LAST_PROVIDER_META["selection_ledger"] = res.selection_ledger
     if res.ok:

@@ -47,10 +47,19 @@ CTX = {"run_id": "testrun:ebridge", "problem_id": "fixture"}
 
 
 # ---------------------------------------------------------------- E1
-def test_e1_registry_has_seven_providers():
+def test_e1_registry_has_eight_providers():
     ids = {p.provider_id for p in PROVIDER_SPECS}
     assert ids == {"openrouter", "nvidia", "anthropic", "gemini", "openai",
-                   "qwen", "deepseek"}
+                   "qwen", "deepseek", "mistral"}
+
+
+def test_e1_nvidia_hosts_frozen_synthesis_model():
+    # 2026-08-27: meta/llama-3.1-8b-instruct retired from NVIDIA catalog
+    # (HTTP 410 verified). The registered default MUST be the frozen
+    # synthesis model family — recorded explicitly, never a silent swap.
+    nv = next(p for p in PROVIDER_SPECS if p.provider_id == "nvidia")
+    assert nv.default_model == "deepseek-ai/deepseek-v4-flash-0731"
+    assert "410" in nv.policy_note  # the retirement fact is recorded
 
 
 def test_e1_no_keys_means_provider_unavailable_not_none_content(monkeypatch):
@@ -81,7 +90,7 @@ def test_e1_explicit_policy_no_silent_substitution(monkeypatch):
 
 def test_e1_availability_matrix_records_all_env_vars():
     matrix = availability_matrix()
-    assert len(matrix) == 7
+    assert len(matrix) == 8
     for m in matrix:
         assert m["env_var"].endswith("_API_KEY")
         assert isinstance(m["available"], bool)
@@ -203,9 +212,21 @@ def test_e3_design_graph_detects_orphan_verifications():
     env = _full_offline_chain("PASS")
     spec = build_invention_spec(env, CTX)
     eng = build_engineering_spec(spec, env, CTX)
-    # attack dimensions beyond the covered first FM appear as explicit gaps
-    gap_ids = [g["gap"] for g in eng["design_graph"]["gaps"]]
-    assert any(g.startswith("FM_WITHOUT_VERIFICATION") for g in gap_ids)
+    # COMPLETE structural coverage: the killer experiment is parented by
+    # EVERY recorded failure mode, so no FM is left without verification
+    graph = build_design_graph(spec, env)
+    gap_ids = [g["gap"] for g in graph["gaps"]]
+    assert not any(g.startswith("FM_WITHOUT_VERIFICATION") for g in gap_ids)
+    vf_parents = {p for v in graph["verifications"] for p in v["parent_ids"]}
+    fm_ids = {f["id"] for f in graph["f_modes"]}
+    assert fm_ids <= vf_parents
+    # the ablation direction still holds: WITHOUT a killer experiment only
+    # the falsification VF exists and orphans are recorded as explicit gaps
+    spec_nk = json.loads(json.dumps(spec))
+    spec_nk["killer_experiment"]["value"]["selected"] = "UNKNOWN"
+    graph_nk = build_design_graph(spec_nk, env)
+    gap_ids_nk = [g["gap"] for g in graph_nk["gaps"]]
+    assert any(g.startswith("FM_WITHOUT_VERIFICATION") for g in gap_ids_nk)
 
 
 # ---------------------------------------------------------------- E9
@@ -276,11 +297,21 @@ def test_e12_traceability_is_structural_with_hashes():
 
 def test_e12_maturity_basis_is_derived_and_honest():
     env, spec, eng = _package_fixture(None)
-    mb = build_maturity_basis(spec, eng, {"maturity": "EARLY_CONCEPT"})
+    mb = build_maturity_basis(spec, eng, {"maturity": "EARLY_CONCEPT"},
+                              env=env)
     assert mb["loop_verification_state"] == "NONE"
     assert mb["real_loop_verified"] is False
     assert mb["transfer_ready"] is False
-    assert "no physical prototype exists" in mb["known_blockers"]
+    # Directive 7: maturity COMPUTED from artifact state, blockers are the
+    # evaluated unsatisfied conditions of the next rung — no injected list
+    assert mb["basis"].startswith("computed")
+    assert mb["technology_maturity"] == "ENGINEERING_DEFINITION"
+    assert mb["next_rung"] == "PROTOTYPE_DESIGN_READY"
+    assert mb["known_blockers"] and all(
+        {"condition_id", "condition", "evidence"} <= set(b)
+        for b in mb["known_blockers"])
+    assert any("geometry" in b["condition"].lower()
+               for b in mb["known_blockers"])
     assert mb["counts"]["verifications_tested"] == 0
     assert mb["counts"]["validations_performed"] == 0
 
@@ -295,23 +326,34 @@ def test_e11_rehearsal_smoke_proves_all_links():
         assert proof["verdict"] == "REHEARSAL_PASS"
         assert proof["SYNTHETIC_REHEARSAL"] is True
         assert proof["REAL_LOOP_VERIFIED"] is False
-        assert len(proof["links_verified"]) >= 19
+        assert len(proof["links_verified"]) >= 31
 
 
 def test_e11_real_smoke_fails_honest_on_missing_credentials(monkeypatch):
     """Without keys, REAL mode must FAIL at SYNTHESIZE with
-    PROVIDER_UNAVAILABLE — and must NOT reach the post-RANK pipeline."""
+    PROVIDER_UNAVAILABLE — and must NOT reach the post-RANK pipeline. The
+    DISCOVERY_RELEASE still exists and is honest (Directive 2). RETRIEVE is
+    disabled and a frozen fixture evidence item is seeded so the run reaches
+    SYNTHESIZE deterministically (no network dependence); the credential
+    loader is no-op'd so live CEO keys cannot leak into this test."""
     from discovery_fabric.engine.llm_registry import PROVIDER_SPECS
     for p in PROVIDER_SPECS:
         monkeypatch.delenv(p.env_var, raising=False)
-    from tests.test_engine_integration import PROBLEM
+    import discovery_fabric.engine.adapters as A
+    monkeypatch.setattr(A, "load_credentials", lambda path=None: {})
+    from tests.test_engine_integration import PROBLEM, fixture_envelope
     with tempfile.TemporaryDirectory() as td:
         run = EngineRun(PROBLEM, td, disabled_stages=[
-            "MULTI_SOURCE_DISCOVERY", "COLLISION", "ATTACK"])
+            "RETRIEVE", "MULTI_SOURCE_DISCOVERY", "COLLISION", "ATTACK"])
+        seeded = fixture_envelope()  # post-RETRIEVE+FREEZE state, offline
+        run.env = seeded
         manifest = run.run()
         assert "PROVIDER_UNAVAILABLE" in \
             manifest["failed_stages"].get("SYNTHESIZE", "")
         assert not (Path(td) / "INVENTION_SPECIFICATION.json").exists()
+        rel = json.loads((Path(td) / "DISCOVERY_RELEASE.json").read_text())
+        assert rel["status"] == "DISCOVERY_INCOMPLETE"
+        assert rel["invention_spec_hash"] is None
 
 
 # ---------------------------------------------------------------- E13

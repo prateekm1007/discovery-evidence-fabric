@@ -5,8 +5,8 @@ exposes ONE interface:
 
     generate(prompt, system, schema, policy) -> LLMCallResult
 
-over seven providers (OpenRouter, NVIDIA, Anthropic, Gemini, OpenAI, Qwen,
-DeepSeek). The engine selects a provider by explicit policy:
+over eight providers (OpenRouter, NVIDIA, Anthropic, Gemini, OpenAI, Qwen,
+DeepSeek, Mistral). The engine selects a provider by explicit policy:
 availability -> quality tier -> cost tier -> latency tier.
 
 Constitutional contract (Art. I, IV, VI, XVIII, XXV):
@@ -84,9 +84,14 @@ PROVIDER_SPECS: List[ProviderSpec] = [
     ProviderSpec(
         "nvidia", "NVIDIA_API_KEY",
         "https://integrate.api.nvidia.com/v1/chat/completions",
-        "meta/llama-3.1-8b-instruct", "openai", 128_000,
-        quality_tier=3, cost_tier=1, latency_tier=1,
-        policy_note="legacy attack-engine primary (fast, cheap)"),
+        "deepseek-ai/deepseek-v4-flash-0731", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=1,
+        policy_note=("hosts the FROZEN synthesis model "
+                     "deepseek-ai/deepseek-v4-flash-0731 (same family as the "
+                     "a2 FROZEN_MODEL); legacy default meta/llama-3.1-8b-"
+                     "instruct was retired from the NVIDIA catalog (HTTP 410, "
+                     "verified 2026-08-27) — replacement is EXPLICIT, not "
+                     "silent, and stays on the frozen model family")),
     ProviderSpec(
         "anthropic", "ANTHROPIC_API_KEY",
         "https://api.anthropic.com/v1/messages",
@@ -117,6 +122,16 @@ PROVIDER_SPECS: List[ProviderSpec] = [
         "deepseek-chat", "openai", 128_000,
         quality_tier=2, cost_tier=1, latency_tier=2,
         policy_note="direct DeepSeek API (same family as frozen synthesis model)"),
+    ProviderSpec(
+        "mistral", "MISTRAL_API_KEY",
+        "https://api.mistral.ai/v1/chat/completions",
+        "mistral-small-latest", "openai", 128_000,
+        quality_tier=3, cost_tier=1, latency_tier=1,
+        policy_note=("mistral-large-latest timed out at 240 s on this account "
+                     "(verified 2026-08-27); default is mistral-small-latest "
+                     "(~1 s latency) — an EXPLICIT recorded tier-3 choice, "
+                     "overridable via MISTRAL_MODEL (never a silent "
+                     "substitution)")),
 ]
 
 _SPEC_BY_ID = {p.provider_id: p for p in PROVIDER_SPECS}
@@ -134,7 +149,7 @@ class SelectionPolicy:
     missing head provider is PROVIDER_UNAVAILABLE, full stop).
     """
     preferred_providers: List[str] = field(default_factory=list)
-    max_preference_fallback: int = 7
+    max_preference_fallback: int = 8
     purpose: str = "general"          # synthesis | attack | evaluation | general
 
 
@@ -254,12 +269,17 @@ def _post_json(url: str, payload: dict, headers: Dict[str, str],
 
 
 def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
-                        timeout: int) -> str:
+                        timeout: int, max_tokens: int) -> str:
     key = os.environ.get(spec.env_var, "").strip()
     data = _post_json(
         spec.url,
         {"model": spec.model_for_call(), "messages": messages,
-         "temperature": 0.0},
+         "temperature": 0.0,
+         # bounded generation: the structured FIELD-line outputs are short;
+         # an unbounded cap lets reasoning models generate for many minutes
+         # (measured 2026-08-27: wall time scales with the token cap on the
+         # NVIDIA deepseek-v4-flash endpoint)
+         "max_tokens": max_tokens},
         {"Authorization": f"Bearer {key}"}, timeout)
     if "error" in data:
         err = data["error"]
@@ -272,7 +292,7 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
 
 
 def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
-                           timeout: int) -> str:
+                           timeout: int, max_tokens: int) -> str:
     key = os.environ.get(spec.env_var, "").strip()
     system = ""
     msgs = []
@@ -283,7 +303,7 @@ def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
             msgs.append(m)
     data = _post_json(
         spec.url,
-        {"model": spec.model_for_call(), "max_tokens": 8000,
+        {"model": spec.model_for_call(), "max_tokens": max_tokens,
          "messages": msgs, **({"system": system} if system else {})},
         {"x-api-key": key, "anthropic-version": "2023-06-01"}, timeout)
     content = "".join(b.get("text", "") for b in data.get("content", []))
@@ -316,12 +336,16 @@ def generate(prompt: str, system: str = "",
              schema: Optional[List[str]] = None,
              evidence: Optional[List[Dict[str, Any]]] = None,
              policy: Optional[SelectionPolicy] = None,
-             timeout: int = 90, max_retries: int = 2) -> LLMCallResult:
+             timeout: int = 240, max_retries: int = 2,
+             max_tokens: int = 512) -> LLMCallResult:
     """CEO E1 single entry point:
     generate(prompt, evidence, schema) -> structured candidate.
     `evidence` items (already-custodied evidence dicts) are appended to the
     prompt as clearly delimited context; the registry never treats model
-    output as evidence (Art. XVIII)."""
+    output as evidence (Art. XVIII).
+    max_tokens=512 default: the FIELD-line output protocol needs ~150-250
+    tokens; a larger cap multiplies wall time on reasoning endpoints without
+    improving output quality (measured 2026-08-27)."""
     spec, ledger = select_provider(policy)
     if spec is None:
         return LLMCallResult(
@@ -346,9 +370,11 @@ def generate(prompt: str, system: str = "",
         t0 = time.time()
         try:
             if spec.flavor == "anthropic":
-                content = _call_anthropic_flavor(spec, messages, timeout)
+                content = _call_anthropic_flavor(spec, messages, timeout,
+                                                 max_tokens)
             else:
-                content = _call_openai_flavor(spec, messages, timeout)
+                content = _call_openai_flavor(spec, messages, timeout,
+                                              max_tokens)
             return LLMCallResult(
                 status=ST_OK, content=content,
                 provider_id=spec.provider_id, model=spec.model_for_call(),

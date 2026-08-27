@@ -68,6 +68,21 @@ def fixture_envelope(attack_overall="PASS"):
     }
     env.evidence = [ev]
     env.evidence_ids = [ev["id"]]
+    # the fixture represents an envelope that already passed RETRIEVE+FREEZE:
+    # record the custody snapshot the EvidenceFreezeAdapter would have written
+    freeze_snapshot = {
+        "run_id": "testrun:fixture",
+        "problem_id": "fixture",
+        "frozen_at": "2026-01-01T00:00:00Z",
+        "evidence_count": 1,
+        "custody_records": [{
+            "record_id": ev["id"], "content_hash": ev["content_hash"],
+            "source": ev["source"], "evidence_class": "SCIENTIFIC_ABSTRACT"}],
+        "hash_verification_all_pass": True,
+        "_fixture_epistemic_class": "SYNTHETIC_TEST_ONLY",
+    }
+    freeze_snapshot["snapshot_hash"] = sha256_obj(freeze_snapshot)
+    env.provenance = {"evidence_freeze": freeze_snapshot}
     raw = {
         "candidate_id": "cand:FIXTURE",
         "falsification_test": (

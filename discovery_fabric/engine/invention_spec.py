@@ -134,7 +134,8 @@ def build_invention_spec(env: Candidate, run_ctx: Dict[str, Any]) -> Dict[str, A
 
     spec["invention_id"] = tagged(
         invention_id, "COMPUTED", "INVENTION_SPEC",
-        note="deterministic id inv:<problem_id>:<final envelope hash[:12]>")
+        note="deterministic id inv:<problem_id>:<final envelope hash, "
+             "first 12 chars>")
 
     spec["problem"] = tagged(
         {"problem_id": env.problem_id,
@@ -199,10 +200,11 @@ def build_invention_spec(env: Candidate, run_ctx: Dict[str, Any]) -> Dict[str, A
          "nearest": (env.collision_results or {}).get("nearest_prior_art", []),
          "queries": (env.collision_results or {}).get("patent", {}).get("queries", []),
          "scientific": ((env.prior_art or {}).get("scientific_report") or {})
-                       .get("results", [])[:5]},
+                       .get("results", [])},
         "COMPUTED", "COLLISION",
         note="search RESULTS with source errors preserved as UNRESOLVED, "
-             "never converted to absence (Art. XXV)")
+             "never converted to absence (Art. XXV); FULL result list "
+             "preserved (no truncation, Directive 6)")
 
     spec["distinguishing_features"] = tagged(
         {"intervention": mm.get("intervention", ""),
