@@ -1,0 +1,92 @@
+{
+  "atom_collection_type": "NEGATIVE_LEARNING_KNOWLEDGE_ATOMS",
+  "generated_at": "2026-08-27T09:41:46Z",
+  "principle": "The first time the AI discovers that its own previous conclusion was wrong, that event becomes a first-class Knowledge Atom. This is the beginning of the genuinely defensible end-to-end AI discovery -> engineering -> transfer -> reality -> learning loop.",
+  "atoms": [
+    {
+      "atom_id": "NA-001",
+      "atom_type": "FACTUAL_CORRECTION",
+      "what_the_AI_believed_before": "Catheter obstruction causes 30-50% of shunt failures (stated in P-01 and P-07 dossiers as established fact via HCUP/AHRQ)",
+      "what_external_evidence_showed": "The 30-50% figure conflates total shunt-failure incidence (40-50% at 1-2 years) with the fraction attributable to obstruction (~23% adult, ~31% pediatric per PubMed 37004137)",
+      "what_the_AI_believes_now": "Obstruction accounts for approximately 23% (adult systematic review, N=38095) to 31% (pediatric) of shunt failures. The problem is still real and significant, but the magnitude was overstated by ~30-100%.",
+      "evidence_sources": [
+        "PubMed 37004137 (adult systematic review)",
+        "PubMed 42490332 (imaging review)"
+      ],
+      "belief_delta": "DECREASED confidence in the 30-50% figure; CORRECTED to 23-31% with proper citations",
+      "affected_packages": [
+        "P-01",
+        "P-07"
+      ],
+      "package_v2_trigger": "YES — factual correction required in next dossier version",
+      "learning_event_class": "AI_WAS_WRONG_ABOUT_A_FACT",
+      "significance": "This is the first time the AI has formally acknowledged that a factual claim in its own dossiers was incorrect. This event is preserved as a first-class Knowledge Atom so future discovery rounds can learn from it."
+    },
+    {
+      "atom_id": "NA-002",
+      "atom_type": "REGULATORY_OVERSTATEMENT",
+      "what_the_AI_believed_before": "P-27-R1 (pressure sensor) could be classified as an 'Active Implant' requiring Class III PMA (this was the consultant's assertion, which the AI initially did not challenge)",
+      "what_external_evidence_showed": "'Active Implant' is ISO 14708-1 terminology, NOT an FDA classification. GWM (ICP monitors) is Class II/510(k). Implantable ICP sensors (Codman, Raumedic) have 510(k) precedent.",
+      "what_the_AI_believes_now": "P-27-R1 regulatory pathway is UNDETERMINED — not 'almost certain PMA.' Predicate analysis against existing implantable ICP sensors is required. The AI should not have accepted the consultant's regulatory assertion without independent verification.",
+      "evidence_sources": [
+        "FDA GWM classification (Class II/510(k))",
+        "FDA JXG classification (Class II/510(k))",
+        "510(k) K161853 (Miethke)",
+        "510(k) K231664 (IRRAflow, 2023)"
+      ],
+      "belief_delta": "CORRECTED — regulatory pathway is UNDETERMINED, not PMA",
+      "affected_packages": [
+        "P-27-R1"
+      ],
+      "package_v2_trigger": "YES — regulatory classification correction required",
+      "learning_event_class": "AI_ACCEPTED_AN_UNSUPPORTED_CONSULTANT_CLAIM",
+      "significance": "The AI initially accepted the consultant's 'Active Implant' classification without independent verification. The CEO audit caught this. The AI must apply the same evidence-skepticism to external claims as it applies to internal claims."
+    },
+    {
+      "atom_id": "NA-003",
+      "atom_type": "UNIT_ERROR_NON_DETECTION",
+      "what_the_AI_believed_before": "P-16 power target is >=500 mW (stated in dossier without question)",
+      "what_external_evidence_showed": "500 mW is physically impossible at the stated irradiance (~1 mW/cm2) and catheter-scale PV area. It would require ~1667 cm2 of PV area.",
+      "what_the_AI_believes_now": "500 mW is a LIKELY UNIT ERROR. The correct value is NOT ESTABLISHED — 500 microW is a hypothesis but must be verified from the original source. The AI failed to catch this unit error during its own R370S/R370T/R370U audits.",
+      "evidence_sources": [
+        "PMC5646820 (GaAs PV efficiency ~30%)",
+        "Dimensional analysis: 500mW / (1mW/cm2 * 30%) = 1667 cm2"
+      ],
+      "belief_delta": "DECREASED confidence in the stated power target; mechanism itself still supported",
+      "affected_packages": [
+        "P-16"
+      ],
+      "package_v2_trigger": "YES — unit error correction (pending source verification, NOT auto-replacement)",
+      "learning_event_class": "AI_FAILED_TO_CATCH_A_UNIT_ERROR",
+      "significance": "The AI's own audits (R370S/R370T/R370U) did not catch the 500 mW unit error. The external consultant caught it. This demonstrates the value of external review and the AI's need for dimensional analysis in future audits."
+    },
+    {
+      "atom_id": "NA-004",
+      "atom_type": "TERMINOLOGY_ERROR_NON_DETECTION",
+      "what_the_AI_believed_before": "P-13 (canonical) is described as 'Neuromorphic Shunt Failure Predictor' in the dossier",
+      "what_external_evidence_showed": "The proposed architecture is gradient boosting — a standard ensemble ML method. 'Neuromorphic' refers to spike-based processing hardware (Intel Loihi, IBM TrueNorth), which is not described in the dossier.",
+      "what_the_AI_believes_now": "The 'Neuromorphic' label is inaccurate and would be immediately challenged by technical buyers. The AI should have caught this terminology error during dossier generation.",
+      "evidence_sources": [
+        "ML terminology (gradient boosting vs neuromorphic hardware)"
+      ],
+      "belief_delta": "DECREASED confidence in the technology's positioning; terminology correction required",
+      "affected_packages": [
+        "P-13"
+      ],
+      "package_v2_trigger": "YES — rename from 'Neuromorphic' to 'ML-based' or 'Gradient Boosting'",
+      "learning_event_class": "AI_USED_INACCURATE_TERMINOLOGY",
+      "significance": "The AI used a technically inaccurate label ('Neuromorphic') for a gradient boosting model. This would damage credibility with technical buyers. The AI must verify terminology accuracy in future dossier generation."
+    }
+  ],
+  "summary": {
+    "total_negative_learning_atoms": 4,
+    "atoms_by_type": {
+      "FACTUAL_CORRECTION": 1,
+      "REGULATORY_OVERSTATEMENT": 1,
+      "UNIT_ERROR_NON_DETECTION": 1,
+      "TERMINOLOGY_ERROR_NON_DETECTION": 1
+    },
+    "key_principle": "These atoms represent the first time the AI has formally acknowledged errors in its own work. They are preserved as first-class knowledge so future discovery rounds can learn from them. The AI does not hide negative learning — it makes it explicit and actionable.",
+    "ai_loop_significance": "This is the beginning of the genuinely defensible end-to-end AI discovery -> engineering -> transfer -> reality -> learning loop. The AI can now demonstrate that external challenge changes what it believes."
+  }
+}

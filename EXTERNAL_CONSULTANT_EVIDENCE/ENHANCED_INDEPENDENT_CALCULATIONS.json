@@ -1,0 +1,209 @@
+{
+  "calculation_type": "ENHANCED_INDEPENDENT_CALCULATIONS",
+  "generated_at": "2026-08-27T09:41:46Z",
+  "principle": "Separate arithmetic from conclusion. Arithmetic can be confirmed while conclusion is contested.",
+  "calculations": {
+    "P-01": {
+      "calculation_id": "IC-001",
+      "package": "P-01",
+      "topic": "svMultiPhysics 16% model error",
+      "consultant_arithmetic": {
+        "claimed_error": "16% (1D model verification)",
+        "source": "dossier text",
+        "arithmetic_verified": true
+      },
+      "consultant_assumptions": {
+        "error_metric": "NOT SPECIFIED (relative to what?)",
+        "validation_variable": "NOT SPECIFIED",
+        "reference_experiment": "NOT SPECIFIED",
+        "sample_count": "NOT SPECIFIED",
+        "operating_range": "NOT SPECIFIED",
+        "confidence_interval": "NOT SPECIFIED"
+      },
+      "independent_conclusion": {
+        "arithmetic_status": "CONFIRMED (16% is stated in dossier)",
+        "conclusion_status": "UNDERCONTEXTUALIZED",
+        "correct_conclusion": "16% model error is noted but cannot be used as evidence against the technology without specifying: validation variable, reference experiment, N, error metric, operating range, and decision sensitivity. A model can have 16% error on one variable and still be useful for another decision.",
+        "kill_condition_triggered": null,
+        "feasibility_risk": "UNKNOWN — requires error characterization"
+      },
+      "evidence_status": "PARTIALLY_CONFIRMED"
+    },
+    "P-15-R1": {
+      "calculation_id": "IC-002",
+      "package": "P-15-R1",
+      "topic": "PVDF piezoelectric power budget",
+      "consultant_arithmetic": {
+        "claimed_power": "25.6 nW for 0.5 cm3 PVDF at 50 microstrain",
+        "power_density": "51.3 microW/cm3",
+        "stress": "100 kPa (derived from 50 microstrain * PVDF modulus)",
+        "kill_threshold": "100 nW",
+        "arithmetic_verified": true
+      },
+      "consultant_assumptions": {
+        "strain": "50 microstrain — ESTIMATED, not independently sourced",
+        "pvdf_d33": "33 pC/N — published, confirmed",
+        "pvdf_g33": "0.24 Vm/N — published, confirmed",
+        "pvdf_epsilon_r": "12 — published, confirmed",
+        "volume": "0.5 cm3 — assumed",
+        "frequency": "NOT SPECIFIED (CSF pulsation frequency)",
+        "electrical_load": "NOT SPECIFIED (matched load assumed)",
+        "coupling_efficiency": "NOT SPECIFIED",
+        "rectification_efficiency": "NOT SPECIFIED"
+      },
+      "independent_conclusion": {
+        "arithmetic_status": "PLAUSIBLE — calculation is arithmetically consistent with stated inputs",
+        "conclusion_status": "NOT_INDEPENDENTLY_REPRODUCIBLE — key input (50 microstrain) is unsourced",
+        "correct_conclusion": "The PVDF power calculation raises a serious feasibility concern. At the assumed strain level (50 microstrain), the calculated power (25.6 nW) is below the kill threshold (100 nW). However, the strain estimate is not independently sourced. If actual in-vivo catheter-wall strain is >200 microstrain, the calculation changes significantly.",
+        "kill_condition_triggered": "NOT_CONFIRMED — hypothesis pending strain measurement",
+        "feasibility_risk": "HIGH — requires empirical strain measurement before kill-condition determination"
+      },
+      "evidence_status": "PARTIALLY_CONFIRMED",
+      "belief_change": {
+        "prior": "P-15-R1 is a promising energy-harvesting concept",
+        "external_evidence": "Power feasibility seriously questioned by independent calculation",
+        "posterior": "P-15-R1 is HIGH_RISK_VALIDATION — power budget is marginal at assumed strain levels",
+        "belief_delta": "DECREASED confidence in feasibility"
+      }
+    },
+    "P-16": {
+      "calculation_id": "IC-003",
+      "package": "P-16",
+      "topic": "NIR PV power target unit error",
+      "consultant_arithmetic": {
+        "claimed_target": ">=500 mW",
+        "incident_irradiance": "~1-1.4 mW/cm2",
+        "pv_efficiency": "~30% (GaAs, PMC5646820)",
+        "area_for_500mW": "500 mW / (1 mW/cm2 * 30%) = 1667 cm2 — physically impossible",
+        "area_for_500microW": "500 microW / (1 mW/cm2 * 30%) = 1.67 cm2 — plausible",
+        "arithmetic_verified": true
+      },
+      "consultant_assumptions": {
+        "irradiance": "from dossier (~1 mW/cm2)",
+        "efficiency": "from PMC5646820 (~30% for GaAs)",
+        "area_calculation": "P / (irradiance * efficiency) — correct dimensional analysis"
+      },
+      "independent_conclusion": {
+        "arithmetic_status": "CONFIRMED — 500 mW is physically impossible at stated irradiance and PV scale",
+        "conclusion_status": "UNIT_ERROR_CONFIRMED — but 500 microW is a HYPOTHESIS, not established",
+        "correct_conclusion": "500 mW = UNSUPPORTED / LIKELY UNIT ERROR. 500 microW = UNCONFIRMED HYPOTHESIS. The AI must NOT silently replace 500mW with 500microW. The correct value must be verified from the original dossier source.",
+        "kill_condition_triggered": null,
+        "feasibility_risk": "LOW for the mechanism (NIR PV is supported by PMC5646820); HIGH for the specific target (needs source verification)"
+      },
+      "evidence_status": "PARTIALLY_CONFIRMED",
+      "belief_change": {
+        "prior": "P-16 power target is >=500 mW",
+        "external_evidence": "500 mW is physically impossible; likely unit error",
+        "posterior": "P-16 power target is UNKNOWN pending source verification. 500 microW is a hypothesis.",
+        "belief_delta": "DECREASED confidence in the stated power target; mechanism itself still supported"
+      }
+    },
+    "P-21-R1": {
+      "calculation_id": "IC-004",
+      "package": "P-21-R1",
+      "topic": "UWB TOA accuracy vs SAR constraint",
+      "consultant_arithmetic": {
+        "formula": "sigma_TOA >= c / (2*pi*beta*sqrt(2*SNR)) — Cramer-Rao Lower Bound",
+        "beta": "500 MHz",
+        "SNR": "10 dB (10x linear)",
+        "GDOP": "2",
+        "sigma_TOA_result": "21.4 mm — VERIFIED",
+        "position_error_result": "42.7 mm — VERIFIED",
+        "required_SNR_for_5mm": "28.6 dB",
+        "arithmetic_verified": true
+      },
+      "consultant_assumptions": {
+        "bandwidth": "500 MHz — assumed, not independently justified",
+        "SNR": "10 dB — assumed, not independently derived",
+        "GDOP": "2 — assumed geometry",
+        "tissue_attenuation": "60-80 dB at 5-10 GHz through 5+ cm — claimed but not sourced",
+        "SAR_limit": "1.6 W/kg — referenced but not linked to specific transmit power"
+      },
+      "independent_conclusion": {
+        "arithmetic_status": "CONFIRMED — CRLB formula is correct and arithmetic is reproducible",
+        "conclusion_status": "ASSUMPTION_DEPENDENT — SNR=10dB is the critical unverified input",
+        "correct_conclusion": "The CRLB calculation challenges the present design assumptions. At SNR=10dB, position error is 42.7mm, exceeding the 5mm clinical target. However, the SNR assumption is not independently derived. A complete link budget with sourced tissue attenuation, SAR-constrained transmit power, receiver noise figure, and processing gain is required before concluding physical impossibility.",
+        "kill_condition_triggered": "NOT_CONFIRMED — hypothesis pending complete link budget",
+        "feasibility_risk": "HIGH — requires link budget analysis at tissue depths >3cm"
+      },
+      "evidence_status": "PARTIALLY_CONFIRMED",
+      "belief_change": {
+        "prior": "P-21-R1 can achieve clinically useful accuracy (<5mm) under SAR constraint",
+        "external_evidence": "CRLB calculation shows 42.7mm at assumed SNR — far above 5mm target",
+        "posterior": "P-21-R1 accuracy is HIGH_RISK — may not achieve clinical target at useful tissue depths",
+        "belief_delta": "DECREASED confidence in accuracy achievability"
+      }
+    },
+    "P-28": {
+      "calculation_id": "IC-005",
+      "package": "P-28",
+      "topic": "Acoustic impedance contrast for tissue obstruction",
+      "consultant_arithmetic": {
+        "Z_CSF": "1.52 MRayl — published",
+        "Z_brain": "1.58 MRayl — published",
+        "Z_debris": "~1.63 MRayl — estimated",
+        "ratio_brain_to_CSF": "1.039 — VERIFIED",
+        "ratio_debris_to_CSF": "1.072 — VERIFIED",
+        "kill_threshold": "1.1",
+        "reflection_coefficient_brain": "R = (1.58-1.52)/(1.58+1.52) = 0.019 = 1.9%",
+        "reflection_coefficient_debris": "R = (1.63-1.52)/(1.63+1.52) = 0.035 = 3.5%",
+        "arithmetic_verified": true
+      },
+      "consultant_assumptions": {
+        "impedance_values": "from published acoustic literature — confirmed",
+        "kill_threshold_definition": "Z ratio < 1.1 — assumed to be the dossier's kill criterion (NOT VERIFIED)",
+        "detection_model": "simplified to impedance ratio only"
+      },
+      "independent_conclusion": {
+        "arithmetic_status": "CONFIRMED — impedance values and ratios are correct",
+        "conclusion_status": "CONCLUSION_TOO_STRONG — impedance ratio alone does not determine detectability",
+        "correct_conclusion": "The impedance contrast for tissue/CSF (1.039-1.072) is low, resulting in reflection coefficients of 1.9-3.5%. This is a serious feasibility concern for tissue obstruction detection. However, detectability also depends on frequency, transducer geometry, coupling, scattering, attenuation, signal processing, clutter, and obstruction morphology. The dossier's actual kill condition may not be defined solely by impedance ratio. The correct framing is: 'The current simplified model provides insufficient contrast evidence; a frequency-dependent phantom experiment is required.' NOT 'kill condition triggered.'",
+        "kill_condition_triggered": "NOT_CONFIRMED — requires the dossier's actual detection model",
+        "feasibility_risk": "HIGH for tissue obstruction; LOW-MEDIUM for air/calcified obstruction"
+      },
+      "evidence_status": "PARTIALLY_CONFIRMED",
+      "belief_change": {
+        "prior": "P-28 can detect obstruction via acoustic contrast",
+        "external_evidence": "Tissue/CSF impedance contrast is very low (1.9-3.5% reflection)",
+        "posterior": "P-28 tissue obstruction detection is HIGH_RISK — may only work for air/calcified obstruction",
+        "belief_delta": "DECREASED confidence in tissue obstruction detection; application scope may narrow"
+      }
+    },
+    "P-29": {
+      "calculation_id": "IC-006",
+      "package": "P-29",
+      "topic": "MR SNR at catheter scale",
+      "consultant_arithmetic": {
+        "formula": "SNR proportional to B0 * sqrt(V_voxel) — first-order scaling",
+        "B0_catheter": "0.5T",
+        "B0_clinical": "3T",
+        "V_catheter": "62.8 mm3 (pi * 1mm^2 * 20mm)",
+        "V_clinical": "1000 mm3 (1 cm3)",
+        "SNR_ratio": "0.167 * 0.251 = 0.042 — VERIFIED",
+        "SNR_catheter": "0.042 * 100 = 4.2 — VERIFIED (given assumed clinical SNR of 100)",
+        "SNR_at_1T": "8.4 — VERIFIED",
+        "B0_for_SNR_10": "~1.2T — VERIFIED",
+        "arithmetic_verified": true
+      },
+      "consultant_assumptions": {
+        "clinical_SNR_reference": "~100 — assumed, not independently sourced",
+        "scaling_formula": "first-order approximation (SNR ∝ B0 * sqrt(V))",
+        "voxel_geometry": "cylindrical, 2mm diameter x 20mm length"
+      },
+      "independent_conclusion": {
+        "arithmetic_status": "CONFIRMED — scaling relationship and arithmetic are correct",
+        "conclusion_status": "SIMPLIFIED_MODEL — ignores multiple material parameters",
+        "correct_conclusion": "The simplified SNR model indicates significant feasibility risk: SNR ~4.2 at 0.5T and ~8.4 at 1.0T, both below the kill threshold of 10. However, the model ignores receive-coil geometry, filling factor, Q factor, sequence, bandwidth, relaxation, flow-encoding parameters, gradient strength, reconstruction, susceptibility, catheter material, and actual measurement voxel. The correct framing is: 'HIGH FEASIBILITY RISK — empirical benchtop SNR experiment required.' NOT 'kill condition triggered.'",
+        "kill_condition_triggered": "NOT_CONFIRMED — simplified model only",
+        "feasibility_risk": "HIGH — requires empirical SNR test at 0.5T and 1.0T"
+      },
+      "evidence_status": "PARTIALLY_CONFIRMED",
+      "belief_change": {
+        "prior": "P-29 can achieve SNR > 10 at catheter scale",
+        "external_evidence": "Simplified SNR model shows 4.2-8.4 at practical B0 values",
+        "posterior": "P-29 SNR is HIGH_RISK — may be physically blocked at catheter scale",
+        "belief_delta": "DECREASED confidence in catheter-scale feasibility; external-sensor repositioning may be required"
+      }
+    }
+  }
+}
