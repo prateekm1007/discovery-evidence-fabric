@@ -1,0 +1,171 @@
+{
+  "record_type": "ROUND200_R199_C4_KILLER_EXPERIMENT_PREREGISTRATION_V1",
+  "version": "1.0.0",
+  "date": "2026-08-24",
+  "round": 200,
+  "authority": "CTO Round 200 directive: pre-register the R199-C4 killer experiment per EXPERIMENT_VALIDITY_GATE_V1 (Article XXXVI).",
+  "constitutional_basis": [
+    "Article I — evidence precedes assertion",
+    "Article VII — never weaken the verifier to rescue a claim",
+    "Article XIX — never optimize for the gate",
+    "Article XXVII — no threshold invention",
+    "Article XXVIII — no silent semantic promotion",
+    "Article XXIX — separate implementation failure from mechanism failure",
+    "Article XXXVI — Experiment Validity Gate (7 conditions)",
+    "Article XXXVII — Future-Novelty Test (ratified this round)"
+  ],
+  "the_experiment": {
+    "name": "R199-C4 Model Failure Recognition Test",
+    "the_killer_question": "When an unmodeled physiological transition occurs, does the controller DECLARE MODEL FAILURE and switch to safe policy, or does it continue optimizing confidently?",
+    "the_falsifier": "If the candidate continues optimizing confidently (does not declare failure within 6h in >= 80% of transitions), the candidate is KILLED.",
+    "the_baseline_failure_mode": "The iLet-style continuous learner has NO model-failure declaration mechanism. By construction, it FAILS this test."
+  },
+  "the_seven_conditions": {
+    "1_PRE_REGISTRATION_VALID": {
+      "pre_registration_file": "ROUND200_R199_C4_KILLER_EXPERIMENT_PREREGISTRATION_V1.json",
+      "hash_pin": "<to be computed after commit>",
+      "commit_before_execution": true,
+      "execution_round": "Round 201 (not this round)"
+    },
+    "2_IMPLEMENTATION_MATCHES_PROTOCOL": {
+      "the_candidate_algorithm": {
+        "name": "Model-Failure-Aware Self-Re-identifying Therapeutic Controller (MFASRTC)",
+        "architecture": "MPC with internal patient model + prediction-error monitor + discrete model-failure declaration threshold + automatic system re-identification + safe fallback policy bank",
+        "the_five_steps": [
+          "1. PREDICT: at each control step, predict patient response to next intervention using internal model",
+          "2. OBSERVE: execute intervention, observe actual response",
+          "3. COMPARE: compute prediction error (residual) and its autocorrelation over a sliding window",
+          "4. DECLARE: if prediction error exceeds threshold for >= K consecutive steps OR autocorrelation signature matches model-plant mismatch pattern, DECLARE MODEL FAILURE (discrete event)",
+          "5. RE-IDENTIFY + SWITCH: switch to safe fallback policy (conservative drainage rate); begin online re-identification of patient model from post-failure observations; when new model converges, switch back to MPC with new model"
+        ],
+        "the_safe_fallback_policy": "Conservative drainage at 50% of nominal rate, with ICP limit at 25 mmHg (clinically safe).",
+        "the_reidentification_method": "Recursive least squares with forgetting factor 0.95 on patient model parameters. Convergence criterion: posterior covariance < threshold.",
+        "inputs": [
+          "ICP (continuous)",
+          "CSF flow",
+          "valve position",
+          "posture",
+          "predicted response",
+          "observed response"
+        ],
+        "outputs": [
+          "valve command",
+          "model_failure_flag (boolean)",
+          "reidentification_active_flag (boolean)",
+          "current_policy_id"
+        ]
+      },
+      "the_baseline_algorithm": {
+        "name": "iLet-style Continuous Learning Controller",
+        "architecture": "Adaptive MPC with online gradient descent on patient model parameters. NO discrete model-failure declaration. NO safe fallback policy switching. Keeps learning within envelope.",
+        "inputs": "SAME as candidate",
+        "outputs": [
+          "valve command"
+        ],
+        "learning_rate": 0.01,
+        "calibration_target": "Matches published iLet adaptation speed (24-48 hour convergence)"
+      },
+      "the_implementation_rule": "The candidate must implement ALL FIVE STEPS. No skipping the discrete declaration step. No replacing it with continuous uncertainty (that is H6, not R199-C4)."
+    },
+    "3_BASELINE_FAIR": {
+      "baseline_source": "Beta Bionics iLet (FDA-cleared) + Medtronic BrainSense aDBS + published adaptive MPC literature",
+      "baseline_parameters_pre_registered": true,
+      "baseline_reproduction_fidelity": "Adaptation speed must match published iLet performance (24-48 hour convergence).",
+      "no_silent_weakening": "Baseline must have SAME actuator capabilities and SAME sensor stream.",
+      "the_asymmetry_documentation": "The candidate's asymmetry is the DISCRETE MODEL-FAILURE DECLARATION + AUTO-REIDENTIFICATION + SAFE POLICY SWITCHING. This is the invention. By design."
+    },
+    "4_NO_DATA_LEAKAGE": {
+      "candidate_and_baseline_receive_same_sensor_stream": true,
+      "train_test_split": "60/40. Training: no transitions. Test: transitions at randomized times.",
+      "transition_injection": "Test patients undergo an UNMODELED transition at a randomized time (uniform between hour 48 and hour 168). Transition types: (a) compartment compliance drops 30%, (b) valve hysteresis emerges (5 mmHg deadband), (c) inflammatory cascade begins (CSF production +20%), (d) tissue compliance shifts (P-V index drops 15%).",
+      "no_cherry_picking": "All test patients included. No exclusion of failure cases."
+    },
+    "5_THRESHOLDS_FROZEN": {
+      "WIN_threshold": {
+        "detection_rate": "candidate declares model failure within 6 hours of transition in >= 80% of transitions",
+        "false_positive_rate": "candidate declares failure when no transition occurred in < 10% of transition-free windows",
+        "safe_switch_rate": "candidate switches to safe fallback policy within 1 hour of declaration in >= 95% of cases",
+        "reidentification_rate": "candidate begins re-identification within 1 hour of declaration in >= 95% of cases",
+        "provenance": "CLINICAL + ENGINEERING — 6-hour detection window is clinically meaningful. 10% FPR is standard alarm threshold."
+      },
+      "KILL_threshold": {
+        "detection_rate": "candidate declares failure in < 30% of transitions",
+        "OR_false_positive_rate": "> 40% (excessive false alarms = clinically unusable)",
+        "provenance": "MODEL_DERIVED — < 30% detection is not significantly better than baseline (0% by construction)."
+      },
+      "MMD_threshold": {
+        "metric": "Distributional shift between predicted and observed responses",
+        "value": "MMD > 0.3 triggers declaration (pre-registered)",
+        "provenance": "ENGINEERING — standard MMD threshold"
+      },
+      "no_threshold_changes_after_execution": true
+    },
+    "6_MODEL_SPECIFICATION_FROZEN": {
+      "candidate_hyperparameters": {
+        "mpc_horizon_steps": 12,
+        "mpc_control_interval_minutes": 15,
+        "prediction_error_window_K": 4,
+        "declaration_threshold_mmd": 0.3,
+        "declaration_threshold_residual_std": 2.5,
+        "safe_fallback_drainage_rate_fraction": 0.5,
+        "safe_fallback_icp_limit_mmhg": 25,
+        "rls_forgetting_factor": 0.95,
+        "reidentification_convergence_covariance_threshold": 0.01
+      },
+      "baseline_hyperparameters": {
+        "learning_rate": 0.01,
+        "mpc_horizon_steps": 12,
+        "mpc_control_interval_minutes": 15,
+        "adaptation_method": "online gradient descent",
+        "envelope_constraints": "matched to candidate's safe fallback limits (fair comparison)"
+      },
+      "no_post_hoc_tuning": "All hyperparameters frozen."
+    },
+    "7_RANDOM_SEED_COHORT_PROVENANCE_COMPLETE": {
+      "random_seed": 42,
+      "cohort_generation_script": "scripts/r201_c4_cohort_generator.py (to be written in Round 201)",
+      "cohort_size": 100,
+      "transition_types": [
+        "compartment_compliance_drop",
+        "valve_hysteresis_emergence",
+        "inflammatory_cascade",
+        "tissue_compliance_shift"
+      ],
+      "transition_time_distribution": "uniform(48h, 168h) per patient",
+      "train_test_split": "60/40 (60 training with NO transitions, 40 testing WITH transitions)",
+      "single_run_only": "Multiple runs require V2 pre-registration"
+    }
+  },
+  "the_validity_check_function": {
+    "pseudocode": "function check_experiment_validity(experiment_id):\n    conditions = [check_all_7_conditions(experiment_id)]\n    if all(conditions):\n        return 'VALIDATED_POSITIVE' or 'VALIDATED_NEGATIVE'\n    else:\n        return 'EXPERIMENT_INVALID'"
+  },
+  "the_four_epistemic_states_overlay": {
+    "VALIDATED_POSITIVE": "All 7 conditions pass AND detection rate >= 80% AND FPR < 10%. Candidate advances to Level 4 (WORLD_CLASS_REVIEW).",
+    "VALIDATED_NEGATIVE": "All 7 conditions pass AND detection rate < 30%. Candidate is KILLED.",
+    "EXPERIMENT_INVALID": "Any of 7 conditions fail. Candidate state UNCHANGED.",
+    "INFRASTRUCTURE_BLOCKED": "Simulation environment cannot execute. Candidate state UNCHANGED."
+  },
+  "the_killer_experiment_rationale": {
+    "why_this_experiment_is_discriminating": "Directly tests the candidate's core architectural claim: DISCRETE model-failure declaration + AUTO-reidentification + SAFE policy switching is superior to continuous learning. Baseline FAILS BY CONSTRUCTION. The question is whether the candidate can DETECT the transition.",
+    "the_predicted_outcome_if_candidate_is_real": "Detection rate 80-95%, FPR 5-10%.",
+    "the_predicted_outcome_if_candidate_is_semantic_relabeling": "Detection rate < 30%. KILL.",
+    "the_asymmetry_test": "The asymmetry is the DISCRETE DECLARATION + AUTO-REIDENTIFICATION + SAFE SWITCH."
+  },
+  "the_h6_overlap_mitigation": {
+    "the_concern": "H6 and R199-C4 are conceptually adjacent. Portfolio must avoid double-counting.",
+    "the_distinction": "H6 = pre-action uncertainty quantification. R199-C4 = post-action model validation + re-identification + safe switch. The killer experiment tests R199-C4's POST-ACTION mechanism.",
+    "the_portfolio_rule": "If both survive their killer experiments, both may be promoted. But dossiers must state which covers which decision. No double-counting."
+  },
+  "honest_disclosure": {
+    "what_this_pre_registration_does": "Specifies all 7 validity conditions before execution.",
+    "what_this_pre_registration_does_NOT_do": "Does not guarantee the experiment is correct.",
+    "the_simulator_risk": "Transition injection is synthetic. Mitigation: transitions based on published physiological failure modes.",
+    "the_baseline_risk": "iLet baseline FAILS BY CONSTRUCTION. This is a feature — confirms candidate's architecture is non-trivial.",
+    "execution_status": "PRE-REGISTERED, NOT EXECUTED. Execution is Round 201."
+  },
+  "state": {
+    "r199_c4_pre_registration_status": "COMPLETE",
+    "execution_round": "201",
+    "next_action": "Round 201: write cohort generator script, execute killer experiment, report results."
+  }
+}
