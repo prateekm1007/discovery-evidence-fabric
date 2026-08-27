@@ -108,6 +108,70 @@ def step_5_data_rooms(canonical):
     return results
 
 
+def step_5c_r370c_factual_integrity():
+    """Step 5c — R370C Factual Integrity hardening.
+
+    Runs the R370C pipeline:
+      1. Apply factual fixes (ISO 7437 → ISO 7197, unsupported tolerances → UNKNOWN,
+         generic evidence → UNKNOWN, criterion_type added to all V&V entries,
+         engineering_artifact_status + transfer_manifest added).
+      2. Save Engineering Number Register (49 numbers with full provenance).
+      3. Save Engineering Standard Register (29 standards, 28 verified + 1 known error).
+      4. Run Technical Factuality Gate (10 checks × 15 packages = 150 checks).
+      5. Run strengthened adversarial QA (12 attacks, target 12/12 detected).
+
+    Constitution: Articles I, II, VI, XXVII, XXVIII, XXX.
+    """
+    _log("STEP 5c — R370C Factual Integrity hardening...")
+
+    # 1. Apply factual fixes (3 passes)
+    _log("  [5c.1] Applying R370C factual fixes (3 passes)...")
+    sys.path.insert(0, os.path.join(FACTORY_ROOT, "templates"))
+    sys.path.insert(0, os.path.join(FACTORY_ROOT, "gates"))
+    from r370c_factual_fix import main as fix1_main
+    fix1_main()
+    from r370c_factual_fix_2 import main as fix2_main
+    fix2_main()
+    from r370c_factual_fix_3 import main as fix3_main
+    fix3_main()
+
+    # 2. Save Engineering Number Register
+    _log("  [5c.2] Saving Engineering Number Register...")
+    from r370c_number_register import save_register as save_number_register
+    save_number_register()
+
+    # 3. Save Engineering Standard Register
+    _log("  [5c.3] Saving Engineering Standard Register...")
+    from r370c_save_standard_register import main as save_standard_register
+    save_standard_register()
+
+    # 4. Run Technical Factuality Gate
+    _log("  [5c.4] Running Technical Factuality Gate (10 checks × 15 packages)...")
+    from r370c_technical_factuality_gate import main as factuality_main
+    factuality_exit = factuality_main()
+    if factuality_exit != 0:
+        _log(f"    CRITICAL: Technical Factuality Gate FAILED (exit {factuality_exit})")
+        raise RuntimeError("Technical Factuality Gate failed")
+    _log("    Technical Factuality Gate: 15/15 PASS")
+
+    # 5. Run strengthened adversarial QA
+    _log("  [5c.5] Running strengthened adversarial QA (12 attacks)...")
+    from r370c_adversarial_qa import main as adv_main
+    adv_exit = adv_main()
+    if adv_exit != 0:
+        _log(f"    CRITICAL: Adversarial QA FAILED (exit {adv_exit})")
+        raise RuntimeError("Adversarial QA failed")
+    _log("    Adversarial QA: 12/12 PASS")
+
+    return {
+        "factual_fixes_applied": True,
+        "number_register": "49 numbers registered",
+        "standard_register": "29 standards (28 verified + 1 known error)",
+        "factuality_gate": "15/15 PASS",
+        "adversarial_qa": "12/12 PASS"
+    }
+
+
 def step_6_qa():
     """Step 6 — Run QA gate."""
     _log("STEP 6 — Running QA gate...")
@@ -485,6 +549,7 @@ def main():
     step_4_portfolio(canonical, constitution_sha)
     step_5_data_rooms(canonical)
     r370b_results = step_5b_r370b_engineering_dossiers()  # R370B: package-specific engineering cores
+    r370c_results = step_5c_r370c_factual_integrity()  # R370C: factual integrity hardening
     qa_results = step_6_qa()
     step_7_render_pdf_pages_to_png()
     deliverables_dir = step_8_copy_to_download()
