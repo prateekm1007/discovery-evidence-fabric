@@ -1,10 +1,11 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 1.7.0
+**Version:** 1.8.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
 **Amended:** 2026-08-26 (Article XXXVII — Synthetic Loop vs Real Loop Verification; see R339/constitution/ARTICLE_XXXVII_SYNTHETIC_VS_REAL_LOOP.md)
+**Amended:** 2026-08-27 (Article XXXVIII — The Reality Boundary; see R370F/constitution/ARTICLE_XXXVIII_THE_REALITY_BOUNDARY.md)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself
 
@@ -1078,3 +1079,96 @@ The next true milestone is moving ONE candidate to `REAL_LOOP_VERIFIED` — whic
 Article XXXV defines the closed loop as the completion standard. Article XXXVII refines it: the loop has two distinct verification states, and only `REAL_LOOP_VERIFIED` satisfies the spirit of Article XXXV.
 
 See the full text at `R339/constitution/ARTICLE_XXXVII_SYNTHETIC_VS_REAL_LOOP.md` for the complete transition rules, anti-gaming clauses, and CEO-owned path to REAL_LOOP_VERIFIED.
+
+---
+
+## Article XXXVIII — The Reality Boundary
+
+**Ratified:** 2026-08-27 (Round 370F, finalized R370G)
+**Amends:** Constitution v1.7.0 → v1.8.0
+**Full text:** `R370F/constitution/ARTICLE_XXXVIII_THE_REALITY_BOUNDARY.md`
+**Sponsor:** CEO directive R370F — "Build the AI Engineering Reality Loop"
+
+### The Central Invariant
+
+> **AI MAY PROPOSE.**
+> **AI MAY COMPUTE.**
+> **AI MAY INTERPRET.**
+> **AI MAY NOT CLAIM THAT REALITY HAPPENED**
+> **UNLESS REALITY PRODUCED THE EVIDENCE.**
+
+This is the strongest invariant in the Constitution. It is the boundary between an engineering-document generator and an engineering intelligence system.
+
+### Five Evidence Layers
+
+| Layer | Rank | AI Can Create? |
+|-------|------|----------------|
+| `SOURCE_FACT` | 1 | YES |
+| `EXTERNAL_PRECEDENT` | 2 | YES |
+| `AI_INFERENCE` | 3 | YES |
+| `COMPUTATIONAL_RESULT` | 4 | **NO** (requires computation log) |
+| `PHYSICAL_OBSERVATION` | 5 | **NO** (requires observation ledger entry) |
+
+### Forbidden Transitions
+
+Seven transitions are mechanically enforced, including:
+- `AI_INFERENCE → PHYSICAL_OBSERVATION` (AI cannot create physical evidence)
+- `COMPUTATIONAL_RESULT → PHYSICAL_OBSERVATION` (computation cannot become reality)
+- `EXTERNAL_PRECEDENT → SOURCE_FACT` (precedent cannot become authoritative)
+
+### Formal REALITY_EVENT Schema (R370G)
+
+Every external event must contain:
+- `event_id`, `event_type`, `package_id`
+- `source_type` (EXTERNAL_HUMAN / EXTERNAL_INSTRUMENT / EXTERNAL_SYSTEM / CONTROLLED_REHEARSAL)
+- `organization`, `operator`, `acquisition_timestamp`
+- `raw_artifact_ref`, `raw_data_sha256`
+- `attestation` (with `attestation_text` and `attestation_hash`)
+- `custody_chain` (non-empty list with step, actor, timestamp, action)
+- `provenance_validated: true`
+
+### Acquisition Attestation
+
+`raw_data_hash` alone is insufficient. The system must distinguish "bytes match" from "bytes are attributable to the stated acquisition event." Requires:
+- instrument identity, serial, calibration record
+- operator, organization, protocol
+- acquisition timestamp, custody chain, signature
+
+### Causal Mutation Engine
+
+Every mutation in the causal chain requires:
+- `before_hash`, `after_hash`, `trigger_event_id`, `reason`, `timestamp`
+
+No silent mutation. The full chain:
+```
+EVENT → EVIDENCE → BELIEF_UPDATE → KNOWLEDGE_ATOM → EIG_CHANGE →
+EXPERIMENT_CHANGE → PACKAGE_MUTATION → DISCOVERY_CONSTRAINT → FUTURE_CANDIDATE_CHANGE
+```
+
+### REAL_LOOP_VERIFIED as Derived State
+
+`REAL_LOOP_VERIFIED` is **impossible to assign manually**. It is a derived state requiring:
+1. A real external event (not CONTROLLED_REHEARSAL)
+2. Valid provenance
+3. Evidence classification
+4. Belief mutation
+5. Knowledge mutation
+6. Experiment-priority mutation
+7. Package mutation
+8. Discovery mutation
+
+All must be linked. Then `REAL_LOOP_VERIFIED = TRUE`. Otherwise `FALSE`.
+
+### Controlled Rehearsal
+
+A `CONTROLLED_LOOP_REHEARSAL` test harness consumes an externally supplied immutable fixture and proves the full causal chain works. The output always says:
+- `SYNTHETIC_REHEARSAL = TRUE`
+- `REAL_LOOP_VERIFIED = FALSE`
+
+until a genuinely real event is supplied.
+
+### Relationship to Article XXXVII
+
+Article XXXVII distinguishes SYNTHETIC_LOOP_VERIFIED from REAL_LOOP_VERIFIED. Article XXXVIII defines the mechanical enforcement: the Reality Boundary that makes it impossible for AI to fake crossing the real-loop threshold.
+
+See the full text at `R370F/constitution/ARTICLE_XXXVIII_THE_REALITY_BOUNDARY.md`.

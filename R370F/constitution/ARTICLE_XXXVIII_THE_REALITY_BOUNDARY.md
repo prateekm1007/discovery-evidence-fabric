@@ -1,6 +1,7 @@
 # Article XXXVIII — The Reality Boundary
 
-**Ratified:** 2026-08-27 (Round 370F)
+**Status:** RATIFIED
+**Ratified:** 2026-08-27 (Round 370F, finalized R370G)
 **Amends:** Constitution v1.7.0 → v1.8.0
 **Sponsor:** CEO directive R370F — "Build the AI Engineering Reality Loop"
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
