@@ -5539,3 +5539,22 @@ Stage Summary:
 - The survivor-to-dossier bridge is now AUTOMATIC, domain-adaptive, truncation-free, computed-maturity, and released — proven by 23 new F-series tests + 40 E-series tests + one REAL end-to-end run producing a RELEASED buyer package at DOWNLOAD/90_cardiac_pacemaker with a hash-bound DISCOVERY_RELEASE.
 - Acceptance table: F_SERIES_ACCEPTANCE.json (all AUTOMATED_* = PASS; all ZERO_* = 0).
 - Remaining honest gaps (unchanged): REAL_LOOP_VERIFIED=FALSE (needs gated external reality event through learning_loop), real buyer, physical experiment — the machine is ready for that data (Art. XXXVII/XXXVIII posture).
+
+---
+Task ID: ONBOARDING-R1
+Agent: main (new coder, Super Z)
+Task: New chat session onboarding per HANDOFF_DOCUMENT.md section 13 quick-start protocol, after sandbox reset. Verification only — no coding, no new machinery.
+
+Work Log:
+- Fresh sandbox confirmed (only download/README.md remained). Cloned dev repo from GitHub using CEO-provided PAT (token lives in remote URL and /tmp/gh_token.txt per documented workflow; token NOT reproduced in any committed artifact — secret-scan baseline must not worsen).
+- Read HANDOFF_DOCUMENT.md completely (530 lines, single source of truth).
+- Read EPISTEMIC_CONSTITUTION.md v1.8.0 (38 articles; governing articles read in full incl. I-VIII, XXIII-XXXIV, XXXV, XXXVII, XXXVIII + Master Principle).
+- Read worklog tail (~240 lines). Repo HEAD is now 162ca5d — handoff doc records bf97cdf, so the handoff PREDATES the D-series audit/integration, E-series survivor->dossier bridge, and F-series automatic pipeline work; all of that is already pushed and intact at HEAD.
+- Ran scripts/r370z_final_cleanroom_verification.py: FINAL BUYER RELEASE VERIFIED. 15/15 COMPLETE / DOWNLOADABLE / ZIP-VALID / HASH-VALID; 0 DRIFT; 0 POST-FREEZE COMMITS; portfolio HEAD = 2e96b27 (FROZEN, unchanged). REAL_BUYER=0, REAL_EXPERIMENT=0, REAL_DATA=0, REAL_LOOP_VERIFIED=FALSE (honest state preserved).
+- Article XXIII repository state check: HEAD == origin/main == ls-remote == 162ca5d22584ed539740496e7e055a8af100700a; 0 uncommitted files before this entry.
+- Full test suite on fresh clone: 824 passed, 2 skipped (live-gated), 2 failed — exactly the 2 documented pre-existing environmental failures (test_patsnap_claims_regression PATENT_BEAR NO_KEY; test_secret_scanning historical baseline). No new failures introduced by onboarding.
+- Environment gap from sandbox reset: .env.keys and CREDENTIALS_AND_MODELS.md were gitignored by design and are NOT in GitHub, so the CEO-provisioned NVIDIA + Mistral keys are lost with the old sandbox. Live synthesis/attack runs will fail closed (PROVIDER_UNAVAILABLE, Art. IV) until CEO re-provisions keys.
+
+Stage Summary:
+- New session fully onboarded: dev repo healthy at 162ca5d, portfolio frozen at 2e96b27 with 0 drift, suite baseline reproduced identically.
+- Awaiting CEO direction per handoff section 13 step 4 (do NOT start coding without explicit direction). Known live options: (a) real buyer engagement / feedback ingestion loop (handoff section 11), (b) V3 mutation on real external evidence, (c) re-provision LLM keys to unblock live E2E (F_SMOKE pattern), (d) STOP CODING posture remains default per Art. XXXIV.
