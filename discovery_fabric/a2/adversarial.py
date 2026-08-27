@@ -77,43 +77,34 @@ REASON: <one sentence>
 
 def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
 
+# E1: transport provenance of the most recent adversarial LLM call.
+# Art. VI: populated only from real registry call results.
+_LAST_ATTACK_PROVIDER_META: dict = {"status": "NEVER_CALLED"}
+
 def llm_chat(prompt, system="", max_retries=1, timeout=30):
-    messages = []
-    if system: messages.append({"role": "system", "content": system})
-    messages.append({"role": "user", "content": prompt})
-
-    # Primary: NVIDIA (meta/llama-3.1-8b-instruct)
-    if NVIDIA_API_KEY:
-        payload = {"model": NVIDIA_MODEL, "messages": messages, "max_tokens": 8000, "temperature": 0.0}
-        for attempt in range(max_retries + 1):
-            try:
-                req = urllib.request.Request(NVIDIA_URL, data=json.dumps(payload).encode(),
-                    headers={"Authorization": f"Bearer {NVIDIA_API_KEY}",
-                             "Content-Type": "application/json", "Accept": "application/json"}, method="POST")
-                resp = urllib.request.urlopen(req, timeout=timeout, context=_SSL)
-                data = json.loads(resp.read())
-                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-                if content: return content
-            except Exception:
-                if attempt < max_retries: time.sleep(3*(attempt+1))
-
-    # Fallback: OpenRouter (deepseek)
-    if OPENROUTER_API_KEY:
-        payload = {"model": FROZEN_MODEL, "messages": messages, "max_tokens": 8000, "temperature": 0.0}
-        for attempt in range(max_retries + 1):
-            try:
-                req = urllib.request.Request(OPENROUTER_URL, data=json.dumps(payload).encode(),
-                    headers={"Authorization": f"Bearer {OPENROUTER_API_KEY}", "Content-Type": "application/json",
-                             "HTTP-Referer": "https://a2-adversarial.local", "X-Title": "A2 Adversarial"}, method="POST")
-                resp = urllib.request.urlopen(req, timeout=timeout, context=_SSL)
-                data = json.loads(resp.read())
-                if "error" in data:
-                    if attempt < max_retries: time.sleep(3*(attempt+1)); continue
-                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-                if content: return content
-            except Exception:
-                if attempt < max_retries: time.sleep(3*(attempt+1))
-
+    """E1: transport delegated to the provider registry. The legacy preference
+    (NVIDIA primary, OpenRouter fallback) is preserved as an explicit
+    preferred_providers policy — substitution stays recorded in the result
+    ledger, never silent (Art. IV/XXVII). Returns content or None as before;
+    _LAST_ATTACK_PROVIDER_META carries the transport provenance."""
+    global _LAST_ATTACK_PROVIDER_META
+    try:
+        from discovery_fabric.engine import llm_registry as reg
+    except Exception as exc:  # explicit failure, not a silent downgrade
+        _LAST_ATTACK_PROVIDER_META = {"status": "CALL_FAILED",
+                                      "error": f"registry import failed: {exc}"}
+        return None
+    policy = reg.SelectionPolicy(
+        preferred_providers=["nvidia", "openrouter", "deepseek", "gemini",
+                             "qwen", "openai", "anthropic"],
+        purpose="attack")
+    res = reg.generate(prompt, system=system, timeout=timeout,
+                       max_retries=max_retries, policy=policy)
+    _LAST_ATTACK_PROVIDER_META = res.to_meta()
+    if res.ok:
+        return res.content
+    print(f"  [adversarial] LLM transport status: {res.status}"
+          f"{(' — ' + res.error[:160]) if res.error else ''}")
     return None
 
 

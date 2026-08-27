@@ -28,7 +28,6 @@ from .candidate import Candidate, StageFailure, canonical_json, sha256_obj, utc_
 from .adapters import ADAPTERS, STAGE_ORDER, load_credentials
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-
 # Stages whose failure is FATAL to the run (nothing downstream is meaningful)
 # vs stages that fail explicit but allow the loop to continue.
 FATAL_STAGES = {"SYNTHESIZE"}
@@ -46,7 +45,9 @@ class EngineRun:
     def __init__(self, problem: Dict[str, Any], out_dir: str,
                  credentials_path: Optional[str] = None,
                  disabled_stages: Optional[List[str]] = None,
-                 run_id: Optional[str] = None):
+                 run_id: Optional[str] = None,
+                 with_package: bool = False,
+                 package_number: str = "90"):
         self.problem = problem
         self.problem_id = problem.get("problem_id", "custom")
         self.run_id = run_id or f"engrun:{self.problem_id}:{utc_now()[:19]}"
@@ -56,6 +57,12 @@ class EngineRun:
         self.env = Candidate(problem=problem, problem_id=self.problem_id)
         self.failed_stages: Dict[str, str] = {}
         self.credentials_loaded = load_credentials(credentials_path)
+        # E2/E3/E4 post-RANK promotion path (survivor -> invention spec ->
+        # engineering spec -> buyer package). Off by default; the D8 stage
+        # order stays EXACT either way.
+        self.with_package = with_package
+        self.package_number = package_number
+        self.package_report: Optional[Dict[str, Any]] = None
 
     # ------------------------------------------------------------------
     def _persist(self, name: str, obj: Any):
@@ -111,6 +118,14 @@ class EngineRun:
 
         final = self._final_state()
         self._persist("final_state.json", final)
+
+        # ---------------- E2/E3/E4 post-RANK promotion path ---------------
+        # Only a SURVIVOR is promotable; every failure is explicit and the
+        # discovery loop artifacts are already on disk (Art. V: fail closed
+        # without becoming a universal rejector).
+        if self.with_package and "SYNTHESIZE" not in self.failed_stages:
+            self._post_rank_pipeline(run_ctx={"run_id": self.run_id})
+
         manifest.update({
             "finished_at": utc_now(),
             "failed_stages": self.failed_stages,
@@ -134,6 +149,46 @@ class EngineRun:
                                      "failure or non-reject outcome); cemetery "
                                      "preserved untouched"})
         return manifest
+
+    # ------------------------------------------------------------------
+    def _post_rank_pipeline(self, run_ctx: Dict[str, Any]) -> None:
+        """SURVIVOR -> INVENTION_SPECIFICATION -> ENGINEERING_SPECIFICATION
+        -> BUYER PACKAGE. Rehearsal flag is False here: this runs only on a
+        real loop envelope. Any failure records an explicit FAILED state in
+        the run directory; it never fabricates a package."""
+        from .engineering_spec import build_engineering_spec
+        from .experiment_selector import select_decisive_experiment
+        from .invention_spec import SPEC_FIELDS, build_invention_spec
+        from .package_factory import generate_buyer_package
+        try:
+            spec = build_invention_spec(self.env, run_ctx)
+            self._persist("INVENTION_SPECIFICATION.json", spec)
+            if not (spec.get("_survivor_gate") or {}).get("survivor"):
+                self._persist("PACKAGE_FAILED.json", {
+                    "stage": "SURVIVOR_GATE",
+                    "reason": "not a survivor; no package generated",
+                    "final_status": (spec.get("_survivor_gate") or {})
+                    .get("final_status")})
+                return
+            eng = build_engineering_spec(spec, self.env, run_ctx)
+            self._persist("ENGINEERING_SPECIFICATION.json", eng)
+            self._persist("DECISIVE_EXPERIMENT.json",
+                          select_decisive_experiment(self.env))
+            self.package_report = generate_buyer_package(
+                str(self.out), spec, eng, self.env,
+                {"run_id": self.run_id,
+                 "package_number": self.package_number},
+                rehearsal=False)
+            self._persist("PACKAGE_REPORT.json",
+                          {k: v for k, v in self.package_report.items()
+                           if k != "rendered"} | {"rendered":
+                                                  self.package_report.get(
+                                                      "rendered", [])})
+        except Exception as exc:  # noqa: BLE001 — explicit, never fabricated
+            self._persist("PACKAGE_FAILED.json", {
+                "stage": "POST_RANK_PIPELINE",
+                "error": f"{type(exc).__name__}: {exc}",
+                "timestamp": utc_now()})
 
     # ------------------------------------------------------------------
     def _blocked_by(self, stage: str) -> Optional[str]:
@@ -235,6 +290,12 @@ def main():
     ap.add_argument("--problem-id", help="id from a2.run.PROBLEM_MANIFEST (p01..p10)")
     ap.add_argument("--out", default=None, help="run output dir")
     ap.add_argument("--disable", default="", help="comma-separated stages to disable (for D10 ablation tests)")
+    ap.add_argument("--with-package", action="store_true",
+                    help="E2/E3/E4: after a surviving RANK, build the "
+                         "invention specification, engineering specification "
+                         "and buyer package in DOWNLOAD/")
+    ap.add_argument("--package-number", default="90",
+                    help="portfolio number prefix for the generated package")
     args = ap.parse_args()
 
     problem: Dict[str, Any]
@@ -252,7 +313,9 @@ def main():
     disabled = [s for s in args.disable.split(",") if s]
     out = args.out or str(REPO_ROOT / "ENGINE_RUNS"
                           / f"{problem.get('problem_id','custom')}_{utc_now()[:19].replace(':','')}")
-    run = EngineRun(problem, out, disabled_stages=disabled)
+    run = EngineRun(problem, out, disabled_stages=disabled,
+                    with_package=args.with_package,
+                    package_number=args.package_number)
     manifest = run.run()
     print(canonical_json(manifest))
     return 0

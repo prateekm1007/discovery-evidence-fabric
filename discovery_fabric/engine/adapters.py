@@ -240,10 +240,20 @@ class SynthesizeAdapter(BaseAdapter):
         mod = _import_with_env("discovery_fabric.a2.synthesize")
         cand = mod.synthesize(env.problem, env.evidence)
         if not cand:
+            # E1 semantics: distinguish credential absence from mechanism
+            # failure (Art. XXIX). PROVIDER_UNAVAILABLE is infrastructure,
+            # never a negative-knowledge event and never NO_INVENTION.
+            from .llm_registry import availability_statement
+            avail = availability_statement()
+            if not avail["any_provider_available"]:
+                raise RuntimeError(
+                    "PROVIDER_UNAVAILABLE: no LLM provider credential in "
+                    f"environment; unblock with env {avail['unblock_with_env']} "
+                    "or .env.keys (E1 llm_registry; no silent substitution)")
             raise RuntimeError(
-                "synthesize returned None: LLM unavailable, refused, or "
-                "empty intervention (OPENROUTER_API_KEY set? see "
-                "RUNTIME_CAPABILITY_REGISTRY.md SYNTHESIS row)")
+                "synthesize returned None: LLM refused, errored, or produced "
+                "an empty intervention (transport/CALL_FAILED — see stage log; "
+                "available providers: " + str(avail["available_providers"]) + ")")
         return _engine_result(
             {"candidate_id": cand.get("candidate_id", ""),
              "mechanism_ids": ["mech:" + sha256_obj(
@@ -257,11 +267,13 @@ class SynthesizeAdapter(BaseAdapter):
                  "raw_candidate": cand},
              "provenance": {**env.provenance, "synthesis": {
                  "model": cand.get("model"),
+                 "provider": cand.get("provider"),
+                 "transport_status": cand.get("transport_status"),
                  "prompt_hash": cand.get("prompt_hash"),
                  "input_hash": cand.get("input_hash"),
                  "output_hash": cand.get("output_hash"),
                  "synthesis_timestamp": cand.get("synthesis_timestamp")}}},
-        model=cand.get("model"))
+        model=cand.get("model"), provider=cand.get("provider"))
 
 
 class EvidenceVerifyAdapter(BaseAdapter):
@@ -431,6 +443,10 @@ class AttackEngineAdapter(BaseAdapter):
         pa_state = env.prior_art.get("prior_art_status", "UNRESOLVED_INSUFFICIENT_EVIDENCE")
         res = mod.adversarial_challenge(raw, evidence_verified=ev_ok,
                                         prior_art_state=pa_state)
+        res = dict(res or {})
+        # E1: record which provider actually executed the attack (Art. VI:
+        # real transport metadata only; NEVER_CALLED stays NEVER_CALLED).
+        res["transport"] = getattr(mod, "_LAST_ATTACK_PROVIDER_META", {})
         return _engine_result({"attack_results": res},
                               overall=res.get("overall"))
 

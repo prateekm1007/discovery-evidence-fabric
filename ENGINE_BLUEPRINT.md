@@ -1,0 +1,158 @@
+# ENGINE_BLUEPRINT.md — E14 Final Architecture
+
+**Directive:** CEO E1–E14 — "SURVIVING DISCOVERY → AUTOMATIC ENGINEERING
+SPECIFICATION → AUTOMATIC 15-DOSSIER-LEVEL PACKAGE"
+**Date:** 2026-08-27
+**Supersedes:** nothing; extends ACTIVE_PATH.md / RUNTIME_CAPABILITY_REGISTRY.json
+**Constitution:** v1.8.0 read before this work (Art. I–XXXVIII acknowledged)
+
+---
+
+## The product (CEO E14, as built)
+
+```
+               DISCOVERY ENGINE  (discovery_fabric/engine/run.py, D6/D8)
+                     │  13 stages: RETRIEVE→…→RANK
+                     ▼
+              PROBLEM FORMATION  (problem.json, custodied+hashed)
+                     │
+                     ▼
+                EVIDENCE FABRIC  (a2/retrieve + orchestrator/evidence_custody)
+                     │
+                     ▼
+             MECHANISM DISCOVERY  (a2/synthesize via E1 llm_registry)
+                     │
+                     ▼
+           CROSS-DOMAIN COLLISION  (a2/prior_art + prior_art_v2 sources)
+                     │
+                     ▼
+             NOVELTY / PRIOR ART  (explicit vocabulary map, Art. XXVII)
+                     │
+                     ▼
+                 ATTACK  (a2/adversarial via E1 llm_registry)
+                     │
+                     ▼
+            KILLER EXPERIMENT  (bayesian_eig, MODEL_DERIVED priors)
+                     │
+                     ▼
+               ADJUDICATION  (deterministic hash-bound council)
+                     │
+                     ▼
+                 SURVIVOR  (survivor gate: no promotion by narrative)
+                     │
+                     ▼
+            INVENTION SPECIFICATION  (engine/invention_spec.py, E2)
+                     │        every field: SOURCE_FACT|COMPUTED|MODELLED|
+                     │        ENGINEERING_PROPOSED|UNKNOWN
+                     ▼
+          ENGINEERING SPECIFICATION  (engine/engineering_spec.py, E3)
+                     │   + domains.py (E6) + equations.py (E7)
+                     │   + structural design graph DI→DO→FM→VF→VA (E8)
+                     ▼
+             DOSSIER GENERATOR  (engine/package_factory.py, E4)
+                     │   reuses FROZEN build_portfolio_v4 builders
+                     ▼
+              BUYER PACKAGE  (engine/package_factory.py, E10)
+                     │   00..05 PDFs + PACKAGE_MANIFEST.json
+                     │   + ENGINEERING_TRACEABILITY.json (E12)
+                     │   + MATURITY_BASIS.json + zip
+                     ▼
+                  BUYER
+                     │
+                     ▼
+               ENGINEER / LAB
+                     │
+                     ▼
+              REAL EXPERIMENT  ── (reality's job, not the engine's)
+                     │
+                     ▼
+                  REAL DATA
+                     │
+                     ▼
+              PROVENANCE CHECK  (frozen r370g REALITY_EVENT gate, E13)
+                     │
+                     ▼
+               BELIEF UPDATE  (engine/learning_loop.py, E13: deterministic
+                     │         Bayes; EXPERIMENTALLY_ESTIMATED observation)
+                     ▼
+              PACKAGE V2 / V3  (same factory; V2_MUTATION_ADDENDUM)
+                     │
+                     ▼
+            SEARCH-SPACE UPDATE  (LEARNING_CONSTRAINTS.jsonl)
+                     │
+                     └──────────────► DISCOVERY ENGINE
+```
+
+---
+
+## What each E-directive landed as
+
+| Directive | Deliverable | Module |
+|---|---|---|
+| E1 | LLM_PROVIDER_REGISTRY — 7 providers, explicit selection ledger, `PROVIDER_UNAVAILABLE ≠ NO_INVENTION`, no silent substitution | `discovery_fabric/engine/llm_registry.py` (bridged into `a2/synthesize.py`, `a2/adversarial.py`) |
+| E2 | Canonical `INVENTION_SPECIFICATION` (16 fields, epistemic-tagged, fact-promotion checker) | `discovery_fabric/engine/invention_spec.py` |
+| E3 | 12-section engineering content with inherited epistemic classes; generator cannot turn a model into a fact | `discovery_fabric/engine/engineering_spec.py` |
+| E4 | Dossier factory REUSE — frozen `build_portfolio_v4.py` builders invoked per-package (no template recreation) | `discovery_fabric/engine/package_factory.py` |
+| E5 | Evidence-bound generation — claims require evidence → field → stage chains; standards are `EXTERNAL_PRECEDENT_CANDIDATE` with verify flags | `package_factory.survivor_to_canonical_package` |
+| E6 | Automatic domain detection (10 templates) with recorded keyword signals; unknown stays `NOT ESTABLISHED` | `discovery_fabric/engine/domains.py` |
+| E7 | Domain equation library (15 equations) — `equation_id/variables/source/applicability/assumptions`; numbers ONLY from SOURCE_FACT/COMPUTED inputs, else SYMBOLIC_ONLY | `discovery_fabric/engine/equations.py` |
+| E8 | Design graph `USER_NEED→DI→DO→FM→VF→VA` with explicit IDs, structural parent links, integrity checks, recorded gaps | `engineering_spec.build_design_graph` |
+| E9 | Cheapest decisive experiment — cross-join of KILLER_EXPERIMENT (EIG/cost) × NEXT_BEST_ACTION (score) + why-sentence | `discovery_fabric/engine/experiment_selector.py` |
+| E10 | Automatic buyer package → `DOWNLOAD/<nn>_<short>/` + `.zip` | `package_factory.generate_buyer_package` |
+| E11 | True E2E smoke — 29 links, fails loudly; real mode + labeled rehearsal mode | `discovery_fabric/engine/smoke_e2e.py` |
+| E12 | End-to-end provenance — `PACKAGE_CLAIM→INVENTION_FIELD→CANDIDATE_STAGE→EVIDENCE_ID→SOURCE→HASH`, structural (never keyword) | `package_factory.build_traceability` |
+| E13 | Learning loop — frozen r370g REALITY_EVENT validation + ledger, belief update, causal mutation, dossier V2, discovery constraints; AI-source events rejected | `discovery_fabric/engine/learning_loop.py` |
+| E14 | This blueprint + 7 new capability rows in RUNTIME_CAPABILITY_REGISTRY.json | `ENGINE_BLUEPRINT.md` |
+
+Conductor integration: `run.py --with-package` runs the post-RANK pipeline
+(survivor gate enforced) without altering the exact D8 13-stage order.
+
+---
+
+## How to run
+
+```bash
+# REAL end-to-end (needs any one provider credential in env or .env.keys):
+python3 -m discovery_fabric.engine.smoke_e2e --problem-id p01 --with-package
+#   or directly:
+python3 -m discovery_fabric.engine.run --problem-id p01 --with-package
+
+# CONTROLLED REHEARSAL (no credentials needed; proves all 19+ links on a
+# recorded fixture; output labeled SYNTHETIC_REHEARSAL=TRUE — never for buyers):
+python3 -m discovery_fabric.engine.smoke_e2e --rehearsal
+
+# Learning loop (after a real buyer/engineer/lab event):
+python3 - <<'PY'
+from discovery_fabric.engine.learning_loop import ingest_external_event
+ingest_external_event(event, package_context, out_dir)
+PY
+```
+
+---
+
+## Honest status (Art. XV — inconvenient truths disclosed)
+
+1. **Full autonomous real E2E is blocked ONLY by credentials.** No provider
+   key exists in this environment (OPENROUTER…DEEPSEEK all absent since the
+   credential scrub). REAL smoke fails at SYNTHESIZE with
+   `PROVIDER_UNAVAILABLE` + the exact unblock list. That is an infrastructure
+   state, not a capability gap — the E1 registry accepts ANY of the seven
+   providers via env or `.env.keys`.
+2. **The bridge machinery is proven** — 25 offline tests + rehearsal smoke
+   (19 links) + full repo suite: 786 passed; 2 pre-existing environmental
+   failures (PATENT_BEAR NO_KEY; secret-scan baseline) verified pre-existing
+   on clean HEAD 7776141.
+3. **Generated packages are honest by construction:** maturity EARLY_CONCEPT
+   until ≥5 design inputs, ≥3 failure modes, ≥4 build-plan steps and a
+   governing model exist (same rule as the frozen portfolio);
+   `transfer_ready=false`; `real_loop_verified=false` (derived state — never
+   assignable); rehearsal packages are visibly flagged and must never reach
+   buyers.
+4. **The generator does not invent engineering.** All parameter values are
+   UNKNOWN until reality (measurement) or computation (logged) produces
+   them; equations are emitted symbolically without sourced inputs; DOs are
+   ABSENT; verifications NOT_TESTED; validations NOT_POSSIBLE_YET. This is
+   the Reality Boundary (Art. XXXVIII) enforced in code, not prose.
+5. **Physical reality loop** remains open by design: it starts when the first
+   validated REALITY_EVENT arrives through `learning_loop.ingest_external_event`
+   — the machine is ready for that dataset (Art. XXXVII/R339 GATE 9 posture).

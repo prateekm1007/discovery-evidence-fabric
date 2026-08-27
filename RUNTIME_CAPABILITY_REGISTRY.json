@@ -4,7 +4,14 @@
  "repo_head_at_creation": "490099ee3192",
  "engine_package": "discovery_fabric/engine/",
  "promotion_rule": "A capability participates in the engine ONLY through the adapter recorded here, which wraps exactly one canonical implementation, has contracts, provenance behavior, tests, and demonstrated candidate effect (RUNTIME_BEHAVIORAL_PROOF.json). Module existence is NOT integration.",
- "status_enum": ["ACTIVE", "PROMOTION_CANDIDATE", "TEST_ONLY", "HISTORICAL", "QUARANTINED", "REJECTED"],
+ "status_enum": [
+  "ACTIVE",
+  "PROMOTION_CANDIDATE",
+  "TEST_ONLY",
+  "HISTORICAL",
+  "QUARANTINED",
+  "REJECTED"
+ ],
  "capabilities": [
   {
    "capability_id": "A2_RETRIEVAL",
@@ -13,10 +20,15 @@
    "purpose": "EuropePMC scientific evidence retrieval with content hashes",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::A2RetrievalAdapter",
-   "input_contract": {"problem": "problem dict with device/failure/failure_mode/constraint/problem_id"},
+   "input_contract": {
+    "problem": "problem dict with device/failure/failure_mode/constraint/problem_id"
+   },
    "output_contract": "envelope.evidence = list of evidence dicts {id, source, source_id, title, abstract, doi, content_hash, provenance, epistemic_state}; envelope.evidence_ids",
    "provenance_contract": "per-item content_hash + retrieval_timestamp + api method recorded by canonical module; adapter records args hash + envelope before/after hashes",
-   "tests": ["tests/test_a2_migration.py (pre-existing)", "tests/test_engine_integration.py::test_retrieval_adapter_live (network, gated)"],
+   "tests": [
+    "tests/test_a2_migration.py (pre-existing)",
+    "tests/test_engine_integration.py::test_retrieval_adapter_live (network, gated)"
+   ],
    "historical_validation": "ACTIVE path stage 1 since A2 migration (R332-era); live EuropePMC probe 2026-08-27 healthy (hitCount>22k for CSF shunt query)",
    "promotion_status": "ACTIVE_SINCE_A2",
    "canonical_choice_rationale": "declared runtime dependency in ACTIVE_PATH.md; no competing implementation",
@@ -29,14 +41,20 @@
    "purpose": "custody-grade evidence snapshot: identity, content hash, span hash, verify() recheck, snapshot hash",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::EvidenceFreezeAdapter",
-   "input_contract": {"envelope.evidence": "retrieved evidence items"},
+   "input_contract": {
+    "envelope.evidence": "retrieved evidence items"
+   },
    "output_contract": "envelope.provenance.evidence_freeze = {snapshot_hash, custody_records[{record_id, content_hash, span_hash,...}], hash_verification_all_pass, frozen_at}",
    "provenance_contract": "sha256 of sorted canonical snapshot JSON (pattern preserved from canonical a2/run.py FREEZE); custody hashes recomputed and verified",
-   "tests": ["tests/test_engine_integration.py::test_freeze_adapter_on_fixture"],
+   "tests": [
+    "tests/test_engine_integration.py::test_freeze_adapter_on_fixture"
+   ],
    "historical_validation": "evidence_custody promoted in CEO v28-29 era; verify() semantics from firewall lineage",
    "promotion_status": "PROMOTED_D5",
    "canonical_choice_rationale": "reuses custody-grade identity instead of re-implementing freeze; snapshot-hash pattern kept byte-compatible with a2/run.py doctrine",
-   "rejected_alternatives": ["re-implementing freeze inline in conductor (would duplicate business logic)"]
+   "rejected_alternatives": [
+    "re-implementing freeze inline in conductor (would duplicate business logic)"
+   ]
   },
   {
    "capability_id": "SYNTHESIS",
@@ -45,10 +63,15 @@
    "purpose": "LLM candidate generation from frozen evidence (OpenRouter deepseek-v4-flash-0731, temp 0)",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::SynthesizeAdapter",
-   "input_contract": {"problem": "problem dict", "evidence": "non-empty frozen evidence"},
+   "input_contract": {
+    "problem": "problem dict",
+    "evidence": "non-empty frozen evidence"
+   },
    "output_contract": "envelope.candidate_id; envelope.mechanism_map {mechanism, intervention, expected_effect, falsification_test, mechanism_source_span, raw_candidate}; envelope.provenance.synthesis {model, prompt_hash, input_hash, output_hash}",
    "provenance_contract": "canonical module returns its own prompt/input/output hashes; adapter propagates them unmodified",
-   "tests": ["tests/test_engine_integration.py (fixture synthesis labeled SYNTHETIC_TEST_ONLY)"],
+   "tests": [
+    "tests/test_engine_integration.py (fixture synthesis labeled SYNTHETIC_TEST_ONLY)"
+   ],
    "historical_validation": "A2 active since R332-era migration",
    "promotion_status": "ACTIVE_SINCE_A2",
    "canonical_choice_rationale": "only LLM synthesis implementation in active path",
@@ -62,10 +85,15 @@
    "purpose": "exact-span verification: source_id + source_hash + verbatim mechanism span",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::EvidenceVerifyAdapter",
-   "input_contract": {"envelope.mechanism_map.raw_candidate": "candidate dict with source_evidence", "envelope.evidence": "evidence list"},
+   "input_contract": {
+    "envelope.mechanism_map.raw_candidate": "candidate dict with source_evidence",
+    "envelope.evidence": "evidence list"
+   },
    "output_contract": "envelope.adjudication.evidence_verification = {verified, evidence_class, issues[], span_present, mechanism_span_verbatim}",
    "provenance_contract": "pure function; adapter hashes inputs into stage log",
-   "tests": ["tests/test_engine_integration.py::test_verify_adapter_accepts_exact_span"],
+   "tests": [
+    "tests/test_engine_integration.py::test_verify_adapter_accepts_exact_span"
+   ],
    "historical_validation": "active since A2; firewall lineage",
    "promotion_status": "ACTIVE_SINCE_A2",
    "canonical_choice_rationale": "declared ACTIVE_PATH dependency",
@@ -78,14 +106,21 @@
    "purpose": "CEO v28.3 four-direction search: discovery / destruction / transfer / reality across 6 free sources (PubMed, ClinicalTrials, openFDA, NIH RePORTER, Crossref, NASA NTRS)",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::MultiSourceDiscoveryAdapter",
-   "input_contract": {"envelope.mechanism_map": "intervention + mechanism", "problem": "failure/failure_mode"},
+   "input_contract": {
+    "envelope.mechanism_map": "intervention + mechanism",
+    "problem": "failure/failure_mode"
+   },
    "output_contract": "envelope.multi_source = FourSearchResult asdict + adjacent_industries_derivation {value, epistemic_class: MODEL_DERIVED, method} + sources_hit",
    "provenance_contract": "per-source totals/errors preserved verbatim from canonical result; derivation heuristics recorded inline",
-   "tests": ["tests/test_engine_integration.py::test_multisource_adapter_live (network, gated)"],
+   "tests": [
+    "tests/test_engine_integration.py::test_multisource_adapter_live (network, gated)"
+   ],
    "historical_validation": "UNPROVEN at HEAD per D1 audit (zero importers, zero tests) until this promotion; source modules use subprocess curl; graveyard/goldmine signal hardcoding in triangulation engine is the reason THIS module (not triangulation) is canonical",
    "promotion_status": "PROMOTED_D5",
    "canonical_choice_rationale": "implements the four-epistemic-direction doctrine directly; keyless (works without credentials); per-source failures degrade to explicit error elements instead of exceptions",
-   "rejected_alternatives": ["orchestrator/triangulation_engine.py (graveyard/goldmine signals hardcoded False; kept as PROMOTION_CANDIDATE for later)"]
+   "rejected_alternatives": [
+    "orchestrator/triangulation_engine.py (graveyard/goldmine signals hardcoded False; kept as PROMOTION_CANDIDATE for later)"
+   ]
   },
   {
    "capability_id": "COLLISION_ENGINE",
@@ -94,14 +129,23 @@
    "purpose": "nearest prior art + novelty risk on scientific AND patent sides; Gate-Q functional-equivalence query expansion; collision -> actions (inspect claims / expand sources)",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::CollisionEngineAdapter",
-   "input_contract": {"envelope.mechanism_map.intervention": "string", "problem.device": "string"},
+   "input_contract": {
+    "envelope.mechanism_map.intervention": "string",
+    "problem.device": "string"
+   },
    "output_contract": "envelope.collision_results {scientific{legacy,mapped,rationale}, patent{queries, expansion(MODEL_DERIVED), hits, source_errors, novelty_risk}}, envelope.prior_art {prior_art_status in classify vocabulary}, envelope.prior_art_ids",
    "provenance_contract": "legacy->classify vocabulary promotion recorded per-hit with rationale (Art. XXVII); UNRESOLVED_SOURCE_FAILURE for dead sources (Art. XXV); source errors never interpreted as absence of prior art",
-   "tests": ["tests/test_engine_integration.py::test_prior_art_status_map_no_silent_kill_promotion", "tests/test_engine_integration.py::test_collision_adapter_maps_legacy_status"],
+   "tests": [
+    "tests/test_engine_integration.py::test_prior_art_status_map_no_silent_kill_promotion",
+    "tests/test_engine_integration.py::test_collision_adapter_maps_legacy_status"
+   ],
    "historical_validation": "R258 correction + R259 collision-engine validation + R269/R272 deep-collision rounds validate the CONCEPT historically (CANONICAL_STATE); those round scripts are one-shot (HISTORICAL) and were not copied",
    "promotion_status": "PROMOTED_D5",
    "canonical_choice_rationale": "a2.prior_art is the declared ACTIVE prior-art dependency; Google Patents source is keyless and TEST_ONLY-covered via regression suite; functional-equivalence expansion implements the R274/R275 Gate-Q lesson",
-   "rejected_alternatives": ["scripts/r258_ib03_correction_collision_engine.py (one-shot round script)", "prior_art_v2/retrieval_v4.py full stack (requires NVIDIA key; deferred to PROMOTION_CANDIDATE when keys are provisioned)"]
+   "rejected_alternatives": [
+    "scripts/r258_ib03_correction_collision_engine.py (one-shot round script)",
+    "prior_art_v2/retrieval_v4.py full stack (requires NVIDIA key; deferred to PROMOTION_CANDIDATE when keys are provisioned)"
+   ]
   },
   {
    "capability_id": "ATTACK_ENGINE",
@@ -110,14 +154,23 @@
    "purpose": "8-dimension adversarial attack (mechanism, transfer, obviousness, prior-art, contradiction, boundary, feasibility, regulatory) with v4_corrections firewalls",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::AttackEngineAdapter",
-   "input_contract": {"envelope.mechanism_map.raw_candidate": "candidate", "evidence_verified": "bool", "prior_art_state": "classify-vocabulary state"},
+   "input_contract": {
+    "envelope.mechanism_map.raw_candidate": "candidate",
+    "evidence_verified": "bool",
+    "prior_art_state": "classify-vocabulary state"
+   },
    "output_contract": "envelope.attack_results = canonical adversarial report {overall: PASS|KILLED|EVALUATION_FAILED|NOT_RUN, attacks{8 dims}, v4_corrections_applied}",
    "provenance_contract": "canonical prompt_hash/output_hash propagated; candidate blinded by canonical module",
-   "tests": ["tests/test_e2e_adversarial_hardening.py (pre-existing)", "tests/test_engine_integration.py (fixture attack results)"],
+   "tests": [
+    "tests/test_e2e_adversarial_hardening.py (pre-existing)",
+    "tests/test_engine_integration.py (fixture attack results)"
+   ],
    "historical_validation": "ACTIVE since A2; NVIDIA->OpenRouter routing; R255-R257 optimizer rounds are HISTORICAL explorations of the same doctrine",
    "promotion_status": "ACTIVE_SINCE_A2",
    "canonical_choice_rationale": "declared ACTIVE_PATH dependency with hardening history (v4 corrections)",
-   "rejected_alternatives": ["scripts/r255/r256/r257 one-shot optimizers (not importable packages)"],
+   "rejected_alternatives": [
+    "scripts/r255/r256/r257 one-shot optimizers (not importable packages)"
+   ],
    "credential_requirement": "NVIDIA_API_KEY primary / OPENROUTER_API_KEY fallback; absence = EVALUATION_FAILED which downstream adjudication maps to INSUFFICIENT_ADJUDICATION (never a silent PASS)"
   },
   {
@@ -127,10 +180,16 @@
    "purpose": "6-field contradiction register (severity x probability x evidence quality x decision impact) with blocking semantics",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::ContradictionQueueAdapter",
-   "input_contract": {"envelope.attack_results.attacks": "killed dims", "envelope.adjudication.evidence_verification.issues": "verify issues", "envelope.collision_results.novelty_risk": "collision signal"},
+   "input_contract": {
+    "envelope.attack_results.attacks": "killed dims",
+    "envelope.adjudication.evidence_verification.issues": "verify issues",
+    "envelope.collision_results.novelty_risk": "collision signal"
+   },
    "output_contract": "envelope.contradictions = queue.to_dict() {contradictions[], blocking_count, unresolved_count}",
    "provenance_contract": "each contradiction id is derived (con:attack:<dim>, con:verify:<hash8>, con:collision:adjacent); inputs hashed in stage log",
-   "tests": ["tests/test_engine_integration.py::test_contradiction_queue_adapter"],
+   "tests": [
+    "tests/test_engine_integration.py::test_contradiction_queue_adapter"
+   ],
    "historical_validation": "spec V4 hardened (6-field contract) per ORCHESTRATOR_SPEC_V4_FINAL; UNPROVEN at runtime until this promotion",
    "promotion_status": "PROMOTED_D5",
    "canonical_choice_rationale": "exact implementation of the V4 contradiction contract",
@@ -143,14 +202,22 @@
    "purpose": "cheapest decisive physical experiment selection by expected information gain per cost",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::KillerExperimentAdapter",
-   "input_contract": {"falsification_test": "candidate's own falsification test", "contradictions.unresolved_count": "int"},
+   "input_contract": {
+    "falsification_test": "candidate's own falsification test",
+    "contradictions.unresolved_count": "int"
+   },
    "output_contract": "envelope.killer_experiment {hypotheses, options_ranked[{eig, eig_per_cost}], selected{name, eig_per_cost, rationale}, epistemic_note}",
    "provenance_contract": "every prior carries EIGProvenance with epistemic_class=MODEL_DERIVED and explicit uncertainty text; SYNTHETIC_TEST_ONLY class can never appear in research runs",
-   "tests": ["tests/test_engine_integration.py::test_killer_experiment_adapter_ranks_by_eig"],
+   "tests": [
+    "tests/test_engine_integration.py::test_killer_experiment_adapter_ranks_by_eig"
+   ],
    "historical_validation": "R250-R253 killer-experiment rounds establish the doctrine (CANONICAL_STATE); bayesian_eig module itself carried synthetic demonstration only (UNPROVEN at runtime) until this promotion",
    "promotion_status": "PROMOTED_D5",
    "canonical_choice_rationale": "pure deterministic math with provenance classes; no LLM, no network",
-   "rejected_alternatives": ["scripts/r250-r253 one-shot killer loops (HISTORICAL)", "hardcoding an experiment (would be threshold invention, Art. XXVII)"]
+   "rejected_alternatives": [
+    "scripts/r250-r253 one-shot killer loops (HISTORICAL)",
+    "hardcoding an experiment (would be threshold invention, Art. XXVII)"
+   ]
   },
   {
    "capability_id": "ADJUDICATION",
@@ -159,14 +226,24 @@
    "purpose": "aggregate evidence verification, attack verdict, contradictions, prior-art state, collision risk, cemetery verdict into one verdict the classifier can consume",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::AdjudicationAdapter",
-   "input_contract": {"envelope.adjudication.evidence_verification": "verify output", "envelope.attack_results": "attack report", "envelope.contradictions": "queue dict", "envelope.collision_results": "collision dict"},
+   "input_contract": {
+    "envelope.adjudication.evidence_verification": "verify output",
+    "envelope.attack_results": "attack report",
+    "envelope.contradictions": "queue dict",
+    "envelope.collision_results": "collision dict"
+   },
    "output_contract": "envelope.adjudication.council {verdict: ESTABLISHED_PROVISIONALLY|CONTESTED|INSUFFICIENT_ADJUDICATION, checks[6], failed_checks, inputs_sha256} + envelope.cemetery_check",
    "provenance_contract": "every check carries inputs_hash; EVALUATION_FAILED attack forces INSUFFICIENT_ADJUDICATION (fail-closed); adjudication never overrides a KILL (Art. VII)",
-   "tests": ["tests/test_engine_integration.py::test_adjudication_fail_closed_on_evaluator_failure"],
+   "tests": [
+    "tests/test_engine_integration.py::test_adjudication_fail_closed_on_evaluator_failure"
+   ],
    "historical_validation": "new glue capability; its INPUTS are all canonical stage outputs",
    "promotion_status": "NEW_D5",
    "canonical_choice_rationale": "no generic canonical adjudicator exists at HEAD: the ensemble requires multi-model analyses (unavailable), the deterministic arbiter is hardcoded to patent C04-L5",
-   "rejected_alternatives": ["epistemic_integrity/invention_loop_engine/ai_adjudication_ensemble.py (REJECTED for now: needs multi-model infrastructure; PROMOTION_CANDIDATE after credentials)", "epistemic_integrity/invention_loop_engine/deterministic_evidence_arbiter.py (REJECTED: hardcoded C04-L5 check set, not generic)"]
+   "rejected_alternatives": [
+    "epistemic_integrity/invention_loop_engine/ai_adjudication_ensemble.py (REJECTED for now: needs multi-model infrastructure; PROMOTION_CANDIDATE after credentials)",
+    "epistemic_integrity/invention_loop_engine/deterministic_evidence_arbiter.py (REJECTED: hardcoded C04-L5 check set, not generic)"
+   ]
   },
   {
    "capability_id": "EPISTEMIC_CLASSIFICATION",
@@ -175,14 +252,22 @@
    "purpose": "assign epistemic ladder state + final status (AUTOMATED_INVENTION_CANDIDATE | REJECTED | UNKNOWN)",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::EpistemicClassificationAdapter",
-   "input_contract": {"prior_art_status": "ALREADY in classify vocabulary (mapped at COLLISION stage)", "attack_results": "canonical report", "evidence_verification": "verify output"},
+   "input_contract": {
+    "prior_art_status": "ALREADY in classify vocabulary (mapped at COLLISION stage)",
+    "attack_results": "canonical report",
+    "evidence_verification": "verify output"
+   },
    "output_contract": "envelope.epistemic_state {epistemic_state, final_status, reason, promotion_blocked}",
    "provenance_contract": "pure function; state_history preserved when present",
-   "tests": ["tests/test_engine_integration.py::test_classify_adapter_with_fixture"],
+   "tests": [
+    "tests/test_engine_integration.py::test_classify_adapter_with_fixture"
+   ],
    "historical_validation": "ACTIVE since A2",
    "promotion_status": "ACTIVE_SINCE_A2",
    "canonical_choice_rationale": "the only classifier; vocabulary alignment handled explicitly at COLLISION (documented map), not by editing classify",
-   "rejected_alternatives": ["modifying classify.py to accept legacy statuses (would mutate ACTIVE canonical code)"]
+   "rejected_alternatives": [
+    "modifying classify.py to accept legacy statuses (would mutate ACTIVE canonical code)"
+   ]
   },
   {
    "capability_id": "NEXT_BEST_ACTION",
@@ -191,10 +276,16 @@
    "purpose": "allocate the next research action by score=(gain x p_decision_change x impact)/cost - redundancy (V4 doctrine incl. DECISION_CHANGE_PROBABILITY)",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::NextBestActionAdapter",
-   "input_contract": {"envelope.contradictions": "unresolved register", "envelope.killer_experiment.selected": "EIG", "envelope.collision_results.novelty_risk": "collision signal"},
+   "input_contract": {
+    "envelope.contradictions": "unresolved register",
+    "envelope.killer_experiment.selected": "EIG",
+    "envelope.collision_results.novelty_risk": "collision signal"
+   },
    "output_contract": "envelope.next_best_action {ranked_actions[{action_id, score, ...}], selected_best, selection_rule}",
    "provenance_contract": "canonical Action.to_dict() payloads preserved; rule string recorded verbatim",
-   "tests": ["tests/test_engine_integration.py::test_next_best_action_adapter"],
+   "tests": [
+    "tests/test_engine_integration.py::test_next_best_action_adapter"
+   ],
    "historical_validation": "implements ORCHESTRATOR_SPEC_V4 NEXT_BEST_ACTION doctrine; module UNPROVEN at runtime until this promotion",
    "promotion_status": "PROMOTED_D5",
    "canonical_choice_rationale": "pure, threshold-explicit, matches V4 spec field-for-field",
@@ -207,10 +298,17 @@
    "purpose": "candidate ranking as ALLOCATION POLICY (not truth): adjudication weight + attack survival + novelty + EIG per cost, with portfolio context",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::PortfolioRankingAdapter",
-   "input_contract": {"envelope.adjudication.council.verdict": "verdict", "envelope.attack_results.overall": "overall", "envelope.collision_results.novelty_risk": "risk", "envelope.killer_experiment.selected.eig_per_cost": "float"},
+   "input_contract": {
+    "envelope.adjudication.council.verdict": "verdict",
+    "envelope.attack_results.overall": "overall",
+    "envelope.collision_results.novelty_risk": "risk",
+    "envelope.killer_experiment.selected.eig_per_cost": "float"
+   },
    "output_contract": "envelope.ranking {formula, formula_version: engine-ranking-v1, components, score, portfolio_context, is_allocation_policy_not_truth: true}",
    "provenance_contract": "formula recorded verbatim in every output; weights explicit (Art. XXVII)",
-   "tests": ["tests/test_engine_integration.py::test_ranking_is_allocation_policy"],
+   "tests": [
+    "tests/test_engine_integration.py::test_ranking_is_allocation_policy"
+   ],
    "historical_validation": "CORRECTED_PORTFOLIO_SCOREBOARD lineage (orchestrator spec artifacts)",
    "promotion_status": "PROMOTED_D5",
    "canonical_choice_rationale": "reuses live portfolio scoreboard; scoring kept deterministic and versioned",
@@ -223,14 +321,20 @@
    "purpose": "negative knowledge: PROVEN_INVARIANT hard blocks, warnings, and append-only FAILURE_LESSON updates on kills",
    "current_status": "ACTIVE",
    "adapter": "discovery_fabric/engine/adapters.py::_CemeterySubCheck (in-loop check) + engine/run.py::_cemetery_update (post-loop append)",
-   "input_contract": {"envelope.mechanism_map": "intervention + mechanism text"},
+   "input_contract": {
+    "envelope.mechanism_map": "intervention + mechanism text"
+   },
    "output_contract": "envelope.cemetery_check {verdict, hard_blocks, warnings, lessons_consulted}; ENGINE_RUNS/<run>/cemetery_update.json on REJECT",
    "provenance_contract": "check consults frozen lessons; updates are APPEND-ONLY with new entry_id + evidence_sources from run",
-   "tests": ["tests/test_engine_integration.py::test_cemetery_check_inside_adjudication"],
+   "tests": [
+    "tests/test_engine_integration.py::test_cemetery_check_inside_adjudication"
+   ],
    "historical_validation": "8 frozen initial lessons (CSF turnover, Jacobian identifiability, stiffness domains)",
    "promotion_status": "PROMOTED_D5",
    "canonical_choice_rationale": "already packaged, import-safe, disk-persisted; check folded into ADJUDICATION to keep the D8 stage chain EXACT",
-   "rejected_alternatives": ["making CEMETERY a separate 14th stage (would violate the D8 exact-chain requirement)"]
+   "rejected_alternatives": [
+    "making CEMETERY a separate 14th stage (would violate the D8 exact-chain requirement)"
+   ]
   },
   {
    "capability_id": "KNOWLEDGE_GRAPH",
@@ -277,12 +381,194 @@
    "promotion_status": "PROMOTION_CANDIDATE_CREDENTIALS_REQUIRED",
    "canonical_choice_rationale": "regression suite is the strongest in repo (13 calibration regression tests + patsnap + elite) but requires .env.keys (NVIDIA_API_KEY, LENS_API_TOKEN, PATSNAP_EUREKA_API_KEY, PATENT_BEAR_API_KEY) which are absent after the credential scrub",
    "rejected_alternatives": []
+  },
+  {
+   "capability_id": "LLM_PROVIDER_REGISTRY",
+   "module_path": "discovery_fabric/engine/llm_registry.py",
+   "canonical_function": "generate(prompt, system, schema, policy) -> LLMCallResult",
+   "purpose": "E1 credential-independent transport over seven providers (openrouter/nvidia/anthropic/gemini/openai/qwen/deepseek); selection policy availability->quality->cost->latency with explicit, recorded substitution; PROVIDER_UNAVAILABLE is an infrastructure state, never NO_INVENTION and never silent (Art. IV/XXVII).",
+   "current_status": "NEW_E1",
+   "adapter": "transport-only bridge inside a2/synthesize.llm_chat and a2/adversarial.llm_chat (business logic untouched)",
+   "input_contract": "prompt str, optional system/schema/evidence, SelectionPolicy(preferred_providers, max_preference_fallback, purpose)",
+   "output_contract": "LLMCallResult{status: OK|PROVIDER_UNAVAILABLE|CALL_FAILED, content, provider_id, model, prompt_hash, output_hash, latency_ms, substituted_from, selection_ledger}",
+   "provenance_contract": "real call metadata only (Art. VI); availability matrix + decision ledger in every result",
+   "tests": [
+    "tests/test_dossier_bridge.py::test_e1_* (4 offline)"
+   ],
+   "historical_validation": "preserves frozen A2 behaviors: synthesis model deepseek/deepseek-v4-flash-0731, attack NVIDIA-first routing",
+   "promotion_status": "PROMOTED_E1",
+   "canonical_choice_rationale": "single transport authority stops per-module vendor hardcoding; keys read at call time so .env.keys bootstrap works",
+   "rejected_alternatives": [
+    "keeping per-module urllib calls (vendor-locked, silent-fallback risk)",
+    "LiteLLM-style auto-routing (silent substitution violates Art. IV/XXVII)"
+   ]
+  },
+  {
+   "capability_id": "INVENTION_SPECIFICATION",
+   "module_path": "discovery_fabric/engine/invention_spec.py",
+   "canonical_function": "build_invention_spec(env, run_ctx) -> canonical spec with 16 CEO-E2 fields",
+   "purpose": "E2: the RANK survivor becomes the canonical INVENTION_SPECIFICATION; every field tagged SOURCE_FACT/COMPUTED/MODELLED/ENGINEERING_PROPOSED/UNKNOWN; adversarial no-fact-promotion checker enforced.",
+   "current_status": "NEW_E2",
+   "adapter": "direct engine module (post-RANK pipeline in run.py --with-package)",
+   "input_contract": "survivor Candidate envelope (gate: classified candidate + sufficient adjudication)",
+   "output_contract": "spec dict; invention_id=inv:<problem>:<envelope hash[:12]>; _integrity.passed",
+   "provenance_contract": "SOURCE_FACT fields must cite evidence ids registered in _evidence_index (envelope evidence + problem.json artifact)",
+   "tests": [
+    "test_e2_invention_spec_complete_and_classed",
+    "test_e2_fact_promotion_attack_is_caught",
+    "test_e2_tagged_constructor_blocks_evidenceless_fact",
+    "test_e2_survivor_gate_refuses_rejected_candidate"
+   ],
+   "historical_validation": "offline survivor chain (D10 fixture) and rejected-chain negative case",
+   "promotion_status": "PROMOTED_E2",
+   "canonical_choice_rationale": "one tagging authority (tagged()) reused by equations/engineering/package prevents class drift",
+   "rejected_alternatives": [
+    "free-form JSON spec (no class enforcement)",
+    "letting the LLM author the spec directly (Art. XVIII)"
+   ]
+  },
+  {
+   "capability_id": "ENGINEERING_SPECIFICATION",
+   "module_path": "discovery_fabric/engine/engineering_spec.py + domains.py + equations.py",
+   "canonical_function": "build_engineering_spec(spec, env, run_ctx); detect_domain(text); select_equations(spec, domain); evaluate_equation(eq, inputs)",
+   "purpose": "E3+E6+E7+E8: 12-section engineering content with inherited epistemic classes, automatic domain detection with recorded signals, domain equation library (equation_id/variables/source/applicability/assumptions; numeric output ONLY with SOURCE_FACT/COMPUTED inputs), and structural USER_NEED->DI->DO->FM->VF->VA graph with explicit IDs and integrity checks.",
+   "current_status": "NEW_E3",
+   "adapter": "direct engine module; output shaped as ArtifactRichDossier engineering_content",
+   "input_contract": "invention spec + envelope",
+   "output_contract": "engineering_content dict (v4-factory compatible) + design_graph{counts,integrity,gaps} + _epistemic_summary",
+   "provenance_contract": "DOs ABSENT, verifications NOT_TESTED, validations NOT_POSSIBLE_YET until reality produces observations (Art. XXXVIII)",
+   "tests": [
+    "test_e3_e8_engineering_spec_and_structural_graph",
+    "test_e3_design_graph_detects_orphan_verifications",
+    "test_e6_* (2)",
+    "test_e7_* (3)"
+   ],
+   "historical_validation": "10 domain templates; 15 equations across 10 domains; guarded/qualified evaluator cases",
+   "promotion_status": "PROMOTED_E3",
+   "canonical_choice_rationale": "deterministic template engine (auditable, no hallucinated engineering); LLM prose deliberately excluded from parameter values",
+   "rejected_alternatives": [
+    "LLM-authored engineering content (would fabricate plausibly-sounding parameters)",
+    "keyword traceability (R370 audit showed it is dangerous)"
+   ]
+  },
+  {
+   "capability_id": "DECISIVE_EXPERIMENT_SELECTOR",
+   "module_path": "discovery_fabric/engine/experiment_selector.py",
+   "canonical_function": "select_decisive_experiment(env) -> cross-joined ranking + explanation",
+   "purpose": "E9: cheapest decisive experiment from the loop's own KILLER_EXPERIMENT (EIG/cost) and NEXT_BEST_ACTION (score) outputs with explicit why-sentence; cost/time/kill_probability remain UNKNOWN where no stage recorded them.",
+   "current_status": "NEW_E9",
+   "adapter": "direct engine module",
+   "input_contract": "envelope with killer_experiment + next_best_action",
+   "output_contract": "{shortlist, selected, explanation, no_invented_values_note}",
+   "provenance_contract": "reuses recorded stage values only; no new scores or thresholds (Art. XXVII)",
+   "tests": [
+    "test_e9_decisive_experiment_has_explanation_and_unknowns"
+   ],
+   "historical_validation": "offline chain",
+   "promotion_status": "PROMOTED_E9",
+   "canonical_choice_rationale": "cross-join of two existing allocation policies instead of a third score",
+   "rejected_alternatives": [
+    "new meta-score (CEO forbade another score)"
+   ]
+  },
+  {
+   "capability_id": "BUYER_PACKAGE_BRIDGE",
+   "module_path": "discovery_fabric/engine/package_factory.py",
+   "canonical_function": "generate_buyer_package(out_dir, spec, eng, env, run_ctx, rehearsal) -> report",
+   "purpose": "E4/E10/E12: survivor -> canonical package record -> FROZEN premium_package_factory/templates/build_portfolio_v4.py builders -> 00..05 PDFs + PACKAGE_MANIFEST.json + ENGINEERING_TRACEABILITY.json (structural DI->DO->FM->VF chains with hashes) + MATURITY_BASIS.json + zip mirroring the portfolio hierarchy. Declares loop_verification_state=NONE, real_loop_verified=false, transfer_ready=false; rehearsal packages flagged SYNTHETIC_REHEARSAL=TRUE.",
+   "current_status": "NEW_E4",
+   "adapter": "loads build_portfolio_v4 by path; per-package builders are pure (pi, d, op) — no template recreation, no global state mutation",
+   "input_contract": "invention spec + engineering spec + survivor envelope",
+   "output_contract": "report{folder, zip, rendered[sha256], failed, missing_links, complete, maturity, posture, traceability_passed}",
+   "provenance_contract": "PACKAGE_CLAIM -> INVENTION_FIELD -> CANDIDATE_STAGE -> EVIDENCE_ID -> SOURCE -> HASH; structural links only",
+   "tests": [
+    "test_e4_e10_full_package_generation_reuses_v4_builders",
+    "test_e12_traceability_is_structural_with_hashes",
+    "test_e12_maturity_basis_is_derived_and_honest"
+   ],
+   "historical_validation": "generates the exact 9-file + zip package shape of technology-transfer-portfolio-15 DOWNLOAD/",
+   "promotion_status": "PROMOTED_E4",
+   "canonical_choice_rationale": "reuse of the exact factory that produced the frozen 15 packages guarantees structural identity (CEO E4 'do not recreate the templates')",
+   "rejected_alternatives": [
+    "new PDF generator (duplicate templates)",
+    "keyword-based traceability file"
+   ]
+  },
+  {
+   "capability_id": "E2E_SMOKE",
+   "module_path": "discovery_fabric/engine/smoke_e2e.py",
+   "canonical_function": "run_real(problem, out_dir) / run_rehearsal(out_dir)",
+   "purpose": "E11: true end-to-end smoke with 29 explicit links; REAL mode fails at SYNTHESIZE with PROVIDER_UNAVAILABLE + unblock list when credentials are absent; --rehearsal mode exercises the identical post-RANK machinery on a recorded fixture with SYNTHETIC_REHEARSAL=TRUE labels (Art. XXXVIII controlled-rehearsal pattern).",
+   "current_status": "NEW_E11",
+   "adapter": "direct engine module (also usable via python -m discovery_fabric.engine.smoke_e2e)",
+   "input_contract": "problem json/id (REAL) or nothing (rehearsal)",
+   "output_contract": "RUN_LINK_PROOF.json{verdict: PASS|REHEARSAL_PASS|FAIL, links_verified, package_zip}",
+   "provenance_contract": "fails loudly listing missing links; never fakes progress (Art. IV/VI/XV)",
+   "tests": [
+    "test_e11_rehearsal_smoke_proves_all_links",
+    "test_e11_real_smoke_fails_honest_on_missing_credentials"
+   ],
+   "historical_validation": "rehearsal: 19 links verified, package complete; REAL: honest PROVIDER_UNAVAILABLE at current no-key state",
+   "promotion_status": "PROMOTED_E11",
+   "canonical_choice_rationale": "same code path for real and rehearsal; only the labeling differs",
+   "rejected_alternatives": [
+    "mocking synthesis to fake a full pass (constitutional violation)"
+   ]
+  },
+  {
+   "capability_id": "EXTERNAL_LEARNING_LOOP",
+   "module_path": "discovery_fabric/engine/learning_loop.py",
+   "canonical_function": "ingest_external_event(event, package_context, out_dir) -> processing record",
+   "purpose": "E13: BUYER_FEEDBACK/ENGINEER_REVIEW/PHYSICAL_OBSERVATION events validated through the FROZEN r370g REALITY_EVENT schema gate, appended to the frozen REALITY_EVENT ledger, then deterministic belief update (MODEL_DERIVED prior + EXPERIMENTALLY_ESTIMATED observation), append-only candidate mutation (before/after hash + trigger event), dossier V2 regeneration with V2_MUTATION_ADDENDUM, and discovery-constraint emission. AI-source events mechanically rejected.",
+   "current_status": "NEW_E13",
+   "adapter": "reuses premium_package_factory/gates/r370g_reality_event_schema.py validate+record (no reimplementation)",
+   "input_contract": "REALITY_EVENT (full schema) + package context (spec, eng, prior belief)",
+   "output_contract": "record{event_validation, belief_update, candidate_mutation, discovery_constraint, dossier_v2}; REAL_LOOP_VERIFIED stays FALSE (derived state)",
+   "provenance_contract": "Art. XXXVIII: no silent mutation; every belief change carries trigger_event_id + before/after hashes",
+   "tests": [
+    "test_e13_reality_boundary_ai_source_rejected",
+    "test_e13_incomplete_event_rejected_no_belief_change",
+    "test_e13_valid_event_updates_belief_and_mutates_candidate"
+   ],
+   "historical_validation": "valid BUYER_FEEDBACK exercises full chain incl. V2 package; AI-source and incomplete events rejected",
+   "promotion_status": "PROMOTED_E13",
+   "canonical_choice_rationale": "reuse of the frozen R370G gate keeps one reality-event authority (Art. X)",
+   "rejected_alternatives": [
+    "parallel event schema (would fragment the reality boundary)",
+    "LLM-scored feedback (untrusted component must not grade reality)"
+   ]
   }
  ],
  "conductor": {
   "entry_point": "discovery_fabric/engine/run.py::EngineRun",
-  "stage_order_exact_per_D8": ["RETRIEVE", "FREEZE", "SYNTHESIZE", "VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION", "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY", "NEXT_BEST_ACTION", "RANK"],
+  "stage_order_exact_per_D8": [
+   "RETRIEVE",
+   "FREEZE",
+   "SYNTHESIZE",
+   "VERIFY",
+   "MULTI_SOURCE_DISCOVERY",
+   "COLLISION",
+   "ATTACK",
+   "CONTRADICTION",
+   "KILLER_EXPERIMENT",
+   "ADJUDICATION",
+   "CLASSIFY",
+   "NEXT_BEST_ACTION",
+   "RANK"
+  ],
   "fail_closed_policy": "SYNTHESIZE failure is fatal to downstream (nothing meaningful without a candidate); other external failures degrade to explicit UNRESOLVED states and SKIPPED only when truly dependent; every terminal state is honest",
   "cemetery_update_policy": "append-only, conductor-level, only on final REJECT/KILL"
+ },
+ "e_directive_addendum": {
+  "directive": "CEO E1-E14: bridge SURVIVING DISCOVERY -> AUTOMATIC ENGINEERING SPECIFICATION -> AUTOMATIC 15-DOSSIER-LEVEL PACKAGE",
+  "added_at_utc": "2026-08-27",
+  "conductor_post_rank_pipeline": "run.py --with-package (survivor gate enforced; D8 stage order unchanged)",
+  "e14_blueprint": "ENGINE_BLUEPRINT.md",
+  "honest_status": {
+   "full_autonomous_e2e": "BLOCKED ONLY BY CREDENTIALS (any of OPENROUTER/NVIDIA/ANTHROPIC/GEMINI/OPENAI/QWEN/DEEPSEEK _API_KEY via env or .env.keys)",
+   "bridge_machinery": "PROVEN offline via controlled rehearsal (SYNTHETIC_REHEARSAL=TRUE)",
+   "real_loop_verified": false,
+   "transfer_ready": false
+  }
  }
 }

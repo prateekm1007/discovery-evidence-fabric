@@ -1,8 +1,18 @@
-"""A2 synthesize — LLM generates candidate from frozen evidence."""
+"""A2 synthesize — LLM generates candidate from frozen evidence.
+
+E1 bridge: transport is delegated to discovery_fabric.engine.llm_registry
+(seven-provider registry; missing keys are PROVIDER_UNAVAILABLE, never a
+silent downgrade — Constitution Art. IV/XXV). Prompt, parsing and candidate
+assembly (business logic) are UNCHANGED from the frozen A2 implementation.
+"""
 from __future__ import annotations
 import os
 import json, re, hashlib, ssl, time, urllib.request
 from datetime import datetime, timezone
+
+# Set by llm_chat() on every call: provenance of the transport actually used.
+# Art. VI: only real call metadata is recorded here, never placeholders.
+_LAST_PROVIDER_META: dict = {"status": "NEVER_CALLED"}
 
 FROZEN_MODEL = "deepseek/deepseek-v4-flash-0731"
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
@@ -36,24 +46,28 @@ MECHANISM_SOURCE_SPAN: <verbatim substring from abstract supporting MECHANISM>
 def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
 
 def llm_chat(prompt, system="", max_retries=2, timeout=60):
-    messages = []
-    if system: messages.append({"role": "system", "content": system})
-    messages.append({"role": "user", "content": prompt})
-    payload = {"model": FROZEN_MODEL, "messages": messages, "max_tokens": 8000, "temperature": 0.0}
-    for attempt in range(max_retries + 1):
-        try:
-            req = urllib.request.Request(OPENROUTER_URL, data=json.dumps(payload).encode(),
-                headers={"Authorization": f"Bearer {OPENROUTER_API_KEY}", "Content-Type": "application/json",
-                         "HTTP-Referer": "https://a2-discovery.local", "X-Title": "A2 Discovery"}, method="POST")
-            resp = urllib.request.urlopen(req, timeout=timeout, context=_SSL)
-            data = json.loads(resp.read())
-            if "error" in data:
-                if attempt < max_retries: time.sleep(3*(attempt+1)); continue
-            content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-            if content: time.sleep(0.5); return content
-            if attempt < max_retries: time.sleep(3*(attempt+1))
-        except:
-            if attempt < max_retries: time.sleep(3*(attempt+1))
+    """E1: delegate transport to the provider registry. Returns content or
+    None exactly as before; _LAST_PROVIDER_META records what happened
+    (OK / PROVIDER_UNAVAILABLE / CALL_FAILED) for the provenance chain."""
+    global _LAST_PROVIDER_META
+    try:
+        from discovery_fabric.engine import llm_registry as reg
+    except Exception as exc:  # registry import broken -> explicit, not silent
+        _LAST_PROVIDER_META = {"status": "CALL_FAILED", "error": f"registry import failed: {exc}"}
+        return None
+    policy = reg.SelectionPolicy(
+        preferred_providers=["openrouter", "deepseek", "anthropic", "openai",
+                             "gemini", "qwen", "nvidia"],
+        purpose="synthesis")
+    res = reg.generate(prompt, system=system, timeout=timeout,
+                       max_retries=max_retries, policy=policy)
+    _LAST_PROVIDER_META = res.to_meta()
+    _LAST_PROVIDER_META["selection_ledger"] = res.selection_ledger
+    if res.ok:
+        time.sleep(0.5)
+        return res.content
+    print(f"  [synthesize] LLM transport status: {res.status}"
+          f"{(' — ' + res.error[:160]) if res.error else ''}")
     return None
 
 def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
@@ -99,7 +113,11 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
             "source_span": paper["abstract"][:2000],
             "retrieval_timestamp": paper["retrieval_timestamp"],
         },
-        "model": FROZEN_MODEL,
+        # E1: record the transport ACTUALLY used (provider + model), falling
+        # back to the frozen model label only when llm_chat was bypassed.
+        "model": (_LAST_PROVIDER_META.get("model") or FROZEN_MODEL),
+        "provider": _LAST_PROVIDER_META.get("provider", "legacy-direct"),
+        "transport_status": _LAST_PROVIDER_META.get("status", "UNKNOWN"),
         "prompt_hash": _hash(SYNTHESIS_PROMPT),
         "input_hash": _hash(prompt),
         "output_hash": _hash(resp),
