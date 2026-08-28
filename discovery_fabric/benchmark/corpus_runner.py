@@ -196,9 +196,15 @@ BENCHMARK_INPUTS: List[Dict[str, Any]] = [
 ]
 
 
-def build_benchmark_envelope(spec: Dict[str, Any], idx: int) -> Candidate:
-    """One survivor envelope per benchmark input (SYNTHETIC_BENCHMARK_INPUT)."""
-    problem_id = f"coder2-bench:{idx:02d}:{spec['domain']}"
+def build_benchmark_envelope(spec: Dict[str, Any], idx: int,
+                             prefix: str = "coder2-bench") -> Candidate:
+    """One survivor envelope per benchmark input (SYNTHETIC_BENCHMARK_INPUT).
+
+    prefix separates the identity universes of the committed benchmark
+    runs (coder2-bench) from the blind runs (coder2-blind) so the two
+    sets' ids can never collide in cross-set contamination checks.
+    """
+    problem_id = f"{prefix}:{idx:02d}:{spec['domain']}"
     problem = {
         "problem_id": problem_id, "device": spec["device"],
         "failure_mode": spec["failure_mode"], "failure": spec["failure"],
@@ -212,12 +218,12 @@ def build_benchmark_envelope(spec: Dict[str, Any], idx: int) -> Candidate:
     ev_base = {
         "source_type": "scientific_paper", "source": "Coder2BenchmarkFixture",
         "publication_date": "2021-06-01",
-        "content_hash": sha256_obj({"b": f"coder2-bench-{idx:02d}"}),
+        "content_hash": sha256_obj({"b": f"{prefix}-{idx:02d}"}),
     }
     ev = dict(ev_base, **{
-        "id": f"coder2-bench-evidence-{idx:02d}",
+        "id": f"{prefix}-evidence-{idx:02d}",
         "source_id": f"BENCH-{idx:02d}",
-        "source_uri": f"https://coder2-benchmark.invalid/{idx:02d}",
+        "source_uri": f"https://{prefix}.invalid/{idx:02d}",
         "title": f"Benchmark fixture study {idx:02d} ({spec['domain']})",
         "abstract": (
             f"In a controlled model, the {spec['mechanism']} was "
@@ -232,9 +238,9 @@ def build_benchmark_envelope(spec: Dict[str, Any], idx: int) -> Candidate:
     supp = []
     for s_i in range(2, 6):
         supp.append(dict(ev_base, **{
-            "id": f"coder2-bench-evidence-{idx:02d}-{s_i}",
+            "id": f"{prefix}-evidence-{idx:02d}-{s_i}",
             "source_id": f"BENCH-{idx:02d}-{s_i}",
-            "source_uri": f"https://coder2-benchmark.invalid/{idx:02d}/{s_i}",
+            "source_uri": f"https://{prefix}.invalid/{idx:02d}/{s_i}",
             "title": f"Benchmark fixture supporting study "
                      f"{idx:02d}-{s_i} ({spec['domain']})",
             "abstract": (
@@ -244,12 +250,12 @@ def build_benchmark_envelope(spec: Dict[str, Any], idx: int) -> Candidate:
                 f"conditions remained consistent with the primary fixture "
                 f"study across repeated measurement series."),
             "doi": f"10.0000/coder2-bench.{idx:02d}.{s_i}",
-            "content_hash": sha256_obj({"b": f"coder2-bench-{idx:02d}-{s_i}"}),
+            "content_hash": sha256_obj({"b": f"{prefix}-{idx:02d}-{s_i}"}),
         }))
     env.evidence = [ev] + supp
     env.evidence_ids = [e["id"] for e in env.evidence]
     freeze = {
-        "run_id": "coder2:benchmark", "problem_id": problem_id,
+        "run_id": f"coder2:{prefix}", "problem_id": problem_id,
         "frozen_at": "2026-01-01T00:00:00Z",
         "evidence_count": len(env.evidence),
         "custody_records": [{"record_id": e["id"],
@@ -260,7 +266,7 @@ def build_benchmark_envelope(spec: Dict[str, Any], idx: int) -> Candidate:
     freeze["snapshot_hash"] = sha256_obj(freeze)
     env.provenance = {"evidence_freeze": freeze}
     raw = {
-        "candidate_id": f"cand:coder2-bench-{idx:02d}",
+        "candidate_id": f"cand:{prefix}-{idx:02d}",
         "falsification_test": spec["fals"],
         "mechanism_source_span": spec["mechanism"],
         "source_evidence": {"source_id": ev["id"],
