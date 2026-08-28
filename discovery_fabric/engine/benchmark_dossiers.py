@@ -220,6 +220,18 @@ def extract_package_vector(pkg_dir: Path) -> Dict[str, Any]:
         if fields_ok and c.get("linked", False):
             complete += 1
     provenance_density = round(complete / len(linkage), 3) if linkage else 0.0
+    # E16-C refinement: completeness among CONSUMED design inputs (a
+    # context input that no design output consumes cannot have downstream
+    # provenance BY CONSTRUCTION — counting it as a provenance failure
+    # conflates context-ness with provenance failure; context-ness is
+    # separately visible in the design_role taxonomy). Measured
+    # identically on both origins.
+    consumed = [c for c in linkage
+                if c.get("design_output_id") not in ("NOT_LINKED", None, "")]
+    complete_consumed = sum(1 for c in consumed
+                            if c.get("linked", False))
+    provenance_density_consumed = (round(complete_consumed / len(consumed), 3)
+                                   if consumed else 0.0)
 
     # --- content-depth measures (from the rendered PDF text) --------------
     mfg_s, mfg_e = _section_span(text, "13. Manufacturing")
@@ -260,6 +272,7 @@ def extract_package_vector(pkg_dir: Path) -> Dict[str, Any]:
         "equation_count": equations,
         "parameter_count": params,
         "provenance_density": provenance_density,
+        "provenance_density_consumed": provenance_density_consumed,
         "traceability_density": (round(len(chains) / objects, 3)
                                  if objects else 0.0),
         "manufacturing_depth": manufacturing_depth,
@@ -282,38 +295,63 @@ def extract_package_vector(pkg_dir: Path) -> Dict[str, Any]:
 
 
 def extract_corpus(corpus_root: Optional[Path] = None) -> Dict[str, Any]:
-    """Extract the 15 benchmark vectors and derive the E15 contract:
-    per dimension floor = min over the corpus, target = median."""
+    """Extract the 15 benchmark vectors and derive the E15 contract.
+
+    CEO E16-A: floors/targets are derived from the TRAINING_REFERENCE
+    stratum ONLY (10 packages). The DEVELOPMENT_HOLDOUT stratum never
+    informs floors; the BLIND_HOLDOUT stratum is sealed until evaluation
+    (benchmark_split.py). All 15 measured vectors are recorded for
+    transparency, each labeled with its stratum."""
+    from .benchmark_split import (SPLIT_ARTIFACT, assign_strata,
+                                  load_split, stratum_of)
     root = Path(corpus_root) if corpus_root else FROZEN_PORTFOLIO
-    packages = []
-    for d in sorted(root.iterdir()):
-        if d.is_dir() and (d / "PACKAGE_MANIFEST.json").exists():
-            packages.append(extract_package_vector(d))
-    if len(packages) != 15:
+    dirs = [d for d in sorted(root.iterdir())
+            if d.is_dir() and (d / "PACKAGE_MANIFEST.json").exists()]
+    if len(dirs) != 15:
         raise RuntimeError(
             f"expected 15 frozen benchmark packages at {root}, found "
-            f"{len(packages)} — E15-A extraction refused (benchmark "
+            f"{len(dirs)} — E15-A extraction refused (benchmark "
             "integrity)")
+    if not SPLIT_ARTIFACT.exists():
+        from .benchmark_split import write_canonical_artifacts
+        write_canonical_artifacts()
+    split = load_split()
+    # a foreign corpus cannot be stratified by the canonical assignment
+    assign_strata(root)
+    packages = []
+    for d in dirs:
+        p = extract_package_vector(d)
+        p["_stratum"] = stratum_of(d.name)
+        packages.append(p)
+    training = [p for p in packages
+                if p["_stratum"] == "TRAINING_REFERENCE"]
+    if len(training) != 10:
+        raise RuntimeError(
+            "TRAINING_REFERENCE stratum must hold 10 packages, found "
+            f"{len(training)} — floors refused (E16-A)")
     floors: Dict[str, Any] = {}
     targets: Dict[str, Any] = {}
     for dim in DIMENSIONS:
-        values = [p[dim] for p in packages]
+        values = [p[dim] for p in training]
         floors[dim] = min(values)
         targets[dim] = (round(statistics.median(values), 3)
                         if isinstance(values[0], float)
                         else statistics.median(values))
     return {
-        "contract": "E15_BENCHMARK_CONTRACT (E15-A)",
-        "version": "1.0.0",
+        "contract": "E15_BENCHMARK_CONTRACT (A8/E15-A, E16-A stratified)",
+        "version": "2.0.0",
         "benchmark_corpus": str(root),
         "corpus_size": len(packages),
         "dimensions": list(DIMENSIONS),
         "floors": floors,
         "targets": targets,
+        "floors_derived_from": "TRAINING_REFERENCE (10 packages; E16-A)",
+        "strata": split["strata"],
         "rule": ("a generated package must meet EVERY floor dimension "
-                 "(E15-J); floor = min across the 15 frozen gold-standard "
-                 "dossiers; target = median; values COMPUTED from the "
-                 "actual corpus, never hard-coded"),
+                 "(E15-J); floor = min across the TRAINING_REFERENCE "
+                 "stratum; target = median; values COMPUTED from the "
+                 "actual corpus, never hard-coded; BLIND_HOLDOUT vectors "
+                 "are sealed and never inform these floors"),
         "per_package": packages,
         "extracted_at": datetime.now(timezone.utc).isoformat(
             timespec="seconds") + "Z",
@@ -397,6 +435,11 @@ def measure_generated_vector(spec: Dict[str, Any], eng: Dict[str, Any],
         if fields_ok and c.get("linked", False):
             complete += 1
     provenance_density = round(complete / len(linkage), 3) if linkage else 0.0
+    consumed = [c for c in linkage
+                if c.get("design_output_id") not in ("NOT_LINKED", None, "")]
+    complete_consumed = sum(1 for c in consumed if c.get("linked", False))
+    provenance_density_consumed = (round(complete_consumed / len(consumed), 3)
+                                   if consumed else 0.0)
 
     manifest_path = folder / "PACKAGE_MANIFEST.json"
     build_plan_objs = 0
@@ -438,6 +481,7 @@ def measure_generated_vector(spec: Dict[str, Any], eng: Dict[str, Any],
         "equation_count": len(equations),
         "parameter_count": len(params),
         "provenance_density": provenance_density,
+        "provenance_density_consumed": provenance_density_consumed,
         "traceability_density": (round(len(chains) / objects, 3)
                                  if objects else 0.0),
         "manufacturing_depth": manufacturing_depth,

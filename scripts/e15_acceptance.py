@@ -76,7 +76,7 @@ def main() -> int:
         },
         "scale_proof": {},
         "equivalence": {},
-        "real_capstone": {},
+        "live_autonomous_software_capstone": {},
     }
 
     # ---------------- E15-I: 15 survivors through the E15 pipeline -------
@@ -239,7 +239,7 @@ def main() -> int:
                     "release_id"),
             }
             break
-    acceptance["real_capstone"] = capstone or {
+    acceptance["live_autonomous_software_capstone"] = capstone or {
         "release_status": "NOT_RELEASED (no released E15 capstone found — "
                           "honest record, Art. XXV)"}
 

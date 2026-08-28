@@ -304,18 +304,28 @@ class EngineRun:
             spec = build_invention_spec(self.env, run_ctx)
             self._spec = spec
             self._persist("INVENTION_SPECIFICATION.json", spec)
-            if not (spec.get("_survivor_gate") or {}).get("survivor"):
-                gate_status = (spec.get("_survivor_gate") or {}).get(
-                    "final_status")
-                self.package_failure = (
-                    "SURVIVOR_GATE: not a survivor; no package generated "
-                    f"(final_status={gate_status})")
-                self._persist("PACKAGE_FAILED.json", {
+            self._naive_survivor = bool(
+                (spec.get("_survivor_gate") or {}).get("survivor"))
+            if not self._naive_survivor:
+                # CEO E16-F: the discovery loop rejected the naive
+                # candidate. The recorded EXPLORATION GRID (E16-E) now
+                # generates the candidate set; every grid candidate faces
+                # the SAME engineering attack -> repair -> selection ->
+                # package -> E16-H release gate. The naive candidate stays
+                # dead. Grid candidates carry the honest marker that
+                # discovery-level verification did NOT run for them, so
+                # the release gate holds them for human review at best
+                # (never an automatic RELEASED without the full loop).
+                self._persist("SURVIVOR_GATE.json", {
                     "stage": "SURVIVOR_GATE",
-                    "reason": "not a survivor; no package generated",
                     "final_status": (spec.get("_survivor_gate") or {})
-                    .get("final_status")})
-                return
+                    .get("final_status"),
+                    "resolution": "exploration grid advances candidates "
+                                  "to the engineering gauntlet (E16-F); "
+                                  "discovery-level verification was NOT "
+                                  "re-run per grid candidate — recorded "
+                                  "honestly",
+                })
 
             # ---------- E15-E: multi-model ensemble (honest, non-fatal) --
             ensemble = None
@@ -360,13 +370,15 @@ class EngineRun:
                 d["mechanism_map"] = mm
                 return Candidate.from_dict(d)
 
-            pool: List[Dict[str, Any]] = [{
-                "key": "primary",
-                "candidate_id": (self.env.candidate_id
-                                 or f"primary:{self.run_id}"),
-                "env_view": self.env,
-                "spec": spec,
-                "origin": "DISCOVERY_LOOP_SURVIVOR"}]
+            pool: List[Dict[str, Any]] = []
+            if self._naive_survivor:
+                pool.append({
+                    "key": "primary",
+                    "candidate_id": (self.env.candidate_id
+                                     or f"primary:{self.run_id}"),
+                    "env_view": self.env,
+                    "spec": spec,
+                    "origin": "DISCOVERY_LOOP_SURVIVOR"})
             for m in (ensemble or {}).get("members", []):
                 cand = m.get("candidate") or {}
                 if (m.get("status") == "OK"
@@ -379,6 +391,51 @@ class EngineRun:
                         "origin": f"ENSEMBLE_{m.get('role')}"
                                   f"({m.get('provider_id')})"})
 
+            # ---- E16-E/E16-F: the exploration grid -----------------------
+            # When the discovery loop rejected the naive candidate, the
+            # recorded exploration angles x configured providers generate
+            # the candidate set for the engineering gauntlet.
+            grid_result = None
+            if not self._naive_survivor:
+                try:
+                    from .candidate_diversity import (generate_diverse_candidates,
+                                                      measure_diversity)
+                    grid_result = generate_diverse_candidates(
+                        self.problem, self.env.evidence or [])
+                    self._persist("EXPLORATION_GRID.json", grid_result)
+                    for c in grid_result.get("candidates", []):
+                        f = c.get("fields") or {}
+                        if not f.get("intervention"):
+                            continue
+                        grid_cand = {
+                            "candidate_id": c["candidate_id"],
+                            "mechanism": f.get("mechanism", ""),
+                            "intervention": f.get("intervention", ""),
+                            "expected_effect": f.get("expected_effect", ""),
+                            "falsification_test":
+                                f.get("falsification_test", ""),
+                            "mechanism_source_span":
+                                f.get("mechanism_source_span", ""),
+                            "source_evidence": {
+                                "source_id": ((self.env.evidence or [{}])[0]
+                                              .get("id", "")),
+                                "source_hash": ((self.env.evidence or [{}])[0]
+                                                .get("content_hash", ""))},
+                            "exploration_angle": c.get("angle"),
+                            "exploration_provider": c.get("provider_id")}
+                        pool.append({
+                            "key": f"grid-{c.get('angle')}",
+                            "candidate_id": c["candidate_id"],
+                            "env_view": _env_with_candidate(grid_cand),
+                            "spec": None,
+                            "origin": f"EXPLORATION_GRID_{c.get('angle')}"
+                                      f"({c.get('provider_id')})"})
+                except Exception as exc:  # noqa: BLE001 — recorded, honest
+                    self._persist("EXPLORATION_GRID.json", {
+                        "status": "GRID_ERROR",
+                        "error": f"{type(exc).__name__}: {exc}"})
+                    grid_result = None
+
             # ---------- E15-F/E15-G: attack all, repair viable ------------
             evaluated: List[Dict[str, Any]] = []
             for c in pool:
@@ -386,6 +443,22 @@ class EngineRun:
                 s = c["spec"] or build_invention_spec(c["env_view"],
                                                       run_ctx)
                 if c["spec"] is None:
+                    if key.startswith("grid-"):
+                        # E16-F honesty marker: this candidate came from
+                        # the exploration grid AFTER the discovery loop
+                        # rejected the naive candidate; discovery-level
+                        # verification did NOT run for it
+                        s = dict(s, _exploration_candidate={
+                            "marker": "EXPLORATION_GRID_CANDIDATE",
+                            "discovery_verification":
+                                "NOT_PERFORMED_FOR_THIS_CANDIDATE",
+                            "consequence": ("the E16-H release gate holds "
+                                            "this dossier for human "
+                                            "engineering review; a "
+                                            "discovery-loop re-run is "
+                                            "required before automatic "
+                                            "release"),
+                            "angle": c.get("origin")})
                     self._persist(f"INVENTION_SPECIFICATION_{key}.json", s)
                 eng1 = build_engineering_spec(s, c["env_view"], run_ctx)
                 if key == "primary":
@@ -499,12 +572,27 @@ class EngineRun:
                 self._persist("DOSSIER_QUALITY_EVALUATION.json",
                               quality_final)
                 assert_quality_gate(quality_final)
+                # ---------- E16-H: holdout release gate -----------------
+                from .release_gate import (HELD_FOR_HUMAN_REVIEW,
+                                           RELEASED,
+                                           evaluate_release_gate)
+                gate = evaluate_release_gate(spec_rel, eng_rel,
+                                             self.package_report)
+                self._persist("RELEASE_GATE_EVALUATION.json", gate)
+                self.release_gate = gate
+                self._terminal_status = (RELEASED
+                                         if gate["decision"] == RELEASED
+                                         else HELD_FOR_HUMAN_REVIEW)
             if (self.package_report.get("complete")
                     and self.package_number is None):
-                # the allocated identity is now a RELEASED package
-                # (registry is append-only; the transition is recorded)
+                # the allocated identity reaches its terminal state:
+                # RELEASED only when the E16-H gate passed all six gates;
+                # HELD_FOR_HUMAN_REVIEW when any gate is CONDITIONAL
+                # (never counted as an automatic PASS — CEO E16-H)
                 from .package_registry import mark_released
                 mark_released(invention_id,
+                              status=getattr(self, "_terminal_status",
+                                             "RELEASED"),
                               registry_path=self.package_registry_path)
         except Exception as exc:  # noqa: BLE001 — explicit, never fabricated
             self.package_failure = f"{type(exc).__name__}: {exc}"

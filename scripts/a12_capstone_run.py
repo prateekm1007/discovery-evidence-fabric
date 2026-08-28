@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""scripts/a12_capstone_run.py — CEO A12: THE REAL CAPSTONE.
+"""scripts/a12_capstone_run.py — CEO A12 capstone runner.
+
+E16-I TERMINOLOGY NOTE: this run is a LIVE AUTONOMOUS SOFTWARE
+CAPSTONE (real literature, real LLM paths, real automatic pipeline).
+The word REAL is reserved — per Article XXXVIII and CEO E16-I — for a
+real buyer, a real engineer, a real experiment and real physical
+observation. REAL_LOOP_VERIFIED remains FALSE for this run.
 
 Execute ONE genuine problem through the ENTIRE system with no manual
 intervention:

@@ -209,11 +209,15 @@ def allocate(invention_id: str, run_id: str,
             fcntl.flock(lf, fcntl.LOCK_UN)
 
 
-def mark_released(invention_id: str, registry_path: Optional[str] = None
-                  ) -> None:
-    """Record that the allocated package was actually RELEASED (status
-    transition ALLOCATED -> RELEASED; never a deletion — append-only
-    registry, history is evidence, Art. XI)."""
+def mark_released(invention_id: str, registry_path: Optional[str] = None,
+                  status: str = "RELEASED") -> None:
+    """Record the allocation's terminal state (status transition
+    ALLOCATED -> RELEASED | HELD_FOR_HUMAN_REVIEW; never a deletion —
+    append-only registry, history is evidence, Art. XI).
+    CEO E16-H: only an all-PASS release gate releases; a CONDITIONAL
+    verdict records HELD_FOR_HUMAN_REVIEW (never an automatic PASS)."""
+    if status not in ("RELEASED", "HELD_FOR_HUMAN_REVIEW"):
+        raise ValueError(f"invalid terminal allocation status: {status!r}")
     p = ensure_registry(registry_path)
     lock = p.with_suffix(p.suffix + ".lock")
     with open(lock, "w") as lf:
@@ -223,7 +227,7 @@ def mark_released(invention_id: str, registry_path: Optional[str] = None
             for r in d["packages"]:
                 if r.get("invention_id") == invention_id and \
                         r.get("status") == "ALLOCATED":
-                    r["status"] = "RELEASED"
+                    r["status"] = status
                     r["released_at"] = utc_now()
             _atomic_write(p, d)
         finally:

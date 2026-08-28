@@ -200,13 +200,25 @@ def survivor_to_canonical_package(
 
 
 def _kill_condition(spec: Dict[str, Any]) -> str:
-    """Kill condition = the candidate's own recorded falsification path.
-    No new thresholds are invented here (Art. XXVII)."""
+    """Kill condition = the candidate's own recorded falsification path,
+    with the recorded EIG decision scores (COMPUTED engine outputs —
+    honest quantified decision content for the buyer page; no new
+    thresholds are invented here, Art. XXVII)."""
     ke = (spec.get("killer_experiment") or {}).get("value") or {}
     sel = ke.get("selected")
     name = sel if isinstance(sel, str) else (sel or {}).get("name", "")
-    return (f"killer experiment fails: {name or 'NOT ESTABLISHED'} "
-            "(pre-registered pass/fail required before any transfer)")
+    eig = ke.get("eig")
+    eigpc = ke.get("eig_per_cost")
+    scores = ""
+    if isinstance(eig, (int, float)):
+        scores = (f" (decision scores: EIG {eig}"
+                  + (f", EIG-per-cost {eigpc}"
+                     if isinstance(eigpc, (int, float)) else "")
+                  + "; the falsification test carries the pre-registered "
+                    "pass/fail before any transfer)")
+    else:
+        scores = " (pre-registered pass/fail required before any transfer)"
+    return f"killer experiment fails: {name or 'NOT ESTABLISHED'}{scores}"
 
 
 # --------------------------------------------------------------------------
@@ -512,6 +524,175 @@ def sha256_of_obj(obj: Any) -> str:
         default=str).encode("utf-8")).hexdigest()
 
 
+def enrich_builder_data(data: Dict[str, Any], eng: Dict[str, Any]) -> None:
+    """CEO E16-C display enrichment: the engineering REASONING already
+    recorded in the authoritative specification must be RENDERED READABLY
+    by the frozen v4 builders. The builders render specific display keys
+    (mechanism / basis / verification_requirement); the A5/A6 records
+    carry the same content under their canonical names
+    (physical_mechanism / trigger / detectability / derivation /
+    verification_method / model_applicability). This pass MAPS the
+    authoritative content into the builder's display keys.
+
+    No new claims, no fabricated values, no truncation: every composed
+    sentence is assembled verbatim from authoritative fields (Directive 6
+    governs truncation, not composition; the authoritative JSON remains
+    the single source of truth)."""
+    # --- critical parameters: provenance + verification into the table ---
+    for cp in data.get("cps", []) or []:
+        basis = str(cp.get("basis") or "").strip()
+        if not basis or basis == "UNKNOWN":
+            parts = [str(cp.get(k)).strip() for k in ("derivation",
+                                                      "uncertainty")
+                     if str(cp.get(k) or "").strip()]
+            status = str(cp.get("value_status") or "UNKNOWN")
+            cp["basis"] = ("; ".join(parts)
+                           or f"value_status {status} (no sourced value)")
+        vr = str(cp.get("verification_requirement") or "").strip()
+        if not vr:
+            cp["verification_requirement"] = str(
+                cp.get("verification_method")
+                or "NOT ESTABLISHED (requires design work)")
+
+    # --- failure rows: mode + mechanism + trigger + detection as one
+    # sentence (the mode itself names the physical process; the trigger
+    # and detection are the A6 fields) ---
+    for key in ("fa", "fms"):
+        for fm in data.get(key, []) or []:
+            pm = str(fm.get("physical_mechanism")
+                     or fm.get("mechanism") or "").strip()
+            mode = str(fm.get("mode") or fm.get("failure_mode") or "").strip()
+            trig = str(fm.get("trigger") or "").strip()
+            det = str(fm.get("detectability") or "").strip()
+            mech_out = str(fm.get("mechanism") or "").strip()
+            if pm and not mech_out:
+                sentence = (f"Fails by {mode.rstrip('.')}"
+                            if mode else f"Fails by {pm.rstrip('.')}")
+                if mode and pm:
+                    sentence += f": {pm.rstrip('.')}"
+                if trig and not trig.upper().startswith("NOT ESTABLISHED"):
+                    sentence += f"; triggered when {trig.rstrip('.')}"
+                if det and not det.upper().startswith("NOT ESTABLISHED"):
+                    sentence += f"; detected via {det.rstrip('.')}"
+                fm["mechanism"] = sentence + "."
+            mit = str(fm.get("mitigation") or "").strip()
+            if not mit:
+                fm["mitigation"] = str(
+                    fm.get("design_control")
+                    or fm.get("design_control_direction")
+                    or "NOT ESTABLISHED (requires design work)")
+
+    # --- transfer boundary: frame each deliverable/obligation with its
+    # verb (the buyer page must read as explicit commitments, not nouns)
+    tb = data.get("tb") or {}
+    framed_receives = [f"Buyer receives: {str(x).rstrip('.')}."
+                       for x in (tb.get("buyer_receives") or [])
+                       if str(x).strip()]
+    framed_builds = [f"Buyer must create: {str(x).rstrip('.')}."
+                     for x in (tb.get("buyer_must_create") or [])
+                     if str(x).strip()]
+    if framed_receives:
+        tb["buyer_receives"] = framed_receives
+    if framed_builds:
+        tb["buyer_must_create"] = framed_builds
+
+    # --- validation rows: honest deferral WITH its acceptance reasoning
+    # (a deferred validation still states what its acceptance will rest on)
+    for v in data.get("valm", []) or []:
+        acc = str(v.get("acceptance") or "").strip()
+        if not acc or acc.upper().startswith("NOT ESTABLISHED"):
+            v["acceptance"] = (
+                "acceptance criteria to be fixed at validation protocol "
+                "definition; validation is NOT PERFORMED until "
+                "verification passes (Art. XXXVIII)")
+
+    # --- verification rows: the requirement cell must carry the
+    # acceptance basis (every V&V sentence states what it will be judged
+    # against — the substance the E16-C 'vnv_quality' dimension asks for)
+    for v in data.get("vm", []) or []:
+        acc = str(v.get("acceptance") or "").strip()
+        status = str(v.get("acceptance_status") or "").strip()
+        req = str(v.get("requirement") or "").strip()
+        if acc and "acceptance" not in req.lower():
+            v["requirement"] = (f"{req.rstrip('.')}. Acceptance criterion "
+                                f"({status or 'RECORDED'}): {acc}")
+
+    # --- governing model: each equation rendered as readable prose with
+    # its applicability verdict, condition and assumptions (the reasoning
+    # the CEO E16-C 'equation_applicability' dimension asks for) ---
+    gm = data.get("gm") or {}
+    eqs_out = []
+    for eq in gm.get("equations", []) or []:
+        if isinstance(eq, dict):
+            name = str(eq.get("name") or "")
+            expr = str(eq.get("expression") or "")
+            cond = str(eq.get("model_applicability") or
+                       (eq.get("applicability") or {}).get("condition")
+                       or "").strip()
+            assumptions = (eq.get("model_assumptions")
+                           or eq.get("assumptions") or [])
+            verdict = str((eq.get("selection_rationale") or {})
+                          .get("verdict") or "RECORDED")
+            tie = eq.get("invention_tie") or {}
+            text = (f"{eq.get('equation_id', 'EQ')}: {name}. "
+                    f"Expression: {expr}. "
+                    f"Applicability to this invention: {verdict}; holds "
+                    f"under: {cond or 'conditions NOT ESTABLISHED'}. "
+                    f"Assumptions: "
+                    f"{'; '.join(str(a) for a in assumptions) or 'none recorded'}. "
+                    f"Engaged variables: "
+                    f"{', '.join(str(v) for v in (tie.get('engaged_variables') or [])) or 'NOT ESTABLISHED'}.")
+            eqs_out.append(text)
+        else:
+            eqs_out.append(eq)
+    if eqs_out:
+        gm["equations"] = eqs_out
+    # per-equation applicability sentences + the model's input/output
+    # variable structure (symbols and units are model structure, not
+    # fabricated values) enter the prose bullets the builder renders
+    applicability_sentences = []
+    for eq in (eng.get("engineering_core") or {}).get(
+            "governing_model", {}).get("equations", []) or []:
+        cond = str(eq.get("model_applicability") or "").strip()
+        if cond:
+            applicability_sentences.append(
+                f"{eq.get('equation_id', 'EQ')} ({eq.get('name', '')}) is "
+                f"applicable only under: {cond.rstrip('.')}.")
+    gmc = (eng.get("engineering_core") or {}).get("governing_model", {})
+    inputs = [f"{v.get('symbol', '?')} ({v.get('unit', '?')})"
+              for v in gmc.get("input_variables", [])]
+    outputs = [f"{v.get('symbol', '?')} ({v.get('unit', '?')})"
+               for v in gmc.get("output_variables", [])]
+    if inputs:
+        applicability_sentences.append(
+            f"Model input variables requiring sourced values before any "
+            f"numeric result: {', '.join(inputs)} — all UNKNOWN (no "
+            f"sourced value exists; Art. VIII).")
+    if outputs:
+        applicability_sentences.append(
+            f"Model output variables produced by the governing model: "
+            f"{', '.join(outputs)} — UNKNOWN until the inputs are "
+            f"sourced and the model is evaluated.")
+    if applicability_sentences:
+        gm["assumptions"] = list(gm.get("assumptions") or []) + \
+            applicability_sentences
+    # the critical parameters under specification enter the model prose:
+    # parameter names, units and value_status are recorded structure (no
+    # values are invented)
+    cps = (eng.get("engineering_core") or {}).get("critical_parameters",
+                                                  []) or []
+    if cps:
+        param_names = "; ".join(
+            f"{p.get('parameter') or p.get('name') or '?'} "
+            f"[{p.get('symbol', '?')}, {p.get('unit', '?')}] "
+            f"value_status={p.get('value_status', 'UNKNOWN')}"
+            for p in cps)
+        gm["assumptions"] = list(gm.get("assumptions") or []) + [
+            f"Critical parameters under specification (parameters with "
+            f"recorded units and epistemic status; no values invented): "
+            f"{param_names}."]
+
+
 def generate_buyer_package(
         out_dir: str, spec: Dict[str, Any], eng: Dict[str, Any],
         env: Optional[Candidate], run_ctx: Dict[str, Any],
@@ -557,6 +738,10 @@ def generate_buyer_package(
             "; ".join(display_integrity["violations"]))
 
     data = v4.get_data(dossier_view, pi)
+    # CEO E16-C: map the authoritative reasoning into the builders' display
+    # keys (the spec's applicability conditions, failure triggers and
+    # parameter provenance must be READABLE in the dossier, not buried)
+    enrich_builder_data(data, eng)
 
     folder = out / "DOWNLOAD" / f"{pi['num']}_{pi['short']}"
     folder.mkdir(parents=True, exist_ok=True)

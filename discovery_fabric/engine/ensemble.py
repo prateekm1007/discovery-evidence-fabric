@@ -88,11 +88,14 @@ def _call_provider(provider_id: str, prompt: str, system: str,
 
 def ensemble_synthesize(problem: Dict[str, Any],
                         evidence: List[Dict[str, Any]],
-                        max_models: int = 2,
+                        max_models: int = 3,
                         timeout: int = 240,
                         ) -> Dict[str, Any]:
-    """E15-E: independent invention candidates from >= 2 configured
-    providers + disagreement objects + recorded adjudication.
+    """E15-E + E16-G: independent invention candidates from up to
+    max_models configured providers + disagreement objects + recorded
+    adjudication. N-ary comparison: COMMON = supported by >= 2 paths;
+    DISAGREEMENTS = pairwise conflicts (deduped, never resolved);
+    UNIQUE = claims from exactly one path.
     Honest degradation: 1 provider -> SINGLE_PROVIDER_PATH; 0 ->
     PROVIDER_UNAVAILABLE. NEVER fabricated disagreement."""
     matrix = availability_matrix()
@@ -202,64 +205,96 @@ def _run_paths(problem: Dict[str, Any], evidence: List[Dict[str, Any]],
             result["adjudication"] = _adjudicate(ok_members)
         return result
 
-    # ---- claim-set comparison --------------------------------------------
+    # ---- claim-set comparison (N-ARY, E16-G) -----------------------------
     dims = ("mechanism", "intervention", "expected_effect",
             "falsification_test")
     fps = {m["role"]: {d: _content_fingerprint(
         m["candidate"].get(d, "")) for d in dims} for m in ok_members}
+    claims: Dict[str, List[Tuple[str, str, float, float]]] = {
+        d: [] for d in dims}
+    for m in ok_members:
+        for d in dims:
+            claims[d].append((m["role"],
+                              m["candidate"].get(d, ""),
+                              _jaccard(fps[m["role"]][d],
+                                       fps[m["role"]][d]), 1.0))
+    # pairwise similarity matrix per dimension
+    from itertools import combinations
+    pair_sims: Dict[str, Dict[Tuple[str, str], float]] = {d: {} for d in dims}
     roles = list(fps)
-    a, b = roles[0], roles[1]
+    for a, b in combinations(roles, 2):
+        for d in dims:
+            pair_sims[d][(a, b)] = _jaccard(fps[a][d], fps[b][d])
 
     common, disagreements, unique = [], [], []
     did = 0
     for d in dims:
-        fa, fb = fps[a][d], fps[b][d]
-        sim = round(_jaccard(fa, fb), 3)
-        claim_a = ok_members[0]["candidate"].get(d, "")
-        claim_b = ok_members[1]["candidate"].get(d, "")
-        if not fa and not fb:
-            continue
-        if sim >= 0.30:
-            common.append({
-                "dimension": d, "similarity": sim,
-                "supporting_roles": [a, b],
-                "claim": claim_a or claim_b,
-                "epistemic_class": "COMPUTED",
-                "note": "independently produced by >= 2 paths",
-            })
-        elif sim <= 0.25:
-            did += 1
-            disagreements.append({
-                "disagreement_id": f"DIS-{did:03d}",
-                "dimension": d,
-                "role_a": a, "claim_a": claim_a,
-                "role_b": b, "claim_b": claim_b,
-                "similarity": sim,
-                "status": "UNRESOLVED (deliberate — no forced consensus)",
-                "resolution_path": ("decisive experiment + buyer "
-                                    "diligence; the disagreement travels "
-                                    "into the dossier's uncertainty "
-                                    "register (Art. XXV)"),
-                "epistemic_class": "COMPUTED",
-                "recorded_at": utc_now(),
-            })
-        else:
-            # the gray band (0.25 < sim < 0.30): neither agreement nor a
-            # sharp disagreement — recorded as a unique variant per role
-            for role, claim in ((a, claim_a), (b, claim_b)):
-                if claim:
-                    unique.append({"dimension": d, "role": role,
-                                   "claim": claim,
-                                   "epistemic_class": "MODELLED"})
+        # agreement clusters: group roles whose claims are mutually >= 0.30
+        agree_groups: List[List[int]] = []
+        for i, (role, claim, _, _) in enumerate(claims[d]):
+            if not claim:
+                continue
+            placed = False
+            for g in agree_groups:
+                j = g[0]
+                sim = pair_sims[d].get(
+                    tuple(sorted([claims[d][j][0], role])),
+                    _jaccard(fps[claims[d][j][0]][d], fps[role][d]))
+                if sim >= 0.30:
+                    g.append(i)
+                    placed = True
+                    break
+            if not placed:
+                agree_groups.append([i])
+        for g in agree_groups:
+            if len(g) >= 2:
+                role0, claim0 = claims[d][g[0]][0], claims[d][g[0]][1]
+                common.append({
+                    "dimension": d,
+                    "supporting_roles": [claims[d][i][0] for i in g],
+                    "claim": claim0,
+                    "epistemic_class": "COMPUTED",
+                    "note": "independently produced by >= 2 paths "
+                            "(N-ary comparison, E16-G)"})
+            else:
+                role0, claim0 = claims[d][g[0]][0], claims[d][g[0]][1]
+                unique.append({"dimension": d, "role": role0,
+                               "claim": claim0,
+                               "epistemic_class": "MODELLED",
+                               "note": "produced by exactly one path"})
+        # pairwise disagreements below the conflict threshold
+        for (a, b), sim in pair_sims[d].items():
+            if sim <= 0.25:
+                claim_a = next(c for r, c, _, _ in claims[d] if r == a)
+                claim_b = next(c for r, c, _, _ in claims[d] if r == b)
+                if not claim_a or not claim_b:
+                    continue
+                did += 1
+                disagreements.append({
+                    "disagreement_id": f"DIS-{did:03d}",
+                    "dimension": d,
+                    "role_a": a, "claim_a": claim_a,
+                    "role_b": b, "claim_b": claim_b,
+                    "similarity": round(sim, 3),
+                    "status": "UNRESOLVED (deliberate — no forced "
+                              "consensus)",
+                    "resolution_path": ("decisive experiment + buyer "
+                                        "diligence; the disagreement "
+                                        "travels into the dossier's "
+                                        "uncertainty register (Art. XXV)"),
+                    "epistemic_class": "COMPUTED",
+                    "recorded_at": utc_now(),
+                })
     result["common_claims"] = common
     result["disagreements"] = disagreements
     result["unique_mechanisms"] = unique
     result["comparison"] = {
-        "method": "significant-word Jaccard over the four invention "
-                  "claim dimensions (deterministic comparator)",
+        "method": "pairwise significant-word Jaccard over the four "
+                  "invention claim dimensions (deterministic, N-ary; "
+                  "E16-G)",
         "thresholds": {"agreement": 0.30, "disagreement": 0.25},
-        "note": "the gray band between the thresholds is recorded as "
-                "unique per-role variants, never forced into either bin",
+        "roles_compared": roles,
+        "pairs_compared": len(roles) * (len(roles) - 1) // 2,
     }
     result["adjudication"] = _adjudicate(ok_members)
     return result

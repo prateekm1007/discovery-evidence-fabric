@@ -1,0 +1,94 @@
+{
+  "artifact": "E16_BENCHMARK_SPLIT (E16-A)",
+  "version": "1.0.0",
+  "split_rule": "packages sorted by package_id, 0-based index i over the 15: BLIND_HOLDOUT if i % 8 == 0 (indices {0, 8}); DEVELOPMENT_HOLDOUT if i % 5 == 4 and not blind (indices {4, 9, 14}); TRAINING_REFERENCE otherwise (the remaining 10). Deterministic, transparent, re-derivable from the frozen corpus alone.",
+  "strata": {
+    "TRAINING_REFERENCE": [
+      "02_adaptive_valve",
+      "03_catalytic_clearance",
+      "04_drainage_floor",
+      "06_failure_predictor",
+      "07_self_powered_sensing",
+      "08_nir_photovoltaic",
+      "11_gravity_damper",
+      "12_osmotic_valve",
+      "13_pressure_sensor",
+      "14_acoustic_detection"
+    ],
+    "DEVELOPMENT_HOLDOUT": [
+      "05_phage_antibiofilm",
+      "10_catheter_navigation",
+      "15_mr_flow_sensor"
+    ],
+    "BLIND_HOLDOUT": [
+      "01_multisegment_flow_control",
+      "09_uwb_localization"
+    ]
+  },
+  "per_package": {
+    "01_multisegment_flow_control": {
+      "stratum": "BLIND_HOLDOUT",
+      "provenance_sha256": "2384b30ead43a0a710455b26b5e95c479df29ef0e87bcc693aedb7d14f15629c"
+    },
+    "02_adaptive_valve": {
+      "stratum": "TRAINING_REFERENCE",
+      "provenance_sha256": "ea45c51bb18ca0bb61d2248bf4418c5fc6a80f72aa89ba16b1b2cdfd7618c980"
+    },
+    "03_catalytic_clearance": {
+      "stratum": "TRAINING_REFERENCE",
+      "provenance_sha256": "a8f98543137b35f111dbd775fcd5c366c8678355560a260646ee1ea9a823f45a"
+    },
+    "04_drainage_floor": {
+      "stratum": "TRAINING_REFERENCE",
+      "provenance_sha256": "c349ea568bf4c51a20c93d822a5fddf272b6c6b4571542d2a655dacd4db44075"
+    },
+    "05_phage_antibiofilm": {
+      "stratum": "DEVELOPMENT_HOLDOUT",
+      "provenance_sha256": "9c3033dbea3e6349faa4802c66ce744d821fe9deb14f2169eed9225e0039c544"
+    },
+    "06_failure_predictor": {
+      "stratum": "TRAINING_REFERENCE",
+      "provenance_sha256": "d3af8138f92ceffc3db6ddf15487937bd0e220bca4d97a2c88a9abd8e37661c9"
+    },
+    "07_self_powered_sensing": {
+      "stratum": "TRAINING_REFERENCE",
+      "provenance_sha256": "ac753f182d1db1c47e5f4d5452ea635ae52fdbfcc8cdd3e9b779e3ce10eb3b78"
+    },
+    "08_nir_photovoltaic": {
+      "stratum": "TRAINING_REFERENCE",
+      "provenance_sha256": "3c9ec720aa165392c1c009d6a17998765ce65706da740e97b95f0cdc68dd75ee"
+    },
+    "09_uwb_localization": {
+      "stratum": "BLIND_HOLDOUT",
+      "provenance_sha256": "5e5e6128a6a88700af4312b2bcd99fc3853f48405868ecb20f1feb2239b95718"
+    },
+    "10_catheter_navigation": {
+      "stratum": "DEVELOPMENT_HOLDOUT",
+      "provenance_sha256": "1ef3b00f8edcb77988633df0d591d512e7ea251892ae7fd54ed2ccf1efd6156a"
+    },
+    "11_gravity_damper": {
+      "stratum": "TRAINING_REFERENCE",
+      "provenance_sha256": "380c0f8fd5835bf1f00f04573d8487d933e2df96629e7a7dd9440e877d7ea12c"
+    },
+    "12_osmotic_valve": {
+      "stratum": "TRAINING_REFERENCE",
+      "provenance_sha256": "b3cf3775fb0d3e3bb7416b0508f406968cab39c07e499c131e067421ca3b62ec"
+    },
+    "13_pressure_sensor": {
+      "stratum": "TRAINING_REFERENCE",
+      "provenance_sha256": "3e0c59a1b99580fc0de7f32bdc6ef654b91fb654431a8a603a603e8b09ee256d"
+    },
+    "14_acoustic_detection": {
+      "stratum": "TRAINING_REFERENCE",
+      "provenance_sha256": "7b67c512a11ae64fccf8e80cd0103ba4ca4c7e4c8955e84d1f1362ae67508d69"
+    },
+    "15_mr_flow_sensor": {
+      "stratum": "DEVELOPMENT_HOLDOUT",
+      "provenance_sha256": "2912708fda5623089b938148c041deaa865ee9fe1d8e2b43255f0dac3acbc2d7"
+    }
+  },
+  "sealed_vectors_file": "BENCHMARK_ENGINEERING_DOSSIERS/BLIND_HOLDOUT/SEALED_VECTORS.json",
+  "sealed_vectors_sha256": "8c0f20a1efd19895307367c100b19dc165304626b16b7d1838d6d9ef34ba732e",
+  "rule": "benchmark floors are derived from TRAINING_REFERENCE ONLY; DEVELOPMENT_HOLDOUT never informs floors; BLIND_HOLDOUT vectors are sealed until evaluation",
+  "generated_at": "2026-08-28T03:18:42+00:00Z"
+}

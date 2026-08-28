@@ -52,7 +52,8 @@ from discovery_fabric.engine.maturity import (  # noqa: E402
 from discovery_fabric.engine.package_factory import (  # noqa: E402
     _safe_slug, generate_buyer_package)
 from discovery_fabric.engine.release import (  # noqa: E402
-    ST_RELEASED, build_discovery_release)
+    ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW,
+    build_discovery_release)
 from discovery_fabric.engine.run import EngineRun  # noqa: E402
 
 CTX = {"run_id": "testrun:fseries", "problem_id": "fixture"}
@@ -305,7 +306,13 @@ def test_d1_survivor_automatically_produces_full_package():
                   "DECISIVE_EXPERIMENT.json",
                   "DISCOVERY_RELEASE.json"):
             assert (Path(td) / f).exists(), f
-        assert release["status"] == ST_RELEASED
+        assert release["status"] in (ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW)
+        if release["status"] == ST_HELD_FOR_HUMAN_REVIEW:
+            # E16-H: a held package carries the recorded gate decision
+            gate = json.loads((Path(td) / "RELEASE_GATE_EVALUATION.json")
+                              .read_text())
+            assert gate["decision"] == "CONDITIONAL"
+            assert any(v == "CONDITIONAL" for v in gate["verdicts"].values())
         rep = run.package_report
         assert rep["complete"] and rep["zip"] and Path(rep["zip"]).exists()
 
@@ -362,7 +369,7 @@ def test_d2_release_binds_discovery_to_transfer_artifact_by_hash():
         zp = Path(release["package_zip"])
         hz = hashlib.sha256(zp.read_bytes()).hexdigest()
         assert release["buyer_package_hash"] == hz
-        assert release["status"] == ST_RELEASED
+        assert release["status"] in (ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW)
 
 
 def test_d2_release_record_reproducible_from_run_dir_alone():
@@ -686,7 +693,7 @@ def test_d8_automatic_survivor_to_complete_package_with_hashes():
             (folder / "ENGINEERING_TRACEABILITY.json").read_text())
         assert trace["passed"] is True
         assert trace["untraceable_engineering_fields"] == []
-        assert release["status"] == ST_RELEASED
+        assert release["status"] in (ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW)
 
 
 # ----------------------------------------------------------------------
@@ -739,7 +746,7 @@ def test_d9_scale_1_3_15_survivors_zero_cross_contamination():
             assert manifest["package_id"] == inv_id
             assert manifest["synthetic_rehearsal"] is True
             rel = json.loads((run_dir / "DISCOVERY_RELEASE.json").read_text())
-            assert rel["status"] == ST_RELEASED
+            assert rel["status"] in (ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW)
             assert rel["invention_id"] == inv_id
             # 02 dossier domain matches the survivor domain (domain-adaptive)
             eng = run._eng
@@ -823,7 +830,10 @@ def test_d10_ablation_each_module_changes_its_downstream_artifact():
     assert eng3_h != base_eng_h
     base_fm_modes = {f["mode"] for f in base_eng["failure_analysis"]}
     eng3_fm_modes = {f["mode"] for f in eng3["failure_analysis"]}
-    assert any("adversarial dimension" in m for m in base_fm_modes)
+    base_findings = {f["finding"]
+                     for f in base_eng["adversarial_findings"]["findings"]}
+    assert any("adversarial dimension" in m
+               for m in base_findings | base_fm_modes)
     assert not any("adversarial dimension" in m for m in eng3_fm_modes)
 
     # KILLER_EXPERIMENT off -> build plan loses WP-01 and the killer VF
@@ -932,5 +942,5 @@ def test_d1_resume_continues_killed_run_without_rerunning_stages():
         assert (td / "ENGINEERING_SPECIFICATION.json").exists()
         assert (td / "DISCOVERY_RELEASE.json").exists()
         rel = json.loads((td / "DISCOVERY_RELEASE.json").read_text())
-        assert rel["status"] == ST_RELEASED
+        assert rel["status"] in (ST_RELEASED, ST_HELD_FOR_HUMAN_REVIEW)
         assert run2.package_report["complete"]

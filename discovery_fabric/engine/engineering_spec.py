@@ -472,8 +472,13 @@ def _build_failure_analysis(spec: Dict[str, Any], module: Dict[str, Any],
                             graph_verifications: List[Dict[str, Any]],
                             arch_do_id: Optional[str],
                             verification_methods: List[str],
-                            ) -> List[Dict[str, Any]]:
+                            ) -> Tuple[List[Dict[str, Any]],
+                                       List[Dict[str, Any]]]:
     """Assemble failure_analysis rows in the CEO A6 nine-field shape.
+    Returns (rows, strategic_findings): rows = physical failure content
+    only; strategic_findings = adversarial dimensions that no domain
+    mechanism explains (E16-C restructure — never padded into failure
+    analysis as contentless placeholders).
 
     Content policy (honesty per Art. XXV/XXXVIII):
       - problem-stated failure  -> SOURCE_FACT row (the motivating failure)
@@ -530,6 +535,13 @@ def _build_failure_analysis(spec: Dict[str, Any], module: Dict[str, Any],
     # physical mechanism when the registry describes the same phenomenon
     # for this invention; otherwise it stays an honest generic placeholder
     # and is CLASSIFIED as such (never silently passed off as substance).
+    # E16-C upgrade: an attack dimension that NO domain mechanism explains
+    # is a STRATEGIC ADVERSARIAL FINDING (novelty risk, transfer weakness,
+    # ...) — not a physical failure mode of the device. It is recorded in
+    # eng['adversarial_findings'], NOT padded into failure analysis as a
+    # contentless placeholder row (the CEO E15 audit: generic failure
+    # content is rejected).
+    strategic_findings: List[Dict[str, Any]] = []
     for f in graph_f_modes:
         vf_id = vf_by_fm.get(f["id"], "NOT_LINKED")
         if f["basis"].startswith("SOURCE_FACT"):
@@ -549,64 +561,70 @@ def _build_failure_analysis(spec: Dict[str, Any], module: Dict[str, Any],
                 "consequence follows from the problem statement)",
                 "design control NOT ESTABLISHED (requires design work)",
                 vf_id, f["basis"]))
-        else:
-            cross = _domain_mechanism_for_attack(
-                f["mode"] + " " + str(f.get("mechanism", "")), module,
-                tokens)
-            if cross:
-                rows.append({
-                    "graph_id": f["id"],
-                    "failure_mode": f["mode"],
-                    "mode": f["mode"],
-                    "physical_mechanism": cross["physical_mechanism"],
-                    "trigger": cross.get("trigger", "NOT ESTABLISHED"),
-                    "detectability": cross.get("detectability",
-                                               "NOT ESTABLISHED"),
-                    "severity": "UNKNOWN (no sourced severity basis)",
-                    "severity_basis": cross.get("severity_basis",
-                                                "NOT ESTABLISHED"),
-                    "design_control": cross.get("design_control_direction",
-                                                "NOT ESTABLISHED"),
-                    "design_feature": "NOT ESTABLISHED",
-                    "verification": vf_id,
-                    "verification_test": vf_id,
-                    "validation": ("NOT_PERFORMED — validation requires "
-                                   "physical observation (Art. XXXVIII)"),
-                    "kill_condition": ("NOT ESTABLISHED — pre-register "
-                                       "pass/fail for this mode before "
-                                       "transfer decisions"),
-                    "evidence": (f"{f['basis']} + domain-registry mechanism "
-                                 f"cross-reference: '{cross.get('mode', '')}'"
-                                 " (E15-D; the adversarial finding describes "
-                                 "a physical phenomenon the domain registry "
-                                 "documents for this invention class)"),
-                    "mitigation": cross.get("design_control_direction",
+            continue
+        cross = _domain_mechanism_for_attack(
+            f["mode"] + " " + str(f.get("mechanism", "")), module,
+            tokens)
+        if cross:
+            rows.append({
+                "graph_id": f["id"],
+                "failure_mode": f["mode"],
+                "mode": f["mode"],
+                "physical_mechanism": cross["physical_mechanism"],
+                "trigger": cross.get("trigger", "NOT ESTABLISHED"),
+                "detectability": cross.get("detectability",
+                                           "NOT ESTABLISHED"),
+                "severity": "UNKNOWN (no sourced severity basis)",
+                "severity_basis": cross.get("severity_basis",
                                             "NOT ESTABLISHED"),
-                    "residual_uncertainty":
-                        "UNKNOWN — untested candidate failure mode (Art. XXV)",
-                    "epistemic_class": f["basis"].split(" (")[0] or "UNKNOWN",
-                    "domain_basis": domain_label(domain),
-                    "invention_applicability": {
-                        "verdict": "TIED",
-                        "evaluation": ("mechanism imported ONLY because the "
-                                       "domain candidate matches the attack "
-                                       "finding AND its applicability signals "
-                                       "match this invention's tokens")},
-                    "mechanism_provenance": {
-                        "source": "domain registry candidate_failure_modes",
-                        "domain_mode": cross.get("mode", ""),
-                        "cross_reference": "E15-D _domain_mechanism_for_attack"},
-                })
-            else:
-                rows.append(_row(
-                    f["id"], f["mode"],
-                    "physical mechanism NOT ESTABLISHED — adversarial verdict "
-                    "recorded: " + f["mechanism"],
-                    "trigger NOT ESTABLISHED (adversarial probe)",
-                    "detectability NOT ESTABLISHED (adversarial probe)",
-                    "severity basis NOT ESTABLISHED (adversarial verdict only)",
-                    "design control NOT ESTABLISHED (requires design work)",
-                    vf_id, f["basis"]))
+                "design_control": cross.get("design_control_direction",
+                                            "NOT ESTABLISHED"),
+                "design_feature": "NOT ESTABLISHED",
+                "verification": vf_id,
+                "verification_test": vf_id,
+                "validation": ("NOT_PERFORMED — validation requires "
+                               "physical observation (Art. XXXVIII)"),
+                "kill_condition": ("NOT ESTABLISHED — pre-register "
+                                   "pass/fail for this mode before "
+                                   "transfer decisions"),
+                "evidence": (f"{f['basis']} + domain-registry mechanism "
+                             f"cross-reference: '{cross.get('mode', '')}'"
+                             " (E15-D; the adversarial finding describes "
+                             "a physical phenomenon the domain registry "
+                             "documents for this invention class)"),
+                "mitigation": cross.get("design_control_direction",
+                                        "NOT ESTABLISHED"),
+                "residual_uncertainty":
+                    "UNKNOWN — untested candidate failure mode (Art. XXV)",
+                "epistemic_class": f["basis"].split(" (")[0] or "UNKNOWN",
+                "domain_basis": domain_label(domain),
+                "invention_applicability": {
+                    "verdict": "TIED",
+                    "evaluation": ("mechanism imported ONLY because the "
+                                   "domain candidate matches the attack "
+                                   "finding AND its applicability signals "
+                                   "match this invention's tokens")},
+                "mechanism_provenance": {
+                    "source": "domain registry candidate_failure_modes",
+                    "domain_mode": cross.get("mode", ""),
+                    "cross_reference": "E15-D _domain_mechanism_for_attack"},
+            })
+        else:
+            strategic_findings.append({
+                "graph_id": f["id"],
+                "finding": f["mode"],
+                "adversarial_verdict": f["mechanism"],
+                "basis": f["basis"],
+                "content_class": "STRATEGIC_FINDING_NOT_PHYSICAL_FAILURE_MODE",
+                "note": ("an adversarial strategic finding (e.g. novelty, "
+                         "transfer, manufacturing risk) — recorded here "
+                         "and in the attack artifacts; it is NOT padded "
+                         "into failure analysis, which carries physical "
+                         "failure modes only (CEO E15 audit: reject "
+                         "generic failure content)"),
+                "resolution": "governed by the engineering attack and the "
+                              "decisive experiment (E15-F)",
+            })
     # E15-D content classification — computed ONCE here, consumed by the
     # E15-B evaluator and the chain enforcement (substance accounting)
     for row in rows:
@@ -666,7 +684,7 @@ def _build_failure_analysis(spec: Dict[str, Any], module: Dict[str, Any],
                               "MODEL_DERIVED, recorded for audit",
             },
         })
-    return rows
+    return rows, strategic_findings
 
 
 # --------------------------------------------------------------------------
@@ -781,35 +799,7 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                 f"({best_hits} shared engineering tokens)")
     _annotate_design_roles(graph["d_inputs"], d_outputs)
 
-    # ---- CEO A4: why this domain (per invention) -------------------------
-    why_this_domain = {
-        "domain": domain,
-        "label": domain_label(domain),
-        "matched_signals": detection["matched_signals"],
-        "matched_in_text": True,
-        "runner_up": detection.get("runner_up"),
-        "basis": ("domain selected by exact-substring matching of the "
-                  "domain's characteristic signals against THIS invention's "
-                  "mechanism/problem text; the matched signals above are "
-                  "the mechanical justification"),
-        "epistemic_class": "MODEL_DERIVED",
-        "note": detection["note"],
-        "equation_applicability_summary": {
-            "applicable": [e["selection_rationale"]["verdict"] and
-                           e["equation"]["equation_id"]
-                           for e in equation_entries
-                           if e["selection_rationale"]["verdict"] ==
-                           "APPLICABLE"],
-            "conditional": [e["equation"]["equation_id"]
-                            for e in equation_entries
-                            if e["selection_rationale"]["verdict"] ==
-                            "CONDITIONAL"],
-            "rejected": [r["equation_id"] for r in rejected_equations],
-        },
-    }
-
-    # ---- CEO A6: invention-specific failure analysis ---------------------
-    failure_modes_out = _build_failure_analysis(
+    failure_modes_out, adversarial_findings = _build_failure_analysis(
         spec, module, domain, graph["f_modes"], graph["verifications"],
         arch_do_id, module.get("verification_methods", []))
 
@@ -827,6 +817,128 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                 "evidence_refs": []})
     graph["f_modes"].extend(dom_graph_fms)
     graph["counts"]["FM"] = len(graph["f_modes"])
+
+    # ---- CEO E16-C: threat wiring for operating-range outputs ------------
+    # a design output that specifies an operating range is threatened by
+    # the domain failure modes whose REGISTRY APPLICABILITY SIGNALS appear
+    # in the range's description (the signals are the domain registry's
+    # own applicability mechanism — reused, not a new keyword hack). The
+    # threat is recorded as an additional FM->DO parent link so the
+    # DI->DO->FM->VF chains complete honestly for range outputs.
+    module_signals = {}
+    for dfm in module.get("failure_modes", []):
+        for f in graph["f_modes"]:
+            if f["id"].startswith("FM-") and not f["id"].startswith("FM-DOM"):
+                continue
+        mode = str(dfm.get("mode", "")).lower()
+        if mode:
+            module_signals[mode] = dfm.get("applicability_signals", [])
+    for f in graph["f_modes"]:
+        mode_text = str(f.get("mode", "")).lower()
+        signals = []
+        for reg_mode, sigs in module_signals.items():
+            # match registry FM to graph FM by shared mode vocabulary
+            reg_words = set(re.findall(r"[a-z]{4,}", reg_mode))
+            graph_words = set(re.findall(r"[a-z]{4,}", mode_text))
+            if len(reg_words & graph_words) >= 2:
+                signals.extend(sigs)
+        if not signals:
+            continue
+        for o in d_outputs:
+            desc = str(o.get("description", "")).lower()
+            if "range" not in desc:
+                continue
+            if o["id"] in (f.get("parent_ids") or []):
+                continue
+            if any(sig and sig.lower() in desc for sig in signals):
+                f["parent_ids"].append(o["id"])
+                f.setdefault("threatened_outputs", []).append(o["id"])
+
+
+    # ---- CEO A4: why this domain (per invention) -------------------------
+    # E16-H DOMAIN_REASONING: the block must answer the CEO's question
+    # "What would change if the mechanism changed?" — derived from the
+    # recorded parameter->equation linkage and the design graph (what
+    # re-opens when the mechanism's physical effect is replaced).
+    param_eq_links = []
+    for cp in _build_critical_parameters(
+            spec, module, domain, equation_entries,
+            module.get("verification_methods", [])):
+        link = _link_parameter_to_equation(
+            str(cp.get("parameter") or cp.get("name") or ""),
+            equation_entries)
+        if link.get("equation_id"):
+            param_eq_links.append({
+                "parameter_id": cp.get("parameter_id"),
+                "parameter": cp.get("parameter") or cp.get("name"),
+                "governing_equation": link["equation_id"],
+                "matched_tokens": link.get("matched_tokens", [])})
+    eq_to_params: Dict[str, List[str]] = {}
+    for l in param_eq_links:
+        eq_to_params.setdefault(l["governing_equation"], []).append(
+            l["parameter"])
+    mechanism_sensitivity = {
+        "question": ("what would change if the mechanism changed "
+                     "(CEO E16 audit: the difference between domain "
+                     "templating and engineering reasoning)"),
+        "answer": {
+            "governing_models_at_risk": [
+                {"equation_id": eq_id,
+                 "governs_parameters": eq_to_params.get(eq_id, []),
+                 "what_changes": (
+                     f"replacing the mechanism's physical effect "
+                     f"invalidates {eq_id}'s applicability verdict, "
+                     f"re-opens the sourcing of "
+                     f"{len(eq_to_params.get(eq_id, []))} governing "
+                     f"parameter(s), and requires re-judgment of the "
+                     f"applicability conditions before any downstream "
+                     f"design output survives")}
+                for eq_id in sorted(eq_to_params)],
+            "rejected_models_would_return": (
+                f"{len(rejected_equations)} equation(s) rejected for THIS "
+                "mechanism would re-enter candidate selection under a "
+                "different mechanism — the rejection is mechanism-"
+                "specific, not absolute"),
+            "design_outputs_dependent": sorted({
+                pid for d in d_outputs for pid in (d.get("parent_ids") or [])
+                if str(pid).startswith("DI-")}),
+            "failure_modes_that_would_vanish": [
+                f["graph_id"] for f in failure_modes_out
+                if (f.get("mechanism_provenance") or {})
+                .get("source", "").startswith("domain registry")
+                or f.get("graph_id", "").startswith("FM-DOM-")],
+            "basis": ("derived mechanically from the recorded parameter-"
+                      "to-equation linkage, the rejected-equation register "
+                      "and the design graph — no new claims"),
+        },
+        "epistemic_class": "MODEL_DERIVED",
+    }
+    why_this_domain = {
+        "domain": domain,
+        "label": domain_label(domain),
+        "matched_signals": detection["matched_signals"],
+        "matched_in_text": True,
+        "runner_up": detection.get("runner_up"),
+        "basis": ("domain selected by exact-substring matching of the "
+                  "domain's characteristic signals against THIS invention's "
+                  "mechanism/problem text; the matched signals above are "
+                  "the mechanical justification"),
+        "epistemic_class": "MODEL_DERIVED",
+        "note": detection["note"],
+        "mechanism_sensitivity": mechanism_sensitivity,
+        "equation_applicability_summary": {
+            "applicable": [e["selection_rationale"]["verdict"] and
+                           e["equation"]["equation_id"]
+                           for e in equation_entries
+                           if e["selection_rationale"]["verdict"] ==
+                           "APPLICABLE"],
+            "conditional": [e["equation"]["equation_id"]
+                            for e in equation_entries
+                            if e["selection_rationale"]["verdict"] ==
+                            "CONDITIONAL"],
+            "rejected": [r["equation_id"] for r in rejected_equations],
+        },
+    }
 
     # governing model from domain equations — symbolic unless fully sourced
     governing = {
@@ -1278,6 +1390,13 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                  "reason": "no measurement or physical observation exists"}],
         },
         "failure_analysis": failure_modes_out,
+        "adversarial_findings": {
+            "rule": ("E16-C: strategic adversarial findings (novelty, "
+                     "transfer, manufacturing, regulatory risks) are "
+                     "recorded here — NOT padded into failure analysis, "
+                     "which carries physical failure modes only"),
+            "findings": adversarial_findings,
+        },
         "engineering_build_plan": build_plan,
         "verification_matrix": [
             dict(

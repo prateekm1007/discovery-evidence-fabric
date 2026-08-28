@@ -29,6 +29,7 @@ from .candidate import sha256_obj, utc_now
 
 # Explicit status vocabulary (Art. X: one authority; no free-text states)
 ST_RELEASED = "RELEASED"
+ST_HELD_FOR_HUMAN_REVIEW = "HELD_FOR_HUMAN_REVIEW"
 ST_NOT_A_SURVIVOR = "NOT_A_SURVIVOR"
 ST_PIPELINE_FAILED = "PIPELINE_FAILED"
 ST_PACKAGE_INCOMPLETE = "PACKAGE_INCOMPLETE"
@@ -89,13 +90,36 @@ def build_discovery_release(
         status = ST_DISCOVERY_INCOMPLETE
     elif spec is not None and not ((spec.get("_survivor_gate") or {})
                                    .get("survivor")):
-        status = ST_NOT_A_SURVIVOR
+        # CEO E16-F: an EXPLORATION-GRID candidate advances through the
+        # engineering gauntlet after the discovery loop rejected the naive
+        # candidate. The package exists and passed the E16-H gate (capped
+        # at HELD — discovery-level verification was not re-run for the
+        # grid candidate). Only a NON-exploration non-survivor is
+        # NOT_A_SURVIVOR.
+        if spec.get("_exploration_candidate"):
+            status = ST_HELD_FOR_HUMAN_REVIEW
+        else:
+            status = ST_NOT_A_SURVIVOR
     elif package_report is None or failure_reason:
         status = ST_PIPELINE_FAILED
     elif not package_report.get("complete") or not buyer_package_hash:
         status = ST_PACKAGE_INCOMPLETE
     else:
-        status = ST_RELEASED
+        # CEO E16-H: the terminal status comes from the persisted holdout
+        # release gate (read from DISK, Art. XXVI). RELEASED requires all
+        # six gates PASS; a CONDITIONAL gate is HELD_FOR_HUMAN_REVIEW and
+        # is NEVER counted as an automatic PASS.
+        gate_path = run_dir / "RELEASE_GATE_EVALUATION.json"
+        if gate_path.exists():
+            try:
+                gate = json.loads(gate_path.read_text())
+                status = (ST_RELEASED
+                          if gate.get("decision") == "RELEASED"
+                          else ST_HELD_FOR_HUMAN_REVIEW)
+            except Exception:  # noqa: BLE001 — corrupt gate = held
+                status = ST_HELD_FOR_HUMAN_REVIEW
+        else:
+            status = ST_HELD_FOR_HUMAN_REVIEW
 
     return {
         "release_id": f"rel:{run_id}:{(invention_id or 'nosurvivor')}",
