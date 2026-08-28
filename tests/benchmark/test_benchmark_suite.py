@@ -7,8 +7,19 @@ the controls (no false positives).
 Regression suite (Phase 13): contract thresholds stay corpus-derived,
 profile/contract/benchmark artifacts stay consistent, and the evaluator
 verdicts on the committed benchmark are stable.
+
+Hermeticity (E20 measurement, 2026-08-28): the heavy module-scoped fixture
+below instantiates BEFORE the function-scoped autouse conftest patch, so
+that patch is not yet active while its rehearsal runs execute. With live
+provider credentials in .env.keys the ensemble call inside
+_post_rank_pipeline then makes LIVE LLM calls (measured: suite hangs on a
+degraded endpoint, 240 s x 3 per call x 6 runs; offline the same suite
+passes in 14.6 s). The fixture therefore guarantees its OWN offline state
+and restores the environment afterwards — the audit suite must never
+spend live calls or depend on ambient credentials.
 """
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -31,6 +42,16 @@ PROFILE = json.loads(
     .read_text(encoding="utf-8"))
 
 
+# Same vocabulary as tests/conftest.py (kept in sync deliberately; the
+# conftest patch is function-scoped and therefore NOT active during this
+# module-scoped fixture's setup — see module docstring).
+_PROVIDER_ENV_VARS = [
+    "OPENROUTER_API_KEY", "NVIDIA_API_KEY", "ANTHROPIC_API_KEY",
+    "GEMINI_API_KEY", "OPENAI_API_KEY", "QWEN_API_KEY", "DEEPSEEK_API_KEY",
+    "MISTRAL_API_KEY",
+]
+
+
 @pytest.fixture(scope="module")
 def two_runs(tmp_path_factory):
     """Complete-dossier runs generated through Coder 1's real pipeline.
@@ -45,25 +66,49 @@ def two_runs(tmp_path_factory):
     so it accepts BOTH statuses as produced-dossier runs; the release-
     YIELD measurement itself lives in the frozen baseline artifacts and
     the engine-head re-measurement, never in this fixture.
+
+    SELF-HERMETICITY (E20): strips provider credentials and neutralizes
+    the .env.keys bootstrap for the ENTIRE module (yield/finally),
+    restoring the exact prior environment afterwards. ENGINE_LIVE=1 is
+    honored as the explicit operator live opt-in (same gate as
+    conftest).
     """
-    root = tmp_path_factory.mktemp("bench_runs")
-    info = corpus_runner.run_benchmark(root, limit=6)
-    released = []
-    for p in info["run_dirs"]:
-        rel = json.loads((Path(p) / "DISCOVERY_RELEASE.json")
-                         .read_text(encoding="utf-8"))
-        has_dossier = bool(rel.get("package_folder") and
-                           Path(rel["package_folder"]).exists())
-        if rel.get("status") in ("RELEASED", "HELD_FOR_HUMAN_REVIEW") \
-                and has_dossier:
-            released.append(Path(p))
-    assert len(released) >= 2, (
-        f"expected at least 2 produced-dossier runs, got "
-        f"{len(released)} — engine E15-H rejection rate on independent "
-        f"inputs is itself a benchmark finding (see "
-        f"AUTOMATED_DOSSIER_BENCHMARK.json and "
-        f"ENGINE_HEAD_REMEASUREMENT_E16MERGE.json)")
-    return released
+    live_opt_in = bool(os.environ.get("ENGINE_LIVE"))
+    saved_env = {v: os.environ.get(v) for v in _PROVIDER_ENV_VARS}
+    import discovery_fabric.engine.adapters as _adapters
+    _orig_load_credentials = _adapters.load_credentials
+    if not live_opt_in:
+        for v in _PROVIDER_ENV_VARS:
+            os.environ.pop(v, None)
+        # the .env.keys bootstrap must not repopulate what we removed
+        _adapters.load_credentials = lambda path=None: {}
+    try:
+        root = tmp_path_factory.mktemp("bench_runs")
+        info = corpus_runner.run_benchmark(root, limit=6)
+        released = []
+        for p in info["run_dirs"]:
+            rel = json.loads((Path(p) / "DISCOVERY_RELEASE.json")
+                             .read_text(encoding="utf-8"))
+            has_dossier = bool(rel.get("package_folder") and
+                               Path(rel["package_folder"]).exists())
+            if rel.get("status") in ("RELEASED", "HELD_FOR_HUMAN_REVIEW") \
+                    and has_dossier:
+                released.append(Path(p))
+        assert len(released) >= 2, (
+            f"expected at least 2 produced-dossier runs, got "
+            f"{len(released)} — engine E15-H rejection rate on independent "
+            f"inputs is itself a benchmark finding (see "
+            f"AUTOMATED_DOSSIER_BENCHMARK.json and "
+            f"ENGINE_HEAD_REMEASUREMENT_E16MERGE.json)")
+        yield released
+    finally:
+        if not live_opt_in:
+            _adapters.load_credentials = _orig_load_credentials
+            for k, v in saved_env.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
 
 
 def _audit(run_dir):

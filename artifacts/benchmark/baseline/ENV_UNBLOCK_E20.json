@@ -1,0 +1,86 @@
+{
+ "artifact": "ENV_UNBLOCK_E20",
+ "owner": "CODER2",
+ "ceo_directive": "Mistral API key re-provisioned to unblock the E19 transport-blocked sealed unseen problems (01/03/04); report the true state",
+ "generated_at": "2026-08-28T13:11:31+00:00Z",
+ "append_only_note": "frozen B10/B16/E19 artifacts NOT modified; this is a NEW environment-measurement artifact at the same engine head 97451397",
+ "measurement_1_mistral_key": {
+  "key_provided_tail": "fgttxW9h",
+  "key_length_chars": 32,
+  "raw_https_chat_completions": {
+   "request": "POST https://api.mistral.ai/v1/chat/completions (model mistral-small-latest, Bearer auth)",
+   "http_status": 401,
+   "response_body": "{\"detail\":\"Invalid API Key\"}"
+  },
+  "raw_https_models_list": {
+   "request": "GET https://api.mistral.ai/v1/models (Bearer auth)",
+   "http_status": 401,
+   "response_body": "{\"detail\":\"Invalid API Key\"}"
+  },
+  "engine_registry_probe": {
+   "transport": "discovery_fabric.engine.llm_registry.generate (provider pinned mistral, fallback forbidden)",
+   "trivial_call": "CALL_FAILED HTTP 401 in 2.51 s wall",
+   "synthesis_scale_call": "CALL_FAILED HTTP 401 in 2.57 s wall",
+   "note": "auth rejection is FAST (2.5 s) — latency is NOT the mistral issue; the key value itself is rejected"
+  },
+  "verdict": "KEY_INVALID — api.mistral.ai rejects this credential with 401 'Invalid API Key' on every endpoint (verified independently via raw HTTPS curl AND the engine's own registry transport; not a header/format/transport artifact)",
+  "likely_causes_for_ceo": [
+   "key copied incompletely or with a typo from the Mistral console (La Plateforme > API Keys)",
+   "key revoked or deactivated before provision",
+   "key issued for a different service/gateway that is not api.mistral.ai"
+  ]
+ },
+ "measurement_2_nvidia_health_reprobe": {
+  "purpose": "Art. XXXIV new-information check — E19 measured 85 s for a 32-token trivial call at 2026-08-28T12:04Z; if the endpoint recovered, further sealed-set attempts would be justified",
+  "transport": "llm_registry.generate, provider pinned nvidia (deepseek-ai/deepseek-v4-flash-0731, the only alive model on the account)",
+  "trivial_call": "CALL_FAILED TimeoutError — read timed out at the 120 s probe budget",
+  "synthesis_scale_call": "CALL_FAILED TimeoutError — read timed out at the 240 s probe budget (the engine's own in-code transport budget)",
+  "comparison_to_e19": "trivial call completed in 85 s at 12:04Z; now exceeds 120 s — endpoint degraded FURTHER, not recovered",
+  "verdict": "NVIDIA_STILL_DEGRADED — no new information favoring retry; Art. XXXIV discipline holds (E19 refusal of further no-information attempts remains correct)"
+ },
+ "conclusion": {
+  "sealed_unseen_problems_01_03_04": "REMAIN TRANSPORT-BLOCKED — the environment still has exactly one alive LLM provider (nvidia, degraded) and one INVALID key (mistral)",
+  "e19_classification_unchanged": "1/4 full-loop honest REJECTED; 2/4 transport-blocked; 1/4 not-run per Art. XXXIV; 0 dossiers; semantic_correctness NOT ASSESSABLE in REAL mode",
+  "b18_milestone": "NOT_MET — unchanged; C3 (semantic fail==0 among released) still not evaluable with zero released dossiers",
+  "not_a_generation_failure": "the engine was never invoked for the blocked problems this session; nothing was fabricated; fail-closed behavior intact (Art. IV/XXV/XXIX)"
+ },
+ "unblock_paths_for_ceo": {
+  "zero_configuration_keys": [
+   "OPENROUTER_API_KEY — first in the engine's default synthesis preference list; hosts the FROZEN synthesis model deepseek/deepseek-v4-flash-0731; strongest drop-in unblock",
+   "DEEPSEEK_API_KEY — second in the default list; same model family on DeepSeek's own endpoint (typically fast); cheap",
+   "ANTHROPIC_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY / QWEN_API_KEY — all in the default synthesis preference list; any one works with no configuration"
+  ],
+  "needs_operator_pin": [
+   "a VALID Mistral key — mistral is quality-tier-3 and NOT in the default synthesis preference list ([openrouter, deepseek, anthropic, openai, gemini, qwen, nvidia]); using it for synthesis requires the engine's designed operator override ENGINE_SYNTHESIS_PROVIDER=mistral (explicit, logged, fallback-forbidden) — the runner script is already prepared to set it"
+  ],
+  "coder1_engine_note": "adding mistral to the default synthesis preference list is an ENGINE change — Coder 1's call, not the auditor's; the operator pin suffices without it",
+  "runner_ready": "sandbox runner prepared and seal-gated (scripts/e20_mistral_preflight.py verified the transport path; the E19 driver resumes blocked problems from their last OK stage snapshot)"
+ },
+ "security_hygiene": {
+  "mistral_key_confinement": "stored ONLY in .env.keys (gitignored, mode 600, never committed — verified via git check-ignore and git ls-files: 0 tracked copies); the full key value appears in NO tracked file and in this artifact only as an 8-char tail",
+  "nvidia_key_tracked_exposure": "current active NVIDIA key NOT in the tracked tree (git grep clean)",
+  "s01_unchanged": "Coder 1's repo-wide secret redaction remains UNPUSHED; origin/main still carries live credential material in 9 tracked files (GitHub PAT ghp_* in 5 files: worklog.md, WORKLOG.md, CANONICAL_STATE x2, scripts/r270; PatSnap sk-* in 4 files: R358, R354 x2, ROUND141 log); PAT rotation still pending CEO action since R270",
+  "origin_state": "origin/main == 97451397 (CODER2-P5); Coder 1's E17 series still UNPUSHED; on-push audit remains pending"
+ },
+ "measurement_3_suite_hermeticity": {
+  "discovery": "while verifying suites after the key provision, the benchmark Phase-1 module (tests/benchmark/test_benchmark_suite.py, CODER2 namespace) HUNG past 580 s with .env.keys present, while passing in 14.56 s with the file moved away",
+  "root_cause": "the module-scoped two_runs fixture instantiates BEFORE the function-scoped autouse hermetic patch in tests/conftest.py; during fixture setup the engine bootstrap (adapters.load_credentials) loads .env.keys into os.environ and the ensemble call inside _post_rank_pipeline makes LIVE LLM calls (nvidia pinned by tier order: 240 s x 3 timeouts per call x 6 rehearsal runs)",
+  "empirical_confirmation": {
+   "with_.env.keys_present": "NO completion within 580 s (killed)",
+   "with_.env.keys_moved_away": "16 passed in 14.56 s"
+  },
+  "defect_class": "same class as Coder 1 UNPUSHED E17 hermeticity fix (conftest ordering + _import_with_env bootstrap); this measurement INDEPENDENTLY CONFIRMS the defect exists at origin/main 97451397 — Coder 1 claim C-class partially corroborated at the defect level (their specific fix remains unverified until push)",
+  "fix_applied": {
+   "file": "tests/benchmark/test_benchmark_suite.py (CODER2 namespace — my file; B1/B2/P4 lineage)",
+   "change": "two_runs made SELF-HERMETIC: strips the 8 provider env vars + neutralizes adapters.load_credentials for the whole module via yield/finally with exact environment restore; ENGINE_LIVE=1 honored as the explicit live opt-in (same gate as conftest)",
+   "not_touched": "tests/conftest.py (Coder 1 file) and every engine file — the conftest-level root fix remains Coder 1 to push"
+  },
+  "verification": {
+   "phase1_with_keys_present": "16 passed in 14.56 s (previously hung)",
+   "full_benchmark_suite_with_keys_present": "126 passed in 44.76 s",
+   "coder1_engine_suites_with_keys_present": "test_e15_series 19 passed 15.74 s; test_e16_series 15 passed 4.83 s (no leak in their function-scoped fixtures)",
+   "main_suite": "847 passed / 2 skipped / 2 failed = exactly the 2 documented pre-existing environmental failures (patsnap rate-limit; secret-scanning = S-01 itself detecting the live PAT at origin)"
+  },
+  "wider_significance": "any operator or CI running the offline suite with credentials in .env.keys would either hang (degraded endpoint) or silently spend live LLM calls during offline tests (healthy endpoint) — the audit suite must never do either"
+ }
+}
