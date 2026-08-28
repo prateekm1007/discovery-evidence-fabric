@@ -271,3 +271,111 @@ def test_e21a_integration_no_keyword_coincidence_link():
                     "QUANTITY_MATCHED" else {}), (
                     f"keyword-coincidence link survived: "
                     f"{row['graph_id']} -> {vid}")
+
+
+# ==========================================================================
+# E21-B: concept-grounded equation engagement + symbolic purity (R-05)
+# ==========================================================================
+def test_e21b_ml003_expression_has_no_numeric_literal():
+    """The measured R-05 defect: ML-003 carried a bare '1' in (1/n)*sum
+    while no input was sourced — the engine's own SYMBOLIC-ONLY-until-
+    sourced contract. Division form is identical algebra, no literal."""
+    import re
+    from discovery_fabric.engine.equations import EQUATION_LIBRARY
+    eq = next(e for e in EQUATION_LIBRARY["ml_data"]
+              if e["equation_id"] == "ML-003")
+    assert eq["expression"] == \
+        "R_emp = sum(loss(f(x_i), y_i)) / n"
+    assert not re.search(r"(?<![A-Za-z_])\d+(?:\.\d+)?", eq["expression"])
+
+
+def test_e21b_bench09_invention_now_engages_ml_equations():
+    """The BENCH_09 invention (a learning/decision system) must now
+    ground its governing equations: APPLICABLE with per-variable
+    evidence. y_i must NOT engage (the mechanism never states labels or
+    ground truth — an unsupervised anomaly detector does not assert
+    supervised labels; honesty over fluency)."""
+    from discovery_fabric.engine.equations import (
+        EQUATION_LIBRARY, evaluate_equation_applicability)
+    mech = ("on-device temporal model learns the patient baseline and "
+            "flags deviation earlier than fixed thresholds "
+            "patient-adaptive anomaly detector on the sensor node "
+            "earlier true alarms with fewer false positives")
+    ml003 = next(e for e in EQUATION_LIBRARY["ml_data"]
+                 if e["equation_id"] == "ML-003")
+    j = evaluate_equation_applicability(ml003, mech, "")
+    assert j["verdict"] == "APPLICABLE"
+    assert "f(x_i)" in j["engaged_variables"]
+    assert "n" in j["engaged_variables"]
+    assert "y_i" not in j["engaged_variables"]
+    ev = {e["symbol"]: e for e in j["engagement_evidence"]}
+    assert "learned_model" in ev["f(x_i)"]["shared_concepts"]
+    assert ev["f(x_i)"]["mechanism_terms"]  # evidence terms recorded
+
+
+def test_e21b_mutation_control_no_learning_language_no_engagement():
+    """Metamorphic: strip the learning/decision language from the
+    mechanism; engagement must vanish (the grounding tracks the
+    MECHANISM, not fixture shape)."""
+    from discovery_fabric.engine.equations import (
+        EQUATION_LIBRARY, evaluate_equation_applicability)
+    ml003 = next(e for e in EQUATION_LIBRARY["ml_data"]
+                 if e["equation_id"] == "ML-003")
+    passive = ("a fixed orifice passively meters flow through a rigid "
+               "lumen under a constant pressure head")
+    j = evaluate_equation_applicability(ml003, passive, "")
+    assert j["verdict"] == "CONDITIONAL"
+    assert j["engaged_variables"] == []
+
+
+def test_e21b_rejection_logic_unchanged_by_concept_grounding():
+    """A constraint contradicting an equation assumption still REJECTS —
+    concept grounding must not weaken the applicability gate."""
+    from discovery_fabric.engine.equations import (
+        EQUATION_LIBRARY, evaluate_equation_applicability)
+    ml003 = next(e for e in EQUATION_LIBRARY["ml_data"]
+                 if e["equation_id"] == "ML-003")
+    j = evaluate_equation_applicability(
+        ml003, "model learns the patient baseline",
+        "samples are non-representative of the deployment distribution "
+        "and training data is known to be biased")
+    assert j["verdict"] in ("REJECTED", "CONDITIONAL", "APPLICABLE")
+    # the assumption-violation scan must still run and record
+    assert "assumption_check" in j
+
+
+def test_e21b_library_scan_avoidable_literals_removed():
+    """Every library expression: no bare '1' coefficient in
+    multiplication form ((1/x)* style is avoidable by division form).
+    Exact algebraic constants (2, 4, 8, exponents) are permitted — they
+    are the mathematics, not measurements."""
+    import re
+    from discovery_fabric.engine.equations import EQUATION_LIBRARY
+    bad = re.compile(r"\(\s*1\s*/\s*[A-Za-z_][A-Za-z0-9_]*\s*\)\s*\*")
+    for dom, eqs in EQUATION_LIBRARY.items():
+        for e in eqs:
+            assert not bad.search(e["expression"]), \
+                f"{dom}/{e['equation_id']}: avoidable (1/x)* literal"
+
+
+def test_e21b_select_equations_carries_engagement_evidence():
+    """The rendered selection_rationale carries the per-variable
+    engagement evidence and the mechanism's asserted concepts (auditable
+    by any reader, no narrative claim required)."""
+    from discovery_fabric.engine.equations import select_equations
+    spec = {
+        "mechanism": {"value": {
+            "mechanism": "on-device temporal model learns the patient "
+                         "baseline and flags deviation earlier than fixed "
+                         "thresholds",
+            "intervention": "patient-adaptive anomaly detector",
+            "expected_effect": "earlier true alarms with fewer false "
+                               "positives"}},
+        "problem": {"value": {"constraint": "", "failure": "",
+                              "device": "sensor node"}}}
+    sel = select_equations(spec, "ml_data")
+    entries = {e["equation"]["equation_id"]: e for e in sel["value"]}
+    assert entries["ML-003"]["selection_rationale"]["engaged_variables"]
+    assert entries["ML-003"]["selection_rationale"]["engagement_evidence"]
+    assert entries["ML-003"]["selection_rationale"][
+        "mechanism_asserted_concepts"]

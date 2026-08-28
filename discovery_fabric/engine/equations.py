@@ -371,22 +371,31 @@ EQUATION_LIBRARY: Dict[str, List[Equation]] = {
     "ml_data": [
         _eq("ML-002", "Bayes' theorem (posterior inference)",
             "P(y|x) = P(x|y) * P(y) / P(x)",
-            [{"symbol": "P(y|x)", "description": "posterior probability", "unit": "-"},
-             {"symbol": "P(x|y)", "description": "likelihood", "unit": "-"},
-             {"symbol": "P(y)", "description": "prior probability", "unit": "-"},
-             {"symbol": "P(x)", "description": "evidence (marginal)", "unit": "-"}],
+            [{"symbol": "P(y|x)", "description": "posterior probability",
+              "unit": "-", "concepts": ["posterior_probability"]},
+             {"symbol": "P(x|y)", "description": "likelihood", "unit": "-",
+              "concepts": ["posterior_probability", "training_data"]},
+             {"symbol": "P(y)", "description": "prior probability", "unit": "-",
+              "concepts": ["posterior_probability"]},
+             {"symbol": "P(x)", "description": "evidence (marginal)", "unit": "-",
+              "concepts": ["posterior_probability"]}],
             "Bayes' theorem (standard probability theory)",
             "probability model correctly specified; priors explicit",
             ["priors and likelihoods are MODEL_DERIVED until validated on "
              "deployment data"],
             "ml_data", output_symbol="P(y|x)"),
         _eq("ML-003", "Empirical risk",
-            "R_emp = (1/n) * sum(loss(f(x_i), y_i))",
-            [{"symbol": "R_emp", "description": "empirical risk", "unit": "-"},
-             {"symbol": "n", "description": "sample count", "unit": "-"},
-             {"symbol": "loss", "description": "loss function value", "unit": "-"},
-             {"symbol": "f(x_i)", "description": "prediction on sample i", "unit": "-"},
-             {"symbol": "y_i", "description": "true label of sample i", "unit": "-"}],
+            "R_emp = sum(loss(f(x_i), y_i)) / n",
+            [{"symbol": "R_emp", "description": "empirical risk", "unit": "-",
+              "concepts": ["risk_error"]},
+             {"symbol": "n", "description": "sample count", "unit": "-",
+              "concepts": ["training_data"]},
+             {"symbol": "loss", "description": "loss function value", "unit": "-",
+              "concepts": ["risk_error"]},
+             {"symbol": "f(x_i)", "description": "prediction on sample i",
+              "unit": "-", "concepts": ["learned_model", "training_data"]},
+             {"symbol": "y_i", "description": "true label of sample i",
+              "unit": "-", "concepts": ["label_outcome"]}],
             "standard empirical-risk quantity (statistical learning "
             "theory texts)",
             "samples independent and representative of the deployment "
@@ -396,9 +405,12 @@ EQUATION_LIBRARY: Dict[str, List[Equation]] = {
             "ml_data", output_symbol="R_emp"),
         _eq("ML-001", "Expected utility of a decision rule",
             "EU = sum_y P(y | x) * U(a(x), y)",
-            [{"symbol": "EU", "description": "expected utility", "unit": "-"},
-             {"symbol": "P(y|x)", "description": "posterior predictive", "unit": "-"},
-             {"symbol": "U", "description": "utility of action under truth", "unit": "-"}],
+            [{"symbol": "EU", "description": "expected utility", "unit": "-",
+              "concepts": ["utility_preference"]},
+             {"symbol": "P(y|x)", "description": "posterior predictive",
+              "unit": "-", "concepts": ["posterior_probability"]},
+             {"symbol": "U", "description": "utility of action under truth",
+              "unit": "-", "concepts": ["utility_preference"]}],
             "standard Bayesian decision theory (decision-theory texts)",
             "utility table fully specified; probabilities calibrated",
             ["utility weights are BUYER_DEFINED/MODEL_DERIVED, never measured"],
@@ -535,6 +547,89 @@ def _token_overlap(text_lower: str, phrases: List[str]) -> List[str]:
     return [p for p in phrases if p and p.lower() in text_lower]
 
 
+# --------------------------------------------------------------------------
+# E21-B: concept grounding for variable engagement
+# --------------------------------------------------------------------------
+# The measured R-05 defect (BENCH_09): the invention "on-device temporal
+# model learns the patient baseline and flags deviation earlier than
+# fixed thresholds" engages the ml_data equations' variables in every
+# engineering sense — it IS a learning/decision system — yet the surface
+# matcher found zero engagements because variable DESCRIPTIONS share no
+# 5+ letter words with the mechanism text. The equations were retained
+# as CONDITIONAL with empty engaged_variables: structurally present,
+# semantically unjustified.
+#
+# CONCEPT_GROUNDING closes that gap the honest way: each concept names
+# an engineering ROLE a mechanism can assert ("a learned model performs
+# inference", "data is consumed to adapt the model", ...). Variables
+# DECLARE their concepts (the "concepts" field — auditable knowledge,
+# like units); mechanism text ASSERTS concepts via the term lists below
+# (the engine's own mechanism-language vocabulary, derived from the
+# domain registry and the equation library's own descriptions). A
+# variable is engaged only when the mechanism asserts one of ITS
+# concepts — never by word coincidence across unrelated texts.
+CONCEPT_GROUNDING: Dict[str, Dict[str, Any]] = {
+    "learned_model": {
+        "terms": ["model", "learner", "classifier", "detector",
+                  "predictor", "network", "algorithm", "learns",
+                  "learned", "learning", "inference", "adaptive",
+                  "anomaly detector", "temporal model"],
+        "grounds": "a learned or algorithmic model performs inference"},
+    "training_data": {
+        "terms": ["sample", "data", "training", "dataset",
+                  "observation", "time-series", "waveform", "baseline",
+                  "cohort", "examples", "patient baseline"],
+        "grounds": "data is consumed to estimate or adapt the model"},
+    "label_outcome": {
+        "terms": ["label", "labels", "ground truth", "true label",
+                  "annotated", "outcome class", "gold standard"],
+        "grounds": "supervised labels or ground-truth outcomes exist"},
+    "decision_rule": {
+        "terms": ["threshold", "thresholds", "decision", "rule",
+                  "policy", "flags", "flagging", "alarm", "trigger",
+                  "cutoff", "criterion"],
+        "grounds": "a decision rule acts on the model's output"},
+    "posterior_probability": {
+        "terms": ["posterior", "prior", "likelihood", "probability",
+                  "probabilistic", "bayesian", "confidence"],
+        "grounds": "uncertainty is represented as a probability"},
+    "utility_preference": {
+        "terms": ["utility", "cost", "benefit", "preference",
+                  "trade-off", "penalty", "reward"],
+        "grounds": "actions are scored by a utility/cost preference"},
+    "risk_error": {
+        "terms": ["risk", "error rate", "loss", "false positive",
+                  "false negative", "generalization", "accuracy",
+                  "false-alarm"],
+        "grounds": "generalization error or decision risk is the "
+                   "quantity of interest"},
+}
+
+
+def assert_concepts(text: str) -> Dict[str, List[str]]:
+    """Concepts ASSERTED by a mechanism/invention text: {concept:
+    [matched terms]}. Deterministic; every assertion carries evidence."""
+    blob = str(text or "").lower()
+    out: Dict[str, List[str]] = {}
+    for concept, spec in CONCEPT_GROUNDING.items():
+        hits = [t for t in spec["terms"] if t in blob]
+        if hits:
+            out[concept] = hits
+    return out
+
+
+def _variable_concepts(var: Dict[str, Any]) -> List[str]:
+    """A variable's declared engineering concepts. Variables with an
+    explicit 'concepts' field use it (auditable knowledge); otherwise
+    concepts resolve from the variable's own description terms."""
+    declared = var.get("concepts")
+    if declared:
+        return list(declared)
+    desc = str(var.get("description", "")).lower()
+    return [c for c, spec in CONCEPT_GROUNDING.items()
+            if any(t in desc for t in spec["terms"])]
+
+
 def evaluate_equation_applicability(eq: Equation, invention_text: str,
                                     constraint_text: str) -> Dict[str, Any]:
     """CEO A4: prove WHY each equation is applicable to THE ACTUAL INVENTION,
@@ -553,12 +648,41 @@ def evaluate_equation_applicability(eq: Equation, invention_text: str,
                     dropped, never silently kept — Art. XVII).
     """
     mech_part = invention_text.lower()
+    # E21-B: concept-grounded engagement. Variables DECLARE engineering
+    # concepts; the mechanism ASSERTS concepts; a variable is engaged
+    # only when the mechanism asserts one of ITS concepts, with the
+    # matching terms recorded as evidence. The legacy description-word
+    # path is retained as a secondary signal (domains without declared
+    # concepts still engage via their own vocabulary).
+    mech_concepts = assert_concepts(invention_text)
     var_engagements = []
+    engagement_evidence = []
     for var in eq["variables"]:
+        v_concepts = _variable_concepts(var)
+        shared = [c for c in v_concepts if c in mech_concepts]
+        if shared:
+            var_engagements.append(var["symbol"])
+            engagement_evidence.append({
+                "symbol": var["symbol"],
+                "shared_concepts": shared,
+                "mechanism_terms": sorted(
+                    {t for c in shared for t in mech_concepts[c]}),
+                "variable_concepts": v_concepts,
+                "grounding": "E21-B concept grounding (declared variable "
+                             "concepts matched against mechanism-asserted "
+                             "concepts)"})
+            continue
         words = [w for w in var["description"].lower().split()
                  if len(w) >= 5]
         if any(w in mech_part for w in words):
             var_engagements.append(var["symbol"])
+            engagement_evidence.append({
+                "symbol": var["symbol"],
+                "shared_concepts": [],
+                "matched_description_words":
+                    [w for w in words if w in mech_part],
+                "grounding": "legacy description-word match (no declared "
+                             "concepts on this variable)"})
     name_engagement = _token_overlap(
         mech_part,
         [w for w in eq["name"].lower().split() if len(w) >= 6])
@@ -591,6 +715,8 @@ def evaluate_equation_applicability(eq: Equation, invention_text: str,
         "verdict": verdict,
         "reason": reason,
         "engaged_variables": var_engagements,
+        "engagement_evidence": engagement_evidence,
+        "mechanism_asserted_concepts": mech_concepts,
         "name_signal_overlap": name_engagement,
         "assumption_check": {
             "assumptions": assumptions,
@@ -655,6 +781,9 @@ def select_equations(spec: Dict[str, Any], domain: str,
                 "verdict": judgment["verdict"],
                 "reason": judgment["reason"],
                 "engaged_variables": judgment["engaged_variables"],
+                "engagement_evidence": judgment["engagement_evidence"],
+                "mechanism_asserted_concepts":
+                    judgment["mechanism_asserted_concepts"],
                 "assumption_check": judgment["assumption_check"],
                 "mechanism_mentions": [
                     k for k in eq["variables"]
