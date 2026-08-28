@@ -1,0 +1,211 @@
+{
+ "artifact": "HUMAN_SPOT_CHECK_QUEUE",
+ "owner": "CODER2",
+ "ceo_directive": "Phase 3 B11 — external human spot-check of claim -> source -> engineering interpretation -> design implication",
+ "status": "PENDING_HUMAN_REVIEW",
+ "created_at": "2026-08-28T05:25:58.764476+00:00",
+ "sampling": {
+  "method": "seeded random sample of reasoning chains from released committed dossiers",
+  "seed": 20260828,
+  "committed_dossiers": [
+   "BENCH_01",
+   "BENCH_04",
+   "BENCH_09"
+  ],
+  "items": 8
+ },
+ "rules": [
+  "human review is EXTERNAL EVIDENCE — never converted to an automated score, never folded into pass/fail",
+  "verdict vocabulary: HUMAN_CONFIRMED | HUMAN_DISPUTED | HUMAN_UNCERTAIN",
+  "aggregation is COUNTS ONLY",
+  "disagreements with automated audit verdicts are preserved, never resolved by overwriting either side",
+  "until reviewed, items stay PENDING_HUMAN_REVIEW — no verdict is fabricated"
+ ],
+ "items": [
+  {
+   "chain_id": "RC-FM004",
+   "chain_subject": "failure_mode:FM-003",
+   "claim": "the transmit power required to close the link deposits local power density in tissue above the sourced exposure ceiling",
+   "source": {
+    "cited_principle": "RF / wireless link",
+    "input_evidence": {
+     "id": "coder2-bench-evidence-04",
+     "title": "Benchmark fixture study 04 (rf_wireless)",
+     "source": "Coder2BenchmarkFixture",
+     "source_uri": "https://coder2-benchmark.invalid/04"
+    },
+    "mechanism_source_span": "exposure-aware link-budget scheduler adapts transmit power to hold link margin"
+   },
+   "engineering_interpretation": "link-margin shortfall solved by raising power; antenna detuning concentrating near-fields | SAR simulation plus phantom measurement against the sourced regulatory limit",
+   "design_implication": "transmit power schedule and duty cycle; exposure-compliant antenna and enclosure design | VF-002",
+   "run": "BENCH_04",
+   "item_id": "HSC-001",
+   "reviewer_verdict": null,
+   "reviewer_id": null,
+   "reviewed_at": null,
+   "reviewer_rationale": null
+  },
+  {
+   "chain_id": "RC-FM002",
+   "chain_subject": "failure_mode:FM-001",
+   "claim": "the transmit power required to close the link deposits local power density in tissue above the sourced exposure ceiling",
+   "source": {
+    "cited_principle": "RF / wireless link",
+    "input_evidence": {
+     "id": "coder2-bench-evidence-04",
+     "title": "Benchmark fixture study 04 (rf_wireless)",
+     "source": "Coder2BenchmarkFixture",
+     "source_uri": "https://coder2-benchmark.invalid/04"
+    },
+    "mechanism_source_span": "exposure-aware link-budget scheduler adapts transmit power to hold link margin"
+   },
+   "engineering_interpretation": "link-margin shortfall solved by raising power; antenna detuning concentrating near-fields | SAR simulation plus phantom measurement against the sourced regulatory limit",
+   "design_implication": "transmit power schedule and duty cycle; exposure-compliant antenna and enclosure design | VF-002",
+   "run": "BENCH_04",
+   "item_id": "HSC-002",
+   "reviewer_verdict": null,
+   "reviewer_id": null,
+   "reviewed_at": null,
+   "reviewer_rationale": null
+  },
+  {
+   "chain_id": "RC-FM011",
+   "chain_subject": "failure_mode:FM-DOM-002",
+   "claim": "external pressure or bending moment exceeds the lumen's collapse resistance; the thin-wall section buckles, the cross-section ovalling shuts the bore and flow stops discontinuously",
+   "source": {
+    "cited_principle": "Fluid mechanics / hydraulics",
+    "input_evidence": {
+     "id": "coder2-bench-evidence-01",
+     "title": "Benchmark fixture study 01 (fluidics_hydraulic)",
+     "source": "Coder2BenchmarkFixture",
+     "source_uri": "https://coder2-benchmark.invalid/01"
+    },
+    "mechanism_source_span": "graded-porosity outlet diffuser spreads flow to reduce stagnant zones where tissue ingrowth starts"
+   },
+   "engineering_interpretation": "device bending, external compression, or suction beyond the wall's critical pressure | kink/collapse test across duty cycle; flow-stoppage signature under applied load",
+   "design_implication": "wall thickness and reinforcement; minimum bend radius; support architecture | VF-006",
+   "run": "BENCH_01",
+   "item_id": "HSC-003",
+   "reviewer_verdict": null,
+   "reviewer_id": null,
+   "reviewed_at": null,
+   "reviewer_rationale": null
+  },
+  {
+   "chain_id": "RC-EQ001",
+   "chain_subject": "equation:RF-001",
+   "claim": "Friis link budget governs the behavior of this invention's primary output within its stated applicability",
+   "source": {
+    "cited_principle": "Friis transmission equation (standard antenna-theory relation)",
+    "input_evidence": {
+     "id": "coder2-bench-evidence-04",
+     "title": "Benchmark fixture study 04 (rf_wireless)",
+     "source": "Coder2BenchmarkFixture",
+     "source_uri": "https://coder2-benchmark.invalid/04"
+    },
+    "mechanism_source_span": "exposure-aware link-budget scheduler adapts transmit power to hold link margin"
+   },
+   "engineering_interpretation": "P_r = P_t * G_t * G_r * (lambda / (4 * pi * d))^2  [RF-001] | Model assumptions: in-body path loss exceeds free-space — margin is MODEL_DERIVED",
+   "design_implication": "no computed value exists (no sourced inputs)",
+   "run": "BENCH_04",
+   "item_id": "HSC-004",
+   "reviewer_verdict": null,
+   "reviewer_id": null,
+   "reviewed_at": null,
+   "reviewer_rationale": null
+  },
+  {
+   "chain_id": "RC-FM010",
+   "chain_subject": "failure_mode:FM-DOM-001",
+   "claim": "at the worst-case combination of depth, antenna orientation and tissue loading the received power falls below the sensitivity floor and the link drops",
+   "source": {
+    "cited_principle": "RF / wireless link",
+    "input_evidence": {
+     "id": "coder2-bench-evidence-04",
+     "title": "Benchmark fixture study 04 (rf_wireless)",
+     "source": "Coder2BenchmarkFixture",
+     "source_uri": "https://coder2-benchmark.invalid/04"
+    },
+    "mechanism_source_span": "exposure-aware link-budget scheduler adapts transmit power to hold link margin"
+   },
+   "engineering_interpretation": "implant orientation change; maximum implant depth; patient tissue-variance at percentiles not measured | BER-vs-distance/depth curves in tissue-equivalent phantom across orientations",
+   "design_implication": "antenna geometry and pattern; link-margin budget with measured tissue loss | VF-005",
+   "run": "BENCH_04",
+   "item_id": "HSC-005",
+   "reviewer_verdict": null,
+   "reviewer_id": null,
+   "reviewed_at": null,
+   "reviewer_rationale": null
+  },
+  {
+   "chain_id": "RC-FM006",
+   "chain_subject": "failure_mode:FM-005",
+   "claim": "physical mechanism NOT ESTABLISHED — adversarial verdict recorded: SURVIVED",
+   "source": {
+    "cited_principle": "UNKNOWN",
+    "input_evidence": {
+     "id": "coder2-bench-evidence-09",
+     "title": "Benchmark fixture study 09 (ml_data)",
+     "source": "Coder2BenchmarkFixture",
+     "source_uri": "https://coder2-benchmark.invalid/09"
+    },
+    "mechanism_source_span": "on-device temporal model learns the patient baseline and flags deviation earlier than fixed thresholds"
+   },
+   "engineering_interpretation": "trigger NOT ESTABLISHED (adversarial probe) | detectability NOT ESTABLISHED (adversarial probe)",
+   "design_implication": "design control NOT ESTABLISHED (requires design work) | VF-002",
+   "run": "BENCH_09",
+   "item_id": "HSC-006",
+   "reviewer_verdict": null,
+   "reviewer_id": null,
+   "reviewed_at": null,
+   "reviewer_rationale": null
+  },
+  {
+   "chain_id": "RC-EQ003",
+   "chain_subject": "equation:ML-001",
+   "claim": "Expected utility of a decision rule governs the behavior of this invention's primary output within its stated applicability",
+   "source": {
+    "cited_principle": "standard Bayesian decision theory (decision-theory texts)",
+    "input_evidence": {
+     "id": "coder2-bench-evidence-09",
+     "title": "Benchmark fixture study 09 (ml_data)",
+     "source": "Coder2BenchmarkFixture",
+     "source_uri": "https://coder2-benchmark.invalid/09"
+    },
+    "mechanism_source_span": "on-device temporal model learns the patient baseline and flags deviation earlier than fixed thresholds"
+   },
+   "engineering_interpretation": "EU = sum_y P(y | x) * U(a(x), y)  [ML-001] | Model assumptions: utility weights are BUYER_DEFINED/MODEL_DERIVED, never measured",
+   "design_implication": "no computed value exists (no sourced inputs)",
+   "run": "BENCH_09",
+   "item_id": "HSC-007",
+   "reviewer_verdict": null,
+   "reviewer_id": null,
+   "reviewed_at": null,
+   "reviewer_rationale": null
+  },
+  {
+   "chain_id": "RC-FM004",
+   "chain_subject": "failure_mode:FM-003",
+   "claim": "physical mechanism NOT ESTABLISHED — adversarial verdict recorded: SURVIVED",
+   "source": {
+    "cited_principle": "UNKNOWN",
+    "input_evidence": {
+     "id": "coder2-bench-evidence-09",
+     "title": "Benchmark fixture study 09 (ml_data)",
+     "source": "Coder2BenchmarkFixture",
+     "source_uri": "https://coder2-benchmark.invalid/09"
+    },
+    "mechanism_source_span": "on-device temporal model learns the patient baseline and flags deviation earlier than fixed thresholds"
+   },
+   "engineering_interpretation": "trigger NOT ESTABLISHED (adversarial probe) | detectability NOT ESTABLISHED (adversarial probe)",
+   "design_implication": "design control NOT ESTABLISHED (requires design work) | VF-002",
+   "run": "BENCH_09",
+   "item_id": "HSC-008",
+   "reviewer_verdict": null,
+   "reviewer_id": null,
+   "reviewed_at": null,
+   "reviewer_rationale": null
+  }
+ ],
+ "blind_stratum_note": "a second queue sampled from the blind dossiers exists in CEO custody (HUMAN_SPOT_CHECK_QUEUE_BLIND.json); its content never enters this repository"
+}

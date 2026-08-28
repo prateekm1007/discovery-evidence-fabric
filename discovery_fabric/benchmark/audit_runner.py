@@ -30,6 +30,8 @@ from . import dossier_quality as dq
 from . import numerical_provenance as np_mod
 from . import reasoning_audit as ra
 from . import replay as rp
+from . import semantic_causal as sc_mod
+from . import semantic_genericness as sg_mod
 
 
 def _j(path: Path) -> Optional[dict]:
@@ -95,6 +97,12 @@ def audit_run(run_dir: Path,
     reasoning = ra.audit_reasoning(metrics.get("eng_spec"),
                                    metrics.get("inv_spec"))
 
+    # Phase 2 B3 — semantic causal review (engineering correctness of
+    # every chain link, independent signature classification)
+    semantic = sc_mod.audit_semantic_causality(
+        metrics.get("eng_spec"), metrics.get("inv_spec"),
+        _input_signature(run_dir))
+
     # cross-artifact consistency (anti-forgery): the claimant's own
     # artifacts must agree with each other. A mutated eng spec / manifest /
     # traceability disagrees with its siblings -> ARTIFACT_INCONSISTENCY.
@@ -114,6 +122,7 @@ def audit_run(run_dir: Path,
     dim_verdicts["VV_SEPARATION"] = vv["verdict"]
     dim_verdicts["INDEPENDENT_REPLAY"] = replay["verdict"]
     dim_verdicts["ARTIFACT_CONSISTENCY"] = consistency["verdict"]
+    dim_verdicts["SEMANTIC_CAUSAL_CORRECTNESS"] = semantic["verdict"]
 
     failing = [k for k, v in dim_verdicts.items() if v == "FAIL"]
     conditional = [k for k, v in dim_verdicts.items()
@@ -148,6 +157,8 @@ def audit_run(run_dir: Path,
         },
         "quality_evaluation": quality,
         "reasoning_audit": reasoning,
+        "semantic_causal_audit": {
+            k: v for k, v in semantic.items() if k != "chains"},
         "artifact_consistency": consistency,
         "numerical_provenance": num_audit,
         "vv_separation": vv,
@@ -216,6 +227,29 @@ def audit_batch(run_dirs: List[Path],
          "violation_count": 0, "verdict": "NOT_MEASURABLE",
          "note": "fewer than two packages"}
 
+    # Phase 2 B4 — semantic genericness audit across released packages
+    # (template prose + factual mischaracterization detection)
+    genericness = sg_mod.audit_semantic_genericness(packages) \
+        if len(packages) > 1 else {
+            "artifact": "SEMANTIC_GENERICNESS_AUDIT",
+            "packages_checked": len(packages), "available": False,
+            "verdict": "NOT_MEASURABLE",
+            "reason": "fewer than two packages"}
+    mismatch_packages = {
+        str(m.get("package_id"))
+        for m in genericness.get("semantic_mismatches") or []}
+    for a in audits:
+        pid = str(a.get("package_id"))
+        run_name = Path(a["run_dir"]).name
+        if pid in mismatch_packages or run_name in mismatch_packages or \
+                run_name in {str(m.get("package_id")) for m in
+                             genericness.get("semantic_mismatches") or []}:
+            a["dimension_verdicts"]["SEMANTIC_GENERICNESS"] = "FAIL"
+            a["failing_dimensions"] = list(
+                a.get("failing_dimensions") or []) + \
+                ["SEMANTIC_GENERICNESS"]
+            a["verdict"] = "BENCHMARK_FAIL"
+
     # aggregate V&V + reasoning + replay artifacts
     vv_all = [a["vv_separation"] for a in audits if "vv_separation" in a]
     reasoning_all = [a["reasoning_audit"] for a in audits
@@ -262,6 +296,7 @@ def audit_batch(run_dirs: List[Path],
                            "BENCHMARK_CONDITIONAL": n_cond,
                            "BENCHMARK_FAIL": n_fail},
         "contamination": contam,
+        "semantic_genericness_audit": genericness,
         "vv_separation_audit": {
             "artifact": "VV_SEPARATION_AUDIT",
             "packages": [{"package_id": a.get("package_id"),
@@ -312,6 +347,21 @@ def audit_batch(run_dirs: List[Path],
         (out_dir / "CROSS_PACKAGE_CONTAMINATION_REPORT.json").write_text(
             json.dumps(contam, indent=1, ensure_ascii=False),
             encoding="utf-8")
+        (out_dir / "SEMANTIC_GENERICNESS_AUDIT.json").write_text(
+            json.dumps(genericness, indent=1, ensure_ascii=False),
+            encoding="utf-8")
+        (out_dir / "ENGINEERING_SEMANTIC_CAUSAL_AUDIT.json").write_text(
+            json.dumps({
+                "artifact": "ENGINEERING_SEMANTIC_CAUSAL_AUDIT",
+                "owner": "CODER2",
+                "packages": [
+                    {"package_id": a.get("package_id"),
+                     "run_dir": a.get("run_dir"),
+                     **{k: v for k, v in
+                        (a.get("semantic_causal_audit") or {}).items()
+                        if k != "chains"}}
+                    for a in audits],
+            }, indent=1, ensure_ascii=False), encoding="utf-8")
         (out_dir / "VV_SEPARATION_AUDIT.json").write_text(
             json.dumps(benchmark["vv_separation_audit"], indent=1,
                        ensure_ascii=False), encoding="utf-8")
