@@ -1,0 +1,570 @@
+{
+ "artifact": "ADJUDICATOR_CALIBRATION",
+ "owner": "CODER2",
+ "ceo_directive": "Phase 4 B14 — calibrate the semantic adjudicators; do not force consensus",
+ "generated_at": "2026-08-28T06:32:51.997354+00:00",
+ "method": {
+  "calibration_set": "12 independently authored known engineering cases; ground truth fixed by the stated engineering principle per case (Art. VIII — not derived from adjudicator behavior)",
+  "instruments": "the UNMODIFIED B9 adjudicators adjudicate_a / adjudicate_b",
+  "verdict_semantics": {
+   "CORRECT": "instrument would not block",
+   "INCORRECT": "instrument would block",
+   "QUESTIONABLE": "honest uncertainty; flags, does not block"
+  },
+  "false_positive": "ground truth INCORRECT, verdict CORRECT — a real defect waved through",
+  "false_negative": "ground truth CORRECT, verdict INCORRECT — good engineering blocked (Art. V risk)",
+  "questionable_handling": "counted as uncertain_defect / uncertain_clean, NEVER folded into false_positive / false_negative",
+  "unstable_class_rule": "an axis is UNSTABLE if any inter-adjudicator disagreement OR any false positive/negative occurs on it (deterministic rule; no invented threshold, Art. XXVII)",
+  "consensus_policy": "NO consensus is forced; no adjudicator code was modified by this calibration (CEO B14; Art. VII/XXX)"
+ },
+ "adjudicator_A": {
+  "scored": 18,
+  "agree_gt": 7,
+  "false_positive": 3,
+  "false_negative": 2,
+  "uncertain_defect": 4,
+  "uncertain_clean": 2,
+  "missed_defect_as_correct": [
+   {
+    "case_id": "CAL06_EQUATION_FAMILY_MISMATCH",
+    "axis": "equation_applicability",
+    "defect_class": "EQUATION_FAMILY_MISMATCH"
+   },
+   {
+    "case_id": "CAL08_CAUSAL_DIRECTION_REVERSED",
+    "axis": "mechanism_correctness",
+    "defect_class": "CAUSAL_DIRECTION_REVERSED"
+   },
+   {
+    "case_id": "CAL10_ACCEPTANCE_CRITERIA_ABSENT",
+    "axis": "verification_appropriateness",
+    "defect_class": "ACCEPTANCE_CRITERIA_ABSENT"
+   }
+  ],
+  "blocked_correct_as_incorrect": [
+   {
+    "case_id": "CAL02_CLEAN_LAMINAR_DRAINAGE",
+    "axis": "failure_mode_correctness"
+   },
+   {
+    "case_id": "CAL07_CLEAN_PASSIVE_ANCHOR",
+    "axis": "mechanism_correctness"
+   }
+  ]
+ },
+ "adjudicator_B": {
+  "scored": 18,
+  "agree_gt": 8,
+  "false_positive": 2,
+  "false_negative": 0,
+  "uncertain_defect": 7,
+  "uncertain_clean": 1,
+  "missed_defect_as_correct": [
+   {
+    "case_id": "CAL01_ACTIVE_PASSIVE_CONTRADICTION",
+    "axis": "mechanism_correctness",
+    "defect_class": "CONTROL_ARCHITECTURE_CONTRADICTION"
+   },
+   {
+    "case_id": "CAL08_CAUSAL_DIRECTION_REVERSED",
+    "axis": "mechanism_correctness",
+    "defect_class": "CAUSAL_DIRECTION_REVERSED"
+   }
+  ],
+  "blocked_correct_as_incorrect": []
+ },
+ "agreement": {
+  "pairs": 18,
+  "agreed": 10,
+  "rate": 0.556
+ },
+ "disagreement": {
+  "pairs": 18,
+  "disagreed": 8,
+  "rate": 0.444
+ },
+ "false_positive": 5,
+ "false_negative": 2,
+ "per_axis": {
+  "mechanism_correctness": {
+   "scored_pairs": 5,
+   "inter_adjudicator_agreed": 3,
+   "inter_adjudicator_disagreed": 2,
+   "false_positives_A_or_B": 3,
+   "false_negatives_A_or_B": 1,
+   "unstable": true
+  },
+  "engineering_reasoning_correctness": {
+   "scored_pairs": 3,
+   "inter_adjudicator_agreed": 3,
+   "inter_adjudicator_disagreed": 0,
+   "false_positives_A_or_B": 0,
+   "false_negatives_A_or_B": 0,
+   "unstable": false
+  },
+  "equation_applicability": {
+   "scored_pairs": 4,
+   "inter_adjudicator_agreed": 1,
+   "inter_adjudicator_disagreed": 3,
+   "false_positives_A_or_B": 1,
+   "false_negatives_A_or_B": 0,
+   "unstable": true
+  },
+  "failure_mode_correctness": {
+   "scored_pairs": 2,
+   "inter_adjudicator_agreed": 1,
+   "inter_adjudicator_disagreed": 1,
+   "false_positives_A_or_B": 0,
+   "false_negatives_A_or_B": 1,
+   "unstable": true
+  },
+  "verification_appropriateness": {
+   "scored_pairs": 4,
+   "inter_adjudicator_agreed": 2,
+   "inter_adjudicator_disagreed": 2,
+   "false_positives_A_or_B": 1,
+   "false_negatives_A_or_B": 0,
+   "unstable": true
+  }
+ },
+ "unstable_classes": [
+  "mechanism_correctness",
+  "equation_applicability",
+  "failure_mode_correctness",
+  "verification_appropriateness"
+ ],
+ "defect_class_catch_table": {
+  "CONTROL_ARCHITECTURE_CONTRADICTION": [
+   {
+    "case_id": "CAL01_ACTIVE_PASSIVE_CONTRADICTION",
+    "axis": "mechanism_correctness",
+    "A": {
+     "verdict": "INCORRECT",
+     "outcome": "AGREE_GT"
+    },
+    "B": {
+     "verdict": "CORRECT",
+     "outcome": "FALSE_POSITIVE"
+    }
+   }
+  ],
+  "EQUATION_REGIME_VIOLATION": [
+   {
+    "case_id": "CAL03_POISEUILLE_IN_TURBULENT_FLOW",
+    "axis": "equation_applicability",
+    "A": {
+     "verdict": "QUESTIONABLE",
+     "outcome": "UNCERTAIN_DEFECT"
+    },
+    "B": {
+     "verdict": "QUESTIONABLE",
+     "outcome": "UNCERTAIN_DEFECT"
+    }
+   }
+  ],
+  "VERIFICATION_QUANTITY_DISJOINT": [
+   {
+    "case_id": "CAL04_VERIFICATION_WRONG_QUANTITY",
+    "axis": "verification_appropriateness",
+    "A": {
+     "verdict": "INCORRECT",
+     "outcome": "AGREE_GT"
+    },
+    "B": {
+     "verdict": "QUESTIONABLE",
+     "outcome": "UNCERTAIN_DEFECT"
+    }
+   }
+  ],
+  "MECHANISM_PASSTHROUGH": [
+   {
+    "case_id": "CAL05_MECHANISM_PASSTHROUGH",
+    "axis": "mechanism_correctness",
+    "A": {
+     "verdict": "QUESTIONABLE",
+     "outcome": "UNCERTAIN_DEFECT"
+    },
+    "B": {
+     "verdict": "QUESTIONABLE",
+     "outcome": "UNCERTAIN_DEFECT"
+    }
+   }
+  ],
+  "EQUATION_FAMILY_MISMATCH": [
+   {
+    "case_id": "CAL06_EQUATION_FAMILY_MISMATCH",
+    "axis": "equation_applicability",
+    "A": {
+     "verdict": "CORRECT",
+     "outcome": "FALSE_POSITIVE"
+    },
+    "B": {
+     "verdict": "QUESTIONABLE",
+     "outcome": "UNCERTAIN_DEFECT"
+    }
+   }
+  ],
+  "CAUSAL_DIRECTION_REVERSED": [
+   {
+    "case_id": "CAL08_CAUSAL_DIRECTION_REVERSED",
+    "axis": "mechanism_correctness",
+    "A": {
+     "verdict": "CORRECT",
+     "outcome": "FALSE_POSITIVE"
+    },
+    "B": {
+     "verdict": "CORRECT",
+     "outcome": "FALSE_POSITIVE"
+    }
+   }
+  ],
+  "FAILURE_MODE_FAMILY_MISMATCH": [
+   {
+    "case_id": "CAL09_FAILURE_MODES_OUTSIDE_FAMILY",
+    "axis": "failure_mode_correctness",
+    "A": {
+     "verdict": "QUESTIONABLE",
+     "outcome": "UNCERTAIN_DEFECT"
+    },
+    "B": {
+     "verdict": "QUESTIONABLE",
+     "outcome": "UNCERTAIN_DEFECT"
+    }
+   }
+  ],
+  "ACCEPTANCE_CRITERIA_ABSENT": [
+   {
+    "case_id": "CAL10_ACCEPTANCE_CRITERIA_ABSENT",
+    "axis": "verification_appropriateness",
+    "A": {
+     "verdict": "CORRECT",
+     "outcome": "FALSE_POSITIVE"
+    },
+    "B": {
+     "verdict": "QUESTIONABLE",
+     "outcome": "UNCERTAIN_DEFECT"
+    }
+   }
+  ]
+ },
+ "instrument_observations": [
+  {
+   "observation_id": "OBS-A1-NEGATION_BLINDNESS",
+   "adjudicator": "ADJUDICATOR_A_FIRST_PRINCIPLES",
+   "root_cause": "token-level active-word matching without negation handling: 'no sensors and no actuators' reads as the active-control term 'actuator'",
+   "evidence": [
+    "CAL07_CLEAN_PASSIVE_ANCHOR: A verdict INCORRECT on ground truth CORRECT (FALSE_NEGATIVE) via CONTROL_ARCHITECTURE_CONTRADICTION"
+   ],
+   "implication": "A can manufacture control-architecture contradictions on honest passive designs; B9 'INCORRECT' verdicts of this class are weak evidence unless the mechanism text carries no negated active words"
+  },
+  {
+   "observation_id": "OBS-A2-FAMILY_VOCABULARY_MISMATCH",
+   "adjudicator": "ADJUDICATOR_A_FIRST_PRINCIPLES",
+   "root_cause": "the family classifier emits family names ('fluidics') while the quantity classifier emits quantity-family names ('hydraulic'); the outside-family comparison can never match, so ANY failure row spanning >= 2 quantity families is flagged",
+   "evidence": [
+    "CAL02_CLEAN_LAMINAR_DRAINAGE: A verdict INCORRECT on ground truth CORRECT (FALSE_NEGATIVE) via FAILURE_MODE_PHYSICS_OUTSIDE_FAMILY on a legitimate hydraulic+biological occlusion row"
+   ],
+   "implication": "A's outside-family finding class is unreliable for multi-physics failure rows (occlusion + biofilm is normal for CSF drainage)"
+  },
+  {
+   "observation_id": "OBS-B1-NO_CONTROL_ARCHITECTURE_CHECK",
+   "adjudicator": "ADJUDICATOR_B_SYSTEMS_TRACE",
+   "root_cause": "adjudicator B is traceability-first and carries no control-architecture check at all",
+   "evidence": [
+    "CAL01_ACTIVE_PASSIVE_CONTRADICTION: B verdict CORRECT on ground truth INCORRECT (FALSE_POSITIVE) with zero findings — the canonical CEO-named defect passes B untouched"
+   ],
+   "implication": "the canonical active/passive contradiction is caught ONLY by A; B9's two-adjudicator design is load-bearing on this axis"
+  },
+  {
+   "observation_id": "OBS-AB1-CAUSAL_DIRECTION_UNVALIDATED",
+   "adjudicator": "BOTH",
+   "root_cause": "neither instrument validates the DIRECTION of a causal claim; presence of causal connectors is checked, physical polarity is not",
+   "evidence": [
+    "CAL08_CAUSAL_DIRECTION_REVERSED: BOTH adjudicators verdict CORRECT on ground truth INCORRECT (FALSE_POSITIVE each) with zero findings — a mechanism that decreases the outlet pressure drop is passed as an anti-overdrainage device"
+   ],
+   "implication": "causal-direction semantics is beyond both instruments; any B9 CORRECT verdict is weak evidence for physical polarity — this is a primary target for the B15 human gold labels"
+  }
+ ],
+ "calibration_rows": [
+  {
+   "case_id": "CAL01_ACTIVE_PASSIVE_CONTRADICTION",
+   "defect_class": "CONTROL_ARCHITECTURE_CONTRADICTION",
+   "axis": "mechanism_correctness",
+   "ground_truth": "INCORRECT",
+   "verdict_A": "INCORRECT",
+   "verdict_B": "CORRECT",
+   "A_vs_gt": "AGREE_GT",
+   "B_vs_gt": "FALSE_POSITIVE",
+   "A_vs_B": "DISAGREE",
+   "finding_classes_A": [
+    "CONTROL_ARCHITECTURE_CONTRADICTION"
+   ],
+   "finding_classes_B": []
+  },
+  {
+   "case_id": "CAL02_CLEAN_LAMINAR_DRAINAGE",
+   "defect_class": "CLEAN_CONTROL",
+   "axis": "mechanism_correctness",
+   "ground_truth": "CORRECT",
+   "verdict_A": "CORRECT",
+   "verdict_B": "CORRECT",
+   "A_vs_gt": "AGREE_GT",
+   "B_vs_gt": "AGREE_GT",
+   "A_vs_B": "AGREE",
+   "finding_classes_A": [],
+   "finding_classes_B": []
+  },
+  {
+   "case_id": "CAL02_CLEAN_LAMINAR_DRAINAGE",
+   "defect_class": "CLEAN_CONTROL",
+   "axis": "engineering_reasoning_correctness",
+   "ground_truth": "CORRECT",
+   "verdict_A": "CORRECT",
+   "verdict_B": "CORRECT",
+   "A_vs_gt": "AGREE_GT",
+   "B_vs_gt": "AGREE_GT",
+   "A_vs_B": "AGREE",
+   "finding_classes_A": [],
+   "finding_classes_B": []
+  },
+  {
+   "case_id": "CAL02_CLEAN_LAMINAR_DRAINAGE",
+   "defect_class": "CLEAN_CONTROL",
+   "axis": "equation_applicability",
+   "ground_truth": "CORRECT",
+   "verdict_A": "QUESTIONABLE",
+   "verdict_B": "CORRECT",
+   "A_vs_gt": "UNCERTAIN_CLEAN",
+   "B_vs_gt": "AGREE_GT",
+   "A_vs_B": "DISAGREE",
+   "finding_classes_A": [
+    "EQUATION_REGIME_REQUIREMENT_NOT_STATED"
+   ],
+   "finding_classes_B": []
+  },
+  {
+   "case_id": "CAL02_CLEAN_LAMINAR_DRAINAGE",
+   "defect_class": "CLEAN_CONTROL",
+   "axis": "failure_mode_correctness",
+   "ground_truth": "CORRECT",
+   "verdict_A": "INCORRECT",
+   "verdict_B": "QUESTIONABLE",
+   "A_vs_gt": "FALSE_NEGATIVE",
+   "B_vs_gt": "UNCERTAIN_CLEAN",
+   "A_vs_B": "DISAGREE",
+   "finding_classes_A": [
+    "FAILURE_MODE_PHYSICS_OUTSIDE_FAMILY"
+   ],
+   "finding_classes_B": [
+    "INPUT_FAILURE_MODE_NOT_ANALYZED"
+   ]
+  },
+  {
+   "case_id": "CAL02_CLEAN_LAMINAR_DRAINAGE",
+   "defect_class": "CLEAN_CONTROL",
+   "axis": "verification_appropriateness",
+   "ground_truth": "CORRECT",
+   "verdict_A": "CORRECT",
+   "verdict_B": "CORRECT",
+   "A_vs_gt": "AGREE_GT",
+   "B_vs_gt": "AGREE_GT",
+   "A_vs_B": "AGREE",
+   "finding_classes_A": [],
+   "finding_classes_B": []
+  },
+  {
+   "case_id": "CAL03_POISEUILLE_IN_TURBULENT_FLOW",
+   "defect_class": "EQUATION_REGIME_VIOLATION",
+   "axis": "equation_applicability",
+   "ground_truth": "INCORRECT",
+   "verdict_A": "QUESTIONABLE",
+   "verdict_B": "QUESTIONABLE",
+   "A_vs_gt": "UNCERTAIN_DEFECT",
+   "B_vs_gt": "UNCERTAIN_DEFECT",
+   "A_vs_B": "AGREE",
+   "finding_classes_A": [
+    "EQUATION_REGIME_REQUIREMENT_NOT_STATED",
+    "EQUATION_APPLICABILITY_MOSTLY_UNVERIFIABLE"
+   ],
+   "finding_classes_B": [
+    "NO_APPLICABILITY_JUDGMENT_VISIBLE"
+   ]
+  },
+  {
+   "case_id": "CAL04_VERIFICATION_WRONG_QUANTITY",
+   "defect_class": "VERIFICATION_QUANTITY_DISJOINT",
+   "axis": "verification_appropriateness",
+   "ground_truth": "INCORRECT",
+   "verdict_A": "INCORRECT",
+   "verdict_B": "QUESTIONABLE",
+   "A_vs_gt": "AGREE_GT",
+   "B_vs_gt": "UNCERTAIN_DEFECT",
+   "A_vs_B": "DISAGREE",
+   "finding_classes_A": [
+    "VERIFICATION_MEASURES_WRONG_QUANTITY",
+    "VERIFICATION_QUANTITY_MISMATCH_WIDESPREAD"
+   ],
+   "finding_classes_B": [
+    "NO_SPECIFIED_VALIDATION"
+   ]
+  },
+  {
+   "case_id": "CAL05_MECHANISM_PASSTHROUGH",
+   "defect_class": "MECHANISM_PASSTHROUGH",
+   "axis": "mechanism_correctness",
+   "ground_truth": "INCORRECT",
+   "verdict_A": "QUESTIONABLE",
+   "verdict_B": "QUESTIONABLE",
+   "A_vs_gt": "UNCERTAIN_DEFECT",
+   "B_vs_gt": "UNCERTAIN_DEFECT",
+   "A_vs_B": "AGREE",
+   "finding_classes_A": [
+    "FAMILY_UNCLASSIFIABLE_BY_ADJUDICATOR",
+    "CONTROL_ARCHITECTURE_UNDISCLOSED",
+    "MECHANISM_LACKS_CAUSAL_CONNECTOR"
+   ],
+   "finding_classes_B": [
+    "MECHANISM_SOURCE_SPAN_ABSENT",
+    "MECHANISM_BODY_BELOW_SUBSTANCE_FLOOR",
+    "MECHANISM_HAS_NO_FALSIFICATION_PATH"
+   ]
+  },
+  {
+   "case_id": "CAL05_MECHANISM_PASSTHROUGH",
+   "defect_class": "MECHANISM_PASSTHROUGH",
+   "axis": "engineering_reasoning_correctness",
+   "ground_truth": "INCORRECT",
+   "verdict_A": "QUESTIONABLE",
+   "verdict_B": "QUESTIONABLE",
+   "A_vs_gt": "UNCERTAIN_DEFECT",
+   "B_vs_gt": "UNCERTAIN_DEFECT",
+   "A_vs_B": "AGREE",
+   "finding_classes_A": [
+    "CHAIN_ROLE_COVERAGE_THIN"
+   ],
+   "finding_classes_B": [
+    "NO_REASONING_CHAINS"
+   ]
+  },
+  {
+   "case_id": "CAL06_EQUATION_FAMILY_MISMATCH",
+   "defect_class": "EQUATION_FAMILY_MISMATCH",
+   "axis": "equation_applicability",
+   "ground_truth": "INCORRECT",
+   "verdict_A": "CORRECT",
+   "verdict_B": "QUESTIONABLE",
+   "A_vs_gt": "FALSE_POSITIVE",
+   "B_vs_gt": "UNCERTAIN_DEFECT",
+   "A_vs_B": "DISAGREE",
+   "finding_classes_A": [],
+   "finding_classes_B": [
+    "NO_APPLICABILITY_JUDGMENT_VISIBLE"
+   ]
+  },
+  {
+   "case_id": "CAL07_CLEAN_PASSIVE_ANCHOR",
+   "defect_class": "CLEAN_CONTROL",
+   "axis": "mechanism_correctness",
+   "ground_truth": "CORRECT",
+   "verdict_A": "INCORRECT",
+   "verdict_B": "CORRECT",
+   "A_vs_gt": "FALSE_NEGATIVE",
+   "B_vs_gt": "AGREE_GT",
+   "A_vs_B": "DISAGREE",
+   "finding_classes_A": [
+    "CONTROL_ARCHITECTURE_CONTRADICTION",
+    "MECHANISM_LACKS_CAUSAL_CONNECTOR"
+   ],
+   "finding_classes_B": []
+  },
+  {
+   "case_id": "CAL08_CAUSAL_DIRECTION_REVERSED",
+   "defect_class": "CAUSAL_DIRECTION_REVERSED",
+   "axis": "mechanism_correctness",
+   "ground_truth": "INCORRECT",
+   "verdict_A": "CORRECT",
+   "verdict_B": "CORRECT",
+   "A_vs_gt": "FALSE_POSITIVE",
+   "B_vs_gt": "FALSE_POSITIVE",
+   "A_vs_B": "AGREE",
+   "finding_classes_A": [],
+   "finding_classes_B": []
+  },
+  {
+   "case_id": "CAL09_FAILURE_MODES_OUTSIDE_FAMILY",
+   "defect_class": "FAILURE_MODE_FAMILY_MISMATCH",
+   "axis": "failure_mode_correctness",
+   "ground_truth": "INCORRECT",
+   "verdict_A": "QUESTIONABLE",
+   "verdict_B": "QUESTIONABLE",
+   "A_vs_gt": "UNCERTAIN_DEFECT",
+   "B_vs_gt": "UNCERTAIN_DEFECT",
+   "A_vs_B": "AGREE",
+   "finding_classes_A": [
+    "DOMINANT_FAMILY_FAILURE_MODES_MISSING"
+   ],
+   "finding_classes_B": [
+    "INPUT_FAILURE_MODE_NOT_ANALYZED"
+   ]
+  },
+  {
+   "case_id": "CAL10_ACCEPTANCE_CRITERIA_ABSENT",
+   "defect_class": "ACCEPTANCE_CRITERIA_ABSENT",
+   "axis": "verification_appropriateness",
+   "ground_truth": "INCORRECT",
+   "verdict_A": "CORRECT",
+   "verdict_B": "QUESTIONABLE",
+   "A_vs_gt": "FALSE_POSITIVE",
+   "B_vs_gt": "UNCERTAIN_DEFECT",
+   "A_vs_B": "DISAGREE",
+   "finding_classes_A": [],
+   "finding_classes_B": [
+    "ACCEPTANCE_CRITERIA_NOT_QUANTIFIED",
+    "NO_SPECIFIED_VALIDATION"
+   ]
+  },
+  {
+   "case_id": "CAL11_CLEAN_THERMAL",
+   "defect_class": "CLEAN_CONTROL",
+   "axis": "equation_applicability",
+   "ground_truth": "CORRECT",
+   "verdict_A": "QUESTIONABLE",
+   "verdict_B": "CORRECT",
+   "A_vs_gt": "UNCERTAIN_CLEAN",
+   "B_vs_gt": "AGREE_GT",
+   "A_vs_B": "DISAGREE",
+   "finding_classes_A": [
+    "EQUATION_REGIME_UNKNOWN_TO_ADJUDICATOR"
+   ],
+   "finding_classes_B": []
+  },
+  {
+   "case_id": "CAL11_CLEAN_THERMAL",
+   "defect_class": "CLEAN_CONTROL",
+   "axis": "verification_appropriateness",
+   "ground_truth": "CORRECT",
+   "verdict_A": "CORRECT",
+   "verdict_B": "CORRECT",
+   "A_vs_gt": "AGREE_GT",
+   "B_vs_gt": "AGREE_GT",
+   "A_vs_B": "AGREE",
+   "finding_classes_A": [],
+   "finding_classes_B": []
+  },
+  {
+   "case_id": "CAL12_CLEAN_TRACE_CLOSURE",
+   "defect_class": "CLEAN_CONTROL",
+   "axis": "engineering_reasoning_correctness",
+   "ground_truth": "CORRECT",
+   "verdict_A": "CORRECT",
+   "verdict_B": "CORRECT",
+   "A_vs_gt": "AGREE_GT",
+   "B_vs_gt": "AGREE_GT",
+   "A_vs_B": "AGREE",
+   "finding_classes_A": [],
+   "finding_classes_B": []
+  }
+ ],
+ "residual_self_reference_disclosure": "Both adjudicators AND this calibration set are authored by Coder 2 (same residual self-reference as B9). The cases' ground truth is justified by stated engineering principles, not by adjudicator behavior, but an author-independent calibration point requires the B15 human gold labels.",
+ "use": "calibration evidence for how much weight the B9 adjudication verdicts can carry; audit-layer credibility input, NOT an engine score"
+}

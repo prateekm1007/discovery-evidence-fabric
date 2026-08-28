@@ -1,0 +1,95 @@
+{
+ "artifact": "CODER2_PHASE3_FINDINGS_FREEZE",
+ "owner": "CODER2",
+ "freeze_id": "B13_PHASE3_FINDINGS_V1",
+ "frozen_at": "2026-08-28T06:26:51.913755+00:00",
+ "ceo_directive": "Phase 4 B13 — freeze the current findings permanently; no benchmark weakening",
+ "findings": {
+  "BASELINE": {
+   "finding": "BASELINE",
+   "value": {
+    "released": 3,
+    "total": 15,
+    "rejected": 12
+   },
+   "status": "FROZEN",
+   "evidence": {
+    "source": "INDEPENDENT_BASELINE_FREEZE.json (B7, verified)",
+    "content_sha256": "ff537529a6a1fd6c7037a8d4550434354371cc9e2004b2f1178550932ddfce07"
+   }
+  },
+  "DOMAIN_REASONING_PRIMARY_DEFECT": {
+   "finding": "DOMAIN_REASONING_PRIMARY_DEFECT",
+   "value": {
+    "status": "CONFIRMED",
+    "primary_domain_reasoning": 12,
+    "of_rejections": 12,
+    "defect": "mechanism text effectively passed through rather than engineered (mechanism body word count equals the input mechanism word count — zero elaboration)"
+   },
+   "evidence": {
+    "source": "REJECTION_DECOMPOSITION.json (B8)",
+    "file_sha256": "f6f2bbd471501ff81bacafedb8e36afc305172c0f7b4f794ae9f17bf5649ebb3"
+   }
+  },
+  "ADJUDICATOR_DISAGREEMENTS": {
+   "finding": "ADJUDICATOR_DISAGREEMENTS",
+   "value": {
+    "status": "PRESERVED",
+    "disagreements": 26,
+    "total_verdicts": 30,
+    "per_axis_disagreed": {
+     "mechanism_correctness": 6,
+     "engineering_reasoning_correctness": 6,
+     "equation_applicability": 3,
+     "failure_mode_correctness": 5,
+     "verification_appropriateness": 6
+    },
+    "resolution": "NONE — disagreements are preserved with both verdicts, never averaged or forced to consensus (CEO B9/B13)"
+   },
+   "evidence": {
+    "source": "BLIND_SEMANTIC_ADJUDICATION.json (B9)",
+    "file_sha256": "7074a35a10d64825d0d90d1ee5aed6a1b9c22d8ed2172b32d4265e2ff8126cb8"
+   }
+  },
+  "UNSEEN_SEMANTIC_FAILURE": {
+   "finding": "UNSEEN_SEMANTIC_FAILURE",
+   "value": {
+    "status": "CONFIRMED",
+    "released_rehearsal_dossiers": 3,
+    "semantic_fail_count": 3,
+    "meaning": "the shallow-generation / wrong-content defect class GENERALIZES to genuinely unseen problem families — not merely overfitting to the 15-package benchmark"
+   },
+   "evidence": {
+    "source": "UNSEEN_PROBLEM_MANIFEST.json (B10)",
+    "file_sha256": "251f1bf93be0229fc7a08c7600a9d878483dd1ee3439fe7fa763ddacc57f3d42",
+    "released_unseen_ids": [
+     "UNSEEN_942c050c807c",
+     "UNSEEN_3d38ba583afb",
+     "UNSEEN_5585f0cdc012"
+    ]
+   }
+  }
+ },
+ "chain_to_b7_freeze": {
+  "freeze_id": "B7_INDEPENDENT_BASELINE_V1",
+  "content_sha256": "ff537529a6a1fd6c7037a8d4550434354371cc9e2004b2f1178550932ddfce07",
+  "baseline_release_yield": {
+   "released": 3,
+   "total": 15
+  },
+  "quality_rejections": {
+   "rejected": 12,
+   "total": 15
+  },
+  "chained_to_B1": "db161312c5c50140aa89c7a00525fe87a161335a043b0592b1b7abe0957042ea"
+ },
+ "permanence_contract": {
+  "never_overwritten": true,
+  "numbers_derived_from_source_artifacts": true,
+  "content_hash": "canonical-content sha256 inside this file (self-verifiable)",
+  "byte_hash_pin": "byte-level sha256 of this file pinned EXTERNALLY in PHASE3_FINDINGS_FREEZE.bytehash + the benchmark test suite",
+  "mutation_detection": "verify_phase3_findings_freeze() checks both hashes; either failing means FINDINGS_FREEZE_MUTATED",
+  "use": "permanent record of what Coder 2 has PROVEN as of the Phase-3 audit; new measurements are written to NEW files, never by editing this one"
+ },
+ "content_sha256": "8369d7c322dc6d4ce11d3caca2a3f18850d1702122acc37a3564b41c6d8a2546"
+}

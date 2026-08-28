@@ -1,0 +1,241 @@
+{
+ "artifact": "CODER1_REPAIR_REGISTER",
+ "owner": "CODER2",
+ "ceo_directive": "Phase 4 B17 — machine-readable repair targets so Coder 1 fixes the actual failure rather than optimizing around the audit",
+ "generated_at": "2026-08-28T06:40:14.957971+00:00",
+ "entry_schema": [
+  "problem",
+  "evidence",
+  "failure_class",
+  "affected_artifact",
+  "expected_change",
+  "release_blocker"
+ ],
+ "ownership_warning": "entries R-08 (environment), R-09 (audit layer) are NOT Coder 1's to fix — they are listed so Coder 1 does not chase problems it does not own",
+ "counts": {
+  "total": 10,
+  "release_blockers": 8,
+  "by_owner": {
+   "CODER1": 7,
+   "ENVIRONMENT (CEO action required)": 1,
+   "CODER2": 1,
+   "CODER1_TEST_SUITE": 1
+  },
+  "by_failure_class": {
+   "ENGINEERING_REASONING_FAILURE": 5,
+   "GENERATION_FAILURE": 2,
+   "EVIDENCE_FAILURE": 1,
+   "AUDIT_FAILURE": 1,
+   "BENCHMARK_FAILURE": 1
+  }
+ },
+ "register": [
+  {
+   "id": "R-01",
+   "problem": "Mechanism pass-through without engineering elaboration: the generated invention specification ships the input mechanism text essentially verbatim (mechanism body word count == input mechanism word count), below the E15-B 25-word substance floor.",
+   "evidence": {
+    "artifact": "REJECTION_DECOMPOSITION.json (B8)",
+    "measurement": "12/12 rejections carry PRIMARY_BLOCKER=DOMAIN_REASONING",
+    "pass_through_examples": [
+     {
+      "coder2-benchmark:02": {
+       "mechanism_body_words": 21,
+       "input_mechanism_words": 21,
+       "e15_b_gate_floor_words": 25,
+       "below_gate_floor": true,
+       "generator_elaborated_mechanism": false,
+       "note": "mechanism body re-measured word-for-word from the invention specification; when body ~= input text the generator passed the input mechanism through without engineering elaboration"
+      }
+     },
+     {
+      "coder2-benchmark:03": {
+       "mechanism_body_words": 22,
+       "input_mechanism_words": 22,
+       "e15_b_gate_floor_words": 25,
+       "below_gate_floor": true,
+       "generator_elaborated_mechanism": false,
+       "note": "mechanism body re-measured word-for-word from the invention specification; when body ~= input text the generator passed the input mechanism through without engineering elaboration"
+      }
+     },
+     {
+      "coder2-benchmark:05": {
+       "mechanism_body_words": 22,
+       "input_mechanism_words": 22,
+       "e15_b_gate_floor_words": 25,
+       "below_gate_floor": true,
+       "generator_elaborated_mechanism": false,
+       "note": "mechanism body re-measured word-for-word from the invention specification; when body ~= input text the generator passed the input mechanism through without engineering elaboration"
+      }
+     }
+    ],
+    "note": "example detail: mechanism_body_words=21, input_mechanism_words=21, generator_elaborated_mechanism=false"
+   },
+   "failure_class": "ENGINEERING_REASONING_FAILURE",
+   "affected_artifact": [
+    "discovery_fabric/engine/invention_spec.py",
+    "discovery_fabric/engine/engineering_spec.py",
+    "(read-only references — Coder 1 owns the fix)"
+   ],
+   "expected_change": "on the frozen committed benchmark inputs, released AND rejected runs alike, the mechanism body contains engineering content the input did not state: elaboration ratio strictly > 1.0 vs the input mechanism AND body >= 25 words AND added content names device-specific physical quantities/relations (re-measured by the frozen B8/B14 instruments)",
+   "release_blocker": true,
+   "owner": "CODER1",
+   "status": "OPEN"
+  },
+  {
+   "id": "R-02",
+   "problem": "Incorrect critical causal chains in released dossiers: reasoning chain links that are physically wrong (domain-family mismatch, wrong causal direction, unproven promotions), each a release blocker under the frozen B3 semantic gate.",
+   "evidence": {
+    "artifact": "REJECTION_DECOMPOSITION.json (B8) secondary CAUSAL_REASONING evidence; B3 semantic causal audit within each run",
+    "measurement": "CAUSAL_REASONING secondary on 12/12 rejections; 21 incorrect critical chains measured on the committed set (frozen B1-B6 finding)"
+   },
+   "failure_class": "ENGINEERING_REASONING_FAILURE",
+   "affected_artifact": [
+    "discovery_fabric/engine/reasoning_chain.py",
+    "(read-only reference — Coder 1 owns the fix)"
+   ],
+   "expected_change": "zero incorrect critical chains on any released dossier, measured by the frozen B3 semantic causal reviewer on both the committed and unseen sets",
+   "release_blocker": true,
+   "owner": "CODER1",
+   "status": "OPEN"
+  },
+  {
+   "id": "R-03",
+   "problem": "Verification specificity: failure-mode verifications that measure a physical quantity disjoint from the failure physics (cannot detect the failure) and acceptance criteria that are absent or unquantified.",
+   "evidence": {
+    "artifact": "REJECTION_DECOMPOSITION.json (B8) secondary VERIFICATION_SPECIFICITY evidence",
+    "measurement": "VERIFICATION_SPECIFICITY secondary on 12/12 rejections; example: verification VF-009 measures quantity family disjoint from the failure mode it claims to test"
+   },
+   "failure_class": "ENGINEERING_REASONING_FAILURE",
+   "affected_artifact": [
+    "discovery_fabric/engine/engineering_spec.py",
+    "discovery_fabric/engine/design_outputs.py",
+    "(read-only references — Coder 1 owns the fix)"
+   ],
+   "expected_change": "every failure-analysis row's verification test measures at least one quantity family present in its own physical mechanism, and every verification-matrix row carries a quantified acceptance criterion (frozen instruments re-measure both)",
+   "release_blocker": true,
+   "owner": "CODER1",
+   "status": "OPEN"
+  },
+  {
+   "id": "R-04",
+   "problem": "Generalization failure: the same engineering-reasoning defect class appears on GENUINELY UNSEEN problem families — all released unseen rehearsal dossiers fail semantic correctness. This is not benchmark overfitting; the defect travels with the generator.",
+   "evidence": {
+    "artifact": "UNSEEN_RUN_METRICS.json (B16) + UNSEEN_PROBLEM_MANIFEST.json (B10)",
+    "measurement": "semantic_correctness_fail=3 of 3 released unseen rehearsal dossiers (B10 frozen: 3/3)"
+   },
+   "failure_class": "ENGINEERING_REASONING_FAILURE",
+   "affected_artifact": [
+    "discovery_fabric/engine/engineering_spec.py",
+    "discovery_fabric/engine/invention_spec.py",
+    "(read-only references — Coder 1 owns the fix)"
+   ],
+   "expected_change": "on the SEALED unseen set (B16 seal; input hashes verified), released dossiers pass semantic correctness — zero incorrect critical chains per released dossier under the frozen instruments",
+   "release_blocker": true,
+   "owner": "CODER1",
+   "status": "OPEN"
+  },
+  {
+   "id": "R-05",
+   "problem": "Equation applicability depth: governing equations on unseen dossiers lack explicit regime applicability records and honest APPLICABLE/CONDITIONAL/REJECTED judgments.",
+   "evidence": {
+    "artifact": "UNSEEN_PROBLEM_MANIFEST.json (B10) UNSEEN_PROBLEM_DEPTH",
+    "measurement": "EQUATION_APPLICABILITY failing depth dimension on 2/3 released unseen rehearsal dossiers"
+   },
+   "failure_class": "ENGINEERING_REASONING_FAILURE",
+   "affected_artifact": [
+    "discovery_fabric/engine/equations.py",
+    "discovery_fabric/engine/engineering_spec.py",
+    "(read-only references — Coder 1 owns the fix)"
+   ],
+   "expected_change": "every governing equation on a released dossier carries its validity-regime applicability text and a visible APPLICABLE/CONDITIONAL/REJECTED judgment (the corpus depth contract re-measures this dimension and it must reach the corpus floor)",
+   "release_blocker": true,
+   "owner": "CODER1",
+   "status": "OPEN"
+  },
+  {
+   "id": "R-06",
+   "problem": "Manufacturing reasoning absent: released unseen dossiers carry no substantive manufacturing/producibility analysis.",
+   "evidence": {
+    "artifact": "UNSEEN_PROBLEM_MANIFEST.json (B10) UNSEEN_PROBLEM_DEPTH",
+    "measurement": "MANUFACTURING_REASONING failing depth dimension on 3/3 released unseen rehearsal dossiers"
+   },
+   "failure_class": "GENERATION_FAILURE",
+   "affected_artifact": [
+    "discovery_fabric/engine/engineering_spec.py",
+    "(read-only reference — Coder 1 owns the fix)"
+   ],
+   "expected_change": "released dossiers carry manufacturing analysis at the corpus depth floor for the MANUFACTURING_REASONING dimension (frozen corpus depth contract re-measures)",
+   "release_blocker": true,
+   "owner": "CODER1",
+   "status": "OPEN"
+  },
+  {
+   "id": "R-07",
+   "problem": "Unknown disclosure: released unseen dossiers do not disclose what remains unknown/unvalidated, weakening buyer credibility.",
+   "evidence": {
+    "artifact": "UNSEEN_PROBLEM_MANIFEST.json (B10) UNSEEN_PROBLEM_DEPTH",
+    "measurement": "UNKNOWN_DISCLOSURE failing depth dimension on 3/3 released unseen rehearsal dossiers"
+   },
+   "failure_class": "GENERATION_FAILURE",
+   "affected_artifact": [
+    "discovery_fabric/engine/package_factory.py",
+    "(read-only reference — Coder 1 owns the fix)"
+   ],
+   "expected_change": "every released dossier carries an explicit unknowns/limitations disclosure section meeting the corpus depth floor for UNKNOWN_DISCLOSURE",
+   "release_blocker": true,
+   "owner": "CODER1",
+   "status": "OPEN"
+  },
+  {
+   "id": "R-08",
+   "problem": "Real-mode synthesis blocked by missing LLM credentials (lost with the previous sandbox). This is an ENVIRONMENT blocker, NOT an engine defect — Coder 1 must NOT chase it.",
+   "evidence": {
+    "artifact": "UNSEEN_RUN_METRICS.json (B16)",
+    "measurement": "real mode: retrieval_success=4/4 but synthesis_blocked_by_credentials=4 — B12 taxonomy EVIDENCE_FAILURE"
+   },
+   "failure_class": "EVIDENCE_FAILURE",
+   "affected_artifact": [
+    "environment: LLM provider credentials (CEO re-provision required); no engine file is at fault"
+   ],
+   "expected_change": "CEO re-provisions the LLM credentials; the engine then re-runs the sealed unseen test in REAL mode with no code change",
+   "release_blocker": true,
+   "release_blocker_scope": "real-mode release claims only; rehearsal-mode results are unaffected",
+   "owner": "ENVIRONMENT (CEO action required)",
+   "status": "OPEN"
+  },
+  {
+   "id": "R-09",
+   "problem": "Audit-layer adjudicator instability: the two B9 semantic adjudicators disagree on most verdicts and the B14 calibration measured false positives and false negatives against known engineering cases. This is CODER2's defect — Coder 1 must NOT chase it.",
+   "evidence": {
+    "artifact": "BLIND_SEMANTIC_ADJUDICATION.json (B9) + ADJUDICATOR_CALIBRATION.json (B14)",
+    "measurement": "B9: 26/30 adjudication verdicts disagree; B14 calibration: adjudicator A FP=3/FN=2, adjudicator B FP=2/FN=0; unstable classes: ['mechanism_correctness', 'equation_applicability', 'failure_mode_correctness', 'verification_appropriateness']"
+   },
+   "failure_class": "AUDIT_FAILURE",
+   "affected_artifact": [
+    "discovery_fabric/benchmark/blind_adjudication.py (Coder 2 namespace — Coder 1 does not touch it)"
+   ],
+   "expected_change": "B15 human gold labels provide the first author-independent calibration point; a future CEO-authorized instrument-repair round (never mid-measurement) addresses the four B14 instrument observations",
+   "release_blocker": false,
+   "release_blocker_note": "advisory for engine release; TRUE blocker only for treating B9 verdicts as an unquestionable oracle",
+   "owner": "CODER2",
+   "status": "OPEN"
+  },
+  {
+   "id": "R-10",
+   "problem": "Benchmark-suite coverage gap (B12 BM2, owned by CODER1_TEST_SUITE): Coder 1's own test suite does not yet encode the frozen depth gates, so Coder 1 can regress depth without its own CI failing.",
+   "evidence": {
+    "artifact": "FINAL_AUDIT_REPORT.json (B12) failure register entry BM2",
+    "measurement": "BM2 status OPEN, owner CODER1_TEST_SUITE"
+   },
+   "failure_class": "BENCHMARK_FAILURE",
+   "affected_artifact": [
+    "tests/ (Coder 1's suite — Coder 1 owns the fix)"
+   ],
+   "expected_change": "Coder 1's suite imports the frozen corpus depth contract and fails on below-floor output (mirror of the Coder 2 gate, read-only reuse)",
+   "release_blocker": false,
+   "owner": "CODER1_TEST_SUITE",
+   "status": "OPEN"
+  }
+ ],
+ "acceptance_rule": "a blocker is cleared only when the frozen instruments (corpus depth contract, B3 semantic causal, B14-calibrated adjudicators, B16 separated metrics) re-measure the expected_change as satisfied — never by editing this register, never by weakening an instrument (Art. VII/XXX)"
+}
