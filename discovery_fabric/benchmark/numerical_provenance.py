@@ -22,6 +22,7 @@ the package regardless of other results.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -69,7 +70,6 @@ def audit_numerical_provenance(run_dir: Optional[Path],
                 sources[name] = p.read_text(encoding="utf-8",
                                              errors="replace")[:200000]
     ev_texts = _evidence_texts(run_dir)
-
     # ---- 1. critical parameters ----------------------------------------
     if eng_spec:
         cps = (eng_spec.get("engineering_core") or {}) \
@@ -93,7 +93,15 @@ def audit_numerical_provenance(run_dir: Optional[Path],
             if not isinstance(d, dict):
                 continue
             v = d.get("value")
-            if _is_number(v):
+            if isinstance(v, str) and "content_hash" in v and \
+                    d.get("evidence_class") == "SOURCE_FACT":
+                # provenance-record values are records, not engineering
+                # numbers — verified by hash binding, not number presence
+                findings.append(_check_provenance_record(
+                    f"{d.get('id')}:provenance", v,
+                    (d.get("evidence_refs") or [None])[0], ev_texts,
+                    run_dir))
+            elif _is_number(v):
                 findings.append(_check_number(
                     f"{d.get('id')}:{v}", v, None,
                     d.get("evidence_class"),
@@ -169,6 +177,68 @@ def audit_numerical_provenance(run_dir: Optional[Path],
         "note": "re-derived from raw artifacts; self-reported "
                 "number_provenance blocks were not consulted (Art. III)",
     }
+
+
+def _check_provenance_record(nid: str, value: str, src_id: Optional[str],
+                             ev_texts: Dict[str, str],
+                             run_dir: Optional[Path]) -> Dict[str, Any]:
+    """Verify a provenance-record value (source URI + content hash).
+
+    The recorded content hash must match the referenced evidence item's
+    actual content hash — a forged or drifted anchor is SOURCE_MISMATCH.
+    """
+    m = re.search(r"content_hash\s+([0-9a-fA-F]{8,})", value)
+    rec: Dict[str, Any] = {
+        "number_id": nid, "value": value[:80], "unit": None,
+        "source_type": "SOURCE_FACT_PROVENANCE_RECORD",
+        "source_id": src_id, "source_hash": m.group(1) if m else None,
+        "derivation": None, "assumptions": None,
+        "status": None, "detail": None}
+    if not m:
+        rec["status"] = "OK_TRIVIAL"
+        rec["detail"] = "provenance record without parsable hash"
+        return rec
+    recorded_hash = m.group(1)
+    # resolve the referenced evidence's actual content hash from run records
+    actual = None
+    lookup_errors: List[str] = []
+    if run_dir:
+        for name in ("candidate_envelope.json", "stage_RETRIEVE.json",
+                     "stage_FREEZE.json"):
+            p = run_dir / name
+            if not p.exists():
+                continue
+            try:
+                data = json.loads(p.read_text(encoding="utf-8"))
+            except Exception as exc:
+                lookup_errors.append(f"{name}: {exc}")
+                continue
+            for ev in _find_evidence_items(data):
+                if isinstance(ev, dict) and str(ev.get("id")) == str(src_id):
+                    actual = ev.get("content_hash")
+                    break
+            if actual:
+                break
+    if lookup_errors:
+        rec["lookup_errors"] = lookup_errors
+    if actual is None:
+        if run_dir is None:
+            rec["status"] = "OK_TRIVIAL"
+            rec["detail"] = ("provenance record present but no run records "
+                             "available to verify against (skipped)")
+        else:
+            rec["status"] = "SOURCE_MISMATCH"
+            rec["detail"] = (f"provenance record references {src_id} but no "
+                             "matching evidence record exists in the run "
+                             "(unresolvable anchor)")
+    elif str(actual) != recorded_hash:
+        rec["status"] = "SOURCE_MISMATCH"
+        rec["detail"] = (f"recorded content_hash {recorded_hash[:12]}... != "
+                         f"actual {str(actual)[:12]}... for {src_id}")
+    else:
+        rec["status"] = "OK_PROVENANCE_VERIFIED"
+        rec["detail"] = "content hash binds to the referenced evidence"
+    return rec
 
 
 def _evidence_texts(run_dir: Optional[Path]) -> Dict[str, str]:

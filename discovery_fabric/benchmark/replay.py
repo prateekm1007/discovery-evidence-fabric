@@ -203,7 +203,7 @@ def _verify_chain_hash(chain: dict, run_dir: Path) -> (bool, str):
     node_id = chain.get("node_id") or chain.get("design_input_id")
     if not node_id:
         return True, "chain carries no node id (skipped)"
-    obj = _find_eng_object(eng, str(node_id), chain.get("chain_type"))
+    obj = _find_eng_object(eng, str(node_id), chain)
     if obj is None:
         return False, f"chain node {node_id} absent from the shipped " \
                       f"engineering specification"
@@ -219,22 +219,85 @@ def _verify_chain_hash(chain: dict, run_dir: Path) -> (bool, str):
 
 
 def _find_eng_object(eng: dict, node_id: str,
-                     chain_type: Optional[str]) -> Optional[dict]:
+                     chain: Optional[dict]) -> Optional[dict]:
+    chain_type = (chain or {}).get("chain_type")
     pools = {
         "DESIGN_INPUT": eng.get("design_inputs", []),
         "DESIGN_OUTPUT": eng.get("design_outputs", []),
         "FAILURE_MODE": eng.get("failure_analysis", []),
         "VERIFICATION": eng.get("verification_matrix", []),
+        "REASONING_CHAIN": ((eng.get("engineering_reasoning_chains")
+                            or {}).get("chains") or []),
     }
     if chain_type in pools:
         for o in pools[chain_type]:
             if isinstance(o, dict) and str(o.get("id") or
-                                           o.get("graph_id")) == node_id:
+                                           o.get("graph_id") or
+                                           o.get("chain_id")) == node_id:
                 return o
+        return None
+    if chain_type == "ENGINEERING_LINKAGE":
+        # linkage chains are DERIVED at package build time from the design
+        # graph; the replay re-derives them independently (same structural
+        # rule: explicit parent ids) and hash-verifies — a forged linkage
+        # row or a mutated graph breaks the binding
+        for link in _derive_linkage_chains(eng):
+            if str(link.get("design_input_id")) == node_id:
+                # the recorded hash covers the full linkage row including
+                # the identity fields carried by the chain record itself
+                full = dict(link)
+                full["chain_type"] = (chain or {}).get("chain_type")
+                full["invention_id"] = (chain or {}).get("invention_id")
+                full["candidate_id"] = (chain or {}).get("candidate_id")
+                return full
         return None
     for pool in pools.values():
         for o in pool:
             if isinstance(o, dict) and str(o.get("id") or
-                                           o.get("graph_id")) == node_id:
+                                           o.get("graph_id") or
+                                           o.get("chain_id")) == node_id:
                 return o
     return None
+
+
+def _derive_linkage_chains(eng: dict) -> List[dict]:
+    """Independently re-derive the DI->DO->FM->VF linkage chains from the
+    engineering specification's structural design graph (explicit parent
+    ids only — no keyword matching)."""
+    graph = eng.get("design_graph") or {}
+    link_maps = graph.get("linkage_maps") or {}
+    fm_parent_do = link_maps.get("fm_parent_do") or {}
+    do_parent_di = link_maps.get("do_parent_di") or {}
+    di_to_do: Dict[str, str] = {}
+    for do_id, di_ids in do_parent_di.items():
+        for di_id in di_ids:
+            di_to_do.setdefault(di_id, do_id)
+    do_to_fm: Dict[str, str] = {}
+    for f in eng.get("failure_analysis", []) or []:
+        if not isinstance(f, dict):
+            continue
+        for do_id in fm_parent_do.get(f.get("graph_id"), []):
+            do_to_fm.setdefault(do_id, f.get("graph_id"))
+    fm_to_vf = {f.get("graph_id"): f.get("verification")
+                for f in (eng.get("failure_analysis", []) or [])
+                if isinstance(f, dict) and f.get("verification") not in
+                ("NOT_LINKED", None, "")}
+    out: List[dict] = []
+    for d in eng.get("design_inputs", []) or []:
+        if not isinstance(d, dict):
+            continue
+        di_id = d.get("id")
+        do_id = di_to_do.get(di_id)
+        fm_id = do_to_fm.get(do_id) if do_id else None
+        vf_id = fm_to_vf.get(fm_id) if fm_id else None
+        out.append({
+            "design_input_id": di_id,
+            "parameter": str(d.get("input") or d.get("label")
+                             or "NOT_LINKED"),
+            "design_output_id": do_id or "NOT_LINKED",
+            "failure_mode_id": fm_id or "NOT_LINKED",
+            "verification_id": vf_id or "NOT_LINKED",
+            "evidence_ids": list(d.get("evidence_refs") or []),
+            "linked": bool(do_id and fm_id and vf_id),
+        })
+    return out

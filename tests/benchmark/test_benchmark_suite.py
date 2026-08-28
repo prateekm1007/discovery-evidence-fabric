@@ -33,10 +33,25 @@ PROFILE = json.loads(
 
 @pytest.fixture(scope="module")
 def two_runs(tmp_path_factory):
-    """Two clean benchmark runs generated through Coder 1's real pipeline."""
+    """Released benchmark runs generated through Coder 1's real pipeline.
+
+    The new engine's E15-H gate honestly rejects some inputs (fail-closed
+    is correct behavior); the fixture generates a few more inputs and
+    keeps the RELEASED ones for depth auditing.
+    """
     root = tmp_path_factory.mktemp("bench_runs")
-    info = corpus_runner.run_benchmark(root, limit=2)
-    return [Path(p) for p in info["run_dirs"]]
+    info = corpus_runner.run_benchmark(root, limit=6)
+    released = []
+    for p in info["run_dirs"]:
+        rel = json.loads((Path(p) / "DISCOVERY_RELEASE.json")
+                         .read_text(encoding="utf-8"))
+        if rel.get("status") == "RELEASED":
+            released.append(Path(p))
+    assert len(released) >= 2, (
+        f"expected at least 2 released runs, got {len(released)} — "
+        "engine E15-H rejection rate on independent inputs is itself a "
+        "benchmark finding (see AUTOMATED_DOSSIER_BENCHMARK.json)")
+    return released
 
 
 def _audit(run_dir):
@@ -183,7 +198,9 @@ def test_committed_benchmark_artifacts_are_consistent():
     if not bench_path.exists():
         pytest.skip("committed benchmark not present")
     bench = json.loads(bench_path.read_text(encoding="utf-8"))
-    assert bench["runs_audited"] == 15
+    assert bench["runs_input"] == 15
+    assert bench["runs_released_and_audited"] + \
+        bench["engine_rejected_count"] == 15
     assert bench["completeness_ok"] is True
     assert bench["batch_verdict"] in ("BENCHMARK_PASS",
                                       "BENCHMARK_CONDITIONAL",
@@ -194,9 +211,6 @@ def test_committed_benchmark_artifacts_are_consistent():
 def test_verdict_vocabulary_has_no_vanity_scores():
     for v in ("PASS", "CONDITIONAL", "FAIL"):
         assert v in CONTRACT["verdict_vocabulary"]
-    assert "SCORE" not in json.dumps(CONTRACT).upper() or True
-    # no numeric quality score may exist anywhere in a quality evaluation
-    audit = _audit_two = None  # vocabulary check only
 
 
 def test_clean_run_does_not_trigger_hard_gates(two_runs):

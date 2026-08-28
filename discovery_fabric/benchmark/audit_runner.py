@@ -171,25 +171,44 @@ def audit_batch(run_dirs: List[Path],
                 profile: Optional[dict] = None,
                 expected_count: Optional[int] = None,
                 out_dir: Optional[Path] = None) -> Dict[str, Any]:
-    """Benchmark a batch of released runs (CEO Phase 6)."""
-    audits = [audit_run(rd, contract, profile) for rd in run_dirs]
+    """Benchmark a batch of released runs (CEO Phase 6).
+
+    Runs whose release status is PIPELINE_FAILED (the engine's own E15-H
+    gate honestly refused to release) are recorded as ENGINE_REJECTED —
+    distinct from BENCHMARK_FAIL (a released package whose depth is below
+    the corpus). Conflating them would punish honest fail-closed behavior.
+    """
+    audits = []
+    engine_rejected = []
+    for rd in run_dirs:
+        rd = Path(rd)
+        rel = _j(rd / "DISCOVERY_RELEASE.json") or {}
+        if rel.get("status") not in (None, "RELEASED"):
+            engine_rejected.append({
+                "run_dir": str(rd),
+                "release_status": rel.get("status"),
+                "failure_reason": rel.get("failure_reason"),
+            })
+            continue
+        audits.append(audit_run(rd, contract, profile))
 
     # cross-package contamination (Phase 5)
+    # NOTE: audits exclude engine-rejected runs, so package metadata must
+    # come from the audits themselves — never zip(audits, run_dirs), which
+    # misaligns ids/signatures when rejections are present.
     packages = []
-    for a, rd in zip(audits, run_dirs):
-        if a.get("verdict") == "BENCHMARK_FAIL" and \
-                "no buyer package" in str(a.get("reason", "")):
-            continue
+    for a in audits:
+        rd = Path(a["run_dir"])
         packages.append({
-            "run_dir": str(rd),
+            "run_dir": a["run_dir"],
             "package_dir": a.get("package_dir"),
             "package_id": a.get("package_id"),
             "invention_id": a.get("invention_id"),
             "candidate_id": a.get("candidate_id"),
             "spec_hash": a.get("spec_hash"),
             "run_id": a.get("run_id"),
-            "evidence_ids": _run_evidence_ids(Path(rd)),
-            "input_signature": _input_signature(Path(rd)),
+            "evidence_ids": _run_evidence_ids(rd),
+            "input_signature": _input_signature(rd),
         })
     contam = ct_mod.audit_contamination(packages) if len(packages) > 1 else \
         {"artifact": "CROSS_PACKAGE_CONTAMINATION_REPORT",
@@ -211,18 +230,22 @@ def audit_batch(run_dirs: List[Path],
 
     batch_verdict = "BENCHMARK_FAIL"
     if contam["violation_count"] == 0:
-        if n_fail == 0 and n_cond == 0:
+        if n_fail == 0 and n_cond == 0 and not engine_rejected:
             batch_verdict = "BENCHMARK_PASS"
         elif n_fail == 0:
             batch_verdict = "BENCHMARK_CONDITIONAL"
     completeness_ok = (expected_count is None or
-                       len(audits) == expected_count)
+                       len(audits) + len(engine_rejected) ==
+                       expected_count)
 
     benchmark = {
         "artifact": "AUTOMATED_DOSSIER_BENCHMARK",
         "owner": "CODER2",
         "auditor": "independent of the generator (Coder 1)",
-        "runs_audited": len(audits),
+        "runs_input": len(run_dirs),
+        "runs_released_and_audited": len(audits),
+        "engine_rejected": engine_rejected,
+        "engine_rejected_count": len(engine_rejected),
         "expected_count": expected_count,
         "completeness_ok": completeness_ok,
         "expected_outputs": {

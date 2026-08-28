@@ -373,14 +373,17 @@ def main() -> int:
     print("=" * 70)
     print("CODER2 AUTOMATED DOSSIER BENCHMARK — 15 SURVIVOR INPUTS")
     print("=" * 70)
-    print(f"runs audited:      {benchmark['runs_audited']}")
-    print(f"completeness:      {benchmark['completeness_ok']}")
-    print(f"verdict counts:    {benchmark['verdict_counts']}")
-    print(f"contamination:     {benchmark['contamination']['verdict']} "
+    print(f"runs input:         {benchmark['runs_input']}")
+    print(f"released+audited:   {benchmark['runs_released_and_audited']}")
+    print(f"engine-rejected:    {benchmark['engine_rejected_count']} "
+          f"(engine's own E15-H gate refused release)")
+    print(f"completeness:       {benchmark['completeness_ok']}")
+    print(f"verdict counts:     {benchmark['verdict_counts']}")
+    print(f"contamination:      {benchmark['contamination']['verdict']} "
           f"({benchmark['contamination']['violation_count']} violations)")
-    print(f"V&V violations:    "
+    print(f"V&V violations:     "
           f"{benchmark['vv_separation_audit']['total_violations']}")
-    print(f"BATCH VERDICT:     {benchmark['batch_verdict']}")
+    print(f"BATCH VERDICT:      {benchmark['batch_verdict']}")
     from collections import Counter
     dim_fails = Counter()
     for r in benchmark["runs"]:

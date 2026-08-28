@@ -48,6 +48,25 @@ def audit_reasoning(eng_spec: Optional[dict],
                             if isinstance(v, dict) and v.get("id")}
     graph = eng_spec.get("design_graph") or {}
     edges = _graph_edges(graph)
+    # the engine's structural linkage maps (explicit ids, A-series/E15):
+    # do_parent_di: {DO -> [DI]}, fm_parent_do: {FM -> [DO]}
+    link_maps = graph.get("linkage_maps") or {}
+    do_parent_di: Dict[str, List[str]] = link_maps.get("do_parent_di") or {}
+    fm_parent_do: Dict[str, List[str]] = link_maps.get("fm_parent_do") or {}
+    do_to_fms: Dict[str, List[str]] = {}
+    for fm_id, do_ids in fm_parent_do.items():
+        for do_id in do_ids:
+            do_to_fms.setdefault(do_id, []).append(fm_id)
+    fm_to_vf: Dict[str, str] = {
+        f.get("graph_id"): f.get("verification")
+        for f in fms
+        if f.get("verification") not in ("NOT_LINKED", None, "")}
+    do_to_vfs: Dict[str, List[str]] = {}
+    for do_id, fm_ids in do_to_fms.items():
+        for fm_id in fm_ids:
+            vf = fm_to_vf.get(fm_id)
+            if vf:
+                do_to_vfs.setdefault(do_id, []).append(vf)
 
     chains: List[Dict[str, Any]] = []
     for do in dos:
@@ -55,8 +74,11 @@ def audit_reasoning(eng_spec: Optional[dict],
             continue
         do_id = do["id"]
         parents = [p for p in (do.get("parent_ids") or [])
-                   if p in dis] or _parents_from_graph(do_id, edges)
-        vf_ids = _vf_links_for_do(do, fms, edges)
+                   if p in dis] or \
+            [p for p in do_parent_di.get(do_id, []) if p in dis] or \
+            _parents_from_graph(do_id, edges)
+        fm_ids = _fms_for_do(do, fms, edges) or do_to_fms.get(do_id, [])
+        vf_ids = _vf_links_for_do(do, fms, edges) or do_to_vfs.get(do_id, [])
         chain = {
             "claim": do_id,
             "claim_basis": {
@@ -68,7 +90,7 @@ def audit_reasoning(eng_spec: Optional[dict],
             "input": parents,
             "assumption": _assumptions(do, eqs, eng_spec),
             "output": do_id,
-            "failure_mode": _fms_for_do(do, fms, edges),
+            "failure_mode": fm_ids,
             "verification": vf_ids,
         }
         chain["missing_steps"] = _missing_steps(chain)

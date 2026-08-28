@@ -119,15 +119,28 @@ def audit_contamination(run_packages: List[Dict[str, Any]]) -> Dict[str, Any]:
         for s in sents:
             sent_owners.setdefault(s, []).append(str(p.get("package_id")))
     pair_shared_violations: List[Dict[str, Any]] = []
+    shared_engine_sentences: Dict[str, List[str]] = {}
     if n >= 3:
         for sent, owners in sent_owners.items():
             if len(owners) == 2:
-                pair_shared_violations.append({
-                    "layer": "L3_CONTENT",
-                    "violation": "PAIR_SHARED_IDENTITY_SENTENCE",
-                    "detail": f"identity sentence shared by exactly "
-                              f"{owners}: '{sent[:140]}'",
-                })
+                # epistemic split: is the shared sentence input-derived (one
+                # invention's content leaking) or engine-origin (template
+                # chrome emitted identically into several packages)?
+                # L3a already hard-fails input-derived leaks. A pair-shared
+                # sentence in NO input signature is engine-origin: it is
+                # genericness (template prose where the gold corpus has
+                # invention-specific prose), reported as a finding — and
+                # potentially a factual mischaracterization when the
+                # boilerplate contradicts one invention's actual nature.
+                if _in_any_signature(sent, run_packages):
+                    pair_shared_violations.append({
+                        "layer": "L3_CONTENT",
+                        "violation": "PAIR_SHARED_INPUT_DERIVED_SENTENCE",
+                        "detail": f"input-derived identity sentence shared "
+                                  f"by exactly {owners}: '{sent[:140]}'",
+                    })
+                else:
+                    shared_engine_sentences[sent] = owners
             elif len(owners) >= 3:
                 template_sentences[sent] = len(owners)
     else:
@@ -164,6 +177,17 @@ def audit_contamination(run_packages: List[Dict[str, Any]]) -> Dict[str, Any]:
                        "contamination)",
             "examples": sorted(template_sentences,
                                key=lambda s: -template_sentences[s])[:5]},
+        "pair_shared_engine_sentences": {
+            "count": len(shared_engine_sentences),
+            "detail": shared_engine_sentences,
+            "finding": "GENERICNESS (pair level) — engine-origin sentences "
+                       "shared by exactly two packages and present in NO "
+                       "input signature. Template prose in identity "
+                       "positions; may factually mischaracterize an "
+                       "invention (e.g. a passive-device disclosure on an "
+                       "active-control invention). Depth finding, not "
+                       "input contamination.",
+        },
         "extraction_errors": [e for p in run_packages
                                for e in p.get("_sentence_extraction_errors",
                                               [])],
@@ -185,6 +209,15 @@ def _signature_set(p: Dict[str, Any]) -> Set[str]:
         if len(words) >= 6:
             out.add(" ".join(words)[:220])
     return out
+
+
+def _in_any_signature(sentence: str,
+                      run_packages: List[Dict[str, Any]]) -> bool:
+    """True if the sentence appears in some run's TRUE input signature."""
+    for p in run_packages:
+        if sentence in _signature_set(p):
+            return True
+    return False
 
 
 def _own_id_universe(p: Dict[str, Any]) -> Set[str]:
