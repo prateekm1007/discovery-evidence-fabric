@@ -1,0 +1,131 @@
+{
+ "artifact": "E17R2_CLAIM_AUDIT",
+ "owner": "CODER2",
+ "generated_at": "2026-08-29T00:00:00+00:00Z",
+ "audit_round": 2,
+ "prior_round": "E17_CLAIM_AUDIT.json (CODER2-P5, engine head 1ff2d707) — 13 claims, 3 red flags",
+ "engine_head_at_audit": "b2559c80c10e498ad86f61ef14e52174e26ec536",
+ "origin_main_at_audit": "b2559c80c10e498ad86f61ef14e52174e26ec536",
+ "coder1_base_state": "Coder 1's round-2 session narrative reports syncing a stale clone (e64d791) to 97451397 (= CODER2-P5) and a CLEAN tree at sync. Verified this session: origin/main remains at b2559c80 (CODER2-P6) with zero E17 commits on any branch (fetch + rev-list + --diff-filter=A over all refs: mechanism_spec.py exists NOWHERE in git). Coder 1's base is therefore P5, ONE LAYER BEHIND P6 (missing: two_runs self-hermetic fix in tests/benchmark/test_benchmark_suite.py, ENV_UNBLOCK_E20.json findings, Mistral-key-invalid + NVIDIA-further-degraded environment truth).",
+ "round1_continuity_finding": {
+  "finding": "E17 ROUND 1 (the 13 claims audited in P5: mechanism_spec.py v1, mutation tests, MECHANISM_REASONING/ENGINEERING_REASONING gates, hermeticity fix, E17-f five problems, repo-wide redaction) is NOT in the round-2 tree — the round-2 session synced to a CLEAN tree and is re-writing mechanism_spec.py from scratch. Round 1 was never pushed, never committed, and is now either destroyed by the untracked-file clean that preceded the fast-forward or stranded in a different sandbox. Either way it is UNRECOVERABLE to the audit.",
+  "classification": "MEASURED COST OF NO PUSH DISCIPLINE",
+  "implication": "Two full E17 builder sessions have produced ZERO auditable, recoverable engine progress. This is the single largest process defect in the program and becomes directive item #1 for round 3."
+ },
+ "verification_classes": {
+  "VERIFIED_NOW": "checked against origin/main this session",
+  "VERIFIED_INEFFECTIVE": "claim made but measured NOT in effect at origin",
+  "CONSISTENT_STALE": "consistent with frozen findings but measured on an older tree than the current head",
+  "CONSISTENT_NARRATIVE": "consistent with recorded remote/session history; the underlying tree state is not independently measurable",
+  "UNVERIFIABLE_UNTIL_PUSH": "code not available; audit on push",
+  "RED_FLAG_ON_PUSH": "design-level concern requiring adversarial validation when the code lands"
+ },
+ "claims": [
+  {
+   "id": "R2-01",
+   "claim": "Synced stale clone (e64d791) to 9745139 (= origin/main at the time) via fetch, untracked-artifact clean, fast-forward",
+   "class": "CONSISTENT_NARRATIVE",
+   "note": "97451397 is CODER2-P5 and e64d791 is its ancestor — the sync story is consistent with recorded remote history. MATERIAL GAP: the base is P5, not P6 (b2559c80). Coder 1 does not have: (a) my two_runs self-hermetic fix in tests/benchmark/test_benchmark_suite.py — their conftest.py-level fix must REBASE ON TOP of mine, not conflict with it; (b) the E20 finding that the Mistral key is INVALID (401, double-verified) and NVIDIA degraded further (>120s trivial); (c) the CEO unblock guidance (zero-config OPENROUTER/DEEPSEEK). FIRST ACTION of round 3: re-sync to b2559c80."
+  },
+  {
+   "id": "R2-02",
+   "claim": "Local registry diff was test-fixture pollution (inv:fixture:* entries) — never to be committed",
+   "class": "CONSISTENT_NARRATIVE",
+   "note": "Matches the documented PACKAGE_ID_REGISTRY.json pollution/restore cycle (Art. IX). Correct posture."
+  },
+  {
+   "id": "R2-03",
+   "claim": "Untracked run artifacts byte-identical to remote blobs — safe to clean and fast-forward",
+   "class": "CONSISTENT_NARRATIVE",
+   "note": "Low materiality by itself, but see round1_continuity_finding: an untracked-file clean on a tree that should have carried unpushed round-1 E17 files is the likely destruction event for round 1. Untracked work that matters must be COMMITTED, never left to survive a clean."
+  },
+  {
+   "id": "R2-04",
+   "claim": "Constitution v1.8.0 read FIRST, all 38 articles, Article XXXVI presence verified",
+   "class": "UNVERIFIABLE_UNTIL_PUSH",
+   "note": "Process claim, same class as round-1 C-01. POSITIVE: the order matches directive item (0) — constitution before any file touch. CEO standing order continues: re-read before every session and before every push."
+  },
+  {
+   "id": "R2-05",
+   "claim": "Read the CODER1_NEXT_MOVE_DIRECTIVE and the B17 repair register before designing",
+   "class": "UNVERIFIABLE_UNTIL_PUSH",
+   "note": "Process claim. The directive they read is the P5 round-1 version; this session issues the ROUND-2 directive (see CODER1_NEXT_MOVE_DIRECTIVE.md, superseding)."
+  },
+  {
+   "id": "R2-06",
+   "claim": "Read the architecture efficiency audit before implementing",
+   "class": "UNVERIFIABLE_UNTIL_PUSH",
+   "note": "Process claim; consistent with directive item (2). No architecture decision in the round-2 narrative CONTRADICTS the measured verdicts (no new stages added; adversarial gates untouched so far)."
+  },
+  {
+   "id": "R2-07",
+   "claim": "Read Coder-2's frozen semantic causal instrument READ-ONLY to understand exactly what R-02 measures",
+   "class": "UNVERIFIABLE_UNTIL_PUSH",
+   "note": "The posture is exactly right and is the directive's intended effect: study the frozen instrument, do not touch it (Art. XXX). The instrument is byte-identical to its frozen state this session (git-diff verified) — no tampering occurred at any head I can measure."
+  },
+  {
+   "id": "R2-08",
+   "claim": "Studied equation applicability logic (R-02/R-05 core), release gate, quality evaluator, depth contract; examined the exact INCORRECT links my instrument found on the held dossiers; 'root causes identified with precision'",
+   "class": "UNVERIFIABLE_UNTIL_PUSH",
+   "note": "EVIDENCE-FIRST APPROACH = GOOD (working from measured defects, not narrative). But the root causes themselves are NOT STATED in the transcript. On push, the root-cause analysis must be checkable against the frozen measured defects: BENCH_01 and BENCH_04 each fail SEMANTIC_CAUSAL_CORRECTNESS with exactly 1 incorrect critical chain; BENCH_09 fails EQUATION_APPLICABILITY and is semantically clean. A root-cause document that does not name these three defects and map each to a code-level cause has not identified anything."
+  },
+  {
+   "id": "R2-09",
+   "claim": "mechanism_spec.py written — 'no passthrough, invention-specific' decomposition engine",
+   "class": "UNVERIFIABLE_UNTIL_PUSH",
+   "note": "Carries the round-1 C-02 caveat: R-01 (pass-through) is ALREADY MEASURED FIXED at the pushed E16 head (P4-INTEGRATION: MECHANISM_DEPTH passes 3/3 on held). 'No passthrough' re-solves a solved problem; the VALUE of mechanism_spec.py must be measured as the marginal delta against the E16 head, and its real job is serving R-02 (invention-specific causal content). On push: elaboration measured against E16 head, not the frozen 1.0x baseline."
+  },
+  {
+   "id": "R2-10",
+   "claim": "Self-caught boilerplate heaviness ('genericness risk + repeated scaffolding') and tightened: one parameter node per phenomenon, denser prose",
+   "class": "UNVERIFIABLE_UNTIL_PUSH",
+   "note": "POSITIVE SIGNAL: internalizing the B4 genericness audit without being told. WATCH-ITEM: 'one parameter node per phenomenon' is stated as a design heuristic — on push it must be justified defect-derived (which measured defect does the 1:1 cardinality fix?) not aesthetic, per Art. XIX/XXVII."
+  },
+  {
+   "id": "R2-11",
+   "claim": "attach() wired into build_invention_spec BEFORE the spec hash is computed",
+   "class": "UNVERIFIABLE_UNTIL_PUSH",
+   "note": "Good reproducibility instinct if true (the spec hash then covers the mechanism layer; spec identity changes deterministically). Verified on push by hash-stability tests."
+  },
+  {
+   "id": "R2-12",
+   "claim": "'Both paths verified'",
+   "class": "RED_FLAG_ON_PUSH",
+   "note": "EVIDENCE-FREE VERIFICATION CLAIM: no test name, no command, no numbers, no definition of 'both paths'. This is the same claim-shape P5 classified across round 1. On push, every 'verified' must name the command that reproduces it. Verification that cannot be re-run by the auditor is narrative, not verification (Art. III)."
+  },
+  {
+   "id": "R2-13",
+   "claim": "E17-b: engineering spec integration — mechanism_architecture block, subsystem mechanism refs, _mechanism_derivation helper, 'every object traceable to mechanism nodes'",
+   "class": "UNVERIFIABLE_UNTIL_PUSH",
+   "note": "Direction aligns with R-02 (causal correctness of critical chains) and R-03 (verification-to-quantity linkage). 'Every object traceable to mechanism nodes' is a strong invariant — if landed with a test that enumerates objects and asserts the trace, it directly serves the B12 E2 weak-FM-tie defect class. Currently INCOMPLETE: the narrative ends mid-edit."
+  },
+  {
+   "id": "R2-14",
+   "claim": "Introduced syntax errors in an edit (malformed joins); self-caught; fixing",
+   "class": "VERIFIED_AS_NARRATIVE (honest self-report)",
+   "note": "SECOND documented malformed-edit event in the E17 series (round 1: M2/M3/M4 mutation-test body corruption; round 2: malformed joins in engineering_spec.py integration). Recurring fragility of large multi-line edits without intermediate checks. PROTOCOL FIX (directive round 2, item 2): one atomic edit -> python -m py_compile <file> -> module smoke test -> commit. A syntax error should never survive longer than one edit."
+  }
+ ],
+ "round2_overall_verdict": {
+  "process_compliance": "GOOD — the round-2 session followed the P5 directive ordering: constitution first, directive + repair register read, frozen instruments studied read-only, evidence-first root-causing from the measured held-dossier defects, R-02/R-05 targeted in priority order. This is the correct shape of a builder session under audit.",
+  "push_discipline": "STILL FAILED — directive item #1 from P5 ('PUSH E17 IMMEDIATELY') was not executed; round 2 accumulated fresh unpushed work on top of a base missing P6. Two E17 sessions have now produced zero auditable engine progress (see round1_continuity_finding). Escalated to directive item #1 for round 3 with a concrete commit protocol.",
+  "verification_hygiene": "WEAK — 'verified' claims without named evidence persist (R2-12). Carried into the on-push audit checklist.",
+  "edit_fragility": "RECURRING — second self-reported malformed-edit event; protocol fix issued (atomic edits + compile gate).",
+  "on_push_audit_checklist": [
+    "1. Byte-diff of every file touched in the CODER2 namespace (discovery_fabric/benchmark/, tests/benchmark/, artifacts/benchmark/) — conftest.py/two_runs must rebase ON my P6 self-hermetic version, never overwrite it",
+    "2. Negative controls: new gates + mutation test + mechanism decomposition must FAIL on the 12 frozen rejected specs and FLAG the B12 E2 weak FM-mechanism ties (Art. VIII)",
+    "3. Elaboration/spec-delta measured against the E16 HEAD (1ff2d707 re-measurement artifacts), not the frozen 1.0x baseline",
+    "4. Root-cause document maps each of: BENCH_01 1 incorrect critical chain, BENCH_04 1 incorrect critical chain, BENCH_09 equation-applicability failure",
+    "5. Full 126-test Coder 2 benchmark suite + engine suites green on the MERGED tree (includes P6)",
+    "6. E17-f five problems: leak + overlap screen vs MY sealed custody set (never a milestone substitute)",
+    "7. Every 'verified' claim in the narrative has a named reproducing command",
+    "8. Redaction commit present at origin (S-01) — secrets currently in 9 tracked files at HEAD"
+  ]
+ },
+ "environment_truth_for_this_round": {
+  "mistral_key": "INVALID — HTTP 401 on every api.mistral.ai endpoint, double-verified (raw HTTPS + engine transport) in CODER2-P6. A valid Mistral key also needs ENGINE_SYNTHESIS_PROVIDER=mistral (tier-3, not in default preference list).",
+  "nvidia": "STILL DEGRADED — trivial 32-token call exceeds 120s (E19 measured 85s completion; endpoint degraded further). Synthesis-scale exceeds the 240s x3 budget.",
+  "consequence": "Sealed unseen problems 01/03/04 REMAIN transport-blocked. Do NOT burn session time on live runs. CEO unblock = valid OPENROUTER_API_KEY or DEEPSEEK_API_KEY (zero-config, top-2 of the default provider preference list).",
+  "b18": "NOT_MET unchanged (C3: zero released unseen dossiers with semantic fail==0)."
+ }
+}
