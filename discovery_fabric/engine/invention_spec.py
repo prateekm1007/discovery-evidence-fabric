@@ -154,26 +154,33 @@ def build_invention_spec(env: Candidate, run_ctx: Dict[str, Any]) -> Dict[str, A
         user_need, "ENGINEERING_PROPOSED", "INVENTION_SPEC",
         note="derived from problem statement; not independently documented")
 
+    raw = mm.get("raw_candidate") or {}
+    source_ev_id = (raw.get("source_evidence") or {}).get("source_id", "")
+    # Art. I/VI: a MODELLED proposal still cites the custodied evidence it
+    # was synthesized FROM (provenance citation — not a class promotion)
+    synthesis_citation = ev(source_ev_id) or (
+        [ev_ids[0]] if ev_ids else [])
+
     spec["mechanism"] = tagged(
         {"mechanism": mm.get("mechanism", ""),
          "intervention": mm.get("intervention", ""),
          "expected_effect": mm.get("expected_effect", ""),
          "mechanism_source_span": mm.get("mechanism_source_span", "")},
         "MODELLED", "SYNTHESIZE",
+        evidence_ids=synthesis_citation,
         note="LLM-proposed transfer mechanism from custodied evidence; "
-             "proposal, not fact (Art. XVIII)")
+             "proposal, not fact (Art. XVIII); evidence_ids cite the "
+             "custodied observation the proposal was synthesized from")
 
-    raw = mm.get("raw_candidate") or {}
     spec["causal_chain"] = tagged(
-        {"source_observation": (ev_index[raw.get("source_evidence", {})
-                                 .get("source_id", "")].get("title", "")
-                                 if raw.get("source_evidence", {}).get("source_id")
-                                 in ev_index else "UNKNOWN"),
+        {"source_observation": (ev_index[source_ev_id].get("title", "")
+                                if source_ev_id in ev_index else "UNKNOWN"),
          "mechanism": mm.get("mechanism", ""),
          "intervention_site": problem.get("device", ""),
          "expected_effect": mm.get("expected_effect", ""),
          "falsification_test": mm.get("falsification_test", "")},
         "MODELLED", "SYNTHESIZE",
+        evidence_ids=synthesis_citation,
         note="source -> mechanism -> intervention -> effect chain; "
              "links are proposals until physically observed")
 
@@ -215,6 +222,7 @@ def build_invention_spec(env: Candidate, run_ctx: Dict[str, Any]) -> Dict[str, A
          "note": "differences are asserted by synthesis and NOT yet claim-"
                  "audited against the nearest patents"},
         "MODELLED", "SYNTHESIZE",
+        evidence_ids=synthesis_citation,
         note="claim-level differentiation requires the inspection action "
              "recorded in next_best_action")
 

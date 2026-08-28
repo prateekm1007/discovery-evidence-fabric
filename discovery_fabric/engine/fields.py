@@ -72,6 +72,11 @@ class DisplayRegister:
         })
         return shown
 
+    def entries(self) -> List[Dict[str, Any]]:
+        """Read-only access to the register entries (audit + integrity
+        verification use this; never mutate through it)."""
+        return list(self._entries)
+
     def violations(self) -> List[str]:
         """Mechanical audit: every display must be the full string, or an
         exact prefix (minus optional trailing whitespace) + ellipsis."""

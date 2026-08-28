@@ -45,6 +45,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import re
 import zipfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -299,6 +300,53 @@ def build_traceability(spec: Dict[str, Any], eng: Dict[str, Any],
             "hash": sha256_obj(v),
             "linked": True, "result": v.get("result", "NOT_TESTED")})
 
+    # CEO E15-A/E15-J: ENGINEERING_LINKAGE chains in the SAME schema as the
+    # frozen gold-standard corpus — ONE chain per design input, anchored
+    # DI -> parameter -> DO -> FM -> VF (the frozen corpus's own chain
+    # shape) — so the benchmark's provenance_density instrument measures
+    # generated and frozen packages with the IDENTICAL meter (like-for-
+    # like, Art. XXIV). Linkage is read from the structural design graph's
+    # linkage maps (explicit parent ids), never keyword-matched.
+    link_maps = (graph.get("linkage_maps") or {})
+    fm_parent_do: Dict[str, List[str]] = (link_maps.get("fm_parent_do")
+                                          or {})
+    do_parent_di: Dict[str, List[str]] = (link_maps.get("do_parent_di")
+                                          or {})
+    # reverse maps: DI -> consuming DO, DO -> threatened FM
+    di_to_do: Dict[str, str] = {}
+    for do_id, di_ids in do_parent_di.items():
+        for di_id in di_ids:
+            di_to_do.setdefault(di_id, do_id)
+    do_to_fm: Dict[str, str] = {}
+    for f in eng.get("failure_analysis", []):
+        for do_id in fm_parent_do.get(f.get("graph_id"), []):
+            do_to_fm.setdefault(do_id, f.get("graph_id"))
+    fm_to_vf: Dict[str, str] = {
+        f.get("graph_id"): f.get("verification")
+        for f in eng.get("failure_analysis")
+        if f.get("verification") not in ("NOT_LINKED", None, "")}
+    for d in eng.get("design_inputs", []):
+        di_id = d["id"]
+        do_id = di_to_do.get(di_id)
+        fm_id = do_to_fm.get(do_id) if do_id else None
+        vf_id = fm_to_vf.get(fm_id) if fm_id else None
+        linkage = {
+            "chain_type": "ENGINEERING_LINKAGE",
+            "invention_id": invention_id,
+            "candidate_id": candidate_id,
+            "design_input_id": di_id,
+            "parameter": str(d.get("input") or d.get("label")
+                             or "NOT_LINKED"),
+            "design_output_id": do_id or "NOT_LINKED",
+            "failure_mode_id": fm_id or "NOT_LINKED",
+            "verification_id": vf_id or "NOT_LINKED",
+            "evidence_ids": list(d.get("evidence_refs") or []),
+            "linked": bool(do_id and fm_id and vf_id),
+        }
+        linkage["hash"] = sha256_obj(
+            {k: v for k, v in linkage.items() if k != "hash"})
+        chains.append(linkage)
+
     eq_integrity = {
         "equations_total": len(eng.get("engineering_core", {})
                                .get("governing_model", {}).get("equations", [])),
@@ -392,6 +440,78 @@ def build_maturity_basis(spec: Dict[str, Any], eng: Dict[str, Any],
 
 
 # --------------------------------------------------------------------------
+def verify_display_value_integrity(register: DisplayRegister,
+                                   spec: Dict[str, Any],
+                                   eng: Dict[str, Any],
+                                   ) -> Dict[str, Any]:
+    """CEO E15 audit issue 3 — the presentation-shortening INVARIANT:
+
+        The PDF may shorten display values, but the buyer package must
+        always retain the full authoritative value and a machine-verifiable
+        mapping from display value -> source value.
+
+    For EVERY register entry this verification proves, at build time:
+      1. the display value is the full value or an exact prefix of it
+         (DisplayRegister.violations), AND
+      2. the full authoritative value EXISTS in the authoritative artifact
+         content (INVENTION_SPECIFICATION.json / ENGINEERING_SPECIFICATION.json
+         — the exact objects the caller persists to the run directory),
+         recorded per entry as the machine-verifiable mapping
+         display -> full -> source artifact(s).
+
+    Any truncated display whose full value is NOT found in an authoritative
+    artifact is a HARD build failure (PackageBuildError) — the invariant
+    never relies on a developer comment.
+    """
+    spec_text = json.dumps(spec, ensure_ascii=False, default=str)
+    eng_text = json.dumps(eng, ensure_ascii=False, default=str)
+    checked: List[Dict[str, Any]] = []
+    violations: List[str] = []
+    for e in register.entries():
+        if not e.get("truncated"):
+            continue
+        full = e["full"]
+        sources = []
+        if full and full in spec_text:
+            sources.append("INVENTION_SPECIFICATION.json")
+        if full and full in eng_text:
+            sources.append("ENGINEERING_SPECIFICATION.json")
+        ok = bool(sources)
+        checked.append({
+            "field": e["field"],
+            "display": e["display"],
+            "full_value_sha256": hashlib.sha256(
+                full.encode("utf-8")).hexdigest(),
+            "full_value_found_in": sources,
+            "mapping_verifiable": ok,
+        })
+        if not ok:
+            violations.append(
+                f"{e['field']}: truncated display value's full text is "
+                "absent from BOTH authoritative artifacts — the "
+                "display->source mapping cannot be verified")
+    return {
+        "rule": ("the PDF may shorten display values; the buyer package "
+                 "always retains the full authoritative value (in this "
+                 "register) and a machine-verifiable mapping display -> "
+                 "full -> source artifact (E15 audit issue 3)"),
+        "authoritative_artifacts": {
+            "INVENTION_SPECIFICATION.json": sha256_of_obj(spec),
+            "ENGINEERING_SPECIFICATION.json": sha256_of_obj(eng)},
+        "register_entry_count": len(register.entries()),
+        "truncated_entry_count": len(checked),
+        "all_mappings_verifiable": not violations,
+        "verified_entries": checked,
+        "violations": violations,
+    }
+
+
+def sha256_of_obj(obj: Any) -> str:
+    return hashlib.sha256(json.dumps(
+        obj, sort_keys=True, ensure_ascii=False,
+        default=str).encode("utf-8")).hexdigest()
+
+
 def generate_buyer_package(
         out_dir: str, spec: Dict[str, Any], eng: Dict[str, Any],
         env: Optional[Candidate], run_ctx: Dict[str, Any],
@@ -425,6 +545,16 @@ def generate_buyer_package(
         raise PackageBuildError(
             "display register violation (Directive 6): " +
             "; ".join(reg_violations))
+
+    # E15 audit issue 3: the display-value INVARIANT (machine-verifiable
+    # mapping display -> full -> authoritative artifact). A truncated
+    # display whose full value cannot be traced to an authoritative
+    # artifact FAILS THE BUILD here — not in review, not in a comment.
+    display_integrity = verify_display_value_integrity(register, spec, eng)
+    if not display_integrity["all_mappings_verifiable"]:
+        raise PackageBuildError(
+            "display-value integrity violation (E15 audit issue 3): " +
+            "; ".join(display_integrity["violations"]))
 
     data = v4.get_data(dossier_view, pi)
 
@@ -502,6 +632,14 @@ def generate_buyer_package(
         "synthetic_rehearsal": rehearsal,
         "discipline_note": discipline_note,
         "display_register": register.to_json(),
+        "display_value_integrity": {
+            "rule": display_integrity["rule"],
+            "all_mappings_verifiable":
+                display_integrity["all_mappings_verifiable"],
+            "truncated_entry_count":
+                display_integrity["truncated_entry_count"],
+            "authoritative_artifacts":
+                display_integrity["authoritative_artifacts"]},
         "provenance": {
             "run_id": run_ctx.get("run_id"),
             "final_envelope_hash": (env.envelope_hash() if env else None),

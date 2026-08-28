@@ -272,12 +272,33 @@ class EngineRun:
     # ------------------------------------------------------------------
     def _post_rank_pipeline(self, run_ctx: Dict[str, Any]) -> None:
         """SURVIVOR -> INVENTION_SPECIFICATION -> ENGINEERING_SPECIFICATION
-        -> BUYER PACKAGE. Rehearsal flag is False here: this runs only on a
-        real loop envelope. Any failure records an explicit FAILED state in
-        the run directory; it never fabricates a package."""
+        -> ADVERSARIAL ENGINEERING ATTACK -> REPAIR (V2) -> STRONGEST-
+        SURVIVOR SELECTION -> BUYER PACKAGE -> QUALITY GATE.
+
+        E15-E: when >= 2 providers are configured, independent invention
+        candidates join the candidate set with explicit disagreement
+        objects (never forced to consensus).
+        E15-F: every candidate is attacked on the ten engineering targets;
+        KILL verdicts remove the candidate BEFORE any document is made.
+        E15-G: REPAIR verdicts mutate the engineering artifact itself
+        (V2 + ledger); cosmetic changes do not pass.
+        E15-H: only the strongest survivor reaches full dossier
+        generation; discovery quality comes before document production.
+        E15-B: the rendered package must pass the substantive quality gate
+        (FAIL blocks the release; CONDITIONAL releases with recorded
+        deficient areas).
+
+        Rehearsal flag is False here: this runs only on a real loop
+        envelope. Any failure records an explicit FAILED state in the run
+        directory; it never fabricates a package."""
+        from .dossier_quality import (evaluate_dossier_quality,
+                                      assert_quality_gate)
+        from .engineering_attack import (attack_engineering,
+                                         repair_engineering,
+                                         select_survivors)
         from .engineering_spec import build_engineering_spec
         from .experiment_selector import select_decisive_experiment
-        from .invention_spec import SPEC_FIELDS, build_invention_spec
+        from .invention_spec import build_invention_spec
         from .package_factory import generate_buyer_package
         try:
             spec = build_invention_spec(self.env, run_ctx)
@@ -295,16 +316,155 @@ class EngineRun:
                     "final_status": (spec.get("_survivor_gate") or {})
                     .get("final_status")})
                 return
-            eng = build_engineering_spec(spec, self.env, run_ctx)
-            self._eng = eng
-            self._persist("ENGINEERING_SPECIFICATION.json", eng)
+
+            # ---------- E15-E: multi-model ensemble (honest, non-fatal) --
+            ensemble = None
+            try:
+                from .ensemble import ensemble_synthesize
+                if self.env.evidence:
+                    ensemble = ensemble_synthesize(self.problem,
+                                                   self.env.evidence)
+                else:
+                    ensemble = {
+                        "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+                        "status": "NO_EVIDENCE",
+                        "note": "no custodied evidence on the envelope; "
+                                "no ensemble ran and no disagreement was "
+                                "fabricated (Art. XXV)"}
+            except Exception as exc:  # noqa: BLE001 — recorded, non-fatal
+                ensemble = {"ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+                            "status": "ENSEMBLE_ERROR",
+                            "error": f"{type(exc).__name__}: {exc}"}
+            self._persist("ENSEMBLE_DISAGREEMENT.json", ensemble)
+            if ensemble.get("disagreements"):
+                spec = dict(spec,
+                            _ensemble_disagreements=ensemble["disagreements"])
+                self._spec = spec
+                self._persist("INVENTION_SPECIFICATION.json", spec)
+
+            # ---------- E15-H: the candidate set --------------------------
+            # primary = the discovery-loop survivor; ensemble members join
+            # as independent invention candidates (same problem, same
+            # evidence, different model path).
+            def _env_with_candidate(cand: Dict[str, Any]):
+                d = self.env.to_dict()
+                mm = dict(d.get("mechanism_map") or {})
+                mm.update({
+                    "mechanism": cand.get("mechanism", ""),
+                    "intervention": cand.get("intervention", ""),
+                    "expected_effect": cand.get("expected_effect", ""),
+                    "falsification_test": cand.get("falsification_test", ""),
+                    "mechanism_source_span":
+                        cand.get("mechanism_source_span", ""),
+                    "raw_candidate": cand})
+                d["mechanism_map"] = mm
+                return Candidate.from_dict(d)
+
+            pool: List[Dict[str, Any]] = [{
+                "key": "primary",
+                "candidate_id": (self.env.candidate_id
+                                 or f"primary:{self.run_id}"),
+                "env_view": self.env,
+                "spec": spec,
+                "origin": "DISCOVERY_LOOP_SURVIVOR"}]
+            for m in (ensemble or {}).get("members", []):
+                cand = m.get("candidate") or {}
+                if (m.get("status") == "OK"
+                        and cand.get("intervention")):
+                    pool.append({
+                        "key": (m.get("role") or "member").lower(),
+                        "candidate_id": cand["candidate_id"],
+                        "env_view": _env_with_candidate(cand),
+                        "spec": None,
+                        "origin": f"ENSEMBLE_{m.get('role')}"
+                                  f"({m.get('provider_id')})"})
+
+            # ---------- E15-F/E15-G: attack all, repair viable ------------
+            evaluated: List[Dict[str, Any]] = []
+            for c in pool:
+                key = c["key"]
+                s = c["spec"] or build_invention_spec(c["env_view"],
+                                                      run_ctx)
+                if c["spec"] is None:
+                    self._persist(f"INVENTION_SPECIFICATION_{key}.json", s)
+                eng1 = build_engineering_spec(s, c["env_view"], run_ctx)
+                if key == "primary":
+                    # the primary artifact is always on disk, even if the
+                    # attack, selection or the quality gate later rejects
+                    # it (Art. V: the run directory is the record)
+                    self._persist("ENGINEERING_SPECIFICATION.json", eng1)
+                attack1 = attack_engineering(s, eng1, c["env_view"])
+                self._persist(f"ENGINEERING_ATTACK_{key}.json", attack1)
+                if attack1["overall"] == "KILLED":
+                    # E15-F: a killed candidate gets NO dossier
+                    self._persist(f"PACKAGE_FAILED_{key}.json", {
+                        "stage": "ENGINEERING_ATTACK",
+                        "reason": "E15-F attack KILLED the candidate",
+                        "candidate_id": c["candidate_id"],
+                        "kill_basis": [i["basis"] for i in attack1["items"]
+                                       if i["verdict"] == "KILL"]})
+                    evaluated.append({
+                        "candidate_id": c["candidate_id"],
+                        "key": key, "attack": attack1, "killed": True})
+                    continue
+                eng_final, repaired = eng1, False
+                if attack1["counts"].get("REPAIR", 0) > 0:
+                    eng2 = repair_engineering(s, eng1, attack1)
+                    if (eng2.get("repair_ledger") or {}).get(
+                            "artifact_mutated"):
+                        self._persist(
+                            f"ENGINEERING_SPECIFICATION_V1_{key}.json", eng1)
+                        eng_final, repaired = eng2, True
+                quality = evaluate_dossier_quality(s, eng_final)
+                evaluated.append({
+                    "candidate_id": c["candidate_id"], "key": key,
+                    "spec": s, "eng": eng_final, "env_view": c["env_view"],
+                    "attack": attack1, "quality": quality,
+                    "repaired": repaired, "origin": c["origin"],
+                    "killed": False})
+
+            # ---------- E15-H: select the strongest survivor ---------------
+            selection = select_survivors(evaluated)
+            self._persist("SURVIVOR_SELECTION.json", selection)
+            if not selection.get("selected"):
+                self.package_failure = (
+                    "E15-H selection: no viable survivor (all candidates "
+                    f"killed or quality-rejected; ranked={len(selection.get('ranked', []))})")
+                self._persist("PACKAGE_FAILED.json", {
+                    "stage": "SURVIVOR_SELECTION",
+                    "reason": self.package_failure,
+                    "selection": {k: v for k, v in selection.items()
+                                  if k != "ranked"}})
+                return
+            chosen = next(e for e in evaluated
+                          if e["candidate_id"] == selection["selected"]
+                          and not e.get("killed"))
+            spec_rel = chosen["spec"]
+            eng_rel = dict(chosen["eng"], engineering_attack_summary={
+                "attack": "ENGINEERING_ATTACK (E15-F)",
+                "overall": chosen["attack"]["overall"],
+                "counts": chosen["attack"]["counts"],
+                "targets": [i["target"] for i in
+                            chosen["attack"]["items"]],
+                "attack_record": f"ENGINEERING_ATTACK_{chosen['key']}.json",
+                "repaired_to_v2": chosen["repaired"],
+                "selection_basis": selection.get("selection_basis"),
+            })
+            if chosen["repaired"]:
+                eng_rel["repair_ledger"] = (chosen["eng"]
+                                            .get("repair_ledger"))
+            self._spec, self._eng = spec_rel, eng_rel
+            self._persist("INVENTION_SPECIFICATION.json", spec_rel)
+            self._persist("ENGINEERING_SPECIFICATION.json", eng_rel)
             self._persist("DECISIVE_EXPERIMENT.json",
-                          select_decisive_experiment(self.env))
+                          select_decisive_experiment(chosen["env_view"]))
+            self._chosen_env = chosen["env_view"]
+
             # CEO A1: resolve the package identity through the canonical
-            # registry — AFTER the survivor gate, so non-survivor runs burn
-            # no number. An explicit self.package_number is a test-only
-            # override; production allocation is registry-driven.
-            invention_id = (spec.get("invention_id") or {}).get("value")
+            # registry — AFTER survivor selection, so killed candidates
+            # burn no number. An explicit self.package_number is a
+            # test-only override; production allocation is registry-driven.
+            invention_id = (spec_rel.get("invention_id") or {}).get("value")
             if self.package_number is None:
                 from .package_registry import allocate
                 row = allocate(
@@ -316,7 +476,7 @@ class EngineRun:
             else:
                 pkg_number = self.package_number
             self.package_report = generate_buyer_package(
-                str(self.out), spec, eng, self.env,
+                str(self.out), spec_rel, eng_rel, chosen["env_view"],
                 {"run_id": self.run_id,
                  "package_number": pkg_number},
                 rehearsal=self.rehearsal)
@@ -330,7 +490,17 @@ class EngineRun:
                     "package incomplete: "
                     f"missing={self.package_report.get('missing_links')} "
                     f"failed={self.package_report.get('failed')}")
-            elif self.package_number is None:
+            else:
+                # ---------- E15-B: substantive quality gate --------------
+                # the rendered package is evaluated WITH its artifacts;
+                # FAIL must not release (CEO: do not lower the benchmark)
+                quality_final = evaluate_dossier_quality(
+                    spec_rel, eng_rel, self.package_report)
+                self._persist("DOSSIER_QUALITY_EVALUATION.json",
+                              quality_final)
+                assert_quality_gate(quality_final)
+            if (self.package_report.get("complete")
+                    and self.package_number is None):
                 # the allocated identity is now a RELEASED package
                 # (registry is append-only; the transition is recorded)
                 from .package_registry import mark_released

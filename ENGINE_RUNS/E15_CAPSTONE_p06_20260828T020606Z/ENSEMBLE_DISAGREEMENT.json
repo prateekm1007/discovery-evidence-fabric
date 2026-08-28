@@ -1,0 +1,167 @@
+{
+ "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+ "version": "1.0.0",
+ "requested_models": 2,
+ "available_providers": [
+  "nvidia",
+  "mistral"
+ ],
+ "members": [
+  {
+   "role": "MODEL_A",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-20b",
+   "prompt_hash": "451d24dc6c3474854a7fb74ec2990422730544af4f7dbd2660c9e3a3866ce505",
+   "output_hash": "02b3d25ee971064a705c983aa2962a8a3faf5482c550040390ed7d6acf2f1bdc",
+   "latency_ms": 4967,
+   "fields": {
+    "mechanism": "mechanical athalamia due to eye rubbing leading to forward IOL displacement, adherence to capsule, trapping fluid",
+    "intervention": "design IOL surface with anti-adhesive microstructure or hydrophilic coating to prevent capsule adhesion and fluid trapping",
+    "expected_effect": "reduced fluid retention in capsular bag, lowering bacterial colonization risk on IOL surface",
+    "falsification_test": "compare fluid volume and bacterial load in capsular bag of patients with standard vs modified IOL over 1 month post‑op",
+    "mechanism_source_span": "\"We hypothesize that mechanical athalamia due to eye rubbing was an acute trigger leading to forward IOL displacement, adhering it to the anterior capsule and trapping fluid.\""
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:nvidia:02b3d25ee971",
+    "mechanism": "mechanical athalamia due to eye rubbing leading to forward IOL displacement, adherence to capsule, trapping fluid",
+    "intervention": "design IOL surface with anti-adhesive microstructure or hydrophilic coating to prevent capsule adhesion and fluid trapping",
+    "expected_effect": "reduced fluid retention in capsular bag, lowering bacterial colonization risk on IOL surface",
+    "falsification_test": "compare fluid volume and bacterial load in capsular bag of patients with standard vs modified IOL over 1 month post‑op",
+    "mechanism_source_span": "\"We hypothesize that mechanical athalamia due to eye rubbing was an acute trigger leading to forward IOL displacement, adhering it to the anterior capsule and trapping fluid.\"",
+    "source_evidence": {
+     "source_id": "europepmc:42254756",
+     "source_hash": "ce38269f7e1cc69a20555449aad213bea6a6e6822a66023d58b566bf46b75944"
+    }
+   }
+  },
+  {
+   "role": "MODEL_B",
+   "provider_id": "mistral",
+   "status": "OK",
+   "model": "mistral-small-latest",
+   "prompt_hash": "451d24dc6c3474854a7fb74ec2990422730544af4f7dbd2660c9e3a3866ce505",
+   "output_hash": "b7e392d5f04e12f80fd07731216c2be64376a318be71e338a0db0e6b692c3b9d",
+   "latency_ms": 1382,
+   "fields": {
+    "mechanism": "Mechanical athalamia due to eye rubbing causing forward IOL displacement and fluid trapping",
+    "intervention": "Design IOL with posterior haptic angulation to resist forward displacement under mechanical stress",
+    "expected_effect": "Reduced risk of capsular bag distension syndrome and associated microbial colonization sites",
+    "falsification_test": "Accelerated mechanical fatigue testing of IOL haptic design under simulated eye rubbing forces",
+    "mechanism_source_span": "\"We hypothesize that mechanical athalamia due to eye rubbing was an acute trigger leading to forward IOL displacement, adhering it to the anterior capsule and trapping fluid.\""
+   },
+   "missing_fields": [],
+   "candidate": {
+    "candidate_id": "cand:ENS:mistral:b7e392d5f04e",
+    "mechanism": "Mechanical athalamia due to eye rubbing causing forward IOL displacement and fluid trapping",
+    "intervention": "Design IOL with posterior haptic angulation to resist forward displacement under mechanical stress",
+    "expected_effect": "Reduced risk of capsular bag distension syndrome and associated microbial colonization sites",
+    "falsification_test": "Accelerated mechanical fatigue testing of IOL haptic design under simulated eye rubbing forces",
+    "mechanism_source_span": "\"We hypothesize that mechanical athalamia due to eye rubbing was an acute trigger leading to forward IOL displacement, adhering it to the anterior capsule and trapping fluid.\"",
+    "source_evidence": {
+     "source_id": "europepmc:42254756",
+     "source_hash": "ce38269f7e1cc69a20555449aad213bea6a6e6822a66023d58b566bf46b75944"
+    }
+   }
+  }
+ ],
+ "common_claims": [
+  {
+   "dimension": "mechanism",
+   "similarity": 0.636,
+   "supporting_roles": [
+    "MODEL_A",
+    "MODEL_B"
+   ],
+   "claim": "mechanical athalamia due to eye rubbing leading to forward IOL displacement, adherence to capsule, trapping fluid",
+   "epistemic_class": "COMPUTED",
+   "note": "independently produced by >= 2 paths"
+  }
+ ],
+ "disagreements": [
+  {
+   "disagreement_id": "DIS-001",
+   "dimension": "intervention",
+   "role_a": "MODEL_A",
+   "claim_a": "design IOL surface with anti-adhesive microstructure or hydrophilic coating to prevent capsule adhesion and fluid trapping",
+   "role_b": "MODEL_B",
+   "claim_b": "Design IOL with posterior haptic angulation to resist forward displacement under mechanical stress",
+   "similarity": 0.048,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-08-28T02:06:48+00:00Z"
+  },
+  {
+   "disagreement_id": "DIS-002",
+   "dimension": "falsification_test",
+   "role_a": "MODEL_A",
+   "claim_a": "compare fluid volume and bacterial load in capsular bag of patients with standard vs modified IOL over 1 month post‑op",
+   "role_b": "MODEL_B",
+   "claim_b": "Accelerated mechanical fatigue testing of IOL haptic design under simulated eye rubbing forces",
+   "similarity": 0.0,
+   "status": "UNRESOLVED (deliberate — no forced consensus)",
+   "resolution_path": "decisive experiment + buyer diligence; the disagreement travels into the dossier's uncertainty register (Art. XXV)",
+   "epistemic_class": "COMPUTED",
+   "recorded_at": "2026-08-28T02:06:48+00:00Z"
+  }
+ ],
+ "unique_mechanisms": [
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_A",
+   "claim": "reduced fluid retention in capsular bag, lowering bacterial colonization risk on IOL surface",
+   "epistemic_class": "MODELLED"
+  },
+  {
+   "dimension": "expected_effect",
+   "role": "MODEL_B",
+   "claim": "Reduced risk of capsular bag distension syndrome and associated microbial colonization sites",
+   "epistemic_class": "MODELLED"
+  }
+ ],
+ "adjudication": {
+  "adjudicator": "DETERMINISTIC (field completeness -> falsifiability -> source span)",
+  "primary_role": "MODEL_A",
+  "primary_provider": "nvidia",
+  "primary_candidate_id": "cand:ENS:nvidia:02b3d25ee971",
+  "ranking": [
+   {
+    "role": "MODEL_A",
+    "provider_id": "nvidia",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   },
+   {
+    "role": "MODEL_B",
+    "provider_id": "mistral",
+    "score": [
+     5,
+     1,
+     1
+    ]
+   }
+  ],
+  "consensus_forced": false,
+  "note": "the primary candidate enters the pipeline; disagreement objects remain UNRESOLVED and travel with the artifact chain (E15-E: do not force consensus)",
+  "decided_at": "2026-08-28T02:06:48+00:00Z"
+ },
+ "built_at": "2026-08-28T02:06:35+00:00Z",
+ "status": "ENSEMBLE_RUN",
+ "paths": [
+  "nvidia",
+  "mistral"
+ ],
+ "comparison": {
+  "method": "significant-word Jaccard over the four invention claim dimensions (deterministic comparator)",
+  "thresholds": {
+   "agreement": 0.3,
+   "disagreement": 0.25
+  },
+  "note": "the gray band between the thresholds is recorded as unique per-role variants, never forced into either bin"
+ }
+}

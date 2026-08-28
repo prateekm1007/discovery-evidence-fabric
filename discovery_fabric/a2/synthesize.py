@@ -45,7 +45,8 @@ MECHANISM_SOURCE_SPAN: <verbatim substring from abstract supporting MECHANISM>
 
 def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
 
-def llm_chat(prompt, system="", max_retries=2, timeout=240):
+def llm_chat(prompt, system="", max_retries=2, timeout=240,
+             max_tokens=512):
     """E1: delegate transport to the provider registry. Returns content or
     None exactly as before; _LAST_PROVIDER_META records what happened
     (OK / PROVIDER_UNAVAILABLE / CALL_FAILED) for the provenance chain.
@@ -80,7 +81,7 @@ def llm_chat(prompt, system="", max_retries=2, timeout=240):
     # inside llm_registry automatically and are recorded in retry_notes.
     res = reg.generate(prompt, system=system, timeout=timeout,
                        max_retries=max_retries, policy=policy,
-                       max_tokens=512)
+                       max_tokens=max_tokens)
     _LAST_PROVIDER_META = res.to_meta()
     _LAST_PROVIDER_META["selection_ledger"] = res.selection_ledger
     if res.ok:
@@ -106,43 +107,73 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
         return None
 
     fields = ["MECHANISM", "INTERVENTION", "EXPECTED_EFFECT", "FALSIFICATION_TEST", "MECHANISM_SOURCE_SPAN"]
-    parsed = {f.lower(): "" for f in fields}
-    pattern = re.compile(rf'^({"|".join(fields)})\s*:\s*(.*)$', re.MULTILINE)
-    for m in pattern.finditer(resp):
-        parsed[m.group(1).lower()] = m.group(2).strip()
+    retry_note = None
+    def _parse_fields(text):
+        parsed = {f.lower(): "" for f in fields}
+        pattern = re.compile(rf'^({"|".join(fields)})\s*:\s*(.*)$', re.MULTILINE)
+        for m in pattern.finditer(text or ""):
+            parsed[m.group(1).lower()] = m.group(2).strip()
+        return parsed
+    parsed = _parse_fields(resp)
+    # E15 recorded same-provider retry: the MECHANISM_SOURCE_SPAN is the
+    # LAST field line and fast endpoints occasionally spend the token cap
+    # before emitting it. One retry with a larger budget ON THE SAME
+    # provider/model — explicitly recorded in the candidate provenance,
+    # never a silent transport change (Art. XXVII).
+    if parsed.get("intervention") and not parsed.get("mechanism_source_span"):
+        retry_note = ("same-provider retry with max_tokens=1024: "
+                      "MECHANISM_SOURCE_SPAN missing from the first "
+                      "response (token-cap truncation suspected)")
+        print("  [synthesize] recorded retry: " + retry_note)
+        resp2 = llm_chat(prompt, system="You are a medical device engineer.",
+                         max_tokens=1024)
+        if resp2:
+            parsed2 = _parse_fields(resp2)
+            if (parsed2.get("intervention")
+                    and parsed2.get("mechanism_source_span")):
+                resp = resp2
+                parsed = parsed2
+            elif parsed2.get("mechanism_source_span"):
+                # keep the retry's span (verbatim) with the first response
+                parsed["mechanism_source_span"] = parsed2[
+                    "mechanism_source_span"]
+                resp = resp + "\n" + resp2
+
+    def _candidate_from(text, parsed):
+        return {
+            "candidate_id": f"cand:A2:{problem['problem_id']}:{_hash(text[:200])}",
+            "problem_id": problem["problem_id"],
+            "device": problem["device"],
+            "failure_mode": problem["failure_mode"],
+            "failure": problem["failure"],
+            "constraint": problem["constraint"],
+            "mechanism": parsed.get("mechanism", ""),
+            "intervention": parsed.get("intervention", ""),
+            "expected_effect": parsed.get("expected_effect", ""),
+            "falsification_test": parsed.get("falsification_test", ""),
+            "mechanism_source_span": parsed.get("mechanism_source_span", ""),
+            "source_evidence": {
+                "source_id": paper["id"],
+                "source_hash": paper["content_hash"],
+                "source_title": paper["title"],
+                "source_span": paper["abstract"][:2000],
+                "retrieval_timestamp": paper["retrieval_timestamp"],
+            },
+            "model": (_LAST_PROVIDER_META.get("model") or FROZEN_MODEL),
+            "provider": _LAST_PROVIDER_META.get("provider", "legacy-direct"),
+            "transport_status": _LAST_PROVIDER_META.get("status", "UNKNOWN"),
+            "prompt_hash": _hash(SYNTHESIS_PROMPT),
+            "input_hash": _hash(prompt),
+            "output_hash": _hash(text),
+            "synthesis_timestamp": datetime.now(timezone.utc).isoformat(),
+        }
     if not parsed.get("intervention"):
         print("  [synthesize] no intervention in response")
         return None
 
-    candidate = {
-        "candidate_id": f"cand:A2:{problem['problem_id']}:{_hash(resp[:200])}",
-        "problem_id": problem["problem_id"],
-        "device": problem["device"],
-        "failure_mode": problem["failure_mode"],
-        "failure": problem["failure"],
-        "constraint": problem["constraint"],
-        "mechanism": parsed.get("mechanism", ""),
-        "intervention": parsed.get("intervention", ""),
-        "expected_effect": parsed.get("expected_effect", ""),
-        "falsification_test": parsed.get("falsification_test", ""),
-        "mechanism_source_span": parsed.get("mechanism_source_span", ""),
-        "source_evidence": {
-            "source_id": paper["id"],
-            "source_hash": paper["content_hash"],
-            "source_title": paper["title"],
-            "source_span": paper["abstract"][:2000],
-            "retrieval_timestamp": paper["retrieval_timestamp"],
-        },
-        # E1: record the transport ACTUALLY used (provider + model), falling
-        # back to the frozen model label only when llm_chat was bypassed.
-        "model": (_LAST_PROVIDER_META.get("model") or FROZEN_MODEL),
-        "provider": _LAST_PROVIDER_META.get("provider", "legacy-direct"),
-        "transport_status": _LAST_PROVIDER_META.get("status", "UNKNOWN"),
-        "prompt_hash": _hash(SYNTHESIS_PROMPT),
-        "input_hash": _hash(prompt),
-        "output_hash": _hash(resp),
-        "synthesis_timestamp": datetime.now(timezone.utc).isoformat(),
-    }
+    candidate = _candidate_from(resp, parsed)
+    if retry_note:
+        candidate["synthesis_retry_note"] = retry_note
     print(f"  [synthesize] intervention: {candidate['intervention'][:60]}")
     return candidate
 

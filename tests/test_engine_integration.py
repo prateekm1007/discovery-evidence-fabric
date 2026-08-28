@@ -100,8 +100,18 @@ def fixture_envelope(attack_overall="PASS"):
         "expected_effect": "reduced proximal obstruction at 90 days",
         "_fixture_epistemic_class": "SYNTHETIC_TEST_ONLY",
     }
+    # E15-B content standard: mirror the multi-sentence mechanism
+    # narrative a real LLM synthesis produces (fixtures represent real
+    # survivors; the depth evaluator is never lowered to admit thin ones)
+    mechanism_rich = (
+        f"{raw['mechanism']}. The proposed intervention realizes this "
+        f"mechanism by placing {raw['intervention']} at the failure site "
+        "identified in the problem statement, where the governing "
+        f"physical effect produces {raw['expected_effect']} under the "
+        "stated constraint; the transfer logic follows from the custodied "
+        "source observation and its mechanism source span.")
     env.mechanism_map = {
-        "mechanism": raw["mechanism"],
+        "mechanism": mechanism_rich,
         "intervention": raw["intervention"],
         "expected_effect": raw["expected_effect"],
         "falsification_test": raw["falsification_test"],

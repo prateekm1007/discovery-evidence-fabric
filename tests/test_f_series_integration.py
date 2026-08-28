@@ -193,6 +193,16 @@ def _survivor_env(domain_id: str, variant: int = 0,
         "constraint": p["constraint"],
     }
     env = Candidate(problem=problem, problem_id=problem_id)
+    # E15-B content standard: a real LLM synthesis produces a multi-sentence,
+    # invention-tied mechanism narrative; the fixture mirrors that shape
+    # (the depth evaluator must not be lowered to admit thin fixtures).
+    mechanism_rich = (
+        f"{p['mechanism']}. The proposed intervention realizes this "
+        f"mechanism by placing {p['intervention']} at the failure site "
+        f"identified in the problem statement, where the governing "
+        f"physical effect produces {p['effect']} under the stated "
+        f"constraint ({p['constraint']}); the transfer logic follows from "
+        "the custodied source observation and its mechanism source span.")
     ev = {
         "id": f"europepmc:FIXTURE-{domain_id}-{variant}",
         "source_type": "scientific_paper", "source": "EuropePMC",
@@ -233,7 +243,7 @@ def _survivor_env(domain_id: str, variant: int = 0,
         "_fixture_epistemic_class": "SYNTHETIC_TEST_ONLY",
     }
     env.mechanism_map = {
-        "mechanism": raw["mechanism"], "intervention": raw["intervention"],
+        "mechanism": mechanism_rich, "intervention": raw["intervention"],
         "expected_effect": raw["expected_effect"],
         "falsification_test": raw["falsification_test"],
         "mechanism_source_span": raw["mechanism_source_span"],
@@ -427,13 +437,24 @@ def test_d4_engineering_depth_is_domain_adaptive():
     rf = probes["rf_wireless"]
     assert any("SAR" in p["parameter"] for p in
                rf["engineering_core"]["critical_parameters"])
-    # domain candidate failure modes are appended and classed
+    # domain candidate failure modes are appended and classed.
+    # E15-D upgrade: an adversarial row may be ENRICHED with a domain
+    # mechanism (cross-reference) — it keeps its COMPUTED class but MUST
+    # carry mechanism_provenance; pure domain candidate rows stay
+    # ENGINEERING_PROPOSED. Either way the domain-sourced content is
+    # explicitly classed and provenance-carrying.
     for eng in probes.values():
         dom_fms = [fm for fm in eng["failure_analysis"]
                    if "domain registry" in fm["evidence"]]
         assert dom_fms
-        assert all(fm["epistemic_class"] == "ENGINEERING_PROPOSED"
-                   for fm in dom_fms)
+        for fm in dom_fms:
+            if fm["epistemic_class"] == "ENGINEERING_PROPOSED":
+                continue
+            assert fm.get("mechanism_provenance"), \
+                f"{fm['graph_id']}: cross-referenced row lacks provenance"
+            assert fm.get("invention_applicability", {}).get("verdict") \
+                == "TIED"
+            assert fm.get("content_class") == "PHYSICAL_MECHANISM"
 
 
 # ----------------------------------------------------------------------
@@ -487,6 +508,10 @@ D6_SOURCE_FILES = [
     "discovery_fabric/engine/depth_contract.py",
     "discovery_fabric/engine/benchmark_corpus.py",
     "discovery_fabric/engine/package_registry.py",
+    # E15 authoritative-content modules (CEO E15-A/B/F/G) — same rule
+    "discovery_fabric/engine/engineering_attack.py",
+    "discovery_fabric/engine/dossier_quality.py",
+    "discovery_fabric/engine/benchmark_dossiers.py",
 ]
 SLICE_RE = re.compile(r"\[:\d+\]")
 

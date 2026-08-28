@@ -53,7 +53,8 @@ recreation).
 from __future__ import annotations
 
 import itertools
-from typing import Any, Dict, List, Optional
+import re
+from typing import Any, Dict, List, Optional, Tuple
 
 from .candidate import Candidate, sha256_obj, utc_now
 from .design_outputs import compile_design_outputs
@@ -404,6 +405,68 @@ def _match_verification_method(parameter_name: str,
 # --------------------------------------------------------------------------
 # CEO A6 — invention-specific failure analysis
 # --------------------------------------------------------------------------
+# CEO E15-D — domain-mechanism cross-reference + generic-content rejection
+# --------------------------------------------------------------------------
+def _domain_mechanism_for_attack(attack_text: str, module: Dict[str, Any],
+                                 tokens: List[str],
+                                 ) -> Optional[Dict[str, Any]]:
+    """E15-D: find the domain-registry failure mechanism that describes the
+    SAME physical phenomenon as an adversarial attack finding. Matching is
+    mechanical: a domain candidate FM qualifies when (a) one of its
+    applicability signals appears in the attack text, or (b) >= 2 of its
+    content tokens overlap the attack text. Returns the A6-shaped detail or
+    None. No match = no mechanism is invented (the attack row stays an
+    honest generic placeholder)."""
+    if not attack_text:
+        return None
+    low = attack_text.lower()
+    best: Optional[Dict[str, Any]] = None
+    best_score = 0
+    for dfm in module.get("failure_modes", []):
+        score = 0
+        for sig in dfm.get("applicability_signals", []):
+            if sig and sig.lower() in low:
+                score += 2
+        for word in re.findall(r"[a-z]{5,}",
+                               dfm.get("mode", "").lower()):
+            if word in low:
+                score += 1
+        # the domain mechanism must ALSO be applicable to this invention
+        # (a generic match against an inapplicable mechanism would import
+        # content the invention never warranted — CEO E15-D)
+        sig_hit = any(s in " ".join(tokens)
+                      for s in dfm.get("applicability_signals", []))
+        content_hit = [t for t in _tie(
+            dfm.get("mode", "") + " " +
+            dfm.get("physical_mechanism", ""),
+            tokens)["matched_tokens"]]
+        if not (sig_hit or content_hit):
+            continue
+        if score > best_score:
+            best, best_score = dfm, score
+    if best and best_score >= 2:
+        pm = str(best.get("physical_mechanism", ""))
+        if pm and not pm.upper().startswith("NOT ESTABLISHED"):
+            return best
+    return None
+
+
+def _content_class(physical_mechanism: str) -> str:
+    """E15-D content classification of a failure row: does it carry an
+    ESTABLISHED physical mechanism (substance) or is it a generic
+    adversarial placeholder (honest, but not substance)?"""
+    pm = str(physical_mechanism or "")
+    if (not pm.strip() or pm.upper().startswith("NOT ESTABLISHED")
+            or "NOT ESTABLISHED" in pm.upper()
+            or pm.strip().upper() in _UNKNOWN_TEXTS):
+        return "GENERIC_ADVERSARIAL_PLACEHOLDER"
+    return "PHYSICAL_MECHANISM"
+
+
+_UNKNOWN_TEXTS = {"UNKNOWN", "NOT_ESTABLISHED", "NOT ESTABLISHED",
+                  "NOT_PERFORMED", "NOT_LINKED", "NOT_ASSIGNED"}
+
+
 def _build_failure_analysis(spec: Dict[str, Any], module: Dict[str, Any],
                             domain: str, graph_f_modes: List[Dict[str, Any]],
                             graph_verifications: List[Dict[str, Any]],
@@ -462,31 +525,98 @@ def _build_failure_analysis(spec: Dict[str, Any], module: Dict[str, Any],
             "domain_basis": domain_basis,
         }
 
-    # 1+2. the design-graph FMs (problem-stated + attack dimensions)
+    # 1+2. the design-graph FMs (problem-stated + attack dimensions).
+    # E15-D: an attack-dimension row is ENRICHED with the domain-registry
+    # physical mechanism when the registry describes the same phenomenon
+    # for this invention; otherwise it stays an honest generic placeholder
+    # and is CLASSIFIED as such (never silently passed off as substance).
     for f in graph_f_modes:
         vf_id = vf_by_fm.get(f["id"], "NOT_LINKED")
         if f["basis"].startswith("SOURCE_FACT"):
+            # the motivating failure IS established (SOURCE_FACT): its
+            # physical mechanism is the operator-stated failure itself;
+            # mechanism detail BEYOND that stays honestly NOT ESTABLISHED
+            # in the trigger field (never appended to the mechanism text,
+            # which would misclassify the row as contentless — E15-D)
             rows.append(_row(
                 f["id"], f["mode"],
-                f["mechanism"] + (f" — physical mechanism per domain "
-                                  f"knowledge: NOT ESTABLISHED"),
+                f["mechanism"],
                 "the operating condition stated in the problem "
-                "(trigger quantification NOT ESTABLISHED)",
+                "(mechanism detail beyond the problem statement and "
+                "trigger quantification NOT ESTABLISHED)",
                 _match_verification_method(f["mode"], verification_methods),
                 "the failure motivates the invention itself (buyer "
                 "consequence follows from the problem statement)",
                 "design control NOT ESTABLISHED (requires design work)",
                 vf_id, f["basis"]))
         else:
-            rows.append(_row(
-                f["id"], f["mode"],
-                "physical mechanism NOT ESTABLISHED — adversarial verdict "
-                "recorded: " + f["mechanism"],
-                "trigger NOT ESTABLISHED (adversarial probe)",
-                "detectability NOT ESTABLISHED (adversarial probe)",
-                "severity basis NOT ESTABLISHED (adversarial verdict only)",
-                "design control NOT ESTABLISHED (requires design work)",
-                vf_id, f["basis"]))
+            cross = _domain_mechanism_for_attack(
+                f["mode"] + " " + str(f.get("mechanism", "")), module,
+                tokens)
+            if cross:
+                rows.append({
+                    "graph_id": f["id"],
+                    "failure_mode": f["mode"],
+                    "mode": f["mode"],
+                    "physical_mechanism": cross["physical_mechanism"],
+                    "trigger": cross.get("trigger", "NOT ESTABLISHED"),
+                    "detectability": cross.get("detectability",
+                                               "NOT ESTABLISHED"),
+                    "severity": "UNKNOWN (no sourced severity basis)",
+                    "severity_basis": cross.get("severity_basis",
+                                                "NOT ESTABLISHED"),
+                    "design_control": cross.get("design_control_direction",
+                                                "NOT ESTABLISHED"),
+                    "design_feature": "NOT ESTABLISHED",
+                    "verification": vf_id,
+                    "verification_test": vf_id,
+                    "validation": ("NOT_PERFORMED — validation requires "
+                                   "physical observation (Art. XXXVIII)"),
+                    "kill_condition": ("NOT ESTABLISHED — pre-register "
+                                       "pass/fail for this mode before "
+                                       "transfer decisions"),
+                    "evidence": (f"{f['basis']} + domain-registry mechanism "
+                                 f"cross-reference: '{cross.get('mode', '')}'"
+                                 " (E15-D; the adversarial finding describes "
+                                 "a physical phenomenon the domain registry "
+                                 "documents for this invention class)"),
+                    "mitigation": cross.get("design_control_direction",
+                                            "NOT ESTABLISHED"),
+                    "residual_uncertainty":
+                        "UNKNOWN — untested candidate failure mode (Art. XXV)",
+                    "epistemic_class": f["basis"].split(" (")[0] or "UNKNOWN",
+                    "domain_basis": domain_label(domain),
+                    "invention_applicability": {
+                        "verdict": "TIED",
+                        "evaluation": ("mechanism imported ONLY because the "
+                                       "domain candidate matches the attack "
+                                       "finding AND its applicability signals "
+                                       "match this invention's tokens")},
+                    "mechanism_provenance": {
+                        "source": "domain registry candidate_failure_modes",
+                        "domain_mode": cross.get("mode", ""),
+                        "cross_reference": "E15-D _domain_mechanism_for_attack"},
+                })
+            else:
+                rows.append(_row(
+                    f["id"], f["mode"],
+                    "physical mechanism NOT ESTABLISHED — adversarial verdict "
+                    "recorded: " + f["mechanism"],
+                    "trigger NOT ESTABLISHED (adversarial probe)",
+                    "detectability NOT ESTABLISHED (adversarial probe)",
+                    "severity basis NOT ESTABLISHED (adversarial verdict only)",
+                    "design control NOT ESTABLISHED (requires design work)",
+                    vf_id, f["basis"]))
+    # E15-D content classification — computed ONCE here, consumed by the
+    # E15-B evaluator and the chain enforcement (substance accounting)
+    for row in rows:
+        row["content_class"] = _content_class(row.get("physical_mechanism"))
+        if row.get("content_class") == "GENERIC_ADVERSARIAL_PLACEHOLDER":
+            row["generic_content_note"] = (
+                "honest placeholder: no physical mechanism is established "
+                "for this adversarial finding yet; it is NOT counted as "
+                "failure-analysis substance (CEO E15-D rejects generic "
+                "failure content)")
 
     # 3. domain candidate failure modes with applicability evaluation
     for j, dfm in enumerate(module.get("failure_modes", [])):
@@ -524,6 +654,10 @@ def _build_failure_analysis(spec: Dict[str, Any], module: Dict[str, Any],
                 "UNKNOWN — untested candidate failure mode (Art. XXV)",
             "epistemic_class": "ENGINEERING_PROPOSED",
             "domain_basis": domain_label(domain),
+            "content_class": ("PHYSICAL_MECHANISM"
+                              if not str(dfm.get("physical_mechanism", ""))
+                              .upper().startswith("NOT ESTABLISHED")
+                              else "GENERIC_ADVERSARIAL_PLACEHOLDER"),
             "invention_applicability": {
                 "verdict": "TIED" if tied else "NOT_ESTABLISHED",
                 "matched_applicability_signals": sig_hits,
@@ -614,6 +748,38 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
     graph["graph_integrity"] = _graph_integrity(
         graph["d_inputs"], d_outputs, graph["f_modes"],
         graph["verifications"], graph["validations"])
+
+    # ---- CEO E15-C: design-input roles (PRIMARY/CONTEXT) -----------------
+    _annotate_design_roles(graph["d_inputs"], d_outputs)
+    # E15-C: a TIED domain design-input pattern is a real design driver —
+    # wire it into the compiled design output it constrains (deterministic
+    # token match); it stops being an unconsumed context row only when an
+    # output actually consumes it. Unmatched rows stay CONTEXT honestly.
+    for d in graph["d_inputs"]:
+        if d.get("design_role") != "CONTEXT":
+            continue
+        if "domain registry pattern" not in d.get("basis", ""):
+            continue
+        if "TIED" not in d.get("value", ""):
+            continue
+        di_words = {w for w in re.findall(r"[a-z]{4,}",
+                                          (d.get("label", "") + " " +
+                                           d.get("value", "")).lower())}
+        best_do, best_hits = None, 0
+        for do_ in d_outputs:
+            desc = str(do_.get("description", "")).lower()
+            hits = sum(1 for w in di_words if w in desc)
+            if hits > best_hits:
+                best_do, best_hits = do_, hits
+        if best_do is not None and best_hits >= 2:
+            if d["id"] not in best_do.get("parent_ids", []):
+                best_do["parent_ids"].append(d["id"])
+            d["design_role"] = "PRIMARY"
+            d.pop("context_note", None)
+            d["consumption_note"] = (
+                f"wired into {best_do['id']} by E15-C token match "
+                f"({best_hits} shared engineering tokens)")
+    _annotate_design_roles(graph["d_inputs"], d_outputs)
 
     # ---- CEO A4: why this domain (per invention) -------------------------
     why_this_domain = {
@@ -739,6 +905,63 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                 "result": "NOT_TESTED"})
     graph["verifications"].extend(extra_verifications)
     graph["counts"]["VF"] = len(graph["verifications"])
+
+    # ---- CEO E15-C/D: link every failure mode to a verification ----------
+    # PHYSICAL rows (established mechanism) get a DEDICATED planned
+    # verification drawn from the domain methods, token-matched to the
+    # row's own detectability text. Generic adversarial placeholders link
+    # to the killer-experiment verification (the measurement that would
+    # expose unknown mechanisms) when one exists. A row that ends with no
+    # linkage is an explicit gap, never a silent one.
+    def _vf_for_row(row: Dict[str, Any]) -> Optional[str]:
+        nonlocal vf_counter
+        if row.get("verification") not in ("NOT_LINKED", "", None):
+            return row.get("verification")
+        tied = ((row.get("invention_applicability") or {})
+                .get("verdict") == "TIED")
+        physical = row.get("content_class") == "PHYSICAL_MECHANISM"
+        if not (tied or physical):
+            # generic placeholder: resolve through the killer experiment
+            for v in graph["verifications"]:
+                if "killer experiment" in str(v.get("method", "")).lower():
+                    return v["id"]
+            return None
+        det = (str(row.get("detectability", "")) + " " +
+               str(row.get("mode", ""))).lower()
+        methods = list(module.get("verification_methods", []))
+        best, best_hits = None, -1
+        for m in methods:
+            hits = sum(1 for w in re.findall(r"[a-z]{4,}", m.lower())
+                       if w in det)
+            if hits > best_hits:
+                best, best_hits = m, hits
+        if best is None:
+            return None
+        vf_counter += 1
+        vid = f"VF-{vf_counter:03d}"
+        graph["verifications"].append({
+            "id": vid, "parent_ids": [row["graph_id"]],
+            "method": best,
+            "basis": "ENGINEERING_PROPOSED (domain verification method)",
+            "result": "NOT_TESTED"})
+        return vid
+
+    vf_counter = len(graph["verifications"])
+    linked_count = 0
+    for row in failure_modes_out:
+        vid = _vf_for_row(row)
+        if vid:
+            row["verification"] = vid
+            row["verification_test"] = vid
+            linked_count += 1
+            if row.get("content_class") == "PHYSICAL_MECHANISM":
+                row["kill_condition"] = (
+                    f"KILL (pre-registered): if verification {vid} "
+                    f"demonstrates '{row.get('mode', '')}' within the "
+                    "intended operating envelope while the recorded design "
+                    "controls are in place, the invention is killed in this "
+                    "architecture (re-open discovery — Art. V)")
+    graph["counts"]["VF"] = len(graph["verifications"])
     graph["graph_integrity"] = _graph_integrity(
         graph["d_inputs"], d_outputs, graph["f_modes"],
         graph["verifications"], graph["validations"])
@@ -831,9 +1054,16 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
     }
     kill_condition_block = {
         "statement": _kill_statement(spec),
-        "falsification_test": (((spec.get("causal_chain") or {})
-                                .get("value") or {}).get("falsification_test",
-                                                         "")),
+        # E15-C: the falsification test may live in the causal chain, the
+        # mechanism block, or the killer experiment — take the first
+        # established source (never fabricate one)
+        "falsification_test": (
+            ((spec.get("causal_chain") or {}).get("value") or {})
+            .get("falsification_test", "")
+            or ((spec.get("mechanism") or {}).get("value") or {})
+            .get("falsification_test", "")
+            or (((spec.get("killer_experiment") or {}).get("value") or {})
+                .get("definition", ""))),
         "killer_experiment": {"selected": ke_name or "UNKNOWN",
                               "eig": ke.get("eig"),
                               "eig_per_cost": ke.get("eig_per_cost")},
@@ -919,7 +1149,10 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
              "source": d["basis"],
              "evidence_class": d["basis"].split(" (")[0],
              "parent_ids": d["parent_ids"],
-             "evidence_refs": d["evidence_refs"]}
+             "evidence_refs": d["evidence_refs"],
+             "design_role": d.get("design_role", "PRIMARY"),
+             **({"context_note": d["context_note"]}
+                if d.get("context_note") else {})}
             for d in graph["d_inputs"]],
         "design_outputs": d_outputs,
         "design_output_compilation": {
@@ -1047,10 +1280,10 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "failure_analysis": failure_modes_out,
         "engineering_build_plan": build_plan,
         "verification_matrix": [
+            dict(
             {"id": v["id"],
              "requirement": v["method"],
              "method": v["method"],
-             "acceptance": "NOT ESTABLISHED (needs sourced threshold)",
              "result": "NOT_TESTED",
              "invention_tie": {
                  "linkage_kind": "killer_experiment" if
@@ -1058,7 +1291,9 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                  "domain_verification_method" if
                  "domain verification method" in v.get("basis", "") else
                  "falsification_test",
-                 "targets": v.get("parent_ids", [])}}
+                 "targets": v.get("parent_ids", [])}},
+            **dict(zip(("acceptance", "acceptance_status"),
+                       _propose_acceptance(v["method"], spec, module))))
             for v in graph["verifications"]],
         "validation_matrix": [
             {"id": v["id"],
@@ -1073,7 +1308,31 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "design_graph": {
             "counts": graph["counts"],
             "integrity": graph["graph_integrity"],
-            "gaps": graph["gaps"]},
+            "gaps": graph["gaps"],
+            "linkage_maps": {
+                "fm_parent_do": {
+                    f["id"]: [p for p in (f.get("parent_ids") or [])
+                              if p in {d["id"] for d in d_outputs}]
+                    for f in graph["f_modes"]},
+                "do_parent_di": {
+                    o["id"]: [p for p in (o.get("parent_ids") or [])
+                              if str(p).startswith("DI-")]
+                    for o in d_outputs}},
+            "nodes": (
+                [{"id": d["id"], "kind": "DESIGN_INPUT",
+                  "label": d["label"], "design_role": d.get("design_role")}
+                 for d in graph["d_inputs"]]
+                + [{"id": o["id"], "kind": "DESIGN_OUTPUT",
+                    "label": str(o.get("description", ""))}
+                   for o in d_outputs]
+                + [{"id": f["id"], "kind": "FAILURE_MODE",
+                    "label": f["mode"]} for f in graph["f_modes"]]
+                + [{"id": v["id"], "kind": "VERIFICATION",
+                    "label": v["method"]}
+                   for v in graph["verifications"]]
+                + [{"id": v["id"], "kind": "VALIDATION",
+                    "label": v.get("status", "")}
+                   for v in graph["validations"]])},
         "_spec_ref": {
             "invention_id": (spec.get("invention_id") or {}).get("value"),
             "spec_hash": spec.get("_spec_hash"),
@@ -1104,6 +1363,8 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
 
     # ---- CEO A3: engineering reasoning chains ----------------------------
     _attach_reasoning_chains(eng, spec)
+    # ---- CEO E15-C: enforce the chains over ALL critical claims ----------
+    enforce_reasoning_chain_coverage(eng)
     return eng
 
 
@@ -1114,6 +1375,155 @@ def _kill_statement(spec: Dict[str, Any]) -> str:
     name = "" if name == "UNKNOWN" else name
     return (f"killer experiment fails: {name or 'NOT ESTABLISHED'} "
             "(pre-registered pass/fail required before any transfer)")
+
+
+# --------------------------------------------------------------------------
+# CEO E15-C — causal-engineering enforcement: acceptance-criteria proposals,
+# design-input roles, and reasoning-chain coverage over ALL critical claims
+# --------------------------------------------------------------------------
+_NUM_THRESHOLD_RE = re.compile(
+    r"(\d+(?:\.\d+)?)\s*(%|mm|cm|mmHg|kPa|Pa|Hz|kHz|MHz|GHz|mA|V|W|mW|J"
+    r"|°C|K|g|mg|mL|L|min|s|ms|h|dB|bar|psi|x10|micron|um|nm)\b", re.I)
+
+
+def _sourced_thresholds(text: str) -> List[str]:
+    """Extract number+unit thresholds from the OPERATOR problem statement
+    (SOURCE_FACT material — the only place numbers may come from without a
+    new custody event). Returns the matched phrases."""
+    return [m.group(0).strip() for m in _NUM_THRESHOLD_RE.finditer(text or "")]
+
+
+def _propose_acceptance(method_text: str, spec: Dict[str, Any],
+                        module: Dict[str, Any],
+                        ) -> Tuple[str, str]:
+    """E15-C: propose an acceptance criterion for a verification row WITHOUT
+    inventing a number (Art. VIII). Priority:
+      1. a number+unit threshold stated in the problem (SOURCE_FACT);
+      2. a named external standard candidate whose tokens match the method
+         (EXTERNAL_PRECEDENT_CANDIDATE — applicability verification required);
+      3. an ENGINEERING_PROPOSED pre-registration rule that fixes the numeric
+         margin from the measured baseline BEFORE the test (no invented
+         value).
+    Returns (acceptance_text, acceptance_status)."""
+    problem = ((spec.get("problem") or {}).get("value") or {})
+    thresholds = _sourced_thresholds(
+        " ".join(str(problem.get(k, "")) for k in
+                 ("constraint", "failure", "device", "failure_mode")))
+    if thresholds:
+        return ("pre-registered pass/fail against the problem-stated "
+                f"threshold(s): {', '.join(thresholds)} (SOURCE_FACT, "
+                "problem statement)", "SOURCE_FACT_THRESHOLD")
+    low = method_text.lower()
+    for s in module.get("standards_candidates", []):
+        std = s.get("standard", "") if isinstance(s, dict) else str(s)
+        words = [w for w in re.findall(r"[a-z]{4,}", std.lower())]
+        if std and any(w in low for w in words):
+            return (f"verify against the cited standard candidate "
+                    f"'{std}' (EXTERNAL_PRECEDENT_CANDIDATE — applicability "
+                    "to THIS design must be verified before release)",
+                    "EXTERNAL_PRECEDENT_CANDIDATE")
+    return ("pre-registered decision rule fixed BEFORE the test: the "
+            "measured effect must exceed the measured baseline under the "
+            "identical setup by the pre-registration margin; the numeric "
+            "margin is fixed from the measured baseline at "
+            "pre-registration (no value is invented here — Art. VIII)",
+            "ENGINEERING_PROPOSED")
+
+
+def _annotate_design_roles(d_inputs: List[Dict[str, Any]],
+                           d_outputs: List[Dict[str, Any]],
+                           ) -> None:
+    """E15-C: tag each design input with its structural role — PRIMARY when
+    a design output consumes it, CONTEXT when it is a recorded constraint
+    feeding design rationale. Makes the orphan question explicit and
+    auditable instead of implicit (Art. XXVII)."""
+    referenced = {pid for d in d_outputs
+                  for pid in (d.get("parent_ids") or [])}
+    for d in d_inputs:
+        if d["id"] in referenced:
+            d["design_role"] = "PRIMARY"
+        else:
+            d["design_role"] = "CONTEXT"
+            d["context_note"] = (
+                "context constraint: no compiled design output consumes "
+                "this input yet; it feeds design rationale and the buyer's "
+                "constraint set (recorded explicitly, never dropped)")
+
+
+def enforce_reasoning_chain_coverage(eng: Dict[str, Any]) -> Dict[str, Any]:
+    """CEO E15-C: EVERY critical engineering claim must carry the complete
+    CLAIM -> PRINCIPLE -> MODEL -> INPUT -> ASSUMPTION -> OUTPUT ->
+    FAILURE_MODE -> VERIFICATION chain with non-empty, provenance-carrying
+    nodes. Critical claims = selected equations (governing model),
+    critical parameters, and failure-analysis rows with an established
+    physical mechanism. Returns the enforcement block; raises
+    ChainCoverageError when a critical claim is unchained (hard gate —
+    the CEO wording is 'enforce', not 'report')."""
+    rc = eng.get("engineering_reasoning_chains") or {}
+    chains = rc.get("chains", []) or []
+    roles = set(rc.get("chain_roles") or ())
+    by_subject = {}
+    for c in chains:
+        by_subject[c.get("subject")] = c
+
+    def _complete(c: Dict[str, Any]) -> Tuple[bool, List[str]]:
+        roles_seen = {n.get("node_type") for n in c.get("nodes", [])}
+        missing = sorted(roles - roles_seen)
+        empty = [n.get("node_type") for n in c.get("nodes", [])
+                 if not str(n.get("content") or "").strip()
+                 or not (n.get("provenance") or {}).get("origin_stage")]
+        return (not missing and not empty, missing + empty)
+
+    critical: List[Tuple[str, str]] = []
+    for eq in ((eng.get("engineering_core") or {})
+               .get("governing_model", {}).get("equations", []) or []):
+        critical.append(("governing_equation",
+                         f"equation:{eq.get('equation_id')}"))
+    for p in ((eng.get("engineering_core") or {})
+              .get("critical_parameters", []) or []):
+        if str(p.get("value_status", "UNKNOWN")).upper() != "UNKNOWN":
+            critical.append(("sourced_parameter",
+                             f"parameter:{p.get('parameter_id')}"))
+    for f in eng.get("failure_analysis", []) or []:
+        if f.get("content_class") == "PHYSICAL_MECHANISM":
+            critical.append(("physical_failure_mode",
+                             f"failure_mode:{f.get('graph_id')}"))
+    violations = []
+    covered = 0
+    for kind, subject in critical:
+        c = by_subject.get(subject)
+        if c is None:
+            violations.append(f"{kind} {subject}: NO reasoning chain")
+            continue
+        ok, why = _complete(c)
+        if ok:
+            covered += 1
+        else:
+            violations.append(f"{kind} {subject}: incomplete chain "
+                              f"({'; '.join(why)})")
+    block = {
+        "rule": ("CEO E15-C: every critical engineering claim carries the "
+                 "8-role causal chain with provenance-carrying nodes; "
+                 "parameters with value_status UNKNOWN are excluded (an "
+                 "unknown has no engineering reasoning to bind — it is "
+                 "recorded as a gap instead)"),
+        "critical_claims_total": len(critical),
+        "covered": covered,
+        "coverage": round(covered / len(critical), 3) if critical else 1.0,
+        "violations": violations,
+        "enforced": True,
+    }
+    eng["chain_enforcement"] = block
+    if violations:
+        raise ChainCoverageError(
+            "E15-C reasoning-chain enforcement FAILED: "
+            + " | ".join(violations))
+    return block
+
+
+class ChainCoverageError(RuntimeError):
+    """Raised when a critical engineering claim lacks its causal chain
+    (CEO E15-C hard gate)."""
 
 
 def _attach_reasoning_chains(eng: Dict[str, Any], spec: Dict[str, Any]
