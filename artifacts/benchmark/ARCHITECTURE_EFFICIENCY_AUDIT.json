@@ -1,0 +1,94 @@
+{
+ "artifact": "ARCHITECTURE_EFFICIENCY_AUDIT",
+ "owner": "CODER2",
+ "generated_at": "2026-08-28T12:20:32+00:00Z",
+ "engine_head_at_audit": "1ff2d707b16bab39a996107e62eb6582ae4d6599",
+ "ceo_questions": [
+  "Is the current discovery/invention engine the most efficient architecture?",
+  "Does the simplest architecture produce the best result?"
+ ],
+ "measurements": {
+  "engine_size": {
+   "modules": 31,
+   "loc": 14234,
+   "stage_order": [
+    "RETRIEVE",
+    "FREEZE",
+    "SYNTHESIZE",
+    "VERIFY",
+    "MULTI_SOURCE_DISCOVERY",
+    "COLLISION",
+    "ATTACK",
+    "CONTRADICTION",
+    "KILLER_EXPERIMENT",
+    "ADJUDICATION",
+    "CLASSIFY",
+    "NEXT_BEST_ACTION",
+    "RANK"
+   ],
+   "adapter_registrations": 32,
+   "llm_providers_registered": 8,
+   "llm_providers_credentialed": 1
+  },
+  "repo_sediment": {
+   "top_level_dirs": 191,
+   "r_series_historical_dirs": 73,
+   "cerevasc_historical_dirs": 60,
+   "tracked_python_files": 699,
+   "tracked_python_files_in_discovery_fabric": 119,
+   "runtime_graph_nodes_analyzed": 358,
+   "runtime_active_modules": 8,
+   "active_fraction": "8/358 = 2.2%",
+   "note": "The ACTIVE engine is ~2% of the analyzed codebase; the rest is historical sediment. The sediment does not slow the engine (imports resolve to the active path) but it slows every audit, hides secrets (all 7 files with live credential material are in sediment: R354, R358, CANONICAL_STATE, worklogs), and multiplies every clone/search/review."
+  },
+  "runtime_cost_structure": {
+   "live_retrieval_seconds": 2,
+   "deterministic_stages": "sub-second each (measured: envelope writes cluster within seconds)",
+   "llm_transport": "100% of wall-time variance",
+   "trivial_call_today_seconds": 85,
+   "synthesis_with_retries_minutes": 8,
+   "engine_transport_budget": "240s x 3 attempts, serial, same-provider only",
+   "conclusion": "Efficiency for this engine == LLM call economy + transport resilience. Stage count is computationally free. Cutting stages would not measurably speed the loop; fixing transport would."
+  },
+  "quality_outcome_structure": {
+   "e16_head_remeasurement": "HELD=3, PIPELINE_FAILED=12, RELEASED=0 (frozen instruments)",
+   "held_failure_pattern": "each held dossier fails EXACTLY ONE dimension: SEMANTIC_CAUSAL x2 (R-02), EQUATION_APPLICABILITY x1 (R-05)",
+   "real_mode_sealed_set": "1/4 full loop (honest REJECTED at adversarial gate); 0 dossiers",
+   "conclusion": "The architecture PRODUCES complete packages; the binding constraint is localized CONTENT CORRECTNESS (R-02/R-05), not missing architectural capability. More stages would not fix R-02/R-05; better generation and targeted repair will."
+  }
+ },
+ "verdict_q1_most_efficient": "NO — close, but three measured inefficiencies: (1) TRANSPORT FRAGILITY: single credentialed provider with 240s x3 serial same-provider retries; the REAL loop stalls exactly here (2/4 sealed problems transport-blocked; 1/4 synthesis took ~8 min). The 8-provider registry exists; the failover-on-timeout path does not. (2) NO TARGETED REPAIR LOOP: the quality gate runs TERMINALLY. A run failing ONE dimension pays the FULL pipeline cost and yields zero dossier (12/15 PIPELINE_FAILED; 3/15 HELD each failing exactly one dimension). Regenerating only the failing dimension would convert HELD->RELEASED at a fraction of cost. (3) SEDIMENT DRAG: 97.8% of analyzed code is historical; it is where secrets hide and where audits slow down. The core 13-stage loop itself is computationally efficient (sub-second per stage) and epistemically sound (honest kills, fail-closed) — keep it.",
+ "verdict_q2_simplest_best": "EMPIRICALLY YES SO FAR, WITH ONE CAVEAT. The best results to date — the frozen 15-package portfolio and the 3 released BENCH dossiers — were produced by the SIMPLE path: curated evidence + frozen v4 builders. The full autonomous 13-stage loop has produced ZERO released dossiers at the current head (it holds 3 and honestly kills its own candidates — which is correct epistemics, not failure). The caveat: the autonomous loop's value is HONESTY (it refuses to self-certify), and its missing capability is generation-time engineering reasoning (R-02/R-05), not simplicity. The simplest architecture that produces the best result = KEEP the 13-stage loop as the honesty spine, KEEP the frozen v4 builders as the packaging layer, FIX synthesis correctness, ADD targeted single-dimension repair, ARCHIVE the sediment. Do NOT add stages; do NOT remove the adversarial gates.",
+ "proposed_register_additions": [
+  {
+   "id": "R-11",
+   "owner": "CODER1",
+   "problem": "Transport resilience: no cross-provider failover on timeout; single-provider credential = single point of failure for the REAL loop",
+   "evidence": "UNSEEN_REAL_RERUN_E19.json problems 1/3 (transport-blocked); smoketest: only 1 of 4 NVIDIA models alive; 85s trivial-call latency measured",
+   "failure_class": "EVIDENCE/ENVIRONMENT-ADJACENT ENGINE GAP",
+   "affected_artifact": "discovery_fabric/engine/llm_registry.py",
+   "expected_change": "on-timeout failover to next available provider (registry already ranks them); timeout budget per attempt documented",
+   "release_blocker": false
+  },
+  {
+   "id": "R-12",
+   "owner": "CODER1",
+   "problem": "Terminal-only quality gating: no targeted repair loop between audit and packaging",
+   "evidence": "ENGINE_HEAD_REMEASUREMENT_E16MERGE.json: each held dossier fails exactly ONE dimension; 12/15 pay full pipeline cost for zero yield",
+   "failure_class": "ARCHITECTURE EFFICIENCY",
+   "affected_artifact": "engine release_gate.py + pipeline",
+   "expected_change": "audit -> regenerate ONLY the failing dimension -> re-gate (bounded retries, all attempts logged)",
+   "release_blocker": false
+  },
+  {
+   "id": "R-13",
+   "owner": "CODER1",
+   "problem": "Repository sediment: 97.8% of analyzed code historical; secrets live in sediment files",
+   "evidence": "this audit's repo_sediment measurements; security finding S-01 (all 7 secret-bearing files are sediment)",
+   "failure_class": "ANTI-ENTROPY",
+   "affected_artifact": "repo root",
+   "expected_change": "archive R-series/CEREVASC sediment to an archive ref; main carries active code + governance; never delete history",
+   "release_blocker": false
+  }
+ ]
+}
