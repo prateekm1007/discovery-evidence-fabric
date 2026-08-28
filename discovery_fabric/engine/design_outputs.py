@@ -196,9 +196,17 @@ def compile_design_outputs(spec: Dict[str, Any], module: Dict[str, Any],
                "unit": p.get("unit", "UNKNOWN")})
 
     # ---- 6. control logic ----------------------------------------------
-    closed_loop = any(tok in " ".join(tokens)
+    # E16 genericness fix (Coder 2 register #7): the closed-loop decision
+    # reads the FULL problem+mechanism vocabulary (the intervention itself
+    # may be an active control even when the probe words sit in the
+    # problem text); "passive" boilerplate is suppressed whenever the
+    # mechanism engages any active-control concept
+    full_text = " ".join(tokens)
+    closed_loop = any(tok in full_text
                       for tok in ("closed", "feedback", "sensor", "sensing",
-                                  "control", "regulat", "adaptiv"))
+                                  "control", "regulat", "adaptiv",
+                                  "actuat", "adjust", "tune", "command",
+                                  "active", "driven", "energiz", "activ"))
     if closed_loop:
         _emit("control_logic",
               f"Sensing -> decision -> actuation loop maintaining the "

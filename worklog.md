@@ -5664,3 +5664,23 @@ Work Log:
 
 Stage Summary:
 - The benchmark is now independent (floors from TRAINING only; blind holdout sealed and tamper-evident); substance is measured by content instruments, not counts; causal chains are semantically validated (an incorrect chain blocks release); candidate diversity is measured and enforced; the release gate holds CONDITIONAL work for human review instead of counting it as success; and the unseen-problem proof is recorded live: the engine explored genuinely diverse candidates on a problem it had never seen, engineered the survivor, produced the buyer-grade package, and honestly HELD it for human review rather than claiming an automatic release. REAL_LOOP_VERIFIED remains FALSE (real buyer / experiment / data / V2 remain the open proof no coder can manufacture).
+
+---
+Task ID: 9b
+Agent: main (Super Z, coding agent)
+Task: Coder 2 deficiency register (CODER2_ENGINEERING_BENCHMARK_REPORT.md) — fixes within Coder-1 scope
+
+Work Log:
+- Remote sync: Coder 2's independent benchmark commits (B1/B2) landed on the remote (shared-filesystem sync had also published my E16 commit). Rebased with the complete E16 state winning on Coder-1 files; worklog union preserved.
+- Register #1 (RELEASE YIELD, HIGH): rejected candidates now persist QUALITY_REJECTION_<key>.json with the EXACT E15-B deficient areas + per-dimension measurements; SURVIVOR_SELECTION.json carries per-candidate rejection_details — the gate's strictness is now auditable, not a count.
+- Register #2 (ENGINEERING_REASONING_DEPTH, HIGH): failure-mode linkage DISTRIBUTES across the design graph — every domain FM now parents every design output its registry applicability signals match (plus a >=2-token match), not only the architecture hub; provenance_density rose 0.083 -> 0.154 on fixtures (further spread rides on richer live mechanisms).
+- Register #3 (UNKNOWN_DISCLOSURE, MEDIUM): remaining_unknowns expanded from 1 aggregate entry to SPECIFIC entries — one per UNKNOWN-class critical parameter (with symbol/unit/binding) and one per not-yet-sourced acceptance criterion (16 entries on the fixture, was 1).
+- Register #4 (MANUFACTURING_REASONING, MEDIUM): the REGULATORY pattern is now an explicit design input (domain standards candidates as recorded basis), consumed by the compliance/exposure design outputs — gold parity (15/15 carry a regulatory DI).
+- Register #5 (VERIFICATION_SPECIFICITY, MEDIUM): already fixed post-A12 by the E15-C acceptance proposals (SOURCE_FACT threshold > named standard > pre-registration rule); confirmed on current builds.
+- Register #7 (GENERICNESS, MEDIUM): the closed-loop decision now reads the FULL problem+mechanism vocabulary (active-control concepts incl. actuat/adjust/tune/command/driven/energiz) — the factually mismatched "operates passively open-loop" disclosure can no longer be emitted into an active-control invention's dossier.
+- Register #6 (EQUATION_APPLICABILITY): domain equation library completion recorded as known scope (1/3 released runs below the 3-equation floor on Coder 2's domains); the A4 rejection mechanism keeps the floor honest where the library is thin.
+- Instrument calibration found during the fixes: the section-span instrument leaked "15. Transfer Boundary" into "16. Open Questions" (rendered by the same frozen builder in BOTH corpora) — "16. Open Questions" added to the canonical section list; floors recalibrated on both sides (engineering_sections floor 26 -> 27).
+- Suite: 855 passed / 2 skipped / 0 failed (excl. the 2 PRE-EXISTING environmental files); Coder-2 benchmark suite: 4/4 standalone contract/consistency tests pass; the two_runs module fixture needs a >10-minute window (15+ full package builds through the now-richer pipeline). E16_ACCEPTANCE.json regenerated with the final suite line.
+
+Stage Summary:
+- All Coder-2 register items either fixed in code (#1, #2, #3, #4, #7), already fixed and confirmed (#5), or recorded as known scope (#6). The release yield question (#1) is now answerable from the artifacts: every rejection carries its exact deficient areas. REAL_LOOP_VERIFIED remains FALSE.

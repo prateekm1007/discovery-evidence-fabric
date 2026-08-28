@@ -489,6 +489,19 @@ class EngineRun:
                             f"ENGINEERING_SPECIFICATION_V1_{key}.json", eng1)
                         eng_final, repaired = eng2, True
                 quality = evaluate_dossier_quality(s, eng_final)
+                if quality["verdict"] == "FAIL":
+                    # Coder 2 register #1: the rejected candidate carries
+                    # its EXACT deficient areas in the run record — the
+                    # gate's strictness must be auditable, not a count
+                    self._persist(f"QUALITY_REJECTION_{key}.json", {
+                        "candidate_id": c["candidate_id"],
+                        "verdict": quality["verdict"],
+                        "deficient_areas": quality["deficient_areas"],
+                        "dimensions": [
+                            {"dimension": d["dimension"],
+                             "verdict": d["verdict"],
+                             "measured": d["measured"]}
+                            for d in quality["dimensions"]]})
                 evaluated.append({
                     "candidate_id": c["candidate_id"], "key": key,
                     "spec": s, "eng": eng_final, "env_view": c["env_view"],
@@ -498,6 +511,12 @@ class EngineRun:
 
             # ---------- E15-H: select the strongest survivor ---------------
             selection = select_survivors(evaluated)
+            selection["rejection_details"] = {
+                e["candidate_id"]: {
+                    "quality_verdict": (e.get("quality") or {}).get("verdict"),
+                    "deficient_areas": (e.get("quality") or {})
+                    .get("deficient_areas", [])[:10]}
+                for e in evaluated if not e.get("killed")}
             self._persist("SURVIVOR_SELECTION.json", selection)
             if not selection.get("selected"):
                 self.package_failure = (

@@ -728,6 +728,30 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                            "use profile)"),
             "basis": "ENGINEERING_PROPOSED (domain registry pattern)",
             "evidence_refs": []})
+    # Coder 2 register #4: the REGULATORY pattern enters the design-input
+    # list explicitly (every gold-standard package carries a regulatory
+    # design input; the domain standards candidates are the recorded
+    # basis)
+    reg_di = None
+    if module.get("standards_candidates"):
+        di_n += 1
+        reg_di = f"DI-{di_n:03d}"
+        first_std = module["standards_candidates"][0]
+        std_name = (first_std.get("standard") if isinstance(first_std, dict)
+                    else str(first_std))
+        graph["d_inputs"].append({
+            "id": reg_di, "parent_ids": ["UIN-001"],
+            "label": f"Regulatory design input: compliance with candidate "
+                     f"standard(s) {std_name}"
+                     + (" and further recorded candidates" if
+                        len(module["standards_candidates"]) > 1 else ""),
+            "value": ("candidate standards from the engineering domain "
+                      "registry; pathway UNKNOWN (per R370C the pathway "
+                      "is never inferred from device class alone); "
+                      "applicability verification is the first engineering "
+                      "action"),
+            "basis": "ENGINEERING_PROPOSED (domain regulatory pattern)",
+            "evidence_refs": []})
     ev_index = spec.get("_evidence_index") or {}
     for ev_id, ev in sorted(ev_index.items()):
         if ev_id.startswith("problem:"):
@@ -853,6 +877,17 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             if any(sig and sig.lower() in desc for sig in signals):
                 f["parent_ids"].append(o["id"])
                 f.setdefault("threatened_outputs", []).append(o["id"])
+    if reg_di:
+        # the regulatory design input feeds the compliance/exposure design
+        # outputs (SAR/exposure/regulatory-constraint outputs) — token
+        # match keeps it honest; a DO that names regulation, exposure,
+        # compliance or constraint consumes it
+        for o in d_outputs:
+            desc = str(o.get("description", "")).lower()
+            if any(w in desc for w in ("regulat", "exposure", "compliance",
+                                       "constraint", "sar", "steril")):
+                if reg_di not in (o.get("parent_ids") or []):
+                    o["parent_ids"].append(reg_di)
 
 
     # ---- CEO A4: why this domain (per invention) -------------------------
@@ -1226,6 +1261,10 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "capital": "NOT ESTABLISHED",
         "basis": "UNKNOWN until the loop closes"})
 
+    acceptance_by_vf = {
+        v["id"]: _propose_acceptance(v["method"], spec, module)
+        for v in graph["verifications"]}
+
     eng = {
         "technology_domain": domain if domain != "UNKNOWN" else "NOT ESTABLISHED",
         "domain_detection": {
@@ -1385,9 +1424,30 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                  "reason": v["reason"]} for v in graph["validations"]],
             "remaining_unknowns": [
                 {"unknown": g["gap"], "reason": g["reason"]}
-                for g in graph["gaps"]] + [
-                {"unknown": "ALL sourced engineering parameter values",
-                 "reason": "no measurement or physical observation exists"}],
+                for g in graph["gaps"]]
+            # Coder 2 register #3: SPECIFIC unknowns, not one aggregate —
+            # one entry per UNKNOWN-class critical parameter
+            + [
+                {"unknown": f"value of critical parameter "
+                            f"{p.get('parameter') or p.get('name')} "
+                            f"[{p.get('symbol', '?')} {p.get('unit', '?')}]",
+                 "reason": "no sourced value exists "
+                           f"(value_status "
+                           f"{p.get('value_status', 'UNKNOWN')}); required "
+                           "before any numeric design decision",
+                 "binding": p.get("parameter_id")}
+                for p in critical_parameters
+                if str(p.get("value_status", "UNKNOWN")).upper() == "UNKNOWN"]
+            # one entry per not-yet-sourced acceptance criterion
+            + [
+                {"unknown": f"acceptance criterion for verification "
+                            f"{vid}",
+                 "reason": f"criterion status {status}: no sourced "
+                           "threshold exists; the numeric margin is fixed "
+                           "at pre-registration from the measured baseline",
+                 "binding": vid}
+                for vid, (acc, status) in acceptance_by_vf.items()
+                if status in ("ENGINEERING_PROPOSED", "NOT ESTABLISHED")],
         },
         "failure_analysis": failure_modes_out,
         "adversarial_findings": {
@@ -1412,7 +1472,7 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                  "falsification_test",
                  "targets": v.get("parent_ids", [])}},
             **dict(zip(("acceptance", "acceptance_status"),
-                       _propose_acceptance(v["method"], spec, module))))
+                       acceptance_by_vf[v["id"]])))
             for v in graph["verifications"]],
         "validation_matrix": [
             {"id": v["id"],

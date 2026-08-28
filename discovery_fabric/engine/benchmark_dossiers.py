@@ -81,6 +81,7 @@ DOSSIER_SECTIONS = [
     "7. Failure Modes", "8. Failure Analysis", "9. Verification Strategy",
     "10. Validation Strategy", "11. Materials", "12. Bill of Materials",
     "13. Manufacturing", "14. External Evidence", "15. Transfer Boundary",
+    "16. Open Questions",
 ]
 
 BUYER_PAGE_SECTIONS = [s for s in DOSSIER_SECTIONS if not s[0].isdigit()]
