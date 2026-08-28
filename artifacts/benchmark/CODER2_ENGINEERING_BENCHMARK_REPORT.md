@@ -282,3 +282,181 @@ detector attacked, clean-content false-positive guards, baseline immutability,
 threshold drift, blind-content absence, attribution classes). Full repo suite:
 905 passed, 2 skipped, only the 2 documented pre-existing environmental
 failures (patsnap rate-limit, secret-scan historical baseline).
+
+## 14. Phase 3 deliverables (B7-B12)
+
+CEO Phase 3 directive, delivered in full. Auditor-only: no engine file
+modified, no rejected output repaired, the benchmark was not weakened,
+and the frozen baselines were not overwritten.
+
+### B7 — Independent baseline freeze (permanent, double-hashed)
+
+`artifacts/benchmark/baseline/INDEPENDENT_BASELINE_FREEZE.json`:
+
+    BASELINE_RELEASE_YIELD = 3/15
+    QUALITY_REJECTIONS     = 12/15
+
+* frozen ONCE, refuses overwrite; canonical-content sha256 inside the
+  file (self-verifiable) + byte-level sha256 pinned EXTERNALLY in
+  `INDEPENDENT_BASELINE_FREEZE.bytehash` (a file cannot contain the hash
+  of its own bytes; `sha256sum` on the committed freeze must reproduce
+  the pin);
+* HASH-CHAINED to the B1 freeze (B1 content sha256 embedded; freezing
+  refuses to proceed if B1 is missing or mutated) — the two freezes
+  provably describe the same measurement;
+* mutation of the numbers (or of the file bytes with a recomputed
+  content hash) is mechanically detected; both hashes are pinned by the
+  test suite.
+
+### B8 — Rejection decomposition (no more "shallow")
+
+All 12 rejections decomposed into PRIMARY_BLOCKER + SECONDARY_BLOCKERS
+over the CEO's 12-category taxonomy, every row carrying named evidence
+(`ENGINE_GATE_RE_DERIVED` — the E15-B evaluator re-run read-only on the
+persisted specs — or `INDEPENDENT_CODER2`). Headline finding:
+
+* **12/12 PRIMARY = DOMAIN_REASONING.** The direct gate cause is the
+  E15-B MECHANISM_DEPTH FAIL, and the independent corroboration is
+  exact: on every rejected run the invention specification's mechanism
+  body has the SAME word count as the input mechanism text
+  (`mechanism_body_words == input_mechanism_words`, e.g. 21 == 21) —
+  the generator passes the input mechanism through with ZERO
+  engineering elaboration.
+* Secondaries on all 12: CAUSAL_REASONING (independent B3 incorrect
+  critical chains) and VERIFICATION_SPECIFICITY (wrong-quantity
+  verifications), plus the UNKNOWN_DISCLOSURE depth floor (recorded as
+  OTHER with an explicit taxonomy note — the CEO taxonomy has no
+  unknown-disclosure category).
+
+### B9 — Blind semantic adjudication layer
+
+Two structurally independent adjudicators (separate code paths and
+knowledge bases; no import of the B3/B4 detectors; Coder 1's labels
+never inputs — Adjudicator A classifies the physics family with its own
+vocabulary from the input signature):
+
+* **Adjudicator A — FIRST_PRINCIPLES** (physics-first): family
+  classification, control-architecture consistency, equation regimes,
+  failure-mode physics, verification-quantity disjointness;
+* **Adjudicator B — SYSTEMS_TRACE** (traceability-first): source-span
+  traceability, chain closure, DI->DO->FM linkage, equation ties,
+  acceptance quantification.
+
+Seeded random sample of 6 of the 8 released dossiers (3 committed +
+5 blind; seed 20260828, recorded). Verdicts per axis:
+CORRECT / QUESTIONABLE / INCORRECT. **Disagreements are preserved with
+both verdicts — never averaged, never resolved by a third rule** (26
+disagreements across 30 axis-verdicts; e.g. Adjudicator A returns
+INCORRECT on the adaptive-power dossier for the control-architecture
+contradiction while Adjudicator B returns CORRECT on traceability
+grounds — both recorded). Residual self-reference risk (both
+adjudicators are authored by Coder 2) is disclosed in the artifact; the
+external counterweight is B11.
+
+### B10 — Unseen-problem test
+
+4 problems outside the 15-technology corpus, outside the benchmark
+fixtures, outside the blind set, never used to tune the evaluator
+(hemodialysis graft / dental implant abutment / contact-lens window /
+ablation tip class). Content custody outside git (repo carries hashes
+only); distinctness mechanically verified (Jaccard < 0.4 vs every
+committed AND blind input; zero mechanism 3-grams in any tracked file).
+
+* **REAL mode**: live EuropePMC retrieval WORKS (5/5/5/4 real evidence
+  items retrieved per problem); synthesis fail-closed on missing LLM
+  credentials -> 0/4 released, **4/4 attributed to EVIDENCE_FAILURE —
+  NOT a generation failure** (the engine's fail-closed behavior is
+  correct under Art. IV/XXIX). CEO key re-provision unlocks this.
+* **REHEARSAL mode (labeled)**: 3/4 released through the full four-stage
+  pipeline; the released dossiers fail corpus depth (EQUATION_APPLICABILITY
+  2/3, MANUFACTURING_REASONING 3/3, UNKNOWN_DISCLOSURE 3/3) and **3/3
+  fail semantic correctness — the wrong-content defect class generalizes
+  to problems the engine has never seen**.
+* The evaluator is answer-blind: NO expected-answer key exists for
+  unseen problems; the instruments are the same frozen property-based
+  measurements used for the committed/blind sets, with NO
+  unseen-specific thresholds.
+
+### B11 — External human spot-check protocol
+
+`HUMAN_SPOT_CHECK_QUEUE.json` (committed; 8 seeded-random items across
+all 3 committed released dossiers) + `HUMAN_SPOT_CHECK_PROTOCOL.md` +
+a blind-stratum queue in CEO custody (6 items, content never committed).
+Each item is one reasoning chain presented as
+claim -> source -> engineering interpretation -> design implication.
+Status: **PENDING_HUMAN_REVIEW** — no verdicts fabricated. Verdict
+vocabulary: HUMAN_CONFIRMED / HUMAN_DISPUTED / HUMAN_UNCERTAIN.
+Ingestion is append-only, duplicate-refusing, queue-immutable, and
+aggregates COUNTS ONLY — human review is external evidence and is never
+converted into an automated score (pinned by tests).
+
+### B12 — Final audit output (five-way failure taxonomy)
+
+`FINAL_AUDIT_REPORT.json` classifies every failure into exactly one of
+GENERATION / AUDIT / BENCHMARK / EVIDENCE / ENGINEERING REASONING
+failure so Coder 1 cannot chase the wrong problem:
+
+| Category | Entries | Open |
+|---|---|---|
+| GENERATION_FAILURE | G1-G4 (12/12 shallow rejections = mechanism pass-through; released depth deficits; blind corroboration; unseen rehearsal depth) | 4 |
+| ENGINEERING_REASONING_FAILURE | E1-E4 (21 incorrect critical chains; control-architecture contradiction; domain boilerplate + Poiseuille assumption mismatch; unseen semantic failures) | 4 |
+| AUDIT_FAILURE | A1-A2 (9 self-found measurement defects + blind-set purification — FIXED, history retained) | 0 |
+| BENCHMARK_FAILURE | BM1-BM2 (blind-input overlap — CLOSED; canonical-registry pollution by Coder 1's test suite — OPEN) | 1 |
+| EVIDENCE_FAILURE | V1-V2 (missing LLM credentials block real-mode synthesis — CEO action required; 2 documented pre-existing environmental) | 2 |
+
+Bottom line (unchanged, now with evidence at every layer): Coder 1's
+engine runs end-to-end but cannot yet generate dossiers at the depth of
+the 15 reference packages, AND its released content carries engineering
+falsehoods that generalize to unseen problems. Repair priorities:
+(1) elaborate mechanisms instead of passing input text through — this
+alone unblocks the 12 rejections; (2) make verification quantities
+match failure physics; (3) stop shipping cross-domain boilerplate. The
+gate is NOT over-strict. Do not declare victory until the frozen
+baseline moves materially upward WITHOUT weakening the benchmark.
+
+## 15. Phase 3 measurement-layer hardening (self-audit)
+
+Defects found by attacking my own Phase 3 implementation, fixed, and
+pinned by tests (Art. XVI/XXX):
+
+* **B7 self-reference bug**: the freeze originally tried to embed the
+  byte hash of its own file inside itself (mathematically impossible);
+  found by my own tamper test before commit, redesigned to the
+  external-pin scheme (content hash inside + byte hash pinned beside);
+* **B7 pin-path bug**: freezing to a custom path wrote the byte pin to
+  the PRODUCTION pin location (caught by the test that freezes to a
+  tmp path and then verifies production integrity — the production pin
+  was re-derived from the untouched freeze bytes and the test now pins
+  both paths);
+* **B8 first-pass ranking defect**: independent severity-3 findings
+  outranked the gate's own FAIL dimension, mislabeling all 12 primaries
+  as CAUSAL_REASONING; corrected to rank the DIRECT gate cause
+  (severity 4) first — the decomposition now reflects what the E15-H
+  selection actually acted on, with independent evidence as
+  corroborating rows and secondaries;
+* **B8 genericness extractor contract**: recurrence is per-field list
+  length, not a count (TypeError caught on first run);
+* **B9 control-architecture scan too narrow**: the passive/open-loop
+  template record ships in design-output rows, outside the
+  architecture fields — Adjudicator A initially missed the canonical
+  contradiction; the ACTIVE side is now the invention's own mechanism
+  claim and the PASSIVE side is scanned dossier-wide (and the
+  consistent-passive case is verified NOT to fire);
+* **B9 test-independence check**: naive text scan of the module source
+  false-positived on the docstring's own independence contract —
+  replaced with an AST import check;
+* **B10 content-leak catch**: the unseen problem set's first draft
+  leaked one 3-gram ("interface temperature below") into a tracked
+  corpus file — caught by the distinctness screen before any run, the
+  mechanism text rephrased, screen re-run clean.
+
+Phase 3 test suite: `tests/benchmark/test_phase3_suite.py` — 34 tests
+(freeze immutability + double-hash tamper detection + external
+sha256sum reproduction, decomposition taxonomy/ranking/coverage,
+adjudicator independence + defect-class catches + false-positive
+guards + disagreement preservation, unseen leak screen + distinctness
+rejection + EVIDENCE_FAILURE attribution, queue schema + ingestion
+validation + no-score-conversion, taxonomy + report completeness).
+Benchmark suite total: 81 passed. Full repo suite: 939 passed / 2
+skipped / only the 2 documented pre-existing environmental failures.
+No new failures introduced.
