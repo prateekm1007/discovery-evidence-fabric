@@ -33,11 +33,18 @@ PROFILE = json.loads(
 
 @pytest.fixture(scope="module")
 def two_runs(tmp_path_factory):
-    """Released benchmark runs generated through Coder 1's real pipeline.
+    """Complete-dossier runs generated through Coder 1's real pipeline.
 
-    The new engine's E15-H gate honestly rejects some inputs (fail-closed
-    is correct behavior); the fixture generates a few more inputs and
-    keeps the RELEASED ones for depth auditing.
+    The engine's E15-H gate honestly rejects some inputs (fail-closed is
+    correct behavior). Since the E16 merge the engine also no longer
+    auto-releases ANY independent benchmark input: dossiers it would
+    have released now come back HELD_FOR_HUMAN_REVIEW (complete buyer
+    package on disk, release gated pending human review — see
+    ENGINE_HEAD_REMEASUREMENT_E16MERGE.json for the measured status
+    distribution). The fixture needs real generated dossiers to attack,
+    so it accepts BOTH statuses as produced-dossier runs; the release-
+    YIELD measurement itself lives in the frozen baseline artifacts and
+    the engine-head re-measurement, never in this fixture.
     """
     root = tmp_path_factory.mktemp("bench_runs")
     info = corpus_runner.run_benchmark(root, limit=6)
@@ -45,12 +52,17 @@ def two_runs(tmp_path_factory):
     for p in info["run_dirs"]:
         rel = json.loads((Path(p) / "DISCOVERY_RELEASE.json")
                          .read_text(encoding="utf-8"))
-        if rel.get("status") == "RELEASED":
+        has_dossier = bool(rel.get("package_folder") and
+                           Path(rel["package_folder"]).exists())
+        if rel.get("status") in ("RELEASED", "HELD_FOR_HUMAN_REVIEW") \
+                and has_dossier:
             released.append(Path(p))
     assert len(released) >= 2, (
-        f"expected at least 2 released runs, got {len(released)} — "
-        "engine E15-H rejection rate on independent inputs is itself a "
-        "benchmark finding (see AUTOMATED_DOSSIER_BENCHMARK.json)")
+        f"expected at least 2 produced-dossier runs, got "
+        f"{len(released)} — engine E15-H rejection rate on independent "
+        f"inputs is itself a benchmark finding (see "
+        f"AUTOMATED_DOSSIER_BENCHMARK.json and "
+        f"ENGINE_HEAD_REMEASUREMENT_E16MERGE.json)")
     return released
 
 
