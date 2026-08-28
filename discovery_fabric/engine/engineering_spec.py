@@ -60,6 +60,7 @@ from .candidate import Candidate, sha256_obj, utc_now
 from .design_outputs import compile_design_outputs
 from .domains import detect_domain, domain_label, get_domain_module
 from .equations import select_equations
+from . import quantity_reasoning
 from .invention_spec import tagged
 
 # Epistemic gate for engineering: DO results are ABSENT until reality
@@ -1032,34 +1033,59 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
     # domain verification-method rows — planned characterizations the
     # domain registry prescribes for this invention class (planned, never
     # executed: result stays NOT_TESTED, Art. XXXVIII). Each names the
-    # TIED domain failure modes it would expose.
+    # TIED domain failure modes it would expose. E21-A: a method is
+    # attached ONLY to the tied FMs whose affected quantity families it
+    # actually MEASURES — never blanket-attached to every tied failure
+    # mode (a BER sweep does not verify a fatigue failure).
+    fm_rows_by_id = {f["graph_id"]: f for f in failure_modes_out}
     tied_dom_fms = [f["graph_id"] for f in failure_modes_out
                     if (f.get("invention_applicability") or {})
                     .get("verdict") == "TIED"]
     extra_verifications: List[Dict[str, Any]] = []
     vf_extra_counter = len(graph["verifications"])
     if tied_dom_fms:
-        # a planned domain characterization enters the graph ONLY when it
-        # has invention-tied failure modes to expose (VF->FM structural
-        # rule; untied candidates would be noise, not depth)
         for m in _first_n(module.get("verification_methods", []), 2):
+            m_meas = quantity_reasoning.measured_families(m)
+            if not m_meas:
+                continue  # UNSPECIFIC method: not a quantity-grounded link
+            targets = [fid for fid in tied_dom_fms
+                       if set(quantity_reasoning.affected_families(
+                           fm_rows_by_id[fid])["families"]) & set(m_meas)]
+            if not targets:
+                continue  # measures no affected family of any tied FM
             vf_extra_counter += 1
             extra_verifications.append({
                 "id": f"VF-{vf_extra_counter:03d}",
-                "parent_ids": tied_dom_fms,
+                "parent_ids": targets,
                 "method": m,
-                "basis": "ENGINEERING_PROPOSED (domain verification method)",
-                "result": "NOT_TESTED"})
+                "basis": "ENGINEERING_PROPOSED (domain verification "
+                         "method, quantity-grounded E21-A)",
+                "result": "NOT_TESTED",
+                "quantity_linkage": {
+                    "rule": "attached only to FMs whose affected families "
+                            "the method measures",
+                    "measured": m_meas}})
     graph["verifications"].extend(extra_verifications)
     graph["counts"]["VF"] = len(graph["verifications"])
 
-    # ---- CEO E15-C/D: link every failure mode to a verification ----------
-    # PHYSICAL rows (established mechanism) get a DEDICATED planned
-    # verification drawn from the domain methods, token-matched to the
-    # row's own detectability text. Generic adversarial placeholders link
-    # to the killer-experiment verification (the measurement that would
-    # expose unknown mechanisms) when one exists. A row that ends with no
-    # linkage is an explicit gap, never a silent one.
+    # ---- CEO E15-C/D + E21-A: link every failure mode to a verification --
+    # E21-A REPLACES keyword-overlap matching (the measured R-02 defect:
+    # the word "accelerated" appeared in both a seat-wear failure's
+    # detectability and a fouling-challenge method, linking a test that
+    # cannot detect the failure) with PHYSICS-BASED QUANTITY LINKAGE:
+    #   (a) the row's OWN detectability text — the domain registry's
+    #       statement of how THIS failure is detected — is the first
+    #       candidate, admitted only if it measures a quantity family the
+    #       failure affects;
+    #   (b) a domain verification method is admitted only on the same
+    #       quantity-overlap rule (most shared families wins);
+    #   (c) a row with NO quantity-matched verification records an
+    #       explicit gap + UNKNOWN disclosure (what is missing, how to
+    #       establish it, who, test method, acceptance rule) and falls
+    #       back to the killer experiment for claim-level coverage —
+    #       NEVER a wrong-quantity verification.
+    # Generic adversarial placeholders still resolve through the killer
+    # experiment (the measurement that would expose unknown mechanisms).
     def _vf_for_row(row: Dict[str, Any]) -> Optional[str]:
         nonlocal vf_counter
         if row.get("verification") not in ("NOT_LINKED", "", None):
@@ -1073,25 +1099,63 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                 if "killer experiment" in str(v.get("method", "")).lower():
                     return v["id"]
             return None
-        det = (str(row.get("detectability", "")) + " " +
-               str(row.get("mode", ""))).lower()
-        methods = list(module.get("verification_methods", []))
-        best, best_hits = None, -1
-        for m in methods:
-            hits = sum(1 for w in re.findall(r"[a-z]{4,}", m.lower())
-                       if w in det)
-            if hits > best_hits:
-                best, best_hits = m, hits
-        if best is None:
-            return None
-        vf_counter += 1
-        vid = f"VF-{vf_counter:03d}"
-        graph["verifications"].append({
-            "id": vid, "parent_ids": [row["graph_id"]],
-            "method": best,
-            "basis": "ENGINEERING_PROPOSED (domain verification method)",
-            "result": "NOT_TESTED"})
-        return vid
+        aff = quantity_reasoning.affected_families(row)
+        det = str(row.get("detectability", "") or "").strip()
+        # (a) the row's own detectability as a dedicated verification
+        if aff["families"] and det and not det.upper().startswith(
+                "NOT ESTABLISHED"):
+            link = quantity_reasoning.quantity_linkage(row, det)
+            if link["verdict"] == "QUANTITY_MATCHED":
+                vf_counter += 1
+                vid = f"VF-{vf_counter:03d}"
+                graph["verifications"].append({
+                    "id": vid, "parent_ids": [row["graph_id"]],
+                    "method": quantity_reasoning
+                              .method_with_quantity_statement(det, link),
+                    "basis": "ENGINEERING_PROPOSED (FM-specific "
+                             "detectability verification, quantity-"
+                             "grounded E21-A)",
+                    "result": "NOT_TESTED",
+                    "quantity_linkage": link})
+                return vid
+        # (b) a domain method that measures an affected family
+        best: Optional[str] = None
+        best_link: Dict[str, Any] = {}
+        for m in list(module.get("verification_methods", [])) + \
+                list(module.get("verification_methods_extra", [])):
+            link = quantity_reasoning.quantity_linkage(row, m)
+            if link["verdict"] == "QUANTITY_MATCHED" and \
+                    len(link["shared_families"]) > \
+                    len(best_link.get("shared_families", [])):
+                best, best_link = m, link
+        if best is not None:
+            vf_counter += 1
+            vid = f"VF-{vf_counter:03d}"
+            graph["verifications"].append({
+                "id": vid, "parent_ids": [row["graph_id"]],
+                "method": best,
+                "basis": "ENGINEERING_PROPOSED (domain verification "
+                         "method, quantity-grounded E21-A)",
+                "result": "NOT_TESTED",
+                "quantity_linkage": best_link})
+            return vid
+        # (c) no quantity-matched verification exists — explicit gap +
+        #     UNKNOWN disclosure; killer experiment only as claim-level
+        #     fallback (it is not a quantity-specific verification)
+        row["verification_gap"] = \
+            quantity_reasoning.unknown_verification_disclosure(
+                row, quantity_reasoning.quantity_linkage(row, det or ""))
+        graph["gaps"].append({
+            "gap": f"FM_WITHOUT_QUANTITY_MATCHED_VERIFICATION:"
+                   f"{row['graph_id']}",
+            "reason": ("no available verification method measures a "
+                       "quantity family this failure affects (E21-A "
+                       "quantity rule); UNKNOWN disclosure recorded on "
+                       "the row")})
+        for v in graph["verifications"]:
+            if "killer experiment" in str(v.get("method", "")).lower():
+                return v["id"]
+        return None
 
     vf_counter = len(graph["verifications"])
     linked_count = 0
@@ -1464,9 +1528,13 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
              "requirement": v["method"],
              "method": v["method"],
              "result": "NOT_TESTED",
+             **({"quantity_linkage": v["quantity_linkage"]}
+                if v.get("quantity_linkage") else {}),
              "invention_tie": {
                  "linkage_kind": "killer_experiment" if
                  "killer experiment" in v["method"] else
+                 "fm_specific_detectability_verification" if
+                 "FM-specific detectability" in v.get("basis", "") else
                  "domain_verification_method" if
                  "domain verification method" in v.get("basis", "") else
                  "falsification_test",

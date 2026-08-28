@@ -233,8 +233,35 @@ def evaluate_chain(chain: Dict[str, Any], eng: Dict[str, Any],
                          "engineering vocabulary with the claim/failure "
                          "mode — relevance cannot be confirmed")
 
+    # R8 — quantity-grounded verification linkage (E21-A): for a failure
+    # chain, a linked verification whose measured quantity families are
+    # DISJOINT from the failure's affected families cannot detect the
+    # failure — that is an INCORRECT causal link, not an open question
+    # (the measured R-02 defect class: seat-wear "verified" by a
+    # fouling challenge because both texts contained "accelerated").
+    # Unresolvable physics on either side stays QUESTIONABLE (Art. XXV).
+    if subject.startswith("failure_mode:"):
+        fmid_r8 = subject.split(":", 1)[1]
+        fm_row_r8 = fms.get(fmid_r8)
+        vm = re.search(r"\b((?:VF|V)-\d{2,3})\b", vcontent)
+        if fm_row_r8 and vm and vm.group(1) in vfs:
+            from .quantity_reasoning import quantity_linkage
+            qlink = quantity_linkage(
+                fm_row_r8, vfs[vm.group(1)].get("method") or "")
+            if qlink["verdict"] == "QUANTITY_DISJOINT":
+                fail("R8: the linked verification measures quantity "
+                     f"families {sorted(qlink['measured'])} disjoint from "
+                     f"the failure's affected families "
+                     f"{sorted(qlink['affected'])} — it cannot detect this "
+                     "failure (E21-A quantity rule)")
+            elif qlink["verdict"] in ("FAILURE_PHYSICS_UNRESOLVED",
+                                      "METHOD_UNSPECIFIC"):
+                question(f"R8: verification quantity linkage incomplete "
+                         f"({qlink['verdict']}) — cannot mechanically "
+                         "confirm the test measures the failed quantity")
+
     if not reasons:
-        reasons.append("all seven semantic checks passed (referential "
+        reasons.append("all eight semantic checks passed (referential "
                        "integrity, domain consistency, applicability, "
                        "non-vacuity, no self-reference, class honesty, "
                        "verification relevance)")
