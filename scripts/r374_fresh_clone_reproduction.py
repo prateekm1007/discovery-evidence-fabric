@@ -234,7 +234,14 @@ def main():
             if pdf_text(pushed_pdf) != pdf_text(fp_repro):
                 text_mismatch.append(rel)
 
-    # d. sha256 manifest over every file under DOWNLOAD/ (R374-5 hashes)
+    # d. sha256 manifest over every file under DOWNLOAD/ (R374-5 hashes).
+    #    The MASTER ZIP embeds the root README.md and
+    #    RELEASE_CONTENT_MANIFEST.json, which carry the honest build
+    #    timestamp (never fabricated — Art. VI). Under the ratified
+    #    R372 timestamp policy (byte-identical except timestamp
+    #    fields), the master ZIP is compared MEMBER-WISE: every member
+    #    byte-identical except timestamp-bearing JSON/MD members, which
+    #    must be timestamp-stripped identical.
     def download_manifest(root):
         manifest = {}
         dl = os.path.join(root, "DOWNLOAD")
@@ -261,10 +268,63 @@ def main():
     changed = sorted(
         rel for rel in set(rebuilt_manifest) & set(pushed_manifest)
         if rebuilt_manifest[rel] != pushed_manifest[rel])
+    # master ZIP member-wise comparison under the timestamp policy
+    master_zip_rel = "technology-transfer-portfolio-15.zip"
+    master_member_ok = True
+    master_member_detail = []
+    if master_zip_rel in changed:
+        import io
+        import zipfile as zf_mod
+        pushed_zf = zf_mod.ZipFile(io.BytesIO(
+            pushed_bytes(f"DOWNLOAD/{master_zip_rel}")))
+        rebuilt_zf = zf_mod.ZipFile(
+            os.path.join(portfolio_clone, "DOWNLOAD", master_zip_rel))
+        p_names = sorted(pushed_zf.namelist())
+        r_names = sorted(rebuilt_zf.namelist())
+        if p_names != r_names:
+            master_member_ok = False
+            master_member_detail.append(
+                f"member list differs: pushed {len(p_names)} vs rebuilt "
+                f"{len(r_names)}")
+        else:
+            for name in p_names:
+                pd = pushed_zf.read(name)
+                rd = rebuilt_zf.read(name)
+                if pd == rd:
+                    continue
+                # timestamp-bearing member: compare timestamp-stripped
+                try:
+                    if name.endswith(".json"):
+                        equal = strip_timestamps(json.loads(
+                            pd.decode("utf-8"))) == strip_timestamps(
+                            json.loads(rd.decode("utf-8")))
+                    elif name.endswith(".md"):
+                        import re as _re
+                        _TS = _re.compile(
+                            r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?"
+                            r"(\.\d+)?Z?")
+                        equal = _TS.sub("TIMESTAMP", pd.decode(
+                            "utf-8")) == _TS.sub("TIMESTAMP", rd.decode(
+                            "utf-8"))
+                    else:
+                        equal = False
+                except Exception:
+                    equal = False
+                if not equal:
+                    master_member_ok = False
+                    master_member_detail.append(
+                        f"member differs beyond timestamps: {name}")
+        if master_member_ok:
+            # the master ZIP difference is exclusively the embedded
+            # build-timestamp members — the ratified R372 policy
+            changed = [c for c in changed if c != master_zip_rel]
     if only_rebuilt or only_pushed or changed:
         hash_mismatch = {"only_rebuilt": only_rebuilt[:6],
                          "only_pushed": only_pushed[:6],
                          "changed": changed[:6]}
+    if not master_member_ok:
+        hash_mismatch = hash_mismatch or {}
+        hash_mismatch["master_zip_members"] = master_member_detail[:6]
 
     result["json_artifacts_reproduced"] = not json_mismatch
     result["json_mismatches"] = json_mismatch[:8]

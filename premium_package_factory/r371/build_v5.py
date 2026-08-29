@@ -295,8 +295,19 @@ def build(portfolio_root, work_dir=None):
         packages, headlines, ranking,
         os.path.join(portfolio_root, "00_PORTFOLIO_15_TECHNOLOGIES.pdf"))
     # PORTFOLIO_MANIFEST.json (canonical maturity source)
+    # R374-5 determinism: no volatile build timestamp here — this file's
+    # sha256 is embedded in README.md and RELEASE_CONTENT_MANIFEST.json,
+    # so a per-build timestamp cascaded into the master ZIP and broke
+    # byte-reproducibility. Build provenance is recorded by git history
+    # (Art. XI: history is evidence); nothing is fabricated.
     manifest = {
-        "portfolio_version": "2.0", "generated_at": _now(), "package_count": 15,
+        "portfolio_version": "2.0", "package_count": 15,
+        "determinism_note": (
+            "This manifest carries no build timestamp by design (CEO "
+            "R374-5 byte-reproducibility): its sha256 is embedded in "
+            "README.md and RELEASE_CONTENT_MANIFEST.json and flows into "
+            "the master ZIP. Build provenance: git history of the "
+            "portfolio repository."),
         "identity_registry": "PORTFOLIO_IDENTITY_REGISTRY.json",
         "ranking": "PORTFOLIO_RANKING.json",
         "packages": [
