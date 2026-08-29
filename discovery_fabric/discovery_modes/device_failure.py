@@ -170,19 +170,37 @@ def retrieve_failures(device_query: str, brand_name: Optional[str] = None,
     """Retrieve failure evidence: MAUDE events + recalls.
 
     Art. XXI.3 discipline: provider failures BLOCK the chain.
+
+    Query ladder (L8 correction, disclosed): the brand-name field query
+    is tried first; if the provider DEFINITIVELY answers zero, a
+    broadened full-text phrase query runs. 'PROBLEM_NOT_DOCUMENTED' can
+    only be concluded after BOTH levels answer zero — killing a
+    territory on a too-narrow field query is a measurement artifact
+    (found live: 'venous filter' has 100 full-text MAUDE records but
+    zero brand_name matches). The retrieval level that produced the
+    signal is recorded in the result.
     """
     from discovery_fabric.source_registry.connectors.openfda import (
         FdaRecallConnector, MaudeConnector,
     )
-    # Phrase-quoted device query (measured: unquoted multi-word terms are
-    # an implicit OR across 1.7M records; the quoted phrase is the exact
-    # device-phrase semantic this operator needs).
     phrase = brand_name or device_query
+    maude_retrieval_level = "BRAND_NAME_FIELD"
     maude_q = f'device.brand_name:"{phrase}"'
-    maude = MaudeConnector().search(maude_q + "+AND+event_type:(Malfunction+OR+Injury)",
-                                    timeout=timeout)
-    recall = FdaRecallConnector().search(
-        f'reason_for_recall:"{device_query}"', timeout=timeout)
+    maude = MaudeConnector().search(
+        maude_q + "+AND+event_type:(Malfunction+OR+Injury)", timeout=timeout)
+    if maude.status == STATUS_EMPTY:
+        # broadened, disclosed second rung — full-text phrase
+        maude_q = f'"{phrase}"+AND+event_type:(Malfunction+OR+Injury)'
+        maude = MaudeConnector().search(maude_q, timeout=timeout)
+        maude_retrieval_level = "FULL_TEXT_PHRASE"
+
+    recall_retrieval_level = "REASON_FIELD"
+    recall_q = f'reason_for_recall:"{device_query}"'
+    recall = FdaRecallConnector().search(recall_q, timeout=timeout)
+    if recall.status == STATUS_EMPTY:
+        recall_q = f'product_description:"{device_query}"'
+        recall = FdaRecallConnector().search(recall_q, timeout=timeout)
+        recall_retrieval_level = "PRODUCT_DESCRIPTION_FIELD"
 
     provider_failures = []
     for r in (maude, recall):
@@ -196,6 +214,10 @@ def retrieve_failures(device_query: str, brand_name: Optional[str] = None,
         "device_query": device_query,
         "maude": maude,
         "recall": recall,
+        "retrieval_levels": {
+            "maude": maude_retrieval_level,
+            "recall": recall_retrieval_level,
+        },
         "provider_failures": provider_failures,
         "blocked": bool(provider_failures),
     }

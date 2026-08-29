@@ -484,6 +484,7 @@ def discover_opportunity(device_query: str, source_domain: str,
     _step("real_world_failure", "OK", {
         "maude_status": maude.status, "maude_records": len(maude.records),
         "recall_status": recall.status, "recall_records": len(recall.records),
+        "retrieval_levels": retrieval.get("retrieval_levels"),
     })
 
     clusters = cluster_mechanisms(maude)

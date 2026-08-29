@@ -176,12 +176,62 @@ INITIAL_CEMETERY = [
 
 
 def load_cemetery() -> List[CemeteryEntry]:
-    """Load the cemetery from disk, or initialize with the initial entries."""
+    """Load the cemetery from disk, or initialize with the initial entries.
+
+    Tolerant parse (L8 fix, 2026-08-29): the canonical CEMETERY.json
+    carries append-only history fields beyond the current dataclass
+    (amendment_history, corrections, ...). Extra fields are IGNORED for
+    the dataclass view but MUST NOT be lost on save — history is
+    evidence (Art. XI). Callers that append should use
+    append_entries_to_cemetery_file(), which preserves existing entries
+    byte-for-byte.
+
+    Defect memory (Art. XXXI): load_cemetery previously did
+    CemeteryEntry(**entry) and crashed on the canonical file's history
+    fields — meaning the engine's CEMETERY_CHECK adapter failed for the
+    real cemetery. Found by the L8 campaign runner.
+    """
     if CEMETERY_PATH.exists():
         with open(CEMETERY_PATH) as f:
             data = json.load(f)
-        return [CemeteryEntry(**e) for e in data.get("entries", [])]
+        valid = set(CemeteryEntry.__dataclass_fields__)
+        entries = []
+        for e in data.get("entries", []):
+            # Older entries may predate current required fields (e.g.
+            # CE-023 predates what_was_proposed/why_it_failed/
+            # what_to_avoid); default-fill rather than crash (Art. XI:
+            # the history they DO carry is still evidence).
+            filled = {k: v for k, v in e.items() if k in valid}
+            for k in ("mechanism_name", "proposed_version",
+                      "killed_at_version", "kill_reason",
+                      "what_was_proposed", "why_it_failed",
+                      "reusable_lesson", "what_to_avoid"):
+                filled.setdefault(k, "")
+            entries.append(CemeteryEntry(**filled))
+        return entries
     return INITIAL_CEMETERY
+
+
+def append_entries_to_cemetery_file(new_entries: List[CemeteryEntry]) -> None:
+    """Append entries to the canonical cemetery WITHOUT round-tripping
+    existing entries through the dataclass (which would drop their
+    history fields — Art. XI history preservation)."""
+    CEMETERY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    if CEMETERY_PATH.exists():
+        with open(CEMETERY_PATH) as f:
+            data = json.load(f)
+    else:
+        data = {
+            "description": "Library of impossibilities — every killed "
+                           "invention with reusable lessons.",
+            "entries": [],
+        }
+    data.setdefault("entries", []).extend(asdict(e) for e in new_entries)
+    data["entry_count"] = len(data["entries"])
+    data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    data["last_update_round"] = "L8-campaign"
+    with open(CEMETERY_PATH, "w") as f:
+        json.dump(data, f, indent=2)
 
 
 def check_candidate_against_cemetery(candidate_description: str) -> Dict:
