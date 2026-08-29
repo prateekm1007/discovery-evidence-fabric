@@ -175,6 +175,21 @@ def _tied(section: str, eng: Dict[str, Any], items: List[Any],
         if wd.get("matched_signals"):
             return True, {"linkage_kind": "domain_detection_evidence",
                           "matched_signals": wd["matched_signals"]}
+        # E21-D: a domain selected by the PHENOMENA layer is tied by the
+        # physics vocabulary the invention's own text states — recorded
+        # per-domain in domain_detection.phenomena_layer (CEO item 2:
+        # keywords route, never justify; when a domain has ZERO routing
+        # keyword hits, the phenomena anchors matched in the invention's
+        # text are the entire — and sufficient — tie evidence). This
+        # ADDS a verifiable evidence path; the keyword path above is
+        # unchanged (Art. VII: extend, never weaken).
+        dd = eng.get("domain_detection", {})
+        dom = wd.get("domain") or eng.get("technology_domain")
+        phen = (dd.get("phenomena_layer") or {}).get(dom) or []
+        if phen:
+            return True, {"linkage_kind":
+                              "phenomena_detection_evidence",
+                          "phenomena_anchors": phen}
     spec_derived = ("KILL_CONDITION", "BUYER_DILIGENCE",
                     "INVESTMENT_LADDER", "VALIDATION_MATRIX",
                     "TRANSFER_BOUNDARY", "REGULATORY",

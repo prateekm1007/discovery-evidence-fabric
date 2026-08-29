@@ -56,9 +56,10 @@ import itertools
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
+from .domain_reasoning import detect_domain_reasoned  # E21-D
 from .candidate import Candidate, sha256_obj, utc_now
 from .design_outputs import compile_design_outputs
-from .domains import detect_domain, domain_label, get_domain_module
+from .domains import domain_label, get_domain_module
 from .equations import select_equations
 from . import quantity_reasoning
 from .invention_spec import tagged
@@ -699,8 +700,24 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
                                    "expected_effect", "falsification_test"))
     problem = ((spec.get("problem") or {}).get("value") or {})
 
-    detection = detect_domain(mech_text + " " + " ".join(
-        str(problem.get(k, "")) for k in ("device", "failure", "constraint")))
+    # E21-D: mechanism-driven domain reasoning (CEO item 2). The OLD
+    # single-layer call concatenated mechanism + wrapper and scored
+    # ROUTING keywords over both with template-declaration-order
+    # tie-breaks — measured consequence (frozen semantic-causal audit,
+    # E21-C head): BENCH_11's thermal invention routed to
+    # mechanical_structural via the polysemous 'steer' ('current
+    # steering'); BENCH_12's energy-harvesting invention routed to
+    # acoustic via 'piezoelectric' while energy_harvesting's bigram
+    # signals missed the word order ("harvests ... energy"). The
+    # phenomena layer scores PHYSICAL QUANTITIES/EFFECTS (the physics
+    # each domain's governing equations actually model) and DOMINATES
+    # routing keywords, which remain the fallback when no physics
+    # evidence exists (recorded as ROUTING_ONLY — keywords route, never
+    # justify: CEO item 2).
+    wrapper_text = " ".join(
+        str(problem.get(k, "")) for k in ("device", "failure",
+                                            "constraint"))
+    detection = detect_domain_reasoned(mech_text, wrapper_text)
     domain = detection["domain"]
     module = get_domain_module(domain)
 
@@ -955,12 +972,20 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
         "matched_signals": detection["matched_signals"],
         "matched_in_text": True,
         "runner_up": detection.get("runner_up"),
-        "basis": ("domain selected by exact-substring matching of the "
-                  "domain's characteristic signals against THIS invention's "
-                  "mechanism/problem text; the matched signals above are "
-                  "the mechanical justification"),
+        "basis": ("domain selected by the PHENOMENA layer (physical "
+                  "quantities/effects the domain's governing equations "
+                  "model) matched against THIS invention's own "
+                  "mechanism/problem text, with keyword routing as "
+                  "fallback/tiebreak — CEO item 2: keywords route, never "
+                  "justify; the layered evidence is recorded in "
+                  "domain_detection"),
         "epistemic_class": "MODEL_DERIVED",
         "note": detection["note"],
+        "selection_basis": detection.get("selection_basis"),
+        "why_selected": detection.get("why_selected"),
+        "applicable_models": detection.get("applicable_models"),
+        "assumptions": detection.get("assumptions"),
+        "limitations": detection.get("limitations"),
         "mechanism_sensitivity": mechanism_sensitivity,
         "equation_applicability_summary": {
             "applicable": [e["selection_rationale"]["verdict"] and
@@ -1335,7 +1360,17 @@ def build_engineering_spec(spec: Dict[str, Any], env: Optional[Candidate],
             "epistemic_class": detection["epistemic_class"],
             "matched_signals": detection["matched_signals"],
             "note": detection["note"],
-            "label": domain_label(domain)},
+            "label": domain_label(domain),
+            # E21-D: the layered domain reasoning is carried into the
+            # artifact itself (CEO item 2: the reviewer must be able to
+            # adjudicate the domain choice from the artifact alone)
+            "selection_basis": detection.get("selection_basis"),
+            "phenomena_layer": detection.get("phenomena_layer"),
+            "routing_layer": detection.get("routing_layer"),
+            "why_selected": detection.get("why_selected"),
+            "applicable_models": detection.get("applicable_models"),
+            "assumptions": detection.get("assumptions"),
+            "limitations": detection.get("limitations")},
         "why_this_domain": why_this_domain,
         "engineering_disciplines": module["disciplines"],
         "system_architecture": {

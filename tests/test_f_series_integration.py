@@ -872,18 +872,22 @@ def test_d10_ablation_domain_module_changes_engineering_and_package():
     base_eng = build_engineering_spec(base_spec, base_env, CTX)
 
     # disable the engineering domain module: detection returns UNKNOWN.
-    # engineering_spec imported detect_domain by name, so patch THERE.
+    # engineering_spec imports detect_domain_reasoned by name (E21-D
+    # mechanism-driven domain reasoning), so patch THERE.
     import discovery_fabric.engine.engineering_spec as es_mod
     dd = importlib.import_module("discovery_fabric.engine.domains")
-    original = es_mod.detect_domain
+    original = es_mod.detect_domain_reasoned
     try:
-        es_mod.detect_domain = lambda text: {
-            "domain": "UNKNOWN", "template": dd.GENERIC_TEMPLATE,
-            "matched_signals": [], "epistemic_class": "MODEL_DERIVED",
-            "note": "ABLATION: domain module disabled"}
+        es_mod.detect_domain_reasoned = (
+            lambda mech, wrapper="", **kw: {
+                "domain": "UNKNOWN",
+                "template": dd.GENERIC_TEMPLATE,
+                "matched_signals": [],
+                "epistemic_class": "MODEL_DERIVED",
+                "note": "ABLATION: domain module disabled"})
         eng2 = build_engineering_spec(base_spec, base_env, CTX)
     finally:
-        es_mod.detect_domain = original
+        es_mod.detect_domain_reasoned = original
     assert base_eng["technology_domain"] == domain_id
     assert eng2["technology_domain"] == "NOT ESTABLISHED"
     h1 = sha256_obj({k: v for k, v in base_eng.items()
