@@ -136,6 +136,31 @@ def _terms(text: str) -> List[str]:
     return [t for t in re.split(r"[^a-z0-9]+", _norm(text)) if len(t) > 3]
 
 
+def _patent_query(device_query: str, mechanism: str, max_terms: int = 8) -> str:
+    """Sanitized keyword query for patent title search.
+
+    Lens title search binds a STRING query; passing the full failure-mode
+    sentence (with nested parentheses and stop-words) yields EMPTY matches
+    (measured 2026-08-29: 'infusion pump Recurring unknown (for use when
+    the device problem is not known)' -> 0 records while real pump-patent
+    art exists). The patent query therefore uses the salient TERMS: device
+    query + mechanism keywords, parenthetical segments dropped, capped.
+    The literature query (EuropePMC) is left natural-language — it is a
+    relevance-ranked full-text search, not a title search.
+    """
+    # drop parenthetical qualifiers from the mechanism text
+    mech = re.sub(r"\([^)]*\)", " ", mechanism)
+    words = _terms(f"{device_query} {mech}")
+    # dedupe preserving order, cap
+    seen: set = set()
+    out: List[str] = []
+    for w in words:
+        if w not in seen:
+            seen.add(w)
+            out.append(w)
+    return " ".join(out[:max_terms])
+
+
 # ---------------------------------------------------------------------------
 # Step 1: device failure retrieval
 # ---------------------------------------------------------------------------
@@ -297,6 +322,7 @@ def retrieve_attempted_solutions(device_query: str, mechanism: str,
         LensPatentConnector,
     )
     query = f"{device_query} {mechanism}"
+    patent_query = _patent_query(device_query, mechanism)
     lit = EuropePmcConnector().search(query, timeout=timeout)
     # Patent retrieval: Lens patent is the primary live source (measured
     # 2026-08-29: HTTP 200 with real records on the provisioned token);
@@ -304,8 +330,25 @@ def retrieve_attempted_solutions(device_query: str, mechanism: str,
     # disclosure. PatentBear is deliberately NOT queried here: the source
     # is provider-metered (20 requests/month) and is reserved for targeted
     # full-text/claims fetches, never routine operator scans.
-    lens_pat = LensPatentConnector().search(query, timeout=timeout)
-    gpat = GooglePatentsConnector().search(query, timeout=timeout)
+    # Lens title:(...) search has MEASURED AND-semantics (2026-08-29:
+    # 'infusion pump mechanical problem' -> 0 while 'infusion pump' -> 9071;
+    # 'infusion pump occlusion' -> 227). FDA problem vocabulary rarely
+    # co-occurs in patent titles, so a definitive EMPTY on the
+    # mechanism-specific query falls back to the device-only query — the
+    # recall step widens, and per-record relevance adjudication (below)
+    # supplies the precision (Art. XXI.4). The fallback is DISCLOSED, and
+    # a provider failure on the first query does NOT trigger it (Art.
+    # XXI.3: only a definitive provider EMPTY does).
+    lens_pat = LensPatentConnector().search(patent_query, timeout=timeout)
+    patent_query_used = patent_query
+    patent_query_fallback = False
+    if lens_pat.status == "EMPTY":
+        device_only = _patent_query(device_query, "")
+        if device_only and device_only != patent_query:
+            lens_pat = LensPatentConnector().search(device_only, timeout=timeout)
+            patent_query_used = device_only
+            patent_query_fallback = True
+    gpat = GooglePatentsConnector().search(patent_query_used, timeout=timeout)
 
     mech_terms = set(_terms(mechanism)) | set(_terms(device_query))
     adjudicated = []
@@ -367,6 +410,9 @@ def retrieve_attempted_solutions(device_query: str, mechanism: str,
     }
     return {
         "query": query,
+        "patent_query": patent_query,
+        "patent_query_used": patent_query_used,
+        "patent_query_fallback": patent_query_fallback,
         "literature": {
             "source_status": lit.status,
             "retrieved": len(adjudicated),
