@@ -131,7 +131,14 @@ class EuropePmcConnector(ConnectorBase):
                     "retrieved_at": utc_now(),
                 },
                 epistemic_state="OBSERVED",
-                limitations=[],
+                limitations=[
+                    "Abstract-level evidence: full text may contain methods "
+                    "and constraints not present in the abstract",
+                    "Publication existence is not clinical evidence of "
+                    "safety or effectiveness",
+                    "Citation counts are bibliometric signals, not "
+                    "validity measures",
+                ],
             ))
         return out
 

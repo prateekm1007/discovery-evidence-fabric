@@ -48,7 +48,14 @@ def _hits_to_records(source_id: str, role: str, hits) -> List[SourceRecord]:
                 "retrieved_at": d.get("retrieved_at_utc"),
             },
             epistemic_state="OBSERVED",
-            limitations=[],
+            limitations=[
+                "Bibliographic hit: a search result is NOT a claim-chart "
+                "novelty determination (Art. XXI.2)",
+                "Snippet relevance is provider-ranked; full claims were "
+                "not retrieved for this record",
+                "Patent existence does not establish commercial practice "
+                "or technical viability",
+            ],
         ))
     return out
 
