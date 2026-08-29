@@ -121,6 +121,7 @@ class SourceQueryResult:
     rate_limit_remaining: Optional[str] = None
     query: str = ""
     retrieved_at: Optional[str] = None
+    total_hits: Optional[int] = None  # provider-reported total population, when the API reports it
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -134,6 +135,7 @@ class SourceQueryResult:
             "rate_limit_remaining": self.rate_limit_remaining,
             "query": self.query,
             "retrieved_at": self.retrieved_at,
+            "total_hits": self.total_hits,
             "records": [r.to_dict() for r in self.records],
         }
 
@@ -162,6 +164,13 @@ class ConnectorBase:
         knowledge -> False (fail-safe: a 404 is NOT treated as absence).
         """
         return False
+
+    def extract_total_hits(self, payload: Any) -> Optional[int]:
+        """Provider-reported TOTAL population for the query, if the API
+        reports one (e.g. openFDA meta.results.total). Used to disclose the
+        difference between the retrieved sample and the population — the
+        sample is never silently presented as the whole."""
+        return None
 
     def build_url(self, query: str) -> str:
         raise NotImplementedError
@@ -275,6 +284,7 @@ class ConnectorBase:
                     http_status=http_status, latency_ms=int((time.time() - t0) * 1000),
                     records=records, rate_limit_remaining=remaining, query=query,
                     retrieved_at=utc_now(),
+                    total_hits=self.extract_total_hits(payload),
                 ),
                 query, url, raw_sha,
             )

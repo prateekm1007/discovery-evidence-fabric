@@ -87,6 +87,12 @@ class _OpenFdaBase(ConnectorBase):
             f"{BASE}/{self.ENDPOINT}?search={q}&limit={_limit_str(self.LIMIT)}"
         )
 
+    def extract_total_hits(self, payload: Any) -> "int | None":
+        try:
+            return int((((payload or {}).get("meta") or {}).get("results") or {}).get("total"))
+        except (TypeError, ValueError):
+            return None
+
     def parse_payload(self, raw: bytes, query: str) -> Any:
         return json.loads(raw.decode("utf-8"))
 
