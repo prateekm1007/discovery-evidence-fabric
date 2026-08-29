@@ -976,25 +976,84 @@ _register(_src(
 # ---------------------------------------------------------------------------
 
 _register(_src(
-    source_id="manufacturing_process_sources",
-    name="(role placeholder) manufacturing & process evidence",
+    source_id="fda_pma_supplements",
+    name="FDA PMA manufacturing/process-change supplements (openFDA)",
     authority_role=["MANUFACTURING"],
-    coverage="None integrated. The directive itself grades this role "
-             "'insufficient'. No public manufacturing-process API measured "
-             "in this environment.",
-    access_method="none",
-    update_frequency="n/a",
-    rate_limits="n/a",
-    licensing="n/a",
-    primary_or_secondary="n/a",
-    freshness="n/a",
-    known_gaps="ROLE UNCOVERED: no candidate source with an open, "
-               "machine-accessible API measured. Remediation: licensed "
-               "corpora (SEMI, IPC), standards bodies, supplier "
-               "capability datasets — all require external agreements.",
-    provenance_method="none",
-    connector=NO_CONNECTOR,
+    coverage="PMA supplement records evidencing FDA-reviewed "
+             "manufacturing changes: process changes (manufacturer/"
+             "sterilizer/packager/supplier), design/components/"
+             "specifications/material changes, supplement types "
+             "(Real-Time, 30-Day Notice, Panel-Track) with decision "
+             "codes. Measured: 56,995 supplement records exist.",
+    access_method="REST JSON, no API key; GET https://api.fda.gov/device/pma.json",
+    update_frequency="openFDA PMA dataset refreshed weekly per FDA docs",
+    rate_limits="240 requests/min without key (per openFDA docs)",
+    licensing="Open data (openFDA terms)",
+    primary_or_secondary="PRIMARY",
+    freshness="Weekly refresh; supplements appear after FDA decision",
+    known_gaps="PMA-class devices only (510(k)-class manufacturing "
+               "changes not represented); supplement reason is FDA's "
+               "categorical label, not the full engineering content. "
+               "Measured LIVE 2026-08-29.",
+    provenance_method="Query + PMA/supplement numbers + raw payload "
+                      "sha256 into hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.manufacturing:PmaManufacturingSupplementConnector",
     auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="manufacturing_literature",
+    name="Manufacturing process literature (EuropePMC, 8-process taxonomy)",
+    authority_role=["MANUFACTURING"],
+    coverage="Peer-reviewed process evidence for the directive's 8 "
+             "processes (extrusion, injection molding, machining, "
+             "additive manufacturing, laser processing, coatings, "
+             "microfabrication, sterilization) queried through the "
+             "medical-device literature, with exact-span constraint/"
+             "risk/verification sentence extraction.",
+    access_method="REST JSON, no API key; GET "
+                  "www.ebi.ac.uk/europepmc/webservices/rest/search",
+    update_frequency="Continuous (EuropePMC refresh cycle)",
+    rate_limits="None published; light paging discipline",
+    licensing="Open data (EuropePMC terms; abstracts per publisher policy)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous",
+    known_gaps="Abstract spans are exact quotes but may omit the "
+               "study's full constraint data; process classification is "
+               "title/abstract grammar (records matching no taxonomy "
+               "term carry process=None). Measured LIVE 2026-08-29.",
+    provenance_method="Query + EuropePMC id + raw payload sha256 into "
+                      "hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.manufacturing:ManufacturingLiteratureConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="gudid_sterilization",
+    name="GUDID sterilization fields on marketed devices (openFDA UDI)",
+    authority_role=["MANUFACTURING"],
+    coverage="Device-level sterilization evidence from GUDID: is_sterile, "
+             "is_sterilization_prior_use, sterilization_methods (free "
+             "text, e.g. 'Moist Heat or Steam Sterilization'). "
+             "Measured: 5,083,929 UDI records carry the sterilization "
+             "block.",
+    access_method="REST JSON, no API key; GET https://api.fda.gov/device/udi.json",
+    update_frequency="GUDID submissions (continuous; openFDA refresh weekly)",
+    rate_limits="240 requests/min without key (per openFDA docs)",
+    licensing="Open data (openFDA terms); fields are manufacturer-declared",
+    primary_or_secondary="PRIMARY",
+    freshness="Weekly refresh",
+    known_gaps="Declared method is not sterilization VALIDATION "
+               "(validation evidence lives in ISO 17665/11135/11137 "
+               "families via the STANDARDS role); free-text methods are "
+               "labeler wording. Measured LIVE 2026-08-29.",
+    provenance_method="Query + public_device_record_key + raw payload "
+                      "sha256 into hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.manufacturing:GudidSterilizationConnector",
+    auth_requires=[],
+    metered_quota=None,
 ))
 
 _register(_src(
