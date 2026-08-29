@@ -998,24 +998,31 @@ _register(_src(
 ))
 
 _register(_src(
-    source_id="commercial_product_sources",
-    name="(role placeholder) commercial & product reality",
+    source_id="gudid_commercial",
+    name="GUDID commercial layer (via openFDA device/udi.json)",
     authority_role=["COMMERCIAL"],
-    coverage="None integrated. Procurement/company/product reality data "
-             "(directive grade: 'insufficient').",
-    access_method="none",
-    update_frequency="n/a",
-    rate_limits="n/a",
-    licensing="n/a",
-    primary_or_secondary="n/a",
-    freshness="n/a",
-    known_gaps="ROLE UNCOVERED: no open machine-accessible procurement or "
-               "product-reality API measured. Remediation: licensed market "
-               "intelligence or public tenders crawlers — external "
-               "agreements required.",
-    provenance_method="none",
-    connector=NO_CONNECTOR,
+    coverage="Marketed-product reality with FDA provenance: brand name, "
+             "company + labeler DUNS, product codes and GMDN category "
+             "terms, commercial distribution status (In/Not in "
+             "Commercial Distribution) and end date, device counts, "
+             "kit/combination-product flags.",
+    access_method="REST JSON, no API key; GET https://api.fda.gov/device/udi.json",
+    update_frequency="GUDID submissions (continuous; openFDA refresh weekly)",
+    rate_limits="240 requests/min without key (per openFDA docs)",
+    licensing="Open data (openFDA terms); fields are manufacturer-declared",
+    primary_or_secondary="PRIMARY",
+    freshness="Weekly refresh; record-version lag possible",
+    known_gaps="PRICING_PROCUREMENT_SIGNAL: NOT covered — no open source "
+               "with defensible provenance (licensed market intelligence "
+               "required; honest gap). Competitive mechanism is "
+               "graph-derived (device->patent edges), never asserted from "
+               "a commercial source. US-market scope only. Measured LIVE "
+               "2026-08-29.",
+    provenance_method="Query + public_device_record_key + raw payload "
+                      "sha256 into hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.commercial:GudidCommercialConnector",
     auth_requires=[],
+    metered_quota=None,
 ))
 
 
