@@ -125,7 +125,13 @@ def _footer_canvas(identity_line, confidentiality=CONFIDENTIALITY):
     return _draw
 
 
-def _doc(path, identity_line, title, author="Discovery Engine (R371 V5)"):
+def _doc(path, identity_line, title, author="Discovery Engine (R372 V6)"):
+    # R372 reproducibility: invariant=1 removes the embedded creation
+    # timestamp so PDF bytes are deterministic across builds (fresh-clone
+    # reproduction compares byte hashes; a timestamped PDF can never
+    # reproduce byte-identically).
+    from reportlab import rl_config
+    rl_config.invariant = 1
     return SimpleDocTemplate(
         path, pagesize=letter,
         leftMargin=0.75 * inch, rightMargin=0.75 * inch,
