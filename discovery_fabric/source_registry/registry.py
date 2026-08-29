@@ -856,24 +856,58 @@ _register(_src(
     source_id="fda_recognized_standards",
     name="FDA Recognized Consensus Standards Database",
     authority_role=["STANDARDS"],
-    coverage="Consensus standards (ISO/IEC/ASTM/...) recognized by FDA for "
-             "regulatory submissions, with recognition numbers and "
-             "supplemental sheet info.",
-    access_method="Web application (accessdata.fda.gov); health probe "
-                  "measured HTTP 503 at measurement time — integration "
-                  "state measured, not assumed",
-    update_frequency="Periodic (FDA updates)",
-    rate_limits="n/a (web app)",
+    coverage="Consensus standards (ISO/IEC/ASTM/AAMI/...) recognized by "
+             "FDA for regulatory submissions: recognition number, "
+             "specialty task group area (device area), extent of "
+             "recognition (Complete/Partial), organization, designation "
+             "and title (the engineering purpose).",
+    access_method="REST (HTML results table), no API key; GET "
+                  "accessdata.fda.gov/scripts/cdrh/cfdocs/cfstandards/"
+                  "results.cfm?start_search=1&keyword=<q>",
+    update_frequency="Periodic (FDA recognition updates)",
+    rate_limits="None published; single-page keyword probes",
     licensing="Public data (FDA terms)",
     primary_or_secondary="PRIMARY",
-    freshness="Periodic",
-    known_gaps="NO CONNECTOR YET: the search application returned 503 at "
-               "probe time (likely bot protection); no published JSON API. "
-               "Honest gap — standards role remains uncovered until an "
-               "integration path is measured working.",
-    provenance_method="Planned: recognition record + payload sha256",
-    connector=NO_CONNECTOR,
+    freshness="Recognition list current at query time",
+    known_gaps="List-level records carry extent-of-recognition but not "
+               "the partial-recognition rationale (on the FDA detail "
+               "page). Specialty task group area is a device-area "
+               "grouping, not product-code-level typing. Measured LIVE "
+               "2026-08-29 (keyword '10993' -> 100 records).",
+    provenance_method="Query + FDA recognition number + raw HTML sha256 "
+                      "into hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.standards:FdaRecognizedStandardsConnector",
     auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="ecfr_title21",
+    name="eCFR Title 21 — Food and Drugs (Subchapter H: Medical Devices)",
+    authority_role=["STANDARDS"],
+    coverage="Codified US regulation for medical devices: device "
+             "classification parts by specialty panel (862-892), QMSR "
+             "part 820 (ISO 13485 incorporated by reference at "
+             "§ 820.7), MDR 803, recall authority 810, IDE 812, PMA 814, "
+             "UDI 830. Structure records + section full text.",
+    access_method="REST JSON/XML, no API key; GET "
+                  "www.ecfr.gov/api/versioner/v1/...",
+    update_frequency="Daily (eCFR issue dates)",
+    rate_limits="None published; light query discipline",
+    licensing="Public domain (US government work)",
+    primary_or_secondary="PRIMARY",
+    freshness="Issue-date pinned per query (2026-08-27 measured)",
+    known_gaps="Incorporated standard texts (e.g. ISO 13485 body) are "
+               "NOT in eCFR — only the incorporation by reference is. "
+               "Structure records do not carry section text (fetch via "
+               "section query). Measured LIVE 2026-08-29 (part 888 -> "
+               "111 sections; § 820.1 full text).",
+    provenance_method="Query + CFR section identifier + raw payload "
+                      "sha256 (structure JSON or section XML) into "
+                      "hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.standards:EcfrTitle21Connector",
+    auth_requires=[],
+    metered_quota=None,
 ))
 
 _register(_src(
