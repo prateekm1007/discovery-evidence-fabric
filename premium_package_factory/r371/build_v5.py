@@ -29,6 +29,22 @@ import shutil
 import sys
 import zipfile
 
+# R374-5 deterministic ZIP entries: zipfile's default embeds each
+# file's mtime into the archive, making the package ZIPs non-reproducible
+# across builds (found live by the R374 fresh-clone protocol — the R372
+# byte-identical claim covered PDFs/JSONs but never the ZIP containers).
+# Fixed epoch timestamps make the ZIP container byte-reproducible while
+# the archived CONTENT is unchanged.
+_ZIP_EPOCH = (1980, 1, 1, 0, 0, 0)
+
+
+def _zip_add(zf, path, arcname):
+    zi = zipfile.ZipInfo(arcname, date_time=_ZIP_EPOCH)
+    zi.compress_type = zipfile.ZIP_DEFLATED
+    zi.external_attr = 0o644 << 16
+    with open(path, "rb") as f:
+        zf.writestr(zi, f.read())
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from premium_package_factory.r371.builder import get_styles, sha256_file, _now
@@ -247,7 +263,7 @@ def build(portfolio_root, work_dir=None):
             os.remove(zpath)
         with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as zf:
             for f in sorted(os.listdir(pdir)):
-                zf.write(os.path.join(pdir, f), f)
+                _zip_add(zf, os.path.join(pdir, f), f)
         print(f"   {p.num} {p.pkg_id} ({p.version}) done")
 
     # README of each package needs the final file list; rebuild readmes now
@@ -268,7 +284,7 @@ def build(portfolio_root, work_dir=None):
         os.remove(zpath)
         with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as zf:
             for f in sorted(os.listdir(pdir)):
-                zf.write(os.path.join(pdir, f), f)
+                _zip_add(zf, os.path.join(pdir, f), f)
 
     # 6. portfolio-level documents -----------------------------------------------
     print("[R372] rendering portfolio documents ...")

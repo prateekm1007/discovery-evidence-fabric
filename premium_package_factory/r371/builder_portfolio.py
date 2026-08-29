@@ -479,17 +479,19 @@ def generate_readme(manifest, loop_summary, out_path):
 
 def build_master_zip(portfolio_root, manifest, dest):
     """Master ZIP built FROM the manifest + the two self-referential files
-    (README.md, RELEASE_CONTENT_MANIFEST.json itself). Phase 2."""
+    (README.md, RELEASE_CONTENT_MANIFEST.json itself). Phase 2.
+    R374-5: deterministic entry timestamps (byte-reproducible container)."""
+    from .build_v5 import _zip_add
     with zipfile.ZipFile(dest, "w", zipfile.ZIP_DEFLATED) as zf:
         for fn in DISTRIBUTION_ROOT_FILES:
             fp = os.path.join(portfolio_root, fn)
             if not os.path.exists(fp):
                 raise FileNotFoundError(f"master zip source missing: {fn}")
-            zf.write(fp, fn)
+            _zip_add(zf, fp, fn)
         for entry in manifest["entries"]:
             if entry["role"] == "package zip":
                 fp = os.path.join(portfolio_root, entry["path"])
-                zf.write(fp, entry["path"])
+                _zip_add(zf, fp, entry["path"])
     return dest
 
 

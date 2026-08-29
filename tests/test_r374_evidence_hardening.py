@@ -591,3 +591,47 @@ class TestEquationStatusAudit:
         r = audit_equation_status(P01, shipped)
         assert not r["ok"]
         assert r["failures"][0]["check"] == "R374_STATUS_MISSING"
+
+
+# ===========================================================================
+# R374-5: deterministic ZIP containers
+# ===========================================================================
+
+class TestDeterministicZips:
+
+    def test_zip_reproducible_across_mtime_changes(self, tmp_path):
+        """The R374-5 defect: zipfile's default embeds file mtimes, so
+        identical content produced ZIPs with different bytes. Fixed
+        epoch entries must reproduce byte-identically even when the
+        source file mtimes change between builds."""
+        import time
+        import zipfile as zf_mod
+        from premium_package_factory.r371.build_v5 import _zip_add
+        src = tmp_path / "a.txt"
+        src.write_text("identical content")
+        z1, z2 = tmp_path / "one.zip", tmp_path / "two.zip"
+        with zf_mod.ZipFile(z1, "w", zf_mod.ZIP_DEFLATED) as zf:
+            _zip_add(zf, str(src), "a.txt")
+        # change the source mtime (simulating a rebuild at another time)
+        later = time.time() + 3600
+        os.utime(src, (later, later))
+        with zf_mod.ZipFile(z2, "w", zf_mod.ZIP_DEFLATED) as zf:
+            _zip_add(zf, str(src), "a.txt")
+        assert z1.read_bytes() == z2.read_bytes(), \
+            "ZIP container not byte-reproducible across mtime changes"
+
+    def test_default_zipfile_write_is_non_deterministic_control(self, tmp_path):
+        """Negative control proving the test above is meaningful: the
+        DEFAULT zf.write() path IS mtime-dependent (the defect class)."""
+        import time
+        import zipfile as zf_mod
+        src = tmp_path / "a.txt"
+        src.write_text("identical content")
+        z1, z2 = tmp_path / "one.zip", tmp_path / "two.zip"
+        with zf_mod.ZipFile(z1, "w", zf_mod.ZIP_DEFLATED) as zf:
+            zf.write(str(src), "a.txt")
+        later = time.time() + 3600
+        os.utime(src, (later, later))
+        with zf_mod.ZipFile(z2, "w", zf_mod.ZIP_DEFLATED) as zf:
+            zf.write(str(src), "a.txt")
+        assert z1.read_bytes() != z2.read_bytes()
