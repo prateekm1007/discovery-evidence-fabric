@@ -2,6 +2,12 @@
   "artifact": "EVIDENCE_COVERAGE_REPORT",
   "directive": "CEO lifecycle directive 2026-08-29 point 6: ten mechanically derived coverage dimensions; a role is covered only if a real query returns usable records with provenance.",
   "coverage_rule": "COVERED = live query returned >=1 usable record (full custody chain: record_id + raw_payload_sha256 + provenance block + limitations attached) and custody hashes match. COVERED_NO_MATCH = provider definitively answered zero for this probe. PROVIDER_FAILURE = transport/auth/rate failure — not absence, not coverage.",
+  "coverage_semantics": {
+    "ROLE_COVERED": "at least ONE live source answered a real query with usable custodied records for this role",
+    "SOURCE_COVERAGE_DEPTH": "per-role live/degraded/unavailable/not_integrated breakdown — carried on every dimension (role_coverage_depth)",
+    "KNOWN_GAPS": "not-integrated sources, unreachable sources, and capability boundaries — carried on every dimension (known_gaps)",
+    "warning": "ROLE_COVERED never implies comprehensive coverage: one live source does not mean the search universe is complete (CEO audit 2026-08-29). Every dimension carries its own depth breakdown and gap list."
+  },
   "dimensions": [
     {
       "dimension": "SCIENCE_COVERAGE",
@@ -19,12 +25,46 @@
       "sample_record": {
         "record_id": "europepmc:42298566",
         "title": "Carbon nanotube‑ and hydroxyapatite‑coated implants: histomorphometric assessment in a rabbit model.",
-        "raw_payload_sha256": "bb1d0e5fd5c4a96203cf9948393c1f6dbb4e2bd15bf73819bbfe2ff957bd6083",
+        "raw_payload_sha256": "678b32fee5d66f79422b68edbafb1523aa3ec7dbf3958aa0a36e443562d1fc4d",
         "limitations_count": 3
       },
       "roles_in_registry": {
         "SCIENTIFIC": 7
-      }
+      },
+      "role_coverage_depth": {
+        "available": true,
+        "health_report_timestamp": "2026-08-29T09:42:11.792344+00:00",
+        "roles": {
+          "SCIENTIFIC": {
+            "in_health_matrix": true,
+            "role_coverage": "COVERED",
+            "live_sources": [
+              "crossref",
+              "elsevier_scopus",
+              "lens_scholarly",
+              "pubmed"
+            ],
+            "degraded_sources": [
+              "openalex",
+              "semantic_scholar"
+            ],
+            "unavailable_sources": [
+              "europepmc"
+            ],
+            "not_integrated_sources": [],
+            "live_depth": 4,
+            "registered_depth": 7
+          }
+        }
+      },
+      "known_gaps": [
+        {
+          "role": "SCIENTIFIC",
+          "kind": "SOURCE_UNAVAILABLE",
+          "gap": "europepmc is registered but currently unreachable",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        }
+      ]
     },
     {
       "dimension": "PATENT_COVERAGE",
@@ -47,7 +87,72 @@
       },
       "roles_in_registry": {
         "PATENT": 8
-      }
+      },
+      "role_coverage_depth": {
+        "available": true,
+        "health_report_timestamp": "2026-08-29T09:42:11.792344+00:00",
+        "roles": {
+          "PATENT": {
+            "in_health_matrix": true,
+            "role_coverage": "COVERED",
+            "live_sources": [
+              "google_patents",
+              "lens_patent",
+              "patentbear"
+            ],
+            "degraded_sources": [],
+            "unavailable_sources": [
+              "epo_ops",
+              "google_bigquery_patents",
+              "patsnap_eureka",
+              "uspto_odp"
+            ],
+            "not_integrated_sources": [
+              "wipo_patentscope"
+            ],
+            "live_depth": 3,
+            "registered_depth": 8
+          }
+        }
+      },
+      "known_gaps": [
+        {
+          "role": "PATENT",
+          "kind": "SOURCE_NOT_INTEGRATED",
+          "gap": "wipo_patentscope is not integrated — the role's evidence universe is deeper than what this engine can query",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        },
+        {
+          "role": "PATENT",
+          "kind": "SOURCE_UNAVAILABLE",
+          "gap": "epo_ops is registered but currently unreachable",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        },
+        {
+          "role": "PATENT",
+          "kind": "SOURCE_UNAVAILABLE",
+          "gap": "google_bigquery_patents is registered but currently unreachable",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        },
+        {
+          "role": "PATENT",
+          "kind": "SOURCE_UNAVAILABLE",
+          "gap": "patsnap_eureka is registered but currently unreachable",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        },
+        {
+          "role": "PATENT",
+          "kind": "SOURCE_UNAVAILABLE",
+          "gap": "uspto_odp is registered but currently unreachable",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        },
+        {
+          "role": "PATENT",
+          "kind": "CAPABILITY_BOUNDARY",
+          "gap": "Live patent sources answer novelty-adjacent queries, but a patent search result is NOT a novelty determination (Art. XXVIII); classification-exhaustive searches remain outside the engine.",
+          "evidence": "recorded limitation (L-series measurement)"
+        }
+      ]
     },
     {
       "dimension": "DEVICE_COVERAGE",
@@ -70,7 +175,35 @@
       },
       "roles_in_registry": {
         "DEVICE_IDENTITY": 2
-      }
+      },
+      "role_coverage_depth": {
+        "available": true,
+        "health_report_timestamp": "2026-08-29T09:42:11.792344+00:00",
+        "roles": {
+          "DEVICE_IDENTITY": {
+            "in_health_matrix": true,
+            "role_coverage": "COVERED",
+            "live_sources": [
+              "fda_udi"
+            ],
+            "degraded_sources": [],
+            "unavailable_sources": [],
+            "not_integrated_sources": [
+              "eudamed"
+            ],
+            "live_depth": 1,
+            "registered_depth": 2
+          }
+        }
+      },
+      "known_gaps": [
+        {
+          "role": "DEVICE_IDENTITY",
+          "kind": "SOURCE_NOT_INTEGRATED",
+          "gap": "eudamed is not integrated — the role's evidence universe is deeper than what this engine can query",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        }
+      ]
     },
     {
       "dimension": "REGULATORY_COVERAGE",
@@ -93,7 +226,45 @@
       },
       "roles_in_registry": {
         "REGULATORY": 6
-      }
+      },
+      "role_coverage_depth": {
+        "available": true,
+        "health_report_timestamp": "2026-08-29T09:42:11.792344+00:00",
+        "roles": {
+          "REGULATORY": {
+            "in_health_matrix": true,
+            "role_coverage": "COVERED",
+            "live_sources": [
+              "fda_510k",
+              "fda_classification",
+              "fda_pma",
+              "fda_registrationlisting"
+            ],
+            "degraded_sources": [],
+            "unavailable_sources": [],
+            "not_integrated_sources": [
+              "eudamed",
+              "fda_denovo"
+            ],
+            "live_depth": 4,
+            "registered_depth": 6
+          }
+        }
+      },
+      "known_gaps": [
+        {
+          "role": "REGULATORY",
+          "kind": "SOURCE_NOT_INTEGRATED",
+          "gap": "eudamed is not integrated — the role's evidence universe is deeper than what this engine can query",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        },
+        {
+          "role": "REGULATORY",
+          "kind": "SOURCE_NOT_INTEGRATED",
+          "gap": "fda_denovo is not integrated — the role's evidence universe is deeper than what this engine can query",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        }
+      ]
     },
     {
       "dimension": "CLINICAL_COVERAGE",
@@ -116,7 +287,35 @@
       },
       "roles_in_registry": {
         "CLINICAL": 2
-      }
+      },
+      "role_coverage_depth": {
+        "available": true,
+        "health_report_timestamp": "2026-08-29T09:42:11.792344+00:00",
+        "roles": {
+          "CLINICAL": {
+            "in_health_matrix": true,
+            "role_coverage": "COVERED",
+            "live_sources": [
+              "clinicaltrials_gov"
+            ],
+            "degraded_sources": [],
+            "unavailable_sources": [],
+            "not_integrated_sources": [
+              "who_ictrp"
+            ],
+            "live_depth": 1,
+            "registered_depth": 2
+          }
+        }
+      },
+      "known_gaps": [
+        {
+          "role": "CLINICAL",
+          "kind": "SOURCE_NOT_INTEGRATED",
+          "gap": "who_ictrp is not integrated — the role's evidence universe is deeper than what this engine can query",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        }
+      ]
     },
     {
       "dimension": "FAILURE_COVERAGE",
@@ -141,7 +340,38 @@
       "roles_in_registry": {
         "ADVERSE_EVENT": 1,
         "RECALL": 1
-      }
+      },
+      "role_coverage_depth": {
+        "available": true,
+        "health_report_timestamp": "2026-08-29T09:42:11.792344+00:00",
+        "roles": {
+          "ADVERSE_EVENT": {
+            "in_health_matrix": true,
+            "role_coverage": "COVERED",
+            "live_sources": [
+              "fda_maude"
+            ],
+            "degraded_sources": [],
+            "unavailable_sources": [],
+            "not_integrated_sources": [],
+            "live_depth": 1,
+            "registered_depth": 1
+          },
+          "RECALL": {
+            "in_health_matrix": true,
+            "role_coverage": "COVERED",
+            "live_sources": [
+              "fda_recall"
+            ],
+            "degraded_sources": [],
+            "unavailable_sources": [],
+            "not_integrated_sources": [],
+            "live_depth": 1,
+            "registered_depth": 1
+          }
+        }
+      },
+      "known_gaps": []
     },
     {
       "dimension": "MATERIAL_COVERAGE",
@@ -159,12 +389,47 @@
       "sample_record": {
         "record_id": "cod:2300273",
         "title": "hydroxyapatite",
-        "raw_payload_sha256": "e4075c3a62e683ac67959e185c7478a4dddc129563799a6d6218abb4360d6250",
+        "raw_payload_sha256": "bf3d043af6cee2378705d09902a85d9e567ace81aef2b421439879e14cbdb228",
         "limitations_count": 2
       },
       "roles_in_registry": {
         "MATERIALS": 3
-      }
+      },
+      "role_coverage_depth": {
+        "available": true,
+        "health_report_timestamp": "2026-08-29T09:42:11.792344+00:00",
+        "roles": {
+          "MATERIALS": {
+            "in_health_matrix": true,
+            "role_coverage": "COVERED",
+            "live_sources": [
+              "cod_optimade",
+              "nist_webbook"
+            ],
+            "degraded_sources": [],
+            "unavailable_sources": [
+              "materials_project"
+            ],
+            "not_integrated_sources": [],
+            "live_depth": 2,
+            "registered_depth": 3
+          }
+        }
+      },
+      "known_gaps": [
+        {
+          "role": "MATERIALS",
+          "kind": "SOURCE_UNAVAILABLE",
+          "gap": "materials_project is registered but currently unreachable",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        },
+        {
+          "role": "MATERIALS",
+          "kind": "CAPABILITY_BOUNDARY",
+          "gap": "Property data coverage is NOT implant-suitability coverage — the PROPERTY_DATA vs IMPLANT_SUITABILITY epistemic split is mechanically enforced (materials_policy.py); Materials Project is 403-blocked (ASN) and remains a measured gap.",
+          "evidence": "recorded limitation (L-series measurement)"
+        }
+      ]
     },
     {
       "dimension": "MANUFACTURING_COVERAGE",
@@ -182,12 +447,40 @@
       "sample_record": {
         "record_id": "mfg-lit:42014629",
         "title": "Clinical implementation of an EU MDR-compliant point-of-care manufacturing framework for patient-specific 3D-printed PEEK implants in craniomaxillofacial reconstruction.",
-        "raw_payload_sha256": "29666f84ef7a1623aaad169f71482fab5b10bad068537efb5d3d4ccf94eaf4a7",
+        "raw_payload_sha256": "97dbead6ab8eb534751ed47b3c264d17247e19b947e106049df563aac521d492",
         "limitations_count": 3
       },
       "roles_in_registry": {
         "MANUFACTURING": 3
-      }
+      },
+      "role_coverage_depth": {
+        "available": true,
+        "health_report_timestamp": "2026-08-29T09:42:11.792344+00:00",
+        "roles": {
+          "MANUFACTURING": {
+            "in_health_matrix": true,
+            "role_coverage": "COVERED",
+            "live_sources": [
+              "fda_pma_supplements",
+              "gudid_sterilization",
+              "manufacturing_literature"
+            ],
+            "degraded_sources": [],
+            "unavailable_sources": [],
+            "not_integrated_sources": [],
+            "live_depth": 3,
+            "registered_depth": 3
+          }
+        }
+      },
+      "known_gaps": [
+        {
+          "role": "MANUFACTURING",
+          "kind": "CAPABILITY_BOUNDARY",
+          "gap": "PMA supplements + literature + sterilization are live; process-capability data (Cpk, yields) is not queryable from any integrated source.",
+          "evidence": "recorded limitation (L-series measurement)"
+        }
+      ]
     },
     {
       "dimension": "STANDARDS_COVERAGE",
@@ -210,7 +503,49 @@
       },
       "roles_in_registry": {
         "STANDARDS": 4
-      }
+      },
+      "role_coverage_depth": {
+        "available": true,
+        "health_report_timestamp": "2026-08-29T09:42:11.792344+00:00",
+        "roles": {
+          "STANDARDS": {
+            "in_health_matrix": true,
+            "role_coverage": "COVERED",
+            "live_sources": [
+              "ecfr_title21",
+              "fda_recognized_standards"
+            ],
+            "degraded_sources": [],
+            "unavailable_sources": [],
+            "not_integrated_sources": [
+              "astm_standards",
+              "iso_catalogue"
+            ],
+            "live_depth": 2,
+            "registered_depth": 4
+          }
+        }
+      },
+      "known_gaps": [
+        {
+          "role": "STANDARDS",
+          "kind": "SOURCE_NOT_INTEGRATED",
+          "gap": "astm_standards is not integrated — the role's evidence universe is deeper than what this engine can query",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        },
+        {
+          "role": "STANDARDS",
+          "kind": "SOURCE_NOT_INTEGRATED",
+          "gap": "iso_catalogue is not integrated — the role's evidence universe is deeper than what this engine can query",
+          "evidence": "SOURCE_HEALTH_REPORT coverage_matrix"
+        },
+        {
+          "role": "STANDARDS",
+          "kind": "CAPABILITY_BOUNDARY",
+          "gap": "FDA recognized standards + eCFR are live; ISO/ASTM raw catalogues remain NOT_INTEGRATED — the standards universe is partially covered.",
+          "evidence": "recorded limitation (L-series measurement)"
+        }
+      ]
     },
     {
       "dimension": "COMMERCIAL_COVERAGE",
@@ -233,7 +568,33 @@
       },
       "roles_in_registry": {
         "COMMERCIAL": 1
-      }
+      },
+      "role_coverage_depth": {
+        "available": true,
+        "health_report_timestamp": "2026-08-29T09:42:11.792344+00:00",
+        "roles": {
+          "COMMERCIAL": {
+            "in_health_matrix": true,
+            "role_coverage": "COVERED",
+            "live_sources": [
+              "gudid_commercial"
+            ],
+            "degraded_sources": [],
+            "unavailable_sources": [],
+            "not_integrated_sources": [],
+            "live_depth": 1,
+            "registered_depth": 1
+          }
+        }
+      },
+      "known_gaps": [
+        {
+          "role": "COMMERCIAL",
+          "kind": "CAPABILITY_BOUNDARY",
+          "gap": "GUDID commercial lens is live; pricing/procurement signals remain NOT_COVERED — commercial coverage is identity-level, not market-dynamics-level.",
+          "evidence": "recorded limitation (L-series measurement)"
+        }
+      ]
     }
   ],
   "summary": {

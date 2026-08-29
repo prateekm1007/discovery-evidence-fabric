@@ -152,6 +152,113 @@ def _usable(record) -> bool:
     )
 
 
+def _role_depth_from_health(roles):
+    """Join the SOURCE_HEALTH_REPORT coverage matrix (if present) to
+    expose, per authority role: which sources are LIVE vs DEGRADED vs
+    UNAVAILABLE vs NOT_INTEGRATED. CEO audit finding (2026-08-29):
+    ROLE_COVERED must never imply comprehensive coverage — the depth
+    breakdown rides WITH the verdict. A stale or missing health report
+    is recorded as such, never silently omitted (Art. XXV)."""
+    health_path = REPO_ROOT / "artifacts" / "source_health" / \
+        "SOURCE_HEALTH_REPORT.json"
+    if not health_path.exists():
+        return {"available": False,
+                "note": "SOURCE_HEALTH_REPORT.json not found — depth "
+                        "breakback unavailable; role_covered verdict "
+                        "stands alone (Art. XXV)"}
+    try:
+        health = json.loads(health_path.read_text())
+    except Exception as e:  # noqa: BLE001
+        return {"available": False, "error": f"{type(e).__name__}: {e}"}
+    matrix = {m.get("role"): m for m in health.get("coverage_matrix", [])}
+    out = {
+        "available": True,
+        "health_report_timestamp": health.get("run_timestamp"),
+        "roles": {},
+    }
+    for role in roles:
+        m = matrix.get(role)
+        if not m:
+            out["roles"][role] = {"in_health_matrix": False}
+            continue
+        out["roles"][role] = {
+            "in_health_matrix": True,
+            "role_coverage": m.get("coverage"),
+            "live_sources": m.get("live_sources", []),
+            "degraded_sources": m.get("degraded_sources", []),
+            "unavailable_sources": m.get("unavailable_sources", []),
+            "not_integrated_sources": m.get("not_integrated_sources", []),
+            "live_depth": len(m.get("live_sources", [])),
+            "registered_depth": (len(m.get("live_sources", []))
+                                 + len(m.get("degraded_sources", []))
+                                 + len(m.get("unavailable_sources", []))
+                                 + len(m.get("not_integrated_sources", []))),
+        }
+    return out
+
+
+def _known_gaps_for(roles):
+    """Honest, MECHANICALLY RECORDED capability gaps per role. These are
+    the audit's KNOWN_GAPS: role coverage (a live query answered) does
+    NOT mean the role's evidence universe is complete. Each gap names
+    its evidence basis — never a narrative invention (Art. XV/XXVII)."""
+    gaps = []
+    health_path = REPO_ROOT / "artifacts" / "source_health" / \
+        "SOURCE_HEALTH_REPORT.json"
+    matrix = {}
+    if health_path.exists():
+        try:
+            matrix = {m.get("role"): m for m in json.loads(
+                health_path.read_text()).get("coverage_matrix", [])}
+        except Exception:  # noqa: BLE001
+            matrix = {}
+    for role in roles:
+        m = matrix.get(role) or {}
+        for sid in m.get("not_integrated_sources", []):
+            gaps.append({
+                "role": role,
+                "kind": "SOURCE_NOT_INTEGRATED",
+                "gap": f"{sid} is not integrated — the role's evidence "
+                       "universe is deeper than what this engine can "
+                       "query",
+                "evidence": "SOURCE_HEALTH_REPORT coverage_matrix",
+            })
+        for sid in m.get("unavailable_sources", []):
+            gaps.append({
+                "role": role,
+                "kind": "SOURCE_UNAVAILABLE",
+                "gap": f"{sid} is registered but currently unreachable",
+                "evidence": "SOURCE_HEALTH_REPORT coverage_matrix",
+            })
+    return gaps
+
+
+#: Capability-level gaps that no single-source status captures. Each is
+#: an honestly recorded limitation of what the role's coverage MEANS
+#: (CEO audit 2026-08-29: the coverage report must never imply
+#: comprehensive coverage).
+CAPABILITY_GAPS = {
+    "PATENT": "Live patent sources answer novelty-adjacent queries, but a "
+              "patent search result is NOT a novelty determination "
+              "(Art. XXVIII); classification-exhaustive searches remain "
+              "outside the engine.",
+    "MATERIALS": "Property data coverage is NOT implant-suitability "
+                 "coverage — the PROPERTY_DATA vs IMPLANT_SUITABILITY "
+                 "epistemic split is mechanically enforced "
+                 "(materials_policy.py); Materials Project is 403-blocked "
+                 "(ASN) and remains a measured gap.",
+    "STANDARDS": "FDA recognized standards + eCFR are live; ISO/ASTM raw "
+                 "catalogues remain NOT_INTEGRATED — the standards "
+                 "universe is partially covered.",
+    "COMMERCIAL": "GUDID commercial lens is live; pricing/procurement "
+                  "signals remain NOT_COVERED — commercial coverage is "
+                  "identity-level, not market-dynamics-level.",
+    "MANUFACTURING": "PMA supplements + literature + sterilization are "
+                     "live; process-capability data (Cpk, yields) is not "
+                     "queryable from any integrated source.",
+}
+
+
 def measure_dimension(spec: dict, timeout: int) -> dict:
     dim = spec["dimension"]
     connector = _connector_for(dim)
@@ -184,6 +291,12 @@ def measure_dimension(spec: dict, timeout: int) -> dict:
         } if usable else None),
         "roles_in_registry": {
             r: len(sources_for_role(r)) for r in spec["roles"]},
+        "role_coverage_depth": _role_depth_from_health(spec["roles"]),
+        "known_gaps": _known_gaps_for(spec["roles"]) + [
+            {"role": role, "kind": "CAPABILITY_BOUNDARY",
+             "gap": CAPABILITY_GAPS[role],
+             "evidence": "recorded limitation (L-series measurement)"}
+            for role in spec["roles"] if role in CAPABILITY_GAPS],
     }
 
 
@@ -224,6 +337,20 @@ def main() -> int:
                          "COVERED_NO_MATCH = provider definitively answered "
                          "zero for this probe. PROVIDER_FAILURE = transport/"
                          "auth/rate failure — not absence, not coverage.",
+        "coverage_semantics": {
+            "ROLE_COVERED": "at least ONE live source answered a real query "
+                            "with usable custodied records for this role",
+            "SOURCE_COVERAGE_DEPTH": "per-role live/degraded/unavailable/"
+                                     "not_integrated breakdown — carried on "
+                                     "every dimension (role_coverage_depth)",
+            "KNOWN_GAPS": "not-integrated sources, unreachable sources, "
+                          "and capability boundaries — carried on every "
+                          "dimension (known_gaps)",
+            "warning": "ROLE_COVERED never implies comprehensive coverage: "
+                       "one live source does not mean the search universe "
+                       "is complete (CEO audit 2026-08-29). Every dimension "
+                       "carries its own depth breakdown and gap list.",
+        },
         "dimensions": dimensions,
         "summary": {
             "total_dimensions": len(dimensions),
