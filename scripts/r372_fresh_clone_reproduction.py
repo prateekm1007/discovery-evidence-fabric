@@ -221,12 +221,19 @@ def main():
         "for CEO audit, not independent certification.")
 
     # record into the REAL portfolio tree (the only write outside cleanroom)
-    real_root = os.path.abspath(os.path.join(
-        os.path.dirname(__file__), "..", "..", "..",
-        "technology-transfer-portfolio-15"))
-    if not os.path.isdir(real_root):
-        real_root = os.path.abspath(os.path.join(
-            os.path.dirname(__file__), "..", "..", "..", "portfolio"))
+    # scripts/ -> engine root -> my-project -> portfolio checkout
+    candidates = [
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
+                                     "..", "..",
+                                     "technology-transfer-portfolio-15")),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
+                                     "..", "portfolio")),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
+                                     "..", "..", "portfolio")),
+    ]
+    real_root = next((c for c in candidates if os.path.isdir(c)), None)
+    if not real_root:
+        raise RuntimeError(f"real portfolio root not found; tried {candidates}")
     qa = os.path.join(real_root, "INTERNAL_QA")
     os.makedirs(qa, exist_ok=True)
     with open(os.path.join(qa, "R372_FRESH_CLONE_REPRODUCTION.json"), "w",
