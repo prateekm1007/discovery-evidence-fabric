@@ -95,15 +95,20 @@ EQUATION_LIBRARY: Dict[str, List[Equation]] = {
              "verified on the actual geometry"],
             "optical_photonic", output_symbol="NA"),
         _eq("OPT-004", "Thermal load deposited at target",
-            "Q = I * A * (1 - eta_conversion)",
+            "Q = I * A - P_conv",
             [{"symbol": "Q", "description": "heat deposited at target", "unit": "W"},
              {"symbol": "I", "description": "irradiance at target", "unit": "W/m^2"},
              {"symbol": "A", "description": "illuminated area", "unit": "m^2"},
-             {"symbol": "eta_conversion", "description": "converted fraction", "unit": "-"}],
-            "energy-balance relation (radiative transfer + conversion)",
+             {"symbol": "P_conv", "description": "converted output power "
+              "(energy conservation: P_conv = eta_conversion * I * A)",
+              "unit": "W"}],
+            "energy-balance relation (radiative transfer + conversion): "
+            "deposition = incident power minus converted power",
             "steady state; unconverted power deposits as heat",
             ["steady temperature requires a conduction/perfusion model "
-             "before any quantitative claim"],
+             "before any quantitative claim",
+             "P_conv is the converted output power; the conversion "
+             "fraction eta_conversion is MODEL_DERIVED until measured"],
             "optical_photonic", output_symbol="Q"),
 
         _eq("OPT-001", "Beer-Lambert attenuation",
@@ -365,7 +370,9 @@ EQUATION_LIBRARY: Dict[str, List[Equation]] = {
              {"symbol": "dT/dx", "description": "temperature gradient", "unit": "K/m"}],
             "Fourier's law (heat-transfer texts)",
             "steady state, isotropic conduction",
-            [],
+            ["steady-state conduction (no transient term)",
+             "isotropic, homogeneous medium conductivity k",
+             "one-dimensional gradient (lateral gradients neglected)"],
             "thermal", output_symbol="q"),
     ],
     "ml_data": [

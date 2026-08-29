@@ -379,3 +379,242 @@ def test_e21b_select_equations_carries_engagement_evidence():
     assert entries["ML-003"]["selection_rationale"]["engagement_evidence"]
     assert entries["ML-003"]["selection_rationale"][
         "mechanism_asserted_concepts"]
+
+
+# ==========================================================================
+# E21-C — naked-number elimination at generation time (measured on the
+# E21-B head, artifact ENGINE_HEAD_REMEASUREMENT_E21.json):
+#   BENCH_03  EQUATION_APPLICABILITY FAIL  — OPT-004 UNSUPPORTED_SUBSTITUTION
+#             (literal '1' in 'I * A * (1 - eta_conversion)' with zero
+#             sourced inputs — violates the engine's own
+#             SYMBOLIC_ONLY-until-sourced contract)
+#   BENCH_13  EQUATION_APPLICABILITY FAIL  — TH-001 MISSING_ASSUMPTIONS
+#             (Fourier conduction shipped with an EMPTY assumptions list)
+#   BENCH_03/12/13 NUMERICAL_PROVENANCE hard violations — verification
+#             acceptance texts restating threshold VALUES and standard
+#             DESIGNATIONS inline (a text field with no provenance
+#             structure cannot distinguish a restated sourced number from
+#             an invented one — that is a naked number by definition)
+#
+# Fix principle (Art. VII-compliant: the artifact was corrected, the
+# frozen verifier untouched): single source of truth. Numbers live on
+# records that carry provenance (design inputs with evidence_refs; the
+# regulatory block's candidate_standards with class + applicability
+# flag); acceptance text NAMES the basis and points at those records.
+# ==========================================================================
+def test_e21c_opt004_expression_has_no_numeric_literal():
+    """OPT-004 carried the measured BENCH_03 defect: the literal '1' in
+    multiplication form with zero sourced inputs. Subtraction form
+    'Q = I * A - P_conv' is the identical energy balance with no literal;
+    the conversion fraction moves into the declared P_conv variable."""
+    import re
+    from discovery_fabric.engine.equations import EQUATION_LIBRARY
+    eq = next(e for e in EQUATION_LIBRARY["optical_photonic"]
+              if e["equation_id"] == "OPT-004")
+    assert eq["expression"] == "Q = I * A - P_conv"
+    assert not re.search(r"(?<![A-Za-z_])\d+(?:\.\d+)?", eq["expression"])
+
+
+def test_e21c_opt004_conversion_semantics_disclosed():
+    """The rewrite must not silently drop the conversion physics: P_conv's
+    description carries the energy-conservation definition and the
+    assumptions disclose that the conversion fraction is MODEL_DERIVED
+    until measured (honesty preserved, not hidden by the new form)."""
+    from discovery_fabric.engine.equations import EQUATION_LIBRARY
+    eq = next(e for e in EQUATION_LIBRARY["optical_photonic"]
+              if e["equation_id"] == "OPT-004")
+    pconv = next(v for v in eq["variables"]
+                 if v["symbol"] == "P_conv")
+    assert "eta_conversion" in pconv["description"]
+    assert any("MODEL_DERIVED" in a for a in eq["assumptions"])
+
+
+def _opt004_record(expr: str, variables: list) -> dict:
+    """Minimal rendered-equation record for the FROZEN auditor (used
+    read-only as the oracle — Art. XXX: instruments test the artifact)."""
+    from discovery_fabric.engine.equations import EQUATION_LIBRARY
+    eq = next(e for e in EQUATION_LIBRARY["optical_photonic"]
+              if e["equation_id"] == "OPT-004")
+    return {
+        "technology_domain": "optical_photonic",
+        "engineering_core": {
+            "governing_model": {"equations": [{
+                "equation_id": "OPT-004",
+                "expression": expr,
+                "variables": variables,
+                "applicability": {
+                    "condition": eq["applicability"],
+                    "judged_for_domain": "optical_photonic"},
+                "assumptions": eq["assumptions"],
+                "source": {"text": "energy-balance relation (radiative "
+                                   "transfer + conversion)"},
+            }]},
+            # UNKNOWN value -> inputs NOT sourced: the SYMBOLIC_ONLY
+            # contract is the binding condition of the measured defect
+            "critical_parameters": [
+                {"parameter": "irradiance at target", "value": "UNKNOWN"}],
+        },
+    }
+
+
+def test_e21c_frozen_equation_audit_accepts_new_opt004():
+    """Frozen-oracle positive control: with unsourced inputs the new
+    subtraction form must NOT raise UNSUPPORTED_SUBSTITUTION (the exact
+    BENCH_03 failure mode)."""
+    from discovery_fabric.benchmark.equation_integrity import audit_equations
+    from discovery_fabric.engine.equations import EQUATION_LIBRARY
+    eq = next(e for e in EQUATION_LIBRARY["optical_photonic"]
+              if e["equation_id"] == "OPT-004")
+    a = audit_equations(_opt004_record(eq["expression"], eq["variables"]))
+    assert a["verdict"] == "PASS", a
+    assert all("UNSUPPORTED_SUBSTITUTION" not in r["issues"]
+               for r in a["equations"])
+
+
+def test_e21c_negative_control_old_opt004_form_still_fails():
+    """Negative control on the MEASURED defect: hand-inject the old
+    '(1 - eta_conversion)' expression into the same record — the frozen
+    auditor must STILL flag UNSUPPORTED_SUBSTITUTION. Proves the fix
+    removes the defect from the artifact, not from the gate (Art. VII /
+    XXX: the instrument is not weakened)."""
+    from discovery_fabric.benchmark.equation_integrity import audit_equations
+    from discovery_fabric.engine.equations import EQUATION_LIBRARY
+    eq = next(e for e in EQUATION_LIBRARY["optical_photonic"]
+              if e["equation_id"] == "OPT-004")
+    old_vars = eq["variables"] + [
+        {"symbol": "eta_conversion", "description": "converted fraction",
+         "unit": "-"}]
+    a = audit_equations(_opt004_record(
+        "Q = I * A * (1 - eta_conversion)", old_vars))
+    assert a["verdict"] == "FAIL"
+    assert any("UNSUPPORTED_SUBSTITUTION" in r["issues"]
+               for r in a["equations"])
+
+
+def test_e21c_th001_carries_explicit_assumptions():
+    """The measured BENCH_13 defect: TH-001 (Fourier conduction) shipped
+    with an EMPTY assumptions list. The library now records the physical
+    assumptions the formula actually relies on."""
+    from discovery_fabric.engine.equations import EQUATION_LIBRARY
+    eq = next(e for e in EQUATION_LIBRARY["thermal"]
+              if e["equation_id"] == "TH-001")
+    real = [a for a in (eq.get("assumptions") or []) if a.strip()]
+    assert len(real) >= 3
+    joined = " ".join(real).lower()
+    assert "steady" in joined          # steady-state conduction
+    assert "isotropic" in joined       # medium homogeneity
+    assert "gradient" in joined        # 1-D gradient idealization
+
+
+def test_e21c_mutation_th001_without_assumptions_flags_missing():
+    """Metamorphic: strip TH-001's assumptions — the frozen auditor must
+    flag MISSING_ASSUMPTIONS again (sensitivity to the defect class, not
+    to fixture shape)."""
+    from discovery_fabric.benchmark.equation_integrity import audit_equations
+    from discovery_fabric.engine.equations import EQUATION_LIBRARY
+    eq = next(e for e in EQUATION_LIBRARY["thermal"]
+              if e["equation_id"] == "TH-001")
+    rec = {
+        "technology_domain": "thermal",
+        "engineering_core": {"governing_model": {"equations": [{
+            "equation_id": "TH-001",
+            "expression": eq["expression"],
+            "variables": eq["variables"],
+            "applicability": {"condition": eq["applicability"],
+                              "judged_for_domain": "thermal"},
+            "assumptions": [],
+            "source": {"text": eq["source"]},
+        }]}},
+    }
+    a = audit_equations(rec)
+    assert a["verdict"] == "FAIL"
+    assert any("MISSING_ASSUMPTIONS" in r["issues"]
+               for r in a["equations"])
+
+
+def test_e21c_acceptance_threshold_path_is_number_free():
+    """The acceptance proposal NAMES the problem-stated threshold basis
+    without restating the numeric value inline — the sourced values live
+    on the design-input records with their provenance. Detector: the
+    frozen numerical-provenance module's own _contains_number."""
+    from discovery_fabric.benchmark.numerical_provenance import (
+        _contains_number)
+    from discovery_fabric.engine.engineering_spec import _propose_acceptance
+    spec = {"problem": {"value": {
+        "constraint": "leak rate must stay below 0.35 mL/min under a "
+                      "sustained 300 mmHg backpressure",
+        "failure": "leakage past the valve seat", "device": "implantable "
+        "valve", "failure_mode": "reverse leakage"}}}
+    acc, status = _propose_acceptance(
+        "benchtop leak-rate challenge across the seat", spec, {})
+    assert status == "SOURCE_FACT_THRESHOLD"
+    assert not _contains_number(acc), acc
+    # the basis is still NAMED (a pointer, not a copy)
+    assert "problem-stated" in acc
+    assert "design-input records" in acc
+
+
+def test_e21c_acceptance_standard_path_is_number_free():
+    """Standard designations carry digits (IEC 60825, ISO 10993) — an
+    identifier is not a measured quantity, but the frozen
+    numerical-provenance gate correctly refuses unclassed digits in
+    acceptance text. The acceptance now points at the structured
+    regulatory record where the designation lives with its class and
+    applicability-verification flag."""
+    from discovery_fabric.benchmark.numerical_provenance import (
+        _contains_number)
+    from discovery_fabric.engine.engineering_spec import _propose_acceptance
+    module = {"standards_candidates": [
+        {"standard": "ISO 10993 biocompatibility evaluation"}]}
+    spec = {"problem": {"value": {"constraint": "", "failure": "",
+                                  "device": "implantable sensor",
+                                  "failure_mode": ""}}}
+    acc, status = _propose_acceptance(
+        "biocompatibility evaluation of the implanted materials",
+        spec, module)
+    assert status == "EXTERNAL_PRECEDENT_CANDIDATE"
+    assert not _contains_number(acc), acc
+    assert "candidate_standards" in acc
+
+
+def test_e21c_negative_control_old_acceptance_form_is_naked_number():
+    """Negative control on the MEASURED defect: the OLD acceptance form
+    (restating the threshold value inline) is a NAKED_NUMBER hard
+    violation under the frozen gate — proving (a) the gate was NOT
+    weakened by the fix and (b) the number-free form is what avoids the
+    violation, not a reinterpretation of the rule."""
+    from discovery_fabric.benchmark.numerical_provenance import (
+        _check_number, _contains_number)
+    old_style = ("pre-registered pass/fail against the problem-stated "
+                 "threshold(s): 0.35 mL/min (SOURCE_FACT, problem "
+                 "statement)")
+    assert _contains_number(old_style)  # the detector sees the digits
+    rec = _check_number("VF-01:acceptance", old_style, None,
+                        "VERIFICATION_ACCEPTANCE", None, None, None,
+                        {}, {}, literal_text=old_style)
+    assert rec["status"] == "NAKED_NUMBER"
+
+
+@pytest.mark.parametrize("domain_id", [
+    "fluidics_hydraulic", "ml_data", "optical_photonic"])
+def test_e21c_integration_acceptances_number_free(domain_id):
+    """Integration invariant: in a built engineering spec every
+    verification acceptance (all three proposal paths) is number-free
+    under the frozen detector; where standards exist, the digits live in
+    the regulatory block's candidate_standards WITH class and
+    applicability flag (the identifier's provenance home)."""
+    from discovery_fabric.benchmark.numerical_provenance import (
+        _contains_number)
+    env = _survivor_env(domain_id)
+    spec = build_invention_spec(env, CTX)
+    eng = build_engineering_spec(spec, env, CTX)
+    assert eng["verification_matrix"]
+    for vf in eng["verification_matrix"]:
+        acc = vf.get("acceptance") or vf.get("acceptance_criterion") or ""
+        assert not _contains_number(acc), f"{vf['id']}: {acc}"
+    # the structured home for designations still carries them (not
+    # deleted — relocated with class + flag)
+    for s in (eng.get("regulatory") or {}).get(
+            "candidate_standards", []) or []:
+        assert s.get("class") == "EXTERNAL_PRECEDENT_CANDIDATE"
+        assert s.get("verify_applicability") is True

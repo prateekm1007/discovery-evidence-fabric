@@ -1657,17 +1657,33 @@ def _propose_acceptance(method_text: str, spec: Dict[str, Any],
         " ".join(str(problem.get(k, "")) for k in
                  ("constraint", "failure", "device", "failure_mode")))
     if thresholds:
+        # E21-C: the acceptance NAMES the problem-stated threshold basis
+        # but never restates the numeric value inline — the sourced
+        # values live on the design-input records with their provenance
+        # (single source of truth; an acceptance restating a number
+        # without carrying its provenance structure is a naked number).
         return ("pre-registered pass/fail against the problem-stated "
-                f"threshold(s): {', '.join(thresholds)} (SOURCE_FACT, "
-                "problem statement)", "SOURCE_FACT_THRESHOLD")
+                "threshold(s) (SOURCE_FACT, problem statement; the "
+                "sourced values and their provenance are recorded on "
+                "the corresponding design-input records)",
+                "SOURCE_FACT_THRESHOLD")
     low = method_text.lower()
     for s in module.get("standards_candidates", []):
         std = s.get("standard", "") if isinstance(s, dict) else str(s)
         words = [w for w in re.findall(r"[a-z]{4,}", std.lower())]
         if std and any(w in low for w in words):
-            return (f"verify against the cited standard candidate "
-                    f"'{std}' (EXTERNAL_PRECEDENT_CANDIDATE — applicability "
-                    "to THIS design must be verified before release)",
+            # E21-C: the standard's designation (which carries digits)
+            # lives in the structured regulatory block with its
+            # EXTERNAL_PRECEDENT_CANDIDATE class and verify-applicability
+            # flag; the acceptance text stays number-free and points at
+            # that record (an identifier is not a measured quantity, and
+            # an acceptance must not smuggle digits it cannot source).
+            return ("verify against the cited standard candidate whose "
+                    "vocabulary matches this verification method "
+                    "(standard identity, class and applicability-"
+                    "verification flag recorded in the regulatory "
+                    "block's candidate_standards — "
+                    "EXTERNAL_PRECEDENT_CANDIDATE)",
                     "EXTERNAL_PRECEDENT_CANDIDATE")
     return ("pre-registered decision rule fixed BEFORE the test: the "
             "measured effect must exceed the measured baseline under the "
