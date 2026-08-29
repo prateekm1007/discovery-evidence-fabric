@@ -768,42 +768,84 @@ _register(_src(
 # ---------------------------------------------------------------------------
 
 _register(_src(
+    source_id="cod_optimade",
+    name="Crystallography Open Database (OPTIMADE v1)",
+    authority_role=["MATERIALS"],
+    coverage="Published crystal structures (CIF) of inorganic, mineral and "
+             "implant-relevant ceramic phases (hydroxyapatite, zirconia, "
+             "titania, calcium phosphates), with space group, cell "
+             "parameters, elements, journal provenance.",
+    access_method="REST OPTIMADE v1, no API key; GET "
+                  "https://www.crystallography.net/cod/optimade/v1/structures",
+    update_frequency="Continuous COD deposits (published structures)",
+    rate_limits="None published; light paging discipline (page_limit<=10)",
+    licensing="Open data (COD terms; CC0-style deposit policy)",
+    primary_or_secondary="PRIMARY",
+    freshness="Structure records are publication-static",
+    known_gaps="Crystallography measures matter, not devices: no impurity "
+               "profiles, no device-grade processing states, no "
+               "biocompatibility. PROPERTY_DATA only — implant "
+               "suitability NOT_ESTABLISHED_BY_THIS_SOURCE (see "
+               "materials_policy.py).",
+    provenance_method="Query + COD entry id + raw payload sha256 into "
+                      "hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.materials:CodOptimadeConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="nist_webbook",
+    name="NIST Chemistry WebBook",
+    authority_role=["MATERIALS"],
+    coverage="Authoritative NIST thermophysical property reference data "
+             "(species pages by name: CAS registry number, formula, "
+             "molecular weight, available property sections incl. "
+             "condensed-phase thermochemistry).",
+    access_method="REST (HTML pages), no API key; GET "
+                  "https://webbook.nist.gov/cgi/cbook.cgi?Name=<q>&Units=SI",
+    update_frequency="Periodic NIST releases",
+    rate_limits="None published; single-page probes only",
+    licensing="Public domain (NIST terms)",
+    primary_or_secondary="PRIMARY",
+    freshness="Reference data releases",
+    known_gaps="Chemical-species scope: implant ceramics/oxides and "
+               "elements covered; engineering alloys and polymers "
+               "(Ti-6Al-4V, PEEK, UHMWPE) out of scope as multi-component "
+               "solids. PROPERTY_DATA only — implant suitability "
+               "NOT_ESTABLISHED_BY_THIS_SOURCE (materials_policy.py).",
+    provenance_method="Query + CAS id (or match slug) + raw HTML sha256 "
+                      "into hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.materials:NistWebbookConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
     source_id="materials_project",
     name="Materials Project",
     authority_role=["MATERIALS"],
     coverage="Computed materials properties (DFT) for inorganic compounds.",
-    access_method="REST with API key",
+    access_method="REST OPTIMADE v1 with API key (X-API-KEY header; key "
+                  "stays out of URLs and the custody log)",
     update_frequency="Periodic dataset releases",
     rate_limits="Key-tier dependent",
     licensing="Open data (Materials Project terms); API key required",
     primary_or_secondary="SECONDARY",
     freshness="Periodic",
-    known_gaps="NO KEY provisioned; heartbeat probe measured 403 "
-               "'IP address or ASN has been (temporarily) blocked' — "
-               "cloud ASN is blocked even before credentials.",
-    provenance_method="Planned: query + material id + payload sha256",
-    connector=NO_CONNECTOR,
+    known_gaps="Connector IMPLEMENTED (connectors/materials.py). Measured "
+               "2026-08-29: HTTP 403 'IP address or ASN has been "
+               "(temporarily) blocked' — cloud ASN blocked before "
+               "credential evaluation. Unlock requires BOTH a "
+               "provisioned MATERIALS_PROJECT_API_KEY in .env.keys AND "
+               "an unblocked egress IP. COMPUTATIONAL evidence class; "
+               "PROPERTY_DATA only — implant suitability NOT established.",
+    provenance_method="Query + material id + payload sha256 into retrieval "
+                      "log",
+    connector="discovery_fabric.source_registry.connectors.materials:MaterialsProjectConnector",
     auth_requires=["MATERIALS_PROJECT_API_KEY (not provisioned)",
                    "unblocked egress IP (ASN currently blocked)"],
-))
-
-_register(_src(
-    source_id="nist_materials",
-    name="NIST Materials Resource Registry",
-    authority_role=["MATERIALS"],
-    coverage="Curated materials data resource index.",
-    access_method="Web portal measured reachable (HTML); no JSON API "
-                  "measured at probe time — NOT integrated",
-    update_frequency="Periodic",
-    rate_limits="n/a",
-    licensing="Public domain (NIST terms)",
-    primary_or_secondary="PRIMARY",
-    freshness="Periodic",
-    known_gaps="NO CONNECTOR: HTML application; data.nist.gov API probe "
-               "timed out. Honest gap.",
-    provenance_method="Planned: resource metadata + payload sha256",
-    connector=NO_CONNECTOR,
-    auth_requires=[],
+    metered_quota=None,
 ))
 
 # ---------------------------------------------------------------------------
