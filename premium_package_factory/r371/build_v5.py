@@ -110,6 +110,12 @@ def build(portfolio_root, work_dir=None):
     for p in packages:
         # R372-3: validation ships inside the buyer-visible registry
         eqs[p.pkg_id]["r372_validation"] = eq_validations[p.pkg_id]
+    # R374-2 + R374-3: three-level validation status + per-symbol unit
+    # status (SOURCE_BACKED / UNKNOWN with resolution paths)
+    from premium_package_factory.r374.equation_status import \
+        attach_r374_status
+    for p in packages:
+        attach_r374_status(eqs[p.pkg_id], p)
     roads = {p.pkg_id: build_unknown_roadmap(p) for p in packages}
     ecos = {p.pkg_id: build_validation_economics(p) for p in packages}
     loops = {p.pkg_id: build_loop_state(p) for p in packages}
@@ -121,6 +127,12 @@ def build(portfolio_root, work_dir=None):
         legacy = os.path.join(INPUT_DIR, "legacy_json", p.num,
                               "ENGINEERING_TRACEABILITY.json")
         traces[p.pkg_id] = build_traceability_json(p, legacy)
+    # R374-1: truth model — chain-level four states + the UNKNOWN-is-
+    # not-verified declaration inside the shipped artifact
+    from premium_package_factory.r374.traceability_truth import \
+        attach_truth_model
+    for p in packages:
+        attach_truth_model(traces[p.pkg_id], p)
     # R372-2: experiment-diagram specs validated at build time (fail closed)
     exp_specs = {p.pkg_id: experiment_diagram_spec(p, headlines[p.pkg_id])
                  for p in packages}

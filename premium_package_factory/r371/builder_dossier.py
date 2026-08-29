@@ -113,6 +113,22 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
             st.append(Paragraph("Model assumptions (as recorded):", S["SM"]))
             for a in e0["assumptions"][:6]:
                 st.append(Paragraph("  • " + _esc(a), S["SM"]))
+    st.append(Spacer(1, 4))
+    if eq_registry.get("r374_validation_status"):
+        rv = eq_registry["r374_validation_status"]
+        t = rv["totals"]
+        st.append(Paragraph(_esc(
+            f"Validation status (three levels, CEO R374-2 — 'validated' "
+            f"never implies an unproven level): STRUCTURAL proven for "
+            f"{t['structural_validated']} of {t['equations']} equations; "
+            f"APPLICABILITY proven for {t['applicability_validated']} of "
+            f"{t['equations']}; DIMENSIONAL proven for "
+            f"{t['dimensionally_validated']} of {t['equations']} "
+            f"({t['dimensional_not_evaluable']} not evaluable — units "
+            f"unrecorded in the canonical record; "
+            f"{t['dimensionally_inconsistent']} inconsistent). Per-symbol "
+            f"unit status (SOURCE_BACKED / UNKNOWN with resolution "
+            f"paths) is carried in EQUATION_REGISTRY.json."), S["DIS"]))
     st.append(Paragraph(
         "The canonical equation strings are retained verbatim in "
         "EQUATION_REGISTRY.json; the typeset form above is a deterministic "

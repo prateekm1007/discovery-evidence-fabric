@@ -13,8 +13,12 @@ Do not declare R372 complete until:
                                             label provenance, no invented
                                             numbers; experiment: all 7 roles
                                             verbatim canonical)
-  66/66 equation validation                 (complete metadata + explicit
-                                            dimensional state; 0 inconsistent)
+  66/66 equation validation records       (complete STRUCTURAL +
+                                            APPLICABILITY metadata +
+                                            explicit dimensional state;
+                                            0 inconsistent. The DIMENSIONAL
+                                            validation level is reported
+                                            separately per R374-2)
   15/15 commercial-evidence schema          (10-field schema + 8-step
                                             establishment workflow, 0 numeric
                                             market values)
@@ -158,6 +162,12 @@ def run_r372_acceptance(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
            f"problems={problems[:6]}")
 
     # ---- 3. 66/66 equation validation --------------------------------------
+    # R374-2 language correction: the check below proves complete
+    # metadata (STRUCTURAL + APPLICABILITY levels) and zero dimensional
+    # INCONSISTENCIES. It does NOT prove dimensional validation — the
+    # dimensional level is reported separately per equation in
+    # r374_validation_status (0 dimensionally consistent at R374; the
+    # honest state — units unrecorded for most symbols).
     problems = []
     total = 0
     inconsistent = 0
@@ -179,8 +189,11 @@ def run_r372_acceptance(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
         problems.append(f"equation total {total} != 66")
     if inconsistent:
         problems.append(f"{inconsistent} dimensionally inconsistent equations")
-    record(f"66/66 equation validation ({total} validated, "
-           f"{inconsistent} inconsistent)", not problems,
+    record(f"66/66 equation validation records complete (structural + "
+           f"applicability metadata; {total} equations, {inconsistent} "
+           f"dimensionally inconsistent; the DIMENSIONAL validation level "
+           f"is reported separately per R374-2 and is 0-proven — units "
+           f"unrecorded for most symbols)", not problems,
            f"problems={problems[:6]}")
 
     # ---- 4. 15/15 commercial-evidence schema -------------------------------

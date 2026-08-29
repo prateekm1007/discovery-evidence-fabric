@@ -55,9 +55,13 @@ def build_ladder(pkg, *, document_complete: bool, engineering_evaluable,
         },
         "ENGINEERING_EVALUABLE": {
             "met": engineering_evaluable,
-            "basis": "traceability semantics, equation validation, "
-                     "mechanism/experiment diagram adequacy, unknown "
-                     "roadmap — all audited mechanically",
+            "basis": "traceability semantics (four-state truth model), "
+                     "equation validation at the STRUCTURAL + "
+                     "APPLICABILITY levels (the DIMENSIONAL level is "
+                     "reported separately and honestly NOT proven for "
+                     "most equations — units unrecorded), mechanism/"
+                     "experiment diagram adequacy, unknown roadmap — "
+                     "all audited mechanically",
         },
         "TRANSFER_EVALUABLE": {
             "met": transfer_evaluable,

@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
@@ -271,8 +272,15 @@ def run_rehearsal(out_dir: str) -> int:
     # Drive the REAL conductor with the recorded fixture envelope: the
     # post-RANK pipeline and the release path run exactly as in production
     # (Directive 1), with the rehearsal label preserved end-to-end.
+    # R374 test-isolation fix (Art. IX): the registry allocation link is
+    # still exercised, but against a SANDBOX registry inside out_dir —
+    # a CONTROLLED_REHEARSAL must never allocate production package
+    # numbers (found live: the e11 smoke test contaminated
+    # PACKAGE_ID_REGISTRY.json with rehearsal allocations P-107/P-108).
     run = EngineRun(PROBLEM, out_dir, run_id=f"rehearsal:{utc_now()[:19]}",
-                    with_package=True)
+                    with_package=True,
+                    package_registry_path=os.path.join(
+                        out_dir, "SANDBOX_PACKAGE_ID_REGISTRY.json"))
     run.env = env
     run.rehearsal = True   # every artifact must carry SYNTHETIC_REHEARSAL
     run._post_rank_pipeline({"run_id": run.run_id})

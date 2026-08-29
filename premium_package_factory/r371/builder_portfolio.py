@@ -204,9 +204,10 @@ def render_release_report(ranking, loop_summary, structural, out_path,
                               0.55 * 72, 0.3 * 72, 0.62 * 72, 0.6 * 72,
                               0.75 * 72], fontsize=6.2))
 
-    # ---- R372-3: equation validation summary ----------------------------
+    # ---- R372-3 / R374-2: equation validation summary -------------------
     if equation_validation:
-        st.append(Paragraph("GOVERNING-EQUATION VALIDATION", S["SH"]))
+        st.append(Paragraph("GOVERNING-EQUATION VALIDATION (THREE LEVELS)",
+                            S["SH"]))
         total_eq = sum(v["equation_count"] for v in equation_validation.values())
         inconsistent = sum(len(v["inconsistent_equations"])
                            for v in equation_validation.values())
@@ -216,17 +217,26 @@ def render_release_report(ranking, loop_summary, structural, out_path,
                 counts[k] = counts.get(k, 0) + n
         st.append(Paragraph(_esc(
             f"All {total_eq} canonical governing equations carry recorded "
-            f"variables, per-variable units, domain, operating regime "
-            f"(boundary conditions), assumptions, applicability and "
-            f"limitations (known failure regimes), plus an explicit "
-            f"dimensional-consistency state. Dimensional outcomes: "
-            f"{counts}. Zero equations are dimensionally inconsistent. The "
-            f"dominant state is honestly NOT_EVALUABLE: the engineering "
-            f"record does not assign units to most equation symbols, and "
-            f"units are taken ONLY from recorded critical parameters - "
-            f"standard-symbol guesses are not used (Constitution Art. VI). "
-            f"Populating the unit fields of the critical parameters is "
-            f"buyer-side engineering work recorded in the unknown roadmaps."),
+            f"variables, per-variable unit status (R374-3), domain, "
+            f"operating regime (boundary conditions), assumptions, "
+            f"applicability and limitations (known failure regimes). "
+            f"Validation is reported at THREE SEPARATE levels (CEO "
+            f"R374-2): STRUCTURAL (the canonical math string parses as a "
+            f"well-formed relation), APPLICABILITY (the applicability "
+            f"envelope is fully recorded) and DIMENSIONAL (unit algebra "
+            f"performed under RECORDED units and consistent). The word "
+            f"'validated' never implies an unproven level. Dimensional "
+            f"outcomes: {counts}. Zero equations are dimensionally "
+            f"inconsistent. The dominant dimensional state is honestly "
+            f"NOT_EVALUABLE: the engineering record does not assign units "
+            f"to most equation symbols ({counts.get('NOT_EVALUABLE_UNITS_UNRECORDED', 0)} of "
+            f"{total_eq}), and units are taken ONLY from recorded "
+            f"critical parameters — standard-symbol guesses are not used "
+            f"(Constitution Art. VI). Every unrecorded-unit symbol "
+            f"carries UNIT_STATUS = UNKNOWN with a resolution path in "
+            f"the shipped EQUATION_REGISTRY.json per package. Populating "
+            f"the unit fields of the critical parameters is buyer-side "
+            f"engineering work recorded in the unknown roadmaps."),
             S["BT"]))
 
     st.append(Paragraph("EVIDENCE DISCIPLINE", S["SH"]))

@@ -421,6 +421,19 @@ def apply_repo_rule(audit: dict, portfolio_root: str,
             for f in r[dim].get("failures", []):
                 failures.append(f"{dim}:{f['check']}: "
                                 f"{str(f.get('detail'))[:120]}")
+        attack_results = {
+            "state": "STRUCTURED",
+            "adversarial_injections_all_caught": audit.get(
+                "adversarial_injections", {}).get("all_caught"),
+            "note": ("validator adversarial injections re-run in the same "
+                     "audit; package-specific audit failures enumerated in "
+                     "why_it_failed"),
+        }
+        kill_condition = (
+            "DEAD if the package cannot pass the complete release gate "
+            "(DOCUMENT_COMPLETE + ENGINEERING_EVALUABLE + "
+            "TRANSFER_EVALUABLE) after the audit failures are remediated "
+            "— the failures are recorded verbatim in why_it_failed")
         entry = {
             "entry_id": entry_id,
             "territory_id": pid,
@@ -448,9 +461,12 @@ def apply_repo_rule(audit: dict, portfolio_root: str,
                                  "R373_INDEPENDENT_ENGINEERING_ARTIFACT_"
                                  "AUDIT.json"],
             "epistemic_class": "ENGINEERING_ARTIFACT_AUDIT_FAILURE",
-            "attack_results": audit.get("adversarial_injections", {}).get(
-                "all_caught"),
+            "attack_results": attack_results,
+            "kill_condition": kill_condition,
         }
+        # R374-6: the six-element failed-candidate pathway
+        from premium_package_factory.r374 import pathway as r374_pathway
+        entry["pathway"] = r374_pathway.entry_pathway(entry)
         if not any(e.get("entry_id") == entry_id
                    for e in cemetery["entries"]):
             cemetery["entries"].append(entry)
