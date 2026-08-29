@@ -1,6 +1,6 @@
 {
   "artifact": "SOURCE_HEALTH_REPORT",
-  "run_timestamp": "2026-08-29T06:46:34.528380+00:00",
+  "run_timestamp": "2026-08-29T08:18:22.487222+00:00",
   "status_vocabulary": [
     "LIVE",
     "DEGRADED",
@@ -8,9 +8,9 @@
     "NOT_INTEGRATED"
   ],
   "status_counts": {
-    "LIVE": 15,
+    "LIVE": 19,
     "DEGRADED": 2,
-    "UNAVAILABLE": 6,
+    "UNAVAILABLE": 5,
     "NOT_INTEGRATED": 11
   },
   "derivation": {
@@ -18,6 +18,10 @@
     "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
     "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
     "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+  },
+  "derivation_metered_sources": {
+    "note": "provider-metered sources (e.g. patentbear) are NEVER live-probed by health checks; their LIVE/DEGRADED status derives from the freshest live retrieval-log proof inside the metered window, with the proof timestamp disclosed per-source under per_source[].last_live_proof",
+    "policy": "see discovery_fabric/source_registry/health.py METERED_DERIVATION"
   },
   "per_source": [
     {
@@ -34,7 +38,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1640,
+      "latency_ms": 2262,
       "record_count": 100,
       "query": "device.brand_name:pacemaker",
       "error": null,
@@ -59,7 +63,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1370,
+      "latency_ms": 1544,
       "record_count": 25,
       "query": "reason_for_recall:catheter",
       "error": null,
@@ -84,7 +88,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1099,
+      "latency_ms": 1092,
       "record_count": 25,
       "query": "device_name:\"pacemaker\"",
       "error": null,
@@ -109,7 +113,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1043,
+      "latency_ms": 1151,
       "record_count": 25,
       "query": "applicant:medtronic",
       "error": null,
@@ -134,7 +138,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1077,
+      "latency_ms": 1120,
       "record_count": 25,
       "query": "brand_name:\"pacemaker\"",
       "error": null,
@@ -159,7 +163,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 825,
+      "latency_ms": 839,
       "record_count": 5,
       "query": "registration.name:medtronic",
       "error": null,
@@ -184,7 +188,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1058,
+      "latency_ms": 1125,
       "record_count": 25,
       "query": "device_name:\"pacemaker\"",
       "error": null,
@@ -229,7 +233,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 926,
+      "latency_ms": 734,
       "record_count": 10,
       "query": "pacemaker",
       "error": null,
@@ -274,7 +278,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1278,
+      "latency_ms": 1433,
       "record_count": 10,
       "query": "pacemaker lead fracture",
       "error": null,
@@ -299,7 +303,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 374,
+      "latency_ms": 310,
       "record_count": 5,
       "query": "pacemaker lead fracture",
       "error": null,
@@ -324,10 +328,10 @@
       },
       "request_status": "RATE_LIMITED",
       "http_status": 429,
-      "latency_ms": 125,
+      "latency_ms": 156,
       "record_count": 0,
       "query": "pacemaker lead fracture",
-      "error": "provider answered with rate/budget limit: HTTP 429: {\"error\":\"Rate limit exceeded\",\"message\":\"Insufficient budget. This request costs $0.001 but you only have $0.0004 remaining. Resets at midnight UTC. Need more? Add funds at https://openalex.org/prici",
+      "error": "provider answered with rate/budget limit: HTTP 429: {\"error\":\"Rate limit exceeded\",\"message\":\"Insufficient budget. This request costs $0.001 but you only have $0 remaining. Resets at midnight UTC. Need more? Add funds at https://openalex.org/pricing\",\"",
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
@@ -349,7 +353,7 @@
       },
       "request_status": "RATE_LIMITED",
       "http_status": 429,
-      "latency_ms": 318,
+      "latency_ms": 205,
       "record_count": 0,
       "query": "pacemaker lead fracture",
       "error": "provider answered with rate/budget limit: HTTP 429: {\"message\": \"Too Many Requests. Please wait and try again or apply for a key for higher rate limits. https://www.semanticscholar.org/product/api#api-key-form\", \"code\": \"429\"}",
@@ -374,9 +378,34 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 710,
+      "latency_ms": 716,
       "record_count": 5,
       "query": "pacemaker lead fracture",
+      "error": null,
+      "derivation": {
+        "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
+        "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
+        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+      }
+    },
+    {
+      "source_id": "elsevier_scopus",
+      "status": "LIVE",
+      "chain": {
+        "connector_exists": true,
+        "live_request_works": true,
+        "response_parses": true,
+        "normalization_works": true,
+        "provenance_stores": true,
+        "retrieval_log_stores": true,
+        "health_check_passes": true
+      },
+      "request_status": "OK",
+      "http_status": 200,
+      "latency_ms": 701,
+      "record_count": 5,
+      "query": "hydrocephalus shunt",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
@@ -399,7 +428,7 @@
       },
       "request_status": "UNAVAILABLE",
       "http_status": 503,
-      "latency_ms": 396,
+      "latency_ms": 242,
       "record_count": 0,
       "query": "pacemaker lead",
       "error": "UNAVAILABLE: HTTP 503",
@@ -412,27 +441,92 @@
     },
     {
       "source_id": "lens_scholarly",
-      "status": "UNAVAILABLE",
+      "status": "LIVE",
       "chain": {
         "connector_exists": true,
-        "live_request_works": false,
-        "response_parses": false,
-        "normalization_works": false,
-        "provenance_stores": false,
+        "live_request_works": true,
+        "response_parses": true,
+        "normalization_works": true,
+        "provenance_stores": true,
         "retrieval_log_stores": true,
-        "health_check_passes": false
+        "health_check_passes": true
       },
-      "request_status": "AUTH_FAILED",
+      "request_status": "OK",
       "http_status": null,
-      "latency_ms": 0,
-      "record_count": 0,
+      "latency_ms": 682,
+      "record_count": 5,
       "query": "pacemaker lead",
-      "error": "AUTH_FAILED: LENS_API_TOKEN not configured",
+      "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
         "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+      }
+    },
+    {
+      "source_id": "lens_patent",
+      "status": "LIVE",
+      "chain": {
+        "connector_exists": true,
+        "live_request_works": true,
+        "response_parses": true,
+        "normalization_works": true,
+        "provenance_stores": true,
+        "retrieval_log_stores": true,
+        "health_check_passes": true
+      },
+      "request_status": "OK",
+      "http_status": null,
+      "latency_ms": 1141,
+      "record_count": 5,
+      "query": "hydrocephalus shunt valve",
+      "error": null,
+      "derivation": {
+        "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
+        "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
+        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+      }
+    },
+    {
+      "source_id": "patentbear",
+      "status": "LIVE",
+      "chain": {
+        "connector_exists": true,
+        "live_request_works": true,
+        "response_parses": true,
+        "normalization_works": true,
+        "provenance_stores": true,
+        "retrieval_log_stores": true,
+        "health_check_passes": true,
+        "proof_kind": "last_live_measurement"
+      },
+      "request_status": "NOT_PROBED (metered; quota-protected)",
+      "last_live_proof": {
+        "timestamp": "2026-08-29T08:01:43.693983+00:00",
+        "status": "OK",
+        "query": "hydrocephalus shunt valve",
+        "record_count": 5,
+        "raw_payload_sha256": "6b5babcdc61aebd83dbb9eec0cc5039f8a204b9adcd6fd988e1097c87c3b0f53"
+      },
+      "error": null,
+      "derivation": {
+        "LIVE": "metered source: 7 chain steps passed on the freshest live retrieval-log proof inside the metered window; live re-probe suppressed to protect provider quota",
+        "DEGRADED": "metered source: freshest live proof shows provider rate/quota limit, or quota exhausted since (guard active)",
+        "UNAVAILABLE": "metered source: no live proof inside the metered window (quota-protected probe suppressed)"
+      },
+      "metered": {
+        "monthly_limit": 20,
+        "metered_by": "provider usage block (monthly_limit/monthly_used/monthly_remaining) returned in every response",
+        "health_policy": "no-live-probe; LIVE is derived from the freshest live retrieval-log proof inside the metered window",
+        "metered_window_days": 31,
+        "prohibited_tools": [
+          "run_lab (bills credits; never called by this engine)",
+          "get_lab_result (only after a run_lab, hence never called)"
+        ],
+        "provider_reported_remaining": 16,
+        "last_quota_at": "2026-08-29T08:01:43.693983+00:00"
       }
     },
     {
@@ -569,7 +663,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 790,
+      "latency_ms": 449,
       "record_count": 1,
       "query": "aspirin",
       "error": null,
@@ -594,7 +688,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 816,
+      "latency_ms": 803,
       "record_count": 5,
       "query": "insulin",
       "error": null,
@@ -619,7 +713,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 8515,
+      "latency_ms": 847,
       "record_count": 1,
       "query": "aspirin",
       "error": null,
@@ -644,7 +738,7 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 491,
+      "latency_ms": 477,
       "record_count": 5,
       "query": "insulin",
       "error": null,
@@ -817,7 +911,7 @@
     }
   ],
   "retrieval_log_audit": {
-    "entries": 131,
+    "entries": 162,
     "chain_valid": true
   },
   "coverage_matrix": [
@@ -826,28 +920,30 @@
       "coverage": "COVERED",
       "live_sources": [
         "crossref",
+        "elsevier_scopus",
         "europepmc",
+        "lens_scholarly",
         "pubmed"
       ],
       "degraded_sources": [
         "openalex",
         "semantic_scholar"
       ],
-      "unavailable_sources": [
-        "lens_scholarly"
-      ],
+      "unavailable_sources": [],
       "not_integrated_sources": []
     },
     {
       "role": "PATENT",
-      "coverage": "GAP",
-      "live_sources": [],
+      "coverage": "COVERED",
+      "live_sources": [
+        "lens_patent",
+        "patentbear"
+      ],
       "degraded_sources": [],
       "unavailable_sources": [
         "epo_ops",
         "google_bigquery_patents",
         "google_patents",
-        "lens_scholarly",
         "patsnap_eureka",
         "uspto_odp"
       ],
@@ -997,8 +1093,11 @@
     "openalex": "DEGRADED",
     "semantic_scholar": "DEGRADED",
     "crossref": "LIVE",
+    "elsevier_scopus": "LIVE",
     "google_patents": "UNAVAILABLE",
-    "lens_scholarly": "UNAVAILABLE",
+    "lens_scholarly": "LIVE",
+    "lens_patent": "LIVE",
+    "patentbear": "LIVE",
     "patsnap_eureka": "UNAVAILABLE",
     "epo_ops": "UNAVAILABLE",
     "uspto_odp": "UNAVAILABLE",
