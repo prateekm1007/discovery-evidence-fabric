@@ -68,6 +68,38 @@ def classify(candidate: dict, evidence_verification: dict, prior_art: dict, adve
     
     state = "CANDIDATE_CONNECTION"
 
+    # ===== Art. XXV separation: non-scientific adversarial states =======
+    # The adversarial challenge may end WITHOUT a scientific verdict about
+    # the candidate: the evaluator transport failed (EVALUATOR_CALL_
+    # FAILED), the evidence gate skipped it (NOT_RUN), or the evaluator
+    # produced an internally invalid verdict (EVALUATION_FAILED). None of
+    # these states is evidence AGAINST the candidate — converting them
+    # into final_status REJECTED would manufacture negative knowledge from
+    # an infrastructure failure (Art. XXI.3/XXV: provider failure is not
+    # absence; unknown stays unknown). The honest outcome is UNKNOWN with
+    # adjudication blocked: promotion is refused AND the cemetery is NOT
+    # written (the conductor only records negative knowledge on REJECTED).
+    # The run stays rerunnable — a later attempt with a healthy evaluator
+    # can still adjudicate the candidate either way.
+    NON_SCIENTIFIC_ADVERSARIAL = {
+        "EVALUATOR_CALL_FAILED",   # transport: timeout / rate limit / error
+        "NOT_RUN",                 # evidence gate skipped the challenge
+        "EVALUATION_FAILED",       # evaluator verdict internally invalid
+    }
+    adv_overall = adversarial.get("overall", "")
+    if adv_overall in NON_SCIENTIFIC_ADVERSARIAL:
+        return {
+            "epistemic_state": "CANDIDATE_CONNECTION",
+            "final_status": "UNKNOWN",
+            "reason": (
+                f"adversarial adjudication incomplete: {adv_overall} — "
+                "infrastructure/evaluator state, NOT a scientific verdict "
+                "(Art. XXV); rerunnable, never negative knowledge"),
+            "promotion_blocked": True,
+            "adjudication_blocked": True,
+            "adversarial_overall": adv_overall,
+        }
+
     # Check adversarial — Item 11: adversarial firewall
     # Adversarial may NOT convert TOPICAL_RELATED or POSSIBLE_RELEVANCE into prior-art kill
     if adversarial.get("overall") != "PASS":

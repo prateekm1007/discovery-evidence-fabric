@@ -86,15 +86,22 @@ def _hash(s): return hashlib.sha256(s.encode()).hexdigest()[:16]
 # Art. VI: populated only from real registry call results.
 _LAST_ATTACK_PROVIDER_META: dict = {"status": "NEVER_CALLED"}
 
-def llm_chat(prompt, system="", max_retries=1, timeout=240):
+def llm_chat(prompt, system="", max_retries=1, timeout=420):
     """E1: transport delegated to the provider registry. The legacy preference
     (NVIDIA primary, OpenRouter fallback) is preserved as an explicit
     preferred_providers policy — substitution stays recorded in the result
     ledger, never silent (Art. IV/XXVII). Returns content or None as before;
     _LAST_ATTACK_PROVIDER_META carries the transport provenance.
-    timeout=240: the frozen deepseek-v4-flash evaluator measured 140-151 s
-    end-to-end on NVIDIA (verified live 2026-08-27); the previous 30 s
-    default produced systematic timeouts after the 8b model retirement."""
+    timeout=420 (raised from 240; measured 2026-08-29, M1 campaign): the
+    frozen deepseek-v4-flash evaluator measured 140-151 s end-to-end on
+    NVIDIA (verified live 2026-08-27), but the same endpoint showed 35 s to
+    >240 s latency variance during the M1 campaign (live measurements:
+    8 KB synthesis prompt 74 s; attack prompt exceeded 2 x 240 s attempts).
+    420 s covers the observed healthy-band tail. This is an OPERATIONAL
+    transport parameter with a recorded measurement basis (Art. XXVII), not
+    a verification-semantics change; transport failure still yields
+    EVALUATOR_CALL_FAILED and classify() maps that to UNKNOWN, never
+    REJECTED (Art. XXV)."""
     global _LAST_ATTACK_PROVIDER_META
     try:
         from discovery_fabric.engine import llm_registry as reg
