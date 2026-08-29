@@ -35,6 +35,9 @@ COVERAGE = REPO_ROOT / "artifacts" / "coverage" / "EVIDENCE_COVERAGE_REPORT.json
 HEALTH = REPO_ROOT / "artifacts" / "source_health" / "SOURCE_HEALTH_REPORT.json"
 CAMPAIGN = (REPO_ROOT / "discovery_campaigns" / "CAMPAIGN_L8_2026-08-29"
             / "CAMPAIGN_REPORT.json")
+M1_REPORT = (REPO_ROOT / "discovery_campaigns"
+             / "M1_DOSSIER_CAMPAIGN_2026-08-29" / "M1_CAMPAIGN_REPORT.json")
+M1_RUNS_ROOT = REPO_ROOT / "ENGINE_RUNS"
 
 
 def _link(name, operating, evidence, prerequisite=None):
@@ -98,37 +101,151 @@ def main() -> int:
          "report": str(CAMPAIGN.relative_to(REPO_ROOT))},
         "universal operator run with surviving candidates"))
 
-    # 4 NOVEL MECHANISM — ranked candidates carry HYPOTHESIS-class
-    # principles; mechanism synthesis for a dossier target is the next
-    # stage's work
-    top = (camp.get("dossier_candidates_ranked") or [{}])[0]
-    links.append(_link(
-        "NOVEL_MECHANISM", False,
-        {"ranked_candidates": survivors,
-         "top_candidate": top.get("candidate_id"),
-         "top_principle": top.get("principle"),
-         "top_class": top.get("principle_class"),
-         "note": "candidates carry HYPOTHESIS-class physical principles "
-                 "with kill conditions — mechanism synthesis per "
-                 "candidate is the next stage"},
-        "dossier-target selection + mechanism synthesis loop"))
+    # 4-12 — the dossier-production chain, evaluated MECHANICALLY from the
+    # M1 campaign's persisted run artifacts (never from narrative). A link
+    # is operating only if at least one M1 candidate's run directory
+    # proves it executed. Transport-blocked executions are recorded as
+    # such — machinery-proven-but-transport-bound is NOT operating (Art.
+    # XXV: infrastructure failure is not a scientific result; Art. XXVIII:
+    # no silent promotion).
+    m1_dirs = sorted(M1_RUNS_ROOT.glob("M1_m1_*"))
 
-    # 5-12 (dossier chain) — not operating in this cycle
-    for name, prereq in [
-        ("PRIOR_ART", "candidate selected for dossier work"),
-        ("ADVERSARIAL_ATTACK", "prior-art stage complete"),
-        ("KILLER_EXPERIMENT", "surviving mechanism + adversarial review"),
-        ("SURVIVING_INVENTION", "killer experiment executed"),
-        ("ENGINEERING_SPECIFICATION", "surviving invention"),
-        ("FULL_TECHNOLOGY_TRANSFER_DOSSIER", "engineering specification"),
-        ("BUYER_ZIP", "dossier passing all gates"),
-        ("PORTFOLIO_REPOSITORY", "buyer zip released by CEO decision"),
-    ]:
-        links.append(_link(
-            name, False,
-            {"note": "not operating in the L-cycle; prerequisite chain "
-                     "starts at NOVEL_MECHANISM"},
-            prereq))
+    def _env(d, stage):
+        p = d / f"envelope_{stage}.json"
+        try:
+            return json.loads(p.read_text())
+        except Exception:  # noqa: BLE001
+            return {}
+
+    synthesized = []
+    prior_art_ran = []
+    attack_scientific = []
+    killer_exp_ran = []
+    survivors = []
+    eng_specs = []
+    packages = []
+    for d in m1_dirs:
+        mm = (_env(d, "SYNTHESIZE").get("mechanism_map") or {})
+        if mm.get("mechanism") and mm.get("intervention"):
+            synthesized.append(d.name)
+        ms = _env(d, "MULTI_SOURCE_DISCOVERY")
+        if (ms.get("prior_art") or ms.get("multi_source")
+                or ms.get("evidence_multisource")):
+            prior_art_ran.append(d.name)
+        overall = ((_env(d, "ATTACK").get("attack_results") or {})
+                   .get("overall"))
+        if overall in ("PASS", "KILLED"):
+            attack_scientific.append((d.name, overall))
+        ke = _env(d, "KILLER_EXPERIMENT").get("killer_experiment") or {}
+        if ke.get("selected"):
+            killer_exp_ran.append(d.name)
+        try:
+            manifest = json.loads((d / "run_manifest.json").read_text())
+        except Exception:  # noqa: BLE001
+            manifest = {}
+        if manifest.get("final_status") == "AUTOMATED_INVENTION_CANDIDATE":
+            survivors.append(d.name)
+        if (d / "ENGINEERING_SPECIFICATION.json").exists():
+            eng_specs.append(d.name)
+        try:
+            pr = json.loads((d / "PACKAGE_REPORT.json").read_text())
+        except Exception:  # noqa: BLE001
+            pr = {}
+        if pr.get("complete"):
+            packages.append((d.name, pr.get("maturity")))
+
+    m1 = json.loads(M1_REPORT.read_text()) if M1_REPORT.exists() else {}
+    m1_classes = (m1.get("summary") or {}).get("release_classes", {})
+    infra_blocked = m1_classes.get("INFRASTRUCTURE_BLOCKED", 0)
+
+    links.append(_link(
+        "NOVEL_MECHANISM", bool(synthesized),
+        {"m1_runs_with_synthesized_mechanism": len(synthesized),
+         "example": (synthesized[0] if synthesized else None),
+         "example_mechanism": (
+             (_env(m1_dirs[0], "SYNTHESIZE")
+              .get("mechanism_map", {}).get("mechanism", "")[:120])
+             if synthesized and m1_dirs else None),
+         "campaign": "M1_DOSSIER_CAMPAIGN_2026-08-29",
+         "transport_note": (
+             "synthesis executes when the LLM endpoint is healthy; the "
+             "single available endpoint (NVIDIA deepseek-v4-flash) "
+             "oscillates 35 s..>240 s latency — blocked runs are "
+             "rerunnable (Art. XXV)")},
+        "LLM transport recovery (a second provider credential would "
+        "de-risk this link)"))
+
+    links.append(_link(
+        "PRIOR_ART", bool(prior_art_ran),
+        {"m1_runs_with_live_prior_art_search": len(prior_art_ran),
+         "note": "MULTI_SOURCE_DISCOVERY executes per run (PubMed/"
+                 "EuropePMC/Lens live queries); a search result is NOT a "
+                 "novelty determination (Art. XXVIII)"},
+        "candidate synthesized"))
+
+    links.append(_link(
+        "ADVERSARIAL_ATTACK", bool(attack_scientific),
+        {"m1_runs_with_scientific_verdict": len(attack_scientific),
+         "verdicts": attack_scientific[:5],
+         "transport_blocked_runs": infra_blocked,
+         "note": ("the attack stage EXECUTED on every run; verdict "
+                  "production is transport-bound. Infrastructure "
+                  "failures map to final_status UNKNOWN (never REJECTED, "
+                  "never cemetery) — the Art. XXV separation is pinned by "
+                  "tests/test_adversarial_infra_separation.py")},
+        "healthy adversarial-evaluator transport"))
+
+    links.append(_link(
+        "KILLER_EXPERIMENT", bool(killer_exp_ran),
+        {"m1_runs_with_selected_experiment": len(killer_exp_ran),
+         "selector": "BayesianEIGCalculator.rank_experiments "
+                     "(deterministic; MODEL_DERIVED priors labeled)"},
+        "adjudicated candidate"))
+
+    links.append(_link(
+        "SURVIVING_INVENTION", bool(survivors),
+        {"m1_survivors": len(survivors),
+         "classification_rule": "final_status AUTOMATED_INVENTION_CANDIDATE "
+                                "(M6: no silent promotion)",
+         "release_classes_so_far": m1_classes},
+        "a candidate passing evidence verify + prior art + scientific "
+        "adversarial verdict + falsification gate (needs healthy "
+        "transport)"))
+
+    links.append(_link(
+        "ENGINEERING_SPECIFICATION", bool(eng_specs),
+        {"m1_runs_with_engineering_spec": len(eng_specs),
+         "machinery_note": ("the spec builder + attack/repair/selection "
+                            "pipeline is proven (rehearsal E11/E15/E16; "
+                            "real run F_SMOKE_REAL_P01 produced a full "
+                            "spec + package); in M1 it requires a "
+                            "survivor")},
+        "a surviving invention"))
+
+    links.append(_link(
+        "FULL_TECHNOLOGY_TRANSFER_DOSSIER", bool(packages),
+        {"m1_complete_packages": len(packages),
+         "packages": packages[:5],
+         "machinery_note": ("package factory renders the 6-PDF + 3-JSON "
+                            "+ zip hierarchy automatically once a "
+                            "survivor exists")},
+        "engineering specification passing the quality gate"))
+
+    links.append(_link(
+        "BUYER_ZIP", bool(packages),
+        {"m1_buyer_zips": len(packages),
+         "note": "buyer zip is part of the package factory output"},
+        "complete dossier"))
+
+    links.append(_link(
+        "PORTFOLIO_REPOSITORY", False,
+        {"boundary": ("discovery-evidence-fabric -> SURVIVING INVENTION "
+                      "-> RELEASE GATE (CEO) -> "
+                      "technology-transfer-portfolio-15"),
+         "note": ("CEO-gated by design (M5): the portfolio repository "
+                  "receives only CEO-released packages; the campaign "
+                  "never writes there automatically")},
+        "CEO release decision on a TRANSFER_PACKAGE_READY candidate"))
 
     # FAILED CANDIDATE -> CEMETERY -> FUTURE SEARCH CONSTRAINT
     cemetery = load_cemetery()
@@ -160,14 +277,21 @@ def main() -> int:
             "links_operating": operating,
             "links_total": len(links),
             "honest_position": (
-                "The evidence substrate (links 1-3) is operating: all 10 "
-                "coverage dimensions covered, all 13 authority roles "
-                "LIVE, the universal failure->gap->opportunity operator "
-                "ran 15 territories with 22 ranked candidates and 3 "
-                "engine kills. Links 4-12 (mechanism synthesis through "
-                "portfolio release) are the dossier-production stage — "
-                "deliberately NOT claimed. The cemetery loop is "
-                "operating with engine consultation."
+                "Evidence substrate (links 1-3) operating: 10/10 coverage "
+                "dimensions, 13/13 authority roles LIVE, universal "
+                "operator ran 15 territories (22 ranked candidates, 3 "
+                "engine kills). The M1 dossier campaign connected the "
+                "conductor to those candidates: mechanism synthesis, "
+                "prior-art search and killer-experiment selection execute "
+                "live per candidate; the adversarial verdict, survivor "
+                "gate and package production are TRANSPORT-BOUND — the "
+                "only available LLM endpoint (NVIDIA deepseek-v4-flash) "
+                "oscillates 35 s..>240 s and Mistral is 401-invalid. "
+                "Blocked runs are honestly recorded "
+                "INFRASTRUCTURE_BLOCKED and rerunnable; evaluator transport failure can "
+                "never produce a false kill (Art. XXV separation, "
+                "regression-pinned). The portfolio boundary stays "
+                "CEO-gated (M5)."
             ),
         },
         "builder_measured_disclosure": {

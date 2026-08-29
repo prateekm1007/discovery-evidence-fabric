@@ -180,7 +180,10 @@ def _run_one(entry: dict, index: int, probe: dict) -> dict:
         })
         return record
 
-    if (not has_progress) and probe.get("status") != "OK":
+    # Gate-passing probe states: a direct OK, the batch-probe-passed
+    # sentinel, or the explicit --no-probe flag (operator responsibility).
+    _GATE_PASS = ("OK", "BATCH_PROBE_PASSED", "SKIPPED_BY_FLAG")
+    if (not has_progress) and probe.get("status") not in _GATE_PASS:
         record.update({
             "status": "SKIPPED_ENDPOINT_UNHEALTHY",
             "release_class": "INFRASTRUCTURE_BLOCKED",
@@ -343,6 +346,11 @@ def main():
                     help="rebuild the aggregate report from RUN_*.json")
     ap.add_argument("--no-probe", action="store_true",
                     help="skip the pre-flight transport probe")
+    ap.add_argument("--batch-probe", action="store_true",
+                    help="probe ONCE per invocation and gate the whole "
+                         "batch on it (fast batch-skip when the endpoint "
+                         "is dead; runs with persisted progress still "
+                         "resume regardless)")
     args = ap.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -375,16 +383,58 @@ def main():
     selected = [int(x) for x in args.only.split(",") if x.strip()] \
         if args.only else list(range(1, len(candidates) + 1))
 
+    # Batch probe: ONE transport probe gates the whole batch. A dead
+    # endpoint produces instant honest SKIPPED records for every fresh
+    # candidate (no per-candidate timeout burn); a healthy endpoint runs
+    # the batch. Runs with persisted progress are exempt (they resume
+    # regardless — their stages fail honestly and stay resumable).
+    batch_probe = None
+    if args.batch_probe and not args.no_probe:
+        batch_probe = _preflight_probe()
+        print(f"[m1] batch probe: {batch_probe.get('status')} "
+              f"({batch_probe.get('latency_ms', '?')} ms)")
+
     for i in selected:
         entry = candidates[i - 1]
         rec_path = OUT_DIR / f"RUN_{i}.json"
+        problem = build_engine_problem(entry)
+        has_progress = any(_run_dir_for(problem["problem_id"])
+                           .glob("envelope_*.json"))
         print(f"\n[m1] === candidate {i}/{len(candidates)}: "
               f"{entry['ranked']['candidate_id']} ===")
 
-        probe = {"status": "SKIPPED_BY_FLAG"} if args.no_probe \
-            else _preflight_probe()
-        print(f"[m1] preflight probe: {probe.get('status')} "
-              f"({probe.get('latency_ms', '?')} ms)")
+        if (batch_probe is not None and batch_probe.get("status") != "OK"
+                and not has_progress):
+            record = {
+                "index": i,
+                "problem_id": problem["problem_id"],
+                "candidate_id": entry["ranked"]["candidate_id"],
+                "territory_id": entry["ranked"].get("territory_id"),
+                "campaign_slot": entry["ranked"].get("campaign_slot"),
+                "device": entry["ranked"].get("device_query"),
+                "principle": entry["ranked"].get("principle"),
+                "principle_class": entry["ranked"].get("principle_class"),
+                "survivor_score": entry["ranked"].get("survivor_score", {}),
+                "run_dir": str(_run_dir_for(problem["problem_id"])
+                               .relative_to(REPO_ROOT)),
+                "status": "SKIPPED_ENDPOINT_UNHEALTHY",
+                "release_class": "INFRASTRUCTURE_BLOCKED",
+                "preflight_probe": batch_probe,
+                "note": ("batch probe failed — endpoint unhealthy; fresh "
+                         "run deferred (Art. XXV: no fake progress)"),
+            }
+            rec_path.write_text(json.dumps(
+                record, indent=1, ensure_ascii=False, default=str))
+            print(f"[m1] -> SKIPPED_ENDPOINT_UNHEALTHY (batch)")
+            continue
+
+        probe = ({"status": "BATCH_PROBE_PASSED"} if batch_probe
+                 else {"status": "SKIPPED_BY_FLAG"} if args.no_probe
+                 else _preflight_probe())
+        if probe.get("status") not in ("BATCH_PROBE_PASSED",
+                                        "SKIPPED_BY_FLAG"):
+            print(f"[m1] preflight probe: {probe.get('status')} "
+                  f"({probe.get('latency_ms', '?')} ms)")
 
         try:
             record = _run_one(entry, i, probe)
