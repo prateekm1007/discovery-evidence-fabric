@@ -114,6 +114,37 @@ def render_buyer_card(pkg, hl, comm, eco, loopstate, out_path):
     caps = "; ".join(profile.get("required_capabilities", []))
     ec = loopstate["evidence_class_counts"]
 
+    # ---- FIVE DECISION CRITICALS (CEO R372-5) --------------------------
+    # The five things a buyer must see immediately. The nine-question
+    # architecture below remains the full decision structure.
+    crit_rows = [
+        ["1. WHAT IS THE INVENTION?", _mut(pkg, hl["mechanism"])],
+        ["2. WHAT IS ACTUALLY ESTABLISHED?",
+         f"Engineering definition: {len(pkg.equations)} governing equations, "
+         f"{len(pkg.design_inputs)} design inputs, {len(pkg.design_outputs)} "
+         f"design outputs, {len(pkg.failure_analysis)} failure modes analyzed, "
+         f"{len(pkg.build_plan)}-step build plan. "
+         f"{ec.get('SOURCE_FACT',0)+ec.get('EXTERNAL_PRECEDENT',0)} "
+         f"source-backed claims; {ec.get('PHYSICAL_OBSERVATION',0)} physical "
+         f"observations (none — no prototype exists; all verification "
+         f"NOT_TESTED)."],
+        ["3. WHAT REMAINS UNCERTAIN?",
+         f"{len(pkg.unknowns)} recorded UNKNOWNs with resolution roadmap "
+         f"(resolution classes in the engineering dossier); market size, "
+         f"competitive landscape, FTO and novelty NOT_ESTABLISHED."],
+        ["4. CHEAPEST DECISIVE NEXT EXPERIMENT?",
+         f"{wp1.get('work_package','WP-01')}: {wp1.get('test_article','')} — "
+         f"{wp1.get('measurement','')}. Recorded effort: "
+         f"{wp1.get('estimated_effort','NOT_RECORDED')}. Cost NOT_ESTABLISHED "
+         f"(no quotation basis — vendor quotations required); this is the "
+         f"first, lowest-cost-known step of the recorded build plan."],
+        ["5. WHAT EVIDENCE WOULD CAUSE THE BUYER TO STOP?", hl["kill_if"]],
+    ]
+    st.append(Paragraph("THE FIVE DECISION CRITICALS", S["SH"]))
+    st.append(_tbl([["Critical", "Answer"]] + crit_rows,
+                   [1.6 * 72, 5.0 * 72], fontsize=7.4))
+    st.append(Spacer(1, 6))
+
     qa = [
         ("1. WHAT IS IT?", _mut(pkg, hl["mechanism"])),
         ("2. WHY DOES IT MATTER?", _mut(pkg, hl["problem"])),
@@ -237,6 +268,13 @@ def render_evidence_summary(pkg, hl, loopstate, out_path):
             st.append(Paragraph(_esc(
                 f"{m.get('mutation_id')}: {m.get('field_affected')} — "
                 f"reason: {str(m.get('reason',''))[:300]}"), S["SM"]))
+            # R372-6: the V2 text itself is rendered in the buyer document
+            # (a trail that only names the mutation without showing the
+            # correction leaves the buyer with V1 content)
+            v2_text = str(m.get("v2_text", ""))
+            if v2_text:
+                st.append(Paragraph(_esc(
+                    f"V2 text now in effect: {v2_text[:700]}"), S["SM"]))
         st.append(Paragraph(
             "Full V1->V2 text trail ships as V2_MUTATION_ADDENDUM.json in this package.",
             S["DIS"]))
@@ -270,11 +308,11 @@ def render_transfer_manifest(pkg, hl, comm, out_path):
 
     st.append(Paragraph("WHAT TRANSFERS", S["SH"]))
     for item in tb.get("buyer_receives", []):
-        st.append(Paragraph("• " + _esc(item), S["BC"]))
+        st.append(Paragraph("• " + _esc(_mut(pkg, item)), S["BC"]))
 
     st.append(Paragraph("WHAT DOES NOT TRANSFER (BUYER MUST DEVELOP)", S["SH"]))
     for item in (tb.get("buyer_must_develop", []) or []):
-        st.append(Paragraph("• " + _esc(item), S["BC"]))
+        st.append(Paragraph("• " + _esc(_mut(pkg, item)), S["BC"]))
     if not (tb.get("buyer_must_develop")):
         st.append(Paragraph("• See engineering dossier build plan — the "
                             "buyer executes the validation work packages.", S["BC"]))

@@ -1,14 +1,18 @@
 """
-build_v5.py — R371 portfolio V5 build orchestrator (entry point).
+build_v5.py — R371 portfolio V5 build orchestrator (R372 release-grade
+extension).
 
 Build order (each step fails closed):
   1. Load canonical packages + V2-mutation-aware headlines
-  2. Derive per-package artifacts (commercial, equations, unknown roadmap,
-     economics, loop state)
-  3. Generate the two technical visuals per package (mechanism + experiment)
+  2. Derive per-package artifacts (commercial, equations + R372 validation,
+     unknown roadmap, economics, loop state, R372 traceability semantics)
+  3. Generate the two technical visuals per package (mechanism + experiment,
+     the experiment diagram rendered from the machine-checkable spec)
   4. Render the six buyer PDFs per package + machine-readable JSON layer
+     (the buyer card carries the FIVE DECISION CRITICALS block)
   5. Build the 15 package ZIPs from the folders
-  6. Render portfolio-level documents (index/ranking, master, release report)
+  6. Render portfolio-level documents (index/ranking, master, release report
+     incl. the R372 traceability semantics table)
   7. Build PORTFOLIO_IDENTITY_REGISTRY.json from the actual artifacts
   8. Build RELEASE_CONTENT_MANIFEST.json from the actual filesystem,
      generate README.md from it, build the master ZIP from it
@@ -43,6 +47,11 @@ from premium_package_factory.r371.loopstate import build_loop_state, portfolio_l
 from premium_package_factory.r371.mechanism_diagram import build_all_mechanism_diagrams
 from premium_package_factory.r371.ranking import build_ranking
 from premium_package_factory.r371.unknowns import build_unknown_roadmap
+from premium_package_factory.r372.diagram_adequacy import (
+    experiment_diagram_spec, validate_experiment_spec)
+from premium_package_factory.r372.equation_validation import validate_registry
+from premium_package_factory.r372.traceability_semantics import (
+    build_traceability_json, portfolio_traceability_table)
 
 FACTORY_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 ENGINE_ROOT = os.path.dirname(FACTORY_ROOT)
@@ -96,14 +105,35 @@ def build(portfolio_root, work_dir=None):
 
     comm = {p.pkg_id: build_commercial_evidence(p) for p in packages}
     eqs = {p.pkg_id: build_equation_registry(p) for p in packages}
+    eq_validations = {p.pkg_id: validate_registry(eqs[p.pkg_id], p)
+                      for p in packages}
+    for p in packages:
+        # R372-3: validation ships inside the buyer-visible registry
+        eqs[p.pkg_id]["r372_validation"] = eq_validations[p.pkg_id]
     roads = {p.pkg_id: build_unknown_roadmap(p) for p in packages}
     ecos = {p.pkg_id: build_validation_economics(p) for p in packages}
     loops = {p.pkg_id: build_loop_state(p) for p in packages}
     loop_summary = portfolio_loop_summary(packages)
     ranking = build_ranking(packages, headlines, roads)
+    # R372-1: explicit traceability semantics per package
+    traces = {}
+    for p in packages:
+        legacy = os.path.join(INPUT_DIR, "legacy_json", p.num,
+                              "ENGINEERING_TRACEABILITY.json")
+        traces[p.pkg_id] = build_traceability_json(p, legacy)
+    # R372-2: experiment-diagram specs validated at build time (fail closed)
+    exp_specs = {p.pkg_id: experiment_diagram_spec(p, headlines[p.pkg_id])
+                 for p in packages}
+    for p in packages:
+        spec_check = validate_experiment_spec(exp_specs[p.pkg_id], p,
+                                              headlines[p.pkg_id])
+        if not spec_check["ok"]:
+            raise RuntimeError(
+                f"experiment diagram spec invalid for {p.pkg_id}: "
+                f"{spec_check['failures']}")
 
     # 3. visuals --------------------------------------------------------------
-    print("[R371] generating technical visuals ...")
+    print("[R372] generating technical visuals ...")
     mech_dir = os.path.join(work, "mechanism")
     mech_pngs = build_all_mechanism_diagrams(mech_dir)
     exp_dir = os.path.join(work, "experiment")
@@ -112,7 +142,8 @@ def build(portfolio_root, work_dir=None):
     for p in packages:
         exp_pngs[p.pkg_id] = build_experiment_diagram(
             p, headlines[p.pkg_id],
-            os.path.join(exp_dir, f"{p.num}_experiment_setup.png"))
+            os.path.join(exp_dir, f"{p.num}_experiment_setup.png"),
+            spec=exp_specs[p.pkg_id])
 
     # 4. per-package render -----------------------------------------------------
     print("[R371] rendering 15 packages ...")
@@ -140,8 +171,12 @@ def build(portfolio_root, work_dir=None):
                                     os.path.join(pdir, "05_TRANSFER_MANIFEST.pdf"))
 
         # machine-readable layer
+        # R372-1: ENGINEERING_TRACEABILITY.json now carries explicit
+        # per-chain semantics (legacy R370 record preserved inside it)
+        _write_json(os.path.join(pdir, "ENGINEERING_TRACEABILITY.json"),
+                    traces[p.pkg_id])
         legacy_num = os.path.join(INPUT_DIR, "legacy_json", p.num)
-        for fn in ("ENGINEERING_TRACEABILITY.json", "MATURITY_BASIS.json"):
+        for fn in ("MATURITY_BASIS.json",):
             src = os.path.join(legacy_num, fn)
             if os.path.exists(src):
                 shutil.copy2(src, os.path.join(pdir, fn))
@@ -224,7 +259,7 @@ def build(portfolio_root, work_dir=None):
                 zf.write(os.path.join(pdir, f), f)
 
     # 6. portfolio-level documents -----------------------------------------------
-    print("[R371] rendering portfolio documents ...")
+    print("[R372] rendering portfolio documents ...")
     bp.render_portfolio_index(
         ranking, loop_summary,
         os.path.join(portfolio_root, "PORTFOLIO_INDEX.pdf"))
@@ -257,8 +292,10 @@ def build(portfolio_root, work_dir=None):
     _write_json(os.path.join(portfolio_root, "PORTFOLIO_RANKING.json"), ranking)
 
     # 7. identity registry from the actual artifacts -------------------------------
-    print("[R371] building identity registry ...")
-    registry = build_registry(portfolio_root)
+    print("[R372] building identity registry ...")
+    registry = build_registry(
+        portfolio_root,
+        statuses={p.pkg_id: "V2" for p in packages if p.addendum})
     for row in registry["packages"]:
         pkg = next(p for p in packages if p.pkg_id == row["historical_package_id"])
         row["technology_name"] = headlines[pkg.pkg_id]["technology_name"]
@@ -270,7 +307,9 @@ def build(portfolio_root, work_dir=None):
     # pass (acceptance-gate results live in INTERNAL_QA/ and RELEASE/, not here)
     bp.render_release_report(
         ranking, loop_summary, {},
-        os.path.join(portfolio_root, "PORTFOLIO_RELEASE_REPORT.pdf"))
+        os.path.join(portfolio_root, "PORTFOLIO_RELEASE_REPORT.pdf"),
+        traceability=traces, packages=packages,
+        equation_validation=eq_validations)
     # pass 1: manifest without README -> GENERATE README from it
     rc_manifest = bp.build_release_content_manifest(portfolio_root,
                                                     include_readme=False)

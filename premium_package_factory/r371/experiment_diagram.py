@@ -1,12 +1,22 @@
 """
-experiment_diagram.py — R371 Phase 5, Visual 2: decisive-experiment /
-verification-setup diagram, auto-derived from canonical engineering data.
+experiment_diagram.py — R371 Phase 5 / R372-2 upgrade: decisive-experiment
+/ verification-setup diagram, rendered FROM a structured, machine-checkable
+spec (r372.diagram_adequacy.experiment_diagram_spec).
+
+Every box corresponds to a required experiment role (CEO R372-2):
+  test article / stimulus / instrumentation / measured outputs /
+  control variables / decision criterion / kill condition
 
 Every label comes from the canonical engineering record:
   test article   <- build plan WP-01 .test_article
+  stimulus       <- verification V-001 .method (the applied test protocol)
   apparatus      <- build plan WP-01 .equipment
   measurement    <- build plan WP-01 .measurement
   acceptance     <- verification V-001 .acceptance (or WP acceptance_criterion)
+  control vars   <- critical parameters (recorded values) with the explicit
+                    NOT_SEPARATELY_RECORDED marker — the canonical record has
+                    no separate control-variable field and that fact is
+                    stated, never papered over (Constitution Art. XXV)
   fail branch    <- package kill condition (headlines registry)
   duration       <- build plan WP-01 .estimated_effort
 
@@ -56,83 +66,96 @@ def _clean(text: str) -> str:
     return re.sub(r"\s+", " ", str(text)).strip()
 
 
-def build_experiment_diagram(pkg, headlines: dict, out_path: str) -> str:
-    """Render the decisive-experiment setup diagram for one package."""
-    bp = pkg.build_plan
-    wp1 = bp[0] if bp else {}
-    ver = pkg.verification[0] if pkg.verification else {}
-    kill_if = _clean(headlines.get("kill_if", ""))
+def build_experiment_diagram(pkg, headlines: dict, out_path: str,
+                             spec: dict = None) -> str:
+    """Render the decisive-experiment setup diagram for one package FROM
+    the structured spec (built on demand if not supplied)."""
+    if spec is None:
+        from premium_package_factory.r372.diagram_adequacy import (
+            experiment_diagram_spec)
+        spec = experiment_diagram_spec(pkg, headlines)
 
-    test_article = _clean(wp1.get("test_article", "NOT_RECORDED"))
-    equipment = _clean(wp1.get("equipment", "NOT_RECORDED"))
-    measurement = _clean(wp1.get("measurement", "NOT_RECORDED"))
-    acceptance = _clean(
-        ver.get("acceptance") or wp1.get("acceptance_criterion") or "NOT_RECORDED"
-    )
-    duration = _clean(wp1.get("estimated_effort", "NOT_RECORDED"))
-    wp_id = _clean(wp1.get("work_package", "WP-01"))
+    roles = spec["roles"]
+    wp_id = spec.get("work_package", "WP-01")
 
-    fig, ax = plt.subplots(figsize=(11.5, 5.4), constrained_layout=True)
-    ax.set_xlim(0, 12)
-    ax.set_ylim(0, 6)
+    fig, ax = plt.subplots(figsize=(12.5, 7.6), constrained_layout=True)
+    ax.set_xlim(0, 13)
+    ax.set_ylim(0, 8.6)
     ax.axis("off")
 
     # title
-    ax.text(6, 5.72, f"Decisive Experiment Setup — {wp_id}",
+    ax.text(6.5, 8.3, f"Decisive Experiment Setup — {wp_id}",
             ha="center", va="center", fontsize=13.5, fontweight="bold", color=INK)
-    ax.text(6, 5.38,
-            f"{pkg.pkg_id} · {_clean(headlines.get('technology_name',''))[:70]}",
+    ax.text(6.5, 7.95,
+            f"{pkg.pkg_id} · {_clean(headlines.get('technology_name',''))[:80]}",
             ha="center", va="center", fontsize=8.5, color=GREY)
 
-    def box(x, y, w, h, header, body, edge, face):
+    def box(x, y, w, h, header, body, edge, face, body_size=7.0):
         ax.add_patch(FancyBboxPatch((x, y), w, h,
                      boxstyle="round,pad=0.06,rounding_size=0.12",
                      linewidth=1.3, edgecolor=edge, facecolor=face))
         ax.text(x + w / 2, y + h - 0.26, header, ha="center", va="center",
-                fontsize=8.6, fontweight="bold", color=edge)
-        ax.text(x + w / 2, y + (h - 0.5) / 2, _wrap(body, 26), ha="center",
-                va="center", fontsize=7.2, color=INK)
+                fontsize=8.4, fontweight="bold", color=edge)
+        ax.text(x + w / 2, y + (h - 0.5) / 2, _wrap(body, 30), ha="center",
+                va="center", fontsize=body_size, color=INK)
 
-    def arrow(x1, y1, x2, y2, label="", color=INK, style="-|>", rad=0.0):
+    def arrow(x1, y1, x2, y2, label="", color=INK, rad=0.0):
         ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2),
-                     arrowstyle=style, mutation_scale=13, linewidth=1.2,
+                     arrowstyle="-|>", mutation_scale=13, linewidth=1.2,
                      color=color,
                      connectionstyle=f"arc3,rad={rad}"))
         if label:
             ax.text((x1 + x2) / 2, (y1 + y2) / 2 + 0.16, label, ha="center",
                     va="center", fontsize=7.4, color=color, fontweight="bold")
 
-    # main chain: test article -> apparatus -> measurement -> acceptance
-    bw, bh = 2.55, 1.9
-    y0 = 3.0
-    box(0.35, y0, bw, bh, "TEST ARTICLE", test_article, BRAND, BRAND_LIGHT)
-    box(3.35, y0, bw, bh, "APPARATUS", equipment, BRAND, BRAND_LIGHT)
-    box(6.35, y0, bw, bh, "MEASURED QUANTITY", measurement, BRAND, BRAND_LIGHT)
-    box(9.35, y0, 2.35, bh, "ACCEPTANCE GATE", acceptance, GREEN, GREEN_LIGHT)
+    # Row 1: test article -> stimulus -> instrumentation
+    bw, bh = 3.6, 1.75
+    y1 = 5.6
+    box(0.3, y1, bw, bh, "TEST ARTICLE", roles["test_article"]["content"],
+        BRAND, BRAND_LIGHT)
+    box(4.3, y1, 3.5, bh, "STIMULUS", roles["stimulus"]["content"],
+        BRAND, BRAND_LIGHT)
+    box(8.6, y1, 4.1, bh, "INSTRUMENTATION",
+        roles["instrumentation"]["content"], BRAND, BRAND_LIGHT)
+    arrow(3.9, y1 + bh / 2, 4.3, y1 + bh / 2)
+    arrow(7.8, y1 + bh / 2, 8.6, y1 + bh / 2)
 
-    arrow(2.9, y0 + bh / 2, 3.35, y0 + bh / 2)
-    arrow(5.9, y0 + bh / 2, 6.35, y0 + bh / 2)
-    arrow(8.9, y0 + bh / 2, 9.35, y0 + bh / 2)
+    # Row 2: control variables -> measured outputs -> decision criterion
+    bw2, bh2 = 3.6, 1.75
+    y2 = 3.3
+    box(0.3, y2, bw2, bh2, "CONTROL VARIABLES",
+        roles["control_variables"]["content"], GREY, "#f4f4f4", body_size=6.4)
+    box(4.4, y2, bw2, bh2, "MEASURED OUTPUTS",
+        roles["measured_outputs"]["content"], BRAND, BRAND_LIGHT)
+    box(8.5, y2, 4.2, bh2, "DECISION CRITERION",
+        roles["decision_criterion"]["content"], GREEN, GREEN_LIGHT)
+    arrow(3.9, y1, 3.9, y2 + bh2, rad=0.0)          # article under test
+    arrow(3.9, y2 + bh2 / 2, 4.4, y2 + bh2 / 2)      # controls -> setup
+    arrow(8.0, y2 + bh2 / 2, 8.5, y2 + bh2 / 2)      # measurement -> criterion
+    arrow(10.6, y1, 10.6, y2 + bh2)                   # apparatus -> measurement
 
-    # duration band under main chain
-    ax.text(1.62, y0 - 0.34, f"Planned effort: {duration}", ha="center",
-            va="center", fontsize=7.0, color=GREY, style="italic")
+    # duration band
+    ax.text(2.1, y1 - 0.32,
+            f"Planned effort: {spec.get('planned_effort', 'NOT_RECORDED')}",
+            ha="center", va="center", fontsize=7.0, color=GREY, style="italic")
 
-    # outcome branches from acceptance gate
-    box(9.35, 0.55, 2.35, 1.35, "PASS → ADVANCE",
+    # outcome branches from decision criterion
+    box(8.5, 0.75, 4.2, 1.5, "PASS → ADVANCE",
         "Proceed to next work package in the canonical build plan",
         GREEN, GREEN_LIGHT)
-    box(5.6, 0.55, 3.2, 1.35, "FAIL → KILL CONDITION",
-        kill_if, RED, RED_LIGHT)
-    arrow(10.5, y0, 10.5, 1.9, "PASS", GREEN)
-    arrow(9.35, y0 + 0.35, 8.8, 1.9, "FAIL", RED, rad=0.18)
+    box(4.4, 0.75, 3.6, 1.5, "FAIL → KILL CONDITION",
+        roles["kill_condition"]["content"], RED, RED_LIGHT)
+    arrow(10.2, y2, 10.6, 2.25, "PASS", GREEN)
+    arrow(8.5, y2 + 0.35, 8.0, 2.25, "FAIL", RED, rad=0.18)
 
     # provenance footer
-    ax.text(0.35, 0.18,
+    ax.text(0.3, 0.28,
             "Schematic auto-derived from the canonical engineering build plan and "
             "verification record. No prototype exists and no experiment has been run "
-            "(all verification results NOT_TESTED).",
-            ha="left", va="center", fontsize=6.6, color=GREY, style="italic")
+            "(all verification results NOT_TESTED). Control variables: the canonical "
+            "record does not enumerate held-constant variables separately — recorded "
+            "critical parameters are shown verbatim.",
+            ha="left", va="center", fontsize=6.3, color=GREY, style="italic")
 
     fig.savefig(out_path, dpi=220, facecolor="white")
     plt.close(fig)
@@ -141,11 +164,14 @@ def build_experiment_diagram(pkg, headlines: dict, out_path: str) -> str:
 
 def build_all(packages, headlines_by_pkg: dict, out_dir: str) -> dict:
     """Render experiment diagrams for all packages. Returns {pkg_id: path}."""
+    from premium_package_factory.r372.diagram_adequacy import (
+        experiment_diagram_spec)
     os.makedirs(out_dir, exist_ok=True)
     paths = {}
     for pkg in packages:
         h = headlines_by_pkg.get(pkg.pkg_id, {})
+        spec = experiment_diagram_spec(pkg, h)
         fp = os.path.join(out_dir, f"{pkg.num}_experiment_setup.png")
-        build_experiment_diagram(pkg, h, fp)
+        build_experiment_diagram(pkg, h, fp, spec=spec)
         paths[pkg.pkg_id] = fp
     return paths

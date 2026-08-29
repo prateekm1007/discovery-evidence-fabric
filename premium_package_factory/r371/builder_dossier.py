@@ -63,9 +63,10 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
         st.append(Paragraph(_esc(_mut(pkg, sa.get("description", ""))), S["BT"]))
         rows = [["ID", "Subsystem", "Function", "Status", "Evidence source"]]
         for sub in sa.get("subsystems", []):
-            rows.append([sub.get("id", ""), sub.get("name", ""),
-                         sub.get("function", ""), sub.get("status", ""),
-                         sub.get("evidence_source", "")[:70]])
+            rows.append([sub.get("id", ""), _mut(pkg, sub.get("name", "")),
+                         _mut(pkg, sub.get("function", "")),
+                         sub.get("status", ""),
+                         _mut(pkg, str(sub.get("evidence_source", ""))[:70])])
         if len(rows) > 1:
             st.append(_tbl(rows, [0.5 * 72, 1.35 * 72, 1.9 * 72, 0.75 * 72, 1.9 * 72]))
     st.append(Spacer(1, 6))
@@ -122,9 +123,10 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     st.append(Paragraph("4. CRITICAL PARAMETERS (UNKNOWN preserved)", S["SH"]))
     rows = [["Parameter", "Recorded value", "Unit", "Basis", "Verification required"]]
     for cp in pkg.critical_parameters:
-        rows.append([cp.get("name", ""), str(cp.get("value", ""))[:120],
-                     cp.get("unit", ""), cp.get("basis", ""),
-                     cp.get("verification_requirement", "")])
+        rows.append([_mut(pkg, cp.get("name", "")),
+                     _mut(pkg, str(cp.get("value", ""))[:120]),
+                     cp.get("unit", ""), _mut(pkg, cp.get("basis", "")),
+                     _mut(pkg, cp.get("verification_requirement", ""))])
     if len(rows) > 1:
         st.append(_tbl(rows, [1.5 * 72, 1.9 * 72, 0.7 * 72, 0.9 * 72, 1.4 * 72]))
 
@@ -132,32 +134,34 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     st.append(Paragraph("5. DESIGN INPUTS / DESIGN OUTPUTS", S["SH"]))
     rows = [["ID", "Design input", "Value / source"]]
     for di in pkg.design_inputs[:14]:
-        rows.append([di.get("id", ""), di.get("input", ""),
-                     str(di.get("value", ""))[:150]])
+        rows.append([di.get("id", ""), _mut(pkg, di.get("input", "")),
+                     _mut(pkg, str(di.get("value", ""))[:150])])
     st.append(_tbl(rows, [0.55 * 72, 1.7 * 72, 4.4 * 72]))
     st.append(Spacer(1, 5))
     rows = [["ID", "Design output", "Status", "Missing inputs"]]
     for do in pkg.design_outputs[:14]:
-        rows.append([do.get("id", ""), do.get("description", ""),
+        rows.append([do.get("id", ""), _mut(pkg, do.get("description", "")),
                      do.get("status", ""),
-                     "; ".join(do.get("missing_inputs", []) or [])[:110]])
+                     _mut(pkg, "; ".join(do.get("missing_inputs", []) or [])[:110])])
     st.append(_tbl(rows, [0.55 * 72, 2.3 * 72, 0.8 * 72, 3.0 * 72]))
 
     # -- 6. failure analysis --------------------------------------------------
     st.append(Paragraph("6. FAILURE ANALYSIS", S["SH"]))
     rows = [["Failure mode", "Mechanism", "Design feature affected", "Evidence"]]
     for fm in pkg.failure_analysis[:10]:
-        rows.append([fm.get("failure_mode", ""), fm.get("mechanism", ""),
-                     fm.get("design_feature_affected", ""),
-                     str(fm.get("evidence", ""))[:130]])
+        rows.append([_mut(pkg, fm.get("failure_mode", "")),
+                     _mut(pkg, fm.get("mechanism", "")),
+                     _mut(pkg, fm.get("design_feature_affected", "")),
+                     _mut(pkg, str(fm.get("evidence", ""))[:130])])
     st.append(_tbl(rows, [1.3 * 72, 1.7 * 72, 1.4 * 72, 2.25 * 72]))
 
     # -- 7. verification + experiment diagram ---------------------------------
     st.append(Paragraph("7. VERIFICATION AND VALIDATION", S["SH"]))
     rows = [["ID", "Requirement", "Method", "Acceptance", "Result"]]
     for v in pkg.verification[:10]:
-        rows.append([v.get("id", ""), v.get("requirement", ""),
-                     v.get("method", ""), str(v.get("acceptance", ""))[:90],
+        rows.append([v.get("id", ""), _mut(pkg, v.get("requirement", "")),
+                     _mut(pkg, v.get("method", "")),
+                     _mut(pkg, str(v.get("acceptance", ""))[:90]),
                      v.get("result", "NOT_TESTED")])
     st.append(_tbl(rows, [0.5 * 72, 1.7 * 72, 1.8 * 72, 1.7 * 72, 0.8 * 72]))
     for v in pkg.validation[:6]:
@@ -176,9 +180,9 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     rows = [["WP", "Test article", "Measurement", "Acceptance criterion", "Recorded effort"]]
     for step in pkg.build_plan:
         rows.append([step.get("work_package", ""),
-                     str(step.get("test_article", ""))[:110],
-                     str(step.get("measurement", ""))[:110],
-                     str(step.get("acceptance_criterion", ""))[:110],
+                     _mut(pkg, str(step.get("test_article", ""))[:110]),
+                     _mut(pkg, str(step.get("measurement", ""))[:110]),
+                     _mut(pkg, str(step.get("acceptance_criterion", ""))[:110]),
                      step.get("estimated_effort", "")])
     st.append(_tbl(rows, [0.45 * 72, 1.65 * 72, 1.65 * 72, 1.65 * 72, 0.9 * 72]))
     st.append(Paragraph(_esc(
@@ -244,10 +248,10 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     tb = pkg.transfer_boundary or {}
     st.append(Paragraph("BUYER RECEIVES:", S["QH"]))
     for item in tb.get("buyer_receives", []):
-        st.append(Paragraph("• " + _esc(item), S["BC"]))
+        st.append(Paragraph("• " + _esc(_mut(pkg, item)), S["BC"]))
     st.append(Paragraph("BUYER MUST DEVELOP:", S["QH"]))
     for item in (tb.get("buyer_must_develop", []) or []):
-        st.append(Paragraph("• " + _esc(item), S["BC"]))
+        st.append(Paragraph("• " + _esc(_mut(pkg, item)), S["BC"]))
     st.append(Paragraph("KILL CONDITION (falsification criterion):", S["QH"]))
     st.append(Paragraph(_esc(hl["kill_if"]), ParagraphStyleKill()))
 

@@ -173,7 +173,7 @@ def diagram_P01(name="P-01"):
     """
     fig, ax = _setup_axes(figsize=(9, 6.2), xlim=(0, 11), ylim=(0, 7))
 
-    _title(ax, "P-01 Rate-Limited Conductance Control",
+    _title(ax, "P-01 Multi-Segment CSF Shunt",
            "Multi-segment catheter + Bayesian occlusion predictor + alpha controller",
            y=6.7)
 
@@ -258,17 +258,17 @@ def diagram_P02(name="P-02"):
            label_size=7.5, label_offset=(0, 0.2))
 
     # Adaptive profile generator
-    _block(ax, 5.6, 3.5, 2.0, 1.0, "Adaptive Profile", sublabel="P_open(t) generator",
+    _block(ax, 5.6, 3.5, 2.0, 1.0, "Adaptive Profile", sublabel="opening profile\n(k_p, k_d)",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
-    _arrow(ax, 4.8, 4.0, 5.6, 4.0, color=INK_700, lw=1.2, label="features",
+    _arrow(ax, 4.8, 4.0, 5.6, 4.0, color=INK_700, lw=1.2, label="trends",
            label_size=7.5, label_offset=(0, 0.2))
 
     # Valve actuator
     _block(ax, 8.4, 3.5, 1.8, 1.0, "Valve Actuator", sublabel="(programmable valve)",
            color=BRAND_700, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
-    _arrow(ax, 7.6, 4.0, 8.4, 4.0, color=INK_700, lw=1.2, label="P_open",
+    _arrow(ax, 7.6, 4.0, 8.4, 4.0, color=INK_700, lw=1.2, label="opening profile",
            label_size=7.5, label_offset=(0, 0.2))
 
     # Patient postural state (input)
@@ -286,7 +286,8 @@ def diagram_P02(name="P-02"):
            label_offset=(0, -0.2))
 
     ax.text(0.4, 0.4,
-            "Honest state: T1 MODEL_PREDICTED (47.3% ICP excursion reduction, not physically measured).",
+            "Honest state: T1 MODEL_PREDICTED (47.3% ICP excursion reduction, not physically measured).\n"
+            "Critical parameters (recorded, UNKNOWN): P_crack · A_max · tau_valve",
             fontsize=7, color=INK_500, style='italic')
 
     return _save(fig, name)
@@ -301,7 +302,7 @@ def diagram_P04(name="P-04"):
            y=6.0)
 
     # CSF inflow
-    _block(ax, 0.3, 3.5, 1.6, 1.0, "CSF Inflow", sublabel="Aβ42 = 50 ng/L",
+    _block(ax, 0.3, 3.5, 1.6, 1.0, "CSF Inflow", sublabel="Aβ42 substrate",
            color=BRAND_700, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
 
@@ -310,10 +311,11 @@ def diagram_P04(name="P-04"):
                            boxstyle="round,pad=0.02,rounding_size=0.05",
                            facecolor='white', edgecolor=BRAND_700, linewidth=1.5)
     ax.add_patch(cath)
-    ax.text(5.65, 4.95, "Catheter Wall", ha='center', va='center',
-            fontsize=8, color=BRAND_700, fontweight='bold')
-    ax.text(5.65, 3.0, "Lumen (CSF flow)", ha='center', va='center',
-            fontsize=8, color=INK_500, style='italic')
+    ax.text(5.65, 4.95, "Catheter body (substrate) + NEP-immobilized coating",
+            ha='center', va='center',
+            fontsize=7, color=BRAND_700, fontweight='bold')
+    ax.text(5.65, 3.0, "inner lumen (Contact-time control geometry)", ha='center', va='center',
+            fontsize=7.5, color=INK_500, style='italic')
 
     # NEP enzymes on wall (small circles)
     for i, x in enumerate(np.linspace(2.8, 8.5, 6)):
@@ -329,7 +331,7 @@ def diagram_P04(name="P-04"):
         diag = Polygon([(x, y+0.12), (x+0.12, y), (x, y-0.12), (x-0.12, y)],
                        facecolor=EV_MODEL, edgecolor=INK_900, linewidth=0.4, zorder=4)
         ax.add_patch(diag)
-    ax.text(5.65, 3.3, "Aβ42 substrate (flowing)", ha='center', va='center',
+    ax.text(5.65, 3.3, "Aβ42 substrate", ha='center', va='center',
             fontsize=7, color=EV_MODEL, style='italic')
 
     # Arrows showing flow + cleavage
@@ -343,19 +345,19 @@ def diagram_P04(name="P-04"):
                arrowstyle="->", label_offset=(0, 0))
 
     # Outflow
-    _block(ax, 9.6, 3.5, 1.2, 1.0, "Outflow", sublabel="< 5 ng/L",
+    _block(ax, 9.6, 3.5, 1.2, 1.0, "Outflow", sublabel="cleared peptides",
            color=BRAND_700, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=8.5, sublabel_size=7)
 
-    # Bottom annotations
-    ax.text(0.3, 1.8, "Engineering FROZEN (4/8):", fontsize=8.5,
+    # Bottom annotations (recorded unknowns — R370Q export)
+    ax.text(0.3, 1.8, "UNKNOWN (critical parameters):", fontsize=8.5,
             color=BRAND_700, fontweight='bold')
-    ax.text(0.3, 1.4, "• Flow range  • Contact-time equation\n• Drainage floor  • Pulsation sync",
+    ax.text(0.3, 1.4, "• Enzyme surface density Gamma • Catheter length L\n• Lumen diameter d • Contact time tau",
             fontsize=7.5, color=INK_700)
 
-    ax.text(5.7, 1.8, "Biology BLOCKED (4/8):", fontsize=8.5,
-            color=EV_KILLED if False else ACCENT, fontweight='bold')
-    ax.text(5.7, 1.4, "• Enzyme identity  • Immobilization chemistry\n• Catalytic kinetics  • CSF stability",
+    ax.text(5.7, 1.8, "UNKNOWN (enzyme):", fontsize=8.5,
+            color=ACCENT, fontweight='bold')
+    ax.text(5.7, 1.4, "• Enzyme half-life in CSF environment • Immunogenicity of immobilized NEP\n• Substrate competition magnitude • In vivo clearance per pass",
             fontsize=7.5, color=INK_700)
 
     ax.text(0.3, 0.4,
@@ -369,7 +371,7 @@ def diagram_P07(name="P-07"):
     """P-07 Drainage Priority Clearance — device cross-section."""
     fig, ax = _setup_axes(figsize=(9, 6), xlim=(0, 11), ylim=(0, 7))
 
-    _title(ax, "P-07 Drainage Priority Clearance",
+    _title(ax, "P-07 Passive Drainage Priority Safety Floor",
            "Passive mechanical bypass maintains drainage when primary path obstructs",
            y=6.5)
 
@@ -408,11 +410,11 @@ def diagram_P07(name="P-07"):
 
     # Pressure-triggered arrow from lumen to bypass
     _arrow(ax, 5.75, 3.5, 5.75, 2.5, color=EV_PHYSICAL, lw=1.4,
-           label="pressure-triggered", label_size=7, label_offset=(1.0, 0))
+           label="pressure-activated", label_size=7, label_offset=(1.0, 0))
 
     # Bypass to drainage outlet
     _arrow(ax, 8.5, 2.15, 10.5, 2.15, color=EV_PHYSICAL, lw=1.4,
-           label="fail-safe >=0.1 mL/min", label_size=7, label_offset=(0, 0.25))
+           label="fail-safe Q_min ~0.05 mL/min", label_size=7, label_offset=(0, 0.25))
 
     # Drainage outlet
     _block(ax, 10.5, 3.7, 0.5, 1.8, "Outlet", color=INK_500, bg=INK_100,
@@ -420,8 +422,8 @@ def diagram_P07(name="P-07"):
 
     # Annotation: P-03 failure mode
     ax.text(0.4, 1.2,
-            "P-03 (related) FALSIFIED: floor 0.001 mL/min/mmHg, structurally insufficient.\n"
-            "P-07 redesign: larger bypass channel + pressure-triggered activation — DECISIVE EXPERIMENT WILL DETERMINE.",
+            "P-03 (related) FALSIFIED: floor 0.001 mL/min/mmHg.\n"
+            "P-07 redesign: pressure-threshold-activated floor (semi-active), larger bypass channel.",
             fontsize=7.5, color=INK_700, style='italic',
             bbox=dict(boxstyle="round,pad=0.3", facecolor=INK_100,
                       edgecolor=INK_300, linewidth=0.5))
@@ -442,8 +444,8 @@ def diagram_P11(name="P-11"):
                          boxstyle="round,pad=0.02,rounding_size=0.05",
                          facecolor=INK_500, edgecolor=INK_900, linewidth=1.0)
     ax.add_patch(ti)
-    ax.text(5.25, 1.75, "Ti-coated Catheter Surface", ha='center', va='center',
-            fontsize=8, color='white', fontweight='bold')
+    ax.text(5.25, 1.75, "Electrospun titanium coating (Catheter body substrate)", ha='center', va='center',
+            fontsize=7.5, color='white', fontweight='bold')
 
     # Electrospun nanofiber matrix (above Ti)
     nanofiber = FancyBboxPatch((0.5, 2.2), 9.5, 0.4,
@@ -470,7 +472,7 @@ def diagram_P11(name="P-11"):
         bact = Ellipse((x, y), 0.45, 0.30, facecolor=EV_KILLED,
                        edgecolor=INK_900, linewidth=0.5, alpha=0.9, zorder=4)
         ax.add_patch(bact)
-    ax.text(5.25, 5.7, "S. aureus Challenge (suspended in CSF)", ha='center',
+    ax.text(5.25, 5.7, "Bacterial challenge load (S. aureus, CFU/mL)", ha='center',
             va='center', fontsize=8, color=EV_KILLED, fontweight='bold')
 
     # Lysis arrows (bacteria → phage)
@@ -484,11 +486,12 @@ def diagram_P11(name="P-11"):
                               facecolor='none', edgecolor=INK_300,
                               linewidth=1.0, linestyle='--', alpha=0.5)
     ax.add_patch(biofilm)
-    ax.text(5.25, 3.85, "Biofilm Matrix (INHIBITED — target >=80% reduction)",
+    ax.text(5.25, 3.85, "Biofilm Matrix (INHIBITED — log reduction >= 3 / 99.9% at 24h)",
             ha='center', va='center', fontsize=7, color=INK_500, style='italic')
 
     ax.text(0.4, 0.4,
-            "Honest state: T1 MODEL_PREDICTED. Decisive experiment: 7-day S. aureus biofilm assay with phage-coated vs uncoated Ti.",
+            "Honest state: T1 MODEL_PREDICTED. Decisive experiment: 7-day S. aureus biofilm assay with phage-coated vs uncoated Ti.\n"
+            "Kinetic parameters (recorded): k_ads (phage-bacteria adsorption rate) · k_decay (phage decay rate)",
             fontsize=7, color=INK_500, style='italic')
 
     return _save(fig, name)
@@ -554,6 +557,10 @@ def diagram_P13(name="P-13"):
            color=EV_MODEL, bg=EV_MODEL_BG, label_color="white",
            sublabel_color=INK_900, fontsize=9, sublabel_size=7.5)
 
+    # Recorded parameters
+    ax.text(0.3, 1.4, "Recorded parameters: Sensor sampling rate ~1-10 Hz (MODELLED) · Prediction horizon target (hours to days)",
+            fontsize=7, color=INK_500, style='italic')
+
     return _save(fig, name)
 
 
@@ -586,7 +593,7 @@ def diagram_P15R1(name="P-15-R1"):
     _block(ax, 5.0, 3.5, 1.6, 1.6, "Power Cond.", sublabel="regulator",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7.5)
-    _arrow(ax, 4.5, 4.3, 5.0, 4.3, color=INK_700, lw=1.2, label="raw V",
+    _arrow(ax, 4.5, 4.3, 5.0, 4.3, color=INK_700, lw=1.2, label="electrical",
            label_size=7, label_offset=(0, 0.2))
 
     # Capacitor
@@ -618,7 +625,7 @@ def diagram_P15R1(name="P-15-R1"):
             fontweight='bold')
     ax.text(0.5, 0.9,
             "Cardiac motion harvesting failed in shunt geometry (10 μW P50 not achievable).\n"
-            "R1 REPAIR: extracardiac sources (CSF pulsation + neck motion) — modelled, NOT yet measured.",
+            "R1 REPAIR: extracardiac harvesting (CSF pulsation + neck motion) — modelled, NOT yet measured.",
             fontsize=7.5, color=INK_700)
 
     return _save(fig, name)
@@ -647,7 +654,7 @@ def diagram_P16(name="P-16"):
             fontsize=9, color=INK_700, fontweight='bold')
     ax.text(3.9, 4.2, "5mm tissue path", ha='center', va='center',
             fontsize=7.5, color=INK_500, style='italic')
-    ax.text(3.9, 3.5, "Jacques 2013 optical props:\nμ_a=0.05/cm, μ_s=8.0/cm",
+    ax.text(3.9, 3.5, "Jacques 2013 + PyTissueOptics v2.0.1 (DCC-Lab, independent):\nμ_a=0.05/cm, μ_s=8.0/cm",
             ha='center', va='center', fontsize=7, color=INK_500)
 
     # GaAs PV cell
@@ -681,10 +688,10 @@ def diagram_P16(name="P-16"):
                              facecolor=EV_COMPUTATIONAL_BG, edgecolor=EV_COMPUTATIONAL,
                              linewidth=1.0)
     ax.add_patch(ev_box)
-    ax.text(0.5, 1.4, "EVIDENCE: T2-CONFIRMED (INDEPENDENTLY COMPUTATIONALLY VALIDATED)",
+    ax.text(0.5, 1.4, "EVIDENCE: COMPUTATIONALLY_SUPPORTED (T2-CONFIRMED)",
             fontsize=8.5, color=EV_COMPUTATIONAL, fontweight='bold')
     ax.text(0.5, 0.85,
-            "PyTissueOptics v2.0.1 (DCC-Lab, independent code base) reproduced MC simulation.\n"
+            "PyTissueOptics v2.0.1 (DCC-Lab, independent) + Jacques 2013 (evidence source).\n"
             "MC convergence documented (CIs overlap). Published Jacques 2013 range confirmed.\n"
             "Reproducible: pip install pytissueoptics. PHYSICAL VALIDATION OUTSTANDING (LED + phantom + PV bench).",
             fontsize=7.5, color=INK_700)
@@ -693,11 +700,11 @@ def diagram_P16(name="P-16"):
 
 
 def diagram_P21R1(name="P-21-R1"):
-    """P-21-R1 UWB Position Mapping R1 Repair — sensor architecture (RFID)."""
+    """P-21-R1 UWB Catheter Position Mapping R1 Repair — sensor architecture."""
     fig, ax = _setup_axes(figsize=(9, 6), xlim=(0, 11), ylim=(0, 7))
 
-    _title(ax, "P-21-R1 Catheter Localization (R1 Repair)",
-           "Passive RFID tag → wearable reader → 3D position solver (revised from UWB)",
+    _title(ax, "P-21-R1 UWB Catheter Position Mapping (R1 Repair)",
+           "Implantable UWB transmitter → external receiver array → TOA localization (SAR-bounded)",
            y=6.5)
 
     # Patient skull (semi-circle representation)
@@ -709,38 +716,38 @@ def diagram_P21R1(name="P-21-R1"):
     ax.text(5.5, 4.5, "Patient Skull/Scalp", ha='center', va='center',
             fontsize=8.5, color=INK_700, fontweight='bold', style='italic')
 
-    # Passive RFID tag at catheter tip
+    # Implantable UWB transmitter at catheter tip
     tag = Circle((5.5, 2.0), 0.35, facecolor=EV_PHYSICAL,
                  edgecolor=INK_900, linewidth=1.0, zorder=5)
     ax.add_patch(tag)
-    ax.text(5.5, 2.0, "RFID\nTag", ha='center', va='center',
+    ax.text(5.5, 2.0, "UWB\nTX", ha='center', va='center',
             fontsize=7, color='white', fontweight='bold', zorder=6)
-    ax.text(5.5, 1.4, "Catheter Tip (868 MHz passive)",
+    ax.text(5.5, 1.4, "Catheter Tip (UWB transmitter)",
             ha='center', va='center', fontsize=7, color=INK_500, style='italic')
 
-    # Wearable reader (external, above skull)
-    _block(ax, 4.5, 5.3, 2.0, 0.8, "Wearable Reader", sublabel="antenna array",
+    # External receiver array (above skull)
+    _block(ax, 4.0, 5.3, 3.0, 0.8, "External Receiver Array", sublabel="4+ antennas",
            color=BRAND_500, bg=BRAND_100, label_color="white",
-           sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
+           sublabel_color=BRAND_700, fontsize=8, sublabel_size=7)
 
     # RF link (bidirectional arrow)
     _arrow(ax, 5.5, 5.3, 5.5, 2.35, color=BRAND_500, lw=1.4,
-           label="868 MHz RF backscatter\nthrough skull tissue",
-           label_size=7, label_offset=(1.5, 0))
+           label="UWB pulse train\nthrough skull tissue",
+           label_size=7, label_offset=(1.6, 0.3))
 
-    # 3D position solver
-    _block(ax, 7.5, 4.5, 2.2, 1.4, "3D Position Solver",
-           sublabel="phase + RSSI\nTarget <=5mm",
+    # Localization algorithm
+    _block(ax, 7.8, 4.3, 2.4, 1.6, "Localization Algorithm",
+           sublabel="TOA + TDOA\n3D position",
            color=BRAND_500, bg=BRAND_100, label_color="white",
-           sublabel_color=BRAND_700, fontsize=9, sublabel_size=7.5)
-    _arrow(ax, 6.5, 5.7, 7.5, 5.2, color=INK_700, lw=1.2,
-           label="signal", label_size=7, label_offset=(0, 0.2))
+           sublabel_color=BRAND_700, fontsize=8, sublabel_size=7.5)
+    _arrow(ax, 7.0, 5.55, 7.8, 5.1, color=INK_700, lw=1.2,
+           label="signal", label_size=7, label_offset=(0.1, 0.25))
 
     # Clinical display
-    _block(ax, 9.9, 4.5, 1.0, 1.4, "Display", sublabel="(x,y,z)",
+    _block(ax, 10.35, 4.3, 0.65, 1.6, "Display", sublabel="(x,y,z)",
            color=ACCENT, bg=ACCENT_LIGHT, label_color="white",
-           sublabel_color=INK_900, fontsize=9, sublabel_size=7)
-    _arrow(ax, 9.7, 5.2, 9.9, 5.2, color=ACCENT, lw=1.4)
+           sublabel_color=INK_900, fontsize=7, sublabel_size=6.5)
+    _arrow(ax, 10.2, 5.1, 10.35, 5.1, color=ACCENT, lw=1.4)
 
     # R1 repair note (red boundary)
     fail_box = FancyBboxPatch((0.3, 0.4), 10.4, 1.3,
@@ -751,8 +758,9 @@ def diagram_P21R1(name="P-21-R1"):
     ax.text(0.5, 1.4, "P-21 ORIGINAL FAILURE:", fontsize=8, color=EV_KILLED,
             fontweight='bold')
     ax.text(0.5, 0.85,
-            "UWB localization accuracy MARGINAL (10mm vs 5mm clinical requirement).\n"
-            "R1 REPAIR: passive RFID for higher accuracy + lower power — modelled, NOT yet measured.",
+            "P-21 original: assumed sub-mm accuracy without SAR analysis.\n"
+            "R1 REPAIR: bounds accuracy by SAR limit (1.6 W/kg averaged over 1g tissue) and tissue propagation physics.\n"
+            "UWB requires Bandwidth B >= 500 MHz (EXTERNAL_PRECEDENT).",
             fontsize=7.5, color=INK_700)
 
     return _save(fig, name)
@@ -763,7 +771,7 @@ def diagram_P22R1(name="P-22-R1"):
     fig, ax = _setup_axes(figsize=(9, 6.2), xlim=(0, 11), ylim=(0, 7))
 
     _title(ax, "P-22-R1 Autonomous Catheter Navigation (R1 Repair)",
-           "Hydraulic multi-segment catheter + PID controller + tissue safety (revised from SMP)",
+           "Hydraulic pressure-driven multi-segment catheter navigation [R1 REPAIR from SMP]",
            y=6.5)
 
     # Hydraulic pressure source
@@ -773,7 +781,7 @@ def diagram_P22R1(name="P-22-R1"):
 
     # Multi-segment catheter
     _block(ax, 2.6, 4.0, 2.4, 1.6, "Multi-segment\nCatheter",
-           sublabel="hydraulic chambers\n(no compressive load → no buckling)",
+           sublabel="hydraulic chambers\n(no buckling failure mode)",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
     _arrow(ax, 2.1, 5.0, 2.6, 4.8, color=INK_700, lw=1.2)
@@ -800,7 +808,7 @@ def diagram_P22R1(name="P-22-R1"):
 
     # Tissue phantom
     _block(ax, 2.6, 1.5, 4.0, 1.5, "Tissue Phantom",
-           sublabel="contact force target < 0.01 N\n(P-22 original VIOLATED 0.039 N)",
+           sublabel="contact force target < 0.01 N\n(P-22 original: effective force 0.039 N exceeds damage threshold 0.01 N by 4x)",
            color=INK_500, bg=INK_100, label_color="white",
            sublabel_color=INK_700, fontsize=9, sublabel_size=7.5)
     _arrow(ax, 3.8, 4.0, 3.8, 3.0, color=INK_700, lw=1.2,
@@ -824,7 +832,7 @@ def diagram_P22R1(name="P-22-R1"):
             color=EV_KILLED, fontweight='bold')
     ax.text(0.5, 0.2,
             "SMP buckling (82x exceedance) • Tissue safety (0.039 N > 0.01 N by 4x) • Control stability (30s delay) • No failure recovery.\n"
-            "R1 REPAIR: hydraulic (no compressive load) + delay-compensated PID + tissue safety target.",
+            "R1 REPAIR: hydraulic pressure-driven navigation + delay-compensated PID + tissue safety.",
             fontsize=7, color=INK_700)
 
     return _save(fig, name)
@@ -834,12 +842,12 @@ def diagram_P24(name="P-24"):
     """P-24 Gravity-Compensated Hydraulic Damper — device cross-section."""
     fig, ax = _setup_axes(figsize=(9, 6), xlim=(0, 11), ylim=(0, 7))
 
-    _title(ax, "P-24 Gravity-Compensated Hydraulic Damper",
+    _title(ax, "P-24 Gravity Compensation Hydraulic Damper for Postural Transients",
            "Passive gravity-head damper for postural ICP compensation",
            y=6.5)
 
     # CSF inflow
-    _block(ax, 0.3, 3.5, 1.4, 1.4, "CSF Inflow", sublabel="P_ICP variable",
+    _block(ax, 0.3, 3.5, 1.4, 1.4, "CSF Inflow", sublabel="postural pressure transients",
            color=BRAND_700, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
     _arrow(ax, 1.7, 4.2, 2.4, 4.2, color=INK_700, lw=1.2)
@@ -860,27 +868,27 @@ def diagram_P24(name="P-24"):
             fontsize=8, color=BRAND_900, style='italic', fontweight='bold')
 
     # Adjustable orifice
-    _block(ax, 5.8, 3.7, 1.4, 1.0, "Adjustable Orifice", sublabel="flow restrictor",
+    _block(ax, 5.8, 3.7, 1.4, 1.0, "Adjustable Orifice", sublabel="hydraulic resistance",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=8.5, sublabel_size=7)
     _arrow(ax, 5.4, 4.2, 5.8, 4.2, color=INK_700, lw=1.2)
 
-    # Pressure equalization membrane
-    _block(ax, 7.6, 3.7, 1.6, 1.0, "PE Membrane", sublabel="pressure equalize",
+    # Gravity reference chamber (pressure equalization)
+    _block(ax, 7.6, 3.7, 1.6, 1.0, "Gravity Reference Chamber", sublabel="dP_gravity = rho * g * dh",
            color=BRAND_500, bg=BRAND_100, label_color="white",
-           sublabel_color=BRAND_700, fontsize=8.5, sublabel_size=7)
+           sublabel_color=BRAND_700, fontsize=8, sublabel_size=6.5)
     _arrow(ax, 7.2, 4.2, 7.6, 4.2, color=INK_700, lw=1.2)
 
     # Drainage outlet
-    _block(ax, 9.6, 3.7, 1.2, 1.0, "Outlet", sublabel="P_stable",
+    _block(ax, 9.6, 3.7, 1.2, 1.0, "Outlet", sublabel="Settling time: tau",
            color=BRAND_700, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
     _arrow(ax, 9.2, 4.2, 9.6, 4.2, color=INK_700, lw=1.2)
 
     # Postural scenarios (bottom)
-    ax.text(0.3, 1.7, "Postural scenarios tested:", fontsize=8.5,
+    ax.text(0.3, 1.7, "Postural ICP compensation:", fontsize=8.5,
             color=BRAND_700, fontweight='bold')
-    scenarios = ["Upright", "Supine", "Trendelenburg", "Lateral", "Transition"]
+    scenarios = ["Upright", "Supine", "Postural change"]
     for i, s in enumerate(scenarios):
         x = 1.5 + i * 1.8
         sc = FancyBboxPatch((x, 1.1), 1.5, 0.4,
@@ -907,7 +915,7 @@ def diagram_P26(name="P-26"):
            y=6.5)
 
     # CSF inflow (variable osmolarity)
-    _block(ax, 0.3, 4.0, 1.6, 1.4, "CSF Inflow", sublabel="osmolarity Δ\n(280-310 mOsm/L)",
+    _block(ax, 0.3, 4.0, 1.6, 1.4, "CSF Inflow", sublabel="osmolarity Δ\n(~290 mOsm/kg, EXTERNAL_PRECEDENT)",
            color=BRAND_700, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
     _arrow(ax, 1.9, 4.7, 2.4, 4.7, color=INK_700, lw=1.2)
@@ -936,9 +944,9 @@ def diagram_P26(name="P-26"):
             va='center', fontsize=7.5, color=INK_700, style='italic')
 
     # Mechanical linkage
-    _block(ax, 6.0, 4.0, 1.6, 1.4, "Mechanical Linkage", sublabel="pressure Δ\n→ displacement",
+    _block(ax, 6.0, 4.0, 1.6, 1.4, "Mechanical Linkage", sublabel="pressure Δ\nJv = Lp * (dP - sigma * dPi)",
            color=BRAND_500, bg=BRAND_100, label_color="white",
-           sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
+           sublabel_color=BRAND_700, fontsize=9, sublabel_size=6.5)
     _arrow(ax, 5.5, 4.7, 6.0, 4.7, color=INK_700, lw=1.2)
 
     # Drainage orifice (variable)
@@ -948,7 +956,7 @@ def diagram_P26(name="P-26"):
     _arrow(ax, 7.6, 4.7, 8.1, 4.7, color=INK_700, lw=1.2)
 
     # Drainage outlet
-    _block(ax, 9.8, 4.0, 1.0, 1.4, "Outlet", sublabel="compensated",
+    _block(ax, 9.8, 4.0, 1.0, 1.4, "Outlet", sublabel="self-regulating",
            color=BRAND_700, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
     _arrow(ax, 9.5, 4.7, 9.8, 4.7, color=INK_700, lw=1.2)
@@ -956,9 +964,9 @@ def diagram_P26(name="P-26"):
     # Bottom annotation
     ax.text(0.3, 1.7, "Target response:", fontsize=8.5, color=BRAND_700,
             fontweight='bold')
-    ax.text(0.3, 1.3, "• Drainage rate adjusts >=25% across osmolarity range\n"
-                       "• Response time < 30 minutes\n"
-                       "• Passive — zero electronics, zero actuation",
+    ax.text(0.3, 1.3, "• Drainage adjusts proportionally (self-regulation)\n"
+                       "• Passive self-regulating CSF drainage\n"
+                       "• Osmolarity reference ~290 mOsm/kg (EXTERNAL_PRECEDENT)",
             fontsize=7.5, color=INK_700)
 
     ax.text(0.3, 0.3,
@@ -983,7 +991,7 @@ def diagram_P27R1(name="P-27-R1"):
     ax.add_patch(diaphragm)
     ax.text(0.65, 5.5, "Diaphragm", ha='center', va='center',
             fontsize=8, color=BRAND_700, fontweight='bold')
-    ax.text(0.1, 4.0, "P", ha='center', va='center', fontsize=12,
+    ax.text(0.1, 4.0, "CSF pressure", ha='center', va='center', fontsize=9,
             color=INK_700, fontweight='bold')
     _arrow(ax, 0.0, 4.0, 0.5, 4.0, color=INK_700, lw=1.4,
            label="CSF pressure", label_size=7, label_offset=(-0.3, 0.5))
@@ -1017,14 +1025,14 @@ def diagram_P27R1(name="P-27-R1"):
            label="self-reference", label_size=7, label_offset=(1.0, 0))
 
     # Signal conditioning
-    _block(ax, 6.5, 3.5, 1.8, 1.0, "Signal Cond.", sublabel="ΔR → V",
+    _block(ax, 6.5, 3.5, 1.8, 1.0, "Signal Cond.", sublabel="resistance change → V",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
-    _arrow(ax, 6.0, 4.0, 6.5, 4.0, color=INK_700, lw=1.2, label="ΔR",
+    _arrow(ax, 6.0, 4.0, 6.5, 4.0, color=INK_700, lw=1.2, label="resistance change",
            label_size=7, label_offset=(0, 0.2))
 
     # Output
-    _block(ax, 8.7, 3.5, 1.5, 1.0, "Output", sublabel="P (drift-free)",
+    _block(ax, 8.7, 3.5, 1.5, 1.0, "Output", sublabel="P (drift compensation)",
            color=ACCENT, bg=ACCENT_LIGHT, label_color="white",
            sublabel_color=INK_900, fontsize=9, sublabel_size=7)
     _arrow(ax, 8.3, 4.0, 8.7, 4.0, color=ACCENT, lw=1.4)
@@ -1051,7 +1059,7 @@ def diagram_P28(name="P-28"):
     fig, ax = _setup_axes(figsize=(9, 6), xlim=(0, 11), ylim=(0, 7))
 
     _title(ax, "P-28 Acoustic Obstruction Detection",
-           "External acoustic transducer → skull → CSF column → obstruction signature",
+           "External acoustic transducer → skull → CSF column → obstruction detection",
            y=6.5)
 
     # External acoustic transducer
@@ -1088,20 +1096,21 @@ def diagram_P28(name="P-28"):
     _arrow(ax, 3.5, 4.0, 4.3, 3.8, color=ACCENT, lw=1.0)
 
     # External acoustic receiver
-    _block(ax, 7.5, 4.5, 1.6, 1.0, "Acoustic RX", sublabel="response",
+    _block(ax, 7.5, 4.5, 1.6, 1.0, "Acoustic RX", sublabel="received echo",
            color=ACCENT, bg=ACCENT_LIGHT, label_color="white",
            sublabel_color=INK_900, fontsize=9, sublabel_size=7)
     _arrow(ax, 5.5, 4.0, 7.5, 4.8, color=ACCENT, lw=1.0,
            label="modified resonance", label_size=7, label_offset=(0, 0.3))
 
     # Signal processor
-    _block(ax, 9.5, 4.5, 1.2, 1.0, "Signal Proc.", sublabel="FFT + clf",
+    _block(ax, 9.5, 4.5, 1.2, 1.0, "Signal Proc.", sublabel="echo classification",
            color=BRAND_700, bg=BRAND_100, label_color="white",
-           sublabel_color=BRAND_700, fontsize=8.5, sublabel_size=7)
+           sublabel_color=BRAND_700, fontsize=8, sublabel_size=6.5)
     _arrow(ax, 9.1, 5.0, 9.5, 5.0, color=INK_700, lw=1.2)
 
-    # Detection states (bottom)
-    states = [("0%", BRAND_700), ("30%", ACCENT), ("70%", EV_MODEL), ("100%", EV_KILLED)]
+    # Detection states (bottom) — recorded obstruction types (V-001)
+    states = [("normal", BRAND_700), ("debris", ACCENT),
+              ("tissue proxy", EV_MODEL), ("air bubble", EV_KILLED)]
     for i, (state, color) in enumerate(states):
         x = 1.0 + i * 2.3
         sc = FancyBboxPatch((x, 1.0), 1.8, 0.5,
@@ -1109,7 +1118,7 @@ def diagram_P28(name="P-28"):
                              facecolor=color, edgecolor=color, linewidth=0.5,
                              alpha=0.85)
         ax.add_patch(sc)
-        ax.text(x + 0.9, 1.25, f"Obstruction {state}", ha='center', va='center',
+        ax.text(x + 0.9, 1.25, f"{state}", ha='center', va='center',
                 fontsize=7, color='white', fontweight='bold')
 
     # Honest state
@@ -1135,9 +1144,9 @@ def diagram_P29(name="P-29"):
                         facecolor=INK_500, edgecolor=INK_900, linewidth=1.0)
     ax.add_patch(mag_top)
     ax.add_patch(mag_bot)
-    ax.text(5.0, 5.25, "NdFeB Magnet Array (B0 field)", ha='center', va='center',
+    ax.text(5.0, 5.25, "Miniaturized Permanent Magnet (B0 source)", ha='center', va='center',
             fontsize=7.5, color='white', fontweight='bold')
-    ax.text(5.0, 1.75, "NdFeB Magnet Array (B0 field)", ha='center', va='center',
+    ax.text(5.0, 1.75, "Miniaturized Permanent Magnet (B0 source)", ha='center', va='center',
             fontsize=7.5, color='white', fontweight='bold')
 
     # B0 field arrows (downward)
@@ -1152,7 +1161,7 @@ def diagram_P29(name="P-29"):
     ax.add_patch(csf)
     ax.text(5.0, 4.2, "CSF Flow Channel", ha='center', va='center',
             fontsize=8, color=BRAND_700, fontweight='bold')
-    ax.text(5.0, 3.5, "(0.01-1.0 mL/min range)", ha='center', va='center',
+    ax.text(5.0, 3.5, "(B0 0.1-1 T — design choice, UNKNOWN)", ha='center', va='center',
             fontsize=7, color=INK_500, style='italic')
 
     # Miniaturized RF coil (around CSF channel)
@@ -1162,6 +1171,8 @@ def diagram_P29(name="P-29"):
         ax.add_patch(coil)
     ax.text(8.0, 3.5, "RF Coil", ha='left', va='center',
             fontsize=8, color=ACCENT, fontweight='bold')
+    ax.text(5.0, 2.2, "Gradient Coil (bipolar)", ha='center', va='center',
+            fontsize=7.5, color=BRAND_700, fontweight='bold', style='italic')
 
     # Spin excitation circuit (left)
     _block(ax, 0.3, 4.0, 1.6, 1.0, "Spin Excite", sublabel="90° RF pulse",
@@ -1170,7 +1181,7 @@ def diagram_P29(name="P-29"):
     _arrow(ax, 1.9, 4.5, 2.5, 4.0, color=ACCENT, lw=1.2)
 
     # Spin detection circuit (right)
-    _block(ax, 8.7, 4.0, 1.6, 1.0, "Spin Detect", sublabel="induced voltage",
+    _block(ax, 8.7, 4.0, 1.6, 1.0, "Spin Detect", sublabel="echo signal",
            color=ACCENT, bg=ACCENT_LIGHT, label_color="white",
            sublabel_color=INK_900, fontsize=9, sublabel_size=7)
     _arrow(ax, 7.5, 4.0, 8.7, 4.5, color=ACCENT, lw=1.2)
@@ -1197,7 +1208,7 @@ def diagram_P29(name="P-29"):
             color=EV_KILLED, fontweight='bold')
     ax.text(0.5, 0.7,
             "Miniaturization feasibility UNVERIFIED (target <5mm diameter).\n"
-            "NMR in catheter-scale form factor is technically challenging.\n"
+            "Miniaturization feasibility is a critical UNKNOWN.\n"
             "PATENT SEARCH PENDING. Power consumption + magnetic safety unknown.",
             fontsize=7.5, color=INK_700)
 

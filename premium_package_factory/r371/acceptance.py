@@ -211,9 +211,21 @@ def run_acceptance(portfolio_root):
             ce_fail.append(f"{folder}: sections {secs ^ SECTIONS}")
         market = next(s for s in ce["commercial_evidence"]
                       if s["section"] == "MARKET_EVIDENCE")
-        for metric in market["metrics"]:
-            if metric["value"] != "NOT_ESTABLISHED":
-                ce_fail.append(f"{folder}: market value {metric['metric']}")
+        # R372 schema: metric list under 'estimate' (legacy 'metrics')
+        for metric in (market.get("metrics") or market.get("estimate") or []):
+            if not isinstance(metric, dict):
+                continue
+            if metric.get("value") != "NOT_ESTABLISHED":
+                ce_fail.append(f"{folder}: market value {metric.get('metric')}")
+        # R372 workflow present with 8 steps
+        wf = market.get("establishment_workflow", [])
+        if len(wf) != 8:
+            ce_fail.append(f"{folder}: establishment_workflow has {len(wf)} steps")
+        for k in ("market_definition", "geography", "year",
+                  "population_basis", "source", "source_hash", "methodology",
+                  "estimate", "uncertainty", "limitations"):
+            if k not in market:
+                ce_fail.append(f"{folder}: MARKET_EVIDENCE missing field {k}")
     record("15/15 commercial evidence sections", not ce_fail,
            f"problems={ce_fail[:5]}")
 

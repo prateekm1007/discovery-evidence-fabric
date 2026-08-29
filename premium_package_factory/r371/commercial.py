@@ -79,16 +79,161 @@ def _market_metric(metric: str, definition: str) -> dict:
     }
 
 
-def build_commercial_evidence(pkg) -> dict:
-    """Build COMMERCIAL_EVIDENCE.json content for one canonical package."""
-    # ---- MARKET_EVIDENCE -------------------------------------------------
-    market = {
+def _market_evidence_section(pkg) -> dict:
+    """MARKET_EVIDENCE with the CEO R372-4 ten-field schema:
+
+        market_definition / geography / year / population_basis / source /
+        source_hash / methodology / estimate / uncertainty / limitations
+
+    plus the 8-step establishment workflow (market definition -> source
+    acquisition -> population -> geography -> year -> methodology ->
+    market estimate -> uncertainty), each step carrying its current status
+    and the concrete action that would establish it. The buyer sees WHY
+    the market is unknown and HOW to establish it — never a guessed number.
+    """
+    domain = pkg.eng.get("technology_domain", "NOT_RECORDED")
+    problem = ""
+    hl_problem = ""
+    # market definition basis: recorded technology domain + problem text
+    # from the headlines registry is added at render time; here we use the
+    # recorded engineering domain verbatim.
+    device_category = domain
+
+    workflow = [
+        {
+            "step": 1,
+            "name": "market definition",
+            "status": "DEFINABLE_NOW",
+            "action": (
+                f"Define the addressable device category from the recorded "
+                f"technology domain: '{device_category}'. Add the clinical "
+                "problem statement and the patient population it names "
+                "(the buyer finalizes scope: device category x indication "
+                "x care setting)."
+            ),
+            "basis": "engineering_content.technology_domain (recorded)",
+        },
+        {
+            "step": 2,
+            "name": "source acquisition",
+            "status": "NO_SOURCE_INTEGRATED",
+            "action": (
+                "Acquire a defensible market-research source: a published "
+                "market-sizing study, or a registry-derived census (e.g., "
+                "GUDID device listings for the relevant product codes, "
+                "implant/procedure volumes from hospital-episode statistics) "
+                "with stated methodology. Capture it with source URL and "
+                "content hash into the commercial evidence layer."
+            ),
+            "basis": (
+                "engine COMMERCIAL source role = GUDID device registry "
+                "(device census, not market value)"
+            ),
+        },
+        {
+            "step": 3,
+            "name": "population",
+            "status": "NOT_ESTABLISHED",
+            "action": (
+                "Establish the patient/procedure population underlying the "
+                "device category (incidence/prevalence of hydrocephalus "
+                "treatment or the relevant indication, shunt implant and "
+                "revision volumes) from the acquired source."
+            ),
+            "basis": None,
+        },
+        {
+            "step": 4,
+            "name": "geography",
+            "status": "BUYER_DEFINED",
+            "action": (
+                "Fix the geography (e.g., US, EU, global). The transferor "
+                "asserts no geography-scoped market claim."
+            ),
+            "basis": None,
+        },
+        {
+            "step": 5,
+            "name": "year",
+            "status": "BUYER_DEFINED",
+            "action": (
+                "Fix the reference year for the estimate; a market estimate "
+                "without a year is meaningless."
+            ),
+            "basis": None,
+        },
+        {
+            "step": 6,
+            "name": "methodology",
+            "status": "NOT_ESTABLISHED",
+            "action": (
+                "Record the sizing methodology of the acquired source "
+                "(bottom-up procedure volumes x ASP, top-down vendor "
+                "revenue share, or registry census) including its "
+                "assumptions."
+            ),
+            "basis": None,
+        },
+        {
+            "step": 7,
+            "name": "market estimate",
+            "status": NOT_ESTABLISHED,
+            "action": (
+                "State the estimate with currency and the source bound to "
+                "it (value, currency, geography, year, source, source_hash, "
+                "methodology all populated — the schema in this file)."
+            ),
+            "basis": None,
+        },
+        {
+            "step": 8,
+            "name": "uncertainty",
+            "status": NOT_ESTABLISHED,
+            "action": (
+                "State the uncertainty (range or interval and its basis). "
+                "A point estimate without uncertainty is not acceptable."
+            ),
+            "basis": None,
+        },
+    ]
+
+    return {
         "section": "MARKET_EVIDENCE",
+        "schema_version": "R372",
+        "schema": [
+            "market_definition", "geography", "year", "population_basis",
+            "source", "source_hash", "methodology", "estimate",
+            "uncertainty", "limitations",
+        ],
         "discipline": (
             "Every market metric is either SOURCE_BACKED (with source, hash "
-            "and methodology) or NOT_ESTABLISHED. No guessed figures."
+            "and methodology) or NOT_ESTABLISHED. No guessed figures. The "
+            "buyer sees why the market is currently unknown and exactly how "
+            "the buyer could establish it."
         ),
-        "metrics": [
+        "market_definition": {
+            "device_category": device_category,
+            "status": "DEFINABLE_FROM_RECORDED_DOMAIN",
+            "note": (
+                "The addressable category is defined by the recorded "
+                "technology domain; the buyer finalizes indication, care-"
+                "setting and segment scope."
+            ),
+        },
+        "geography": NOT_ESTABLISHED,
+        "year": NOT_ESTABLISHED,
+        "population_basis": {
+            "status": NOT_ESTABLISHED,
+            "note": (
+                "No patient/procedure population source is integrated. The "
+                "engine's device evidence (GUDID listings) enumerates "
+                "marketed devices, not treated patients."
+            ),
+        },
+        "source": None,
+        "source_hash": None,
+        "methodology": None,
+        "estimate": [
             _market_metric(
                 "TOTAL_ADDRESSABLE_MARKET",
                 "Aggregate annual value of purchases in the addressable "
@@ -105,8 +250,24 @@ def build_commercial_evidence(pkg) -> dict:
                 "problem this package addresses.",
             ),
         ],
+        "uncertainty": NOT_ESTABLISHED,
+        "limitations": (
+            "No market-research source is integrated in the engine's "
+            "evidence layer; every numeric market field is deliberately "
+            "empty. Registry-derived sizing (GUDID census) and published "
+            "studies exist for this category and the buyer can establish "
+            "the estimate through the workflow below without the transferor "
+            "guessing a number."
+        ),
+        "establishment_workflow": workflow,
         "verdict": f"MARKET_SIZE = {NOT_ESTABLISHED}",
     }
+
+
+def build_commercial_evidence(pkg) -> dict:
+    """Build COMMERCIAL_EVIDENCE.json content for one canonical package."""
+    # ---- MARKET_EVIDENCE (R372 schema + establishment workflow) ----------
+    market = _market_evidence_section(pkg)
 
     # ---- COMPETITOR_EVIDENCE ----------------------------------------------
     competitor_entries = []
@@ -248,7 +409,12 @@ def count_unsourced_claims(evidence: dict) -> int:
     """Acceptance helper: count numeric market values (must be 0)."""
     n = 0
     for section in evidence["commercial_evidence"]:
-        for metric in section.get("metrics", []) or []:
+        # R372 schema: metric list lives under 'estimate';
+        # legacy key 'metrics' kept for compatibility
+        metrics = section.get("metrics") or section.get("estimate") or []
+        for metric in metrics:
+            if not isinstance(metric, dict):
+                continue
             v = metric.get("value")
             if v is not None and v != NOT_ESTABLISHED and not isinstance(v, str):
                 n += 1

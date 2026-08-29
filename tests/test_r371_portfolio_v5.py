@@ -283,7 +283,8 @@ class TestCommercialDiscipline:
             ce = build_commercial_evidence(p)
             market = next(s for s in ce["commercial_evidence"]
                           if s["section"] == "MARKET_EVIDENCE")
-            for metric in market["metrics"]:
+            # R372 schema: metric list lives under 'estimate'
+            for metric in (market.get("metrics") or market.get("estimate")):
                 assert metric["value"] == "NOT_ESTABLISHED"
                 # full 11-field provenance schema present
                 for field in ("metric", "value", "currency", "geography", "year",
