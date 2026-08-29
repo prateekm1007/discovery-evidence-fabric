@@ -227,7 +227,15 @@ EQUATION_LIBRARY: Dict[str, List[Equation]] = {
              {"symbol": "B0", "description": "static field strength", "unit": "T"}],
             "standard NMR relation (MRI physics texts)",
             "single species (protons), weak-field linear regime",
-            [],
+            ["single resonant species at the field strength (protons); "
+             "multi-species signals separate by their own gyromagnetic "
+             "ratios and must not be folded into one f0",
+             "B0 is the field the spin actually experiences at its "
+             "location — spatial field uniformity (or the local "
+             "gradient map) must be characterized, not assumed away",
+             "gyromagnetic ratio is field-independent in the linear "
+             "regime; no saturation or field-strength-dependent "
+             "corrections apply"],
             "mri_nmr", output_symbol="f0"),
     ],
     "enzyme_biocatalytic": [

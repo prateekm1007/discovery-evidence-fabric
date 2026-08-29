@@ -85,7 +85,18 @@ def _section_items(eng: Dict[str, Any], section: str) -> List[Any]:
         return [ma] if ma.get("physical_changes") else []
     if section == "ENGINEERING_DOMAIN":
         wd = eng.get("why_this_domain", {})
-        return [wd] if wd.get("matched_signals") else []
+        # E21-D: the detection record is a valid section item when it
+        # carries EITHER routing-signal evidence OR phenomena evidence
+        # for the selected domain (a PHENOMENA_DOMINANT selection with
+        # zero routing keyword hits is a complete, fully-reasoned
+        # record — measured case: BENCH_12 energy_harvesting; the
+        # phenomena anchors are recorded in domain_detection).
+        dd = eng.get("domain_detection", {})
+        dom = wd.get("domain") or eng.get("technology_domain")
+        phen = (dd.get("phenomena_layer") or {}).get(dom) or []
+        if wd.get("matched_signals") or phen:
+            return [wd]
+        return []
     if section == "GOVERNING_MODELS":
         return core.get("governing_model", {}).get(
             "domain_governing_models", [])

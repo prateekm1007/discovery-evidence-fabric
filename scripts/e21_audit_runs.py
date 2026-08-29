@@ -12,7 +12,9 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from discovery_fabric.benchmark import audit_runner  # noqa: E402
 
-RUNS_ROOT = Path("/home/z/my-project/scripts/e21_runs")
+import os
+RUNS_ROOT = Path(os.environ.get("E21_RUNS_ROOT",
+    "/home/z/my-project/scripts/e21_runs"))
 
 
 def utc() -> str:
@@ -87,7 +89,8 @@ def main() -> int:
     incorrect_total = sum(r.get("incorrect_critical_chains", 0)
                           for r in rows)
     out = {
-        "artifact": "ENGINE_HEAD_REMEASUREMENT_E21",
+        "artifact": os.environ.get("E21_ARTIFACT_NAME",
+                                  "ENGINE_HEAD_REMEASUREMENT_E21"),
         "owner": "CODER (sole builder; former Coder 2)",
         "disclosure": ("BUILDER-MEASURED pending the CEO's independent "
                        "audit (Art. XXVI): generated AND audited in one "

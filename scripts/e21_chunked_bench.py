@@ -13,7 +13,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "tests"))
 
-RUNS_ROOT = Path("/home/z/my-project/scripts/e21_runs")
+import os
+RUNS_ROOT = Path(os.environ.get("E21_RUNS_ROOT",
+    "/home/z/my-project/scripts/e21_runs"))
 RUNS_ROOT.mkdir(parents=True, exist_ok=True)
 
 from discovery_fabric.benchmark.corpus_runner import (  # noqa: E402

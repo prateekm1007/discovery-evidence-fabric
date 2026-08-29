@@ -346,3 +346,96 @@ def test_e21d_integration_reasoning_carried_into_artifact():
     # the honest basis text is recorded in why_this_domain (the
     # human-facing justification block)
     assert "keywords route, never justify" in eng["why_this_domain"]["basis"]
+
+
+def test_e21d_depth_contract_counts_phenomena_selected_domain():
+    """Measured BENCH_12 case: energy_harvesting selected PHENOMENA_
+    DOMINANT with ZERO routing keyword hits — the depth contract's
+    ENGINEERING_DOMAIN section must count the fully-reasoned detection
+    record as its item (item presence and tie BOTH accept phenomena
+    evidence; the keyword path is unchanged). Without this, the package
+    build fails with ENGINEERING_DOMAIN(items=0/1) despite a complete,
+    evidence-bearing domain record."""
+    import sys as _sys
+    from pathlib import Path as _Path
+    from discovery_fabric.engine.depth_contract import (
+        evaluate_depth_contract)
+    run = _Path("/home/z/my-project/scripts/e21d_runs/BENCH_12")
+    if not (run / "ENGINEERING_SPECIFICATION.json").exists():
+        pytest.skip("E21-D BENCH_12 run not present")
+    spec = json.loads((run / "INVENTION_SPECIFICATION.json")
+                      .read_text(encoding="utf-8"))
+    eng = json.loads((run / "ENGINEERING_SPECIFICATION.json")
+                     .read_text(encoding="utf-8"))
+    wd = eng["why_this_domain"]
+    assert wd["selection_basis"] == "PHENOMENA_DOMINANT"
+    assert not wd["matched_signals"]  # the measured condition
+    res = evaluate_depth_contract(spec, eng)
+    sec = res["sections"]["ENGINEERING_DOMAIN"]
+    assert sec["present"] is True
+    assert sec["item_count"] >= 1
+    assert sec["invention_tied"] is True
+    assert sec["satisfied"] is True
+    # the tie may fire via invention tokens (first-priority path) or via
+    # the phenomena-detection path — both are genuine recorded evidence
+    assert sec["tie_evidence"]["linkage_kind"] in (
+        "invention_tokens", "explicit_linkage_records",
+        "domain_detection_evidence", "phenomena_detection_evidence")
+
+
+def test_e21d_no_equation_in_library_has_empty_assumptions():
+    """Library-wide pin of the MISSING_ASSUMPTIONS defect class (frozen
+    instrument caught MRI-001 when the mri_nmr domain first became
+    benchmark-governed at E21-D; E21-C fixed TH-001 for the same class).
+    Every equation in EVERY domain library must carry >= 1 explicit
+    physical assumption — no future domain may ship equations with an
+    empty assumptions list."""
+    from discovery_fabric.engine.equations import EQUATION_LIBRARY
+    empty = [(dom, e["equation_id"])
+             for dom, eqs in EQUATION_LIBRARY.items()
+             for e in eqs if not e.get("assumptions")]
+    assert not empty, f"equations with empty assumptions: {empty}"
+
+
+def test_e21d_mri001_passes_frozen_equation_audit():
+    """Positive control with the frozen oracle: MRI-001 with the new
+    assumptions must pass audit_equations even with unsourced inputs
+    (same oracle pattern as the E21-C OPT-004 control)."""
+    from discovery_fabric.engine.equations import EQUATION_LIBRARY
+    from discovery_fabric.benchmark.equation_integrity import (
+        audit_equations)
+    eq = next(e for e in EQUATION_LIBRARY["mri_nmr"]
+              if e["equation_id"] == "MRI-001")
+    record = {
+        "technology_domain": "mri_nmr",
+        "engineering_core": {
+            "governing_model": {"equations": [{
+                "equation_id": "MRI-001",
+                "expression": eq["expression"],
+                "variables": eq["variables"],
+                "applicability": {
+                    "condition": eq["applicability"],
+                    "judged_for_domain": "mri_nmr"},
+                "assumptions": eq["assumptions"],
+                "source": {"text": "standard NMR relation (MRI physics "
+                                   "texts)"},
+            }]},
+            "critical_parameters": [
+                {"parameter": "static field strength",
+                 "value": "UNKNOWN"}],
+        },
+    }
+    a = audit_equations(record)
+    issues = [i for r in a.get("equations", [])
+              for i in r.get("issues", [])]
+    assert not any("MISSING_ASSUMPTIONS" in i for i in issues), issues
+    # mutation control: stripped assumptions -> the frozen oracle
+    # re-flags the defect (the gate was not weakened; the artifact
+    # changed)
+    mutated = json.loads(json.dumps(record))
+    mutated["engineering_core"]["governing_model"]["equations"][0][
+        "assumptions"] = []
+    a2 = audit_equations(mutated)
+    issues2 = [i for r in a2.get("equations", [])
+               for i in r.get("issues", [])]
+    assert any("MISSING_ASSUMPTIONS" in i for i in issues2), issues2
