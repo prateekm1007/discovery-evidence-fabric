@@ -4585,7 +4585,7 @@ Task: Add 10 CEO-provided 2035-horizon candidates (SC-A through SC-J). Run throu
 
 Work Log:
 - CEO provided 10 new candidates with 2035 technology horizon (SC-A: phase-change valve, SC-B: UWB position mapper, SC-C: biohybrid endothelial interface, SC-D: bacteriophage defense, SC-E: autonomous catheter navigation, SC-F: chemical molecular ICP signaling, SC-G: neuromorphic failure predictor, SC-H: enzymatic protein clearance, SC-I: NIR photovoltaic therapeutic, SC-J: glycan immune tolerance).
-- PAT revocation: CEO directed. NOTE: PAT revocation requires GitHub web UI (Settings > Developer settings > Personal access tokens). Cannot be done from CLI. CEO must revoke [REDACTED:github_pat] via GitHub web UI and provide new PAT.
+- PAT revocation: CEO directed. NOTE: PAT revocation requires GitHub web UI (Settings > Developer settings > Personal access tokens). Cannot be done from CLI. CEO must revoke ghp_[S01-REDACTED:arT] via GitHub web UI and provide new PAT.
 - Ran all 10 through 15-gate protocol with R269 lessons applied:
   - M4=NOT FOUND = unresolved question, NOT survival guarantee
   - Element-level collision needed, not concept-level

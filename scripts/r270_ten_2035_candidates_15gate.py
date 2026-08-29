@@ -373,7 +373,7 @@ output = {
     "generated_at": datetime.now(timezone.utc).isoformat(),
     "generated_by": "Round 270 — 10 CEO 2035-Horizon Candidates Through 15-Gate Protocol",
     "ceo_directive": "Add 10 new 2035-horizon candidates (SC-A through SC-J). Run through 15-gate protocol. Revoke and rotate PAT.",
-    "pat_note": "CEO directed PAT revocation. PAT revocation requires GitHub web UI (Settings > Developer settings > Personal access tokens). Cannot be done from CLI. The PAT [REDACTED:github_pat] should be revoked by the CEO via GitHub web UI.",
+    "pat_note": "CEO directed PAT revocation. PAT revocation requires GitHub web UI (Settings > Developer settings > Personal access tokens). Cannot be done from CLI. The PAT ghp_[S01-REDACTED:arT] should be revoked by the CEO via GitHub web UI.",
     "r269_lessons_applied": [
         "M4=NOT FOUND = unresolved question, NOT survival guarantee",
         "Deep element-level collision needed, not concept-level",

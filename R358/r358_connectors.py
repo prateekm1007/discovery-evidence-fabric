@@ -157,8 +157,8 @@ class PatentBearClient:
 # CONNECTOR 2: PatSnap (NOT WORKING — proper error classification)
 # ============================================================
 
-PATSNAP_KEY = "[REDACTED:patsnap_key]"
-PATSNAP_KEY_OLD = "[REDACTED:patsnap_key]"
+PATSNAP_KEY = "sk-[S01-REDACTED:RQ]"
+PATSNAP_KEY_OLD = "sk-[S01-REDACTED:kWs]"
 
 class PatSnapClient:
     """PatSnap connector. NOT WORKING — keys rejected by both endpoints."""

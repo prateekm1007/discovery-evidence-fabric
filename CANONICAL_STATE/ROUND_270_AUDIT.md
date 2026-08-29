@@ -8,7 +8,7 @@
 
 ## PAT Revocation Note
 
-CEO directed PAT revocation. PAT revocation requires GitHub web UI (Settings > Developer settings > Personal access tokens). Cannot be done from CLI. The CEO must revoke `[REDACTED:github_pat]` via GitHub web UI and provide a new PAT.
+CEO directed PAT revocation. PAT revocation requires GitHub web UI (Settings > Developer settings > Personal access tokens). Cannot be done from CLI. The CEO must revoke `ghp_[S01-REDACTED:arT]` via GitHub web UI and provide a new PAT.
 
 ---
 

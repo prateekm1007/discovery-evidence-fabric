@@ -3,7 +3,7 @@
 import requests, json, time
 from pathlib import Path
 
-API_KEY = "[REDACTED:patsnap_key]"
+API_KEY = "sk-[S01-REDACTED:kWs]"
 BASE = "https://connect.patsnap.com/api"
 HEADERS = {"X-PatSnap-API-Key": API_KEY, "Content-Type": "application/json"}
 

@@ -4585,7 +4585,7 @@ Task: Add 10 CEO-provided 2035-horizon candidates (SC-A through SC-J). Run throu
 
 Work Log:
 - CEO provided 10 new candidates with 2035 technology horizon (SC-A: phase-change valve, SC-B: UWB position mapper, SC-C: biohybrid endothelial interface, SC-D: bacteriophage defense, SC-E: autonomous catheter navigation, SC-F: chemical molecular ICP signaling, SC-G: neuromorphic failure predictor, SC-H: enzymatic protein clearance, SC-I: NIR photovoltaic therapeutic, SC-J: glycan immune tolerance).
-- PAT revocation: CEO directed. NOTE: PAT revocation requires GitHub web UI (Settings > Developer settings > Personal access tokens). Cannot be done from CLI. CEO must revoke [REDACTED:github_pat] via GitHub web UI and provide new PAT.
+- PAT revocation: CEO directed. NOTE: PAT revocation requires GitHub web UI (Settings > Developer settings > Personal access tokens). Cannot be done from CLI. CEO must revoke ghp_[S01-REDACTED:arT] via GitHub web UI and provide new PAT.
 - Ran all 10 through 15-gate protocol with R269 lessons applied:
   - M4=NOT FOUND = unresolved question, NOT survival guarantee
   - Element-level collision needed, not concept-level
@@ -4952,7 +4952,7 @@ Task: CEO provided GitHub PAT and instructed: (1) read all governance/anti-entro
 
 Work Log:
 - READ GOVERNANCE FILES: Constitution V1.1 (INVENTION_PROTOCOL_V1_1.md, SHA-256 b87d01e0..., frozen at commit 37f79fe). Constitution registry (protocol/CONSTITUTION_REGISTRY.json). Preflight check (protocol/preflight_check.py — mechanical enforcement of 12 sections). Governance directory (protocol/governance/ — 35 files including DETERMINISTIC_STATE_MACHINE, RETROACTIVE_INFLATION_SCANNER, V11_PRODUCTION_STANDARD). Epistemic integrity module (epistemic_integrity/ — 30+ files including hallucination_gauntlet, semantic_verifier, evidence_binding, state_reconciliation).
-- CONFIGURED PAT INLINE: Used '[REDACTED:github_pat]' via git remote set-url with inline credentials. PAT NOT persisted to disk, NOT committed to repo, NOT added to .env.keys. Verified .gitignore blocks .env.keys, *.env. Verified no PAT string in any committed file.
+- CONFIGURED PAT INLINE: Used 'ghp_[S01-REDACTED:arT]' via git remote set-url with inline credentials. PAT NOT persisted to disk, NOT committed to repo, NOT added to .env.keys. Verified .gitignore blocks .env.keys, *.env. Verified no PAT string in any committed file.
 - PULLED R335-R370: git fetch + git pull origin main brought local repo from fb9d691 (R334) to d4101d3 (R370-COMPLETION). 36 new commits (R335 through R370-COMPLETION). R370 artifacts now locally available: R370/multi_axis_readiness/ALL_AXES.json (15 packages, 8-axis readiness), R370/commissionable_contracts/ALL_CONTRACTS.json (15 packages), R370/claim_level/ALL_CLAIMS.json (15 packages), R370/decision_grade_buyers/ALL_BUYER_MAPS.json, R370/inventor_removed_test/ALL_BUYER_TESTS.json, R370_completion/upgraded_packages/ALL_COMMISSIONABLE.json.
 - RESOLVED CANONICAL SOURCE GAP: Built gates/rebuild_canonical_from_r370_repo.py that constructs the canonical input entirely from R370 repo artifacts (R332 baseline + R370 axes + R370 contracts + R370 claims). Zero fields from conversation summary. All 15 packages verified against actual R370 repo state. The previous "5 un-verifiable packages" gap (P-24, P-26, P-27-R1, P-28, P-29) is RESOLVED — all now have repo-verified provenance.
 - RE-RAN ALL SIX GATES with verified R370 canonical:
