@@ -294,10 +294,18 @@ def retrieve_attempted_solutions(device_query: str, mechanism: str,
     )
     from discovery_fabric.source_registry.connectors.patents import (
         GooglePatentsConnector,
+        LensPatentConnector,
     )
     query = f"{device_query} {mechanism}"
     lit = EuropePmcConnector().search(query, timeout=timeout)
-    pat = GooglePatentsConnector().search(query, timeout=timeout)
+    # Patent retrieval: Lens patent is the primary live source (measured
+    # 2026-08-29: HTTP 200 with real records on the provisioned token);
+    # Google Patents retained as a secondary attempt for coverage
+    # disclosure. PatentBear is deliberately NOT queried here: the source
+    # is provider-metered (20 requests/month) and is reserved for targeted
+    # full-text/claims fetches, never routine operator scans.
+    lens_pat = LensPatentConnector().search(query, timeout=timeout)
+    gpat = GooglePatentsConnector().search(query, timeout=timeout)
 
     mech_terms = set(_terms(mechanism)) | set(_terms(device_query))
     adjudicated = []
@@ -317,12 +325,45 @@ def retrieve_attempted_solutions(device_query: str, mechanism: str,
                 "overlapping_terms": overlap,
             },
         })
+    patent_adjudicated = []
+    for rec in lens_pat.records:
+        text_terms = set(_terms((rec.title or "") + " " + (rec.normalized.get("snippet") or "")))
+        overlap = sorted(mech_terms & text_terms)
+        relevant = len(overlap) >= 2
+        patent_adjudicated.append({
+            "record_id": rec.record_id,
+            "title": rec.title,
+            "uri": rec.uri,
+            "raw_payload_sha256": rec.raw_payload_sha256,
+            "relevance": "RELEVANT" if relevant else "IRRELEVANT_FILTERED",
+            "relevance_basis": {
+                "method": "term overlap between patent title/snippet and "
+                          "constraint mechanism terms (transparent, "
+                          "adjudicable)",
+                "overlapping_terms": overlap,
+            },
+        })
     patent_status = {
-        "source_id": pat.source_id, "status": pat.status, "error": pat.error,
-        "record_count": len(pat.records),
-        "note": "Patent attempted-solution retrieval is provider-limited "
-                "today (Google Patents measured UNAVAILABLE 503); recorded "
-                "honestly — NOT treated as absence of prior art (Art. XXI.3).",
+        "primary": {
+            "source_id": lens_pat.source_id, "status": lens_pat.status,
+            "error": lens_pat.error, "record_count": len(lens_pat.records),
+            "relevant": sum(1 for p in patent_adjudicated
+                            if p["relevance"] == "RELEVANT"),
+            "records": patent_adjudicated,
+        },
+        "secondary": {
+            "source_id": gpat.source_id, "status": gpat.status,
+            "error": gpat.error, "record_count": len(gpat.records),
+        },
+        "note": (
+            "Lens patent search is the live patent-coverage path (measured "
+            "2026-08-29). Google Patents historically measures UNAVAILABLE "
+            "(503 bot-block). Claim-level evidence requires a Patent Bear "
+            "full-text fetch (metered, not spent by routine operator runs). "
+            "Any provider failure here is NOT treated as absence of prior "
+            "art (Art. XXI.3); zero relevant patents in a bounded retrieval "
+            "is NOT a novelty determination (Art. XXI.2)."
+        ),
     }
     return {
         "query": query,
@@ -368,7 +409,10 @@ def remaining_limitation(attempted: Dict[str, Any], constraint: Dict[str, Any]) 
             "relevant_attempts_counted": len(relevant),
             "retrieved_records": attempted["literature"]["retrieved"],
             "exhaustive_survey": False,
-            "patent_coverage": attempted["patents"]["status"],
+            "patent_coverage": {
+                "primary": attempted["patents"]["primary"]["status"],
+                "secondary": attempted["patents"]["secondary"]["status"],
+            },
         },
         "unaddressed_terms": unaddressed,
     }

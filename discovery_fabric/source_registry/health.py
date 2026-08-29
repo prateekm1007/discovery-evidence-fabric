@@ -32,6 +32,7 @@ DEGRADED (defined, not invented — Art. XXVII):
 from __future__ import annotations
 
 import importlib
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 from discovery_fabric.source_registry.base import (
@@ -56,6 +57,136 @@ DERIVATION = {
                       "README mentions are not integration — Art. XXI)",
 }
 
+# Metered-source policy (Patent Bear class of providers):
+# a live health probe costs provider quota (Patent Bear: 1 of 20 monthly
+# requests), so automated probes are SUPPRESSED. Health is derived from the
+# freshest live retrieval-log proof inside the metered window. This is a
+# POLICY decision recorded here (Art. XXVII), not a provider fact; every
+# derived status discloses the last-live-proof timestamp so a reader can
+# judge its age. A source with NO live proof inside the window is
+# UNAVAILABLE('no live proof') — never silently LIVE.
+METERED_DERIVATION = {
+    "LIVE": "metered source: 7 chain steps passed on the freshest live "
+            "retrieval-log proof inside the metered window; live re-probe "
+            "suppressed to protect provider quota",
+    "DEGRADED": "metered source: freshest live proof shows provider "
+                "rate/quota limit, or quota exhausted since (guard active)",
+    "UNAVAILABLE": "metered source: no live proof inside the metered "
+                   "window (quota-protected probe suppressed)",
+}
+
+
+def _check_metered_source(source_id: str, metered: Dict[str, Any]) -> Dict[str, Any]:
+    """Health for a provider-metered source WITHOUT a live probe.
+
+    Reads the append-only retrieval log: the freshest entry with status
+    OK/EMPTY (a live provider answer) inside the metered window is the
+    last live proof. Quota state comes from the provider-reported
+    rate_limit_remaining in the freshest entry that carries one (Art. VI:
+    provider accounting, never an engine estimate).
+    """
+    from discovery_fabric.source_registry.retrieval_log import read_entries
+
+    window_days = int(metered.get("metered_window_days", 31))
+    window_start = datetime.now(timezone.utc) - timedelta(days=window_days)
+
+    entries = read_entries(source_id=source_id)
+    last_live = None
+    last_quota = None
+    for e in reversed(entries):
+        if last_live is None and e.get("status") in (STATUS_OK, STATUS_EMPTY):
+            try:
+                ts = datetime.fromisoformat(e["timestamp"])
+                if ts.tzinfo is None:
+                    ts = ts.replace(tzinfo=timezone.utc)
+                if ts >= window_start:
+                    last_live = e
+            except (KeyError, ValueError):
+                continue
+        if e.get("rate_limit_remaining") not in (None, ""):
+            last_quota = e
+        if last_live is not None and last_quota is not None:
+            break
+
+    chain = {
+        "connector_exists": True,
+        "live_request_works": None,   # not re-executed (quota-protected)
+        "response_parses": None,
+        "normalization_works": None,
+        "provenance_stores": None,
+        "retrieval_log_stores": True,  # the proof lives IN the log
+        "health_check_passes": None,
+        "proof_kind": "last_live_measurement",
+    }
+
+    if last_live is None:
+        return {
+            "source_id": source_id,
+            "status": "UNAVAILABLE",
+            "chain": chain,
+            "request_status": "NOT_PROBED",
+            "error": (
+                f"metered source: no live retrieval-log proof inside the "
+                f"{window_days}-day metered window; live probe suppressed "
+                "to protect provider quota — LIVE is not assertable "
+                "without a real work-driven call (Art. VI/XXI)"
+            ),
+            "derivation": METERED_DERIVATION,
+            "metered": {
+                **metered,
+                "last_quota_reported": (last_quota or {}).get("rate_limit_remaining"),
+                "last_quota_at": (last_quota or {}).get("timestamp"),
+            },
+        }
+
+    # Quota guard state: provider-reported remaining in the freshest usage
+    remaining = None
+    if last_quota is not None:
+        try:
+            remaining = int(str(last_quota.get("rate_limit_remaining")).strip())
+        except (TypeError, ValueError):
+            remaining = None
+
+    status = "LIVE"
+    reason = None
+    if remaining is not None and remaining <= 0:
+        status = "DEGRADED"
+        reason = (
+            f"provider-reported quota exhausted (remaining={remaining} at "
+            f"{last_quota.get('timestamp')}); connector guard returns "
+            "RATE_LIMITED without spending a request"
+        )
+    elif last_live.get("status") == STATUS_RATE_LIMITED:
+        status = "DEGRADED"
+        reason = f"last live proof was itself rate-limited: {last_live.get('error')}"
+
+    chain["live_request_works"] = True
+    chain["response_parses"] = True
+    chain["normalization_works"] = True
+    chain["provenance_stores"] = True
+    chain["health_check_passes"] = status == "LIVE"
+
+    return {
+        "source_id": source_id,
+        "status": status,
+        "chain": chain,
+        "request_status": "NOT_PROBED (metered; quota-protected)",
+        "last_live_proof": {
+            "timestamp": last_live.get("timestamp"),
+            "status": last_live.get("status"),
+            "query": last_live.get("query"),
+            "record_count": last_live.get("record_count"),
+            "raw_payload_sha256": last_live.get("raw_payload_sha256"),
+        },
+        "error": reason,
+        "derivation": METERED_DERIVATION,
+        "metered": {
+            **metered,
+            "provider_reported_remaining": remaining,
+            "last_quota_at": (last_quota or {}).get("timestamp"),
+        },
+    }
+
 
 def load_connector(source_id: str) -> Optional[Any]:
     """Import the connector class named in the registry (step 1)."""
@@ -71,6 +202,10 @@ def load_connector(source_id: str) -> Optional[Any]:
 def check_source(source_id: str, timeout: int = 30) -> Dict[str, Any]:
     """Run the 7-step chain for ONE source; return the measured result."""
     rec = SOURCE_REGISTRY[source_id]
+
+    # Metered sources: NO live probe — derived health (see policy above).
+    if rec.get("metered_quota"):
+        return _check_metered_source(source_id, rec["metered_quota"])
 
     chain = {
         "connector_exists": False,

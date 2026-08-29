@@ -259,6 +259,21 @@ def fetch_google_patent_full_claims(patent_id: str) -> Dict[str, Any]:
 
 
 # ----------------------- SOURCE 2: LENS SCHOLARLY -----------------------
+def _lens_string_query(query: str) -> str:
+    """Lucene-style title-scoped string query for the Lens APIs.
+
+    MEASURED DEFECT FIXED (2026-08-29, Art. XXXI memory): the structured
+    DSL body {"query": {"bool": {"must": [{"match": {"title": ...}}]}}}
+    does NOT 400 on api.lens.org — it is silently ignored (total=756812,
+    max_score=0.0) and the API returns the newest records REGARDLESS of
+    relevance (an astrophysics paper answered a CSF-shunt query). The
+    STRING form 'title:(...)' is the only measured-correct relevance
+    binding. A regression test pins this: the request body MUST use the
+    string form, never the DSL form.
+    """
+    return f"title:({query})"
+
+
 def search_lens_scholarly(query: str, num_results: int = 8) -> SourceQueryResult:
     """
     Search Lens Scholarly API (non-patent literature).
@@ -274,11 +289,11 @@ def search_lens_scholarly(query: str, num_results: int = 8) -> SourceQueryResult
 
     url = "https://api.lens.org/scholarly/search"
     payload = json.dumps({
-        "query": {"bool": {"must": [{"match": {"title": query}}]}},
+        "query": _lens_string_query(query),
         "size": num_results,
         "sort": [{"date_published": "desc"}],
         "include": ["title", "authors", "date_published", "year_published",
-                    "external_ids", "abstract", "source"],
+                    "external_ids", "abstract", "source", "lens_id"],
     }).encode()
 
     headers = {"Authorization": f"Bearer {LENS_TOKEN}"}
@@ -346,6 +361,123 @@ def search_lens_scholarly(query: str, num_results: int = 8) -> SourceQueryResult
 
     return SourceQueryResult(
         source_id="LENS_SCHOLARLY",
+        success=True,
+        latency_ms=latency,
+        hits=hits,
+    )
+
+
+# ----------------------- SOURCE 2b: LENS PATENT -----------------------
+def search_lens_patent(query: str, num_results: int = 8) -> SourceQueryResult:
+    """
+    Search Lens PATENT API (POST api.lens.org/patent/search).
+
+    Measured 2026-08-29 (string-query form, NO include parameter —
+    'include' is rejected by the patent endpoint with
+    'Unrecognized fields' 400s; the default response already carries
+    biblio/doc_key/abstract/legal_status/families):
+      - the provisioned LENS_API_TOKEN authenticates (200);
+      - title:(...) string queries bind relevance correctly (48 total
+        for 'hydrocephalus shunt valve');
+      - invention_title is a LIST of {text, lang} objects;
+        applicants live at biblio.parties.applicants[].extracted_name.value.
+    The scholarly-side adapter is search_lens_scholarly. Per CEO Section 4
+    (elite_v3): the two Lens resources are SEPARATE sources, never merged.
+    """
+    if not LENS_TOKEN:
+        return SourceQueryResult(
+            source_id="LENS_PATENT",
+            success=False,
+            latency_ms=0,
+            error="LENS_API_TOKEN not configured",
+        )
+
+    url = "https://api.lens.org/patent/search"
+    payload = json.dumps({
+        "query": _lens_string_query(query),
+        "size": num_results,
+        "sort": [{"date_published": "desc"}],
+    }).encode()
+
+    headers = {"Authorization": f"Bearer {LENS_TOKEN}"}
+    status, body, latency = _http_post(url, payload, headers=headers, timeout=25)
+
+    if status != 200:
+        return SourceQueryResult(
+            source_id="LENS_PATENT",
+            success=False,
+            latency_ms=latency,
+            error=f"HTTP {status}: {body.decode('utf-8', errors='ignore')[:200]}",
+            error_code=status,
+        )
+
+    try:
+        data = json.loads(body)
+    except Exception as e:
+        return SourceQueryResult(
+            source_id="LENS_PATENT",
+            success=False,
+            latency_ms=latency,
+            error=f"JSON parse error: {e}",
+        )
+
+    def _title_of(record: dict) -> str:
+        biblio = record.get("biblio") or {}
+        it = biblio.get("invention_title")
+        if isinstance(it, list):
+            for item in it:
+                if isinstance(item, dict) and item.get("text"):
+                    return str(item["text"])
+            return ""
+        return str(it or record.get("title") or "")
+
+    def _applicants_of(record: dict) -> List[str]:
+        parties = ((record.get("biblio") or {}).get("parties") or {})
+        out = []
+        for a in (parties.get("applicants") or [])[:10]:
+            name = ((a.get("extracted_name") or {}).get("value")
+                    if isinstance(a, dict) else None)
+            if name:
+                out.append(str(name))
+        return out
+
+    hits: List[PriorArtHit] = []
+    for record in data.get("data", []):
+        title = _title_of(record)
+        abstract = record.get("abstract") or ""
+        if isinstance(abstract, list):  # some records: [{text, lang}]
+            abstract = abstract[0].get("text", "") if abstract else ""
+        snippet = (abstract[:400] if abstract else title)[:400]
+
+        doc_key = record.get("doc_key") or ""
+        lens_id = record.get("lens_id") or ""
+        source_url = f"https://www.lens.org/patent/{lens_id}" if lens_id else ""
+
+        hit = PriorArtHit(
+            source_id="LENS_PATENT",
+            source_url=source_url,
+            retrieved_at_utc=_now_utc(),
+            query=query,
+            raw_payload_sha256=_sha256(json.dumps(record, sort_keys=True)),
+            title=title,
+            snippet=snippet,
+            assignee_or_authors=_applicants_of(record),
+            publication_date=str(record.get("date_published") or ""),
+            patent_id=doc_key or lens_id,
+            raw_metadata={
+                "lens_id": lens_id,
+                "doc_key": doc_key,
+                "jurisdiction": record.get("jurisdiction"),
+                "kind": record.get("kind"),
+                "doc_number": record.get("doc_number"),
+                "legal_status": record.get("legal_status"),
+                "date_published": record.get("date_published"),
+            },
+        )
+        hits.append(hit)
+
+    return SourceQueryResult(
+        source_id="LENS_PATENT",
         success=True,
         latency_ms=latency,
         hits=hits,

@@ -284,5 +284,32 @@ def patent_family_entity(record) -> Entity:
     )
 
 
+def patent_claim_entity(record, claim: Dict[str, Any]) -> Entity:
+    """One VERBATIM numbered claim of a patent — PATENT_CLAIM entity.
+
+    Claims come only from full-text retrieval (e.g. Patent Bear
+    get_patent_record: claim text is provider-verbatim, numbered by the
+    provider). Claim text is stored as retrieved — never summarized,
+    never paraphrased (Art. II: exact evidence beats semantic plausibility).
+    """
+    n = record.normalized
+    pid = n.get("patent_id") or n.get("publication_number") or n.get("patent_number") or ""
+    num = claim.get("number")
+    text = str(claim.get("text") or "").strip()
+    return Entity(
+        entity_type="PATENT_CLAIM",
+        entity_id=f"PATENT_CLAIM:{_slug(str(pid))}:{num}",
+        display_name=f"Claim {num} of {pid}",
+        identifiers={"publication_number": pid, "claim_number": num},
+        provenance=[_custody(record)],
+        attributes={
+            "claim_number": num,
+            "claim_text": text,
+            "claim_kind": claim.get("kind"),  # provider-declared, if any
+        },
+        limitations=list(record.limitations),
+    )
+
+
 def _slug(text: str) -> str:
     return "".join(c if c.isalnum() else "_" for c in (text or "").strip())[:120]

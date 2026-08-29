@@ -185,6 +185,15 @@ class ConnectorBase:
 
     # ---- engine ----------------------------------------------------------
 
+    def request_headers(self) -> Dict[str, str]:
+        """Extra request headers for authenticated sources (e.g. API keys).
+
+        Keys live in .env.keys (gitignored) and are NEVER placed in URLs —
+        the retrieval log stores the URL, so header auth also keeps
+        credentials out of the custody log (S-01 discipline).
+        """
+        return {}
+
     def _request(self, url: str, timeout: int = 25) -> Tuple[Optional[bytes], str, Optional[int], Optional[str], Optional[str]]:
         """Live HTTP GET with Art. XXI.3 status discipline.
 
@@ -193,7 +202,12 @@ class ConnectorBase:
         t0 = time.time()
         try:
             req = urllib.request.Request(
-                url, headers={"User-Agent": USER_AGENT, "Accept": "application/json,*/*"}
+                url,
+                headers={
+                    "User-Agent": USER_AGENT,
+                    "Accept": "application/json,*/*",
+                    **self.request_headers(),
+                },
             )
             resp = urllib.request.urlopen(req, timeout=timeout, context=SSL_CONTEXT)
             body = resp.read()

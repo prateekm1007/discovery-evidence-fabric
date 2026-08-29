@@ -19,6 +19,18 @@ PROVIDER_ENV_VARS = [
     "MISTRAL_API_KEY",
 ]
 
+# Source-layer credentials (read from .env.keys, not env vars). Same
+# hermetic rule as the LLM keys above: provisioning a source key (e.g. the
+# 2026-08-29 LENS/Elsevier/PatentBear keys) must NOT silently turn
+# previously-hermetic tests into live callers. CRITICAL for PatentBear:
+# every live call costs 1 of 20 monthly requests — a test suite run could
+# burn the whole quota. ENGINE_LIVE=1 opts out explicitly.
+SOURCE_KEY_MODULES_ATTRS = [
+    ("discovery_fabric.prior_art_v2.sources", "LENS_TOKEN"),
+    ("discovery_fabric.prior_art_v2.sources", "PATENT_BEAR_KEY"),
+    ("discovery_fabric.prior_art_v2.sources", "PATSNAP_KEY"),
+]
+
 
 @pytest.fixture(autouse=True)
 def _hermetic_no_provider_keys(monkeypatch):
@@ -31,4 +43,20 @@ def _hermetic_no_provider_keys(monkeypatch):
     import discovery_fabric.engine.adapters as _adapters
     monkeypatch.setattr(_adapters, "load_credentials",
                         lambda path=None: {}, raising=True)
+    # source-layer keys from .env.keys: neutralized the same way
+    import importlib
+    for module_path, attr in SOURCE_KEY_MODULES_ATTRS:
+        try:
+            mod = importlib.import_module(module_path)
+            monkeypatch.setattr(mod, attr, "", raising=False)
+        except ImportError:
+            pass
+    try:
+        import discovery_fabric.source_registry.keys as _srckeys
+        monkeypatch.setattr(_srckeys, "load_keys", lambda: {},
+                            raising=True)
+        monkeypatch.setattr(_srckeys, "load_key", lambda name: "",
+                            raising=True)
+    except ImportError:
+        pass
     yield

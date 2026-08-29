@@ -50,6 +50,7 @@ def _src(
     provenance_method: str,
     connector: Optional[str] = None,
     auth_requires: Optional[List[str]] = None,
+    metered_quota: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Build a source record with the 13 directive fields + wiring keys."""
     return {
@@ -70,6 +71,11 @@ def _src(
         # required credentials; health check imports these dynamically.
         "connector": connector,
         "auth_requires": auth_requires or [],
+        # metered_quota (wiring, not part of the 13): provider-metered source.
+        # The health checker must NOT live-probe a metered source (each probe
+        # burns provider quota); its health is derived from the freshest
+        # live retrieval-log proof inside the metered window (see health.py).
+        "metered_quota": metered_quota,
     }
 
 
@@ -413,6 +419,36 @@ _register(_src(
     auth_requires=[],
 ))
 
+_register(_src(
+    source_id="elsevier_scopus",
+    name="Elsevier Scopus (Scopus Search API)",
+    authority_role=["SCIENTIFIC"],
+    coverage="Scopus-indexed scientific, technical, and medical literature: "
+             "titles, abstracts, authors, affiliations, publication dates, "
+             "citation counts; broad STM coverage incl. engineering and "
+             "medical-device literature.",
+    access_method="REST JSON; GET "
+                  "https://api.elsevier.com/content/search/scopus with "
+                  "X-ELS-APIKey header",
+    update_frequency="Daily (Scopus daily update cycle)",
+    rate_limits="Per key: measured 2026-08-29 at probe volume; institutional "
+                "entitlement governs full-text endpoints — this integration "
+                "uses search metadata only",
+    licensing="Elsevier Developer Portal terms; API key per registered "
+              "account; metadata use per Elsevier policy",
+    primary_or_secondary="SECONDARY",
+    freshness="Daily",
+    known_gaps="Subscription-boundary opacity: search returns totalResults "
+               "and metadata for the whole index, but some full-text "
+               "representations require entitlement this key may not carry "
+               "(not measured, not claimed). Relevance must still be "
+               "adjudicated per record (Art. XXI.4).",
+    provenance_method="Query + Scopus EID/DOI + raw payload sha256 into "
+                      "retrieval log",
+    connector="discovery_fabric.source_registry.connectors.scientific:ElsevierScopusConnector",
+    auth_requires=["ELSEVIER_API_KEY (provisioned in .env.keys)"],
+))
+
 # ---------------------------------------------------------------------------
 # PATENT
 # ---------------------------------------------------------------------------
@@ -439,23 +475,119 @@ _register(_src(
     auth_requires=[],
 ))
 
+# The Lens: TWO SEPARATE sources (CEO Section 4 / elite_v3 — never merged).
+# Measured 2026-08-29 with the provisioned LENS_API_TOKEN: BOTH endpoints
+# authenticate and return relevant records with title:(...) string queries
+# (patent: 48 total for 'hydrocephalus shunt valve'; scholarly: 1309 total
+# for 'cerebrospinal fluid shunt'). Measurement history disclosed: the FIRST
+# scholarly probe at 07:47 UTC answered 401 'Unable to authorize user to
+# this resource'; re-measurement at 08:04+ answered 200 — classified as a
+# TRANSIENT provider state (likely entitlement propagation after key
+# provisioning), not a stable entitlement boundary. Separately discovered
+# and fixed the same day: the structured DSL query form is SILENTLY IGNORED
+# by api.lens.org (returns 756k newest records regardless of relevance) —
+# the string form is the only correct relevance binding; a regression test
+# pins it.
 _register(_src(
     source_id="lens_scholarly",
-    name="The Lens (patent + scholarly)",
-    authority_role=["PATENT", "SCIENTIFIC"],
-    coverage="Patent families and scholarly records with structured claims.",
-    access_method="REST (POST /patent/search) with Bearer token",
+    name="The Lens — scholarly (NPL) search",
+    authority_role=["SCIENTIFIC"],
+    coverage="Non-patent scholarly literature records (NPL) with abstracts "
+             "and external ids; NOT patent coverage (CEO Section 4).",
+    access_method="REST (POST https://api.lens.org/scholarly/search) with "
+                  "Bearer token",
     update_frequency="Continuous",
-    rate_limits="Token-tier dependent",
-    licensing="API terms per subscription",
+    rate_limits="Token-tier dependent; measured 2026-08-29 working at "
+                "probe volume (single-digit requests); one transient 401 "
+                "observed 14 minutes after token provisioning",
+    licensing="API terms per Lens subscription",
     primary_or_secondary="SECONDARY",
     freshness="Continuous",
-    known_gaps="NO TOKEN provisioned in .env.keys — live path cannot "
-               "authenticate (honest dependency, not silently claimed).",
-    provenance_method="Existing prior_art_v2 PriorArtHit custody "
-                      "(raw_payload_sha256, query, retrieved_at)",
+    known_gaps="MEASUREMENT HISTORY (2026-08-29): first probe 401 (07:47 "
+               "UTC), re-measurement 200 with relevant records (08:04+ UTC) "
+               "— transient provider state disclosed, not hidden. Known "
+               "limits: abstract coverage varies; relevance must still be "
+               "adjudicated per record (Art. XXI.4); the DSL query form is "
+               "broken-by-design on Lens (silently ignored) — string form "
+               "pinned by regression test.",
+    provenance_method="prior_art_v2 PriorArtHit custody "
+                      "(raw_payload_sha256, query, retrieved_at) + registry "
+                      "retrieval log",
     connector="discovery_fabric.source_registry.connectors.patents:LensConnector",
-    auth_requires=["LENS_API_TOKEN (not provisioned)"],
+    auth_requires=["LENS_API_TOKEN (provisioned in .env.keys)"],
+))
+
+_register(_src(
+    source_id="lens_patent",
+    name="The Lens — patent search",
+    authority_role=["PATENT"],
+    coverage="Global patent bibliographic records: title, abstract, "
+             "applicants, publication date, jurisdiction, doc_key, "
+             "legal_status; queryable by title terms (string query form).",
+    access_method="REST (POST https://api.lens.org/patent/search) with "
+                  "Bearer token",
+    update_frequency="Continuous",
+    rate_limits="Token-tier dependent; measured 2026-08-29 working at "
+                "probe volume (single-digit requests)",
+    licensing="API terms per Lens subscription",
+    primary_or_secondary="SECONDARY",
+    freshness="Continuous",
+    known_gaps="Bibliographic coverage only in search results — claim TEXT "
+               "is not included; claim-level evidence needs PatentBear "
+               "full-record fetch (metered) or another claims source. The "
+               "patent endpoint rejects 'include' parameters (400 "
+               "Unrecognized fields — measured); invention_title arrives as "
+               "a [{text, lang}] list. Relevance must still be adjudicated "
+               "per record (Art. XXI.4).",
+    provenance_method="prior_art_v2 PriorArtHit custody "
+                      "(raw_payload_sha256, query, retrieved_at) + registry "
+                      "retrieval log",
+    connector="discovery_fabric.source_registry.connectors.patents:LensPatentConnector",
+    auth_requires=["LENS_API_TOKEN (provisioned in .env.keys)"],
+))
+
+_register(_src(
+    source_id="patentbear",
+    name="Patent Bear (MCP JSON-RPC: US patent search + full-text records)",
+    authority_role=["PATENT"],
+    coverage="US patents and published applications: keyword search, exact "
+             "identifier lookup (e.g. US9033909B2), and VERBATIM full text "
+             "— title, abstract, numbered claims, description sections.",
+    access_method="MCP (JSON-RPC 2.0 over HTTP POST "
+                  "https://www.patentbear.com/mcp) with Bearer token; tools: "
+                  "search_patents, get_patent_record, run_lab, get_lab_result",
+    update_frequency="Continuous (Patent Bear record store)",
+    rate_limits="MEASURED 2026-08-29 on this key: 20 requests/month across "
+                "search_patents + get_patent_record (provider 'usage' block "
+                "in every response); run_lab bills credits SEPARATELY and is "
+                "PROHIBITED in this engine (never called). Connector carries "
+                "a quota guard: provider-reported remaining==0 -> RATE_LIMITED "
+                "without making the call.",
+    licensing="Commercial subscription (Patent Bear terms); API key per "
+              "account",
+    primary_or_secondary="SECONDARY",
+    freshness="Continuous",
+    known_gaps="US-centric corpus (US grants + publications + NPL articles); "
+               "monthly quota of 20 makes bulk retrieval impossible — the "
+               "engine uses it for targeted full-text/claims fetches ONLY, "
+               "never for routine scanning; automated health checks do NOT "
+               "live-probe this source (metered; see health.py policy).",
+    provenance_method="prior_art_v2 PriorArtHit custody + registry retrieval "
+                      "log; usage block (monthly_used/remaining) logged per "
+                      "response as rate_limit_remaining",
+    connector="discovery_fabric.source_registry.connectors.patents:PatentBearConnector",
+    auth_requires=["PATENT_BEAR_API_KEY (provisioned in .env.keys)"],
+    metered_quota={
+        "monthly_limit": 20,
+        "metered_by": "provider usage block (monthly_limit/monthly_used/"
+                      "monthly_remaining) returned in every response",
+        "health_policy": "no-live-probe; LIVE is derived from the freshest "
+                         "live retrieval-log proof inside the metered window",
+        "metered_window_days": 31,
+        "prohibited_tools": ["run_lab (bills credits; never called by this "
+                             "engine)", "get_lab_result (only after a "
+                             "run_lab, hence never called)"],
+    },
 ))
 
 _register(_src(

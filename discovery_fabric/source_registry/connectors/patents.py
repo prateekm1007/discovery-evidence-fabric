@@ -75,6 +75,9 @@ def _adapt(source_id: str, role: str, pa_result, query: str, url_hint: str) -> S
             source_id=source_id, status=status, ok=True,
             http_status=error_code, latency_ms=latency, records=records,
             query=query, retrieved_at=utc_now(),
+            rate_limit_remaining=(str(pa_result.rate_limit_remaining)
+                                  if getattr(pa_result, "rate_limit_remaining", None) is not None
+                                  else None),
         )
     else:
         msg = (error or "").lower()
@@ -123,6 +126,7 @@ class _PaV2Wrapper(ConnectorBase):
                 raw_payload_sha256=(out.records[0].raw_payload_sha256
                                     if out.records else None),
                 error=out.error,
+                rate_limit_remaining=out.rate_limit_remaining,
             )
         except Exception as e:  # noqa: BLE001
             out.error = (out.error or "") + f" | retrieval_log_write_failed: {e}"
@@ -142,14 +146,96 @@ class GooglePatentsConnector(_PaV2Wrapper):
 
 
 class LensConnector(_PaV2Wrapper):
+    """The Lens SCHOLARLY (NPL) resource — SCIENTIFIC role only.
+
+    CEO Section 4 / elite_v3: LENS_PATENT and LENS_SCHOLARLY are SEPARATE
+    sources and are never merged. The patent-side connector is
+    LensPatentConnector below. Measured 2026-08-29: the provisioned token
+    authenticates on BOTH endpoints (one transient 401 observed 14 min
+    after provisioning, then 200s — see registry measurement history).
+    """
+
     SOURCE_ID = "lens_scholarly"
-    ROLES = ("PATENT", "SCIENTIFIC")
+    ROLES = ("SCIENTIFIC",)
     HEALTH_QUERY = "pacemaker lead"
-    URL_HINT = "https://api.lens.org/patent/search"
+    URL_HINT = "https://api.lens.org/scholarly/search"
 
     def search(self, query: str, timeout: int = 25) -> SourceQueryResult:
         from discovery_fabric.prior_art_v2.sources import search_lens_scholarly
         pa = search_lens_scholarly(query, num_results=5)
+        return self._finish_pa(_adapt(self.SOURCE_ID, self.ROLE, pa, query, self.URL_HINT), query)
+
+
+class LensPatentConnector(_PaV2Wrapper):
+    """The Lens PATENT resource — PATENT role.
+
+    Measured 2026-08-29: HTTP 200 with real patent records on the
+    provisioned token. Bibliographic coverage (title/abstract/applicants/
+    doc_key); claim TEXT is not in search results (see registry known_gaps).
+    """
+
+    SOURCE_ID = "lens_patent"
+    ROLES = ("PATENT",)
+    HEALTH_QUERY = "hydrocephalus shunt valve"
+    URL_HINT = "https://api.lens.org/patent/search"
+
+    def search(self, query: str, timeout: int = 25) -> SourceQueryResult:
+        from discovery_fabric.prior_art_v2.sources import search_lens_patent
+        pa = search_lens_patent(query, num_results=5)
+        return self._finish_pa(_adapt(self.SOURCE_ID, self.ROLE, pa, query, self.URL_HINT), query)
+
+
+class PatentBearConnector(_PaV2Wrapper):
+    """Patent Bear MCP — PATENT role, PROVIDER-METERED (20 requests/month).
+
+    Quota discipline (measured 2026-08-29, provider usage block):
+    - search_patents and get_patent_record draw from the SAME 20/month pool;
+    - the provider's usage block is logged verbatim per response
+      (rate_limit_remaining in the retrieval log);
+    - GUARD: if the freshest provider-reported remaining is 0, search()
+      returns RATE_LIMITED WITHOUT making the call (Art. XXI.3 — a quota
+      exhaustion is a provider state, never 'no results');
+    - run_lab / get_lab_result BILL CREDITS and are NEVER called by this
+      engine (registry metered_quota.prohibited_tools).
+    """
+
+    SOURCE_ID = "patentbear"
+    ROLES = ("PATENT",)
+    HEALTH_QUERY = "hydrocephalus shunt valve"
+    URL_HINT = "https://www.patentbear.com/mcp"
+
+    def _last_reported_remaining(self) -> int | None:
+        """Freshest provider-reported monthly_remaining for this source,
+        from the append-only retrieval log (None = never reported)."""
+        from discovery_fabric.source_registry.retrieval_log import read_entries
+        for e in reversed(read_entries(source_id=self.SOURCE_ID)):
+            v = e.get("rate_limit_remaining")
+            if v is not None and str(v).strip() != "":
+                try:
+                    return int(str(v).strip())
+                except ValueError:
+                    continue
+        return None
+
+    def search(self, query: str, timeout: int = 25) -> SourceQueryResult:
+        remaining = self._last_reported_remaining()
+        if remaining is not None and remaining <= 0:
+            return self._finish_pa(
+                SourceQueryResult(
+                    source_id=self.SOURCE_ID, status="RATE_LIMITED", ok=False,
+                    error=(
+                        "Patent Bear monthly quota exhausted (provider-reported "
+                        f"remaining={remaining} in the freshest logged usage "
+                        "block); NO request was made — this is a provider "
+                        "metering state, not an absence of patents "
+                        "(Art. XXI.3)"
+                    ),
+                    query=query, retrieved_at=utc_now(),
+                ),
+                query,
+            )
+        from discovery_fabric.prior_art_v2.sources import search_patent_bear
+        pa = search_patent_bear(query, num_results=5)
         return self._finish_pa(_adapt(self.SOURCE_ID, self.ROLE, pa, query, self.URL_HINT), query)
 
 

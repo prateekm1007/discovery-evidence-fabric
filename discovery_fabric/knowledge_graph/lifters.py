@@ -159,11 +159,33 @@ def lift_clinical_trial_record(g: KnowledgeGraph, record) -> List[str]:
 
 
 def lift_patent_record(g: KnowledgeGraph, record) -> List[str]:
-    """Patent hit -> PATENT_FAMILY node. No device edge unless a measured
-    linkage exists (none fabricated)."""
+    """Patent hit -> PATENT_FAMILY node (+ PATENT_CLAIM nodes when the
+    record carries verbatim claims, e.g. a Patent Bear full-text fetch).
+
+    No PATENT_COVERS_DEVICE edge unless a measured linkage exists (none
+    fabricated — device linkage is asserted by NOBODY here).
+    """
+    from discovery_fabric.knowledge_graph.entities import (
+        patent_claim_entity,
+    )
+    from discovery_fabric.knowledge_graph.edges import make_edge
+
     fam = patent_family_entity(record)
     g.add_entity(fam)
-    return [fam.entity_id]
+    made = [fam.entity_id]
+
+    claims = (record.normalized or {}).get("claims") or []
+    for claim in claims:
+        if not isinstance(claim, dict) or not str(claim.get("text") or "").strip():
+            continue
+        ent = patent_claim_entity(record, claim)
+        g.add_entity(ent)
+        edge = make_edge("PATENT_CLAIM_BELONGS_TO", ent.entity_id,
+                         fam.entity_id, record)
+        if edge is not None:
+            g.add_edge(edge)
+        made.append(ent.entity_id)
+    return made
 
 
 LIFTERS = {
@@ -173,6 +195,17 @@ LIFTERS = {
     "fda_pma": lift_pma_record,
     "fda_udi": lift_udi_record,
     "clinicaltrials_gov": lift_clinical_trial_record,
+    # patent sources -> PATENT_FAMILY (+PATENT_CLAIM when verbatim claims
+    # are present in the record). Bibliographic hits produce family nodes
+    # only; claim nodes require full-text retrieval (measured providers:
+    # Patent Bear get_patent_record).
+    "lens_patent": lift_patent_record,
+    "patentbear": lift_patent_record,
+    "google_patents": lift_patent_record,
+    "epo_ops": lift_patent_record,
+    "uspto_odp": lift_patent_record,
+    "patsnap_eureka": lift_patent_record,
+    "google_bigquery_patents": lift_patent_record,
 }
 
 

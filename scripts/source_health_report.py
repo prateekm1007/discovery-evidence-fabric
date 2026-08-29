@@ -91,6 +91,15 @@ def main() -> int:
             for s in ["LIVE", "DEGRADED", "UNAVAILABLE", "NOT_INTEGRATED"]
         },
         "derivation": report["results"][0]["derivation"] if report["results"] else {},
+        "derivation_metered_sources": {
+            "note": "provider-metered sources (e.g. patentbear) are NEVER "
+                    "live-probed by health checks; their LIVE/DEGRADED status "
+                    "derives from the freshest live retrieval-log proof inside "
+                    "the metered window, with the proof timestamp disclosed "
+                    "per-source under per_source[].last_live_proof",
+            "policy": "see discovery_fabric/source_registry/health.py "
+                      "METERED_DERIVATION",
+        },
         "per_source": report["results"],
         "retrieval_log_audit": report["retrieval_log_audit"],
         "coverage_matrix": matrix,

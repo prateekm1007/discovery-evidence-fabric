@@ -299,3 +299,124 @@ class SemanticScholarConnector(ConnectorBase):
                 ],
             ))
         return out
+
+
+class ElsevierScopusConnector(ConnectorBase):
+    """Elsevier Scopus Search API — SCIENTIFIC role.
+
+    Measured 2026-08-29 with the provisioned ELSEVIER_API_KEY: HTTP 200
+    with real search-results; the no-key control answers 401
+    AUTHENTICATION_ERROR (the key is what authorizes — positive and
+    negative control both measured).
+
+    Auth: X-ELS-APIKey HEADER (never a URL param) so the credential cannot
+    land in the retrieval-log URL field (S-01 discipline).
+
+    Scopus quirk handled honestly: a zero-match query still returns HTTP
+    200 with an EMPTY "entry" list — that flows to EMPTY through the base
+    (a definitive provider answer). A 401 (invalid/expired key) or 429
+    (quota) stays AUTH_FAILED / RATE_LIMITED (Art. XXI.3).
+    """
+
+    SOURCE_ID = "elsevier_scopus"
+    ROLES = ("SCIENTIFIC",)
+    HEALTH_QUERY = "hydrocephalus shunt"
+    LIMIT = 5
+
+    def request_headers(self) -> Dict[str, str]:
+        from discovery_fabric.source_registry.keys import load_key
+        key = load_key("ELSEVIER_API_KEY")
+        return {"X-ELS-APIKey": key} if key else {}
+
+    def build_url(self, query: str) -> str:
+        q = urllib.parse.quote(query)
+        return ("https://api.elsevier.com/content/search/scopus"
+                f"?query={q}&count={self.LIMIT}&view=STANDARD")
+
+    def _key_provisioned(self) -> bool:
+        from discovery_fabric.source_registry.keys import load_key
+        return bool(load_key("ELSEVIER_API_KEY"))
+
+    def search(self, query: str, timeout: int = 25):
+        if not self._key_provisioned():
+            from discovery_fabric.source_registry.base import SourceQueryResult
+            from discovery_fabric.source_registry.retrieval_log import append_entry
+            out = SourceQueryResult(
+                source_id=self.SOURCE_ID, status="AUTH_FAILED", ok=False,
+                error="ELSEVIER_API_KEY not provisioned in .env.keys",
+                query=query, retrieved_at=utc_now(),
+            )
+            try:
+                append_entry(
+                    source_id=self.SOURCE_ID, query=query,
+                    url=self.build_url(query), status=out.status,
+                    http_status=None, latency_ms=0, record_count=0,
+                    raw_payload_sha256=None, error=out.error,
+                )
+            except Exception:  # noqa: BLE001
+                pass
+            return out
+        return self._execute(query, timeout=timeout)
+
+    def parse_payload(self, raw: bytes, query: str) -> Any:
+        data = json.loads(raw.decode("utf-8"))
+        if not isinstance(data, dict) or "search-results" not in data:
+            # service-error / status bodies must not parse as results
+            raise ValueError(f"unexpected scopus payload shape: {list(data)[:5] if isinstance(data, dict) else type(data)}")
+        return data
+
+    def extract_total_hits(self, payload: Any) -> Any:
+        sr = (payload or {}).get("search-results") or {}
+        try:
+            return int(sr.get("opensearch:totalResults"))
+        except (TypeError, ValueError):
+            return None
+
+    def normalize_payload(self, payload: Any, query: str, raw_sha: str) -> List[SourceRecord]:
+        sr = (payload or {}).get("search-results") or {}
+        entries = sr.get("entry") or []
+        out: List[SourceRecord] = []
+        for r in entries:
+            if not isinstance(r, dict):
+                continue
+            # Scopus signals an error entry as {"service-error": ...} or an
+            # entry with status text instead of dc:identifier — skip those
+            # honestly rather than fabricating a record.
+            if "service-error" in r or not r.get("dc:identifier"):
+                continue
+            eid = str(r.get("dc:identifier") or "").replace("SCOPUS_ID:", "")
+            doi = r.get("prism:doi") or None
+            out.append(SourceRecord(
+                source_id=self.SOURCE_ID,
+                role="SCIENTIFIC",
+                record_id=f"scopus:{eid}",
+                title=r.get("dc:title") or "",
+                uri=(f"https://www.scopus.com/record/display.uri?eid=2-s2.0-{eid}&origin=inward"
+                     if eid else ""),
+                retrieved_at=utc_now(),
+                query=query,
+                raw_payload_sha256=raw_sha,
+                normalized={
+                    "scopus_eid": eid,
+                    "doi": doi,
+                    "creator": r.get("dc:creator"),
+                    "publication_name": r.get("prism:publicationName"),
+                    "publication_date": r.get("prism:coverDate"),
+                    "citedby_count": r.get("citedby-count"),
+                    "abstract": _clean(r.get("abstract") or "")[:4000] or None,
+                },
+                provenance={
+                    "provider": self.SOURCE_ID,
+                    "api": "api.elsevier.com/content/search/scopus",
+                    "query": query,
+                    "raw_payload_sha256": raw_sha,
+                    "retrieved_at": utc_now(),
+                },
+                epistemic_state="OBSERVED",
+                limitations=[
+                    "Subscription-boundary opacity: some full-text "
+                    "representations require entitlement this key may not "
+                    "carry (not measured, not claimed)",
+                ],
+            ))
+        return out

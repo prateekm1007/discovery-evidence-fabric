@@ -59,8 +59,14 @@ def append_entry(
     raw_payload_sha256: Optional[str],
     error: Optional[str] = None,
     run_id: Optional[str] = None,
+    rate_limit_remaining: Optional[str] = None,
 ) -> dict:
-    """Append one custody entry; returns the written entry."""
+    """Append one custody entry; returns the written entry.
+
+    rate_limit_remaining: PROVIDER-REPORTED metering state (e.g. Patent
+    Bear usage.monthly_remaining), stored verbatim as a string. It is the
+    provider's own accounting, never an engine-side estimate (Art. VI).
+    """
     from discovery_fabric.source_registry.base import utc_now, sha256_obj
 
     with _LOCK:
@@ -76,6 +82,7 @@ def append_entry(
             "raw_payload_sha256": raw_payload_sha256,
             "error": error,
             "run_id": run_id,
+            "rate_limit_remaining": rate_limit_remaining,
             "timestamp": utc_now(),
             "prev_entry_sha256": prev_sha,
         }

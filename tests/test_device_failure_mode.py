@@ -143,8 +143,14 @@ class TestUnexploredSpace:
             "query": "q",
             "literature": {"source_status": "OK", "retrieved": len(recs),
                            "relevant": len(recs), "records": recs},
-            "patents": {"status": "UNAVAILABLE", "error": "503",
-                        "record_count": 0, "note": ""},
+            "patents": {
+                "primary": {"source_id": "lens_patent", "status": "UNAVAILABLE",
+                            "error": "provider-limited", "record_count": 0,
+                            "relevant": 0, "records": []},
+                "secondary": {"source_id": "google_patents", "status": "UNAVAILABLE",
+                              "error": "503", "record_count": 0},
+                "note": "",
+            },
         }
 
     def test_matching_axis_without_attempts_is_direction(self):
@@ -184,7 +190,14 @@ class TestRemainingLimitation:
             "query": "q",
             "literature": {"source_status": "OK", "retrieved": 8, "relevant": 3,
                            "records": []},
-            "patents": {"status": "UNAVAILABLE", "error": "503", "record_count": 0},
+            "patents": {
+                "primary": {"source_id": "lens_patent", "status": "UNAVAILABLE",
+                            "error": "provider-limited", "record_count": 0,
+                            "relevant": 0, "records": []},
+                "secondary": {"source_id": "google_patents", "status": "UNAVAILABLE",
+                              "error": "503", "record_count": 0},
+                "note": "",
+            },
         }
         constraint = {
             "constraint_statement": "Devices must maintain function despite lead fracture",
