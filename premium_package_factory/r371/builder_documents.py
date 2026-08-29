@@ -106,9 +106,33 @@ def render_buyer_card(pkg, hl, comm, eco, loopstate, out_path):
     rows = []
     wp1 = pkg.build_plan[0] if pkg.build_plan else {}
     tb = pkg.transfer_boundary or {}
-    buyer_receives = "; ".join(tb.get("buyer_receives", [])[:5]) or "See transfer manifest"
-    buyer_must = "; ".join(
-        (tb.get("buyer_must_develop", []) or [])[:5]) or "See transfer manifest"
+    # R373-7 q6/q7: the receive/must lists are canonical strings and MUST
+    # pass through the V2 mutation layer (a list item can itself carry a
+    # corrected string — e.g. P-27-R1's regulatory-submission item). The
+    # R373-5 chain audit caught the card rendering the stale V1 form.
+    # An item changed by a mutation renders WITH its citation tag (the
+    # mutation id + evidence basis), so any company name inside a
+    # corrected item is a cited mention, never a bare one.
+    def _mut_tagged(item: str) -> str:
+        out = _mut(pkg, item)
+        if out != item:
+            for m in (pkg.addendum or {}).get("mutations", []):
+                if m.get("v1_text") and m.get("v1_text") in item:
+                    basis = "; ".join(m.get("evidence_basis", []))
+                    tag = f" [V2 correction {m.get('mutation_id')}"
+                    if basis:
+                        tag += f"; evidence basis: {basis}"
+                    return out + tag + "]"
+        return out
+
+    buyer_receives = "; ".join(
+        _mut_tagged(item) for item in tb.get("buyer_receives", [])[:5]
+    ) or "See transfer manifest"
+    buyer_must_items = (tb.get("buyer_must_create", [])
+                        or tb.get("buyer_must_develop", []) or [])
+    buyer_must = "; ".join(_mut_tagged(item)
+                           for item in buyer_must_items[:5]) or \
+        "NOT_RECORDED in the engineering record"
     profile = next((s for s in comm["commercial_evidence"]
                     if s["section"] == "BUYER_PROFILE"), {})
     caps = "; ".join(profile.get("required_capabilities", []))
@@ -141,8 +165,36 @@ def render_buyer_card(pkg, hl, comm, eco, loopstate, out_path):
         ["5. WHAT EVIDENCE WOULD CAUSE THE BUYER TO STOP?", hl["kill_if"]],
     ]
     st.append(Paragraph("THE FIVE DECISION CRITICALS", S["SH"]))
-    st.append(_tbl([["Critical", "Answer"]] + crit_rows,
-                   [1.6 * 72, 5.0 * 72], fontsize=7.4))
+    # R373-7 fix: the criticals table previously used plain string cells,
+    # which CLIP long answers mid-sentence (critical #5 — the kill
+    # condition — was cut off at ~150 chars; caught by the R373-5 chain
+    # audit's v1-coverage check). Paragraph cells wrap, so the buyer
+    # receives every critical answer in full.
+    from reportlab.platypus import Paragraph as _P, Table as _T, \
+        TableStyle as _TS
+    from reportlab.lib import colors as _c
+    from reportlab.lib.styles import ParagraphStyle as _PS
+    _qstyle = _PS("critq", fontName="Helvetica-Bold", fontSize=7.4,
+                  leading=9.2, textColor=_c.HexColor("#0f2a4d"))
+    _astyle = _PS("crita", fontName="Helvetica", fontSize=7.4, leading=9.2,
+                  textColor=_c.HexColor("#1f2937"))
+    _crit_cells = [[_P("Critical", _qstyle), _P("Answer", _qstyle)]]
+    for q, a in crit_rows:
+        _crit_cells.append([_P(_esc(q), _qstyle), _P(_esc(a), _astyle)])
+    _crit_tbl = _T(_crit_cells, colWidths=[1.6 * 72, 5.0 * 72])
+    _crit_tbl.setStyle(_TS([
+        ("GRID", (0, 0), (-1, -1), 0.4, _c.HexColor("#cbd5e1")),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("BACKGROUND", (0, 0), (-1, 0), _c.HexColor("#0f2a4d")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), _c.white),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1),
+         [_c.white, _c.HexColor("#f6f8fb")]),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+    ]))
+    st.append(_crit_tbl)
     st.append(Spacer(1, 6))
 
     qa = [
@@ -175,6 +227,27 @@ def render_buyer_card(pkg, hl, comm, eco, loopstate, out_path):
     for q, a in qa:
         st.append(Paragraph(_esc(q), S["QH"]))
         st.append(Paragraph(_esc(a), S["BC"]))
+
+    # ---- R373-5: V2 CORRECTIONS IN EFFECT ------------------------------
+    # Every recorded mutation must be carried by the buyer card itself
+    # (CEO R373 chain: ... -> PDF -> buyer card -> evidence summary ->
+    # transfer manifest -> ZIP). The card renders mutation id, affected
+    # field and the V2 text now in effect. The V1 text is NOT rendered
+    # here — the full V1->V2 trail ships as V2_MUTATION_ADDENDUM.json.
+    if pkg.addendum:
+        st.append(Paragraph(
+            "V2 CORRECTIONS IN EFFECT (external evidence that changed "
+            "this dossier)", S["QH"]))
+        for m in pkg.addendum.get("mutations", []):
+            basis = "; ".join(m.get("evidence_basis", [])) or \
+                "evidence basis recorded in the addendum"
+            st.append(Paragraph(_esc(
+                f"{m.get('mutation_id')} — {m.get('field_affected')}: "
+                f"{str(m.get('v2_text', ''))} "
+                f"[Evidence basis: {basis}]"), S["BC"]))
+        st.append(Paragraph(_esc(
+            "Full V1->V2 text trail with evidence basis ships as "
+            "V2_MUTATION_ADDENDUM.json in this package."), S["DIS"]))
 
     if caps:
         st.append(Paragraph("BUYER CAPABILITY REQUIRED", S["QH"]))
@@ -274,7 +347,7 @@ def render_evidence_summary(pkg, hl, loopstate, out_path):
             v2_text = str(m.get("v2_text", ""))
             if v2_text:
                 st.append(Paragraph(_esc(
-                    f"V2 text now in effect: {v2_text[:700]}"), S["SM"]))
+                    f"V2 text now in effect: {v2_text}"), S["SM"]))
         st.append(Paragraph(
             "Full V1->V2 text trail ships as V2_MUTATION_ADDENDUM.json in this package.",
             S["DIS"]))
@@ -311,11 +384,25 @@ def render_transfer_manifest(pkg, hl, comm, out_path):
         st.append(Paragraph("• " + _esc(_mut(pkg, item)), S["BC"]))
 
     st.append(Paragraph("WHAT DOES NOT TRANSFER (BUYER MUST DEVELOP)", S["SH"]))
-    for item in (tb.get("buyer_must_develop", []) or []):
+    # R373-7 q6: read the CANONICAL field buyer_must_create (R370Q export;
+    # present for all 15 packages, 5-8 items each). The legacy reader looked
+    # for buyer_must_develop only and silently dropped the recorded list.
+    must_items = (tb.get("buyer_must_create", [])
+                  or tb.get("buyer_must_develop", []) or [])
+    for item in must_items:
         st.append(Paragraph("• " + _esc(_mut(pkg, item)), S["BC"]))
-    if not (tb.get("buyer_must_develop")):
-        st.append(Paragraph("• See engineering dossier build plan — the "
-                            "buyer executes the validation work packages.", S["BC"]))
+    if not must_items:
+        st.append(Paragraph("• NOT_RECORDED in the engineering record — "
+                            "see engineering dossier build plan for the "
+                            "validation work packages.", S["BC"]))
+    # The validation work packages are also part of what the buyer executes
+    # (recorded build plan, canonical engineering_build_plan).
+    st.append(Paragraph(_esc(
+        "In addition, the buyer executes the recorded validation work "
+        f"packages WP-01..WP-{len(pkg.build_plan):02d} "
+        "(engineering dossier, engineering build plan) — no validation "
+        "experiment has been run; all verification results are NOT_TESTED."),
+        S["BC"]))
 
     st.append(Paragraph("BUYER CAPABILITY REQUIRED", S["SH"]))
     profile = next((s for s in comm["commercial_evidence"]
@@ -339,6 +426,24 @@ def render_transfer_manifest(pkg, hl, comm, out_path):
         "representation of physical performance. Items marked NOT_ESTABLISHED "
         "or UNKNOWN do not exist as established facts. This manifest is "
         "honest: unavailable items are named as unavailable."), S["BT"]))
+
+    # ---- R373-5: the manifest carries the V2 correction state ---------
+    # (CEO R373 chain: ... -> evidence summary -> transfer manifest -> ZIP;
+    # the buyer evaluates the CORRECTED asset, so the manifest discloses
+    # every correction now in effect, WITH its evidence basis. V1 text is
+    # not rendered here — the full trail ships as V2_MUTATION_ADDENDUM.)
+    if pkg.addendum:
+        st.append(Paragraph("V2 CORRECTIONS IN EFFECT", S["SH"]))
+        for m in pkg.addendum.get("mutations", []):
+            basis = "; ".join(m.get("evidence_basis", [])) or \
+                "evidence basis recorded in the addendum"
+            st.append(Paragraph(_esc(
+                f"{m.get('mutation_id')} — {m.get('field_affected')}: "
+                f"{str(m.get('v2_text', ''))} "
+                f"[Evidence basis: {basis}]"), S["BC"]))
+        st.append(Paragraph(_esc(
+            "Full V1->V2 text trail with evidence basis ships as "
+            "V2_MUTATION_ADDENDUM.json in this package."), S["DIS"]))
     doc.build(st, onFirstPage=_footer_canvas(ident), onLaterPages=_footer_canvas(ident))
     return out_path
 

@@ -159,17 +159,93 @@ def _entry(unknown: str, cls: str, pkg, rule_id: str) -> dict:
               if critical else
               "Gates design detail and the next work package, not package feasibility")
 
+    # ---- R373-6 fields (CEO R373 directive 6) ---------------------------
+    # why_unknown: the record-state reason, mechanically derived from the
+    # classification rule + recorded facts (all verification NOT_TESTED,
+    # 0 PHYSICAL_OBSERVATION evidence) — never a narrative guess.
+    why = _WHY_UNKNOWN[cls].format(topic=topic.lower())
+    # method: the resolution method class + canonical instrumentation when
+    # a build-plan step is linked.
+    method = _METHOD[cls]
+    if step and cls == "BENCH_TEST_REQUIRED":
+        method = (f"Bench test — {step.get('measurement', 'measurement')} "
+                  f"using {step.get('equipment', 'recorded equipment')} "
+                  f"(build plan {step.get('work_package', 'WP')})")
+    # responsible_function: disclosed engineering-organization convention
+    # (the mapping table ships in the roadmap discipline note).
+    func = _RESPONSIBLE_FUNCTION[cls]
+
     return {
         "unknown_id": None,  # assigned by caller (U-01...)
         "unknown_statement": unknown,
         "classification": cls,
         "classification_basis": rule_id,
         "is_critical": critical,
+        "why_unknown": why,
+        "what_would_resolve_it": action,
+        "method": method,
+        "responsible_function": func,
         "resolution_action": action,
         "expected_output": expected,
         "decision_impact": impact,
         "linked_build_plan_step": step.get("work_package") if step else None,
     }
+
+
+# R373-6 mechanical derivation tables (disclosed conventions, not facts)
+_WHY_UNKNOWN = {
+    "LITERATURE_RESOLVABLE":
+        "Not resolved against captured external sources; no source-backed "
+        "claim in the record covers this item.",
+    "COMPUTATION_RESOLVABLE":
+        "No recorded computational study covers this item (all results in "
+        "the record are stated with their model class, none addresses it).",
+    "BENCH_TEST_REQUIRED":
+        "No physical measurement exists — all verification results are "
+        "NOT_TESTED in the canonical record (0 PHYSICAL_OBSERVATION "
+        "evidence; no prototype has been tested).",
+    "ENGINEERING_DESIGN_REQUIRED":
+        "No design decision with recorded basis exists in the canonical "
+        "record for this item.",
+    "REGULATORY_REQUIRED":
+        "No regulatory pathway decision is recorded (pathway, product code "
+        "and submission type are undetermined in the record).",
+    "LEGAL_IP_REQUIRED":
+        "No counsel-authored IP determination is recorded (novelty and FTO "
+        "are NOT_ESTABLISHED in the record).",
+    "FUNDAMENTALLY_UNRESOLVED":
+        "Requires evidence outside the current record (living-system or "
+        "external dataset); not obtainable by bench, computation, "
+        "literature or design work alone at this stage.",
+}
+_METHOD = {
+    "LITERATURE_RESOLVABLE":
+        "Targeted literature search with source capture and hashing",
+    "COMPUTATION_RESOLVABLE":
+        "Computational study with uncertainty quantification (FDA CM&S / "
+        "ASME V&V 40 discipline)",
+    "BENCH_TEST_REQUIRED": "Bench test per canonical build-plan step",
+    "ENGINEERING_DESIGN_REQUIRED":
+        "Engineering design study with documented selection basis",
+    "REGULATORY_REQUIRED":
+        "Regulatory pathway engagement (FDA pre-submission / standards "
+        "applicability review)",
+    "LEGAL_IP_REQUIRED":
+        "Patent counsel work (classification search / FTO opinion)",
+    "FUNDAMENTALLY_UNRESOLVED":
+        "External data acquisition or long-lead evidence program",
+}
+_RESPONSIBLE_FUNCTION = {
+    "LITERATURE_RESOLVABLE": "Research / evidence analysis",
+    "COMPUTATION_RESOLVABLE": "Modeling & simulation engineering",
+    "BENCH_TEST_REQUIRED": "Test engineering",
+    "ENGINEERING_DESIGN_REQUIRED": "Design engineering",
+    "REGULATORY_REQUIRED": "Regulatory affairs",
+    "LEGAL_IP_REQUIRED": "IP counsel",
+    "FUNDAMENTALLY_UNRESOLVED":
+        "External data acquisition (no internal engineering function can "
+        "close it alone)",
+}
 
 
 def build_unknown_roadmap(pkg) -> dict:
@@ -192,7 +268,14 @@ def build_unknown_roadmap(pkg) -> dict:
             "canonical engineering record. Classification is mechanical "
             "(each entry records the rule that fired) and converts each "
             "unknown into a resolution action, expected output and "
-            "decision impact — an engineering roadmap, not a reduced count."
+            "decision impact — an engineering roadmap, not a reduced count. "
+            "R373-6 fields: why_unknown is the record-state reason "
+            "(mechanically derived from the classification + recorded "
+            "facts); what_would_resolve_it = resolution_action; method is "
+            "the resolution method class; responsible_function is a "
+            "DISCLOSED ORGANIZATIONAL CONVENTION mapping the resolution "
+            "class to the engineering function that owns it (not a "
+            "recorded fact); decision_impact is as recorded."
         ),
         "classification_counts": counts,
         "unknowns": entries,

@@ -145,13 +145,43 @@ def _arrow(ax, x1, y1, x2, y2, label=None, color=INK_700, lw=1.2,
                           edgecolor='none', alpha=0.92))
 
 
-def _title(ax, text, subtitle=None, y=5.7):
-    """Add a diagram title."""
+def _title(ax, text, subtitle=None, y=5.7, pkg_id=None):
+    """Add a diagram title. When pkg_id is given, the CANONICAL mechanism
+    statement from the headlines registry is drawn as a dedicated line
+    under the title (R373-1: the depicted mechanism must be the package's
+    mechanism — the statement itself is now part of the diagram, traced
+    verbatim to the canonical record)."""
     ax.text(5, y, text, ha='center', va='center',
             fontsize=11, fontweight='bold', color=INK_900)
     if subtitle:
         ax.text(5, y - 0.35, subtitle, ha='center', va='center',
                 fontsize=8.5, color=INK_500, style='italic')
+    mech = _canonical_mechanism(pkg_id)
+    if mech:
+        ax.text(5, y - (0.72 if subtitle else 0.38), mech,
+                ha='center', va='center', fontsize=8.2,
+                color=BRAND_900, fontweight='bold', wrap=True)
+
+
+_HEADLINES_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    'input', 'headlines_r371.json')
+_HEADLINES_CACHE = {}
+
+
+def _canonical_mechanism(pkg_id):
+    """Canonical mechanism statement (V2-mutation aware) for a package."""
+    if not pkg_id:
+        return None
+    if not _HEADLINES_CACHE:
+        try:
+            import json
+            with open(_HEADLINES_PATH, encoding='utf-8') as f:
+                for row in json.load(f)['packages']:
+                    _HEADLINES_CACHE[row['package_id']] = row['mechanism']
+        except Exception:
+            return None
+    return _HEADLINES_CACHE.get(pkg_id)
 
 
 def _save(fig, name):
@@ -175,7 +205,7 @@ def diagram_P01(name="P-01"):
 
     _title(ax, "P-01 Multi-Segment CSF Shunt",
            "Multi-segment catheter + Bayesian occlusion predictor + alpha controller",
-           y=6.7)
+           y=6.7, pkg_id="P-01")
 
     # CSF source
     _block(ax, 0.4, 4.5, 1.6, 1.0, "CSF Production", sublabel="Q_prod",
@@ -243,7 +273,7 @@ def diagram_P02(name="P-02"):
 
     _title(ax, "P-02 Adaptive Valve Profile",
            "Feedback loop: ICP sensor → trend extractor → adaptive profile → valve",
-           y=6.0)
+           y=6.0, pkg_id="P-02")
 
     # ICP sensor
     _block(ax, 0.4, 3.5, 1.8, 1.0, "ICP Sensor", sublabel="(existing, implanted)",
@@ -299,7 +329,7 @@ def diagram_P04(name="P-04"):
 
     _title(ax, "P-04 Catalytic Contact-Time Lock",
            "NEP enzyme on catheter wall clears Aβ42 via mass-transport-limited contact",
-           y=6.0)
+           y=6.0, pkg_id="P-04")
 
     # CSF inflow
     _block(ax, 0.3, 3.5, 1.6, 1.0, "CSF Inflow", sublabel="Aβ42 substrate",
@@ -373,7 +403,7 @@ def diagram_P07(name="P-07"):
 
     _title(ax, "P-07 Passive Drainage Priority Safety Floor",
            "Passive mechanical bypass maintains drainage when primary path obstructs",
-           y=6.5)
+           y=6.5, pkg_id="P-07")
 
     # Catheter main lumen (large horizontal rounded rectangle)
     main_lumen = FancyBboxPatch((1.0, 3.5), 8.5, 1.5,
@@ -437,7 +467,7 @@ def diagram_P11(name="P-11"):
 
     _title(ax, "P-11 Phage Anti-Biofilm",
            "S. aureus phage K immobilized on electrospun Ti-coated catheter surface",
-           y=6.0)
+           y=6.0, pkg_id="P-11")
 
     # Ti-coated catheter surface (bottom horizontal block)
     ti = FancyBboxPatch((0.5, 1.5), 9.5, 0.5,
@@ -501,9 +531,9 @@ def diagram_P13(name="P-13"):
     """P-13 Neuromorphic Predictor — data pipeline."""
     fig, ax = _setup_axes(figsize=(9, 6), xlim=(0, 11), ylim=(0, 7))
 
-    _title(ax, "P-13 Neuromorphic Predictor",
+    _title(ax, "P-13 ML-Based Failure Predictor",
            "ML pipeline: ICP+flow sensor streams → features → predictor → clinical alert",
-           y=6.5)
+           y=6.5, pkg_id="P-13")
 
     # Two sensor streams
     _block(ax, 0.3, 4.5, 1.6, 1.0, "ICP Sensor", sublabel="P_ICP(t)",
@@ -570,7 +600,7 @@ def diagram_P15R1(name="P-15-R1"):
 
     _title(ax, "P-15-R1 Self-Powered Sensing (R1 Repair)",
            "Extracardiac harvesting: CSF pulsation + neck motion → piezo → cap → duty-cycled sensor",
-           y=6.5)
+           y=6.5, pkg_id="P-15-R1")
 
     # Two energy sources
     _block(ax, 0.3, 4.5, 1.8, 1.0, "CSF Pulsation", sublabel="mechanical",
@@ -637,7 +667,7 @@ def diagram_P16(name="P-16"):
 
     _title(ax, "P-16 940nm Optical Power Delivery",
            "External 940nm LED → scalp/skull tissue → implanted GaAs PV → power conditioning → load",
-           y=6.5)
+           y=6.5, pkg_id="P-16")
 
     # External LED
     _block(ax, 0.3, 3.5, 1.6, 1.4, "940nm LED", sublabel="external\nwearable",
@@ -705,7 +735,7 @@ def diagram_P21R1(name="P-21-R1"):
 
     _title(ax, "P-21-R1 UWB Catheter Position Mapping (R1 Repair)",
            "Implantable UWB transmitter → external receiver array → TOA localization (SAR-bounded)",
-           y=6.5)
+           y=6.5, pkg_id="P-21-R1")
 
     # Patient skull (semi-circle representation)
     theta = np.linspace(0, np.pi, 50)
@@ -772,7 +802,7 @@ def diagram_P22R1(name="P-22-R1"):
 
     _title(ax, "P-22-R1 Autonomous Catheter Navigation (R1 Repair)",
            "Hydraulic pressure-driven multi-segment catheter navigation [R1 REPAIR from SMP]",
-           y=6.5)
+           y=6.5, pkg_id="P-22-R1")
 
     # Hydraulic pressure source
     _block(ax, 0.3, 4.5, 1.8, 1.0, "Hydraulic Source", sublabel="P_hyd per segment",
@@ -844,7 +874,7 @@ def diagram_P24(name="P-24"):
 
     _title(ax, "P-24 Gravity Compensation Hydraulic Damper for Postural Transients",
            "Passive gravity-head damper for postural ICP compensation",
-           y=6.5)
+           y=6.5, pkg_id="P-24")
 
     # CSF inflow
     _block(ax, 0.3, 3.5, 1.4, 1.4, "CSF Inflow", sublabel="postural pressure transients",
@@ -900,7 +930,7 @@ def diagram_P24(name="P-24"):
 
     # Honest state
     ax.text(0.3, 0.4,
-            "Honest state: T1 MODEL_PREDICTED (60% postural ICP excursion reduction). Passive — no electronics, no actuation.",
+            "Honest state: T1 MODEL_PREDICTED (60% postural ICP excursion reduction). Passive — no electronics.",
             fontsize=7, color=INK_500, style='italic')
 
     return _save(fig, name)
@@ -912,7 +942,7 @@ def diagram_P26(name="P-26"):
 
     _title(ax, "P-26 Osmotic-Regulated Drainage Valve",
            "Passive osmotic membrane responds to CSF osmolarity changes",
-           y=6.5)
+           y=6.5, pkg_id="P-26")
 
     # CSF inflow (variable osmolarity)
     _block(ax, 0.3, 4.0, 1.6, 1.4, "CSF Inflow", sublabel="osmolarity Δ\n(~290 mOsm/kg, EXTERNAL_PRECEDENT)",
@@ -970,7 +1000,7 @@ def diagram_P26(name="P-26"):
             fontsize=7.5, color=INK_700)
 
     ax.text(0.3, 0.3,
-            "Honest state: T1 MODEL_PREDICTED (35% drainage regulation improvement). Prior-art: 11 hits — FTO analysis required.",
+            "Honest state: T1 MODEL_PREDICTED (35% drainage regulation improvement). Prior-art: 11 hits — FTO required.",
             fontsize=7, color=INK_500, style='italic')
 
     return _save(fig, name)
@@ -982,7 +1012,7 @@ def diagram_P27R1(name="P-27-R1"):
 
     _title(ax, "P-27-R1 Self-Referenced Piezoresistive Sensor (R1 Repair)",
            "Metal tube substrate + vacuum reference chamber for drift compensation",
-           y=6.5)
+           y=6.5, pkg_id="P-27-R1")
 
     # Pressure-sensitive diaphragm (left)
     diaphragm = FancyBboxPatch((0.5, 2.8), 0.3, 2.5,
@@ -995,6 +1025,21 @@ def diagram_P27R1(name="P-27-R1"):
             color=INK_700, fontweight='bold')
     _arrow(ax, 0.0, 4.0, 0.5, 4.0, color=INK_700, lw=1.4,
            label="CSF pressure", label_size=7, label_offset=(-0.3, 0.5))
+
+    # Catheter integration (R373-1: the canonical subsystem 'Catheter
+    # integration (mechanical protection)' — the sensor mounts in the
+    # catheter wall, protected from mechanical damage)
+    catheter_wall = FancyBboxPatch((0.3, 2.0), 5.8, 0.45,
+                                   boxstyle="round,pad=0.02,rounding_size=0.05",
+                                   facecolor="white", edgecolor=INK_500,
+                                   linewidth=1.0, linestyle="-")
+    ax.add_patch(catheter_wall)
+    ax.text(3.2, 2.225, "Catheter Integration (mechanical protection)",
+            ha='center', va='center', fontsize=7.5, color=INK_700,
+            fontweight='bold')
+    _arrow(ax, 1.2, 2.45, 0.65, 2.8, color=INK_500, lw=0.9,
+           label="mounts sensor in catheter wall", label_size=6.5,
+           label_offset=(1.8, -0.12))
 
     # Metal tube substrate (horizontal)
     tube = FancyBboxPatch((0.8, 3.5), 5.0, 1.0,
@@ -1060,7 +1105,7 @@ def diagram_P28(name="P-28"):
 
     _title(ax, "P-28 Acoustic Obstruction Detection",
            "External acoustic transducer → skull → CSF column → obstruction detection",
-           y=6.5)
+           y=6.5, pkg_id="P-28")
 
     # External acoustic transducer
     _block(ax, 0.3, 4.5, 1.6, 1.0, "Acoustic TX", sublabel="1-10 kHz",
@@ -1123,7 +1168,7 @@ def diagram_P28(name="P-28"):
 
     # Honest state
     ax.text(0.3, 0.3,
-            "Honest state: T1 MODEL_PREDICTED (>=90% detection accuracy). PATENT SEARCH PENDING — high priority for buyer diligence.",
+            "Honest state: T1 MODEL_PREDICTED (>=90% detection accuracy). PATENT SEARCH PENDING.",
             fontsize=7, color=INK_500, style='italic')
 
     return _save(fig, name)
@@ -1135,7 +1180,7 @@ def diagram_P29(name="P-29"):
 
     _title(ax, "P-29 MR Flow Quantification Sensor",
            "Miniaturized NMR: B0 field + RF coil → proton spin phase shift → flow rate",
-           y=6.5)
+           y=6.5, pkg_id="P-29")
 
     # Permanent magnet array (top + bottom)
     mag_top = Rectangle((2.5, 5.0), 5.0, 0.5,

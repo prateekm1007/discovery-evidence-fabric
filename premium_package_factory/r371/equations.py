@@ -234,10 +234,15 @@ def render_equation_png(mathtext: str, out_path: str, dpi: int = 300) -> str:
 
 def build_equation_registry(pkg) -> dict:
     """EQUATION_REGISTRY.json content for one package."""
+    from .canonical_source import apply_mutations
     entries = []
     assumptions = pkg.gm.get("assumptions", [])
     boundary = pkg.gm.get("boundary_conditions", [])
-    summary = pkg.gm.get("summary", "")
+    # R373-5 fix: the registry is a BUYER-SHIPPED JSON — its rendered prose
+    # carries the V2 state (the R373 chain audit caught the stale V1
+    # 'Neuromorphic ML predictor' summary here). The equation strings
+    # themselves stay verbatim canonical.
+    summary = apply_mutations(pkg.gm.get("summary", ""), pkg.addendum)
 
     for i, eq in enumerate(pkg.equations, start=1):
         math_part, annotation, corrupt_note = split_annotation(eq)
@@ -261,7 +266,8 @@ def build_equation_registry(pkg) -> dict:
             "applicability": boundary,
             "assumptions": assumptions,
             "source": {
-                "origin": "governing_model.equations (R370Q canonical export)",
+                "origin": "governing_model.equations (R370Q canonical "
+                          "export; V2-mutation-aware rendering)",
                 "summary": summary,
             },
         }

@@ -575,6 +575,32 @@ def experiment_diagram_spec(pkg, headlines: dict) -> dict:
     stimulus = (ver.get("method") or wp1.get("design_work")
                 or _NOT_RECORDED)
 
+    # R373-2 decision consequence: what happens when the criterion is met
+    # and when it is not. Both branches from canonical data only:
+    #   PASS branch -> WP-01 deliverable (build plan) + next work package
+    #                  (recorded sequence) — or explicit PROPOSED marker
+    #                  where the record names no next step.
+    #   FAIL branch -> package kill condition (headlines registry).
+    deliverable = wp1.get("deliverable") or _NOT_RECORDED
+    next_wp = bp[1].get("work_package") if len(bp) > 1 else None
+    if next_wp:
+        pass_branch = (f"IF ACCEPTANCE MET -> deliver {deliverable}; "
+                       f"proceed to {next_wp} (recorded build-plan sequence)")
+        pass_source = ("engineering_build_plan[0].deliverable + "
+                       "engineering_build_plan[1].work_package")
+    elif wp1.get("deliverable"):
+        pass_branch = (f"IF ACCEPTANCE MET -> deliver {deliverable} "
+                       "(final recorded work package)")
+        pass_source = "engineering_build_plan[0].deliverable"
+    else:
+        pass_branch = ("IF ACCEPTANCE MET -> PROPOSED: proceed per "
+                       "engineering judgment (no next work package or "
+                       "deliverable recorded)")
+        pass_source = "PROPOSED (nothing recorded — explicitly proposed)"
+    fail_branch = (f"IF KILL CONDITION MET -> stop; do not build: "
+                   f"{headlines.get('kill_if', '')}")
+    decision_consequence = f"{pass_branch}. {fail_branch}"
+
     return {
         "package_id": pkg.pkg_id,
         "portfolio_number": pkg.num,
@@ -609,6 +635,11 @@ def experiment_diagram_spec(pkg, headlines: dict) -> dict:
                            if ver.get("acceptance")
                            else "engineering_build_plan[0].acceptance_criterion"),
             },
+            "decision_consequence": {
+                "content": decision_consequence,
+                "source": (f"{pass_source}; "
+                           "kill condition: headlines registry"),
+            },
             "kill_condition": {
                 "content": headlines.get("kill_if", ""),
                 "source": "headlines registry (V2-mutation aware)"},
@@ -625,12 +656,14 @@ def experiment_diagram_spec(pkg, headlines: dict) -> dict:
 
 def validate_experiment_spec(spec: dict, pkg, headlines: dict) -> dict:
     """Every required role present, every content string verbatim canonical,
-    decision criterion exact, control variables honest."""
+    decision criterion exact, control variables honest, decision consequence
+    composed from canonical branches or explicitly PROPOSED (R373-2)."""
     failures = []
     roles = spec["roles"]
     required = ["test_article", "stimulus", "instrumentation",
                 "measured_outputs", "control_variables",
-                "decision_criterion", "kill_condition"]
+                "decision_criterion", "decision_consequence",
+                "kill_condition"]
     for r in required:
         if r not in roles or not str(roles[r].get("content", "")).strip():
             failures.append({"check": "ROLE_MISSING", "detail": r})
@@ -662,6 +695,34 @@ def validate_experiment_spec(spec: dict, pkg, headlines: dict) -> dict:
         failures.append({"check": "CRITERION_NOT_VERBATIM", "detail": ""})
     if roles["kill_condition"]["content"] != headlines.get("kill_if", ""):
         failures.append({"check": "KILL_CONDITION_DRIFT", "detail": ""})
+
+    # decision consequence (R373-2): composed ONLY from canonical branches
+    # (deliverable / next work package / kill condition) or carrying an
+    # explicit PROPOSED marker. Re-derive the expected string exactly.
+    deliverable = wp1.get("deliverable") or _NOT_RECORDED
+    next_wp = bp[1].get("work_package") if len(bp) > 1 else None
+    if next_wp:
+        expected_pass = (f"IF ACCEPTANCE MET -> deliver {deliverable}; "
+                         f"proceed to {next_wp} (recorded build-plan "
+                         f"sequence)")
+    elif wp1.get("deliverable"):
+        expected_pass = (f"IF ACCEPTANCE MET -> deliver {deliverable} "
+                         "(final recorded work package)")
+    else:
+        expected_pass = ("IF ACCEPTANCE MET -> PROPOSED: proceed per "
+                         "engineering judgment (no next work package or "
+                         "deliverable recorded)")
+    expected_consequence = (f"{expected_pass}. "
+                            f"IF KILL CONDITION MET -> stop; do not build: "
+                            f"{headlines.get('kill_if', '')}")
+    if roles["decision_consequence"]["content"] != expected_consequence:
+        failures.append({
+            "check": "DECISION_CONSEQUENCE_NOT_CANONICAL",
+            "detail": "decision consequence is not the exact composition of "
+                      "recorded pass branch (build-plan deliverable / next "
+                      "work package, or explicit PROPOSED marker) and "
+                      "recorded fail branch (kill condition)",
+        })
 
     # control variables: honest form — the spec builder composes the
     # content deterministically from recorded critical parameters; verify
@@ -705,6 +766,9 @@ def validate_experiment_spec(spec: dict, pkg, headlines: dict) -> dict:
                    "instrumentation verbatim", "measured outputs verbatim",
                    "control variables honest (marker + verbatim)",
                    "decision criterion verbatim",
+                   "decision consequence canonical (pass branch from "
+                   "build plan or explicit PROPOSED; fail branch = kill "
+                   "condition)",
                    "kill condition verbatim"],
         "failures": failures,
         "ok": not failures,

@@ -272,6 +272,24 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     st.append(Paragraph("14. ABBREVIATIONS", S["SH"]))
     st.append(_abbrev_table(pkg, hl))
 
+    # -- 15. V2 corrections in effect (R373-5: the dossier PDF is a chain
+    # stage — every recorded mutation, INCLUDING additive disclosures that
+    # replace no V1 string, must be carried by this document) -------------
+    if pkg.addendum:
+        st.append(Paragraph(
+            "15. V2 CORRECTIONS IN EFFECT (external evidence that changed "
+            "this dossier)", S["SH"]))
+        for m in pkg.addendum.get("mutations", []):
+            basis = "; ".join(m.get("evidence_basis", [])) or \
+                "evidence basis recorded in the addendum"
+            st.append(Paragraph(_esc(
+                f"{m.get('mutation_id')} — {m.get('field_affected')}: "
+                f"{str(m.get('v2_text', ''))} "
+                f"[Evidence basis: {basis}]"), S["BT"]))
+        st.append(Paragraph(_esc(
+            "Full V1->V2 text trail with evidence basis ships as "
+            "V2_MUTATION_ADDENDUM.json in this package."), S["DIS"]))
+
     st.append(Paragraph(_esc(
         "Disclosure: this dossier is an engineering-definition technology-"
         "transfer document. It contains source-native information, derived "

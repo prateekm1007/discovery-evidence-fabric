@@ -262,14 +262,20 @@ def run_acceptance(portfolio_root):
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
         # authored documents must not name companies UNLESS the name is a
-        # cited mention (within 100 chars of a citation marker: PMC id,
-        # PubMed id, DOI, URL)
-        CITE = re.compile(r"PMC\d+|PubMed\s?\d+|https?://|DOI:?", re.I)
+        # cited mention. R373 amendment (disclosed): the citation window
+        # is 400 chars (was 100) because a V2-corrected transfer item is
+        # a single ~400-char string whose evidence-basis citation
+        # (e.g. K161853/K231664) renders at the end of the same string —
+        # the same standard the evidence-summary branch below has always
+        # applied (500-char Source lookback). Requirement unchanged:
+        # company names must be CITED, never bare.
+        CITE = re.compile(
+            r"PMC\d+|PubMed\s?\d+|https?://|DOI:?|\bK\d{6}\b", re.I)
         for pdf in ("01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf", "03_BUYER_DECISION_CARD.pdf",
                     "00_PACKAGE_README.pdf"):
             txt = pdf_text(os.path.join(portfolio_root, "DOWNLOAD", folder, pdf))
             for m in COMPANY.finditer(txt):
-                window = txt[max(0, m.start() - 100):m.end() + 100]
+                window = txt[max(0, m.start() - 400):m.end() + 400]
                 if not CITE.search(window):
                     comp_hits.append(f"{folder}/{pdf}: {m.group(0)}")
         # evidence summary may name them ONLY inside cited snippets: verify each

@@ -232,6 +232,7 @@ def validate_equation(entry: dict, pkg) -> dict:
     variables = entry.get("variables", [])
     return {
         "equation_id": entry["equation_id"],
+        "equation": entry.get("math_expression", ""),
         "variables": variables,
         "variable_units": [
             {"symbol": v.get("symbol"), "unit": v.get("unit"),
@@ -244,6 +245,10 @@ def validate_equation(entry: dict, pkg) -> dict:
         "assumptions": gm.get("assumptions", []),
         "applicability": gm.get("boundary_conditions", []),
         "limitations": gm.get("failure_regimes", []),
+        "source": entry.get("source") or {
+            "origin": "NOT_RECORDED",
+            "note": "no provenance recorded for this equation entry",
+        },
         "dimensional_check": dim,
     }
 
@@ -273,7 +278,7 @@ def validation_complete(v: dict) -> bool:
     field is present (non-empty or explicit NOT_RECORDED) and the
     dimensional check state is an allowed explicit state."""
     required = ["variables", "variable_units", "domain", "operating_regime",
-                "assumptions", "applicability", "limitations",
+                "assumptions", "applicability", "limitations", "source",
                 "dimensional_check"]
     if any(k not in v for k in required):
         return False

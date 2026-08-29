@@ -139,14 +139,21 @@ def build_experiment_diagram(pkg, headlines: dict, out_path: str,
             f"Planned effort: {spec.get('planned_effort', 'NOT_RECORDED')}",
             ha="center", va="center", fontsize=7.0, color=GREY, style="italic")
 
-    # outcome branches from decision criterion
-    box(8.5, 0.75, 4.2, 1.5, "PASS → ADVANCE",
-        "Proceed to next work package in the canonical build plan",
-        GREEN, GREEN_LIGHT)
-    box(4.4, 0.75, 3.6, 1.5, "FAIL → KILL CONDITION",
-        roles["kill_condition"]["content"], RED, RED_LIGHT)
-    arrow(10.2, y2, 10.6, 2.25, "PASS", GREEN)
-    arrow(8.5, y2 + 0.35, 8.0, 2.25, "FAIL", RED, rad=0.18)
+    # outcome branches from decision criterion — R373-2: the consequence is
+    # the canonical decision_consequence role (pass branch from the build
+    # plan deliverable/sequence; fail branch = kill condition).
+    consequence = roles.get("decision_consequence", {}).get("content", "")
+    pass_branch = consequence.split(". IF KILL")[0] if consequence else \
+        "Proceed per canonical build plan"
+    fail_branch = consequence.split("IF KILL CONDITION MET -> stop; "
+                                    "do not build: ")[-1] if "IF KILL" in \
+        consequence else roles["kill_condition"]["content"]
+    box(8.5, 0.55, 4.2, 1.7, "PASS → CONSEQUENCE",
+        pass_branch, GREEN, GREEN_LIGHT, body_size=6.3)
+    box(4.4, 0.55, 3.6, 1.7, "FAIL → KILL CONDITION",
+        f"Stop; do not build: {fail_branch}", RED, RED_LIGHT, body_size=6.3)
+    arrow(10.2, y2, 10.6, 2.3, "PASS", GREEN)
+    arrow(8.5, y2 + 0.35, 8.0, 2.3, "FAIL", RED, rad=0.18)
 
     # provenance footer
     ax.text(0.3, 0.28,
