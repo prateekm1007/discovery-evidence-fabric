@@ -49,7 +49,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-FROZEN_PORTFOLIO = Path("/home/z/my-project/portfolio/DOWNLOAD")
+FROZEN_PORTFOLIO = Path(__file__).resolve().parents[2] / \
+    "BENCHMARK_ENGINEERING_DOSSIERS" / "frozen_corpus_r370"
 BENCHMARK_DIR = REPO_ROOT / "BENCHMARK_ENGINEERING_DOSSIERS"
 SPLIT_ARTIFACT = BENCHMARK_DIR / "E16_BENCHMARK_SPLIT.json"
 SEALED_DIR = BENCHMARK_DIR / "BLIND_HOLDOUT"

@@ -39,7 +39,8 @@ from typing import Any, Dict, List, Optional
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # canonical frozen portfolio location (cloned next to the dev repo)
-FROZEN_PORTFOLIO = Path("/home/z/my-project/portfolio/DOWNLOAD")
+FROZEN_PORTFOLIO = Path(__file__).resolve().parents[2] / \
+    "BENCHMARK_ENGINEERING_DOSSIERS" / "frozen_corpus_r370"
 CANONICAL_ARTIFACT = REPO_ROOT / "BENCHMARK_DEPTH_CONTRACT.json"
 
 DIMENSIONS = ("section_coverage", "engineering_object_count",

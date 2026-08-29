@@ -53,7 +53,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # canonical frozen portfolio location (cloned next to the dev repo; frozen
 # at 2e96b27 — read-only, never modified)
-FROZEN_PORTFOLIO = Path("/home/z/my-project/portfolio/DOWNLOAD")
+FROZEN_PORTFOLIO = Path(__file__).resolve().parents[2] / \
+    "BENCHMARK_ENGINEERING_DOSSIERS" / "frozen_corpus_r370"
 
 # canonical E15-A artifact directory (committed to the dev repo)
 BENCHMARK_DIR = REPO_ROOT / "BENCHMARK_ENGINEERING_DOSSIERS"
