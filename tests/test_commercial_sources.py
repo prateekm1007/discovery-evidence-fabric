@@ -103,7 +103,10 @@ class TestGudidCommercial:
     def test_openfda_404_not_found_is_definitive_empty(self):
         body = json.dumps({"error": {"code": "NOT_FOUND",
                                      "message": "No matches found!"}}).encode()
-        res = _wire(body, http_status=404).search("nonexistent brand")
+        # 404 flows through _request as a non-OK status; the base then
+        # consults definitive_empty() (Art. XXI.3).
+        res = _wire(body, http_status=404, status="SEARCH_FAILED").search(
+            "nonexistent brand")
         assert res.status == STATUS_EMPTY
         assert res.ok is True
 
