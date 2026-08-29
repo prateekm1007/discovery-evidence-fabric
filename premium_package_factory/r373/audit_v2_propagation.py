@@ -109,6 +109,25 @@ def _v2_forms(v2: str):
 # V1 release text extraction (portfolio git history, read-only)
 # ---------------------------------------------------------------------------
 
+_V1_RELEASE_COMMIT = "ef619a1ed7678467781a03494c964ec5c75ec501"
+
+
+def _git_show(portfolio_root: str, spec: str) -> bytes:
+    """`git show <commit>:<path>` with a targeted fetch fallback for
+    shallow clones (the frozen V1 release commit predates a depth-1
+    clone's history)."""
+    r = subprocess.run(["git", "-C", portfolio_root, "show", spec],
+                       capture_output=True)
+    if r.returncode == 0 and r.stdout:
+        return r.stdout
+    commit = spec.split(":", 1)[0]
+    subprocess.run(["git", "-C", portfolio_root, "fetch", "--depth", "1",
+                    "origin", commit], capture_output=True, timeout=180)
+    r = subprocess.run(["git", "-C", portfolio_root, "show", spec],
+                       capture_output=True)
+    return r.stdout if r.returncode == 0 else b""
+
+
 def v1_release_texts(portfolio_root: str, pkg, folder: str) -> str:
     """Concatenated PDF text of the package as shipped in the immutable
     V1 release commit ef619a1 (pre-mutation buyer portfolio)."""
@@ -116,11 +135,8 @@ def v1_release_texts(portfolio_root: str, pkg, folder: str) -> str:
     if key in _ZIP_CACHE:
         return _ZIP_CACHE[key]
     try:
-        r = subprocess.run(
-            ["git", "-C", portfolio_root, "show",
-             f"ef619a1:DOWNLOAD/{folder}.zip"],
-            capture_output=True)
-        data = r.stdout
+        data = _git_show(portfolio_root,
+                         f"{_V1_RELEASE_COMMIT}:DOWNLOAD/{folder}.zip")
         if not data:
             _ZIP_CACHE[key] = ""
             return ""
