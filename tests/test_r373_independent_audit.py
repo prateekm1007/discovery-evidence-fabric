@@ -436,6 +436,76 @@ class TestV1SourceClassification:
 
 
 # ---------------------------------------------------------------------------
+# R373-9 repository rule — pass releases, fail goes to the cemetery
+# ---------------------------------------------------------------------------
+
+class TestRepoRule:
+    def _fake_audit(self, fail_pid):
+        """Minimal audit-shaped dict with one failing package."""
+        pkgs = {p.pkg_id: p for p in PACKAGES}
+        packages = {}
+        for p in PACKAGES:
+            gate = "FAIL" if p.pkg_id == fail_pid else "PASS"
+            packages[p.pkg_id] = {
+                "state_ladder": {"release_gate": gate,
+                                 "portfolio_number": p.num},
+                "mechanism_diagram_audit": {"failures": [
+                    {"check": "MECHANISM_IDENTITY",
+                     "detail": "test fixture failure"}]},
+                "experiment_diagram_audit": {"failures": []},
+                "traceability_audit": {"failures": []},
+                "equation_audit": {"failures": []},
+                "v2_propagation_audit": {"failures": []},
+                "unknowns_audit": {"failures": []},
+                "buyer_usability_audit": {"failures": []},
+                "commercial_evidence_audit": {"failures": []},
+                "document_completeness_audit": {"failures": []},
+            }
+        return {"packages": packages,
+                "adversarial_injections": {"all_caught": True}}
+
+    def test_failing_package_goes_to_cemetery(self, tmp_path):
+        import shutil
+        from premium_package_factory.r373 import run_r373_audit as runner
+        # temp portfolio copy with the failing package's folder + zip
+        portfolio = tmp_path / "portfolio"
+        (portfolio / "DOWNLOAD").mkdir(parents=True)
+        folder = next(p for p in PACKAGES if p.pkg_id == "P-26").folder
+        shutil.copytree(
+            os.path.join(os.path.dirname(os.path.dirname(
+                os.path.dirname(os.path.abspath(__file__)))), "portfolio",
+                "DOWNLOAD", folder),
+            portfolio / "DOWNLOAD" / folder)
+        (portfolio / "DOWNLOAD" / f"{folder}.zip").write_bytes(b"zip")
+        engine = tmp_path / "engine"
+        (engine / "MECHANISM_CEMETERY").mkdir(parents=True)
+        audit = self._fake_audit("P-26")
+        outcome = runner.apply_repo_rule(
+            audit, str(portfolio), engine_root=str(engine))
+        assert "P-26" in outcome["fail_cemetery"]
+        assert outcome["cemetery_entry_ids"]
+        # cemetery entry written with evidence + reusable lesson
+        c = json.load(open(engine / "MECHANISM_CEMETERY" / "CEMETERY.json"))
+        entry = c["entries"][-1]
+        assert entry["entry_id"] == "CE-R373-P-26"
+        assert entry["why_it_failed"]
+        assert entry["reusable_lesson"]
+        assert entry["epistemic_class"] == "ENGINEERING_ARTIFACT_AUDIT_FAILURE"
+        # package removed from the portfolio copy
+        assert not (portfolio / "DOWNLOAD" / folder).exists()
+        assert not (portfolio / "DOWNLOAD" / f"{folder}.zip").exists()
+
+    def test_passing_packages_are_released_only(self, tmp_path):
+        from premium_package_factory.r373 import run_r373_audit as runner
+        audit = self._fake_audit(None)
+        outcome = runner.apply_repo_rule(
+            audit, str(tmp_path / "portfolio"), engine_root=str(tmp_path))
+        assert len(outcome["pass_released"]) == len(PACKAGES)
+        assert not outcome["fail_cemetery"]
+        assert not outcome["cemetery_entry_ids"]
+
+
+# ---------------------------------------------------------------------------
 # full-runner positive case (slow; runs the real audit)
 # ---------------------------------------------------------------------------
 

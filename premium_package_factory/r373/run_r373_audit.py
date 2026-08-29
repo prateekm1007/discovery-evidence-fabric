@@ -374,6 +374,116 @@ def run_r373_audit(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
     return audit
 
 
+# ---------------------------------------------------------------------------
+# R373-9 repository rule: pass -> released in the portfolio; fail ->
+# engine cemetery with evidence preserved (never deleted)
+# ---------------------------------------------------------------------------
+
+def apply_repo_rule(audit: dict, portfolio_root: str,
+                    engine_root: str = ENGINE_ROOT,
+                    apply_changes: bool = True) -> dict:
+    """Apply the CEO R373-9 repository rule to an audit result.
+
+    PASS  -> the package stays in the portfolio release (the buyer
+             release repo holds only gate-passing packages).
+    FAIL  -> a cemetery entry is APPENDED to
+             MECHANISM_CEMETERY/CEMETERY.json in the engine repo with
+             the package's evidence, failure reason (the audit failures),
+             attack results (adversarial injection outcomes) and reusable
+             constraints preserved, and the package folder + ZIP are
+             REMOVED from the portfolio release (never deleted without a
+             record — the cemetery entry is the record).
+
+    This cycle all 15 packages passed, so the rule was a no-op on the
+    real release; the mechanism exists and is unit-tested on a copy.
+    """
+    outcome = {"pass_released": [], "fail_cemetery": [],
+               "cemetery_entry_ids": []}
+    cemetery_path = os.path.join(engine_root, "MECHANISM_CEMETERY",
+                                 "CEMETERY.json")
+    cemetery = _load(cemetery_path) if os.path.exists(cemetery_path) else \
+        {"description": "Library of impossibilities — every killed "
+                        "invention with reusable lessons.", "entries": []}
+    changed = False
+    for pid, r in audit["packages"].items():
+        lad = r["state_ladder"]
+        if lad["release_gate"] == "PASS":
+            outcome["pass_released"].append(pid)
+            continue
+        # failed candidate -> cemetery entry (evidence preserved)
+        entry_id = f"CE-R373-{pid}"
+        failures = []
+        for dim in ("mechanism_diagram_audit", "experiment_diagram_audit",
+                    "traceability_audit", "equation_audit",
+                    "v2_propagation_audit", "unknowns_audit",
+                    "buyer_usability_audit", "commercial_evidence_audit",
+                    "document_completeness_audit"):
+            for f in r[dim].get("failures", []):
+                failures.append(f"{dim}:{f['check']}: "
+                                f"{str(f.get('detail'))[:120]}")
+        entry = {
+            "entry_id": entry_id,
+            "territory_id": pid,
+            "mechanism_name": pid,
+            "proposed_version": "R373 release candidate",
+            "killed_at_version": "R373 independent engineering-artifact "
+                                 "audit",
+            "kill_reason": ("FAILED the R373 artifact release gate "
+                            "(DOCUMENT_COMPLETE + ENGINEERING_EVALUABLE + "
+                            "TRANSFER_EVALUABLE)"),
+            "what_was_proposed": ("portfolio release candidate at "
+                                  "engineering-definition maturity"),
+            "why_it_failed": failures[:12],
+            "reusable_lesson": ("A release candidate that cannot pass the "
+                                "independent artifact audit must not ship "
+                                "to the buyer release repo; the audit "
+                                "failures enumerate exactly which artifact "
+                                "dimension is inadequate."),
+            "what_to_avoid": ("shipping packages whose diagrams, "
+                              "traceability, equations, unknowns, V2 "
+                              "chain or buyer usability fail mechanical "
+                              "audit"),
+            "physical_constraint": None,
+            "evidence_sources": [f"INTERNAL_QA/"
+                                 "R373_INDEPENDENT_ENGINEERING_ARTIFACT_"
+                                 "AUDIT.json"],
+            "epistemic_class": "ENGINEERING_ARTIFACT_AUDIT_FAILURE",
+            "attack_results": audit.get("adversarial_injections", {}).get(
+                "all_caught"),
+        }
+        if not any(e.get("entry_id") == entry_id
+                   for e in cemetery["entries"]):
+            cemetery["entries"].append(entry)
+            outcome["cemetery_entry_ids"].append(entry_id)
+            changed = True
+        outcome["fail_cemetery"].append(pid)
+        if apply_changes:
+            # remove from the portfolio release (the record is the
+            # cemetery entry + the git history of the portfolio repo)
+            pdir = os.path.join(portfolio_root, "DOWNLOAD",
+                                _folder_of(audit, pid))
+            for target in (pdir, pdir + ".zip"):
+                if os.path.exists(target):
+                    import shutil
+                    if os.path.isdir(target):
+                        shutil.rmtree(target)
+                    else:
+                        os.remove(target)
+    if changed and apply_changes:
+        cemetery["entry_count"] = len(cemetery["entries"])
+        cemetery["updated_at"] = _now()
+        with open(cemetery_path, "w", encoding="utf-8") as f:
+            json.dump(cemetery, f, indent=2, ensure_ascii=False)
+    return outcome
+
+
+def _folder_of(audit: dict, pid: str) -> str:
+    for p in load_all_packages():
+        if p.pkg_id == pid:
+            return p.folder
+    return pid
+
+
 def main():
     root = sys.argv[1] if len(sys.argv) > 1 else os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "..", "..",
