@@ -395,8 +395,29 @@ class EngineRun:
             # When the discovery loop rejected the naive candidate, the
             # recorded exploration angles x configured providers generate
             # the candidate set for the engineering gauntlet.
+            # INFRASTRUCTURE EXCEPTION (Art. XXV, M1 campaign 2026-08-29):
+            # when the naive candidate was never adjudicated — evaluator
+            # transport failed (adjudication_blocked, final_status UNKNOWN)
+            # — the grid is SKIPPED: generating unverified grid candidates
+            # through the same endpoint that just failed the adjudication
+            # burns transport windows without new evidence. The correct
+            # next action is re-running the loop when transport recovers
+            # (the run stays resumable). A SCIENTIFIC rejection (REJECTED)
+            # still runs the grid unchanged.
+            adjudication_blocked = bool(
+                (self.env.epistemic_state or {}).get("adjudication_blocked"))
             grid_result = None
-            if not self._naive_survivor:
+            if adjudication_blocked:
+                self._persist("EXPLORATION_GRID.json", {
+                    "status": "SKIPPED_ADJUDICATION_BLOCKED",
+                    "reason": ("naive candidate was never adjudicated "
+                               "(evaluator transport failure — Art. XXV); "
+                               "the exploration grid would spend the same "
+                               "degraded transport on candidates that "
+                               "cannot be discovery-verified either. "
+                               "Re-run the loop when transport recovers."),
+                })
+            if not self._naive_survivor and not adjudication_blocked:
                 try:
                     from .candidate_diversity import (generate_diverse_candidates,
                                                       measure_diversity)

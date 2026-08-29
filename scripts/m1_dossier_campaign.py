@@ -94,19 +94,47 @@ def _completed(run_dir: Path) -> bool:
 
 
 def _preflight_probe() -> dict:
-    """Small LLM call to gauge endpoint health BEFORE spending a run."""
+    """Endpoint health probe BEFORE spending a run. Policy (measured
+    2026-08-29: the NVIDIA endpoint's latency floor fluctuates — a tiny
+    call took 35 s, 74 s and >90 s within one hour):
+      - fast hard failure (HTTP/auth/connection error) -> UNHEALTHY, skip
+      - timeout at 90 s -> ONE retry at 240 s; a second timeout on a tiny
+        call is a strong negative signal -> UNHEALTHY, skip
+      - OK -> proceed (does NOT guarantee the bigger in-run calls succeed;
+        recorded honestly either way)
+    """
+    from discovery_fabric.engine.adapters import load_credentials
+    load_credentials()
     from discovery_fabric.engine import llm_registry as reg
-    try:
-        res = reg.generate(prompt="Reply with exactly: READY",
-                           system="transport health probe",
-                           timeout=PROBE_TIMEOUT_S, max_retries=0)
-        return {"status": res.status,
-                "provider": res.provider_id,
-                "latency_ms": res.latency_ms,
-                "error": (res.error or "")[:160]}
-    except Exception as exc:  # noqa: BLE001
-        return {"status": "CALL_FAILED",
-                "error": f"{type(exc).__name__}: {exc}"}
+
+    def _call(timeout):
+        try:
+            res = reg.generate(prompt="Reply with exactly: READY",
+                               system="transport health probe",
+                               timeout=timeout, max_retries=0)
+            return {"status": res.status,
+                    "provider": res.provider_id,
+                    "latency_ms": res.latency_ms,
+                    "error": (res.error or "")[:160]}
+        except Exception as exc:  # noqa: BLE001
+            return {"status": "CALL_FAILED",
+                    "error": f"{type(exc).__name__}: {exc}"}
+
+    first = _call(PROBE_TIMEOUT_S)
+    if first["status"] == "OK":
+        return first
+    is_timeout = "timeout" in (first.get("error") or "").lower()
+    if not is_timeout:
+        return first          # hard failure — no retry burn
+    second = _call(240)
+    if second["status"] == "OK":
+        second["retried_after_timeout"] = True
+        return second
+    return {"status": second["status"],
+            "provider": second.get("provider"),
+            "error": second.get("error") or first.get("error"),
+            "note": "tiny-call timeout at both 90 s and 240 s — endpoint "
+                    "too slow to sustain in-run calls; run deferred"}
 
 
 def _run_one(entry: dict, index: int, probe: dict) -> dict:
@@ -134,6 +162,14 @@ def _run_one(entry: dict, index: int, probe: dict) -> dict:
         "preflight_probe": probe,
     }
 
+    # A run with persisted envelopes has real progress (retrieval and
+    # possibly synthesis already done in a healthy window). Resume it
+    # regardless of the CURRENT probe state: each stage carries its own
+    # timeout/retry and fails honestly if the endpoint is still dead —
+    # the run stays resumable, so no progress is ever lost. The probe
+    # gates only FRESH runs (avoids burning synthesis timeouts on a
+    # dead endpoint with nothing to resume).
+    has_progress = run_dir.exists() and any(run_dir.glob("envelope_*.json"))
     if entry.get("chain_detail") is None:
         record.update({
             "status": "BLOCKED_NO_CHAIN_DETAIL",
@@ -144,13 +180,15 @@ def _run_one(entry: dict, index: int, probe: dict) -> dict:
         })
         return record
 
-    if probe.get("status") != "OK":
+    if (not has_progress) and probe.get("status") != "OK":
         record.update({
             "status": "SKIPPED_ENDPOINT_UNHEALTHY",
             "release_class": "INFRASTRUCTURE_BLOCKED",
-            "note": ("pre-flight transport probe failed — endpoint "
-                     "unhealthy; run deferred, nothing was attempted "
-                     "(Art. XXV: no fake progress)"),
+            "note": ("pre-flight transport probe failed on a FRESH run — "
+                     "endpoint unhealthy; run deferred, nothing was "
+                     "attempted (Art. XXV: no fake progress). Runs with "
+                     "persisted progress resume regardless: stages fail "
+                     "honestly and stay resumable."),
         })
         return record
 
