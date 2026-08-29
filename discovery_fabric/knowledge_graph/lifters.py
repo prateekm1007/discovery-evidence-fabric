@@ -188,6 +188,107 @@ def lift_patent_record(g: KnowledgeGraph, record) -> List[str]:
     return made
 
 
+def lift_gudid_commercial_record(g: KnowledgeGraph, record) -> List[str]:
+    """GUDID commercial record -> COMMERCIAL_PRODUCT + DEVICE (identity
+    from the record key / brand) + DEVICE_COMMERCIALIZED_AS edge."""
+    from discovery_fabric.knowledge_graph.entities import (
+        commercial_product_entity,
+    )
+    prod = commercial_product_entity(record)
+    g.add_entity(prod)
+    created = [prod.entity_id]
+    dev = device_entity_from_record(record)
+    if dev is not None:
+        g.add_entity(dev)
+        g.add_edge(edge_from_record(
+            "DEVICE_COMMERCIALIZED_AS", dev.entity_id, prod.entity_id, record))
+        created.append(dev.entity_id)
+    return created
+
+
+def lift_gudid_sterilization_record(g: KnowledgeGraph, record) -> List[str]:
+    """GUDID sterilization record -> MANUFACTURING_PROCESS node + DEVICE
+    node + DEVICE_MADE_VIA edge (device-level sterilization evidence)."""
+    from discovery_fabric.knowledge_graph.entities import (
+        manufacturing_process_entity,
+    )
+    proc = manufacturing_process_entity(record)
+    g.add_entity(proc)
+    created = [proc.entity_id]
+    dev = device_entity_from_record(record)
+    if dev is not None and (record.normalized or {}).get("processes"):
+        g.add_entity(dev)
+        g.add_edge(edge_from_record(
+            "DEVICE_MADE_VIA", dev.entity_id, proc.entity_id, record))
+        created.append(dev.entity_id)
+    return created
+
+
+def lift_pma_supplement_record(g: KnowledgeGraph, record) -> List[str]:
+    """PMA manufacturing/process-change supplement -> REGULATORY_ACTION
+    (PMA_MANUFACTURING_SUPPLEMENT) + DEVICE + DEVICE_CLEARED_VIA edge.
+
+    The supplement is a regulatory ACTION (FDA approved a manufacturing
+    change), not itself a process instance; process identity is left to
+    records that name processes (gudid_sterilization, literature)."""
+    n = record.normalized
+    pma = n.get("pma_number")
+    sup = n.get("supplement_number")
+    if not (pma and sup):
+        return []
+    action = regulatory_action_entity(record, "PMA_APPROVAL")
+    # supplement identity keeps the action node distinct from the
+    # original PMA approval node
+    action.entity_id = f"REGULATORY_ACTION:pma:{pma}S{sup}"
+    action.display_name = f"PMA_MANUFACTURING_SUPPLEMENT {pma} S{sup}"
+    action.attributes = {
+        **(action.attributes or {}),
+        "action_type": "PMA_MANUFACTURING_SUPPLEMENT",
+        "supplement_reason": n.get("supplement_reason"),
+        "supplement_type": n.get("supplement_type"),
+        "classification": n.get("classification"),
+    }
+    g.add_entity(action)
+    created = [action.entity_id]
+    dev = device_entity_from_record(record)
+    if dev is not None:
+        g.add_entity(dev)
+        g.add_edge(edge_from_record(
+            "DEVICE_CLEARED_VIA", dev.entity_id, action.entity_id, record))
+        created.append(dev.entity_id)
+    return created
+
+
+def lift_manufacturing_literature_record(g: KnowledgeGraph, record) -> List[str]:
+    """Manufacturing literature -> MANUFACTURING_PROCESS node (process
+    evidence with constraint/risk/verification spans). No device edge:
+    literature records do not identify a specific marketed device
+    (no fabricated adjacency, Art. XXI.4)."""
+    from discovery_fabric.knowledge_graph.entities import (
+        manufacturing_process_entity,
+    )
+    proc = manufacturing_process_entity(record)
+    g.add_entity(proc)
+    return [proc.entity_id]
+
+
+def lift_standard_record(g: KnowledgeGraph, record) -> List[str]:
+    """FDA recognized standard / eCFR section -> STANDARD node."""
+    from discovery_fabric.knowledge_graph.entities import standard_entity
+    std = standard_entity(record)
+    g.add_entity(std)
+    return [std.entity_id]
+
+
+def lift_material_record(g: KnowledgeGraph, record) -> List[str]:
+    """MATERIALS-role record -> MATERIAL node (PROPERTY_DATA dimension;
+    implant suitability NOT established by these sources)."""
+    from discovery_fabric.knowledge_graph.entities import material_entity
+    mat = material_entity(record)
+    g.add_entity(mat)
+    return [mat.entity_id]
+
+
 LIFTERS = {
     "fda_maude": lift_maude_record,
     "fda_recall": lift_recall_record,
@@ -206,6 +307,16 @@ LIFTERS = {
     "uspto_odp": lift_patent_record,
     "patsnap_eureka": lift_patent_record,
     "google_bigquery_patents": lift_patent_record,
+    # lifecycle closure (L5)
+    "gudid_commercial": lift_gudid_commercial_record,
+    "gudid_sterilization": lift_gudid_sterilization_record,
+    "fda_pma_supplements": lift_pma_supplement_record,
+    "manufacturing_literature": lift_manufacturing_literature_record,
+    "fda_recognized_standards": lift_standard_record,
+    "ecfr_title21": lift_standard_record,
+    "cod_optimade": lift_material_record,
+    "nist_webbook": lift_material_record,
+    "materials_project": lift_material_record,
 }
 
 

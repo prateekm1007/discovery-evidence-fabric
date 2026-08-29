@@ -35,6 +35,7 @@ ENTITY_TYPES = [
     "MATERIAL",
     "MANUFACTURING_PROCESS",
     "STANDARD",
+    "COMMERCIAL_PRODUCT",
 ]
 
 # Identity strength for DEVICE nodes: exact identifiers only.
@@ -313,3 +314,173 @@ def patent_claim_entity(record, claim: Dict[str, Any]) -> Entity:
 
 def _slug(text: str) -> str:
     return "".join(c if c.isalnum() else "_" for c in (text or "").strip())[:120]
+
+
+# ---------------------------------------------------------------------------
+# Lifecycle-closure entities (L5): COMMERCIAL_PRODUCT, MANUFACTURING_PROCESS,
+# STANDARD, MATERIAL — constructed ONLY from fields the record carries.
+# ---------------------------------------------------------------------------
+
+def commercial_product_entity(record) -> Entity:
+    """COMMERCIAL_PRODUCT node from a gudid_commercial record.
+
+    Identity = the GUDID public device record key (the FDA's own key for
+    the marketed product version). Company/category/distribution status
+    ride as attributes; the epistemic state carries the manufacturer-
+    declared caveat from the record's own limitations.
+    """
+    n = record.normalized
+    key = n.get("public_device_record_key")
+    eid = (f"COMMERCIAL_PRODUCT:gudid:{key}" if key
+           else f"COMMERCIAL_PRODUCT:name:{_slug(n.get('brand_name', ''))}")
+    return Entity(
+        entity_type="COMMERCIAL_PRODUCT",
+        entity_id=eid,
+        display_name=f"{n.get('brand_name', '')} ({n.get('company_name', '')})",
+        identifiers={"public_device_record_key": key,
+                     "brand_name": n.get("brand_name")},
+        provenance=[_custody(record)],
+        attributes={
+            "company_name": n.get("company_name"),
+            "labeler_duns_number": n.get("labeler_duns_number"),
+            "product_codes": n.get("product_codes"),
+            "product_code_names": n.get("product_code_names"),
+            "gmdn_pt_names": n.get("gmdn_pt_names"),
+            "commercial_distribution_status": n.get("commercial_distribution_status"),
+            "commercial_distribution_end_date": n.get("commercial_distribution_end_date"),
+            "is_on_market": n.get("is_on_market"),
+            "version_or_model_number": n.get("version_or_model_number"),
+        },
+        limitations=list(record.limitations),
+    )
+
+
+def manufacturing_process_entity(record) -> Entity:
+    """MANUFACTURING_PROCESS node from gudid_sterilization or
+    manufacturing_literature records.
+
+    Identity discipline:
+    - gudid_sterilization: process instance = 'sterilization' + the
+      declared method text (device-level evidence).
+    - manufacturing_literature: process = the taxonomy process name
+      (literature-level process evidence, no specific device claimed).
+    """
+    n = record.normalized
+    if record.source_id == "gudid_sterilization":
+        method = n.get("sterilization_methods") or "unspecified"
+        eid = f"MANUFACTURING_PROCESS:sterilization:{_slug(method)}"
+        disp = f"Sterilization: {method}"
+        attrs = {
+            "process": "sterilization",
+            "method": method,
+            "method_list": n.get("sterilization_method_list"),
+            "is_sterile": n.get("is_sterile"),
+            "device_brand": n.get("brand_name"),
+            "company": n.get("company_name"),
+        }
+    else:
+        procs = n.get("processes") or []
+        if not procs:
+            return Entity(
+                entity_type="MANUFACTURING_PROCESS",
+                entity_id=f"MANUFACTURING_PROCESS:lit:{_slug(record.record_id)}",
+                display_name=f"Manufacturing literature: {record.title[:80]}",
+                identifiers={"literature_record": record.record_id},
+                provenance=[_custody(record)],
+                attributes={"process": None, "processes": procs,
+                            "note": "no taxonomy process matched"},
+                limitations=list(record.limitations),
+            )
+        p = procs[0]
+        eid = f"MANUFACTURING_PROCESS:lit:{_slug(p)}"
+        disp = f"Manufacturing process evidence: {p}"
+        attrs = {
+            "process": p,
+            "processes": procs,
+            "constraint_spans": n.get("process_constraint_spans"),
+            "risk_spans": n.get("quality_risk_spans"),
+            "verification_spans": n.get("verification_spans"),
+        }
+    return Entity(
+        entity_type="MANUFACTURING_PROCESS",
+        entity_id=eid,
+        display_name=disp,
+        identifiers={"source_record": record.record_id},
+        provenance=[_custody(record)],
+        attributes=attrs,
+        limitations=list(record.limitations),
+    )
+
+
+def standard_entity(record) -> Entity:
+    """STANDARD node from fda_recognized_standards or ecfr_title21
+    records."""
+    n = record.normalized
+    if record.source_id == "fda_recognized_standards":
+        rec_no = n.get("recognition_number")
+        eid = f"STANDARD:fda_recognized:{_slug(str(rec_no))}"
+        disp = (f"{n.get('standards_organization', '')} "
+                f"{n.get('standard_designation', '')}").strip()
+        attrs = {
+            "kind": "consensus_standard",
+            "designation": n.get("standard_designation"),
+            "organization": n.get("standards_organization"),
+            "title": n.get("standard_title"),
+            "specialty_task_group_area": n.get("specialty_task_group_area"),
+            "extent_of_recognition": n.get("extent_of_recognition"),
+            "date_of_entry": n.get("date_of_entry"),
+        }
+    else:  # ecfr_title21
+        sec = n.get("section")
+        eid = f"STANDARD:ecfr:21cfr_{_slug(str(sec))}"
+        disp = f"21 CFR § {sec}"
+        attrs = {
+            "kind": "codified_regulation",
+            "cfr_title": 21,
+            "part": n.get("part"),
+            "section": sec,
+            "part_label": n.get("part_label"),
+            "subpart": n.get("subpart"),
+            "issue_date": n.get("issue_date"),
+        }
+    return Entity(
+        entity_type="STANDARD",
+        entity_id=eid,
+        display_name=disp,
+        identifiers={"record": record.record_id},
+        provenance=[_custody(record)],
+        attributes=attrs,
+        limitations=list(record.limitations),
+    )
+
+
+def material_entity(record) -> Entity:
+    """MATERIAL node from MATERIALS-role records (COD / NIST WebBook /
+    Materials Project). Property data only — implant suitability is
+    NOT_ESTABLISHED by these sources (materials_policy.py); the node
+    carries that split explicitly."""
+    n = record.normalized
+    formula = n.get("chemical_formula") or n.get("formula") or n.get("species_name")
+    name = n.get("chemical_name") or n.get("species_name") or record.title
+    eid = (f"MATERIAL:{record.source_id}:{_slug(str(record.record_id))}")
+    return Entity(
+        entity_type="MATERIAL",
+        entity_id=eid,
+        display_name=str(name or formula or record.title)[:120],
+        identifiers={"record": record.record_id},
+        provenance=[_custody(record)],
+        attributes={
+            "chemical_formula": formula,
+            "chemical_name": n.get("chemical_name"),
+            "mineral_name": n.get("mineral_name"),
+            "space_group": n.get("space_group"),
+            "elements": n.get("elements"),
+            "cas_registry_number": n.get("cas_registry_number"),
+            "molecular_weight": n.get("molecular_weight"),
+            "property_sections": n.get("property_sections"),
+            "evidence_dimension": n.get("evidence_dimension", "PROPERTY_DATA"),
+            "implant_suitability": n.get(
+                "implant_suitability", "NOT_ESTABLISHED_BY_THIS_SOURCE"),
+        },
+        limitations=list(record.limitations),
+    )

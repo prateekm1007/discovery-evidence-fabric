@@ -102,6 +102,96 @@ class KnowledgeGraph:
     def rejected(self) -> List[Dict[str, Any]]:
         return list(self._rejected)
 
+    # ---- lifecycle progression (L5) --------------------------------------
+
+    #: Which edges evidence which lifecycle stage. A stage is REACHED
+    #: only through evidence-bound edges (custody present) — narrative
+    #: claims about lifecycle progression are not graph facts.
+    LIFECYCLE_STAGES = {
+        "PATENT": {"edges": ("PATENT_COVERS_DEVICE",), "side": "target"},
+        "REGULATORY": {"edges": ("DEVICE_CLEARED_VIA",), "side": "source"},
+        "COMMERCIAL": {"edges": ("DEVICE_COMMERCIALIZED_AS",), "side": "source"},
+        "CLINICAL": {"edges": ("DEVICE_STUDIED_IN",
+                               "COMMERCIAL_PRODUCT_STUDIED_IN"), "side": "source"},
+        "ADVERSE_EVENT": {"edges": ("DEVICE_SUBJECT_OF_ADVERSE_EVENT",
+                                    "COMMERCIAL_PRODUCT_SUBJECT_OF_ADVERSE_EVENT"),
+                          "side": "source"},
+        "RECALL": {"edges": ("DEVICE_SUBJECT_OF_RECALL",
+                             "COMMERCIAL_PRODUCT_SUBJECT_OF_RECALL"),
+                   "side": "source"},
+        "MATERIAL": {"edges": ("DEVICE_USES_MATERIAL",), "side": "source"},
+        "MANUFACTURING": {"edges": ("DEVICE_MADE_VIA",), "side": "source"},
+        "STANDARD": {"edges": ("DEVICE_GOVERNED_BY",), "side": "source"},
+    }
+
+    def lifecycle_progression(self, entity_id: str) -> Dict[str, Any]:
+        """Answer the CEO's lifecycle question for one device/product:
+
+        What stages has this approach ACTUALLY reached, with how many
+        evidence-bound edges and which custody?
+
+        The canonical lifecycle order is
+            invention -> patent -> device -> regulation -> commercial ->
+            clinical use -> failure/recall
+        Stages without evidence-bound edges report reached=False with
+        evidence_count=0 — an explicit UNKNOWN, never an inferred
+        absence (Art. XXV: absence of edges is absence of EVIDENCE, not
+        proof the stage didn't happen).
+        """
+        ent = self._entities.get(entity_id)
+        if ent is None:
+            return {"entity_id": entity_id, "error": "ENTITY_NOT_IN_GRAPH"}
+        stages: Dict[str, Any] = {}
+        for stage, spec in self.LIFECYCLE_STAGES.items():
+            hits = []
+            for e in self._edges:
+                if e.edge_type not in spec["edges"]:
+                    continue
+                if spec["side"] == "source" and e.source_entity_id == entity_id:
+                    hits.append(e)
+                elif spec["side"] == "target" and e.target_entity_id == entity_id:
+                    hits.append(e)
+                # COMMERCIAL_PRODUCT-side stages also count for the
+                # linked device? No — the graph has no inferred
+                # adjacency (R4). Stage reach is computed per entity.
+            stages[stage] = {
+                "reached": bool(hits),
+                "evidence_count": len(hits),
+                "counterparts": sorted({(e.target_entity_id if spec["side"] == "source"
+                                         else e.source_entity_id) for e in hits}),
+                "custody": [p for e in hits for p in e.provenance][:20],
+            }
+        reached_order = [s for s in
+                         ("PATENT", "REGULATORY", "COMMERCIAL", "CLINICAL",
+                          "ADVERSE_EVENT", "RECALL")
+                         if stages[s]["reached"]]
+        return {
+            "entity_id": entity_id,
+            "entity_type": ent.entity_type,
+            "display_name": ent.display_name,
+            "stages": stages,
+            "progression": reached_order,
+            "full_chain_reached": (
+                stages["PATENT"]["reached"] and stages["REGULATORY"]["reached"]
+                and stages["COMMERCIAL"]["reached"]
+                and (stages["CLINICAL"]["reached"]
+                     or stages["ADVERSE_EVENT"]["reached"]
+                     or stages["RECALL"]["reached"])),
+            "note": "stages not reached = no evidence-bound edges in THIS "
+                    "graph snapshot; not proof the stage never happened "
+                    "(Art. XXV)",
+        }
+
+    def lifecycle_table(self) -> List[Dict[str, Any]]:
+        """Lifecycle progression for every DEVICE / COMMERCIAL_PRODUCT
+        node — the query that answers 'what technical approaches have
+        actually progressed ... ?' across the graph."""
+        rows = []
+        for ent in self.entities("DEVICE") + self.entities("COMMERCIAL_PRODUCT"):
+            rows.append(self.lifecycle_progression(ent.entity_id))
+        return sorted(rows, key=lambda r: -sum(
+            1 for s in r.get("stages", {}).values() if s.get("reached")))
+
     def stats(self) -> Dict[str, Any]:
         by_type: Dict[str, int] = {}
         for e in self._entities.values():
