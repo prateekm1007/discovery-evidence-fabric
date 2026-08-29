@@ -79,7 +79,10 @@ class _OpenFdaBase(ConnectorBase):
             return False
 
     def build_url(self, query: str) -> str:
-        q = urllib.parse.quote(query)
+        # openFDA query syntax uses ':' for field targeting and '+' for
+        # boolean separators; both MUST survive encoding (measured: quote()
+        # turning '+' into '%2B' causes openFDA 500 SERVER_ERROR).
+        q = urllib.parse.quote(query, safe=":+")
         return (
             f"{BASE}/{self.ENDPOINT}?search={q}&limit={_limit_str(self.LIMIT)}"
         )
