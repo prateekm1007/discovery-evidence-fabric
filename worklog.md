@@ -6109,3 +6109,22 @@ Work Log:
 
 Stage Summary:
 - The engine now runs the COMPLETE new-problem loop on unseen territories with healthy transport: evidence-bound problem -> 13-stage kill chain -> adjudication -> cemetery/survivor -> automatic specification + package + gates. The bottleneck is no longer transport or connectivity — it is the DEPTH of the generated engineering reasoning vs the hand-built benchmark (engineering_specificity, manufacturing_reasoning). Next decisive move: raise the engineering-spec generator's manufacturing/specificity reasoning to the frozen floors WITHOUT touching any gate, then re-run the campaign.
+
+---
+Task ID: CODER-V3RENDER
+Agent: CODER (sole builder; Super Z session 2026-08-30)
+Task: CEO forensic directive — eliminate PDF rendering defects from all 15 V2 dossiers (Directives 1a/1b/2/3/4 + build gate + regenerate V3).
+
+Work Log:
+- Forensic reproduced on the uploaded V2 zip (byte-identical to a30ee9c): P-01 dossier 482 overlapping pairs + 12 overflow rows; root cause confirmed in code — _tbl() passed RAW STRINGS to Table (single unwrapped line at natural width), fixed-height flowchart boxes, uncited-footer collision risk.
+- Directive 1a/1b: _tbl() unified factory — every cell a Paragraph with wordWrap='LTR', VALIGN TOP, col-width assertion against the real 504pt frame (54pt margins; the directive's 492 assumed 60pt — enforced against the ACTUAL frame, stricter).
+- Directive 4: cell_safe() first-sentence summaries for narrative fields with explicit [full text: register] pointers — never silent loss; applied at 8 dossier table sites.
+- Directive 2: experiment_diagram.py rewritten with measured auto-size boxes (matplotlib port of draw_autosize_box): content wrapped and measured BEFORE drawing; rows advance by measured max height; no hardcoded heights.
+- Directive 3 equivalent + gate: gates/render_verification.py (CEO's verify_pdf_rendering, pdfplumber char-geometry scan) wired BLOCKING into build_v5 at all three render points — no ZIP unless every PDF clean; 5 adversarial tests (V2 raw-string pattern proves the gate FAILS it; fixed render passes; width assertion).
+- Gate found + fixed live: footer identity line overprinted the centered confidentiality text on portfolio-level docs (8 pairs/page) — now measured and truncated with ellipsis.
+- RESULT: 93/93 PDFs 0 overlaps / 0 overflow; P-01 482+12 -> 0+0; gates R371 16/16, R372 12/12, R373 15/15+injections, R374 7/7 on V3 (earlier 'failures' were the stale default scan directory, not the release tree); byte-reproducible (tree hash d854670c twice).
+- SEPARATE DEFECT FOUND + CONTAINED (Art. XIV/XV): the b10 unseen-content screen had been HANGING quadratically since the R375 campaign commit grew the tracked set — the dequadraticated rewrite (identical-or-stricter semantics) surfaced a real trigram leak ('surface coating with', unseen spec #2) in two t15 runtime grid artifacts; contained: untracked from HEAD, bytes retrievable via recorded git blobs, full disclosure artifacts/benchmark/B10_CONTAINMENT_2026-08-30.json; benchmark 126/126 green again.
+- Engine suite 1351+2. Pushed: engine db99ac16; portfolio a30ee9c -> dec91e3 (V3, CEO-authorized supersession of the R375-1 freeze for this render fix; commit lineage includes the CEO-referenced 57b9c27).
+
+Stage Summary:
+- All 15 buyer packages now render defect-free with a permanent blocking gate on the defect class; content/evidence layer unchanged; no gate lowered; byte-reproducibility preserved. The b10 blindness screen is now fast AND it caught a real leak that had shipped silently.
