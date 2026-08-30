@@ -1,0 +1,3609 @@
+{
+ "artifact": "SOURCE_MATURITY_GRADES",
+ "version": "1.0.0",
+ "directive": "CEO 2026-08-30 — SOURCE COVERAGE MATURITY MODEL before any new source integration; distinguishes role COVERAGE from DEPTH/QUALITY/AVAILABILITY",
+ "scale": {
+  "0": "ABSENT_OR_BLOCKED",
+  "1": "WEAK",
+  "2": "ADEQUATE",
+  "3": "STRONG",
+  "UNMEASURED": "EXPLICIT_UNKNOWN_ART_XXV"
+ },
+ "inputs": {
+  "health_report_run": "2026-08-29T09:42:11.792344+00:00",
+  "retrieval_log_entries": 969,
+  "retrieval_log_span": [
+   "2026-08-29",
+   "2026-08-29"
+  ],
+  "registry_sources": 41,
+  "custody_chain_audit": {
+   "entries": 969,
+   "recomputed_ok": 969,
+   "bad_links": [],
+   "chain_intact": true
+  }
+ },
+ "dimension_definitions_ref": "TOSCANINI/SOURCE_COVERAGE_MATURITY_MODEL.md",
+ "sources": {
+  "fda_maude": {
+   "source_id": "fda_maude",
+   "name": "FDA MAUDE adverse-event reports (openFDA device/event)",
+   "authority_role": [
+    "ADVERSE_EVENT"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 5090 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "5090 OK records across 81 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "openFDA MAUDE dataset refreshed weekly per FDA docs; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "80/81 entries with hash+payload provenance fields (98.8%); 59 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "failure_class=3 domain=medical",
+     "rationale": "source exists to record failures/negative events"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US market adverse-event jurisdiction",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "1976-present",
+     "rationale": "declared span ~50y (>=40=3, >=20=2, else 1)"
+    }
+   },
+   "numeric_grade_count": 10,
+   "unmeasured_count": 1,
+   "depth_mean": 2.7
+  },
+  "fda_recall": {
+   "source_id": "fda_recall",
+   "name": "FDA device recall enforcement reports (openFDA device/recall)",
+   "authority_role": [
+    "RECALL"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 825 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "825 OK records across 86 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "openFDA recall dataset refreshed weekly per FDA docs; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "86/86 entries with hash+payload provenance fields (100.0%); 49 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "failure_class=3 domain=medical",
+     "rationale": "source exists to record failures/negative events"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US market recall jurisdiction",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.78
+  },
+  "fda_510k": {
+   "source_id": "fda_510k",
+   "name": "FDA 510(k) clearances (openFDA device/510k)",
+   "authority_role": [
+    "REGULATORY"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 325 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['fda_device_regulatory']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "325 OK records across 13 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "openFDA 510(k) dataset refreshed weekly per FDA docs; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "13/13 entries with hash+payload provenance fields (100.0%); 13 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US clearance pathway",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.33
+  },
+  "fda_pma": {
+   "source_id": "fda_pma",
+   "name": "FDA PMA approvals and supplements (openFDA device/pma)",
+   "authority_role": [
+    "REGULATORY"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 175 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['fda_device_regulatory']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "175 OK records across 7 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "openFDA PMA dataset refreshed weekly per FDA docs; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "7/7 entries with hash+payload provenance fields (100.0%); 7 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US approval pathway",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.22
+  },
+  "fda_udi": {
+   "source_id": "fda_udi",
+   "name": "AccessGUDID device identity (openFDA device/udi)",
+   "authority_role": [
+    "DEVICE_IDENTITY"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 275 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['gudid_identity']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "275 OK records across 11 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "GUDID data refreshed daily per openFDA docs; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "11/11 entries with hash+payload provenance fields (100.0%); 11 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US market device identity",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.33
+  },
+  "fda_registrationlisting": {
+   "source_id": "fda_registrationlisting",
+   "name": "FDA establishment registration & device listing (openFDA device/registrationlisting)",
+   "authority_role": [
+    "REGULATORY"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 35 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['fda_device_regulatory']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "35 OK records across 8 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 2,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Per openFDA docs (annual registration cycle, periodic refresh); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "8/8 entries with hash+payload provenance fields (100.0%); 7 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US establishment registration",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.11
+  },
+  "fda_classification": {
+   "source_id": "fda_classification",
+   "name": "FDA product classification (openFDA device/classification)",
+   "authority_role": [
+    "REGULATORY"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 175 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['fda_device_regulatory']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "175 OK records across 7 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 2,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Per openFDA docs (periodic refresh); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "7/7 entries with hash+payload provenance fields (100.0%); 7 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US device classification",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.11
+  },
+  "fda_denovo": {
+   "source_id": "fda_denovo",
+   "name": "FDA De Novo classification requests",
+   "authority_role": [
+    "REGULATORY"
+   ],
+   "health_status": "NOT_INTEGRATED",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED: connector_exists=False",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['fda_device_regulatory']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries for this source",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FRESHNESS": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "CSV updated periodically by FDA",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US classification pathway",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "1997-present",
+     "rationale": "declared span ~29y (>=40=3, >=20=2, else 1)"
+    }
+   },
+   "numeric_grade_count": 8,
+   "unmeasured_count": 3,
+   "depth_mean": 1.25
+  },
+  "clinicaltrials_gov": {
+   "source_id": "clinicaltrials_gov",
+   "name": "ClinicalTrials.gov registry (API v2)",
+   "authority_role": [
+    "CLINICAL"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 110 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['clinical_registries']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "110 OK records across 11 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous (records updated by sponsors); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "11/11 entries with hash+payload provenance fields (100.0%); 11 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "failure_class=2 domain=medical",
+     "rationale": "records attempts incl. terminated/withdrawn/failed"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "US-run registry accepting global trials",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.56
+  },
+  "who_ictrp": {
+   "source_id": "who_ictrp",
+   "name": "WHO International Clinical Trials Registry Platform",
+   "authority_role": [
+    "CLINICAL"
+   ],
+   "health_status": "NOT_INTEGRATED",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED: connector_exists=False",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['clinical_registries']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries for this source",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Continuous aggregation",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "failure_class=2 domain=medical",
+     "rationale": "records attempts incl. terminated/withdrawn/failed"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "WHO aggregation of national trial registries",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 7,
+   "unmeasured_count": 4,
+   "depth_mean": 1.86
+  },
+  "europepmc": {
+   "source_id": "europepmc",
+   "name": "Europe PMC (REST)",
+   "authority_role": [
+    "SCIENTIFIC"
+   ],
+   "health_status": "UNAVAILABLE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE: connector_exists=True",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['biomedical_literature']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "3610 OK records across 366 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous (EBI releases); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "362/366 entries with hash+payload provenance fields (98.9%); 361 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Europe PMC aggregates global open-access + MEDLINE corpus",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 1.89
+  },
+  "pubmed": {
+   "source_id": "pubmed",
+   "name": "PubMed (NCBI E-utilities)",
+   "authority_role": [
+    "SCIENTIFIC"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 35 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['biomedical_literature']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "35 OK records across 7 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Daily (MEDLINE updates); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "7/7 entries with hash+payload provenance fields (100.0%); 7 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "MEDLINE indexes global biomedical literature",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.56
+  },
+  "openalex": {
+   "source_id": "openalex",
+   "name": "OpenAlex",
+   "authority_role": [
+    "SCIENTIFIC"
+   ],
+   "health_status": "DEGRADED",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "DEGRADED (RATE_LIMITED)",
+     "rationale": "provider answers restricted; unusable in campaigns today"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "aggregator; overlaps ['biomedical_literature']",
+     "rationale": "repackages upstream corpora already reachable via primaries"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "DEGRADED",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "0 OK records across 6 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Continuous",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "SECONDARY",
+     "rationale": "derived/repackaged view of primary issuers"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "2/6 entries with hash+payload provenance fields (33.3%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "OpenAlex catalogs global scholarly works",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 1.44
+  },
+  "semantic_scholar": {
+   "source_id": "semantic_scholar",
+   "name": "Semantic Scholar (S2 API)",
+   "authority_role": [
+    "SCIENTIFIC"
+   ],
+   "health_status": "DEGRADED",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "DEGRADED (RATE_LIMITED)",
+     "rationale": "provider answers restricted; unusable in campaigns today"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['biomedical_literature']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "DEGRADED",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "0 OK records across 6 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Continuous",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "SECONDARY",
+     "rationale": "derived/repackaged view of primary issuers"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "2/6 entries with hash+payload provenance fields (33.3%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "S2 catalogs global scholarly works",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 1.56
+  },
+  "crossref": {
+   "source_id": "crossref",
+   "name": "Crossref",
+   "authority_role": [
+    "SCIENTIFIC"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 30 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['biomedical_literature']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "30 OK records across 6 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "6/6 entries with hash+payload provenance fields (100.0%); 6 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Crossref registers global DOIs",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.56
+  },
+  "elsevier_scopus": {
+   "source_id": "elsevier_scopus",
+   "name": "Elsevier Scopus (Scopus Search API)",
+   "authority_role": [
+    "SCIENTIFIC"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 15 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "aggregator; overlaps ['biomedical_literature']",
+     "rationale": "repackages upstream corpora already reachable via primaries"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "15 OK records across 3 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Daily (Scopus daily update cycle); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "SECONDARY",
+     "rationale": "derived/repackaged view of primary issuers"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "3/3 entries with hash+payload provenance fields (100.0%); 3 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Scopus indexes global literature",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.22
+  },
+  "google_patents": {
+   "source_id": "google_patents",
+   "name": "Google Patents (xhr query)",
+   "authority_role": [
+    "PATENT"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 130 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "aggregator; overlaps ['global_patent_bibliographic']",
+     "rationale": "repackages upstream corpora already reachable via primaries"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "130 OK records across 96 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "SECONDARY",
+     "rationale": "derived/repackaged view of primary issuers"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "13/96 entries with hash+payload provenance fields (13.5%); 13 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "aggregates 100+ patent offices",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.11
+  },
+  "lens_scholarly": {
+   "source_id": "lens_scholarly",
+   "name": "The Lens — scholarly (NPL) search",
+   "authority_role": [
+    "SCIENTIFIC"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 20 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "aggregator; overlaps ['biomedical_literature']",
+     "rationale": "repackages upstream corpora already reachable via primaries"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "20 OK records across 8 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "SECONDARY",
+     "rationale": "derived/repackaged view of primary issuers"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "4/8 entries with hash+payload provenance fields (50.0%); 4 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Lens scholarly aggregates global corpora",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.11
+  },
+  "lens_patent": {
+   "source_id": "lens_patent",
+   "name": "The Lens — patent search",
+   "authority_role": [
+    "PATENT"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 385 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "aggregator; overlaps ['global_patent_bibliographic']",
+     "rationale": "repackages upstream corpora already reachable via primaries"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "385 OK records across 155 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "SECONDARY",
+     "rationale": "derived/repackaged view of primary issuers"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "79/155 entries with hash+payload provenance fields (51.0%); 79 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "aggregates global patent + scholarly corpora",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.22
+  },
+  "patentbear": {
+   "source_id": "patentbear",
+   "name": "Patent Bear (MCP JSON-RPC: US patent search + full-text records)",
+   "authority_role": [
+    "PATENT"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 5 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['global_patent_bibliographic']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "5 OK records across 1 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)",
+     "note": "metered source: {'monthly_limit': 20, 'metered_by': 'provider usage block (monthly_limit/monthly_used/monthly_remaining) returned in every response', 'health_policy': 'no-live-probe; LIVE is derived from the freshest live retrieval-log proof inside the metered window', 'metered_window_days': 31, 'prohibited_tools': ['run_lab (bills credits; never called by this engine)', 'get_lab_result (only after a run_lab, hence never called)']} — volume is policy-capped, not availability-capped"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous (Patent Bear record store); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "SECONDARY",
+     "rationale": "derived/repackaged view of primary issuers"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "1/1 entries with hash+payload provenance fields (100.0%); 1 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "multi-office patent store (provider scope declared limited)",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.22
+  },
+  "patsnap_eureka": {
+   "source_id": "patsnap_eureka",
+   "name": "PatSnap Eureka open platform",
+   "authority_role": [
+    "PATENT"
+   ],
+   "health_status": "UNAVAILABLE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE: connector_exists=True",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['global_patent_bibliographic']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "0 OK records across 6 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Continuous",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "SECONDARY",
+     "rationale": "derived/repackaged view of primary issuers"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "0/6 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "aggregates global patent data",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 1.33
+  },
+  "epo_ops": {
+   "source_id": "epo_ops",
+   "name": "EPO Open Patent Services (OPS)",
+   "authority_role": [
+    "PATENT"
+   ],
+   "health_status": "UNAVAILABLE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE: connector_exists=True",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['global_patent_bibliographic']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "0 OK records across 6 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Continuous",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "0/6 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "EPC member offices + worldwide bibliographic",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 1.33
+  },
+  "uspto_odp": {
+   "source_id": "uspto_odp",
+   "name": "USPTO Open Data Portal",
+   "authority_role": [
+    "PATENT"
+   ],
+   "health_status": "UNAVAILABLE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE: connector_exists=True",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['global_patent_bibliographic']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "0 OK records across 5 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Continuous",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "0/5 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US grants and pre-grant publications only",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 1.22
+  },
+  "wipo_patentscope": {
+   "source_id": "wipo_patentscope",
+   "name": "WIPO PATENTSCOPE",
+   "authority_role": [
+    "PATENT"
+   ],
+   "health_status": "NOT_INTEGRATED",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED: connector_exists=False",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['global_patent_bibliographic']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries for this source",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Continuous",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "PCT international applications + national phase data",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 7,
+   "unmeasured_count": 4,
+   "depth_mean": 1.57
+  },
+  "google_bigquery_patents": {
+   "source_id": "google_bigquery_patents",
+   "name": "Google Patents Public Datasets (BigQuery)",
+   "authority_role": [
+    "PATENT"
+   ],
+   "health_status": "UNAVAILABLE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE: connector_exists=True",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['global_patent_bibliographic']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "0 OK records across 5 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "Periodic dataset publication",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "0/5 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "bulk global patent corpus",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 1.33
+  },
+  "pubchem": {
+   "source_id": "pubchem",
+   "name": "PubChem (PUG REST)",
+   "authority_role": [
+    "CHEMISTRY"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 4 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "4 OK records across 5 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "5/5 entries with hash+payload provenance fields (100.0%); 4 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "chemical identity is global science",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.44
+  },
+  "uniprot": {
+   "source_id": "uniprot",
+   "name": "UniProt KB",
+   "authority_role": [
+    "BIOLOGY"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 25 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "25 OK records across 5 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous releases; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "5/5 entries with hash+payload provenance fields (100.0%); 5 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "global protein sequence resource",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.56
+  },
+  "chembl": {
+   "source_id": "chembl",
+   "name": "ChEMBL",
+   "authority_role": [
+    "BIOLOGY"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 5 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "5 OK records across 5 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 2,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Periodic releases; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "5/5 entries with hash+payload provenance fields (100.0%); 5 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "global bioassay literature curation",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.33
+  },
+  "rcsb_pdb": {
+   "source_id": "rcsb_pdb",
+   "name": "RCSB Protein Data Bank",
+   "authority_role": [
+    "BIOLOGY"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 25 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "25 OK records across 5 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Weekly structural releases; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "5/5 entries with hash+payload provenance fields (100.0%); 5 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "global structural depositions",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.56
+  },
+  "cod_optimade": {
+   "source_id": "cod_optimade",
+   "name": "Crystallography Open Database (OPTIMADE v1)",
+   "authority_role": [
+    "MATERIALS"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 35 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "35 OK records across 7 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous COD deposits (published structures); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "7/7 entries with hash+payload provenance fields (100.0%); 7 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "global crystallographic openness network",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.56
+  },
+  "nist_webbook": {
+   "source_id": "nist_webbook",
+   "name": "NIST Chemistry WebBook",
+   "authority_role": [
+    "MATERIALS"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 18 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "18 OK records across 4 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 2,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Periodic NIST releases; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "4/4 entries with hash+payload provenance fields (100.0%); 3 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "universal thermophysical reference data",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.33
+  },
+  "materials_project": {
+   "source_id": "materials_project",
+   "name": "Materials Project",
+   "authority_role": [
+    "MATERIALS"
+   ],
+   "health_status": "UNAVAILABLE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE: connector_exists=True",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "UNAVAILABLE",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "0 OK records across 2 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "Periodic dataset releases",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "SECONDARY",
+     "rationale": "derived/repackaged view of primary issuers"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "0/2 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "computed materials data applicable worldwide",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 1.22
+  },
+  "fda_recognized_standards": {
+   "source_id": "fda_recognized_standards",
+   "name": "FDA Recognized Consensus Standards Database",
+   "authority_role": [
+    "STANDARDS"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 800 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "800 OK records across 8 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 2,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Periodic (FDA recognition updates); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "8/8 entries with hash+payload provenance fields (100.0%); 8 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "FDA recognition list (standards bodies are global; recognition is US)",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.33
+  },
+  "ecfr_title21": {
+   "source_id": "ecfr_title21",
+   "name": "eCFR Title 21 — Food and Drugs (Subchapter H: Medical Devices)",
+   "authority_role": [
+    "STANDARDS"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 334 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "334 OK records across 4 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Daily (eCFR issue dates); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "4/4 entries with hash+payload provenance fields (100.0%); 4 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US federal regulation text",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.44
+  },
+  "iso_catalogue": {
+   "source_id": "iso_catalogue",
+   "name": "ISO standards catalogue",
+   "authority_role": [
+    "STANDARDS"
+   ],
+   "health_status": "NOT_INTEGRATED",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED: connector_exists=False",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['standards_catalogues']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries for this source",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Continuous",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "international standards body",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 7,
+   "unmeasured_count": 4,
+   "depth_mean": 1.57
+  },
+  "astm_standards": {
+   "source_id": "astm_standards",
+   "name": "ASTM standards catalogue",
+   "authority_role": [
+    "STANDARDS"
+   ],
+   "health_status": "NOT_INTEGRATED",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED: connector_exists=False",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['standards_catalogues']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries for this source",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Continuous",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "international-membership standards body, US-based",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 7,
+   "unmeasured_count": 4,
+   "depth_mean": 1.43
+  },
+  "eudamed": {
+   "source_id": "eudamed",
+   "name": "European Database on Medical Devices (EUDAMED)",
+   "authority_role": [
+    "REGULATORY",
+    "DEVICE_IDENTITY"
+   ],
+   "health_status": "NOT_INTEGRATED",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED: connector_exists=False",
+     "rationale": "no usable retrieval path measured"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 0,
+     "basis": "MEASURED",
+     "evidence": "NOT_INTEGRATED",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
+    },
+    "RECORD_VOLUME": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries for this source",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "Continuous",
+     "rationale": "no successful retrieval to measure pipeline side"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no retrieval-log entries",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "EU market regulatory jurisdiction",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 7,
+   "unmeasured_count": 4,
+   "depth_mean": 1.43
+  },
+  "fda_pma_supplements": {
+   "source_id": "fda_pma_supplements",
+   "name": "FDA PMA manufacturing/process-change supplements (openFDA)",
+   "authority_role": [
+    "MANUFACTURING"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 20 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['fda_device_regulatory']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "20 OK records across 4 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "openFDA PMA dataset refreshed weekly per FDA docs; last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "4/4 entries with hash+payload provenance fields (100.0%); 4 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US approval pathway",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.22
+  },
+  "manufacturing_literature": {
+   "source_id": "manufacturing_literature",
+   "name": "Manufacturing process literature (EuropePMC, 8-process taxonomy)",
+   "authority_role": [
+    "MANUFACTURING"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 80 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['biomedical_literature']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "80 OK records across 8 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous (EuropePMC refresh cycle); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "8/8 entries with hash+payload provenance fields (100.0%); 8 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=n/a",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "derived from global literature (EuropePMC cycle)",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.56
+  },
+  "gudid_sterilization": {
+   "source_id": "gudid_sterilization",
+   "name": "GUDID sterilization fields on marketed devices (openFDA UDI)",
+   "authority_role": [
+    "MANUFACTURING"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 40 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['gudid_identity']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "40 OK records across 4 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "GUDID submissions (continuous; openFDA refresh weekly); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "4/4 entries with hash+payload provenance fields (100.0%); 4 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US market submissions",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.22
+  },
+  "gudid_commercial": {
+   "source_id": "gudid_commercial",
+   "name": "GUDID commercial layer (via openFDA device/udi.json)",
+   "authority_role": [
+    "COMMERCIAL"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 80 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 2,
+     "basis": "DECLARED",
+     "evidence": "corpus shared with ['gudid_identity']",
+     "rationale": "redundant capability inside an overlap group"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "80 OK records across 8 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "GUDID submissions (continuous; openFDA refresh weekly); last successful retrieval 2026-08-29",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "rationale": "Art. XXV: unknown stays unknown"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "8/8 entries with hash+payload provenance fields (100.0%); 8 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 0,
+     "basis": "DECLARED",
+     "evidence": "failure_class=0 domain=n/a",
+     "rationale": "evidence class carries no failure semantics"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US market commercial reality",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": "UNMEASURED",
+     "basis": "UNMEASURED",
+     "evidence": "no coverage span declared in registry coverage field",
+     "rationale": "Art. XXV: unknown stays unknown"
+    }
+   },
+   "numeric_grade_count": 9,
+   "unmeasured_count": 2,
+   "depth_mean": 2.22
+  }
+ },
+ "role_depth": {
+  "SCIENTIFIC": {
+   "covered_binary": true,
+   "serving_sources": [
+    "europepmc",
+    "pubmed",
+    "openalex",
+    "semantic_scholar",
+    "crossref",
+    "elsevier_scopus",
+    "lens_scholarly"
+   ],
+   "live_sources": [
+    "pubmed",
+    "crossref",
+    "elsevier_scopus",
+    "lens_scholarly"
+   ],
+   "live_count": 4,
+   "best_live_source": "pubmed",
+   "best_depth_mean": 2.56,
+   "live_depth_mean": 2.36,
+   "depth_label": "ADEQUATE",
+   "limiting_dimensions": [
+    "pubmed:QUERY_RELEVANCE=UNMEASURED",
+    "pubmed:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=1",
+    "pubmed:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "PATENT": {
+   "covered_binary": true,
+   "serving_sources": [
+    "google_patents",
+    "lens_patent",
+    "patentbear",
+    "patsnap_eureka",
+    "epo_ops",
+    "uspto_odp",
+    "wipo_patentscope",
+    "google_bigquery_patents"
+   ],
+   "live_sources": [
+    "google_patents",
+    "lens_patent",
+    "patentbear"
+   ],
+   "live_count": 3,
+   "best_live_source": "lens_patent",
+   "best_depth_mean": 2.22,
+   "live_depth_mean": 2.18,
+   "depth_label": "ADEQUATE",
+   "limiting_dimensions": [
+    "google_patents:SOURCE_DIVERSITY=1",
+    "google_patents:QUERY_RELEVANCE=UNMEASURED",
+    "google_patents:PROVENANCE_COMPLETENESS=1",
+    "google_patents:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=1",
+    "google_patents:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "REGULATORY": {
+   "covered_binary": true,
+   "serving_sources": [
+    "fda_510k",
+    "fda_pma",
+    "fda_registrationlisting",
+    "fda_classification",
+    "fda_denovo",
+    "eudamed"
+   ],
+   "live_sources": [
+    "fda_510k",
+    "fda_pma",
+    "fda_registrationlisting",
+    "fda_classification"
+   ],
+   "live_count": 4,
+   "best_live_source": "fda_510k",
+   "best_depth_mean": 2.33,
+   "live_depth_mean": 2.19,
+   "depth_label": "ADEQUATE",
+   "limiting_dimensions": [
+    "fda_510k:QUERY_RELEVANCE=UNMEASURED",
+    "fda_510k:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
+    "fda_510k:GEOGRAPHIC_COVERAGE=1",
+    "fda_510k:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "DEVICE_IDENTITY": {
+   "covered_binary": true,
+   "serving_sources": [
+    "fda_udi",
+    "eudamed"
+   ],
+   "live_sources": [
+    "fda_udi"
+   ],
+   "live_count": 1,
+   "best_live_source": "fda_udi",
+   "best_depth_mean": 2.33,
+   "live_depth_mean": 2.33,
+   "depth_label": "ADEQUATE",
+   "limiting_dimensions": [
+    "fda_udi:QUERY_RELEVANCE=UNMEASURED",
+    "fda_udi:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
+    "fda_udi:GEOGRAPHIC_COVERAGE=1",
+    "fda_udi:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "ADVERSE_EVENT": {
+   "covered_binary": true,
+   "serving_sources": [
+    "fda_maude"
+   ],
+   "live_sources": [
+    "fda_maude"
+   ],
+   "live_count": 1,
+   "best_live_source": "fda_maude",
+   "best_depth_mean": 2.7,
+   "live_depth_mean": 2.7,
+   "depth_label": "WORLD_CLASS",
+   "limiting_dimensions": [
+    "fda_maude:QUERY_RELEVANCE=UNMEASURED",
+    "fda_maude:GEOGRAPHIC_COVERAGE=1"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "RECALL": {
+   "covered_binary": true,
+   "serving_sources": [
+    "fda_recall"
+   ],
+   "live_sources": [
+    "fda_recall"
+   ],
+   "live_count": 1,
+   "best_live_source": "fda_recall",
+   "best_depth_mean": 2.78,
+   "live_depth_mean": 2.78,
+   "depth_label": "WORLD_CLASS",
+   "limiting_dimensions": [
+    "fda_recall:QUERY_RELEVANCE=UNMEASURED",
+    "fda_recall:GEOGRAPHIC_COVERAGE=1",
+    "fda_recall:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "CLINICAL": {
+   "covered_binary": true,
+   "serving_sources": [
+    "clinicaltrials_gov",
+    "who_ictrp"
+   ],
+   "live_sources": [
+    "clinicaltrials_gov"
+   ],
+   "live_count": 1,
+   "best_live_source": "clinicaltrials_gov",
+   "best_depth_mean": 2.56,
+   "live_depth_mean": 2.56,
+   "depth_label": "WORLD_CLASS",
+   "limiting_dimensions": [
+    "clinicaltrials_gov:QUERY_RELEVANCE=UNMEASURED",
+    "clinicaltrials_gov:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "MATERIALS": {
+   "covered_binary": true,
+   "serving_sources": [
+    "cod_optimade",
+    "nist_webbook",
+    "materials_project"
+   ],
+   "live_sources": [
+    "cod_optimade",
+    "nist_webbook"
+   ],
+   "live_count": 2,
+   "best_live_source": "cod_optimade",
+   "best_depth_mean": 2.56,
+   "live_depth_mean": 2.45,
+   "depth_label": "ADEQUATE",
+   "limiting_dimensions": [
+    "cod_optimade:QUERY_RELEVANCE=UNMEASURED",
+    "cod_optimade:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
+    "cod_optimade:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "MANUFACTURING": {
+   "covered_binary": true,
+   "serving_sources": [
+    "fda_pma_supplements",
+    "manufacturing_literature",
+    "gudid_sterilization"
+   ],
+   "live_sources": [
+    "fda_pma_supplements",
+    "manufacturing_literature",
+    "gudid_sterilization"
+   ],
+   "live_count": 3,
+   "best_live_source": "manufacturing_literature",
+   "best_depth_mean": 2.56,
+   "live_depth_mean": 2.33,
+   "depth_label": "ADEQUATE",
+   "limiting_dimensions": [
+    "fda_pma_supplements:QUERY_RELEVANCE=UNMEASURED",
+    "fda_pma_supplements:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
+    "fda_pma_supplements:GEOGRAPHIC_COVERAGE=1",
+    "fda_pma_supplements:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "STANDARDS": {
+   "covered_binary": true,
+   "serving_sources": [
+    "fda_recognized_standards",
+    "ecfr_title21",
+    "iso_catalogue",
+    "astm_standards"
+   ],
+   "live_sources": [
+    "fda_recognized_standards",
+    "ecfr_title21"
+   ],
+   "live_count": 2,
+   "best_live_source": "ecfr_title21",
+   "best_depth_mean": 2.44,
+   "live_depth_mean": 2.38,
+   "depth_label": "ADEQUATE",
+   "limiting_dimensions": [
+    "fda_recognized_standards:QUERY_RELEVANCE=UNMEASURED",
+    "fda_recognized_standards:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
+    "fda_recognized_standards:GEOGRAPHIC_COVERAGE=1",
+    "fda_recognized_standards:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "CHEMISTRY": {
+   "covered_binary": true,
+   "serving_sources": [
+    "pubchem"
+   ],
+   "live_sources": [
+    "pubchem"
+   ],
+   "live_count": 1,
+   "best_live_source": "pubchem",
+   "best_depth_mean": 2.44,
+   "live_depth_mean": 2.44,
+   "depth_label": "ADEQUATE",
+   "limiting_dimensions": [
+    "pubchem:RECORD_VOLUME=1",
+    "pubchem:QUERY_RELEVANCE=UNMEASURED",
+    "pubchem:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
+    "pubchem:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "BIOLOGY": {
+   "covered_binary": true,
+   "serving_sources": [
+    "uniprot",
+    "chembl",
+    "rcsb_pdb"
+   ],
+   "live_sources": [
+    "uniprot",
+    "chembl",
+    "rcsb_pdb"
+   ],
+   "live_count": 3,
+   "best_live_source": "uniprot",
+   "best_depth_mean": 2.56,
+   "live_depth_mean": 2.48,
+   "depth_label": "ADEQUATE",
+   "limiting_dimensions": [
+    "uniprot:QUERY_RELEVANCE=UNMEASURED",
+    "uniprot:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
+    "uniprot:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "COMMERCIAL": {
+   "covered_binary": true,
+   "serving_sources": [
+    "gudid_commercial"
+   ],
+   "live_sources": [
+    "gudid_commercial"
+   ],
+   "live_count": 1,
+   "best_live_source": "gudid_commercial",
+   "best_depth_mean": 2.22,
+   "live_depth_mean": 2.22,
+   "depth_label": "ADEQUATE",
+   "limiting_dimensions": [
+    "gudid_commercial:QUERY_RELEVANCE=UNMEASURED",
+    "gudid_commercial:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
+    "gudid_commercial:GEOGRAPHIC_COVERAGE=1",
+    "gudid_commercial:TEMPORAL_COVERAGE=UNMEASURED"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  }
+ },
+ "engine_level": {
+  "GEOGRAPHIC": {
+   "live_source_distribution": {
+    "SINGLE_JURISDICTION": 12,
+    "MULTI_REGION": 2,
+    "GLOBAL": 13
+   },
+   "finding": "12 of 27 live sources are single-jurisdiction (US regulatory reality); EU regulatory reality has no live source (eudamed NOT_INTEGRATED)"
+  },
+  "FAILURE_NEGATIVE_EVIDENCE": {
+   "failure_native_live_sources": [
+    "fda_maude",
+    "fda_recall"
+   ],
+   "failure_domains": [
+    "medical"
+   ],
+   "finding": "all failure-native live sources are MEDICAL-ONLY — non-medical failure evidence (industrial/transport/energy/aerospace incidents) has ZERO live coverage; CEO blind spot mechanically confirmed"
+  },
+  "QUERY_RELEVANCE": {
+   "status": "UNMEASURED engine-wide",
+   "machinery_gap": "per-record relevance adjudication exists in discovery_modes/device_failure.py but is not aggregated per-source; must be closed before any relevance-quality claim"
+  },
+  "CONCENTRATION": {
+   "top5_share_note": "top-5 sources carried 81% of custody-log usage (TOSCANINI_DATABASE_COVERAGE_AUDIT); scientific layer leans on overlapping literature corpora"
+  }
+ }
+}
