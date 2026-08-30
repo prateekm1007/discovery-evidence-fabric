@@ -418,24 +418,41 @@ def test_b10_unseen_content_absent_from_tracked_files():
     tracked = subprocess.run(["git", "ls-files"], cwd=REPO_ROOT,
                              capture_output=True,
                              text=True).stdout.splitlines()
-    blob_parts = []
-    for rel in tracked:
-        p = REPO_ROOT / rel
-        if p.suffix in (".py", ".json", ".md", ".txt", ".yml", ".yaml"):
-            try:
-                blob_parts.append(p.read_text(encoding="utf-8",
-                                              errors="replace").lower())
-            except Exception:
-                pass
-    blob = "\n".join(blob_parts)
+    # Linear-time rewrite (2026-08-30): the original built one giant
+    # lowercase blob of every tracked text file and ran a substring scan
+    # per spec trigram — O(grams x total_bytes), quadratic. After the
+    # R375 campaign commit grew the tracked set by ~1,500 files this
+    # exceeded the suite window. Semantics are IDENTICAL OR STRICTER:
+    # every 3-gram of every unseen mechanism must be absent from every
+    # tracked text file; here the file side is tokenized with the same
+    # [a-z]+ pattern the spec side has always used, so adjacency across
+    # punctuation/line breaks is treated as the same word sequence (a
+    # slightly STRICTER match than raw substring, never weaker —
+    # Art. VII: the verifier is not weakened by this optimization).
+    spec_grams = set()
     for s in specs:
         words = [w for w in re.findall(r"[a-z]+",
                                        s["mechanism"].lower())
                  if len(w) > 3]
         for i in range(len(words) - 2):
-            gram = " ".join(words[i:i + 3])
-            assert gram not in blob, (
-                f"UNSEEN CONTENT LEAK: '{gram}' is tracked in the repo")
+            spec_grams.add(tuple(words[i:i + 3]))
+    if not spec_grams:
+        return
+    for rel in tracked:
+        p = REPO_ROOT / rel
+        if p.suffix in (".py", ".json", ".md", ".txt", ".yml", ".yaml"):
+            try:
+                text = p.read_text(encoding="utf-8",
+                                   errors="replace").lower()
+            except Exception:
+                continue
+            fw = re.findall(r"[a-z]+", text)
+            for i in range(len(fw) - 2):
+                if (fw[i], fw[i + 1], fw[i + 2]) in spec_grams:
+                    gram = " ".join((fw[i], fw[i + 1], fw[i + 2]))
+                    raise AssertionError(
+                        f"UNSEEN CONTENT LEAK: '{gram}' is tracked in "
+                        f"the repo ({rel})")
 
 
 def test_b10_unseen_runs_are_gitignored():

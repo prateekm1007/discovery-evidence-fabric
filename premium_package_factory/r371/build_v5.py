@@ -58,6 +58,8 @@ from premium_package_factory.r371.commercial import build_commercial_evidence
 from premium_package_factory.r371.economics import build_validation_economics
 from premium_package_factory.r371.equations import build_equation_registry
 from premium_package_factory.r371.experiment_diagram import build_experiment_diagram
+from premium_package_factory.gates.render_verification import (
+    verify_package, verify_pdf_rendering)
 from premium_package_factory.r371.identity import build_registry, write_registry
 from premium_package_factory.r371.loopstate import build_loop_state, portfolio_loop_summary
 from premium_package_factory.r371.mechanism_diagram import build_all_mechanism_diagrams
@@ -198,6 +200,11 @@ def build(portfolio_root, work_dir=None):
         bd.render_transfer_manifest(p, h, comm[p.pkg_id],
                                     os.path.join(pdir, "05_TRANSFER_MANIFEST.pdf"))
 
+        # V3 BUILD GATE (CEO forensic directive 2026-08-30): the package
+        # ZIP is not created unless every rendered PDF is free of the V2
+        # defect class (overflow / overprinting). Blocking by exception.
+        verify_package(pdir)
+
         # machine-readable layer
         # R372-1: ENGINEERING_TRACEABILITY.json now carries explicit
         # per-chain semantics (legacy R370 record preserved inside it)
@@ -274,6 +281,7 @@ def build(portfolio_root, work_dir=None):
                             encoding="utf-8"))
         bd.render_package_readme(p, h, pm["files"],
                                  os.path.join(pdir, "00_PACKAGE_README.pdf"))
+        verify_pdf_rendering(os.path.join(pdir, "00_PACKAGE_README.pdf"))
         # update manifest hash for the re-rendered readme
         for f in pm["files"]:
             if f["file"] == "00_PACKAGE_README.pdf":
@@ -293,6 +301,9 @@ def build(portfolio_root, work_dir=None):
         os.path.join(portfolio_root, "PORTFOLIO_INDEX.pdf"))
     bp.render_master_portfolio(
         packages, headlines, ranking,
+        os.path.join(portfolio_root, "00_PORTFOLIO_15_TECHNOLOGIES.pdf"))
+    verify_pdf_rendering(os.path.join(portfolio_root, "PORTFOLIO_INDEX.pdf"))
+    verify_pdf_rendering(
         os.path.join(portfolio_root, "00_PORTFOLIO_15_TECHNOLOGIES.pdf"))
     # PORTFOLIO_MANIFEST.json (canonical maturity source)
     # R374-5 determinism: no volatile build timestamp here — this file's

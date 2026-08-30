@@ -25,7 +25,7 @@ import os
 from reportlab.platypus import Image, PageBreak, Paragraph, Spacer, Table, TableStyle
 
 from .builder import (
-    _doc, _esc, _footer_canvas, _img, _mut, _tbl, NOT_ESTABLISHED,
+    _doc, _esc, _footer_canvas, _img, _mut, _tbl, NOT_ESTABLISHED, cell_safe,
 )
 from .equations import render_equation_png
 
@@ -140,7 +140,7 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     rows = [["Parameter", "Recorded value", "Unit", "Basis", "Verification required"]]
     for cp in pkg.critical_parameters:
         rows.append([_mut(pkg, cp.get("name", "")),
-                     _mut(pkg, str(cp.get("value", ""))[:120]),
+                     _mut(pkg, str(cp.get("value", ""))),
                      cp.get("unit", ""), _mut(pkg, cp.get("basis", "")),
                      _mut(pkg, cp.get("verification_requirement", ""))])
     if len(rows) > 1:
@@ -151,7 +151,10 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     rows = [["ID", "Design input", "Value / source"]]
     for di in pkg.design_inputs[:14]:
         rows.append([di.get("id", ""), _mut(pkg, di.get("input", "")),
-                     _mut(pkg, str(di.get("value", ""))[:150])])
+                     cell_safe("clinical_need" if "need" in str(
+                         di.get("input", "")).lower() else "value",
+                         _mut(pkg, di.get("value", "")),
+                         register="package JSON registers")])
     st.append(_tbl(rows, [0.55 * 72, 1.7 * 72, 4.4 * 72]))
     st.append(Spacer(1, 5))
     rows = [["ID", "Design output", "Status", "Missing inputs"]]
@@ -168,7 +171,8 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
         rows.append([_mut(pkg, fm.get("failure_mode", "")),
                      _mut(pkg, fm.get("mechanism", "")),
                      _mut(pkg, fm.get("design_feature_affected", "")),
-                     _mut(pkg, str(fm.get("evidence", ""))[:130])])
+                     cell_safe("evidence", _mut(pkg, fm.get("evidence", "")),
+                               register="engineering record")])
     st.append(_tbl(rows, [1.3 * 72, 1.7 * 72, 1.4 * 72, 2.25 * 72]))
 
     # -- 7. verification + experiment diagram ---------------------------------
@@ -176,8 +180,11 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     rows = [["ID", "Requirement", "Method", "Acceptance", "Result"]]
     for v in pkg.verification[:10]:
         rows.append([v.get("id", ""), _mut(pkg, v.get("requirement", "")),
-                     _mut(pkg, v.get("method", "")),
-                     _mut(pkg, str(v.get("acceptance", ""))[:90]),
+                     cell_safe("method", _mut(pkg, v.get("method", "")),
+                               register="verification record"),
+                     cell_safe("acceptance",
+                               _mut(pkg, v.get("acceptance", "")),
+                               register="verification record"),
                      v.get("result", "NOT_TESTED")])
     st.append(_tbl(rows, [0.5 * 72, 1.7 * 72, 1.8 * 72, 1.7 * 72, 0.8 * 72]))
     for v in pkg.validation[:6]:
@@ -196,9 +203,15 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     rows = [["WP", "Test article", "Measurement", "Acceptance criterion", "Recorded effort"]]
     for step in pkg.build_plan:
         rows.append([step.get("work_package", ""),
-                     _mut(pkg, str(step.get("test_article", ""))[:110]),
-                     _mut(pkg, str(step.get("measurement", ""))[:110]),
-                     _mut(pkg, str(step.get("acceptance_criterion", ""))[:110]),
+                     cell_safe("test_article",
+                               _mut(pkg, step.get("test_article", "")),
+                               register="build plan"),
+                     cell_safe("measurement",
+                               _mut(pkg, step.get("measurement", "")),
+                               register="build plan"),
+                     cell_safe("acceptance_criterion",
+                               _mut(pkg, step.get("acceptance_criterion", "")),
+                               register="build plan"),
                      step.get("estimated_effort", "")])
     st.append(_tbl(rows, [0.45 * 72, 1.65 * 72, 1.65 * 72, 1.65 * 72, 0.9 * 72]))
     st.append(Paragraph(_esc(
@@ -219,8 +232,12 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
         "reduced count."), S["BT"]))
     rows = [["ID", "Unknown (verbatim)", "Class", "Resolution action", "Decision impact"]]
     for u in roadmap["unknowns"]:
-        rows.append([u["unknown_id"], u["unknown_statement"][:150],
-                     u["classification"], u["resolution_action"][:170],
+        rows.append([u["unknown_id"],
+                     cell_safe("why_unknown", u["unknown_statement"],
+                               register="UNKNOWN_ROADMAP.json", fontsize=6.7),
+                     u["classification"],
+                     cell_safe("resolution_action", u["resolution_action"],
+                               register="UNKNOWN_ROADMAP.json", fontsize=6.7),
                      "CRITICAL gate" if u["is_critical"] else "design gate"])
     st.append(_tbl(rows, [0.42 * 72, 2.0 * 72, 1.05 * 72, 2.3 * 72, 0.7 * 72], fontsize=6.7))
 
