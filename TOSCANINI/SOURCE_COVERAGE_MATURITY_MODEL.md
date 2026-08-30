@@ -204,15 +204,25 @@ unmeasured relevance quality, and degraded/overlapping scientific breadth.
 ## 6. What this model now demands (the to-do list it generates)
 
 1. Close QUERY_RELEVANCE: persist per-source relevance-adjudication
-   aggregation in the custody log → then measure it.
+   aggregation in the custody log → then measure it. (STILL OPEN.)
 2. Rescue DEGRADED sources (OpenAlex 429, Semantic Scholar 429) before
-   adding replacements (CEO directive 3).
+   adding replacements (CEO directive 3). (DONE 2026-08-30: backoff +
+   Retry-After policy, metered-protected; S2 recovered LIVE in isolation;
+   OpenAlex honestly DEGRADED — provider daily-budget window.)
 3. Resolve NOT_INTEGRATED/UNAVAILABLE with real retrievals — no integration
-   claim without usable evidence (CEO directive 1).
+   claim without usable evidence (CEO directive 1). (DONE 2026-08-30:
+   europepmc zero-hit parse bug fixed → LIVE; uspto_odp endpoint-retirement
+   unmasked → honest credential-block; 32 LIVE now.)
 4. Integrate free/open priority sources (NASA NTRS, DOE OSTI, arXiv, NHTSA,
    NTSB, EUDAMED, FDA De Novo) → their first graded act is their probe
-   (CEO directive 2).
-5. Re-run the model after every health run; the grades file is generated,
+   (CEO directive 2). (DONE 2026-08-30 for NTRS/OSTI/arXiv/NHTSA — LIVE;
+   NTSB/EUDAMED/De Novo measured-blocked, honestly recorded.)
+5. Cross-source identity/dedup + contradiction detection + negative-evidence
+   architecture (CEO directives 4-5). (DONE 2026-08-30:
+   entity_resolution.py + negative_evidence.py; live anchor verification
+   EuropePMC+Crossref → one canonical entity; 146 negative-evidence records
+   across medical+transport in the live demonstration.)
+6. Re-run the model after every health run; the grades file is generated,
    never hand-edited (Art. X: registry + measurement are the authority).
 
 ---
