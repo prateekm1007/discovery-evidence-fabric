@@ -6146,3 +6146,22 @@ Work Log:
 
 Stage Summary:
 - V4 release built and verified: 15/15 packages, 90/90 buyer PDFs, 3 portfolio PDFs, 1,249 authoritative strings verified IN FULL, every page rasterized+inspected (PNG audit artifacts persist in INTERNAL_QA/rendered_pages), worst-case fixtures permanent. Acceptance numbers in portfolio INTERNAL_QA/R375_ACCEPTANCE.json; fresh-clone certificate R375_FRESH_CLONE_REPRODUCTION.json.
+
+---
+Task ID: CODER-TOSCANINI-AUDIT
+Agent: CODER (sole builder; Super Z session 2026-08-30)
+Task: CEO directive — Toscanini general-purpose invention engine, database coverage audit (10 steps; report true numbers; governance files read first).
+
+Work Log:
+- Constitution v1.8.0 re-read IN FULL (Articles I-XXXVIII) + amendment articles XXXVI/XXXVII/XXXVIII + ACTIVE_PATH.md before any work. Art. XXXIV explicitly sanctions database acquisition as the next action.
+- Repo state recorded (Art. XXIII): HEAD = origin/main = 66376d37. Found UNCOMMITTED R376 WIP in the tree: release-path audit instrument + CI workflow + wiring. Verified INCOMPLETE: 3 test floors broken (buyer_decision_completeness 5/26, section_coverage 5/26), release-chain audit FAILs vs shipped portfolio (V4 packages carry no RELEASE_GATE_CERTIFICATE), a10 path ~25x slower. Per Art. XV/XI preserved on branch r376-wip-2026-08-30 (commit 264ec050, defects enumerated) — NOT merged, NOT destroyed. Main restored to clean green 66376d37 (a10 re-verified PASS in 16s).
+- TRUE NUMBERS measured (not claimed): 41 registry sources / 35 connectors; live re-probe TODAY of all 8 non-LIVE sources (scripts/toscanini_live_probe.py): europepmc RECOVERED UNAVAILABLE->LIVE (8/29 failure was transient); openalex still DEGRADED (credit-budget 429); semantic_scholar DEGRADED; epo_ops/uspto_odp/google_bigquery/patsnap/materials_project UNAVAILABLE (credentials/ASN). Totals: 28 LIVE / 2 DEGRADED / 5 UNAVAILABLE / 6 NOT_INTEGRATED; 13/13 roles COVERED; 969 custody retrieval-log entries chain-valid; top-5 sources = 81% of usage (europepmc 366, lens_patent 155, google_patents 96, fda_recall 86, fda_maude 81).
+- Second retrieval layer inventoried (orchestrator/ adapters incl. NASA NTRS UNWIRED into four-search, OSTI triangulation-only, NIH RePORTER) — custody-bypassing; flagged for unification (audit step 6).
+- Blind spots grep-verified ZERO: non-medical failure DBs (no NTSB/NHTSA/EASA anywhere), standards full text, custody-grade gov tech reports (NASA/OSTI), EU regulatory (EUDAMED unconnected).
+- CEO-15 mapping: 6 already LIVE, 4 built-but-blocked, 5 absent from custody layer.
+- Scored every source on coverage x authority x machine-accessibility x licensing x freshness x invention-value; tiers T0 (30 keep/restore) / T1 (7 free adds: ntrs, osti, arxiv, nhtsa, ntsb, eudamed, denovo) / T2 (4 CEO decisions: uspto_odp + epo_ops free keys, materials_project key+egress, ISO/ASTM licensing) / T3 (4 deferred as redundant — anti-count-theater).
+- Machinery steps 6-10 assessed: normalized interface exists but TWO layers must unify; provenance custody solid; MAUDE-not-ground-truth ALREADY codified as Art. XXI.5 per-record metadata; dedup exists in two ununified engines; cross-source FACTUAL contradiction detection ABSENT (largest machinery gap, depends on dedup unification).
+- Artifacts: TOSCANINI/TOSCANINI_DATABASE_COVERAGE_AUDIT.md + TOSCANINI_SOURCE_SCORECARD.json (machine-readable, JSON-valid). Verdict recorded: Toscanini may NOT be called general-purpose today (medical vertical world-class, horizontal not yet); cheapest path = 12 free actions.
+
+Stage Summary:
+- Coverage audit complete and honest; no API integration started (per directive). Toscanini name recorded as engine identity (code rename deferred behind evidence work). R376 WIP preserved on branch awaiting proper completion — disclosed, not hidden.

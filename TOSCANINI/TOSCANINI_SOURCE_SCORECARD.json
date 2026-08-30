@@ -1,0 +1,798 @@
+{
+ "audit": "TOSCANINI_SOURCE_SCORECARD",
+ "version": "1.0.0",
+ "directive": "CEO 2026-08-30 - Toscanini general-purpose invention engine, database coverage audit steps 4-5",
+ "scoring_model": {
+  "axes": {
+   "coverage": "breadth of relevant records for Toscanini's problem->mechanism->prior-art->candidate->spec->validation->transfer chain (1=narrow, 5=decisive breadth)",
+   "authority": "evidentiary authority of the issuing organization (1=anonymous, 5=primary legal/national authority)",
+   "machine_accessibility": "API quality, structure, reliability for programmatic use (1=scrape-only, 5=first-class free API)",
+   "licensing": "freedom to retrieve, store, and reason over records (1=prohibited, 5=open/CC0)",
+   "freshness": "update cadence (1=stale snapshots, 5=continuous)",
+   "invention_value": "marginal value to invention reasoning beyond existing LIVE sources (1=redundant, 5=uniquely enables a blind-spot class)"
+  },
+  "total": "sum of six axes (6-30)",
+  "tiers": {
+   "T0_KEEP_RESTORE": "already LIVE, or built+blocked with a known unblock - keep/restore first (cheapest coverage win)",
+   "T1_ADD_NOW": "absent today, free/open API, fills a blind-spot class - add next",
+   "T2_CEO_DECISION": "paid/credential/licensed - value is real but requires a CEO procurement or credential decision",
+   "T3_DEFER": "redundant with a LIVE source or low invention value at this stage"
+  }
+ },
+ "evidence_basis": {
+  "health_report": "artifacts/source_health/SOURCE_HEALTH_REPORT.json (2026-08-29 run, 350-entry log audit)",
+  "live_reprobe_2026_08_30": "europepmc/openalex/semantic_scholar/epo_ops/uspto_odp/materials_project/patsnap_eureka/google_bigquery_patents re-measured live via scripts/toscanini_live_probe.py (session 2026-08-30)",
+  "retrieval_log": "artifacts/source_health/retrieval_log.jsonl - 969 custody entries, chain_valid=true",
+  "campaign_usage": "ENGINE_RUNS/M1_* (R375 campaign) source citations counted per run envelope",
+  "note": "Every status below is MEASURED (Art. XXI), never doc-claimed. Statuses as of 2026-08-30."
+ },
+ "current_sources": {
+  "LIVE_28": {
+   "europepmc": {
+    "status": "LIVE (re-probed 2026-08-30; UNAVAILABLE in 8/29 report was transient probe failure)",
+    "score": {
+     "coverage": 5,
+     "authority": 4,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 28,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 366,
+    "note": "Most-used source (38% of custody log). Full-text-capable REST, CC0 metadata."
+   },
+   "pubmed": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 5,
+     "authority": 5,
+     "machine_accessibility": 4,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 3
+    },
+    "total": 27,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 7,
+    "note": "Overlaps europepmc substantially (same underlying corpus); keep as independence check."
+   },
+   "crossref": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 5,
+     "authority": 4,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 3
+    },
+    "total": 27,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 6,
+    "note": "DOI authority; metadata backbone for dedup keys."
+   },
+   "elsevier_scopus": {
+    "status": "LIVE (free tier)",
+    "score": {
+     "coverage": 5,
+     "authority": 4,
+     "machine_accessibility": 3,
+     "licensing": 2,
+     "freshness": 5,
+     "invention_value": 3
+    },
+    "total": 22,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 3,
+    "note": "Abstracts limited without subscription; used within free quota."
+   },
+   "lens_scholarly": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 4,
+     "authority": 4,
+     "machine_accessibility": 4,
+     "licensing": 3,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 24,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 8,
+    "note": "Scholarly-patent linkage - the unique cross-class bridge."
+   },
+   "lens_patent": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 5,
+     "authority": 5,
+     "machine_accessibility": 4,
+     "licensing": 3,
+     "freshness": 5,
+     "invention_value": 5
+    },
+    "total": 27,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 155,
+    "note": "Patent+scholarly graph in one system; bibliographic (claims NOT in search results - measured)."
+   },
+   "google_patents": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 5,
+     "authority": 4,
+     "machine_accessibility": 3,
+     "licensing": 4,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 25,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 96,
+    "note": "Broad coverage incl. full claims text via XHR; primary patent workhorse with Lens."
+   },
+   "patentbear": {
+    "status": "LIVE (metered)",
+    "score": {
+     "coverage": 4,
+     "authority": 4,
+     "machine_accessibility": 4,
+     "licensing": 3,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 24,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 1,
+    "note": "ONLY live claims-text source; metered - every call must earn its quota."
+   },
+   "fda_maude": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 4,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 5
+    },
+    "total": 29,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 81,
+    "note": "NOT ground truth - Art. XXI.5 limitations metadata on every record (incidence UNKNOWN, causation UNVERIFIED); already constitutionally codified."
+   },
+   "fda_recall": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 3,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 5
+    },
+    "total": 28,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 86,
+    "note": "Root-cause narratives - the richest structured failure-evidence source in the fabric."
+   },
+   "fda_510k": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 4,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 28,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 13,
+    "note": "Predicate chains - regulatory pathway reasoning."
+   },
+   "fda_pma": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 3,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 27,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 7,
+    "note": ""
+   },
+   "fda_pma_supplements": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 2,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 5
+    },
+    "total": 27,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 4,
+    "note": "Manufacturing/processing change records - directly feeds the R375 depth bottleneck (manufacturing_reasoning)."
+   },
+   "fda_udi": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 4,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 28,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 11,
+    "note": ""
+   },
+   "fda_registrationlisting": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 4,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 3
+    },
+    "total": 27,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 8,
+    "note": ""
+   },
+   "fda_classification": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 3,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 3
+    },
+    "total": 26,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 7,
+    "note": ""
+   },
+   "gudid_commercial": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 4,
+     "authority": 5,
+     "machine_accessibility": 4,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 27,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 8,
+    "note": "Commercial reality - what actually survived contact with the market."
+   },
+   "gudid_sterilization": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 2,
+     "authority": 5,
+     "machine_accessibility": 4,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 25,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 4,
+    "note": "Sterilization method field - manufacturing constraint evidence."
+   },
+   "clinicaltrials_gov": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 4,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 28,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 11,
+    "note": "What was attempted in humans and what failed - endpoints + interventions."
+   },
+   "manufacturing_literature": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 2,
+     "authority": 3,
+     "machine_accessibility": 3,
+     "licensing": 4,
+     "freshness": 4,
+     "invention_value": 4
+    },
+    "total": 20,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 8,
+    "note": "Curated manufacturing-knowledge base - directly feeds manufacturing_reasoning depth."
+   },
+   "fda_recognized_standards": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 3,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 4,
+     "invention_value": 5
+    },
+    "total": 27,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 8,
+    "note": "Which standards FDA accepts - the standards-class anchor without paywalled full text."
+   },
+   "ecfr_title21": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 3,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 27,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 4,
+    "note": "US medical-device regulation as code - requirement extraction."
+   },
+   "pubchem": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 4,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 3
+    },
+    "total": 27,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 5,
+    "note": "Chemical identity + properties; PUG REST is first-class."
+   },
+   "nist_webbook": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 3,
+     "authority": 5,
+     "machine_accessibility": 4,
+     "licensing": 5,
+     "freshness": 3,
+     "invention_value": 4
+    },
+    "total": 24,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 4,
+    "note": "Measured thermophysical reference - physical-truth anchor."
+   },
+   "cod_optimade": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 3,
+     "authority": 4,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 3,
+     "invention_value": 3
+    },
+    "total": 23,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 7,
+    "note": "Open crystallography via OPTIMADE - materials structural truth."
+   },
+   "uniprot": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 3,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 2
+    },
+    "total": 25,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 5,
+    "note": "Protein identity - biomedical-invention relevance."
+   },
+   "chembl": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 3,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 4,
+     "invention_value": 2
+    },
+    "total": 24,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 5,
+    "note": "Bioactivity data - drug-device combination reasoning."
+   },
+   "rcsb_pdb": {
+    "status": "LIVE",
+    "score": {
+     "coverage": 2,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 2
+    },
+    "total": 24,
+    "tier": "T0_KEEP_RESTORE",
+    "log_entries": 5,
+    "note": "3D structures - narrow but unique."
+   }
+  },
+  "NOT_INTEGRATED_6": {
+   "wipo_patentscope": {
+    "score": {
+     "coverage": 4,
+     "authority": 5,
+     "machine_accessibility": 2,
+     "licensing": 3,
+     "freshness": 5,
+     "invention_value": 3
+    },
+    "total": 22,
+    "tier": "T3_DEFER (PCT coverage overlaps Lens/Google Patents; scrape-only access)",
+    "note": "Registered pending a compliant access path."
+   },
+   "iso_catalogue": {
+    "score": {
+     "coverage": 3,
+     "authority": 5,
+     "machine_accessibility": 2,
+     "licensing": 1,
+     "freshness": 4,
+     "invention_value": 4
+    },
+    "total": 19,
+    "tier": "T2_CEO_DECISION (CEO priority #13; catalogue metadata free, full text paid)",
+    "note": "Standard REQUIREMENTS text needs licensed access - a CEO procurement decision, not a coding task."
+   },
+   "astm_standards": {
+    "score": {
+     "coverage": 3,
+     "authority": 5,
+     "machine_accessibility": 2,
+     "licensing": 1,
+     "freshness": 4,
+     "invention_value": 4
+    },
+    "total": 19,
+    "tier": "T2_CEO_DECISION (same licensing situation)",
+    "note": ""
+   },
+   "eudamed": {
+    "score": {
+     "coverage": 3,
+     "authority": 5,
+     "machine_accessibility": 3,
+     "licensing": 5,
+     "freshness": 4,
+     "invention_value": 4
+    },
+    "total": 24,
+    "tier": "T1_ADD_NOW (free REST API exists; connector not written)",
+    "note": "EU commercial/regulatory reality - the non-US half of class 6."
+   },
+   "fda_denovo": {
+    "score": {
+     "coverage": 2,
+     "authority": 5,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 4,
+     "invention_value": 3
+    },
+    "total": 24,
+    "tier": "T1_ADD_NOW (openFDA endpoint; trivial once prioritized)",
+    "note": "Novel-device pathway - regulatory-precedent completeness."
+   },
+   "who_ictrp": {
+    "score": {
+     "coverage": 2,
+     "authority": 5,
+     "machine_accessibility": 3,
+     "licensing": 5,
+     "freshness": 4,
+     "invention_value": 2
+    },
+    "total": 21,
+    "tier": "T3_DEFER (overlaps ClinicalTrials.gov)",
+    "note": ""
+   }
+  },
+  "BUILT_BUT_BLOCKED_7": {
+   "openalex": {
+    "status": "DEGRADED (re-probed 2026-08-30: still failing - credit-budget model measured 429 'Insufficient budget... Resets at midnight')",
+    "score": {
+     "coverage": 5,
+     "authority": 4,
+     "machine_accessibility": 5,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 5
+    },
+    "total": 29,
+    "tier": "T0_KEEP_RESTORE (CEO priority #1)",
+    "log_entries": 6,
+    "unblock": "polite-pool mailto registration / budget reset discipline / institutional data grant; NO code work needed - connector is done",
+    "note": "CEO list #1. Semantic-concept search is the unique capability (finds similar work across terminology)."
+   },
+   "semantic_scholar": {
+    "status": "DEGRADED (response no longer parses at current tier)",
+    "score": {
+     "coverage": 4,
+     "authority": 4,
+     "machine_accessibility": 3,
+     "licensing": 4,
+     "freshness": 5,
+     "invention_value": 3
+    },
+    "total": 23,
+    "tier": "T3_DEFER (redundant while OpenAlex+europepmc LIVE)",
+    "log_entries": 6,
+    "unblock": "API key tier decision",
+    "note": "Citation-graph value overlaps OpenAlex; fix OpenAlex first."
+   },
+   "materials_project": {
+    "status": "UNAVAILABLE (measured 403: cloud ASN blocked before credential evaluation; key ALSO not provisioned)",
+    "score": {
+     "coverage": 4,
+     "authority": 4,
+     "machine_accessibility": 4,
+     "licensing": 4,
+     "freshness": 4,
+     "invention_value": 4
+    },
+    "total": 24,
+    "tier": "T2_CEO_DECISION (CEO priority #6)",
+    "log_entries": 2,
+    "unblock": "BOTH a provisioned MATERIALS_PROJECT_API_KEY in .env.keys AND an unblocked egress IP (residential/proxy egress is a CEO infrastructure decision)",
+    "note": "DFT-computed properties - fills the computational-materials blind spot."
+   },
+   "epo_ops": {
+    "status": "UNAVAILABLE (live request fails - OAuth credentials absent)",
+    "score": {
+     "coverage": 5,
+     "authority": 5,
+     "machine_accessibility": 3,
+     "licensing": 4,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 26,
+    "tier": "T2_CEO_DECISION (free credentials, registration required)",
+    "log_entries": 6,
+    "unblock": "EPO OPS consumer-key registration (free throttled tier exists)",
+    "note": "Primary European patent authority + INPADOC legal status."
+   },
+   "uspto_odp": {
+    "status": "UNAVAILABLE (live request fails - API key absent)",
+    "score": {
+     "coverage": 5,
+     "authority": 5,
+     "machine_accessibility": 4,
+     "licensing": 5,
+     "freshness": 5,
+     "invention_value": 4
+    },
+    "total": 28,
+    "tier": "T2_CEO_DECISION (CEO priority #3; free API keys)",
+    "log_entries": 5,
+    "unblock": "USPTO ODP API key registration (free)",
+    "note": "US primary authority - claims, classifications, continuity."
+   },
+   "google_bigquery_patents": {
+    "status": "UNAVAILABLE (GCP credentials absent)",
+    "score": {
+     "coverage": 5,
+     "authority": 4,
+     "machine_accessibility": 4,
+     "licensing": 4,
+     "freshness": 4,
+     "invention_value": 3
+    },
+    "total": 24,
+    "tier": "T3_DEFER (Lens+Google Patents+PatentBear cover the class LIVE)",
+    "log_entries": 5,
+    "unblock": "GCP project + BigQuery sandbox (query costs apply)",
+    "note": "Bulk historical analysis; not needed for per-candidate reasoning."
+   },
+   "patsnap_eureka": {
+    "status": "UNAVAILABLE (subscription credential absent)",
+    "score": {
+     "coverage": 4,
+     "authority": 3,
+     "machine_accessibility": 4,
+     "licensing": 2,
+     "freshness": 5,
+     "invention_value": 3
+    },
+    "total": 21,
+    "tier": "T3_DEFER",
+    "log_entries": 6,
+    "unblock": "Paid subscription decision",
+    "note": "Commercial aggregator - overlaps Lens substantially."
+   }
+  }
+ },
+ "proposed_additions": {
+  "nasa_ntrs": {
+   "status": "ABSENT from custody layer (an orchestrator-layer adapter EXISTS in orchestrator/multi_source_discovery.py but is UNWIRED into the four-search attack and NOT in the 41-source registry)",
+   "score": {
+    "coverage": 4,
+    "authority": 5,
+    "machine_accessibility": 4,
+    "licensing": 5,
+    "freshness": 4,
+    "invention_value": 5
+   },
+   "total": 27,
+   "tier": "T1_ADD_NOW (CEO priority #4)",
+   "unblock": "promote the existing adapter into the registry with SourceRecord custody + retrieval log",
+   "note": "Aerospace/propulsion/materials/controls R&D that never becomes a commercial product - the government-negative-knowledge archive."
+  },
+  "doe_osti": {
+   "status": "ABSENT from custody layer (triangulation-engine adapter only - the module that committed the V16.1 Art. XXI violation; OSTI itself was never the defect, custody was)",
+   "score": {
+    "coverage": 4,
+    "authority": 5,
+    "machine_accessibility": 5,
+    "licensing": 5,
+    "freshness": 4,
+    "invention_value": 5
+   },
+   "total": 28,
+   "tier": "T1_ADD_NOW (CEO priority #5)",
+   "unblock": "write registry connector on the public v1 API (already probe-tested in provider_health_probe)",
+   "note": "Energy/batteries/nuclear/manufacturing R&D - same negative-knowledge value class as NTRS."
+  },
+  "arxiv": {
+   "status": "SCAFFOLD ONLY (a2_forensic_audit records 'README only')",
+   "score": {
+    "coverage": 4,
+    "authority": 3,
+    "machine_accessibility": 5,
+    "licensing": 5,
+    "freshness": 5,
+    "invention_value": 4
+   },
+   "total": 26,
+   "tier": "T1_ADD_NOW",
+   "unblock": "write connector on the public API",
+   "note": "Fast-moving methods (ML-for-engineering, control, materials) ahead of journals."
+  },
+  "non_medical_failure_dbs": {
+   "status": "ABSENT ENTIRELY (no NTSB / NHTSA-SAFERCAR / EASA / industrial-incident source anywhere in the codebase - grep-verified)",
+   "score": {
+    "coverage": 4,
+    "authority": 5,
+    "machine_accessibility": 3,
+    "licensing": 4,
+    "freshness": 4,
+    "invention_value": 5
+   },
+   "total": 25,
+   "tier": "T1_ADD_NOW (CEO priority #14 - the largest TRUE blind spot)",
+   "unblock": "pick per API availability: NHTSA recalls API (free, first-class) first; NTSB (av-info web service, free); PHMSA/EPSR for process incidents",
+   "note": "Unmet-PROBLEM discovery outside medicine - Toscanini cannot be 'general-purpose' while failure evidence is medical-only."
+  },
+  "euro_regulatory_eudamed": {
+   "see": "eudamed under NOT_INTEGRATED",
+   "tier": "T1_ADD_NOW"
+  },
+  "standards_full_text": {
+   "status": "ABSENT (metadata-only: fda_recognized_standards + ecfr_title21 are LIVE; ISO/ASTM/IEC/ASME/IEEE requirement text is paywalled)",
+   "score": {
+    "coverage": 5,
+    "authority": 5,
+    "machine_accessibility": 2,
+    "licensing": 1,
+    "freshness": 4,
+    "invention_value": 5
+   },
+   "total": 22,
+   "tier": "T2_CEO_DECISION (CEO priority #13)",
+   "unblock": "licensed subscription (e.g. ANSI/ISO/ASTM library) OR restrict to public-domain requirement summaries (NIST SP series, IEEE Open)",
+   "note": "Turns 'interesting concept' into 'constrained engineering requirement' - directly feeds the R375 engineering_specificity depth gap. The FREE partial answer: NIST SP-series + FDA consensus standards recognition lists are already open."
+  },
+  "openalex_restoration": {
+   "see": "openalex under BUILT_BUT_BLOCKED",
+   "tier": "T0_KEEP_RESTORE (CEO priority #1)"
+  }
+ },
+ "minimum_world_class_set": {
+  "principle": "Every CEO evidence class gets >=2 INDEPENDENT LIVE custody sources; no class depends on a single provider (Art. XXI.7 independence); nothing is added that duplicates a LIVE source without new capability.",
+  "restore_first_zero_new_code": [
+   "openalex (budget/mailto discipline)",
+   "europepmc (already back LIVE - verified today)"
+  ],
+  "add_free_now": [
+   "nasa_ntrs (promote existing adapter to registry custody)",
+   "doe_osti (new connector, public v1 API)",
+   "arxiv (new connector)",
+   "nhtsa_recalls (new connector - first non-medical failure source)",
+   "ntsb (new connector - second non-medical failure source)",
+   "eudamed (new connector - EU reality)",
+   "fda_denovo (openFDA endpoint)"
+  ],
+  "ceo_decision_needed": [
+   "uspto_odp API key (free)",
+   "epo_ops OAuth registration (free throttled tier)",
+   "materials_project key + unblocked egress (infrastructure)",
+   "ISO/ASTM full-text licensing (paid)",
+   "semantic_scholar API tier (defer; redundant)"
+  ],
+  "deferred": [
+   "google_bigquery_patents (redundant LIVE)",
+   "patsnap_eureka (paid, redundant)",
+   "wipo_patentscope (scrape-only, redundant)",
+   "who_ictrp (redundant)"
+  ],
+  "class_coverage_after_minimum_set": {
+   "SCIENCE": "europepmc, pubmed, crossref, openalex(restored), lens_scholarly, arxiv, elsevier_scopus = 7",
+   "TECHNOLOGY_PATENTS": "lens_patent, google_patents, patentbear + uspto_odp/epo_ops on CEO credential decision = 3 now / 5 decided",
+   "REAL_WORLD_FAILURES": "fda_maude, fda_recall + nhtsa_recalls, ntsb = 4 (was medical-only)",
+   "PHYSICAL_TRUTH": "nist_webbook, pubchem, cod_optimade, uniprot, chembl, rcsb_pdb + materials_project on CEO decision = 6 now / 7 decided",
+   "ENGINEERING_STANDARDS": "fda_recognized_standards, ecfr_title21 + NIST SP-series (free add) + ISO/ASTM on licensing decision = 3 now / 4 decided",
+   "COMMERCIAL_REGULATORY": "fda_510k, fda_pma, fda_udi, fda_classification, fda_registrationlisting, fda_denovo(add), gudid_commercial, eudamed(add) = 8 (was US-only)"
+  }
+ },
+ "machinery_gaps_vs_ceo_steps_6_to_10": {
+  "step6_normalized_evidence_interface": {
+   "exists": "EvidenceItem schema (27 fields, provenance required) + 35 connectors normalizing to SourceRecord + openalex mapper",
+   "gap": "TWO PARALLEL LAYERS: orchestrator/-layer curl adapters (multi_source_discovery, triangulation_engine) bypass registry custody - unify so ALL retrieval goes through the one interface",
+   "risk_if_unfixed": "Art. XXI.9 violation class - unlogged retrieval is noise, not evidence"
+  },
+  "step7_provenance_to_component": {
+   "exists": "retrieval_log.jsonl (969 entries, chain_valid) + raw_payload_sha256 + PriorArtHit custody + a2 span-exact evidence binding + dossier claim IDs",
+   "gap": "orchestrator-layer adapters log partially; component-level linkage (claim->invention component) exists only in the dossier builders, not as a uniform queryable chain"
+  },
+  "step8_source_reliability_rules": {
+   "exists": "Art. XXI.5 MAUDE limitations as structured per-record metadata (constitutionally codified); per-connector limitations[] field",
+   "gap": "generalize evidence-quality WEIGHTS per source class (peer-reviewed vs preprint vs regulatory-record vs user-submitted-report) - designed in this audit, not yet a uniform weight table in code"
+  },
+  "step9_dedup": {
+   "exists": "patent-number normalization + federated merge (prior_art_v2/federated_evidence.py); typed identity dedup paper/patent/trial/fda_device/fda_event with possible-match flagging (orchestrator/evidence_identity.py)",
+   "gap": "the two dedup engines are NOT unified; no single canonical-index (DOI/patent-number/K-number/NCT-id) across the whole fabric; cross-layer double-counting remains possible"
+  },
+  "step10_contradiction_detection": {
+   "exists": "ContradictionQueue (6-field register) collecting attack/verification/collision contradictions into every candidate envelope - unresolved contradictions are PRESERVED, never dropped",
+   "gap": "NO cross-source FACTUAL contradiction detection (source A property value vs source B conflicting value on the same entity). Requires: entity resolution (step 9 unified) + typed comparison rules per evidence class. This is the largest machinery gap and depends on step 9 first."
+  }
+ },
+ "verdict": {
+  "can_call_toscanini_general_purpose_today": false,
+  "why": "General-purpose requires reasoning across all six classes. Today: non-medical failure evidence = ZERO sources; standards full-text = ZERO; government technical reports = ZERO custody sources; patents lack claims-text breadth (single metered source); EU commercial reality = ZERO. The medical vertical is world-class (28 LIVE custody sources); the horizontal is not yet.",
+  "cheapest_path": "12 free/zero-code-to-low-code actions take the fabric from medical-world-class to genuinely general-purpose: 2 restorations (openalex budget, europepmc already back), 7 free connectors (ntrs, osti, arxiv, nhtsa, ntsb, eudamed, denovo), 2 free credential registrations (uspto_odp, epo_ops), 1 licensing decision (ISO/ASTM).",
+  "what_is_already_strong": "The custody architecture (retrieval log, per-record limitations, measured health, role-coverage matrix, constitutional anti-contamination rules) is the hard part and it EXISTS - Toscanini's expansion is plugging sources into a proven epistemic spine, not building one."
+ }
+}
