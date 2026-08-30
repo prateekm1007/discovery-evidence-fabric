@@ -53,6 +53,15 @@ STATUS_RATE_LIMITED = "RATE_LIMITED"      # 429 / explicit budget exhausted
 STATUS_UNAVAILABLE = "UNAVAILABLE"        # 5xx
 STATUS_PARSE_FAILED = "PARSE_FAILED"      # request OK, body not parseable
 STATUS_NOT_IMPLEMENTED = "NOT_IMPLEMENTED"
+# 2026-08-31 (CEO source-routing directive): a connector with a declared
+# query grammar (parse_query) that receives a query OUTSIDE that grammar
+# must refuse BEFORE the HTTP call. Measured defect this closes: the
+# engine sent 'wind turbine gearbox micropitting failure' to NHTSA's
+# make|model|year endpoint, which answered HTTP 500 — a question the
+# source cannot answer, burned as a provider failure (Art. XXI.3).
+# GRAMMAR_MISMATCH is an ENGINE-side routing error, never a provider
+# failure and never evidence of absence (Art. XXV).
+STATUS_GRAMMAR_MISMATCH = "GRAMMAR_MISMATCH"
 
 
 def utc_now() -> str:
@@ -299,7 +308,8 @@ class ConnectorBase:
             return None, STATUS_SEARCH_FAILED, None, f"{type(e).__name__}: {e}", None
 
     def _execute(self, query: str, timeout: int = 25) -> SourceQueryResult:
-        """Uniform query execution: request -> parse -> normalize -> log.
+        """Uniform query execution: grammar gate -> request -> parse ->
+        normalize -> log.
 
         Flow discipline: parse/normalize run ONLY on a 2xx success body.
         An error-status body is inspected solely through definitive_empty()
@@ -307,7 +317,39 @@ class ConnectorBase:
         bodies (429 rate-limit JSON, 5xx HTML) from masquerading as
         PARSE_FAILED payloads and masking the true provider status
         (Art. XXI.3).
+
+        Grammar gate (2026-08-31, CEO source-routing directive): when a
+        connector declares parse_query() and the query does not match its
+        grammar, the query is REFUSED before any HTTP call. Asking a
+        structured endpoint (NHTSA make|model|year, CPSC/USGS/FRA date
+        windows) a free-text question it cannot answer is an engine-side
+        routing defect — it must surface as GRAMMAR_MISMATCH (recorded in
+        the retrieval log with the declared grammar), never as a degenerate
+        HTTP request that fails as 500/UNAVAILABLE and never as EMPTY
+        (which would convert a routing error into absence, Art. XXV).
         """
+        grammar_gate = getattr(self, "parse_query", None)
+        grammar_decl = getattr(self, "QUERY_GRAMMAR", "")
+        if callable(grammar_gate) and grammar_decl:
+            t0 = time.time()
+            try:
+                parsed_ok = grammar_gate(query) is not None
+            except Exception:  # noqa: BLE001 — a crashing validator is a mismatch
+                parsed_ok = False
+            if not parsed_ok:
+                return self._finish(
+                    SourceQueryResult(
+                        source_id=self.SOURCE_ID,
+                        status=STATUS_GRAMMAR_MISMATCH, ok=False,
+                        latency_ms=0,
+                        error=(f"query does not match source grammar: "
+                               f"{grammar_decl} — engine routing error, "
+                               f"not a provider failure (not absence, "
+                               f"Art. XXV)"),
+                        query=query, retrieved_at=utc_now(),
+                    ),
+                    query, "(grammar-gate: no request sent)", None,
+                )
         url = self.build_url(query)
         self._current_query = query  # consumed by _request for POST APIs
         t0 = time.time()

@@ -83,6 +83,9 @@ class NhtsaComplaintConnector(ConnectorBase):
     SOURCE_ID = "nhtsa_complaints"
     ROLES = ("ADVERSE_EVENT",)
     HEALTH_QUERY = "toyota|camry|2020"
+    # Declared grammar for the base-class grammar gate (2026-08-31):
+    # this endpoint answers VEHICLE-parameterized questions only.
+    QUERY_GRAMMAR = "make|model|year (e.g. toyota|camry|2020)"
     LIMIT = 25
 
     def parse_query(self, query: str) -> Optional[Dict[str, str]]:
@@ -190,6 +193,9 @@ class CpscRecallConnector(ConnectorBase):
     SOURCE_ID = "cpsc_recalls"
     ROLES = ("RECALL", "COMMERCIAL")
     HEALTH_QUERY = "2026-06-01"
+    # Declared grammar for the base-class grammar gate (2026-08-31):
+    # this endpoint offers a date window only — no content search.
+    QUERY_GRAMMAR = "YYYY-MM-DD date window (RecallDateStart)"
 
     def build_url(self, query: str) -> str:
         # query = ISO date (YYYY-MM-DD) — recalls published since that date.
@@ -282,6 +288,8 @@ class UsgsEarthquakeConnector(ConnectorBase):
     SOURCE_ID = "usgs_earthquakes"
     ROLES = ("HAZARD_EVENT",)
     HEALTH_QUERY = "2026-07-01"
+    # Declared grammar for the base-class grammar gate (2026-08-31).
+    QUERY_GRAMMAR = "YYYY-MM-DD date window (starttime)"
 
     def parse_query(self, query: str) -> Optional[str]:
         import re
@@ -372,6 +380,8 @@ class FraRailAccidentConnector(ConnectorBase):
     SOURCE_ID = "fra_rail_accidents"
     ROLES = ("INCIDENT",)
     HEALTH_QUERY = "2023-01-01"
+    # Declared grammar for the base-class grammar gate (2026-08-31).
+    QUERY_GRAMMAR = "YYYY-MM-DD date floor ($where date >= X)"
 
     def parse_query(self, query: str) -> Optional[str]:
         import re

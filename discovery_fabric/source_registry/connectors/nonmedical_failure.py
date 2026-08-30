@@ -57,6 +57,8 @@ class NhtsaRecallConnector(ConnectorBase):
     SOURCE_ID = "nhtsa_recalls"
     ROLES = ("RECALL",)
     HEALTH_QUERY = "toyota|camry|2020"
+    # Declared grammar for the base-class grammar gate (2026-08-31).
+    QUERY_GRAMMAR = "make|model|year (e.g. toyota|camry|2020)"
     LIMIT = 25  # endpoint-controlled; kept at API default page size
 
     def parse_query(self, query: str) -> Optional[Dict[str, str]]:

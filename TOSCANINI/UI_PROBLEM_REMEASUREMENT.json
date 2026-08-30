@@ -1,0 +1,163 @@
+{
+ "artifact": "UI_PROBLEM_REMEASUREMENT",
+ "directive": "CEO 2026-08-31 — investigate the measured DOE OSTI relevance failure end-to-end",
+ "disclosure": "extraction fields are builder-authored stand-ins (live LLM PROVIDER_UNAVAILABLE this session); retrieval, connectors and adjudication are fully LIVE; adjudication rule unchanged (overlap >= 2)",
+ "baseline_reference": "TOSCANINI/QUERY_RELEVANCE_USAGE.json 2026-08-30: doe_osti pooled 0.175 (7/40, UI questions 0/20)",
+ "problems": [
+  {
+   "text": "Why do wind turbine gearbox bearings develop micropitting failures within 5 years of operation?",
+   "runs": [
+    {
+     "query_form": "question_form (old defect condition)",
+     "retrieval": [
+      {
+       "source": "fra_rail_accidents",
+       "status": "GRAMMAR_MISMATCH",
+       "count": 0,
+       "relevant": 0,
+       "error": "query does not match source grammar: YYYY-MM-DD date floor ($where date >= X) — engine routing error, not a provider fai"
+      },
+      {
+       "source": "doe_osti",
+       "status": "OK",
+       "count": 9,
+       "relevant": 9,
+       "error": ""
+      }
+     ],
+     "routing_notes": []
+    },
+    {
+     "query_form": "keyword_form (fixed)",
+     "retrieval": [
+      {
+       "source": "fra_rail_accidents",
+       "status": "GRAMMAR_MISMATCH",
+       "count": 0,
+       "relevant": 0,
+       "error": "query does not match source grammar: YYYY-MM-DD date floor ($where date >= X) — engine routing error, not a provider fai"
+      },
+      {
+       "source": "doe_osti",
+       "status": "OK",
+       "count": 10,
+       "relevant": 9,
+       "error": ""
+      }
+     ],
+     "routing_notes": []
+    }
+   ]
+  },
+  {
+   "text": "How can hydrogen embrittlement be prevented in high-strength bolts used for bridge construction?",
+   "runs": [
+    {
+     "query_form": "question_form (old defect condition)",
+     "retrieval": [
+      {
+       "source": "europepmc",
+       "status": "EMPTY",
+       "count": 0,
+       "relevant": 0,
+       "error": ""
+      },
+      {
+       "source": "arxiv",
+       "status": "OK",
+       "count": 5,
+       "relevant": 4,
+       "error": ""
+      },
+      {
+       "source": "doe_osti",
+       "status": "OK",
+       "count": 10,
+       "relevant": 2,
+       "error": ""
+      }
+     ],
+     "routing_notes": []
+    },
+    {
+     "query_form": "keyword_form (fixed)",
+     "retrieval": [
+      {
+       "source": "europepmc",
+       "status": "OK",
+       "count": 7,
+       "relevant": 1,
+       "error": ""
+      },
+      {
+       "source": "arxiv",
+       "status": "OK",
+       "count": 5,
+       "relevant": 4,
+       "error": ""
+      },
+      {
+       "source": "doe_osti",
+       "status": "OK",
+       "count": 10,
+       "relevant": 3,
+       "error": ""
+      }
+     ],
+     "routing_notes": []
+    }
+   ]
+  },
+  {
+   "text": "Why do lithium-ion battery packs in electric vehicles develop thermal runaway during fast charging?",
+   "runs": [
+    {
+     "query_form": "question_form (old defect condition)",
+     "retrieval": [
+      {
+       "source": "nhtsa_complaints",
+       "status": "NOT_QUERIED_GRAMMAR",
+       "count": 0,
+       "relevant": 0,
+       "error": "no vehicle extracted; source grammar is make|model|year (routing decision, not absence)"
+      },
+      {
+       "source": "nhtsa_recalls",
+       "status": "NOT_QUERIED_GRAMMAR",
+       "count": 0,
+       "relevant": 0,
+       "error": "no vehicle extracted; source grammar is make|model|year (routing decision, not absence)"
+      }
+     ],
+     "routing_notes": [
+      "nhtsa_complaints: not queried — no vehicle (make|model|year) extracted from the problem; this source answers vehicle-parameterized questions only",
+      "nhtsa_recalls: not queried — no vehicle (make|model|year) extracted from the problem; this source answers vehicle-parameterized questions only"
+     ]
+    },
+    {
+     "query_form": "keyword_form (fixed)",
+     "retrieval": [
+      {
+       "source": "nhtsa_complaints",
+       "status": "NOT_QUERIED_GRAMMAR",
+       "count": 0,
+       "relevant": 0,
+       "error": "no vehicle extracted; source grammar is make|model|year (routing decision, not absence)"
+      },
+      {
+       "source": "nhtsa_recalls",
+       "status": "NOT_QUERIED_GRAMMAR",
+       "count": 0,
+       "relevant": 0,
+       "error": "no vehicle extracted; source grammar is make|model|year (routing decision, not absence)"
+      }
+     ],
+     "routing_notes": [
+      "nhtsa_complaints: not queried — no vehicle (make|model|year) extracted from the problem; this source answers vehicle-parameterized questions only",
+      "nhtsa_recalls: not queried — no vehicle (make|model|year) extracted from the problem; this source answers vehicle-parameterized questions only"
+     ]
+    }
+   ]
+  }
+ ]
+}

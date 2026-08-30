@@ -97,6 +97,69 @@ def terms(text: str) -> List[str]:
             if len(t) > 2 and t not in _STOP]
 
 
+# ---------------------------------------------------------------------------
+# keyword_form — engine-level query-form discipline (2026-08-31, CEO
+# source-routing directive). Single implementation shared by the UI problem
+# builder and the engine's prior-art collision stage: search APIs answer
+# KEYWORD queries; interrogative prefixes, sentence punctuation and filler
+# words measurably degrade or zero results (measured on DOE OSTI 0.175
+# relevance failure investigation; measured on the patent collision stage
+# where 'implement multi-sensory monitoring system using x-ray' returned
+# surgical robots as nearest prior art for a battery-sensing candidate).
+# ---------------------------------------------------------------------------
+
+_KEYWORD_FILLER = {
+    "the", "a", "an", "of", "in", "for", "and", "or", "to", "with",
+    "on", "by", "at", "from", "is", "are", "was", "were", "be", "been",
+    "being", "do", "does", "did", "can", "could", "should", "would",
+    "how", "why", "what", "when", "which", "where", "who", "that", "this",
+    "these", "those", "it", "its", "their", "my", "your", "i", "we",
+    "implement", "implementing", "using", "use", "used", "within",
+    "system", "method", "apparatus", "device",
+}
+
+_INTERROGATIVE_RE = re.compile(
+    r"^(how|why|what|when|which|where|who|can|could|should|is|are|do|does|did)\b[ \-]?",
+    re.IGNORECASE,
+)
+
+
+def keyword_form(query: str, max_terms: int = 10) -> str:
+    """Normalize a search string to keyword form (deterministic, disclosed).
+
+    Transforms (no stemming, no synonym maps — Art. II spirit: nothing is
+    inferred):
+      1. strip an interrogative prefix ('How can ...' -> '...')
+      2. strip sentence punctuation ('?', '.', '!')
+      3. drop filler tokens that carry no query content
+      4. cap at max_terms content terms, preserving order
+    Returns "" when nothing content-bearing remains.
+    """
+    q = _INTERROGATIVE_RE.sub("", (query or "").strip())
+    q = q.strip().rstrip("?.! ").strip()
+    tokens = [t for t in re.split(r"[^A-Za-z0-9\-]+", q) if t]
+    kept = [t for t in tokens if t.lower() not in _KEYWORD_FILLER]
+    return " ".join(kept[:max_terms])
+
+
+def is_question_form(query: str) -> bool:
+    """True when a query is an interrogative sentence, not keywords.
+
+    Deterministic: trailing '?' OR (interrogative first word AND >= 5
+    tokens). 'lithium battery safety' never trips; 'How can hydrogen
+    embrittlement be prevented in high-strength steels?' always does.
+    """
+    q = (query or "").strip()
+    if q.endswith("?"):
+        return True
+    words = q.split()
+    first = words[0].lower() if words else ""
+    return first in {
+        "how", "why", "what", "when", "which", "where", "who", "can",
+        "could", "should", "is", "are", "do", "does", "did",
+    } and len(words) >= 5
+
+
 def query_content_terms(query: str) -> List[str]:
     """Content terms of a query, honoring field:value grammar (openFDA).
 
@@ -112,13 +175,23 @@ def query_content_terms(query: str) -> List[str]:
 
 
 def record_text(rec: Dict[str, Any]) -> str:
-    """Title + abstract/snippet + structured text fields of a record dict."""
+    """Title + abstract/snippet + structured text fields of a record dict.
+
+    2026-08-31 (relevance-failure investigation): added `subjects` (and
+    singular `subject`) — DOE OSTI records carry subject-term lists the
+    old rule never saw. This is evidence EXPANSION (Art. VII allowed fix
+    #3: obtain better evidence), not threshold weakening: the >= 2
+    term-overlap rule, MIN_OVERLAP_TERMS and the band thresholds are all
+    UNCHANGED — the adjudicator simply receives text the provider already
+    returned that the connector was discarding.
+    """
     n = rec.get("normalized", {}) or {}
     parts = [rec.get("title") or ""]
     for k in ("abstract", "snippet", "summary", "component", "problem",
               "purpose", "description", "condition", "conditions",
               "keywords", "applicant", "defect_summary", "consequence",
-              "hazards", "products", "cause", "components"):
+              "hazards", "products", "cause", "components", "subjects",
+              "subject"):
         v = n.get(k) or rec.get(k)
         if isinstance(v, str):
             parts.append(v)

@@ -268,6 +268,7 @@ def aggregate_usage(source_id: Optional[str] = None) -> Dict[str, Any]:
             "irrelevant_filtered_total": 0,
             "ok_status_zero_relevant_queries": 0,
             "distinct_queries_zero_relevant": set(),
+            "zero_relevant_timestamps": [],
             "basis_methods": {},
             "first_timestamp": None,
             "last_timestamp": None,
@@ -296,6 +297,8 @@ def aggregate_usage(source_id: Optional[str] = None) -> Dict[str, Any]:
         ):
             agg["ok_status_zero_relevant_queries"] += 1
             agg["distinct_queries_zero_relevant"].add(e.get("query"))
+            if ts:
+                agg["zero_relevant_timestamps"].append(ts)
 
     sources: Dict[str, Any] = {}
     for sid, agg in sorted(per_source.items()):
@@ -329,12 +332,19 @@ def aggregate_usage(source_id: Optional[str] = None) -> Dict[str, Any]:
         out["zero_relevant_ok_status"] = {
             "flagged": len(zero_q) >= 2,
             "distinct_queries": sorted(zero_q),
+            "query_timestamps": sorted(
+                agg["zero_relevant_timestamps"]),
             "note": (
                 "HYPOTHESIS FLAG (never a verdict): provider returned status "
                 "OK while every retrieved record was adjudicated irrelevant "
                 "on >= 2 distinct queries — the status-OK-plus-irrelevant-"
                 "records defect class. Investigate the connector; do not "
-                "auto-demote the source."
+                "auto-demote the source. Timestamps are disclosed so a "
+                "reader can see whether the zero-relevant queries are "
+                "current or predate a known fix (the doe_osti instances "
+                "are pre-fix history from 2026-08-30: root-caused to "
+                "question-form queries + dropped abstracts, fixed "
+                "2026-08-31, battery re-measured 75%)."
             ) if len(zero_q) >= 2 else None,
         }
         sources[sid] = out

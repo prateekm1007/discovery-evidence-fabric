@@ -282,3 +282,61 @@ complaints 1969-2026), others stay honestly UNMEASURED.
 
 Scale bands, basis discipline, and band rationale are unchanged from
 v1.0.0; only measurement coverage changed.
+
+---
+
+## Appendix (v1.2.0) — doe_osti 0.175 relevance failure: root-caused and re-measured
+
+CEO directive 2026-08-31 ("investigate the measured DOE OSTI relevance
+failure end-to-end: problem -> query -> connector -> returned records ->
+relevance adjudication"). The instrument's own zero-relevant flag pointed
+at the defect; the end-to-end investigation isolated FOUR compounding
+defect sites, each measured live
+(`scripts/osti_relevance_failure_investigation.py`):
+
+1. **Query form (problem -> query).** With the LLM provider
+   unavailable, the extraction fallback passed the raw user QUESTION to
+   search APIs (`text[:60]`); the LLM extraction likewise emitted
+   question-form queries. Measured: a trailing `?` zeroed one OSTI query
+   outright (micropitting? -> EMPTY; without `?` -> 10 records).
+2. **Abstract drop (connector).** OSTI returns a `description` field
+   (~1.2 KB abstract) that normalize_payload DISCARDED — adjudication
+   saw titles only. Controlled A/B over 3 intents: title-only
+   0.00/0.40/0.70 relevant-rate vs title+abstract 0.60/0.60/1.00. THE
+   DOMINANT DEFECT.
+3. **Format flip (connector).** The same query returns XML on some
+   calls and JSON on others (6-call sample: 5 XML / 1 JSON;
+   `format=json` does NOT force JSON). The JSON-only parser turned every
+   XML answer into PARSE_FAILED — most OSTI responses were discarded
+   before adjudication ever ran.
+4. **Source routing (query -> source).** The engine asked NHTSA's
+   make|model|year endpoint free-text questions ("wind turbine gearbox
+   micropitting failure" -> HTTP 500, burned as a provider failure).
+
+Fixes (adjudication rule UNCHANGED — Art. VII: evidence fixed, verifier
+not weakened; MIN_OVERLAP_TERMS still 2, pinned by test):
+
+- engine-level `keyword_form()` (query_relevance.py) shared by the UI
+  problem builder and the prior-art collision stage (one method);
+- OSTI connector parses BOTH shapes and keeps the abstract + subjects;
+- base-class grammar gate: connectors with declared grammars refuse
+  mismatched queries BEFORE any HTTP call (GRAMMAR_MISMATCH status,
+  block_class ENGINE_QUERY_GRAMMAR — engine-side defect, never provider
+  failure, never absence);
+- automotive-family routing extracts an optional VEHICLE make|model|year;
+  NHTSA sources are asked vehicle questions only, otherwise honestly
+  recorded NOT_QUERIED_GRAMMAR;
+- the collision stage's patent queries are keyword-form and every patent
+  hit is relevance-adjudicated before entering nearest_prior_art
+  (measured: the query 'implement multi-sensory monitoring system using
+  x-ray' had returned SURGICAL ROBOTS as nearest prior art for a
+  battery-sensing candidate).
+
+Re-measured (battery, same rule, live):
+- doe_osti battery 7/20 (35%) -> **15/20 (75%)**, grade 2 -> 3,
+  differentiation DISTINCT
+- pooled usage rate 0.175 -> 0.455 (band 1 -> 2): the append-only log
+  honestly retains the pre-fix entries; the flag now carries timestamps
+  so a reader can see the zero-relevant queries predate the fix
+- the three failing UI problems replayed live: micropitting EMPTY ->
+  9/10 relevant; NHTSA routing honest; grammar gate measured working

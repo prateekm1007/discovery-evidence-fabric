@@ -319,7 +319,8 @@ def check_source(source_id: str, timeout: int = 30) -> Dict[str, Any]:
         status = "DEGRADED"
         reason = f"provider answered with rate/budget limit: {result.error}"
     elif result.status in ("AUTH_FAILED", "UNAVAILABLE", "TIMEOUT",
-                           "SEARCH_FAILED", "PARSE_FAILED", "NOT_IMPLEMENTED"):
+                           "SEARCH_FAILED", "PARSE_FAILED", "NOT_IMPLEMENTED",
+                           "GRAMMAR_MISMATCH"):
         block_info = classify_block(
             request_status=result.status, error=result.error,
             http_status=result.http_status)

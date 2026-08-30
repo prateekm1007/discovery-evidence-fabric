@@ -62,6 +62,7 @@ LEGACY_VOCABULARY_MAP = {
 BLOCK_CLASSES = (
     "AUTH", "EGRESS", "PROVIDER_RETIRED", "REGISTRATION",
     "HTTP_5XX", "NETWORK", "METERED_WINDOW", "CONNECTOR_IMPORT",
+    "ENGINE_QUERY_GRAMMAR",
 )
 
 BLOCK_CLASS_DERIVATION = {
@@ -88,6 +89,13 @@ BLOCK_CLASS_DERIVATION = {
         "probes suppressed by quota policy (disclosed, dated)"
     ),
     "CONNECTOR_IMPORT": "connector module import failed (code defect)",
+    "ENGINE_QUERY_GRAMMAR": (
+        "request_status == GRAMMAR_MISMATCH — the ENGINE asked a source a "
+        "question outside its declared grammar (e.g. free text to a "
+        "make|model|year endpoint). Engine-side routing defect, NOT a "
+        "provider failure and NOT absence (Art. XXV): the source's health "
+        "is unmeasured through that query until the engine asks correctly"
+    ),
 }
 
 # Signature rules, checked IN ORDER (most specific first). Ordering is
@@ -138,6 +146,13 @@ def classify_block(request_status: Optional[str] = None,
     elif request_status == "CONNECTOR_IMPORT":
         block_class = "CONNECTOR_IMPORT"
         fired_rule = "request_status == CONNECTOR_IMPORT (engine code defect)"
+    elif request_status == "GRAMMAR_MISMATCH":
+        block_class = "ENGINE_QUERY_GRAMMAR"
+        fired_rule = (
+            "request_status == GRAMMAR_MISMATCH (engine asked outside the "
+            "source's declared grammar — engine-side defect, provider "
+            "unmeasured through this query)"
+        )
     else:
         for cls, pattern in _RULES:
             if pattern.search(err):

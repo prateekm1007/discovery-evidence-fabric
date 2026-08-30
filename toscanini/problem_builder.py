@@ -92,6 +92,23 @@ LIMIT_STAMPS = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Query-form discipline — CEO source-routing directive 2026-08-31.
+# The IMPLEMENTATION lives in the engine (discovery_fabric/source_registry/
+# query_relevance.keyword_form) so the UI builder and the prior-art
+# collision stage share ONE method; re-exported here for convenience.
+# ---------------------------------------------------------------------------
+from discovery_fabric.source_registry.query_relevance import (  # noqa: E402
+    is_question_form as _is_question_form,
+    keyword_form,
+)
+
+_INTERROGATIVE_RE = re.compile(
+    r"^(how|why|what|when|which|where|who|can|could|should|is|are|do|does|did)\b[ \-]?",
+    re.IGNORECASE,
+)
+
+
 def _slug(text: str, n: int = 42) -> str:
     s = re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")
     return s[:n].rstrip("_") or "problem"
@@ -107,19 +124,23 @@ def extract_problem_fields(text: str) -> Dict[str, Any]:
     still MODEL_DERIVED, never presented as evidence)."""
     from discovery_fabric.engine import llm_registry as reg
     schema = ["DOMAIN", "DEVICE", "FAILURE_MODE", "CONSTRAINT",
-              "FAILURE_QUERY", "SCIENCE_QUERY"]
+              "FAILURE_QUERY", "SCIENCE_QUERY", "VEHICLE"]
     system = (
         "You convert a user's engineering problem description into "
-        "structured discovery-engine fields. ALL SIX field lines are "
+        "structured discovery-engine fields. The first SIX field lines are "
         "MANDATORY, each on its own line as FIELD: value. DOMAIN must be "
         "exactly one of: medical, automotive, energy, aerospace, "
         "electronics, industrial, materials, general. DEVICE is a concise "
         "noun phrase naming the technical system (never a question). "
         "FAILURE_MODE is a concise noun phrase naming the failure "
-        "mechanism. FAILURE_QUERY is a search string for a "
-        "failure/incident database. SCIENCE_QUERY is a technical "
-        "literature search string. CONSTRAINT states the engineering "
-        "requirement any solution must satisfy. No preamble, no markdown.")
+        "mechanism. FAILURE_QUERY and SCIENCE_QUERY are KEYWORD search "
+        "strings: 3-8 content nouns each, NO question words (how/why/what), "
+        "NO punctuation — e.g. 'lithium battery thermal runaway', not 'Why "
+        "do lithium batteries fail?'. CONSTRAINT states the engineering "
+        "requirement any solution must satisfy. VEHICLE is OPTIONAL: only "
+        "when the problem names a specific road vehicle, emit VEHICLE: "
+        "make|model|year (e.g. VEHICLE: toyota|camry|2020); otherwise omit "
+        "the line. No preamble, no markdown.")
     prompt = f"User problem description:\n\"\"\"\n{text[:2000]}\n\"\"\""
 
     def _parse(content: str) -> Dict[str, str]:
@@ -134,7 +155,7 @@ def extract_problem_fields(text: str) -> Dict[str, Any]:
     res = reg.generate(system=system, prompt=prompt, schema=schema,
                        timeout=180, max_tokens=420)
     parsed = _parse(res.content) if res.status == "OK" else {}
-    missing = [f for f in schema if f.lower() not in parsed]
+    missing = [f for f in schema[:6] if f.lower() not in parsed]
     if missing and res.status == "OK":
         retry = reg.generate(
             system=system,
@@ -147,8 +168,29 @@ def extract_problem_fields(text: str) -> Dict[str, Any]:
             parsed.update(_parse(retry.content))
             parsed["_retried"] = True
 
-    # Deterministic MODEL_DERIVED derivation for any still-missing core field
-    fq = parsed.get("failure_query") or text[:60]
+    # Deterministic MODEL_DERIVED derivation for any still-missing core field.
+    # 2026-08-31 fix (relevance-failure investigation): the old fallback
+    # `parsed.get('failure_query') or text[:60]` passed the raw user
+    # QUESTION to search APIs when the LLM omitted the field. Fallbacks now
+    # derive keyword-form content — never the raw interrogative sentence.
+    fq = parsed.get("failure_query") or keyword_form(text) or text[:60]
+    # Query-form discipline: whatever the LLM proposed, queries leaving
+    # this builder for free-text sources are keyword-form (measured OSTI
+    # degradation on question strings; the rule is deterministic and
+    # disclosed in keyword_form's docstring).
+    if parsed.get("failure_query"):
+        parsed["failure_query"] = (keyword_form(parsed["failure_query"])
+                                    or parsed["failure_query"])
+    if parsed.get("science_query"):
+        parsed["science_query"] = (keyword_form(parsed["science_query"])
+                                   or parsed["science_query"])
+    # VEHICLE grammar validation: only a well-formed make|model|year value
+    # may reach the NHTSA connectors (their grammar gate refuses anything
+    # else — here we pre-filter so the routing decision is visible).
+    veh = parsed.get("vehicle") or ""
+    if veh and not re.fullmatch(r"[\w .\-]+\|[\w .\-]+\|\d{4}", veh):
+        parsed["_vehicle_dropped"] = veh
+        parsed.pop("vehicle")
     if "device" not in parsed:
         parsed["device"] = " ".join(fq.split()[:4])
     if "failure_mode" not in parsed:
@@ -258,14 +300,50 @@ def build_problem(text: str, on_event=None) -> Dict[str, Any]:
     constraint = (extraction.get("constraint")
                   or "Solution must address the documented failure mode "
                      "without introducing a larger one.")
-    fail_q = extraction.get("failure_query") or device
-    sci_q = extraction.get("science_query") or f"{device} {failure_mode}"
+    # 2026-08-31 query-form discipline: free-text search sources receive
+    # KEYWORD-form queries (keyword_form applied inside extraction; the
+    # fallbacks below also derive keyword content — never the raw
+    # interrogative user sentence, which measurably degrades/zeroes OSTI).
+    fail_q = extraction.get("failure_query") or keyword_form(device)
+    sci_q = (extraction.get("science_query")
+             or keyword_form(f"{device} {failure_mode}"))
+    vehicle = extraction.get("vehicle") or ""
+    # Defensive re-validation at the routing boundary (the extraction path
+    # validates too, but build_problem must be safe against any caller):
+    # only a well-formed make|model|year reaches the NHTSA grammar.
+    if vehicle and not re.fullmatch(r"[\w .\-]+\|[\w .\-]+\|\d{4}", vehicle):
+        vehicle = ""
 
     emit({"phase": "RETRIEVE_EVIDENCE", "label":
           f"Live evidence retrieval — domain family '{domain}'"})
     results = []
+    routing_notes = []
     for name, role, cls in _families()[domain]:
-        query = fail_q if role == "failure" else sci_q
+        # Grammar-aware routing (CEO source-routing directive 2026-08-31):
+        # the automotive family's NHTSA connectors answer ONLY
+        # make|model|year questions. Without an extracted vehicle, asking
+        # them a free-text failure query is a question they cannot answer
+        # (measured: HTTP 500, burned as a provider failure). The source is
+        # honestly recorded as NOT_QUERIED_GRAMMAR — an engine routing
+        # decision, never absence (Art. XXV).
+        if getattr(cls, "QUERY_GRAMMAR", "") and "make|model|year" in cls.QUERY_GRAMMAR \
+                and not vehicle:
+            routing_notes.append(
+                f"{name}: not queried — no vehicle (make|model|year) "
+                f"extracted from the problem; this source answers "
+                f"vehicle-parameterized questions only")
+            results.append({
+                "source": name, "role": role,
+                "status": "NOT_QUERIED_GRAMMAR", "count": 0,
+                "records": [], "relevant": 0,
+                "error": "no vehicle extracted; source grammar is "
+                         "make|model|year (routing decision, not absence)",
+            })
+            continue
+        # NHTSA-style sources WITH a vehicle: the vehicle IS the query —
+        # the failure query is free-text and would be a grammar mismatch.
+        query = vehicle if getattr(cls, "QUERY_GRAMMAR", "") and "make|model|year" \
+            in cls.QUERY_GRAMMAR else (fail_q if role == "failure" else sci_q)
         emit({"phase": "RETRIEVE_EVIDENCE", "label":
               f"Querying {name} ({role}): '{query[:70]}'"})
         results.append(_search_one(name, role, cls, query))
@@ -277,6 +355,8 @@ def build_problem(text: str, on_event=None) -> Dict[str, Any]:
     # Compose the failure statement from retrieved records (Art. XX).
     parts = [f"User-submitted engineering problem (session input): "
              f"\"{text[:300]}\". "]
+    for note in routing_notes:
+        parts.append(f"ROUTING: {note}.")
     for r in results:
         if r["status"] != "OK" or not r["records"]:
             parts.append(f"[{r['source']}] retrieval status {r['status']}"
@@ -316,6 +396,10 @@ def build_problem(text: str, on_event=None) -> Dict[str, Any]:
             "llm": {k: extraction["_llm"][k] for k in
                     ("status", "provider", "latency_ms")},
             "user_text_epistemic_class": "EXTERNAL_EVIDENCE",
+            "query_form": "keyword (deterministic normalization; question "
+                          "forms degraded measured relevance — 2026-08-31 "
+                          "investigation)",
+            "routing_notes": routing_notes,
         },
         "retrieval": [
             {"source": r["source"], "role": r["role"], "status": r["status"],

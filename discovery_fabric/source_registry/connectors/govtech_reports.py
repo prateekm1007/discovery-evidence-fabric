@@ -140,6 +140,26 @@ class DoeOstiConnector(ConnectorBase):
     - `format=xml` + %20-encoded query silently returns JSON anyway
       (Content-Type flip-flops) — the connector asserts the parsed shape,
       never trusting the Content-Type.
+
+    TWO MORE DEFECTS MEASURED LIVE 2026-08-31 (CEO relevance-failure
+    investigation — the doe_osti 0.175 pooled relevant-rate root cause):
+    - FORMAT FLIP: the SAME query returns XML on some calls and JSON on
+      others (6-call sample: XML,XML,JSON,XML,XML,XML; format=json does
+      NOT force JSON). The old JSON-only parser turned every XML answer
+      into PARSE_FAILED — most OSTI responses were being discarded
+      before adjudication ever ran. parse_payload now accepts BOTH
+      shapes and normalizes them to the same record list.
+    - ABSTRACT DROP: the API returns a `description` field (measured
+      ~1.2 KB per record) that the old normalize_payload DISCARDED —
+      relevance adjudication saw titles only. Controlled A/B (3 intents
+      x 2 query forms): title-only 0.00/0.40/0.70 relevant-rate vs
+      title+description 0.60/0.60/1.00. The abstract is now kept in
+      normalized.description (truncated at 4000 chars like NTRS).
+    - TRAILING '?': a trailing question mark on a natural-language query
+      measurably zeroed one query (micropitting? -> EMPTY; the same
+      question without '?' -> 10 records). build_url now strips trailing
+      punctuation as defense-in-depth; the query GENERATOR is also fixed
+      to emit keyword-form queries (problem_builder.keyword_form).
     """
 
     SOURCE_ID = "doe_osti"
@@ -148,15 +168,76 @@ class DoeOstiConnector(ConnectorBase):
     LIMIT = 10
 
     def build_url(self, query: str) -> str:
-        q = urllib.parse.quote(query)
+        # strip trailing sentence punctuation — a trailing '?' measurably
+        # zeroes some OSTI queries (measured 2026-08-31); it is query noise
+        # a search API should never receive
+        q = urllib.parse.quote((query or "").rstrip("?.! "))
         return (f"https://www.osti.gov/api/v1/records?q={q}"
                 f"&rows={self.LIMIT}")
 
     def parse_payload(self, raw: bytes, query: str) -> Any:
-        payload = json.loads(raw.decode("utf-8", "replace"))
-        if not isinstance(payload, list):
-            raise ValueError("doe_osti native JSON is not a record array")
-        return {"records": payload}
+        """Parse BOTH measured response shapes (format flip).
+
+        - JSON: top-level array of record dicts.
+        - XML: <records><record><osti_id>...<title>...<description>...
+          with wrapper tags for authors/research_orgs/sponsor_orgs/
+          subjects (measured shape, 2026-08-31).
+        Both are normalized to {"records": [...]} with the SAME field
+        names so normalize_payload is shape-agnostic.
+        """
+        text = raw.decode("utf-8", "replace").lstrip()
+        if text.startswith("[") or text.startswith("{"):
+            payload = json.loads(text)
+            if isinstance(payload, list):
+                return {"records": payload}
+            if isinstance(payload, dict) and isinstance(
+                    payload.get("records"), list):
+                return payload
+            raise ValueError("doe_osti JSON is not a record array")
+        if "<record>" in text or "<records" in text:
+            return {"records": self._parse_xml_records(text)}
+        raise ValueError("doe_osti payload is neither JSON nor XML records")
+
+    _XML_SCALAR = ("osti_id", "title", "description", "doi",
+                  "publication_date", "entry_date", "product_type",
+                  "report_number", "language", "publisher", "format")
+    # measured XML shape: <authors><author>...</author></authors> etc —
+    # wrapper tag (plural) with repeated child tags (singular)
+    _XML_LISTS = ("authors", "research_orgs", "sponsor_orgs", "subjects")
+
+    @classmethod
+    def _parse_xml_records(cls, text: str) -> List[Dict[str, Any]]:
+        import xml.etree.ElementTree as ET
+
+        out: List[Dict[str, Any]] = []
+        # strip anything before the <records> root (XML declaration,
+        # whitespace, BOM) so ET.fromstring gets a clean document
+        start = text.find("<records")
+        if start < 0:
+            return out
+        doc = text[start:]
+        try:
+            root = ET.fromstring(doc)
+        except ET.ParseError as e:
+            raise ValueError(f"doe_osti XML parse error: {e}") from e
+        records = [root] if root.tag == "record" else root.findall("record")
+        for rec in records:
+            d: Dict[str, Any] = {}
+            for tag in cls._XML_SCALAR:
+                el = rec.find(tag)
+                if el is not None and (el.text or "").strip():
+                    d[tag] = el.text.strip()
+            for tag in cls._XML_LISTS:
+                wrapper = rec.find(tag)
+                if wrapper is None:
+                    continue
+                items = [(c.text or "").strip() for c in list(wrapper)]
+                items = [i for i in items if i]
+                if items:
+                    d[tag] = items
+            if d.get("osti_id"):
+                out.append(d)
+        return out
 
     def normalize_payload(self, payload: Any, query: str, raw_sha: str) -> List[SourceRecord]:
         out: List[SourceRecord] = []
@@ -177,6 +258,11 @@ class DoeOstiConnector(ConnectorBase):
                 normalized={
                     "osti_id": oid,
                     "doi": self._norm_doi(r.get("doi")),
+                    # ABSTRACT KEPT (2026-08-31 fix): the API's `description`
+                    # is the record abstract (~1.2 KB measured); dropping it
+                    # starved relevance adjudication to titles only — the
+                    # dominant measured contributor to the 0.175 rate.
+                    "description": self._trunc(r.get("description")),
                     "publication_date": r.get("publication_date"),
                     "entry_date": r.get("entry_date"),
                     "product_type": r.get("product_type"),
@@ -204,3 +290,10 @@ class DoeOstiConnector(ConnectorBase):
             return None
         m = re.search(r"10\.\d{4,9}/\S+", str(v))
         return m.group(0) if m else str(v)
+
+    @staticmethod
+    def _trunc(v: Any, n: int = 4000) -> Optional[str]:
+        """Abstract truncation — same 4000-char policy as the NTRS connector."""
+        if not isinstance(v, str) or not v.strip():
+            return None
+        return v.strip()[:n]

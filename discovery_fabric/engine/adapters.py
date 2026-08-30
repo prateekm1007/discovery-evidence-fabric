@@ -357,10 +357,27 @@ class CollisionEngineAdapter(BaseAdapter):
                 f"unmapped legacy prior-art status: {legacy!r} — refuse to guess "
                 "(Art. XXVII: no silent semantic promotion)")
 
-        # Patent-side collision search with functional-equivalence expansion
+        # Patent-side collision search with functional-equivalence
+        # expansion.
+        #
+        # QUERY-FORM FIX (2026-08-31, CEO source-routing directive): the
+        # old query took the FIRST 6 words >3 chars of the intervention —
+        # measured defect: 'Implement multi-modal sensing system within
+        # battery pack...' produced the query 'implement multi-sensory
+        # monitoring system using x-ray', and Google Patents answered
+        # radiographic imagers and SURGICAL ROBOTS as the "nearest prior
+        # art" for a battery-sensing candidate (recorded in
+        # t6_energy_ev_thermal_runaway/envelope_KILLER_EXPERIMENT.json).
+        # The query now uses the engine keyword_form (filler words
+        # 'implement/system/using/within' dropped — the search asks about
+        # the CONTENT, not the sentence around it).
         src = importlib.import_module("discovery_fabric.prior_art_v2.sources")
-        base_terms = [w for w in intervention.lower().replace(",", " ").split()
-                      if len(w) > 3][:6]
+        from discovery_fabric.source_registry.query_relevance import (
+            keyword_form as _keyword_form)
+        kw_query = _keyword_form(intervention, max_terms=6)
+        base_terms = kw_query.split() or [w for w in
+                                          intervention.lower().replace(",", " ").split()
+                                          if len(w) > 3][:6]
         expansions: List[str] = []
         for w in base_terms:
             expansions += _keyword_hits(w, FUNCTION_EQUIV_EXPANSION)
@@ -378,10 +395,34 @@ class CollisionEngineAdapter(BaseAdapter):
                     {"query": q, "error": sqr.error,
                      "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"})
 
-        overlap = [h for h in patent_hits
+        # RELEVANCE FILTER (2026-08-31, Art. XXI.4 — the collision stage is
+        # an entry point into the evidence pipeline): every patent hit is
+        # adjudicated against the intervention's content terms with the
+        # SAME term-overlap rule family as every other pipeline entry
+        # point (>= 2 shared terms). Off-domain hits stay RECORDED with
+        # their verdict (disclosed, never silently dropped — Art. XV) but
+        # do not enter nearest_prior_art, so the differentiation link
+        # compares the candidate against REAL adjacent art, not keyword
+        # collisions from an unrelated domain.
+        from discovery_fabric.source_registry.query_relevance import (
+            adjudicate_record as _adjudicate)
+        patent_adjudications = []
+        for h in patent_hits:
+            adj = _adjudicate(
+                {"record_id": h.get("patent_id") or h.get("source_id"),
+                 "title": h.get("title") or "",
+                 "normalized": {}},
+                " ".join(base_terms))
+            adj["query"] = patent_queries[0] if patent_queries else ""
+            patent_adjudications.append(adj)
+        relevant_hits = [h for h, a in zip(patent_hits, patent_adjudications)
+                         if a["relevance"] == "RELEVANT"]
+        nearest_pool = relevant_hits or []
+
+        overlap = [h for h in nearest_pool
                    if any(w in (h.get("title") or "").lower()
-                          for w in base_terms[:3]) or len(patent_hits) <= 2]
-        if patent_hits and overlap:
+                          for w in base_terms[:3])] or nearest_pool[:2]
+        if nearest_pool and overlap:
             novelty_risk = "ADJACENT_COLLISION_CANDIDATES"
         elif patent_hits:
             novelty_risk = "SEARCHED_NO_DIRECT_TITLE_MATCH"
@@ -399,21 +440,33 @@ class CollisionEngineAdapter(BaseAdapter):
                            "queries": sci.get("queries", []),
                            "limitations": sci.get("limitations", [])},
             "patent": {"queries": patent_queries,
+                       "query_form": "keyword (engine keyword_form — "
+                                      "measured filler-word query pollution "
+                                      "2026-08-31)",
                        "query_expansion": {
                            "method": "FUNCTION_EQUIV_EXPANSION (Gate-Q doctrine)",
                            "epistemic_class": "MODEL_DERIVED",
                            "expansions": expansions},
                        "hits": patent_hits, "source_errors": patent_errors,
-                       "hit_count": len(patent_hits)},
+                       "hit_count": len(patent_hits),
+                       "relevance_adjudications": patent_adjudications,
+                       "relevant_hit_count": len(relevant_hits)},
             "novelty_risk": novelty_risk,
             "nearest_prior_art": [
                 {"title": h.get("title"), "patent_id": h.get("patent_id"),
-                 "url": h.get("source_url")} for h in patent_hits[:3]],
-            "actions": ["inspect_nearest_claims" if patent_hits
+                 "url": h.get("source_url")} for h in nearest_pool[:3]],
+            "nearest_prior_art_note": (
+                "relevance-filtered (Art. XXI.4): entries adjudicated "
+                "RELEVANT against the intervention content terms; "
+                "off-domain hits remain recorded in patent.hits with "
+                "their verdicts — never silently dropped"),
+            "actions": ["inspect_nearest_claims" if nearest_pool
                         else "expand_search_sources"],
             "timestamp": utc_now(),
         }
         prior_art_ids = [h.get("patent_id") or h.get("source_id", "")
+                         for h in nearest_pool[:5]] or \
+                        [h.get("patent_id") or h.get("source_id", "")
                          for h in patent_hits[:5]]
         return _engine_result(
             {"collision_results": collision,
