@@ -44,9 +44,17 @@ def gh_token():
 
 
 def clone(repo, dest):
+    """Fresh clone from GitHub. Uses the repo's authenticated origin URL
+    (the working clone's credential) when no separate token file exists."""
     tok = gh_token()
-    url = (f"https://{tok}@github.com/{repo}.git" if tok
-           else f"https://github.com/{repo}.git")
+    if tok:
+        url = f"https://{tok}@github.com/{repo}.git"
+    else:
+        cfg = subprocess.run(
+            ["git", "config", "--get", "remote.origin.url"],
+            cwd="/home/z/my-project/discovery-evidence-fabric",
+            capture_output=True, text=True).stdout.strip()
+        url = cfg or f"https://github.com/{repo}.git"
     r = subprocess.run(["git", "clone", "--depth", "1", url, dest],
                        capture_output=True, text=True, timeout=300)
     if r.returncode != 0:
