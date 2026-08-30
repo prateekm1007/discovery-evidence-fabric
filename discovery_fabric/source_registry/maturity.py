@@ -108,6 +108,10 @@ OVERLAP_GROUPS: Dict[str, List[str]] = {
 GEOGRAPHIC: Dict[str, Dict[str, Any]] = {
     # science corpora: worldwide literature / universal reference data
     "pubmed": (3, "MEDLINE indexes global biomedical literature"),
+    "arxiv": (3, "global preprint submissions, physics/math/CS/quant-bio skew"),
+    "nasa_ntrs": (3, "universal aerospace technical knowledge (NASA/NACA corpus)"),
+    "doe_osti": (3, "universal energy/materials research outputs (DOE-funded corpus)"),
+    "nhtsa_recalls": (1, "US vehicle market recall jurisdiction"),
     "europepmc": (3, "Europe PMC aggregates global open-access + MEDLINE corpus"),
     "openalex": (3, "OpenAlex catalogs global scholarly works"),
     "semantic_scholar": (3, "S2 catalogs global scholarly works"),
@@ -160,7 +164,7 @@ GEOGRAPHIC: Dict[str, Dict[str, Any]] = {
 #   0 NOT_A_FAILURE_SOURCE — evidence class carries no failure semantics
 FAILURE_CLASS: Dict[str, int] = {}
 for _sid, _cls in [
-    ("fda_maude", 3), ("fda_recall", 3),
+    ("fda_maude", 3), ("fda_recall", 3), ("nhtsa_recalls", 3),
     ("clinicaltrials_gov", 2), ("who_ictrp", 2),
     # literature/patents: negative results and failed applications are
     # structurally underrepresented (publication/grant bias)
@@ -169,6 +173,7 @@ for _sid, _cls in [
         "elsevier_scopus", "lens_scholarly", "manufacturing_literature",
         "google_patents", "lens_patent", "patsnap_eureka", "patentbear",
         "epo_ops", "uspto_odp", "wipo_patentscope", "google_bigquery_patents",
+        "nasa_ntrs", "doe_osti", "arxiv",
     ]],
     *[ (s, 0) for s in [
         "fda_510k", "fda_pma", "fda_pma_supplements", "fda_denovo",
@@ -181,9 +186,10 @@ for _sid, _cls in [
 ]:
     FAILURE_CLASS[_sid] = _cls
 
-# Domain of failure evidence (for the engine-level medical-only finding).
+# Domain of failure evidence (for the engine-level finding).
 FAILURE_DOMAIN: Dict[str, str] = {
     "fda_maude": "medical", "fda_recall": "medical",
+    "nhtsa_recalls": "transport",
     "clinicaltrials_gov": "medical", "who_ictrp": "medical",
 }
 
@@ -604,11 +610,15 @@ def build_grades() -> Dict[str, Any]:
                 "failure_native_live_sources": failure_native,
                 "failure_domains": failure_domains,
                 "finding": (
-                    "all failure-native live sources are "
-                    + ("MEDICAL-ONLY" if failure_domains == ["medical"] else str(failure_domains))
-                    + " — non-medical failure evidence (industrial/transport/energy/"
-                    "aerospace incidents) has ZERO live coverage; CEO blind spot "
-                    "mechanically confirmed"
+                    "failure-native live sources cover: "
+                    + (", ".join(failure_domains) if failure_domains else "NONE")
+                    + ". Domains with ZERO live failure coverage: "
+                    + ", ".join(d for d in ("medical", "transport", "industrial",
+                                            "energy", "aerospace", "electronics",
+                                            "infrastructure", "chemical")
+                                if d not in failure_domains)
+                    + " (CEO negative-evidence directive: every unlisted domain "
+                    "is an open gap)"
                 ),
             },
             "QUERY_RELEVANCE": {

@@ -338,6 +338,118 @@ class SemanticScholarConnector(ConnectorBase):
         return out
 
 
+class ArxivConnector(ConnectorBase):
+    """arXiv preprint server — SCIENTIFIC role (preprints).
+
+    Measured live 2026-08-30: https://export.arxiv.org/api/query answers
+    200 Atom XML (the http:// variant and burst probing measured 429 —
+    arXiv asks for ~3s courtesy between calls; enforced below).
+
+    Terms (arXiv API ToU): retrieval for research with attribution is
+    permitted; the API is rate-limited by courtesy interval, not keys.
+
+    Epistemic note: PREPRINT evidence class — NOT peer-reviewed. Records
+    carry that limitation structurally.
+    """
+
+    SOURCE_ID = "arxiv"
+    ROLES = ("SCIENTIFIC",)
+    HEALTH_QUERY = "flow diversion stent"
+    LIMIT = 5
+    _COURTESY_SECONDS = 3.0
+    _last_request_ts: float = 0.0
+    BACKOFF_BASE_SECONDS = 4.0
+
+    def build_url(self, query: str) -> str:
+        q = urllib.parse.quote(query)
+        return (f"https://export.arxiv.org/api/query?search_query=all:{q}"
+                f"&max_results={self.LIMIT}")
+
+    def _request(self, url, timeout=25):
+        # arXiv courtesy interval: the API asks clients to wait ~3 seconds
+        # between calls; enforced client-side (bounded, burst-safe).
+        import time as _time
+        delta = _time.time() - ArxivConnector._last_request_ts
+        if delta < self._COURTESY_SECONDS:
+            _time.sleep(self._COURTESY_SECONDS - delta)
+        try:
+            return super()._request(url, timeout=timeout)
+        finally:
+            ArxivConnector._last_request_ts = _time.time()
+
+    def parse_payload(self, raw: bytes, query: str) -> Any:
+        import xml.etree.ElementTree as ET
+        text = raw.decode("utf-8", "replace")
+        if "<feed" not in text:
+            raise ValueError("arxiv payload missing Atom <feed> root")
+        ns = {"a": "http://www.w3.org/2005/Atom",
+              "arxiv": "http://arxiv.org/schemas/atom"}
+        root = ET.fromstring(text)
+        entries = []
+        for e in root.findall("a:entry", ns):
+            def _t(tag):
+                el = e.find(f"a:{tag}", ns)
+                return el.text.strip() if el is not None and el.text else ""
+            links = {l.get("title", ""): l.get("href", "")
+                     for l in e.findall("a:link", ns)}
+            authors = [a.find("a:name", ns).text
+                       for a in e.findall("a:author", ns)
+                       if a.find("a:name", ns) is not None]
+            entries.append({
+                "id": _t("id"),
+                "title": " ".join(_t("title").split()),
+                "summary": _t("summary"),
+                "published": _t("published"),
+                "updated": _t("updated"),
+                "authors": authors,
+                "primary_category": (e.find("arxiv:primary_category", ns).get("term")
+                                     if e.find("arxiv:primary_category", ns) is not None else ""),
+                "pdf_url": links.get("pdf", ""),
+            })
+        return {"entries": entries}
+
+    def normalize_payload(self, payload: Any, query: str, raw_sha: str) -> List[SourceRecord]:
+        out: List[SourceRecord] = []
+        for r in payload.get("entries", []):
+            aid = (r.get("id") or "").rsplit("/", 1)[-1]
+            out.append(SourceRecord(
+                source_id=self.SOURCE_ID,
+                role="SCIENTIFIC",
+                record_id=f"arxiv:{aid}",
+                title=r.get("title") or "",
+                uri=r.get("id") or (f"https://arxiv.org/abs/{aid}" if aid else ""),
+                retrieved_at=utc_now(),
+                query=query,
+                raw_payload_sha256=raw_sha,
+                normalized={
+                    "arxiv_id": aid,
+                    "doi": f"10.48550/arxiv.{aid.split('v')[0]}" if aid else None,
+                    "published": r.get("published"),
+                    "updated": r.get("updated"),
+                    "authors": (r.get("authors") or [])[:20],
+                    "primary_category": r.get("primary_category"),
+                    "abstract": (r.get("summary") or "")[:4000] or None,
+                    "pdf_url": r.get("pdf_url"),
+                },
+                provenance={
+                    "provider": self.SOURCE_ID,
+                    "api": "export.arxiv.org/api/query",
+                    "query": query,
+                    "raw_payload_sha256": raw_sha,
+                    "retrieved_at": utc_now(),
+                },
+                epistemic_state="OBSERVED",
+                limitations=[
+                    "PREPRINT: not peer-reviewed; findings may be revised "
+                    "or withdrawn",
+                    "PREPRINT_SERVER_BIAS: arXiv coverage is "
+                    "physics/math/CS/quant-bio skewed — absence of an "
+                    "arXiv record is not absence of the science",
+                ],
+            ))
+        return out
+
+
 class ElsevierScopusConnector(ConnectorBase):
     """Elsevier Scopus Search API — SCIENTIFIC role.
 

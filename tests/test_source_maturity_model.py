@@ -142,8 +142,17 @@ def test_query_relevance_canary_unmeasured_engine_wide(grades):
 
 def test_engine_findings_state_inconvenient_results(grades):
     """Art. XV: the engine-level findings must contain the negative
-    statements (medical-only failures, single-jurisdiction concentration)."""
-    assert "MEDICAL-ONLY" in grades["engine_level"]["FAILURE_NEGATIVE_EVIDENCE"]["finding"]
+    statements — which failure domains ARE covered and which have ZERO
+    live coverage (the list must never shrink to empty while gaps exist)."""
+    finding = grades["engine_level"]["FAILURE_NEGATIVE_EVIDENCE"]["finding"]
+    domains = grades["engine_level"]["FAILURE_NEGATIVE_EVIDENCE"]["failure_domains"]
+    for d in domains:
+        assert d in finding
+    assert "ZERO live failure coverage" in finding
+    # while any CEO-named domain is missing, it must be named as a gap
+    for d in ("industrial", "energy", "aerospace", "electronics"):
+        if d not in domains:
+            assert d in finding
     dist = grades["engine_level"]["GEOGRAPHIC"]["live_source_distribution"]
     assert dist.get("SINGLE_JURISDICTION", 0) > 0
     assert "no live source" in grades["engine_level"]["GEOGRAPHIC"]["finding"]

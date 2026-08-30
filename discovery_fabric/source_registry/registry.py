@@ -1099,6 +1099,123 @@ _register(_src(
     metered_quota=None,
 ))
 
+# ---------------------------------------------------------------------------
+# GOVERNMENT TECHNICAL REPORTS + NON-MEDICAL FAILURES
+# (CEO Toscanini directive 2026-08-30 — free/open priority sources; all
+#  endpoints measured live before registration, this session)
+# ---------------------------------------------------------------------------
+
+_register(_src(
+    source_id="nasa_ntrs",
+    name="NASA Technical Reports Server (NTRS)",
+    authority_role=["SCIENTIFIC"],
+    coverage="Aerospace, aeronautics, materials, propulsion, and space-"
+             "science R&D citations and reports (NASA + NACA eras), "
+             "including failure analyses and lessons-learned.",
+    access_method="REST JSON, no key: GET https://ntrs.nasa.gov/api/"
+                  "citations/search?q=...&page.size=N (measured 200)",
+    update_frequency="Continuous (new report releases and retro-digitized "
+                     "NACA-era records)",
+    rate_limits="Public API; no published hard limit measured; modest "
+                "page sizes used",
+    licensing="Open data (NASA/US-government works; NTRS terms — export-"
+              "control metadata carried per record)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous releases",
+    known_gaps="Report-grade evidence, not peer-review grade. Negative "
+               "findings/lessons-learned present but NOT structurally "
+               "flagged. Full text sometimes distribution-restricted; the "
+               "connector indexes metadata + abstract only.",
+    provenance_method="Query + NTRS id + raw payload sha256 into "
+                      "hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.govtech_reports:NasaNtrsConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="doe_osti",
+    name="DOE Office of Scientific and Technical Information (OSTI)",
+    authority_role=["SCIENTIFIC"],
+    coverage="Energy, batteries, materials, nuclear, and fundamental-"
+             "science research outputs funded by DOE (journal articles, "
+             "technical reports, datasets).",
+    access_method="REST JSON, no key: GET https://www.osti.gov/api/v1/"
+                  "records?query=...&rows=N (measured 200, native JSON "
+                  "array; note: api.osti.gov does not resolve from this "
+                  "egress; format=xml+%-encoding measured flip-flopping)",
+    update_frequency="Continuous (as DOE-funded outputs are submitted)",
+    rate_limits="Public API; courtesy-limited",
+    licensing="Open data (OSTI/US-government terms; metadata freely "
+              "redistributable)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous",
+    known_gaps="DOE-funded scope only — absence of an OSTI record is not "
+               "absence of the research. Negative findings not structurally "
+               "flagged.",
+    provenance_method="Query + OSTI id + raw payload sha256 into "
+                      "hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.govtech_reports:DoeOstiConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="arxiv",
+    name="arXiv preprint server",
+    authority_role=["SCIENTIFIC"],
+    coverage="Preprints in physics, mathematics, CS, quantitative biology, "
+             "statistics, engineering; mechanism evidence at the research "
+             "frontier.",
+    access_method="REST Atom XML, no key: GET https://export.arxiv.org/api/"
+                  "query?search_query=all:...&max_results=N (measured 200 "
+                  "over https; http variant measured 429)",
+    update_frequency="Continuous (new submissions announce daily)",
+    rate_limits="Courtesy interval ~3 seconds between calls (enforced "
+                "client-side); burst probing measured 429",
+    licensing="Open access (arXiv terms; attribution required; licenses "
+              "vary per article)",
+    primary_or_secondary="PRIMARY",
+    freshness="Daily announcement cycle",
+    known_gaps="PREPRINT evidence class — NOT peer-reviewed; versions and "
+               "withdrawals exist. Coverage skew: physics/math/CS/quant-bio.",
+    provenance_method="Query + arxiv id + raw payload sha256 into "
+                      "hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.scientific:ArxivConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="nhtsa_recalls",
+    name="NHTSA vehicle-recall campaigns",
+    authority_role=["RECALL"],
+    coverage="US vehicle safety-recall campaigns by make/model/year with "
+             "component, defect summary, consequence, and remedy. First "
+             "NON-MEDICAL failure-evidence source (transport domain).",
+    access_method="REST JSON, no key: GET https://api.nhtsa.gov/recalls/"
+                  "recallsByVehicle?make&model&modelYear (measured 200; "
+                  "query grammar 'make|model|year' — parameterized "
+                  "endpoint, not free text)",
+    update_frequency="Continuous (recall campaign publication)",
+    rate_limits="Public API; no published hard limit measured",
+    licensing="Open data (NHTSA/US-government terms)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous",
+    known_gaps="US vehicle market only. A recall is an acknowledged "
+               "defect, NOT an incidence rate; affected-unit counts are "
+               "not field-failure counts (Art. XXI.5-analog carried per "
+               "record). No free-text search — query ladder must target "
+               "make/model/year triples. NTSB investigations remain a "
+               "route-blocked gap (CAROL API paths serve HTML, measured "
+               "2026-08-30).",
+    provenance_method="Query (make|model|year) + NHTSA campaign number + "
+                      "raw payload sha256 into hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.nonmedical_failure:NhtsaRecallConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
 
 # ---------------------------------------------------------------------------
 # Registry API
