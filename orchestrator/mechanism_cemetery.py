@@ -215,23 +215,35 @@ def load_cemetery() -> List[CemeteryEntry]:
 def append_entries_to_cemetery_file(new_entries: List[CemeteryEntry]) -> None:
     """Append entries to the canonical cemetery WITHOUT round-tripping
     existing entries through the dataclass (which would drop their
-    history fields — Art. XI history preservation)."""
+    history fields — Art. XI history preservation).
+
+    2026-08-30 (R375): the read-modify-write is now flock-serialized —
+    concurrent campaign runs appending simultaneously could otherwise
+    lose entries (last-writer-wins), violating the append-only/no-loss
+    mandate. Same pattern as package_registry.allocate."""
+    import fcntl
     CEMETERY_PATH.parent.mkdir(parents=True, exist_ok=True)
-    if CEMETERY_PATH.exists():
-        with open(CEMETERY_PATH) as f:
-            data = json.load(f)
-    else:
-        data = {
-            "description": "Library of impossibilities — every killed "
-                           "invention with reusable lessons.",
-            "entries": [],
-        }
-    data.setdefault("entries", []).extend(asdict(e) for e in new_entries)
-    data["entry_count"] = len(data["entries"])
-    data["updated_at"] = datetime.now(timezone.utc).isoformat()
-    data["last_update_round"] = "L8-campaign"
-    with open(CEMETERY_PATH, "w") as f:
-        json.dump(data, f, indent=2)
+    lock_path = CEMETERY_PATH.with_suffix(CEMETERY_PATH.suffix + ".lock")
+    with open(lock_path, "w") as lf:
+        fcntl.flock(lf, fcntl.LOCK_EX)
+        try:
+            if CEMETERY_PATH.exists():
+                with open(CEMETERY_PATH) as f:
+                    data = json.load(f)
+            else:
+                data = {
+                    "description": "Library of impossibilities — every killed "
+                                   "invention with reusable lessons.",
+                    "entries": [],
+                }
+            data.setdefault("entries", []).extend(asdict(e) for e in new_entries)
+            data["entry_count"] = len(data["entries"])
+            data["updated_at"] = datetime.now(timezone.utc).isoformat()
+            data["last_update_round"] = "L8-campaign"
+            with open(CEMETERY_PATH, "w") as f:
+                json.dump(data, f, indent=2)
+        finally:
+            fcntl.flock(lf, fcntl.LOCK_UN)
 
 
 def check_candidate_against_cemetery(candidate_description: str) -> Dict:

@@ -5,9 +5,12 @@ exposes ONE interface:
 
     generate(prompt, system, schema, policy) -> LLMCallResult
 
-over eight providers (OpenRouter, NVIDIA, Anthropic, Gemini, OpenAI, Qwen,
-DeepSeek, Mistral). The engine selects a provider by explicit policy:
-availability -> quality tier -> cost tier -> latency tier.
+over nine providers (zai, OpenRouter, NVIDIA, Anthropic, Gemini, OpenAI,
+Qwen, DeepSeek, Mistral). The engine selects a provider by explicit policy:
+availability -> quality tier -> cost tier -> latency tier. The ninth
+provider (zai, 2026-08-30) is the sandbox-local gateway added as the healthy
+transport path after the NVIDIA latency collapse — E1 credential
+independence working as designed, not a policy change.
 
 Constitutional contract (Art. I, IV, VI, XVIII, XXV):
   - A missing API key is PROVIDER_UNAVAILABLE, never NO_INVENTION and never
@@ -70,10 +73,31 @@ class ProviderSpec:
         return override or self.default_model
 
 
-# The seven-provider registry (CEO E1). Quality tiers are RECORDED POLICY
-# INPUTS (Art. XXVII: explicit, documented), not measurements; they encode
-# the engine's default preference order and are inspected in every ledger.
+# The provider registry (CEO E1; nine providers since 2026-08-30 — the
+# zai sandbox gateway is the healthy-transport ninth). Quality tiers are
+# RECORDED POLICY INPUTS (Art. XXVII: explicit, documented), not
+# measurements; they encode the engine's default preference order and are
+# inspected in every ledger.
 PROVIDER_SPECS: List[ProviderSpec] = [
+    ProviderSpec(
+        "zai", "ZAI_API_KEY",
+        "http://127.0.0.1:8787/v1/chat/completions",
+        "glm-4-plus", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=1,
+        policy_note=(
+            "sandbox-local OpenAI-compatible gateway (scripts/zai_gateway.mjs) "
+            "backed by the z-ai SDK serving glm-4-plus (verified live "
+            "2026-08-30: READY probe, ~2 s). Registered as the HEALTHY "
+            "transport path after the measured NVIDIA latency collapse "
+            "(35 s..>240 s variance on identical calls; tiny-call timeouts "
+            "re-verified 2026-08-30) and the Mistral 401 — the documented "
+            "M1 unblock ('a healthy/second LLM provider'). Placed at the "
+            "head of the tier-2 group so the DEFAULT policy (availability "
+            "-> quality -> cost -> latency) prefers the healthy path over "
+            "the degraded one; purpose-specific call sites select it via "
+            "the explicit ENGINE_*_PROVIDER operator overrides (recorded "
+            "in candidate provenance, never silent). Tier assignment is a "
+            "recorded policy input (Art. XXVII), not a measurement")),
     ProviderSpec(
         "openrouter", "OPENROUTER_API_KEY",
         "https://openrouter.ai/api/v1/chat/completions",

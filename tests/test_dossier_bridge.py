@@ -47,10 +47,21 @@ CTX = {"run_id": "testrun:ebridge", "problem_id": "fixture"}
 
 
 # ---------------------------------------------------------------- E1
-def test_e1_registry_has_eight_providers():
+def test_e1_registry_has_nine_providers():
+    # 2026-08-30 (R375): the zai sandbox-local gateway (glm-4-plus) was
+    # added as the ninth provider — the documented healthy-transport
+    # unblock after the measured NVIDIA latency collapse. E1 credential
+    # independence working as designed; no semantics changed.
     ids = {p.provider_id for p in PROVIDER_SPECS}
-    assert ids == {"openrouter", "nvidia", "anthropic", "gemini", "openai",
-                   "qwen", "deepseek", "mistral"}
+    assert ids == {"zai", "openrouter", "nvidia", "anthropic", "gemini",
+                   "openai", "qwen", "deepseek", "mistral"}
+
+
+def test_e1_zai_gateway_is_explicit_and_documented():
+    z = next(p for p in PROVIDER_SPECS if p.provider_id == "zai")
+    assert z.env_var == "ZAI_API_KEY"
+    assert z.url.startswith("http://127.0.0.1:")  # loopback only
+    assert z.policy_note  # the NVIDIA-collapse basis is recorded (Art. XXVII)
 
 
 def test_e1_nvidia_hosts_frozen_synthesis_model():
@@ -90,7 +101,7 @@ def test_e1_explicit_policy_no_silent_substitution(monkeypatch):
 
 def test_e1_availability_matrix_records_all_env_vars():
     matrix = availability_matrix()
-    assert len(matrix) == 8
+    assert len(matrix) == 9
     for m in matrix:
         assert m["env_var"].endswith("_API_KEY")
         assert isinstance(m["available"], bool)

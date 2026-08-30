@@ -28,6 +28,7 @@ distinct epistemic objects with their angle + model provenance.
 from __future__ import annotations
 
 import itertools
+import os
 import re
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
@@ -93,11 +94,24 @@ def generate_diverse_candidates(problem: Dict[str, Any],
     from .llm_registry import availability_matrix, generate, SelectionPolicy
     available = [m["provider_id"] for m in availability_matrix()
                  if m["available"]]
+    # OPERATOR OVERRIDE (2026-08-30, R375): ENGINE_GRID_PROVIDERS pins the
+    # grid transport to an explicit provider list — the same explicit,
+    # logged override pattern as ENGINE_SYNTHESIS_PROVIDER /
+    # ENGINE_ATTACK_PROVIDER / ENGINE_ENSEMBLE_PROVIDERS. Without it, the
+    # angle x provider grid burns 240 s x 3 attempts per angle on a
+    # degraded-but-credentialed endpoint (measured live 2026-08-30: the
+    # NVIDIA tiny-call timeout). The override travels in the grid result
+    # (never silent).
+    override = [p.strip() for p in os.environ.get(
+        "ENGINE_GRID_PROVIDERS", "").split(",") if p.strip()]
+    if override:
+        available = [p for p in override if p in available] or available
     result: Dict[str, Any] = {
         "diversity": "CANDIDATE_DIVERSITY (E16-E)",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "min_candidates": min_candidates,
-        "available_providers": available,
+        "available_providers": available[:2],
+        "operator_override": override or None,
         "angles": [a[0] for a in EXPLORATION_ANGLES],
         "candidates": [],
         "built_at": utc_now(),

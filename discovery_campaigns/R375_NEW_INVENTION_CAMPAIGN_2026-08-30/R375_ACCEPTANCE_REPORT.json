@@ -1,0 +1,124 @@
+{
+ "directive": "CEO R375 — prove the engine can reproduce the portfolio standard on new inventions",
+ "round": "R375",
+ "date": "2026-08-30",
+ "author": "CODER (sole builder)",
+ "status": "SUBMITTED FOR CEO AUDIT (Art. XXVI — builder-measured)",
+
+ "portfolio_freeze": {
+  "frozen_release_candidate": "a30ee9c",
+  "modified": false,
+  "rule": "CEO R375-1: no modification until the next generated invention passes the same release process. No generated dossier reached the full release gate this round, so the portfolio repository was correctly left untouched."
+ },
+
+ "campaign": {
+  "problem_statements": 22,
+  "territories": {
+   "ORTHOPEDICS": ["hip prosthesis x2", "knee prosthesis x2", "pedicle screw x2", "shoulder prosthesis x2", "limb prosthesis"],
+   "CARDIOVASCULAR": ["coronary stent x2", "heart valve prosthesis", "pacemaker lead x2", "venous filter x2"],
+   "NEUROVASCULAR": ["flow diverter x2", "intracranial stent x2"],
+   "OPHTHALMOLOGY": ["intraocular lens x2"]
+  },
+  "template_independence": "problems derive from the L8 operator-evidence campaign (MAUDE clusters, recall root causes, event narratives) in the four R375 territories — none of the 15 existing shunt technologies was used as a template",
+  "chain_per_problem": "evidence -> mechanism -> prior art -> novelty/collision -> adversarial attack -> contradiction -> killer experiment -> adjudication (EngineRun conductor, 13 stages, envelope-persisted)",
+  "outcomes": {
+   "runs_completed": 22,
+   "substantive_kills": 20,
+   "survivors_AUTOMATED_INVENTION_CANDIDATE": 2,
+   "infrastructure_blocks_remaining": 0,
+   "packages_generated_automatically": 21,
+   "manual_authoring": "NONE — every artifact written by the conductor/package factory stage code (run directories are the record)"
+  },
+  "survivors": [
+   {
+    "campaign_index": 8,
+    "problem": "shoulder prosthesis / adverse event without identified device problem",
+    "problem_id": "m1_t04_shoulder_prosthesis_adverse_event_withou_9f19a0ff",
+    "maturity": "ENGINEERING_DEFINITION"
+   },
+   {
+    "campaign_index": 9,
+    "problem": "coronary stent / device remains implanted - occlusion",
+    "problem_id": "m1_t06_coronary_stent_device_remains_impla_8cc833d3",
+    "maturity": "ENGINEERING_DEFINITION"
+   }
+  ]
+ },
+
+ "kill_negative_knowledge": {
+  "cemetery_entries_appended": 20,
+  "cemetery_total_after": 46,
+  "fields_per_entry": ["entry_id", "what_was_proposed", "why_it_failed", "evidence_sources", "what_to_avoid", "kill_reason", "reusable_lesson", "epistemic_class"],
+  "nothing_deleted": true,
+  "append_only_lock_added": "flock serialization on the cemetery append (concurrent-run safety; same pattern as the package registry)"
+ },
+
+ "evaluation": {
+  "frozen_evaluator": "E15-B dossier_quality (10 content dimensions) + E16-H holdout release gate (blind frozen packages, 10 substance dimensions) + E15-A/E15-J frozen-corpus floors (16 instruments) — all LOADED UNMODIFIED",
+  "floors_lowered": false,
+  "packages_evaluated": 21,
+  "e15b_verdicts": {"PASS": 0, "CONDITIONAL": 21, "FAIL": 0},
+  "e16h_decisions": {"RELEASED": 0, "HELD_FOR_HUMAN_REVIEW": 4, "FAIL": 17},
+  "frozen_floor_all_pass": 0,
+  "mechanism_substantive_elements_7_of_7": "21/21 packages (physical principle, causal operation, components, interfaces, constraints, critical parameters, failure consequences all present)",
+  "holdout_detail_survivors": {
+   "cand_9_coronary_stent": "8/10 blind floors met; below: engineering_specificity 0.333 < 0.55, manufacturing_reasoning 0.0 < 1.0",
+   "cand_8_shoulder": "6/10 blind floors met; below: mechanism_reasoning 0.0 < 0.125, engineering_specificity 0.25 < 0.55, failure_analysis 0.167 < 0.5, manufacturing_reasoning 0.0 < 1.0"
+  },
+  "provenance_density_decomposition": {
+   "frozen_floor": 0.333,
+   "generated_typical": 0.25,
+   "finding": "on the survivor package, 6 of 8 linkage rows carry all five chain fields but are marked linked=false BY THE R374 TRUTH MODEL (honest PARTIAL/UNKNOWN chain states); 0 rows are structurally broken. The meter counts honestly-unverified chains as incomplete — the correct constitutional behavior (UNKNOWN is never verified traceability). The depth gap that remains REAL is engineering_specificity and manufacturing_reasoning."
+  }
+ },
+
+ "acceptance_r375_8": {
+  "requirement": "at least 5 genuinely new inventions reaching AUTOMATIC ENGINEERING SPECIFICATION + AUTOMATIC COMPLETE DOSSIER + INDEPENDENT QUALITY PASS without hand-written dossier repair",
+  "measured": {
+   "automatic_engineering_specification": "21/21 (machine-written ENGINEERING_SPECIFICATION.json per package)",
+   "automatic_complete_dossier": "21/21 (6 PDFs + JSON registers + ZIP per package, zero manual repair)",
+   "independent_quality_pass": "0/21 (E15-B: 0 strict PASS; E16-H: 0 RELEASED; frozen floors: 0 all-pass)"
+  },
+  "verdict": "NOT MET — reported honestly. 2 of the required 5 inventions survived the full discovery loop automatically; none of the 21 generated dossiers yet reaches the frozen benchmark floors."
+ },
+
+ "defects_found_and_fixed_live": [
+  {
+   "defect": "Art. XXI.3 violation in a2/retrieve.py: ANY provider exception was swallowed into return [] — a EuropePMC timeout/error masqueraded as 'zero evidence retrieved'",
+   "fix": "SearchProviderFailure raised explicitly (stage failure = rerunnable infrastructure state, never fabricated absence); 4 pinning tests",
+   "evidence": "tests/test_r375_retrieval_repair.py 7 passed"
+  },
+  {
+   "defect": "Boolean-poisoned retrieval queries: MAUDE problem-term phrases containing literal 'or'/'(s)' ('coagulation in device or device ingredient(s)...') parse as dangling boolean operators in EuropePMC (verified live: poisoned query hitCount 0 vs 4580 sanitized)",
+   "fix": "sanitize_query() vocabulary hygiene + ONE recorded fallback query on true zero (queries travel in every item's provenance); candidate 11 subsequently retrieved real evidence and was adjudicated on substance",
+   "evidence": "tests/test_r375_retrieval_repair.py::TestPoisonedQueryFallback (live-verified)"
+  },
+  {
+   "defect": "Exploration grid burned 240 s x 3 attempts per angle on the dead NVIDIA endpoint (no operator pin existed for the grid)",
+   "fix": "ENGINE_GRID_PROVIDERS operator override (same explicit recorded pattern as synthesis/attack/ensemble overrides)"
+  },
+  {
+   "defect": "Cemetery append was not concurrency-safe (read-modify-write race could lose kill entries under parallel runs)",
+   "fix": "flock-serialized append (package-registry pattern)"
+  }
+ ],
+
+ "infrastructure_changes": [
+  "zai sandbox gateway registered as the NINTH llm_registry provider (glm-4-plus via scripts/zai_gateway.mjs, loopback-only, bearer-key auth, JSONL call log with prompt/content hashes; 429 backoff 30/60/90 s) — the documented healthy-transport unblock after the measured NVIDIA latency collapse (35 s..>240 s; tiny-call timeouts re-verified 2026-08-30) and the Mistral 401. E1 credential independence working as designed; no gate touched.",
+  "Provider selection during the campaign: ENGINE_SYNTHESIS_PROVIDER=zai, ENGINE_ATTACK_PROVIDER=zai, ENGINE_ENSEMBLE_PROVIDERS=zai, ENGINE_GRID_PROVIDERS=zai — every pin is echoed in the stage logs and travels in candidate provenance (never silent).",
+  "3 transport-era blocked run directories preserved verbatim with .blocked_* suffixes (zero-evidence, poisoned-query, evaluator-blocked); their replacements completed under healthy transport."
+ ],
+
+ "honest_open_items": [
+  "0 REAL loop states (14 NONE + 1 SYNTHETIC + 2 new-campaign packages NONE) — the reality boundary stands (Art. XXXVII/XXXVIII)",
+  "Generated-dossier depth gap vs the 15 hand-built benchmark packages: engineering_specificity and manufacturing_reasoning are the decisive missing dimensions; manufacturing_reasoning measures 0.0 on both survivors",
+  "The 2 survivors are INVENTION_CANDIDATE class (ENGINEERING_DEFINITION maturity) — TRANSFER_PACKAGE_READY remains impossible without reality-side verification evidence (Art. XXXVIII)",
+  "E15-B BUYER_ACTIONABILITY CONDITIONAL on all 21 packages (buyer-card quantification depth below the strict bar)"
+ ],
+
+ "reproduction": {
+  "campaign": "bash scripts/zai_gw_run.sh python scripts/m1_dossier_campaign.py (resumable; per-run records are the authority)",
+  "evaluation": "python scripts/r375_evaluate_campaign.py",
+  "tests": "python -m pytest tests/ (1345 passed + 2 skipped; one append-only audit test requires the cemetery commit to exist — git-history comparison semantics)"
+ }
+}

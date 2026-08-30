@@ -318,12 +318,17 @@ def _aggregate():
             "final_status UNKNOWN (never REJECTED, never cemetery) per "
             "Art. XXV — see tests/test_adversarial_infra_separation.py."),
         "infrastructure_state": {
-            "llm_providers": ("NVIDIA deepseek-v4-flash LIVE with high "
-                              "latency variance (measured 35 s..>240 s, "
-                              "2026-08-29); Mistral key INVALID (401, "
-                              "re-verified); single-path transport — "
-                              "blocked runs are rerunnable, honestly "
-                              "recorded"),
+            "llm_providers": (
+                "R375 2026-08-30: campaign COMPLETED on the zai sandbox "
+                "gateway (glm-4-plus via scripts/zai_gateway.mjs; "
+                "registered as the ninth llm_registry provider after the "
+                "measured NVIDIA latency collapse and the Mistral 401 — "
+                "E1 credential independence). Upstream quota (429) "
+                "absorbed by gateway backoff. 22/22 runs completed: 20 "
+                "substantive research kills (cemetery), 2 "
+                "AUTOMATED_INVENTION_CANDIDATE survivors; 3 transport-era "
+                "blocked run dirs preserved verbatim with .blocked_* "
+                "suffixes (Art. XI); zero blocks remaining"),
         },
         "builder_measured_disclosure": {
             "art_xxvi": ("BUILDER-MEASURED; reproduction: "
