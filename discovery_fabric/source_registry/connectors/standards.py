@@ -35,11 +35,15 @@ from __future__ import annotations
 
 import json
 import re
+import time
+import urllib.error
 import urllib.parse
-from typing import Any, Dict, List, Optional
+import urllib.request
+from typing import Any, Dict, List, Optional, Tuple
 
 from discovery_fabric.source_registry.base import (
-    ConnectorBase, SourceRecord, STATUS_OK, utc_now,
+    ConnectorBase, SourceRecord, STATUS_OK, utc_now, SSL_CONTEXT,
+    USER_AGENT, sha256_bytes,
 )
 
 FDA_STDS_LIMITATIONS = [
@@ -71,19 +75,64 @@ ECFR_ISSUE_DATE = "2026-08-27"
 
 
 class FdaRecognizedStandardsConnector(ConnectorBase):
-    """FDA Recognized Consensus Standards database (HTML results table)."""
+    """FDA Recognized Consensus Standards database (HTML results table).
+
+    DEFECT MEASURED LIVE 2026-08-30 (QUERY_RELEVANCE battery): the CDRH
+    results.cfm endpoint IGNORES every probed server-side filter param
+    (keyword=, title=, stdsgn=, designation= — all return the identical
+    first catalog page of 100 rows). Pagination DOES work (pgnum=N).
+    Behavior before this finding: the connector believed the server had
+    filtered by keyword and shipped the first 100 catalog rows as if
+    they answered the query — status-OK-plus-irrelevant-records (the
+    Lens-DSL / OSTI `query=` defect class).
+
+    Honest semantics AFTER the fix: the connector fetches a PAGE_BUDGET
+    window of the recognition catalog (newest-first, 100 rows/page) and
+    filters CLIENT-SIDE on designation+title. A zero-match result is a
+    definitive EMPTY **of the fetched window only** — every record and
+    the registry known_gaps carry that limitation; it is NEVER evidence
+    that a standard is not recognized (Art. XXI.3/XXV).
+    """
 
     SOURCE_ID = "fda_recognized_standards"
     ROLES = ("STANDARDS",)
     HEALTH_QUERY = "10993"          # biocompatibility family — measured
     LIMIT = 100
+    #: catalog pages fetched per query (100 rows each) — ENGINEERING
+    #: budget: 3 pages bounds the cost of one query while giving the
+    #: client-side filter a 300-row window (disclosed per record).
+    PAGE_BUDGET = 3
 
     _HEADER_CELL = "Date of Entry"
 
-    def build_url(self, query: str) -> str:
-        q = urllib.parse.quote(query)
+    def build_url(self, query: str, page: int = 1) -> str:
+        # NOTE: no server-side query param is trusted (measured ignored);
+        # the query is applied client-side in normalize_payload.
         return ("https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/"
-                f"cfstandards/results.cfm?start_search=1&keyword={q}")
+                f"cfstandards/results.cfm?start_search=1&pgnum={page}")
+
+    def fetch_pages(self, timeout: int) -> List[Tuple[bytes, str]]:
+        """Fetch the PAGE_BUDGET catalog window via the base _request
+        (so status discipline + test interception both hold)."""
+        out: List[Tuple[bytes, str]] = []
+        for page in range(1, self.PAGE_BUDGET + 1):
+            url = self.build_url("", page=page)
+            body, status, http_status, error, _rem = self._request(
+                url, timeout=timeout)
+            if status != STATUS_OK or not body:
+                if page == 1:
+                    # first page failed: the provider did not answer
+                    raise RuntimeError(
+                        f"first catalog page failed: status={status} "
+                        f"http={http_status} error={error!r}")
+                break  # later-page failure: window is what we have
+            out.append((body, sha256_bytes(body)))
+            if not self._page_has_rows(body):
+                break  # exhausted catalog before budget
+        return out
+
+    def _page_has_rows(self, body: bytes) -> bool:
+        return b"detail.cfm?standard__identification_no=" in body
 
     def parse_payload(self, raw: bytes, query: str) -> Any:
         html = raw.decode("utf-8", "replace")
@@ -120,6 +169,94 @@ class FdaRecognizedStandardsConnector(ConnectorBase):
             raise ValueError("fda_recognized_standards: no results table "
                              "in response body")
         return {"records": parsed}
+
+    def search(self, query: str, timeout: int = 25) -> "SourceQueryResult":  # type: ignore[override]
+        """Catalog-window search: fetch pages, parse, client-side filter.
+
+        The base _execute() contract assumes one request per query; this
+        connector needs PAGE_BUDGET requests + a client filter. Custody
+        (retrieval-log entry with the union sha of fetched pages) is
+        preserved via _finish.
+        """
+        import hashlib
+        from discovery_fabric.source_registry.base import SourceQueryResult as SQR
+        t0 = time.time()
+        try:
+            pages = self.fetch_pages(timeout)
+        except urllib.error.HTTPError as e:
+            status = ("UNAVAILABLE" if e.code >= 500 else
+                      "AUTH_FAILED" if e.code in (401, 403) else
+                      "RATE_LIMITED" if e.code == 429 else "SEARCH_FAILED")
+            return self._finish(SQR(source_id=self.SOURCE_ID, status=status,
+                                    ok=False, http_status=e.code,
+                                    latency_ms=int((time.time() - t0) * 1000),
+                                    error=str(e)[:300], query=query,
+                                    retrieved_at=utc_now()),
+                                query, self.build_url(""), None)
+        except RuntimeError as e:  # first page failed (provider answer class)
+            from discovery_fabric.source_registry.base import STATUS_UNAVAILABLE as _U
+            return self._finish(SQR(source_id=self.SOURCE_ID,
+                                    status=_U, ok=False,
+                                    latency_ms=int((time.time() - t0) * 1000),
+                                    error=str(e)[:300], query=query,
+                                    retrieved_at=utc_now()),
+                                query, self.build_url(""), None)
+        except Exception as e:  # noqa: BLE001
+            return self._finish(SQR(source_id=self.SOURCE_ID,
+                                    status="SEARCH_FAILED", ok=False,
+                                    latency_ms=int((time.time() - t0) * 1000),
+                                    error=repr(e)[:300], query=query,
+                                    retrieved_at=utc_now()),
+                                query, self.build_url(""), None)
+        all_records: List[Dict[str, Any]] = []
+        union_sha = hashlib.sha256()
+        n_pages = 0
+        try:
+            for body, sha in pages:
+                n_pages += 1
+                union_sha.update(sha.encode("ascii"))
+                payload = self.parse_payload(body, query)
+                all_records.extend(payload.get("records", []))
+        except ValueError as e:
+            # gateway/maintenance page: unparseable body (old contract kept)
+            return self._finish(SQR(source_id=self.SOURCE_ID,
+                                    status="PARSE_FAILED", ok=False,
+                                    latency_ms=int((time.time() - t0) * 1000),
+                                    error=str(e)[:300], query=query,
+                                    retrieved_at=utc_now()),
+                                query, self.build_url(""), None)
+        raw_sha = union_sha.hexdigest()
+        qterms = [t for t in re.split(r"[^a-z0-9]+", query.lower()) if t]
+        filtered = []
+        for r in all_records:
+            hay = " ".join([r.get("standard_designation") or "",
+                             r.get("standard_title") or ""]).lower()
+            if not qterms or all(t in hay for t in qterms):
+                filtered.append(r)
+        dedup: Dict[str, Dict[str, Any]] = {}
+        for r in filtered:
+            key = r.get("recognition_number")
+            if key and key not in dedup:
+                dedup[key] = r
+        records = self.normalize_payload(
+            {"records": list(dedup.values())[: self.LIMIT]}, query, raw_sha)
+        for rec in records:
+            rec.normalized["client_side_filtered"] = True
+            rec.normalized["catalog_window_pages"] = n_pages
+            rec.normalized["window_rows_scanned"] = len(all_records)
+            rec.limitations = list(rec.limitations or []) + [
+                f"server-side keyword filter measured broken 2026-08-30; "
+                f"query applied client-side over a {n_pages}-page "
+                f"({len(all_records)}-row) catalog window — EMPTY means "
+                f"'not in the fetched window', NEVER 'not recognized'"
+            ]
+        status = "OK" if records else "EMPTY"
+        return self._finish(SQR(source_id=self.SOURCE_ID, status=status,
+                                ok=True,
+                                latency_ms=int((time.time() - t0) * 1000),
+                                records=records, query=query,
+                                retrieved_at=utc_now()),
+                            query, self.build_url(""), raw_sha)
 
     def normalize_payload(self, payload: Any, query: str, raw_sha: str) -> List[SourceRecord]:
         out: List[SourceRecord] = []

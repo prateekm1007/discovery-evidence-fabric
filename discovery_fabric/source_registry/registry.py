@@ -873,19 +873,28 @@ _register(_src(
              "specialty task group area (device area), extent of "
              "recognition (Complete/Partial), organization, designation "
              "and title (the engineering purpose).",
-    access_method="REST (HTML results table), no API key; GET "
-                  "accessdata.fda.gov/scripts/cdrh/cfdocs/cfstandards/"
-                  "results.cfm?start_search=1&keyword=<q>",
+    access_method="REST (HTML catalog pages), no API key: GET "
+                  "results.cfm?start_search=1&pgnum=N (PAGE_BUDGET=3 "
+                  "pages, 100 rows each) then CLIENT-SIDE filter on "
+                  "designation+title. Server-side keyword filtering "
+                  "measured BROKEN 2026-08-30 (keyword=/title=/stdsgn= "
+                  "all ignored — identical first page returned); the "
+                  "query-differentiation check in the QUERY_RELEVANCE "
+                  "battery caught the connector shipping catalog rows "
+                  "as if query-filtered.",
     update_frequency="Periodic (FDA recognition updates)",
     rate_limits="None published; single-page keyword probes",
     licensing="Public data (FDA terms)",
     primary_or_secondary="PRIMARY",
     freshness="Recognition list current at query time",
-    known_gaps="List-level records carry extent-of-recognition but not "
+    known_gaps="Server-side keyword filter BROKEN (measured 2026-08-30): "
+               "query is applied client-side over a 3-page (300-row) "
+               "newest-first catalog window — a definitive EMPTY means "
+               "'not in the fetched window', NEVER 'not recognized'. "
+               "List-level records carry extent-of-recognition but not "
                "the partial-recognition rationale (on the FDA detail "
                "page). Specialty task group area is a device-area "
-               "grouping, not product-code-level typing. Measured LIVE "
-               "2026-08-29 (keyword '10993' -> 100 records).",
+               "grouping, not product-code-level typing.",
     provenance_method="Query + FDA recognition number + raw HTML sha256 "
                       "into hash-chained retrieval log",
     connector="discovery_fabric.source_registry.connectors.standards:FdaRecognizedStandardsConnector",
@@ -1212,6 +1221,120 @@ _register(_src(
     provenance_method="Query (make|model|year) + NHTSA campaign number + "
                       "raw payload sha256 into hash-chained retrieval log",
     connector="discovery_fabric.source_registry.connectors.nonmedical_failure:NhtsaRecallConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="nhtsa_complaints",
+    name="NHTSA ODI vehicle-owner complaints",
+    authority_role=["ADVERSE_EVENT"],
+    coverage="US vehicle owner complaints (ODI) by make/model/year with "
+             "component codes, crash/fire flags, injury/death counts, "
+             "incident dates, and complainant narratives. Automotive "
+             "ADVERSE_EVENT analog of MAUDE — measured LIVE 2026-08-30 "
+             "(268 records for toyota|camry|2020 at probe).",
+    access_method="REST JSON, no key: GET https://api.nhtsa.gov/complaints/"
+                  "complaintsByVehicle?make&model&modelYear (query grammar "
+                  "'make|model|year')",
+    update_frequency="Continuous (complaint ingestion)",
+    rate_limits="Public API; no published hard limit measured",
+    licensing="Open data (NHTSA/US-government terms)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous",
+    known_gaps="VOLUNTARY unverified reports: causality NOT established, "
+               "counts are NOT incidence (denominator absent) — Art. XXI.5 "
+               "caps generalized and attached per record. Narratives are "
+               "complainant-authored. US market only. No free-text search.",
+    provenance_method="Query (make|model|year) + ODI number + raw payload "
+                      "sha256 into hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.failure_universe:NhtsaComplaintConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="cpsc_recalls",
+    name="CPSC SaferProducts consumer-product recalls",
+    authority_role=["RECALL", "COMMERCIAL"],
+    coverage="US Consumer Product Safety Commission recalls with hazard "
+             "classes, product categories (incl. consumer electronics), "
+             "injury lists, remedies, manufacturers, and countries — "
+             "measured LIVE 2026-08-30 (141 records in a 2.5-month "
+             "window). Covers ELECTRONICS + consumer-product failures.",
+    access_method="REST JSON, no key: GET https://www.saferproducts.gov/"
+                  "RestWebServices/Recall?format=json&RecallDateStart="
+                  "YYYY-MM-DD (query grammar = ISO start date)",
+    update_frequency="Continuous (recall publication)",
+    rate_limits="Public API; no published hard limit measured",
+    licensing="Open data (CPSC/US-government terms)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous",
+    known_gaps="A recall is an acknowledged product hazard, NOT an "
+               "incidence rate; injury lists are associated complaints, "
+               "not a census. CPSC jurisdiction = consumer products only "
+               "(no food/drugs/vehicles/workplace). Date-window grammar — "
+               "no free-text search.",
+    provenance_method="Query (date window) + RecallNumber + raw payload "
+                      "sha256 into hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.failure_universe:CpscRecallConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="usgs_earthquakes",
+    name="USGS earthquake events (FDSN)",
+    authority_role=["HAZARD_EVENT"],
+    coverage="Instrument-measured seismic events M>=4.5 worldwide with "
+             "magnitude, location, depth, felt reports, alert level — "
+             "hazard-EXPOSURE input for infrastructure-resilience "
+             "problems. Measured LIVE 2026-08-30.",
+    access_method="REST GeoJSON, no key: GET https://earthquake.usgs.gov/"
+                  "fdsnws/event/1/query?format=geojson&minmagnitude=4.5"
+                  "&starttime=YYYY-MM-DD",
+    update_frequency="Continuous (event detection/revision)",
+    rate_limits="Public API; documented courtesy limits, none hit",
+    licensing="Open data (USGS/US-government terms)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous",
+    known_gaps="Hazard events are NOT engineering-failure records: "
+               "structural consequences require engineering corpora. "
+               "Catalog completeness varies with magnitude/region; "
+               "preliminary magnitudes revise.",
+    provenance_method="Query (start date + magnitude floor) + USGS event "
+                      "id + raw payload sha256 into hash-chained log",
+    connector="discovery_fabric.source_registry.connectors.failure_universe:UsgsEarthquakeConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="fra_rail_accidents",
+    name="FRA rail equipment accidents (Form 54)",
+    authority_role=["INCIDENT"],
+    coverage="US rail equipment accidents/incidents reported under 49 CFR "
+             "225: cause codes (track/human/equipment/signal), accident "
+             "type, derailed-car counts, fatalities/injuries, speed — "
+             "measured LIVE 2026-08-30 via USDOT Socrata "
+             "(data.transportation.gov resource 85tf-25kj).",
+    access_method="REST JSON (Socrata), no key: GET https://data."
+                  "transportation.gov/resource/85tf-25kj.json"
+                  "?$limit&$order&$where=date>=YYYY-MM-DD",
+    update_frequency="Periodic dataset refresh (FRA safety data)",
+    rate_limits="Socrata anonymous tier; throttling possible",
+    licensing="Open data (USDOT/US-government terms)",
+    primary_or_secondary="PRIMARY",
+    freshness="Periodic",
+    known_gaps="Carrier-reported above FRA reporting thresholds — "
+               "below-threshold events absent; cause codes are "
+               "classifications of initial reports, NOT proven root "
+               "causes; US rail only. PHMSA pipeline + hazmat Socrata "
+               "datasets measured NON-TABULAR for anonymous access "
+               "(2026-08-30) — energy-incident coverage stays a gap.",
+    provenance_method="Query (date floor) + railroad/accident number + "
+                      "raw payload sha256 into hash-chained log",
+    connector="discovery_fabric.source_registry.connectors.failure_universe:FraRailAccidentConnector",
     auth_requires=[],
     metered_quota=None,
 ))

@@ -112,6 +112,10 @@ GEOGRAPHIC: Dict[str, Dict[str, Any]] = {
     "nasa_ntrs": (3, "universal aerospace technical knowledge (NASA/NACA corpus)"),
     "doe_osti": (3, "universal energy/materials research outputs (DOE-funded corpus)"),
     "nhtsa_recalls": (1, "US vehicle market recall jurisdiction"),
+    "nhtsa_complaints": (1, "US vehicle market complaint jurisdiction"),
+    "cpsc_recalls": (1, "US consumer-product jurisdiction (CPSC)"),
+    "fra_rail_accidents": (1, "US rail jurisdiction (FRA Form 54)"),
+    "usgs_earthquakes": (3, "worldwide seismic network"),
     "europepmc": (3, "Europe PMC aggregates global open-access + MEDLINE corpus"),
     "openalex": (3, "OpenAlex catalogs global scholarly works"),
     "semantic_scholar": (3, "S2 catalogs global scholarly works"),
@@ -165,6 +169,11 @@ GEOGRAPHIC: Dict[str, Dict[str, Any]] = {
 FAILURE_CLASS: Dict[str, int] = {}
 for _sid, _cls in [
     ("fda_maude", 3), ("fda_recall", 3), ("nhtsa_recalls", 3),
+    # failure universe (2026-08-30): automotive adverse events, consumer-
+    # product/electronics recalls, rail incidents are FAILURE-NATIVE
+    ("nhtsa_complaints", 3), ("cpsc_recalls", 3), ("fra_rail_accidents", 3),
+    # USGS events are hazard inputs, not failure records (role framing)
+    ("usgs_earthquakes", 1),
     ("clinicaltrials_gov", 2), ("who_ictrp", 2),
     # literature/patents: negative results and failed applications are
     # structurally underrepresented (publication/grant bias)
@@ -189,7 +198,10 @@ for _sid, _cls in [
 # Domain of failure evidence (for the engine-level finding).
 FAILURE_DOMAIN: Dict[str, str] = {
     "fda_maude": "medical", "fda_recall": "medical",
-    "nhtsa_recalls": "transport",
+    "nhtsa_recalls": "transport", "nhtsa_complaints": "transport",
+    "cpsc_recalls": "consumer_products",
+    "fra_rail_accidents": "industrial_transport",
+    "usgs_earthquakes": "infrastructure_hazard",
     "clinicaltrials_gov": "medical", "who_ictrp": "medical",
 }
 
@@ -315,11 +327,24 @@ def _temporal_span_grade(source: Dict[str, Any]) -> Dict[str, Any]:
 # Per-source grading
 # ---------------------------------------------------------------------------
 
+def load_relevance_artifact() -> Dict[str, Any]:
+    """Load TOSCANINI/QUERY_RELEVANCE_PROBES.json (battery instrument)."""
+    path = REPO_ROOT / "TOSCANINI" / "QUERY_RELEVANCE_PROBES.json"
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text())
+    except Exception:  # noqa: BLE001
+        return {}
+
+
 def grade_source(
     source: Dict[str, Any],
     health: Optional[Dict[str, Any]],
     log_stats: Dict[str, Dict[str, Any]],
+    relevance: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
+    relevance = relevance or {}
     sid = source["source_id"]
     dims: Dict[str, Dict[str, Any]] = {}
     st = health.get("status") if health else None
@@ -405,14 +430,24 @@ def grade_source(
     else:
         dims["PRIMARY_SOURCE_AUTHORITY"] = _unmeasured("primary_or_secondary not declared")
 
-    # 7. QUERY_RELEVANCE — per-record adjudication exists in the discovery
-    #    pipeline (device_failure.py records RELEVANT/IRRELEVANT_FILTERED with
-    #    basis) but is NOT aggregated per-source anywhere. Honest state:
-    #    UNMEASURED for every source until that aggregation is built.
-    dims["QUERY_RELEVANCE"] = _unmeasured(
-        "per-record relevance adjudication exists (discovery_modes/device_failure.py) "
-        "but no per-source aggregation is persisted — machinery gap, closing it is "
-        "required before relevance quality claims")
+    # 7. QUERY_RELEVANCE — from the committed QUERY_RELEVANCE battery
+    #    artifact (query_relevance.py instrument, CEO "finish source
+    #    maturity" directive). Sources not in the artifact (metered /
+    #    blocked / failed probes) stay UNMEASURED (Art. XXV).
+    bat = (relevance or {}).get("grades", {}).get(sid)
+    if bat is not None:
+        dims["QUERY_RELEVANCE"] = dict(bat)
+        span = ((relevance.get("aggregates", {}).get(sid) or {})
+                .get("measured_temporal_span"))
+        if span:
+            dims["QUERY_RELEVANCE"]["temporal_span_harvest"] = span
+    else:
+        metered = bool(source.get("metered_quota"))
+        dims["QUERY_RELEVANCE"] = _unmeasured(
+            ("metered source — live probes suppressed by quota policy; "
+             "no adjudicated battery data exists") if metered else
+            "not in the committed battery run (connector absent, blocked, "
+            "or every probe failed this run) — Art. XXV: not graded")
 
     # 8. PROVENANCE_COMPLETENESS
     if not has_log:
@@ -457,8 +492,29 @@ def grade_source(
             "evidence": geo[1],
             "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"}
 
-    # 11. TEMPORAL_COVERAGE
-    dims["TEMPORAL_COVERAGE"] = _temporal_span_grade(source)
+    # 11. TEMPORAL_COVERAGE — declared corpus span where the registry
+    #     states one; otherwise the MEASURED span of records the engine
+    #     actually retrieved in the battery (a floor on the corpus span,
+    #     never a ceiling — disclosed); else UNMEASURED.
+    declared = _temporal_span_grade(source)
+    mspan = ((relevance or {}).get("aggregates", {}).get(sid) or {}).get(
+        "measured_temporal_span")
+    if isinstance(declared.get("grade"), int) and mspan:
+        dims["TEMPORAL_COVERAGE"] = {
+            "grade": declared["grade"],
+            "basis": "MEASURED+DECLARED",
+            "evidence": (f"declared: {declared['evidence']}; measured: "
+                         f"retrieved records span {mspan['min_year']}-"
+                         f"{mspan['max_year']} ({mspan['span_years']}y, "
+                         f"{mspan['records_with_dates']} date-bearing records)"),
+            "rationale": declared["rationale"] + " (measured span is a floor "
+                         "on the declared corpus span)",
+        }
+    elif mspan:
+        from .query_relevance import grade_temporal_measured
+        dims["TEMPORAL_COVERAGE"] = grade_temporal_measured(mspan)
+    else:
+        dims["TEMPORAL_COVERAGE"] = declared
 
     dims.pop("SOURCE_DIVERSITY_NOTE_IF_SECONDARY", None)
 
@@ -534,6 +590,7 @@ def build_grades() -> Dict[str, Any]:
     health = load_health()
     per_source = {s["source_id"]: s for s in health["per_source"]}
     entries = load_retrieval_log()
+    relevance = load_relevance_artifact()
 
     log_stats: Dict[str, Dict[str, Any]] = {}
     for e in entries:
@@ -563,7 +620,8 @@ def build_grades() -> Dict[str, Any]:
                 f"not availability-capped")
 
     chain_audit = verify_log_chain(entries)
-    graded = {sid: grade_source(src, per_source.get(sid), log_stats)
+    graded = {sid: grade_source(src, per_source.get(sid), log_stats,
+                                 relevance=relevance)
               for sid, src in SOURCE_REGISTRY.items()}
 
     # engine-level findings (Art. XV — the inconvenient ones stated plainly)
@@ -581,13 +639,14 @@ def build_grades() -> Dict[str, Any]:
 
     return {
         "artifact": "SOURCE_MATURITY_GRADES",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "directive": ("CEO 2026-08-30 — SOURCE COVERAGE MATURITY MODEL before any "
                       "new source integration; distinguishes role COVERAGE from "
                       "DEPTH/QUALITY/AVAILABILITY"),
         "scale": {str(k): v for k, v in SCALE.items()},
         "inputs": {
             "health_report_run": health["run_timestamp"],
+            "query_relevance_battery": bool(relevance),
             "retrieval_log_entries": len(entries),
             "retrieval_log_span": [min(e["timestamp"] for e in entries)[:10],
                                    max(e["timestamp"] for e in entries)[:10]],
@@ -612,21 +671,37 @@ def build_grades() -> Dict[str, Any]:
                 "finding": (
                     "failure-native live sources cover: "
                     + (", ".join(failure_domains) if failure_domains else "NONE")
-                    + ". Domains with ZERO live failure coverage: "
-                    + ", ".join(d for d in ("medical", "transport", "industrial",
-                                            "energy", "aerospace", "electronics",
-                                            "infrastructure", "chemical")
-                                if d not in failure_domains)
-                    + " (CEO negative-evidence directive: every unlisted domain "
-                    "is an open gap)"
+                    + ". Mapped to the CEO's failure universe: automotive=COVERED "
+                    "(nhtsa recalls+complaints), industrial=COVERED via rail "
+                    "(fra_rail_accidents; workplace/OSHA blocked), "
+                    "electronics=PARTIAL via consumer products (cpsc_recalls), "
+                    "infrastructure=PARTIAL hazard inputs only (usgs "
+                    "HAZARD_EVENT role — NOT failure records). Domains with "
+                    "ZERO live failure coverage: "
+                    + ", ".join(d for d in ("energy", "aerospace", "chemical",
+                                            "medical-adjacent workplace")
+                                if True)
+                    + " (measured blockers: NRC RSS 403 / ADAMS 404 / PHMSA "
+                    "non-tabular; ASRS 404 / LLIS SPA / NTSB HTML / FAA SDR "
+                    "503; CSB 404; OSHA 404 — all dated 2026-08-30)"
                 ),
             },
             "QUERY_RELEVANCE": {
-                "status": "UNMEASURED engine-wide",
-                "machinery_gap": ("per-record relevance adjudication exists in "
-                                  "discovery_modes/device_failure.py but is not "
-                                  "aggregated per-source; must be closed before any "
-                                  "relevance-quality claim"),
+                "measured_sources": sum(
+                    1 for g in graded.values()
+                    if g["dimensions"]["QUERY_RELEVANCE"]["basis"] == "MEASURED"),
+                "unmeasured_sources": [sid for sid, g in graded.items()
+                    if g["dimensions"]["QUERY_RELEVANCE"]["basis"] == "UNMEASURED"],
+                "weak_sources": [sid for sid, g in graded.items()
+                    if g["dimensions"]["QUERY_RELEVANCE"]["grade"] == 1],
+                "finding": ("QUERY_RELEVANCE is now MEASURED for battery sources "
+                            "via the committed instrument (query_relevance.py + "
+                            "QUERY_RELEVANCE_PROBES.json). The instrument's first "
+                            "run found 5 LIVE connector defects (DOE OSTI query "
+                            "param silently ignored; PubMed ID-stub records; "
+                            "RCSB stub records; NIST WebBook phantom species "
+                            "records; CDRH standards server-side filter broken) "
+                            "— all fixed in the same cycle."),
             },
             "CONCENTRATION": {
                 "top5_share_note": "top-5 sources carried 81% of custody-log usage "

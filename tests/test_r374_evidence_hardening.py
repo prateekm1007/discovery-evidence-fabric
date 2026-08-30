@@ -508,15 +508,15 @@ class TestPathway:
             real = json.load(f)
         cur = copy.deepcopy(real)
         cur["entries"] = cur["entries"][:-1]  # simulate a deletion
-        pathway.migrate_cemetery(cur)
+        pathway.migrate_cemetery(cur)  # must NOT re-chain (laundering-safe)
         audit = pathway.audit_cemetery(cur, engine_root)
-        # the previous git state has MORE entries than the tampered
-        # current state -> append-only violation
-        assert audit["append_only"]["previous_entry_count"] >= \
-            audit["entry_count"]
-        assert audit["append_only"]["removed_entry_ids"] or \
-            audit["append_only"]["previous_entry_count"] > \
-            audit["entry_count"]
+        # 2026-08-30 STRENGTHENED (Art. XXXI, machinery reference:
+        # pathway._chain_backfill/_chain_verify — internal hash chain):
+        # git-count comparison could not detect deletion of UNCOMMITTED
+        # entries (found live when the 6-domain benchmark legitimately
+        # grew the cemetery between commits); the internal chain detects
+        # ANY deletion regardless of growth or commit state.
+        assert audit["append_only"]["internal_chain"]["valid"] is False
         assert audit["append_only"]["nothing_deleted"] is False
         assert audit["ok"] is False
 

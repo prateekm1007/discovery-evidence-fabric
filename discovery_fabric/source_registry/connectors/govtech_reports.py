@@ -127,14 +127,19 @@ class DoeOstiConnector(ConnectorBase):
     R&D records.
 
     Measured live 2026-08-30 (this session):
-    - https://www.osti.gov/api/v1/records?query=...&rows=N  -> 200 with a
+    - https://www.osti.gov/api/v1/records?q=...&rows=N  -> 200 with a
       top-level JSON ARRAY of records (native v1 shape).
     - api.osti.gov does not resolve from this egress.
-    - QUIRK MEASURED: `format=xml` + %20-encoded query silently returns
-      JSON anyway (Content-Type flip-flops) — so the connector uses the
-      native JSON and asserts the parsed shape, never trusting the
-      Content-Type (retired/masked-endpoint lesson, same class as the
-      PatentsView HTML-200 found the same day).
+    - CRITICAL QUIRK MEASURED 2026-08-30 (found by the QUERY_RELEVANCE
+      battery): the `query=` parameter is SILENTLY IGNORED — completely
+      different queries return byte-identical record sets (lithium
+      battery safety vs concrete pavement -> same 5 records: lignin,
+      superconducting magnets...). The correct parameter is `q=`.
+      Status-OK-plus-irrelevant-records is the Lens-DSL defect class;
+      pinned by test_free_priority_sources.py regression.
+    - `format=xml` + %20-encoded query silently returns JSON anyway
+      (Content-Type flip-flops) — the connector asserts the parsed shape,
+      never trusting the Content-Type.
     """
 
     SOURCE_ID = "doe_osti"
@@ -144,7 +149,7 @@ class DoeOstiConnector(ConnectorBase):
 
     def build_url(self, query: str) -> str:
         q = urllib.parse.quote(query)
-        return (f"https://www.osti.gov/api/v1/records?query={q}"
+        return (f"https://www.osti.gov/api/v1/records?q={q}"
                 f"&rows={self.LIMIT}")
 
     def parse_payload(self, raw: bytes, query: str) -> Any:

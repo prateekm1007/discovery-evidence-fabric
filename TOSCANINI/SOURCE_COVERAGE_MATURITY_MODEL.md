@@ -1,6 +1,6 @@
 # SOURCE COVERAGE MATURITY MODEL — Toscanini
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Directive:** CEO 2026-08-30 — "First create a SOURCE COVERAGE MATURITY MODEL … Every source must be graded across those dimensions."
 **Status:** RATIFIED INSTRUMENT (grades regenerate mechanically via `python3 -m discovery_fabric.source_registry.maturity`)
 **Machine output:** `TOSCANINI/SOURCE_MATURITY_GRADES.json`
@@ -38,11 +38,11 @@ temporal span, relevance quality).
 | 4 | `RECORD_VOLUME` | OK records in the hash-chained custody log | MEASURED |
 | 5 | `FRESHNESS` | min(provider-declared cadence, pipeline last-success date) | MEASURED+DECLARED |
 | 6 | `PRIMARY_SOURCE_AUTHORITY` | PRIMARY (issuer) / SECONDARY (repackager) | DECLARED |
-| 7 | `QUERY_RELEVANCE` | Per-source relevance-adjudication quality | **UNMEASURED engine-wide (honest)** |
+| 7 | `QUERY_RELEVANCE` | Per-source relevance-adjudication quality via the committed battery (`query_relevance.py` -> `QUERY_RELEVANCE_PROBES.json`); query-differentiation check flags silently-ignored query params | MEASURED (battery sources) |
 | 8 | `PROVENANCE_COMPLETENESS` | Custody fields (entry hash, payload hash, chain link) present on logged retrievals | MEASURED |
 | 9 | `FAILURE_NEGATIVE_EVIDENCE_COVERAGE` | Failure-native / attempt-outcomes / mixed-undersampled / not-a-failure-source | DECLARED |
 | 10 | `GEOGRAPHIC_COVERAGE` | Corpus reach: global / multi-region / single jurisdiction | DECLARED |
-| 11 | `TEMPORAL_COVERAGE` | Declared historical span of the corpus | DECLARED |
+| 11 | `TEMPORAL_COVERAGE` | Declared corpus span; where undeclared, the MEASURED span of records the engine actually retrieved (battery date harvest — a floor, never a ceiling) | MEASURED / DECLARED |
 
 ### Scale
 
@@ -235,3 +235,41 @@ unmeasured relevance quality, and degraded/overlapping scientific breadth.
 - **Art. XV** — engine findings state the negative results verbatim.
 - **Art. XII/XVI** — the custody chain is recomputed as part of grading
   (969/969 links verified), not assumed.
+
+
+---
+
+## Appendix (v1.1.0) — the two dimensions that became MEASURED
+
+**QUERY_RELEVANCE** closed the machinery gap via a committed battery
+instrument (`discovery_fabric/source_registry/query_relevance.py`,
+reproduction: `python3 scripts/toscanini_query_relevance_probe.py`):
+
+- 2 fixed, grammar-honoring queries per source (one in-domain baseline,
+  one cross-domain generality probe)
+- every returned record adjudicated RELEVANT/IRRELEVANT with a
+  transparent basis (term overlap with declared threshold; STRUCTURAL
+  notes for parameterized grammars)
+- QUERY_DIFFERENTIATION check: different queries returning identical
+  record-id sets => QUERY_POSSIBLY_IGNORED (hypothesis flag)
+
+The battery's first run FOUND FIVE LIVE CONNECTOR DEFECTS (all fixed in
+the same cycle, all in the status-OK-plus-irrelevant-records class):
+
+1. DOE OSTI: `query=` parameter silently ignored (correct: `q=`) —
+   different queries returned byte-identical record sets
+2. PubMed: records shipped as ID stubs (no titles/dates/abstracts) —
+   now chains esummary + efetch
+3. RCSB PDB: records shipped as id+score stubs — now chains
+   data.rcsb.org structure titles
+4. NIST WebBook: section anchors misparsed as phantom species records
+5. CDRH recognized-standards: server-side keyword filter broken (all
+   filter params ignored) — connector now client-side filters a
+   disclosed 3-page catalog window
+
+**TEMPORAL_COVERAGE** harvests date-bearing fields from the same battery
+records; 24 sources carry MEASURED spans (e.g. crossref 1968-2026, nhtsa
+complaints 1969-2026), others stay honestly UNMEASURED.
+
+Scale bands, basis discipline, and band rationale are unchanged from
+v1.0.0; only measurement coverage changed.

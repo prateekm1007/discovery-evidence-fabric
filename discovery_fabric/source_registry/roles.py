@@ -70,6 +70,19 @@ ROLE_DEFINITIONS = {
         "Procurement, company, and product-reality data. Authoritative for: "
         "what is actually marketed, by whom, at what price point."
     ),
+    "INCIDENT": (
+        "Cause-coded accident/incident regulatory reports outside "
+        "healthcare (rail Form 54, transport, industrial). Authoritative "
+        "for: what failed in service, under which cause classification, "
+        "with which severity. Cause codes are classifications of the "
+        "initial report, NOT proven root causes (Art. XXI.5-analog)."
+    ),
+    "HAZARD_EVENT": (
+        "Instrument-measured natural-hazard events (seismic, etc.). "
+        "Authoritative for: hazard EXPOSURE inputs to infrastructure/"
+        "resilience problems. A hazard event is NOT an engineering-"
+        "failure record; consequences require engineering corpora."
+    ),
 }
 
 # Roles the CEO coverage matrix reports on (directive-specified order).
@@ -77,6 +90,7 @@ COVERAGE_MATRIX_ROLES = [
     "SCIENTIFIC", "PATENT", "REGULATORY", "DEVICE_IDENTITY",
     "ADVERSE_EVENT", "RECALL", "CLINICAL", "MATERIALS",
     "MANUFACTURING", "STANDARDS", "CHEMISTRY", "BIOLOGY", "COMMERCIAL",
+    "INCIDENT", "HAZARD_EVENT",
 ]
 
 VALID_ROLES = set(ROLE_DEFINITIONS)

@@ -120,16 +120,25 @@ ECFR_SECTION_XML = (
 
 class TestFdaRecognizedStandards:
     def test_results_table_parses_to_records(self):
+        # 2026-08-30 contract change: server-side keyword filter measured
+        # BROKEN; the connector now client-side filters a page window.
+        # Query '10993' -> only the ISO 10993-14 row survives the filter
+        # (the old assertion len==2 pinned the unfiltered-catalog defect).
         c = _wire(FdaRecognizedStandardsConnector(), FDA_HTML)
         res = c.search("10993")
         assert res.status == STATUS_OK
-        assert len(res.records) == 2
+        assert len(res.records) == 1
+        assert res.records[0].record_id == "fda_std:rec:2-248"
+        assert any("client-side" in x for x in res.records[0].limitations)
+        # an empty query returns the whole window
+        res_all = c.search("")
+        assert res_all.status == STATUS_OK
+        assert len(res_all.records) == 2
         r0 = res.records[0]
-        assert r0.record_id == "fda_std:rec:1-183"
-        assert r0.normalized["specialty_task_group_area"] == "Anesthesiology"
+        assert r0.normalized["specialty_task_group_area"] == "Biocompatibility"
         assert r0.normalized["extent_of_recognition"] == "Complete"
-        assert r0.normalized["standard_identification_no"] == "45631"
-        assert r0.uri.endswith("standard__identification_no=45631")
+        assert r0.normalized["standard_identification_no"] == "45000"
+        assert r0.uri.endswith("standard__identification_no=45000")
 
     def test_header_row_is_skipped_not_a_record(self):
         c = _wire(FdaRecognizedStandardsConnector(), FDA_HTML_HEADER_ONLY)

@@ -271,19 +271,59 @@ class RcsbPdbConnector(ConnectorBase):
     def parse_payload(self, raw: bytes, query: str) -> Any:
         return json.loads(raw.decode("utf-8"))
 
+    def fetch_entry_summaries(self, ids):
+        """data.rcsb.org pass: structure titles for the id list.
+
+        DEFECT FIXED 2026-08-30 (found live by the QUERY_RELEVANCE
+        battery): records previously shipped as stubs titled 'PDB entry
+        1BOM (score 1.0)' — identifiers with scores, no structure names;
+        unusable as evidence downstream and unadjudicable for relevance
+        (0/10 on 'insulin' although the entries ARE insulin structures).
+        The search API returns ids+scores only; titles require one
+        data.rcsb.org call per entry (free; LIMIT=5 keeps this at 5
+        requests). Failure degrades to the stub AND is disclosed on the
+        record — never swallowed.
+        """
+        out = {}
+        for ident in ids:
+            try:
+                url = f"https://data.rcsb.org/rest/v1/core/entry/{ident}"
+                req = urllib.request.Request(
+                    url, headers={"User-Agent": USER_AGENT,
+                                  "Accept": "application/json"})
+                resp = urllib.request.urlopen(req, timeout=15,
+                                              context=SSL_CONTEXT)
+                data = json.loads(resp.read().decode("utf-8"))
+                out[ident] = {
+                    "title": ((data.get("struct") or {}).get("title")),
+                    "deposition_date": (data.get("rcsb_accession_info") or {}).get(
+                        "deposit_date"),
+                    "experimental_method": ((data.get("exptl") or [{}])[0] or {}).get(
+                        "method"),
+                }
+            except Exception:  # noqa: BLE001 — per-entry degradation, disclosed
+                continue
+        return out
+
     def normalize_payload(self, payload: Any, query: str, raw_sha: str) -> List[SourceRecord]:
         result_set = (payload or {}).get("result_set")
         if not isinstance(result_set, list):
             raise ValueError("rcsb payload missing result_set list")
+        idents = [r.get("identifier") or "" for r in result_set]
+        summaries = self.fetch_entry_summaries(idents)
         out = []
         for r in result_set:
             ident = r.get("identifier") or ""
             score = r.get("score")
+            s = summaries.get(ident) or {}
+            title = (s.get("title") or "").strip()
+            if not title:
+                title = f"PDB entry {ident} (score {score})"
             out.append(SourceRecord(
                 source_id=self.SOURCE_ID,
                 role="BIOLOGY",
                 record_id=f"pdb:{ident}",
-                title=f"PDB entry {ident} (score {score})",
+                title=title,
                 uri=f"https://www.rcsb.org/structure/{ident}",
                 retrieved_at=utc_now(),
                 query=query,
@@ -291,6 +331,10 @@ class RcsbPdbConnector(ConnectorBase):
                 normalized={
                     "pdb_id": ident,
                     "search_score": score,
+                    "structure_title": s.get("title"),
+                    "deposition_date": s.get("deposition_date"),
+                    "experimental_method": s.get("experimental_method"),
+                    "summary_fetched": bool(s),
                 },
                 provenance={
                     "provider": self.SOURCE_ID,

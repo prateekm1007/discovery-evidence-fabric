@@ -176,15 +176,22 @@ class NistWebbookConnector(ConnectorBase):
         mw_m = re.search(r"Molecular weight[^\d]*([\d.]+)", html)
         sections = [s for s in self._SECTION_LABELS if s in html]
 
-        # multi-match 'Search Results' page: species rows
+        # multi-match 'Search Results' page: species rows.
+        # DEFECT FIXED 2026-08-30 (found live by the QUERY_RELEVANCE
+        # battery): on single-species pages the same anchor regex also
+        # caught SECTION anchors ('Gas phase thermochemistry data') and
+        # emitted them as phantom 'species' records — off-title noise that
+        # scored 0% relevance. Species links are only meaningful on the
+        # multi-match Search Results page; other pages emit none.
         species: List[Dict[str, Any]] = []
-        for _href, cas_digits, name in re.findall(
-                r'href="(/cgi/cbook\.cgi\?ID=C(\d{2,9})[^"]*)"[^>]*>(.*?)</a>',
-                html):
-            label = re.sub(r"<[^>]+>", " ", name)
-            label = re.sub(r"\s+", " ", label).strip()
-            if label:
-                species.append({"cas_number": cas_digits, "name": label})
+        if "Search Results" in html:
+            for _href, cas_digits, name in re.findall(
+                    r'href="(/cgi/cbook\.cgi\?ID=C(\d{2,9})[^"]*)"[^>]*>(.*?)</a>',
+                    html):
+                label = re.sub(r"<[^>]+>", " ", name)
+                label = re.sub(r"\s+", " ", label).strip()
+                if label and "data" not in label.lower():
+                    species.append({"cas_number": cas_digits, "name": label})
         return {
             "title": title,
             "cas_id": (cas_m.group(1) if cas_m else None),

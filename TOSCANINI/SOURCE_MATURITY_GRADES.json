@@ -1,6 +1,6 @@
 {
  "artifact": "SOURCE_MATURITY_GRADES",
- "version": "1.0.0",
+ "version": "1.1.0",
  "directive": "CEO 2026-08-30 — SOURCE COVERAGE MATURITY MODEL before any new source integration; distinguishes role COVERAGE from DEPTH/QUALITY/AVAILABILITY",
  "scale": {
   "0": "ABSENT_OR_BLOCKED",
@@ -10,16 +10,17 @@
   "UNMEASURED": "EXPLICIT_UNKNOWN_ART_XXV"
  },
  "inputs": {
-  "health_report_run": "2026-08-30T10:35:09.328645+00:00",
-  "retrieval_log_entries": 1074,
+  "health_report_run": "2026-08-30T11:36:27.001688+00:00",
+  "query_relevance_battery": true,
+  "retrieval_log_entries": 1277,
   "retrieval_log_span": [
    "2026-08-29",
    "2026-08-30"
   ],
-  "registry_sources": 45,
+  "registry_sources": 49,
   "custody_chain_audit": {
-   "entries": 1074,
-   "recomputed_ok": 1074,
+   "entries": 1277,
+   "recomputed_ok": 1277,
    "bad_links": [],
    "chain_intact": true
   }
@@ -37,7 +38,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 5290 custody-log records",
+     "evidence": "LIVE chain 7/7 with 5890 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -55,7 +56,7 @@
     "RECORD_VOLUME": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "5290 OK records across 83 logged retrievals",
+     "evidence": "5890 OK records across 89 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -71,15 +72,15 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "200/200 battery records adjudicated relevant (rate 100%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "82/83 entries with hash+payload provenance fields (98.8%); 61 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "88/89 entries with hash+payload provenance fields (98.9%); 67 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -101,9 +102,9 @@
      "rationale": "declared span ~50y (>=40=3, >=20=2, else 1)"
     }
    },
-   "numeric_grade_count": 10,
-   "unmeasured_count": 1,
-   "depth_mean": 2.7
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.73
   },
   "fda_recall": {
    "source_id": "fda_recall",
@@ -116,7 +117,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 875 custody-log records",
+     "evidence": "LIVE chain 7/7 with 953 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -134,7 +135,7 @@
     "RECORD_VOLUME": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "875 OK records across 88 logged retrievals",
+     "evidence": "953 OK records across 92 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -150,15 +151,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "26/28 battery records adjudicated relevant (rate 93%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2004,
+      "max_year": 2025,
+      "span_years": 21,
+      "records_with_dates": 75
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "88/88 entries with hash+payload provenance fields (100.0%); 51 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "92/92 entries with hash+payload provenance fields (100.0%); 55 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -174,15 +181,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2004-2025 (21y across 75 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.78
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.73
   },
   "fda_510k": {
    "source_id": "fda_510k",
@@ -195,7 +202,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 375 custody-log records",
+     "evidence": "LIVE chain 7/7 with 425 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -213,7 +220,7 @@
     "RECORD_VOLUME": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "375 OK records across 15 logged retrievals",
+     "evidence": "425 OK records across 18 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -229,15 +236,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "25/25 battery records adjudicated relevant (rate 100%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 1980,
+      "max_year": 2013,
+      "span_years": 33,
+      "records_with_dates": 50
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "15/15 entries with hash+payload provenance fields (100.0%); 15 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "18/18 entries with hash+payload provenance fields (100.0%); 17 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -253,15 +266,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 1980-2013 (33y across 50 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.33
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.36
   },
   "fda_pma": {
    "source_id": "fda_pma",
@@ -274,7 +287,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 225 custody-log records",
+     "evidence": "LIVE chain 7/7 with 400 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -292,7 +305,7 @@
     "RECORD_VOLUME": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "225 OK records across 9 logged retrievals",
+     "evidence": "400 OK records across 16 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -308,15 +321,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "50/50 battery records adjudicated relevant (rate 100%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 1994,
+      "max_year": 2025,
+      "span_years": 31,
+      "records_with_dates": 100
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "9/9 entries with hash+payload provenance fields (100.0%); 9 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "16/16 entries with hash+payload provenance fields (100.0%); 16 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -332,15 +351,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 1994-2025 (31y across 100 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.33
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.36
   },
   "fda_udi": {
    "source_id": "fda_udi",
@@ -353,7 +372,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 325 custody-log records",
+     "evidence": "LIVE chain 7/7 with 400 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -371,7 +390,7 @@
     "RECORD_VOLUME": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "325 OK records across 13 logged retrievals",
+     "evidence": "400 OK records across 16 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -387,15 +406,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "50/50 battery records adjudicated relevant (rate 100%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2015,
+      "max_year": 2025,
+      "span_years": 10,
+      "records_with_dates": 50
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "13/13 entries with hash+payload provenance fields (100.0%); 13 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "16/16 entries with hash+payload provenance fields (100.0%); 16 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -411,15 +436,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2015-2025 (10y across 50 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.33
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.27
   },
   "fda_registrationlisting": {
    "source_id": "fda_registrationlisting",
@@ -432,7 +457,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 45 custody-log records",
+     "evidence": "LIVE chain 7/7 with 70 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -450,7 +475,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "45 OK records across 10 logged retrievals",
+     "evidence": "70 OK records across 15 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -466,15 +491,15 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "10/10 battery records adjudicated relevant (rate 100%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "10/10 entries with hash+payload provenance fields (100.0%); 9 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "15/15 entries with hash+payload provenance fields (100.0%); 14 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -496,9 +521,9 @@
      "rationale": "Art. XXV: unknown stays unknown"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.11
+   "numeric_grade_count": 10,
+   "unmeasured_count": 1,
+   "depth_mean": 2.2
   },
   "fda_classification": {
    "source_id": "fda_classification",
@@ -511,7 +536,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 225 custody-log records",
+     "evidence": "LIVE chain 7/7 with 253 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -529,7 +554,7 @@
     "RECORD_VOLUME": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "225 OK records across 9 logged retrievals",
+     "evidence": "253 OK records across 12 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -545,15 +570,15 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "3/3 battery records adjudicated relevant (rate 100%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "9/9 entries with hash+payload provenance fields (100.0%); 9 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "12/12 entries with hash+payload provenance fields (100.0%); 11 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -575,9 +600,9 @@
      "rationale": "Art. XXV: unknown stays unknown"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.22
+   "numeric_grade_count": 10,
+   "unmeasured_count": 1,
+   "depth_mean": 2.3
   },
   "fda_denovo": {
    "source_id": "fda_denovo",
@@ -626,7 +651,7 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "evidence": "not in the committed battery run (connector absent, blocked, or every probe failed this run) — Art. XXV: not graded",
      "rationale": "Art. XXV: unknown stays unknown"
     },
     "PROVENANCE_COMPLETENESS": {
@@ -669,7 +694,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 130 custody-log records",
+     "evidence": "LIVE chain 7/7 with 190 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -687,7 +712,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "130 OK records across 13 logged retrievals",
+     "evidence": "190 OK records across 19 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -703,15 +728,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "9/20 battery records adjudicated relevant (rate 45%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2006,
+      "max_year": 2029,
+      "span_years": 23,
+      "records_with_dates": 60
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "13/13 entries with hash+payload provenance fields (100.0%); 13 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "19/19 entries with hash+payload provenance fields (100.0%); 19 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -727,15 +758,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2006-2029 (23y across 60 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.56
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.45
   },
   "who_ictrp": {
    "source_id": "who_ictrp",
@@ -784,7 +815,7 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "evidence": "not in the committed battery run (connector absent, blocked, or every probe failed this run) — Art. XXV: not graded",
      "rationale": "Art. XXV: unknown stays unknown"
     },
     "PROVENANCE_COMPLETENESS": {
@@ -827,7 +858,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 3630 custody-log records",
+     "evidence": "LIVE chain 7/7 with 3730 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -845,7 +876,7 @@
     "RECORD_VOLUME": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "3630 OK records across 368 logged retrievals",
+     "evidence": "3730 OK records across 378 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -861,15 +892,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "20/20 battery records adjudicated relevant (rate 100%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2023,
+      "max_year": 2026,
+      "span_years": 3,
+      "records_with_dates": 20
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "364/368 entries with hash+payload provenance fields (98.9%); 363 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "374/378 entries with hash+payload provenance fields (98.9%); 373 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -885,15 +922,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2023-2026 (3y across 20 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.56
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.45
   },
   "pubmed": {
    "source_id": "pubmed",
@@ -906,7 +943,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 45 custody-log records",
+     "evidence": "LIVE chain 7/7 with 95 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -924,7 +961,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "45 OK records across 9 logged retrievals",
+     "evidence": "95 OK records across 19 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -940,15 +977,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "10/10 battery records adjudicated relevant (rate 100%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2026,
+      "max_year": 2026,
+      "span_years": 0,
+      "records_with_dates": 10
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "9/9 entries with hash+payload provenance fields (100.0%); 9 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "19/19 entries with hash+payload provenance fields (100.0%); 19 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -964,15 +1007,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2026-2026 (0y across 10 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.56
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.45
   },
   "openalex": {
    "source_id": "openalex",
@@ -1003,7 +1046,7 @@
     "RECORD_VOLUME": {
      "grade": 0,
      "basis": "MEASURED",
-     "evidence": "0 OK records across 28 logged retrievals",
+     "evidence": "0 OK records across 34 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -1021,13 +1064,13 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "evidence": "no battery query returned records this run (failed / empty / blocked) — Art. XXV: not graded",
+     "rationale": "relevance quality is not inferable from provider failure or definitive empties"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "15/28 entries with hash+payload provenance fields (53.6%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "evidence": "17/34 entries with hash+payload provenance fields (50.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -1064,7 +1107,7 @@
     "ROLE_COVERAGE": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "DEGRADED (RATE_LIMITED)",
+     "evidence": "DEGRADED (OK)",
      "rationale": "provider answers restricted; unusable in campaigns today"
     },
     "SOURCE_DIVERSITY": {
@@ -1082,7 +1125,7 @@
     "RECORD_VOLUME": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "5 OK records across 9 logged retrievals",
+     "evidence": "10 OK records across 12 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -1100,13 +1143,13 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "evidence": "no battery query returned records this run (failed / empty / blocked) — Art. XXV: not graded",
+     "rationale": "relevance quality is not inferable from provider failure or definitive empties"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "3/9 entries with hash+payload provenance fields (33.3%); 1 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "evidence": "4/12 entries with hash+payload provenance fields (33.3%); 2 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -1143,7 +1186,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 40 custody-log records",
+     "evidence": "LIVE chain 7/7 with 65 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -1161,7 +1204,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "40 OK records across 8 logged retrievals",
+     "evidence": "65 OK records across 13 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -1177,15 +1220,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "10/10 battery records adjudicated relevant (rate 100%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 1968,
+      "max_year": 2026,
+      "span_years": 58,
+      "records_with_dates": 6
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "8/8 entries with hash+payload provenance fields (100.0%); 8 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "13/13 entries with hash+payload provenance fields (100.0%); 13 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -1201,15 +1250,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 1968-2026 (58y across 6 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.56
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.64
   },
   "elsevier_scopus": {
    "source_id": "elsevier_scopus",
@@ -1222,7 +1271,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 25 custody-log records",
+     "evidence": "LIVE chain 7/7 with 50 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -1240,7 +1289,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "25 OK records across 5 logged retrievals",
+     "evidence": "50 OK records across 10 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -1256,15 +1305,21 @@
      "rationale": "derived/repackaged view of primary issuers"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "6/10 battery records adjudicated relevant (rate 60%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2026,
+      "max_year": 2027,
+      "span_years": 1,
+      "records_with_dates": 10
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "5/5 entries with hash+payload provenance fields (100.0%); 5 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "10/10 entries with hash+payload provenance fields (100.0%); 10 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -1280,15 +1335,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2026-2027 (1y across 10 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.33
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.18
   },
   "google_patents": {
    "source_id": "google_patents",
@@ -1296,13 +1351,13 @@
    "authority_role": [
     "PATENT"
    ],
-   "health_status": "LIVE",
+   "health_status": "UNAVAILABLE",
    "dimensions": {
     "ROLE_COVERAGE": {
-     "grade": 3,
+     "grade": 0,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 150 custody-log records",
-     "rationale": "role exercised with real retrievable evidence"
+     "evidence": "UNAVAILABLE: connector_exists=True",
+     "rationale": "no usable retrieval path measured"
     },
     "SOURCE_DIVERSITY": {
      "grade": 1,
@@ -1311,15 +1366,15 @@
      "rationale": "repackages upstream corpora already reachable via primaries"
     },
     "LIVE_AVAILABILITY": {
-     "grade": 3,
+     "grade": 0,
      "basis": "MEASURED",
-     "evidence": "LIVE",
-     "rationale": "from measured 7-step health chain"
+     "evidence": "UNAVAILABLE",
+     "rationale": "DEGRADED=1 because rate/budget-limited sources cannot support campaign runs"
     },
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "150 OK records across 98 logged retrievals",
+     "evidence": "150 OK records across 101 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -1337,13 +1392,13 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "evidence": "no battery query returned records this run (failed / empty / blocked) — Art. XXV: not graded",
+     "rationale": "relevance quality is not inferable from provider failure or definitive empties"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "15/98 entries with hash+payload provenance fields (15.3%); 15 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "15/101 entries with hash+payload provenance fields (14.9%); 15 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -1367,7 +1422,7 @@
    },
    "numeric_grade_count": 9,
    "unmeasured_count": 2,
-   "depth_mean": 2.11
+   "depth_mean": 1.44
   },
   "lens_scholarly": {
    "source_id": "lens_scholarly",
@@ -1380,7 +1435,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 30 custody-log records",
+     "evidence": "LIVE chain 7/7 with 45 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -1398,7 +1453,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "30 OK records across 10 logged retrievals",
+     "evidence": "45 OK records across 13 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -1414,15 +1469,21 @@
      "rationale": "derived/repackaged view of primary issuers"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "10/10 battery records adjudicated relevant (rate 100%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2026,
+      "max_year": 2026,
+      "span_years": 0,
+      "records_with_dates": 10
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "6/10 entries with hash+payload provenance fields (60.0%); 6 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "9/13 entries with hash+payload provenance fields (69.2%); 9 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -1438,15 +1499,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2026-2026 (0y across 10 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.11
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.09
   },
   "lens_patent": {
    "source_id": "lens_patent",
@@ -1459,7 +1520,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 395 custody-log records",
+     "evidence": "LIVE chain 7/7 with 410 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -1477,7 +1538,7 @@
     "RECORD_VOLUME": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "395 OK records across 157 logged retrievals",
+     "evidence": "410 OK records across 160 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -1493,15 +1554,21 @@
      "rationale": "derived/repackaged view of primary issuers"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "9/10 battery records adjudicated relevant (rate 90%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2019,
+      "max_year": 2026,
+      "span_years": 7,
+      "records_with_dates": 10
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "81/157 entries with hash+payload provenance fields (51.6%); 81 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "84/160 entries with hash+payload provenance fields (52.5%); 84 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -1517,15 +1584,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2019-2026 (7y across 10 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.22
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.18
   },
   "patentbear": {
    "source_id": "patentbear",
@@ -1556,7 +1623,7 @@
     "RECORD_VOLUME": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "5 OK records across 7 logged retrievals",
+     "evidence": "5 OK records across 8 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)",
      "note": "metered source: {'monthly_limit': 20, 'metered_by': 'provider usage block (monthly_limit/monthly_used/monthly_remaining) returned in every response', 'health_policy': 'no-live-probe; LIVE is derived from the freshest live retrieval-log proof inside the metered window', 'metered_window_days': 31, 'prohibited_tools': ['run_lab (bills credits; never called by this engine)', 'get_lab_result (only after a run_lab, hence never called)']} — volume is policy-capped, not availability-capped"
     },
@@ -1575,13 +1642,13 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "evidence": "metered source — live probes suppressed by quota policy; no adjudicated battery data exists",
      "rationale": "Art. XXV: unknown stays unknown"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "1/7 entries with hash+payload provenance fields (14.3%); 1 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "1/8 entries with hash+payload provenance fields (12.5%); 1 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -1636,7 +1703,7 @@
     "RECORD_VOLUME": {
      "grade": 0,
      "basis": "MEASURED",
-     "evidence": "0 OK records across 8 logged retrievals",
+     "evidence": "0 OK records across 11 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -1654,13 +1721,13 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "evidence": "no battery query returned records this run (failed / empty / blocked) — Art. XXV: not graded",
+     "rationale": "relevance quality is not inferable from provider failure or definitive empties"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "0/8 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "evidence": "0/11 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -1715,7 +1782,7 @@
     "RECORD_VOLUME": {
      "grade": 0,
      "basis": "MEASURED",
-     "evidence": "0 OK records across 8 logged retrievals",
+     "evidence": "0 OK records across 9 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -1733,13 +1800,13 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "evidence": "not in the committed battery run (connector absent, blocked, or every probe failed this run) — Art. XXV: not graded",
      "rationale": "Art. XXV: unknown stays unknown"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "0/8 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "evidence": "0/9 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -1794,7 +1861,7 @@
     "RECORD_VOLUME": {
      "grade": 0,
      "basis": "MEASURED",
-     "evidence": "0 OK records across 7 logged retrievals",
+     "evidence": "0 OK records across 8 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -1812,13 +1879,13 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "evidence": "not in the committed battery run (connector absent, blocked, or every probe failed this run) — Art. XXV: not graded",
      "rationale": "Art. XXV: unknown stays unknown"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "0/7 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "evidence": "0/8 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -1891,7 +1958,7 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "evidence": "not in the committed battery run (connector absent, blocked, or every probe failed this run) — Art. XXV: not graded",
      "rationale": "Art. XXV: unknown stays unknown"
     },
     "PROVENANCE_COMPLETENESS": {
@@ -1952,7 +2019,7 @@
     "RECORD_VOLUME": {
      "grade": 0,
      "basis": "MEASURED",
-     "evidence": "0 OK records across 7 logged retrievals",
+     "evidence": "0 OK records across 8 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -1970,13 +2037,13 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "evidence": "not in the committed battery run (connector absent, blocked, or every probe failed this run) — Art. XXV: not graded",
      "rationale": "Art. XXV: unknown stays unknown"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "0/7 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "evidence": "0/8 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -2013,7 +2080,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 6 custody-log records",
+     "evidence": "LIVE chain 7/7 with 11 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -2031,7 +2098,7 @@
     "RECORD_VOLUME": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "6 OK records across 7 logged retrievals",
+     "evidence": "11 OK records across 12 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -2047,15 +2114,15 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "2/2 battery records adjudicated relevant (rate 100%); query_differentiation=NOT_EVALUABLE",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "7/7 entries with hash+payload provenance fields (100.0%); 6 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "12/12 entries with hash+payload provenance fields (100.0%); 11 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -2077,9 +2144,9 @@
      "rationale": "Art. XXV: unknown stays unknown"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.44
+   "numeric_grade_count": 10,
+   "unmeasured_count": 1,
+   "depth_mean": 2.5
   },
   "uniprot": {
    "source_id": "uniprot",
@@ -2092,7 +2159,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 35 custody-log records",
+     "evidence": "LIVE chain 7/7 with 60 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -2110,7 +2177,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "35 OK records across 7 logged retrievals",
+     "evidence": "60 OK records across 12 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -2126,15 +2193,15 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "10/10 battery records adjudicated relevant (rate 100%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "7/7 entries with hash+payload provenance fields (100.0%); 7 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "12/12 entries with hash+payload provenance fields (100.0%); 12 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -2156,9 +2223,9 @@
      "rationale": "Art. XXV: unknown stays unknown"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.56
+   "numeric_grade_count": 10,
+   "unmeasured_count": 1,
+   "depth_mean": 2.6
   },
   "chembl": {
    "source_id": "chembl",
@@ -2171,7 +2238,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 7 custody-log records",
+     "evidence": "LIVE chain 7/7 with 12 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -2189,7 +2256,7 @@
     "RECORD_VOLUME": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "7 OK records across 7 logged retrievals",
+     "evidence": "12 OK records across 12 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -2205,15 +2272,15 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "2/2 battery records adjudicated relevant (rate 100%); query_differentiation=NOT_EVALUABLE",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "7/7 entries with hash+payload provenance fields (100.0%); 7 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "12/12 entries with hash+payload provenance fields (100.0%); 12 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -2235,9 +2302,9 @@
      "rationale": "Art. XXV: unknown stays unknown"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.33
+   "numeric_grade_count": 10,
+   "unmeasured_count": 1,
+   "depth_mean": 2.4
   },
   "rcsb_pdb": {
    "source_id": "rcsb_pdb",
@@ -2250,7 +2317,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 35 custody-log records",
+     "evidence": "LIVE chain 7/7 with 70 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -2268,7 +2335,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "35 OK records across 7 logged retrievals",
+     "evidence": "70 OK records across 14 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -2284,15 +2351,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "8/10 battery records adjudicated relevant (rate 80%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 1994,
+      "max_year": 2024,
+      "span_years": 30,
+      "records_with_dates": 10
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "7/7 entries with hash+payload provenance fields (100.0%); 7 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "14/14 entries with hash+payload provenance fields (100.0%); 14 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -2308,15 +2381,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 1994-2024 (30y across 10 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.56
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.55
   },
   "cod_optimade": {
    "source_id": "cod_optimade",
@@ -2329,7 +2402,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 45 custody-log records",
+     "evidence": "LIVE chain 7/7 with 68 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -2347,7 +2420,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "45 OK records across 9 logged retrievals",
+     "evidence": "68 OK records across 14 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -2363,15 +2436,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "9/9 battery records adjudicated relevant (rate 100%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 1918,
+      "max_year": 2010,
+      "span_years": 92,
+      "records_with_dates": 9
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "9/9 entries with hash+payload provenance fields (100.0%); 9 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "14/14 entries with hash+payload provenance fields (100.0%); 14 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -2387,15 +2466,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 1918-2010 (92y across 9 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.56
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.64
   },
   "nist_webbook": {
    "source_id": "nist_webbook",
@@ -2408,7 +2487,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 30 custody-log records",
+     "evidence": "LIVE chain 7/7 with 46 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -2426,7 +2505,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "30 OK records across 6 logged retrievals",
+     "evidence": "46 OK records across 11 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -2442,15 +2521,15 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "2/2 battery records adjudicated relevant (rate 100%); query_differentiation=NOT_EVALUABLE",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "6/6 entries with hash+payload provenance fields (100.0%); 5 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "11/11 entries with hash+payload provenance fields (100.0%); 10 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -2472,9 +2551,9 @@
      "rationale": "Art. XXV: unknown stays unknown"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.44
+   "numeric_grade_count": 10,
+   "unmeasured_count": 1,
+   "depth_mean": 2.5
   },
   "materials_project": {
    "source_id": "materials_project",
@@ -2505,7 +2584,7 @@
     "RECORD_VOLUME": {
      "grade": 0,
      "basis": "MEASURED",
-     "evidence": "0 OK records across 5 logged retrievals",
+     "evidence": "0 OK records across 8 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -2523,13 +2602,13 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "evidence": "no battery query returned records this run (failed / empty / blocked) — Art. XXV: not graded",
+     "rationale": "relevance quality is not inferable from provider failure or definitive empties"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 1,
      "basis": "MEASURED",
-     "evidence": "0/5 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
+     "evidence": "0/8 entries with hash+payload provenance fields (0.0%); 0 OK; chain steps provenance_stores=False, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -2566,7 +2645,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 1000 custody-log records",
+     "evidence": "LIVE chain 7/7 with 1424 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -2584,7 +2663,7 @@
     "RECORD_VOLUME": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "1000 OK records across 10 logged retrievals",
+     "evidence": "1424 OK records across 17 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -2600,15 +2679,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "21/21 battery records adjudicated relevant (rate 100%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2016,
+      "max_year": 2026,
+      "span_years": 10,
+      "records_with_dates": 21
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "10/10 entries with hash+payload provenance fields (100.0%); 10 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "17/17 entries with hash+payload provenance fields (100.0%); 17 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -2624,15 +2709,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2016-2026 (10y across 21 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.33
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.27
   },
   "ecfr_title21": {
    "source_id": "ecfr_title21",
@@ -2645,7 +2730,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 556 custody-log records",
+     "evidence": "LIVE chain 7/7 with 907 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -2663,7 +2748,7 @@
     "RECORD_VOLUME": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "556 OK records across 6 logged retrievals",
+     "evidence": "907 OK records across 11 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -2679,15 +2764,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "120/120 battery records adjudicated relevant (rate 100%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2026,
+      "max_year": 2026,
+      "span_years": 0,
+      "records_with_dates": 120
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "6/6 entries with hash+payload provenance fields (100.0%); 6 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "11/11 entries with hash+payload provenance fields (100.0%); 11 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -2703,15 +2794,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2026-2026 (0y across 120 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.44
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.36
   },
   "iso_catalogue": {
    "source_id": "iso_catalogue",
@@ -2760,7 +2851,7 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "evidence": "not in the committed battery run (connector absent, blocked, or every probe failed this run) — Art. XXV: not graded",
      "rationale": "Art. XXV: unknown stays unknown"
     },
     "PROVENANCE_COMPLETENESS": {
@@ -2839,7 +2930,7 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "evidence": "not in the committed battery run (connector absent, blocked, or every probe failed this run) — Art. XXV: not graded",
      "rationale": "Art. XXV: unknown stays unknown"
     },
     "PROVENANCE_COMPLETENESS": {
@@ -2919,7 +3010,7 @@
     "QUERY_RELEVANCE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
+     "evidence": "not in the committed battery run (connector absent, blocked, or every probe failed this run) — Art. XXV: not graded",
      "rationale": "Art. XXV: unknown stays unknown"
     },
     "PROVENANCE_COMPLETENESS": {
@@ -2962,7 +3053,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 30 custody-log records",
+     "evidence": "LIVE chain 7/7 with 40 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -2980,7 +3071,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "30 OK records across 6 logged retrievals",
+     "evidence": "40 OK records across 9 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -2996,15 +3087,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "5/5 battery records adjudicated relevant (rate 100%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2014,
+      "max_year": 2025,
+      "span_years": 11,
+      "records_with_dates": 5
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "6/6 entries with hash+payload provenance fields (100.0%); 6 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "9/9 entries with hash+payload provenance fields (100.0%); 8 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -3020,15 +3117,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2014-2025 (11y across 5 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.22
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.18
   },
   "manufacturing_literature": {
    "source_id": "manufacturing_literature",
@@ -3041,7 +3138,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 100 custody-log records",
+     "evidence": "LIVE chain 7/7 with 150 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -3059,7 +3156,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "100 OK records across 10 logged retrievals",
+     "evidence": "150 OK records across 15 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -3075,15 +3172,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "10/20 battery records adjudicated relevant (rate 50%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2025,
+      "max_year": 2026,
+      "span_years": 1,
+      "records_with_dates": 20
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "10/10 entries with hash+payload provenance fields (100.0%); 10 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "15/15 entries with hash+payload provenance fields (100.0%); 15 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -3099,15 +3202,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2025-2026 (1y across 20 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.56
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.36
   },
   "gudid_sterilization": {
    "source_id": "gudid_sterilization",
@@ -3120,7 +3223,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 60 custody-log records",
+     "evidence": "LIVE chain 7/7 with 90 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -3138,7 +3241,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "60 OK records across 6 logged retrievals",
+     "evidence": "90 OK records across 9 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -3154,15 +3257,15 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "20/20 battery records adjudicated relevant (rate 100%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1"
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "6/6 entries with hash+payload provenance fields (100.0%); 6 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "9/9 entries with hash+payload provenance fields (100.0%); 9 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -3184,9 +3287,9 @@
      "rationale": "Art. XXV: unknown stays unknown"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.22
+   "numeric_grade_count": 10,
+   "unmeasured_count": 1,
+   "depth_mean": 2.3
   },
   "gudid_commercial": {
    "source_id": "gudid_commercial",
@@ -3199,7 +3302,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 100 custody-log records",
+     "evidence": "LIVE chain 7/7 with 130 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -3217,7 +3320,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "100 OK records across 10 logged retrievals",
+     "evidence": "130 OK records across 13 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -3233,15 +3336,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "20/20 battery records adjudicated relevant (rate 100%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2015,
+      "max_year": 2025,
+      "span_years": 10,
+      "records_with_dates": 22
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "10/10 entries with hash+payload provenance fields (100.0%); 10 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "13/13 entries with hash+payload provenance fields (100.0%); 13 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -3257,15 +3366,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2015-2025 (10y across 22 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.22
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.18
   },
   "nasa_ntrs": {
    "source_id": "nasa_ntrs",
@@ -3278,7 +3387,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 20 custody-log records",
+     "evidence": "LIVE chain 7/7 with 50 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -3296,7 +3405,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "20 OK records across 2 logged retrievals",
+     "evidence": "50 OK records across 5 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -3312,15 +3421,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "20/20 battery records adjudicated relevant (rate 100%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 1996,
+      "max_year": 2025,
+      "span_years": 29,
+      "records_with_dates": 20
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "2/2 entries with hash+payload provenance fields (100.0%); 2 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "5/5 entries with hash+payload provenance fields (100.0%); 5 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -3336,15 +3451,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 1996-2025 (29y across 20 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.67
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.64
   },
   "doe_osti": {
    "source_id": "doe_osti",
@@ -3357,7 +3472,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 20 custody-log records",
+     "evidence": "LIVE chain 7/7 with 90 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -3375,7 +3490,7 @@
     "RECORD_VOLUME": {
      "grade": 2,
      "basis": "MEASURED",
-     "evidence": "20 OK records across 3 logged retrievals",
+     "evidence": "90 OK records across 10 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -3391,15 +3506,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "7/20 battery records adjudicated relevant (rate 35%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2025,
+      "max_year": 2026,
+      "span_years": 1,
+      "records_with_dates": 40
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "3/3 entries with hash+payload provenance fields (100.0%); 2 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "10/10 entries with hash+payload provenance fields (100.0%); 9 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -3415,15 +3536,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2025-2026 (1y across 40 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.67
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.45
   },
   "arxiv": {
    "source_id": "arxiv",
@@ -3436,7 +3557,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 10 custody-log records",
+     "evidence": "LIVE chain 7/7 with 40 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -3452,9 +3573,9 @@
      "rationale": "from measured 7-step health chain"
     },
     "RECORD_VOLUME": {
-     "grade": 1,
+     "grade": 2,
      "basis": "MEASURED",
-     "evidence": "10 OK records across 2 logged retrievals",
+     "evidence": "40 OK records across 8 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -3470,15 +3591,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "9/10 battery records adjudicated relevant (rate 90%); query_differentiation=DISTINCT",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2012,
+      "max_year": 2026,
+      "span_years": 14,
+      "records_with_dates": 10
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "2/2 entries with hash+payload provenance fields (100.0%); 2 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "8/8 entries with hash+payload provenance fields (100.0%); 8 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -3494,15 +3621,15 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "no coverage span declared in registry coverage field",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2012-2026 (14y across 10 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.56
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.55
   },
   "nhtsa_recalls": {
    "source_id": "nhtsa_recalls",
@@ -3515,7 +3642,7 @@
     "ROLE_COVERAGE": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "LIVE chain 7/7 with 6 custody-log records",
+     "evidence": "LIVE chain 7/7 with 46 custody-log records",
      "rationale": "role exercised with real retrievable evidence"
     },
     "SOURCE_DIVERSITY": {
@@ -3531,9 +3658,9 @@
      "rationale": "from measured 7-step health chain"
     },
     "RECORD_VOLUME": {
-     "grade": 1,
+     "grade": 2,
      "basis": "MEASURED",
-     "evidence": "6 OK records across 2 logged retrievals",
+     "evidence": "46 OK records across 8 logged retrievals",
      "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
     },
     "FRESHNESS": {
@@ -3549,15 +3676,21 @@
      "rationale": "authoritative issuer of the records"
     },
     "QUERY_RELEVANCE": {
-     "grade": "UNMEASURED",
-     "basis": "UNMEASURED",
-     "evidence": "per-record relevance adjudication exists (discovery_modes/device_failure.py) but no per-source aggregation is persisted — machinery gap, closing it is required before relevance quality claims",
-     "rationale": "Art. XXV: unknown stays unknown"
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "9/9 battery records adjudicated relevant (rate 100%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2019,
+      "max_year": 2026,
+      "span_years": 7,
+      "records_with_dates": 9
+     }
     },
     "PROVENANCE_COMPLETENESS": {
      "grade": 3,
      "basis": "MEASURED",
-     "evidence": "2/2 entries with hash+payload provenance fields (100.0%); 2 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "evidence": "8/8 entries with hash+payload provenance fields (100.0%); 8 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
      "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
     },
     "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
@@ -3573,15 +3706,350 @@
      "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
     },
     "TEMPORAL_COVERAGE": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2019-2026 (7y across 9 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
+    }
+   },
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.55
+  },
+  "nhtsa_complaints": {
+   "source_id": "nhtsa_complaints",
+   "name": "NHTSA ODI vehicle-owner complaints",
+   "authority_role": [
+    "ADVERSE_EVENT"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 100 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 2,
+     "basis": "MEASURED",
+     "evidence": "100 OK records across 4 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous (complaint ingestion); last successful retrieval 2026-08-30",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "50/50 battery records adjudicated relevant (rate 100%)",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 1969,
+      "max_year": 2026,
+      "span_years": 57,
+      "records_with_dates": 100
+     }
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "4/4 entries with hash+payload provenance fields (100.0%); 4 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "failure_class=3 domain=transport",
+     "rationale": "source exists to record failures/negative events"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US vehicle market complaint jurisdiction",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 1969-2026 (57y across 100 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
+    }
+   },
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.73
+  },
+  "cpsc_recalls": {
+   "source_id": "cpsc_recalls",
+   "name": "CPSC SaferProducts consumer-product recalls",
+   "authority_role": [
+    "RECALL",
+    "COMMERCIAL"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 253 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "253 OK records across 8 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous (recall publication); last successful retrieval 2026-08-30",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "51/51 battery records adjudicated relevant (rate 100%); query_differentiation=PARAMETERIZED_DATE_WINDOW",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2026,
+      "max_year": 2026,
+      "span_years": 0,
+      "records_with_dates": 100
+     }
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "8/8 entries with hash+payload provenance fields (100.0%); 8 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "failure_class=3 domain=consumer_products",
+     "rationale": "source exists to record failures/negative events"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US consumer-product jurisdiction (CPSC)",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2026-2026 (0y across 100 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
+    }
+   },
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.64
+  },
+  "usgs_earthquakes": {
+   "source_id": "usgs_earthquakes",
+   "name": "USGS earthquake events (FDSN)",
+   "authority_role": [
+    "HAZARD_EVENT"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 200 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "200 OK records across 8 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 3,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Continuous (event detection/revision); last successful retrieval 2026-08-30",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "50/50 battery records adjudicated relevant (rate 100%); query_differentiation=PARAMETERIZED_DATE_WINDOW",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1"
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "8/8 entries with hash+payload provenance fields (100.0%); 8 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "failure_class=1 domain=infrastructure_hazard",
+     "rationale": "failures appear but publication/grant bias undersamples them"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "worldwide seismic network",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
      "grade": "UNMEASURED",
      "basis": "UNMEASURED",
      "evidence": "no coverage span declared in registry coverage field",
      "rationale": "Art. XXV: unknown stays unknown"
     }
    },
-   "numeric_grade_count": 9,
-   "unmeasured_count": 2,
-   "depth_mean": 2.56
+   "numeric_grade_count": 10,
+   "unmeasured_count": 1,
+   "depth_mean": 2.8
+  },
+  "fra_rail_accidents": {
+   "source_id": "fra_rail_accidents",
+   "name": "FRA rail equipment accidents (Form 54)",
+   "authority_role": [
+    "INCIDENT"
+   ],
+   "health_status": "LIVE",
+   "dimensions": {
+    "ROLE_COVERAGE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE chain 7/7 with 200 custody-log records",
+     "rationale": "role exercised with real retrievable evidence"
+    },
+    "SOURCE_DIVERSITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "sole provider of its corpus among registered sources",
+     "rationale": "no registered source shares this corpus"
+    },
+    "LIVE_AVAILABILITY": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "LIVE",
+     "rationale": "from measured 7-step health chain"
+    },
+    "RECORD_VOLUME": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "200 OK records across 8 logged retrievals",
+     "rationale": "bands anchored on measured usage in the custody log: <20 = probe-scale (health checks only — the source has never been exercised at query scale), 20-199 = query-scale (used in real retrievals), >=200 = campaign-scale (sustained multi-query use, e.g. L8 15-territory run)"
+    },
+    "FRESHNESS": {
+     "grade": 2,
+     "basis": "MEASURED+DECLARED",
+     "evidence": "Periodic dataset refresh (FRA safety data); last successful retrieval 2026-08-30",
+     "rationale": "min(declared cadence, measured last-success)"
+    },
+    "PRIMARY_SOURCE_AUTHORITY": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "PRIMARY",
+     "rationale": "authoritative issuer of the records"
+    },
+    "QUERY_RELEVANCE": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "50/50 battery records adjudicated relevant (rate 100%); query_differentiation=PARAMETERIZED_DATE_WINDOW",
+     "rationale": "ENGINEERING bands (Art. XXVII, declared in query_relevance.py): >=2/3 majority on-domain = 3; >=1/3 usable signal = 2; <1/3 off-domain flood = 1",
+     "temporal_span_harvest": {
+      "min_year": 2026,
+      "max_year": 2026,
+      "span_years": 0,
+      "records_with_dates": 50
+     }
+    },
+    "PROVENANCE_COMPLETENESS": {
+     "grade": 3,
+     "basis": "MEASURED",
+     "evidence": "8/8 entries with hash+payload provenance fields (100.0%); 8 OK; chain steps provenance_stores=True, retrieval_log_stores=True",
+     "rationale": "custody fields (entry_sha256, raw_payload_sha256, prev link) complete on every logged retrieval = 3"
+    },
+    "FAILURE_NEGATIVE_EVIDENCE_COVERAGE": {
+     "grade": 3,
+     "basis": "DECLARED",
+     "evidence": "failure_class=3 domain=industrial_transport",
+     "rationale": "source exists to record failures/negative events"
+    },
+    "GEOGRAPHIC_COVERAGE": {
+     "grade": 1,
+     "basis": "DECLARED",
+     "evidence": "US rail jurisdiction (FRA Form 54)",
+     "rationale": "3=global corpus/universal data, 2=multi-region, 1=single jurisdiction"
+    },
+    "TEMPORAL_COVERAGE": {
+     "grade": 1,
+     "basis": "MEASURED",
+     "evidence": "retrieved records span 2026-2026 (0y across 50 date-bearing records)",
+     "rationale": "measured floor on corpus span (records actually retrieved by the engine, not the full corpus); bands >=40y=3, >=20y=2, else 1 — identical to the declared-span bands"
+    }
+   },
+   "numeric_grade_count": 11,
+   "unmeasured_count": 0,
+   "depth_mean": 2.55
   }
  },
  "role_depth": {
@@ -3610,14 +4078,13 @@
     "arxiv"
    ],
    "live_count": 8,
-   "best_live_source": "nasa_ntrs",
-   "best_depth_mean": 2.67,
-   "live_depth_mean": 2.5,
-   "depth_label": "WORLD_CLASS",
+   "best_live_source": "crossref",
+   "best_depth_mean": 2.64,
+   "live_depth_mean": 2.43,
+   "depth_label": "ADEQUATE",
    "limiting_dimensions": [
-    "europepmc:QUERY_RELEVANCE=UNMEASURED",
     "europepmc:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=1",
-    "europepmc:TEMPORAL_COVERAGE=UNMEASURED"
+    "europepmc:TEMPORAL_COVERAGE=1"
    ],
    "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
   },
@@ -3634,21 +4101,19 @@
     "google_bigquery_patents"
    ],
    "live_sources": [
-    "google_patents",
     "lens_patent",
     "patentbear"
    ],
-   "live_count": 3,
+   "live_count": 2,
    "best_live_source": "lens_patent",
-   "best_depth_mean": 2.22,
-   "live_depth_mean": 2.11,
+   "best_depth_mean": 2.18,
+   "live_depth_mean": 2.09,
    "depth_label": "ADEQUATE",
    "limiting_dimensions": [
-    "google_patents:SOURCE_DIVERSITY=1",
-    "google_patents:QUERY_RELEVANCE=UNMEASURED",
-    "google_patents:PROVENANCE_COMPLETENESS=1",
-    "google_patents:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=1",
-    "google_patents:TEMPORAL_COVERAGE=UNMEASURED"
+    "lens_patent:SOURCE_DIVERSITY=1",
+    "lens_patent:PROVENANCE_COMPLETENESS=1",
+    "lens_patent:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=1",
+    "lens_patent:TEMPORAL_COVERAGE=1"
    ],
    "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
   },
@@ -3670,14 +4135,12 @@
    ],
    "live_count": 4,
    "best_live_source": "fda_510k",
-   "best_depth_mean": 2.33,
-   "live_depth_mean": 2.25,
+   "best_depth_mean": 2.36,
+   "live_depth_mean": 2.3,
    "depth_label": "ADEQUATE",
    "limiting_dimensions": [
-    "fda_510k:QUERY_RELEVANCE=UNMEASURED",
     "fda_510k:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
-    "fda_510k:GEOGRAPHIC_COVERAGE=1",
-    "fda_510k:TEMPORAL_COVERAGE=UNMEASURED"
+    "fda_510k:GEOGRAPHIC_COVERAGE=1"
    ],
    "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
   },
@@ -3692,32 +4155,32 @@
    ],
    "live_count": 1,
    "best_live_source": "fda_udi",
-   "best_depth_mean": 2.33,
-   "live_depth_mean": 2.33,
+   "best_depth_mean": 2.27,
+   "live_depth_mean": 2.27,
    "depth_label": "ADEQUATE",
    "limiting_dimensions": [
-    "fda_udi:QUERY_RELEVANCE=UNMEASURED",
     "fda_udi:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
     "fda_udi:GEOGRAPHIC_COVERAGE=1",
-    "fda_udi:TEMPORAL_COVERAGE=UNMEASURED"
+    "fda_udi:TEMPORAL_COVERAGE=1"
    ],
    "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
   },
   "ADVERSE_EVENT": {
    "covered_binary": true,
    "serving_sources": [
-    "fda_maude"
+    "fda_maude",
+    "nhtsa_complaints"
    ],
    "live_sources": [
-    "fda_maude"
+    "fda_maude",
+    "nhtsa_complaints"
    ],
-   "live_count": 1,
+   "live_count": 2,
    "best_live_source": "fda_maude",
-   "best_depth_mean": 2.7,
-   "live_depth_mean": 2.7,
+   "best_depth_mean": 2.73,
+   "live_depth_mean": 2.73,
    "depth_label": "WORLD_CLASS",
    "limiting_dimensions": [
-    "fda_maude:QUERY_RELEVANCE=UNMEASURED",
     "fda_maude:GEOGRAPHIC_COVERAGE=1"
    ],
    "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
@@ -3726,21 +4189,21 @@
    "covered_binary": true,
    "serving_sources": [
     "fda_recall",
-    "nhtsa_recalls"
+    "nhtsa_recalls",
+    "cpsc_recalls"
    ],
    "live_sources": [
     "fda_recall",
-    "nhtsa_recalls"
+    "nhtsa_recalls",
+    "cpsc_recalls"
    ],
-   "live_count": 2,
+   "live_count": 3,
    "best_live_source": "fda_recall",
-   "best_depth_mean": 2.78,
-   "live_depth_mean": 2.67,
+   "best_depth_mean": 2.73,
+   "live_depth_mean": 2.64,
    "depth_label": "WORLD_CLASS",
    "limiting_dimensions": [
-    "fda_recall:QUERY_RELEVANCE=UNMEASURED",
-    "fda_recall:GEOGRAPHIC_COVERAGE=1",
-    "fda_recall:TEMPORAL_COVERAGE=UNMEASURED"
+    "fda_recall:GEOGRAPHIC_COVERAGE=1"
    ],
    "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
   },
@@ -3755,13 +4218,10 @@
    ],
    "live_count": 1,
    "best_live_source": "clinicaltrials_gov",
-   "best_depth_mean": 2.56,
-   "live_depth_mean": 2.56,
-   "depth_label": "WORLD_CLASS",
-   "limiting_dimensions": [
-    "clinicaltrials_gov:QUERY_RELEVANCE=UNMEASURED",
-    "clinicaltrials_gov:TEMPORAL_COVERAGE=UNMEASURED"
-   ],
+   "best_depth_mean": 2.45,
+   "live_depth_mean": 2.45,
+   "depth_label": "ADEQUATE",
+   "limiting_dimensions": [],
    "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
   },
   "MATERIALS": {
@@ -3777,13 +4237,11 @@
    ],
    "live_count": 2,
    "best_live_source": "cod_optimade",
-   "best_depth_mean": 2.56,
-   "live_depth_mean": 2.5,
+   "best_depth_mean": 2.64,
+   "live_depth_mean": 2.57,
    "depth_label": "WORLD_CLASS",
    "limiting_dimensions": [
-    "cod_optimade:QUERY_RELEVANCE=UNMEASURED",
-    "cod_optimade:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
-    "cod_optimade:TEMPORAL_COVERAGE=UNMEASURED"
+    "cod_optimade:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0"
    ],
    "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
   },
@@ -3801,14 +4259,13 @@
    ],
    "live_count": 3,
    "best_live_source": "manufacturing_literature",
-   "best_depth_mean": 2.56,
-   "live_depth_mean": 2.33,
+   "best_depth_mean": 2.36,
+   "live_depth_mean": 2.28,
    "depth_label": "ADEQUATE",
    "limiting_dimensions": [
-    "fda_pma_supplements:QUERY_RELEVANCE=UNMEASURED",
     "fda_pma_supplements:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
     "fda_pma_supplements:GEOGRAPHIC_COVERAGE=1",
-    "fda_pma_supplements:TEMPORAL_COVERAGE=UNMEASURED"
+    "fda_pma_supplements:TEMPORAL_COVERAGE=1"
    ],
    "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
   },
@@ -3826,14 +4283,13 @@
    ],
    "live_count": 2,
    "best_live_source": "ecfr_title21",
-   "best_depth_mean": 2.44,
-   "live_depth_mean": 2.38,
+   "best_depth_mean": 2.36,
+   "live_depth_mean": 2.31,
    "depth_label": "ADEQUATE",
    "limiting_dimensions": [
-    "fda_recognized_standards:QUERY_RELEVANCE=UNMEASURED",
     "fda_recognized_standards:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
     "fda_recognized_standards:GEOGRAPHIC_COVERAGE=1",
-    "fda_recognized_standards:TEMPORAL_COVERAGE=UNMEASURED"
+    "fda_recognized_standards:TEMPORAL_COVERAGE=1"
    ],
    "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
   },
@@ -3847,12 +4303,11 @@
    ],
    "live_count": 1,
    "best_live_source": "pubchem",
-   "best_depth_mean": 2.44,
-   "live_depth_mean": 2.44,
-   "depth_label": "ADEQUATE",
+   "best_depth_mean": 2.5,
+   "live_depth_mean": 2.5,
+   "depth_label": "WORLD_CLASS",
    "limiting_dimensions": [
     "pubchem:RECORD_VOLUME=1",
-    "pubchem:QUERY_RELEVANCE=UNMEASURED",
     "pubchem:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
     "pubchem:TEMPORAL_COVERAGE=UNMEASURED"
    ],
@@ -3872,11 +4327,10 @@
    ],
    "live_count": 3,
    "best_live_source": "uniprot",
-   "best_depth_mean": 2.56,
-   "live_depth_mean": 2.48,
-   "depth_label": "ADEQUATE",
+   "best_depth_mean": 2.6,
+   "live_depth_mean": 2.52,
+   "depth_label": "WORLD_CLASS",
    "limiting_dimensions": [
-    "uniprot:QUERY_RELEVANCE=UNMEASURED",
     "uniprot:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
     "uniprot:TEMPORAL_COVERAGE=UNMEASURED"
    ],
@@ -3885,21 +4339,60 @@
   "COMMERCIAL": {
    "covered_binary": true,
    "serving_sources": [
-    "gudid_commercial"
+    "gudid_commercial",
+    "cpsc_recalls"
    ],
    "live_sources": [
-    "gudid_commercial"
+    "gudid_commercial",
+    "cpsc_recalls"
    ],
-   "live_count": 1,
-   "best_live_source": "gudid_commercial",
-   "best_depth_mean": 2.22,
-   "live_depth_mean": 2.22,
+   "live_count": 2,
+   "best_live_source": "cpsc_recalls",
+   "best_depth_mean": 2.64,
+   "live_depth_mean": 2.41,
    "depth_label": "ADEQUATE",
    "limiting_dimensions": [
-    "gudid_commercial:QUERY_RELEVANCE=UNMEASURED",
     "gudid_commercial:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=0",
     "gudid_commercial:GEOGRAPHIC_COVERAGE=1",
-    "gudid_commercial:TEMPORAL_COVERAGE=UNMEASURED"
+    "gudid_commercial:TEMPORAL_COVERAGE=1"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "INCIDENT": {
+   "covered_binary": true,
+   "serving_sources": [
+    "fra_rail_accidents"
+   ],
+   "live_sources": [
+    "fra_rail_accidents"
+   ],
+   "live_count": 1,
+   "best_live_source": "fra_rail_accidents",
+   "best_depth_mean": 2.55,
+   "live_depth_mean": 2.55,
+   "depth_label": "WORLD_CLASS",
+   "limiting_dimensions": [
+    "fra_rail_accidents:GEOGRAPHIC_COVERAGE=1",
+    "fra_rail_accidents:TEMPORAL_COVERAGE=1"
+   ],
+   "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
+  },
+  "HAZARD_EVENT": {
+   "covered_binary": true,
+   "serving_sources": [
+    "usgs_earthquakes"
+   ],
+   "live_sources": [
+    "usgs_earthquakes"
+   ],
+   "live_count": 1,
+   "best_live_source": "usgs_earthquakes",
+   "best_depth_mean": 2.8,
+   "live_depth_mean": 2.8,
+   "depth_label": "WORLD_CLASS",
+   "limiting_dimensions": [
+    "usgs_earthquakes:FAILURE_NEGATIVE_EVIDENCE_COVERAGE=1",
+    "usgs_earthquakes:TEMPORAL_COVERAGE=UNMEASURED"
    ],
    "note": "binary coverage is ONE of eleven dimensions; depth shown separately"
   }
@@ -3907,27 +4400,50 @@
  "engine_level": {
   "GEOGRAPHIC": {
    "live_source_distribution": {
-    "SINGLE_JURISDICTION": 13,
+    "SINGLE_JURISDICTION": 16,
     "MULTI_REGION": 2,
     "GLOBAL": 17
    },
-   "finding": "13 of 32 live sources are single-jurisdiction (US regulatory reality); EU regulatory reality has no live source (eudamed NOT_INTEGRATED)"
+   "finding": "16 of 35 live sources are single-jurisdiction (US regulatory reality); EU regulatory reality has no live source (eudamed NOT_INTEGRATED)"
   },
   "FAILURE_NEGATIVE_EVIDENCE": {
    "failure_native_live_sources": [
     "fda_maude",
     "fda_recall",
-    "nhtsa_recalls"
+    "nhtsa_recalls",
+    "nhtsa_complaints",
+    "cpsc_recalls",
+    "fra_rail_accidents"
    ],
    "failure_domains": [
+    "consumer_products",
+    "industrial_transport",
     "medical",
     "transport"
    ],
-   "finding": "failure-native live sources cover: medical, transport. Domains with ZERO live failure coverage: industrial, energy, aerospace, electronics, infrastructure, chemical (CEO negative-evidence directive: every unlisted domain is an open gap)"
+   "finding": "failure-native live sources cover: consumer_products, industrial_transport, medical, transport. Mapped to the CEO's failure universe: automotive=COVERED (nhtsa recalls+complaints), industrial=COVERED via rail (fra_rail_accidents; workplace/OSHA blocked), electronics=PARTIAL via consumer products (cpsc_recalls), infrastructure=PARTIAL hazard inputs only (usgs HAZARD_EVENT role — NOT failure records). Domains with ZERO live failure coverage: energy, aerospace, chemical, medical-adjacent workplace (measured blockers: NRC RSS 403 / ADAMS 404 / PHMSA non-tabular; ASRS 404 / LLIS SPA / NTSB HTML / FAA SDR 503; CSB 404; OSHA 404 — all dated 2026-08-30)"
   },
   "QUERY_RELEVANCE": {
-   "status": "UNMEASURED engine-wide",
-   "machinery_gap": "per-record relevance adjudication exists in discovery_modes/device_failure.py but is not aggregated per-source; must be closed before any relevance-quality claim"
+   "measured_sources": 34,
+   "unmeasured_sources": [
+    "fda_denovo",
+    "who_ictrp",
+    "openalex",
+    "semantic_scholar",
+    "google_patents",
+    "patentbear",
+    "patsnap_eureka",
+    "epo_ops",
+    "uspto_odp",
+    "wipo_patentscope",
+    "google_bigquery_patents",
+    "materials_project",
+    "iso_catalogue",
+    "astm_standards",
+    "eudamed"
+   ],
+   "weak_sources": [],
+   "finding": "QUERY_RELEVANCE is now MEASURED for battery sources via the committed instrument (query_relevance.py + QUERY_RELEVANCE_PROBES.json). The instrument's first run found 5 LIVE connector defects (DOE OSTI query param silently ignored; PubMed ID-stub records; RCSB stub records; NIST WebBook phantom species records; CDRH standards server-side filter broken) — all fixed in the same cycle."
   },
   "CONCENTRATION": {
    "top5_share_note": "top-5 sources carried 81% of custody-log usage (TOSCANINI_DATABASE_COVERAGE_AUDIT); scientific layer leans on overlapping literature corpora"

@@ -1,0 +1,412 @@
+{
+ "artifact": "OPEN_CORPORA_REGISTRY",
+ "directive": "CEO 2026-08-30 — Open Data Expansion Audit; 10-field audit per corpus + layer classification; measured access verdicts from TOSCANINI/OPEN_DATA_PROBES.json",
+ "layers": {
+  "OPEN_HISTORICAL_CORPUS": [
+   "openalex",
+   "opsd",
+   "pmc_oa_bulk"
+  ],
+  "PATENT_PRIOR_ART_CORPUS": [
+   "patentsview_bulk",
+   "uspto_bulk",
+   "ep_patent_all_claims"
+  ],
+  "ENGINEERING_FAILURE_CORPUS": [
+   "ntsb_data",
+   "hf_manufacturing_failure"
+  ],
+  "AUTHORITATIVE_LIVE_EVIDENCE": [
+   "nasa_ntrs",
+   "doe_osti",
+   "materials_project",
+   "arxiv"
+  ],
+  "BENCHMARK_EVALUATION_DATA": [
+   "golden_fto",
+   "patent_strategist_bench",
+   "novelty_search_bench"
+  ],
+  "MODEL_TRAINING_DATA": [
+   "hf_robotics"
+  ]
+ },
+ "layer_rules": {
+  "AUTHORITATIVE_LIVE_EVIDENCE": "may enter the live evidence registry through the 7-step custody chain",
+  "OPEN_HISTORICAL_CORPUS": "bulk corpora: hash-pinned snapshot custody, offline query, version-pinned provenance",
+  "ENGINEERING_FAILURE_CORPUS": "failure evidence with epistemic caps; EXPERIMENTAL vs REGISTRY sub-class mandatory",
+  "PATENT_PRIOR_ART_CORPUS": "prior-art evidence; unofficial repackagings never outrank the issuing office",
+  "BENCHMARK_EVALUATION_DATA": "NEVER enters the evidence layer (contamination rule, CEO 2026-08-30); evaluation instruments only",
+  "MODEL_TRAINING_DATA": "model/training substrate; never evidence"
+ },
+ "corpora": {
+  "openalex": {
+   "corpus_id": "openalex",
+   "name": "OpenAlex scholarly graph + CC0 snapshot",
+   "layer": "OPEN_HISTORICAL_CORPUS",
+   "priority_tier": 1,
+   "audit": {
+    "authority": "OurResearch (OpenAlex): independent scholarly-index issuer; PRIMARY_MEASURED-class metadata (publisher-deposited + crawled), not peer-review certification",
+    "license": "CC0 (snapshot; official docs) — API terms separately rate/budget-limited",
+    "provenance": "Per-record IDs (DOI/back-compat), per-snapshot manifest; versioned releases",
+    "freshness": "Continuously updated API; periodic full-snapshot releases",
+    "coverage": "~250M works, authors, institutions, topics, citations (declared)",
+    "schema": "Documented entities (works/authors/institutions/topics) + Parquet snapshot",
+    "access_method": "REST API (polite pool/budget) + bulk snapshot download",
+    "reproducibility": "Snapshot version pinning; hash-verifiable downloads; API with per-request caching headers",
+    "contamination_risk": "LOW as evidence: aggregator metadata, not benchmark answers. Mixed peer-review status per record (preprints included)",
+    "toscanini_role": "Scientific knowledge-graph substrate: paper/author/institution/citation/concept graph feeding canonical entities + prior art"
+   },
+   "measured_access": {
+    "measured": "HTTP_429",
+    "detail": "{\"error\":\"Rate limit exceeded\",\"message\":\"Insufficient budget. This request costs $0.0001 "
+   },
+   "status_note": "API measured 429 budget-blocked from this egress EVEN ANONYMOUS ($0 remaining, resets midnight UTC — provider IP-budget state, not our key). Snapshot host files.openalex.org: DNS does not resolve from this egress (measured twice 2026-08-30). Integration blocked on egress/policy, registered with measured blockers."
+  },
+  "patentsview_bulk": {
+   "corpus_id": "patentsview_bulk",
+   "name": "PatentsView official data downloads (sources.yml tables)",
+   "layer": "PATENT_PRIOR_ART_CORPUS",
+   "priority_tier": 1,
+   "audit": {
+    "authority": "USPTO-derived, PatentsView (Fairview/Arizona State) — repackage of the PRIMARY office's own data",
+    "license": "USPTO data: US-government works (public domain); PatentsView terms apply to API",
+    "provenance": "Official table set: granted patents, inventors, assignees, CPC, citations, applications, foreign priority, examiners",
+    "freshness": "Periodic bulk updates (annual/quarterly table releases)",
+    "coverage": "Full US granted-patent + application corpus (1976–present, declared)",
+    "schema": "Documented per-table schemas (TSV/CSV) in the sources.yml configuration",
+    "access_method": "HTTP bulk downloads configured by data-downloads/sources.yml",
+    "reproducibility": "Deterministic URLs + per-release file lists; table version pinning",
+    "contamination_risk": "LOW: authoritative bibliographic facts, not evaluation labels",
+    "toscanini_role": "Prior-art corpus: claim/CPC/citation graph for novelty collision + technology-evolution mining"
+   },
+   "measured_access": {
+    "measured": "REACHABLE_200",
+    "detail": "# Configuration file for PatentsView data sources and download URLs # For more information"
+   },
+   "status_note": "sources.yml MEASURED REACHABLE (200, raw.githubusercontent.com). Bulk host access pending a bulk-file probe round; API host search.patentsview.org DNS-fails from this egress (was 403-key-gated earlier same day — both measurements recorded)."
+  },
+  "uspto_bulk": {
+   "corpus_id": "uspto_bulk",
+   "name": "USPTO bulk patent data (redbook/fulltext)",
+   "layer": "PATENT_PRIOR_ART_CORPUS",
+   "priority_tier": 1,
+   "audit": {
+    "authority": "USPTO — the PRIMARY issuing office itself",
+    "license": "US-government works: public domain",
+    "provenance": "Official bulk XML/JSON per week-of-year",
+    "freshness": "Weekly grant/application publication files",
+    "coverage": "All US grants + applications, full text + classification",
+    "schema": "Documented redbook XML/JSON schemas",
+    "access_method": "HTTP directory download (bulkdata.uspto.gov)",
+    "reproducibility": "Deterministic per-week URLs",
+    "contamination_risk": "LOW (primary registry)",
+    "toscanini_role": "Primary prior-art full text for claim-level collision analysis"
+   },
+   "measured_access": {
+    "measured": "UNREACHABLE",
+    "detail": "URLError(gaierror(-2, 'Name or service not known'))"
+   },
+   "status_note": "bulkdata.uspto.gov DNS FAILS from this egress (measured twice, Errno -5/-2). Primary-office corpus blocked at network layer; recorded, not worked around."
+  },
+  "ntsb_data": {
+   "corpus_id": "ntsb_data",
+   "name": "NTSB accident databases (CAROL exports + curated tables)",
+   "layer": "ENGINEERING_FAILURE_CORPUS",
+   "priority_tier": 1,
+   "audit": {
+    "authority": "NTSB — independent accident investigator: PRIMARY_REGULATORY-class investigations",
+    "license": "US-government works: public domain",
+    "provenance": "Investigation records: accident, aircraft, narrative, crew, engine, injury tables (curated third-party conversion: TimothyElder/ntsb and 2026 curation project)",
+    "freshness": "Continuous investigation publication; curated conversions lag",
+    "coverage": "US civil aviation (+ highway/marine/rail/pipeline investigations)",
+    "schema": "CSV/SQL relational tables with documented quality/provenance notes (curated repo)",
+    "access_method": "CAROL web export (machine-blocked) + curated GitHub CSV/SQL",
+    "reproducibility": "Curated repo pins versions; raw CAROL exports dated per query",
+    "contamination_risk": "MEDIUM: third-party curation layer between the primary investigator and the corpus — must carry converter provenance",
+    "toscanini_role": "Failure narratives: failure -> contributing factors -> mechanism -> intervention opportunity (aerospace + transport domains)"
+   },
+   "measured_access": {
+    "measured": "REACHABLE_200",
+    "detail": "<!DOCTYPE html>\r <html>\r <head>\r     <meta charset=\"utf-8\" />\r     <meta name=\"viewport\" c"
+   },
+   "status_note": "CAROL export route MEASURED serving HTML SPA (no machine route; consistent with prior finding). Curated GitHub conversion is the practical corpus; integration = downloading + hashing the curated tables with converter provenance disclosed."
+  },
+  "nasa_ntrs": {
+   "corpus_id": "nasa_ntrs",
+   "name": "NASA Technical Reports Server",
+   "layer": "AUTHORITATIVE_LIVE_EVIDENCE",
+   "priority_tier": 1,
+   "audit": {
+    "authority": "NASA — primary issuer of aerospace technical reports",
+    "license": "US-government terms (public domain unless marked)",
+    "provenance": "Per-record NTRS citation IDs",
+    "freshness": "Continuous",
+    "coverage": "NASA/NACA aerospace R&D 1915–present",
+    "schema": "JSON API documented (OpenAPI)",
+    "access_method": "REST JSON (ntrs.nasa.gov/api)",
+    "reproducibility": "Deterministic API queries + raw-payload hashing (in custody log)",
+    "contamination_risk": "LOW",
+    "toscanini_role": "Aerospace science/engineering evidence (LIVE, integrated 2026-08-30)"
+   },
+   "measured_access": {
+    "measured": "REACHABLE_200",
+    "detail": "{\"stats\":{\"took\":76,\"total\":3924,\"estimate\":false,\"maxScore\":126.95606},\"results\":[{\"_meta"
+   },
+   "status_note": "MEASURED LIVE (200, search API total=3924 for 'battery'). Already in the live registry through the 7-step chain."
+  },
+  "doe_osti": {
+   "corpus_id": "doe_osti",
+   "name": "DOE OSTI R&D records",
+   "layer": "AUTHORITATIVE_LIVE_EVIDENCE",
+   "priority_tier": 1,
+   "audit": {
+    "authority": "DOE OSTI — primary issuer of energy R&D records",
+    "license": "US-government terms",
+    "provenance": "OSTI IDs + DOIs",
+    "freshness": "Continuous",
+    "coverage": "DOE-funded energy/materials R&D output",
+    "schema": "JSON API v1 (q= grammar; query= SILENTLY IGNORED — measured defect fixed 2026-08-30)",
+    "access_method": "REST JSON (www.osti.gov/api/v1)",
+    "reproducibility": "Deterministic q= queries + payload hashing",
+    "contamination_risk": "LOW",
+    "toscanini_role": "Energy science/engineering evidence (LIVE, integrated)"
+   },
+   "measured_access": {
+    "measured": "REACHABLE_200",
+    "detail": "list[1]"
+   },
+   "status_note": "MEASURED LIVE (200 list[1]). Query-param defect found by QUERY_RELEVANCE battery and fixed this cycle."
+  },
+  "materials_project": {
+   "corpus_id": "materials_project",
+   "name": "Materials Project computational materials data",
+   "layer": "AUTHORITATIVE_LIVE_EVIDENCE",
+   "priority_tier": 1,
+   "audit": {
+    "authority": "Materials Project (LBNL/MIT/Duke) — authoritative DFT-computed materials database",
+    "license": "MP terms: free with registration; CC BY 4.0 for most data (declared)",
+    "provenance": "Per-material mp-ids + computation method metadata",
+    "freshness": "Continuously revised database",
+    "coverage": "~150k+ computed inorganic structures (declared)",
+    "schema": "REST materials/summary + battery + reactions documented on GitHub",
+    "access_method": "REST JSON with API key",
+    "reproducibility": "Deterministic queries; version-tagged database snapshots",
+    "contamination_risk": "LOW; note: COMPUTED (DFT), not instrument-measured — carries method caveats as epistemic caps",
+    "toscanini_role": "Computational materials evidence: material -> property -> constraint -> substitution chain (CEO chain #5)"
+   },
+   "measured_access": {
+    "measured": "HTTP_403",
+    "detail": "{\"error\": \"Your IP address or ASN has been (temporarily) blocked from accessing all MP ser"
+   },
+   "status_note": "MEASURED 403 provider ASN/IP block WITH the CEO-provisioned key (re-verified 2026-08-30) — the key is valid; the egress is blocked. CEO action item: egress/proxy decision. Registered with the measured distinction."
+  },
+  "opsd": {
+   "corpus_id": "opsd",
+   "name": "Open Power System Data",
+   "layer": "OPEN_HISTORICAL_CORPUS",
+   "priority_tier": 1,
+   "audit": {
+    "authority": "OPSD consortium (TU Berlin/ETH/IZNE): curated from TSO/ENTSO-E primary sources",
+    "license": "MIT (code); data CC BY 4.0 (declared on the portals)",
+    "provenance": "Per-dataset versioned releases with source attribution per column",
+    "freshness": "Periodic versioned releases (dated release folders)",
+    "coverage": "European power system: load, wind/solar generation, capacities, plants, weather",
+    "schema": "Documented CSV per package (measured headers: capacity/technology/country; electrical_capacity/energy_source_level...)",
+    "access_method": "Direct CSV download (data.open-power-system-data.org)",
+    "reproducibility": "Deterministic dated-release URLs — ideal for hash-pinned custody",
+    "contamination_risk": "LOW (curated primary repackage, attribution carried)",
+    "toscanini_role": "Energy/infrastructure evidence substrate: real generation/load/plant data for the ENERGY domain benchmark problems"
+   },
+   "measured_access": {
+    "measured": "REACHABLE_200",
+    "detail": "<!DOCTYPE html> <html class=\"no-js\" lang=\"en-US\" itemscope=\"itemscope\" itemtype=\"https://s"
+   },
+   "status_note": "MEASURED REACHABLE: portal 200 + two real data CSVs 200 with schema headers (national_generation_capacity_stacked.csv, renewable_power_plants_DE.csv). Highest-value IMMEDIATELY-INTEGRABLE new corpus from this audit. INTEGRATED 2026-08-30: national_generation_capacity_staked snapshot COMPLETE under hash-chained corpus custody (6,463,593 bytes, ~37,279 rows, sha 4890bf0e...). renewable_power_plants_DE (345,194,496 bytes measured via HEAD) DEFERRED: exceeded the download window this cycle — manifest entry intentionally absent rather than truncated."
+  },
+  "arxiv": {
+   "corpus_id": "arxiv",
+   "name": "arXiv preprints",
+   "layer": "AUTHORITATIVE_LIVE_EVIDENCE",
+   "priority_tier": 1,
+   "audit": {
+    "authority": "arXiv (Cornell) — primary preprint server",
+    "license": "Per-record licenses (arXiv non-exclusive license / CC variants)",
+    "provenance": "arXiv ids + DOIs (10.48550)",
+    "freshness": "Continuous",
+    "coverage": "Physics/CS/math/quant-bio/engineering preprints",
+    "schema": "Atom XML API",
+    "access_method": "REST Atom (export.arxiv.org)",
+    "reproducibility": "Deterministic queries + 3s courtesy interval (enforced client-side)",
+    "contamination_risk": "LOW as evidence; PREPRINT epistemic caps carried (SECONDARY trust tier)",
+    "toscanini_role": "Fast-moving scientific evidence (LIVE, integrated)"
+   },
+   "measured_access": {
+    "measured": "REACHABLE_200",
+    "detail": "<?xml version='1.0' encoding='UTF-8'?> <feed xmlns:opensearch=\"http://a9.com/-/spec/opense"
+   },
+   "status_note": "MEASURED LIVE (200 Atom feed)."
+  },
+  "pmc_oa_bulk": {
+   "corpus_id": "pmc_oa_bulk",
+   "name": "PubMed Central Open Access subset (bulk)",
+   "layer": "OPEN_HISTORICAL_CORPUS",
+   "priority_tier": 1,
+   "audit": {
+    "authority": "NCBI PMC — primary archive of OA biomedical full texts",
+    "license": "Per-article OA licenses (CC BY/BY-NC etc.) — license carried per record, not assumed",
+    "provenance": "PMC IDs + PMIDs + per-file checksums in official file lists",
+    "freshness": "Continuous OA ingestion",
+    "coverage": "Millions of OA biomedical articles (declared ~26.6M title/abstract in third-party conversions)",
+    "schema": "XML/JSONL packages with official file lists",
+    "access_method": "FTP/HTTPS bulk (ftp.ncbi.nlm.nih.gov/pub/pmc/...)",
+    "reproducibility": "Official file lists with checksums; dated snapshots",
+    "contamination_risk": "LOW; mixed licenses require per-record license metadata",
+    "toscanini_role": "Biomedical full-text historical corpus: mechanism evidence at depth beyond abstracts"
+   },
+   "measured_access": {
+    "measured": "HTTP_404",
+    "detail": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>404 Not Found</titl"
+   },
+   "status_note": "Probed file_list.txt + oa_jsonl paths 404 (paths moved). NCBI eutils (pubmed/esearch/esummary/efetch) MEASURED LIVE and integrated — bulk-path update is a follow-up with corrected paths."
+  },
+  "golden_fto": {
+   "corpus_id": "golden_fto",
+   "name": "v13s/golden-fto-layer-a (FTO benchmark)",
+   "layer": "BENCHMARK_EVALUATION_DATA",
+   "priority_tier": 2,
+   "audit": {
+    "authority": "Community benchmark author (HF); NOT a primary registry",
+    "license": "HF dataset card terms — verify per-use",
+    "provenance": "HF dataset (id, sha, lastModified via API)",
+    "freshness": "Snapshot (dated HF revision)",
+    "coverage": "13.4M records declared (FTO-layer labels)",
+    "schema": "HF dataset API",
+    "access_method": "HF datasets API + parquet files",
+    "reproducibility": "HF revision pinning by sha",
+    "contamination_risk": "CRITICAL if mixed into evidence: contains LABELS for prior-art/FTO judgments — evaluation use ONLY",
+    "toscanini_role": "Evaluate Toscanini's FTO/prior-art reasoning against labeled gold; NEVER retrieval evidence"
+   },
+   "measured_access": {
+    "measured": "REACHABLE_200",
+    "detail": "{\"_id\":\"69f4ab1bbe7c0a03281b23e1\",\"id\":\"v13s/golden-fto-layer-a\",\"author\":\"v13s\",\"sha\":\"b3"
+   },
+   "status_note": "MEASURED REACHABLE (200 HF API). Layer-locked to evaluation."
+  },
+  "patent_strategist_bench": {
+   "corpus_id": "patent_strategist_bench",
+   "name": "Orionfold/patent-strategist-bench-v0.1",
+   "layer": "BENCHMARK_EVALUATION_DATA",
+   "priority_tier": 2,
+   "audit": {
+    "authority": "Community benchmark author",
+    "license": "HF dataset card terms",
+    "provenance": "HF dataset revision",
+    "freshness": "v0.1 snapshot",
+    "coverage": "Patent strategy QA/eval tasks",
+    "schema": "HF datasets API",
+    "access_method": "HF API + parquet",
+    "reproducibility": "Revision pinning",
+    "contamination_risk": "CRITICAL if evidence-mixed: contains evaluation answers",
+    "toscanini_role": "Prior-art REASONING evaluation (per CEO: train/evaluate, don't retrieve)"
+   },
+   "measured_access": {
+    "measured": "REACHABLE_200",
+    "detail": "['_id', 'id', 'author', 'sha', 'lastModified', 'private', 'gated', 'disabled']"
+   },
+   "status_note": "MEASURED REACHABLE (200). Layer-locked to evaluation."
+  },
+  "novelty_search_bench": {
+   "corpus_id": "novelty_search_bench",
+   "name": "PatSnap/novelty-search-bench",
+   "layer": "BENCHMARK_EVALUATION_DATA",
+   "priority_tier": 2,
+   "audit": {
+    "authority": "PatSnap (commercial patent-analytics vendor) — benchmark publisher",
+    "license": "HF dataset card terms",
+    "provenance": "HF dataset revision",
+    "freshness": "Snapshot",
+    "coverage": "Novelty-search query/prior-art pairs",
+    "schema": "HF datasets API",
+    "access_method": "HF API",
+    "reproducibility": "Revision pinning",
+    "contamination_risk": "CRITICAL if evidence-mixed (labels = novelty answers)",
+    "toscanini_role": "Novelty-search evaluation instrument"
+   },
+   "measured_access": {
+    "measured": "REACHABLE_200",
+    "detail": "['_id', 'id', 'author', 'sha', 'lastModified', 'private', 'gated', 'disabled']"
+   },
+   "status_note": "MEASURED REACHABLE (200). Layer-locked to evaluation."
+  },
+  "ep_patent_all_claims": {
+   "corpus_id": "ep_patent_all_claims",
+   "name": "mhurhangee/ep-patent-all-claims (4.42M)",
+   "layer": "PATENT_PRIOR_ART_CORPUS",
+   "priority_tier": 2,
+   "audit": {
+    "authority": "THIRD-PARTY conversion of EPO data — NOT the primary office",
+    "license": "HF card; underlying EPO data CC BY 4.0 (EPO open data terms)",
+    "provenance": "HF dataset sha; converter provenance UNKNOWN — must be treated as unofficial",
+    "freshness": "Snapshot (conversion date)",
+    "coverage": "4.42M EP claims records (declared)",
+    "schema": "HF datasets API",
+    "access_method": "HF API + parquet",
+    "reproducibility": "Revision pinning",
+    "contamination_risk": "MEDIUM: unofficial conversion layer; claims text fidelity unverified vs EPO register",
+    "toscanini_role": "Patent claim corpus for overlap analysis — ONLY after provenance/fidelity spot-verification vs EPO primary routes"
+   },
+   "measured_access": {
+    "measured": "REACHABLE_200",
+    "detail": "['_id', 'id', 'author', 'sha', 'lastModified', 'private', 'gated', 'disabled']"
+   },
+   "status_note": "MEASURED REACHABLE (200). Tier 2: unofficial repackage — do not treat as authoritative while EPO OPS is the registered primary (credential-blocked)."
+  },
+  "hf_manufacturing_failure": {
+   "corpus_id": "hf_manufacturing_failure",
+   "name": "HF manufacturing/failure-detection datasets (3D-ADAM, tool-wear, UR5/RLBench failures, wafer variation...)",
+   "layer": "ENGINEERING_FAILURE_CORPUS",
+   "priority_tier": 2,
+   "audit": {
+    "authority": "Academic lab datasets — measurement experiments, NOT failure registries",
+    "license": "Per-dataset (mostly research-permissive); verify per dataset",
+    "provenance": "Per-lab; experimental setups documented in papers",
+    "freshness": "Static snapshots",
+    "coverage": "Specific rigs/processes (milling, molding, wafer, robot arms)",
+    "schema": "Time-series/tabular per dataset",
+    "access_method": "HF API",
+    "reproducibility": "Fixed snapshots",
+    "contamination_risk": "LOW as evidence-class EXPERIMENTAL; NOT incident data — must never be counted as field failures",
+    "toscanini_role": "Failure-PATTERN mining + engineering hypothesis generation with EXPERIMENTAL epistemic caps (CEO: 'not authoritative failure registries — classify appropriately')"
+   },
+   "measured_access": null,
+   "status_note": "Not individually probed this round (catalog-level audit; per-dataset audit before any use)."
+  },
+  "hf_robotics": {
+   "corpus_id": "hf_robotics",
+   "name": "Robotics datasets (Open X-Embodiment, LeRobot, NVIDIA PhysicalAI, tactile/force...)",
+   "layer": "MODEL_TRAINING_DATA",
+   "priority_tier": 2,
+   "audit": {
+    "authority": "Academic/consortium data collections",
+    "license": "Per-dataset",
+    "provenance": "Per-episode capture metadata",
+    "freshness": "Static",
+    "coverage": "Thousands of manipulation/locomotion episodes",
+    "schema": "Per-framework (LeRobot/RLDS)",
+    "access_method": "HF API",
+    "reproducibility": "Snapshot pinning",
+    "contamination_risk": "LOW for evidence; HIGH volume-to-value ratio for invention work today",
+    "toscanini_role": "Future: observed failure -> physical state -> intervention -> outcome chains (CEO #7). MODEL/TRAINING layer for now — NOT evidence."
+   },
+   "measured_access": null,
+   "status_note": "Catalog-level audit; deferred."
+  }
+ },
+ "counts": {
+  "audited": 16,
+  "tier1": 10,
+  "tier2": 6,
+  "reachable_now": 10
+ }
+}

@@ -116,13 +116,22 @@ def classify_negative_evidence(record: Dict[str, Any]) -> Dict[str, Any]:
     domain: Optional[str] = None
 
     # --- incident / recall / adverse-event classes by structure ---------
-    if norm.get("nhtsa_campaign_number") or "nhtsa" in sid:
+    # failure universe (2026-08-30): order matters — a complaint is an
+    # adverse-event signal, a campaign is a recall action; both carry
+    # "nhtsa" in sid so the structured field decides, never the host.
+    if norm.get("odi_number") or "nhtsa_complaints" in sid:
+        cls, domain = "ADVERSE_EVENT_SIGNAL", "transport"
+    elif norm.get("nhtsa_campaign_number"):
         cls, domain = "RECALL_EVENT", "transport"
+    elif norm.get("recall_number") and "cpsc" in sid:
+        cls, domain = "RECALL_EVENT", "consumer_products"
     elif norm.get("recall_event_id") or (
             role == "RECALL" and ("fda" in sid)):
         cls, domain = "RECALL_EVENT", "medical"
     elif role == "ADVERSE_EVENT" or "maude" in sid:
         cls, domain = "ADVERSE_EVENT_SIGNAL", "medical"
+    elif norm.get("accident_number") or "fra" in sid or role == "INCIDENT":
+        cls, domain = "INCIDENT_REPORT", "industrial_transport"
     elif norm.get("incident_id") or "ntsb" in sid:
         cls, domain = "INCIDENT_REPORT", "transport"
 

@@ -131,13 +131,28 @@ def test_role_depth_flips_to_gap_when_live_sources_removed(grades):
     assert rolled[role]["depth_label"] == "GAP_NO_LIVE_SOURCE"
 
 
-def test_query_relevance_canary_unmeasured_engine_wide(grades):
-    """Art. XXXI canary: QUERY_RELEVANCE is UNMEASURED for every source until
-    per-source relevance aggregation is built AND this test is deliberately
-    updated. Changing this test requires a machinery reference."""
+def test_query_relevance_canary_measured_only_from_battery(grades):
+    """Art. XXXI canary (updated 2026-08-30 WITH machinery reference —
+    query_relevance.py instrument + QUERY_RELEVANCE_PROBES.json battery
+    artifact + this session's worklog entry): QUERY_RELEVANCE grades may
+    be MEASURED ONLY for sources present in the committed battery
+    artifact; every other source must remain UNMEASURED. The spirit of
+    the original canary (no relevance claims without the aggregation
+    machinery) is preserved: delete the artifact and this test fails."""
+    from pathlib import Path
+    battery = Path("TOSCANINI/QUERY_RELEVANCE_PROBES.json")
+    assert battery.exists(), "battery artifact missing — grades would be " \
+                             "unfounded (Art. XXV)"
+    bat = json.loads(battery.read_text())
     for sid, g in grades["sources"].items():
-        assert g["dimensions"]["QUERY_RELEVANCE"]["grade"] == "UNMEASURED", sid
-    assert grades["engine_level"]["QUERY_RELEVANCE"]["status"] == "UNMEASURED engine-wide"
+        basis = g["dimensions"]["QUERY_RELEVANCE"]["basis"]
+        if basis == "MEASURED":
+            assert sid in bat["grades"], \
+                f"{sid} graded MEASURED but absent from battery artifact"
+        else:
+            assert basis == "UNMEASURED", sid
+    qr = grades["engine_level"]["QUERY_RELEVANCE"]
+    assert qr["measured_sources"] >= 30
 
 
 def test_engine_findings_state_inconvenient_results(grades):

@@ -162,6 +162,73 @@ def audit_entry_pathway(entry: dict) -> dict:
 # cemetery migration + audit
 # ---------------------------------------------------------------------------
 
+
+def _entry_chain_hash(entry: dict) -> str:
+    """Deterministic content hash of an entry EXCLUDING chain fields."""
+    import hashlib
+    stripped = {k: v for k, v in entry.items()
+                if k not in ("prev_entry_sha256",)}
+    return hashlib.sha256(json.dumps(
+        stripped, sort_keys=True, ensure_ascii=False, default=str).encode()
+    ).hexdigest()
+
+
+def _chain_backfill(cemetery: dict) -> None:
+    """ONE-TIME internal hash-chain backfill (2026-08-30).
+
+    Why: git-based append-only verification CANNOT detect deletion of
+    UNCOMMITTED entries (found live when this cycle's 5 benchmark kills
+    legitimately grew the cemetery between commits). Each entry now
+    carries prev_entry_sha256 and the file carries chain_head_sha256 —
+    any deletion, reordering or mid-file insertion breaks the chain.
+
+    Idempotence is LAUNDERING-SAFE: when chain fields already exist they
+    are left UNTOUCHED (a tampered file is never silently re-chained —
+    Art. IX); verification lives in audit_cemetery.
+    """
+    entries = cemetery.get("entries", [])
+    if not entries or all("prev_entry_sha256" in e for e in entries):
+        # empty cemetery or fully chained: nothing to backfill; NEVER
+        # recompute an existing chain
+        if entries and "chain_head_sha256" not in cemetery:
+            prev = None
+            for e in entries:
+                h = _entry_chain_hash(e)
+                e.setdefault("prev_entry_sha256", prev)
+                prev = h
+            cemetery["chain_head_sha256"] = prev or ""
+        return
+    prev = None
+    for e in entries:
+        if "prev_entry_sha256" in e:
+            prev = _entry_chain_hash(e)
+            continue
+        e["prev_entry_sha256"] = prev
+        prev = _entry_chain_hash(e)
+    cemetery["chain_head_sha256"] = prev or ""
+
+
+def _chain_verify(cemetery: dict) -> dict:
+    """Verify the internal chain: returns {valid, break_index, reason}."""
+    entries = cemetery.get("entries", [])
+    if not entries:
+        return {"valid": True, "reason": "empty cemetery"}
+    if "chain_head_sha256" not in cemetery or any(
+            "prev_entry_sha256" not in e for e in entries):
+        return {"valid": None,
+                "reason": "chain not backfilled (run migrate_cemetery once)"}
+    prev = None
+    for i, e in enumerate(entries):
+        if e.get("prev_entry_sha256") != prev:
+            return {"valid": False, "break_index": i,
+                    "reason": f"entry {i} prev_entry_sha256 mismatch "
+                              f"(deletion/reorder/insertion detected)"}
+        prev = _entry_chain_hash(e)
+    head_ok = cemetery.get("chain_head_sha256") == prev
+    return {"valid": head_ok, "reason": None if head_ok else
+            "chain_head_sha256 mismatch (tail deletion detected)"}
+
+
 def migrate_cemetery(cemetery: dict) -> dict:
     """Attach the six-element pathway to every entry IN PLACE (all
     original fields preserved verbatim; only the pathway sub-block is
@@ -169,6 +236,7 @@ def migrate_cemetery(cemetery: dict) -> dict:
     for entry in cemetery.get("entries", []):
         if "pathway" not in entry:
             entry["pathway"] = entry_pathway(entry)
+    _chain_backfill(cemetery)
     cemetery.setdefault("pathway_schema", {
         "schema": "R374_FAILED_CANDIDATE_PATHWAY",
         "elements": list(PATHWAY_ELEMENTS),
@@ -205,10 +273,13 @@ def audit_cemetery(cemetery: dict, engine_root: str) -> dict:
         git_head_ids = None  # no git history available (e.g. fresh clone
         # before first commit) — disclosed, not silently passed
 
+    chain = _chain_verify(cemetery)
     complete = all(p["complete"] for p in per_entry)
-    append_only_ok = (git_head_ids is None) or (not removed and
-                                                (prev_count or 0) <=
-                                                len(entries))
+    # append-only = BOTH (a) no committed deletion (git) AND (b) the
+    # internal chain holds (catches UNCOMMITTED deletion — git cannot)
+    git_ok = (git_head_ids is None) or (not removed and
+                                        (prev_count or 0) <= len(entries))
+    append_only_ok = git_ok and chain["valid"] is not False
     return {
         "schema": "R374_CEMETERY_PATHWAY_AUDIT",
         "entry_count": len(entries),
@@ -225,6 +296,7 @@ def audit_cemetery(cemetery: dict, engine_root: str) -> dict:
             "previous_entry_count": prev_count,
             "removed_entry_ids": removed,
             "nothing_deleted": append_only_ok,
+            "internal_chain": chain,
         },
         "ok": complete and append_only_ok,
     }

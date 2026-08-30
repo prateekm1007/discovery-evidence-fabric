@@ -13,10 +13,11 @@ from __future__ import annotations
 import json
 import re
 import urllib.parse
-from typing import Any, Dict, List
+import urllib.request
+from typing import Any, Dict, List, Optional, Tuple
 
 from discovery_fabric.source_registry.base import (
-    ConnectorBase, SourceRecord, utc_now,
+    ConnectorBase, SourceRecord, utc_now, SSL_CONTEXT, USER_AGENT,
 )
 
 
@@ -36,22 +37,101 @@ class PubMedConnector(ConnectorBase):
         return ("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
                 f"?db=pubmed&term={q}&retmode=json&retmax={self.LIMIT}")
 
+    def build_summary_url(self, ids: List[str]) -> str:
+        return ("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
+                f"?db=pubmed&retmode=json&id={','.join(ids)}")
+
+    def build_fetch_url(self, ids: List[str]) -> str:
+        return ("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+                f"?db=pubmed&retmode=xml&id={','.join(ids)}")
+
+    def fetch_abstracts(self, ids: List[str]) -> Dict[str, str]:
+        """efetch pass: abstract text per PMID (the evidence field).
+
+        Added 2026-08-30 after the battery graded pubmed's title-only
+        records 0.3 relevance: esummary carries titles but not abstracts,
+        and the abstract is where query terms actually live for most
+        PubMed hits. One batched efetch call for the whole id list.
+        Failure degrades to no-abstract (disclosed) — never fails the
+        retrieval.
+        """
+        if not ids:
+            return {}
+        try:
+            url = self.build_fetch_url(ids)
+            req = urllib.request.Request(
+                url, headers={"User-Agent": USER_AGENT,
+                              "Accept": "application/xml"})
+            resp = urllib.request.urlopen(req, timeout=25,
+                                          context=SSL_CONTEXT)
+            xml = resp.read().decode("utf-8", "replace")
+            out: Dict[str, str] = {}
+            for article in re.findall(
+                    r"<PubmedArticle>(.*?)</PubmedArticle>", xml, re.S):
+                pmid_m = re.search(
+                    r"<PMID[^>]*>(\d+)</PMID>", article)
+                if not pmid_m:
+                    continue
+                parts = re.findall(
+                    r"<AbstractText[^>]*>(.*?)</AbstractText>", article, re.S)
+                text = _clean(" ".join(parts))
+                if text:
+                    out[pmid_m.group(1)] = text[:4000]
+            return out
+        except Exception:  # noqa: BLE001 — degradation disclosed per record
+            return {}
+
     def parse_payload(self, raw: bytes, query: str) -> Any:
         return json.loads(raw.decode("utf-8"))
+
+    def fetch_summaries(self, ids: List[str]) -> Tuple[Dict[str, Dict[str, Any]], Optional[str]]:
+        """esummary pass: titles + dates for the esearch id list.
+
+        DEFECT FIXED 2026-08-30 (found live by the QUERY_RELEVANCE
+        battery): records previously shipped as ID stubs titled
+        'PubMed PMID NNNN' with no metadata — the source was answering
+        but its records were unusable as evidence downstream and
+        unadjudicable for relevance. Records now carry title,
+        publication date, journal, authors (esummary is a free second
+        call; NCBI asks 3 req/s — a single follow-up stays inside it).
+        A failed esummary degrades titles to PMID stubs AND the error is
+        DISCLOSED on every affected record — never swallowed (the first
+        cut of this fix had a bare except that ate a NameError; that is
+        the Art. XV failure mode and it is not repeated).
+        """
+        if not ids:
+            return {}, None
+        try:
+            url = self.build_summary_url(ids)
+            req = urllib.request.Request(
+                url, headers={"User-Agent": USER_AGENT,
+                              "Accept": "application/json"})
+            resp = urllib.request.urlopen(req, timeout=20,
+                                          context=SSL_CONTEXT)
+            data = json.loads(resp.read().decode("utf-8"))
+            return (data.get("result") or {}), None
+        except Exception as e:  # noqa: BLE001 — degraded, but DISCLOSED per record
+            return {}, f"esummary pass failed: {e!r}"
 
     def normalize_payload(self, payload: Any, query: str, raw_sha: str) -> List[SourceRecord]:
         result = (payload or {}).get("esearchresult") or {}
         if "error" in result:
             raise ValueError(f"pubmed error: {result['error']}")
         ids = result.get("idlist") or []
-        # esearch returns ids only; titles fetched via esummary would double
-        # requests. Record ids as records; enrichment is a separate call path.
-        return [
-            SourceRecord(
+        summaries, esummary_error = self.fetch_summaries(ids)
+        abstracts = self.fetch_abstracts(ids)
+        out: List[SourceRecord] = []
+        for pid in ids:
+            s = summaries.get(pid) or {}
+            title = _clean(s.get("title") or "") if s else ""
+            if not title:
+                title = f"PubMed PMID {pid}"
+            pubdate = s.get("pubdate") if s else None
+            out.append(SourceRecord(
                 source_id=self.SOURCE_ID,
                 role="SCIENTIFIC",
                 record_id=f"pmid:{pid}",
-                title=f"PubMed PMID {pid}",
+                title=title,
                 uri=f"https://pubmed.ncbi.nlm.nih.gov/{pid}/",
                 retrieved_at=utc_now(),
                 query=query,
@@ -59,23 +139,28 @@ class PubMedConnector(ConnectorBase):
                 normalized={
                     "pmid": pid,
                     "total_count": result.get("count"),
-                    "translation_set": None,  # not fetched
+                    "publication_date": pubdate,
+                    "journal": (s.get("fulljournalname") or None) if s else None,
+                    "authors": ([a.get("name") for a in (s.get("authors") or [])[:10]]
+                                 if s else None),
+                    "abstract": abstracts.get(pid),
+                    "esummary_fetched": bool(s),
+                    "esummary_error": esummary_error,
                 },
                 provenance={
                     "provider": self.SOURCE_ID,
-                    "api": "eutils.ncbi.nlm.nih.gov",
+                    "api": "eutils.ncbi.nlm.nih.gov esearch+esummary",
                     "query": query,
                     "raw_payload_sha256": raw_sha,
                     "retrieved_at": utc_now(),
                 },
                 epistemic_state="OBSERVED",
-                limitations=[
-                    "esearch returns identifiers only; metadata requires a "
-                    "second esummary/efetch call (not yet chained)",
-                ],
-            )
-            for pid in ids
-        ]
+                limitations=([
+                    f"esummary pass failed ({esummary_error}); record is an "
+                    "ID stub without metadata (title shows PMID placeholder)",
+                ] if not s else []),
+            ))
+        return out
 
 
 class EuropePmcConnector(ConnectorBase):
