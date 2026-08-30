@@ -83,6 +83,16 @@ ROLE_DEFINITIONS = {
         "resilience problems. A hazard event is NOT an engineering-"
         "failure record; consequences require engineering corpora."
     ),
+    "EXPERIMENT": (
+        "Funded research-attempt records (grants/projects with objectives, "
+        "dates, and where available outcomes). Authoritative for: WHAT WAS "
+        "TRIED, at what scale, with which declared objectives — the "
+        "attempt-outcome universe beyond publication bias (a funded "
+        "attempt that never published is still an attempt). Project "
+        "records establish that research HAPPENED and what it targeted; "
+        "they do NOT establish that a mechanism works (absence of a "
+        "positive outcome is not evidence of failure — Art. XXV)."
+    ),
 }
 
 # Roles the CEO coverage matrix reports on (directive-specified order).
@@ -90,7 +100,7 @@ COVERAGE_MATRIX_ROLES = [
     "SCIENTIFIC", "PATENT", "REGULATORY", "DEVICE_IDENTITY",
     "ADVERSE_EVENT", "RECALL", "CLINICAL", "MATERIALS",
     "MANUFACTURING", "STANDARDS", "CHEMISTRY", "BIOLOGY", "COMMERCIAL",
-    "INCIDENT", "HAZARD_EVENT",
+    "INCIDENT", "HAZARD_EVENT", "EXPERIMENT",
 ]
 
 VALID_ROLES = set(ROLE_DEFINITIONS)

@@ -6,9 +6,18 @@ CEO database-layer directive, per source:
     NORMALIZATION WORKS -> PROVENANCE STORES -> RETRIEVAL LOG STORES ->
     HEALTH CHECK PASSES
 
-and emits the measured status vocabulary:
+and emits the measured status vocabulary (CEO directive 2026-08-30 #5,
+mechanically honest):
 
-    LIVE / DEGRADED / UNAVAILABLE / NOT_INTEGRATED
+    LIVE / DEGRADED / BLOCKED / NOT_INTEGRATED
+
+Every BLOCKED status carries a machine-derived block_class (AUTH /
+EGRESS / PROVIDER_RETIRED / REGISTRATION / HTTP_5XX / NETWORK /
+METERED_WINDOW / CONNECTOR_IMPORT) derived from the measured request
+status, HTTP code, and error signature by status_model.py — never
+hand-assigned. The pre-2026-08-30 label `UNAVAILABLE` is the same state
+family; it is interpreted through status_model.LEGACY_VOCABULARY_MAP
+(Art. XI — history is not rewritten, the rename is recorded).
 
 Constitutional anchors:
 - Art. XXVI: no self-certification. The health checker is a MEASUREMENT
@@ -51,11 +60,19 @@ DERIVATION = {
             "normalizable records (or a definitive zero)",
     "DEGRADED": "provider answered but restricted: rate-limit/budget, or "
                 f"latency above the disclosed {LATENCY_DEGRADED_MS} ms triage bound",
-    "UNAVAILABLE": "connector exists; live request failed (auth, blocked, "
-                   "5xx, network)",
+    "BLOCKED": "connector exists; the live request could not be answered "
+               "usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/"
+               "REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived "
+               "mechanically from the measured signature by status_model.py",
     "NOT_INTEGRATED": "no connector exists (registry records the gap; "
                       "README mentions are not integration — Art. XXI)",
 }
+
+# Legacy vocabulary note (Art. XI): artifacts before 2026-08-30 say
+# UNAVAILABLE where this module now says BLOCKED (+ block_class).
+from discovery_fabric.source_registry.status_model import (  # noqa: E402
+    LEGACY_VOCABULARY_MAP, classify_block,
+)
 
 # Metered-source policy (Patent Bear class of providers):
 # a live health probe costs provider quota (Patent Bear: 1 of 20 monthly
@@ -71,8 +88,9 @@ METERED_DERIVATION = {
             "suppressed to protect provider quota",
     "DEGRADED": "metered source: freshest live proof shows provider "
                 "rate/quota limit, or quota exhausted since (guard active)",
-    "UNAVAILABLE": "metered source: no live proof inside the metered "
-                   "window (quota-protected probe suppressed)",
+    "BLOCKED": "metered source: no live proof inside the metered "
+               "window (quota-protected probe suppressed) — block_class "
+               "METERED_WINDOW",
 }
 
 
@@ -122,7 +140,8 @@ def _check_metered_source(source_id: str, metered: Dict[str, Any]) -> Dict[str, 
     if last_live is None:
         return {
             "source_id": source_id,
-            "status": "UNAVAILABLE",
+            "status": "BLOCKED",
+            "block": classify_block(metered_window=True),
             "chain": chain,
             "request_status": "NOT_PROBED",
             "error": (
@@ -223,7 +242,10 @@ def check_source(source_id: str, timeout: int = 30) -> Dict[str, Any]:
     except Exception as e:  # noqa: BLE001
         return {
             "source_id": source_id,
-            "status": "UNAVAILABLE",
+            "status": "BLOCKED",
+            "block": classify_block(
+                request_status="CONNECTOR_IMPORT",
+                error=f"connector import failed: {type(e).__name__}: {e}"),
             "chain": {**chain, "connector_exists": False},
             "error": f"connector import failed: {type(e).__name__}: {e}",
             "derivation": DERIVATION,
@@ -279,8 +301,11 @@ def check_source(source_id: str, timeout: int = 30) -> Dict[str, Any]:
         entries = read_entries(source_id=source_id)
         chain["retrieval_log_stores"] = len(entries) > 0
 
-    # step 7 + status derivation
+    # step 7 + status derivation (mechanically honest vocabulary; BLOCKED
+    # classes derived by status_model.classify_block from the measured
+    # signature — CEO directive 2026-08-30 #5)
     status: str
+    block_info: Optional[Dict[str, Any]] = None
     if result.status in (STATUS_OK, STATUS_EMPTY):
         status = "LIVE"
         if result.status == STATUS_EMPTY:
@@ -295,15 +320,23 @@ def check_source(source_id: str, timeout: int = 30) -> Dict[str, Any]:
         reason = f"provider answered with rate/budget limit: {result.error}"
     elif result.status in ("AUTH_FAILED", "UNAVAILABLE", "TIMEOUT",
                            "SEARCH_FAILED", "PARSE_FAILED", "NOT_IMPLEMENTED"):
-        status = "UNAVAILABLE"
-        reason = f"{result.status}: {result.error}"
+        block_info = classify_block(
+            request_status=result.status, error=result.error,
+            http_status=result.http_status)
+        status = block_info["status"]
+        reason = (f"{result.status}: {result.error} "
+                  f"[block_class={block_info['block_class']}]")
     else:  # unknown status — honest recording, never silence
-        status = "UNAVAILABLE"
-        reason = f"unmapped status {result.status!r}: {result.error}"
+        block_info = classify_block(
+            request_status=result.status, error=result.error,
+            http_status=result.http_status)
+        status = block_info["status"]
+        reason = (f"unmapped status {result.status!r}: {result.error} "
+                  f"[block_class={block_info['block_class']}]")
 
     chain["health_check_passes"] = status == "LIVE"
 
-    return {
+    out = {
         "source_id": source_id,
         "status": status,
         "chain": chain,
@@ -315,6 +348,9 @@ def check_source(source_id: str, timeout: int = 30) -> Dict[str, Any]:
         "error": reason if status != "LIVE" else None,
         "derivation": DERIVATION,
     }
+    if block_info is not None:
+        out["block"] = block_info
+    return out
 
 
 def run_health_check(source_ids: Optional[List[str]] = None,

@@ -60,3 +60,49 @@ def _hermetic_no_provider_keys(monkeypatch):
     except ImportError:
         pass
     yield
+
+
+@pytest.fixture(autouse=True)
+def _hermetic_relevance_custody_log(tmp_path, monkeypatch):
+    """Relevance-adjudication custody log isolation (Art. IX/XVII).
+
+    `relevance_aggregation.record_adjudications()` is now called from inside
+    the discovery pipeline. Without this fixture, any hermetic test that
+    exercises the pipeline would APPEND to the production custody log
+    `artifacts/source_health/relevance_adjudication_log.jsonl` —
+    contaminating real per-source usage measurements with test adjudications
+    (exactly the e11 registry-contamination defect class from R374). The
+    autouse redirect makes contamination impossible without per-test
+    cooperation. ENGINE_LIVE=1 opts out (operator-intentional live run).
+    """
+    if os.environ.get("ENGINE_LIVE"):
+        yield
+        return
+    import discovery_fabric.source_registry.relevance_aggregation as _ra
+    monkeypatch.setattr(_ra, "LOG_PATH", tmp_path / "relevance_adjudication_log.jsonl")
+    yield
+
+
+@pytest.fixture(autouse=True)
+def _hermetic_package_id_registry(tmp_path, monkeypatch):
+    """Production PACKAGE_ID_REGISTRY guard (Art. IX/XVII — e11 class).
+
+    FOUND LIVE 2026-08-30: tests/test_f_series_integration.py::
+    test_d1_resume_continues_killed_run_without_rerunning_stages resumed an
+    EngineRun via from_run_dir() whose manifest carried NO
+    package_registry_path, so the automatic post-RANK pipeline allocated
+    P-148 against the PRODUCTION registry (working tree only — restored
+    before commit; disclosed in the worklog). The R374 sandbox covered the
+    direct-construction path but not the resume path.
+
+    This guard redirects package_registry.CANONICAL_REGISTRY to a tmp path
+    for EVERY hermetic test, making the contamination class impossible
+    regardless of individual test discipline. ENGINE_LIVE=1 opts out.
+    """
+    if os.environ.get("ENGINE_LIVE"):
+        yield
+        return
+    import discovery_fabric.engine.package_registry as _pr
+    monkeypatch.setattr(_pr, "CANONICAL_REGISTRY",
+                        tmp_path / "PACKAGE_ID_REGISTRY_SANDBOX.json")
+    yield

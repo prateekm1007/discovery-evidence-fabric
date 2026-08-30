@@ -212,6 +212,50 @@ def load_cemetery() -> List[CemeteryEntry]:
     return INITIAL_CEMETERY
 
 
+def _entry_chain_hash(entry: dict) -> str:
+    """Deterministic content hash EXCLUDING chain fields.
+
+    MUST stay byte-identical in semantics to
+    premium_package_factory/r374/pathway._entry_chain_hash (the R374
+    audit's canonical verifier): sha256 over the entry dict minus
+    prev_entry_sha256, sort_keys, ensure_ascii=False, default=str.
+    """
+    import hashlib
+    stripped = {k: v for k, v in entry.items()
+                if k not in ("prev_entry_sha256",)}
+    return hashlib.sha256(json.dumps(
+        stripped, sort_keys=True, ensure_ascii=False, default=str).encode()
+    ).hexdigest()
+
+
+def _chain_extend(cemetery: dict) -> None:
+    """Extend the internal hash chain over any UNCHAINED entries.
+
+    LAUNDERING-SAFE (same discipline as R374 pathway._chain_backfill):
+    existing chain fields are never recomputed; only entries missing
+    prev_entry_sha256 get chained onto the running head, and
+    chain_head_sha256 is refreshed. Defect memory (Art. XXXI,
+    2026-08-30): the engine kill path round-tripped the whole cemetery
+    through save_cemetery() and DESTROYED the chain the R374 cycle
+    installed (52 chained entries at 50d1664a -> 57 unchained in the
+    working file). Nothing was deleted (git id-diff verified empty), but
+    deletion detection was silently lost until the R374 test caught it.
+    """
+    entries = cemetery.get("entries", [])
+    if not entries:
+        return
+    prev = None
+    # resume the head from the last chained entry (or None)
+    for e in entries:
+        if "prev_entry_sha256" in e:
+            prev = _entry_chain_hash(e)
+    for e in entries:
+        if "prev_entry_sha256" not in e:
+            e["prev_entry_sha256"] = prev
+            prev = _entry_chain_hash(e)
+    cemetery["chain_head_sha256"] = prev or ""
+
+
 def append_entries_to_cemetery_file(new_entries: List[CemeteryEntry]) -> None:
     """Append entries to the canonical cemetery WITHOUT round-tripping
     existing entries through the dataclass (which would drop their
@@ -220,7 +264,12 @@ def append_entries_to_cemetery_file(new_entries: List[CemeteryEntry]) -> None:
     2026-08-30 (R375): the read-modify-write is now flock-serialized —
     concurrent campaign runs appending simultaneously could otherwise
     lose entries (last-writer-wins), violating the append-only/no-loss
-    mandate. Same pattern as package_registry.allocate."""
+    mandate. Same pattern as package_registry.allocate.
+
+    2026-08-30 (chain fix): appends now MAINTAIN the internal hash chain
+    (chain fields on new entries + refreshed chain_head_sha256) so the
+    R374 append-only audit keeps detecting deletions.
+    """
     import fcntl
     CEMETERY_PATH.parent.mkdir(parents=True, exist_ok=True)
     lock_path = CEMETERY_PATH.with_suffix(CEMETERY_PATH.suffix + ".lock")
@@ -237,6 +286,7 @@ def append_entries_to_cemetery_file(new_entries: List[CemeteryEntry]) -> None:
                     "entries": [],
                 }
             data.setdefault("entries", []).extend(asdict(e) for e in new_entries)
+            _chain_extend(data)
             data["entry_count"] = len(data["entries"])
             data["updated_at"] = datetime.now(timezone.utc).isoformat()
             data["last_update_round"] = "L8-campaign"

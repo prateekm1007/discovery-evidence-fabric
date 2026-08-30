@@ -1,6 +1,6 @@
 # SOURCE COVERAGE MATURITY MODEL — Toscanini
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Directive:** CEO 2026-08-30 — "First create a SOURCE COVERAGE MATURITY MODEL … Every source must be graded across those dimensions."
 **Status:** RATIFIED INSTRUMENT (grades regenerate mechanically via `python3 -m discovery_fabric.source_registry.maturity`)
 **Machine output:** `TOSCANINI/SOURCE_MATURITY_GRADES.json`
@@ -34,11 +34,11 @@ temporal span, relevance quality).
 |---|-----------|----------|-------|
 | 1 | `ROLE_COVERAGE` | Does the source demonstrably fulfill its declared authority roles (measured 7-step chain + real records)? | MEASURED |
 | 2 | `SOURCE_DIVERSITY` | Structural independence of the underlying corpus vs other registered sources (overlap groups; aggregator status) | DECLARED |
-| 3 | `LIVE_AVAILABILITY` | Measured health: LIVE / DEGRADED / UNAVAILABLE / NOT_INTEGRATED | MEASURED |
+| 3 | `LIVE_AVAILABILITY` | Measured health: LIVE / DEGRADED / BLOCKED / NOT_INTEGRATED (mechanically honest vocabulary, CEO directive 2026-08-30 #5; every BLOCKED carries a machine-derived block_class via `status_model.py`; legacy artifacts saying UNAVAILABLE read through `LEGACY_VOCABULARY_MAP`) | MEASURED |
 | 4 | `RECORD_VOLUME` | OK records in the hash-chained custody log | MEASURED |
 | 5 | `FRESHNESS` | min(provider-declared cadence, pipeline last-success date) | MEASURED+DECLARED |
 | 6 | `PRIMARY_SOURCE_AUTHORITY` | PRIMARY (issuer) / SECONDARY (repackager) | DECLARED |
-| 7 | `QUERY_RELEVANCE` | Per-source relevance-adjudication quality via the committed battery (`query_relevance.py` -> `QUERY_RELEVANCE_PROBES.json`); query-differentiation check flags silently-ignored query params | MEASURED (battery sources) |
+| 7 | `QUERY_RELEVANCE` | Per-source relevance-adjudication quality: committed battery (`query_relevance.py` -> `QUERY_RELEVANCE_PROBES.json`) PLUS the persisted USAGE aggregation from real runs (`relevance_aggregation.py` hash-chained custody log -> `QUERY_RELEVANCE_USAGE.json`); query-differentiation and ZERO_RELEVANT_OK_STATUS flags mark the status-OK-plus-irrelevant-records defect class | MEASURED (battery + usage) |
 | 8 | `PROVENANCE_COMPLETENESS` | Custody fields (entry hash, payload hash, chain link) present on logged retrievals | MEASURED |
 | 9 | `FAILURE_NEGATIVE_EVIDENCE_COVERAGE` | Failure-native / attempt-outcomes / mixed-undersampled / not-a-failure-source | DECLARED |
 | 10 | `GEOGRAPHIC_COVERAGE` | Corpus reach: global / multi-region / single jurisdiction | DECLARED |
@@ -204,7 +204,16 @@ unmeasured relevance quality, and degraded/overlapping scientific breadth.
 ## 6. What this model now demands (the to-do list it generates)
 
 1. Close QUERY_RELEVANCE: persist per-source relevance-adjudication
-   aggregation in the custody log → then measure it. (STILL OPEN.)
+   aggregation in the custody log → then measure it. (DONE 2026-08-30:
+   `relevance_aggregation.py` — hash-chained append-only adjudication
+   log; ONE recording path for the pipeline (device_failure step 4), the
+   committed battery, and the Toscanini UI builder; usage aggregation
+   with declared bands, a 30-record sample floor, and the
+   ZERO_RELEVANT_OK_STATUS defect-class hypothesis flag. First live
+   aggregation: 28 entries / 9 sources / 260 records; the flag fired on
+   doe_osti (0.175 pooled relevant-rate on real-run queries) — a real
+   finding, disclosed, not hidden. Reproduction:
+   `python3 scripts/query_relevance_usage_report.py`.)
 2. Rescue DEGRADED sources (OpenAlex 429, Semantic Scholar 429) before
    adding replacements (CEO directive 3). (DONE 2026-08-30: backoff +
    Retry-After policy, metered-protected; S2 recovered LIVE in isolation;

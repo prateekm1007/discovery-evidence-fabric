@@ -209,6 +209,16 @@ class ConnectorBase:
     def build_url(self, query: str) -> str:
         raise NotImplementedError
 
+    # POST-API support (2026-08-30, NIH RePORTER integration): connectors
+    # for POST-only JSON APIs set HTTP_METHOD="POST" and return a JSON
+    # body from build_request_body(). The retrieval log still records the
+    # URL (never the body), so custody discipline is unchanged. Default
+    # stays GET — every existing connector is untouched.
+    HTTP_METHOD = "GET"
+
+    def build_request_body(self, query: str) -> Optional[bytes]:
+        return None
+
     def parse_payload(self, raw: bytes, query: str) -> Any:
         """Parse raw bytes -> structured payload. Raise on unparseable."""
         raise NotImplementedError
@@ -235,13 +245,25 @@ class ConnectorBase:
         """
         t0 = time.time()
         try:
+            method = getattr(self, "HTTP_METHOD", "GET")
+            # POST body is built from the CURRENT query stashed by
+            # _execute (keeps _request(url, timeout) signature stable
+            # for every existing subclass and test stub)
+            body = self.build_request_body(
+                getattr(self, "_current_query", "")) \
+                if method == "POST" else None
+            headers = {
+                "User-Agent": USER_AGENT,
+                "Accept": "application/json,*/*",
+                **self.request_headers(),
+            }
+            if body is not None:
+                headers["Content-Type"] = "application/json"
             req = urllib.request.Request(
                 url,
-                headers={
-                    "User-Agent": USER_AGENT,
-                    "Accept": "application/json,*/*",
-                    **self.request_headers(),
-                },
+                data=body,
+                headers=headers,
+                method=method,
             )
             resp = urllib.request.urlopen(req, timeout=timeout, context=SSL_CONTEXT)
             body = resp.read()
@@ -287,6 +309,7 @@ class ConnectorBase:
         (Art. XXI.3).
         """
         url = self.build_url(query)
+        self._current_query = query  # consumed by _request for POST APIs
         t0 = time.time()
         body, status, http_status, error, remaining = self._request(url, timeout=timeout)
 

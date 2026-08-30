@@ -103,6 +103,24 @@ def main() -> int:
     agg = qr.aggregate(results)
     grades = {sid: qr.grade_query_relevance(a) for sid, a in agg.items()}
 
+    # Persist this battery run's per-source adjudications through the SAME
+    # custody path as pipeline adjudications (maturity §6.1 closure: one
+    # recording path, one aggregation). run_id marks the origin so usage
+    # aggregation can always separate battery traffic from pipeline traffic.
+    from discovery_fabric.source_registry import relevance_aggregation
+    for sid, a in agg.items():
+        for pq in a["queries"]:
+            try:
+                relevance_aggregation.record_adjudications(
+                    source_id=sid,
+                    query=pq["query"],
+                    adjudicated_records=pq["adjudications"],
+                    run_id="battery:QUERY_RELEVANCE_PROBES",
+                    provider_status=pq.get("status"),
+                )
+            except Exception as e:  # noqa: BLE001 — surface, never swallow
+                print(f"[battery] custody append failed {sid}: {e!r}")
+
     # merge with any previous chunk run (the battery runs in chunks; each
     # chunk's sources accumulate into one artifact)
     if OUT_PATH.exists():

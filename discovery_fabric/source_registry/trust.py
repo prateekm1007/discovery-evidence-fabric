@@ -115,6 +115,14 @@ SOURCE_TRUST: Dict[str, Tuple[str, str]] = {
     "who_ictrp": ("SECONDARY", "registry entries (sponsor-reported)"),
     "nasa_ntrs": ("SECONDARY", "technical reports — editorially curated, not peer-reviewed"),
     "doe_osti": ("SECONDARY", "technical reports/OSTI records — not peer-reviewed"),
+    # --- EXPERIMENT role (attempt records, CEO 2026-08-30 #3) ---
+    # A funded project record is an administrative ATTEMPT record: issuer-
+    # authoritative for the fact the research happened and its declared
+    # objectives — never for the validity of the mechanism studied (the
+    # EXPERIMENT role caps this in roles.py; Art. XXV).
+    "nih_reporter": ("PRIMARY_REGULATORY", "NIH's OWN award records — issuer-authoritative for what was funded/attempts; NOT outcome validity"),
+    "nsf_awards": ("PRIMARY_REGULATORY", "NSF's OWN award records (blocked: no anonymous route) — attempts, not outcomes"),
+    "cordis_projects": ("PRIMARY_REGULATORY", "EU Commission's OWN project records (blocked: registration) — attempts, not outcomes"),
     "manufacturing_literature": ("SECONDARY", "process literature mix incl. non-peer-reviewed"),
     # patent sources: aggregator views of PRIMARY offices (EPO/USPTO/WIPO
     # bibliographic facts are regulatory; the AGGREGATOR layer can err)

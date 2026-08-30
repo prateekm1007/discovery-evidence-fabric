@@ -338,6 +338,23 @@ def load_relevance_artifact() -> Dict[str, Any]:
         return {}
 
 
+def _usage_relevance(sid: str) -> Optional[Dict[str, Any]]:
+    """Persisted per-source relevance-adjudication usage aggregation.
+
+    Returns None when the source has no persisted adjudications (never a
+    0 — Art. XXV). Reading the custody log cannot mutate it (Art. IX).
+    """
+    try:
+        from discovery_fabric.source_registry import relevance_aggregation
+        entries = relevance_aggregation.read_entries(source_id=sid)
+        if not entries:
+            return None
+        agg = relevance_aggregation.aggregate_usage(source_id=sid)
+        return agg.get("sources", {}).get(sid)
+    except Exception:  # noqa: BLE001 — instrument failure is disclosed, not raised
+        return {"error": "usage aggregation unavailable (instrument failure)"}
+
+
 def grade_source(
     source: Dict[str, Any],
     health: Optional[Dict[str, Any]],
@@ -367,7 +384,9 @@ def grade_source(
         dims["ROLE_COVERAGE"] = {"grade": 1, "basis": "MEASURED",
             "evidence": f"DEGRADED ({health.get('request_status')})",
             "rationale": "provider answers restricted; unusable in campaigns today"}
-    elif st in ("UNAVAILABLE", "NOT_INTEGRATED"):
+    elif st in ("BLOCKED", "UNAVAILABLE", "NOT_INTEGRATED"):
+        # (UNAVAILABLE = pre-2026-08-30 legacy label for BLOCKED — read
+        # through status_model.LEGACY_VOCABULARY_MAP, Art. XI)
         dims["ROLE_COVERAGE"] = {"grade": 0, "basis": "MEASURED",
             "evidence": f"{st}: connector_exists={chain.get('connector_exists')}",
             "rationale": "no usable retrieval path measured"}
@@ -392,7 +411,8 @@ def grade_source(
             "rationale": "no registered source shares this corpus"}
 
     # 3. LIVE_AVAILABILITY
-    avail = {("LIVE", 3), ("DEGRADED", 1), ("UNAVAILABLE", 0), ("NOT_INTEGRATED", 0)}
+    avail = {("LIVE", 3), ("DEGRADED", 1), ("BLOCKED", 0),
+             ("UNAVAILABLE", 0), ("NOT_INTEGRATED", 0)}
     if st is None or st == "NOT_MEASURED":
         dims["LIVE_AVAILABILITY"] = _unmeasured("health status not measured")
     else:
@@ -434,6 +454,11 @@ def grade_source(
     #    artifact (query_relevance.py instrument, CEO "finish source
     #    maturity" directive). Sources not in the artifact (metered /
     #    blocked / failed probes) stay UNMEASURED (Art. XXV).
+    #    v1.2.0 — USAGE AGGREGATION (maturity §6.1 closure): the persisted
+    #    per-source relevance-adjudication aggregation from REAL runs
+    #    (relevance_aggregation.py custody log) is attached alongside the
+    #    battery grade so relevance quality is measured from actual engine
+    #    usage, continuously, not only from the fixed battery.
     bat = (relevance or {}).get("grades", {}).get(sid)
     if bat is not None:
         dims["QUERY_RELEVANCE"] = dict(bat)
@@ -448,6 +473,9 @@ def grade_source(
              "no adjudicated battery data exists") if metered else
             "not in the committed battery run (connector absent, blocked, "
             "or every probe failed this run) — Art. XXV: not graded")
+    usage = _usage_relevance(sid)
+    if usage is not None:
+        dims["QUERY_RELEVANCE"]["usage_aggregation"] = usage
 
     # 8. PROVENANCE_COMPLETENESS
     if not has_log:

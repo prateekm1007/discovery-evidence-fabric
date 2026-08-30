@@ -687,11 +687,20 @@ class EngineRun:
 
     # ------------------------------------------------------------------
     def _cemetery_update(self, final: Dict[str, Any]):
-        """Append-only negative knowledge on final KILL/REJECT (D9 output)."""
+        """Append-only negative knowledge on final KILL/REJECT (D9 output).
+
+        2026-08-30 chain fix (Art. XXXI defect memory): this path
+        previously called the dataclass round-trip writer, which
+        re-serialized EVERY entry — destroying chain
+        fields, R374 pathway blocks and history fields, silently
+        disabling deletion detection (caught by the R374 append-only
+        test after 5 MVP UI kills unchained the file). Appends now go
+        through append_entries_to_cemetery_file() (byte-preserving,
+        flock-serialized, chain-maintaining).
+        """
         try:
             import importlib
             mc = importlib.import_module("orchestrator.mechanism_cemetery")
-            entries = list(mc.load_cemetery())
             mm = self.env.mechanism_map or {}
             entry = mc.CemeteryEntry(
                 entry_id=f"cem:engrun:{sha256_obj(self.run_id)[:10]}",
@@ -707,10 +716,10 @@ class EngineRun:
                                .get("novelty_risk", "unresolved prior art")[:200],
                 evidence_sources=[e for e in (self.env.evidence_ids or [])[:3]],
                 epistemic_class="FAILURE_LESSON")
-            entries.append(entry)
-            mc.save_cemetery(entries)
+            mc.append_entries_to_cemetery_file([entry])
             self._persist("cemetery_update.json",
-                          {"appended": asdict_ok(entry), "total_entries": len(entries),
+                          {"appended": asdict_ok(entry),
+                           "total_entries": len(mc.load_cemetery()),
                            "append_only": True})
         except Exception as exc:  # noqa: BLE001 - recorded, never fatal
             self._persist("cemetery_update.json",

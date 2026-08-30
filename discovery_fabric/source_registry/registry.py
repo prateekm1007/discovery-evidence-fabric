@@ -27,7 +27,14 @@ from typing import Any, Dict, List, Optional
 
 NOT_MEASURED = "NOT_MEASURED"
 # Measured-status vocabulary (health report overlay values).
-MEASURED_STATUSES = {"LIVE", "DEGRADED", "UNAVAILABLE", "NOT_INTEGRATED"}
+# Mechanically honest vocabulary (CEO directive 2026-08-30 #5):
+# LIVE / DEGRADED / BLOCKED / NOT_INTEGRATED. UNAVAILABLE is accepted on
+# input as the pre-rename legacy label for BLOCKED (status_model.
+# LEGACY_VOCABULARY_MAP, Art. XI) so historical overlays remain loadable.
+MEASURED_STATUSES = {"LIVE", "DEGRADED", "BLOCKED", "UNAVAILABLE",
+                     "NOT_INTEGRATED"}
+# statuses this module EMITS (legacy label never emitted again)
+EMITTED_STATUSES = {"LIVE", "DEGRADED", "BLOCKED", "NOT_INTEGRATED"}
 
 # A source with no connector: the registry records it so the coverage
 # matrix can report the gap HONESTLY (Art. XV/XXV), but it can never be
@@ -1336,6 +1343,89 @@ _register(_src(
                       "raw payload sha256 into hash-chained log",
     connector="discovery_fabric.source_registry.connectors.failure_universe:FraRailAccidentConnector",
     auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="nih_reporter",
+    name="NIH RePORTER (funded research projects)",
+    authority_role=["EXPERIMENT"],
+    coverage="NIH-funded biomedical research PROJECT records: what was "
+             "attempted, by which organization, over which period, with "
+             "declared objectives and abstracts — the attempt-outcome "
+             "universe beyond publication bias. Measured LIVE 2026-08-30 "
+             "(POST v2/projects/search, real appl_id records).",
+    access_method="REST JSON POST, no key: https://api.reporter.nih.gov"
+                  "/v2/projects/search (measured 200)",
+    update_frequency="Continuous (RePORTER refreshes with reporting "
+                     "cycles)",
+    rate_limits="Public API; no key; modest page sizes used",
+    licensing="Open data (NIH/US-government terms)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous",
+    known_gaps="ATTEMPT records, not outcome proof: a funded project is "
+               "an attempt with declared objectives, never evidence the "
+               "objective was achieved. NIH-funded biomedical scope only "
+               "— absence of a RePORTER project is not evidence a "
+               "technology was never researched. Non-medical experiment "
+               "coverage (NSF awards, CORDIS) measured BLOCKED from this "
+               "egress 2026-08-30 (nsf_awards: 404/403; cordis: HTML app "
+               "shell) and stays an honest gap.",
+    provenance_method="Query + appl_id + raw payload sha256 into "
+                      "hash-chained retrieval log",
+    connector="discovery_fabric.source_registry.connectors.research_attempts:NihReporterConnector",
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="nsf_awards",
+    name="NSF Award Search (non-medical research attempts)",
+    authority_role=["EXPERIMENT"],
+    coverage="NSF-funded engineering/physical-science research awards — "
+             "the non-medial counterpart of RePORTER for what was "
+             "attempted. NOT INTEGRATED: measured blocked from this "
+             "egress 2026-08-30 (api.nsf.gov/api/v1/awards.json HTTP "
+             "404; api.nsf.gov/services/awards.json HTTP 403 Forbidden; "
+             "www.research.gov route unreachable).",
+    access_method="Blocked: no anonymous API route measured from this "
+                  "network (404/403/connection-failure, dated)",
+    update_frequency="Continuous (provider side)",
+    rate_limits="Unknown from this egress",
+    licensing="Open data (NSF/US-government terms)",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous (provider side)",
+    known_gaps="No connector exists — measured BLOCKED (EGRESS-class "
+               "signatures). NOT_INTEGRATED is the honest status; this "
+               "row records the gap and the measured block evidence.",
+    provenance_method="N/A (not integrated)",
+    connector=None,
+    auth_requires=[],
+    metered_quota=None,
+))
+
+_register(_src(
+    source_id="cordis_projects",
+    name="EU CORDIS (framework research projects)",
+    authority_role=["EXPERIMENT"],
+    coverage="EU-funded research projects across ALL domains (Horizon "
+             "programmes) — pan-domain attempt records incl. engineering "
+             "and energy. NOT INTEGRATED: measured blocked 2026-08-30 "
+             "(all API routes return the HTML application shell; "
+             "data-extraction API requires registration).",
+    access_method="Blocked: anonymous JSON routes absent; data-extraction "
+                  "API requires registration (BLOCKED::REGISTRATION)",
+    update_frequency="Continuous (provider side)",
+    rate_limits="Unknown (registration-gated)",
+    licensing="Open data (EU terms) — API access is registration-gated",
+    primary_or_secondary="PRIMARY",
+    freshness="Continuous (provider side)",
+    known_gaps="No connector exists — measured BLOCKED (REGISTRATION "
+               "class). EU research-attempt coverage stays an honest gap "
+               "until credentials/registration are provided (CEO action).",
+    provenance_method="N/A (not integrated)",
+    connector=None,
+    auth_requires=["CORDIS API registration (not provisioned)"],
     metered_quota=None,
 ))
 

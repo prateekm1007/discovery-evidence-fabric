@@ -430,11 +430,35 @@ def retrieve_attempted_solutions(device_query: str, mechanism: str,
             "is NOT a novelty determination (Art. XXI.2)."
         ),
     }
+    # Persist the per-source adjudication aggregation in custody (Art.
+    # XXI.4/.9 — the relevance decision is part of the evidence custody
+    # chain; maturity §6.1 'QUERY_RELEVANCE aggregation' closure). Recording
+    # failures must never break the run itself — a custody-append failure is
+    # DISCLOSED in the returned artifact instead of silently swallowed.
+    from discovery_fabric.source_registry import relevance_aggregation
+    custody_notes = []
+    for src_id, provider_status, recs in (
+        (lit.source_id, lit.status, adjudicated),
+        (lens_pat.source_id, lens_pat.status, patent_adjudicated),
+    ):
+        try:
+            relevance_aggregation.record_adjudications(
+                source_id=src_id,
+                query=patent_query_used if recs is patent_adjudicated else query,
+                adjudicated_records=recs,
+                run_id=f"pipeline:device_failure:{device_query[:60]}",
+                provider_status=provider_status,
+            )
+        except Exception as exc:  # noqa: BLE001 — disclosed, never silent
+            custody_notes.append(
+                f"relevance-custody append failed for {src_id}: {exc}")
+
     return {
         "query": query,
         "patent_query": patent_query,
         "patent_query_used": patent_query_used,
         "patent_query_fallback": patent_query_fallback,
+        "relevance_custody": custody_notes or "appended (2 sources)",
         "literature": {
             "source_status": lit.status,
             "retrieved": len(adjudicated),

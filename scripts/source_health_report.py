@@ -6,7 +6,12 @@ Runs the measured health check over EVERY registry source and writes:
   artifacts/source_health/SOURCE_HEALTH_REPORT.json   (append-only per run)
   stdout summary + auditable coverage matrix
 
-Statuses (directive vocabulary): LIVE / DEGRADED / UNAVAILABLE / NOT_INTEGRATED.
+Statuses (CEO directive 2026-08-30 #5, mechanically honest vocabulary):
+LIVE / DEGRADED / BLOCKED / NOT_INTEGRATED — every BLOCKED entry carries
+a machine-derived block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/
+HTTP_5XX/NETWORK/METERED_WINDOW/CONNECTOR_IMPORT) with the measured
+evidence + date. Legacy artifacts saying UNAVAILABLE are the same state
+family (status_model.LEGACY_VOCABULARY_MAP, Art. XI).
 Coverage matrix rule: a role is COVERED only if >= 1 source measured LIVE
 serves it; PARTIAL if only DEGRADED sources serve it; otherwise GAP.
 
@@ -31,6 +36,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 from discovery_fabric.source_registry.health import run_health_check  # noqa: E402
+from discovery_fabric.source_registry.status_model import (  # noqa: E402
+    BLOCK_CLASSES, LEGACY_VOCABULARY_MAP,
+)
 from discovery_fabric.source_registry.registry import (  # noqa: E402
     SOURCE_REGISTRY, apply_measured_statuses,
 )
@@ -42,8 +50,9 @@ REPORT_DIR = REPO_ROOT / "artifacts" / "source_health"
 ROLE_ICON = {"COVERED": "✅", "PARTIAL": "🟡", "GAP": "❌"}
 
 
-def coverage_matrix(measured: dict) -> list:
+def coverage_matrix(measured: dict, report_results: list = None) -> list:
     """Role -> coverage derived ONLY from measured source statuses."""
+    report_results_by_id = {r["source_id"]: r for r in (report_results or [])}
     matrix = []
     for role in COVERAGE_MATRIX_ROLES:
         serving = [sid for sid, rec in SOURCE_REGISTRY.items()
@@ -60,7 +69,12 @@ def coverage_matrix(measured: dict) -> list:
             "coverage": cov,
             "live_sources": sorted([sid for sid, s in statuses.items() if s == "LIVE"]),
             "degraded_sources": sorted([sid for sid, s in statuses.items() if s == "DEGRADED"]),
-            "unavailable_sources": sorted([sid for sid, s in statuses.items() if s == "UNAVAILABLE"]),
+            "unavailable_sources": sorted([sid for sid, s in statuses.items()
+                                             if s in ("BLOCKED", "UNAVAILABLE")]),
+            "block_classes": {
+                sid: ((report_results_by_id.get(sid) or {}).get("block") or {}).get("block_class")
+                for sid, s in statuses.items() if s == "BLOCKED"
+            },
             "not_integrated_sources": sorted([sid for sid, s in statuses.items()
                                               if s == "NOT_INTEGRATED"]),
         })
@@ -80,15 +94,21 @@ def main() -> int:
     # connector rule at overlay time)
     overlaid = apply_measured_statuses(measured)
 
-    matrix = coverage_matrix(measured)
+    matrix = coverage_matrix(measured, report["results"])
 
     out = {
         "artifact": "SOURCE_HEALTH_REPORT",
         "run_timestamp": report["run_timestamp"],
-        "status_vocabulary": ["LIVE", "DEGRADED", "UNAVAILABLE", "NOT_INTEGRATED"],
+        "status_vocabulary": ["LIVE", "DEGRADED", "BLOCKED", "NOT_INTEGRATED"],
+        "legacy_vocabulary_map": LEGACY_VOCABULARY_MAP,
         "status_counts": {
             s: sum(1 for v in measured.values() if v == s)
-            for s in ["LIVE", "DEGRADED", "UNAVAILABLE", "NOT_INTEGRATED"]
+            for s in ["LIVE", "DEGRADED", "BLOCKED", "NOT_INTEGRATED"]
+        },
+        "block_class_counts": {
+            bc: sum(1 for r in report["results"]
+                    if (r.get("block") or {}).get("block_class") == bc)
+            for bc in BLOCK_CLASSES
         },
         "derivation": report["results"][0]["derivation"] if report["results"] else {},
         "derivation_metered_sources": {

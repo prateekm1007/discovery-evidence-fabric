@@ -74,9 +74,76 @@ def update_session(session_id: str, **fields) -> Optional[Dict[str, Any]]:
     for s in data.get("sessions", []):
         if s.get("session_id") == session_id:
             s.update(fields)
+            s["updated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
             _locked_write(SESSIONS_PATH, data)
             return s
     return None
+
+
+# ---------------------------------------------------------------------------
+# Failure recovery (CEO directive 2026-08-30 #8: transport reliability,
+# queueing, RESUMABILITY, failure recovery)
+# ---------------------------------------------------------------------------
+
+STUCK_AFTER_HOURS = 3  # MODEL_DERIVED operational bound, disclosed per use
+
+ERROR_STATUSES = ("ERROR_TRANSPORT", "ERROR_BUILD", "ERROR_RUN",
+                  "ERROR_STUCK")
+
+
+def mark_stuck_sessions(max_age_hours: float = STUCK_AFTER_HOURS) -> List[str]:
+    """HONEST stuck detection: a session RUNNING/PENDING with no update for
+    > max_age_hours is marked ERROR_STUCK with reason.
+
+    Never fabricates a research outcome (Art. XXV): the session says the
+    worker disappeared (server restart, crash, OOM), nothing about the
+    science. Retried sessions resume through the SAME worker path (the
+    engine itself resumes from persisted run-dir stage snapshots).
+    """
+    import datetime as _dt
+    cutoff = (_dt.datetime.utcnow()
+              - _dt.timedelta(hours=max_age_hours)).strftime(
+        "%Y-%m-%dT%H:%M:%SZ")
+    stuck = []
+    for s in list_sessions():
+        if s.get("status") not in ("RUNNING", "PENDING"):
+            continue
+        # a fresh session has no updated_at until first update; created_at
+        # is the honest fallback
+        marker = s.get("updated_at") or s.get("created_at") or ""
+        if marker and marker < cutoff:
+            update_session(
+                s["session_id"], status="ERROR_STUCK",
+                error=(f"no worker progress for >{max_age_hours}h (last "
+                       f"update {marker}) — worker died or service "
+                       "restarted; retry to resume"))
+            stuck.append(s["session_id"])
+    return stuck
+
+
+def retry_session(session_id: str) -> Optional[Dict[str, Any]]:
+    """Re-enqueue an errored session through the SAME worker path.
+
+    Allowed only from ERROR_* states (never from COMPLETE — a completed
+    verdict is a research outcome, not a transport artifact; re-running
+    it must be a NEW session so history stays append-only). Attempt
+    count is recorded; a session that keeps failing stays honestly
+    errored with its full history.
+    """
+    s = get_session(session_id)
+    if not s:
+        return None
+    if s.get("status") not in ERROR_STATUSES:
+        return {"error": (f"session status {s.get('status')!r} is not "
+                          "retryable — only ERROR_* sessions can re-enter "
+                          "the queue (completed verdicts are append-only)")}
+    attempts = int(s.get("retry_attempts") or 0) + 1
+    return update_session(
+        session_id,
+        status="PENDING",
+        error=None,
+        retry_attempts=attempts,
+        last_error=s.get("error"))
 
 
 def create_session(title: str, user_text: str, domain_hint: str = "") -> Dict[str, Any]:

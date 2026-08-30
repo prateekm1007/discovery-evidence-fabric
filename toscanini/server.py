@@ -100,7 +100,13 @@ class Handler(BaseHTTPRequestHandler):
                 "runs_root": str(store.ENGINE_RUNS),
             })
         if p.path == "/api/sessions":
-            return self._json(200, {"sessions": store.list_sessions()})
+            # failure recovery (CEO #8): honest stuck detection runs on
+            # every history read — dead workers surface as ERROR_STUCK,
+            # never as eternal spinners
+            stuck = store.mark_stuck_sessions()
+            sessions = store.list_sessions()
+            return self._json(200, {"sessions": sessions,
+                                    "marked_stuck": stuck})
         if p.path == "/api/cemetery":
             return self._json(200, store.cemetery_summary())
 
@@ -160,6 +166,31 @@ class Handler(BaseHTTPRequestHandler):
             if not share_id:
                 return self._json(404, {"error": "session not found"})
             return self._json(200, {"share_id": share_id})
+
+        # failure recovery (CEO #8): re-enqueue an ERROR_* session through
+        # the SAME serialized worker path. COMPLETE verdicts are NOT
+        # retryable (append-only history — re-running is a new session).
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "sessions" \
+                and parts[3] == "retry":
+            sid = parts[2]
+            result = store.retry_session(sid)
+            if result is None:
+                return self._json(404, {"error": "session not found"})
+            if "error" in result:
+                return self._json(409, result)
+            env = dict(os.environ)
+            env.setdefault("ENGINE_SYNTHESIS_PROVIDER", "zai")
+            env.setdefault("ENGINE_ATTACK_PROVIDER", "zai")
+            env.setdefault("ENGINE_ENSEMBLE_PROVIDERS", "zai")
+            env.setdefault("ENGINE_GRID_PROVIDERS", "zai")
+            subprocess.Popen(
+                [sys.executable, "-m", "toscanini.worker", sid],
+                cwd=str(REPO_ROOT), env=env,
+                stdout=open(REPO_ROOT / "ENGINE_RUNS" / "toscanini_worker.log",
+                            "ab"),
+                stderr=subprocess.STDOUT,
+                start_new_session=True)
+            return self._json(200, result)
 
         return self._json(404, {"error": "no such endpoint"})
 

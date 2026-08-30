@@ -1,22 +1,36 @@
 {
   "artifact": "SOURCE_HEALTH_REPORT",
-  "run_timestamp": "2026-08-30T11:36:27.001688+00:00",
+  "run_timestamp": "2026-08-30T16:05:25.071224+00:00",
   "status_vocabulary": [
     "LIVE",
     "DEGRADED",
-    "UNAVAILABLE",
+    "BLOCKED",
     "NOT_INTEGRATED"
   ],
+  "legacy_vocabulary_map": {
+    "UNAVAILABLE": "BLOCKED",
+    "legacy_note": "2026-08-30 vocabulary rename (CEO directive #5): UNAVAILABLE -> BLOCKED with machine-derived block_class. Old artifacts saying UNAVAILABLE are interpreted through this map; they are not rewritten."
+  },
   "status_counts": {
-    "LIVE": 35,
+    "LIVE": 37,
     "DEGRADED": 2,
-    "UNAVAILABLE": 6,
-    "NOT_INTEGRATED": 6
+    "BLOCKED": 5,
+    "NOT_INTEGRATED": 8
+  },
+  "block_class_counts": {
+    "AUTH": 3,
+    "EGRESS": 1,
+    "PROVIDER_RETIRED": 1,
+    "REGISTRATION": 0,
+    "HTTP_5XX": 0,
+    "NETWORK": 0,
+    "METERED_WINDOW": 0,
+    "CONNECTOR_IMPORT": 0
   },
   "derivation": {
     "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
     "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-    "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+    "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
     "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
   },
   "derivation_metered_sources": {
@@ -38,14 +52,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1754,
+      "latency_ms": 1928,
       "record_count": 100,
       "query": "device.brand_name:pacemaker",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -63,14 +77,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1472,
+      "latency_ms": 1479,
       "record_count": 25,
       "query": "reason_for_recall:catheter",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -88,14 +102,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1091,
+      "latency_ms": 1102,
       "record_count": 25,
       "query": "device_name:\"pacemaker\"",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -113,14 +127,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1087,
+      "latency_ms": 1145,
       "record_count": 25,
       "query": "applicant:medtronic",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -138,14 +152,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1076,
+      "latency_ms": 1103,
       "record_count": 25,
       "query": "brand_name:\"pacemaker\"",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -163,14 +177,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 2753,
+      "latency_ms": 847,
       "record_count": 5,
       "query": "registration.name:medtronic",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -188,14 +202,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1130,
+      "latency_ms": 1165,
       "record_count": 25,
       "query": "device_name:\"pacemaker\"",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -215,7 +229,7 @@
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -233,14 +247,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 610,
+      "latency_ms": 288,
       "record_count": 10,
       "query": "pacemaker",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -260,7 +274,7 @@
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -278,14 +292,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1264,
+      "latency_ms": 1312,
       "record_count": 10,
       "query": "pacemaker lead fracture",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -303,14 +317,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1780,
+      "latency_ms": 1341,
       "record_count": 5,
       "query": "pacemaker lead fracture",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -328,14 +342,14 @@
       },
       "request_status": "RATE_LIMITED",
       "http_status": 429,
-      "latency_ms": 60322,
+      "latency_ms": 60306,
       "record_count": 0,
       "query": "pacemaker lead fracture",
-      "error": "provider answered with rate/budget limit: HTTP 429: {\"error\":\"Rate limit exceeded\",\"message\":\"Insufficient budget. This request costs $0.001 but you only have $0 remaining. Resets at midnight UTC. Need more? Add funds at https://openalex.org/pricing\",\" | Retry-After: 44647",
+      "error": "provider answered with rate/budget limit: HTTP 429: {\"error\":\"Rate limit exceeded\",\"message\":\"Insufficient budget. This request costs $0.001 but you only have $0 remaining. Resets at midnight UTC. Need more? Add funds at https://openalex.org/pricing\",\" | Retry-After: 28513",
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -345,22 +359,22 @@
       "chain": {
         "connector_exists": true,
         "live_request_works": true,
-        "response_parses": true,
-        "normalization_works": true,
-        "provenance_stores": true,
+        "response_parses": false,
+        "normalization_works": false,
+        "provenance_stores": false,
         "retrieval_log_stores": true,
         "health_check_passes": false
       },
-      "request_status": "OK",
-      "http_status": 200,
-      "latency_ms": 10202,
-      "record_count": 5,
+      "request_status": "RATE_LIMITED",
+      "http_status": 429,
+      "latency_ms": 10055,
+      "record_count": 0,
       "query": "pacemaker lead fracture",
-      "error": "latency 10202 ms above triage bound",
+      "error": "provider answered with rate/budget limit: HTTP 429: {\"message\": \"Too Many Requests. Please wait and try again or apply for a key for higher rate limits. https://www.semanticscholar.org/product/api#api-key-form\", \"code\": \"429\"}",
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -378,14 +392,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1150,
+      "latency_ms": 805,
       "record_count": 5,
       "query": "pacemaker lead fracture",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -403,39 +417,39 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 714,
+      "latency_ms": 796,
       "record_count": 5,
       "query": "hydrocephalus shunt",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
     {
       "source_id": "google_patents",
-      "status": "UNAVAILABLE",
+      "status": "LIVE",
       "chain": {
         "connector_exists": true,
-        "live_request_works": false,
-        "response_parses": false,
-        "normalization_works": false,
-        "provenance_stores": false,
+        "live_request_works": true,
+        "response_parses": true,
+        "normalization_works": true,
+        "provenance_stores": true,
         "retrieval_log_stores": true,
-        "health_check_passes": false
+        "health_check_passes": true
       },
-      "request_status": "UNAVAILABLE",
-      "http_status": 503,
-      "latency_ms": 493,
-      "record_count": 0,
+      "request_status": "OK",
+      "http_status": null,
+      "latency_ms": 833,
+      "record_count": 10,
       "query": "pacemaker lead",
-      "error": "UNAVAILABLE: HTTP 503",
+      "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -453,14 +467,14 @@
       },
       "request_status": "OK",
       "http_status": null,
-      "latency_ms": 690,
+      "latency_ms": 761,
       "record_count": 5,
       "query": "pacemaker lead",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -478,14 +492,14 @@
       },
       "request_status": "OK",
       "http_status": null,
-      "latency_ms": 1235,
+      "latency_ms": 1182,
       "record_count": 5,
       "query": "hydrocephalus shunt valve",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -514,7 +528,7 @@
       "derivation": {
         "LIVE": "metered source: 7 chain steps passed on the freshest live retrieval-log proof inside the metered window; live re-probe suppressed to protect provider quota",
         "DEGRADED": "metered source: freshest live proof shows provider rate/quota limit, or quota exhausted since (guard active)",
-        "UNAVAILABLE": "metered source: no live proof inside the metered window (quota-protected probe suppressed)"
+        "BLOCKED": "metered source: no live proof inside the metered window (quota-protected probe suppressed) — block_class METERED_WINDOW"
       },
       "metered": {
         "monthly_limit": 20,
@@ -531,7 +545,7 @@
     },
     {
       "source_id": "patsnap_eureka",
-      "status": "UNAVAILABLE",
+      "status": "BLOCKED",
       "chain": {
         "connector_exists": true,
         "live_request_works": false,
@@ -546,17 +560,27 @@
       "latency_ms": 0,
       "record_count": 0,
       "query": "pacemaker lead",
-      "error": "AUTH_FAILED: PATSNAP_EUREKA_API_KEY not configured",
+      "error": "AUTH_FAILED: PATSNAP_EUREKA_API_KEY not configured [block_class=AUTH]",
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+      },
+      "block": {
+        "status": "BLOCKED",
+        "block_class": "AUTH",
+        "block_evidence": {
+          "request_status": "AUTH_FAILED",
+          "http_status": null,
+          "error_excerpt": "PATSNAP_EUREKA_API_KEY not configured",
+          "fired_rule": "signature 'api[_ ]?key|not configured|no \\\\w* ?credentials|unauthorized|token|402 payment|subscription' matched measured error"
+        }
       }
     },
     {
       "source_id": "epo_ops",
-      "status": "UNAVAILABLE",
+      "status": "BLOCKED",
       "chain": {
         "connector_exists": true,
         "live_request_works": false,
@@ -571,17 +595,27 @@
       "latency_ms": null,
       "record_count": 0,
       "query": "pacemaker",
-      "error": "AUTH_FAILED: SOURCE_UNAVAILABLE/AUTH_FAILURE",
+      "error": "AUTH_FAILED: SOURCE_UNAVAILABLE/AUTH_FAILURE [block_class=AUTH]",
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+      },
+      "block": {
+        "status": "BLOCKED",
+        "block_class": "AUTH",
+        "block_evidence": {
+          "request_status": "AUTH_FAILED",
+          "http_status": null,
+          "error_excerpt": "SOURCE_UNAVAILABLE/AUTH_FAILURE",
+          "fired_rule": "request_status == AUTH_FAILED (no finer signature)"
+        }
       }
     },
     {
       "source_id": "uspto_odp",
-      "status": "UNAVAILABLE",
+      "status": "BLOCKED",
       "chain": {
         "connector_exists": true,
         "live_request_works": false,
@@ -596,12 +630,22 @@
       "latency_ms": null,
       "record_count": 0,
       "query": "pacemaker",
-      "error": "AUTH_FAILED: SOURCE_UNAVAILABLE/AUTH_FAILURE: PatentsView legacy endpoint retired 2026-08-30 (HTML page measured); replacement API requires an unprovisioned PATENTSVIEW_API_KEY / USPTO_ODP_API_KEY",
+      "error": "AUTH_FAILED: SOURCE_UNAVAILABLE/AUTH_FAILURE: PatentsView legacy endpoint retired 2026-08-30 (HTML page measured); replacement API requires an unprovisioned PATENTSVIEW_API_KEY / USPTO_ODP_API_KEY [block_class=PROVIDER_RETIRED]",
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+      },
+      "block": {
+        "status": "BLOCKED",
+        "block_class": "PROVIDER_RETIRED",
+        "block_evidence": {
+          "request_status": "AUTH_FAILED",
+          "http_status": null,
+          "error_excerpt": "SOURCE_UNAVAILABLE/AUTH_FAILURE: PatentsView legacy endpoint retired 2026-08-30 (HTML page measured); replacement API requires an unprovisioned PATENTSVIEW_API_KEY / USPTO_ODP_API_KEY",
+          "fired_rule": "signature 'retired|deprecat|html page measured|endpoint.*(moved|changed)|no longer' matched measured error"
+        }
       }
     },
     {
@@ -620,13 +664,13 @@
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
     {
       "source_id": "google_bigquery_patents",
-      "status": "UNAVAILABLE",
+      "status": "BLOCKED",
       "chain": {
         "connector_exists": true,
         "live_request_works": false,
@@ -641,12 +685,22 @@
       "latency_ms": null,
       "record_count": 0,
       "query": "pacemaker",
-      "error": "AUTH_FAILED: BigQuery: no GCP credentials provisioned",
+      "error": "AUTH_FAILED: BigQuery: no GCP credentials provisioned [block_class=AUTH]",
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+      },
+      "block": {
+        "status": "BLOCKED",
+        "block_class": "AUTH",
+        "block_evidence": {
+          "request_status": "AUTH_FAILED",
+          "http_status": null,
+          "error_excerpt": "BigQuery: no GCP credentials provisioned",
+          "fired_rule": "signature 'api[_ ]?key|not configured|no \\\\w* ?credentials|unauthorized|token|402 payment|subscription' matched measured error"
+        }
       }
     },
     {
@@ -663,14 +717,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1025,
+      "latency_ms": 842,
       "record_count": 1,
       "query": "aspirin",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -688,14 +742,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 799,
+      "latency_ms": 876,
       "record_count": 5,
       "query": "insulin",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -713,14 +767,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 867,
+      "latency_ms": 910,
       "record_count": 1,
       "query": "aspirin",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -738,14 +792,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 2981,
+      "latency_ms": 3111,
       "record_count": 5,
       "query": "insulin",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -763,14 +817,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1187,
+      "latency_ms": 2230,
       "record_count": 5,
       "query": "hydroxyapatite",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -788,20 +842,20 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 538,
+      "latency_ms": 554,
       "record_count": 1,
       "query": "zirconium dioxide",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
     {
       "source_id": "materials_project",
-      "status": "UNAVAILABLE",
+      "status": "BLOCKED",
       "chain": {
         "connector_exists": true,
         "live_request_works": false,
@@ -813,15 +867,25 @@
       },
       "request_status": "AUTH_FAILED",
       "http_status": 403,
-      "latency_ms": 75,
+      "latency_ms": 94,
       "record_count": 0,
       "query": "TiO2",
-      "error": "AUTH_FAILED: HTTP 403: {\"error\": \"Your IP address or ASN has been (temporarily) blocked from accessing all MP services due to inefficient or abusive traffic. Please make yourself familiar with our terms, make sure to run th",
+      "error": "AUTH_FAILED: HTTP 403: {\"error\": \"Your IP address or ASN has been (temporarily) blocked from accessing all MP services due to inefficient or abusive traffic. Please make yourself familiar with our terms, make sure to run th [block_class=EGRESS]",
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+      },
+      "block": {
+        "status": "BLOCKED",
+        "block_class": "EGRESS",
+        "block_evidence": {
+          "request_status": "AUTH_FAILED",
+          "http_status": 403,
+          "error_excerpt": "HTTP 403: {\"error\": \"Your IP address or ASN has been (temporarily) blocked from accessing all MP services due to inefficient or abusive traffic. Please make yourself familiar with our terms, make sure to run th",
+          "fired_rule": "signature 'ip address|\\\\basn\\\\b|blocked from accessing|bot.?check|bot.?block|captcha|forbidden' matched measured error"
+        }
       }
     },
     {
@@ -838,14 +902,14 @@
       },
       "request_status": "OK",
       "http_status": null,
-      "latency_ms": 649,
-      "record_count": 3,
+      "latency_ms": 2615,
+      "record_count": 1,
       "query": "10993",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -863,14 +927,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 601,
+      "latency_ms": 709,
       "record_count": 111,
       "query": "888",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -890,7 +954,7 @@
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -910,7 +974,7 @@
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -930,7 +994,7 @@
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -948,14 +1012,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 826,
+      "latency_ms": 966,
       "record_count": 5,
       "query": "supplement_reason:\"Process Change - Manufacturer/Sterilizer/Packager/Supplier\"",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -973,14 +1037,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1431,
+      "latency_ms": 1317,
       "record_count": 10,
       "query": "additive manufacturing",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -998,14 +1062,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 912,
+      "latency_ms": 1010,
       "record_count": 10,
       "query": "brand_name:\"catheter\" AND _exists_:sterilization",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -1023,14 +1087,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1020,
+      "latency_ms": 963,
       "record_count": 10,
       "query": "brand_name:\"hip system\"",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -1048,14 +1112,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1120,
+      "latency_ms": 1203,
       "record_count": 10,
       "query": "battery thermal runaway",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -1073,14 +1137,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 907,
+      "latency_ms": 928,
       "record_count": 10,
       "query": "lithium battery safety",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -1098,14 +1162,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 459,
+      "latency_ms": 639,
       "record_count": 5,
       "query": "flow diversion stent",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -1123,14 +1187,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 39,
+      "latency_ms": 47,
       "record_count": 3,
       "query": "toyota|camry|2020",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -1148,14 +1212,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 61,
+      "latency_ms": 79,
       "record_count": 25,
       "query": "toyota|camry|2020",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -1173,14 +1237,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 62,
+      "latency_ms": 67,
       "record_count": 50,
       "query": "2026-06-01",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -1198,14 +1262,14 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1254,
+      "latency_ms": 968,
       "record_count": 25,
       "query": "2026-07-01",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     },
@@ -1223,20 +1287,85 @@
       },
       "request_status": "OK",
       "http_status": 200,
-      "latency_ms": 1830,
+      "latency_ms": 1693,
       "record_count": 25,
       "query": "2023-01-01",
       "error": null,
       "derivation": {
         "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
         "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
-        "UNAVAILABLE": "connector exists; live request failed (auth, blocked, 5xx, network)",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
+        "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+      }
+    },
+    {
+      "source_id": "nih_reporter",
+      "status": "LIVE",
+      "chain": {
+        "connector_exists": true,
+        "live_request_works": true,
+        "response_parses": true,
+        "normalization_works": true,
+        "provenance_stores": true,
+        "retrieval_log_stores": true,
+        "health_check_passes": true
+      },
+      "request_status": "OK",
+      "http_status": 200,
+      "latency_ms": 1069,
+      "record_count": 10,
+      "query": "hydrogel cartilage repair",
+      "error": null,
+      "derivation": {
+        "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
+        "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
+        "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+      }
+    },
+    {
+      "source_id": "nsf_awards",
+      "status": "NOT_INTEGRATED",
+      "chain": {
+        "connector_exists": false,
+        "live_request_works": false,
+        "response_parses": false,
+        "normalization_works": false,
+        "provenance_stores": false,
+        "retrieval_log_stores": false,
+        "health_check_passes": false
+      },
+      "error": null,
+      "derivation": {
+        "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
+        "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
+        "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
+      }
+    },
+    {
+      "source_id": "cordis_projects",
+      "status": "NOT_INTEGRATED",
+      "chain": {
+        "connector_exists": false,
+        "live_request_works": false,
+        "response_parses": false,
+        "normalization_works": false,
+        "provenance_stores": false,
+        "retrieval_log_stores": false,
+        "health_check_passes": false
+      },
+      "error": null,
+      "derivation": {
+        "LIVE": "all 7 chain steps passed; provider answered with parseable, normalizable records (or a definitive zero)",
+        "DEGRADED": "provider answered but restricted: rate-limit/budget, or latency above the disclosed 10000 ms triage bound",
+        "BLOCKED": "connector exists; the live request could not be answered usefully — block_class (AUTH/EGRESS/PROVIDER_RETIRED/REGISTRATION/HTTP_5XX/NETWORK/METERED_WINDOW) is derived mechanically from the measured signature by status_model.py",
         "NOT_INTEGRATED": "no connector exists (registry records the gap; README mentions are not integration — Art. XXI)"
       }
     }
   ],
   "retrieval_log_audit": {
-    "entries": 1275,
+    "entries": 1423,
     "chain_valid": true
   },
   "coverage_matrix": [
@@ -1258,12 +1387,14 @@
         "semantic_scholar"
       ],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": []
     },
     {
       "role": "PATENT",
       "coverage": "COVERED",
       "live_sources": [
+        "google_patents",
         "lens_patent",
         "patentbear"
       ],
@@ -1271,10 +1402,15 @@
       "unavailable_sources": [
         "epo_ops",
         "google_bigquery_patents",
-        "google_patents",
         "patsnap_eureka",
         "uspto_odp"
       ],
+      "block_classes": {
+        "patsnap_eureka": "AUTH",
+        "epo_ops": "AUTH",
+        "uspto_odp": "PROVIDER_RETIRED",
+        "google_bigquery_patents": "AUTH"
+      },
       "not_integrated_sources": [
         "wipo_patentscope"
       ]
@@ -1290,6 +1426,7 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": [
         "eudamed",
         "fda_denovo"
@@ -1303,6 +1440,7 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": [
         "eudamed"
       ]
@@ -1316,6 +1454,7 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": []
     },
     {
@@ -1328,6 +1467,7 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": []
     },
     {
@@ -1338,6 +1478,7 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": [
         "who_ictrp"
       ]
@@ -1353,6 +1494,9 @@
       "unavailable_sources": [
         "materials_project"
       ],
+      "block_classes": {
+        "materials_project": "EGRESS"
+      },
       "not_integrated_sources": []
     },
     {
@@ -1365,6 +1509,7 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": []
     },
     {
@@ -1376,6 +1521,7 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": [
         "astm_standards",
         "iso_catalogue"
@@ -1389,6 +1535,7 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": []
     },
     {
@@ -1401,6 +1548,7 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": []
     },
     {
@@ -1412,6 +1560,7 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": []
     },
     {
@@ -1422,6 +1571,7 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": []
     },
     {
@@ -1432,7 +1582,22 @@
       ],
       "degraded_sources": [],
       "unavailable_sources": [],
+      "block_classes": {},
       "not_integrated_sources": []
+    },
+    {
+      "role": "EXPERIMENT",
+      "coverage": "COVERED",
+      "live_sources": [
+        "nih_reporter"
+      ],
+      "degraded_sources": [],
+      "unavailable_sources": [],
+      "block_classes": {},
+      "not_integrated_sources": [
+        "cordis_projects",
+        "nsf_awards"
+      ]
     }
   ],
   "registry_overlay": {
@@ -1452,22 +1617,22 @@
     "semantic_scholar": "DEGRADED",
     "crossref": "LIVE",
     "elsevier_scopus": "LIVE",
-    "google_patents": "UNAVAILABLE",
+    "google_patents": "LIVE",
     "lens_scholarly": "LIVE",
     "lens_patent": "LIVE",
     "patentbear": "LIVE",
-    "patsnap_eureka": "UNAVAILABLE",
-    "epo_ops": "UNAVAILABLE",
-    "uspto_odp": "UNAVAILABLE",
+    "patsnap_eureka": "BLOCKED",
+    "epo_ops": "BLOCKED",
+    "uspto_odp": "BLOCKED",
     "wipo_patentscope": "NOT_INTEGRATED",
-    "google_bigquery_patents": "UNAVAILABLE",
+    "google_bigquery_patents": "BLOCKED",
     "pubchem": "LIVE",
     "uniprot": "LIVE",
     "chembl": "LIVE",
     "rcsb_pdb": "LIVE",
     "cod_optimade": "LIVE",
     "nist_webbook": "LIVE",
-    "materials_project": "UNAVAILABLE",
+    "materials_project": "BLOCKED",
     "fda_recognized_standards": "LIVE",
     "ecfr_title21": "LIVE",
     "iso_catalogue": "NOT_INTEGRATED",
@@ -1484,7 +1649,10 @@
     "nhtsa_complaints": "LIVE",
     "cpsc_recalls": "LIVE",
     "usgs_earthquakes": "LIVE",
-    "fra_rail_accidents": "LIVE"
+    "fra_rail_accidents": "LIVE",
+    "nih_reporter": "LIVE",
+    "nsf_awards": "NOT_INTEGRATED",
+    "cordis_projects": "NOT_INTEGRATED"
   },
   "builder_measured_disclosure": {
     "art_xxvi": "This report is BUILDER-MEASURED (the builder ran the health check). Independent reproduction command: python scripts/source_health_report.py — any third party can re-run it against the same committed registry.",

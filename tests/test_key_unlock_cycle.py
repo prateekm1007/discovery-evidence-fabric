@@ -245,7 +245,11 @@ class TestMeteredHealthPolicy:
             lambda source_id=None: [],
         )
         r = health.check_source("patentbear")
-        assert r["status"] == "UNAVAILABLE"
+        # 2026-08-30 vocabulary rename (CEO #5): UNAVAILABLE -> BLOCKED with
+        # machine-derived block_class; the test's INTENT is unchanged —
+        # no live proof is NEVER silently LIVE
+        assert r["status"] == "BLOCKED"
+        assert r["block"]["block_class"] == "METERED_WINDOW"
         assert "no live retrieval-log proof" in r["error"]
         assert r["request_status"] == "NOT_PROBED"
 

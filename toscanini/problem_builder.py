@@ -195,17 +195,44 @@ def _narratives(records: List[dict], n: int = 2, maxlen: int = 200) -> List[str]
     return out
 
 
-def _search_one(name: str, role: str, cls, query: str, timeout: int = 40):
+def _search_one(name: str, role: str, cls, query: str, timeout: int = 40,
+                run_id: str = "toscanini:ui"):
     try:
         conn = cls()
         res = conn.search(query, timeout=timeout)
         recs = [r.to_dict() for r in res.records] if res.status == "OK" else []
+        # Art. XXI.4: every record entering the evidence pipeline is
+        # relevance-adjudicated with the SAME term-overlap rule as the
+        # discovery pipeline and the battery (one method, not two), and the
+        # adjudication is persisted in custody through the SAME aggregation
+        # path (maturity §6.1 closure).
+        from discovery_fabric.source_registry import query_relevance as _qr
+        from discovery_fabric.source_registry import relevance_aggregation as _ra
+        adjudications = [
+            _qr.adjudicate_record(rec, query) for rec in recs]
+        n_rel = sum(1 for a in adjudications
+                    if a["relevance"] == _qr.RELEVANT)
+        try:
+            _ra.record_adjudications(
+                source_id=res.source_id or name,
+                query=query,
+                adjudicated_records=adjudications,
+                run_id=run_id,
+                provider_status=res.status,
+            )
+        except Exception as exc:  # noqa: BLE001 — disclosed, never silent
+            return {"source": name, "role": role, "status": res.status,
+                    "count": len(recs), "records": recs,
+                    "relevant": n_rel,
+                    "custody_note": f"relevance-custody append failed: {exc}",
+                    "error": (res.error or "")[:160] if res.status != "OK" else ""}
         return {"source": name, "role": role, "status": res.status,
                 "count": len(recs), "records": recs,
+                "relevant": n_rel,
                 "error": (res.error or "")[:160] if res.status != "OK" else ""}
     except Exception as exc:  # noqa: BLE001
         return {"source": name, "role": role, "status": "CALL_FAILED",
-                "count": 0, "records": [],
+                "count": 0, "records": [], "relevant": 0,
                 "error": f"{type(exc).__name__}: {exc}"[:160]}
 
 
@@ -292,7 +319,8 @@ def build_problem(text: str, on_event=None) -> Dict[str, Any]:
         },
         "retrieval": [
             {"source": r["source"], "role": r["role"], "status": r["status"],
-             "count": r["count"], "error": r["error"],
+             "count": r["count"], "relevant": r.get("relevant"),
+             "error": r["error"],
              "epistemic_class": "EXTERNAL_EVIDENCE",
              "records": [
                  {"title": (rec.get("title")
