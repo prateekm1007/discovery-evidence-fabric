@@ -112,10 +112,14 @@ def _block(ax, x, y, w, h, label, sublabel=None, color=BRAND_500, bg=BRAND_100,
         ax.add_patch(inner)
 
     txt_color = label_color if color != bg else INK_900
+    # R375-4 fix: label/sublabel pinned to opposite box edges (label
+    # va='top' just under the top border, sublabel va='bottom' just over
+    # the bottom border). The old fixed fractions (0.62h / 0.28h) let
+    # labels collide inside short blocks (found live across 7 diagrams).
     if sublabel:
-        ax.text(x + w / 2, y + h * 0.62, label, ha='center', va='center',
+        ax.text(x + w / 2, y + h - 0.16, label, ha='center', va='top',
                 fontsize=fontsize, fontweight='bold', color=txt_color)
-        ax.text(x + w / 2, y + h * 0.28, sublabel, ha='center', va='center',
+        ax.text(x + w / 2, y + 0.12, sublabel, ha='center', va='bottom',
                 fontsize=sublabel_size, color=sublabel_color, style='italic')
     else:
         ax.text(x + w / 2, y + h / 2, label, ha='center', va='center',
@@ -147,20 +151,88 @@ def _arrow(ax, x1, y1, x2, y2, label=None, color=INK_700, lw=1.2,
 
 def _title(ax, text, subtitle=None, y=5.7, pkg_id=None):
     """Add a diagram title. When pkg_id is given, the CANONICAL mechanism
-    statement from the headlines registry is drawn as a dedicated line
+    statement from the headlines registry is drawn as a dedicated band
     under the title (R373-1: the depicted mechanism must be the package's
     mechanism — the statement itself is now part of the diagram, traced
-    verbatim to the canonical record)."""
-    ax.text(5, y, text, ha='center', va='center',
-            fontsize=11, fontweight='bold', color=INK_900)
-    if subtitle:
-        ax.text(5, y - 0.35, subtitle, ha='center', va='center',
-                fontsize=8.5, color=INK_500, style='italic')
+    verbatim to the canonical record).
+
+    R375-4 fix (found live by the in-PNG text-geometry check): matplotlib
+    wrap=True wraps to the FIGURE width, not the AXES width — long
+    statements overran the axes (11 diagrams); multi-line blocks also
+    collided with content below. The statement is now pre-wrapped to the
+    measured axes width and the whole title stack gets a DEDICATED band:
+    the axes headroom grows, the stack is drawn top-anchored in the new
+    band, and all existing content coordinates stay untouched (nothing
+    moves, nothing shrinks)."""
+    import textwrap as _tw
     mech = _canonical_mechanism(pkg_id)
-    if mech:
-        ax.text(5, y - (0.72 if subtitle else 0.38), mech,
-                ha='center', va='center', fontsize=8.2,
-                color=BRAND_900, fontweight='bold', wrap=True)
+    x0, x1 = ax.get_xlim()
+    cx = (x0 + x1) / 2
+
+    def _fit_wrapped(text, fontsize, weight, target_frac=0.94, tries=20,
+                     style='normal'):
+        """Wrap `text` so the FINAL artist fits the measured axes width.
+        R375-4: draws the real artist, measures it, tightens, redraws —
+        no width estimation (estimation failed on bold/caps strings)."""
+        renderer = ax.figure.canvas.get_renderer()
+        ax_bbox = ax.get_window_extent(renderer)
+        target_px = (ax_bbox.x1 - ax_bbox.x0) * target_frac
+        du_w = x1 - x0
+        chars = max(24, int(du_w * target_frac / (fontsize * 0.0125)))
+        artist = None
+        for _ in range(tries):
+            wrapped = "\n".join(_tw.wrap(str(text), width=chars))
+            artist = ax.text(cx, ax.get_ylim()[0],
+                             wrapped, ha='center', va='center',
+                             fontsize=fontsize, fontweight=weight,
+                             style=style, linespacing=1.30)
+            bb = artist.get_window_extent(renderer)
+            if bb.x1 - bb.x0 <= target_px:
+                artist.remove()          # probe only — re-drawn in band
+                return wrapped
+            artist.remove()
+            chars = max(16, int(chars * target_px / (bb.x1 - bb.x0)) - 2)
+        return wrapped
+
+    bottom, top = ax.get_ylim()
+    # aspect='equal' COUPLES ylim to the axes box width: extending ylim
+    # shrinks the box, which shrinks the wrap target. Stabilize by
+    # extending with a full line of SLACK headroom and fitting against a
+    # 0.88 target so a subsequent box shrink still leaves the final
+    # artist inside; iterate a bounded number of rounds.
+    sub_wrapped = subtitle
+    mech_wrapped = None
+    for _round in range(4):
+        sub_lines = sub_wrapped.count("\n") + 1 if sub_wrapped else 0
+        est_mech_lines = 3 if mech_wrapped is None else \
+            mech_wrapped.count("\n") + 1
+        stack_h = 0.40 + (sub_lines * 0.26 if sub_wrapped else 0.0) \
+            + (est_mech_lines + 1) * 0.235 + 0.30      # +1 line slack
+        avail = top - y
+        if stack_h > avail:
+            ax.set_ylim(bottom, top + (stack_h - avail))
+            top = top + (stack_h - avail)
+        if subtitle:
+            sub_wrapped = _fit_wrapped(subtitle, 8.5, 'normal',
+                                       target_frac=0.88, style='italic')
+        if mech:
+            mech_wrapped = _fit_wrapped(mech, 8.2, 'bold', target_frac=0.88)
+    subtitle = sub_wrapped if sub_wrapped else subtitle
+    wrapped = mech_wrapped or ""
+    sub_lines = subtitle.count("\n") + 1 if subtitle else 0
+    n_lines = wrapped.count("\n") + 1
+
+    ax.text(cx, top - 0.22, text, ha='center', va='top',
+            fontsize=11, fontweight='bold', color=INK_900)
+    y_cursor = top - 0.22 - 0.30
+    if subtitle:
+        ax.text(cx, y_cursor, subtitle, ha='center', va='top',
+                fontsize=8.5, color=INK_500, style='italic')
+        y_cursor -= 0.26 * sub_lines
+    if wrapped:
+        ax.text(cx, y_cursor, wrapped, ha='center', va='top',
+                fontsize=8.2, color=BRAND_900, fontweight='bold',
+                linespacing=1.30)
 
 
 _HEADLINES_PATH = os.path.join(
@@ -184,9 +256,57 @@ def _canonical_mechanism(pkg_id):
     return _HEADLINES_CACHE.get(pkg_id)
 
 
+def verify_text_geometry(fig, name):
+    """R375-4 (CEO final PDF rendering hardening): post-draw self-check.
+
+    Overlaps INSIDE an embedded PNG are invisible to the PDF-layer gates
+    (pdfplumber sees one image, not its ink) — so the diagram factory
+    itself must mechanically refuse to ship a figure whose texts collide
+    or spill outside the axes:
+
+      1. no two text artists' window extents overlap (1.5px tolerance);
+      2. every text artist lies inside the axes bbox + 6px margin.
+
+    A deliberate-overlap regression fixture (R375-7) proves this raises.
+    """
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    extents = []
+    for ax in fig.axes:
+        ax_bbox = ax.get_window_extent(renderer)
+        for txt in ax.texts:
+            if not txt.get_text().strip():
+                continue
+            try:
+                bb = txt.get_window_extent(renderer)
+            except Exception:
+                continue
+            extents.append((txt.get_text()[:28], bb))
+            if (bb.x0 < ax_bbox.x0 - 6 or bb.x1 > ax_bbox.x1 + 6 or
+                    bb.y0 < ax_bbox.y0 - 6 or bb.y1 > ax_bbox.y1 + 6):
+                raise RuntimeError(
+                    f"diagram '{name}': text outside axes: "
+                    f"'{txt.get_text()[:40]}' bbox "
+                    f"[{bb.x0:.0f},{bb.x1:.0f}]x[{bb.y0:.0f},{bb.y1:.0f}] "
+                    f"vs axes [{ax_bbox.x0:.0f},{ax_bbox.x1:.0f}]x"
+                    f"[{ax_bbox.y0:.0f},{ax_bbox.y1:.0f}]")
+    tol = 1.5
+    for i in range(len(extents)):
+        for j in range(i + 1, len(extents)):
+            ta, a = extents[i]
+            tb, b = extents[j]
+            ix = min(a.x1, b.x1) - max(a.x0, b.x0)
+            iy = min(a.y1, b.y1) - max(a.y0, b.y0)
+            if ix > tol and iy > tol:
+                raise RuntimeError(
+                    f"diagram '{name}': text overlap: '{ta}' x '{tb}' "
+                    f"({ix:.1f}x{iy:.1f}px)")
+
+
 def _save(fig, name):
-    """Save figure to output dir and return path."""
+    """Save figure to output dir and return path (self-verified)."""
     path = os.path.join(OUTPUT_DIR, f"{name}.png")
+    verify_text_geometry(fig, name)
     fig.savefig(path, dpi=180, bbox_inches='tight', facecolor='white',
                 pad_inches=0.15)
     plt.close(fig)
@@ -253,16 +373,16 @@ def diagram_P01(name="P-01"):
            color=BRAND_900, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=6.5)
     _arrow(ax, 6.6, 6.1, 6.4, 6.1, color=INK_700, lw=1.0, label="P(occlude)",
-           label_size=7, label_offset=(0, 0.2))
+           label_size=7, label_offset=(0.15, -0.62))
     # Controller back to ventricles (alpha update)
     _arrow(ax, 5.3, 5.6, 3.3, 5.5, color=ACCENT, lw=1.4,
-           label="alpha update", label_size=7, label_offset=(0, 0.25),
+           label="alpha update", label_size=7, label_offset=(-0.45, 0.5),
            curve=-0.15)
 
     # Honest state callout
-    ax.text(0.4, 0.2,
-            "Honest state: T2-CONDITIONAL (svMultiPhysics verified 1D model within 16%). Strict dual-invariant FALSIFIED → graceful degradation.",
-            fontsize=7, color=INK_500, style='italic')
+    ax.text(5.95, 4.35,
+            "Honest state: T2-CONDITIONAL\nsvMultiPhysics verified 1D model within 16%; strict\ndual-invariant FALSIFIED → graceful degradation.",
+            fontsize=6.0, color=INK_500, style='italic', va='bottom')
 
     return _save(fig, name)
 
@@ -281,25 +401,25 @@ def diagram_P02(name="P-02"):
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
 
     # Trend extractor
-    _block(ax, 3.0, 3.5, 1.8, 1.0, "Trend Extractor", sublabel="dP/dt + postural",
+    _block(ax, 3.0, 3.5, 1.8, 1.0, "Trend Extractor", sublabel="dP/dt\npostural",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
     _arrow(ax, 2.2, 4.0, 3.0, 4.0, color=INK_700, lw=1.2, label="P_ICP(t)",
-           label_size=7.5, label_offset=(0, 0.2))
+           label_size=7.5, label_offset=(0, -0.58))
 
     # Adaptive profile generator
-    _block(ax, 5.6, 3.5, 2.0, 1.0, "Adaptive Profile", sublabel="opening profile\n(k_p, k_d)",
+    _block(ax, 5.6, 3.42, 2.0, 1.3, "Adaptive Profile", sublabel="k_p, k_d",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
     _arrow(ax, 4.8, 4.0, 5.6, 4.0, color=INK_700, lw=1.2, label="trends",
-           label_size=7.5, label_offset=(0, 0.2))
+           label_size=7.5, label_offset=(0, -0.58))
 
     # Valve actuator
-    _block(ax, 8.4, 3.5, 1.8, 1.0, "Valve Actuator", sublabel="(programmable valve)",
+    _block(ax, 8.4, 3.5, 1.8, 1.0, "Valve Actuator", sublabel="(programmable)",
            color=BRAND_700, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
     _arrow(ax, 7.6, 4.0, 8.4, 4.0, color=INK_700, lw=1.2, label="opening profile",
-           label_size=7.5, label_offset=(0, 0.2))
+           label_size=7.5, label_offset=(0, -0.58))
 
     # Patient postural state (input)
     _block(ax, 3.0, 1.0, 1.8, 0.9, "Postural State", sublabel="(accelerometer)",
@@ -367,7 +487,7 @@ def diagram_P04(name="P-04"):
     # Arrows showing flow + cleavage
     _arrow(ax, 1.9, 4.0, 2.4, 4.0, color=INK_700, lw=1.2)
     _arrow(ax, 8.9, 4.0, 9.6, 4.0, color=INK_700, lw=1.2,
-           label="cleared peptides", label_size=7, label_offset=(0, 0.25))
+           label="cleared peptides", label_size=7, label_offset=(0, -0.62))
 
     # Cleavage arrows (enzyme to substrate)
     for x in [3.5, 5.0, 6.5, 8.0]:
@@ -385,14 +505,14 @@ def diagram_P04(name="P-04"):
     ax.text(0.3, 1.4, "• Enzyme surface density Gamma • Catheter length L\n• Lumen diameter d • Contact time tau",
             fontsize=7.5, color=INK_700)
 
-    ax.text(5.7, 1.8, "UNKNOWN (enzyme):", fontsize=8.5,
+    ax.text(5.7, 1.95, "UNKNOWN (enzyme):", fontsize=8.5,
             color=ACCENT, fontweight='bold')
-    ax.text(5.7, 1.4, "• Enzyme half-life in CSF environment • Immunogenicity of immobilized NEP\n• Substrate competition magnitude • In vivo clearance per pass",
-            fontsize=7.5, color=INK_700)
+    ax.text(5.7, 1.5, "• Enzyme half-life in CSF environment\n• Immunogenicity of immobilized NEP\n• Substrate competition magnitude\n• In vivo clearance per pass",
+            fontsize=7.5, color=INK_700, va='top')
 
-    ax.text(0.3, 0.4,
-            "Honest state: T1 MODEL_PREDICTED (100% clearance model). Biology blocked — decisive experiment can resolve enzyme stability question.",
-            fontsize=7, color=INK_500, style='italic')
+    ax.text(0.3, 0.18,
+            "Honest state: T1 MODEL_PREDICTED (100% clearance model).\nBiology blocked — decisive experiment can resolve enzyme stability question.",
+            fontsize=6.5, color=INK_500, style='italic', va='bottom')
 
     return _save(fig, name)
 
@@ -447,7 +567,7 @@ def diagram_P07(name="P-07"):
            label="fail-safe Q_min ~0.05 mL/min", label_size=7, label_offset=(0, 0.25))
 
     # Drainage outlet
-    _block(ax, 10.5, 3.7, 0.5, 1.8, "Outlet", color=INK_500, bg=INK_100,
+    _block(ax, 10.15, 3.7, 0.75, 1.8, "Out", color=INK_500, bg=INK_100,
            label_color="white", fontsize=8)
 
     # Annotation: P-03 failure mode
@@ -493,7 +613,7 @@ def diagram_P11(name="P-11"):
                       edgecolor=INK_900, linewidth=0.5, zorder=5)
         ax.add_patch(head)
         ax.plot([x, x], [3.05, 2.65], color=INK_900, linewidth=1.0, zorder=5)
-    ax.text(0.4, 3.2, "Phage K", ha='right', va='center',
+    ax.text(0.75, 3.55, "Phage K", ha='left', va='center',
             fontsize=8, color=EV_PHYSICAL, fontweight='bold')
 
     # S. aureus bacteria (ovals, attacking from above)
@@ -520,7 +640,7 @@ def diagram_P11(name="P-11"):
             ha='center', va='center', fontsize=7, color=INK_500, style='italic')
 
     ax.text(0.4, 0.4,
-            "Honest state: T1 MODEL_PREDICTED. Decisive experiment: 7-day S. aureus biofilm assay with phage-coated vs uncoated Ti.\n"
+            "Honest state: T1 MODEL_PREDICTED. Decisive experiment:\n7-day S. aureus biofilm assay with phage-coated vs uncoated Ti.\n"
             "Kinetic parameters (recorded): k_ads (phage-bacteria adsorption rate) · k_decay (phage decay rate)",
             fontsize=7, color=INK_500, style='italic')
 
@@ -544,7 +664,7 @@ def diagram_P13(name="P-13"):
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
 
     # Feature extractor
-    _block(ax, 2.6, 3.5, 1.8, 1.6, "Feature Extractor",
+    _block(ax, 2.6, 3.35, 1.8, 1.9, "Feature Extractor",
            sublabel="Rolling window\n24h features",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7.5)
@@ -588,7 +708,7 @@ def diagram_P13(name="P-13"):
            sublabel_color=INK_900, fontsize=9, sublabel_size=7.5)
 
     # Recorded parameters
-    ax.text(0.3, 1.4, "Recorded parameters: Sensor sampling rate ~1-10 Hz (MODELLED) · Prediction horizon target (hours to days)",
+    ax.text(0.3, 2.15, "Recorded parameters: Sensor sampling rate ~1-10 Hz (MODELLED) · Prediction horizon target (hours to days)",
             fontsize=7, color=INK_500, style='italic')
 
     return _save(fig, name)
@@ -616,7 +736,7 @@ def diagram_P15R1(name="P-15-R1"):
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7.5)
     _arrow(ax, 2.1, 5.0, 2.7, 4.5, color=INK_700, lw=1.0, label="coupling",
-           label_size=7, label_offset=(-0.3, 0.1))
+           label_size=7, label_offset=(0.30, -0.52))
     _arrow(ax, 2.1, 3.0, 2.7, 3.5, color=INK_700, lw=1.0)
 
     # Power conditioning
@@ -670,7 +790,7 @@ def diagram_P16(name="P-16"):
            y=6.5, pkg_id="P-16")
 
     # External LED
-    _block(ax, 0.3, 3.5, 1.6, 1.4, "940nm LED", sublabel="external\nwearable",
+    _block(ax, 0.3, 3.35, 1.6, 1.7, "940nm LED", sublabel="external\nwearable",
            color=ACCENT, bg=ACCENT_LIGHT, label_color="white",
            sublabel_color=INK_900, fontsize=9, sublabel_size=7.5)
 
@@ -684,8 +804,8 @@ def diagram_P16(name="P-16"):
             fontsize=9, color=INK_700, fontweight='bold')
     ax.text(3.9, 4.2, "5mm tissue path", ha='center', va='center',
             fontsize=7.5, color=INK_500, style='italic')
-    ax.text(3.9, 3.5, "Jacques 2013 + PyTissueOptics v2.0.1 (DCC-Lab, independent):\nμ_a=0.05/cm, μ_s=8.0/cm",
-            ha='center', va='center', fontsize=7, color=INK_500)
+    ax.text(3.9, 3.35, "Jacques 2013 + PyTissueOptics\nv2.0.1 (DCC-Lab, independent):\nμ_a=0.05/cm, μ_s=8.0/cm",
+            ha='center', va='center', fontsize=6.5, color=INK_500)
 
     # GaAs PV cell
     _block(ax, 5.9, 3.5, 1.6, 1.4, "GaAs PV", sublabel="implanted",
@@ -705,11 +825,12 @@ def diagram_P16(name="P-16"):
     # Arrows
     _arrow(ax, 1.9, 4.2, 2.4, 4.2, color=INK_700, lw=1.2,
            label="940nm collimated", label_size=7, label_offset=(0, 0.25))
-    _arrow(ax, 5.4, 4.2, 5.9, 4.2, color=ACCENT, lw=1.4,
-           label="fluence 1.05 mW/cm²\n(T2-CONFIRMED)", label_size=7,
-           label_offset=(0, 0.4))
-    _arrow(ax, 7.5, 4.2, 7.9, 4.2, color=INK_700, lw=1.2,
-           label="~1050 μW", label_size=7, label_offset=(0, 0.25))
+    _arrow(ax, 5.4, 4.2, 5.9, 4.2, color=ACCENT, lw=1.4)
+    ax.text(6.05, 2.95, "fluence 1.05 mW/cm² (T2-CONFIRMED) →",
+            fontsize=6.8, color=ACCENT, ha='center', va='top')
+    _arrow(ax, 7.5, 4.2, 7.9, 4.2, color=INK_700, lw=1.2)
+    ax.text(8.6, 2.95, "→ ~1050 μW", fontsize=6.8, color=INK_700,
+            ha='center', va='top')
     _arrow(ax, 9.3, 4.2, 9.5, 4.2, color=INK_700, lw=1.2)
 
     # Evidence ladder (T2 verified callout)
@@ -718,9 +839,9 @@ def diagram_P16(name="P-16"):
                              facecolor=EV_COMPUTATIONAL_BG, edgecolor=EV_COMPUTATIONAL,
                              linewidth=1.0)
     ax.add_patch(ev_box)
-    ax.text(0.5, 1.4, "EVIDENCE: COMPUTATIONALLY_SUPPORTED (T2-CONFIRMED)",
+    ax.text(0.5, 1.55, "EVIDENCE: COMPUTATIONALLY_SUPPORTED (T2-CONFIRMED)",
             fontsize=8.5, color=EV_COMPUTATIONAL, fontweight='bold')
-    ax.text(0.5, 0.85,
+    ax.text(0.5, 0.78,
             "PyTissueOptics v2.0.1 (DCC-Lab, independent) + Jacques 2013 (evidence source).\n"
             "MC convergence documented (CIs overlap). Published Jacques 2013 range confirmed.\n"
             "Reproducible: pip install pytissueoptics. PHYSICAL VALIDATION OUTSTANDING (LED + phantom + PV bench).",
@@ -752,7 +873,7 @@ def diagram_P21R1(name="P-21-R1"):
     ax.add_patch(tag)
     ax.text(5.5, 2.0, "UWB\nTX", ha='center', va='center',
             fontsize=7, color='white', fontweight='bold', zorder=6)
-    ax.text(5.5, 1.4, "Catheter Tip (UWB transmitter)",
+    ax.text(5.5, 2.75, "Catheter Tip (UWB transmitter)",
             ha='center', va='center', fontsize=7, color=INK_500, style='italic')
 
     # External receiver array (above skull)
@@ -771,7 +892,7 @@ def diagram_P21R1(name="P-21-R1"):
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=8, sublabel_size=7.5)
     _arrow(ax, 7.0, 5.55, 7.8, 5.1, color=INK_700, lw=1.2,
-           label="signal", label_size=7, label_offset=(0.1, 0.25))
+           label="signal", label_size=7, label_offset=(0.55, 0.62))
 
     # Clinical display
     _block(ax, 10.35, 4.3, 0.65, 1.6, "Display", sublabel="(x,y,z)",
@@ -785,9 +906,9 @@ def diagram_P21R1(name="P-21-R1"):
                               facecolor=EV_KILLED_BG, edgecolor=EV_KILLED,
                               linewidth=1.0)
     ax.add_patch(fail_box)
-    ax.text(0.5, 1.4, "P-21 ORIGINAL FAILURE:", fontsize=8, color=EV_KILLED,
+    ax.text(0.5, 1.62, "P-21 ORIGINAL FAILURE:", fontsize=8, color=EV_KILLED,
             fontweight='bold')
-    ax.text(0.5, 0.85,
+    ax.text(0.5, 0.78,
             "P-21 original: assumed sub-mm accuracy without SAR analysis.\n"
             "R1 REPAIR: bounds accuracy by SAR limit (1.6 W/kg averaged over 1g tissue) and tissue propagation physics.\n"
             "UWB requires Bandwidth B >= 500 MHz (EXTERNAL_PRECEDENT).",
@@ -827,7 +948,7 @@ def diagram_P22R1(name="P-22-R1"):
            color=BRAND_700, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
     _arrow(ax, 7.0, 5.0, 7.5, 5.0, color=INK_700, lw=1.2, label="error",
-           label_size=7, label_offset=(0, 0.2))
+           label_size=7, label_offset=(0.05, -0.32))
 
     # Feedback to hydraulic source
     _arrow(ax, 8.4, 5.5, 8.4, 6.3, color=ACCENT, lw=1.4)
@@ -838,7 +959,7 @@ def diagram_P22R1(name="P-22-R1"):
 
     # Tissue phantom
     _block(ax, 2.6, 1.5, 4.0, 1.5, "Tissue Phantom",
-           sublabel="contact force target < 0.01 N\n(P-22 original: effective force 0.039 N exceeds damage threshold 0.01 N by 4x)",
+           sublabel="contact force target < 0.01 N\n(P-22 original: 0.039 N exceeds\n0.01 N threshold by 4x)",
            color=INK_500, bg=INK_100, label_color="white",
            sublabel_color=INK_700, fontsize=9, sublabel_size=7.5)
     _arrow(ax, 3.8, 4.0, 3.8, 3.0, color=INK_700, lw=1.2,
@@ -858,12 +979,12 @@ def diagram_P22R1(name="P-22-R1"):
                               facecolor=EV_KILLED_BG, edgecolor=EV_KILLED,
                               linewidth=1.0)
     ax.add_patch(fail_box)
-    ax.text(0.5, 0.7, "P-22 ORIGINAL FAILURE (4 UNRESOLVED):", fontsize=8,
-            color=EV_KILLED, fontweight='bold')
-    ax.text(0.5, 0.2,
-            "SMP buckling (82x exceedance) • Tissue safety (0.039 N > 0.01 N by 4x) • Control stability (30s delay) • No failure recovery.\n"
+    ax.text(0.5, 0.78, "P-22 ORIGINAL FAILURE (4 UNRESOLVED):", fontsize=8,
+            color=EV_KILLED, fontweight='bold', va='top')
+    ax.text(0.5, 0.60,
+            "SMP buckling (82x exceedance) • Tissue safety (0.039 N > 0.01 N by 4x)\n• Control stability (30s delay) • No failure recovery.\n"
             "R1 REPAIR: hydraulic pressure-driven navigation + delay-compensated PID + tissue safety.",
-            fontsize=7, color=INK_700)
+            fontsize=7, color=INK_700, va='top')
 
     return _save(fig, name)
 
@@ -877,7 +998,7 @@ def diagram_P24(name="P-24"):
            y=6.5, pkg_id="P-24")
 
     # CSF inflow
-    _block(ax, 0.3, 3.5, 1.4, 1.4, "CSF Inflow", sublabel="postural pressure transients",
+    _block(ax, 0.3, 3.35, 1.55, 1.7, "CSF Inflow", sublabel="postural\npressure transients",
            color=BRAND_700, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
     _arrow(ax, 1.7, 4.2, 2.4, 4.2, color=INK_700, lw=1.2)
@@ -898,13 +1019,13 @@ def diagram_P24(name="P-24"):
             fontsize=8, color=BRAND_900, style='italic', fontweight='bold')
 
     # Adjustable orifice
-    _block(ax, 5.8, 3.7, 1.4, 1.0, "Adjustable Orifice", sublabel="hydraulic resistance",
+    _block(ax, 5.8, 3.62, 1.55, 1.25, "Adjustable\nOrifice", sublabel="hydraulic resistance",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=8.5, sublabel_size=7)
     _arrow(ax, 5.4, 4.2, 5.8, 4.2, color=INK_700, lw=1.2)
 
     # Gravity reference chamber (pressure equalization)
-    _block(ax, 7.6, 3.7, 1.6, 1.0, "Gravity Reference Chamber", sublabel="dP_gravity = rho * g * dh",
+    _block(ax, 7.6, 3.62, 1.7, 1.25, "Gravity Ref.\nChamber", sublabel="dP_gravity =\nrho * g * dh",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=8, sublabel_size=6.5)
     _arrow(ax, 7.2, 4.2, 7.6, 4.2, color=INK_700, lw=1.2)
@@ -945,7 +1066,7 @@ def diagram_P26(name="P-26"):
            y=6.5, pkg_id="P-26")
 
     # CSF inflow (variable osmolarity)
-    _block(ax, 0.3, 4.0, 1.6, 1.4, "CSF Inflow", sublabel="osmolarity Δ\n(~290 mOsm/kg, EXTERNAL_PRECEDENT)",
+    _block(ax, 0.55, 4.0, 1.6, 1.4, "CSF Inflow", sublabel="osmolarity Δ\n(~290 mOsm/kg,\nEXTERNAL_PRECEDENT)",
            color=BRAND_700, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
     _arrow(ax, 1.9, 4.7, 2.4, 4.7, color=INK_700, lw=1.2)
@@ -974,7 +1095,7 @@ def diagram_P26(name="P-26"):
             va='center', fontsize=7.5, color=INK_700, style='italic')
 
     # Mechanical linkage
-    _block(ax, 6.0, 4.0, 1.6, 1.4, "Mechanical Linkage", sublabel="pressure Δ\nJv = Lp * (dP - sigma * dPi)",
+    _block(ax, 6.0, 3.85, 1.7, 1.9, "Mechanical Linkage", sublabel="pressure Δ\nJv = Lp *\n(dP - sigma * dPi)",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=6.5)
     _arrow(ax, 5.5, 4.7, 6.0, 4.7, color=INK_700, lw=1.2)
@@ -992,12 +1113,12 @@ def diagram_P26(name="P-26"):
     _arrow(ax, 9.5, 4.7, 9.8, 4.7, color=INK_700, lw=1.2)
 
     # Bottom annotation
-    ax.text(0.3, 1.7, "Target response:", fontsize=8.5, color=BRAND_700,
-            fontweight='bold')
-    ax.text(0.3, 1.3, "• Drainage adjusts proportionally (self-regulation)\n"
+    ax.text(0.3, 1.95, "Target response:", fontsize=8.5, color=BRAND_700,
+            fontweight='bold', va='top')
+    ax.text(0.3, 1.55, "• Drainage adjusts proportionally (self-regulation)\n"
                        "• Passive self-regulating CSF drainage\n"
                        "• Osmolarity reference ~290 mOsm/kg (EXTERNAL_PRECEDENT)",
-            fontsize=7.5, color=INK_700)
+            fontsize=7.5, color=INK_700, va='top')
 
     ax.text(0.3, 0.3,
             "Honest state: T1 MODEL_PREDICTED (35% drainage regulation improvement). Prior-art: 11 hits — FTO required.",
@@ -1021,10 +1142,10 @@ def diagram_P27R1(name="P-27-R1"):
     ax.add_patch(diaphragm)
     ax.text(0.65, 5.5, "Diaphragm", ha='center', va='center',
             fontsize=8, color=BRAND_700, fontweight='bold')
-    ax.text(0.1, 4.0, "CSF pressure", ha='center', va='center', fontsize=9,
+    ax.text(0.75, 4.0, "CSF\npressure", ha='center', va='center', fontsize=9,
             color=INK_700, fontweight='bold')
     _arrow(ax, 0.0, 4.0, 0.5, 4.0, color=INK_700, lw=1.4,
-           label="CSF pressure", label_size=7, label_offset=(-0.3, 0.5))
+           label="CSF pressure", label_size=7, label_offset=(0.75, 0.42))
 
     # Catheter integration (R373-1: the canonical subsystem 'Catheter
     # integration (mechanical protection)' — the sensor mounts in the
@@ -1073,8 +1194,8 @@ def diagram_P27R1(name="P-27-R1"):
     _block(ax, 6.5, 3.5, 1.8, 1.0, "Signal Cond.", sublabel="resistance change → V",
            color=BRAND_500, bg=BRAND_100, label_color="white",
            sublabel_color=BRAND_700, fontsize=9, sublabel_size=7)
-    _arrow(ax, 6.0, 4.0, 6.5, 4.0, color=INK_700, lw=1.2, label="resistance change",
-           label_size=7, label_offset=(0, 0.2))
+    _arrow(ax, 6.0, 4.0, 6.5, 4.0, color=INK_700, lw=1.2, label="Δresistance",
+           label_size=7, label_offset=(0.1, 0.45))
 
     # Output
     _block(ax, 8.7, 3.5, 1.5, 1.0, "Output", sublabel="P (drift compensation)",
@@ -1125,7 +1246,7 @@ def diagram_P28(name="P-28"):
     csf = Rectangle((4.3, 1.5), 0.4, 2.5,
                     facecolor=BRAND_100, edgecolor=BRAND_500, linewidth=1.0)
     ax.add_patch(csf)
-    ax.text(4.5, 1.2, "CSF column\n(catheter)", ha='center', va='center',
+    ax.text(4.5, 0.75, "CSF column\n(catheter)", ha='center', va='center',
             fontsize=7, color=BRAND_700, fontweight='bold')
 
     # Obstruction site (red blob on CSF column)

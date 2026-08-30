@@ -105,7 +105,7 @@ def strongest_evidence(pkg) -> str:
     ext = pkg.external_precedent
     if ext:
         e = ext[0]
-        return (e.get("source_title") or e.get("source") or "captured source")[:90]
+        return e.get("source_title") or e.get("source") or "captured source"
     return "NO EXTERNAL PRECEDENT RECORDED"
 
 
@@ -122,7 +122,8 @@ def build_ranking(packages, headlines_by_pkg, roadmaps_by_pkg) -> dict:
                 "portfolio_number": pkg.num,
                 "package_id": pkg.pkg_id,
                 "technology": h.get("technology_name"),
-                "problem": (h.get("problem") or "")[:220],
+                "problem": h.get("problem") or "",
+                "folder": pkg.folder,
                 "domain": pkg.domain,
                 "maturity": "ENGINEERING_DEFINITION",
                 "transfer_posture": "SPONSORED_VALIDATION",

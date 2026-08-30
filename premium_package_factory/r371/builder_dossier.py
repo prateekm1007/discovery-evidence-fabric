@@ -25,13 +25,13 @@ import os
 from reportlab.platypus import Image, PageBreak, Paragraph, Spacer, Table, TableStyle
 
 from .builder import (
-    _doc, _esc, _footer_canvas, _img, _mut, _tbl, NOT_ESTABLISHED, cell_safe,
+    _doc, _esc, _footer_canvas, _img, _mut, _tbl, NOT_ESTABLISHED, cell_full,
 )
-from .equations import render_equation_png
+from .equations import measured_equation_image, render_equation_png
 
 
 def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
-                               loopstate, mech_png, exp_png, out_path):
+                               loopstate, mech_png, exp_pngs, out_path):
     ident = pkg.identity_line
     doc = _doc(out_path, ident,
                f"Engineering Technology-Transfer Dossier — {pkg.pkg_id}")
@@ -66,7 +66,7 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
             rows.append([sub.get("id", ""), _mut(pkg, sub.get("name", "")),
                          _mut(pkg, sub.get("function", "")),
                          sub.get("status", ""),
-                         _mut(pkg, str(sub.get("evidence_source", ""))[:70])])
+                         _mut(pkg, str(sub.get("evidence_source", "")))])
         if len(rows) > 1:
             st.append(_tbl(rows, [0.5 * 72, 1.35 * 72, 1.9 * 72, 0.75 * 72, 1.9 * 72]))
     st.append(Spacer(1, 6))
@@ -89,7 +89,23 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
         if e["typeset"]:
             png = os.path.join(_TMP_DIR, f"{pkg.pkg_id}_{e['equation_id']}.png")
             render_equation_png(e["typeset"], png)
-            st.append(_img(png, 4.6 * 72))
+            # R375-3/7: measured equation embed — the typeset PNG is placed
+            # at its natural size (up to the 504pt frame) and NEVER below
+            # an 8pt effective glyph size; an equation too wide for a
+            # readable one-line embed falls back to the verbatim record
+            # (rendered as wrapping monospace text) instead of shipping an
+            # unreadably shrunken image.
+            eq_img, note = measured_equation_image(png, frame_pt=504.0,
+                                                   floor_pt=8.0)
+            if eq_img is not None:
+                st.append(eq_img)
+            else:
+                st.append(Paragraph(_esc(
+                    f"Typeset form omitted for readability — the equation "
+                    f"exceeds one readable line at page width ({note}). "
+                    f"Verbatim canonical form below."), S["SM"]))
+                st.append(Paragraph(_esc(
+                    f"{e['equation_canonical']}"), S["MT"]))
         else:
             st.append(Paragraph(_esc(
                 f"Relation (rendered verbatim from the record — "
@@ -98,7 +114,7 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
             st.append(Paragraph(_esc(f"Caption: {e['caption']}"), S["SM"]))
         if e["variables"]:
             st.append(Paragraph("Variables (recorded critical parameters):", S["SM"]))
-            for v in e["variables"][:6]:
+            for v in e["variables"]:
                 st.append(Paragraph(_esc(
                     f"  {v['symbol']} — {v['recorded_name']} = {v['value']} "
                     f"[{v['unit']}] (basis: {v['basis']})"), S["SM"]))
@@ -107,11 +123,11 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
         e0 = eq_registry["equations"][0]
         if e0.get("applicability"):
             st.append(Paragraph("Applicability / boundary conditions:", S["SM"]))
-            for b in e0["applicability"][:6]:
+            for b in e0["applicability"]:
                 st.append(Paragraph("  • " + _esc(b), S["SM"]))
         if e0.get("assumptions"):
             st.append(Paragraph("Model assumptions (as recorded):", S["SM"]))
-            for a in e0["assumptions"][:6]:
+            for a in e0["assumptions"]:
                 st.append(Paragraph("  • " + _esc(a), S["SM"]))
     st.append(Spacer(1, 4))
     if eq_registry.get("r374_validation_status"):
@@ -147,47 +163,44 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
         st.append(_tbl(rows, [1.5 * 72, 1.9 * 72, 0.7 * 72, 0.9 * 72, 1.4 * 72]))
 
     # -- 5. design inputs / outputs ------------------------------------------
+    # R375-1: design inputs are AUTHORITATIVE engineering content — the
+    # full value renders (Paragraph wraps, row grows, table splits); no
+    # summarization, no truncation.
     st.append(Paragraph("5. DESIGN INPUTS / DESIGN OUTPUTS", S["SH"]))
     rows = [["ID", "Design input", "Value / source"]]
-    for di in pkg.design_inputs[:14]:
+    for di in pkg.design_inputs:
         rows.append([di.get("id", ""), _mut(pkg, di.get("input", "")),
-                     cell_safe("clinical_need" if "need" in str(
-                         di.get("input", "")).lower() else "value",
-                         _mut(pkg, di.get("value", "")),
-                         register="package JSON registers")])
+                     cell_full(_mut(pkg, di.get("value", "")))])
     st.append(_tbl(rows, [0.55 * 72, 1.7 * 72, 4.4 * 72]))
     st.append(Spacer(1, 5))
     rows = [["ID", "Design output", "Status", "Missing inputs"]]
-    for do in pkg.design_outputs[:14]:
+    for do in pkg.design_outputs:
         rows.append([do.get("id", ""), _mut(pkg, do.get("description", "")),
                      do.get("status", ""),
-                     _mut(pkg, "; ".join(do.get("missing_inputs", []) or [])[:110])])
+                     cell_full(_mut(pkg, "; ".join(
+                         do.get("missing_inputs", []) or [])))])
     st.append(_tbl(rows, [0.55 * 72, 2.3 * 72, 0.8 * 72, 3.0 * 72]))
 
     # -- 6. failure analysis --------------------------------------------------
     st.append(Paragraph("6. FAILURE ANALYSIS", S["SH"]))
     rows = [["Failure mode", "Mechanism", "Design feature affected", "Evidence"]]
-    for fm in pkg.failure_analysis[:10]:
+    for fm in pkg.failure_analysis:
         rows.append([_mut(pkg, fm.get("failure_mode", "")),
                      _mut(pkg, fm.get("mechanism", "")),
                      _mut(pkg, fm.get("design_feature_affected", "")),
-                     cell_safe("evidence", _mut(pkg, fm.get("evidence", "")),
-                               register="engineering record")])
+                     cell_full(_mut(pkg, fm.get("evidence", "")))])
     st.append(_tbl(rows, [1.3 * 72, 1.7 * 72, 1.4 * 72, 2.25 * 72]))
 
     # -- 7. verification + experiment diagram ---------------------------------
     st.append(Paragraph("7. VERIFICATION AND VALIDATION", S["SH"]))
     rows = [["ID", "Requirement", "Method", "Acceptance", "Result"]]
-    for v in pkg.verification[:10]:
+    for v in pkg.verification:
         rows.append([v.get("id", ""), _mut(pkg, v.get("requirement", "")),
-                     cell_safe("method", _mut(pkg, v.get("method", "")),
-                               register="verification record"),
-                     cell_safe("acceptance",
-                               _mut(pkg, v.get("acceptance", "")),
-                               register="verification record"),
+                     cell_full(_mut(pkg, v.get("method", ""))),
+                     cell_full(_mut(pkg, v.get("acceptance", ""))),
                      v.get("result", "NOT_TESTED")])
     st.append(_tbl(rows, [0.5 * 72, 1.7 * 72, 1.8 * 72, 1.7 * 72, 0.8 * 72]))
-    for v in pkg.validation[:6]:
+    for v in pkg.validation:
         if isinstance(v, dict):
             st.append(Paragraph(_esc(
                 f"Validation: {v.get('requirement','')} — {v.get('method','')} "
@@ -195,23 +208,24 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     st.append(Spacer(1, 6))
     st.append(Paragraph("DECISIVE EXPERIMENT / VERIFICATION SETUP "
                         "(schematic, auto-derived from the canonical build plan)", S["QH"]))
-    if exp_png and os.path.exists(exp_png):
-        st.append(_img(exp_png, 6.9 * 72))
+    # R375-3: the diagram may reflow into MULTIPLE parts (each page-fitting,
+    # auto-sized); embed every part, each on its own page if needed.
+    if exp_pngs:
+        pngs = [exp_pngs] if isinstance(exp_pngs, str) else list(exp_pngs)
+        for k, png in enumerate(pngs):
+            if os.path.exists(png):
+                if k > 0:
+                    st.append(PageBreak())
+                st.append(_img(png, 6.9 * 72))
 
     # -- 8. build plan ----------------------------------------------------------
     st.append(Paragraph("8. ENGINEERING BUILD PLAN (recorded effort; cost NOT_ESTABLISHED)", S["SH"]))
     rows = [["WP", "Test article", "Measurement", "Acceptance criterion", "Recorded effort"]]
     for step in pkg.build_plan:
         rows.append([step.get("work_package", ""),
-                     cell_safe("test_article",
-                               _mut(pkg, step.get("test_article", "")),
-                               register="build plan"),
-                     cell_safe("measurement",
-                               _mut(pkg, step.get("measurement", "")),
-                               register="build plan"),
-                     cell_safe("acceptance_criterion",
-                               _mut(pkg, step.get("acceptance_criterion", "")),
-                               register="build plan"),
+                     cell_full(_mut(pkg, step.get("test_article", ""))),
+                     cell_full(_mut(pkg, step.get("measurement", ""))),
+                     cell_full(_mut(pkg, step.get("acceptance_criterion", ""))),
                      step.get("estimated_effort", "")])
     st.append(_tbl(rows, [0.45 * 72, 1.65 * 72, 1.65 * 72, 1.65 * 72, 0.9 * 72]))
     st.append(Paragraph(_esc(
@@ -233,11 +247,9 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     rows = [["ID", "Unknown (verbatim)", "Class", "Resolution action", "Decision impact"]]
     for u in roadmap["unknowns"]:
         rows.append([u["unknown_id"],
-                     cell_safe("why_unknown", u["unknown_statement"],
-                               register="UNKNOWN_ROADMAP.json", fontsize=6.7),
+                     cell_full(u["unknown_statement"], fontsize=6.7),
                      u["classification"],
-                     cell_safe("resolution_action", u["resolution_action"],
-                               register="UNKNOWN_ROADMAP.json", fontsize=6.7),
+                     cell_full(u["resolution_action"], fontsize=6.7),
                      "CRITICAL gate" if u["is_critical"] else "design gate"])
     st.append(_tbl(rows, [0.42 * 72, 2.0 * 72, 1.05 * 72, 2.3 * 72, 0.7 * 72], fontsize=6.7))
 
@@ -253,10 +265,10 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
                              "the full metric schema and establishment pathway)."), S["BT"]))
     st.append(Paragraph(_esc(f"COMPETITIVE CONTEXT: {comp.get('verdict','')}"), S["BT"]))
     if comp.get("entries"):
-        for entry in comp["entries"][:3]:
+        for entry in comp["entries"]:
             st.append(Paragraph(_esc(
                 f"  {entry['entry_id']}: {', '.join(entry['companies_named_in_source'])} "
-                f"— cited within hashed source '{entry['source_title'][:70]}'"), S["SM"]))
+                f"— cited within hashed source '{entry['source_title']}'"), S["SM"]))
     st.append(Paragraph(_esc(f"COMMERCIAL PRECEDENT: {prec.get('verdict','')}"), S["BT"]))
     st.append(Paragraph(_esc(
         f"IP STATUS: patents filed: {ip.get('patent_applications_filed_by_transferor','')}; "
@@ -274,7 +286,7 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
         f"Basis: {tr['basis']}"), S["BT"]))
     st.append(Paragraph(_esc(
         f"Expected decision: {eco['expected_decision']['decision']} — "
-        f"acceptance: {str(eco['expected_decision']['acceptance_criterion'])[:160]}"), S["BT"]))
+        f"acceptance: {eco['expected_decision']['acceptance_criterion']}"), S["BT"]))
 
     # -- 12. transfer boundary + kill ------------------------------------------------
     st.append(Paragraph("12. TRANSFER BOUNDARY AND KILL CONDITION", S["SH"]))

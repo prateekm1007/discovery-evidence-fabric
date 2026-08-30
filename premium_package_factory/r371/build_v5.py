@@ -28,6 +28,7 @@ import os
 import shutil
 import sys
 import zipfile
+from pathlib import Path
 
 # R374-5 deterministic ZIP entries: zipfile's default embeds each
 # file's mtime into the archive, making the package ZIPs non-reproducible
@@ -59,7 +60,10 @@ from premium_package_factory.r371.economics import build_validation_economics
 from premium_package_factory.r371.equations import build_equation_registry
 from premium_package_factory.r371.experiment_diagram import build_experiment_diagram
 from premium_package_factory.gates.render_verification import (
-    verify_package, verify_pdf_rendering)
+    content_completeness, geometric_qa, rendered_page_qa, verify_package,
+    verify_pdf_rendering, write_report)
+from premium_package_factory.gates.content_expectations import (
+    build_content_expectations)
 from premium_package_factory.r371.identity import build_registry, write_registry
 from premium_package_factory.r371.loopstate import build_loop_state, portfolio_loop_summary
 from premium_package_factory.r371.mechanism_diagram import build_all_mechanism_diagrams
@@ -177,6 +181,12 @@ def build(portfolio_root, work_dir=None):
 
     # 4. per-package render -----------------------------------------------------
     print("[R371] rendering 15 packages ...")
+    # R375-5/6: every rendered page is rasterized to PNG under
+    # INTERNAL_QA/rendered_pages/ — the actual rendered page is the audit
+    # object. GEOMETRIC_QA + RENDERED_PAGE_QA + content completeness are
+    # ALL blocking before the package ZIP is created.
+    qa_root = os.path.join(portfolio_root, "INTERNAL_QA", "rendered_pages")
+    qa_report = {}
     for p in packages:
         h = headlines[p.pkg_id]
         folder = p.folder
@@ -200,10 +210,37 @@ def build(portfolio_root, work_dir=None):
         bd.render_transfer_manifest(p, h, comm[p.pkg_id],
                                     os.path.join(pdir, "05_TRANSFER_MANIFEST.pdf"))
 
-        # V3 BUILD GATE (CEO forensic directive 2026-08-30): the package
-        # ZIP is not created unless every rendered PDF is free of the V2
-        # defect class (overflow / overprinting). Blocking by exception.
-        verify_package(pdir)
+        # V3 BUILD GATE + R375-5/6 RENDERED-PAGE GATE: the package ZIP is
+        # not created unless every rendered PDF passes GEOMETRIC_QA and
+        # RENDERED_PAGE_QA (blocking by exception). PNG page artifacts
+        # persist for audit under INTERNAL_QA/rendered_pages/.
+        pkg_qa = verify_package(
+            pdir, png_dir=os.path.join(qa_root, folder))
+
+        # R375-1/10 content completeness: every authoritative canonical
+        # string must appear IN FULL in the package's PDF text (cell-aware
+        # extraction — see pdf_haystacks).
+        from premium_package_factory.gates.render_verification import (
+            pdf_haystacks)
+        streams = []
+        for f in sorted(os.listdir(pdir)):
+            if f.endswith(".pdf"):
+                streams.extend(pdf_haystacks(os.path.join(pdir, f)))
+        exp = build_content_expectations(p, h, roads[p.pkg_id])
+        ok, failures = content_completeness(exp, streams)
+        if not ok:
+            raise RuntimeError(
+                f"R375 content completeness FAILED for {p.pkg_id}: "
+                f"{len(failures)} authoritative strings missing/truncated "
+                f"from the PDF set: "
+                + "; ".join(f"{f['field']} "
+                             f"(head: {f['expected_head'][:60]!r})"
+                             for f in failures[:8]))
+        qa_report[folder] = {"geometric_and_rendered": "PASS",
+                             "content_completeness": {
+                                 "expected": len(exp), "missing": 0}}
+        print(f"   {p.num} QA: geometric+rendered+completeness PASS "
+              f"({len(exp)} authoritative strings verified in full)")
 
         # machine-readable layer
         # R372-1: ENGINEERING_TRACEABILITY.json now carries explicit
@@ -302,9 +339,10 @@ def build(portfolio_root, work_dir=None):
     bp.render_master_portfolio(
         packages, headlines, ranking,
         os.path.join(portfolio_root, "00_PORTFOLIO_15_TECHNOLOGIES.pdf"))
-    verify_pdf_rendering(os.path.join(portfolio_root, "PORTFOLIO_INDEX.pdf"))
-    verify_pdf_rendering(
-        os.path.join(portfolio_root, "00_PORTFOLIO_15_TECHNOLOGIES.pdf"))
+    for _pf in ("PORTFOLIO_INDEX.pdf", "00_PORTFOLIO_15_TECHNOLOGIES.pdf"):
+        geometric_qa(os.path.join(portfolio_root, _pf))
+        rendered_page_qa(os.path.join(portfolio_root, _pf),
+                         png_dir=os.path.join(qa_root, Path(_pf).stem))
     # PORTFOLIO_MANIFEST.json (canonical maturity source)
     # R374-5 determinism: no volatile build timestamp here — this file's
     # sha256 is embedded in README.md and RELEASE_CONTENT_MANIFEST.json,
@@ -360,6 +398,16 @@ def build(portfolio_root, work_dir=None):
         os.path.join(portfolio_root, "PORTFOLIO_RELEASE_REPORT.pdf"),
         traceability=traces, packages=packages,
         equation_validation=eq_validations)
+    # R375 gap fix: the release report was previously rendered but NEVER
+    # verified (the V3 gate covered index + master only). Both instruments
+    # now apply to every shipped PDF.
+    geometric_qa(os.path.join(portfolio_root, "PORTFOLIO_RELEASE_REPORT.pdf"))
+    rendered_page_qa(os.path.join(portfolio_root,
+                                  "PORTFOLIO_RELEASE_REPORT.pdf"),
+                     png_dir=os.path.join(qa_root, "PORTFOLIO_RELEASE_REPORT"))
+    # persist the R375 QA verdict for fresh-clone comparison
+    write_report(qa_report, os.path.join(
+        portfolio_root, "INTERNAL_QA", "R375_RENDER_QA.json"))
     # pass 1: manifest without README -> GENERATE README from it
     rc_manifest = bp.build_release_content_manifest(portfolio_root,
                                                     include_readme=False)

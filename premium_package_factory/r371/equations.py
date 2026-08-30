@@ -232,6 +232,46 @@ def render_equation_png(mathtext: str, out_path: str, dpi: int = 300) -> str:
     return out_path
 
 
+#: equation typeset source font size (points) — used by the R375 measured
+#: embed to compute the EFFECTIVE glyph size after scaling.
+EQ_SOURCE_FONTSIZE = 15.0
+EQ_SOURCE_DPI = 300
+
+
+def measured_equation_image(png_path: str, frame_pt: float = 504.0,
+                            floor_pt: float = 8.0):
+    """R375-3/7: embed an equation PNG at a MEASURED size.
+
+    The PNG was rendered at EQ_SOURCE_FONTSIZE pt glyphs. Its natural
+    width in points is px / dpi * 72. The embed width is the natural size
+    capped at frame_pt — but if capping would push the effective glyph
+    size below floor_pt, the equation is too long for a readable one-line
+    image and (None, note) is returned so the caller falls back to the
+    verbatim canonical string as wrapping monospace text. Equations are
+    never shipped unreadably shrunken.
+    """
+    from PIL import Image as _PILImage
+    from reportlab.platypus import Image as _RLImage
+
+    with _PILImage.open(png_path) as im:
+        px_w = im.size[0]
+    natural_pt = px_w / EQ_SOURCE_DPI * 72.0
+    embed_pt = min(natural_pt, frame_pt)
+    effective = EQ_SOURCE_FONTSIZE * embed_pt / natural_pt
+    if effective < floor_pt:
+        return None, (f"effective glyph size {effective:.1f}pt would fall "
+                      f"below the {floor_pt:.0f}pt floor at page width")
+    return _RLImage(png_path, width=embed_pt,
+                    height=embed_pt * _pil_height_ratio(png_path)), None
+
+
+def _pil_height_ratio(png_path: str) -> float:
+    from PIL import Image as _PILImage
+    with _PILImage.open(png_path) as im:
+        w, h = im.size
+    return h / w
+
+
 def build_equation_registry(pkg) -> dict:
     """EQUATION_REGISTRY.json content for one package."""
     from .canonical_source import apply_mutations

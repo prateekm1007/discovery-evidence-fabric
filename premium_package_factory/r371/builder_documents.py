@@ -12,7 +12,7 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import Paragraph, Spacer
 
 from .builder import (
-    _doc, _esc, _footer_canvas, _img, _mut, _tbl, CONFIDENTIALITY,
+    _doc, _esc, _footer_canvas, _img, _mut, _tbl, cell_full, CONFIDENTIALITY,
     NOT_ESTABLISHED,
 )
 from .equations import render_equation_png
@@ -60,12 +60,15 @@ def render_exec_brief(pkg, hl, comm, eco, loopstate, out_path):
 
     st.append(Paragraph("WHAT IS NOT ESTABLISHED?", S["QH"]))
     n_unk = len(pkg.unknowns)
-    crit = [u for u in pkg.unknowns if "critical" in u.lower()][:2]
+    crit = [u for u in pkg.unknowns if "critical" in u.lower()]
+    n_crit = len(crit)
     comp_verdict = (comm["commercial_evidence"][1]["verdict"].lower()
                     if len(comm["commercial_evidence"]) > 1 else NOT_ESTABLISHED.lower())
     not_est_text = (
         f"{n_unk} recorded UNKNOWNs (none suppressed). "
-        + ("Most critical: " + "; ".join(crit) + ". " if crit else "")
+        + ("Most critical: " + "; ".join(crit[:2])
+           + (f" (+{n_crit - 2} more critical unknowns)" if n_crit > 2 else "")
+           + ". " if crit else "")
         + "Market size: NOT_ESTABLISHED. Competitive landscape: "
         + comp_verdict
         + ". Full resolution roadmap in the engineering dossier.")
@@ -126,12 +129,12 @@ def render_buyer_card(pkg, hl, comm, eco, loopstate, out_path):
         return out
 
     buyer_receives = "; ".join(
-        _mut_tagged(item) for item in tb.get("buyer_receives", [])[:5]
+        _mut_tagged(item) for item in tb.get("buyer_receives", [])
     ) or "See transfer manifest"
     buyer_must_items = (tb.get("buyer_must_create", [])
                         or tb.get("buyer_must_develop", []) or [])
     buyer_must = "; ".join(_mut_tagged(item)
-                           for item in buyer_must_items[:5]) or \
+                           for item in buyer_must_items) or \
         "NOT_RECORDED in the engineering record"
     profile = next((s for s in comm["commercial_evidence"]
                     if s["section"] == "BUYER_PROFILE"), {})
@@ -165,36 +168,16 @@ def render_buyer_card(pkg, hl, comm, eco, loopstate, out_path):
         ["5. WHAT EVIDENCE WOULD CAUSE THE BUYER TO STOP?", hl["kill_if"]],
     ]
     st.append(Paragraph("THE FIVE DECISION CRITICALS", S["SH"]))
-    # R373-7 fix: the criticals table previously used plain string cells,
-    # which CLIP long answers mid-sentence (critical #5 — the kill
-    # condition — was cut off at ~150 chars; caught by the R373-5 chain
-    # audit's v1-coverage check). Paragraph cells wrap, so the buyer
-    # receives every critical answer in full.
-    from reportlab.platypus import Paragraph as _P, Table as _T, \
-        TableStyle as _TS
-    from reportlab.lib import colors as _c
-    from reportlab.lib.styles import ParagraphStyle as _PS
-    _qstyle = _PS("critq", fontName="Helvetica-Bold", fontSize=7.4,
-                  leading=9.2, textColor=_c.HexColor("#0f2a4d"))
-    _astyle = _PS("crita", fontName="Helvetica", fontSize=7.4, leading=9.2,
-                  textColor=_c.HexColor("#1f2937"))
-    _crit_cells = [[_P("Critical", _qstyle), _P("Answer", _qstyle)]]
+    # R372-5: Paragraph cells wrap, so the buyer receives every critical
+    # answer in full. R375-2: routed through the ONE canonical table
+    # renderer (_tbl) — the last raw Table() construction in the V5 build
+    # path is gone (explicit widths asserted against the 504pt frame,
+    # repeatRows headers, splitByRow page splitting).
+    _crit_rows = [["Critical", "Answer"]]
     for q, a in crit_rows:
-        _crit_cells.append([_P(_esc(q), _qstyle), _P(_esc(a), _astyle)])
-    _crit_tbl = _T(_crit_cells, colWidths=[1.6 * 72, 5.0 * 72])
-    _crit_tbl.setStyle(_TS([
-        ("GRID", (0, 0), (-1, -1), 0.4, _c.HexColor("#cbd5e1")),
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("BACKGROUND", (0, 0), (-1, 0), _c.HexColor("#0f2a4d")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), _c.white),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1),
-         [_c.white, _c.HexColor("#f6f8fb")]),
-        ("LEFTPADDING", (0, 0), (-1, -1), 4),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-        ("TOPPADDING", (0, 0), (-1, -1), 3),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
-    ]))
-    st.append(_crit_tbl)
+        _crit_rows.append([cell_full(q, fontsize=7.4, bold=True),
+                           cell_full(a, fontsize=7.4)])
+    st.append(_tbl(_crit_rows, [1.6 * 72, 5.0 * 72], fontsize=7.4))
     st.append(Spacer(1, 6))
 
     qa = [
@@ -282,9 +265,12 @@ def render_package_readme(pkg, hl, files_manifest, out_path):
         "5. 05_TRANSFER_MANIFEST.pdf — transfer boundary and buyer capability<br/>"
         "Machine-readable layer: the JSON files listed below.", S["BT"]))
     st.append(Paragraph("PACKAGE CONTENTS (from the release manifest)", S["SH"]))
-    rows = [["File", "Role", "SHA-256 (first 16)"]]
+    # R375-1: summary-only cell — the SHA is shown truncated BY DESIGN with
+    # an explicit pointer to the full authoritative record inside the same
+    # package (PACKAGE_MANIFEST.json carries the full sha256 per file).
+    rows = [["File", "Role", "SHA-256 (first 16 — full hash in PACKAGE_MANIFEST.json)"]]
     for f in files_manifest:
-        rows.append([f["file"], f.get("role", ""), f["sha256"][:16]])
+        rows.append([f["file"], f.get("role", ""), f["sha256"][:16] + "…"])
     st.append(_tbl(rows, [2.6 * 72, 1.7 * 72, 1.6 * 72]))
     st.append(Paragraph(_esc(
         "Identity: this package's portfolio number, historical package ID, "
@@ -333,14 +319,18 @@ def render_evidence_summary(pkg, hl, loopstate, out_path):
         st.append(Paragraph(_esc(f"URL: {ext.get('source','')}"), S["MT"]))
         st.append(Paragraph(_esc(f"Source hash: {ext.get('source_hash','')}"), S["MT"]))
         snippet = _mut(pkg, ext.get("source_snippet", ""))
-        st.append(Paragraph(_esc(f"Excerpt: {snippet[:600]}"), S["SM"]))
+        # R375-1: the excerpt is authoritative external evidence — rendered
+        # in FULL (no [:600] slice). Paragraph wraps; the section paginates.
+        st.append(Paragraph(_esc(f"Excerpt: {snippet}"), S["SM"]))
 
     if pkg.addendum:
         st.append(Paragraph("V2 MUTATION TRAIL (external evidence that changed this dossier)", S["SH"]))
         for m in pkg.addendum.get("mutations", []):
+            # R375-1: the mutation reason is authoritative — rendered in
+            # FULL (the former [:300] slice is removed).
             st.append(Paragraph(_esc(
                 f"{m.get('mutation_id')}: {m.get('field_affected')} — "
-                f"reason: {str(m.get('reason',''))[:300]}"), S["SM"]))
+                f"reason: {m.get('reason','')}"), S["SM"]))
             # R372-6: the V2 text itself is rendered in the buyer document
             # (a trail that only names the mutation without showing the
             # correction leaves the buyer with V1 content)

@@ -67,8 +67,12 @@ def render_portfolio_index(ranking, loop_summary, out_path):
     st.append(Spacer(1, 4))
 
     st.append(Paragraph("PORTFOLIO COMPARISON TABLE (rank order)", S["SH"]))
+    # R375-1: this is the ONE summary-only table in the release (declared
+    # in SUMMARY_TABLE_WHITELIST): per-package cells are short digests with
+    # an EXPLICIT pointer to the full authoritative record — the package's
+    # engineering dossier inside the same release.
     hdr = ["#", "Pkg", "Technology", "Kill test.", "Ev.", "Art.", "First decisive WP",
-           "Largest uncertainty (class)", "Loop"]
+           "Largest uncertainty (class)", "Loop", "Full record"]
     rows = [hdr]
     for r in ranking["rows"]:
         lu = r["largest_uncertainty"]
@@ -82,22 +86,29 @@ def render_portfolio_index(ranking, loop_summary, out_path):
             str(r["timeline_first_decisive_wp"])[:18],
             f"{stmt} [{lu['classification'] or '-'}]"[:80],
             "SYNTH" if r["loop_verification_state"] == "SYNTHETIC_LOOP_VERIFIED" else "NONE",
+            f"DOWNLOAD/{r['folder']}/02 dossier",
         ])
     st.append(_tbl(rows, [0.26 * 72, 0.5 * 72, 1.7 * 72, 0.5 * 72, 0.24 * 72,
-                          0.3 * 72, 0.72 * 72, 2.0 * 72, 0.42 * 72], fontsize=6.2))
+                          0.3 * 72, 0.72 * 72, 1.86 * 72, 0.42 * 72, 0.46 * 72], fontsize=6.2))
     st.append(Paragraph("Ev. = distinct hashed external sources; Art. = design "
                         "inputs+outputs+failure modes+verification+build steps; "
                         "Kill test. QUANT = recorded numeric threshold; QUAL = "
                         "qualitative. Cost range for all packages: NOT_ESTABLISHED "
-                        "(no quotation basis in the engineering record).", S["DIS"]))
+                        "(no quotation basis in the engineering record). Cells in "
+                        "this table are SUMMARIES — the authoritative record for "
+                        "every row is the package's engineering dossier under "
+                        "DOWNLOAD/<folder>/.", S["DIS"]))
 
     st.append(PageBreak())
     st.append(Paragraph("PACKAGE ONE-LINERS (portfolio order)", S["SH"]))
+    # R375-1: full problem + kill condition — Paragraphs wrap; no slices.
+    # The rank pointer directs the reader to the full dossier.
     for r in sorted(ranking["rows"], key=lambda x: x["portfolio_number"]):
         st.append(Paragraph(_esc(
             f"{r['portfolio_number']} · {r['package_id']} — {r['technology']} "
-            f"(rank {r['rank']}). Problem: {r['problem'][:170]} Kill: "
-            f"{(r['kill_condition'] or '')[:150]}"), S["BC"]))
+            f"(rank {r['rank']}; full record: DOWNLOAD/{r['folder']}/02 "
+            f"dossier). Problem: {r['problem']} Kill: "
+            f"{r['kill_condition'] or ''}"), S["BC"]))
     doc.build(st, onFirstPage=_footer_canvas(ident), onLaterPages=_footer_canvas(ident))
     return out_path
 
@@ -131,7 +142,7 @@ def render_master_portfolio(packages, headlines, ranking, out_path):
         h = headlines[pkg.pkg_id]
         st.append(Paragraph(_esc(f"{pkg.num} · {pkg.pkg_id} — {h['technology_name']}"), S["SH"]))
         st.append(Paragraph(_esc(f"WHAT: {_mut_text(pkg, h['mechanism'])}"), S["BC"]))
-        st.append(Paragraph(_esc(f"PROBLEM: {_mut_text(pkg, h['problem'])[:400]}"), S["BC"]))
+        st.append(Paragraph(_esc(f"PROBLEM: {_mut_text(pkg, h['problem'])}"), S["BC"]))
         st.append(Paragraph(_esc(f"KILL: {h['kill_if']}"), S["BC"]))
     doc.build(st, onFirstPage=_footer_canvas(ident), onLaterPages=_footer_canvas(ident))
     return out_path

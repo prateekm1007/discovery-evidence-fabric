@@ -95,8 +95,13 @@ def get_styles():
                              textColor=colors.HexColor("#1f2937")),
         "SM": ParagraphStyle("SM", fontName="Helvetica", fontSize=7.6,
                              leading=10, textColor=DGREY, spaceAfter=2),
+        # R375: wordWrap='LTR' — canonical equation strings, source URLs and
+        # hashes are long UNBROKEN tokens; without long-word breaking a
+        # single 200-char token overflows the frame horizontally (the exact
+        # V2 defect class). The worst-case-equation fixture pins this.
         "MT": ParagraphStyle("MT", fontName="Courier", fontSize=7.8,
-                             leading=10.4, textColor=DGREY, spaceAfter=3),
+                             leading=10.4, textColor=DGREY, spaceAfter=3,
+                             wordWrap="LTR"),
         "DIS": ParagraphStyle("DIS", fontName="Helvetica-Oblique", fontSize=7.2,
                               leading=9.6, textColor=DGREY, alignment=TA_CENTER,
                               spaceBefore=6),
@@ -203,7 +208,7 @@ def _tbl(rows, widths, header=True, fontsize=7.6):
     def _cell(v, style):
         if isinstance(v, Paragraph):
             return v
-        safe = (str(v) if v is not None else "").replace(
+        safe = _winansi_safe(v).replace(
             "&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         return Paragraph(safe, style)
 
@@ -235,44 +240,79 @@ def _tbl(rows, widths, header=True, fontsize=7.6):
     return t
 
 
-#: Long-form narrative fields summarized (first sentence) before table
-#: insertion — CEO Directive 4. The full text ALWAYS ships in the package
-#: JSON registers; the cell appends an explicit pointer so the summary is
-#: never mistaken for the complete record (Art. II/XXV: no silent loss).
-SUMMARY_FIELDS = {
-    "clinical_need", "problem_statement", "v2_correction_text", "v2_text",
-    "resolution_action", "decision_impact", "why_unknown",
-    "mechanism_description", "basis", "value", "evidence", "measurement",
-    "test_article", "acceptance", "acceptance_criterion", "method",
+#: R375-1 — AUTHORITATIVE vs SUMMARY-ONLY tables.
+#:
+#: The V3 fix summarized long narrative fields everywhere. CEO R375-1
+#: (2026-08-30) removes authoritative truncation ENTIRELY: a table that
+#: carries engineering record content must render the FULL value
+#: (cell_full); ONLY tables that are explicitly summary views may shorten,
+#: and then ONLY with an explicit pointer to where the full authoritative
+#: record lives inside the same package.
+#:
+#: Summary-only tables (the COMPLETE list — enforced by
+#: tests/test_r375_render_hardening.py::test_cell_safe_only_in_summary_tables):
+#:   - builder_portfolio.py portfolio INDEX comparison table (per-package
+#:     cells point at DOWNLOAD/<folder>/02_..._DOSSIER.pdf)
+SUMMARY_TABLE_WHITELIST = {
+    "premium_package_factory/r371/builder_portfolio.py",
 }
 
 
-def cell_safe(field_name, text, max_chars=180, register=None, fontsize=7.6):
-    """Directive 4: prepare a long-form field for a table cell.
+def cell_full(text, fontsize=7.6, bold=False):
+    """R375-1 FULL_VALUE cell preparation.
 
-    - narrative fields: first complete sentence that fits, else hard cut
-      with ellipsis; an explicit pointer to the full-text register is
-      appended so nothing is silently lost.
-    - short fields: full text (rendering wraps it correctly now).
+    Returns a Paragraph containing the COMPLETE text — never truncated,
+    never summarized, never elided. Long content wraps inside the column
+    (wordWrap='LTR' breaks unbroken tokens too); the row grows to the
+    measured paragraph height and the table splits across pages
+    (repeatRows=1 repeats the header). This is the ONLY legal cell
+    preparation for authoritative engineering content.
+    """
+    from reportlab.platypus import Paragraph
+    from reportlab.lib.styles import ParagraphStyle
+
+    raw = _winansi_safe(text)
+    style = ParagraphStyle(
+        "CellFull", fontName="Helvetica-Bold" if bold else "Helvetica",
+        fontSize=fontsize, leading=fontsize + 2.6, wordWrap="LTR",
+        allowWidows=0, allowOrphans=0)
+    safe = raw.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    return Paragraph(safe or "—", style)
+
+
+def cell_safe(field_name, text, max_chars=180, register=None, fontsize=7.6):
+    """R375-1 SUMMARY cell preparation — LEGAL ONLY IN SUMMARY-ONLY TABLES.
+
+    A summary table shows a short digest + an EXPLICIT pointer to the full
+    authoritative record inside the same package. It may NEVER be used for
+    authoritative engineering content (design inputs, failure evidence,
+    V&V methods/acceptance, build plan, unknown statements, mutations).
+
+    Call sites are mechanically restricted to SUMMARY_TABLE_WHITELIST.
     Returns a Paragraph for _tbl() (never a raw string).
     """
     from reportlab.platypus import Paragraph
     from reportlab.lib.styles import ParagraphStyle
 
-    raw = str(text) if text is not None else ""
+    raw = _winansi_safe(text)
+    if not register:
+        raise ValueError(
+            "cell_safe() R375-1 contract: summary cells MUST carry an "
+            "explicit pointer (register=...) to the full authoritative "
+            "record inside the package")
     style = ParagraphStyle(
         "CellSafe", fontName="Helvetica", fontSize=fontsize,
         leading=fontsize + 2.6, wordWrap="LTR",
         allowWidows=0, allowOrphans=0)
 
-    if field_name in SUMMARY_FIELDS and len(raw) > max_chars:
+    if len(raw) > max_chars:
         sentences = raw.replace("\n", " ").split(". ")
         summary = sentences[0]
         if len(summary) > max_chars:
             summary = summary[:max_chars].rstrip() + "…"
         elif len(sentences) > 1:
             summary += "."
-        text = f"{summary} [full text: {register or 'canonical register'}]"
+        text = f"{summary} [SUMMARY — full text: {register}]"
     else:
         text = raw if raw else "—"
 
@@ -281,14 +321,69 @@ def cell_safe(field_name, text, max_chars=180, register=None, fontsize=7.6):
 
 
 def _img(path, width):
+    """Embed an image at `width` pt, DEFENSIVELY contained to one page.
+
+    R375-3/4: containment is defensive only — the diagram/equation layers
+    upstream must already produce page-fitting aspect ratios (they now
+    reflow and split); this clamp guarantees an oversized PNG can never
+    push a flowable past the frame (ReportLab would raise LayoutError,
+    which IS the correct hard failure — the clamp simply keeps the
+    geometry honest while it does).
+    """
     from reportlab.lib.utils import ImageReader
     ir = ImageReader(path)
     iw, ih = ir.getSize()
+    PAGE_H = 792.0
+    TOP, BOTTOM = 0.7 * 72, 0.75 * 72
+    usable_h = PAGE_H - TOP - BOTTOM
+    h = width * ih / iw
+    if h > usable_h:
+        width = width * usable_h / h
     return Image(path, width=width, height=width * ih / iw)
 
 
+#: R375-1/10 glyph-truth map: characters in the canonical record that
+#: Helvetica (cp1252) cannot encode. RenderLab would silently draw a
+#: placeholder box for these (found live by the content-completeness
+#: gate on P-01: '→', '・'). Substitutions are meaning-preserving and
+#: applied IDENTICALLY at render and in the completeness expectations,
+#: so containment stays byte-exact.
+_GLYPH_MAP = {
+    "\u03b2": "beta",      # β
+    "\u03bc": "\u00b5",   # μ -> micro sign µ (cp1252 0xB5, same look)
+    "\u30fb": "\u00b7",   # ・ -> middle dot ·
+    "\u2192": "->",        # →
+    "\u2190": "<-",        # ←
+    "\u21d2": "=>",        # ⇒
+    "\u2264": "<=",        # ≤
+    "\u2265": ">=",        # ≥
+    "\u2248": "~",         # ≈
+    "\u2260": "!=",        # ≠
+    "\u2010": "-",         # ‐ hyphen
+    "\u03c0": "pi",        # π
+    "\u0394": "Delta",     # Δ
+    "\u03a9": "ohm",       # Ω
+    "\u00b2": "\u00b2", "\u00b3": "\u00b3",
+}
+
+
+def _winansi_safe(t):
+    """Replace non-cp1252 glyphs with meaning-preserving equivalents so
+    the buyer never sees a placeholder box; unknown exotics fall back to
+    cp1252 'replace' encoding (and are disclosed by the build gate
+    because completeness applies the SAME transform)."""
+    s = str(t if t is not None else "")
+    for k, v in _GLYPH_MAP.items():
+        s = s.replace(k, v)
+    try:
+        s.encode("cp1252")
+        return s
+    except UnicodeEncodeError:
+        return s.encode("cp1252", errors="replace").decode("cp1252")
+
+
 def _esc(t):
-    return (str(t) if t is not None else "").replace("&", "&amp;").replace(
+    return _winansi_safe(t).replace("&", "&amp;").replace(
         "<", "&lt;").replace(">", "&gt;")
 
 
