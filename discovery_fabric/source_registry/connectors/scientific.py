@@ -93,10 +93,23 @@ class EuropePmcConnector(ConnectorBase):
         return json.loads(raw.decode("utf-8"))
 
     def normalize_payload(self, payload: Any, query: str, raw_sha: str) -> List[SourceRecord]:
-        result = (payload or {}).get("resultList") or {}
+        # 2026-08-30 defect fixed (found by the resolve-unavailable live
+        # probe): EuropePMC answers a zero-hit query with hitCount=0 and NO
+        # resultList.result key — a DEFINITIVE provider answer. The old
+        # code raised ValueError here, misclassifying definitive empties as
+        # PARSE_FAILED (Art. XXI.3: provider answer is not provider
+        # failure; this exact bug caused a false UNAVAILABLE in the
+        # 2026-08-29 health report).
+        body = payload or {}
+        result = body.get("resultList") or {}
         results = result.get("result")
+        if results is None:
+            if isinstance(body.get("hitCount"), int) and body.get("hitCount") == 0:
+                return []  # definitive EMPTY: provider answered zero hits
+            raise ValueError("europepmc payload missing resultList.result "
+                             "and hitCount is not a definitive zero")
         if not isinstance(results, list):
-            raise ValueError("europepmc payload missing resultList.result")
+            raise ValueError("europepmc resultList.result is not a list")
         out = []
         for r in results:
             abstract = _clean(r.get("abstractText", "") or "")
@@ -202,11 +215,19 @@ class OpenAlexConnector(ConnectorBase):
     ROLES = ("SCIENTIFIC",)
     HEALTH_QUERY = "pacemaker lead fracture"
     LIMIT = 5
+    # 2026-08-30: budget-window recovery. OpenAlex's 2025+ credit system
+    # measured 'Insufficient budget ... $0 remaining' from this egress;
+    # a registered contact email (polite pool) earns a higher free daily
+    # budget. OPENALEX_EMAIL in .env.keys switches us onto it the day it
+    # is provisioned; the placeholder keeps today's behavior.
+    BACKOFF_BASE_SECONDS = 5.0
 
     def build_url(self, query: str) -> str:
         q = urllib.parse.quote(query)
+        from discovery_fabric.source_registry.keys import load_key
+        email = load_key("OPENALEX_EMAIL") or "discovery-fabric@example.org"
         return (f"https://api.openalex.org/works?search={q}&per-page={self.LIMIT}"
-                "&mailto=discovery-fabric%40example.org")
+                f"&mailto={urllib.parse.quote(email)}")
 
     def parse_payload(self, raw: bytes, query: str) -> Any:
         return json.loads(raw.decode("utf-8"))
@@ -258,6 +279,15 @@ class SemanticScholarConnector(ConnectorBase):
     ROLES = ("SCIENTIFIC",)
     HEALTH_QUERY = "pacemaker lead fracture"
     LIMIT = 5
+    # 2026-08-30: 429 recovery via bounded backoff (unauthenticated tier is
+    # burst-limited); S2_API_KEY in .env.keys switches to the key tier the
+    # day it is provisioned (header auth — never a URL param).
+    BACKOFF_BASE_SECONDS = 3.0
+
+    def request_headers(self) -> Dict[str, str]:
+        from discovery_fabric.source_registry.keys import load_key
+        key = load_key("S2_API_KEY")
+        return {"x-api-key": key} if key else {}
 
     def build_url(self, query: str) -> str:
         q = urllib.parse.quote(query)

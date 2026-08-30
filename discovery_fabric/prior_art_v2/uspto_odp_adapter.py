@@ -42,7 +42,20 @@ def _sha256(s: str) -> str:
 
 
 USPTO_ODP_BASE = "https://api.uspto.gov/api/v1"
-USPTO_PV_BASE = "https://api.patentsview.org/patents"
+# 2026-08-30 measured reality (CEO resolve-unavailable directive):
+# - legacy api.patentsview.org/patents/query is RETIRED — it now serves an
+#   HTML SPA page with HTTP 200, which is why uspto_search died with
+#   'JSON parse error: Expecting value' (a masked endpoint retirement,
+#   not a transient parse failure).
+# - the replacement PatentsView API (search.patentsview.org) and the USPTO
+#   ODP API (api.uspto.gov) BOTH require API keys (403 'Missing
+#   Authentication Token' measured). No credential is provisioned.
+# The adapter therefore: (a) validates content-type before parsing so a
+# retired endpoint can never masquerade as a parse error (Art. XXI.3);
+# (b) reads USPTO_ODP_API_KEY / PATENTSVIEW_API_KEY from .env.keys so the
+# path is ready the day a credential arrives; absent key -> AUTH_FAILED.
+USPTO_PV_BASE = "https://search.patentsview.org/api/v1"
+_PV_ENDPOINTS_MEASURED_RETIRED = "2026-08-30"
 
 
 # ----------------------- DATA SCHEMAS -----------------------
@@ -98,17 +111,29 @@ class USPTOSearchAttempt:
 
 # ----------------------- AUTH -----------------------
 def _load_uspto_key() -> str:
-    """Load USPTO ODP API key from .env.keys or env vars."""
+    """Load USPTO/PatentsView API key from .env.keys or env vars.
+
+    Accepts USPTO_ODP_API_KEY or PATENTSVIEW_API_KEY (either unlocks the
+    new PatentsView search API; absent -> callers fail AUTH_FAILED)."""
     keys_file = Path("/home/z/my-project/discovery-evidence-fabric/.env.keys")
     if keys_file.exists():
         for line in keys_file.read_text().splitlines():
-            if line.startswith("USPTO_ODP_API_KEY="):
-                return line.split("=", 1)[1].strip()
-    return os.environ.get("USPTO_ODP_API_KEY", "")
+            for name in ("USPTO_ODP_API_KEY", "PATENTSVIEW_API_KEY"):
+                if line.startswith(name + "="):
+                    val = line.split("=", 1)[1].strip()
+                    if val:
+                        return val
+    return os.environ.get("USPTO_ODP_API_KEY", "") or \
+        os.environ.get("PATENTSVIEW_API_KEY", "")
 
 
-def _http_get(url: str, headers: Dict = None, timeout: int = 15) -> Tuple[int, bytes, str]:
-    """HTTP GET with USPTO auth if available."""
+def _http_get(url: str, headers: Dict = None, timeout: int = 15,
+              response_content_type: list = None) -> Tuple[int, bytes, str]:
+    """HTTP GET with USPTO auth if available.
+
+    response_content_type: mutable out-param; the caller uses it to detect
+    retired endpoints that answer 200 with HTML (masked-failure control).
+    """
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
@@ -119,12 +144,17 @@ def _http_get(url: str, headers: Dict = None, timeout: int = 15) -> Tuple[int, b
 
     api_key = _load_uspto_key()
     if api_key:
+        h["X-Api-Key"] = api_key
         h["X-USPTO-API-Key"] = api_key
 
     try:
         req = urllib.request.Request(url, method="GET", headers=h)
         resp = urllib.request.urlopen(req, timeout=timeout, context=ctx)
-        return resp.status, resp.read(), ""
+        body_bytes = resp.read()
+        if response_content_type is not None:
+            response_content_type.append(
+                dict(resp.headers).get("Content-Type", ""))
+        return resp.status, body_bytes, ""
     except urllib.error.HTTPError as e:
         body = e.read().decode("utf-8", errors="ignore")[:500]
         return e.code, body.encode(), f"HTTP {e.code}: {body[:200]}"
@@ -132,38 +162,96 @@ def _http_get(url: str, headers: Dict = None, timeout: int = 15) -> Tuple[int, b
         return 0, b"", f"EXCEPTION: {type(e).__name__}: {str(e)[:200]}"
 
 
+def _http_get_json(url: str, headers: Dict = None, timeout: int = 15):
+    """GET that also returns response Content-Type so callers can refuse to
+    parse HTML as JSON (retired-endpoint mask, caught live 2026-08-30 when
+    api.patentsview.org began serving an SPA page with HTTP 200)."""
+    ctypes: list = []
+    status, body, err = _http_get(url, headers=headers, timeout=timeout,
+                                  response_content_type=ctypes)
+    return status, body, err, (ctypes[0] if ctypes else "")
+
+
 # ----------------------- API CALLS -----------------------
 def uspto_search(query: str, limit: int = 10) -> USPTOSearchAttempt:
-    """Search USPTO ODP for patents matching a query."""
+    """Search USPTO patents via the PatentsView API (new endpoint).
+
+    2026-08-30 measured reality (live probe, custody-logged):
+    - legacy api.patentsview.org/patents/query is RETIRED (serves an HTML
+      SPA page with HTTP 200) — previously masqueraded as 'JSON parse
+      error'; now detected via content-type guard -> ENDPOINT_RETIRED.
+    - the replacement API (search.patentsview.org) and USPTO ODP
+      (api.uspto.gov) both require API keys (403 measured). Without a key
+      the attempt fails AUTH_FAILED immediately — no burn, no mask.
+    """
     attempt = USPTOSearchAttempt(
         query=query[:500],
         attempted=True,
         retrieved_at_utc=_now_utc(),
     )
 
-    # Try PatentsView-style query
-    pv_query = json.dumps({
-        "_text_phrase": {"patent_title": query},
-        "_or": [{"_text_phrase": {"patent_abstract": query}}],
-    })
-    url = f"{USPTO_PV_BASE}/query?q={urllib.parse.quote(pv_query)}&f=" + urllib.parse.quote(
-        json.dumps(["patent_number", "patent_title", "patent_abstract",
-                    "patent_date", "patent_type", "assignees"])
-    ) + f"&o={{\"size\":{limit}}}"
+    if not _load_uspto_key():
+        attempt.api_status = False
+        attempt.failure_substate = "AUTH_FAILURE"
+        attempt.normalized_state = "SOURCE_UNAVAILABLE"
+        attempt.api_error_msg = (
+            "PatentsView legacy endpoint retired 2026-08-30 (HTML page "
+            "measured); replacement API requires an unprovisioned "
+            "PATENTSVIEW_API_KEY / USPTO_ODP_API_KEY")
+        return attempt
 
-    status, body, err = _http_get(url)
+    # New PatentsView API shape: POST /patent/ with structured query.
+    pv_body = {
+        "q": {"_text_any": {"patent_title": query,
+                            "patent_abstract": query}},
+        "f": ["patent_number", "patent_title", "patent_abstract",
+              "patent_date", "assignees"],
+        "o": {"size": limit},
+    }
+    url = f"{USPTO_PV_BASE}/patent/"
+
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    h = {"User-Agent": "Patent-Evidence-Mesh/1.0",
+         "Accept": "application/json",
+         "Content-Type": "application/json",
+         "X-Api-Key": _load_uspto_key()}
+    try:
+        req = urllib.request.Request(url, data=json.dumps(pv_body).encode(),
+                                     headers=h, method="POST")
+        resp = urllib.request.urlopen(req, timeout=20, context=ctx)
+        status, body, ctype = resp.status, resp.read(), \
+            dict(resp.headers).get("Content-Type", "")
+    except urllib.error.HTTPError as e:
+        status, body, ctype = e.code, e.read(), \
+            dict(e.headers).get("Content-Type", "")
+    except Exception as e:
+        status, body, ctype = 0, b"", ""
+
     attempt.http_status = status
 
     if status != 200:
         attempt.api_status = False
-        attempt.api_error_msg = err
-        if status == 401 or status == 403:
+        attempt.api_error_msg = f"HTTP {status}: {body[:200]!r}"
+        if status in (401, 403):
             attempt.failure_substate = "AUTH_FAILURE"
         elif status == 429:
             attempt.failure_substate = "RATE_LIMITED"
         else:
             attempt.failure_substate = "HTTP_ERROR"
         attempt.normalized_state = "SOURCE_UNAVAILABLE"
+        return attempt
+
+    # content-type guard: a retired/misrouted endpoint answering 200 with
+    # HTML is ENDPOINT_RETIRED, never a JSON parse crash (Art. XXI.3).
+    if "json" not in (ctype or "").lower():
+        attempt.api_status = False
+        attempt.failure_substate = "ENDPOINT_RETIRED"
+        attempt.normalized_state = "SOURCE_UNAVAILABLE"
+        attempt.api_error_msg = (
+            f"expected JSON, received Content-Type {ctype!r} — endpoint "
+            f"retired or misrouted (measured {_PV_ENDPOINTS_MEASURED_RETIRED})")
         return attempt
 
     attempt.api_status = True

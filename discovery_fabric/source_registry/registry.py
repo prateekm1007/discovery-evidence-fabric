@@ -262,8 +262,12 @@ _register(_src(
     primary_or_secondary="PRIMARY",
     freshness="Periodic CSV publication",
     known_gaps="NO CONNECTOR: measured probe of api.fda.gov/device/ndec and "
-               "/denovo returned 404. Integration requires the CSV "
-               "pipeline — honest gap, recorded, not silently claimed.",
+               "/denovo returned 404; /other/deNovo.json 404 (2026-08-30). "
+               "CSV download route measured 2026-08-30: fda.gov dataset "
+               "page answers HTTP 401 bot-protection from this egress "
+               "ASN — route blocked HERE, dataset exists. Integration "
+               "requires the CSV pipeline from an unblocked egress — "
+               "honest gap, recorded, not silently claimed.",
     provenance_method="Planned: CSV row hash + download timestamp; not yet "
                       "implemented",
     connector=NO_CONNECTOR,
@@ -309,7 +313,13 @@ _register(_src(
     primary_or_secondary="PRIMARY",
     freshness="Continuous",
     known_gaps="NO CONNECTOR: the portal is an HTML application; no "
-               "measured machine API. Recorded as an honest gap.",
+               "measured machine API. Re-measured 2026-08-30: legacy "
+               "RESTfulAPI.svc redirects to the new SPA platform; "
+               "trialsearch.who.int/api/v1 and /api/v2 return 404 — legacy "
+               "API RETIRED, replacement is an undocumented SPA backend. "
+               "Using it would be brittle and against portal intent. "
+               "Honest gap; CLINICAL role remains covered LIVE by "
+               "clinicaltrials_gov.",
     provenance_method="Planned: export parsing; not yet implemented",
     connector=NO_CONNECTOR,
     auth_requires=[],
@@ -833,18 +843,20 @@ _register(_src(
     licensing="Open data (Materials Project terms); API key required",
     primary_or_secondary="SECONDARY",
     freshness="Periodic",
-    known_gaps="Connector IMPLEMENTED (connectors/materials.py). Measured "
-               "2026-08-29: HTTP 403 'IP address or ASN has been "
-               "(temporarily) blocked' — cloud ASN blocked before "
-               "credential evaluation. Unlock requires BOTH a "
-               "provisioned MATERIALS_PROJECT_API_KEY in .env.keys AND "
-               "an unblocked egress IP. COMPUTATIONAL evidence class; "
-               "PROPERTY_DATA only — implant suitability NOT established.",
+    known_gaps="Connector IMPLEMENTED (connectors/materials.py). CEO "
+               "provisioned MATERIALS_PROJECT_API_KEY on 2026-08-30 "
+               "(stored in .env.keys, header-auth). Re-measured 2026-08-30 "
+               "WITH key: still HTTP 403 'IP address or ASN has been "
+               "(temporarily) blocked' — provider-side egress ASN block, "
+               "key is NOT the blocker. Unlock requires the ASN block to "
+               "clear (provider says temporary) or an unblocked egress. "
+               "COMPUTATIONAL evidence class; PROPERTY_DATA only — "
+               "implant suitability NOT established.",
     provenance_method="Query + material id + payload sha256 into retrieval "
                       "log",
     connector="discovery_fabric.source_registry.connectors.materials:MaterialsProjectConnector",
-    auth_requires=["MATERIALS_PROJECT_API_KEY (not provisioned)",
-                   "unblocked egress IP (ASN currently blocked)"],
+    auth_requires=["MATERIALS_PROJECT_API_KEY (PROVISIONED 2026-08-30 by CEO)",
+                   "unblocked egress IP (ASN block outstanding 2026-08-30)"],
     metered_quota=None,
 ))
 
@@ -965,7 +977,10 @@ _register(_src(
     known_gaps="NO CONNECTOR: anonymous access is browse-only; the "
                "directive's own qualifier 'where legally/technically "
                "accessible' is measured NOT satisfied for machine access "
-               "from this environment.",
+               "from this environment. Re-measured 2026-08-30: /api/ and "
+               "public-UDI paths return the SPA shell (HTML) or redirect "
+               "to the app — no unauthenticated JSON route exists; the "
+               "documented EUDAMED API requires EU-login registration.",
     provenance_method="Planned: module record + payload sha256",
     connector=NO_CONNECTOR,
     auth_requires=["EC access agreement (not provisioned)"],

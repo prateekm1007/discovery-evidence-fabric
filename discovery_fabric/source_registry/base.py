@@ -153,6 +153,40 @@ class ConnectorBase:
     #: health-check probe query (tiny, deterministic)
     HEALTH_QUERY: str = ""
 
+    # ---- rate-limit recovery policy (2026-08-30, CEO fix-degraded) -----
+    #: bounded retries for transient RATE_LIMITED answers; 0 disables.
+    RATE_LIMIT_RETRIES: int = 2
+    #: base seconds for exponential backoff (2**attempt * base), capped.
+    BACKOFF_BASE_SECONDS: float = 2.0
+    BACKOFF_CAP_SECONDS: float = 30.0
+
+    def is_metered(self) -> bool:
+        """True when the source is provider-metered (quota per window).
+
+        Metered sources NEVER auto-retry rate limits: a retry spends the
+        same scarce quota the 429 is protecting (PatentBear 20/month,
+        Lens credits). The registry's metered_quota marker is the
+        authority; connectors may override for policy reasons.
+        """
+        try:
+            from discovery_fabric.source_registry.registry import SOURCE_REGISTRY
+            rec = SOURCE_REGISTRY.get(self.SOURCE_ID, {})
+            return bool(rec.get("metered_quota"))
+        except Exception:  # noqa: BLE001 — registry unavailable = not metered
+            return False
+
+    def _backoff_seconds(self, error: Optional[str], attempt: int) -> float:
+        """Delay before retry attempt N. Honors provider Retry-After when
+        present in the error string (surfaced by _request), else
+        exponential with cap."""
+        import re as _re
+        if error:
+            m = _re.search(r"Retry-After:\s*(\d+)", error)
+            if m:
+                return min(float(m.group(1)), self.BACKOFF_CAP_SECONDS)
+        return min((2 ** attempt) * self.BACKOFF_BASE_SECONDS,
+                   self.BACKOFF_CAP_SECONDS)
+
     # ---- steps of the 7-step chain, overridable -------------------------
 
     def definitive_empty(self, http_status: Optional[int], body: Optional[bytes]) -> bool:
@@ -228,7 +262,11 @@ class ConnectorBase:
             else:
                 status = STATUS_SEARCH_FAILED
             detail = error_body[:300].decode("utf-8", "replace")
-            return error_body, status, code, f"HTTP {code}: {detail[:200]}", None
+            retry_after = e.headers.get("Retry-After") if getattr(e, "headers", None) else None
+            err = f"HTTP {code}: {detail[:200]}"
+            if status == STATUS_RATE_LIMITED and retry_after:
+                err += f" | Retry-After: {retry_after}"
+            return error_body, status, code, err, None
         except urllib.error.URLError as e:
             if isinstance(getattr(e, "reason", None), TimeoutError) or "timed out" in str(e).lower():
                 return None, STATUS_TIMEOUT, None, f"URLError: {e}", None
@@ -251,6 +289,26 @@ class ConnectorBase:
         url = self.build_url(query)
         t0 = time.time()
         body, status, http_status, error, remaining = self._request(url, timeout=timeout)
+
+        # 2026-08-30 (CEO fix-degraded directive): RATE_LIMITED answers get
+        # bounded exponential backoff with provider Retry-After honored —
+        # BUT ONLY for non-metered sources. A metered source must never
+        # auto-retry: every retry burns provider quota (PatentBear
+        # 20/month discipline). Budget-window limits (OpenAlex
+        # 'Insufficient budget', $0 remaining) retry once politely then
+        # fail honestly — a spent daily budget is provider-side state,
+        # not something code can spend differently.
+        retries_used = 0
+        while (status == STATUS_RATE_LIMITED
+               and retries_used < self.RATE_LIMIT_RETRIES
+               and not self.is_metered()):
+            delay = self._backoff_seconds(error, retries_used)
+            time.sleep(delay)
+            retries_used += 1
+            body, status, http_status, error, remaining = self._request(url, timeout=timeout)
+        if retries_used and status != STATUS_RATE_LIMITED:
+            note = f"recovered after {retries_used} backoff retry(ies)"
+            error = f"{error} | {note}" if error else note
 
         # Provider-definitive zero: HTTP error status + provider's own
         # 'no records' body -> EMPTY (ok=True: the provider ANSWERED).
@@ -299,6 +357,9 @@ class ConnectorBase:
                     records=records, rate_limit_remaining=remaining, query=query,
                     retrieved_at=utc_now(),
                     total_hits=self.extract_total_hits(payload),
+                    # carry the backoff-recovery note (non-fatal) when the
+                    # answer arrived only after retries
+                    error=error if error and "recovered after" in error else None,
                 ),
                 query, url, raw_sha,
             )
