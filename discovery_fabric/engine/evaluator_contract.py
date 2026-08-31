@@ -78,6 +78,13 @@ EVALUATOR_EVIDENCE_RANKS = {
     "SIMULATION": 4,              # COMPUTATIONAL_RESULT
     "NEURAL_OPERATOR": 4,         # COMPUTATIONAL_RESULT
     "EXPERIMENT": 5,              # reserved; not registrable by software
+    "ANALYTICAL_EQUATION": 4,     # R383: closed-form deterministic
+                                  # engineering relations (Poiseuille,
+                                  # transit time, hoop stress, ...).
+                                  # Rank 4 = COMPUTATIONAL_RESULT: every
+                                  # output carries a computation log and
+                                  # is never a physical observation
+                                  # (ADR_R383_ANALYTICAL_EVALUATOR.md).
 }
 
 # The five CEO mutation types (directive item 6) + the mapping from

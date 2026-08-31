@@ -70,8 +70,10 @@ from .technical_state import (
     attach_technical_state, get_technical_state,
     propose_technical_state, validate_technical_state)
 from .technical_evaluator import evaluate_candidate_technically
+from .technical_equations import (
+    evaluate_candidate_quantitatively, quantitative_margin_comparison)
 
-TECHNICAL_LEDGER_VERSION = "2.0.0"
+TECHNICAL_LEDGER_VERSION = "3.0.0"   # R383: +analytical equation layer
 
 # ---------------------------------------------------------------------------
 # Declared thresholds (Art. XXVII)
@@ -154,6 +156,30 @@ def extract_technical_state(ctx: CandidateContext,
 # ---------------------------------------------------------------------------
 def diagnose_technical(spec: Dict[str, Any]) -> Dict[str, Any]:
     return evaluate_candidate_technically(spec)
+
+
+def _quant_trigger_summary(spec: Dict[str, Any]) -> Dict[str, Any]:
+    """Compact quantitative-diagnosis record for the mutation causal
+    chain (Art. XXXVIII: the trigger that caused this mutation, with
+    its computed magnitudes)."""
+    q = evaluate_candidate_quantitatively(spec)
+    lv = q.get("limiting_variable") or {}
+    obj = q.get("objective") or {}
+    if not lv:
+        return {"engaged": False, "status": q.get("status"),
+                "note": "no bound equation named a limiting variable"}
+    return {
+        "engaged": True,
+        "evaluator": "analytical_equation_v1 (deterministic, R383)",
+        "objective": {k: obj.get(k) for k in (
+            "target", "direction", "value", "unit", "margin",
+            "margin_status")},
+        "limiting_variable": {k: lv.get(k) for k in (
+            "param_id", "improving_move", "elasticity", "statement")},
+        "solve_for": {k: (lv.get("solve_for") or {}).get(k) for k in (
+            "status", "proposed_value", "predicted_output",
+            "predicted_margin", "best_output", "best_margin")},
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -330,6 +356,86 @@ def propose_technical_mutation(ctx: CandidateContext,
         record["fields"] = _parse_fields(res.content)
         record["raw_content_sha256"] = sha256_obj(res.content or "")
     return record
+
+
+def build_deterministic_proposal(ctx: CandidateContext,
+                                 qdiag: Dict[str, Any]
+                                 ) -> Optional[Dict[str, Any]]:
+    """R383: the DETERMINISTIC mutation proposal, solved from the
+    bound analytical equation (bisection over the declared envelope).
+    Shaped EXACTLY like an LLM proposal so it enters the SAME T0-T10
+    production gates with NO exemption; its provenance is recorded as
+    DETERMINISTIC_SOLVE (a solved value, not a hallucination risk —
+    but still gated, because a solved value that rebuilds invalid
+    geometry or violates a constraint is not defensible).
+    Returns None when the quantitative layer has no reachable solve
+    (the untrusted LLM path then owns the attempt)."""
+    lv = qdiag.get("limiting_variable") or {}
+    solve = lv.get("solve_for") or {}
+    if not lv or solve.get("status") != "REACHABLE":
+        return None
+    state = get_technical_state(ctx.spec) or {}
+    p = _param(state, str(lv.get("param_id")))
+    if p is None:
+        return None
+    kind = CATEGORY_TO_KIND.get(str(p.get("category")))
+    if kind not in ("PARAMETER_CHANGE", "GEOMETRY_CHANGE",
+                    "OPERATING_CONDITION_CHANGE"):
+        return None        # numeric kinds only; the LLM path owns the rest
+    new_value = float(solve["proposed_value"])
+    cur = p.get("value")
+    if isinstance(cur, (int, float)) and not isinstance(cur, bool) \
+            and abs(new_value - float(cur)) < 1e-12:
+        return None        # a no-op is not a mutation
+    obj = qdiag.get("objective") or {}
+    req = obj.get("binding_constraint") or {}
+    name = str(p.get("name") or lv.get("param_id"))
+    unit = str(p.get("unit") or "")
+    pid = str(lv.get("param_id"))
+    direction = "INCREASE" if str(lv.get("improving_move")) == \
+        "INCREASE" else "DECREASE"
+    eq_id = str(lv.get("equation_id") or "")
+    fields = {
+        "MUTATION_KIND": kind,
+        "TARGET_PARAM": pid,
+        "DIRECTION": direction,
+        "NEW_VALUE": f"{new_value:.9g}",
+        "VALUE_CLASS": "MODELLED",
+        "VALUE_SPAN": "NONE",
+        "VALUE_EVIDENCE_ID": "NONE",
+        "RATIONALE": (
+            f"deterministic solve of {eq_id}: {name} {cur} -> "
+            f"{new_value:.6g} {unit} moves {obj.get('target')} from "
+            f"{obj.get('value')} to a predicted "
+            f"{solve.get('predicted_output')} {obj.get('unit')} "
+            f"(margin {obj.get('margin')} -> "
+            f"{solve.get('predicted_margin')}); requirement "
+            f"{req.get('bound')} {req.get('limit')}"),
+        "MECHANISM_DELTA": (
+            f"{name} changed from {cur} to {new_value:.6g} {unit} — "
+            f"the value solved from the bound analytical relation "
+            f"{eq_id} for the requirement margin"),
+        "INTERVENTION_DELTA": (
+            f"the {name} is set to {new_value:.6g} {unit}, the "
+            f"deterministically solved value for the requirement "
+            f"{req.get('bound')} {req.get('limit')} {req.get('unit') or ''}"),
+    }
+    return {
+        "proposal_id": f"detsolve:{sha256_obj(fields)[:12]}",
+        "provider": "DETERMINISTIC_SOLVE",
+        "model": "analytical_equation_v1",
+        "status": "OK",
+        "prompt_hash": None,
+        "output_hash": sha256_obj(fields),
+        "latency_ms": 0,
+        "error": None,
+        "fields": fields,
+        "origin": (
+            "DETERMINISTIC_SOLVE (R383): NEW_VALUE was computed by "
+            "bisection over the declared envelope from the bound "
+            "analytical equation — not proposed by an LLM; it enters "
+            "the same T0-T10 gates with no exemption"),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -820,13 +926,22 @@ def apply_technical_mutation(ctx: CandidateContext,
                 (diagnose_technical(parent_spec)
                  .get("computation_log")),
         },
+        "quantitative_diagnosis": _quant_trigger_summary(parent_spec),
         "proposal_provenance": {
             "proposal_id": proposal.get("proposal_id"),
             "provider": proposal.get("provider"),
             "model": proposal.get("model"),
             "prompt_hash": proposal.get("prompt_hash"),
             "output_hash": proposal.get("output_hash"),
-            "llm_is_untrusted_proposer": True,
+            "origin": (
+                "DETERMINISTIC_SOLVE (R383): the proposal value was "
+                "solved from the bound analytical equation by "
+                "bisection over the declared envelope — NOT an LLM "
+                "proposal; it passed the SAME T0-T10 production gates"
+                if proposal.get("provider") == "DETERMINISTIC_SOLVE"
+                else "UNTRUSTED_LLM_PROPOSER"),
+            "llm_is_untrusted_proposer": proposal.get("provider")
+            != "DETERMINISTIC_SOLVE",
         },
         "validation": validation,
         "changed_variable": {
@@ -948,6 +1063,12 @@ def re_evaluate_technical(child_ctx: CandidateContext,
     # --- fresh technical evaluation on the child's own state
     out["technical"] = evaluate_candidate_technically(spec)
 
+    # --- R383: fresh QUANTITATIVE evaluation on the child's own state
+    # (and, when the child carries a REBUILT parametric model, on the
+    # child's OWN measured geometry — CEO focus 4: measured geometry
+    # feeds technical evaluation)
+    out["quantitative"] = evaluate_candidate_quantitatively(spec)
+
     # --- both instruments on the child's own artifacts
     measured = _measure_ctx(child_ctx)
     out["i_dimensions"] = measured["i_dimensions"]
@@ -991,6 +1112,13 @@ def keep_or_kill_technical(parent_ctx: CandidateContext,
          variable, the child's OWN rebuilt parametric model must pass
          geometry validation (measured on the built solid; a render is
          never evidence)
+      K8 R383 quantitative margin: when BOTH the parent and the child
+         carry a quantitative objective computation from the SAME
+         bound equation, the child's OWN computed margin must improve
+         by at least the declared non-trivial fraction
+         (QUANT_MIN_RELATIVE_IMPROVEMENT) — the CEO's "technically
+         better for a STATED REASON" as a measured gate; candidates
+         without equation bindings are untouched (K1 governs)
     """
     from .cad_pipeline import get_parametric_model  # noqa: PLC0415
 
@@ -1214,6 +1342,25 @@ def keep_or_kill_technical(parent_ctx: CandidateContext,
             "no parametric model bound to the changed variable — "
             "the state-level gates are decisive")
 
+    # K8 — R383 quantitative margin (the stated-reason gate). Engages
+    # ONLY when both sides computed the objective under the same
+    # bound equation (margins from different models are never
+    # compared — that would be model laundering); otherwise the
+    # direction-level K1 criterion governs and this check records
+    # NOT_ENGAGED.
+    comparison = quantitative_margin_comparison(
+        parent_eval.get("quantitative"),
+        child_eval.get("quantitative"))
+    checks["quantitative_margin"] = comparison
+    if comparison.get("engaged") and \
+            comparison.get("verdict") != "IMPROVED":
+        reasons.append(
+            "quantitative_margin: the child's own computed objective "
+            "margin did not improve beyond the declared threshold — "
+            + str(comparison.get("statement")
+                  or comparison.get("reason")
+                  or "margin comparison not improved")[:400])
+
     action = "KEEP" if not reasons else "REJECT_MUTATION"
     return {"action": action, "checks": checks, "reasons": reasons,
             "decided_at": utc_now()}
@@ -1285,10 +1432,16 @@ def improve_candidate_technical(ctx: CandidateContext,
                                 live_sources: Optional[List[str]] = None,
                                 provider: Optional[str] = None,
                                 ) -> Dict[str, Any]:
-    """The CEO V2 loop driver. Returns the TECHNICAL_IMPROVEMENT_LEDGER.
+    """The CEO V2 loop driver (R383: + deterministic analytical
+    equation layer). Returns the TECHNICAL_IMPROVEMENT_LEDGER.
 
     Outcome vocabulary (honest, exhaustive):
-      TECHNICALLY_IMPROVED           >= 1 KEEP (attribution recorded)
+      TECHNICALLY_IMPROVED           >= 1 KEEP (attribution recorded;
+                                      R383: the keep may ALSO be the
+                                      measured target-met stop, and a
+                                      quantitative KEEP requires the
+                                      child's OWN computed margin to
+                                      improve — K8)
       TECHNICAL_UNQUANTIFIED         no quantifiable technical content
                                       in the candidate's own evidence
                                       (honest measured gap — the 🟡
@@ -1300,8 +1453,15 @@ def improve_candidate_technical(ctx: CandidateContext,
                                       T10 CAD gate (measured on the
                                       built solid)
       KILLED_NO_IMPROVING_TECHNICAL_MUTATION    valid mutations did not
-                                      improve (measured)
-      KILLED_CONSTRAINT_WALL         improving directions all blocked
+                                      improve (measured; R383: the
+                                      K8 margin comparison is the
+                                      stated reason)
+      KILLED_CONSTRAINT_WALL         improving directions all blocked;
+                                      R383: ALSO fires when the final
+                                      quantitative diagnosis proves the
+                                      requirement UNREACHABLE inside
+                                      the declared envelope (measured
+                                      best-achievable margin)
       TECHNICAL_IMPROVEMENT_BLOCKED_TRANSPORT   LLM unavailable (never
                                       a kill — Art. XXV)
       IMPROVEMENT_NOT_RUN_CANDIDATE_KILLED      Art. XX guard
@@ -1314,14 +1474,16 @@ def improve_candidate_technical(ctx: CandidateContext,
                          "MAX_PROPOSALS_PER_ITERATION"]["value"])
 
     ledger: Dict[str, Any] = {
-        "ledger": ("TECHNICAL_IMPROVEMENT_LEDGER (R379 TECHNICAL "
-                   "IMPROVEMENT ENGINE V2)"),
+        "ledger": ("TECHNICAL_IMPROVEMENT_LEDGER (R379 V2 + R383 "
+                   "ANALYTICAL EQUATION LAYER)"),
         "version": TECHNICAL_LEDGER_VERSION,
         "loop": ("CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + "
-                 "direction) -> TECHNICAL MUTATION (actual design "
-                 "variable) -> INDEPENDENT TECHNICAL EVALUATION -> "
-                 "EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL -> SECOND "
-                 "IMPROVEMENT"),
+                 "direction + R383 QUANTITATIVE margins/sensitivities) -> "
+                 "DETERMINISTIC SOLVE-OR-LLM MUTATION (actual design "
+                 "variable) -> CAD REBUILD -> INDEPENDENT TECHNICAL "
+                 "EVALUATION (monotone + quantitative on the child's OWN "
+                 "measured geometry) -> EVIDENCE/PRIOR-ART RECHECK -> "
+                 "KEEP/KILL (K1-K8) -> SECOND IMPROVEMENT"),
         "collision_mode": collision_mode,
         "live_sources": live_sources,
         "thresholds": TECHNICAL_THRESHOLDS,
@@ -1387,16 +1549,26 @@ def improve_candidate_technical(ctx: CandidateContext,
 
     # fidelity escalation record (CEO item 7 — honest)
     b_status = (baseline_eval.get("technical") or {}).get("status")
+    b_quant = baseline_eval.get("quantitative") or {}
     ledger["fidelity_escalation"] = {
-        "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1)",
+        "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1) "
+                        "+ ANALYTICAL_EQUATION (analytical_equation_v1, "
+                        "R383)",
         "deciding_question": ("does a design-variable change improve "
-                              "the objective within constraints?"),
+                              "the objective within constraints, and by "
+                              "how much?"),
         "resolved_at_current_tier": b_status == "QUANTIFIED",
+        "quantitative_tier_engaged": b_quant.get("status") in (
+            "QUANTIFIED", "PARTIALLY_QUANTIFIED"),
+        "quantitative_objective_computed": (b_quant.get("objective")
+                                            or {}).get("computed"),
         "escalation_needed": b_status != "QUANTIFIED",
         "next_tier_available": False,
-        "note": ("higher tiers (NUMERICAL_SOLVER / SIMULATION / "
-                 "NEURAL_OPERATOR) are contract-reserved and not "
-                 "registered; escalation is recorded, never faked at "
+        "note": ("the R383 ANALYTICAL_EQUATION tier is LIVE (closed-form "
+                 "deterministic relations with computation logs); the "
+                 "higher tiers (NUMERICAL_SOLVER / SIMULATION / "
+                 "NEURAL_OPERATOR) remain contract-reserved and "
+                 "unregistered; escalation is recorded, never faked at "
                  "the current tier"),
     }
 
@@ -1417,6 +1589,7 @@ def improve_candidate_technical(ctx: CandidateContext,
 
     for iteration in range(1, max_iterations + 1):
         diag = diagnose_technical(ctx.spec)
+        qdiag = evaluate_candidate_quantitatively(ctx.spec)
         lv = diag.get("limiting_variable")
         it_record: Dict[str, Any] = {
             "iteration": iteration,
@@ -1430,10 +1603,36 @@ def improve_candidate_technical(ctx: CandidateContext,
                      "blocked": bool(d.get("blocked_by"))}
                     for d in (diag.get("improvement_directions") or [])],
                 "constraint_results": diag.get("constraint_results"),
+                "quantitative": _public_quant(qdiag),
             },
             "proposals": [],
             "mutation_attempts_extra": [],
         }
+
+        # R383 quantitative trigger: when the analytical layer BOUND
+        # and found an UNMET requirement, its magnitude-ranked
+        # limiting variable (with a reachable solve) is the mutation
+        # trigger the T1/T3 gates read. The gates themselves are
+        # UNCHANGED — the trigger legitimately comes from the
+        # higher-fidelity evaluator when one is bound (the R379
+        # ordinal convention governs unbound candidates).
+        trigger_eval = diag
+        q_lv = qdiag.get("limiting_variable")
+        if q_lv and (q_lv.get("solve_for") or {}).get("status") \
+                == "REACHABLE":
+            trigger_eval = dict(diag)
+            trigger_eval["limiting_variable"] = q_lv
+            it_record["diagnosis"]["trigger"] = (
+                "QUANTITATIVE (analytical_equation_v1): "
+                f"{q_lv.get('param_id')} "
+                f"{q_lv.get('improving_move')} — magnitude-ranked, "
+                f"solve reachable at "
+                f"{(q_lv.get('solve_for') or {}).get('proposed_value')}")
+        elif q_lv:
+            it_record["diagnosis"]["trigger"] = (
+                f"QUANTITATIVE DIAGNOSIS PRESENT but solve "
+                f"{(q_lv.get('solve_for') or {}).get('status')} — "
+                f"the ordinal monotone trigger governs")
 
         # constraint-wall kill: improving directions exist but all are
         # blocked (or no movable design variable at all)
@@ -1468,40 +1667,65 @@ def improve_candidate_technical(ctx: CandidateContext,
             ledger["iterations"].append(it_record)
             break
 
-        # ---- proposals (untrusted) with directional feedback loop ----
+        # ---- proposals: DETERMINISTIC SOLVE FIRST (R383), then the
+        # untrusted LLM path with directional feedback -------------
         valid_proposal: Optional[Dict[str, Any]] = None
         valid_validation: Optional[Dict[str, Any]] = None
         transport_blocked = False
         rejections: List[Dict[str, Any]] = []
-        for attempt in range(1, max_proposals + 1):
-            proposal = propose_technical_mutation(
-                ctx, diag, provider=provider,
-                feedback=[r.get("feedback_record") or r
-                          for r in rejections])
-            if proposal.get("status") != "OK":
-                transport_blocked = transport_blocked or \
-                    proposal.get("status") == "PROVIDER_UNAVAILABLE"
-                it_record["proposals"].append(
-                    {k: v for k, v in proposal.items() if k != "fields"})
-                continue
-            validation = validate_technical_mutation(ctx, proposal, diag)
-            if not validation["valid"]:
+        det_proposal = build_deterministic_proposal(ctx, qdiag)
+        if det_proposal is not None:
+            det_validation = validate_technical_mutation(
+                ctx, det_proposal, trigger_eval)
+            it_record["proposals"].append({
+                "proposal_id": det_proposal.get("proposal_id"),
+                "provider": det_proposal.get("provider"),
+                "model": det_proposal.get("model"),
+                "origin": det_proposal.get("origin"),
+                "fields": det_proposal.get("fields"),
+                "validation": det_validation})
+            if det_validation["valid"]:
+                valid_proposal = det_proposal
+                valid_validation = det_validation
+            else:
                 rejections.append({
                     "feedback_record": {
-                        "reasons": validation["reasons"],
-                        "mutation_kind": validation.get(
+                        "reasons": det_validation["reasons"],
+                        "mutation_kind": det_validation.get(
                             "mutation_kind")}})
-            it_record["proposals"].append({
-                "proposal_id": proposal.get("proposal_id"),
-                "provider": proposal.get("provider"),
-                "model": proposal.get("model"),
-                "prompt_hash": proposal.get("prompt_hash"),
-                "output_hash": proposal.get("output_hash"),
-                "fields": proposal.get("fields"),
-                "validation": validation})
-            if validation["valid"]:
-                valid_proposal, valid_validation = proposal, validation
-                break
+        if valid_proposal is None:
+            for attempt in range(1, max_proposals + 1):
+                proposal = propose_technical_mutation(
+                    ctx, trigger_eval, provider=provider,
+                    feedback=[r.get("feedback_record") or r
+                              for r in rejections])
+                if proposal.get("status") != "OK":
+                    transport_blocked = transport_blocked or \
+                        proposal.get("status") == "PROVIDER_UNAVAILABLE"
+                    it_record["proposals"].append(
+                        {k: v for k, v in proposal.items()
+                         if k != "fields"})
+                    continue
+                validation = validate_technical_mutation(
+                    ctx, proposal, trigger_eval)
+                if not validation["valid"]:
+                    rejections.append({
+                        "feedback_record": {
+                            "reasons": validation["reasons"],
+                            "mutation_kind": validation.get(
+                                "mutation_kind")}})
+                it_record["proposals"].append({
+                    "proposal_id": proposal.get("proposal_id"),
+                    "provider": proposal.get("provider"),
+                    "model": proposal.get("model"),
+                    "prompt_hash": proposal.get("prompt_hash"),
+                    "output_hash": proposal.get("output_hash"),
+                    "fields": proposal.get("fields"),
+                    "validation": validation})
+                if validation["valid"]:
+                    valid_proposal, valid_validation = \
+                        proposal, validation
+                    break
 
         if valid_proposal is None:
             if transport_blocked:
@@ -1566,6 +1790,26 @@ def improve_candidate_technical(ctx: CandidateContext,
         if decision["action"] == "KEEP":
             ctx = child
             parent_eval = re_eval
+            # R383: when this iteration was driven by the quantitative
+            # trigger and the child's OWN computed margin now MEETS the
+            # requirement, the loop's objective is achieved — stop with
+            # the honest target-met reason (further optimization beyond
+            # the requirement is not this loop's mandate)
+            q_after = (re_eval.get("quantitative") or {})
+            if trigger_eval is not diag and \
+                    q_after.get("requirement_satisfied") is True:
+                obj_after = q_after.get("objective") or {}
+                ledger["outcome"] = "TECHNICALLY_IMPROVED"
+                ledger["outcome_reason"] = (
+                    f"iteration {iteration}: KEEP confirmed by the "
+                    f"child's OWN independent evaluation AND the "
+                    f"requirement is now MET — objective "
+                    f"{obj_after.get('target')} = "
+                    f"{obj_after.get('value')} {obj_after.get('unit')} "
+                    f"(margin "
+                    f"{round((obj_after.get('margin') or 0) * 100, 1)}"
+                    f"%); {obj_after.get('statement')}")
+                break
             continue
 
         # REJECT: the parent stands; try the NEXT valid proposal within
@@ -1581,7 +1825,7 @@ def improve_candidate_technical(ctx: CandidateContext,
                 "mutation_kind": valid_validation.get("mutation_kind")}})
         while len(it_record["proposals"]) < max_proposals:
             proposal = propose_technical_mutation(
-                ctx, diag, provider=provider,
+                ctx, trigger_eval, provider=provider,
                 feedback=[r.get("feedback_record") or r
                           for r in rejections])
             if proposal.get("status") != "OK":
@@ -1590,7 +1834,8 @@ def improve_candidate_technical(ctx: CandidateContext,
                 it_record["proposals"].append(
                     {k: v for k, v in proposal.items() if k != "fields"})
                 break
-            validation = validate_technical_mutation(ctx, proposal, diag)
+            validation = validate_technical_mutation(
+                ctx, proposal, trigger_eval)
             if not validation["valid"]:
                 rejections.append({
                     "feedback_record": {
@@ -1650,16 +1895,94 @@ def improve_candidate_technical(ctx: CandidateContext,
             (it.get("decision") or {}).get("action") == "KEEP"
             for it in ledger["iterations"]) else \
             "KILLED_NO_IMPROVING_TECHNICAL_MUTATION"
+        if not ledger.get("outcome_reason"):
+            ledger["outcome_reason"] = (
+                f"{max_iterations} iteration(s) ran within budget; "
+                f"keeps: "
+                f"{sum(1 for it in ledger['iterations'] if (it.get('decision') or {}).get('action') == 'KEEP')}"
+                f" (the R379 convention: the budget, not a verdict, "
+                f"ended the loop)")
 
     final_eval = _full_eval(ctx, collision_mode, live_sources) \
         if ledger.get("outcome") not in (
             "TECHNICAL_UNQUANTIFIED",) else baseline_eval
     ledger["final"] = _public_eval(final_eval)
     ledger["current_ctx"] = ctx
+
+    # ---- R383 post-loop honesty: the measured constraint wall ------
+    # If the loop ran and the requirement is STILL unmet while the
+    # final quantitative diagnosis proves the margin target is
+    # UNREACHABLE inside the declared envelope, that is measured
+    # evidence that no defensible improvement inside this design space
+    # meets the requirement (CEO R383 rule 10: kill, with the number).
+    f_quant = final_eval.get("quantitative") or {}
+    f_lv = f_quant.get("limiting_variable") or {}
+    f_solve = f_lv.get("solve_for") or {}
+    f_obj = f_quant.get("objective") or {}
+    # the measured wall: the objective IS computed and STILL unmet
+    # while the quantitative layer can name NO reachable improvement —
+    # either an explicit UNREACHABLE_IN_ENVELOPE solve, or no limiting
+    # variable at all (no movable design variable with room left; e.g.
+    # the design sits ON the envelope edge)
+    quant_wall = (
+        f_quant.get("requirement_satisfied") is False
+        and bool(f_obj.get("computed"))
+        and (f_solve.get("status") == "UNREACHABLE_IN_ENVELOPE"
+             or (not f_lv and (f_quant.get("limiting_variable")
+                               is None))))
+    if quant_wall and \
+            ledger.get("outcome") in (
+            "TECHNICALLY_IMPROVED", "KILLED_NO_IMPROVING_TECHNICAL_MUTATION",
+            "KILLED_NO_DEFENSIBLE_TECHNICAL_MUTATION",
+            "KILLED_CONSTRAINT_WALL"):
+        keeps_had = sum(1 for it in ledger["iterations"]
+                        if (it.get("decision") or {}).get("action")
+                        == "KEEP")
+        best_ev = (f"best achievable at the envelope edge is "
+                   f"{f_solve.get('best_output')} "
+                   f"{f_solve.get('output_unit')} (margin "
+                   f"{round((f_solve.get('best_margin') or 0) * 100, 1)}%)"
+                   if f_solve.get("best_output") is not None
+                   else ("the quantitative layer can name NO movable "
+                         "improving design variable with room inside "
+                         "the declared envelopes (the design sits at "
+                         "the envelope edge)"))
+        wall_reason = (
+            f"MEASURED CONSTRAINT WALL: after "
+            f"{len(ledger['iterations'])} iteration(s) "
+            f"({keeps_had} KEEP(s)), the objective "
+            f"{f_obj.get('target')} = {f_obj.get('value')} "
+            f"{f_obj.get('unit')} still misses the requirement "
+            f"(margin {round((f_obj.get('margin') or 0) * 100, 1)}%); "
+            f"the quantitative diagnosis proves the margin target is "
+            f"UNREACHABLE — no defensible improvement inside the "
+            f"declared design space meets the requirement — {best_ev}. "
+            f"Candidate killed.")
+        if ledger.get("outcome") == "TECHNICALLY_IMPROVED":
+            ledger["outcome"] = "KILLED_CONSTRAINT_WALL"
+            ledger["outcome_reason"] = wall_reason + (
+                " (the intermediate KEEP(s) are recorded in the ledger "
+                "— the child WAS strictly better, but better-within-a-"
+                "failing-design-space is not a defensible destination)")
+        else:
+            ledger["outcome_reason"] = \
+                str(ledger.get("outcome_reason") or "") + " " + wall_reason
+
     ledger["outcome_summary"] = {
         "baseline_status": (baseline_eval.get("technical") or {})
         .get("status"),
         "final_status": (final_eval.get("technical") or {}).get("status"),
+        "baseline_quantitative": (baseline_eval.get("quantitative")
+                                  or {}).get("status"),
+        "final_quantitative": f_quant.get("status"),
+        "final_quantitative_objective": {
+            "target": f_obj.get("target"),
+            "value": f_obj.get("value"),
+            "unit": f_obj.get("unit"),
+            "margin": f_obj.get("margin"),
+            "margin_status": f_obj.get("margin_status"),
+            "equation_id": f_obj.get("equation_id"),
+        },
         "baseline_i_average": (baseline_eval.get("i_average")),
         "final_i_average": (final_eval.get("i_average")),
         "baseline_prior_art": baseline_eval.get("prior_art_status"),
@@ -1683,10 +2006,13 @@ def _full_eval(ctx: CandidateContext, collision_mode: str,
                live_sources: Optional[List[str]]) -> Dict[str, Any]:
     """Baseline evaluation: technical + instruments + the candidate's
     OWN recorded prior-art state (no re-adjudication — the baseline is
-    the parent's standing position; the CHILD is the one re-checked)."""
+    the parent's standing position; the CHILD is the one re-checked).
+    R383: also the quantitative analytical evaluation (equation
+    bindings, objective margin, sensitivities)."""
     from .improvement_engine import _measure_ctx
     out = {
         "technical": evaluate_candidate_technically(ctx.spec),
+        "quantitative": evaluate_candidate_quantitatively(ctx.spec),
         "re_evaluated_at": utc_now(),
         "collision_mode": collision_mode,
     }
@@ -1700,6 +2026,7 @@ def _full_eval(ctx: CandidateContext, collision_mode: str,
 def _public_eval(ev: Dict[str, Any]) -> Dict[str, Any]:
     """Ledger-safe view of an evaluation (the technical evaluation is
     already public-shaped; instruments summarized)."""
+    q = ev.get("quantitative") or {}
     return {
         "technical": {
             "status": (ev.get("technical") or {}).get("status"),
@@ -1712,9 +2039,62 @@ def _public_eval(ev: Dict[str, Any]) -> Dict[str, Any]:
             "computation_log": (ev.get("technical") or {})
             .get("computation_log"),
         },
+        "quantitative": _public_quant(q),
         "i_dimensions": ev.get("i_dimensions"),
         "i_flags": ev.get("i_flags"),
         "i_average": ev.get("i_average"),
         "q_average": ev.get("q_average"),
         "prior_art_status": ev.get("prior_art_status"),
+    }
+
+
+def _public_quant(q: Dict[str, Any]) -> Dict[str, Any]:
+    """Ledger-safe summary of the quantitative analytical evaluation
+    (bindings and inputs stay in the full evaluation record the
+    mutation chain keeps; the ledger carries the decision-relevant
+    magnitudes)."""
+    obj = q.get("objective") or {}
+    lv = q.get("limiting_variable") or {}
+    return {
+        "status": q.get("status"),
+        "objective": {
+            "target": obj.get("target"), "direction": obj.get("direction"),
+            "computed": obj.get("computed"),
+            "value": obj.get("value"), "unit": obj.get("unit"),
+            "equation_id": obj.get("equation_id"),
+            "margin": obj.get("margin"),
+            "margin_status": obj.get("margin_status"),
+            "statement": obj.get("statement"),
+        },
+        "requirement_satisfied": q.get("requirement_satisfied"),
+        "limiting_variable": ({
+            "param_id": lv.get("param_id"),
+            "improving_move": lv.get("improving_move"),
+            "elasticity": lv.get("elasticity"),
+            "equation_id": lv.get("equation_id"),
+            "statement": lv.get("statement"),
+            "solve_for": ({
+                "status": (lv.get("solve_for") or {}).get("status"),
+                "proposed_value": (lv.get("solve_for") or {})
+                .get("proposed_value"),
+                "predicted_output": (lv.get("solve_for") or {})
+                .get("predicted_output"),
+                "predicted_margin": (lv.get("solve_for") or {})
+                .get("predicted_margin"),
+                "best_output": (lv.get("solve_for") or {})
+                .get("best_output"),
+                "best_margin": (lv.get("solve_for") or {})
+                .get("best_margin"),
+                "envelope": (lv.get("solve_for") or {})
+                .get("envelope"),
+            } if lv.get("solve_for") else None),
+        } if lv else None),
+        "computed_equations": [
+            {"equation_id": c.get("equation_id"),
+             "status": c.get("status"),
+             "output_param_id": c.get("output_param_id"),
+             "value": c.get("value")}
+            for c in (q.get("computations") or [])],
+        "computation_log": (q.get("computation_log") or {}).get("steps"),
+        "evidence_rank": q.get("evidence_rank"),
     }
