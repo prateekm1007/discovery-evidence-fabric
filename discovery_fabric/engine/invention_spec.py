@@ -165,12 +165,16 @@ def build_invention_spec(env: Candidate, run_ctx: Dict[str, Any]) -> Dict[str, A
         {"mechanism": mm.get("mechanism", ""),
          "intervention": mm.get("intervention", ""),
          "expected_effect": mm.get("expected_effect", ""),
-         "mechanism_source_span": mm.get("mechanism_source_span", "")},
+         "mechanism_source_span": mm.get("mechanism_source_span", ""),
+         "span_derivation": mm.get("span_derivation")},
         "MODELLED", "SYNTHESIZE",
         evidence_ids=synthesis_citation,
         note="LLM-proposed transfer mechanism from custodied evidence; "
              "proposal, not fact (Art. XVIII); evidence_ids cite the "
-             "custodied observation the proposal was synthesized from")
+             "custodied observation the proposal was synthesized from; "
+             "span_derivation measures whether the quoted span actually "
+             "contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED "
+             "is an honest state, never silently dropped)")
 
     spec["causal_chain"] = tagged(
         {"source_observation": (ev_index[source_ev_id].get("title", "")

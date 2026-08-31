@@ -389,6 +389,7 @@ class EngineRun:
                     "falsification_test": cand.get("falsification_test", ""),
                     "mechanism_source_span":
                         cand.get("mechanism_source_span", ""),
+                    "span_derivation": cand.get("span_derivation"),
                     "raw_candidate": cand})
                 d["mechanism_map"] = mm
                 new_collision, coll_err = _collision_for_candidate(mm)
@@ -485,6 +486,7 @@ class EngineRun:
                                 f.get("falsification_test", ""),
                             "mechanism_source_span":
                                 f.get("mechanism_source_span", ""),
+                            "span_derivation": f.get("span_derivation"),
                             "source_evidence": {
                                 "source_id": ((self.env.evidence or [{}])[0]
                                               .get("id", "")),
@@ -498,7 +500,10 @@ class EngineRun:
                             "env_view": _env_with_candidate(grid_cand),
                             "spec": None,
                             "origin": f"EXPLORATION_GRID_{c.get('angle')}"
-                                      f"({c.get('provider_id')})"})
+                                      f"({c.get('provider_id')})",
+                            "span_underived": bool(
+                                (f.get("span_derivation") or {})
+                                .get("underived"))})
                 except Exception as exc:  # noqa: BLE001 — recorded, honest
                     import traceback as _tb
                     self._persist("EXPLORATION_GRID.json", {
@@ -578,7 +583,8 @@ class EngineRun:
                     "spec": s, "eng": eng_final, "env_view": c["env_view"],
                     "attack": attack1, "quality": quality,
                     "repaired": repaired, "origin": c["origin"],
-                    "killed": False})
+                    "killed": False,
+                    "span_underived": bool(c.get("span_underived"))})
 
             # ---------- E15-H: select the strongest survivor ---------------
             selection = select_survivors(evaluated)

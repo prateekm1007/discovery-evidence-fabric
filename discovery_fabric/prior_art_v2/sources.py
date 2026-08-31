@@ -484,6 +484,86 @@ def search_lens_patent(query: str, num_results: int = 8) -> SourceQueryResult:
     )
 
 
+def fetch_lens_patent_full_abstract(doc_key: str) -> Dict[str, Any]:
+    """Deep-fetch ONE patent record's FULL abstract by doc_key (R377).
+
+    MEASURED CONTEXT (TOSCANINI/R377_PATENT_TEXT_FETCH.json): during the
+    six fresh-domain runs every Google claims fetch failed — the engine
+    built https://patents.google.com/patent/<LENS doc_key>/en which
+    404s (Google's canonical id has no underscores/date suffix), and
+    the corrected id is 503-blocked from this ASN anyway — so every
+    family adjudicated at ABSTRACT tier on a 400-char TRUNCATED
+    snippet while the Lens record carries the full abstract. This
+    endpoint re-queries Lens by doc_key and returns the complete
+    abstract text (more evidence for the SAME adjudication rules —
+    Art. VII: evidence expanded, thresholds untouched).
+    """
+    if not LENS_TOKEN:
+        return {"doc_key": doc_key, "error": "LENS_API_TOKEN not configured"}
+    url = "https://api.lens.org/patent/search"
+    payload = json.dumps({
+        "query": f'doc_key:("{doc_key}")',
+        "size": 1,
+    }).encode()
+    headers = {"Authorization": f"Bearer {LENS_TOKEN}"}
+    status, body, latency = _http_post(url, payload, headers=headers,
+                                       timeout=25)
+    if status != 200:
+        return {"doc_key": doc_key, "error": f"HTTP {status}",
+                "latency_ms": latency}
+    try:
+        data = json.loads(body)
+    except Exception as exc:  # noqa: BLE001
+        return {"doc_key": doc_key, "error": f"JSON parse error: {exc}"}
+    recs = data.get("data") or []
+    if not recs:
+        return {"doc_key": doc_key, "error": "NO_RECORD",
+                "latency_ms": latency}
+    rec = recs[0]
+    abstract = rec.get("abstract") or ""
+    if isinstance(abstract, list):
+        abstract = abstract[0].get("text", "") if abstract else ""
+    biblio = rec.get("biblio") or {}
+    it = biblio.get("invention_title")
+    title = ""
+    if isinstance(it, list):
+        for item in it:
+            if isinstance(item, dict) and item.get("text"):
+                title = str(item["text"])
+                break
+    elif isinstance(it, str):
+        title = it
+    return {
+        "doc_key": doc_key,
+        "title": title,
+        "abstract_full": str(abstract),
+        "abstract_len": len(str(abstract)),
+        "lens_id": rec.get("lens_id"),
+        "fetched_at_utc": _now_utc(),
+        "latency_ms": latency,
+        "raw_payload_sha256": _sha256(json.dumps(rec, sort_keys=True)),
+    }
+
+
+def google_patents_canonical_id(patent_id: str) -> str:
+    """Canonicalize a Lens doc_key to the Google Patents id form.
+
+    MEASURED DEFECT (R377): 'US_20260253984_A1_20260827' (Lens doc_key)
+    was used verbatim in the claims-fetch URL — Google serves 404 for
+    it; the canonical form is 'US20260253984A1' (country + number +
+    kind code, no underscores, no date suffix). Deterministic parse:
+    underscore-split, drop any all-digit trailing segment (the doc_key
+    date suffix), join the rest.
+    """
+    pid = (patent_id or "").strip()
+    if not pid:
+        return ""
+    parts = [p for p in pid.split("_") if p]
+    if len(parts) > 1 and parts[-1].isdigit() and len(parts[-1]) == 8:
+        parts = parts[:-1]  # '20260827' date suffix
+    return "".join(parts)
+
+
 # ----------------------- SOURCE 3: PATSNAP EUREKA (PROVISIONAL) -----------------------
 def search_patsnap_eureka(query: str, num_results: int = 8) -> SourceQueryResult:
     """

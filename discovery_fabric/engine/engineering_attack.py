@@ -691,14 +691,20 @@ def select_survivors(candidates: List[Dict[str, Any]]
     """E15-H selection over attacked (+repaired, +quality-evaluated)
     candidates. Each candidate dict carries:
         candidate_id, attack (post-repair), quality (E15-B result or None),
-        repaired (bool)
+        repaired (bool), span_underived (bool, R377)
     Selection policy (recorded, deterministic, NOT a new numeric score):
       1. KILLed candidates are out (no dossier for the weak).
-      2. Among the rest, prefer the better E15-B verdict
+      2. R377: SPAN_UNDERIVED candidates are out — a mechanism whose
+         quoted evidence span does not contain its vocabulary is a
+         prior-knowledge proposal, not an evidence-derived candidate
+         (CEO R377: "a higher kill rate is acceptable if the surviving
+         inventions become materially better"). The flag and its
+         measurement stay on the ranked record.
+      3. Among the rest, prefer the better E15-B verdict
          (PASS > CONDITIONAL > FAIL); FAIL means the quality gate rejects
          the candidate.
-      3. Tie-break: fewer deficient areas, then fewer UNCERTAIN verdicts.
-      4. All comparisons and the final choice are recorded.
+      4. Tie-break: fewer deficient areas, then fewer UNCERTAIN verdicts.
+      5. All comparisons and the final choice are recorded.
     """
     ranked: List[Dict[str, Any]] = []
     for c in candidates:
@@ -707,6 +713,7 @@ def select_survivors(candidates: List[Dict[str, Any]]
         verdict_rank = {"PASS": 0, "CONDITIONAL": 1, "FAIL": 2,
                         None: 3}.get(quality.get("verdict"), 3)
         killed = attack.get("overall") == "KILLED"
+        underived = bool(c.get("span_underived"))
         ranked.append({
             "candidate_id": c.get("candidate_id"),
             "killed": killed,
@@ -717,23 +724,30 @@ def select_survivors(candidates: List[Dict[str, Any]]
             "quality_deficient_count": len(quality.get("deficient_areas", [])
                                            or []),
             "repaired": bool(c.get("repaired")),
+            "span_underived": underived,
             "_verdict_rank": verdict_rank,
         })
     eligible = [r for r in ranked if not r["killed"]
-                and r["quality_verdict"] != "FAIL"]
+                and r["quality_verdict"] != "FAIL"
+                and not r["span_underived"]]
     eligible.sort(key=lambda r: (r["_verdict_rank"],
                                  r["quality_deficient_count"],
                                  r["uncertain_count"]))
     selection = {
         "selection": "STRONGEST_SURVIVOR (E15-H)",
-        "policy": ("kill first; among survivors prefer better E15-B "
-                   "verdict, then fewer deficient areas, then fewer "
-                   "UNCERTAIN attack outcomes; NO numeric score is "
-                   "computed (CEO standing rule: no new scoring systems)"),
+        "policy": ("kill first; SPAN_UNDERIVED candidates are ineligible "
+                   "(R377 evidence-derivation requirement); among "
+                   "survivors prefer better E15-B verdict, then fewer "
+                   "deficient areas, then fewer UNCERTAIN attack "
+                   "outcomes; NO numeric score is computed (CEO standing "
+                   "rule: no new scoring systems)"),
         "ranked": ranked,
         "selected": eligible[0]["candidate_id"] if eligible else None,
         "selection_basis": eligible[0] if eligible else None,
         "killed": [r["candidate_id"] for r in ranked if r["killed"]],
+        "span_underived_excluded": [r["candidate_id"] for r in ranked
+                                    if not r["killed"]
+                                    and r["span_underived"]],
         "quality_rejected": [r["candidate_id"] for r in ranked
                              if not r["killed"]
                              and r["quality_verdict"] == "FAIL"],

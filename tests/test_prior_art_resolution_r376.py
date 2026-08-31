@@ -87,8 +87,12 @@ class TestQueryLadder:
         profile = cr.build_candidate_profile(CFRP_MM, CFRP_PROBLEM)
         ladder = cr.build_query_ladder(profile)
         classes = [s["query_class"] for s in ladder]
+        # R377: FUNCTION class added (measured recall defect: a detection
+        # candidate's ladder carried no form of 'detect' and never
+        # retrieved detection art — CEO directive cycle R377). The four
+        # R376 classes and their order are UNCHANGED.
         assert classes == ["ENTITY", "MECHANISM", "DISTINGUISHING",
-                           "ADJACENT"]
+                           "FUNCTION", "ADJACENT"]
 
     def test_formulation_defect_pinned_cfrp(self):
         """The measured defect: the query was 'implement comprehensive

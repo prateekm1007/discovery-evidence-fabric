@@ -55,6 +55,30 @@ from discovery_fabric.source_registry.query_relevance import terms
 # Declared thresholds (Art. XXVII — provenance, class, uncertainty, rationale)
 # ---------------------------------------------------------------------------
 THRESHOLDS: Dict[str, Dict[str, Any]] = {
+    "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": (
+            "R377 patent-text ground truth (TOSCANINI/"
+            "R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_"
+            "TRUTH.json): 12/30 family representatives (40%) were "
+            "substantively irrelevant cross-domain term collisions "
+            "(CWDM optical link for a battery-thermal candidate; "
+            "dental-condition monitoring for rolling stock; bone "
+            "fracture forceps for rail steel...). A hit sharing NO "
+            "entity term with the candidate now needs >= 3 NON-generic "
+            "mechanism terms to be mechanism art: the measured true "
+            "cross-domain analog (line-pipe steel with hydrogen "
+            "fracture toughness for a rail-steel candidate) shares 3 "
+            "non-generic terms and survives; every measured false "
+            "positive shares <= 2 and is demoted. This RAISES the "
+            "cross-domain bar (was the same >= 2 as same-domain) — "
+            "stricter, not weaker (Art. VII)."
+        ),
+        "uncertainty": "term overlap remains a proxy; entity word-sense "
+                       "collisions ('gear': steering vs draft) can still "
+                       "pass — disclosed limitation, not a solved problem",
+    },
     "MIN_MECHANISM_OVERLAP": {
         "value": 2,
         "epistemic_class": "ENGINEERING",
@@ -96,8 +120,38 @@ THRESHOLDS: Dict[str, Dict[str, Any]] = {
     },
 }
 
+# Generic function vocabulary: appears in every technical domain, so a
+# term overlap consisting ONLY of these is a cross-domain collision,
+# not a substantive relationship (R377 measured: CWDM optical-link
+# patent matched a battery-thermal candidate on 'optical'+'thermal';
+# a dental-monitoring patent matched a rolling-stock candidate on
+# 'condition'+'monitoring'+'based').
+GENERIC_FUNCTION_TERMS = {
+    "system", "systems", "method", "methods", "apparatus", "device",
+    "devices", "process", "processes", "technique", "techniques",
+    "monitoring", "monitor", "monitors", "sensor", "sensors",
+    "sensing", "detection", "detecting", "detect", "control",
+    "controlling", "controller", "management", "managing", "data",
+    "signal", "signals", "processing", "based", "including",
+    "configured", "assembly", "structure", "structures",
+    "component", "components", "element", "elements", "unit",
+    "module", "circuit", "circuits", "level", "point", "points",
+    "along", "path", "early", "real", "time", "smart", "advanced",
+    "improved", "novel", "existing", "retrofit", "retrofitted",
+    "implement", "implemented", "deployment", "deploy", "install",
+    "installed", "connected", "integrated", "analysis", "analyzes",
+    "pattern", "patterns",
+}
+
 # Verbs/filler that open LLM-written interventions and carry no search value.
 # The measured defect: position-based term selection captured these first.
+# NOTE (R377 measured): these verbs are filler for QUERY TERM SELECTION
+# in the DISTINGUISHING class, but the FUNCTION noun forms (detection,
+# monitoring, protection...) are NOT filler — they are the function
+# vocabulary the FUNCTION query class searches on (the EV run's ladder
+# had no form of 'detect' anywhere and never retrieved the rich
+# thermal-runaway-DETECTION art family that a single function-word
+# query returns).
 _INTERVENTION_FILLER = {
     "implement", "implementing", "incorporate", "incorporating",
     "design", "designing", "develop", "developing", "apply", "applying",
@@ -192,6 +246,8 @@ class CandidateProfile:
     mechanism_terms: List[str]    # the causal mechanism
     distinguishing_terms: List[str]  # candidate core (query-facing, capped)
     adjacent_terms: List[str]     # function-level, implementation-free
+    device_terms: List[str] = field(default_factory=list)  # DEVICE-only
+    function_terms: List[str] = field(default_factory=list)  # R377: what it DOES
     distinguishing_full: List[str] = field(default_factory=list)  # ALL elements
 
     @staticmethod
@@ -205,6 +261,14 @@ class CandidateProfile:
 
     def folded_entity(self) -> set:
         return self._folded(self.entity_terms)
+
+    def folded_device(self) -> set:
+        """DEVICE-only anchors (no failure-mode words). The same-domain
+        adjudication path requires a DEVICE term: 'thermal' is a
+        failure-mode adjective that appears in every thermal patent
+        ('Thermal-efficient CWDM link') and must not confer same-domain
+        status on a battery candidate (R377 measured case)."""
+        return self._folded(self.device_terms)
 
     def folded_all(self) -> set:
         return (self.folded_search_profile() | self.folded_entity()
@@ -245,14 +309,87 @@ def build_candidate_profile(mechanism_map: Dict[str, Any],
     distinguishing = [t for t in distinguishing
                       if t not in _INTERVENTION_FILLER][:cap + 2]
 
+    # R377 (measured anchor-crowding defect): the DISTINGUISHING query
+    # must carry the candidate's TECHNICAL CORE. In the electronics run
+    # the query was 'battery consumer lithium management ion temperature
+    # current' — 'overcharge' and 'protection' (the actual differentiating
+    # technical terms) were ranked out by entity anchors (+4) while the
+    # true art ('battery overcharge protection circuit') went unfound.
+    # SECOND measured iteration: anchoring on the mechanism text is NOT
+    # enough — the mechanism itself can be entity-dominated ('smart
+    # battery management systems'). The technical core is the
+    # intervention vocabulary that is NOT entity/device boilerplate and
+    # NOT generic: 'overcharge', 'protection', 'perovskite',
+    # 'semitransparent' — the words only THIS candidate's claim adds to
+    # the domain. Those lead the query; entity anchors fill the rest.
+    from discovery_fabric.source_registry.query_relevance import _fold
+    entity_folded = {_fold(t) for t in entity_set}
+    device_folded = {_fold(t) for t in device_set}
+    mech_folded = {_fold(t) for t in mech_set}
+
+    def _core_weight(tok: str) -> int:
+        f = _fold(tok)
+        w = 0
+        if f not in entity_folded and f not in device_folded:
+            w += 3  # not domain boilerplate = differentiating by definition
+        if f in mech_folded:
+            w += 1
+        if len(tok) > 6:
+            w += 1
+        return w
+
+    core_candidates = [t for t in _natural_tokens(intervention)
+                       if t not in _INTERVENTION_FILLER
+                       and t not in GENERIC_FUNCTION_TERMS]
+    core_order: Dict[str, int] = {}
+    core_ranked: List[str] = []
+    for t in core_candidates:
+        if t in core_order:
+            continue
+        core_order[t] = len(core_ranked)
+        core_ranked.append(t)
+    core_ranked.sort(key=lambda t: (-_core_weight(t), core_order[t]))
+    tech_core = [t for t in core_ranked if _core_weight(t) >= 3][
+        :max(3, cap - 3)]
+    # prepend the technical core (deduplicated) — the differentiating
+    # vocabulary leads the query; entity anchors follow it
+    for t in reversed(tech_core):
+        if t not in distinguishing:
+            distinguishing.insert(0, t)
+    distinguishing = distinguishing[:cap + 2]
+
     mechanism_q = _ranked_terms(mechanism, anchors, cap)
     entity_q = _ranked_terms(f"{device} {failure}", anchors, cap)
+    device_q = _ranked_terms(device, anchors, cap)
     # adjacent-function terms: entity + effect WITHOUT the candidate's
     # implementation terms — finds alternative approaches that could
     # destroy differentiation
     adjacent_q = _ranked_terms(
         f"{device} {expected_effect} {failure}", anchors, cap,
         exclude=set(distinguishing) - entity_set)
+
+    # R377 (measured adjacent-collapse defect): in both inspected runs
+    # the ADJACENT query came out IDENTICAL to the ENTITY query — the
+    # exclude set (distinguishing minus entity) was empty because the
+    # distinguishing terms overlapped the entity terms, so the
+    # adjacent search re-ran the entity search and found the SAME art.
+    # Fix: the adjacent query excludes ALL entity terms and searches
+    # the FUNCTION vocabulary (effect + failure function) — the
+    # alternative-approach space by construction.
+    if adjacent_q == entity_q:
+        adjacent_q = _ranked_terms(
+            f"{expected_effect} {failure}", anchors, cap,
+            exclude=entity_set)
+
+    # R377 FUNCTION query class (measured function-term starvation): the
+    # EV run's ladder contained no form of 'detect' for a DETECTION
+    # candidate and never retrieved the thermal-runaway-DETECTION art
+    # (a single 'thermal runaway detection battery' query returns 5
+    # direct-art patents). Function nouns are extracted from the
+    # expected_effect + intervention in NOUN form and combined with the
+    # top entity term — the function-word search the ladder lacked.
+    function_q = _function_terms(entity_q, expected_effect,
+                                 intervention, failure)
 
     # FULL element set (coverage denominator): every natural content
     # term of the intervention minus filler — UNCAPPED. A patent claim
@@ -270,16 +407,120 @@ def build_candidate_profile(mechanism_map: Dict[str, Any],
     return CandidateProfile(
         intervention=intervention, mechanism=mechanism,
         expected_effect=expected_effect,
-        entity_terms=entity_q, mechanism_terms=mechanism_q,
+        entity_terms=entity_q, device_terms=device_q,
+        mechanism_terms=mechanism_q,
         distinguishing_terms=distinguishing, adjacent_terms=adjacent_q,
+        function_terms=function_q,
         distinguishing_full=distinguishing_full)
+
+
+# Verb -> canonical function-noun map (deterministic, disclosed). The
+# measured starvation defect: the intervention says "to detect early
+# thermal runaway initiation" — the VERB 'detect' was stripped as filler
+# and the noun 'detection' never entered any query, while the art is
+# TITLED 'thermal runaway detection system'. Patents name the function
+# with nouns; the ladder must search the noun form.
+_FUNCTION_VERB_TO_NOUN = {
+    "detect": "detection", "detects": "detection",
+    "detecting": "detection", "detected": "detection",
+    "monitor": "monitoring", "monitors": "monitoring",
+    "monitored": "monitoring",
+    "prevent": "prevention", "prevents": "prevention",
+    "preventing": "prevention", "prevented": "prevention",
+    "protect": "protection", "protects": "protection",
+    "protecting": "protection", "protected": "protection",
+    "sense": "sensing", "senses": "sensing",
+    "diagnose": "diagnosis", "diagnoses": "diagnosis",
+    "diagnosing": "diagnosis",
+    "predict": "prediction", "predicts": "prediction",
+    "predicting": "prediction", "predicted": "prediction",
+    "regulate": "regulation", "regulates": "regulation",
+    "regulating": "regulation",
+    "isolate": "isolation", "isolates": "isolation",
+    "isolating": "isolation",
+    "mitigate": "mitigation", "mitigates": "mitigation",
+    "mitigating": "mitigation",
+    "suppress": "suppression", "suppresses": "suppression",
+    "suppressing": "suppression",
+    "estimate": "estimation", "estimates": "estimation",
+    "estimating": "estimation",
+    "activate": "activation", "activates": "activation",
+    "activating": "activation",
+    "indicate": "indication", "indicates": "indication",
+    "indicating": "indication",
+    "measure": "measurement", "measures": "measurement",
+    "measuring": "measurement",
+    "inspect": "inspection", "inspects": "inspection",
+    "inspecting": "inspection",
+    "compensate": "compensation", "compensates": "compensation",
+    "compensating": "compensation",
+    "adjust": "adjustment", "adjusts": "adjustment",
+    "adjusting": "adjustment",
+    "warn": "warning", "warns": "warning",
+    "switch": "switching", "switches": "switching",
+}
+
+
+# Words that add NOTHING to a function query (structure-only words).
+# NOTE: function nouns themselves (detection, protection, monitoring,
+# imaging, measurement...) are GOOD query terms even though they sit in
+# GENERIC_FUNCTION_TERMS — that set governs CROSS-DOMAIN ADJUDICATION
+# (a collision of only generic words is not substantive), while THIS
+# set governs QUERY CONSTRUCTION (patents are titled '... detection
+# system', '... protection circuit'). Two roles, two lists.
+_FUNCTION_QUERY_STOP = {
+    "system", "systems", "method", "methods", "apparatus", "device",
+    "devices", "process", "processes", "technique", "using", "based",
+    "including", "configured", "processing", "management", "unit",
+    "module", "circuit", "circuits", "implementation", "implementing",
+    "implement", "development", "developing", "develop",
+}
+
+
+def _function_terms(entity_q: List[str], expected_effect: str,
+                    intervention: str, failure: str) -> List[str]:
+    """FUNCTION query terms: what the candidate DOES (canonical noun
+    form) + the top entity anchor. Deterministic extraction: function
+    verbs AND function nouns present in the effect/intervention text
+    are normalized to the noun patents are TITLED with (detect ->
+    'detection', prevent -> 'protection'...). The verb forms stay in
+    _INTERVENTION_FILLER for the DISTINGUISHING class; the NOUN forms
+    here are the function vocabulary ('thermal runaway detection
+    system', 'battery overcharge protection circuit')."""
+    _FN_RE = re.compile(
+        r"\b[a-z]+(?:tion|sion|ment|ing|ness|ity|ance|ence)\b")
+    source_text = f"{expected_effect} {intervention} {failure}".lower()
+    candidates: List[str] = []
+    # 1. verb forms normalized to canonical function nouns
+    for w in re.findall(r"[a-z]+", source_text):
+        if w in _FUNCTION_VERB_TO_NOUN:
+            fn = _FUNCTION_VERB_TO_NOUN[w]
+            if fn not in _FUNCTION_QUERY_STOP and fn not in candidates:
+                candidates.append(fn)
+    # 2. noun-suffix function words already in the text
+    for m in _FN_RE.finditer(source_text):
+        w = m.group(0)
+        if w in _FUNCTION_QUERY_STOP or w in _STOP_NATURAL:
+            continue
+        if w not in candidates:
+            candidates.append(w)
+    out: List[str] = []
+    if entity_q:
+        out.append(entity_q[0])
+    for w in candidates:
+        if len(out) >= THRESHOLDS["MAX_QUERY_TERMS"]["value"]:
+            break
+        if w not in out:
+            out.append(w)
+    return out[:THRESHOLDS["MAX_QUERY_TERMS"]["value"]]
 
 
 # ---------------------------------------------------------------------------
 # Query ladder — 4 classes, direct + adjacent (CEO directive 3/5)
 # ---------------------------------------------------------------------------
 
-QUERY_CLASSES = ("ENTITY", "MECHANISM", "DISTINGUISHING", "ADJACENT")
+QUERY_CLASSES = ("ENTITY", "MECHANISM", "DISTINGUISHING", "FUNCTION",
+                 "ADJACENT")
 
 
 def build_query_ladder(profile: CandidateProfile) -> List[Dict[str, Any]]:
@@ -307,11 +548,23 @@ def build_query_ladder(profile: CandidateProfile) -> List[Dict[str, Any]]:
          "purpose": "direct prior art on the causal mechanism"},
         {"query_class": "DISTINGUISHING",
          "terms": profile.distinguishing_terms,
-         "purpose": "direct prior art on the candidate's technical core"},
+         "purpose": "direct prior art on the candidate's technical core "
+                    "(technical terms lead; entity anchors follow — "
+                    "R377 anchor-crowding fix)"},
+        {"query_class": "FUNCTION",
+         "terms": profile.function_terms,
+         "purpose": "prior art on the FUNCTION itself (detection / "
+                    "protection / regulation...): patents are titled "
+                    "with function nouns; a detection candidate whose "
+                    "ladder lacks 'detection' cannot find detection art "
+                    "(R377 measured: the EV run missed the entire "
+                    "thermal-runaway-DETECTION family)"},
         {"query_class": "ADJACENT",
          "terms": profile.adjacent_terms,
          "purpose": "adjacent technical approaches that could destroy "
-                    "differentiation (function without implementation)"},
+                    "differentiation (function without implementation; "
+                    "entity terms excluded so it never collapses into "
+                    "the entity query — R377 fix)"},
     ]
     out = []
     for step in ladder:
@@ -462,37 +715,84 @@ def adjudicate_hit(hit: PatentHit,
     adjudicated against the candidate's MECHANISM + DISTINGUISHING terms
     (not against the query that found it). A hit that overlaps the entity
     domain but not the mechanism is ADJACENT_ONLY — it can threaten
-    differentiation but is NOT nearest prior art."""
+    differentiation but is NOT nearest prior art.
+
+    R377 entity-anchored precision rule (measured: 12/30 family
+    representatives in the six fresh runs were substantively irrelevant
+    cross-domain term collisions):
+
+      same-domain (>= 1 entity term in the hit text):
+          MECHANISM_RELEVANT requires >= 2 mechanism terms (UNCHANGED
+          threshold; generic function words count — in-domain they are
+          meaningful: 'pressure monitoring device for medicine
+          infusion' IS the medical candidate's function)
+      cross-domain (0 entity terms):
+          MECHANISM_RELEVANT requires >= 3 NON-GENERIC mechanism terms
+          (RAISED bar — 'optical'+'thermal' alone is a CWDM collision,
+          not battery art; 'hydrogen'+'fracture'+'steel' IS genuine
+          cross-domain steel art for a rail-steel candidate)
+      CROSS_DOMAIN_TERM_COLLISION: mechanism overlap exists, no entity
+          overlap, below the cross-domain bar — recorded with terms and
+          basis, never a family (the measured demotion class)
+    """
     from discovery_fabric.source_registry.query_relevance import _fold  # noqa: F401
     text_terms = _term_set(f"{hit.title} {hit.snippet}")
     profile_terms = profile.folded_search_profile()
     mech_overlap = sorted(profile_terms & text_terms)
     entity_overlap = sorted(profile.folded_entity() & text_terms)
+    device_overlap = sorted(profile.folded_device() & text_terms)
     min_ov = THRESHOLDS["MIN_MECHANISM_OVERLAP"]["value"]
-    mechanism_relevant = len(mech_overlap) >= min_ov
+    cross_min = THRESHOLDS["CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP"]["value"]
+    mech_nongeneric = sorted(
+        t for t in mech_overlap if t not in GENERIC_FUNCTION_TERMS)
+
+    if device_overlap:
+        # same/related domain (a DEVICE noun appears in the hit text):
+        # the ORIGINAL >= 2 rule, unchanged
+        mechanism_relevant = len(mech_overlap) >= min_ov
+    else:
+        # cross-domain (no device term): stricter — non-generic terms
+        # only, higher bar
+        mechanism_relevant = len(mech_nongeneric) >= cross_min
     adjacent_only = (not mechanism_relevant
                      and len(entity_overlap) >= min_ov)
+    term_collision = (not mechanism_relevant and not adjacent_only
+                      and len(mech_overlap) >= 1)
+
     if mechanism_relevant:
         verdict = "MECHANISM_RELEVANT"
     elif adjacent_only:
         verdict = "ADJACENT_ONLY"
+    elif term_collision:
+        verdict = "CROSS_DOMAIN_TERM_COLLISION"
     else:
         verdict = "IRRELEVANT"
+
+    basis = {
+        "method": (f"term overlap >= {min_ov} between hit text "
+                   f"(title+snippet) and the candidate's mechanism ∪ "
+                   f"distinguishing terms — same rule family as the "
+                   f"pipeline adjudicator; the QUERY that found the "
+                   f"hit is NOT the adjudication basis"),
+        "query_class": hit.query_class,
+    }
+    if not device_overlap:
+        basis["cross_domain_rule"] = (
+            f"no DEVICE-term overlap: mechanism relevance required "
+            f">= {cross_min} NON-generic mechanism terms "
+            f"(R377 precision rule; generic function words excluded "
+            f"from the cross-domain count; failure-mode adjectives do "
+            f"not confer same-domain status)")
     return {
         "patent_id": hit.patent_id,
         "title": hit.title[:140],
         "source_id": hit.source_id,
         "verdict": verdict,
         "mechanism_overlap_terms": mech_overlap,
+        "mechanism_overlap_nongeneric": mech_nongeneric,
         "entity_overlap_terms": entity_overlap,
-        "relevance_basis": {
-            "method": (f"term overlap >= {min_ov} between hit text "
-                       f"(title+snippet) and the candidate's mechanism ∪ "
-                       f"distinguishing terms — same rule family as the "
-                       f"pipeline adjudicator; the QUERY that found the "
-                       f"hit is NOT the adjudication basis"),
-            "query_class": hit.query_class,
-        },
+        "device_overlap_terms": device_overlap,
+        "relevance_basis": basis,
     }
 
 
@@ -556,23 +856,56 @@ def fetch_claim_evidence(patent_id: str,
                          hit: PatentHit) -> Dict[str, Any]:
     """Deep-fetch full claims (google_patents, free). On failure the hit
     keeps its abstract-tier evidence (Lens snippet); failures are
-    recorded, never silently downgraded to 'no evidence'."""
+    recorded, never silently downgraded to 'no evidence'.
+
+    R377 fixes (both measured):
+      1. the Google URL is built from the CANONICAL id form — the Lens
+         doc_key ('US_20260253984_A1_20260827') 404s on Google; the
+         canonical form is 'US20260253984A1'
+      2. when Google fails (503-bot-blocked from this ASN), the FULL
+         Lens abstract is deep-fetched by doc_key — the family's
+         coverage decision then measures against the COMPLETE abstract
+         text, not the 400-char search snippet (more evidence, same
+         rules — Art. VII)
+    """
     src = __import__(
         "discovery_fabric.prior_art_v2.sources", fromlist=["x"])
     fetched: Dict[str, Any] = {"claims_text": "", "abstract": "",
-                               "fetch_status": "NOT_ATTEMPTED"}
+                               "fetch_status": "NOT_ATTEMPTED",
+                               "fetch_path": None}
     if patent_id:
+        canonical = src.google_patents_canonical_id(patent_id)
         try:
-            r = src.fetch_google_patent_full_claims(patent_id)
+            r = src.fetch_google_patent_full_claims(canonical or patent_id)
             if r.get("claims") or r.get("abstract"):
                 fetched["claims_text"] = " ".join(r.get("claims") or [])
                 fetched["abstract"] = str(r.get("abstract") or "")
                 fetched["fetch_status"] = "OK"
+                fetched["fetch_path"] = "google_patents_canonical"
             else:
                 fetched["fetch_status"] = str(
                     r.get("error") or "EMPTY_RESPONSE")
         except Exception as exc:  # noqa: BLE001
             fetched["fetch_status"] = f"{type(exc).__name__}: {exc}"
+        # Lens full-abstract fallback — claims unavailable, but the
+        # COMPLETE abstract is strictly better evidence than the
+        # 400-char snippet (measured: all 30 family reps in the six
+        # fresh runs were stuck on truncated snippets)
+        if fetched["fetch_status"] != "OK":
+            google_error = str(fetched["fetch_status"])
+            try:
+                lr = src.fetch_lens_patent_full_abstract(patent_id)
+                if lr.get("abstract_full"):
+                    fetched["abstract"] = str(lr["abstract_full"])
+                    fetched["fetch_status"] = "OK"
+                    fetched["fetch_path"] = (
+                        "lens_doc_key_full_abstract (google claims "
+                        f"unavailable: {google_error})")
+                else:
+                    fetched["lens_fallback_error"] = str(
+                        lr.get("error") or "NO_ABSTRACT")
+            except Exception as exc:  # noqa: BLE001
+                fetched["lens_fallback_error"] = f"{type(exc).__name__}: {exc}"
     return fetched
 
 
@@ -674,7 +1007,8 @@ def resolve_differentiation(families: List[Dict[str, Any]],
         claims = (fetch_claim_evidence(rep.patent_id, rep)
                   if deep_fetch else {"fetch_status": "NOT_ATTEMPTED"})
         tier = evidence_tier(rep, claims)
-        cov = coverage_decision(profile, family_text(rep, claims))
+        fam_text = family_text(rep, claims)
+        cov = coverage_decision(profile, fam_text)
         per_family.append({
             "family_id": fam["family_id"],
             "representative": {
@@ -686,6 +1020,15 @@ def resolve_differentiation(families: List[Dict[str, Any]],
             "member_patent_ids": [m.patent_id for m in fam["members"]],
             "evidence_tier": tier,
             "claims_fetch_status": claims.get("fetch_status"),
+            "claims_fetch_path": claims.get("fetch_path"),
+            # R377: the ADJUDICATED TEXT the coverage decision measured
+            # against, hash-custodied — auditability (the coverage class
+            # is now verifiable from the artifact alone) and instrument
+            # measurability (I4 pair-novelty needs the family text on
+            # the artifact, not just the title)
+            "adjudicated_text_excerpt": fam_text[:1200],
+            "adjudicated_text_sha256": __import__("hashlib").sha256(
+                fam_text.encode("utf-8", errors="ignore")).hexdigest(),
             "coverage": cov,
         })
     tiers = [f["evidence_tier"] for f in per_family]
@@ -761,6 +1104,8 @@ def run_collision(mechanism_map: Dict[str, Any],
                 if a["verdict"] == "MECHANISM_RELEVANT"]
     adjacent = [h for h, a in zip(hits, adjudications)
                 if a["verdict"] == "ADJACENT_ONLY"]
+    term_collisions = [h for h, a in zip(hits, adjudications)
+                       if a["verdict"] == "CROSS_DOMAIN_TERM_COLLISION"]
     families = cluster_families(relevant, adjudications)
     searches_succeeded = bool(hits) or not errors
     resolution = resolve_differentiation(
@@ -803,12 +1148,16 @@ def run_collision(mechanism_map: Dict[str, Any],
         novelty_risk = "UNRESOLVED_INSUFFICIENT_EVIDENCE"
 
     return {
-        "strategy": "mechanism-centered multi-query (R376)",
+        "strategy": "mechanism-centered multi-query (R376; R377 adds the "
+                    "FUNCTION class, entity-anchored cross-domain "
+                    "precision, canonical claims fetch + Lens full "
+                    "abstract)",
         "query_ladder": ladder,
         "candidate_profile": {
             "entity_terms": profile.entity_terms,
             "mechanism_terms": profile.mechanism_terms,
             "distinguishing_terms": profile.distinguishing_terms,
+            "function_terms": profile.function_terms,
             "adjacent_terms": profile.adjacent_terms,
         },
         "patent": {
@@ -832,6 +1181,19 @@ def run_collision(mechanism_map: Dict[str, Any],
                 {"patent_id": h.patent_id, "title": h.title,
                  "source_id": h.source_id, "query_class": h.query_class}
                 for h in adjacent],
+            "cross_domain_term_collisions": [
+                {"patent_id": h.patent_id, "title": h.title,
+                 "source_id": h.source_id,
+                 "query_class": h.query_class,
+                 "overlap_terms": next(
+                     (a["mechanism_overlap_terms"] for a in adjudications
+                      if a["patent_id"] == h.patent_id), [])}
+                for h in term_collisions],
+            "cross_domain_collision_note": (
+                "R377: demoted with recorded terms — mechanism overlap "
+                "without entity overlap and below the non-generic bar "
+                "is a term collision, not prior art (measured: 40% of "
+                "R376 family reps were collisions)"),
         },
         "families": [{
             "family_id": f["family_id"],

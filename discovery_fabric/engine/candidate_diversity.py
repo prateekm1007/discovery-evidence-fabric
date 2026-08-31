@@ -80,7 +80,61 @@ def angle_prompt(base_prompt: str, angle: Tuple[str, str]) -> str:
     angle is an EXPLICIT recorded addition — never a silent prompt change)."""
     name, instruction = angle
     return (f"{base_prompt}\n\nEXPLORATION ANGLE ({name}): {instruction}\n"
-            "Respond in the SAME field format as instructed above.")
+            "Respond in the SAME field format as instructed above.\n\n"
+            "DERIVATION REQUIREMENT (R377): the MECHANISM must be a "
+            "physical/chemical/biological phenomenon DESCRIBED IN THE "
+            "ABSTRACT — even when transferring across industries, "
+            "transfer a phenomenon the paper actually reports, do not "
+            "import one from general engineering knowledge. The "
+            "MECHANISM_SOURCE_SPAN must be the exact sentence that "
+            "reports the phenomenon, and the INTERVENTION must "
+            "instantiate THAT phenomenon in the device. A mechanism "
+            "absent from the paper is a prior-knowledge proposal, not "
+            "an evidence-derived candidate, and will be flagged as "
+            "such.")
+
+
+def span_derivation_check(fields: Dict[str, Any]) -> Dict[str, Any]:
+    """R377 deterministic derivation measurement for one candidate.
+
+    Measures whether the quoted MECHANISM_SOURCE_SPAN substantively
+    supports the MECHANISM + INTERVENTION: shared content terms between
+    the span and the mechanism/intervention text (same term-rule family
+    as the engine adjudicator — Art. II). A span about a different
+    therapy than the mechanism quotes is decoration, not derivation
+    (measured on the R376 survivors: span-derivation 0/17 terms on the
+    medical survivor; 0/14 on aerospace).
+
+    Diagnostic flag — SPAN_UNDERIVED is recorded on the candidate and
+    makes the candidate ineligible for survivor selection (CEO R377:
+    "a higher kill rate is acceptable if the surviving inventions "
+    "become materially better"); it never fabricates a span.
+    """
+    from discovery_fabric.source_registry.query_relevance import terms
+    mechanism = f"{fields.get('mechanism', '')} " \
+                f"{fields.get('intervention', '')}"
+    span = str(fields.get("mechanism_source_span") or "")
+    mech_terms = set(terms(mechanism))
+    span_terms = set(terms(span))
+    if not span_terms or not mech_terms:
+        return {"n_shared": 0, "ratio": None,
+                "underived": True,
+                "state": "NO_SPAN" if not span_terms
+                else "NO_MECHANISM_TERMS"}
+    shared = span_terms & mech_terms
+    ratio = round(len(shared) / len(span_terms), 3)
+    return {
+        "n_shared": len(shared),
+        "shared_terms": sorted(shared)[:20],
+        "span_terms_n": len(span_terms),
+        "ratio": ratio,
+        "underived": ratio < 0.20,
+        "state": "MEASURED",
+        "basis": ("shared content terms between span and "
+                  "mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED "
+                  "(the quoted span does not contain the mechanism's "
+                  "vocabulary)"),
+    }
 
 
 def generate_diverse_candidates(problem: Dict[str, Any],
@@ -158,7 +212,11 @@ def _run_grid(problem: Dict[str, Any], evidence: List[Dict[str, Any]],
             if res.ok:
                 fields = _parse_fields(res.content)
                 if fields.get("intervention"):
+                    fields["span_derivation"] = span_derivation_check(
+                        fields)
                     entry["fields"] = fields
+                    entry["span_underived"] = fields[
+                        "span_derivation"]["underived"]
                     entry["candidate_id"] = (
                         f"cand:DIV:{angle[0]}:{pid}:"
                         f"{(res.output_hash or '')[:12]}")

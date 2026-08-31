@@ -100,6 +100,26 @@ def retrieve(problem: dict) -> list[dict]:
             time.sleep(1.0)
             items = search_europe_pmc(fallback, per_page=5)
             queries.append(fallback)
+    if not items:
+        # R377 measured defect (stress test m7, titanium grinding): for
+        # NON-MEDICAL engineering domains the device string itself can
+        # be long and specific enough to zero-hit EuropePMC even after
+        # the fallback ('vitrified-bond aluminum-oxide grinding wheel
+        # for titanium alloy parts wheel mechanism' -> 0) while a
+        # CORE-TERM query returns real domain literature ('titanium
+        # grinding wheel loading' -> 2, 'grinding titanium alloy' -> 3).
+        # A third escalation on the top content terms of device+failure
+        # is search-BREADTH expansion (more evidence sought, Art.
+        # XXI.2 discipline intact: every query recorded, absence never
+        # claimed without exhausting the ladder).
+        core = " ".join(sanitize_query(
+            f"{device} {fm.lower().replace('_', ' ')}").split()[:4])
+        if core and core not in queries:
+            print(f"  [retrieve] fallback returned 0 — core-term query: "
+                  f"{core}")
+            time.sleep(1.0)
+            items = search_europe_pmc(core, per_page=5)
+            queries.append(core)
     time.sleep(1.0)
     print(f"  [retrieve] found {len(items)} evidence items "
           f"(queries tried: {len(queries)})")
