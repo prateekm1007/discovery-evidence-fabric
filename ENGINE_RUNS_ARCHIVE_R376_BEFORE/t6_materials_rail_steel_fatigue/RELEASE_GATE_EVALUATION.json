@@ -1,0 +1,135 @@
+{
+ "gate": "E16_HOLDOUT_RELEASE_GATE",
+ "version": "1.0.0",
+ "gates": {
+  "SUBSTANTIVE_DEPTH": {
+   "verdict": "PASS",
+   "dims_at_or_above_p25": 8,
+   "deficient_areas": [
+    "engineering_specificity: 0.269 < reference P25 0.526 (reference min 0.263)",
+    "failure_analysis: 0.385 < reference P25 0.5 (reference min 0.5)"
+   ],
+   "content_vector": {
+    "mechanism_reasoning": 0.5,
+    "engineering_specificity": 0.269,
+    "equation_applicability": 5.0,
+    "parameter_reasoning": 1.0,
+    "failure_analysis": 0.385,
+    "vnv_quality": 1.031,
+    "manufacturing_reasoning": 0.5,
+    "transfer_reasoning": 0.462,
+    "buyer_usefulness": 0.375,
+    "unknown_disclosure": 0.447
+   }
+  },
+  "CAUSAL_CORRECTNESS": {
+   "verdict": "CONDITIONAL",
+   "counts": {
+    "CORRECT": 4,
+    "QUESTIONABLE": 5,
+    "INCORRECT": 0
+   },
+   "rule": "one INCORRECT critical chain blocks release (E16-H); QUESTIONABLE chains are bound to the decisive experiment and buyer diligence"
+  },
+  "TRACEABILITY": {
+   "verdict": "PASS",
+   "trace_passed": true,
+   "untraceable_fields": [],
+   "orphan_primary_design_inputs": []
+  },
+  "PROVENANCE": {
+   "verdict": "PASS",
+   "number_provenance_violations": [],
+   "display_value_integrity_all_verifiable": true,
+   "chain_enforcement_coverage": 1.0
+  },
+  "DOMAIN_REASONING": {
+   "verdict": "PASS",
+   "why_this_domain_present": true,
+   "matched_signals": [
+    "thermal"
+   ],
+   "all_equations_judged": true,
+   "mechanism_sensitivity_present": true,
+   "mechanism_sensitivity_models_at_risk": 2
+  },
+  "HOLDOUT_TEST": {
+   "verdict": "FAIL",
+   "seal_verified": true,
+   "blind_packages": [
+    "01_multisegment_flow_control",
+    "09_uwb_localization"
+   ],
+   "dims_at_or_above_blind_min": 7,
+   "dimensions": {
+    "mechanism_reasoning": {
+     "value": 0.5,
+     "blind_min": 0.125,
+     "at_or_above_blind_min": true
+    },
+    "engineering_specificity": {
+     "value": 0.269,
+     "blind_min": 0.55,
+     "at_or_above_blind_min": false
+    },
+    "equation_applicability": {
+     "value": 5.0,
+     "blind_min": 1.0,
+     "at_or_above_blind_min": true
+    },
+    "parameter_reasoning": {
+     "value": 1.0,
+     "blind_min": 1.0,
+     "at_or_above_blind_min": true
+    },
+    "failure_analysis": {
+     "value": 0.385,
+     "blind_min": 0.5,
+     "at_or_above_blind_min": false
+    },
+    "vnv_quality": {
+     "value": 1.031,
+     "blind_min": 0.2,
+     "at_or_above_blind_min": true
+    },
+    "manufacturing_reasoning": {
+     "value": 0.5,
+     "blind_min": 1.0,
+     "at_or_above_blind_min": false
+    },
+    "transfer_reasoning": {
+     "value": 0.462,
+     "blind_min": 0.182,
+     "at_or_above_blind_min": true
+    },
+    "buyer_usefulness": {
+     "value": 0.375,
+     "blind_min": 0.375,
+     "at_or_above_blind_min": true
+    },
+    "unknown_disclosure": {
+     "value": 0.447,
+     "blind_min": 0.176,
+     "at_or_above_blind_min": true
+    }
+   },
+   "policy": ">= 7/10 content dimensions at or above the blind holdout minimum and no dimension below 0.5x that minimum"
+  }
+ },
+ "verdicts": {
+  "SUBSTANTIVE_DEPTH": "PASS",
+  "CAUSAL_CORRECTNESS": "CONDITIONAL",
+  "TRACEABILITY": "PASS",
+  "PROVENANCE": "PASS",
+  "DOMAIN_REASONING": "PASS",
+  "HOLDOUT_TEST": "FAIL"
+ },
+ "decision": "FAIL",
+ "decision_rule": "RELEASED = all six PASS; HELD_FOR_HUMAN_REVIEW = any CONDITIONAL; BLOCKED = any FAIL",
+ "policy_detail": {
+  "RELEASED": "all six gates PASS",
+  "HELD_FOR_HUMAN_REVIEW": "any gate CONDITIONAL — requires human engineering review before release; NEVER counted as an automatic PASS (CEO E16-H)",
+  "BLOCKED": "any gate FAIL — the dossier does not leave the engine"
+ },
+ "evaluated_at": "2026-08-30T12:21:01+00:00Z"
+}

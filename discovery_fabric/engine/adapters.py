@@ -332,24 +332,44 @@ class MultiSourceDiscoveryAdapter(BaseAdapter):
 
 
 class CollisionEngineAdapter(BaseAdapter):
-    """Canonical composite: prior-art side = a2/prior_art.search_prior_art
-    (ACTIVE, legacy vocabulary -> explicit map); patent side =
-    prior_art_v2/sources.search_google_patents (TEST_ONLY, keyless) with
-    Gate-Q functional-equivalence query expansion. Rejected alternatives
-    (recorded): scripts/r258+r259 one-shot round scripts (not importable);
-    retrieval_v4 full stack (requires NVIDIA key; promoted later)."""
+    """Canonical composite (R376 mechanism-centered collision):
+    patent side = prior_art_v2.collision_resolution.run_collision —
+    multi-query ladder (entity/mechanism/distinguishing/adjacent) over
+    google_patents + lens_patent, mechanism-level adjudication against
+    the candidate profile, deterministic family clustering, and a
+    resolution state machine (RESOLVED_DIFFERENTIATED /
+    RESOLVED_ANTICIPATED / UNRESOLVED_*). Scientific side =
+    a2/prior_art.search_prior_art (EuropePMC, keyword_form queries).
+    Rejected alternatives (recorded): scripts/r258+r259 one-shot round
+    scripts (not importable); retrieval_v4 full stack (requires NVIDIA
+    key; promoted later)."""
     capability_id = "COLLISION_ENGINE"
-    module_path = ("discovery_fabric/a2/prior_art.py + "
-                   "discovery_fabric/prior_art_v2/sources.py")
-    canonical_fn = "search_prior_art + search_google_patents"
+    module_path = ("discovery_fabric/prior_art_v2/collision_resolution.py + "
+                   "discovery_fabric/a2/prior_art.py")
+    canonical_fn = "run_collision (mechanism-centered) + search_prior_art"
     needs_network = True
     depends_on = ["SYNTHESIS"]
 
     def execute(self, env, run_ctx):
+        # ---------------- scientific side (EuropePMC) -------------------
+        # QUERY-FORM (R375/R376): keyword_form of device+failure and of
+        # the mechanism — the old raw '{device} {intervention[:50]}'
+        # queries measured as filler-polluted ('knee prosthesis Implement
+        # a comprehensive post-market surveillance').
         pa = importlib.import_module("discovery_fabric.a2.prior_art")
         mm = env.mechanism_map
         intervention = mm.get("intervention", "") or env.problem.get("failure", "")
-        sci = pa.search_prior_art(intervention[:200], env.problem.get("device", ""))
+        from discovery_fabric.source_registry.query_relevance import (
+            keyword_form as _kwf)
+        device = env.problem.get("device", "")
+        failure = env.problem.get("failure", "")
+        sci_queries = [
+            _kwf(f"{device} {failure}", max_terms=6),
+            _kwf(str(mm.get("mechanism") or intervention), max_terms=6),
+        ]
+        sci_queries = [q for q in sci_queries if q.strip()] or \
+            [_kwf(intervention, max_terms=6)]
+        sci = pa.search_prior_art_with_queries(sci_queries)
         legacy = sci.get("prior_art_status", "")
         mapping = PRIOR_ART_STATUS_MAP.get(legacy)
         if mapping is None:
@@ -357,123 +377,55 @@ class CollisionEngineAdapter(BaseAdapter):
                 f"unmapped legacy prior-art status: {legacy!r} — refuse to guess "
                 "(Art. XXVII: no silent semantic promotion)")
 
-        # Patent-side collision search with functional-equivalence
-        # expansion.
-        #
-        # QUERY-FORM FIX (2026-08-31, CEO source-routing directive): the
-        # old query took the FIRST 6 words >3 chars of the intervention —
-        # measured defect: 'Implement multi-modal sensing system within
-        # battery pack...' produced the query 'implement multi-sensory
-        # monitoring system using x-ray', and Google Patents answered
-        # radiographic imagers and SURGICAL ROBOTS as the "nearest prior
-        # art" for a battery-sensing candidate (recorded in
-        # t6_energy_ev_thermal_runaway/envelope_KILLER_EXPERIMENT.json).
-        # The query now uses the engine keyword_form (filler words
-        # 'implement/system/using/within' dropped — the search asks about
-        # the CONTENT, not the sentence around it).
-        src = importlib.import_module("discovery_fabric.prior_art_v2.sources")
-        from discovery_fabric.source_registry.query_relevance import (
-            keyword_form as _keyword_form)
-        kw_query = _keyword_form(intervention, max_terms=6)
-        base_terms = kw_query.split() or [w for w in
-                                          intervention.lower().replace(",", " ").split()
-                                          if len(w) > 3][:6]
-        expansions: List[str] = []
-        for w in base_terms:
-            expansions += _keyword_hits(w, FUNCTION_EQUIV_EXPANSION)
-        patent_queries = [" ".join(base_terms)]
-        if expansions:
-            patent_queries.append(" ".join(sorted(set(expansions))[:6]))
-        patent_hits, patent_errors = [], []
-        for q in patent_queries[:2]:
-            sqr = src.search_google_patents(q, num_results=5)
-            if sqr.success:
-                for h in sqr.hits:
-                    patent_hits.append(asdict(h))
-            else:
-                patent_errors.append(
-                    {"query": q, "error": sqr.error,
-                     "epistemic_state": "UNRESOLVED_SOURCE_FAILURE"})
+        # ---------------- patent side: mechanism-centered collision -----
+        # R376 (CEO prior-art differentiation + resolution directive):
+        # the measured defects (F/E/B/M, PRIOR_ART_FAILURE_TRACE.json)
+        # are fixed HERE — multi-query ladder around the mechanism and
+        # distinguishing technical features, two patent sources,
+        # mechanism-level adjudication BEFORE nearest-prior-art status,
+        # family clustering, honest resolution states.
+        cr = importlib.import_module(
+            "discovery_fabric.prior_art_v2.collision_resolution")
+        collision = cr.run_collision(mm, env.problem)
+        resolution = collision["differentiation_resolution"]
+        novelty_risk = collision["novelty_risk"]
 
-        # RELEVANCE FILTER (2026-08-31, Art. XXI.4 — the collision stage is
-        # an entry point into the evidence pipeline): every patent hit is
-        # adjudicated against the intervention's content terms with the
-        # SAME term-overlap rule family as every other pipeline entry
-        # point (>= 2 shared terms). Off-domain hits stay RECORDED with
-        # their verdict (disclosed, never silently dropped — Art. XV) but
-        # do not enter nearest_prior_art, so the differentiation link
-        # compares the candidate against REAL adjacent art, not keyword
-        # collisions from an unrelated domain.
-        from discovery_fabric.source_registry.query_relevance import (
-            adjudicate_record as _adjudicate)
-        patent_adjudications = []
-        for h in patent_hits:
-            adj = _adjudicate(
-                {"record_id": h.get("patent_id") or h.get("source_id"),
-                 "title": h.get("title") or "",
-                 "normalized": {}},
-                " ".join(base_terms))
-            adj["query"] = patent_queries[0] if patent_queries else ""
-            patent_adjudications.append(adj)
-        relevant_hits = [h for h, a in zip(patent_hits, patent_adjudications)
-                         if a["relevance"] == "RELEVANT"]
-        nearest_pool = relevant_hits or []
-
-        overlap = [h for h in nearest_pool
-                   if any(w in (h.get("title") or "").lower()
-                          for w in base_terms[:3])] or nearest_pool[:2]
-        if nearest_pool and overlap:
-            novelty_risk = "ADJACENT_COLLISION_CANDIDATES"
-        elif patent_hits:
-            novelty_risk = "SEARCHED_NO_DIRECT_TITLE_MATCH"
-        elif patent_errors and not patent_hits:
-            novelty_risk = "UNRESOLVED_INSUFFICIENT_EVIDENCE"
-        else:
-            novelty_risk = "NO_MATCH_FOUND"
-
-        collision = {
-            "scientific": {"legacy_status": legacy,
-                           "mapped_status": mapping["mapped"],
-                           "mapping_rationale": mapping["rationale"],
-                           "result_count": sci.get("result_count"),
-                           "results": sci.get("results", []),
-                           "queries": sci.get("queries", []),
-                           "limitations": sci.get("limitations", [])},
-            "patent": {"queries": patent_queries,
-                       "query_form": "keyword (engine keyword_form — "
-                                      "measured filler-word query pollution "
-                                      "2026-08-31)",
-                       "query_expansion": {
-                           "method": "FUNCTION_EQUIV_EXPANSION (Gate-Q doctrine)",
-                           "epistemic_class": "MODEL_DERIVED",
-                           "expansions": expansions},
-                       "hits": patent_hits, "source_errors": patent_errors,
-                       "hit_count": len(patent_hits),
-                       "relevance_adjudications": patent_adjudications,
-                       "relevant_hit_count": len(relevant_hits)},
-            "novelty_risk": novelty_risk,
-            "nearest_prior_art": [
-                {"title": h.get("title"), "patent_id": h.get("patent_id"),
-                 "url": h.get("source_url")} for h in nearest_pool[:3]],
-            "nearest_prior_art_note": (
-                "relevance-filtered (Art. XXI.4): entries adjudicated "
-                "RELEVANT against the intervention content terms; "
-                "off-domain hits remain recorded in patent.hits with "
-                "their verdicts — never silently dropped"),
-            "actions": ["inspect_nearest_claims" if nearest_pool
-                        else "expand_search_sources"],
-            "timestamp": utc_now(),
+        collision["scientific"] = {
+            "legacy_status": legacy,
+            "mapped_status": mapping["mapped"],
+            "mapping_rationale": mapping["rationale"],
+            "result_count": sci.get("result_count"),
+            "results": sci.get("results", []),
+            "queries": sci.get("queries", []),
+            "limitations": sci.get("limitations", []),
         }
-        prior_art_ids = [h.get("patent_id") or h.get("source_id", "")
-                         for h in nearest_pool[:5]] or \
-                        [h.get("patent_id") or h.get("source_id", "")
-                         for h in patent_hits[:5]]
+        # prior_art_status: the PATENT-SIDE resolution state is the
+        # prior-art position (patents are the differentiation universe);
+        # the scientific mapping stays recorded alongside (no silent
+        # promotion of literature evidence either way — Art. XXVII)
+        collision["prior_art_status"] = resolution["state"]
+        collision["prior_art_status_basis"] = {
+            "authority": "patent-side differentiation_resolution",
+            "scientific_mapped_status": mapping["mapped"],
+            "note": ("scientific (EuropePMC) status recorded; the "
+                     "prior-art POSITION comes from the patent-side "
+                     "resolution with per-family evidence tiers"),
+        }
+
+        prior_art_ids = [p.get("patent_id") for p in
+                         collision.get("nearest_prior_art", [])
+                         if p.get("patent_id")] or \
+                        [h.get("patent_id") for h in
+                         (collision.get("patent", {}).get("hits") or [])
+                         if h.get("patent_id")]
         return _engine_result(
             {"collision_results": collision,
-             "prior_art": {"prior_art_status": mapping["mapped"],
+             "prior_art": {"prior_art_status": resolution["state"],
                            "legacy_status": legacy,
+                           "differentiation_resolution": resolution,
                            "scientific_report": sci,
-                           "state_vocabulary": "classify/v4_corrections"},
+                           "state_vocabulary":
+                               "collision_resolution R376 + classify/v4"},
              "prior_art_ids": [p for p in prior_art_ids if p]},
             novelty_risk=novelty_risk)
 
@@ -678,7 +630,12 @@ class AdjudicationAdapter(BaseAdapter):
             {"check": "no_specific_prior_disclosure",
              "result": env.prior_art.get("prior_art_status") not in
                        ("SPECIFIC_DISCLOSURE",
-                        "IDENTICAL_OR_NEAR_IDENTICAL_DISCLOSURE"),
+                        "IDENTICAL_OR_NEAR_IDENTICAL_DISCLOSURE",
+                        # R376: search-derived specific-disclosure-class
+                        # finding (claim/abstract-level full coverage of
+                        # mechanism + distinguishing terms; per-family
+                        # evidence in collision_results)
+                        "RESOLVED_ANTICIPATED"),
              "inputs_hash": sha256_obj(env.prior_art.get("prior_art_status", ""))},
             {"check": "collision_not_unresolved",
              "result": env.collision_results.get("novelty_risk") not in

@@ -16,6 +16,16 @@ STATES = [
 KILL_STATES = {
     "SPECIFIC_DISCLOSURE",
     "IDENTICAL_OR_NEAR_IDENTICAL_DISCLOSURE",
+    # R376 (CEO prior-art differentiation + resolution directive):
+    # RESOLVED_ANTICIPATED is a search-derived specific-disclosure-class
+    # finding — a prior-art family whose claim/abstract text covers the
+    # candidate's mechanism AND >= 80% of its distinguishing terms
+    # (thresholds declared in collision_resolution.THRESHOLDS, per-family
+    # evidence recorded in collision_results.differentiation_resolution).
+    # It kills promotion exactly like SPECIFIC_DISCLOSURE, with the
+    # evidence trail recorded; it is NOT a novelty determination
+    # (Art. XXVIII limitation carried inline in the resolution record).
+    "RESOLVED_ANTICIPATED",
 }
 
 # Prior-art states that do NOT kill (Item 4)
@@ -24,6 +34,13 @@ NON_KILL_STATES = {
     "TOPICAL_RELATED",
     "POSSIBLE_RELEVANCE",
     "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    # R376 resolution states (collision_resolution.py):
+    # the position is resolved with surviving differentiators — the
+    # candidate MAY promote (attack/adjudication still apply)
+    "RESOLVED_DIFFERENTIATED",
+    # honest unresolved states — never converted either way (Art. XXV)
+    "UNRESOLVED_PARTIAL_EVIDENCE",
+    "UNRESOLVED_NO_RELEVANT_ART",
 }
 
 

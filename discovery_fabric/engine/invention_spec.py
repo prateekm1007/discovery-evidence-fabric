@@ -204,23 +204,48 @@ def build_invention_spec(env: Candidate, run_ctx: Dict[str, Any]) -> Dict[str, A
     spec["prior_art"] = tagged(
         {"status": (env.prior_art or {}).get("prior_art_status", ""),
          "legacy_status": (env.prior_art or {}).get("legacy_status", ""),
+         "differentiation_resolution":
+             (env.prior_art or {}).get("differentiation_resolution")
+             or (env.collision_results or {})
+             .get("differentiation_resolution", {}),
          "nearest": (env.collision_results or {}).get("nearest_prior_art", []),
-         "queries": (env.collision_results or {}).get("patent", {}).get("queries", []),
+         "queries": [
+             {"query_class": s.get("query_class"), "query": s.get("query")}
+             for s in (env.collision_results or {})
+             .get("query_ladder", [])],
          "scientific": ((env.prior_art or {}).get("scientific_report") or {})
                        .get("results", [])},
         "COMPUTED", "COLLISION",
         note="search RESULTS with source errors preserved as UNRESOLVED, "
              "never converted to absence (Art. XXV); FULL result list "
-             "preserved (no truncation, Directive 6)")
+             "preserved (no truncation, Directive 6); resolution states "
+             "are SEARCH_RESULT class positions, not novelty "
+             "determinations (Art. XXVIII)")
 
+    nearest_entries = (env.collision_results or {}) \
+        .get("nearest_prior_art", [])
     spec["distinguishing_features"] = tagged(
         {"intervention": mm.get("intervention", ""),
          "vs_nearest_prior_art": [
-             {"title": p.get("title"), "patent_id": p.get("patent_id")}
-             for p in (env.collision_results or {})
-             .get("nearest_prior_art", [])],
-         "note": "differences are asserted by synthesis and NOT yet claim-"
-                 "audited against the nearest patents"},
+             {"title": p.get("title"), "patent_id": p.get("patent_id"),
+              "family_id": p.get("family_id"),
+              "family_size": p.get("family_size"),
+              "evidence_tier": p.get("evidence_tier"),
+              "coverage_class": p.get("coverage_class"),
+              "coverage_ratio": p.get("coverage_ratio"),
+              "mechanism_overlap_terms":
+                  p.get("mechanism_overlap_terms"),
+              "distinguishing_terms_surviving":
+                  p.get("distinguishing_terms_surviving")}
+             for p in nearest_entries],
+         "surviving_differentiators":
+             ((env.collision_results or {})
+              .get("differentiation_resolution", {})
+              .get("surviving_differentiators")),
+         "note": ("R376: nearest entries are mechanism-relevant family "
+                  "representatives with per-family coverage and evidence "
+                  "tier; differences below the term-overlap thresholds "
+                  "are recorded, not claim-charted (Art. XXVIII)")},
         "MODELLED", "SYNTHESIZE",
         evidence_ids=synthesis_citation,
         note="claim-level differentiation requires the inspection action "

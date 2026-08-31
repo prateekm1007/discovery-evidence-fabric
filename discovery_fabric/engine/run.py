@@ -356,6 +356,29 @@ class EngineRun:
             # primary = the discovery-loop survivor; ensemble members join
             # as independent invention candidates (same problem, same
             # evidence, different model path).
+            #
+            # R376 (prior-art differentiation directive, defect class E):
+            # a grid/ensemble candidate MUST NOT inherit the naive
+            # candidate's collision results — measured defect
+            # (M1_m1_t02_knee...): the CFRP grid candidate carried
+            # 'data marketplace' patents found by the NAIVE candidate's
+            # surveillance-system queries. Every non-primary candidate
+            # now gets its OWN mechanism-centered collision run; on
+            # failure the prior-art state is UNRESOLVED_INSUFFICIENT_
+            # EVIDENCE with the error recorded — inherited art is never
+            # silently reused and unknown is never converted (Art. XXV).
+            def _collision_for_candidate(mm: Dict[str, Any]):
+                """Returns (result_dict_or_None, error_string_or_None).
+                ALWAYS a 2-tuple — a bare dict return would unpack its
+                KEYS into (new_collision, coll_err) and crash every grid
+                candidate (measured: GRID_ERROR TypeError on the first
+                fresh medical run)."""
+                try:
+                    from .prior_art_v2_bridge import candidate_collision
+                    return candidate_collision(mm, self.problem), None
+                except Exception as exc:  # noqa: BLE001 — honest record
+                    return None, f"{type(exc).__name__}: {exc}"
+
             def _env_with_candidate(cand: Dict[str, Any]):
                 d = self.env.to_dict()
                 mm = dict(d.get("mechanism_map") or {})
@@ -368,6 +391,31 @@ class EngineRun:
                         cand.get("mechanism_source_span", ""),
                     "raw_candidate": cand})
                 d["mechanism_map"] = mm
+                new_collision, coll_err = _collision_for_candidate(mm)
+                if new_collision is not None:
+                    d["collision_results"] = new_collision["collision"]
+                    d["prior_art"] = new_collision["prior_art"]
+                else:
+                    d["collision_results"] = {
+                        "strategy": "mechanism-centered multi-query (R376)",
+                        "collision_rerun_error": coll_err,
+                        "novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+                        "differentiation_resolution": {
+                            "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+                            "epistemic_class": "SEARCH_RESULT",
+                            "reason": f"per-candidate collision re-run "
+                                      f"failed: {coll_err}",
+                            "constitutional_limitation":
+                                "unknown stays unknown (Art. XXV)"},
+                        "nearest_prior_art": [],
+                    }
+                    d["prior_art"] = {
+                        "prior_art_status":
+                            "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+                        "differentiation_resolution":
+                            d["collision_results"][
+                                "differentiation_resolution"],
+                        "state_vocabulary": "collision_resolution R376"}
                 return Candidate.from_dict(d)
 
             pool: List[Dict[str, Any]] = []
@@ -452,9 +500,11 @@ class EngineRun:
                             "origin": f"EXPLORATION_GRID_{c.get('angle')}"
                                       f"({c.get('provider_id')})"})
                 except Exception as exc:  # noqa: BLE001 — recorded, honest
+                    import traceback as _tb
                     self._persist("EXPLORATION_GRID.json", {
                         "status": "GRID_ERROR",
-                        "error": f"{type(exc).__name__}: {exc}"})
+                        "error": f"{type(exc).__name__}: {exc}",
+                        "traceback": _tb.format_exc()[-2000:]})
                     grid_result = None
 
             # ---------- E15-F/E15-G: attack all, repair viable ------------

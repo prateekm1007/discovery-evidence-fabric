@@ -397,32 +397,44 @@ class TestCollisionQueryForm:
 
 
 class TestCollisionPriorArtFilter:
-    """End-to-end through CollisionEngineAdapter.execute with stubbed
-    patent search + prior-art modules."""
+    """End-to-end through CollisionEngineAdapter.execute with the R376
+    mechanism-centered collision core (network touchpoints stubbed).
+
+    Re-pins the four R375 behaviors through the NEW architecture:
+      1. off-domain patents never become nearest prior art
+      2. off-domain hits stay recorded with verdicts (Art. XV)
+      3. the query ladder carries the domain content (battery/thermal)
+      4. novelty_risk recomputes on the filtered (family) pool
+    """
 
     @pytest.fixture()
     def collision_result(self, monkeypatch):
+        import dataclasses
         import types
+        import sys
         adapter_mod = pytest.importorskip(
             "discovery_fabric.engine.adapters")
-        # stub a2.prior_art.search_prior_art
+        # stub a2.prior_art.search_prior_art_with_queries (scientific side)
         pa = types.ModuleType("discovery_fabric.a2.prior_art")
-        pa.search_prior_art = lambda text, device: {
+        pa.search_prior_art_with_queries = lambda queries: {
             "prior_art_status": "NO_MATCHING_EVIDENCE_FOUND",
-            "result_count": 0, "results": [], "queries": ["q"],
+            "result_count": 0, "results": [], "queries": list(queries),
             "limitations": [],
         }
-        # stub prior_art_v2.sources.search_google_patents: return the
-        # MEASURED junk hits + one genuine adjacent-art hit (as dataclass
-        # instances — the adapter calls asdict() on each hit)
-        src = types.ModuleType("discovery_fabric.prior_art_v2.sources")
-        import dataclasses
+        monkeypatch.setitem(sys.modules,
+                            "discovery_fabric.a2.prior_art", pa)
+
+        # stub the collision core's network touchpoints (the MEASURED
+        # t6_energy junk hits + one genuine adjacent-art hit)
+        from discovery_fabric.prior_art_v2 import collision_resolution \
+            as cr_mod
 
         @dataclasses.dataclass
         class _Hit:
             title: str
             patent_id: str
             source_url: str
+            snippet: str = ""
 
         _HITS = [
             _Hit("Portable radiographic imaging apparatus and system",
@@ -430,18 +442,29 @@ class TestCollisionPriorArtFilter:
             _Hit("Robotic surgical system for insertion of surgical "
                  "implants", "US20230181258A1", "u2"),
             _Hit("Battery package thermal runaway early warning system "
-                 "with optical sensing", "CN212313296U", "u3"),
+                 "with optical sensing", "CN212313296U", "u3",
+                 "A battery package thermal runaway early warning system "
+                 "with optical sensing of cell off-gas for EV battery "
+                 "packs, providing early warning before propagation."),
         ]
 
-        class _SQR:
-            success = True
-            error = None
-            hits = _HITS
-        src.search_google_patents = lambda q, num_results=5: _SQR()
-        import sys
-        monkeypatch.setitem(sys.modules, "discovery_fabric.a2.prior_art", pa)
-        monkeypatch.setitem(
-            sys.modules, "discovery_fabric.prior_art_v2.sources", src)
+        def _fake_search(ladder, sources=None, sleep_between=0.4,
+                         per_source_results=5):
+            hits = []
+            for h in _HITS:
+                hits.append(cr_mod.PatentHit(
+                    patent_id=h.patent_id, title=h.title,
+                    snippet=h.snippet, source_id="google_patents",
+                    source_url=h.source_url, query_class="DISTINGUISHING",
+                    query="q", assignee="", publication_date="",
+                    raw_payload_sha256=""))
+            return hits, []
+
+        monkeypatch.setattr(cr_mod, "search_patents", _fake_search)
+        monkeypatch.setattr(
+            cr_mod, "fetch_claim_evidence",
+            lambda patent_id, hit: {"claims_text": "", "abstract": "",
+                                    "fetch_status": "NOT_ATTEMPTED"})
 
         from discovery_fabric.engine.candidate import Candidate
         env = Candidate(
@@ -474,34 +497,46 @@ class TestCollisionPriorArtFilter:
     def test_offdomain_hits_stay_recorded_with_verdicts(self,
                                                         collision_result):
         """Art. XV: junk hits are disclosed with adjudications, not
-        silently dropped. (Two queries run — base + expansion — so each
-        hit is adjudicated once per query.)"""
+        silently dropped. R376: every hit is adjudicated against the
+        candidate profile (mechanism U distinguishing terms), not the
+        query string."""
         collision = collision_result["apply_to"]["collision_results"]
         adjudications = collision["patent"]["relevance_adjudications"]
-        assert len(adjudications) == 6  # 2 queries x 3 hits, all adjudicated
-        by_record = {}
-        for a in adjudications:
-            by_record.setdefault(a["record_id"], set()).add(a["relevance"])
-        assert by_record["US20230181258A1"] == {"IRRELEVANT_FILTERED"}
-        assert by_record["US9492137B2"] == {"IRRELEVANT_FILTERED"}
-        assert by_record["CN212313296U"] == {"RELEVANT"}
-        assert collision["patent"]["hit_count"] == 6
-        assert collision["patent"]["relevant_hit_count"] >= 1
+        by_record = {a["patent_id"]: a["verdict"]
+                     for a in adjudications}
+        assert len(adjudications) == 3  # 3 hits, each adjudicated once
+        assert by_record["US20230181258A1"] == "IRRELEVANT"
+        assert by_record["US9492137B2"] in ("IRRELEVANT", "ADJACENT_ONLY")
+        assert by_record["CN212313296U"] == "MECHANISM_RELEVANT"
+        assert collision["patent"]["hit_count"] == 3
+        assert collision["patent"]["relevant_hit_count"] == 1
 
-    def test_patent_query_is_keyword_form(self, collision_result):
+    def test_query_ladder_carries_domain_content(self,
+                                                 collision_result):
+        """R376: the query ladder is mechanism/entity-centered — the
+        ENTITY query must anchor the battery/thermal domain (measured
+        R375 defect: the query carried neither)."""
         collision = collision_result["apply_to"]["collision_results"]
-        queries = collision["patent"]["queries"]
-        assert queries, "patent queries recorded"
-        first = queries[0]
-        for filler in ("implement", "system", "using", "within"):
-            assert not first.startswith(filler)
-        assert "battery" in first or "sensing" in first
+        ladder = collision["query_ladder"]
+        assert ladder, "query ladder recorded"
+        entity_q = next(s["query"] for s in ladder
+                        if s["query_class"] == "ENTITY")
+        assert "battery" in entity_q
+        assert "thermal" in entity_q
+        for step in ladder:
+            for filler in ("implement", "using", "within"):
+                assert filler not in step["query"].split()
 
     def test_novelty_risk_recomputes_on_filtered_pool(self,
                                                       collision_result):
         collision = collision_result["apply_to"]["collision_results"]
-        # one relevant hit that overlaps base terms -> ADJACENT candidates
+        # one mechanism-relevant family -> ADJACENT candidates
         assert collision["novelty_risk"] == "ADJACENT_COLLISION_CANDIDATES"
+        # R376: the resolution state is the prior-art position
+        res = collision["differentiation_resolution"]
+        assert res["state"] in ("RESOLVED_DIFFERENTIATED",
+                                "UNRESOLVED_PARTIAL_EVIDENCE")
+        assert collision["prior_art_status"] == res["state"]
 
 
 class TestGrammarMismatchStatusModel:
