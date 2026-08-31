@@ -1,0 +1,620 @@
+{
+ "invention_id": {
+  "value": "inv:w9_nephrology_hemodialysis_dose_flow_limit:83bb2ea13ac5",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "w9_nephrology_hemodialysis_dose_flow_limit",
+   "device": "maintenance hemodialysis extracorporeal circuit (blood pump, arterial/venous limb, dialyser, dialysate path)",
+   "failure": "Documented nephrology problem: maintenance hemodialysis patients receive a prescribed dialysis dose (commonly indexed as single-pool Kt/V, with guideline targets reported around 1.2-1.4 per session in the literature) that depends directly on the sustained blood flow rate through the extracorporeal circuit and the dialysate flow rate across the dialyser. When the delivered blood flow rate falls below the prescribed value (prescriptions commonly in the 300-500 mL/min range in the literature, with some reports of inadequate dose at lower effective flows), the delivered dose falls short and session time must be extended. Documented contributing factors include vascular access recirculation, arterial and venous pressure limits of the circuit, dialyser mass-transfer area and fiber bundle geometry, dialysate flow proportioning limits, and needle gauge resistance. This description is qualitative problem-domain context from the nephrology and biomedical-engineering literature; no specific incidence rates are asserted here (the engine's own retrieval must find and custody the evidence).",
+   "failure_mode": "delivered dialysis dose falls below prescription when blood flow rate and dialysate flow rate cannot be sustained",
+   "constraint": "Any intervention must deliver the prescribed dose within the arterial and venous pressure limits the extracorporeal circuit tolerates, without increasing access recirculation, without extending session time beyond the facility schedule, and without requiring replacement of the installed machine fleet."
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:d839fa6a"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of maintenance hemodialysis extracorporeal circuit (blood pump, arterial/venous limb, dialyser, dialysate path)",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "hypersensitivity to the hemodialyzer membrane",
+   "intervention": "use a biocompatible membrane material with reduced allergenic properties in the dialyser",
+   "expected_effect": "reduced allergic reactions allowing for sustained blood flow rates without pressure limit triggers",
+   "mechanism_source_span": "The predominant etiological factors identified were hypersensitivity to the hemodialyzer membrane (n = 11",
+   "span_derivation": {
+    "n_shared": 3,
+    "shared_terms": [
+     "hemodialyzer",
+     "hypersensitivity",
+     "membrane"
+    ],
+    "span_terms_n": 7,
+    "ratio": 0.429,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:42237261"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Hemodialysis-related allergic reactions: a retrospective cohort study of clinical presentations, etiologies, and management.",
+   "mechanism": "hypersensitivity to the hemodialyzer membrane",
+   "intervention_site": "maintenance hemodialysis extracorporeal circuit (blood pump, arterial/venous limb, dialyser, dialysate path)",
+   "expected_effect": "reduced allergic reactions allowing for sustained blood flow rates without pressure limit triggers",
+   "falsification_test": "compare blood flow rates and delivered Kt/V values between patients using standard membranes versus the hypoallergenic membrane during dialysis sessions"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:42237261"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {
+    "discovery": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "destruction": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "transfer": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    },
+    "reality": {
+     "sources_recorded": 0,
+     "sources_errored": 0
+    }
+   }
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "maintenance hemodialysis extracorporeal circuit blood arterial"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "hypersensitivity hemodialyzer membrane"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "dialyser membrane reduced biocompatible material allergenic properties"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "maintenance allowing session contributing recirculation proportioning"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "reduced allergic reactions allowing without triggers"
+    }
+   ],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "use a biocompatible membrane material with reduced allergenic properties in the dialyser",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:42237261"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "Any intervention must deliver the prescribed dose within the arterial and venous pressure limits the extracorporeal circuit tolerates, without increasing access recirculation, without extending session time beyond the facility schedule, and without requiring replacement of the installed machine fleet.",
+   "failure_mode_of_device": "delivered dialysis dose falls below prescription when blood flow rate and dialysate flow rate cannot be sustained"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:d839fa6a"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [
+   {
+    "dimension": "unsupported_mechanism",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "weak_transfer",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "obvious_combination",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "prior_art",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "contradiction",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "boundary_failure",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "engineering_infeasibility",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Improved blood flow rates through the extracorporeal circuit by reducing allergic reactions that cause vasoconstriction and pressure limitations",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-08-31T07:08:47.714468+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-08-31T07:08:47.714468+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "europepmc:42237261",
+    "title": "Hemodialysis-related allergic reactions: a retrospective cohort study of clinical presentations, etiologies, and management.",
+    "source_uri": "https://europepmc.org/article/42237261",
+    "doi": "10.1186/s12882-026-05075-w",
+    "content_hash": "a625438e3975b0f48f9c3bc1ea2992b51400ae793cc93744a23be49ca6e9fc80",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:42279182",
+    "title": "Estimation of Intradialytic Blood Volume Reduction Using Hemoglobin Changes: A Prospective Validation Study of a Pragmatic Clinical Tool.",
+    "source_uri": "https://europepmc.org/article/42279182",
+    "doi": "10.3390/jcm15114323",
+    "content_hash": "bfebbebf56bd24aea38ca7dfb0965e644f8d05304b5c0c3ce8ba347a86cd6f2c",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:42030219",
+    "title": "Interpreting D-Dimer and Fibrin(ogen) Degradation Products in Hemodialysis Vascular Access Surveillance.",
+    "source_uri": "https://europepmc.org/article/42030219",
+    "doi": "10.1159/000552076",
+    "content_hash": "81b51cc1054fe75b17dee657939e614f59f7475f6f9eae2aae9b5d2332018862",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:42069650",
+    "title": "Renal replacement therapy in patients under extracorporeal membrane oxygenation: a narrative review.",
+    "source_uri": "https://europepmc.org/article/42069650",
+    "doi": "10.1186/s13054-026-06033-6",
+    "content_hash": "684856322ac09b1681bb67d20a77d7a8fa72fa39529744ec406932389233826f",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41482790",
+    "title": "Synergistic action of heparin and fluid-stopping device in reducing air embolism and hemodialysis clotting: Early results from a randomized trial.",
+    "source_uri": "https://europepmc.org/article/41482790",
+    "doi": "10.36721/pjps.2026.39.1.reg.15238.1",
+    "content_hash": "e96fbff4fcca35bdefcfb7b23a91ee6ca2ace01865e2f74283af427c95c03c37",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "europepmc:41482790",
+   "europepmc:42030219",
+   "europepmc:42069650",
+   "europepmc:42237261",
+   "europepmc:42279182"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:attack:unsupported_mechanism",
+    "description": "attack dimension unsupported_mechanism returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:attack:weak_transfer",
+    "description": "attack dimension weak_transfer returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:attack:contradiction",
+    "description": "attack dimension contradiction returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "unresolved_source": "maintenance hemodialysis extracorporeal circuit blood arterial",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "maintenance hemodialysis extracorporeal circuit blood arterial",
+    "error": "HTTP 429: {\"reference\":\"0b68e04d-8e48-44c9-b7a2-fa4e6404d4ac\",\"message\":\"Too many requests. Allowed '1000' per month.\",\"code\":429}"
+   },
+   {
+    "unresolved_source": "hypersensitivity hemodialyzer membrane",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "hypersensitivity hemodialyzer membrane",
+    "error": "HTTP 429: {\"reference\":\"f9548d5a-4960-47af-a3d0-3ad559ef5188\",\"message\":\"Too many requests. Allowed '1000' per month.\",\"code\":429}"
+   },
+   {
+    "unresolved_source": "dialyser membrane reduced biocompatible material allergenic properties",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "dialyser membrane reduced biocompatible material allergenic properties",
+    "error": "HTTP 429: {\"reference\":\"b661be78-dfcf-4b5e-b453-46a0b7a3f472\",\"message\":\"Too many requests. Allowed '1000' per month.\",\"code\":429}"
+   },
+   {
+    "unresolved_source": "maintenance allowing session contributing recirculation proportioning",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "maintenance allowing session contributing recirculation proportioning",
+    "error": "HTTP 429: {\"reference\":\"de5cfb4e-467b-415e-8f96-7a06ee84be0e\",\"message\":\"Too many requests. Allowed '1000' per month.\",\"code\":429}"
+   },
+   {
+    "unresolved_source": "reduced allergic reactions allowing without triggers",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "reduced allergic reactions allowing without triggers",
+    "error": "HTTP 429: {\"reference\":\"022379c0-f895-4675-9aa9-66dd61411b7e\",\"message\":\"Too many requests. Allowed '1000' per month.\",\"code\":429}"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "compare blood flow rates and delivered Kt/V values between patients using standard membranes versus the hypoallergenic membrane during dialysis sessions"
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:w9_nephrology_hemodialysis_dose_flow_limit:2026-08-31T07:07:25",
+   "final_envelope_hash": "83bb2ea13ac5e5d639a7feffe1c51f728f7396372bcbfef5e33f48377f7f475a",
+   "final_status": "REJECTED",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-08-31T07:08:47+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "REJECTED",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-08-31T07:13:14+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "europepmc:42237261": {
+   "id": "europepmc:42237261",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:42237261",
+   "source_uri": "https://europepmc.org/article/42237261",
+   "title": "Hemodialysis-related allergic reactions: a retrospective cohort study of clinical presentations, etiologies, and management.",
+   "abstract": "Objective This study aimed to investigate the etiology, clinical manifestations, management strategies, and clinical outcome of hemodialysis-related allergic reactions. Methods A retrospective cohort study was conducted to analyze clinical data from patients who experienced hemodialysis-related allergic reactions at the Affiliated Hospital of Jiangnan University between January 2020 and December 2025. Patients undergoing maintenance hemodialysis-with no prior history of these allergic reactions-served as the control group. Their clinical characteristics and reaction profiles were systematically analyzed. Results A total of 40 cases of hemodialysis-related allergic reactions were identified as the study group. Isolated pruritus and skin rash were observed in 25 patients (62.5%); hemodialysis-related leukopenia and thrombocytopenia, in 4 cases (10.0%); and severe anaphylactic reactions, in five cases (12.5%); Five cases exhibited atypical hemodialysis-related allergic reactions (12.5%), including hypotension within 10 min of hemodialysis initiation, malaise, nausea, and vomiting. The predominant etiological factors identified were hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%), AVF needles kits and hemodialysis extracorporeal circuit tubing (Ethylene Oxide Residue) (n = 27, 67.5%), and Nafamostat Mesylate (n = 2, 5%). Thorough saline pre-rinsing of the extracorporeal circuit remained the primary preventive strategy against EO-induced hypersensitivity. Switching to irradiated-sterilized acetate-membrane or wet-membrane dialyzers effectively prevented dialyzer hypersensitivity reaction. Glucocorticoid administration was effective in mitigating severe anaphylactic reactions. Patients in the study group exhibited significantly higher plasma eosinophil counts and C-reactive protein concentrations, and significantly lower hemoglobin levels, and serum albumin concentrations compared with the control group. Conclusion Hemodialysis-related allergic reactions are",
+   "doi": "10.1186/s12882-026-05075-w",
+   "publication_date": "2026-06-03",
+   "retrieval_timestamp": "2026-08-31T07:07:31.334969+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "a625438e3975b0f48f9c3bc1ea2992b51400ae793cc93744a23be49ca6e9fc80",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-08-31T07:07:31.334969+00:00",
+    "query_or_method": "maintenance hemodialysis extracorporeal circuit",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:42279182": {
+   "id": "europepmc:42279182",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:42279182",
+   "source_uri": "https://europepmc.org/article/42279182",
+   "title": "Estimation of Intradialytic Blood Volume Reduction Using Hemoglobin Changes: A Prospective Validation Study of a Pragmatic Clinical Tool.",
+   "abstract": "Background/Objectives: Accurate assessment of intradialytic blood volume (BV) changes is important for optimizing fluid management in hemodialysis, but continuous BV monitoring is not universally available. Hemoglobin changes reflect hemoconcentration and may provide a simple surrogate for estimating BV reduction. We prospectively evaluated a hemoglobin-based method for estimating intradialytic BV reduction compared with machine-based BV monitoring. Methods: In this prospective single-center observational study, 187 hemodialysis sessions with complete paired measurements were analyzed. Formula-based BV reduction was calculated from pre- and post-dialysis hemoglobin values and compared with machine-measured BV reduction. Agreement was assessed using Pearson correlation, predefined absolute-difference thresholds, and Bland-Altman analysis. Exploratory receiver operating characteristic analyses evaluated the ability of formula-based estimates to identify sessions with larger machine-measured BV reductions. Results: Formula-based and machine-measured BV reduction demonstrated a moderate-to-strong correlation (r = 0.645). The predefined pragmatic agreement criterion of ≥70% of measurements within ±5% was met, with 77.5% of measurements within this range. Bland-Altman analysis demonstrated a small mean bias of -1.5%, with 95% limits of agreement from -12.4% to 9.3%. Exploratory classification performance was favorable across machine-defined BV reduction thresholds, with area under curve (AUC) values ranging from 0.84 to 0.87. At the ≥8% threshold, sensitivity was 72%, specificity 85%, positive predictive value 83%, and negative predictive value 74%. Linear regression showed that 42% of variability in machine-measured BV reduction was explained by the formula-based estimate. Conclusions: A hemoglobin-based approach provides a simple approximation of intradialytic BV reduction. Although not interchangeable with continuous monitoring, it may support post-session assessment a",
+   "doi": "10.3390/jcm15114323",
+   "publication_date": "2026-06-03",
+   "retrieval_timestamp": "2026-08-31T07:07:31.334969+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "bfebbebf56bd24aea38ca7dfb0965e644f8d05304b5c0c3ce8ba347a86cd6f2c",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-08-31T07:07:31.334969+00:00",
+    "query_or_method": "maintenance hemodialysis extracorporeal circuit",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:42030219": {
+   "id": "europepmc:42030219",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:42030219",
+   "source_uri": "https://europepmc.org/article/42030219",
+   "title": "Interpreting D-Dimer and Fibrin(ogen) Degradation Products in Hemodialysis Vascular Access Surveillance.",
+   "abstract": "Background Vascular access dysfunction remains a major source of morbidity and repeat procedures in maintenance hemodialysis (HD), with thrombosis as a key proximate event. D-dimer and fibrin(ogen) degradation products (FDPs) are widely available readouts of downstream fibrin(ogen) turnover, but they are not routinely used for access surveillance and are often difficult to interpret in HD. Summary This narrative review summarizes HD-specific biology relevant to fibrin turnover and synthesizes clinical evidence linking D-dimer and FDP to access outcomes across arteriovenous fistulas, grafts, and catheters. HD promotes a prothrombotic, hypofibrinolytic profile through uremia-related endothelial disturbance, chronic inflammation, and extracorporeal circuit effects. The clinical literature is mostly small and heterogeneous in assay platforms, sampling, and outcome definitions. Across cohorts, repeated pre-dialysis measurements may provide more interpretable within-patient context than single measurements, although longitudinal HD access-specific evidence remains limited. Interpretation remains constrained by assay and unit variability and by non-access-related influences such as inflammation and intercurrent illness. Accordingly, D-dimer and FDP are best used as contextual adjuncts within an imaging- and hemodynamics-based framework, interpreted alongside access flow measures, duplex ultrasound, and clinical assessment. Key messages In HD access, repeated pre-dialysis measurements may provide more interpretable within-patient context than one-off D-dimer/FDP values, although direct longitudinal evidence remains limited. Assay and unit heterogeneity, plus systemic confounding, limit portability and access-specific interpretation. Biomarkers are best read as supportive context alongside hemodynamic measures and clinical assessment, not as stand-alone surveillance tools. Imaging-anchored prospective studies with standardized sampling and explicit assay/unit reporting are n",
+   "doi": "10.1159/000552076",
+   "publication_date": "2026-04-24",
+   "retrieval_timestamp": "2026-08-31T07:07:31.334969+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "81b51cc1054fe75b17dee657939e614f59f7475f6f9eae2aae9b5d2332018862",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-08-31T07:07:31.334969+00:00",
+    "query_or_method": "maintenance hemodialysis extracorporeal circuit",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:42069650": {
+   "id": "europepmc:42069650",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:42069650",
+   "source_uri": "https://europepmc.org/article/42069650",
+   "title": "Renal replacement therapy in patients under extracorporeal membrane oxygenation: a narrative review.",
+   "abstract": "Background The use of extracorporeal membrane oxygenation (ECMO) has expanded for severe respiratory and circulatory failure. Acute kidney injury (AKI) is one of the most frequent complications. Up to 85% of ECMO patients develop AKI and approximately half of them require renal replacement therapy (RRT) making a comprehensive understanding of both therapies and their interaction essential for patient management. However, evidence to guide ECMO-specific RRT strategies remains limited. Main body ECMO-related AKI arises from a complex interplay between patient and circuit factors that promote inflammation, endothelial injury, and tubular damage. Timing of RRT initiation in ECMO patients often relies on criteria used in the general critically ill population. Fluid overload is consistently associated with worse outcomes, and observational data suggest that earlier RRT, primarily to control fluid balance, may improve survival although randomized trials in ECMO patients are lacking. All RRT modalities can theoretically be used, but continuous techniques are preferred. RRT can be delivered via a parallel circuit using a dedicated venous catheter or integrated into the ECMO circuit. Integrated configurations reduce the need for additional vascular access and may prolong filter lifespan but require careful pressure management and team expertise to avoid alarms, hemolysis, and air embolism. Anticoagulation strategies must balance bleeding and thrombosis risk across both circuits; unfractionated heparin remains standard, while regional citrate anticoagulation can safely extend filter lifespan in selected patients although data is lacking in patients under veno-arterial ECMO. RRT during ECMO is associated with higher short-term mortality and an increased burden of chronic kidney disease among survivors. Conclusions The management of AKI in ECMO patients remains a major clinical challenge. While RRT is often required in this population, optimal strategies for its initiation, moda",
+   "doi": "10.1186/s13054-026-06033-6",
+   "publication_date": "2026-05-02",
+   "retrieval_timestamp": "2026-08-31T07:07:31.334969+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "684856322ac09b1681bb67d20a77d7a8fa72fa39529744ec406932389233826f",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-08-31T07:07:31.334969+00:00",
+    "query_or_method": "maintenance hemodialysis extracorporeal circuit",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41482790": {
+   "id": "europepmc:41482790",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41482790",
+   "source_uri": "https://europepmc.org/article/41482790",
+   "title": "Synergistic action of heparin and fluid-stopping device in reducing air embolism and hemodialysis clotting: Early results from a randomized trial.",
+   "abstract": "Background Entry of air into the extracorporeal circuit and inappropriate anticoagulation are significant factors associated with clotting. Even with systemic heparination, microbubbles can be implicated as sites for thrombosis and accelerate heparin metabolism. Fluid Stop devices, which prevent fluid from flowing during line drainage, have been shown potentially to decrease air embolism and improve hemostasis within circuits, but there is no concrete evidence available regarding simultaneous heparin use. Objectives The objective of this trial was to determine whether the use of systemic heparin and a portable fluid stop device can decrease air embolism and clotting within hemodialysis circuits compared with traditional infusion sets. Anticoagulation stability, risk of bleeding, and patient satisfaction were also measured. Methods In this prospectively conducted single-center randomized controlled trial, 80 hemodialysis patients receiving maintenance hemodialysis were randomly assigned either to a control group with standard infusion sets or an observation group with fluid-stopping sets and all receiving standard heparin doses. A total of 800 hemodialysis sessions were conducted prospectively with observation for air bubble entrance, line draining, and clotting. Secondary endpoints included ACT variability, satisfaction rates, and instances of bleeding complications. Results A significantly lower number of line emptying procedures (3 vs. 24; 5.0% vs. 27.5%), air bubble entries (4 vs. 28; 7.5% vs. 32.5%), and clotting incidents (2 vs. 12; 2.5% vs. 22.5%) were seen in the observation group compared with controls (P Conclusion Findings from these preliminary studies indicate that fluid-stopping devices may potentially improve heparin efficacy by preventing air embolism and clotting with no loss of safety. Based on these preliminary findings, larger multicenter trials are needed.",
+   "doi": "10.36721/pjps.2026.39.1.reg.15238.1",
+   "publication_date": "2026-01-01",
+   "retrieval_timestamp": "2026-08-31T07:07:31.334969+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "e96fbff4fcca35bdefcfb7b23a91ee6ca2ace01865e2f74283af427c95c03c37",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-08-31T07:07:31.334969+00:00",
+    "query_or_method": "maintenance hemodialysis extracorporeal circuit",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "problem:d839fa6a": {
+   "id": "problem:d839fa6a",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "d839fa6aaf66959dfcfc0011dd786cdff01af400d06bc107cc8ec28da55f3aec",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "REJECTED",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "27540eab417b427f3082d89bfad0f2dd26cfff67dc5c5cfe50b172ead1923d18",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-08-31T07:13:14+00:00Z"
+ },
+ "_exploration_candidate": {
+  "marker": "EXPLORATION_GRID_CANDIDATE",
+  "discovery_verification": "NOT_PERFORMED_FOR_THIS_CANDIDATE",
+  "consequence": "the E16-H release gate holds this dossier for human engineering review; a discovery-loop re-run is required before automatic release",
+  "angle": "EXPLORATION_GRID_constraint_first(zai)"
+ }
+}

@@ -1,0 +1,1307 @@
+{
+ "ledger": "TECHNICAL_IMPROVEMENT_LEDGER (R379 TECHNICAL IMPROVEMENT ENGINE V2)",
+ "version": "2.0.0",
+ "loop": "CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + direction) -> TECHNICAL MUTATION (actual design variable) -> INDEPENDENT TECHNICAL EVALUATION -> EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL -> SECOND IMPROVEMENT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "thresholds": {
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO milestone is DIAGNOSE -> TECHNICAL MUTATION -> RE-EVALUATE -> SECOND IMPROVEMENT; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget, identical to the R378 epistemic loop: three attempts, then the honest no-defensible-mutation verdict"
+  },
+  "VALUE_CLASS_STRICTNESS": {
+   "value": "HARD",
+   "epistemic_class": "ENGINEERING",
+   "justification": "EXTRACTED claims are span-verified or rejected (Art. II/VI); MODELLED values are admitted only when declared; an unbounded parameter is immutable (ADR_R379 anti-gaming)"
+  }
+ },
+ "mutation_kinds_live": [
+  "PARAMETER_CHANGE",
+  "GEOMETRY_CHANGE",
+  "MATERIAL_CHANGE",
+  "OPERATING_CONDITION_CHANGE",
+  "MECHANISM_CHANGE"
+ ],
+ "mutation_kinds_reserved": {
+  "ARCHITECTURE_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)",
+  "CONTROL_POLICY_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)"
+ },
+ "keep_criterion": "the child's OWN independent technical evaluation must confirm the objective improves in the mutation direction with constraints preserved — a score increase is NEVER sufficient (CEO R379 item 4/8)",
+ "started_at": "2026-08-31T07:28:16+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "status": "QUANTIFIED",
+    "limiting_variable": {
+     "param_id": "param_2",
+     "name": "carbon fiber reinforcement ratio",
+     "improving_move": "INCREASE",
+     "objective_target": "param_3",
+     "objective_direction": "MAXIMIZE",
+     "envelope": [
+      30.0,
+      70.0
+     ],
+     "envelope_class": "MODELLED",
+     "causal_path_length": 1,
+     "statement": "The limiting variable is carbon fiber reinforcement ratio. Changing it by increase is predicted to improve objective param_3 (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+     "convention": {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     }
+    },
+    "improvement_directions_summary": [
+     {
+      "param_id": "param_2",
+      "improving_move": "INCREASE",
+      "mutable": true,
+      "blocked": false
+     },
+     {
+      "param_id": "param_3",
+      "improving_move": "INCREASE",
+      "mutable": false,
+      "blocked": false
+     }
+    ],
+    "constraint_results": [
+     {
+      "constraint_id": "constraint_1",
+      "target": "param_1",
+      "bound": "<=",
+      "limit": 80.0,
+      "limit_class": "EXTRACTED",
+      "status": "UNVERIFIABLE",
+      "reason": "target param_1 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+     }
+    ]
+   },
+   "proposals": [
+    {
+     "proposal_id": "tmp:0f2d90b766de",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "aa2c95f7690afd7a182ebe73a084f5c9966ad0d530ce0e38cd9a444db8cdc52b",
+     "output_hash": "6b4775b492c8802e734f070d079f731ebabef4dbb225a90c3bca9faf5cf2b7a3",
+     "fields": {
+      "MUTATION_KIND": "MATERIAL_CHANGE",
+      "TARGET_PARAM": "param_2",
+      "NEW_VALUE": "55.0",
+      "DIRECTION": "INCREASE",
+      "VALUE_CLASS": "MODELLED",
+      "VALUE_SPAN": "NONE",
+      "VALUE_EVIDENCE_ID": "NONE",
+      "RATIONALE": "Increasing carbon fiber reinforcement ratio improves cyclic loading resistance by enhancing material strength and fatigue properties.",
+      "MECHANISM_DELTA": "The carbon fiber reinforcement ratio in the screw core is increased to 55.0 to enhance the screw's resistance to cyclic loading without failure.",
+      "INTERVENTION_DELTA": "The composite material formulation is adjusted to increase the carbon fiber proportion to 55.0 while maintaining biocompatible outer surface compatibility."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "mutation_kind": "MATERIAL_CHANGE",
+      "target_param": "param_2",
+      "checks": {
+       "mutation_kind_valid": "MATERIAL_CHANGE",
+       "target_is_limiting_variable": "param_2",
+       "target_exists": true,
+       "target_is_design_variable": true,
+       "kind_matches_category": true,
+       "envelope_declared": [
+        30.0,
+        70.0
+       ],
+       "direction_matches_evaluator": "INCREASE",
+       "new_value_present": "55.0",
+       "mutation_changes_value": true,
+       "value_class_declared": "MODELLED",
+       "spec_text_sync": "The carbon fiber reinforcement ratio in the screw core is increased to 55.0 to e | The composite material formulation is adjusted to increase the carbon fiber prop"
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T07:29:01+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts_extra": [],
+   "mutation_applied": {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:64bc312ca5ad",
+    "mutation_kind": "MATERIAL_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "param_2",
+     "improving_direction": "INCREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "1d0280e06b2971804d560493402d3fbd501f50ed0eaa7b13d0bc7c31096ef171",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective param_3 (MAXIMIZE)",
+       "checked 1 constraint(s) numerically where values exist",
+       "propagated signs over 3 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-08-31T07:29:01+00:00Z",
+      "deterministic": true
+     }
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:0f2d90b766de",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "aa2c95f7690afd7a182ebe73a084f5c9966ad0d530ce0e38cd9a444db8cdc52b",
+     "output_hash": "6b4775b492c8802e734f070d079f731ebabef4dbb225a90c3bca9faf5cf2b7a3",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "MATERIAL_CHANGE",
+     "target_param": "param_2",
+     "checks": {
+      "mutation_kind_valid": "MATERIAL_CHANGE",
+      "target_is_limiting_variable": "param_2",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       30.0,
+       70.0
+      ],
+      "direction_matches_evaluator": "INCREASE",
+      "new_value_present": "55.0",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The carbon fiber reinforcement ratio in the screw core is increased to 55.0 to e | The composite material formulation is adjusted to increase the carbon fiber prop"
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T07:29:01+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "param_2",
+     "name": "carbon fiber reinforcement ratio",
+     "from_value": null,
+     "to_value": 55.0,
+     "from_class": "UNKNOWN",
+     "to_class": "MODELLED",
+     "envelope": [
+      30.0,
+      70.0
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The carbon fiber reinforcement ratio in the screw core is increased to 55.0 to enhance the screw's resistance to cyclic loading without failure.",
+     "intervention": "The composite material formulation is adjusted to increase the carbon fiber proportion to 55.0 while maintaining biocompatible outer surface compatibility."
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "modify pedicle screw design enable percutaneous"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "6bd1452ca5f41718b59991369630142edf15fef14d0a715584cd30520d07b8b6",
+    "reason": "Increasing carbon fiber reinforcement ratio improves cyclic loading resistance by enhancing material strength and fatigue properties.",
+    "applied_at": "2026-08-31T07:29:01+00:00Z"
+   },
+   "re_evaluation": {
+    "technical": {
+     "status": "QUANTIFIED",
+     "objective": {
+      "target": "param_3",
+      "direction": "MAXIMIZE",
+      "known": true,
+      "basis": "to reduce fracture risk by increasing fatigue resistance"
+     },
+     "limiting_variable": {
+      "param_id": "param_2",
+      "name": "carbon fiber reinforcement ratio",
+      "improving_move": "INCREASE",
+      "objective_target": "param_3",
+      "objective_direction": "MAXIMIZE",
+      "envelope": [
+       30.0,
+       70.0
+      ],
+      "envelope_class": "MODELLED",
+      "causal_path_length": 1,
+      "statement": "The limiting variable is carbon fiber reinforcement ratio. Changing it by increase is predicted to improve objective param_3 (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+      "convention": {
+       "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+       "epistemic_class": "ENGINEERING",
+       "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+       "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+      }
+     },
+     "constraint_results": [
+      {
+       "constraint_id": "constraint_1",
+       "target": "param_1",
+       "bound": "<=",
+       "limit": 80.0,
+       "limit_class": "EXTRACTED",
+       "status": "UNVERIFIABLE",
+       "reason": "target param_1 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+      }
+     ],
+     "uncertainty": {
+      "unknown_value_params": [
+       "param_1",
+       "param_3",
+       "param_4",
+       "param_5",
+       "param_6",
+       "param_8"
+      ],
+      "modelled_relations": 1,
+      "extracted_relations": 2,
+      "unverifiable_constraints": [
+       "constraint_1"
+      ],
+      "objective_known": true,
+      "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+     },
+     "computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "e1b7812a0e109f3918108cd751175e744a36c66a169fe9afaa0760ad3003dc21",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective param_3 (MAXIMIZE)",
+       "checked 1 constraint(s) numerically where values exist",
+       "propagated signs over 3 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-08-31T07:29:01+00:00Z",
+      "deterministic": true
+     }
+    },
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.097,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": true,
+     "recombination_only": false
+    },
+    "i_average": 0.382,
+    "q_average": 0.5,
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+   },
+   "decision": {
+    "action": "KEEP",
+    "checks": {
+     "technical_objective": "CONFIRMED on the child's independent evaluation: param_2 INCREASE improves objective param_3 (MAXIMIZE) with constraints preserved",
+     "no_new_constraint_violation": true,
+     "no_constraint_laundering": true,
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "i1_structural_floor": {
+      "parent": 0.125,
+      "child": 0.097,
+      "floor": 0.2,
+      "crossed_downward": false,
+      "note": "numeric I1 movement is recorded, never gated here (CEO R379 item 8); the floor crossing IS gated — a mutation may not flip a derived mechanism to underived"
+     },
+     "prior_art_position_not_degraded": true,
+     "value_class_provenance": "MODELLED design value — declared, never promoted (Art. XXVIII); the improvement attribution carries the class"
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T07:29:01+00:00Z"
+   },
+   "attribution": {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "param_2 --INCREASES--> param_3 (MODELLED): increased carbon fiber reinforcement ratio improves fatigue resistance",
+    "changed_variable": "param_2",
+    "changed_variable_name": "carbon fiber reinforcement ratio",
+    "direction": "INCREASE",
+    "from_value": null,
+    "to_value": 55.0,
+    "value_class": "MODELLED",
+    "envelope": [
+     30.0,
+     70.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "param_2 55.0 is predicted to move objective param_3 (MAXIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: param_2 INCREASE improves objective param_3 (MAXIMIZE) with constraints preserved",
+    "constraints_result": [
+     "constraint_1: UNVERIFIABLE"
+    ],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:64bc312ca5ad",
+    "recorded_at": "2026-08-31T07:29:01+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "status": "QUANTIFIED",
+    "limiting_variable": {
+     "param_id": "param_2",
+     "name": "carbon fiber reinforcement ratio",
+     "improving_move": "INCREASE",
+     "objective_target": "param_3",
+     "objective_direction": "MAXIMIZE",
+     "envelope": [
+      30.0,
+      70.0
+     ],
+     "envelope_class": "MODELLED",
+     "causal_path_length": 1,
+     "statement": "The limiting variable is carbon fiber reinforcement ratio. Changing it by increase is predicted to improve objective param_3 (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+     "convention": {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     }
+    },
+    "improvement_directions_summary": [
+     {
+      "param_id": "param_2",
+      "improving_move": "INCREASE",
+      "mutable": true,
+      "blocked": false
+     },
+     {
+      "param_id": "param_3",
+      "improving_move": "INCREASE",
+      "mutable": false,
+      "blocked": false
+     }
+    ],
+    "constraint_results": [
+     {
+      "constraint_id": "constraint_1",
+      "target": "param_1",
+      "bound": "<=",
+      "limit": 80.0,
+      "limit_class": "EXTRACTED",
+      "status": "UNVERIFIABLE",
+      "reason": "target param_1 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+     }
+    ]
+   },
+   "proposals": [
+    {
+     "proposal_id": "tmp:c8606cadfb63",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "8607c207e500c494db8610e84867fc6232d0cc2dfc6dffcba697fdad63afd85a",
+     "output_hash": "61b0c5a24f9bc887f50ea15cb84fef73dc12dcd72dbd6cbba0a43aacade272b4",
+     "fields": {
+      "MUTATION_KIND": "MATERIAL_CHANGE",
+      "TARGET_PARAM": "param_2",
+      "NEW_VALUE": "65.0",
+      "DIRECTION": "INCREASE",
+      "VALUE_CLASS": "MODELLED",
+      "VALUE_SPAN": "NONE",
+      "VALUE_EVIDENCE_ID": "NONE",
+      "RATIONALE": "Increasing carbon fiber reinforcement ratio enhances resistance to cyclic loading without failure.",
+      "MECHANISM_DELTA": "The carbon fiber reinforcement ratio in the screw core is increased from 55.0 to 65.0 to further enhance the screw's resistance to cyclic loading without failure.",
+      "INTERVENTION_DELTA": "The composite material formulation is adjusted to increase the carbon fiber proportion from 55.0 to 65.0 while maintaining biocompatible outer surface compatibility."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "mutation_kind": "MATERIAL_CHANGE",
+      "target_param": "param_2",
+      "checks": {
+       "mutation_kind_valid": "MATERIAL_CHANGE",
+       "target_is_limiting_variable": "param_2",
+       "target_exists": true,
+       "target_is_design_variable": true,
+       "kind_matches_category": true,
+       "envelope_declared": [
+        30.0,
+        70.0
+       ],
+       "direction_matches_evaluator": "INCREASE",
+       "new_value_present": "65.0",
+       "mutation_changes_value": true,
+       "value_class_declared": "MODELLED",
+       "spec_text_sync": "The carbon fiber reinforcement ratio in the screw core is increased from 55.0 to | The composite material formulation is adjusted to increase the carbon fiber prop"
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T07:29:04+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts_extra": [],
+   "mutation_applied": {
+    "chain": "ORIGINAL CANDIDATE -> TECHNICAL DIAGNOSIS -> TECHNICAL MUTATION -> NEW CANDIDATE",
+    "mutation_id": "tmut:7267118c75de",
+    "mutation_kind": "MATERIAL_CHANGE",
+    "layer": "TECHNICAL (R379 V2) — an actual design variable was changed, not the wording",
+    "diagnostic_trigger": {
+     "evaluator": "analytical_monotone_v1 (deterministic)",
+     "limiting_variable": "param_2",
+     "improving_direction": "INCREASE",
+     "evaluation_computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "e1b7812a0e109f3918108cd751175e744a36c66a169fe9afaa0760ad3003dc21",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective param_3 (MAXIMIZE)",
+       "checked 1 constraint(s) numerically where values exist",
+       "propagated signs over 3 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-08-31T07:29:04+00:00Z",
+      "deterministic": true
+     }
+    },
+    "proposal_provenance": {
+     "proposal_id": "tmp:c8606cadfb63",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "8607c207e500c494db8610e84867fc6232d0cc2dfc6dffcba697fdad63afd85a",
+     "output_hash": "61b0c5a24f9bc887f50ea15cb84fef73dc12dcd72dbd6cbba0a43aacade272b4",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "mutation_kind": "MATERIAL_CHANGE",
+     "target_param": "param_2",
+     "checks": {
+      "mutation_kind_valid": "MATERIAL_CHANGE",
+      "target_is_limiting_variable": "param_2",
+      "target_exists": true,
+      "target_is_design_variable": true,
+      "kind_matches_category": true,
+      "envelope_declared": [
+       30.0,
+       70.0
+      ],
+      "direction_matches_evaluator": "INCREASE",
+      "new_value_present": "65.0",
+      "mutation_changes_value": true,
+      "value_class_declared": "MODELLED",
+      "spec_text_sync": "The carbon fiber reinforcement ratio in the screw core is increased from 55.0 to | The composite material formulation is adjusted to increase the carbon fiber prop"
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T07:29:04+00:00Z"
+    },
+    "changed_variable": {
+     "param_id": "param_2",
+     "name": "carbon fiber reinforcement ratio",
+     "from_value": 55.0,
+     "to_value": 65.0,
+     "from_class": "MODELLED",
+     "to_class": "MODELLED",
+     "envelope": [
+      30.0,
+      70.0
+     ],
+     "envelope_class": "MODELLED"
+    },
+    "spec_text_delta": {
+     "mechanism": "The carbon fiber reinforcement ratio in the screw core is increased from 55.0 to 65.0 to further enhance the screw's resistance to cyclic loading without failure.",
+     "intervention": "The composite material formulation is adjusted to increase the carbon fiber proportion from 55.0 to 65.0 while maintaining biocompatible outer surface compatibility."
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:weak_transfer",
+      "modify pedicle screw design enable percutaneous"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "a2dc25b91625e977c0e632c273f26a5b905afb5288bbc9faf922a44b2bf1f819",
+    "reason": "Increasing carbon fiber reinforcement ratio enhances resistance to cyclic loading without failure.",
+    "applied_at": "2026-08-31T07:29:04+00:00Z"
+   },
+   "re_evaluation": {
+    "technical": {
+     "status": "QUANTIFIED",
+     "objective": {
+      "target": "param_3",
+      "direction": "MAXIMIZE",
+      "known": true,
+      "basis": "to reduce fracture risk by increasing fatigue resistance"
+     },
+     "limiting_variable": {
+      "param_id": "param_2",
+      "name": "carbon fiber reinforcement ratio",
+      "improving_move": "INCREASE",
+      "objective_target": "param_3",
+      "objective_direction": "MAXIMIZE",
+      "envelope": [
+       30.0,
+       70.0
+      ],
+      "envelope_class": "MODELLED",
+      "causal_path_length": 1,
+      "statement": "The limiting variable is carbon fiber reinforcement ratio. Changing it by increase is predicted to improve objective param_3 (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+      "convention": {
+       "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+       "epistemic_class": "ENGINEERING",
+       "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+       "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+      }
+     },
+     "constraint_results": [
+      {
+       "constraint_id": "constraint_1",
+       "target": "param_1",
+       "bound": "<=",
+       "limit": 80.0,
+       "limit_class": "EXTRACTED",
+       "status": "UNVERIFIABLE",
+       "reason": "target param_1 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+      }
+     ],
+     "uncertainty": {
+      "unknown_value_params": [
+       "param_1",
+       "param_3",
+       "param_4",
+       "param_5",
+       "param_6",
+       "param_8"
+      ],
+      "modelled_relations": 1,
+      "extracted_relations": 2,
+      "unverifiable_constraints": [
+       "constraint_1"
+      ],
+      "objective_known": true,
+      "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+     },
+     "computation_log": {
+      "evaluator_id": "analytical_monotone_v1",
+      "fidelity_tier": "STRUCTURED_CONSTRAINT",
+      "evidence_rank": 3,
+      "input_state_sha256": "33a0bdcfab75265d292bfc251f633c1ec3f1c24cb73d48d10605c914f5583d69",
+      "conventions": [
+       {
+        "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+        "epistemic_class": "ENGINEERING",
+        "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+        "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+       },
+       {
+        "name": "DIRECTIONAL_FAIL_CLOSED",
+        "epistemic_class": "ENGINEERING",
+        "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+        "uncertainty": "direction-level only at this tier"
+       }
+      ],
+      "steps": [
+       "resolved objective param_3 (MAXIMIZE)",
+       "checked 1 constraint(s) numerically where values exist",
+       "propagated signs over 3 relation(s)",
+       "ranked 1 movable improving direction(s)"
+      ],
+      "computed_at": "2026-08-31T07:29:04+00:00Z",
+      "deterministic": true
+     }
+    },
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.094,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": true,
+     "recombination_only": false
+    },
+    "i_average": 0.381,
+    "q_average": 0.5,
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+   },
+   "decision": {
+    "action": "KEEP",
+    "checks": {
+     "technical_objective": "CONFIRMED on the child's independent evaluation: param_2 INCREASE improves objective param_3 (MAXIMIZE) with constraints preserved",
+     "no_new_constraint_violation": true,
+     "no_constraint_laundering": true,
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "i1_structural_floor": {
+      "parent": 0.097,
+      "child": 0.094,
+      "floor": 0.2,
+      "crossed_downward": false,
+      "note": "numeric I1 movement is recorded, never gated here (CEO R379 item 8); the floor crossing IS gated — a mutation may not flip a derived mechanism to underived"
+     },
+     "prior_art_position_not_degraded": true,
+     "value_class_provenance": "MODELLED design value — declared, never promoted (Art. XXVIII); the improvement attribution carries the class"
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T07:29:04+00:00Z"
+   },
+   "attribution": {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "param_2 --INCREASES--> param_3 (MODELLED): increased carbon fiber reinforcement ratio improves fatigue resistance",
+    "changed_variable": "param_2",
+    "changed_variable_name": "carbon fiber reinforcement ratio",
+    "direction": "INCREASE",
+    "from_value": 55.0,
+    "to_value": 65.0,
+    "value_class": "MODELLED",
+    "envelope": [
+     30.0,
+     70.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "param_2 65.0 is predicted to move objective param_3 (MAXIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: param_2 INCREASE improves objective param_3 (MAXIMIZE) with constraints preserved",
+    "constraints_result": [
+     "constraint_1: UNVERIFIABLE"
+    ],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:7267118c75de",
+    "recorded_at": "2026-08-31T07:29:04+00:00Z"
+   }
+  }
+ ],
+ "outcome": "TECHNICALLY_IMPROVED",
+ "outcome_reason": "",
+ "extraction": {
+  "proposal_id": "tsp:b223a37bc1a5",
+  "attempts": [
+   {
+    "attempt": 1,
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "status": "OK",
+    "prompt_hash": "42c55584064119696fedd68c846f9550c5b7344d8a6aaa90b5d70d8e6e61fedb",
+    "output_hash": "a8542497f1338df15e41fe0afe1575e899d8067c9f0aacb61ae7eb3f3f385ca5",
+    "latency_ms": 41341,
+    "error": null,
+    "raw_content_sha256": "e548e693749bf59ee4df67550ebc1e9e8533a28fca03f0201dcfc1dd959fe889"
+   }
+  ],
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "status": "OK",
+  "prompt_hash": "42c55584064119696fedd68c846f9550c5b7344d8a6aaa90b5d70d8e6e61fedb",
+  "output_hash": "a8542497f1338df15e41fe0afe1575e899d8067c9f0aacb61ae7eb3f3f385ca5",
+  "latency_ms": 41341,
+  "error": null,
+  "proposal": {
+   "objects": [
+    {
+     "object_id": "device_1",
+     "name": "pedicle screw",
+     "role": "spinal fixation device"
+    },
+    {
+     "object_id": "component_1",
+     "name": "carbon fiber core",
+     "role": "reinforcement element"
+    },
+    {
+     "object_id": "component_2",
+     "name": "biocompatible outer surface",
+     "role": "tissue interface"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "param_1",
+     "name": "pedicle screw width",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 3,
+     "range_max": 7,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "dimension determining screw size relative to pedicle"
+    },
+    {
+     "param_id": "param_2",
+     "name": "carbon fiber reinforcement ratio",
+     "category": "MATERIALS",
+     "unit": "%",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 30,
+     "range_max": 70,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "proportion of carbon fiber in screw core"
+    },
+    {
+     "param_id": "param_3",
+     "name": "fatigue resistance",
+     "category": "PARAMETERS",
+     "unit": "cycles",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 5000000,
+     "range_max": 5000000,
+     "range_span": "5,000,000 cycles",
+     "range_evidence_id": "europepmc:42199852",
+     "role": "ability to withstand cyclic loading without failure"
+    },
+    {
+     "param_id": "param_4",
+     "name": "transitional segment length",
+     "category": "GEOMETRY",
+     "unit": "mm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 5,
+     "range_max": 15,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "length of optimized transitional segment in screw design"
+    },
+    {
+     "param_id": "param_5",
+     "name": "stress concentration",
+     "category": "PARAMETERS",
+     "unit": "MPa",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "localized stress at critical points in the screw"
+    },
+    {
+     "param_id": "param_6",
+     "name": "pedicle breach risk",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "likelihood of screw perforating pedicle cortex"
+    },
+    {
+     "param_id": "param_7",
+     "name": "bending stiffness",
+     "category": "PARAMETERS",
+     "unit": "N/m",
+     "value": 111,
+     "value_class": "EXTRACTED",
+     "value_span": "111±9.2 N/m",
+     "value_evidence_id": "europepmc:42199852",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "resistance to bending deformation under load"
+    },
+    {
+     "param_id": "param_8",
+     "name": "biocompatibility",
+     "category": "MATERIALS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "material compatibility with biological tissue"
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "constraint_1",
+     "target": "param_1",
+     "bound": "<=",
+     "limit": 80,
+     "unit": "% of pedicle width",
+     "limit_class": "EXTRACTED",
+     "limit_span": "screws that exceed 80% of the pedicle width",
+     "limit_evidence_id": "europepmc:42325820",
+     "justification": "Screws exceeding 80% of pedicle width increase breach risk (Art. XXVII: extracted from evidence)"
+    },
+    {
+     "constraint_id": "constraint_2",
+     "target": "param_8",
+     "bound": "=",
+     "limit": 1,
+     "unit": "biocompatible",
+     "limit_class": "EXTRACTED",
+     "limit_span": "maintaining biocompatible outer surface",
+     "limit_evidence_id": "europepmc:42634753",
+     "justification": "Outer surface must remain biocompatible (Art. XXVII: extracted from evidence)"
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "objective_1",
+     "target": "param_3",
+     "direction": "MAXIMIZE",
+     "basis": "to reduce fracture risk by increasing fatigue resistance"
+    },
+    {
+     "objective_id": "objective_2",
+     "target": "param_5",
+     "direction": "MINIMIZE",
+     "basis": "to reduce fracture risk by decreasing stress concentrations"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "mode_1",
+     "name": "screw fracture",
+     "problem_link": "directly addresses the device failure mode of fracture"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "relation_1",
+     "cause": "param_2",
+     "effect": "param_3",
+     "direction": "INCREASES",
+     "statement": "increased carbon fiber reinforcement ratio improves fatigue resistance",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "relation_2",
+     "cause": "param_4",
+     "effect": "param_5",
+     "direction": "DECREASES",
+     "statement": "optimized transitional segment length reduces stress concentration",
+     "relation_class": "EXTRACTED",
+     "span": "Pedicle screws with optimally extended transitional segments can effectively alleviate local stress concentrations",
+     "evidence_id": "europepmc:41944348"
+    },
+    {
+     "relation_id": "relation_3",
+     "cause": "param_1",
+     "effect": "param_6",
+     "direction": "INCREASES",
+     "statement": "larger screw width increases pedicle breach risk",
+     "relation_class": "EXTRACTED",
+     "span": "screws that exceed 80% of the pedicle width heighten the risk of breach",
+     "evidence_id": "europepmc:42325820"
+    }
+   ]
+  },
+  "raw_content_sha256": "e548e693749bf59ee4df67550ebc1e9e8533a28fca03f0201dcfc1dd959fe889"
+ },
+ "technical_state_counts": {
+  "parameters": 8,
+  "parameters_with_value": 1,
+  "parameters_extracted": 1,
+  "parameters_modelled": 0,
+  "parameters_with_envelope": 3,
+  "constraints": 1,
+  "objectives": 2,
+  "dependencies": 3,
+  "objects": 3,
+  "failure_modes": 1
+ },
+ "baseline": {
+  "technical": {
+   "status": "QUANTIFIED",
+   "objective": {
+    "target": "param_3",
+    "direction": "MAXIMIZE",
+    "known": true,
+    "basis": "to reduce fracture risk by increasing fatigue resistance"
+   },
+   "limiting_variable": {
+    "param_id": "param_2",
+    "name": "carbon fiber reinforcement ratio",
+    "improving_move": "INCREASE",
+    "objective_target": "param_3",
+    "objective_direction": "MAXIMIZE",
+    "envelope": [
+     30.0,
+     70.0
+    ],
+    "envelope_class": "MODELLED",
+    "causal_path_length": 1,
+    "statement": "The limiting variable is carbon fiber reinforcement ratio. Changing it by increase is predicted to improve objective param_3 (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+    "convention": {
+     "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+     "epistemic_class": "ENGINEERING",
+     "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+     "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+    }
+   },
+   "constraint_results": [
+    {
+     "constraint_id": "constraint_1",
+     "target": "param_1",
+     "bound": "<=",
+     "limit": 80.0,
+     "limit_class": "EXTRACTED",
+     "status": "UNVERIFIABLE",
+     "reason": "target param_1 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    }
+   ],
+   "uncertainty": {
+    "unknown_value_params": [
+     "param_1",
+     "param_2",
+     "param_3",
+     "param_4",
+     "param_5",
+     "param_6",
+     "param_8"
+    ],
+    "modelled_relations": 1,
+    "extracted_relations": 2,
+    "unverifiable_constraints": [
+     "constraint_1"
+    ],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "1d0280e06b2971804d560493402d3fbd501f50ed0eaa7b13d0bc7c31096ef171",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective param_3 (MAXIMIZE)",
+     "checked 1 constraint(s) numerically where values exist",
+     "propagated signs over 3 relation(s)",
+     "ranked 1 movable improving direction(s)"
+    ],
+    "computed_at": "2026-08-31T07:28:57+00:00Z",
+    "deterministic": true
+   }
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.125,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.396,
+  "q_average": 0.5,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "fidelity_escalation": {
+  "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1)",
+  "deciding_question": "does a design-variable change improve the objective within constraints?",
+  "resolved_at_current_tier": true,
+  "escalation_needed": false,
+  "next_tier_available": false,
+  "note": "higher tiers (NUMERICAL_SOLVER / SIMULATION / NEURAL_OPERATOR) are contract-reserved and not registered; escalation is recorded, never faked at the current tier"
+ },
+ "final": {
+  "technical": {
+   "status": "QUANTIFIED",
+   "objective": {
+    "target": "param_3",
+    "direction": "MAXIMIZE",
+    "known": true,
+    "basis": "to reduce fracture risk by increasing fatigue resistance"
+   },
+   "limiting_variable": {
+    "param_id": "param_2",
+    "name": "carbon fiber reinforcement ratio",
+    "improving_move": "INCREASE",
+    "objective_target": "param_3",
+    "objective_direction": "MAXIMIZE",
+    "envelope": [
+     30.0,
+     70.0
+    ],
+    "envelope_class": "MODELLED",
+    "causal_path_length": 1,
+    "statement": "The limiting variable is carbon fiber reinforcement ratio. Changing it by increase is predicted to improve objective param_3 (MAXIMIZE) while preserving all declared constraints that are checkable at this tier.",
+    "convention": {
+     "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+     "epistemic_class": "ENGINEERING",
+     "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+     "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+    }
+   },
+   "constraint_results": [
+    {
+     "constraint_id": "constraint_1",
+     "target": "param_1",
+     "bound": "<=",
+     "limit": 80.0,
+     "limit_class": "EXTRACTED",
+     "status": "UNVERIFIABLE",
+     "reason": "target param_1 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    }
+   ],
+   "uncertainty": {
+    "unknown_value_params": [
+     "param_1",
+     "param_3",
+     "param_4",
+     "param_5",
+     "param_6",
+     "param_8"
+    ],
+    "modelled_relations": 1,
+    "extracted_relations": 2,
+    "unverifiable_constraints": [
+     "constraint_1"
+    ],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "33a0bdcfab75265d292bfc251f633c1ec3f1c24cb73d48d10605c914f5583d69",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective param_3 (MAXIMIZE)",
+     "checked 1 constraint(s) numerically where values exist",
+     "propagated signs over 3 relation(s)",
+     "ranked 1 movable improving direction(s)"
+    ],
+    "computed_at": "2026-08-31T07:29:04+00:00Z",
+    "deterministic": true
+   }
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.094,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.381,
+  "q_average": 0.5,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "outcome_summary": {
+  "baseline_status": "QUANTIFIED",
+  "final_status": "QUANTIFIED",
+  "baseline_i_average": 0.396,
+  "final_i_average": 0.381,
+  "baseline_prior_art": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "final_prior_art": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+  "iterations_run": 2,
+  "keeps": 2,
+  "attributions": [
+   {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "param_2 --INCREASES--> param_3 (MODELLED): increased carbon fiber reinforcement ratio improves fatigue resistance",
+    "changed_variable": "param_2",
+    "changed_variable_name": "carbon fiber reinforcement ratio",
+    "direction": "INCREASE",
+    "from_value": null,
+    "to_value": 55.0,
+    "value_class": "MODELLED",
+    "envelope": [
+     30.0,
+     70.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "param_2 55.0 is predicted to move objective param_3 (MAXIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: param_2 INCREASE improves objective param_3 (MAXIMIZE) with constraints preserved",
+    "constraints_result": [
+     "constraint_1: UNVERIFIABLE"
+    ],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:64bc312ca5ad",
+    "recorded_at": "2026-08-31T07:29:01+00:00Z"
+   },
+   {
+    "artifact": "TECHNICAL_IMPROVEMENT_ATTRIBUTION",
+    "technical_mechanism": "param_2 --INCREASES--> param_3 (MODELLED): increased carbon fiber reinforcement ratio improves fatigue resistance",
+    "changed_variable": "param_2",
+    "changed_variable_name": "carbon fiber reinforcement ratio",
+    "direction": "INCREASE",
+    "from_value": 55.0,
+    "to_value": 65.0,
+    "value_class": "MODELLED",
+    "envelope": [
+     30.0,
+     70.0
+    ],
+    "envelope_class": "MODELLED",
+    "predicted_effect": "param_2 65.0 is predicted to move objective param_3 (MAXIMIZE) in the improving sense",
+    "evaluated_result": "CONFIRMED on the child's independent evaluation: param_2 INCREASE improves objective param_3 (MAXIMIZE) with constraints preserved",
+    "constraints_result": [
+     "constraint_1: UNVERIFIABLE"
+    ],
+    "evidence_class": "AI_INFERENCE (rank 3) — a direction-level prediction of the declared analytical model over the structured technical state. NOT a measurement, NOT a physical observation (Art. XXVIII / XXXVIII). The value class of the changed variable is recorded above; MODELLED design values are invention content, never evidence.",
+    "mutation_id": "tmut:7267118c75de",
+    "recorded_at": "2026-08-31T07:29:04+00:00Z"
+   }
+  ]
+ },
+ "finished_at": "2026-08-31T07:29:04+00:00Z"
+}

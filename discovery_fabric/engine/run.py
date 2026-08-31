@@ -674,6 +674,58 @@ class EngineRun:
                     })
                     return
 
+            # ---------- R379: TECHNICAL IMPROVEMENT ENGINE V2 pass -----
+            # CEO 2026-08-31 (R379): make the mutation engine about
+            # THE TECHNOLOGY, not the wording. The technical pass runs
+            # AFTER the epistemic pass (wording first, design second —
+            # the technical mutation's spec-text sync is final):
+            #   TECHNICAL DIAGNOSIS (limiting variable + direction)
+            #   -> TECHNICAL MUTATION (an ACTUAL design variable,
+            #      within evidence-declared envelopes)
+            #   -> INDEPENDENT TECHNICAL EVALUATION + prior-art recheck
+            #   -> KEEP/KILL -> SECOND IMPROVEMENT
+            # A TECHNICALLY_IMPROVED child REPLACES the candidate (the
+            # engineering spec + attack + quality re-run for the child;
+            # nothing inherited). A KILLED_* outcome blocks packaging
+            # (CEO rule 9). TECHNICAL_UNQUANTIFIED is an honest
+            # measured gap (the 🟡 state), NOT a kill — the parent
+            # proceeds with the ledger on disk. Transport failure is
+            # BLOCKED_TRANSPORT (Art. XXV: infrastructure is not a
+            # research verdict).
+            technical = self._technical_improvement_pass(
+                chosen, spec_rel, run_ctx)
+            if technical is not None:
+                if technical["outcome"] == "TECHNICALLY_IMPROVED":
+                    rebuilt = technical["rebuilt"]
+                    spec_rel, eng_rel = (rebuilt["spec"],
+                                         rebuilt["eng"])
+                    chosen = dict(chosen,
+                                  env_view=rebuilt["env_view"],
+                                  attack=rebuilt["attack"],
+                                  quality=rebuilt["quality"],
+                                  repaired=rebuilt["repaired"],
+                                  candidate_id=rebuilt["candidate_id"])
+                    self._spec, self._eng = spec_rel, eng_rel
+                    self._chosen_env = chosen["env_view"]
+                    self._persist("INVENTION_SPECIFICATION.json",
+                                  spec_rel)
+                    self._persist("ENGINEERING_SPECIFICATION.json",
+                                  eng_rel)
+                    self._persist("DECISIVE_EXPERIMENT.json",
+                                  rebuilt["decisive"])
+                elif technical["outcome"].startswith("KILLED_"):
+                    self.package_failure = (
+                        f"TECHNICAL IMPROVEMENT ENGINE V2 "
+                        f"({technical['outcome']}): "
+                        f"{technical['reason']}")
+                    self._persist("PACKAGE_FAILED.json", {
+                        "stage": "TECHNICAL_IMPROVEMENT_PASS",
+                        "outcome": technical["outcome"],
+                        "reason": technical["reason"],
+                        "ledger": "TECHNICAL_IMPROVEMENT_LEDGER.json",
+                    })
+                    return
+
             # CEO A1: resolve the package identity through the canonical
             # registry — AFTER survivor selection, so killed candidates
             # burn no number. An explicit self.package_number is a
@@ -863,6 +915,146 @@ class EngineRun:
                     "improvement_mutation_id": mut_id,
                 }),
                 "attack": attack, "quality": quality,
+                "repaired": repaired,
+                "env_view": child_env,
+                "decisive": child_ctx.decisive,
+                "candidate_id": f"{chosen['candidate_id']}+{mut_id}",
+            },
+        }
+
+    # ------------------------------------------------------------------
+    def _technical_improvement_pass(self, chosen: Dict[str, Any],
+                                    spec_rel: Dict[str, Any],
+                                    run_ctx: Dict[str, Any]
+                                    ) -> Optional[Dict[str, Any]]:
+        """R379 TECHNICAL IMPROVEMENT ENGINE V2 pass on the selected
+        survivor (after the R378 epistemic pass). Returns None when
+        disabled or infrastructure-blocked (parent proceeds);
+        otherwise the ledger outcome + (when TECHNICALLY_IMPROVED) the
+        fully rebuilt child artifacts.
+
+        Honesty contract:
+        - TECHNICAL_UNQUANTIFIED is a measured capability gap, not a
+          verdict — the parent proceeds, ledger on disk
+        - KILLED_* blocks packaging (CEO rule 9 — a higher kill rate
+          is acceptable)
+        - the child's engineering spec + attack + quality are re-run
+          from scratch (nothing inherited)
+        - every KEEP carries an improvement attribution whose evidence
+          class is a model inference, never a measurement
+        """
+        import os as _os
+        if _os.environ.get("ENGINE_TECHNICAL_PASS", "1") == "0":
+            self._persist("TECHNICAL_IMPROVEMENT_LEDGER.json", {
+                "stage": "TECHNICAL_IMPROVEMENT_PASS",
+                "status": "DISABLED_BY_OPERATOR",
+                "note": "ENGINE_TECHNICAL_PASS=0 (explicit operator "
+                        "override; recorded, never silent)"})
+            return None
+        from .dossier_quality import evaluate_dossier_quality
+        from .engineering_attack import (attack_engineering,
+                                         repair_engineering)
+        from .engineering_spec import build_engineering_spec
+        from .evaluator_contract import CandidateContext
+        from .experiment_selector import select_decisive_experiment
+        from .technical_improvement_engine import \
+            improve_candidate_technical
+        env_view = chosen["env_view"]
+        try:
+            ev_items = [{"id": e.get("id"),
+                         "title": str(e.get("title") or ""),
+                         "text": str(e.get("abstract")
+                                     or e.get("content") or "")}
+                        for e in (getattr(env_view, "evidence", None)
+                                  or [])]
+            ctx = CandidateContext(
+                spec=spec_rel,
+                decisive=select_decisive_experiment(env_view),
+                problem=self.problem,
+                evidence_items=ev_items,
+                collision=getattr(env_view, "collision_results", None),
+                attack=chosen.get("attack"),
+                run_ctx={"run_id": self.run_id})
+            ledger = improve_candidate_technical(
+                ctx,
+                collision_mode=_os.environ.get(
+                    "ENGINE_TECHNICAL_COLLISION_MODE",
+                    "REPLAY_CACHE"),
+                live_sources=[s for s in _os.environ.get(
+                    "ENGINE_COLLISION_SOURCES", "").split(",") if s]
+                or None,
+                provider=_os.environ.get(
+                    "ENGINE_TECHNICAL_PROVIDER") or
+                _os.environ.get("ENGINE_IMPROVEMENT_PROVIDER") or None)
+        except Exception as exc:  # noqa: BLE001 — recorded, never fatal
+            self._persist("TECHNICAL_IMPROVEMENT_LEDGER.json", {
+                "stage": "TECHNICAL_IMPROVEMENT_PASS",
+                "status": "ERROR",
+                "error": f"{type(exc).__name__}: {exc}",
+                "consequence": ("the parent candidate proceeds "
+                                "unchanged (honest degradation — an "
+                                "engine defect never kills research)"),
+                "timestamp": utc_now()})
+            return None
+
+        public = {k: v for k, v in ledger.items()
+                  if k != "current_ctx"}
+        public["status"] = ledger["outcome"]
+        self._persist("TECHNICAL_IMPROVEMENT_LEDGER.json", public)
+
+        outcome = ledger.get("outcome")
+        if outcome != "TECHNICALLY_IMPROVED":
+            return {"outcome": outcome,
+                    "reason": ledger.get("outcome_reason", ""),
+                    "ledger_public": public}
+
+        # ---- TECHNICALLY_IMPROVED: rebuild the child's artifacts -----
+        child_ctx = ledger.get("current_ctx")
+        child_spec = child_ctx.spec
+        child_env = self._env_view_for_improved(env_view, child_spec)
+        eng = build_engineering_spec(child_spec, child_env, run_ctx)
+        attack = attack_engineering(child_spec, eng, child_env)
+        self._persist("ENGINEERING_ATTACK_technically_improved.json",
+                      attack)
+        if attack["overall"] == "KILLED":
+            self._persist("PACKAGE_FAILED.json", {
+                "stage": "TECHNICAL_IMPROVEMENT_PASS",
+                "outcome": "TECHNICALLY_IMPROVED_CANDIDATE_ATTACK_KILLED",
+                "reason": "the technically improved candidate was "
+                          "KILLED by the re-run engineering attack "
+                          "(E15-F)",
+                "kill_basis": [i["basis"] for i in attack["items"]
+                               if i["verdict"] == "KILL"]})
+            return {"outcome": "KILLED_ATTACK_AFTER_TECHNICAL_IMPROVEMENT",
+                    "reason": "the technically improved candidate was "
+                              "killed by the re-run engineering attack",
+                    "ledger_public": public}
+        repaired = False
+        if attack["counts"].get("REPAIR", 0) > 0:
+            eng2 = repair_engineering(child_spec, eng, attack)
+            if (eng2.get("repair_ledger") or {}).get("artifact_mutated"):
+                self._persist(
+                    "ENGINEERING_SPECIFICATION_V1_technical.json", eng)
+                eng, repaired = eng2, True
+        quality = evaluate_dossier_quality(child_spec, eng)
+        mut_id = ((child_spec.get("_technical_improvement") or {})
+                  .get("mutation", {}) or {}).get("mutation_id")
+        return {
+            "outcome": "TECHNICALLY_IMPROVED",
+            "reason": ledger.get("outcome_reason", ""),
+            "ledger_public": public,
+            "rebuilt": {
+                "spec": child_spec,
+                "eng": dict(eng, engineering_attack_summary={
+                    "attack": "ENGINEERING_ATTACK (E15-F, re-run on the "
+                              "technically improved candidate R379)",
+                    "overall": attack["overall"],
+                    "counts": attack["counts"],
+                    "repaired_to_v2": repaired,
+                    "technical_mutation_id": mut_id,
+                }),
+                "attack": attack,
+                "quality": quality,
                 "repaired": repaired,
                 "env_view": child_env,
                 "decisive": child_ctx.decisive,

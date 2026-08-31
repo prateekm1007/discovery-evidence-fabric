@@ -1,0 +1,655 @@
+{
+ "ledger": "TECHNICAL_IMPROVEMENT_LEDGER (R379 TECHNICAL IMPROVEMENT ENGINE V2)",
+ "version": "2.0.0",
+ "loop": "CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + direction) -> TECHNICAL MUTATION (actual design variable) -> INDEPENDENT TECHNICAL EVALUATION -> EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL -> SECOND IMPROVEMENT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "thresholds": {
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO milestone is DIAGNOSE -> TECHNICAL MUTATION -> RE-EVALUATE -> SECOND IMPROVEMENT; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget, identical to the R378 epistemic loop: three attempts, then the honest no-defensible-mutation verdict"
+  },
+  "VALUE_CLASS_STRICTNESS": {
+   "value": "HARD",
+   "epistemic_class": "ENGINEERING",
+   "justification": "EXTRACTED claims are span-verified or rejected (Art. II/VI); MODELLED values are admitted only when declared; an unbounded parameter is immutable (ADR_R379 anti-gaming)"
+  }
+ },
+ "mutation_kinds_live": [
+  "PARAMETER_CHANGE",
+  "GEOMETRY_CHANGE",
+  "MATERIAL_CHANGE",
+  "OPERATING_CONDITION_CHANGE",
+  "MECHANISM_CHANGE"
+ ],
+ "mutation_kinds_reserved": {
+  "ARCHITECTURE_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)",
+  "CONTROL_POLICY_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)"
+ },
+ "keep_criterion": "the child's OWN independent technical evaluation must confirm the objective improves in the mutation direction with constraints preserved — a score increase is NEVER sufficient (CEO R379 item 4/8)",
+ "started_at": "2026-08-31T06:10:56+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "status": "PARTIALLY_QUANTIFIED",
+    "limiting_variable": null,
+    "improvement_directions_summary": [
+     {
+      "param_id": "detection_time",
+      "improving_move": "DECREASE",
+      "mutable": false,
+      "blocked": true
+     },
+     {
+      "param_id": "temp_rise_rate",
+      "improving_move": "DECREASE",
+      "mutable": false,
+      "blocked": true
+     }
+    ],
+    "constraint_results": [
+     {
+      "constraint_id": "c1",
+      "target": "detection_time",
+      "bound": "<=",
+      "limit": 0.5,
+      "limit_class": "MODELLED",
+      "status": "UNVERIFIABLE",
+      "reason": "target detection_time has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+     },
+     {
+      "constraint_id": "c2",
+      "target": "energy_density",
+      "bound": ">=",
+      "limit": 250.0,
+      "limit_class": "MODELLED",
+      "status": "UNVERIFIABLE",
+      "reason": "target energy_density has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+     },
+     {
+      "constraint_id": "c3",
+      "target": "pack_mass",
+      "bound": "<=",
+      "limit": 500.0,
+      "limit_class": "MODELLED",
+      "status": "UNVERIFIABLE",
+      "reason": "target pack_mass has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+     }
+    ]
+   },
+   "proposals": [],
+   "mutation_attempts_extra": []
+  }
+ ],
+ "outcome": "TECHNICAL_UNQUANTIFIED",
+ "outcome_reason": "improving directions exist but no movable DESIGN variable (outcomes are not set directly; unbounded parameters are immutable — ADR_R379)",
+ "extraction": {
+  "proposal_id": "tsp:549daacb2e1b",
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "status": "OK",
+  "prompt_hash": "844f3ffc062937104e9e543f403b53c3feed07958428fbc22cdfd3dbd3dcbd69",
+  "output_hash": "d9e88f74aa0013043c2be5bdc18706a0cc481190fad50687cf19c1f69ee201aa",
+  "latency_ms": 40418,
+  "error": null,
+  "proposal": {
+   "objects": [
+    {
+     "object_id": "battery_pack",
+     "name": "electric vehicle traction battery pack",
+     "role": "energy storage device for electric vehicles"
+    },
+    {
+     "object_id": "monitoring_system",
+     "name": "multi-sensory monitoring system",
+     "role": "detects early thermal runaway initiation and monitors propagation pathways"
+    },
+    {
+     "object_id": "xray_imaging",
+     "name": "X-ray imaging system",
+     "role": "component of monitoring system for internal battery structure analysis"
+    },
+    {
+     "object_id": "optical_sensors",
+     "name": "optical sensors",
+     "role": "component of monitoring system for surface temperature and visual changes detection"
+    },
+    {
+     "object_id": "acoustic_field_imaging",
+     "name": "acoustic field imaging system",
+     "role": "component of monitoring system for detecting mechanical failures and gas generation"
+    },
+    {
+     "object_id": "spectroscopy",
+     "name": "spectroscopy system",
+     "role": "component of monitoring system for chemical composition analysis during thermal events"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "energy_density",
+     "name": "battery pack energy density",
+     "category": "PARAMETERS",
+     "unit": "Wh/kg",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "energy storage capacity per unit mass"
+    },
+    {
+     "param_id": "pack_mass",
+     "name": "battery pack mass",
+     "category": "PARAMETERS",
+     "unit": "kg",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "total weight of the battery pack"
+    },
+    {
+     "param_id": "detection_time",
+     "name": "thermal runaway detection time",
+     "category": "PARAMETERS",
+     "unit": "seconds",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "time required to detect thermal runaway initiation"
+    },
+    {
+     "param_id": "propagation_time",
+     "name": "thermal runaway propagation time",
+     "category": "PARAMETERS",
+     "unit": "seconds",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "time for thermal runaway to spread to adjacent cells"
+    },
+    {
+     "param_id": "temp_rise_rate",
+     "name": "temperature rise rate",
+     "category": "PARAMETERS",
+     "unit": "°C/s",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "rate of temperature increase during thermal runaway"
+    },
+    {
+     "param_id": "electrolyte",
+     "name": "battery electrolyte",
+     "category": "MATERIALS",
+     "unit": null,
+     "value": "liquid/gel flammable solvent",
+     "value_class": "EXTRACTED",
+     "value_span": "The electrolyte is a liquid/gel flammable solvent",
+     "value_evidence_id": "europepmc:34073571",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "conductive medium between battery electrodes"
+    },
+    {
+     "param_id": "cathode_type",
+     "name": "battery cathode material",
+     "category": "MATERIALS",
+     "unit": null,
+     "value": "Nickel Manganese Cobalt oxide (NMC)",
+     "value_class": "EXTRACTED",
+     "value_span": "most of the EV companies use Nickel Manganese Cobalt oxide (NMC)",
+     "value_evidence_id": "europepmc:34073571",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "positive electrode material in battery"
+    },
+    {
+     "param_id": "anode_type",
+     "name": "battery anode material",
+     "category": "MATERIALS",
+     "unit": null,
+     "value": "graphite-based",
+     "value_class": "EXTRACTED",
+     "value_span": "Most of the Li-ion batteries anodes are graphite-based",
+     "value_evidence_id": "europepmc:34073571",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "negative electrode material in battery"
+    },
+    {
+     "param_id": "thermal_margin",
+     "name": "thermal margin",
+     "category": "PARAMETERS",
+     "unit": "°C",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "safety buffer between normal operating temperature and thermal runaway threshold"
+    },
+    {
+     "param_id": "prediction_rmse",
+     "name": "temperature prediction error",
+     "category": "PARAMETERS",
+     "unit": "°C",
+     "value": 2.1,
+     "value_class": "EXTRACTED",
+     "value_span": "achieve prediction RMSE below 2.1 °C",
+     "value_evidence_id": "europepmc:41826393",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "accuracy of temperature prediction in the monitoring system"
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "c1",
+     "target": "detection_time",
+     "bound": "<=",
+     "limit": 0.5,
+     "unit": "seconds",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "detection must occur before propagation to adjacent cells (Art. XXVII: no invented thresholds)"
+    },
+    {
+     "constraint_id": "c2",
+     "target": "energy_density",
+     "bound": ">=",
+     "limit": 250,
+     "unit": "Wh/kg",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "must meet industry standards for EV battery packs (Art. XXVII: no invented thresholds)"
+    },
+    {
+     "constraint_id": "c3",
+     "target": "pack_mass",
+     "bound": "<=",
+     "limit": 500,
+     "unit": "kg",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "must remain within vehicle weight constraints (Art. XXVII: no invented thresholds)"
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "o1",
+     "target": "detection_time",
+     "direction": "MINIMIZE",
+     "basis": "early detection of thermal runaway in individual cells before propagation to adjacent cells"
+    },
+    {
+     "objective_id": "o2",
+     "target": "energy_density",
+     "direction": "MAXIMIZE",
+     "basis": "maintain pack energy density within vehicle constraints"
+    },
+    {
+     "objective_id": "o3",
+     "target": "pack_mass",
+     "direction": "MINIMIZE",
+     "basis": "maintain pack mass within vehicle constraints"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "fm1",
+     "name": "thermal runaway initiation",
+     "problem_link": "battery thermal runaway initiation in individual cells"
+    },
+    {
+     "mode_id": "fm2",
+     "name": "thermal runaway propagation",
+     "problem_link": "thermal runaway spreading from one cell to adjacent cells"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "d1",
+     "cause": "temp_rise_rate",
+     "effect": "detection_time",
+     "direction": "INCREASES",
+     "statement": "faster temperature rise requires shorter detection time to prevent propagation",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "d2",
+     "cause": "electrolyte",
+     "effect": "temp_rise_rate",
+     "direction": "INCREASES",
+     "statement": "flammable electrolyte increases temperature rise rate during thermal events",
+     "relation_class": "EXTRACTED",
+     "span": "The electrolyte makes the battery and battery pack unsafe",
+     "evidence_id": "europepmc:34073571"
+    },
+    {
+     "relation_id": "d3",
+     "cause": "prediction_rmse",
+     "effect": "detection_time",
+     "direction": "DECREASES",
+     "statement": "lower temperature prediction error enables earlier detection of thermal runaway",
+     "relation_class": "EXTRACTED",
+     "span": "achieve prediction RMSE below 2.1 °C",
+     "evidence_id": "europepmc:41826393"
+    }
+   ]
+  },
+  "raw_content_sha256": "be2f6b1c6c2d49436f3ca05e948f22ba1de95d30e346bf714247e8ebacdabad4"
+ },
+ "technical_state_counts": {
+  "parameters": 10,
+  "parameters_with_value": 4,
+  "parameters_extracted": 4,
+  "parameters_modelled": 0,
+  "parameters_with_envelope": 0,
+  "constraints": 3,
+  "objectives": 3,
+  "dependencies": 1,
+  "objects": 6,
+  "failure_modes": 2
+ },
+ "baseline": {
+  "technical": {
+   "status": "PARTIALLY_QUANTIFIED",
+   "objective": {
+    "target": "detection_time",
+    "direction": "MINIMIZE",
+    "known": true,
+    "basis": "early detection of thermal runaway in individual cells before propagation to adjacent cells"
+   },
+   "limiting_variable": null,
+   "constraint_results": [
+    {
+     "constraint_id": "c1",
+     "target": "detection_time",
+     "bound": "<=",
+     "limit": 0.5,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target detection_time has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    },
+    {
+     "constraint_id": "c2",
+     "target": "energy_density",
+     "bound": ">=",
+     "limit": 250.0,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target energy_density has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    },
+    {
+     "constraint_id": "c3",
+     "target": "pack_mass",
+     "bound": "<=",
+     "limit": 500.0,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target pack_mass has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    }
+   ],
+   "uncertainty": {
+    "unknown_value_params": [
+     "detection_time",
+     "energy_density",
+     "pack_mass",
+     "propagation_time",
+     "temp_rise_rate",
+     "thermal_margin"
+    ],
+    "modelled_relations": 1,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [
+     "c1",
+     "c2",
+     "c3"
+    ],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "4aac45ad5511f2c4fa203acda825b355122780942b7335076ddf3acb36db9e87",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective detection_time (MINIMIZE)",
+     "checked 3 constraint(s) numerically where values exist",
+     "propagated signs over 1 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-08-31T06:11:37+00:00Z",
+    "deterministic": true
+   }
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.727,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.875,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.812,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.971,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_EXPERIMENT"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.846,
+  "q_average": 0.9,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "fidelity_escalation": {
+  "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1)",
+  "deciding_question": "does a design-variable change improve the objective within constraints?",
+  "resolved_at_current_tier": false,
+  "escalation_needed": true,
+  "next_tier_available": false,
+  "note": "higher tiers (NUMERICAL_SOLVER / SIMULATION / NEURAL_OPERATOR) are contract-reserved and not registered; escalation is recorded, never faked at the current tier"
+ },
+ "final": {
+  "technical": {
+   "status": "PARTIALLY_QUANTIFIED",
+   "objective": {
+    "target": "detection_time",
+    "direction": "MINIMIZE",
+    "known": true,
+    "basis": "early detection of thermal runaway in individual cells before propagation to adjacent cells"
+   },
+   "limiting_variable": null,
+   "constraint_results": [
+    {
+     "constraint_id": "c1",
+     "target": "detection_time",
+     "bound": "<=",
+     "limit": 0.5,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target detection_time has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    },
+    {
+     "constraint_id": "c2",
+     "target": "energy_density",
+     "bound": ">=",
+     "limit": 250.0,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target energy_density has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    },
+    {
+     "constraint_id": "c3",
+     "target": "pack_mass",
+     "bound": "<=",
+     "limit": 500.0,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target pack_mass has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    }
+   ],
+   "uncertainty": {
+    "unknown_value_params": [
+     "detection_time",
+     "energy_density",
+     "pack_mass",
+     "propagation_time",
+     "temp_rise_rate",
+     "thermal_margin"
+    ],
+    "modelled_relations": 1,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [
+     "c1",
+     "c2",
+     "c3"
+    ],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "4aac45ad5511f2c4fa203acda825b355122780942b7335076ddf3acb36db9e87",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective detection_time (MINIMIZE)",
+     "checked 3 constraint(s) numerically where values exist",
+     "propagated signs over 1 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-08-31T06:11:37+00:00Z",
+    "deterministic": true
+   }
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.727,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.875,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.812,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.971,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_EXPERIMENT"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.846,
+  "q_average": 0.9,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "outcome_summary": {
+  "baseline_status": "PARTIALLY_QUANTIFIED",
+  "final_status": "PARTIALLY_QUANTIFIED",
+  "baseline_i_average": 0.846,
+  "final_i_average": 0.846,
+  "baseline_prior_art": "RESOLVED_DIFFERENTIATED",
+  "final_prior_art": "RESOLVED_DIFFERENTIATED",
+  "iterations_run": 1,
+  "keeps": 0,
+  "attributions": []
+ },
+ "finished_at": "2026-08-31T06:11:37+00:00Z"
+}

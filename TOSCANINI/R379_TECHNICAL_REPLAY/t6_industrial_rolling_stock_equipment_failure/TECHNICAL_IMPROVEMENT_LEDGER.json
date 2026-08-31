@@ -1,0 +1,616 @@
+{
+ "ledger": "TECHNICAL_IMPROVEMENT_LEDGER (R379 TECHNICAL IMPROVEMENT ENGINE V2)",
+ "version": "2.0.0",
+ "loop": "CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + direction) -> TECHNICAL MUTATION (actual design variable) -> INDEPENDENT TECHNICAL EVALUATION -> EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL -> SECOND IMPROVEMENT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "thresholds": {
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO milestone is DIAGNOSE -> TECHNICAL MUTATION -> RE-EVALUATE -> SECOND IMPROVEMENT; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget, identical to the R378 epistemic loop: three attempts, then the honest no-defensible-mutation verdict"
+  },
+  "VALUE_CLASS_STRICTNESS": {
+   "value": "HARD",
+   "epistemic_class": "ENGINEERING",
+   "justification": "EXTRACTED claims are span-verified or rejected (Art. II/VI); MODELLED values are admitted only when declared; an unbounded parameter is immutable (ADR_R379 anti-gaming)"
+  }
+ },
+ "mutation_kinds_live": [
+  "PARAMETER_CHANGE",
+  "GEOMETRY_CHANGE",
+  "MATERIAL_CHANGE",
+  "OPERATING_CONDITION_CHANGE",
+  "MECHANISM_CHANGE"
+ ],
+ "mutation_kinds_reserved": {
+  "ARCHITECTURE_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)",
+  "CONTROL_POLICY_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)"
+ },
+ "keep_criterion": "the child's OWN independent technical evaluation must confirm the objective improves in the mutation direction with constraints preserved — a score increase is NEVER sufficient (CEO R379 item 4/8)",
+ "started_at": "2026-08-31T06:11:43+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "status": "PARTIALLY_QUANTIFIED",
+    "limiting_variable": null,
+    "improvement_directions_summary": [
+     {
+      "param_id": "param_001",
+      "improving_move": "INCREASE",
+      "mutable": false,
+      "blocked": false
+     }
+    ],
+    "constraint_results": [
+     {
+      "constraint_id": "constraint_002",
+      "target": "param_006",
+      "bound": ">=",
+      "limit": 65.0,
+      "limit_class": "MODELLED",
+      "status": "UNVERIFIABLE",
+      "reason": "target param_006 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+     },
+     {
+      "constraint_id": "constraint_003",
+      "target": "param_007",
+      "bound": ">=",
+      "limit": 67.0,
+      "limit_class": "MODELLED",
+      "status": "UNVERIFIABLE",
+      "reason": "target param_007 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+     }
+    ]
+   },
+   "proposals": [],
+   "mutation_attempts_extra": []
+  }
+ ],
+ "outcome": "TECHNICAL_UNQUANTIFIED",
+ "outcome_reason": "improving directions exist but no movable DESIGN variable (outcomes are not set directly; unbounded parameters are immutable — ADR_R379)",
+ "extraction": {
+  "proposal_id": "tsp:885a035dade9",
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "status": "OK",
+  "prompt_hash": "9eb13d08b07e563272df14388e14ac99aafd876f0653d42da1c6a068511d5c45",
+  "output_hash": "ac7aea0516b52ac6e53db885c3b6a9b1724ae8a91c730cfbf674af5394d9e21e",
+  "latency_ms": 73929,
+  "error": null,
+  "proposal": {
+   "objects": [
+    {
+     "object_id": "sensor_001",
+     "name": "vibration sensor",
+     "role": "monitors mechanical vibration in draft gear mechanisms"
+    },
+    {
+     "object_id": "sensor_002",
+     "name": "temperature sensor",
+     "role": "monitors temperature in journal bearings"
+    },
+    {
+     "object_id": "processing_unit",
+     "name": "onboard processing unit",
+     "role": "analyzes sensor data patterns indicative of wear or overheating"
+    },
+    {
+     "object_id": "wsn",
+     "name": "Wireless Sensor Network",
+     "role": "enables communication between sensors and processing unit"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "param_001",
+     "name": "detection_speed",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "km/h",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0,
+     "range_max": 80,
+     "range_span": "during low-speed operations (yard switching)",
+     "range_evidence_id": "evidence_001",
+     "role": "speed at which the system can detect equipment degradation"
+    },
+    {
+     "param_id": "param_002",
+     "name": "vibration_frequency",
+     "category": "PARAMETERS",
+     "unit": "Hz",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "frequency range of vibrations monitored by the sensor"
+    },
+    {
+     "param_id": "param_003",
+     "name": "temperature_threshold",
+     "category": "PARAMETERS",
+     "unit": "°C",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "temperature level indicating potential bearing failure"
+    },
+    {
+     "param_id": "param_004",
+     "name": "data_processing_rate",
+     "category": "PARAMETERS",
+     "unit": "Hz",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "rate at which the processing unit analyzes sensor data"
+    },
+    {
+     "param_id": "param_005",
+     "name": "communication_range",
+     "category": "PARAMETERS",
+     "unit": "m",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "maximum distance sensors can communicate with processing unit"
+    },
+    {
+     "param_id": "param_006",
+     "name": "dust_resistance",
+     "category": "MATERIALS",
+     "unit": "IP rating",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "level of protection against dust ingress"
+    },
+    {
+     "param_id": "param_007",
+     "name": "moisture_resistance",
+     "category": "MATERIALS",
+     "unit": "IP rating",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "level of protection against moisture ingress"
+    },
+    {
+     "param_id": "param_008",
+     "name": "power_tolerance",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "V",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "voltage range the system can tolerate with intermittent power"
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "constraint_001",
+     "target": "param_001",
+     "bound": "<=",
+     "limit": 80,
+     "unit": "km/h",
+     "limit_class": "EXTRACTED",
+     "limit_span": "during low-speed operations (yard switching)",
+     "limit_evidence_id": "evidence_001",
+     "justification": "System must detect degradation during yard switching operations before components reach critical failure points at mainline speeds"
+    },
+    {
+     "constraint_id": "constraint_002",
+     "target": "param_006",
+     "bound": ">=",
+     "limit": 65,
+     "unit": "IP rating",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "Must tolerate dust exposure in freight duty cycles (IP65 rating provides dust protection)"
+    },
+    {
+     "constraint_id": "constraint_003",
+     "target": "param_007",
+     "bound": ">=",
+     "limit": 67,
+     "unit": "IP rating",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "Must tolerate moisture exposure in freight duty cycles (IP67 rating provides water immersion protection)"
+    },
+    {
+     "constraint_id": "constraint_004",
+     "target": "param_008",
+     "bound": "between",
+     "limit": 9,
+     "unit": "V",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "Must operate with intermittent power typical in railway environments (9-36V DC common in rail applications)"
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "objective_001",
+     "target": "param_001",
+     "direction": "MAXIMIZE",
+     "basis": "Detect equipment degradation before en-route failure at mainline speeds"
+    },
+    {
+     "objective_id": "objective_002",
+     "target": "param_006",
+     "direction": "MAXIMIZE",
+     "basis": "Tolerate dust exposure in freight duty cycles"
+    },
+    {
+     "objective_id": "objective_003",
+     "target": "param_007",
+     "direction": "MAXIMIZE",
+     "basis": "Tolerate moisture exposure in freight duty cycles"
+    },
+    {
+     "objective_id": "objective_004",
+     "target": "param_003",
+     "direction": "MINIMIZE",
+     "basis": "Detect overheating before journal bearing failure occurs"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "mode_001",
+     "name": "sensor_failure",
+     "problem_link": "in-service mechanical or electrical equipment failure"
+    },
+    {
+     "mode_id": "mode_002",
+     "name": "communication_failure",
+     "problem_link": "in-service mechanical or electrical equipment failure"
+    },
+    {
+     "mode_id": "mode_003",
+     "name": "processing_failure",
+     "problem_link": "in-service mechanical or electrical equipment failure"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "dependency_001",
+     "cause": "param_002",
+     "effect": "param_003",
+     "direction": "INCREASES",
+     "statement": "Increased vibration frequency indicates mechanical wear which can lead to increased temperature",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dependency_002",
+     "cause": "param_003",
+     "effect": "mode_003",
+     "direction": "INCREASES",
+     "statement": "Higher temperature readings can overwhelm the processing unit if not properly filtered",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dependency_003",
+     "cause": "param_006",
+     "effect": "mode_001",
+     "direction": "DECREASES",
+     "statement": "Higher dust resistance reduces the likelihood of sensor failure due to contamination",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dependency_004",
+     "cause": "param_007",
+     "effect": "mode_001",
+     "direction": "DECREASES",
+     "statement": "Higher moisture resistance reduces the likelihood of sensor failure due to environmental exposure",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    }
+   ]
+  },
+  "raw_content_sha256": "42620ae87ab7ddbe670b778130941a08e0ba7c9ae9f8bc8a71ef9e8f7c708e18"
+ },
+ "technical_state_counts": {
+  "parameters": 8,
+  "parameters_with_value": 0,
+  "parameters_extracted": 0,
+  "parameters_modelled": 0,
+  "parameters_with_envelope": 0,
+  "constraints": 2,
+  "objectives": 4,
+  "dependencies": 1,
+  "objects": 4,
+  "failure_modes": 3
+ },
+ "baseline": {
+  "technical": {
+   "status": "PARTIALLY_QUANTIFIED",
+   "objective": {
+    "target": "param_001",
+    "direction": "MAXIMIZE",
+    "known": true,
+    "basis": "Detect equipment degradation before en-route failure at mainline speeds"
+   },
+   "limiting_variable": null,
+   "constraint_results": [
+    {
+     "constraint_id": "constraint_002",
+     "target": "param_006",
+     "bound": ">=",
+     "limit": 65.0,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target param_006 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    },
+    {
+     "constraint_id": "constraint_003",
+     "target": "param_007",
+     "bound": ">=",
+     "limit": 67.0,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target param_007 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    }
+   ],
+   "uncertainty": {
+    "unknown_value_params": [
+     "param_001",
+     "param_002",
+     "param_003",
+     "param_004",
+     "param_005",
+     "param_006",
+     "param_007",
+     "param_008"
+    ],
+    "modelled_relations": 1,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [
+     "constraint_002",
+     "constraint_003"
+    ],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "188f03bc11302702886db7f303e2b1060db84c04c5d522f9fa5afff1b7558b57",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective param_001 (MAXIMIZE)",
+     "checked 2 constraint(s) numerically where values exist",
+     "propagated signs over 1 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-08-31T06:12:57+00:00Z",
+    "deterministic": true
+   }
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.25,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.708,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_EXPERIMENT"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.74,
+  "q_average": 0.7,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "fidelity_escalation": {
+  "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1)",
+  "deciding_question": "does a design-variable change improve the objective within constraints?",
+  "resolved_at_current_tier": false,
+  "escalation_needed": true,
+  "next_tier_available": false,
+  "note": "higher tiers (NUMERICAL_SOLVER / SIMULATION / NEURAL_OPERATOR) are contract-reserved and not registered; escalation is recorded, never faked at the current tier"
+ },
+ "final": {
+  "technical": {
+   "status": "PARTIALLY_QUANTIFIED",
+   "objective": {
+    "target": "param_001",
+    "direction": "MAXIMIZE",
+    "known": true,
+    "basis": "Detect equipment degradation before en-route failure at mainline speeds"
+   },
+   "limiting_variable": null,
+   "constraint_results": [
+    {
+     "constraint_id": "constraint_002",
+     "target": "param_006",
+     "bound": ">=",
+     "limit": 65.0,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target param_006 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    },
+    {
+     "constraint_id": "constraint_003",
+     "target": "param_007",
+     "bound": ">=",
+     "limit": 67.0,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target param_007 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    }
+   ],
+   "uncertainty": {
+    "unknown_value_params": [
+     "param_001",
+     "param_002",
+     "param_003",
+     "param_004",
+     "param_005",
+     "param_006",
+     "param_007",
+     "param_008"
+    ],
+    "modelled_relations": 1,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [
+     "constraint_002",
+     "constraint_003"
+    ],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "188f03bc11302702886db7f303e2b1060db84c04c5d522f9fa5afff1b7558b57",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective param_001 (MAXIMIZE)",
+     "checked 2 constraint(s) numerically where values exist",
+     "propagated signs over 1 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-08-31T06:12:57+00:00Z",
+    "deterministic": true
+   }
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.25,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.708,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_EXPERIMENT"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.74,
+  "q_average": 0.7,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "outcome_summary": {
+  "baseline_status": "PARTIALLY_QUANTIFIED",
+  "final_status": "PARTIALLY_QUANTIFIED",
+  "baseline_i_average": 0.74,
+  "final_i_average": 0.74,
+  "baseline_prior_art": "RESOLVED_DIFFERENTIATED",
+  "final_prior_art": "RESOLVED_DIFFERENTIATED",
+  "iterations_run": 1,
+  "keeps": 0,
+  "attributions": []
+ },
+ "finished_at": "2026-08-31T06:12:57+00:00Z"
+}

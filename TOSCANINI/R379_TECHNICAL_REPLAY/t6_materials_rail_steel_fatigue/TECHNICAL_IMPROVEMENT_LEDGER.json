@@ -1,0 +1,572 @@
+{
+ "ledger": "TECHNICAL_IMPROVEMENT_LEDGER (R379 TECHNICAL IMPROVEMENT ENGINE V2)",
+ "version": "2.0.0",
+ "loop": "CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + direction) -> TECHNICAL MUTATION (actual design variable) -> INDEPENDENT TECHNICAL EVALUATION -> EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL -> SECOND IMPROVEMENT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "thresholds": {
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO milestone is DIAGNOSE -> TECHNICAL MUTATION -> RE-EVALUATE -> SECOND IMPROVEMENT; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget, identical to the R378 epistemic loop: three attempts, then the honest no-defensible-mutation verdict"
+  },
+  "VALUE_CLASS_STRICTNESS": {
+   "value": "HARD",
+   "epistemic_class": "ENGINEERING",
+   "justification": "EXTRACTED claims are span-verified or rejected (Art. II/VI); MODELLED values are admitted only when declared; an unbounded parameter is immutable (ADR_R379 anti-gaming)"
+  }
+ },
+ "mutation_kinds_live": [
+  "PARAMETER_CHANGE",
+  "GEOMETRY_CHANGE",
+  "MATERIAL_CHANGE",
+  "OPERATING_CONDITION_CHANGE",
+  "MECHANISM_CHANGE"
+ ],
+ "mutation_kinds_reserved": {
+  "ARCHITECTURE_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)",
+  "CONTROL_POLICY_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)"
+ },
+ "keep_criterion": "the child's OWN independent technical evaluation must confirm the objective improves in the mutation direction with constraints preserved — a score increase is NEVER sufficient (CEO R379 item 4/8)",
+ "started_at": "2026-08-31T06:13:03+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "status": "PARTIALLY_QUANTIFIED",
+    "limiting_variable": null,
+    "improvement_directions_summary": [
+     {
+      "param_id": "fracture_toughness_hydrogenated",
+      "improving_move": "INCREASE",
+      "mutable": false,
+      "blocked": false
+     }
+    ],
+    "constraint_results": [
+     {
+      "constraint_id": "c1",
+      "target": "fracture_toughness_hydrogenated",
+      "bound": ">=",
+      "limit": 46.6,
+      "limit_class": "EXTRACTED",
+      "status": "SATISFIED",
+      "value": 46.6,
+      "slack": 0.0
+     },
+     {
+      "constraint_id": "c2",
+      "target": "hydrogen_content",
+      "bound": "<=",
+      "limit": 0.8,
+      "limit_class": "EXTRACTED",
+      "status": "UNVERIFIABLE",
+      "reason": "target hydrogen_content has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+     }
+    ]
+   },
+   "proposals": [],
+   "mutation_attempts_extra": []
+  }
+ ],
+ "outcome": "TECHNICAL_UNQUANTIFIED",
+ "outcome_reason": "improving directions exist but no movable DESIGN variable (outcomes are not set directly; unbounded parameters are immutable — ADR_R379)",
+ "extraction": {
+  "proposal_id": "tsp:271b6adfc978",
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "status": "OK",
+  "prompt_hash": "daf4199747d87978707e71cdc1fe7625868c24104cf839420a68aad84273b58a",
+  "output_hash": "947f6684db2f07b3d2d7a94852c6bc40fcd573d804795abb69e516e529f074ae",
+  "latency_ms": 45434,
+  "error": null,
+  "proposal": {
+   "objects": [
+    {
+     "object_id": "rail_steel",
+     "name": "pearlite steel (R260)",
+     "role": "base material for rail joints"
+    },
+    {
+     "object_id": "weld_joint",
+     "name": "thermite weldment",
+     "role": "joint connection between rail sections"
+    },
+    {
+     "object_id": "crack_resistant_insert",
+     "name": "additively manufactured crack-resistant material insert",
+     "role": "protective element at rail joints to mitigate hydrogen embrittlement"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "hydrogen_content",
+     "name": "hydrogen content in pearlite steel",
+     "category": "MATERIALS",
+     "unit": "ppm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.4,
+     "range_max": 0.8,
+     "range_span": "0.4 … 0.8 ppm",
+     "range_evidence_id": "europepmc:41515718",
+     "role": "hydrogen absorbed during welding that influences fatigue and brittle fractures"
+    },
+    {
+     "param_id": "hydrogen_saturation",
+     "name": "hydrogen saturation level",
+     "category": "MATERIALS",
+     "unit": "ppm",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": 4.7,
+     "range_span": "up to 4.7 ppm",
+     "range_evidence_id": "europepmc:41515718",
+     "role": "maximum hydrogen content in specimens during testing"
+    },
+    {
+     "param_id": "fracture_toughness_non_hydrogenated",
+     "name": "fracture toughness of non-hydrogenated specimens",
+     "category": "PARAMETERS",
+     "unit": "MPa m^0.5",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 49.7,
+     "range_max": 50.7,
+     "range_span": "49.7 … 50.7 MPa m^0.5",
+     "range_evidence_id": "europepmc:41515718",
+     "role": "baseline fracture toughness measurement in non-hydrogenated specimens"
+    },
+    {
+     "param_id": "fracture_toughness_hydrogenated",
+     "name": "fracture toughness of hydrogenated specimens",
+     "category": "PARAMETERS",
+     "unit": "MPa m^0.5",
+     "value": 46.6,
+     "value_class": "EXTRACTED",
+     "value_span": "46.6 MPa m 0.5",
+     "value_evidence_id": "europepmc:41515718",
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "reduced fracture toughness in hydrogenated specimens"
+    },
+    {
+     "param_id": "fatigue_cycles",
+     "name": "number of fatigue cycles",
+     "category": "PARAMETERS",
+     "unit": "cycles",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "number of load cycles to achieve fatigue crack"
+    },
+    {
+     "param_id": "temperature_excursion",
+     "name": "temperature variation",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "°C",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "temperature variation that affects rail joint performance"
+    },
+    {
+     "param_id": "traffic_load",
+     "name": "applied traffic load",
+     "category": "OPERATING_CONDITIONS",
+     "unit": "MPa",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "dynamic load applied to rail joints during operation"
+    },
+    {
+     "param_id": "crack_propagation_rate",
+     "name": "crack propagation rate",
+     "category": "PARAMETERS",
+     "unit": "mm/cycle",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "speed at which cracks grow under cyclic loading"
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "c1",
+     "target": "fracture_toughness_hydrogenated",
+     "bound": ">=",
+     "limit": 46.6,
+     "unit": "MPa m^0.5",
+     "limit_class": "EXTRACTED",
+     "limit_span": "46.6 MPa m 0.5",
+     "limit_evidence_id": "europepmc:41515718",
+     "justification": "minimum fracture toughness to prevent critical fracture in hydrogenated specimens"
+    },
+    {
+     "constraint_id": "c2",
+     "target": "hydrogen_content",
+     "bound": "<=",
+     "limit": 0.8,
+     "unit": "ppm",
+     "limit_class": "EXTRACTED",
+     "limit_span": "0.4 … 0.8 ppm",
+     "limit_evidence_id": "europepmc:41515718",
+     "justification": "maximum hydrogen content during welding to minimize embrittlement"
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "o1",
+     "target": "fracture_toughness_hydrogenated",
+     "direction": "MAXIMIZE",
+     "basis": "to prevent service fracture under measured traffic loads across temperature excursions"
+    },
+    {
+     "objective_id": "o2",
+     "target": "fatigue_cycles",
+     "direction": "MAXIMIZE",
+     "basis": "to extend service life of rail joints under temperature excursions and traffic loads"
+    },
+    {
+     "objective_id": "o3",
+     "target": "crack_propagation_rate",
+     "direction": "MINIMIZE",
+     "basis": "to reduce fracture incidents in rail joints"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "fm1",
+     "name": "rail steel fatigue fracture",
+     "problem_link": "rail steel fatigue fracture in service"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "d1",
+     "cause": "hydrogen_content",
+     "effect": "fatigue_cycles",
+     "direction": "DECREASES",
+     "statement": "increased hydrogen content in pearlite steel reduces the number of cycles to achieve fatigue crack",
+     "relation_class": "EXTRACTED",
+     "span": "in hydrogen-saturated (up to 4.7 ppm) specimens, the desired fatigue crack can be obtained at a considerably lower number of cycles of the same dynamic load than in non-hydrogenated ones",
+     "evidence_id": "europepmc:41515718"
+    },
+    {
+     "relation_id": "d2",
+     "cause": "hydrogen_content",
+     "effect": "fracture_toughness_hydrogenated",
+     "direction": "DECREASES",
+     "statement": "increased hydrogen content reduces fracture toughness of pearlite steel",
+     "relation_class": "EXTRACTED",
+     "span": "hydrogenated specimens exhibit lower fracture toughness than their non-hydrogenated counterparts",
+     "evidence_id": "europepmc:41515718"
+    },
+    {
+     "relation_id": "d3",
+     "cause": "hydrogen_content",
+     "effect": "crack_propagation_rate",
+     "direction": "INCREASES",
+     "statement": "increased hydrogen content accelerates crack propagation",
+     "relation_class": "EXTRACTED",
+     "span": "Increased hydrogen content can also affect crack propagation",
+     "evidence_id": "europepmc:41515718"
+    },
+    {
+     "relation_id": "d4",
+     "cause": "temperature_excursion",
+     "effect": "hydrogen_content",
+     "direction": "INCREASES",
+     "statement": "temperature variations during operation influence hydrogen absorption in pearlite steel",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    }
+   ]
+  },
+  "raw_content_sha256": "d04ced4efa5599862e0340e643e588bb1247fd63e5782bfe09a85c2c5b30f371"
+ },
+ "technical_state_counts": {
+  "parameters": 8,
+  "parameters_with_value": 1,
+  "parameters_extracted": 1,
+  "parameters_modelled": 0,
+  "parameters_with_envelope": 2,
+  "constraints": 2,
+  "objectives": 3,
+  "dependencies": 3,
+  "objects": 3,
+  "failure_modes": 1
+ },
+ "baseline": {
+  "technical": {
+   "status": "PARTIALLY_QUANTIFIED",
+   "objective": {
+    "target": "fracture_toughness_hydrogenated",
+    "direction": "MAXIMIZE",
+    "known": true,
+    "basis": "to prevent service fracture under measured traffic loads across temperature excursions"
+   },
+   "limiting_variable": null,
+   "constraint_results": [
+    {
+     "constraint_id": "c1",
+     "target": "fracture_toughness_hydrogenated",
+     "bound": ">=",
+     "limit": 46.6,
+     "limit_class": "EXTRACTED",
+     "status": "SATISFIED",
+     "value": 46.6,
+     "slack": 0.0
+    },
+    {
+     "constraint_id": "c2",
+     "target": "hydrogen_content",
+     "bound": "<=",
+     "limit": 0.8,
+     "limit_class": "EXTRACTED",
+     "status": "UNVERIFIABLE",
+     "reason": "target hydrogen_content has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    }
+   ],
+   "uncertainty": {
+    "unknown_value_params": [
+     "crack_propagation_rate",
+     "fatigue_cycles",
+     "fracture_toughness_non_hydrogenated",
+     "hydrogen_content",
+     "hydrogen_saturation",
+     "temperature_excursion",
+     "traffic_load"
+    ],
+    "modelled_relations": 1,
+    "extracted_relations": 2,
+    "unverifiable_constraints": [
+     "c2"
+    ],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "0814da7699bfc4f081cb018abf53fc34d43a2c284757c76766ed862ff698af9f",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective fracture_toughness_hydrogenated (MAXIMIZE)",
+     "checked 2 constraint(s) numerically where values exist",
+     "propagated signs over 3 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-08-31T06:13:49+00:00Z",
+    "deterministic": true
+   }
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.652,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.737,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.984,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_EXPERIMENT"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.843,
+  "q_average": 0.82,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "fidelity_escalation": {
+  "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1)",
+  "deciding_question": "does a design-variable change improve the objective within constraints?",
+  "resolved_at_current_tier": false,
+  "escalation_needed": true,
+  "next_tier_available": false,
+  "note": "higher tiers (NUMERICAL_SOLVER / SIMULATION / NEURAL_OPERATOR) are contract-reserved and not registered; escalation is recorded, never faked at the current tier"
+ },
+ "final": {
+  "technical": {
+   "status": "PARTIALLY_QUANTIFIED",
+   "objective": {
+    "target": "fracture_toughness_hydrogenated",
+    "direction": "MAXIMIZE",
+    "known": true,
+    "basis": "to prevent service fracture under measured traffic loads across temperature excursions"
+   },
+   "limiting_variable": null,
+   "constraint_results": [
+    {
+     "constraint_id": "c1",
+     "target": "fracture_toughness_hydrogenated",
+     "bound": ">=",
+     "limit": 46.6,
+     "limit_class": "EXTRACTED",
+     "status": "SATISFIED",
+     "value": 46.6,
+     "slack": 0.0
+    },
+    {
+     "constraint_id": "c2",
+     "target": "hydrogen_content",
+     "bound": "<=",
+     "limit": 0.8,
+     "limit_class": "EXTRACTED",
+     "status": "UNVERIFIABLE",
+     "reason": "target hydrogen_content has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    }
+   ],
+   "uncertainty": {
+    "unknown_value_params": [
+     "crack_propagation_rate",
+     "fatigue_cycles",
+     "fracture_toughness_non_hydrogenated",
+     "hydrogen_content",
+     "hydrogen_saturation",
+     "temperature_excursion",
+     "traffic_load"
+    ],
+    "modelled_relations": 1,
+    "extracted_relations": 2,
+    "unverifiable_constraints": [
+     "c2"
+    ],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "0814da7699bfc4f081cb018abf53fc34d43a2c284757c76766ed862ff698af9f",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective fracture_toughness_hydrogenated (MAXIMIZE)",
+     "checked 2 constraint(s) numerically where values exist",
+     "propagated signs over 3 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-08-31T06:13:49+00:00Z",
+    "deterministic": true
+   }
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.652,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.737,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.984,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_EXPERIMENT"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.843,
+  "q_average": 0.82,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "outcome_summary": {
+  "baseline_status": "PARTIALLY_QUANTIFIED",
+  "final_status": "PARTIALLY_QUANTIFIED",
+  "baseline_i_average": 0.843,
+  "final_i_average": 0.843,
+  "baseline_prior_art": "RESOLVED_DIFFERENTIATED",
+  "final_prior_art": "RESOLVED_DIFFERENTIATED",
+  "iterations_run": 1,
+  "keeps": 0,
+  "attributions": []
+ },
+ "finished_at": "2026-08-31T06:13:49+00:00Z"
+}

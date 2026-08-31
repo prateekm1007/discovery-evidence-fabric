@@ -622,6 +622,21 @@ def search_patsnap_eureka(query: str, num_results: int = 8) -> SourceQueryResult
                     error=f"PATSNAP_AUTH_HEADER_INVALID: {err_msg}",
                     error_code=err_code,
                 )
+            if err_code == 67200202 or "apikey auth error" in err_msg.lower():
+                # R379: the CEO-provided fresh key (sk-…) was probed
+                # live and rejected with 67200202 "apikey auth error!"
+                # (HTTP 200) — a distinct auth-class failure from the
+                # historical BALANCE_EXHAUSTED 67200005. Recorded
+                # precisely so the health report shows the exact
+                # unblock action needed (credential/tier verification),
+                # never a generic HTTP error.
+                return SourceQueryResult(
+                    source_id="PATSNAP_EUREKA",
+                    success=False,
+                    latency_ms=latency,
+                    error=f"PATSNAP_KEY_REJECTED_AUTH: {err_msg}",
+                    error_code=err_code,
+                )
             # If we get here, the API returned a real chat response — parse it
             choices = data.get("choices") or []
             if choices:

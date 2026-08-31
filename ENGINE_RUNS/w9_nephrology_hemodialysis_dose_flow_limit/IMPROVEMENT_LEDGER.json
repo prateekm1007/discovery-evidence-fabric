@@ -1,0 +1,1145 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-08-31T07:13:14+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.071,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.071 < STRONG floor 0.7; underived_flag set (span_support=0.429, evidence_support=0.071) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:3ad29cc05d8e",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "4d06d3101777e02766ee822a55973565c6702dfbe00f90fa222995067a5dd9f0",
+     "output_hash": "3ad29cc05d8e117ce30a3e0b68191fa0b6c152ca60386e3acf2691d2629527da",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%)",
+      "INTERVENTION": "implement a membrane coating technology from the water purification industry that reduces protein fouling and biocompatibility issues",
+      "EXPECTED_EFFECT": "maintain optimal blood flow rates by preventing allergic reactions that cause patients to request reduced flow rates",
+      "FALSIFICATION_TEST": "",
+      "MECHANISM_SOURCE_SPAN": "The predominant etiological factors identified were hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%), AVF needles kits and hemodialysis extracorporeal circuit tubing (Ethylene Oxide Residue) (n = 27, 67.5%), and Nafamostat Mesylate (n = 2, 5%). Thorough saline pre-rinsing of the extracorporeal circuit remained the primary preventive strategy against EO-induced hypersensitivity. Switching to irradiated-sterilized acetate-membrane or wet-membrane dialyzers effectively prevented dialyzer hy",
+      "SOURCE_EVIDENCE_ID": "europepmc:42237261",
+      "EXPERIMENT": "falsification_test_from_candidate",
+      "EXPERIMENT_BASELINE": "",
+      "EXPERIMENT_EIG": "",
+      "CONSTRAINT_DERIVED": "The evidence-derived constraint is that hypersensitivity to the hemodialyzer membrane is a documented etiological factor in 27.5% of hemodialysis-related allergic reactions, with switching to irradiated-sterilized acetate-membrane or wet-membrane dialyzers being an effective preventive strategy.",
+      "MUTATION_REASON": "This mutation repairs the measured weakness by anchoring the mechanism's technical vocabulary directly in the cited evidence, specifically using the exact terminology \"hypersensitivity to the hemodialyzer membrane\" as reported in the evidence with its associated prevalence rate."
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:42237261",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.286,
+       "evidence_support_cleared": 0.286,
+       "constraint_traceable_to_evidence": "The evidence-derived constraint is that hypersensitivity to the hemodialyzer membrane is a documented etiological factor"
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T07:13:22+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:897542647628",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "c2991ff48bd16c12401bd5bc4f469dde153f967e14ee1448887776049609f519",
+     "output_hash": "89754264762816518bc2478233d8de96278626169b239eea8b09e139982a4c00",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "hypersensitivity to the hemodialyzer membrane causing allergic reactions",
+      "INTERVENTION": "implement a membrane coating technology from the water purification industry that reduces protein fouling and biocompatibility issues to prevent hypersensitivity reactions",
+      "EXPECTED_EFFECT": "maintain optimal blood flow rates by preventing allergic reactions that cause patients to request reduced flow rates",
+      "FALSIFICATION_TEST": "",
+      "MECHANISM_SOURCE_SPAN": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%), AVF needles kits and hemodialysis extracorporeal circuit tubing (Ethylene Oxide Residue) (n = 27, 67.5%), and Nafamostat Mesylate (n = 2, 5%)",
+      "SOURCE_EVIDENCE_ID": "europepmc:42237261",
+      "EXPERIMENT": "compare the frequency of hypersensitivity reactions between patients using coated membranes versus standard membranes",
+      "EXPERIMENT_BASELINE": "standard hemodialyzer membranes without coating technology",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "coating technology must specifically target hemodialyzer membrane hypersensitivity reactions",
+      "MUTATION_REASON": "repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism's technical vocabulary in the evidence's actual text"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:42237261",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.333,
+       "evidence_support_cleared": 0.333,
+       "constraint_traceable_to_evidence": "coating technology must specifically target hemodialyzer membrane hypersensitivity reactions"
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T07:13:28+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:cff715408493",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.071,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:3ad29cc05d8e",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "4d06d3101777e02766ee822a55973565c6702dfbe00f90fa222995067a5dd9f0",
+       "output_hash": "3ad29cc05d8e117ce30a3e0b68191fa0b6c152ca60386e3acf2691d2629527da",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "europepmc:42237261",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.286,
+        "evidence_support_cleared": 0.286,
+        "constraint_traceable_to_evidence": "The evidence-derived constraint is that hypersensitivity to the hemodialyzer membrane is a documented etiological factor"
+       },
+       "reasons": [],
+       "validated_at": "2026-08-31T07:13:22+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "hypersensitivity to the hemodialyzer membrane",
+        "after": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%)"
+       },
+       "intervention": {
+        "before": "implement a membrane coating technology from the water purification industry that reduces protein fouling and biocompatibility issues",
+        "after": "implement a membrane coating technology from the water purification industry that reduces protein fouling and biocompatibility issues"
+       },
+       "mechanism_source_span": {
+        "before": "The predominant etiological factors identified were hypersensitivity to the hemodialyzer membrane (n = 11",
+        "after": "The predominant etiological factors identified were hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%), AVF needles kits and hemodialysis extracorporeal circuit tubing (Ethylene Oxide Residue) (n = 27, 67.5%), and Nafamostat Mesylate (n = 2, 5%). Thorough saline pre-rinsing of the extraco"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:unsupported_mechanism",
+        "con:attack:weak_transfer",
+        "con:attack:contradiction",
+        "maintenance hemodialysis extracorporeal circuit blood arterial",
+        "maintenance hemodialysis extracorporeal circuit blood arterial",
+        "hypersensitivity hemodialyzer membrane",
+        "hypersensitivity hemodialyzer membrane",
+        "membrane coating technology purification industry reduces protein",
+        "membrane coating technology purification industry reduces protein",
+        "maintenance prevention preventing coating purification fouling",
+        "maintenance prevention preventing coating purification fouling",
+        "maintain optimal preventing allergic reactions request",
+        "maintain optimal preventing allergic reactions request"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "eaa5a89dd4abdbbd6266a717918c568e70cd2fd1e6c9b9aa0fa93628cd507d85",
+      "child_spec_hash": null,
+      "reason": "This mutation repairs the measured weakness by anchoring the mechanism's technical vocabulary directly in the cited evidence, specifically using the exact terminology \"hypersensitivity to the hemodialyzer membrane\" as reported in the evidence with its associated prevalence rate.",
+      "applied_at": "2026-08-31T07:13:22+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-08-31T07:13:22+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.081,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": true,
+       "recombination_only": false
+      },
+      "i_average": 0.374,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "REJECT_MUTATION",
+      "improved": false,
+      "checks": {
+       "targeted_dimension": "0.071 -> 0.081 (score moved but the structural flag PERSISTS — not a defensible improvement)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-08-31T07:13:22+00:00Z"
+     }
+    },
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:bc7aabf5f1e9",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.071,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:897542647628",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "c2991ff48bd16c12401bd5bc4f469dde153f967e14ee1448887776049609f519",
+       "output_hash": "89754264762816518bc2478233d8de96278626169b239eea8b09e139982a4c00",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "europepmc:42237261",
+        "span_verbatim_in_evidence": true,
+        "evidence_support": 0.333,
+        "evidence_support_cleared": 0.333,
+        "constraint_traceable_to_evidence": "coating technology must specifically target hemodialyzer membrane hypersensitivity reactions"
+       },
+       "reasons": [],
+       "validated_at": "2026-08-31T07:13:28+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "hypersensitivity to the hemodialyzer membrane",
+        "after": "hypersensitivity to the hemodialyzer membrane causing allergic reactions"
+       },
+       "intervention": {
+        "before": "implement a membrane coating technology from the water purification industry that reduces protein fouling and biocompatibility issues",
+        "after": "implement a membrane coating technology from the water purification industry that reduces protein fouling and biocompatibility issues to prevent hypersensitivity reactions"
+       },
+       "mechanism_source_span": {
+        "before": "The predominant etiological factors identified were hypersensitivity to the hemodialyzer membrane (n = 11",
+        "after": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%), AVF needles kits and hemodialysis extracorporeal circuit tubing (Ethylene Oxide Residue) (n = 27, 67.5%), and Nafamostat Mesylate (n = 2, 5%)"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:unsupported_mechanism",
+        "con:attack:weak_transfer",
+        "con:attack:contradiction",
+        "maintenance hemodialysis extracorporeal circuit blood arterial",
+        "maintenance hemodialysis extracorporeal circuit blood arterial",
+        "hypersensitivity hemodialyzer membrane",
+        "hypersensitivity hemodialyzer membrane",
+        "membrane coating technology purification industry reduces protein",
+        "membrane coating technology purification industry reduces protein",
+        "maintenance prevention preventing coating purification fouling",
+        "maintenance prevention preventing coating purification fouling",
+        "maintain optimal preventing allergic reactions request",
+        "maintain optimal preventing allergic reactions request"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "eaa5a89dd4abdbbd6266a717918c568e70cd2fd1e6c9b9aa0fa93628cd507d85",
+      "child_spec_hash": null,
+      "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism's technical vocabulary in the evidence's actual text",
+      "applied_at": "2026-08-31T07:13:28+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-08-31T07:13:28+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.2,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.433,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.071 -> 0.2 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-08-31T07:13:28+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:cff715408493",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.071,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:3ad29cc05d8e",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "4d06d3101777e02766ee822a55973565c6702dfbe00f90fa222995067a5dd9f0",
+     "output_hash": "3ad29cc05d8e117ce30a3e0b68191fa0b6c152ca60386e3acf2691d2629527da",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:42237261",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.286,
+      "evidence_support_cleared": 0.286,
+      "constraint_traceable_to_evidence": "The evidence-derived constraint is that hypersensitivity to the hemodialyzer membrane is a documented etiological factor"
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T07:13:22+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "hypersensitivity to the hemodialyzer membrane",
+      "after": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%)"
+     },
+     "intervention": {
+      "before": "implement a membrane coating technology from the water purification industry that reduces protein fouling and biocompatibility issues",
+      "after": "implement a membrane coating technology from the water purification industry that reduces protein fouling and biocompatibility issues"
+     },
+     "mechanism_source_span": {
+      "before": "The predominant etiological factors identified were hypersensitivity to the hemodialyzer membrane (n = 11",
+      "after": "The predominant etiological factors identified were hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%), AVF needles kits and hemodialysis extracorporeal circuit tubing (Ethylene Oxide Residue) (n = 27, 67.5%), and Nafamostat Mesylate (n = 2, 5%). Thorough saline pre-rinsing of the extraco"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:unsupported_mechanism",
+      "con:attack:weak_transfer",
+      "con:attack:contradiction",
+      "maintenance hemodialysis extracorporeal circuit blood arterial",
+      "maintenance hemodialysis extracorporeal circuit blood arterial",
+      "hypersensitivity hemodialyzer membrane",
+      "hypersensitivity hemodialyzer membrane",
+      "membrane coating technology purification industry reduces protein",
+      "membrane coating technology purification industry reduces protein",
+      "maintenance prevention preventing coating purification fouling",
+      "maintenance prevention preventing coating purification fouling",
+      "maintain optimal preventing allergic reactions request",
+      "maintain optimal preventing allergic reactions request"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "eaa5a89dd4abdbbd6266a717918c568e70cd2fd1e6c9b9aa0fa93628cd507d85",
+    "child_spec_hash": null,
+    "reason": "This mutation repairs the measured weakness by anchoring the mechanism's technical vocabulary directly in the cited evidence, specifically using the exact terminology \"hypersensitivity to the hemodialyzer membrane\" as reported in the evidence with its associated prevalence rate.",
+    "applied_at": "2026-08-31T07:13:22+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T07:13:28+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.2,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.433,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.071 -> 0.2 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T07:13:28+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.2,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.2 < STRONG floor 0.7",
+      "mutation_type": "MECHANISM_STRENGTHENING"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "state": "UNMEASURABLE_NO_SURVIVORS",
+      "what_is_missing": "no surviving differentiators recorded",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "state": "UNMEASURABLE_NO_FAMILIES",
+      "what_is_missing": "no prior-art families adjudicated — residue vs found art is unmeasured; absence of found art is not novelty",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     },
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:b490d2f16661",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "3a609adeaf88a93e350751264a1f7af598fa7f4a5601699bfafdce22c3b7ccae",
+     "output_hash": "b490d2f16661b87b198def96ba23611a49328ea3e2978c86abfa3fb5268e238b",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%)",
+      "INTERVENTION": "switching to irradiated-sterilized acetate-membrane or wet-membrane dialyzers",
+      "EXPECTED_EFFECT": "maintain optimal blood flow rates by preventing allergic reactions that cause patients to request reduced flow rates",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%)",
+      "SOURCE_EVIDENCE_ID": "europepmc:42237261",
+      "EXPERIMENT": "compare the incidence of allergic reactions between patients using standard hemodialyzers versus those using irradiated-sterilized acetate-membrane or wet-membrane dialyzers",
+      "EXPERIMENT_BASELINE": "standard hemodialyzers without membrane modification",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by using verbatim evidence span with technical vocabulary directly from the source text"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:42237261",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 3,
+        "shared_terms": [
+         "hemodialyzer",
+         "hypersensitivity",
+         "membrane"
+        ],
+        "span_terms_n": 3,
+        "ratio": 1.0,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 1.0
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T07:13:32+00:00Z"
+     }
+    }
+   ],
+   "mutation_attempts": [
+    {
+     "mutation_applied": {
+      "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+      "mutation_id": "mut:ccedd17affca",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "diagnostic_trigger": {
+       "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "measured_before": 0.2,
+       "basis": "R378 evaluator-contract diagnosis (deterministic)"
+      },
+      "proposal_provenance": {
+       "proposal_id": "prop:b490d2f16661",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "prompt_hash": "3a609adeaf88a93e350751264a1f7af598fa7f4a5601699bfafdce22c3b7ccae",
+       "output_hash": "b490d2f16661b87b198def96ba23611a49328ea3e2978c86abfa3fb5268e238b",
+       "llm_is_untrusted_proposer": true
+      },
+      "validation": {
+       "valid": true,
+       "stage": "VALIDATION",
+       "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+       "mutation_type": "MECHANISM_STRENGTHENING",
+       "checks": {
+        "mutation_type_matches_diagnosis": true,
+        "span_evidence_exists": "europepmc:42237261",
+        "span_verbatim_in_evidence": true,
+        "mutation_changes_candidate": true,
+        "span_derivation": {
+         "n_shared": 3,
+         "shared_terms": [
+          "hemodialyzer",
+          "hypersensitivity",
+          "membrane"
+         ],
+         "span_terms_n": 3,
+         "ratio": 1.0,
+         "underived": false,
+         "state": "MEASURED",
+         "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+        },
+        "span_derivation_cleared": 1.0
+       },
+       "reasons": [],
+       "validated_at": "2026-08-31T07:13:32+00:00Z"
+      },
+      "fields_changed": {
+       "mechanism": {
+        "before": "hypersensitivity to the hemodialyzer membrane causing allergic reactions",
+        "after": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%)"
+       },
+       "intervention": {
+        "before": "implement a membrane coating technology from the water purification industry that reduces protein fouling and biocompatibility issues to prevent hypersensitivity reactions",
+        "after": "switching to irradiated-sterilized acetate-membrane or wet-membrane dialyzers"
+       },
+       "mechanism_source_span": {
+        "before": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%), AVF needles kits and hemodialysis extracorporeal circuit tubing (Ethylene Oxide Residue) (n = 27, 67.5%), and Nafamostat Mesylate (n = 2, 5%)",
+        "after": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%)"
+       }
+      },
+      "inherited_negatives": {
+       "uncertainty_ids": [
+        "con:attack:unsupported_mechanism",
+        "con:attack:weak_transfer",
+        "con:attack:contradiction",
+        "maintenance hemodialysis extracorporeal circuit blood arterial",
+        "maintenance hemodialysis extracorporeal circuit blood arterial",
+        "hypersensitivity hemodialyzer membrane",
+        "hypersensitivity hemodialyzer membrane",
+        "membrane coating technology purification industry reduces protein",
+        "membrane coating technology purification industry reduces protein",
+        "maintenance prevention preventing coating purification fouling",
+        "maintenance prevention preventing coating purification fouling",
+        "maintain optimal preventing allergic reactions request",
+        "maintain optimal preventing allergic reactions request"
+       ],
+       "collision_family_ids": [],
+       "source_errors": []
+      },
+      "parent_spec_hash": "93c68f6809c262f96608286ceefb62799e3f530dfbcf3973b8900ba0d25ba8d0",
+      "child_spec_hash": null,
+      "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by using verbatim evidence span with technical vocabulary directly from the source text",
+      "applied_at": "2026-08-31T07:13:32+00:00Z"
+     },
+     "re_evaluation": {
+      "collision_mode": "REPLAY_CACHE",
+      "re_evaluated_at": "2026-08-31T07:13:32+00:00Z",
+      "re_adjudication": {
+       "mode": "REPLAY_CACHE",
+       "valid": false,
+       "reason": "NO_CACHED_FAMILIES"
+      },
+      "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+      "re_adjudication_failure": "NO_CACHED_FAMILIES",
+      "i_dimensions": {
+       "I1_MECHANISM_EVIDENCE_DERIVATION": {
+        "score": 0.375,
+        "state": "MEASURED"
+       },
+       "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_SURVIVORS"
+       },
+       "I3_RECOMBINATION_RISK": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILIES"
+       },
+       "I4_NEW_TECHNICAL_RELATIONSHIP": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+       },
+       "I5_EXPERIMENT_DISCRIMINATION": {
+        "score": 0.667,
+        "state": "MEASURED"
+       }
+      },
+      "i_flags": {
+       "underived_mechanism": false,
+       "recombination_only": false
+      },
+      "i_average": 0.521,
+      "q_dimensions": {
+       "Q1_EVIDENCE_BINDING": {
+        "score": 0.5,
+        "state": "MEASURED"
+       },
+       "Q2_PRIOR_ART_SPECIFICITY": {
+        "score": null,
+        "state": "UNMEASURABLE_NO_PRIOR_ART"
+       },
+       "Q3_PRIOR_ART_RESOLUTION": {
+        "score": 0.0,
+        "state": "MEASURED"
+       },
+       "Q4_EXPERIMENT_DECISIVENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       },
+       "Q5_CHAIN_COMPLETENESS": {
+        "score": 1.0,
+        "state": "MEASURED"
+       }
+      },
+      "q_average": 0.625
+     },
+     "decision": {
+      "action": "KEEP",
+      "improved": true,
+      "checks": {
+       "targeted_dimension": "0.2 -> 0.375 (improved)",
+       "negatives_preserved": true,
+       "no_new_structural_flags": true,
+       "no_unknown_conversion_without_new_evidence": true,
+       "text_gap_conversions_recorded": [],
+       "prior_art_position_not_degraded": true
+      },
+      "reasons": [],
+      "decided_at": "2026-08-31T07:13:32+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:ccedd17affca",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.2,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:b490d2f16661",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "3a609adeaf88a93e350751264a1f7af598fa7f4a5601699bfafdce22c3b7ccae",
+     "output_hash": "b490d2f16661b87b198def96ba23611a49328ea3e2978c86abfa3fb5268e238b",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:42237261",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 3,
+       "shared_terms": [
+        "hemodialyzer",
+        "hypersensitivity",
+        "membrane"
+       ],
+       "span_terms_n": 3,
+       "ratio": 1.0,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 1.0
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T07:13:32+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "hypersensitivity to the hemodialyzer membrane causing allergic reactions",
+      "after": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%)"
+     },
+     "intervention": {
+      "before": "implement a membrane coating technology from the water purification industry that reduces protein fouling and biocompatibility issues to prevent hypersensitivity reactions",
+      "after": "switching to irradiated-sterilized acetate-membrane or wet-membrane dialyzers"
+     },
+     "mechanism_source_span": {
+      "before": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%), AVF needles kits and hemodialysis extracorporeal circuit tubing (Ethylene Oxide Residue) (n = 27, 67.5%), and Nafamostat Mesylate (n = 2, 5%)",
+      "after": "hypersensitivity to the hemodialyzer membrane (n = 11, 27.5%)"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:unsupported_mechanism",
+      "con:attack:weak_transfer",
+      "con:attack:contradiction",
+      "maintenance hemodialysis extracorporeal circuit blood arterial",
+      "maintenance hemodialysis extracorporeal circuit blood arterial",
+      "hypersensitivity hemodialyzer membrane",
+      "hypersensitivity hemodialyzer membrane",
+      "membrane coating technology purification industry reduces protein",
+      "membrane coating technology purification industry reduces protein",
+      "maintenance prevention preventing coating purification fouling",
+      "maintenance prevention preventing coating purification fouling",
+      "maintain optimal preventing allergic reactions request",
+      "maintain optimal preventing allergic reactions request"
+     ],
+     "collision_family_ids": [],
+     "source_errors": []
+    },
+    "parent_spec_hash": "93c68f6809c262f96608286ceefb62799e3f530dfbcf3973b8900ba0d25ba8d0",
+    "child_spec_hash": null,
+    "reason": "repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by using verbatim evidence span with technical vocabulary directly from the source text",
+    "applied_at": "2026-08-31T07:13:32+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T07:13:32+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": false,
+     "reason": "NO_CACHED_FAMILIES"
+    },
+    "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "re_adjudication_failure": "NO_CACHED_FAMILIES",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.375,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_SURVIVORS"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILIES"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.521,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": null,
+      "state": "UNMEASURABLE_NO_PRIOR_ART"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.625
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.2 -> 0.375 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T07:13:32+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.071,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.369,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.375,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_SURVIVORS"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILIES"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_FAMILY_TEXT"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.521,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_PRIOR_ART"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.625,
+  "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+ },
+ "finished_at": "2026-08-31T07:13:32+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.369,
+  "final_i_average": 0.521,
+  "baseline_q_average": 0.625,
+  "final_q_average": 0.625,
+  "iterations_run": 2,
+  "keeps": 2
+ },
+ "status": "IMPROVED"
+}

@@ -1,0 +1,522 @@
+{
+ "ledger": "TECHNICAL_IMPROVEMENT_LEDGER (R379 TECHNICAL IMPROVEMENT ENGINE V2)",
+ "version": "2.0.0",
+ "loop": "CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + direction) -> TECHNICAL MUTATION (actual design variable) -> INDEPENDENT TECHNICAL EVALUATION -> EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL -> SECOND IMPROVEMENT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "thresholds": {
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO milestone is DIAGNOSE -> TECHNICAL MUTATION -> RE-EVALUATE -> SECOND IMPROVEMENT; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget, identical to the R378 epistemic loop: three attempts, then the honest no-defensible-mutation verdict"
+  },
+  "VALUE_CLASS_STRICTNESS": {
+   "value": "HARD",
+   "epistemic_class": "ENGINEERING",
+   "justification": "EXTRACTED claims are span-verified or rejected (Art. II/VI); MODELLED values are admitted only when declared; an unbounded parameter is immutable (ADR_R379 anti-gaming)"
+  }
+ },
+ "mutation_kinds_live": [
+  "PARAMETER_CHANGE",
+  "GEOMETRY_CHANGE",
+  "MATERIAL_CHANGE",
+  "OPERATING_CONDITION_CHANGE",
+  "MECHANISM_CHANGE"
+ ],
+ "mutation_kinds_reserved": {
+  "ARCHITECTURE_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)",
+  "CONTROL_POLICY_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)"
+ },
+ "keep_criterion": "the child's OWN independent technical evaluation must confirm the objective improves in the mutation direction with constraints preserved — a score increase is NEVER sufficient (CEO R379 item 4/8)",
+ "started_at": "2026-08-31T06:08:57+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "status": "PARTIALLY_QUANTIFIED",
+    "limiting_variable": null,
+    "improvement_directions_summary": [
+     {
+      "param_id": "param_001",
+      "improving_move": "DECREASE",
+      "mutable": false,
+      "blocked": true
+     },
+     {
+      "param_id": "param_002",
+      "improving_move": "DECREASE",
+      "mutable": false,
+      "blocked": true
+     },
+     {
+      "param_id": "param_004",
+      "improving_move": "INCREASE",
+      "mutable": false,
+      "blocked": false
+     },
+     {
+      "param_id": "param_005",
+      "improving_move": "DECREASE",
+      "mutable": false,
+      "blocked": true
+     }
+    ],
+    "constraint_results": [
+     {
+      "constraint_id": "const_001",
+      "target": "param_005",
+      "bound": "<=",
+      "limit": 100.0,
+      "limit_class": "MODELLED",
+      "status": "UNVERIFIABLE",
+      "reason": "target param_005 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+     }
+    ]
+   },
+   "proposals": [],
+   "mutation_attempts_extra": []
+  }
+ ],
+ "outcome": "TECHNICAL_UNQUANTIFIED",
+ "outcome_reason": "improving directions exist but no movable DESIGN variable (outcomes are not set directly; unbounded parameters are immutable — ADR_R379)",
+ "extraction": {
+  "proposal_id": "tsp:f9353c5d8cd4",
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "status": "OK",
+  "prompt_hash": "f99af5bfc30bcee6a6b7d2eb10c16bf849c39544fb3594d6a0cd385cf2213646",
+  "output_hash": "74a97f3dc9bf4da79d4145e478906b15468763f1515ac191fd813cb167869c1d",
+  "latency_ms": 44248,
+  "error": null,
+  "proposal": {
+   "objects": [
+    {
+     "object_id": "obj_001",
+     "name": "infusion pump",
+     "role": "primary device for delivering therapeutic substances"
+    },
+    {
+     "object_id": "obj_002",
+     "name": "effluent chemistry monitoring system",
+     "role": "real-time detection system for occlusion via chemical analysis"
+    },
+    {
+     "object_id": "obj_003",
+     "name": "infusion path",
+     "role": "conduit through which therapeutic substances flow"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "param_001",
+     "name": "viscosity range",
+     "category": "PARAMETERS",
+     "unit": "cP",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 1,
+     "range_max": 10,
+     "range_span": "viscosity and flow-rate range",
+     "range_evidence_id": "europepmc:41815933",
+     "role": "fluid resistance characteristics affecting flow dynamics"
+    },
+    {
+     "param_id": "param_002",
+     "name": "flow rate range",
+     "category": "PARAMETERS",
+     "unit": "mL/h",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 0.1,
+     "range_max": 20,
+     "range_span": "viscosity and flow-rate range",
+     "range_evidence_id": "europepmc:41815933",
+     "role": "volume delivery speed affecting pressure buildup"
+    },
+    {
+     "param_id": "param_003",
+     "name": "chemical composition",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "analyzed property for detecting occlusion indicators"
+    },
+    {
+     "param_id": "param_004",
+     "name": "dissolved material concentration",
+     "category": "PARAMETERS",
+     "unit": "mg/dL",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "quantitative measure for detecting flow obstruction"
+    },
+    {
+     "param_id": "param_005",
+     "name": "pressure threshold",
+     "category": "PARAMETERS",
+     "unit": "mmHg",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "critical pressure level before clinically harmful delivery"
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "const_001",
+     "target": "param_005",
+     "bound": "<=",
+     "limit": 100,
+     "unit": "mmHg",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "Art. XXVII: no invented thresholds - pressure must be kept below clinically harmful level"
+    },
+    {
+     "constraint_id": "const_002",
+     "target": "param_001",
+     "bound": "BETWEEN",
+     "limit": 1,
+     "unit": "cP",
+     "limit_class": "EXTRACTED",
+     "limit_span": "viscosity and flow-rate range",
+     "limit_evidence_id": "europepmc:41815933",
+     "justification": "Art. XXVII: no invented thresholds - must cover specified viscosity range"
+    },
+    {
+     "constraint_id": "const_003",
+     "target": "param_002",
+     "bound": "BETWEEN",
+     "limit": 0.1,
+     "unit": "mL/h",
+     "limit_class": "EXTRACTED",
+     "limit_span": "viscosity and flow-rate range",
+     "limit_evidence_id": "europepmc:41815933",
+     "justification": "Art. XXVII: no invented thresholds - must cover specified flow rate range"
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "obj_001",
+     "target": "param_003",
+     "direction": "MONITOR",
+     "basis": "detect occlusion through changes in chemical composition before pressure changes become clinically harmful"
+    },
+    {
+     "objective_id": "obj_002",
+     "target": "param_004",
+     "direction": "MONITOR",
+     "basis": "detect occlusion through changes in dissolved material concentration before pressure changes become clinically harmful"
+    },
+    {
+     "objective_id": "obj_003",
+     "target": "param_005",
+     "direction": "MINIMIZE",
+     "basis": "prevent clinically harmful pressure/volume delivery across the pump's viscosity and flow-rate range"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "fail_001",
+     "name": "downstream occlusion detection failure",
+     "problem_link": "Device: infusion pump; Failure mode: downstream occlusion detection failure"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "dep_001",
+     "cause": "param_001",
+     "effect": "param_005",
+     "direction": "INCREASES",
+     "statement": "higher viscosity increases pressure buildup for a given flow rate",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep_002",
+     "cause": "param_002",
+     "effect": "param_005",
+     "direction": "INCREASES",
+     "statement": "higher flow rate increases pressure buildup for a given viscosity",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "dep_003",
+     "cause": "param_003",
+     "effect": "param_004",
+     "direction": "DECREASES",
+     "statement": "occlusion decreases dissolved material concentration by reducing flow",
+     "relation_class": "EXTRACTED",
+     "span": "dissolved material concentration that indicate flow obstruction",
+     "evidence_id": "europepmc:42261546"
+    },
+    {
+     "relation_id": "dep_004",
+     "cause": "param_004",
+     "effect": "param_005",
+     "direction": "DECREASES",
+     "statement": "decreased dissolved material concentration indicates increased pressure buildup",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    }
+   ]
+  },
+  "raw_content_sha256": "2b912d4623384ca31ca2babfb4e1693c34d6348b4a8bf2fa0454e1afe4fbc79b"
+ },
+ "technical_state_counts": {
+  "parameters": 5,
+  "parameters_with_value": 0,
+  "parameters_extracted": 0,
+  "parameters_modelled": 0,
+  "parameters_with_envelope": 0,
+  "constraints": 1,
+  "objectives": 1,
+  "dependencies": 3,
+  "objects": 3,
+  "failure_modes": 1
+ },
+ "baseline": {
+  "technical": {
+   "status": "PARTIALLY_QUANTIFIED",
+   "objective": {
+    "target": "param_005",
+    "direction": "MINIMIZE",
+    "known": true,
+    "basis": "prevent clinically harmful pressure/volume delivery across the pump's viscosity and flow-rate range"
+   },
+   "limiting_variable": null,
+   "constraint_results": [
+    {
+     "constraint_id": "const_001",
+     "target": "param_005",
+     "bound": "<=",
+     "limit": 100.0,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target param_005 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    }
+   ],
+   "uncertainty": {
+    "unknown_value_params": [
+     "param_001",
+     "param_002",
+     "param_003",
+     "param_004",
+     "param_005"
+    ],
+    "modelled_relations": 3,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [
+     "const_001"
+    ],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "5032a8b4ff207e057d09ecb9db5ec8d4eabf5a4a7bcec71b5fe711dc0ff20dcc",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective param_005 (MINIMIZE)",
+     "checked 1 constraint(s) numerically where values exist",
+     "propagated signs over 3 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-08-31T06:09:41+00:00Z",
+    "deterministic": true
+   }
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.714,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.625,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.818,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_EXPERIMENT"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.789,
+  "q_average": 0.75,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "fidelity_escalation": {
+  "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1)",
+  "deciding_question": "does a design-variable change improve the objective within constraints?",
+  "resolved_at_current_tier": false,
+  "escalation_needed": true,
+  "next_tier_available": false,
+  "note": "higher tiers (NUMERICAL_SOLVER / SIMULATION / NEURAL_OPERATOR) are contract-reserved and not registered; escalation is recorded, never faked at the current tier"
+ },
+ "final": {
+  "technical": {
+   "status": "PARTIALLY_QUANTIFIED",
+   "objective": {
+    "target": "param_005",
+    "direction": "MINIMIZE",
+    "known": true,
+    "basis": "prevent clinically harmful pressure/volume delivery across the pump's viscosity and flow-rate range"
+   },
+   "limiting_variable": null,
+   "constraint_results": [
+    {
+     "constraint_id": "const_001",
+     "target": "param_005",
+     "bound": "<=",
+     "limit": 100.0,
+     "limit_class": "MODELLED",
+     "status": "UNVERIFIABLE",
+     "reason": "target param_005 has no numeric value (UNKNOWN) — the constraint cannot be checked at this tier (Art. XXV: unknown is not satisfied)"
+    }
+   ],
+   "uncertainty": {
+    "unknown_value_params": [
+     "param_001",
+     "param_002",
+     "param_003",
+     "param_004",
+     "param_005"
+    ],
+    "modelled_relations": 3,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [
+     "const_001"
+    ],
+    "objective_known": true,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "5032a8b4ff207e057d09ecb9db5ec8d4eabf5a4a7bcec71b5fe711dc0ff20dcc",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective param_005 (MINIMIZE)",
+     "checked 1 constraint(s) numerically where values exist",
+     "propagated signs over 3 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-08-31T06:09:41+00:00Z",
+    "deterministic": true
+   }
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.714,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.625,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.818,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": null,
+    "state": "UNMEASURABLE_NO_EXPERIMENT"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.789,
+  "q_average": 0.75,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "outcome_summary": {
+  "baseline_status": "PARTIALLY_QUANTIFIED",
+  "final_status": "PARTIALLY_QUANTIFIED",
+  "baseline_i_average": 0.789,
+  "final_i_average": 0.789,
+  "baseline_prior_art": "RESOLVED_DIFFERENTIATED",
+  "final_prior_art": "RESOLVED_DIFFERENTIATED",
+  "iterations_run": 1,
+  "keeps": 0,
+  "attributions": []
+ },
+ "finished_at": "2026-08-31T06:09:41+00:00Z"
+}

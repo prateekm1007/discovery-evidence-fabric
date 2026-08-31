@@ -43,6 +43,24 @@ def _sha(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def _forms_of(v: Any) -> List[str]:
+    """Decimal literal forms a numeric value can take inside a span
+    (55.0 / 55 / 0.4) — shared with the technical-state validator's
+    number-in-span rule so the audit and the builder agree."""
+    if v is None or isinstance(v, bool) or not isinstance(v, (int, float)):
+        return []
+    forms = {str(v)}
+    if isinstance(v, float):
+        if v.is_integer():
+            forms.add(str(int(v)))
+        forms.add(f"{v:.4f}".rstrip("0").rstrip("."))
+    return sorted(forms)
+
+
+def _num_in_span(v: Any, span: str) -> bool:
+    return any(f in span for f in _forms_of(v))
+
+
 def audit_numerical_provenance(run_dir: Optional[Path],
                                package_dir: Optional[Path],
                                eng_spec: Optional[dict],
@@ -159,6 +177,151 @@ def audit_numerical_provenance(run_dir: Optional[Path],
                 findings.append(_check_number(
                     f"INV:{field}", str(val), None, None, None, None,
                     None, sources, ev_texts, literal_text=str(val)))
+
+        # ---- R379: the structured TECHNICAL_STATE section is audited
+        # with the SAME hardness as every other numeric site — a new
+        # section must not become a laundering path for invented
+        # numbers (Art. III: this audit re-derives from raw artifacts
+        # and never trusts the builder's own class labels).
+        ts = (inv_spec.get("technical_state") or {}).get("value") \
+            if isinstance(inv_spec.get("technical_state"), dict) \
+            else None
+        if isinstance(ts, dict):
+            for p in ts.get("parameters") or []:
+                if not isinstance(p, dict):
+                    continue
+                pid = p.get("param_id") or "<param>"
+                for key in ("value", "range_min", "range_max"):
+                    v = p.get(key)
+                    if v is None or not _is_number(v):
+                        continue
+                    vclass = (p.get("value_class")
+                              if key == "value" else
+                              p.get("range_class")) or "UNKNOWN"
+                    if vclass == "EXTRACTED":
+                        span = (p.get("value_span")
+                                if key == "value"
+                                else p.get("range_span")) or ""
+                        ev_id = (p.get("value_evidence_id")
+                                 if key == "value"
+                                 else p.get("range_evidence_id")) or ""
+                        src_text = ev_texts.get(ev_id) or \
+                            sources.get(ev_id)
+                        if not ev_id or src_text is None:
+                            findings.append({
+                                "number_id": f"TS:{pid}:{key}",
+                                "value": v, "unit": p.get("unit"),
+                                "source_type": "EXTRACTED",
+                                "source_id": ev_id, "source_hash": None,
+                                "derivation": None, "assumptions": None,
+                                "status": "NAKED_NUMBER",
+                                "detail": ("EXTRACTED technical-state "
+                                           "value cites no custodied "
+                                           "evidence")})
+                        elif span and span not in src_text:
+                            findings.append({
+                                "number_id": f"TS:{pid}:{key}",
+                                "value": v, "unit": p.get("unit"),
+                                "source_type": "EXTRACTED",
+                                "source_id": ev_id, "source_hash": None,
+                                "derivation": None, "assumptions": None,
+                                "status": "UNSUPPORTED_NUMBER",
+                                "detail": ("technical-state span is NOT "
+                                           "verbatim in the cited "
+                                           "evidence (Art. VI)")})
+                        elif span and not _num_in_span(v, span):
+                            findings.append({
+                                "number_id": f"TS:{pid}:{key}",
+                                "value": v, "unit": p.get("unit"),
+                                "source_type": "EXTRACTED",
+                                "source_id": ev_id, "source_hash": None,
+                                "derivation": None, "assumptions": None,
+                                "status": "UNSUPPORTED_NUMBER",
+                                "detail": ("the number is not inside "
+                                           "its own span")})
+                        else:
+                            findings.append({
+                                "number_id": f"TS:{pid}:{key}",
+                                "value": v, "unit": p.get("unit"),
+                                "source_type": "EXTRACTED",
+                                "source_id": ev_id, "source_hash": None,
+                                "derivation": None, "assumptions": None,
+                                "status": "OK",
+                                "detail": "span-verified"})
+                    elif vclass == "MODELLED":
+                        findings.append({
+                            "number_id": f"TS:{pid}:{key}",
+                            "value": v, "unit": p.get("unit"),
+                            "source_type": "MODELLED",
+                            "source_id": None, "source_hash": None,
+                            "derivation": None, "assumptions": None,
+                            "status": "OK_CLASSIFIED",
+                            "detail": ("model-declared design value, "
+                                       "explicitly classed")})
+                    else:
+                        findings.append({
+                            "number_id": f"TS:{pid}:{key}",
+                            "value": v, "unit": p.get("unit"),
+                            "source_type": "UNKNOWN_CLASS",
+                            "source_id": None, "source_hash": None,
+                            "derivation": None, "assumptions": None,
+                            "status": "NAKED_NUMBER",
+                            "detail": ("numeric technical-state value "
+                                       "with no EXTRACTED/MODELLED "
+                                       "class — a number with no class "
+                                       "is certainty laundering (Art. XXV)")})
+            for c in ts.get("constraints") or []:
+                if not isinstance(c, dict):
+                    continue
+                v = c.get("limit")
+                if not _is_number(v):
+                    continue
+                if (c.get("limit_class") or "") == "EXTRACTED":
+                    span = c.get("limit_span") or ""
+                    ev_id = c.get("limit_evidence_id") or ""
+                    src_text = ev_texts.get(ev_id) or sources.get(ev_id)
+                    if not ev_id or src_text is None or \
+                            span not in (src_text or "") or \
+                            (span and not _num_in_span(v, span)):
+                        findings.append({
+                            "number_id":
+                                f"TS:{c.get('constraint_id')}:limit",
+                            "value": v, "unit": c.get("unit"),
+                            "source_type": "EXTRACTED",
+                            "source_id": ev_id, "source_hash": None,
+                            "derivation": None, "assumptions": None,
+                            "status": "UNSUPPORTED_NUMBER",
+                            "detail": ("EXTRACTED constraint limit not "
+                                       "span-verified")})
+                    else:
+                        findings.append({
+                            "number_id":
+                                f"TS:{c.get('constraint_id')}:limit",
+                            "value": v, "unit": c.get("unit"),
+                            "source_type": "EXTRACTED",
+                            "source_id": ev_id, "source_hash": None,
+                            "derivation": None, "assumptions": None,
+                            "status": "OK",
+                            "detail": "span-verified"})
+                elif (c.get("limit_class") or "") == "MODELLED":
+                    findings.append({
+                        "number_id": f"TS:{c.get('constraint_id')}:limit",
+                        "value": v, "unit": c.get("unit"),
+                        "source_type": "MODELLED",
+                        "source_id": None, "source_hash": None,
+                        "derivation": None, "assumptions": None,
+                        "status": "OK_CLASSIFIED",
+                        "detail": ("model-declared threshold with "
+                                   "justification (Art. XXVII)")})
+                else:
+                    findings.append({
+                        "number_id": f"TS:{c.get('constraint_id')}:limit",
+                        "value": v, "unit": c.get("unit"),
+                        "source_type": "UNKNOWN_CLASS",
+                        "source_id": None, "source_hash": None,
+                        "derivation": None, "assumptions": None,
+                        "status": "NAKED_NUMBER",
+                        "detail": "constraint limit with no class"})
 
     # ---- verdict --------------------------------------------------------
     hard = [f for f in findings if f["status"] in

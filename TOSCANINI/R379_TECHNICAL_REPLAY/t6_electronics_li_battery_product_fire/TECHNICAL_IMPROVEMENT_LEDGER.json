@@ -1,0 +1,409 @@
+{
+ "ledger": "TECHNICAL_IMPROVEMENT_LEDGER (R379 TECHNICAL IMPROVEMENT ENGINE V2)",
+ "version": "2.0.0",
+ "loop": "CANDIDATE -> TECHNICAL DIAGNOSIS (limiting variable + direction) -> TECHNICAL MUTATION (actual design variable) -> INDEPENDENT TECHNICAL EVALUATION -> EVIDENCE/PRIOR-ART RECHECK -> KEEP/KILL -> SECOND IMPROVEMENT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "thresholds": {
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO milestone is DIAGNOSE -> TECHNICAL MUTATION -> RE-EVALUATE -> SECOND IMPROVEMENT; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget, identical to the R378 epistemic loop: three attempts, then the honest no-defensible-mutation verdict"
+  },
+  "VALUE_CLASS_STRICTNESS": {
+   "value": "HARD",
+   "epistemic_class": "ENGINEERING",
+   "justification": "EXTRACTED claims are span-verified or rejected (Art. II/VI); MODELLED values are admitted only when declared; an unbounded parameter is immutable (ADR_R379 anti-gaming)"
+  }
+ },
+ "mutation_kinds_live": [
+  "PARAMETER_CHANGE",
+  "GEOMETRY_CHANGE",
+  "MATERIAL_CHANGE",
+  "OPERATING_CONDITION_CHANGE",
+  "MECHANISM_CHANGE"
+ ],
+ "mutation_kinds_reserved": {
+  "ARCHITECTURE_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)",
+  "CONTROL_POLICY_CHANGE": "needs a structural/control search space at a higher fidelity tier (ADR_R379)"
+ },
+ "keep_criterion": "the child's OWN independent technical evaluation must confirm the objective improves in the mutation direction with constraints preserved — a score increase is NEVER sufficient (CEO R379 item 4/8)",
+ "started_at": "2026-08-31T06:15:28+00:00Z",
+ "iterations": [],
+ "outcome": "TECHNICAL_UNQUANTIFIED",
+ "outcome_reason": "the candidate's own custodied evidence yields no quantifiable technical objective+leverage (admitted: {\"parameters\": 8, \"parameters_with_value\": 0, \"parameters_extracted\": 0, \"parameters_modelled\": 0, \"parameters_with_envelope\": 0, \"constraints\": 0, \"objectives\": 3, \"dependencies\": 3, \"objects\": 2, \"failure_modes\": 3}); the technical layer cannot engage — an honest measured gap (the 🟡 state), not a kill and not a failure",
+ "extraction": {
+  "proposal_id": "tsp:fc74147169c5",
+  "provider": "zai",
+  "model": "glm-4-plus",
+  "status": "OK",
+  "prompt_hash": "f8fcc1a3b4e57181e3b2caebe2f9529ff1b359a6fb9aa23731b4afbf2b4bab5b",
+  "output_hash": "e991b0e6d340f50541208a82a42ee137f5b004ac7966c6371c79a03ce48cf85d",
+  "latency_ms": 39395,
+  "error": null,
+  "proposal": {
+   "objects": [
+    {
+     "object_id": "BMS",
+     "name": "Smart Battery Management System",
+     "role": "Battery safety monitoring and protection circuit"
+    },
+    {
+     "object_id": "LIB",
+     "name": "Lithium-ion Battery",
+     "role": "Energy storage component"
+    }
+   ],
+   "parameters": [
+    {
+     "param_id": "overcharge_protection",
+     "name": "Overcharge protection threshold",
+     "category": "PARAMETERS",
+     "unit": "V",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 4.2,
+     "range_max": 4.3,
+     "range_span": "4.2 to 4.3",
+     "range_evidence_id": "europepmc:40741837",
+     "role": "Prevents battery from charging beyond safe voltage limit"
+    },
+    {
+     "param_id": "temp_monitor",
+     "name": "Temperature monitoring threshold",
+     "category": "PARAMETERS",
+     "unit": "°C",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": 60,
+     "range_max": 80,
+     "range_span": "60 to 80",
+     "range_evidence_id": "europepmc:40741837",
+     "role": "Detects abnormal temperature conditions that could lead to thermal runaway"
+    },
+    {
+     "param_id": "current_limit",
+     "name": "Current limiting threshold",
+     "category": "PARAMETERS",
+     "unit": "A",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "Restricts current flow to prevent dangerous charging conditions"
+    },
+    {
+     "param_id": "energy_density",
+     "name": "Energy density",
+     "category": "PARAMETERS",
+     "unit": "Wh/kg",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "Energy storage capacity per unit mass of battery"
+    },
+    {
+     "param_id": "dendrite_formation",
+     "name": "Dendrite formation rate",
+     "category": "PARAMETERS",
+     "unit": null,
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "Rate of lithium dendrite growth which can cause internal short circuits"
+    },
+    {
+     "param_id": "thermal_propagation",
+     "name": "Thermal propagation speed",
+     "category": "PARAMETERS",
+     "unit": "°C/s",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "Rate at which temperature spreads between battery cells"
+    },
+    {
+     "param_id": "cycle_stability",
+     "name": "Cycle stability",
+     "category": "PARAMETERS",
+     "unit": "cycles",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "Number of charge/discharge cycles before significant capacity degradation"
+    },
+    {
+     "param_id": "sensor_response",
+     "name": "Sensor response time",
+     "category": "PARAMETERS",
+     "unit": "ms",
+     "value": null,
+     "value_class": "UNKNOWN",
+     "value_span": null,
+     "value_evidence_id": null,
+     "range_min": null,
+     "range_max": null,
+     "range_span": null,
+     "range_evidence_id": null,
+     "role": "Time taken for sensors to detect abnormal conditions and trigger protection"
+    }
+   ],
+   "constraints": [
+    {
+     "constraint_id": "cost_constraint",
+     "target": "BMS",
+     "bound": "<=",
+     "limit": 5,
+     "unit": "USD",
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "Must meet consumer product cost targets for retrofitting at pack or circuit level"
+    },
+    {
+     "constraint_id": "retrofit_compatibility",
+     "target": "BMS",
+     "bound": ">=",
+     "limit": 1,
+     "unit": null,
+     "limit_class": "MODELLED",
+     "limit_span": null,
+     "limit_evidence_id": null,
+     "justification": "Must be retrofittable to existing consumer lithium-ion battery packs"
+    },
+    {
+     "constraint_id": "temp_constraint",
+     "target": "temp_monitor",
+     "bound": "<=",
+     "limit": 80,
+     "unit": "°C",
+     "limit_class": "EXTRACTED",
+     "limit_span": "60 to 80",
+     "limit_evidence_id": "europepmc:40741837",
+     "justification": "Temperature monitoring must detect abnormal conditions before thermal runaway occurs"
+    }
+   ],
+   "objectives": [
+    {
+     "objective_id": "prevent_thermal_runaway",
+     "target": "temp_monitor",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "Prevent thermal runaway by detecting abnormal temperature conditions that could lead to battery fire initiation"
+    },
+    {
+     "objective_id": "limit_overcharge",
+     "target": "overcharge_protection",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "Prevent battery fire initiation by stopping charging beyond safe voltage limits during overcharge scenarios"
+    },
+    {
+     "objective_id": "restrict_current",
+     "target": "current_limit",
+     "direction": "MAINTAIN_WITHIN",
+     "basis": "Prevent battery fire by limiting dangerous current flows from cheap chargers or malfunctioning charging equipment"
+    }
+   ],
+   "failure_modes": [
+    {
+     "mode_id": "thermal_runaway",
+     "name": "Thermal runaway",
+     "problem_link": "Battery fire initiation in consumer products due to excessive temperature"
+    },
+    {
+     "mode_id": "overcharge_failure",
+     "name": "Overcharge failure",
+     "problem_link": "Battery fire initiation in consumer products due to charging beyond safe voltage limits"
+    },
+    {
+     "mode_id": "current_spike",
+     "name": "Current spike",
+     "problem_link": "Battery fire initiation in consumer products due to excessive current flow from chargers"
+    }
+   ],
+   "dependencies": [
+    {
+     "relation_id": "temp_dependency",
+     "cause": "temp_monitor",
+     "effect": "thermal_propagation",
+     "direction": "DECREASES",
+     "statement": "Early temperature detection by sensors decreases the rate of thermal propagation between battery cells",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "voltage_dependency",
+     "cause": "overcharge_protection",
+     "effect": "dendrite_formation",
+     "direction": "DECREASES",
+     "statement": "Voltage limiting decreases the rate of lithium dendrite formation which can cause internal short circuits",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "current_dependency",
+     "cause": "current_limit",
+     "effect": "thermal_runaway",
+     "direction": "DECREASES",
+     "statement": "Current limiting decreases the likelihood of thermal runaway by preventing excessive heat generation",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    },
+    {
+     "relation_id": "sensor_dependency",
+     "cause": "sensor_response",
+     "effect": "thermal_propagation",
+     "direction": "DECREASES",
+     "statement": "Faster sensor response time decreases the rate of thermal propagation by enabling quicker intervention",
+     "relation_class": "MODELLED",
+     "span": null,
+     "evidence_id": null
+    }
+   ]
+  },
+  "raw_content_sha256": "0fc4f52055b63fa13fa6ac3cee9b9b18d70d5c36400418141a74b56adc081726"
+ },
+ "technical_state_counts": {
+  "parameters": 8,
+  "parameters_with_value": 0,
+  "parameters_extracted": 0,
+  "parameters_modelled": 0,
+  "parameters_with_envelope": 0,
+  "constraints": 0,
+  "objectives": 3,
+  "dependencies": 3,
+  "objects": 2,
+  "failure_modes": 3
+ },
+ "baseline": {
+  "technical": {
+   "status": "UNQUANTIFIED",
+   "objective": {
+    "target": "temp_monitor",
+    "direction": "MAINTAIN_WITHIN",
+    "known": false,
+    "basis": "Prevent thermal runaway by detecting abnormal temperature conditions that could lead to battery fire initiation"
+   },
+   "limiting_variable": null,
+   "constraint_results": [],
+   "uncertainty": {
+    "unknown_value_params": [
+     "current_limit",
+     "cycle_stability",
+     "dendrite_formation",
+     "energy_density",
+     "overcharge_protection",
+     "sensor_response",
+     "temp_monitor",
+     "thermal_propagation"
+    ],
+    "modelled_relations": 3,
+    "extracted_relations": 0,
+    "unverifiable_constraints": [],
+    "objective_known": false,
+    "note": "UNKNOWN values are never treated as zeros; unverifiable constraints are never treated as satisfied (Art. XXV / Art. IV)"
+   },
+   "computation_log": {
+    "evaluator_id": "analytical_monotone_v1",
+    "fidelity_tier": "STRUCTURED_CONSTRAINT",
+    "evidence_rank": 3,
+    "input_state_sha256": "ea7058b7ed61b1a5269c328d7de04fc41b15982c7c456ac750e8441906e6a45a",
+    "conventions": [
+     {
+      "name": "ORDINAL_LEVERAGE_BY_PATH_LENGTH",
+      "epistemic_class": "ENGINEERING",
+      "justification": "with MONOTONE-only relations the evaluator cannot rank leverage by magnitude; it ranks by (1) fewest constraint blocks, (2) shortest causal path from the parameter to the objective target, (3) envelope provenance class (EXTRACTED beats MODELLED). This is a declared ordinal convention, not a measurement — recorded on every evaluation that uses it.",
+      "uncertainty": "ordinal only; magnitudes are UNKNOWN at this tier"
+     },
+     {
+      "name": "DIRECTIONAL_FAIL_CLOSED",
+      "epistemic_class": "ENGINEERING",
+      "justification": "a proposed change is constraint-BLOCKED when (a) the changed parameter's own numeric constraint would be violated at the proposed value, or (b) a relation-connected constraint target is already VIOLATED or value-UNKNOWN and the predicted direction moves it TOWARD its bound. Fail-closed on directional risk: an unknown-position target moving toward a bound is a blocked move, not an accepted one (Art. IV).",
+      "uncertainty": "direction-level only at this tier"
+     }
+    ],
+    "steps": [
+     "resolved objective temp_monitor (MAINTAIN_WITHIN)",
+     "checked 0 constraint(s) numerically where values exist",
+     "propagated signs over 3 relation(s)",
+     "ranked 0 movable improving direction(s)"
+    ],
+    "computed_at": "2026-08-31T06:16:08+00:00Z",
+    "deterministic": true
+   }
+  },
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.25,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.643,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.2,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.833,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.519,
+  "q_average": 0.843,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "fidelity_escalation": {
+  "current_tier": "STRUCTURED_CONSTRAINT (analytical_monotone_v1)",
+  "deciding_question": "does a design-variable change improve the objective within constraints?",
+  "resolved_at_current_tier": false,
+  "escalation_needed": true,
+  "next_tier_available": false,
+  "note": "higher tiers (NUMERICAL_SOLVER / SIMULATION / NEURAL_OPERATOR) are contract-reserved and not registered; escalation is recorded, never faked at the current tier"
+ },
+ "finished_at": "2026-08-31T06:16:08+00:00Z"
+}
