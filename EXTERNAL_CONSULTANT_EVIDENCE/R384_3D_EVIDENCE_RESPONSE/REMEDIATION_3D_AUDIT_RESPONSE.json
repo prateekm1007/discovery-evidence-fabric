@@ -1,0 +1,461 @@
+{
+ "artifact": "REMEDIATION_3D_AUDIT_RESPONSE",
+ "date": "2026-09-01",
+ "responds_to": "Independent External Engineering Consultant Re-Review (Toscanini 3D Technology Package Reality & Design-Quality Review), verdict FAIL",
+ "audited_artifact": {
+  "path": "/home/z/my-project/upload/files_extracted/V2_technology-transfer-portfolio-15.zip",
+  "sha256": "c98680f7686440a1b3ae5b24803dbccb0d9ba19fcb7db8600da591134e5aae69",
+  "census": "0 STEP/STL/GLB/OBJ/3MF/PNG/JPG/SVG"
+ },
+ "deliverable": "technology-transfer-portfolio-15-3D-EVIDENCE.zip",
+ "defect_responses": [
+  {
+   "id": "C1",
+   "defect": "Zero CAD/mesh files in all 15 packages.",
+   "response": "Correct for the audited V2 artifact, and now moot for the evidence edition: 14 of 15 packages ship STEP (B-rep), STL, GLB, engineering SVG views, PNG renders and the parametric source of truth; 06 is software-only by its own record (3D_NOT_APPLICABLE).",
+   "evidence": "EVIDENCE/NN_*/MODEL/ of the 3D-EVIDENCE ZIP; per-package counts in R384_3D_EVIDENCE_SUMMARY.json"
+  },
+  {
+   "id": "C2",
+   "defect": "Mechanism-to-geometry chain broken for every physical device claim.",
+   "response": "The chain is now closed per package: dossier mechanism -> technical state parameters -> parametric build program -> kernel-built solid -> measured features (radii, walls, volumes) compared back to the parameters, all logged.",
+   "evidence": "MODEL/PARAMETRIC_MODEL_SOURCE.py + PARAMETERS.json + 3D_EVIDENCE/PARAMETER_FEATURE_LOG.json + KEY_DIMENSIONS.json"
+  },
+  {
+   "id": "C3",
+   "defect": "No parameter -> measured CAD feature verification possible.",
+   "response": "Every package ships a parameter-feature log: each parameter is matched against features measured on the independently rebuilt solid (1:1, 2:1 radius/diameter relations, tolerance 1e-6 mm); non-linearly bound parameters are recorded as such instead of being faked as matches.",
+   "evidence": "3D_EVIDENCE/PARAMETER_FEATURE_LOG.json (coverage per package in the cards below)"
+  },
+  {
+   "id": "C4",
+   "defect": "No manufacturing-compatible solids (extrusion, molding, coating, microfab).",
+   "response": "The solids are kernel B-reps in AP214 STEP with real dimensions in the process-relevant classes: extrudable multi-lumen profiles (01, 04, 10, 14, 15), molded valve bodies (02, 12), coating annuli stacks (03, 05), MEMS-scale dies (13), and laminate/cantilever parts (07, 08, 09).",
+   "evidence": "MODEL/*.step + section solids in MODEL/3D_EVIDENCE/"
+  },
+  {
+   "id": "C5",
+   "defect": "No buyer-usable 3D or section imagery (PDFs are text-only).",
+   "response": "Every CAD package ships an isometric PNG, an exploded-view PNG (multi-object models), longitudinal and transverse section-cutaway PNGs, a zoomed transverse section coupon PNG for catheter-class models, and the OCCT hidden-line SVG drawing set - all rendered from the shipped mesh derivatives, each carrying the render-is-not-validation footer.",
+   "evidence": "MODEL/3D_EVIDENCE/*_render_*.png + MODEL/*_view_*.svg"
+  },
+  {
+   "id": "C6",
+   "defect": "Internal flow / optical / damper paths cannot be inspected.",
+   "response": "Internal paths are now section solids: dual-lumen and multi-lumen cross-sections (01, 04, 10, 14, 15), the valve seat and poppet interface (02, 12), the PV stack with optical standoff (08), and the damper annular gap (11) are all cut at the invention-critical plane and shipped as STEP/STL plus rendered cutaways.",
+   "evidence": "MODEL/3D_EVIDENCE/*_section_*_solid.step/.stl + section renders"
+  },
+  {
+   "id": "C7",
+   "defect": "Assembly reality unauditable (no parts tree).",
+   "response": "Multi-object models ship per-object STEP + assembly STEP + per-object STL + exploded-view SVG and PNG with labeled parts; object roles are declared in MODEL_MANIFEST.json and measured individually in KEY_DIMENSIONS.json.",
+   "evidence": "MODEL/*_assembly.step, *_view_exploded.svg, 3D_EVIDENCE/*_render_exploded.png, MODEL_MANIFEST.json"
+  },
+  {
+   "id": "C8",
+   "defect": "Mutation certificates do not show CAD rebuild or geometric delta.",
+   "response": "The improvement-loop evidence records the full geometric loop: the mutated parameter, the child CAD rebuild, the measured wall change (0.2 -> 0.1 mm), the failed G4 gate and the KILLED_GEOMETRY_INVALID outcome - a measured geometric delta, not prose. The regeneration check re-proves reproducibility from the shipped source today.",
+   "evidence": "MODEL/IMPROVEMENT_LOOP_EVIDENCE.json + 3D_EVIDENCE/REGENERATION_CHECK.json"
+  },
+  {
+   "id": "C9",
+   "defect": "Build ladders ($5K-$25K) have no dimensioned concept model behind them.",
+   "response": "Every physical package's build ladder is now backed by a dimensioned, kernel-built concept model with declared envelopes, measured features and a dimensioned SVG view; the dimensions are MODELLED proposals inside declared envelopes (Art. XXVII), labeled as such, never presented as measurements of hardware.",
+   "evidence": "MODEL/*_view_dimensioned.svg + PARAMETERS.json (value_class MODELLED)"
+  },
+  {
+   "id": "C10",
+   "defect": "Uniform PDF/JSON skeleton with no package-specific solids reads as presentation pipeline.",
+   "response": "The presentation skeleton is now one layer of a package-specific engineering artifact: each package's solids are built from its own template with its own parameter map, measured individually, and differ structurally (7-object ringed catheter, 4-part membrane valve, bimorph cantilever, PV stack, helical antenna...). The uniformity that remains is the verification method - by design.",
+   "evidence": "Compare MODEL/ folders across EVIDENCE/NN_*"
+  }
+ ],
+ "portfolio_questions": [
+  {
+   "question": "1. Package-specific 3D?",
+   "answer": "Yes for 14 of 15: each package ships its own parametric source, parameter map, per-object and assembly solids, section solids and renders built from package-specific templates. Package 06 is software-only by its own record and ships no geometry, as the audit's footnote allows."
+  },
+  {
+   "question": "2. Domain-realistic?",
+   "answer": "The geometry is catheter-and-valve-scale with French-class dimensions (2.0-3.0 mm catheter ODs, 0.35-1.2 mm lumens, 0.02-0.08 mm functional layers, 8-12 mm valve housings, MEMS-scale dies at 2.2 mm with 0.07 mm diaphragms) - realistic for the CSF-shunt domain the record declares. Realism of the physics remains in the analytical layer, not claimed as validated hardware."
+  },
+  {
+   "question": "3. Parameters <-> mechanism geometry?",
+   "answer": "Yes, per package: the parameter-feature log maps each parameter to measured solid features at 1e-6 mm tolerance, and records honestly where a parameter is non-linearly or non-geometrically bound. Coverage numbers are in the evidence cards (e.g. 6/6 for packages 01, 12, 14)."
+  },
+  {
+   "question": "4. Understand from 3D artifacts?",
+   "answer": "Yes: an engineer can open the STEP files, load the section solids at the invention-critical planes, read the measured features, and view the rendered cutaways - the mechanism geometry is inspectable without reading any prose."
+  },
+  {
+   "question": "5. Build prototype from supplied design?",
+   "answer": "As a concept model, yes: the solids are dimensioned, watertight, parametric and exportable to vendor formats. Full prototype build still requires the tolerance studies the dossiers flag as UNKNOWN (extrusion Cpk, molding Cpk, microfab tolerance) - not claimed as resolved."
+  },
+  {
+   "question": "6. Consistent with dossiers?",
+   "answer": "Yes: the geometry implements the dossiers' mechanism descriptions and governing equations' design variables; the V2 gap the audit found (build plans without geometry) is closed by the evidence edition."
+  },
+  {
+   "question": "7. Visual theater?",
+   "answer": "The renders exist now, but they are deliberately labeled presentation-only; technical validity comes from the deterministic measured gates. Theater was never the defect - absence was; both are now addressed without conflating them."
+  },
+  {
+   "question": "8. Synthetic dimensions?",
+   "answer": "Dimensions are MODELLED proposals inside declared envelopes, traceable to measured solid features to 1e-6 mm - labeled MODELLED, never presented as hardware measurements. The audit's distinction is preserved and disclosed."
+  },
+  {
+   "question": "9. CAD pipeline output?",
+   "answer": "Yes: OCCT (cadquery) kernel solids, deterministic sandboxed build programs, hashed derivatives, independent trimesh watertight verification, and an independent regeneration check per package executed for this response."
+  },
+  {
+   "question": "10. 3D layer improve credibility?",
+   "answer": "For the 14 physical-device packages, yes: claims that were prose are now inspectable geometry with measured features. For 06 the honest answer is that geometry would have REDUCED credibility; the software-only classification stands."
+  }
+ ],
+ "validity_classification": [
+  {
+   "class": "CAD_VALIDATED",
+   "status": "PRESENT (14 of 15 packages)",
+   "basis": "Kernel-built B-rep solids; deterministic G-gates G1-G9 recorded SATISFIED in GEOMETRY_VALIDATION_REPORT.json; independent trimesh watertight check re-run at remediation (ALL_WATERTIGHT); regeneration from the shipped parametric source reproduced the shipped measurements exactly (REGENERATION_CHECK)."
+  },
+  {
+   "class": "COMPUTATIONALLY_SUPPORTED",
+   "status": "Equation/analytical layer (unchanged)",
+   "basis": "Governing relations (Poiseuille, PV power, osmotic flux, piezo bound...) remain analytical with declared provenance in EQUATION_REGISTRY.json - never laundered into geometry claims."
+  },
+  {
+   "class": "MODELLED",
+   "status": "All geometric parameter values (unchanged)",
+   "basis": "Every parameter carries value_class MODELLED with declared envelopes and design basis in PARAMETERS.json."
+  },
+  {
+   "class": "ENGINEERINGALLY_PLAUSIBLE (geometry)",
+   "status": "DEMONSTRATED at kernel level for 14 of 15",
+   "basis": "Plausible, dimensioned, sectioned, manufacturing-format geometry exists per package. Plausibility of the physical device claim itself remains SPONSORED_VALIDATION, not proven by CAD."
+  },
+  {
+   "class": "UNVERIFIED",
+   "status": "All physical/manufacturing/clinical claims (unchanged)",
+   "basis": "No physical observation, tolerance study or clinical evidence is claimed anywhere in the evidence edition."
+  },
+  {
+   "class": "PHYSICALLY_VALIDATED",
+   "status": "NONE (unchanged, never claimed)",
+   "basis": "Zero packages claim physical validation; COMPUTATIONAL_RESULT is the highest class any geometric measurement carries (Art. XXXVIII)."
+  }
+ ],
+ "residual_honest_gaps": [
+  "No physical prototypes exist; PHYSICALLY_VALIDATED remains NONE for every package.",
+  "All dimensions are MODELLED proposals inside declared envelopes; not hardware measurements.",
+  "Manufacturing tolerances UNKNOWN pending supplier Cpk studies.",
+  "Render quality proves nothing about validity.",
+  "Buyer release remains the 4 BUYER_PRIMARY packages (CEO R382).",
+  "Package 06 ships no geometry by honest 3D_NOT_APPLICABLE classification."
+ ],
+ "per_package_summary": {
+  "01_multisegment_flow_control": {
+   "package_id": "P-01",
+   "tier": "HOLDING",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 6,
+    "with_linear_feature_match": 6
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 20,
+    "STL": 19,
+    "PNG_RENDER": 5,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "02_adaptive_valve": {
+   "package_id": "P-02",
+   "tier": "HOLDING",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 5,
+    "with_linear_feature_match": 4
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 9,
+    "STL": 8,
+    "PNG_RENDER": 4,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "03_catalytic_clearance": {
+   "package_id": "P-04",
+   "tier": "SPECIALIST_TRACK",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 4,
+    "with_linear_feature_match": 3
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 9,
+    "STL": 8,
+    "PNG_RENDER": 5,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "04_drainage_floor": {
+   "package_id": "P-07",
+   "tier": "DOWNLOAD",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 5,
+    "with_linear_feature_match": 4
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 4,
+    "STL": 4,
+    "PNG_RENDER": 4,
+    "GLB": 1,
+    "SVG": 6,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "05_phage_antibiofilm": {
+   "package_id": "P-11",
+   "tier": "SPECIALIST_TRACK",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 5,
+    "with_linear_feature_match": 3
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 13,
+    "STL": 12,
+    "PNG_RENDER": 5,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "06_failure_predictor": {
+   "package_id": "P-13",
+   "tier": "RETIRED",
+   "3d_design_status": "NOT_APPLICABLE",
+   "augmentation_status": "NOT_AUGMENTED",
+   "regeneration_status": null,
+   "watertight_status": null,
+   "parameter_feature_coverage": null,
+   "model_file_counts": null
+  },
+  "07_self_powered_sensing": {
+   "package_id": "P-15-R1",
+   "tier": "RETIRED",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 5,
+    "with_linear_feature_match": 4
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 13,
+    "STL": 12,
+    "PNG_RENDER": 4,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "08_nir_photovoltaic": {
+   "package_id": "P-16",
+   "tier": "DOWNLOAD",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 5,
+    "with_linear_feature_match": 3
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 10,
+    "STL": 9,
+    "PNG_RENDER": 4,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "09_uwb_localization": {
+   "package_id": "P-21-R1",
+   "tier": "HOLDING",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 5,
+    "with_linear_feature_match": 4
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STL": 8,
+    "STEP": 8,
+    "PNG_RENDER": 5,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "10_catheter_navigation": {
+   "package_id": "P-22-R1",
+   "tier": "RETIRED",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 5,
+    "with_linear_feature_match": 4
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "PNG_RENDER": 4,
+    "STEP": 4,
+    "STL": 4,
+    "GLB": 1,
+    "SVG": 6,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "11_gravity_damper": {
+   "package_id": "P-24",
+   "tier": "DOWNLOAD",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 6,
+    "with_linear_feature_match": 5
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 9,
+    "STL": 8,
+    "PNG_RENDER": 5,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "12_osmotic_valve": {
+   "package_id": "P-26",
+   "tier": "HOLDING",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 6,
+    "with_linear_feature_match": 6
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 12,
+    "STL": 11,
+    "PNG_RENDER": 4,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "13_pressure_sensor": {
+   "package_id": "P-27-R1",
+   "tier": "DOWNLOAD",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 6,
+    "with_linear_feature_match": 3
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 8,
+    "STL": 7,
+    "PNG_RENDER": 4,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "14_acoustic_detection": {
+   "package_id": "P-28",
+   "tier": "RETIRED",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 6,
+    "with_linear_feature_match": 6
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 9,
+    "STL": 8,
+    "PNG_RENDER": 5,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  },
+  "15_mr_flow_sensor": {
+   "package_id": "P-29",
+   "tier": "SPECIALIST_TRACK",
+   "3d_design_status": "PRESENT_AND_VALIDATED",
+   "augmentation_status": "AUGMENTED",
+   "regeneration_status": "REPRODUCIBLE",
+   "watertight_status": "ALL_WATERTIGHT",
+   "parameter_feature_coverage": {
+    "parameters_total": 7,
+    "with_linear_feature_match": 5
+   },
+   "model_file_counts": {
+    "JSON": 13,
+    "STEP": 15,
+    "STL": 14,
+    "PNG_RENDER": 5,
+    "GLB": 1,
+    "SVG": 7,
+    "PARAMETRIC_SOURCE": 1
+   }
+  }
+ }
+}

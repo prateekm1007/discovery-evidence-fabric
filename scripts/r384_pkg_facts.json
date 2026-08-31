@@ -1,0 +1,2491 @@
+{
+ "04_drainage_floor": {
+  "pid": "P-07",
+  "name": "Passive Drainage Priority Safety Floor",
+  "tier": "DOWNLOAD",
+  "objects": [
+   [
+    "dual_lumen_catheter",
+    "extruded body with central primary lumen + eccentric smaller floor lumen"
+   ]
+  ],
+  "dims": {
+   "dual_lumen_catheter": {
+    "vol": 583.55,
+    "bbox": [
+     3.0,
+     3.0,
+     100.0
+    ],
+    "radii": [
+     0.3,
+     0.55,
+     1.5
+    ],
+    "walls": [
+     0.2,
+     0.565
+    ]
+   }
+  },
+  "params": [
+   {
+    "param_id": "outer_diameter_mm",
+    "value": 3.0,
+    "unit": "mm",
+    "envelope": [
+     2.5,
+     3.5
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Multi-lumen extrusion needs a larger body than a single-lumen catheter; envelope engine-declared.",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(multi-lumen extruded catheter, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "primary_lumen_diameter_mm",
+    "value": 1.1,
+    "unit": "mm",
+    "envelope": [
+     0.8,
+     1.4
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Primary drainage path conductance is dominated by lumen diameter (Poiseuille); G_primary recorded UNKNOWN \u2014 engine proposal at standard shunt ID.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"G_primary (primary conductance)\"]",
+     "recorded_name": "G_primary (primary conductance)",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mL/(min\u00b7mmHg)",
+     "recorded_basis": "Standard shunt catheter geometry",
+     "recorded_verification_requirement": "Bench flow measurement"
+    }
+   },
+   {
+    "param_id": "floor_lumen_diameter_mm",
+    "value": 0.6,
+    "unit": "mm",
+    "envelope": [
+     0.3,
+     0.8
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "The floor path must hold a LOWER conductance than the primary (the record's design intent); a materially smaller diameter is the passive way to get it.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Floor lumen diameter d_floor\"]",
+     "recorded_name": "Floor lumen diameter d_floor",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mm",
+     "recorded_basis": "Derived from G_floor target via Hagen-Poiseuille",
+     "recorded_verification_requirement": "Geometric inspection"
+    }
+   },
+   {
+    "param_id": "floor_offset_mm",
+    "value": 1.0,
+    "unit": "mm",
+    "envelope": [
+     0.7,
+     1.1
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Eccentric placement packs the floor lumen against the wall while the primary stays central; bounded so the wall stays manufacturable.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Floor lumen diameter d_floor\"]",
+     "recorded_name": "Floor lumen diameter d_floor",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mm",
+     "recorded_basis": "Derived from G_floor target via Hagen-Poiseuille",
+     "recorded_verification_requirement": "Geometric inspection"
+    }
+   },
+   {
+    "param_id": "length_mm",
+    "value": 100.0,
+    "unit": "mm",
+    "envelope": [
+     80.0,
+     140.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "shunt catheter working length envelope",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(multi-lumen extruded catheter, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   }
+  ]
+ },
+ "08_nir_photovoltaic": {
+  "pid": "P-16",
+  "name": "NIR Photovoltaic Power Delivery for Implantable Devices",
+  "tier": "DOWNLOAD",
+  "objects": [
+   [
+    "gaas_pv_cell",
+    "implanted GaAs photovoltaic receiver die"
+   ],
+   [
+    "substrate_disc",
+    "carrier substrate the cell is bonded to"
+   ],
+   [
+    "encapsulation_cap",
+    "hermetic brim cap with optical standoff over the active face"
+   ]
+  ],
+  "dims": {
+   "gaas_pv_cell": {
+    "vol": 11.55,
+    "bbox": [
+     7.0,
+     7.0,
+     0.3
+    ],
+    "radii": [
+     3.5
+    ],
+    "walls": null
+   },
+   "substrate_disc": {
+    "vol": 33.63,
+    "bbox": [
+     7.9,
+     7.9,
+     0.69
+    ],
+    "radii": [
+     3.95
+    ],
+    "walls": null
+   },
+   "encapsulation_cap": {
+    "vol": 27.45,
+    "bbox": [
+     8.8,
+     8.8,
+     0.85
+    ],
+    "radii": [
+     3.5,
+     4.4
+    ],
+    "walls": [
+     0.9
+    ]
+   }
+  },
+  "params": [
+   {
+    "param_id": "cell_diameter_mm",
+    "value": 7.0,
+    "unit": "mm",
+    "envelope": [
+     2.0,
+     8.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Record: 'constrained by catheter geometry' \u2014 the engine instantiates a catheter-pocket-scale receiver disc.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"PV cell area\"]",
+     "recorded_name": "PV cell area",
+     "recorded_value": "UNKNOWN \u2014 constrained by catheter geometry",
+     "recorded_unit": "mm^2",
+     "recorded_basis": "Catheter integration",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "cell_thickness_mm",
+    "value": 0.3,
+    "unit": "mm",
+    "envelope": [
+     0.2,
+     0.5
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "GaAs thin-film die thickness class",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(no recorded critical parameter \u2014 GaAs die)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "substrate_thickness_mm",
+    "value": 0.65,
+    "unit": "mm",
+    "envelope": [
+     0.4,
+     0.9
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "carrier/carrier-substrate class",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(no recorded critical parameter \u2014 carrier)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "encapsulation_thickness_mm",
+    "value": 0.55,
+    "unit": "mm",
+    "envelope": [
+     0.3,
+     0.8
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "biocompatible hermetic cap thickness class",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(no recorded critical parameter \u2014 package)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "encapsulation_margin_mm",
+    "value": 0.45,
+    "unit": "mm",
+    "envelope": [
+     0.3,
+     0.6
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "cap brim margin seating on the substrate",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(no recorded critical parameter \u2014 package)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   }
+  ]
+ },
+ "11_gravity_damper": {
+  "pid": "P-24",
+  "name": "Gravity Compensation Hydraulic Damper for Postural Transients",
+  "tier": "DOWNLOAD",
+  "objects": [
+   [
+    "damper_housing",
+    "damper housing cup: coaxial bore + axial inlet port through the floor"
+   ],
+   [
+    "damper_spool",
+    "annular spool riding in the bore; the bore-spool annular gap IS the damping element"
+   ]
+  ],
+  "dims": {
+   "damper_housing": {
+    "vol": 765.76,
+    "bbox": [
+     8.0,
+     8.0,
+     25.0
+    ],
+    "radii": [
+     2.5,
+     4.0
+    ],
+    "walls": [
+     1.5
+    ]
+   },
+   "damper_spool": {
+    "vol": 284.01,
+    "bbox": [
+     4.64,
+     4.64,
+     18.0
+    ],
+    "radii": [
+     0.6,
+     2.32
+    ],
+    "walls": [
+     1.72
+    ]
+   }
+  },
+  "params": [
+   {
+    "param_id": "housing_od_mm",
+    "value": 8.0,
+    "unit": "mm",
+    "envelope": [
+     6.0,
+     10.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "valve-body-scale damper housing; the record declares damper element geometry UNKNOWN \u2014 engine proposal.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Damper element geometry\"]",
+     "recorded_name": "Damper element geometry",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mm",
+     "recorded_basis": "Design choice",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "housing_height_mm",
+    "value": 25.0,
+    "unit": "mm",
+    "envelope": [
+     18.0,
+     30.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "axial space for bore + spool + chamber",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Damper element geometry\"]",
+     "recorded_name": "Damper element geometry",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mm",
+     "recorded_basis": "Design choice",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "bore_diameter_mm",
+    "value": 5.0,
+    "unit": "mm",
+    "envelope": [
+     4.0,
+     6.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "working bore; sets the reference scale of the annular gap element.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Damper element geometry\"]",
+     "recorded_name": "Damper element geometry",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mm",
+     "recorded_basis": "Design choice",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "damping_gap_mm",
+    "value": 0.18,
+    "unit": "mm",
+    "envelope": [
+     0.15,
+     0.6
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "THE mechanism parameter: annular-gap resistance c_h scales as 1/gap^3 (MODELLED relation); bounded below by manufacturability, above by insufficient-damping risk (both are record failure modes).",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Damper coefficient c_h\"]",
+     "recorded_name": "Damper coefficient c_h",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mmHg/(mL/min)",
+     "recorded_basis": "Design choice",
+     "recorded_verification_requirement": "Bench flow test"
+    }
+   },
+   {
+    "param_id": "inlet_bore_diameter_mm",
+    "value": 1.2,
+    "unit": "mm",
+    "envelope": [
+     0.8,
+     1.5
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "inlet port keeps the drainage floor open (record: minimum Q MODEL_DERIVED candidate 0.05 mL/min) \u2014 the gap never gates the floor to zero.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Drainage floor (minimum Q)\"]",
+     "recorded_name": "Drainage floor (minimum Q)",
+     "recorded_value": "UNKNOWN \u2014 MODEL_DERIVED candidate 0.05 mL/min",
+     "recorded_unit": "mL/min",
+     "recorded_basis": "Clinical need",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "spool_height_mm",
+    "value": 18.0,
+    "unit": "mm",
+    "envelope": [
+     14.0,
+     22.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "spool length spanning the damping gap path",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Damper element geometry\"]",
+     "recorded_name": "Damper element geometry",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mm",
+     "recorded_basis": "Design choice",
+     "recorded_verification_requirement": null
+    }
+   }
+  ]
+ },
+ "13_pressure_sensor": {
+  "pid": "P-27-R1",
+  "name": "Self-Referencing Piezoresistive Pressure Sensor",
+  "tier": "DOWNLOAD",
+  "objects": [
+   [
+    "sensor_die",
+    "active die: etched cavity over a thin diaphragm (piezoresistive sense element)"
+   ],
+   [
+    "reference_die",
+    "solid dummy die for the self-referencing bridge (record R1 fix)"
+   ],
+   [
+    "carrier_platform",
+    "carrier platform bonding both dies (catheter integration)"
+   ]
+  ],
+  "dims": {
+   "sensor_die": {
+    "vol": 1.21,
+    "bbox": [
+     2.2,
+     2.2,
+     0.45
+    ],
+    "radii": [],
+    "walls": null
+   },
+   "reference_die": {
+    "vol": 2.18,
+    "bbox": [
+     2.2,
+     2.2,
+     0.45
+    ],
+    "radii": [],
+    "walls": null
+   },
+   "carrier_platform": {
+    "vol": 9.45,
+    "bbox": [
+     5.25,
+     3.0,
+     0.6
+    ],
+    "radii": [],
+    "walls": null
+   }
+  },
+  "params": [
+   {
+    "param_id": "die_width_mm",
+    "value": 2.2,
+    "unit": "mm",
+    "envelope": [
+     1.8,
+     2.6
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Record: 'constrained by catheter geometry' \u2014 die footprint inside a ~2 mm-class carrier.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Sensor size\"]",
+     "recorded_name": "Sensor size",
+     "recorded_value": "UNKNOWN \u2014 constrained by catheter geometry",
+     "recorded_unit": "mm",
+     "recorded_basis": "Catheter integration constraint",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "die_thickness_mm",
+    "value": 0.45,
+    "unit": "mm",
+    "envelope": [
+     0.35,
+     0.65
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "standard silicon die thickness class",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(no recorded critical parameter \u2014 die stack)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "diaphragm_thickness_mm",
+    "value": 0.07,
+    "unit": "mm",
+    "envelope": [
+     0.05,
+     0.25
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "THE recorded design variable (UNKNOWN): sensitivity ~ 1/t^2 against rupture margin; envelope bounded by the record's 'Diaphragm mechanical damage' failure mode.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Diaphragm thickness\"]",
+     "recorded_name": "Diaphragm thickness",
+     "recorded_value": "UNKNOWN \u2014 design choice",
+     "recorded_unit": "\u03bcm",
+     "recorded_basis": "Sensitivity vs pressure range tradeoff",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "cavity_width_mm",
+    "value": 1.6,
+    "unit": "mm",
+    "envelope": [
+     1.2,
+     1.9
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "etched cavity span = the diaphragm active diameter; bounded inside the die with a side wall.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Diaphragm thickness\"]",
+     "recorded_name": "Diaphragm thickness",
+     "recorded_value": "UNKNOWN \u2014 design choice",
+     "recorded_unit": "\u03bcm",
+     "recorded_basis": "Sensitivity vs pressure range tradeoff",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "carrier_platform_thickness_mm",
+    "value": 0.6,
+    "unit": "mm",
+    "envelope": [
+     0.4,
+     0.9
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "carrier carrying both dies (record subsystem)",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "Catheter integration (mechanical protection)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "carrier_margin_mm",
+    "value": 0.4,
+    "unit": "mm",
+    "envelope": [
+     0.25,
+     0.6
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "carrier edge margin around the dies",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "Catheter integration (mechanical protection)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   }
+  ]
+ },
+ "01_multisegment_flow_control": {
+  "pid": "P-01",
+  "name": "Multi-Segment Flow Control with Bayesian Occlusion Prediction",
+  "tier": "HOLDING",
+  "objects": [
+   [
+    "catheter_body",
+    "extruded catheter body with central drainage lumen"
+   ],
+   [
+    "flow_sensor_ring_s1",
+    "segment 1 flow sensor collar"
+   ],
+   [
+    "flow_sensor_ring_s2",
+    "segment 2 flow sensor collar"
+   ],
+   [
+    "flow_sensor_ring_s3",
+    "segment 3 flow sensor collar"
+   ],
+   [
+    "flow_sensor_ring_s4",
+    "segment 4 flow sensor collar"
+   ],
+   [
+    "flow_sensor_ring_s5",
+    "segment 5 flow sensor collar"
+   ],
+   [
+    "flow_sensor_ring_s6",
+    "segment 6 flow sensor collar"
+   ]
+  ],
+  "dims": {
+   "catheter_body": {
+    "vol": 501.4,
+    "bbox": [
+     2.6,
+     2.6,
+     120.0
+    ],
+    "radii": [
+     0.6,
+     1.3
+    ],
+    "walls": [
+     0.7
+    ]
+   },
+   "flow_sensor_ring_s1": {
+    "vol": 3.24,
+    "bbox": [
+     3.0,
+     3.0,
+     1.5
+    ],
+    "radii": [
+     1.25,
+     1.5
+    ],
+    "walls": [
+     0.25
+    ]
+   },
+   "flow_sensor_ring_s2": {
+    "vol": 3.24,
+    "bbox": [
+     3.0,
+     3.0,
+     1.5
+    ],
+    "radii": [
+     1.25,
+     1.5
+    ],
+    "walls": [
+     0.25
+    ]
+   },
+   "flow_sensor_ring_s3": {
+    "vol": 3.24,
+    "bbox": [
+     3.0,
+     3.0,
+     1.5
+    ],
+    "radii": [
+     1.25,
+     1.5
+    ],
+    "walls": [
+     0.25
+    ]
+   },
+   "flow_sensor_ring_s4": {
+    "vol": 3.24,
+    "bbox": [
+     3.0,
+     3.0,
+     1.5
+    ],
+    "radii": [
+     1.25,
+     1.5
+    ],
+    "walls": [
+     0.25
+    ]
+   },
+   "flow_sensor_ring_s5": {
+    "vol": 3.24,
+    "bbox": [
+     3.0,
+     3.0,
+     1.5
+    ],
+    "radii": [
+     1.25,
+     1.5
+    ],
+    "walls": [
+     0.25
+    ]
+   },
+   "flow_sensor_ring_s6": {
+    "vol": 3.24,
+    "bbox": [
+     3.0,
+     3.0,
+     1.5
+    ],
+    "radii": [
+     1.25,
+     1.5
+    ],
+    "walls": [
+     0.25
+    ]
+   }
+  },
+  "params": [
+   {
+    "param_id": "outer_diameter_mm",
+    "value": 2.6,
+    "unit": "mm",
+    "envelope": [
+     2.0,
+     3.2
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Standard adult CSF shunt catheter outer diameter (silicone extrusion class); the record declares segment geometry UNKNOWN \u2014 this is the engine's MODELLED design proposal inside a declared envelope.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Segment geometry (r, L)\"]",
+     "recorded_name": "Segment geometry (r, L)",
+     "recorded_value": "UNKNOWN production dimensions",
+     "recorded_unit": "mm",
+     "recorded_basis": "Design choice",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "lumen_diameter_mm",
+    "value": 1.2,
+    "unit": "mm",
+    "envelope": [
+     0.8,
+     1.5
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Drainage lumen inside the segment-geometry envelope; lumen area sets the segment hydraulic conductance the record's flow controller acts on.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Segment geometry (r, L)\"]",
+     "recorded_name": "Segment geometry (r, L)",
+     "recorded_value": "UNKNOWN production dimensions",
+     "recorded_unit": "mm",
+     "recorded_basis": "Design choice",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "length_mm",
+    "value": 120.0,
+    "unit": "mm",
+    "envelope": [
+     80.0,
+     150.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Ventricular catheter working length (cranial entry to ventricle).",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Segment geometry (r, L)\"]",
+     "recorded_name": "Segment geometry (r, L)",
+     "recorded_value": "UNKNOWN production dimensions",
+     "recorded_unit": "mm",
+     "recorded_basis": "Design choice",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "segment_count",
+    "value": 6.0,
+    "unit": "count",
+    "envelope": [
+     2.0,
+     8.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Record: 'MODELLED (4 in V0 prototype)' \u2014 the engine proposal starts at the recorded V0 value and the envelope is the declared design space.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Number of segments N\"]",
+     "recorded_name": "Number of segments N",
+     "recorded_value": "MODELLED (4 in V0 prototype)",
+     "recorded_unit": "count",
+     "recorded_basis": "R332 decisive experiment",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "sensor_ring_width_mm",
+    "value": 1.5,
+    "unit": "mm",
+    "envelope": [
+     1.0,
+     2.5
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Press-fit sensor collar axial width; envelope is the engine-declared mounting space.",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "Per-segment flow sensors",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "sensor_ring_outer_diameter_mm",
+    "value": 3.0,
+    "unit": "mm",
+    "envelope": [
+     2.6,
+     3.6
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Collar outer diameter; bounded so the local diameter step stays below 1.2x the catheter OD (insertion profile).",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "Per-segment flow sensors",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   }
+  ]
+ },
+ "02_adaptive_valve": {
+  "pid": "P-02",
+  "name": "Adaptive Valve Profile for Postural ICP Regulation",
+  "tier": "HOLDING",
+  "objects": [
+   [
+    "valve_housing",
+    "valve body with axial flow bore and conical seat pocket"
+   ],
+   [
+    "valve_poppet",
+    "conical poppet element pressed into the seat cone (sealed state)"
+   ],
+   [
+    "actuator_cartridge",
+    "top annular cartridge seat for the recorded actuator candidate"
+   ]
+  ],
+  "dims": {
+   "valve_housing": {
+    "vol": 2221.72,
+    "bbox": [
+     12.0,
+     12.0,
+     20.0
+    ],
+    "radii": [
+     0.6,
+     0.6,
+     6.0
+    ],
+    "walls": [
+     5.4,
+     5.4
+    ]
+   },
+   "valve_poppet": {
+    "vol": 9.83,
+    "bbox": [
+     3.84,
+     3.84,
+     1.68
+    ],
+    "radii": [],
+    "walls": null
+   },
+   "actuator_cartridge": {
+    "vol": 265.96,
+    "bbox": [
+     7.0,
+     7.0,
+     7.12
+    ],
+    "radii": [
+     0.6,
+     3.5
+    ],
+    "walls": [
+     2.9
+    ]
+   }
+  },
+  "params": [
+   {
+    "param_id": "housing_diameter_mm",
+    "value": 12.0,
+    "unit": "mm",
+    "envelope": [
+     8.0,
+     16.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Shunt valve housing scale; the record's subsystem 'Adaptive valve seat' is housed at this envelope.",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(no recorded critical parameter \u2014 housing envelope)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "housing_height_mm",
+    "value": 20.0,
+    "unit": "mm",
+    "envelope": [
+     14.0,
+     26.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Axial space for seat + ball + cartridge stack.",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(no recorded critical parameter \u2014 housing envelope)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "flow_bore_diameter_mm",
+    "value": 1.2,
+    "unit": "mm",
+    "envelope": [
+     0.8,
+     1.5
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Axial flow bore; A_max is recorded UNKNOWN \u2014 the bore is the engine's MODELLED instantiation of the valve area at the low end of shunt bores.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Maximum valve area A_max\"]",
+     "recorded_name": "Maximum valve area A_max",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mm^2",
+     "recorded_basis": "Design choice",
+     "recorded_verification_requirement": "Geometric inspection + flow bench"
+    }
+   },
+   {
+    "param_id": "poppet_head_diameter_mm",
+    "value": 2.4,
+    "unit": "mm",
+    "envelope": [
+     1.5,
+     3.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Poppet-head/seat engagement sets the opening pressure the record lists as UNKNOWN; the engine proposes a poppet-in-cone seat (low differential pressure class). NOTE: a sphere element was tried first and REJECTED by the G2 independent watertight gate (OCCT sphere seam) \u2014 recorded, not hidden.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Cracking pressure P_crack\"]",
+     "recorded_name": "Cracking pressure P_crack",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mmHg",
+     "recorded_basis": "Design choice",
+     "recorded_verification_requirement": "Bench measurement per ISO 7197"
+    }
+   },
+   {
+    "param_id": "actuator_cartridge_diameter_mm",
+    "value": 7.0,
+    "unit": "mm",
+    "envelope": [
+     4.0,
+     10.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Cartridge annulus carrying the recorded actuator candidate; bore stays open for flow.",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "Actuator (candidate: MEMS electrothermal or shape-memory polymer)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   }
+  ]
+ },
+ "09_uwb_localization": {
+  "pid": "P-21-R1",
+  "name": "UWB Catheter Position Mapping with SAR-Bounded Accuracy",
+  "tier": "HOLDING",
+  "objects": [
+   [
+    "implant_body",
+    "implant catheter section with drainage lumen"
+   ],
+   [
+    "helical_antenna",
+    "helical conductor wound into the implant surface (record subsystem: implantable antenna)"
+   ]
+  ],
+  "dims": {
+   "implant_body": {
+    "vol": 75.16,
+    "bbox": [
+     2.0,
+     2.0,
+     30.0
+    ],
+    "radii": [
+     0.45,
+     1.0
+    ],
+    "walls": [
+     0.55
+    ]
+   },
+   "helical_antenna": {
+    "vol": 7.09,
+    "bbox": [
+     2.11,
+     2.11,
+     21.18
+    ],
+    "radii": [],
+    "walls": null
+   }
+  },
+  "params": [
+   {
+    "param_id": "implant_od_mm",
+    "value": 2.0,
+    "unit": "mm",
+    "envelope": [
+     1.6,
+     2.4
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Record: 'constrained by catheter diameter ~2 mm' \u2014 the engine takes the record's own cited scale.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Implant antenna size\"]",
+     "recorded_name": "Implant antenna size",
+     "recorded_value": "UNKNOWN \u2014 constrained by catheter diameter ~2 mm",
+     "recorded_unit": "mm",
+     "recorded_basis": "Catheter geometry",
+     "recorded_verification_requirement": "Geometric verification with catheter vendor"
+    }
+   },
+   {
+    "param_id": "lumen_diameter_mm",
+    "value": 0.9,
+    "unit": "mm",
+    "envelope": [
+     0.6,
+     1.2
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "drainage lumen stays open",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(catheter body, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "implant_length_mm",
+    "value": 30.0,
+    "unit": "mm",
+    "envelope": [
+     20.0,
+     40.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "implant section carrying TX + antenna; the record's UWB transmitter subsystem",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Implant antenna size\"]",
+     "recorded_name": "Implant antenna size",
+     "recorded_value": "UNKNOWN \u2014 constrained by catheter diameter ~2 mm",
+     "recorded_unit": "mm",
+     "recorded_basis": "Catheter geometry",
+     "recorded_verification_requirement": "Geometric verification with catheter vendor"
+    }
+   },
+   {
+    "param_id": "antenna_wire_diameter_mm",
+    "value": 0.18,
+    "unit": "mm",
+    "envelope": [
+     0.05,
+     0.2
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "conductor gauge: RF conduction loss and skin depth set the minimum; biocompatible metal per record BOM (Pt-Ir/gold)",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Implant antenna size\"]",
+     "recorded_name": "Implant antenna size",
+     "recorded_value": "UNKNOWN \u2014 constrained by catheter diameter ~2 mm",
+     "recorded_unit": "mm",
+     "recorded_basis": "Catheter geometry",
+     "recorded_verification_requirement": "Geometric verification with catheter vendor"
+    }
+   },
+   {
+    "param_id": "helix_pitch_mm",
+    "value": 0.45,
+    "unit": "mm",
+    "envelope": [
+     0.3,
+     0.8
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "helix pitch for a compact normal-mode helical antenna at UWB center frequency; pitch must exceed wire diameter (self-clearance, checked by the geometry gates)",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Implant antenna size\"]",
+     "recorded_name": "Implant antenna size",
+     "recorded_value": "UNKNOWN \u2014 constrained by catheter diameter ~2 mm",
+     "recorded_unit": "mm",
+     "recorded_basis": "Catheter geometry",
+     "recorded_verification_requirement": "Geometric verification with catheter vendor"
+    }
+   }
+  ]
+ },
+ "12_osmotic_valve": {
+  "pid": "P-26",
+  "name": "Osmotic Pressure Regulating Drainage Valve",
+  "tier": "HOLDING",
+  "objects": [
+   [
+    "valve_housing",
+    "two-chamber housing: through bore; the membrane divides it into CSF chamber and osmotic reservoir"
+   ],
+   [
+    "semipermeable_membrane",
+    "semipermeable membrane disc press-sealed across the bore (record subsystem)"
+   ],
+   [
+    "membrane_retaining_ring_upper",
+    "upper clamp ring press-fit into the bore, overlapping the membrane edge"
+   ],
+   [
+    "membrane_retaining_ring_lower",
+    "lower clamp ring press-fit into the bore, overlapping the membrane edge"
+   ]
+  ],
+  "dims": {
+   "valve_housing": {
+    "vol": 678.58,
+    "bbox": [
+     10.0,
+     10.0,
+     24.0
+    ],
+    "radii": [
+     4.0,
+     5.0
+    ],
+    "walls": [
+     1.0
+    ]
+   },
+   "semipermeable_membrane": {
+    "vol": 4.54,
+    "bbox": [
+     8.5,
+     8.5,
+     0.08
+    ],
+    "radii": [
+     4.25
+    ],
+    "walls": null
+   },
+   "membrane_retaining_ring_upper": {
+    "vol": 2.1,
+    "bbox": [
+     8.04,
+     8.04,
+     1.2
+    ],
+    "radii": [
+     3.95,
+     4.02
+    ],
+    "walls": [
+     0.07
+    ]
+   },
+   "membrane_retaining_ring_lower": {
+    "vol": 2.1,
+    "bbox": [
+     8.04,
+     8.04,
+     1.2
+    ],
+    "radii": [
+     3.95,
+     4.02
+    ],
+    "walls": [
+     0.07
+    ]
+   }
+  },
+  "params": [
+   {
+    "param_id": "housing_od_mm",
+    "value": 10.0,
+    "unit": "mm",
+    "envelope": [
+     8.0,
+     14.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "valve-body scale for a membrane chamber stack",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(valve housing, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "housing_height_mm",
+    "value": 24.0,
+    "unit": "mm",
+    "envelope": [
+     18.0,
+     30.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "chamber + reservoir stack height; the record's reservoir-volume design variable is realized by chamber height.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Reservoir volume\"]",
+     "recorded_name": "Reservoir volume",
+     "recorded_value": "UNKNOWN \u2014 determines lifetime before depletion",
+     "recorded_unit": "mL",
+     "recorded_basis": "Design choice",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "chamber_bore_diameter_mm",
+    "value": 8.0,
+    "unit": "mm",
+    "envelope": [
+     6.0,
+     10.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "working bore hosting membrane + rings",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(valve housing, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "membrane_thickness_mm",
+    "value": 0.08,
+    "unit": "mm",
+    "envelope": [
+     0.05,
+     0.2
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Lp is a material+thickness property; the engine instantiates the recorded membrane materials (cellulose acetate / polyamide / PES class) at a thin-film thickness. Record failure mode 'Membrane rupture' sets the lower bound.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Membrane hydraulic permeability Lp\"]",
+     "recorded_name": "Membrane hydraulic permeability Lp",
+     "recorded_value": "UNKNOWN \u2014 design choice",
+     "recorded_unit": "m/(Pa\u00b7s)",
+     "recorded_basis": "Membrane selection",
+     "recorded_verification_requirement": "ASTM D3985 permeation test"
+    }
+   },
+   {
+    "param_id": "membrane_diameter_mm",
+    "value": 8.5,
+    "unit": "mm",
+    "envelope": [
+     7.6,
+     8.55
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "A is the recorded UNKNOWN driving osmotic flux; realized as the membrane disc seated in the housing seat pocket.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Membrane area A\"]",
+     "recorded_name": "Membrane area A",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "m^2",
+     "recorded_basis": "Geometry",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "retaining_ring_height_mm",
+    "value": 1.2,
+    "unit": "mm",
+    "envelope": [
+     0.8,
+     1.6
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "clamp rings retaining the membrane",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(no recorded critical parameter \u2014 clamp)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   }
+  ]
+ },
+ "06_failure_predictor": {
+  "error": "[Errno 2] No such file or directory: 'RETIRED/06_failure_predictor/MODEL/MODEL_MANIFEST.json'"
+ },
+ "07_self_powered_sensing": {
+  "pid": "P-15-R1",
+  "name": "Self-Powered Sensing via Piezoelectric Energy Harvesting",
+  "tier": "RETIRED",
+  "objects": [
+   [
+    "piezo_layer_a",
+    "lower piezo lamina of the bimorph"
+   ],
+   [
+    "piezo_layer_b",
+    "upper piezo lamina of the bimorph"
+   ],
+   [
+    "proof_mass",
+    "tip mass (tantalum/ceramic per record BOM)"
+   ],
+   [
+    "anchor_block",
+    "clamp anchor at the fixed end"
+   ]
+  ],
+  "dims": {
+   "piezo_layer_a": {
+    "vol": 8.0,
+    "bbox": [
+     20.0,
+     4.0,
+     0.1
+    ],
+    "radii": [],
+    "walls": null
+   },
+   "piezo_layer_b": {
+    "vol": 8.0,
+    "bbox": [
+     20.0,
+     4.0,
+     0.1
+    ],
+    "radii": [],
+    "walls": null
+   },
+   "proof_mass": {
+    "vol": 36.0,
+    "bbox": [
+     3.0,
+     4.0,
+     3.0
+    ],
+    "radii": [],
+    "walls": null
+   },
+   "anchor_block": {
+    "vol": 6.2,
+    "bbox": [
+     6.2,
+     4.0,
+     0.25
+    ],
+    "radii": [],
+    "walls": null
+   }
+  },
+  "params": [
+   {
+    "param_id": "beam_length_mm",
+    "value": 20.0,
+    "unit": "mm",
+    "envelope": [
+     10.0,
+     25.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Cantilever active length; strain and active volume both scale with it. Envelope is the engine-declared catheter-implant pocket space.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Active piezo volume\"]",
+     "recorded_name": "Active piezo volume",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mm^3",
+     "recorded_basis": "Design choice constrained by catheter geometry",
+     "recorded_verification_requirement": "Geometric specification"
+    }
+   },
+   {
+    "param_id": "beam_width_mm",
+    "value": 4.0,
+    "unit": "mm",
+    "envelope": [
+     3.0,
+     6.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "bimorph width inside the implant pocket",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Active piezo volume\"]",
+     "recorded_name": "Active piezo volume",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mm^3",
+     "recorded_basis": "Design choice constrained by catheter geometry",
+     "recorded_verification_requirement": "Geometric specification"
+    }
+   },
+   {
+    "param_id": "piezo_layer_thickness_mm",
+    "value": 0.1,
+    "unit": "mm",
+    "envelope": [
+     0.05,
+     0.25
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "PVDF film thickness class (record BOM: PVDF preferred); bimorph = two bonded layers.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Active piezo volume\"]",
+     "recorded_name": "Active piezo volume",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mm^3",
+     "recorded_basis": "Design choice constrained by catheter geometry",
+     "recorded_verification_requirement": "Geometric specification"
+    }
+   },
+   {
+    "param_id": "proof_mass_size_mm",
+    "value": 3.0,
+    "unit": "mm",
+    "envelope": [
+     2.0,
+     4.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Tip mass tunes the resonant response to the CSF pulsation band; sized to the beam.",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(no recorded critical parameter \u2014 mass from power budget)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "anchor_length_mm",
+    "value": 5.0,
+    "unit": "mm",
+    "envelope": [
+     3.0,
+     8.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "clamp block for the fixed end",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(no recorded critical parameter \u2014 clamp)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   }
+  ]
+ },
+ "10_catheter_navigation": {
+  "pid": "P-22-R1",
+  "name": "Autonomous Catheter Navigation with Human-in-the-Loop",
+  "tier": "RETIRED",
+  "objects": [
+   [
+    "steerable_catheter_body",
+    "multi-lumen body: central drainage lumen + three 120-degree offset steering lumens"
+   ]
+  ],
+  "dims": {
+   "steerable_catheter_body": {
+    "vol": 233.38,
+    "bbox": [
+     2.6,
+     2.6,
+     60.0
+    ],
+    "radii": [
+     0.175,
+     0.175,
+     0.175,
+     0.6,
+     1.3
+    ],
+    "walls": [
+     0.175,
+     0.175,
+     0.175,
+     0.7
+    ]
+   }
+  },
+  "params": [
+   {
+    "param_id": "outer_diameter_mm",
+    "value": 2.6,
+    "unit": "mm",
+    "envelope": [
+     2.0,
+     3.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "OD with EI: the record's flexural-rigidity design choice is realized by wall + lumen geometry.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Flexural rigidity EI\"]",
+     "recorded_name": "Flexural rigidity EI",
+     "recorded_value": "UNKNOWN \u2014 design choice balancing bendability and buckling resistance",
+     "recorded_unit": "N\u00b7m^2",
+     "recorded_basis": "Material + geometry selection",
+     "recorded_verification_requirement": "Bench bending test per ISO 10555-1"
+    }
+   },
+   {
+    "param_id": "main_lumen_diameter_mm",
+    "value": 1.2,
+    "unit": "mm",
+    "envelope": [
+     0.8,
+     1.4
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "central drainage lumen",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(multi-lumen catheter body, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "steering_lumen_diameter_mm",
+    "value": 0.35,
+    "unit": "mm",
+    "envelope": [
+     0.2,
+     0.5
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "hydraulic steering actuator area A is the recorded UNKNOWN; realized as three steering lumens \u2014 pressurized area = steering force.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Actuator area A\"]",
+     "recorded_name": "Actuator area A",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "m^2",
+     "recorded_basis": "Geometry",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "steering_offset_radius_mm",
+    "value": 0.95,
+    "unit": "mm",
+    "envelope": [
+     0.6,
+     0.95
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "offset radius = moment arm of the steering force; bounded by wall manufacturability (checked by the wall constraint).",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Actuator area A\"]",
+     "recorded_name": "Actuator area A",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "m^2",
+     "recorded_basis": "Geometry",
+     "recorded_verification_requirement": null
+    }
+   },
+   {
+    "param_id": "length_mm",
+    "value": 60.0,
+    "unit": "mm",
+    "envelope": [
+     40.0,
+     80.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Record: 'anatomy-dependent ~30-50 cm total; the modeled section is the steerable distal segment' \u2014 engine-declared distal-section envelope.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Catheter length L\"]",
+     "recorded_name": "Catheter length L",
+     "recorded_value": "UNKNOWN \u2014 anatomy-dependent (cranial to peritoneal ~30-50 cm typical)",
+     "recorded_unit": "m",
+     "recorded_basis": "Anatomical constraint",
+     "recorded_verification_requirement": "Anatomical measurement to confirm range"
+    }
+   }
+  ]
+ },
+ "14_acoustic_detection": {
+  "pid": "P-28",
+  "name": "Acoustic Obstruction Detection for CSF Shunts",
+  "tier": "RETIRED",
+  "objects": [
+   [
+    "catheter_tip_body",
+    "tip body: drainage lumen + recessed transducer pocket at the distal face"
+   ],
+   [
+    "pzt_transducer_disc",
+    "PZT transducer disc press-fit in the pocket (annular around the lumen)"
+   ],
+   [
+    "acoustic_window_cap",
+    "thin acoustic window cap sealing the pocket (record subsystem)"
+   ]
+  ],
+  "dims": {
+   "catheter_tip_body": {
+    "vol": 62.15,
+    "bbox": [
+     2.0,
+     2.0,
+     25.0
+    ],
+    "radii": [
+     0.45,
+     0.85,
+     1.0
+    ],
+    "walls": [
+     0.15,
+     0.55
+    ]
+   },
+   "pzt_transducer_disc": {
+    "vol": 0.46,
+    "bbox": [
+     1.74,
+     1.74,
+     0.26
+    ],
+    "radii": [
+     0.45,
+     0.87
+    ],
+    "walls": [
+     0.42
+    ]
+   },
+   "acoustic_window_cap": {
+    "vol": 0.23,
+    "bbox": [
+     1.9,
+     1.9,
+     0.08
+    ],
+    "radii": [
+     0.95
+    ],
+    "walls": null
+   }
+  },
+  "params": [
+   {
+    "param_id": "catheter_tip_od_mm",
+    "value": 2.0,
+    "unit": "mm",
+    "envelope": [
+     1.6,
+     2.4
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Record: 'constrained by catheter ~2 mm' \u2014 the engine takes the record's cited scale.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Transducer size\"]",
+     "recorded_name": "Transducer size",
+     "recorded_value": "UNKNOWN \u2014 constrained by catheter ~2 mm",
+     "recorded_unit": "mm",
+     "recorded_basis": "Catheter geometry",
+     "recorded_verification_requirement": "Geometric verification with catheter vendor"
+    }
+   },
+   {
+    "param_id": "lumen_diameter_mm",
+    "value": 0.9,
+    "unit": "mm",
+    "envelope": [
+     0.6,
+     1.2
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "drainage lumen stays open past the tip",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(catheter integration, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "tip_length_mm",
+    "value": 25.0,
+    "unit": "mm",
+    "envelope": [
+     15.0,
+     35.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "instrumented tip section length",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(catheter integration, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "pzt_disc_diameter_mm",
+    "value": 1.7,
+    "unit": "mm",
+    "envelope": [
+     1.0,
+     1.8
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "active PZT aperture; detection power and beam scale with aperture; bounded by the tip wall.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Transducer size\"]",
+     "recorded_name": "Transducer size",
+     "recorded_value": "UNKNOWN \u2014 constrained by catheter ~2 mm",
+     "recorded_unit": "mm",
+     "recorded_basis": "Catheter geometry",
+     "recorded_verification_requirement": "Geometric verification with catheter vendor"
+    }
+   },
+   {
+    "param_id": "pzt_thickness_mm",
+    "value": 0.3,
+    "unit": "mm",
+    "envelope": [
+     0.2,
+     0.5
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "disc thickness sets the resonance frequency class (record: 'likely 5-20 MHz for catheter scale'); engine instantiates a mid-band thickness.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Operating frequency\"]",
+     "recorded_name": "Operating frequency",
+     "recorded_value": "UNKNOWN \u2014 design choice (likely 5-20 MHz for catheter-scale resolution)",
+     "recorded_unit": "MHz",
+     "recorded_basis": "Resolution vs attenuation tradeoff",
+     "recorded_verification_requirement": "Bench SNR test"
+    }
+   },
+   {
+    "param_id": "acoustic_window_thickness_mm",
+    "value": 0.08,
+    "unit": "mm",
+    "envelope": [
+     0.05,
+     0.15
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "record: 'acoustic-transparent window' \u2014 a thin bonded cap over the transducer pocket.",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(acoustic window, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   }
+  ]
+ },
+ "03_catalytic_clearance": {
+  "pid": "P-04",
+  "name": "Catalytic Contact Time Lock for Amyloid Beta Clearance",
+  "tier": "SPECIALIST_TRACK",
+  "objects": [
+   [
+    "catheter_body",
+    "catheter substrate tube"
+   ],
+   [
+    "enzyme_coating_layer",
+    "NEP-immobilized coating annulus lining the lumen (contact-time surface)"
+   ]
+  ],
+  "dims": {
+   "catheter_body": {
+    "vol": 438.02,
+    "bbox": [
+     2.6,
+     2.6,
+     110.0
+    ],
+    "radii": [
+     0.65,
+     1.3
+    ],
+    "walls": [
+     0.65
+    ]
+   },
+   "enzyme_coating_layer": {
+    "vol": 9.75,
+    "bbox": [
+     1.3,
+     1.3,
+     110.0
+    ],
+    "radii": [
+     0.63,
+     0.652
+    ],
+    "walls": [
+     0.022
+    ]
+   }
+  },
+  "params": [
+   {
+    "param_id": "outer_diameter_mm",
+    "value": 2.6,
+    "unit": "mm",
+    "envelope": [
+     2.0,
+     3.2
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "standard CSF shunt catheter body scale",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "Catheter length L / Lumen diameter d",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "lumen_diameter_mm",
+    "value": 1.3,
+    "unit": "mm",
+    "envelope": [
+     1.0,
+     1.5
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Record: 'Standard shunt catheter ~1-1.5 mm ID' \u2014 the engine proposal sits inside the record's own cited range.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Lumen diameter d\"]",
+     "recorded_name": "Lumen diameter d",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "m",
+     "recorded_basis": "Standard shunt catheter ~1-1.5 mm ID",
+     "recorded_verification_requirement": "Specification"
+    }
+   },
+   {
+    "param_id": "length_mm",
+    "value": 110.0,
+    "unit": "mm",
+    "envelope": [
+     60.0,
+     120.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Record: 'Design choice balancing clearance vs anatomy' \u2014 envelope is the engine-declared design space.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Catheter length L\"]",
+     "recorded_name": "Catheter length L",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "m",
+     "recorded_basis": "Design choice balancing clearance vs anatomy",
+     "recorded_verification_requirement": "Geometric specification"
+    }
+   },
+   {
+    "param_id": "enzyme_coating_thickness_mm",
+    "value": 0.02,
+    "unit": "mm",
+    "envelope": [
+     0.005,
+     0.05
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "NEP immobilization layer thickness; the surface-density design variable is realized as a coating annulus of this thickness.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Enzyme surface density Gamma\"]",
+     "recorded_name": "Enzyme surface density Gamma",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "mol/m^2",
+     "recorded_basis": "Design choice + coating process capability",
+     "recorded_verification_requirement": "Surface assay (e.g., fluorescent labeling, activity assay)"
+    }
+   }
+  ]
+ },
+ "05_phage_antibiofilm": {
+  "pid": "P-11",
+  "name": "Phage Anti-Biofilm Coating for Shunt Infection Prevention",
+  "tier": "SPECIALIST_TRACK",
+  "objects": [
+   [
+    "catheter_body",
+    "catheter substrate tube"
+   ],
+   [
+    "titanium_coating_layer",
+    "electrospun titanium coating annulus (record subsystem)"
+   ],
+   [
+    "phage_immobilization_layer",
+    "phage K immobilization + stabilization matrix annulus (record subsystem)"
+   ]
+  ],
+  "dims": {
+   "catheter_body": {
+    "vol": 301.59,
+    "bbox": [
+     2.6,
+     2.6,
+     80.0
+    ],
+    "radii": [
+     0.7,
+     1.3
+    ],
+    "walls": [
+     0.6
+    ]
+   },
+   "titanium_coating_layer": {
+    "vol": 18.73,
+    "bbox": [
+     1.41,
+     1.41,
+     80.0
+    ],
+    "radii": [
+     0.65,
+     0.705
+    ],
+    "walls": [
+     0.055
+    ]
+   },
+   "phage_immobilization_layer": {
+    "vol": 7.09,
+    "bbox": [
+     1.3,
+     1.3,
+     80.0
+    ],
+    "radii": [
+     0.63,
+     0.652
+    ],
+    "walls": [
+     0.022
+    ]
+   }
+  },
+  "params": [
+   {
+    "param_id": "outer_diameter_mm",
+    "value": 2.6,
+    "unit": "mm",
+    "envelope": [
+     2.0,
+     3.2
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "standard CSF shunt catheter body",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(catheter body substrate, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "lumen_diameter_mm",
+    "value": 1.4,
+    "unit": "mm",
+    "envelope": [
+     1.0,
+     1.6
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "lumen carries the coating stack and must stay open for drainage",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(catheter body substrate, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "length_mm",
+    "value": 80.0,
+    "unit": "mm",
+    "envelope": [
+     60.0,
+     120.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "catheter working length envelope",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(catheter body substrate, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "titanium_coating_thickness_mm",
+    "value": 0.05,
+    "unit": "mm",
+    "envelope": [
+     0.01,
+     0.1
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Record: UNKNOWN with 10-1000x surface-area multiplier from electrospinning; the engine proposal is a mid-range electrospun layer.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Electrospun Ti coating thickness\"]",
+     "recorded_name": "Electrospun Ti coating thickness",
+     "recorded_value": "UNKNOWN",
+     "recorded_unit": "\u03bcm",
+     "recorded_basis": "Electrospinning process parameters",
+     "recorded_verification_requirement": "SEM cross-section"
+    }
+   },
+   {
+    "param_id": "phage_layer_thickness_mm",
+    "value": 0.02,
+    "unit": "mm",
+    "envelope": [
+     0.005,
+     0.05
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Phage immobilization matrix thickness \u2014 the realization of the recorded surface-density design variable at coating-process scale.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"Phage K titer (initial)\"]",
+     "recorded_name": "Phage K titer (initial)",
+     "recorded_value": "UNKNOWN achievable surface density",
+     "recorded_unit": "PFU/cm^2",
+     "recorded_basis": "Coating process-dependent",
+     "recorded_verification_requirement": "Surface titer assay"
+    }
+   }
+  ]
+ },
+ "15_mr_flow_sensor": {
+  "pid": "P-29",
+  "name": "MR Flow Quantification Sensor at Catheter Scale",
+  "tier": "SPECIALIST_TRACK",
+  "objects": [
+   [
+    "flow_tube",
+    "CSF flow tube through the sensing section"
+   ],
+   [
+    "rf_coil_ring",
+    "RF transmit/receive coil annulus (record subsystem)"
+   ],
+   [
+    "magnet_segment_proximal",
+    "proximal half-annular magnet segment (B0 source, record subsystem)"
+   ],
+   [
+    "magnet_segment_distal",
+    "distal half-annular magnet segment (B0 source, record subsystem)"
+   ]
+  ],
+  "dims": {
+   "flow_tube": {
+    "vol": 91.03,
+    "bbox": [
+     2.0,
+     2.0,
+     40.0
+    ],
+    "radii": [
+     0.525,
+     1.0
+    ],
+    "walls": [
+     0.475
+    ]
+   },
+   "rf_coil_ring": {
+    "vol": 15.63,
+    "bbox": [
+     3.1,
+     3.1,
+     3.0
+    ],
+    "radii": [
+     0.8625,
+     1.55
+    ],
+    "walls": [
+     0.6875
+    ]
+   },
+   "magnet_segment_proximal": {
+    "vol": 49.32,
+    "bbox": [
+     4.2,
+     4.2,
+     6.0
+    ],
+    "radii": [
+     0.96,
+     2.1
+    ],
+    "walls": [
+     1.14
+    ]
+   },
+   "magnet_segment_distal": {
+    "vol": 49.32,
+    "bbox": [
+     4.2,
+     4.2,
+     6.0
+    ],
+    "radii": [
+     0.96,
+     2.1
+    ],
+    "walls": [
+     1.14
+    ]
+   }
+  },
+  "params": [
+   {
+    "param_id": "tube_od_mm",
+    "value": 2.0,
+    "unit": "mm",
+    "envelope": [
+     1.6,
+     2.4
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "Record: 'constrained by catheter ~2 mm' \u2014 flow tube at the record's cited scale.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"RF coil size\"]",
+     "recorded_name": "RF coil size",
+     "recorded_value": "UNKNOWN \u2014 constrained by catheter ~2 mm or external patch",
+     "recorded_unit": "mm",
+     "recorded_basis": "Form factor",
+     "recorded_verification_requirement": "Geometric verification with catheter vendor"
+    }
+   },
+   {
+    "param_id": "tube_length_mm",
+    "value": 40.0,
+    "unit": "mm",
+    "envelope": [
+     25.0,
+     55.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "instrumented flow section length",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(sensor assembly, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "lumen_diameter_mm",
+    "value": 1.05,
+    "unit": "mm",
+    "envelope": [
+     0.7,
+     1.3
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "CSF flow lumen through the sensing section",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "(flow path, record subsystem)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   },
+   {
+    "param_id": "coil_thickness_mm",
+    "value": 0.55,
+    "unit": "mm",
+    "envelope": [
+     0.3,
+     0.8
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "copper winding cross-section class (record BOM: copper/silver wire); realized as the annular coil body.",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"RF coil size\"]",
+     "recorded_name": "RF coil size",
+     "recorded_value": "UNKNOWN \u2014 constrained by catheter ~2 mm or external patch",
+     "recorded_unit": "mm",
+     "recorded_basis": "Form factor",
+     "recorded_verification_requirement": "Geometric verification with catheter vendor"
+    }
+   },
+   {
+    "param_id": "coil_height_mm",
+    "value": 3.0,
+    "unit": "mm",
+    "envelope": [
+     2.0,
+     5.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "solenoid axial length",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"RF coil size\"]",
+     "recorded_name": "RF coil size",
+     "recorded_value": "UNKNOWN \u2014 constrained by catheter ~2 mm or external patch",
+     "recorded_unit": "mm",
+     "recorded_basis": "Form factor",
+     "recorded_verification_requirement": "Geometric verification with catheter vendor"
+    }
+   },
+   {
+    "param_id": "magnet_thickness_mm",
+    "value": 1.1,
+    "unit": "mm",
+    "envelope": [
+     0.5,
+     1.2
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "B0 is the recorded UNKNOWN (likely 0.1-1 T); the geometry-side term is the magnet cross-section \u2014 realized as two half-annular rare-earth segments (record BOM: NdFeB/SmCo).",
+    "record_binding": {
+     "binding_status": "BOUND_TO_RECORD",
+     "source": "R370Q ArtifactRichDossier engineering_content.engineering_core.critical_parameters[name=\"B0 field strength\"]",
+     "recorded_name": "B0 field strength",
+     "recorded_value": "UNKNOWN \u2014 design choice (likely 0.1-1 T for miniaturization)",
+     "recorded_unit": "T",
+     "recorded_basis": "Miniaturization tradeoff",
+     "recorded_verification_requirement": "Field mapping"
+    }
+   },
+   {
+    "param_id": "magnet_length_mm",
+    "value": 6.0,
+    "unit": "mm",
+    "envelope": [
+     4.0,
+     8.0
+    ],
+    "value_class": "MODELLED",
+    "envelope_class": "MODELLED",
+    "category": "GEOMETRY",
+    "design_basis": "two magnet segments spaced by the coil create the bipolar field region the record's gradient encoding uses.",
+    "record_binding": {
+     "binding_status": "NOT_IN_RECORD_ENGINE_DECLARED",
+     "source": "r381 template (engine-owned design choice)",
+     "recorded_name": "Gradient coil (bipolar)",
+     "note": "no verbatim critical parameter of this name exists in the canonical record; the value below is an ENGINE-DECLARED MODELLED design proposal inside a declared envelope \u2014 never an evidence claim"
+    }
+   }
+  ]
+ }
+}
