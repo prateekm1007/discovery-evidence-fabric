@@ -629,6 +629,51 @@ class EngineRun:
                           select_decisive_experiment(chosen["env_view"]))
             self._chosen_env = chosen["env_view"]
 
+            # ---------- R378: TECHNICAL IMPROVEMENT ENGINE pass ----------
+            # CEO 2026-08-31 directive: the loop must become
+            #   CANDIDATE -> DIAGNOSE -> CONTROLLED MUTATION ->
+            #   RE-EVALUATE -> RE-SCORE -> KEEP OR KILL -> REPEAT
+            # The pass runs on the SELECTED SURVIVOR before packaging.
+            # A material improvement REPLACES the candidate (the
+            # engineering spec + attack + quality re-run for the child —
+            # no score is inherited); a no-defensible-improvement
+            # verdict KILLS the candidate (CEO rule 9: no buyer package;
+            # a higher kill rate is acceptable); transport failure is
+            # honest IMPROVEMENT_BLOCKED_TRANSPORT (parent proceeds —
+            # infrastructure is not a research verdict, Art. XXV).
+            improvement = self._improvement_pass(chosen, spec_rel, run_ctx)
+            if improvement is not None:
+                if improvement["outcome"] == "IMPROVED":
+                    rebuilt = improvement["rebuilt"]
+                    spec_rel, eng_rel = (rebuilt["spec"],
+                                         rebuilt["eng"])
+                    chosen = dict(chosen,
+                                  env_view=rebuilt["env_view"],
+                                  attack=rebuilt["attack"],
+                                  quality=rebuilt["quality"],
+                                  repaired=rebuilt["repaired"],
+                                  candidate_id=rebuilt["candidate_id"])
+                    self._spec, self._eng = spec_rel, eng_rel
+                    self._chosen_env = chosen["env_view"]
+                    self._persist("INVENTION_SPECIFICATION.json",
+                                  spec_rel)
+                    self._persist("ENGINEERING_SPECIFICATION.json",
+                                  eng_rel)
+                    self._persist("DECISIVE_EXPERIMENT.json",
+                                  rebuilt["decisive"])
+                elif improvement["outcome"].startswith("KILLED_"):
+                    self.package_failure = (
+                        f"TECHNICAL IMPROVEMENT ENGINE "
+                        f"({improvement['outcome']}): "
+                        f"{improvement['reason']}")
+                    self._persist("PACKAGE_FAILED.json", {
+                        "stage": "IMPROVEMENT_PASS",
+                        "outcome": improvement["outcome"],
+                        "reason": improvement["reason"],
+                        "ledger": "IMPROVEMENT_LEDGER.json",
+                    })
+                    return
+
             # CEO A1: resolve the package identity through the canonical
             # registry — AFTER survivor selection, so killed candidates
             # burn no number. An explicit self.package_number is a
@@ -696,6 +741,168 @@ class EngineRun:
                 "stage": "POST_RANK_PIPELINE",
                 "error": self.package_failure,
                 "timestamp": utc_now()})
+
+    # ------------------------------------------------------------------
+    def _improvement_pass(self, chosen: Dict[str, Any],
+                          spec_rel: Dict[str, Any],
+                          run_ctx: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """R378 TECHNICAL IMPROVEMENT ENGINE pass on the selected
+        survivor. Returns None when the pass is disabled or
+        infrastructure-blocked (parent proceeds); otherwise the ledger
+        outcome + (when IMPROVED) the fully rebuilt child artifacts.
+
+        Honesty contract:
+        - transport failure -> IMPROVEMENT_BLOCKED_TRANSPORT (parent
+          proceeds; infrastructure is not a research verdict, Art. XXV)
+        - the child's engineering spec, attack, repair and quality are
+          RE-RUN (CEO rule 11 — nothing inherited)
+        - a KILL outcome blocks packaging (CEO rule 9)
+        """
+        import os as _os
+        if _os.environ.get("ENGINE_IMPROVEMENT_PASS", "1") == "0":
+            self._persist("IMPROVEMENT_LEDGER.json", {
+                "stage": "IMPROVEMENT_PASS",
+                "status": "DISABLED_BY_OPERATOR",
+                "note": "ENGINE_IMPROVEMENT_PASS=0 (explicit operator "
+                        "override; recorded, never silent)"})
+            return None
+        from .dossier_quality import evaluate_dossier_quality
+        from .engineering_attack import (attack_engineering,
+                                         repair_engineering)
+        from .engineering_spec import build_engineering_spec
+        from .evaluator_contract import CandidateContext
+        from .experiment_selector import select_decisive_experiment
+        from .improvement_engine import improve_candidate
+        env_view = chosen["env_view"]
+        try:
+            decisive = select_decisive_experiment(env_view)
+            ev_items = [{"id": e.get("id"),
+                         "title": str(e.get("title") or ""),
+                         "text": str(e.get("abstract")
+                                     or e.get("content") or "")}
+                        for e in (getattr(env_view, "evidence", None)
+                                  or [])]
+            ctx = CandidateContext(
+                spec=spec_rel, decisive=decisive, problem=self.problem,
+                evidence_items=ev_items,
+                collision=getattr(env_view, "collision_results", None),
+                attack=chosen.get("attack"),
+                run_ctx={"run_id": self.run_id})
+            live_sources = [s for s in _os.environ.get(
+                "ENGINE_COLLISION_SOURCES", "").split(",") if s] or None
+            ledger = improve_candidate(
+                ctx, collision_mode="REPLAY_CACHE",
+                live_sources=live_sources,
+                provider=_os.environ.get(
+                    "ENGINE_IMPROVEMENT_PROVIDER") or None)
+        except Exception as exc:  # noqa: BLE001 — recorded, never fatal
+            self._persist("IMPROVEMENT_LEDGER.json", {
+                "stage": "IMPROVEMENT_PASS", "status": "ERROR",
+                "error": f"{type(exc).__name__}: {exc}",
+                "consequence": ("the parent candidate proceeds "
+                                "unchanged (honest degradation — an "
+                                "engine defect never kills research)"),
+                "timestamp": utc_now()})
+            return None
+
+        public = {k: v for k, v in ledger.items()
+                  if k != "current_ctx"}
+        public["status"] = ledger["outcome"]
+        self._persist("IMPROVEMENT_LEDGER.json", public)
+
+        outcome = ledger.get("outcome")
+        if outcome not in ("IMPROVED",):
+            return {"outcome": outcome,
+                    "reason": ledger.get("outcome_reason", ""),
+                    "ledger_public": public}
+
+        # ---- IMPROVED: rebuild the child's full artifact chain --------
+        child_ctx = ledger.get("current_ctx")
+        child_spec = child_ctx.spec
+        child_env = self._env_view_for_improved(env_view, child_spec)
+        eng = build_engineering_spec(child_spec, child_env, run_ctx)
+        attack = attack_engineering(child_spec, eng, child_env)
+        self._persist("ENGINEERING_ATTACK_improved.json", attack)
+        if attack["overall"] == "KILLED":
+            # the improvement survived the quality instruments but the
+            # engineering attack killed the mutated artifact: honest
+            # kill with both records on disk
+            self._persist("PACKAGE_FAILED.json", {
+                "stage": "IMPROVEMENT_PASS",
+                "outcome": "IMPROVED_CANDIDATE_ATTACK_KILLED",
+                "reason": "the improved candidate was KILLED by the "
+                          "re-run engineering attack (E15-F)",
+                "kill_basis": [i["basis"] for i in attack["items"]
+                               if i["verdict"] == "KILL"]})
+            return {"outcome": "KILLED_ATTACK_AFTER_IMPROVEMENT",
+                    "reason": "the improved candidate was killed by the "
+                              "re-run engineering attack",
+                    "ledger_public": public}
+        repaired = False
+        if attack["counts"].get("REPAIR", 0) > 0:
+            eng2 = repair_engineering(child_spec, eng, attack)
+            if (eng2.get("repair_ledger") or {}).get("artifact_mutated"):
+                self._persist(
+                    "ENGINEERING_SPECIFICATION_V1_improved.json", eng)
+                eng, repaired = eng2, True
+        quality = evaluate_dossier_quality(child_spec, eng)
+        mut_id = ((child_spec.get("_improvement") or {})
+                  .get("mutation", {}) or {}).get("mutation_id")
+        return {
+            "outcome": "IMPROVED",
+            "reason": ledger.get("outcome_reason", ""),
+            "ledger_public": public,
+            "rebuilt": {
+                "spec": child_spec,
+                "eng": dict(eng, engineering_attack_summary={
+                    "attack": "ENGINEERING_ATTACK (E15-F, re-run on the "
+                              "improved candidate R378)",
+                    "overall": attack["overall"],
+                    "counts": attack["counts"],
+                    "repaired_to_v2": repaired,
+                    "improvement_mutation_id": mut_id,
+                }),
+                "attack": attack, "quality": quality,
+                "repaired": repaired,
+                "env_view": child_env,
+                "decisive": child_ctx.decisive,
+                "candidate_id": f"{chosen['candidate_id']}+{mut_id}",
+            },
+        }
+
+    def _env_view_for_improved(self, env_view, child_spec):
+        """Construct the improved candidate's envelope view: the mutated
+        mechanism map + the re-adjudicated prior-art position (the
+        improvement pass already re-ran the adjudication — it is NOT
+        re-run here, and the parent's collision is never silently
+        reused: the child's own resolution travels on the view)."""
+        d = env_view.to_dict()
+        mv = (child_spec.get("mechanism") or {}).get("value") or {}
+        mm = dict(d.get("mechanism_map") or {})
+        mm.update({
+            "mechanism": mv.get("mechanism", ""),
+            "intervention": mv.get("intervention", ""),
+            "expected_effect": mv.get("expected_effect", ""),
+            "falsification_test": mv.get("falsification_test", ""),
+            "mechanism_source_span": mv.get("mechanism_source_span", ""),
+            "span_derivation": mv.get("span_derivation"),
+            "raw_candidate": mv.get("raw_candidate") or {}})
+        d["mechanism_map"] = mm
+        pav = (child_spec.get("prior_art") or {}).get("value") or {}
+        col = dict(d.get("collision_results") or {})
+        col["differentiation_resolution"] = \
+            pav.get("differentiation_resolution") or {}
+        col["prior_art_status"] = pav.get("status")
+        col["nearest_prior_art"] = \
+            ((child_spec.get("distinguishing_features") or {})
+             .get("value") or {}).get("vs_nearest_prior_art") or []
+        d["collision_results"] = col
+        pa = dict(d.get("prior_art") or {})
+        pa["prior_art_status"] = pav.get("status")
+        pa["differentiation_resolution"] = \
+            pav.get("differentiation_resolution") or {}
+        d["prior_art"] = pa
+        return Candidate.from_dict(d)
 
     # ------------------------------------------------------------------
     def _blocked_by(self, stage: str) -> Optional[str]:

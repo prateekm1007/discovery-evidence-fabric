@@ -1,0 +1,1202 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-08-31T04:08:19+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.0,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.0 < STRONG floor 0.7; underived_flag set (span_support=0.0, evidence_support=0.333) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "MECHANISM_STRENGTHENING"
+     },
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "measured_value": 0.1,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.1 < STRONG floor 0.7",
+      "mutation_type": "DIFFERENTIATOR"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "measured_value": 0.333,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.333 < STRONG floor 0.7",
+      "mutation_type": "DIFFERENTIATOR"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_TERSE_MECHANISM",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:0d427c55916d",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "5bb35659868265949db84aa7042559d982bacd3ee3043a70b58b66db95fff8d4",
+     "output_hash": "0d427c55916da16c3fa610de148fc5697deaf782efdb3ef971eb3e481fb69c03",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Real-time pressure monitoring with differential pressure sensing across the infusion path to detect occlusion events",
+      "INTERVENTION": "Install differential pressure sensors at multiple points along the infusion path with independent signal processing and cross-validation algorithms",
+      "EXPECTED_EFFECT": "Enhanced occlusion detection capability by monitoring pressure differentials before triggering alarm, reducing false positives while maintaining sensitivity to actual occlusions",
+      "FALSIFICATION_TEST": "Measure pressure differentials during simulated occlusion events across various viscosities and flow rates to verify alarm triggers before harmful pressure thresholds",
+      "MECHANISM_SOURCE_SPAN": "With the treatment zone converted to a sealed saline chamber, concentrated chemical agents, each targeting a specific plaque component, dissolve the atheroma in situ: ethylenediaminetetraacetic acid (EDTA) for calcified deposits, surfactants for the lipid-rich necrotic core, and collagenase for the fibrous cap. The agents are cycled iteratively to penetrate layered plaque, and dissolved material is flushed out under alternating unidirectional flow, with real-time effluent chemistry providing both treatment endpoint and quantitative plaque composition without imaging.",
+      "SOURCE_EVIDENCE_ID": "europepmc:42261546",
+      "EXPERIMENT": "Compare the differential pressure sensing approach against baseline single-point pressure monitoring in detecting occlusions across various viscosities and flow rates",
+      "EXPERIMENT_BASELINE": "Pressure monitoring with redundant sensors",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "Real-time pressure differential monitoring must detect occlusions before clinically harmful pressure/volume delivery across all pump viscosity and flow-rate ranges",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by incorporating technical vocabulary from the evidence span about real-time monitoring and differential sensing"
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:42261546",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 2,
+        "shared_terms": [
+         "real",
+         "time"
+        ],
+        "span_terms_n": 53,
+        "ratio": 0.038,
+        "underived": true,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": false
+      },
+      "reasons": [
+       "span_derivation_cleared: re-measured span-derivation ratio 0.038 < 0.2 — the new span still does not contain the new mechanism's vocabulary"
+      ],
+      "validated_at": "2026-08-31T04:08:28+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:80a99df0c793",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "0f122665aeb4beae0dd64df8bdf2af78e02abf7ec60286be92aa1b0e54ac0431",
+     "output_hash": "80a99df0c793a06837d16474266d259904f9644dac11bbad2ec60736cd4e0fb8",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Real-time effluent chemistry providing treatment endpoint and quantitative occlusion detection",
+      "INTERVENTION": "Install inline effluent chemistry monitoring with real-time analysis of fluid properties to detect occlusion events",
+      "EXPECTED_EFFECT": "Enhanced occlusion detection capability through direct measurement of fluid dynamics and chemistry changes indicative of occlusion",
+      "FALSIFICATION_TEST": "Compare pressure-based detection against chemistry-based detection in simulated occlusion scenarios across viscosity and flow-rate ranges",
+      "MECHANISM_SOURCE_SPAN": "real-time effluent chemistry providing both treatment endpoint and quantitative plaque composition without imaging",
+      "SOURCE_EVIDENCE_ID": "europepmc:42261546",
+      "EXPERIMENT": "Compare the chemistry-based occlusion detection against the current dual-pressure sensor baseline in controlled occlusion scenarios",
+      "EXPERIMENT_BASELINE": "dual pressure sensors at different points along the infusion path with independent signal processing",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "Occlusion detection must provide quantitative composition analysis of the fluid to distinguish between true occlusions and false positives",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by using verbatim technical vocabulary from the evidence span to derive the mechanism"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:42261546",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 8,
+        "shared_terms": [
+         "chemistry",
+         "effluent",
+         "endpoint",
+         "providing",
+         "quantitative",
+         "real",
+         "time",
+         "treatment"
+        ],
+        "span_terms_n": 13,
+        "ratio": 0.615,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 0.615
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T04:08:35+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:758942ed7efc",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.0,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:80a99df0c793",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "0f122665aeb4beae0dd64df8bdf2af78e02abf7ec60286be92aa1b0e54ac0431",
+     "output_hash": "80a99df0c793a06837d16474266d259904f9644dac11bbad2ec60736cd4e0fb8",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:42261546",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 8,
+       "shared_terms": [
+        "chemistry",
+        "effluent",
+        "endpoint",
+        "providing",
+        "quantitative",
+        "real",
+        "time",
+        "treatment"
+       ],
+       "span_terms_n": 13,
+       "ratio": 0.615,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.615
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T04:08:35+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Pressure monitoring with redundant sensors",
+      "after": "Real-time effluent chemistry providing treatment endpoint and quantitative occlusion detection"
+     },
+     "intervention": {
+      "before": "Install dual pressure sensors at different points along the infusion path with independent signal processing",
+      "after": "Install inline effluent chemistry monitoring with real-time analysis of fluid properties to detect occlusion events"
+     },
+     "mechanism_source_span": {
+      "before": "\"While there is overlap with existing literature on intrathecal baclofen therapy, the clinical presentation and work-up varies when utilizing opioids and local anesthetics.\"",
+      "after": "real-time effluent chemistry providing both treatment endpoint and quantitative plaque composition without imaging"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:unsupported_mechanism",
+      "con:attack:weak_transfer",
+      "con:attack:contradiction",
+      "con:attack:regulatory_incompatibility",
+      "con:collision:adjacent",
+      "infusion pump occlusion detection pumps documented",
+      "pressure monitoring redundant sensors",
+      "pressure infusion sensors install different independent processing dual",
+      "infusion pump occlusion detection pumps alarm"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "e98477edfe5ef4f84dd76c443624f03a21ed3fe81b0bbc276bc7164aca367c02",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by using verbatim technical vocabulary from the evidence span to derive the mechanism",
+    "applied_at": "2026-08-31T04:08:35+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T04:08:35+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "event",
+      "fluid",
+      "inline",
+      "occlusion"
+     ],
+     "entity_retention_vs_problem": 0.8,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:4 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "CN_224421631_U_20260630",
+         "title": "Pressure maintaining device for pressurized infusion",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/080-430-241-390-970",
+         "assignee": "['SHAOXING PEOPLES HOSPITAL']",
+         "publication_date": "2026-06-30"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_224421631_U_20260630"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Pressure maintaining device for pressurized infusion The utility model relates to a pressure maintaining device for pressurized transfusion, which comprises an automatic pressurizing air pump, a manual pressurizing system and a sealed pressurizing bag, the automatic pressurizing air pump, the manual pressurizing system and the sealed pressurizing bag are connected through an air path tee joint, and the sealed pressurizing bag is provided with a spac  The utility model relates to a pressure maintaining device for pressurized transfusion, which comprises an automatic pressurizing air pump, a manual pressurizing system and a sealed pressurizing bag, the automatic pressurizing air pump, the manual pressurizing system and the sealed pressurizing bag are connected through an air path tee joint, and the sealed pressurizing bag is provided with a space capable of accommodating a transfusion bag. An air pressure displayer is connected to the sealed pressurizing bag and used for displaying the air pressure condition in the sealed pressurizing bag. The pressure maintaining device for pressurized infusion is used for displaying the air pressure in the sealed pressurized bag, and medical staff ",
+        "adjudicated_text_sha256": "49edc685d482b98e10b03a8e97a31e647b7854431e57348fb12d7c2a4bb860d2",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [],
+         "distinguishing_terms_covered": [],
+         "distinguishing_terms_surviving": [
+          "analysi",
+          "chemistry",
+          "effluent",
+          "event",
+          "fluid",
+          "inline",
+          "install",
+          "occlusion",
+          "property",
+          "real",
+          "time"
+         ],
+         "coverage_ratio": 0.0,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "CN_122297834_A_20260630",
+         "title": "Pressure monitoring device, power source system and medicine infusion system",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/181-532-969-232-069",
+         "assignee": "['MICROTECH MEDICAL HANGZHOU CO LTD']",
+         "publication_date": "2026-06-30"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_122297834_A_20260630"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Pressure monitoring device, power source system and medicine infusion system The invention provides a pressure monitoring device, a power source system and a medicine infusion system. The pressure monitoring device comprises an elastic film covering the fluid channel; the conductive layer is located on the surface, away from the fluid channel, of the elastic film or spaced from the surface, away from the fluid channel, of the elastic film; the conductive layer is of an int  The invention provides a pressure monitoring device, a power source system and a medicine infusion system. The pressure monitoring device comprises an elastic film covering the fluid channel; the conductive layer is located on the surface, away from the fluid channel, of the elastic film or spaced from the surface, away from the fluid channel, of the elastic film; the conductive layer is of an integrated structure or comprises a plurality of first conductors which are not in contact with each other; and the detection device is at least connected with the conductive layer. According to the pressure monitoring device, the elastic film is arranged on the fluid channel, and the conductive layer is arranged on the su",
+        "adjudicated_text_sha256": "1e57454cfbd2ad3dc316f3c09ef553a5a72356f34ddbc50810578fbb3f245709",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [
+          "detection"
+         ],
+         "distinguishing_terms_covered": [
+          "fluid"
+         ],
+         "distinguishing_terms_surviving": [
+          "analysi",
+          "chemistry",
+          "effluent",
+          "event",
+          "inline",
+          "install",
+          "occlusion",
+          "property",
+          "real",
+          "time"
+         ],
+         "coverage_ratio": 0.091,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "US_20260174973_A1_20260625",
+         "title": "Pressure changing device and infusion connector",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/061-795-833-258-28X",
+         "assignee": "['DENG SAMING']",
+         "publication_date": "2026-06-25"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260174973_A1_20260625"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Pressure changing device and infusion connector A pressure changing device and an infusion connector are provided. The pressure changing device includes a pressure changing member. When the pressure changing device is connected to an infusion head or a syringe head, a negative pressure is generated in the pressure changing device, which draws thrombus from a connected indwelling needle into an indwelling needle holder or the pressure changing d  A pressure changing device and an infusion connector are provided. The pressure changing device includes a pressure changing member. When the pressure changing device is connected to an infusion head or a syringe head, a negative pressure is generated in the pressure changing device, which draws thrombus from a connected indwelling needle into an indwelling needle holder or the pressure changing device, thereby preventing the thrombus from re-entering the blood vessel of a patient through the indwelling needle. Then the negative pressure disappears, and liquid can flow into the blood vessel normally through the indwelling needle. When removing the infusion head or the syringe head, the pressure changing device generates a positive pressure ",
+        "adjudicated_text_sha256": "4a13c6544a7acf5ee1a5f86f66b8be6462b4938a2db7583f3f48b02c73204ef4",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [],
+         "distinguishing_terms_covered": [],
+         "distinguishing_terms_surviving": [
+          "analysi",
+          "chemistry",
+          "effluent",
+          "event",
+          "fluid",
+          "inline",
+          "install",
+          "occlusion",
+          "property",
+          "real",
+          "time"
+         ],
+         "coverage_ratio": 0.0,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-04",
+        "representative": {
+         "patent_id": "CN_224370359_U_20260619",
+         "title": "Negative pressure driven infusion device",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/137-638-694-655-184",
+         "assignee": "['NANJING LINGJI YIDONG DRIVING TECH CO LTD']",
+         "publication_date": "2026-06-19"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_224370359_U_20260619"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Negative pressure driven infusion device The utility model relates to the technical field of medical instruments, and provides a negative pressure driven infusion device which comprises a shell, a negative pressure assembly and a linkage assembly. One end of the linkage assembly is assembled in the shell and can move between a first position and a second position, when the linkage assembly is located at the first position, a containing s  The utility model relates to the technical field of medical instruments, and provides a negative pressure driven infusion device which comprises a shell, a negative pressure assembly and a linkage assembly. One end of the linkage assembly is assembled in the shell and can move between a first position and a second position, when the linkage assembly is located at the first position, a containing space is formed between the linkage assembly and the bottom of the shell, and the containing space is used for containing a liquid medicine bag; the other end of the linkage assembly can be locked or unlocked; the negative pressure assembly is arranged in the shell and provided with a piston rod, and the outer side end of the piston rod is connected with t",
+        "adjudicated_text_sha256": "681580beb7b68d178918301e41ff1088d7567ace3f0c0e94b08d7747970d6d3a",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [],
+         "distinguishing_terms_covered": [],
+         "distinguishing_terms_surviving": [
+          "analysi",
+          "chemistry",
+          "effluent",
+          "event",
+          "fluid",
+          "inline",
+          "install",
+          "occlusion",
+          "property",
+          "real",
+          "time"
+         ],
+         "coverage_ratio": 0.0,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 4,
+      "n_search_errors": 0,
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "analysi",
+       "chemistry",
+       "effluent",
+       "event",
+       "fluid",
+       "inline",
+       "install",
+       "occlusion",
+       "property",
+       "real",
+       "time"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 0.727,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.857,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.75,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.7
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.0 -> 0.5 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [
+      "I4_NEW_TECHNICAL_RELATIONSHIP"
+     ],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T04:08:35+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.5,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.5 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:38c09b5778f0",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "b292e5c2eb7abd2093777c37439acd41d2290055e2ba81168854337b40a97dbf",
+     "output_hash": "38c09b5778f089392eae37487a0254e7bce5ff8b29592cd4ea5502aede7e213a",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Real-time effluent chemistry providing treatment endpoint and quantitative occlusion detection",
+      "INTERVENTION": "Install inline effluent chemistry monitoring with real-time analysis of fluid properties to detect occlusion events through quantitative plaque composition assessment",
+      "EXPECTED_EFFECT": "Enhanced occlusion detection capability through direct measurement of fluid dynamics and chemistry changes indicative of occlusion",
+      "FALSIFICATION_TEST": "Compare pressure-based detection against chemistry-based detection in simulated occlusion scenarios across viscosity and flow-rate ranges",
+      "MECHANISM_SOURCE_SPAN": "dissolved material is flushed out under alternating unidirectional flow, with real-time effluent chemistry providing both treatment endpoint and quantitative plaque composition without imaging",
+      "SOURCE_EVIDENCE_ID": "europepmc:42261546",
+      "EXPERIMENT": "Compare chemistry-based occlusion detection against pressure-based detection in simulated occlusion scenarios across viscosity and flow-rate ranges",
+      "EXPERIMENT_BASELINE": "pressure-based detection",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "The occlusion detection system must provide quantitative composition analysis of the effluent to distinguish between different types of occlusions",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism in the exact technical vocabulary from the evidence source, specifically incorporating \"quantitative plaque composition\" from the evidence span"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:42261546",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.562,
+       "evidence_support_cleared": 0.562,
+       "constraint_traceable_to_evidence": "The occlusion detection system must provide quantitative composition analysis of the effluent to distinguish between dif"
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T04:08:41+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:71783cf1cafc",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.5,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:38c09b5778f0",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "b292e5c2eb7abd2093777c37439acd41d2290055e2ba81168854337b40a97dbf",
+     "output_hash": "38c09b5778f089392eae37487a0254e7bce5ff8b29592cd4ea5502aede7e213a",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:42261546",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.562,
+      "evidence_support_cleared": 0.562,
+      "constraint_traceable_to_evidence": "The occlusion detection system must provide quantitative composition analysis of the effluent to distinguish between dif"
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T04:08:41+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Real-time effluent chemistry providing treatment endpoint and quantitative occlusion detection",
+      "after": "Real-time effluent chemistry providing treatment endpoint and quantitative occlusion detection"
+     },
+     "intervention": {
+      "before": "Install inline effluent chemistry monitoring with real-time analysis of fluid properties to detect occlusion events",
+      "after": "Install inline effluent chemistry monitoring with real-time analysis of fluid properties to detect occlusion events through quantitative plaque composition assessment"
+     },
+     "mechanism_source_span": {
+      "before": "real-time effluent chemistry providing both treatment endpoint and quantitative plaque composition without imaging",
+      "after": "dissolved material is flushed out under alternating unidirectional flow, with real-time effluent chemistry providing both treatment endpoint and quantitative plaque composition without imaging"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:unsupported_mechanism",
+      "con:attack:weak_transfer",
+      "con:attack:contradiction",
+      "con:attack:regulatory_incompatibility",
+      "con:collision:adjacent",
+      "infusion pump occlusion detection pumps documented",
+      "pressure monitoring redundant sensors",
+      "pressure infusion sensors install different independent processing dual",
+      "infusion pump occlusion detection pumps alarm"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "080b1a00dbd0dc3178b4b6780fff060e4abcefde2bac8c5c531c2d01b90eff26",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism in the exact technical vocabulary from the evidence source, specifically incorporating \"quantitative plaque composition\" from the evidence span",
+    "applied_at": "2026-08-31T04:08:41+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T04:08:41+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "event",
+      "fluid",
+      "inline",
+      "occlusion",
+      "through"
+     ],
+     "entity_retention_vs_problem": 1.0,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:4 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "CN_224421631_U_20260630",
+         "title": "Pressure maintaining device for pressurized infusion",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/080-430-241-390-970",
+         "assignee": "['SHAOXING PEOPLES HOSPITAL']",
+         "publication_date": "2026-06-30"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_224421631_U_20260630"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Pressure maintaining device for pressurized infusion The utility model relates to a pressure maintaining device for pressurized transfusion, which comprises an automatic pressurizing air pump, a manual pressurizing system and a sealed pressurizing bag, the automatic pressurizing air pump, the manual pressurizing system and the sealed pressurizing bag are connected through an air path tee joint, and the sealed pressurizing bag is provided with a spac  The utility model relates to a pressure maintaining device for pressurized transfusion, which comprises an automatic pressurizing air pump, a manual pressurizing system and a sealed pressurizing bag, the automatic pressurizing air pump, the manual pressurizing system and the sealed pressurizing bag are connected through an air path tee joint, and the sealed pressurizing bag is provided with a space capable of accommodating a transfusion bag. An air pressure displayer is connected to the sealed pressurizing bag and used for displaying the air pressure condition in the sealed pressurizing bag. The pressure maintaining device for pressurized infusion is used for displaying the air pressure in the sealed pressurized bag, and medical staff ",
+        "adjudicated_text_sha256": "49edc685d482b98e10b03a8e97a31e647b7854431e57348fb12d7c2a4bb860d2",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [],
+         "distinguishing_terms_covered": [
+          "through"
+         ],
+         "distinguishing_terms_surviving": [
+          "analysi",
+          "assessment",
+          "chemistry",
+          "composition",
+          "effluent",
+          "event",
+          "fluid",
+          "inline",
+          "install",
+          "occlusion",
+          "plaque",
+          "property",
+          "quantitative",
+          "real",
+          "time"
+         ],
+         "coverage_ratio": 0.062,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "CN_122297834_A_20260630",
+         "title": "Pressure monitoring device, power source system and medicine infusion system",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/181-532-969-232-069",
+         "assignee": "['MICROTECH MEDICAL HANGZHOU CO LTD']",
+         "publication_date": "2026-06-30"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_122297834_A_20260630"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Pressure monitoring device, power source system and medicine infusion system The invention provides a pressure monitoring device, a power source system and a medicine infusion system. The pressure monitoring device comprises an elastic film covering the fluid channel; the conductive layer is located on the surface, away from the fluid channel, of the elastic film or spaced from the surface, away from the fluid channel, of the elastic film; the conductive layer is of an int  The invention provides a pressure monitoring device, a power source system and a medicine infusion system. The pressure monitoring device comprises an elastic film covering the fluid channel; the conductive layer is located on the surface, away from the fluid channel, of the elastic film or spaced from the surface, away from the fluid channel, of the elastic film; the conductive layer is of an integrated structure or comprises a plurality of first conductors which are not in contact with each other; and the detection device is at least connected with the conductive layer. According to the pressure monitoring device, the elastic film is arranged on the fluid channel, and the conductive layer is arranged on the su",
+        "adjudicated_text_sha256": "1e57454cfbd2ad3dc316f3c09ef553a5a72356f34ddbc50810578fbb3f245709",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [
+          "detection"
+         ],
+         "distinguishing_terms_covered": [
+          "fluid"
+         ],
+         "distinguishing_terms_surviving": [
+          "analysi",
+          "assessment",
+          "chemistry",
+          "composition",
+          "effluent",
+          "event",
+          "inline",
+          "install",
+          "occlusion",
+          "plaque",
+          "property",
+          "quantitative",
+          "real",
+          "through",
+          "time"
+         ],
+         "coverage_ratio": 0.062,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "US_20260174973_A1_20260625",
+         "title": "Pressure changing device and infusion connector",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/061-795-833-258-28X",
+         "assignee": "['DENG SAMING']",
+         "publication_date": "2026-06-25"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260174973_A1_20260625"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Pressure changing device and infusion connector A pressure changing device and an infusion connector are provided. The pressure changing device includes a pressure changing member. When the pressure changing device is connected to an infusion head or a syringe head, a negative pressure is generated in the pressure changing device, which draws thrombus from a connected indwelling needle into an indwelling needle holder or the pressure changing d  A pressure changing device and an infusion connector are provided. The pressure changing device includes a pressure changing member. When the pressure changing device is connected to an infusion head or a syringe head, a negative pressure is generated in the pressure changing device, which draws thrombus from a connected indwelling needle into an indwelling needle holder or the pressure changing device, thereby preventing the thrombus from re-entering the blood vessel of a patient through the indwelling needle. Then the negative pressure disappears, and liquid can flow into the blood vessel normally through the indwelling needle. When removing the infusion head or the syringe head, the pressure changing device generates a positive pressure ",
+        "adjudicated_text_sha256": "4a13c6544a7acf5ee1a5f86f66b8be6462b4938a2db7583f3f48b02c73204ef4",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [],
+         "distinguishing_terms_covered": [
+          "through"
+         ],
+         "distinguishing_terms_surviving": [
+          "analysi",
+          "assessment",
+          "chemistry",
+          "composition",
+          "effluent",
+          "event",
+          "fluid",
+          "inline",
+          "install",
+          "occlusion",
+          "plaque",
+          "property",
+          "quantitative",
+          "real",
+          "time"
+         ],
+         "coverage_ratio": 0.062,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-04",
+        "representative": {
+         "patent_id": "CN_224370359_U_20260619",
+         "title": "Negative pressure driven infusion device",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/137-638-694-655-184",
+         "assignee": "['NANJING LINGJI YIDONG DRIVING TECH CO LTD']",
+         "publication_date": "2026-06-19"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_224370359_U_20260619"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Negative pressure driven infusion device The utility model relates to the technical field of medical instruments, and provides a negative pressure driven infusion device which comprises a shell, a negative pressure assembly and a linkage assembly. One end of the linkage assembly is assembled in the shell and can move between a first position and a second position, when the linkage assembly is located at the first position, a containing s  The utility model relates to the technical field of medical instruments, and provides a negative pressure driven infusion device which comprises a shell, a negative pressure assembly and a linkage assembly. One end of the linkage assembly is assembled in the shell and can move between a first position and a second position, when the linkage assembly is located at the first position, a containing space is formed between the linkage assembly and the bottom of the shell, and the containing space is used for containing a liquid medicine bag; the other end of the linkage assembly can be locked or unlocked; the negative pressure assembly is arranged in the shell and provided with a piston rod, and the outer side end of the piston rod is connected with t",
+        "adjudicated_text_sha256": "681580beb7b68d178918301e41ff1088d7567ace3f0c0e94b08d7747970d6d3a",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [],
+         "distinguishing_terms_covered": [],
+         "distinguishing_terms_surviving": [
+          "analysi",
+          "assessment",
+          "chemistry",
+          "composition",
+          "effluent",
+          "event",
+          "fluid",
+          "inline",
+          "install",
+          "occlusion",
+          "plaque",
+          "property",
+          "quantitative",
+          "real",
+          "through",
+          "time"
+         ],
+         "coverage_ratio": 0.0,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 4,
+      "n_search_errors": 0,
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "analysi",
+       "assessment",
+       "chemistry",
+       "composition",
+       "effluent",
+       "event",
+       "fluid",
+       "inline",
+       "install",
+       "occlusion",
+       "plaque",
+       "property",
+       "quantitative",
+       "real",
+       "through",
+       "time"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.476,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 0.812,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.833,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.758,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.7
+   },
+   "decision": {
+    "action": "REJECT_MUTATION",
+    "improved": false,
+    "checks": {
+     "targeted_dimension": "0.5 -> 0.476 (no improvement)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T04:08:41+00:00Z"
+   }
+  }
+ ],
+ "outcome": "KILLED_NO_IMPROVING_MUTATION",
+ "outcome_reason": "iteration 2: a validated EVIDENCE_DERIVED_CONSTRAINT mutation was applied and fully re-evaluated, but the targeted dimension I1_MECHANISM_EVIDENCE_DERIVATION did not improve (0.5 -> 0.476 (no improvement)); no invariant violated. No defensible improvement exists. Candidate killed.",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.1,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.333,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_TERSE_MECHANISM"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.275,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.9,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.727,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.857,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.75,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.7,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "finished_at": "2026-08-31T04:08:41+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.275,
+  "final_i_average": 0.75,
+  "baseline_q_average": 0.9,
+  "final_q_average": 0.7,
+  "iterations_run": 2,
+  "keeps": 1
+ }
+}

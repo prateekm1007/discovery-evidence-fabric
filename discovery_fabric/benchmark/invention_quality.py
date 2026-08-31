@@ -160,11 +160,23 @@ def measure_mechanism_derivation(spec: Dict[str, Any]) -> Dict[str, Any]:
     intervention = str(mv.get("intervention") or "")
     span = str(mv.get("mechanism_source_span") or "")
 
-    # candidate-level source evidence (abstract text) when present
+    # candidate-level source evidence (abstract text) when present.
+    # R378 dead-code fix (measured live in the improvement replay): the
+    # raw_candidate read was TAG-LEVEL only, but real specs carry it
+    # INSIDE value — the source_span path never fired, so evidence_
+    # support measured titles-only. The fix reads BOTH levels (strictly
+    # MORE evidence, never less — Art. VII). R377 artifacts (no
+    # value.raw_candidate) measure identically; R378 mutation children
+    # (apply_mutation writes value.raw_candidate.source_evidence.
+    # source_span, validated as a verbatim substring of custodied
+    # evidence upstream) now measure their genuine derivation.
     source_span = ""
     raw = (spec.get("mechanism") or {})
-    if isinstance(raw.get("raw_candidate"), dict):
-        se = raw["raw_candidate"].get("source_evidence") or {}
+    rc = raw.get("raw_candidate")
+    if not isinstance(rc, dict):
+        rc = (raw.get("value") or {}).get("raw_candidate") or {}
+    if isinstance(rc, dict):
+        se = rc.get("source_evidence") or {}
         source_span = str(se.get("source_span") or "")
     evidence_titles = " ".join(
         str(e.get("title") or "")

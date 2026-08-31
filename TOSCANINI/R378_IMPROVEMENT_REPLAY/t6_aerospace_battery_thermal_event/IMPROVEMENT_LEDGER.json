@@ -1,0 +1,1092 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-08-31T04:08:41+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.0,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.0 < STRONG floor 0.7; underived_flag set (span_support=0.0, evidence_support=0.176) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "MECHANISM_STRENGTHENING"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "measured_value": 0.615,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.615 < STRONG floor 0.7",
+      "mutation_type": "DIFFERENTIATOR"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:bffb0ecb2216",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "1cd959e0e19eb8b4441e2c384a099569f563d0ca331bbc44375ca2d36523a7c8",
+     "output_hash": "bffb0ecb2216f2d3a41cb5bfbb85ad0719ac7d00e971ae04af9106a0f21925e0",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Semitransparent perovskite thermal regulators with degradation mechanisms for improved durability",
+      "INTERVENTION": "Development of battery enclosure with integrated semitransparent perovskite thermal regulators that convert excess heat into visible light for dissipation while incorporating strategies to improve durability against degradation mechanisms",
+      "EXPECTED_EFFECT": "Maintaining battery temperature within safe operational limits while allowing visual monitoring of thermal status and enhancing long-term stability through degradation resistance",
+      "FALSIFICATION_TEST": "Compare battery thermal event containment between standard installation and installation with semitransparent perovskite thermal regulators across certification environmental conditions",
+      "MECHANISM_SOURCE_SPAN": "stability challenges, including degradation mechanisms and recent strategies for improving their durability",
+      "SOURCE_EVIDENCE_ID": "europepmc:41945257",
+      "EXPERIMENT": "Compare the thermal runaway containment performance of the semitransparent perovskite thermal regulators against standard battery enclosures under extreme temperature cycling conditions",
+      "EXPERIMENT_BASELINE": "standard battery enclosures",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "degradation resistance must be maintained across certification environmental conditions",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by incorporating the technical vocabulary 'degradation mechanisms' from the evidence span into the mechanism description"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:41945257",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 4,
+        "shared_terms": [
+         "degradation",
+         "durability",
+         "mechanism",
+         "strategy"
+        ],
+        "span_terms_n": 10,
+        "ratio": 0.4,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 0.4
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T04:08:46+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:7e4f882549b4",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.0,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:bffb0ecb2216",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "1cd959e0e19eb8b4441e2c384a099569f563d0ca331bbc44375ca2d36523a7c8",
+     "output_hash": "bffb0ecb2216f2d3a41cb5bfbb85ad0719ac7d00e971ae04af9106a0f21925e0",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:41945257",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 4,
+       "shared_terms": [
+        "degradation",
+        "durability",
+        "mechanism",
+        "strategy"
+       ],
+       "span_terms_n": 10,
+       "ratio": 0.4,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.4
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T04:08:46+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Thermal-optical hybrid management using semitransparent perovskite components",
+      "after": "Semitransparent perovskite thermal regulators with degradation mechanisms for improved durability"
+     },
+     "intervention": {
+      "before": "Development of battery enclosure with integrated semitransparent perovskite thermal regulators that convert excess heat into visible light for dissipation",
+      "after": "Development of battery enclosure with integrated semitransparent perovskite thermal regulators that convert excess heat into visible light for dissipation while incorporating strategies to improve durability against degradation mechanisms"
+     },
+     "mechanism_source_span": {
+      "before": "Advancing this technology requires deeper understanding of its design principles, applications, economic viability, and performance limitations",
+      "after": "stability challenges, including degradation mechanisms and recent strategies for improving their durability"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:unsupported_mechanism",
+      "con:attack:weak_transfer",
+      "con:attack:engineering_infeasibility",
+      "con:attack:regulatory_incompatibility",
+      "con:collision:adjacent",
+      "thermal battery aircraft onboard lithium installation",
+      "thermal optical management semitransparent perovskite components",
+      "thermal battery semitransparent perovskite heat development enclosure",
+      "thermal battery aircraft onboard lithium installation"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "327ae914e2afa50d5d2f7717a578fd45c55ecbae53c3b6d39feb09a71980abda",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION defect by incorporating the technical vocabulary 'degradation mechanisms' from the evidence span into the mechanism description",
+    "applied_at": "2026-08-31T04:08:46+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T04:08:46+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "battery",
+      "dissipation",
+      "enclosure",
+      "heat",
+      "mechanism",
+      "thermal"
+     ],
+     "entity_retention_vs_problem": 0.833,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:3 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "WO_2026178341_A1_20260827",
+         "title": "BATTERY PACK WITH THERMAL RUNAWAY CONTAINMENT",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/007-366-494-146-908",
+         "assignee": "['BETA AIR LLC']",
+         "publication_date": "2026-08-27"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "WO_2026178341_A1_20260827"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "BATTERY PACK WITH THERMAL RUNAWAY CONTAINMENT A battery pack including measures to contain thermal runaway and mitigate damage therefrom. Battery subpacks are arranged with vent ends with vents/burst plates at a pack vent manifold of the battery pack. If a subpack cell enters thermal runaway, the battery subpack burst plate ruptures and ejecta enters the pack vent manifold and exits via an exhaust port. Leaks from coolant are prevented from c  A battery pack including measures to contain thermal runaway and mitigate damage therefrom. Battery subpacks are arranged with vent ends with vents/burst plates at a pack vent manifold of the battery pack. If a subpack cell enters thermal runaway, the battery subpack burst plate ruptures and ejecta enters the pack vent manifold and exits via an exhaust port. Leaks from coolant are prevented from contaminating electrical and data connections by placing fluid connectors and piping in the pack vent manifold with electrical and data connections at the opposite ends of the battery subpacks.",
+        "adjudicated_text_sha256": "e38d641b49462fd391026426e0fd0bef94d5cde702b9a35717f7ba4e23287536",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "thermal"
+         ],
+         "distinguishing_terms_surviving": [
+          "against",
+          "convert",
+          "degradation",
+          "development",
+          "dissipation",
+          "durability",
+          "enclosure",
+          "excess",
+          "heat",
+          "light",
+          "mechanism",
+          "perovskite",
+          "regulator",
+          "semitransparent",
+          "strategy",
+          "visible"
+         ],
+         "coverage_ratio": 0.111,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "US_20260253984_A1_20260827",
+         "title": "Thermal Management Device for Battery Energy Storage Systems",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/132-517-237-466-06X",
+         "assignee": "['Bergstrom, Inc.']",
+         "publication_date": "2026-08-27"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260253984_A1_20260827"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Thermal Management Device for Battery Energy Storage Systems This disclosure regards a thermal management device with integrated refrigeration and cooling capabilities. The device includes an enclosure, which contains a refrigerant loop, a coolant loop, and a refrigerant-loop HX configured to transfer heat from a liquid coolant in the coolant loop to a fluid refrigerant in the refrigerant loop. The refrigerant loop includes a compressor, which is fluidicall  This disclosure regards a thermal management device with integrated refrigeration and cooling capabilities. The device includes an enclosure, which contains a refrigerant loop, a coolant loop, and a refrigerant-loop HX configured to transfer heat from a liquid coolant in the coolant loop to a fluid refrigerant in the refrigerant loop. The refrigerant loop includes a compressor, which is fluidically coupled to a shared HX; the shared HX, which is fluidically coupled to the refrigerant-loop HX; and the refrigerant-loop HX, which is fluidically coupled to the compressor. The coolant loop includes a coolant-loop HX, which is fluidically coupled to a coolant pump and configured to transfer heat from a battery energy storage system t",
+        "adjudicated_text_sha256": "9ef4906a9119ada84091730993c6d1fac834e366ceb7f1ebed0dcebd038e9a56",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "enclosure",
+          "heat",
+          "thermal"
+         ],
+         "distinguishing_terms_surviving": [
+          "against",
+          "convert",
+          "degradation",
+          "development",
+          "dissipation",
+          "durability",
+          "excess",
+          "light",
+          "mechanism",
+          "perovskite",
+          "regulator",
+          "semitransparent",
+          "strategy",
+          "visible"
+         ],
+         "coverage_ratio": 0.222,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "US_20260243981_A1_20260820",
+         "title": "THERMAL MANAGEMENT OF OPTICAL COMPONENTS",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/189-305-426-815-04X",
+         "assignee": "['LUMENTUM TECH UK LIMITED']",
+         "publication_date": "2026-08-20"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260243981_A1_20260820"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "THERMAL MANAGEMENT OF OPTICAL COMPONENTS In some implementations, an optical assembly may include a heat-generating device and a thermal dissipation component. The heat-generating device may be configured to generate heat during operation. The thermal dissipation component may include a first surface directly attached to a second surface of the heat-generating device to receive the heat generated by the heat-generating device. For exampl  In some implementations, an optical assembly may include a heat-generating device and a thermal dissipation component. The heat-generating device may be configured to generate heat during operation. The thermal dissipation component may include a first surface directly attached to a second surface of the heat-generating device to receive the heat generated by the heat-generating device. For example, the thermal dissipation component may contain a phase change material configured to undergo phase transitions between a first phase state and a second phase state, where the phase transitions may cause the heat to spread throughout the thermal dissipation component in one or more normal directions relative to a first direction in which the heat is rece",
+        "adjudicated_text_sha256": "ca3587307ba41b508a748729addabcce870bcf8a04f046812d6565340192e81c",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "dissipation",
+          "heat",
+          "thermal"
+         ],
+         "distinguishing_terms_surviving": [
+          "against",
+          "battery",
+          "convert",
+          "degradation",
+          "development",
+          "durability",
+          "enclosure",
+          "excess",
+          "light",
+          "mechanism",
+          "perovskite",
+          "regulator",
+          "semitransparent",
+          "strategy",
+          "visible"
+         ],
+         "coverage_ratio": 0.167,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 3,
+      "n_search_errors": 0,
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "against",
+       "battery",
+       "convert",
+       "degradation",
+       "development",
+       "dissipation",
+       "durability",
+       "enclosure",
+       "excess",
+       "heat",
+       "light",
+       "mechanism",
+       "perovskite",
+       "regulator",
+       "semitransparent",
+       "strategy",
+       "visible"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.304,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.722,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.739,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.667,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.833
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.0 -> 0.304 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T04:08:46+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.304,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.304 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:c83bdfe46ad6",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "cf7b68d1c44e290167c041ba9fcaed76b46e58e31fed9ca631e3de9eb076d32a",
+     "output_hash": "c83bdfe46ad6e15df06aa7599409e3e6b5aeeee6ea426eae1df1b74b33a31587",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Semitransparent perovskite thermal regulators with degradation mechanisms and stability challenges for improved durability",
+      "INTERVENTION": "Development of battery enclosure with integrated semitransparent perovskite thermal regulators that convert excess heat into visible light for dissipation while incorporating strategies to improve durability against degradation mechanisms and stability challenges",
+      "EXPECTED_EFFECT": "Maintaining battery temperature within safe operational limits while allowing visual monitoring of thermal status and enhancing long-term stability through degradation resistance and stability challenge mitigation",
+      "FALSIFICATION_TEST": "Compare battery thermal event containment between standard installation and installation with semitransparent perovskite thermal regulators across certification environmental conditions",
+      "MECHANISM_SOURCE_SPAN": "Particular attention is devoted to stability challenges, including degradation mechanisms and recent strategies for improving their durability.",
+      "SOURCE_EVIDENCE_ID": "europepmc:41945257",
+      "EXPERIMENT": "falsification_test_from_candidate",
+      "EXPERIMENT_BASELINE": "standard installation",
+      "EXPERIMENT_EIG": "0.304",
+      "CONSTRAINT_DERIVED": "The thermal regulators must address both degradation mechanisms and stability challenges as explicitly mentioned in the evidence",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism's technical vocabulary in the evidence's actual text regarding stability challenges and degradation mechanisms"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:41945257",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.36,
+       "evidence_support_cleared": 0.36,
+       "constraint_traceable_to_evidence": "The thermal regulators must address both degradation mechanisms and stability challenges as explicitly mentioned in the "
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T04:08:50+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:af9a3542585f",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.304,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:c83bdfe46ad6",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "cf7b68d1c44e290167c041ba9fcaed76b46e58e31fed9ca631e3de9eb076d32a",
+     "output_hash": "c83bdfe46ad6e15df06aa7599409e3e6b5aeeee6ea426eae1df1b74b33a31587",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:41945257",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.36,
+      "evidence_support_cleared": 0.36,
+      "constraint_traceable_to_evidence": "The thermal regulators must address both degradation mechanisms and stability challenges as explicitly mentioned in the "
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T04:08:50+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Semitransparent perovskite thermal regulators with degradation mechanisms for improved durability",
+      "after": "Semitransparent perovskite thermal regulators with degradation mechanisms and stability challenges for improved durability"
+     },
+     "intervention": {
+      "before": "Development of battery enclosure with integrated semitransparent perovskite thermal regulators that convert excess heat into visible light for dissipation while incorporating strategies to improve durability against degradation mechanisms",
+      "after": "Development of battery enclosure with integrated semitransparent perovskite thermal regulators that convert excess heat into visible light for dissipation while incorporating strategies to improve durability against degradation mechanisms and stability challenges"
+     },
+     "mechanism_source_span": {
+      "before": "stability challenges, including degradation mechanisms and recent strategies for improving their durability",
+      "after": "Particular attention is devoted to stability challenges, including degradation mechanisms and recent strategies for improving their durability."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:unsupported_mechanism",
+      "con:attack:weak_transfer",
+      "con:attack:engineering_infeasibility",
+      "con:attack:regulatory_incompatibility",
+      "con:collision:adjacent",
+      "thermal battery aircraft onboard lithium installation",
+      "thermal optical management semitransparent perovskite components",
+      "thermal battery semitransparent perovskite heat development enclosure",
+      "thermal battery aircraft onboard lithium installation"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "287b024576b20980fa39798c007ec89ce1971da7b6e1ca548cc528a00f5b41f8",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by re-anchoring the mechanism's technical vocabulary in the evidence's actual text regarding stability challenges and degradation mechanisms",
+    "applied_at": "2026-08-31T04:08:50+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T04:08:50+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "battery",
+      "dissipation",
+      "enclosure",
+      "heat",
+      "mechanism",
+      "thermal"
+     ],
+     "entity_retention_vs_problem": 1.0,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:3 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "WO_2026178341_A1_20260827",
+         "title": "BATTERY PACK WITH THERMAL RUNAWAY CONTAINMENT",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/007-366-494-146-908",
+         "assignee": "['BETA AIR LLC']",
+         "publication_date": "2026-08-27"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "WO_2026178341_A1_20260827"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "BATTERY PACK WITH THERMAL RUNAWAY CONTAINMENT A battery pack including measures to contain thermal runaway and mitigate damage therefrom. Battery subpacks are arranged with vent ends with vents/burst plates at a pack vent manifold of the battery pack. If a subpack cell enters thermal runaway, the battery subpack burst plate ruptures and ejecta enters the pack vent manifold and exits via an exhaust port. Leaks from coolant are prevented from c  A battery pack including measures to contain thermal runaway and mitigate damage therefrom. Battery subpacks are arranged with vent ends with vents/burst plates at a pack vent manifold of the battery pack. If a subpack cell enters thermal runaway, the battery subpack burst plate ruptures and ejecta enters the pack vent manifold and exits via an exhaust port. Leaks from coolant are prevented from contaminating electrical and data connections by placing fluid connectors and piping in the pack vent manifold with electrical and data connections at the opposite ends of the battery subpacks.",
+        "adjudicated_text_sha256": "e38d641b49462fd391026426e0fd0bef94d5cde702b9a35717f7ba4e23287536",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "thermal"
+         ],
+         "distinguishing_terms_surviving": [
+          "against",
+          "challenge",
+          "convert",
+          "degradation",
+          "development",
+          "dissipation",
+          "durability",
+          "enclosure",
+          "excess",
+          "heat",
+          "light",
+          "mechanism",
+          "perovskite",
+          "regulator",
+          "semitransparent",
+          "stability",
+          "strategy",
+          "visible"
+         ],
+         "coverage_ratio": 0.1,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "US_20260253984_A1_20260827",
+         "title": "Thermal Management Device for Battery Energy Storage Systems",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/132-517-237-466-06X",
+         "assignee": "['Bergstrom, Inc.']",
+         "publication_date": "2026-08-27"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260253984_A1_20260827"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Thermal Management Device for Battery Energy Storage Systems This disclosure regards a thermal management device with integrated refrigeration and cooling capabilities. The device includes an enclosure, which contains a refrigerant loop, a coolant loop, and a refrigerant-loop HX configured to transfer heat from a liquid coolant in the coolant loop to a fluid refrigerant in the refrigerant loop. The refrigerant loop includes a compressor, which is fluidicall  This disclosure regards a thermal management device with integrated refrigeration and cooling capabilities. The device includes an enclosure, which contains a refrigerant loop, a coolant loop, and a refrigerant-loop HX configured to transfer heat from a liquid coolant in the coolant loop to a fluid refrigerant in the refrigerant loop. The refrigerant loop includes a compressor, which is fluidically coupled to a shared HX; the shared HX, which is fluidically coupled to the refrigerant-loop HX; and the refrigerant-loop HX, which is fluidically coupled to the compressor. The coolant loop includes a coolant-loop HX, which is fluidically coupled to a coolant pump and configured to transfer heat from a battery energy storage system t",
+        "adjudicated_text_sha256": "9ef4906a9119ada84091730993c6d1fac834e366ceb7f1ebed0dcebd038e9a56",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "enclosure",
+          "heat",
+          "thermal"
+         ],
+         "distinguishing_terms_surviving": [
+          "against",
+          "challenge",
+          "convert",
+          "degradation",
+          "development",
+          "dissipation",
+          "durability",
+          "excess",
+          "light",
+          "mechanism",
+          "perovskite",
+          "regulator",
+          "semitransparent",
+          "stability",
+          "strategy",
+          "visible"
+         ],
+         "coverage_ratio": 0.2,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "US_20260243981_A1_20260820",
+         "title": "THERMAL MANAGEMENT OF OPTICAL COMPONENTS",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/189-305-426-815-04X",
+         "assignee": "['LUMENTUM TECH UK LIMITED']",
+         "publication_date": "2026-08-20"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260243981_A1_20260820"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "THERMAL MANAGEMENT OF OPTICAL COMPONENTS In some implementations, an optical assembly may include a heat-generating device and a thermal dissipation component. The heat-generating device may be configured to generate heat during operation. The thermal dissipation component may include a first surface directly attached to a second surface of the heat-generating device to receive the heat generated by the heat-generating device. For exampl  In some implementations, an optical assembly may include a heat-generating device and a thermal dissipation component. The heat-generating device may be configured to generate heat during operation. The thermal dissipation component may include a first surface directly attached to a second surface of the heat-generating device to receive the heat generated by the heat-generating device. For example, the thermal dissipation component may contain a phase change material configured to undergo phase transitions between a first phase state and a second phase state, where the phase transitions may cause the heat to spread throughout the thermal dissipation component in one or more normal directions relative to a first direction in which the heat is rece",
+        "adjudicated_text_sha256": "ca3587307ba41b508a748729addabcce870bcf8a04f046812d6565340192e81c",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "dissipation",
+          "heat",
+          "thermal"
+         ],
+         "distinguishing_terms_surviving": [
+          "against",
+          "battery",
+          "challenge",
+          "convert",
+          "degradation",
+          "development",
+          "durability",
+          "enclosure",
+          "excess",
+          "light",
+          "mechanism",
+          "perovskite",
+          "regulator",
+          "semitransparent",
+          "stability",
+          "strategy",
+          "visible"
+         ],
+         "coverage_ratio": 0.15,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 3,
+      "n_search_errors": 0,
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "against",
+       "battery",
+       "challenge",
+       "convert",
+       "degradation",
+       "development",
+       "dissipation",
+       "durability",
+       "enclosure",
+       "excess",
+       "heat",
+       "light",
+       "mechanism",
+       "perovskite",
+       "regulator",
+       "semitransparent",
+       "stability",
+       "strategy",
+       "visible"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.36,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.75,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.755,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.667,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.833
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.304 -> 0.36 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T04:08:51+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.615,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.9,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.636,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.667,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.833,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.36,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.75,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.755,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.667,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.833,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "finished_at": "2026-08-31T04:08:51+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.636,
+  "final_i_average": 0.755,
+  "baseline_q_average": 0.833,
+  "final_q_average": 0.833,
+  "iterations_run": 2,
+  "keeps": 2
+ }
+}

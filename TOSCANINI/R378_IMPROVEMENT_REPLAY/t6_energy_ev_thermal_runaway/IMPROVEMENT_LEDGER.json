@@ -1,0 +1,1064 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-08-31T04:08:51+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.188,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.188 < STRONG floor 0.7; underived_flag set (span_support=0.485, evidence_support=0.188) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:79f05baadfb4",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "aace46cd471c6ead30f9a488ab565ac46d71d1fe2431d3bc93b1f5778d42ff7f",
+     "output_hash": "79f05baadfb4e13bdd4712e2a2fe53bc17b1b39c4dae7853550b86250b133b2e",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Advanced characterization techniques including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy to study thermal runaway (TR) mechanism and reveal how thermal failures develop and propagate in batteries",
+      "INTERVENTION": "Implement multi-sensory monitoring system using X-ray imaging, optical sensors, acoustic sensors, and spectroscopy within the battery pack to detect early thermal runaway initiation and monitor propagation pathways",
+      "EXPECTED_EFFECT": "Early detection of thermal runaway in individual cells before propagation to adjacent cells, allowing for targeted suppression while maintaining pack energy density and mass constraints",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "This review first examines the causes and consequences of thermal failure, providing didactic mechanistic insights. It then compares recent progress in thermal and electrochemical failure analysis using advanced characterization techniques, including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy, to study the thermal runaway (TR) mechanism and reveal how thermal failures develop and propagate in batteries.",
+      "SOURCE_EVIDENCE_ID": "europepmc:42101825",
+      "EXPERIMENT": "Compare the multi-sensory monitoring system against baseline single-parameter temperature monitoring systems in detecting thermal runaway initiation and propagation pathways",
+      "EXPERIMENT_BASELINE": "single-parameter temperature monitoring systems",
+      "EXPERIMENT_EIG": "0.35",
+      "CONSTRAINT_DERIVED": "The monitoring system must specifically track thermal failure propagation pathways between adjacent cells",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism's technical vocabulary in the evidence's actual text and adding a constraint derived from the evidence about tracking propagation pathways"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:42101825",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.682,
+       "evidence_support_cleared": 0.682,
+       "constraint_traceable_to_evidence": "The monitoring system must specifically track thermal failure propagation pathways between adjacent cells"
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T04:08:57+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:22a72eed1e45",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.188,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:79f05baadfb4",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "aace46cd471c6ead30f9a488ab565ac46d71d1fe2431d3bc93b1f5778d42ff7f",
+     "output_hash": "79f05baadfb4e13bdd4712e2a2fe53bc17b1b39c4dae7853550b86250b133b2e",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:42101825",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.682,
+      "evidence_support_cleared": 0.682,
+      "constraint_traceable_to_evidence": "The monitoring system must specifically track thermal failure propagation pathways between adjacent cells"
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T04:08:57+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Advanced characterization techniques including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy to study thermal runaway (TR) mechanism",
+      "after": "Advanced characterization techniques including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy to study thermal runaway (TR) mechanism and reveal how thermal failures develop and propagate in batteries"
+     },
+     "intervention": {
+      "before": "Implement multi-sensory monitoring system using X-ray imaging, optical sensors, acoustic sensors, and spectroscopy within the battery pack to detect early thermal runaway initiation",
+      "after": "Implement multi-sensory monitoring system using X-ray imaging, optical sensors, acoustic sensors, and spectroscopy within the battery pack to detect early thermal runaway initiation and monitor propagation pathways"
+     },
+     "mechanism_source_span": {
+      "before": "This review first examines the causes and consequences of thermal failure, providing didactic mechanistic insights. It then compares recent progress in thermal and electrochemical failure analysis using advanced characterization techniques, including X-ray imaging, optical sensing, acoustic field im",
+      "after": "This review first examines the causes and consequences of thermal failure, providing didactic mechanistic insights. It then compares recent progress in thermal and electrochemical failure analysis using advanced characterization techniques, including X-ray imaging, optical sensing, acoustic field im"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:obvious_combination",
+      "con:attack:engineering_infeasibility",
+      "con:attack:regulatory_incompatibility",
+      "con:collision:adjacent",
+      "thermal runaway electric vehicle traction battery",
+      "thermal runaway advanced characterization techniques including",
+      "thermal runaway battery pack imaging optical acoustic spectroscopy",
+      "thermal runaway electric vehicle traction battery"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "e4a4ecd4c64a07a99a0abcdad21b7e973e4768bdce804f392fb9bcf977520725",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by re-anchoring the mechanism's technical vocabulary in the evidence's actual text and adding a constraint derived from the evidence about tracking propagation pathways",
+    "applied_at": "2026-08-31T04:08:57+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T04:08:57+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "battery",
+      "failure",
+      "initiation",
+      "pack",
+      "propagation",
+      "runaway",
+      "thermal"
+     ],
+     "entity_retention_vs_problem": 0.833,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:2 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "US_20260254046_A1_20260827",
+         "title": "BATTERY THERMAL RUNAWAY FLUE GAS TREATMENT DEVICE AND BATTERY",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/120-223-762-190-461",
+         "assignee": "[\"D-AUS ENERGY STORAGE TECHNOLOGY (XI'AN) CO., LTD.\"]",
+         "publication_date": "2026-08-27"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260254046_A1_20260827"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "BATTERY THERMAL RUNAWAY FLUE GAS TREATMENT DEVICE AND BATTERY A battery thermal runaway flue gas treatment device and a battery are provided. The treatment device includes a cooling unit and an adsorption unit. The cooling unit includes N cooling tanks connected in series in sequence, a cooling channel for cooling liquid to pass through and a flue gas channel for the thermal runaway flue gas to pass through are arranged in each of the N cooling tanks The ads  ",
+        "adjudicated_text_sha256": "6508970ab7e62529b0db4abf883cb0107850d919c0966a3d0aac149418a34bd1",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "runaway",
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "runaway",
+          "thermal"
+         ],
+         "distinguishing_terms_surviving": [
+          "acoustic",
+          "early",
+          "imaging",
+          "initiation",
+          "multi",
+          "optical",
+          "pack",
+          "pathway",
+          "propagation",
+          "ray",
+          "sensor",
+          "sensory",
+          "spectroscopy",
+          "within"
+         ],
+         "coverage_ratio": 0.176,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "US_20260229626_A1_20260806",
+         "title": "BATTERY MONITORING FOR DETECTION OF THERMAL EVENTS",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/029-370-598-785-034",
+         "assignee": "['GM GLOBAL TECH OPERATIONS LLC']",
+         "publication_date": "2026-08-06"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260229626_A1_20260806"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "BATTERY MONITORING FOR DETECTION OF THERMAL EVENTS A system for detection of thermal events in a battery system includes a sensing circuit operably connected to the battery system, the battery system including a plurality of sets of battery cells, the sensing circuit including a plurality of resistors, each resistor of the plurality of resistors disposed proximate to a respective set of battery cells, where the plurality of resistors are connected  ",
+        "adjudicated_text_sha256": "4c6f35084fa7d89bed4a5fbee1ef339050b5558531c9cc10d5bca8d54dae95f4",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "thermal"
+         ],
+         "distinguishing_terms_surviving": [
+          "acoustic",
+          "early",
+          "imaging",
+          "initiation",
+          "multi",
+          "optical",
+          "pack",
+          "pathway",
+          "propagation",
+          "ray",
+          "runaway",
+          "sensor",
+          "sensory",
+          "spectroscopy",
+          "within"
+         ],
+         "coverage_ratio": 0.118,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 2,
+      "n_search_errors": 0,
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "acoustic",
+       "early",
+       "imaging",
+       "initiation",
+       "multi",
+       "optical",
+       "pack",
+       "pathway",
+       "propagation",
+       "ray",
+       "runaway",
+       "sensor",
+       "sensory",
+       "spectroscopy",
+       "within"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.579,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 0.867,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.8,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 0.971,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.777,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.9
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.188 -> 0.579 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T04:08:57+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.579,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.579 < STRONG floor 0.7",
+      "mutation_type": "MECHANISM_STRENGTHENING"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:9a99d26b1987",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "b81c52e2855a2fade01b43f771a3663627a3e329c257c5bf59aa0d37ef4f0929",
+     "output_hash": "9a99d26b198710e02c504563692c08967d5473cdde662fecc98e0bb8d041a029",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Advanced characterization techniques including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy to study thermal runaway (TR) mechanism and reveal how thermal failures develop and propagate in batteries",
+      "INTERVENTION": "Implement multi-sensory monitoring system using X-ray imaging, optical sensors, acoustic sensors, and spectroscopy within the battery pack to detect early thermal runaway initiation and monitor propagation pathways",
+      "EXPECTED_EFFECT": "Early detection of thermal runaway in individual cells before propagation to adjacent cells, allowing for targeted suppression while maintaining pack energy density and mass constraints",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "This review first examines the causes and consequences of thermal failure, providing didactic mechanistic insights. It then compares recent progress in thermal and electrochemical failure analysis using advanced characterization techniques, including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy, to study the thermal runaway (TR) mechanism and reveal how thermal failures develop and propagate in batteries.",
+      "SOURCE_EVIDENCE_ID": "europepmc:42101825",
+      "EXPERIMENT": "Compare the multi-sensory monitoring system against conventional battery management systems in detecting thermal runaway initiation in controlled laboratory conditions",
+      "EXPERIMENT_BASELINE": "conventional battery management systems",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "Repairs the measured weakness in I1_MECHANISM_EVIDENCE_DERIVATION by including a verbatim span from the evidence that contains the technical vocabulary of the mechanism"
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:42101825",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": false,
+       "span_derivation": {
+        "n_shared": 22,
+        "shared_terms": [
+         "acoustic",
+         "advanced",
+         "battery",
+         "characterization",
+         "develop",
+         "failure",
+         "field",
+         "how",
+         "imaging",
+         "including",
+         "mechanism",
+         "optical",
+         "propagate",
+         "ray",
+         "reveal",
+         "runaway",
+         "sensing",
+         "spectroscopy",
+         "study",
+         "technique"
+        ],
+        "span_terms_n": 38,
+        "ratio": 0.579,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 0.579
+      },
+      "reasons": [
+       "mutation_changes_candidate: mechanism and intervention unchanged (a no-op is not a mutation)"
+      ],
+      "validated_at": "2026-08-31T04:09:03+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:ec0a475ebb9b",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "ec767fab17797bd0b3511546d887b4d748a7619a26fe1c6a12486b36aa496462",
+     "output_hash": "ec0a475ebb9be107e5ca20b8483aa91bb2c103e533168c03a2df0d4ff22c240b",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Advanced characterization techniques including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy to study thermal runaway mechanism and reveal how thermal failures develop and propagate in batteries",
+      "INTERVENTION": "Implement multi-sensory monitoring system using X-ray imaging, optical sensors, acoustic field imaging, and spectroscopy within the battery pack to detect early thermal runaway initiation and monitor propagation pathways",
+      "EXPECTED_EFFECT": "Early detection of thermal runaway in individual cells before propagation to adjacent cells, allowing for targeted suppression while maintaining pack energy density and mass constraints",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "advanced characterization techniques, including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy, to study the thermal runaway (TR) mechanism and reveal how thermal failures develop and propagate in batteries",
+      "SOURCE_EVIDENCE_ID": "europepmc:42101825",
+      "EXPERIMENT": "Compare the multi-sensory monitoring system against conventional battery management systems in detecting thermal runaway initiation under identical abuse conditions",
+      "EXPERIMENT_BASELINE": "conventional battery management systems",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "thermal runaway propagation time must be greater than detection+suppression time",
+      "MUTATION_REASON": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by using a verbatim span from evidence that contains the mechanism's technical vocabulary with a span-derivation ratio of 0.20"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:42101825",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 21,
+        "shared_terms": [
+         "acoustic",
+         "advanced",
+         "battery",
+         "characterization",
+         "develop",
+         "failure",
+         "field",
+         "how",
+         "imaging",
+         "including",
+         "mechanism",
+         "optical",
+         "propagate",
+         "ray",
+         "reveal",
+         "runaway",
+         "sensing",
+         "spectroscopy",
+         "study",
+         "technique"
+        ],
+        "span_terms_n": 21,
+        "ratio": 1.0,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 1.0
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T04:09:09+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:84eb29ef292a",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.579,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:ec0a475ebb9b",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "ec767fab17797bd0b3511546d887b4d748a7619a26fe1c6a12486b36aa496462",
+     "output_hash": "ec0a475ebb9be107e5ca20b8483aa91bb2c103e533168c03a2df0d4ff22c240b",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:42101825",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 21,
+       "shared_terms": [
+        "acoustic",
+        "advanced",
+        "battery",
+        "characterization",
+        "develop",
+        "failure",
+        "field",
+        "how",
+        "imaging",
+        "including",
+        "mechanism",
+        "optical",
+        "propagate",
+        "ray",
+        "reveal",
+        "runaway",
+        "sensing",
+        "spectroscopy",
+        "study",
+        "technique"
+       ],
+       "span_terms_n": 21,
+       "ratio": 1.0,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 1.0
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T04:09:09+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Advanced characterization techniques including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy to study thermal runaway (TR) mechanism and reveal how thermal failures develop and propagate in batteries",
+      "after": "Advanced characterization techniques including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy to study thermal runaway mechanism and reveal how thermal failures develop and propagate in batteries"
+     },
+     "intervention": {
+      "before": "Implement multi-sensory monitoring system using X-ray imaging, optical sensors, acoustic sensors, and spectroscopy within the battery pack to detect early thermal runaway initiation and monitor propagation pathways",
+      "after": "Implement multi-sensory monitoring system using X-ray imaging, optical sensors, acoustic field imaging, and spectroscopy within the battery pack to detect early thermal runaway initiation and monitor propagation pathways"
+     },
+     "mechanism_source_span": {
+      "before": "This review first examines the causes and consequences of thermal failure, providing didactic mechanistic insights. It then compares recent progress in thermal and electrochemical failure analysis using advanced characterization techniques, including X-ray imaging, optical sensing, acoustic field im",
+      "after": "advanced characterization techniques, including X-ray imaging, optical sensing, acoustic field imaging, and spectroscopy, to study the thermal runaway (TR) mechanism and reveal how thermal failures develop and propagate in batteries"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:obvious_combination",
+      "con:attack:engineering_infeasibility",
+      "con:attack:regulatory_incompatibility",
+      "con:collision:adjacent",
+      "thermal runaway electric vehicle traction battery",
+      "thermal runaway advanced characterization techniques including",
+      "thermal runaway battery pack imaging optical acoustic spectroscopy",
+      "thermal runaway electric vehicle traction battery"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "b955fb9607f967267888f6ea9e93c97f853aac0b33bf4a98a1e2f5928c8e7f5e",
+    "child_spec_hash": null,
+    "reason": "Repairs the I1_MECHANISM_EVIDENCE_DERIVATION defect by using a verbatim span from evidence that contains the mechanism's technical vocabulary with a span-derivation ratio of 0.20",
+    "applied_at": "2026-08-31T04:09:09+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T04:09:09+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "battery",
+      "failure",
+      "initiation",
+      "pack",
+      "propagation",
+      "runaway",
+      "thermal"
+     ],
+     "entity_retention_vs_problem": 1.0,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:2 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "US_20260254046_A1_20260827",
+         "title": "BATTERY THERMAL RUNAWAY FLUE GAS TREATMENT DEVICE AND BATTERY",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/120-223-762-190-461",
+         "assignee": "[\"D-AUS ENERGY STORAGE TECHNOLOGY (XI'AN) CO., LTD.\"]",
+         "publication_date": "2026-08-27"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260254046_A1_20260827"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "BATTERY THERMAL RUNAWAY FLUE GAS TREATMENT DEVICE AND BATTERY A battery thermal runaway flue gas treatment device and a battery are provided. The treatment device includes a cooling unit and an adsorption unit. The cooling unit includes N cooling tanks connected in series in sequence, a cooling channel for cooling liquid to pass through and a flue gas channel for the thermal runaway flue gas to pass through are arranged in each of the N cooling tanks The ads  ",
+        "adjudicated_text_sha256": "6508970ab7e62529b0db4abf883cb0107850d919c0966a3d0aac149418a34bd1",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "runaway",
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "runaway",
+          "thermal"
+         ],
+         "distinguishing_terms_surviving": [
+          "acoustic",
+          "early",
+          "field",
+          "imaging",
+          "initiation",
+          "multi",
+          "optical",
+          "pack",
+          "pathway",
+          "propagation",
+          "ray",
+          "sensor",
+          "sensory",
+          "spectroscopy",
+          "within"
+         ],
+         "coverage_ratio": 0.167,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "US_20260229626_A1_20260806",
+         "title": "BATTERY MONITORING FOR DETECTION OF THERMAL EVENTS",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/029-370-598-785-034",
+         "assignee": "['GM GLOBAL TECH OPERATIONS LLC']",
+         "publication_date": "2026-08-06"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260229626_A1_20260806"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "BATTERY MONITORING FOR DETECTION OF THERMAL EVENTS A system for detection of thermal events in a battery system includes a sensing circuit operably connected to the battery system, the battery system including a plurality of sets of battery cells, the sensing circuit including a plurality of resistors, each resistor of the plurality of resistors disposed proximate to a respective set of battery cells, where the plurality of resistors are connected  ",
+        "adjudicated_text_sha256": "4c6f35084fa7d89bed4a5fbee1ef339050b5558531c9cc10d5bca8d54dae95f4",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "thermal"
+         ],
+         "distinguishing_terms_surviving": [
+          "acoustic",
+          "early",
+          "field",
+          "imaging",
+          "initiation",
+          "multi",
+          "optical",
+          "pack",
+          "pathway",
+          "propagation",
+          "ray",
+          "runaway",
+          "sensor",
+          "sensory",
+          "spectroscopy",
+          "within"
+         ],
+         "coverage_ratio": 0.111,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 2,
+      "n_search_errors": 0,
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "acoustic",
+       "early",
+       "field",
+       "imaging",
+       "initiation",
+       "multi",
+       "optical",
+       "pack",
+       "pathway",
+       "propagation",
+       "ray",
+       "runaway",
+       "sensor",
+       "sensory",
+       "spectroscopy",
+       "within"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.727,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 0.875,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.812,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 0.971,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.81,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.9
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.579 -> 0.727 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T04:09:09+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.188,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.846,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.769,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.978,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.69,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.9,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.727,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.875,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.812,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.971,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.81,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.9,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "finished_at": "2026-08-31T04:09:09+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.69,
+  "final_i_average": 0.81,
+  "baseline_q_average": 0.9,
+  "final_q_average": 0.9,
+  "iterations_run": 2,
+  "keeps": 2
+ }
+}

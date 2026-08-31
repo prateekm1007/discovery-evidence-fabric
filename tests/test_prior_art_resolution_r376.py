@@ -428,12 +428,39 @@ class TestRunCollision:
         assert r["patent"]["adjacent_only_hits"]
 
     def test_metered_source_not_queried(self):
-        """PatentBear (20/month) is never spent on collision search."""
+        """PatentBear is OPT-IN (R378 CEO directive: 'Use PatentBear for
+        patents'): absent from `sources` it is never queried, and the
+        artifact records the metered-source policy. The quota guard
+        refusal is recorded as an error, never as absence."""
         with pytest.MonkeyPatch.context() as mp:
             _patch_search(mp, [])
             r = cr.run_collision(BATTERY_MM, BATTERY_PROBLEM)
-        not_queried = r["patent"]["metered_sources_not_queried"]
-        assert any(nq["source"] == "patentbear" for nq in not_queried)
+        metered = r["patent"]["metered_sources"]
+        assert "patentbear" in metered
+        assert "opt-in" in metered["patentbear"]["policy"].lower()
+        # patentbear was NOT in the default source list -> no patentbear
+        # query was issued (the patched search records every call)
+        issued = [e for e in r["patent"]["source_errors"]
+                  if e.get("source") == "patentbear"]
+        assert issued == []
+
+    def test_patentbear_quota_guard_refusal_is_error_not_absence(self):
+        """When the persistent meter is at/below the reserve floor, the
+        guard refuses BEFORE the call and the refusal surfaces as an
+        UNRESOLVED_SOURCE_FAILURE error — never as zero hits / absence
+        (Art. XXI.3 + metered-source policy)."""
+        import tempfile
+        from pathlib import Path
+        from discovery_fabric.prior_art_v2 import sources as psrc
+        with tempfile.TemporaryDirectory() as td:
+            meter = Path(td) / "patentbear_meter.json"
+            meter.write_text('{"monthly_remaining": 1}')
+            with pytest.MonkeyPatch.context() as mp:
+                mp.setattr(psrc, "PATENTBEAR_METER_PATH", meter)
+                r = psrc.search_patent_bear("battery thermal runaway")
+            assert not r.success
+            assert "RATE_LIMITED" in (r.error or "")
+            assert r.error_code == 429
 
 
 # ---------------------------------------------------------------------------

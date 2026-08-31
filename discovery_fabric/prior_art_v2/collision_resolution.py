@@ -605,10 +605,14 @@ def search_patents(ladder: List[Dict[str, Any]],
     """Run the query ladder against the live patent sources.
 
     Sources: google_patents (free) + lens_patent (live token).
-    patentbear is PROVIDER-METERED (20/month) and is NOT queried here by
-    default (metered-source policy; recorded as NOT_QUERIED_METERED).
-    Failures are recorded as UNRESOLVED_SOURCE_FAILURE per query+source —
-    never converted to absence (Art. XXI.3).
+    patentbear (R378, CEO directive 'Use PatentBear for patents') is an
+    OPT-IN source: pass sources=["patentbear", ...] explicitly. It is
+    provider-metered and carries a persistent quota guard with a
+    reserve floor (patentbear_meter.json; metered-source policy) —
+    when the guard refuses, the refusal is recorded as
+    NOT_QUERIED_QUOTA_GUARD, never as absence.
+    Failures are recorded as UNRESOLVED_SOURCE_FAILURE per
+    query+source — never converted to absence (Art. XXI.3).
     """
     sources = sources or ["google_patents", "lens_patent"]
     hits: List[PatentHit] = []
@@ -630,8 +634,19 @@ def search_patents(ladder: List[Dict[str, Any]],
             return src.search_lens_patent(
                 step.get("query_compact") or step["query"], num_results=n)
 
+    class _PatentBearSearch:
+        """R378 CEO-designated patent source. Free-text keyword form
+        (PatentBear searches full text natively). The persistent meter
+        guard inside search_patent_bear refuses at the reserve floor —
+        the refusal surfaces here as a recorded error, never absence."""
+
+        def __call__(self, step, n):
+            return src.search_patent_bear(step["query"],
+                                          num_results=max(n, 8))
+
     fns = {"google_patents": _GoogleSearch(),
-           "lens_patent": _LensSearch()}
+           "lens_patent": _LensSearch(),
+           "patentbear": _PatentBearSearch()}
 
     def _call_with_backoff(fn, step, n, source_id):
         """Retry on HTTP 429 (Lens short-window rate limit — measured
@@ -983,7 +998,8 @@ def resolve_differentiation(families: List[Dict[str, Any]],
                             profile: CandidateProfile,
                             search_errors: List[Dict[str, Any]],
                             searches_succeeded: bool,
-                            deep_fetch: bool = True
+                            deep_fetch: bool = True,
+                            precomputed: Optional[List[Dict[str, Any]]] = None,
                             ) -> Dict[str, Any]:
     """Decide the prior-art position with per-family evidence.
 
@@ -1000,37 +1016,76 @@ def resolve_differentiation(families: List[Dict[str, Any]],
                             (zero hits is NOT novelty — Art. XXI.2)
     UNRESOLVED_INSUFFICIENT_EVIDENCE  all searches failed (provider
                             failures are not absence — Art. XXI.3)
+
+    `precomputed` (R378 technical-improvement-engine re-adjudication
+    path): a list of family records whose evidence was ALREADY fetched
+    and custody-recorded ({family_id, representative: PatentHit,
+    members, evidence_tier, fam_text, claims_fetch_status,
+    claims_fetch_path}). When supplied, the network fetch is skipped and
+    the CACHED evidence text/tier is re-adjudicated against the GIVEN
+    profile — the same state machine, same thresholds, one authority
+    (Art. X). The caller records collision_mode=REPLAY_CACHE; the
+    artifact discloses that the SEARCH was cached while the
+    ADJUDICATION re-ran (CEO improvement-engine rule 11: re-run the
+    checks — never inherit the parent's score).
     """
     per_family: List[Dict[str, Any]] = []
-    for fam in families:
-        rep: PatentHit = fam["representative"]
-        claims = (fetch_claim_evidence(rep.patent_id, rep)
-                  if deep_fetch else {"fetch_status": "NOT_ATTEMPTED"})
-        tier = evidence_tier(rep, claims)
-        fam_text = family_text(rep, claims)
-        cov = coverage_decision(profile, fam_text)
-        per_family.append({
-            "family_id": fam["family_id"],
-            "representative": {
-                "patent_id": rep.patent_id, "title": rep.title[:140],
-                "source_id": rep.source_id, "source_url": rep.source_url,
-                "assignee": rep.assignee,
-                "publication_date": rep.publication_date},
-            "family_size": len(fam["members"]),
-            "member_patent_ids": [m.patent_id for m in fam["members"]],
-            "evidence_tier": tier,
-            "claims_fetch_status": claims.get("fetch_status"),
-            "claims_fetch_path": claims.get("fetch_path"),
-            # R377: the ADJUDICATED TEXT the coverage decision measured
-            # against, hash-custodied — auditability (the coverage class
-            # is now verifiable from the artifact alone) and instrument
-            # measurability (I4 pair-novelty needs the family text on
-            # the artifact, not just the title)
-            "adjudicated_text_excerpt": fam_text[:1200],
-            "adjudicated_text_sha256": __import__("hashlib").sha256(
-                fam_text.encode("utf-8", errors="ignore")).hexdigest(),
-            "coverage": cov,
-        })
+    if precomputed is not None:
+        for fam in precomputed:
+            rep: PatentHit = fam["representative"]
+            tier = str(fam.get("evidence_tier") or "TITLE")
+            fam_text = str(fam.get("fam_text") or "")
+            cov = coverage_decision(profile, fam_text)
+            per_family.append({
+                "family_id": fam.get("family_id"),
+                "representative": {
+                    "patent_id": rep.patent_id, "title": rep.title[:140],
+                    "source_id": rep.source_id,
+                    "source_url": rep.source_url,
+                    "assignee": rep.assignee,
+                    "publication_date": rep.publication_date},
+                "family_size": len(fam.get("members") or []),
+                "member_patent_ids": [m.patent_id for m in
+                                      (fam.get("members") or [])],
+                "evidence_tier": tier,
+                "claims_fetch_status": fam.get("claims_fetch_status"),
+                "claims_fetch_path": fam.get("claims_fetch_path"),
+                "adjudicated_text_excerpt": fam_text[:1200],
+                "adjudicated_text_sha256": __import__("hashlib").sha256(
+                    fam_text.encode("utf-8", errors="ignore")).hexdigest(),
+                "coverage": cov,
+            })
+        families = []
+    else:
+        for fam in families:
+            rep: PatentHit = fam["representative"]
+            claims = (fetch_claim_evidence(rep.patent_id, rep)
+                      if deep_fetch else {"fetch_status": "NOT_ATTEMPTED"})
+            tier = evidence_tier(rep, claims)
+            fam_text = family_text(rep, claims)
+            cov = coverage_decision(profile, fam_text)
+            per_family.append({
+                "family_id": fam["family_id"],
+                "representative": {
+                    "patent_id": rep.patent_id, "title": rep.title[:140],
+                    "source_id": rep.source_id, "source_url": rep.source_url,
+                    "assignee": rep.assignee,
+                    "publication_date": rep.publication_date},
+                "family_size": len(fam["members"]),
+                "member_patent_ids": [m.patent_id for m in fam["members"]],
+                "evidence_tier": tier,
+                "claims_fetch_status": claims.get("fetch_status"),
+                "claims_fetch_path": claims.get("fetch_path"),
+                # R377: the ADJUDICATED TEXT the coverage decision measured
+                # against, hash-custodied — auditability (the coverage class
+                # is now verifiable from the artifact alone) and instrument
+                # measurability (I4 pair-novelty needs the family text on
+                # the artifact, not just the title)
+                "adjudicated_text_excerpt": fam_text[:1200],
+                "adjudicated_text_sha256": __import__("hashlib").sha256(
+                    fam_text.encode("utf-8", errors="ignore")).hexdigest(),
+                "coverage": cov,
+            })
     tiers = [f["evidence_tier"] for f in per_family]
     full_cover = [f for f in per_family
                   if f["coverage"]["coverage_class"] == "FULL_COVER"]
@@ -1162,11 +1217,17 @@ def run_collision(mechanism_map: Dict[str, Any],
         },
         "patent": {
             "sources": (sources or ["google_patents", "lens_patent"]),
-            "metered_sources_not_queried": [
-                {"source": "patentbear",
-                 "reason": "provider-metered 20/month; reserved by the "
-                           "metered-source policy (K-series) — not spent "
-                           "on collision search"}],
+            "metered_sources": {
+                "patentbear": {
+                    "policy": ("OPT-IN since R378 (CEO directive: "
+                               "'Use PatentBear for patents'); queried "
+                               "only when listed in sources; persistent "
+                               "quota guard with reserve floor "
+                               "(patentbear_meter.json)"),
+                    "not_queried_when_absent":
+                        ("metered-source policy — not spent on default "
+                         "collision search (K-series)")},
+            },
             "hit_count": len(hits),
             "hits": [{"patent_id": h.patent_id, "title": h.title,
                       "snippet": h.snippet[:400], "source_id": h.source_id,

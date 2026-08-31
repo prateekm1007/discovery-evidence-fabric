@@ -669,6 +669,41 @@ def search_patsnap_eureka(query: str, num_results: int = 8) -> SourceQueryResult
 
 
 # ----------------------- SOURCE 4: PATENT_BEAR (MCP) -----------------------
+# R378: persistent quota meter. The CEO statement (2026-08-31):
+# "Use PatentBear for patents. Investors have provided unlimited
+# investment for it." The ACCOUNT upgrade is a CEO-side action; until
+# the provider meter itself changes, the measured meter (monthly_remaining
+# in every response) remains the authority. The guard below reserves a
+# small floor of searches so the last queries can never be burned
+# silently by a batch run (metered-source policy, K-series).
+PATENTBEAR_METER_PATH = Path(__file__).resolve().parents[2] / \
+    "patent_sources" / "patentbear_meter.json"
+PATENTBEAR_RESERVE_FLOOR = int(os.environ.get("PATENTBEAR_RESERVE_FLOOR", "2"))
+
+
+def patentbear_meter_state() -> Dict[str, Any]:
+    """Read the persisted meter (remaining/quota as last reported by
+    the provider). Missing file = UNKNOWN (never guessed)."""
+    try:
+        return json.loads(PATENTBEAR_METER_PATH.read_text())
+    except Exception:  # noqa: BLE001 — missing/corrupt = UNKNOWN
+        return {"monthly_remaining": None, "updated_at": None,
+                "note": "no provider-reported meter state recorded yet"}
+
+
+def _patentbear_update_meter(remaining: Any) -> None:
+    """Persist the provider-reported remaining quota after a call."""
+    try:
+        PATENTBEAR_METER_PATH.parent.mkdir(parents=True, exist_ok=True)
+        PATENTBEAR_METER_PATH.write_text(json.dumps({
+            "monthly_remaining": remaining,
+            "updated_at": _now_utc(),
+            "reserve_floor": PATENTBEAR_RESERVE_FLOOR,
+        }, indent=1))
+    except Exception:  # noqa: BLE001 — meter persistence is best-effort
+        pass
+
+
 def search_patent_bear(query: str, num_results: int = 8) -> SourceQueryResult:
     """
     Search Patent Bear via MCP (Model Context Protocol) JSON-RPC endpoint.
@@ -680,8 +715,25 @@ def search_patent_bear(query: str, num_results: int = 8) -> SourceQueryResult:
       - search_patents: keyword/identifier search across patents, publications, NPL
       - get_patent_record: full text fetch by patent id
 
-    Rate limit: 20 searches/month on this key (tracked in usage response).
+    Rate limit: 20 searches/month on this key (tracked in usage response);
+    CEO 2026-08-31: investors fund unlimited usage — the account upgrade
+    is pending; the provider-reported meter remains the authority. The
+    persistent meter guard reserves PATENTBEAR_RESERVE_FLOOR searches
+    (default 2) so batch runs can never silently burn the last queries.
     """
+    meter = patentbear_meter_state()
+    remaining = meter.get("monthly_remaining")
+    if isinstance(remaining, (int, float)) and remaining <= PATENTBEAR_RESERVE_FLOOR:
+        return SourceQueryResult(
+            source_id="PATENT_BEAR",
+            success=False,
+            latency_ms=0,
+            error=(f"RATE_LIMITED: provider meter shows "
+                   f"{int(remaining)} remaining; reserve floor "
+                   f"{PATENTBEAR_RESERVE_FLOOR} enforced "
+                   "(metered-source policy)"),
+            error_code=429,
+        )
     if not PATENT_BEAR_KEY:
         return SourceQueryResult(
             source_id="PATENT_BEAR",
@@ -863,6 +915,9 @@ def search_patent_bear(query: str, num_results: int = 8) -> SourceQueryResult:
 
     # Track usage in error field if rate limit hit (informational)
     usage = search_data.get("usage", {})
+    # R378: persist the provider-reported meter after every response —
+    # the guard on the next call reads it (never burns the reserve floor)
+    _patentbear_update_meter(usage.get("monthly_remaining"))
 
     return SourceQueryResult(
         source_id="PATENT_BEAR",

@@ -1,0 +1,919 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-08-31T04:09:51+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "measured_value": 0.2,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.2 < STRONG floor 0.7",
+      "mutation_type": "DIFFERENTIATOR"
+     },
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.25,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.25 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "measured_value": 0.643,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.643 < STRONG floor 0.7",
+      "mutation_type": "DIFFERENTIATOR"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I3_RECOMBINATION_RISK",
+     "mutation_type": "DIFFERENTIATOR"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:529bafbc6dec",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "28b989207d482bc0b3dd46290b83de8c7c313435d65917c51c3ab7f95519addd",
+     "output_hash": "529bafbc6decbd3f7b185190235b39c540f6efcc2684d0e0b43385be0b656ba0",
+     "fields": {
+      "MUTATION_TYPE": "DIFFERENTIATOR",
+      "MECHANISM": "smart battery management systems that enhance resilience against thermal runaway, interfacial degradation, and mechanical abuse",
+      "INTERVENTION": "implement a circuit-level battery management system with overcharge protection, temperature monitoring, current limiting, and machine-learning-driven fault detection that can be retrofitted to existing consumer lithium-ion battery packs",
+      "EXPECTED_EFFECT": "prevent thermal runaway by detecting abnormal charging conditions, excessive temperature, and potentially dangerous current flows, thereby reducing battery fire incidents across various consumer misuse scenarios",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "It is analyzed failure mechanisms across scales, from atomic-scale dendrite formation to module-level thermal propagation. It is also evaluate advanced diagnostic tools (e.g., machine learning-driven fault detection). Furthermore, emerging solutions is highlighted, such as self-healing electrolytes, nanostructured thermal barriers, and smart battery management systems that enhance resilience while maintaining energy density.",
+      "SOURCE_EVIDENCE_ID": "europepmc:40741837",
+      "EXPERIMENT": "compare the candidate against conventional battery management systems in preventing thermal runaway under overcharge conditions",
+      "EXPERIMENT_BASELINE": "conventional battery management systems",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "repairs the I3_RECOMBINATION_RISK weakness by replacing generic configuration vocabulary with specific technical terms from the evidence, including thermal runaway, interfacial degradation, mechanical abuse, machine-learning-driven fault detection, and dendrite formation"
+     },
+     "validation": {
+      "valid": false,
+      "stage": "VALIDATION",
+      "target_dimension": "I3_RECOMBINATION_RISK",
+      "mutation_type": "DIFFERENTIATOR",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_verbatim_in_evidence": false,
+       "mutation_changes_candidate": true,
+       "meaningful_residue_after": [
+        "learning",
+        "fault",
+        "driven",
+        "consumer"
+       ],
+       "meaningful_residue_exists": [
+        "learning",
+        "fault",
+        "driven",
+        "consumer"
+       ]
+      },
+      "reasons": [
+       "span_verbatim_in_evidence: the quoted span is NOT a verbatim substring of the cited evidence (fabricated spans are invalid — Art. VI)"
+      ],
+      "validated_at": "2026-08-31T04:09:57+00:00Z"
+     }
+    },
+    {
+     "proposal_id": "prop:be0a471b68f5",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "f7acaeffd45d07dcd4ac12e93431d974047feba153ce82cc209729fdea4baa5c",
+     "output_hash": "be0a471b68f54da3a3ca6e15b05e9d4dbec2e2d8d67eb0dc7fb35e4a91c6dbf7",
+     "fields": {
+      "MUTATION_TYPE": "DIFFERENTIATOR",
+      "MECHANISM": "smart battery management systems that enhance resilience through thermal runaway prevention and interfacial degradation monitoring",
+      "INTERVENTION": "implement a circuit-level battery management system with overcharge protection, temperature monitoring, current limiting, and interfacial degradation detection that can be retrofitted to existing consumer lithium-ion battery packs",
+      "EXPECTED_EFFECT": "prevent thermal runaway and interfacial degradation by detecting abnormal charging conditions, excessive temperature, potentially dangerous current flows, and electrolyte-electrode interface deterioration, thereby reducing battery fire incidents across various consumer misuse scenarios",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "battery safety has emerged as a cornerstone of innovation in the automotive industry. This review systematically examines critical safety challenges, such as thermal runaway, interfacial degradation, and mechanical abuse, which threaten performance, reliability, and consumer confidence. By bridging material science with systems engineering, it is analyzed failure mechanisms across scales, from atomic-scale dendrite formation to module-level thermal propagation.",
+      "SOURCE_EVIDENCE_ID": "europepmc:40741837",
+      "EXPERIMENT": "compare the candidate against conventional battery management systems that lack interfacial degradation monitoring in scenarios involving accelerated aging and overcharging",
+      "EXPERIMENT_BASELINE": "conventional battery management systems",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "NONE",
+      "MUTATION_REASON": "repairs the I3_RECOMBINATION_RISK weakness by adding specific technical terms from the evidence (thermal runaway, interfacial degradation) to create a meaningful novel residue against the adjudicated family texts"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I3_RECOMBINATION_RISK",
+      "mutation_type": "DIFFERENTIATOR",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:40741837",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "meaningful_residue_after": [
+        "degradation",
+        "interfacial",
+        "consumer"
+       ],
+       "meaningful_residue_exists": [
+        "degradation",
+        "interfacial",
+        "consumer"
+       ]
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T04:10:04+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:fe0ce3e63efd",
+    "mutation_type": "DIFFERENTIATOR",
+    "diagnostic_trigger": {
+     "dimension": "I3_RECOMBINATION_RISK",
+     "measured_before": 0.2,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:be0a471b68f5",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "f7acaeffd45d07dcd4ac12e93431d974047feba153ce82cc209729fdea4baa5c",
+     "output_hash": "be0a471b68f54da3a3ca6e15b05e9d4dbec2e2d8d67eb0dc7fb35e4a91c6dbf7",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I3_RECOMBINATION_RISK",
+     "mutation_type": "DIFFERENTIATOR",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:40741837",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "meaningful_residue_after": [
+       "degradation",
+       "interfacial",
+       "consumer"
+      ],
+      "meaningful_residue_exists": [
+       "degradation",
+       "interfacial",
+       "consumer"
+      ]
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T04:10:04+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "smart battery management systems that enhance resilience",
+      "after": "smart battery management systems that enhance resilience through thermal runaway prevention and interfacial degradation monitoring"
+     },
+     "intervention": {
+      "before": "implement a circuit-level battery management system with overcharge protection, temperature monitoring, and current limiting that can be retrofitted to existing consumer lithium-ion battery packs",
+      "after": "implement a circuit-level battery management system with overcharge protection, temperature monitoring, current limiting, and interfacial degradation detection that can be retrofitted to existing consumer lithium-ion battery packs"
+     },
+     "mechanism_source_span": {
+      "before": "smart battery management systems that enhance resilience while maintaining energy density",
+      "after": "battery safety has emerged as a cornerstone of innovation in the automotive industry. This review systematically examines critical safety challenges, such as thermal runaway, interfacial degradation, and mechanical abuse, which threaten performance, reliability, and consumer confidence. By bridging "
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:engineering_infeasibility",
+      "con:collision:adjacent",
+      "battery batteries consumer lithium powered products",
+      "battery management systems enhance resilience smart",
+      "battery consumer lithium management ion temperature current",
+      "battery batteries consumer lithium powered products"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06",
+      "PA-FAM-07"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "bfdaf2832b3a50eda52e69530b498d3f56a14cf19efdc8f80a782a3b7b158430",
+    "child_spec_hash": null,
+    "reason": "repairs the I3_RECOMBINATION_RISK weakness by adding specific technical terms from the evidence (thermal runaway, interfacial degradation) to create a meaningful novel residue against the adjudicated family texts",
+    "applied_at": "2026-08-31T04:10:04+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T04:10:04+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "battery",
+      "consumer",
+      "current",
+      "limiting",
+      "lithium",
+      "overcharge",
+      "pack",
+      "protection",
+      "runaway",
+      "temperature",
+      "that",
+      "thermal"
+     ],
+     "entity_retention_vs_problem": 1.0,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:7 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "US_20260254394_A1_20260827",
+         "title": "BATTERY AND MOTOR SYSTEM FOR REPLACING INTERNAL COMBUSTION ENGINE",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/071-398-500-528-716",
+         "assignee": "['BLACK & DECKER, INC.']",
+         "publication_date": "2026-08-27"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260254394_A1_20260827"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "BATTERY AND MOTOR SYSTEM FOR REPLACING INTERNAL COMBUSTION ENGINE A battery-powered motor may include an electric motor, a controller, and a housing. The electric motor may be wound to enable the battery-powered motor to achieve a non-limited motor maximum motor revolutions per minute (RPM) for at least one specified battery. The controlling current may include limiting current to the electric motor at lower RPMs, and limiting the current to prevent the RPM of t  ",
+        "adjudicated_text_sha256": "4bb6dedc0ff39a5840d06b3898635da1323ebb92a1da09a8de4ecdf6a5cbaa47",
+        "coverage": {
+         "coverage_class": "NONE",
+         "mechanism_overlap_terms": [
+          "battery"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "current",
+          "limiting"
+         ],
+         "distinguishing_terms_surviving": [
+          "circuit",
+          "consumer",
+          "degradation",
+          "detection",
+          "existing",
+          "interfacial",
+          "ion",
+          "level",
+          "lithium",
+          "management",
+          "overcharge",
+          "pack",
+          "protection",
+          "retrofitted",
+          "temperature"
+         ],
+         "coverage_ratio": 0.167,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "US_20260251722_A1_20260827",
+         "title": "CALIBRATION METHOD OF BATTERY ELECTRONIC CONTROL UNIT",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/098-289-555-125-866",
+         "assignee": "['TOYOTA JIDOSHA KABUSHIKI KAISHA']",
+         "publication_date": "2026-08-27"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260251722_A1_20260827"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "CALIBRATION METHOD OF BATTERY ELECTRONIC CONTROL UNIT A calibration method of a battery electronic control unit (ECU) according to the present disclosure uses an inspection device. The battery ECU includes a first high-frequency signal supplying unit that supplies a first high-frequency signal of 0.1 MHz or higher to a lithium-ion secondary battery, and a first detecting unit that detects a value of a real part of alternating current impedance from t  ",
+        "adjudicated_text_sha256": "da33c8b29aa97229a505ddc77ca2e9011c884e4c279b4e2fd00b767d9815248f",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "ion",
+          "lithium"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "current",
+          "ion",
+          "lithium"
+         ],
+         "distinguishing_terms_surviving": [
+          "circuit",
+          "consumer",
+          "degradation",
+          "detection",
+          "existing",
+          "interfacial",
+          "level",
+          "limiting",
+          "management",
+          "overcharge",
+          "pack",
+          "protection",
+          "retrofitted",
+          "temperature"
+         ],
+         "coverage_ratio": 0.222,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "CN_121791385_A_20260403",
+         "title": "Battery overcharge protection method, device and equipment and storage medium",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/107-844-669-549-725",
+         "assignee": "['GANFENG LITHIUM BATTERY DONGGUAN TECH CO LTD']",
+         "publication_date": "2026-04-03"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_121791385_A_20260403"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Battery overcharge protection method, device and equipment and storage medium The invention provides a battery overcharge protection method, device and equipment and a storage medium, and the method comprises the steps: collecting the temperature, voltage, gas concentration, smoke concentration and other state parameters in the charging process of a battery through a plurality of sensors, and carrying out the normalization processing of the state parameters, and calculating  ",
+        "adjudicated_text_sha256": "6943f8e0d498e2d0a41e7d1fba495b9b56c7d1c966572efb05666c3b80d94f08",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "overcharge"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "overcharge",
+          "protection",
+          "temperature"
+         ],
+         "distinguishing_terms_surviving": [
+          "circuit",
+          "consumer",
+          "current",
+          "degradation",
+          "detection",
+          "existing",
+          "interfacial",
+          "ion",
+          "level",
+          "limiting",
+          "lithium",
+          "management",
+          "pack",
+          "retrofitted"
+         ],
+         "coverage_ratio": 0.222,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-04",
+        "representative": {
+         "patent_id": "US_20260254044_A1_20260827",
+         "title": "ADAPTIVE VENT PATH MANAGEMENT STRATEGIES FOR TRACTION BATTERY PACKS",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/160-440-878-657-459",
+         "assignee": "['FORD GLOBAL TECHNOLOGIES, LLC']",
+         "publication_date": "2026-08-27"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260254044_A1_20260827"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "ADAPTIVE VENT PATH MANAGEMENT STRATEGIES FOR TRACTION BATTERY PACKS Adaptive vent path management strategies are provided for traction battery packs. The traction battery pack may include a sacrificial component that can transition from a non-deformed state to a deformed state to provide an adaptive vent flow path within the traction battery pack. For example, the sacrificial component may be designed to plastically deform (e.g., melt, sag, etc.) to block a primar  Adaptive vent path management strategies are provided for traction battery packs. The traction battery pack may include a sacrificial component that can transition from a non-deformed state to a deformed state to provide an adaptive vent flow path within the traction battery pack. For example, the sacrificial component may be designed to plastically deform (e.g., melt, sag, etc.) to block a primary vent flow path and thereby redirect battery vent byproducts to a secondary vent flow path during a battery thermal event. The sacrificial component may incorporate a combination of different materials for achieving the adaptive vent flow path.",
+        "adjudicated_text_sha256": "abf382e29791775a4c23ccc69f0b70336d2fdf2addf254457a5e5e9015fb63b3",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "management",
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "management",
+          "pack"
+         ],
+         "distinguishing_terms_surviving": [
+          "circuit",
+          "consumer",
+          "current",
+          "degradation",
+          "detection",
+          "existing",
+          "interfacial",
+          "ion",
+          "level",
+          "limiting",
+          "lithium",
+          "overcharge",
+          "protection",
+          "retrofitted",
+          "temperature"
+         ],
+         "coverage_ratio": 0.167,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-05",
+        "representative": {
+         "patent_id": "CN_122092449_A_20260526",
+         "title": "Battery overcharge protection method based on electrochemical impedance spectroscopy",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/164-946-430-884-358",
+         "assignee": "['UNIV HEBEI TECHNOLOGY']",
+         "publication_date": "2026-05-26"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_122092449_A_20260526"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Battery overcharge protection method based on electrochemical impedance spectroscopy The invention provides an electrochemical impedance spectroscopy-based battery overcharge protection method, which comprises the following steps of: generating a plurality of training samples according to an electrochemical impedance spectroscopy, and optimizing the number and the maximum depth of decision trees by adopting an optimization algorithm to obtain an overcharge prediction model. And ca  ",
+        "adjudicated_text_sha256": "9c6dc778d00295adbc6aeac6447a5f732bfcbf69f16c20af92b71e72693d5644",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "overcharge"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "overcharge",
+          "protection"
+         ],
+         "distinguishing_terms_surviving": [
+          "circuit",
+          "consumer",
+          "current",
+          "degradation",
+          "detection",
+          "existing",
+          "interfacial",
+          "ion",
+          "level",
+          "limiting",
+          "lithium",
+          "management",
+          "pack",
+          "retrofitted",
+          "temperature"
+         ],
+         "coverage_ratio": 0.167,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-06",
+        "representative": {
+         "patent_id": "CN_224053919_U_20260327",
+         "title": "Voltage protection circuit for lithium ion single-section positive end secondary overcharge protection",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/091-283-120-474-002",
+         "assignee": "['CELL TECH ZHONGSHAN CO LTD']",
+         "publication_date": "2026-03-27"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_224053919_U_20260327"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Voltage protection circuit for lithium ion single-section positive end secondary overcharge protection The utility model provides a voltage protection circuit for lithium ion single-section positive end secondary overcharge protection, which relates to the technical field of lithium ion battery protection and comprises a primary protection unit, a secondary protection unit and a fusing protection unit. The primary protection unit is connected with the positive pole of the power supply and is connec  ",
+        "adjudicated_text_sha256": "061d912639cc17fc9c4cddf3369765250c738a52f3409036a84d59aaf66ee323",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "ion",
+          "lithium",
+          "overcharge"
+         ],
+         "distinguishing_terms_covered": [
+          "battery",
+          "circuit",
+          "ion",
+          "lithium",
+          "overcharge",
+          "protection"
+         ],
+         "distinguishing_terms_surviving": [
+          "consumer",
+          "current",
+          "degradation",
+          "detection",
+          "existing",
+          "interfacial",
+          "level",
+          "limiting",
+          "management",
+          "pack",
+          "retrofitted",
+          "temperature"
+         ],
+         "coverage_ratio": 0.333,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-07",
+        "representative": {
+         "patent_id": "AU_2026200264_A1_20260806",
+         "title": "ENERGY DISCHARGE SYSTEM TO PREVENT THERMAL RUNAWAY IN A LOCOMOTIVE",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/169-854-771-755-638",
+         "assignee": "['PROGRESS RAIL LOCOMOTIVE INC']",
+         "publication_date": "2026-08-06"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "AU_2026200264_A1_20260806"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "ENERGY DISCHARGE SYSTEM TO PREVENT THERMAL RUNAWAY IN A LOCOMOTIVE -21- Abstract ENERGY DISCHARGE SYSTEM TO PREVENT THERMAL RUNAWAY IN A When there is an event that could result in a thermal runaway, a battery system (200) of a locomotive (100) discharges the battery energy into a dynamic brake grid (116) of the locomotive. Discharging the battery energy into the dynamic brake grid is expected to significantly affect the sequence of events in a thermal runaway as  ",
+        "adjudicated_text_sha256": "42b74a2411e5070b35027d7627673fe61018e28379efdf7fb80d1d7a005fd846",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "battery",
+          "runaway",
+          "thermal"
+         ],
+         "distinguishing_terms_covered": [
+          "battery"
+         ],
+         "distinguishing_terms_surviving": [
+          "circuit",
+          "consumer",
+          "current",
+          "degradation",
+          "detection",
+          "existing",
+          "interfacial",
+          "ion",
+          "level",
+          "limiting",
+          "lithium",
+          "management",
+          "overcharge",
+          "pack",
+          "protection",
+          "retrofitted",
+          "temperature"
+         ],
+         "coverage_ratio": 0.056,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 7,
+      "n_search_errors": 0,
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "circuit",
+       "consumer",
+       "current",
+       "degradation",
+       "detection",
+       "existing",
+       "interfacial",
+       "ion",
+       "level",
+       "limiting",
+       "lithium",
+       "management",
+       "overcharge",
+       "pack",
+       "protection",
+       "retrofitted",
+       "temperature"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05",
+      "PA-FAM-06",
+      "PA-FAM-07"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.186,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 0.647,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.333,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 0.844,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": true,
+     "recombination_only": false
+    },
+    "i_average": 0.535,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.714,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.843
+   },
+   "decision": {
+    "action": "REJECT_MUTATION",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.2 -> 0.333 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": false,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [
+     "mutation introduced new structural flags: ['underived_mechanism']"
+    ],
+    "decided_at": "2026-08-31T04:10:04+00:00Z"
+   }
+  }
+ ],
+ "outcome": "KILLED_NO_IMPROVING_MUTATION",
+ "outcome_reason": "iteration 1: a validated DIFFERENTIATOR mutation was applied and fully re-evaluated, but the targeted dimension I3_RECOMBINATION_RISK did not improve (0.2 -> 0.333 (improved)); mutation introduced new structural flags: ['underived_mechanism']. No defensible improvement exists. Candidate killed.",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.25,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.643,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.2,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.833,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.519,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.714,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.843,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.25,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.643,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.2,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.833,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.519,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.714,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.843,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "finished_at": "2026-08-31T04:10:04+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.519,
+  "final_i_average": 0.519,
+  "baseline_q_average": 0.843,
+  "final_q_average": 0.843,
+  "iterations_run": 1,
+  "keeps": 0
+ }
+}

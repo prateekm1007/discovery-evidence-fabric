@@ -386,7 +386,22 @@ class CollisionEngineAdapter(BaseAdapter):
         # family clustering, honest resolution states.
         cr = importlib.import_module(
             "discovery_fabric.prior_art_v2.collision_resolution")
-        collision = cr.run_collision(mm, env.problem)
+        # ENGINE_COLLISION_SOURCES (R378, CEO directive 'Use PatentBear
+        # for patents'): explicit operator override of the patent source
+        # list — same explicit, recorded pattern as the other
+        # ENGINE_*_PROVIDER overrides. Default unchanged
+        # (google_patents + lens_patent); patentbear is opt-in with its
+        # persistent quota guard (reserve floor; refusals recorded as
+        # errors, never absence).
+        _collision_sources = [s.strip() for s in os.environ.get(
+            "ENGINE_COLLISION_SOURCES", "").split(",") if s.strip()] or None
+        collision = cr.run_collision(mm, env.problem,
+                                     sources=_collision_sources)
+        if _collision_sources:
+            collision["operator_source_override"] = {
+                "sources": _collision_sources,
+                "note": ("ENGINE_COLLISION_SOURCES operator override "
+                         "(R378; explicit, recorded, never silent)")}
         resolution = collision["differentiation_resolution"]
         novelty_risk = collision["novelty_risk"]
 

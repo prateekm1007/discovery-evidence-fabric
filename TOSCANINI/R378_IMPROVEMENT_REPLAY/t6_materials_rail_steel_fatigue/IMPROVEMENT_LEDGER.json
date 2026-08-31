@@ -1,0 +1,1379 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-08-31T04:09:19+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.145,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.145 < STRONG floor 0.7; underived_flag set (span_support=0.145, evidence_support=0.476) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "MECHANISM_STRENGTHENING"
+     },
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "DIFFERENTIATOR"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:1d9dcd4927ae",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "cc5834dac733b799a201eb28de235dd521f34eb3bc471abf00f6825e6d4fcec0",
+     "output_hash": "1d9dcd4927ae4ad10af08ba42f34bb2e7ea7f915cafa2ce18f59372982b6daa2",
+     "fields": {
+      "MUTATION_TYPE": "MECHANISM_STRENGTHENING",
+      "MECHANISM": "Hydrogen absorbed (0.4 … 0.8 ppm) by the pearlite (R260) steel while welding, and subsequent operation thereof, exercises considerable influence on fatigue and brittle fractures of the constructions from which they are manufactured. Accordingly, in hydrogen-saturated (up to 4.7 ppm) specimens, the desired fatigue crack can be obtained at a considerably lower number of cycles of the same dynamic load than in non-hydrogenated ones. Increased hydrogen content can also affect crack propagation. Tests have shown that critical fracture occurs faster in hydrogenated specimens (46.6 MPa m 0.5 ) than in non-hydrogenated ones. Also, hydrogenated specimens exhibit lower fracture toughness than their non-hydrogenated counterparts.",
+      "INTERVENTION": "Implement additively manufactured crack-resistant material inserts at rail joints to prevent hydrogen degradation and fatigue fracture",
+      "EXPECTED_EFFECT": "Extended service life of rail joints under temperature excursions and traffic loads, with reduced fracture incidents",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Comprehensive investigations of the serviceability of pearlite (R260) steel have been performed and, especially, of the serviceability of their welded joints (WJ) during long-term operation in hydrogen-containing environments for application in additive manufacturing technology. It is important to estimate the durability of these steels and their WJ in hydrogen and develop the procedures of analysis of the influence of hydrogen during long-term operation. It has been experimentally observed that hydrogen absorbed (0.4 … 0.8 ppm) by the pearlite (R260) steel while welding, and subsequent operation thereof, exercises considerable influence on fatigue and brittle fractures of the constructions from which they are manufactured. Accordingly, in hydrogen-saturated (up to 4.7 ppm) specimens, the desired fatigue crack can be obtained at a considerably lower number of cycles of the same dynamic load than in non-hydrogenated ones. Increased hydrogen content can also affect crack propagation. Tests have shown that critical fracture occurs faster in hydrogenated specimens (46.6 MPa m 0.5 ) than in non-hydrogenated ones. Also, hydrogenated specimens exhibit lower fracture toughness than their non-hydrogenated counterparts.",
+      "SOURCE_EVIDENCE_ID": "europepmc:41515718",
+      "EXPERIMENT": "Compare the fatigue crack propagation rate in hydrogen-saturated pearlite steel specimens with and without additively manufactured crack-resistant material inserts under cyclic loading conditions",
+      "EXPERIMENT_BASELINE": "Non-hydrogenated specimens",
+      "EXPERIMENT_EIG": "0.8",
+      "CONSTRAINT_DERIVED": "The material inserts must prevent hydrogen absorption in the pearlite steel joints to maintain fracture toughness above 46.6 MPa m^0.5 under service conditions",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by deriving the mechanism directly from the evidence span containing the technical vocabulary about hydrogen absorption in pearlite steel and its effects on fatigue and fracture properties"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "MECHANISM_STRENGTHENING",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:41515718",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "span_derivation": {
+        "n_shared": 57,
+        "shared_terms": [
+         "absorbed",
+         "accordingly",
+         "affect",
+         "also",
+         "brittle",
+         "can",
+         "considerable",
+         "considerably",
+         "construction",
+         "content",
+         "counterpart",
+         "crack",
+         "critical",
+         "cycle",
+         "desired",
+         "dynamic",
+         "exercise",
+         "exhibit",
+         "faster",
+         "fatigue"
+        ],
+        "span_terms_n": 82,
+        "ratio": 0.695,
+        "underived": false,
+        "state": "MEASURED",
+        "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+       },
+       "span_derivation_cleared": 0.695
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T04:09:38+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:d4f098154de4",
+    "mutation_type": "MECHANISM_STRENGTHENING",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.145,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:1d9dcd4927ae",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "cc5834dac733b799a201eb28de235dd521f34eb3bc471abf00f6825e6d4fcec0",
+     "output_hash": "1d9dcd4927ae4ad10af08ba42f34bb2e7ea7f915cafa2ce18f59372982b6daa2",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "MECHANISM_STRENGTHENING",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:41515718",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "span_derivation": {
+       "n_shared": 57,
+       "shared_terms": [
+        "absorbed",
+        "accordingly",
+        "affect",
+        "also",
+        "brittle",
+        "can",
+        "considerable",
+        "considerably",
+        "construction",
+        "content",
+        "counterpart",
+        "crack",
+        "critical",
+        "cycle",
+        "desired",
+        "dynamic",
+        "exercise",
+        "exhibit",
+        "faster",
+        "fatigue"
+       ],
+       "span_terms_n": 82,
+       "ratio": 0.695,
+       "underived": false,
+       "state": "MEASURED",
+       "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+      },
+      "span_derivation_cleared": 0.695
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T04:09:38+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Hydrogen absorption in pearlite steel leads to reduced fatigue life and decreased fracture toughness",
+      "after": "Hydrogen absorbed (0.4 … 0.8 ppm) by the pearlite (R260) steel while welding, and subsequent operation thereof, exercises considerable influence on fatigue and brittle fractures of the constructions from which they are manufactured. Accordingly, in hydrogen-saturated (up to 4.7 ppm) specimens, the d"
+     },
+     "intervention": {
+      "before": "Implement additively manufactured crack-resistant material inserts at rail joints to prevent hydrogen degradation and fatigue fracture",
+      "after": "Implement additively manufactured crack-resistant material inserts at rail joints to prevent hydrogen degradation and fatigue fracture"
+     },
+     "mechanism_source_span": {
+      "before": "hydrogen absorbed (0.4 … 0.8 ppm) by the pearlite (R260) steel while welding, and subsequent operation thereof, exercises considerable influence on fatigue and brittle fractures of the constructions from which they are manufactured. Accordingly, in hydrogen-saturated (up to 4.7 ppm) specimens, the d",
+      "after": "Comprehensive investigations of the serviceability of pearlite (R260) steel have been performed and, especially, of the serviceability of their welded joints (WJ) during long-term operation in hydrogen-containing environments for application in additive manufacturing technology. It is important to e"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:engineering_infeasibility",
+      "con:attack:regulatory_incompatibility",
+      "con:collision:adjacent",
+      "steel fracture fatigue rail joint rails",
+      "steel fracture fatigue reduced hydrogen absorption",
+      "fracture fatigue rail joints hydrogen additively manufactured",
+      "steel fracture fatigue rail reduced rails"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "a564bd7b938d0e1b656d08d6b44c94669fbbcfe96fc8e320a522697f58de80d6",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION by deriving the mechanism directly from the evidence span containing the technical vocabulary about hydrogen absorption in pearlite steel and its effects on fatigue and fracture properties",
+    "applied_at": "2026-08-31T04:09:38+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T04:09:38+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "fatigue",
+      "fracture",
+      "hydrogen",
+      "joint",
+      "material",
+      "rail",
+      "same",
+      "steel",
+      "test",
+      "that",
+      "toughness",
+      "which"
+     ],
+     "entity_retention_vs_problem": 1.0,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:5 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "AU_2023352248_B2_20260813",
+         "title": "STEEL MATERIAL FOR HIGH-STRENGTH LINE PIPE WITH HIGH FRACTURE TOUGHNESS IN HYDROGEN AND METHOD FOR PRODUCING THE SAME, AND STEEL PIPE FOR HI",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/113-068-735-768-239",
+         "assignee": "['JFE STEEL CORP']",
+         "publication_date": "2026-08-13"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "AU_2023352248_B2_20260813"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "STEEL MATERIAL FOR HIGH-STRENGTH LINE PIPE WITH HIGH FRACTURE TOUGHNESS IN HYDROGEN AND METHOD FOR PRODUCING THE SAME, AND STEEL PIPE FOR HIGHSTRENGTH LINE PIPE AND METHOD FOR PRODUCING THE SAME The purpose of the present invention is to provide a high-strength line pipe steel material that has excellent fracture toughness in hydrogen in a high-pressure hydrogen gas environment, and that is suitable for use for a steel structure used in a high-pressure hydrogen gas environment, such as a line pipe for 100% hydrogen gas or for natural gas (natural gas is gas containing a hydrocarbon such a  ",
+        "adjudicated_text_sha256": "ad01e567840178c680c8e373809c7abb1995cacbfb1e6e09f394b05cef5b002c",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "fracture",
+          "hydrogen",
+          "steel"
+         ],
+         "distinguishing_terms_covered": [
+          "fracture",
+          "hydrogen",
+          "material"
+         ],
+         "distinguishing_terms_surviving": [
+          "additively",
+          "crack",
+          "degradation",
+          "fatigue",
+          "insert",
+          "joint",
+          "manufactured",
+          "rail",
+          "resistant"
+         ],
+         "coverage_ratio": 0.25,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "EP_4772663_A1_20260708",
+         "title": "HERSTELLUNGSVERFAHREN FÜR STAHLPLATTE MIT HOHER BRUCHZÄHIGKEIT",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/152-398-075-533-552",
+         "assignee": "['INST OF RESEARCH OF IRON AND STEEL JIANGSU PROVINCE/SHA STEEL CO LTD CN', 'UNIV BEIJING SCIENCE & TECHNOLOGY', 'JIANGSU SHAGANG GROUP CO LTD']",
+         "publication_date": "2026-07-08"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "EP_4772663_A1_20260708"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "HERSTELLUNGSVERFAHREN FÜR STAHLPLATTE MIT HOHER BRUCHZÄHIGKEIT The present application discloses a production method for a high fracture toughness steel plate, comprising: a steelmaking, wherein a molten steel contains C 0.03-0.07%, Si 0.15-0.25%, Mn 1.43-1.55%, P≤0.015%, S≤0.003%, Cr 0.05-0.25%, Ni≤0.23%, Cu 0.13-0.25%, Mo≤0.15%, Nb 0.02-0.04%, Ti 0.01-0.02%, Alt 0.02-0.05%, and a strengthening equivalent Req is 0.43-0.57%; a continuous casting, controlling   ",
+        "adjudicated_text_sha256": "966ca0f58955370c69cf27f960b89996f1cbd336b5f60278165919f226fb2088",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "fracture",
+          "steel"
+         ],
+         "distinguishing_terms_covered": [
+          "fracture"
+         ],
+         "distinguishing_terms_surviving": [
+          "additively",
+          "crack",
+          "degradation",
+          "fatigue",
+          "hydrogen",
+          "insert",
+          "joint",
+          "manufactured",
+          "material",
+          "rail",
+          "resistant"
+         ],
+         "coverage_ratio": 0.083,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "CN_224441433_U_20260703",
+         "title": "Adjustable punching steel plate integrated fixing forceps for long bone fracture",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/011-163-905-812-376",
+         "assignee": "['TAIYUAN DEAO ARTIFICIAL LIMB ORTHOPEDIC REHABILITATION TECH INDUSTRY CO LTD']",
+         "publication_date": "2026-07-03"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_224441433_U_20260703"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Adjustable punching steel plate integrated fixing forceps for long bone fracture The utility model relates to the technical field of orthopedic medical instruments, in particular to long bone fracture adjustable punching steel plate integrated fixing forceps which comprise a first forceps body and a second forceps body, the first forceps body and the second forceps body are hinged in a crossed mode, a first clamping portion is arranged at the top of the first forceps body, and  The utility model relates to the technical field of orthopedic medical instruments, in particular to long bone fracture adjustable punching steel plate integrated fixing forceps which comprise a first forceps body and a second forceps body, the first forceps body and the second forceps body are hinged in a crossed mode, a first clamping portion is arranged at the top of the first forceps body, and a plurality of short needles are arranged on the inner surface of the first clamping portion. A second clamping part is arranged at the top of the second clamp body, the second clamping part comprises a fixing plate and a clamping block, the clamping block is in sliding connection with the inner side of the fixing ",
+        "adjudicated_text_sha256": "d0737797d9fabdff8119ee4d674037519b4a1f179a8cac344990e82adf0e622f",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "fracture",
+          "steel"
+         ],
+         "distinguishing_terms_covered": [
+          "fracture"
+         ],
+         "distinguishing_terms_surviving": [
+          "additively",
+          "crack",
+          "degradation",
+          "fatigue",
+          "hydrogen",
+          "insert",
+          "joint",
+          "manufactured",
+          "material",
+          "rail",
+          "resistant"
+         ],
+         "coverage_ratio": 0.083,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-04",
+        "representative": {
+         "patent_id": "CN_122221500_A_20260616",
+         "title": "Rubber fatigue fracture phase field simulation method based on parameter joint inversion and heat transfer analogy",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/047-998-091-546-831",
+         "assignee": "['UNIV SOUTHWEST PETROLEUM']",
+         "publication_date": "2026-06-16"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_122221500_A_20260616"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Rubber fatigue fracture phase field simulation method based on parameter joint inversion and heat transfer analogy The invention discloses a rubber fatigue fracture phase field simulation method based on parameter joint inversion and heat transfer analogy, and the method comprises the steps: obtaining rubber mechanics and fatigue related data through a test, fitting a hyperelastic constitutive model to obtain material parameters, building a tearing and fatigue fracture finite element model, and carrying out th  ",
+        "adjudicated_text_sha256": "355735a4d0bb4a942f69181e5570aad2fe00863841c86ee308d4fe82a6279b43",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "fatigue",
+          "fracture",
+          "joint"
+         ],
+         "distinguishing_terms_covered": [
+          "fatigue",
+          "fracture",
+          "joint",
+          "material"
+         ],
+         "distinguishing_terms_surviving": [
+          "additively",
+          "crack",
+          "degradation",
+          "hydrogen",
+          "insert",
+          "manufactured",
+          "rail",
+          "resistant"
+         ],
+         "coverage_ratio": 0.333,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-05",
+        "representative": {
+         "patent_id": "WO_2026152867_A1_20260723",
+         "title": "FALL-PREVENTION DEVICE FOR STEEL GRID AND ANTI-FALL STEEL GRID",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/142-033-556-137-732",
+         "assignee": "['INSPECTION & CERTIFICATION CO LTD MCC']",
+         "publication_date": "2026-07-23"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "WO_2026152867_A1_20260723"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "FALL-PREVENTION DEVICE FOR STEEL GRID AND ANTI-FALL STEEL GRID Provided in the present invention are a fall-prevention device for a steel grid and an anti-fall steel grid. The steel grid comprises a support column and a grid body, wherein a steel grid bearing is mounted at the top of the support column, and the grid body comprises a bearing spherical joint and grid members and is welded to the steel grid bearing via the bearing spherical joint. The fall-preve  ",
+        "adjudicated_text_sha256": "551553c293fa7302350f47659e0b40681349e5501e0de8c4eb179a0cadda0f9b",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "joint",
+          "steel"
+         ],
+         "distinguishing_terms_covered": [
+          "joint"
+         ],
+         "distinguishing_terms_surviving": [
+          "additively",
+          "crack",
+          "degradation",
+          "fatigue",
+          "fracture",
+          "hydrogen",
+          "insert",
+          "manufactured",
+          "material",
+          "rail",
+          "resistant"
+         ],
+         "coverage_ratio": 0.083,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 5,
+      "n_search_errors": 0,
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "additively",
+       "crack",
+       "degradation",
+       "fatigue",
+       "fracture",
+       "hydrogen",
+       "insert",
+       "joint",
+       "manufactured",
+       "material",
+       "rail",
+       "resistant"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.695,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.667,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 0.984,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.803,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.4,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.78
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.145 -> 0.695 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T04:09:38+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I3_RECOMBINATION_RISK",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "DIFFERENTIATOR"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     },
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.695,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.695 < STRONG floor 0.7",
+      "mutation_type": "MECHANISM_STRENGTHENING"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I3_RECOMBINATION_RISK",
+     "mutation_type": "DIFFERENTIATOR"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:a373dd4fdcac",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "31665b1cd52719b941ddefcc99994014772bcda6c5e7b828fc0992dc15553efb",
+     "output_hash": "a373dd4fdcac6a99e817500a261698c4673314e3aa16cef94630ee69e974df0a",
+     "fields": {
+      "MUTATION_TYPE": "DIFFERENTIATOR",
+      "MECHANISM": "Hydrogen absorbed (0.4 … 0.8 ppm) by the pearlite (R260) steel while welding, and subsequent operation thereof, exercises considerable influence on fatigue and brittle fractures of the constructions from which they are manufactured. Accordingly, in hydrogen-saturated (up to 4.7 ppm) specimens, the desired fatigue crack can be obtained at a considerably lower number of cycles of the same dynamic load than in non-hydrogenated ones. Increased hydrogen content can also affect crack propagation. Tests have shown that critical fracture occurs faster in hydrogenated specimens (46.6 MPa m 0.5 ) than in non-hydrogenated ones. Also, hydrogenated specimens exhibit lower fracture toughness than their non-hydrogenated counterparts.",
+      "INTERVENTION": "Implement additively manufactured crack-resistant material inserts at rail joints to prevent hydrogen degradation and fatigue fracture by mitigating hydrogen embrittlement mechanisms in pearlite steel thermite weldments",
+      "EXPECTED_EFFECT": "Extended service life of rail joints under temperature excursions and traffic loads, with reduced fracture incidents",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "Comprehensive investigations of the serviceability of pearlite (R260) steel have been performed and, especially, of the serviceability of their welded joints (WJ) during long-term operation in hydrogen-containing environments for application in additive manufacturing technology. It is important to estimate the durability of these steels and their WJ in hydrogen and develop the procedures of analysis of the influence of hydrogen during long-term operation. It has been experimentally observed that hydrogen absorbed (0.4 … 0.8 ppm) by the pearlite (R260) steel while welding, and subsequent operation thereof, exercises considerable influence on fatigue and brittle fractures of the constructions from which they are manufactured. Accordingly, in hydrogen-saturated (up to 4.7 ppm) specimens, the desired fatigue crack can be obtained at a considerably lower number of cycles of the same dynamic load than in non-hydrogenated ones. Increased hydrogen content can also affect crack propagation. Tests have shown that critical fracture occurs faster in hydrogenated specimens (46.6 MPa m 0.5 ) than in non-hydrogenated ones. Also, hydrogenated specimens exhibit lower fracture toughness than their non-hydrogenated counterparts. Finally, it has been demonstrated that the fracture toughness of specimens taken from rail negligibly (49.7 … 50.7 MPa m 0.5 ) depend on their orientation (L-S or S-L).",
+      "SOURCE_EVIDENCE_ID": "europepmc:41515718",
+      "EXPERIMENT": "Compare fatigue crack initiation cycles in hydrogen-saturated pearlite steel thermite weldments with and without additively manufactured crack-resistant material inserts under simulated rail service conditions",
+      "EXPERIMENT_BASELINE": "non-hydrogenated specimens",
+      "EXPERIMENT_EIG": "0.75",
+      "CONSTRAINT_DERIVED": "The crack-resistant material inserts must specifically target hydrogen embrittlement mechanisms in pearlite steel thermite weldments to prevent fatigue fracture under measured traffic loads across temperature excursions",
+      "MUTATION_REASON": "Repairs I3_RECOMBINATION_RISK by replacing generic configuration vocabulary with specific technical terms from the evidence related to hydrogen degradation in pearlite steel weldments"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I3_RECOMBINATION_RISK",
+      "mutation_type": "DIFFERENTIATOR",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:41515718",
+       "span_verbatim_in_evidence": true,
+       "mutation_changes_candidate": true,
+       "meaningful_residue_after": [
+        "insert",
+        "mitigating",
+        "degradation",
+        "embrittlement",
+        "additively",
+        "crack",
+        "manufactured",
+        "pearlite",
+        "weldment",
+        "rail",
+        "mechanism",
+        "thermite",
+        "resistant"
+       ],
+       "meaningful_residue_exists": [
+        "insert",
+        "mitigating",
+        "degradation",
+        "embrittlement",
+        "additively",
+        "crack",
+        "manufactured",
+        "pearlite"
+       ]
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T04:09:51+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:059562d8effe",
+    "mutation_type": "DIFFERENTIATOR",
+    "diagnostic_trigger": {
+     "dimension": "I3_RECOMBINATION_RISK",
+     "measured_before": 0.667,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:a373dd4fdcac",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "31665b1cd52719b941ddefcc99994014772bcda6c5e7b828fc0992dc15553efb",
+     "output_hash": "a373dd4fdcac6a99e817500a261698c4673314e3aa16cef94630ee69e974df0a",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I3_RECOMBINATION_RISK",
+     "mutation_type": "DIFFERENTIATOR",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:41515718",
+      "span_verbatim_in_evidence": true,
+      "mutation_changes_candidate": true,
+      "meaningful_residue_after": [
+       "insert",
+       "mitigating",
+       "degradation",
+       "embrittlement",
+       "additively",
+       "crack",
+       "manufactured",
+       "pearlite",
+       "weldment",
+       "rail",
+       "mechanism",
+       "thermite",
+       "resistant"
+      ],
+      "meaningful_residue_exists": [
+       "insert",
+       "mitigating",
+       "degradation",
+       "embrittlement",
+       "additively",
+       "crack",
+       "manufactured",
+       "pearlite"
+      ]
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T04:09:51+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Hydrogen absorbed (0.4 … 0.8 ppm) by the pearlite (R260) steel while welding, and subsequent operation thereof, exercises considerable influence on fatigue and brittle fractures of the constructions from which they are manufactured. Accordingly, in hydrogen-saturated (up to 4.7 ppm) specimens, the d",
+      "after": "Hydrogen absorbed (0.4 … 0.8 ppm) by the pearlite (R260) steel while welding, and subsequent operation thereof, exercises considerable influence on fatigue and brittle fractures of the constructions from which they are manufactured. Accordingly, in hydrogen-saturated (up to 4.7 ppm) specimens, the d"
+     },
+     "intervention": {
+      "before": "Implement additively manufactured crack-resistant material inserts at rail joints to prevent hydrogen degradation and fatigue fracture",
+      "after": "Implement additively manufactured crack-resistant material inserts at rail joints to prevent hydrogen degradation and fatigue fracture by mitigating hydrogen embrittlement mechanisms in pearlite steel thermite weldments"
+     },
+     "mechanism_source_span": {
+      "before": "Comprehensive investigations of the serviceability of pearlite (R260) steel have been performed and, especially, of the serviceability of their welded joints (WJ) during long-term operation in hydrogen-containing environments for application in additive manufacturing technology. It is important to e",
+      "after": "Comprehensive investigations of the serviceability of pearlite (R260) steel have been performed and, especially, of the serviceability of their welded joints (WJ) during long-term operation in hydrogen-containing environments for application in additive manufacturing technology. It is important to e"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:engineering_infeasibility",
+      "con:attack:regulatory_incompatibility",
+      "con:collision:adjacent",
+      "steel fracture fatigue rail joint rails",
+      "steel fracture fatigue reduced hydrogen absorption",
+      "fracture fatigue rail joints hydrogen additively manufactured",
+      "steel fracture fatigue rail reduced rails"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "315e9f245002bdd89efda452e96e10fa43988db924787897565affc70a1b88c0",
+    "child_spec_hash": null,
+    "reason": "Repairs I3_RECOMBINATION_RISK by replacing generic configuration vocabulary with specific technical terms from the evidence related to hydrogen degradation in pearlite steel weldments",
+    "applied_at": "2026-08-31T04:09:51+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T04:09:51+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "fatigue",
+      "fracture",
+      "hydrogen",
+      "joint",
+      "material",
+      "rail",
+      "same",
+      "steel",
+      "test",
+      "that",
+      "toughness",
+      "which"
+     ],
+     "entity_retention_vs_problem": 1.0,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:5 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "AU_2023352248_B2_20260813",
+         "title": "STEEL MATERIAL FOR HIGH-STRENGTH LINE PIPE WITH HIGH FRACTURE TOUGHNESS IN HYDROGEN AND METHOD FOR PRODUCING THE SAME, AND STEEL PIPE FOR HI",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/113-068-735-768-239",
+         "assignee": "['JFE STEEL CORP']",
+         "publication_date": "2026-08-13"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "AU_2023352248_B2_20260813"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "STEEL MATERIAL FOR HIGH-STRENGTH LINE PIPE WITH HIGH FRACTURE TOUGHNESS IN HYDROGEN AND METHOD FOR PRODUCING THE SAME, AND STEEL PIPE FOR HIGHSTRENGTH LINE PIPE AND METHOD FOR PRODUCING THE SAME The purpose of the present invention is to provide a high-strength line pipe steel material that has excellent fracture toughness in hydrogen in a high-pressure hydrogen gas environment, and that is suitable for use for a steel structure used in a high-pressure hydrogen gas environment, such as a line pipe for 100% hydrogen gas or for natural gas (natural gas is gas containing a hydrocarbon such a  ",
+        "adjudicated_text_sha256": "ad01e567840178c680c8e373809c7abb1995cacbfb1e6e09f394b05cef5b002c",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "fracture",
+          "hydrogen",
+          "steel"
+         ],
+         "distinguishing_terms_covered": [
+          "fracture",
+          "hydrogen",
+          "material",
+          "steel"
+         ],
+         "distinguishing_terms_surviving": [
+          "additively",
+          "crack",
+          "degradation",
+          "embrittlement",
+          "fatigue",
+          "insert",
+          "joint",
+          "manufactured",
+          "mechanism",
+          "mitigating",
+          "pearlite",
+          "rail",
+          "resistant",
+          "thermite",
+          "weldment"
+         ],
+         "coverage_ratio": 0.211,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "EP_4772663_A1_20260708",
+         "title": "HERSTELLUNGSVERFAHREN FÜR STAHLPLATTE MIT HOHER BRUCHZÄHIGKEIT",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/152-398-075-533-552",
+         "assignee": "['INST OF RESEARCH OF IRON AND STEEL JIANGSU PROVINCE/SHA STEEL CO LTD CN', 'UNIV BEIJING SCIENCE & TECHNOLOGY', 'JIANGSU SHAGANG GROUP CO LTD']",
+         "publication_date": "2026-07-08"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "EP_4772663_A1_20260708"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "HERSTELLUNGSVERFAHREN FÜR STAHLPLATTE MIT HOHER BRUCHZÄHIGKEIT The present application discloses a production method for a high fracture toughness steel plate, comprising: a steelmaking, wherein a molten steel contains C 0.03-0.07%, Si 0.15-0.25%, Mn 1.43-1.55%, P≤0.015%, S≤0.003%, Cr 0.05-0.25%, Ni≤0.23%, Cu 0.13-0.25%, Mo≤0.15%, Nb 0.02-0.04%, Ti 0.01-0.02%, Alt 0.02-0.05%, and a strengthening equivalent Req is 0.43-0.57%; a continuous casting, controlling   ",
+        "adjudicated_text_sha256": "966ca0f58955370c69cf27f960b89996f1cbd336b5f60278165919f226fb2088",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "fracture",
+          "steel"
+         ],
+         "distinguishing_terms_covered": [
+          "fracture",
+          "steel"
+         ],
+         "distinguishing_terms_surviving": [
+          "additively",
+          "crack",
+          "degradation",
+          "embrittlement",
+          "fatigue",
+          "hydrogen",
+          "insert",
+          "joint",
+          "manufactured",
+          "material",
+          "mechanism",
+          "mitigating",
+          "pearlite",
+          "rail",
+          "resistant",
+          "thermite",
+          "weldment"
+         ],
+         "coverage_ratio": 0.105,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "CN_224441433_U_20260703",
+         "title": "Adjustable punching steel plate integrated fixing forceps for long bone fracture",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/011-163-905-812-376",
+         "assignee": "['TAIYUAN DEAO ARTIFICIAL LIMB ORTHOPEDIC REHABILITATION TECH INDUSTRY CO LTD']",
+         "publication_date": "2026-07-03"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_224441433_U_20260703"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Adjustable punching steel plate integrated fixing forceps for long bone fracture The utility model relates to the technical field of orthopedic medical instruments, in particular to long bone fracture adjustable punching steel plate integrated fixing forceps which comprise a first forceps body and a second forceps body, the first forceps body and the second forceps body are hinged in a crossed mode, a first clamping portion is arranged at the top of the first forceps body, and  The utility model relates to the technical field of orthopedic medical instruments, in particular to long bone fracture adjustable punching steel plate integrated fixing forceps which comprise a first forceps body and a second forceps body, the first forceps body and the second forceps body are hinged in a crossed mode, a first clamping portion is arranged at the top of the first forceps body, and a plurality of short needles are arranged on the inner surface of the first clamping portion. A second clamping part is arranged at the top of the second clamp body, the second clamping part comprises a fixing plate and a clamping block, the clamping block is in sliding connection with the inner side of the fixing ",
+        "adjudicated_text_sha256": "d0737797d9fabdff8119ee4d674037519b4a1f179a8cac344990e82adf0e622f",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "fracture",
+          "steel"
+         ],
+         "distinguishing_terms_covered": [
+          "fracture",
+          "steel"
+         ],
+         "distinguishing_terms_surviving": [
+          "additively",
+          "crack",
+          "degradation",
+          "embrittlement",
+          "fatigue",
+          "hydrogen",
+          "insert",
+          "joint",
+          "manufactured",
+          "material",
+          "mechanism",
+          "mitigating",
+          "pearlite",
+          "rail",
+          "resistant",
+          "thermite",
+          "weldment"
+         ],
+         "coverage_ratio": 0.105,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-04",
+        "representative": {
+         "patent_id": "CN_122221500_A_20260616",
+         "title": "Rubber fatigue fracture phase field simulation method based on parameter joint inversion and heat transfer analogy",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/047-998-091-546-831",
+         "assignee": "['UNIV SOUTHWEST PETROLEUM']",
+         "publication_date": "2026-06-16"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_122221500_A_20260616"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Rubber fatigue fracture phase field simulation method based on parameter joint inversion and heat transfer analogy The invention discloses a rubber fatigue fracture phase field simulation method based on parameter joint inversion and heat transfer analogy, and the method comprises the steps: obtaining rubber mechanics and fatigue related data through a test, fitting a hyperelastic constitutive model to obtain material parameters, building a tearing and fatigue fracture finite element model, and carrying out th  ",
+        "adjudicated_text_sha256": "355735a4d0bb4a942f69181e5570aad2fe00863841c86ee308d4fe82a6279b43",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "fatigue",
+          "fracture",
+          "joint"
+         ],
+         "distinguishing_terms_covered": [
+          "fatigue",
+          "fracture",
+          "joint",
+          "material"
+         ],
+         "distinguishing_terms_surviving": [
+          "additively",
+          "crack",
+          "degradation",
+          "embrittlement",
+          "hydrogen",
+          "insert",
+          "manufactured",
+          "mechanism",
+          "mitigating",
+          "pearlite",
+          "rail",
+          "resistant",
+          "steel",
+          "thermite",
+          "weldment"
+         ],
+         "coverage_ratio": 0.211,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-05",
+        "representative": {
+         "patent_id": "WO_2026152867_A1_20260723",
+         "title": "FALL-PREVENTION DEVICE FOR STEEL GRID AND ANTI-FALL STEEL GRID",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/142-033-556-137-732",
+         "assignee": "['INSPECTION & CERTIFICATION CO LTD MCC']",
+         "publication_date": "2026-07-23"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "WO_2026152867_A1_20260723"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "FALL-PREVENTION DEVICE FOR STEEL GRID AND ANTI-FALL STEEL GRID Provided in the present invention are a fall-prevention device for a steel grid and an anti-fall steel grid. The steel grid comprises a support column and a grid body, wherein a steel grid bearing is mounted at the top of the support column, and the grid body comprises a bearing spherical joint and grid members and is welded to the steel grid bearing via the bearing spherical joint. The fall-preve  ",
+        "adjudicated_text_sha256": "551553c293fa7302350f47659e0b40681349e5501e0de8c4eb179a0cadda0f9b",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "joint",
+          "steel"
+         ],
+         "distinguishing_terms_covered": [
+          "joint",
+          "steel"
+         ],
+         "distinguishing_terms_surviving": [
+          "additively",
+          "crack",
+          "degradation",
+          "embrittlement",
+          "fatigue",
+          "fracture",
+          "hydrogen",
+          "insert",
+          "manufactured",
+          "material",
+          "mechanism",
+          "mitigating",
+          "pearlite",
+          "rail",
+          "resistant",
+          "thermite",
+          "weldment"
+         ],
+         "coverage_ratio": 0.105,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 5,
+      "n_search_errors": 0,
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "additively",
+       "crack",
+       "degradation",
+       "embrittlement",
+       "fatigue",
+       "fracture",
+       "hydrogen",
+       "insert",
+       "joint",
+       "manufactured",
+       "material",
+       "mechanism",
+       "mitigating",
+       "pearlite",
+       "rail",
+       "resistant",
+       "steel",
+       "thermite",
+       "weldment"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03",
+      "PA-FAM-04",
+      "PA-FAM-05"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.652,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 0.737,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 0.984,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.808,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.6,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.82
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.667 -> 0.737 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T04:09:51+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.145,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.667,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.873,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.67,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.4,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.78,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.652,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.737,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 0.984,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.808,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.6,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.82,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "finished_at": "2026-08-31T04:09:51+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.67,
+  "final_i_average": 0.808,
+  "baseline_q_average": 0.78,
+  "final_q_average": 0.82,
+  "iterations_run": 2,
+  "keeps": 2
+ }
+}

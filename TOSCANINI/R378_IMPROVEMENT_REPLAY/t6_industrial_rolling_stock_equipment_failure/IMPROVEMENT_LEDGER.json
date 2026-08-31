@@ -1,0 +1,1104 @@
+{
+ "ledger": "IMPROVEMENT_LEDGER (R378 TECHNICAL IMPROVEMENT ENGINE)",
+ "version": "1.0.0",
+ "loop": "CANDIDATE -> DIAGNOSE WEAKNESS -> IDENTIFY LIMITING FEATURE -> GENERATE CONTROLLED MUTATION -> RE-EVALUATE EVIDENCE/MECHANISM/PRIOR ART -> RE-SCORE -> KEEP OR KILL -> REPEAT",
+ "collision_mode": "REPLAY_CACHE",
+ "live_sources": null,
+ "evaluators_registered": [
+  {
+   "evaluator_id": "term_rule_v1",
+   "fidelity_tier": "TERM_RULE",
+   "evidence_rank": 3
+  }
+ ],
+ "q_instrument": "discovery_fabric/benchmark/candidate_quality.py (FROZEN, hash-pinned, imported read-only)",
+ "i_instrument": "discovery_fabric/benchmark/invention_quality.py (R377, imported read-only)",
+ "thresholds": {
+  "SPAN_DERIVATION_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the engine's own span-derivation rule (candidate_diversity.span_derivation_check): ratio < 0.20 = SPAN_UNDERIVED. A MECHANISM_STRENGTHENING mutation must CLEAR this floor — the same rule that gates the grid, not a new one."
+  },
+  "EVIDENCE_SUPPORT_MIN": {
+   "value": 0.2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "I1's underived flag fires below 0.20; an EVIDENCE_DERIVED_CONSTRAINT mutation must clear the same floor on evidence_support."
+  },
+  "DOMAIN_OVERLAP_MIN": {
+   "value": 1,
+   "epistemic_class": "ENGINEERING",
+   "justification": "REPLAY_CACHE re-adjudication is valid only while the mutated candidate stays in the domain the cached art was found FOR. Guard: >= 1 NON-generic technical term shared between the child's mechanism+intervention and the cached family corpus. ZERO overlap means the mutation abandoned the domain (measured attack: re-adjudicating a cement-curing intervention against battery art fabricates surviving differentiators — false novelty from stale art). The overlap count is RECORDED on every cache adjudication so thin-domain links are auditable. NOTE: entity-term retention vs the problem CANNOT catch this class — entity terms are problem-derived and unchanged by mutations (measured while writing the guard's tests); it is recorded for audit only."
+  },
+  "MAX_ITERATIONS_DEFAULT": {
+   "value": 2,
+   "epistemic_class": "ENGINEERING",
+   "justification": "the CEO minimum loop is DIAGNOSE -> IMPROVE -> RE-EVALUATE -> IMPROVE AGAIN; two iterations demonstrate repeatability at bounded cost"
+  },
+  "MAX_PROPOSALS_PER_ITERATION": {
+   "value": 3,
+   "epistemic_class": "ENGINEERING",
+   "justification": "bounded proposal budget: three attempts, then the honest no-defensible-mutation verdict"
+  }
+ },
+ "started_at": "2026-08-31T04:09:09+00:00Z",
+ "iterations": [
+  {
+   "iteration": 1,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.071,
+      "weakness_kind": "UNDERIVED",
+      "why_weak": "measured 0.071 < STRONG floor 0.7; underived_flag set (span_support=0.5, evidence_support=0.071) — the quoted span and/or evidence does not contain the mechanism's vocabulary",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "measured_value": 0.632,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.632 < STRONG floor 0.7",
+      "mutation_type": "DIFFERENTIATOR"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [
+     {
+      "dimension": "I4_NEW_TECHNICAL_RELATIONSHIP",
+      "state": "UNMEASURABLE_TERSE_MECHANISM",
+      "what_is_missing": "no adjudicated family text stored — pair novelty vs found art is unmeasured",
+      "consequence": "no mutation targets this dimension until the gap closes (Art. XXV)"
+     }
+    ],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:1b0b3367b86e",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "d75ed30687bcea0e6e705172d4a67699ca35e16aa63b1e620487c8b1e46e8021",
+     "output_hash": "1b0b3367b86ed36c91f1b42eb9e32efb4b9003358c28468c49347c272d7adca2",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Condition monitoring approaches connected to the application of sensors for rail vehicle subsystem monitoring",
+      "INTERVENTION": "Deploy vibration and temperature sensors on draft gear mechanisms and journal bearings, connected to an onboard processing unit that analyzes data patterns indicative of wear or overheating",
+      "EXPECTED_EFFECT": "Detection of equipment degradation during low-speed operations (yard switching) before components reach critical failure points at mainline speeds",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "The evolution of the approaches applied to rail systems' condition monitoring has followed manual maintenance, through methods connected to the application of sensors, up to the currently discussed methods and techniques focused on the mutual use of automation, data processing, and exchange.",
+      "SOURCE_EVIDENCE_ID": "europepmc:34300450",
+      "EXPERIMENT": "Compare the candidate sensor-based condition monitoring approach against traditional manual maintenance methods to evaluate detection efficacy during yard switching operations",
+      "EXPERIMENT_BASELINE": "manual maintenance",
+      "EXPERIMENT_EIG": "0.85",
+      "CONSTRAINT_DERIVED": "Condition monitoring must use methods connected to the application of sensors for rail vehicle subsystem monitoring",
+      "MUTATION_REASON": "Repairs the underived mechanism by anchoring it in the evidence's technical vocabulary about sensor-based condition monitoring approaches"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:34300450",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.368,
+       "evidence_support_cleared": 0.368,
+       "constraint_traceable_to_evidence": "Condition monitoring must use methods connected to the application of sensors for rail vehicle subsystem monitoring"
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T04:09:14+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:051cc3050c27",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.071,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:1b0b3367b86e",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "d75ed30687bcea0e6e705172d4a67699ca35e16aa63b1e620487c8b1e46e8021",
+     "output_hash": "1b0b3367b86ed36c91f1b42eb9e32efb4b9003358c28468c49347c272d7adca2",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:34300450",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.368,
+      "evidence_support_cleared": 0.368,
+      "constraint_traceable_to_evidence": "Condition monitoring must use methods connected to the application of sensors for rail vehicle subsystem monitoring"
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T04:09:14+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "sensor-based condition monitoring",
+      "after": "Condition monitoring approaches connected to the application of sensors for rail vehicle subsystem monitoring"
+     },
+     "intervention": {
+      "before": "Deploy vibration and temperature sensors on draft gear mechanisms and journal bearings, connected to an onboard processing unit that analyzes data patterns indicative of wear or overheating",
+      "after": "Deploy vibration and temperature sensors on draft gear mechanisms and journal bearings, connected to an onboard processing unit that analyzes data patterns indicative of wear or overheating"
+     },
+     "mechanism_source_span": {
+      "before": "methods connected to the application of sensors",
+      "after": "The evolution of the approaches applied to rail systems' condition monitoring has followed manual maintenance, through methods connected to the application of sensors, up to the currently discussed methods and techniques focused on the mutual use of automation, data processing, and exchange."
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:engineering_infeasibility",
+      "con:collision:adjacent",
+      "freight rolling running electrical systems stock",
+      "condition monitoring sensor based",
+      "sensors gear mechanisms journal bearings overheating draft vibration",
+      "freight rolling running electrical systems stock"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "e04e2d1a5fc631944d1788d5e6407b4d48e1fd098ce43c324e3b1fef289d4edf",
+    "child_spec_hash": null,
+    "reason": "Repairs the underived mechanism by anchoring it in the evidence's technical vocabulary about sensor-based condition monitoring approaches",
+    "applied_at": "2026-08-31T04:09:14+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T04:09:14+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "bearing",
+      "condition",
+      "draft",
+      "gear",
+      "journal",
+      "mechanism",
+      "overheating"
+     ],
+     "entity_retention_vs_problem": 1.0,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:3 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "US_12721098_B2_20260825",
+         "title": "Substrate processing system and condition monitoring method",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/009-913-685-499-186",
+         "assignee": "['Tokyo Electron Limited']",
+         "publication_date": "2026-08-25"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_12721098_B2_20260825"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Substrate processing system and condition monitoring method A substrate processing system is provided with: a substrate processing apparatus including a loading/unloading port for a substrate and configured to execute predetermined processing on the substrate; a transfer device connected to the substrate processing apparatus via an opening/closing mechanism configured to open/close the loading/unloading port, and including a substrate transfer mechanism co  ",
+        "adjudicated_text_sha256": "524b653053f49a15e83dbeaa2ed65761576bb651680e2e4ed6d86b3467779ec7",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "condition",
+          "connected",
+          "mechanism",
+          "monitoring"
+         ],
+         "distinguishing_terms_covered": [
+          "connected",
+          "mechanism",
+          "processing"
+         ],
+         "distinguishing_terms_surviving": [
+          "analyze",
+          "bearing",
+          "data",
+          "deploy",
+          "draft",
+          "gear",
+          "indicative",
+          "journal",
+          "onboard",
+          "overheating",
+          "pattern",
+          "sensor",
+          "temperature",
+          "unit",
+          "vibration",
+          "wear"
+         ],
+         "coverage_ratio": 0.158,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "US_20260232422_A1_20260813",
+         "title": "DETECTING AND MONITORING DEVELOPMENT OF A DENTAL CONDITION",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/042-330-112-943-878",
+         "assignee": "['3SHAPE AS']",
+         "publication_date": "2026-08-13"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260232422_A1_20260813"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "DETECTING AND MONITORING DEVELOPMENT OF A DENTAL CONDITION A method, user interface and system for detecting and monitoring development of a dental condition. In particular, detecting and monitoring such a development by comparing digital 3D representations of the patient's set of teeth recorded at a first and a second point in time. For example, determining tooth movement for at least one tooth between the first and second point in time based on derived   ",
+        "adjudicated_text_sha256": "b0e390062c0ff804aa8a94727edf51d5264ea5890bfbf049ee680de4cf699e2f",
+        "coverage": {
+         "coverage_class": "MECHANISM_ONLY",
+         "mechanism_overlap_terms": [
+          "condition",
+          "monitoring"
+         ],
+         "distinguishing_terms_covered": [],
+         "distinguishing_terms_surviving": [
+          "analyze",
+          "bearing",
+          "connected",
+          "data",
+          "deploy",
+          "draft",
+          "gear",
+          "indicative",
+          "journal",
+          "mechanism",
+          "onboard",
+          "overheating",
+          "pattern",
+          "processing",
+          "sensor",
+          "temperature",
+          "unit",
+          "vibration",
+          "wear"
+         ],
+         "coverage_ratio": 0.0,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "CN_122108767_A_20260529",
+         "title": "Quality detection device for flexible freight bag production based on intelligent sensor",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/128-873-374-787-51X",
+         "assignee": "['SHANDONG LIANCHEN MACHINERY EQUIPMENT CO LTD']",
+         "publication_date": "2026-05-29"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_122108767_A_20260529"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Quality detection device for flexible freight bag production based on intelligent sensor The invention relates to the technical field of flexible freight bag quality detection devices, and discloses a flexible freight bag production quality detection device based on an intelligent sensor, which comprises a test frame, the inner wall of the test frame is slidably connected with a sliding column through a spring, and the bottom of the sliding column is fixedly connected with a circular   The invention relates to the technical field of flexible freight bag quality detection devices, and discloses a flexible freight bag production quality detection device based on an intelligent sensor, which comprises a test frame, the inner wall of the test frame is slidably connected with a sliding column through a spring, and the bottom of the sliding column is fixedly connected with a circular plate. The top of the circular plate is fixedly connected with the bottom of a limiting column, the bottom of the circular plate is fixedly connected with a hook, and the circumferential surface of the hook is slidably connected with a long plate. Meanwhile, the sliding columns move downwards to be buffered ",
+        "adjudicated_text_sha256": "0115231222e8ce5bfb686887f4891d7736809d36dcc717e98278fc44df90dd48",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "connected",
+          "sensor"
+         ],
+         "distinguishing_terms_covered": [
+          "connected",
+          "sensor"
+         ],
+         "distinguishing_terms_surviving": [
+          "analyze",
+          "bearing",
+          "data",
+          "deploy",
+          "draft",
+          "gear",
+          "indicative",
+          "journal",
+          "mechanism",
+          "onboard",
+          "overheating",
+          "pattern",
+          "processing",
+          "temperature",
+          "unit",
+          "vibration",
+          "wear"
+         ],
+         "coverage_ratio": 0.105,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 3,
+      "n_search_errors": 0,
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "analyze",
+       "bearing",
+       "connected",
+       "data",
+       "deploy",
+       "draft",
+       "gear",
+       "indicative",
+       "journal",
+       "mechanism",
+       "onboard",
+       "overheating",
+       "pattern",
+       "processing",
+       "sensor",
+       "temperature",
+       "unit",
+       "vibration",
+       "wear"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.211,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 0.632,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.702,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.7
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.071 -> 0.211 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [
+      "I4_NEW_TECHNICAL_RELATIONSHIP"
+     ],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T04:09:14+00:00Z"
+   }
+  },
+  {
+   "iteration": 2,
+   "diagnosis": {
+    "limiting_features": [
+     {
+      "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "measured_value": 0.211,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.211 < STRONG floor 0.7",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+     },
+     {
+      "dimension": "I2_DIFFERENTIATOR_TECHNICAL_MEANING",
+      "measured_value": 0.632,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.632 < STRONG floor 0.7",
+      "mutation_type": "DIFFERENTIATOR"
+     },
+     {
+      "dimension": "I5_EXPERIMENT_DISCRIMINATION",
+      "measured_value": 0.667,
+      "weakness_kind": "LOW_SCORE",
+      "why_weak": "measured 0.667 < STRONG floor 0.7",
+      "mutation_type": "EXPERIMENT_DISCRIMINATION"
+     }
+    ],
+    "evidence_gaps": [],
+    "target": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT"
+    }
+   },
+   "proposals": [
+    {
+     "proposal_id": "prop:913d41dca3bf",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "a25e7871ac097ae2bc449329f688d43a420f08399ac71e0f1f2869c513c8f01e",
+     "output_hash": "913d41dca3bf8ad735d1b1feb5e2b24806379be69ad73cf2be7abe819156da0f",
+     "fields": {
+      "MUTATION_TYPE": "EVIDENCE_DERIVED_CONSTRAINT",
+      "MECHANISM": "Condition monitoring approaches connected to the application of sensors for rail vehicle subsystem monitoring",
+      "INTERVENTION": "Deploy vibration and temperature sensors on draft gear mechanisms and journal bearings, connected to an onboard processing unit that analyzes data patterns indicative of wear or overheating, utilizing Wireless Sensor Networks (WSNs) for the railway environment",
+      "EXPECTED_EFFECT": "Detection of equipment degradation during low-speed operations (yard switching) before components reach critical failure points at mainline speeds",
+      "FALSIFICATION_TEST": "falsification_test_from_candidate",
+      "MECHANISM_SOURCE_SPAN": "the emergence of Wireless Sensor Networks (WSNs) for the railway environment",
+      "SOURCE_EVIDENCE_ID": "europepmc:28635672",
+      "EXPERIMENT": "Compare the performance of the WSN-enabled condition monitoring system against traditional wired sensor systems in detecting draft gear and bearing failures under simulated freight duty cycles",
+      "EXPERIMENT_BASELINE": "traditional wired sensor systems",
+      "EXPERIMENT_EIG": "0.65",
+      "CONSTRAINT_DERIVED": "The condition monitoring system must utilize Wireless Sensor Networks (WSNs) specifically designed for railway environmental conditions",
+      "MUTATION_REASON": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by incorporating the specific technical term \"Wireless Sensor Networks (WSNs)\" directly from the evidence text"
+     },
+     "validation": {
+      "valid": true,
+      "stage": "VALIDATION",
+      "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+      "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+      "checks": {
+       "mutation_type_matches_diagnosis": true,
+       "span_evidence_exists": "europepmc:28635672",
+       "span_verbatim_in_evidence": true,
+       "evidence_support": 0.208,
+       "evidence_support_cleared": 0.208,
+       "constraint_traceable_to_evidence": "The condition monitoring system must utilize Wireless Sensor Networks (WSNs) specifically designed for railway environme"
+      },
+      "reasons": [],
+      "validated_at": "2026-08-31T04:09:19+00:00Z"
+     }
+    }
+   ],
+   "mutation_applied": {
+    "chain": "ORIGINAL -> DIAGNOSTIC -> MUTATION -> NEW CANDIDATE",
+    "mutation_id": "mut:63cbdcef0920",
+    "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+    "diagnostic_trigger": {
+     "dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "measured_before": 0.211,
+     "basis": "R378 evaluator-contract diagnosis (deterministic)"
+    },
+    "proposal_provenance": {
+     "proposal_id": "prop:913d41dca3bf",
+     "provider": "zai",
+     "model": "glm-4-plus",
+     "prompt_hash": "a25e7871ac097ae2bc449329f688d43a420f08399ac71e0f1f2869c513c8f01e",
+     "output_hash": "913d41dca3bf8ad735d1b1feb5e2b24806379be69ad73cf2be7abe819156da0f",
+     "llm_is_untrusted_proposer": true
+    },
+    "validation": {
+     "valid": true,
+     "stage": "VALIDATION",
+     "target_dimension": "I1_MECHANISM_EVIDENCE_DERIVATION",
+     "mutation_type": "EVIDENCE_DERIVED_CONSTRAINT",
+     "checks": {
+      "mutation_type_matches_diagnosis": true,
+      "span_evidence_exists": "europepmc:28635672",
+      "span_verbatim_in_evidence": true,
+      "evidence_support": 0.208,
+      "evidence_support_cleared": 0.208,
+      "constraint_traceable_to_evidence": "The condition monitoring system must utilize Wireless Sensor Networks (WSNs) specifically designed for railway environme"
+     },
+     "reasons": [],
+     "validated_at": "2026-08-31T04:09:19+00:00Z"
+    },
+    "fields_changed": {
+     "mechanism": {
+      "before": "Condition monitoring approaches connected to the application of sensors for rail vehicle subsystem monitoring",
+      "after": "Condition monitoring approaches connected to the application of sensors for rail vehicle subsystem monitoring"
+     },
+     "intervention": {
+      "before": "Deploy vibration and temperature sensors on draft gear mechanisms and journal bearings, connected to an onboard processing unit that analyzes data patterns indicative of wear or overheating",
+      "after": "Deploy vibration and temperature sensors on draft gear mechanisms and journal bearings, connected to an onboard processing unit that analyzes data patterns indicative of wear or overheating, utilizing Wireless Sensor Networks (WSNs) for the railway environment"
+     },
+     "mechanism_source_span": {
+      "before": "The evolution of the approaches applied to rail systems' condition monitoring has followed manual maintenance, through methods connected to the application of sensors, up to the currently discussed methods and techniques focused on the mutual use of automation, data processing, and exchange.",
+      "after": "the emergence of Wireless Sensor Networks (WSNs) for the railway environment"
+     }
+    },
+    "inherited_negatives": {
+     "uncertainty_ids": [
+      "con:attack:engineering_infeasibility",
+      "con:collision:adjacent",
+      "freight rolling running electrical systems stock",
+      "condition monitoring sensor based",
+      "sensors gear mechanisms journal bearings overheating draft vibration",
+      "freight rolling running electrical systems stock"
+     ],
+     "collision_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03"
+     ],
+     "source_errors": []
+    },
+    "parent_spec_hash": "35d8a6db3113f72d1ce8ac23664693e175e1bcc4946db5084652513223529f6b",
+    "child_spec_hash": null,
+    "reason": "Repairs I1_MECHANISM_EVIDENCE_DERIVATION weakness by incorporating the specific technical term \"Wireless Sensor Networks (WSNs)\" directly from the evidence text",
+    "applied_at": "2026-08-31T04:09:19+00:00Z"
+   },
+   "re_evaluation": {
+    "collision_mode": "REPLAY_CACHE",
+    "re_evaluated_at": "2026-08-31T04:09:19+00:00Z",
+    "re_adjudication": {
+     "mode": "REPLAY_CACHE",
+     "valid": true,
+     "domain_overlap_terms": [
+      "bearing",
+      "condition",
+      "draft",
+      "gear",
+      "journal",
+      "mechanism",
+      "overheating"
+     ],
+     "entity_retention_vs_problem": 1.0,
+     "resolution": {
+      "state": "RESOLVED_DIFFERENTIATED",
+      "epistemic_class": "SEARCH_RESULT",
+      "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+      "evidence_tier_summary": "CLAIMS:0 ABSTRACT:3 TITLE:0",
+      "per_family": [
+       {
+        "family_id": "PA-FAM-01",
+        "representative": {
+         "patent_id": "US_12721098_B2_20260825",
+         "title": "Substrate processing system and condition monitoring method",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/009-913-685-499-186",
+         "assignee": "['Tokyo Electron Limited']",
+         "publication_date": "2026-08-25"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_12721098_B2_20260825"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Substrate processing system and condition monitoring method A substrate processing system is provided with: a substrate processing apparatus including a loading/unloading port for a substrate and configured to execute predetermined processing on the substrate; a transfer device connected to the substrate processing apparatus via an opening/closing mechanism configured to open/close the loading/unloading port, and including a substrate transfer mechanism co  ",
+        "adjudicated_text_sha256": "524b653053f49a15e83dbeaa2ed65761576bb651680e2e4ed6d86b3467779ec7",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "condition",
+          "connected",
+          "mechanism",
+          "monitoring"
+         ],
+         "distinguishing_terms_covered": [
+          "connected",
+          "mechanism",
+          "processing"
+         ],
+         "distinguishing_terms_surviving": [
+          "analyze",
+          "bearing",
+          "data",
+          "deploy",
+          "draft",
+          "environment",
+          "gear",
+          "indicative",
+          "journal",
+          "network",
+          "onboard",
+          "overheating",
+          "pattern",
+          "railway",
+          "sensor",
+          "temperature",
+          "unit",
+          "vibration",
+          "wear",
+          "wireless",
+          "wsn"
+         ],
+         "coverage_ratio": 0.125,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-02",
+        "representative": {
+         "patent_id": "US_20260232422_A1_20260813",
+         "title": "DETECTING AND MONITORING DEVELOPMENT OF A DENTAL CONDITION",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/042-330-112-943-878",
+         "assignee": "['3SHAPE AS']",
+         "publication_date": "2026-08-13"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "US_20260232422_A1_20260813"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "DETECTING AND MONITORING DEVELOPMENT OF A DENTAL CONDITION A method, user interface and system for detecting and monitoring development of a dental condition. In particular, detecting and monitoring such a development by comparing digital 3D representations of the patient's set of teeth recorded at a first and a second point in time. For example, determining tooth movement for at least one tooth between the first and second point in time based on derived   ",
+        "adjudicated_text_sha256": "b0e390062c0ff804aa8a94727edf51d5264ea5890bfbf049ee680de4cf699e2f",
+        "coverage": {
+         "coverage_class": "MECHANISM_ONLY",
+         "mechanism_overlap_terms": [
+          "condition",
+          "monitoring"
+         ],
+         "distinguishing_terms_covered": [],
+         "distinguishing_terms_surviving": [
+          "analyze",
+          "bearing",
+          "connected",
+          "data",
+          "deploy",
+          "draft",
+          "environment",
+          "gear",
+          "indicative",
+          "journal",
+          "mechanism",
+          "network",
+          "onboard",
+          "overheating",
+          "pattern",
+          "processing",
+          "railway",
+          "sensor",
+          "temperature",
+          "unit",
+          "vibration",
+          "wear",
+          "wireless",
+          "wsn"
+         ],
+         "coverage_ratio": 0.0,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       },
+       {
+        "family_id": "PA-FAM-03",
+        "representative": {
+         "patent_id": "CN_122108767_A_20260529",
+         "title": "Quality detection device for flexible freight bag production based on intelligent sensor",
+         "source_id": "lens_patent",
+         "source_url": "https://www.lens.org/patent/128-873-374-787-51X",
+         "assignee": "['SHANDONG LIANCHEN MACHINERY EQUIPMENT CO LTD']",
+         "publication_date": "2026-05-29"
+        },
+        "family_size": 1,
+        "member_patent_ids": [
+         "CN_122108767_A_20260529"
+        ],
+        "evidence_tier": "ABSTRACT",
+        "claims_fetch_status": "CACHED (adjudicated text of record)",
+        "claims_fetch_path": "replay_cache",
+        "adjudicated_text_excerpt": "Quality detection device for flexible freight bag production based on intelligent sensor The invention relates to the technical field of flexible freight bag quality detection devices, and discloses a flexible freight bag production quality detection device based on an intelligent sensor, which comprises a test frame, the inner wall of the test frame is slidably connected with a sliding column through a spring, and the bottom of the sliding column is fixedly connected with a circular   The invention relates to the technical field of flexible freight bag quality detection devices, and discloses a flexible freight bag production quality detection device based on an intelligent sensor, which comprises a test frame, the inner wall of the test frame is slidably connected with a sliding column through a spring, and the bottom of the sliding column is fixedly connected with a circular plate. The top of the circular plate is fixedly connected with the bottom of a limiting column, the bottom of the circular plate is fixedly connected with a hook, and the circumferential surface of the hook is slidably connected with a long plate. Meanwhile, the sliding columns move downwards to be buffered ",
+        "adjudicated_text_sha256": "0115231222e8ce5bfb686887f4891d7736809d36dcc717e98278fc44df90dd48",
+        "coverage": {
+         "coverage_class": "PARTIAL_COVER",
+         "mechanism_overlap_terms": [
+          "connected",
+          "sensor"
+         ],
+         "distinguishing_terms_covered": [
+          "connected",
+          "sensor"
+         ],
+         "distinguishing_terms_surviving": [
+          "analyze",
+          "bearing",
+          "data",
+          "deploy",
+          "draft",
+          "environment",
+          "gear",
+          "indicative",
+          "journal",
+          "mechanism",
+          "network",
+          "onboard",
+          "overheating",
+          "pattern",
+          "processing",
+          "railway",
+          "temperature",
+          "unit",
+          "vibration",
+          "wear",
+          "wireless",
+          "wsn"
+         ],
+         "coverage_ratio": 0.083,
+         "thresholds_applied": {
+          "min_mechanism_overlap": 2,
+          "anticipation_coverage_ratio": 0.8
+         }
+        }
+       }
+      ],
+      "n_families": 3,
+      "n_search_errors": 0,
+      "thresholds": {
+       "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+        "value": 3,
+        "epistemic_class": "ENGINEERING",
+        "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+        "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+       },
+       "MIN_MECHANISM_OVERLAP": {
+        "value": 2,
+        "epistemic_class": "ENGINEERING",
+        "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+        "uncertainty": "term overlap is a proxy for mechanism identity"
+       },
+       "ANTICIPATION_COVERAGE_RATIO": {
+        "value": 0.8,
+        "epistemic_class": "ENGINEERING",
+        "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+        "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+       },
+       "MAX_QUERY_TERMS": {
+        "value": 6,
+        "epistemic_class": "ENGINEERING",
+        "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+       },
+       "ABSTRACT_TIER_MIN_CHARS": {
+        "value": 80,
+        "epistemic_class": "ENGINEERING",
+        "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+       }
+      },
+      "surviving_differentiators": [
+       "analyze",
+       "bearing",
+       "connected",
+       "data",
+       "deploy",
+       "draft",
+       "environment",
+       "gear",
+       "indicative",
+       "journal",
+       "mechanism",
+       "network",
+       "onboard",
+       "overheating",
+       "pattern",
+       "processing",
+       "railway",
+       "sensor",
+       "temperature",
+       "unit",
+       "vibration",
+       "wear",
+       "wireless",
+       "wsn"
+      ]
+     },
+     "cache_disclosure": "the SEARCH was cached (Lens 429-exhausted / Google 503 / PatentBear metered — measured this cycle); the ADJUDICATION (coverage + state machine) fully re-ran against the hash-custodied family texts for the MUTATED profile — no score was inherited",
+     "cached_family_ids": [
+      "PA-FAM-01",
+      "PA-FAM-02",
+      "PA-FAM-03"
+     ]
+    },
+    "prior_art_status": "RESOLVED_DIFFERENTIATED",
+    "i_dimensions": {
+     "I1_MECHANISM_EVIDENCE_DERIVATION": {
+      "score": 0.25,
+      "state": "MEASURED"
+     },
+     "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+      "score": 0.708,
+      "state": "MEASURED"
+     },
+     "I3_RECOMBINATION_RISK": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I4_NEW_TECHNICAL_RELATIONSHIP": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "I5_EXPERIMENT_DISCRIMINATION": {
+      "score": 0.667,
+      "state": "MEASURED"
+     }
+    },
+    "i_flags": {
+     "underived_mechanism": false,
+     "recombination_only": false
+    },
+    "i_average": 0.725,
+    "q_dimensions": {
+     "Q1_EVIDENCE_BINDING": {
+      "score": 0.5,
+      "state": "MEASURED"
+     },
+     "Q2_PRIOR_ART_SPECIFICITY": {
+      "score": 0.0,
+      "state": "MEASURED"
+     },
+     "Q3_PRIOR_ART_RESOLUTION": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q4_EXPERIMENT_DECISIVENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     },
+     "Q5_CHAIN_COMPLETENESS": {
+      "score": 1.0,
+      "state": "MEASURED"
+     }
+    },
+    "q_average": 0.7
+   },
+   "decision": {
+    "action": "KEEP",
+    "improved": true,
+    "checks": {
+     "targeted_dimension": "0.211 -> 0.25 (improved)",
+     "negatives_preserved": true,
+     "no_new_structural_flags": true,
+     "no_unknown_conversion_without_new_evidence": true,
+     "text_gap_conversions_recorded": [],
+     "prior_art_position_not_degraded": true
+    },
+    "reasons": [],
+    "decided_at": "2026-08-31T04:09:19+00:00Z"
+   }
+  }
+ ],
+ "outcome": "IMPROVED",
+ "outcome_reason": "",
+ "baseline": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.071,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.632,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 0.909,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": null,
+    "state": "UNMEASURABLE_TERSE_MECHANISM"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": true,
+   "recombination_only": false
+  },
+  "i_average": 0.57,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.7,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "final": {
+  "i_dimensions": {
+   "I1_MECHANISM_EVIDENCE_DERIVATION": {
+    "score": 0.25,
+    "state": "MEASURED"
+   },
+   "I2_DIFFERENTIATOR_TECHNICAL_MEANING": {
+    "score": 0.708,
+    "state": "MEASURED"
+   },
+   "I3_RECOMBINATION_RISK": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I4_NEW_TECHNICAL_RELATIONSHIP": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "I5_EXPERIMENT_DISCRIMINATION": {
+    "score": 0.667,
+    "state": "MEASURED"
+   }
+  },
+  "i_flags": {
+   "underived_mechanism": false,
+   "recombination_only": false
+  },
+  "i_average": 0.725,
+  "q_dimensions": {
+   "Q1_EVIDENCE_BINDING": {
+    "score": 0.5,
+    "state": "MEASURED"
+   },
+   "Q2_PRIOR_ART_SPECIFICITY": {
+    "score": 0.0,
+    "state": "MEASURED"
+   },
+   "Q3_PRIOR_ART_RESOLUTION": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q4_EXPERIMENT_DECISIVENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   },
+   "Q5_CHAIN_COMPLETENESS": {
+    "score": 1.0,
+    "state": "MEASURED"
+   }
+  },
+  "q_average": 0.7,
+  "prior_art_status": "RESOLVED_DIFFERENTIATED"
+ },
+ "finished_at": "2026-08-31T04:09:19+00:00Z",
+ "outcome_summary": {
+  "baseline_i_average": 0.57,
+  "final_i_average": 0.725,
+  "baseline_q_average": 0.7,
+  "final_q_average": 0.7,
+  "iterations_run": 2,
+  "keeps": 2
+ }
+}
