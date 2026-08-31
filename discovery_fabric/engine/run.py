@@ -726,6 +726,46 @@ class EngineRun:
                     })
                     return
 
+            # ---------- R380: 3D ENGINEERING DESIGN PIPELINE pass -------
+            # CEO 2026-08-31 (R380): TECHNICAL STATE -> PARAMETER MAP ->
+            # PARAMETRIC 3D MODEL (CadQuery+OCCT) -> STEP/STL/GLB ->
+            # GEOMETRY VALIDATION. Runs AFTER the technical pass so the
+            # (possibly improved) spec drives the model, and so any
+            # model-bound mutation already rebuilt geometry at apply
+            # time (T10/K7 gates). NOT_APPLICABLE is the honest verdict
+            # for non-geometric inventions — recorded, never forced;
+            # it never blocks packaging. A model that FAILS geometry
+            # validation is equally honest data: the ledger records it
+            # and packaging proceeds WITHOUT a 3D section (a broken
+            # model must never be smuggled into a package).
+            try:
+                from .cad_pipeline import (
+                    get_parametric_model, run_cad_pass)
+                _three_d_dir = str(self.out / "three_d")
+                spec_rel, cad_ledger = run_cad_pass(
+                    spec_rel, out_dir=_three_d_dir,
+                    provider=_os.environ.get(
+                        "ENGINE_CAD_PROVIDER") or None,
+                    allow_llm=_os.environ.get(
+                        "ENGINE_CAD_LLM", "1") != "0")
+                self._spec = spec_rel
+                self._persist("CAD_PIPELINE_LEDGER.json", cad_ledger)
+                _pm = get_parametric_model(spec_rel)
+                if _pm is not None:
+                    self._persist("PARAMETRIC_MODEL.json", _pm)
+                    self._persist("INVENTION_SPECIFICATION.json",
+                                  spec_rel)
+            except Exception as exc:  # noqa: BLE001 — recorded, never fatal
+                self._persist("CAD_PIPELINE_LEDGER.json", {
+                    "stage": "CAD_PIPELINE_PASS",
+                    "status": "ERROR",
+                    "error": f"{type(exc).__name__}: {exc}",
+                    "consequence": ("the candidate proceeds without a "
+                                    "3D section (honest degradation — "
+                                    "an engine defect never kills "
+                                    "research)"),
+                    "timestamp": utc_now()})
+
             # CEO A1: resolve the package identity through the canonical
             # registry — AFTER survivor selection, so killed candidates
             # burn no number. An explicit self.package_number is a
@@ -839,7 +879,13 @@ class EngineRun:
                 evidence_items=ev_items,
                 collision=getattr(env_view, "collision_results", None),
                 attack=chosen.get("attack"),
-                run_ctx={"run_id": self.run_id})
+                run_ctx={"run_id": self.run_id,
+                         # R380: mutations on model-bound design
+                         # variables export their rebuilt derivatives
+                         # (STEP/STL/GLB/SVG) into the run's three_d
+                         # directory — the geometry gates (T10/K7)
+                         # consume the same rebuild
+                         "cad_out_dir": str(self.out / "three_d")})
             live_sources = [s for s in _os.environ.get(
                 "ENGINE_COLLISION_SOURCES", "").split(",") if s] or None
             ledger = improve_candidate(
@@ -974,7 +1020,13 @@ class EngineRun:
                 evidence_items=ev_items,
                 collision=getattr(env_view, "collision_results", None),
                 attack=chosen.get("attack"),
-                run_ctx={"run_id": self.run_id})
+                run_ctx={"run_id": self.run_id,
+                         # R380: mutations on model-bound design
+                         # variables export their rebuilt derivatives
+                         # (STEP/STL/GLB/SVG) into the run's three_d
+                         # directory — the geometry gates (T10/K7)
+                         # consume the same rebuild
+                         "cad_out_dir": str(self.out / "three_d")})
             ledger = improve_candidate_technical(
                 ctx,
                 collision_mode=_os.environ.get(

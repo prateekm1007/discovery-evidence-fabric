@@ -362,6 +362,12 @@ def validate_technical_mutation(ctx: CandidateContext,
          constraint targeting this parameter
       T8 spec-text sync: the deltas name the changed variable
       T9 MECHANISM_CHANGE: span-backed relation, both endpoints named
+      T10 CAD geometry gate (R380): when the parent spec carries a
+         PARAMETRIC MODEL whose parameter map binds the target
+         parameter, the proposed value must REBUILD into valid
+         geometry (dry-run, no exports) — a numerically-legal mutation
+         that produces an unbuildable design is not defensible
+         (CEO R380: CAD generator -> geometry validates -> KEEP/KILL)
     """
     checks: Dict[str, Any] = {}
     reasons: List[str] = []
@@ -598,6 +604,56 @@ def validate_technical_mutation(ctx: CandidateContext,
                   "the deltas do not name the changed variable — "
                   "prose/state divergence")
 
+    # T10: CAD geometry gate (R380) — the mutation must rebuild into
+    # valid geometry when the target parameter drives the parametric
+    # model. MEASURED on the dry-run rebuild's built solid; a breach,
+    # impossible dimension, or non-manifold result fails here and the
+    # proposal is rejected BEFORE any child is constructed.
+    if kind in ("PARAMETER_CHANGE", "GEOMETRY_CHANGE") and \
+            new_value is not None and target_pid:
+        try:
+            from .cad_pipeline import (  # noqa: PLC0415
+                get_parametric_model, rebuild_with_mutation)
+            parent_model = get_parametric_model(ctx.spec)
+            if parent_model is not None and target_pid in \
+                    (parent_model.get("parameter_map") or {}):
+                _child, geo_rec = rebuild_with_mutation(
+                    parent_model, target_pid, new_value,
+                    mutation_id="dryrun:T10",
+                    reason="T10 dry-run geometry validation",
+                    out_dir=None)   # no exports at gate time
+                gval = ((_child or {}).get("geometry_validation") or {})
+                if geo_rec.get("status") == "UNBOUND_PARAMETER":
+                    _pass("t10_geometry_gate",
+                          "target not bound to the parametric model")
+                elif gval.get("valid"):
+                    _pass("t10_geometry_gate", {
+                        "rebuilt_model_id": _child.get("model_id"),
+                        "measured_wall_mm": (
+                            (_child.get("measurements") or {})
+                            .get("objects", {}).get(
+                                next(iter((_child.get("measurements")
+                                           or {}).get("objects", {}))),
+                                {}).get("min_wall_thickness_mm")),
+                        "checks": {g: c.get("status") for g, c in
+                                   (gval.get("checks") or {}).items()},
+                    })
+                else:
+                    _fail("t10_geometry_gate",
+                          "the mutated value does not rebuild into "
+                          "valid geometry: " + "; ".join(
+                              str(r)[:200] for r in
+                              (gval.get("reasons") or
+                               geo_rec.get("build_errors") or
+                               ["unknown geometry failure"])))
+            else:
+                _pass("t10_geometry_gate",
+                      "no parametric model bound to this parameter — "
+                      "the state-level gates are decisive")
+        except ImportError:
+            _pass("t10_geometry_gate",
+                  "cad_pipeline unavailable (hermetic state-only mode)")
+
     return {"valid": not reasons, "stage": "VALIDATION",
             "mutation_kind": kind, "target_param": target_pid,
             "checks": checks, "reasons": reasons,
@@ -687,6 +743,64 @@ def apply_technical_mutation(ctx: CandidateContext,
              "variables carry their value class; predictions are model "
              "inferences, never measurements")
 
+    # ---- R380 CAD REBUILD: the child's own parametric model ----------
+    # When the parent spec carries a parametric model bound to the
+    # target parameter, the child's model is REBUILT from the
+    # definition with the new value (never inherited derivatives),
+    # exported (STEP/STL/GLB/SVG when an output directory is
+    # configured), re-validated, and attached to the child spec. A
+    # full-validation failure (e.g. non-manifold STL caught only on
+    # export) is recorded on the model — the K7 keep gate consumes it.
+    cad_rebuild: Optional[Dict[str, Any]] = None
+    if kind in ("PARAMETER_CHANGE", "GEOMETRY_CHANGE") and \
+            p is not None and isinstance(p.get("value"), (int, float)) \
+            and not isinstance(p.get("value"), bool):
+        try:
+            from .cad_pipeline import (  # noqa: PLC0415
+                attach_parametric_model, geometry_warrants_3d,
+                get_parametric_model, rebuild_with_mutation)
+            parent_model = get_parametric_model(parent_spec)
+            if parent_model is not None and target_pid in \
+                    (parent_model.get("parameter_map") or {}):
+                out_dir = ((ctx.run_ctx or {}).get("cad_out_dir")
+                           or None)
+                mut_id_ref = f"tmut:{sha256_obj(f)[:12]}"
+                rebuilt, geo_rec = rebuild_with_mutation(
+                    parent_model, target_pid,
+                    float(p["value"]), mutation_id=mut_id_ref,
+                    reason=str(f.get("RATIONALE") or "")[:300],
+                    out_dir=out_dir)
+                if rebuilt is not None:
+                    rebuilt["candidate_id"] = \
+                        f"{spec.get('candidate_id') or 'candidate'}"
+                    spec = attach_parametric_model(
+                        spec, rebuilt, geo_rec,
+                        geometry_warrants_3d(parent_spec))
+                    cad_rebuild = {
+                        "before_model_id": parent_model.get("model_id"),
+                        "after_model_id": rebuilt.get("model_id"),
+                        "param_id": target_pid,
+                        "from_value": old_value,
+                        "to_value": p["value"],
+                        "rebuild_status": geo_rec.get("status"),
+                        "geometry_valid": (rebuilt.get(
+                            "geometry_validation") or {}).get(
+                            "valid"),
+                        "geometry_reasons": (rebuilt.get(
+                            "geometry_validation") or {}).get(
+                            "reasons") or [],
+                        "derived_artifacts": sorted(
+                            (rebuilt.get("derived_artifacts")
+                             or {}).keys()),
+                        "evidence_class": "COMPUTATIONAL_RESULT",
+                    }
+        except ImportError:
+            cad_rebuild = {
+                "status": "CAD_PIPELINE_UNAVAILABLE",
+                "note": "hermetic state-only mode; geometry gates "
+                        "skipped (recorded, never silent)",
+            }
+
     parent_hash = (parent_spec.get("_spec_hash") or sha256_obj(
         {k: v for k, v in parent_spec.items()
          if not k.startswith("_")}))
@@ -726,6 +840,7 @@ def apply_technical_mutation(ctx: CandidateContext,
             "envelope_class": (p or {}).get("range_class"),
         },
         "spec_text_delta": {"mechanism": md, "intervention": idl},
+        "cad_rebuild": cad_rebuild,
         "inherited_negatives": collect_negatives(parent_spec,
                                                  ctx.decisive),
         "parent_spec_hash": parent_hash,
@@ -861,7 +976,10 @@ def keep_or_kill_technical(parent_ctx: CandidateContext,
       K2 constraints: no NEW VIOLATED constraint on the child (vs the
          parent's constraint results); previously UNVERIFIABLE
          constraints may not silently become SATISFIED without new
-         numeric evidence (value-class laundering)
+         numeric evidence — EXTRACTED span-verified values (R379) or
+         the child's own geometry-measured values with valid child
+         geometry + computation log (R380); MODELLED-only satisfaction
+         is laundering
       K3 negatives preserved (CEO rule 10)
       K4 no new structural flags; I1 not regressed (the mutation must
          not de-evidence the mechanism)
@@ -869,7 +987,13 @@ def keep_or_kill_technical(parent_ctx: CandidateContext,
       K6 value classes: EXTRACTED -> EXTRACTED requires a verified span
          (validated at T6); MODELLED stays MODELLED; no UNKNOWN ->
          value without a recorded class
+      K7 R380 geometry: when the mutation touched a model-bound design
+         variable, the child's OWN rebuilt parametric model must pass
+         geometry validation (measured on the built solid; a render is
+         never evidence)
     """
+    from .cad_pipeline import get_parametric_model  # noqa: PLC0415
+
     reasons: List[str] = []
     checks: Dict[str, Any] = {}
 
@@ -928,18 +1052,38 @@ def keep_or_kill_technical(parent_ctx: CandidateContext,
         if (p_cr or {}).get("status") == "UNVERIFIABLE" and \
                 c.get("status") == "SATISFIED":
             # the target's value appeared where the parent had none:
-            # legitimate ONLY if the value's class is EXTRACTED with a
-            # verified span (validated) — MODELLED values may not
-            # SATISFY a constraint the parent could not check
-            tgt = c.get("target")
-            state = get_technical_state(child_ctx.spec) or {}
-            tp = _param(state, str(tgt))
-            vclass = (tp or {}).get("value_class")
-            if vclass != "EXTRACTED":
-                laundered.append(
-                    f"{cid}: UNVERIFIABLE -> SATISFIED via a "
-                    f"{vclass} value (model-declared satisfaction is "
-                    f"certainty laundering — Art. XXV)")
+            # legitimate ONLY with NEW NUMERIC EVIDENCE — either
+            # (i) EXTRACTED: a span-verified evidence value (the R379
+            #  path), or
+            # (ii) GEOMETRY_MEASURED (R380): the child's OWN rebuilt
+            #  parametric model MEASURES the target on the built solid
+            #  with VALID geometry and a computation log (the CEO R380
+            #  loop: CAD generator -> geometry validates -> evaluator).
+            #  A MODELLED state value alone still may not SATISFY a
+            #  constraint the parent could not check (Art. XXV).
+            if c.get("value_source") == \
+                    "GEOMETRY_MEASURED_ON_BUILT_SOLID":
+                child_pm = get_parametric_model(child_ctx.spec)
+                child_gv = (child_pm or {}).get(
+                    "geometry_validation") or {}
+                has_log = bool(((child_pm or {}).get("measurements")
+                                or {}).get("computation_log"))
+                if not (child_gv.get("valid") and has_log):
+                    laundered.append(
+                        f"{cid}: UNVERIFIABLE -> SATISFIED via a "
+                        f"claimed geometry measurement WITHOUT valid "
+                        f"child geometry or a computation log — "
+                        f"forged measurement (Art. VI)")
+            else:
+                tgt = c.get("target")
+                state = get_technical_state(child_ctx.spec) or {}
+                tp = _param(state, str(tgt))
+                vclass = (tp or {}).get("value_class")
+                if vclass != "EXTRACTED":
+                    laundered.append(
+                        f"{cid}: UNVERIFIABLE -> SATISFIED via a "
+                        f"{vclass} value (model-declared satisfaction is "
+                        f"certainty laundering — Art. XXV)")
     checks["no_new_constraint_violation"] = not new_violations
     if new_violations:
         reasons.append(f"new constraint violations on the child: "
@@ -1033,6 +1177,43 @@ def keep_or_kill_technical(parent_ctx: CandidateContext,
     else:
         checks["value_class_provenance"] = str(to_class)
 
+    # K7 — R380 geometry: when the child carries a rebuilt parametric
+    # model (the mutation touched a model-bound design variable), the
+    # CHILD's OWN geometry validation must be VALID. The rebuild is
+    # measured on the built solid (never on the parent's, never on a
+    # render); a full-validation failure detected only at apply time
+    # (e.g. a non-manifold STL derivative) rejects here.
+    child_model = get_parametric_model(child_ctx.spec)
+    cad_mut = (mut.get("cad_rebuild") or {})
+    if child_model is not None and cad_mut:
+        c_gv = child_model.get("geometry_validation") or {}
+        if c_gv.get("valid"):
+            checks["geometry_valid_on_child"] = {
+                "model_id": child_model.get("model_id"),
+                "validator": c_gv.get("validator"),
+                "measured_wall_mm": (
+                    (child_model.get("measurements") or {})
+                    .get("objects", {}).get(
+                        next(iter((child_model.get("measurements")
+                                   or {}).get("objects", {}))),
+                        {}).get("min_wall_thickness_mm")),
+                "note": "geometry validated on the child's OWN rebuilt "
+                        "solid (COMPUTATIONAL_RESULT, Art. XXXVIII)",
+            }
+        else:
+            checks["geometry_valid_on_child"] = \
+                c_gv.get("reasons") or "geometry invalid on child"
+            reasons.append(
+                "geometry_valid_on_child: the child's rebuilt "
+                "parametric model FAILED geometry validation — "
+                + "; ".join(str(r)[:160] for r in
+                            (c_gv.get("reasons") or
+                             ["unknown"])[:3]))
+    else:
+        checks["geometry_valid_on_child"] = (
+            "no parametric model bound to the changed variable — "
+            "the state-level gates are decisive")
+
     action = "KEEP" if not reasons else "REJECT_MUTATION"
     return {"action": action, "checks": checks, "reasons": reasons,
             "decided_at": utc_now()}
@@ -1114,6 +1295,10 @@ def improve_candidate_technical(ctx: CandidateContext,
                                       state; NOT a kill)
       TECHNICALLY_HEALTHY_NO_MUTATION no limiting variable found
       KILLED_NO_DEFENSIBLE_TECHNICAL_MUTATION   no valid proposal
+      KILLED_GEOMETRY_INVALID                  every proposal rebuilt
+                                      to invalid geometry at the R380
+                                      T10 CAD gate (measured on the
+                                      built solid)
       KILLED_NO_IMPROVING_TECHNICAL_MUTATION    valid mutations did not
                                       improve (measured)
       KILLED_CONSTRAINT_WALL         improving directions all blocked
@@ -1327,14 +1512,37 @@ def improve_candidate_technical(ctx: CandidateContext,
                     f"provider unavailability — infrastructure, not a "
                     f"research verdict (Art. XXV); the candidate stands")
             else:
-                ledger["outcome"] = \
-                    "KILLED_NO_DEFENSIBLE_TECHNICAL_MUTATION"
-                ledger["outcome_reason"] = (
-                    f"iteration {iteration}: "
-                    f"{len(it_record['proposals'])} technical mutation "
-                    f"proposal(s) generated; none passed deterministic "
-                    f"validation. No defensible technical improvement "
-                    f"exists. Candidate killed.")
+                # R380: if EVERY proposal died specifically at the T10
+                # CAD geometry gate, the kill is a GEOMETRY kill — the
+                # candidate's improving directions are all
+                # geometrically unbuildable (measured, not asserted)
+                all_geometry = bool(it_record["proposals"]) and all(
+                    any("t10_geometry_gate" in str(r)
+                        for r in (p.get("validation") or {})
+                        .get("reasons") or [])
+                    for p in it_record["proposals"]
+                    if (p.get("validation") or {}).get("reasons"))
+                if all_geometry:
+                    ledger["outcome"] = "KILLED_GEOMETRY_INVALID"
+                    ledger["outcome_reason"] = (
+                        f"iteration {iteration}: "
+                        f"{len(it_record['proposals'])} mutation "
+                        f"proposal(s) proposed; every one rebuilt to "
+                        f"INVALID GEOMETRY (T10 CAD gate — measured on "
+                        f"the built solid). The improving directions "
+                        f"are geometrically unbuildable at this design "
+                        f"point. No defensible technical improvement "
+                        f"exists. Candidate killed.")
+                else:
+                    ledger["outcome"] = \
+                        "KILLED_NO_DEFENSIBLE_TECHNICAL_MUTATION"
+                    ledger["outcome_reason"] = (
+                        f"iteration {iteration}: "
+                        f"{len(it_record['proposals'])} technical "
+                        f"mutation proposal(s) generated; none passed "
+                        f"deterministic validation. No defensible "
+                        f"technical improvement exists. Candidate "
+                        f"killed.")
             ledger["iterations"].append(it_record)
             break
 

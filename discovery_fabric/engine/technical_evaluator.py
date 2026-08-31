@@ -137,11 +137,20 @@ class _Graph:
         return result
 
 
-def evaluate_technical_state(state: Dict[str, Any]) -> Dict[str, Any]:
+def evaluate_technical_state(state: Dict[str, Any],
+                            geometry_measurements: Optional[Dict[str, Any]]
+                            = None) -> Dict[str, Any]:
     """The deterministic analytical evaluation. INPUT: the structured
-    technical state. OUTPUT: the contract's full shape — predictions,
-    constraint results, sensitivity, limiting variable, improvement
-    directions, uncertainty, computation log (provenance)."""
+    technical state; optionally the MEASURED geometry quantities of a
+    validated parametric model (R380 loop order: geometry validation
+    -> technical evaluation). OUTPUT: the contract's full shape —
+    predictions, constraint results, sensitivity, limiting variable,
+    improvement directions, uncertainty, computation log (provenance).
+
+    Geometry-measured constraint checks are declared GEOMETRY_MEASURED
+    (COMPUTATIONAL_RESULT, computation-logged) — they never write back
+    into the state's own values, and state-only callers (no geometry)
+    get byte-identical behavior to R379."""
     params = {p["param_id"]: p for p in
               (state or {}).get("parameters") or []}
     constraints = (state or {}).get("constraints") or []
@@ -182,14 +191,8 @@ def evaluate_technical_state(state: Dict[str, Any]) -> Dict[str, Any]:
             "target": c.get("target"), "bound": c.get("bound"),
             "limit": c.get("limit"), "limit_class": c.get("limit_class"),
         }
-        if target is None or target.get("value") is None or \
-                not isinstance(target.get("value"), (int, float)):
-            result["status"] = "UNVERIFIABLE"
-            result["reason"] = (
-                f"target {c.get('target')} has no numeric value "
-                f"(UNKNOWN) — the constraint cannot be checked at this "
-                f"tier (Art. XXV: unknown is not satisfied)")
-        else:
+        if target is not None and target.get("value") is not None and \
+                isinstance(target.get("value"), (int, float)):
             v = float(target["value"])
             lim = float(c.get("limit"))
             ok = (v <= lim) if c.get("bound") == "<=" else (v >= lim)
@@ -197,6 +200,41 @@ def evaluate_technical_state(state: Dict[str, Any]) -> Dict[str, Any]:
             result["value"] = v
             result["slack"] = round(
                 (lim - v) if c.get("bound") == "<=" else (v - lim), 4)
+        else:
+            # R380: the state target is UNKNOWN, but the geometry may
+            # MEASURE this quantity on the built solid — check it there,
+            # declared as GEOMETRY_MEASURED with its evidence class
+            measured = _geometry_value_for(str(c.get("target") or ""),
+                                           geometry_measurements)
+            if measured is not None:
+                v, src = measured
+                lim = float(c.get("limit"))
+                ok = (v <= lim) if c.get("bound") == "<=" else \
+                    (v >= lim)
+                result["status"] = "SATISFIED" if ok else "VIOLATED"
+                result["value"] = v
+                result["slack"] = round(
+                    (lim - v) if c.get("bound") == "<=" else (v - lim), 4)
+                result["value_source"] = src["source"]
+                result["measured_on"] = {
+                    "object_id": src["object_id"],
+                    "measured_field": src["measured_field"],
+                    "evidence_class": "COMPUTATIONAL_RESULT",
+                    "note": ("measured on the built solid by the CAD "
+                             "kernel (computation log in the "
+                             "parametric model's measurements section); "
+                             "the STATE's own value remains UNKNOWN — "
+                             "this check never writes back "
+                             "(Art. XXVIII)"),
+                }
+            else:
+                result["status"] = "UNVERIFIABLE"
+                result["reason"] = (
+                    f"target {c.get('target')} has no numeric value "
+                    f"(UNKNOWN) and the geometry does not measure a "
+                    f"matching quantity — the constraint cannot be "
+                    f"checked at this tier (Art. XXV: unknown is not "
+                    f"satisfied)")
         constraint_results.append(result)
 
     # ---- sensitivity: direction of objective response per parameter ---
@@ -468,6 +506,33 @@ def _influence_on(state: Dict[str, Any], pid: str
     return out
 
 
+def _geometry_value_for(target: str,
+                        geometry_measurements: Optional[Dict[str, Any]]
+                        ) -> Optional[Tuple[float, Dict[str, Any]]]:
+    """Resolve a declared constraint target (a state parameter id)
+    to a MEASURED quantity on the built solid, when the spec carries
+    a validated parametric model. Match rule (declared convention):
+    the measured field name equals the target, or the target equals
+    the field with a min_/max_ prefix stripped. Returns
+    (value, source_record) or None."""
+    if not geometry_measurements:
+        return None
+    for oid, m in (geometry_measurements.get("objects") or {}).items():
+        for field, value in (m or {}).items():
+            if not isinstance(value, (int, float)) or \
+                    isinstance(value, bool):
+                continue
+            f = str(field)
+            base = f[4:] if f.startswith(("min_", "max_")) else f
+            if f == target or base == target:
+                return float(value), {
+                    "object_id": oid, "measured_field": f,
+                    "source": "GEOMETRY_MEASURED_ON_BUILT_SOLID",
+                    "evidence_class": "COMPUTATIONAL_RESULT",
+                }
+    return None
+
+
 def evaluate_candidate_technically(spec: Dict[str, Any]) -> \
         Dict[str, Any]:
     """Evaluate a candidate's spec: reads the technical_state section
@@ -502,7 +567,22 @@ def evaluate_candidate_technically(spec: Dict[str, Any]) -> \
             "evidence_class_note": (
                 "no prediction made — nothing was evaluated"),
         }
-    return evaluate_technical_state(state)
+    # R380: GEOMETRY VALIDATION -> TECHNICAL EVALUATION (the CEO loop
+    # order). When the spec carries a validated parametric model, its
+    # MEASURED quantities (COMPUTATIONAL_RESULT, computation-logged)
+    # are available to the constraint checks: a constraint whose state
+    # target is UNKNOWN may be checked against the MEASURED geometry —
+    # declared as GEOMETRY_MEASURED, never silently, never promoted
+    # into the state's own values (Art. XXVIII; state-only candidates
+    # are unaffected — geometry_measurements stays None for them).
+    geometry_measurements = None
+    pm = (spec.get("parametric_model") or {})
+    if isinstance(pm, dict) and isinstance(pm.get("value"), dict):
+        pm_val = pm["value"]
+        if (pm_val.get("geometry_validation") or {}).get("valid"):
+            geometry_measurements = pm_val.get("measurements")
+    return evaluate_technical_state(
+        state, geometry_measurements=geometry_measurements)
 
 
 def technical_evaluate_wrapper(ctx: Any) -> Dict[str, Any]:

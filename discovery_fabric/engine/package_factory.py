@@ -113,8 +113,8 @@ def _load_v4():
     return mod
 
 
-def _sha256_file(p: Path) -> str:
-    return hashlib.sha256(p.read_bytes()).hexdigest()
+def _sha256_file(p: "Path | str") -> str:
+    return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
 def _safe_slug(s: str, maxlen: int = 40) -> str:
@@ -693,6 +693,195 @@ def enrich_builder_data(data: Dict[str, Any], eng: Dict[str, Any]) -> None:
             f"{param_names}."]
 
 
+def build_three_d_section(spec: Dict[str, Any],
+                           folder: Path) -> Dict[str, Any]:
+    """R380: the THREE_D_DESIGN package section — only when the spec
+    carries a VALIDATED parametric model (CEO package requirement 1-10):
+    parametric model source, STEP, STL/GLB, key dimensions, views,
+    geometry validation report, parameter manifest, design lineage,
+    technical evaluation result, and the explicit COMPUTATIONAL_RESULT
+    vs physical-evidence distinction. Inventions with no meaningful
+    geometry record an honest not-present verdict — never forced
+    (CEO R380; Art. XXVIII render-never-validates)."""
+    import shutil
+    pm_section = spec.get("parametric_model") or {}
+    model = pm_section.get("value") if isinstance(pm_section, dict) else None
+    if not isinstance(model, dict):
+        warrants = (spec.get("technical_state") or {}).get(
+            "warrants_3d") or {}
+        return {
+            "present": False,
+            "verdict": "NOT_PRESENT",
+            "reason": ("the spec carries no parametric model section "
+                       "(non-geometric invention or model rejected by "
+                       "the geometry gates) — a 3D section is never "
+                       "forced onto inventions without meaningful "
+                       "physical geometry (CEO R380)"),
+            "warrants_3d": warrants or "not evaluated",
+        }
+    gv = model.get("geometry_validation") or {}
+    if not gv.get("valid"):
+        return {
+            "present": False,
+            "verdict": "REJECTED_BY_GEOMETRY_GATES",
+            "model_id": model.get("model_id"),
+            "reasons": gv.get("reasons") or ["geometry invalid"],
+            "note": ("an invalid model is honest data; it never enters "
+                     "a buyer package"),
+        }
+
+    tdd = folder / "THREE_D_DESIGN"
+    tdd.mkdir(parents=True, exist_ok=True)
+    files: List[Dict[str, Any]] = []
+
+    def _copy(src_path: str, name: str, role: str,
+              evidence_class: str) -> None:
+        if not src_path or not Path(src_path).exists():
+            files.append({"file": name, "status": "MISSING",
+                          "source": src_path})
+            return
+        dst = tdd / name
+        shutil.copy2(src_path, dst)
+        files.append({
+            "file": f"THREE_D_DESIGN/{name}",
+            "sha256": _sha256_file(dst),
+            "bytes": dst.stat().st_size, "role": role,
+            "source_sha256": _sha256_file(src_path),
+            "evidence_class": evidence_class})
+
+    # 1. parametric model source (THE source of truth)
+    (tdd / "PARAMETRIC_MODEL_SOURCE.py").write_text(
+        model.get("build_program") or "")
+    files.append({"file": "THREE_D_DESIGN/PARAMETRIC_MODEL_SOURCE.py",
+                  "sha256": _sha256_file(tdd / "PARAMETRIC_MODEL_SOURCE.py"),
+                  "role": "parametric model definition (source of truth)",
+                  "evidence_class": "COMPUTATIONAL_RESULT"})
+    # 2. STEP / 3. STL+GLB / 5. views — the hashed derivatives
+    for key, art in sorted((model.get("derived_artifacts")
+                            or {}).items()):
+        kind, oid = key.split(":", 1)
+        if kind == "STEP":
+            _copy(art.get("path"), f"{oid}.step" if oid !=
+                  "assembly" else "assembly.step",
+                  art.get("role", "STEP derivative"), "COMPUTATIONAL_RESULT")
+        elif kind == "STL":
+            _copy(art.get("path"), f"{oid}.stl",
+                  art.get("role", "STL derivative"), "COMPUTATIONAL_RESULT")
+        elif kind == "GLB":
+            _copy(art.get("path"), "presentation.glb",
+                  art.get("role", "GLB derivative"),
+                  "COMPUTATIONAL_RESULT (presentation only — a render "
+                  "is NOT engineering validation)")
+        elif kind == "SVG":
+            _copy(art.get("path"), f"view_{oid}.svg",
+                  art.get("role", "engineering view"), "COMPUTATIONAL_RESULT")
+    # 4. key dimensions (measured, with computation logs)
+    measurements = model.get("measurements") or {}
+    key_dims = {
+        "model_id": model.get("model_id"),
+        "measured_objects": {
+            oid: {k: v for k, v in m.items()
+                  if k in ("bbox", "volume_mm3", "min_wall_thickness_mm",
+                           "signed_containment_walls_mm",
+                           "cylinder_face_radii")}
+            for oid, m in (measurements.get("objects") or {}).items()},
+        "computation_log": measurements.get("computation_log"),
+        "evidence_class": "COMPUTATIONAL_RESULT",
+        "note": ("dimensions are MEASURED on the built solid by the "
+                 "OCCT kernel (not the parameter claims); a "
+                 "COMPUTATIONAL_RESULT is never physical evidence "
+                 "(Art. XXXVIII)"),
+    }
+    (tdd / "KEY_DIMENSIONS.json").write_text(
+        json.dumps(key_dims, indent=2, ensure_ascii=False))
+    # 6. geometry validation report
+    (tdd / "GEOMETRY_VALIDATION_REPORT.json").write_text(
+        json.dumps(gv, indent=2, ensure_ascii=False))
+    # 7. parameter manifest
+    (tdd / "PARAMETER_MANIFEST.json").write_text(
+        json.dumps({
+            "model_id": model.get("model_id"),
+            "model_version": model.get("model_version"),
+            "kernel": model.get("kernel"),
+            "kernel_version": model.get("kernel_version"),
+            "parameter_map": model.get("parameter_map"),
+            "measured_dimension_bindings":
+                model.get("measured_dimension_bindings"),
+            "constraints": model.get("constraints"),
+        }, indent=2, ensure_ascii=False))
+    # 8. design lineage
+    (tdd / "DESIGN_LINEAGE.json").write_text(
+        json.dumps({
+            "model_id": model.get("model_id"),
+            "parent_model_id": model.get("parent_model_id"),
+            "parent_candidate": model.get("parent_candidate"),
+            "origin": model.get("origin"),
+            "template_id": model.get("template_id"),
+            "mutation_provenance": model.get("mutation_provenance"),
+            "source_evidence_provenance":
+                model.get("source_evidence_provenance"),
+            "program_source_sha256": model.get("program_source_sha256"),
+            "evidence_class": "COMPUTATIONAL_RESULT",
+        }, indent=2, ensure_ascii=False))
+    # 9. technical evaluation result (state-level, cross-referenced)
+    (tdd / "TECHNICAL_EVALUATION_RESULT.json").write_text(
+        json.dumps({
+            "note": ("the technical evaluation is computed by the R379 "
+                     "analytical evaluator on the structured technical "
+                     "state; the geometry validation above is computed "
+                     "by the CAD kernel on the built solid — separate "
+                     "authorities (Art. XIII)"),
+            "state_section": "spec.technical_state",
+            "geometry_section": "spec.parametric_model.value."
+                                "geometry_validation",
+            "evidence_class": "AI_INFERENCE (state predictions) / "
+                              "COMPUTATIONAL_RESULT (geometry)",
+        }, indent=2, ensure_ascii=False))
+    for extra in ("KEY_DIMENSIONS.json", "GEOMETRY_VALIDATION_REPORT.json",
+                  "PARAMETER_MANIFEST.json", "DESIGN_LINEAGE.json",
+                  "TECHNICAL_EVALUATION_RESULT.json"):
+        files.append({
+            "file": f"THREE_D_DESIGN/{extra}",
+            "sha256": _sha256_file(tdd / extra),
+            "bytes": (tdd / extra).stat().st_size,
+            "role": extra.replace(".json", "").lower(),
+            "evidence_class": "COMPUTATIONAL_RESULT"})
+    # 10. the explicit class distinction lives in the section header
+    (tdd / "README.json").write_text(json.dumps({
+        "section": "THREE_D_DESIGN (R380 3D ENGINEERING DESIGN PIPELINE)",
+        "source_of_truth": ("the parametric model definition "
+                            "(PARAMETRIC_MODEL_SOURCE.py + "
+                            "PARAMETER_MANIFEST.json); the STEP/STL/GLB/"
+                            "SVG files are hashed DERIVATIVES"),
+        "evidence_classes": {
+            "parametric_definition": "COMPUTATIONAL_RESULT",
+            "step_stl_glb_derivatives": "COMPUTATIONAL_RESULT",
+            "geometric_measurements": "COMPUTATIONAL_RESULT (kernel "
+                                      "computation logs included)",
+            "physical_evidence": "NONE — no physical observation "
+                                 "exists in this section; manufacture "
+                                 "and measurement are the buyer's "
+                                 "next step (Art. XXXVIII)"},
+        "render_rule": ("a render — GLB/SVG — is presentation only; "
+                        "technical validation is the geometry "
+                        "validation report (G1-G8), never the render"),
+    }, indent=2, ensure_ascii=False))
+    files.append({
+        "file": "THREE_D_DESIGN/README.json",
+        "sha256": _sha256_file(tdd / "README.json"),
+        "role": "section header with evidence-class distinctions"})
+    return {
+        "present": True, "verdict": "PRESENT_AND_VALIDATED",
+        "model_id": model.get("model_id"),
+        "kernel": model.get("kernel"),
+        "files": files,
+        "geometry_checks": {g: c.get("status") for g, c in
+                            (gv.get("checks") or {}).items()},
+        "evidence_class": "COMPUTATIONAL_RESULT",
+        "warrants_3d": pm_section.get("warrants_3d"),
+    }
+
+
 def generate_buyer_package(
         out_dir: str, spec: Dict[str, Any], eng: Dict[str, Any],
         env: Optional[Candidate], run_ctx: Dict[str, Any],
@@ -775,6 +964,12 @@ def generate_buyer_package(
             failed.append({"file": fname,
                            "error": f"{type(exc).__name__}: {exc}"})
 
+    # R380: the THREE_D_DESIGN section (present only when a VALIDATED
+    # parametric model exists; honest NOT_PRESENT otherwise — never forced)
+    three_d = build_three_d_section(spec, folder)
+    three_d_files = [f["file"] for f in (three_d.get("files") or [])
+                     if f.get("sha256")]
+
     # traceability + computed maturity + manifest
     trace = build_traceability(spec, eng, pkg, env)
     trace_path = folder / "ENGINEERING_TRACEABILITY.json"
@@ -842,6 +1037,17 @@ def generate_buyer_package(
         "traceability_passed": trace["passed"],
         "untraceable_engineering_fields":
             trace["untraceable_engineering_fields"],
+        "three_d_design": {
+            "present": three_d["present"],
+            "verdict": three_d["verdict"],
+            "model_id": three_d.get("model_id"),
+            "kernel": three_d.get("kernel"),
+            "file_count": len(three_d_files),
+            "geometry_checks": three_d.get("geometry_checks"),
+            "evidence_class": "COMPUTATIONAL_RESULT",
+            "physical_evidence": "NONE (Art. XXXVIII — compute is "
+                                 "never reality)",
+        },
         "external_evidence_count": len(pkg["external_sources"]),
         "engineering_artifact_count": len(eng.get(
             "engineering_build_plan", [])),
@@ -854,8 +1060,9 @@ def generate_buyer_package(
     zip_path = out / "DOWNLOAD" / f"{pi['num']}_{pi['short']}.zip"
     if not failed:
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-            for f in sorted(folder.iterdir()):
-                zf.write(f, f"{folder.name}/{f.name}")
+            for f in sorted(folder.rglob("*")):
+                if f.is_file():
+                    zf.write(f, f"{folder.name}/{f.relative_to(folder)}")
 
     # E11 contract: report missing links loudly
     expected = PACKAGE_FILES + ["PACKAGE_MANIFEST.json",

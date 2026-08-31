@@ -323,6 +323,153 @@ def audit_numerical_provenance(run_dir: Optional[Path],
                         "status": "NAKED_NUMBER",
                         "detail": "constraint limit with no class"})
 
+        # ---- R380: the PARAMETRIC_MODEL section is audited with the
+        # SAME hardness — geometric measurements are numbers, and a new
+        # section must not become a laundering path for invented
+        # measurements (Art. III/VI/XXXVIII).
+        pm = (inv_spec.get("parametric_model") or {}).get("value") \
+            if isinstance(inv_spec.get("parametric_model"), dict) \
+            else None
+        if isinstance(pm, dict):
+            # (a) the section's evidence class is COMPUTATIONAL_RESULT —
+            #     anything claiming physical observation is a forbidden
+            #     transition (Art. XXXVIII: compute is never reality)
+            pm_class = (inv_spec.get("parametric_model") or
+                        {}).get("epistemic_class")
+            if pm_class not in (None, "COMPUTATIONAL_RESULT"):
+                findings.append({
+                    "number_id": "PM:epistemic_class", "value": pm_class,
+                    "unit": None, "source_type": "SECTION_CLASS",
+                    "source_id": None, "source_hash": None,
+                    "derivation": None, "assumptions": None,
+                    "status": "NAKED_NUMBER",
+                    "detail": (f"parametric model section claims "
+                               f"class {pm_class} — only "
+                               f"COMPUTATIONAL_RESULT is legal for "
+                               f"computed geometry (Art. XXXVIII)")})
+            # (b) parameter map values carry a value_class; EXTRACTED
+            #     values must be span-verified like any TS value
+            for pid, p in sorted((pm.get("parameter_map")
+                                  or {}).items()):
+                if not isinstance(p, dict):
+                    continue
+                v = p.get("value")
+                if not _is_number(v):
+                    continue
+                vclass = p.get("value_class") or "UNKNOWN"
+                if vclass == "MODELLED":
+                    findings.append({
+                        "number_id": f"PM:{pid}:value", "value": v,
+                        "unit": p.get("unit"), "source_type": "MODELLED",
+                        "source_id": None, "source_hash": None,
+                        "derivation": None, "assumptions": None,
+                        "status": "OK_CLASSIFIED",
+                        "detail": "model-declared design parameter"})
+                elif vclass == "EXTRACTED":
+                    span = p.get("value_span") or ""
+                    ev_id = p.get("value_evidence_id") or ""
+                    src_text = ev_texts.get(ev_id) or sources.get(ev_id)
+                    if not ev_id or src_text is None or \
+                            span not in (src_text or "") or \
+                            not _num_in_span(v, span):
+                        findings.append({
+                            "number_id": f"PM:{pid}:value", "value": v,
+                            "unit": p.get("unit"),
+                            "source_type": "EXTRACTED",
+                            "source_id": ev_id, "source_hash": None,
+                            "derivation": None, "assumptions": None,
+                            "status": "UNSUPPORTED_NUMBER",
+                            "detail": ("EXTRACTED parametric parameter "
+                                       "not span-verified (Art. VI)")})
+                    else:
+                        findings.append({
+                            "number_id": f"PM:{pid}:value", "value": v,
+                            "unit": p.get("unit"),
+                            "source_type": "EXTRACTED",
+                            "source_id": ev_id, "source_hash": None,
+                            "derivation": None, "assumptions": None,
+                            "status": "OK", "detail": "span-verified"})
+                else:
+                    findings.append({
+                        "number_id": f"PM:{pid}:value", "value": v,
+                        "unit": p.get("unit"),
+                        "source_type": "UNKNOWN_CLASS",
+                        "source_id": None, "source_hash": None,
+                        "derivation": None, "assumptions": None,
+                            "status": "NAKED_NUMBER",
+                            "detail": ("parametric parameter with no "
+                                       "EXTRACTED/MODELLED class — an "
+                                       "unclassed number is certainty "
+                                       "laundering (Art. XXV)")})
+            # (c) MEASURED geometric quantities must carry computation
+            #     logs — a measurement without its computation record
+            #     is an invented measurement
+            meas = pm.get("measurements") or {}
+            logged_objects = {
+                entry.get("object_id")
+                for entry in meas.get("computation_log") or []
+                if isinstance(entry, dict)}
+            for oid, m in sorted((meas.get("objects") or {}).items()):
+                if not isinstance(m, dict):
+                    continue
+                for field in ("volume_mm3", "min_wall_thickness_mm"):
+                    v = m.get(field)
+                    if not _is_number(v):
+                        continue
+                    if oid in logged_objects:
+                        findings.append({
+                            "number_id": f"PM:meas:{oid}:{field}",
+                            "value": v, "unit": "mm^3" if field ==
+                            "volume_mm3" else "mm",
+                            "source_type": "COMPUTATIONAL_RESULT",
+                            "source_id": None, "source_hash": None,
+                            "derivation": "OCCT kernel computation log "
+                                          "in measurements.computation_log",
+                            "assumptions": None, "status": "OK_CLASSIFIED",
+                            "detail": "kernel-measured with computation log"})
+                    else:
+                        findings.append({
+                            "number_id": f"PM:meas:{oid}:{field}",
+                            "value": v, "unit": None,
+                            "source_type": "COMPUTATIONAL_RESULT",
+                            "source_id": None, "source_hash": None,
+                            "derivation": None, "assumptions": None,
+                            "status": "NAKED_NUMBER",
+                            "detail": ("measured geometric quantity with "
+                                       "no computation log — an invented "
+                                       "measurement (Art. VI)")})
+            # (d) derived artifact hashes must be real: when the run
+            #     directory is available, re-hash the referenced files
+            if run_dir:
+                for key, art in sorted((pm.get("derived_artifacts")
+                                        or {}).items()):
+                    if not isinstance(art, dict):
+                        continue
+                    path = art.get("path")
+                    recorded = art.get("sha256")
+                    if path and recorded and Path(path).exists():
+                        actual = _sha(path)
+                        if actual != recorded:
+                            findings.append({
+                                "number_id": f"PM:art:{key}:sha256",
+                                "value": recorded, "unit": None,
+                                "source_type": "ARTIFACT_HASH",
+                                "source_id": path, "source_hash": recorded,
+                                "derivation": None, "assumptions": None,
+                                "status": "SOURCE_MISMATCH",
+                                "detail": ("derived artifact hash does "
+                                           "not match the file on disk "
+                                           "(Art. VI)")})
+                        else:
+                            findings.append({
+                                "number_id": f"PM:art:{key}:sha256",
+                                "value": recorded, "unit": None,
+                                "source_type": "ARTIFACT_HASH",
+                                "source_id": path, "source_hash": recorded,
+                                "derivation": None, "assumptions": None,
+                                "status": "OK",
+                                "detail": "artifact hash re-verified on disk"})
+
     # ---- verdict --------------------------------------------------------
     hard = [f for f in findings if f["status"] in
             ("NAKED_NUMBER", "UNSUPPORTED_NUMBER", "SOURCE_MISMATCH")]
