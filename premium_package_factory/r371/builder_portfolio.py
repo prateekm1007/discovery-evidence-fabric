@@ -44,12 +44,31 @@ PORTFOLIO_ROOT_DEFAULT = os.path.abspath(
 
 
 # ---------------------------------------------------------------------------
-def render_portfolio_index(ranking, loop_summary, out_path):
+def render_portfolio_index(ranking, loop_summary, out_path,
+                           buyer_rows=None, presentation_order=None):
+    """R382: when buyer_rows is given, the index renders the
+    BUYER_PRIMARY subset in the CEO presentation order (rank column
+    preserves the disclosed portfolio ranking policy); legacy call
+    renders the full ranking order."""
     ident = "Portfolio of 15 technology-transfer packages — R372 V6 release"
     doc = _doc(out_path, ident, "Portfolio Index")
+    if buyer_rows is not None:
+        nums = {r["num"] for r in buyer_rows}
+        rrows = [r for r in ranking["rows"]
+                 if r["portfolio_number"] in nums]
+        order = {n: i for i, n in enumerate(presentation_order or [])}
+        rrows.sort(key=lambda r: order.get(r["portfolio_number"], 99))
+        subtitle = (f"{len(rrows)} engineering-definition packages "
+                    "selected for this buyer release · presented in "
+                    "the portfolio owner's order (the rank column "
+                    "preserves the disclosed portfolio ranking policy)")
+    else:
+        rrows = ranking["rows"]
+        subtitle = ("15 engineering-definition packages · ranked by a "
+                    "disclosed, evidence-derived policy (no composite "
+                    "scores)")
     st = [Paragraph("TECHNOLOGY-TRANSFER PORTFOLIO — INDEX AND RANKING", S["CT"]),
-          Paragraph("15 engineering-definition packages · ranked by a disclosed, "
-                    "evidence-derived policy (no composite scores)", S["CS"]),
+          Paragraph(subtitle, S["CS"]),
           Spacer(1, 6)]
     st.append(Paragraph("RANKING POLICY (disclosed)", S["SH"]))
     st.append(Paragraph(_esc(
@@ -74,7 +93,7 @@ def render_portfolio_index(ranking, loop_summary, out_path):
     hdr = ["#", "Pkg", "Technology", "Kill test.", "Ev.", "Art.", "First decisive WP",
            "Largest uncertainty (class)", "Loop", "Full record"]
     rows = [hdr]
-    for r in ranking["rows"]:
+    for r in rrows:
         lu = r["largest_uncertainty"]
         stmt = (lu["statement"] or "")[:80]
         rows.append([
@@ -103,7 +122,7 @@ def render_portfolio_index(ranking, loop_summary, out_path):
     st.append(Paragraph("PACKAGE ONE-LINERS (portfolio order)", S["SH"]))
     # R375-1: full problem + kill condition — Paragraphs wrap; no slices.
     # The rank pointer directs the reader to the full dossier.
-    for r in sorted(ranking["rows"], key=lambda x: x["portfolio_number"]):
+    for r in sorted(rrows, key=lambda x: x["portfolio_number"]):
         st.append(Paragraph(_esc(
             f"{r['portfolio_number']} · {r['package_id']} — {r['technology']} "
             f"(rank {r['rank']}; full record: DOWNLOAD/{r['folder']}/02 "
@@ -155,7 +174,8 @@ def _mut_text(pkg, text):
 
 def render_release_report(ranking, loop_summary, structural, out_path,
                           traceability=None, packages=None,
-                          equation_validation=None):
+                          equation_validation=None, buyer_rows=None,
+                          presentation_order=None):
     """Release report from build-time structural facts. Acceptance-gate
     RESULTS live in INTERNAL_QA/R371_ACCEPTANCE_REPORT.json (internal) and
     RELEASE/R371_RELEASE_CANDIDATE.json (CEO audit) - not in this buyer
@@ -168,6 +188,21 @@ def render_release_report(ranking, loop_summary, structural, out_path,
     ident = "Portfolio of 15 technology-transfer packages - R372 V6 release"
     doc = _doc(out_path, ident, "Portfolio Release Report")
     st = [Paragraph("PORTFOLIO RELEASE REPORT - R372 V6", S["CT"]), Spacer(1, 6)]
+    # R382: buyer-release scope disclosure (honest, one paragraph, no
+    # internal strategy details — the full disposition record is an
+    # internal artifact, not a buyer document)
+    if buyer_rows is not None:
+        n = len(buyer_rows)
+        st.append(Paragraph("BUYER RELEASE SCOPE", S["SH"]))
+        st.append(Paragraph(_esc(
+            f"This release presents {n} packages selected for the "
+            "current buyer engagement from the portfolio owner's "
+            "technology-transfer portfolio. The identity registry, "
+            "the release manifest and the master ZIP describe exactly "
+            "this release; package selection is the portfolio owner's "
+            "disposition, and every selected package is presented "
+            "with its full evidence record including its recorded "
+            "uncertainties and decisive next experiment."), S["BT"]))
     st.append(Paragraph("RELEASE IDENTITY INTEGRITY", S["SH"]))
     st.append(Paragraph(_esc(
         "One canonical registry (PORTFOLIO_IDENTITY_REGISTRY.json) binds each "
@@ -290,19 +325,24 @@ def render_release_report(ranking, loop_summary, structural, out_path,
 # ---------------------------------------------------------------------------
 # Phase 2: RELEASE_CONTENT_MANIFEST + generated README
 # ---------------------------------------------------------------------------
+# R382: the buyer release no longer ships the 15-technology master
+# catalog (it described the full portfolio breadth); the master
+# portfolio document is generated for INTERNAL use (INTERNAL_QA/)
+# and the pre-disposition buyer-facing copy is preserved in
+# RELEASE/history_r381/.
 DISTRIBUTION_ROOT_FILES = [
     "README.md",
     "PORTFOLIO_IDENTITY_REGISTRY.json",
     "RELEASE_CONTENT_MANIFEST.json",
     "PORTFOLIO_MANIFEST.json",
     "PORTFOLIO_RANKING.json",
-    "00_PORTFOLIO_15_TECHNOLOGIES.pdf",
     "PORTFOLIO_INDEX.pdf",
     "PORTFOLIO_RELEASE_REPORT.pdf",
 ]
 
 
-def build_release_content_manifest(portfolio_root, include_readme=True):
+def build_release_content_manifest(portfolio_root, include_readme=True,
+                                   package_rows=None):
     """Walk the ACTUAL distribution filesystem. Zero hand-authored claims.
 
     Two-pass protocol (Phase 2):
@@ -332,7 +372,11 @@ def build_release_content_manifest(portfolio_root, include_readme=True):
             "bytes": os.path.getsize(fp),
         })
     download = os.path.join(portfolio_root, "DOWNLOAD")
-    for row in PACKAGE_MAP:
+    # R382: the buyer release manifest covers the BUYER_PRIMARY
+    # packages (CEO disposition); the full 15-package working
+    # portfolio is the internal layer.
+    rows = package_rows or PACKAGE_MAP
+    for row in rows:
         folder = f"{row['num']}_{row['short']}"
         pdir = os.path.join(download, folder)
         zpath = os.path.join(download, f"{folder}.zip")
@@ -387,15 +431,19 @@ def build_release_content_manifest(portfolio_root, include_readme=True):
 
 
 def generate_readme(manifest, loop_summary, out_path):
-    """README.md generated from the manifest — Phase 2 (zero drift)."""
+    """README.md generated from the manifest — Phase 2 (zero drift).
+    R382: package count and master-ZIP description are COMPUTED from
+    the manifest (buyer-scoped when the disposition is applied)."""
     pkg_rows = [e for e in manifest["entries"] if e["role"] == "package folder"]
     root_rows = [e for e in manifest["entries"] if e["role"] == "root document"]
     # master ZIP is not a manifest entry (self-reference); the README
     # names it structurally and points to the acceptance gate for its hash
+    n_pkgs = len(pkg_rows)
     lines = []
-    lines.append("# 15 Technology-Transfer Opportunities — R372 V6 Release")
+    lines.append(f"# {n_pkgs} Technology-Transfer Opportunities — "
+                 "R382 Buyer Release")
     lines.append("")
-    lines.append("This release contains 15 engineering technology-transfer "
+    lines.append(f"This release contains {n_pkgs} engineering technology-transfer "
                  "dossiers prepared for external technical, commercial and "
                  "strategic evaluation. Each package identifies the "
                  "technology, supporting evidence, engineering status, "
@@ -454,7 +502,8 @@ def generate_readme(manifest, loop_summary, out_path):
     lines.append(f"### Master distribution ZIP")
     lines.append("")
     lines.append("- `DOWNLOAD/technology-transfer-portfolio-15.zip` — contains "
-                 "the 15 package ZIPs plus the root documents listed above. "
+                 f"the {n_pkgs} package ZIPs of this release plus the root "
+                 "documents listed above. "
                  "Its sha256 is recorded by the R371 acceptance gate in "
                  "INTERNAL_QA/R371_ACCEPTANCE_REPORT.json (a ZIP built from "
                  "this manifest cannot contain its own hash).")

@@ -1,6 +1,10 @@
-"""R381 portfolio-level verification (CEO steps 8-10):
-- every applicable package ships the full required view set, as VALID,
-  non-trivial SVG XML;
+"""R381 portfolio-level verification (CEO steps 8-10), R382
+ disposition-aware:
+- packages are resolved WHEREVER they live (DOWNLOAD for buyer
+  packages; HOLDING/SPECIALIST_TRACK/RETIRED for the others — bytes
+  frozen by the disposition);
+- every applicable package ships the full required view set, as
+  VALID, non-trivial SVG XML;
 - the dimensioned view is annotated with MEASURED dimensions;
 - no NOT_APPLICABLE package carries any geometry artifact;
 - manifest / traceability / 3D_DESIGN_STATUS agree in every package;
@@ -16,17 +20,24 @@ import zipfile
 ROOT = "/home/z/my-project/technology-transfer-portfolio-15"
 DL = os.path.join(ROOT, "DOWNLOAD")
 
+sys.path.insert(0, "/home/z/my-project/discovery-evidence-fabric")
+from premium_package_factory.r371.canonical_source import PACKAGE_MAP  # noqa: E402
+from premium_package_factory.r382.disposition import package_location  # noqa: E402
+
 problems = []
 rows = []
-for folder in sorted(os.listdir(DL)):
-    pdir = os.path.join(DL, folder)
-    if not os.path.isdir(pdir) or folder.endswith(".zip"):
+for row in sorted(PACKAGE_MAP, key=lambda r: r["num"]):
+    folder = f"{row['num']}_{row['short']}"
+    pdir, rel = package_location(ROOT, row["num"])
+    if not os.path.isdir(pdir):
+        problems.append(f"{folder}: package missing at {rel}")
         continue
     mdir = os.path.join(pdir, "MODEL")
     st = json.load(open(os.path.join(mdir, "3D_DESIGN_STATUS.json")))
     cls, status = st["classification"], st["3d_design_status"]
     pm = json.load(open(os.path.join(pdir, "PACKAGE_MANIFEST.json")))
-    tr = json.load(open(os.path.join(pdir, "ENGINEERING_TRACEABILITY.json")))
+    tr = json.load(open(os.path.join(
+        pdir, "ENGINEERING_TRACEABILITY.json")))
     if pm["three_d_design"]["classification"] != cls or \
             pm["three_d_design"]["status"] != status:
         problems.append(f"{folder}: manifest drift")
@@ -35,6 +46,8 @@ for folder in sorted(os.listdir(DL)):
         problems.append(f"{folder}: traceability drift")
     row = {"folder": folder, "cls": cls, "status": status,
            "loop": pm["three_d_design"]["improvement_loop_outcome"]}
+    row["folder"] = folder
+    row["location"] = rel
     if cls == "3D_NOT_APPLICABLE":
         files = set(os.listdir(mdir))
         if files != {"3D_DESIGN_STATUS.json", "README.json"}:
@@ -74,22 +87,34 @@ for folder in sorted(os.listdir(DL)):
         problems.append(f"{folder}: multi-object model lacks exploded view")
     if n_obj == 1 and exploded:
         problems.append(f"{folder}: single-object model HAS exploded view")
-    # zip contains model dir byte-identically (spot check 3 files)
-    with zipfile.ZipFile(os.path.join(DL, folder + ".zip")) as zf:
-        names = set(zf.namelist())
-        mfiles = {f"MODEL/{f}" for f in os.listdir(mdir)}
-        if not mfiles.issubset(names):
-            problems.append(f"{folder}: zip missing MODEL files: "
-                            f"{sorted(mfiles - names)[:3]}")
-        for mf in sorted(mfiles)[:3]:
-            if zf.read(mf) != open(os.path.join(pdir, mf), "rb").read():
-                problems.append(f"{folder}: zip/folder bytes differ {mf}")
-    row["views"] = len(views)
-    row["objects"] = n_obj
+    # zip contains model dir byte-identically (spot check 3 files;
+    # non-buyer packages keep their frozen zips in their state dir)
+    zip_fp = os.path.join(os.path.dirname(pdir), folder + ".zip")
+    if not os.path.exists(zip_fp):
+        problems.append(f"{folder}: package ZIP missing at {rel}")
+    else:
+        with zipfile.ZipFile(zip_fp) as zf:
+            names = set(zf.namelist())
+            mfiles = {f"MODEL/{f}" for f in os.listdir(mdir)}
+            if not mfiles.issubset(names):
+                problems.append(f"{folder}: zip missing MODEL files: "
+                                f"{sorted(mfiles - names)[:3]}")
+            for mf in sorted(mfiles)[:3]:
+                if zf.read(mf) != open(os.path.join(
+                        pdir, mf), "rb").read():
+                    problems.append(
+                        f"{folder}: zip/folder bytes differ {mf}")
+    row["views"] = len([f for f in os.listdir(mdir)
+                        if f.endswith(".svg")]) if os.path.isdir(mdir) \
+        else 0
+    row["objects"] = len(json.load(open(os.path.join(
+        mdir, "MODEL_MANIFEST.json")))["objects"] or []) \
+        if os.path.isdir(mdir) else 0
     rows.append(row)
 
 for r in rows:
-    print(f"{r['folder']:32s} {r['cls']:30s} {r['status']:24s} "
+    print(f"{r['folder']:32s} {r['location']:16s} "
+          f"{r['cls']:30s} {r['status']:24s} "
           f"loop={str(r['loop']):24s} views={r.get('views', 0)} "
           f"objects={r.get('objects', 0)}")
 print()

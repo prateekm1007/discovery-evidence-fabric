@@ -418,98 +418,37 @@ def build(portfolio_root, work_dir=None):
             for f in _package_files_recursive(pdir):
                 _zip_add(zf, os.path.join(pdir, f), f)
 
-    # 6. portfolio-level documents -----------------------------------------------
-    print("[R372] rendering portfolio documents ...")
-    bp.render_portfolio_index(
-        ranking, loop_summary,
-        os.path.join(portfolio_root, "PORTFOLIO_INDEX.pdf"))
-    bp.render_master_portfolio(
-        packages, headlines, ranking,
-        os.path.join(portfolio_root, "00_PORTFOLIO_15_TECHNOLOGIES.pdf"))
-    for _pf in ("PORTFOLIO_INDEX.pdf", "00_PORTFOLIO_15_TECHNOLOGIES.pdf"):
-        geometric_qa(os.path.join(portfolio_root, _pf))
-        rendered_page_qa(os.path.join(portfolio_root, _pf),
-                         png_dir=os.path.join(qa_root, Path(_pf).stem))
-    # PORTFOLIO_MANIFEST.json (canonical maturity source)
-    # R374-5 determinism: no volatile build timestamp here — this file's
-    # sha256 is embedded in README.md and RELEASE_CONTENT_MANIFEST.json,
-    # so a per-build timestamp cascaded into the master ZIP and broke
-    # byte-reproducibility. Build provenance is recorded by git history
-    # (Art. XI: history is evidence); nothing is fabricated.
-    manifest = {
-        "portfolio_version": "2.0", "package_count": 15,
-        "determinism_note": (
-            "This manifest carries no build timestamp by design (CEO "
-            "R374-5 byte-reproducibility): its sha256 is embedded in "
-            "README.md and RELEASE_CONTENT_MANIFEST.json and flows into "
-            "the master ZIP. Build provenance: git history of the "
-            "portfolio repository."),
-        "identity_registry": "PORTFOLIO_IDENTITY_REGISTRY.json",
-        "ranking": "PORTFOLIO_RANKING.json",
-        "packages": [
-            {
-                "portfolio_number": p.num, "package_id": p.pkg_id,
-                "technology_name": headlines[p.pkg_id]["technology_name"],
-                "folder_name": p.folder,
-                "package_version": p.version,
-                "technology_maturity": "ENGINEERING_DEFINITION",
-                "dossier_maturity": "COMPLETE_FOR_CURRENT_STAGE",
-                "transfer_posture": "SPONSORED_VALIDATION",
-                "loop_verification_state": p.loop_state,
-                "kill_condition": headlines[p.pkg_id]["kill_if"],
-                "rank": next(r["rank"] for r in ranking["rows"]
-                             if r["package_id"] == p.pkg_id),
-            }
-            for p in packages
-        ],
-    }
-    _write_json(os.path.join(portfolio_root, "PORTFOLIO_MANIFEST.json"), manifest)
-    _write_json(os.path.join(portfolio_root, "PORTFOLIO_RANKING.json"), ranking)
-
-    # 7. identity registry from the actual artifacts -------------------------------
-    print("[R372] building identity registry ...")
-    registry = build_registry(
+    # 5.5 R382: CEO PORTFOLIO DISPOSITION ---------------------------------
+    # The buyer release becomes the 4 BUYER_PRIMARY packages (CEO
+    # presentation order); the other 11 packages MOVE (byte-identical)
+    # to HOLDING/ SPECIALIST_TRACK/ RETIRED/ with the disposition
+    # record + frozen identity hashes at the portfolio root. The
+    # pre-disposition release is snapshotted to RELEASE/history_r381/
+    # (history is evidence, Art. XI).
+    print("[R382] applying CEO portfolio disposition ...")
+    from premium_package_factory.r382.disposition import (
+        apply_portfolio_disposition)
+    disposition_summary = apply_portfolio_disposition(
         portfolio_root,
         statuses={p.pkg_id: "V2" for p in packages if p.addendum})
-    for row in registry["packages"]:
-        pkg = next(p for p in packages if p.pkg_id == row["historical_package_id"])
-        row["technology_name"] = headlines[pkg.pkg_id]["technology_name"]
-    write_registry(portfolio_root, registry)
+    print(f"   buyer release (CEO order): "
+          f"{disposition_summary['buyer_primary']}")
 
-    # 8. release content manifest -> README -> master zip (two-pass, Phase 2)
-    print("[R371] building release content manifest, README, master zip ...")
-    # release report rendered FIRST so its hash is final before any manifest
-    # pass (acceptance-gate results live in INTERNAL_QA/ and RELEASE/, not here)
-    bp.render_release_report(
-        ranking, loop_summary, {},
-        os.path.join(portfolio_root, "PORTFOLIO_RELEASE_REPORT.pdf"),
-        traceability=traces, packages=packages,
-        equation_validation=eq_validations)
-    # R375 gap fix: the release report was previously rendered but NEVER
-    # verified (the V3 gate covered index + master only). Both instruments
-    # now apply to every shipped PDF.
-    geometric_qa(os.path.join(portfolio_root, "PORTFOLIO_RELEASE_REPORT.pdf"))
-    rendered_page_qa(os.path.join(portfolio_root,
-                                  "PORTFOLIO_RELEASE_REPORT.pdf"),
-                     png_dir=os.path.join(qa_root, "PORTFOLIO_RELEASE_REPORT"))
-    # persist the R375 QA verdict for fresh-clone comparison
+    # 6-8. buyer-scoped release documents ------------------------------------
+    # ONE code path with the live-tree retrofit (r382.release_docs):
+    # index/report/manifests/README/master ZIP regenerated over the
+    # BUYER_PRIMARY subset; the full 15-technology overview moves to
+    # the INTERNAL layer.
+    print("[R382] regenerating buyer release documents ...")
+    from premium_package_factory.r382.release_docs import (
+        regenerate_buyer_release_documents)
+    release_summary = regenerate_buyer_release_documents(
+        portfolio_root, packages, headlines, ranking, loop_summary,
+        traces, eq_validations, qa_root=qa_root)
+    # R375-5/6 per-package QA verdict persists exactly as before
     write_report(qa_report, os.path.join(
         portfolio_root, "INTERNAL_QA", "R375_RENDER_QA.json"))
-    # pass 1: manifest without README -> GENERATE README from it
-    rc_manifest = bp.build_release_content_manifest(portfolio_root,
-                                                    include_readme=False)
-    bp.generate_readme(rc_manifest, loop_summary,
-                       os.path.join(portfolio_root, "README.md"))
-    # pass 2: full manifest (README hash final) -> write -> master zip FROM it
-    rc_manifest = bp.build_release_content_manifest(portfolio_root,
-                                                    include_readme=True)
-    _write_json(os.path.join(portfolio_root, "RELEASE_CONTENT_MANIFEST.json"),
-                rc_manifest)
-    master_zip = os.path.join(portfolio_root, "DOWNLOAD",
-                              "technology-transfer-portfolio-15.zip")
-    if os.path.exists(master_zip):
-        os.remove(master_zip)
-    bp.build_master_zip(portfolio_root, rc_manifest, master_zip)
+    print(f"   master ZIP: {release_summary['master_zip_sha256'][:16]}...")
 
     # 9. history preservation ---------------------------------------------------------
     hist = os.path.join(portfolio_root, "RELEASE", "history_r370")

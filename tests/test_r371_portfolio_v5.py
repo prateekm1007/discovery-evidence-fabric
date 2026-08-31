@@ -420,15 +420,31 @@ class TestBuildAndAcceptance:
         failed = [r for r in report["conditions"] if r["status"] != "PASS"]
         assert not failed, f"acceptance failures: {failed}"
         assert report["all_pass"] is True
-        # release candidate written only on full pass
+        # release candidate written only on full pass (R382 cycle: the
+        # disposition release candidate)
         cand = os.path.join(portfolio_root, "RELEASE",
-                            "R371_RELEASE_CANDIDATE.json")
+                            "R382_RELEASE_CANDIDATE.json")
         assert os.path.exists(cand)
         with open(cand, encoding="utf-8") as f:
             c = json.load(f)
         assert c["status"] == "RELEASE_CANDIDATE_SUBMITTED_FOR_CEO_AUDIT"
         assert "not independent certification" in c["note"] or \
                "requires independent" in c["note"]
+        # R382 disposition structure on the fresh build
+        download = os.path.join(portfolio_root, "DOWNLOAD")
+        dl_dirs = sorted(d for d in os.listdir(download)
+                         if os.path.isdir(os.path.join(download, d)))
+        assert dl_dirs == sorted([
+            "04_drainage_floor", "11_gravity_damper",
+            "13_pressure_sensor", "08_nir_photovoltaic"])
+        assert os.path.isdir(os.path.join(portfolio_root, "HOLDING",
+                                          "01_multisegment_flow_control"))
+        assert os.path.isdir(os.path.join(portfolio_root, "RETIRED",
+                                          "06_failure_predictor"))
+        assert os.path.isdir(os.path.join(
+            portfolio_root, "SPECIALIST_TRACK", "03_catalytic_clearance"))
+        assert os.path.exists(os.path.join(
+            portfolio_root, "PORTFOLIO_DISPOSITION.json"))
 
     def test_master_zip_equals_manifest(self, tmp_path):
         portfolio_root = str(tmp_path / "portfolio")

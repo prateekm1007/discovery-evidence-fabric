@@ -37,11 +37,16 @@ ALLOWED_PORTFOLIO_TOP = {
     "RELEASE_CONTENT_MANIFEST.json",
     "PORTFOLIO_MANIFEST.json",
     "PORTFOLIO_RANKING.json",
-    "00_PORTFOLIO_15_TECHNOLOGIES.pdf",
     "PORTFOLIO_INDEX.pdf",
     "PORTFOLIO_RELEASE_REPORT.pdf",
-    "DOWNLOAD",       # the 15 package folders + ZIPs + master ZIP
-    "RELEASE",        # release certificates (incl. history_r370)
+    # R382 CEO portfolio disposition: internal holding layers (bytes of
+    # held/specialist/retired packages, frozen) + the disposition record
+    "PORTFOLIO_DISPOSITION.json",
+    "HOLDING",         # gate-pending packages (not buyer-visible)
+    "SPECIALIST_TRACK",  # separate-outreach packages (not buyer deck)
+    "RETIRED",         # retired packages (history is evidence, Art. XI)
+    "DOWNLOAD",       # the BUYER_PRIMARY package folders + ZIPs + master ZIP
+    "RELEASE",        # release certificates (incl. history_r370/r381)
     "INTERNAL_QA",    # acceptance reports (mechanical gate results)
     ".git",           # repo plumbing
 }
@@ -78,8 +83,18 @@ def verify_portfolio_boundary(portfolio_root) -> dict:
         rel_dir = os.path.relpath(dirpath, portfolio_root)
         internal = rel_dir.startswith(("INTERNAL_QA", "RELEASE"))
         for fn in filenames:
-            if fn.endswith(".py") or fn.startswith(".env") or \
-                    fn.endswith(".key"):
+            # R382 amendment (disclosed): MODEL/PARAMETRIC_MODEL_SOURCE.py
+            # is a CEO-R381-mandated BUYER artifact (the parametric
+            # source of truth, explicitly required in the package MODEL/
+            # dir) — not engine tooling. The rule 'no tooling code in
+            # the release' is unchanged for every other .py file.
+            is_parametric_source = (
+                fn == "PARAMETRIC_MODEL_SOURCE.py"
+                and os.path.basename(rel_dir) == "MODEL")
+            if fn.endswith(".py") and not is_parametric_source:
+                problems.append(f"engine/tooling file in release: "
+                                f"{os.path.join(dirpath, fn)}")
+            if fn.startswith(".env") or fn.endswith(".key"):
                 problems.append(f"engine/tooling file in release: "
                                 f"{os.path.join(dirpath, fn)}")
             if internal or not fn.endswith(tuple(_TEXT_SUFFIXES)):

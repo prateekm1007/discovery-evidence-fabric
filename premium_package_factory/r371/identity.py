@@ -34,19 +34,25 @@ def sha256_file(fp: str) -> str:
     return h.hexdigest()
 
 
-def build_registry(portfolio_root: str, statuses=None) -> dict:
+def build_registry(portfolio_root: str, statuses=None, rows=None,
+                   location_map=None) -> dict:
     """Build the identity registry from the ACTUAL release tree on disk.
 
-    Called after the V5 build has written DOWNLOAD/NN_folder/ trees.
-    Hashes are computed from the files that will ship — never asserted.
+    Called after the V5 build has written the package trees.
+    R382: `rows` scopes the registry to a package subset (the buyer
+    release uses the BUYER_PRIMARY rows); `location_map` (num ->
+    DOWNLOAD | HOLDING | SPECIALIST_TRACK | RETIRED) tells the builder
+    where each package folder physically lives after the CEO
+    disposition. Hashes are computed from the files that will ship —
+    never asserted.
     """
-    download = os.path.join(portfolio_root, "DOWNLOAD")
     packages = []
-    for row in PACKAGE_MAP:
+    for row in (rows or PACKAGE_MAP):
         folder = folder_name(row["num"], row["short"])
-        pdir = os.path.join(download, folder)
+        loc = (location_map or {}).get(row["num"], "DOWNLOAD")
+        pdir = os.path.join(portfolio_root, loc, folder)
         dossier_fp = os.path.join(pdir, "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf")
-        zip_fp = os.path.join(download, f"{folder}.zip")
+        zip_fp = os.path.join(portfolio_root, loc, f"{folder}.zip")
         manifest_fp = os.path.join(pdir, "PACKAGE_MANIFEST.json")
         for fp in (dossier_fp, zip_fp, manifest_fp):
             if not os.path.exists(fp):
@@ -58,6 +64,8 @@ def build_registry(portfolio_root: str, statuses=None) -> dict:
                 "historical_package_id": row["pkg_id"],
                 "technology_name": None,  # filled by builder from headlines
                 "folder_name": folder,
+                "location": loc,
+                "buyer_release": loc == "DOWNLOAD",
                 "dossier_hash": sha256_file(dossier_fp),
                 "package_zip_hash": sha256_file(zip_fp),
                 "manifest_hash": sha256_file(manifest_fp),
@@ -90,12 +98,16 @@ def write_registry(portfolio_root: str, registry: dict) -> str:
 def verify_registry(portfolio_root: str) -> dict:
     """Machine-enforce the identity invariants (Phase 1 acceptance).
 
-    Verifies:
-      15 portfolio numbers == 15 package IDs == 15 folders == 15 ZIPs
-      == 15 manifests == 15 dossiers; hashes on disk match the registry;
-      every PACKAGE_MANIFEST.json self-identifies consistently; every ZIP
-      contains its own manifest identity.
+    R382 disposition-aware: when PORTFOLIO_DISPOSITION.json exists the
+    shipped registry covers the BUYER_RELEASE scope (exactly the
+    BUYER_PRIMARY packages in DOWNLOAD/) and the 15/15 identity
+    invariant is completed against the disposition record's frozen
+    identities (each non-buyer package's manifest + ZIP hashes are
+    re-verified wherever the package physically lives). Without a
+    disposition record the legacy 15-in-DOWNLOAD path is verified.
     """
+    import zipfile
+
     problems = []
     fp = os.path.join(portfolio_root, REGISTRY_NAME)
     if not os.path.exists(fp):
@@ -105,6 +117,92 @@ def verify_registry(portfolio_root: str) -> dict:
     pkgs = registry["packages"]
     download = os.path.join(portfolio_root, "DOWNLOAD")
 
+    disposition_fp = os.path.join(portfolio_root,
+                                  "PORTFOLIO_DISPOSITION.json")
+    disposition = None
+    if os.path.exists(disposition_fp):
+        try:
+            with open(disposition_fp, "r", encoding="utf-8") as f:
+                disposition = json.load(f)
+        except (OSError, ValueError):
+            problems.append("disposition record unreadable")
+
+    if disposition is not None:
+        # buyer-scope registry: exactly the BUYER_PRIMARY packages
+        disp = disposition.get("dispositions") or {}
+        buyer = {n for n, e in disp.items()
+                 if e.get("state") == "BUYER_PRIMARY"}
+        reg_ids = {p["historical_package_id"] for p in pkgs}
+        buyer_ids = {disp[n]["pkg_id"] for n in buyer}
+        if reg_ids != buyer_ids:
+            problems.append(
+                f"registry scope {sorted(reg_ids)} != BUYER_PRIMARY "
+                f"{sorted(buyer_ids)}")
+        for p in pkgs:
+            if p.get("location") not in ("DOWNLOAD", None):
+                problems.append(
+                    f"{p['folder_name']}: shipped registry entry not in "
+                    f"DOWNLOAD ({p.get('location')})")
+            pdir = os.path.join(download, p["folder_name"])
+            mfp = os.path.join(pdir, "PACKAGE_MANIFEST.json")
+            zfp = os.path.join(download, f"{p['folder_name']}.zip")
+            if not (os.path.isdir(pdir) and os.path.exists(mfp)):
+                problems.append(
+                    f"{p['folder_name']}: buyer package missing")
+                continue
+            if sha256_file(mfp) != p.get("manifest_hash"):
+                problems.append(
+                    f"{p['folder_name']}: registry manifest hash mismatch")
+            if not os.path.exists(zfp):
+                problems.append(f"{p['folder_name']}: buyer ZIP missing")
+            elif sha256_file(zfp) != p.get("package_zip_hash"):
+                problems.append(
+                    f"{p['folder_name']}: registry ZIP hash mismatch")
+            with open(mfp, "r", encoding="utf-8") as f:
+                manifest = json.load(f)
+            if manifest.get("portfolio_number") != p["portfolio_number"] or \
+                    manifest.get("package_id") != p["historical_package_id"]:
+                problems.append(
+                    f"{p['folder_name']}: manifest identity mismatch")
+        # complete the 15/15 invariant from the frozen identities
+        if set(disp) != {f"{i:02d}" for i in range(1, 16)}:
+            problems.append("disposition does not cover 01..15")
+        for n, entry in sorted(disp.items()):
+            fi = entry.get("frozen_identity") or {}
+            loc = entry.get("location")
+            folder = entry.get("folder")
+            if not loc or not folder:
+                problems.append(f"{n}: disposition entry incomplete")
+                continue
+            pdir = os.path.join(portfolio_root, loc, folder)
+            mfp = os.path.join(pdir, "PACKAGE_MANIFEST.json")
+            zfp = os.path.join(portfolio_root, loc, folder + ".zip")
+            if not os.path.isdir(pdir) or not os.path.exists(mfp):
+                problems.append(f"{folder}: package missing at {loc}")
+                continue
+            if sha256_file(mfp) != fi.get("package_manifest_sha256"):
+                problems.append(
+                    f"{folder}: frozen manifest hash drift at {loc}")
+            if not os.path.exists(zfp):
+                problems.append(f"{folder}: ZIP missing at {loc}")
+            elif sha256_file(zfp) != fi.get("package_zip_sha256"):
+                problems.append(f"{folder}: frozen ZIP hash drift at {loc}")
+        counts = {
+            "portfolio_numbers": len({p["portfolio_number"]
+                                      for p in pkgs}),
+            "package_ids": len({p["historical_package_id"]
+                                for p in pkgs}),
+            "buyer_release": len(pkgs),
+            "frozen_total": len(disp),
+        }
+        return {
+            "ok": not problems,
+            "problems": problems,
+            "counts": counts,
+            "ambiguous_identities": len(problems),
+        }
+
+    # ---- legacy (pre-R382): all 15 in DOWNLOAD -------------------------
     nums = [p["portfolio_number"] for p in pkgs]
     ids = [p["historical_package_id"] for p in pkgs]
     folders = [p["folder_name"] for p in pkgs]
@@ -117,8 +215,6 @@ def verify_registry(portfolio_root: str) -> dict:
         problems.append("historical package ids not unique")
     if len(set(folders)) != 15:
         problems.append("folder names not unique")
-
-    import zipfile
 
     for p in pkgs:
         pdir = os.path.join(download, p["folder_name"])

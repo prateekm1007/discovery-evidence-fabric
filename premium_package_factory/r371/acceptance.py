@@ -74,6 +74,15 @@ def _load(portfolio_root, rel):
         return json.load(f)
 
 
+def _pkg_loc(portfolio_root, row):
+    """R382 disposition-aware package location: (absolute dir, relative
+    dir). Buyer packages live in DOWNLOAD/; held/specialist/retired
+    packages live in their state directories with bytes frozen by the
+    disposition record (fallback for pre-R382 trees: DOWNLOAD)."""
+    from ..r382.disposition import package_location
+    return package_location(portfolio_root, row["num"])
+
+
 def run_acceptance(portfolio_root):
     results = []  # (condition, status, details)
     packages = load_all_packages()
@@ -135,8 +144,9 @@ def run_acceptance(portfolio_root):
     problems = []
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
-        pdir = os.path.join(portfolio_root, "DOWNLOAD", folder)
-        pm = _load(portfolio_root, f"DOWNLOAD/{folder}/PACKAGE_MANIFEST.json")
+        pdir, _rel = _pkg_loc(portfolio_root, row)
+        pm = json.load(open(os.path.join(pdir, "PACKAGE_MANIFEST.json"),
+                            encoding="utf-8"))
         version = pm["package_version"]
         for pdf in ("00_PACKAGE_README.pdf", "01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf",
                     "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf",
@@ -157,7 +167,8 @@ def run_acceptance(portfolio_root):
     mech_fail, exp_fail = [], []
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
-        fp = os.path.join(portfolio_root, "DOWNLOAD", folder,
+        pdir, _rel = _pkg_loc(portfolio_root, row)
+        fp = os.path.join(pdir,
                           "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf")
         imgs = pdf_images(fp)
         big = [(w, h) for w, h in imgs if w >= 1000 and h >= 700]
@@ -172,7 +183,9 @@ def run_acceptance(portfolio_root):
     eq_fail = []
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
-        reg = _load(portfolio_root, f"DOWNLOAD/{folder}/EQUATION_REGISTRY.json")
+        pdir, _rel = _pkg_loc(portfolio_root, row)
+        reg = json.load(open(os.path.join(pdir, "EQUATION_REGISTRY.json"),
+                             encoding="utf-8"))
         typeset = [e for e in reg["equations"] if e["rendering"] == "TYPESET_MATHEXT"]
         if not typeset:
             eq_fail.append(f"{folder}: no typeset equation")
@@ -185,8 +198,7 @@ def run_acceptance(portfolio_root):
         # <=700px tall; diagrams are >=850px tall — height is the discriminator;
         # width varies with equation length so it is not a valid filter)
         imgs = pdf_images(os.path.join(
-            portfolio_root, "DOWNLOAD", folder,
-            "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf"))
+            pdir, "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf"))
         eq_imgs = [i for i in imgs if i[1] <= 700]
         if len(eq_imgs) < len(typeset):
             eq_fail.append(f"{folder}: {len(eq_imgs)} eq images < {len(typeset)} typeset")
@@ -200,7 +212,9 @@ def run_acceptance(portfolio_root):
                "FUNDAMENTALLY_UNRESOLVED"}
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
-        rm = _load(portfolio_root, f"DOWNLOAD/{folder}/UNKNOWN_ROADMAP.json")
+        pdir, _rel = _pkg_loc(portfolio_root, row)
+        rm = json.load(open(os.path.join(pdir, "UNKNOWN_ROADMAP.json"),
+                            encoding="utf-8"))
         if rm["unknown_count_roadmap"] != rm["unknown_count_source"]:
             ur_fail.append(f"{folder}: count changed")
         for u in rm["unknowns"]:
@@ -217,7 +231,9 @@ def run_acceptance(portfolio_root):
                 "BUYER_PROFILE", "IP_STATUS"}
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
-        ce = _load(portfolio_root, f"DOWNLOAD/{folder}/COMMERCIAL_EVIDENCE.json")
+        pdir, _rel = _pkg_loc(portfolio_root, row)
+        ce = json.load(open(os.path.join(pdir, "COMMERCIAL_EVIDENCE.json"),
+                            encoding="utf-8"))
         secs = {s["section"] for s in ce["commercial_evidence"]}
         if secs != SECTIONS:
             ce_fail.append(f"{folder}: sections {secs ^ SECTIONS}")
@@ -245,8 +261,8 @@ def run_acceptance(portfolio_root):
     tm_fail = []
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
-        txt = pdf_text(os.path.join(portfolio_root, "DOWNLOAD", folder,
-                                    "05_TRANSFER_MANIFEST.pdf"))
+        pdir, _rel = _pkg_loc(portfolio_root, row)
+        txt = pdf_text(os.path.join(pdir, "05_TRANSFER_MANIFEST.pdf"))
         for section in ("CONFIDENTIALITY CLASSIFICATION", "BUYER CAPABILITY REQUIRED",
                         "IP STATUS"):
             if section not in txt:
@@ -260,9 +276,10 @@ def run_acceptance(portfolio_root):
         r"[^.]{0,60}\$\s?\d)", re.I)
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
+        pdir, _rel = _pkg_loc(portfolio_root, row)
         for pdf in ("01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf", "03_BUYER_DECISION_CARD.pdf",
                     "00_PACKAGE_README.pdf", "05_TRANSFER_MANIFEST.pdf"):
-            txt = pdf_text(os.path.join(portfolio_root, "DOWNLOAD", folder, pdf))
+            txt = pdf_text(os.path.join(pdir, pdf))
             for m in pattern.finditer(txt):
                 market_hits.append(f"{folder}/{pdf}: {m.group(0)[:40]}")
     record("0 unsupported market claims", not market_hits,
@@ -273,6 +290,7 @@ def run_acceptance(portfolio_root):
     comp_hits = []
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
+        pdir, _rel = _pkg_loc(portfolio_root, row)
         # authored documents must not name companies UNLESS the name is a
         # cited mention. R373 amendment (disclosed): the citation window
         # is 400 chars (was 100) because a V2-corrected transfer item is
@@ -285,15 +303,14 @@ def run_acceptance(portfolio_root):
             r"PMC\d+|PubMed\s?\d+|https?://|DOI:?|\bK\d{6}\b", re.I)
         for pdf in ("01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf", "03_BUYER_DECISION_CARD.pdf",
                     "00_PACKAGE_README.pdf"):
-            txt = pdf_text(os.path.join(portfolio_root, "DOWNLOAD", folder, pdf))
+            txt = pdf_text(os.path.join(pdir, pdf))
             for m in COMPANY.finditer(txt):
                 window = txt[max(0, m.start() - 400):m.end() + 400]
                 if not CITE.search(window):
                     comp_hits.append(f"{folder}/{pdf}: {m.group(0)}")
         # evidence summary may name them ONLY inside cited snippets: verify each
         # name occurrence is within 400 chars of a 'Source' citation line
-        txt = pdf_text(os.path.join(portfolio_root, "DOWNLOAD", folder,
-                                    "04_EVIDENCE_SUMMARY.pdf"))
+        txt = pdf_text(os.path.join(pdir, "04_EVIDENCE_SUMMARY.pdf"))
         for m in COMPANY.finditer(txt):
             window = txt[max(0, m.start() - 500):m.start()]
             if "Source" not in window and "V2 MUTATION" not in window:
@@ -313,17 +330,17 @@ def run_acceptance(portfolio_root):
     RETIRE_CTX = re.compile(r"retired|template artifact|prior", re.I)
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
+        pdir, _rel = _pkg_loc(portfolio_root, row)
         for pdf in ("00_PACKAGE_README.pdf", "01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf",
                     "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf",
                     "03_BUYER_DECISION_CARD.pdf", "05_TRANSFER_MANIFEST.pdf"):
-            txt = pdf_text(os.path.join(portfolio_root, "DOWNLOAD", folder, pdf))
+            txt = pdf_text(os.path.join(pdir, pdf))
             for m in LADDER.finditer(txt):
                 window = txt[max(0, m.start() - 150):m.end() + 150]
                 if not RETIRE_CTX.search(window):
                     th_fail.append(f"{folder}/{pdf}: {m.group(0)}")
         # kill condition must match the V2-mutated headlines registry verbatim
-        txt = pdf_text(os.path.join(portfolio_root, "DOWNLOAD", folder,
-                                    "03_BUYER_DECISION_CARD.pdf"))
+        txt = pdf_text(os.path.join(pdir, "03_BUYER_DECISION_CARD.pdf"))
         kill = headlines[row["pkg_id"]]["kill_if"]
         if kill and kill[:80] not in txt:
             th_fail.append(f"{folder}: kill condition drifted from registry")
@@ -342,7 +359,7 @@ def run_acceptance(portfolio_root):
     # every distribution root file must be described in README
     for fn in ("PORTFOLIO_IDENTITY_REGISTRY.json", "PORTFOLIO_RANKING.json",
                "PORTFOLIO_INDEX.pdf", "PORTFOLIO_RELEASE_REPORT.pdf",
-               "00_PORTFOLIO_15_TECHNOLOGIES.pdf", "RELEASE_CONTENT_MANIFEST.json"):
+               "RELEASE_CONTENT_MANIFEST.json"):
         if fn not in readme:
             drift.append(f"README does not describe {fn}")
     record("0 archive/documentation drift", not drift, f"problems={drift[:5]}")
@@ -351,9 +368,10 @@ def run_acceptance(portfolio_root):
     proto_fail = []
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
+        pdir, _rel = _pkg_loc(portfolio_root, row)
         for pdf in ("02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf",
                     "03_BUYER_DECISION_CARD.pdf"):
-            txt = pdf_text(os.path.join(portfolio_root, "DOWNLOAD", folder, pdf))
+            txt = pdf_text(os.path.join(pdir, pdf))
             if re.search(r"\bprototype exists\b", txt, re.I):
                 if not re.search(r"[Nn]o prototype exists", txt):
                     proto_fail.append(f"{folder}/{pdf}: affirmative prototype claim")
@@ -365,8 +383,9 @@ def run_acceptance(portfolio_root):
     v2_pkgs = {p.pkg_id for p in packages if p.addendum}
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
-        pdir = os.path.join(portfolio_root, "DOWNLOAD", folder)
-        pm = _load(portfolio_root, f"DOWNLOAD/{folder}/PACKAGE_MANIFEST.json")
+        pdir, _rel = _pkg_loc(portfolio_root, row)
+        pm = json.load(open(os.path.join(pdir, "PACKAGE_MANIFEST.json"),
+                            encoding="utf-8"))
         listed = {f["file"] for f in pm["files"]} | {"PACKAGE_MANIFEST.json"}
         actual = set(
             os.path.relpath(os.path.join(root, f), pdir)
@@ -399,22 +418,21 @@ def run_acceptance(portfolio_root):
     td_fail, td_rows = [], []
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
-        pdir = os.path.join(portfolio_root, "DOWNLOAD", folder)
+        pdir, _rel = _pkg_loc(portfolio_root, row)
         mdir = os.path.join(pdir, "MODEL")
         status_fp = os.path.join(mdir, "3D_DESIGN_STATUS.json")
         if not os.path.exists(status_fp):
             td_fail.append(f"{folder}: MODEL/3D_DESIGN_STATUS.json missing")
             continue
-        st = _load(portfolio_root, f"DOWNLOAD/{folder}/MODEL/"
-                                  f"3D_DESIGN_STATUS.json")
+        st = json.load(open(status_fp, encoding="utf-8"))
         cls = st.get("classification")
         s3 = st.get("3d_design_status")
         mfiles = sorted(os.listdir(mdir)) if os.path.isdir(mdir) else []
         geom_exts = {".step", ".stl", ".glb", ".svg"}
         geom_files = [f for f in mfiles
                       if f.rsplit(".", 1)[-1].lower() in geom_exts]
-        pmx = _load(portfolio_root,
-                    f"DOWNLOAD/{folder}/PACKAGE_MANIFEST.json")
+        pmx = json.load(open(os.path.join(pdir, "PACKAGE_MANIFEST.json"),
+                             encoding="utf-8"))
         pm_3d = pmx.get("three_d_design") or {}
         # the manifest must carry the SAME classification/status as the
         # MODEL/ record (no drift between the two claims)
@@ -422,8 +440,9 @@ def run_acceptance(portfolio_root):
                 pm_3d.get("status") != s3:
             td_fail.append(f"{folder}: manifest/3D_DESIGN_STATUS drift")
         # traceability must reference the 3D layer with same verdict
-        tr = _load(portfolio_root, f"DOWNLOAD/{folder}/"
-                                   f"ENGINEERING_TRACEABILITY.json")
+        tr = json.load(open(
+            os.path.join(pdir, "ENGINEERING_TRACEABILITY.json"),
+            encoding="utf-8"))
         tr_3d = tr.get("three_d_design") or {}
         if tr_3d.get("classification") != cls or \
                 tr_3d.get("status") != s3:
@@ -473,12 +492,13 @@ def run_acceptance(portfolio_root):
                 else:
                     td_fail.append(f"{folder}: no loop evidence")
                 # validation report must say valid AND carry the G-gates
-                gv = _load(portfolio_root, f"DOWNLOAD/{folder}/MODEL/"
-                                           f"GEOMETRY_VALIDATION_REPORT.json")
+                gv = json.load(open(os.path.join(
+                    mdir, "GEOMETRY_VALIDATION_REPORT.json"),
+                    encoding="utf-8"))
                 if gv.get("valid") is not True:
                     td_fail.append(f"{folder}: geometry report not valid")
-                kd = _load(portfolio_root, f"DOWNLOAD/{folder}/MODEL/"
-                                           f"KEY_DIMENSIONS.json")
+                kd = json.load(open(os.path.join(
+                    mdir, "KEY_DIMENSIONS.json"), encoding="utf-8"))
                 objs = kd.get("objects") or {}
                 covered = {e.get("object_id") for e in
                            (kd.get("computation_log") or [])}
@@ -516,7 +536,24 @@ def run_acceptance(portfolio_root):
               encoding="utf-8") as f:
         json.dump(_r381_audit, f, indent=2, ensure_ascii=False)
 
-    # -- 17. release candidate --------------------------------------------------------------------------------
+    # -- 18. R382 CEO PORTFOLIO DISPOSITION ----------------------------------
+    # The buyer release IS the 4 BUYER_PRIMARY packages; every non-buyer
+    # package is frozen in its state dir; every disposition carries
+    # verifiable evidence; the CEO's business claims stay attributed as
+    # CEO-stated, never laundered as record evidence (Art. III/VI/XV).
+    from ..r382.disposition import verify_disposition
+    disp_check = verify_disposition(portfolio_root)
+    record(f"CEO portfolio disposition enforced "
+           f"({disp_check['rows'] and sum(1 for r in disp_check['rows'])}"
+           f" packages: buyer release 4 in CEO order)",
+           disp_check["ok"],
+           f"problems={disp_check['problems'][:6]}")
+    with open(os.path.join(portfolio_root, "INTERNAL_QA",
+                           "R382_DISPOSITION_AUDIT.json"), "w",
+              encoding="utf-8") as f:
+        json.dump(disp_check, f, indent=2, ensure_ascii=False)
+
+    # -- 19. release candidate --------------------------------------------------------------------------------
     all_pass = all(s == "PASS" for _, s, _ in results)
     report = {
         "report": "R371_ACCEPTANCE_REPORT",
@@ -542,24 +579,34 @@ def run_acceptance(portfolio_root):
         candidate = {
             "artifact": "PORTFOLIO_RELEASE_CANDIDATE",
             "generated_at": _now(),
-            "cycle": "R371",
+            "cycle": "R382",
+            "buyer_release": (
+                "4 BUYER_PRIMARY packages in CEO presentation order "
+                "(04 drainage floor, 11 gravity damper, 13 pressure "
+                "sensor, 08 NIR photovoltaic) per PORTFOLIO_"
+                "DISPOSITION.json"),
             "acceptance_report": "INTERNAL_QA/R371_ACCEPTANCE_REPORT.json",
             "master_zip_sha256": report["master_zip_sha256"],
             "identity_registry_sha256": sha256_file(
                 os.path.join(portfolio_root, "PORTFOLIO_IDENTITY_REGISTRY.json")),
             "status": "RELEASE_CANDIDATE_SUBMITTED_FOR_CEO_AUDIT",
             "note": (
-                "All 15 acceptance conditions PASS mechanically. Per "
-                "Constitution Art. XXVI this is a builder-produced result and "
-                "requires independent CEO audit before the release is called "
+                "All acceptance conditions PASS mechanically, including "
+                "the R382 disposition gate. Per Constitution Art. XXVI "
+                "this is a builder-produced result and requires "
+                "independent CEO audit before the release is called "
                 "complete."
             ),
         }
         rel_dir = os.path.join(portfolio_root, "RELEASE")
         os.makedirs(rel_dir, exist_ok=True)
-        with open(os.path.join(rel_dir, "R371_RELEASE_CANDIDATE.json"), "w",
+        with open(os.path.join(rel_dir, "R382_RELEASE_CANDIDATE.json"), "w",
                   encoding="utf-8") as f:
             json.dump(candidate, f, indent=2, ensure_ascii=False)
+        # the historical R371 release candidate (if present) is NEVER
+        # rewritten here: its recorded sha256 belongs to the 15-package
+        # master ZIP preserved in RELEASE/history_r381/ (Art. VI — the
+        # record of the superseded release stays true for its own bytes)
     return report
 
 

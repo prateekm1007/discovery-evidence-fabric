@@ -788,7 +788,11 @@ def validate_geometry(model: Dict[str, Any],
                 mesh = trimesh.load(art.get("path"), force="mesh")
                 watertight = bool(mesh.is_watertight)
                 g2_results.append({
-                    "artifact": key, "path": art.get("path"),
+                    "artifact": key,
+                    # R382 boundary rule: a shipped buyer artifact must
+                    # not reference the transferor's filesystem — the
+                    # artifact identity is the key + filename
+                    "path": os.path.basename(art.get("path") or ""),
                     "watertight": watertight,
                     "faces": int(len(mesh.faces)),
                     "vertices": int(len(mesh.vertices)),
