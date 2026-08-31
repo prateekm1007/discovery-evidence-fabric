@@ -339,10 +339,15 @@ def build_release_content_manifest(portfolio_root, include_readme=True):
         if not os.path.isdir(pdir) or not os.path.exists(zpath):
             raise FileNotFoundError(f"package missing: {folder}")
         files = []
-        for f in sorted(os.listdir(pdir)):
-            fp = os.path.join(pdir, f)
-            files.append({"path": f, "sha256": sha256_file(fp),
-                          "bytes": os.path.getsize(fp)})
+        # R381: recursive walk — MODEL/ subdirectory files are first-class
+        # release content (same paths as the package ZIP entries)
+        for root, _dirs, fnames in os.walk(pdir):
+            for f in fnames:
+                rel = os.path.relpath(os.path.join(root, f), pdir)
+                files.append({"path": rel, "sha256": sha256_file(
+                    os.path.join(pdir, rel)),
+                    "bytes": os.path.getsize(os.path.join(pdir, rel))})
+        files.sort(key=lambda e: e["path"])
         entries.append({
             "path": f"DOWNLOAD/{folder}", "role": "package folder",
             "package_id": row["pkg_id"], "portfolio_number": row["num"],

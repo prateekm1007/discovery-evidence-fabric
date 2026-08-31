@@ -101,13 +101,25 @@ def run_acceptance(portfolio_root):
         if "sha256" in entry and sha256_file(fp) != entry["sha256"]:
             problems.append(f"hash drift {entry['path']}")
         if entry["role"] == "package folder":
-            actual = sorted(f for f in os.listdir(fp))
+            # R381: recursive comparison — MODEL/ files are folder content
+            actual = sorted(
+                os.path.relpath(os.path.join(root, f), fp)
+                for root, _dirs, fs in os.walk(fp) for f in fs)
             listed = sorted(f["path"] for f in entry["files"])
             if actual != listed:
                 problems.append(f"folder/manifest drift {entry['path']}")
             for fe in entry["files"]:
                 if sha256_file(os.path.join(fp, fe["path"])) != fe["sha256"]:
                     problems.append(f"file hash drift {entry['path']}/{fe['path']}")
+            # R381: package ZIP must equal the folder content byte-for-byte
+            # (folder/ZIP mechanical equivalence, CEO portfolio step 8)
+            zpath = entry["path"] + ".zip"
+            with zipfile.ZipFile(os.path.join(portfolio_root, zpath)) as zf:
+                znames = sorted(zf.namelist())
+            if znames != actual:
+                problems.append(
+                    f"zip/folder drift {zpath}: "
+                    f"{sorted(set(znames) ^ set(actual))[:4]}")
     master = os.path.join(portfolio_root, "DOWNLOAD",
                           "technology-transfer-portfolio-15.zip")
     with zipfile.ZipFile(master) as zf:
@@ -356,7 +368,9 @@ def run_acceptance(portfolio_root):
         pdir = os.path.join(portfolio_root, "DOWNLOAD", folder)
         pm = _load(portfolio_root, f"DOWNLOAD/{folder}/PACKAGE_MANIFEST.json")
         listed = {f["file"] for f in pm["files"]} | {"PACKAGE_MANIFEST.json"}
-        actual = set(os.listdir(pdir))
+        actual = set(
+            os.path.relpath(os.path.join(root, f), pdir)
+            for root, _dirs, fs in os.walk(pdir) for f in fs)
         if listed != actual:
             prov_fail.append(f"{folder}: manifest/folder file set drift")
         for must in ("ENGINEERING_TRACEABILITY.json", "MATURITY_BASIS.json"):
@@ -378,7 +392,131 @@ def run_acceptance(portfolio_root):
             pass
     record("0 provenance loss", not prov_fail, f"problems={prov_fail[:5]}")
 
-    # -- 16. release candidate --------------------------------------------------------------------------------
+    # -- 16. R381 3D ENGINEERING DESIGN HONESTY ----------------------------------
+    # CEO R381 portfolio steps 8-10: every package carries an honest 3D
+    # classification; every applicable package carries a real validated
+    # model; NO package silently claims 3D where 3D is NOT_APPLICABLE.
+    td_fail, td_rows = [], []
+    for row in PACKAGE_MAP:
+        folder = f"{row['num']}_{row['short']}"
+        pdir = os.path.join(portfolio_root, "DOWNLOAD", folder)
+        mdir = os.path.join(pdir, "MODEL")
+        status_fp = os.path.join(mdir, "3D_DESIGN_STATUS.json")
+        if not os.path.exists(status_fp):
+            td_fail.append(f"{folder}: MODEL/3D_DESIGN_STATUS.json missing")
+            continue
+        st = _load(portfolio_root, f"DOWNLOAD/{folder}/MODEL/"
+                                  f"3D_DESIGN_STATUS.json")
+        cls = st.get("classification")
+        s3 = st.get("3d_design_status")
+        mfiles = sorted(os.listdir(mdir)) if os.path.isdir(mdir) else []
+        geom_exts = {".step", ".stl", ".glb", ".svg"}
+        geom_files = [f for f in mfiles
+                      if f.rsplit(".", 1)[-1].lower() in geom_exts]
+        pmx = _load(portfolio_root,
+                    f"DOWNLOAD/{folder}/PACKAGE_MANIFEST.json")
+        pm_3d = pmx.get("three_d_design") or {}
+        # the manifest must carry the SAME classification/status as the
+        # MODEL/ record (no drift between the two claims)
+        if pm_3d.get("classification") != cls or \
+                pm_3d.get("status") != s3:
+            td_fail.append(f"{folder}: manifest/3D_DESIGN_STATUS drift")
+        # traceability must reference the 3D layer with same verdict
+        tr = _load(portfolio_root, f"DOWNLOAD/{folder}/"
+                                   f"ENGINEERING_TRACEABILITY.json")
+        tr_3d = tr.get("three_d_design") or {}
+        if tr_3d.get("classification") != cls or \
+                tr_3d.get("status") != s3:
+            td_fail.append(f"{folder}: traceability/3D_DESIGN_STATUS drift")
+        if cls == "3D_NOT_APPLICABLE":
+            if geom_files:
+                td_fail.append(
+                    f"{folder}: NOT_APPLICABLE but geometry artifacts "
+                    f"present: {geom_files[:4]}")
+            for f in mfiles:
+                if f not in ("3D_DESIGN_STATUS.json", "README.json"):
+                    td_fail.append(
+                        f"{folder}: NOT_APPLICABLE but extra MODEL file {f}")
+        elif cls == "3D_PHYSICAL_DESIGN_REQUIRED":
+            if s3 == "PRESENT_AND_VALIDATED":
+                for must in ("PARAMETRIC_MODEL_SOURCE.py",
+                             "MODEL_MANIFEST.json", "PARAMETERS.json",
+                             "CONSTRAINTS.json",
+                             "GEOMETRY_VALIDATION_REPORT.json",
+                             "KEY_DIMENSIONS.json",
+                             "ENGINEERING_PROVENANCE.json",
+                             "DESIGN_LINEAGE.json",
+                             "IMPROVEMENT_LOOP_EVIDENCE.json"):
+                    if must not in mfiles:
+                        td_fail.append(
+                            f"{folder}: validated model missing {must}")
+                if not any(f.endswith(".step") for f in mfiles):
+                    td_fail.append(f"{folder}: no STEP derivative")
+                if not any(f.endswith(".stl") for f in mfiles):
+                    td_fail.append(f"{folder}: no STL derivative")
+                if not any(f.endswith(".glb") for f in mfiles):
+                    td_fail.append(f"{folder}: no GLB derivative")
+                views = [f for f in mfiles if f.endswith(".svg")]
+                if not views:
+                    td_fail.append(f"{folder}: no rendered views")
+                # the improvement loop must have RUN (any honest outcome)
+                loop_fp = os.path.join(mdir, "IMPROVEMENT_LOOP_EVIDENCE.json")
+                if os.path.exists(loop_fp):
+                    loop = json.load(open(loop_fp, encoding="utf-8"))
+                    if loop.get("outcome") not in (
+                            "KEEP", "KILL", "KILLED_GEOMETRY_INVALID",
+                            "KILLED_EVALUATION_UNAVAILABLE",
+                            "ERROR_UNBOUND_PARAMETER"):
+                        td_fail.append(
+                            f"{folder}: bad loop outcome "
+                            f"{loop.get('outcome')}")
+                else:
+                    td_fail.append(f"{folder}: no loop evidence")
+                # validation report must say valid AND carry the G-gates
+                gv = _load(portfolio_root, f"DOWNLOAD/{folder}/MODEL/"
+                                           f"GEOMETRY_VALIDATION_REPORT.json")
+                if gv.get("valid") is not True:
+                    td_fail.append(f"{folder}: geometry report not valid")
+                kd = _load(portfolio_root, f"DOWNLOAD/{folder}/MODEL/"
+                                           f"KEY_DIMENSIONS.json")
+                objs = kd.get("objects") or {}
+                covered = {e.get("object_id") for e in
+                           (kd.get("computation_log") or [])}
+                for oid in objs:
+                    if oid not in covered:
+                        td_fail.append(
+                            f"{folder}: {oid} measurement lacks "
+                            f"computation log")
+            elif not str(s3 or "").startswith("BLOCKED"):
+                td_fail.append(
+                    f"{folder}: REQUIRED but neither validated nor "
+                    f"BLOCKED: {s3}")
+            else:
+                # honest BLOCKED requires an exact reason (CEO: record
+                # BLOCKED with the exact reason, never fabricate)
+                if not st.get("reason"):
+                    td_fail.append(f"{folder}: BLOCKED without reason")
+        else:
+            td_fail.append(f"{folder}: bad classification {cls}")
+        td_rows.append({"folder": folder, "classification": cls,
+                        "status": s3,
+                        "loop": (pm_3d.get("improvement_loop_outcome"))})
+    n_ok = sum(1 for r in td_rows if r["classification"] ==
+               "3D_PHYSICAL_DESIGN_REQUIRED")
+    n_na = sum(1 for r in td_rows if r["classification"] ==
+               "3D_NOT_APPLICABLE")
+    record(f"15/15 honest 3D design classification "
+           f"({n_ok} REQUIRED / {n_na} NOT_APPLICABLE)",
+           not td_fail,
+           f"problems={td_fail[:6]}")
+    # persist the R381 audit rows for the release report
+    _r381_audit = {"rows": td_rows, "failures": td_fail[:20]}
+    with open(os.path.join(portfolio_root, "INTERNAL_QA",
+                           "R381_3D_DESIGN_AUDIT.json"), "w",
+              encoding="utf-8") as f:
+        json.dump(_r381_audit, f, indent=2, ensure_ascii=False)
+
+    # -- 17. release candidate --------------------------------------------------------------------------------
     all_pass = all(s == "PASS" for _, s, _ in results)
     report = {
         "report": "R371_ACCEPTANCE_REPORT",

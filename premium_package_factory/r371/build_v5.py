@@ -74,6 +74,7 @@ from premium_package_factory.r372.diagram_adequacy import (
 from premium_package_factory.r372.equation_validation import validate_registry
 from premium_package_factory.r372.traceability_semantics import (
     build_traceability_json, portfolio_traceability_table)
+from premium_package_factory.r381.portfolio_cad import build_model_layer
 
 FACTORY_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 ENGINE_ROOT = os.path.dirname(FACTORY_ROOT)
@@ -101,7 +102,28 @@ PACKAGE_JSON_ROLES = {
     "VALIDATION_ECONOMICS.json": "cost NOT_ESTABLISHED + time ranges with basis",
     "LOOP_STATE.json": "loop verification state + event queues",
     "V2_MUTATION_ADDENDUM.json": "V1->V2 mutation trail (external-evidence driven)",
+    "MODEL/3D_DESIGN_STATUS.json": "R381 honest 3D classification (REQUIRED / NOT_APPLICABLE)",
+    "MODEL/PARAMETRIC_MODEL_SOURCE.py": "R381 parametric build program — source of truth",
+    "MODEL/MODEL_MANIFEST.json": "R381 model identity, kernel, artifacts + sha256, views",
+    "MODEL/PARAMETERS.json": "R381 parameter map + envelopes + record bindings",
+    "MODEL/CONSTRAINTS.json": "R381 geometric constraints, interference pairs, material compatibility",
+    "MODEL/GEOMETRY_VALIDATION_REPORT.json": "R381 deterministic G1-G8 validation on the built solid",
+    "MODEL/KEY_DIMENSIONS.json": "R381 measured geometry + computation logs",
+    "MODEL/ENGINEERING_PROVENANCE.json": "R381 per-parameter provenance chains",
+    "MODEL/DESIGN_LINEAGE.json": "R381 base -> mutation -> child lineage",
+    "MODEL/IMPROVEMENT_LOOP_EVIDENCE.json": "R381 mutation -> rebuild -> evaluate -> KEEP/KILL",
+    "MODEL/README.json": "R381 model directory readme",
 }
+
+
+def _package_files_recursive(pdir):
+    """Relative paths of every FILE under the package dir (MODEL/
+    included). Sorted; directories themselves are not entries."""
+    out = []
+    for root, _dirs, files in os.walk(pdir):
+        for f in files:
+            out.append(os.path.relpath(os.path.join(root, f), pdir))
+    return sorted(out)
 
 
 def _write_json(path, obj):
@@ -243,10 +265,59 @@ def build(portfolio_root, work_dir=None):
               f"({len(exp)} authoritative strings verified in full)")
 
         # machine-readable layer
+        # R381: the 3D engineering design layer runs FIRST here so its
+        # verdict can enter the traceability + manifest records below.
+        # Honest outcomes only (PRESENT_AND_VALIDATED / NOT_APPLICABLE /
+        # BLOCKED_*); a BLOCKED/NOT_APPLICABLE status never kills the
+        # package build (the buyer package is the deliverable, the 3D
+        # layer is evidence). Fail-closed on CRASH (a silent skip would
+        # fabricate a package without its design layer). CAD crashes are
+        # recorded honestly as BLOCKED with the exception, never hidden.
+        try:
+            model_summary = build_model_layer(p.pkg_id, pdir,
+                                              work_dir=work)
+        except Exception as exc:  # noqa: BLE001
+            from premium_package_factory.r381.portfolio_cad import (
+                R381_VERSION, _write_json as _r381_write_json, MODEL_DIR)
+            import traceback as _tb
+            mdir = os.path.join(pdir, MODEL_DIR)
+            os.makedirs(mdir, exist_ok=True)
+            _r381_write_json(os.path.join(
+                mdir, "3D_DESIGN_STATUS.json"), {
+                "artifact": "3D_DESIGN_STATUS",
+                "r381_version": R381_VERSION,
+                "package_id": p.pkg_id,
+                "classification": "3D_PHYSICAL_DESIGN_REQUIRED",
+                "3d_design_status": "BLOCKED_PIPELINE_EXCEPTION",
+                "reason": (f"the R381 CAD layer raised {type(exc).__name__}: "
+                           f"{exc} — recorded, not hidden (Art. XV)"),
+                "traceback_tail": _tb.format_exc().strip().splitlines()[-6:],
+            })
+            model_summary = {"status": "BLOCKED_PIPELINE_EXCEPTION",
+                             "files": [], "model_id": None}
+        print(f"   {p.num} R381 3D: {model_summary.get('status')}")
+
         # R372-1: ENGINEERING_TRACEABILITY.json now carries explicit
         # per-chain semantics (legacy R370 record preserved inside it)
+        # R381: the traceability record gains the 3D-design chain summary
+        # (the full per-parameter chain ships in MODEL/ENGINEERING_PROVENANCE)
+        _trace = traces[p.pkg_id]
+        _trace["three_d_design"] = {
+            "r381_version": model_summary.get("r381_version", "1.0.0"),
+            "classification": (model_summary.get("classification") or
+                               {}).get("classification"),
+            "status": model_summary.get("status"),
+            "model_id": model_summary.get("model_id"),
+            "improvement_loop_outcome": model_summary.get("loop_outcome"),
+            "provenance": "MODEL/ENGINEERING_PROVENANCE.json",
+            "chain_shape": ("TECHNICAL_STATE -> parameter -> CAD feature -> "
+                            "derived geometry -> measured geometry -> "
+                            "validation result"),
+            "evidence_class": "COMPUTATIONAL_RESULT",
+            "render_is_not_validation": True,
+        }
         _write_json(os.path.join(pdir, "ENGINEERING_TRACEABILITY.json"),
-                    traces[p.pkg_id])
+                    _trace)
         legacy_num = os.path.join(INPUT_DIR, "legacy_json", p.num)
         for fn in ("MATURITY_BASIS.json",):
             src = os.path.join(legacy_num, fn)
@@ -273,13 +344,15 @@ def build(portfolio_root, work_dir=None):
                                  os.path.join(pdir, fcert))
 
         # package manifest (identity-linked) — files hashed from disk
+        # R381: MODEL/ files are first-class manifest entries (recursive
+        # walk; subdirectory files listed as MODEL/<name>)
         files = []
-        for f in sorted(os.listdir(pdir)):
+        for f in _package_files_recursive(pdir):
             if f == "PACKAGE_MANIFEST.json":
                 continue
             files.append({
                 "file": f,
-                "role": PACKAGE_JSON_ROLES.get(f, "buyer document"),
+                "role": PACKAGE_JSON_ROLES.get(f, _model_artifact_role(f)),
                 "sha256": sha256_file(os.path.join(pdir, f)),
             })
         pm = {
@@ -292,6 +365,20 @@ def build(portfolio_root, work_dir=None):
             "transfer_posture": "SPONSORED_VALIDATION",
             "loop_verification_state": p.loop_state,
             "has_v2_addendum": bool(p.addendum),
+            "three_d_design": {
+                "classification": (model_summary.get("classification") or
+                                   {}).get("classification"),
+                "status": model_summary.get("status"),
+                "model_id": model_summary.get("model_id"),
+                "improvement_loop_outcome": model_summary.get("loop_outcome"),
+                "directory": "MODEL/",
+                "policy": (
+                    "CEO R381: honest classification from the canonical "
+                    "record; geometry verdicts are MEASURED on the built "
+                    "solid; all 3D content is COMPUTATIONAL_RESULT with "
+                    "computation logs; a render is presentation, never "
+                    "validation (Art. XXVIII/XXXVIII)."),
+            },
             "identity_policy": (
                 "Portfolio number and historical package ID are bound in "
                 "PORTFOLIO_IDENTITY_REGISTRY.json and never renumbered."),
@@ -306,7 +393,7 @@ def build(portfolio_root, work_dir=None):
         if os.path.exists(zpath):
             os.remove(zpath)
         with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as zf:
-            for f in sorted(os.listdir(pdir)):
+            for f in _package_files_recursive(pdir):
                 _zip_add(zf, os.path.join(pdir, f), f)
         print(f"   {p.num} {p.pkg_id} ({p.version}) done")
 
@@ -328,7 +415,7 @@ def build(portfolio_root, work_dir=None):
         zpath = os.path.join(portfolio_root, "DOWNLOAD", f"{p.folder}.zip")
         os.remove(zpath)
         with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as zf:
-            for f in sorted(os.listdir(pdir)):
+            for f in _package_files_recursive(pdir):
                 _zip_add(zf, os.path.join(pdir, f), f)
 
     # 6. portfolio-level documents -----------------------------------------------
@@ -442,6 +529,20 @@ def build(portfolio_root, work_dir=None):
     print("[R371] V5 build complete:", portfolio_root)
     return {"portfolio_root": portfolio_root, "ranking": ranking,
             "loop_summary": loop_summary}
+
+
+def _model_artifact_role(rel_path):
+    """R381: role for MODEL/ artifacts not in the static role table
+    (STEP/STL/GLB/SVG derivatives of the parametric model)."""
+    if rel_path.startswith("MODEL/"):
+        ext = rel_path.rsplit(".", 1)[-1].lower() if "." in rel_path else ""
+        return {
+            "step": "3D engineering exchange derivative (B-rep, hashed)",
+            "stl": "mesh derivative (trimesh watertight-checked)",
+            "glb": "presentation/render derivative (render != validation)",
+            "svg": "rendered engineering view (presentation only)",
+        }.get(ext, "3D design artifact (MODEL/)")
+    return "buyer document"
 
 
 def main():
