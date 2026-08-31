@@ -6223,3 +6223,21 @@ Work Log:
 
 Stage Summary:
 - The OSTI relevance failure is root-caused to four engine-side defects and closed with the adjudication rule untouched; battery 75%, grade 3. Source routing is now grammar-honest engine-wide. The invention-chain quality instrument gives the CEO's key question its first measured answer: chains complete reliably, differentiation does not yet reach STRONG anywhere — Q2/Q3 are the next engineering target, and the instrument now measures them per-run.
+---
+Task ID: CODER-R376
+Agent: CODER (sole builder; Super Z session 2026-08-31)
+Task: CEO prior-art differentiation + resolution directive — trace weakest Q2/Q3 cases, separate failure causes, build mechanism-centered multi-query search, require claim/mechanism-level relevance, resolve families honestly, measure before/after with the existing instrument.
+
+Work Log:
+- Constitution v1.8.0 re-read in full first; repo verified clean at 18c4e8e7 (Art. XXIII).
+- Failure trace (scripts/prior_art_failure_trace.py -> TOSCANINI/PRIOR_ART_FAILURE_TRACE.json): weakest 20 of 53 runs — B breadth 18/20, E entity/claim mismatch 17/20, M no-family-resolution 17/20 (status vocabulary had NO RESOLVED state — resolution structurally impossible), F search formulation 15/20 (verb-first 6-word window lost the technical core: CFRP knee searched as 'post-market surveillance'; battery query had neither 'battery' nor 'thermal'), W invention wording 0/20 (NOT a cause).
+- Architectural defect found: grid/ensemble candidates INHERITED the naive candidate's collision verbatim (CFRP spec carried surveillance-system art) — _env_with_candidate now re-runs the collision per candidate.
+- collision_resolution.py built: candidate profile (entity/mechanism/distinguishing/adjacent terms, natural forms), 4-class query ladder, source-aware routing (Google full-form; Lens title-scoped compact top-2 — measured: 4+ term title queries return 0), 2 sources + 429 backoff, mechanism-level adjudication against the candidate profile (not the query), deterministic family clustering (>=3 title terms or assignee), resolution state machine with per-family evidence tiers (CLAIMS/ABSTRACT/TITLE) and FULL-element-set coverage denominator.
+- classify: RESOLVED_ANTICIPATED -> KILL (specific-disclosure-class, evidence recorded); RESOLVED_DIFFERENTIATED/UNRESOLVED_* non-kill; adjudication check extended.
+- 3 defects found by adversarial testing, fixed with pinned tests (R376/constitution/R376_MEMORY_ARTIFACT.md): (1) folded tokens ('prosthesi') in queries -> Lens 0 hits; (2) coverage-denominator dilution — capped query-core denominator let a DOMAIN-only patent measure 0.857 and falsely anticipate (battery case); fixed with uncapped full element set; (3) tuple-unpack crash — _collision_for_candidate returned a bare dict on success, splitting dict keys, crashing every grid candidate (GRID_ERROR 0-candidates on the first fresh medical run); traceback capture added.
+- Measurements with the UNCHANGED instrument (hash-pinned): 53-run controlled replay Q2 0.078->0.572, Q3 0.0->0.83 (44 RESOLVED_DIFFERENTIATED / 6 UNRESOLVED_NO_RELEVANT_ART / 2 partial / 1 source-failed; internal controls Q1/Q4/Q5 unchanged = replay fidelity); fresh six-domain end-to-end (medical + 5 non-medical, full chain incl. per-candidate grid collisions) Q2 0.133->0.74, Q3 0.0->1.0, all six STRONG band.
+- Before-run artifacts preserved: ENGINE_RUNS_ARCHIVE_R376_BEFORE/ (t6 originals + 2 scrapped grid-bug medical runs).
+- Suite 1616+2, frozen benchmark 126/126, secret scan clean (.env.keys untracked; zai gateway loopback secret), patentbear quota untouched (metered policy). Committed + pushed + remote-verified: 974908c7.
+
+Stage Summary:
+- The prior-art link now produces RESOLVED positions: EVIDENCE -> DISTINCT MECHANISM -> DIFFERENTIATED CANDIDATE -> RESOLVED PRIOR-ART POSITION (with surviving differentiators recorded per family) -> DECISIVE EXPERIMENT. First measured evidence for the CEO milestone: differentiated invention candidates, not merely complete dossiers. Honest limits: resolution is SEARCH_RESULT class (Art. XXVIII), abstract-tier when Google claims fetch is 503; 6 runs found no relevant art (recorded UNRESOLVED_NO_RELEVANT_ART — never novelty claims).
