@@ -44,7 +44,9 @@ import trimesh  # noqa: E402
 
 from r384_render_lib import decimate, render_scene  # noqa: E402
 
-BUILD_ROOT = Path("/home/z/my-project/technology-transfer-portfolio-15")
+BUILD_ROOT = Path(os.environ.get(
+    "TTP_PORTFOLIO_ROOT",
+    "/home/z/my-project/technology-transfer-portfolio-15"))
 REPO_ROOT = Path("/home/z/my-project/discovery-evidence-fabric")
 TIERS = ["DOWNLOAD", "HOLDING", "RETIRED", "SPECIALIST_TRACK"]
 TOL_DIM = 1e-3   # engine MEASURED_VS_CLAIMED_TOLERANCE (mm)

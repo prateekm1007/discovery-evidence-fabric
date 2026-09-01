@@ -45,10 +45,12 @@ import json
 import pathlib
 import re
 import shutil
+import os
 import sys
 import zipfile
 
-GH = pathlib.Path("/home/z/my-project/ttp15-github")
+GH = pathlib.Path(os.environ.get(
+    "TTP_PORTFOLIO_ROOT", "/home/z/my-project/ttp15-github"))
 ENGINE = "/home/z/my-project/discovery-evidence-fabric"
 sys.path.insert(0, ENGINE)
 
