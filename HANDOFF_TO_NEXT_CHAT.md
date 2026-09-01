@@ -8,11 +8,11 @@
 > actual state, or the next session starts from a false premise — the old
 > handoff was 15 days stale, which was a real defect of exactly that class).
 >
-> **Generated:** 2026-09-01, R385B correction cycle (commit follows this file)
-> **Constitution:** `EPISTEMIC_CONSTITUTION.md` v1.8.0 — re-read IN FULL before code.
-> Read Articles II, III, XVIII, XXV, XXVII, XXVIII, XXXIV, XXXVIII with
-> particular care (they govern the CAD pipeline, evidence binding, and the
-> reality boundary).
+> **Generated:** 2026-09-01, R385B correction cycle; **updated same day by R386** (canonical release chain — §0.5). Commit follows this file.
+> **Constitution:** `EPISTEMIC_CONSTITUTION.md` v1.9.0 — re-read IN FULL before code.
+> Read Articles II, III, XVIII, XXV, XXVII, XXVIII, XXXIV, XXXVIII, **XXXIX** with
+> particular care (XXXIX governs the release chain and the buyer-distribution
+> authority; it is mechanically enforced by `scripts/r386_release_chain.py`).
 
 ---
 
@@ -24,7 +24,7 @@ about the other.**
 | | Engine repo | Portfolio repo (THE BUYER RELEASE) |
 |---|---|---|
 | URL | `github.com/prateekm1007/discovery-evidence-fabric` | `github.com/prateekm1007/technology-transfer-portfolio-15` |
-| HEAD (verified 2026-09-01, ls-remote) | `5dc153d8` | `d5f8930` |
+| HEAD (verify via `git ls-remote`, Art. XXIII; R386 chain at HEAD) | R386 or later | `c83a2a6a` (release `d5f8930` + canonical manifest) |
 | Role | The factory: engine code, CAD pipeline, tests, evidence records | The product: 15 buyer-facing technology packages |
 | 3D CAD output files | **NOT stored here by convention** ("cryptographic anchors in, regenerable binaries out"): TTP_PACKAGES/ are legacy old-generation trees with 0 CAD files; the delivered 3D-EVIDENCE ZIP is anchored by SHA256SUMS.txt, not committed | **STORED HERE**: every package ships `MODEL/` (parametric source + STEP/STL/GLB/SVG + G-gate certificates + `3D_EVIDENCE/` layer) inside the per-package ZIPs and the master ZIP |
 
@@ -41,12 +41,55 @@ its remote.
 
 ---
 
-## 1. VERIFIED STATE OF THE PORTFOLIO REPO (buyer release) — `d5f8930`
+## 0.5 THE RELEASE CHAIN (R386) — the two-repo ambiguity is now AUTOMATED away
+
+Per constitution **Article XXXIX** (v1.9.0), the program has a four-state
+release chain with automatic failure:
+
+```
+ENGINE REPO  ->  CANONICAL RELEASE MANIFEST  ->  PORTFOLIO REPO  ->  BUYER ZIP  ->  VERIFICATION
+```
+
+- Portfolio repo root now carries **`CANONICAL_RELEASE_MANIFEST.json`** (commit
+  `c83a2a6a`): pins sha256 of all 924 buyer-surface files (8 root docs + every
+  `DOWNLOAD/` file incl. `MODEL/` 3D layers + 15 package ZIPs + master ZIP
+  `5044045a…`), the engine build commit `64c5ebca` (builder script sha-pinned),
+  the 3D census recomputed from disk, and the final-authority declaration.
+- Engine repo root now carries **`ENGINE_RELEASE_REGISTRY.json`**: the
+  authoritative index pinning portfolio release commit, manifest sha256,
+  master-ZIP sha256, engine build commit, and verification records.
+- **The authority rule (verbatim, mechanical):** the buyer-distribution
+  repository, not a local workspace and not the engine repository, is the final
+  authority for what a buyer actually receives.
+- **Anyone can verify the chain from anywhere, without trusting this handoff:**
+
+```bash
+python scripts/r386_release_chain.py verify-fresh \
+  --engine-url https://github.com/prateekm1007/discovery-evidence-fabric.git \
+  --portfolio-url https://github.com/prateekm1007/technology-transfer-portfolio-15.git
+```
+
+  (exit 0 + PASS certificate = all four states agree; nonzero = a state
+  disagrees, name it in any report). 21 hermetic negative-control tests
+  (`tests/test_r386_release_chain.py`) pin that every tampered state fails.
+- Honest scope of the chain certificate: **delivery verification from clean
+  clones** (the exact bytes a buyer receives). It does NOT claim
+  rebuild-from-source reproduction — that remains the open item below (engine
+  3D self-containment, CEO decision).
+- Any future release MUST follow the Article XXXIX §5 protocol order (both
+  repos clean and pushed BEFORE the build; portfolio committed first; manifest
+  from the pushed state; registry recorded; clean-clone verification). The
+  tool refuses to generate/record on dirty or unpushed trees.
+
+---
+
+## 1. VERIFIED STATE OF THE PORTFOLIO REPO (buyer release) — `d5f8930` (manifest at `c83a2a6a`)
 
 Chain of commits: `57b9c273` (V2 flat layout, pre-3D) → `d1c802d` (V4 render
 hardening) → `fa6131b` (R384: 3D design layer added to every package) →
 `d5f8930` (R385: root buyer documents regenerated for the 3D edition + full
-release verification rerun). **No tag has been cut** (deliberate — pending CEO
+release verification rerun) → `c83a2a6a` (R386: canonical release manifest
+committed; buyer surface unchanged). **No tag has been cut** (deliberate — pending CEO
 audit sign-off).
 
 What a buyer receives at `d5f8930` (all independently re-measured by the
@@ -87,7 +130,7 @@ R385B auditor session with trimesh + cadquery, not taken from the manifests):
 
 ---
 
-## 2. VERIFIED STATE OF THE ENGINE REPO — `5dc153d8`
+## 2. VERIFIED STATE OF THE ENGINE REPO — R386 chain at HEAD (R377→R386)
 
 Rounds at HEAD: R377 (invention-substance quality) → R378/R379 (technical
 improvement engine, structured technical state) → **R380 (CAD pipeline:
@@ -158,7 +201,11 @@ The genuine lessons the audit taught, accepted and acted on:
 2. **CEO decision — engine-repo 3D self-containment.** Either sync the 3D
    output into the engine repo (or a portfolio mirror inside it), or record
    the portfolio repo as the canonical 3D home (one paragraph in the engine
-   README would suffice). Currently the split is implicit.
+   README would suffice). NOTE (R386): the *ambiguity* part of this item is
+   now closed mechanically — `CANONICAL_RELEASE_MANIFEST.json` + `ENGINE_RELEASE_REGISTRY.json`
+   declare the portfolio repo as the distribution authority and the chain
+   verifier fails on any disagreement; what remains open is only the CEO's
+   choice on physically mirroring the 3D binaries into the engine repo.
 3. **TOSCANINI frontend.** Zero committed UI. The audit's sequencing directive
    (no UI before the 3D buyer layer is complete) is now satisfied by fact —
    the 3D layer IS complete in the portfolio repo — so UI work is unblocked
@@ -180,9 +227,11 @@ The genuine lessons the audit taught, accepted and acted on:
 
 ## 5. NON-NEGOTIABLE RULES FOR THE NEXT SESSION (unchanged)
 
-1. Re-read `EPISTEMIC_CONSTITUTION.md` v1.8.0 IN FULL before writing code.
+1. Re-read `EPISTEMIC_CONSTITUTION.md` v1.9.0 IN FULL before writing code.
 2. Verify repo state from the REMOTES (`git ls-remote` / GitHub API), never
-   from local checkouts or summaries (Art. XXIII).
+   from local checkouts or summaries (Art. XXIII/XXXIX). For the buyer
+   release specifically, run the chain verifier from clean clones:
+   `python scripts/r386_release_chain.py verify-fresh ...` (Art. XXXIX §3).
 3. The verifier never trusts the claimant (Art. III): any green gate must be
    re-derivable by an independent instrument (trimesh for STL, fresh rebuild
    for CAD, `unzip -l` for ZIP contents).
@@ -205,7 +254,7 @@ The genuine lessons the audit taught, accepted and acted on:
   SOURCE tree; **currently rolled back to a pre-3D state (0 MODEL dirs)** — do
   not use as evidence of anything; the release truth is the portfolio remote.
 - `/home/z/my-project/scripts/` — generation/verification scripts
-  (r381…r385); `r385_root_docs_regeneration.py` is now committed to this
+  (r381…r386); `r385_root_docs_regeneration.py` is now committed to this
   repo's `scripts/` as well.
 
 *Historical note: the CereVasc-era program description (150 inventions, 15

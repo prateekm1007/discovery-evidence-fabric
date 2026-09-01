@@ -1,11 +1,12 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 1.8.0
+**Version:** 1.9.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
 **Amended:** 2026-08-26 (Article XXXVII — Synthetic Loop vs Real Loop Verification; see R339/constitution/ARTICLE_XXXVII_SYNTHETIC_VS_REAL_LOOP.md)
 **Amended:** 2026-08-27 (Article XXXVIII — The Reality Boundary; see R370F/constitution/ARTICLE_XXXVIII_THE_REALITY_BOUNDARY.md)
+**Amended:** 2026-09-01 (Article XXXIX — The Buyer-Distribution Repository Is the Final Authority; enforced by `scripts/r386_release_chain.py` + `ENGINE_RELEASE_REGISTRY.json` + `CANONICAL_RELEASE_MANIFEST.json`)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
 **Scope:** Governs both research output AND modifications to the epistemic machinery itself
 
@@ -1172,3 +1173,37 @@ until a genuinely real event is supplied.
 Article XXXVII distinguishes SYNTHETIC_LOOP_VERIFIED from REAL_LOOP_VERIFIED. Article XXXVIII defines the mechanical enforcement: the Reality Boundary that makes it impossible for AI to fake crossing the real-loop threshold.
 
 See the full text at `R370F/constitution/ARTICLE_XXXVIII_THE_REALITY_BOUNDARY.md`.
+
+---
+
+## Article XXXIX — The Buyer-Distribution Repository Is the Final Authority
+
+**Ratified:** 2026-09-01 (Round R386, CEO directive after the R385B external-audit reconciliation)
+**Amends:** Constitution v1.8.0 → v1.9.0
+**Enforced by:** `scripts/r386_release_chain.py` (four-state verifier with 21 hermetic negative controls), `ENGINE_RELEASE_REGISTRY.json` (engine side), `CANONICAL_RELEASE_MANIFEST.json` (portfolio side)
+
+### The Central Rule
+
+> **The buyer-distribution repository, not a local workspace and not the engine repository, is the final authority for what a buyer actually receives.**
+
+The chain of custody for anything a buyer receives is exactly:
+
+```
+ENGINE REPO  →  CANONICAL RELEASE MANIFEST  →  PORTFOLIO REPO  →  BUYER ZIP  →  VERIFICATION
+```
+
+Any local checkout, engine-side copy, or summary that disagrees with the pushed main branch of the buyer-distribution repository is, by definition, stale or wrong with respect to buyer truth. The R385B audit reconciliation proved this failure mode is real: a rolled-back local workspace made two external auditors and a coder disagree about whether the buyer release contained the 3D layer, while the pushed portfolio remote carried the truth the whole time.
+
+### Sections
+
+1. **Manifest required.** Every release MUST carry a `CANONICAL_RELEASE_MANIFEST.json` committed in the buyer-distribution repository, pinning by sha256 every buyer-surface file (the root buyer documents, every file under `DOWNLOAD/` including `MODEL/` 3D layers, the 15 package ZIPs, and the master ZIP) and recording the engine build commit and the builder-script sha256. The manifest is timeless (no timestamps; provenance is git history).
+
+2. **Engine record required.** The engine repository MUST record the same release in `ENGINE_RELEASE_REGISTRY.json`: the portfolio release commit, the manifest sha256, the master-ZIP sha256, the engine build commit, and the builder-script sha256. A manifest cannot contain its own portfolio commit hash — the engine-side registry is what closes that cycle.
+
+3. **The four states must agree exactly.** ENGINE RECORD, CANONICAL MANIFEST, PORTFOLIO TREE, and BUYER ZIP bytes must agree. Verification (`scripts/r386_release_chain.py verify-fresh`) MUST fail automatically — nonzero exit plus a FAIL certificate — when any state disagrees. No release may be claimed as shipped, tagged, or buyer-ready while the chain verifier fails or has not been run from clean clones.
+
+4. **Verification from clean clones only.** Authoritative verification runs from fresh clones of BOTH remotes (extends Article XXIII: never infer repository state from local state). A verification performed on a local workspace is non-authoritative by rule, whatever its result.
+
+5. **Release protocol order.** Both repos clean and pushed at HEAD == origin/main BEFORE the build; release content committed and pushed to the buyer-distribution repository FIRST; manifest generated from the pushed state; engine registry entry recorded; then clean-clone verification. Release content that exists only in a local workspace is UNRELEASED by definition.
+
+6. **Honesty of the chain certificate.** The chain certificate must distinguish delivery verification (the bytes in the authority repository, verified from clean clones) from rebuild-from-source reproduction. The former never implies the latter (extends Articles XXV and XXVI).
