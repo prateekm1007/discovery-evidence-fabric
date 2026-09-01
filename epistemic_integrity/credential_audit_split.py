@@ -207,6 +207,12 @@ SCANNER_SELF_EXCLUSIONS = {
     "epistemic_integrity/credential_fingerprints.py",
     "epistemic_integrity/credential_audit_split.py",
     "epistemic_integrity/historical_artifact_audit.py",
+    # R387: the adversarial test corpus for this scanner intentionally
+    # contains synthetic key-FORMAT vectors (positive controls that the
+    # patterns still catch real formats). Excluded from the production
+    # scan for the same reason the scanner's own files are: test
+    # fixtures are not repository credentials.
+    "tests/test_r387_ci_red_state_fixes.py",
 }
 
 
