@@ -253,6 +253,11 @@ The genuine lessons the audit taught, accepted and acted on:
 - `/home/z/my-project/technology-transfer-portfolio-15/` — legacy portfolio
   SOURCE tree; **currently rolled back to a pre-3D state (0 MODEL dirs)** — do
   not use as evidence of anything; the release truth is the portfolio remote.
+- `/home/z/my-project/portfolio/` — a SECOND stale portfolio checkout
+  (R384-era `a30ee9c`, dirty) — same rule: not evidence of anything. Run
+  `python scripts/r386_release_chain.py drift --repos <paths...>` to name all
+  standing trees that disagree with the remotes; both stale trees DRIFT by
+  design of the tool's report (local workspaces are non-authority, Art. XXXIX).
 - `/home/z/my-project/scripts/` — generation/verification scripts
   (r381…r386); `r385_root_docs_regeneration.py` is now committed to this
   repo's `scripts/` as well.

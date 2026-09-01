@@ -62,6 +62,8 @@ FACTORY_ROOT = os.path.join(ENGINE_ROOT, "premium_package_factory")
 INPUT_DIR = os.path.join(FACTORY_ROOT, "input")
 
 from premium_package_factory.r372 import boundary_guard, v2_propagation
+from premium_package_factory.r372.v2_propagation import (
+    resolve_package_dir, package_zip_path, walk_relative_files)
 from premium_package_factory.r372.diagram_adequacy import (
     record_diagram, validate_mechanism_diagram,
     experiment_diagram_spec, validate_experiment_spec)
@@ -87,11 +89,17 @@ def run_r372_acceptance(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
         with open(os.path.join(portfolio_root, rel), encoding="utf-8") as f:
             return json.load(f)
 
+    def load_pkg(folder, filename):
+        """Load a package file from its R382-disposition-aware location."""
+        with open(os.path.join(resolve_package_dir(portfolio_root, folder),
+                               filename), encoding="utf-8") as f:
+            return json.load(f)
+
     # ---- 1. 15/15 traceability semantics explicit ------------------------
     problems = []
     for row in PACKAGE_MAP:
         folder = f"{row['num']}_{row['short']}"
-        tr = load(f"DOWNLOAD/{folder}/ENGINEERING_TRACEABILITY.json")
+        tr = load_pkg(folder, "ENGINEERING_TRACEABILITY.json")
         if tr.get("schema") != "R372_TRACEABILITY_SEMANTICS":
             problems.append(f"{folder}: schema != R372")
             continue
@@ -177,7 +185,7 @@ def run_r372_acceptance(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
         total += val["equation_count"]
         inconsistent += len(val["inconsistent_equations"])
         # the shipped registry must carry the validation
-        shipped = load(f"DOWNLOAD/{p.folder}/EQUATION_REGISTRY.json")
+        shipped = load_pkg(p.folder, "EQUATION_REGISTRY.json")
         if "r372_validation" not in shipped:
             problems.append(f"{p.folder}: shipped registry lacks validation")
             continue
@@ -202,7 +210,7 @@ def run_r372_acceptance(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
               "source", "source_hash", "methodology", "estimate",
               "uncertainty", "limitations")
     for p in packages:
-        ce = load(f"DOWNLOAD/{p.folder}/COMMERCIAL_EVIDENCE.json")
+        ce = load_pkg(p.folder, "COMMERCIAL_EVIDENCE.json")
         market = next(s for s in ce["commercial_evidence"]
                       if s["section"] == "MARKET_EVIDENCE")
         for k in FIELDS:
@@ -235,7 +243,7 @@ def run_r372_acceptance(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
 
     for p in packages:
         txt = _raw_pdf_text(os.path.join(
-            portfolio_root, "DOWNLOAD", p.folder,
+            resolve_package_dir(portfolio_root, p.folder),
             "03_BUYER_DECISION_CARD.pdf"))
         for header in CRITICALS:
             if header not in txt:
@@ -268,8 +276,8 @@ def run_r372_acceptance(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
         for pdf in ("01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf",
                     "03_BUYER_DECISION_CARD.pdf", "00_PACKAGE_README.pdf",
                     "05_TRANSFER_MANIFEST.pdf"):
-            txt = pdf_text(os.path.join(portfolio_root, "DOWNLOAD",
-                                        p.folder, pdf))
+            txt = pdf_text(os.path.join(
+                resolve_package_dir(portfolio_root, p.folder), pdf))
             for m in market_re.finditer(txt):
                 hits.append(f"{p.folder}/{pdf}: {m.group(0)[:40]}")
     record("0 fabricated values", not hits, f"hits={hits[:5]}")
@@ -285,14 +293,15 @@ def run_r372_acceptance(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
         for pdf in ("00_PACKAGE_README.pdf", "01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf",
                     "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf",
                     "03_BUYER_DECISION_CARD.pdf", "05_TRANSFER_MANIFEST.pdf"):
-            txt = pdf_text(os.path.join(portfolio_root, "DOWNLOAD",
-                                        p.folder, pdf))
+            txt = pdf_text(os.path.join(
+                resolve_package_dir(portfolio_root, p.folder), pdf))
             for m in LADDER.finditer(txt):
                 window = txt[max(0, m.start() - 150):m.end() + 150]
                 if not RETIRE.search(window):
                     th.append(f"{p.folder}/{pdf}: {m.group(0)[:40]}")
-        txt = pdf_text(os.path.join(portfolio_root, "DOWNLOAD", p.folder,
-                                    "03_BUYER_DECISION_CARD.pdf"))
+        txt = pdf_text(os.path.join(
+            resolve_package_dir(portfolio_root, p.folder),
+            "03_BUYER_DECISION_CARD.pdf"))
         kill = headlines[p.pkg_id]["kill_if"]
         if kill and kill[:80] not in txt:
             th.append(f"{p.folder}: kill condition drifted")
@@ -309,7 +318,7 @@ def run_r372_acceptance(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
         if "sha256" in entry and sha256_file(fp) != entry["sha256"]:
             drift.append(f"hash drift {entry['path']}")
         if entry["role"] == "package folder":
-            actual = sorted(os.listdir(fp))
+            actual = sorted(walk_relative_files(fp))  # R381 3D-layer aware
             listed = sorted(f["path"] for f in entry["files"])
             if actual != listed:
                 drift.append(f"folder/manifest drift {entry['path']}")
@@ -323,8 +332,8 @@ def run_r372_acceptance(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
         if not folder:
             idp.append(f"{rrow['historical_package_id']}: no folder_name")
             continue
-        pdir = os.path.join(portfolio_root, "DOWNLOAD", folder)
-        pm = load(f"DOWNLOAD/{folder}/PACKAGE_MANIFEST.json")
+        pdir = resolve_package_dir(portfolio_root, folder)
+        pm = load_pkg(folder, "PACKAGE_MANIFEST.json")
         if pm["package_id"] != rrow["historical_package_id"]:
             idp.append(f"{folder}: manifest id mismatch")
         for pdf in ("00_PACKAGE_README.pdf",
@@ -342,10 +351,10 @@ def run_r372_acceptance(portfolio_root, engine_root=ENGINE_ROOT) -> dict:
     el = []
     v2_pkgs = {p.pkg_id for p in packages if p.addendum}
     for p in packages:
-        pdir = os.path.join(portfolio_root, "DOWNLOAD", p.folder)
-        pm = load(f"DOWNLOAD/{p.folder}/PACKAGE_MANIFEST.json")
+        pdir = resolve_package_dir(portfolio_root, p.folder)
+        pm = load_pkg(p.folder, "PACKAGE_MANIFEST.json")
         listed = {f["file"] for f in pm["files"]} | {"PACKAGE_MANIFEST.json"}
-        actual = set(os.listdir(pdir))
+        actual = walk_relative_files(pdir)  # R381 3D-layer aware
         if listed != actual:
             el.append(f"{p.folder}: manifest/folder file set drift")
         txt = pdf_text(os.path.join(pdir, "04_EVIDENCE_SUMMARY.pdf"))

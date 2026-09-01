@@ -484,3 +484,30 @@ def _failed(result, cid) -> bool:
         if c["id"] == cid:
             return c["status"] == "FAIL"
     return False
+
+
+# ---------------------------------------------------------------------------
+# record-verification
+# ---------------------------------------------------------------------------
+
+def test_record_verification_appends_and_refuses_fail(chain_pair, tmp_path):
+    engine, portfolio, _, _ = chain_pair
+    result = verify_chain(engine, portfolio, "R38X-TEST")
+    cert = tmp_path / "cert.json"
+    cert.write_text(json.dumps(result), encoding="utf-8")
+    rc = chain_main(["record-verification", "--engine", str(engine),
+                     "--cert", str(cert)])
+    assert rc == 0
+    reg = json.loads((engine / REGISTRY_NAME).read_text())
+    vs = reg["releases"][0]["verifications"]
+    assert len(vs) == 1 and vs[0]["overall"] == "PASS"
+    assert vs[0]["checks_total"] == len(result["checks"])
+
+    result["overall"] = "FAIL"  # a forged/tampered certificate
+    bad = tmp_path / "bad_cert.json"
+    bad.write_text(json.dumps(result), encoding="utf-8")
+    rc = chain_main(["record-verification", "--engine", str(engine),
+                     "--cert", str(bad)])
+    assert rc == 2
+    reg = json.loads((engine / REGISTRY_NAME).read_text())
+    assert len(reg["releases"][0]["verifications"]) == 1  # unchanged

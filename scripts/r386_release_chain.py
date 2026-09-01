@@ -862,6 +862,49 @@ def _find_keys(obj, forbidden: set) -> list:
 
 
 # --------------------------------------------------------------------------
+# record-verification — append a clean-clone verification record to the entry
+# --------------------------------------------------------------------------
+
+def cmd_record_verification(args) -> int:
+    engine_root = pathlib.Path(args.engine).resolve()
+    cert = read_json(pathlib.Path(args.cert).resolve())
+    if cert.get("overall") != "PASS" and not args.force:
+        print("REFUSED — only PASS certificates may be recorded "
+              "(use --force to record a FAIL deliberately)")
+        return 2
+    reg_path = engine_root / REGISTRY_NAME
+    registry = read_json(reg_path)
+    rid = cert.get("release_id")
+    for e in registry["releases"]:
+        if e["release_id"] == rid:
+            e.setdefault("verifications", []).append({
+                "verified_at": _dt.datetime.now(
+                    _dt.timezone.utc).isoformat(timespec="seconds"),
+                "mode": cert.get("mode", "unknown"),
+                "engine_main_verified": cert["states"]["engine_head"],
+                "portfolio_main_verified": cert["states"]["portfolio_head"],
+                "manifest_sha256": cert["states"]["manifest_sha256"],
+                "master_zip_sha256": cert["states"]["master_zip_sha256"],
+                "overall": cert["overall"],
+                "checks_passed": sum(1 for c in cert["checks"]
+                                     if c["status"] == "PASS"),
+                "checks_total": len(cert["checks"]),
+                "certificate": args.cert if args.cert.startswith(
+                    "RELEASE_CHAIN/") else pathlib.Path(
+                    args.cert).resolve().name,
+                "honesty_scope": cert.get("honesty_scope", ""),
+            })
+            dump_json(reg_path, registry)
+            print(f"[r386] verification recorded for {rid} "
+                  f"({cert['overall']}, "
+                  f"{sum(1 for c in cert['checks'] if c['status'] == 'PASS')}"
+                  f"/{len(cert['checks'])} checks)")
+            return 0
+    print(f"REFUSED — no registry entry for release_id={rid}")
+    return 2
+
+
+# --------------------------------------------------------------------------
 # verify-fresh — clone both remotes, then verify (the authoritative mode)
 # --------------------------------------------------------------------------
 
@@ -984,6 +1027,12 @@ def main(argv=None) -> int:
     r.add_argument("--status",
                    default="SUBMITTED_FOR_CEO_AUDIT_NOT_TAGGED")
     r.set_defaults(func=cmd_record)
+
+    rv = sub.add_parser("record-verification")
+    rv.add_argument("--engine", required=True)
+    rv.add_argument("--cert", required=True)
+    rv.add_argument("--force", action="store_true")
+    rv.set_defaults(func=cmd_record_verification)
 
     v = sub.add_parser("verify")
     v.add_argument("--engine", required=True)

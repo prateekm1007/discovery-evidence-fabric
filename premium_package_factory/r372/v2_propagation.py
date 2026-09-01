@@ -65,10 +65,50 @@ BUYER_PDFS[2] = "02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf"
 BUYER_PDFS += ["03_BUYER_DECISION_CARD.pdf", "04_EVIDENCE_SUMMARY.pdf",
                "05_TRANSFER_MANIFEST.pdf"]
 
+# R382 disposition locations, in resolution order. The engine build applies
+# the CEO disposition (4 buyer-primary in DOWNLOAD; the rest in HOLDING /
+# SPECIALIST_TRACK / RETIRED); the portfolio release tree is the flat
+# pre-disposition layout (all 15 under DOWNLOAD). Both are valid states and
+# both must be verifiable — the resolver finds a package wherever it lives.
+DISPOSITION_BASES = ("DOWNLOAD", "HOLDING", "SPECIALIST_TRACK", "RETIRED")
+
+
+def resolve_package_dir(portfolio_root, folder):
+    """Disposition-aware package directory (R382 layouts and flat layouts)."""
+    for base in DISPOSITION_BASES:
+        cand = os.path.join(str(portfolio_root), base, folder)
+        if os.path.isdir(cand):
+            return cand
+    return os.path.join(str(portfolio_root), "DOWNLOAD", folder)
+
+
+def package_zip_path(portfolio_root, folder):
+    """Disposition-aware package ZIP path."""
+    for base in DISPOSITION_BASES:
+        cand = os.path.join(str(portfolio_root), base, f"{folder}.zip")
+        if os.path.isfile(cand):
+            return cand
+    return os.path.join(str(portfolio_root), "DOWNLOAD", f"{folder}.zip")
+
+
+def walk_relative_files(pdir):
+    """Every file under a package dir as '/'-separated relative paths.
+
+    R381 3D-layer aware: packages now contain a MODEL/ subdirectory, so a
+    flat os.listdir() no longer equals the manifest's recursive file set
+    (a latent flat-layout assumption in the R372 instruments, found live by
+    the R386 full-suite run)."""
+    out = set()
+    for root, _dirs, files in os.walk(str(pdir)):
+        for f in files:
+            rel = os.path.relpath(os.path.join(root, f), str(pdir))
+            out.add(rel.replace(os.sep, "/"))
+    return out
+
 
 def verify_package_v2(portfolio_root, pkg, addendum_input_path: str) -> dict:
     """Verify V2 propagation for one package with a recorded addendum."""
-    pdir = os.path.join(portfolio_root, "DOWNLOAD", pkg.folder)
+    pdir = resolve_package_dir(portfolio_root, pkg.folder)
     checks = []
     ok_all = True
 
@@ -108,14 +148,28 @@ def verify_package_v2(portfolio_root, pkg, addendum_input_path: str) -> dict:
     record("VERSION_2", version_ok,
            f"PACKAGE_MANIFEST version == {addendum.get('v2_version')}")
 
-    reg_path = os.path.join(portfolio_root, "PORTFOLIO_IDENTITY_REGISTRY.json")
+    reg_path = os.path.join(str(portfolio_root),
+                            "PORTFOLIO_IDENTITY_REGISTRY.json")
     reg_ok = False
+    reg_detail = "identity registry status == V2"
     if os.path.exists(reg_path):
         reg = json.load(open(reg_path, encoding="utf-8"))
         row = next((r for r in reg["packages"]
                     if r["historical_package_id"] == pkg.pkg_id), None)
         reg_ok = bool(row) and row.get("status") == "V2"
-    record("REGISTRY_V2", reg_ok, "identity registry status == V2")
+        if row is None:
+            # R382 disposition: the identity registry scopes to the
+            # buyer-visible release. A V2-carrying package that is NOT
+            # buyer-visible (HOLDING/SPECIALIST_TRACK/RETIRED) is legitimately
+            # outside the registry; a buyer-visible (DOWNLOAD) package that
+            # is missing from the registry is genuine identity drift.
+            buyer_visible = os.path.basename(
+                os.path.dirname(pdir)) == "DOWNLOAD"
+            reg_ok = not buyer_visible
+            reg_detail = ("not in registry scope (R382 disposition, "
+                          "non-buyer-visible package)" if reg_ok else
+                          "buyer-visible package missing from registry")
+    record("REGISTRY_V2", reg_ok, reg_detail)
 
     # 4/5. V2 rendered, V1 absent (buyer PDFs)
     pdf_texts = {}
@@ -172,13 +226,14 @@ def verify_package_v2(portfolio_root, pkg, addendum_input_path: str) -> dict:
                    f"v1_text absent from buyer PDFs outside V2 renderings "
                    f"(stale in: {sorted(set(stale_hits))})")
 
-    # 6. ZIP == folder
-    zpath = os.path.join(portfolio_root, "DOWNLOAD", f"{pkg.folder}.zip")
+    # 6. ZIP == folder (R381 3D-layer aware: recursive relative file walk,
+    # directory entries in the ZIP skipped)
+    zpath = package_zip_path(portfolio_root, pkg.folder)
     zip_ok = True
     if os.path.exists(zpath):
         with zipfile.ZipFile(zpath) as zf:
-            names = set(zf.namelist())
-            folder_files = set(os.listdir(pdir))
+            names = {n for n in zf.namelist() if not n.endswith("/")}
+            folder_files = walk_relative_files(pdir)
             if names != folder_files:
                 zip_ok = False
             else:

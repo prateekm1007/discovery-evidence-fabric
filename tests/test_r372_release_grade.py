@@ -600,19 +600,29 @@ class TestRepoBoundary:
 class TestBuyerCriticals:
     @pytest.fixture(scope="class")
     def built(self, tmp_path_factory):
-        """One full build; the buyer card must carry the five criticals."""
+        """One full build; the buyer card must carry the five criticals.
+
+        R382 disposition-aware: the engine build applies the CEO portfolio
+        disposition (4 buyer-primary under DOWNLOAD; the rest under
+        HOLDING / SPECIALIST_TRACK / RETIRED), so package locations are
+        resolved, not assumed. (The portfolio release tree uses the flat
+        layout; the resolver handles both.)
+        """
         from premium_package_factory.r371 import build_v5
+        from premium_package_factory.r372.v2_propagation import (
+            resolve_package_dir)
         root = tmp_path_factory.mktemp("r372_build")
         portfolio = root / "portfolio"
         portfolio.mkdir()
         build_v5.build(str(portfolio), work_dir=str(root / "work"))
-        return str(portfolio)
+        return str(portfolio), resolve_package_dir
 
     def test_five_criticals_in_every_card(self, built):
         import subprocess
         import re
+        portfolio, resolve = built
         for p in PACKAGES:
-            fp = os.path.join(built, "DOWNLOAD", p.folder,
+            fp = os.path.join(resolve(portfolio, p.folder),
                               "03_BUYER_DECISION_CARD.pdf")
             r = subprocess.run(["pdftotext", "-raw", fp, "-"],
                                capture_output=True, text=True)
@@ -628,7 +638,8 @@ class TestBuyerCriticals:
     def test_nine_question_architecture_retained(self, built):
         import subprocess
         import re
-        fp = os.path.join(built, "DOWNLOAD", "01_multisegment_flow_control",
+        portfolio, resolve = built
+        fp = os.path.join(resolve(portfolio, "01_multisegment_flow_control"),
                           "03_BUYER_DECISION_CARD.pdf")
         r = subprocess.run(["pdftotext", "-raw", fp, "-"],
                            capture_output=True, text=True)
@@ -637,8 +648,9 @@ class TestBuyerCriticals:
             assert q in txt
 
     def test_full_r372_gate_passes(self, built):
+        portfolio, _resolve = built
         from premium_package_factory.r372 import acceptance_r372
-        report = acceptance_r372.run_r372_acceptance(built)
+        report = acceptance_r372.run_r372_acceptance(portfolio)
         failed = [c for c in report["conditions"] if c["status"] != "PASS"]
         assert not failed, failed
         assert report["all_pass"] is True
