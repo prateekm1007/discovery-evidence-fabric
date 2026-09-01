@@ -8,7 +8,9 @@
 > actual state, or the next session starts from a false premise — the old
 > handoff was 15 days stale, which was a real defect of exactly that class).
 >
-> **Generated:** 2026-09-01, R385B correction cycle; **updated same day by R386** (canonical release chain — §0.5). Commit follows this file.
+> **Generated:** 2026-09-01, R385B correction cycle; **updated same day by R386** (canonical release chain — §0.5),
+> **by R387** (CI genuinely green, STL defects closed, release `R387-3D-QUALITY-EDITION`,
+> tag `v1.0.0-3D-edition`), and **by R388** (pipeline distillation + legacy archive — §0.7).
 > **Constitution:** `EPISTEMIC_CONSTITUTION.md` v1.9.0 — re-read IN FULL before code.
 > Read Articles II, III, XVIII, XXV, XXVII, XXVIII, XXXIV, XXXVIII, **XXXIX** with
 > particular care (XXXIX governs the release chain and the buyer-distribution
@@ -83,14 +85,45 @@ python scripts/r386_release_chain.py verify-fresh \
 
 ---
 
-## 1. VERIFIED STATE OF THE PORTFOLIO REPO (buyer release) — `d5f8930` (manifest at `c83a2a6a`)
+## 0.7 R388 DISTILLATION (2026-09-01) — the active tree is now ONE canonical loop
+
+CEO order "distill → verify → productize" executed with a call-graph audit
+(imports + quoted path literals + read/write direction + G4 territory-map
+constraints):
+
+- **Archived (nothing destroyed):** 112 legacy roots (~6,346 files, 84.4 MB)
+  removed from main and preserved byte-identical on branch
+  `archive/rounds-R309-R383` (= pre-R388 tip) and in git history. Inventory:
+  `ARCHIVE_MANIFEST.json`. Covers R310–R378 round trees, superseded CEREVASC
+  research trees (the ones NOT required by G4/ledger), generation-era corpora,
+  campaign byproducts, the stale `WORKLOG.md` fork, and a stale A2-era
+  submodule gitlink.
+- **Kept because load-bearing (evidence in ARCHIVE_MANIFEST.json):** all
+  G4-required CEREVASC adjudication trees, R332/R334/R341/R346/R370-family
+  frozen buyer-package state, constitution amendment sources
+  (R309/R339/R370F), benchmark frozen corpus, tournament_v3 root-hash
+  evidence, external corpora custody snapshots, engine runtime state
+  (patent_sources meter, canonical_data), discovery_campaigns (service seed
+  + test evidence), and the full evidence-custody set (ENGINE_RUNS,
+  artifacts, experiments, inventions, elite_v3).
+- **worklog.md rotated** to CODER-R371+ (157 KB); full history in git.
+- **Docs distilled:** `README.md` + `ACTIVE_PATH.md` now define the ONE
+  canonical production loop (stage → module map). No constitution edit was
+  needed (R309/R339/R370F kept whole) → G14 acknowledgment untouched.
+- NEXT (CEO strict order): buyer-dossier product output → Claude-like UI
+  (Next.js/Vercel + FastAPI boundary) → investor demo (P-04, P-08, one
+  non-medical).
+
+## 1. VERIFIED STATE OF THE PORTFOLIO REPO (buyer release) — `b978e32c` (release `R387-3D-QUALITY-EDITION`, tag `v1.0.0-3D-edition`)
 
 Chain of commits: `57b9c273` (V2 flat layout, pre-3D) → `d1c802d` (V4 render
 hardening) → `fa6131b` (R384: 3D design layer added to every package) →
 `d5f8930` (R385: root buyer documents regenerated for the 3D edition + full
 release verification rerun) → `c83a2a6a` (R386: canonical release manifest
-committed; buyer surface unchanged). **No tag has been cut** (deliberate — pending CEO
-audit sign-off).
+committed; buyer surface unchanged). **Tag cut at R387:** `v1.0.0-3D-edition` with `RELEASE/LATEST_RELEASE.json`
+pointer. R387 rebuilt 3 packages via the canonical path (P-07/P-13 G2b
+buyer-visible evidence, P-09 856 KB watertight antenna); 12 packages
+byte-identical; chain verified 26/26 from clean clones.
 
 What a buyer receives at `d5f8930` (all independently re-measured by the
 R385B auditor session with trimesh + cadquery, not taken from the manifests):
@@ -196,8 +229,9 @@ The genuine lessons the audit taught, accepted and acted on:
 
 ## 4. OPEN ITEMS (honest, no ordering implied except where noted)
 
-1. **CEO decision — tag the portfolio release.** `d5f8930` is submitted for
-   CEO audit (Art. XXVI). No tag until the CEO accepts.
+1. ~~CEO decision — tag the portfolio release.~~ DONE at R387
+   (`v1.0.0-3D-edition`; pending CEO acceptance is now the tag itself, not
+   the act of tagging).
 2. **CEO decision — engine-repo 3D self-containment.** Either sync the 3D
    output into the engine repo (or a portfolio mirror inside it), or record
    the portfolio repo as the canonical 3D home (one paragraph in the engine
@@ -206,11 +240,11 @@ The genuine lessons the audit taught, accepted and acted on:
    declare the portfolio repo as the distribution authority and the chain
    verifier fails on any disagreement; what remains open is only the CEO's
    choice on physically mirroring the 3D binaries into the engine repo.
-3. **TOSCANINI frontend.** Zero committed UI. The audit's sequencing directive
-   (no UI before the 3D buyer layer is complete) is now satisfied by fact —
-   the 3D layer IS complete in the portfolio repo — so UI work is unblocked
-   but must not regress the engine (Art. XXXIV: reality-side bottleneck
-   ranking still governs).
+3. **TOSCANINI frontend.** Zero committed UI. The 3D buyer layer is complete
+   in the portfolio repo, the backend service exists (`toscanini/`), and the
+   R388 distillation cleared the working tree — UI work is UNBLOCKED and is
+   the next CEO-ordered deliverable (Claude-like single-screen UX;
+   Next.js/Vercel frontend + FastAPI boundary over the long-running engine).
 4. **Physical validation: NONE.** 0 physical observations, 0 external
    validation events — recorded honestly everywhere (Art. XXXVIII). The
    07_self_powered_sensing revival still awaits its $3K shaker test; that is
