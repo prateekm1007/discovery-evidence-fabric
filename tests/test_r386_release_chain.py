@@ -132,10 +132,25 @@ def build_fixture_pair(tmp: pathlib.Path):
         _write(pkg / n, d)
     _make_zip(portfolio / "DOWNLOAD" / "01_demo_device.zip",
               {n: d for n, d in pkg_files.items()})
+    # second package: honest 3D_NOT_APPLICABLE (ships only declarations)
+    pkg2 = portfolio / "DOWNLOAD" / "02_ml_only"
+    pkg2_files = {
+        "00_PACKAGE_README.pdf": b"%PDF-readme-ml",
+        "MODEL/3D_DESIGN_STATUS.json": json.dumps({
+            "package_id": "P-02", "3d_design_status": "NOT_APPLICABLE"}),
+        "MODEL/README.json": json.dumps({
+            "note": "computational technology; no physical geometry"}),
+    }
+    for n, d in pkg2_files.items():
+        _write(pkg2 / n, d)
+    _make_zip(portfolio / "DOWNLOAD" / "02_ml_only.zip", pkg2_files)
     _make_zip(portfolio / "DOWNLOAD" / "technology-transfer-portfolio-15.zip",
               {**root_files,
                "DOWNLOAD/01_demo_device.zip":
                    (portfolio / "DOWNLOAD" / "01_demo_device.zip")
+                   .read_bytes(),
+               "DOWNLOAD/02_ml_only.zip":
+                   (portfolio / "DOWNLOAD" / "02_ml_only.zip")
                    .read_bytes()})
     _write(portfolio / "INTERNAL_QA" / "R38X_VERIFICATION.json",
            '{"overall": "PASS"}')
@@ -197,6 +212,8 @@ def test_chain_passes_on_faithful_pair(chain_pair):
     assert {"E1", "E2", "E3", "E4", "E5", "E7", "E8", "E9", "M1", "M2",
             "M3", "M4", "M5", "M6", "P1", "P2", "P3", "P4", "Z1", "Z2",
             "Z3", "Z4", "Z5", "S1"} <= ids
+    z5 = [c for c in result["checks"] if c["id"] == "Z5"][0]
+    assert z5["status"] == "PASS"  # N/A package ships declaration files only
 
 
 def test_certificate_states_recorded(chain_pair):
@@ -374,6 +391,27 @@ def test_validated_package_zip_missing_model_layer(chain_pair):
     result = verify_chain(engine, portfolio, "R38X-TEST")
     assert result["overall"] == "FAIL"
     assert _failed(result, "Z1") and _failed(result, "Z5")
+
+
+def test_na_package_with_geometry_shipped(chain_pair):
+    """An N/A package that quietly ships geometry fails the chain."""
+    engine, portfolio, _, _ = chain_pair
+    pkg2_files = {
+        "00_PACKAGE_README.pdf": b"%PDF-readme-ml",
+        "MODEL/3D_DESIGN_STATUS.json": json.dumps({
+            "package_id": "P-02", "3d_design_status": "NOT_APPLICABLE"}),
+        "MODEL/README.json": json.dumps({"note": "..."}),
+        "MODEL/P-02_secret_geometry.step": b"STEP-BYTES",
+    }
+    _write(portfolio / "DOWNLOAD" / "02_ml_only" / "MODEL" /
+           "P-02_secret_geometry.step", b"STEP-BYTES")
+    _make_zip(portfolio / "DOWNLOAD" / "02_ml_only.zip", pkg2_files)
+    _commit_all(portfolio, "tamper: geometry hidden in an N/A package")
+    result = verify_chain(engine, portfolio, "R38X-TEST")
+    assert result["overall"] == "FAIL"
+    assert _failed(result, "Z1") and _failed(result, "Z5")
+    z5 = [c for c in result["checks"] if c["id"] == "Z5"][0]
+    assert any("geometry shipped" in d for d in z5["details"])
 
 
 # ---------------------------------------------------------------------------

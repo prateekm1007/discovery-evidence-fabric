@@ -784,8 +784,11 @@ def verify_chain(engine_root: pathlib.Path,
                         f"{manifest['master_zip']['sha256'][:12]}")
 
         c = add("Z5", STATE_ZIP, "3D layer present in every applicable "
-                                "package ZIP and honestly absent in P-06")
+                                "package ZIP; N/A packages ship only their "
+                                "honest declaration files")
         bad = []
+        GEOM_EXT = (".step", ".stl", ".glb", ".svg")
+        NA_ALLOWED = {"MODEL/3D_DESIGN_STATUS.json", "MODEL/README.json"}
         for e in manifest["package_zips"]:
             members = set(zip_member_hashes(
                 portfolio_root / e["zip"]))
@@ -796,10 +799,20 @@ def verify_chain(engine_root: pathlib.Path,
                     status = pc.get("design_status")
             if status == "PRESENT_AND_VALIDATED" and not model_members:
                 bad.append(f"{e['folder']}: validated but no MODEL/ in ZIP")
-            if status == "NOT_APPLICABLE" and model_members:
-                bad.append(f"{e['folder']}: N/A but MODEL/ shipped")
-        c.ok("14 validated + 1 honest N/A") if not bad else c.fail(
-            "; ".join(bad[:6]))
+            elif status == "NOT_APPLICABLE":
+                geometry = [m for m in model_members
+                            if m.lower().endswith(GEOM_EXT)
+                            or m.endswith("PARAMETRIC_MODEL_SOURCE.py")]
+                extra = [m for m in model_members
+                         if m not in NA_ALLOWED and m not in geometry]
+                if geometry:
+                    bad.append(f"{e['folder']}: N/A but geometry shipped "
+                               f"({geometry[:2]})")
+                elif extra:
+                    bad.append(f"{e['folder']}: N/A with undeclared MODEL/ "
+                               f"files ({extra[:2]})")
+        c.ok("14 validated + 1 honest N/A (declaration files only)") \
+            if not bad else c.fail("; ".join(bad[:6]))
 
     c = add("S1", "GLOBAL", "no secrets in the buyer surface")
     hits = secret_scan(portfolio_root)
