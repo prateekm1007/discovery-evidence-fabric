@@ -6458,3 +6458,39 @@ Work Log:
 
 Stage Summary:
 - The R385B class of ambiguity (two repos + stale local workspaces) is now structurally impossible to ship silently: any disagreement among the four states fails verification automatically, the authority rule is constitutional (Art. XXXIX v1.9.0) and mechanically enforced (the verifier fails if the article is deleted), and anyone can re-verify from anywhere without trusting any local state or summary. Honest scope: the chain certificate verifies DELIVERY from clean clones; rebuild-from-source reproduction remains the declared open item (engine 3D self-containment, CEO decision), as do the tag decision, PHYSICALLY_VALIDATED = NONE, and PAT rotation.
+
+---
+## R387 — CI RED STATE FIXED + EXTERNAL-AUDIT STL DEFECTS CLOSED + R387-3D-QUALITY-EDITION RELEASED (2026-09-01)
+
+**CEO directive:** "Determine exactly why the current tip is red and fix the cause without weakening any gate. We need the repository itself to be genuinely green." + the external audit's three STL defects.
+
+**Diagnosis (reproduced locally, deterministic — same commit, same capsule):**
+- G10 `post_scrub_evidence_revalidation`: 7 ledger events (ST-CV-T06-0002/0003/0004/0005, T07-0002, T08-0002, T02L-0002) referenced commits destroyed by the v26 filter-repo scrub.
+- G11 `historical_artifact_audit`: ONE unauthorized marker `REDACTED-TRIGRAM` — the B10 containment report's own self-redaction (2026-08-30), never registered in AUTHORIZED_REDACTION_NAMES.
+- G12 `credential_audit_split`: REAL key material at HEAD and in history the v26 scrub had missed (a live 52-char Lens token at HEAD — the v26 pattern demanded exactly 50 chars; PatSnap sk-l/sk-K variants — the pattern demanded sk-G; a live Scopus key in template history; 1 GitHub PAT + 6 PatentBear keys in history) + 4 measured false-positive classes (PDF /ID trailer hex, ${TOKEN} URL placeholders, JSON-escaped JSON-LD, embedded-redaction-marker env values).
+- G13 derives from G10-G12. The 14-gate CI had been failing since v26-era state accumulated; the R386 worklog reported the local suite (2037 tests) but CI is a separate authority (Art. XXVI).
+
+**Fixes (ALL adversarially pinned in tests/test_r387_ci_red_state_fixes.py — 15 tests; every gate kept its semantics or was strengthened):**
+1. G10: evidence-based ledger remap — the 7 events now point at 6720fada69ee where every event's artifact_hash resolves with sha256 equality (per-event verified BEFORE remap; state hashes untouched — they never covered commit_sha; transition chain re-linked; HISTORICAL_PROVENANCE_LIMITATION.json records the event, incl. what can no longer be proven). This is the Aug-21 fix (3974af75, reverted e8796912) done right — that mapping sent 3 of 7 events to commits where the artifact hash does NOT resolve.
+2. G11: REDACTED-TRIGRAM registered with provenance (name-scoped; unregistered markers still HOLD — anti-gaming test).
+3. G12 HEAD redaction: live pb_live_ + Lens-52 material → [REDACTED:*] markers (R356×3, R358, R362, R363 + 4 Lens files).
+4. G12 scanner STRENGTHENED: Lens 50+ (was exactly 50), PatSnap sk- any (was sk-G) — both classes measured as missed real material; the 4 false-positive classes excluded with structural evidence; PDF /ID masking.
+5. Credential scrub #2 (filter-repo, replace-text): 14 key values removed from ALL reachable history (1 GitHub PAT, 6 PatentBear, 1 Lens-52, 6 PatSnap) + the live Scopus key in template history (second pass). Stale remote branches deleted. 267 of 885 commits rewritten (oldest match at #618); ALL ledger-event commits (#185-#335) preceded it and survived with unchanged SHAs. Unreachable-but-retained commits on GitHub's side (PR ref) + key ROTATION remain CEO actions — disclosed.
+6. cad_pipeline: adaptive component-STL deliverable budget (declared 2MB cap + tolerance ladder + OCCT triangulation-cache clear — measured: the cache made every tolerance change silently no-op; the antenna stayed 605,108 tris at 0.02..0.3mm) + G2b mesh-representational-exactness evidence (PRISMATIC_EXACT_MESH / APPROXIMATE_DECLARED / DEGENERATE_MESH with measured B-rep-vs-mesh volume ratios and a 4x-finer-tolerance limit probe).
+7. r384 augment: same cache clear (the 9.7MB coupon was silently over-budget for the same reason).
+
+**External-audit STL defects (measured outcomes):**
+- Defect 1 (P-07/P-13 "degenerate 12-triangle STLs"): DISPROVEN as tessellation collapse — STEP B-reps are 6-face prisms, mesh/B-rep volume ratio 1.0000, 4x-finer tolerance reproduces identical face counts. The models are minimal-but-valid parametric designs. Remediation = buyer-visible G2b evidence (the box is the design, not a broken export) instead of inventing geometry (Art. XXVII).
+- Defect 2 (P-09 helical antenna 30MB): FIXED — 855,684B / 17,112 tris, watertight, 46.5 turns measured vs 46.7 expected, volume ratio 0.907 (APPROXIMATE_DECLARED, exact STEP unchanged), coupon 9.7MB→1.7MB, GLB 14.7MB→375KB.
+- Defect 3 (stale referenced commit): FIXED — tag v1.0.0-3D-edition + RELEASE/LATEST_RELEASE.json (chain-neutral path).
+
+**Release: R387-3D-QUALITY-EDITION** — portfolio b978e32 (3 packages regenerated: 07, 09, 13; 12 packages byte-identical to R385-3D-EDITION after discarding header-noise-only re-augmentation diffs), manifest 6fe97697, master ZIP b9dd8a8f, engine build 25173ecf, chain record cf2665b6. r385 G1-G9 all PASS (G9 byte-reproducible). **r386 verify-fresh from clean clones of both remotes: 26/26 PASS.**
+
+**CI STATE: GREEN.** GitHub Actions "Epistemic Certification (14 gates)": 5d5e4cbd success, 25173ecf success, c027d7fd success, **cf2665b6 (tip) success** — versus failure at 91c52bd3/60c7887e.
+
+**Disclosed findings (Art. XV):**
+- OCCT assembly STEP/GLB writer is process-nondeterministic (STYLED_ITEM ordering varies run-to-run with identical inputs — all objects share one color so the permutation is semantically null; per-object STEP/STL are stable). Assembly-artifact byte-rebuild is not currently reproducible; delivery hashes stay pinned by the manifest. The r384 section-solid STEP headers also carry wall-clock timestamps + per-process counters (same class).
+- The Aug-21 subagent's reverted fix was directionally right but unproven for 3/7 events (why it was reverted); the R387 remap is per-event hash-verified.
+- Assembly STEP nondeterminism + key rotation + GitHub dangling-commit GC = open items for the CEO.
+
+**Next session (CEO order, in strict order):** pipeline distillation call-graph audit (KEEP/MERGE/REPLACE/ARCHIVE/REMOVE per stage) → archive R-series/CEREVASC out of the active path (archive, don't destroy) → ONE canonical production loop → buyer-dossier product output → Claude-like UI (Next.js/Vercel + FastAPI boundary) → investor demo (P-04, P-08, one non-medical).
