@@ -453,6 +453,14 @@ def _full_history_blob_scan() -> Dict[str, int]:
         if path in ("epistemic_integrity/credential_fingerprints.py",
                     "epistemic_integrity/historical_artifact_audit.py"):
             continue
+        # R387: skip this audit's own adversarial test corpus. The
+        # negative-control fixture intentionally contains an
+        # UNREGISTERED marker ([REDACTED-TOTALLY-NEW]) to prove the
+        # authorization check still fails on unknown markers — a test
+        # vector, not repository evidence (same self-exclusion principle
+        # the credential scanner already applies).
+        if path == "tests/test_r387_ci_red_state_fixes.py":
+            continue
 
         blob_bytes = _git_cat_file_blob_bytes(blob_sha)
         if blob_bytes is None:
