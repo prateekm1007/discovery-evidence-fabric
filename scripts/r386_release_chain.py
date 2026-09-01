@@ -203,7 +203,10 @@ def census_3d(portfolio_root: pathlib.Path) -> dict:
                     continue
                 entry["files"] += 1
                 ext = f.suffix.lower().lstrip(".")
-                if ext in counts:
+                if ext == "py":
+                    # .py under MODEL/ = parametric model source by convention
+                    counts["parametric_sources"] += 1
+                elif ext in counts:
                     counts[ext] += 1
             entry["model_files_by_type"] = counts
             for k in ("step", "stl", "glb", "svg", "png", "parametric_sources"):
