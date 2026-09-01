@@ -5,6 +5,23 @@
 > `archive/rounds-R309-R383`). It is the single authority for what the
 > production path IS; anything not listed here is either evidence custody,
 > governance, or archive.
+>
+> **R389 addendum — the PRODUCT layer** (CEO order: stop adding general
+> infrastructure; productize). The loop below is UNCHANGED; the new surface
+> puts it behind a Claude-like product:
+>
+> | Layer | Module | Notes |
+> |---|---|---|
+> | Job API (Phase 7) | `toscanini/server.py` | `POST /api/run`, `GET /api/run/{id}/stream` (SSE), `GET /api/run/{id}/result` — ALIASES of the same session/worker path; the frontend never touches internal Python modules |
+> | Frontend (Phases 4–6) | `TOSCANINI_UI/webapp/` (Next.js + React Three Fiber) | three experiences: CONVERSATION → DESIGN/3D → RESULT; reasoning display = the 8-step engineering argument from artifacts (never chain-of-thought); single DOWNLOAD TECHNOLOGY PACKAGE action |
+> | Showcase (Phase 8) | `toscanini/showcase.py` | serves the REAL portfolio packages (Art. XXXIX authority) with interactive 3D |
+> | Interactive evaluator (Phase 5) | `toscanini/showcase.py::evaluate_parameter` → `cad_pipeline.rebuild_with_mutation` | parameter inside its DECLARED envelope → real sandbox rebuild → re-measured geometry + preview GLB; out-of-envelope/unbound → explicit refusal (never clamped) |
+> | Reality layer (Phase 2) | `discovery_fabric/engine/reality_provider.py` | provider-neutral REALITY_PROVIDER (World Labs/Marble first adapter, verified live); REALITY_MODEL (10 fields, origin-tagged); DESIGN_WORLD ↔ REALITY_COMPARISON ↔ REALITY_WORLD. Providers emit RECONSTRUCTED/COMPUTATIONAL only — MEASURED requires R370G-attested events; a reconstruction can never become PHYSICAL_VALIDATION (Art. XXXVIII, structurally enforced) |
+> | Phase 1 audit | `R389_PIPELINE_AUDIT.{md,json}` | final call-graph audit: 13 stages KEEP, 37/41 modules reachable, 4 tooling-only, zero dead code — measured, not assumed |
+>
+> Final audit verdict: the active path is already minimal for its epistemic
+> guarantees; the correct move was exactly what the CEO ordered — stop
+> pruning, build the product.
 
 ## The loop
 

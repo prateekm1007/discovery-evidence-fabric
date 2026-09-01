@@ -114,6 +114,64 @@ constraints):
   (Next.js/Vercel + FastAPI boundary) → investor demo (P-04, P-08, one
   non-medical).
 
+## 0.8 R389 PRODUCTIZATION (2026-09-01) — the Claude-like product exists
+
+CEO order R389 (8 phases) executed on top of the distilled tree. The engine
+loop is UNCHANGED — everything below is product surface + the reality layer.
+
+- **Phase 1 — final pipeline audit** (`R389_PIPELINE_AUDIT.md` +
+  `.json`, script `scripts/r389_pipeline_audit.py`): measured stage-envelope
+  deltas (13 stages, all KEEP — the four smallest are exactly the epistemic
+  safeguards), 37/41 engine modules reachable, the 4 unreachable are
+  benchmark/audit tooling referenced by tests. **Zero dead code found** —
+  the R388 distillation had already removed it. (Audit-defect lesson
+  recorded: the first pass missed relative imports and produced a false
+  33-unreachable result — fixed before any classification was drawn.)
+- **Phase 2 — REALITY layer** (`discovery_fabric/engine/reality_provider.py`):
+  provider-neutral REALITY_PROVIDER contract; World Labs/Marble adapter
+  VERIFIED LIVE (operation `666549e8…`, world `695dcc40…`; GLB re-measured
+  by trimesh: 177,712 tris; record at
+  `TOSCANINI/R389_REALITY_PROVIDER_LIVE/VERIFICATION_RECORD.json`).
+  REALITY_MODEL = 10 CEO fields, every datum origin-tagged.
+  DESIGN_WORLD ↔ REALITY_COMPARISON ↔ REALITY_WORLD. Structural boundary:
+  providers are locked to RECONSTRUCTED/COMPUTATIONAL; MEASURED has exactly
+  one door (R370G-attested event, validated); `RealityModel.add()` rejects
+  direct MEASURED data (adversarial hole found by self-attack, closed, test-
+  pinned). 23 adversarial tests in
+  `tests/test_r389_reality_provider.py`.
+- **Phase 3 — directional physics:** verified ALREADY BUILT (per the STOP
+  rule, no new infrastructure): R378 `evaluator_contract.py` (fidelity
+  ladder, provider-neutral, evidence-rank declarations) + R379 direction
+  propagation + R383 quantitative margins. The product surface consumes it.
+- **Phases 4–7 — the product:** `TOSCANINI_UI/webapp/` (Next.js 15 +
+  React Three Fiber; source committed, `node_modules`/`.next` ignored).
+  Three experiences: CONVERSATION (one text box, no dashboard clutter) →
+  live stage stream → DESIGN/3D (GLB viewer: rotate/zoom/pan/wireframe,
+  RECONSTRUCTED badge support) → RESULT (8-step engineering argument:
+  problem → observation → evidence → mechanism → design decision →
+  technical result → uncertainty → next experiment — all artifact-derived,
+  never chain-of-thought) → single DOWNLOAD TECHNOLOGY PACKAGE action.
+  Job API per CEO spec: `POST /api/run`, `GET /api/run/{id}/stream`,
+  `GET /api/run/{id}/result` — ALIASES of the same session/worker path
+  (route-equality test-pinned). Frontend imports ZERO internal Python
+  (grep-pinned by test). Engine service: `python3 -m toscanini.server`
+  (8788); webapp: `cd TOSCANINI_UI/webapp && npm install && npm run dev`
+  (3000, `/api/*` rewritten to the engine service; prod: `ENGINE_API` env).
+- **Phase 5 — interactive 3D:** `toscanini/showcase.py::evaluate_parameter`
+  → `cad_pipeline.rebuild_with_mutation`: parameter inside its DECLARED
+  envelope → REAL sandbox rebuild (new model_id, mutation provenance,
+  re-measured geometry, G1–G8 validation, preview GLB served at
+  `/api/showcase/{slot}/preview/…`); out-of-envelope or unbound → explicit
+  refusal (never clamped). Browser-verified live: 0.6 → 0.45 mm floor
+  lumen rebuild, volume 595.92 mm³, preview swapped into the viewer.
+- **Phase 8 — investor demos served from the same code path:** slots `04`
+  (P-07 drainage floor — medical), `08` (NIR photovoltaic), `09` (UWB
+  localization — NON-medical), all from the portfolio buyer-distribution
+  repo (Art. XXXIX authority; showcase skips gracefully where that checkout
+  is absent, e.g. CI). `tests/test_r389_product_surface.py` (14 tests).
+- **World Labs key custody:** `.env.keys` (gitignored) — never committed;
+  secret-hygiene test-pinned (payloads + ledger scanned for key material).
+
 ## 1. VERIFIED STATE OF THE PORTFOLIO REPO (buyer release) — `b978e32c` (release `R387-3D-QUALITY-EDITION`, tag `v1.0.0-3D-edition`)
 
 Chain of commits: `57b9c273` (V2 flat layout, pre-3D) → `d1c802d` (V4 render

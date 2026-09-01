@@ -34,6 +34,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from toscanini import gateway as gw  # noqa: E402
 from toscanini import sessions as store  # noqa: E402
+from toscanini import showcase as show  # noqa: E402
 
 PORT = 8788
 
@@ -110,6 +111,43 @@ class Handler(BaseHTTPRequestHandler):
         if p.path == "/api/cemetery":
             return self._json(200, store.cemetery_summary())
 
+        # ---- R389 Phase 7: the CEO's canonical job API naming. These are
+        # ALIASES to the same handlers (one canonical production path —
+        # never a second run path):
+        #   POST /api/run              == POST /api/discoveries
+        #   GET  /api/run/{id}/stream  == GET  /api/sessions/{id}/events
+        #   GET  /api/run/{id}/result  == GET  /api/sessions/{id}
+        if p.path == "/api/showcase":
+            return self._json(200, {"showcase": show.list_showcase()})
+
+        if len(parts) >= 3 and parts[0] == "api" and parts[1] == "run":
+            rid = parts[2]
+            if len(parts) == 4 and parts[3] == "stream":
+                return self._sse(rid)
+            if len(parts) == 4 and parts[3] == "result":
+                detail = store.session_detail(rid)
+                return self._json(200, detail) if detail \
+                    else self._json(404, {"error": "not found"})
+            if len(parts) == 4 and parts[3] == "package":
+                return self._package(rid)
+
+        if len(parts) >= 3 and parts[0] == "api" and parts[1] == "showcase":
+            slot = parts[2]
+            if len(parts) == 3:
+                detail = show.showcase_detail(slot)
+                return self._json(200, detail) if detail \
+                    else self._json(404, {"error": "no such showcase slot"})
+            if len(parts) == 4 and parts[3] == "model":
+                return self._serve_file(show.glb_path(slot),
+                                        "model/gltf-binary")
+            if len(parts) == 4 and parts[3] == "package":
+                return self._serve_file(show.package_zip(slot),
+                                        "application/zip")
+            if len(parts) == 5 and parts[3] == "preview":
+                return self._serve_file(
+                    show.preview_glb_path(slot, parts[4]),
+                    "model/gltf-binary")
+
         if len(parts) >= 3 and parts[0] == "api" and parts[1] == "sessions":
             sid = parts[2]
             if len(parts) == 3:
@@ -131,33 +169,37 @@ class Handler(BaseHTTPRequestHandler):
         p = urllib.parse.urlparse(self.path)
         parts = [x for x in p.path.split("/") if x]
 
-        if p.path == "/api/discoveries":
+        # R389 Phase 7: /api/run is the CEO's canonical job API name for
+        # the SAME discovery start path (one production loop, one worker).
+        if p.path == "/api/discoveries" or p.path == "/api/run":
             body = self._body_json()
             text = (body.get("text") or "").strip()
             if len(text) < 15:
                 return self._json(400, {"error": "problem description too short"})
             session = store.create_session(
                 title=text.split("\n")[0][:120], user_text=text)
-            # Transport pinning (EXPLICIT operator overrides, logged by the
-            # engine and recorded in candidate provenance — the designed
-            # mechanism for degraded-endpoint situations: nvidia oscillates
-            # 35s..>240s and mistral is payment-blocked; zai gateway is the
-            # measured-healthy transport). Without the pin, synthesis waits
-            # out multiple 240 s timeouts before substituting.
-            env = dict(os.environ)
-            env.setdefault("ENGINE_SYNTHESIS_PROVIDER", "zai")
-            env.setdefault("ENGINE_ATTACK_PROVIDER", "zai")
-            env.setdefault("ENGINE_ENSEMBLE_PROVIDERS", "zai")
-            env.setdefault("ENGINE_GRID_PROVIDERS", "zai")
-            subprocess.Popen(
-                [sys.executable, "-m", "toscanini.worker",
-                 session["session_id"]],
-                cwd=str(REPO_ROOT), env=env,
-                stdout=open(REPO_ROOT / "ENGINE_RUNS" / "toscanini_worker.log",
-                            "ab"),
-                stderr=subprocess.STDOUT,
-                start_new_session=True)
+            self._spawn_worker(session["session_id"])
             return self._json(200, session)
+
+        # R389 Phase 5: interactive parameter evaluation on a showcase
+        # package — real geometry rebuild, honest envelope enforcement.
+        # Route shape: /api/showcase/{slot}/evaluate  (4 segments).
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "showcase" \
+                and parts[3] == "evaluate":
+            body = self._body_json()
+            try:
+                new_value = float(body.get("value"))
+            except (TypeError, ValueError):
+                return self._json(400, {"error": "value must be a number"})
+            result, refusal = show.evaluate_parameter(
+                parts[2], body.get("param_id") or "", new_value,
+                reason=(body.get("reason") or "interactive product preview"))
+            if result is None:
+                # honest refusal (unbound parameter / outside declared
+                # envelope) — surfaced, never silently clamped
+                return self._json(409, refusal or
+                                  {"error": "evaluation refused"})
+            return self._json(200, result)
 
         if len(parts) == 4 and parts[0] == "api" and parts[1] == "sessions" \
                 and parts[3] == "share":
@@ -178,21 +220,50 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(404, {"error": "session not found"})
             if "error" in result:
                 return self._json(409, result)
-            env = dict(os.environ)
-            env.setdefault("ENGINE_SYNTHESIS_PROVIDER", "zai")
-            env.setdefault("ENGINE_ATTACK_PROVIDER", "zai")
-            env.setdefault("ENGINE_ENSEMBLE_PROVIDERS", "zai")
-            env.setdefault("ENGINE_GRID_PROVIDERS", "zai")
-            subprocess.Popen(
-                [sys.executable, "-m", "toscanini.worker", sid],
-                cwd=str(REPO_ROOT), env=env,
-                stdout=open(REPO_ROOT / "ENGINE_RUNS" / "toscanini_worker.log",
-                            "ab"),
-                stderr=subprocess.STDOUT,
-                start_new_session=True)
+            self._spawn_worker(sid)
             return self._json(200, result)
 
         return self._json(404, {"error": "no such endpoint"})
+
+    # ------------------------------------------------------------ spawn
+    def _spawn_worker(self, session_id: str) -> None:
+        """Start the serialized discovery worker (detached).
+
+        Transport pinning (EXPLICIT operator overrides, logged by the
+        engine and recorded in candidate provenance — the designed
+        mechanism for degraded-endpoint situations: nvidia oscillates
+        35s..>240s and mistral is payment-blocked; zai gateway is the
+        measured-healthy transport). Without the pin, synthesis waits
+        out multiple 240 s timeouts before substituting.
+        """
+        env = dict(os.environ)
+        env.setdefault("ENGINE_SYNTHESIS_PROVIDER", "zai")
+        env.setdefault("ENGINE_ATTACK_PROVIDER", "zai")
+        env.setdefault("ENGINE_ENSEMBLE_PROVIDERS", "zai")
+        env.setdefault("ENGINE_GRID_PROVIDERS", "zai")
+        subprocess.Popen(
+            [sys.executable, "-m", "toscanini.worker", session_id],
+            cwd=str(REPO_ROOT), env=env,
+            stdout=open(REPO_ROOT / "ENGINE_RUNS" / "toscanini_worker.log",
+                        "ab"),
+            stderr=subprocess.STDOUT,
+            start_new_session=True)
+
+    # ------------------------------------------------------------- file
+    def _serve_file(self, path, mime: str, download_name=None):
+        if not path or not Path(path).exists():
+            return self._json(404, {"error": "file not available"})
+        p = Path(path)
+        data = p.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", mime)
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Access-Control-Allow-Origin", "*")
+        if download_name:
+            self.send_header("Content-Disposition",
+                             f'attachment; filename="{download_name}"')
+        self.end_headers()
+        self.wfile.write(data)
 
     # ------------------------------------------------------------- package
     def _package(self, sid: str):

@@ -1,0 +1,43 @@
+{
+  "artifact": "R389_PIPELINE_AUDIT",
+  "method": "static AST import graph + measured stage-envelope deltas (AST is conservative: dynamic imports in adapters.py are added explicitly; quoted path literals audited in R388)",
+  "product_entry_modules": [
+    "toscanini.worker",
+    "toscanini.server",
+    "toscanini.sessions",
+    "toscanini.problem_builder",
+    "toscanini.gateway"
+  ],
+  "engine_modules_total": 41,
+  "engine_modules_reachable": 37,
+  "engine_modules_unreachable": [
+    "benchmark_corpus",
+    "blind_protocol",
+    "campaign_bridge",
+    "smoke_e2e"
+  ],
+  "adapter_stage_modules": [
+    "candidate",
+    "query_relevance",
+    "llm_registry"
+  ],
+  "stage_delta_unique_paths": {
+    "RETRIEVE": 59,
+    "FREEZE": 21,
+    "SYNTHESIZE": 38,
+    "VERIFY": 8,
+    "MULTI_SOURCE_DISCOVERY": 88,
+    "COLLISION": 136,
+    "ATTACK": 28,
+    "CONTRADICTION": 14,
+    "KILLER_EXPERIMENT": 23,
+    "ADJUDICATION": 31,
+    "CLASSIFY": 4,
+    "NEXT_BEST_ACTION": 24,
+    "RANK": 14
+  },
+  "notes": [
+    "Unreachable-from-production engine modules are ARCHIVE/REMOVE candidates ONLY if tests do not independently require them (benchmarks/smoke tools are tooling, not production).",
+    "Stage deltas measured on real run w9_nephrology_hemodialysis_dose_flow_limit."
+  ]
+}
