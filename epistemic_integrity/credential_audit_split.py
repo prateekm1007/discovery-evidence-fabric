@@ -78,16 +78,26 @@ AUDIT_SCHEMA_VERSION = "1.0.0"
 
 PATTERN_SCAN_CORPUS = {
     "LENS_API_KEY_FORMAT": {
-        "pattern": re.compile(r"(?<![A-Za-z0-9])MA[A-Za-z0-9]{48}(?![A-Za-z0-9])"),
-        "description": "Lens API token (exactly 50 alphanumeric chars starting with MA)",
+        # R387 (2026-09-01): broadened from exactly-48 trailing chars to
+        # 48+ after MEASURING a live 52-char Lens token at HEAD
+        # (R358/r358_connectors.py LENS_KEY=MA5xazB4...Jd, 52 chars) — the
+        # v26 scrub and this scanner both missed it because the exact-
+        # length pattern did not match. Strengthening, not weakening.
+        "pattern": re.compile(r"(?<![A-Za-z0-9])MA[A-Za-z0-9]{48,}(?![A-Za-z0-9])"),
+        "description": ("Lens API token (50+ alphanumeric chars starting "
+                        "MA)"),
     },
     "SCOPUS_API_KEY_FORMAT": {
         "pattern": re.compile(r"(?<![a-fA-F0-9])15[a-f0-9]{30}(?![a-fA-F0-9])"),
         "description": "Scopus API key (exactly 32 hex chars starting with 15)",
     },
     "PATSNAP_API_KEY_FORMAT": {
-        "pattern": re.compile(r"(?<![A-Za-z0-9])sk-G[A-Za-z0-9]{44,}(?![A-Za-z0-9])"),
-        "description": "PatSnap API key (sk-G + 44+ alphanumeric)",
+        # R387 (2026-09-01): broadened from sk-G-prefixed keys to any
+        # sk- + 44+ after MEASURING two additional live PatSnap keys in
+        # R358 history (sk-lNgoLj3... and sk-Kt6EKi7..., 51 chars) that
+        # the sk-G-only pattern missed. Strengthening, not weakening.
+        "pattern": re.compile(r"(?<![A-Za-z0-9])sk-[A-Za-z0-9]{44,}(?![A-Za-z0-9])"),
+        "description": "PatSnap API key (sk- + 44+ alphanumeric)",
     },
     "GITHUB_PAT_FORMAT": {
         "pattern": re.compile(r"(?<![A-Za-z0-9_])ghp_[A-Za-z0-9]{36}(?![A-Za-z0-9])"),
@@ -162,6 +172,11 @@ FALSE_POSITIVE_VALUE_PATTERNS = [
     re.compile(r"^ftp://"),              # FTP URLs
     re.compile(r"^\[REDACTED[:\-]"),     # Already redacted
     re.compile(r"^REDACTED-"),           # Already redacted
+    # R387: values that CONTAIN a redaction marker (the v26 scrub
+    # redacted the middle of the value, leaving a live prefix/suffix —
+    # e.g. sk-[S01-REDACTED:kWs]). Measured class, not speculation.
+    re.compile(r"\[S?\d*-REDACTED"),
+    re.compile(r"\[REDACTED[:\-]"),      # Redaction marker mid-value
     re.compile(r"\{.*\}"),               # Template variables
     re.compile(r"\(.*\)"),               # Function calls
     re.compile(r"^args\."),              # argparse args
@@ -321,12 +336,33 @@ def _forbidden_files_in_history() -> List[str]:
 # Pass A — Pattern scan
 # ---------------------------------------------------------------------------
 
+# R387 (2026-09-01): PDF trailer /ID false-positive exclusion.
+# MEASURED context (Art. II): ReportLab writes the document identifier
+# into the PDF trailer as << /ID [<32-hex><32-hex>] >> — derived from the
+# document content (MD5), never from any credential. When such an ID
+# happens to start with "15", the SCOPUS_API_KEY_FORMAT pattern (32 hex
+# starting 15) false-positives on it. This is a STRUCTURAL location
+# (the RFC-defined file identifier field), not key material: excluding
+# exactly these spans does not weaken the gate — a real Scopus key
+# placed anywhere else in a PDF (body text, annotations, metadata)
+# still matches. Pinned by adversarial tests in
+# tests/test_r387_ci_red_state_fixes.py: (a) a Scopus-format key in a
+# PDF body MUST match; (b) the /ID trailer hex MUST NOT match.
+_PDF_ID_ARRAY_RE = re.compile(
+    r"/ID\s*\[\s*<[0-9A-Fa-f]{32}>\s*<[0-9A-Fa-f]{32}>\s*\]")
+
+
 def _pattern_scan_blob(blob_bytes: bytes) -> Dict[str, int]:
     """Scan one blob with the credential format corpus. Returns cred_type → count."""
     try:
         text = blob_bytes.decode("utf-8", errors="replace")
     except Exception:
         return {}
+
+    # R387: mask the PDF file-identifier array (structural false-positive
+    # class — see _PDF_ID_ARRAY_RE above) before applying the corpus.
+    if text.startswith("%PDF-"):
+        text = _PDF_ID_ARRAY_RE.sub("/ID [<<MASKED-PDF-FILE-ID>>]", text)
 
     matches: Dict[str, int] = {}
     for cred_type, spec in PATTERN_SCAN_CORPUS.items():
@@ -388,6 +424,19 @@ def _is_url_cred_false_positive(url: str) -> bool:
     for host in URL_FALSE_POSITIVE_HOSTS:
         if host in url:
             return True
+    # R387 (2026-09-01), two MEASURED false-positive classes:
+    # 1. Placeholder passwords: https://user:${TOKEN}@host (HANDOFF_DOCUMENT.md
+    #    documents the authenticated remote setup with a shell variable —
+    #    a template, not a credential).
+    # 2. JSON-escaped JSON-LD: matches whose "password" segment contains
+    #    JSON escape sequences (\", \\, \n) — measured on
+    #    CEREVASC_R2_C3.../CN122376206A_patsnap.json where schema.org
+    #    JSON-LD strings collide with the URL heuristic. A real
+    #    user:password@host URL embedded in JSON carries no backslashes.
+    if re.search(r":[^@/\s]*\$\{[^}]+\}@", url):
+        return True
+    if re.search(r":[^@]*\\\\|:[^@]*\\\"", url):
+        return True
     return False
 
 

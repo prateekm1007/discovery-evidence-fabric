@@ -126,6 +126,15 @@ AUTHORIZED_REDACTION_NAMES = {
     # v26: OpenRouter key markers (added by pass 3 scrub)
     "OPENROUTER-KEY",
     "OPENROUTER-PATTERN-MATCH",
+    # R387 (2026-09-01): the B10 unseen-content containment report
+    # (artifacts/benchmark/B10_CONTAINMENT_2026-08-30.json) redacts the
+    # colliding unseen-set trigram with the marker REDACTED-TRIGRAM —
+    # a self-disclosed redaction by the engine's own leak-screen
+    # instrument (negative knowledge, Art. XV/XXXI). Registered here
+    # with provenance so the audit recognizes it as an authorized
+    # redaction marker class. The registration is name-scoped: any
+    # OTHER unregistered marker still triggers HOLD.
+    "TRIGRAM",
 }
 
 # Pattern to detect any REDACTED-* marker in content.

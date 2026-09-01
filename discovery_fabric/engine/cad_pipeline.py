@@ -102,7 +102,61 @@ CAD_THRESHOLDS: Dict[str, Dict[str, Any]] = {
             "triangles) — checked by an INDEPENDENT verifier (trimesh), "
             "not by OCCT alone (Art. III verifier separation)"),
     },
+    "STL_MAIN_BYTES_CAP": {
+        "value": 2_000_000,
+        "unit": "bytes",
+        "epistemic_class": "ENGINEERING",
+        "justification": (
+            "R387 deliverable budget for one component mesh: a buyer "
+            "importing an STL into SolidWorks/Fusion/Magics must get a "
+            "practically usable artifact, not a 30 MB 600k-triangle "
+            "tessellation of a sub-millimetre wire helix (external "
+            "audit 2026-09-01). The cap mirrors the R384 section-solid "
+            "budget design: exceeded only by measured size, walked "
+            "down a declared tolerance ladder, every attempt recorded, "
+            "watertightness re-verified at the chosen tolerance"),
+    },
+    "MESH_VOLUME_RATIO_FLOOR": {
+        "value": 0.85,
+        "unit": "ratio",
+        "epistemic_class": "ENGINEERING",
+        "justification": (
+            "R387 G2b floor separating an honestly-declared approximate "
+            "mesh from a degenerate one: a mesh whose measured volume is "
+            "below 85% of the OCCT B-rep volume has lost real material "
+            "(collapsed features) and is a defect; above the floor the "
+            "mesh is an APPROXIMATE_DECLARED derivative carrying its "
+            "chosen tolerance, face count and measured volume ratio in "
+            "the buyer-visible report — the exact STEP B-rep remains the "
+            "engineering reference (Art. XXXVIII: COMPUTATIONAL_RESULT "
+            "discipline; nothing is silently degraded)"),
+    },
 }
+
+# R387 adaptive mesh ladder for component STL exports. The first entry is
+# the engineering tolerance used for every normal component (byte-identical
+# to the pre-R387 export for all packages below the budget). Later entries
+# are only attempted when the measured file size exceeds the declared cap.
+STL_TOL_LADDER = ((0.02, 0.1), (0.05, 0.3), (0.08, 0.5), (0.15, 0.8))
+
+# R387 finer-tolerance limit probe: used ONLY as validation evidence that
+# a minimal mesh is the exact tessellation of a prismatic solid (not a
+# collapsed export). Never used for the shipped bytes.
+STL_LIMIT_PROBE_TOLERANCE = 0.005
+
+
+def _clear_tessellation_cache(solid: Any) -> None:
+    """R387: OCCT caches face triangulation inside the shape — a second
+    exportStl with a coarser tolerance silently reuses the FIRST mesh
+    (measured: a true-helix sweep stayed at 605,108 triangles for every
+    tolerance from 0.02/0.1 to 0.3/1.2 because the first fine meshing
+    persisted). Clearing the cached triangulation before each export is
+    what makes a tolerance change actually take effect."""
+    try:
+        from OCP.BRepTools import BRepTools  # noqa: PLC0415
+        BRepTools.Clean_s(solid.wrapped)
+    except Exception:  # noqa: BLE001 — cache clear is best-effort
+        pass
 
 # sandbox: names a build program may NEVER touch (Art. XVIII — the
 # program is untrusted code until the gates admit it)
@@ -809,6 +863,126 @@ def validate_geometry(model: Dict[str, Any],
                          "unavailable — Art. XXV: not silently passed")
     _record("G2_non_manifold_solids", g2_status, g2_detail)
 
+    # ---- G2b mesh representational exactness ---------------------------
+    #      R387 (external audit 2026-09-01): a minimal mesh (a 12-triangle
+    #      box) is HONEST only when it is the exact tessellation of a
+    #      prismatic B-rep — not a collapsed export. This check measures
+    #      the mesh/B-rep volume ratio with the independent verifier and,
+    #      for minimal meshes, re-exports at a 4x finer tolerance to PROVE
+    #      the mesh is the tessellation limit (identical face count). The
+    #      result travels in the buyer-visible validation report so an
+    #      engineer opening the STL knows the box is the parametric
+    #      design, not a broken derivative.
+    g2b_status = "UNVERIFIABLE"
+    g2b_detail = ("secondary verifier not yet run (no STL derivative at "
+                 "validation time)")
+    if stl_paths:
+        try:
+            import trimesh  # noqa: PLC0415 — independent verifier
+            import tempfile  # noqa: PLC0415 — probe only
+            g2b_results = []
+            for key, art in stl_paths.items():
+                oid = key.split(":", 1)[1] if ":" in key else key
+                shp = shapes.get(oid)
+                solid = (shp.val() if hasattr(shp, "val") else shp) \
+                    if shp is not None else None
+                mesh = trimesh.load(art.get("path"), force="mesh")
+                faces = int(len(mesh.faces))
+                entry = {
+                    "artifact": key,
+                    "path": os.path.basename(art.get("path") or ""),
+                    "mesh_faces": faces,
+                }
+                if solid is not None:
+                    try:
+                        brep_volume = float(solid.Volume())
+                        ratio = (float(mesh.volume) / brep_volume
+                                 if brep_volume > 0 else None)
+                        entry["brep_volume_mm3"] = brep_volume
+                        entry["mesh_volume_mm3"] = float(mesh.volume)
+                        entry["mesh_to_brep_volume_ratio"] = (
+                            round(ratio, 6) if ratio is not None else None)
+                        entry["brep_faces"] = len(solid.Faces())
+                        floor = CAD_THRESHOLDS[
+                            "MESH_VOLUME_RATIO_FLOOR"]["value"]
+                        if ratio is not None and ratio < floor:
+                            entry["classification"] = "DEGENERATE_MESH"
+                            entry["note"] = (
+                                "measured mesh volume is below the "
+                                f"declared floor ({floor}): real "
+                                "material is missing — the mesh is a "
+                                "defective derivative, not a declared "
+                                "approximation")
+                        elif ratio is not None and ratio < 0.995:
+                            entry["classification"] = "APPROXIMATE_DECLARED"
+                            entry["note"] = (
+                                "declared coarse-tessellation derivative: "
+                                "the chosen tolerance, face count and "
+                                "measured mesh/B-rep volume ratio are "
+                                "recorded above; the STEP B-rep is the "
+                                "exact engineering reference")
+                        # limit probe: minimal mesh + exact volume ->
+                        # finer tolerance must reproduce the same faces
+                        if faces <= 64 and ratio is not None \
+                                and ratio >= 0.995:
+                            probe_faces = None
+                            try:
+                                with tempfile.NamedTemporaryFile(
+                                        suffix=".stl") as tf:
+                                    _clear_tessellation_cache(solid)
+                                    solid.exportStl(
+                                        tf.name,
+                                        tolerance=(
+                                            STL_LIMIT_PROBE_TOLERANCE),
+                                        angularTolerance=0.1)
+                                    pm = trimesh.load(tf.name, force="mesh")
+                                    probe_faces = int(len(pm.faces))
+                            except Exception as exc:  # noqa: BLE001
+                                entry["limit_probe_error"] = (
+                                    f"{type(exc).__name__}: {exc}")
+                            entry["finer_tolerance_probe"] = {
+                                "tolerance": STL_LIMIT_PROBE_TOLERANCE,
+                                "faces_at_finer_tolerance": probe_faces,
+                                "identical_face_count": (
+                                    probe_faces == faces
+                                    if probe_faces is not None else None),
+                            }
+                            if probe_faces == faces:
+                                entry["classification"] = (
+                                    "PRISMATIC_EXACT_MESH")
+                                entry["note"] = (
+                                    "the mesh is the exact tessellation "
+                                    "of a prismatic solid (a re-export at "
+                                    "4x finer tolerance reproduces the "
+                                    "identical face count and the "
+                                    "mesh/B-rep volume ratio is 1.0): "
+                                    "the component is a rectangular prism "
+                                    "by parametric design — the minimal "
+                                    "mesh is the geometry, not a broken "
+                                    "export")
+                    except Exception as exc:  # noqa: BLE001
+                        entry["error"] = f"{type(exc).__name__}: {exc}"
+                g2b_results.append(entry)
+            measured = [e for e in g2b_results
+                        if e.get("mesh_to_brep_volume_ratio") is not None]
+            degenerate = [e for e in g2b_results
+                          if e.get("classification") == "DEGENERATE_MESH"]
+            g2b_status = (
+                "VIOLATED" if degenerate or (measured and len(measured)
+                                             < len(g2b_results))
+                else ("SATISFIED" if measured else "UNVERIFIABLE"))
+            if degenerate:
+                reasons.append(
+                    "G2b_mesh_representational_exactness: " +
+                    ", ".join(e["artifact"] for e in degenerate) +
+                    " mesh volume below the declared floor")
+            g2b_detail = g2b_results
+        except ImportError:
+            g2b_status = "UNVERIFIABLE"
+            g2b_detail = ("trimesh (independent secondary verifier) "
+                          "unavailable — Art. XXV: not silently passed")
+    _record("G2b_mesh_representational_exactness", g2b_status, g2b_detail)
+
     # ---- G7 impossible intersections ----------------------------------
     #      declared clearance/contact pairs between objects
     pairs = model.get("interference_pairs") or []
@@ -928,6 +1102,36 @@ def _sha256_file(path: str) -> str:
     return h.hexdigest()
 
 
+def _mesh_quality_evidence(p: str, solid: Any) -> Optional[Dict[str, Any]]:
+    """R387 Art. III dual verification of a shipped mesh: measure the mesh
+    with trimesh (independent verifier) and compare against the OCCT B-rep
+    measurement. Records faces, watertightness and the mesh/B-rep volume
+    ratio — the buyer-visible evidence that the mesh faithfully represents
+    the B-rep at the chosen tolerance."""
+    try:
+        import trimesh  # noqa: PLC0415 — independent verifier
+        mesh = trimesh.load(p, force="mesh")
+        try:
+            brep_volume = float(solid.Volume())
+        except Exception:  # noqa: BLE001
+            brep_volume = None
+        ratio = (float(mesh.volume) / brep_volume
+                 if brep_volume and brep_volume > 0 else None)
+        return {
+            "verifier": "trimesh (independent of OCCT)",
+            "faces": int(len(mesh.faces)),
+            "vertices": int(len(mesh.vertices)),
+            "watertight": bool(mesh.is_watertight),
+            "mesh_volume_mm3": float(mesh.volume),
+            "brep_volume_mm3": brep_volume,
+            "mesh_to_brep_volume_ratio": (
+                round(ratio, 6) if ratio is not None else None),
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {"status": "VERIFIER_UNAVAILABLE",
+                "error": f"{type(exc).__name__}: {exc}"}
+
+
 def export_derivatives(model: Dict[str, Any],
                        shapes: Dict[str, Any],
                        out_dir: str
@@ -973,12 +1177,47 @@ def export_derivatives(model: Dict[str, Any],
                     "assembly STEP (all objects)")
 
     # ---- STL (per object) ---------------------------------------------
+    # R387: adaptive deliverable budget. Export at the engineering
+    # tolerance first; only when the measured size exceeds the declared
+    # cap walk the coarser ladder (mirrors the R384 section-solid design:
+    # every attempt and the chosen tolerance are recorded — the mesh is
+    # never silently degraded, and it is re-verified watertight by the
+    # independent verifier at the chosen tolerance).
+    budget = CAD_THRESHOLDS["STL_MAIN_BYTES_CAP"]["value"]
     for oid, wp in shapes.items():
         p = str(out / f"{base}_{oid}.stl")
         solid = wp.val() if hasattr(wp, "val") else wp
-        solid.exportStl(p, tolerance=0.02, angularTolerance=0.1)
+        # R387: OCCT caches face triangulation inside the shape — a second
+        # exportStl with a coarser tolerance silently reuses the FIRST
+        # mesh (measured: the true-helix sweep stayed at 605k triangles
+        # for every tolerance). Clear the cached triangulation before
+        # every attempt so each tolerance is actually applied.
+        attempts = []
+        chosen = None
+        for tol, atol in STL_TOL_LADDER:
+            _clear_tessellation_cache(solid)
+            solid.exportStl(p, tolerance=tol, angularTolerance=atol)
+            b = os.path.getsize(p)
+            attempts.append({"tolerance": tol, "angularTolerance": atol,
+                             "bytes": b})
+            chosen = attempts[-1]
+            if b <= budget:
+                break
+        mesh_evidence = _mesh_quality_evidence(p, solid)
         _record_art("STL", oid, p, "mesh derivative (additive-mfg "
                                    "approximation of the B-rep)")
+        key = f"STL:{oid}"
+        if key in arts and isinstance(arts[key], dict):
+            arts[key]["export"] = {
+                "budget_bytes": budget,
+                "attempts": attempts,
+                "chosen": chosen,
+                "note": ("tolerance ladder is deterministic and "
+                         "byte-reproducible; files under the budget keep "
+                         "the engineering tolerance export unchanged"),
+            }
+            if mesh_evidence is not None:
+                arts[key]["mesh_quality"] = mesh_evidence
 
     # ---- GLB (assembly presentation — NOT engineering validation) ----
     try:

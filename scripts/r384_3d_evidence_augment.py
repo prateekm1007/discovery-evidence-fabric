@@ -128,6 +128,16 @@ def export_cut_solid(cut, ev: Path, pid: str, oid: str, plane: str,
     stl = ev / f"{pid}_{oid}_section_{plane}{suffix}_solid.stl"
     chosen = None
     for tol, atol in STL_TOL_LADDER:
+        # R387: OCCT caches face triangulation inside the shape — without
+        # clearing it, every ladder attempt after the first silently
+        # reuses the first mesh (measured on the helical-antenna coupon:
+        # 9.7 MB at every tolerance). Clear before each attempt so the
+        # declared tolerance actually applies.
+        try:
+            from OCP.BRepTools import BRepTools  # noqa: PLC0415
+            BRepTools.Clean_s(cut.wrapped)
+        except Exception:  # noqa: BLE001 — best-effort cache clear
+            pass
         cut.exportStl(str(stl), tolerance=tol, angularTolerance=atol)
         b = stl.stat().st_size
         chosen = {"tolerance": tol, "angularTolerance": atol, "bytes": b}
