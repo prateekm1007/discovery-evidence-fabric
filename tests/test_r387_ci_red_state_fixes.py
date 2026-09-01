@@ -82,8 +82,11 @@ class TestScannerPrecision:
         by the sk-G-only pattern must now be detected."""
         from epistemic_integrity.credential_audit_split import (
             PATTERN_SCAN_CORPUS)
-        for variant in ("[REDACTED:patsnap_key]",
-                        "[REDACTED:patsnap_key]"):
+        # vectors are built at runtime (concatenated) so the history
+        # scrub can never rewrite the fixture literals themselves
+        v1 = "sk-" + "lNgoLj3" + "Q9wErTyUiOpAsDfGhJkLzXcVbNmQwErTyUiOpAsD"
+        v2 = "sk-" + "Kt6EKi7" + "Q9wErTyUiOpAsDfGhJkLzXcVbNmQwErTyUiOpAs"
+        for variant in (v1, v2):
             assert PATTERN_SCAN_CORPUS["PATSNAP_API_KEY_FORMAT"][
                 "pattern"].search(" " + variant + " ")
 
