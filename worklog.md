@@ -501,3 +501,28 @@ Stage Summary:
 - Assembly STEP nondeterminism + key rotation + GitHub dangling-commit GC = open items for the CEO.
 
 **Next session (CEO order, in strict order):** pipeline distillation call-graph audit (KEEP/MERGE/REPLACE/ARCHIVE/REMOVE per stage) → archive R-series/CEREVASC out of the active path (archive, don't destroy) → ONE canonical production loop → buyer-dossier product output → Claude-like UI (Next.js/Vercel + FastAPI boundary) → investor demo (P-04, P-08, one non-medical).
+
+---
+
+## R388 — PIPELINE DISTILLATION + LEGACY ARCHIVE (CEO order #2/#5: distill → verify → productize)
+
+Task ID: CODER-R388
+Agent: CODER (Super Z session 2026-09-01, continuation of CODER-R387)
+Task: Execute the CEO-ordered distillation: call-graph audit, legacy archive (archive-don't-destroy), one canonical production loop — WITHOUT breaking CI, the release chain, or the evidence moat.
+
+Work Log:
+- Constitution v1.9.0 re-read IN FULL before any code change (session mandate; Art. XXXIX chain authority).
+- CALL-GRAPH AUDIT (evidence before assertion): imports + quoted path literals + read/write direction + G4 territory-map constraints over every top-level tree. Iterative safety sweeps; strict `REPO_ROOT/"name"` operand pattern as the authoritative check.
+- KEY STRUCTURAL FINDINGS: G4 (state reconciliation) globs per-territory CEREVASC adjudication trees from CANONICAL_STATE/PORTFOLIO.json against the WORKING TREE — the CEREVASC territory trees are load-bearing, not legacy. R370-family + R332/R334/R341/R346 are frozen buyer-package state loaded by premium_package_factory gates. R309/R339/R370F hold constitution amendment full-texts (kept whole → no constitution edit → G14 acknowledgment untouched). discovery_campaigns is the toscanini service seed + test evidence; tournament_v3 root hash is recomputed by tests; patent_sources holds the PatentBear quota meter; canonical_data is read by reconciliation gates.
+- ARCHIVE EXECUTED: 111 legacy roots (5,873 files, 82.0 MB) removed from main and preserved byte-identical on branch archive/rounds-R309-R383 (= pre-R388 tip c7f7d692) + full git history. Per-path inventory with byte counts + rationale: ARCHIVE_MANIFEST.json (committed). Covers R310–R378 round trees, superseded CEREVASC research trees, generation-era corpora (skills/ 59 MB, tournament-era macro/micro), campaign byproducts, stale WORKLOG.md duplicate, and a stale A2-era submodule gitlink.
+- REGRESSION CAUGHT AND FIXED (Art. XV/XXXI): patentability/ was initially archived in error — tests/test_v5_forensic_fix_regression.py failed (V5DiscoveryRouter._get_historical_ids reads patentability/retrieval_v4/<invention>/RETRIEVAL_RESULTS.json = V4 historical prior-art evidence). Restored byte-identical from the archive branch BEFORE push; test re-run 9/9 PASS; correction + memory artifact recorded in ARCHIVE_MANIFEST.json.
+- WORKLOG ROTATION: worklog.md trimmed to CODER-R371+ (863 KB → 157 KB); full history in git. Stale uppercase WORKLOG.md fork archived.
+- ONE CANONICAL PRODUCTION LOOP: README.md + ACTIVE_PATH.md rewritten as the stage→module map (PROBLEM→EVIDENCE→MECHANISM→CANDIDATES→ATTACK→INVENTION DIAGNOSTIC→IMPROVE→TECHNICAL EVALUATION→3D DESIGN→DECISIVE EXPERIMENT→ENGINEERING DOSSIER→BUYER PACKAGE). HANDOFF_TO_NEXT_CHAT.md updated (§0.7).
+- LOCAL VERIFICATION: full test suite run in batches — ~1,993 passed, 2 skipped, 0 failures attributable to R388. Disclosed exceptions: (a) r371 TestBuildAndAcceptance (3 tests) + r372 tail (3 tests) exceed the session's 10-min per-command ceiling — verified IDENTICALLY SLOW at pre-R388 commit c7f7d692 (Art. XXXII alternative-explanation test); their subject matter is independently verified by the chain verifier; (b) r373 test_r373_audit_all_pass_on_real_release fails against the local (non-authoritative) workspace portfolio checkout — verified failing IDENTICALLY at c7f7d692 (environment artifact: checkout at post-release pointer 04e4497, not the release commit).
+- 14-GATE LOCAL REPRODUCTION on commit 8cb6ff3b: ALL GREEN (G4 exact, G5 pre-existing quarantined only, G10 29/29 ledger artifacts valid, G12 history clean, G14 acknowledged).
+- PUSHED: main 8cb6ff3b → 562dc6d1; archive/rounds-R309-R383 → origin. REMOTE CI: "Epistemic Certification (14 gates)" = SUCCESS on BOTH commits (independent certification, Art. XXVI).
+- CLEAN-CLONE CHAIN VERIFICATION (Art. XXXIX §4): verify-fresh --release-id R387-3D-QUALITY-EDITION → 25/25 PASS at engine tip 8cb6ff3b (portfolio 04e4497 audit-only; buyer surface byte-exact). Certificate: RELEASE_CHAIN/RELEASE_CHAIN_VERIFICATION_R388_DISTILLED_TREE.json (committed 562dc6d1).
+
+Stage Summary:
+- The active tree is now ONE canonical loop; 111 legacy roots archived without destruction; CI independently green; release chain 25/25 from clean clones; the moat (ledger, G4 territory trees, mechanism cemetery, negative knowledge, honest PHYSICALLY_VALIDATED=NONE) fully preserved.
+- NOT STARTED (next session, CEO strict order): buyer-dossier product output (9-component dossier as product), Claude-like UI (Next.js/Vercel + FastAPI over toscanini service), investor demo (P-04 drainage floor, P-08 NIR photovoltaic, one non-medical).
