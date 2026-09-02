@@ -1,0 +1,222 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "nvidia"
+ ],
+ "operator_override": [
+  "nvidia"
+ ],
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "37c68546f4b12d029e134c3de363edb7ced24a3feec5e6645bfd53318e9a41a4",
+   "output_hash": "ca498f67ace3d6dbf82b981a7efca3689180ec35a2e9ca869e3925b5483d8186",
+   "fields": {
+    "mechanism": "oxygen oxidation and conversion reaction (a chemical gas‑free lithium supply method originally developed for Si‑based LIBs).",
+    "intervention": "apply the same oxygen‑oxidation‑based prelithiation coating to the separator surface of the pouch cell, allowing lithium to be released to the anode during formation without electrolyte decomposition that produces gas.",
+    "expected_effect": "eliminates gas‑forming side reactions during early cycles, thus suppressing swelling while preserving cell energy density and cycle life.",
+    "falsification_test": "fabricate cells with the coated separator, run formation, and monitor cell thickness and internal pressure; successful suppression is indicated by <0.1 mm thickness increase versus >0.5 mm in control cells lacking the coating.",
+    "mechanism_source_span": "\"MNCP presents several tunable delithiation plateaus to prelithiate anodes in the initial and extending cycles with exceeding 600 milliampere-hours per gram without gas generation.\"",
+    "span_derivation": {
+     "n_shared": 3,
+     "shared_terms": [
+      "anode",
+      "gas",
+      "without"
+     ],
+     "span_terms_n": 20,
+     "ratio": 0.15,
+     "underived": true,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:cross_industry_transfer:nvidia:ca498f67ace3"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "34d49eee61847c0c2f5341fac8c5a93c8148565464f8bc7470a07b2cc05d153a",
+   "output_hash": "cef98f02e337aa3055592249a8af2224afb1669c65167c9d69f76802c80466f0",
+   "fields": {
+    "mechanism": "oxygen oxidation (as a chemical reaction that consumes oxygen and does not generate gas)",
+    "intervention": "incorporate a multiphase nanocomposite oxygen‑scavenging additive, analogous to the MNCP, into the pouch‑cell electrolyte or separator to actively oxidize residual oxygen during formation cycling, thereby preventing gas evolution",
+    "expected_effect": "suppression of gas‑induced swelling and blistering during formation without the need for a vent, while maintaining lithium‑ion transport and overall cell performance",
+    "falsification_test": "run parallel formation cycles on cells with and without the oxygen‑scavenging additive, monitor internal pressure rise and pouch thickness with a pressure sensor and laser profilometer; a statistically significant reduction in pressure and thickness change validates the mechanism",
+    "mechanism_source_span": "\"Herein, we have developed a multiphase nanocomposite prelithiation agent (MNCP) on the basis of two distinct mechanisms-oxygen oxidation and conversion reaction-aiming to provide service life lithium replenishment for Si-based LIBs.\"",
+    "span_derivation": {
+     "n_shared": 6,
+     "shared_terms": [
+      "mncp",
+      "multiphase",
+      "nanocomposite",
+      "oxidation",
+      "oxygen",
+      "reaction"
+     ],
+     "span_terms_n": 24,
+     "ratio": 0.25,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:mechanism_inversion:nvidia:cef98f02e337"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "316126e000cbf4a76a1b883b145944b68e719c8ac00fc74adf45e2d7d6456415",
+   "output_hash": "90fbbf8c1998a2d8cdf6db0615b2a405da706008773034f6a9acd4f1f379e6f8",
+   "fields": {
+    "mechanism": "oxygen oxidation (as one of the two distinct mechanisms reported in the nanocomposite prelithiation agent)",
+    "intervention": "apply the multiphase",
+    "span_derivation": {
+     "n_shared": 0,
+     "ratio": null,
+     "underived": true,
+     "state": "NO_SPAN"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:simplification:nvidia:90fbbf8c1998"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "9496c1cb75441c83653244751621ca386ba027c94fafb2206439e4ceba879680",
+   "output_hash": "069f99325b739ca1653fd83645bedfda5490c406982a22a12f032f2e1d796fe2",
+   "fields": {
+    "mechanism": "Oxygen oxidation and conversion reaction occurring in the multiphase nanocomposite prelithiation agent, which consume residual oxygen and store lithium without producing gas.",
+    "intervention": "Coat the Si anode (or integrate within the electrode stack) with the multiphase nanocomposite prelithiation agent (MNCP) so that during formation cycling the oxygen oxidation and conversion reaction mechanisms operate to pre‑lithiate the anode and scavenge oxygen, eliminating gas evolution.",
+    "expected_effect": "Suppressed gas generation during formation, preventing pouch‑cell blistering and swelling while preserving or enhancing capacity and cycle life.",
+    "falsification_test": "Compare two otherwise identical pouch cells (one with MNCP coating, one without) under standard formation cycling; measure internal pressure rise and cell thickness change, and perform gas chromatography on any vented gases—absence of pressure increase in the MNCP cell falsifies the mechanism.",
+    "mechanism_source_span": "\"two distinct mechanisms-oxygen oxidation and conversion reaction-aiming to provide service life lithium replenishment for Si-based LIBs.\"",
+    "span_derivation": {
+     "n_shared": 6,
+     "shared_terms": [
+      "conversion",
+      "lithium",
+      "mechanism",
+      "oxidation",
+      "oxygen",
+      "reaction"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.4,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:nvidia:069f99325b73"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "73d95cb29fa9fc75af29018a082f5a145604974baf9fc82de9de2a084608304f",
+   "output_hash": "b247e4f0fc2625385ed2b864885ee755677ba923a48496d14e469fcb107c9a63",
+   "fields": {
+    "mechanism": "oxygen oxidation and conversion reaction providing lithium replenishment without gas generation",
+    "intervention": "incorporate the multiphase nanocomposite prelithiation agent (MNCP) into the pouch cell (e.g., as a thin coating on the Si‑based anode or mixed into the electrode slurry) so that during formation cycling lithium is supplied via the oxygen oxidation and conversion reaction pathways, suppressing electrolyte decomposition that produces gas",
+    "expected_effect": "markedly lower gas evolution during formation, eliminating or greatly reducing blistering and swelling of the pouch cell while preserving or enhancing capacity and cycle life",
+    "falsification_test": "run parallel formation cycles on two identical pouch cells—one with MNCP added and one without—measure in‑situ gas pressure or collect evolved gases with gas chromatography, and record cell thickness change; a statistically significant reduction in gas volume and swelling in the MNCP cell would confirm the mechanism, whereas no difference would falsify it",
+    "mechanism_source_span": "\"Herein, we have developed a multiphase nanocomposite prelithiation agent (MNCP) on the basis of two distinct mechanisms-oxygen oxidation and conversion reaction-aiming to provide service life lithium replenishment for Si-based LIBs.\"",
+    "span_derivation": {
+     "n_shared": 12,
+     "shared_terms": [
+      "agent",
+      "based",
+      "conversion",
+      "lithium",
+      "mncp",
+      "multiphase",
+      "nanocomposite",
+      "oxidation",
+      "oxygen",
+      "prelithiation",
+      "reaction",
+      "replenishment"
+     ],
+     "span_terms_n": 24,
+     "ratio": 0.5,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:constraint_first:nvidia:b247e4f0fc26"
+  }
+ ],
+ "built_at": "2026-09-02T08:51:04+00:00Z",
+ "usable_candidates": 5,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 5,
+  "mean_pairwise_token_distance": 0.774,
+  "distinct_mechanism_clusters": 5,
+  "cluster_sizes": [
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [],
+  "architecture_term_count": 52,
+  "architecture_terms_sample": [
+   "actively",
+   "additive",
+   "agent",
+   "allowing",
+   "analogous",
+   "anode",
+   "apply",
+   "cell",
+   "coat",
+   "coating",
+   "conversion",
+   "cycling",
+   "decomposition",
+   "during",
+   "electrode",
+   "electrolyte",
+   "eliminating",
+   "evolution",
+   "formation",
+   "incorporate",
+   "integrate",
+   "lithiate",
+   "lithium",
+   "mechanisms"
+  ],
+  "failure_mode_signal_count": 0,
+  "failure_modes_invoked_sample": [],
+  "prior_art_query_set_count": 5,
+  "detected_domain": "UNKNOWN"
+ }
+}
