@@ -161,6 +161,11 @@ def test_bench_04_false_premise_blocks_engine_chain():
                        (Path(td) / "candidate_envelope.json").read_text())
                    ["stage_log"]}
         assert skipped.get("SYNTHESIZE") == "SKIPPED_UPSTREAM_FAILURE"
+        # R397 pin: PHYSICS is a downstream stage of the premise gate —
+        # after a premise fatality it records SKIPPED_UPSTREAM_FAILURE
+        # (executing it recorded a misleading OK with an empty mechanism;
+        # found live by the R396 P3 probe, fixed in DOWNSTREAM_BLOCKERS)
+        assert skipped.get("PHYSICS") == "SKIPPED_UPSTREAM_FAILURE"
         cem = json.loads((Path(td) / "cemetery_update.json").read_text())
         assert cem["appended"] is False
         assert manifest["final_status"] == "MALFORMED_OR_FALSE_PREMISE"

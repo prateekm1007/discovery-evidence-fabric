@@ -38,11 +38,18 @@ FATAL_STAGES = {"SYNTHESIZE", "PREMISE_GATE"}
 
 # If a stage failed, which later stages are meaningless without it?
 DOWNSTREAM_BLOCKERS = {
+    # R397: PHYSICS is in every downstream set — after a premise
+    # fatality or synthesis failure the physics stage must record
+    # SKIPPED_UPSTREAM_FAILURE like every other discovery stage (it
+    # has no mechanism to evaluate; executing it after a fatality
+    # recorded a misleading OK — found live by the R396 P3 probe
+    # against the local instance, fixed with a pinned test).
     "PREMISE_GATE": {"SYNTHESIZE", "VERIFY", "MULTI_SOURCE_DISCOVERY",
-                     "COLLISION", "ATTACK", "CONTRADICTION",
+                     "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
                      "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY",
                      "NEXT_BEST_ACTION", "RANK"},
-    "SYNTHESIZE": {"VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION", "ATTACK",
+    "SYNTHESIZE": {"VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION",
+                   "PHYSICS", "ATTACK",
                    "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
                    "CLASSIFY", "NEXT_BEST_ACTION", "RANK"},
     "RETRIEVE": {"VERIFY", "SYNTHESIZE"},

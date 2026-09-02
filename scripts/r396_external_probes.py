@@ -103,6 +103,15 @@ def _request(base: str, path: str, method: str = "GET",
             raw = r.read()
             rec["status"] = r.status
             rec["content_type"] = r.headers.get("Content-Type")
+            # R397 fix: capture the owner cookie the server sets on run
+            # creation (the R394 s15 contract: owner capability is the
+            # httpOnly tosca_owner cookie — X-Owner-Key was never a
+            # server-side contract; the probe must speak the public
+            # product surface exactly as a browser does)
+            set_cookie = r.headers.get("Set-Cookie") or ""
+            if "tosca_owner=" in set_cookie:
+                rec["owner_cookie"] = set_cookie.split("tosca_owner=")[1] \
+                    .split(";")[0]
             rec["elapsed_ms"] = int((time.time() - started) * 1000)
             try:
                 rec["response_json"] = json.loads(raw.decode())
@@ -130,12 +139,19 @@ def _json(rec: Dict[str, Any]) -> Optional[dict]:
 
 def _wait_terminal(base: str, session_id: str, owner: str,
                    timeout_s: int = 600) -> Optional[dict]:
-    """Poll a session until a terminal status; return the detail JSON."""
+    """Poll a session until a terminal status; return the detail JSON.
+
+    R397 fix: `owner` is the tosca_owner COOKIE harvested from the run
+    creation response (the server's actual owner-capability contract —
+    R394 s15). The old X-Owner-Key header was never a server-side
+    contract, so every poll was 404-denied and the probe timed out
+    without ever seeing the terminal state (found live against the
+    local instance)."""
     deadline = time.time() + timeout_s
     last = None
     while time.time() < deadline:
         rec = _request(base, f"/api/sessions/{session_id}",
-                       headers={"X-Owner-Key": owner})
+                       headers={"Cookie": f"tosca_owner={owner}"})
         d = _json(rec)
         if d:
             last = d
@@ -149,13 +165,20 @@ def _wait_terminal(base: str, session_id: str, owner: str,
 
 
 def _start_run(base: str, text: str) -> Optional[str]:
-    owner = uuid.uuid4().hex
+    """POST /api/discoveries and return (session_id, owner_cookie).
+
+    R397 fix: the server assigns ownership via the Set-Cookie response
+    header (tosca_owner, httpOnly) — the owner key the caller replays
+    as a Cookie. The body's owner_key field was never read by the
+    server (removed here so the probe exercises only the real
+    contract)."""
     rec = _request(base, "/api/discoveries", method="POST",
-                   body={"text": text, "owner_key": owner})
+                   body={"text": text})
     d = _json(rec)
+    cookie = rec.get("owner_cookie") or ""
     if d and d.get("session_id"):
-        return d["session_id"], owner
-    return None, owner
+        return d["session_id"], cookie
+    return None, cookie
 
 
 # ---------------------------------------------------------------------------
@@ -237,7 +260,20 @@ def probe_p3(base: str) -> Dict[str, Any]:
     synth = by_stage.get("SYNTHESIZE", {})
     fs = detail.get("final_state") or {}
     final = detail.get("status") or fs.get("final_status") or ""
-    blob = json.dumps(detail)
+    # the MECHANISM-bearing surfaces only (R397 fix: the original
+    # blob-wide "CMOS not in json" over-triggered on the RETRIEVE
+    # stage's sample_titles — retrieval legitimately happens BEFORE
+    # the premise gate fires, and the retrieved-record disclosure is
+    # honest evidence-of-what-was-fetched, not a synthesized mechanism.
+    # The contract under test: no CMOS-based mechanism/candidate was
+    # ever BUILT from that irrelevant retrieval.)
+    mechanism_blob = json.dumps({
+        "synth_mechanism": (synth.get("mechanism") or {}),
+        "invention_specification": detail.get("invention_specification"),
+        "engineering_specification": detail.get("engineering_specification"),
+        "survivor_selection": detail.get("survivor_selection"),
+        "final_state": fs,
+    })
     checks = {
         "early_malformed_or_false_premise": (
             final in ("COMPLETED_FALSE_PREMISE",
@@ -245,7 +281,7 @@ def probe_p3(base: str) -> Dict[str, Any]:
             or pg.get("verdict") == "MALFORMED_OR_FALSE_PREMISE"),
         "explicit_reason": bool(pg.get("explanation")),
         "no_mechanism_synthesis": not synth.get("mechanism"),
-        "no_cmos_mechanism": "CMOS" not in blob,
+        "no_cmos_mechanism": "CMOS" not in mechanism_blob,
         "no_downstream_candidate": not (
             detail.get("invention_specification")
             or detail.get("engineering_specification")
