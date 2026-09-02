@@ -45,6 +45,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from toscanini import artifact_identity  # noqa: E402  R396 B.3
 from toscanini import sessions as store
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -54,13 +55,23 @@ LOCK_PATH = ENGINE_RUNTIME / "durable.lock"
 
 REMOTE = "https://github.com/prateekm1007/discovery-evidence-fabric.git"
 FILE_CAP_BYTES = 20 * 1024 * 1024
+# R396 B.3: integrity manifest + append-only snapshot log live in the
+# state repo. The manifest cannot hash itself (or the log) — both are
+# excluded from the file map and named here so the exclusion is a
+# constant, not a convention.
+MANIFEST_NAME = "MANIFEST.json"
+SNAPSHOT_LOG_NAME = "snapshot_log.jsonl"
 
 _LAST: Dict[str, Any] = {"ok": None, "at": None, "reason": None,
                          "error": None, "files": 0, "commit": None,
-                         "pushed": None}
+                         "pushed": None, "manifest_sha256": None,
+                         "engine_commit": None}
 _LAST_RESTORE: Dict[str, Any] = {"at": None, "sessions": 0, "runs": 0,
                                  "evidence": 0, "interrupted": 0,
-                                 "error": None}
+                                 "error": None, "branch_sessions": None,
+                                 "integrity_mismatches": None,
+                                 "integrity_verified": None,
+                                 "manifest_sha256": None}
 
 
 def enabled() -> bool:
@@ -82,6 +93,25 @@ def state() -> Dict[str, Any]:
         "last_restore": dict(_LAST_RESTORE),
         "store": "private engine repo runtime-state branch (git)",
     }
+
+
+# R396 B.3: per-file integrity manifest --------------------------------
+
+def _file_sha256(path: Path) -> str:
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _tree_sha256(file_hashes: Dict[str, str]) -> str:
+    """Deterministic digest over the sorted (path, sha) pairs — the
+    integrity identity of one snapshot payload."""
+    import hashlib
+    lines = sorted(f"{p} {s}" for p, s in file_hashes.items())
+    return hashlib.sha256("\n".join(lines).encode()).hexdigest()
 
 
 # ---------------------------------------------------------------------------
@@ -197,16 +227,27 @@ def _ensure_state_repo() -> Path:
 
 def snapshot(reason: str) -> Dict[str, Any]:
     """Commit the current durable state and push it. Returns an honest
-    outcome dict (also cached for /api/health)."""
+    outcome dict (also cached for /api/health).
+
+    R396 B.3: every successful snapshot records its timestamp, the
+    ARTIFACT identity of the engine that took it (R396 A — never an
+    env-asserted value), the file count, and an integrity manifest
+    (per-file sha256 + tree digest) committed alongside the payload, so
+    a restore can PROVE state equality instead of asserting it."""
+    ident_commit, ident_source = artifact_identity.resolve_engine_commit()
     _LAST.update({"ok": None, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                                   time.gmtime()),
                   "reason": reason, "error": None, "files": 0,
-                  "commit": None, "pushed": None})
+                  "commit": None, "pushed": None,
+                  "manifest_sha256": None,
+                  "engine_commit": ident_commit or None})
     if not enabled():
+        _LAST["ok"] = False  # explicit refusal, not an unattempted null
         _LAST["error"] = ("durable persistence not enabled "
                           "(DURABLE_STATE_ENABLED != 1)")
         return dict(_LAST)
     if not os.environ.get("GITHUB_TOKEN", "").strip():
+        _LAST["ok"] = False  # explicit refusal, not an unattempted null
         _LAST["error"] = "GITHUB_TOKEN not set — cannot push runtime state"
         return dict(_LAST)
 
@@ -217,18 +258,37 @@ def snapshot(reason: str) -> Dict[str, Any]:
         repo = _ensure_state_repo()
         payload = _collect_payload()
         copied = 0
+        file_hashes: Dict[str, str] = {}
         for dest, src in sorted(payload.items()):
             target = repo / dest
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, target)
+            file_hashes[dest] = _file_sha256(target)
             copied += 1
-        # append-only snapshot log
-        log = repo / "snapshot_log.jsonl"
+        # R396 B.3: integrity manifest (self-excluded by name constant)
+        manifest = {
+            "schema": 1,
+            "at": _LAST["at"],
+            "reason": reason,
+            "engine_commit": ident_commit or None,
+            "engine_commit_source": ident_source,
+            "files": file_hashes,
+            "tree_sha256": _tree_sha256(file_hashes),
+        }
+        manifest_bytes = json.dumps(manifest, indent=1,
+                                    sort_keys=True).encode() + b"\n"
+        (repo / MANIFEST_NAME).write_bytes(manifest_bytes)
+        _LAST["manifest_sha256"] = _tree_sha256(file_hashes)
+        # append-only snapshot log — same record shape as the manifest
+        # summary + the state-repo commit it becomes (R396 B.3)
+        log = repo / SNAPSHOT_LOG_NAME
         with open(log, "a") as lf:
             lf.write(json.dumps({
                 "reason": reason,
                 "at": _LAST["at"],
-                "files": copied}) + "\n")
+                "files": copied,
+                "engine_commit": ident_commit or None,
+                "tree_sha256": _LAST["manifest_sha256"]}) + "\n")
         _git(repo, "add", "-A")
         commit = _git(repo, "-c", "user.name=toscanini-runtime",
                       "-c", "user.email=runtime@toscanini.local",
@@ -268,11 +328,22 @@ def restore() -> Dict[str, Any]:
     """Pull the runtime-state branch and re-materialize local state after
     a restart. Sessions merge by session_id (latest update wins, both
     directions honest); run artifacts copy only when absent (immutable).
-    ACTIVE jobs whose worker is gone become INTERRUPTED (directive 7)."""
+    ACTIVE jobs whose worker is gone become INTERRUPTED (directive 7).
+
+    R396 B.2/B.3/B.5: a restore without a successful preceding snapshot
+    is NOT durability evidence (the directive's rule). The report now
+    distinguishes branch_sessions (what the branch holds), merged (what
+    was applied from the branch), and verifies every restored file
+    against the snapshot's integrity manifest — mismatches are
+    disclosed, never averaged away (Art. XXV)."""
     _LAST_RESTORE.update({"at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                               time.gmtime()),
                           "sessions": 0, "runs": 0, "evidence": 0,
-                          "interrupted": 0, "error": None})
+                          "interrupted": 0, "error": None,
+                          "branch_sessions": None,
+                          "integrity_mismatches": None,
+                          "integrity_verified": None,
+                          "manifest_sha256": None})
     if not enabled():
         _LAST_RESTORE["error"] = "not enabled"
         return dict(_LAST_RESTORE)
@@ -285,12 +356,49 @@ def restore() -> Dict[str, Any]:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX)
             repo = _ensure_state_repo()
+            # --- R396 B.3: integrity verification of the branch state ---
+            mismatches: List[str] = []
+            manifest_path = repo / MANIFEST_NAME
+            if manifest_path.exists():
+                try:
+                    manifest = json.loads(manifest_path.read_text())
+                    _LAST_RESTORE["manifest_sha256"] = manifest.get(
+                        "tree_sha256")
+                    _LAST_RESTORE["snapshot_of_record"] = {
+                        "at": manifest.get("at"),
+                        "reason": manifest.get("reason"),
+                        "engine_commit": manifest.get("engine_commit"),
+                        "files": len(manifest.get("files") or {}),
+                    }
+                    for rel, want in (manifest.get("files") or {}).items():
+                        f = repo / rel
+                        if not f.exists():
+                            mismatches.append(f"{rel}: missing")
+                        elif _file_sha256(f) != want:
+                            mismatches.append(f"{rel}: sha256 mismatch")
+                    # recompute the tree digest from the branch bytes
+                    recomputed = _tree_sha256(
+                        {rel: _file_sha256(repo / rel)
+                         for rel in (manifest.get("files") or {})
+                         if (repo / rel).exists()})
+                    _LAST_RESTORE["integrity_verified"] = (
+                        not mismatches
+                        and recomputed == manifest.get("tree_sha256"))
+                except Exception as exc:  # noqa: BLE001
+                    mismatches.append(
+                        f"{MANIFEST_NAME}: unreadable ({exc!r})")
+            else:
+                _LAST_RESTORE["integrity_verified"] = None
+            if mismatches:
+                _LAST_RESTORE["integrity_mismatches"] = mismatches[:50]
             # --- sessions merge (union, latest update wins) ---
             remote_sessions = repo / "sessions.json"
             merged = 0
             if remote_sessions.exists():
                 local = store._locked_read(store.SESSIONS_PATH) or {}
                 remote = json.loads(remote_sessions.read_text())
+                _LAST_RESTORE["branch_sessions"] = len(
+                    remote.get("sessions", []))
                 by_id = {s["session_id"]: s
                          for s in local.get("sessions", [])}
                 for s in remote.get("sessions", []):

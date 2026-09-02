@@ -1,0 +1,744 @@
+{
+ "run": "R396 Phase D.3 \u2014 P-07 failure-mode contract (explicit solver outputs)",
+ "reference_case": "P-07 (portfolio 04_drainage_floor)",
+ "envelope": {
+  "fluid": {
+   "viscosity_mPa_s": 1.0,
+   "density_kg_m3": 993.0,
+   "temperature_K": 310.15,
+   "source_class": "MODEL_DERIVED (P-07 declared basis: water-class fluid at body temperature)"
+  },
+  "boundary": {
+   "inlet_mmHg": 12.0,
+   "outlet_mmHg": 4.0,
+   "source_class": "MODEL_DERIVED (P-07 declared operating envelope)"
+  },
+  "primary_lumen_diameter_mm": 1.0,
+  "floor_lumen_diameter_mm": 0.6,
+  "length_mm": 90.0,
+  "required_min_flow_ml_min": 0.05,
+  "source_class": "MODEL_DERIVED \u2014 the P-07 reference envelope (R381 CAD binding names; P-07 package's own declared dimensions and operating range); not a measured value (Art. XXVII)"
+ },
+ "scenario_vocabulary": {
+  "directive": [
+   "NORMAL",
+   "PARTIAL_FAILURE",
+   "SEVERE_FAILURE",
+   "ALTERNATIVE_PATH"
+  ],
+  "engine": [
+   "NORMAL",
+   "PARTIAL_OBSTRUCTION",
+   "SEVERE_OBSTRUCTION",
+   "ALTERNATIVE_PATH"
+  ],
+  "mapping": {
+   "NORMAL": "NORMAL (unobstructed)",
+   "PARTIAL_FAILURE": "PARTIAL_OBSTRUCTION (50% primary obstruction)",
+   "SEVERE_FAILURE": "SEVERE_OBSTRUCTION (90% primary obstruction)",
+   "ALTERNATIVE_PATH": "ALTERNATIVE_PATH (primary 100% obstructed; flow through the invented floor path)"
+  }
+ },
+ "candidate_scenarios": [
+  {
+   "scenario": "NORMAL",
+   "target_metric": "total_flow_ml_min",
+   "value": 0.001109076478217846,
+   "result": {
+    "solver_version": "hydraulic_network_1d/1.0.0",
+    "model_version": "1d-laminar-incompressible-network/1.0.0",
+    "status": "COMPUTATIONAL_RESULT",
+    "evidence_class": "COMPUTATIONAL_RESULT",
+    "input_hash": "489fee741bdd7db5e54e1f2fd0eac305d6460da887b5157442c2cf88168492bb",
+    "geometry_identity": "P-07-candidate-reference@NORMAL",
+    "geometry_hash": "653847221100f1b25a938c7548fee4986a3d0ca5cf92b9d5f2b51defcab20eb0",
+    "predicted_quantities": {
+     "total_flow_ml_min": 0.001109076478217846,
+     "total_flow_ml_s": 1.8484607970297432e-05,
+     "inlet_node_pressure_mmHg": 12.0,
+     "outlet_node_pressure_mmHg": 4.0,
+     "node_pressures_mmHg": {
+      "A": 12.0,
+      "B": 4.0
+     },
+     "segment_flows": [
+      {
+       "segment_id": "primary",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 1.0,
+       "effective_diameter_mm": 1.0,
+       "length_mm": 90.0,
+       "obstruction_pct": 0.0,
+       "conductance_ml_s_mmhg": 2.0454815831154205e-06,
+       "flow_ml_s": 1.6363852664923364e-05,
+       "flow_ml_min": 0.0009818311598954019,
+       "velocity_m_s": 2.0835104317200304e-05,
+       "reynolds": 0.0206892585869799
+      },
+      {
+       "segment_id": "floor",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 0.6,
+       "effective_diameter_mm": 0.6,
+       "length_mm": 90.0,
+       "obstruction_pct": 0.0,
+       "conductance_ml_s_mmhg": 2.6509441317175834e-07,
+       "flow_ml_s": 2.1207553053740668e-06,
+       "flow_ml_min": 0.000127245318322444,
+       "velocity_m_s": 7.500637554192106e-06,
+       "reynolds": 0.004468879854787657
+      }
+     ]
+    },
+    "units": {
+     "flow": "mL/min (mL/s where stated)",
+     "pressure": "mmHg",
+     "conductance": "(mL/s)/mmHg",
+     "velocity": "m/s",
+     "reynolds": "dimensionless"
+    },
+    "convergence": {
+     "mass_conservation_residual_ml_s": 0.0,
+     "linear_solve": "numpy.linalg.solve (direct LU)",
+     "reference_tolerance": 1e-12
+    },
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "assumptions": [
+     "laminar fully-developed Poiseuille flow in every segment",
+     "incompressible Newtonian fluid with constant viscosity at the stated operating temperature",
+     "rigid walls (no collapsible lumen mechanics)",
+     "no gravity head (horizontal network; declare elevation explicitly if it matters \u2014 V0 does not model it)",
+     "steady state (no transient pressure waves)"
+    ],
+    "limitations": [
+     "invalid above the laminar Reynolds limit (flagged per segment, never silently returned)",
+     "no wall compliance, no non-Newtonian rheology, no slip",
+     "junction losses are not modelled (V0 counts only developed-flow resistance); short segments overestimate conductance",
+     "obstruction is modeled as a uniform diameter reduction of the segment, not as a discrete stenosis geometry"
+    ],
+    "output_hash": "890d30ca2b61148a2bfbd72ee38f4f3cbe534fdbe480af2c026ef1aa66e2c407"
+   }
+  },
+  {
+   "scenario": "PARTIAL_OBSTRUCTION",
+   "target_metric": "total_flow_ml_min",
+   "value": 0.00037270310829629457,
+   "result": {
+    "solver_version": "hydraulic_network_1d/1.0.0",
+    "model_version": "1d-laminar-incompressible-network/1.0.0",
+    "status": "COMPUTATIONAL_RESULT",
+    "evidence_class": "COMPUTATIONAL_RESULT",
+    "input_hash": "fd115f5ca13610b90b7444f3334ce43b745a01321dddfcf009269970b2de084f",
+    "geometry_identity": "P-07-candidate-reference@PARTIAL_OBSTRUCTION",
+    "geometry_hash": "be8ae8ed190bc1f4cad23c15064d22df72c37aa0566dd36231629e8bcc0805ea",
+    "predicted_quantities": {
+     "total_flow_ml_min": 0.00037270310829629457,
+     "total_flow_ml_s": 6.211718471604909e-06,
+     "inlet_node_pressure_mmHg": 12.0,
+     "outlet_node_pressure_mmHg": 4.0,
+     "node_pressures_mmHg": {
+      "A": 12.0,
+      "B": 4.0
+     },
+     "segment_flows": [
+      {
+       "segment_id": "primary",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 1.0,
+       "effective_diameter_mm": 0.707107,
+       "length_mm": 90.0,
+       "obstruction_pct": 50.0,
+       "conductance_ml_s_mmhg": 5.113703957788553e-07,
+       "flow_ml_s": 4.090963166230843e-06,
+       "flow_ml_min": 0.0002454577899738506,
+       "velocity_m_s": 1.041754571120195e-05,
+       "reynolds": 0.007314755258744402
+      },
+      {
+       "segment_id": "floor",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 0.6,
+       "effective_diameter_mm": 0.6,
+       "length_mm": 90.0,
+       "obstruction_pct": 0.0,
+       "conductance_ml_s_mmhg": 2.6509441317175834e-07,
+       "flow_ml_s": 2.1207553053740668e-06,
+       "flow_ml_min": 0.000127245318322444,
+       "velocity_m_s": 7.500637554192106e-06,
+       "reynolds": 0.004468879854787657
+      }
+     ]
+    },
+    "units": {
+     "flow": "mL/min (mL/s where stated)",
+     "pressure": "mmHg",
+     "conductance": "(mL/s)/mmHg",
+     "velocity": "m/s",
+     "reynolds": "dimensionless"
+    },
+    "convergence": {
+     "mass_conservation_residual_ml_s": 0.0,
+     "linear_solve": "numpy.linalg.solve (direct LU)",
+     "reference_tolerance": 1e-12
+    },
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "assumptions": [
+     "laminar fully-developed Poiseuille flow in every segment",
+     "incompressible Newtonian fluid with constant viscosity at the stated operating temperature",
+     "rigid walls (no collapsible lumen mechanics)",
+     "no gravity head (horizontal network; declare elevation explicitly if it matters \u2014 V0 does not model it)",
+     "steady state (no transient pressure waves)"
+    ],
+    "limitations": [
+     "invalid above the laminar Reynolds limit (flagged per segment, never silently returned)",
+     "no wall compliance, no non-Newtonian rheology, no slip",
+     "junction losses are not modelled (V0 counts only developed-flow resistance); short segments overestimate conductance",
+     "obstruction is modeled as a uniform diameter reduction of the segment, not as a discrete stenosis geometry"
+    ],
+    "output_hash": "b6ec8a823755728b56bb0ee177bb45c6e3e52e4daa2c230ccea78a7f5db28b75"
+   }
+  },
+  {
+   "scenario": "SEVERE_OBSTRUCTION",
+   "target_metric": "total_flow_ml_min",
+   "value": 0.00013706362992139801,
+   "result": {
+    "solver_version": "hydraulic_network_1d/1.0.0",
+    "model_version": "1d-laminar-incompressible-network/1.0.0",
+    "status": "COMPUTATIONAL_RESULT",
+    "evidence_class": "COMPUTATIONAL_RESULT",
+    "input_hash": "24cdce5c617d9880b787f25ec808a281b1bf52267340b5189105abf60dccdde1",
+    "geometry_identity": "P-07-candidate-reference@SEVERE_OBSTRUCTION",
+    "geometry_hash": "56d738b16a55d9f2b4e3045cb39b030f296bc76483f79c21b5b8dafc29cd1d58",
+    "predicted_quantities": {
+     "total_flow_ml_min": 0.00013706362992139801,
+     "total_flow_ml_s": 2.2843938320233004e-06,
+     "inlet_node_pressure_mmHg": 12.0,
+     "outlet_node_pressure_mmHg": 4.0,
+     "node_pressures_mmHg": {
+      "A": 12.0,
+      "B": 4.0
+     },
+     "segment_flows": [
+      {
+       "segment_id": "primary",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 1.0,
+       "effective_diameter_mm": 0.316228,
+       "length_mm": 90.0,
+       "obstruction_pct": 90.0,
+       "conductance_ml_s_mmhg": 2.0454815831154187e-08,
+       "flow_ml_s": 1.636385266492335e-07,
+       "flow_ml_min": 9.81831159895401e-06,
+       "velocity_m_s": 2.083507348462514e-06,
+       "reynolds": 0.0006542513182570766
+      },
+      {
+       "segment_id": "floor",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 0.6,
+       "effective_diameter_mm": 0.6,
+       "length_mm": 90.0,
+       "obstruction_pct": 0.0,
+       "conductance_ml_s_mmhg": 2.6509441317175834e-07,
+       "flow_ml_s": 2.1207553053740668e-06,
+       "flow_ml_min": 0.000127245318322444,
+       "velocity_m_s": 7.500637554192106e-06,
+       "reynolds": 0.004468879854787657
+      }
+     ]
+    },
+    "units": {
+     "flow": "mL/min (mL/s where stated)",
+     "pressure": "mmHg",
+     "conductance": "(mL/s)/mmHg",
+     "velocity": "m/s",
+     "reynolds": "dimensionless"
+    },
+    "convergence": {
+     "mass_conservation_residual_ml_s": 0.0,
+     "linear_solve": "numpy.linalg.solve (direct LU)",
+     "reference_tolerance": 1e-12
+    },
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "assumptions": [
+     "laminar fully-developed Poiseuille flow in every segment",
+     "incompressible Newtonian fluid with constant viscosity at the stated operating temperature",
+     "rigid walls (no collapsible lumen mechanics)",
+     "no gravity head (horizontal network; declare elevation explicitly if it matters \u2014 V0 does not model it)",
+     "steady state (no transient pressure waves)"
+    ],
+    "limitations": [
+     "invalid above the laminar Reynolds limit (flagged per segment, never silently returned)",
+     "no wall compliance, no non-Newtonian rheology, no slip",
+     "junction losses are not modelled (V0 counts only developed-flow resistance); short segments overestimate conductance",
+     "obstruction is modeled as a uniform diameter reduction of the segment, not as a discrete stenosis geometry"
+    ],
+    "output_hash": "6cd77cf32815cfcd0a4fca5824ae7901b7f6af10da059521dae89c2439e192e1"
+   }
+  },
+  {
+   "scenario": "ALTERNATIVE_PATH",
+   "target_metric": "total_flow_ml_min",
+   "value": 0.000127245318322444,
+   "result": {
+    "solver_version": "hydraulic_network_1d/1.0.0",
+    "model_version": "1d-laminar-incompressible-network/1.0.0",
+    "status": "COMPUTATIONAL_RESULT",
+    "evidence_class": "COMPUTATIONAL_RESULT",
+    "input_hash": "e66d97372ca8b27ebd8d0008a1fb7215d808ca9e1384af67ff71e189a9fb40cb",
+    "geometry_identity": "P-07-candidate-reference@ALTERNATIVE_PATH",
+    "geometry_hash": "92fa4f6b1cffb48d671fca0bb6fa5a3be0a20dff3471f27f0c76fa59bbffd33a",
+    "predicted_quantities": {
+     "total_flow_ml_min": 0.000127245318322444,
+     "total_flow_ml_s": 2.1207553053740668e-06,
+     "inlet_node_pressure_mmHg": 12.0,
+     "outlet_node_pressure_mmHg": 4.0,
+     "node_pressures_mmHg": {
+      "A": 12.0,
+      "B": 4.0
+     },
+     "segment_flows": [
+      {
+       "segment_id": "primary",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 1.0,
+       "effective_diameter_mm": 0.0,
+       "length_mm": 90.0,
+       "obstruction_pct": 100.0,
+       "conductance_ml_s_mmhg": 0.0,
+       "flow_ml_s": 0.0,
+       "flow_ml_min": 0.0,
+       "velocity_m_s": 0.0,
+       "reynolds": 0.0
+      },
+      {
+       "segment_id": "floor",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 0.6,
+       "effective_diameter_mm": 0.6,
+       "length_mm": 90.0,
+       "obstruction_pct": 0.0,
+       "conductance_ml_s_mmhg": 2.6509441317175834e-07,
+       "flow_ml_s": 2.1207553053740668e-06,
+       "flow_ml_min": 0.000127245318322444,
+       "velocity_m_s": 7.500637554192106e-06,
+       "reynolds": 0.004468879854787657
+      }
+     ]
+    },
+    "units": {
+     "flow": "mL/min (mL/s where stated)",
+     "pressure": "mmHg",
+     "conductance": "(mL/s)/mmHg",
+     "velocity": "m/s",
+     "reynolds": "dimensionless"
+    },
+    "convergence": {
+     "mass_conservation_residual_ml_s": 0.0,
+     "linear_solve": "numpy.linalg.solve (direct LU)",
+     "reference_tolerance": 1e-12
+    },
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "assumptions": [
+     "laminar fully-developed Poiseuille flow in every segment",
+     "incompressible Newtonian fluid with constant viscosity at the stated operating temperature",
+     "rigid walls (no collapsible lumen mechanics)",
+     "no gravity head (horizontal network; declare elevation explicitly if it matters \u2014 V0 does not model it)",
+     "steady state (no transient pressure waves)"
+    ],
+    "limitations": [
+     "invalid above the laminar Reynolds limit (flagged per segment, never silently returned)",
+     "no wall compliance, no non-Newtonian rheology, no slip",
+     "junction losses are not modelled (V0 counts only developed-flow resistance); short segments overestimate conductance",
+     "obstruction is modeled as a uniform diameter reduction of the segment, not as a discrete stenosis geometry"
+    ],
+    "output_hash": "ea223bc7608324f5e8621acbcee4e737c3112c5a5f3fd36cf0002e73882a7eda"
+   }
+  }
+ ],
+ "baseline_scenarios": [
+  {
+   "scenario": "NORMAL",
+   "target_metric": "total_flow_ml_min",
+   "value": 0.0009818311598954019,
+   "result": {
+    "solver_version": "hydraulic_network_1d/1.0.0",
+    "model_version": "1d-laminar-incompressible-network/1.0.0",
+    "status": "COMPUTATIONAL_RESULT",
+    "evidence_class": "COMPUTATIONAL_RESULT",
+    "input_hash": "665dd3fdd1076b2d089be768b0a6f7ef7e94fe68bb650fb7a1035d8b771c41b6",
+    "geometry_identity": "P-07-baseline-reference@NORMAL",
+    "geometry_hash": "3c65a6c0041d87d60bb1dbc91b393a625bc388bc5925e2b002dfa74a49b2e401",
+    "predicted_quantities": {
+     "total_flow_ml_min": 0.0009818311598954019,
+     "total_flow_ml_s": 1.6363852664923364e-05,
+     "inlet_node_pressure_mmHg": 12.0,
+     "outlet_node_pressure_mmHg": 4.0,
+     "node_pressures_mmHg": {
+      "A": 12.0,
+      "B": 4.0
+     },
+     "segment_flows": [
+      {
+       "segment_id": "primary",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 1.0,
+       "effective_diameter_mm": 1.0,
+       "length_mm": 90.0,
+       "obstruction_pct": 0.0,
+       "conductance_ml_s_mmhg": 2.0454815831154205e-06,
+       "flow_ml_s": 1.6363852664923364e-05,
+       "flow_ml_min": 0.0009818311598954019,
+       "velocity_m_s": 2.0835104317200304e-05,
+       "reynolds": 0.0206892585869799
+      }
+     ]
+    },
+    "units": {
+     "flow": "mL/min (mL/s where stated)",
+     "pressure": "mmHg",
+     "conductance": "(mL/s)/mmHg",
+     "velocity": "m/s",
+     "reynolds": "dimensionless"
+    },
+    "convergence": {
+     "mass_conservation_residual_ml_s": 0.0,
+     "linear_solve": "numpy.linalg.solve (direct LU)",
+     "reference_tolerance": 1e-12
+    },
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "assumptions": [
+     "laminar fully-developed Poiseuille flow in every segment",
+     "incompressible Newtonian fluid with constant viscosity at the stated operating temperature",
+     "rigid walls (no collapsible lumen mechanics)",
+     "no gravity head (horizontal network; declare elevation explicitly if it matters \u2014 V0 does not model it)",
+     "steady state (no transient pressure waves)"
+    ],
+    "limitations": [
+     "invalid above the laminar Reynolds limit (flagged per segment, never silently returned)",
+     "no wall compliance, no non-Newtonian rheology, no slip",
+     "junction losses are not modelled (V0 counts only developed-flow resistance); short segments overestimate conductance",
+     "obstruction is modeled as a uniform diameter reduction of the segment, not as a discrete stenosis geometry"
+    ],
+    "output_hash": "b56a78e659fb1e5fef9121a1957dfaed0af0e7822734a1ec6c01e1e783894200"
+   }
+  },
+  {
+   "scenario": "PARTIAL_OBSTRUCTION",
+   "target_metric": "total_flow_ml_min",
+   "value": 0.0002454577899738506,
+   "result": {
+    "solver_version": "hydraulic_network_1d/1.0.0",
+    "model_version": "1d-laminar-incompressible-network/1.0.0",
+    "status": "COMPUTATIONAL_RESULT",
+    "evidence_class": "COMPUTATIONAL_RESULT",
+    "input_hash": "2f8d70f42b94b3bd90d764999e5ca35416bca26d807566dd0c2a41a446a1c110",
+    "geometry_identity": "P-07-baseline-reference@PARTIAL_OBSTRUCTION",
+    "geometry_hash": "768839be3deb060f4275c33a276c69612ab89aeee8b9b8079056b39b6ba45099",
+    "predicted_quantities": {
+     "total_flow_ml_min": 0.0002454577899738506,
+     "total_flow_ml_s": 4.090963166230843e-06,
+     "inlet_node_pressure_mmHg": 12.0,
+     "outlet_node_pressure_mmHg": 4.0,
+     "node_pressures_mmHg": {
+      "A": 12.0,
+      "B": 4.0
+     },
+     "segment_flows": [
+      {
+       "segment_id": "primary",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 1.0,
+       "effective_diameter_mm": 0.707107,
+       "length_mm": 90.0,
+       "obstruction_pct": 50.0,
+       "conductance_ml_s_mmhg": 5.113703957788553e-07,
+       "flow_ml_s": 4.090963166230843e-06,
+       "flow_ml_min": 0.0002454577899738506,
+       "velocity_m_s": 1.041754571120195e-05,
+       "reynolds": 0.007314755258744402
+      }
+     ]
+    },
+    "units": {
+     "flow": "mL/min (mL/s where stated)",
+     "pressure": "mmHg",
+     "conductance": "(mL/s)/mmHg",
+     "velocity": "m/s",
+     "reynolds": "dimensionless"
+    },
+    "convergence": {
+     "mass_conservation_residual_ml_s": 0.0,
+     "linear_solve": "numpy.linalg.solve (direct LU)",
+     "reference_tolerance": 1e-12
+    },
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "assumptions": [
+     "laminar fully-developed Poiseuille flow in every segment",
+     "incompressible Newtonian fluid with constant viscosity at the stated operating temperature",
+     "rigid walls (no collapsible lumen mechanics)",
+     "no gravity head (horizontal network; declare elevation explicitly if it matters \u2014 V0 does not model it)",
+     "steady state (no transient pressure waves)"
+    ],
+    "limitations": [
+     "invalid above the laminar Reynolds limit (flagged per segment, never silently returned)",
+     "no wall compliance, no non-Newtonian rheology, no slip",
+     "junction losses are not modelled (V0 counts only developed-flow resistance); short segments overestimate conductance",
+     "obstruction is modeled as a uniform diameter reduction of the segment, not as a discrete stenosis geometry"
+    ],
+    "output_hash": "9ba54d12f353275f6a58f1b04b75c371e7adbbc4526dd09bec253b5eeeddee9a"
+   }
+  },
+  {
+   "scenario": "SEVERE_OBSTRUCTION",
+   "target_metric": "total_flow_ml_min",
+   "value": 9.81831159895401e-06,
+   "result": {
+    "solver_version": "hydraulic_network_1d/1.0.0",
+    "model_version": "1d-laminar-incompressible-network/1.0.0",
+    "status": "COMPUTATIONAL_RESULT",
+    "evidence_class": "COMPUTATIONAL_RESULT",
+    "input_hash": "b7e1d0b739cbee1b337a8e4e5c00d7a4149932dcaeb45e9d283bfec097f2d6d3",
+    "geometry_identity": "P-07-baseline-reference@SEVERE_OBSTRUCTION",
+    "geometry_hash": "7833f8da74b42a2d184a8aa736199bfe709a3a0d8e40591c730e725d74216b8b",
+    "predicted_quantities": {
+     "total_flow_ml_min": 9.81831159895401e-06,
+     "total_flow_ml_s": 1.636385266492335e-07,
+     "inlet_node_pressure_mmHg": 12.0,
+     "outlet_node_pressure_mmHg": 4.0,
+     "node_pressures_mmHg": {
+      "A": 12.0,
+      "B": 4.0
+     },
+     "segment_flows": [
+      {
+       "segment_id": "primary",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 1.0,
+       "effective_diameter_mm": 0.316228,
+       "length_mm": 90.0,
+       "obstruction_pct": 90.0,
+       "conductance_ml_s_mmhg": 2.0454815831154187e-08,
+       "flow_ml_s": 1.636385266492335e-07,
+       "flow_ml_min": 9.81831159895401e-06,
+       "velocity_m_s": 2.083507348462514e-06,
+       "reynolds": 0.0006542513182570766
+      }
+     ]
+    },
+    "units": {
+     "flow": "mL/min (mL/s where stated)",
+     "pressure": "mmHg",
+     "conductance": "(mL/s)/mmHg",
+     "velocity": "m/s",
+     "reynolds": "dimensionless"
+    },
+    "convergence": {
+     "mass_conservation_residual_ml_s": 0.0,
+     "linear_solve": "numpy.linalg.solve (direct LU)",
+     "reference_tolerance": 1e-12
+    },
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "assumptions": [
+     "laminar fully-developed Poiseuille flow in every segment",
+     "incompressible Newtonian fluid with constant viscosity at the stated operating temperature",
+     "rigid walls (no collapsible lumen mechanics)",
+     "no gravity head (horizontal network; declare elevation explicitly if it matters \u2014 V0 does not model it)",
+     "steady state (no transient pressure waves)"
+    ],
+    "limitations": [
+     "invalid above the laminar Reynolds limit (flagged per segment, never silently returned)",
+     "no wall compliance, no non-Newtonian rheology, no slip",
+     "junction losses are not modelled (V0 counts only developed-flow resistance); short segments overestimate conductance",
+     "obstruction is modeled as a uniform diameter reduction of the segment, not as a discrete stenosis geometry"
+    ],
+    "output_hash": "10c7e75d299218e8c2cb1906c0f59453332d21d9eb87d9c91b913c189b707b07"
+   }
+  },
+  {
+   "scenario": "ALTERNATIVE_PATH",
+   "target_metric": "total_flow_ml_min",
+   "value": 0.0,
+   "result": {
+    "solver_version": "hydraulic_network_1d/1.0.0",
+    "model_version": "1d-laminar-incompressible-network/1.0.0",
+    "status": "COMPUTATIONAL_RESULT",
+    "evidence_class": "COMPUTATIONAL_RESULT",
+    "input_hash": "32fb8886b6a1c978af7fe213ec84fca280bf13522329f96d17faf4027095c104",
+    "geometry_identity": "P-07-baseline-reference@ALTERNATIVE_PATH",
+    "geometry_hash": "60ae2c974e67deecc48c70349999761c84d36ff19127ead4d9782979b150ba47",
+    "predicted_quantities": {
+     "total_flow_ml_min": 0.0,
+     "total_flow_ml_s": 0.0,
+     "inlet_node_pressure_mmHg": 12.0,
+     "outlet_node_pressure_mmHg": 4.0,
+     "node_pressures_mmHg": {
+      "A": 12.0,
+      "B": 4.0
+     },
+     "segment_flows": [
+      {
+       "segment_id": "primary",
+       "node_a": "A",
+       "node_b": "B",
+       "diameter_mm": 1.0,
+       "effective_diameter_mm": 0.0,
+       "length_mm": 90.0,
+       "obstruction_pct": 100.0,
+       "conductance_ml_s_mmhg": 0.0,
+       "flow_ml_s": 0.0,
+       "flow_ml_min": 0.0,
+       "velocity_m_s": 0.0,
+       "reynolds": 0.0
+      }
+     ]
+    },
+    "units": {
+     "flow": "mL/min (mL/s where stated)",
+     "pressure": "mmHg",
+     "conductance": "(mL/s)/mmHg",
+     "velocity": "m/s",
+     "reynolds": "dimensionless"
+    },
+    "convergence": {
+     "mass_conservation_residual_ml_s": 0.0,
+     "linear_solve": "numpy.linalg.solve (direct LU)",
+     "reference_tolerance": 1e-12
+    },
+    "model_validity": {
+     "laminar_valid": true,
+     "reynolds_flags": [],
+     "note": ""
+    },
+    "assumptions": [
+     "laminar fully-developed Poiseuille flow in every segment",
+     "incompressible Newtonian fluid with constant viscosity at the stated operating temperature",
+     "rigid walls (no collapsible lumen mechanics)",
+     "no gravity head (horizontal network; declare elevation explicitly if it matters \u2014 V0 does not model it)",
+     "steady state (no transient pressure waves)"
+    ],
+    "limitations": [
+     "invalid above the laminar Reynolds limit (flagged per segment, never silently returned)",
+     "no wall compliance, no non-Newtonian rheology, no slip",
+     "junction losses are not modelled (V0 counts only developed-flow resistance); short segments overestimate conductance",
+     "obstruction is modeled as a uniform diameter reduction of the segment, not as a discrete stenosis geometry"
+    ],
+    "output_hash": "8e27839f1f7074511cecc077da2634176404812992b5fad8d6bd469a0df5ee1b"
+   }
+  }
+ ],
+ "baseline_comparison": {
+  "outcome": "BEATS_BASELINE",
+  "candidate_outcome": "CANDIDATE_BEATS_BASELINE",
+  "baseline": {
+   "spec_summary": {
+    "geometry_identity": "P-07-baseline-reference",
+    "geometry_hash": "4b4c34e87b5d112032d356c9d31881c50dd92a2a04098422b2e974e8eff56c40",
+    "n_segments": 1,
+    "segments": [
+     {
+      "segment_id": "primary",
+      "diameter_mm": 1.0,
+      "length_mm": 90.0
+     }
+    ]
+   },
+   "value": 9.81831159895401e-06
+  },
+  "candidate": {
+   "spec_summary": {
+    "geometry_identity": "P-07-candidate-reference",
+    "geometry_hash": "804d8d0075b72f1138fd207c81b836af2385e23b53a889d14e6fb97219abc68b",
+    "n_segments": 2,
+    "segments": [
+     {
+      "segment_id": "primary",
+      "diameter_mm": 1.0,
+      "length_mm": 90.0
+     },
+     {
+      "segment_id": "floor",
+      "diameter_mm": 0.6,
+      "length_mm": 90.0
+     }
+    ]
+   },
+   "value": 0.00013706362992139801
+  },
+  "comparison": {
+   "scenario": "SEVERE_OBSTRUCTION",
+   "target_metric": "total_flow_ml_min",
+   "operating_condition": {
+    "inlet_mmHg": 12.0,
+    "outlet_mmHg": 4.0,
+    "fluid": {
+     "viscosity_mPa_s": 1.0,
+     "density_kg_m3": 993.0,
+     "temperature_K": 310.15,
+     "source_class": "MODEL_DERIVED (P-07 declared basis: water-class fluid at body temperature)"
+    }
+   },
+   "improvement_absolute": 0.000127245,
+   "improvement_relative": 12.96
+  },
+  "constraints": {
+   "required_min": 0.05,
+   "meets_required_min": false
+  },
+  "uncertainty": {
+   "model_class": "MODEL_DERIVED",
+   "sources": [
+    "uniform-obstruction stenosis model (not discrete geometry)",
+    "junction losses unmodelled (V0)",
+    "fluid viscosity is an input datum, not a measured operating condition"
+   ]
+  },
+  "solver_version": "hydraulic_network_1d/1.0.0",
+  "rule": "'simulation ran' is NEVER 'invention succeeded'; the outcome is comparative against the declared baseline under the declared failure scenario (R394 s10)"
+ },
+ "plausibility_gate": {
+  "status": "COMPUTATIONAL_RESULT",
+  "note": "deterministic bounds (six families) executed before/inside every solve above; a violation would have produced PLAUSIBILITY_BOUND_VIOLATED and NO computational evidence"
+ },
+ "evidence_class_note": "every scenario output is COMPUTATIONAL_RESULT (Art. XXXVIII layer 4) with input/output hashes, convergence residual, assumptions and limitations recorded; none of it may be cited as physical observation \u2014 physical validation is the Phase E flow-rig experiment"
+}

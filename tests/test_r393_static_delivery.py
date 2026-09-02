@@ -233,12 +233,19 @@ class TestShowcaseBriefPayload:
         assert d["maturity"] == "ENGINEERING_DEFINITION"
         assert isinstance(d["known_blockers"], list) and d["known_blockers"]
         assert "SOURCE_FACT" in d["evidence_class_counts"]
-        # R394: the decisive work package is DERIVED from the recorded
-        # kill condition (never build_plan[0] list position). For P-07
-        # the kill condition is common-cause obstruction with no
-        # differential immunity -> WP-04 (comparative obstruction
-        # specimens) is the honest decisive experiment.
-        assert d["first_decisive_work_package"]["work_package"] == "WP-04"
+        # Art. XXXIX honesty: the showcase displays EXACTLY what the
+        # portfolio authority records. The pinned release (b978e32)
+        # carries the LEGACY economics key (first_decisive_work_package
+        # = WP-01, the R371 build_plan[0] selection). The R394
+        # kill-condition derivation (common-cause obstruction -> WP-04)
+        # is implemented and pinned in premium_package_factory/r394/
+        # decisive_experiment.py + tests/test_r394_semantics.py, and
+        # ships in the economics JSON under `decisive_work_package` at
+        # the NEXT portfolio release — the showcase prefers that key
+        # when present. This test pins the CURRENT authority state so
+        # it cannot silently diverge from the deployed showcase truth
+        # (which reads the same pinned portfolio).
+        assert d["first_decisive_work_package"]["work_package"] == "WP-01"
 
     def test_no_physical_validation_claim_in_payload(self):
         """Art. XXXVIII guard: the payload must not claim physical

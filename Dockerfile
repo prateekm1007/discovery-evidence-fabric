@@ -44,12 +44,56 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 COPY --from=webapp-builder /webapp/out ./TOSCANINI_UI/webapp-export
 
-# R392 (directive 3): bake the EXACT engine commit into the image when
-# the build context carries .git; otherwise ENGINE_COMMIT.txt records
-# that fact and the runtime env (deployment configuration) supplies the
-# pin. Never fabricated, source labeled (Art. VI).
-RUN if [ -d .git ]; then git rev-parse HEAD > /app/ENGINE_COMMIT.txt; \
-    else echo BUILD_CONTEXT_NO_GIT > /app/ENGINE_COMMIT.txt; fi
+# R396 Phase A.3/A.4: bake the ACTUAL git commit SHA into the build
+# artifact. This is THE identity of the deployed engine — no runtime
+# environment variable can define or change it. Sources, in priority
+# order, each honestly labeled and never fabricated (Art. VI):
+#   1. RENDER_GIT_COMMIT — Render provides the exact sha being built
+#      (passed as a build-arg by the deploy step; see DEPLOYMENT_CONFIG)
+#   2. git rev-parse HEAD — when the build context carries .git
+#   3. BUILD_CONTEXT_NO_GIT — identity unresolved, health reports drift
+#      RED (never a guessed or env-asserted commit)
+# ARTIFACT_IDENTITY.sha256 (sha256 of the json bytes, computed HERE at
+# build time) lets the running process prove it is still the built
+# artifact (BUILD == RUNNING == HEALTH, R396 A.6); a runtime mismatch
+# is reported as identity_tamper and drift RED.
+ARG RENDER_GIT_COMMIT=""
+RUN python3 - <<'PYEOF'
+import hashlib, json, os, subprocess
+commit = (os.environ.get("RENDER_GIT_COMMIT") or "").strip()
+source = "render_git_commit"
+ctx_head = ""
+if os.path.isdir(".git"):
+    try:
+        ctx_head = subprocess.run(
+            ["git", "rev-parse", "HEAD"], capture_output=True,
+            text=True, timeout=30).stdout.strip()
+    except Exception:
+        ctx_head = ""
+if not commit:
+    if ctx_head:
+        commit, source = ctx_head, "build_context_git"
+    else:
+        commit, source = "BUILD_CONTEXT_NO_GIT", "build_context_no_git"
+doc = {
+    "engine_commit": commit,
+    "source": source,
+    "render_git_commit": (os.environ.get("RENDER_GIT_COMMIT") or "").strip() or None,
+    "build_context_git_head": ctx_head or None,
+    "baked_at_utc": subprocess.run(
+        ["date", "-u", "+%Y-%m-%dT%H:%M:%SZ"], capture_output=True,
+        text=True).stdout.strip(),
+}
+raw = json.dumps(doc, indent=1, sort_keys=True).encode() + b"\n"
+open("ARTIFACT_IDENTITY.json", "wb").write(raw)
+open("ARTIFACT_IDENTITY.sha256", "w").write(
+    hashlib.sha256(raw).hexdigest() + "  ARTIFACT_IDENTITY.json\n")
+# R392 compatibility: ENGINE_COMMIT.txt stays an echo of the SAME
+# artifact-derived value (legacy consumers); it is never an independent
+# identity source.
+open("ENGINE_COMMIT.txt", "w").write(commit + "\n")
+print(f"baked artifact identity: {commit} (source {source})")
+PYEOF
 
 # R392: startup = acquire the PINNED portfolio (token-safe), then serve.
 # See toscanini/container-entrypoint.sh. A failed acquisition degrades

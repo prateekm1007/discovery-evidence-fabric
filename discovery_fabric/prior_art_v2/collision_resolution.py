@@ -1240,6 +1240,22 @@ def resolve_differentiation(families: List[Dict[str, Any]],
 # The collision core — one authority for the loop stage AND grid candidates
 # ---------------------------------------------------------------------------
 
+def _determinism_block(mechanism_map: Dict[str, Any],
+                       problem: Dict[str, Any],
+                       resolution: Dict[str, Any]) -> Dict[str, Any]:
+    """R396 P6 — build the run-record determinism block (pure call into
+    prior_art_v2.determinism; ledger failures are disclosed inside the
+    block, never fatal to the collision itself)."""
+    from discovery_fabric.prior_art_v2 import determinism as det
+    return det.record_and_compare(
+        fingerprint=det.problem_fingerprint(problem, mechanism_map),
+        verdict=str(resolution.get("state") or ""),
+        relevance_model_version=str(
+            resolution.get("relevance_model_version") or ""),
+        evset_identity=det.evidence_set_identity(resolution),
+        run_id=str(problem.get("problem_id") or ""))
+
+
 def run_collision(mechanism_map: Dict[str, Any],
                   problem: Dict[str, Any],
                   sources: Optional[List[str]] = None,
@@ -1377,6 +1393,12 @@ def run_collision(mechanism_map: Dict[str, Any],
         } for f in families],
         "mandatory_searches": mandatory,
         "differentiation_resolution": resolution,
+        # R396 P6: the run-record determinism block — verdict,
+        # relevance model version, relevant-evidence-set identity,
+        # variance summary vs identical prior replays, and the
+        # DETERMINISTIC / NON_DETERMINISTIC / BASELINE_RUN class
+        "determinism": _determinism_block(mechanism_map, problem,
+                                          resolution),
         "nearest_prior_art": nearest,
         "nearest_prior_art_note": (
             "family representatives; every entry is MECHANISM_RELEVANT "

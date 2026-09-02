@@ -13,7 +13,7 @@ export const NARRATIVE_GROUPS: { heading: string; stages: string[] }[] = [
     heading: "Testing competing mechanisms",
     stages: ["SYNTHESIZE", "MULTI_SOURCE_DISCOVERY", "COLLISION"],
   },
-  { heading: "Building the candidate", stages: ["VERIFY"] },
+  { heading: "Building the candidate", stages: ["VERIFY", "PHYSICS"] },
   { heading: "Attacking the candidate", stages: ["ATTACK", "CONTRADICTION"] },
   { heading: "Improving it", stages: ["ADJUDICATION"] },
   { heading: "Designing the experiment", stages: ["KILLER_EXPERIMENT"] },
@@ -40,6 +40,14 @@ export const STAGE_SENTENCE: Record<string, (s: StageDigest) => string> = {
       : "Synthesizing candidate mechanisms from the evidence…",
   VERIFY: () =>
     "Each claim verified against its exact evidence binding — no fuzzy matches admitted.",
+  PHYSICS: (s) => {
+    const verdict =
+      (s as Record<string, unknown>).lifecycle_verdict ??
+      (s as Record<string, unknown>).baseline_outcome;
+    return verdict
+      ? `Physics gate: ${String(verdict).replace(/_/g, " ").toLowerCase()} against the un-invented baseline.`
+      : "Solving the candidate's physics against its baseline — plausibility bounds, failure modes, and the baseline comparison.";
+  },
   MULTI_SOURCE_DISCOVERY: (s) =>
     s.prior_art_count != null
       ? `Scanned ${s.prior_art_count} prior-art candidates across independent sources.`
@@ -179,7 +187,7 @@ export default function RunNarrative({
       {!done && stages.length > 0 && (
         <div className="nline working">
           <span className="cursor" />
-          Working — {stages.length} of 13 steps recorded so far; every
+          Working — {stages.length} of 15 steps recorded so far; every
           status comes from the run directory, never fabricated
         </div>
       )}

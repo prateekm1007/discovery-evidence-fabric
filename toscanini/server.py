@@ -33,6 +33,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
+from toscanini import artifact_identity  # noqa: E402  R396 A.3-A.7
 from toscanini import gateway as gw  # noqa: E402
 from toscanini import sessions as store  # noqa: E402
 from toscanini import showcase as show  # noqa: E402
@@ -53,28 +54,17 @@ def _git_head() -> str:
         return ""
 
 
-# R392 (directive 3): the deployed engine is identified by an EXACT
-# commit, resolved with its source labeled — never guessed (Art. VI):
-#   1. ENGINE_COMMIT env (the explicit deployment configuration)
-#   2. /app/ENGINE_COMMIT.txt (baked into the Docker image at build time
-#      when .git is present in the build context)
-#   3. live git (local dev)
-def _resolve_engine_commit() -> tuple:
-    env = (os.environ.get("ENGINE_COMMIT") or "").strip()
-    if env:
-        return env, "deployment_config_env"
-    baked = REPO_ROOT / "ENGINE_COMMIT.txt"
-    if baked.exists():
-        v = baked.read_text().strip()
-        if v and v != "BUILD_CONTEXT_NO_GIT":
-            return v, "image_baked"
-    head = _git_head()
-    if head:
-        return head, "git"
-    return "", "UNRESOLVED"
-
-
-ENGINE_COMMIT, ENGINE_COMMIT_SOURCE = _resolve_engine_commit()
+# R396 Phase A.3: the engine identity comes from the BUILD ARTIFACT
+# ONLY (toscanini/artifact_identity.py): ARTIFACT_IDENTITY.json baked
+# at Docker/build time, tamper-checked against its baked sha256. An
+# environment variable can pin an EXPECTATION (operator-declared
+# intended commit, cross-checked for drift) but can NEVER define the
+# identity — the R392 env-first order (deployment_config_env) was the
+# exact defect this removes. Local dev (no artifact file) resolves from
+# live git, exactly as before.
+ENGINE_COMMIT, ENGINE_COMMIT_SOURCE = \
+    artifact_identity.resolve_engine_commit()
+OPERATOR_DECLARED_COMMIT = artifact_identity.operator_declared_commit()
 PORTFOLIO_COMMIT_PINNED = (os.environ.get("PORTFOLIO_COMMIT") or "").strip()
 # R394 s15: the operator key — callers presenting it see every session
 # (enterprise operator path; set ENGINE_OPERATOR_KEY on the service).
@@ -114,6 +104,7 @@ def _health_payload() -> dict:
     portfolio_actual = show.portfolio_commit()
     transport = gw.transport_snapshot()
     probe = gw.last_probe()
+    ident = artifact_identity.identity()
     # LLM_TRANSPORT_READY is TRUE only with probe evidence of a real
     # completion from THIS process's transport (never a configured-but-
     # unverified key). A stale-but-OK probe is reported with its age so
@@ -123,61 +114,108 @@ def _health_payload() -> dict:
     transport_configured = transport.get("status") in (
         "EXTERNAL", "UP", "ALREADY_UP", "LOCAL_CONFIGURED")
 
-    # ---- R394 s1: deployment identity assertion -----------------------
-    live_head = _git_head()
-    baked = REPO_ROOT / "ENGINE_COMMIT.txt"
-    image_baked = ""
-    if baked.exists():
-        v = baked.read_text().strip()
-        if v and v != "BUILD_CONTEXT_NO_GIT":
-            image_baked = v
-    # The INTENDED engine commit is the deployment configuration env
-    # (ENGINE_COMMIT). The RUNNING identity is what this process
-    # actually resolved. Drift is RED when the running resolution
-    # disagrees with the intended pin, or when the image-baked commit
-    # (when present) disagrees with the running commit.
-    running = ENGINE_COMMIT
+    # ---- R396 Phase A: build-artifact identity assertion ----------------
+    # The identity is the BUILD ARTIFACT (ARTIFACT_IDENTITY.json), not
+    # an env var. BUILD == RUNNING == HEALTH is proven by the runtime
+    # re-hash of the artifact file against the build-time sha256
+    # (identity_tamper=false). The operator-declared env pin (when set)
+    # is an EXPECTATION cross-checked for drift; a hosted deployment
+    # that resolves identity from live git (no artifact file) is RED.
+    running = ident["engine_commit"]
+    # fresh per-request read of the env expectation (never identity)
+    operator_declared = artifact_identity.operator_declared_commit()
     drift_reasons = []
     if not running:
         drift_reasons.append("engine commit unresolved")
-    if image_baked and running and image_baked != running:
+    if ident.get("engine_commit_source") == "ARTIFACT_CORRUPT":
+        drift_reasons.append("artifact identity file corrupt")
+    if ident.get("identity_tamper"):
         drift_reasons.append(
-            f"image_baked={image_baked[:12]} != running={running[:12]}")
-    if ENGINE_COMMIT_SOURCE == "git" and os.environ.get("PORT"):
+            "identity_tamper: running artifact bytes differ from the "
+            "build-time sha256 — the process is not the built artifact")
+    if running == "BUILD_CONTEXT_NO_GIT":
         drift_reasons.append(
-            "hosted deployment resolved engine commit from live git, "
-            "not the deployment pin — set ENGINE_COMMIT (R392 pin contract)")
+            "build context carried no git identity and no RENDER_GIT_"
+            "COMMIT build-arg — the artifact identity is UNRESOLVED")
+    if operator_declared and running and \
+            operator_declared != running and \
+            running != "BUILD_CONTEXT_NO_GIT":
+        drift_reasons.append(
+            f"operator_declared={operator_declared[:12]} != "
+            f"artifact={running[:12]}")
+    if ident.get("artifact_file") is False and os.environ.get("PORT") \
+            and ident.get("engine_commit_source") in ("git", "UNRESOLVED"):
+        drift_reasons.append(
+            "hosted deployment has no baked artifact identity — "
+            "deployment produced without the R396 artifact contract")
     deployment_identity = {
-        "intended_engine_commit": (os.environ.get("ENGINE_COMMIT")
-                                    or None),
-        "running_engine_commit": running or None,
-        "running_engine_commit_source": ENGINE_COMMIT_SOURCE,
-        "image_baked_commit": image_baked or None,
-        "live_git_head": live_head or None,
+        # BUILD side (baked into the image at build time)
+        "build_artifact_commit": ident.get("engine_commit") or None,
+        "build_artifact_source": ident.get("artifact_source"),
+        "build_artifact_sha256": ident.get("artifact_sha256_baked"),
+        "render_git_commit": ident.get("render_git_commit"),
+        "build_context_git_head": ident.get("build_context_git_head"),
+        "baked_at_utc": ident.get("baked_at_utc"),
+        # RUNNING side (re-hashed by this process at request time)
+        "running_artifact_sha256": ident.get("artifact_sha256_runtime"),
+        "identity_tamper": ident.get("identity_tamper"),
+        # HEALTH side (what this payload reports)
+        "health_reported_commit": running or None,
+        "health_reported_commit_source": ENGINE_COMMIT_SOURCE,
+        # operator expectation (env var — cross-check ONLY, R396 A.3)
+        "operator_declared_commit": operator_declared,
+        "live_git_head": ident.get("live_git_head") if isinstance(
+            ident.get("live_git_head"), str) else _git_head() or None,
+        # restart vs deployment (R396 A.7)
+        "boot_time_utc": ident.get("boot_time_utc"),
+        "is_restart_not_deployment": True,
         "portfolio_commit_pinned": PORTFOLIO_COMMIT_PINNED or None,
         "portfolio_commit_running": portfolio_actual,
         "deployment_drift": "RED" if drift_reasons else "GREEN",
         "drift_reasons": drift_reasons,
-        "rule": ("DEPLOYED_ENGINE_COMMIT == INTENDED_ENGINE_COMMIT and "
-                 "RUNNING_BUILD_ID == DEPLOYMENT_RECORD; drift is RED "
-                 "=> the release is NOT healthy regardless of other "
-                 "readiness fields (R394 s1)"),
+        "rule": ("identity = build artifact only (env vars pin "
+                 "expectations, never identity); BUILD_ARTIFACT_SHA == "
+                 "RUNNING_ARTIFACT_SHA == HEALTH_REPORTED_SHA with "
+                 "identity_tamper=false; drift is RED => the release is "
+                 "NOT healthy regardless of other readiness fields "
+                 "(R394 s1, R396 A.6)"),
     }
+
+    # R396 A.8: gateway_up is a LOCAL-SANDBOX-GATEWAY fact. In EXTERNAL
+    # transport mode (the hosted shape) no local gateway exists or is
+    # needed — reporting a bare false there was an unreadable "down"
+    # signal for a healthy deployment. The field now reports null with
+    # an explicit note in EXTERNAL mode (documented and gated, per the
+    # directive); transport truth is llm_transport_ready (live probe).
+    ext_mode = transport.get("status") == "EXTERNAL"
+    gateway_up_value = None if ext_mode else gw.gateway_up()
 
     return {
         "ok": True, "status": "ok", "service": "toscanini",
-        # legacy keys (R391 contract) kept for the Render healthcheck
-        "engine_commit": ENGINE_COMMIT,
+        # legacy keys (R391 contract) kept for the Render healthcheck;
+        # the reported commit is the FRESH artifact read (per-request),
+        # so in-container tampering is reflected immediately
+        "engine_commit": running,
         "transport": transport.get("base_url") or "local",
         "portfolio_ready": portfolio_ready,
-        "gateway_up": gw.gateway_up(),
+        "gateway_up": gateway_up_value,
+        "gateway_up_note": (
+            "not applicable: EXTERNAL transport mode (no local gateway "
+            "by design); transport readiness = llm_transport_ready"
+            if ext_mode else
+            "local sandbox gateway liveness (127.0.0.1:8787)"),
+        # R396 A.2: operator-key configuration is DISCLOSED (a bool,
+        # never the key). Sessions isolation enforcement is independent
+        # of this flag — the operator key only ADDS a visibility
+        # capability; it never weakens owner scoping.
+        "operator_key_configured": bool(OPERATOR_KEY),
         # R394 s1: the deployment identity assertion
         "deployment_identity": deployment_identity,
         # R392 readiness split (directive 2)
         "readiness": {
             "engine_ready": engine_ready,
-            "engine_commit": ENGINE_COMMIT,
-            "engine_commit_source": ENGINE_COMMIT_SOURCE,
+            "engine_commit": running,
+            "engine_commit_source": ident.get("engine_commit_source"),
             "deployment_drift": deployment_identity["deployment_drift"],
             "portfolio_ready": portfolio_ready,
             "portfolio_commit": portfolio_actual,
@@ -304,7 +342,10 @@ class Handler(BaseHTTPRequestHandler):
         if p.path == "/api/engine":
             return self._json(200, {
                 "engine_commit": ENGINE_COMMIT,
-                "gateway_up": gw.gateway_up(),
+                "engine_commit_source": ENGINE_COMMIT_SOURCE,
+                "gateway_up": (None
+                               if gw.transport_snapshot().get("status")
+                               == "EXTERNAL" else gw.gateway_up()),
                 "runs_root": str(store.ENGINE_RUNS),
             })
         if p.path == "/api/sessions":
@@ -531,6 +572,13 @@ class Handler(BaseHTTPRequestHandler):
             share_id = store.create_share(sid)
             if not share_id:
                 return self._json(404, {"error": "session not found"})
+            # R396 B.2: a share is durable state — snapshotted so a
+            # restart cannot silently revoke or lose a public link.
+            try:
+                from toscanini import durable
+                durable.snapshot(f"share:{sid}")
+            except Exception:  # noqa: BLE001 — disclosed via health
+                pass
             return self._json(200, {"share_id": share_id})
 
         # failure recovery (CEO #8): re-enqueue an ERROR_* session through
@@ -836,15 +884,54 @@ def main():
                   f"{interrupted}", file=sys.stderr)
     except Exception as exc:  # noqa: BLE001
         print(f"interrupted-sweep failed: {exc}", file=sys.stderr)
+    # R396 B.1/B.2: a boot snapshot immediately after restore. This is
+    # the snapshot-pipeline health check on EVERY boot (a failure is
+    # disclosed through /api/health durable.last_snapshot — never
+    # silent), and it is the evidence for the release rule "a
+    # successful release requires at least one successful snapshot":
+    # the deployed artifact takes one snapshot by itself, with its
+    # artifact identity recorded in the snapshot record. A quiet
+    # deployment (no user runs) can no longer have a null snapshot
+    # state that a spin-down would silently lose.
+    try:
+        from toscanini import durable
+        if durable.enabled():
+            snap = durable.snapshot(
+                f"boot:{(ENGINE_COMMIT or 'UNRESOLVED')[:12]}:"
+                "after_restore")
+            if not snap.get("ok"):
+                print(f"boot snapshot not ok: {snap.get('error')}",
+                      file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001 — disclosed via health
+        print(f"boot snapshot failed: {exc}", file=sys.stderr)
     # R392 (directive 2): a startup transport probe seeds the health
     # endpoint with REAL evidence (never a configured-but-dead key).
-    # Background + best-effort: a slow/blocked provider delays nothing.
+    # R396 A.8 fix: the OLD thread ran ensure_gateway() BEFORE the
+    # probe in one try-block — when ensure_gateway raised (or was slow),
+    # the probe never ran and health stayed NEVER_PROBED after boot
+    # (measured on the public deployment). Now: (1) the probe state is
+    # marked PENDING the moment the thread starts; (2) ensure_gateway
+    # failures can never prevent preflight_probe, which records its OWN
+    # outcome in every path (success / CALL_FAILED).
     def _startup_probe():
         try:
-            gw.ensure_gateway()
-            gw.preflight_probe()
-        except Exception:  # noqa: BLE001 — last_probe records the failure
+            gw.record_probe({"status": "PROBE_PENDING"}, "startup")
+        except Exception:  # noqa: BLE001
             pass
+        try:
+            gw.ensure_gateway()
+        except Exception:  # noqa: BLE001 — gateway spawn is best-effort
+            pass
+        try:
+            gw.preflight_probe()
+        except Exception as exc:  # noqa: BLE001 — recorded, never silent
+            try:
+                gw.record_probe(
+                    {"status": "CALL_FAILED",
+                     "error": f"{type(exc).__name__}: {exc}"[:200]},
+                    "startup")
+            except Exception:  # noqa: BLE001
+                pass
     threading.Thread(target=_startup_probe, daemon=True).start()
     srv = ThreadingHTTPServer((HOST, PORT), Handler)
     print(f"toscanini service on {HOST}:{PORT} "

@@ -30,6 +30,9 @@ ENVELOPE_FIELDS = [
     "evidence_classification",
     "prior_art_ids", "prior_art",
     "collision_results",
+    # R397 Phase 2: the PHYSICS stage verdict block (first-class stage
+    # between COLLISION and ATTACK — lifecycle-affecting, not a report)
+    "physics",
     "attack_results",
     "contradictions",
     "killer_experiment",
@@ -72,6 +75,7 @@ class Candidate:
     prior_art_ids: List[str] = field(default_factory=list)
     prior_art: Dict[str, Any] = field(default_factory=dict)
     collision_results: Dict[str, Any] = field(default_factory=dict)
+    physics: Dict[str, Any] = field(default_factory=dict)
     attack_results: Dict[str, Any] = field(default_factory=dict)
     contradictions: Dict[str, Any] = field(default_factory=dict)
     killer_experiment: Dict[str, Any] = field(default_factory=dict)

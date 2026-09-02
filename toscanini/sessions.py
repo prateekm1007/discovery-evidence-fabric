@@ -374,6 +374,17 @@ def stage_summaries(run_dir: Path) -> List[Dict[str, Any]]:
                 for p in (pa[:5] if isinstance(pa, list) else [])]
         elif stage == "COLLISION":
             cr = env.get("collision_results")
+            # R396 P6: the run record carries the determinism block —
+            # verdict, relevance model version, evidence-set identity,
+            # variance summary, DETERMINISTIC/ NON_DETERMINISTIC class
+            det = env.get("determinism")
+            if isinstance(det, dict):
+                digest["determinism"] = {
+                    k: det.get(k) for k in (
+                        "classification", "verdict",
+                        "relevance_model_version",
+                        "evidence_set_identity", "n_prior_replays",
+                        "variance_summary") if k in det}
             digest["collisions"] = []
             if isinstance(cr, dict):
                 for universe, blk in list(cr.items())[:5]:
@@ -392,6 +403,19 @@ def stage_summaries(run_dir: Path) -> List[Dict[str, Any]]:
                         "note": ((c.get("note") or c.get("reason") or "")
                                  [:200] if isinstance(c, dict) else ""),
                     })
+        elif stage == "PHYSICS":
+            # R397 Phase 2: the first-class physics stage digest — the
+            # lifecycle verdict + baseline comparison the run UI shows
+            ph = env.get("physics") or {}
+            if isinstance(ph, dict):
+                digest["lifecycle_verdict"] = ph.get("lifecycle_verdict")
+                comp = ph.get("baseline_comparison") or {}
+                digest["baseline_outcome"] = comp.get("outcome")
+                digest["relative_improvement"] = comp.get(
+                    "relative_improvement")
+                digest["chain"] = ph.get("chain_executed")
+                fm = ph.get("failure_mode_contract") or {}
+                digest["failure_modes"] = fm.get("candidate")
         elif stage == "ATTACK":
             ar = env.get("attack_results") or {}
             if isinstance(ar, dict):

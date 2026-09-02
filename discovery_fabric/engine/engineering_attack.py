@@ -691,7 +691,8 @@ def select_survivors(candidates: List[Dict[str, Any]]
     """E15-H selection over attacked (+repaired, +quality-evaluated)
     candidates. Each candidate dict carries:
         candidate_id, attack (post-repair), quality (E15-B result or None),
-        repaired (bool), span_underived (bool, R377)
+        repaired (bool), span_underived (bool, R377),
+        physics_lifecycle (str, R397 Phase 2)
     Selection policy (recorded, deterministic, NOT a new numeric score):
       1. KILLed candidates are out (no dossier for the weak).
       2. R377: SPAN_UNDERIVED candidates are out — a mechanism whose
@@ -700,11 +701,20 @@ def select_survivors(candidates: List[Dict[str, Any]]
          (CEO R377: "a higher kill rate is acceptable if the surviving
          inventions become materially better"). The flag and its
          measurement stay on the ranked record.
-      3. Among the rest, prefer the better E15-B verdict
+      3. R397 Phase 2: a candidate whose physics_lifecycle is
+         DOES_NOT_BEAT_BASELINE or PLAUSIBILITY_BOUND_VIOLATED is
+         INELIGIBLE for strongest-survivor selection — the release
+         would claim an improvement the machine's own physics says the
+         candidate does not deliver. MECHANISM_NOT_SIMULATABLE and
+         INCONCLUSIVE candidates remain eligible (honest disclosure,
+         never a fabricated kill — the domain refusal is not negative
+         knowledge).
+      4. Among the rest, prefer the better E15-B verdict
          (PASS > CONDITIONAL > FAIL); FAIL means the quality gate rejects
-         the candidate.
-      4. Tie-break: fewer deficient areas, then fewer UNCERTAIN verdicts.
-      5. All comparisons and the final choice are recorded.
+         the candidate. BEATS_BASELINE outranks within the same verdict
+         tier (physics strength is a recorded tie-break, not a score).
+      5. Tie-break: fewer deficient areas, then fewer UNCERTAIN verdicts.
+      6. All comparisons and the final choice are recorded.
     """
     ranked: List[Dict[str, Any]] = []
     for c in candidates:
@@ -712,8 +722,11 @@ def select_survivors(candidates: List[Dict[str, Any]]
         quality = c.get("quality") or {}
         verdict_rank = {"PASS": 0, "CONDITIONAL": 1, "FAIL": 2,
                         None: 3}.get(quality.get("verdict"), 3)
-        killed = attack.get("overall") == "KILLED"
+        killed = attack.get("overall") == "KILLED" \
+            or bool(c.get("physics_kill"))
         underived = bool(c.get("span_underived"))
+        physics_lifecycle = c.get("physics_lifecycle") \
+            or "MECHANISM_NOT_SIMULATABLE"
         ranked.append({
             "candidate_id": c.get("candidate_id"),
             "killed": killed,
@@ -725,19 +738,29 @@ def select_survivors(candidates: List[Dict[str, Any]]
                                            or []),
             "repaired": bool(c.get("repaired")),
             "span_underived": underived,
+            "physics_lifecycle": physics_lifecycle,
             "_verdict_rank": verdict_rank,
+            "_physics_rank": {"BEATS_BASELINE": 0,
+                              "MECHANISM_NOT_SIMULATABLE": 1,
+                              "INCONCLUSIVE": 1,
+                              None: 1}.get(physics_lifecycle, 1),
         })
     eligible = [r for r in ranked if not r["killed"]
                 and r["quality_verdict"] != "FAIL"
-                and not r["span_underived"]]
-    eligible.sort(key=lambda r: (r["_verdict_rank"],
+                and not r["span_underived"]
+                and r["physics_lifecycle"] not in
+                ("DOES_NOT_BEAT_BASELINE", "PLAUSIBILITY_BOUND_VIOLATED")]
+    eligible.sort(key=lambda r: (r["_verdict_rank"], r["_physics_rank"],
                                  r["quality_deficient_count"],
                                  r["uncertain_count"]))
     selection = {
-        "selection": "STRONGEST_SURVIVOR (E15-H)",
+        "selection": "STRONGEST_SURVIVOR (E15-H + R397 physics gate)",
         "policy": ("kill first; SPAN_UNDERIVED candidates are ineligible "
-                   "(R377 evidence-derivation requirement); among "
-                   "survivors prefer better E15-B verdict, then fewer "
+                   "(R377 evidence-derivation requirement); R397 Phase 2: "
+                   "DOES_NOT_BEAT_BASELINE and PLAUSIBILITY_BOUND_VIOLATED "
+                   "candidates are ineligible for release (the machine's "
+                   "own physics gates the claim); among survivors prefer "
+                   "better E15-B verdict, then BEATS_BASELINE, then fewer "
                    "deficient areas, then fewer UNCERTAIN attack "
                    "outcomes; NO numeric score is computed (CEO standing "
                    "rule: no new scoring systems)"),
@@ -751,6 +774,20 @@ def select_survivors(candidates: List[Dict[str, Any]]
         "quality_rejected": [r["candidate_id"] for r in ranked
                              if not r["killed"]
                              and r["quality_verdict"] == "FAIL"],
+        "physics_ineligible": [r["candidate_id"] for r in ranked
+                               if not r["killed"]
+                               and not r["span_underived"]
+                               and r["physics_lifecycle"] in
+                               ("DOES_NOT_BEAT_BASELINE",
+                                "PLAUSIBILITY_BOUND_VIOLATED")],
+        "physics_policy_note": (
+            "R397 Phase 2: the physics verdicts are lifecycle-affecting, "
+            "not report fields — DOES_NOT_BEAT_BASELINE blocks automatic "
+            "release with the design-learning mutation recorded as the "
+            "next candidate; PLAUSIBILITY_BOUND_VIOLATED candidates are "
+            "killed before the engineering attack; MECHANISM_NOT_SIMULATABLE "
+            "stays eligible with an honest disclosure (a domain refusal is "
+            "not negative knowledge — Art. XXV/XXIX)"),
         "decided_at": utc_now(),
     }
     return selection

@@ -207,7 +207,12 @@ def test_health_payload_carries_deployment_identity():
     payload = srv._health_payload()
     di = payload["deployment_identity"]
     assert di["deployment_drift"] in ("GREEN", "RED")
-    assert "rule" in di and "DEPLOYED_ENGINE_COMMIT" in di["rule"]
+    # R396 A.3-A.6 contract upgrade: identity is the BUILD ARTIFACT
+    # (BUILD == RUNNING == HEALTH proof chain); the R392-era
+    # DEPLOYED_ENGINE_COMMIT-from-env contract is superseded.
+    assert "rule" in di and "BUILD_ARTIFACT_SHA == RUNNING_ARTIFACT_SHA" \
+        in di["rule"]
+    assert "never identity" in di["rule"]  # env vars are expectations only
     # RED drift must surface in readiness too (the release is NOT
     # healthy when drift is RED — the invariant is machine-checkable)
     if di["deployment_drift"] == "RED":

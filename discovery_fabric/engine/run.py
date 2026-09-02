@@ -566,6 +566,51 @@ class EngineRun:
                             "angle": c.get("origin")})
                     self._persist(f"INVENTION_SPECIFICATION_{key}.json", s)
                 eng1 = build_engineering_spec(s, c["env_view"], run_ctx)
+                # R396 Phase D + R397 Phase 2: the physics gate —
+                # plausibility bounds (before expensive simulation), the
+                # failure-mode contract, and the BASELINE comparison with
+                # the exact directive vocabulary. The verdicts are
+                # LIFECYCLE-AFFECTING (R397: "do not make any of these
+                # merely report fields"):
+                #   PLAUSIBILITY_BOUND_VIOLATED -> the candidate is killed
+                #     at the physics gate BEFORE the attack/dossier
+                #     compute (no gauntlet run on a physically impossible
+                #     basis);
+                #   DOES_NOT_BEAT_BASELINE -> the candidate can NOT be
+                #     the released survivor (the design-learning mutation
+                #     is recorded as the next candidate);
+                #   MECHANISM_NOT_SIMULATABLE -> proceeds with the honest
+                #     refusal (the release must disclose it).
+                try:
+                    from .physics_gate import evaluate_candidate_physics
+                    eng1["physics_evaluation"] = evaluate_candidate_physics(
+                        s, eng1, run_ctx)
+                except Exception as exc:  # noqa: BLE001 — disclosed
+                    eng1["physics_evaluation"] = {
+                        "gate_version": "physics_gate/1.0.0",
+                        "error": f"{type(exc).__name__}: {exc}"[:300]}
+                physics_lifecycle = _physics_lifecycle(
+                    eng1.get("physics_evaluation") or {})
+                if physics_lifecycle == "PLAUSIBILITY_BOUND_VIOLATED":
+                    self._persist(f"PACKAGE_FAILED_{key}.json", {
+                        "stage": "PHYSICS",
+                        "reason": ("R397 Phase 2 physics kill: the "
+                                   "candidate's input envelope violates "
+                                   "a deterministic physical bound "
+                                   "(killed BEFORE expensive simulation "
+                                   "and BEFORE the engineering attack)"),
+                        "candidate_id": c["candidate_id"],
+                        "physics_lifecycle": physics_lifecycle,
+                        "violations": ((eng1.get("physics_evaluation")
+                                        .get("plausibility_gate") or {})
+                                       .get("violations", [])[:5])})
+                    evaluated.append({
+                        "candidate_id": c["candidate_id"], "key": key,
+                        "killed": True,
+                        "physics_lifecycle": physics_lifecycle,
+                        "physics_kill": True})
+                    continue
+
                 if key == "primary":
                     # the primary artifact is always on disk, even if the
                     # attack, selection or the quality gate later rejects
@@ -613,6 +658,7 @@ class EngineRun:
                     "attack": attack1, "quality": quality,
                     "repaired": repaired, "origin": c["origin"],
                     "killed": False,
+                    "physics_lifecycle": physics_lifecycle,
                     "span_underived": bool(c.get("span_underived"))})
 
             # ---------- E15-H: select the strongest survivor ---------------
@@ -1276,6 +1322,41 @@ class EngineRun:
             self._persist("cemetery_update.json",
                           {"error": f"{type(exc).__name__}: {exc}",
                            "appended": False})
+
+
+def _physics_lifecycle(physics_evaluation: Dict[str, Any]) -> str:
+    """Derive the LIFECYCLE verdict from a physics_evaluation block
+    (R397 Phase 2 vocabulary). One authority — the mapping rules are
+    pinned by tests/test_r397_physics_stage.py so the stage and the
+    gauntlet cannot drift apart (Art. X).
+
+    Returns one of:
+      MECHANISM_NOT_SIMULATABLE — non-representable domain or no
+        comparison possible (honest refusal; the candidate proceeds,
+        the release discloses)
+      PLAUSIBILITY_BOUND_VIOLATED — killed before simulation
+      BEATS_BASELINE / DOES_NOT_BEAT_BASELINE / INCONCLUSIVE — the
+        baseline comparison outcome
+      INCONCLUSIVE is also the conservative default for gate errors
+        (never a silent pass — Art. IV/XXV). An EMPTY or non-dict
+        evaluation is MECHANISM_NOT_SIMULATABLE: no physics evidence
+        exists at all, so no physics claim is possible (never silently
+        INCONCLUSIVE — a missing evaluation and an executed-but-
+        inconclusive one are different epistemic states)."""
+    if not isinstance(physics_evaluation, dict) or not physics_evaluation:
+        return "MECHANISM_NOT_SIMULATABLE"
+    if physics_evaluation.get("error"):
+        return "INCONCLUSIVE"
+    if physics_evaluation.get("plausibility_gate", {}).get(
+            "status") == "PLAUSIBILITY_BOUND_VIOLATED":
+        return "PLAUSIBILITY_BOUND_VIOLATED"
+    if physics_evaluation.get("applicable") is False:
+        return "MECHANISM_NOT_SIMULATABLE"
+    outcome = ((physics_evaluation.get("baseline_comparison") or {})
+               .get("outcome"))
+    if outcome in ("BEATS_BASELINE", "DOES_NOT_BEAT_BASELINE"):
+        return outcome
+    return "INCONCLUSIVE"
 
 
 def asdict_ok(obj) -> Dict[str, Any]:

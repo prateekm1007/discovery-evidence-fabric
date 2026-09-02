@@ -131,3 +131,19 @@ def _hermetic_r370g_reality_ledgers(tmp_path, monkeypatch):
     monkeypatch.setattr(_mod, "CAUSAL_MUTATION_LEDGER_PATH",
                         str(tmp_path / "CAUSAL_MUTATION_LEDGER.jsonl"))
     yield
+
+
+@pytest.fixture(autouse=True)
+def _hermetic_collision_replay_ledger(tmp_path, monkeypatch):
+    """R396 P6 determinism-ledger guard (e11 class, Art. IX/XVII):
+    hermetic tests must never append replay entries to the production
+    ENGINE_RUNTIME/collision_replay_ledger.jsonl — a contaminated
+    ledger would manufacture false DETERMINISTIC classifications for
+    later live probes. ENGINE_LIVE=1 opts out (operator-intentional)."""
+    if os.environ.get("ENGINE_LIVE"):
+        yield
+        return
+    from discovery_fabric.prior_art_v2 import determinism as _det
+    monkeypatch.setattr(_det, "LEDGER_PATH",
+                        tmp_path / "collision_replay_ledger.jsonl")
+    yield

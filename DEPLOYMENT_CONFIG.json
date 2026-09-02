@@ -1,55 +1,66 @@
 {
-  "deployment_config": {
-    "version": "R392",
-    "service": "toscanini-engine-docker",
-    "host": "Render (Docker, region oregon)",
-    "public_url": "https://toscanini-engine-docker.onrender.com",
-    "architecture": "same-origin: this engine serves the Next.js static export AND /api/* on $PORT (no proxy, no CORS, no client-side keys)",
-    "authority": "ENGINE_COMMIT + PORTFOLIO_COMMIT + this deployment configuration = the reproducible deployed product"
-  },
-  "pins": {
-    "portfolio_commit": "b978e32c6a484fa14d7b42e60f407333612a50d9",
-    "portfolio_release": "R387-3D-QUALITY-EDITION (ENGINE_RELEASE_REGISTRY.json entry; CANONICAL_RELEASE_MANIFEST.json pins 924 buyer-surface files)",
-    "portfolio_acquisition": "toscanini/start.sh fetches EXACTLY this sha at container start (git fetch --depth 1 <sha>; token-safe GIT_ASKPASS). A moving branch NEVER determines buyer-package contents.",
-    "engine_commit": "set by the deploy step: the Render env var ENGINE_COMMIT is set to the exact sha the deploy was triggered with, at deploy time. Verification is LIVE: GET /api/health reports engine_commit, engine_commit_source, and (when the build context carried .git) the image-baked commit for cross-check. A manifest cannot contain its own commit (Art. XXXIX section 2 pattern)."
-  },
-  "runtime_env_contract": {
-    "secrets": [
-      "GITHUB_TOKEN (private-repo acquisition + runtime-state pushes; supplied via GIT_ASKPASS, never in URLs/argv/image/logs)",
-      "NVIDIA_API_KEY (public LLM transport)"
-    ],
-    "transport": {
-      "NVIDIA_MODEL": "openai/gpt-oss-120b",
-      "ENGINE_SYNTHESIS_PROVIDER": "nvidia",
-      "ENGINE_ATTACK_PROVIDER": "nvidia",
-      "ENGINE_ENSEMBLE_PROVIDERS": "nvidia",
-      "ENGINE_GRID_PROVIDERS": "nvidia",
-      "note": "explicit operator overrides (R375 mechanism) — recorded in every call-site ledger and in candidate provenance; NVIDIA_MODEL is the registry's existing per-provider model override. Measured 2026-09-02 from the deployment source network: 3 consecutive OK completions, 1.5-3.1 s, FIELD-line compliant."
-    },
-    "persistence": {
-      "DURABLE_STATE_ENABLED": "1",
-      "DURABLE_STATE_BRANCH": "runtime-state",
-      "note": "minimum durable layer: session/job metadata, evidence references, key run artifacts, package zips — committed to the private engine repo's runtime-state branch via the existing GITHUB_TOKEN. Large regenerable intermediates stay ephemeral."
-    },
-    "pins_env": {
-      "ENGINE_COMMIT": "<exact sha at deploy time>",
-      "PORTFOLIO_COMMIT": "b978e32c6a484fa14d7b42e60f407333612a50d9"
-    },
-    "server": {
-      "PORT": "set by Render",
-      "ENGINE_HOST": "0.0.0.0 (Render contract)"
-    }
-  },
-  "deploy_procedure": [
-    "1. Repo clean and pushed; CI green on the exact commit (Art. XXIII/XXVI).",
-    "2. autoDeploy OFF on the Render service — a moving main never silently redeploys.",
-    "3. Set ENGINE_COMMIT + PORTFOLIO_COMMIT + transport + persistence env vars on the service.",
-    "4. Trigger the deploy pinned to the exact commit (Render deploy API, commit id).",
-    "5. Verify: GET /api/health -> engine_commit matches, portfolio_commit matches the pin (portfolio_pin_match=true), llm_transport_ready=true (real live completion), discovery_ready=true.",
-    "6. Run a FRESH discovery through the public URL (never a replayed fixture)."
+ "deployment_config": {
+  "version": "R396",
+  "service": "toscanini-engine-docker",
+  "host": "Render (Docker, region oregon)",
+  "public_url": "https://toscanini-engine-docker.onrender.com",
+  "architecture": "same-origin: this engine serves the Next.js static export AND /api/* on $PORT (no proxy, no CORS, no client-side keys)",
+  "authority": "ENGINE_COMMIT + PORTFOLIO_COMMIT + this deployment configuration = the reproducible deployed product"
+ },
+ "pins": {
+  "portfolio_commit": "b978e32c6a484fa14d7b42e60f407333612a50d9",
+  "portfolio_release": "R387-3D-QUALITY-EDITION (ENGINE_RELEASE_REGISTRY.json entry; CANONICAL_RELEASE_MANIFEST.json pins 924 buyer-surface files)",
+  "portfolio_acquisition": "toscanini/start.sh fetches EXACTLY this sha at container start (git fetch --depth 1 <sha>; token-safe GIT_ASKPASS). A moving branch NEVER determines buyer-package contents.",
+  "engine_commit": "IDENTITY = BUILD ARTIFACT ONLY (R396 A.3-A.6). The Docker build bakes ARTIFACT_IDENTITY.json + ARTIFACT_IDENTITY.sha256 from RENDER_GIT_COMMIT (build-arg) or git rev-parse HEAD; /api/health reports the artifact-derived SHA with a runtime tamper check (BUILD_ARTIFACT_SHA == RUNNING_ARTIFACT_SHA == HEALTH_REPORTED_SHA). The ENGINE_COMMIT env var, if set, is an operator-declared EXPECTATION cross-checked for drift \u2014 it NEVER defines identity."
+ },
+ "runtime_env_contract": {
+  "secrets": [
+   "GITHUB_TOKEN (private-repo acquisition + runtime-state pushes; supplied via GIT_ASKPASS, never in URLs/argv/image/logs)",
+   "NVIDIA_API_KEY (public LLM transport)",
+   "ENGINE_OPERATOR_KEY (R396 A.2 / R394 s15: operator visibility capability for /api/sessions; set on the service, verified present via health.operator_key_configured, the value itself is never disclosed)"
   ],
-  "security": {
-    "cors": "removed everywhere (same-origin by construction)",
-    "secrets_scope": "server-side only; adversarial leak scan (scripts/r392_readiness_tests.py) covers HTML, JS bundle, API responses, logs, and the Docker build context"
+  "transport": {
+   "NVIDIA_MODEL": "openai/gpt-oss-120b",
+   "ENGINE_SYNTHESIS_PROVIDER": "nvidia",
+   "ENGINE_ATTACK_PROVIDER": "nvidia",
+   "ENGINE_ENSEMBLE_PROVIDERS": "nvidia",
+   "ENGINE_GRID_PROVIDERS": "nvidia",
+   "note": "explicit operator overrides (R375 mechanism) \u2014 recorded in every call-site ledger and in candidate provenance; NVIDIA_MODEL is the registry's existing per-provider model override. Measured 2026-09-02 from the deployment source network: 3 consecutive OK completions, 1.5-3.1 s, FIELD-line compliant."
+  },
+  "persistence": {
+   "DURABLE_STATE_ENABLED": "1",
+   "DURABLE_STATE_BRANCH": "runtime-state",
+   "note": "minimum durable layer: session/job metadata, evidence references, key run artifacts, package zips \u2014 committed to the private engine repo's runtime-state branch via the existing GITHUB_TOKEN. Large regenerable intermediates stay ephemeral."
+  },
+  "pins_env": {
+   "ENGINE_COMMIT": "<exact sha at deploy time>",
+   "PORTFOLIO_COMMIT": "b978e32c6a484fa14d7b42e60f407333612a50d9"
+  },
+  "server": {
+   "PORT": "set by Render",
+   "ENGINE_HOST": "0.0.0.0 (Render contract)"
   }
+ },
+ "deploy_procedure": [
+  "1. Repo clean and pushed; CI green on the exact commit (Art. XXIII/XXVI).",
+  "2. autoDeploy OFF on the Render service \u2014 a moving main never silently redeploys.",
+  "3. Verify service env: GITHUB_TOKEN, NVIDIA_API_KEY, NVIDIA_MODEL=openai/gpt-oss-120b, ENGINE_*_PROVIDER=nvidia pins, DURABLE_STATE_ENABLED=1, ENGINE_OPERATOR_KEY set (R396 A.2).",
+  "4. Trigger the deploy pinned to the exact commit (Render deploy API, commit id). The Dockerfile bakes the artifact identity from RENDER_GIT_COMMIT/git at build time.",
+  "5. Verify: GET /api/health -> deployment_identity.deployment_drift=GREEN, engine_commit == the deployed sha (artifact-derived, source build_artifact), identity_tamper=false, portfolio_pin_match=true, llm_transport_ready=true (real live completion), discovery_ready=true, durable.last_snapshot.ok=true (boot snapshot, R396 B.2).",
+  "6. Run a FRESH discovery through the public URL (never a replayed fixture).",
+  "7. Run the R396 external acceptance probes P1-P7 (scripts/r396_external_probes.py) against the public host and preserve the raw outputs (Phase C)."
+ ],
+ "security": {
+  "cors": "removed everywhere (same-origin by construction)",
+  "secrets_scope": "server-side only; adversarial leak scan (scripts/r392_readiness_tests.py) covers HTML, JS bundle, API responses, logs, and the Docker build context"
+ },
+ "pins_env": {
+  "ENGINE_COMMIT": "OPTIONAL expectation pin only (R396 A.3) \u2014 cross-checked against the artifact identity; never the identity source",
+  "PORTFOLIO_COMMIT": "b978e32c6a484fa14d7b42e60f407333612a50d9"
+ },
+ "r396_release_gate": {
+  "deployment": "deployment_identity.deployment_drift == GREEN with identity_tamper == false and health_reported_commit == the deployed git sha (BUILD == RUNNING == HEALTH)",
+  "durability": "durable.last_snapshot.ok == true (the boot snapshot after restore; a restore without a successful preceding snapshot is not durability evidence)",
+  "probes": "P1-P7 raw outputs preserved in the worklog; CI results are NOT external acceptance"
+ }
 }

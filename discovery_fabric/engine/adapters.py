@@ -515,6 +515,60 @@ class CollisionEngineAdapter(BaseAdapter):
             novelty_risk=novelty_risk)
 
 
+class PhysicsStageAdapter(BaseAdapter):
+    """R397 Phase 2 — PHYSICS as a FIRST-CLASS canonical stage.
+
+    Canonical: discovery_fabric/engine/physics_stage.py::
+    evaluate_envelope_physics + physics_core.py (the ONE solver).
+    Executed for every ordinary user run (STAGE_ORDER) between
+    COLLISION and ATTACK so the physics verdicts are ON THE ENVELOPE
+    before the adversarial attack, the adjudication and the release.
+
+    The consultant finding this closes: 'the physics solver is
+    validated code but not part of the live run chain.' The full
+    directive chain (PRE-REQUIREMENTS -> PLAUSIBILITY -> SOLVER ->
+    FAILURE MODES -> BASELINE COMPARISON -> COMPUTATIONAL_RESULT)
+    executes here at the mechanism level, and the gauntlet-level
+    enforcement (run.py) applies the SAME gate to every pool candidate
+    with real lifecycle effects (kill at bound violation, block
+    automatic release on DOES_NOT_BEAT_BASELINE)."""
+    capability_id = "PHYSICS_GATE"
+    module_path = "discovery_fabric/engine/physics_stage.py"
+    canonical_fn = "evaluate_envelope_physics(env, run_ctx)"
+    needs_network = False
+    depends_on = ["SYNTHESIS"]
+
+    input_contract = {"mechanism_map": "the synthesized mechanism",
+                      "problem": "device/failure/constraint for domain "
+                                 "classification"}
+    output_contract = ("envelope.physics = verdict block: "
+                       "lifecycle_verdict in {MECHANISM_NOT_SIMULATABLE, "
+                       "PLAUSIBILITY_BOUND_VIOLATED, BEATS_BASELINE, "
+                       "DOES_NOT_BEAT_BASELINE, INCONCLUSIVE} + the "
+                       "directive chain record")
+
+    def execute(self, env, run_ctx):
+        from .physics_stage import evaluate_envelope_physics
+        result = evaluate_envelope_physics(env, run_ctx)
+        # A plausibility-bound violation is a FIRST-CLASS physics kill:
+        # the mechanism violates a deterministic physical law —
+        # research stops (Art. XIV: RED = STOP), never silently
+        # proceeds to attack/dossier on a physically impossible basis.
+        if result.get("lifecycle_verdict") == \
+                "PLAUSIBILITY_BOUND_VIOLATED":
+            from .candidate import StageFailure  # noqa: PLC0415
+            raise StageFailure(
+                "PHYSICS",
+                "PLAUSIBILITY_BOUND_VIOLATED — the candidate's input "
+                "envelope violates a deterministic physical bound: "
+                + str(result.get("plausibility", {}).get("violations"))
+                [:400])
+        return _engine_result({"physics": result},
+                              lifecycle_verdict=result.get(
+                                  "lifecycle_verdict"),
+                              chain=result.get("chain_executed"))
+
+
 class AttackEngineAdapter(BaseAdapter):
     """Canonical: discovery_fabric/a2/adversarial.py::adversarial_challenge
     (ACTIVE; NVIDIA->OpenRouter; v4_corrections applied inside).
@@ -925,6 +979,7 @@ ADAPTERS = {
     "VERIFY": EvidenceVerifyAdapter(),
     "MULTI_SOURCE_DISCOVERY": MultiSourceDiscoveryAdapter(),
     "COLLISION": CollisionEngineAdapter(),
+    "PHYSICS": PhysicsStageAdapter(),
     "ATTACK": AttackEngineAdapter(),
     "CONTRADICTION": ContradictionQueueAdapter(),
     "KILLER_EXPERIMENT": KillerExperimentAdapter(),
@@ -942,7 +997,14 @@ ADAPTERS = {
 # amorphous borosilicate glass) is rejected BEFORE candidate-generation
 # compute is burned (directive: "first-class discovery stage, not an
 # adversarial cleanup trick").
+# R397 Phase 2: PHYSICS is a FIRST-CLASS stage between COLLISION and
+# ATTACK — the physics solver (validated code) is now part of the LIVE
+# RUN CHAIN for every ordinary user run: plausibility bounds before
+# simulation, the four failure modes, the baseline comparison, and
+# lifecycle verdicts that gate the candidate (consultant finding:
+# "the physics solver is validated code but not part of the live run
+# chain"). The D8 chain is 15 stages.
 STAGE_ORDER = ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
-               "VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION", "ATTACK",
-               "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
+               "VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION", "PHYSICS",
+               "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
                "CLASSIFY", "NEXT_BEST_ACTION", "RANK"]

@@ -374,6 +374,23 @@ def solve_network(spec: Dict[str, Any]) -> Dict[str, Any]:
         "geometry_hash": spec.get("geometry_hash"),
         **output_core,
     }
+
+    # R396 D.2 — post-solve physical caps (flow/energy/mass/
+    # attenuation families), still BEFORE any expensive downstream
+    # compute. A violated cap demotes the record: NO computational
+    # evidence is emitted for an unphysical result (the raw numbers
+    # stay in the record for audit — never hidden, never cited).
+    cap_violations = _physical_cap_violations(record, spec)
+    if cap_violations:
+        record["status"] = "PLAUSIBILITY_BOUND_VIOLATED"
+        record["violations"] = cap_violations
+        record["cap_check_note"] = (
+            "post-solve physical cap failed (R396 D.2: flow/energy/"
+            "mass/attenuation families); predicted quantities are "
+            "retained for audit but this is NOT computational "
+            "evidence — the input envelope is unphysical or outside "
+            "the declared domain")
+
     record["output_hash"] = _sha(_canonical(
         {k: v for k, v in record.items() if k != "output_hash"}))
     return record
@@ -388,7 +405,22 @@ def _plausibility_violations(spec: Dict[str, Any]) -> List[Dict[str, Any]]:
     measured value, and the class. Geometry-scale + flow-scale + power
     bounds; anything failing means the hypothesis is physically
     impossible or outside the model's domain — kill EARLY, before
-    burning solve/loop compute (directive s11)."""
+    burning solve/loop compute (directive s11).
+
+    R396 Phase D.2 completes the directive's six bound families
+    (mass / energy / flow / thermal / attenuation / scale):
+      thermal     liquid-water-class temperature range (the declared
+                  V0 fluid class — NIST SRD 69 liquid range, class
+                  ENGINEERING)
+      flow/energy/mass  the inviscid Bernoulli cap (checked on the
+                  solved output in _physical_cap_violations — a REAL
+                  physical bound, not an invented envelope: no passive
+                  network can deliver more flow than sqrt(2*dP/rho)
+                  through the total area)
+      attenuation  passive-network pressure monotonicity (checked on
+                  solved node pressures — pressure cannot amplify
+                  without a pump)
+    """
     v: List[Dict[str, Any]] = []
     fluid = spec["fluid"]
     boundary = spec["boundary"]
@@ -396,6 +428,21 @@ def _plausibility_violations(spec: Dict[str, Any]) -> List[Dict[str, Any]]:
         v.append({"bound": "fluid.viscosity > 0",
                   "measured": fluid["viscosity_mPa_s"],
                   "class": "PHYSICAL"})
+    # R396 D.2 — thermal bound (declared V0 fluid class)
+    t_k = fluid.get("temperature_K")
+    if t_k is not None:
+        t_k = float(t_k)
+        if not (273.15 <= t_k <= 373.15):
+            v.append({
+                "bound": "273.15 K <= fluid.temperature_K <= 373.15 K "
+                         "(liquid-water-class fluid; the declared V0 "
+                         "fluid class)",
+                "measured": t_k,
+                "class": "THERMAL",
+                "basis": "NIST SRD 69 liquid-water range at 1 atm, "
+                         "applied to the declared V0 fluid class "
+                         "(water-like Newtonian liquid)",
+                "threshold_class": "ENGINEERING"})
     if float(boundary["inlet_mmHg"]) <= float(boundary["outlet_mmHg"]):
         v.append({"bound": "inlet pressure > outlet pressure (forward "
                            "flow requested)",
@@ -422,6 +469,100 @@ def _plausibility_violations(spec: Dict[str, Any]) -> List[Dict[str, Any]]:
             v.append({"bound": "obstruction <= 100%",
                       "measured": s.get("obstruction_pct"),
                       "segment": sid, "class": "PHYSICAL"})
+    return v
+
+
+def _physical_cap_violations(record: Dict[str, Any],
+                             spec: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """R396 D.2 — post-solve physical caps (flow / energy / mass /
+    attenuation), derived from REAL physics, never invented envelopes:
+
+      flow    the inviscid Bernoulli cap: no passive network can
+              exceed v_max = sqrt(2 * dP / rho); per-segment velocity
+              AND total flow are checked against their caps.
+      energy  hydraulic dissipated power P = dP * Q_total <= dP * Q_cap
+              (follows from the flow cap — reported separately because
+              the directive names the family).
+      mass    mass flow = rho * Q_total <= rho * Q_cap (likewise).
+      attenuation  every solved node pressure lies within
+              [outlet_p, inlet_p] — a passive hydraulic network cannot
+              amplify pressure (no pump in the model).
+
+    Checked immediately after the (cheap, deterministic) V0 solve —
+    still BEFORE any expensive downstream CAD/simulation compute. A
+    violation means the input envelope is unphysical or the network is
+    outside the declared domain; the record is marked and NO
+    computational evidence is emitted."""
+    v: List[Dict[str, Any]] = []
+    fluid = spec["fluid"]
+    boundary = spec["boundary"]
+    rho = float(fluid.get("density_kg_m3") or 993.0)
+    dp_pa = (float(boundary["inlet_mmHg"])
+             - float(boundary["outlet_mmHg"])) * _UNIT_MM_HG_TO_PA
+    pq = record.get("predicted_quantities") or {}
+    if dp_pa <= 0:
+        return v  # degenerate pressure handled by the pre-solve bound
+    v_max = (2.0 * dp_pa / rho) ** 0.5
+    # per-segment velocity cap (flow family)
+    for f in (pq.get("segment_flows") or []):
+        vel = float(f.get("velocity_m_s") or 0.0)
+        if vel > v_max * (1.0 + 1e-9):
+            v.append({
+                "bound": f"segment velocity <= inviscid cap "
+                         f"sqrt(2*dP/rho) = {v_max:.4f} m/s",
+                "measured": {"segment": f.get("segment_id"),
+                             "velocity_m_s": vel},
+                "class": "FLOW_CAP",
+                "basis": "Bernoulli inviscid limit — no passive flow can "
+                         "exceed it for the applied pressure gradient "
+                         "(physical bound, not a declared envelope)"})
+    # total flow / energy / mass caps
+    q_total_ml_s = float(pq.get("total_flow_ml_s") or 0.0)
+    area_total_m2 = 0.0
+    for s in spec["segments"]:
+        d_eff = effective_diameter(float(s["diameter_mm"]),
+                                   float(s.get("obstruction_pct") or 0.0))
+        area_total_m2 += math.pi * (d_eff * 1e-3 / 2.0) ** 2
+    q_cap_m3_s = area_total_m2 * v_max
+    q_cap_ml_s = q_cap_m3_s * 1e6
+    if q_total_ml_s > q_cap_ml_s * (1.0 + 1e-9):
+        v.append({
+            "bound": "total flow <= inviscid cap A_total * "
+                     f"sqrt(2*dP/rho) = {q_cap_ml_s:.6f} mL/s",
+            "measured": q_total_ml_s,
+            "class": "FLOW_CAP",
+            "basis": "Bernoulli inviscid limit over the total effective "
+                     "area (physical bound)"})
+        power_w = dp_pa * q_total_ml_s * 1e-9
+        power_cap_w = dp_pa * q_cap_m3_s
+        v.append({
+            "bound": "hydraulic dissipated power dP*Q <= dP*Q_cap = "
+                     f"{power_cap_w:.6f} W",
+            "measured": round(power_w, 9),
+            "class": "ENERGY_CAP",
+            "basis": "follows from the inviscid flow cap (physical "
+                     "bound; the power family the directive names)"})
+        v.append({
+            "bound": f"mass flow rho*Q <= rho*Q_cap = "
+                     f"{rho * q_cap_m3_s * 1000.0:.6f} g/s",
+            "measured": round(rho * q_total_ml_s * 1e-6 * 1000.0, 9),
+            "class": "MASS_CAP",
+            "basis": "mass conservation at the inviscid flow cap "
+                     "(physical bound)"})
+    # attenuation: passive-network pressure monotonicity
+    lo = float(boundary["outlet_mmHg"])
+    hi = float(boundary["inlet_mmHg"])
+    for node, p in (pq.get("node_pressures_mmHg") or {}).items():
+        p = float(p)
+        if p < lo - 1e-9 or p > hi + 1e-9:
+            v.append({
+                "bound": "passive node pressure within [outlet, inlet] "
+                         "(pressure cannot amplify without a pump)",
+                "measured": {"node": node, "pressure_mmHg": p},
+                "class": "ATTENUATION",
+                "basis": "passive hydraulic network physics (the solver "
+                         "models no pump)"})
+            break
     return v
 
 
@@ -551,10 +692,24 @@ def compare_to_baseline(candidate_spec: Dict[str, Any],
     verdict = "BEATS_BASELINE" if beats else "DOES_NOT_BEAT_BASELINE"
     record = {
         "outcome": verdict,
+        # R396 D.1: the directive's exact vocabulary, surfaced verbatim
+        # (CANDIDATE_DOES_NOT_BEAT_BASELINE must be a PRODUCIBLE state
+        # of the machine, not only an internal comparison verdict)
+        "candidate_outcome": (
+            "CANDIDATE_BEATS_BASELINE" if verdict == "BEATS_BASELINE"
+            else "CANDIDATE_DOES_NOT_BEAT_BASELINE"),
         "baseline": {"spec_summary": _spec_summary(baseline_spec),
                      "value": base_val},
         "candidate": {"spec_summary": _spec_summary(candidate_spec),
                       "value": cand_val},
+        # R397 Phase 2: the directive's five required fields surfaced
+        # TOP-LEVEL (BASELINE, CANDIDATE, TARGET METRIC, CONSTRAINTS,
+        # RELATIVE IMPROVEMENT) — the nested comparison block keeps the
+        # full detail; the top-level keys are the contract downstream
+        # stages and the lifecycle mapping read
+        "target_metric": target_metric,
+        "relative_improvement": (round(rel, 6) if rel is not None
+                                 else None),
         "comparison": {
             "scenario": scenario,
             "target_metric": target_metric,
