@@ -1,0 +1,623 @@
+{
+ "invention_id": {
+  "value": "inv:ui_occlusion_detection_delay_384979:19da18c2291b",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_occlusion_detection_delay_384979",
+   "device": "infusion pump",
+   "failure": "Documented problem 'occlusion detection delay' concerning infusion pump. User-submitted engineering problem (session input): \"Why do infusion pumps fail to detect downstream occlusion in time? (provider timeout behavior)\".  [fda_maude] 100 records retrieved live (1997-2076). Illustrative records: 'MAUDE report 100000: Injury [VITAL SIGNS]'; 'MAUDE report 10000000: Malfunction [630G INSULIN PUMP MMT-1715K 630G BLACK MG]'. LIMITS STAMPED INLINE: voluntary/regulatory reports; counts are NOT incidence rates; causality UNVERIFIED (Art. XXI.5). [europepmc] 10 records retrieved live (2026-2026). Illustrative records: 'Telemetric lumbar cerebrospinal fluid pressure monitoring for spaceflight: a novel approach to spaceflight-associated neuro-ocular syndrome research.'; 'Modeling and Design of a Soft Capacitive Slip Sensor with Fluid Dielectric Interlayer.'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. Problem-existence basis: live records retrieved.",
+   "failure_mode": "occlusion detection delay",
+   "constraint": "detect occlusion within required safety interval"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:4d455bb2"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of infusion pump",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "ischemic duration directly determines infarct size and clinical outcomes",
+   "intervention": "adopt the rapid‑trigger principle from industrial gas‑leak detection (continuous sensor sampling with instant alarm) to infusion pumps by adding a dual‑sensor (pressure and flow) high‑speed comparator that fires an alarm within milliseconds of pressure rise",
+   "expected_effect": "near‑instant occlusion alert eliminates provider timeout, ensuring immediate corrective action",
+   "mechanism_source_span": "\"ischemic duration directly determines infarct size and clinical outcomes.\"",
+   "span_derivation": {
+    "n_shared": 8,
+    "shared_terms": [
+     "clinical",
+     "determine",
+     "directly",
+     "duration",
+     "infarct",
+     "ischemic",
+     "outcome",
+     "size"
+    ],
+    "span_terms_n": 8,
+    "ratio": 1.0,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:41440853"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "The Irreversible March of Time: Ischemic Delay and Impact on Outcomes in ST-Segment Elevation Myocardial Infarction.",
+   "mechanism": "ischemic duration directly determines infarct size and clinical outcomes",
+   "intervention_site": "infusion pump",
+   "expected_effect": "near‑instant occlusion alert eliminates provider timeout, ensuring immediate corrective action",
+   "falsification_test": "simulate occlusion in a test loop; verify alarm triggers within 5 ms in >95% of trials; compare to current system latency"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:41440853"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "infusion pump occlusion pumps provider timeout"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "ischemic duration directly determines infarct clinical"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "industrial infusion pumps detection pressure sensor instant trigger"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "infusion detection occlusion ensuring action sampling"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "infusion occlusion provider timeout documented problem"
+    }
+   ],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "adopt the rapid‑trigger principle from industrial gas‑leak detection (continuous sensor sampling with instant alarm) to infusion pumps by adding a dual‑sensor (pressure and flow) high‑speed comparator that fires an alarm within milliseconds of pressure rise",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:41440853"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "detect occlusion within required safety interval",
+   "failure_mode_of_device": "occlusion detection delay"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:4d455bb2"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [
+   {
+    "dimension": "unsupported_mechanism",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "weak_transfer",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "obvious_combination",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "prior_art",
+    "attack_verdict": "SURVIVE (firewall: prior_art_state=UNRESOLVED_INSUFFICIENT_EVIDENCE is a non-kill state; adversarial PRIOR_ART=KILL is forbidden)",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "contradiction",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "boundary_failure",
+    "attack_verdict": "INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE)",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "engineering_infeasibility",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Shortens occlusion detection time to meet safety interval requirements, decreasing infusion interruption risk and improving patient safety",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-02T21:36:39.887841+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-02T21:36:39.887841+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "europepmc:41440853",
+    "title": "The Irreversible March of Time: Ischemic Delay and Impact on Outcomes in ST-Segment Elevation Myocardial Infarction.",
+    "source_uri": "https://europepmc.org/article/41440853",
+    "doi": "10.3390/jcdd12120474",
+    "content_hash": "f698e9fe94c85c54d3903acdeb74f701a80f50d6e5b226c8313ba03f7741de45",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41641357",
+    "title": "Computational modeling of oxygen dynamics in port-wine stain photodynamic therapy: treatment outcome optimization and pain management.",
+    "source_uri": "https://europepmc.org/article/41641357",
+    "doi": "10.1117/1.jbo.31.2.028001",
+    "content_hash": "cff388f7ae2dfc945a14b58f4c07ae564da120efc2a8e4ccc68a42af4b000603",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41815566",
+    "title": "Postoperative complications of coronary artery bypass grafting: a narrative review on pathophysiology, management strategies, and the emerging role of artificial intelligence.",
+    "source_uri": "https://europepmc.org/article/41815566",
+    "doi": "10.21037/cdt-2025-480",
+    "content_hash": "ea9555034deda727165c7c8390169f067c2ba2937f4033a6ca5c16bafa1e6744",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41230899",
+    "title": "Ocular Blood Velocity Measurement With Optical Coherence Tomography Using Speckle Analysis.",
+    "source_uri": "https://europepmc.org/article/41230899",
+    "doi": "10.1167/tvst.14.11.13",
+    "content_hash": "061c2b1abe1f8a173acaed15400bef51211be5d2b46c1ae896c88e1a88582e62",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:39222143",
+    "title": "Causes, risk factors, and complications of accidental intra-arterial administration of medications in a children's hospital: a case series.",
+    "source_uri": "https://europepmc.org/article/39222143",
+    "doi": "10.1186/s40981-024-00728-x",
+    "content_hash": "1d04b15aecdedca07a198194e33cfdd2a2881481fbf2db74fd4c71d78d0cdd3a",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "europepmc:39222143",
+   "europepmc:41230899",
+   "europepmc:41440853",
+   "europepmc:41641357",
+   "europepmc:41815566"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:attack:unsupported_mechanism",
+    "description": "attack dimension unsupported_mechanism returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:attack:weak_transfer",
+    "description": "attack dimension weak_transfer returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:attack:obvious_combination",
+    "description": "attack dimension obvious_combination returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:attack:contradiction",
+    "description": "attack dimension contradiction returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:attack:engineering_infeasibility",
+    "description": "attack dimension engineering_infeasibility returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:attack:regulatory_incompatibility",
+    "description": "attack dimension regulatory_incompatibility returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "unresolved_source": "infusion pump occlusion pumps provider timeout",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "infusion pump occlusion pumps provider timeout",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "ischemic duration directly determines infarct clinical",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "ischemic duration directly determines infarct clinical",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "industrial infusion pumps detection pressure sensor instant trigger",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "industrial infusion pumps detection pressure sensor instant trigger",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "infusion detection occlusion ensuring action sampling",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "infusion detection occlusion ensuring action sampling",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "infusion occlusion provider timeout documented problem",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "infusion occlusion provider timeout documented problem",
+    "error": "LENS_API_TOKEN not configured"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "simulate occlusion in a test loop; verify alarm triggers within 5 ms in >95% of trials; compare to current system latency"
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_occlusion_detection_delay_384979:2026-09-02T21:36:19",
+   "final_envelope_hash": "19da18c2291be75a1e2ddf3f094d1ba07b9084844a19ff1ed2e2a66a057fd24d",
+   "final_status": "REJECTED",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-02T21:36:40+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "REJECTED",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-02T21:38:23+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "europepmc:41440853": {
+   "id": "europepmc:41440853",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41440853",
+   "source_uri": "https://europepmc.org/article/41440853",
+   "title": "The Irreversible March of Time: Ischemic Delay and Impact on Outcomes in ST-Segment Elevation Myocardial Infarction.",
+   "abstract": "ST-segment elevation myocardial infarction (STEMI) represents a time-critical medical emergency where complete coronary artery occlusion initiates progressive myocardial necrosis. The fundamental principle of modern STEMI care-\"Time is Muscle\"-establishes that ischemic duration directly determines infarct size and clinical outcomes. Each minute of delay correlates with increased mortality, larger infarcts, and a higher risk of heart failure development. Total ischemic time encompasses both patient-mediated delays (often the largest component) and system-related delays, each influenced by distinct factors requiring targeted interventions. This comprehensive review analyzes the components of total ischemic time, quantifies the clinical consequences of delay, and evaluates evidence-based mitigation strategies. We examine the evolution from fibrinolysis to primary percutaneous coronary intervention and the resulting logistical challenges. System-level interventions-including public awareness campaigns, regionalized STEMI networks, pre-hospital ECG acquisition, and standardized hospital protocols-have dramatically reduced treatment times. However, persistent disparities based on geography, presentation timing, sex, race, and age remain problematic. Emerging technologies, particularly artificial intelligence for ECG interpretation, offer promise for further time reduction.",
+   "doi": "10.3390/jcdd12120474",
+   "publication_date": "2025-12-02",
+   "retrieval_timestamp": "2026-09-02T21:36:20.869685+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "f698e9fe94c85c54d3903acdeb74f701a80f50d6e5b226c8313ba03f7741de45",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T21:36:20.869685+00:00",
+    "query_or_method": "infusion pump occlusion detection delay mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41641357": {
+   "id": "europepmc:41641357",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41641357",
+   "source_uri": "https://europepmc.org/article/41641357",
+   "title": "Computational modeling of oxygen dynamics in port-wine stain photodynamic therapy: treatment outcome optimization and pain management.",
+   "abstract": "Significance Port-wine stains (PWSs) are congenital capillary malformations with the incidence of in newborns of ∼0.8% to 2.1%. Hematoporphyrin monomethyl ether-mediated photodynamic therapy (HMME-PDT) has been widely applied in China for PWS. However, there remains substantial room for improvement in both the phototherapeutic selectivity coefficient (PSC) and pain management. Aim We investigated the feasibility of modulating transcutaneous oxygen delivery during photodynamic therapy of PWS to enhance therapeutic efficacy and reduce pain. Approach A three-dimensional (3D) computational biophysical model was employed to elucidate the mechanisms through which transcutaneous oxygen modulation enhances the therapeutic efficacy of HMME-PDT and improves pain management. The model was constructed to simulate the light propagation, photosensitizer kinetics, oxygen diffusion, and reactive oxygen species (ROS) generation. A treatment optimization strategy based on epidermal oxygen regulation was proposed and evaluated in computational studies. The spatiotemporal distributions of singlet oxygen under normoxic, hypoxic, and anoxic conditions were evaluated, and their effects on treatment-induced pain and lesion-targeted cytotoxicity were analyzed. Results Computational analysis showed that compared with normoxic conditions, hypoxia and anoxia significantly enhanced PSC, with improvements of 48% and 61%, respectively. Furthermore, these oxygen-modulated regimens attenuated treatment-associated pain, reducing photochemical pain duration of 17% (hypoxia) and 30% (anoxia). Choosing the right combination of light source irradiance and surface oxygen supply rate amplified therapeutic performance and patient comfort, achieving a 213% increase in PSC and a 57% reduction in photochemical pain duration. These findings establish a mechanistic framework for advancing precision PDT protocols with minimized iatrogenic discomfort. Conclusions Established in this computational study, strategic",
+   "doi": "10.1117/1.jbo.31.2.028001",
+   "publication_date": "2026-02-03",
+   "retrieval_timestamp": "2026-09-02T21:36:20.869685+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "cff388f7ae2dfc945a14b58f4c07ae564da120efc2a8e4ccc68a42af4b000603",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T21:36:20.869685+00:00",
+    "query_or_method": "infusion pump occlusion detection delay mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41815566": {
+   "id": "europepmc:41815566",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41815566",
+   "source_uri": "https://europepmc.org/article/41815566",
+   "title": "Postoperative complications of coronary artery bypass grafting: a narrative review on pathophysiology, management strategies, and the emerging role of artificial intelligence.",
+   "abstract": "Background and objective Coronary artery bypass grafting (CABG) remains a vital treatment option for high-risk patients with advanced coronary artery disease, especially those with multivessel disease, extensive left main disease, or refractory angina. While CABG effectively lowers long-term mortality and morbidity, it is still associated with many postoperative complications that can hinder recovery and affect quality of life. This review aims to thoroughly explore risk factors, prevention, and management strategies of major postoperative complications after CABG, categorized by physiological systems. Methods A comprehensive literature review was conducted on PubMed and Google Scholar from January 1, 2005, to August 6, 2025, without applying filters, but only including English-language publications, to gather a wide range of studies. Full texts were chosen based on set criteria, followed by a qualitative analysis to identify common themes, results, and gaps. Key content and findings Post-CABG complications span neurological, cardiac, pulmonary, renal, gastrointestinal/hepatobiliary, infectious, endocrine, and psychosocial domains. Across systems, consistently identified significant risk factors include advanced age, diabetes, renal dysfunction, prolonged cardiopulmonary bypass time, prior stroke, chronic obstructive pulmonary disease (COPD), and impaired left ventricular (LV) function. Effective preventive strategies included optimized glycemic control, early mobilization and rehabilitation, targeted use of anti-inflammatory and antioxidant therapies, prophylactic amiodarone or magnesium for atrial fibrillation (AF), strict infection-control measures, renal-protective protocols, and multimodal pain management. Recently, artificial intelligence (AI)-based tools, including machine learning models for predicting acute kidney injury, delirium, stroke, arrhythmias, and surgical-site infections, are emerging as promising adjuncts for earlier risk identification and perso",
+   "doi": "10.21037/cdt-2025-480",
+   "publication_date": "2026-02-02",
+   "retrieval_timestamp": "2026-09-02T21:36:20.869685+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "ea9555034deda727165c7c8390169f067c2ba2937f4033a6ca5c16bafa1e6744",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T21:36:20.869685+00:00",
+    "query_or_method": "infusion pump occlusion detection delay mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41230899": {
+   "id": "europepmc:41230899",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41230899",
+   "source_uri": "https://europepmc.org/article/41230899",
+   "title": "Ocular Blood Velocity Measurement With Optical Coherence Tomography Using Speckle Analysis.",
+   "abstract": "Purpose To develop and validate a novel method for quantifying blood flow velocity in ocular vessels using speckle pattern analysis in optical coherence tomography (OCT) images. Methods We developed an OCT-based methodology that quantifies flow velocity by analyzing speckle structures within OCT images to derive a relative flow value (RFV) based on the horizontal derivative of speckle patterns. A model eye with 150-µm capillary tubing was used to evaluate speckle pattern analysis at controlled flow rates of human and porcine blood. We assessed the correlation between RFV and actual flow velocities and examined measurement consistency across vessel sectioning angles varying ±20° from perpendicular. Results RFV exhibited a power-law relationship with actual flow velocities, RFV = 169.6 × (Actual Flow)0.264 (r2 = 0.983), and maintained accuracy without saturation up to 70 mm/s. Measurements remained consistent across vessel sectioning angles. Intraluminal speckle structures changed dynamically with flow velocity, and averaged images revealed characteristic hourglass profiles at higher velocities. In a patient with central retinal vein occlusion, RFV detected altered pulsatility and reduced venous flow, aligning with clinical expectations. Conclusions This speckle-based OCT method provides a non-invasive, depth-resolved approach for quantifying ocular blood velocity with minimal computational requirements. It holds potential for diagnosing and monitoring vascular abnormalities in ocular and systemic diseases. Further validation is necessary across diverse patient populations. Translational relevance This method simplifies blood flow quantification, enhancing the role of OCT in hemodynamic assessment both ocularly and systemically.",
+   "doi": "10.1167/tvst.14.11.13",
+   "publication_date": "2025-11-01",
+   "retrieval_timestamp": "2026-09-02T21:36:20.869685+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "061c2b1abe1f8a173acaed15400bef51211be5d2b46c1ae896c88e1a88582e62",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T21:36:20.869685+00:00",
+    "query_or_method": "infusion pump occlusion detection delay mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:39222143": {
+   "id": "europepmc:39222143",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:39222143",
+   "source_uri": "https://europepmc.org/article/39222143",
+   "title": "Causes, risk factors, and complications of accidental intra-arterial administration of medications in a children's hospital: a case series.",
+   "abstract": "Background Accidental intra-arterial administration of a medication can lead to serious iatrogenic harm. Most studies have discussed single cases of accidental intra-arterial administration of a medication, but only a few have described multiple cases occurring in a single, pediatric hospital setting. Methods The subjects were pediatric patients with an accidental intra-arterial administration of a medication. After obtaining approval from the institutional review board, the relevant cases were extracted from incident reports submitted to the patient safety office of the study center between November 2016 and April 2023. Results A review of 18,204 incident reports yielded 10 cases (patient age: 27 days to 13 years) of accidental intra-arterial administration of a medication. The most common site of the cannulation was the dorsum of the foot followed by the dorsum of the hand. The medications administered were narcotics, sedatives, muscle relaxants, antibiotics, and crystalloids. No serious adverse events occurred after injection. In some cases, the accidental arterial cannulation was not discovered immediately (53 min to 26 days). Seven patients had difficult intravenous access; in two of these, ultrasound-guided peripheral venous cannulation was used. Conclusions We experienced 10 cases of accidental intra-arterial administration of a medication. The dorsalis pedis artery and the radial artery around the anatomical tobacco socket were common sites of unintentional arterial cannulation. Difficult intravenous (IV) access may be associated with unintentional arterial cannulation. If IV access is difficult or the free IV drip is sluggish, strict vigilance and repeated confirmation are needed to prevent unintentional arterial cannulation.",
+   "doi": "10.1186/s40981-024-00728-x",
+   "publication_date": "2024-09-02",
+   "retrieval_timestamp": "2026-09-02T21:36:20.869685+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "1d04b15aecdedca07a198194e33cfdd2a2881481fbf2db74fd4c71d78d0cdd3a",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T21:36:20.869685+00:00",
+    "query_or_method": "infusion pump occlusion detection delay mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "problem:4d455bb2": {
+   "id": "problem:4d455bb2",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "4d455bb202b33d675395649559bf961650bbed461986268468df09aeb8ec5bce",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "REJECTED",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "3a9d2c5f767a9b526e3496e084c69ec9d2bcd13deea1be9495610d050e0a2d13",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-02T21:38:23+00:00Z"
+ },
+ "_exploration_candidate": {
+  "marker": "EXPLORATION_GRID_CANDIDATE",
+  "discovery_verification": "NOT_PERFORMED_FOR_THIS_CANDIDATE",
+  "consequence": "the E16-H release gate holds this dossier for human engineering review; a discovery-loop re-run is required before automatic release",
+  "angle": "EXPLORATION_GRID_cross_industry_transfer(nvidia)"
+ }
+}
