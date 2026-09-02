@@ -21,8 +21,14 @@ RUN NEXT_OUTPUT=export npm run build
 # ---------- stage 2: the engine ----------
 FROM python:3.12-slim
 
+# git: portfolio acquisition + durable runtime-state
+# libGL/libGLU/X11: cadquery/OCP native geometry (the interactive 3D
+# rebuild path) — python:3.12-slim lacks them; discovered by the R392
+# live failure matrix (BUILD_ERROR libGL.so.1 on /api/showcase/*/evaluate)
 RUN apt-get update \
- && apt-get install -y --no-install-recommends git ca-certificates \
+ && apt-get install -y --no-install-recommends \
+      git ca-certificates \
+      libgl1 libglu1-mesa libxext6 libx11-6 libxrender1 \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
