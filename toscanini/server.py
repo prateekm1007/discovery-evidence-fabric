@@ -95,11 +95,15 @@ class Handler(BaseHTTPRequestHandler):
 
         if p.path == "/healthz" or p.path == "/api/health":
             # /api/health is the R391 deployment healthcheck alias (same
-            # probe, Render-style {"status": "ok"} envelope included)
+            # probe, Render-style {"status": "ok"} envelope included).
+            # portfolio_ready is honest: showcase serves real packages
+            # only when the buyer-distribution repo is present.
             return self._json(200, {"ok": True, "status": "ok",
                                     "service": "toscanini",
                                     "engine_commit": ENGINE_COMMIT,
                                     "transport": gw.external_base_url() or "local",
+                                    "portfolio_ready":
+                                        bool(show.DOWNLOAD_ROOT.exists()),
                                     "gateway_up": gw.gateway_up()})
         if p.path == "/api/engine":
             return self._json(200, {
