@@ -1,0 +1,236 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "nvidia"
+ ],
+ "operator_override": [
+  "nvidia"
+ ],
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "4d6f9d25040047759b0e9d382f225cf3d96f156b6ec5e398519c81ebb23f31fb",
+   "output_hash": "c687a72143194b13074428121c2b20b8d767f854a0fe6006fe05c9418f2d23ad",
+   "fields": {
+    "mechanism": "Incorporation of Joule heating, reversible entropic heat, and radiative losses into a physics-informed neural network for real-time temperature prediction.",
+    "intervention": "Embed the enhanced physics-informed neural network model into the aircraft lithium‑battery management system to continuously predict cell surface temperature during flight and trigger protective actions (e.g., load reduction, active cooling) when predicted temperature approaches runaway thresholds.",
+    "expected_effect": "Early detection of abnormal heating prevents temperature from reaching runaway conditions, thereby eliminating thermal events under flight conditions.",
+    "falsification_test": "Conduct flight-profile tests on instrumented battery packs with the PINN‑based BMS enabled versus a conventional BMS; verify that no thermal runaway occurs in the PINN case while a controlled over‑current event induces runaway in the conventional case.",
+    "mechanism_source_span": "\"the proposed model incorporates Joule heating, reversible entropic heat, and radiative losses directly into its loss function.\"",
+    "span_derivation": {
+     "n_shared": 9,
+     "shared_terms": [
+      "entropic",
+      "heat",
+      "heating",
+      "into",
+      "joule",
+      "losse",
+      "model",
+      "radiative",
+      "reversible"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.6,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:cross_industry_transfer:nvidia:c687a7214319"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "a62f8399787ac70426db5ce80d36ccd3b8ed12e9a61b0afd175606997aae91bb",
+   "output_hash": "08dbecf2ea1b5512c1b2c5ec0beb9d73bfc659ffa36e9435ab9d92298e340f22",
+   "fields": {
+    "mechanism": "Radiative heat loss from the battery surface (radiative cooling)",
+    "intervention": "Apply a high-emissivity coating or attach radiative heat‑sink panels to the exterior of the aircraft lithium‑battery installation to increase surface radiative heat dissipation during operation",
+    "expected_effect": "Enhanced passive removal of heat will limit temperature spikes during high‑power or fault conditions, thereby lowering the probability of thermal runaway in flight",
+    "falsification_test": "Conduct side‑by‑side flight‑profile thermal tests of identical battery packs, one with the high‑emissivity treatment and one without, measuring peak surface temperature and any onset of thermal runaway; a statistically significant reduction in peak temperature for the treated pack falsifies the null hypothesis that the coating has no effect",
+    "mechanism_source_span": "\"radiative losses directly into its loss function.\"",
+    "span_derivation": {
+     "n_shared": 2,
+     "shared_terms": [
+      "loss",
+      "radiative"
+     ],
+     "span_terms_n": 7,
+     "ratio": 0.286,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:mechanism_inversion:nvidia:08dbecf2ea1b"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "786b16e8e294f3bdb64d5e9375f286f750b607a6c30f0a06ad847b1239148e29",
+   "output_hash": "a9b6dfebf87813ab2ca81fce763885e95772acf3b2e09d1b5ec80a412a3d1069",
+   "fields": {
+    "mechanism": "Joule heating (internal resistive heat generation during charge/discharge)",
+    "intervention": "Implement a predictive BMS that uses the enhanced PINN model to limit charge/discharge current when predicted Joule heating would raise battery temperature toward runaway thresholds in flight conditions",
+    "expected_effect": "Keeps battery temperature below critical levels, preventing thermal runaway during operation",
+    "falsification_test": "Conduct flight‑simulated discharge cycles with and without the predictive current‑limiting BMS and verify that temperature excursions exceeding the runaway threshold are eliminated in the intervention case",
+    "span_derivation": {
+     "n_shared": 0,
+     "ratio": null,
+     "underived": true,
+     "state": "NO_SPAN"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:simplification:nvidia:a9b6dfebf878"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "dbb9e2ee8ae2ddaf4f2098e090e5e1a4c575f1d6bff72a591f6a3eb944a005bb",
+   "output_hash": "d21a79021f5af4d17bb66a693c4d29a1217e073aa2e53d6a0031f7c430b615ec",
+   "fields": {
+    "mechanism": "Joule heating, reversible entropic heat, and radiative losses directly incorporated into the model’s loss function.",
+    "intervention": "Embed an enhanced physics‑informed neural network (PINN) into the aircraft lithium‑battery management system that continuously predicts surface temperature using real‑time current, voltage, and ambient data while accounting for Joule heating and radiative heat loss, and automatically limits charge/discharge current when the predicted temperature approaches a safety threshold.",
+    "expected_effect": "Early, accurate temperature prediction enables pre‑emptive current reduction, preventing excessive heat buildup and thus averting thermal runaway during flight.",
+    "falsification_test": "Conduct a flight‑profile test with two identical battery packs—one equipped with the PINN‑based BMS and one with a conventional BMS—subject both to high‑load cycles; verify that the PINN‑enabled pack’s predicted temperature triggers current limiting before temperature exceeds the runaway threshold, while the control pack reaches higher temperatures or exhibits thermal events.",
+    "mechanism_source_span": "Unlike prior PINN approaches, the proposed model incorporates Joule heating, reversible entropic heat, and radiative losses directly into its loss function.",
+    "span_derivation": {
+     "n_shared": 14,
+     "shared_terms": [
+      "approache",
+      "directly",
+      "entropic",
+      "function",
+      "heat",
+      "heating",
+      "into",
+      "joule",
+      "loss",
+      "losse",
+      "model",
+      "pinn",
+      "radiative",
+      "reversible"
+     ],
+     "span_terms_n": 19,
+     "ratio": 0.737,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:nvidia:d21a79021f5a"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "58719a2e13b95d618cc18474aa56f7ff3fe3a1a74d50ed8e2ecdd47aa1dcf819",
+   "output_hash": "8c159a2825bbbe7805172c7e1a653052340c0d7dba31b6f8ae4c74ef20ce7b09",
+   "fields": {
+    "mechanism": "Utilization of reversible entropic heat (entropy‑driven heat generation) as a predictive indicator of temperature rise in lithium‑ion cells.",
+    "intervention": "Embed an enhanced physics‑informed neural network (PINN) that models reversible entropic heat alongside Joule heating and radiative losses into the aircraft battery management system to continuously predict surface temperature and trigger protective actions (e.g., current limiting, cooling) before runaway conditions develop.",
+    "expected_effect": "Early detection of abnormal temperature increase, allowing pre‑emptive control actions that keep cell temperature below critical thresholds, thereby preventing thermal runaway during flight.",
+    "falsification_test": "Conduct a flight‑profile test on aircraft‑grade lithium‑ion batteries with the PINN‑enabled BMS versus a conventional BMS; compare maximum cell temperature and incidence of thermal‑runaway events under induced abuse (high discharge, low‑temperature start‑up). Failure of the PINN system to reduce peak temperature or event frequency falsifies the hypothesis.",
+    "mechanism_source_span": "\"the proposed model incorporates Joule heating, reversible entropic heat, and radiative losses directly into its loss function.\"",
+    "span_derivation": {
+     "n_shared": 9,
+     "shared_terms": [
+      "entropic",
+      "heat",
+      "heating",
+      "into",
+      "joule",
+      "losse",
+      "model",
+      "radiative",
+      "reversible"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.6,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:constraint_first:nvidia:8c159a2825bb"
+  }
+ ],
+ "built_at": "2026-09-02T21:58:44+00:00Z",
+ "usable_candidates": 5,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 5,
+  "mean_pairwise_token_distance": 0.76,
+  "distinct_mechanism_clusters": 5,
+  "cluster_sizes": [
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [],
+  "architecture_term_count": 78,
+  "architecture_terms_sample": [
+   "accounting",
+   "actions",
+   "active",
+   "aircraft",
+   "alongside",
+   "ambient",
+   "apply",
+   "approaches",
+   "attach",
+   "automatically",
+   "battery",
+   "before",
+   "cell",
+   "charge",
+   "coating",
+   "conditions",
+   "continuously",
+   "cooling",
+   "current",
+   "data",
+   "develop",
+   "discharge",
+   "dissipation",
+   "during"
+  ],
+  "failure_mode_signal_count": 4,
+  "failure_modes_invoked_sample": [
+   "coolant/flow path blockage (if active)",
+   "hotspot exceeding material/safety limit",
+   "interface delamination raising resistance over life",
+   "thermal runaway coupling to electronics"
+  ],
+  "prior_art_query_set_count": 5,
+  "detected_domain": "thermal"
+ }
+}
