@@ -411,12 +411,21 @@ def probe_p6(base: str) -> Dict[str, Any]:
             "raw_ref": len(RAW) - 1}
 
 
-def probe_p7(base: str) -> Dict[str, Any]:
+def probe_p7(base: str, case_filter: Optional[set] = None,
+             on_case=None) -> Dict[str, Any]:
     """The 18-case benchmark against the deployed host. The exact
     problems mirror tests/test_r394_benchmark.py (the permanent
     benchmark), executed through the PUBLIC product surface — CI
-    results are not production acceptance (R396 Phase C/F)."""
+    results are not production acceptance (R396 Phase C/F).
+
+    R400 addition: case_filter (a set of 1-based case indexes) runs a
+    subset so long benchmarks execute in resumable batches through
+    bounded tool windows; on_case(results) lets the caller flush each
+    completed case incrementally (a timeout then never loses completed
+    cases). Neither changes any check or verdict semantics."""
     cases = _benchmark_cases()
+    if case_filter:
+        cases = [c for i, c in enumerate(cases, 1) if i in case_filter]
     results = []
     for i, case in enumerate(cases, 1):
         text = case["text"]
@@ -442,15 +451,23 @@ def probe_p7(base: str) -> Dict[str, Any]:
             "final_status": (detail or {}).get("status"),
             "expected": case.get("expected"),
         })
+        if on_case is not None:
+            try:
+                on_case(results)
+            except Exception:  # noqa: BLE001
+                pass
     ok = all(r.get("accepted") is not False for r in results)
     terminal = all(r.get("final_status") or r.get("accepted")
                    for r in results)
-    return {"probe": "P7", "checks": {
-        "all_18_accepted_or_rejected_honestly": ok,
-        "all_reached_terminal_state": terminal,
-        "n_cases": len(cases),
-    }, "pass": ok and terminal, "results": results,
-    "raw_ref": len(RAW) - 1}
+    return {"probe": "P7" if not case_filter else "P7-batch",
+            "case_filter": (sorted(case_filter) if case_filter else None),
+            "checks": {
+                "all_selected_accepted_or_rejected_honestly": ok,
+                "all_selected_reached_terminal_state": terminal,
+                "n_cases": len(cases),
+                "partial": bool(case_filter),
+            }, "pass": ok and terminal, "results": results,
+            "raw_ref": len(RAW) - 1}
 
 
 def _benchmark_cases() -> List[Dict[str, str]]:
@@ -522,6 +539,10 @@ def main() -> int:
     ap.add_argument("--deployed-sha", default="")
     ap.add_argument("--out", default="")
     ap.add_argument("--wait", type=int, default=600)
+    ap.add_argument("--p7-cases", default="",
+                    help="1-based case range for P7 batches, e.g. 1-6 "
+                         "(R400: resumable batches through bounded tool "
+                         "windows; semantics unchanged)")
     args = ap.parse_args()
     probes = {p.strip() for p in args.p.split(",")}
     report: Dict[str, Any] = {
@@ -532,27 +553,55 @@ def main() -> int:
                                      time.gmtime()),
         "probes": [],
     }
-    if "1" in probes:
-        report["probes"].append(probe_p1(args.base, args.deployed_sha))
-    if "2" in probes:
-        report["probes"].append(probe_p2(args.base))
-    if "3" in probes:
-        report["probes"].append(probe_p3(args.base))
-    if "4" in probes:
-        report["probes"].append(probe_p4(args.base))
-    if "5" in probes:
-        report["probes"].append(probe_p5(args.base))
-    if "6" in probes:
-        report["probes"].append(probe_p6(args.base))
-    if "7" in probes:
-        report["probes"].append(probe_p7(args.base))
-    report["finished_utc"] = time.strftime("%Y-%m-%dT%H:%M:%SZ",
-                                           time.gmtime())
-    report["all_pass"] = all(p.get("pass") for p in report["probes"])
-    report["raw"] = RAW
     out = Path(args.out or REPO_ROOT / "R396" / "EXTERNAL_PROBES.json")
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report, indent=1, default=str))
+
+    def _flush(finished: bool = False) -> None:
+        """R400: write the report (incl. raw exchanges) after every
+        probe so an interrupted long suite keeps its completed records
+        (Art. XV — a timeout is recorded, never discarded)."""
+        if finished:
+            report["finished_utc"] = time.strftime(
+                "%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+            report["all_pass"] = all(p.get("pass")
+                                     for p in report["probes"])
+        report["raw"] = list(RAW)
+        out.write_text(json.dumps(report, indent=1, default=str))
+
+    if "1" in probes:
+        report["probes"].append(probe_p1(args.base, args.deployed_sha))
+        _flush()
+    if "2" in probes:
+        report["probes"].append(probe_p2(args.base))
+        _flush()
+    if "3" in probes:
+        report["probes"].append(probe_p3(args.base))
+        _flush()
+    if "4" in probes:
+        report["probes"].append(probe_p4(args.base))
+        _flush()
+    if "5" in probes:
+        report["probes"].append(probe_p5(args.base))
+        _flush()
+    if "6" in probes:
+        report["probes"].append(probe_p6(args.base))
+        _flush()
+    if "7" in probes:
+        cf: Optional[set] = None
+        if args.p7_cases:
+            a, _, b = args.p7_cases.partition("-")
+            lo, hi = int(a or 1), int(b or a or 18)
+            cf = set(range(lo, hi + 1))
+
+        def _p7_case_flush(r: list) -> None:
+            report["p7_partial_results"] = list(r)
+            _flush()
+
+        report["probes"].append(
+            probe_p7(args.base, case_filter=cf, on_case=_p7_case_flush))
+        report.pop("p7_partial_results", None)
+        _flush()
+    _flush(finished=True)
     print(json.dumps({k: v for k, v in report.items()
                       if k != "raw"}, indent=1, default=str))
     print(f"\nraw exchanges preserved -> {out}")

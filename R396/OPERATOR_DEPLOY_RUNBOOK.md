@@ -75,12 +75,30 @@ Must show:
 
 ## 5. External acceptance probes (P1–P7)
 
+**R400: ONE COMMAND now runs the entire live acceptance** (P1 identity
+with the pinned SHA target, P2 isolation, P3 premise gate, P4
+incomplete-search gate, P5 relevance ×2, P6 determinism ×3, P7
+18-case benchmark in resumable batches of 3, AND the R400-C
+production physics chain run with the full 12-field capture contract
+— every completed unit flushed to disk, a timeout never loses
+records, non-affirmative states never converted):
+
 ```bash
 cd discovery-evidence-fabric
+python3 scripts/r400_post_deploy_acceptance.py
+```
+
+Or run them individually (same public-host contract, no local
+substitution):
+
+```bash
 python3 scripts/r396_external_probes.py \
   --base https://toscanini-engine-docker.onrender.com \
   --deployed-sha 930eca8b7db8b0885abccb4e8159a77b8e802723 \
-  --out R396/EXTERNAL_PROBES_73b89df3.json
+  --out R400/LIVE_PROBES_<name>_postdeploy.json        # --p 1..7
+python3 scripts/r400_production_chain_run.py \
+  --base https://toscanini-engine-docker.onrender.com \
+  --out R400/PRODUCTION_PHYSICS_RUN_live_postdeploy.json
 ```
 
 P1–P7 then run against the live host (P3 false-premise canary, P4
@@ -90,4 +108,8 @@ it — this is the Phase 1 acceptance record ("CI is not acceptance").
 
 Baseline for comparison: `R396/EXTERNAL_PROBES_BASELINE_f9dfd45d.json` (the
 pre-deployment honest failure record — P1 env-asserted identity, P2 metadata
-leakage, which this deployment closes).
+leakage, which this deployment closes). R400's same-day pre-deploy
+re-measurement of the live f9dfd45d host is preserved in
+`R400/LIVE_PROBES_*_f9dfd45d_predeploy.json` (P1/P2/P3/P4/P6 FAIL,
+P5 PASS, P7 all-18-terminal — every failure classified, none
+converted).
