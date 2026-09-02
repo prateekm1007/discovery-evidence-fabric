@@ -558,9 +558,15 @@ def diagram_P07(name="P-07"):
     ax.text(5.75, 2.15, "Passive Floor Bypass Channel", ha='center', va='center',
             fontsize=8, color=EV_PHYSICAL, fontweight='bold')
 
-    # Pressure-triggered arrow from lumen to bypass
+    # Pressure-triggered arrow from lumen to bypass — R394 fix: the
+    # canonical record (V3 corrections, P-07_V3_CORRECTIONS.json) removed
+    # the pressure-activated-switch semantics: the floor is PERMANENTLY
+    # OPEN and drainage shifts by differential conductance as the
+    # primary lumen's conductance collapses. The arrow now states the
+    # implemented physics; 'pressure-activated' had no recorded basis.
     _arrow(ax, 5.75, 3.5, 5.75, 2.5, color=EV_PHYSICAL, lw=1.4,
-           label="pressure-activated", label_size=7, label_offset=(1.0, 0))
+           label="differential conductance (passive)", label_size=7,
+           label_offset=(1.0, 0))
 
     # Bypass to drainage outlet
     _arrow(ax, 8.5, 2.15, 10.5, 2.15, color=EV_PHYSICAL, lw=1.4,
@@ -570,10 +576,16 @@ def diagram_P07(name="P-07"):
     _block(ax, 10.15, 3.7, 0.75, 1.8, "Out", color=INK_500, bg=INK_100,
            label_color="white", fontsize=8)
 
-    # Annotation: P-03 failure mode
+    # Annotation: P-03 failure mode — R394 fix: line 2 now states the
+    # corrected P-07 mechanism (permanently open larger bypass channel,
+    # passive differential conductance, no moving parts); the old
+    # 'pressure-threshold-activated floor (semi-active)' wording was
+    # removed from the canonical record by the V3 corrections and had
+    # become an untraced label.
     ax.text(0.4, 1.2,
             "P-03 (related) FALSIFIED: floor 0.001 mL/min/mmHg.\n"
-            "P-07 redesign: pressure-threshold-activated floor (semi-active), larger bypass channel.",
+            "P-07: permanently open bypass channel (passive differential "
+            "conductance; no moving parts).",
             fontsize=7.5, color=INK_700, style='italic',
             bbox=dict(boxstyle="round,pad=0.3", facecolor=INK_100,
                       edgecolor=INK_300, linewidth=0.5))

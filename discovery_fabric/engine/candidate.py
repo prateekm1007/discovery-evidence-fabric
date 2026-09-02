@@ -22,6 +22,12 @@ ENVELOPE_FIELDS = [
     "candidate_id", "problem_id", "problem",
     "evidence_ids", "evidence",
     "mechanism_ids", "mechanism_map",
+    # R394 s6: the premise-gate verdict travels in the envelope (a
+    # false premise is a first-class recorded outcome, not a log line)
+    "premise_gate",
+    # R394 s5: claim-level evidence classification (per-item classes
+    # + five relevance dimensions) travels with the evidence
+    "evidence_classification",
     "prior_art_ids", "prior_art",
     "collision_results",
     "attack_results",
@@ -61,6 +67,8 @@ class Candidate:
     evidence: List[Dict[str, Any]] = field(default_factory=list)
     mechanism_ids: List[str] = field(default_factory=list)
     mechanism_map: Dict[str, Any] = field(default_factory=dict)
+    premise_gate: Dict[str, Any] = field(default_factory=dict)
+    evidence_classification: Dict[str, Any] = field(default_factory=dict)
     prior_art_ids: List[str] = field(default_factory=list)
     prior_art: Dict[str, Any] = field(default_factory=dict)
     collision_results: Dict[str, Any] = field(default_factory=dict)

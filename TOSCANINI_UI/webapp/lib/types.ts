@@ -19,6 +19,22 @@ export interface SessionRow {
   problem_id: string | null;
   final_status: string | null;
   origin: string;
+  user_state_view?: UserStateView;
+}
+
+// R394/R395: the user-facing run state — derived backend-side from the
+// session record's own fields. The UI renders THIS, never raw
+// machine-state combinations (COMPLETE + REJECTED etc.).
+export interface UserStateView {
+  user_state: string;
+  label: string;
+  meaning: string;
+  decision: string;
+  finished: boolean;
+  found_something: boolean;
+  rejected: boolean;
+  package_available: boolean;
+  machine_status?: string;
 }
 
 export interface StageDigest {
@@ -65,6 +81,28 @@ export interface SessionDetail {
   decisive_experiment?: Record<string, unknown>;
   evidence_pack?: { retrieval?: { source?: string; title?: string }[] };
   cemetery_update?: Record<string, unknown>;
+  user_state_view?: UserStateView;
+}
+
+// R395: conversational Q&A over a run's / invention's own artifacts.
+// status: ANSWERED (answer present) / NOT_IN_RECORD (honest refusal) /
+// REFUSED_OVERCLAIM (reality-boundary guard) / REFUSED (run not
+// finished) / TRANSPORT_ERROR / BAD_QUESTION.
+export interface AskResponse {
+  status: string;
+  answer?: string;
+  reason?: string;
+  epistemic_class?: string;
+  basis?: string;
+  transport?: { provider?: string; model?: string };
+}
+
+// R395: the honest engine health, for the workspace status dot.
+export interface HealthSummary {
+  llm_transport_ready?: boolean;
+  portfolio_ready?: boolean;
+  engine_commit?: string;
+  durable?: { last_snapshot?: { at?: string; pushed?: boolean } };
 }
 
 export interface PackageInfo {
@@ -111,6 +149,8 @@ export interface ShowcaseDetail {
   package_id: string;
   title: string;
   blurb: string;
+  domain?: string;
+  demo_focus?: boolean;
   brief?: BriefSections;
   maturity?: string | null;
   maturity_basis?: string | null;
@@ -125,7 +165,14 @@ export interface ShowcaseDetail {
   parameters: ShowcaseParam[];
   key_dimensions: Record<string, Record<string, unknown>>;
   loop_verification_state?: string;
-  model: { glb: string; glb_path: string | null };
+  model: {
+    glb: string;
+    glb_path: string | null;
+    step?: string[];
+    stl?: string[];
+    svg_views?: string[];
+    downloads?: { step?: string; stl?: string; glb?: string };
+  };
   dossier: { pdfs: string[]; download: string };
   provenance_note?: string;
 }

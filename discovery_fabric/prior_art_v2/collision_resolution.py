@@ -991,7 +991,55 @@ def coverage_decision(profile: CandidateProfile,
 RESOLVED_STATES = ("RESOLVED_DIFFERENTIATED", "RESOLVED_ANTICIPATED")
 UNRESOLVED_STATES = ("UNRESOLVED_INSUFFICIENT_EVIDENCE",
                      "UNRESOLVED_NO_RELEVANT_ART",
-                     "UNRESOLVED_PARTIAL_EVIDENCE")
+                     "UNRESOLVED_PARTIAL_EVIDENCE",
+                     "UNRESOLVED_SEARCH_INCOMPLETE")
+
+# R394 section 3: the relevance-instrument identity. Persisted in every
+# resolution record and every adjudication so the determinism contract
+# is checkable: same problem + source snapshot + query + THIS model
+# version + THESE thresholds must yield the same relevance decision.
+RELEVANCE_MODEL_VERSION = "collision_resolution/2.0.0"
+
+
+def mandatory_searches_complete(errors: List[Dict[str, Any]],
+                                ladder: List[Dict[str, Any]],
+                                sources: Optional[List[str]] = None) -> Dict[str, Any]:
+    """R394 section 2: which (ladder query class x source) pairs are
+    MANDATORY search dependencies for a positive differentiation claim,
+    and whether every one of them completed successfully.
+
+    Rule (declared, fail-closed): every query class in the ladder that
+    was ATTEMPTED against every configured source is mandatory. A pair
+    is complete when its search returned without error (hits or a
+    legitimate zero). Any error on any mandatory pair makes the search
+    universe incomplete -> positive differentiation is FORBIDDEN.
+
+    The deployed-production defect this closes (R394/PRODUCTION_AUDIT
+    claim 4, CONFIRMED_CURRENT): run ts_d1ab9fd4d756 claimed
+    RESOLVED_DIFFERENTIATED while 5 of 10 ladder searches had FAILED —
+    resolve_differentiation never consulted search_errors and
+    run_collision computed searches_succeeded = bool(hits) or not
+    errors (one surviving query 'succeeded' the whole search).
+    """
+    sources = sources or ["google_patents", "lens_patent"]
+    n_pairs = len(ladder) * len(sources)
+    n_err = len(errors)
+    complete = (n_err == 0) and n_pairs > 0
+    failed_pairs = [
+        {"query": e.get("query", ""), "source": e.get("source"),
+         "error": str(e.get("error", ""))[:200]}
+        for e in errors]
+    return {
+        "mandatory_pairs": n_pairs,
+        "failed_pairs": n_err,
+        "complete": complete,
+        "failed": failed_pairs,
+        "rule": ("every attempted (query_class x source) pair must "
+                 "complete successfully before RESOLVED_DIFFERENTIATED "
+                 "is permitted (R394 s2; a partial search cannot "
+                 "support a no-covering-art claim)"),
+        "relevance_model_version": RELEVANCE_MODEL_VERSION,
+    }
 
 
 def resolve_differentiation(families: List[Dict[str, Any]],
@@ -1000,22 +1048,35 @@ def resolve_differentiation(families: List[Dict[str, Any]],
                             searches_succeeded: bool,
                             deep_fetch: bool = True,
                             precomputed: Optional[List[Dict[str, Any]]] = None,
+                            search_incomplete: Optional[bool] = None,
                             ) -> Dict[str, Any]:
     """Decide the prior-art position with per-family evidence.
 
     RESOLVED_ANTICIPATED    some family shows FULL_COVER at >= ABSTRACT
                             tier — the candidate's distinguishing core is
                             already covered (specific-disclosure-class
-                            evidence; kill-grade at CLASSIFY)
+                            evidence; kill-grade at CLASSIFY). May stand
+                            on a PARTIALLY failed search: the covering
+                            family is found art regardless of whether
+                            other searches ran; the incompleteness is
+                            disclosed, never silently dropped.
     RESOLVED_DIFFERENTIATED every family adjudicated at >= ABSTRACT tier,
-                            no family covers the core — the position is
-                            resolved with surviving differentiators
+                            no family covers the core, AND every
+                            mandatory (query_class x source) search
+                            completed successfully (R394 s2: a failed
+                            mandatory search forbids the no-covering-art
+                            claim this state makes)
+    UNRESOLVED_SEARCH_INCOMPLETE  some mandatory search failed: the
+                            searched universe is incomplete; findings
+                            stand as evidence but NO position may be
+                            claimed (R394 s2 — the state that replaces
+                            the measured false RESOLVED_DIFFERENTIATED)
     UNRESOLVED_PARTIAL_EVIDENCE  families exist but at least one is stuck
                             at TITLE tier (evidence too thin to decide)
     UNRESOLVED_NO_RELEVANT_ART   searches succeeded, nothing relevant
                             (zero hits is NOT novelty — Art. XXI.2)
-    UNRESOLVED_INSUFFICIENT_EVIDENCE  all searches failed (provider
-                            failures are not absence — Art. XXI.3)
+    UNRESOLVED_INSUFFICIENT_EVIDENCE  no search succeeded at all
+                            (provider failures are not absence — Art. XXI.3)
 
     `precomputed` (R378 technical-improvement-engine re-adjudication
     path): a list of family records whose evidence was ALREADY fetched
@@ -1030,6 +1091,12 @@ def resolve_differentiation(families: List[Dict[str, Any]],
     checks — never inherit the parent's score).
     """
     per_family: List[Dict[str, Any]] = []
+    # R394 section 2: the mandatory-search gate. `search_incomplete`
+    # may be supplied by callers that replay precomputed evidence (the
+    # searches were NOT re-run; the recorded completeness governs).
+    search_incomplete = (search_incomplete
+                         if search_incomplete is not None
+                         else bool(search_errors))
     if precomputed is not None:
         for fam in precomputed:
             rep: PatentHit = fam["representative"]
@@ -1090,8 +1157,17 @@ def resolve_differentiation(families: List[Dict[str, Any]],
     full_cover = [f for f in per_family
                   if f["coverage"]["coverage_class"] == "FULL_COVER"]
     tier_rank = {"TITLE": 0, "ABSTRACT": 1, "CLAIMS": 2}
+    # R394 s2 state machine — the order is load-bearing:
+    #   1. a KILL (anticipation) may stand on found art even when the
+    #      search was incomplete (more search cannot un-find covering
+    #      art; the incompleteness is disclosed alongside);
+    #   2. any mandatory-search failure FORBIDS the positive
+    #      differentiation claim (UNRESOLVED_SEARCH_INCOMPLETE);
+    #   3. only then do tier/resolution checks apply.
     if full_cover and all(tier_rank[t] >= 1 for t in tiers):
         state = "RESOLVED_ANTICIPATED"
+    elif search_incomplete and searches_succeeded:
+        state = "UNRESOLVED_SEARCH_INCOMPLETE"
     elif per_family and all(tier_rank[t] >= 1 for t in tiers):
         state = "RESOLVED_DIFFERENTIATED"
     elif per_family:
@@ -1116,6 +1192,25 @@ def resolve_differentiation(families: List[Dict[str, Any]],
         "per_family": per_family,
         "n_families": len(per_family),
         "n_search_errors": len(search_errors),
+        "search_errors": search_errors[:12],
+        "search_execution": {
+            "mandatory_complete": not search_incomplete,
+            "n_errors": len(search_errors),
+            "rule": ("RESOLVED_DIFFERENTIATED requires every mandatory "
+                     "(query_class x source) search to have completed "
+                     "successfully (R394 s2); provider failure never "
+                     "becomes absence (Art. XXI.3)"),
+        },
+        "relevance_model_version": RELEVANCE_MODEL_VERSION,
+        "determinism_contract": {
+            "inputs": ("problem + candidate profile + query ladder + "
+                       "source results (per-family adjudicated text, "
+                       "hash-custodied) + thresholds + relevance model "
+                       "version"),
+            "check": ("identical inputs must yield identical coverage "
+                      "decisions and state; divergence on replay is "
+                      "FLAG_INCONSISTENT_RETRIEVAL (R394 s3)"),
+        },
         "thresholds": THRESHOLDS,
     }
     if state == "RESOLVED_ANTICIPATED":
@@ -1125,6 +1220,13 @@ def resolve_differentiation(families: List[Dict[str, Any]],
             "specific-disclosure-class evidence found by search; "
             "CLASSIFY treats this as a prior-art kill with the evidence "
             "recorded here")
+        if search_incomplete:
+            resolution["search_incomplete_disclosure"] = (
+                "the kill stands on the found covering family (found art "
+                "is art regardless of other searches); other mandatory "
+                "searches FAILED and are recorded in search_errors — "
+                "the search universe is incomplete, which only matters "
+                "for absence/differentiation claims (R394 s2)")
     if state == "RESOLVED_DIFFERENTIATED":
         surviving = set()
         for f in per_family:
@@ -1162,10 +1264,20 @@ def run_collision(mechanism_map: Dict[str, Any],
     term_collisions = [h for h, a in zip(hits, adjudications)
                        if a["verdict"] == "CROSS_DOMAIN_TERM_COLLISION"]
     families = cluster_families(relevant, adjudications)
-    searches_succeeded = bool(hits) or not errors
+    # R394 s2: 'searches_succeeded' now means AT LEAST ONE mandatory
+    # (query_class x source) pair completed without error — hit count is
+    # irrelevant to execution success. The old `bool(hits) or not
+    # errors` made a single surviving query 'succeed' the entire search
+    # while five mandatory pairs had failed (measured on production,
+    # ts_d1ab9fd4d756: RESOLVED_DIFFERENTIATED with 5/10 errors).
+    sources_used = sources or ["google_patents", "lens_patent"]
+    n_pairs = len(ladder) * len(sources_used)
+    searches_succeeded = n_pairs > 0 and len(errors) < n_pairs
+    mandatory = mandatory_searches_complete(errors, ladder, sources_used)
     resolution = resolve_differentiation(
         families, profile, errors, searches_succeeded,
-        deep_fetch=deep_fetch)
+        deep_fetch=deep_fetch,
+        search_incomplete=not mandatory["complete"])
 
     # nearest prior art = family representatives (mechanism-relevant by
     # construction, per-family evidence tiers recorded)
@@ -1195,8 +1307,10 @@ def run_collision(mechanism_map: Dict[str, Any],
         novelty_risk = "ADJACENT_COLLISION_CANDIDATES"
     elif nearest:
         novelty_risk = "ADJACENT_COLLISION_CANDIDATES"
-    elif errors and not hits:
+    elif errors and not searches_succeeded:
         novelty_risk = "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+    elif errors:
+        novelty_risk = "UNRESOLVED_SEARCH_INCOMPLETE"
     elif searches_succeeded:
         novelty_risk = "SEARCHED_NO_DIRECT_TITLE_MATCH"
     else:
@@ -1261,6 +1375,7 @@ def run_collision(mechanism_map: Dict[str, Any],
             "family_size": len(f["members"]),
             "member_patent_ids": [m.patent_id for m in f["members"]],
         } for f in families],
+        "mandatory_searches": mandatory,
         "differentiation_resolution": resolution,
         "nearest_prior_art": nearest,
         "nearest_prior_art_note": (
@@ -1272,4 +1387,94 @@ def run_collision(mechanism_map: Dict[str, Any],
         "prior_art_status": resolution["state"],
         "actions": (["inspect_nearest_claims"] if nearest
                     else ["expand_search_sources"]),
+    }
+
+
+# ---------------------------------------------------------------------------
+# R394 section 3 — deterministic relevance: the replay-consistency check
+# ---------------------------------------------------------------------------
+
+def check_replay_consistency(mechanism_map: Dict[str, Any],
+                             problem: Dict[str, Any],
+                             recorded_resolution: Dict[str, Any],
+                             ) -> Dict[str, Any]:
+    """Re-run the deterministic adjudication over a RECORDED resolution
+    and compare. R394 section 3:
+
+      'Same problem + source snapshot + retrieval query +
+       relevance-model version + threshold must yield the same
+       relevance decision... If two identical runs produce different
+       evidence judgments from identical evidence: FLAG_INCONSISTENT_
+    RETRIEVAL. Do not silently choose one.'
+
+    The relevance decision is a pure function of (candidate profile,
+    per-family adjudicated text, thresholds, model version). This check
+    rebuilds the profile from the recorded mechanism map, re-derives the
+    coverage decision for every recorded family from its custody-hashed
+    adjudicated text, and compares against the recorded decisions.
+
+    Returns {consistent: bool, flag: FLAG_INCONSISTENT_RETRIEVAL|None,
+    divergences: [...]}. PURE FUNCTION — no network, no LLM, no clock.
+    """
+    profile = build_candidate_profile(mechanism_map, problem)
+    recorded_version = recorded_resolution.get("relevance_model_version")
+    divergences: List[Dict[str, Any]] = []
+
+    if recorded_version != RELEVANCE_MODEL_VERSION:
+        divergences.append({
+            "field": "relevance_model_version",
+            "recorded": recorded_version,
+            "recomputed": RELEVANCE_MODEL_VERSION,
+            "basis": ("the recorded decision was produced by a different "
+                      "relevance model — not comparable without the "
+                      "recorded model's code (disclosed, not silently "
+                      "re-judged)"),
+        })
+
+    for fam in (recorded_resolution.get("per_family") or []):
+        fam_text = str(fam.get("adjudicated_text_excerpt") or "")
+        cov_rec = fam.get("coverage") or {}
+        cov_new = coverage_decision(profile, fam_text)
+        for key in ("coverage_class", "coverage_ratio",
+                    "distinguishing_terms_surviving"):
+            a, b = cov_rec.get(key), cov_new.get(key)
+            if a != b:
+                divergences.append({
+                    "family_id": fam.get("family_id"),
+                    "field": f"coverage.{key}",
+                    "recorded": a,
+                    "recomputed": b,
+                    "basis": ("identical profile + identical custody-"
+                              "hashed family text produced a different "
+                              "relevance decision — the determinism "
+                              "contract is violated"),
+                })
+        # custody check: the excerpt must still hash to the recorded
+        # sha256 (truncation caveat: the excerpt is capped at 1200 chars
+        # so the hash binds the EXCERPT, disclosed as such)
+        recorded_sha = fam.get("adjudicated_text_sha256")
+        if recorded_sha:
+            import hashlib as _h
+            recomputed_sha = _h.sha256(
+                fam_text.encode("utf-8", errors="ignore")).hexdigest()
+            if recomputed_sha != recorded_sha:
+                divergences.append({
+                    "family_id": fam.get("family_id"),
+                    "field": "adjudicated_text_sha256",
+                    "recorded": recorded_sha,
+                    "recomputed": recomputed_sha,
+                    "basis": "the adjudicated text changed after the "
+                             "decision was recorded",
+                })
+
+    consistent = not divergences
+    return {
+        "consistent": consistent,
+        "flag": None if consistent else "FLAG_INCONSISTENT_RETRIEVAL",
+        "n_divergences": len(divergences),
+        "divergences": divergences[:20],
+        "relevance_model_version": RELEVANCE_MODEL_VERSION,
+        "rule": ("identical inputs must yield identical relevance "
+                 "decisions; any divergence is FLAGGED, never silently "
+                 "resolved (R394 s3)"),
     }

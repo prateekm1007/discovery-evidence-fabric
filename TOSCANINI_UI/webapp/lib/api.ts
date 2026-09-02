@@ -9,7 +9,9 @@
 // service, so no CORS and no internal-module coupling.
 
 import type {
+  AskResponse,
   EvalResult,
+  HealthSummary,
   RealityLoopRecord,
   Refusal,
   SessionDetail,
@@ -31,6 +33,39 @@ async function json<T>(res: Response): Promise<T> {
     throw new Error(`${res.status} ${res.statusText} ${detail}`.trim());
   }
   return res.json() as Promise<T>;
+}
+
+// R395: the ask endpoint returns the answer INSIDE a 200 body even for
+// honest refusals (NOT_IN_RECORD etc.) — only transport/protocol-level
+// failures are HTTP errors. This keeps the honest states first-class.
+export async function askRun(id: string, question: string): Promise<AskResponse> {
+  return json<AskResponse>(
+    await fetch(`/api/run/${id}/ask`, {
+      method: "POST",
+      headers: JSON_HEADERS,
+      body: JSON.stringify({ question }),
+    })
+  );
+}
+
+export async function askInvention(slot: string, question: string): Promise<AskResponse> {
+  return json<AskResponse>(
+    await fetch(`/api/showcase/${slot}/ask`, {
+      method: "POST",
+      headers: JSON_HEADERS,
+      body: JSON.stringify({ question }),
+    })
+  );
+}
+
+export async function getHealth(): Promise<HealthSummary | null> {
+  try {
+    return await json<HealthSummary>(
+      await fetch("/api/health", { cache: "no-store" })
+    );
+  } catch {
+    return null;
+  }
 }
 
 export async function listSessions(): Promise<SessionRow[]> {

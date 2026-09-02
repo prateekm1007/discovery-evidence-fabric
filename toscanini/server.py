@@ -26,6 +26,7 @@ import sys
 import time
 import threading
 import urllib.parse
+import uuid
 from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -75,6 +76,10 @@ def _resolve_engine_commit() -> tuple:
 
 ENGINE_COMMIT, ENGINE_COMMIT_SOURCE = _resolve_engine_commit()
 PORTFOLIO_COMMIT_PINNED = (os.environ.get("PORTFOLIO_COMMIT") or "").strip()
+# R394 s15: the operator key — callers presenting it see every session
+# (enterprise operator path; set ENGINE_OPERATOR_KEY on the service).
+OPERATOR_KEY = (os.environ.get("ENGINE_OPERATOR_KEY") or "").strip()
+OWNER_COOKIE = "tosca_owner"
 
 # R391 (deployment): same-origin static webapp. When the Docker image
 # builds the Next.js export into TOSCANINI_UI/webapp-export/, the engine
@@ -99,7 +104,12 @@ def _health_payload() -> dict:
     """R392 directive 2: the honest, machine-readable readiness split.
     Built from REAL state — live git reads, the transport probe cache
     (a genuine completion), the durable store's own bookkeeping. Nothing
-    here is derived from a summary (Art. XXIV)."""
+    here is derived from a summary (Art. XXIV).
+    R394 s1 adds the DEPLOYMENT IDENTITY ASSERTION: the health endpoint
+    must expose enough information to prove, without secrets, that
+    DEPLOYED_ENGINE_COMMIT == INTENDED_ENGINE_COMMIT and that the
+    running build matches the deployment record — with an explicit
+    DEPLOYMENT_DRIFT verdict (GREEN / RED), never a silent mismatch."""
     portfolio_ready = bool(show.DOWNLOAD_ROOT.exists())
     portfolio_actual = show.portfolio_commit()
     transport = gw.transport_snapshot()
@@ -112,6 +122,48 @@ def _health_payload() -> dict:
     engine_ready = bool(ENGINE_COMMIT)
     transport_configured = transport.get("status") in (
         "EXTERNAL", "UP", "ALREADY_UP", "LOCAL_CONFIGURED")
+
+    # ---- R394 s1: deployment identity assertion -----------------------
+    live_head = _git_head()
+    baked = REPO_ROOT / "ENGINE_COMMIT.txt"
+    image_baked = ""
+    if baked.exists():
+        v = baked.read_text().strip()
+        if v and v != "BUILD_CONTEXT_NO_GIT":
+            image_baked = v
+    # The INTENDED engine commit is the deployment configuration env
+    # (ENGINE_COMMIT). The RUNNING identity is what this process
+    # actually resolved. Drift is RED when the running resolution
+    # disagrees with the intended pin, or when the image-baked commit
+    # (when present) disagrees with the running commit.
+    running = ENGINE_COMMIT
+    drift_reasons = []
+    if not running:
+        drift_reasons.append("engine commit unresolved")
+    if image_baked and running and image_baked != running:
+        drift_reasons.append(
+            f"image_baked={image_baked[:12]} != running={running[:12]}")
+    if ENGINE_COMMIT_SOURCE == "git" and os.environ.get("PORT"):
+        drift_reasons.append(
+            "hosted deployment resolved engine commit from live git, "
+            "not the deployment pin — set ENGINE_COMMIT (R392 pin contract)")
+    deployment_identity = {
+        "intended_engine_commit": (os.environ.get("ENGINE_COMMIT")
+                                    or None),
+        "running_engine_commit": running or None,
+        "running_engine_commit_source": ENGINE_COMMIT_SOURCE,
+        "image_baked_commit": image_baked or None,
+        "live_git_head": live_head or None,
+        "portfolio_commit_pinned": PORTFOLIO_COMMIT_PINNED or None,
+        "portfolio_commit_running": portfolio_actual,
+        "deployment_drift": "RED" if drift_reasons else "GREEN",
+        "drift_reasons": drift_reasons,
+        "rule": ("DEPLOYED_ENGINE_COMMIT == INTENDED_ENGINE_COMMIT and "
+                 "RUNNING_BUILD_ID == DEPLOYMENT_RECORD; drift is RED "
+                 "=> the release is NOT healthy regardless of other "
+                 "readiness fields (R394 s1)"),
+    }
+
     return {
         "ok": True, "status": "ok", "service": "toscanini",
         # legacy keys (R391 contract) kept for the Render healthcheck
@@ -119,11 +171,14 @@ def _health_payload() -> dict:
         "transport": transport.get("base_url") or "local",
         "portfolio_ready": portfolio_ready,
         "gateway_up": gw.gateway_up(),
+        # R394 s1: the deployment identity assertion
+        "deployment_identity": deployment_identity,
         # R392 readiness split (directive 2)
         "readiness": {
             "engine_ready": engine_ready,
             "engine_commit": ENGINE_COMMIT,
             "engine_commit_source": ENGINE_COMMIT_SOURCE,
+            "deployment_drift": deployment_identity["deployment_drift"],
             "portfolio_ready": portfolio_ready,
             "portfolio_commit": portfolio_actual,
             "portfolio_commit_pinned": PORTFOLIO_COMMIT_PINNED or None,
@@ -161,12 +216,49 @@ def _durable_state() -> dict:
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
+    # ------------------------------------------------------------ owner
+    # R394 s15: opaque cookie-scoped ownership. The key is NOT an identity
+    # — it is a capability token issued on first visit (httpOnly, no
+    # personal data). Sessions created by a caller are owned by that
+    # key; reads are scoped to owned + explicitly-public sessions. The
+    # operator key (env, also acceptable via X-Operator-Key header)
+    # grants full visibility for operations.
+    def _owner_key(self) -> str:
+        """Resolve the caller's owner key: cookie, else X-Operator-Key,
+        else a fresh key (recorded so the response can set the cookie)."""
+        cookie = self.headers.get("Cookie") or ""
+        for part in cookie.split(";"):
+            k, _, v = part.strip().partition("=")
+            if k == OWNER_COOKIE and v:
+                return v[:64]
+        hdr = self.headers.get("X-Operator-Key") or ""
+        if hdr and OPERATOR_KEY and hdr == OPERATOR_KEY:
+            return OPERATOR_KEY
+        new_key = uuid.uuid4().hex
+        self._pending_owner_cookie = new_key
+        return new_key
+
+    def _access(self, session_id: str) -> Optional[str]:
+        return store.session_access(session_id, self._owner_key_cached,
+                                    OPERATOR_KEY)
+
+    def _denied(self):
+        # 404 (not 403): a denied caller learns nothing about whether
+        # the session exists (enumeration-safe privacy)
+        return self._json(404, {"error": "not found"})
+
     # ------------------------------------------------------------------ util
     def _json(self, code: int, payload) -> None:
         body = json.dumps(payload, ensure_ascii=False, default=str).encode()
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
+        if getattr(self, "_pending_owner_cookie", None):
+            self.send_header(
+                "Set-Cookie",
+                f"{OWNER_COOKIE}={self._pending_owner_cookie}; HttpOnly; "
+                "SameSite=Lax; Path=/; Max-Age=31536000")
+            self._pending_owner_cookie = None
         self.end_headers()
         self.wfile.write(body)
 
@@ -186,6 +278,9 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         p = urllib.parse.urlparse(self.path)
         parts = [x for x in p.path.split("/") if x]
+        # R394 s15: resolve the caller's owner capability ONCE per request
+        # (before any handler that needs scoping).
+        self._owner_key_cached = self._owner_key()
 
         if p.path == "/healthz" or p.path == "/api/health":
             # R391: /api/health is the deployment healthcheck alias.
@@ -219,10 +314,21 @@ class Handler(BaseHTTPRequestHandler):
             # eternal spinners, never as success
             interrupted = store.mark_interrupted_sessions()
             stuck = store.mark_stuck_sessions()
-            sessions = store.list_sessions()
-            return self._json(200, {"sessions": sessions,
-                                    "marked_stuck": stuck,
-                                    "marked_interrupted": interrupted})
+            # R394 s15: OWNERSHIP — a caller sees ONLY their own sessions
+            # plus explicitly public demo content. Measured defect this
+            # closes (consultant claim 3, CONFIRMED_CURRENT): anonymous
+            # /api/sessions returned all 32 users' problems with worker
+            # pids and /app filesystem paths.
+            sessions = store.list_sessions_visible_to(
+                self._owner_key_cached, OPERATOR_KEY)
+            # R394 (CEO directive 2/16): every history row carries the
+            # user-facing state projection AND carries NO operational
+            # internals (strip_operational_fields)
+            from toscanini.user_state import public_session_view
+            return self._json(200, {
+                "sessions": [public_session_view(s) for s in sessions],
+                "marked_stuck": stuck,
+                "marked_interrupted": interrupted})
         if p.path == "/api/cemetery":
             return self._json(200, store.cemetery_summary())
 
@@ -238,12 +344,20 @@ class Handler(BaseHTTPRequestHandler):
         if len(parts) >= 3 and parts[0] == "api" and parts[1] == "run":
             rid = parts[2]
             if len(parts) == 4 and parts[3] == "stream":
+                if self._access(rid) == "DENY":
+                    return self._denied()
                 return self._sse(rid)
             if len(parts) == 4 and parts[3] == "result":
+                if self._access(rid) == "DENY":
+                    return self._denied()
                 detail = store.session_detail(rid)
-                return self._json(200, detail) if detail \
-                    else self._json(404, {"error": "not found"})
+                if detail:
+                    from toscanini.user_state import public_session_view
+                    return self._json(200, public_session_view(detail))
+                return self._json(404, {"error": "not found"})
             if len(parts) == 4 and parts[3] == "package":
+                if self._access(rid) == "DENY":
+                    return self._denied()
                 return self._package(rid)
 
         if len(parts) >= 3 and parts[0] == "api" and parts[1] == "showcase":
@@ -270,15 +384,35 @@ class Handler(BaseHTTPRequestHandler):
                 return self._serve_file(
                     show.preview_glb_path(slot, parts[4]),
                     "model/gltf-binary")
+            # R395: first-class geometry downloads — STEP/STL/GLB from
+            # the artifact panel (kind whitelist; 404 honest when absent)
+            if len(parts) == 5 and parts[3] == "download":
+                kind = parts[4]
+                dpath = show.download_path(slot, kind)
+                slot_dir = show._slot_dir(slot)
+                return self._serve_file(
+                    dpath, show.download_mime(kind),
+                    download_name=(
+                        f"{slot_dir.name}.{kind}" if dpath and slot_dir
+                        else None))
 
         if len(parts) >= 3 and parts[0] == "api" and parts[1] == "sessions":
             sid = parts[2]
             if len(parts) == 3:
+                if self._access(sid) == "DENY":
+                    return self._denied()
                 detail = store.session_detail(sid)
-                return self._json(200, detail) if detail else self._json(404, {"error": "not found"})
+                if detail:
+                    from toscanini.user_state import public_session_view
+                    return self._json(200, public_session_view(detail))
+                return self._json(404, {"error": "not found"})
             if len(parts) == 4 and parts[3] == "events":
+                if self._access(sid) == "DENY":
+                    return self._denied()
                 return self._sse(sid)
             if len(parts) == 4 and parts[3] == "package":
+                if self._access(sid) == "DENY":
+                    return self._denied()
                 return self._package(sid)
 
         if len(parts) == 3 and parts[0] == "api" and parts[1] == "share":
@@ -297,6 +431,9 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         p = urllib.parse.urlparse(self.path)
         parts = [x for x in p.path.split("/") if x]
+        # R394 s15: owner capability is resolved for POSTs too (run
+        # creation binds ownership; ask/share/retry are owner-scoped).
+        self._owner_key_cached = self._owner_key()
 
         # R389 Phase 7: /api/run is the CEO's canonical job API name for
         # the SAME discovery start path (one production loop, one worker).
@@ -306,7 +443,8 @@ class Handler(BaseHTTPRequestHandler):
             if len(text) < 15:
                 return self._json(400, {"error": "problem description too short"})
             session = store.create_session(
-                title=text.split("\n")[0][:120], user_text=text)
+                title=text.split("\n")[0][:120], user_text=text,
+                owner_key=self._owner_key_cached)
             # R392 (directive 5): the job exists durably from the moment
             # it is accepted — an immediate restart cannot erase it.
             try:
@@ -315,7 +453,51 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:  # noqa: BLE001 — disclosed via health
                 pass
             self._spawn_worker(session["session_id"])
-            return self._json(200, session)
+            # R394 s15: the response carries the customer projection —
+            # never the owner_key, worker identity, or filesystem paths
+            from toscanini.user_state import public_session_view
+            return self._json(200, public_session_view(session))
+
+        # R395: conversational Q&A over a run's / invention's own
+        # artifacts — honest refusals are 200-body states (the client
+        # renders them as first-class answers), transport/protocol
+        # failures are real HTTP errors.
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "run" \
+                and parts[3] == "ask":
+            body = self._body_json()
+            question = (body.get("question") or "").strip()
+            if not question:
+                return self._json(400, {"error": "question required"})
+            if self._access(parts[2]) == "DENY":
+                return self._denied()
+            detail = store.session_detail(parts[2])
+            if not detail:
+                return self._json(404, {"error": "run not found"})
+            from toscanini.user_state import public_session_view
+            from toscanini import run_qa
+            out = run_qa.answer_about_run(public_session_view(detail),
+                                          question)
+            code = 200 if out["status"] in (
+                "ANSWERED", "NOT_IN_RECORD", "REFUSED_OVERCLAIM",
+                "REFUSED", "BAD_QUESTION") else 503
+            return self._json(code, out)
+
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "showcase" \
+                and parts[3] == "ask":
+            body = self._body_json()
+            question = (body.get("question") or "").strip()
+            if not question:
+                return self._json(400, {"error": "question required"})
+            detail = show.showcase_detail(parts[2])
+            if not detail:
+                return self._json(404, {"error": "no such showcase slot"})
+            reality = show.reality_loop_record(parts[2])
+            from toscanini import run_qa
+            out = run_qa.answer_about_invention(detail, reality, question)
+            code = 200 if out["status"] in (
+                "ANSWERED", "NOT_IN_RECORD", "REFUSED_OVERCLAIM",
+                "REFUSED", "BAD_QUESTION") else 503
+            return self._json(code, out)
 
         # R389 Phase 5: interactive parameter evaluation on a showcase
         # package — real geometry rebuild, honest envelope enforcement.
@@ -340,6 +522,12 @@ class Handler(BaseHTTPRequestHandler):
         if len(parts) == 4 and parts[0] == "api" and parts[1] == "sessions" \
                 and parts[3] == "share":
             sid = parts[2]
+            # R394 s15: publishing a public share is an OWNER action —
+            # a caller cannot expose another user's run. The share
+            # registry itself is unchanged (explicit, deliberate, and
+            # now consent-scoped).
+            if self._access(sid) not in ("OWNER", "PUBLIC"):
+                return self._denied()
             share_id = store.create_share(sid)
             if not share_id:
                 return self._json(404, {"error": "session not found"})
@@ -351,13 +539,16 @@ class Handler(BaseHTTPRequestHandler):
         if len(parts) == 4 and parts[0] == "api" and parts[1] == "sessions" \
                 and parts[3] == "retry":
             sid = parts[2]
+            if self._access(sid) == "DENY":
+                return self._denied()
             result = store.retry_session(sid)
             if result is None:
                 return self._json(404, {"error": "session not found"})
             if "error" in result:
                 return self._json(409, result)
             self._spawn_worker(sid)
-            return self._json(200, result)
+            from toscanini.user_state import public_session_view
+            return self._json(200, public_session_view(result))
 
         return self._json(404, {"error": "no such endpoint"})
 
@@ -600,7 +791,9 @@ class Handler(BaseHTTPRequestHandler):
                                    "ERROR_STUCK", "INTERRUPTED"):
                     detail = store.session_detail(sid)
                     if detail:
+                        from toscanini.user_state import user_state_view
                         send("final", {
+                            "user_state_view": user_state_view(detail),
                             "final_status": detail.get("final_status"),
                             "package": detail.get("package"),
                             "stages": detail.get("stages"),

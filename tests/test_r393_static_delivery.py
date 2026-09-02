@@ -233,7 +233,12 @@ class TestShowcaseBriefPayload:
         assert d["maturity"] == "ENGINEERING_DEFINITION"
         assert isinstance(d["known_blockers"], list) and d["known_blockers"]
         assert "SOURCE_FACT" in d["evidence_class_counts"]
-        assert d["first_decisive_work_package"]["work_package"] == "WP-01"
+        # R394: the decisive work package is DERIVED from the recorded
+        # kill condition (never build_plan[0] list position). For P-07
+        # the kill condition is common-cause obstruction with no
+        # differential immunity -> WP-04 (comparative obstruction
+        # specimens) is the honest decisive experiment.
+        assert d["first_decisive_work_package"]["work_package"] == "WP-04"
 
     def test_no_physical_validation_claim_in_payload(self):
         """Art. XXXVIII guard: the payload must not claim physical

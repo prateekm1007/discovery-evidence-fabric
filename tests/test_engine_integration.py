@@ -142,8 +142,11 @@ def fixture_envelope(attack_overall="PASS"):
 # ----------------------------------------------------------------------
 
 def test_stage_order_is_exact_d8_chain():
+    # R394 s6: PREMISE_GATE is a first-class stage between FREEZE and
+    # SYNTHESIZE (directive: "a first-class discovery stage, not an
+    # adversarial cleanup trick") — the D8 chain is 14 stages.
     assert STAGE_ORDER == [
-        "RETRIEVE", "FREEZE", "SYNTHESIZE", "VERIFY",
+        "RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE", "VERIFY",
         "MULTI_SOURCE_DISCOVERY", "COLLISION", "ATTACK", "CONTRADICTION",
         "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY", "NEXT_BEST_ACTION",
         "RANK"]

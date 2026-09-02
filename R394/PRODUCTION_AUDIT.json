@@ -1,0 +1,72 @@
+{
+  "audit_id": "R394-PRODUCTION-AUDIT",
+  "measured_at": "2026-09-02T10:04-10:12Z",
+  "directive": "R394/R395 EXTERNAL CONSULTANT REPLY RECONCILIATION — section 0",
+  "method": "direct measurement against the public deployment https://toscanini-engine-docker.onrender.com and the local engine repo verified against its remote (Art. XXIII)",
+
+  "production_state": {
+    "github_head_ls_remote": "ab6a028e94b8dc151f06693b31ce08ed1961ca4b",
+    "deployed_engine_commit": "f9dfd45d833f2c443eed556f8529f7650b226d3c",
+    "deployed_engine_commit_source": "deployment_config_env",
+    "deployed_portfolio_commit": "b978e32c6a484fa14d7b42e60f407333612a50d9",
+    "portfolio_pin_match": true,
+    "deployment_drift": "NONE (code-identical): git diff f9dfd45d..ab6a028e touches worklog.md ONLY (+28 lines). Deployed pin is deliberate (autoDeploy off, R393 procedure).",
+    "image_build_identity": "NOT EXPOSED in /api/health beyond engine_commit_source=deployment_config_env; the image-baked commit cross-check is only reported when the build context carried .git (health reported no image_baked source) — gap for section 1 to close",
+    "health_payload_summary": {
+      "ok": true, "service": "toscanini",
+      "transport": "https://integrate.api.nvidia.com/v1/chat/completions",
+      "provider": "nvidia", "model": "openai/gpt-oss-120b",
+      "llm_transport_ready": true,
+      "last_probe": {"status": "OK", "latency_ms": 1471},
+      "portfolio_ready": true,
+      "gateway_up": false,
+      "durable": {"enabled": true, "branch": "runtime-state",
+                  "last_restore": {"at": "2026-09-02T10:03:24Z",
+                                   "sessions": 9, "runs": 9, "evidence": 9}},
+      "server_header": "BaseHTTP/0.6 Python/3.12.14 (Render Docker, cloudflare fronting)"
+    },
+    "durable_sessions_total": 32,
+    "suite_collected": "2226 tests (local, uncommitted R394/R395 tree)",
+    "uncommitted_tree": "prior-session product-surface work (R394 semantics/R395 workspace) present but UNCOMMITTED — not deployed, not claimed; audited separately below"
+  },
+
+  "consultant_claims": [
+    {
+      "claim": "curl/prior-art failure",
+      "classification": "CONFIRMED_CURRENT",
+      "evidence": "GET /api/run/ts_5c6ea3076a42/result -> final_state.failed_stages.MULTI_SOURCE_DISCOVERY = \"FileNotFoundError: [Errno 2] No such file or directory: 'curl'\". Root cause: orchestrator/multi_source_discovery.py::_curl_json shells out to the curl binary; the deployed image (python:3.12-slim) contains no curl. The MULTI_SOURCE_DISCOVERY stage is FAILED_EXPLICIT on every inspected public run (stage log across the durable sessions). Also orchestrator/provider_health_probe.py, orchestrator/triangulation_engine.py, orchestrator/providers/espacenet.py carry the same curl dependency (not on the public run path)."
+    },
+    {
+      "claim": "EuropePMC 504",
+      "classification": "CONFIRMED_CODE_DEFECT / INTERMITTENT_LIVE",
+      "evidence": "Direct measurement: EuropePMC unreachable from the audit host at 10:10Z (connection timeout, 30 s). The deployed host DID reach it at 08:48Z (RETRIEVE OK, 1 record). The release-relevant defect is confirmed by code inspection: discovery_fabric/a2/prior_art.py::search_prior_art_with_queries records per-query SEARCH_FAILED but, when ALL queries fail, still sets prior_art_status = NO_MATCHING_EVIDENCE_FOUND — a provider outage is silently converted into an absence claim (Art. XXI.3 violation, exactly SEARCH_FAILED != NO_MATCH_FOUND). PRIOR_ART_STATUS_MAP then maps NO_MATCHING_EVIDENCE_FOUND -> NO_MATCH_FOUND. Section 2/4 close this."
+    },
+    {
+      "claim": "global session exposure",
+      "classification": "CONFIRMED_CURRENT",
+      "evidence": "Anonymous GET /api/sessions (no auth, no owner token) returned ALL 32 sessions with every user's engineering problem text (user_text), internal worker PID (worker_pid: 117/81/258/223/191...) and internal filesystem paths (run_dir: /app/ENGINE_RUNS/...). Same for GET /api/run/{id}/result. Release blocker for enterprise claims (section 15)."
+    },
+    {
+      "claim": "positive differentiation after failed search",
+      "classification": "CONFIRMED_CURRENT",
+      "evidence": "GET /api/run/ts_d1ab9fd4d756/result: final_status = AUTOMATED_INVENTION_CANDIDATE, prior_art_status = RESOLVED_DIFFERENTIATED, differentiation_resolution.n_search_errors = 5 (five of ten ladder searches FAILED), MULTI_SOURCE_DISCOVERY FAILED_EXPLICIT in the same run. Code root cause (discovery_fabric/prior_art_v2/collision_resolution.py): resolve_differentiation() never consults search_errors on the RESOLVED_DIFFERENTIATED branch, and run_collision computes searches_succeeded = bool(hits) or not errors — a single surviving query makes the whole search 'succeeded' even when the candidate's DISTINGUISHING/MECHANISM ladder steps failed. This is the release-blocking epistemic defect of section 2."
+    },
+    {
+      "claim": "same-input verdict instability",
+      "classification": "CONFIRMED_CURRENT",
+      "evidence": "Identical user_text 'Why do tunneled hemodialysis catheters lose flow patency within weeks of insertion despite flushing...' produced OPPOSITE verdicts on the public deployment: ts_d1ab9fd4d756 (2026-09-02T04:35Z) -> COMPLETE / AUTOMATED_INVENTION_CANDIDATE; ts_f796e7dfd5d0 (2026-09-02T09:29Z) -> COMPLETE / REJECTED. Secondary instability: 'wind turbine gearbox micropitting' -> 1 REJECTED + 3 ERROR_* (ERROR_RUN x2, ERROR_BUILD) across four attempts. Section 3 (deterministic relevance + persisted decision inputs) attacks the adjudication-side variance; LLM-synthesis variance and live corpus drift are disclosed, not denied."
+    },
+    {
+      "claim": "OSTI relevance instability",
+      "classification": "DETERMINISM_GAP_CONFIRMED (live pairing not reproduced this session)",
+      "evidence": "discovery_fabric/source_registry/query_relevance.py::adjudicate_record is deterministic given (record, query) — pure set overlap. The instability mechanism is real: relevance decisions persist NO relevance-model version, NO threshold, NO decision-input hash, and no run-to-run consistency flag; the adjudicated corpus itself drifts live. Section 3 closes the gap: persist source IDs/timestamps/provider/model version/scores/threshold/classification per decision, and flag FLAG_INCONSISTENT_RETRIEVAL when identical inputs yield divergent judgments."
+    }
+  ],
+
+  "uncommitted_prior_session_work": {
+    "present": "26 modified files + R394/ + premium_package_factory/r394/ + toscanini/run_qa.py + toscanini/user_state.py + new UI components (untracked)",
+    "assessment": "Product-surface work responding to the prior interaction-model directive: user-state projection (aligns with section 16), run Q&A, three-pane workspace, portfolio R394 semantics. NOT the engine evidence/physics defects of THIS directive. Per section 18 (FIX -> MEASURE -> REPLACE -> PROVE -> THEN DELETE): retained in tree, not deleted; committed separately only after its own gates pass. This directive's fixes are committed independently and are prioritized per section 7 (production/evidence defects before the physics core)."
+  },
+
+  "deployment_identity_assertion_status": "Section 1 OPEN at audit time: /api/health reports engine_commit + portfolio_commit + portfolio_pin_match but no explicit DEPLOYMENT_DRIFT verdict and no build-id equality assertion; DEPLOYMENT_CONFIG.json carries the pin contract. Section 1 closes this in-code."
+}

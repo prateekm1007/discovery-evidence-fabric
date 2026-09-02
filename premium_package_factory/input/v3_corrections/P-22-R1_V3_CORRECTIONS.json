@@ -1,0 +1,58 @@
+{
+  "package_id": "P-22-R1",
+  "v3_version": "3.0",
+  "supersedes": "V1 (no V2 addendum for this package)",
+  "authority": "CEO R394 semantics directive (R392/R393 updated) Priority 13 + Constitution Art. I/II/VI/XXVIII — the hard release gate MECHANISM_CLAIM_WITHOUT_GEOMETRIC_IMPLEMENTATION",
+  "purpose": "Resolve the mechanism/geometry embodiment contradiction: the canonical mechanism_architecture and the shipped parametric model both implement differential pressurization of three offset steering lumens, while subsystem SS-02 and the critical parameters describe an inflatable balloon/bellows actuator that exists in no geometry. The correction removes the unimplemented balloon/bellows embodiment and aligns the subsystem and parameter descriptions to the implemented steering-lumen mechanism (the mechanism's own physical_changes statement). No claim is added; an unsupported alternative embodiment is removed (Art. XXVIII).",
+  "operations": [
+    {
+      "op": "replace_string",
+      "path": "system_architecture.subsystems[1].name",
+      "before": "Hydraulic steering actuator",
+      "after": "Hydraulic steering lumens",
+      "reason": "The parametric model (P-22-R1_steerable_catheter_body: one main through-bore plus three steering lumens of steering_lumen_diameter_mm at steering_offset_radius_mm, 120 degrees apart) contains no balloon, bellows, or discrete actuator element. The actuating geometry IS the three offset steering lumens; the subsystem is renamed to the implemented element. The mechanism_architecture.physical_changes field already states this mechanism ('Hydraulic pressure in steering lumen deflects catheter tip; coordinated multi-lumen pressure changes navigate catheter')."
+    },
+    {
+      "op": "replace_string",
+      "path": "system_architecture.subsystems[1].function",
+      "before": "Inflatable/deflatable balloon or bellows at catheter tip; bends catheter when pressurized",
+      "after": "Three steering lumens in the catheter wall at offset radius, pressurized differentially; the differential lumen pressure produces the tip bending moment (geometry: steering_lumen_diameter_mm, steering_offset_radius_mm)",
+      "reason": "The balloon/bellows embodiment exists in no shipped geometry and is removed as an unsupported mechanism claim (MECHANISM_CLAIM_WITHOUT_GEOMETRIC_IMPLEMENTATION; Art. I evidence precedes assertion). The implemented physics is unchanged: differential hydraulic pressure creates the tip bending moment via the offset lumen cross-sections, consistent with the governing equations F_hydraulic = P*A and M_tip = F_hydraulic * d_moment_arm."
+    },
+    {
+      "op": "replace_string",
+      "path": "system_architecture.subsystems[3].function",
+      "before": "Closed-loop controller computing actuator pressures to track target trajectory; human-in-the-loop fallback (R1 fix)",
+      "after": "Closed-loop controller computing steering-lumen pressures to track target trajectory; human-in-the-loop fallback (R1 fix)",
+      "reason": "The controller computes pressures FOR the steering lumens; it contains no actuator element itself. The 'actuator pressures' phrasing implied a mechanical actuating element inside the controller subsystem. The R1 human-in-the-loop fix is unchanged."
+    },
+    {
+      "op": "replace_string",
+      "path": "engineering_core.critical_parameters[2].name",
+      "before": "Actuator pressure P",
+      "after": "Steering-lumen pressure P",
+      "reason": "The pressure is applied to the steering lumens (the implemented actuation geometry), not to a balloon actuator. Same physical quantity, same governing equation (F_hydraulic = P * A); the name is aligned to the implemented embodiment."
+    },
+    {
+      "op": "replace_string",
+      "path": "engineering_core.critical_parameters[2].basis",
+      "before": "Actuator design",
+      "after": "Steering-lumen actuation design",
+      "reason": "Basis text aligned with the corrected parameter name; the design quantity is the differential steering-lumen pressure."
+    },
+    {
+      "op": "replace_string",
+      "path": "engineering_core.critical_parameters[3].name",
+      "before": "Actuator area A",
+      "after": "Steering-lumen area A",
+      "reason": "The force-area is the steering-lumen cross-section (steering_lumen_diameter_mm), the geometric quantity the shipped model actually carries. Same governing equation; the name is aligned to the implemented embodiment."
+    },
+    {
+      "op": "replace_string",
+      "path": "mechanism_architecture.key_physics",
+      "before": "Catheter bending governed by beam theory: curvature kappa = M / (E*I), where M is bending moment from actuator force. Buckling failure when axial compression exceeds Euler load P_cr = pi^2*E*I/L^2.",
+      "after": "Catheter bending governed by beam theory: curvature kappa = M / (E*I), where M is bending moment from differential steering-lumen pressure force. Buckling failure when axial compression exceeds Euler load P_cr = pi^2*E*I/L^2.",
+      "reason": "The bending moment source is the differential steering-lumen pressure (the implemented mechanism); 'actuator force' carried the removed balloon/bellows embodiment's vocabulary. The physics statements are otherwise unchanged."
+    }
+  ]
+}

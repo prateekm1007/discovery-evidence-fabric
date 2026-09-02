@@ -102,6 +102,11 @@ PACKAGE_JSON_ROLES = {
     "VALIDATION_ECONOMICS.json": "cost NOT_ESTABLISHED + time ranges with basis",
     "LOOP_STATE.json": "loop verification state + event queues",
     "V2_MUTATION_ADDENDUM.json": "V1->V2 mutation trail (external-evidence driven)",
+    "V3_MUTATION_ADDENDUM.json": "R394 canonical correction trail (exact-match, auditable)",
+    "MECHANISM_EVIDENCE.json": "R394 5-way classified mechanism evidence + the four-question record",
+    "R394_RELEASE_GATES.json": "R394 hard release gates (mechanism-geometry, decisive experiment, self-containment, equation structure)",
+    "EXTERNAL_CONSULTANT_EVIDENCE/CONSULTANT_RECONCILIATION_REPORT.json": "referenced V2 mutation evidence basis, shipped in-package (self-containment)",
+    "MODEL/VALIDATION_STATES.json": "R394 CAD/engineering validation state split (never one blob)",
     "MODEL/3D_DESIGN_STATUS.json": "R381 honest 3D classification (REQUIRED / NOT_APPLICABLE)",
     "MODEL/PARAMETRIC_MODEL_SOURCE.py": "R381 parametric build program — source of truth",
     "MODEL/MODEL_MANIFEST.json": "R381 model identity, kernel, artifacts + sha256, views",
@@ -114,6 +119,26 @@ PACKAGE_JSON_ROLES = {
     "MODEL/IMPROVEMENT_LOOP_EVIDENCE.json": "R381 mutation -> rebuild -> evaluate -> KEEP/KILL",
     "MODEL/README.json": "R381 model directory readme",
 }
+
+
+def _external_references(portfolio_root: str) -> dict:
+    """R394: immutable external references for artifacts a package
+    references but does not carry (CEO option 2). The portfolio-root
+    identity registry is pinned by sha256 here AND by the canonical
+    release manifest (Art. XXXIX chain)."""
+    out = {}
+    reg = os.path.join(portfolio_root, "PORTFOLIO_IDENTITY_REGISTRY.json")
+    if os.path.isfile(reg):
+        out["PORTFOLIO_IDENTITY_REGISTRY.json"] = {
+            "location": "portfolio root (ships with the distribution)",
+            "sha256": sha256_file(reg),
+            "pinned_by": "CANONICAL_RELEASE_MANIFEST.json (Art. XXXIX "
+                         "release chain)",
+            "note": "immutable external reference with recorded "
+                    "integrity hash — the buyer can verify the bytes "
+                    "independently",
+        }
+    return out
 
 
 def _package_files_recursive(pdir):
@@ -161,16 +186,24 @@ def build(portfolio_root, work_dir=None):
     for p in packages:
         attach_r374_status(eqs[p.pkg_id], p)
     roads = {p.pkg_id: build_unknown_roadmap(p) for p in packages}
-    ecos = {p.pkg_id: build_validation_economics(p) for p in packages}
+    # R394: the decisive work package derives from the recorded kill
+    # condition (never build_plan[0]); the derivation ships in the JSON.
+    ecos = {p.pkg_id: build_validation_economics(
+        p, headlines[p.pkg_id].get("kill_if", "")) for p in packages}
     loops = {p.pkg_id: build_loop_state(p) for p in packages}
     loop_summary = portfolio_loop_summary(packages)
     ranking = build_ranking(packages, headlines, roads)
     # R372-1: explicit traceability semantics per package
+    # R394: + genuine identifier/phrase bindings and the extended
+    # chain slots (mechanism feature, parameter, experiment, decision)
     traces = {}
     for p in packages:
         legacy = os.path.join(INPUT_DIR, "legacy_json", p.num,
                               "ENGINEERING_TRACEABILITY.json")
-        traces[p.pkg_id] = build_traceability_json(p, legacy)
+        trace = build_traceability_json(p, legacy)
+        from premium_package_factory.r394.traceability import attach \
+            as _r394_attach_trace
+        traces[p.pkg_id] = _r394_attach_trace(p, trace)
     # R374-1: truth model — chain-level four states + the UNKNOWN-is-
     # not-verified declaration inside the shipped artifact
     from premium_package_factory.r374.traceability_truth import \
@@ -267,7 +300,7 @@ def build(portfolio_root, work_dir=None):
         # machine-readable layer
         # R381: the 3D engineering design layer runs FIRST here so its
         # verdict can enter the traceability + manifest records below.
-        # Honest outcomes only (PRESENT_AND_VALIDATED / NOT_APPLICABLE /
+        # Honest outcomes only (CAD_VALIDATED / NOT_APPLICABLE /
         # BLOCKED_*); a BLOCKED/NOT_APPLICABLE status never kills the
         # package build (the buyer package is the deliverable, the 3D
         # layer is evidence). Fail-closed on CRASH (a silent skip would
@@ -309,7 +342,14 @@ def build(portfolio_root, work_dir=None):
             "status": model_summary.get("status"),
             "model_id": model_summary.get("model_id"),
             "improvement_loop_outcome": model_summary.get("loop_outcome"),
-            "provenance": "MODEL/ENGINEERING_PROVENANCE.json",
+            # R394 self-containment: the provenance pointer is recorded
+            # only when the file actually exists (software-only packages
+            # are 3D_NOT_APPLICABLE and carry no ENGINEERING_PROVENANCE)
+            "provenance": ("MODEL/ENGINEERING_PROVENANCE.json"
+                           if os.path.exists(os.path.join(
+                               pdir, "MODEL",
+                               "ENGINEERING_PROVENANCE.json"))
+                           else None),
             "chain_shape": ("TECHNICAL_STATE -> parameter -> CAD feature -> "
                             "derived geometry -> measured geometry -> "
                             "validation result"),
@@ -343,6 +383,72 @@ def build(portfolio_root, work_dir=None):
                     shutil.copy2(os.path.join(cert_src, fcert),
                                  os.path.join(pdir, fcert))
 
+        # ------------------ R394 truth-and-semantics layer ------------------
+        # (a) MECHANISM_EVIDENCE.json — the 5-way classified evidence +
+        #     the four-question record (statements recorded per package;
+        #     absent -> honest None, never synthesized)
+        from premium_package_factory.r394.evidence_classes import (
+            build_mechanism_evidence)
+        _stmt_path = os.path.join(
+            INPUT_DIR, "v3_corrections",
+            f"{p.pkg_id}_MECHANISM_EVIDENCE_STATEMENTS.json")
+        _stmt = None
+        if os.path.exists(_stmt_path):
+            with open(_stmt_path, encoding="utf-8") as _sf:
+                _stmt = json.load(_sf)
+        _write_json(os.path.join(pdir, "MECHANISM_EVIDENCE.json"),
+                    build_mechanism_evidence(p, _stmt))
+        # (b) MODEL/VALIDATION_STATES.json — the CAD/engineering split
+        from premium_package_factory.r394.validation_states import (
+            derive_validation_states, compact_epistemic_line)
+        _vstates = derive_validation_states(
+            p, os.path.join(pdir, "MODEL"), eqs[p.pkg_id],
+            loops[p.pkg_id])
+        _write_json(os.path.join(pdir, "MODEL", "VALIDATION_STATES.json"),
+                    _vstates)
+        # (c) V3 correction trail ships as the audit record
+        if p.v3_trail:
+            _write_json(os.path.join(pdir, "V3_MUTATION_ADDENDUM.json"),
+                        p.v3_trail)
+        # (d) self-containment: the V2 mutation certificate references
+        # EXTERNAL_CONSULTANT_EVIDENCE/CONSULTANT_RECONCILIATION_REPORT.json
+        # — ship the referenced artifact INSIDE the package at the same
+        # relative path so the reference resolves (CEO directive 12)
+        _consultant_src = os.path.join(
+            ENGINE_ROOT, "EXTERNAL_CONSULTANT_EVIDENCE",
+            "CONSULTANT_RECONCILIATION_REPORT.json")
+        _certs = [f for f in os.listdir(pdir)
+                  if f.startswith("PACKAGE_MUTATION_CERTIFICATE")]
+        if _certs and os.path.exists(_consultant_src):
+            with open(os.path.join(pdir, _certs[0]), encoding="utf-8") \
+                    as _cf:
+                _cert = json.load(_cf)
+            if "EXTERNAL_CONSULTANT_EVIDENCE" in json.dumps(_cert):
+                _dest = os.path.join(pdir, "EXTERNAL_CONSULTANT_EVIDENCE")
+                os.makedirs(_dest, exist_ok=True)
+                shutil.copy2(_consultant_src, os.path.join(
+                    _dest, "CONSULTANT_RECONCILIATION_REPORT.json"))
+        # (e) the four HARD release gates — FAIL blocks the ZIP (raise)
+        from premium_package_factory.r394.release_gates import run_all_gates
+        _manifest_pre = {
+            "external_references": _external_references(portfolio_root),
+        }
+        _gates = run_all_gates(
+            p, pdir, os.path.join(pdir, "MODEL"), ecos[p.pkg_id],
+            eqs[p.pkg_id], headlines[p.pkg_id].get("kill_if", ""),
+            manifest_dict=_manifest_pre)
+        _write_json(os.path.join(pdir, "R394_RELEASE_GATES.json"), _gates)
+        if _gates["overall"] != "PASS":
+            raise RuntimeError(
+                f"R394 release gates FAILED for {p.pkg_id}: "
+                + "; ".join(
+                    f"{g['gate']}={g['state']} "
+                    f"({len(g.get('violations', []))} violation(s))"
+                    for g in _gates["gates"] if g["state"] == "FAIL"))
+        print(f"   {p.num} R394 gates: PASS "
+              f"(epistemic line: "
+              f"{' / '.join(compact_epistemic_line(_vstates))})")
+
         # package manifest (identity-linked) — files hashed from disk
         # R381: MODEL/ files are first-class manifest entries (recursive
         # walk; subdirectory files listed as MODEL/<name>)
@@ -365,6 +471,14 @@ def build(portfolio_root, work_dir=None):
             "transfer_posture": "SPONSORED_VALIDATION",
             "loop_verification_state": p.loop_state,
             "has_v2_addendum": bool(p.addendum),
+            "has_v3_addendum": bool(p.v3_trail),
+            "epistemic_maturity_line": compact_epistemic_line(_vstates),
+            "validation_states": {
+                k: (v.get("state") if isinstance(v, dict) else v)
+                for k, v in _vstates.items()
+                if isinstance(v, dict) and "state" in v
+            },
+            "external_references": _external_references(portfolio_root),
             "three_d_design": {
                 "classification": (model_summary.get("classification") or
                                    {}).get("classification"),
@@ -381,7 +495,9 @@ def build(portfolio_root, work_dir=None):
             },
             "identity_policy": (
                 "Portfolio number and historical package ID are bound in "
-                "PORTFOLIO_IDENTITY_REGISTRY.json and never renumbered."),
+                "PORTFOLIO_IDENTITY_REGISTRY.json (portfolio root; sha256 "
+                "pinned in this manifest's external_references and in "
+                "CANONICAL_RELEASE_MANIFEST.json) and never renumbered."),
             "files": files,
             "external_evidence_count": len(p.external_precedent),
             "engineering_artifact_count": len(p.build_plan),

@@ -23,6 +23,7 @@ from __future__ import annotations
 import fcntl
 import os
 import sys
+import time
 import traceback
 from pathlib import Path
 
@@ -81,10 +82,21 @@ def run(session_id: str) -> None:
     _lock_handle = _serialize_run()
 
     # --- phase 1: transport -------------------------------------------------
+    # R395: the public transport (registry-resolved NVIDIA) measurably
+    # oscillates (R392 record: 35 s..>240 s; historical public failures
+    # gateway=ALREADY_UP probe=CALL_FAILED Timeout). One REAL retry with
+    # backoff before declaring ERROR_TRANSPORT — the retry is itself a
+    # genuine live completion (never a skipped probe), and a second
+    # failure stays exactly what it is (Art. XXV).
     g = gw.ensure_gateway()
     probeable = g["status"] in ("UP", "ALREADY_UP", "EXTERNAL")
     probe = gw.preflight_probe() if probeable else {
         "status": "NO_TRANSPORT", "error": str(g)}
+    if probe.get("status") != "OK" and probeable:
+        print(f"  [worker] transport probe failed ({probe.get('status')}); "
+              f"one retry after 10 s backoff", file=sys.stderr)
+        time.sleep(10)
+        probe = gw.preflight_probe()
     if probe.get("status") != "OK":
         store.update_session(
             session_id, status="ERROR_TRANSPORT",

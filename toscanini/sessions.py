@@ -25,8 +25,8 @@ SESSIONS_PATH = STORE_DIR / "sessions.json"
 SHARES_PATH = STORE_DIR / "shares.json"
 ENGINE_RUNS = REPO_ROOT / "ENGINE_RUNS"
 
-STAGES = ["RETRIEVE", "FREEZE", "SYNTHESIZE", "VERIFY",
-          "MULTI_SOURCE_DISCOVERY", "COLLISION", "ATTACK",
+STAGES = ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
+          "VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION", "ATTACK",
           "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
           "CLASSIFY", "NEXT_BEST_ACTION", "RANK"]
 
@@ -60,6 +60,62 @@ def _locked_write(path: Path, data: Dict) -> None:
 def list_sessions() -> List[Dict[str, Any]]:
     return sorted(_locked_read(SESSIONS_PATH).get("sessions", []),
                   key=lambda s: s.get("created_at", ""), reverse=True)
+
+
+# ---------------------------------------------------------------------------
+# R394 section 15 — ownership (session owner == run owner == artifact
+# owner; one session maps to one run and its artifacts)
+#
+# MEASURED DEFECT (public deployment, consultant claim 3,
+# CONFIRMED_CURRENT): anonymous GET /api/sessions returned ALL 32 users'
+# engineering problems with worker pids and filesystem paths. This is
+# the enterprise release blocker: no user may see another user's
+# engineering problem by default.
+#
+# Model:
+#   - every session stores an opaque owner_key (issued as a cookie by
+#     the server; never a user identity, never a login — privacy
+#     scoping without identity infrastructure)
+#   - a caller sees a session iff owner_key matches, the session is
+#     explicitly public (curated demo content, labeled origin), or the
+#     caller holds the operator key (env ENGINE_OPERATOR_KEY)
+#   - public sharing of a specific run stays the EXPLICIT deliberate
+#     path (create_share) — unchanged
+#   - legacy sessions with no owner_key belong to NO cookie holder
+#     (fail-closed: visible only to the operator key)
+# ---------------------------------------------------------------------------
+
+def list_sessions_visible_to(owner_key: str,
+                             operator_key: str = "") -> List[Dict[str, Any]]:
+    """Sessions the given owner may see: their own + explicitly public.
+    Legacy ownerless sessions are NOT visible to cookie holders."""
+    out = []
+    for s in list_sessions():
+        if _session_access(s, owner_key, operator_key) != "DENY":
+            out.append(s)
+    return sorted(out, key=lambda s: s.get("created_at", ""), reverse=True)
+
+
+def _session_access(session: Dict[str, Any], owner_key: str,
+                    operator_key: str = "") -> str:
+    if operator_key and owner_key == operator_key:
+        return "OWNER"  # the operator key grants full visibility
+    if session.get("public"):
+        return "PUBLIC"
+    if owner_key and session.get("owner_key") == owner_key:
+        return "OWNER"
+    # legacy ownerless session: pre-scoping history — invisible to every
+    # cookie holder (fail-closed); only the operator key reaches it above
+    return "DENY"
+
+
+def session_access(session_id: str, owner_key: str,
+                   operator_key: str = "") -> Optional[str]:
+    """OWNER | PUBLIC | OPERATOR_ONLY | DENY | None (no such session)."""
+    s = get_session(session_id)
+    if not s:
+        return None
+    return _session_access(s, owner_key, operator_key)
 
 
 def get_session(session_id: str) -> Optional[Dict[str, Any]]:
@@ -207,13 +263,17 @@ def retry_session(session_id: str) -> Optional[Dict[str, Any]]:
         last_error=s.get("error"))
 
 
-def create_session(title: str, user_text: str, domain_hint: str = "") -> Dict[str, Any]:
+def create_session(title: str, user_text: str, domain_hint: str = "",
+                   owner_key: str = "") -> Dict[str, Any]:
     session = {
         "session_id": f"ts_{uuid.uuid4().hex[:12]}",
         "title": title[:120],
         "user_text": user_text[:4000],
         "domain_hint": domain_hint,
         "origin": "toscanini_ui",
+        # R394 s15: ownership is recorded at creation — the creator's
+        # cookie owner_key; empty only for operator-side/test creates
+        "owner_key": owner_key or "",
         "status": "PENDING",
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "worker_pid": None,
@@ -294,6 +354,10 @@ def stage_summaries(run_dir: Path) -> List[Dict[str, Any]]:
             digest["sample_titles"] = [
                 (e.get("title") or "")[:140]
                 for e in (env.get("evidence") or [])[:5]]
+        elif stage == "PREMISE_GATE":
+            pg = env.get("premise_gate") or {}
+            digest["verdict"] = pg.get("verdict")
+            digest["explanation"] = (pg.get("explanation") or "")[:240]
         elif stage == "SYNTHESIZE":
             mm = env.get("mechanism_map") or {}
             digest["mechanism"] = mm.get("mechanism")
@@ -483,6 +547,10 @@ def seed_benchmark_sessions() -> int:
             "user_text": DEMO_TITLES.get(domain, ""),
             "domain_hint": domain,
             "origin": "six_domain_benchmark_2026-08-30",
+            # R394 s15: curated demo content is EXPLICITLY public —
+            # deliberate, labeled, operator-chosen (the directive's
+            # "public sharing must be explicit and deliberate")
+            "public": True,
             "status": "COMPLETE",
             "created_at": (fs.get("timestamp")
                            or "2026-08-30T12:00:00Z"),

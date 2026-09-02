@@ -90,6 +90,18 @@ _UNIT_MAP = {
     "µw/cm²": Dimension("power") / Dimension("length")**2,
     "uw/cm2": Dimension("power") / Dimension("length")**2,
     "µs": Dimension("time"),
+    # R394: units recorded by the V3 symbol-units overlay (basis per
+    # symbol recorded in governing_model.symbol_units)
+    "ml/(min·mmhg)": Dimension("volume") / Dimension("time") /
+                      Dimension("pressure"),
+    "ml/(min*mmhg)": Dimension("volume") / Dimension("time") /
+                     Dimension("pressure"),
+    "mpa·s": Dimension("pressure") * Dimension("time"),
+    "mpa*s": Dimension("pressure") * Dimension("time"),
+    "pa·s": Dimension("pressure") * Dimension("time"),
+    "pa*s": Dimension("pressure") * Dimension("time"),
+    "dimensionless": Dimension(1), "1": Dimension(1),
+    "mmhg·min": Dimension("pressure") * Dimension("time"),
 }
 
 
@@ -114,16 +126,36 @@ def _symbols_in(math_expr: str) -> list:
     return sorted(set(_IDENT_RE.findall(math_expr or "")))
 
 
-def _symbol_units(math_expr: str, critical_parameters: list) -> dict:
+def _symbol_units(math_expr: str, critical_parameters: list,
+                  recorded_units: dict | None = None) -> dict:
     """Assign recorded units to expression symbols. A symbol gets a unit
-    only when a recorded critical-parameter name contains that symbol as a
-    whole identifier token AND that parameter carries a unit. No guessing."""
+    (a) from the RECORDED symbol-units overlay (governing_model.
+    symbol_units — R394, each entry carries its own basis), or (b) when a
+    recorded critical-parameter name contains that symbol as a whole
+    identifier token AND that parameter carries a unit. No guessing.
+    Python-keyword-renamed symbols (lambda_) match their original name
+    (lambda) in the recorded parameters."""
     units = {}
     syms = _symbols_in(math_expr)
+    overlay = recorded_units or {}
     for sym in syms:
+        # keyword-renamed symbols match the original recorded name
+        candidates = [sym]
+        if sym.endswith("_") and sym[:-1] in _PY_KEYWORDS:
+            candidates.append(sym[:-1])
+        if sym in overlay:
+            entry = overlay[sym]
+            dim = _unit_dimension(entry.get("unit")
+                                  if isinstance(entry, dict) else entry)
+            if dim is not None:
+                units[sym] = ("governing_model.symbol_units "
+                              f"({sym} — recorded basis)",
+                              entry.get("unit") if isinstance(entry, dict)
+                              else entry, dim)
+                continue
         for cp in critical_parameters:
             name_tokens = _IDENT_RE.findall(cp.get("name") or "")
-            if sym in name_tokens:
+            if any(c in name_tokens for c in candidates):
                 dim = _unit_dimension(cp.get("unit"))
                 if dim is not None:
                     units[sym] = (cp.get("name"), cp.get("unit"), dim)
@@ -131,28 +163,87 @@ def _symbol_units(math_expr: str, critical_parameters: list) -> dict:
     return units
 
 
+_FUNC_CALL_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9_]*)\s*\(")
+_BRACKET_CONC_RE = re.compile(r"\[([A-Za-z][A-Za-z0-9_]*)\]")
+_RELATION_RE = re.compile(r"(>=|<=|==|~=|=|~)")
+_PY_KEYWORDS = {"lambda", "class", "def", "return", "pass", "in",
+                "not", "and", "or", "is", "while", "for", "if",
+                "else", "elif", "try", "except", "raise", "global"}
+
+
+def _normalize_notation(expr: str) -> str:
+    """Deterministic notation normalization FOR THE CHECK ONLY (the
+    canonical string is never rewritten — Art. II):
+      [X]   concentration notation -> bare symbol X (sympy parses
+            bracket groups as Python lists; the concentration of X is
+            the quantity X for dimensional purposes)
+      lam.. Python-keyword identifiers (lambda!) get a '_' suffix so
+            they parse as symbols, never as the keyword
+    """
+    s = _BRACKET_CONC_RE.sub(r"\1", expr or "")
+    if s:
+        for kw in _PY_KEYWORDS:
+            s = re.sub(rf"\b{kw}\b", f"{kw}_", s)
+    return s
+
+
+def split_relation(math_expr: str):
+    """Split a relation into (lhs, op, rhs). Handles =, ~, >=, <=, ==
+    (the R371 split-on-'=' broke 'sigma_TOA >= c / …' into 'sigma_TOA >'
+    and '= c / …'). Returns None when no relation operator is present."""
+    m = _RELATION_RE.search(math_expr or "")
+    if not m:
+        return None
+    return (math_expr[:m.start()].strip(), m.group(1),
+            math_expr[m.end():].strip())
+
+
 def _parse_side(expr: str):
-    """Parse one side of an equation with sympy. Returns (expr, error)."""
+    """Parse one side of an equation with sympy. Returns (expr, error).
+
+    Identifiers IMMEDIATELY followed by '(' (e.g. 'A_actuator(P,
+    dP/dt)') are canonical FUNCTION-APPLICATION notation — they are
+    mapped to sympy Function objects so the argument tuple parses as a
+    call, not an implicit multiplication (deterministic syntax-level
+    handling; the canonical string is never rewritten — Art. II).
+    Bracket concentration notation [X] is normalized to X for the
+    parse (see _normalize_notation)."""
     try:
-        local = {s: sympy.Symbol(s) for s in _symbols_in(expr)}
+        expr = _normalize_notation(expr)
+        func_names = set(_FUNC_CALL_RE.findall(expr))
+        local = {}
+        for s in _symbols_in(expr):
+            if s in func_names:
+                local[s] = sympy.Function(s)
+            else:
+                local[s] = sympy.Symbol(s)
         return sympy.parse_expr(expr, local_dict=local,
                                 transformations="all"), None
     except Exception as e:  # syntax errors are expected for prose strings
         return None, f"SYMPY_PARSE_ERROR: {str(e)[:80]}"
 
 
-def dimensional_check(math_expr: str, critical_parameters: list) -> dict:
+def dimensional_check(math_expr: str, critical_parameters: list,
+                      recorded_units: dict | None = None) -> dict:
     """Dimensional-consistency check for one equation (canonical ASCII math
-    expression, annotation/label already removed)."""
+    expression, annotation/label already removed). Relations =, ~, >=, <=
+    are all dimension-comparable (a proportionality relates same-dimension
+    quantities up to a constant)."""
+    math_expr = _normalize_notation(math_expr)
     if not math_expr or not math_expr.strip():
         return {"state": "NOT_EVALUABLE_SYNTAX",
                 "reason": "empty expression"}
-    if "=" not in math_expr:
+    rel = split_relation(math_expr)
+    if rel is None:
+        if "<" in math_expr or ">" in math_expr:
+            return {"state": "NOT_EVALUABLE_NO_EQUALITY",
+                    "reason": "strict inequality (dimension comparison "
+                              "not defined for '<'/'>' relations)"}
         return {"state": "NOT_EVALUABLE_NO_EQUALITY",
-                "reason": "expression contains no '=' relation "
+                "reason": "expression contains no relation operator "
                           "(definition or inequality, not an equality "
                           "to check)"}
-    lhs, rhs = math_expr.split("=", 1)
+    lhs, _op, rhs = rel
     lhs_expr, err1 = _parse_side(lhs)
     rhs_expr, err2 = _parse_side(rhs)
     if err1 or err2:
@@ -160,8 +251,7 @@ def dimensional_check(math_expr: str, critical_parameters: list) -> dict:
                 "reason": err1 or err2}
 
     syms = _symbols_in(math_expr)
-    units = _symbol_units(math_expr, critical_parameters)
-    # functions (exp, log, sqrt...) and dimensionless numerals are fine;
+    units = _symbol_units(math_expr, critical_parameters, recorded_units)
     # every FREE symbol needs a recorded unit
     free = set()
     for side in (lhs_expr, rhs_expr):
@@ -227,7 +317,8 @@ def validate_equation(entry: dict, pkg) -> dict:
                          "boundary unrecoverable); preserved verbatim, "
                          "never repaired (Art. VI)"}
     else:
-        dim = dimensional_check(math_expr, pkg.critical_parameters)
+        dim = dimensional_check(math_expr, pkg.critical_parameters,
+                                gm.get("symbol_units"))
 
     variables = entry.get("variables", [])
     return {

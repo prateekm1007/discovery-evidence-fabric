@@ -31,10 +31,17 @@ from .adapters import ADAPTERS, STAGE_ORDER
 REPO_ROOT = Path(__file__).resolve().parents[2]
 # Stages whose failure is FATAL to the run (nothing downstream is meaningful)
 # vs stages that fail explicit but allow the loop to continue.
-FATAL_STAGES = {"SYNTHESIZE"}
+# R394 s6: PREMISE_GATE is fatal — a malformed/false premise makes every
+# downstream stage meaningless, and burning candidate-generation compute
+# after detection is forbidden by directive.
+FATAL_STAGES = {"SYNTHESIZE", "PREMISE_GATE"}
 
 # If a stage failed, which later stages are meaningless without it?
 DOWNSTREAM_BLOCKERS = {
+    "PREMISE_GATE": {"SYNTHESIZE", "VERIFY", "MULTI_SOURCE_DISCOVERY",
+                     "COLLISION", "ATTACK", "CONTRADICTION",
+                     "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY",
+                     "NEXT_BEST_ACTION", "RANK"},
     "SYNTHESIZE": {"VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION", "ATTACK",
                    "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
                    "CLASSIFY", "NEXT_BEST_ACTION", "RANK"},
@@ -180,6 +187,22 @@ class EngineRun:
                     adapter.canonical_fn, adapter.execute, self.env,
                     {"run_id": self.run_id, "problem_id": self.problem_id})
                 self._persist(f"stage_{stage}.json", entry.get("result_meta", {}))
+                # R394 s6: conductor-level premise fatality. The stage is
+                # a deterministic instrument that ALWAYS executes; the
+                # DECISION to halt the loop is orchestration. A malformed
+                # premise is registered as an explicit failed stage so
+                # downstream stages record SKIPPED_UPSTREAM_FAILURE and
+                # the final state is MALFORMED_OR_FALSE_PREMISE (never a
+                # burned-synthesis silent reject).
+                if entry.get("result_meta", {}).get(
+                        "premise_verdict") == "MALFORMED_OR_FALSE_PREMISE":
+                    verdict = self.env.premise_gate or {}
+                    self.failed_stages["PREMISE_GATE"] = (
+                        f"MALFORMED_OR_FALSE_PREMISE: "
+                        f"{verdict.get('explanation', '')}")
+                    self._persist("stage_PREMISE_GATE_FAILURE.json",
+                                  {"stage": "PREMISE_GATE",
+                                   "verdict": verdict})
             except StageFailure as sf:
                 self.failed_stages[stage] = sf.error
                 self._persist(f"stage_{stage}_FAILURE.json",
@@ -193,7 +216,9 @@ class EngineRun:
         # Only a SURVIVOR is promotable; every failure is explicit and the
         # discovery loop artifacts are already on disk (Art. V: fail closed
         # without becoming a universal rejector).
-        if self.with_package and "SYNTHESIZE" not in self.failed_stages:
+        # R394 s6: a premise-rejected run has no survivor by construction.
+        if self.with_package and "SYNTHESIZE" not in self.failed_stages \
+                and "PREMISE_GATE" not in self.failed_stages:
             self._post_rank_pipeline(run_ctx={"run_id": self.run_id})
 
         # ------------- Directive 2: canonical DISCOVERY_RELEASE -----------
@@ -229,9 +254,13 @@ class EngineRun:
         # Cemetery records RESEARCH kills only. An infrastructure failure
         # (e.g. missing LLM credential) is not negative knowledge about the
         # mechanism (Art. XXV: unknown/failed-run is not a failure lesson).
+        # R394 s6: a premise reject is not negative knowledge EITHER — the
+        # premise was malformed before any mechanism existed to kill; it
+        # teaches nothing about a mechanism class.
         research_reject = (
             final.get("final_status") == "REJECTED"
-            and "SYNTHESIZE" not in self.failed_stages)
+            and "SYNTHESIZE" not in self.failed_stages
+            and "PREMISE_GATE" not in self.failed_stages)
         if research_reject:
             self._cemetery_update(final)
         else:
@@ -1158,8 +1187,17 @@ class EngineRun:
     def _final_state(self) -> Dict[str, Any]:
         eps = self.env.epistemic_state or {}
         synthesis_ok = "SYNTHESIZE" not in self.failed_stages
+        premise_reject = "PREMISE_GATE" in self.failed_stages
         status = eps.get("final_status")
-        if not synthesis_ok:
+        if premise_reject:
+            # R394 s6: the REQUIRED outcome — a self-explaining terminal
+            # state. 'MALFORMED_OR_FALSE_PREMISE' is NOT a REJECTED
+            # candidate (nothing was synthesized — no mechanism exists
+            # to kill) and is NOT negative knowledge (no cemetery entry).
+            status = "MALFORMED_OR_FALSE_PREMISE"
+            reason = ("the problem's premise is physically/scientifically "
+                      f"incoherent: {self.failed_stages.get('PREMISE_GATE', '')[:300]}")
+        elif not synthesis_ok:
             status = "REJECTED"
             reason = f"synthesis failed: {self.failed_stages.get('SYNTHESIZE','')[:300]}"
         elif status:
@@ -1167,6 +1205,7 @@ class EngineRun:
         else:
             status = "UNKNOWN"
             reason = "classification stage did not produce a final status"
+        premise = self.env.premise_gate or {}
         return {
             "run_id": self.run_id,
             "problem_id": self.problem_id,
@@ -1175,11 +1214,16 @@ class EngineRun:
             "epistemic_state": eps.get("epistemic_state",
                                        eps.get("state", "OBSERVED")),
             "reason": reason,
+            "premise_verdict": premise.get("verdict"),
+            "premise_explanation": premise.get("explanation"),
             "evidence_verified": bool((self.env.adjudication or {})
                                       .get("evidence_verification", {})
                                       .get("verified", False)),
+            "evidence_classification_counts": (self.env.evidence_classification or {}).get("counts"),
             "prior_art_status": self.env.prior_art.get("prior_art_status"),
             "collision_novelty_risk": self.env.collision_results.get("novelty_risk"),
+            "collision_search_execution": (self.env.collision_results.get(
+                "differentiation_resolution", {}) or {}).get("search_execution"),
             "adversarial_overall": self.env.attack_results.get("overall"),
             "adjudication_verdict": (self.env.adjudication.get("council") or {})
                                     .get("verdict"),

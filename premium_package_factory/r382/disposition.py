@@ -1096,7 +1096,7 @@ def apply_portfolio_disposition(portfolio_root: str,
         "artifact": "R381_RELEASE_HISTORY_SNAPSHOT",
         "what_this_is": (
             "the pre-disposition R371/R381 buyer release: 15 "
-            "packages, all PRESENT_AND_VALIDATED 3D designs, "
+            "packages, all CAD_VALIDATED 3D designs, "
             "acceptance 16/16 PASS. Superseded by the R382 CEO "
             "portfolio disposition (buyer release = 4 primary "
             "packages)."),

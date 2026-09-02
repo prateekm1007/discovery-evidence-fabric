@@ -41,6 +41,16 @@ NON_KILL_STATES = {
     # honest unresolved states — never converted either way (Art. XXV)
     "UNRESOLVED_PARTIAL_EVIDENCE",
     "UNRESOLVED_NO_RELEVANT_ART",
+    # R394 s2: a mandatory (query_class x source) search failed — the
+    # searched universe is incomplete. Findings stand as evidence, but
+    # NO absence/differentiation conclusion is permitted (non-kill,
+    # unknown — replaces the measured false RESOLVED_DIFFERENTIATED on
+    # partial-search failures, production run ts_d1ab9fd4d756).
+    "UNRESOLVED_SEARCH_INCOMPLETE",
+    # scientific-side search-execution states (a2/prior_art.py R394):
+    # outages and partial outages are UNKNOWN, never no-match
+    "SEARCH_FAILED",
+    "SEARCH_PARTIAL",
 }
 
 

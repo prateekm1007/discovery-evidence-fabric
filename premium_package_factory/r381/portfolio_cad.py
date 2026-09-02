@@ -1641,7 +1641,11 @@ def write_model_dir(pkg_id: str, portfolio_dir_pkg: str,
                   if regen.get("status") not in (None, "REPRODUCIBLE")
                   else "BLOCKED_GEOMETRY_INVALID")
     else:
-        status = "PRESENT_AND_VALIDATED"
+        # R394 (CEO directive 13): CAD validation is stated as CAD
+        # validation — never as a blob that could be read as physical
+        # or engineering validation. The full split ships in
+        # MODEL/VALIDATION_STATES.json.
+        status = "CAD_VALIDATED"
 
     # --- PARAMETRIC_MODEL_SOURCE.py (the source of truth) -------------
     src_path = os.path.join(mdir, "PARAMETRIC_MODEL_SOURCE.py")
@@ -1668,11 +1672,15 @@ def write_model_dir(pkg_id: str, portfolio_dir_pkg: str,
         "classification": classification["classification"],
         "3d_design_status": status,
         "status_meaning": {
-            "PRESENT_AND_VALIDATED": (
+            "CAD_VALIDATED": (
                 "a package-specific parametric model was built, "
                 "measured and validated through the deterministic "
                 "geometry gates (incl. the independent trimesh "
-                "watertight check and the G9 regeneration check)"),
+                "watertight check and the G9 regeneration check). "
+                "CAD_VALIDATED states CAD validation ONLY — it never "
+                "implies engineering-model, bench, physical, clinical "
+                "or regulatory validation; the separate states ship "
+                "in MODEL/VALIDATION_STATES.json (R394; Art. XXVIII)."),
             "BLOCKED_GEOMETRY_INVALID": (
                 "the model was built but FAILED the geometry gates — "
                 "the failure is recorded, never hidden"),
@@ -1901,9 +1909,13 @@ def build_model_layer(pkg_id: str, package_dir: str,
                       work_dir: str) -> Dict[str, Any]:
     """The R381 3D layer for ONE package. Honest outcomes only:
 
-      PRESENT_AND_VALIDATED  a package-specific model is built, measured
-                             and validated; artifacts + provenance + the
-                             improvement-loop evidence ship in MODEL/
+      CAD_VALIDATED          a package-specific model is built, measured
+                             and validated through the geometry gates;
+                             artifacts + provenance + the improvement-
+                             loop evidence ship in MODEL/; CAD validation
+                             never implies engineering or physical
+                             validation (the split states ship in
+                             MODEL/VALIDATION_STATES.json — R394)
       3D_NOT_APPLICABLE      the record itself shows a software-only
                              technology; MODEL/ carries the honest
                              classification and NOTHING that claims 3D

@@ -1,9 +1,54 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { listSessions, listShowcase, startRun } from "@/lib/api";
-import type { SessionRow, ShowcaseRow } from "@/lib/types";
+// R395: THE WORKSPACE — the product's one experience (CEO directive:
+// the interaction model gets one decisive redesign, borrowed from the
+// Claude philosophy: conversation as the primary workspace, the
+// substantial artifact beside it).
+//
+//   ┌────────────────────────────────────────────────────────────┐
+//   │ Toscanini · engine status          [+ New problem]         │
+//   ├───────────────┬────────────────────────────┬───────────────┤
+//   │ HISTORY       │ CONVERSATION               │ ARTIFACT      │
+//   │ your runs     │ problem → investigation    │ 3D design     │
+//   │ inventions    │ → engineering argument     │ parameters    │
+//   │               │ → ask about it             │ downloads     │
+//   └───────────────┴────────────────────────────┴───────────────┘
+//
+// The 13-stage pipeline, the machine states, the G-gates — all of it
+// stays underneath (complexity hidden behind a simple surface).
+// Honest states everywhere: user_state_view pills, honest refusals,
+// no fabricated progress, nothing claims physical validation.
+
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  getHealth,
+  getRealityLoop,
+  getRunResult,
+  getShowcase,
+  listSessions,
+  listShowcase,
+  retryRun,
+  startRun,
+} from "@/lib/api";
+import type {
+  HealthSummary,
+  RealityLoopRecord,
+  SessionDetail,
+  SessionRow,
+  ShowcaseDetail,
+  ShowcaseRow,
+} from "@/lib/types";
+import HistoryRail from "@/components/HistoryRail";
+import RunNarrative, { isTerminal } from "@/components/RunNarrative";
+import {
+  EngineeringArgument,
+  NoveltyAndCemetery,
+} from "@/components/EngineeringArgument";
+import AskBox from "@/components/AskBox";
+import RunArtifact from "@/components/RunArtifact";
+import InventionArtifact from "@/components/InventionArtifact";
+import InventionStory from "@/components/InventionStory";
 
 const EXAMPLES = [
   "Why do infusion pumps fail to detect downstream occlusion before patient harm?",
@@ -12,144 +57,396 @@ const EXAMPLES = [
   "How can we keep minimum drainage when a shunt's primary lumen obstructs?",
 ];
 
-function statusClass(status: string): string {
-  if (status.startsWith("ERROR")) return "ERROR";
-  return status;
+function TransportDot({ health }: { health: HealthSummary | null }) {
+  const ready = health?.llm_transport_ready === true;
+  return (
+    <span
+      className={`transport-dot ${ready ? "ok" : "down"}`}
+      title={
+        ready
+          ? "engine live — LLM transport responding (real probe)"
+          : "LLM transport not responding right now — runs will say so honestly"
+      }
+    />
+  );
 }
 
-export default function Home() {
-  const router = useRouter();
+function NewProblemPane({
+  onStarted,
+}: {
+  onStarted: (id: string) => void;
+}) {
   const [text, setText] = useState("");
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sessions, setSessions] = useState<SessionRow[]>([]);
-  const [showcase, setShowcase] = useState<ShowcaseRow[]>([]);
-
-  useEffect(() => {
-    listSessions().then(setSessions).catch(() => setSessions([]));
-    listShowcase().then(setShowcase).catch(() => setShowcase([]));
-  }, []);
+  const [submitting, setSubmitting] = useState(false);
 
   async function submit() {
     const t = text.trim();
     if (t.length < 15) {
-      setError("Please describe the problem in a bit more detail (at least 15 characters).");
+      setError(
+        "Please describe the problem in a bit more detail (at least 15 characters)."
+      );
       return;
     }
+    if (submitting) return;
     setError(null);
-    setBusy(true);
+    setSubmitting(true);
+    onStarted("busy");
     try {
       const session = await startRun(t);
-      router.push(`/run?id=${session.session_id}`);
+      onStarted(session.session_id);
     } catch (e) {
       setError(e instanceof Error ? e.message : "failed to start the run");
-      setBusy(false);
+      onStarted("");
+      setSubmitting(false);
     }
   }
 
-  const focus = showcase.filter((s) => s.demo_focus);
-  const others = showcase.filter((s) => !s.demo_focus);
-
   return (
-    <main>
-      <section className="hero">
-        <h1>
-          Describe an engineering or scientific problem.
-          <br />
-          Get a technology package you can act on.
-        </h1>
-        <p className="lede">
-          Toscanini runs a real discovery engine — evidence first, adversarial
-          attacks included — and returns a mechanism, an inspectable 3D design,
-          a decisive experiment, and a downloadable buyer dossier.
-        </p>
-
-        <div className="ask">
-          <textarea
-            placeholder="e.g. Why do hemodialysis grafts clot at the venous anastomosis despite anticoagulation?"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit();
-            }}
-          />
-          <div className="ask-foot">
-            <span className="hint">
-              ⌘↵ to start · runs take minutes; you can leave and come back
-            </span>
-            <button className="btn" onClick={submit} disabled={busy}>
-              {busy ? "Starting…" : "Start discovery"}
-            </button>
-          </div>
+    <section className="hero workspace-hero">
+      <h1>
+        What problem should Toscanini investigate?
+      </h1>
+      <p className="lede">
+        A real discovery engine runs underneath: evidence first, adversarial
+        attacks included. Watch it investigate, see the engineering
+        argument, then inspect the invention.
+      </p>
+      <div className="ask">
+        <textarea
+          placeholder="e.g. Why do hemodialysis grafts clot at the venous anastomosis despite anticoagulation?"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit();
+          }}
+        />
+        <div className="ask-foot">
+          <span className="hint">
+            ⌘↵ to start · runs take minutes; you can leave and come back
+          </span>
+          <button className="btn" onClick={submit} type="button">
+            {submitting ? "Starting…" : "Start discovery"}
+          </button>
         </div>
-
-        {error && <div className="errbox" style={{ textAlign: "left" }}>{error}</div>}
-
-        <div className="examples">
-          {EXAMPLES.map((ex) => (
-            <button
-              key={ex}
-              className="example"
-              onClick={() => setText(ex)}
-              type="button"
-            >
-              {ex.length > 62 ? ex.slice(0, 60) + "…" : ex}
-            </button>
-          ))}
+      </div>
+      {error && (
+        <div className="errbox" style={{ textAlign: "left" }}>
+          {error}
         </div>
-      </section>
-
-      {sessions.length > 0 && (
-        <section className="section">
-          <h2>Your runs</h2>
-          <div className="sub">Real engine runs, artifact-derived statuses</div>
-          <div className="history">
-            {sessions.slice(0, 12).map((s) => (
-              <a className="run-row" href={`/run?id=${s.session_id}`} key={s.session_id}>
-                <span className={`pill ${statusClass(s.status)}`}>{s.status}</span>
-                <span className="title">{s.title}</span>
-                <span className="when">
-                  {s.final_status ? `${s.final_status} · ` : ""}
-                  {s.created_at?.slice(0, 16).replace("T", " ")}
-                </span>
-              </a>
-            ))}
-          </div>
-        </section>
       )}
+      <div className="examples">
+        {EXAMPLES.map((ex) => (
+          <button
+            key={ex}
+            className="example"
+            onClick={() => setText(ex)}
+            type="button"
+          >
+            {ex.length > 62 ? ex.slice(0, 60) + "…" : ex}
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
 
-      {focus.length > 0 && (
-        <section className="section">
-          <h2>Technology packages</h2>
-          <div className="sub">
-            Built by the same engine, released through the certified chain —
-            inspect them end-to-end, including the interactive 3D design
-          </div>
-          <div className="gallery">
-            {focus.map((s) => (
-              <a className="card" href={`/showcase?slot=${s.slot}`} key={s.slot}>
-                <div className="kicker">
-                  {s.domain} · {s.package_id}
+function RunConversation({ detail }: { detail: SessionDetail }) {
+  const done = isTerminal(detail.status);
+  const usv = detail.user_state_view;
+  return (
+    <>
+      {/* the user's message: the problem itself */}
+      <div className="msg user">
+        <div className="msg-role">You</div>
+        <div className="msg-body">{detail.user_text}</div>
+      </div>
+
+      {/* Toscanini's live reply: the narrative stream */}
+      <div className="msg tosca">
+        <div className="msg-role">
+          Toscanini
+          {usv && done && (
+            <span className={`pill ${usv.rejected ? "REJECTED" : "COMPLETE"}`}>
+              {usv.label}
+            </span>
+          )}
+        </div>
+        <div className="msg-body">
+          <RunNarrative detail={detail} />
+
+          {done && usv && (
+            <div className="narrative-summary">
+              {usv.decision}
+              {usv.meaning && (
+                <div className="faint" style={{ marginTop: 4 }}>
+                  {usv.meaning}
                 </div>
-                <h3>{s.title}</h3>
-                <p>{s.blurb}</p>
-                <div className="foot">
-                  {s.parameter_count} live parameters · interactive 3D
-                </div>
-              </a>
-            ))}
-          </div>
-          {others.length > 0 && (
-            <div className="examples" style={{ justifyContent: "flex-start", marginTop: 16 }}>
-              {others.map((s) => (
-                <a className="example" href={`/showcase?slot=${s.slot}`} key={s.slot}>
-                  {s.title}
-                </a>
-              ))}
+              )}
             </div>
           )}
-        </section>
+
+          {done && detail.status === "COMPLETE" && (
+            <>
+              <div className="reasoning">
+                <h3>The engineering argument</h3>
+                <div className="sub">
+                  derived from the run&apos;s persisted artifacts — evidence,
+                  mechanisms, decisions, and what is still unknown
+                </div>
+                <EngineeringArgument detail={detail} />
+              </div>
+              <NoveltyAndCemetery detail={detail} />
+            </>
+          )}
+        </div>
+      </div>
+
+      {done && (
+        <AskBox
+          mode="run"
+          subject={detail.session_id}
+          enabled={detail.status === "COMPLETE"}
+        />
       )}
-    </main>
+    </>
+  );
+}
+
+function WorkspaceInner() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const runId = params.get("run");
+  const slot = params.get("invention");
+
+  const [sessions, setSessions] = useState<SessionRow[]>([]);
+  const [showcase, setShowcase] = useState<ShowcaseRow[]>([]);
+  const [health, setHealth] = useState<HealthSummary | null>(null);
+  const [detail, setDetail] = useState<SessionDetail | null>(null);
+  const [invention, setInvention] = useState<ShowcaseDetail | null>(null);
+  const [reality, setReality] = useState<RealityLoopRecord | null>(null);
+  const [railOpen, setRailOpen] = useState(false);
+  const [starting, setStarting] = useState(false);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ---- load rails + health once ----
+  useEffect(() => {
+    listSessions().then(setSessions).catch(() => setSessions([]));
+    listShowcase().then(setShowcase).catch(() => setShowcase([]));
+    getHealth().then(setHealth).catch(() => setHealth(null));
+    const h = setInterval(() => {
+      getHealth().then(setHealth).catch(() => {});
+      if (!runId) {
+        listSessions().then(setSessions).catch(() => {});
+      }
+    }, 30000);
+    return () => clearInterval(h);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ---- load the focused run (and poll while it works) ----
+  useEffect(() => {
+    setDetail(null);
+    if (timer.current) clearInterval(timer.current);
+    const id = runId ?? "";
+    if (!id) return;
+    let alive = true;
+    async function poll() {
+      try {
+        const d = await getRunResult(id);
+        if (!alive) return;
+        setDetail(d);
+        if (isTerminal(d.status)) {
+          if (timer.current) clearInterval(timer.current);
+          listSessions().then(setSessions).catch(() => {});
+        }
+      } catch {
+        /* transient — the next poll will retry */
+      }
+    }
+    poll();
+    timer.current = setInterval(poll, 2500);
+    return () => {
+      alive = false;
+      if (timer.current) clearInterval(timer.current);
+    };
+  }, [runId]);
+
+  // ---- load the focused invention ----
+  useEffect(() => {
+    setInvention(null);
+    setReality(null);
+    if (!slot) return;
+    getShowcase(slot)
+      .then(setInvention)
+      .catch(() => setInvention(null));
+    getRealityLoop(slot).then(setReality).catch(() => setReality(null));
+  }, [slot]);
+
+  const selectRun = useCallback(
+    (id: string) => {
+      setRailOpen(false);
+      router.push(`/?run=${id}`);
+    },
+    [router]
+  );
+  const selectInvention = useCallback(
+    (s: string) => {
+      setRailOpen(false);
+      router.push(`/?invention=${s}`);
+    },
+    [router]
+  );
+  const newProblem = useCallback(() => {
+    setRailOpen(false);
+    router.push("/");
+  }, [router]);
+
+  function onStarted(id: string) {
+    if (id === "busy") {
+      setStarting(true);
+      return;
+    }
+    setStarting(false);
+    if (id) {
+      listSessions().then(setSessions).catch(() => {});
+      selectRun(id);
+    }
+  }
+
+  const activeMode = runId ? "run" : slot ? "invention" : "fresh";
+
+  return (
+    <div className="workspace">
+      <header className="ws-top">
+        <button
+          className="rail-toggle"
+          onClick={() => setRailOpen(!railOpen)}
+          type="button"
+          aria-label="toggle history"
+        >
+          ☰
+        </button>
+        <a className="brand" href="/">
+          Toscanini
+        </a>
+        <span className="ws-status">
+          <TransportDot health={health} />
+          <span className="ws-status-text">
+            {health?.llm_transport_ready === true
+              ? "engine live"
+              : "engine starting…"}
+          </span>
+        </span>
+        <span className="ws-spacer" />
+        <button className="btn small ghost" onClick={newProblem} type="button">
+          + New problem
+        </button>
+      </header>
+
+      <div className="ws-body">
+        <div className={`ws-rail ${railOpen ? "open" : ""}`}>
+          <HistoryRail
+            sessions={sessions}
+            showcase={showcase}
+            activeRun={runId}
+            activeInvention={slot}
+            onSelectRun={selectRun}
+            onSelectInvention={selectInvention}
+            onNewProblem={newProblem}
+          />
+        </div>
+        {railOpen && (
+          <div
+            className="ws-rail-backdrop"
+            onClick={() => setRailOpen(false)}
+          />
+        )}
+
+        <main className="ws-center">
+          {activeMode === "fresh" &&
+            (starting ? (
+              <div className="loading">Starting the run…</div>
+            ) : (
+              <NewProblemPane onStarted={onStarted} />
+            ))}
+
+          {activeMode === "run" &&
+            (detail ? (
+              <RunConversation detail={detail} />
+            ) : (
+              <div className="loading">Loading run…</div>
+            ))}
+
+          {activeMode === "invention" &&
+            (invention ? (
+              <div className="invstory">
+                <InventionStory detail={invention} loop={reality} />
+                <AskBox
+                  mode="invention"
+                  subject={slot ?? ""}
+                  enabled={true}
+                  placeholder="Ask about this technology — answered from its own record…"
+                />
+              </div>
+            ) : (
+              <div className="loading">Loading package…</div>
+            ))}
+        </main>
+
+        <aside className="ws-artifact">
+          {activeMode === "run" &&
+            (detail ? (
+              <RunArtifact
+                detail={detail}
+                onRetry={(id) =>
+                  retryRun(id).then(() => location.reload())
+                }
+              />
+            ) : (
+              <div className="artifact">
+                <div className="artifact-h">Artifact</div>
+                <div className="faint">loading…</div>
+              </div>
+            ))}
+
+          {activeMode === "invention" &&
+            (invention ? (
+              <InventionArtifact detail={invention} slot={slot ?? ""} />
+            ) : (
+              <div className="artifact">
+                <div className="artifact-h">Artifact</div>
+                <div className="faint">loading…</div>
+              </div>
+            ))}
+
+          {activeMode === "fresh" && (
+            <div className="artifact artifact-quite">
+              <div className="artifact-h">Artifact</div>
+              <div className="artifact-placeholder">
+                <div className="ph-shape" aria-hidden="true" />
+                <div>
+                  The invention will appear here — the inspectable 3D
+                  design, live parameters, dimensions, and the downloadable
+                  technology package.
+                </div>
+                <div className="faint" style={{ fontSize: 12 }}>
+                  released inventions in the rail load instantly with full
+                  3D
+                </div>
+              </div>
+            </div>
+          )}
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="loading">Loading…</div>}>
+      <WorkspaceInner />
+    </Suspense>
   );
 }

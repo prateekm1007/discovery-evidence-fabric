@@ -81,6 +81,18 @@ def load_v2_addendum(pkg_id: str):
         return json.load(f)
 
 
+def _load_corrected_dossier(pkg_id: str):
+    """Load the R370Q export and apply the R394 V3 corrections (if any).
+
+    Returns (corrected_view, v3_trail, v3_corrections). The export FILE
+    is never modified (Art. XI); the corrections ship as the audit trail
+    (V3_MUTATION_ADDENDUM.json) inside the package.
+    """
+    from premium_package_factory.r394.canonical_corrections import \
+        apply_to_dossier
+    return apply_to_dossier(load_dossier(pkg_id), pkg_id)
+
+
 def apply_mutations(text: str, addendum: dict) -> str:
     """Apply recorded V1->V2 text mutations to a rendered string.
 
@@ -120,15 +132,24 @@ class CanonicalPackage:
         self.pkg_id = pkg_id
         self.short = short
         self.folder = folder_name(num, short)
-        self.dossier = load_dossier(pkg_id)
         self.addendum = load_v2_addendum(pkg_id)
+        self.dossier, self.v3_trail, self.v3_corrections = \
+            _load_corrected_dossier(pkg_id)
         ec = self.dossier["engineering_content"]
         self.eng = ec
         self.core = ec.get("engineering_core", {})
         self.gm = self.core.get("governing_model", {})
         self.claims = self.dossier.get("claim_traceability", {}).get("claims", [])
-        self.version = package_version(self.addendum)
+        self.version = self.v3_version if self.v3_corrections \
+            else package_version(self.addendum)
         self.loop_state = LOOP_STATES.get(pkg_id, "NONE")
+
+    @property
+    def v3_version(self) -> str:
+        """V3-aware version (V3 corrections supersede the V2 line)."""
+        if self.v3_corrections:
+            return self.v3_corrections.get("v3_version", "3.0")
+        return package_version(self.addendum)
 
     # -- identity ---------------------------------------------------------
     @property

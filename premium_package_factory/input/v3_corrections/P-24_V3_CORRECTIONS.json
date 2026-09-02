@@ -1,0 +1,16 @@
+{
+  "package_id": "P-24",
+  "v3_version": "3.0",
+  "supersedes": "V2",
+  "authority": "CEO R394 semantics directive (R392/R393 updated) Priority 13 + Constitution Art. I/II/VI/XXVIII — the hard release gate MECHANISM_CLAIM_WITHOUT_GEOMETRIC_IMPLEMENTATION",
+  "purpose": "Resolve the subsystem/geometry vocabulary contradiction: SS-02's function says 'References valve setting to gravity', but the package's own architecture description states the design is NOT a switching valve ('Unlike fixed anti-siphon devices (ASD) that switch open/closed, this provides continuous proportional damping'), and the shipped parametric model is a proportional spool damper (housing, bore, damping gap, spool — no valve seat, no switching element). The correction removes the valve vocabulary that the record itself disclaims. No claim is added; an inconsistent word is removed (Art. XXVIII).",
+  "operations": [
+    {
+      "op": "replace_string",
+      "path": "system_architecture.subsystems[1].function",
+      "before": "References valve setting to gravity (postural); provides dP_gravity = rho * g * dh",
+      "after": "References the damping setting to gravity (postural hydrostatic head); provides dP_gravity = rho * g * dh",
+      "reason": "The package's own architecture description disclaims a switching valve ('Unlike fixed anti-siphon devices (ASD) that switch open/closed, this provides continuous proportional damping based on gravity head') and the parametric model (housing_od_mm, bore_diameter_mm, damping_gap_mm, spool_height_mm) contains no valve seat or switching element. The gravity reference is hydrostatic (rho * g * dh) — passive physics acting on the proportional damping setting. The word 'valve' carried the switching embodiment the design explicitly replaces; removing it aligns the subsystem with the mechanism's own statements. The physical quantity dP_gravity is unchanged."
+    }
+  ]
+}

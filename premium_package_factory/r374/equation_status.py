@@ -104,24 +104,39 @@ def _structural_check(math_expr: str, rendering_note) -> dict:
     if not (math_expr or "").strip():
         return {"proven": False,
                 "basis": "empty expression"}
-    if "=" in math_expr:
-        lhs, rhs = math_expr.split("=", 1)
-        e1, err1 = _parse_side(lhs)
+    from ..r372.equation_validation import _parse_side, split_relation, \
+        _normalize_notation
+    math_expr = _normalize_notation(math_expr)
+    rel = split_relation(math_expr)
+    if rel is not None:
+        # any relation operator (=, ~, >=, <=): both sides must parse
+        # ('~' proportionality and '>=' comparisons included — the R394
+        # fix; the old split-on-'=' broke 'sigma_TOA >= c / …')
+        _lhs, _op, rhs = rel
+        e1, err1 = _parse_side(_lhs)
         e2, err2 = _parse_side(rhs)
         if err1 or err2:
             return {"proven": False,
                     "basis": f"parse failed: {(err1 or err2)[:100]} "
                              "(canonical string retained verbatim)"}
         return {"proven": True,
-                "basis": "both sides of the recorded equality parse as "
-                         "sympy expressions under the canonical symbols"}
+                "basis": f"both sides of the recorded {_op!r} relation "
+                         "parse as sympy expressions under the canonical "
+                         "symbols"}
     # no '=': a relation/inequality string — structural ONLY if the whole
     # string parses as a genuine sympy RELATIONAL (Re < 2300). A bare
     # expression parse is NOT accepted: sympy auto-symbols English words
     # into implicit multiplication ("flow proportional to ..." would
     # otherwise fake a pass — caught here, Art. XXX).
     try:
-        local = {s: sympy.Symbol(s) for s in _symbols_in(math_expr)}
+        func_names = set(re.findall(r"\b([A-Za-z][A-Za-z0-9_]*)\s*\(",
+                                    math_expr))
+        local = {}
+        for s in _symbols_in(math_expr):
+            if s in func_names:
+                local[s] = sympy.Function(s)
+            else:
+                local[s] = sympy.Symbol(s)
         expr = sympy.parse_expr(math_expr, local_dict=local,
                                 transformations="all")
         is_rel = isinstance(expr, sympy.logic.boolalg.Boolean) or \

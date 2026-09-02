@@ -940,7 +940,10 @@ def test_d1_resume_continues_killed_run_without_rerunning_stages():
         stages = [e["stage"] for e in run2.env.stage_log]
         for stg, _ in CHAIN_PLAN:
             assert stages.count(stg) == 1, stg
-        assert len(run2.env.stage_log) == done_before + 6  # + DISABLED entries
+        # +6 DISABLED entries + 1 for the R394 PREMISE_GATE stage (not in
+        # the disabled list, so the resumed conductor EXECUTES it — the
+        # fixture problem is premise-coherent)
+        assert len(run2.env.stage_log) == done_before + 7
         # the automatic survivor -> package pipeline ran in phase 2
         assert (td / "INVENTION_SPECIFICATION.json").exists()
         assert (td / "ENGINEERING_SPECIFICATION.json").exists()

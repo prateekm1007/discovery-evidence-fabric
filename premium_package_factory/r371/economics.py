@@ -65,11 +65,18 @@ def _parse_effort(text: str):
     return lo, hi, qualifier
 
 
-def build_validation_economics(pkg) -> dict:
-    """VALIDATION_ECONOMICS.json content for one package."""
+def build_validation_economics(pkg, kill_condition: str = "") -> dict:
+    """VALIDATION_ECONOMICS.json content for one package.
+
+    R394: the decisive work package is DERIVED from the recorded kill
+    condition (premium_package_factory.r394.decisive_experiment) — never
+    build_plan[0]. The derivation, matched tokens, and all scored
+    candidates ship in the JSON for buyer audit.
+    """
+    from premium_package_factory.r394.decisive_experiment import (
+        derive_decisive_work_package, dependency_closure_effort)
     steps = []
     total_lo, total_hi = 0, 0
-    decisive = None
     for i, step in enumerate(pkg.build_plan):
         parsed = _parse_effort(step.get("estimated_effort", ""))
         if parsed is None:
@@ -96,10 +103,14 @@ def build_validation_economics(pkg) -> dict:
             ),
         }
         steps.append(rec)
-        if decisive is None:
-            decisive = rec
 
-    wp1 = pkg.build_plan[0] if pkg.build_plan else {}
+    decisive = derive_decisive_work_package(pkg, kill_condition)
+    if decisive.get("decisive_experiment_state") == \
+            "DERIVED_FROM_KILL_CONDITION":
+        closure = dependency_closure_effort(
+            pkg, decisive["work_package"])
+        decisive["earliest_start"] = closure
+
     ver1 = pkg.verification[0] if pkg.verification else {}
 
     return {
@@ -125,11 +136,7 @@ def build_validation_economics(pkg) -> dict:
             ),
         },
         "time_range": {
-            "first_decisive_work_package": {
-                "work_package": wp1.get("work_package"),
-                "recorded_effort": wp1.get("estimated_effort"),
-                "parsed_weeks": (decisive or {}).get("parsed_weeks"),
-            },
+            "decisive_work_package": decisive,
             "full_build_plan": {
                 "low_weeks": total_lo if total_lo else NOT_ESTABLISHED,
                 "high_weeks": total_hi if total_hi else NOT_ESTABLISHED,
@@ -166,12 +173,18 @@ def build_validation_economics(pkg) -> dict:
         "expected_decision": {
             "decision": (
                 "Whether the package kill condition is CONFIRMED or "
-                "REFUTED by the first decisive work package"
+                "REFUTED by the decisive work package (derived from the "
+                "kill condition, not from list position — R394)"
             ),
             "kill_condition_link": "headlines.kill_if",
-            "acceptance_criterion": ver1.get("acceptance")
-            or wp1.get("acceptance_criterion"),
-            "verification_requirement": ver1.get("requirement"),
+            "kill_condition": kill_condition or None,
+            "acceptance_criterion": (decisive.get("acceptance_criterion")
+                                     or ver1.get("acceptance")
+                                     or (pkg.build_plan[0].get(
+                                         "acceptance_criterion")
+                                         if pkg.build_plan else None)),
+            "verification_requirement": (decisive.get("measurement")
+                                         or ver1.get("requirement")),
         },
         "work_package_economics": steps,
         "discipline": (

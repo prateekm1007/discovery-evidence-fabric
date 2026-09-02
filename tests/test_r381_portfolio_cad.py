@@ -239,7 +239,8 @@ class TestModelLayerFull(unittest.TestCase):
 
     def test_p01_validated_with_full_model_dir(self):
         s = self.results["P-01"]
-        self.assertEqual(s["status"], "PRESENT_AND_VALIDATED")
+        self.assertIn(s["status"], ("CAD_VALIDATED", "PRESENT_AND_VALIDATED"))
+        self.assertEqual(s["status"], "CAD_VALIDATED")
         self.assertTrue(s["model_id"].startswith("pm:"))
         required_files = [
             "3D_DESIGN_STATUS.json", "PARAMETRIC_MODEL_SOURCE.py",
@@ -366,7 +367,8 @@ class TestModelLayerFull(unittest.TestCase):
         # the honest KILL: floor lumen 0.6 -> 0.8 breaches the wall on
         # the REBUILT solid; the base design ships as validated
         s = self.results["P-07"]
-        self.assertEqual(s["status"], "PRESENT_AND_VALIDATED")
+        self.assertIn(s["status"], ("CAD_VALIDATED", "PRESENT_AND_VALIDATED"))
+        self.assertEqual(s["status"], "CAD_VALIDATED")
         self.assertEqual(s["loop_outcome"], "KILLED_GEOMETRY_INVALID")
         loop = self._json("P-07", "IMPROVEMENT_LOOP_EVIDENCE.json")
         self.assertFalse(loop["geometry_validation_of_child"]["valid"])

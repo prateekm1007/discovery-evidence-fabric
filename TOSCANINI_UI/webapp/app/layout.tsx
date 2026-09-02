@@ -17,19 +17,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>
-        <div className="shell">
-          <header className="topbar">
-            <div className="brand">
-              Toscanini<em>.</em>
-            </div>
-            <div className="meta">
-              discovery · invention · evidence · 3D design
-            </div>
-          </header>
-          {children}
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

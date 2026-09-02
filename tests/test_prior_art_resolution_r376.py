@@ -395,7 +395,12 @@ class TestRunCollision:
                                          "abstract": "",
                                          "fetch_status": "NOT_ATTEMPTED"})
             r = cr.run_collision(BATTERY_MM, BATTERY_PROBLEM)
-        assert r["prior_art_status"] == "UNRESOLVED_INSUFFICIENT_EVIDENCE"
+        # R394 s2 contract change (deliberate, directive-driven): a
+        # PARTIAL search failure is UNRESOLVED_SEARCH_INCOMPLETE — more
+        # precise than the old coarse UNRESOLVED_INSUFFICIENT_EVIDENCE.
+        # Both forbid absence and differentiation claims; the errors are
+        # still recorded (the test's load-bearing intent).
+        assert r["prior_art_status"] == "UNRESOLVED_SEARCH_INCOMPLETE"
         assert r["patent"]["source_errors"]
 
     def test_adjacent_only_hits_recorded_as_threats(self):

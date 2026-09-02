@@ -58,9 +58,13 @@ def portfolio_commit() -> str:
     except Exception:  # noqa: BLE001
         return ""
 
-# The three CEO-picked investor demos (R389 Phase 8) + every other slot
-# with a real 3D model, all served from the same code path.
-DEMO_FOCUS = ("04", "08", "09")
+# R394 (CEO directive 3): the internal "CEO investor demo #N"
+# labels are REMOVED from the customer-facing product — the showcase
+# says what the technology does, never why a demo was built. The three
+# former focus slots stay first by the same honest ordering (they were
+# picked for cross-domain variety: medical hydraulic, medical
+# photonic, non-medical positioning), described by their own content.
+FOCUS_SLOTS = ("04", "08", "09")
 
 SLOT_TITLES = {
     "01": ("Multisegment flow control", "A multi-segment catheter that "
@@ -69,19 +73,17 @@ SLOT_TITLES = {
             "within a physiologic envelope"),
     "03": ("Catalytic clearance", "Surface catalysis clears accumulated "
             "protein deposits at the interface"),
-    "04": ("Drainage floor protection", "A parallel low-conductance "
-            "floor lumen keeps minimum drainage when the primary path "
-            "obstructs — the CEO investor demo #1"),
-    "05": ("Phage antibiofilm", " bacteriophage-coated surface prevents "
+    "04": ("Drainage floor protection", "A permanently open, "
+            "lower-conductance floor lumen keeps minimum drainage "
+            "flowing when the primary path obstructs"),
+    "05": ("Phage antibiofilm", "Bacteriophage-coated surface prevents "
             "bacterial biofilm establishment"),
     "07": ("Self-powered sensing", "Energy-harvesting sensor without a "
             "battery or lead"),
     "08": ("NIR photovoltaic conversion", "Near-infrared photovoltaic "
-            "layer converts wasted deep-tissue light — CEO investor "
-            "demo #2"),
+            "layer converts wasted deep-tissue light into device power"),
     "09": ("UWB localization", "Ultra-wideband pulse positioning of "
-            "instruments without line-of-sight — CEO investor demo #3 "
-            "(non-medical domain)"),
+            "instruments without line-of-sight"),
     "10": ("Catheter navigation", "Shape-memory steering of catheter "
             "tips under magnetic guidance"),
     "11": ("Gravity damper", "Passive gravity-compensating damper "
@@ -223,7 +225,7 @@ def list_showcase() -> List[Dict[str, Any]]:
             "title": title,
             "blurb": blurb,
             "domain": ("non-medical" if slot == "09" else "medical"),
-            "demo_focus": slot in DEMO_FOCUS,
+            "demo_focus": slot in FOCUS_SLOTS,
             "parameter_count": len(plist),
             "glb": f"/api/showcase/{slot}/model",
         })
@@ -245,9 +247,14 @@ def showcase_detail(slot: str) -> Optional[Dict[str, Any]]:
     title, blurb = SLOT_TITLES.get(slot, (d.name.replace("_", " "), ""))
     maturity = _read_json(d / "MATURITY_BASIS.json") or {}
     loop_counts = (loop_state.get("evidence_class_counts") or {})
-    first_wp = (((_read_json(d / "VALIDATION_ECONOMICS.json") or {})
-                 .get("time_range") or {}).get("first_decisive_work_package")
-                or {})
+    # R394: the economics JSON now ships `decisive_work_package`
+    # (derived from the recorded kill condition, never list position);
+    # older built trees carry the legacy `first_decisive_work_package` —
+    # both are read honestly, absent -> None, never synthesized.
+    _ec_time = (_read_json(d / "VALIDATION_ECONOMICS.json") or {}).get(
+        "time_range") or {}
+    first_wp = (_ec_time.get("decisive_work_package")
+                or _ec_time.get("first_decisive_work_package") or {})
     zip_path = None
     zips = list(DOWNLOAD_ROOT.glob(f"{d.name}.zip"))
     if zips:
@@ -259,7 +266,7 @@ def showcase_detail(slot: str) -> Optional[Dict[str, Any]]:
         "package_id": manifest.get("package_id") or d.name,
         "title": title,
         "blurb": blurb,
-        "demo_focus": slot in DEMO_FOCUS,
+        "demo_focus": slot in FOCUS_SLOTS,
         "created_from": "portfolio buyer-distribution repository "
                         "(Art. XXXIX authority)",
         "brief": brief,
@@ -268,8 +275,10 @@ def showcase_detail(slot: str) -> Optional[Dict[str, Any]]:
         "known_blockers": maturity.get("known_blockers") or [],
         "evidence_class_counts": loop_counts,
         "first_decisive_work_package": {
-            "work_package": first_wp.get("work_package"),
-            "recorded_effort": first_wp.get("recorded_effort"),
+            "work_package": (first_wp.get("work_package")
+                              or first_wp.get("work_package_id")),
+            "recorded_effort": (first_wp.get("recorded_effort")
+                                or first_wp.get("effort")),
         },
         "mechanism_summary": eq_reg.get("model_summary"),
         "equations": [
@@ -296,14 +305,21 @@ def showcase_detail(slot: str) -> Optional[Dict[str, Any]]:
         "model": {
             "glb": f"/api/showcase/{slot}/model",
             "glb_path": str(glbs[0]) if glbs else None,
-            "step": sorted(model.glob("*.step")),
-            "stl": sorted(model.glob("*.stl")),
-            "svg_views": sorted(model.glob("*.svg")),
+            "step": [p.name for p in sorted(model.glob("*.step"))],
+            "stl": [p.name for p in sorted(model.glob("*.stl"))],
+            "svg_views": [p.name for p in sorted(model.glob("*.svg"))],
+            # R395: first-class downloads — the buyer can take the
+            # geometry in STEP/STL/GLB straight from the artifact panel
+            "downloads": {
+                k: f"/api/showcase/{slot}/download/{k}"
+                for k in ("step", "stl", "glb")
+                if download_path(slot, k)
+            },
         },
         "dossier": {
             "pdfs": [p.name for p in sorted(d.glob("*.pdf"))],
             "download": f"/api/showcase/{slot}/package",
-            "download_path": zip_path,
+            "download_path": Path(zip_path).name if zip_path else None,
         },
         "provenance_note":
             "All geometry is COMPUTATIONAL_RESULT with computation logs; "
@@ -319,6 +335,31 @@ def glb_path(slot: str) -> Optional[Path]:
         return None
     glbs = sorted((d / "MODEL").glob("*.glb"))
     return glbs[0] if glbs else None
+
+
+# R395: downloadable geometry — the buyer-facing CAD surfaces. kind is
+# one of step / stl / glb (the dossier ZIP is /package). None when the
+# slot or the artifact does not exist — the caller 404s honestly.
+_DOWNLOAD_MIME = {
+    "step": "application/step",
+    "stl": "model/stl",
+    "glb": "model/gltf-binary",
+}
+
+
+def download_path(slot: str, kind: str) -> Optional[Path]:
+    d = _slot_dir(slot)
+    if not d or kind not in _DOWNLOAD_MIME:
+        return None
+    model = d / "MODEL"
+    if not model.exists():
+        return None
+    hits = sorted(model.glob(f"*.{kind}"))
+    return hits[0] if hits else None
+
+
+def download_mime(kind: str) -> str:
+    return _DOWNLOAD_MIME.get(kind, "application/octet-stream")
 
 
 def package_zip(slot: str) -> Optional[Path]:

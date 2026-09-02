@@ -1,0 +1,272 @@
+{
+  "package_id": "P-07",
+  "v3_version": "3.0",
+  "supersedes": "V2",
+  "authority": "CEO directive R392/R393 (updated) Priority 1/3/5 + Constitution Art. I/II/VI/XXVIII",
+  "purpose": "Resolve the mechanism/CAD contradiction (Option B: the implemented geometry is a permanently open, lower-conductance parallel floor lumen — no switching element exists and none is claimed), repair the corrupted EQ-4 canonical string, record units for all equation symbols, and replace adjacent-domain web content with mechanism-specific classified evidence.",
+  "operations": [
+    {
+      "op": "replace_string",
+      "path": "system_architecture.description",
+      "before": "CSF shunt with passive safety floor: a secondary drainage path with lower conductance that maintains minimum drainage when the primary path obstructs. Differential pressure thresholds activate the floor path.",
+      "after": "CSF shunt with passive safety floor: a permanently open secondary drainage path with lower conductance that maintains minimum drainage when the primary path obstructs. The floor lumen is always open; drainage priority shifts to it passively by differential conductance as the primary lumen's conductance collapses. The implemented geometry contains only the two permanently open lumens — no actuator and no moving element.",
+      "reason": "The parametric model (two permanently open through-bores in one cylindrical body) implements differential conductance, not a pressure-activated switch. A mechanism claim without geometric implementation is forbidden (CEO R392/R393 hard gate MECHANISM_CLAIM_WITHOUT_GEOMETRIC_IMPLEMENTATION; Art. I evidence precedes assertion, Art. XXVIII no silent semantic promotion)."
+    },
+    {
+      "op": "replace_string",
+      "path": "system_architecture.subsystems[1].function",
+      "before": "Lower-conductance path that opens when primary obstructs (pressure threshold or mechanical backup)",
+      "after": "Permanently open lower-conductance path that maintains minimum drainage when the primary path obstructs (differential conductance; always open, no moving parts)",
+      "reason": "'opens when primary obstructs' implied a switching behavior the geometry does not implement; the lumen never opens or closes — it is always open and drains continuously."
+    },
+    {
+      "op": "remove_subsystem",
+      "subsystem_id": "SS-03",
+      "reason": "SS-03 'Pressure-activated switch (optional)' described a mechanical switch that activates the floor path when dP exceeds a threshold. The parametric model contains no switch, valve, or pressure-responsive feature: only a cylindrical body, a primary through-bore, and a floor through-bore. The claim is removed rather than implemented because the invention's defensible concept (per the surviving governing model, equations, and safety invariants) is the passive permanently-open differential-conductance floor — adding an unvalidated switching element would create a new unsupported mechanism claim.",
+      "evidence_basis": "MODEL/PARAMETRIC_MODEL_SOURCE.py (build program: body.cut(prim).cut(floor) — two through-bores, no actuator); CEO R392/R393 Priority 1 Option B."
+    },
+    {
+      "op": "replace_string",
+      "path": "mechanism_architecture.physical_changes",
+      "before": "When primary lumen obstructs (debris, tissue ingrowth, protein aggregation), pressure upstream rises; secondary lumen either passively continues to drain (always open, lower conductance) or opens via pressure-activated switch.",
+      "after": "When primary lumen obstructs (debris, tissue ingrowth, protein aggregation), the permanently open secondary lumen continues to drain at its lower conductance; total drainage falls from Q_primary + Q_floor toward Q_floor as G_primary collapses.",
+      "reason": "Removes the pressure-activated-switch branch (see SS-03 removal); states the implemented physics: continuous parallel drainage with conductance collapse on the primary path."
+    },
+    {
+      "op": "replace_string",
+      "path": "mechanism_architecture.activation_model.transition_mechanism",
+      "before": "Either always-open floor (passive) OR pressure-threshold-activated floor (semi-active)",
+      "after": "Always-open floor (passive differential conductance) — the implemented geometry has no moving parts and no actuator",
+      "reason": "The dual-mode language presented a switching alternative that no geometry implements. The record now states the single implemented mechanism."
+    },
+    {
+      "op": "replace_string",
+      "path": "design_inputs[3].value",
+      "before": "ICP 5-40 mmHg (floor activation threshold range; passive safety engages at high ICP)",
+      "after": "ICP 5-40 mmHg (operating pressure range; drainage through the always-open floor lumen scales with ICP by its conductance)",
+      "reason": "'floor activation threshold' described the removed switching concept; the floor is always open and its flow follows G_floor * dP directly."
+    },
+    {
+      "op": "remove_critical_parameter",
+      "name": "Obstruction resistance threshold",
+      "reason": "The parameter's recorded basis ('Pressure at which floor dominates') describes the removed pressure-switching concept. In the implemented differential-conductance design, floor dominance is set by the conductance ratio G_floor/G_primary, not by a pressure threshold. The claim-traceability record C-P-07-005 ('Obstruction resistance threshold: UNKNOWN') is preserved verbatim as history.",
+      "evidence_basis": "Governing model EQ-3 (parallel conductance) and EQ-4 (Q_floor_min = G_floor * dP_max); SS-03 removal above."
+    },
+    {
+      "op": "set_symbol_units",
+      "reason": "Record units for every equation symbol (CEO directive 9). Units carry a recorded basis; none is guessed from symbol convention (Art. VI). With units recorded, genuine dimensional validation becomes evaluable for the governing equations.",
+      "symbol_units": {
+        "Q": {
+          "unit": "mL/min",
+          "basis": "Clinical CSF drainage flow; the record's own boundary conditions and DI-005 (Q_min target) are expressed in mL/min.",
+          "basis_class": "RECORDED"
+        },
+        "Q_total": {
+          "unit": "mL/min",
+          "basis": "Total drainage = sum of per-path flows (EQ-2); same recorded flow unit.",
+          "basis_class": "DERIVED_DIMENSIONAL_IDENTITY"
+        },
+        "Q_primary": {
+          "unit": "mL/min",
+          "basis": "Per-path drainage flow through the primary lumen; same recorded flow unit.",
+          "basis_class": "RECORDED"
+        },
+        "Q_floor": {
+          "unit": "mL/min",
+          "basis": "Per-path drainage flow through the floor lumen; same recorded flow unit.",
+          "basis_class": "RECORDED"
+        },
+        "Q_floor_min": {
+          "unit": "mL/min",
+          "basis": "Minimum drainage at worst-case pressure (EQ-4); product of G_floor and dP_max.",
+          "basis_class": "DERIVED_DIMENSIONAL_IDENTITY"
+        },
+        "r": {
+          "unit": "mm",
+          "basis": "Catheter lumen radius; device geometry is mm-scale (d_floor recorded in mm).",
+          "basis_class": "RECORDED"
+        },
+        "L": {
+          "unit": "mm",
+          "basis": "Catheter flow-path length; device geometry is mm-scale.",
+          "basis_class": "RECORDED"
+        },
+        "dP": {
+          "unit": "mmHg",
+          "basis": "Boundary conditions: 'dP across shunt: 0-35 mmHg'.",
+          "basis_class": "RECORDED"
+        },
+        "dP_max": {
+          "unit": "mmHg",
+          "basis": "Worst-case operating differential pressure; same recorded pressure unit (ICP 5-40 mmHg, outlet ~5-15 mmHg).",
+          "basis_class": "RECORDED"
+        },
+        "eta": {
+          "unit": "mPa·s",
+          "basis": "CSF dynamic viscosity (water-like, approximately 1.0 mPa·s) — the hydraulic model's viscosity; confirmation against measured CSF rheology is recorded as buyer-side engineering development.",
+          "basis_class": "DOMAIN_STANDARD_WITH_CONFIRMATION_REQUIRED"
+        },
+        "G_floor": {
+          "unit": "mL/(min·mmHg)",
+          "basis": "Critical parameter 'G_floor (floor conductance)' recorded unit.",
+          "basis_class": "RECORDED"
+        },
+        "G_primary": {
+          "unit": "mL/(min·mmHg)",
+          "basis": "Critical parameter 'G_primary (primary conductance)' recorded unit.",
+          "basis_class": "RECORDED"
+        },
+        "G_total": {
+          "unit": "mL/(min·mmHg)",
+          "basis": "Parallel conductance sum (EQ-3) — dimensionally identical to the summands; a sum requires a common unit.",
+          "basis_class": "DERIVED_DIMENSIONAL_IDENTITY"
+        },
+        "pi": {
+          "unit": "dimensionless",
+          "basis": "Mathematical constant (circle ratio); dimensionless by definition.",
+          "basis_class": "MATHEMATICAL_CONSTANT"
+        }
+      }
+    },
+    {
+      "op": "replace_external_evidence",
+      "reason": "The prior external precedent list was adjacent-domain web content (an IV-catheter marketing video, an Instagram reel, urinary-catheter care pages) with no mechanism-specific bearing on multi-lumen CSF shunts. Replaced with a classified evidence set retrieved by mechanism-specific queries (EuropePMC, R394 retrieval record R394/p07_evidence/) covering: dual-lumen ventricular drainage systems, multi-lumen ventricular drainage catheter prior art, obstruction-resistant catheter architecture, and pressure-responsive flow control. Each record carries its own provenance (provider, query, raw payload sha256, retrieval time) and a 5-way classification with recorded rationale. No patentability or novelty conclusions are drawn.",
+      "classification_summary": {
+        "classes": [
+          "BACKGROUND",
+          "ANALOGY",
+          "DIRECT_MECHANISM_EVIDENCE",
+          "DIRECT_PRIOR_ART",
+          "CONTRADICTORY_EVIDENCE"
+        ],
+        "rule": "Classified by recorded adjudication of title+abstract against the mechanism feature (multi-lumen / dual-lumen / parallel drainage in the CSF-shunt domain) — per-record rationale recorded; provenance chain per record (Art. XXI.4/21.9).",
+        "retrieval_record": "R394/p07_evidence/P07_MECHANISM_EVIDENCE.json (7 queries, 69 records, 0 provider failures)"
+      },
+      "replacement": [
+        {
+          "source": "europepmc:patent-2010-multilumen-ventricular-drainage",
+          "source_title": "MULTI-LUMEN VENTRICULAR DRAINAGE CATHETER",
+          "source_snippet": "A shunt includes a housing having an inlet, an outlet and a flow control mechanism disposed within the housing. A ventricular catheter is connected to the inlet of the housing. The catheter has a longitudinal length, a proximal end, a distal end, and an inner lumen extending therethrough. The inner lumen of the catheter includes at least two lumens at the distal end and has only one lumen at the proximal end. The catheter has one slit and aperture corresponding to each of the at least two lumens located at the distal end of the catheter.",
+          "classification": "DIRECT_PRIOR_ART",
+          "classification_rationale": "Patent-shaped record describing a multi-lumen ventricular drainage catheter with at least two distal lumens and one slit+aperture per lumen — the closest named prior art for multi-lumen ventricular drainage.",
+          "retrieved_by_query": "multi_lumen_ventricular",
+          "year": "2010",
+          "provenance": {
+            "provider": "europepmc",
+            "record_id": "europepmc:patent-2010-multilumen-ventricular-drainage"
+          }
+        },
+        {
+          "source": "https://pubmed.ncbi.nlm.nih.gov/38468682",
+          "source_title": "Stereotactic placement of dual lumen catheter system for continuous drainage, irrigation, and intraventricular antibiotic therapy for treatment of brain abscess with ventriculitis - A case report and literature review.",
+          "source_snippet": "This report discusses a case where the dual-lumen catheter system, an innovative neurosurgical tool integrating continuous irrigation with drainage, was employed. Dual-lumen ventricular catheter systems are in clinical use for combined drainage and irrigation.",
+          "classification": "DIRECT_MECHANISM_EVIDENCE",
+          "classification_rationale": "Clinical use of a dual-lumen ventricular catheter system (drainage + irrigation functions) — establishes that dual-lumen ventricular catheters are manufacturable and clinically deployed; the two lumens serve DIFFERENT functions, not parallel redundancy.",
+          "retrieved_by_query": "dual_lumen_shunt",
+          "year": "2024",
+          "provenance": {
+            "provider": "europepmc",
+            "record_id": "europepmc:38468682",
+            "doi": "10.25259/sni_977_2023"
+          }
+        },
+        {
+          "source": "https://pubmed.ncbi.nlm.nih.gov/40745075",
+          "source_title": "Prospective Trial of Cerebrospinal Fluid Filtration After Aneurysmal Subarachnoid Hemorrhage via Lumbar Catheter Extension (PILLAR-XT).",
+          "source_snippet": "After aneurysm repair, a dual-lumen intrathecal catheter was inserted into the study participant's spinal canal. CSF was extracorporeally filtered for up to 72 h.",
+          "classification": "DIRECT_MECHANISM_EVIDENCE",
+          "classification_rationale": "Prospective trial employing a dual-lumen intrathecal catheter (aspiration + return functions) — current dual-lumen CSF-access catheter practice in trials; lumens serve distinct functions.",
+          "retrieved_by_query": "dual_lumen_shunt",
+          "year": "2025",
+          "provenance": {
+            "provider": "europepmc",
+            "record_id": "europepmc:40745075",
+            "doi": "10.1007/s12028-025-02328-8"
+          }
+        },
+        {
+          "source": "https://pubmed.ncbi.nlm.nih.gov/39944477",
+          "source_title": "The impact of architectural modifications on relative resistance to fluid flow in ventricular catheters.",
+          "source_snippet": "This study represents the in-vitro assessment of various architectural modifications on catheter flow rate and pressure, focusing on bulk outflow dynamics and occlusion with whole blood-inoculated cerebrospinal fluid. 16 variations from standard catheters were assessed.",
+          "classification": "DIRECT_MECHANISM_EVIDENCE",
+          "classification_rationale": "In-vitro study of how ventricular-catheter architecture changes outflow resistance and occlusion behavior with blood-inoculated CSF — direct experimental method for the design-space question (architecture vs obstruction), reusable as the pattern for the package's decisive experiment.",
+          "retrieved_by_query": "obstruction_resistant_shunt",
+          "year": "2025",
+          "provenance": {
+            "provider": "europepmc",
+            "record_id": "europepmc:39944477",
+            "doi": "10.3389/fbioe.2024.1519499"
+          }
+        },
+        {
+          "source": "https://pubmed.ncbi.nlm.nih.gov/41616221",
+          "source_title": "In Vitro Assessment of Ventricular Catheters with a Multilayered Fibrous Web to Prevent Cellular Occlusion.",
+          "source_snippet": "Approximately 40% of these shunts fail within two years, primarily due to catheter occlusion caused by cell attachment and cellular debris. Previous strategies, including polyvinylpyrrolidone (PVP) coatings aimed at reducing bacterial adhesion, have not significantly mitigated occlusion.",
+          "classification": "DIRECT_MECHANISM_EVIDENCE",
+          "classification_rationale": "Alternative obstruction-prevention architecture (multilayered fibrous web) assessed in vitro — establishes the occlusion-prevention design space and quantifies the failure driver the package addresses; distinct mechanism from parallel lumen redundancy.",
+          "retrieved_by_query": "anti_occlusion_catheter",
+          "year": "2026",
+          "provenance": {
+            "provider": "europepmc",
+            "record_id": "europepmc:41616221",
+            "doi": "10.1021/acsbiomaterials.5c02111"
+          }
+        },
+        {
+          "source": "https://pubmed.ncbi.nlm.nih.gov/38878895",
+          "source_title": "Use of an Irrigating External Ventricular Drain in an Infant: Proof-Of-Concept Technical Note.",
+          "source_snippet": "This concept has recently been further extrapolated to the use of a continuous irrigating EVD over standard manual endoscopic irrigation.",
+          "classification": "DIRECT_MECHANISM_EVIDENCE",
+          "classification_rationale": "Proof-of-concept multi-function (irrigating) external ventricular drain — evidence that multi-lumen/multi-function ventricular access is an active engineering direction.",
+          "retrieved_by_query": "dual_lumen_shunt",
+          "year": "2024",
+          "provenance": {
+            "provider": "europepmc",
+            "record_id": "europepmc:38878895",
+            "doi": "10.1016/j.wneu.2024.06.038"
+          }
+        },
+        {
+          "source": "https://pubmed.ncbi.nlm.nih.gov/42113255",
+          "source_title": "Programmable shunt valves with a \"virtual off\" for intrathecal chemotherapy delivery in children with high-grade CNS tumors and hydrocephalus.",
+          "source_snippet": "We present our experience in delivery of chemotherapy to children via programmable valves. Programmable shunt valves with a virtual-off state represent the current state of flow-control art.",
+          "classification": "BACKGROUND",
+          "classification_rationale": "Current state of pressure/flow control in shunt valves (programmable, valve-based) — background establishing the flow-control landscape the passive floor differs from; valve-based control is the dominant incumbent.",
+          "retrieved_by_query": "pressure_responsive_flow",
+          "year": "2026",
+          "provenance": {
+            "provider": "europepmc",
+            "record_id": "europepmc:42113255",
+            "doi": "10.1007/s00381-026-07311-y"
+          }
+        },
+        {
+          "source": "https://pubmed.ncbi.nlm.nih.gov/39767937",
+          "source_title": "Clinical Outcomes and Complication Rates of Ventriculoperitoneal Shunts in Hydrocephalic Infants.",
+          "source_snippet": "Clinical outcomes and complication rates of ventriculoperitoneal shunts — obstruction remains a leading complication requiring revision.",
+          "classification": "BACKGROUND",
+          "classification_rationale": "Clinical complication-rate background for the problem statement (obstruction-driven revision burden).",
+          "retrieved_by_query": "obstruction_resistant_shunt",
+          "year": "2024",
+          "provenance": {
+            "provider": "europepmc",
+            "record_id": "europepmc:39767937"
+          }
+        },
+        {
+          "source": "https://pubmed.ncbi.nlm.nih.gov/18635482",
+          "source_title": "A prospective randomized trial of two safety peripheral intravenous catheters.",
+          "source_snippet": "Safety catheters are not superior with regard to failure rate in the emergency department setting.",
+          "classification": "ANALOGY",
+          "classification_rationale": "Adjacent-domain (peripheral IV safety catheters) randomized evidence that a safety feature does not automatically reduce failure — retained as a cautionary analogy for safety-feature claims; carries no CSF-shunt mechanism weight.",
+          "retrieved_by_query": "retained_from_v1_record",
+          "year": "2008",
+          "provenance": {
+            "provider": "v1_canonical_record",
+            "record_id": "pubmed:18635482"
+          }
+        }
+      ]
+    }
+  ]
+}

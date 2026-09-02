@@ -457,7 +457,7 @@ def run_acceptance(portfolio_root):
                     td_fail.append(
                         f"{folder}: NOT_APPLICABLE but extra MODEL file {f}")
         elif cls == "3D_PHYSICAL_DESIGN_REQUIRED":
-            if s3 == "PRESENT_AND_VALIDATED":
+            if s3 in ("PRESENT_AND_VALIDATED", "CAD_VALIDATED"):
                 for must in ("PARAMETRIC_MODEL_SOURCE.py",
                              "MODEL_MANIFEST.json", "PARAMETERS.json",
                              "CONSTRAINTS.json",

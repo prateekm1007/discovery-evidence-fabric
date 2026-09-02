@@ -42,7 +42,6 @@ FOUR-SEARCH ATTACK:
 """
 from __future__ import annotations
 import json
-import subprocess
 import time
 import urllib.parse
 from dataclasses import dataclass, field
@@ -50,48 +49,59 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
+from discovery_fabric.connectors.connector_states import fetch_json
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 # ---------------------------------------------------------------------------
 # Source adapters (free APIs, no key required unless noted)
+#
+# R394 section 4: the curl subprocess is GONE. The deployed image
+# (python:3.12-slim) contains no curl, so every public run failed this
+# stage with FileNotFoundError('curl') — measured 2026-09-02
+# (R394/PRODUCTION_AUDIT.json, consultant claim 1, CONFIRMED_CURRENT).
+# Every call now goes through the shared Python HTTP stack
+# (discovery_fabric.connectors.connector_states) which classifies
+# outcomes into the eight explicit connector states and never converts
+# an outage into zero results.
 # ---------------------------------------------------------------------------
 
-def _curl_json(url: str, headers: dict = None, timeout: int = 30) -> Optional[dict]:
-    """Fetch JSON from URL using curl."""
-    cmd = ["curl", "-s", "-L", url]
-    if headers:
-        for k, v in headers.items():
-            cmd.extend(["-H", f"{k}: {v}"])
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-    if result.returncode != 0:
-        return None
-    try:
-        return json.loads(result.stdout)
-    except:
-        return None
+def _search_get(url: str, timeout: int = 30) -> Optional[dict]:
+    """GET JSON through the connector-state stack. Returns the parsed
+    payload on SUCCESS/EMPTY_RESULT, None on any outage (the caller
+    records the outage state — never a silent zero)."""
+    r = fetch_json(url, timeout=timeout)
+    if r.get("connector_state") in ("SUCCESS", "EMPTY_RESULT"):
+        return r.get("data")
+    return None
 
 
 def search_pubmed(query: str, limit: int = 5) -> dict:
     """Search PubMed via NCBI E-utilities."""
     encoded = urllib.parse.quote(query)
     url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term={encoded}&retmax={limit}&retmode=json"
-    data = _curl_json(url)
-    if not data:
-        return {"source": "PubMed", "query": query, "total": 0, "results": [], "error": "fetch failed"}
+    data = _search_get(url)
+    if data is None:
+        return {"source": "PubMed", "query": query, "total": 0, "results": [],
+                "error": "fetch failed", "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+                "note": "outage — NOT absence (R394 s4)"}
     total = int(data.get("esearchresult", {}).get("count", "0"))
     ids = data.get("esearchresult", {}).get("idlist", [])
-    return {"source": "PubMed", "query": query, "total": total, "results": [{"pmid": pid} for pid in ids]}
+    return {"source": "PubMed", "query": query, "total": total, "results": [{"pmid": pid} for pid in ids],
+            "connector_state": "EMPTY_RESULT" if total == 0 else "SUCCESS"}
 
 
 def search_clinical_trials(query: str, limit: int = 5) -> dict:
     """Search ClinicalTrials.gov API."""
     encoded = urllib.parse.quote(query)
     url = f"https://clinicaltrials.gov/api/v2/studies?query.term={encoded}&pageSize={limit}&format=json"
-    data = _curl_json(url)
-    if not data:
-        return {"source": "ClinicalTrials.gov", "query": query, "total": 0, "results": [], "error": "fetch failed"}
+    data = _search_get(url)
+    if data is None:
+        return {"source": "ClinicalTrials.gov", "query": query, "total": 0, "results": [],
+                "error": "fetch failed", "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+                "note": "outage — NOT absence (R394 s4)"}
     total = data.get("totalCount", 0)
     studies = data.get("studies", [])
     results = []
@@ -109,9 +119,11 @@ def search_openfda(query: str, limit: int = 5) -> dict:
     """Search FDA openFDA for device adverse events."""
     encoded = urllib.parse.quote(query)
     url = f"https://api.fda.gov/device/event.json?search=device.generic_name:{encoded}&limit={limit}"
-    data = _curl_json(url)
-    if not data:
-        return {"source": "openFDA", "query": query, "total": 0, "results": [], "error": "fetch failed or no results"}
+    data = _search_get(url)
+    if data is None:
+        return {"source": "openFDA", "query": query, "total": 0, "results": [],
+                "error": "fetch failed or no results", "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+                "note": "outage — NOT absence (R394 s4)"}
     total = data.get("meta", {}).get("results", {}).get("total", 0)
     results = data.get("results", [])
     return {"source": "openFDA", "query": query, "total": total, "results": [{"event": r.get("event_type", ""), "date": r.get("date_received", "")} for r in results[:limit]]}
@@ -121,16 +133,14 @@ def search_nih_reporter(query: str, limit: int = 5) -> dict:
     """Search NIH RePORTER for funded research."""
     url = "https://api.reporter.nih.gov/v2/projects/search"
     payload = json.dumps({"criteria": {"text": query}, "offset": 0, "limit": limit, "sort_field": "project_start_date", "sort_order": "desc"})
-    result = subprocess.run(
-        ["curl", "-s", "-X", "POST", url, "-H", "Content-Type: application/json", "-d", payload],
-        capture_output=True, text=True, timeout=30
-    )
-    if result.returncode != 0:
-        return {"source": "NIH RePORTER", "query": query, "total": 0, "results": [], "error": "fetch failed"}
-    try:
-        data = json.loads(result.stdout)
-    except:
-        return {"source": "NIH RePORTER", "query": query, "total": 0, "results": [], "error": "parse failed"}
+    r = fetch_json(url, timeout=30, method="POST", body=payload,
+                   headers={"Content-Type": "application/json"})
+    if r.get("connector_state") not in ("SUCCESS", "EMPTY_RESULT"):
+        state = r.get("connector_state")
+        return {"source": "NIH RePORTER", "query": query, "total": 0, "results": [],
+                "error": f"fetch failed", "connector_state": state,
+                "connector_reason": r.get("reason", "")}
+    data = r.get("data") or {}
     total = data.get("meta", {}).get("total", 0)
     projects = data.get("results", [])
     results = []
@@ -142,16 +152,19 @@ def search_nih_reporter(query: str, limit: int = 5) -> dict:
             "fiscal_year": p.get("fiscal_year", ""),
             "award_amount": p.get("award_amount", 0),
         })
-    return {"source": "NIH RePORTER", "query": query, "total": total, "results": results}
+    return {"source": "NIH RePORTER", "query": query, "total": total, "results": results,
+            "connector_state": r.get("connector_state")}
 
 
 def search_crossref(query: str, limit: int = 5) -> dict:
     """Search Crossref for DOI metadata."""
     encoded = urllib.parse.quote(query)
     url = f"https://api.crossref.org/works?query={encoded}&rows={limit}"
-    data = _curl_json(url)
-    if not data:
-        return {"source": "Crossref", "query": query, "total": 0, "results": [], "error": "fetch failed"}
+    data = _search_get(url)
+    if data is None:
+        return {"source": "Crossref", "query": query, "total": 0, "results": [],
+                "error": "fetch failed", "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+                "note": "outage — NOT absence (R394 s4)"}
     total = data.get("message", {}).get("total-results", 0)
     items = data.get("message", {}).get("items", [])
     results = []
@@ -168,9 +181,11 @@ def search_nasa_tech_reports(query: str, limit: int = 5) -> dict:
     """Search NASA Technical Reports Server (NTRS)."""
     encoded = urllib.parse.quote(query)
     url = f"https://ntrs.nasa.gov/api/citations/search?q={encoded}&page[size]={limit}"
-    data = _curl_json(url)
-    if not data:
-        return {"source": "NASA NTRS", "query": query, "total": 0, "results": [], "error": "fetch failed"}
+    data = _search_get(url)
+    if data is None:
+        return {"source": "NASA NTRS", "query": query, "total": 0, "results": [],
+                "error": "fetch failed", "connector_state": "UNAVAILABLE_OR_TIMEOUT",
+                "note": "outage — NOT absence (R394 s4)"}
     results = []
     for item in data.get("data", [])[:limit]:
         attrs = item.get("attributes", {})

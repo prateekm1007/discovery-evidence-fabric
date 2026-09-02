@@ -75,15 +75,32 @@ def render_exec_brief(pkg, hl, comm, eco, loopstate, out_path):
     st.append(Paragraph(_esc(not_est_text), S["BT"]))
 
     st.append(Paragraph("WHAT DOES THE BUYER DO NEXT?", S["QH"]))
-    wp1 = pkg.build_plan[0] if pkg.build_plan else {}
-    t_first = eco["time_range"]["first_decisive_work_package"]
-    st.append(Paragraph(_esc(
-        f"Decisive experiment: {wp1.get('work_package','WP-01')} — "
-        f"{wp1.get('test_article','')} ({wp1.get('measurement','')}). "
-        f"Recorded effort: {wp1.get('estimated_effort','NOT_RECORDED')}. "
-        f"Validation cost: NOT_ESTABLISHED (no quotation basis exists in the "
-        f"engineering record — vendor quotations required). "
-        f"Kill condition: {hl['kill_if']}"), S["BT"]))
+    dec = eco["time_range"].get("decisive_work_package") or {}
+    if dec.get("decisive_experiment_state") == "DERIVED_FROM_KILL_CONDITION":
+        es = (dec.get("earliest_start") or {}).get(
+            "earliest_start_weeks") or {}
+        es_txt = ""
+        if es:
+            es_txt = (f" Earliest start after its dependency closure: "
+                      f"{es.get('low', '?')}-{es.get('high', '?')} weeks "
+                      f"(sequential, no parallelization credit).")
+        st.append(Paragraph(_esc(
+            f"Decisive experiment: {dec.get('work_package', '')} — "
+            f"{dec.get('test_article', '')} ({dec.get('measurement', '')}). "
+            f"Recorded effort: {dec.get('recorded_effort', 'NOT_RECORDED')}."
+            f"{es_txt} "
+            f"Validation cost: NOT_ESTABLISHED (no quotation basis exists in the "
+            f"engineering record — vendor quotations required). "
+            f"Kill condition: {hl['kill_if']}"), S["BT"]))
+    else:
+        st.append(Paragraph(_esc(
+            "Decisive experiment: NOT DERIVED — no work package's recorded "
+            f"fields share enough content tokens with the recorded kill "
+            "condition under the mechanical derivation rule; the "
+            "scored candidates ship in VALIDATION_ECONOMICS.json "
+            "for audit. "
+            f"Kill condition: {hl['kill_if']}. "
+            "Validation cost: NOT_ESTABLISHED."), S["BT"]))
 
     st.append(Paragraph(_esc(
         "This is an engineering-definition technology-transfer dossier. It is "
@@ -107,7 +124,14 @@ def render_buyer_card(pkg, hl, comm, eco, loopstate, out_path):
           Spacer(1, 4)]
 
     rows = []
-    wp1 = pkg.build_plan[0] if pkg.build_plan else {}
+    # R394: the decisive experiment shown to the buyer is the one
+    # DERIVED from the kill condition (economics.py derivation), never
+    # build_plan[0].
+    _dec = (eco.get("time_range") or {}).get(
+        "decisive_work_package") or {}
+    _dec_wp = (_dec if _dec.get("decisive_experiment_state")
+               == "DERIVED_FROM_KILL_CONDITION" else None)
+    _dec_first = _dec_wp or (pkg.build_plan[0] if pkg.build_plan else {})
     tb = pkg.transfer_boundary or {}
     # R373-7 q6/q7: the receive/must lists are canonical strings and MUST
     # pass through the V2 mutation layer (a list item can itself carry a
@@ -160,11 +184,17 @@ def render_buyer_card(pkg, hl, comm, eco, loopstate, out_path):
          f"(resolution classes in the engineering dossier); market size, "
          f"competitive landscape, FTO and novelty NOT_ESTABLISHED."],
         ["4. CHEAPEST DECISIVE NEXT EXPERIMENT?",
-         f"{wp1.get('work_package','WP-01')}: {wp1.get('test_article','')} — "
-         f"{wp1.get('measurement','')}. Recorded effort: "
-         f"{wp1.get('estimated_effort','NOT_RECORDED')}. Cost NOT_ESTABLISHED "
-         f"(no quotation basis — vendor quotations required); this is the "
-         f"first, lowest-cost-known step of the recorded build plan."],
+         (f"{_dec_first.get('work_package','WP-01')}: "
+          f"{_dec_first.get('test_article','')} — "
+          f"{_dec_first.get('measurement','')}. Recorded effort: "
+          f"{_dec_first.get('estimated_effort','NOT_RECORDED')}. Cost "
+          f"NOT_ESTABLISHED "
+          f"(no quotation basis — vendor quotations required); "
+          + ("derived from the recorded kill condition — the package "
+             "that directly tests what would kill the project."
+             if _dec_wp else
+             "the first, lowest-cost-known step of the recorded build "
+             "plan (no package uniquely tests the kill condition)."))],
         ["5. WHAT EVIDENCE WOULD CAUSE THE BUYER TO STOP?", hl["kill_if"]],
     ]
     st.append(Paragraph("THE FIVE DECISION CRITICALS", S["SH"]))
@@ -199,10 +229,16 @@ def render_buyer_card(pkg, hl, comm, eco, loopstate, out_path):
          f"experiment is specified and costed as NOT_ESTABLISHED pending "
          f"vendor quotation — no invented precision."),
         ("6. WHAT IS THE DECISIVE EXPERIMENT?",
-         f"{wp1.get('work_package','WP-01')}: {wp1.get('test_article','')} — "
-         f"{wp1.get('measurement','')}. Acceptance: "
-         f"{(pkg.verification[0].get('acceptance','') if pkg.verification else wp1.get('acceptance_criterion',''))} "
-         f"Recorded effort: {wp1.get('estimated_effort','NOT_RECORDED')}."),
+         (f"{_dec_first.get('work_package','WP-01')}: "
+          f"{_dec_first.get('test_article','')} — "
+          f"{_dec_first.get('measurement','')}. Acceptance: "
+          f"{(_dec_first.get('acceptance_criterion') or (pkg.verification[0].get('acceptance','') if pkg.verification else ''))} "
+          f"Recorded effort: {_dec_first.get('estimated_effort','NOT_RECORDED')}. "
+          + ("Designated because it directly tests the kill condition "
+             "(machine-derived, not list position)."
+             if _dec_wp else
+             "NOT DERIVED from the kill condition — nothing is "
+             "labeled decisive without derivation."))),
         ("7. WHAT DOES THE BUYER RECEIVE?", buyer_receives),
         ("8. WHAT MUST THE BUYER DEVELOP?", buyer_must),
         ("9. WHAT WOULD KILL THE PROJECT?", hl["kill_if"]),

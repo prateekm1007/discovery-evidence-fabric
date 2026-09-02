@@ -88,6 +88,9 @@ PRIOR_ART_STATUS_MAP = {
         "mapped": "NO_MATCH_FOUND",
         "rationale": "direct vocabulary alignment; EuropePMC-only search",
         "epistemic_class": "SEARCH_RESULT",
+        "precondition": ("every mandatory query executed OK — the a2 "
+                         "layer guarantees this status is derived from "
+                         "execution, never from outage (R394 s2)"),
     },
     "PARTIAL_PRIOR_ART": {
         "mapped": "POSSIBLE_RELEVANCE",
@@ -99,6 +102,25 @@ PRIOR_ART_STATUS_MAP = {
         "rationale": ("legacy 'likely' is not a specific disclosure; patent-grade "
                       "collision search is required before any KILL promotion"),
         "epistemic_class": "SEARCH_RESULT",
+    },
+    # R394 section 2: search-execution states NEVER map to absence or
+    # differentiation. An outage is epistemic UNKNOWN (Art. XXI.3/XXV).
+    "SEARCH_FAILED": {
+        "mapped": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+        "rationale": ("every scientific-side query failed (provider "
+                      "outage/timeout); a search failure is not a "
+                      "scientific conclusion — no absence, no "
+                      "differentiation permitted from this report"),
+        "epistemic_class": "SEARCH_EXECUTION",
+        "epistemic_effect": "UNKNOWN",
+    },
+    "SEARCH_PARTIAL": {
+        "mapped": "UNRESOLVED_PARTIAL_EVIDENCE",
+        "rationale": ("some queries failed; findings stand as evidence "
+                      "but the searched universe is incomplete — no "
+                      "clean no-match claim permitted"),
+        "epistemic_class": "SEARCH_EXECUTION",
+        "epistemic_effect": "UNKNOWN",
     },
 }
 
@@ -225,6 +247,33 @@ class EvidenceFreezeAdapter(BaseAdapter):
             custody_records=len(records), hash_ok=ok)
 
 
+class PremiseGateAdapter(BaseAdapter):
+    """R394 section 6 — the false-premise gate. Runs AFTER the problem
+    is frozen and BEFORE candidate synthesis. Deterministic hard-rule
+    table (definitional contradictions only — see premise_gate.py for
+    the honest scope). A matched contradiction raises StageFailure
+    (MALFORMED_OR_FALSE_PREMISE) so the conductor records the explicit
+    stage failure, skips synthesis + everything downstream, and the
+    run terminates honestly with the premise explanation (never a
+    fabricated green path, never a burned-synthesis silent reject)."""
+    capability_id = "PREMISE_GATE"
+    module_path = "discovery_fabric/engine/premise_gate.py"
+    canonical_fn = "check_premise(problem)"
+    needs_network = False
+    depends_on = []
+
+    def execute(self, env, run_ctx):
+        from discovery_fabric.engine.premise_gate import check_premise
+        verdict = check_premise(env.problem)
+        # The stage ALWAYS succeeds in executing (it is a deterministic
+        # instrument); the CONDUCTOR decides fatality from the verdict —
+        # so the envelope cleanly carries the full verdict record via
+        # the standard apply_to path and the stage_log stays truthful.
+        return _engine_result(
+            {"premise_gate": verdict},
+            premise_verdict=verdict["verdict"])
+
+
 class SynthesizeAdapter(BaseAdapter):
     """Canonical: discovery_fabric/a2/synthesize.py::synthesize (ACTIVE)."""
     capability_id = "SYNTHESIS"
@@ -287,9 +336,30 @@ class EvidenceVerifyAdapter(BaseAdapter):
         mod = importlib.import_module("discovery_fabric.a2.verify")
         raw = env.mechanism_map.get("raw_candidate") or {}
         res = mod.verify_evidence(raw, env.evidence)
+        # R394 section 5: claim-level evidence classification rides the
+        # VERIFY stage (domain/failure-mode/mechanism/material/regime
+        # relevance per item; DIRECT_SUPPORT..IRRELEVANT). It records —
+        # it does NOT gate: the classification is evidence metadata for
+        # adjudication and the dossier; a topically-relevant-but-
+        # mechanism-irrelevant item is exactly the distinction buyers
+        # need, and it must not silently disappear from the record.
+        try:
+            from discovery_fabric.engine.evidence_classification import (
+                classify_evidence_set)
+            classification = classify_evidence_set(
+                env.evidence, env.problem, env.mechanism_map)
+        except Exception as exc:  # noqa: BLE001 — recorded, never hidden
+            classification = {
+                "classifier_version": "evidence_classification/1.0.0",
+                "error": f"{type(exc).__name__}: {exc}",
+                "n_items": len(env.evidence or []),
+                "note": "classification failed — recorded, not hidden; "
+                        "verification result unaffected",
+            }
         return _engine_result(
             {"adjudication": {**env.adjudication,
-                              "evidence_verification": res}},
+                              "evidence_verification": res},
+             "evidence_classification": classification},
             verified=res.get("verified"))
 
 
@@ -850,6 +920,7 @@ class _CemeterySubCheck:
 ADAPTERS = {
     "RETRIEVE": A2RetrievalAdapter(),
     "FREEZE": EvidenceFreezeAdapter(),
+    "PREMISE_GATE": PremiseGateAdapter(),
     "SYNTHESIZE": SynthesizeAdapter(),
     "VERIFY": EvidenceVerifyAdapter(),
     "MULTI_SOURCE_DISCOVERY": MultiSourceDiscoveryAdapter(),
@@ -866,7 +937,12 @@ ADAPTERS = {
 
 # Stage order per CEO directive D8 (exact chain; cemetery negative-knowledge
 # check is a sub-check of ADJUDICATION; cemetery UPDATE is conductor-level).
-STAGE_ORDER = ["RETRIEVE", "FREEZE", "SYNTHESIZE", "VERIFY",
-               "MULTI_SOURCE_DISCOVERY", "COLLISION", "ATTACK",
+# R394 section 6: PREMISE_GATE is a FIRST-CLASS stage between FREEZE and
+# SYNTHESIZE — a malformed/false premise (e.g. grain boundaries in
+# amorphous borosilicate glass) is rejected BEFORE candidate-generation
+# compute is burned (directive: "first-class discovery stage, not an
+# adversarial cleanup trick").
+STAGE_ORDER = ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
+               "VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION", "ATTACK",
                "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
                "CLASSIFY", "NEXT_BEST_ACTION", "RANK"]

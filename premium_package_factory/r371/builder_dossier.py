@@ -279,11 +279,25 @@ def render_engineering_dossier(pkg, hl, eq_registry, roadmap, comm, eco,
     tr = eco["time_range"]
     st.append(Paragraph(_esc(
         f"Cost range: {eco['cost_range']['value']} — {eco['cost_range']['basis']}"), S["BT"]))
-    st.append(Paragraph(_esc(
-        f"Time to decisive experiment (WP-01): {tr['first_decisive_work_package'].get('recorded_effort')}. "
-        f"Full build plan (sequential sum of recorded efforts): "
-        f"{tr['full_build_plan']['low_weeks']}–{tr['full_build_plan']['high_weeks']} weeks. "
-        f"Basis: {tr['basis']}"), S["BT"]))
+    dec = tr.get("decisive_work_package") or {}
+    if dec.get("decisive_experiment_state") == "DERIVED_FROM_KILL_CONDITION":
+        st.append(Paragraph(_esc(
+            f"Time to decisive experiment ({dec.get('work_package')}): "
+            f"{dec.get('recorded_effort')}. "
+            f"Designated by derivation from the recorded kill condition — "
+            f"matched tokens: "
+            f"{', '.join(dec.get('matched_tokens') or [])}. "
+            f"Full build plan (sequential sum of recorded efforts): "
+            f"{tr['full_build_plan']['low_weeks']}-{tr['full_build_plan']['high_weeks']} weeks. "
+            f"Basis: {tr['basis']}"), S["BT"]))
+    else:
+        st.append(Paragraph(_esc(
+            "Decisive experiment: NOT DERIVED — no work package's recorded "
+            "fields share enough content tokens with the kill condition "
+            "under the mechanical derivation rule. "
+            f"Full build plan (sequential sum of recorded efforts): "
+            f"{tr['full_build_plan']['low_weeks']}-{tr['full_build_plan']['high_weeks']} weeks. "
+            f"Basis: {tr['basis']}"), S["BT"]))
     st.append(Paragraph(_esc(
         f"Expected decision: {eco['expected_decision']['decision']} — "
         f"acceptance: {eco['expected_decision']['acceptance_criterion']}"), S["BT"]))

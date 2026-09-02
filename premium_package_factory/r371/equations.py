@@ -46,20 +46,90 @@ _PROSE_WORDS = re.compile(
 )
 
 
-def split_annotation(eq: str):
-    """Split a trailing bracketed description from an equation string.
+def _is_annotation_group(group: str) -> bool:
+    """Is a TRAILING bracket group a prose annotation (strip it) or
+    math notation (keep it)? Deterministic, corpus-verified rules:
 
-    Canonical strings sometimes carry a trailing description such as
-    'dP_damper = c_h * Q [hydraulic damping]'. The math part is rendered
-    typeset; the annotation is rendered as a caption. Where the recorded
-    string is corrupted (e.g. a missing opening bracket), the tail is
-    returned as annotation with a corruption note — never silently repaired.
+    KEEP as math notation:
+      [S] / [A]            single short symbol (len <= 3)
+      [Phage] / [Bacteria] single CAPITALIZED token (species/symbol)
+      [t_critical]         underscore-bearing identifier
+      [0] / [1, 2]         numeric intervals
+    STRIP as annotation (prose):
+      [parallel conductance]           multi-word phrase (any plain word
+                                       >= 3 chars without underscore)
+      [laminar if Re < 2300]           condition note (multi-word)
+      [proposed controller law, MODELLED]  comma-bearing prose
+      [Starling/Kedem-Katchalsky]      model-name citation (single token
+                                       with '/', len >= 8)
+      [prediction]                     single lowercase prose word
+    """
+    segs = group.split()
+    if not segs:
+        return False
+    if len(segs) == 1:
+        s = segs[0]
+        if len(s) <= 3:
+            return False                       # [S], [A], [B2]
+        if "_" in s:
+            return False                       # [t_critical]
+        if s.replace(",", "").replace(".", "").isdigit():
+            return False                       # [0], [1]
+        if any(c.isdigit() for c in s):
+            return False                       # numeric-bearing
+        if s[0].isupper() and "/" not in s:
+            return False                       # [Phage], [Bacteria]
+        if "/" in s and len(s) >= 8:
+            return True                        # [Starling/Kedem-Katchalsky]
+        return s.isalpha() and s[0].islower()  # [prediction]
+    # multi-segment: annotation iff it contains a plain prose word
+    for s in segs:
+        w = s.strip(",.").rstrip(";:")
+        if len(w) >= 3 and w.isalpha() and not w[0].isupper():
+            return True                        # 'parallel', 'enzyme', ...
+        if len(w) >= 4 and w.isalpha() and w[0].isupper() \
+                and "_" not in w and w not in ("Re",):
+            # capitalized prose words in multi-word phrases ('MODELLED',
+            # 'Hagen' in 'Hagen-Poiseuille per segment') — annotation only
+            # when the segment count >= 3 (a phrase, not symbol pairs)
+            if len(segs) >= 3:
+                return True
+    return False
+
+
+def split_annotation(eq: str):
+    """Split trailing bracketed ANNOTATIONS from an equation string.
+
+    Canonical strings carry trailing descriptions such as
+    'dP_damper = c_h * Q [hydraulic damping]' — and P-07's EQ-3 carried
+    TWO ('G_total = G_primary + G_floor [parallel conductance] [P-07 …]'),
+    which left an annotation inside the math expression and broke the
+    structural parse (found live by the R394 CEO audit). P-02's EQ-4
+    carried a comma-bearing prose annotation; P-26 a model-name
+    citation. Rule (recorded, deterministic): a TRAILING bracket group
+    is stripped iff it is a PROSE annotation per _is_annotation_group;
+    math notation ([S] concentration, [0, t_critical] intervals) is
+    never stripped. Multiple trailing annotations are stripped
+    iteratively.
+
+    Where the recorded string is corrupted (e.g. a missing opening
+    bracket), the tail is returned as annotation with a corruption note
+    — never silently repaired (Art. VI).
     """
     eq = eq.strip()
-    m = re.search(r"\s*\[([^\]]*)\]\s*$", eq)
-    if m:
-        return eq[: m.start()].strip(), m.group(1).strip(), None
-    if "]" in eq and "[" not in eq:
+    annotations = []
+    while True:
+        m = re.search(r"\s*\[([^\]]*)\]\s*$", eq)
+        if not m:
+            break
+        group = m.group(1)
+        if not _is_annotation_group(group):
+            break  # math notation (concentration / interval) — keep it
+        annotations.insert(0, group)
+        eq = eq[: m.start()].rstrip()
+    if annotations:
+        return eq, " ".join(a.strip() for a in annotations if a.strip()), None
+    if "]" in eq and "[" not in eq.split("]")[0]:
         # CORRUPTED canonical data: the math/annotation boundary cannot be
         # recovered without guessing (Art. II/VI). The whole string is
         # returned untouched and rendered VERBATIM.
