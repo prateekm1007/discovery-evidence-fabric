@@ -1,0 +1,609 @@
+{
+ "invention_id": {
+  "value": "inv:ui_thermal_degradation_323795:db5ea6ffe6a4",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_thermal_degradation_323795",
+   "device": "rooftop solar inverter",
+   "failure": "Documented problem 'thermal degradation' concerning rooftop solar inverter. User-submitted engineering problem (session input): \"Why do commercial rooftop solar inverters fail prematurely in hot climates?\".  ROUTING: nhtsa_complaints: not queried — no vehicle (make|model|year) extracted from the problem; this source answers vehicle-parameterized questions only. [nhtsa_complaints] retrieval status NOT_QUERIED_GRAMMAR (no vehicle extracted; source grammar is make|model|year (routing decision, not absence)) — provider outcome recorded, not treated as absence (Art. XXI.3). [doe_osti] 10 records retrieved live (2026-2026). Illustrative records: 'Physics-of-Failure (PoF) based reliability assessment for photovoltaic (PV) inverters requires long-duration electrical and electrothermal stress histories, yet generating such stress histories with h'; 'Growth in power requirements and the complexity of emerging distribution systems are creating the need for new solid-state products for many applications. The qualification requirements, testing stand'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. Problem-existence basis: live records retrieved.",
+   "failure_mode": "thermal degradation",
+   "constraint": "maintain >95% availability at ambient temperatures above 40°C"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:705cbcad"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of rooftop solar inverter",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Adaptive droop characteristic adjustment via ANN‑assisted real‑time tuning of droop coefficients and PI gains",
+   "intervention": "Embed an ANN‑driven adaptive droop controller in the rooftop solar inverter that continuously modifies droop coefficients based on ambient temperature and load conditions to limit over‑current and heat generation",
+   "expected_effect": "Lowered semiconductor junction temperatures, enabling >95% availability at ambient >40 °C and extending inverter service life by reducing thermal degradation",
+   "mechanism_source_span": "\"By dynamically tuning droop coefficients and PI gains in real time, the controller enhances system adaptability under fluctuating renewable generation and rapidly varying residential loads.\"",
+   "span_derivation": {
+    "n_shared": 9,
+    "shared_terms": [
+     "coefficient",
+     "controller",
+     "droop",
+     "gain",
+     "generation",
+     "load",
+     "real",
+     "time",
+     "tuning"
+    ],
+    "span_terms_n": 19,
+    "ratio": 0.474,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:41963476"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "ANN-augmented adaptive droop/PI control for residential hybrid microgrids with IoT monitoring.",
+   "mechanism": "Adaptive droop characteristic adjustment via ANN‑assisted real‑time tuning of droop coefficients and PI gains",
+   "intervention_site": "rooftop solar inverter",
+   "expected_effect": "Lowered semiconductor junction temperatures, enabling >95% availability at ambient >40 °C and extending inverter service life by reducing thermal degradation",
+   "falsification_test": "Operate two identical inverters in a climate chamber at 45 °C with fluctuating irradiance; one uses fixed droop settings, the other uses the ANN‑adaptive droop; compare component temperature profiles and time‑to‑failure metrics"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:41963476"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "inverter inverters rooftop solar thermal degradation"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "adaptive characteristic adjustment assisted coefficients droop"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "inverter rooftop adaptive solar coefficients ann droop"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "inverter junction enabling availability extending reducing"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "lowered semiconductor junction temperatures enabling availability"
+    }
+   ],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Embed an ANN‑driven adaptive droop controller in the rooftop solar inverter that continuously modifies droop coefficients based on ambient temperature and load conditions to limit over‑current and heat generation",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:41963476"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "maintain >95% availability at ambient temperatures above 40°C",
+   "failure_mode_of_device": "thermal degradation"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:705cbcad"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [
+   {
+    "dimension": "unsupported_mechanism",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "weak_transfer",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "obvious_combination",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "prior_art",
+    "attack_verdict": "SURVIVE (firewall: prior_art_state=UNRESOLVED_INSUFFICIENT_EVIDENCE is a non-kill state; adversarial PRIOR_ART=KILL is forbidden)",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "contradiction",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "boundary_failure",
+    "attack_verdict": "KIL",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "engineering_infeasibility",
+    "attack_verdict": "",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "attack_verdict": "",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Lower internal temperature excursions, slower component aging, and sustained >95 % availability at ambient >40 °C",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-02T04:37:03.346457+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-02T04:37:03.346457+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "europepmc:41963476",
+    "title": "ANN-augmented adaptive droop/PI control for residential hybrid microgrids with IoT monitoring.",
+    "source_uri": "https://europepmc.org/article/41963476",
+    "doi": "10.1038/s41598-026-46557-z",
+    "content_hash": "3b64f4a4c1d3b9bdb35143c01e7f355d7a6d1af9903eeb406d75c0c76d556dcc",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:40040982",
+    "title": "Performance and suitability analysis of rooftop solar PV in Oman: A case study of university branches.",
+    "source_uri": "https://europepmc.org/article/40040982",
+    "doi": "10.1016/j.heliyon.2025.e42578",
+    "content_hash": "e86714de489fca6c433fa555c0463661709b1c4c182cd26b637e738d6d05f0d4",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:42354789",
+    "title": "Engineering of Optoelectronic Devices for Renewable Energy Applications.",
+    "source_uri": "https://europepmc.org/article/42354789",
+    "doi": "10.3390/mi17060758",
+    "content_hash": "31df1c36a5cbe3d7be3c8b26b72e2e70e6e2693f9fabb62783f4a20f97e0f721",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41710126",
+    "title": "A Review of Floating Photovoltaic Systems: Prospects, Challenges, and Sustainability Considerations.",
+    "source_uri": "https://europepmc.org/article/41710126",
+    "doi": "10.1002/gch2.202500581",
+    "content_hash": "46f4a9e2f45f7ddf7bf2978fc40d0d85b464df261ee9c9cbd74d5ec409011c33",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41339664",
+    "title": "Intelligent demand-side energy management via optimized ANFIS-gene expression programming in hybrid renewable-grid systems.",
+    "source_uri": "https://europepmc.org/article/41339664",
+    "doi": "10.1038/s41598-025-26988-w",
+    "content_hash": "453b2706da4e22f9845aae7c6513dc3e1e5a9d908d0a07ec60469b6a2cc01f9d",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "europepmc:40040982",
+   "europepmc:41339664",
+   "europepmc:41710126",
+   "europepmc:41963476",
+   "europepmc:42354789"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:attack:unsupported_mechanism",
+    "description": "attack dimension unsupported_mechanism returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:attack:weak_transfer",
+    "description": "attack dimension weak_transfer returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "contradiction_id": "con:attack:obvious_combination",
+    "description": "attack dimension obvious_combination returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "unresolved_source": "inverter inverters rooftop solar thermal degradation",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "inverter inverters rooftop solar thermal degradation",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "adaptive characteristic adjustment assisted coefficients droop",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "adaptive characteristic adjustment assisted coefficients droop",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "inverter rooftop adaptive solar coefficients ann droop",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "inverter rooftop adaptive solar coefficients ann droop",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "inverter junction enabling availability extending reducing",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "inverter junction enabling availability extending reducing",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "lowered semiconductor junction temperatures enabling availability",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "lowered semiconductor junction temperatures enabling availability",
+    "error": "LENS_API_TOKEN not configured"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "Operate two identical inverters in a climate chamber at 45 °C with fluctuating irradiance; one uses fixed droop settings, the other uses the ANN‑adaptive droop; compare component temperature profiles and time‑to‑failure metrics"
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_thermal_degradation_323795:2026-09-02T04:36:35",
+   "final_envelope_hash": "db5ea6ffe6a433fb6631accf4a7a06f65b1808131aa9060a30f3b11670ca71ec",
+   "final_status": "REJECTED",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-02T04:37:03+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "REJECTED",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-02T04:38:26+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "europepmc:41963476": {
+   "id": "europepmc:41963476",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41963476",
+   "source_uri": "https://europepmc.org/article/41963476",
+   "title": "ANN-augmented adaptive droop/PI control for residential hybrid microgrids with IoT monitoring.",
+   "abstract": "In alignment with Saudi Arabia's Vision 2030 goals for energy diversification, sustainability, and increased renewable energy penetration, this paper presents an ANN-assisted adaptive droop/Proportional-Integral (PI) control strategy for residential hybrid microgrids integrating photovoltaic (PV) systems, optional micro-wind turbines, and battery energy storage. The proposed scheme is designed for a grid-tied residential microgrid with islanding capability and is modeled and simulated in MATLAB/Simulink. By dynamically tuning droop coefficients and PI gains in real time, the controller enhances system adaptability under fluctuating renewable generation and rapidly varying residential loads. Simulation results demonstrate that, compared with conventional fixed-gain drop/PI control, the proposed approach improves renewable energy utilization by approximately 15%, increases PV self-consumption by 20%, and reduces peak grid import by about 18%, while maintaining stable voltage and frequency regulation. Efficient energy shifting is achieved through coordinated battery operation, with charging during mid-day solar peaks and discharging during evening demand; battery power reaches up to 5 kW, and State of Charge (SoC) is maintained within 35-90% limits. An Internet of Things (IoT) monitoring layer implemented using ThingSpeak provides near real-time telemetry, with median communication latency below 500 ms and full command success rate. A detailed case study based on the climatic conditions and AC-dominated residential load profiles of Jeddah, Saudi Arabia confirms reduced PV curtailment, improved self-consumption, and decreased reliance on grid imports during peak demand periods. The results highlight the effectiveness of ANN-driven adaptive control combined with secure IoT monitoring in enhancing the performance and operational resilience of residential microgrids in challenging environments.",
+   "doi": "10.1038/s41598-026-46557-z",
+   "publication_date": "2026-04-10",
+   "retrieval_timestamp": "2026-09-02T04:36:37.582484+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "3b64f4a4c1d3b9bdb35143c01e7f355d7a6d1af9903eeb406d75c0c76d556dcc",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T04:36:37.582484+00:00",
+    "query_or_method": "rooftop solar inverter thermal degradation mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:40040982": {
+   "id": "europepmc:40040982",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:40040982",
+   "source_uri": "https://europepmc.org/article/40040982",
+   "title": "Performance and suitability analysis of rooftop solar PV in Oman: A case study of university branches.",
+   "abstract": "One of the goals of Oman vision 2040 is to attain a 30 % of renewable energy mix, mainly from solar and wind energy projects for electricity generation by 2030, in alignment with the net zero emissions commitment by 2050. The adoption of residential rooftop solar PV installations supports achieving this target. This paper aims to assess the feasibility and performance of the rooftop solar PV projects at various locations in Oman and to suggest the strategies for promoting rooftop solar PV projects in Oman. In the Middle East countries like Oman, dust from sandstorms and temperature are significantly affects the performance of PV systems and is an important derating factor to consider when evaluating their performance as discussed in this paper. This paper starts by qualitatively assess the suitable regions in Oman for solar PV projects based on temperature levels, dust accumulation, humidity and population density and then proceeds to find the best locations in the selected region. A rooftop solar PV system is designed, analysed its performance, Levelized Cost of Electricity (LCOE) and environmental benefit were calculated for smart bus stop load located in the selected region's university of technology and applied sciences (UTAS) campus using analytical method. The results obtained through analytical method were compared with System Advisor Model (SAM) software. Key findings from the study: The northern part regions of Oman were identified as the most suitable region to install the solar PV systems. In the northern part regions, Ibri is the best location for rooftop solar PV projects compared to other locations. However, at other locations, the AC energy generation from 2.2kWp solar PV systems ranges from 4243.44 kWh to 4841.34 kWh annually, shows that these locations are also competitively suitable for solar PV projects. The LCOE and carbon emission cost of all UTAS branch locations ranges from 8.5 ¢/kWh to 9.7¢/kWh and 128.16 $ per year to 146.74 $ per year accor",
+   "doi": "10.1016/j.heliyon.2025.e42578",
+   "publication_date": "2025-02-11",
+   "retrieval_timestamp": "2026-09-02T04:36:37.582484+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "e86714de489fca6c433fa555c0463661709b1c4c182cd26b637e738d6d05f0d4",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T04:36:37.582484+00:00",
+    "query_or_method": "rooftop solar inverter thermal degradation mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:42354789": {
+   "id": "europepmc:42354789",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:42354789",
+   "source_uri": "https://europepmc.org/article/42354789",
+   "title": "Engineering of Optoelectronic Devices for Renewable Energy Applications.",
+   "abstract": "Optoelectronic devices are emerging as a cornerstone of advanced renewable energy technologies, offering innovative routes for energy harvesting, conversion, and management with high efficiency and versatility. This review summarizes recent advances in the semiconductor materials engineering field, device configurations, and light-matter interaction mechanisms that underpin advanced optoelectronic systems for solar energy harvesting, solar-driven chemical conversion, and smart grid integration, among others. Emphasis is placed on the breakthroughs achieved in the perovskite and hybrid photovoltaics, photoelectrochemical energy conversion, and nanostructured optoelectronic platforms that enable much-increased light absorption, reduced recombination losses, and scalable large-scale fabrications. Moreover, the challenges closely linked with long-term stability, environmental durability and benevolence, and worldwide deployment are critically addressed, together with the emerging opportunities in AI design, tandem device technological solutions, integrated energy systems, and machine learning approaches for optimizing device performance, thermal management, and energy storage capabilities. Finally, the present review concludes by outlining the future research directions that could accelerate the transition toward high-performance, cost-effective, and sustainable optoelectronic solutions responsive to global renewable energy requirements.",
+   "doi": "10.3390/mi17060758",
+   "publication_date": "2026-06-22",
+   "retrieval_timestamp": "2026-09-02T04:36:37.582484+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "31df1c36a5cbe3d7be3c8b26b72e2e70e6e2693f9fabb62783f4a20f97e0f721",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T04:36:37.582484+00:00",
+    "query_or_method": "rooftop solar inverter thermal degradation mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41710126": {
+   "id": "europepmc:41710126",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41710126",
+   "source_uri": "https://europepmc.org/article/41710126",
+   "title": "A Review of Floating Photovoltaic Systems: Prospects, Challenges, and Sustainability Considerations.",
+   "abstract": "The floating photovoltaic (FPV) system is gaining global attention as a promising renewable energy solution that addresses both land scarcity and rising energy demand while contributing to climate change mitigation. Unlike conventional ground-mounted solar, FPV installations make use of reservoirs, lakes, and coastal waters, which not only saves valuable land but also improves efficiency through natural cooling, resulting in 10%-20% higher energy yields and up to 70% reduction in water evaporation. This paper reviews FPV's evolution from early concepts in the late 20th century to rapid commercialization after 2007. The study outlines three main system designs: Pontoon-based, flexible membrane, and submerged structures, alongside critical components such as floating platforms, mooring systems, and AI-enabled monitoring that ensure stability and performance. Engineering strategies discussed in this work include optimized site selection, hydrodynamic resilience, and auxiliary measures like cooling and automated cleaning. The paper also evaluates environmental interactions and shows that FPV may alter aquatic ecosystems by reducing light penetration and dissolved oxygen levels. However, it also demonstrates that these risks can be mitigated through eco-friendly anchoring and limited coverage. Life cycle assessments presented here highlight sustainability benefits, including energy payback times of 1-3 years, emission reductions of 5%-10%, and recyclability rates up to 90%. Asia leads in current deployment, where the planned capacity of the largest FPV project has surpassed 2200 MW. Despite the availability of several FPV technologies, their extensive development is hindered by inadequate policy support as well as challenges such as material durability, maintenance complexity, and fragmented regulations. However, FPV offers an opportunity to combine clean energy generation with sustainable water management. This paper provides insights for policymakers to design supporti",
+   "doi": "10.1002/gch2.202500581",
+   "publication_date": "2026-02-17",
+   "retrieval_timestamp": "2026-09-02T04:36:37.582484+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "46f4a9e2f45f7ddf7bf2978fc40d0d85b464df261ee9c9cbd74d5ec409011c33",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T04:36:37.582484+00:00",
+    "query_or_method": "rooftop solar inverter thermal degradation mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41339664": {
+   "id": "europepmc:41339664",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41339664",
+   "source_uri": "https://europepmc.org/article/41339664",
+   "title": "Intelligent demand-side energy management via optimized ANFIS-gene expression programming in hybrid renewable-grid systems.",
+   "abstract": "In the pursuit of sustainable industrial operations, efficient energy management has become a critical challenge, particularly under scenarios where the electrical grid is restricted to serving industrial loads. This study addresses the urgent need for intelligent forecasting and scheduling frameworks by proposing a hybrid Gene Expression Programming Adaptive Neuro-Fuzzy Inference System (GEP-ANFIS) for predictive energy management in hybrid renewable energy systems. The model was evaluated using standard forecasting metrics. For solar PV prediction, GEP-ANFIS achieved low short- and long-term error rates, with MAPE values below 6% and 8%, respectively. For industrial load forecasting, the model exhibited high precision, maintaining MAPE values under 2.5% (short-term) and under 3.5% (long-term). These results demonstrate consistent improvements over conventional ANFIS and GEP models. Economic evaluation confirmed significant cost benefits. In a Grid-only configuration, GEP-ANFIS reduced daily energy costs by 7.4% compared to ANFIS. Greater efficiency was observed in PV and Battery-only and Grid-connected PV-Battery setups, where GEP-ANFIS achieved daily cost reductions of 6.5% and 6.3%, respectively. Over a 20-year planning horizon, the system recorded a 6.5% reduction over ANFIS and a 37.7% improvement over HOMER. A sensitivity analysis was also conducted to assess the robustness of the GEP-ANFIS model under varying solar PV power, and battery storage capacity. Results indicated the robustness, efficiency, and scalability of the GEP-ANFIS controller, especially in resource-constrained, PV-dominated microgrids, making it a strategic solution for sustainable industrial energy management while preserving battery longevity by avoiding deep discharge scenarios.",
+   "doi": "10.1038/s41598-025-26988-w",
+   "publication_date": "2025-12-03",
+   "retrieval_timestamp": "2026-09-02T04:36:37.582484+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "453b2706da4e22f9845aae7c6513dc3e1e5a9d908d0a07ec60469b6a2cc01f9d",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T04:36:37.582484+00:00",
+    "query_or_method": "rooftop solar inverter thermal degradation mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "problem:705cbcad": {
+   "id": "problem:705cbcad",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "705cbcadc9156b3477d43d51080a477f4ca447c7257ab6c3ecdf562c95e23d48",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "REJECTED",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "384703b447254bacc5879e818d53d9ea1c78dd8cabe6a97fe8cb61eea09416cc",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-02T04:38:26+00:00Z"
+ },
+ "_exploration_candidate": {
+  "marker": "EXPLORATION_GRID_CANDIDATE",
+  "discovery_verification": "NOT_PERFORMED_FOR_THIS_CANDIDATE",
+  "consequence": "the E16-H release gate holds this dossier for human engineering review; a discovery-loop re-run is required before automatic release",
+  "angle": "EXPLORATION_GRID_cross_industry_transfer(nvidia)"
+ }
+}
