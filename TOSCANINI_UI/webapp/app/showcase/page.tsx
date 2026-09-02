@@ -9,7 +9,8 @@
 // viewer (when shown) carries a RECONSTRUCTED badge, and the loop state
 // says exactly what has and has not been verified against reality.
 
-import { use, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { evaluateParam, getRealityLoop, getShowcase } from "@/lib/api";
 import type {
   EvalResult,
@@ -291,12 +292,16 @@ function RealityLoopPanel({ record }: { record: RealityLoopRecord }) {
   );
 }
 
-export default function ShowcasePage({
-  params,
-}: {
-  params: Promise<{ slot: string }>;
-}) {
-  const { slot } = use(params);
+export default function ShowcasePage() {
+  return (
+    <Suspense fallback={<div className="loading">Loading package…</div>}>
+      <ShowcasePageInner />
+    </Suspense>
+  );
+}
+
+function ShowcasePageInner() {
+  const slot = useSearchParams().get("slot") ?? "";
   const [detail, setDetail] = useState<ShowcaseDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeGlb, setActiveGlb] = useState<string | null>(null);

@@ -53,6 +53,24 @@ def _git_head() -> str:
 
 ENGINE_COMMIT = _git_head()
 
+# R391 (deployment): same-origin static webapp. When the Docker image
+# builds the Next.js export into TOSCANINI_UI/webapp-export/, the engine
+# serves it — one public URL serves the whole product (pages + /api/*).
+# Absent locally (dev uses `next dev`); never fabricated.
+WEBAPP_EXPORT = REPO_ROOT / "TOSCANINI_UI" / "webapp-export"
+
+_STATIC_TYPES = {
+    ".html": "text/html; charset=utf-8",
+    ".js": "text/javascript; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".json": "application/json",
+    ".txt": "text/plain; charset=utf-8",
+    ".svg": "image/svg+xml",
+    ".ico": "image/x-icon",
+    ".png": "image/png",
+    ".woff2": "font/woff2",
+}
+
 
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
@@ -180,6 +198,12 @@ class Handler(BaseHTTPRequestHandler):
         if len(parts) == 3 and parts[0] == "api" and parts[1] == "share":
             payload = self._share_payload(parts[2])
             return self._json(200, payload) if payload else self._json(404, {"error": "not found"})
+
+        # R391: same-origin static webapp (Render deployment shape).
+        # API paths never fall through here — /api 404s stay honest JSON.
+        if not p.path.startswith("/api"):
+            if self._serve_static(p.path):
+                return
 
         return self._json(404, {"error": "no such endpoint"})
 
@@ -387,6 +411,54 @@ class Handler(BaseHTTPRequestHandler):
                 "maturity": pkg.get("maturity"),
             },
         }
+
+    # ------------------------------------------------------------- static
+    def _serve_static(self, path: str) -> bool:
+        """Serve the same-origin static webapp export (R391).
+
+        Returns False when the export is absent (local dev) or the path
+        is not a webapp path — callers then keep their normal behavior.
+        Path traversal is structurally rejected: only normalized, resolved
+        paths strictly inside WEBAPP_EXPORT are served."""
+        if not WEBAPP_EXPORT.exists():
+            return False
+        clean = urllib.parse.urlparse(path).path
+        if clean.startswith("/api/") or clean == "/api":
+            return False
+        rel = clean.strip("/")
+        # page routes → their exported shells (query params carry state)
+        if rel in ("", "run", "showcase"):
+            rel = (rel + "/" if rel else "") + "index.html"
+        if not rel or ".." in rel.split("/"):
+            return False
+        f = (WEBAPP_EXPORT / rel).resolve()
+        try:
+            f.relative_to(WEBAPP_EXPORT.resolve())
+        except ValueError:
+            return False
+        if not f.is_file():
+            # unknown non-API path → honest 404 page if exported
+            f404 = WEBAPP_EXPORT / "404.html"
+            if f404.is_file():
+                self._send_static(f404, "text/html; charset=utf-8", 404)
+                return True
+            return False
+        mime = _STATIC_TYPES.get(f.suffix.lower(),
+                                 "application/octet-stream")
+        cache = "public, max-age=31536000, immutable" \
+            if rel.startswith("_next/") else "no-cache"
+        self._send_static(f, mime, 200, cache)
+        return True
+
+    def _send_static(self, f: Path, mime: str, code: int,
+                     cache: str = "no-cache") -> None:
+        data = f.read_bytes()
+        self.send_response(code)
+        self.send_header("Content-Type", mime)
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", cache)
+        self.end_headers()
+        self.wfile.write(data)
 
     # ------------------------------------------------------------------ SSE
     def _sse(self, sid: str):

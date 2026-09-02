@@ -5,7 +5,8 @@
 // The reasoning display is derived from run artifacts — never private
 // chain-of-thought (R389 Phase 4).
 
-import { use, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { getRunResult, retryRun } from "@/lib/api";
 import type { SessionDetail, StageDigest } from "@/lib/types";
 
@@ -286,12 +287,16 @@ function RunView({ detail }: { detail: NonNullable<SessionDetail> }) {
   );
 }
 
-export default function RunPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
+export default function RunPage() {
+  return (
+    <Suspense fallback={<div className="loading">Loading run…</div>}>
+      <RunPageInner />
+    </Suspense>
+  );
+}
+
+function RunPageInner() {
+  const id = useSearchParams().get("id") ?? "";
   const [detail, setDetail] = useState<SessionDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);

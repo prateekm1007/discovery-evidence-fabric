@@ -1,13 +1,22 @@
 # Toscanini engine — hosted deployment image (R391).
 #
-# Python 3.12 + the pinned requirements.txt. The buyer-distribution
-# portfolio repo is cloned as a SIBLING directory at container start:
-# showcase serves the REAL packages from it (Art. XXXIX — the
-# buyer-distribution repository is the authority; files are never
-# re-rendered). GITHUB_TOKEN is a runtime secret (Render env var).
-#
-# Render contract: listen on $PORT (the server reads it — R391 change;
-# default 8788 for local dev). Healthcheck: /api/health.
+# Stage 1 builds the Next.js webapp as a static export (same-origin:
+# all fetches are relative, so /api/* resolves to this engine — no
+# proxy, no CORS; the same codebase also deploys to Vercel unchanged).
+# Stage 2 is the Python engine: it serves the export AND the job API
+# on $PORT, and clones the buyer-distribution portfolio as a SIBLING
+# at container start (Art. XXXIX — showcase serves the REAL packages;
+# never re-rendered). GITHUB_TOKEN is a runtime secret.
+
+# ---------- stage 1: webapp static export ----------
+FROM node:20-alpine AS webapp-builder
+WORKDIR /webapp
+COPY TOSCANINI_UI/webapp/package.json TOSCANINI_UI/webapp/package-lock.json ./
+RUN npm ci
+COPY TOSCANINI_UI/webapp/ ./
+RUN NEXT_OUTPUT=export npm run build
+
+# ---------- stage 2: the engine ----------
 FROM python:3.12-slim
 
 RUN apt-get update \
@@ -20,6 +29,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+COPY --from=webapp-builder /webapp/out ./TOSCANINI_UI/webapp-export
 
 # Startup: clone the portfolio sibling (once), then serve.
 # A failed clone degrades the showcase (404s) but never fabricates

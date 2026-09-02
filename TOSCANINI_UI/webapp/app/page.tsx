@@ -40,7 +40,7 @@ export default function Home() {
     setBusy(true);
     try {
       const session = await startRun(t);
-      router.push(`/run/${session.session_id}`);
+      router.push(`/run?id=${session.session_id}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "failed to start the run");
       setBusy(false);
@@ -105,7 +105,7 @@ export default function Home() {
           <div className="sub">Real engine runs, artifact-derived statuses</div>
           <div className="history">
             {sessions.slice(0, 12).map((s) => (
-              <a className="run-row" href={`/run/${s.session_id}`} key={s.session_id}>
+              <a className="run-row" href={`/run?id=${s.session_id}`} key={s.session_id}>
                 <span className={`pill ${statusClass(s.status)}`}>{s.status}</span>
                 <span className="title">{s.title}</span>
                 <span className="when">
@@ -127,7 +127,7 @@ export default function Home() {
           </div>
           <div className="gallery">
             {focus.map((s) => (
-              <a className="card" href={`/showcase/${s.slot}`} key={s.slot}>
+              <a className="card" href={`/showcase?slot=${s.slot}`} key={s.slot}>
                 <div className="kicker">
                   {s.domain} · {s.package_id}
                 </div>
@@ -142,7 +142,7 @@ export default function Home() {
           {others.length > 0 && (
             <div className="examples" style={{ justifyContent: "flex-start", marginTop: 16 }}>
               {others.map((s) => (
-                <a className="example" href={`/showcase/${s.slot}`} key={s.slot}>
+                <a className="example" href={`/showcase?slot=${s.slot}`} key={s.slot}>
                   {s.title}
                 </a>
               ))}
