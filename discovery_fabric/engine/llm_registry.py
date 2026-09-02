@@ -68,6 +68,19 @@ class ProviderSpec:
     latency_tier: int           # 1 = fastest
     policy_note: str
 
+    def url_for_call(self) -> str:
+        """Effective endpoint for this call.
+
+        R391 (deployment): an EXPLICIT operator override `{PROVIDER}_BASE_URL`
+        re-points a provider slot at a public OpenAI-compatible endpoint —
+        the mechanism that lets a hosted engine use the same registry
+        without the sandbox-local gateway. Transport-only: provider
+        selection policy, quality tiers, and epistemic semantics are
+        untouched (same operator-override class as the ENGINE_*_PROVIDER
+        pins — recorded, never silent)."""
+        return (os.environ.get(f"{self.provider_id.upper()}_BASE_URL", "")
+                .strip() or self.url)
+
     def model_for_call(self) -> str:
         override = os.environ.get(f"{self.provider_id.upper()}_MODEL", "")
         return override or self.default_model
@@ -298,7 +311,7 @@ def _call_openai_flavor(spec: ProviderSpec, messages: List[dict],
                         timeout: int, max_tokens: int) -> str:
     key = os.environ.get(spec.env_var, "").strip()
     data = _post_json(
-        spec.url,
+        spec.url_for_call(),
         {"model": spec.model_for_call(), "messages": messages,
          "temperature": 0.0,
          # bounded generation: the structured FIELD-line outputs are short;
@@ -343,7 +356,7 @@ def _call_anthropic_flavor(spec: ProviderSpec, messages: List[dict],
         else:
             msgs.append(m)
     data = _post_json(
-        spec.url,
+        spec.url_for_call(),
         {"model": spec.model_for_call(), "max_tokens": max_tokens,
          "messages": msgs, **({"system": system} if system else {})},
         {"x-api-key": key, "anthropic-version": "2023-06-01"}, timeout)

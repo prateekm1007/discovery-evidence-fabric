@@ -160,6 +160,7 @@ export interface RealityLoopRecord {
   observation?: {
     event_id?: string;
     origin?: string;
+    origin_caveat?: string;
     quantity?: string;
     design_value?: number;
     measured_value?: number;

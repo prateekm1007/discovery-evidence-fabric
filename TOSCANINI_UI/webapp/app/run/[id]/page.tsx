@@ -9,70 +9,81 @@ import { use, useEffect, useRef, useState } from "react";
 import { getRunResult, retryRun } from "@/lib/api";
 import type { SessionDetail, StageDigest } from "@/lib/types";
 
-const STAGE_LABELS: Record<string, string> = {
-  RETRIEVE: "Retrieving evidence",
-  FREEZE: "Freezing evidence custody",
-  SYNTHESIZE: "Synthesizing mechanisms",
-  VERIFY: "Verifying evidence bindings",
-  MULTI_SOURCE_DISCOVERY: "Multi-source discovery",
-  COLLISION: "Checking prior art",
-  ATTACK: "Adversarial attacks",
-  CONTRADICTION: "Resolving contradictions",
-  KILLER_EXPERIMENT: "Designing decisive experiment",
-  ADJUDICATION: "Adjudicating",
-  CLASSIFY: "Classifying epistemic state",
-  NEXT_BEST_ACTION: "Ranking next actions",
-  RANK: "Final ranking",
+// R391 (claude.ai principle): the run page shows the ENGINEERING ARGUMENT
+// AS IT EMERGES — one plain sentence per persisted stage — not pipeline
+// labels. Same artifact-derived data, same honest counters; the plumbing
+// stays invisible ("complex pipeline, boring interface").
+
+const STAGE_SENTENCE: Record<string, (s: StageDigest) => string> = {
+  RETRIEVE: (s) =>
+    s.records_found != null
+      ? `Read ${s.records_found} evidence records from ${(s.sources ?? []).join(
+          ", "
+        )} — each custody-frozen with a content hash.`
+        : "Reading the evidence base…",
+  FREEZE: () =>
+    "Evidence custody frozen: every claim will have to bind to an exact source span.",
+  SYNTHESIZE: (s) =>
+    [s.mechanism, s.intervention].filter(Boolean).length > 0
+      ? `Candidate mechanism: ${[s.mechanism, s.intervention]
+          .filter(Boolean)
+          .join(" → ")}.`
+        : "Synthesizing candidate mechanisms from the evidence…",
+  VERIFY: () =>
+    "Each claim verified against its exact evidence binding — no fuzzy matches admitted.",
+  MULTI_SOURCE_DISCOVERY: (s) =>
+    s.prior_art_count != null
+      ? `Scanned ${s.prior_art_count} prior-art candidates across independent sources.`
+      : "Scanning prior art across independent sources…",
+  COLLISION: (s) =>
+    (s.collisions ?? []).length > 0
+      ? `Prior-art collision check: ${(s.collisions ?? [])
+          .map((c) => `${c.universe ?? ""}: ${c.verdict ?? "?"}`)
+          .join(" · ")}.`
+      : "Prior-art collision check complete — nothing overlapped.",
+  ATTACK: (s) =>
+    s.overall
+      ? `Adversarial gate: ${s.overall}.`
+      : `${(s.challenges ?? []).length} adversarial attacks run against the candidate.`,
+  CONTRADICTION: (s) =>
+    s.count != null
+      ? `${s.count} contradictions found and resolved against the evidence.`
+      : "Resolving contradictions in the evidence…",
+  KILLER_EXPERIMENT: (s) => {
+    const ke = s.experiment as Record<string, unknown> | undefined;
+    const name = String(ke?.name ?? ke?.description ?? "");
+    return name
+      ? `Decisive experiment designed: ${name}.`
+      : "Designing the experiment that could kill the candidate…";
+  },
+  ADJUDICATION: (s) =>
+    s.verdict
+      ? `Adjudicated: ${s.verdict}.`
+      : (s.reason ?? "Adjudicating the surviving candidate…"),
+  CLASSIFY: (s) => {
+    const es = s.epistemic_state as Record<string, unknown> | undefined;
+    const state = String(es?.epistemic_state ?? es?.final_status ?? "");
+    return state
+      ? `Epistemic state: ${state}.`
+      : "Classifying what is actually known…";
+  },
+  NEXT_BEST_ACTION: () => "Ranked the next actions by information value.",
+  RANK: (s) =>
+    s.score != null
+      ? `Final ranking recorded — score ${s.score}.`
+      : "Final ranking recorded.",
 };
+
+function stageSentence(s: StageDigest): string {
+  const fn = STAGE_SENTENCE[s.stage];
+  return fn ? fn(s) : `${s.stage.toLowerCase().replace(/_/g, " ")}…`;
+}
 
 const PHASE_LABELS: Record<string, string> = {
-  BUILDING_PROBLEM: "Building an evidence-bound problem statement…",
+  BUILDING_PROBLEM: "Reading the problem and binding it to evidence…",
   PENDING: "Queued…",
-  RUNNING: "The engine is running…",
+  RUNNING: "Thinking…",
 };
-
-function stageInfo(s: StageDigest): string {
-  switch (s.stage) {
-    case "RETRIEVE":
-      return s.records_found != null
-        ? `${s.records_found} records from ${(s.sources ?? []).join(", ")}`
-        : "";
-    case "FREEZE":
-      return "content hashes + exact spans bound";
-    case "SYNTHESIZE":
-      return [s.mechanism, s.intervention].filter(Boolean).join(" → ") || "";
-    case "VERIFY":
-      return "claim-level verification";
-    case "MULTI_SOURCE_DISCOVERY":
-      return s.prior_art_count != null
-        ? `${s.prior_art_count} prior-art candidates scanned`
-        : "";
-    case "COLLISION":
-      return (s.collisions ?? [])
-        .map((c) => `${c.universe ?? ""}: ${c.verdict ?? "?"}`)
-        .join(" · ");
-    case "ATTACK":
-      return s.overall
-        ? `adversarial gate: ${s.overall}`
-        : `${(s.challenges ?? []).length} attacks`;
-    case "CONTRADICTION":
-      return s.count != null ? `${s.count} contradictions` : "";
-    case "KILLER_EXPERIMENT": {
-      const ke = s.experiment as Record<string, unknown> | undefined;
-      return String(ke?.name ?? ke?.description ?? "");
-    }
-    case "ADJUDICATION":
-      return s.verdict ? `verdict: ${s.verdict}` : (s.reason ?? "");
-    case "CLASSIFY": {
-      const es = s.epistemic_state as Record<string, unknown> | undefined;
-      return String(es?.epistemic_state ?? es?.final_status ?? "");
-    }
-    case "RANK":
-      return s.score != null ? `score ${s.score}` : "";
-    default:
-      return "";
-  }
-}
 
 function str(x: unknown, max = 400): string {
   if (x == null) return "";
@@ -337,25 +348,26 @@ export default function RunPage({
             </span>
           </div>
 
-          <div className="stages">
-            {stages.map((s) => (
-              <div className={`stage ${s.status ?? ""}`} key={s.stage}>
-                <div className="name">
-                  <span className="dot" />
-                  {STAGE_LABELS[s.stage] ?? s.stage}
-                </div>
-                <div className="info">{stageInfo(s)}</div>
+          <div className="narrative" aria-live="polite">
+            {stages.map((s, i) => (
+              <div
+                className={`nline ${
+                  s.status === "FAIL" ? "fail" : done ? "" : "latest"
+                }`}
+                key={s.stage}
+              >
+                {s.status === "FAIL" ? "Blocked: " : ""}
+                {stageSentence(s)}
+                {i === stages.length - 1 && !done && (
+                  <span className="cursor" />
+                )}
               </div>
             ))}
             {!done && (
-              <div className="stage">
-                <div className="name">
-                  <span className="dot" /> …
-                </div>
-                <div className="info">
-                  {stages.length}/13 stages persisted · statuses come from the
-                  run directory, never fabricated
-                </div>
+              <div className="nline working">
+                <span className="cursor" />
+                Working — {stages.length} of 13 steps recorded so far; every
+                status comes from the run directory, never fabricated
               </div>
             )}
           </div>

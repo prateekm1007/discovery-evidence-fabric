@@ -199,6 +199,12 @@ function RealityLoopPanel({ record }: { record: RealityLoopRecord }) {
               <span>
                 {obs.measured_value?.toFixed(4)} mPa·s ({obs.origin})
               </span>
+              {obs.origin_caveat && (
+                <>
+                  <span className="k">caveat</span>
+                  <span className="faint">{obs.origin_caveat}</span>
+                </>
+              )}
               <span className="k">discrepancy</span>
               <span>
                 {(obs.relative_delta ?? 0) * 100 > 0 ? "+" : ""}

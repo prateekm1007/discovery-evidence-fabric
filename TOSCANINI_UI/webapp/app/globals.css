@@ -278,37 +278,39 @@ a { color: inherit; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* stage stream */
-.stages { display: flex; flex-direction: column; gap: 0; margin-top: 14px; }
+/* narrative stream — the engineering argument as it emerges (R391:
+   claude.ai principle — no pipeline labels, no machine badges; plain
+   sentences derived from the persisted stage artifacts) */
+.narrative {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 18px 0 0;
+  max-width: 720px;
+}
 
-.stage {
-  display: grid;
-  grid-template-columns: 210px 1fr;
-  gap: 16px;
-  padding: 13px 4px;
-  border-bottom: 1px solid var(--line);
+.nline {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  padding: 2px 0;
   animation: fadein 0.35s ease;
 }
 @keyframes fadein { from { opacity: 0; transform: translateY(3px); } }
 
-.stage .name {
-  font-family: var(--mono);
-  font-size: 12.5px;
-  letter-spacing: 0.3px;
-  color: var(--ink-soft);
-  display: flex;
-  gap: 8px;
-  align-items: baseline;
+.nline.latest { color: var(--ink); }
+.nline.fail { color: var(--bad); }
+.nline.working { color: var(--ink-faint); font-size: 13.5px; margin-top: 6px; }
+
+.nline .cursor {
+  display: inline-block;
+  width: 8px; height: 16px;
+  margin-left: 6px;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  animation: blink 1.1s steps(1) infinite;
 }
-.stage .name .dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--ink-faint);
-  display: inline-block; flex: none;
-}
-.stage.PASS .name .dot { background: var(--ok); }
-.stage.FAIL .name .dot { background: var(--bad); }
-.stage .info { font-size: 13.5px; color: var(--ink-soft); }
-.stage .info b { color: var(--ink); font-weight: 600; }
+@keyframes blink { 50% { opacity: 0; } }
 
 /* ---------------- reasoning summary ---------------- */
 .reasoning {
@@ -477,6 +479,7 @@ a { color: inherit; }
   padding: 3px 9px;
 }
 .kv .bad { color: var(--bad); font-weight: 600; }
+.kv .faint { color: var(--ink-faint); font-size: 12.5px; }
 
 /* ---------------- result blocks ---------------- */
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 22px; }

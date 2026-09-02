@@ -36,7 +36,10 @@ from toscanini import gateway as gw  # noqa: E402
 from toscanini import sessions as store  # noqa: E402
 from toscanini import showcase as show  # noqa: E402
 
-PORT = 8788
+PORT = int(os.environ.get("PORT") or 8788)
+# R391 (deployment): hosted engines (Render) set PORT and expect a
+# 0.0.0.0 bind; local dev keeps the loopback default.
+HOST = os.environ.get("ENGINE_HOST") or ("0.0.0.0" if os.environ.get("PORT") else "127.0.0.1")
 
 
 def _git_head() -> str:
@@ -90,9 +93,13 @@ class Handler(BaseHTTPRequestHandler):
         p = urllib.parse.urlparse(self.path)
         parts = [x for x in p.path.split("/") if x]
 
-        if p.path == "/healthz":
-            return self._json(200, {"ok": True, "service": "toscanini",
+        if p.path == "/healthz" or p.path == "/api/health":
+            # /api/health is the R391 deployment healthcheck alias (same
+            # probe, Render-style {"status": "ok"} envelope included)
+            return self._json(200, {"ok": True, "status": "ok",
+                                    "service": "toscanini",
                                     "engine_commit": ENGINE_COMMIT,
+                                    "transport": gw.external_base_url() or "local",
                                     "gateway_up": gw.gateway_up()})
         if p.path == "/api/engine":
             return self._json(200, {
@@ -442,9 +449,10 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     store.seed_benchmark_sessions()
-    srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
-    print(f"toscanini service on 127.0.0.1:{PORT} "
-          f"(engine {ENGINE_COMMIT[:8]})", flush=True)
+    srv = ThreadingHTTPServer((HOST, PORT), Handler)
+    print(f"toscanini service on {HOST}:{PORT} "
+          f"(engine {ENGINE_COMMIT[:8]}, transport "
+          f"{gw.external_base_url() or 'local-gateway'})", flush=True)
     srv.serve_forever()
 
 

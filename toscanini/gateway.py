@@ -10,6 +10,7 @@ from __future__ import annotations
 import os
 import subprocess
 import time
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -41,9 +42,32 @@ def gateway_up() -> bool:
         return False
 
 
+def external_base_url() -> str | None:
+    """R391 (deployment): if ZAI_BASE_URL points at a non-loopback
+    OpenAI-compatible endpoint, the registry talks to it DIRECTLY (the
+    {PROVIDER}_BASE_URL override in llm_registry) — no local gateway
+    subprocess exists or is needed on a hosted engine."""
+    url = (os.environ.get("ZAI_BASE_URL") or "").strip()
+    if not url:
+        return None
+    host = urllib.parse.urlparse(url).hostname or ""
+    if host in ("127.0.0.1", "localhost", "::1"):
+        return None
+    return url
+
+
 def ensure_gateway() -> dict:
-    """Start the zai gateway if not already up. Idempotent."""
+    """Start the zai gateway if not already up. Idempotent.
+
+    External-transport mode: when ZAI_BASE_URL points at a public
+    endpoint, this returns EXTERNAL and the sandbox gateway is never
+    spawned — the engine's llm_registry calls the public endpoint
+    directly (transport swap only; the preflight probe still demands
+    a real live completion before any run)."""
     global _proc
+    ext = external_base_url()
+    if ext:
+        return {"started": False, "status": "EXTERNAL", "base_url": ext}
     if gateway_up():
         return {"started": False, "status": "ALREADY_UP"}
     keys = _load_env_keys()

@@ -569,3 +569,30 @@ Work Log:
 
 Stage Summary:
 - The reality loop is CLOSED for P-07 with the proof the CEO demanded: decision-before (0.6 mm @ eta=1.0), trigger observation (EVT-R390-NIST-WATER-VISC-310K), decision-after (0.5471 mm @ eta=0.6913), re-evaluated result (conductance restored 0.99998). REAL_LOOP_VERIFIED derived mechanically from the append-only ledgers, now committed durable. Remaining per CEO order: freeze-audit confirmation (done by R389 Phase 1), deployment (Vercel + production backend), and the two real investor demos.
+
+---
+
+## R391 — DEPLOY THE PRODUCT (CEO audit: "The next session should end with a public URL")
+
+Task ID: CODER-R391
+Agent: CODER (Super Z session 2026-09-02)
+Task: Execute the R390 audit's strict order — claude.ai interface principle applied to the UI, vercel.json, engine host deployment (Render key provided in session), Vercel webapp deployment, fresh run through the public URL, and the water≠CSF precision fix. Deployment is THE priority; no new engine infrastructure.
+
+Work Log:
+- Constitution v1.9.0 re-read IN FULL before any code change (file hash 6bfad26fa828... verified identical to the R390 read). Repo state per Art. XXIII: HEAD == origin/main == 3ab9c6b7, clean. CI verified green at tip via GitHub API (3ab9c6b7 success).
+- TRANSPORT SURVEY (evidence before assertion): the sandbox z-ai gateway is loop-local by design (internal endpoint, session-bound credential — documented in scripts/zai_gateway.mjs; not deployable and not copied). Public-transport inventory: NVIDIA 60s+ timeouts re-measured (latency collapse persists), Mistral 401 re-verified, ZAI zgwy_ key 401 on both public Z.ai endpoints, no OpenRouter/Anthropic/OpenAI/Gemini keys exist in .env.keys. Conclusion disclosed below in Stage Summary.
+- ENGINE CHANGES (transport-only, product surface, zero epistemic-machinery change):
+  1. llm_registry: ProviderSpec.url_for_call() — explicit operator override {PROVIDER}_BASE_URL re-points a provider slot at any public OpenAI-compatible endpoint (same override class as ENGINE_*_PROVIDER pins: recorded, never silent). Both flavor call sites use it. Selection policy, quality tiers, ledger semantics untouched.
+  2. toscanini/gateway: external_base_url() — when ZAI_BASE_URL points at a non-loopback URL, ensure_gateway returns EXTERNAL and never spawns the sandbox gateway; the registry calls the public endpoint directly. Loopback URLs still use the local gateway (sandbox behavior unchanged).
+  3. toscanini/worker: preflight still REQUIRED in EXTERNAL mode (real live completion before any run — probe semantics unchanged).
+  4. toscanini/server: PORT env (Render contract) + 0.0.0.0 bind when PORT is set (loopback default preserved for local dev) + /api/health alias returning {"status":"ok"} (deployment healthcheck; same probe as /healthz).
+  5. requirements.txt (new): 12 pins matching the verified venv (cadquery 2.6.1, OCP 7.8.1.1.post1, numpy, matplotlib, pdfplumber, pillow, PyMuPDF, pypdf, PyPDF2, reportlab, sympy, trimesh).
+- UI (claude.ai principle — "complex pipeline, boring interface"): the run page's machine-label stage table (13 monospace pipeline badges) replaced by a NARRATIVE STREAM — one plain-English sentence per persisted stage, same artifact-derived data, same honest counters (records found, attacks run, verdicts), failed stages marked. "Thinking…" phase label. CSS: .stages/.stage grid removed, .narrative/.nline prose styles added. Home page and showcase pages already conform (single input, no config wall) — unchanged.
+- WATER ≠ CSF CAVEAT (audit item 9): LOOP_CLOSURE_RECORD.json observation_origin_caveat added — "NIST SRD 69 measures pure water; CSF viscosity is slightly higher due to dissolved proteins (published CSF at 37 C spans roughly 0.7-1.0 mPa.s)..." — surfaced through reality_loop_record() (showcase.py) and the RealityLoopPanel (types + page). The rehearsal fixture untouched.
+- vercel.json (new): exact audit-specified 5-line file.
+- VERIFICATION: adversarial mechanic checks (URL override on/off, external/loopback gateway mode, EXTERNAL ensure_gateway never spawns, PORT/HOST resolution) all PASS; webapp tsc --noEmit clean + production build clean; suites: r389 product surface + r390 reality loop + r389 reality provider + toscanini recovery + production guards = 67 passed 1 skipped (pre-existing); dossier bridge = 27 passed. 14-gate in-place run on the dirty tree fails only G0 (dirty worktree — by design, Art. IX) and the G13 binding cascade from it; clean-tree gate re-run after commit recorded below.
+- DEPLOYMENT: engine → Render (API key provided), webapp → Vercel (API key provided). Results appended below after execution.
+
+Stage Summary:
+- Code changes are transport-config + UI-presentation only; the engine loop, gates, ledgers, and canonical state are untouched (Art. IX/XXXVIII). 
+- HONEST DISCLOSURE (Art. XV/XXV): no working public LLM transport exists among the current keys. The deployed engine will start, serve showcase packages, the reality loop, and sessions — but a FRESH run will end in the designed honest ERROR_TRANSPORT state until ONE public LLM key is set as a Render env var (ZAI_BASE_URL + ZAI_API_KEY for any OpenAI-compatible endpoint, e.g. OpenRouter; NVIDIA degrades to 60-240 s latency and breaks the 90 s preflight probe). This is a credential, not a code, gap.

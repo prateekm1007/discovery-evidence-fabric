@@ -393,6 +393,7 @@ def reality_loop_record(slot: str) -> Optional[Dict[str, Any]]:
         "observation": {
             "event_id": rec.get("observation_event_id"),
             "origin": rec.get("observation_origin"),
+            "origin_caveat": rec.get("observation_origin_caveat"),
             "quantity": comp.get("name"),
             "design_value": comp.get("design_value"),
             "measured_value": comp.get("reality_value"),

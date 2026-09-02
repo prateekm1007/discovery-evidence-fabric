@@ -16,6 +16,7 @@
   "package_id": "P-07",
   "observation_event_id": "EVT-R390-NIST-WATER-VISC-310K",
   "observation_origin": "MEASURED",
+  "observation_origin_caveat": "NIST SRD 69 measures pure water; CSF viscosity is slightly higher due to dissolved proteins (published CSF at 37 C spans roughly 0.7-1.0 mPa.s depending on protein content and pathology). This correction replaces the room-temperature water approximation with a body-temperature pure-water value. Benchtop CSF viscosity measurement remains an open item.",
   "real_event": true,
   "design_world": {
     "artifact": "DESIGN_WORLD",
@@ -59,7 +60,7 @@
         "value_mPa_s": 1.0,
         "epistemic_class": "ENGINEERING_REFERENCE",
         "declared_uncertainty": 0.2,
-        "declared_basis": "const:csf_viscosity — 'CSF dynamic viscosity (water-like)', source_note: 'cerebrospinal fluid is reported at ~1.0 mPa*s, essentially water viscosity at 37 C'",
+        "declared_basis": "const:csf_viscosity \u2014 'CSF dynamic viscosity (water-like)', source_note: 'cerebrospinal fluid is reported at ~1.0 mPa*s, essentially water viscosity at 37 C'",
         "source_module": "discovery_fabric/engine/technical_equations.py"
       }
     ]
@@ -79,16 +80,16 @@
     "relative_delta": 0.308696,
     "declared_uncertainty": 0.2,
     "status": "DISCREPANCY",
-    "design_declared_basis": "const:csf_viscosity — 'CSF dynamic viscosity (water-like)', source_note: 'cerebrospinal fluid is reported at ~1.0 mPa*s, essentially water viscosity at 37 C'"
+    "design_declared_basis": "const:csf_viscosity \u2014 'CSF dynamic viscosity (water-like)', source_note: 'cerebrospinal fluid is reported at ~1.0 mPa*s, essentially water viscosity at 37 C'"
   },
   "causal_hypothesis": {
     "hypothesis_id": "HYP-loop-EVT-R390-NIST-WATER-VISC-310K",
     "deterministic": true,
     "llm_used": false,
-    "equation_basis": "EQ-1 (package EQUATION_REGISTRY): Q = (pi * r^4 * dP) / (8 * eta * L) — Hagen-Poiseuille per lumen; conductance G = Q/dP = pi*d^4 / (128*eta*L). The exponent 1/4 below is this equation's own r^4 exponent.",
-    "statement": "The design's declared viscosity basis (1.0 mPa*s, ENGINEERING_REFERENCE) claims to be 'essentially water viscosity at 37 C'. The measured value is 0.6913035999999999 mPa*s (NIST SRD 69, MEASURED) — the declared basis is refuted: 1.0 mPa*s is water near 293 K, not 310.15 K. Through EQ-1 (G = pi*d^4/(128*eta*L)), the as-designed floor conductance is 1.447x the design basis — the over-drainage guard calibration is off. The design variable controlling floor conductance is floor_lumen_diameter_mm (envelope [0.3, 0.8] mm); restoring the declared conductance at the measured viscosity requires d_new = d_old * (eta_measured / eta_design)^(1/4).",
+    "equation_basis": "EQ-1 (package EQUATION_REGISTRY): Q = (pi * r^4 * dP) / (8 * eta * L) \u2014 Hagen-Poiseuille per lumen; conductance G = Q/dP = pi*d^4 / (128*eta*L). The exponent 1/4 below is this equation's own r^4 exponent.",
+    "statement": "The design's declared viscosity basis (1.0 mPa*s, ENGINEERING_REFERENCE) claims to be 'essentially water viscosity at 37 C'. The measured value is 0.6913035999999999 mPa*s (NIST SRD 69, MEASURED) \u2014 the declared basis is refuted: 1.0 mPa*s is water near 293 K, not 310.15 K. Through EQ-1 (G = pi*d^4/(128*eta*L)), the as-designed floor conductance is 1.447x the design basis \u2014 the over-drainage guard calibration is off. The design variable controlling floor conductance is floor_lumen_diameter_mm (envelope [0.3, 0.8] mm); restoring the declared conductance at the measured viscosity requires d_new = d_old * (eta_measured / eta_design)^(1/4).",
     "quantity_role": "conductance is inversely proportional to eta and proportional to d^4; holding the declared conductance fixed when eta changes by factor f requires d to change by f^(1/4)",
-    "residual_unknown": "Direct measurement of human CSF dynamic viscosity at 310.15 K across the shunt operating pressure envelope (the published water datum corrects the design's stated basis; CSF itself remains unmeasured — unknown stays unknown, Art. XXV)"
+    "residual_unknown": "Direct measurement of human CSF dynamic viscosity at 310.15 K across the shunt operating pressure envelope (the published water datum corrects the design's stated basis; CSF itself remains unmeasured \u2014 unknown stays unknown, Art. XXV)"
   },
   "technical_state_update": {
     "parameter": "csf_viscosity_design_basis",
@@ -116,7 +117,7 @@
     "compensation": "d_new = d_old * (eta_measured / eta_design)^(1/4)",
     "rebuild_status": "OK",
     "applied_to_canonical_package": false,
-    "note": "deterministic sandbox rebuild (PARAMETRIC_MODEL_SOURCE executed); the canonical portfolio bytes are untouched (Art. IX) — this is the recorded design decision, delivered as a V2-class mutation proposal with full provenance"
+    "note": "deterministic sandbox rebuild (PARAMETRIC_MODEL_SOURCE executed); the canonical portfolio bytes are untouched (Art. IX) \u2014 this is the recorded design decision, delivered as a V2-class mutation proposal with full provenance"
   },
   "new_design": {
     "model_id": "pm:115852de5865efc8",
@@ -144,7 +145,7 @@
       "G_ml_min_mmHg": 1.43151e-05
     },
     "as_built_at_design_geometry": {
-      "basis": "measured constant + UNCHANGED shipped geometry — the discrepancy being closed",
+      "basis": "measured constant + UNCHANGED shipped geometry \u2014 the discrepancy being closed",
       "d_mm": 0.6,
       "eta_mPa_s": 0.6913035999999999,
       "L_mm": 100.0,
@@ -163,7 +164,7 @@
       "answer": true,
       "decision_before": "floor_lumen_diameter_mm = 0.6 mm (derived at eta=1.0 mPa*s, basis refuted by observation)",
       "decision_after": "floor_lumen_diameter_mm = 0.5471 mm (derived at measured eta=0.6913035999999999 mPa*s, event EVT-R390-NIST-WATER-VISC-310K)",
-      "technical_result": "declared floor conductance 1.432e-05 mL/(min*mmHg) restored to 1.431e-05 (ratio 1.0000); as-built-at-old-geometry conductance was 2.071e-05 — the over-drainage guard is re-calibrated to the measured reality basis"
+      "technical_result": "declared floor conductance 1.432e-05 mL/(min*mmHg) restored to 1.431e-05 (ratio 1.0000); as-built-at-old-geometry conductance was 2.071e-05 \u2014 the over-drainage guard is re-calibrated to the measured reality basis"
     }
   },
   "causal_chain": {
@@ -210,7 +211,7 @@
         "reason": "experiment priority changed: the direct CSF viscosity measurement is now the highest-EIG experiment (the observation proved the viscosity basis load-bearing: 30.9% shift vs declared +/-20%)",
         "details": {
           "eig_basis": "measured impact above the declared uncertainty band; deterministic ranking statement",
-          "new_top_experiment": "Direct measurement of human CSF dynamic viscosity at 310.15 K across the shunt operating pressure envelope (the published water datum corrects the design's stated basis; CSF itself remains unmeasured — unknown stays unknown, Art. XXV)"
+          "new_top_experiment": "Direct measurement of human CSF dynamic viscosity at 310.15 K across the shunt operating pressure envelope (the published water datum corrects the design's stated basis; CSF itself remains unmeasured \u2014 unknown stays unknown, Art. XXV)"
         },
         "recorded": true
       },
@@ -218,8 +219,8 @@
         "stage": "EXPERIMENT_CHANGE",
         "reason": "next decisive experiment changed",
         "details": {
-          "experiment": "Direct measurement of human CSF dynamic viscosity at 310.15 K across the shunt operating pressure envelope (the published water datum corrects the design's stated basis; CSF itself remains unmeasured — unknown stays unknown, Art. XXV)",
-          "would_reopen_if": "measured CSF viscosity departs from the water basis by more than the declared band — the loop re-runs through the same code path"
+          "experiment": "Direct measurement of human CSF dynamic viscosity at 310.15 K across the shunt operating pressure envelope (the published water datum corrects the design's stated basis; CSF itself remains unmeasured \u2014 unknown stays unknown, Art. XXV)",
+          "would_reopen_if": "measured CSF viscosity departs from the water basis by more than the declared band \u2014 the loop re-runs through the same code path"
         },
         "recorded": true
       },
@@ -239,8 +240,8 @@
         "stage": "DISCOVERY_CONSTRAINT",
         "reason": "discovery search space constrained",
         "details": {
-          "constraint": "future candidates in the drainage-floor territory must derive floor conductance at the MEASURED viscosity basis (event EVT-R390-NIST-WATER-VISC-310K) or a direct CSF measurement — the 1.0 mPa*s 'water at 37 C' basis is cemetery-entered for this territory",
-          "derivation": "EQ-1 (package EQUATION_REGISTRY): Q = (pi * r^4 * dP) / (8 * eta * L) — Hagen-Poiseuille per lumen; conductance G = Q/dP = pi*d^4 / (128*eta*L). The exponent 1/4 below is this equation's own r^4 exponent."
+          "constraint": "future candidates in the drainage-floor territory must derive floor conductance at the MEASURED viscosity basis (event EVT-R390-NIST-WATER-VISC-310K) or a direct CSF measurement \u2014 the 1.0 mPa*s 'water at 37 C' basis is cemetery-entered for this territory",
+          "derivation": "EQ-1 (package EQUATION_REGISTRY): Q = (pi * r^4 * dP) / (8 * eta * L) \u2014 Hagen-Poiseuille per lumen; conductance G = Q/dP = pi*d^4 / (128*eta*L). The exponent 1/4 below is this equation's own r^4 exponent."
         },
         "recorded": true
       },

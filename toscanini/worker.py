@@ -53,7 +53,8 @@ def run(session_id: str) -> None:
 
     # --- phase 1: transport -------------------------------------------------
     g = gw.ensure_gateway()
-    probe = gw.preflight_probe() if g["status"] in ("UP", "ALREADY_UP") else {
+    probeable = g["status"] in ("UP", "ALREADY_UP", "EXTERNAL")
+    probe = gw.preflight_probe() if probeable else {
         "status": "GATEWAY_DOWN", "error": str(g)}
     if probe.get("status") != "OK":
         store.update_session(
