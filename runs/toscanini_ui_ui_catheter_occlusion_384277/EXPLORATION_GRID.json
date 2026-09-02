@@ -1,0 +1,211 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "nvidia"
+ ],
+ "operator_override": [
+  "nvidia"
+ ],
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "bb294ec7d2fc63c172f10d3e8d93eadcdf830b51ddbcb371669e5e1f6d4c5a39",
+   "output_hash": "a47d0d0c0ae096284d49fe093627547be41d9d7fa63dd6a0ce56bffd499f2347",
+   "fields": {
+    "mechanism": "Heparin coating provides surface anticoagulant activity that inhibits fibrin and platelet adhesion.",
+    "intervention": "Apply a heparin‑based anti‑fouling coating to marine vessel hulls or offshore pipeline interiors to prevent biofouling and scale buildup.",
+    "expected_effect": "Reduced biofilm and mineral deposit formation, maintaining fluid flow and lowering drag/pressure loss.",
+    "falsification_test": "Field study deploying coated vs uncoated hull panels/pipeline sections in identical marine conditions and measuring fouling mass and flow resistance over a 30‑day period.",
+    "mechanism_source_span": "\"Heparin-coated TDCs were associated with significantly longer failure-free survival and lower complication rates compared with non-heparin-coated catheters.\"",
+    "span_derivation": {
+     "n_shared": 1,
+     "shared_terms": [
+      "heparin"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.067,
+     "underived": true,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:cross_industry_transfer:nvidia:a47d0d0c0ae0"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "7fece84e922ad3d4608a5e3a0a77dc63b54f940f59d71505c4e629916cf47326",
+   "output_hash": "b8de5dd1231ff3f8fe171e544aeeef78e09cca72f0cf1e2454d9187e69564511",
+   "fields": {
+    "mechanism": "Heparin coating provides an anticoagulant surface that inhibits thrombus formation, leading to longer failure‑free survival.",
+    "intervention": "Apply a permanent, covalently bonded hydrophilic polymer (e.g., PEG brush) to the catheter lumen and external surface to create a passive, non‑fouling interface that physically repels protein and cellular adhesion, thereby preventing clot buildup without active heparin.",
+    "expected_effect": "Sustained ≥300 mL/min flow for weeks post‑insertion with reduced occlusion risk, matching or exceeding heparin‑coated performance while avoiding systemic anticoagulant exposure and infection risk.",
+    "falsification_test": "In a controlled in‑vitro blood loop, compare flow rate decay, pressure rise, and thrombus mass over 30 days among uncoated catheters, heparin‑coated catheters, and the PEG‑coated catheters; the hypothesis is falsified if PEG‑coated catheters do not demonstrate flow preservation comparable to heparin‑coated devices.",
+    "mechanism_source_span": "Heparin-coated TDCs were associated with significantly longer failure‑free survival and lower complication rates compared with non‑heparin‑coated catheters.",
+    "span_derivation": {
+     "n_shared": 7,
+     "shared_terms": [
+      "catheter",
+      "failure",
+      "free",
+      "heparin",
+      "longer",
+      "non",
+      "survival"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.467,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:mechanism_inversion:nvidia:b8de5dd1231f"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "cb07281fb78955b77ade8f39b8acb40ff4de0cdfdd34a32caf37751738bc6c3c",
+   "output_hash": "4510746a0d74c37969e58948c1e2fdfc7d4ec1f17f308df86f86dd3c6cde68b5",
+   "fields": {
+    "mechanism": "Anticoagulant heparin coating on the catheter surface reduces thrombus formation and occlusion.",
+    "intervention": "Apply a continuous heparin-bonded polymer coating to the inner lumen and external surface of the tunneled hemodialysis catheter.",
+    "expected_effect": "Maintains ≥300 mL/min blood flow for weeks post‑insertion with no increase in infection risk.",
+    "falsification_test": "Conduct a",
+    "span_derivation": {
+     "n_shared": 0,
+     "ratio": null,
+     "underived": true,
+     "state": "NO_SPAN"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:simplification:nvidia:4510746a0d74"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "7b2b9c42aa51368323ed208215a122a3a2662399b077af786cb114fcd2803e66",
+   "output_hash": "caed70bd6573d1c31673925f6562a55a1d9bf3d7dff6a16e7f3bbc15d9980372",
+   "fields": {
+    "mechanism": "Anticoagulant surface provided by heparin coating that inhibits thrombus formation on catheter lumen.",
+    "intervention": "Apply a heparin coating to the inner lumen of the tunneled catheter and embed a low‑intensity ultrasonic transducer in the catheter wall to deliver periodic acoustic energy that synergistically disrupts platelet adhesion and enhances heparin activity.",
+    "expected_effect": "Sustained ≥300 mL/min blood flow with markedly reduced catheter occlusion over weeks without raising infection risk.",
+    "falsification_test": "Randomized bench‑scale flow loop comparing (a) heparin‑coated catheters alone vs (b) heparin‑coated catheters with ultrasonic actuation, measuring time to >50 % flow reduction under standardized clot‑forming conditions.",
+    "mechanism_source_span": "\"Heparin-coated TDCs were associated with significantly longer failure‑free survival and lower complication rates compared with non‑heparin‑coated catheters.\"",
+    "span_derivation": {
+     "n_shared": 2,
+     "shared_terms": [
+      "catheter",
+      "heparin"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.133,
+     "underived": true,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:nvidia:caed70bd6573"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "38fec1374afac450221b20bc0ea93eed907ae999922bb1302d27f644ee9b5a13",
+   "output_hash": "a5a8ffb96aaf6861b68f6dfe376f744e9dca8f48ecc74063bb2b4761a80ed57e",
+   "fields": {
+    "mechanism": "Anticoagulant heparin surface reduces thrombus formation within the catheter lumen, preserving flow patency.",
+    "intervention": "Apply a covalently bonded heparin coating to the inner lumen and external surface of the tunneled hemodialysis catheter to create a continuous antithrombotic interface.",
+    "expected_effect": "Sustained ≥300 mL/min blood flow for weeks post‑insertion with no rise in infection incidence, due to inhibition of fibrin/platelet deposition that causes occlusion.",
+    "falsification_test": "Conduct a blinded, randomized clinical trial comparing heparin‑coated catheters to identical uncoated catheters, measuring time to first flow‑limiting occlusion and quantifying intraluminal thrombus via ultrasound; a lack of statistically significant patency improvement falsifies the mechanism.",
+    "mechanism_source_span": "\"Heparin-coated TDCs were associated with significantly longer failure-free survival and lower complication rates compared with non-heparin-coated catheters.\"",
+    "span_derivation": {
+     "n_shared": 2,
+     "shared_terms": [
+      "catheter",
+      "heparin"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.133,
+     "underived": true,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": true,
+   "candidate_id": "cand:DIV:constraint_first:nvidia:a5a8ffb96aaf"
+  }
+ ],
+ "built_at": "2026-09-02T21:25:14+00:00Z",
+ "usable_candidates": 5,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 5,
+  "mean_pairwise_token_distance": 0.733,
+  "distinct_mechanism_clusters": 4,
+  "cluster_sizes": [
+   2,
+   1,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [],
+  "architecture_term_count": 57,
+  "architecture_terms_sample": [
+   "acoustic",
+   "active",
+   "activity",
+   "adhesion",
+   "anti",
+   "antithrombotic",
+   "apply",
+   "biofouling",
+   "bonded",
+   "brush",
+   "buildup",
+   "catheter",
+   "cellular",
+   "clot",
+   "coating",
+   "continuous",
+   "covalently",
+   "create",
+   "deliver",
+   "disrupts",
+   "embed",
+   "energy",
+   "enhances",
+   "external"
+  ],
+  "failure_mode_signal_count": 2,
+  "failure_modes_invoked_sample": [
+   "bond-wire fatigue under cyclic excitation",
+   "coupling loss at interface deairing failure"
+  ],
+  "prior_art_query_set_count": 5,
+  "detected_domain": "acoustic"
+ }
+}
