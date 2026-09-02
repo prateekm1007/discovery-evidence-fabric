@@ -1,0 +1,249 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "nvidia"
+ ],
+ "operator_override": [
+  "nvidia"
+ ],
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "67f168b637d0c841f837d45a713d4540e3b8e04b8adb17dae54fb922c48199fb",
+   "output_hash": "c90f62b462da9163c401e37c1b44f573f9d74b4a328b97cb49511c8402324976",
+   "fields": {
+    "mechanism": "variations in hydraulic characteristics caused by oil temperature changes",
+    "intervention": "integrate real-time oil temperature sensing into the viscosity model and apply a temperature‑dependent correction factor derived from the observed temperature‑viscosity relationship, mirroring the temperature compensation used in the AFC controller",
+    "expected_effect": "parameter estimation error is reduced, keeping viscosity predictions within the specified tolerance across temperature fluctuations",
+    "falsification_test": "measure fluid viscosity at several controlled oil temperatures, run the corrected model, and verify that estimated parameters remain within tolerance; error exceeding tolerance falsifies the approach",
+    "mechanism_source_span": "\"variations in hydraulic characteristics caused by oil temperature changes.\"",
+    "span_derivation": {
+     "n_shared": 7,
+     "shared_terms": [
+      "caused",
+      "change",
+      "characteristic",
+      "hydraulic",
+      "oil",
+      "temperature",
+      "variation"
+     ],
+     "span_terms_n": 7,
+     "ratio": 1.0,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:cross_industry_transfer:nvidia:c90f62b462da"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "af2e0cc636db034d033e692b50ddaad5449d0386900e4278ee6a1daded793279",
+   "output_hash": "21655ba35f41554e66486b7ef88a9baf80bc973b38f04ddd79556000e48902d5",
+   "fields": {
+    "mechanism": "Shot-to-shot compensation mechanism that accumulates and transfers learning results across consecutive shots.",
+    "intervention": "Implement a cycle‑to‑cycle accumulation of viscosity estimates derived from measured flow rates, storing them in a passive lookup table that updates the P‑07 model’s viscosity parameter before each new prediction.",
+    "expected_effect": "Reduces parameter estimation error by continuously refining the viscosity parameter with historical flow data, keeping model predictions within the required tolerance.",
+    "falsification_test": "Compare the P‑07 model’s viscosity predictions against benchmark measurements over 100 injection cycles with and without the shot‑to‑shot accumulation; a statistically significant reduction in estimation error (e.g., >20% RMSE decrease) validates the intervention.",
+    "mechanism_source_span": "To overcome the limited learning duration within a single injection shot, a shot-to-shot compensation mechanism accumulates and transfers learning results across consecutive shots.",
+    "span_derivation": {
+     "n_shared": 9,
+     "shared_terms": [
+      "accumulate",
+      "across",
+      "compensation",
+      "consecutive",
+      "learning",
+      "mechanism",
+      "result",
+      "shot",
+      "transfer"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.6,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:mechanism_inversion:nvidia:21655ba35f41"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "384fbd8cc0aa0894954300354eca0c66b6dd61cd156979948d1be036370ca7e8",
+   "output_hash": "9f4f2451dfa2fd4b119172fddcd1d1ed620806731f4dba5911d12cf0327cecb1",
+   "fields": {
+    "mechanism": "AFC learning parameters vary systematically with material changes, reflecting resin viscosity.",
+    "intervention": "Incorporate the converged AFC learning parameters measured during injection cycles as real‑time correction factors for the P‑07 model’s viscosity parameter.",
+    "expected_effect": "The viscosity parameter will be continuously adjusted to match actual resin behavior, keeping model error within the specified tolerance.",
+    "falsification_test": "Run a series of injections with known resin viscosities, record AFC learning parameters, update the model, and compare the estimated viscosity to independent rheometer measurements; a deviation beyond tolerance falsifies the mechanism.",
+    "mechanism_source_span": "The results show that the converged AFC learning parameters vary systematically with material changes and correspond to differences in molded product appearance.",
+    "span_derivation": {
+     "n_shared": 8,
+     "shared_terms": [
+      "afc",
+      "change",
+      "converged",
+      "learning",
+      "material",
+      "parameter",
+      "systematically",
+      "vary"
+     ],
+     "span_terms_n": 16,
+     "ratio": 0.5,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:simplification:nvidia:9f4f2451dfa2"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "dd5c88ad38cadbfcc818af73a29750bd3f3ab64ecf07fc18e5dfc24daff18a43",
+   "output_hash": "e7eec86b915cc8e78578b164eb36c03900e479e197731e31f77e9fdbc2290203",
+   "fields": {
+    "mechanism": "shot-to-shot compensation mechanism that accumulates and transfers adaptive feedforward control learning parameters across consecutive injection cycles, reflecting material viscosity changes due to temperature variations.",
+    "intervention": "embed a shot-to-shot adaptive update loop in the viscosity model where measured flow rates and oil temperature feed a feedforward controller that revises the viscosity parameter using accumulated AFC learning parameters.",
+    "expected_effect": "the viscosity parameter will be continuously corrected, reducing estimation error and keeping model accuracy within the specified tolerance despite thermal-induced viscosity shifts.",
+    "falsification_test": "run a series of flow experiments at multiple oil temperatures, compare viscosity‑parameter estimation errors with the adaptive shot-to-shot update versus a static model; a lack of statistically significant error reduction disproves the mechanism.",
+    "mechanism_source_span": "\"To overcome the limited learning duration within a single injection shot, a shot-to-shot compensation mechanism accumulates and transfers learning results across consecutive shots.\"",
+    "span_derivation": {
+     "n_shared": 9,
+     "shared_terms": [
+      "accumulate",
+      "across",
+      "compensation",
+      "consecutive",
+      "injection",
+      "learning",
+      "mechanism",
+      "shot",
+      "transfer"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.6,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:nvidia:e7eec86b915c"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "4758969c68ec32531b2917e332c9feb1935ae21e77acc1e517dec48993e90634",
+   "output_hash": "127d5bdc3bceb7a02dea0e561762b90c5d5cd952394c3ff637f2aa5d5ff5de4a",
+   "fields": {
+    "mechanism": "Shot-to-shot compensation mechanism that accumulates and transfers learning results across consecutive cycles, enabling adaptive update of model parameters.",
+    "intervention": "Integrate a shot-to-shot compensation routine into the P-07 viscosity model that uses measured flow data to update the viscosity parameter via AFC‑derived learning parameters after each injection cycle.",
+    "expected_effect": "The viscosity parameter will converge toward the true material viscosity, keeping estimation error within the specified tolerance and improving model accuracy.",
+    "falsification_test": "Run a series of controlled injections with known viscosities, apply the shot-to-shot update, and verify that the post‑update parameter error falls below the tolerance; failure to achieve this demonstrates falsification.",
+    "mechanism_source_span": "To overcome the limited learning duration within a single injection shot, a shot-to-shot compensation mechanism accumulates and transfers learning results across consecutive shots.",
+    "span_derivation": {
+     "n_shared": 10,
+     "shared_terms": [
+      "accumulate",
+      "across",
+      "compensation",
+      "consecutive",
+      "injection",
+      "learning",
+      "mechanism",
+      "result",
+      "shot",
+      "transfer"
+     ],
+     "span_terms_n": 15,
+     "ratio": 0.667,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:constraint_first:nvidia:127d5bdc3bce"
+  }
+ ],
+ "built_at": "2026-09-02T21:55:44+00:00Z",
+ "usable_candidates": 5,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 5,
+  "mean_pairwise_token_distance": 0.778,
+  "distinct_mechanism_clusters": 5,
+  "cluster_sizes": [
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [],
+  "architecture_term_count": 54,
+  "architecture_terms_sample": [
+   "accumulated",
+   "accumulation",
+   "adaptive",
+   "after",
+   "apply",
+   "before",
+   "compensation",
+   "controller",
+   "converged",
+   "correction",
+   "cycle",
+   "cycles",
+   "data",
+   "dependent",
+   "derived",
+   "during",
+   "embed",
+   "estimates",
+   "factor",
+   "factors",
+   "feed",
+   "feedforward",
+   "flow",
+   "implement"
+  ],
+  "failure_mode_signal_count": 3,
+  "failure_modes_invoked_sample": [
+   "encrustation / mineral deposition",
+   "proximal occlusion by tissue ingrowth",
+   "regime transition to turbulence altering calibration"
+  ],
+  "prior_art_query_set_count": 5,
+  "detected_domain": "fluidics_hydraulic"
+ }
+}
