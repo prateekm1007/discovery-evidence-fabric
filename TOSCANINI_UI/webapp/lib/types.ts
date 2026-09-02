@@ -95,12 +95,31 @@ export interface ShowcaseParam {
   design_basis?: string;
 }
 
+export interface BriefSections {
+  what_it_does?: string | null;
+  why_it_matters?: string | null;
+  established?: string | null;
+  not_established?: string | null;
+  decisive_experiment?: string | null;
+  kill_condition?: string | null;
+  source?: string;
+}
+
 export interface ShowcaseDetail {
   kind: "SHOWCASE";
   slot: string;
   package_id: string;
   title: string;
   blurb: string;
+  brief?: BriefSections;
+  maturity?: string | null;
+  maturity_basis?: string | null;
+  known_blockers?: string[];
+  evidence_class_counts?: Record<string, number>;
+  first_decisive_work_package?: {
+    work_package?: string | null;
+    recorded_effort?: string | null;
+  };
   mechanism_summary?: string;
   equations: { id?: string; expression?: string; caption?: string }[];
   parameters: ShowcaseParam[];

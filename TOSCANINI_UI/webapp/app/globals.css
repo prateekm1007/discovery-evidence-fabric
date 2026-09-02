@@ -559,3 +559,122 @@ a { color: inherit; }
 .backrow { margin-top: 30px; }
 .backrow a { color: var(--ink-faint); font-size: 13px; text-decoration: none; }
 .backrow a:hover { color: var(--accent); }
+
+/* ---------------- R393: run narrative groups (the eight states) ------- */
+.ngroup { margin-top: 26px; }
+.ngroup h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 17px;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.ngroup .nline { font-size: 14px; color: var(--ink-soft); margin-bottom: 5px; }
+.ngroup .nline.latest { color: var(--ink); }
+.ngroup .nline.fail { color: var(--bad); }
+
+/* ---------------- R393: showcase brief sections ----------------------- */
+.briefsec .brieflead {
+  font-size: 16.5px;
+  color: var(--ink);
+  margin: 10px 0 8px;
+  line-height: 1.6;
+  max-width: 74ch;
+}
+.briefsec .briefbody {
+  font-size: 14.5px;
+  color: var(--ink-soft);
+  margin: 8px 0;
+  line-height: 1.62;
+  max-width: 74ch;
+}
+.briefsec .briefbody b { color: var(--ink); }
+.briefsec .brieffoot {
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  margin: 12px 0 0;
+  line-height: 1.55;
+  max-width: 74ch;
+}
+.resultgrid { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 6px; }
+
+.killbox {
+  background: #f9eeec;
+  border: 1px solid #e6c9c3;
+  border-left: 3px solid var(--bad);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 14.5px;
+  color: var(--ink);
+  margin: 12px 0 8px;
+  line-height: 1.6;
+  max-width: 74ch;
+}
+.killbox b { color: var(--bad); }
+
+/* technical inspection: secondary, collapsed by default */
+details.tech {
+  margin-top: 30px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  padding: 0;
+}
+details.tech summary {
+  cursor: pointer;
+  padding: 16px 20px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  letter-spacing: 0.2px;
+  list-style: none;
+  user-select: none;
+}
+details.tech summary::before { content: "+ "; color: var(--accent); font-weight: 700; }
+details.tech[open] summary::before { content: "− "; }
+details.tech summary:hover { color: var(--ink); }
+details.tech .techbody { padding: 4px 20px 22px; }
+details.tech ul { margin: 8px 0 4px; padding-left: 18px; }
+details.tech li { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px; line-height: 1.5; }
+
+/* ---------------- R393: responsive pass (directive 8) ----------------- */
+@media (max-width: 720px) {
+  .shell { padding: 0 16px 60px; }
+  .topbar { padding: 20px 0 14px; margin-bottom: 26px; }
+  .topbar .meta { display: none; }
+
+  .hero { margin-top: 18px; }
+  .hero h1 { font-size: 25px; line-height: 1.3; }
+  .hero p.lede { font-size: 14.5px; }
+  .ask { padding: 16px; }
+  .ask textarea { font-size: 15px; min-height: 110px; }
+  .ask .ask-foot { flex-direction: column; align-items: stretch; gap: 10px; }
+  .ask .hint { order: 2; text-align: center; }
+  .ask .btn { order: 1; width: 100%; }
+  .examples { justify-content: center; }
+
+  .section { margin-top: 38px; }
+  .section h2 { font-size: 19px; }
+  .briefsec .brieflead { font-size: 15px; }
+  .briefsec .briefbody, .briefsec .brieffoot { font-size: 13.5px; }
+  .killbox { font-size: 13.5px; padding: 12px 14px; }
+
+  .statusbar { flex-wrap: wrap; gap: 8px; }
+  .run-row { flex-wrap: wrap; }
+  .run-row .title { flex-basis: 100%; order: 3; margin-top: 4px; }
+
+  .arg .step { grid-template-columns: 1fr; gap: 4px; padding: 10px 0; }
+
+  .canvas-wrap { height: 320px !important; }
+  .download-cta { padding: 22px 18px; }
+  .download-cta .msg { min-width: 100%; }
+  .download-cta .btn.download { width: 100%; text-align: center; }
+
+  .ngroup { margin-top: 20px; }
+  .ngroup h3 { font-size: 15.5px; }
+  .ngroup .nline { font-size: 13.5px; }
+
+  .kv { font-size: 12.5px; }
+  .block { padding: 16px; }
+  details.tech summary { padding: 14px 16px; font-size: 12.5px; }
+  details.tech .techbody { padding: 2px 16px 18px; }
+}

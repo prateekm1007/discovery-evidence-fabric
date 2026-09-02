@@ -104,6 +104,97 @@ def _slot_dir(slot: str) -> Optional[Path]:
     return None
 
 
+# ------------------------------------------------------------------
+# R393 (CEO directive 7): the buyer-facing executive-brief sections,
+# extracted VERBATIM from the released 01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf
+# in the buyer-distribution chain (Art. XXXIX authority). The showcase
+# presents the certified release's own words — never re-authored, never
+# re-rendered content. Slots whose brief lacks a section degrade honestly
+# (the section is omitted, never synthesized).
+_BRIEF_CACHE: Dict[str, Dict[str, Optional[str]]] = {}
+
+_BRIEF_LABELS = [
+    ("WHAT IS IT?", "what_it_does"),
+    ("WHY DOES IT MATTER?", "why_it_matters"),
+    ("WHAT IS ESTABLISHED?", "established"),
+    ("WHAT IS NOT ESTABLISHED?", "not_established"),
+    ("WHAT DOES THE BUYER DO NEXT?", "buyer_next"),
+]
+
+
+def _split_brief_text(text: str) -> Dict[str, Optional[str]]:
+    """Pure parser: split extracted brief text into labeled sections.
+
+    Labels can wrap mid-line in the extracted PDF text (measured: slot 11
+    renders 'Kill\\ncondition:'), so label matching is whitespace-flexible.
+    The buyer-chain template's fixed closing paragraph
+    ('This is an engineering-definition') terminates the buyer-next
+    section mechanically. Unparseable sections stay None — never guessed.
+    """
+    out: Dict[str, Optional[str]] = {
+        key: None for _, key in _BRIEF_LABELS
+    }
+    out["decisive_experiment"] = None
+    out["kill_condition"] = None
+    # locate every label (first occurrence only)
+    hits = []
+    for label, key in _BRIEF_LABELS:
+        m = re.search(re.escape(label).replace(r"\ ", r"\s+"), text)
+        if m:
+            hits.append((m.start(), m.end(), key))
+    hits.sort()
+    raw_slices: Dict[str, str] = {}
+    for i, (start, end, key) in enumerate(hits):
+        stop = hits[i + 1][0] if i + 1 < len(hits) else len(text)
+        raw_slices[key] = text[end:stop]
+        body = " ".join(raw_slices[key].split())
+        if body:
+            out[key] = body
+    nxt = raw_slices.get("buyer_next") or ""
+    m = re.search(
+        r"Decisive\s+experiment:\s*(.*?)(?=Kill\s+condition:|$)",
+        nxt, re.S)
+    if m:
+        out["decisive_experiment"] = " ".join(m.group(1).split()) or None
+    m = re.search(
+        r"Kill\s+condition:\s*(.*?)"
+        r"(?=This is an engineering-definition|$)",
+        nxt, re.S)
+    if m:
+        out["kill_condition"] = " ".join(m.group(1).split()) or None
+    return out
+
+
+def brief_sections(slot_dir: Path) -> Dict[str, Optional[str]]:
+    """Extract the executive-brief sections for one package (cached)."""
+    key = slot_dir.name
+    if key in _BRIEF_CACHE:
+        return _BRIEF_CACHE[key]
+    out: Dict[str, Optional[str]] = {
+        "what_it_does": None, "why_it_matters": None,
+        "established": None, "not_established": None,
+        "decisive_experiment": None, "kill_condition": None,
+        "source": "01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf — released "
+                  "buyer-distribution chain (Art. XXXIX), extracted verbatim",
+    }
+    pdf = slot_dir / "01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf"
+    if pdf.is_file():
+        try:
+            import pdfplumber  # deferred: heavy import, engine requirement
+            with pdfplumber.open(pdf) as p:
+                text = "\n".join(
+                    (pg.extract_text() or "") for pg in p.pages[:2])
+            parsed = _split_brief_text(text)
+            for k in ("what_it_does", "why_it_matters", "established",
+                      "not_established", "decisive_experiment",
+                      "kill_condition"):
+                out[k] = parsed.get(k)
+        except Exception:  # noqa: BLE001 — degrade honestly, never invent
+            pass
+    _BRIEF_CACHE[key] = out
+    return out
+
+
 def _slots_with_models() -> List[str]:
     out = []
     for d in sorted(DOWNLOAD_ROOT.iterdir()) if DOWNLOAD_ROOT.exists() \
@@ -152,10 +243,16 @@ def showcase_detail(slot: str) -> Optional[Dict[str, Any]]:
     status_3d = _read_json(model / "3D_DESIGN_STATUS.json") or {}
     glbs = sorted(model.glob("*.glb"))
     title, blurb = SLOT_TITLES.get(slot, (d.name.replace("_", " "), ""))
+    maturity = _read_json(d / "MATURITY_BASIS.json") or {}
+    loop_counts = (loop_state.get("evidence_class_counts") or {})
+    first_wp = (((_read_json(d / "VALIDATION_ECONOMICS.json") or {})
+                 .get("time_range") or {}).get("first_decisive_work_package")
+                or {})
     zip_path = None
     zips = list(DOWNLOAD_ROOT.glob(f"{d.name}.zip"))
     if zips:
         zip_path = str(zips[0])
+    brief = brief_sections(d)
     return {
         "kind": "SHOWCASE",
         "slot": slot,
@@ -165,6 +262,15 @@ def showcase_detail(slot: str) -> Optional[Dict[str, Any]]:
         "demo_focus": slot in DEMO_FOCUS,
         "created_from": "portfolio buyer-distribution repository "
                         "(Art. XXXIX authority)",
+        "brief": brief,
+        "maturity": maturity.get("technology_maturity"),
+        "maturity_basis": maturity.get("basis"),
+        "known_blockers": maturity.get("known_blockers") or [],
+        "evidence_class_counts": loop_counts,
+        "first_decisive_work_package": {
+            "work_package": first_wp.get("work_package"),
+            "recorded_effort": first_wp.get("recorded_effort"),
+        },
         "mechanism_summary": eq_reg.get("model_summary"),
         "equations": [
             {"id": e.get("equation_id"),

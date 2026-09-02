@@ -16,7 +16,12 @@ WORKDIR /webapp
 COPY TOSCANINI_UI/webapp/package.json TOSCANINI_UI/webapp/package-lock.json ./
 RUN npm ci
 COPY TOSCANINI_UI/webapp/ ./
-RUN NEXT_OUTPUT=export npm run build
+# R393 (CEO directive 2): mechanical build assertion — the image build
+# FAILS if the export is missing pages, CSS, or JS chunks, or if any page
+# references a stylesheet/asset that does not exist. The R389→R392 defect
+# (globals.css never imported → zero CSS in the export → the public
+# deployment rendered as browser-default HTML) can never ship again.
+RUN NEXT_OUTPUT=export npm run build && node verify-export.mjs
 
 # ---------- stage 2: the engine ----------
 FROM python:3.12-slim

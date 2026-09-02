@@ -323,9 +323,12 @@ function ShowcasePageInner() {
   if (!detail) return <main><div className="loading">Loading package…</div></main>;
 
   const baseGlb = detail.model.glb;
+  const brief = detail.brief ?? {};
+  const ecc = detail.evidence_class_counts ?? {};
 
   return (
     <main className="runpage">
+      {/* ---------------- TITLE ---------------- */}
       <div className="problem">
         <div className="label">
           {detail.package_id} · technology package · from the certified
@@ -334,11 +337,34 @@ function ShowcasePageInner() {
         <div className="text" style={{ fontFamily: "var(--serif)", fontSize: 22 }}>
           {detail.title}
         </div>
-        <div style={{ marginTop: 8, color: "var(--ink-soft)", fontSize: 15 }}>
-          {detail.blurb}
-        </div>
       </div>
 
+      {/* ---------------- WHAT IT DOES ---------------- */}
+      {(brief.what_it_does || detail.mechanism_summary) && (
+        <section className="section briefsec">
+          <h2>What it does</h2>
+          <div className="sub">from the released executive brief</div>
+          {brief.what_it_does && (
+            <p className="brieflead">{brief.what_it_does}</p>
+          )}
+          {detail.mechanism_summary && (
+            <p className="briefbody">
+              <b>The engineering model:</b> {detail.mechanism_summary}
+            </p>
+          )}
+        </section>
+      )}
+
+      {/* ---------------- WHY IT MATTERS ---------------- */}
+      {brief.why_it_matters && (
+        <section className="section briefsec">
+          <h2>Why it matters</h2>
+          <div className="sub">the recorded problem, with its sources</div>
+          <p className="briefbody">{brief.why_it_matters}</p>
+        </section>
+      )}
+
+      {/* ---------------- 3D MODEL ---------------- */}
       {activeGlb && (
         <ModelViewer
           url={activeGlb}
@@ -351,95 +377,90 @@ function ShowcasePageInner() {
         />
       )}
 
-      {detail.mechanism_summary && (
-        <div className="reasoning" style={{ marginTop: 22 }}>
-          <h3>Mechanism</h3>
-          <div className="sub">the engineering model, in one paragraph</div>
-          <div style={{ fontSize: 15.5 }}>{detail.mechanism_summary}</div>
-        </div>
+      {/* ---------------- KEY TECHNICAL RESULT ---------------- */}
+      {(detail.maturity || brief.established) && (
+        <section className="section briefsec">
+          <h2>Key technical result</h2>
+          <div className="sub">what is actually established</div>
+          <div className="resultgrid">
+            {detail.maturity && (
+              <span className="pill COMPLETE">{detail.maturity}</span>
+            )}
+            {detail.loop_verification_state && (
+              <span className="pill RUNNING">
+                loop state: {detail.loop_verification_state}
+              </span>
+            )}
+          </div>
+          {brief.established && (
+            <p className="briefbody">{brief.established}</p>
+          )}
+        </section>
       )}
 
-      {loop && <RealityLoopPanel record={loop} />}
-
-      <div className="section">
-        <h2>Design parameters</h2>
-        <div className="sub">
-          change a parameter inside its declared envelope — the real
-          parametric model rebuilds in the engine&apos;s deterministic CAD
-          sandbox and the geometry re-validates
-        </div>
-        <div className="params">
-          {detail.parameters.map((p) => (
-            <ParamCard
-              key={p.param_id}
-              slot={slot}
-              param={p}
-              activeGlb={activeGlb ?? ""}
-              onPreview={(r) => {
-                if ((r as EvalResult & { __activate?: boolean }).__activate) {
-                  setActiveGlb(r.preview_glb?.serve ?? activeGlb);
-                }
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {detail.equations.length > 0 && (
-        <div className="section">
-          <h2>Engineering equations</h2>
-          <div className="sub">
-            the closed-form relations bound to this design
-          </div>
-          <div className="params">
-            {detail.equations.map((e, i) => (
-              <div className="param" key={i}>
-                <div className="pid" style={{ fontSize: 14 }}>
-                  {e.expression}
-                </div>
-                {e.caption && (
-                  <div className="basis" style={{ marginTop: 6 }}>
-                    {e.caption}
-                  </div>
-                )}
-              </div>
+      {/* ---------------- EVIDENCE ---------------- */}
+      {(Object.keys(ecc).length > 0 || brief.established) && (
+        <section className="section briefsec">
+          <h2>Evidence</h2>
+          <div className="sub">honest evidence classes — nothing hidden</div>
+          <div className="chainpills">
+            {Object.entries(ecc).map(([cls, n]) => (
+              <span className={`chainpill ${cls === "PHYSICAL_OBSERVATION" && n === 0 ? "" : ""}`} key={cls}>
+                {cls.replace(/_/g, " ")}: {String(n)}
+              </span>
             ))}
           </div>
-        </div>
+          <p className="brieffoot">
+            Every claim traces to its recorded evidence span. The full
+            evidence summary, traceability records, and each source citation
+            are inside the downloadable package.
+          </p>
+        </section>
       )}
 
-      {Object.keys(detail.key_dimensions).length > 0 && (
-        <div className="section">
-          <h2>Key dimensions</h2>
-          <div className="sub">
-            independently re-measured from the geometry (computation log)
-          </div>
-          <div className="grid2">
-            {Object.entries(detail.key_dimensions).map(([oid, dims]) => {
-              const d = dims as Record<string, unknown>;
-              const bbox = (d.bbox ?? {}) as Record<string, number>;
-              return (
-                <div className="block" key={oid}>
-                  <h4>{oid}</h4>
-                  <div className="kv">
-                    <span className="k">volume</span>
-                    <span>{String(d.volume_mm3)} mm³</span>
-                    <span className="k">bbox</span>
-                    <span>
-                      {bbox.xlen}×{bbox.ylen}×{bbox.zlen} mm
-                    </span>
-                    <span className="k">min wall</span>
-                    <span>{String(d.min_wall_thickness_mm ?? "—")} mm</span>
-                    <span className="k">valid solid</span>
-                    <span>{String(d.is_valid_solid)}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+      {/* ---------------- WHAT COULD KILL IT ---------------- */}
+      {(brief.kill_condition || brief.not_established) && (
+        <section className="section briefsec">
+          <h2>What could kill it</h2>
+          <div className="sub">stated before you buy — the design&apos;s own recorded kill condition</div>
+          {brief.kill_condition && (
+            <div className="killbox">
+              <b>Kill condition:</b> {brief.kill_condition}
+            </div>
+          )}
+          {brief.not_established && (
+            <p className="briefbody">{brief.not_established}</p>
+          )}
+          {(detail.known_blockers ?? []).length > 0 && (
+            <details className="tech">
+              <summary>All recorded blockers and unknowns</summary>
+              <ul>
+                {(detail.known_blockers ?? []).map((b, i) => (
+                  <li key={i}>{b}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </section>
       )}
 
+      {/* ---------------- DECISIVE EXPERIMENT ---------------- */}
+      {(brief.decisive_experiment || detail.first_decisive_work_package?.work_package) && (
+        <section className="section briefsec">
+          <h2>Decisive experiment</h2>
+          <div className="sub">the first thing the buyer runs — it can falsify the mechanism</div>
+          {brief.decisive_experiment && (
+            <p className="brieflead">{brief.decisive_experiment}</p>
+          )}
+          {detail.first_decisive_work_package?.recorded_effort && (
+            <p className="brieffoot">
+              Recorded effort: {detail.first_decisive_work_package.recorded_effort}
+            </p>
+          )}
+        </section>
+      )}
+
+      {/* ---------------- DOWNLOAD PACKAGE ---------------- */}
       <div className="download-cta">
         <div className="msg">
           <h3>Technology package</h3>
@@ -455,6 +476,97 @@ function ShowcasePageInner() {
           Download technology package
         </a>
       </div>
+
+      {loop && <RealityLoopPanel record={loop} />}
+
+      {/* ---------------- technical inspection (secondary) ---------------- */}
+      <details className="tech tech-wide" open={false}>
+        <summary>
+          Technical inspection — live parameters, equations, dimensions
+        </summary>
+        <div className="techbody">
+          <div className="sub" style={{ marginTop: 14 }}>
+            change a parameter inside its declared envelope — the real
+            parametric model rebuilds in the engine&apos;s deterministic CAD
+            sandbox and the geometry re-validates
+          </div>
+          <div className="params">
+            {detail.parameters.map((p) => (
+              <ParamCard
+                key={p.param_id}
+                slot={slot}
+                param={p}
+                activeGlb={activeGlb ?? ""}
+                onPreview={(r) => {
+                  if ((r as EvalResult & { __activate?: boolean }).__activate) {
+                    setActiveGlb(r.preview_glb?.serve ?? activeGlb);
+                  }
+                }}
+              />
+            ))}
+          </div>
+
+          {detail.equations.length > 0 && (
+            <div className="section" style={{ marginTop: 34 }}>
+              <h2>Engineering equations</h2>
+              <div className="sub">
+                the closed-form relations bound to this design
+              </div>
+              <div className="params">
+                {detail.equations.map((e, i) => (
+                  <div className="param" key={i}>
+                    <div className="pid" style={{ fontSize: 14 }}>
+                      {e.expression}
+                    </div>
+                    {e.caption && (
+                      <div className="basis" style={{ marginTop: 6 }}>
+                        {e.caption}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {Object.keys(detail.key_dimensions).length > 0 && (
+            <div className="section" style={{ marginTop: 34 }}>
+              <h2>Key dimensions</h2>
+              <div className="sub">
+                independently re-measured from the geometry (computation log)
+              </div>
+              <div className="grid2">
+                {Object.entries(detail.key_dimensions).map(([oid, dims]) => {
+                  const d = dims as Record<string, unknown>;
+                  const bbox = (d.bbox ?? {}) as Record<string, number>;
+                  return (
+                    <div className="block" key={oid}>
+                      <h4>{oid}</h4>
+                      <div className="kv">
+                        <span className="k">volume</span>
+                        <span>{String(d.volume_mm3)} mm³</span>
+                        <span className="k">bbox</span>
+                        <span>
+                          {bbox.xlen}×{bbox.ylen}×{bbox.zlen} mm
+                        </span>
+                        <span className="k">min wall</span>
+                        <span>{String(d.min_wall_thickness_mm ?? "—")} mm</span>
+                        <span className="k">valid solid</span>
+                        <span>{String(d.is_valid_solid)}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <p className="brieffoot" style={{ marginTop: 26 }}>
+            {detail.provenance_note}{" "}
+            {brief.source ? ` Brief sections extracted verbatim from ${brief.source}.` : ""}
+          </p>
+        </div>
+      </details>
 
       <div className="backrow">
         <a href="/">← all packages</a>

@@ -14,6 +14,27 @@ import type { SessionDetail, StageDigest } from "@/lib/types";
 // AS IT EMERGES — one plain sentence per persisted stage — not pipeline
 // labels. Same artifact-derived data, same honest counters; the plumbing
 // stays invisible ("complex pipeline, boring interface").
+//
+// R393 (CEO directive 6): the visible run experience is the eight
+// human-readable narrative states. The 13 internal stages map underneath;
+// the machine is never shown.
+
+const NARRATIVE_GROUPS: { heading: string; stages: string[] }[] = [
+  { heading: "Understanding the problem", stages: [] },
+  { heading: "Searching the evidence", stages: ["RETRIEVE", "FREEZE"] },
+  {
+    heading: "Testing competing mechanisms",
+    stages: ["SYNTHESIZE", "MULTI_SOURCE_DISCOVERY", "COLLISION"],
+  },
+  { heading: "Building the candidate", stages: ["VERIFY"] },
+  { heading: "Attacking the candidate", stages: ["ATTACK", "CONTRADICTION"] },
+  { heading: "Improving it", stages: ["ADJUDICATION"] },
+  { heading: "Designing the experiment", stages: ["KILLER_EXPERIMENT"] },
+  {
+    heading: "Preparing the technology package",
+    stages: ["CLASSIFY", "NEXT_BEST_ACTION", "RANK"],
+  },
+];
 
 const STAGE_SENTENCE: Record<string, (s: StageDigest) => string> = {
   RETRIEVE: (s) =>
@@ -363,21 +384,79 @@ function RunPageInner() {
           </div>
 
           <div className="narrative" aria-live="polite">
-            {stages.map((s, i) => (
-              <div
-                className={`nline ${
-                  s.status === "FAIL" ? "fail" : done ? "" : "latest"
-                }`}
-                key={s.stage}
-              >
-                {s.status === "FAIL" ? "Blocked: " : ""}
-                {stageSentence(s)}
-                {i === stages.length - 1 && !done && (
-                  <span className="cursor" />
-                )}
-              </div>
-            ))}
-            {!done && (
+            {/* R393 directive 6: the eight narrative states. A heading
+                appears only when its work has actually begun; stage
+                sentences render beneath it. Unknown future stages fall
+                into an honest trailing group — never hidden. */}
+            {(() => {
+              const byStage = new Map(stages.map((s) => [s.stage, s]));
+              const seen = new Set<string>();
+              const blocks: React.ReactNode[] = [];
+              for (const g of NARRATIVE_GROUPS) {
+                const present = g.stages.filter((st) => byStage.has(st));
+                if (present.length === 0) continue;
+                present.forEach((st) => seen.add(st));
+                const isLast =
+                  present[present.length - 1] === stages[stages.length - 1]?.stage;
+                blocks.push(
+                  <div className="ngroup" key={g.heading}>
+                    <h3>{g.heading}</h3>
+                    {present.map((st) => {
+                      const s = byStage.get(st)!;
+                      const last =
+                        isLast && st === present[present.length - 1];
+                      return (
+                        <div
+                          className={`nline ${
+                            s.status === "FAIL" ? "fail" : done ? "" : "latest"
+                          }`}
+                          key={s.stage}
+                        >
+                          {s.status === "FAIL" ? "Blocked: " : ""}
+                          {stageSentence(s)}
+                          {last && !done && <span className="cursor" />}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              }
+              // stage "Understanding the problem" while the problem is
+              // still being built (before any stage lands)
+              if (stages.length === 0 && !done) {
+                blocks.push(
+                  <div className="ngroup" key="understand">
+                    <h3>Understanding the problem</h3>
+                    <div className="nline working">
+                      <span className="cursor" />
+                      {detail.status === "BUILDING_PROBLEM"
+                        ? "reading the problem and binding it to the evidence base…"
+                        : PHASE_LABELS[detail.status] ?? "working…"}
+                    </div>
+                  </div>
+                );
+              }
+              // honest fallback: engine stages outside the eight states
+              const rest = stages.filter((s) => !seen.has(s.stage));
+              if (rest.length > 0) {
+                blocks.push(
+                  <div className="ngroup" key="more">
+                    <h3>Continuing</h3>
+                    {rest.map((s) => (
+                      <div
+                        className={`nline ${s.status === "FAIL" ? "fail" : ""}`}
+                        key={s.stage}
+                      >
+                        {s.status === "FAIL" ? "Blocked: " : ""}
+                        {stageSentence(s)}
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+              return blocks;
+            })()}
+            {!done && stages.length > 0 && (
               <div className="nline working">
                 <span className="cursor" />
                 Working — {stages.length} of 13 steps recorded so far; every
