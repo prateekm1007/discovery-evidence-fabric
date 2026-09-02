@@ -1,6 +1,6 @@
 # R397 Operator Deploy Runbook — Phase 1 "Make Current Code Real"
 
-**Engine state:** `eb354d3a` (origin/main; code tip `73b89df3` + evidence commit).
+**Engine state:** `930eca8b` (origin/main; the R399 lean build — image context 225→64 MB).
 **Certification:** CI "Epistemic Certification" 14-Gate Detached Certification =
 **SUCCESS** on `73b89df3` (run 33667364597; `c6527873` also SUCCESS).
 **Local proof already done:** artifact-identity contract + session isolation verified
@@ -18,7 +18,7 @@ exact and verifiable.
 ## 1. Deploy
 
 Render dashboard → service `toscanini-engine-docker` → **Manual Deploy →
-Deploy specific commit** → `eb354d3a` (or latest main). autoDeploy stays OFF.
+Deploy specific commit** → `930eca8b` (or latest main). autoDeploy stays OFF.
 
 - The Docker build bakes `ARTIFACT_IDENTITY.json` + `ARTIFACT_IDENTITY.sha256`
   from `RENDER_GIT_COMMIT` (Render supplies it when deploying a GitHub commit)
@@ -42,7 +42,7 @@ ENGINE_ENSEMBLE_PROVIDERS / ENGINE_GRID_PROVIDERS   nvidia
 DURABLE_STATE_ENABLED 1
 PORTFOLIO_COMMIT      b978e32c6a484fa14d7b42e60f407333612a50d9
 ENGINE_OPERATOR_KEY   <generate a strong random secret>   # NEW (R396 A.2)
-ENGINE_COMMIT         73b89df364c00c3a9c120b48d05a62160617818d
+ENGINE_COMMIT         930eca8b7db8b0885abccb4e8159a77b8e802723
                       # OPTIONAL now — an EXPECTATION cross-check only;
                       # identity itself comes from the build artifact
 ```
@@ -54,7 +54,7 @@ curl -sS https://toscanini-engine-docker.onrender.com/api/health | python3 -m js
 ```
 
 Must show:
-- `engine_commit` = `73b89df3…`, `engine_commit_source` = `build_artifact`
+- `engine_commit` = `930eca8b…`, `engine_commit_source` = `build_artifact`
 - `deployment_identity.identity_tamper` = `false`
 - `build_artifact_sha256` == `running_artifact_sha256`
 - `deployment_identity.deployment_drift` = `GREEN`
@@ -79,7 +79,7 @@ Must show:
 cd discovery-evidence-fabric
 python3 scripts/r396_external_probes.py \
   --base https://toscanini-engine-docker.onrender.com \
-  --deployed-sha 73b89df364c00c3a9c120b48d05a62160617818d \
+  --deployed-sha 930eca8b7db8b0885abccb4e8159a77b8e802723 \
   --out R396/EXTERNAL_PROBES_73b89df3.json
 ```
 
