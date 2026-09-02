@@ -22,6 +22,28 @@
 > Final audit verdict: the active path is already minimal for its epistemic
 > guarantees; the correct move was exactly what the CEO ordered — stop
 > pruning, build the product.
+>
+> **R390 addendum — the REALITY LOOP is CLOSED** (CEO directive #6). The
+> production loop above ends at BUYER PACKAGE; R390 adds the loop that
+> feeds REALITY back into the next design:
+>
+> ```
+> REAL OBSERVATION → REALITY MODEL → DESIGN/REALITY COMPARISON →
+> DISCREPANCY → CAUSAL HYPOTHESIS → TECHNICAL STATE UPDATE → MUTATION →
+> NEW DESIGN → RE-EVALUATION
+> ```
+>
+> | Component | Module | Notes |
+> |---|---|---|
+> | Acquisition | `discovery_fabric/engine/reality_loop.py::acquire_nist_water_viscosity` | live external wire fetch, raw-byte sha256 custody, R370G event through the frozen gate; first live event: `EVT-R390-NIST-WATER-VISC-310K` (NIST SRD 69 water at 310.15 K) |
+> | Closure | `discovery_fabric/engine/reality_loop.py::close_reality_loop` | deterministic (zero LLM); MEASURED only via the R370G one door; discrepancy threshold = the design's OWN declared band; compensation from the package's EQ-1; envelope refusal, never clamp; canonical bytes untouched (Art. IX) |
+> | Causal chain + state | R370G `record_causal_mutation` × 9 stages → `compute_real_loop_verified()` | REAL_LOOP_VERIFIED is DERIVED, never assigned; ledgers append-only and COMMITTED (R370U anchor precedent) |
+> | Operator script | `scripts/r390_close_reality_loop.py` | `--rehearsal` (hermetic, state can never flip) / `--live` (canonical ledger) — same code path (Art. XXXVII) |
+> | Product surface | `GET /api/showcase/{slot}/reality-loop` + webapp `RealityLoopPanel` | the decision-change proof shown to investors: observation → discrepancy → decision before/after → re-evaluated result → residual unknown |
+>
+> Live closure on P-07: measured η = 0.6913 mPa·s refuted the declared
+> "water at 37 C" basis; `floor_lumen_diameter_mm` 0.6 → 0.5471 mm;
+> conductance restored 0.99998. Art. XXXVII scorecard: REAL 0 → 1.
 
 ## The loop
 

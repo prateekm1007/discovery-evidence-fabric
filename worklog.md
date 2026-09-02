@@ -526,3 +526,46 @@ Work Log:
 Stage Summary:
 - The active tree is now ONE canonical loop; 111 legacy roots archived without destruction; CI independently green; release chain 25/25 from clean clones; the moat (ledger, G4 territory trees, mechanism cemetery, negative knowledge, honest PHYSICALLY_VALIDATED=NONE) fully preserved.
 - NOT STARTED (next session, CEO strict order): buyer-dossier product output (9-component dossier as product), Claude-like UI (Next.js/Vercel + FastAPI over toscanini service), investor demo (P-04 drainage floor, P-08 NIR photovoltaic, one non-medical).
+
+---
+
+## R389 — PRODUCTIZATION (CEO order: STOP infrastructure → PRODUCTIZE)
+
+Task ID: CODER-R389
+Agent: CODER (Super Z session 2026-09-01; worklog entry appended retroactively at R390 — the R389 commit 0c243835 shipped without its worklog entry, a discipline miss caught and corrected here, Art. XXXI)
+Task: CEO 8-phase productization directive on the distilled tree — final audit, reality layer, Claude-like product, investor demo slots. Engine loop UNCHANGED; everything is product surface + the reality layer.
+
+Work Log:
+- Commit 0c243835 (pushed, remote-verified): all 8 phases in one commit, detailed message preserved in git.
+- Phase 1 final pipeline audit: R389_PIPELINE_AUDIT.{md,json} + scripts/r389_pipeline_audit.py — 13/13 stages KEEP (smallest deltas = epistemic safeguards), 37/41 modules production-reachable, 4 = test-referenced tooling, ZERO dead code. First-pass audit defect (relative imports → false 33-unreachable) found/fixed/re-run before classification (Art. XXXI lesson recorded). Removed a non-authoritative local verification JSON accidentally committed at 8cb6ff3b.
+- Phase 2 reality layer: discovery_fabric/engine/reality_provider.py — provider-neutral contract + ledger + WorldLabs adapter VERIFIED LIVE (op 666549e8, world 695dcc40, GLB re-measured 177,712 tris; TOSCANINI/R389_REALITY_PROVIDER_LIVE/). REALITY_MODEL 10 CEO fields; MEASURED one door (R370G); direct add() hole self-attacked and closed (23 adversarial tests).
+- Phase 3 verified ALREADY BUILT (R378/R379/R383) — no new infrastructure (STOP rule).
+- Phases 4-7: TOSCANINI_UI/webapp/ Next.js 15 + R3F (one text box → stage stream → 3D viewer → 8-step engineering argument → single DOWNLOAD). Job API aliases test-pinned; frontend imports zero internal Python (grep-pinned). Phase 5 interactive 3D: envelope-checked sandbox rebuilds with refusal semantics, browser-verified live (0.6 → 0.45 mm). Phase 8 demo slots 04/08/09 from the portfolio authority.
+- Tests: ~2078 passed batched; 1 pre-existing failure proven pre-existing by clean-clone reproduction; 14-gate local reproduction GREEN; World Labs key in gitignored .env.keys, secret-hygiene test-pinned.
+
+Stage Summary:
+- The Claude-like product exists end-to-end with honest epistemic labels everywhere. Reality layer live-verified as provider (RECONSTRUCTED only). Everything downstream of this entry is R390.
+
+---
+
+## R390 — CLOSE THE ACTUAL REALITY LOOP (CEO directive #6)
+
+Task ID: CODER-R390
+Agent: CODER (Super Z session 2026-09-02)
+Task: CEO 10-point final directive, point #6 — the loop REAL OBSERVATION → REALITY MODEL → DESIGN/REALITY COMPARISON → DISCREPANCY → CAUSAL HYPOTHESIS → TECHNICAL STATE UPDATE → MUTATION → NEW DESIGN → RE-EVALUATION, with the PROOF that an observation changes a technical decision. R389 stopped at proposals (auto_applied:False); R390 is the application side.
+
+Work Log:
+- Constitution v1.9.0 re-read IN FULL before any code change (session mandate; Art. XXXIX). Repo state verified against the remote per Art. XXIII: local == origin/main == 0c243835 (R389). R389 found committed WITHOUT its worklog entry — this retroactive entry corrects that miss (Art. XXXI memory artifact).
+- discovery_fabric/engine/reality_loop.py (993 lines): the CEO's 9-step loop implemented end-to-end. REAL OBSERVATION = acquire_nist_water_viscosity() — LIVE NIST WebBook wire fetch (SRD 69, water, CAS 7732-18-5, T=310.15 K, P=101.325 kPa, liquid phase), raw bytes saved + sha256 + parsed exact tab-delimited row + R370G REALITY_EVENT (acquisition attestation, custody chain, publisher-cited instrument provenance — an ACQUISITION of externally published measured data, honestly labeled, not a benchtop measurement) through the FROZEN gate.
+- CAUSAL RULES are the package's own EQ-1 math (Hagen-Poiseuille; compensation exponent 1/4 = the equation's own r^4 exponent) — deterministic, zero LLM (Art. XVIII). MEASURED enters only through add_measured() (the R370G one door; Art. XXXVIII). Discrepancy threshold = the design's own declared ±20% band (Art. XXVII). Out-of-envelope compensation → explicit refusal, never clamped. Canonical portfolio bytes untouched (Art. IX) — mutation recorded as V2-class design decision with full provenance.
+- LIVE RUN (TOSCANINI/R390_REALITY_LOOP/live/ + loop-EVT-R390-NIST-WATER-VISC-310K/): measured eta = 0.6913 mPa·s vs design basis 1.0 ("essentially water at 37 C") — basis REFUTED (1.0 is water near 293 K; +30.9% vs declared ±20% → DISCREPANCY). Compensation: floor_lumen_diameter_mm 0.6 → 0.5471 mm (0.6913^(1/4)×0.6, inside envelope [0.3, 0.8]). CAD sandbox rebuild OK (new model_id, measured geometry 0.5471, G1-G8 valid, GLB/STEP/STL derived). Re-evaluation: conductance 1.4315e-5 → restored ratio 0.99998 (as-built-at-old-geometry was 2.071e-5 = +44.7% over-drainage miscalibration exposed). 9-stage Art. XXXVIII causal chain recorded in the canonical mutation ledger; compute_real_loop_verified() derives REAL_LOOP_VERIFIED mechanically — the FIRST real external event in the program's history (scorecard per Art. XXXVII: REAL 0 → 1).
+- Rehearsal mode (same code path, redirected ledger, CONTROLLED_REHEARSAL source): machinery proven, loop state UNTOUCHED, canonical ledgers untouched (Art. XXXVII same-path rule).
+- Hermetic guard (tests/conftest.py): autouse fixture redirects BOTH R370G ledger paths for every test (the e11 contamination class, closed structurally); ENGINE_LIVE=1 opts out for operator-intentional live runs.
+- Product surface: toscanini/showcase.py::reality_loop_record() + GET /api/showcase/{slot}/reality-loop (server.py); webapp RealityLoopPanel (showcase/[slot]/page.tsx): MEASURED/REAL_LOOP_VERIFIED pills, the observation (design basis vs measured, DISCREPANCY), the decision it changed (before → after), the re-evaluated technical result, the residual unknown, the 9 chain stages, the honesty note. lib/types.ts RealityLoopRecord (the previous session's api.ts import was dangling — type undefined, build-breaking — FIXED and completed here).
+- Browser-verified live (agent-browser): panel renders on /showcase/04 with full content, 9 chain pills, zero console errors; screenshot TOSCANINI/R390_REALITY_LOOP/live/UI_BROWSER_VERIFIED.png. Webapp tsc --noEmit clean + production build clean. Endpoint curl 200.
+- Reality ledgers (premium_package_factory/output/reality_loop/{REALITY_EVENT,CAUSAL_MUTATION}_LEDGER.jsonl) now carry their FIRST real entries — committed following the R370U cryptographic-anchor precedent (.gitignore exception added); hermetic guard keeps tests from dirtying them.
+- Tests: 17 adversarial R390 tests (bypass attacks: measured smuggling, rehearsal-as-real, unknown event id, stripped attestation, gas-phase row, malformed payload, raw-byte tamper; discipline: within-uncertainty changes nothing, out-of-envelope refuses; metamorphic: value changes decision; determinism; canonical byte-identity incl. portfolio DOWNLOAD tree). Related suites: r389 reality provider + product surface + r386 chain + dossier bridge + toscanini recovery = 113 passed, 1 skipped (pre-existing). Secret scan 4/4 + direct key-pattern scan of every changed file CLEAN; .env.keys ignored-verified.
+- Honest limits disclosed: the observation is an ACQUISITION of published NIST SRD 69 data (reality-produced, custody-complete), NOT an operator benchtop measurement — the attestation says exactly that; direct CSF viscosity remains unmeasured and is named as the next decisive experiment (Art. XXV/XXXIV); the canonical buyer package is untouched (the V2 machinery owns any canonical regeneration — the mutation is a recorded decision, not a shipped byte change).
+
+Stage Summary:
+- The reality loop is CLOSED for P-07 with the proof the CEO demanded: decision-before (0.6 mm @ eta=1.0), trigger observation (EVT-R390-NIST-WATER-VISC-310K), decision-after (0.5471 mm @ eta=0.6913), re-evaluated result (conductance restored 0.99998). REAL_LOOP_VERIFIED derived mechanically from the append-only ledgers, now committed durable. Remaining per CEO order: freeze-audit confirmation (done by R389 Phase 1), deployment (Vercel + production backend), and the two real investor demos.

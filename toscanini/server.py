@@ -140,6 +140,14 @@ class Handler(BaseHTTPRequestHandler):
             if len(parts) == 4 and parts[3] == "model":
                 return self._serve_file(show.glb_path(slot),
                                         "model/gltf-binary")
+            if len(parts) == 4 and parts[3] == "reality-loop":
+                rl = show.reality_loop_record(slot)
+                return self._json(200, rl) if rl \
+                    else self._json(404, {
+                        "error": "no reality-loop closure for this slot",
+                        "note": "the R390 loop machinery exists; this "
+                                "package has not yet been confronted "
+                                "with a real observation"})
             if len(parts) == 4 and parts[3] == "package":
                 return self._serve_file(show.package_zip(slot),
                                         "application/zip")

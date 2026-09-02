@@ -106,3 +106,28 @@ def _hermetic_package_id_registry(tmp_path, monkeypatch):
     monkeypatch.setattr(_pr, "CANONICAL_REGISTRY",
                         tmp_path / "PACKAGE_ID_REGISTRY_SANDBOX.json")
     yield
+
+
+@pytest.fixture(autouse=True)
+def _hermetic_r370g_reality_ledgers(tmp_path, monkeypatch):
+    """Production R370G reality ledgers guard (Art. IX/XVII — e11 class).
+
+    R390 reality_loop tests (and any future code touching the frozen R370G
+    gate) must never append REALITY_EVENT / CAUSAL_MUTATION entries to the
+    canonical ledgers under premium_package_factory/output/reality_loop/.
+    The guard redirects both ledger paths at import-module level for EVERY
+    hermetic test; ENGINE_LIVE=1 opts out (operator-intentional live run).
+    """
+    if os.environ.get("ENGINE_LIVE"):
+        yield
+        return
+    # Patch the engine's cached gate instance (reality_loop._r370g
+    # registers under sys.modules["r390_r370g"]; learning_loop loads its
+    # own — both are patched here by name).
+    from discovery_fabric.engine import reality_loop as _rl
+    _mod = _rl._r370g()
+    monkeypatch.setattr(_mod, "REALITY_EVENT_LEDGER_PATH",
+                        str(tmp_path / "REALITY_EVENT_LEDGER.jsonl"))
+    monkeypatch.setattr(_mod, "CAUSAL_MUTATION_LEDGER_PATH",
+                        str(tmp_path / "CAUSAL_MUTATION_LEDGER.jsonl"))
+    yield

@@ -44,11 +44,12 @@ discovery_fabric/            engine: connectors, discovery modes, engine stages,
                              prior_art_v2, source_registry, benchmark
 orchestrator/                four-search attack, triangulation, provider health
 toscanini/                   HTTP+SSE service (server, gateway, sessions,
-                             problem_builder) — the UI backend
+                             problem_builder, showcase — the UI backend)
 premium_package_factory/     canonical package builder: gates, templates,
                              r381 CAD templates, r382 disposition, r371 builder
+                             + the R370G reality-event/mutation ledgers
 scripts/                     release chain (r386), release build (r384/r385),
-                             campaign + measurement tools
+                             campaign + measurement tools, r390 reality loop
 tests/                       full suite (2,037+ tests, incl. adversarial
                              R386/R387 release-chain controls)
 epistemic_integrity/         CI 14-gate certification, registries, ledger,
@@ -56,7 +57,9 @@ epistemic_integrity/         CI 14-gate certification, registries, ledger,
 CANONICAL_STATE/             G5 canonical portfolio state
 TTP_PACKAGES/                legacy old-generation package trees (0 CAD files,
                              kept as provenance record)
-TOSCANINI/ TOSCANINI_UI/     live demos (R380 3D, R383 quantitative) + sessions
+TOSCANINI/ TOSCANINI_UI/     live demos (R380 3D, R383 quantitative, R389
+                             product + R390 reality-loop closure records) +
+                             sessions; webapp = Next.js product surface
 ENGINE_RUNS/ artifacts/      run evidence custody
 experiments/ discovery_campaigns/ inventions/ tournament_v3/
 external_corpora/ elite_v3/  measurement / benchmark / custody inputs
@@ -75,9 +78,17 @@ MECHANISTIC_HYPOTHESIS → EXPERIMENTAL_PROPOSAL → INVENTION_CANDIDATE
 ```
 
 Loop verification states (Article XXXVII): `NONE | SYNTHETIC_LOOP_VERIFIED |
-REAL_LOOP_VERIFIED`. Physical validation is claimed NOWHERE
-(Article XXXVIII: 3D output is `COMPUTATIONAL_RESULT`, never
-`PHYSICAL_OBSERVATION`; `PHYSICALLY_VALIDATED: NONE` throughout).
+REAL_LOOP_VERIFIED`. R390 closed the first REAL loop on the engine side:
+`EVT-R390-NIST-WATER-VISC-310K` (live NIST SRD 69 acquisition) refuted P-07's
+declared viscosity basis and changed `floor_lumen_diameter_mm` 0.6 → 0.5471
+mm (conductance restored 0.99998); `REAL_LOOP_VERIFIED` was DERIVED by
+`compute_real_loop_verified()` from the committed append-only ledgers —
+never assigned. The canonical portfolio bytes are untouched (Art. IX): the
+package-side state bump is a CEO-owned V3 regeneration, not silently applied.
+Physical validation is still claimed NOWHERE (Article XXXVIII: the event is
+an acquisition of externally published measured data, custody-complete and
+honestly labeled — not an operator benchtop measurement; 3D output remains
+`COMPUTATIONAL_RESULT`, never `PHYSICAL_OBSERVATION`).
 
 ## Anti-Hallucination Rule
 

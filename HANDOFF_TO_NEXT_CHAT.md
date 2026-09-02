@@ -172,6 +172,45 @@ loop is UNCHANGED — everything below is product surface + the reality layer.
 - **World Labs key custody:** `.env.keys` (gitignored) — never committed;
   secret-hygiene test-pinned (payloads + ledger scanned for key material).
 
+## 0.9 R390 REALITY LOOP CLOSED (2026-09-02) — the first REAL external event
+
+CEO directive #6 executed: the loop REAL OBSERVATION → REALITY MODEL →
+COMPARISON → DISCREPANCY → CAUSAL HYPOTHESIS → TECHNICAL STATE UPDATE →
+MUTATION → NEW DESIGN → RE-EVALUATION, closed LIVE on P-07 with the
+proof the CEO demanded — an observation changed a technical decision.
+
+- **The observation:** `EVT-R390-NIST-WATER-VISC-310K` — live NIST
+  WebBook acquisition (SRD 69, water, 310.15 K, liquid) = 0.6913 mPa·s
+  vs the design basis 1.0 mPa·s ("essentially water at 37 C" — REFUTED;
+  1.0 is water near 293 K). +30.9% vs the declared ±20% band. An
+  ACQUISITION of externally published measured data, custody-complete
+  (raw bytes + sha256 + attestation + frozen-gate validation) — honestly
+  labeled, NOT an operator benchtop measurement.
+- **The decision change:** `floor_lumen_diameter_mm` 0.6 → 0.5471 mm
+  (EQ-1 compensation d·(ηm/ηd)^(1/4), inside envelope [0.3, 0.8]);
+  deterministic sandbox rebuild (G1–G8 valid, measured geometry); floor
+  conductance restored to ratio 0.99998 (the as-built-at-old-geometry
+  +44.7% over-drainage miscalibration is what the observation exposed).
+  Canonical package bytes UNTOUCHED (Art. IX) — recorded V2-class
+  decision with full provenance.
+- **The state:** `REAL_LOOP_VERIFIED` derived mechanically by
+  `compute_real_loop_verified()` from the 9-stage Art. XXXVIII causal
+  chain in the append-only ledgers (`premium_package_factory/output/
+  reality_loop/*.jsonl` — now COMMITTED per the R370U anchor precedent).
+  First real event in program history (Art. XXXVII scorecard: REAL 0→1).
+- **Code:** `discovery_fabric/engine/reality_loop.py` (acquisition +
+  closure; zero LLM; MEASURED only through the R370G one door),
+  `scripts/r390_close_reality_loop.py` (`--rehearsal` hermetic /
+  `--live`), 17 adversarial tests
+  (`tests/test_r390_reality_loop.py`), conftest autouse guard redirects
+  both ledgers for every hermetic test (e11 class closed; ENGINE_LIVE=1
+  opts out). Product surface: `GET /api/showcase/{slot}/reality-loop` +
+  webapp `RealityLoopPanel` (browser-verified, screenshot in
+  `TOSCANINI/R390_REALITY_LOOP/live/`).
+- **Honest limits:** direct CSF viscosity remains unmeasured — named as
+  the next decisive experiment (Art. XXV/XXXIV). Rehearsal closures
+  never flip state (same code path, Art. XXXVII).
+
 ## 1. VERIFIED STATE OF THE PORTFOLIO REPO (buyer release) — `b978e32c` (release `R387-3D-QUALITY-EDITION`, tag `v1.0.0-3D-edition`)
 
 Chain of commits: `57b9c273` (V2 flat layout, pre-3D) → `d1c802d` (V4 render

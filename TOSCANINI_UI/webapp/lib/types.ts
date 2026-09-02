@@ -139,3 +139,67 @@ export interface Refusal {
   status: string;
   reason: string;
 }
+
+// R390: the reality-loop closure (CEO directive #6 — the proof that an
+// observation changes a technical decision). Mirrors
+// toscanini/showcase.py::reality_loop_record().
+export interface ConductanceRow {
+  basis?: string;
+  d_mm?: number;
+  eta_mPa_s?: number;
+  L_mm?: number;
+  G_ml_min_mmHg?: number;
+}
+
+export interface RealityLoopRecord {
+  kind: "REALITY_LOOP";
+  slot: string;
+  status?: string;
+  loop_verification_state?: string;
+  real_event?: boolean;
+  observation?: {
+    event_id?: string;
+    origin?: string;
+    quantity?: string;
+    design_value?: number;
+    measured_value?: number;
+    relative_delta?: number;
+    declared_uncertainty?: number;
+    status?: string;
+    design_declared_basis?: string;
+  };
+  causal_hypothesis?: {
+    statement?: string;
+    equation_basis?: string;
+    residual_unknown?: string;
+    deterministic?: boolean;
+    llm_used?: boolean;
+  };
+  decision_change?: {
+    question?: string;
+    answer?: boolean;
+    before?: string;
+    after?: string;
+    technical_result?: string;
+    mutation?: {
+      parameter?: string;
+      from?: number;
+      to?: number;
+      envelope?: number[] | null;
+      applied_to_canonical_package?: boolean;
+    };
+  };
+  re_evaluation?: {
+    evaluator?: string;
+    before?: ConductanceRow;
+    as_built?: ConductanceRow;
+    after?: ConductanceRow;
+    restored_ratio?: number;
+  };
+  causal_chain?: {
+    stages?: string[];
+    recorded_in_canonical_ledger?: boolean;
+  };
+  preview_glb?: string | null;
+  honesty?: string;
+}

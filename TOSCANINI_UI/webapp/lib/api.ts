@@ -10,6 +10,7 @@
 
 import type {
   EvalResult,
+  RealityLoopRecord,
   Refusal,
   SessionDetail,
   SessionRow,
@@ -86,4 +87,14 @@ export async function evaluateParam(
     return { ok: false, refusal: (await res.json()) as Refusal };
   }
   return { ok: true, result: await json<EvalResult>(res) };
+}
+
+export async function getRealityLoop(
+  slot: string
+): Promise<RealityLoopRecord | null> {
+  const res = await fetch(`/api/showcase/${slot}/reality-loop`, {
+    cache: "no-store",
+  });
+  if (!res.ok) return null;
+  return (await res.json()) as RealityLoopRecord;
 }

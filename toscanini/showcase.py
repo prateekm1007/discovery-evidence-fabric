@@ -344,3 +344,101 @@ def preview_glb_path(slot: str, name: str) -> Optional[Path]:
     if not hits:
         return None
     return sorted(hits, key=lambda p: p.stat().st_mtime)[-1]
+
+
+# ---------------------------------------------------------------------------
+# R390: the REALITY LOOP surface (CEO directive #6 — the proof that an
+# observation changes a technical decision, shown in the product)
+# ---------------------------------------------------------------------------
+
+def reality_loop_record(slot: str) -> Optional[Dict[str, Any]]:
+    """Product view of the R390 reality-loop closure for a slot.
+
+    Reads the LIVE closure record (TOSCANINI/R390_REALITY_LOOP/**) for
+    this slot's package and returns the investor-facing summary: the
+    CEO's nine loop steps, the observation, the discrepancy, the causal
+    hypothesis, the decision change, and the re-evaluated technical
+    result. Honest labels only — MEASURED is shown with its acquisition
+    attestation; nothing claims PHYSICAL_VALIDATION (Art. XXXVIII).
+    """
+    root = REPO_ROOT / "TOSCANINI" / "R390_REALITY_LOOP"
+    if not root.exists():
+        return None
+    candidates = []
+    for p in root.rglob("LOOP_CLOSURE_RECORD.json"):
+        try:
+            rec = json.loads(p.read_text())
+        except (json.JSONDecodeError, ValueError):
+            continue
+        if rec.get("package_slot") == slot:
+            candidates.append(rec)
+    if not candidates:
+        return None
+    # prefer a real-event LOOP_CLOSED record; else the newest
+    candidates.sort(key=lambda r: (
+        bool(r.get("real_event")), r.get("status") == "LOOP_CLOSED"))
+    rec = candidates[-1]
+    comp = rec.get("comparison") or {}
+    hyp = rec.get("causal_hypothesis") or {}
+    mut = rec.get("mutation") or {}
+    reev = rec.get("re_evaluation") or {}
+    proof = (reev.get("decision_change_proof") or {})
+    chain = rec.get("causal_chain") or {}
+    return {
+        "kind": "REALITY_LOOP",
+        "slot": slot,
+        "status": rec.get("status"),
+        "loop_verification_state": rec.get("loop_verification_state"),
+        "real_event": rec.get("real_event"),
+        "observation": {
+            "event_id": rec.get("observation_event_id"),
+            "origin": rec.get("observation_origin"),
+            "quantity": comp.get("name"),
+            "design_value": comp.get("design_value"),
+            "measured_value": comp.get("reality_value"),
+            "relative_delta": comp.get("relative_delta"),
+            "declared_uncertainty": comp.get("declared_uncertainty"),
+            "status": comp.get("status"),
+            "design_declared_basis": comp.get("design_declared_basis"),
+        },
+        "causal_hypothesis": {
+            "statement": hyp.get("statement"),
+            "equation_basis": hyp.get("equation_basis"),
+            "residual_unknown": hyp.get("residual_unknown"),
+            "deterministic": hyp.get("deterministic"),
+            "llm_used": hyp.get("llm_used"),
+        },
+        "decision_change": {
+            "question": proof.get("question"),
+            "answer": proof.get("answer"),
+            "before": proof.get("decision_before"),
+            "after": proof.get("decision_after"),
+            "technical_result": proof.get("technical_result"),
+            "mutation": {
+                "parameter": mut.get("target_parameter"),
+                "from": mut.get("from_value"),
+                "to": mut.get("to_value"),
+                "envelope": mut.get("envelope"),
+                "applied_to_canonical_package":
+                    mut.get("applied_to_canonical_package")},
+        },
+        "re_evaluation": {
+            "evaluator": reev.get("evaluator"),
+            "before": reev.get("before"),
+            "as_built": reev.get("as_built_at_design_geometry"),
+            "after": reev.get("after"),
+            "restored_ratio": reev.get("conductance_restored_ratio"),
+        },
+        "causal_chain": {
+            "stages": [s.get("stage") for s in
+                       (chain.get("stages") or [])],
+            "recorded_in_canonical_ledger":
+                chain.get("recorded_in_canonical_ledger"),
+        },
+        "preview_glb": ((rec.get("new_design") or {}).get("preview_glb")
+                        or {}).get("path"),
+        "honesty": rec.get("honesty") or (
+            "MEASURED data entered through the R370G one door; the "
+            "canonical buyer package is untouched; PHYSICAL_VALIDATION "
+            "is never claimed (Art. XXXVIII)"),
+    }
