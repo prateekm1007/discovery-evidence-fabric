@@ -42,16 +42,18 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Changed files are docs-only (guard the tier itself)
+      - name: Classify the push (mixed pushes carry FULL too)
         run: |
           FILES=$(git diff --name-only HEAD~1 HEAD || true)
           echo "$FILES"
           CODE=$(echo "$FILES" | grep -vE '\.(md|json)$|^R3[0-9]{3}/' || true)
           if [ -n "$CODE" ]; then
-            echo "This push carries code files — the FULL certification"
-            echo "workflow should have run (it triggers on any code path)."
-            echo "Offending files: $CODE"
-            exit 1
+            echo "NOTE: this push carries code files — the FULL certification"
+            echo "workflow runs for it; the lightweight checks below still run"
+            echo "(cheap, and the secret scan applies to prose exactly as to"
+            echo "code). This is not a failure."
+          else
+            echo "Docs-only push: this workflow is the CI tier for it."
           fi
 
       - name: Secret scan over the diff
