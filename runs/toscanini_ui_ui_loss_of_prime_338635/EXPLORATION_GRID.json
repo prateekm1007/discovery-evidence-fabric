@@ -1,0 +1,207 @@
+{
+ "diversity": "CANDIDATE_DIVERSITY (E16-E)",
+ "version": "1.1.0",
+ "min_candidates": 10,
+ "available_providers": [
+  "nvidia"
+ ],
+ "operator_override": [
+  "nvidia"
+ ],
+ "angles": [
+  "cross_industry_transfer",
+  "mechanism_inversion",
+  "simplification",
+  "multi_physics_hybrid",
+  "constraint_first"
+ ],
+ "candidates": [
+  {
+   "angle": "cross_industry_transfer",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "34de5b71a5002fbb69dff89658abf5db5eb9b0dc46338b4b4e48e29d7dfd84ff",
+   "output_hash": "d91597a27c21a05962dd3824644285dc924f6724617f09f7a23323c3b2469ac8"
+  },
+  {
+   "angle": "mechanism_inversion",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "fee0cb3a2bbf0899e063dd5fd81d8dbaeeb63a1836c66e35fda9676c593aef8b",
+   "output_hash": "85c94618591dcb597692ea5154c18c4874d7594bf833713792b0c48770a5ed1d",
+   "fields": {
+    "mechanism": "methane production by intestinal methanogen overgrowth (increase of methane‑producing archaea)",
+    "intervention": "embed a passive, temperature‑activated methane‑generating chamber upstream of the check valve that releases gas on warm‑up to create positive pressure and self‑prime the syrup line without electronics",
+    "expected_effect": "the released methane pressure maintains fluid continuity through the valve during warm restarts, preventing loss of prime and stall",
+    "falsification_test": "run the soda pump through repeated warm‑restart cycles with the methane chamber installed versus a control unit; measure whether the valve retains prime and compare stall incidence",
+    "mechanism_source_span": "intestinal methanogen overgrowth (IMO) manifests with an increase of methane-producing archaea, specifically Methanobrevibacter smithii.",
+    "span_derivation": {
+     "n_shared": 7,
+     "shared_terms": [
+      "archaea",
+      "increase",
+      "intestinal",
+      "methane",
+      "methanogen",
+      "overgrowth",
+      "producing"
+     ],
+     "span_terms_n": 12,
+     "ratio": 0.583,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:mechanism_inversion:nvidia:85c94618591d"
+  },
+  {
+   "angle": "simplification",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "7231ca8513f48dbc618b0180a961efc5379804dfe13428bdd8642fe7ace0e25e",
+   "output_hash": "252fd2786c2774a9703814221a0a682c3dc07eb2b88e920f77b03380ebeecdce",
+   "fields": {
+    "mechanism": "Production of methane gas by overgrown methanogenic archaea in the intestine.",
+    "intervention": "Add a sealed, syrup‑compatible micro‑bioreactor containing a slow‑release substrate that supports methane‑producing microbes, positioned upstream of the check valve so generated methane pressure pushes syrup into the valve to re‑prime it after a warm restart.",
+    "expected_effect": "Passive self‑priming of the syrup pump after warm restarts, maintaining flow without electronic control.",
+    "falsification_test": "Compare priming success rate and time to prime of pumps with and without the methane‑generating micro‑reactor after a controlled warm‑restart cycle, measuring syrup flow initiation.",
+    "mechanism_source_span": "intestinal methanogen overgrowth (IMO) manifests with an increase of methane-producing archaea, specifically Methanobrevibacter smithii.",
+    "span_derivation": {
+     "n_shared": 3,
+     "shared_terms": [
+      "archaea",
+      "methane",
+      "producing"
+     ],
+     "span_terms_n": 12,
+     "ratio": 0.25,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:simplification:nvidia:252fd2786c27"
+  },
+  {
+   "angle": "multi_physics_hybrid",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "82fa823bacaa48c45a98a27f926587f3911f40b7204bbdedf9595cf91b1cf315",
+   "output_hash": "863f3314a651c8aa762bf8717cd490ec0963073092cfc67d0047b8b3bc48f7d4",
+   "fields": {
+    "mechanism": "Methane production by intestinal methanogen overgrowth (IMO) via methane‑producing archaea (Methanobrevibacter smithii).",
+    "intervention": "Embed a sealed, syrup‑compatible micro‑bioreactor that contains a slow‑release substrate for methanogenic archaea (or a chemical analog) which, upon warming, generates methane gas; the gas pressure passively forces syrup through the check valve to re‑prime it.",
+    "expected_effect": "Generated methane pressure clears air pockets and pushes syrup past the valve, maintaining prime after warm restarts without any electronic control.",
+    "falsification_test": "Conduct a warm‑restart trial on two identical fountain pumps—one equipped with the methane‑generating bioreactor and one without—and record the time to loss of prime and flow continuity; a statistically significant reduction in loss‑of‑prime events for the test unit confirms the mechanism.",
+    "mechanism_source_span": "\"intestinal methanogen overgrowth (IMO) manifests with an increase of methane‑producing archaea, specifically Methanobrevibacter smithii.\"",
+    "span_derivation": {
+     "n_shared": 9,
+     "shared_terms": [
+      "archaea",
+      "imo",
+      "intestinal",
+      "methane",
+      "methanobrevibacter",
+      "methanogen",
+      "overgrowth",
+      "producing",
+      "smithii"
+     ],
+     "span_terms_n": 12,
+     "ratio": 0.75,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:multi_physics_hybrid:nvidia:863f3314a651"
+  },
+  {
+   "angle": "constraint_first",
+   "provider_id": "nvidia",
+   "status": "OK",
+   "model": "openai/gpt-oss-120b",
+   "prompt_hash": "e42daff37f0e7c30aebe7623ed92ff4f0dd33f3ddbd11189226cdebcf8fd11ae",
+   "output_hash": "95a6a35d8082162761807fe9e5ac7a514b76054d84cd5103a237cabf2ce63d02",
+   "fields": {
+    "mechanism": "methane gas production by methanogenic archaea (Methanobrevibacter smithii) leading to increased internal pressure.",
+    "intervention": "integrate a sealed, syrup‑compatible micro‑bioreactor containing Methanobrevibacter smithii that, when the system warms, generates methane to push syrup through the check valve and re‑establish prime without electronic control.",
+    "expected_effect": "the generated methane pressure automatically re‑primes the check valve after a warm restart, preventing loss of prime and stall.",
+    "falsification_test": "run two identical soda pump units, one with the methanogen bioreactor and one without; after a warm shutdown and restart, measure whether the valve re‑primes and record pressure rise in the line; lack of priming in the control and successful priming in the test validates the mechanism.",
+    "mechanism_source_span": "intestinal methanogen overgrowth (IMO) manifests with an increase of methane-producing archaea, specifically Methanobrevibacter smithii.",
+    "span_derivation": {
+     "n_shared": 4,
+     "shared_terms": [
+      "archaea",
+      "methane",
+      "methanobrevibacter",
+      "smithii"
+     ],
+     "span_terms_n": 12,
+     "ratio": 0.333,
+     "underived": false,
+     "state": "MEASURED",
+     "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+    }
+   },
+   "span_underived": false,
+   "candidate_id": "cand:DIV:constraint_first:nvidia:95a6a35d8082"
+  }
+ ],
+ "built_at": "2026-09-02T08:44:46+00:00Z",
+ "usable_candidates": 4,
+ "status": "GRID_RUN",
+ "diversity_metrics": {
+  "candidates_measured": 4,
+  "mean_pairwise_token_distance": 0.704,
+  "distinct_mechanism_clusters": 4,
+  "cluster_sizes": [
+   1,
+   1,
+   1,
+   1
+  ],
+  "rewrite_pairs_jaccard_ge_0_8": [],
+  "architecture_term_count": 58,
+  "architecture_terms_sample": [
+   "activated",
+   "after",
+   "analog",
+   "archaea",
+   "bioreactor",
+   "chamber",
+   "check",
+   "chemical",
+   "compatible",
+   "containing",
+   "contains",
+   "control",
+   "create",
+   "electronic",
+   "electronics",
+   "embed",
+   "establish",
+   "forces",
+   "generated",
+   "generates",
+   "generating",
+   "integrate",
+   "line",
+   "methane"
+  ],
+  "failure_mode_signal_count": 1,
+  "failure_modes_invoked_sample": [
+   "check-valve seat wear opening reverse leakage"
+  ],
+  "prior_art_query_set_count": 4,
+  "detected_domain": "fluidics_hydraulic"
+ }
+}
