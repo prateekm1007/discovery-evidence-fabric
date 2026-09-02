@@ -1,0 +1,164 @@
+{
+ "suite": "R396 external acceptance probes",
+ "base": "http://127.0.0.1:8901",
+ "deployed_sha": "930eca8b7db8b0885abccb4e8159a77b8e802723",
+ "started_utc": "2026-09-02T20:18:59Z",
+ "probes": [
+  {
+   "probe": "P1",
+   "checks": {
+    "reachable": true,
+    "identity_source_is_artifact": true,
+    "no_env_asserted_identity": true,
+    "identity_tamper_false": true,
+    "build_running_health_equal": true,
+    "drift_green": true,
+    "gateway_up_gated": true,
+    "health_commit_equals_deployed": true
+   },
+   "pass": true,
+   "observed_engine_commit": "930eca8b7db8b0885abccb4e8159a77b8e802723",
+   "raw_ref": 0
+  },
+  {
+   "probe": "P2",
+   "checks": {
+    "reachable": true,
+    "zero_cross_user_sessions": true,
+    "zero_run_dir_leakage": true,
+    "zero_pid_leakage": true,
+    "zero_worker_starttime_leakage": true,
+    "zero_filesystem_path_leakage": true,
+    "zero_owner_key_leakage": true
+   },
+   "pass": null,
+   "n_sessions_visible": 0,
+   "n_public_demo_sessions": 0,
+   "leaks": {
+    "run_dir": false,
+    "pid": false,
+    "worker_starttime": false,
+    "filesystem_paths": false,
+    "owner_key": false
+   },
+   "raw_ref": 1
+  }
+ ],
+ "finished_utc": "2026-09-02T20:18:59Z",
+ "all_pass": false,
+ "raw": [
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:8901/api/health",
+   "request_body": null,
+   "at_utc": "2026-09-02T20:18:59Z",
+   "status": 200,
+   "content_type": "application/json; charset=utf-8",
+   "owner_cookie": "46646c21672846b689421659806828e2",
+   "elapsed_ms": 8,
+   "response_json": {
+    "ok": true,
+    "status": "ok",
+    "service": "toscanini",
+    "engine_commit": "930eca8b7db8b0885abccb4e8159a77b8e802723",
+    "transport": "local",
+    "portfolio_ready": true,
+    "gateway_up": true,
+    "gateway_up_note": "local sandbox gateway liveness (127.0.0.1:8787)",
+    "operator_key_configured": false,
+    "deployment_identity": {
+     "build_artifact_commit": "930eca8b7db8b0885abccb4e8159a77b8e802723",
+     "build_artifact_source": "render_git_commit",
+     "build_artifact_sha256": "b7a7f424a83d49c16be2294fec650f342280030317b0868e4e34860417bebbe3",
+     "render_git_commit": "930eca8b7db8b0885abccb4e8159a77b8e802723",
+     "build_context_git_head": "930eca8b7db8b0885abccb4e8159a77b8e802723",
+     "baked_at_utc": "2026-09-02T20:18:58Z",
+     "running_artifact_sha256": "b7a7f424a83d49c16be2294fec650f342280030317b0868e4e34860417bebbe3",
+     "identity_tamper": false,
+     "health_reported_commit": "930eca8b7db8b0885abccb4e8159a77b8e802723",
+     "health_reported_commit_source": "build_artifact",
+     "operator_declared_commit": null,
+     "live_git_head": "930eca8b7db8b0885abccb4e8159a77b8e802723",
+     "boot_time_utc": "2026-09-02T20:18:58Z",
+     "is_restart_not_deployment": true,
+     "portfolio_commit_pinned": null,
+     "portfolio_commit_running": "b978e32c6a484fa14d7b42e60f407333612a50d9",
+     "deployment_drift": "GREEN",
+     "drift_reasons": [],
+     "rule": "identity = build artifact only (env vars pin expectations, never identity); BUILD_ARTIFACT_SHA == RUNNING_ARTIFACT_SHA == HEALTH_REPORTED_SHA with identity_tamper=false; drift is RED => the release is NOT healthy regardless of other readiness fields (R394 s1, R396 A.6)"
+    },
+    "readiness": {
+     "engine_ready": true,
+     "engine_commit": "930eca8b7db8b0885abccb4e8159a77b8e802723",
+     "engine_commit_source": "build_artifact",
+     "deployment_drift": "GREEN",
+     "portfolio_ready": true,
+     "portfolio_commit": "b978e32c6a484fa14d7b42e60f407333612a50d9",
+     "portfolio_commit_pinned": null,
+     "portfolio_pin_match": null,
+     "llm_transport_ready": true,
+     "llm_transport": {
+      "mode": "ALREADY_UP",
+      "provider": null,
+      "model": null,
+      "base_url": null,
+      "selection": null,
+      "last_probe": {
+       "status": "OK",
+       "provider": "zai",
+       "model": "glm-4-plus",
+       "latency_ms": 250,
+       "error": "",
+       "at": "2026-09-02T20:18:58Z",
+       "source": "preflight"
+      }
+     },
+     "discovery_ready": true
+    },
+    "durable": {
+     "enabled": false,
+     "branch": null,
+     "last_snapshot": {
+      "ok": null,
+      "at": null,
+      "reason": null,
+      "error": null,
+      "files": 0,
+      "commit": null,
+      "pushed": null,
+      "manifest_sha256": null,
+      "engine_commit": null
+     },
+     "last_restore": {
+      "at": "2026-09-02T20:18:58Z",
+      "sessions": 0,
+      "runs": 0,
+      "evidence": 0,
+      "interrupted": 0,
+      "error": "not enabled",
+      "branch_sessions": null,
+      "integrity_mismatches": null,
+      "integrity_verified": null,
+      "manifest_sha256": null
+     },
+     "store": "private engine repo runtime-state branch (git)"
+    }
+   }
+  },
+  {
+   "method": "GET",
+   "url": "http://127.0.0.1:8901/api/sessions",
+   "request_body": null,
+   "at_utc": "2026-09-02T20:18:59Z",
+   "status": 200,
+   "content_type": "application/json; charset=utf-8",
+   "owner_cookie": "f284bbd214b045ae896a10c6a4b582be",
+   "elapsed_ms": 2,
+   "response_json": {
+    "sessions": [],
+    "marked_stuck": [],
+    "marked_interrupted": []
+   }
+  }
+ ]
+}
