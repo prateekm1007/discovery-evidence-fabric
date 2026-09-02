@@ -5,6 +5,7 @@ export type SessionStatus =
   | "PENDING"
   | "RUNNING"
   | "COMPLETE"
+  | "INTERRUPTED" // R392: worker died without a verdict (recoverable)
   | "ERROR_TRANSPORT"
   | "ERROR_BUILD"
   | "ERROR_RUN"

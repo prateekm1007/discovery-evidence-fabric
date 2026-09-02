@@ -4,11 +4,18 @@ Adapted from scripts/toscanini_6domain_benchmark.py (same mechanism, same
 port). The gateway is a child process; the engine's llm_registry talks to
 it. Keys stay server-side (loaded from .env.keys) and never appear in any
 UI-facing payload.
+
+R392 (public transport): the engine is in EXTERNAL transport mode when the
+registry's own provider selection resolves to a PUBLIC (non-loopback)
+endpoint with a usable credential — the hosted deployment shape. No local
+gateway subprocess exists or is needed in that mode; the preflight probe
+still demands a real live completion before any run (unchanged semantics).
 """
 from __future__ import annotations
 
 import os
 import subprocess
+import threading
 import time
 import urllib.parse
 import urllib.request
@@ -18,6 +25,28 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 GATEWAY_PORT = 8787
 
 _proc: subprocess.Popen | None = None
+
+# ---------------------------------------------------------------------------
+# R392: transport probe cache (directive 2 — honest readiness).
+# The LAST REAL probe result (a genuine live LLM completion, from a worker
+# preflight or an explicit health probe). Never fabricated; stale until a
+# real call succeeds (Art. XXV).
+# ---------------------------------------------------------------------------
+_PROBE_LOCK = threading.Lock()
+_LAST_PROBE: dict = {"status": "NEVER_PROBED", "at": None, "source": None}
+
+
+def record_probe(probe: dict, source: str) -> None:
+    with _PROBE_LOCK:
+        _LAST_PROBE.clear()
+        _LAST_PROBE.update(probe or {})
+        _LAST_PROBE["at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        _LAST_PROBE["source"] = source
+
+
+def last_probe() -> dict:
+    with _PROBE_LOCK:
+        return dict(_LAST_PROBE)
 
 
 def _load_env_keys() -> dict:
@@ -56,24 +85,104 @@ def external_base_url() -> str | None:
     return url
 
 
+def _loopback(url: str) -> bool:
+    host = (urllib.parse.urlparse(url).hostname or "").lower()
+    return host in ("127.0.0.1", "localhost", "::1", "")
+
+
+def registry_external_transport() -> dict | None:
+    """R392: ask the EXISTING provider abstraction which provider the
+    engine would actually call under the default selection policy
+    (availability -> quality -> cost -> latency). If that provider has a
+    usable credential and a public (non-loopback) endpoint, the engine is
+    in EXTERNAL transport mode and the returned dict describes it.
+
+    This adds NO new LLM architecture: it reuses select_provider() exactly
+    as generate() does, so the transport the health endpoint reports is
+    the transport the engine will actually use. Providers whose slot is
+    re-pointed at a loopback URL (sandbox zai) are treated as local — the
+    sandbox gateway path is unchanged.
+    """
+    try:
+        from discovery_fabric.engine.adapters import load_credentials
+        load_credentials()
+        from discovery_fabric.engine import llm_registry as reg
+        spec, ledger = reg.select_provider(reg.SelectionPolicy())
+    except Exception:  # noqa: BLE001 — unavailable, not silent success
+        return None
+    if spec is None:
+        return None
+    url = spec.url_for_call()
+    if not url or _loopback(url):
+        return None
+    return {
+        "status": "EXTERNAL",
+        "base_url": url,
+        "provider": spec.provider_id,
+        "model": spec.model_for_call(),
+        "selection": "registry default policy (availability->quality->"
+                     "cost->latency)",
+    }
+
+
+def transport_snapshot() -> dict:
+    """R392: READ-ONLY transport assessment for the health endpoint —
+    same resolution order as ensure_gateway() but NEVER spawns anything
+    (a GET must not have process side effects). Status values:
+    EXTERNAL / ALREADY_UP / LOCAL_CONFIGURED (zai key present, gateway
+    not yet spawned) / NO_TRANSPORT."""
+    ext = external_base_url()
+    if ext:
+        return {"status": "EXTERNAL", "base_url": ext, "provider": "zai",
+                "selection": "ZAI_BASE_URL operator override"}
+    if gateway_up():
+        return {"status": "ALREADY_UP"}
+    zai_key = _load_env_keys().get("ZAI_API_KEY") or \
+        os.environ.get("ZAI_API_KEY")
+    if zai_key:
+        return {"status": "LOCAL_CONFIGURED",
+                "base_url": f"http://127.0.0.1:{GATEWAY_PORT}/v1/chat/"
+                            "completions",
+                "provider": "zai", "model": "glm-4-plus",
+                "selection": "sandbox local gateway (spawned on first run)"}
+    reg_ext = registry_external_transport()
+    if reg_ext:
+        return reg_ext
+    return {"status": "NO_TRANSPORT",
+            "reason": "no LLM provider credential available in the "
+                      "environment (see availability matrix)"}
+
+
 def ensure_gateway() -> dict:
     """Start the zai gateway if not already up. Idempotent.
 
-    External-transport mode: when ZAI_BASE_URL points at a public
-    endpoint, this returns EXTERNAL and the sandbox gateway is never
-    spawned — the engine's llm_registry calls the public endpoint
-    directly (transport swap only; the preflight probe still demands
-    a real live completion before any run)."""
+    Transport resolution order (explicit at every step, never silent):
+      1. ZAI_BASE_URL external re-point (R391 operator override) -> EXTERNAL
+      2. local gateway already up -> ALREADY_UP
+      3. zai credential present -> spawn the sandbox gateway -> UP
+         (unavailable: NO_ZAI_KEY / GATEWAY_FAILED_TO_START)
+      4. R392: registry-resolved public provider -> EXTERNAL
+         (the hosted shape; the preflight probe still runs a REAL live
+         completion before any run)
+      5. otherwise -> NO_TRANSPORT (honest: nothing is configured)
+    """
     global _proc
     ext = external_base_url()
     if ext:
-        return {"started": False, "status": "EXTERNAL", "base_url": ext}
+        return {"started": False, "status": "EXTERNAL", "base_url": ext,
+                "provider": "zai",
+                "selection": "ZAI_BASE_URL operator override"}
     if gateway_up():
         return {"started": False, "status": "ALREADY_UP"}
     keys = _load_env_keys()
     zai_key = keys.get("ZAI_API_KEY") or os.environ.get("ZAI_API_KEY")
     if not zai_key:
-        return {"started": False, "status": "NO_ZAI_KEY"}
+        reg_ext = registry_external_transport()
+        if reg_ext:
+            return reg_ext
+        return {"started": False, "status": "NO_TRANSPORT",
+                "reason": ("no LLM provider credential available in the "
+                           "environment (see availability matrix)")}
     env = dict(os.environ)
     env["ZAI_GATEWAY_KEY"] = zai_key
     env["ZAI_GATEWAY_LOG"] = str(REPO_ROOT / "ENGINE_RUNS" / "zai_gateway_calls.jsonl")
@@ -91,7 +200,12 @@ def ensure_gateway() -> dict:
 
 
 def preflight_probe() -> dict:
-    """Small live LLM call to verify transport health before a run."""
+    """Small live LLM call to verify transport health before a run.
+
+    R392: the result is cached for the health endpoint (directive 2) —
+    LLM_TRANSPORT_READY is only ever TRUE when this real completion
+    succeeded. A missing credential, timeout, or HTTP failure stays
+    exactly what it is (Art. XXV)."""
     from discovery_fabric.engine.adapters import load_credentials
     load_credentials()
     from discovery_fabric.engine import llm_registry as reg
@@ -99,8 +213,12 @@ def preflight_probe() -> dict:
         res = reg.generate(prompt="Reply with exactly: READY",
                            system="transport health probe",
                            timeout=90, max_retries=0)
-        return {"status": res.status, "provider": res.provider_id,
-                "latency_ms": res.latency_ms,
-                "error": (res.error or "")[:160]}
+        out = {"status": res.status, "provider": res.provider_id,
+               "model": res.model,
+               "latency_ms": res.latency_ms,
+               "error": (res.error or "")[:160]}
     except Exception as exc:  # noqa: BLE001
-        return {"status": "CALL_FAILED", "error": f"{type(exc).__name__}: {exc}"[:200]}
+        out = {"status": "CALL_FAILED",
+               "error": f"{type(exc).__name__}: {exc}"[:200]}
+    record_probe(out, "preflight")
+    return out

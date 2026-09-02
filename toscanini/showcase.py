@@ -41,6 +41,23 @@ PORTFOLIO_ROOT = REPO_ROOT.parent / "portfolio"
 DOWNLOAD_ROOT = PORTFOLIO_ROOT / "DOWNLOAD"
 PREVIEW_ROOT = REPO_ROOT / "TOSCANINI_UI" / "previews"
 
+
+def portfolio_commit() -> str:
+    """R392 (directive 3): the EXACT portfolio commit the showcase serves.
+    Read live from the deployed clone (git truth, never a cached summary —
+    Art. XXIV). Empty string when the portfolio is absent; the pin the
+    container was ASKED to acquire travels separately in /api/health
+    (portfolio_commit_pinned) so a drift between requested and actual is
+    visible, never hidden."""
+    import subprocess
+    try:
+        r = subprocess.run(
+            ["git", "-C", str(PORTFOLIO_ROOT), "rev-parse", "HEAD"],
+            capture_output=True, text=True, timeout=10)
+        return r.stdout.strip() if r.returncode == 0 else ""
+    except Exception:  # noqa: BLE001
+        return ""
+
 # The three CEO-picked investor demos (R389 Phase 8) + every other slot
 # with a real 3D model, all served from the same code path.
 DEMO_FOCUS = ("04", "08", "09")

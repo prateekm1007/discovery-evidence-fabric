@@ -44,14 +44,37 @@ HOST = os.environ.get("ENGINE_HOST") or ("0.0.0.0" if os.environ.get("PORT") els
 
 def _git_head() -> str:
     try:
-        return subprocess.run(
+        r = subprocess.run(
             ["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD"],
-            capture_output=True, text=True, timeout=10).stdout.strip()
+            capture_output=True, text=True, timeout=10)
+        return r.stdout.strip() if r.returncode == 0 else ""
     except Exception:  # noqa: BLE001
-        return "UNKNOWN"
+        return ""
 
 
-ENGINE_COMMIT = _git_head()
+# R392 (directive 3): the deployed engine is identified by an EXACT
+# commit, resolved with its source labeled — never guessed (Art. VI):
+#   1. ENGINE_COMMIT env (the explicit deployment configuration)
+#   2. /app/ENGINE_COMMIT.txt (baked into the Docker image at build time
+#      when .git is present in the build context)
+#   3. live git (local dev)
+def _resolve_engine_commit() -> tuple:
+    env = (os.environ.get("ENGINE_COMMIT") or "").strip()
+    if env:
+        return env, "deployment_config_env"
+    baked = REPO_ROOT / "ENGINE_COMMIT.txt"
+    if baked.exists():
+        v = baked.read_text().strip()
+        if v and v != "BUILD_CONTEXT_NO_GIT":
+            return v, "image_baked"
+    head = _git_head()
+    if head:
+        return head, "git"
+    return "", "UNRESOLVED"
+
+
+ENGINE_COMMIT, ENGINE_COMMIT_SOURCE = _resolve_engine_commit()
+PORTFOLIO_COMMIT_PINNED = (os.environ.get("PORTFOLIO_COMMIT") or "").strip()
 
 # R391 (deployment): same-origin static webapp. When the Docker image
 # builds the Next.js export into TOSCANINI_UI/webapp-export/, the engine
@@ -72,6 +95,69 @@ _STATIC_TYPES = {
 }
 
 
+def _health_payload() -> dict:
+    """R392 directive 2: the honest, machine-readable readiness split.
+    Built from REAL state — live git reads, the transport probe cache
+    (a genuine completion), the durable store's own bookkeeping. Nothing
+    here is derived from a summary (Art. XXIV)."""
+    portfolio_ready = bool(show.DOWNLOAD_ROOT.exists())
+    portfolio_actual = show.portfolio_commit()
+    transport = gw.transport_snapshot()
+    probe = gw.last_probe()
+    # LLM_TRANSPORT_READY is TRUE only with probe evidence of a real
+    # completion from THIS process's transport (never a configured-but-
+    # unverified key). A stale-but-OK probe is reported with its age so
+    # the caller can decide (machine-readable honesty, not a lie).
+    probe_ok = probe.get("status") == "OK"
+    engine_ready = bool(ENGINE_COMMIT)
+    transport_configured = transport.get("status") in (
+        "EXTERNAL", "UP", "ALREADY_UP", "LOCAL_CONFIGURED")
+    return {
+        "ok": True, "status": "ok", "service": "toscanini",
+        # legacy keys (R391 contract) kept for the Render healthcheck
+        "engine_commit": ENGINE_COMMIT,
+        "transport": transport.get("base_url") or "local",
+        "portfolio_ready": portfolio_ready,
+        "gateway_up": gw.gateway_up(),
+        # R392 readiness split (directive 2)
+        "readiness": {
+            "engine_ready": engine_ready,
+            "engine_commit": ENGINE_COMMIT,
+            "engine_commit_source": ENGINE_COMMIT_SOURCE,
+            "portfolio_ready": portfolio_ready,
+            "portfolio_commit": portfolio_actual,
+            "portfolio_commit_pinned": PORTFOLIO_COMMIT_PINNED or None,
+            "portfolio_pin_match": (
+                bool(PORTFOLIO_COMMIT_PINNED)
+                and portfolio_actual == PORTFOLIO_COMMIT_PINNED)
+                if (PORTFOLIO_COMMIT_PINNED and portfolio_actual) else None,
+            "llm_transport_ready": bool(transport_configured and probe_ok),
+            "llm_transport": {
+                "mode": transport.get("status"),
+                "provider": transport.get("provider"),
+                "model": transport.get("model"),
+                "base_url": transport.get("base_url"),
+                "selection": transport.get("selection"),
+                "last_probe": probe,
+            },
+            # discovery needs the engine + a verified-live LLM; the
+            # portfolio (showcase) is reported separately above
+            "discovery_ready": bool(engine_ready and transport_configured
+                                     and probe_ok),
+        },
+        "durable": _durable_state(),
+    }
+
+
+def _durable_state() -> dict:
+    try:
+        from toscanini import durable
+        return durable.state()
+    except Exception as exc:  # noqa: BLE001 — disclosed, never silent
+        return {"enabled": False,
+                "error": f"{type(exc).__name__}: {exc}"[:200]}
+
+
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
@@ -81,7 +167,6 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(body)
 
@@ -97,32 +182,30 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):  # quiet
         pass
 
-    def do_OPTIONS(self):
-        self.send_response(204)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods",
-                         "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        self.send_header("Content-Length", "0")
-        self.end_headers()
-
     # ------------------------------------------------------------------ GET
     def do_GET(self):
         p = urllib.parse.urlparse(self.path)
         parts = [x for x in p.path.split("/") if x]
 
         if p.path == "/healthz" or p.path == "/api/health":
-            # /api/health is the R391 deployment healthcheck alias (same
-            # probe, Render-style {"status": "ok"} envelope included).
-            # portfolio_ready is honest: showcase serves real packages
-            # only when the buyer-distribution repo is present.
-            return self._json(200, {"ok": True, "status": "ok",
-                                    "service": "toscanini",
-                                    "engine_commit": ENGINE_COMMIT,
-                                    "transport": gw.external_base_url() or "local",
-                                    "portfolio_ready":
-                                        bool(show.DOWNLOAD_ROOT.exists()),
-                                    "gateway_up": gw.gateway_up()})
+            # R391: /api/health is the deployment healthcheck alias.
+            # R392 (directive 2): HONEST, machine-readable readiness — the
+            # product is never reported ready when the LLM cannot produce
+            # a completion. Four independent states:
+            #   engine_ready      — server + exact engine commit resolved
+            #   portfolio_ready   — buyer-distribution repo present (+commit)
+            #   llm_transport     — provider configured AND a REAL live
+            #                       completion succeeded (probe evidence;
+            #                       ?probe=1 forces a fresh one)
+            #   discovery_ready   — engine + transport verified live
+            # "ok"/"status" stay 200-level (service is up) — readiness
+            # carries the truth (Art. XXV: unknown stays unknown).
+            force_probe = (p.query or "").strip().lower() in (
+                "probe=1", "probe=true", "probe")
+            if force_probe:
+                gw.ensure_gateway()
+                gw.preflight_probe()
+            return self._json(200, _health_payload())
         if p.path == "/api/engine":
             return self._json(200, {
                 "engine_commit": ENGINE_COMMIT,
@@ -130,13 +213,16 @@ class Handler(BaseHTTPRequestHandler):
                 "runs_root": str(store.ENGINE_RUNS),
             })
         if p.path == "/api/sessions":
-            # failure recovery (CEO #8): honest stuck detection runs on
-            # every history read — dead workers surface as ERROR_STUCK,
-            # never as eternal spinners
+            # failure recovery (CEO #8 + R392 directive 7): honest dead-
+            # worker detection runs on every history read — interrupted/
+            # stuck sessions surface as INTERRUPTED/ERROR_STUCK, never as
+            # eternal spinners, never as success
+            interrupted = store.mark_interrupted_sessions()
             stuck = store.mark_stuck_sessions()
             sessions = store.list_sessions()
             return self._json(200, {"sessions": sessions,
-                                    "marked_stuck": stuck})
+                                    "marked_stuck": stuck,
+                                    "marked_interrupted": interrupted})
         if p.path == "/api/cemetery":
             return self._json(200, store.cemetery_summary())
 
@@ -221,6 +307,13 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(400, {"error": "problem description too short"})
             session = store.create_session(
                 title=text.split("\n")[0][:120], user_text=text)
+            # R392 (directive 5): the job exists durably from the moment
+            # it is accepted — an immediate restart cannot erase it.
+            try:
+                from toscanini import durable
+                durable.snapshot(f"created:{session['session_id']}")
+            except Exception:  # noqa: BLE001 — disclosed via health
+                pass
             self._spawn_worker(session["session_id"])
             return self._json(200, session)
 
@@ -273,17 +366,26 @@ class Handler(BaseHTTPRequestHandler):
         """Start the serialized discovery worker (detached).
 
         Transport pinning (EXPLICIT operator overrides, logged by the
-        engine and recorded in candidate provenance — the designed
-        mechanism for degraded-endpoint situations: nvidia oscillates
-        35s..>240s and mistral is payment-blocked; zai gateway is the
-        measured-healthy transport). Without the pin, synthesis waits
-        out multiple 240 s timeouts before substituting.
+        engine and recorded in candidate provenance). The zai pin — the
+        measured-healthy sandbox transport — is only the DEFAULT when the
+        zai path is actually usable (key present or local gateway up);
+        otherwise the pins stay unset and every call site's own selection
+        policy decides (R392: the hosted engine resolves its public
+        provider through the registry — recorded in each ledger, never
+        silent). An explicit ENGINE_*_PROVIDER set by the deployment
+        always wins (setdefault no-ops).
         """
         env = dict(os.environ)
-        env.setdefault("ENGINE_SYNTHESIS_PROVIDER", "zai")
-        env.setdefault("ENGINE_ATTACK_PROVIDER", "zai")
-        env.setdefault("ENGINE_ENSEMBLE_PROVIDERS", "zai")
-        env.setdefault("ENGINE_GRID_PROVIDERS", "zai")
+        zai_usable = bool(
+            os.environ.get("ZAI_API_KEY")
+            or gw._load_env_keys().get("ZAI_API_KEY")
+            or gw.gateway_up()
+            or gw.external_base_url())
+        if zai_usable:
+            env.setdefault("ENGINE_SYNTHESIS_PROVIDER", "zai")
+            env.setdefault("ENGINE_ATTACK_PROVIDER", "zai")
+            env.setdefault("ENGINE_ENSEMBLE_PROVIDERS", "zai")
+            env.setdefault("ENGINE_GRID_PROVIDERS", "zai")
         subprocess.Popen(
             [sys.executable, "-m", "toscanini.worker", session_id],
             cwd=str(REPO_ROOT), env=env,
@@ -301,7 +403,6 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", mime)
         self.send_header("Content-Length", str(len(data)))
-        self.send_header("Access-Control-Allow-Origin", "*")
         if download_name:
             self.send_header("Content-Disposition",
                              f'attachment; filename="{download_name}"')
@@ -325,7 +426,6 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Disposition",
                          f'attachment; filename="{zp.name}"')
         self.send_header("Content-Length", str(len(data)))
-        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(data)
 
@@ -468,7 +568,6 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream; charset=utf-8")
         self.send_header("Cache-Control", "no-cache")
-        self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Connection", "close")
         self.end_headers()
 
@@ -497,7 +596,8 @@ class Handler(BaseHTTPRequestHandler):
                                "problem_id": cur.get("problem_id"),
                                "error": cur.get("error")})
                 if last_status in ("COMPLETE", "ERROR_TRANSPORT",
-                                   "ERROR_BUILD", "ERROR_RUN"):
+                                   "ERROR_BUILD", "ERROR_RUN",
+                                   "ERROR_STUCK", "INTERRUPTED"):
                     detail = store.session_detail(sid)
                     if detail:
                         send("final", {
@@ -525,9 +625,38 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     store.seed_benchmark_sessions()
+    # R392 (directive 5/7): after a restart, the durable record is
+    # re-materialized FIRST (history survives), then jobs whose worker
+    # died with the previous process are marked INTERRUPTED — never
+    # COMPLETE, never silently still-RUNNING. Both outcomes are honest
+    # and disclosed through /api/health.
+    try:
+        from toscanini import durable
+        durable.restore()
+    except Exception as exc:  # noqa: BLE001 — disclosed, never fatal
+        print(f"durable restore failed: {type(exc).__name__}: {exc}",
+              file=sys.stderr)
+    try:
+        interrupted = store.mark_interrupted_sessions()
+        if interrupted:
+            print(f"marked {len(interrupted)} interrupted job(s): "
+                  f"{interrupted}", file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001
+        print(f"interrupted-sweep failed: {exc}", file=sys.stderr)
+    # R392 (directive 2): a startup transport probe seeds the health
+    # endpoint with REAL evidence (never a configured-but-dead key).
+    # Background + best-effort: a slow/blocked provider delays nothing.
+    def _startup_probe():
+        try:
+            gw.ensure_gateway()
+            gw.preflight_probe()
+        except Exception:  # noqa: BLE001 — last_probe records the failure
+            pass
+    threading.Thread(target=_startup_probe, daemon=True).start()
     srv = ThreadingHTTPServer((HOST, PORT), Handler)
     print(f"toscanini service on {HOST}:{PORT} "
-          f"(engine {ENGINE_COMMIT[:8]}, transport "
+          f"(engine {ENGINE_COMMIT[:8] or 'UNRESOLVED'} via "
+          f"{ENGINE_COMMIT_SOURCE}, transport "
           f"{gw.external_base_url() or 'local-gateway'})", flush=True)
     srv.serve_forever()
 

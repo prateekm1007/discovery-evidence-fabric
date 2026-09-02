@@ -86,6 +86,16 @@ const PHASE_LABELS: Record<string, string> = {
   RUNNING: "Thinking…",
 };
 
+// R392 job lifecycle: a run is finished only at a REAL terminal state —
+// COMPLETE, an honest ERROR_*, or INTERRUPTED (worker died; recoverable).
+function isTerminal(status: string): boolean {
+  return (
+    status === "COMPLETE" ||
+    status === "INTERRUPTED" ||
+    status.startsWith("ERROR")
+  );
+}
+
 function str(x: unknown, max = 400): string {
   if (x == null) return "";
   if (typeof x === "string") return x;
@@ -310,7 +320,7 @@ function RunPageInner() {
         if (!alive) return;
         setDetail(d);
         setError(null);
-        if (d.status === "COMPLETE" || d.status.startsWith("ERROR")) {
+        if (isTerminal(d.status)) {
           if (timer.current) clearInterval(timer.current);
         }
       } catch (e) {
@@ -327,8 +337,7 @@ function RunPageInner() {
   }, [id]);
 
   const stages = detail?.stages ?? [];
-  const done =
-    detail?.status === "COMPLETE" || (detail?.status ?? "").startsWith("ERROR");
+  const done = detail ? isTerminal(detail.status) : false;
 
   return (
     <main className="runpage">
@@ -377,7 +386,8 @@ function RunPageInner() {
             )}
           </div>
 
-          {detail.status.startsWith("ERROR") && (
+          {(detail.status.startsWith("ERROR") ||
+            detail.status === "INTERRUPTED") && (
             <div className="errbox">
               <b>{detail.status}</b> — {detail.error ?? "unknown error"}
               <div style={{ marginTop: 10 }}>

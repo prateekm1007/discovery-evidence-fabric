@@ -90,6 +90,66 @@ STUCK_AFTER_HOURS = 3  # MODEL_DERIVED operational bound, disclosed per use
 ERROR_STATUSES = ("ERROR_TRANSPORT", "ERROR_BUILD", "ERROR_RUN",
                   "ERROR_STUCK")
 
+# R392 (directive 7): the explicit durable job lifecycle. A run is
+# PENDING (created, queued) -> RUNNING (worker alive, any phase) ->
+# COMPLETE | ERROR_* | INTERRUPTED. INTERRUPTED means the worker process
+# died without a terminal verdict (service restart / crash / spin-down):
+# it is RECOVERABLE through the same retry path, never silently reported
+# as successful or still-running (Art. XXV).
+ACTIVE_STATUSES = ("PENDING", "BUILDING_PROBLEM", "RUNNING")
+RETRYABLE_STATUSES = ERROR_STATUSES + ("INTERRUPTED",)
+
+
+def _proc_stat_starttime(pid: int) -> Optional[str]:
+    """Linux /proc/<pid>/stat field 22 (starttime, clock ticks since boot).
+
+    Recorded when a worker is spawned and compared on liveness checks so
+    a REUSED pid can never masquerade as the original worker (Art. XVII:
+    every control gets an attempted bypass). Returns None when the pid is
+    not alive (or /proc is unavailable, e.g. non-Linux hosts)."""
+    try:
+        stat = Path(f"/proc/{int(pid)}/stat").read_text()
+        # field 2 (comm) may contain spaces inside parens — split after ')'
+        after_comm = stat.rsplit(")", 1)[1].split()
+        return after_comm[19]  # fields 3.. => index 19 is field 22
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def worker_alive(session: Dict[str, Any]) -> Optional[bool]:
+    """True/False when decidable from /proc; None when unknown (no pid
+    recorded — e.g. sessions seeded from the benchmark, or non-Linux)."""
+    pid = session.get("worker_pid")
+    if not pid:
+        return None
+    starttime = session.get("worker_starttime")
+    live = _proc_stat_starttime(pid)
+    if live is None:
+        return False
+    if starttime and live != str(starttime):
+        return False  # pid reused by a different process
+    return True
+
+
+def mark_interrupted_sessions() -> List[str]:
+    """R392: pid-liveness sweep. ACTIVE sessions whose worker process is
+    verifiably dead become INTERRUPTED (recoverable). Sessions with no
+    recorded pid (legacy / seeded) are left to the time-based stuck
+    detector — never guessed (Art. XXV)."""
+    interrupted: List[str] = []
+    for s in list_sessions():
+        if s.get("status") not in ACTIVE_STATUSES:
+            continue
+        alive = worker_alive(s)
+        if alive is False:
+            update_session(
+                s["session_id"], status="INTERRUPTED",
+                error=(f"worker process (pid {s.get('worker_pid')}) is no "
+                       "longer running — service restarted or worker "
+                       "crashed; retry to resume"))
+            interrupted.append(s["session_id"])
+    return interrupted
+
 
 def mark_stuck_sessions(max_age_hours: float = STUCK_AFTER_HOURS) -> List[str]:
     """HONEST stuck detection: a session RUNNING/PENDING with no update for
@@ -133,10 +193,11 @@ def retry_session(session_id: str) -> Optional[Dict[str, Any]]:
     s = get_session(session_id)
     if not s:
         return None
-    if s.get("status") not in ERROR_STATUSES:
+    if s.get("status") not in RETRYABLE_STATUSES:
         return {"error": (f"session status {s.get('status')!r} is not "
-                          "retryable — only ERROR_* sessions can re-enter "
-                          "the queue (completed verdicts are append-only)")}
+                          "retryable — only ERROR_*/INTERRUPTED sessions "
+                          "can re-enter the queue (completed verdicts are "
+                          "append-only)")}
     attempts = int(s.get("retry_attempts") or 0) + 1
     return update_session(
         session_id,
@@ -153,8 +214,10 @@ def create_session(title: str, user_text: str, domain_hint: str = "") -> Dict[st
         "user_text": user_text[:4000],
         "domain_hint": domain_hint,
         "origin": "toscanini_ui",
-        "status": "BUILDING_PROBLEM",
+        "status": "PENDING",
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "worker_pid": None,
+        "worker_starttime": None,
         "run_dir": None,
         "problem_id": None,
         "final_status": None,

@@ -5,12 +5,15 @@ Runs as a detached subprocess started by the server:
     python3 -m toscanini.worker <session_id>
 
 Phases (all real, all persisted — the UI streams them from artifacts):
-  1. ensure zai gateway transport (disclosed if unavailable)
+  0. job lifecycle: RUNNING + worker identity (pid/starttime) recorded
+     durably (R392 directive 7 — restart never fakes success or spin)
+  1. ensure LLM transport (disclosed if unavailable)
   2. evidence-bound problem build (live retrieval; MODEL_DERIVED extraction)
   3. EngineRun through the full 13-stage chain + automatic package on
      survivor (canonical factory, QA gates — the SAME path as the 15
      portfolio packages; nothing about the dossier is edited manually)
   4. terminal status recorded from the run manifest (never fabricated)
+  5. durable snapshot of the epistemic record (R392 directive 5)
 
 Art. XXV: transport/infrastructure failure -> status ERROR_* with reason;
 NEVER a research kill.
@@ -18,6 +21,7 @@ NEVER a research kill.
 from __future__ import annotations
 
 import fcntl
+import os
 import sys
 import traceback
 from pathlib import Path
@@ -42,11 +46,36 @@ def _serialize_run():
     return f  # keep the handle open for the process lifetime
 
 
+def _register_running(session_id: str) -> None:
+    """R392 directive 7: the job is RUNNING with an identity a later
+    process can verify — /proc pid + starttime. A restart marks this
+    session INTERRUPTED (recoverable), never COMPLETE, never spinning."""
+    starttime = store._proc_stat_starttime(os.getpid())
+    store.update_session(session_id, status="RUNNING",
+                         worker_pid=os.getpid(),
+                         worker_starttime=starttime)
+
+
+def _snapshot(session_id: str, reason: str) -> None:
+    """Best-effort durable snapshot (R392 directive 5). Failures are
+    disclosed through the health endpoint (durable.last_error), never
+    silently swallowed and never fatal to the run itself."""
+    try:
+        from toscanini import durable
+        durable.snapshot(reason)
+    except Exception as exc:  # noqa: BLE001
+        print(f"  [worker] durable snapshot failed ({reason}): "
+              f"{type(exc).__name__}: {exc}", file=sys.stderr)
+
+
 def run(session_id: str) -> None:
     s = store.get_session(session_id)
     if not s:
         print(f"session {session_id} not found", file=sys.stderr)
         sys.exit(2)
+
+    # --- phase 0: job lifecycle (durable, restart-safe) ----------------------
+    _register_running(session_id)
 
     # Serialize engine runs (transport protection). Held for the whole run.
     _lock_handle = _serialize_run()
@@ -55,13 +84,14 @@ def run(session_id: str) -> None:
     g = gw.ensure_gateway()
     probeable = g["status"] in ("UP", "ALREADY_UP", "EXTERNAL")
     probe = gw.preflight_probe() if probeable else {
-        "status": "GATEWAY_DOWN", "error": str(g)}
+        "status": "NO_TRANSPORT", "error": str(g)}
     if probe.get("status") != "OK":
         store.update_session(
             session_id, status="ERROR_TRANSPORT",
             error=(f"LLM transport unavailable: gateway={g.get('status')} "
                    f"probe={probe.get('status')} {probe.get('error', '')}"
                    )[:400])
+        _snapshot(session_id, f"terminal:ERROR_TRANSPORT:{session_id}")
         return
 
     # --- phase 2: evidence-bound problem ------------------------------------
@@ -70,11 +100,12 @@ def run(session_id: str) -> None:
     except Exception as exc:  # noqa: BLE001
         store.update_session(session_id, status="ERROR_BUILD",
                              error=f"{type(exc).__name__}: {exc}"[:400])
+        _snapshot(session_id, f"terminal:ERROR_BUILD:{session_id}")
         return
     problem = built["problem"]
     store.save_evidence_pack(session_id, built["evidence_pack"])
     run_dir = store.ENGINE_RUNS / f"toscanini_ui_{problem['problem_id']}"
-    store.update_session(session_id, status="RUNNING",
+    store.update_session(session_id,
                          problem_id=problem["problem_id"],
                          run_dir=str(run_dir),
                          domain=built["domain"])
@@ -88,6 +119,7 @@ def run(session_id: str) -> None:
         store.update_session(session_id, status="ERROR_RUN",
                              error=f"{type(exc).__name__}: {exc}"[:400],
                              traceback=traceback.format_exc()[-2000:])
+        _snapshot(session_id, f"terminal:ERROR_RUN:{session_id}")
         return
 
     # --- phase 4: honest terminal status -------------------------------------
@@ -100,6 +132,9 @@ def run(session_id: str) -> None:
         session_id, status="COMPLETE",
         final_status=(final or {}).get("final_status")
         or manifest.get("final_status", "UNKNOWN"))
+
+    # --- phase 5: durable epistemic record -----------------------------------
+    _snapshot(session_id, f"terminal:COMPLETE:{session_id}")
 
 
 if __name__ == "__main__":

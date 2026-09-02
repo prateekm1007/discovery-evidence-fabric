@@ -1,12 +1,14 @@
-# Toscanini engine — hosted deployment image (R391).
+# Toscanini engine — hosted deployment image (R391; R392 pinning +
+# token-safe startup).
 #
 # Stage 1 builds the Next.js webapp as a static export (same-origin:
 # all fetches are relative, so /api/* resolves to this engine — no
 # proxy, no CORS; the same codebase also deploys to Vercel unchanged).
 # Stage 2 is the Python engine: it serves the export AND the job API
-# on $PORT, and clones the buyer-distribution portfolio as a SIBLING
+# on $PORT, and acquires the buyer-distribution portfolio as a SIBLING
 # at container start (Art. XXXIX — showcase serves the REAL packages;
-# never re-rendered). GITHUB_TOKEN is a runtime secret.
+# never re-rendered). GITHUB_TOKEN is a runtime secret supplied to git
+# through a GIT_ASKPASS helper — never in a URL, argv, or the image.
 
 # ---------- stage 1: webapp static export ----------
 FROM node:20-alpine AS webapp-builder
@@ -31,12 +33,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 COPY --from=webapp-builder /webapp/out ./TOSCANINI_UI/webapp-export
 
-# Startup: clone the portfolio sibling (once), then serve.
-# A failed clone degrades the showcase (404s) but never fabricates
-# packages — the healthcheck reports portfolio readiness honestly.
-CMD ["sh", "-c", "git config --global --add safe.directory /app; \
-if [ ! -d ../portfolio/.git ]; then \
-  git clone --depth 1 https://x-access-token:${GITHUB_TOKEN}@github.com/prateekm1007/technology-transfer-portfolio-15.git ../portfolio \
-  || echo 'WARN: portfolio clone failed — showcase packages unavailable (fresh runs unaffected)'; \
-fi; \
-python -m toscanini.server"]
+# R392 (directive 3): bake the EXACT engine commit into the image when
+# the build context carries .git; otherwise ENGINE_COMMIT.txt records
+# that fact and the runtime env (deployment configuration) supplies the
+# pin. Never fabricated, source labeled (Art. VI).
+RUN if [ -d .git ]; then git rev-parse HEAD > /app/ENGINE_COMMIT.txt; \
+    else echo BUILD_CONTEXT_NO_GIT > /app/ENGINE_COMMIT.txt; fi
+
+# R392: startup = acquire the PINNED portfolio (token-safe), then serve.
+# See toscanini/container-entrypoint.sh. A failed acquisition degrades
+# the showcase (portfolio_ready=false) but never fabricates packages —
+# the health endpoint reports readiness honestly.
+RUN chmod +x /app/toscanini/container-entrypoint.sh
+ENTRYPOINT ["/app/toscanini/container-entrypoint.sh"]

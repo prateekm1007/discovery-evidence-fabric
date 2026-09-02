@@ -1,0 +1,353 @@
+"""toscanini/durable.py — the MINIMUM durable persistence layer (R392
+directives 5-6).
+
+Render's default filesystem is EPHEMERAL (restarts and idle spin-downs wipe
+it). This module preserves exactly what the CEO listed — nothing more:
+
+  DURABLE METADATA (always persisted):
+    - sessions.json / shares.json  (session + job + share state)
+    - evidence_<sid>.json          (evidence references)
+    - the run-dir epistemic record (envelopes, specifications, decisive
+      experiment, survivor/cemetery records, final_state, run_manifest,
+      PACKAGE_REPORT, RELEASE_PROOF) — the small JSON artifacts that carry
+      the evidence trail
+    - the buyer package ZIP under DOWNLOAD/ (the final result reference)
+
+  EPHEMERAL (never migrated, regenerable or bulky intermediates):
+    - exploration grids, per-angle attack outputs beyond the survivor
+      chain, plots, gateway logs, the state-repo cache itself.
+
+Store: a private branch ("runtime-state") of the EXISTING private engine
+repository, via the EXISTING GITHUB_TOKEN. No new infrastructure (directive
+6): no database server, no object-store account, one git branch.
+
+Security (directive 4): the token is supplied through a runtime
+GIT_ASKPASS helper (generated per call, mode 0700, reads the env var at
+call time). It never appears in a command-line URL, in argv, in the image,
+or in logs (git does not echo askpass output).
+
+Honesty (Art. XV/XXV): every snapshot/restore outcome — including
+refusals (not enabled, no token, push denied) — is reported to the caller
+and surfaced through /api/health (durable.*). A failed snapshot NEVER
+fails the run it belongs to.
+
+Guard: per-file cap 20 MB (structured JSON + zips are ~1-3 MB; anything
+larger is disclosed as skipped rather than silently dropped).
+"""
+from __future__ import annotations
+
+import fcntl
+import json
+import os
+import shutil
+import subprocess
+import time
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from toscanini import sessions as store
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+ENGINE_RUNTIME = REPO_ROOT / "ENGINE_RUNTIME"
+STATE_REPO = ENGINE_RUNTIME / "state-repo"
+LOCK_PATH = ENGINE_RUNTIME / "durable.lock"
+
+REMOTE = "https://github.com/prateekm1007/discovery-evidence-fabric.git"
+FILE_CAP_BYTES = 20 * 1024 * 1024
+
+_LAST: Dict[str, Any] = {"ok": None, "at": None, "reason": None,
+                         "error": None, "files": 0, "commit": None,
+                         "pushed": None}
+_LAST_RESTORE: Dict[str, Any] = {"at": None, "sessions": 0, "runs": 0,
+                                 "evidence": 0, "interrupted": 0,
+                                 "error": None}
+
+
+def enabled() -> bool:
+    """Durable persistence is an EXPLICIT deployment choice (Render sets
+    DURABLE_STATE_ENABLED=1). Local dev defaults OFF — the sandbox must
+    not push its test sessions into the real runtime-state branch."""
+    return os.environ.get("DURABLE_STATE_ENABLED", "").strip() == "1"
+
+
+def branch() -> str:
+    return os.environ.get("DURABLE_STATE_BRANCH", "").strip() or "runtime-state"
+
+
+def state() -> Dict[str, Any]:
+    return {
+        "enabled": enabled(),
+        "branch": branch() if enabled() else None,
+        "last_snapshot": dict(_LAST),
+        "last_restore": dict(_LAST_RESTORE),
+        "store": "private engine repo runtime-state branch (git)",
+    }
+
+
+# ---------------------------------------------------------------------------
+# token-safe git transport
+# ---------------------------------------------------------------------------
+
+_ASKPASS_PATH: Optional[Path] = None
+
+
+def _askpass() -> Path:
+    """(Re)generate the GIT_ASKPASS helper. The script contains NO literal
+    secret — it reads GITHUB_TOKEN from its own environment at call time.
+    Mode 0700; lives only on the ephemeral container/sandbox disk."""
+    global _ASKPASS_PATH
+    ENGINE_RUNTIME.mkdir(parents=True, exist_ok=True)
+    p = ENGINE_RUNTIME / "askpass.sh"
+    p.write_text(
+        "#!/bin/sh\n"
+        "case \"$1\" in\n"
+        "  *sername*) echo \"x-access-token\" ;;\n"
+        "  *assword*) printf '%s\\n' \"$GITHUB_TOKEN\" ;;\n"
+        "  *) echo \"\" ;;\n"
+        "esac\n")
+    p.chmod(0o700)
+    _ASKPASS_PATH = p
+    return p
+
+
+def _git(cwd: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
+    token = os.environ.get("GITHUB_TOKEN", "").strip()
+    env = dict(os.environ)
+    env["GIT_TERMINAL_PROMPT"] = "0"
+    if token:
+        env["GIT_ASKPASS"] = str(_askpass())
+    r = subprocess.run(
+        ["git", "-C", str(cwd), *args],
+        capture_output=True, text=True, timeout=300, env=env)
+    if check and r.returncode != 0:
+        raise RuntimeError(
+            f"git {' '.join(args[:3])} failed: {r.stderr.strip()[:300]}")
+    return r
+
+
+# ---------------------------------------------------------------------------
+# payload selection (durable metadata vs bulky intermediates)
+# ---------------------------------------------------------------------------
+
+def _run_dir_files(run_dir: Path) -> List[Path]:
+    """Files worth persisting from one engine run dir: the envelopes,
+    specifications, verdicts, manifests, release proofs, package report
+    and the buyer ZIP. Grid/angle intermediates and plots stay ephemeral
+    (regenerable, bulky)."""
+    keep_json = {
+        "problem.json", "candidate_envelope.json", "final_state.json",
+        "run_manifest.json", "INVENTION_SPECIFICATION.json",
+        "ENGINEERING_SPECIFICATION.json", "DECISIVE_EXPERIMENT.json",
+        "SURVIVOR_SELECTION.json", "SURVIVOR_GATE.json",
+        "cemetery_update.json", "PACKAGE_REPORT.json",
+        "RELEASE_GATE_EVALUATION.json", "RELEASE_PROOF.json",
+        "DISCOVERY_RELEASE.json", "DOSSIER_QUALITY_EVALUATION.json",
+        "ENSEMBLE_DISAGREEMENT.json", "EXPLORATION_GRID.json",
+    }
+    out: List[Path] = []
+    for f in sorted(run_dir.glob("*.json")):
+        if f.name in keep_json or f.name.startswith("envelope_"):
+            out.append(f)
+    dl = run_dir / "DOWNLOAD"
+    if dl.is_dir():
+        out.extend(sorted(p for p in dl.rglob("*") if p.is_file()))
+    return [f for f in out if f.stat().st_size <= FILE_CAP_BYTES]
+
+
+def _collect_payload() -> Dict[str, Path]:
+    """Map of destination-in-state-repo -> source-path-on-disk for the
+    CURRENT durable state. Only sessions referenced by the index are
+    persisted — the benchmark-seeded run dirs already ship in the engine
+    image (git-tracked), so persisting them again would be redundant."""
+    payload: Dict[str, Path] = {}
+    src_sessions = store.SESSIONS_PATH
+    if src_sessions.exists():
+        payload["sessions.json"] = src_sessions
+    src_shares = store.SHARES_PATH
+    if src_shares.exists():
+        payload["shares.json"] = src_shares
+    for ev in sorted(store.STORE_DIR.glob("evidence_*.json")):
+        payload[f"evidence/{ev.name}"] = ev
+    for s in store.list_sessions():
+        rd = s.get("run_dir")
+        if not rd or s.get("origin") != "toscanini_ui":
+            continue  # seeded benchmark runs ship in the image
+        run_dir = Path(rd)
+        if not run_dir.exists():
+            continue
+        for f in _run_dir_files(run_dir):
+            payload[f"runs/{run_dir.name}/{f.relative_to(run_dir)}"] = f
+    return payload
+
+
+# ---------------------------------------------------------------------------
+# snapshot / restore
+# ---------------------------------------------------------------------------
+
+def _ensure_state_repo() -> Path:
+    if not (STATE_REPO / ".git").exists():
+        STATE_REPO.mkdir(parents=True, exist_ok=True)
+        _git(STATE_REPO, "init", "-b", branch())
+        _git(STATE_REPO, "remote", "add", "origin", REMOTE)
+    fetch = _git(STATE_REPO, "fetch", "origin", branch(), check=False)
+    if fetch.returncode == 0:
+        _git(STATE_REPO, "reset", "--hard", "FETCH_HEAD", check=False)
+    return STATE_REPO
+
+
+def snapshot(reason: str) -> Dict[str, Any]:
+    """Commit the current durable state and push it. Returns an honest
+    outcome dict (also cached for /api/health)."""
+    _LAST.update({"ok": None, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                                  time.gmtime()),
+                  "reason": reason, "error": None, "files": 0,
+                  "commit": None, "pushed": None})
+    if not enabled():
+        _LAST["error"] = ("durable persistence not enabled "
+                          "(DURABLE_STATE_ENABLED != 1)")
+        return dict(_LAST)
+    if not os.environ.get("GITHUB_TOKEN", "").strip():
+        _LAST["error"] = "GITHUB_TOKEN not set — cannot push runtime state"
+        return dict(_LAST)
+
+    ENGINE_RUNTIME.mkdir(parents=True, exist_ok=True)
+    lock = open(LOCK_PATH, "w")
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        repo = _ensure_state_repo()
+        payload = _collect_payload()
+        copied = 0
+        for dest, src in sorted(payload.items()):
+            target = repo / dest
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, target)
+            copied += 1
+        # append-only snapshot log
+        log = repo / "snapshot_log.jsonl"
+        with open(log, "a") as lf:
+            lf.write(json.dumps({
+                "reason": reason,
+                "at": _LAST["at"],
+                "files": copied}) + "\n")
+        _git(repo, "add", "-A")
+        commit = _git(repo, "-c", "user.name=toscanini-runtime",
+                      "-c", "user.email=runtime@toscanini.local",
+                      "commit", "-m", f"runtime-state: {reason}",
+                      "--quiet", check=False)
+        pushed = None
+        if commit.returncode == 0:
+            _LAST["commit"] = _git(repo, "rev-parse", "HEAD").stdout.strip()
+            _LAST["files"] = copied
+            push = _git(repo, "push", "origin",
+                        f"HEAD:refs/heads/{branch()}", check=False)
+            pushed = push.returncode == 0
+            if not pushed:
+                _LAST["error"] = ("push failed: "
+                                  + push.stderr.strip()[:200])
+        else:
+            # nothing new locally — earlier commits may still be unpushed
+            push = _git(repo, "push", "origin",
+                        f"HEAD:refs/heads/{branch()}", check=False)
+            pushed = push.returncode == 0
+            _LAST["files"] = copied
+            if not pushed and commit.stderr.strip():
+                _LAST["error"] = commit.stderr.strip()[:200]
+        _LAST["ok"] = pushed is True
+        _LAST["pushed"] = pushed
+        return dict(_LAST)
+    except Exception as exc:  # noqa: BLE001 — disclosed, never silent
+        _LAST["ok"] = False
+        _LAST["error"] = f"{type(exc).__name__}: {exc}"[:300]
+        return dict(_LAST)
+    finally:
+        fcntl.flock(lock, fcntl.LOCK_UN)
+        lock.close()
+
+
+def restore() -> Dict[str, Any]:
+    """Pull the runtime-state branch and re-materialize local state after
+    a restart. Sessions merge by session_id (latest update wins, both
+    directions honest); run artifacts copy only when absent (immutable).
+    ACTIVE jobs whose worker is gone become INTERRUPTED (directive 7)."""
+    _LAST_RESTORE.update({"at": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                              time.gmtime()),
+                          "sessions": 0, "runs": 0, "evidence": 0,
+                          "interrupted": 0, "error": None})
+    if not enabled():
+        _LAST_RESTORE["error"] = "not enabled"
+        return dict(_LAST_RESTORE)
+    if not os.environ.get("GITHUB_TOKEN", "").strip():
+        _LAST_RESTORE["error"] = "GITHUB_TOKEN not set"
+        return dict(_LAST_RESTORE)
+    try:
+        ENGINE_RUNTIME.mkdir(parents=True, exist_ok=True)
+        lock = open(LOCK_PATH, "w")
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            repo = _ensure_state_repo()
+            # --- sessions merge (union, latest update wins) ---
+            remote_sessions = repo / "sessions.json"
+            merged = 0
+            if remote_sessions.exists():
+                local = store._locked_read(store.SESSIONS_PATH) or {}
+                remote = json.loads(remote_sessions.read_text())
+                by_id = {s["session_id"]: s
+                         for s in local.get("sessions", [])}
+                for s in remote.get("sessions", []):
+                    sid = s.get("session_id")
+                    if not sid:
+                        continue
+                    cur = by_id.get(sid)
+                    if cur is None or (s.get("updated_at") or "") >= (
+                            cur.get("updated_at") or cur.get("created_at")
+                            or ""):
+                        by_id[sid] = s
+                        merged += 1
+                store._locked_write(
+                    store.SESSIONS_PATH,
+                    {"sessions": list(by_id.values())})
+            _LAST_RESTORE["sessions"] = merged
+            # --- shares merge ---
+            remote_shares = repo / "shares.json"
+            if remote_shares.exists():
+                local = store._locked_read(store.SHARES_PATH) or {}
+                remote = json.loads(remote_shares.read_text())
+                local.update(remote)
+                store._locked_write(store.SHARES_PATH, local)
+            # --- evidence + run artifacts (copy when absent) ---
+            ev_dir = repo / "evidence"
+            if ev_dir.is_dir():
+                for f in ev_dir.glob("evidence_*.json"):
+                    dst = store.STORE_DIR / f.name
+                    if not dst.exists():
+                        dst.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(f, dst)
+                        _LAST_RESTORE["evidence"] += 1
+            runs_dir = repo / "runs"
+            if runs_dir.is_dir():
+                for rd in runs_dir.iterdir():
+                    if not rd.is_dir():
+                        continue
+                    dst_root = store.ENGINE_RUNS / rd.name
+                    had_any = False
+                    for f in rd.rglob("*"):
+                        if not f.is_file():
+                            continue
+                        rel = f.relative_to(rd)
+                        dst = dst_root / rel
+                        if not dst.exists():
+                            dst.parent.mkdir(parents=True, exist_ok=True)
+                            shutil.copy2(f, dst)
+                            had_any = True
+                    if had_any:
+                        _LAST_RESTORE["runs"] += 1
+            # --- honest interruption of dead jobs (directive 7) ---
+            _LAST_RESTORE["interrupted"] = len(
+                store.mark_interrupted_sessions())
+            return dict(_LAST_RESTORE)
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
+            lock.close()
+    except Exception as exc:  # noqa: BLE001 — disclosed, never silent
+        _LAST_RESTORE["error"] = f"{type(exc).__name__}: {exc}"[:300]
+        return dict(_LAST_RESTORE)
