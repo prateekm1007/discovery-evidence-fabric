@@ -653,7 +653,15 @@ def search_patents(ladder: List[Dict[str, Any]],
         during the 53-run replay: 52/53 runs saw at least one 429 with
         0.4s spacing; the limit clears within seconds). Backoff: 2s, 5s.
         Non-429 failures return immediately (no retry masking of real
-        errors — Art. XXI.3 states stay honest)."""
+        errors — Art. XXI.3 states stay honest).
+        R399 W2.4: a QUOTA-CLASS 429 (budget/quota/resets signature)
+        TRIPS the circuit breaker and stops retrying immediately — a
+        monthly quota does not clear in 5 s; retrying it burns 7 s of
+        backoff per doomed query (measured: 10 futile lens queries per
+        run, plus per-grid-candidate re-runs, while the quota was
+        spent). The breaker parks the source for the quota window;
+        subsequent queries are refused locally with
+        NOT_QUERIED_QUOTA_EXHAUSTED (never absence)."""
         delays = (0.0, 2.0, 5.0)
         last = None
         for delay in delays:
@@ -664,11 +672,33 @@ def search_patents(ladder: List[Dict[str, Any]],
             err = str(getattr(last, "error", "") or "")
             if ok or "429" not in err:
                 return last
+            from discovery_fabric.prior_art_v2 import quota_breaker
+            if quota_breaker.is_quota_exhaustion(err):
+                quota_breaker.trip(source_id, err)
+                return last  # quota window — retrying is futile
         return last
+
+    # R399 W2.4: consult the breaker BEFORE any query — a parked source
+    # is refused locally for every ladder step (and every per-candidate
+    # collision re-run) with the honest NOT_QUERIED_QUOTA_EXHAUSTED
+    # error record; the epistemic outcome is identical to the live 429
+    # (search incomplete — never absence), the waste is not.
+    from discovery_fabric.prior_art_v2 import quota_breaker
+    parked = {}
+    for source_id in sources:
+        entry = quota_breaker.check(source_id)
+        if entry is not None:
+            parked[source_id] = entry
 
     for step in ladder:
         for source_id in sources:
             fn = fns.get(source_id)
+            if source_id in parked:
+                rec = quota_breaker.refusal_record(source_id,
+                                                   parked[source_id])
+                rec["query"] = step["query"]
+                errors.append(rec)
+                continue
             if fn is None:
                 errors.append({"query": step["query"], "source": source_id,
                                "error": "unknown source",

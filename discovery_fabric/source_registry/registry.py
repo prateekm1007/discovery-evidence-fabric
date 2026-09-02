@@ -1431,6 +1431,125 @@ _register(_src(
 
 
 # ---------------------------------------------------------------------------
+# R399 W3: ROUTING STATES — a first-class, epistemic, REVERSIBLE layer
+# ---------------------------------------------------------------------------
+# Routing state is a DIFFERENT dimension from health_status:
+#   health_status  = can the provider be reached at all (measured LIVE/
+#                    DEGRADED/BLOCKED/NOT_INTEGRATED)
+#   routing_state  = SHOULD the engine actively query this source in the
+#                    run routing graph (ACTIVE / ARCHIVED_ROUTING /
+#                    SUSPENDED_RELEVANCE)
+# A routing state is never a silent code path: every dispatch site that
+# skips a non-ACTIVE source records the state + basis + reinstatement
+# criterion in the run record, and the health report carries the state
+# without probing the source (no quota burn for a parked source).
+# Flipping a state back to ACTIVE is a one-line registry change with a
+# worklog entry — the implementation is archived IN PLACE, never deleted.
+
+ROUTING_STATES = ("ACTIVE", "ARCHIVED_ROUTING", "SUSPENDED_RELEVANCE")
+
+_ROUTING_STATE_OVERRIDES: Dict[str, Dict[str, Any]] = {
+    # NHTSA — ARCHIVED_ROUTING (R399 W3). Measured basis: the connectors
+    # grammar-gate themselves out of every non-vehicle problem
+    # (NOT_QUERIED_GRAMMAR — 70 recorded grammar-mismatches vs zero
+    # production-run uses in the current medical/engineering domain
+    # set; only automotive problems with an extracted
+    # make|model|year ever produce a real query). The current
+    # production domain set has no vehicle problems: zero utility,
+    # live routing complexity. The implementation (connectors,
+    # grammar, limitations) stays archived in place.
+    "nhtsa_recalls": {
+        "routing_state": "ARCHIVED_ROUTING",
+        "routing_basis": (
+            "measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem "
+            "(70 recorded grammar mismatches, zero production-run uses "
+            "in the current domain set — R399 audit W3)"),
+        "reinstatement_criterion": (
+            "the production domain set includes vehicle problems with "
+            "extracted make|model|year parameters (flip to ACTIVE + "
+            "worklog entry; connector implementation archived in place)"),
+    },
+    "nhtsa_complaints": {
+        "routing_state": "ARCHIVED_ROUTING",
+        "routing_basis": (
+            "measured: NOT_QUERIED_GRAMMAR on every non-vehicle problem "
+            "(70 recorded grammar mismatches, zero production-run uses "
+            "in the current domain set — R399 audit W3)"),
+        "reinstatement_criterion": (
+            "the production domain set includes vehicle problems with "
+            "extracted make|model|year parameters (flip to ACTIVE + "
+            "worklog entry; connector implementation archived in place)"),
+    },
+    # COD (crystallography) — ARCHIVED_ROUTING (R399 W3). Measured
+    # basis: EMPTY on every observed run in the audit; zero run-level
+    # dispatch in the current domain set. Materials-role coverage is
+    # served by nist_webbook / materials_project paths.
+    "cod_optimade": {
+        "routing_state": "ARCHIVED_ROUTING",
+        "routing_basis": (
+            "measured: EMPTY on every observed run (R399 audit W3); "
+            "zero production-run dispatches in the current domain set"),
+        "reinstatement_criterion": (
+            "a production problem class needs crystal-structure "
+            "evidence (flip to ACTIVE + worklog entry; connector "
+            "implementation archived in place)"),
+    },
+    # DOE OSTI — SUSPENDED_RELEVANCE (R399 W3). NOT deleted: the
+    # connector works; the RELEVANCE of its records is unstable (the
+    # R375 measured instability — same fusion papers adjudicated
+    # relevant 3 then 0 — pooled relevant-rate 0.175 before the
+    # keyword-form/abstract fixes). Until the semantic reranker lands
+    # (Phase P1), its records poison more than they feed synthesis-
+    # feeding retrieval. Suspended with an explicit reinstatement
+    # criterion, in the registry, the health report, and the worklog.
+    "doe_osti": {
+        "routing_state": "SUSPENDED_RELEVANCE",
+        "routing_basis": (
+            "measured relevance instability (R375: same fusion papers "
+            "relevant 3 -> 0; pooled relevant-rate 0.175 pre-fix; "
+            "DETERMINISM_GAP flagged in the R394 production audit) — "
+            "records poison synthesis-feeding retrieval more than they "
+            "feed it until relevance is semantically adjudicated"),
+        "reinstatement_criterion": (
+            "the Phase P1 semantic reranker lands (semantic relevance "
+            "adjudication between query and record, replacing lexical "
+            "overlap); flip to ACTIVE + a measured relevance re-run + "
+            "worklog entry"),
+    },
+}
+
+for _sid, _routing in _ROUTING_STATE_OVERRIDES.items():
+    if _sid in SOURCE_REGISTRY:
+        SOURCE_REGISTRY[_sid]["routing_state"] = _routing["routing_state"]
+        SOURCE_REGISTRY[_sid]["routing_basis"] = _routing["routing_basis"]
+        SOURCE_REGISTRY[_sid]["reinstatement_criterion"] = \
+            _routing["reinstatement_criterion"]
+
+for _sid, _rec in SOURCE_REGISTRY.items():
+    # every source carries an explicit routing state (default ACTIVE —
+    # absent means active, but the field is always present for audit)
+    _rec.setdefault("routing_state", "ACTIVE")
+
+
+def routing_state(source_id: str) -> str:
+    """The routing state of a source (one authority; default ACTIVE)."""
+    rec = SOURCE_REGISTRY.get(source_id) or {}
+    return rec.get("routing_state") or "ACTIVE"
+
+
+def routing_info(source_id: str) -> Dict[str, Any]:
+    """The full routing block (state, basis, reinstatement criterion) —
+    the exact record dispatch sites and the health report embed."""
+    rec = SOURCE_REGISTRY.get(source_id) or {}
+    return {
+        "source_id": source_id,
+        "routing_state": routing_state(source_id),
+        "routing_basis": rec.get("routing_basis"),
+        "reinstatement_criterion": rec.get("reinstatement_criterion"),
+    }
+
+
+# ---------------------------------------------------------------------------
 # Registry API
 # ---------------------------------------------------------------------------
 

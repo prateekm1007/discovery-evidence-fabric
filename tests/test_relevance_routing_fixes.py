@@ -290,13 +290,22 @@ class TestGrammarGate:
 
 
 class TestProblemBuilderRouting:
-    """Automotive family without an extracted vehicle -> NOT_QUERIED_GRAMMAR."""
+    """R399 W3: the registry routing state is the FIRST gate (NHTSA is
+    ARCHIVED_ROUTING — not queried, state recorded); the grammar gate
+    still applies when the source is ACTIVE (reversible archive)."""
 
     @staticmethod
     def _build(monkeypatch, extraction):
         monkeypatch.setattr(pb, "extract_problem_fields",
                             lambda text: dict(extraction))
         return pb.build_problem("Why do lithium-ion battery packs fail?")
+
+    def _activate(self, monkeypatch, sid="nhtsa_complaints"):
+        """Flip a source to ACTIVE routing (the reversible-archive proof:
+        the archived implementation still works when reinstated)."""
+        import discovery_fabric.source_registry.registry as reg
+        monkeypatch.setitem(
+            reg.SOURCE_REGISTRY[sid], "routing_state", "ACTIVE")
 
     def test_automotive_without_vehicle_skips_nhtsa(self, monkeypatch):
         out = self._build(monkeypatch, {
@@ -308,14 +317,46 @@ class TestProblemBuilderRouting:
                      "latency_ms": 1},
         })
         statuses = {r["source"]: r["status"] for r in out["evidence_pack"]["retrieval"]}
+        # R399 W3: NHTSA is ARCHIVED_ROUTING — the skip now happens one
+        # level earlier than the grammar gate, with the state, basis and
+        # reinstatement criterion recorded (never silent, never absence)
+        assert statuses["nhtsa_complaints"] == \
+            "NOT_QUERIED_ARCHIVED_ROUTING"
+        assert statuses["nhtsa_recalls"] == \
+            "NOT_QUERIED_ARCHIVED_ROUTING"
+        nhtsa_rows = [r for r in out["evidence_pack"]["retrieval"]
+                      if r["source"] == "nhtsa_complaints"]
+        assert nhtsa_rows[0]["routing"]["routing_state"] == \
+            "ARCHIVED_ROUTING"
+        assert nhtsa_rows[0]["routing"]["reinstatement_criterion"]
+        notes = out["evidence_pack"]["extraction"]["routing_notes"]
+        assert any("nhtsa_complaints" in n and
+                   "ARCHIVED_ROUTING" in n for n in notes)
+
+    def test_automotive_active_routing_still_grammar_gates(self, monkeypatch):
+        """Reversible-archive proof: with the routing state ACTIVE, the
+        grammar gate still applies exactly as before (the archived
+        implementation is intact — reinstatement is a state flip)."""
+        self._activate(monkeypatch, "nhtsa_complaints")
+        self._activate(monkeypatch, "nhtsa_recalls")
+        out = self._build(monkeypatch, {
+            "domain": "automotive", "device": "lithium-ion battery pack",
+            "failure_mode": "thermal runaway", "constraint": "must not ignite",
+            "failure_query": "lithium battery thermal runaway",
+            "science_query": "lithium battery thermal runaway vehicle",
+            "_llm": {"status": "OK", "provider": "test",
+                     "latency_ms": 1},
+        })
+        statuses = {r["source"]: r["status"] for r in out["evidence_pack"]["retrieval"]}
         assert statuses["nhtsa_complaints"] == "NOT_QUERIED_GRAMMAR"
         assert statuses["nhtsa_recalls"] == "NOT_QUERIED_GRAMMAR"
-        notes = out["evidence_pack"]["extraction"]["routing_notes"]
-        assert any("nhtsa_complaints" in n for n in notes)
-        assert "ROUTING:" in out["problem"]["failure"]
 
     def test_vehicle_reaches_nhtsa_as_query(self, monkeypatch):
-        """With a vehicle extracted, the vehicle IS the NHTSA query."""
+        """With a vehicle extracted AND the routing state ACTIVE, the
+        vehicle IS the NHTSA query (the reversible-archive proof for the
+        query-formation path)."""
+        self._activate(monkeypatch, "nhtsa_complaints")
+        self._activate(monkeypatch, "nhtsa_recalls")
         captured = {}
         real_search_one = pb._search_one
 
@@ -338,6 +379,8 @@ class TestProblemBuilderRouting:
         assert captured.get("nhtsa_recalls") == "tesla|model 3|2021"
 
     def test_malformed_vehicle_dropped(self, monkeypatch):
+        self._activate(monkeypatch, "nhtsa_complaints")
+        self._activate(monkeypatch, "nhtsa_recalls")
         out = self._build(monkeypatch, {
             "domain": "automotive", "device": "car", "failure_mode": "fire",
             "constraint": "x",

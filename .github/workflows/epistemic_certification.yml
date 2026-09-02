@@ -1,12 +1,28 @@
-# Epistemic Firewall Certification
+# Epistemic Firewall Certification — R399 W4 CI COST TIERING
 #
 # Per CEO v26 audit directive 4:
 #   "Add a GitHub Actions workflow that runs the detached certification on
 #    the exact commit and exposes the result as a GitHub status/check."
 #
-# This workflow runs on every push to main and on manual dispatch.
-# It runs the full 13-gate certification inside a detached worktree
-# and uploads the capsule as a GitHub Actions artifact.
+# R399 W4 (CEO directive, measured): the certification fired a full
+# 14-gate run on EVERY push — including worklog-only commits (measured:
+# 20% of the last 200 commits are docs-only; 663 total runs). Tiers
+# now (certification SUBSTANCE never reduced — only its triggers):
+#
+#   LIGHTWEIGHT  markdown/evidence-only pushes — the lightweight
+#                workflow (epistemic_lightweight.yml): secret scan +
+#                constitution presence + registry JSON validity.
+#   FULL         engine/workflow/connector/ontology/test/release-relevant
+#                code paths — THIS workflow, the unchanged 14-gate
+#                detached certification + capsule.
+#   FAST         other code-path changes (scripts/, UI, docs mix) — this
+#                workflow's fast-check job: secret scan + the frozen
+#                benchmark + the release-gate suites (the epistemic
+#                core; engine changes always get FULL anyway).
+#   RELEASE      workflow_dispatch (commit_sha input) — the complete
+#                certification; the EXTERNAL ACCEPTANCE protocol (P1-P7
+#                probes against the deployed host) remains operator-side
+#                by design (CI is not acceptance — R396 Phase C).
 #
 # The workflow is DETERMINISTIC: same commit → same capsule hash.
 # The CEO can independently reproduce the certification by:
@@ -23,6 +39,16 @@ name: Epistemic Certification
 on:
   push:
     branches: [main]
+    # R399 W4 LIGHTWEIGHT tier: a push whose EVERY changed file is
+    # docs/evidence (markdown, worklog, R-round records) does not run
+    # the full certification — the lightweight workflow handles it.
+    # Any code-path file in the push re-enables this workflow (GitHub
+    # paths-ignore semantics: skip only when ALL files match).
+    paths-ignore:
+      - "worklog.md"
+      - "**.md"
+      - "R3[0-9][0-9]/**"
+      - "ARCHIVE_MANIFEST.json"
   workflow_dispatch:
     inputs:
       commit_sha:
@@ -36,8 +62,47 @@ permissions:
   actions: write
 
 jobs:
+  # R399 W4 FAST vs FULL split: engine-relevant paths get the unchanged
+  # full certification; other code paths (scripts/UI) get the
+  # fast-check job. Certification substance is never reduced — the
+  # full path runs for exactly the paths it guards.
+  classify:
+    name: Classify changed paths (R399 W4 tier)
+    runs-on: ubuntu-latest
+    outputs:
+      engine_paths: ${{ steps.filter.outputs.engine_paths }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.commit_sha || github.ref }}
+      - name: Path filter (engine-relevant vs other code)
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            engine_paths:
+              - 'discovery_fabric/**'
+              - 'toscanini/**'
+              - 'orchestrator/**'
+              - 'epistemic_integrity/**'
+              - 'premium_package_factory/**'
+              - 'mechanisms/**'
+              - 'quarantine/**'
+              - 'tests/**'
+              - '.github/workflows/**'
+              - 'EPISTEMIC_CONSTITUTION.md'
+              - 'requirements.txt'
+              - 'pyproject.toml'
+              - 'ENGINE_RELEASE_REGISTRY.json'
+              - 'Dockerfile'
+              - '.dockerignore'
+
   certify:
     name: Run 14-Gate Detached Certification
+    needs: classify
+    if: ${{ needs.classify.outputs.engine_paths == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -189,3 +254,68 @@ jobs:
           echo "python -m epistemic_integrity.post_scrub_certification_capsule" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "Compare the capsule_hash to: \`${{ steps.capsule.outputs.capsule_hash }}\`" >> $GITHUB_STEP_SUMMARY
+
+  # R399 W4 FAST tier: non-engine code-path pushes (scripts/, UI).
+  # The epistemic core still runs (the frozen benchmark + the
+  # release-gate suites + the secret scan); the 14-gate detached
+  # certification is reserved for engine-relevant paths — which is
+  # exactly what it certifies. A fast-check pass is NOT a
+  # certification claim (Art. XXVI: the check name says so).
+  fast-check:
+    name: Fast check (non-engine code path, R399 W4)
+    needs: classify
+    if: ${{ needs.classify.outputs.engine_paths == 'false' && github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+      - name: Secret scan (changed files)
+        run: |
+          python - <<'PY'
+          import re, subprocess
+          base = subprocess.run(['git','merge-base','HEAD','origin/main~1'],
+                                capture_output=True, text=True).stdout.strip() or 'HEAD~1'
+          diff = subprocess.run(['git','diff','--name-only', base, 'HEAD'],
+                                capture_output=True, text=True).stdout
+          patterns = {
+              'github_pat': r'gh[pousr]_[A-Za-z0-9]{20,}',
+              'nvidia': r'nvapi-[A-Za-z0-9]{20,}',
+              'openrouter': r'sk-or-[A-Za-z0-9-]{20,}',
+              'aws': r'AKIA[0-9A-Z]{16}',
+              'bearer': r'Bearer\s+[A-Za-z0-9._-]{24,}',
+          }
+          hits = []
+          for f in diff.splitlines():
+              try:
+                  text = open(f, errors='replace').read()
+              except OSError:
+                  continue
+              for name, pat in patterns.items():
+                  if re.search(pat, text):
+                      hits.append(f'{f}: {name}')
+          if hits:
+              print('SECRET SCAN FAIL:'); [print(' ', h) for h in hits]
+              raise SystemExit(1)
+          print('secret scan: CLEAN')
+          PY
+      - name: Frozen benchmark + release-gate suites (the epistemic core)
+        run: |
+          python -m pytest tests/test_r394_benchmark.py tests/test_r396_release_gate.py \
+            tests/test_r397_physics_stage.py tests/test_r399_gates.py \
+            tests/test_r399_routing_states.py -q
+      - name: Tier summary
+        if: always()
+        run: |
+          echo "## R399 W4 FAST tier" >> $GITHUB_STEP_SUMMARY
+          echo "Non-engine code path: secret scan + epistemic core suites." >> $GITHUB_STEP_SUMMARY
+          echo "This is a fast check, NOT a detached certification (Art. XXVI)." >> $GITHUB_STEP_SUMMARY

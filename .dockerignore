@@ -1,4 +1,4 @@
-# Keep the engine image lean and secret-free (R391).
+# Keep the engine image lean and secret-free (R391; R399 W1).
 # The webapp builds separately on Vercel; .env.keys must NEVER enter
 # an image (Render env vars are the hosted credential path).
 TOSCANINI_UI/webapp/node_modules
@@ -10,3 +10,65 @@ TOSCANINI_UI/previews
 .pytest_cache
 TOSCANINI_UI/webapp/out
 TOSCANINI_UI/webapp-export
+
+# ---------------------------------------------------------------------------
+# R399 W1: the production image carries ONLY what the runtime imports and
+# serves. Measured archaeology (du, verified zero runtime imports per dir):
+#   ENGINE_RUNS/            88 MB — runtime WRITES (recreated on demand);
+#                           tracked archaeology lives in git history + the
+#                           runtime-state branch, never in the image
+#   experiments/            25 MB — CI/test instrumentation corpora
+#   tournament_v3/          15 MB — CI regression corpora (V3 replay AIC)
+#   artifacts/benchmark/    14 MB — benchmark instrumentation records
+#   ENGINE_RUNS_ARCHIVE_R376_BEFORE/ 13 MB — archive of an archive
+#   external_corpora/       6.2 MB — offline snapshot script inputs
+#   discovery_campaigns/    (archived subdirs only; the runtime seed
+#                           campaign TOSCANINI_6DOMAIN_* is KEPT below)
+#   CEREVASC_*              ~10 MB — superseded invention snapshots
+#                           (git history preserves every version)
+#   R3xx dirs               ~10 MB — round-era records
+#   TTP_PACKAGES/           2.1 MB — superseded TTP skeletons
+#   EXTERNAL_CONSULTANT_EVIDENCE/ 3.4 MB, RELEASE_CHAIN/, canonical_data/,
+#   elite_v3/, scripts_v25_t6v2/, scripts_v6_v4_v3_2l/, engine/ (W6 archive)
+#
+# Tests, CI workflows and docs do not run inside the container.
+# Runtime-KEPT (verified live references): toscanini/, discovery_fabric/,
+# orchestrator/, epistemic_integrity/, premium_package_factory/,
+# scripts/, TOSCANINI/, inventions/, MECHANISM_CEMETERY/,
+# external_evidence/, patent_sources/, MULTI_SOURCE_DISCOVERY/,
+# discovery_campaigns/TOSCANINI_6DOMAIN_2026-08-30 (the public demo
+# seed), artifacts/source_health (runtime read/write), quarantine/,
+# mechanisms/, requirements.txt, DEPLOYMENT_CONFIG.json.
+# ---------------------------------------------------------------------------
+ENGINE_RUNS
+experiments
+tournament_v3
+artifacts/benchmark
+ENGINE_RUNS_ARCHIVE_R376_BEFORE
+external_corpora
+canonical_data
+TTP_PACKAGES
+EXTERNAL_CONSULTANT_EVIDENCE
+RELEASE_CHAIN
+CEREVASC_*
+elite_v3
+scripts_v25_t6v2
+scripts_v6_v4_v3_2l
+engine
+R3[0-9][0-9][0-9]*
+BENCHMARK_ENGINEERING_DOSSIERS
+discovery_campaigns/CAMPAIGN_L8_2026-08-29
+discovery_campaigns/M1_DOSSIER_CAMPAIGN_2026-08-29
+discovery_campaigns/R375_NEW_INVENTION_CAMPAIGN_2026-08-30
+tests
+.github
+*.md
+worklog.md
+ARTIFACT_IDENTITY.json
+ARTIFACT_IDENTITY.sha256
+ENGINE_COMMIT.txt
+*.log
+# NOTE: .git is deliberately NOT ignored — the Dockerfile's identity
+# bake falls back to the build context's git HEAD when no
+# RENDER_GIT_COMMIT build-arg is supplied (R396 A.3 priority 2; the
+# fallback source must reach the build).

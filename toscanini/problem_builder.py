@@ -318,7 +318,31 @@ def build_problem(text: str, on_event=None) -> Dict[str, Any]:
           f"Live evidence retrieval — domain family '{domain}'"})
     results = []
     routing_notes = []
+    from discovery_fabric.source_registry.registry import routing_info  # R399 W3
     for name, role, cls in _families()[domain]:
+        # R399 W3: the registry routing state gates the ACTIVE routing
+        # graph. ARCHIVED_ROUTING (NHTSA, COD) and SUSPENDED_RELEVANCE
+        # (OSTI) sources are NOT queried — the skip is recorded with
+        # the state, basis and reinstatement criterion (never a silent
+        # code path, never absence — Art. XXI.3/XXV). This is the
+        # synthesis-feeding retrieval path, which is exactly what the
+        # OSTI SUSPENDED_RELEVANCE state suspends.
+        _routing = routing_info(name)
+        if _routing["routing_state"] != "ACTIVE":
+            routing_notes.append(
+                f"{name}: routing state {_routing['routing_state']} — "
+                f"{_routing['routing_basis']}; reinstatement: "
+                f"{_routing['reinstatement_criterion']}")
+            results.append({
+                "source": name, "role": role,
+                "status": f"NOT_QUERIED_{_routing['routing_state']}",
+                "count": 0, "records": [], "relevant": 0,
+                "routing": _routing,
+                "error": (f"engine routing decision (R399 W3): "
+                          f"{_routing['routing_state']} — not a provider "
+                          f"failure and not absence"),
+            })
+            continue
         # Grammar-aware routing (CEO source-routing directive 2026-08-31):
         # the automotive family's NHTSA connectors answer ONLY
         # make|model|year questions. Without an extracted vehicle, asking
@@ -405,6 +429,10 @@ def build_problem(text: str, on_event=None) -> Dict[str, Any]:
             {"source": r["source"], "role": r["role"], "status": r["status"],
              "count": r["count"], "relevant": r.get("relevant"),
              "error": r["error"],
+             # R399 W3: the routing-state record travels with the row
+             # (state + basis + reinstatement criterion — the skip is
+             # auditable, never silent)
+             "routing": r.get("routing"),
              "epistemic_class": "EXTERNAL_EVIDENCE",
              "records": [
                  {"title": (rec.get("title")

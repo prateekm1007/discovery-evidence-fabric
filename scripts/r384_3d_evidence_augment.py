@@ -104,11 +104,23 @@ STL_TOL_LADDER = ((0.02, 0.1), (0.05, 0.3), (0.08, 0.5), (0.15, 0.8))
 
 
 def export_cut_solid(cut, ev: Path, pid: str, oid: str, plane: str,
-                     suffix: str = "") -> dict:
+                     suffix: str = "",
+                     dedup_index: dict | None = None) -> dict:
     """STEP always attempted (compact B-rep reference), STL adaptively
     tessellated to stay inside the deliverable budget; size caps are
     recorded honestly (never silently shipped oversized or silently
-    dropped - every omission carries its measured reason)."""
+    dropped - every omission carries its measured reason).
+
+    R399 W5 (byte-dedup, FUTURE packages only — the pinned portfolio is
+    an Art. XXXIX authority boundary and is never touched): when the
+    exported STL bytes are identical to a mesh the package ALREADY
+    carries (the shipped MODEL/*.stl, or an earlier section export),
+    the duplicate file is NOT shipped — the manifest records a
+    reference {canonical, sha256, reason} instead. The canonical mesh
+    IS the section evidence (byte-identical = same geometry = same
+    render); measured basis: 14 redundant STL copies across the frozen
+    portfolio (e.g. a flat plate whose section plane does not intersect
+    it re-exported the whole shipped mesh)."""
     info = {"object_id": oid}
     stp = ev / f"{pid}_{oid}_section_{plane}{suffix}_solid.step"
     cut.exportStep(str(stp))
@@ -160,6 +172,28 @@ def export_cut_solid(cut, ev: Path, pid: str, oid: str, plane: str,
         chosen["trimesh_watertight"] = bool(m.is_watertight)
     except Exception as exc:  # noqa: BLE001
         chosen["trimesh_check_error"] = f"{type(exc).__name__}: {exc}"
+    # R399 W5: byte-dedup — identical mesh already in the package? ship
+    # a reference, not a duplicate copy
+    if dedup_index is not None:
+        mesh_sha = sha256_file(stl)
+        canonical = dedup_index.get(mesh_sha)
+        if canonical is not None:
+            stl.unlink()
+            info["stl"] = None
+            info["stl_reference"] = {
+                "canonical": canonical[0],
+                "sha256": mesh_sha,
+                "render_path": canonical[1],
+                "reason": ("byte-identical to a mesh the package already "
+                           "carries — the canonical file IS the section "
+                           "evidence (R399 W5 dedup; future packages "
+                           "only, the pinned portfolio is frozen)"),
+            }
+            info["stl_export"] = chosen
+            return info
+        dedup_index[mesh_sha] = (
+            f"MODEL/3D_EVIDENCE/{pid}_{oid}_section_{plane}{suffix}"
+            "_solid.stl", str(stl))
     info["stl"] = (f"MODEL/3D_EVIDENCE/"
                    f"{pid}_{oid}_section_{plane}{suffix}_solid.stl")
     info["stl_export"] = chosen
@@ -406,6 +440,20 @@ def augment_package(tier: str, folder: str) -> dict:
     uncut_volume = compound.Volume()
     sec_info = {}
     section_stls = {"longitudinal": [], "transverse": []}
+    # R399 W5: the package-wide byte-dedup index — sha256(mesh bytes) ->
+    # (manifest relpath, render path), seeded with the SHIPPED model
+    # meshes so a section export that reproduces a shipped mesh exactly
+    # references it instead of shipping a second copy. Future packages
+    # only; the pinned portfolio is never re-generated (Art. XXXIX).
+    dedup_index: dict = {}
+    for _oid, _path in object_stl_paths(model_dir, pid, manifest).items():
+        try:
+            p = Path(_path)
+            if p.exists():
+                dedup_index[sha256_file(p)] = (
+                    f"MODEL/{p.name}", str(p))
+        except Exception:  # noqa: BLE001 — best-effort seed
+            pass
     for plane in ("longitudinal", "transverse"):
         cuts, desc, cut_errors = per_object_cuts(shapes, plane, bbox)
         entry = {"plane": desc,
@@ -416,15 +464,25 @@ def augment_package(tier: str, folder: str) -> dict:
                  "objects": {},
                  "cut_errors": cut_errors}
         for oid, cut in cuts.items():
-            entry["objects"][oid] = export_cut_solid(cut, ev, pid, oid, plane)
+            entry["objects"][oid] = export_cut_solid(
+                cut, ev, pid, oid, plane, dedup_index=dedup_index)
             entry["objects"][oid]["cut_volume_mm3"] = round(cut.Volume(), 6)
             stl_name = f"{pid}_{oid}_section_{plane}_solid.stl"
+            _ref = entry["objects"][oid].get("stl_reference")
             if (ev / stl_name).exists():
                 section_stls[plane].append(str(ev / stl_name))
+            elif _ref:
+                # R399 W5: the render uses the CANONICAL mesh (same bytes
+                # = same geometry = same image); the manifest carries the
+                # reference instead of a duplicate file
+                section_stls[plane].append(_ref["render_path"])
             if entry["objects"][oid].get("step"):
                 created.append(f"{pid}_{oid}_section_{plane}_solid.step")
             if entry["objects"][oid].get("stl"):
                 created.append(f"{pid}_{oid}_section_{plane}_solid.stl")
+            elif _ref:
+                created.append(f"{pid}_{oid}_section_{plane}_solid.stl"
+                               " (REFERENCE: " + _ref["canonical"] + ")")
             else:
                 # mesh-level half-shell fallback (object whose B-rep/mesh
                 # cut exceeded the size budget): slice the SHIPPED STL at
@@ -514,16 +572,27 @@ def augment_package(tier: str, folder: str) -> dict:
                     entry["objects"][oid] = {"status": "EMPTY_CUT"}
                     continue
                 entry["objects"][oid] = export_cut_solid(
-                    coupon, ev, pid, oid, "transverse", suffix="_coupon")
+                    coupon, ev, pid, oid, "transverse", suffix="_coupon",
+                    dedup_index=dedup_index)
                 stl_name = f"{pid}_{oid}_section_transverse_coupon_solid.stl"
+                _cref = entry["objects"][oid].get("stl_reference")
                 if (ev / stl_name).exists():
                     coupon_stls.append(str(ev / stl_name))
+                elif _cref:
+                    # R399 W5: byte-identical coupon -> reference the
+                    # canonical mesh (measured in the frozen portfolio:
+                    # the P-24/P-29 coupon equaled the transverse solid)
+                    coupon_stls.append(_cref["render_path"])
                 if entry["objects"][oid].get("step"):
                     created.append(
                         f"{pid}_{oid}_section_transverse_coupon_solid.step")
                 if entry["objects"][oid].get("stl"):
                     created.append(
                         f"{pid}_{oid}_section_transverse_coupon_solid.stl")
+                elif _cref:
+                    created.append(
+                        f"{pid}_{oid}_section_transverse_coupon_solid.stl"
+                        " (REFERENCE: " + _cref["canonical"] + ")")
             except Exception as exc:  # noqa: BLE001
                 entry["objects"][oid] = {"status": "FAILED",
                                          "error": f"{type(exc).__name__}: {exc}"}

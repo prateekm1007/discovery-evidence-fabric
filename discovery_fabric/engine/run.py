@@ -27,6 +27,7 @@ from typing import Any, Dict, List, Optional
 from .candidate import Candidate, StageFailure, canonical_json, sha256_obj, utc_now
 from . import adapters as _adapters
 from .adapters import ADAPTERS, STAGE_ORDER
+from . import stage_entry  # R399 W2: the one shared entry-justification helper
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 # Stages whose failure is FATAL to the run (nothing downstream is meaningful)
@@ -104,6 +105,11 @@ class EngineRun:
         self.package_report: Optional[Dict[str, Any]] = None
         self.release: Optional[Dict[str, Any]] = None
         self.package_failure: Optional[str] = None
+        # R399 W2.5: stages skipped by the blocker cascade — a skipped
+        # stage blocks its own downstream set exactly like a failed one
+        # (the audit's measured defect: OK-on-empty-input downstream
+        # stages after an upstream skip)
+        self._skipped_stages: set = set()
 
     @classmethod
     def from_run_dir(cls, run_dir: str, **overrides) -> "EngineRun":
@@ -163,6 +169,14 @@ class EngineRun:
                     e["stage"] for e in self.env.stage_log
                     if e.get("status") in ("OK", "DISABLED_BY_CONFIG",
                                            "SKIPPED_UPSTREAM_FAILURE")}
+                # R399 W2.5 (resume path): previously-skipped stages keep
+                # cascading after a restart — a stage skipped before the
+                # crash must not let its downstream stages execute OK on
+                # the empty envelope after resume (the same measured
+                # defect, restart flavor)
+                self._skipped_stages |= {
+                    e["stage"] for e in self.env.stage_log
+                    if e.get("status") == "SKIPPED_UPSTREAM_FAILURE"}
 
         for stage in STAGE_ORDER:
             if stage in self.disabled:
@@ -178,21 +192,42 @@ class EngineRun:
                 continue
             skipped = self._blocked_by(stage)
             if skipped:
+                # R399 W2.5 skip cascade: a skipped stage is registered so
+                # everything downstream of IT is also skipped (a stage
+                # that never ran is as dead as one that failed — the
+                # audit measured COLLISION..RANK executing OK on empty
+                # inputs after an upstream RETRIEVE failure had already
+                # skipped SYNTHESIZE/VERIFY). The entry carries the
+                # shared entry-justification block (R399: every stage
+                # answers WHY it consumed compute — or honestly didn't).
+                self._skipped_stages.add(stage)
                 self.env.stage_log.append({
                     "stage": stage, "capability_id": ADAPTERS[stage].capability_id,
                     "status": "SKIPPED_UPSTREAM_FAILURE",
                     "upstream_failure": skipped, "candidate_delta": [],
                     "delta_real": False, "started_at": utc_now(),
-                    "finished_at": utc_now()})
+                    "finished_at": utc_now(),
+                    "entry": stage_entry.justify(
+                        stage, self.env, self.failed_stages,
+                        self._skipped_stages)})
                 self._persist_envelope(stage)
                 continue
 
             adapter = ADAPTERS[stage]
+            # R399 entry justification, stamped BEFORE execution: the
+            # stamp is computed from the same state the conductor's own
+            # decision used (failed/skipped sets + the envelope) — the
+            # helper records, the conductor decides (one shared helper,
+            # no new governance subsystem).
+            _entry_block = stage_entry.justify(
+                stage, self.env, self.failed_stages,
+                self._skipped_stages)
             try:
                 entry = self.env.run_stage(
                     stage, adapter.capability_id, adapter.module_path,
                     adapter.canonical_fn, adapter.execute, self.env,
                     {"run_id": self.run_id, "problem_id": self.problem_id})
+                entry["entry"] = _entry_block
                 self._persist(f"stage_{stage}.json", entry.get("result_meta", {}))
                 # R394 s6: conductor-level premise fatality. The stage is
                 # a deterministic instrument that ALWAYS executes; the
@@ -212,6 +247,12 @@ class EngineRun:
                                    "verdict": verdict})
             except StageFailure as sf:
                 self.failed_stages[stage] = sf.error
+                # R399: the failed stage's entry also carries its entry
+                # justification (it WAS allowed to consume compute — the
+                # record says why)
+                if self.env.stage_log and \
+                        self.env.stage_log[-1].get("stage") == stage:
+                    self.env.stage_log[-1]["entry"] = _entry_block
                 self._persist(f"stage_{stage}_FAILURE.json",
                               {"stage": stage, "error": sf.error})
             self._persist_envelope(stage)
@@ -364,23 +405,47 @@ class EngineRun:
                 })
 
             # ---------- E15-E: multi-model ensemble (honest, non-fatal) --
+            # R399 W2.3: expensive candidate generation requires >= 1
+            # VERIFIED_EVIDENCE_ITEM (directive: "EVIDENCE VERIFICATION
+            # FAILURE: Do not execute the diversity grid" — the same
+            # gate applies to the ensemble, the other expensive
+            # candidate generator). The shared entry-justification helper
+            # stamps the decision; zero verified items -> SKIPPED with
+            # the measured counts (never a silent code path).
             ensemble = None
-            try:
-                from .ensemble import ensemble_synthesize
-                if self.env.evidence:
-                    ensemble = ensemble_synthesize(self.problem,
-                                                   self.env.evidence)
-                else:
-                    ensemble = {
-                        "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
-                        "status": "NO_EVIDENCE",
-                        "note": "no custodied evidence on the envelope; "
-                                "no ensemble ran and no disagreement was "
-                                "fabricated (Art. XXV)"}
-            except Exception as exc:  # noqa: BLE001 — recorded, non-fatal
-                ensemble = {"ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
-                            "status": "ENSEMBLE_ERROR",
-                            "error": f"{type(exc).__name__}: {exc}"}
+            _ens_entry = stage_entry.justify(
+                "ENSEMBLE", self.env, self.failed_stages,
+                self._skipped_stages)
+            if _ens_entry["entry_status"] == "SKIPPED":
+                ensemble = {
+                    "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+                    "status": "SKIPPED_EVIDENCE_VERIFICATION_FAILED",
+                    "entry": _ens_entry,
+                    "note": ("zero verified evidence items on the "
+                             "envelope — ensemble candidates would be "
+                             "generated from unverified evidence "
+                             "(R399 W2.3); nothing was fabricated "
+                             "(Art. XXV)"),
+                }
+            else:
+                try:
+                    from .ensemble import ensemble_synthesize
+                    if self.env.evidence:
+                        ensemble = ensemble_synthesize(self.problem,
+                                                       self.env.evidence)
+                    else:
+                        ensemble = {
+                            "ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+                            "status": "NO_EVIDENCE",
+                            "entry": _ens_entry,
+                            "note": "no custodied evidence on the envelope; "
+                                    "no ensemble ran and no disagreement was "
+                                    "fabricated (Art. XXV)"}
+                except Exception as exc:  # noqa: BLE001 — recorded, non-fatal
+                    ensemble = {"ensemble": "MULTI_MODEL_DISAGREEMENT (E15-E)",
+                                "status": "ENSEMBLE_ERROR",
+                                "entry": _ens_entry,
+                                "error": f"{type(exc).__name__}: {exc}"}
             self._persist("ENSEMBLE_DISAGREEMENT.json", ensemble)
             if ensemble.get("disagreements"):
                 spec = dict(spec,
@@ -503,50 +568,74 @@ class EngineRun:
                                "Re-run the loop when transport recovers."),
                 })
             if not self._naive_survivor and not adjudication_blocked:
-                try:
-                    from .candidate_diversity import (generate_diverse_candidates,
-                                                      measure_diversity)
-                    grid_result = generate_diverse_candidates(
-                        self.problem, self.env.evidence or [])
-                    self._persist("EXPLORATION_GRID.json", grid_result)
-                    for c in grid_result.get("candidates", []):
-                        f = c.get("fields") or {}
-                        if not f.get("intervention"):
-                            continue
-                        grid_cand = {
-                            "candidate_id": c["candidate_id"],
-                            "mechanism": f.get("mechanism", ""),
-                            "intervention": f.get("intervention", ""),
-                            "expected_effect": f.get("expected_effect", ""),
-                            "falsification_test":
-                                f.get("falsification_test", ""),
-                            "mechanism_source_span":
-                                f.get("mechanism_source_span", ""),
-                            "span_derivation": f.get("span_derivation"),
-                            "source_evidence": {
-                                "source_id": ((self.env.evidence or [{}])[0]
-                                              .get("id", "")),
-                                "source_hash": ((self.env.evidence or [{}])[0]
-                                                .get("content_hash", ""))},
-                            "exploration_angle": c.get("angle"),
-                            "exploration_provider": c.get("provider_id")}
-                        pool.append({
-                            "key": f"grid-{c.get('angle')}",
-                            "candidate_id": c["candidate_id"],
-                            "env_view": _env_with_candidate(grid_cand),
-                            "spec": None,
-                            "origin": f"EXPLORATION_GRID_{c.get('angle')}"
-                                      f"({c.get('provider_id')})",
-                            "span_underived": bool(
-                                (f.get("span_derivation") or {})
-                                .get("underived"))})
-                except Exception as exc:  # noqa: BLE001 — recorded, honest
-                    import traceback as _tb
+                # R399 W2.3 (the directive's exact gate): the diversity
+                # grid is expensive candidate generation — it requires
+                # >= 1 VERIFIED_EVIDENCE_ITEM. A run that died of
+                # evidence-verification failure must not pay for 4+ LLM
+                # candidates that can never be discovery-verified on the
+                # same unverified evidence (audit measurement: >=4
+                # cand:DIV:* candidates on an evidence-dead run). The
+                # shared helper stamps the decision with the measured
+                # counts — a skip is a recorded refusal, never absence.
+                _grid_entry = stage_entry.justify(
+                    "EXPLORATION_GRID", self.env, self.failed_stages,
+                    self._skipped_stages)
+                if _grid_entry["entry_status"] == "SKIPPED":
                     self._persist("EXPLORATION_GRID.json", {
-                        "status": "GRID_ERROR",
-                        "error": f"{type(exc).__name__}: {exc}",
-                        "traceback": _tb.format_exc()[-2000:]})
-                    grid_result = None
+                        "status": "SKIPPED_EVIDENCE_VERIFICATION_FAILED",
+                        "entry": _grid_entry,
+                        "reason": (_grid_entry.get("skip_reason")
+                                   + "; the naive candidate stays dead "
+                                     "(its own verification failed); no "
+                                     "grid candidates were generated on "
+                                     "unverified evidence (R399 W2.3)"),
+                    })
+                else:
+                    try:
+                        from .candidate_diversity import (generate_diverse_candidates,
+                                                          measure_diversity)
+                        grid_result = generate_diverse_candidates(
+                            self.problem, self.env.evidence or [])
+                        grid_result["entry"] = _grid_entry
+                        self._persist("EXPLORATION_GRID.json", grid_result)
+                        for c in grid_result.get("candidates", []):
+                            f = c.get("fields") or {}
+                            if not f.get("intervention"):
+                                continue
+                            grid_cand = {
+                                "candidate_id": c["candidate_id"],
+                                "mechanism": f.get("mechanism", ""),
+                                "intervention": f.get("intervention", ""),
+                                "expected_effect": f.get("expected_effect", ""),
+                                "falsification_test":
+                                    f.get("falsification_test", ""),
+                                "mechanism_source_span":
+                                    f.get("mechanism_source_span", ""),
+                                "span_derivation": f.get("span_derivation"),
+                                "source_evidence": {
+                                    "source_id": ((self.env.evidence or [{}])[0]
+                                                  .get("id", "")),
+                                    "source_hash": ((self.env.evidence or [{}])[0]
+                                                    .get("content_hash", ""))},
+                                "exploration_angle": c.get("angle"),
+                                "exploration_provider": c.get("provider_id")}
+                            pool.append({
+                                "key": f"grid-{c.get('angle')}",
+                                "candidate_id": c["candidate_id"],
+                                "env_view": _env_with_candidate(grid_cand),
+                                "spec": None,
+                                "origin": f"EXPLORATION_GRID_{c.get('angle')}"
+                                          f"({c.get('provider_id')})",
+                                "span_underived": bool(
+                                    (f.get("span_derivation") or {})
+                                    .get("underived"))})
+                    except Exception as exc:  # noqa: BLE001 — recorded, honest
+                        import traceback as _tb
+                        self._persist("EXPLORATION_GRID.json", {
+                            "status": "GRID_ERROR",
+                            "error": f"{type(exc).__name__}: {exc}",
+                            "traceback": _tb.format_exc()[-2000:]})
+                        grid_result = None
 
             # ---------- E15-F/E15-G: attack all, repair viable ------------
             evaluated: List[Dict[str, Any]] = []
@@ -807,6 +896,48 @@ class EngineRun:
                         "ledger": "TECHNICAL_IMPROVEMENT_LEDGER.json",
                     })
                     return
+
+            # ---------- R399 W2.1: SCIENTIFIC REJECTION -> NO DOSSIER -----
+            # Directive: "SCIENTIFICALLY REJECTED RUN: Do not generate
+            # expensive buyer dossier/PDF/ZIP artifacts." A run whose
+            # discovery loop classified the candidate REJECTED (a
+            # scientific verdict) stops HERE: everything up to selection
+            # and the improvement passes is the epistemic record and is
+            # already on disk; the expensive CAD pass, package-number
+            # allocation, PDF/ZIP/rendering and quality-gate compute are
+            # reserved for runs whose candidate is not scientifically
+            # dead. The skip is a RECORDED refusal with the measured
+            # basis (never a silent code path, never absence), and the
+            # release record still carries the honest non-RELEASED
+            # status + reason (Directive 2 below, unchanged).
+            # Operational failures (adjudication_blocked / transport)
+            # do NOT hit this gate — their state stays resumable and
+            # their pipeline already skips earlier (W2.2 gates above).
+            _final_status = (self.env.epistemic_state or {}).get(
+                "final_status", "")
+            if _final_status == "REJECTED":
+                self.package_failure = (
+                    "R399 W2.1: scientifically rejected run — no buyer "
+                    "dossier/PDF/ZIP artifacts generated (the run's "
+                    "epistemic record up to selection is complete and "
+                    "honest; the expensive packaging compute is reserved "
+                    "for non-rejected candidates)")
+                self._persist("PACKAGE_SKIPPED_SCIENTIFICALLY_REJECTED.json", {
+                    "stage": "PACKAGE_GENERATION",
+                    "entry_status": "SKIPPED",
+                    "prerequisite": "CANDIDATE_NOT_SCIENTIFICALLY_REJECTED",
+                    "skip_reason": self.package_failure,
+                    "prerequisite_evidence": {
+                        "final_status": _final_status,
+                        "selected_candidate": selection.get("selected"),
+                        "n_ranked": len(selection.get("ranked", [])),
+                        "note": ("the E16-H release gate would hold any "
+                                 "grid-candidate dossier for human review "
+                                 "at best — a rejected run's dossier has "
+                                 "no release path, so the compute buys "
+                                 "nothing (R399 audit W2.1)")},
+                })
+                return
 
             # ---------- R380: 3D ENGINEERING DESIGN PIPELINE pass -------
             # CEO 2026-08-31 (R380): TECHNICAL STATE -> PARAMETER MAP ->
@@ -1235,6 +1366,15 @@ class EngineRun:
         for failed, blocked in DOWNSTREAM_BLOCKERS.items():
             if stage in blocked and failed in self.failed_stages:
                 return f"{failed}: {self.failed_stages[failed][:160]}"
+        # R399 W2.5 skip cascade: a stage skipped upstream is as dead as
+        # one that failed — everything downstream records
+        # SKIPPED_UPSTREAM_FAILURE instead of executing OK on empty
+        # inputs (measured defect: the audit's two runs)
+        for skipped_stage in sorted(self._skipped_stages):
+            blocked = DOWNSTREAM_BLOCKERS.get(skipped_stage, set())
+            if stage in blocked:
+                return (f"{skipped_stage}: SKIPPED_UPSTREAM_FAILURE "
+                        f"(R399 cascade — the stage never executed)")
         return None
 
     def _final_state(self) -> Dict[str, Any]:

@@ -1,0 +1,115 @@
+# Epistemic Lightweight Check — R399 W4 LIGHTWEIGHT tier
+#
+# Fires on pushes whose changed files include markdown/worklog/R-round
+# records. When EVERY changed file is docs/evidence, the full
+# certification workflow is skipped by its paths-ignore (a 14-gate
+# detached certification of a markdown edit guards nothing — R399 W4);
+# this workflow provides the always-appropriate checks instead:
+#
+#   1. SECRET SCAN — a pasted key into a worklog/record is the real
+#      docs-only risk (history: PAT + provider keys leaked into tracked
+#      files; secret discipline applies to prose exactly as to code).
+#   2. CONSTITUTION PRESENCE — the constitutional contract that CI
+#      verifies the constitution file is present and versioned.
+#   3. REGISTRY JSON VALIDITY — the machine-readable records
+#      (ENGINE_RELEASE_REGISTRY.json, DEPLOYMENT_CONFIG.json,
+#      PACKAGE_ID_REGISTRY.json, ARCHIVE_MANIFEST.json) parse.
+#
+# This is a check, NOT a certification (Art. XXVI). Certification
+# (FULL) runs on engine-relevant paths; RELEASE runs on dispatch.
+
+name: Epistemic Lightweight Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "worklog.md"
+      - "**.md"
+      - "R3[0-9][0-9]/**"
+      - "ARCHIVE_MANIFEST.json"
+
+permissions:
+  contents: read
+
+jobs:
+  lightweight:
+    name: Docs-only push checks (R399 W4 LIGHTWEIGHT)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Changed files are docs-only (guard the tier itself)
+        run: |
+          FILES=$(git diff --name-only HEAD~1 HEAD || true)
+          echo "$FILES"
+          CODE=$(echo "$FILES" | grep -vE '\.(md|json)$|^R3[0-9]{3}/' || true)
+          if [ -n "$CODE" ]; then
+            echo "This push carries code files — the FULL certification"
+            echo "workflow should have run (it triggers on any code path)."
+            echo "Offending files: $CODE"
+            exit 1
+          fi
+
+      - name: Secret scan over the diff
+        run: |
+          python - <<'PY'
+          import re, subprocess
+          diff = subprocess.run(['git','diff','HEAD~1','HEAD'],
+                                capture_output=True, text=True).stdout
+          patterns = {
+              'github_pat': r'gh[pousr]_[A-Za-z0-9]{20,}',
+              'github_classic': r'github_pat_[A-Za-z0-9_]{20,}',
+              'nvidia': r'nvapi-[A-Za-z0-9]{20,}',
+              'openrouter': r'sk-or-[A-Za-z0-9-]{20,}',
+              'patsnap': r'(?i)patsnap.{0,40}(?:key|token)\s*[:=]\s*[A-Za-z0-9]{16,}',
+              'lens': r'(?i)lens.{0,40}(?:key|token)\s*[:=]\s*[A-Za-z0-9]{16,}',
+              'elsevier': r'(?i)elsevier.{0,40}(?:key|token)\s*[:=]\s*[A-Za-z0-9]{16,}',
+              'aws': r'AKIA[0-9A-Z]{16}',
+              'bearer': r'Bearer\s+[A-Za-z0-9._-]{24,}',
+          }
+          hits = []
+          for line in diff.splitlines():
+              if not line.startswith('+'):
+                  continue
+              for name, pat in patterns.items():
+                  if re.search(pat, line):
+                      hits.append((name, line[:120]))
+          if hits:
+              print('SECRET SCAN FAIL:')
+              for h in hits[:10]:
+                  print(' ', h)
+              raise SystemExit(1)
+          print('secret scan over the docs diff: CLEAN')
+          PY
+
+      - name: Constitution present and versioned
+        run: |
+          test -f EPISTEMIC_CONSTITUTION.md
+          grep -q "Version:" EPISTEMIC_CONSTITUTION.md
+          echo "constitution present and versioned"
+
+      - name: Machine registries parse
+        run: |
+          python - <<'PY'
+          import json
+          for p in ("ENGINE_RELEASE_REGISTRY.json", "DEPLOYMENT_CONFIG.json",
+                    "PACKAGE_ID_REGISTRY.json", "ARCHIVE_MANIFEST.json"):
+              try:
+                  json.load(open(p))
+                  print(f"{p}: valid JSON")
+              except FileNotFoundError:
+                  print(f"{p}: absent (allowed — record not yet created)")
+              except json.JSONDecodeError as e:
+                  raise SystemExit(f"{p}: INVALID JSON — {e}")
+          PY
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## R399 W4 LIGHTWEIGHT tier" >> $GITHUB_STEP_SUMMARY
+          echo "Docs/evidence-only push: secret scan + constitution + registry validity." >> $GITHUB_STEP_SUMMARY
+          echo "Not a certification (Art. XXVI) — the full 14-gate detached certification runs on engine-relevant paths." >> $GITHUB_STEP_SUMMARY

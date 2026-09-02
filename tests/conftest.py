@@ -146,4 +146,12 @@ def _hermetic_collision_replay_ledger(tmp_path, monkeypatch):
     from discovery_fabric.prior_art_v2 import determinism as _det
     monkeypatch.setattr(_det, "LEDGER_PATH",
                         tmp_path / "collision_replay_ledger.jsonl")
+    # R399 W2.4: the same guard class for the quota breaker — hermetic
+    # tests must never trip or clear the production breaker state
+    # (patent_sources/quota_breaker.json), and must never inherit a
+    # tripped production state (a hermetic run would skip Lens for a
+    # reason that does not exist in the test).
+    from discovery_fabric.prior_art_v2 import quota_breaker as _qb
+    monkeypatch.setattr(_qb, "BREAKER_PATH",
+                        tmp_path / "quota_breaker.json")
     yield

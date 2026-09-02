@@ -222,6 +222,27 @@ def check_source(source_id: str, timeout: int = 30) -> Dict[str, Any]:
     """Run the 7-step chain for ONE source; return the measured result."""
     rec = SOURCE_REGISTRY[source_id]
 
+    # R399 W3: a non-ACTIVE routing state is reported WITHOUT probing
+    # the source (no HTTP, no quota burn for a parked source) — the
+    # state, basis and reinstatement criterion travel in the record;
+    # never a silent skip, never a BLOCKED (the provider is reachable —
+    # the ENGINE chose not to route to it).
+    if rec.get("routing_state") and rec["routing_state"] != "ACTIVE":
+        from discovery_fabric.source_registry.registry import routing_info
+        return {
+            "source_id": source_id,
+            "status": rec["routing_state"],
+            "probed": False,
+            "routing": routing_info(source_id),
+            "chain": None,
+            "error": None,
+            "derivation": DERIVATION,
+            "note": (f"routing state {rec['routing_state']} — source NOT "
+                     f"probed (R399 W3): the health of the provider is "
+                     f"not in question; the engine's routing decision is "
+                     f"the recorded fact"),
+        }
+
     # Metered sources: NO live probe — derived health (see policy above).
     if rec.get("metered_quota"):
         return _check_metered_source(source_id, rec["metered_quota"])
