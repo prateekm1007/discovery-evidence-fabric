@@ -1,0 +1,593 @@
+{
+ "invention_id": {
+  "value": "inv:ui_catheter_occlusion_385299:e650afd08ef0",
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "deterministic id inv:<problem_id>:<final envelope hash, first 12 chars>"
+ },
+ "problem": {
+  "value": {
+   "problem_id": "ui_catheter_occlusion_385299",
+   "device": "tunneled hemodialysis catheter",
+   "failure": "Documented problem 'catheter occlusion' concerning tunneled hemodialysis catheter. User-submitted engineering problem (session input): \"Why do tunneled hemodialysis catheters lose flow patency within weeks of insertion despite flushing protocols?\".  [fda_maude] 100 records retrieved live (1997-2032). Illustrative records: 'MAUDE report 100000: Injury [VITAL SIGNS]'; 'MAUDE report 10000032: Malfunction [PUMP MMT-1780KPK 670G PATHWAY BLACK MG]'. LIMITS STAMPED INLINE: voluntary/regulatory reports; counts are NOT incidence rates; causality UNVERIFIED (Art. XXI.5). [europepmc] 10 records retrieved live (2025-2026). Illustrative records: 'The Challenges of Vascular Implants: Regulatory Strategies and Biological Responses.'; 'Emerging Gel Technologies for Atherosclerosis Research and Intervention.'. LIMITS STAMPED INLINE: literature context establishes the problem class, not event rates. Problem-existence basis: live records retrieved.",
+   "failure_mode": "catheter occlusion",
+   "constraint": "maintain flow patency for weeks under standard flushing protocols"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:e40234b0"
+  ],
+  "note": "operator-supplied problem statement, custodied as the run's content-hashed problem.json artifact"
+ },
+ "user_need": {
+  "value": "reliable operation of tunneled hemodialysis catheter",
+  "epistemic_class": "ENGINEERING_PROPOSED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "derived from problem statement; not independently documented"
+ },
+ "mechanism": {
+  "value": {
+   "mechanism": "Antifouling surface coating that chemically resists adhesion of biological or material deposits, as evidenced by heparin coating’s anticoagulant effect.",
+   "intervention": "Incorporate a marine‑grade polymer anti‑biofouling coating (e.g., copper‑based or silicone‑based fouling‑release polymer) onto catheter surfaces to create a non‑thrombogenic interface.",
+   "expected_effect": "Similar reduction in thrombus adherence, extending catheter patency without reliance on heparin.",
+   "mechanism_source_span": "\"Heparin-coated TDCs were associated with significantly longer failure-free survival and lower complication rates compared with non-heparin-coated catheters.\"",
+   "span_derivation": {
+    "n_shared": 3,
+    "shared_terms": [
+     "catheter",
+     "heparin",
+     "non"
+    ],
+    "span_terms_n": 15,
+    "ratio": 0.2,
+    "underived": false,
+    "state": "MEASURED",
+    "basis": "shared content terms between span and mechanism+intervention; ratio < 0.20 = SPAN_UNDERIVED (the quoted span does not contain the mechanism's vocabulary)"
+   }
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:42195057"
+  ],
+  "note": "LLM-proposed transfer mechanism from custodied evidence; proposal, not fact (Art. XVIII); evidence_ids cite the custodied observation the proposal was synthesized from; span_derivation measures whether the quoted span actually contains the mechanism's vocabulary (R377 — SPAN_UNDERIVED is an honest state, never silently dropped)"
+ },
+ "causal_chain": {
+  "value": {
+   "source_observation": "Heparin-Coated Tunneled Hemodialysis Catheters Improve Failure-Free Survival in ESRD.",
+   "mechanism": "Antifouling surface coating that chemically resists adhesion of biological or material deposits, as evidenced by heparin coating’s anticoagulant effect.",
+   "intervention_site": "tunneled hemodialysis catheter",
+   "expected_effect": "Similar reduction in thrombus adherence, extending catheter patency without reliance on heparin.",
+   "falsification_test": "In‑vitro flow loop comparing standard catheters, heparin‑coated catheters, and catheters with marine anti‑fouling coating for clot formation over 14 days."
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:42195057"
+  ],
+  "note": "source -> mechanism -> intervention -> effect chain; links are proposals until physically observed"
+ },
+ "novelty_hypothesis": {
+  "value": {
+   "collision_novelty_risk": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "prior_art_status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "multi_source_directions": {}
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "novelty is a HYPOTHESIS bounded by searched sources; zero hits is not proof of novelty (Art. XXI.2)"
+ },
+ "prior_art": {
+  "value": {
+   "status": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "legacy_status": "",
+   "differentiation_resolution": {
+    "state": "UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "epistemic_class": "SEARCH_RESULT",
+    "constitutional_limitation": "a search-derived prior-art POSITION, not a novelty determination (Art. XXVIII); coverage measured by declared term-overlap thresholds, not a claim chart",
+    "evidence_tier_summary": "NO_FAMILIES",
+    "per_family": [],
+    "n_families": 0,
+    "n_search_errors": 10,
+    "thresholds": {
+     "CROSS_DOMAIN_MIN_NONGENERIC_OVERLAP": {
+      "value": 3,
+      "epistemic_class": "ENGINEERING",
+      "justification": "R377 patent-text ground truth (TOSCANINI/R377_PATENT_TEXT_FETCH.json + R377_PATENT_TEXT_GROUND_TRUTH.json): 12/30 family representatives (40%) were substantively irrelevant cross-domain term collisions (CWDM optical link for a battery-thermal candidate; dental-condition monitoring for rolling stock; bone fracture forceps for rail steel...). A hit sharing NO entity term with the candidate now needs >= 3 NON-generic mechanism terms to be mechanism art: the measured true cross-domain analog (line-pipe steel with hydrogen fracture toughness for a rail-steel candidate) shares 3 non-generic terms and survives; every measured false positive shares <= 2 and is demoted. This RAISES the cross-domain bar (was the same >= 2 as same-domain) — stricter, not weaker (Art. VII).",
+      "uncertainty": "term overlap remains a proxy; entity word-sense collisions ('gear': steering vs draft) can still pass — disclosed limitation, not a solved problem"
+     },
+     "MIN_MECHANISM_OVERLAP": {
+      "value": 2,
+      "epistemic_class": "ENGINEERING",
+      "justification": "same term-overlap rule family as the pipeline relevance adjudicator and the Q2 instrument (>= 2 shared content terms = domain-specific rather than accidental collision); NOT weakened relative to any prior gate",
+      "uncertainty": "term overlap is a proxy for mechanism identity"
+     },
+     "ANTICIPATION_COVERAGE_RATIO": {
+      "value": 0.8,
+      "epistemic_class": "ENGINEERING",
+      "justification": "a family ANTICIPATES only when nearly ALL elements of the candidate's FULL distinguishing set (uncapped — the claim elements, not the 6-term query core) appear in the family's claim/abstract text; 0.8 leaves a >= 20% element margin — anything lower would convert partial art into a kill (Art. XXVIII forbids). Measured adversarial case: a domain-only patent reached 0.857 against a capped denominator whose true differentiators (acoustic, multi-modal) had been ranked out",
+      "uncertainty": "claim coverage measured by term overlap, not a claim chart; recorded per family with evidence tier"
+     },
+     "MAX_QUERY_TERMS": {
+      "value": 6,
+      "epistemic_class": "ENGINEERING",
+      "justification": "provider-measured sweet spot for keyword patent queries (longer queries dilute ranking)"
+     },
+     "ABSTRACT_TIER_MIN_CHARS": {
+      "value": 80,
+      "epistemic_class": "ENGINEERING",
+      "justification": "below ~80 chars a snippet carries title echoes, not mechanism description; it cannot support an abstract-tier coverage decision"
+     }
+    }
+   },
+   "nearest": [],
+   "queries": [
+    {
+     "query_class": "ENTITY",
+     "query": "catheter catheters biological tunneled hemodialysis patency"
+    },
+    {
+     "query_class": "MECHANISM",
+     "query": "biological heparin antifouling surface coating chemically"
+    },
+    {
+     "query_class": "DISTINGUISHING",
+     "query": "catheter coating surfaces polymer biofouling silicone fouling"
+    },
+    {
+     "query_class": "FUNCTION",
+     "query": "catheter reduction adherence extending reliance biofouling"
+    },
+    {
+     "query_class": "ADJACENT",
+     "query": "catheter catheters biological tunneled hemodialysis heparin"
+    }
+   ],
+   "scientific": []
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "COLLISION",
+  "evidence_ids": [],
+  "note": "search RESULTS with source errors preserved as UNRESOLVED, never converted to absence (Art. XXV); FULL result list preserved (no truncation, Directive 6); resolution states are SEARCH_RESULT class positions, not novelty determinations (Art. XXVIII)"
+ },
+ "distinguishing_features": {
+  "value": {
+   "intervention": "Incorporate a marine‑grade polymer anti‑biofouling coating (e.g., copper‑based or silicone‑based fouling‑release polymer) onto catheter surfaces to create a non‑thrombogenic interface.",
+   "vs_nearest_prior_art": [],
+   "surviving_differentiators": null,
+   "note": "R376: nearest entries are mechanism-relevant family representatives with per-family coverage and evidence tier; differences below the term-overlap thresholds are recorded, not claim-charted (Art. XXVIII)"
+  },
+  "epistemic_class": "MODELLED",
+  "origin_stage": "SYNTHESIZE",
+  "evidence_ids": [
+   "europepmc:42195057"
+  ],
+  "note": "claim-level differentiation requires the inspection action recorded in next_best_action"
+ },
+ "constraints": {
+  "value": {
+   "stated_constraint": "maintain flow patency for weeks under standard flushing protocols",
+   "failure_mode_of_device": "catheter occlusion"
+  },
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "PROBLEM",
+  "evidence_ids": [
+   "problem:e40234b0"
+  ],
+  "note": "operator-stated constraints, custodied with the problem.json artifact"
+ },
+ "failure_modes": {
+  "value": [
+   {
+    "dimension": "unsupported_mechanism",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "weak_transfer",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "obvious_combination",
+    "attack_verdict": "KILLED",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "prior_art",
+    "attack_verdict": "SURVIVE (firewall: prior_art_state=UNRESOLVED_INSUFFICIENT_EVIDENCE is a non-kill state; adversarial PRIOR_ART=KILL is forbidden)",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "contradiction",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "boundary_failure",
+    "attack_verdict": "INSUFFICIENT_EVIDENCE (INSUFFICIENT_EVIDENCE)",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "engineering_infeasibility",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   },
+   {
+    "dimension": "regulatory_incompatibility",
+    "attack_verdict": "PASS",
+    "epistemic_class": "COMPUTED",
+    "origin_stage": "ATTACK"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "ATTACK",
+  "evidence_ids": [],
+  "note": "adversarial dimensions recorded by the attack engine"
+ },
+ "killer_experiment": {
+  "value": {
+   "selected": "falsification_test_from_candidate",
+   "eig": 0.44573539382492045,
+   "eig_per_cost": 0.44573539382492045,
+   "definition": "physical bench/clinical experiment — NOT simulation",
+   "hypotheses": [
+    {
+     "name": "H_effect_holds",
+     "description": "expected effect holds: Extended flow patency for weeks post‑insertion, with fewer occlusion events despite standard flushing protocols.",
+     "prior_probability": 0.6,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-02T21:41:59.411970+00:00"
+     }
+    },
+    {
+     "name": "H_effect_fails",
+     "description": "expected effect does not reproduce outside source context",
+     "prior_probability": 0.4,
+     "provenance": {
+      "source": "adjudication.evidence_verification + candidate text",
+      "epistemic_class": "MODEL_DERIVED",
+      "uncertainty": "priors/likelihoods derived from text analysis, not measurement",
+      "created_at": "2026-09-02T21:41:59.411970+00:00"
+     }
+    }
+   ],
+   "options_ranked": [
+    {
+     "name": "falsification_test_from_candidate",
+     "eig": 0.44573539382492045,
+     "eig_per_cost": 0.44573539382492045,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    },
+    {
+     "name": "contradiction_attacking_experiment",
+     "eig": 0.34249274537077934,
+     "eig_per_cost": 0.1712463726853897,
+     "minimum_epistemic_class": "EIGEpistemicClass.MODEL_DERIVED",
+     "can_influence_real_experiment": true
+    }
+   ],
+   "epistemic_note": "all priors MODEL_DERIVED; no EXPERIMENTALLY_ESTIMATED inputs exist at this stage (Art. XXVIII/XXXVIII: no synthetic shortcut to physical observation)"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "KILLER_EXPERIMENT",
+  "evidence_ids": [],
+  "note": "Bayesian EIG over MODEL_DERIVED priors; no physical claim"
+ },
+ "engineering_parameters": {
+  "value": {},
+  "epistemic_class": "UNKNOWN",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "no engineering parameters exist yet; physical geometry, materials and setpoints are ENGINEERING_PROPOSED at best and are produced by the engineering specification stage, never invented here"
+ },
+ "evidence": {
+  "value": [
+   {
+    "id": "europepmc:42195057",
+    "title": "Heparin-Coated Tunneled Hemodialysis Catheters Improve Failure-Free Survival in ESRD.",
+    "source_uri": "https://europepmc.org/article/42195057",
+    "doi": "10.3390/medicina62050804",
+    "content_hash": "e1d61076608401623fc63b91542dda30307bea6e3857755d42bf2d71a40ea107",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41357461",
+    "title": "Complications of tunneled central venous catheter placement: a narrative review of risks, prevention, and management strategies.",
+    "source_uri": "https://europepmc.org/article/41357461",
+    "doi": "10.3389/fradi.2025.1684246",
+    "content_hash": "dd1780dabf56cb1a65aa72024b19df5dc290495cce6aa1e908ed2e1730b944f0",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:42046065",
+    "title": "Risk prediction models for central venous catheter-related complications in children: a systematic review.",
+    "source_uri": "https://europepmc.org/article/42046065",
+    "doi": "10.1186/s12887-026-06919-y",
+    "content_hash": "b4ed62aa3bbb9d1195b89f15168dbbb66bebfbb1a7656431ab7c8db6edce8a24",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41464672",
+    "title": "Four-Year Outcomes of aXess Arteriovenous Conduit in Hemodialysis Patients: Insights from Two Case Reports of the aXess FIH Study.",
+    "source_uri": "https://europepmc.org/article/41464672",
+    "doi": "10.3390/jcm14248768",
+    "content_hash": "daf2ffa27ab530ade981bd8a8e59ff091ff4a8b49c49b132e7e0d686f03f0fae",
+    "frozen": false
+   },
+   {
+    "id": "europepmc:41929450",
+    "title": "The fungal stronghold: biofilms in hemodialysis catheters, diagnostic pitfalls, and the challenge of catheter salvage.",
+    "source_uri": "https://europepmc.org/article/41929450",
+    "doi": "10.3389/fcimb.2026.1774864",
+    "content_hash": "1aae8e5131b82c3dda06fc32f489edd99ae5de0feef4e72a524440c44c2e1e6b",
+    "frozen": false
+   }
+  ],
+  "epistemic_class": "SOURCE_FACT",
+  "origin_stage": "RETRIEVE+FREEZE",
+  "evidence_ids": [
+   "europepmc:41357461",
+   "europepmc:41464672",
+   "europepmc:41929450",
+   "europepmc:42046065",
+   "europepmc:42195057"
+  ],
+  "note": "custodied evidence with content hashes"
+ },
+ "uncertainties": {
+  "value": [
+   {
+    "contradiction_id": "con:attack:obvious_combination",
+    "description": "attack dimension obvious_combination returned KILL",
+    "severity": "HIGH"
+   },
+   {
+    "unresolved_source": "catheter catheters biological tunneled hemodialysis patency",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "catheter catheters biological tunneled hemodialysis patency",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "biological heparin antifouling surface coating chemically",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "biological heparin antifouling surface coating chemically",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "catheter coating surfaces polymer biofouling silicone fouling",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "catheter coating surfaces polymer biofouling silicone fouling",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "catheter reduction adherence extending reliance biofouling",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "catheter reduction adherence extending reliance biofouling",
+    "error": "LENS_API_TOKEN not configured"
+   },
+   {
+    "unresolved_source": "catheter catheters biological tunneled hemodialysis heparin",
+    "error": "HTTP 503"
+   },
+   {
+    "unresolved_source": "catheter catheters biological tunneled hemodialysis heparin",
+    "error": "LENS_API_TOKEN not configured"
+   }
+  ],
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "CONTRADICTION",
+  "evidence_ids": [],
+  "note": "unresolved contradictions and source failures preserved as unknowns (Art. XXV)"
+ },
+ "assumptions": {
+  "value": [
+   {
+    "assumption": "mechanism transfers across domain context",
+    "basis": "MODELLED",
+    "test": "In‑vitro flow loop comparing standard catheters, heparin‑coated catheters, and catheters with marine anti‑fouling coating for clot formation over 14 days."
+   },
+   {
+    "assumption": "searched sources approximate the prior-art universe",
+    "basis": "MODELLED",
+    "test": "expand sources (see next_best_action)"
+   }
+  ],
+  "epistemic_class": "MODELLED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "explicit assumptions each carrying its own falsification path"
+ },
+ "provenance": {
+  "value": {
+   "run_id": "engrun:ui_catheter_occlusion_385299:2026-09-02T21:41:39",
+   "final_envelope_hash": "e650afd08ef09501df2b0b88f74934e2369448147b402375f2bec89bd7493412",
+   "final_status": "REJECTED",
+   "adjudication_verdict": "CONTESTED",
+   "ranking": {
+    "formula": "score = 0.35*adjudication_w + 0.25*attack_pass + 0.20*novelty_w + 0.20*min(eig_per_cost,1)",
+    "formula_version": "engine-ranking-v1",
+    "components": {
+     "adjudication": 0.4,
+     "attack_pass": 0.0,
+     "novelty": 0.2,
+     "eig_per_cost_capped": 0.44573539382492045
+    },
+    "score": 0.2691,
+    "portfolio_context": {
+     "target_invention_count": 10,
+     "survivors": 0,
+     "active": 0
+    },
+    "is_allocation_policy_not_truth": true,
+    "timestamp": "2026-09-02T21:41:59+00:00Z"
+   },
+   "survivor_gate": {
+    "survivor": false,
+    "final_status": "REJECTED",
+    "verdict": "CONTESTED",
+    "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+   },
+   "code_commit": null,
+   "built_at": "2026-09-02T21:43:49+00:00Z"
+  },
+  "epistemic_class": "COMPUTED",
+  "origin_stage": "INVENTION_SPEC",
+  "evidence_ids": [],
+  "note": "every value above traces to a stage output in the envelope"
+ },
+ "_evidence_index": {
+  "europepmc:42195057": {
+   "id": "europepmc:42195057",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:42195057",
+   "source_uri": "https://europepmc.org/article/42195057",
+   "title": "Heparin-Coated Tunneled Hemodialysis Catheters Improve Failure-Free Survival in ESRD.",
+   "abstract": "Background and Objectives: Tunneled hemodialysis catheters (TDCs) are essential for vascular access in patients with end-stage renal disease (ESRD). This study retrospectively evaluated the clinical outcomes of permanent TDCs placed at a single center, comparing heparin-coated versus non-heparin-coated catheters. Materials and Methods: A total of 189 patients who underwent permanent TDC placement between January 2021 and January 2022 were included. Patients were categorized by catheter type (heparin-coated, n = 80; non-heparin-coated, n = 109). Catheter failure-free survival was analyzed using the Kaplan-Meier method, with arteriovenous fistula creation treated strictly as a censoring event. Multivariable Cox proportional hazards regression was used to identify independent predictors of catheter failure. Results: Complications were significantly more frequent in the non-heparin-coated group ( p = 0.004). Catheter exchange was required exclusively in the non-heparin-coated group ( p p Conclusions: Heparin-coated TDCs were associated with significantly longer failure-free survival and lower complication rates compared with non-heparin-coated catheters. Due to the low overall event rate, individual patient-level covariates including INR did not reach statistical significance in the multivariable model.",
+   "doi": "10.3390/medicina62050804",
+   "publication_date": "2026-04-22",
+   "retrieval_timestamp": "2026-09-02T21:41:40.846942+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "e1d61076608401623fc63b91542dda30307bea6e3857755d42bf2d71a40ea107",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T21:41:40.846942+00:00",
+    "query_or_method": "tunneled hemodialysis catheter catheter occlusion mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41357461": {
+   "id": "europepmc:41357461",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41357461",
+   "source_uri": "https://europepmc.org/article/41357461",
+   "title": "Complications of tunneled central venous catheter placement: a narrative review of risks, prevention, and management strategies.",
+   "abstract": "Background Tunneled cuffed catheter (TCC) remains a crucial vascular access option for patients undergoing hemodialysis, particularly in those who are not candidates for arteriovenous fistulas or grafts. However, placement carries immediate and delayed complications. Objective This narrative review aims to provide a comprehensive overview of the complications encountered during and after the placement of a TCC for hemodialysis, highlighting current evidence, risk factors, prevention strategies, and management approaches. Methods A critical selection of relevant literature was performed through PubMed and Scopus databases, focusing on articles published in the last two decades. Particular attention was given to studies reporting on mechanical, infectious, thrombotic, and late-onset complications, as well as technical factors influencing outcomes. Results Complications of TCCs can be classified as immediate (e.g., arterial puncture, pneumothorax, bleeding), early (e.g., catheter malposition, exit-site infections), and late (e.g., central venous stenosis, catheter-related bloodstream infections, thrombosis). Patient- and procedure-related factors increase risk. Ultrasound and fluoroscopy, strict sterility, and timely management reduce complications rates. Conclusion TCCs are indispensable in selected patients, but understanding their complications is key to patient safety and outcomes. Optimal outcomes depend on accurate patient selection, operator expertise, and standardized post-placement care.",
+   "doi": "10.3389/fradi.2025.1684246",
+   "publication_date": "2025-11-20",
+   "retrieval_timestamp": "2026-09-02T21:41:40.846942+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "dd1780dabf56cb1a65aa72024b19df5dc290495cce6aa1e908ed2e1730b944f0",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T21:41:40.846942+00:00",
+    "query_or_method": "tunneled hemodialysis catheter catheter occlusion mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:42046065": {
+   "id": "europepmc:42046065",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:42046065",
+   "source_uri": "https://europepmc.org/article/42046065",
+   "title": "Risk prediction models for central venous catheter-related complications in children: a systematic review.",
+   "abstract": "BACKGROUND: Central venous catheters (CVCs) are widely used in pediatric care; however, their indwelling procedure can lead to severe complications such as catheter-associated infections and thrombosis. These complications significantly increase the suffering of pediatric patients, prolong hospitalization, and pose life-threatening risks. Although multiple risk prediction models have been developed to identify high-risk pediatric patients, a systematic and comprehensive evaluation of these models is still lacking. OBJECTIVE: We systematically reviewed published risk prediction models for central venous catheter-related complications ( CLABSI and CRT ) in children, both domestically and internationally. The review assessed their predictive performance, validation status, and methodological quality, aiming to provide a basis for the selection of appropriate models in clinical practice. METHODS: Following the PRISMA guidelines, a systematic search was conducted in databases including PubMed, Web of Science, Embase, Cochrane Library, CINAHL, CNKI, Wanfang, VIP, and CBM for relevant literature from their inception to December 31, 2025. Two researchers independently screened the literature, extracted data, and assessed the risk of bias and applicability using the PROBAST tool. A descriptive analysis was performed on the model construction methods, performance metrics, and validation status. RESULTS: A total of 15 studies were included in this analysis. Among them, three studies developed prediction models for CLABSI, all constructed using logistic regression(LR), with modeling AUCs ranging from 0.793 to 0.812; only one model underwent external validation. Twelve studies developed prediction models for CRT, employing diverse modeling methods (such as LR and machine learning). The modeling AUCs ranged from 0.74 to 0.957, of which four models underwent external validation (AUC 0.745–0.922). The PROBAST assessment indicated that most studies had a high risk of bias, primarily",
+   "doi": "10.1186/s12887-026-06919-y",
+   "publication_date": "2026-04-27",
+   "retrieval_timestamp": "2026-09-02T21:41:40.846942+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "b4ed62aa3bbb9d1195b89f15168dbbb66bebfbb1a7656431ab7c8db6edce8a24",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T21:41:40.846942+00:00",
+    "query_or_method": "tunneled hemodialysis catheter catheter occlusion mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41464672": {
+   "id": "europepmc:41464672",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41464672",
+   "source_uri": "https://europepmc.org/article/41464672",
+   "title": "Four-Year Outcomes of aXess Arteriovenous Conduit in Hemodialysis Patients: Insights from Two Case Reports of the aXess FIH Study.",
+   "abstract": "Background/Objectives : Arteriovenous grafts (AVGs) are critical for hemodialysis access in patients with inadequate native vasculature. The Xeltis aXess graft, a novel bioresorbable vascular access conduit, promotes endogenous tissue restoration. While early outcomes have been promising, longer-term data remain limited. This report presents the longest reported, four-year follow-up on two of the first implanted aXess devices. Case Summaries : Case 1: A 64-year-old woman underwent aXess graft placement on 10 June 2021, between the right brachial artery and vein. She experienced graft thrombosis after 12 months and 18 months, both of which were successfully resolved with thrombectomy, in one instance in combination with drug-coated balloon (DCB) angioplasty. The graft remains functional. Case 2: A 76-year-old man received an aXess graft on 11 June 2021, in the left arm. After 6 months, he underwent balloon and DCB angioplasty for graft-vein (G-V) anastomosis stenosis. After 28 months, to resolve multiple pseudoaneurysms, followed by aneurysm resection and AVG reconstruction at month 29, a tunneled catheter was placed to perform dialysis sessions in the meantime. At month 44, graft-venous (G-V) angioplasty with DCB was performed to resolve G-V and axillary vein stenoses diagnosed at month 43. The graft remains in use. Results : Both patients retained functional dialysis access after four years, despite requiring multiple interventions for thrombosis, stenosis, and pseudoaneurysms. Conclusions : These cases demonstrate that the aXess graft can maintain functionality over four years with appropriate management, although close surveillance and reinterventions may be required.",
+   "doi": "10.3390/jcm14248768",
+   "publication_date": "2025-12-11",
+   "retrieval_timestamp": "2026-09-02T21:41:40.846942+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "daf2ffa27ab530ade981bd8a8e59ff091ff4a8b49c49b132e7e0d686f03f0fae",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T21:41:40.846942+00:00",
+    "query_or_method": "tunneled hemodialysis catheter catheter occlusion mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "europepmc:41929450": {
+   "id": "europepmc:41929450",
+   "source_type": "scientific_paper",
+   "source": "EuropePMC",
+   "source_id": "europepmc:41929450",
+   "source_uri": "https://europepmc.org/article/41929450",
+   "title": "The fungal stronghold: biofilms in hemodialysis catheters, diagnostic pitfalls, and the challenge of catheter salvage.",
+   "abstract": "The management of fungal catheter-related bloodstream infections (CRBSIs) in the hemodialysis population represents a critical collision between rigorous infectious disease guidelines and the grim clinical reality of vascular access exhaustion. While guidelines from the IDSA and KDIGO unequivocally recommend immediate catheter removal to prevent metastatic complications, nephrologists are frequently confronted with patients for whom the current catheter represents the last viable lifeline. This review provides a comprehensive analysis of the \"catheter salvage\" dilemma, moving beyond superficial treatment algorithms to explore the molecular and structural mechanisms that make fungal biofilms a formidable adversary. We dissect the pathogenesis of Candida colonization on abiotic surfaces (silicone and polyurethane), detailing the transition from yeast to hyphal structures and the secretion of a complex extracellular matrix (ECM). We highlight how the ECM, rich in β-1,3 glucan, acts as a physical shield that sequesters azoles, rendering standard systemic therapy ineffective despite in vitro susceptibility. Furthermore, we discuss the role of metabolically dormant \"persister cells\" in driving high relapse rates and analyze the epidemiological shift toward Candida parapsilosis , a pathogen with a unique affinity for foreign bodies and parenteral nutrition lines. Diagnostically, we scrutinize the limitations of traditional blood cultures and the \"Differential Time to Positivity\" (DTP) criteria, arguing that the slower growth kinetics of fungi render DTP unreliable compared to bacterial infections. The core of this review evaluates the efficacy and safety of Antifungal Lock Therapy (ALT) as a bridging strategy. We provide a comparative analysis of lock agents, contrasting the broad lytic potential of ethanol (the \"nuclear option\") with the safety profile of taurolidine and the pharmacological nuances of amphotericin B and echinocandins. Ultimately, we propose that while cat",
+   "doi": "10.3389/fcimb.2026.1774864",
+   "publication_date": "2026-03-18",
+   "retrieval_timestamp": "2026-09-02T21:41:40.846942+00:00",
+   "retrieval_method": "europepmc_api",
+   "content_hash": "1aae8e5131b82c3dda06fc32f489edd99ae5de0feef4e72a524440c44c2e1e6b",
+   "provenance": {
+    "provider": "EuropePMC",
+    "retrieved_at": "2026-09-02T21:41:40.846942+00:00",
+    "query_or_method": "tunneled hemodialysis catheter catheter occlusion mechanism",
+    "api_version": "rest"
+   },
+   "epistemic_state": "OBSERVED"
+  },
+  "problem:e40234b0": {
+   "id": "problem:e40234b0",
+   "title": "operator problem statement (problem.json)",
+   "content_hash": "e40234b0f42b16a5675ccdc9bdc095d8ed11cdfa1d5c68e9ed105e45dbe9100a",
+   "custody": "engine run problem.json artifact"
+  }
+ },
+ "_survivor_gate": {
+  "survivor": false,
+  "final_status": "REJECTED",
+  "verdict": "CONTESTED",
+  "reason": "only a classified candidate with sufficient adjudication may be specified (Art. XXVIII: no promotion by narrative)"
+ },
+ "_spec_hash": "d7b2338e437b4a013814f3d1f526efe99012faf24345e9922147ea463d53f7eb",
+ "_integrity": {
+  "no_fact_promotion_violations": [],
+  "passed": true,
+  "checked_at": "2026-09-02T21:43:49+00:00Z"
+ },
+ "_exploration_candidate": {
+  "marker": "EXPLORATION_GRID_CANDIDATE",
+  "discovery_verification": "NOT_PERFORMED_FOR_THIS_CANDIDATE",
+  "consequence": "the E16-H release gate holds this dossier for human engineering review; a discovery-loop re-run is required before automatic release",
+  "angle": "EXPLORATION_GRID_cross_industry_transfer(nvidia)"
+ }
+}
