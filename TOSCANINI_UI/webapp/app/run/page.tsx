@@ -133,6 +133,43 @@ function pick(obj: Record<string, unknown> | null | undefined, key: string) {
   return obj[key];
 }
 
+// R393: the cemetery update rendered as a raw JSON dump — machine bytes in
+// the product AND an unbreakable string that broke page layout (measured:
+// horizontal overflow on the public run page). Rendered human-readable
+// from the record's own fields; structure changes degrade to wrapped
+// text, never to unwrapped JSON.
+function CemeteryBlock({ update }: { update: unknown }) {
+  const app = ((update as Record<string, unknown>)?.appended ??
+    update) as Record<string, unknown>;
+  const proposed = String(app.what_was_proposed ?? app.mechanism_name ?? "");
+  const why = String(app.why_it_failed ?? app.kill_reason ?? "").trim();
+  const lesson = String(app.reusable_lesson ?? "").trim();
+  const entryId = String(app.entry_id ?? "");
+  const total = (update as Record<string, unknown>)?.total_entries;
+  if (!proposed && !why && !entryId) {
+    return (
+      <li style={{ fontSize: 13.5 }}>{str(update, 400)}</li>
+    );
+  }
+  return (
+    <li style={{ fontSize: 13.5, lineHeight: 1.55 }}>
+      {proposed && (
+        <>
+          Killed and recorded: <b>{proposed}</b>
+          {why && ` — ${why}`}
+          {lesson && `. Lesson kept: ${lesson}`}
+          .
+        </>
+      )}
+      <div className="faint" style={{ marginTop: 5, fontSize: 12 }}>
+        negative knowledge — the cemetery is append-only
+        {total != null ? ` (${total} entries)` : ""}
+        {entryId ? ` · ${entryId}` : ""}
+      </div>
+    </li>
+  );
+}
+
 function RunView({ detail }: { detail: NonNullable<SessionDetail> }) {
   const inv = (detail.invention_specification ??
     {}) as Record<string, unknown>;
@@ -273,9 +310,7 @@ function RunView({ detail }: { detail: NonNullable<SessionDetail> }) {
           <h4>Cemetery update (negative knowledge)</h4>
           <ul>
             {detail.cemetery_update ? (
-              <li style={{ fontSize: 13.5 }}>
-                {str(detail.cemetery_update, 500)}
-              </li>
+              <CemeteryBlock update={detail.cemetery_update} />
             ) : (
               <li>
                 no cemetery entry from this run{" "}

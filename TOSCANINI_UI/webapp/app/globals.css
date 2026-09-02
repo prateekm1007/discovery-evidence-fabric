@@ -18,6 +18,17 @@
 
 * { box-sizing: border-box; }
 
+/* R393 defensive wrap: long unbreakable strings (entry ids, hashes,
+   URLs, raw fallbacks) must never push a page past its viewport —
+   measured as horizontal overflow on the public run page. */
+body, .nline, .arg .step .v, .block li, .block, .briefbody, .brieflead,
+.brieffoot, .killbox, .param .basis, .kv, .reasoning .sub, .section .sub,
+details.tech li, .evalresult, .notavail, .errbox {
+  overflow-wrap: anywhere;
+}
+main, .shell { min-width: 0; }
+img, canvas, video { max-width: 100%; }
+
 html, body {
   margin: 0;
   padding: 0;
