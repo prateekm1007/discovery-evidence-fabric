@@ -862,3 +862,16 @@ Work Log:
 
 Stage Summary:
 - Phase 4 corpus + contract + driver committed (measurement deferred to transport recovery, honest state recorded). Phase 5 closed: OpenAlex live in the canonical discovery lane with full provenance and honest lane states (its live proof lands when the credit budget resets at midnight UTC — the 429 lane state is itself measured evidence today), and the discovery/verification retrieval planes are now machine-separable by the custody role field, with the verification-path custody gap disclosed.
+
+---
+Task ID: CODER-R401-WC2 (phase 7 + orchestration)
+Agent: CODER (Super Z session 2026-09-03, continuation)
+Task: CEO directive 7 — the model contest harness: no hardcoded DeepSeek, benchmark the currently servable models against the same frozen synthesis/verification benchmark, select the winner from measured behavior. Plus the single entry point for every transport-blocked measurement.
+
+Work Log:
+- scripts/r401wc2_model_contest.py — the contest harness: (1) SERVABILITY measured first (a tiny live pinned call per registered provider; dead/absent providers are recorded honestly as absent, never contestants — Art. XXV); (2) every SERVABLE model runs the SAME frozen battery through the ENGINE'S OWN call sites (extraction on the committed fixture records, operator instantiation for GEOMETRIC_TRANSFORMATION + BOUNDARY_CONDITION_CHANGE on a controlled qualifying M1, independent attack on the calibration corpus's clean control) with the provider PINNED per model (SelectionPolicy preferred_providers=[pid], max_preference_fallback=0 — NO substitution: the measurement is of THIS model); (3) scoring is the machine validators (field validity, span binding, semantic verdicts, testable-prediction checks, attack verdict structure) — never narrative; (4) the selection rule on the record: the winner is selected FROM THE MEASUREMENT over the same frozen battery; with fewer than two contestants there is NO selection (a baseline measurement, recorded exactly so — never a crowning, never reputation-based). The frozen battery fixture: the committed LIVE_RETRIEVAL.json records (24 live-retrieved, committed 2026-09-03) + three contest problems DISJOINT from the frozen benchmark (reserved for baseline-vs-R401) and the 18-case battery.
+- scripts/r401wc2_run_when_transport_recovers.py — the ONE orchestrator for the four transport-blocked measurements (directives 2, 3, 4, 7): probes the transport first (BLOCKED stops cleanly, Art. XXV, state recorded), runs each driver in order, idempotent (done-markers), per-measurement state persisted to R401-WC2/TRANSPORT_SESSION_STATE.json. FIRST RUN TODAY: transport measured BLOCKED (z.ai 429, recorded 15:19:59Z).
+- The z.ai quota has now been exhausted for >70 minutes (14:07 onward, continuously probed). All four LLM-dependent measurements are frozen-and-waiting; the orchestrator is the resume path.
+
+Stage Summary:
+- Phase 7 harness committed (contest = measured servability + engine-context battery + machine-validator scoring + explicit no-crowning rule). The single orchestrator records the honest transport state and will drive all deferred measurements when the quota window resets.
