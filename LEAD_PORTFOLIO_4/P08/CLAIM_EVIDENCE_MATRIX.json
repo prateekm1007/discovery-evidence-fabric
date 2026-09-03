@@ -1,0 +1,64 @@
+{
+ "artifact_type": "CLAIM_EVIDENCE_MATRIX",
+ "company_designation": "P08",
+ "directive_basis": "R404 item 9: CLAIM -> SOURCE -> EVIDENCE_CLASS -> VERIFICATION -> UNKNOWN -> EXPERIMENT for every important claim; a buyer can inspect why every important sentence exists.",
+ "scope": "The important claims as they stand in the buyer sequence + canonical records. Every UNKNOWN stays UNKNOWN (Art. XXV); no claim is promoted by documentation.",
+ "rows": [
+  {
+   "claim": "Implanted devices need power for years without battery-revision surgery (problem)",
+   "source": "frozen dossier problem statement + clinical literature context",
+   "evidence_class": "EXTERNAL_PRECEDENT",
+   "verification": "package-recorded; consistent with the R332 problem framing",
+   "unknown": "the specific >= 500 \u00b5W target's buyer derivation (BUYER_DEFINED target with a recorded unit-error correction)",
+   "experiment": "n/a (premise)"
+  },
+  {
+   "claim": "Fluence at 5 mm tissue-equivalent phantom is 1.0-1.4 mW/cm\u00b2 (three archived anchors: 1.049054 / 1.415645 / 1.146949)",
+   "source": "LEAD_PORTFOLIO_4/P08/VERIFICATION_EVIDENCE/{R310,R311,R312}/ \u2014 restored, sha256-pinned, preregistration-hash-bound",
+   "evidence_class": "COMPUTATIONAL_RESULT_ARCHIVED (Monte Carlo; preregistered phantom + Jacques 2013 properties; CI overlap verdict)",
+   "verification": "4-model disagreement map + ACTUAL PyTissueOptics v2.0.1 execution + convergence ladder; all within the published 0.5-2.0 range; MCX (GPU) never run (documented CUDA constraint)",
+   "unknown": "REAL tissue path (skull/dura layers, in-vivo optics); real source spec; encapsulation transmission",
+   "experiment": "DECISIVE_EXPERIMENT.json \u2014 phantom-path bench measurement of fluence/efficiency/thermal triplet"
+  },
+  {
+   "claim": "The receiver area is 38.4845 mm\u00b2 (shipped KEEP child)",
+   "source": "R381 KEEP child built solid; R404 independent re-measure (GEOMETRY_REVERIFICATION_EVIDENCE.json)",
+   "evidence_class": "COMPUTATIONAL_RESULT",
+   "verification": "fresh deterministic rebuild + gate battery: 38.4845 mm\u00b2 (pi \u00d7 3.5\u00b2)",
+   "unknown": "n/a (geometry is deterministic)",
+   "experiment": "n/a"
+  },
+  {
+   "claim": "Deliverable electrical power: canonical figure UNKNOWN; conditional modelled band 121-163 \u00b5W under stated assumptions",
+   "source": "ENERGY_BUDGET.json v2.0 canonical calculation (P = Phi \u00d7 A \u00d7 eta)",
+   "evidence_class": "MODELLED (conditional; inputs archived/computational + GaAs-class 0.30 EXTERNAL_PRECEDENT assumption)",
+   "verification": "arithmetic shown and re-checked; every input carries value/unit/source/evidence_class/calculation",
+   "unknown": "eta_cell (targeted, low-irradiance, in-vivo temperature) UNKNOWN; encapsulation UNKNOWN; power electronics UNKNOWN",
+   "experiment": "the bench experiment measures IV curves at the phantom fluence \u2014 the band's first physical check"
+  },
+  {
+   "claim": "The historical ~1050 \u00b5W figure is RECONCILED, not a system-output claim",
+   "source": "VERIFICATION_EVIDENCE/R310 field 'verified_power_output_uW_assuming_1cm2_PV_100pct_conversion' + R332's qualifier-dropping re-label",
+   "evidence_class": "COMPUTATIONAL_RESULT_ARCHIVED (reference conversion: 1 cm\u00b2 \u00d7 100 %)",
+   "verification": "the field name itself records the assumption; D1 RESOLVED in ENERGY_BUDGET v2.0",
+   "unknown": "n/a (reconciliation complete)",
+   "experiment": "n/a"
+  },
+  {
+   "claim": "The 500 \u00b5W device target vs the conditional band is an open engineering gap (D2)",
+   "source": "R332/R370Q pass rule (BUYER_DEFINED target) vs the canonical calculation",
+   "evidence_class": "BUYER_DEFINED (target) vs MODELLED (band) \u2014 recorded as DISCREPANCY, not hidden",
+   "verification": "D2 OPEN in ENERGY_BUDGET v2.0; the falsifier explicitly routes an in-band measurement to a target/area decision, not falsification",
+   "unknown": "which side of the trade the owner picks (area \u00d74.3 / fluence / efficiency / target revision)",
+   "experiment": "the bench measurement informs the decision"
+  },
+  {
+   "claim": "Specific-mechanism prior-art query returned 0 hits; closest reference lacks all 5 mapped elements",
+   "source": "NOVELTY_EVIDENCE/restored/R359/patentbear_full/P-16_patentbear.json + R365 passage-level analysis",
+   "evidence_class": "SEARCH_ACTIVITY record (NOT a novelty determination)",
+   "verification": "restored, sha256-pinned; passage-level element mapping archived",
+   "unknown": "global novelty NOT established; PatSnap attempted-never-executed; web-fallback landscape not exhaustive",
+   "experiment": "optional professional search"
+  }
+ ]
+}

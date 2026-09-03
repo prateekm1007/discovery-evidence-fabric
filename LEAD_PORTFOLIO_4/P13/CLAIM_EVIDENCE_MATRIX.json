@@ -1,0 +1,64 @@
+{
+ "artifact_type": "CLAIM_EVIDENCE_MATRIX",
+ "company_designation": "P13",
+ "directive_basis": "R404 item 9: CLAIM -> SOURCE -> EVIDENCE_CLASS -> VERIFICATION -> UNKNOWN -> EXPERIMENT for every important claim; a buyer can inspect why every important sentence exists.",
+ "scope": "The important claims as they stand in the buyer sequence + canonical records. Every UNKNOWN stays UNKNOWN (Art. XXV); no claim is promoted by documentation.",
+ "rows": [
+  {
+   "claim": "Single-ended piezoresistive sensors drift (typical 1-10 mmHg/month class)",
+   "source": "external precedent literature cited in the frozen dossier (incl. S0924424724006095)",
+   "evidence_class": "EXTERNAL_PRECEDENT",
+   "verification": "literature-cited range; not re-measured by the engine",
+   "unknown": "the specific achievable drift of THIS die design",
+   "experiment": "the paired-die benchmark measures both arms directly"
+  },
+  {
+   "claim": "The self-referencing bridge cancels COMMON-MODE (thermal) drift",
+   "source": "V_out = (R_active - R_dummy)/(4R)*V_ex bridge equation (frozen dossier) + the P-25 in-model measurement (67.8 % cancellation)",
+   "evidence_class": "MODELLED (equation) + historical in-model measurement (P-25, R337)",
+   "verification": "the cancellation was MEASURED IN-MODEL at R337 on the predecessor \u2014 the physics of common-mode cancellation worked; it is the residual that failed",
+   "unknown": "whether the cancellation ratio holds for the current die geometry",
+   "experiment": "thermal-sweep arm of the paired-die benchmark (both arms, same instrument)"
+  },
+  {
+   "claim": "NON-COMMON-MODE drift is NOT compensated \u2014 the predecessor's measured kill channel (biofouling + asymmetric creep)",
+   "source": "P-25 failure record: R337 audit (3.45 mmHg residual vs 2.0 threshold; biofouling 3 \u00b5V/day on the exposed element only) + R347 cemetery KA-P-25-CEMETERY-001/DC-P-25-001 + LINEAGE_AUDIT.json",
+   "evidence_class": "COMPUTATIONAL_RESULT (historical in-model measurement) + codified cemetery lesson (KA-014 class)",
+   "verification": "the failure is preserved in history (R337/R347/R370J); the R404 lineage audit restores it to the canonical record after its erasure from the frozen buyer dossier (biofouling 0 mentions there)",
+   "unknown": "whether recalibration/anti-fouling can hold error below threshold \u2014 the P-25 open boundary condition, STILL OPEN",
+   "experiment": "the fouling-exposure arm of the paired-die benchmark \u2014 designed to measure exactly this channel"
+  },
+  {
+   "claim": "Drift target < 0.5 mmHg/month",
+   "source": "frozen dossier drift_compensation_target",
+   "evidence_class": "MODEL_DERIVED target (dossier label: 'MODELLED \u2014 no hardware validation')",
+   "verification": "target provenance declared MODEL_DERIVED per Art. XXVII; acceptance threshold for the benchmark must be pre-registered with provenance, NOT borrowed from P-25's cancelled numbers",
+   "unknown": "hardware feasibility",
+   "experiment": "primary endpoint of the paired-die benchmark (improvement ratio)"
+  },
+  {
+   "claim": "Shipped CAD valid (sensor die 0.07 mm diaphragm + reference die + carrier)",
+   "source": "geometry gate battery + R404 independent re-run (GEOMETRY_REVERIFICATION_EVIDENCE.json)",
+   "evidence_class": "COMPUTATIONAL_RESULT",
+   "verification": "fresh deterministic rebuild: ALL gates satisfied; diaphragm 0.12 -> 0.07 KEEP reproduced",
+   "unknown": "MEMS process for a catheter-integrated 0.07 mm diaphragm (unvalidated)",
+   "experiment": "process validation (owner decision)"
+  },
+  {
+   "claim": "No prior-art search artifact exists for THIS technology (REPORTED by management, UNLOCATED in the full reachable history)",
+   "source": "NOVELTY_ASSESSMENT.json (NOVELTY_SEARCH_REPORTED + SOURCE_ARTIFACT_UNAVAILABLE) \u2014 full git-history + artifact-archive search at R403 AND re-verified at R404",
+   "evidence_class": "ABSENCE-OF-ARTIFACT (honest state; NOT 'never performed', Art. XXI.3/XXV)",
+   "verification": "exhaustive search: working tree, all branches, archive branch, restored artifacts, 189 patent/novelty-named files in history \u2014 none targets this technology's queries",
+   "unknown": "the searches management reports may exist outside the repository",
+   "experiment": "fresh prior-art search (the cheap parallel owner action)"
+  },
+  {
+   "claim": "The forbidden stability terms (per the BENCHMARK_SPECIFICATION language guard) are not used anywhere on the package surface",
+   "source": "BENCHMARK_SPECIFICATION.json language guard (forbidden-terms list, referenced not quoted)",
+   "evidence_class": "language discipline (pinned)",
+   "verification": "grep-verified across the buyer-facing package surface + machine-pinned by tests",
+   "unknown": "n/a",
+   "experiment": "n/a"
+  }
+ ]
+}

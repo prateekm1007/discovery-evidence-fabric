@@ -1,0 +1,56 @@
+{
+ "artifact_type": "CLAIM_EVIDENCE_MATRIX",
+ "company_designation": "P04",
+ "directive_basis": "R404 item 9: CLAIM -> SOURCE -> EVIDENCE_CLASS -> VERIFICATION -> UNKNOWN -> EXPERIMENT for every important claim; a buyer can inspect why every important sentence exists.",
+ "scope": "The important claims as they stand in the buyer sequence + canonical records. Every UNKNOWN stays UNKNOWN (Art. XXV); no claim is promoted by documentation.",
+ "rows": [
+  {
+   "claim": "Distal-catheter obstruction is a dominant shunt-failure mode requiring revision surgery",
+   "source": "frozen dossier failure-mode family + 5 external evidence items (BENCHMARK_ENGINEERING_DOSSIERS/frozen_corpus_r370/04_drainage_floor/)",
+   "evidence_class": "EXTERNAL_PRECEDENT (engineering-precedent class items recorded in the package)",
+   "verification": "literature-derived, package-recorded with traceability; NOT independently re-derived by the engine",
+   "unknown": "clinical benefit MAGNITUDE of a floor mechanism (recorded UNKNOWN until trial)",
+   "experiment": "none for the premise itself (problem-existence accepted at package level); the floor mechanism is tested by the bench obstruction challenge"
+  },
+  {
+   "claim": "A low-conductance floor lumen keeps a minimum drainage path alive when the primary lumen obstructs",
+   "source": "G_floor/G_primary = (d_floor/d_primary)^4 (Poiseuille) \u2014 frozen governing equations + design inputs",
+   "evidence_class": "MODELLED",
+   "verification": "deterministic solver + physical caps recorded in the frozen dossier; NOT physically measured",
+   "unknown": "clinically defensible Q_min; common-cause obstruction immunity (the declared kill condition)",
+   "experiment": "DECISIVE_EXPERIMENT.json \u2014 bench obstruction challenge vs single-lumen control, incl. the dominant obstruction material"
+  },
+  {
+   "claim": "The shipped geometry is valid (all gates)",
+   "source": "geometry gate battery on the built solid; R404 INDEPENDENT re-run (GEOMETRY_REVERIFICATION_EVIDENCE.json)",
+   "evidence_class": "COMPUTATIONAL_RESULT",
+   "verification": "G1-G9 re-executed on a fresh deterministic rebuild at R404: ALL SATISFIED, min wall 0.2 mm measured",
+   "unknown": "multi-lumen extrusion process capability (manufacturing)",
+   "experiment": "extrusion trial (manufacturing validation, owner decision)"
+  },
+  {
+   "claim": "The KILLED_GEOMETRY_INVALID mutation was an implementation failure, honestly preserved",
+   "source": "IMPROVEMENT_LOOP_EVIDENCE.json in the shipped buyer package MODEL/ + R404 re-run",
+   "evidence_class": "COMPUTATIONAL_RESULT",
+   "verification": "R404 re-execution REPRODUCED the kill (G4 min wall 0.1 < 0.15)",
+   "unknown": "n/a (the record is complete; Art. XXIX separation applies)",
+   "experiment": "n/a"
+  },
+  {
+   "claim": "Prior-art search documented for this technology (CONDITIONAL novelty posture)",
+   "source": "NOVELTY_EVIDENCE/restored/R359/patentbear_full/P-07_patentbear.json + evidence graph + R361 assessment (sha256-pinned)",
+   "evidence_class": "SEARCH_ACTIVITY record (NOT a novelty determination, Art. XXVIII)",
+   "verification": "restored byte-identically from the archive branch; hashes recomputed by test",
+   "unknown": "global novelty NOT established; PatSnap attempted-never-executed; not an exhaustive classification search",
+   "experiment": "optional professional search; NOT required for the bench experiment"
+  },
+  {
+   "claim": "Zero physical validation of any kind",
+   "source": "all 4 verification items recorded NOT_TESTED in the frozen dossier",
+   "evidence_class": "honest state declaration",
+   "verification": "machine-checked (maturity record forbids physical claims)",
+   "unknown": "everything physical",
+   "experiment": "the bench obstruction challenge is the first physical evidence opportunity"
+  }
+ ]
+}

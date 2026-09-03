@@ -1,0 +1,64 @@
+{
+ "artifact_type": "LINEAGE_AUDIT",
+ "company_designation": "P13",
+ "portfolio_number": "13",
+ "historical_package_id": "P-27-R1",
+ "technology_name": "Self-Referencing Piezoresistive Pressure Sensor",
+ "directive_basis": "R404 directive item 7: determine exactly what the P25 failure means relative to P13. Create predecessor / failure / causal implication / new architecture / remaining uncertainty. Do not let a predecessor failure either disappear or incorrectly kill its descendant.",
+ "predecessor": {
+  "identity": "P-25 \u2014 Self-Referencing Piezoresistive Pressure Sensor (born R336 as autonomous-discovery candidate CAND-002, machine-generated, survived 6 hostile admission attacks, promoted to P-25)",
+  "design": "Dual-element differential measurement: an exposed active piezoresistive element + a reference element sharing the thermal environment; the bridge output cancels common-mode drift",
+  "birth_evidence": [
+   "6bb09a50 (R336): DISCOVERY_ENGINE_RESULT.json + PROMOTION_DECISIONS.json",
+   "R336/m2_discovery_engine/autonomous_discovery_engine.py (admission attacks)"
+  ],
+  "death": "R337 computational falsification FAIL -> R347 CEO-ordered move to the Internal Knowledge Cemetery -> R370J reconciliation CF-004 re-confirms the state ('P-25 was killed/cemeteried before R370B; not in current canonical 15')"
+ },
+ "failure": {
+  "what_failed": [
+   "Falsification threshold 2.0 mmHg NOT met: dual-element residual error 3.45 mmHg over 30 days (single-element reference: 10.73 mmHg)",
+   "Common-mode drift cancellation measured in-model at 67.8 % \u2014 the cancellation itself WORKS",
+   "Root cause: biofouling (3 \u00b5V/day, affecting ONLY the exposed element) and asymmetric creep (0.5 \u00b5V/day) are NON-COMMON-MODE \u2014 the differential bridge does not cancel them"
+  ],
+  "classification_at_failure": "T1-FAIL \u2014 mechanism limitation, NOT implementation failure (R337 audit, Constitution Art. XXIX: the model ran, the physics is real, the mechanism is insufficient for the clinical threshold)",
+  "cemetery_records": [
+   "R347/cemetery/CEMETERY_ENTRIES.json \u2014 P-25 entry: KA-P-25-CEMETERY-001 + discovery constraint DC-P-25-001 ('future candidates with similar mechanism must address the identified failure before admission')",
+   "premium_package_factory/gates/r370j_audit_reconciliation.py CF-004 (P-25 confirmed dead, not in current canonical 15)"
+  ],
+  "cemetery_rule": "'A candidate in the cemetery cannot be revived without a constitutional waiver' (R347 cemetery_entries.json closing rule)",
+  "boundary_condition_left_open": "The R347 cemetery entry itself names the open question: 'Whether anti-fouling coating or periodic recalibration can bring error below 2.0 mmHg. If not, mechanism is falsified for absolute measurement (may survive for trending only).'"
+ },
+ "causal_implication": {
+  "what_the_failure_establishes": "Self-referencing ALONE is insufficient for absolute pressure accuracy in a fouling environment: the bridge cancels common-mode (thermal) drift \u2014 measured 67.8 % effective in the model \u2014 but non-common-mode drift (asymmetric biofouling on the exposed element, asymmetric creep) passes straight through the differential output.",
+  "what_it_does_not_establish": "It does not falsify the common-mode cancellation itself; it does not falsify the architecture for trending-class use; and per Art. XXIX it does not kill the mechanism family \u2014 it CONDITIONS re-admission on addressing the non-common-mode channel (DC-P-25-001).",
+  "implication_for_P13": "P13 inherits exactly this conditional: its single claim (drift advantage vs a single-ended baseline) survives ONLY IF the non-common-mode channel (biofouling, reference drift) does not erase the common-mode gain. The BENCHMARK_SPECIFICATION's biofouling_channel field and the DECISIVE_EXPERIMENT's fouling-exposure arm measure precisely this channel first."
+ },
+ "new_architecture": {
+  "identity": "P-27-R1 (current P13) \u2014 the same self-referencing dual-element family: active sensor die (0.07 mm diaphragm after the R381 KEEP mutation) + shielded reference die on a carrier platform; shipped CAD VALID through all geometry gates, independently re-verified at R404 (GEOMETRY_REVERIFICATION_EVIDENCE.json)",
+  "design_deltas_vs_P25": [
+   "diaphragm thickness 0.12 -> 0.07 mm (R381 KEEP mutation; sensitivity ~1/t^2 MODELLED, \u00d72.939)",
+   "recorded mitigations in the current dossier's failure-mode table: 'Periodic recalibration protocol + spare capacity'",
+   "hermeticity spec MIL-STD-883 leak < 1e-8 atm\u00b7cc/s (planned, not tested)"
+  ],
+  "what_did_NOT_change": "The non-common-mode drift channel is NOT recorded as repaired: no anti-fouling mechanism, no non-common-mode compensation element, and no recalibration-interval demonstration exists in the package. 'Periodic recalibration' is the P-25 cemetery entry's own OPEN boundary question carried forward as a mitigation LABEL \u2014 not a demonstrated repair.",
+  "re_admission_path": "The technology re-entered the buyer corpus at the R370 build (premium_package_factory/templates/build_portfolio.py PACKAGE_MAP row 13: 'P-27-R1' / 'pressure_sensor') when the P-27-R1 label \u2014 previously the OLD P-27 (shape-memory-polymer catheter)'s metallic-tubing repair candidate \u2014 was reassigned to this sensor technology. The R403 NOVELTY_ASSESSMENT documents the same collision as audit conflict C3 (the lineage mis-attribution in R370/claim_level/ALL_CLAIMS.json row P-27-R1-C002).",
+  "governance_gap": "NO cemetery-waiver or DC-P-25-001-satisfaction artifact has been located for the re-admission (searched: R366-R370 trees, gates, corpus-build inputs, and the full reachable git history at R403 and R404). The re-admission is therefore recorded here as a GOVERNANCE GAP, not silently ratified (Art. XV): closing it is an owner action \u2014 either record a waiver with its basis, or re-run the admission with the P-25 failure addressed per DC-P-25-001."
+ },
+ "remaining_uncertainty": [
+  "Whether recalibration or anti-fouling can hold error below the acceptance threshold under fouling \u2014 the P-25 open boundary condition, STILL OPEN (zero physical measurement exists for any variant of this architecture)",
+  "Reference-element long-term stability \u2014 the bridge is only as stable as the reference; unmeasured",
+  "Cycling/aging endurance drift evolution \u2014 a field the dossier itself lacks (added to the benchmark matrix at R403)",
+  "No prior-art search artifact exists for THIS technology (NOVELTY_ASSESSMENT: NOVELTY_SEARCH_REPORTED + SOURCE_ARTIFACT_UNAVAILABLE \u2014 management-reported but unlocated)",
+  "The frozen buyer dossier's lineage narrative is MIS-ATTRIBUTED and its failure-mode table omits the predecessor's measured kill channel (see lineage_narrative_mis_attribution below)"
+ ],
+ "lineage_narrative_mis_attribution": {
+  "frozen_dossier_claim": "The current package's frozen system_architecture states: 'R1 fix: original P-27 suffered from chronic drift; R1 redesign adds self-referencing bridge for drift correction.'",
+  "why_it_is_wrong": "The 'original P-27' was the Shape-Memory Polymer kink-resistant catheter (born R347 as a P-25/P-10 replacement) \u2014 a DIFFERENT technology with no self-referencing bridge and no chronic-drift record. The self-referencing bridge was born in P-25 (R336, CAND-002). The 'P-27-R1' label was reassigned to the pressure sensor at the R370 corpus build, and the narrative retro-fitted a P-27 lineage onto it.",
+  "biofouling_erasure": "The frozen dossier contains ZERO mentions of biofouling or non-common-mode drift \u2014 the predecessor's exact measured kill channel is absent from the buyer-facing failure-mode table (its 'chronic drift' failure modes carry 'UNKNOWN \u2014 no sourced evidence' labels instead of the P-25 measured 3.45 mmHg record). This is the 'predecessor failure disappears' failure mode the R404 directive item 7 exists to prevent.",
+  "disposition": "DISCLOSED, not rewritten: the frozen corpus and the buyer-distribution repository are release-chain territory (Art. XXXIX) \u2014 zero buyer-surface bytes are modified this round. The engine-side correction of record is THIS file + the R403 BENCHMARK_SPECIFICATION (biofouling_channel + KA-014 citation) + the R403 NOVELTY_ASSESSMENT C3 disclosure. The buyer-surface text fix is an owner release operation. tests/test_r404_buyer_grade.py machine-pins BOTH the frozen dossier's wrong narrative (so the defect cannot silently drift) and this correction."
+ },
+ "directive_answer": {
+  "does_the_predecessor_failure_kill_P13": "NO \u2014 per Art. XXIX the T1-FAIL was a mechanism-insufficiency finding (not an invariant impossibility proof, and the design space of non-common-mode countermeasures is not exhausted), and the cemetery rule itself conditions re-admission rather than eternal prohibition. The failure does not disappear either: it defines P13's largest scientific risk (the non-common-mode channel), which the paired-die benchmark and its fouling arm measure FIRST.",
+  "has_it_disappeared": "It had PARTIALLY disappeared in the frozen buyer dossier (biofouling 0 mentions; wrong predecessor narrative; failure modes relabeled 'UNKNOWN \u2014 no sourced evidence' where a measured predecessor record exists). The R403 benchmark specification and this lineage audit restore it to the engine-side canonical record; the buyer-surface correction is a release operation."
+ }
+}

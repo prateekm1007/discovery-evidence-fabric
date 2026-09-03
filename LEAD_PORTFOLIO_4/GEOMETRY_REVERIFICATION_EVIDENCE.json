@@ -1,0 +1,275 @@
+{
+ "artifact_type": "GEOMETRY_REVERIFICATION_EVIDENCE",
+ "purpose": "R404 directive item 5: independent re-execution of the geometry gates on freshly rebuilt models \u2014 the recorded VALID claims are NOT trusted as inputs (Art. III/XXIV); the gates are re-run from the committed deterministic templates. Local execution = evidence, not certification (Art. XXVI \u2014 CI re-runs the suite).",
+ "executed_at": "2026-09-03T21:43:55Z",
+ "method": "model_from_template -> build_portfolio_model (deterministic CadQuery/OCCT build + G1-G9 gate battery on the built solid) -> run_improvement_loop for the package's recorded mutation",
+ "packages": {
+  "P04": {
+   "base_model": {
+    "model_id": "pm:4d42cf7d74b35dac",
+    "geometry_validation_valid": true,
+    "gate_statuses": {
+     "G3_impossible_dimensions": "SATISFIED",
+     "G5_missing_parameters": "SATISFIED",
+     "G5b_hardcoded_values": "SATISFIED",
+     "G1_invalid_geometry": "SATISFIED",
+     "G6_broken_assembly": "SATISFIED",
+     "G4_violated_geometric_constraints": "SATISFIED",
+     "G4b_measured_vs_claimed_dimensions": "SATISFIED",
+     "G1b_cylinder_containment": "SATISFIED",
+     "G2_non_manifold_solids": "SATISFIED",
+     "G2b_mesh_representational_exactness": "SATISFIED",
+     "G7_impossible_intersections": "UNVERIFIABLE",
+     "G8_geometry_assumptions": "SUPPORTED"
+    },
+    "reasons": [],
+    "key_measurements": {
+     "dual_lumen_catheter.min_wall_thickness_mm": 0.2,
+     "dual_lumen_catheter.volume_mm3": 583.550835,
+     "dual_lumen_catheter.bbox_xy": {
+      "xlen": 3.0,
+      "ylen": 3.0
+     }
+    }
+   },
+   "improvement_loop_rerun": {
+    "outcome": "KILLED_GEOMETRY_INVALID",
+    "outcome_reason": "the child failed the deterministic geometry gates: G4_violated_geometric_constraints: [{'constraint_id': 'C_MIN_WALL', 'target': 'min_wall_thickness_mm', 'limit': 0.15, 'bound': '>=', 'status': 'VIOLATED', 'measured_value': 0.1, 'measured_from': 'dual_lumen_catheter.min_wall_thickness_mm', 'source': 'MEASURED_ON_BUILT_SOLID'}]",
+    "mutation": {
+     "param_id": "floor_lumen_diameter_mm",
+     "from_value": 0.6,
+     "to_value": 0.8,
+     "basis": "Record critical parameter 'Floor lumen diameter d_floor' (UNKNOWN) and kill condition 'Common-cause obstruction affects both primary and floor lumens equally (no differential immunity)': raising floor conductance toward the primary erodes the differential-immunity margin AND the wall."
+    },
+    "child_model_id": "pm:b792618b53f272ee",
+    "child_geometry_valid": false,
+    "child_gate_reasons": [
+     "G4_violated_geometric_constraints: [{'constraint_id': 'C_MIN_WALL', 'target': 'min_wall_thickness_mm', 'limit': 0.15, 'bound': '>=', 'status': 'VIOLATED', 'measured_value': 0.1, 'measured_from': 'dual_lumen_catheter.min_wall_thickness_mm', 'source': 'MEASURED_ON_BUILT_SOLID'}]"
+    ],
+    "evaluation": null
+   }
+  },
+  "P08": {
+   "base_model": {
+    "model_id": "pm:dc689bde1ced3a64",
+    "geometry_validation_valid": true,
+    "gate_statuses": {
+     "G3_impossible_dimensions": "SATISFIED",
+     "G5_missing_parameters": "SATISFIED",
+     "G5b_hardcoded_values": "SATISFIED",
+     "G1_invalid_geometry": "SATISFIED",
+     "G6_broken_assembly": "SATISFIED",
+     "G4_violated_geometric_constraints": "SATISFIED",
+     "G4b_measured_vs_claimed_dimensions": "SATISFIED",
+     "G1b_cylinder_containment": "SATISFIED",
+     "G2_non_manifold_solids": "SATISFIED",
+     "G2b_mesh_representational_exactness": "SATISFIED",
+     "G7_impossible_intersections": "SATISFIED",
+     "G8_geometry_assumptions": "SUPPORTED"
+    },
+    "reasons": [],
+    "key_measurements": {
+     "gaas_pv_cell.volume_mm3": 5.890486,
+     "gaas_pv_cell.bbox_xy": {
+      "xlen": 5.0,
+      "ylen": 5.0
+     },
+     "substrate_disc.volume_mm3": 18.755041,
+     "substrate_disc.bbox_xy": {
+      "xlen": 5.9,
+      "ylen": 5.9
+     },
+     "encapsulation_cap.min_wall_thickness_mm": 0.9,
+     "encapsulation_cap.volume_mm3": 18.499268,
+     "encapsulation_cap.bbox_xy": {
+      "xlen": 6.8,
+      "ylen": 6.8
+     },
+     "receiver_disc_area_mm2": 19.635,
+     "receiver_disc_diameter_mm": 5.0
+    }
+   },
+   "improvement_loop_rerun": {
+    "outcome": "KEEP",
+    "outcome_reason": "child geometry VALID through all gates AND the declared MODELLED relation improved: receiver_cell_area_mm2 19.635 -> 38.485",
+    "mutation": {
+     "param_id": "cell_diameter_mm",
+     "from_value": 5.0,
+     "to_value": 7.0,
+     "basis": "Record critical parameter 'PV cell area' (UNKNOWN, constrained by catheter geometry) and record failure mode 'Insufficient power at depth': intercepted photon flux scales with receiver area."
+    },
+    "child_model_id": "pm:b5ffd7a6d0d1e37f",
+    "child_geometry_valid": true,
+    "child_gate_reasons": [],
+    "evaluation": null,
+    "kept_child": {
+     "model_id": "pm:b5ffd7a6d0d1e37f",
+     "valid": true
+    },
+    "kept_child_receiver_area_mm2": 38.4845
+   }
+  },
+  "P11": {
+   "base_model": {
+    "model_id": "pm:328fcdcca1fd2f26",
+    "geometry_validation_valid": true,
+    "gate_statuses": {
+     "G3_impossible_dimensions": "SATISFIED",
+     "G5_missing_parameters": "SATISFIED",
+     "G5b_hardcoded_values": "SATISFIED",
+     "G1_invalid_geometry": "SATISFIED",
+     "G6_broken_assembly": "SATISFIED",
+     "G4_violated_geometric_constraints": "SATISFIED",
+     "G4b_measured_vs_claimed_dimensions": "SATISFIED",
+     "G1b_cylinder_containment": "SATISFIED",
+     "G2_non_manifold_solids": "SATISFIED",
+     "G2b_mesh_representational_exactness": "SATISFIED",
+     "G7_impossible_intersections": "SATISFIED",
+     "G8_geometry_assumptions": "SUPPORTED"
+    },
+    "reasons": [],
+    "key_measurements": {
+     "damper_housing.min_wall_thickness_mm": 1.5,
+     "damper_housing.volume_mm3": 765.763209,
+     "damper_housing.bbox_xy": {
+      "xlen": 8.0,
+      "ylen": 8.0
+     },
+     "damper_spool.min_wall_thickness_mm": 1.6,
+     "damper_spool.volume_mm3": 253.338032,
+     "damper_spool.bbox_xy": {
+      "xlen": 4.4,
+      "ylen": 4.4
+     },
+     "damping_gap_source": "annular gap = bore radius - spool outer radius; captured from the improvement-loop evaluation below (computed on MEASURED cylinder radii)"
+    }
+   },
+   "improvement_loop_rerun": {
+    "outcome": "KEEP",
+    "outcome_reason": "child geometry VALID through all gates AND the declared MODELLED relation improved: annular_damping_gap_mm 0.3 -> 0.18",
+    "mutation": {
+     "param_id": "damping_gap_mm",
+     "from_value": 0.3,
+     "to_value": 0.18,
+     "basis": "Record critical parameter 'Damper coefficient c_h' (UNKNOWN, mmHg/(mL/min)) and record failure mode 'Insufficient damping (c_h too low)': for annular Poiseuille flow c_h rises steeply as the gap closes."
+    },
+    "child_model_id": "pm:c27f470fc50c2e36",
+    "child_geometry_valid": true,
+    "child_gate_reasons": [],
+    "evaluation": null,
+    "kept_child": {
+     "model_id": "pm:c27f470fc50c2e36",
+     "valid": true
+    }
+   }
+  },
+  "P13": {
+   "base_model": {
+    "model_id": "pm:05d93b557c2aa9fc",
+    "geometry_validation_valid": true,
+    "gate_statuses": {
+     "G3_impossible_dimensions": "SATISFIED",
+     "G5_missing_parameters": "SATISFIED",
+     "G5b_hardcoded_values": "SATISFIED",
+     "G1_invalid_geometry": "SATISFIED",
+     "G6_broken_assembly": "SATISFIED",
+     "G4_violated_geometric_constraints": "SATISFIED",
+     "G4b_measured_vs_claimed_dimensions": "SATISFIED",
+     "G1b_cylinder_containment": "UNVERIFIABLE",
+     "G2_non_manifold_solids": "SATISFIED",
+     "G2b_mesh_representational_exactness": "SATISFIED",
+     "G7_impossible_intersections": "SATISFIED",
+     "G8_geometry_assumptions": "SUPPORTED"
+    },
+    "reasons": [],
+    "key_measurements": {
+     "sensor_die.volume_mm3": 1.3332,
+     "sensor_die.bbox_xy": {
+      "xlen": 2.2,
+      "ylen": 2.2
+     },
+     "reference_die.volume_mm3": 2.178,
+     "reference_die.bbox_xy": {
+      "xlen": 2.2,
+      "ylen": 2.2
+     },
+     "carrier_platform.volume_mm3": 9.45,
+     "carrier_platform.bbox_xy": {
+      "xlen": 5.25,
+      "ylen": 3.0
+     }
+    }
+   },
+   "improvement_loop_rerun": {
+    "outcome": "KEEP",
+    "outcome_reason": "child geometry VALID through all gates AND the declared MODELLED relation improved: diaphragm_thickness_mm 0.12 -> 0.07",
+    "mutation": {
+     "param_id": "diaphragm_thickness_mm",
+     "from_value": 0.12,
+     "to_value": 0.07,
+     "basis": "Record critical parameter 'Diaphragm thickness' (UNKNOWN, design choice) and record failure modes 'Chronic drift exceeds self-referencing' + 'Diaphragm mechanical damage': thinner diaphragm buys sensitivity but spends rupture margin \u2014 the exact trade the improvement loop must adjudicate."
+    },
+    "child_model_id": "pm:e478a473e1da01a5",
+    "child_geometry_valid": true,
+    "child_gate_reasons": [],
+    "evaluation": null,
+    "kept_child": {
+     "model_id": "pm:e478a473e1da01a5",
+     "valid": true
+    }
+   }
+  }
+ },
+ "p04_directive_block": {
+  "FAILED_MUTATION": {
+   "mutation": {
+    "param_id": "floor_lumen_diameter_mm",
+    "from_value": 0.6,
+    "to_value": 0.8,
+    "basis": "Record critical parameter 'Floor lumen diameter d_floor' (UNKNOWN) and kill condition 'Common-cause obstruction affects both primary and floor lumens equally (no differential immunity)': raising floor conductance toward the primary erodes the differential-immunity margin AND the wall."
+   },
+   "outcome": "KILLED_GEOMETRY_INVALID",
+   "reason": "the child failed the deterministic geometry gates: G4_violated_geometric_constraints: [{'constraint_id': 'C_MIN_WALL', 'target': 'min_wall_thickness_mm', 'limit': 0.15, 'bound': '>=', 'status': 'VIOLATED', 'measured_value': 0.1, 'measured_from': 'dual_lumen_catheter.min_wall_thickness_mm', 'source': 'MEASURED_ON_BUILT_SOLID'}]",
+   "failed_gates": [
+    "G4_violated_geometric_constraints: [{'constraint_id': 'C_MIN_WALL', 'target': 'min_wall_thickness_mm', 'limit': 0.15, 'bound': '>=', 'status': 'VIOLATED', 'measured_value': 0.1, 'measured_from': 'dual_lumen_catheter.min_wall_thickness_mm', 'source': 'MEASURED_ON_BUILT_SOLID'}]"
+   ],
+   "history_preserved": "the KILLED mutation remains preserved verbatim in the shipped buyer package MODEL/ artifacts and in the r381 loop record; this re-run confirms it reproduces from committed code"
+  },
+  "CURRENT_GEOMETRY": {
+   "model_id": "pm:4d42cf7d74b35dac",
+   "parameters": {
+    "outer_diameter_mm": 3.0,
+    "primary_lumen_diameter_mm": 1.1,
+    "floor_lumen_diameter_mm": 0.6,
+    "floor_offset_mm": 1.0,
+    "length_mm": 100.0
+   }
+  },
+  "GEOMETRY_EVIDENCE": {
+   "gate_statuses": {
+    "G3_impossible_dimensions": "SATISFIED",
+    "G5_missing_parameters": "SATISFIED",
+    "G5b_hardcoded_values": "SATISFIED",
+    "G1_invalid_geometry": "SATISFIED",
+    "G6_broken_assembly": "SATISFIED",
+    "G4_violated_geometric_constraints": "SATISFIED",
+    "G4b_measured_vs_claimed_dimensions": "SATISFIED",
+    "G1b_cylinder_containment": "SATISFIED",
+    "G2_non_manifold_solids": "SATISFIED",
+    "G2b_mesh_representational_exactness": "SATISFIED",
+    "G7_impossible_intersections": "UNVERIFIABLE",
+    "G8_geometry_assumptions": "SUPPORTED"
+   },
+   "key_measurements": {
+    "dual_lumen_catheter.min_wall_thickness_mm": 0.2,
+    "dual_lumen_catheter.volume_mm3": 583.550835,
+    "dual_lumen_catheter.bbox_xy": {
+     "xlen": 3.0,
+     "ylen": 3.0
+    }
+   },
+   "method": "fresh deterministic rebuild + G1-G9 re-execution"
+  },
+  "ENGINEERING_CONCLUSION": "INDEPENDENTLY CONFIRMED: the shipped base geometry is valid through the full deterministic gate battery on a fresh rebuild, and the recorded KILLED_GEOMETRY_INVALID mutation reproduces (the gate rejects the 0.8 mm floor lumen on minimum wall). The kill applies to the single mutation; the shipped model, the architecture and the concept are not killed by it (Art. XXIX). CAD validity is COMPUTATIONAL_RESULT evidence only \u2014 it is NOT physical validation (Art. LIII)."
+ }
+}

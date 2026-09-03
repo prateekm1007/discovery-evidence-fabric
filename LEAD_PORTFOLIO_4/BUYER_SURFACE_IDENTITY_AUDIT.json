@@ -1,0 +1,21 @@
+{
+ "artifact_type": "BUYER_SURFACE_IDENTITY_AUDIT",
+ "directive_basis": "R404 item 8: every buyer document must use the commercial designation consistently (P04/P08/P11/P13); historical package IDs remain provenance fields; no buyer-facing document may create ambiguity between commercial ID / historical ID / portfolio number / model ID.",
+ "current_state_measured": {
+  "buyer_distribution_repository": "The buyer surface (v1.0.0-3D-edition release, the Art. XXXIX authority) uses: folder names NN_short_name (04_drainage_floor, 08_nir_photovoltaic, 11_gravity_damper, 13_pressure_sensor, 14_acoustic_detection); PACKAGE_MANIFEST.json package_id = HISTORICAL IDs (P-07 / P-16 / P-24 / P-27-R1); PORTFOLIO_IDENTITY_REGISTRY.json v2.0 (portfolio_number + historical_package_id + technology_name as the identity authority); PDF identity lines derive from that registry. NO commercial designation (P04/P08/P11/P13) appears anywhere on the buyer surface.",
+  "engine_side": "The commercial designation layer exists ONLY in LEAD_PORTFOLIO_IDENTITY_REGISTRY.json and the LEAD_PORTFOLIO_4/ records (identity_line_external 'P04 \u2014 \u2026'; historical IDs confined to machine-readable provenance fields). The engine-side consistency tests fail on cross-artifact drift.",
+  "buyer_repo_bytes_touched_this_round": 0
+ },
+ "ambiguity_traps_catalogued": [
+  "commercial P13 (Self-Referencing Pressure Sensor, historical P-27-R1, portfolio folder 13) vs HISTORICAL P-13 (Adaptive Valve, portfolio folder 02) \u2014 a reader seeing 'P-13' can be misled into the wrong technology",
+  "commercial P04 (Drainage Floor, historical P-07, folder 04) vs HISTORICAL P-04 (Catalytic Clearance, portfolio folder 03)",
+  "the P-27-R1 label itself has TWO histories: the OLD P-27's metallic-tubing repair candidate (R366) and the pressure sensor (R370 reassignment) \u2014 the R403 C3/lineage mis-attribution",
+  "model IDs (pm:\u2026) are CAD-implementation identifiers \u2014 a third layer, never a package identity"
+ ],
+ "remediation_path": "The commercial-designation migration of the buyer surface is an Art. XXXIX RELEASE-CHAIN OPERATION, not a working-tree edit: both repos clean and pushed at HEAD == origin/main BEFORE the build; release content committed and pushed to the buyer-distribution repository FIRST (buyer docs regenerated with commercial designations as primary identity lines and historical IDs demoted to provenance fields); CANONICAL_RELEASE_MANIFEST regenerated from the pushed state; ENGINE_RELEASE_REGISTRY entry recorded; clean-clone verification of the four agreeing states. The engine already carries the authoritative mapping (LEAD_PORTFOLIO_IDENTITY_REGISTRY.json) the regeneration would consume. This round records the gap; it does not perform the release.",
+ "engine_side_guarantees_this_round": [
+  "every LEAD_PORTFOLIO_4 record carries company_designation as the external identity + historical_package_id as provenance only",
+  "BUYER_SEQUENCE identity_line_external uses the commercial designation; provenance_line_machine_readable carries the full mapping",
+  "the R403 consistency tests fail on registry/corpus/manifest identity drift; the R404 tests pin the ambiguity-trap facts"
+ ]
+}

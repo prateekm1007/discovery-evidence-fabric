@@ -1,105 +1,214 @@
 {
  "artifact_type": "ENERGY_BUDGET",
+ "artifact_version": "2.0",
+ "version_history": [
+  "1.0 (R403): first full stage-by-stage assembly; recorded the ~1050 uW vs ~121 uW contradiction as discrepancy D1 and classified the fluence as T2_CONFIRMED_ASSERTED_NOT_ARCHIVED ( WRONG: the execution artifacts exist in git history \u2014 restored at R404 under VERIFICATION_EVIDENCE/)",
+  "2.0 (R404, this version): canonical calculation with archived inputs; D1 RESOLVED (the two figures are the same fluence under different area/efficiency assumptions \u2014 R310's own field name records the reference-conversion basis); fluence evidence class corrected to ARCHIVED COMPUTATIONAL_RESULT; canonical buyer figure stated as UNKNOWN with the conditional band 121-163 uW shown"
+ ],
  "company_designation": "P08",
  "portfolio_number": "08",
  "historical_package_id": "P-16",
  "technology_name": "NIR Photovoltaic Power Delivery for Implantable Devices",
- "constitutional_basis": "Directive section 11: audit the entire energy chain (optical source -> tissue transmission -> implanted PV -> electrical conversion -> usable device power); every loss explicit; photovoltaic efficiency must never be quoted as implanted-system efficiency. Constitution Art. XXV (unknown stays unknown) and Art. II (exact evidence beats plausibility).",
- "scope": "STAGE-BY-STAGE loss map assembled from RECORDED repository values only. Every number carries its evidence class; no number is invented; arithmetic derivations are shown explicitly where computed.",
+ "constitutional_basis": "R404 directive item 4: build ONE canonical energy-budget calculation; every number requires value, unit, source, evidence_class, calculation; the final buyer package gets one canonical figure or UNKNOWN. Constitution Art. II (exact evidence), Art. XXV (unknown stays unknown), Art. XXVIII (no silent promotion: PV efficiency is never system efficiency), Art. LXII (reproducible from committed evidence).",
+ "scope": "STAGE-BY-STAGE loss map assembled from RECORDED repository values only. No number is invented. The canonical calculation at the bottom carries the full input provenance chain.",
  "evidence_class_vocabulary": [
-  "EXTERNAL_PRECEDENT — published-literature value carried in the package (e.g. Jacques 2013 optical properties)",
-  "MODELLED — computed/modelled, not measured (Art. XXXVIII layer 4)",
-  "T2_CONFIRMED_ASSERTED_NOT_ARCHIVED — claimed as simulation-confirmed in the frozen dossier but the execution artifacts are absent from the repository (R310/R311/R312 cited, not present); not reproducible from repo bytes",
-  "COMPUTATIONAL_RESULT — measured on the built CAD solid by the deterministic pipeline",
-  "UNKNOWN — not modeled, not measured, not bounded in any committed artifact"
+  "EXTERNAL_PRECEDENT \u2014 published-literature value carried in the package (e.g. Jacques 2013 optical properties)",
+  "MODELLED \u2014 computed/modelled, not measured (Art. XXXVIII layer 4)",
+  "COMPUTATIONAL_RESULT_ARCHIVED \u2014 computed AND the execution artifact is restored/pinned in this repository (VERIFICATION_EVIDENCE/)",
+  "COMPUTATIONAL_RESULT \u2014 measured on the built CAD solid by the deterministic pipeline",
+  "UNKNOWN \u2014 not modeled, not measured, not bounded in any committed artifact"
  ],
  "chain": [
   {
    "stage": "1. External optical source (940 nm class)",
-   "quantity": "Incident irradiance at skin surface",
-   "value": "UNKNOWN",
-   "evidence_class": "UNKNOWN",
+   "quantity": "Incident irradiance at skin surface (real device spec)",
+   "value": "UNKNOWN (real source); 1.0 mW (phantom input)",
+   "unit": "mW / mW-total-power",
+   "source": "R370Q dossier (real source: UNKNOWN, bounded by tissue heating limit); R310 preregistered phantom (source_power_mW: 1.0, isotropic point source at z=0)",
+   "evidence_class": "UNKNOWN (real) / COMPUTATIONAL_RESULT_ARCHIVED (phantom input, R310)",
+   "calculation": "no computation \u2014 the phantom input is a declared model boundary, the real source is unspecified",
    "loss": "not quantified",
-   "notes": "R370Q dossier: external source power 'UNKNOWN — bounded by tissue heating limit'. The consultant's plausibility reconstruction used 100 mW/cm² as the assumed incident case (EXTERNAL_PRECEDENT-class assumption, reviewer's arithmetic, not a shipped spec). No source wall-plug efficiency, no skin-interface coupling loss is recorded anywhere."
+   "notes": "The verified fluence chain is normalized to a 1.0 mW source at the phantom. Any real external source power, its skin-coupling and its thermal-limit basis are UNKNOWN. The consultant's 100 mW/cm2 incident-case reconstruction is EXTERNAL_PRECEDENT-class reviewer arithmetic, not a shipped spec."
   },
   {
-   "stage": "2. Tissue transmission (scalp/skull/brain path to implant site)",
-   "quantity": "Transmitted fraction at the PV surface",
-   "value": "5 mm soft tissue: 60.7 % (mu_eff = 1.0 /cm) to 28.7 % (mu_eff = 2.5 /cm); skull composition: WORSE, UNQUANTIFIED in the repository",
+   "stage": "2. Tissue transmission (5 mm homogeneous phantom path)",
+   "quantity": "Transmitted fraction at the detector plane",
+   "value": "5 mm soft tissue: 60.7 % (mu_eff = 1.0 /cm) to 28.7 % (mu_eff = 2.5 /cm); per-layer skull path: UNQUANTIFIED",
+   "unit": "percent",
+   "source": "EQ-1 Beer-Lambert I(d) = I0*exp(-mu_eff*d) with Jacques 2013 properties (mu_a 0.05/cm, mu_s 8.0/cm, g 0.9, n 1.4) \u2014 the package's own EXTERNAL_PRECEDENT; frozen in R310 VERIF-002 preregistration",
    "evidence_class": "EXTERNAL_PRECEDENT",
-   "loss": "39-71 % over 5 mm soft tissue; more through skull (unquantified)",
-   "notes": "EQ-1 Beer-Lambert I(d) = I0*exp(-mu_eff*d); mu_eff 1.0-2.5 /cm at 940 nm per Jacques 2013 (the package's own EXTERNAL_PRECEDENT). Governing equation committed; path decomposition (skin/scalp/skull/dura) per-layer: UNKNOWN. Implied TOTAL transmission from the 100 mW/cm² consultant case to the recorded PV fluence is 1.0-1.4 % — i.e. an additional ~25-29x 'path losses' beyond the 5 mm soft-tissue figure, consistent with a deeper/optically-worse implant path, which the repo does not decompose."
+   "calculation": "exp(-mu_eff * 0.5 cm): exp(-0.5)=0.6065 -> 60.7 %; exp(-1.25)=0.2865 -> 28.7 %",
+   "loss": "39-71 % over 5 mm homogeneous soft tissue; more through a real scalp+skull path (unquantified)",
+   "notes": "The Monte-Carlo chain below supersedes the analytic estimate for the 5 mm phantom; the REAL path (skin/scalp/skull/dura decomposition) remains UNKNOWN \u2014 the phantom is homogeneous."
   },
   {
-   "stage": "3. Fluence at the implanted PV surface",
-   "quantity": "PV-surface irradiance",
-   "value": "1.0-1.4 mW/cm² (Monte-Carlo converged value 1.049 mW/cm²; published comparison range 0.5-2.0 mW/cm²; MC-vs-MC agreement 0.11 %)",
-   "evidence_class": "T2_CONFIRMED_ASSERTED_NOT_ARCHIVED",
-   "loss": "n/a (this is the post-tissue state)",
-   "notes": "Frozen dossier states 'T2-CONFIRMED via PyTissueOptics v2.0.1' and cites R310/R311/R312 execution directories that DO NOT EXIST in the repository or its git history; the claim's own record labels it MODELLED with limitation 'model prediction — not experimentally verified' and independent_verification 'none'. The R309 pre-registration protocol (MCX vs PyTissueOptics vs Jacques 2013, tolerance 0.05 mW/cm²) IS committed; the execution artifacts are not. This number may not be treated as verified until the runs are repeated or the artifacts restored."
+   "stage": "3. Fluence at the implanted PV plane (5 mm phantom)",
+   "quantity": "Detector-plane fluence",
+   "value": "1.049054 / 1.415645 / 1.146949 (three archived model anchors); recorded verified range 1.0-1.4",
+   "unit": "mW/cm\u00b2",
+   "source": "LEAD_PORTFOLIO_4/P08/VERIFICATION_EVIDENCE/R310/P-16_VERIF-002_RESULT.json (4-model disagreement map, 200k photons/model, MC-vs-MC agreement 0.11 %, converged 1.049054, CI95 \u00b10.128); R311/P-16_VERIF-003_RESULT.json (ACTUAL PyTissueOptics v2.0.1 DCC-Lab execution, 20k photons, 1.415645, CI95 \u00b10.544); R312/P-16-VERIF-004_RESULT.json (convergence ladder 50k photons, 1.146949, CI95 \u00b10.318, CI-overlap verdict MODEL_VERIFIED)",
+   "evidence_class": "COMPUTATIONAL_RESULT_ARCHIVED (restored, sha256-pinned)",
+   "calculation": "Monte Carlo photon transport through the 5 mm / mu-properties phantom; all three anchors within the published Jacques 2013 range 0.5-2.0 mW/cm\u00b2",
+   "loss": "n/a (post-tissue state)",
+   "notes": "R403's T2_CONFIRMED_ASSERTED_NOT_ARCHIVED class is CORRECTED by this version: the execution artifacts exist in git history (deleted at R388, restored at R404). The preregistration hashes recorded inside the result files match the restored preregistration files byte-for-byte. All three runs are CPU-mode; MCX (GPU) was never run (documented CUDA constraint). This is SIMULATION, not tissue measurement (Art. XXXVIII)."
   },
   {
    "stage": "4. Encapsulation / optical window transmission at 940 nm",
-   "quantity": "Transmission through the hermetic encapsulation cap",
+   "quantity": "Transmission through the hermetic encapsulation cap (0.55 mm)",
    "value": "UNKNOWN",
+   "unit": "percent",
+   "source": "no recorded material or transmission spec",
    "evidence_class": "UNKNOWN",
+   "calculation": "none possible",
    "loss": "not quantified",
-   "notes": "The CAD ships an encapsulation cap (0.55 mm) — its optical material, transmission at 940 nm, and Fresnel/reflection losses are unrecorded. The fluence claim of stage 3 is described as at the PV surface (post-encapsulation or pre-encapsulation is itself unspecified)."
+   "notes": "The CAD ships the cap; its optical material, 940 nm transmission and Fresnel losses are unrecorded. Whether the stage-3 fluence is pre- or post-encapsulation is itself unspecified."
   },
   {
    "stage": "5. Photovoltaic conversion",
-   "quantity": "PV module efficiency under implanted conditions (low irradiance ~1 mW/cm², 940 nm, in-vivo temperature)",
-   "value": "UNKNOWN for the targeted cell; ~30 % cited for GaAs class cells",
-   "evidence_class": "UNKNOWN (targeted cell) / EXTERNAL_PRECEDENT (~30 % GaAs, consultant-cited literature)",
-   "loss": "70 % class (if GaAs ~30 % holds at low irradiance — itself unverified: low-irradiance efficiency can differ substantially from standard-condition efficiency)",
-   "notes": "R370Q dossier records PV efficiency 'UNKNOWN for targeted PV cell'. Efficiency at ~1 mW/cm² is NOT standard-condition efficiency — using a datasheet number here would be exactly the module-vs-system conflation the directive forbids."
+   "quantity": "PV module efficiency under implanted conditions (~1 mW/cm\u00b2, 940 nm, in-vivo temperature)",
+   "value": "UNKNOWN for the targeted cell; 0.30 (GaAs-class assumption)",
+   "unit": "dimensionless",
+   "source": "R370Q dossier ('UNKNOWN for targeted PV cell'); 0.30 GaAs-class consultant-cited literature value",
+   "evidence_class": "UNKNOWN (targeted cell) / EXTERNAL_PRECEDENT (0.30 GaAs-class assumption)",
+   "calculation": "not derivable from repository inputs",
+   "loss": "~70 % class IF the GaAs assumption holds at low irradiance \u2014 itself unverified (low-irradiance efficiency can differ substantially from standard-condition efficiency)",
+   "notes": "Using a datasheet number here would be exactly the module-vs-system conflation the constitution forbids."
   },
   {
    "stage": "6. Receiver area",
-   "quantity": "PV active area",
-   "value": "38.485 mm² (= 0.38485 cm²) on the shipped KEEP child (base design 19.635 mm²)",
+   "quantity": "PV active area (shipped KEEP child)",
+   "value": "38.4845",
+   "unit": "mm\u00b2 (= 0.384845 cm\u00b2)",
+   "source": "measured on the built solid: R381 KEEP child (cell diameter 5.0 -> 7.0 mm); independently re-measured at R404 in LEAD_PORTFOLIO_4/GEOMETRY_REVERIFICATION_EVIDENCE.json (fresh deterministic rebuild + gate battery: 38.4845 mm\u00b2)",
    "evidence_class": "COMPUTATIONAL_RESULT",
-   "loss": "n/a (geometric input, not a loss)",
-   "notes": "The R381 improvement loop grew the receiver cell diameter 5.0 -> 7.0 mm (area x1.96, KEEP). Measured on the built solid."
+   "calculation": "pi \u00d7 (7.0/2)\u00b2 = 38.4845 mm\u00b2 (base design 19.635 mm\u00b2 = pi \u00d7 (5.0/2)\u00b2)",
+   "loss": "n/a (geometric input)",
+   "notes": "The R381 improvement loop grew the receiver diameter (area \u00d71.96, KEEP)."
   },
   {
-   "stage": "7. Raw electrical output",
-   "quantity": "DC power from the PV at the recorded fluence",
-   "value": "~1050 uW claimed (MODELLED: 'fluence x area x efficiency' with area and efficiency unstated)",
-   "evidence_class": "MODELLED — NOT REPRODUCIBLE from recorded inputs",
-   "loss": "see derived discrepancy D1",
-   "notes": "The ~1050 uW figure's formula inputs are not recorded; no committed artifact enumerates them. ARITHMETIC CHECK (shown, on recorded values): 1.049 mW/cm² x 0.38485 cm² x 0.30 = 0.121 mW = ~121 uW — a factor ~8.7 BELOW the claimed 1050 uW. The claim cannot be reproduced from the repository's own recorded numbers and must not be quoted to a buyer as a system output."
+   "stage": "7. Raw electrical output at the PV terminals",
+   "quantity": "DC power from the PV at the archived fluence (the canonical calculation below)",
+   "value": "canonical figure: UNKNOWN (efficiency unknown); conditional band 121-163 uW under the stated assumptions",
+   "unit": "\u00b5W",
+   "source": "the canonical calculation in this file",
+   "evidence_class": "MODELLED (conditional band; inputs COMPUTATIONAL_RESULT_ARCHIVED + COMPUTATIONAL_RESULT + EXTERNAL_PRECEDENT assumption)",
+   "calculation": "P = Phi \u00d7 A \u00d7 eta (shown in canonical_calculation)",
+   "loss": "see canonical calculation",
+   "notes": "The historical ~1050 uW figure is RECONCILED below \u2014 it is the same fluence expressed on a 1 cm\u00b2 / 100 %-conversion reference detector and was never a claim about the shipped receiver."
   },
   {
    "stage": "8. Power electronics / conditioning / storage",
-   "quantity": "MPPT, boost/conversion, and storage efficiency",
+   "quantity": "MPPT, boost/conversion, storage efficiency",
    "value": "UNKNOWN",
+   "unit": "dimensionless",
+   "source": "no power-management architecture recorded",
    "evidence_class": "UNKNOWN",
+   "calculation": "none",
    "loss": "not quantified",
-   "notes": "No power-management architecture is recorded in the package. Diode/rectification, maximum-power-point tracking, and any duty-cycling storage losses are entirely unmodeled."
+   "notes": "Diode/rectification, MPPT and duty-cycling storage losses are entirely unmodeled."
   },
   {
    "stage": "9. Usable device power / load",
-   "quantity": "Power available to the implanted device function",
-   "value": "Target >= 500 uW (post unit-error correction; the pre-correction '>= 500 mW' figure was a confirmed unit error)",
-   "evidence_class": "BUYER_DEFINED (target) with consultant-verified arithmetic",
+   "quantity": "Power available to the implanted device function (target)",
+   "value": "target >= 500 (pass threshold); pre-correction '>= 500 mW' was a confirmed unit error",
+   "unit": "\u00b5W",
+   "source": "R332/R370Q decisive-experiment pass rule (BUYER_DEFINED target)",
+   "evidence_class": "BUYER_DEFINED (target)",
+   "calculation": "n/a (target)",
    "loss": "n/a (target)",
-   "notes": "Consultant's independent check: 500 uW at ~1 mW/cm² implies ~1.67 cm² of PV at ~30 % efficiency — 4.3x MORE area than the shipped 0.385 cm² receiver. DERIVED DISCREPANCY D2: at the recorded fluence and the consultant GaAs figure, the shipped receiver supports roughly 115-160 uW — BELOW the 500 uW target. The gap must be closed by area, fluence, efficiency, or target revision — all currently open."
+   "notes": "D2 REMAINS OPEN: the conditional band 121-163 uW is BELOW the 500 uW target \u2014 the gap must be closed by receiver area (\u00d74.3 at the recorded fluence), source fluence, cell efficiency, or target revision. This is an engineering-tradeoff decision (see DISCREPANCY D2), not a falsification (the DECISIVE_EXPERIMENT falsifier states a measured power inside the 116-162 uW recorded band confirms the chain and relocates the gap to a target/area decision)."
   }
  ],
+ "canonical_calculation": {
+  "formula": "P_electrical = Phi_det \u00d7 A_receiver \u00d7 eta_cell",
+  "status": "THE ONE canonical energy-budget calculation for the buyer package (directive item 4)",
+  "inputs": [
+   {
+    "symbol": "Phi_det",
+    "name": "fluence at the detector plane (5 mm homogeneous phantom, 1.0 mW source)",
+    "value": "1.049054 (R310 MC anchor) / 1.415645 (R311 PyTissueOptics) / 1.146949 (R312 50k ladder)",
+    "unit": "mW/cm\u00b2",
+    "source": "LEAD_PORTFOLIO_4/P08/VERIFICATION_EVIDENCE/{R310,R311,R312}/ (restored, sha256-pinned, preregistration-hash-bound)",
+    "evidence_class": "COMPUTATIONAL_RESULT_ARCHIVED",
+    "calculation": "Monte Carlo transport, preregistered phantom + Jacques 2013 optical properties; three model anchors with CI95 \u00b10.128 / \u00b10.544 / \u00b10.318; all within the published 0.5-2.0 range"
+   },
+   {
+    "symbol": "A_receiver",
+    "name": "shipped PV active area",
+    "value": 0.384845,
+    "unit": "cm\u00b2",
+    "source": "R381 KEEP child built solid; independently re-measured R404 (GEOMETRY_REVERIFICATION_EVIDENCE.json)",
+    "evidence_class": "COMPUTATIONAL_RESULT",
+    "calculation": "pi \u00d7 (7.0 mm / 2)\u00b2 = 38.4845 mm\u00b2"
+   },
+   {
+    "symbol": "eta_cell",
+    "name": "targeted-cell conversion efficiency at ~1 mW/cm\u00b2, 940 nm, in-vivo temperature",
+    "value": null,
+    "unit": "dimensionless",
+    "source": "R370Q dossier: 'UNKNOWN for targeted PV cell'; 0.30 is the GaAs-class EXTERNAL_PRECEDENT assumption used ONLY for the conditional band",
+    "evidence_class": "UNKNOWN (targeted cell)",
+    "calculation": "not derivable from repository inputs \u2014 no cell test exists"
+   }
+  ],
+  "derived_conditional_values": [
+   {
+    "condition": "eta = 0.30 (GaAs-class assumption), Phi = 1.049054 (R310 MC)",
+    "value": 121.0,
+    "unit": "\u00b5W",
+    "calculation": "1.049054 \u00d7 0.384845 \u00d7 0.30 = 0.121016 mW"
+   },
+   {
+    "condition": "eta = 0.30, Phi = 1.415645 (R311 PyTissueOptics)",
+    "value": 163.4,
+    "unit": "\u00b5W",
+    "calculation": "1.415645 \u00d7 0.384845 \u00d7 0.30 = 0.163370 mW"
+   },
+   {
+    "condition": "eta = 0.30, Phi = 1.146949 (R312 50k-photon ladder)",
+    "value": 132.4,
+    "unit": "\u00b5W",
+    "calculation": "1.146949 \u00d7 0.384845 \u00d7 0.30 = 0.132373 mW"
+   }
+  ],
+  "canonical_figure_for_buyer_package": {
+   "deliverable_electrical_power": "UNKNOWN",
+   "basis": "eta_cell (targeted, low-irradiance, in-vivo temperature) is UNKNOWN; the encapsulation and power-electronics stages are UNKNOWN; therefore the deliverable power cannot be established from repository inputs (Art. XXV). The conditional band 121-163 \u00b5W MUST be presented as a modelled band under explicitly stated assumptions (archived fluence \u00d7 measured area \u00d7 GaAs-class efficiency assumption) \u2014 never as system output, never as 'verified power'.",
+   "presentation_rule": "Buyer documents quote ONE canonical statement: 'conditional modelled band 121-163 \u00b5W under stated assumptions; canonical deliverable power UNKNOWN pending the bench measurement of fluence and cell efficiency'"
+  },
+  "the_reconciliation": {
+   "directive": "R404 item 4: the reported ~1050 \u00b5W and ~121 \u00b5W must be reconciled",
+   "the_reported_1050": {
+    "value": 1049.054387745623,
+    "unit": "\u00b5W",
+    "source": "VERIFICATION_EVIDENCE/R310/P-16_VERIF-002_RESULT.json \u2014 the field is literally named 'verified_power_output_uW_assuming_1cm2_PV_100pct_conversion'; the preregistered phantom detector is 'PV cell at z=5mm, 1 cm^2 active area'",
+    "evidence_class": "COMPUTATIONAL_RESULT_ARCHIVED (reference conversion)",
+    "calculation": "1.049054 mW/cm\u00b2 \u00d7 1.0 cm\u00b2 \u00d7 1.00 = 1049.054 \u00b5W \u2014 the fluence expressed as power on the preregistered REFERENCE detector at 100 % conversion"
+   },
+   "the_reported_121": {
+    "value": 121.0,
+    "unit": "\u00b5W",
+    "source": "R403 ENERGY_BUDGET arithmetic check; re-derived here from archived inputs",
+    "evidence_class": "MODELLED (conditional)",
+    "calculation": "1.049054 mW/cm\u00b2 \u00d7 0.384845 cm\u00b2 \u00d7 0.30 = 121.0 \u00b5W \u2014 the SAME fluence applied to the SHIPPED receiver area with the GaAs-class efficiency assumption"
+   },
+   "resolution": "RESOLVED: the two figures are the SAME fluence under different (area, efficiency) assumptions \u2014 1.0 cm\u00b2 \u00d7 100 % (R310's reference-detector conversion, recorded by its own field name) vs 0.3848 cm\u00b2 \u00d7 30 % (shipped receiver + GaAs-class assumption). The contradiction was born at R332, which re-labeled the reference conversion as '~1050 \u03bcW power output (derived from fluence \u00d7 area \u00d7 efficiency, MODELLED)' WITHOUT the 1 cm\u00b2/100 % qualifiers, and propagated through the R370Q dossier exports. The 1050 figure is not reproducible as a claim about the shipped receiver and must never be quoted as system output; the conditional band for the shipped receiver is 121-163 \u00b5W under stated assumptions."
+  }
+ },
  "derived_discrepancies": [
-  "D1: The claimed ~1050 uW output is ~8.7x above what the recorded inputs (1.049 mW/cm² x 0.38485 cm² x 0.30) produce (~121 uW). The claim's own formula inputs are unrecorded; it is not reproducible from the repository (Constitution Art. LXII).",
-  "D2: The >= 500 uW device target implies ~1.67 cm² receiver area at the recorded fluence (consultant arithmetic) vs 0.385 cm² shipped — a 4.3x area shortfall (or equivalent fluence/efficiency/target adjustment).",
-  "D3: The complete loss decomposition (source wall-plug, skin coupling, per-layer tissue including skull, encapsulation, low-irradiance PV efficiency, power electronics) has NEVER existed in one artifact — this file is the first assembly, and it assembles gaps as much as numbers."
+  "D1 [RESOLVED at R404]: the ~1050 \u00b5W claim was the R310 reference-detector conversion (1 cm\u00b2, 100 %) re-labeled without its qualifiers at R332; the ~121 \u00b5W figure is the same fluence on the shipped receiver with the GaAs-class assumption. Both derivations now shown in canonical_calculation.the_reconciliation.",
+  "D2 [OPEN \u2014 engineering decision]: the >= 500 \u00b5W device target implies ~1.67 cm\u00b2 receiver area at the recorded fluence and 30 % efficiency vs 0.3848 cm\u00b2 shipped \u2014 a ~4.3x area shortfall (or equivalent fluence/efficiency/target adjustment). Resolution is an owner engineering decision; the decisive-experiment falsifier explicitly treats a measured power inside the conditional band as chain-confirmation + target/area relocation, NOT mechanism falsification.",
+  "D3 [PARTIALLY RESOLVED]: the complete loss decomposition now exists in one artifact with the simulation chain archived and hash-pinned; stages 1 (real source), 4 (encapsulation), 5 (targeted-cell efficiency) and 8 (power electronics) remain UNKNOWN."
  ],
- "module_vs_system_guard": "NO number in this budget may be quoted as 'system efficiency' or 'system power'. The only system-level recorded numbers are the fluence range (T2_ASSERTED) and the 500 uW target (BUYER_DEFINED). PV cell efficiency (~30 % GaAs class) is a component figure under non-implanted conditions.",
- "platform_claim_guard": "The 'platform technology' framing is NOT supported by repository evidence until (a) the R310/R311/R312 execution artifacts are restored or the simulation chain re-run, and (b) the D1/D2 arithmetic gaps are resolved with recorded inputs. This budget explicitly does not make that claim.",
+ "module_vs_system_guard": "NO number in this budget may be quoted as 'system efficiency' or 'system power'. The only recorded system-level quantities are the archived fluence (simulation) and the 500 \u00b5W target (BUYER_DEFINED). PV cell efficiency (0.30 GaAs-class) is a component figure under NON-implanted, standard-irradiance conditions.",
+ "platform_claim_guard": "The 'platform technology' framing is not supported until (a) the bench phantom-path experiment measures the real chain and (b) the D2 target/area decision is made. This budget explicitly does not make that claim.",
+ "r403_audit_error_disclosure": "Art. XV/XXXI: the R403 version of this file stated the R310/R311/R312 execution artifacts 'DO NOT EXIST in the repository or its git history'. That statement was WRONG \u2014 the artifacts exist in git history (deleted from the working tree at R388, commit 8cb6ff3b) and are restored byte-identically under VERIFICATION_EVIDENCE/ with sha256 + blob-sha1 custody. The error's lesson (search git history, not just the working tree, before declaring evidence absent) is recorded in the restoration provenance.",
  "open_owner_actions": [
-  "Restore or re-run the PyTissueOptics/MCX verification chain (pre-registration exists at R309; execution artifacts missing)",
-  "Record the source spec (irradiance class, safety limit basis) — currently UNKNOWN",
-  "Record encapsulation optical transmission at 940 nm — currently UNKNOWN",
+  "D2 engineering decision: receiver area vs source fluence vs cell efficiency vs target revision (the 500 \u00b5W target vs 121-163 \u00b5W conditional band)",
+  "Record the real external source spec (irradiance class, safety limit basis) \u2014 currently UNKNOWN",
+  "Record encapsulation optical transmission at 940 nm \u2014 currently UNKNOWN",
   "Record targeted-cell low-irradiance efficiency or a test plan for it",
-  "Reconcile D1/D2: either record the inputs behind ~1050 uW or withdraw the figure",
-  "Model the power-management stage or record it as a design decision"
+  "Model the power-management stage or record it as a design decision",
+  "Run the phantom-path bench experiment (DECISIVE_EXPERIMENT.json) to convert the quantitative basis from simulation to measurement"
  ]
 }
