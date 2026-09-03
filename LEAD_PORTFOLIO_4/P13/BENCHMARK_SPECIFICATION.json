@@ -1,0 +1,44 @@
+{
+ "artifact_type": "BENCHMARK_SPECIFICATION",
+ "company_designation": "P13",
+ "portfolio_number": "13",
+ "historical_package_id": "P-27-R1",
+ "technology_name": "Self-Referencing Piezoresistive Pressure Sensor",
+ "constitutional_basis": "Directive section 12: the central proposition is NOT 'a pressure sensor works' (trivial) — it is that SELF-REFERENCING provides a meaningful improvement in pressure measurement stability/drift/error under relevant conditions vs a BASELINE sensor. The benchmark is built explicitly around baseline vs self-referencing. Constitution Art. XLVII (baseline supremacy; identical instrument across arms).",
+ "central_proposition": "A self-referencing piezoresistive architecture (active pressure-exposed element + dummy pressure-shielded element sharing the thermal environment, bridge output V_out = (R_active(T,P) - R_dummy(T))/(4R)*V_ex) reduces drift and thermal error materially below a single-ended baseline sensor under catheter-integrated CSF conditions.",
+ "language_guard": {
+  "forbidden_terms": ["drift-free", "self-calibrating"],
+  "basis": "Directive section 12: do not use 'drift-free'; do not use 'self-calibrating' unless the architecture and evidence support it. The recorded architecture is a differential bridge referencing a dummy element — it compensates COMMON-MODE thermal drift only; it is neither free of drift (non-common-mode drift is uncompensated — the P-25 failure evidence) nor capable of self-calibration (no calibration actuation exists; the dossier's own mitigation for residual drift is PERIODIC RECALIBRATION, which is the opposite of automatic self-calibration).",
+  "grep_verified": "No buyer-facing package surface currently uses either term (verified across the frozen corpus for this package; this record pins the guard)"
+ },
+ "arms": {
+  "baseline": "Single-ended piezoresistive pressure sensor of the same die/process family (same sensing element WITHOUT the dummy/reference element), same packaging, same electronics chain, same instrument — the architecture's absence is the ONLY difference (Constitution Art. XLVII).",
+  "treatment": "Self-referencing architecture: active + dummy element bridge per the shipped design (diaphragm 0.07 mm class after the KEEP mutation; reference die included in the shipped CAD)."
+ },
+ "recorded_evidence_basis": {
+  "the_only_measured_self_referencing_result_in_repository_history": {
+   "package": "P-25 (RETIRED — the pressure sensor's direct predecessor, killed at R370J)",
+   "result": "67.8 % drift cancellation BUT 3.45 mmHg error > 2.0 mmHg threshold — FAILED the acceptance threshold; biofouling dominates NON-COMMON-MODE drift",
+   "lesson_codified": "KA-014: candidates relying on self-referencing WITHOUT a non-common-mode drift repair mechanism are blocked (the codified lesson blocks exactly this architecture class unless the non-common-mode channel is addressed)",
+   "source": "PORTFOLIO_COMMERCIAL_STATE.json P-25 entry; R339/g5_ka014_stress_test/KA014_STRESS_TEST.json"
+  },
+  "the_drift_target": "1-10 mmHg/month (typical, external-precedent literature) -> < 0.5 mmHg/month (drift_compensation_target) — MODEL_DERIVED target, status 'MODELLED — no hardware validation of drift performance' (R370Q dossier)",
+  "ka014_implication": "P-27-R1's recorded mitigations (periodic recalibration, spare capacity) do NOT obviously satisfy KA-014's non-common-mode drift repair requirement — this benchmark's endpoints are designed to measure exactly that unresolved channel. This is the package's largest scientific risk, made explicit."
+ },
+ "measurement_matrix": {
+  "initial_accuracy": "Static pressure accuracy over the ICP range (0-40 mmHg class) at reference conditions, both arms, same reference instrument",
+  "temperature_dependence": "Thermal sweep (body-relevant range incl. fever class excursions, e.g. 33-41 C): zero offset and sensitivity drift vs temperature, both arms — the common-mode channel the architecture claims to cancel",
+  "drift": "Long-duration zero/sensitivity drift at fixed conditions (target horizon per the MODEL_DERIVED < 0.5 mmHg/month figure; interim acceleration methods recorded as acceleration-class, never silently equated to real-time aging)",
+  "hysteresis": "Pressure up-down cycles: hysteresis loop area, both arms (the dossier's WP-01 already names sensitivity/linearity/hysteresis)",
+  "cycling": "Pressure/thermal cycling endurance: drift evolution ACROSS cycles (a field the current dossier lacks — added here per directive section 12)",
+  "aging": "Chronic aging study with periodic calibration (the dossier's recorded verification item; here measured as the DIFFERENCE between arms, not just absolute drift)",
+  "reference_stability": "The dummy element's own stability (the reference can drift too — the bridge is only as stable as the reference; measured directly)",
+  "packaging_effects": "Hermeticity per MIL-STD-883 leak < 1e-8 atm*cc/s (recorded WP-03) + packaging-induced stress on both elements (the R370Q failure-mode table's packaging entries)",
+  "calibration_retention": "Time-between-calibration performance: residual error growth after calibration, both arms — the operational meaning of the drift improvement",
+  "biofouling_channel": "The P-25-recorded dominant non-common-mode drift driver: a fouling-exposure protocol arm (accelerated protein adsorption class exposure of the active element vs the shielded dummy — designed to measure whether the architecture's differential signal survives asymmetric fouling; the exact channel that killed P-25)"
+ },
+ "primary_endpoint": "Drift (zero + sensitivity) of the self-referencing arm vs the baseline arm over the pre-registered duration, expressed against the MODEL_DERIVED < 0.5 mmHg/month target — with the improvement ratio (baseline drift / treatment drift) as the headline number. NOTE the P-25 precedent: 67.8 % cancellation FAILED against a 2.0 mmHg error threshold; the acceptance threshold here must be pre-registered with provenance (Art. XXVII), not borrowed from the cancelled P-25 numbers.",
+ "secondary_endpoints": ["thermal zero/sensitivity drift ratio between arms", "hysteresis and linearity comparison", "reference-element stability", "cycling endurance drift evolution", "biofouling-channel differential error (the KA-014 channel)", "calibration retention interval ratio"],
+ "decision_rule": "The architecture EARNS its central proposition only if the treatment arm's drift/error improvement over the SAME-instrument baseline is material on the primary endpoint AND the non-common-mode channels (biofouling, reference drift) do not erase the advantage. If asymmetric fouling dominates (P-25's failure class), the self-referencing premise for THIS application is falsified — repair (non-common-mode compensation mechanism) or cemetery, per the KA-014 lesson.",
+ "honest_basis_note": "Every planned verification item in the shipped dossier is currently NOT_TESTED; this specification is the first assembly of the baseline-vs-treatment comparison the proposition actually requires. No numbers above are measurements; they are the pre-registration of what must be measured."
+}

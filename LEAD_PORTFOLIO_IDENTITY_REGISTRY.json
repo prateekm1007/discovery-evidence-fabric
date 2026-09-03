@@ -1,0 +1,82 @@
+{
+ "artifact_type": "LEAD_PORTFOLIO_IDENTITY_REGISTRY",
+ "registry_version": "1.0",
+ "authority": "Toscanini commercial technology identity",
+ "constitutional_basis": "Article XI (history is evidence — historical IDs immutable, never renumbered, never reissued); Article X (one canonical authority for the commercial identity layer); Article XXXIX (the buyer-distribution repository remains the final authority for buyer-received bytes).",
+ "purpose": "The single canonical mapping between the company's external commercial designations (the names the company sells and negotiates under), the external portfolio sequence (01-15), and the immutable historical package IDs (provenance layer). Every buyer-facing artifact, manifest, package record and test must derive its identity from THIS registry. Historical package IDs are PROVENANCE, never commercial identity: a buyer-facing document uses the company designation; the historical ID belongs to the machine-readable provenance layer.",
+ "identity_hierarchy": [
+  "company_designation (EXTERNAL COMMERCIAL IDENTITY — primary on buyer-facing material)",
+  "portfolio_number (external folder sequence 01-15)",
+  "historical_package_id (IMMUTABLE PROVENANCE — never renamed, never reissued, never shown to buyers without this mapping)",
+  "technology_name (canonical human-readable name)"
+ ],
+ "prohibitions": [
+  "Renaming any historical package ID (P-24 stays P-24; P-27-R1 stays P-27-R1)",
+  "Renumbering the portfolio sequence",
+  "Rewriting historical hashes or mutation certificates",
+  "Renaming historical artifacts/folders in a way that destroys provenance",
+  "Treating the engine-side PACKAGE_ID_REGISTRY.json sequential allocation scheme as an authority for lead-portfolio identity (its rows 16-158 are sandbox fixture allocations that collide with real historical IDs — see LEAD_PORTFOLIO_4_AUDIT.md conflict C1)"
+ ],
+ "lead_packages": [
+  {
+   "company_designation": "P04",
+   "portfolio_number": "04",
+   "historical_package_id": "P-07",
+   "technology_name": "Passive Drainage Priority Safety Floor",
+   "folder_name": "04_drainage_floor",
+   "current_version": "2.0",
+   "commercial_lead": true
+  },
+  {
+   "company_designation": "P08",
+   "portfolio_number": "08",
+   "historical_package_id": "P-16",
+   "technology_name": "NIR Photovoltaic Power Delivery for Implantable Devices",
+   "folder_name": "08_nir_photovoltaic",
+   "current_version": "1.0",
+   "commercial_lead": true
+  },
+  {
+   "company_designation": "P11",
+   "portfolio_number": "11",
+   "historical_package_id": "P-24",
+   "technology_name": "Gravity Compensation Hydraulic Damper for Postural Transients",
+   "folder_name": "11_gravity_damper",
+   "current_version": "1.0",
+   "commercial_lead": true
+  },
+  {
+   "company_designation": "P13",
+   "portfolio_number": "13",
+   "historical_package_id": "P-27-R1",
+   "technology_name": "Self-Referencing Piezoresistive Pressure Sensor",
+   "folder_name": "13_pressure_sensor",
+   "current_version": "2.0",
+   "commercial_lead": true
+  }
+ ],
+ "separate_historical_items": [
+  {
+   "company_designation": "P14",
+   "portfolio_number": "14",
+   "historical_package_id": "P-28",
+   "technology_name": "Acoustic Obstruction Detection for CSF Shunts",
+   "folder_name": "14_acoustic_detection",
+   "current_version": "2.0",
+   "commercial_lead": false,
+   "classification": "SEPARATE_HISTORICAL_EXPERIMENTAL_ITEM — previously evaluated; broad obstruction-detection thesis carries a HIGH FEASIBILITY RISK (acoustic impedance contrast insufficient for the dominant tissue/debris obstruction types; kill condition NOT confirmed — see LEAD_PORTFOLIO_4/P14/P14_EXTERNAL_DISTRIBUTION_RECORD.json). NOT part of the four-lead commercial portfolio."
+  }
+ ],
+ "consumers": [
+  "LEAD_PORTFOLIO_4_MANIFEST.json (root)",
+  "LEAD_PORTFOLIO_4/P04..P13, P14 package records",
+  "NOVELTY_EVIDENCE/ (restored search artifacts keyed by historical_package_id)",
+  "tests/test_r403_lead_portfolio_integrity.py (cross-artifact consistency — fails on any identity drift)",
+  "Buyer-facing document regeneration (future rounds; per Article XXXIX the released buyer bytes change only through the release-chain protocol)"
+ ],
+ "known_collisions_disclosed": [
+  "Engine PACKAGE_ID_REGISTRY.json rows 16-158 allocate P-16..P-158 to sandbox fixtures (inv:fixture:*) colliding with real historical IDs; that registry is an allocation ledger, not a technology identity authority for this portfolio (audit conflict C1).",
+  "PORTFOLIO_COMMERCIAL_STATE.json (CEO-owned, 2026-08-26) tracks an older 15-candidate set with no P-26/P-27-R1/P-28 entries; its 'P-04' token denotes an older catalytic-clearance candidate (audit conflict C2).",
+  "The historical ID P-27-R1 previously belonged to a metallic-tubing catheter repair (searched by PatentBear at R359-R364) BEFORE the R370 corpus build reassigned the ID to the pressure sensor; novelty citations keyed to that ID before 2026-08-27 do NOT cover the pressure sensor (audit conflict C3)."
+ ]
+}

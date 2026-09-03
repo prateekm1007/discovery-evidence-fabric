@@ -1,0 +1,105 @@
+{
+ "artifact_type": "ENERGY_BUDGET",
+ "company_designation": "P08",
+ "portfolio_number": "08",
+ "historical_package_id": "P-16",
+ "technology_name": "NIR Photovoltaic Power Delivery for Implantable Devices",
+ "constitutional_basis": "Directive section 11: audit the entire energy chain (optical source -> tissue transmission -> implanted PV -> electrical conversion -> usable device power); every loss explicit; photovoltaic efficiency must never be quoted as implanted-system efficiency. Constitution Art. XXV (unknown stays unknown) and Art. II (exact evidence beats plausibility).",
+ "scope": "STAGE-BY-STAGE loss map assembled from RECORDED repository values only. Every number carries its evidence class; no number is invented; arithmetic derivations are shown explicitly where computed.",
+ "evidence_class_vocabulary": [
+  "EXTERNAL_PRECEDENT — published-literature value carried in the package (e.g. Jacques 2013 optical properties)",
+  "MODELLED — computed/modelled, not measured (Art. XXXVIII layer 4)",
+  "T2_CONFIRMED_ASSERTED_NOT_ARCHIVED — claimed as simulation-confirmed in the frozen dossier but the execution artifacts are absent from the repository (R310/R311/R312 cited, not present); not reproducible from repo bytes",
+  "COMPUTATIONAL_RESULT — measured on the built CAD solid by the deterministic pipeline",
+  "UNKNOWN — not modeled, not measured, not bounded in any committed artifact"
+ ],
+ "chain": [
+  {
+   "stage": "1. External optical source (940 nm class)",
+   "quantity": "Incident irradiance at skin surface",
+   "value": "UNKNOWN",
+   "evidence_class": "UNKNOWN",
+   "loss": "not quantified",
+   "notes": "R370Q dossier: external source power 'UNKNOWN — bounded by tissue heating limit'. The consultant's plausibility reconstruction used 100 mW/cm² as the assumed incident case (EXTERNAL_PRECEDENT-class assumption, reviewer's arithmetic, not a shipped spec). No source wall-plug efficiency, no skin-interface coupling loss is recorded anywhere."
+  },
+  {
+   "stage": "2. Tissue transmission (scalp/skull/brain path to implant site)",
+   "quantity": "Transmitted fraction at the PV surface",
+   "value": "5 mm soft tissue: 60.7 % (mu_eff = 1.0 /cm) to 28.7 % (mu_eff = 2.5 /cm); skull composition: WORSE, UNQUANTIFIED in the repository",
+   "evidence_class": "EXTERNAL_PRECEDENT",
+   "loss": "39-71 % over 5 mm soft tissue; more through skull (unquantified)",
+   "notes": "EQ-1 Beer-Lambert I(d) = I0*exp(-mu_eff*d); mu_eff 1.0-2.5 /cm at 940 nm per Jacques 2013 (the package's own EXTERNAL_PRECEDENT). Governing equation committed; path decomposition (skin/scalp/skull/dura) per-layer: UNKNOWN. Implied TOTAL transmission from the 100 mW/cm² consultant case to the recorded PV fluence is 1.0-1.4 % — i.e. an additional ~25-29x 'path losses' beyond the 5 mm soft-tissue figure, consistent with a deeper/optically-worse implant path, which the repo does not decompose."
+  },
+  {
+   "stage": "3. Fluence at the implanted PV surface",
+   "quantity": "PV-surface irradiance",
+   "value": "1.0-1.4 mW/cm² (Monte-Carlo converged value 1.049 mW/cm²; published comparison range 0.5-2.0 mW/cm²; MC-vs-MC agreement 0.11 %)",
+   "evidence_class": "T2_CONFIRMED_ASSERTED_NOT_ARCHIVED",
+   "loss": "n/a (this is the post-tissue state)",
+   "notes": "Frozen dossier states 'T2-CONFIRMED via PyTissueOptics v2.0.1' and cites R310/R311/R312 execution directories that DO NOT EXIST in the repository or its git history; the claim's own record labels it MODELLED with limitation 'model prediction — not experimentally verified' and independent_verification 'none'. The R309 pre-registration protocol (MCX vs PyTissueOptics vs Jacques 2013, tolerance 0.05 mW/cm²) IS committed; the execution artifacts are not. This number may not be treated as verified until the runs are repeated or the artifacts restored."
+  },
+  {
+   "stage": "4. Encapsulation / optical window transmission at 940 nm",
+   "quantity": "Transmission through the hermetic encapsulation cap",
+   "value": "UNKNOWN",
+   "evidence_class": "UNKNOWN",
+   "loss": "not quantified",
+   "notes": "The CAD ships an encapsulation cap (0.55 mm) — its optical material, transmission at 940 nm, and Fresnel/reflection losses are unrecorded. The fluence claim of stage 3 is described as at the PV surface (post-encapsulation or pre-encapsulation is itself unspecified)."
+  },
+  {
+   "stage": "5. Photovoltaic conversion",
+   "quantity": "PV module efficiency under implanted conditions (low irradiance ~1 mW/cm², 940 nm, in-vivo temperature)",
+   "value": "UNKNOWN for the targeted cell; ~30 % cited for GaAs class cells",
+   "evidence_class": "UNKNOWN (targeted cell) / EXTERNAL_PRECEDENT (~30 % GaAs, consultant-cited literature)",
+   "loss": "70 % class (if GaAs ~30 % holds at low irradiance — itself unverified: low-irradiance efficiency can differ substantially from standard-condition efficiency)",
+   "notes": "R370Q dossier records PV efficiency 'UNKNOWN for targeted PV cell'. Efficiency at ~1 mW/cm² is NOT standard-condition efficiency — using a datasheet number here would be exactly the module-vs-system conflation the directive forbids."
+  },
+  {
+   "stage": "6. Receiver area",
+   "quantity": "PV active area",
+   "value": "38.485 mm² (= 0.38485 cm²) on the shipped KEEP child (base design 19.635 mm²)",
+   "evidence_class": "COMPUTATIONAL_RESULT",
+   "loss": "n/a (geometric input, not a loss)",
+   "notes": "The R381 improvement loop grew the receiver cell diameter 5.0 -> 7.0 mm (area x1.96, KEEP). Measured on the built solid."
+  },
+  {
+   "stage": "7. Raw electrical output",
+   "quantity": "DC power from the PV at the recorded fluence",
+   "value": "~1050 uW claimed (MODELLED: 'fluence x area x efficiency' with area and efficiency unstated)",
+   "evidence_class": "MODELLED — NOT REPRODUCIBLE from recorded inputs",
+   "loss": "see derived discrepancy D1",
+   "notes": "The ~1050 uW figure's formula inputs are not recorded; no committed artifact enumerates them. ARITHMETIC CHECK (shown, on recorded values): 1.049 mW/cm² x 0.38485 cm² x 0.30 = 0.121 mW = ~121 uW — a factor ~8.7 BELOW the claimed 1050 uW. The claim cannot be reproduced from the repository's own recorded numbers and must not be quoted to a buyer as a system output."
+  },
+  {
+   "stage": "8. Power electronics / conditioning / storage",
+   "quantity": "MPPT, boost/conversion, and storage efficiency",
+   "value": "UNKNOWN",
+   "evidence_class": "UNKNOWN",
+   "loss": "not quantified",
+   "notes": "No power-management architecture is recorded in the package. Diode/rectification, maximum-power-point tracking, and any duty-cycling storage losses are entirely unmodeled."
+  },
+  {
+   "stage": "9. Usable device power / load",
+   "quantity": "Power available to the implanted device function",
+   "value": "Target >= 500 uW (post unit-error correction; the pre-correction '>= 500 mW' figure was a confirmed unit error)",
+   "evidence_class": "BUYER_DEFINED (target) with consultant-verified arithmetic",
+   "loss": "n/a (target)",
+   "notes": "Consultant's independent check: 500 uW at ~1 mW/cm² implies ~1.67 cm² of PV at ~30 % efficiency — 4.3x MORE area than the shipped 0.385 cm² receiver. DERIVED DISCREPANCY D2: at the recorded fluence and the consultant GaAs figure, the shipped receiver supports roughly 115-160 uW — BELOW the 500 uW target. The gap must be closed by area, fluence, efficiency, or target revision — all currently open."
+  }
+ ],
+ "derived_discrepancies": [
+  "D1: The claimed ~1050 uW output is ~8.7x above what the recorded inputs (1.049 mW/cm² x 0.38485 cm² x 0.30) produce (~121 uW). The claim's own formula inputs are unrecorded; it is not reproducible from the repository (Constitution Art. LXII).",
+  "D2: The >= 500 uW device target implies ~1.67 cm² receiver area at the recorded fluence (consultant arithmetic) vs 0.385 cm² shipped — a 4.3x area shortfall (or equivalent fluence/efficiency/target adjustment).",
+  "D3: The complete loss decomposition (source wall-plug, skin coupling, per-layer tissue including skull, encapsulation, low-irradiance PV efficiency, power electronics) has NEVER existed in one artifact — this file is the first assembly, and it assembles gaps as much as numbers."
+ ],
+ "module_vs_system_guard": "NO number in this budget may be quoted as 'system efficiency' or 'system power'. The only system-level recorded numbers are the fluence range (T2_ASSERTED) and the 500 uW target (BUYER_DEFINED). PV cell efficiency (~30 % GaAs class) is a component figure under non-implanted conditions.",
+ "platform_claim_guard": "The 'platform technology' framing is NOT supported by repository evidence until (a) the R310/R311/R312 execution artifacts are restored or the simulation chain re-run, and (b) the D1/D2 arithmetic gaps are resolved with recorded inputs. This budget explicitly does not make that claim.",
+ "open_owner_actions": [
+  "Restore or re-run the PyTissueOptics/MCX verification chain (pre-registration exists at R309; execution artifacts missing)",
+  "Record the source spec (irradiance class, safety limit basis) — currently UNKNOWN",
+  "Record encapsulation optical transmission at 940 nm — currently UNKNOWN",
+  "Record targeted-cell low-irradiance efficiency or a test plan for it",
+  "Reconcile D1/D2: either record the inputs behind ~1050 uW or withdraw the figure",
+  "Model the power-management stage or record it as a design decision"
+ ]
+}

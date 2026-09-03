@@ -1,0 +1,34 @@
+{
+ "artifact_type": "DIFFERENTIATION_AND_CAUSAL_CHAIN",
+ "company_designation": "P11",
+ "portfolio_number": "11",
+ "historical_package_id": "P-24",
+ "technology_name": "Gravity Compensation Hydraulic Damper for Postural Transients",
+ "constitutional_basis": "Directive section 10: the causal chain must be explicit; the decisive experiment must compare against a REAL baseline architecture; do not merely show that the mechanism moves fluid. Constitution Art. XLVII (baseline supremacy) and Art. XX (problem existence).",
+ "causal_chain": [
+  {"step": 1, "event": "Postural/orientation change (e.g. supine -> upright)", "physics": "dP_gravity = rho * g * dh; postural range up to ~50 cm H2O (~37 mmHg) recorded in the buyer equation registry (EQ-1)", "class": "EXTERNAL_PRECEDENT (physics) + MODELLED (range)"},
+  {"step": 2, "event": "Hydrostatic/gravitational pressure transient appears across the shunt", "physics": "The postural step changes total driving pressure: dP_total = dP_valve + dP_gravity - dP_damper (EQ-3)", "class": "MODELLED"},
+  {"step": 3, "event": "Hydraulic response of the damper", "physics": "First-order fluid response: dQ/dt = (dP_total - dP_gravity - c_h*Q)/I_h; damping element provides hydraulic resistance proportional to flow: F = c*v, dP_damper = c_h*Q (EQ-2/EQ-4); settling ~5*tau, tau = I_h/c_h (EQ-5)", "class": "MODELLED — comparative advantage over ASD UNKNOWN (the dossier's own status label)"},
+  {"step": 4, "event": "Damping/control of the transient", "physics": "The annular damping gap (shipped: 0.18 mm after the KEEP mutation; c_h ~ 1/gap^3, MODELLED, relative change x4.63) attenuates the flow transient amplitude and settling behavior", "class": "COMPUTATIONAL_RESULT (gap, measured on built solid) + MODELLED (c_h)"},
+  {"step": 5, "event": "Altered flow response", "physics": "Attenuated postural flow excursions vs the standard/ASD architectures across the postural pressure set (10/20/30/40 mmHg)", "class": "MODELLED (R339 comparison table)"}
+ ],
+ "what_the_device_does": "A passive hydraulic damper inline with the CSF shunt that damps postural flow transients — a compressible-element/annular-gap proportional resistance element reacting to the hydrostatic pressure step of posture change, rather than a binary anti-siphon membrane or a programmable valve setting.",
+ "what_the_baseline_is": "ASD (anti-siphon device) — the incumbent passive gravity-compensation architecture — plus the standard valve catheter as the null baseline. The R339 buyer package comparison table covers 4 postures at 10/20/30/40 mmHg: damper vs ASD vs standard.",
+ "the_honest_finding": {
+  "quote": "ASD is BETTER than P-24 at target-flow matching in 3/4 postures. P-24's advantage is proportional response and faster modeled dynamics — neither yet established as clinically material.",
+  "source": "R339/g2_p24_buyer_package/P-24_BUYER_PACKAGE.json (asd_comparison_table: postures_asd_closer_to_target = 3/4; honest_finding field)",
+  "established_advantages_over_ASD": 0,
+  "vvuq_label": "COMPUTATIONALLY_SUPPORTED_BUT_UNCERTAINTY_SENSITIVE — 78.8 % of the modeled parameter ensemble meets target"
+ },
+ "differentiators": [
+  {"claim": "Response speed (0.1 s vs 0.5 s class; quantitative value 0.4 s recorded)", "verdict": "UNESTABLISHED", "materiality_evidence": "NONE — postural transitions take 1-3 seconds; the recorded note is that the speed difference may be clinically immaterial", "source": "R339/g3_p24_differentiation/P-24_DIFFERENTIATION_ATTACK.json"},
+  {"claim": "Proportional control (smooth, continuously varying resistance vs binary anti-siphon switching)", "verdict": "UNESTABLISHED", "materiality_evidence": "NONE — no model of ICP oscillation as a function of valve binary-switching exists", "source": "same"}
+ ],
+ "differentiation_verdict_counts": {"ESTABLISHED": 0, "UNESTABLISHED": 2, "WEAK": 1, "FALSE": 2, "DISADVANTAGE": 2, "NEUTRAL": 1, "NONE": 1},
+ "decision_recorded": "The two unestablished advantages (response speed, proportional control) become the decisive experiment's primary endpoints. If bench data shows neither is clinically material, P-24 enters the repair pipeline; if repair fails, cemetery (R339 g3 decision, quoted in PORTFOLIO_COMMERCIAL_STATE.json).",
+ "problem_existence_gaps": [
+  "The clinical harm model of postural over-drainage transients (vs steady-state over-drainage, which ASDs already address) is the premise this package must defend — the differentiation audit records no established clinical materiality for EITHER differentiator",
+  "0 established advantages over the incumbent ASD is the honest starting position; the package is a hypothesis about two unestablished differentiators, not an improvement claim"
+ ],
+ "loop_verification_state": "SYNTHETIC_LOOP_VERIFIED (the only non-NONE state in the buyer portfolio; R339 11-step Article-XXXV loop on synthetic observations — 'Posterior is NOT reality-informed') — never to be presented as physical validation"
+}

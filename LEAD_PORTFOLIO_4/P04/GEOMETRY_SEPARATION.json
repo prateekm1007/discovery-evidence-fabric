@@ -1,0 +1,56 @@
+{
+ "artifact_type": "GEOMETRY_SEPARATION_RECORD",
+ "constitutional_basis": "Article XXIX — a failed embodiment (implementation) cannot kill the invention unless the design space is exhausted or an invariant proof shows impossibility. A bad geometry implementation does not automatically kill the scientific idea; an invalid geometry cannot be presented as manufacturing-ready. This record separates the three layers explicitly and machine-checkably.",
+ "company_designation": "P04",
+ "historical_package_id": "P-07",
+ "layers": {
+  "scientific_concept": {
+   "statement": "A passive, valve-free dual-lumen drainage architecture in which a low-conductance floor lumen maintains a minimum drainage rate when the primary lumen is obstructed, providing an intrinsic safety floor against over-drainage/under-drainage failure of a CSF shunt's distal catheter.",
+   "status": "MECHANISM_SUPPORTED (4 governing equations, 10 design inputs, 5 failure modes, 5 external evidence items in the frozen dossier); PROBLEM EXISTENCE is itself recorded as partially unknown (clinical benefit magnitude UNKNOWN until trial)",
+   "kill_condition": "Common-cause obstruction affecting both primary and floor lumens equally (recorded critical unknown); clinical irrelevance of the maintained minimum flow (Q_min unknown)"
+  },
+  "engineering_architecture": {
+   "statement": "Extruded dual-lumen silicone catheter: primary lumen (1.1 mm) + eccentric floor lumen (0.6 mm) at 1.0 mm offset in a 3.0 mm OD body, 100 mm length; G_floor/G_primary = (d_floor/d_primary)^4 (Poiseuille, MODELLED).",
+   "status": "ENGINEERING_DEFINED; parametric template tpl:P07_drainage_floor_dual_lumen:v1 with measured-on-built-solid constraints (min wall >= 0.15 mm, floor conductance split >= 0)"
+  },
+  "current_cad_implementation": {
+   "shipped_model": {
+    "model_id": "pm:4d42cf7d74b35dac",
+    "validation": "VALID — ALL geometry gates satisfied (G1, G2, G3, G4 with C_MIN_WALL measured 0.2 mm, G4b within 0.001 mm, G1b containment [0.2, 0.565], G5, G5b, G6; G7 UNVERIFIABLE single-object N/A; G8 SUPPORTED; G9 REPRODUCIBLE)",
+    "lineage": "DESIGN_LINEAGE.json states verbatim: shipped_model_is = 'the base design (the mutation was KILLED)'",
+    "location": "buyer-distribution repository DOWNLOAD/04_drainage_floor/MODEL/ (Art. XXXIX authority; engine-side frozen corpus)"
+   },
+   "improvement_loop_outcome": {
+    "outcome": "KILLED_GEOMETRY_INVALID",
+    "scope": "APPLIES TO THE SINGLE ATTEMPTED MUTATION ONLY — NOT to the shipped base model, NOT to the concept, NOT to the architecture",
+    "mutation": {
+     "param": "floor_lumen_diameter_mm",
+     "from": 0.6,
+     "to": 0.8,
+     "note": "deliberately pushed to the envelope edge [0.3, 0.8] — 'the honest KILL demo: geometry gate decides' (the evaluator hard-sets improved:false so the geometry gate decides)",
+     "mutation_id": "p3dmut:808887454979d092",
+     "child_model_id": "pm:b792618b53f272ee"
+    },
+    "failed_gate": "G4 / C_MIN_WALL only: measured minimum wall thickness 0.1 mm < 0.15 mm limit (MEASURED_ON_BUILT_SOLID); no other gate failed",
+    "preservation": "The dead mutation is PRESERVED verbatim in the shipped buyer package: MODEL/IMPROVEMENT_LOOP_EVIDENCE.json + MODEL/3D_DESIGN_STATUS.json + DOWNLOAD/04_drainage_floor/ENGINEERING_TRACEABILITY.json (three_d_design.improvement_loop_outcome). Nothing is hidden.",
+    "not_conflated_with": "TOSCANINI/R383_LIVE_QUANTITATIVE/LEDGER_case4.json KILLED_GEOMETRY_INVALID is a SYNTHETIC DEMO FIXTURE whose parent was deliberately invalid (measured wall -0.05 mm) — it is NOT this package and must never be cited as package evidence"
+   },
+   "valid_new_version_candidate": {
+    "exists": true,
+    "description": "The R390 reality loop rebuilt the catheter at floor_lumen_diameter_mm = 0.5471 mm (deterministic compensation d_new = d_old*(eta_meas/eta_design)^(1/4) from the MEASURED NIST water viscosity 0.6913036 mPa·s @ 310.15 K, refuting the 1.0 mPa·s design constant); rebuild status OK, model pm:115852de5865efc8, geometry_validation.valid = true, conductance restored to ratio 0.999984",
+    "status": "SANDBOX_ONLY — applied_to_canonical_package = false (Art. IX: the canonical package was not mutated by the loop). Applying it to the buyer surface is an owner release-chain decision (Art. XXXIX protocol), NOT a hardening edit. The valid rebuild is recorded here as evidence that a physically coherent refined geometry EXISTS."
+   }
+  }
+ },
+ "answer_to_directive_section_9": {
+  "can_the_concept_be_represented_with_physically_coherent_geometry": "YES — it already is: the shipped base model pm:4d42cf7d74b35dac is fully VALID through all deterministic gates; the single improvement mutation died at one gate (min-wall), which is preserved; a valid refined rebuild (0.5471 mm) exists from the R390 loop",
+  "action_taken": "No 'fix' was performed and none was needed — the invalid MUTATION was never shipped and the shipped geometry is not invalid. No test was made greener by this record; the three-layer separation is now explicit and the failed mutation remains first-class visible",
+  "geometry_gates_rerun": "Not re-executed this round (the shipped GEOMETRY_VALIDATION_REPORT.json + REGENERATION_CHECK.json + STL_INDEPENDENT_WATERTIGHT_CHECK.json in the buyer repo are the authoritative validation record, sha-pinned by the release manifest; re-running would rebuild identical bytes from the committed PARAMETRIC_MODEL_SOURCE.py)"
+ },
+ "unexplored_design_space": [
+  "outer_diameter_mm envelope [2.5, 3.5] (raising OD restores wall margin at larger floor lumen) — never tried",
+  "intermediate floor_lumen_diameter_mm values (e.g. 0.7 mm) — the single loop jumped straight to the 0.8 envelope edge",
+  "primary_lumen_diameter_mm [0.8, 1.4] and floor_offset_mm [0.7, 1.1] — never tried",
+  "Per Article XXIX, the one dead mutation does NOT exhaust this space; per directive section 9 the kill is not generalized"
+ ]
+}

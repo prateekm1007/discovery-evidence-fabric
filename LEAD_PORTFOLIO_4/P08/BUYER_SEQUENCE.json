@@ -1,0 +1,28 @@
+{
+ "artifact_type": "BUYER_SEQUENCE",
+ "company_designation": "P08",
+ "portfolio_number": "08",
+ "historical_package_id": "P-16",
+ "technology_name": "NIR Photovoltaic Power Delivery for Implantable Devices",
+ "sequence_purpose": "Standardized 10-step buyer-facing sequence (directive section 13) — same structure as P04/P11/P13. Company designation on buyer material; historical ID in the machine-readable provenance layer only (directive section 19).",
+ "identity_line_external": "P08 — NIR Photovoltaic Power Delivery for Implantable Devices",
+ "provenance_line_machine_readable": "P08 = Portfolio 08 = historical package P-16 = folder 08_nir_photovoltaic = version 1.0 (LEAD_PORTFOLIO_IDENTITY_REGISTRY.json)",
+ "information_classification": {
+  "INTERNAL_PROVENANCE": ["historical_package_id", "folder_name", "mutation ids", "model ids", "source artifact paths", "R3xx round identifiers"],
+  "BUYER_VISIBLE": ["all ten sections below", "company designation", "technology name"],
+  "CONFIDENTIAL_AFTER_NDA": ["frozen dossier PDFs (CONFIDENTIAL — TECHNOLOGY TRANSFER EVALUATION stamped)"],
+  "LEGAL_IP": ["NOVELTY_ASSESSMENT.json (search documentation; NOT patentability; NOT FTO)"]
+ },
+ "sections": {
+  "1_problem": "Implantable devices (sensors, valves, drug-delivery actuators) need power for years without percutaneous leads or repeated battery-revision surgery; battery volume dominates device size and revision risk. The frozen dossier targets the implanted-shunt power problem (the >= 500 uW device target class).",
+  "2_existing_limitation": "Existing transcutaneous power approaches (inductive coupling, battery, wired) trade depth/alignment sensitivity against device volume and revision surgery; per-cutaneous leads carry infection risk. No documented 940 nm GaAs photovoltaic transcranial power-delivery architecture was found in the closest prior art (PatentBear specific-mechanism query: 0 hits; closest reference lacks all 5 mapped elements — see NOVELTY_ASSESSMENT.json).",
+  "3_proposed_technology": "An implanted GaAs photovoltaic receiver (shipped geometry: 7 mm cell on substrate under hermetic encapsulation) powered by an external 940 nm near-infrared source through the tissue path, delivering electrical power to the implanted device function.",
+  "4_mechanism": "Optical chain: source -> Beer-Lambert tissue transmission I(d) = I0*exp(-mu_eff*d) (mu_eff 1.0-2.5 /cm at 940 nm, Jacques 2013) -> PV-surface fluence -> GaAs photovoltaic conversion -> conditioned electrical power (EQ-1/EQ-2/EQ-3 in the frozen equation registry). The complete stage-by-stage chain with every loss and evidence class is assembled in ENERGY_BUDGET.json — including its explicit UNKNOWNs and two recorded arithmetic discrepancies (D1: claimed ~1050 uW not reproducible from recorded inputs, ~121 uW derivable; D2: 500 uW target implies 4.3x more receiver area than shipped).",
+  "5_evidence": "3 governing equations; 9 design inputs; 6 failure modes; parametric CAD shipped and VALID (receiver area grown 19.635 -> 38.485 mm², KEEP, measured on built solid); tissue-optics simulation chain PRE-REGISTERED (R309: MCX vs PyTissueOptics vs Jacques 2013) and asserted executed (fluence 1.0-1.4 mW/cm², MC agreement 0.11 %) — with the execution artifacts ABSENT from the repository (the claim self-labels MODELLED, independent_verification 'none'); all traceability chains honestly UNKNOWN; zero physical observation; unit error in the original power target (mW vs uW) caught and corrected by the external consultant review.",
+  "6_novelty_assessment": "DOCUMENTED PRIOR-ART SEARCH: PatentBear real searches (2026-08-26) — broad 40 hits (domain-adjacent) / specific-mechanism 0 hits ('completely novel combination', PASS, VERY HIGH) / passage-level claim analysis of closest US20190111255A1: 0 of 5 key elements found; global novelty NOT established; PatSnap attempted but never executed (documented failure); NOT patentability, NOT FTO. Full record: NOVELTY_ASSESSMENT.json.",
+  "7_engineering_definition": "Parametric template P16_nir_pv_receiver:v1: 7.0 mm GaAs cell (0.3 mm) on substrate disc (0.65 mm) under encapsulation cap (0.55 mm, 0.45 mm margin); STEP/STL/GLB shipped sha-pinned; hermetic packaging concept recorded but its 940 nm optical transmission is UNKNOWN (ENERGY_BUDGET stage 4).",
+  "8_known_unknowns": "PV efficiency for the targeted cell at low irradiance (UNKNOWN); external source power and its thermal-limit basis (UNKNOWN); per-layer tissue path incl. skull (unquantified); encapsulation transmission (UNKNOWN); power electronics (UNKNOWN); the D1/D2 discrepancies; regulatory pathway (UNKNOWN). None converted to certainty.",
+  "9_decisive_experiment": "The phantom-path bench experiment: tissue-equivalent optical path (mu_eff verified) + the same GaAs receiver, against a free-space control, with reference photodiode + IV curves + thermal probes. Does the recorded fluence/efficiency/thermal chain survive a physical path? Full falsification contract (hypothesis, null, controls, endpoints, thresholds with provenance, falsifier, decision rule): DECISIVE_EXPERIMENT.json.",
+  "10_buyer_decision": "Fund the bench experiment (cost UNSETIMATED — owner input; bench-class components, no human/animal subjects) to convert the package's entire quantitative basis from simulation-asserted to physically measured — with a genuine kill path (thermal infeasibility / fluence failure) that ends the program at its cheapest point. Prerequisite owner actions: resolve the D1/D2 arithmetic discrepancies and restore or re-run the registered simulation chain. Transfer state: TECHNICAL_REVIEW (evidence-gated ladder; REAL_BUYER 0)."
+ }
+}
