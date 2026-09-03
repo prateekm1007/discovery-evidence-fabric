@@ -1,0 +1,106 @@
+{
+ "suite": "R401-WC PHASE 5 \u2014 dedup safety (adversarial fixtures)",
+ "instrument": "discovery_fabric.engine.mechanism_space.deduplicate_candidates (the production spine)",
+ "fixture_authorship": "fixtures authored independently of the comparator implementation (Art. VIII); expected outcomes declared BEFORE running the machine",
+ "n_fixture_pairs": 6,
+ "n_correct": 6,
+ "false_merge": {
+  "definition": "expected SPLIT, machine collapsed the pair",
+  "count": 0
+ },
+ "false_split": {
+  "definition": "expected MERGE, machine kept the pair apart",
+  "count": 0
+ },
+ "accuracy": 1.0,
+ "verdict": "DEDUP_SAFE",
+ "results": [
+  {
+   "fixture_id": "F1a-wording-heparin",
+   "class": "1_same_mechanism_different_wording",
+   "expected": "MERGE",
+   "machine": "MERGE",
+   "correct": true,
+   "n_kept": 1,
+   "adversarial_point": "morphological rewording (lumen vs luminal, coating vs bonding) must NOT buy distinctness",
+   "dimension_jaccards": null,
+   "recorded_reason": "NEAR_DUPLICATE: mechanism core equivalent (graph/intervention/predicted-effect Jaccard >= 0.8) and no informative dimension differs \u2014 the two candidates differ only in wording"
+  },
+  {
+   "fixture_id": "F2a-phenomenon-patency",
+   "class": "2_same_phenomenon_different_mechanism",
+   "expected": "SPLIT",
+   "machine": "SPLIT",
+   "correct": true,
+   "n_kept": 2,
+   "adversarial_point": "both keep the catheter patent (the phenomenon) \u2014 the causal cores are unrelated (electrostatic repulsion vs mechanical flush); phenomenon overlap must never merge mechanisms",
+   "dimension_jaccards": {
+    "mechanism_graph": 0.0,
+    "intervention": 0.0,
+    "boundary_conditions": 0.0,
+    "failure_mode": 0.0,
+    "design_variable": 0.0,
+    "predicted_effect": 0.182
+   },
+   "recorded_reason": "GENUINE_MECHANISM_DIFFERENCE: at least one mechanism-core dimension is materially different (recorded)"
+  },
+  {
+   "fixture_id": "F3a-crossdomain-wick-same-envelope",
+   "class": "3a_cross_domain_same_mechanism_same_envelope",
+   "expected": "MERGE",
+   "machine": "MERGE",
+   "correct": true,
+   "n_kept": 1,
+   "adversarial_point": "the SAME capillary-wick causal core proposed twice with botanical vs engineering vocabulary; envelope identical \u2014 a true duplicate must merge despite domain wording",
+   "dimension_jaccards": null,
+   "recorded_reason": "NEAR_DUPLICATE: mechanism core equivalent (graph/intervention/predicted-effect Jaccard >= 0.8) and no informative dimension differs \u2014 the two candidates differ only in wording"
+  },
+  {
+   "fixture_id": "F3b-crossdomain-wick-different-boundary",
+   "class": "3b_cross_domain_same_mechanism_different_boundary",
+   "expected": "SPLIT",
+   "machine": "SPLIT",
+   "correct": true,
+   "n_kept": 2,
+   "adversarial_point": "same capillary core, but plant xylem operates under negative transpiration tension at 25C in soil while the catheter must operate under positive intra-abdominal pressure at 37C in protein-rich dialysate \u2014 the boundary regime difference is MATERIAL for this problem and must be recorded, not collapsed",
+   "dimension_jaccards": {
+    "mechanism_graph": 1.0,
+    "intervention": 0.0,
+    "boundary_conditions": 0.0,
+    "failure_mode": 0.0,
+    "design_variable": 0.143,
+    "predicted_effect": 0.0
+   },
+   "recorded_reason": "GENUINE_MECHANISM_DIFFERENCE: at least one mechanism-core dimension is materially different (recorded)"
+  },
+  {
+   "fixture_id": "F4a-synonym-hydrophilic",
+   "class": "4_near_duplicate_synonym_variation",
+   "expected": "MERGE",
+   "machine": "MERGE",
+   "correct": true,
+   "n_kept": 1,
+   "adversarial_point": "reduces/diminishes, fouling/adhesion, coating/treatment \u2014 synonym-level variation over an identical causal core and envelope must not split",
+   "dimension_jaccards": null,
+   "recorded_reason": "NEAR_DUPLICATE: mechanism core equivalent (graph/intervention/predicted-effect Jaccard >= 0.8) and no informative dimension differs \u2014 the two candidates differ only in wording"
+  },
+  {
+   "fixture_id": "F5a-distinct-valve-vs-osmotic",
+   "class": "5_genuinely_distinct_mechanism",
+   "expected": "SPLIT",
+   "machine": "SPLIT",
+   "correct": true,
+   "n_kept": 2,
+   "adversarial_point": "a mechanically actuated anti-reflux valve and an osmotic gradient pump are unrelated causal structures \u2014 both must survive as distinct mechanisms",
+   "dimension_jaccards": {
+    "mechanism_graph": 0.0,
+    "intervention": 0.0,
+    "boundary_conditions": 0.111,
+    "failure_mode": 0.0,
+    "design_variable": 0.0,
+    "predicted_effect": 0.091
+   },
+   "recorded_reason": "GENUINE_MECHANISM_DIFFERENCE: at least one mechanism-core dimension is materially different (recorded)"
+  }
+ ]
+}

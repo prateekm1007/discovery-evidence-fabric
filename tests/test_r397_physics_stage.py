@@ -84,7 +84,9 @@ def test_stage_order_has_physics_between_collision_and_attack():
     assert STAGE_ORDER.index("PHYSICS") == \
         STAGE_ORDER.index("COLLISION") + 1
     assert STAGE_ORDER.index("ATTACK") == STAGE_ORDER.index("PHYSICS") + 1
-    assert len(STAGE_ORDER) == 15
+    # R401: MECHANISM_SPACE between VERIFY and MULTI_SOURCE_DISCOVERY
+    # — the chain is 16 stages since R401 (documented change)
+    assert len(STAGE_ORDER) == 16
 
 
 def test_physics_adapter_registered_and_offline():

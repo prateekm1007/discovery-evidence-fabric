@@ -1,0 +1,60 @@
+{
+ "suite": "R401-WC PHASE 2 — fidelity guard",
+ "recorded_at": "2026-09-03",
+ "guard_contract": "hard-fail on unexplained KEEP/KILL changes; environmental limitations carry explicit states; 29/31 is never silently treated as 31/31",
+ "suites": {
+  "frozen_benchmark (tests/benchmark/)": {"result": "126/126 PASS", "env_notes": "none"},
+  "r396_release_gate": {"result": "31/31 PASS", "env_notes": "the prior-session report's '29/31 with 2 known-env failures' was a DIFFERENT environment; this workspace measures 31/31 (recorded per Art. XXIV: measured artifact over prior narrative)"},
+  "r399_gates": {"result": "6/6 PASS", "env_notes": "none"},
+  "r386_release_chain": {"result": "23/23 PASS (local hermetic suite)"},
+  "r372_release_grade": {
+   "result": "44/45 — 1 FAIL: TestBuyerCriticals::test_full_r372_gate_passes (V2 mutation propagation: failing packages P-01, P-07, P-13)",
+   "classification": "PRE_EXISTING_CONTENT_DEFECT_AT_HEAD",
+   "evidence": "the IDENTICAL test re-run in the detached worktree at the baseline commit 7dbebe94 (engine identical to the deployed 930eca8b artifact) FAILS the same way (1 failed in 672s) — the defect predates all R401 work",
+   "scope": "the failure is in the fresh-build+verify cycle (build_v5 into tmp + acceptance_r372); the RELEASED buyer surface is UNAFFECTED — the r386 verify-fresh from clean clones PASSES every buyer-surface check (924 files pinned hash-exact, 15 package ZIPs + master ZIP byte-exact)",
+   "counted_as_pass": false
+  },
+  "r401_stream_a (captured-run fixtures)": {"result": "28/28 PASS"},
+  "r401 mechanism-space suites": {"result": "144/144 PASS (acceptance states, cheap screen, evidence precision, mechanism space, operator behavior, stream A)"},
+  "r392_readiness": {
+   "result": "35 passed, 2 skipped (solo, no gateway listening) / 5 failed 30 passed 2 skipped (full-suite context, live gateway listening)",
+   "env_notes": "gateway-state-dependent transport tests — the same class the prior session disclosed as 'local gateway ALREADY_UP'; the 5 failures reproduce IDENTICALLY at the baseline commit 7dbebe94 with the gateway up"
+  },
+  "FULL SUITE (tests/, excluding the slow portfolio-build suites r371/r372)": {
+   "result": "2358 passed, 30 failed, 9 skipped (411.8s)",
+   "classification": "ALL 30 PRE_EXISTING_AT_HEAD — every failing test re-run in the detached worktree at the baseline commit 7dbebe94 fails IDENTICALLY (r373 x3, r374 x1, r389 x7, r390 x7, r392 x5, r393 x2, r394 x2, r395 x3)",
+   "root_causes": [
+    "the local sibling portfolio checkout (/home/z/my-project/portfolio) is STALE (local HEAD a30ee9c vs remote main 04e4497b) and DIRTY (217 modified files, mtimes 2026-08-29 — PRE-SESSION dirt, not caused by this session); the product-surface/reality-loop/audit tests read that checkout and fail on its uncommitted state",
+    "the r392 transport tests are gateway-liveness-dependent (fail with a live loopback gateway, pass without one)"
+   ],
+   "released_buyer_surface_unaffected": "the r386 verify-fresh from clean clones PASSES every buyer-surface check (924 files hash-exact, ZIPs byte-exact) — the local dirt is a workspace artifact, never shipped",
+   "r401_regressions": "ZERO — no failure appears in the working tree that does not appear identically at the baseline commit"
+  }
+ },
+ "keep_kill_flip_analysis": {
+  "prior_machine_decisions": [
+   {"decision": "R400-C production run: REJECTED (adversarial challenge / design-learning KILL)", "artifacts": "R400/RUN_ARTIFACTS_ui_partial_obstruction/*", "unchanged_this_session": true, "sha256_16": {"PACKAGE_FAILED.json": "cb68bf57268ff4aa", "SURVIVOR_GATE.json": "6d97df9abb321955"}},
+   {"decision": "r401_core_proof e2e run: REJECTED (adversarial challenge)", "artifacts": "ENGINE_RUNS/r401_core_proof_20260903T020451Z/*", "unchanged_this_session": true, "sha256_16": {"final_state.json": "038cacbe19d380fd", "envelope_MECHANISM_SPACE.json": "2470819affa01a89"}}
+  ],
+  "new_machine_decisions_this_session": [
+   {"decision": "R401_BASELINE frozen: REJECTED (adversarial challenge failed; attack survival 0/6)", "artifacts": "R401/R401_BASELINE.json + R401/BASELINE_RUN_ARTIFACTS/*"}
+  ],
+  "flips": "NONE — no prior KEEP/KILL decision changed; the pinned test expectations all pass (except the pre-existing r372 defect, classified above); the guard does NOT fire",
+  "baseline_vs_candidate_verdicts": "baseline REJECTED (frozen) vs R401A e2e REJECTED — same verdict class, different mechanism structure (the structural delta is the measured subject, not a fidelity flip)"
+ },
+ "environmental_limitation_states": [
+  {"limit": "NVIDIA inference path", "state": "BLOCKED_INFERENCE_UNAVAILABLE (catalog 200 OK / completions hang / embeddings 410 EOL — measured, R401/PHASE6_FRONTIER_CONTEST_STATE.json)"},
+  {"limit": "Semantic Scholar keyless", "state": "RATE_LIMITED_429 — not a quality result"},
+  {"limit": "PatentsView/USPTO-ODP", "state": "AUTH_FAILED_NO_KEY"},
+  {"limit": "the 153-pair labeled set", "state": "MISSING_UNRECOVERABLE (replaced by the 48-pair in-session auditor set — weaker, disclosed)"},
+  {"limit": "dense/cross-encoder arms", "state": "stack installed mid-session; measured or BLOCKED per RETRIEVAL_ARMS_RESULTS.json"},
+  {"limit": "r372 fresh-build V2 propagation", "state": "PRE_EXISTING_CONTENT_DEFECT_AT_HEAD (disclosed above, counted as FAIL)"}
+ ],
+ "custody_log_contamination_event": {
+  "event": "+18 retrieval-custody entries in the main repo log during this session (07:41-07:58, 'CSF shunt OBSTRUCTION' battery-shaped queries)",
+  "chain_integrity": "VALID (1852 entries, chain_valid=true)",
+  "attribution": "most plausibly a live transport-recovery test in this session's fidelity-suite runs (conftest-guard gap); full analysis in R401/R401_BASELINE_ADDENDUM.json",
+  "resolution": "revert to session-start state at commit prep; the guard gap recorded as a defect for the next hardening round (Art. XXXI)"
+ },
+ "verdict": "FIDELITY_GUARD_PASS_WITH_DISCLOSED_STATES — no unexplained KEEP/KILL change; every limitation carries an explicit state; the one failing test is proven pre-existing at the baseline commit"
+}

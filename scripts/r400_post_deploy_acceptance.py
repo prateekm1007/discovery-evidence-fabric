@@ -41,6 +41,18 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 DEPLOYED_SHA = "930eca8b7db8b0885abccb4e8159a77b8e802723"
 OUT_DIR = REPO_ROOT / "R400"
 
+# R401 Phase 0: the explicit acceptance-state vocabulary is owned by
+# the probe module (one authority, Art. X) — the harness imports it
+# rather than redefining it.
+import importlib.util as _ilu
+
+_spec = _ilu.spec_from_file_location(
+    "r396_external_probes", REPO_ROOT / "scripts" /
+    "r396_external_probes.py")
+_mod = _ilu.module_from_spec(_spec)
+_spec.loader.exec_module(_mod)
+ACCEPTANCE_STATES = _mod.ACCEPTANCE_STATES
+
 
 def _run(cmd: List[str], timeout_s: int) -> Dict[str, Any]:
     """Run a subprocess, capture everything (Art. XV: a timeout is a
@@ -63,10 +75,42 @@ def _run(cmd: List[str], timeout_s: int) -> Dict[str, Any]:
 
 
 def _probe_pass(out_json: Path) -> Any:
+    """R401 Phase 0: return the EXPLICIT acceptance state of every
+    probe in a completed probe report (a list), or the single state
+    "NO_RECORD" when the report file does not exist (fail-closed:
+    a missing record is INCOMPLETE-class, never silently skipped).
+
+    The per-record mapping is owned by the probe module's
+    probe_record_state (one authority, Art. X): PASS only on an
+    explicit state == PASS; legacy `pass: None` never becomes PASS."""
     if not out_json.exists():
         return "NO_RECORD"
     d = json.loads(out_json.read_text())
-    return [p.get("pass") for p in d.get("probes", [])]
+    states = [_mod.probe_record_state(p) for p in d.get("probes", [])]
+    return states or "NO_RECORD"
+
+
+# R401 Phase 0: the gate aggregation works on EXPLICIT states, never
+# on Booleans. PASS is the only affirmative state; every other state
+# (FAIL / OBSERVATION_ONLY / INCOMPLETE / UNRESOLVED /
+# QUOTA_EXHAUSTED / NO_RECORD) blocks acceptance and is listed by name
+# in non_affirmative_states — none is ever converted (Art. XXV).
+AFFIRMATIVE_STATE = "PASS"
+
+
+def _flatten_gate_states(gates: Dict[str, Any]) -> List[str]:
+    """Flatten every gate's `result` (a state string or a list of state
+    strings) into one state list. This also fixes the latent KeyError:
+    the R400C gate previously carried no `result` key at all, so the
+    verdict step crashed before writing the final acceptance record."""
+    flat: List[str] = []
+    for g in gates.values():
+        res = g.get("result")
+        if isinstance(res, list):
+            flat.extend(res)
+        elif res is not None:
+            flat.append(res)
+    return flat
 
 
 def main() -> int:
@@ -157,29 +201,56 @@ def main() -> int:
              590)
     cap = None
     cap_json = OUT_DIR / "PRODUCTION_PHYSICS_RUN_live_postdeploy.json"
+    run_record: Dict[str, Any] = {}
     if cap_json.exists():
         d = json.loads(cap_json.read_text())
         cap = d.get("r400c_capture")
+        run_record = d
+    # R401 Phase 0: the physics-chain gate is adjudicated on the SAME
+    # explicit-state contract as the probes (this also fixes the latent
+    # KeyError: this gate previously had no `result` key, so the final
+    # verdict step crashed). PASS requires the capture contract fields
+    # to be present; a finished run with a broken/absent capture is
+    # FAIL; no record or a non-terminal run is INCOMPLETE (nothing was
+    # proven, Art. XXV). The machine's own verdict (REJECTED is an
+    # acceptable outcome) is NOT part of this gate — the gate tests the
+    # capture contract, not the winner.
+    final_status = run_record.get("final_status")
+    required_capture = bool(
+        cap and (cap.get("physics_model_version")
+                 and (cap.get("baseline_comparison") or {}).get("outcome")
+                 and (cap.get("verdict") or {}).get("result_class")))
+    if not cap_json.exists() or not final_status:
+        r400c_state = "INCOMPLETE"
+    elif required_capture:
+        r400c_state = "PASS"
+    else:
+        r400c_state = "FAIL"
     verdict["gates"]["R400C_PHYSICS_RUN"] = {
+        "result": r400c_state,
         "capture_present": cap is not None,
         "physics_model_version": (cap or {}).get("physics_model_version"),
         "baseline_comparison_outcome": (
             (cap or {}).get("baseline_comparison") or {}).get("outcome"),
         "result_class_verdict": ((cap or {}).get("verdict") or {}).get(
             "result_class"),
+        "final_status": final_status,
         "exec": r}
     flush()
 
     # ---- 6. the verdict (never converts non-affirmatives) ----------
-    gate_results = [g["result"] for g in verdict["gates"].values()]
-    flat = [v for grp in gate_results for v in
-            (grp if isinstance(grp, list) else [grp])]
-    non_pass = [v for v in flat if v is not True]
+    flat = _flatten_gate_states(verdict["gates"])
+    non_pass = [v for v in flat if v != AFFIRMATIVE_STATE]
     verdict["finished_utc"] = time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                             time.gmtime())
-    verdict["all_gates_pass"] = not non_pass and flat
-    verdict["non_affirmative_states"] = non_pass  # INCOMPLETE/FAILED/
-    # UNRESOLVED/QUOTA_EXHAUSTED stay exactly what they are (Art. XXV)
+    verdict["all_gates_pass"] = bool(flat) and not non_pass
+    verdict["n_gate_states"] = len(flat)
+    # INCOMPLETE/FAILED/UNRESOLVED/QUOTA_EXHAUSTED/OBSERVATION_ONLY/
+    # NO_RECORD stay exactly what they are (Art. XXV) — named, counted,
+    # never converted into an affirmative result
+    verdict["non_affirmative_states"] = non_pass
+    verdict["non_affirmative_counts"] = {
+        s: non_pass.count(s) for s in sorted(set(non_pass))}
     flush()
     (OUT_DIR / "POST_DEPLOY_ACCEPTANCE.json").write_text(
         json.dumps(verdict, indent=1, default=str))

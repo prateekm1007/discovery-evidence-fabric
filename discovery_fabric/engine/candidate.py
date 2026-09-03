@@ -28,6 +28,10 @@ ENVELOPE_FIELDS = [
     # R394 s5: claim-level evidence classification (per-item classes
     # + five relevance dimensions) travels with the evidence
     "evidence_classification",
+    # R401: the structured mechanism space (structured evidence, five
+    # transformation operators, distinctness, per-candidate
+    # mechanism-level verification) — first-class stage output
+    "mechanism_space",
     "prior_art_ids", "prior_art",
     "collision_results",
     # R397 Phase 2: the PHYSICS stage verdict block (first-class stage
@@ -72,6 +76,8 @@ class Candidate:
     mechanism_map: Dict[str, Any] = field(default_factory=dict)
     premise_gate: Dict[str, Any] = field(default_factory=dict)
     evidence_classification: Dict[str, Any] = field(default_factory=dict)
+    # R401: the structured mechanism space stage output
+    mechanism_space: Dict[str, Any] = field(default_factory=dict)
     prior_art_ids: List[str] = field(default_factory=list)
     prior_art: Dict[str, Any] = field(default_factory=dict)
     collision_results: Dict[str, Any] = field(default_factory=dict)

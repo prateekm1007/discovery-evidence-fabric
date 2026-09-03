@@ -68,6 +68,50 @@ def _worst(verdicts: Dict[str, str]) -> str:
     return "PASS"
 
 
+def _apply_candidate_honesty_caps(overall: str,
+                                  verdicts: Dict[str, str],
+                                  gates: Dict[str, Dict[str, Any]],
+                                  spec: Dict[str, Any]):
+    """Candidate-origin honesty caps (pure; independently tested).
+
+    E16-F cap: an exploration-grid candidate (discovery-level
+    verification NOT performed for it) can be HELD at best.
+
+    R401 Phase 4 cap: a mechanism-space candidate whose mechanism-level
+    evidence support is not affirmatively SUPPORTED can be HELD at best
+    — PARTIALLY_SUPPORTED / CONTESTED / NOT_ENOUGH_EVIDENCE are honest
+    non-affirmative states, never converted into automatic release. A
+    SUPPORTED candidate records the affirmative MECHANISM_SUPPORT gate.
+    """
+    exploration = spec.get("_exploration_candidate")
+    if exploration and overall == "RELEASED":
+        overall = HELD_FOR_HUMAN_REVIEW
+        verdicts["DISCOVERY_VERIFICATION"] = "CONDITIONAL"
+        gates["DISCOVERY_VERIFICATION"] = {
+            "verdict": "CONDITIONAL",
+            "note": exploration.get("consequence")}
+    ms_marker = spec.get("_mechanism_space_candidate")
+    if ms_marker and overall == "RELEASED":
+        support_state = ms_marker.get("mechanism_support_state")
+        if support_state != "SUPPORTED":
+            overall = HELD_FOR_HUMAN_REVIEW
+            verdicts["DISCOVERY_VERIFICATION"] = "CONDITIONAL"
+            gates["DISCOVERY_VERIFICATION"] = {
+                "verdict": "CONDITIONAL",
+                "note": (
+                    f"mechanism-level evidence support state is "
+                    f"{support_state} (R401 Phase 4) — "
+                    + str(ms_marker.get("consequence") or ""))}
+        else:
+            verdicts["MECHANISM_SUPPORT"] = "PASS"
+            gates["MECHANISM_SUPPORT"] = {
+                "verdict": "PASS",
+                "note": ("mechanism-level evidence verification found "
+                         "affirmative SUPPORTS with no contradictions "
+                         "(R401 Phase 4)")}
+    return overall, verdicts, gates
+
+
 def evaluate_release_gate(spec: Dict[str, Any], eng: Dict[str, Any],
                           package_report: Dict[str, Any],
                           causal_result: Optional[Dict[str, Any]] = None,
@@ -209,17 +253,8 @@ def evaluate_release_gate(spec: Dict[str, Any], eng: Dict[str, Any],
 
     verdicts = {g: gates[g]["verdict"] for g in GATES}
     overall = _worst(verdicts)
-    # E16-F honesty cap: a dossier whose candidate came from the
-    # exploration grid (the discovery loop rejected the naive candidate;
-    # discovery-level verification did NOT run for this candidate) can be
-    # HELD at best — never automatically RELEASED
-    exploration = spec.get("_exploration_candidate")
-    if exploration and overall == "RELEASED":
-        overall = HELD_FOR_HUMAN_REVIEW
-        verdicts["DISCOVERY_VERIFICATION"] = "CONDITIONAL"
-        gates["DISCOVERY_VERIFICATION"] = {
-            "verdict": "CONDITIONAL",
-            "note": exploration.get("consequence")}
+    overall, verdicts, gates = _apply_candidate_honesty_caps(
+        overall, verdicts, gates, spec)
     policy = {
         RELEASED: "all six gates PASS",
         HELD_FOR_HUMAN_REVIEW: ("any gate CONDITIONAL — requires human "

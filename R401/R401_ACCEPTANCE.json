@@ -1,0 +1,174 @@
+{
+ "suite": "R401-WC PHASE 13 \u2014 behavioral acceptance",
+ "rule": "R401 is NOT complete because code is cleaner, databases changed, models changed, components benchmarked, or five candidates were generated \u2014 only the ten behavioral criteria decide",
+ "criteria": [
+  {
+   "n": 1,
+   "criterion": ">=5 materially distinct mechanisms",
+   "evidence": "R401_END_TO_END_RESULTS.json (mechanism_space)",
+   "value": {
+    "n_generated": 5,
+    "n_retained": 5,
+    "distinctness_kept": 5,
+    "material_distinctness_rate": 1.0
+   },
+   "pass": true
+  },
+  {
+   "n": 2,
+   "criterion": "Operator fidelity passes (each operator: machine-verifiable semantic change; wording/synonym/expansion FAIL)",
+   "evidence": "tests/test_r401_operator_behavior.py (VALID/REWRITE/BROKEN per operator)",
+   "value": {
+    "passed": true,
+    "summary": "12 passed in 0.26s"
+   },
+   "pass": true
+  },
+  {
+   "n": 3,
+   "criterion": ">=1 transformed mechanism reaches CAD",
+   "evidence": "INVENTION_SPECIFICATION_mech-GEOMETRIC_TRANSFORMATION-1.json (cited in R401_END_TO_END_RESULTS.json)",
+   "value": {
+    "reached_cad": true
+   },
+   "pass": true
+  },
+  {
+   "n": 4,
+   "criterion": ">=1 transformed mechanism reaches physics/baseline OR honest MECHANISM_NOT_SIMULATABLE",
+   "evidence": "stage_PHYSICS.json (BEATS_BASELINE, chain includes BASELINE_COMPARISON) + CHEAP_SCREEN.json (3 candidates MECHANISM_NOT_SIMULATABLE_EXPECTED)",
+   "value": {
+    "physics_lifecycle": "BEATS_BASELINE",
+    "includes_baseline_comparison": true
+   },
+   "pass": true
+  },
+  {
+   "n": 5,
+   "criterion": "mechanism-level verification works (five-value vocabulary; phenomenon support != mechanism support; analogy never direct support)",
+   "evidence": "tests/test_r401_mechanism_space.py + test_r401_evidence_precision.py + per-candidate mechanism_support_state in the e2e record",
+   "value": {
+    "passed": true,
+    "summary": "50 passed in 0.62s"
+   },
+   "pass": true
+  },
+  {
+   "n": 6,
+   "criterion": "evidence precision improves or meets the declared target",
+   "evidence": "replay-set measurement (fixed 14-record fixture, pinned by tests) + pipeline-level comparison vs the frozen baseline",
+   "value": {
+    "replay": {
+     "before": 0.5,
+     "after": 1.0,
+     "irrelevant_before": 0.5,
+     "irrelevant_after": 0.0
+    },
+    "pipeline_baseline_evidence_precision": 0.4,
+    "e2e_evidence_mechanism_support_rate": 0.5,
+    "note": "the replay fixture is small (14 records) and the 153-pair prior set is MISSING \u2014 declared target basis is the fixed replay fixture; the broad-corpus target remains open pending the labeled-set rebuild"
+   },
+   "pass": true
+  },
+  {
+   "n": 7,
+   "criterion": "mechanism-irrelevant precedent decreases",
+   "evidence": "same replay measurement (irrelevant share)",
+   "value": {
+    "irrelevant_before": 0.5,
+    "irrelevant_after": 0.0
+   },
+   "pass": true
+  },
+  {
+   "n": 8,
+   "criterion": "fidelity guard passes",
+   "evidence": "R401/FIDELITY_GUARD.json",
+   "value": {
+    "verdict": "FIDELITY_GUARD_PASS_WITH_DISCLOSED_STATES \u2014 no unexplained KEEP/KILL change; every limitation carries an explicit state; the one failing test is proven pre-existing at the baseline commit"
+   },
+   "pass": true
+  },
+  {
+   "n": 9,
+   "criterion": "frozen benchmarks remain valid",
+   "evidence": "FIDELITY_GUARD.json suites (126/126 benchmark; r396 31/31; r399 6/6; r386 23/23; stream A 28/28; r372 44/45 with the pre-existing-at-HEAD defect disclosed, never counted as a pass)",
+   "value": {
+    "suites": {
+     "frozen_benchmark (tests/benchmark/)": {
+      "result": "126/126 PASS",
+      "env_notes": "none"
+     },
+     "r396_release_gate": {
+      "result": "31/31 PASS",
+      "env_notes": "the prior-session report's '29/31 with 2 known-env failures' was a DIFFERENT environment; this workspace measures 31/31 (recorded per Art. XXIV: measured artifact over prior narrative)"
+     },
+     "r399_gates": {
+      "result": "6/6 PASS",
+      "env_notes": "none"
+     },
+     "r386_release_chain": {
+      "result": "23/23 PASS (local hermetic suite)"
+     },
+     "r372_release_grade": {
+      "result": "44/45 \u2014 1 FAIL: TestBuyerCriticals::test_full_r372_gate_passes (V2 mutation propagation: failing packages P-01, P-07, P-13)",
+      "classification": "PRE_EXISTING_CONTENT_DEFECT_AT_HEAD",
+      "evidence": "the IDENTICAL test re-run in the detached worktree at the baseline commit 7dbebe94 (engine identical to the deployed 930eca8b artifact) FAILS the same way (1 failed in 672s) \u2014 the defect predates all R401 work",
+      "scope": "the failure is in the fresh-build+verify cycle (build_v5 into tmp + acceptance_r372); the RELEASED buyer surface is UNAFFECTED \u2014 the r386 verify-fresh from clean clones PASSES every buyer-surface check (924 files pinned hash-exact, 15 package ZIPs + master ZIP byte-exact)",
+      "counted_as_pass": false
+     },
+     "r401_stream_a (captured-run fixtures)": {
+      "result": "28/28 PASS"
+     },
+     "r401 mechanism-space suites": {
+      "result": "144/144 PASS (acceptance states, cheap screen, evidence precision, mechanism space, operator behavior, stream A)"
+     },
+     "r392_readiness": {
+      "result": "35 passed, 2 skipped (solo, no gateway listening) / 5 failed 30 passed 2 skipped (full-suite context, live gateway listening)",
+      "env_notes": "gateway-state-dependent transport tests \u2014 the same class the prior session disclosed as 'local gateway ALREADY_UP'; the 5 failures reproduce IDENTICALLY at the baseline commit 7dbebe94 with the gateway up"
+     },
+     "FULL SUITE (tests/, excluding the slow portfolio-build suites r371/r372)": {
+      "result": "2358 passed, 30 failed, 9 skipped (411.8s)",
+      "classification": "ALL 30 PRE_EXISTING_AT_HEAD \u2014 every failing test re-run in the detached worktree at the baseline commit 7dbebe94 fails IDENTICALLY (r373 x3, r374 x1, r389 x7, r390 x7, r392 x5, r393 x2, r394 x2, r395 x3)",
+      "root_causes": [
+       "the local sibling portfolio checkout (/home/z/my-project/portfolio) is STALE (local HEAD a30ee9c vs remote main 04e4497b) and DIRTY (217 modified files, mtimes 2026-08-29 \u2014 PRE-SESSION dirt, not caused by this session); the product-surface/reality-loop/audit tests read that checkout and fail on its uncommitted state",
+       "the r392 transport tests are gateway-liveness-dependent (fail with a live loopback gateway, pass without one)"
+      ],
+      "released_buyer_surface_unaffected": "the r386 verify-fresh from clean clones PASSES every buyer-surface check (924 files hash-exact, ZIPs byte-exact) \u2014 the local dirt is a workspace artifact, never shipped",
+      "r401_regressions": "ZERO \u2014 no failure appears in the working tree that does not appear identically at the baseline commit"
+     }
+    }
+   },
+   "pass": true
+  },
+  {
+   "n": 10,
+   "criterion": "complete artifacts are reproducible",
+   "evidence": "all phase records cite the run's own artifacts; the measurement scripts are committed; the baseline + e2e records name their run dirs",
+   "value": {
+    "records": [
+     "COMMIT_PREP.json",
+     "DEDUP_RESULTS.json",
+     "FIDELITY_GUARD.json",
+     "PHASE0_CANONICALIZATION.json",
+     "PHASE6_FRONTIER_CONTEST_STATE.json",
+     "R401_BASELINE.json",
+     "R401_BASELINE_ADDENDUM.json",
+     "R401_END_TO_END_RESULTS.json",
+     "RETRIEVAL_ARMS_RESULTS.json",
+     "RETRIEVAL_LABELS.json",
+     "RETRIEVAL_LANE_PROBES.json",
+     "RETRIEVAL_POOL_UNLABELED.json",
+     "STAGE_INFORMATION_VALUE.json"
+    ],
+    "e2e_run_dir_files": 66,
+    "baseline_run_dir": "/home/z/my-project/baseline_wt_r401/ENGINE_RUNS/r401_baseline_20260903T073958Z"
+   },
+   "pass": true
+  }
+ ],
+ "n_pass": 10,
+ "n_total": 10,
+ "verdict": "R401_BEHAVIORALLY_ACCEPTED",
+ "phase14_note": "R401 does NOT itself establish: PHYSICAL_OBSERVATION > 0, REAL_LOOP_VERIFIED, multiple solver-domain validation, or commercial validation \u2014 those remain world-class qualification gates (Phase 14)"
+}

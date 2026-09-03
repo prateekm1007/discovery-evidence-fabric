@@ -1,0 +1,22 @@
+{
+ "phase": "R401-WC PHASE 6 — frontier LLM contest",
+ "probed_at": "2026-09-03T07:5xZ (live, this session)",
+ "probe_method": "direct HTTPS calls to integrate.api.nvidia.com with the stored NVIDIA_API_KEY (.env.keys, key length 70)",
+ "measurements": [
+  {"endpoint": "/v1/models", "http": 200, "time_s": 0.18,
+   "result": "81 models listed — authentication works for catalog"},
+  {"endpoint": "/v1/chat/completions",
+   "model": "deepseek-ai/deepseek-v4-flash-0731",
+   "attempts": [
+    {"http": "000-no-response", "time_s": 40.0, "note": "no response, client timeout"},
+    {"http": "000-no-response", "time_s": 15.0, "note": "no response, client timeout"},
+    {"http": "000-no-response", "time_s": 15.0, "note": "no response, client timeout"}]},
+  {"endpoint": "/v1/embeddings",
+   "model": "nvidia/nv-embedqa-e5-v5", "http": 410,
+   "detail": "model end-of-life 2026-08-25T09:00:00Z — no longer available"}
+ ],
+ "determination": "INFERENCE_UNAVAILABLE — the authorized NVIDIA path authenticates for catalog listing but delivers NO completions (connection-level timeouts, not HTTP error responses) and the probed embeddings model is retired. The 6-model frontier contest (gpt-oss-120b / kimi / minimax / nemotron / deepseek / mistral, pure vs hybrid) CANNOT run.",
+ "contest_status": "BLOCKED_INFERENCE_UNAVAILABLE",
+ "note_on_prior_report": "the missing bench report claimed 403 on completions; this session measures connection timeouts (HTTP 000) — the failure mode differs in detail, the conclusion is the same: no working inference entitlement. Recorded per Art. XXIV (measured artifact over prior narrative).",
+ "permitted_alternative": "the zai local gateway (glm-4-plus) remains the engine's HEALTHY registered transport for pipeline runs; the frontier contest specifically requires multi-model inference this environment cannot currently obtain."
+}

@@ -363,6 +363,66 @@ class EvidenceVerifyAdapter(BaseAdapter):
             verified=res.get("verified"))
 
 
+class MechanismSpaceAdapter(BaseAdapter):
+    """R401: the structured mechanism space — a FIRST-CLASS stage
+    between VERIFY and MULTI_SOURCE_DISCOVERY. Canonical:
+    discovery_fabric/engine/mechanism_space.py::build_mechanism_space.
+
+    Converts custodied evidence into STRUCTURED data (11 fields),
+    derives candidates through the five transformation operators
+    (deterministic input contracts + LLM instantiation + span-bound
+    validation), collapses wording-only duplicates (machine-checkable
+    distinctness), and verifies each retained candidate's asserted
+    mechanism against the evidence bundle (SUPPORTS /
+    PARTIALLY_SUPPORTS / CONTRADICTS / IRRELEVANT /
+    NOT_ENOUGH_EVIDENCE — contradictions stay visible).
+
+    The stage is EXPENSIVE candidate generation: the R399 W2.3 gate
+    applies (>= 1 VERIFIED_EVIDENCE_ITEM), stamped by the shared
+    entry-justification helper; zero verified items -> the honest
+    skipped state (never silent, never fabricated). The stage is
+    NON-FATAL: a skipped/failed mechanism space leaves the primary
+    discovery loop and the grid path untouched."""
+    capability_id = "MECHANISM_SPACE"
+    module_path = "discovery_fabric/engine/mechanism_space.py"
+    canonical_fn = "build_mechanism_space(problem, evidence)"
+    needs_network = True
+    depends_on = ["A2_RETRIEVAL", "SYNTHESIS"]
+
+    input_contract = {"problem": "problem dict",
+                      "evidence": "envelope.evidence (custodied items)"}
+    output_contract = ("envelope.mechanism_space = {state, "
+                       "structured_evidence, operator_results, "
+                       "distinctness, candidates[], metrics}")
+
+    def execute(self, env, run_ctx):
+        from . import stage_entry
+        entry_block = stage_entry.justify(
+            "MECHANISM_SPACE", env, None, None)
+        if entry_block["entry_status"] == "SKIPPED":
+            return _engine_result(
+                {"mechanism_space": {
+                    "mechanism_space_version": "mechanism_space/1.0.0",
+                    "state": "SKIPPED_EVIDENCE_VERIFICATION_FAILED",
+                    "entry": entry_block,
+                    "note": ("zero verified evidence items on the "
+                             "envelope — the mechanism space would "
+                             "build candidates on unverified evidence "
+                             "(R399 W2.3 applies to ALL expensive "
+                             "candidate generation); nothing was "
+                             "fabricated (Art. XXV)"),
+                    "candidates": []}},
+                state="SKIPPED_EVIDENCE_VERIFICATION_FAILED")
+        from discovery_fabric.engine.mechanism_space import (
+            build_mechanism_space)
+        space = build_mechanism_space(env.problem, env.evidence or [])
+        space["entry"] = entry_block
+        return _engine_result(
+            {"mechanism_space": space},
+            state=space.get("state"),
+            n_candidates=space.get("n_candidates_retained", 0))
+
+
 class MultiSourceDiscoveryAdapter(BaseAdapter):
     """Canonical: orchestrator/multi_source_discovery.py::run_four_search_attack
     (the CEO v28.3 four-direction search: discovery/destruction/transfer/reality)."""
@@ -385,6 +445,34 @@ class MultiSourceDiscoveryAdapter(BaseAdapter):
             failure_mode=env.problem.get("failure_mode", ""),
             adjacent_industries=adjacent)
         d = asdict(res) if not hasattr(res, "to_dict") else res.to_dict()
+        # R401A A5: the ROLE of this stage is explicit — the four-
+        # direction search here VERIFIES a serious candidate (it runs
+        # AFTER VERIFY, feeding collision/adjudication). The evidence
+        # used to CREATE mechanisms is the DISCOVERY_SUPPORT plane
+        # (RETRIEVE -> MECHANISM_SPACE, stamped in the structured
+        # evidence record). Both planes keep the full honesty
+        # vocabulary: SEARCH_FAILED / SEARCH_PARTIAL / UNRESOLVED /
+        # UNKNOWN are never converted to absence (Art. XXI.3/XXV).
+        d["evidence_plane"] = {
+            "role": "VERIFICATION_SUPPORT",
+            "purpose": ("four-direction search attack around a serious "
+                        "candidate: discovery/destruction/transfer/"
+                        "reality directions feed collision, "
+                        "adjudication and the dossier"),
+            "complementary_plane": {
+                "role": "DISCOVERY_SUPPORT",
+                "location": ("RETRIEVE -> MECHANISM_SPACE (the "
+                              "structured evidence consumed by the "
+                              "five transformation operators)"),
+                "stamp": "mechanism_space.structured_evidence."
+                          "items[].retrieval_role",
+            },
+            "state_vocabulary_contract": (
+                "SEARCH_FAILED / SEARCH_PARTIAL / UNRESOLVED / UNKNOWN "
+                "stay exactly what they are on BOTH planes — no outage "
+                "may become absence; per-source error/unavailable "
+                "fields are preserved in sources_hit"),
+        }
         d["adjacent_industries_derivation"] = {
             "value": adjacent, "epistemic_class": "MODEL_DERIVED",
             "method": "keyword map ADJACENT_INDUSTRY_MAP in adapters.py"}
@@ -977,6 +1065,7 @@ ADAPTERS = {
     "PREMISE_GATE": PremiseGateAdapter(),
     "SYNTHESIZE": SynthesizeAdapter(),
     "VERIFY": EvidenceVerifyAdapter(),
+    "MECHANISM_SPACE": MechanismSpaceAdapter(),
     "MULTI_SOURCE_DISCOVERY": MultiSourceDiscoveryAdapter(),
     "COLLISION": CollisionEngineAdapter(),
     "PHYSICS": PhysicsStageAdapter(),
@@ -1004,7 +1093,14 @@ ADAPTERS = {
 # lifecycle verdicts that gate the candidate (consultant finding:
 # "the physics solver is validated code but not part of the live run
 # chain"). The D8 chain is 15 stages.
+# R401: MECHANISM_SPACE is a FIRST-CLASS stage between VERIFY and
+# MULTI_SOURCE_DISCOVERY — the structured mechanism space (structured
+# evidence -> five transformation operators -> distinctness ->
+# mechanism-level verification). The chain is 16 stages. Deliberate,
+# documented contract change (same pattern as R394 PREMISE_GATE and
+# R397 PHYSICS); pinned tests updated with the new arithmetic.
 STAGE_ORDER = ["RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE",
-               "VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION", "PHYSICS",
+               "VERIFY", "MECHANISM_SPACE", "MULTI_SOURCE_DISCOVERY",
+               "COLLISION", "PHYSICS",
                "ATTACK", "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
                "CLASSIFY", "NEXT_BEST_ACTION", "RANK"]

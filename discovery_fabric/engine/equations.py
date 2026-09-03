@@ -474,6 +474,23 @@ EQUATION_LIBRARY: Dict[str, List[Equation]] = {
 }
 
 
+# --------------------------------------------------------------------------
+# R401A A1: the ONE canonical equation authority owns the identity of
+# every law shared across layers. Post-build link: each library entry
+# whose id resolves to a canonical law carries the canonical reference
+# (selection/applicability behavior unchanged — this is identity
+# linkage, not a semantic change; equivalence pinned by
+# tests/test_r401_stream_a.py).
+from discovery_fabric.engine import equation_authority as _EA  # noqa: E402
+
+for _domain, _eqs in EQUATION_LIBRARY.items():
+    for _e in _eqs:
+        _canonical = _EA.resolve_alias("equations.py", _e["equation_id"])
+        if _canonical:
+            _e["canonical_law"] = _canonical
+            _e["authority_version"] = _EA.AUTHORITY_VERSION
+
+
 def equations_for_domain(domain: str) -> List[Equation]:
     return EQUATION_LIBRARY.get(domain, [])
 

@@ -1,0 +1,74 @@
+{
+ "phase": "R401-WC PHASE 0 — canonicalize the empirical evidence",
+ "determined_at": "2026-09-03",
+ "repo_state_at_determination": {
+  "HEAD": "7dbebe940fe73f47a420b4f0ca2f9e5188d22ca4",
+  "origin_main_local_ref": "7dbebe940fe73f47a420b4f0ca2f9e5188d22ca4",
+  "ls_remote_main": "7dbebe940fe73f47a420b4f0ca2f9e5188d22ca4",
+  "checkout_state": "HEAD == origin/main == remote main — NOT_STALE (Art. XXII/XXIII)",
+  "working_tree": "uncommitted R401A work present (144 R401 tests green); bench/ absent entirely"
+ },
+ "determination": {
+  "bench_benchmark_worldclass_py": {
+   "committed_to_canonical_repository": false,
+   "present_in_workspace": false,
+   "git_ls_files_count": 0,
+   "filesystem_search": "not found anywhere under /home/z (find -name benchmark_worldclass.py)"
+  },
+  "bench_results": {
+   "committed_to_canonical_repository": false,
+   "present_in_workspace": false,
+   "note": "labeled_pairs.json, db_ab.json, relevance_lexical_corrected.json, synth_local.json, micro.json, fidelity_guard.json — none present"
+  },
+  "bench_kkernel": {
+   "committed_to_canonical_repository": false,
+   "present_in_workspace": false
+  },
+  "conclusion": "The benchmark harness, raw result artifacts, and the 153-pair labeled gold set described in the R401 world-class report are NOT committed to the canonical repository and NOT present in this workspace. They exist only as narrative numbers in the report text."
+ },
+ "epistemic_classification": {
+  "report_empirical_claims_status": "NOT_REPRODUCIBLE_FROM_REPOSITORY",
+  "constitutional_basis": [
+   "Art. VI — never manufacture provenance: the artifacts must not be fabricated to match the reported numbers",
+   "Art. XXIV — a summary never outranks the underlying artifact: the report is a summary; the artifacts do not exist",
+   "Art. XXV — unknown must remain unknown: the reported measurements are unverifiable claims, not canonical evidence",
+   "Art. I — evidence precedes assertion: no release-certified claim may rest on results that cannot be reproduced from repository artifacts"
+  ],
+  "permitted_use": "The report's numbers may be cited ONLY as unverified prior-session claims (status: PROVENANCE_INCOMPLETE), never as release-certified evidence, never as R401 acceptance inputs.",
+  "specific_numbers_that_may_NOT_be_claimed_as_canonical": [
+   "OpenAlex 8/8 domains ~1.7s 5/5 hits",
+   "lexical@0.10 F1 .802 full-set",
+   "e5-large P .630 / R .919 / F1 .747 held-out",
+   "bge-large F1 .729 held-out",
+   "GLiNER F1 .324",
+   "96.7% cross-source redundancy removed in 0.011s",
+   "hybrid grounded 3/3 vs pure 0/3 (Qwen2.5-0.5B CPU)",
+   "benchmark 27/27; release-gate 29/31 with 2 known-env failures",
+   "the 153-pair auditor-labeled set (85 RELEVANT / 68 IRRELEVANT)"
+  ]
+ },
+ "what_IS_canonical_and_reproducible_here": [
+  "the repository's own frozen benchmark suite (tests/benchmark/*, artifacts/benchmark/*)",
+  "the repository's own release-gate suites",
+  "the engine pipeline at HEAD 7dbebe94 (engine code identical to the deployed 930eca8b per R400-E: zero engine-code changes in R400)",
+  "the uncommitted R401A mechanism-space work in the working tree (144 tests green)"
+ ],
+ "commit_protocol_for_any_new_benchmark_result": {
+  "required_record_fields": [
+   "Git SHA",
+   "dataset hash",
+   "model version",
+   "configuration hash",
+   "hardware",
+   "timestamp",
+   "raw-result hash"
+  ],
+  "required_gates_before_commit": [
+   "secret scan",
+   "data/hash verification",
+   "deterministic replay test",
+   "repository identity binding"
+  ],
+  "note": "A new harness built in this session measures THIS environment's real behavior with full metadata provenance; it never backfills the missing prior-session numbers."
+ }
+}

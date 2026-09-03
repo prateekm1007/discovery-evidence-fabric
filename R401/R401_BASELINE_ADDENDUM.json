@@ -1,0 +1,35 @@
+{
+ "suite": "R401_BASELINE_ADDENDUM — correction to the frozen baseline record (R401/R401_BASELINE.json is NOT modified; this addendum supersedes one erroneous metric, Art. XV/XXXI)",
+ "error_disclosed": {
+  "metric": "metrics.retrieval (retrieval_calls=1819, retrieval_latency_ms_total=3021935)",
+  "what_was_wrong": "the count read the WORKTREE's committed historical retrieval_log.jsonl (1819 entries from before the run) — the engine's RETRIEVE and MULTI_SOURCE_DISCOVERY stages do not append to that custody log; they record their queries in the run's own stage envelopes. The 1819 number measured repository history, not this run.",
+  "failed_assumption": "the baseline driver assumed the worktree custody log would accumulate the run's retrieval calls (the same assumption the filter_basis note disclosed as a fallback). The assumption was wrong: the pipeline's retrieval stages persist per-query records inside stage envelopes, not the source-registry log.",
+  "why_no_rewrite": "R401_BASELINE.json is frozen write-once by directive; the correction is recorded here with the corrected measurement derived from the run's OWN artifacts"
+ },
+ "corrected_retrieval_measurement": {
+  "basis": "counted from the run's own persisted envelopes (envelope_RETRIEVE.json, envelope_MULTI_SOURCE_DISCOVERY.json, RUNNER_STDOUT.log)",
+  "retrieve_stage_calls": 1,
+  "retrieve_stage_detail": "one EuropePMC batch query 'peritoneal dialysis catheter obstruction mechanism' returning the 5 frozen evidence items (retrieved 2026-09-03T07:40:00Z)",
+  "multi_source_calls": 12,
+  "multi_source_detail": {
+   "discovery": ["pubmed (EMPTY_RESULT)", "crossref (1237)", "nih_reporter (SUCCESS)"],
+   "destruction": ["pubmed_failures (468989, SUCCESS)", "openfda_adverse (24112527)", "clinical_trials_fail (UNAVAILABLE_OR_TIMEOUT)"],
+   "transfer": ["minimally invasive surgery (50611)", "interventional radiology (20015)", "process industry fluidics (23587)", "aerospace fuel systems (36416)"],
+   "reality": ["clinical_trials (UNAVAILABLE_OR_TIMEOUT)", "nih_funding (SUCCESS)", "fda_adverse (24112527)"]
+  },
+  "prior_art_calls": 2,
+  "prior_art_detail": "both SEARCH_FAILED (results=0, failed=2/2 — from RUNNER_STDOUT)",
+  "total_live_retrieval_calls": 15,
+  "unavailable_not_absence": "UNAVAILABLE_OR_TIMEOUT states are recorded as such, never as empty evidence (Art. XXI.3)"
+ },
+ "other_metric_notes": {
+  "llm_calls": "VALID as frozen — measured as the gateway-log line delta across the driver's execution windows (10 completed glm-4-plus calls, all OK, 74.1 s total latency; the pre-pin hung attempts on NVIDIA never completed and logged nothing)",
+  "network_cost": "the frozen note stands (call counts + summed latency as the measured proxies; byte-level transfer not instrumented)"
+ },
+ "custody_log_anomaly_disclosed": {
+  "event": "18 append-only entries appeared in the MAIN repo's artifacts/source_health/retrieval_log.jsonl during this session's window (07:41:52-07:58:49) with queries 'CSF shunt OBSTRUCTION' and 'OBSTRUCTION prevention coating flow' on openalex/arxiv/nasa_ntrs",
+  "attribution_analysis": "the queries match NEITHER the baseline problem (peritoneal dialysis catheter) NOR any script authored this session; the 3-round ~8.5-min retry pattern matches the engine's transport-recovery retry semantics; 'CSF shunt' is frozen-benchmark vocabulary (tests/benchmark/test_phase2_suite.py). Most plausible attribution: a live transport-recovery test inside this session's fidelity-suite runs appended to the canonical log — a conftest-guard gap (the prior guards cover registry+relevance log; the retrieval custody log was evidently not covered on this path).",
+  "integrity": "the log's hash chain verifies VALID across all 1852 entries (verify_chain: chain_valid=true) — append-only, no rewrite, no corruption",
+  "resolution": "the +18 test-contamination entries will be reverted at commit-prep (file restored to its session-start 1834-entry state, which itself carried the prior session's +15 legitimate run entries); the guard gap is recorded here as a defect for the next hardening round (Art. XXXI)"
+ }
+}

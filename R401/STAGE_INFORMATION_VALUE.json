@@ -1,0 +1,387 @@
+{
+ "generated_by": "scripts/r401_stage_table.py (AUTO-INTROSPECTED \u2014 never hand-maintained; regenerate after any stage/adapter change)",
+ "n_stages": 16,
+ "stage_order": [
+  "RETRIEVE",
+  "FREEZE",
+  "PREMISE_GATE",
+  "SYNTHESIZE",
+  "VERIFY",
+  "MECHANISM_SPACE",
+  "MULTI_SOURCE_DISCOVERY",
+  "COLLISION",
+  "PHYSICS",
+  "ATTACK",
+  "CONTRADICTION",
+  "KILLER_EXPERIMENT",
+  "ADJUDICATION",
+  "CLASSIFY",
+  "NEXT_BEST_ACTION",
+  "RANK"
+ ],
+ "stage_table": [
+  {
+   "stage": "RETRIEVE",
+   "cost_class": "CHEAP_LLM",
+   "network_required": true,
+   "deterministic": false,
+   "decision_dependency": false,
+   "learning_dependency": false,
+   "provenance_dependency": false,
+   "downstream_consumers": [
+    "MECHANISM_SPACE",
+    "SYNTHESIZE",
+    "VERIFY"
+   ],
+   "capability_id": "A2_RETRIEVAL",
+   "canonical_module": "discovery_fabric/a2/retrieve.py"
+  },
+  {
+   "stage": "FREEZE",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": false,
+   "learning_dependency": false,
+   "provenance_dependency": true,
+   "downstream_consumers": [],
+   "capability_id": "EVIDENCE_FREEZE",
+   "canonical_module": "orchestrator/evidence_custody.py"
+  },
+  {
+   "stage": "PREMISE_GATE",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": false,
+   "learning_dependency": false,
+   "provenance_dependency": false,
+   "downstream_consumers": [
+    "ADJUDICATION",
+    "ATTACK",
+    "CLASSIFY",
+    "COLLISION",
+    "CONTRADICTION",
+    "KILLER_EXPERIMENT",
+    "MECHANISM_SPACE",
+    "MULTI_SOURCE_DISCOVERY",
+    "NEXT_BEST_ACTION",
+    "PHYSICS",
+    "RANK",
+    "SYNTHESIZE",
+    "VERIFY"
+   ],
+   "capability_id": "PREMISE_GATE",
+   "canonical_module": "discovery_fabric/engine/premise_gate.py"
+  },
+  {
+   "stage": "SYNTHESIZE",
+   "cost_class": "CHEAP_LLM",
+   "network_required": true,
+   "deterministic": false,
+   "decision_dependency": false,
+   "learning_dependency": true,
+   "provenance_dependency": false,
+   "downstream_consumers": [
+    "ADJUDICATION",
+    "ATTACK",
+    "CLASSIFY",
+    "COLLISION",
+    "CONTRADICTION",
+    "KILLER_EXPERIMENT",
+    "MECHANISM_SPACE",
+    "MULTI_SOURCE_DISCOVERY",
+    "NEXT_BEST_ACTION",
+    "PHYSICS",
+    "RANK",
+    "VERIFY"
+   ],
+   "capability_id": "SYNTHESIS",
+   "canonical_module": "discovery_fabric/a2/synthesize.py"
+  },
+  {
+   "stage": "VERIFY",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": false,
+   "learning_dependency": false,
+   "provenance_dependency": true,
+   "downstream_consumers": [],
+   "capability_id": "EVIDENCE_VERIFY",
+   "canonical_module": "discovery_fabric/a2/verify.py"
+  },
+  {
+   "stage": "MECHANISM_SPACE",
+   "cost_class": "EXPENSIVE_LLM",
+   "network_required": true,
+   "deterministic": false,
+   "decision_dependency": false,
+   "learning_dependency": true,
+   "provenance_dependency": false,
+   "downstream_consumers": [],
+   "capability_id": "MECHANISM_SPACE",
+   "canonical_module": "discovery_fabric/engine/mechanism_space.py"
+  },
+  {
+   "stage": "MULTI_SOURCE_DISCOVERY",
+   "cost_class": "CHEAP_LLM",
+   "network_required": true,
+   "deterministic": false,
+   "decision_dependency": false,
+   "learning_dependency": false,
+   "provenance_dependency": false,
+   "downstream_consumers": [],
+   "capability_id": "MULTI_SOURCE_DISCOVERY",
+   "canonical_module": "orchestrator/multi_source_discovery.py"
+  },
+  {
+   "stage": "COLLISION",
+   "cost_class": "CHEAP_LLM",
+   "network_required": true,
+   "deterministic": false,
+   "decision_dependency": true,
+   "learning_dependency": false,
+   "provenance_dependency": true,
+   "downstream_consumers": [],
+   "capability_id": "COLLISION_ENGINE",
+   "canonical_module": "discovery_fabric/prior_art_v2/collision_resolution.py + discovery_fabric/a2/prior_art.py"
+  },
+  {
+   "stage": "PHYSICS",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": true,
+   "learning_dependency": false,
+   "provenance_dependency": false,
+   "downstream_consumers": [],
+   "capability_id": "PHYSICS_GATE",
+   "canonical_module": "discovery_fabric/engine/physics_stage.py"
+  },
+  {
+   "stage": "ATTACK",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": true,
+   "deterministic": false,
+   "decision_dependency": true,
+   "learning_dependency": false,
+   "provenance_dependency": false,
+   "downstream_consumers": [],
+   "capability_id": "ATTACK_ENGINE",
+   "canonical_module": "discovery_fabric/a2/adversarial.py"
+  },
+  {
+   "stage": "CONTRADICTION",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": false,
+   "learning_dependency": false,
+   "provenance_dependency": false,
+   "downstream_consumers": [],
+   "capability_id": "CONTRADICTION_QUEUE",
+   "canonical_module": "orchestrator/contradiction_queue.py"
+  },
+  {
+   "stage": "KILLER_EXPERIMENT",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": false,
+   "learning_dependency": true,
+   "provenance_dependency": false,
+   "downstream_consumers": [],
+   "capability_id": "KILLER_EXPERIMENT",
+   "canonical_module": "epistemic_integrity/invention_loop_engine/bayesian_eig.py"
+  },
+  {
+   "stage": "ADJUDICATION",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": true,
+   "learning_dependency": false,
+   "provenance_dependency": false,
+   "downstream_consumers": [],
+   "capability_id": "ADJUDICATION",
+   "canonical_module": "discovery_fabric/engine/adapters.py (glue over canonical inputs)"
+  },
+  {
+   "stage": "CLASSIFY",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": true,
+   "learning_dependency": false,
+   "provenance_dependency": false,
+   "downstream_consumers": [],
+   "capability_id": "EPISTEMIC_CLASSIFICATION",
+   "canonical_module": "discovery_fabric/a2/classify.py"
+  },
+  {
+   "stage": "NEXT_BEST_ACTION",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": false,
+   "learning_dependency": true,
+   "provenance_dependency": false,
+   "downstream_consumers": [],
+   "capability_id": "NEXT_BEST_ACTION",
+   "canonical_module": "orchestrator/next_best_action.py"
+  },
+  {
+   "stage": "RANK",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": true,
+   "learning_dependency": false,
+   "provenance_dependency": true,
+   "downstream_consumers": [],
+   "capability_id": "PORTFOLIO_RANKING",
+   "canonical_module": "orchestrator/portfolio.py + deterministic score in adapter"
+  },
+  {
+   "stage": "GAUNTLET_SPEC",
+   "cost_class": "EXPENSIVE_EVALUATION",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": true,
+   "learning_dependency": false,
+   "provenance_dependency": true,
+   "downstream_consumers": [],
+   "capability_id": null,
+   "canonical_module": "discovery_fabric/engine/run.py",
+   "note": "build_invention_spec + engineering spec + CAD"
+  },
+  {
+   "stage": "GAUNTLET_PHYSICS_GATE",
+   "cost_class": "CHEAP_DETERMINISTIC",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": true,
+   "learning_dependency": false,
+   "provenance_dependency": true,
+   "downstream_consumers": [],
+   "capability_id": null,
+   "canonical_module": "discovery_fabric/engine/run.py",
+   "note": "physics gate plausibility + baseline comparison"
+  },
+  {
+   "stage": "GAUNTLET_CHEAP_SCREEN",
+   "cost_class": "UNCLASSIFIED",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": true,
+   "learning_dependency": false,
+   "provenance_dependency": true,
+   "downstream_consumers": [],
+   "capability_id": null,
+   "canonical_module": "discovery_fabric/engine/run.py",
+   "note": "B8 cheap-first screen (representability + constraint + baseline + top-N)"
+  },
+  {
+   "stage": "GAUNTLET_INDEPENDENT_ATTACK",
+   "cost_class": "CHEAP_LLM",
+   "network_required": true,
+   "deterministic": false,
+   "decision_dependency": true,
+   "learning_dependency": false,
+   "provenance_dependency": true,
+   "downstream_consumers": [],
+   "capability_id": null,
+   "canonical_module": "discovery_fabric/engine/run.py",
+   "note": "R401 independent attacker (separate reasoning context)"
+  },
+  {
+   "stage": "GAUNTLET_PACKAGE",
+   "cost_class": "EXPENSIVE_EVALUATION",
+   "network_required": false,
+   "deterministic": true,
+   "decision_dependency": true,
+   "learning_dependency": true,
+   "provenance_dependency": true,
+   "downstream_consumers": [],
+   "capability_id": null,
+   "canonical_module": "discovery_fabric/engine/run.py",
+   "note": "quality + release gate + buyer package"
+  }
+ ],
+ "canonical_authority_map": {
+  "equation_identity": {
+   "module": "discovery_fabric/engine/equation_authority.py",
+   "layers_consuming": [
+    "discovery_fabric/engine/equations.py (registry/selection)",
+    "discovery_fabric/engine/technical_equations.py (analytical evaluation)"
+   ],
+   "merged_duplicates": [
+    "FLUID-001 <-> eq:hagen_poiseuille_flow_v1"
+   ]
+  },
+  "improvement_orchestration": {
+   "module": "discovery_fabric/engine/improvement_authority.py",
+   "mode_engines": [
+    "improvement_engine.py (EPISTEMIC/EVIDENCE)",
+    "technical_improvement_engine.py (PARAMETER/TECHNICAL)"
+   ],
+   "evaluation_authority": "technical_evaluator.evaluate_candidate_technically (consumed, never redefined)"
+  },
+  "engineering_evaluation": {
+   "module": "discovery_fabric/engine/technical_evaluator.py",
+   "analytical_layer": "discovery_fabric/engine/technical_equations.py (EVALUATOR_ID=analytical_equation_v1; LIVE \u2014 consumed by technical_improvement_engine + r383 demos + test_r383_analytical_evaluator.py)",
+   "deterministic_attack": "discovery_fabric/engine/engineering_attack.py",
+   "audit_note": "analytical_evaluator.py DOES NOT EXIST as a module in the tree \u2014 the analytical evaluator IS the technical_equations layer; the A3 dead-branch did not fire (no module to archive)"
+  },
+  "mechanism_space": {
+   "module": "discovery_fabric/engine/mechanism_space.py",
+   "operators": 5,
+   "cheap_screen": "discovery_fabric/engine/cheap_screen.py",
+   "independent_attack": "discovery_fabric/engine/independent_attack.py"
+  },
+  "reality_loop": {
+   "classification": "REALITY_LOOP_INFRASTRUCTURE (A6)",
+   "modules": [
+    "discovery_fabric/engine/reality_calibration.py (MEASUREMENT -> REALITY_EVENT -> DISCREPANCY -> MODEL UPDATE -> DESIGN; calibration from caller's REALITY_EVENT only)",
+    "discovery_fabric/engine/reality_loop.py"
+   ],
+   "preserved_boundary": "PHYSICAL_OBSERVATION boundary + custody + measurement provenance + held-out validation (Art. XXXVIII; unchanged by R401)"
+  },
+  "evidence_planes": {
+   "DISCOVERY_SUPPORT": "RETRIEVE -> MECHANISM_SPACE (structured evidence -> five operators)",
+   "VERIFICATION_SUPPORT": "MULTI_SOURCE_DISCOVERY (four-direction search around a serious candidate)",
+   "state_vocabulary": "SEARCH_FAILED / SEARCH_PARTIAL / UNRESOLVED / UNKNOWN on both planes"
+  }
+ },
+ "stage_import_map": {
+  "RETRIEVE": "discovery_fabric/a2/retrieve.py",
+  "FREEZE": "orchestrator/evidence_custody.py",
+  "PREMISE_GATE": "discovery_fabric/engine/premise_gate.py",
+  "SYNTHESIZE": "discovery_fabric/a2/synthesize.py",
+  "VERIFY": "discovery_fabric/a2/verify.py",
+  "MECHANISM_SPACE": "discovery_fabric/engine/mechanism_space.py",
+  "MULTI_SOURCE_DISCOVERY": "orchestrator/multi_source_discovery.py",
+  "COLLISION": "discovery_fabric/prior_art_v2/collision_resolution.py + discovery_fabric/a2/prior_art.py",
+  "PHYSICS": "discovery_fabric/engine/physics_stage.py",
+  "ATTACK": "discovery_fabric/a2/adversarial.py",
+  "CONTRADICTION": "orchestrator/contradiction_queue.py",
+  "KILLER_EXPERIMENT": "epistemic_integrity/invention_loop_engine/bayesian_eig.py",
+  "ADJUDICATION": "discovery_fabric/engine/adapters.py (glue over canonical inputs)",
+  "CLASSIFY": "discovery_fabric/a2/classify.py",
+  "NEXT_BEST_ACTION": "orchestrator/next_best_action.py",
+  "RANK": "orchestrator/portfolio.py + deterministic score in adapter"
+ },
+ "cheap_first_ladder": [
+  "STRUCTURED MECHANISM",
+  "MATERIAL DISTINCTNESS",
+  "REPRESENTABILITY",
+  "CHEAP PHYSICS / CONSTRAINT SCREEN",
+  "BASELINE SCREEN",
+  "TOP-N",
+  "EXPENSIVE ENGINEERING EVALUATION",
+  "ATTACK",
+  "IMPROVEMENT",
+  "CAD / RELEASE"
+ ]
+}

@@ -145,10 +145,13 @@ def justify(stage: str,
             })
             return out
     # 2. verified-evidence prerequisite for expensive candidate
-    #    generation (the grid / ensemble sites call this helper with
-    #    their stage names; the conductor's core stages have no
-    #    evidence prerequisite — the chain already gates them)
-    if stage in ("EXPLORATION_GRID", "ENSEMBLE") and env is not None:
+    #    generation (the grid / ensemble / mechanism-space sites call
+    #    this helper with their stage names; the conductor's core stages
+    #    have no evidence prerequisite — the chain already gates them)
+    #    R401: MECHANISM_SPACE joins the expensive set — it generates
+    #    candidates through five LLM instantiation calls.
+    if stage in ("EXPLORATION_GRID", "ENSEMBLE", "MECHANISM_SPACE") \
+            and env is not None:
         prereq = verified_evidence_prerequisite(env)
         if not prereq["satisfied"]:
             out.update({

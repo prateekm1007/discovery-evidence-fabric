@@ -453,8 +453,17 @@ _UNIT_SI.update({
 # THE EQUATION REGISTRY (engine-owned; the LLM never writes physics)
 # ---------------------------------------------------------------------------
 def _hp_flow(si: Dict[str, float]) -> float:
-    return math.pi * si["lumen_diameter"] ** 4 * si["pressure_drop"] / \
-        (128.0 * si["viscosity"] * si["flow_path_length"])
+    # R401A A1: delegates to the ONE canonical equation authority
+    # (equation_authority.py) — the historical standalone
+    # implementation is identical and retired to git history; its
+    # numerical equivalence is pinned by tests/test_r401_stream_a.py
+    from discovery_fabric.engine.equation_authority import (
+        hagen_poiseuille_flow_si)
+    return hagen_poiseuille_flow_si(
+        diameter_m=si["lumen_diameter"],
+        pressure_drop_Pa=si["pressure_drop"],
+        viscosity_Pa_s=si["viscosity"],
+        length_m=si["flow_path_length"])
 
 
 def _hp_validity(si: Dict[str, float], out: float
@@ -623,6 +632,13 @@ def _cap_validity(si: Dict[str, float], out: float
 
 EQUATIONS: Dict[str, Dict[str, Any]] = {
     "eq:hagen_poiseuille_flow_v1": {
+        # R401A A1: the law's identity (form, symbols, units,
+        # assumptions, provenance) is owned by equation_authority.py;
+        # this layer-specific entry keeps ONLY the evaluation machinery
+        # (compute/validity/monotonicity/output_role) and carries the
+        # canonical reference.
+        "canonical_law": "law:hagen_poiseuille",
+        "authority_version": "equation_authority/1.0.0",
         "equation_id": "eq:hagen_poiseuille_flow_v1",
         "name": "Hagen–Poiseuille laminar volumetric flow",
         "domain": "FLUIDICS",

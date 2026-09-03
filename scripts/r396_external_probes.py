@@ -83,6 +83,70 @@ INCOMPLETE_SEARCH_PROBLEM = (
 
 RAW: List[Dict[str, Any]] = []
 
+# ---------------------------------------------------------------------------
+# R401 Phase 0: EXPLICIT acceptance states — Boolean `pass` (True/False)
+# and the historical P2 `pass: None` conflated three different things:
+# adjudicated success, adjudicated failure, and "not adjudicated". The
+# acceptance contract now carries an explicit `state` on every probe:
+#
+#   PASS              every check adjudicated True (affirmative — the ONLY
+#                     affirmative state)
+#   FAIL              at least one check adjudicated False (a genuine
+#                     failure; mechanically derived from the checks, so
+#                     no later field edit can coerce it into PASS)
+#   OBSERVATION_ONLY  an observation was recorded, no adjudication was
+#                     performed (non-failing — therefore NOT PASS)
+#   INCOMPLETE        the probe did not complete (unreachable host, run
+#                     not accepted, no terminal state) — unknown, not
+#                     failure (Art. XXV: unknown stays unknown)
+#   UNRESOLVED        a check value is neither True nor False — unknown,
+#                     never treated as false and never as pass
+#   QUOTA_EXHAUSTED   the probe could not run because a provider quota
+#                     was exhausted — recorded, never absence
+#
+# `pass` is kept as a DERIVED mirror (True iff state == PASS) for older
+# consumers; the authoritative field is `state`.
+ACCEPTANCE_STATES = ("PASS", "FAIL", "OBSERVATION_ONLY", "INCOMPLETE",
+                     "UNRESOLVED", "QUOTA_EXHAUSTED")
+
+
+def acceptance_state(checks: Dict[str, Any], *, completed: bool = True,
+                     quota_exhausted: bool = False) -> str:
+    """Derive the explicit acceptance state from the checks themselves.
+
+    Pure function — the state is computed from the check values at
+    probe time and never from any other field of the record, so a
+    genuine failure cannot be coerced into PASS by editing `pass` or
+    any sibling field (R401 Phase 0 directive, conditions 5 and 6)."""
+    if quota_exhausted:
+        return "QUOTA_EXHAUSTED"
+    if not completed:
+        return "INCOMPLETE"
+    vals = list(checks.values())
+    if any(v is False for v in vals):
+        return "FAIL"
+    if all(v is True for v in vals):
+        return "PASS"
+    return "UNRESOLVED"
+
+
+def _state_mirror(state: str) -> bool:
+    """`pass` mirror for backward compatibility: True iff PASS."""
+    return state == "PASS"
+
+
+def probe_record_state(p: Dict[str, Any]) -> str:
+    """Map a probe record to its acceptance state for aggregation.
+
+    PASS only when the record explicitly carries `state == PASS`; a
+    legacy record (no `state` field) counts as PASS only when its
+    `pass` field was an explicit True — `None`/absent/False never
+    become PASS (R401 Phase 0 condition 5: non-failing is not pass)."""
+    st = p.get("state")
+    if st in ACCEPTANCE_STATES:
+        return st
+    return "PASS" if p.get("pass") is True else "UNRESOLVED"
+
 
 def _request(base: str, path: str, method: str = "GET",
              body: Optional[dict] = None, timeout: int = 90,
@@ -208,8 +272,10 @@ def probe_p1(base: str, deployed_sha: str) -> Dict[str, Any]:
         checks["health_commit_equals_deployed"] = (
             di.get("health_reported_commit") == deployed_sha)
     observed = di.get("health_reported_commit")
+    state = acceptance_state(checks, completed=rec.get("status") == 200)
     return {"probe": "P1", "checks": checks,
-            "pass": all(checks.values()),
+            "state": state,
+            "pass": _state_mirror(state),
             "observed_engine_commit": observed,
             "raw_ref": len(RAW) - 1}
 
@@ -229,7 +295,7 @@ def probe_p2(base: str) -> Dict[str, Any]:
         "owner_key": "owner_key" in blob,
     }
     non_public = [s for s in sessions if not s.get("public")]
-    return {"probe": "P2", "checks": {
+    checks = {
         "reachable": rec.get("status") == 200,
         "zero_cross_user_sessions": len(non_public) == 0,
         "zero_run_dir_leakage": not leaks["run_dir"],
@@ -237,10 +303,23 @@ def probe_p2(base: str) -> Dict[str, Any]:
         "zero_worker_starttime_leakage": not leaks["worker_starttime"],
         "zero_filesystem_path_leakage": not leaks["filesystem_paths"],
         "zero_owner_key_leakage": not leaks["owner_key"],
-    }, "pass": None, "n_sessions_visible": len(sessions),
-    "n_public_demo_sessions": len(sessions),
-    "leaks": leaks,
-    "raw_ref": len(RAW) - 1}
+    }
+    # R401 Phase 0: P2 is now ADJUDICATED. Previously `pass` was always
+    # None — the machine never said FAIL on a genuinely leaky host (the
+    # R400-B pre-deploy record's "P2 FAIL" was a human classification of
+    # 5/7 false checks, not a machine verdict), and P2 could never earn
+    # PASS on a clean host either. The state is derived mechanically from
+    # the checks: any False -> FAIL (locked — condition 6); all True ->
+    # PASS (earned, never "non-failing therefore pass" — condition 5);
+    # unreachable -> INCOMPLETE (not adjudicated, Art. XXV).
+    state = acceptance_state(checks, completed=rec.get("status") == 200)
+    return {"probe": "P2", "checks": checks,
+            "state": state,
+            "pass": _state_mirror(state),
+            "n_sessions_visible": len(sessions),
+            "n_public_demo_sessions": len(sessions),
+            "leaks": leaks,
+            "raw_ref": len(RAW) - 1}
 
 
 def probe_p3(base: str) -> Dict[str, Any]:
@@ -248,11 +327,15 @@ def probe_p3(base: str) -> Dict[str, Any]:
     sid, owner = sid_owner if isinstance(sid_owner, tuple) else (
         None, uuid.uuid4().hex)
     if not sid:
-        return {"probe": "P3", "pass": False,
+        # R401 Phase 0: the probe could not execute — INCOMPLETE (nothing
+        # was proven either way), not a Boolean failure of the contract.
+        return {"probe": "P3", "state": "INCOMPLETE",
+                "pass": False,
                 "error": "run not accepted", "raw_ref": len(RAW) - 1}
     detail = _wait_terminal(base, sid, owner)
     if not detail:
-        return {"probe": "P3", "pass": False, "session_id": sid,
+        return {"probe": "P3", "state": "INCOMPLETE", "pass": False,
+                "session_id": sid,
                 "error": "no terminal state", "raw_ref": len(RAW) - 1}
     stages = detail.get("stages") or []
     by_stage = {s.get("stage"): s for s in stages}
@@ -287,8 +370,10 @@ def probe_p3(base: str) -> Dict[str, Any]:
             or detail.get("engineering_specification")
             or detail.get("survivor_selection")),
     }
+    state = acceptance_state(checks)
     return {"probe": "P3", "checks": checks,
-            "pass": all(checks.values()), "session_id": sid,
+            "state": state, "pass": _state_mirror(state),
+            "session_id": sid,
             "final_status": final,
             "premise_gate_verdict": pg.get("verdict"),
             "premise_gate_reason": (pg.get("explanation") or "")[:300],
@@ -300,11 +385,12 @@ def probe_p4(base: str) -> Dict[str, Any]:
     sid, owner = sid_owner if isinstance(sid_owner, tuple) else (
         None, uuid.uuid4().hex)
     if not sid:
-        return {"probe": "P4", "pass": False,
+        return {"probe": "P4", "state": "INCOMPLETE", "pass": False,
                 "error": "run not accepted", "raw_ref": len(RAW) - 1}
     detail = _wait_terminal(base, sid, owner)
     if not detail:
-        return {"probe": "P4", "pass": False, "session_id": sid,
+        return {"probe": "P4", "state": "INCOMPLETE", "pass": False,
+                "session_id": sid,
                 "error": "no terminal state", "raw_ref": len(RAW) - 1}
     stages = detail.get("stages") or []
     by_stage = {s.get("stage"): s for s in stages}
@@ -328,8 +414,10 @@ def probe_p4(base: str) -> Dict[str, Any]:
             and (search_status.get("mandatory_complete") is False
                  or res.get("search_errors"))),
     }
+    state = acceptance_state(checks)
     return {"probe": "P4", "checks": checks,
-            "pass": all(checks.values()), "session_id": sid,
+            "state": state, "pass": _state_mirror(state),
+            "session_id": sid,
             "final_status": final,
             "collision_verdicts": verdicts,
             "search_execution": search_status,
@@ -360,10 +448,26 @@ def probe_p5(base: str) -> Dict[str, Any]:
     fusion_leak = any(
         "divertor" in t.lower() or "fusion" in t.lower()
         for r in results for t in r.get("evidence_titles", []))
+    # R401 Phase 0: a vacuous observation is NOT a pass. Previously, if
+    # the host refused BOTH runs, verdicts became [None, None] and
+    # `stable` evaluated True on the empty set — a host that accepted no
+    # runs at all "passed" P5. Adjudication now requires BOTH runs to
+    # have completed; otherwise the probe is INCOMPLETE (nothing was
+    # observed, Art. XXV — never a pass, and never a false FAIL claim
+    # against a contract the probe never got to test).
+    completed_runs = [r for r in results if not r.get("error")]
+    if len(completed_runs) < len(results):
+        state = "INCOMPLETE"
+    else:
+        state = acceptance_state({
+            "verdicts_stable": stable,
+            "no_fusion_divertor_admitted": not fusion_leak,
+        })
     return {"probe": "P5", "checks": {
         "verdicts_stable": stable,
         "no_fusion_divertor_admitted": not fusion_leak,
-    }, "pass": stable and not fusion_leak,
+        "runs_completed": len(completed_runs) == len(results),
+    }, "state": state, "pass": _state_mirror(state),
     "runs": results, "raw_ref": len(RAW) - 1}
 
 
@@ -406,8 +510,16 @@ def probe_p6(base: str) -> Dict[str, Any]:
         "classified_deterministic": complete[-1].get(
             "classification") == "DETERMINISTIC" if complete else False,
     }
+    # R401 Phase 0: no completed run -> the determinism contract was
+    # never observed -> INCOMPLETE, not FAIL (unknown is not failure,
+    # Art. XXV). With >=1 completed run the checks adjudicate normally.
+    if not complete:
+        state = "INCOMPLETE"
+    else:
+        state = acceptance_state(checks)
     return {"probe": "P6", "checks": checks,
-            "pass": all(checks.values()), "runs": runs,
+            "state": state, "pass": _state_mirror(state),
+            "runs": runs,
             "raw_ref": len(RAW) - 1}
 
 
@@ -459,14 +571,25 @@ def probe_p7(base: str, case_filter: Optional[set] = None,
     ok = all(r.get("accepted") is not False for r in results)
     terminal = all(r.get("final_status") or r.get("accepted")
                    for r in results)
+    checks = {
+        "all_selected_accepted_or_rejected_honestly": ok,
+        "all_selected_reached_terminal_state": terminal,
+        "n_cases": len(cases),
+        "partial": bool(case_filter),
+    }
+    # n_cases/partial are observations, not adjudications — exclude them
+    # from the state derivation (a non-Boolean check value would make the
+    # state UNRESOLVED under the classifier, which would be wrong here:
+    # they are recorded metadata, not verdicts).
+    state = acceptance_state({
+        "all_selected_accepted_or_rejected_honestly": ok,
+        "all_selected_reached_terminal_state": terminal,
+    })
     return {"probe": "P7" if not case_filter else "P7-batch",
             "case_filter": (sorted(case_filter) if case_filter else None),
-            "checks": {
-                "all_selected_accepted_or_rejected_honestly": ok,
-                "all_selected_reached_terminal_state": terminal,
-                "n_cases": len(cases),
-                "partial": bool(case_filter),
-            }, "pass": ok and terminal, "results": results,
+            "checks": checks,
+            "state": state, "pass": _state_mirror(state),
+            "results": results,
             "raw_ref": len(RAW) - 1}
 
 
@@ -559,12 +682,22 @@ def main() -> int:
     def _flush(finished: bool = False) -> None:
         """R400: write the report (incl. raw exchanges) after every
         probe so an interrupted long suite keeps its completed records
-        (Art. XV — a timeout is recorded, never discarded)."""
+        (Art. XV — a timeout is recorded, never discarded).
+
+        R401 Phase 0: `all_pass` is now derived from the explicit
+        `state` field — PASS is the ONLY affirmative state. A probe in
+        FAIL / OBSERVATION_ONLY / INCOMPLETE / UNRESOLVED /
+        QUOTA_EXHAUSTED blocks the suite, and a record without a state
+        (historical records) is non-affirmative via the legacy `pass`
+        fallback (pass None/absent -> never pass)."""
         if finished:
             report["finished_utc"] = time.strftime(
                 "%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-            report["all_pass"] = all(p.get("pass")
-                                     for p in report["probes"])
+            report["all_pass"] = (bool(report["probes"])
+                                  and all(probe_record_state(p) == "PASS"
+                                          for p in report["probes"]))
+            report["states"] = {p.get("probe"): probe_record_state(p)
+                                for p in report["probes"]}
         report["raw"] = list(RAW)
         out.write_text(json.dumps(report, indent=1, default=str))
 

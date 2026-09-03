@@ -946,8 +946,10 @@ def test_d1_resume_continues_killed_run_without_rerunning_stages():
         # is premise-coherent and the physics stage is deterministic
         # offline: it evaluates the envelope mechanism honestly, an
         # out-of-domain verdict completes OK without fabricating a
-        # comparison). The D8 chain is 15 stages since R397.
-        assert len(run2.env.stage_log) == done_before + 8
+        # comparison). R401: the MECHANISM_SPACE stage also executes
+        # (or honestly skips with zero verified evidence) on the resume
+        # path — the chain is 16 stages since R401.
+        assert len(run2.env.stage_log) == done_before + 9
         # the automatic survivor -> package pipeline ran in phase 2
         assert (td / "INVENTION_SPECIFICATION.json").exists()
         assert (td / "ENGINEERING_SPECIFICATION.json").exists()

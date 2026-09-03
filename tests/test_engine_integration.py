@@ -148,10 +148,12 @@ def test_stage_order_is_exact_d8_chain():
     # R397 Phase 2: PHYSICS is a first-class stage between COLLISION and
     # ATTACK — the physics solver is part of the LIVE RUN CHAIN for
     # every ordinary user run (consultant finding: "validated code but
-    # not part of the live run chain"). The D8 chain is 15 stages.
+    # not part of the live run chain"). R401: MECHANISM_SPACE between
+    # VERIFY and MULTI_SOURCE_DISCOVERY — the D8 chain is 16 stages.
     assert STAGE_ORDER == [
         "RETRIEVE", "FREEZE", "PREMISE_GATE", "SYNTHESIZE", "VERIFY",
-        "MULTI_SOURCE_DISCOVERY", "COLLISION", "PHYSICS", "ATTACK",
+        "MECHANISM_SPACE", "MULTI_SOURCE_DISCOVERY", "COLLISION",
+        "PHYSICS", "ATTACK",
         "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY",
         "NEXT_BEST_ACTION", "RANK"]
 

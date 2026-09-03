@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -45,15 +46,20 @@ DOWNSTREAM_BLOCKERS = {
     # has no mechanism to evaluate; executing it after a fatality
     # recorded a misleading OK — found live by the R396 P3 probe
     # against the local instance, fixed with a pinned test).
-    "PREMISE_GATE": {"SYNTHESIZE", "VERIFY", "MULTI_SOURCE_DISCOVERY",
+    "PREMISE_GATE": {"SYNTHESIZE", "VERIFY", "MECHANISM_SPACE",
+                     "MULTI_SOURCE_DISCOVERY",
                      "COLLISION", "PHYSICS", "ATTACK", "CONTRADICTION",
                      "KILLER_EXPERIMENT", "ADJUDICATION", "CLASSIFY",
                      "NEXT_BEST_ACTION", "RANK"},
-    "SYNTHESIZE": {"VERIFY", "MULTI_SOURCE_DISCOVERY", "COLLISION",
+    "SYNTHESIZE": {"VERIFY", "MECHANISM_SPACE",
+                   "MULTI_SOURCE_DISCOVERY", "COLLISION",
                    "PHYSICS", "ATTACK",
                    "CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION",
                    "CLASSIFY", "NEXT_BEST_ACTION", "RANK"},
-    "RETRIEVE": {"VERIFY", "SYNTHESIZE"},
+    # R401: MECHANISM_SPACE consumes the frozen evidence — a retrieval
+    # failure leaves it nothing to structure (SKIPPED_UPSTREAM_FAILURE,
+    # the recorded refusal — never OK-on-empty-input)
+    "RETRIEVE": {"VERIFY", "SYNTHESIZE", "MECHANISM_SPACE"},
 }
 
 
@@ -134,6 +140,15 @@ class EngineRun:
         return cls(**kwargs)
 
     # ------------------------------------------------------------------
+    def _persisted_skip(self, key: str) -> bool:
+        """R401B B8 resume-path correctness: a mechanism-space
+        candidate whose cheap-screen/top-N skip was already persisted
+        in a previous (interrupted) execution of this run stays skipped
+        — the record on disk is the authority (Art. X)."""
+        return (self.out / f"PACKAGE_SKIPPED_CHEAP_SCREEN_{key}.json"
+                ).exists() or \
+            (self.out / f"PACKAGE_SKIPPED_TOPN_{key}.json").exists()
+
     def _persist(self, name: str, obj: Any):
         p = self.out / name
         p.write_text(json.dumps(obj, indent=1, ensure_ascii=False, default=str))
@@ -619,10 +634,20 @@ class EngineRun:
                                                     .get("content_hash", ""))},
                                 "exploration_angle": c.get("angle"),
                                 "exploration_provider": c.get("provider_id")}
+                            # R401 resume-robustness: a grid candidate
+                            # whose kill record already exists needs NO
+                            # env_view (and NO re-burned per-candidate
+                            # collision) — the gauntlet loop skips it at
+                            # the persisted kill before touching the view
+                            _dead_grid = (
+                                self.out /
+                                f"PACKAGE_FAILED_grid-{c.get('angle')}"
+                                ".json").exists()
                             pool.append({
                                 "key": f"grid-{c.get('angle')}",
                                 "candidate_id": c["candidate_id"],
-                                "env_view": _env_with_candidate(grid_cand),
+                                "env_view": None if _dead_grid else
+                                _env_with_candidate(grid_cand),
                                 "spec": None,
                                 "origin": f"EXPLORATION_GRID_{c.get('angle')}"
                                           f"({c.get('provider_id')})",
@@ -637,10 +662,189 @@ class EngineRun:
                             "traceback": _tb.format_exc()[-2000:]})
                         grid_result = None
 
+            # ---- R401: the structured mechanism space candidates ----
+            # Every mechanism-space candidate joins the gauntlet pool
+            # carrying its OWN mechanism-level evidence verification
+            # (unlike the grid candidates, whose discovery verification
+            # was not re-run). Each faces the SAME canonical downstream
+            # chain: collision -> spec -> physics gate -> engineering
+            # attack -> INDEPENDENT attack -> repair -> quality ->
+            # selection -> package.
+            ms = self.env.mechanism_space or {}
+            _ms_seq: Dict[str, int] = {}
+            for c in (ms.get("candidates") or []):
+                if not c.get("candidate_id"):
+                    continue
+                op = c.get("transformation_operator", "OP")
+                _ms_seq[op] = _ms_seq.get(op, 0) + 1
+                mech_cand = {
+                    "candidate_id": c["candidate_id"],
+                    "mechanism": c.get("mechanism", ""),
+                    "intervention": c.get("intervention", ""),
+                    "expected_effect": c.get("predicted_effect",
+                                             c.get("expected_effect", "")),
+                    "falsification_test": c.get(
+                        "testable_prediction", ""),
+                    "mechanism_source_span": c.get(
+                        "mechanism_source_span", ""),
+                    "source_evidence": {
+                        "source_id": (c.get("evidence_bundle") or {})
+                        .get("primary_item_id", ""),
+                        "source_hash": ((c.get("evidence_bundle") or {})
+                                        .get("primary_source") or {})
+                        .get("content_hash", "")},
+                    "mechanism_support": c.get("mechanism_support"),
+                    "mechanism_space_candidate": c,
+                    "derivation_trace": c.get("derivation_trace"),
+                }
+                _mech_key = f"mech-{op}-{_ms_seq[op]}"
+                _dead_mech = self._persisted_skip(_mech_key) or (
+                    self.out / f"PACKAGE_FAILED_{_mech_key}.json"
+                ).exists()
+                # R401 resume-robustness: the per-candidate env (which
+                # embeds its OWN collision run — minutes of network
+                # work) is persisted once and REUSED on every resume;
+                # the record on disk is the authority (Art. X)
+                _env_file = self.out / f"ENVELOPE_{_mech_key}.json"
+                if _dead_mech:
+                    _mech_env = None
+                elif _env_file.exists():
+                    try:
+                        _mech_env = Candidate.from_dict(
+                            json.loads(_env_file.read_text()))
+                    except Exception:  # noqa: BLE001 — corrupt record
+                        _mech_env = _env_with_candidate(mech_cand)
+                        self._persist(f"ENVELOPE_{_mech_key}.json",
+                                      _mech_env.to_dict())
+                else:
+                    _mech_env = _env_with_candidate(mech_cand)
+                    self._persist(f"ENVELOPE_{_mech_key}.json",
+                                  _mech_env.to_dict())
+                pool.append({
+                    "key": _mech_key,
+                    "candidate_id": c["candidate_id"],
+                    "env_view": _mech_env,
+                    "spec": None,
+                    "origin": f"MECHANISM_SPACE_{op}",
+                    "mechanism_space_candidate": c,
+                })
+
+            # ---------- R401B B8: the CHEAP-FIRST scientific filter ----------
+            # Mechanism-space candidates are screened BEFORE the
+            # expensive gauntlet: representability (disclosure, never a
+            # kill), declared-envelope constraint screen, baseline
+            # direction screen, then TOP-N by cheap score. Screened-out
+            # and deferred candidates keep their FULL structured record
+            # on disk (learning-critical information, never lost).
+            # Every skip carries the explicit reason.
+            ms_pool_keys = [c["key"] for c in pool
+                            if c["key"].startswith("mech-")]
+            if ms_pool_keys:
+                from .cheap_screen import screen_candidate, rank_top_n
+                screened = []
+                for c in pool:
+                    if not c["key"].startswith("mech-"):
+                        continue
+                    screen = screen_candidate(
+                        c.get("mechanism_space_candidate") or {},
+                        self.problem)
+                    c["cheap_screen"] = screen
+                    screened.append(screen)
+                topn = rank_top_n(
+                    screened, int(os.environ.get("R401_TOP_N", "6")))
+                self._persist("CHEAP_SCREEN.json", {
+                    "cheap_screen_version": "cheap_screen/1.0.0",
+                    "policy": ("B8 ladder: structured mechanism -> "
+                               "distinctness -> representability -> "
+                               "cheap constraint screen -> baseline "
+                               "screen -> top-N -> expensive "
+                               "evaluation -> attack -> improvement -> "
+                               "CAD/release; kills only on cheaply "
+                               "decidable defects; UNDECIDED advances"),
+                    "screens": screened,
+                    "topn": {k: v for k, v in topn.items()
+                             if k != "screens"},
+                    "deferred": topn.get("deferred", [])})
+                for c in pool:
+                    if not c["key"].startswith("mech-"):
+                        continue
+                    screen = c["cheap_screen"]
+                    cid = screen.get("candidate_id")
+                    if screen["state"] == "SCREENED_OUT":
+                        self._persist(
+                            f"PACKAGE_SKIPPED_CHEAP_SCREEN_{c['key']}.json",
+                            {"stage": "CHEAP_SCREEN",
+                             "candidate_id": cid,
+                             "reasons": screen["reasons"],
+                             "checks": screen["checks"],
+                             "structured_candidate": c.get(
+                                 "mechanism_space_candidate"),
+                             "note": ("the full structured record is "
+                                      "preserved — learning-critical "
+                                      "information stays available "
+                                      "(B8)")})
+                        continue
+                    if cid in {d.get("candidate_id")
+                               for d in topn.get("deferred", [])}:
+                        d = next(x for x in topn.get("deferred", [])
+                                 if x.get("candidate_id") == cid)
+                        self._persist(
+                            f"PACKAGE_SKIPPED_TOPN_{c['key']}.json",
+                            {"stage": "TOPN",
+                             "candidate_id": cid,
+                             "cheap_score": screen["cheap_score"],
+                             "rank": d.get("rank"),
+                             "reason": d.get("skip_reason"),
+                             "structured_candidate": c.get(
+                                 "mechanism_space_candidate")})
+                        continue
+
             # ---------- E15-F/E15-G: attack all, repair viable ------------
             evaluated: List[Dict[str, Any]] = []
             for c in pool:
                 key = c["key"]
+                # R401 resume-robustness (the R399 W2.5 class): a
+                # candidate whose terminal KILL record was already
+                # persisted in a previous (interrupted) execution of
+                # this run stays killed — the record on disk is the
+                # authority (Art. X); the expensive per-candidate
+                # collision/spec/attack work is never re-burned for a
+                # candidate whose outcome is already recorded.
+                _kill_file = self.out / f"PACKAGE_FAILED_{key}.json"
+                if _kill_file.exists():
+                    try:
+                        _kill = json.loads(_kill_file.read_text())
+                    except Exception:  # noqa: BLE001 — malformed record
+                        _kill = {"stage": "UNKNOWN",
+                                 "reason": "kill record unreadable"}
+                    evaluated.append({
+                        "candidate_id": c["candidate_id"], "key": key,
+                        "killed": True, "attack": {"overall": "KILLED"},
+                        "resumed_kill": True,
+                        "kill_stage": _kill.get("stage"),
+                        "kill_reason": (_kill.get("reason") or
+                                        "")[:200]})
+                    continue
+                if key.startswith("mech-"):
+                    screen = c.get("cheap_screen")
+                    if screen is None:
+                        # defensive: the screening block always sets it;
+                        # a missing screen is an implementation defect
+                        # and is recorded, never passed silently
+                        screen = {"state": "ADVANCE",
+                                  "reasons": ["SCREEN_MISSING_DEFECT"],
+                                  "cheap_score": 0, "checks": {},
+                                  "cheap_screen_version":
+                                      "cheap_screen/1.0.0"}
+                        c["cheap_screen"] = screen
+                    if screen["state"] == "SCREENED_OUT" or \
+                            self._persisted_skip(key):
+                        evaluated.append({
+                            "candidate_id": c["candidate_id"],
+                            "key": key, "killed": True,
+                            "cheap_screen": screen,
+                            "killed_by": "CHEAP_SCREEN"})
+                        continue
                 s = c["spec"] or build_invention_spec(c["env_view"],
                                                       run_ctx)
                 if c["spec"] is None:
@@ -660,6 +864,34 @@ class EngineRun:
                                             "required before automatic "
                                             "release"),
                             "angle": c.get("origin")})
+                    if key.startswith("mech-"):
+                        # R401 honesty marker: this candidate WAS
+                        # discovery-verified at the mechanism level (the
+                        # MECHANISM_SPACE stage ran the relation
+                        # adjudication for it); the release gate holds
+                        # it for human review unless the support state
+                        # is affirmatively SUPPORTED (PARTIALLY_SUPPORTED
+                        # / CONTESTED / NOT_ENOUGH_EVIDENCE are honest
+                        # non-affirmative states — never converted)
+                        ms_cand = c.get("mechanism_space_candidate") or {}
+                        support = (ms_cand.get("mechanism_support") or {})
+                        s = dict(s, _mechanism_space_candidate={
+                            "marker": "MECHANISM_SPACE_CANDIDATE",
+                            "transformation_operator":
+                                ms_cand.get("transformation_operator"),
+                            "mechanism_support_state": support.get(
+                                "mechanism_support_state"),
+                            "support_counts": support.get("counts"),
+                            "contradictions_visible": support.get(
+                                "contradictions_visible"),
+                            "consequence": ("the E16-H release gate holds "
+                                            "this dossier for human review "
+                                            "unless mechanism-level "
+                                            "evidence support is "
+                                            "SUPPORTED; contradictions "
+                                            "and partial support are "
+                                            "never converted "
+                                            "(R401 Phase 4)")})
                     self._persist(f"INVENTION_SPECIFICATION_{key}.json", s)
                 eng1 = build_engineering_spec(s, c["env_view"], run_ctx)
                 # R396 Phase D + R397 Phase 2: the physics gate —
@@ -726,6 +958,96 @@ class EngineRun:
                         "candidate_id": c["candidate_id"],
                         "key": key, "attack": attack1, "killed": True})
                     continue
+                # ---- R401 Phase 6: the INDEPENDENT adversarial attack ---
+                # The generator's reasoning context never attacks its own
+                # candidate: the independent attacker runs on a different
+                # provider when one is credentialed (SEPARATE_PROVIDER,
+                # recorded) or in a strictly separate adversarial
+                # conversation (SEPARATE_CONTEXT, disclosed). It seeks the
+                # six directive failure classes. ATTACK_INCOMPLETE never
+                # kills (Art. XXIX: an attack that did not run is not a
+                # mechanism failure) — the marker travels with the
+                # candidate.
+                indep_attack = None
+                if key.startswith("mech-") or key.startswith("grid-"):
+                    # R401 resume-robustness: a persisted independent
+                    # attack record is REUSED (never re-burned) — the
+                    # LLM-throttled step keeps cross-window progress
+                    _indep_file = (self.out /
+                                   f"INDEPENDENT_ATTACK_{key}.json")
+                    if _indep_file.exists():
+                        try:
+                            indep_attack = json.loads(
+                                _indep_file.read_text())
+                        except Exception:  # noqa: BLE001 — corrupt record
+                            indep_attack = None
+                    if indep_attack is None:
+                        try:
+                            from .independent_attack import \
+                                independent_attack
+                            generator_provider = (
+                                ((c.get("mechanism_space_candidate")
+                                  or {}).get("derivation_trace")
+                                 or {}).get("llm_provider")
+                                or c.get("exploration_provider")
+                                or None)
+                            ms_cand = (c.get(
+                                "mechanism_space_candidate") or {})
+                            indep_attack = independent_attack(
+                                ms_cand if ms_cand else {
+                                    "candidate_id": c["candidate_id"],
+                                    "mechanism": (
+                                        c.get("env_view")
+                                        .mechanism_map.get(
+                                            "mechanism", "")),
+                                    "intervention": (
+                                        c.get("env_view")
+                                        .mechanism_map.get(
+                                            "intervention", "")),
+                                    "predicted_effect": (
+                                        c.get("env_view")
+                                        .mechanism_map.get(
+                                            "expected_effect", "")),
+                                    "testable_prediction": (
+                                        c.get("env_view")
+                                        .mechanism_map.get(
+                                            "falsification_test", "")),
+                                    "novel_design_variable": "",
+                                    "known_failure_modes": [],
+                                    "constraint_set": {}},
+                                self.problem,
+                                self.env.evidence or [],
+                                generator_provider)
+                            self._persist(
+                                f"INDEPENDENT_ATTACK_{key}.json",
+                                indep_attack)
+                        except Exception as exc:  # noqa: BLE001 — rec
+                            indep_attack = {
+                                "attack_version":
+                                    "independent_attack/1.0.0",
+                                "candidate_id": c["candidate_id"],
+                                "state": "ATTACK_INCOMPLETE",
+                                "overall": "ATTACK_INCOMPLETE",
+                                "error": (f"{type(exc).__name__}: "
+                                          f"{exc}")[:300]}
+                            self._persist(
+                                f"INDEPENDENT_ATTACK_{key}.json",
+                                indep_attack)
+                if indep_attack and indep_attack.get("overall") == "KILLED":
+                    self._persist(f"PACKAGE_FAILED_{key}.json", {
+                        "stage": "INDEPENDENT_ATTACK",
+                        "reason": ("R401 Phase 6: the independent attacker "
+                                   "produced a validated KILL (a specific "
+                                   "concrete failure basis cited)"),
+                        "candidate_id": c["candidate_id"],
+                        "independence_mode": indep_attack.get(
+                            "independence_mode"),
+                        "kill_basis": indep_attack.get("kill_basis")})
+                    evaluated.append({
+                        "candidate_id": c["candidate_id"],
+                        "key": key, "attack": attack1,
+                        "independent_attack": indep_attack, "killed": True})
+                    continue
                 eng_final, repaired = eng1, False
                 if attack1["counts"].get("REPAIR", 0) > 0:
                     eng2 = repair_engineering(s, eng1, attack1)
@@ -751,7 +1073,9 @@ class EngineRun:
                 evaluated.append({
                     "candidate_id": c["candidate_id"], "key": key,
                     "spec": s, "eng": eng_final, "env_view": c["env_view"],
-                    "attack": attack1, "quality": quality,
+                    "attack": attack1,
+                    "independent_attack": indep_attack,
+                    "quality": quality,
                     "repaired": repaired, "origin": c["origin"],
                     "killed": False,
                     "physics_lifecycle": physics_lifecycle,
