@@ -155,3 +155,64 @@ def _hermetic_collision_replay_ledger(tmp_path, monkeypatch):
     monkeypatch.setattr(_qb, "BREAKER_PATH",
                         tmp_path / "quota_breaker.json")
     yield
+
+
+@pytest.fixture(autouse=True)
+def _hermetic_mechanism_cemetery(tmp_path, monkeypatch):
+    """Production MECHANISM_CEMETERY/CEMETERY.json guard (e11 class,
+    Art. IX/XVII — same pattern as the R374 registry/relevance guards).
+
+    FOUND LIVE 2026-09-03 (R401-WC1 session, working tree only, reverted
+    before commit): tests/test_r399_gates.py grid-gate tests resume
+    EngineRuns whose post-RANK pipeline appends fixture kill entries to
+    the PRODUCTION cemetery (entry_count 109 -> 111). The guard
+    redirects orchestrator.mechanism_cemetery.CEMETERY_PATH to a tmp
+    sandbox SEEDED with a copy of the production cemetery — reads see
+    the same lessons (check_candidate_against_cemetery semantics
+    unchanged); writes are isolated. ENGINE_LIVE=1 opts out.
+    """
+    if os.environ.get("ENGINE_LIVE"):
+        yield
+        return
+    from pathlib import Path as _Path
+    import orchestrator.mechanism_cemetery as _mc
+    sandbox = tmp_path / "MECHANISM_CEMETERY_SANDBOX.json"
+    prod = _Path(_mc.CEMETERY_PATH)
+    if prod.exists():
+        sandbox.write_bytes(prod.read_bytes())
+    monkeypatch.setattr(_mc, "CEMETERY_PATH", sandbox)
+    yield
+
+
+@pytest.fixture(autouse=True)
+def _hermetic_source_health_retrieval_log(tmp_path, monkeypatch):
+    """Production source-health retrieval log guard (e11 class,
+    Art. IX/XVII).
+
+    FOUND LIVE 2026-09-03 (R401-WC1 session, working tree only, reverted
+    before commit): a hermetic test_r399_gates.py run made LIVE OpenAlex
+    calls (key-free polite-pool API — the provider-key guards cannot stop
+    it; measured: HTTP 429 'Insufficient budget', ~60 s latency each)
+    whose entries appended to the production
+    artifacts/source_health/retrieval_log.jsonl, contaminating real
+    per-source health measurements with test traffic. The guard
+    redirects retrieval_log.LOG_PATH and maturity.RETRIEVAL_LOG_PATH to
+    a tmp sandbox seeded from production (reads unchanged; writes
+    isolated). ENGINE_LIVE=1 opts out. The underlying defect — live
+    network calls inside the hermetic suite — is disclosed in the R401-WC1
+    worklog for the next round (transport isolation, not just log
+    isolation).
+    """
+    if os.environ.get("ENGINE_LIVE"):
+        yield
+        return
+    from pathlib import Path as _Path
+    from discovery_fabric.source_registry import retrieval_log as _rl
+    from discovery_fabric.source_registry import maturity as _mat
+    sandbox = tmp_path / "retrieval_log_SANDBOX.jsonl"
+    prod = _Path(_rl.LOG_PATH)
+    if prod.exists():
+        sandbox.write_bytes(prod.read_bytes())
+    monkeypatch.setattr(_rl, "LOG_PATH", sandbox)
+    monkeypatch.setattr(_mat, "RETRIEVAL_LOG_PATH", sandbox)
+    yield

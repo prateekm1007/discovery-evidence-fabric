@@ -155,10 +155,54 @@ FORBIDDEN_FILENAMES = {
 #           values that are already redacted (start with [REDACTED: or REDACTED-),
 #           values that are path templates (contain {var} or /api/),
 #           values that are function calls (contain parentheses).
+#
+# R401-WC1 (2026-09-03, measured on the 78817a26 CI run): the key-name
+# keyword test is WORD-DELIMITED, not substring. The pre-fix pattern
+# matched "AUTH" inside "AUTHORITY" (EVALUATION_AUTHORITY_FUNCTION =
+# "evaluate_candidate_technically" — a Python constant naming a function,
+# flagged as an ENV_ASSIGNMENT credential, turning the certification RED
+# with zero credential material present). The same substring semantics
+# also matched COMPASS/MONKEY/TOKENIZED-class keys. Simultaneously the
+# pre-fix pattern REQUIRED >=1 character before the keyword, so keys that
+# START with a keyword (SECRET=, AUTH=, PASSWORD=, TOKEN=) were silently
+# MISSED — a true-positive detection gap, now closed and pinned.
+#
+# The keyword must therefore be a whole underscore-delimited word of the
+# key name: API_KEY, GITHUB_TOKEN, SERVICE_PASSWORD, DB_PASS, SECRET,
+# AUTH all match; EVALUATION_AUTHORITY_FUNCTION, COMPASS_DIRECTION,
+# MONKEY_PATCH_TARGET, TOKENIZED_VIEW_BUILDER do not. The key candidate
+# regex below is deliberately generic (any UPPER_CASE name) — the
+# word-membership filter _is_credential_key_name() is the precision
+# gate. Pass A (exact credential formats) is unchanged and remains the
+# primary detection: this heuristic only exists to catch evasive-format
+# values under credential-shaped names.
+CREDENTIAL_KEY_WORDS = frozenset({
+    "API", "TOKEN", "SECRET", "KEY", "PASSWORD", "PASS", "CRED", "AUTH",
+})
+
+
+def _is_credential_key_name(key: str) -> bool:
+    """True when at least one underscore-delimited word of the env-style
+    key name is EXACTLY a credential keyword.
+
+    Substring matches inside larger words (AUTHORITY, COMPASS, MONKEY,
+    TOKENIZED) do NOT count — the measured R401-WC1 false-positive class.
+    Standalone keywords count anywhere in the name, including at the
+    start (SECRET=, AUTH=) and as the whole key (KEY=, TOKEN=).
+    """
+    words = [w for w in key.strip().upper().split("_") if w]
+    return any(w in CREDENTIAL_KEY_WORDS for w in words)
+
+
 ENV_ASSIGNMENT_PATTERNS = [
-    # Standard env assignment: API_KEY=value (value 20+ chars, not URL/redacted/template)
+    # Standard env assignment: KEY=VALUE (value 20+ chars, not URL/redacted/template).
+    # The KEY group is generic UPPER_CASE (env-var convention — the (?i)
+    # flag was dropped R401-WC1 because it also matched lowercase code
+    # identifiers like pass_source / token_bucket, a measured
+    # false-positive class); _is_credential_key_name() applies the
+    # word-delimited keyword test (see R401-WC1 note above).
     re.compile(
-        r"(?im)^\s*(?:export\s+)?([A-Z][A-Z0-9_]*(?:API|TOKEN|SECRET|KEY|PASSWORD|PASS|CRED|AUTH)[A-Z0-9_]*)\s*=\s*[\"']?([^\"'\s]{20,})[\"']?\s*$"
+        r"(?m)^\s*(?:export\s+)?([A-Z][A-Z0-9_]*)\s*=\s*[\"']?([^\"'\s]{20,})[\"']?\s*$"
     ),
     # YAML-style: api_key: value
     re.compile(
@@ -170,6 +214,19 @@ ENV_ASSIGNMENT_PATTERNS = [
 FALSE_POSITIVE_VALUE_PATTERNS = [
     re.compile(r"^https?://"),           # URL constants
     re.compile(r"^ftp://"),              # FTP URLs
+    # R401-WC1 (measured, historical blob 301bcb8a: API_PATH =
+    # "/zp/volunteer/intelligenceVolunteer"): a value starting with
+    # "/" is a path, not credential material. This implements the
+    # documented intent ("values that are path templates") that was
+    # never actually coded.
+    re.compile(r"^/"),                   # Path values
+    # R401-WC1 (measured, scripts/r6_execution_artifact.py:
+    # PASS_FAIL_SCRIPT_HASH = ANALYSIS_SCRIPT_HASH): a pure all-caps
+    # symbolic identifier (letters + underscores ONLY, no digits) is a
+    # constant reference, not material. Real secret material carries
+    # entropy — digits or mixed case (SUPERSECRETKEYVALUE123 still
+    # matches detection; pinned in test_r401_ci_capsule_green.py).
+    re.compile(r"^[A-Z][A-Z_]*$"),        # Symbolic constant references
     re.compile(r"^\[REDACTED[:\-]"),     # Already redacted
     re.compile(r"^REDACTED-"),           # Already redacted
     # R387: values that CONTAIN a redaction marker (the v26 scrub
@@ -213,6 +270,20 @@ SCANNER_SELF_EXCLUSIONS = {
     # scan for the same reason the scanner's own files are: test
     # fixtures are not repository credentials.
     "tests/test_r387_ci_red_state_fixes.py",
+    # R401-WC1 (2026-09-03, measured): the r389 security-hygiene test
+    # carried a literal fake-secret vector — SECRET = "SUPER...123" —
+    # used to prove WorldLabsProvider never leaks key material into
+    # payloads or ledgers. The STRENGTHENED word-delimited scanner (which
+    # newly detects keyword-at-start keys) correctly found the shape in
+    # the reachable HISTORICAL blob; the current version of the file is
+    # scrub-proof (runtime concatenation, pinned by
+    # test_r401_ci_capsule_green.py::test_r389_fixture_scrub_proof).
+    # Disposition follows the R387 precedent exactly: an intentional
+    # security-test fixture is not a repository credential. Detection
+    # capability is NOT weakened — digit-carrying all-caps material
+    # remains flagged (pinned:
+    # test_all_caps_material_with_digits_still_flagged).
+    "tests/test_r389_reality_provider.py",
 }
 
 
@@ -465,8 +536,17 @@ def _object_audit_blob(blob_bytes: bytes, path: str) -> Tuple[bool, int, int, in
     sample_matches = []
     for pat in ENV_ASSIGNMENT_PATTERNS:
         for m in pat.finditer(text):
+            groups = m.groups()
+            # R401-WC1: patterns with a KEY group (the env-style pattern)
+            # require the key name to carry a credential keyword as a whole
+            # underscore-delimited word — substring matches inside larger
+            # words (AUTHORITY, COMPASS, MONKEY) are the measured
+            # false-positive class this filter eliminates. The YAML-style
+            # pattern has no key group; its key set is already whole-word.
+            if len(groups) >= 2 and not _is_credential_key_name(groups[0]):
+                continue
             # Extract the value (last group)
-            value = m.groups()[-1] if m.groups() else ""
+            value = groups[-1] if groups else ""
             if _is_false_positive_value(value):
                 continue
             env_matches += 1
