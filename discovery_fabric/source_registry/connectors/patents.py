@@ -124,6 +124,7 @@ class _PaV2Wrapper(ConnectorBase):
 
     def _finish_pa(self, out: SourceQueryResult, query: str) -> SourceQueryResult:
         from discovery_fabric.source_registry.retrieval_log import append_entry
+        from discovery_fabric.source_registry.base import _RETRIEVAL_ROLE
         try:
             append_entry(
                 source_id=out.source_id, query=query,
@@ -134,6 +135,7 @@ class _PaV2Wrapper(ConnectorBase):
                                     if out.records else None),
                 error=out.error,
                 rate_limit_remaining=out.rate_limit_remaining,
+                retrieval_role=_RETRIEVAL_ROLE.get(),
             )
         except Exception as e:  # noqa: BLE001
             out.error = (out.error or "") + f" | retrieval_log_write_failed: {e}"

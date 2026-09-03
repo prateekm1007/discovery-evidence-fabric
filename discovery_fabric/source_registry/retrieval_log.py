@@ -60,12 +60,22 @@ def append_entry(
     error: Optional[str] = None,
     run_id: Optional[str] = None,
     rate_limit_remaining: Optional[str] = None,
+    retrieval_role: Optional[str] = None,
 ) -> dict:
     """Append one custody entry; returns the written entry.
 
     rate_limit_remaining: PROVIDER-REPORTED metering state (e.g. Patent
     Bear usage.monthly_remaining), stored verbatim as a string. It is the
     provider's own accounting, never an engine-side estimate (Art. VI).
+
+    retrieval_role (R401-WC2, CEO directive 5): the CALLER's purpose —
+    DISCOVERY (evidence-finding for synthesis) or VERIFICATION
+    (adversarial prior-art/contradiction search). The discovery and
+    verification retrieval planes are SEPARATE lanes by contract: the
+    role field makes the separation machine-visible on every custody
+    entry. Legacy entries (pre-R401-WC2) carry None — the role is
+    additive metadata, never a behavior change; the chain hash covers
+    the entry as stored, so old and new entries verify identically.
     """
     from discovery_fabric.source_registry.base import utc_now, sha256_obj
 
@@ -83,6 +93,7 @@ def append_entry(
             "error": error,
             "run_id": run_id,
             "rate_limit_remaining": rate_limit_remaining,
+            "retrieval_role": retrieval_role,
             "timestamp": utc_now(),
             "prev_entry_sha256": prev_sha,
         }

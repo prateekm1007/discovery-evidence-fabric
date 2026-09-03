@@ -1,0 +1,320 @@
+{
+  "corpus_version": "r401wc2-attacker-calibration/1.0.0",
+  "authored_at": "2026-09-03",
+  "authored_by": "CODER (R401-WC2 session), CEO directive 4: 'Build the attacker calibration corpus. Seed known defects. Measure attacker sensitivity by failure category. Do not optimize for an arbitrary kill percentage.'",
+  "authorship_rule": "Independently authored from engineering-physics knowledge (Art. VIII): the fixtures and their ground truths were written BEFORE any attacker run on them; they are never derived from attacker outputs. The domain (compressed-air moisture separation) is distinct from the frozen cross-domain benchmark (R401-WC2/BENCHMARK) and the 18-case production battery — the two instruments never share problems.",
+  "the_common_problem": {
+    "device": "inline compressed-air moisture separator (1/2 inch line, 8 bar nominal, 5 m3/h)",
+    "failure": "liquid water carryover past the separator floods downstream pneumatic instruments and corrodes distribution lines during high-demand cycling",
+    "failure_mode": "carryover",
+    "constraint": "hold residual moisture at or below the 3 C pressure-dew-point equivalent at 5 m3/h without adding a refrigerated dryer or raising pressure drop above 70 mbar",
+    "baseline": "the standard shop cyclone separator currently installed: inertial separation only, residual dew point 12 C equivalent at the duty point, 35 mbar pressure drop, drain valve that requires weekly manual blowdown"
+  },
+  "scoring_contract": {
+    "sensitivity_by_category": "for each seeded case, DETECTED means the attacker's verdict on the SEEDED class is KILL or RISK (with a concrete basis); a KILL on a DIFFERENT class without flagging the seeded class is a LOCALIZATION MISS (recorded separately — an unlocalized kill is real information, never converted into a detection)",
+    "specificity": "for each clean control, a KILL on ANY class is a FALSE KILL (recorded with its basis; the clean candidates carry no seeded defect — killing them means the attacker fires on sound engineering)",
+    "basis_quality": "every KILL must cite a basis of at least 40 characters (the attacker's own machine floor); basis-less verdicts are INVALID by the attacker's contract",
+    "no_arbitrary_kill_percentage": "the output is a per-category confusion matrix (detected / missed / false-killed) with the raw verdicts and bases on the record. There is NO target kill rate; a corpus the attacker kills 100 percent of is as suspicious as one it kills 0 percent of. Calibration measures the attacker's EARS, not its appetite.",
+    "honest_states": "ATTACK_INCOMPLETE (transport) is a recorded state, never a miss (Art. XXIX); re-run when the transport recovers"
+  },
+  "cases": [
+    {
+      "case_id": "cal-01-mechanism-failure-electrostatic",
+      "seed_class": "MECHANISM_FAILURE",
+      "candidate": {
+        "candidate_id": "cal:electrostatic-grounded-media",
+        "mechanism": "electrostatic attraction between charged water droplets and the grounded coalescing media accelerates droplet capture and merger",
+        "intervention": "permanently grounded conductive coalescing media cartridge with a 12 V bias electrode upstream",
+        "predicted_effect": "residual moisture falls to the 3 C dew-point equivalent at the duty point",
+        "testable_prediction": "with the bias electrode energized at 12 V the downstream dew point drops from 12 C to 3 C within 60 seconds; with it de-energized the dew point returns to 12 C",
+        "novel_design_variable": "bias electrode voltage (0-24 V)",
+        "known_failure_modes": ["media saturation under oil aerosol carryover"],
+        "constraint_set": {"boundary_conditions": "8 bar, 20 C inlet, 5 m3/h"}
+      },
+      "ground_truth": {
+        "defect_description": "the mechanism is physically dead: grounded CONDUCTIVE media cannot hold the charge asymmetry the mechanism requires — a grounded conductor cannot electrostatically attract droplets (the field gradient at a grounded equipotential surface is zero at the surface), and a 12 V bias across conductive media produces no droplet-scale field",
+        "why_it_is_a_defect": "electrostatic coalescence requires an INSULATING dielectric media and a sustained field gradient; the candidate grounds the media AND makes it conductive, eliminating both. The claimed causal chain (charge attraction -> capture -> dew point drop) cannot operate as stated"
+      }
+    },
+    {
+      "case_id": "cal-02-mechanism-failure-capillary-direction",
+      "seed_class": "MECHANISM_FAILURE",
+      "candidate": {
+        "candidate_id": "cal:capillary-wrong-direction",
+        "mechanism": "capillary wicking through a hydrophilic felt sleeve draws separated liquid water radially OUTWARD into the bowl wall where it drains by gravity",
+        "intervention": "hydrophilic polymer felt sleeve wrapped around the vortex outlet tube",
+        "predicted_effect": "liquid re-entrainment eliminated; dew point held at 3 C equivalent through demand cycling",
+        "testable_prediction": "with the felt sleeve installed, downstream liquid carryover during 30-second demand surges is zero versus 2 g/min without it",
+        "novel_design_variable": "felt sleeve pore size (10-80 micrometers)",
+        "known_failure_modes": ["felt blinding by compressor oil"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h, 30-second surge cycling"}
+      },
+      "ground_truth": {
+        "defect_description": "the wicking direction contradicts the physics: capillary wicking draws liquid INTO the capillary structure (toward smaller pores, higher capillary pressure), and the sleeve sits at the OUTLET tube where it wicks liquid back toward the clean air path — capillarity transports water toward the outlet-adjacent felt, increasing re-entrainment rather than eliminating it",
+        "why_it_is_a_defect": "the causal direction (wicking removes liquid from the separation zone) is reversed: the predicted zero-carryover cannot follow from the stated mechanism"
+      }
+    },
+    {
+      "case_id": "cal-03-boundary-laminar-claimed",
+      "seed_class": "BOUNDARY_CONDITION_FAILURE",
+      "candidate": {
+        "candidate_id": "cal:laminar-vane-regime",
+        "mechanism": "laminar boundary-layer interception on closely spaced vanes captures fine droplets by viscous deposition",
+        "intervention": "vane pack with 0.5 mm channel gaps and 40 vane stages",
+        "predicted_effect": "droplets above 1 micrometer removed at 99 percent; dew point 3 C equivalent",
+        "testable_prediction": "gravimetric droplet-size distribution at the outlet shifts from 12 C equivalent to 3 C equivalent at the 5 m3/h duty point",
+        "novel_design_variable": "vane channel gap (0.3-1.5 mm)",
+        "known_failure_modes": ["vane fouling in oily service"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h, inlet temperature 20 C"}
+      },
+      "ground_truth": {
+        "defect_description": "the mechanism requires a LAMINAR channel flow, but at the stated duty the vane-channel Reynolds number is approximately 40000 (5 m3/h through 0.5 mm gaps at air velocities near 25 m/s) — deep turbulent regime; viscous laminar deposition cannot operate and turbulent re-entrainment dominates",
+        "why_it_is_a_defect": "the claimed droplet-removal physics exists only in the laminar regime; the stated operating point is far outside it. The boundary condition the mechanism needs (Re below ~2300) contradicts the problem's own flow specification"
+      }
+    },
+    {
+      "case_id": "cal-04-boundary-pressure-outside",
+      "seed_class": "BOUNDARY_CONDITION_FAILURE",
+      "candidate": {
+        "candidate_id": "cal:sub-pressure-regime",
+        "mechanism": "flash-evaporation condensation trap: an insulated expansion pocket condenses vapor on chilled walls during sub-2-bar pressure operation",
+        "intervention": "expansion pocket with 4x area ratio ahead of the drain sump",
+        "predicted_effect": "dew point 3 C equivalent at the separator outlet",
+        "testable_prediction": "outlet dew point reads 3 C equivalent whenever line pressure is at or below 2 bar",
+        "novel_design_variable": "expansion area ratio (2x-6x)",
+        "known_failure_modes": ["freeze-up in winter outdoor service"],
+        "constraint_set": {"boundary_conditions": "line pressure 8 bar nominal, duty 5 m3/h"}
+      },
+      "ground_truth": {
+        "defect_description": "the mechanism operates only at or below 2 bar (its own testable prediction says so), but the problem's line is an 8-bar system — the duty point is OUTSIDE the mechanism's boundary regime entirely; the pocket produces a marginal pressure dip, not flash expansion, at 8 bar with 4x area",
+        "why_it_is_a_defect": "the candidate's stated boundary condition (below 2 bar) contradicts the problem constraint (8 bar nominal); the predicted 3 C dew point cannot occur at the actual operating point"
+      }
+    },
+    {
+      "case_id": "cal-05-evidence-contradiction-humidity",
+      "seed_class": "EVIDENCE_CONTRADICTION",
+      "candidate": {
+        "candidate_id": "cal:humidity-rising-efficiency",
+        "mechanism": "hygroscopic polymer fiber media gains capture efficiency as inlet humidity rises because fiber swelling tightens pore structure",
+        "intervention": "hygroscopic-fiber coalescing cartridge replacing the cyclone stage",
+        "predicted_effect": "dew point improves monotonically with inlet relative humidity, reaching 3 C equivalent at 85 percent RH",
+        "testable_prediction": "outlet dew point improves linearly from 12 C to 3 C equivalent as inlet RH rises 40 to 85 percent",
+        "novel_design_variable": "fiber swelling ratio (1.0-1.6)",
+        "known_failure_modes": ["cartridge compaction over 2000 hours"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h, inlet RH 40-85 percent"}
+      },
+      "evidence_items": [
+        {"id": "ev:swell-99", "title": "Water-uptake kinetics of cross-linked polyamide coalescing fibers: swelling-induced pore CLOSURE degrades capture efficiency above 60 percent RH (measured: efficiency falls 22 percent as RH rises 40 to 85 percent)"}
+      ],
+      "ground_truth": {
+        "defect_description": "the held evidence DIRECTLY contradicts the mechanism: the cited fiber class LOSES efficiency as humidity rises (swelling closes the capture pores), while the candidate claims monotonic improvement",
+        "why_it_is_a_defect": "the candidate's central efficiency claim is contradicted by its own evidence bundle (efficiency minus 22 percent versus the claimed improvement); the mechanism's key premise is refuted by the record held"
+      }
+    },
+    {
+      "case_id": "cal-06-evidence-contradiction-valve",
+      "seed_class": "EVIDENCE_CONTRADICTION",
+      "candidate": {
+        "candidate_id": "cal:fail-open-drain-safety",
+        "mechanism": "magnetically latched float drain valve stays closed on power loss, holding the condensate sump sealed so carryover cannot pass during outages",
+        "intervention": "magnetically latched float drain valve with a loss-of-power closed state",
+        "predicted_effect": "zero carryover events during 100 percent of 24-hour power-loss windows",
+        "testable_prediction": "in 20 power-drop trials the valve position sensor reads CLOSED for the full window in every trial",
+        "novel_design_variable": "latch magnet grade (N35-N52)",
+        "known_failure_modes": ["latch demagnetization above 80 C"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h, 24-hour outage windows"}
+      },
+      "evidence_items": [
+        {"id": "ev:valve-42", "title": "Failure-mode analysis of magnetically latched drain valves in compressed-air service: loss of supply pressure causes the float chamber to equalize and the valve to OPEN (fail-open under outage; measured in 31 of 31 bench trials)"}
+      ],
+      "ground_truth": {
+        "defect_description": "the held evidence contradicts the candidate's safety claim: the cited valve class fails OPEN on outage (31 of 31 trials), not closed — the candidate's zero-carryover-during-outage claim rests on the exact opposite failure mode of the record it holds",
+        "why_it_is_a_defect": "the candidate's outage-safety mechanism is refuted by its own evidence bundle; the predicted 20/20 closed readings cannot occur with the cited valve class"
+      }
+    },
+    {
+      "case_id": "cal-07-baseline-equivalence-pressure-drop",
+      "seed_class": "BASELINE_EQUIVALENCE",
+      "candidate": {
+        "candidate_id": "cal:vane-equal-pressure-drop",
+        "mechanism": "redesigned helical vane pack improves droplet separation efficiency without increasing flow resistance",
+        "intervention": "helical vane pack with 22 stages replacing the standard cyclone element",
+        "predicted_effect": "pressure drop 35 mbar at 5 m3/h with dew point 12 C equivalent (matching the installed separator) while extending service intervals by cleaner walls",
+        "testable_prediction": "side-by-side over 500 hours: outlet dew point equals the installed cyclone's 12 C equivalent within 0.5 C, and wall deposit mass is 30 percent lower",
+        "novel_design_variable": "vane helix angle (15-45 degrees)",
+        "known_failure_modes": ["vane leading-edge erosion"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h"}
+      },
+      "ground_truth": {
+        "defect_description": "the predicted SEPARATION outcome equals the baseline: dew point 12 C equivalent — the SAME residual moisture as the installed cyclone (the problem's target is 3 C). The claimed improvement is wall cleanliness (a maintenance nicety), not the failure-mode fix; the separator still fails the carryover requirement identically to the baseline",
+        "why_it_is_a_defect": "on the quantity that defines the problem (residual moisture), the candidate's predicted effect IS the baseline effect — the invention does not beat the un-invented standard where it matters"
+      }
+    },
+    {
+      "case_id": "cal-08-baseline-equivalence-residual",
+      "seed_class": "BASELINE_EQUIVALENCE",
+      "candidate": {
+        "candidate_id": "cal:mesh-equal-dewpoint",
+        "mechanism": "stainless demister mesh pad intercepts coarse droplets ahead of the outlet",
+        "intervention": "demister mesh pad (75 micrometer weave) at the bowl outlet",
+        "predicted_effect": "residual dew point 12 C equivalent at 5 m3/h; pressure drop 34 mbar (1 mbar below the baseline)",
+        "testable_prediction": "outlet dew point within 0.5 C of the baseline cyclone's 12 C equivalent across the 3-6 m3/h band; pressure drop 34 plus or minus 2 mbar",
+        "novel_design_variable": "mesh weave density (4-12 kg/m3)",
+        "known_failure_modes": ["mesh corrosion in acidic condensate"],
+        "constraint_set": {"boundary_conditions": "8 bar, 3-6 m3/h"}
+      },
+      "ground_truth": {
+        "defect_description": "the predicted dew point (12 C equivalent) and pressure drop (34 versus 35 mbar) are the baseline's values within noise — the mesh pad changes neither the failure-mode quantity nor the flow behavior; only fine-droplet capture below 5 micrometers would move the dew point and the coarse weave does not capture there",
+        "why_it_is_a_defect": "the predicted effects are baseline-equivalent on every problem-relevant axis; the candidate is a restatement of the standard, not an improvement over it"
+      }
+    },
+    {
+      "case_id": "cal-09-implementation-pore-coating",
+      "seed_class": "IMPLEMENTATION_IMPOSSIBILITY",
+      "candidate": {
+        "candidate_id": "cal:pore-coating-geometry",
+        "mechanism": "a 5-nanometer hydrophilic titania coating on every internal pore wall of a sintered bronze element raises droplet wetting and drainage",
+        "intervention": "atomic-layer-deposited titania coating across the full internal surface of the 50-micrometer-pore sintered bronze element",
+        "predicted_effect": "dew point 3 C equivalent with self-draining element",
+        "testable_prediction": "coated element dew point reads 3 C equivalent versus 12 C for the uncoated element in side-by-side bench service",
+        "novel_design_variable": "coating cycle count (5-40 ALD cycles)",
+        "known_failure_modes": ["coating abrasion by particulate"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h"}
+      },
+      "ground_truth": {
+        "defect_description": "the embodiment cannot be built as specified: ALD process temperature (150-250 C) on sintered BRONZE (a zinc alloy) de-zincifies and embrittles the pore walls, and thousands of ALD cycles over the element's multi-square-meter internal surface is economically absurd for a commodity 60-euro separator cartridge",
+        "why_it_is_a_defect": "the manufacturing route (ALD on sintered bronze at process temperature) destroys the substrate; the embodiment is unimplementable at the stated cost and material class"
+      }
+    },
+    {
+      "case_id": "cal-10-implementation-acrylic-vessel",
+      "seed_class": "IMPLEMENTATION_IMPOSSIBILITY",
+      "candidate": {
+        "candidate_id": "cal:acrylic-16bar",
+        "mechanism": "a transparent acrylic bowl allows optical condensate-level observation enabling timely manual drain actuation",
+        "intervention": "seamless extruded acrylic pressure bowl rated for the 16-bar proof-test requirement",
+        "predicted_effect": "carryover eliminated by same-day drain actuation driven by direct level observation",
+        "testable_prediction": "the bowl survives the 16-bar 60-second proof test with zero leakage in 10 of 10 units",
+        "novel_design_variable": "bowl wall thickness (3-12 mm)",
+        "known_failure_modes": ["UV yellowing over 5 years"],
+        "constraint_set": {"boundary_conditions": "8 bar nominal, 16 bar proof, 20 C"}
+      },
+      "ground_truth": {
+        "defect_description": "an extruded SEAMLESS acrylic pressure vessel cannot carry 16 bar at the separator's 60 mm bore: the hoop stress with the mandatory 4x safety factor for brittle polymers exceeds the acrylic's design strength at any wall thickness where the extrusion is still seamless — and seamless extruded acrylic creeps at sustained 8 bar even if a burst test passed",
+        "why_it_is_a_defect": "the pressure containment requirement (16 bar proof, 4x safety factor on a brittle polymer) exceeds the material-and-process class specified; the embodiment as stated cannot pass its own proof test"
+      }
+    },
+    {
+      "case_id": "cal-11-measurement-unquantified",
+      "seed_class": "MEASUREMENT_AMBIGUITY",
+      "candidate": {
+        "candidate_id": "cal:unquantified-improvement",
+        "mechanism": "optimized vane leading-edge radius reduces droplet re-entrainment",
+        "intervention": "vane pack with rounded leading edges (radius 0.4 mm)",
+        "predicted_effect": "separation efficiency improves relative to the current vane pack",
+        "testable_prediction": "the separator works better after the change; the improvement is visible in the downstream air being drier",
+        "novel_design_variable": "leading-edge radius (0.1-0.8 mm)",
+        "known_failure_modes": ["edge fouling"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h"}
+      },
+      "ground_truth": {
+        "defect_description": "the testable prediction names NO quantity, NO instrument, NO acceptance threshold and NO comparison condition — 'works better' and 'air being drier' are unfalsifiable in practice (any outcome can be argued as improvement)",
+        "why_it_is_a_defect": "the prediction does not discriminate: it cannot be failed, so it cannot test the mechanism (the whole point of a testable prediction is a possible negative)"
+      }
+    },
+    {
+      "case_id": "cal-12-measurement-unmeasurable",
+      "seed_class": "MEASUREMENT_AMBIGUITY",
+      "candidate": {
+        "candidate_id": "cal:unmeasurable-dewpoint",
+        "mechanism": "a high-surface-area internal condensate film strip captures transient mist during demand surges",
+        "intervention": "high-surface-area internal condensate film strip",
+        "predicted_effect": "dew point improves by a 'noticeable margin' measured 'the standard way' when the shop feels like checking",
+        "testable_prediction": "the dew point will read better under improved conditions",
+        "novel_design_variable": "strip surface area (0.02-0.3 m2)",
+        "known_failure_modes": ["film carryover"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h"}
+      },
+      "ground_truth": {
+        "defect_description": "the prediction's terms are undefined at the measurement layer: 'better under improved conditions' specifies no instrument (chilled-mirror? capacitive sensor?), no calibration state, no duty point during measurement, and 'improved conditions' is circular (the prediction is conditional on the very thing being tested)",
+        "why_it_is_a_defect": "the measurement is not specified enough to run — no method, no instrument, no conditions; the prediction cannot be adjudicated by any physical observation"
+      }
+    },
+    {
+      "case_id": "cal-13-clean-vane-quantified",
+      "seed_class": null,
+      "control": true,
+      "candidate": {
+        "candidate_id": "cal:clean-vane-quantified",
+        "mechanism": "a two-stage inertial vane pack with an intermediate quiescent zone separates droplets above 8 micrometers by staged inertial impaction with re-entrainment suppression",
+        "intervention": "two-stage vane pack (12 stages, 1.2 mm gaps, quiescent baffle between stages) replacing the cyclone element",
+        "predicted_effect": "outlet dew point 3 C equivalent at 5 m3/h with pressure drop 62 mbar",
+        "testable_prediction": "chilled-mirror dew point at the outlet measures 3 plus or minus 1 C equivalent over a 4-hour 5 m3/h run, versus 12 C for the baseline cyclone in the same rig; pressure drop 62 plus or minus 5 mbar",
+        "novel_design_variable": "inter-stage quiescent zone length (5-40 mm)",
+        "known_failure_modes": ["oil fouling of the quiescent baffle"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h, inlet 20 C"}
+      },
+      "ground_truth": {
+        "defect_description": "none — a sound control: quantified prediction with instrument and acceptance band, physics consistent with the regime (turbulent inertial separation at the vane stage's intended channel Reynolds regime), predicted effect beats the baseline on the problem quantity, pressure drop within the 70 mbar constraint",
+        "why_it_is_a_defect": "not a defect — the specificity control"
+      }
+    },
+    {
+      "case_id": "cal-14-clean-coalescer-quantified",
+      "seed_class": null,
+      "control": true,
+      "candidate": {
+        "candidate_id": "cal:clean-coalescer-quantified",
+        "mechanism": "borosilicate glass-fiber coalescing media merges sub-8-micrometer droplets into drops large enough for the downstream vane stage to intercept",
+        "intervention": "glass-fiber coalescing cartridge (layer-graded 8 to 2 micrometers) ahead of the vane pack",
+        "predicted_effect": "liquid aerosol mass at the outlet below 0.5 mg/m3 at 5 m3/h",
+        "testable_prediction": "isokinetic gravimetric aerosol sampling at the outlet measures below 0.5 mg/m3 over 8 hours (versus 40 mg/m3 for the baseline cyclone), with pressure drop 58 plus or minus 6 mbar",
+        "novel_design_variable": "media grade layering (coarse-to-fine ratio)",
+        "known_failure_modes": ["media saturation requiring 6-month swap"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h, oil-free inlet"}
+      },
+      "ground_truth": {
+        "defect_description": "none — a sound control: graded coalescer media with an instrumented mass-based prediction, regime-consistent physics, effect beats baseline on the problem quantity",
+        "why_it_is_a_defect": "not a defect — the specificity control"
+      }
+    },
+    {
+      "case_id": "cal-15-clean-drain-failsafe",
+      "seed_class": null,
+      "control": true,
+      "candidate": {
+        "candidate_id": "cal:clean-drain-failsafe",
+        "mechanism": "a spring-to-close pilot-operated drain valve dumps condensate on level-sensor command and closes loss-free on power failure (spring return, fails CLOSED with the sump isolated)",
+        "intervention": "spring-to-close pilot drain valve with capacitive level trigger at 80 percent sump",
+        "predicted_effect": "zero carryover from sump overflow over a 12-week unattended trial",
+        "testable_prediction": "in 20 power-drop trials the valve position sensor reads CLOSED within 2 seconds every trial; in a 12-week unattended trial zero liquid carryover events are detected by the downstream dew-point alarm (threshold 5 C equivalent)",
+        "novel_design_variable": "spring return force margin (1.5-3x)",
+        "known_failure_modes": ["pilot seat wear after 1e6 cycles"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h, 20 C"}
+      },
+      "ground_truth": {
+        "defect_description": "none — a sound control: the fail-safe mechanism is stated with its actuation physics (spring return, fails closed), the prediction is instrumented with counts, timing and a threshold, and the mechanism class (spring-to-close, not magnetic-latch) has no contradicting record in this bundle",
+        "why_it_is_a_defect": "not a defect — the specificity control"
+      }
+    },
+    {
+      "case_id": "cal-16-clean-staged-separator",
+      "seed_class": null,
+      "control": true,
+      "candidate": {
+        "candidate_id": "cal:clean-staged-separator",
+        "mechanism": "a staged cyclone-to-vane-to-coalescer separation train, each stage sized for the droplet band the previous stage passes, moves the residual dew point in quantified steps",
+        "intervention": "three-stage separation train with inter-stage pressure recovery rings",
+        "predicted_effect": "outlet dew point 2 C equivalent at 5 m3/h, total pressure drop 66 mbar",
+        "testable_prediction": "stage-by-stage dew-point instrumentation reads 9 C then 5 C then 2 C equivalent plus or minus 1 C at 5 m3/h; total pressure drop 66 plus or minus 6 mbar (below the 70 mbar constraint); the 3 C target met with 1 C margin",
+        "novel_design_variable": "stage 2 vane gap (0.8-1.6 mm)",
+        "known_failure_modes": ["inter-stage ring fouling"],
+        "constraint_set": {"boundary_conditions": "8 bar, 5 m3/h"}
+      },
+      "ground_truth": {
+        "defect_description": "none — a sound control: quantified stage-wise predictions with instruments, margins and the constraint honored (66 mbar below 70); the mechanism's physics (inertial staging by droplet band) is standard separator-design logic executed cleanly",
+        "why_it_is_a_defect": "not a defect — the specificity control"
+      }
+    }
+  ]
+}

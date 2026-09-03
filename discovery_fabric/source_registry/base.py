@@ -26,9 +26,18 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import contextvars
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
+
+# R401-WC2 (CEO directive 5): the retrieval ROLE context — DISCOVERY
+# (evidence-finding) vs VERIFICATION (adversarial prior-art search).
+# Set by ConnectorBase.search(retrieval_role=...), read by the custody
+# log writer. ContextVar (not instance state) because the patent lane
+# dispatches searchers to a thread pool.
+_RETRIEVAL_ROLE: "contextvars.ContextVar[Optional[str]]" = \
+    contextvars.ContextVar("retrieval_role", default=None)
 
 # Permissive SSL mirrors the existing connector base in this codebase
 # (a2/retrieve.py, prior_art_v2/sources.py). Tightening is a separate,
@@ -440,9 +449,21 @@ class ConnectorBase:
             query, url, None,
         )
 
-    def search(self, query: str, timeout: int = 25) -> SourceQueryResult:
-        """Public entrypoint. Subclasses may override only to add params."""
-        return self._execute(query, timeout=timeout)
+    def search(self, query: str, timeout: int = 25,
+               retrieval_role: str = "") -> SourceQueryResult:
+        """Public entrypoint. Subclasses may override only to add params.
+
+        retrieval_role (R401-WC2, CEO directive 5): the CALLER's purpose —
+        'DISCOVERY' (evidence-finding) or 'VERIFICATION' (adversarial
+        prior-art search). Recorded on the custody entry; empty string
+        = unlabeled (legacy callers). Thread-safe via ContextVar (the
+        patent lane runs searchers in a thread pool)."""
+        import contextvars
+        token = _RETRIEVAL_ROLE.set(retrieval_role or None)
+        try:
+            return self._execute(query, timeout=timeout)
+        finally:
+            _RETRIEVAL_ROLE.reset(token)
 
     # ---- retrieval-log custody -------------------------------------------
 
@@ -456,6 +477,7 @@ class ConnectorBase:
                 latency_ms=result.latency_ms, record_count=len(result.records),
                 raw_payload_sha256=raw_sha,
                 error=result.error,
+                retrieval_role=_RETRIEVAL_ROLE.get(),
             )
         except Exception as e:  # noqa: BLE001
             # Logging failure must not corrupt the result, but MUST surface.

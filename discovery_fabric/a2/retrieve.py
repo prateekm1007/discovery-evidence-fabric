@@ -121,6 +121,123 @@ def retrieve(problem: dict) -> list[dict]:
             items = search_europe_pmc(core, per_page=5)
             queries.append(core)
     time.sleep(1.0)
+    # ---- R401-WC2 (CEO directive 5): the OpenAlex lane in the CANONICAL
+    # primary path. EuropePMC stays the primary lane; OpenAlex is a
+    # SECOND discovery lane queried with its own derived query, merged
+    # with cross-source dedup by DOI/title. Provenance is preserved by
+    # construction: the lane goes through the source-registry connector
+    # (custody log entry with retrieval_role=DISCOVERY; every item
+    # carries the registry's own provenance record). A lane failure
+    # (e.g. the 2025+ credit-budget 429 measured live) is an HONEST
+    # PARTIAL state recorded in RETRIEVAL_LANES and returned with the
+    # evidence — never absence, never a raised stage failure when the
+    # other lane produced evidence (Art. XXI.3 discipline is unchanged
+    # for the primary lane: if EuropePMC itself fails, retrieve() still
+    # raises).
+    lanes: dict = {"europepmc": {"queries": queries,
+                                 "n_items": len(items), "status": "OK"}}
+    openalex_items = _search_openalex_lane(device, fm, lanes)
+    items, dedup = _merge_lanes(items, openalex_items)
+    if dedup:
+        lanes["cross_source_dedup"] = dedup
     print(f"  [retrieve] found {len(items)} evidence items "
-          f"(queries tried: {len(queries)})")
+          f"(queries tried: {len(queries)}; lanes: "
+          f"{ {k: v['n_items'] for k, v in lanes.items() if 'n_items' in v} })")
+    RETRIEVAL_LANES.clear()
+    RETRIEVAL_LANES.update(lanes)
     return items
+
+
+# The lane-state record for the LAST retrieve() call (the conductor
+# attaches it to the RETRIEVE envelope — machine-visible lane honesty).
+RETRIEVAL_LANES: dict = {}
+
+
+def _search_openalex_lane(device: str, fm: str,
+                          lanes: dict) -> list[dict]:
+    """One OpenAlex query (device + failure-mode terms; the primary
+    'mechanism' suffix is deliberately dropped — keyword_form and the
+    collision-measured 'mechanism' meta-word defect). Failures return
+    [] with the lane state recorded (never raised: a partial-lane
+    failure is not a stage failure when the primary lane succeeded)."""
+    from discovery_fabric.source_registry.query_relevance import \
+        keyword_form
+    q = keyword_form(f"{device} {fm.lower().replace('_', ' ')}")
+    if not q:
+        lanes["openalex"] = {"queries": [], "n_items": 0,
+                             "status": "NO_QUERY_FORMED"}
+        return []
+    try:
+        from discovery_fabric.source_registry.connectors.scientific \
+            import OpenAlexConnector
+        r = OpenAlexConnector().search(q, retrieval_role="DISCOVERY")
+    except Exception as exc:  # noqa: BLE001 — honest lane state
+        lanes["openalex"] = {"queries": [q], "n_items": 0,
+                             "status": "SEARCH_FAILED",
+                             "error": f"{type(exc).__name__}: {exc}"[:160]}
+        return []
+    items = []
+    for rec in r.records:
+        n = rec.normalized or {}
+        abstract = n.get("abstract") or ""
+        if not abstract or len(str(abstract)) < 200:
+            continue
+        items.append({
+            "id": f"openalex:{rec.record_id}",
+            "source_type": "scientific_paper",
+            "source": "OpenAlex",
+            "source_id": f"openalex:{rec.record_id}",
+            "source_uri": rec.uri,
+            "title": rec.title or "",
+            "abstract": str(abstract)[:2400],
+            "doi": n.get("doi") or None,
+            "publication_date": None,
+            "retrieval_timestamp": rec.retrieved_at,
+            "retrieval_method": "source_registry_openalex",
+            "content_hash": rec.raw_payload_sha256 or "",
+            "provenance": {"provider": "OpenAlex",
+                           "retrieved_at": rec.retrieved_at,
+                           "query_or_method": q,
+                           "retrieval_role": "DISCOVERY",
+                           "registry_provenance": rec.provenance or {}},
+            "epistemic_state": "OBSERVED",
+            "limitations": [
+                "Abstracts are inverted-index reconstructions",
+                "Credit-budget model: 429 'Insufficient budget' "
+                "measured this session — availability resets per "
+                "provider policy"],
+        })
+    lanes["openalex"] = {"queries": [q], "n_items": len(items),
+                         "status": r.status}
+    if r.error:
+        lanes["openalex"]["error"] = str(r.error)[:160]
+    return items
+
+
+def _merge_lanes(primary: list[dict],
+                secondary: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Merge two lanes' items with cross-source dedup: same DOI or a
+    ~normalized title match means the same paper — the PRIMARY lane's
+    item wins (the record's abstract is already provenance-bound);
+    the dedup record is RETURNED (recorded in the lane states, never
+    silently dropped). Returns (merged, dedup_record)."""
+    def _title_key(t: str) -> str:
+        return " ".join(re.findall(r"[a-z0-9]+", (t or "").lower()))[:80]
+    seen_doi = {i.get("doi") for i in primary if i.get("doi")}
+    seen_title = {_title_key(i.get("title", "")) for i in primary}
+    out = list(primary)
+    dedup = []
+    for it in secondary:
+        doi = it.get("doi")
+        tk = _title_key(it.get("title", ""))
+        if (doi and doi in seen_doi) or (tk and tk in seen_title):
+            dedup.append({"deduped_id": it.get("id"),
+                          "basis": "doi" if doi and doi in seen_doi
+                          else "title"})
+            continue
+        out.append(it)
+        if doi:
+            seen_doi.add(doi)
+        if tk:
+            seen_title.add(tk)
+    return out, dedup

@@ -1537,7 +1537,8 @@ def multi_source_expansion(problem: Dict[str, Any],
             connector = cls()
             results = []
             for q in (q_domain, q_mechanism):
-                r = connector.search(q, timeout=25)
+                r = connector.search(q, timeout=25,
+                                     retrieval_role="DISCOVERY")
                 entry = {"query": q, "status": r.status,
                          "n_records": len(r.records)}
                 if r.error:
