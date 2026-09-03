@@ -153,10 +153,15 @@ jobs:
                 f"{bb.xlen:.4f}x{bb.ylen:.4f}x{bb.zlen:.4f})")
           PY
 
-      - name: CAD kernel suites (hermetic)
+      - name: CAD kernel suite (hermetic)
         run: |
-          python -m pytest tests/test_r380_cad_pipeline.py \
-            tests/test_e21_series.py -q
+          # test_r380_cad_pipeline.py is the hermetic CAD kernel suite
+          # (proven in CI: 46/46 on d806e98d's failed run — the failure
+          # was ONLY test_e21_series.py, which reads the GITIGNORED
+          # artifacts/benchmark/generated/runs/ rehearsal outputs whose
+          # regeneration (corpus_runner) requires the LLM transport —
+          # not CI-hermetic; e21 stays a local suite).
+          python -m pytest tests/test_r380_cad_pipeline.py -q
 
       - name: Configure git identity
         run: |
@@ -349,7 +354,7 @@ jobs:
           python -m pytest tests/test_r394_benchmark.py tests/test_r396_release_gate.py \
             tests/test_r397_physics_stage.py tests/test_r399_gates.py \
             tests/test_r399_routing_states.py -q
-      - name: CAD executability proof + kernel suites (R401-WC2)
+      - name: CAD executability proof + kernel suite (R401-WC2)
         run: |
           python - <<'PY'
           import cadquery as cq
@@ -364,8 +369,9 @@ jobs:
           assert stl.stat().st_size > 100
           print(f"CAD_EXECUTABLE: cadquery {cq.__version__}")
           PY
-          python -m pytest tests/test_r380_cad_pipeline.py \
-            tests/test_e21_series.py -q
+          # hermetic CAD kernel suite only (e21 needs gitignored
+          # LLM-regenerated benchmark runs — see the certify job note)
+          python -m pytest tests/test_r380_cad_pipeline.py -q
       - name: Tier summary
         if: always()
         run: |
