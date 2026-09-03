@@ -499,6 +499,24 @@ def assemble_candidate(operator: Dict[str, Any],
             "primary_source": structured_item.get("source", {}),
             "mechanism_source_span": fields.get(
                 "mechanism_source_span", ""),
+            # Art. XLIV (audit CB-3): every mechanism records the
+            # evidence generation it was built from — the plane, the
+            # snapshot id + hash, the retrieval role / version /
+            # sources / timestamp. A candidate is never ambiguous
+            # about which evidence freeze it came from.
+            "evidence_plane": structured_item.get("_evidence_plane", ""),
+            "evidence_snapshot_id": structured_item.get(
+                "_evidence_snapshot_id", ""),
+            "evidence_hash": structured_item.get("_evidence_hash", ""),
+            "retrieval_role": structured_item.get("_retrieval_role", ""),
+            "retrieval_version": (
+                "multi_source_expansion/2.0.0"
+                if structured_item.get("_evidence_plane") ==
+                "DISCOVERY_EXPANSION" else "a2_retrieve/frozen_envelope"),
+            "retrieval_sources": structured_item.get(
+                "_retrieval_sources", ""),
+            "retrieval_timestamp": structured_item.get(
+                "_retrieval_timestamp", ""),
         },
         "constraint_set": {
             "problem_constraint": problem.get("constraint", ""),
@@ -1104,18 +1122,63 @@ def _parse_candidate_fields(text: str) -> Dict[str, str]:
 
 
 # ---------------------------------------------------------------------------
-# 7. Machine-checkable distinctness (R401 Phase 3)
+# 7. Machine-checkable distinctness (R402 instrument v2 — Art. XLII)
 #
 # Deterministic comparison over SIX structural dimensions:
 #   mechanism_graph, intervention, boundary conditions, failure mode,
-#   design variable, predicted effect.
-# Wording is normalized away (term sets, stopwords removed): two
-# candidates differing only in wording must NOT count as distinct.
+#   design variable, predicted effect. Wording is normalized away
+#   (term sets, stopwords removed): two candidates differing only in
+#   wording must NOT count as distinct.
+#
+# R402 (audit CB-1, Art. XLII — Mechanism Distinctness Independence):
+#   the v1 rule let FREE-TEXT envelope differences (a renamed design
+#   knob, a reworded boundary condition) BLOCK the merge of candidates
+#   whose causal core was IDENTICAL (graph Jaccard 1.0) — the audit's
+#   probes A/B/C measured it: renamed-knob / synonym / added-
+#   specificity variants were all kept as GENUINE_MECHANISM_DIFFERENCE.
+#   That inverted the Article XLII burden: vocabulary variation in
+#   envelope fields was ALLOWED TO CREATE mechanisms.
+#
+# v2 decision rule (three verdicts, never a forced binary):
+#   DISTINCT      causal core materially different (aggregate graph
+#                 Jaccard < CAUSAL_CORE_DISTINCT_FLOOR) — different
+#                 causal variables / different physics vocabulary.
+#   EQUIVALENT    causal core equivalent (>= CAUSAL_CORE_MERGE_JACCARD)
+#                 AND at most a design-knob difference: a knob rename /
+#                 parameter rename / synonym change CANNOT independently
+#                 create a new invention (Art. XLII forbidden list) —
+#                 the candidates are the same mechanism family (merged,
+#                 the knob delta recorded).
+#   INDETERMINATE (a) causal core equivalent but a boundary-regime or
+#                 failure-mode delta exists — a boundary-regime change
+#                 IS a legitimate distinctness dimension, and a
+#                 deterministic term instrument cannot classify regime
+#                 change vs rewording; or (b) the causal core sits in
+#                 the ambiguous band. INDETERMINATE candidates are kept
+#                 in the pipeline (they are hypotheses pending
+#                 independent distinctness adjudication) but are NOT
+#                 counted by the material-diversity metric (Art. XXV:
+#                 the instrument's inability to prove difference is
+#                 not proof of difference).
+#
+#   Threshold provenance (Art. XXVII, MODEL_DERIVED, declared): the
+#   bars are calibrated on the repo's own adversarial fixtures —
+#   true-duplicate pair (REWORDED_DUPLICATE vs GOOD in
+#   tests/test_r401_mechanism_space.py) measures aggregate graph
+#   Jaccard 0.8; true-distinct pair (electrostatic vs heparin) measures
+#   0.167. CAUSAL_CORE_MERGE_JACCARD = 0.8 (the measured duplicate
+#   score, unchanged from v1); CAUSAL_CORE_DISTINCT_FLOOR = 0.45 sits
+#   in the wide empty band between 0.167 and 0.8 with margin on both
+#   sides. NOT fitted to any output count.
 # ---------------------------------------------------------------------------
+DISTINCTNESS_INSTRUMENT_VERSION = "mechanism_distinctness/2.0.0"
+DISTINCTNESS_VERDICTS = ("DISTINCT", "EQUIVALENT", "INDETERMINATE")
 DISTINCTNESS_DIMENSIONS = (
     "mechanism_graph", "intervention", "boundary_conditions",
     "failure_mode", "design_variable", "predicted_effect")
-NEAR_DUPLICATE_JACCARD = 0.8
+NEAR_DUPLICATE_JACCARD = 0.8            # causal-core merge bar (v1 name kept)
+CAUSAL_CORE_MERGE_JACCARD = 0.8         # same value, v2 name (see above)
+CAUSAL_CORE_DISTINCT_FLOOR = 0.45       # below = materially different core
 
 
 def _dimension_terms(candidate: Dict[str, Any], dim: str) -> set:
@@ -1150,22 +1213,48 @@ def _jaccard(a: set, b: set) -> Optional[float]:
     return round(len(a & b) / len(u), 3) if u else None
 
 
+def _role_jaccards(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, Any]:
+    """Role-respecting per-node comparison (Art. XLII's representation
+    list: causal structure / physical effect / intervention roles are
+    compared like-for-like, not as one aggregate bag). Recorded as the
+    adjudicator's structural view; the verdict itself uses the
+    aggregate core (the calibrated instrument — see thresholds)."""
+    out: Dict[str, Any] = {}
+    ga = a.get("mechanism_graph") or {}
+    gb = b.get("mechanism_graph") or {}
+    roles = sorted(set(ga.get("nodes") or {}) | set(gb.get("nodes") or {}))
+    for role in roles:
+        ta = set((ga.get("nodes") or {}).get(role, {}).get("terms") or [])
+        tb = set((gb.get("nodes") or {}).get(role, {}).get("terms") or [])
+        j = _jaccard(ta, tb)
+        out[role] = {"jaccard": j,
+                     "equivalent": True if j is None else
+                     j >= CAUSAL_CORE_MERGE_JACCARD}
+    edges_a = {f"{e.get('from')}>{e.get('relation')}>{e.get('to')}"
+               for e in ga.get("edges") or []}
+    edges_b = {f"{e.get('from')}>{e.get('relation')}>{e.get('to')}"
+               for e in gb.get("edges") or []}
+    out["edge_signatures"] = {
+        "a": sorted(edges_a), "b": sorted(edges_b),
+        "identical": edges_a == edges_b}
+    return out
+
+
 def compare_candidates(a: Dict[str, Any], b: Dict[str, Any]
                        ) -> Dict[str, Any]:
     """Pairwise structural comparison with the full recorded basis.
 
-    Decision rule (deterministic, recorded): the MECHANISM GRAPH is the
-    machine-checkable mechanism core — its node term sets already
-    aggregate the intervention, mechanism, predicted-effect and
-    observed-outcome vocabulary. Two candidates are NEAR-DUPLICATES
-    when the graph is term-equivalent (Jaccard >= 0.8) AND the design
-    variable and the envelope dimensions (boundary conditions, failure
-    modes) show no material difference. Single-dimension
-    intervention/predicted-effect jaccards are RECORDED as graph
-    components — morphological rewording (lumen vs luminal) drops a
-    single dimension below the bar while the aggregate graph stays
-    equivalent, and that is exactly the "differ only in wording" case
-    the directive orders collapsed (never counted as distinct)."""
+    v2 verdict rule (deterministic, recorded): the MECHANISM GRAPH
+    aggregate (node term sets + edge signatures) is the machine-
+    checkable causal core. Two candidates are EQUIVALENT when the core
+    is term-equivalent AND the only residual differences are wording
+    class (including design-knob renames — Art. XLII: a knob rename
+    cannot independently create an invention). They are DISTINCT when
+    the causal core itself is materially different. Everything the
+    instrument cannot classify (boundary-regime / failure-mode deltas
+    on an identical core; cores in the ambiguous band) is INDETERMINATE
+    — kept visible, referred to independent adjudication, never
+    counted as distinct."""
     dims = {}
     for d in DISTINCTNESS_DIMENSIONS:
         j = _jaccard(_dimension_terms(a, d), _dimension_terms(b, d))
@@ -1174,41 +1263,103 @@ def compare_candidates(a: Dict[str, Any], b: Dict[str, Any]
                        "note": "both dimensions empty — uninformative"}
         else:
             dims[d] = {"jaccard": j,
-                       "equivalent": j >= NEAR_DUPLICATE_JACCARD}
-    informative = [d for d in dims if dims[d]["jaccard"] is not None]
-    n_equiv = sum(1 for d in informative if dims[d]["equivalent"])
-    graph_equiv = dims["mechanism_graph"]["equivalent"]
-    # the non-graph structural dimensions that must not differ for a
-    # dedup: the design knob + the envelope (boundary, failure modes)
-    non_graph_blockers = ["design_variable", "boundary_conditions",
-                          "failure_mode"]
-    no_structural_difference = all(
-        dims[d]["equivalent"] for d in non_graph_blockers)
-    near_duplicate = bool(informative and graph_equiv
-                          and no_structural_difference)
-    return {"near_duplicate": near_duplicate,
-            "mechanism_core_equivalent": graph_equiv,
+                       "equivalent": j >= CAUSAL_CORE_MERGE_JACCARD}
+    core_j = dims["mechanism_graph"]["jaccard"]
+    knob = dims["design_variable"]
+    regime = dims["boundary_conditions"]
+    failure = dims["failure_mode"]
+
+    def _differs(d: Dict[str, Any]) -> bool:
+        return d["jaccard"] is not None and not d["equivalent"]
+
+    if core_j is None:
+        verdict = "INDETERMINATE"
+        basis = ("both causal cores empty — nothing to compare; unknown "
+                 "stays unknown (Art. XXV)")
+    elif core_j < CAUSAL_CORE_DISTINCT_FLOOR:
+        verdict = "DISTINCT"
+        basis = (f"causal core materially different (aggregate graph "
+                 f"Jaccard {core_j} < {CAUSAL_CORE_DISTINCT_FLOOR}): the "
+                 "intervention/mechanism/effect vocabulary itself differs "
+                 "— different causal variables, not different wording")
+    elif core_j >= CAUSAL_CORE_MERGE_JACCARD:
+        # causal core equivalent — envelope fields may NOT create
+        # distinctness (Art. XLII). Classify the residual delta.
+        if _differs(regime) or _differs(failure):
+            verdict = "INDETERMINATE"
+            which = [d for d in ("boundary_conditions", "failure_mode")
+                     if _differs(dims[d])]
+            basis = (f"causal core equivalent (Jaccard {core_j}) but "
+                     f"{', '.join(which)} differs materially — a "
+                     "boundary-regime / failure-mode change is a "
+                     "legitimate distinctness dimension that a "
+                     "deterministic term instrument cannot classify "
+                     "against rewording; referred to independent "
+                     "distinctness adjudication; NOT counted as a "
+                     "materially distinct mechanism (Art. XLII/XXV)")
+        elif _differs(knob):
+            verdict = "EQUIVALENT"
+            basis = (f"causal core equivalent (Jaccard {core_j}) and only "
+                     "the design variable differs — design-knob renaming "
+                     "cannot independently create a new invention "
+                     "(Art. XLII forbidden list); same mechanism family, "
+                     "knob delta recorded")
+        else:
+            verdict = "EQUIVALENT"
+            basis = (f"causal core equivalent (Jaccard {core_j}) and all "
+                     "envelope dimensions equivalent — the candidates "
+                     "differ only in wording")
+    else:
+        verdict = "INDETERMINATE"
+        basis = (f"causal core in the ambiguous band "
+                 f"({CAUSAL_CORE_DISTINCT_FLOOR} <= Jaccard {core_j} < "
+                 f"{CAUSAL_CORE_MERGE_JACCARD}) — the instrument cannot "
+                 "classify rewording vs different causal variables; "
+                 "referred to independent distinctness adjudication; "
+                 "NOT counted as a materially distinct mechanism")
+
+    differing = [d for d in dims
+                 if dims[d]["jaccard"] is not None
+                 and not dims[d]["equivalent"]]
+    return {"verdict": verdict,
+            "near_duplicate": verdict == "EQUIVALENT",  # v1 alias
+            "mechanism_core_equivalent": bool(
+                core_j is not None and
+                core_j >= CAUSAL_CORE_MERGE_JACCARD),
+            "causal_core_jaccard": core_j,
             "dimensions": dims,
-            "n_dimensions_equivalent": n_equiv,
-            "n_dimensions_informative": len(informative),
+            "role_comparison": _role_jaccards(a, b),
+            "differing_dimensions": differing,
+            "n_dimensions_equivalent": sum(
+                1 for d in dims
+                if dims[d]["jaccard"] is not None and dims[d]["equivalent"]),
+            "n_dimensions_informative": sum(
+                1 for d in dims if dims[d]["jaccard"] is not None),
+            "basis": basis,
+            "instrument_version": DISTINCTNESS_INSTRUMENT_VERSION,
             "decision_rule": (
-                f"near-duplicate iff mechanism_graph Jaccard >= "
-                f"{NEAR_DUPLICATE_JACCARD} (the causal core aggregates "
-                "intervention/mechanism/effect vocabulary) and the "
-                "design variable + boundary + failure-mode dimensions "
-                "show no material difference; wording-only variation "
-                "collapses (never counted as distinct)")}
+                f"v2 three-verdict rule: DISTINCT iff aggregate graph "
+                f"Jaccard < {CAUSAL_CORE_DISTINCT_FLOOR}; EQUIVALENT iff "
+                f">= {CAUSAL_CORE_MERGE_JACCARD} and at most a "
+                "design-knob difference (knob rename cannot create an "
+                "invention, Art. XLII); INDETERMINATE for boundary/"
+                "failure deltas on an equivalent core or cores in the "
+                "ambiguous band — never counted as distinct")}
 
 
 def deduplicate_candidates(candidates: List[Dict[str, Any]]
                            ) -> Dict[str, Any]:
-    """Collapse near-duplicates (recording WHY); retain genuine
-    differences (recording the structural difference). Deterministic
-    order: first occurrence (by operator order then item order) wins."""
+    """Collapse EQUIVALENT candidates (recording WHY); retain DISTINCT
+    and INDETERMINATE candidates (recording the verdict basis); every
+    retained candidate carries its distinctness_verdict for downstream
+    consumers and the diversity metric counts DISTINCT only (Art.
+    XLVIII). Deterministic order: first occurrence (by operator order
+    then item order) wins."""
     kept: List[Dict[str, Any]] = []
     dedup_events: List[Dict[str, Any]] = []
     retain_events: List[Dict[str, Any]] = []
     seen_hashes: set = set()
+    n_distinct = n_indeterminate = n_equivalent = 0
     for c in candidates:
         if c.get("candidate_state") != "CANDIDATE":
             continue
@@ -1218,62 +1369,106 @@ def deduplicate_candidates(candidates: List[Dict[str, Any]]
                 "kept_id": None, "dropped_id": c.get("candidate_id"),
                 "reason": "IDENTICAL_HASH (byte-identical candidate)",
                 "dimensions": None})
+            n_equivalent += 1
             continue
-        clash = None
+        merged = None
         for k in kept:
             cmp = compare_candidates(k, c)
-            if cmp["near_duplicate"]:
-                clash = (k, cmp)
+            if cmp["verdict"] == "EQUIVALENT":
+                merged = (k, cmp)
                 break
-        if clash:
-            k, cmp = clash
+        if merged:
+            k, cmp = merged
+            n_equivalent += 1
+            c["distinctness_verdict"] = "EQUIVALENT"
+            c["distinctness_basis"] = cmp["basis"]
             dedup_events.append({
                 "kept_id": k.get("candidate_id"),
                 "dropped_id": c.get("candidate_id"),
+                "verdict": "EQUIVALENT",
                 "reason": ("NEAR_DUPLICATE: mechanism core equivalent "
-                           f"(graph/intervention/predicted-effect "
-                           f"Jaccard >= {NEAR_DUPLICATE_JACCARD}) and no "
-                           "informative dimension differs — the two "
-                           "candidates differ only in wording"),
+                           f"(graph Jaccard >= {NEAR_DUPLICATE_JACCARD}) "
+                           "and the candidates differ only in wording "
+                           "(or a design-knob rename, which cannot create "
+                           "an invention — Art. XLII)"),
                 "comparison": cmp})
         else:
-            # record the structural difference against the nearest kept
-            # candidate (the RETAIN basis — why this candidate is a
-            # distinct mechanism)
-            basis = None
+            # no EQUIVALENT twin: retain. Label against the nearest
+            # kept candidate — the recorded verdict basis.
             if kept:
                 best = max(
                     (compare_candidates(k, c) for k in kept),
-                    key=lambda cmp: cmp["n_dimensions_equivalent"])
-                basis = {
+                    key=lambda cmp: (
+                        cmp["causal_core_jaccard"]
+                        if cmp["causal_core_jaccard"] is not None
+                        else -1.0))
+                verdict = best["verdict"]
+                if verdict == "INDETERMINATE":
+                    basis = best["basis"]
+                else:
+                    basis = best["basis"]
+                event_basis = {
                     "nearest_kept": None,
-                    "differing_dimensions": [
-                        d for d in best["dimensions"]
-                        if best["dimensions"][d]["jaccard"] is not None
-                        and not best["dimensions"][d]["equivalent"]],
+                    "verdict": verdict,
+                    "differing_dimensions": best["differing_dimensions"],
+                    "causal_core_jaccard": best["causal_core_jaccard"],
                     "comparison": best}
+            else:
+                verdict = "DISTINCT"
+                basis = ("first candidate — the first mechanism family "
+                         "in this space; no prior family to compare")
+                event_basis = {
+                    "nearest_kept": None,
+                    "verdict": "DISTINCT",
+                    "differing_dimensions": None,
+                    "causal_core_jaccard": None,
+                    "comparison": None,
+                    "note": "first family — baseline of the space"}
+            c["distinctness_verdict"] = verdict
+            c["distinctness_basis"] = basis
+            if verdict == "DISTINCT":
+                n_distinct += 1
+                reason = ("GENUINE_MECHANISM_DIFFERENCE: the causal core "
+                          "is materially different (recorded)")
+            else:
+                n_indeterminate += 1
+                reason = ("INDETERMINATE_DISTINCTNESS: retained as a "
+                          "hypothesis pending independent distinctness "
+                          "adjudication; NOT counted as a materially "
+                          "distinct mechanism (Art. XLII/XXV)")
             retain_events.append({
                 "retained_id": c.get("candidate_id"),
-                "reason": ("GENUINE_MECHANISM_DIFFERENCE: at least one "
-                           "mechanism-core dimension is materially "
-                           "different (recorded)"),
-                "difference_basis": basis})
+                "verdict": verdict,
+                "reason": reason,
+                "difference_basis": event_basis})
             kept.append(c)
             seen_hashes.add(h)
     return {
         "n_input": len(candidates),
         "n_kept": len(kept),
         "kept_ids": [c.get("candidate_id") for c in kept],
+        "n_distinct": n_distinct,
+        "n_indeterminate": n_indeterminate,
+        "n_equivalent_merged": n_equivalent,
+        "distinctness_verdicts": {
+            "DISTINCT": n_distinct,
+            "INDETERMINATE": n_indeterminate,
+            "EQUIVALENT": n_equivalent},
+        "instrument_version": DISTINCTNESS_INSTRUMENT_VERSION,
         "dedup_events": dedup_events,
         "retain_events": retain_events,
         "distinctness_rule": (
-            "near-duplicate iff the mechanism_graph (aggregating "
-            "intervention/mechanism/effect/outcome term sets) is "
-            f"term-equivalent at Jaccard >= {NEAR_DUPLICATE_JACCARD} "
-            "and the design-variable, boundary and failure-mode "
-            "dimensions show no material difference — wording-only "
-            "differences collapse and are recorded; every retain "
-            "records its structural difference"),
+            "v2 three-verdict rule (Art. XLII): the mechanism graph "
+            "aggregate (node term sets + edge signatures) is the causal "
+            f"core; DISTINCT iff its Jaccard < "
+            f"{CAUSAL_CORE_DISTINCT_FLOOR}; EQUIVALENT (merge) iff >= "
+            f"{NEAR_DUPLICATE_JACCARD} "
+            "with at most a design-knob difference (knob/parameter/"
+            "synonym renames cannot independently create an invention); "
+            "INDETERMINATE for boundary-regime or failure-mode deltas on "
+            "an equivalent core, or cores in the ambiguous band — kept "
+            "visible, never counted as distinct; every verdict records "
+            "its basis"),
     }
 
 
@@ -1484,28 +1679,97 @@ def _record_to_item(rec: Any) -> Optional[Dict[str, Any]]:
     }
 
 
+def _evidence_version_record(state: str,
+                             records: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Art. XLIV — the evidence-version record a NEW retrieval must
+    carry: its own snapshot id + hash (over the record content hashes /
+    ids, deterministically ordered) and its own freeze event. Post-freeze
+    retrieval creates a NEW epistemic version; it never merges silently
+    into the frozen plane."""
+    basis = sorted(
+        str(r.get("content_hash") or r.get("id") or "")
+        for r in records)
+    snapshot_hash = sha256_obj({"basis": basis})
+    snapshot_id = f"evsnap_{snapshot_hash[:16]}"
+    return {
+        "retrieval_role": "DISCOVERY_EXPANSION",
+        "state": state,
+        "evidence_snapshot_id": snapshot_id,
+        "evidence_hash": snapshot_hash,
+        "n_records": len(records),
+        "record_ids": [r.get("id") for r in records][:50],
+        "retrieved_at": utc_now(),
+        "freeze_event": {
+            "event": "NEW_FREEZE_PERFORMED",
+            "rule": ("Art. XLIV: post-freeze retrieval -> NEW evidence "
+                     "snapshot -> NEW freeze -> NEW epistemic version; "
+                     "never a silent union with the frozen plane"),
+        },
+    }
+
+
 def multi_source_expansion(problem: Dict[str, Any],
                            per_source: int = 3
                            ) -> Dict[str, Any]:
     """Query the expansion sources with problem-derived keyword queries
-    (deterministic; two queries: domain terms + failure-mechanism
-    terms). Returns records + the full per-source honesty states."""
+    (deterministic; two queries: domain terms + failure-mechanism terms).
+
+    R402 v2 (audit CB-2, Art. XLIII — Search-Space Neutrality): the v1
+    mechanism query hardcoded an unproven solution class —
+    `keyword_form(f"{failure} prevention coating flow")` — injecting
+    'coating/flow' into EVERY domain's search space (the audit measured
+    it across 8 domains: thermal runaway, DC arc fault, rag clogging,
+    aseptic loosening, humidity drift, surface pickup, blade erosion,
+    catheter obstruction — all queried for coatings). The v2 mechanism
+    query derives from the problem's OWN vocabulary: the failure
+    description + the stated constraint (the unmet need the mechanism
+    must serve). Every query records its derivation class; no term may
+    enter a query unless it came from problem facts, frozen evidence,
+    or is an explicitly marked EXPLORATORY_HYPOTHESIS.
+
+    R402 v2 (audit CB-3, Art. XLIV — Evidence Boundary): the expansion
+    is POST-FREEZE retrieval and is now versioned as such — it returns
+    its own evidence snapshot (id + hash over the retrieved records'
+    custody chains) and its own freeze event, so the generation plane
+    is never a silent union with the frozen plane (see
+    build_structured_evidence)."""
     from discovery_fabric.source_registry.query_relevance import \
         keyword_form
     device = str(problem.get("device") or "")
     failure = str(problem.get("failure_mode") or
                   problem.get("failure") or "")
+    constraint = str(problem.get("constraint") or "")
     q_domain = keyword_form(f"{device} {failure}")
     # NOTE: the meta-word "mechanism" is deliberately ABSENT — the
     # measured collision (arxiv "Synthesis of Mechanism ... Differential
     # Evolution" — linkage machinery, not causal mechanism) taught it;
     # failure + intervention vocabulary is the content
-    q_mechanism = keyword_form(
-        f"{failure} prevention coating flow") or q_domain
+    #
+    # v2: failure DESCRIPTION + CONSTRAINT vocabulary (problem facts),
+    # NOT a hardcoded solution class (Art. XLIII)
+    q_mechanism = keyword_form(f"{failure} {constraint}") or q_domain
     out: Dict[str, Any] = {
-        "expansion_version": "multi_source_expansion/1.0.0",
-        "queries": {"domain": q_domain, "mechanism": q_mechanism},
+        "expansion_version": "multi_source_expansion/2.0.0",
+        "queries": {
+            "domain": {
+                "text": q_domain,
+                "derivation": "DERIVED_FROM_PROBLEM_FACTS",
+                "term_sources": {"device": device,
+                                 "failure_mode": failure}},
+            "mechanism": {
+                "text": q_mechanism,
+                "derivation": "DERIVED_FROM_PROBLEM_FACTS",
+                "term_sources": {"failure_mode": failure,
+                                 "constraint": constraint}}},
         "sources": {}, "records": [],
+        "search_space_neutrality": {
+            "solution_class_injection": "NONE",
+            "rule": ("Art. XLIII: no solution-class term may enter a "
+                     "query unless derived from problem facts / frozen "
+                     "evidence, or explicitly marked "
+                     "EXPLORATORY_HYPOTHESIS — the v1 hardcoded "
+                     "'prevention coating flow' class is removed"),
+        },
     }
     import importlib
     import os as _os
@@ -1514,6 +1778,8 @@ def multi_source_expansion(problem: Dict[str, Any],
         # plane alone; never silent — the state says so
         out["state"] = "DISABLED_BY_ENV (R401_NO_EXPANSION)"
         out["n_records"] = 0
+        out["evidence_version"] = _evidence_version_record(
+            "DISABLED_BY_ENV", [])
         return out
     _SRC_CLASSES = {
         "openalex": ("discovery_fabric.source_registry.connectors."
@@ -1566,10 +1832,17 @@ def multi_source_expansion(problem: Dict[str, Any],
                 "state": "SEARCH_FAILED",
                 "error": f"{type(exc).__name__}: {exc}"[:200]}
     out["n_records"] = len(out["records"])
+    # Art. XLIV (audit CB-3): post-freeze retrieval carries its own
+    # evidence snapshot + freeze event — a NEW epistemic version, never
+    # a silent merge into the frozen plane
+    out["evidence_version"] = _evidence_version_record(
+        out.get("state", "SEARCH_EXECUTED"), out["records"])
     out["note"] = ("expansion evidence rides the registry's own "
                    "retrieval-log custody (Art. XXI.9); SEARCH_FAILED "
                    "and NO_USABLE_RECORDS are recorded states, never "
-                   "absence (Art. XXI.3)")
+                   "absence (Art. XXI.3); the expansion is POST-FREEZE "
+                   "retrieval and creates its own evidence snapshot + "
+                   "freeze + epistemic version (Art. XLIV)")
     return out
 
 
@@ -1580,7 +1853,17 @@ def build_structured_evidence(problem: Dict[str, Any],
     """Multi-source custodied evidence -> structured mechanism-space
     data. Rerank (Phase 5) selects the mechanism-signal-dense records;
     each selected record is extracted + validated. Every step recorded.
-    No evidence -> honest refusal (Art. XXV)."""
+    No evidence -> honest refusal (Art. XXV).
+
+    R402 v2 (audit CB-3, Art. XLIV — Evidence Boundary): the FROZEN
+    plane (the evidence this stage received — already frozen upstream
+    by the FREEZE stage) and the EXPANSION plane (post-freeze
+    retrieval) are kept as separately-hashed evidence generations.
+    The union the reranker consumes is EXPLICIT and recorded: plane
+    membership, snapshot ids and hashes travel on every structured
+    item and on every candidate's evidence bundle — never a silent
+    merge (the v1 `list(evidence) + expansion["records"]` union was
+    the audit's B-1/CB-3 finding)."""
     if not evidence:
         return {
             "structured_evidence_version": MECHANISM_SPACE_VERSION,
@@ -1589,11 +1872,39 @@ def build_structured_evidence(problem: Dict[str, Any],
             "note": "no custodied evidence on the envelope — no "
                     "structured mechanism space was built and none was "
                     "fabricated (Art. XXV)"}
+    # the frozen plane's own snapshot (hash over the envelope's
+    # evidence content hashes — the freeze this stage INHERITED)
+    frozen_basis = sorted(
+        str(it.get("content_hash") or it.get("id") or "")
+        for it in evidence)
+    frozen_hash = sha256_obj({"frozen_basis": frozen_basis})
+    frozen_snapshot_id = f"evsnap_{frozen_hash[:16]}"
     # the bounded multi-source expansion (R401 Phase 5/B1) — the
     # primary a2 plane stays authoritative; the expansion ADDS
-    # cross-domain mechanism material for the operators
+    # cross-domain mechanism material for the operators, and (v2)
+    # carries its OWN evidence version + freeze event (Art. XLIV)
     expansion = multi_source_expansion(problem)
-    combined = list(evidence) + expansion["records"]
+    exp_version = expansion.get("evidence_version") or {}
+    # EXPLICIT two-plane union (never silent): stamp plane membership
+    # on every record before the rerank sees the combined list
+    frozen_stamped = []
+    for it in evidence:
+        it = dict(it)
+        it["_evidence_plane"] = "FROZEN_PRIMARY"
+        it["_evidence_snapshot_id"] = frozen_snapshot_id
+        it["_evidence_hash"] = frozen_hash
+        it["_retrieval_role"] = "FROZEN_PRIMARY"
+        frozen_stamped.append(it)
+    expansion_stamped = []
+    for it in expansion["records"]:
+        it = dict(it)
+        it["_evidence_plane"] = "DISCOVERY_EXPANSION"
+        it["_evidence_snapshot_id"] = exp_version.get(
+            "evidence_snapshot_id", "")
+        it["_evidence_hash"] = exp_version.get("evidence_hash", "")
+        it["_retrieval_role"] = "DISCOVERY_EXPANSION"
+        expansion_stamped.append(it)
+    combined = frozen_stamped + expansion_stamped
     rerank = mechanism_signal_rerank(combined, top_k=top_k)
     selected = [combined[i] for i in rerank["selected_indexes"]]
     items = []
@@ -1603,6 +1914,16 @@ def build_structured_evidence(problem: Dict[str, Any],
         structured["_record_text"] = " ".join(
             str(rec.get(k) or "") for k in ("title", "abstract",
                                             "snippet"))
+        # Art. XLIV: the plane / snapshot / role travel on the
+        # structured item into every candidate's evidence bundle
+        structured["_evidence_plane"] = rec.get("_evidence_plane", "")
+        structured["_evidence_snapshot_id"] = rec.get(
+            "_evidence_snapshot_id", "")
+        structured["_evidence_hash"] = rec.get("_evidence_hash", "")
+        structured["_retrieval_role"] = rec.get("_retrieval_role", "")
+        structured["_retrieval_sources"] = rec.get("source", "")
+        structured["_retrieval_timestamp"] = rec.get(
+            "retrieval_timestamp", "")
         items.append(structured)
     n_mech = sum(1 for it in items
                  if it["extraction_summary"]["mechanism_extracted"])
@@ -1614,7 +1935,92 @@ def build_structured_evidence(problem: Dict[str, Any],
         "rerank": rerank,
         "multi_source_expansion": expansion,
         "n_items_with_bound_mechanism": n_mech,
+        "evidence_boundary": {
+            "rule": ("Art. XLIV: frozen plane and post-freeze "
+                     "expansion plane are separately-hashed evidence "
+                     "generations; the union is explicit and plane "
+                     "membership travels on every item (never a "
+                     "silent merge)"),
+            "frozen_plane": {
+                "retrieval_role": "FROZEN_PRIMARY",
+                "evidence_snapshot_id": frozen_snapshot_id,
+                "evidence_hash": frozen_hash,
+                "n_items": len(evidence)},
+            "expansion_plane": exp_version,
+            "planes_disjoint": True,
+        },
     }
+
+
+def _consult_cemetery(candidates: List[Dict[str, Any]]
+                      ) -> Dict[str, Any]:
+    """Art. LI (audit CB-5) — the mechanism space CONSUMES the cemetery.
+
+    For every CANDIDATE-state candidate, consult the negative-knowledge
+    library (read-only). A PROVEN_INVARIANT hard-block kills the
+    candidate in-place (state -> NOT_A_CANDIDATE_CEMETERY_PROVEN_
+    INVARIANT, the block recorded on the candidate with entry ids and
+    matched domain terms); STRONG_CONSTRAINT warnings ride the
+    candidate downstream (recorded, not blocking — explicit override
+    justification territory). The consultation itself is recorded:
+    entry count, blocked count, warning count, and the honest
+    CEMETERY_CONSULTATION_UNAVAILABLE state if the orchestrator layer
+    is not importable in this context (never silent, never a block on
+    infrastructure failure — Art. XXV)."""
+    record: Dict[str, Any] = {
+        "consumption_version": "cemetery_consumption/1.0.0",
+        "rule": ("Art. LI: negative knowledge is a state-transition "
+                 "mechanism — killed invariants must be capable of "
+                 "changing future search; a written-but-never-read "
+                 "cemetery is a log, not a memory"),
+        "n_candidates_consulted": 0,
+        "n_blocked": 0,
+        "n_warned": 0,
+        "blocked": [],
+    }
+    try:
+        from orchestrator.mechanism_cemetery import \
+            check_candidate_against_cemetery
+    except Exception as exc:  # noqa: BLE001 — honest state (Art. XXV)
+        record["state"] = "CEMETERY_CONSULTATION_UNAVAILABLE"
+        record["error"] = f"{type(exc).__name__}: {exc}"[:200]
+        record["note"] = ("the cemetery could not be consulted — "
+                          "infrastructure state, NOT a scientific "
+                          "verdict; no candidate was blocked or "
+                          "cleared by this (Art. XXV)")
+        return record
+    total_lessons: Optional[int] = None
+    for c in candidates:
+        if c.get("candidate_state") != "CANDIDATE":
+            continue
+        record["n_candidates_consulted"] += 1
+        desc = " ".join(str(c.get(k) or "") for k in (
+            "intervention", "mechanism", "predicted_effect",
+            "novel_design_variable"))[:2000]
+        try:
+            res = check_candidate_against_cemetery(desc)
+        except Exception as exc:  # noqa: BLE001 — honest state (Art. XXV)
+            record["state"] = "CEMETERY_CONSULTATION_UNAVAILABLE"
+            record["error"] = f"{type(exc).__name__}: {exc}"[:200]
+            return record
+        total_lessons = res.get("total_lessons_consulted", 0)
+        hard = res.get("hard_blocks") or []
+        if hard:
+            c["candidate_state"] = \
+                "NOT_A_CANDIDATE_CEMETERY_PROVEN_INVARIANT"
+            c["cemetery_block"] = hard
+            record["n_blocked"] += 1
+            record["blocked"].append({
+                "candidate_id": c.get("candidate_id"),
+                "entries": [b.get("cemetery_entry") for b in hard],
+                "domain_match": [b.get("domain_match") for b in hard],
+            })
+        elif res.get("warnings"):
+            c["cemetery_warnings"] = res["warnings"]
+            record["n_warned"] += 1
+    record["state"] = "CONSULTED"
+    record["total_lessons_consulted"] = total_lessons
+    return record
 
 
 def build_mechanism_space(problem: Dict[str, Any],
@@ -1668,6 +2074,7 @@ def build_mechanism_space(problem: Dict[str, Any],
              "record_text": it.get("_record_text", "")}
             for it in se.get("items", [])],
         "rerank": se.get("rerank"),
+        "evidence_boundary": se.get("evidence_boundary"),
         "multi_source_expansion": {
             k: v for k, v in (se.get("multi_source_expansion") or
                               {}).items() if k != "records"} | {
@@ -1697,6 +2104,15 @@ def build_mechanism_space(problem: Dict[str, Any],
         {k: v for k, v in r.items() if k != "candidates"}
         for r in operator_results]
     space["operator_candidates_full"] = operator_results
+    # R402 / Art. LI (audit CB-5): the mechanism space CONSUMES the
+    # cemetery — negative knowledge must change future search, not sit
+    # in an archive. A candidate whose causal vocabulary hard-blocks on
+    # a PROVEN_INVARIANT is killed HERE (recorded, with the entry ids
+    # and the matched domain terms); STRONG_CONSTRAINT warnings ride
+    # the candidate downstream. The v1 space had ZERO references to
+    # the cemetery — failures were archived, never learned.
+    cemetery_consumption = _consult_cemetery(all_candidates)
+    space["cemetery_consumption"] = cemetery_consumption
     # distinctness
     dedup = deduplicate_candidates(all_candidates)
     kept = dedup["n_kept"]
@@ -1740,7 +2156,8 @@ def _public_candidate(c: Dict[str, Any]) -> Dict[str, Any]:
         "testable_prediction", "testable_prediction_check",
         "derivation_trace", "falsification_test", "expected_effect",
         "mechanism_source_span", "span_binding", "extraction_confidence",
-        "mechanism_support")}
+        "mechanism_support", "distinctness_verdict",
+        "distinctness_basis")}
     return out
 
 
@@ -1755,6 +2172,16 @@ def _metrics(space: Dict[str, Any],
              n_structured_items: int) -> Dict[str, Any]:
     n_gen = len(generated)
     n_ret = len(retained)
+    # Art. XLVIII (v2): the diversity metric counts DISTINCT verdicts
+    # only. INDETERMINATE candidates are retained (hypotheses pending
+    # independent adjudication) but never counted; EQUIVALENT merges
+    # are reported. The v1 rate (n_ret/n_gen) measured vocabulary
+    # entropy of free-text envelope fields — the audit's CB-1 finding.
+    verdicts = [c.get("distinctness_verdict") for c in retained]
+    n_distinct = sum(1 for v in verdicts if v == "DISTINCT")
+    n_indeterminate = sum(1 for v in verdicts
+                          if v == "INDETERMINATE")
+    n_equivalent = n_gen - n_ret
     operator_counts = {}
     for op_id in OPERATOR_IDS:
         n_op_gen = sum(1 for c in generated
@@ -1779,7 +2206,16 @@ def _metrics(space: Dict[str, Any],
         "mechanism_candidates_after_dedup": n_ret,
         "operator_counts": operator_counts,
         "material_distinctness_rate": (
-            round(n_ret / n_gen, 3) if n_gen else None),
+            round(n_distinct / n_gen, 3) if n_gen else None),
+        "material_mechanism_diversity": {
+            "n_distinct": n_distinct,
+            "n_indeterminate": n_indeterminate,
+            "n_equivalent_merged": n_equivalent,
+            "instrument_version": DISTINCTNESS_INSTRUMENT_VERSION,
+            "note": ("MMD per Art. XLVIII: counts DISTINCT verdicts only "
+                     "— EQUIVALENT merges and INDETERMINATE referrals "
+                     "are reported but never counted as distinct "
+                     "mechanisms (Art. XLII/XXV)")},
         "evidence_mechanism_support_rate": (
             round(support_items / adjudicated, 3) if adjudicated
             else None),

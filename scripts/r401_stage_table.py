@@ -56,6 +56,27 @@ def main() -> int:
             consumers.setdefault(blocker, []).append(b)
             consumers.setdefault(b, [])
 
+    # R402 (audit NF-1): the DECLARED dependency graph — from the
+    # adapters' depends_on, which since R402 is in the STAGE-NAME
+    # namespace and resolves. Emitted separately from the conductor's
+    # skip-cascade policy (DOWNSTREAM_BLOCKERS) with BOTH semantics
+    # labeled: the v1 artifact exposed only the skip-cascade view, so
+    # 13 of 16 stages reported downstream_consumers: [] and any
+    # consumer of the declared graph got a false picture (two
+    # representations, disagreeing silently — Art. X defect).
+    declared_graph: Dict[str, List[str]] = {}
+    for stage in STAGE_ORDER:
+        adapter = ADAPTERS.get(stage)
+        deps = list(getattr(adapter, "depends_on", []) or [])
+        for d in deps:
+            if d not in STAGE_ORDER:
+                raise SystemExit(
+                    f"r401_stage_table: depends_on entry '{d}' of "
+                    f"{stage} does not resolve to a stage in "
+                    f"STAGE_ORDER — regenerate blocked (audit NF-1 "
+                    f"contract violated)")
+        declared_graph[stage] = deps
+
     table = []
     for stage in STAGE_ORDER:
         adapter = ADAPTERS.get(stage)
@@ -70,7 +91,14 @@ def main() -> int:
             "decision_dependency": stage in DECISION_CONSUMERS,
             "learning_dependency": stage in LEARNING_CONSUMERS,
             "provenance_dependency": stage in PROVENANCE_CONSUMERS,
+            "depends_on": declared_graph[stage],
             "downstream_consumers": sorted(consumers.get(stage, [])),
+            "downstream_consumers_semantics": (
+                "conductor skip-cascade policy (run.py "
+                "DOWNSTREAM_BLOCKERS: which stage failures abort which "
+                "downstream compute) — NOT the data dependency graph; "
+                "the declared graph is per-stage 'depends_on' + the "
+                "top-level declared_dependency_graph"),
             "capability_id": getattr(adapter, "capability_id", None),
             "canonical_module": getattr(adapter, "module_path", None),
         })
@@ -189,6 +217,14 @@ def main() -> int:
         "n_stages": len(STAGE_ORDER),
         "stage_order": list(STAGE_ORDER),
         "stage_table": table,
+        "declared_dependency_graph": declared_graph,
+        "declared_dependency_graph_semantics": (
+            "the adapters' depends_on (stage-name namespace, R402 "
+            "NF-1 fix): which stages must have produced their outputs "
+            "before this stage's contract holds. DISTINCT from the "
+            "conductor's skip-cascade policy (DOWNSTREAM_BLOCKERS) — "
+            "the two maps answer different questions and both are "
+            "recorded, labeled, and never conflated (Art. X)"),
         "canonical_authority_map": authority_map,
         "stage_import_map": import_map,
         "cheap_first_ladder": [

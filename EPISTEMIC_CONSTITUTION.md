@@ -1,14 +1,15 @@
 # Epistemic Constitution — Research & Coding
 
-**Version:** 1.9.0
+**Version:** 2.0.0
 **Ratified:** 2026-08-19
 **Amended:** 2026-08-20 (Articles XXIII–XXXIV — Anti-Gaming, Anti-Entropy, Anti-Hallucination Principles; Article XXXV — Closed-Loop Epistemic Control as the Completion Standard)
 **Amended:** 2026-08-25 (Article XXXVI — TECHNOLOGY_TRANSFER_READY as the Manufactured-Asset Completion Standard; see R309/constitution/ARTICLE_XXXVI_TECHNOLOGY_TRANSFER_READY.md)
 **Amended:** 2026-08-26 (Article XXXVII — Synthetic Loop vs Real Loop Verification; see R339/constitution/ARTICLE_XXXVII_SYNTHETIC_VS_REAL_LOOP.md)
 **Amended:** 2026-08-27 (Article XXXVIII — The Reality Boundary; see R370F/constitution/ARTICLE_XXXVIII_THE_REALITY_BOUNDARY.md)
 **Amended:** 2026-09-01 (Article XXXIX — The Buyer-Distribution Repository Is the Final Authority; enforced by `scripts/r386_release_chain.py` + `ENGINE_RELEASE_REGISTRY.json` + `CANONICAL_RELEASE_MANIFEST.json`)
+**Amended:** 2026-09-04 (THE DISCOVERY IMPERATIVE + Articles XL–LXIII — the Discovery & Invention Constitution, per the CEO R402 directive after the R401-WC external audit: the Constitution's center of gravity moves from "do not lie about knowledge" to "do not mistake plausible generation for knowledge creation"; see `CODER_DIRECTIVE_R402.md`)
 **Authority:** Constitutional — supersedes all coding directives, gate results, and research priorities
-**Scope:** Governs both research output AND modifications to the epistemic machinery itself
+**Scope:** Governs both research output AND modifications to the epistemic machinery itself, AND — from v2.0.0 — what the machine may call a discovery or an invention
 
 ---
 
@@ -19,6 +20,37 @@ The lesson from v1→v26 is that the coder is capable of accidentally optimizing
 This constitution governs not only the research output, but **how the coder is allowed to modify the epistemic machinery itself**.
 
 The coder MUST read this constitution before every coding session and before every commit.
+
+---
+
+# THE DISCOVERY IMPERATIVE
+
+> ## **THE MACHINE SHALL NEVER CONFUSE GENERATION WITH DISCOVERY.**
+>
+> Generation produces possibilities.
+>
+> Discovery produces possibilities that survive increasingly independent attempts to show that they are wrong.
+>
+> Invention is therefore not defined by novelty of language, candidate count, model confidence, or document quality.
+>
+> **Invention is a surviving causal hypothesis with a defensible mechanism, evidence, engineering realization, measurable expected advantage, adversarial challenge, and a decisive path to reality.**
+
+The purpose of the system is not to generate plausible ideas. The purpose is to discover **technically meaningful opportunities for intervention**.
+
+```text
+Plausibility ≠ Discovery
+Novel wording ≠ Novel mechanism
+Candidate count ≠ Invention count
+Evidence count ≠ Evidence quality
+Simulation ≠ Reality
+Prediction ≠ Observation
+Archival memory ≠ Learning
+Package generation ≠ Commercial validation
+```
+
+A candidate shall not be called an invention solely because an AI model generated it. A candidate becomes a **DISCOVERY CANDIDATE** only when it satisfies the machine-defined discovery contract (Articles XLI–LXIII).
+
+**Evidence honesty is necessary. It is not sufficient.** This Constitution governs both **epistemic integrity** (Articles I–XXXIX) and **discovery integrity** (Articles XL–LXIII).
 
 ---
 
@@ -635,33 +667,30 @@ This violated Articles XXI.1, XXI.3, XXI.4, XXI.5, XXI.8, and XXI.10. The gravey
 
 ---
 
-## The Mandatory Coding Loop
+## The Mandatory Coding Loop (v2.0.0 — the discovery-machine loop)
 
-This coding loop is constitutional — the coder MUST follow it for every meaningful change:
+This coding loop is constitutional — the coder MUST follow it for every meaningful change. From v2.0.0 it is the **sixteen-step discovery loop** (CEO R402 directive); it supersedes — and deliberately subsumes — the ten-step v1 loop (READ CONSTITUTION → … → ONLY THEN COMMIT, retained in the git history per Article XI). Every v1 step survives as a component of the v2 steps (attack-the-implementation = step 10; positive/negative/metamorphic tests = steps 8–10; production immutability + provenance + canonical state = steps 2, 11, 14; honest reporting = steps 12–13).
 
 ```text
-READ CONSTITUTION
-      ↓
-STATE INTENDED CHANGE
-      ↓
-IDENTIFY EPISTEMIC RISK
-      ↓
-IMPLEMENT
-      ↓
-ATTACK THE IMPLEMENTATION
-      ↓
-RUN POSITIVE + NEGATIVE + METAMORPHIC TESTS
-      ↓
-CHECK PRODUCTION IMMUTABILITY
-      ↓
-CHECK PROVENANCE
-      ↓
-CHECK CANONICAL STATE
-      ↓
-REPORT FAILURES HONESTLY
-      ↓
-ONLY THEN COMMIT
+1.  READ CONSTITUTION
+2.  RECORD STATE
+3.  STATE THE SCIENTIFIC CLAIM BEING CHANGED
+4.  STATE THE MEASUREMENT THAT CAN FALSIFY IT
+5.  IDENTIFY THE CURRENT EVIDENCE
+6.  IDENTIFY THE INDEPENDENT EVALUATOR
+7.  IMPLEMENT
+8.  RUN BASELINE
+9.  RUN EXPERIMENT
+10. RUN ADVERSARIAL TEST
+11. REPLAY FROM CLEAN STATE
+12. CLASSIFY RESULT
+13. RECORD UNKNOWNS
+14. UPDATE LEARNING MEMORY
+15. COMMIT
+16. RE-RUN CONSTITUTIONAL GATES
 ```
+
+The difference between the two loops is the difference between a **software development constitution** and a **discovery-machine constitution**: steps 3–6 force every change to be an experiment with a claim, a falsifier, evidence, and an evaluator that is not the author; step 11 forbids "it worked once on my machine" from becoming a result; step 13 makes `PROVENANCE_INCOMPLETE` a first-class deliverable; step 14 makes learning a recorded state transition, not an archive append.
 
 ---
 
@@ -1207,3 +1236,712 @@ Any local checkout, engine-side copy, or summary that disagrees with the pushed 
 5. **Release protocol order.** Both repos clean and pushed at HEAD == origin/main BEFORE the build; release content committed and pushed to the buyer-distribution repository FIRST; manifest generated from the pushed state; engine registry entry recorded; then clean-clone verification. Release content that exists only in a local workspace is UNRELEASED by definition.
 
 6. **Honesty of the chain certificate.** The chain certificate must distinguish delivery verification (the bytes in the authority repository, verified from clean clones) from rebuild-from-source reproduction. The former never implies the latter (extends Articles XXV and XXVI).
+
+---
+
+# THE DISCOVERY & INVENTION CONSTITUTION
+
+**Ratified:** 2026-09-04 (Round R402, CEO constitutional directive after the R401-WC external audit + re-verification addendum)
+**Amends:** Constitution v1.9.0 → v2.0.0
+**Articles XL–LXIII.** Articles I–XXXIX are preserved verbatim as the historical foundation of **epistemic integrity**. These articles define **discovery integrity**: what the machine must be able to demonstrate before a candidate may be called a discovery or an invention.
+
+---
+
+## Article XL — The Discovery Imperative
+
+The purpose of the system is not to generate plausible ideas. The purpose is to discover **technically meaningful opportunities for intervention**.
+
+```text
+Plausibility ≠ Discovery
+Novel wording ≠ Novel mechanism
+Candidate count ≠ Invention count
+Evidence count ≠ Evidence quality
+Simulation ≠ Reality
+Prediction ≠ Observation
+Archival memory ≠ Learning
+Package generation ≠ Commercial validation
+```
+
+A candidate shall not be called an invention solely because an AI model generated it. A candidate becomes a **DISCOVERY CANDIDATE** only when it satisfies the machine-defined discovery contract.
+
+---
+
+## Article XLI — Mechanism Before Invention
+
+Every invention candidate must contain an explicit mechanism. Minimum canonical representation:
+
+```text
+PROBLEM
+→ FAILURE / UNMET NEED
+→ CAUSAL MECHANISM
+→ INTERVENTION
+→ PHYSICAL / CHEMICAL / COMPUTATIONAL EFFECT
+→ BOUNDARY CONDITIONS
+→ DESIGN VARIABLES
+→ PREDICTED EFFECT
+→ FAILURE MODES
+→ TESTABLE PREDICTION
+```
+
+A phenomenon is not automatically a mechanism. A correlation is not automatically a causal mechanism. A component change is not automatically an invention. A different parameter value is not automatically a different mechanism.
+
+---
+
+## Article XLII — Mechanism Distinctness Independence
+
+> **The generator SHALL NOT be the final authority on whether its own mechanisms are distinct.**
+
+The discovery engine must have a separate mechanism-distinctness authority. Distinctness must be evaluated using a representation independent of superficial wording. At minimum:
+
+```text
+causal structure
+physical effect
+intervention
+boundary regime
+failure mode
+engineering realization
+```
+
+The following MUST NOT independently create a new invention:
+
+```text
+synonym change
+sentence restructuring
+unit conversion
+parameter renaming
+design-knob renaming
+surface vocabulary variation
+```
+
+A mechanism-distinctness result must support:
+
+```text
+DISTINCT
+EQUIVALENT
+INDETERMINATE
+```
+
+not force a binary answer when evidence is insufficient. `INDETERMINATE` is a legitimate verdict: the instrument's inability to prove difference is not proof of difference (Article XXV), and its inability to prove equivalence is not proof of equivalence. Diversity metrics may count `DISTINCT` only.
+
+---
+
+## Article XLIII — Discovery Must Be Search-Space Neutral
+
+> **The machine SHALL NOT embed an unproven solution class into its search query before the problem has earned that solution class from evidence or mechanism reasoning.**
+
+The query must be derived from:
+
+```text
+problem facts
+failure mechanisms
+constraints
+frozen evidence
+domain ontology
+```
+
+Any solution-class injection must be explicitly marked:
+
+```text
+DERIVED_FROM_EVIDENCE
+```
+
+or
+
+```text
+EXPLORATORY_HYPOTHESIS
+```
+
+---
+
+## Article XLIV — Evidence Boundary
+
+Once evidence is frozen:
+
+> **No evidence may silently enter the reasoning process.**
+
+If additional retrieval is needed:
+
+```text
+NEW RETRIEVAL
+→ NEW EVIDENCE SNAPSHOT
+→ NEW FREEZE
+→ NEW EPISTEMIC VERSION
+```
+
+Never:
+
+```text
+FREEZE
+→ hidden retrieval
+→ merge hidden evidence
+→ generate invention
+```
+
+Every mechanism must record:
+
+```text
+evidence_snapshot_id
+evidence_hash
+retrieval_version
+retrieval_sources
+retrieval_timestamp
+```
+
+---
+
+## Article XLV — Generator / Verifier Separation
+
+Generation and verification must have **epistemic separation**, not merely different function names. Preferred hierarchy:
+
+```text
+Generator
+    ↓
+Independent evidence verifier
+    ↓
+Independent mechanism adjudicator
+    ↓
+Independent adversary
+    ↓
+Deterministic adjudication
+```
+
+The system must record the degree of independence:
+
+```text
+SEPARATE_MODEL_FAMILY
+SEPARATE_PROVIDER
+SEPARATE_CONTEXT_ONLY
+NOT_INDEPENDENT
+```
+
+`SEPARATE_CONTEXT_ONLY` must **never** be labelled "independent adversarial validation." If no independent attacker is available:
+
+```text
+ATTACK_INDEPENDENCE_UNAVAILABLE
+```
+
+not PASS.
+
+---
+
+## Article XLVI — Discovery Requires Causal Novelty
+
+> **Retrieval absence is not novelty proof.**
+
+A mechanism may be:
+
+```text
+known
+recombined
+adapted
+transferred
+generalized
+parameterized
+truly distinct
+unknown
+```
+
+The machine must distinguish these. A mechanism transferred from another domain is not novel merely because its application domain changed. It becomes interesting because the transfer may create a new causal architecture, new operating regime, new boundary condition, or new engineering advantage.
+
+---
+
+## Article XLVII — Baseline Supremacy
+
+Every serious invention candidate must be evaluated against a baseline:
+
+```text
+BASELINE
+CANDIDATE
+TARGET METRIC
+OPERATING CONDITIONS
+UNCERTAINTY
+```
+
+A candidate cannot be described as advantageous merely because the model predicts an advantage. The claim must eventually become:
+
+```text
+candidate metric
+vs
+baseline metric
+```
+
+with uncertainty and applicability stated.
+
+> **The baseline must remain unchanged across comparative arms.** The measurement instrument must be identical on both arms; a candidate may not be compared against a baseline that lacks the mechanism-space stage the candidate enjoyed, nor against an instrument that changed across the commit boundary between arms.
+
+---
+
+## Article XLVIII — Invention Diversity Must Be Measured, Not Counted
+
+```text
+5 candidates = 5 inventions
+```
+
+is forbidden. Instead:
+
+```text
+candidate count
+    ↓
+distinctness adjudication
+    ↓
+mechanism families
+    ↓
+materially distinct mechanisms
+```
+
+The canonical metric is **Material Mechanism Diversity (MMD)** and must report:
+
+```text
+number of independent mechanism families
+confidence interval
+adjudicator version
+benchmark version
+false-merge rate
+false-split rate
+```
+
+The distinctness instrument itself must be independently calibrated (Article VIII discipline applied to the distinctness instrument: a corpus authored before the matcher, with ground truths not derived from the matcher's own behavior).
+
+---
+
+## Article XLIX — Multi-Problem Discovery Requirement
+
+> **A behavioral discovery claim requires performance across a frozen multi-domain benchmark.**
+
+```text
+minimum 10 problems
+minimum 6 domains
+minimum 2 independent problems per major domain family
+```
+
+measuring:
+
+```text
+mechanism diversity
+evidence support
+engineering passage
+attack sensitivity
+baseline improvement
+experimental testability
+```
+
+The result must be reported by domain, not just as one average. No discovery capability may be declared validated on a single problem.
+
+---
+
+## Article L — The Attacker Must Be Calibrated
+
+Before attack results are allowed to influence world-class classification, a calibration corpus of:
+
+```text
+known-defect mechanisms
++
+known-good mechanisms
+```
+
+must exist. At minimum test:
+
+```text
+causal-invalidity
+boundary-condition failure
+evidence contradiction
+baseline equivalence
+implementation impossibility
+manufacturing failure
+measurement ambiguity
+scaling failure
+safety failure
+hidden dependency
+```
+
+Report:
+
+```text
+sensitivity by defect class
+false-kill rate
+independence state
+attack coverage
+```
+
+This makes the attacker a scientific instrument rather than a second LLM opinion.
+
+---
+
+## Article LI — Learning Must Change Future Search
+
+> **Negative knowledge is not an archive. Negative knowledge is a state-transition mechanism.**
+
+A killed invention must be capable of affecting subsequent search. The machine must be able to demonstrate:
+
+```text
+before failure knowledge
+        ↓
+candidate generation
+        ↓
+failure
+        ↓
+knowledge extraction
+        ↓
+future search modification
+        ↓
+measured behavioral change
+```
+
+The constitutional acceptance test is:
+
+> **Does incorporating prior failure knowledge change future behavior in the predicted direction?**
+
+If not, it remains archival memory. A cemetery that is written but never read by the generator is a log, not a memory.
+
+---
+
+## Article LII — Killer Experiment Is a Falsification Contract
+
+Every decisive experiment must contain:
+
+```text
+HYPOTHESIS
+TREATMENT
+CONTROL
+MEASUREMENT
+APPARATUS
+SAMPLE
+ACCEPTANCE THRESHOLD
+FALSIFICATION THRESHOLD
+UNCERTAINTY
+COST
+TIME
+SAFETY
+```
+
+And most importantly:
+
+> **There must exist an experimental outcome that kills the mechanism.**
+
+Experiment prioritization without a falsification contract is ranking, not science.
+
+---
+
+## Article LIII — Reality Cannot Be Simulated Into Existence
+
+The promotion ladder is explicit (extends Articles XXXVII–XXXVIII):
+
+```text
+MODEL_DERIVED
+↓
+COMPUTATIONAL_RESULT
+↓
+EXTERNAL_REFERENCE_DATA
+↓
+PHYSICAL_OBSERVATION
+↓
+REAL_LOOP_VERIFIED
+↓
+REPEATED_REALITY_VERIFIED
+```
+
+No state may skip a level. Multiple experiments are eventually required before the machine may call something robustly reality-validated.
+
+---
+
+## Article LIV — Every Invention Must Carry Its Own Kill Condition
+
+Every invention package must contain:
+
+```text
+WHY_IT_MAY_WORK
+WHY_IT_MAY_FAIL
+WHAT_WOULD_KILL_IT
+CHEAPEST_DECISIVE_TEST
+CURRENT_UNKNOWN
+NEXT_INFORMATION_GAIN
+```
+
+An invention without a kill condition is not a completed discovery object. It is a hypothesis.
+
+---
+
+## Article LV — Autonomous Discovery Loop
+
+The canonical loop:
+
+```text
+PROBLEM
+ ↓
+PROBLEM DECOMPOSITION
+ ↓
+EVIDENCE DISCOVERY
+ ↓
+EVIDENCE FREEZE
+ ↓
+CAUSAL MODEL
+ ↓
+UNRESOLVED GAP
+ ↓
+MECHANISM SEARCH
+ ↓
+MECHANISM DISTINCTION
+ ↓
+EVIDENCE VERIFICATION
+ ↓
+PRIOR-ART / STATE-OF-THE-ART COLLISION
+ ↓
+ENGINEERING REPRESENTATION
+ ↓
+COMPUTATIONAL VALIDATION
+ ↓
+BASELINE COMPARISON
+ ↓
+ADVERSARIAL ATTACK
+ ↓
+FALSIFICATION EXPERIMENT
+ ↓
+ADJUDICATION
+ ↓
+RELEASE / REJECT
+ ↓
+REALITY
+ ↓
+LEARNING
+ ↓
+NEXT SEARCH
+```
+
+Every stage needs a typed contract. Every stage needs a failure state. Every transition needs provenance. And **no stage may silently substitute a weaker operation while retaining the same epistemic label**.
+
+---
+
+## Article LVI — The Machine Must Optimize for Information Gain
+
+The machine should not optimize for:
+
+```text
+candidate count
+document count
+citation count
+pipeline completion
+survival rate
+package count
+```
+
+It should optimize for:
+
+> **expected reduction in uncertainty per unit of computational, experimental, and financial cost.**
+
+For each candidate:
+
+```text
+current uncertainty
+        ↓
+possible next action
+        ↓
+expected information gain
+        ↓
+cost
+        ↓
+risk
+        ↓
+decision impact
+```
+
+---
+
+## Article LVII — Discovery Portfolio Principle
+
+For every difficult problem, where applicable, the search should explore different regions of mechanism space:
+
+```text
+CONSERVATIVE MECHANISM
+ALTERNATIVE MECHANISM
+CROSS-DOMAIN TRANSFER
+BOUNDARY-CONDITION CHANGE
+FAILURE-PATH INVERSION
+GEOMETRIC / TOPOLOGICAL CHANGE
+```
+
+The goal is not to force six operators. The goal is to ensure that the search explores **different regions of mechanism space**.
+
+---
+
+## Article LVIII — No Self-Scored World-Class Claims
+
+> **The system may not certify its own world-class status using an evaluator whose behavior was optimized by the system itself.**
+
+World-class qualification requires independent evaluation. At least:
+
+```text
+independent benchmark
+independent adjudication
+independent attack
+independent reproducibility
+```
+
+and eventually:
+
+```text
+independent physical validation
+independent technical review
+```
+
+---
+
+## Article LIX — No Benchmark Gaming
+
+Once a benchmark is frozen:
+
+```text
+NO PROMPT TUNING
+NO THRESHOLD TUNING
+NO OPERATOR TUNING
+NO RETRIEVAL TUNING
+NO MODEL SELECTION
+```
+
+against the held-out benchmark. All tuning happens on a separate development set. Then:
+
+```text
+DEVELOPMENT SET
+→ FREEZE
+→ BLIND TEST
+→ EXTERNAL AUDIT
+```
+
+---
+
+## Article LX — Discovery Classification Ladder
+
+```text
+HYPOTHESIZED
+      ↓
+EVIDENCE_SUPPORTED
+      ↓
+MECHANISTICALLY_COHERENT
+      ↓
+INDEPENDENTLY_CHALLENGED
+      ↓
+COMPUTATIONALLY_SUPPORTED
+      ↓
+ENGINEERINGALLY_REPRESENTED
+      ↓
+EXPERIMENT_READY
+      ↓
+PHYSICALLY_OBSERVED
+      ↓
+REALITY_REPLICATED
+      ↓
+TECHNOLOGY_TRANSFER_READY
+```
+
+The system must never move upward simply because a report was generated. Each transition requires evidence.
+
+---
+
+## Article LXI — Infrastructure Failure Is Never Scientific Rejection
+
+These must be distinct:
+
+```text
+REJECTED_SCIENTIFIC
+REJECTED_ENGINEERING
+REJECTED_EVIDENCE
+REJECTED_PRIOR_ART
+REJECTED_ATTACK
+REJECTED_EXPERIMENT
+INCOMPLETE_INFRASTRUCTURE_FAILURE
+INCOMPLETE_DATA_FAILURE
+INCOMPLETE_INFERENCE_FAILURE
+```
+
+A missing LLM transport, a skipped stage, a provider outage, or an unevaluated gate is an `INCOMPLETE_*` or `UNKNOWN` state. Converting it into `REJECTED` manufactures negative knowledge from infrastructure and contaminates scientific statistics (extends Articles XXI.3 and XXV to the terminal decision field).
+
+---
+
+## Article LXII — Reproducibility Is Part of Discovery
+
+A discovery that cannot be reconstructed is not a fully certified discovery. Every serious result needs:
+
+```text
+problem hash
+evidence snapshot hash
+prompt hash
+model identifier
+model configuration
+candidate hash
+mechanism representation
+adjudicator version
+solver version
+attack version
+experiment version
+code commit
+environment
+result hash
+```
+
+And:
+
+> **Every headline scientific metric must be regenerable from committed or immutable evidence.**
+
+No machine-bound paths. No hidden external fixtures. No uncommitted run directory carrying the project's central claim.
+
+---
+
+## Article LXIII — Buyer Reality Principle
+
+The final output is not "here is an interesting AI-generated idea." It is:
+
+> **"Here is a technically characterized opportunity, here is what supports it, here is what remains unknown, here is how it can be killed, here is what it would cost to learn whether it works, and here is why a company might rationally spend that money."**
+
+That is the constitutional definition of a technology package.
+
+---
+
+# THE FOUR CONSTITUTIONAL LAYERS
+
+```text
+CONSTITUTION
+    ↓
+WHAT MUST ALWAYS BE TRUE
+
+DISCOVERY CONTRACTS
+    ↓
+WHAT A VALID MECHANISM / INVENTION / EXPERIMENT MEANS
+
+BENCHMARKS
+    ↓
+HOW WE MEASURE WHETHER IT WORKS
+
+IMPLEMENTATION
+    ↓
+HOW THE CURRENT VERSION ACHIEVES IT
+```
+
+When the implementation changes, the scientific standard does not. For example: **Constitution** — mechanisms must be materially distinct (Article XLII); **Discovery contract** — the canonical mechanism representation (Article XLI); **Benchmark** — an independently labelled distinctness corpus authored before any matcher; **Implementation** — the current structural matcher / embedding judge / whatever eventually wins. The Constitution specifies invariants and evidentiary standards. Implementation can change. The scientific contract cannot. The Constitution does not dictate specific models, providers, or matchers — those live in versioned technical policies and benchmarks, never in constitutional law.
+
+---
+
+# WORLD_CLASS_DISCOVERY_GATE
+
+One immutable constitutional gate. It cannot become GREEN merely because code coverage is high. It requires measured evidence for:
+
+```text
+✓ multi-domain discovery                     (Article XLIX)
+✓ mechanism distinctness                     (Article XLII/XLVIII)
+✓ evidence grounding                         (Articles I–III, XLIV)
+✓ causal coherence                           (Article XLI)
+✓ independent attack                         (Articles XLV, L, LVIII)
+✓ known-defect attack sensitivity            (Article L)
+✓ baseline comparison                        (Article XLVII)
+✓ engineering representability               (Article LX)
+✓ computational validation                   (Articles LIII, LX)
+✓ falsifiable experiment                     (Article LII)
+✓ reproducibility                            (Article LXII)
+✓ learning from failure                      (Article LI)
+✓ physical validation                        (Articles XXXVII, XXXVIII, LIII)
+✓ technology-transfer package quality        (Articles XXXVI, LXIII)
+```
+
+And the final question remains:
+
+> **Does the machine repeatedly discover mechanisms that an independent technical evaluator could reasonably decide are worth building or testing?**
+
+That is the constitutional north star.

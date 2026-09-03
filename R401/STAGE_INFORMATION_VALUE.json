@@ -28,11 +28,13 @@
    "decision_dependency": false,
    "learning_dependency": false,
    "provenance_dependency": false,
+   "depends_on": [],
    "downstream_consumers": [
     "MECHANISM_SPACE",
     "SYNTHESIZE",
     "VERIFY"
    ],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "A2_RETRIEVAL",
    "canonical_module": "discovery_fabric/a2/retrieve.py"
   },
@@ -44,7 +46,11 @@
    "decision_dependency": false,
    "learning_dependency": false,
    "provenance_dependency": true,
+   "depends_on": [
+    "RETRIEVE"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "EVIDENCE_FREEZE",
    "canonical_module": "orchestrator/evidence_custody.py"
   },
@@ -56,6 +62,7 @@
    "decision_dependency": false,
    "learning_dependency": false,
    "provenance_dependency": false,
+   "depends_on": [],
    "downstream_consumers": [
     "ADJUDICATION",
     "ATTACK",
@@ -71,6 +78,7 @@
     "SYNTHESIZE",
     "VERIFY"
    ],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "PREMISE_GATE",
    "canonical_module": "discovery_fabric/engine/premise_gate.py"
   },
@@ -82,6 +90,9 @@
    "decision_dependency": false,
    "learning_dependency": true,
    "provenance_dependency": false,
+   "depends_on": [
+    "RETRIEVE"
+   ],
    "downstream_consumers": [
     "ADJUDICATION",
     "ATTACK",
@@ -96,6 +107,7 @@
     "RANK",
     "VERIFY"
    ],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "SYNTHESIS",
    "canonical_module": "discovery_fabric/a2/synthesize.py"
   },
@@ -107,7 +119,11 @@
    "decision_dependency": false,
    "learning_dependency": false,
    "provenance_dependency": true,
+   "depends_on": [
+    "SYNTHESIZE"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "EVIDENCE_VERIFY",
    "canonical_module": "discovery_fabric/a2/verify.py"
   },
@@ -119,7 +135,12 @@
    "decision_dependency": false,
    "learning_dependency": true,
    "provenance_dependency": false,
+   "depends_on": [
+    "RETRIEVE",
+    "SYNTHESIZE"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "MECHANISM_SPACE",
    "canonical_module": "discovery_fabric/engine/mechanism_space.py"
   },
@@ -131,7 +152,11 @@
    "decision_dependency": false,
    "learning_dependency": false,
    "provenance_dependency": false,
+   "depends_on": [
+    "SYNTHESIZE"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "MULTI_SOURCE_DISCOVERY",
    "canonical_module": "orchestrator/multi_source_discovery.py"
   },
@@ -143,7 +168,11 @@
    "decision_dependency": true,
    "learning_dependency": false,
    "provenance_dependency": true,
+   "depends_on": [
+    "SYNTHESIZE"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "COLLISION_ENGINE",
    "canonical_module": "discovery_fabric/prior_art_v2/collision_resolution.py + discovery_fabric/a2/prior_art.py"
   },
@@ -155,7 +184,11 @@
    "decision_dependency": true,
    "learning_dependency": false,
    "provenance_dependency": false,
+   "depends_on": [
+    "SYNTHESIZE"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "PHYSICS_GATE",
    "canonical_module": "discovery_fabric/engine/physics_stage.py"
   },
@@ -167,7 +200,13 @@
    "decision_dependency": true,
    "learning_dependency": false,
    "provenance_dependency": false,
+   "depends_on": [
+    "SYNTHESIZE",
+    "VERIFY",
+    "COLLISION"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "ATTACK_ENGINE",
    "canonical_module": "discovery_fabric/a2/adversarial.py"
   },
@@ -179,7 +218,12 @@
    "decision_dependency": false,
    "learning_dependency": false,
    "provenance_dependency": false,
+   "depends_on": [
+    "ATTACK",
+    "COLLISION"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "CONTRADICTION_QUEUE",
    "canonical_module": "orchestrator/contradiction_queue.py"
   },
@@ -191,7 +235,12 @@
    "decision_dependency": false,
    "learning_dependency": true,
    "provenance_dependency": false,
+   "depends_on": [
+    "CONTRADICTION",
+    "SYNTHESIZE"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "KILLER_EXPERIMENT",
    "canonical_module": "epistemic_integrity/invention_loop_engine/bayesian_eig.py"
   },
@@ -203,7 +252,14 @@
    "decision_dependency": true,
    "learning_dependency": false,
    "provenance_dependency": false,
+   "depends_on": [
+    "VERIFY",
+    "ATTACK",
+    "CONTRADICTION",
+    "COLLISION"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "ADJUDICATION",
    "canonical_module": "discovery_fabric/engine/adapters.py (glue over canonical inputs)"
   },
@@ -215,7 +271,11 @@
    "decision_dependency": true,
    "learning_dependency": false,
    "provenance_dependency": false,
+   "depends_on": [
+    "ADJUDICATION"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "EPISTEMIC_CLASSIFICATION",
    "canonical_module": "discovery_fabric/a2/classify.py"
   },
@@ -227,7 +287,13 @@
    "decision_dependency": false,
    "learning_dependency": true,
    "provenance_dependency": false,
+   "depends_on": [
+    "CONTRADICTION",
+    "KILLER_EXPERIMENT",
+    "ADJUDICATION"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "NEXT_BEST_ACTION",
    "canonical_module": "orchestrator/next_best_action.py"
   },
@@ -239,7 +305,12 @@
    "decision_dependency": true,
    "learning_dependency": false,
    "provenance_dependency": true,
+   "depends_on": [
+    "ADJUDICATION",
+    "NEXT_BEST_ACTION"
+   ],
    "downstream_consumers": [],
+   "downstream_consumers_semantics": "conductor skip-cascade policy (run.py DOWNSTREAM_BLOCKERS: which stage failures abort which downstream compute) \u2014 NOT the data dependency graph; the declared graph is per-stage 'depends_on' + the top-level declared_dependency_graph",
    "capability_id": "PORTFOLIO_RANKING",
    "canonical_module": "orchestrator/portfolio.py + deterministic score in adapter"
   },
@@ -309,6 +380,64 @@
    "note": "quality + release gate + buyer package"
   }
  ],
+ "declared_dependency_graph": {
+  "RETRIEVE": [],
+  "FREEZE": [
+   "RETRIEVE"
+  ],
+  "PREMISE_GATE": [],
+  "SYNTHESIZE": [
+   "RETRIEVE"
+  ],
+  "VERIFY": [
+   "SYNTHESIZE"
+  ],
+  "MECHANISM_SPACE": [
+   "RETRIEVE",
+   "SYNTHESIZE"
+  ],
+  "MULTI_SOURCE_DISCOVERY": [
+   "SYNTHESIZE"
+  ],
+  "COLLISION": [
+   "SYNTHESIZE"
+  ],
+  "PHYSICS": [
+   "SYNTHESIZE"
+  ],
+  "ATTACK": [
+   "SYNTHESIZE",
+   "VERIFY",
+   "COLLISION"
+  ],
+  "CONTRADICTION": [
+   "ATTACK",
+   "COLLISION"
+  ],
+  "KILLER_EXPERIMENT": [
+   "CONTRADICTION",
+   "SYNTHESIZE"
+  ],
+  "ADJUDICATION": [
+   "VERIFY",
+   "ATTACK",
+   "CONTRADICTION",
+   "COLLISION"
+  ],
+  "CLASSIFY": [
+   "ADJUDICATION"
+  ],
+  "NEXT_BEST_ACTION": [
+   "CONTRADICTION",
+   "KILLER_EXPERIMENT",
+   "ADJUDICATION"
+  ],
+  "RANK": [
+   "ADJUDICATION",
+   "NEXT_BEST_ACTION"
+  ]
+ },
+ "declared_dependency_graph_semantics": "the adapters' depends_on (stage-name namespace, R402 NF-1 fix): which stages must have produced their outputs before this stage's contract holds. DISTINCT from the conductor's skip-cascade policy (DOWNSTREAM_BLOCKERS) \u2014 the two maps answer different questions and both are recorded, labeled, and never conflated (Art. X)",
  "canonical_authority_map": {
   "equation_identity": {
    "module": "discovery_fabric/engine/equation_authority.py",

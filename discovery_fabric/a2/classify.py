@@ -56,17 +56,49 @@ NON_KILL_STATES = {
 
 def classify(candidate: dict, evidence_verification: dict, prior_art: dict, adversarial: dict) -> dict:
     """Step 7: Assign epistemic state. No silent promotion.
-    
+
     PRIOR_ART_KILL_REQUIRES_SPECIFIC_DISCLOSURE = TRUE (Item 10a)
     Only SPECIFIC_DISCLOSURE or IDENTICAL_OR_NEAR_IDENTICAL_DISCLOSURE may kill.
     TOPICAL_RELATED, POSSIBLE_RELEVANCE, NO_MATCH_FOUND do NOT kill.
+
+    R402 (audit NF-2, Art. XXV/LXI): an UNEVALUATED verification (the
+    VERIFY stage never ran — skipped, disabled, or failed upstream) is
+    NOT negative knowledge. Converting "never evaluated" into
+    REJECTED/"evidence verification failed" manufactures negative
+    knowledge from an infrastructure state and contaminates the
+    scientific statistics (the audit reproduced it: VERIFY+SYNTHESIZE
+    disabled -> final REJECTED). The honest outcome is UNKNOWN with
+    the stage state named; only an evaluation that ACTUALLY RAN and
+    failed may reject — and then it must say WHY (the issues).
     """
     state = "OBSERVED"
 
     # Can only promote if evidence is verified
     if not evidence_verification.get("verified"):
+        # distinguish EVALUATED-AND-FAILED from NEVER-EVALUATED
+        # (Art. XXV/LXI): a verification record that exists and carries
+        # an evaluation is negative knowledge; an absent/empty record
+        # means the stage never produced one — UNKNOWN, rerunnable
+        evaluated = bool(evidence_verification) and (
+            "verified" in evidence_verification
+            or evidence_verification.get("state") not in (
+                None, "NOT_RUN", "SKIPPED", "DISABLED", ""))
+        if not evaluated:
+            return {
+                "epistemic_state": "OBSERVED", "final_status": "UNKNOWN",
+                "reason": ("evidence verification NOT_EVALUATED — the "
+                           "verification stage did not produce a verdict "
+                           "(skipped/disabled/upstream failure); not a "
+                           "scientific verdict, never negative knowledge "
+                           "(Art. XXV/LXI); rerunnable"),
+                "promotion_blocked": True, "adjudication_blocked": True,
+                "verification_state": "NOT_EVALUATED"}
+        issues = evidence_verification.get("issues") or []
+        issue_text = "; ".join(str(i) for i in issues[:5]) or "no issues recorded"
         return {"epistemic_state": "OBSERVED", "final_status": "REJECTED",
-                "reason": "evidence verification failed", "promotion_blocked": True}
+                "reason": (f"evidence verification failed: {issue_text}"),
+                "promotion_blocked": True,
+                "verification_state": "EVALUATED_FAILED"}
 
     state = "INFERRED"
 
@@ -130,11 +162,18 @@ def classify(candidate: dict, evidence_verification: dict, prior_art: dict, adve
     # Check adversarial — Item 11: adversarial firewall
     # Adversarial may NOT convert TOPICAL_RELATED or POSSIBLE_RELEVANCE into prior-art kill
     if adversarial.get("overall") != "PASS":
-        # Check if the adversarial kill is based on prior art
-        adv_reason = adversarial.get("reason", "").lower()
+        # R402 (audit CB-6): the terminal reason must carry the kill
+        # dimensions — never an empty trailing colon. The kill basis
+        # lives in adversarial["attacks"] (dimension -> verdict text);
+        # surface it when the top-level reason is absent or thin.
         attacks = adversarial.get("attacks", {})
+        killed_dims = [k for k, v in attacks.items()
+                       if "KILLED" in str(v).upper()]
+        dim_detail = ", ".join(
+            f"{k}: {str(attacks[k])[:80]}" for k in killed_dims)
+        adv_reason = str(adversarial.get("reason", "") or "").strip()
         prior_art_attack = attacks.get("prior_art", "")
-        
+
         # If prior_art state is non-kill, adversarial cannot use prior art to kill
         if pa_status in NON_KILL_STATES and "KILLED" in prior_art_attack.upper():
             # Adversarial tried to convert non-kill prior art into kill — BLOCK this
@@ -144,12 +183,19 @@ def classify(candidate: dict, evidence_verification: dict, prior_art: dict, adve
                 # Only prior_art kill — but prior_art state is non-kill → don't kill
                 pass  # Continue
             else:
+                other_detail = ", ".join(
+                    f"{k}: {str(attacks[k])[:80]}" for k in other_kills)
                 return {"epistemic_state": "CANDIDATE_CONNECTION", "final_status": "REJECTED",
-                        "reason": f"adversarial challenge failed: {', '.join(other_kills)}",
+                        "reason": (f"adversarial challenge failed: "
+                                   f"{other_detail}"),
                         "promotion_blocked": True}
         else:
+            detail = adv_reason or dim_detail or "no kill basis recorded"
+            reason = (f"adversarial challenge failed: {detail}")
+            if dim_detail and dim_detail.lower() not in adv_reason.lower():
+                reason = (f"{reason}; killed dimensions: {dim_detail}")
             return {"epistemic_state": "CANDIDATE_CONNECTION", "final_status": "REJECTED",
-                    "reason": f"adversarial challenge failed: {adv_reason}",
+                    "reason": reason,
                     "promotion_blocked": True}
 
     state = "MECHANISTIC_HYPOTHESIS"

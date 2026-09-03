@@ -21,12 +21,30 @@ coagulation mechanism' returns 4580). Two Art. XXI defects existed here:
       provenance; nothing is silently substituted.
 """
 from __future__ import annotations
-import json, re, hashlib, ssl, time, urllib.request, urllib.parse
+import json, os, re, hashlib, ssl, time, urllib.request, urllib.parse
 from datetime import datetime, timezone
 
-_SSL = ssl.create_default_context()
-_SSL.check_hostname = False
-_SSL.verify_mode = ssl.CERT_NONE
+
+def _tls_verify_enabled() -> bool:
+    """R402 (audit CB-10, security): TLS verification is ON by default.
+    The v1 module disabled it globally (check_hostname=False,
+    verify_mode=CERT_NONE) — evidence provenance was MITM-able for every
+    production retrieval. Opt-out remains an EXPLICIT, recorded operator
+    action (ENGINE_TLS_VERIFY=0), never a silent global; a verification
+    failure raises SearchProviderFailure (Art. XXI.3 — provider failure,
+    never absence), so a broken trust store surfaces loudly instead of
+    silently degrading to insecure retrieval."""
+    flag = os.environ.get("ENGINE_TLS_VERIFY", "1").strip().lower()
+    return flag not in ("0", "false", "no", "off")
+
+
+_TLS_VERIFY_ENABLED = _tls_verify_enabled()
+if _TLS_VERIFY_ENABLED:
+    _SSL = ssl.create_default_context()
+else:
+    _SSL = ssl.create_default_context()
+    _SSL.check_hostname = False
+    _SSL.verify_mode = ssl.CERT_NONE
 
 
 class SearchProviderFailure(RuntimeError):
@@ -67,7 +85,8 @@ def search_europe_pmc(query: str, per_page: int = 5) -> list[dict]:
                 "title": r.get("title", "") or "", "abstract": abstract[:2000],
                 "doi": r.get("doi", "") or None, "publication_date": r.get("firstPublicationDate", "") or None,
                 "retrieval_timestamp": now, "retrieval_method": "europepmc_api", "content_hash": content_hash,
-                "provenance": {"provider": "EuropePMC", "retrieved_at": now, "query_or_method": query, "api_version": "rest"},
+                "tls_verified": _TLS_VERIFY_ENABLED,
+                "provenance": {"provider": "EuropePMC", "retrieved_at": now, "query_or_method": query, "api_version": "rest", "tls_verified": _TLS_VERIFY_ENABLED},
                 "epistemic_state": "OBSERVED",
             })
         return items

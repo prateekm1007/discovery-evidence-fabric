@@ -178,6 +178,15 @@ class BaseAdapter:
     module_path = ""
     canonical_fn = ""
     needs_network = False
+    # R402 (audit NF-1): depends_on is declared in the STAGE-NAME
+    # namespace — the SAME namespace as STAGE_ORDER. The v1 values used
+    # capability IDs (A2_RETRIEVAL, SYNTHESIS, EVIDENCE_VERIFY, ...) which
+    # resolve to NO stage: 12 of 16 stages' declared dependencies were
+    # unresolvable and any consumer of the declared graph (introspection
+    # tooling, auditors, future orchestrators) got a false picture.
+    # Contract (pinned by test): every entry resolves to a stage in
+    # STAGE_ORDER. capability_id remains the CAPABILITY namespace —
+    # the two vocabularies never mix in depends_on.
     depends_on: List[str] = []
 
     input_contract = {}
@@ -213,7 +222,7 @@ class EvidenceFreezeAdapter(BaseAdapter):
     capability_id = "EVIDENCE_FREEZE"
     module_path = "orchestrator/evidence_custody.py"
     canonical_fn = "promote_to_evidence(record, source, query, class, binding)"
-    depends_on = ["A2_RETRIEVAL"]
+    depends_on = ["RETRIEVE"]
 
     def execute(self, env, run_ctx):
         ec = importlib.import_module("orchestrator.evidence_custody")
@@ -280,7 +289,7 @@ class SynthesizeAdapter(BaseAdapter):
     module_path = "discovery_fabric/a2/synthesize.py"
     canonical_fn = "synthesize(problem, evidence)"
     needs_network = True
-    depends_on = ["A2_RETRIEVAL"]
+    depends_on = ["RETRIEVE"]
 
     def execute(self, env, run_ctx):
         if not env.evidence:
@@ -330,7 +339,7 @@ class EvidenceVerifyAdapter(BaseAdapter):
     capability_id = "EVIDENCE_VERIFY"
     module_path = "discovery_fabric/a2/verify.py"
     canonical_fn = "verify_evidence(candidate, evidence)"
-    depends_on = ["SYNTHESIS"]
+    depends_on = ["SYNTHESIZE"]
 
     def execute(self, env, run_ctx):
         mod = importlib.import_module("discovery_fabric.a2.verify")
@@ -387,7 +396,7 @@ class MechanismSpaceAdapter(BaseAdapter):
     module_path = "discovery_fabric/engine/mechanism_space.py"
     canonical_fn = "build_mechanism_space(problem, evidence)"
     needs_network = True
-    depends_on = ["A2_RETRIEVAL", "SYNTHESIS"]
+    depends_on = ["RETRIEVE", "SYNTHESIZE"]
 
     input_contract = {"problem": "problem dict",
                       "evidence": "envelope.evidence (custodied items)"}
@@ -430,7 +439,7 @@ class MultiSourceDiscoveryAdapter(BaseAdapter):
     module_path = "orchestrator/multi_source_discovery.py"
     canonical_fn = "run_four_search_attack(name, mechanism, problem, failure_mode, adjacent)"
     needs_network = True
-    depends_on = ["SYNTHESIS"]
+    depends_on = ["SYNTHESIZE"]
 
     def execute(self, env, run_ctx):
         msd = importlib.import_module("orchestrator.multi_source_discovery")
@@ -506,7 +515,7 @@ class CollisionEngineAdapter(BaseAdapter):
                    "discovery_fabric/a2/prior_art.py")
     canonical_fn = "run_collision (mechanism-centered) + search_prior_art"
     needs_network = True
-    depends_on = ["SYNTHESIS"]
+    depends_on = ["SYNTHESIZE"]
 
     def execute(self, env, run_ctx):
         # ---------------- scientific side (EuropePMC) -------------------
@@ -624,7 +633,7 @@ class PhysicsStageAdapter(BaseAdapter):
     module_path = "discovery_fabric/engine/physics_stage.py"
     canonical_fn = "evaluate_envelope_physics(env, run_ctx)"
     needs_network = False
-    depends_on = ["SYNTHESIS"]
+    depends_on = ["SYNTHESIZE"]
 
     input_contract = {"mechanism_map": "the synthesized mechanism",
                       "problem": "device/failure/constraint for domain "
@@ -665,7 +674,7 @@ class AttackEngineAdapter(BaseAdapter):
     module_path = "discovery_fabric/a2/adversarial.py"
     canonical_fn = "adversarial_challenge(candidate, evidence_verified, prior_art_state)"
     needs_network = True
-    depends_on = ["SYNTHESIS", "EVIDENCE_VERIFY", "COLLISION_ENGINE"]
+    depends_on = ["SYNTHESIZE", "VERIFY", "COLLISION"]
 
     def execute(self, env, run_ctx):
         mod = _import_with_env("discovery_fabric.a2.adversarial")
@@ -688,7 +697,7 @@ class ContradictionQueueAdapter(BaseAdapter):
     capability_id = "CONTRADICTION_QUEUE"
     module_path = "orchestrator/contradiction_queue.py"
     canonical_fn = "ContradictionQueue.add / to_dict"
-    depends_on = ["ATTACK_ENGINE", "COLLISION_ENGINE"]
+    depends_on = ["ATTACK", "COLLISION"]
 
     def execute(self, env, run_ctx):
         from orchestrator.contradiction_queue import ContradictionQueue
@@ -738,7 +747,7 @@ class KillerExperimentAdapter(BaseAdapter):
     capability_id = "KILLER_EXPERIMENT"
     module_path = "epistemic_integrity/invention_loop_engine/bayesian_eig.py"
     canonical_fn = "BayesianEIGCalculator.rank_experiments"
-    depends_on = ["CONTRADICTION_QUEUE", "SYNTHESIS"]
+    depends_on = ["CONTRADICTION", "SYNTHESIZE"]
 
     def execute(self, env, run_ctx):
         beig = _load_by_path(
@@ -837,8 +846,8 @@ class AdjudicationAdapter(BaseAdapter):
     capability_id = "ADJUDICATION"
     module_path = "discovery_fabric/engine/adapters.py (glue over canonical inputs)"
     canonical_fn = "deterministic check aggregation"
-    depends_on = ["EVIDENCE_VERIFY", "ATTACK_ENGINE", "CONTRADICTION_QUEUE",
-                  "COLLISION_ENGINE"]
+    depends_on = ["VERIFY", "ATTACK", "CONTRADICTION",
+                  "COLLISION"]
 
     def execute(self, env, run_ctx):
         ev = env.adjudication.get("evidence_verification") or {}
@@ -922,7 +931,7 @@ class NextBestActionAdapter(BaseAdapter):
     capability_id = "NEXT_BEST_ACTION"
     module_path = "orchestrator/next_best_action.py"
     canonical_fn = "NextBestAction.rank_actions/select_best"
-    depends_on = ["CONTRADICTION_QUEUE", "KILLER_EXPERIMENT", "ADJUDICATION"]
+    depends_on = ["CONTRADICTION", "KILLER_EXPERIMENT", "ADJUDICATION"]
 
     def execute(self, env, run_ctx):
         from orchestrator.next_best_action import Action, NextBestAction
@@ -1019,28 +1028,19 @@ class PortfolioRankingAdapter(BaseAdapter):
         return _engine_result({"ranking": payload}, score=score)
 
 
-class MechanismCemeteryAdapter(BaseAdapter):
-    """Canonical: orchestrator/mechanism_cemetery.py (append-only negative
-    knowledge). CHECK runs inside the loop; UPDATE (save) happens only at
-    conductor level after a final KILL/REJECT, keeping D8's stage list exact."""
-    capability_id = "MECHANISM_CEMETERY"
-    module_path = "orchestrator/mechanism_cemetery.py"
-    canonical_fn = "check_candidate_against_cemetery"
-    depends_on = ["SYNTHESIS"]
-
-    def execute(self, env, run_ctx):
-        mc = importlib.import_module("orchestrator.mechanism_cemetery")
-        mm = env.mechanism_map
-        desc = " ".join([mm.get("intervention", ""), mm.get("mechanism", ""),
-                         mm.get("expected_effect", "")])[:2000]
-        res = mc.check_candidate_against_cemetery(desc)
-        return _engine_result({"cemetery_check": res},
-                              verdict=res.get("verdict"))
-
-
 class _CemeterySubCheck:
     """Internal helper used by AdjudicationAdapter (keeps D8 stage list exact
-    while still consulting negative knowledge inside the loop)."""
+    while still consulting negative knowledge inside the loop).
+
+    R402 (audit CB-9): the STANDALONE MechanismCemeteryAdapter that was
+    registered in ADAPTERS under "CEMETERY_CHECK" is REMOVED — it was
+    registered but unreachable (absent from STAGE_ORDER: the cemetery
+    check runs as THIS sub-check of ADJUDICATION and the cemetery
+    UPDATE is conductor-level after a final KILL/REJECT, per the D8
+    directive). A registered-but-unreachable adapter is a shadow
+    capability (Art. X: one authority, no dead registrations).
+    ADAPTERS keys now equal STAGE_ORDER entries exactly — pinned by
+    test."""
 
     @staticmethod
     def verdict(env) -> Dict[str, Any]:
@@ -1076,8 +1076,12 @@ ADAPTERS = {
     "CLASSIFY": EpistemicClassificationAdapter(),
     "NEXT_BEST_ACTION": NextBestActionAdapter(),
     "RANK": PortfolioRankingAdapter(),
-    "CEMETERY_CHECK": MechanismCemeteryAdapter(),
 }
+# R402 (audit CB-9): the dead "CEMETERY_CHECK" registration is removed —
+# ADAPTERS keys == STAGE_ORDER entries, one namespace, no unreachable
+# registrations (the cemetery check is the ADJUDICATION sub-check via
+# _CemeterySubCheck; the cemetery UPDATE is conductor-level after a
+# final KILL/REJECT). Pinned by test.
 
 # Stage order per CEO directive D8 (exact chain; cemetery negative-knowledge
 # check is a sub-check of ADJUDICATION; cemetery UPDATE is conductor-level).

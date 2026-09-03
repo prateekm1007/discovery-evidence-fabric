@@ -29,6 +29,51 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CEMETERY_PATH = REPO_ROOT / "MECHANISM_CEMETERY" / "CEMETERY.json"
 
 
+# R402 (audit CB-5): meta-vocabulary that appears in ANY candidate text
+# regardless of domain — these can never establish domain match (they
+# are the epistemic envelope every entry shares, not physics).
+_CEMETERY_META_TERMS = frozenset({
+    "mechanism", "mechanisms", "system", "systems", "device", "devices",
+    "candidate", "candidates", "constraint", "constraints", "physical",
+    "physics", "proven", "invariant", "invariants", "impossible",
+    "impossibility", "lesson", "lessons", "fail", "failed", "failure",
+    "failures", "proposed", "propose", "proposal", "version", "versions",
+    "always", "never", "check", "must", "cannot", "may", "should",
+    "would", "could", "without", "first", "any", "all", "none",
+    "combined", "combination", "engineering", "complexity", "benefit",
+    "different", "single", "multiple", "value", "values", "class",
+    "classes", "avoid", "based", "compare", "dominated", "pareto",
+})
+
+
+def entry_domain_terms(entry: "CemeteryEntry") -> List[str]:
+    """R402 (audit CB-5): derive the entry's domain vocabulary from its
+    OWN text — physical_constraint + mechanism_name + what_to_avoid +
+    reusable_lesson — stopword-normalized, meta-terms removed, sorted
+    deterministically. Universal: an invariant written in ANY domain's
+    vocabulary carries its own matching terms (the v1 hardcoded
+    three-domain elif ladder made every other domain dead code)."""
+    try:
+        from discovery_fabric.source_registry.query_relevance import (
+            terms as _terms)
+    except Exception:  # noqa: BLE001 — fallback tokenizer, same output shape
+        import re as _re
+
+        def _terms(text):
+            return {w for w in _re.findall(r"[a-z]{4,}",
+                                           str(text or "").lower())
+                    if w not in _CEMETERY_META_TERMS}
+    vocab: set = set()
+    for field_text in (getattr(entry, "physical_constraint", "") or "",
+                       getattr(entry, "mechanism_name", "") or "",
+                       getattr(entry, "what_to_avoid", "") or "",
+                       getattr(entry, "reusable_lesson", "") or ""):
+        vocab.update(t for t in _terms(field_text)
+                     if len(t) >= 4 and t not in _CEMETERY_META_TERMS
+                     and not t.isdigit())
+    return sorted(vocab)[:24]
+
+
 @dataclass(frozen=True)
 class CemeteryEntry:
     """A killed mechanism with reusable lessons.
@@ -329,16 +374,25 @@ def check_candidate_against_cemetery(candidate_description: str) -> Dict:
             # This is NOT keyword matching — it's checking if the candidate's domain
             # matches the invariant's domain
             candidate_lower = candidate_description.lower()
-            constraint_lower = entry.physical_constraint.lower()
 
-            # Extract key domain terms from the constraint
-            domain_terms = []
-            if "csf turnover" in constraint_lower or "retention" in constraint_lower:
-                domain_terms = ["retention", "membrane", "mwco", "filtration", "antibody", "therapeutic"]
-            elif "jacobian" in constraint_lower or "identifiab" in constraint_lower:
-                domain_terms = ["state estimation", "identifiab", "jacobian", "sensor", "measurement"]
-            elif "stiffness" in constraint_lower or "bending" in constraint_lower:
-                domain_terms = ["flexible", "compliant", "bending", "trauma", "neck", "interface"]
+            # R402 (audit CB-5): the domain terms are DERIVED FROM THE
+            # ENTRY'S OWN VOCABULARY (physical_constraint + reusable
+            # lesson + mechanism name, stopword-normalized), NOT from a
+            # hardcoded three-domain elif ladder. The v1 ladder meant a
+            # PROVEN_INVARIANT written in any NEW domain vocabulary
+            # (anything outside csf-retention / identifiability /
+            # bending-stiffness) could NEVER hard-block — the cemetery
+            # was dead code for every domain except the three it was
+            # hand-wired for. Domain universality is now structural:
+            # every invariant carries its own domain vocabulary.
+            domain_terms = entry_domain_terms(entry)
+            entry_note = {
+                "domain_terms_source": (
+                    "entry vocabulary: physical_constraint + "
+                    "reusable_lesson + mechanism_name (stopword-"
+                    "normalized; generic epistemic words removed)"),
+                "domain_terms": domain_terms[:24],
+            }
 
             # Check domain overlap
             domain_match = sum(1 for t in domain_terms if t in candidate_lower)
@@ -350,6 +404,8 @@ def check_candidate_against_cemetery(candidate_description: str) -> Dict:
                     "epistemic_class": entry.epistemic_class,
                     "physical_constraint": entry.physical_constraint,
                     "lesson": entry.reusable_lesson,
+                    "domain_match": domain_match,
+                    **entry_note,
                 })
 
         elif entry.epistemic_class == "STRONG_CONSTRAINT":
