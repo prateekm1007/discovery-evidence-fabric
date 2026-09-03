@@ -61,6 +61,11 @@ export interface StageDigest {
   action?: Record<string, unknown>;
   score?: number;
   breakdown?: Record<string, number>;
+  // R397 physics stage (R401-WC2 fix: the PHYSICS digest carries the
+  // lifecycle verdict + baseline outcome; typed explicitly so the
+  // build's strict cast check passes without an unknown-cast)
+  lifecycle_verdict?: string;
+  baseline_outcome?: string;
 }
 
 export interface SessionDetail {

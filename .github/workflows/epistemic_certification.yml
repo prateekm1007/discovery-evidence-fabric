@@ -163,6 +163,20 @@ jobs:
           # not CI-hermetic; e21 stays a local suite).
           python -m pytest tests/test_r380_cad_pipeline.py -q
 
+      - name: Webapp build check (R401-WC2)
+        run: |
+          # The deploy of 6ffdbbb5 failed at the Docker webapp stage on
+          # a TS error (RunNarrative.tsx cast) shipped at R397 — no CI
+          # step built the webapp, so nothing caught it until Render.
+          # The Dockerfile's verify-export.mjs assertion works (the
+          # deploy failed LOUDLY, by design) — this step moves the
+          # same check earlier: build here, fail here.
+          set -e
+          cd TOSCANINI_UI/webapp
+          npm ci --no-audit --no-fund
+          NEXT_OUTPUT=export npm run build
+          node verify-export.mjs
+
       - name: Configure git identity
         run: |
           git config user.name "github-actions[bot]"
@@ -372,6 +386,14 @@ jobs:
           # hermetic CAD kernel suite only (e21 needs gitignored
           # LLM-regenerated benchmark runs — see the certify job note)
           python -m pytest tests/test_r380_cad_pipeline.py -q
+      - name: Webapp build check (R401-WC2 — the fast tier is where UI
+          changes land)
+        run: |
+          set -e
+          cd TOSCANINI_UI/webapp
+          npm ci --no-audit --no-fund
+          NEXT_OUTPUT=export npm run build
+          node verify-export.mjs
       - name: Tier summary
         if: always()
         run: |

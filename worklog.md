@@ -875,3 +875,18 @@ Work Log:
 
 Stage Summary:
 - Phase 7 harness committed (contest = measured servability + engine-context battery + machine-validator scoring + explicit no-crowning rule). The single orchestrator records the honest transport state and will drive all deferred measurements when the quota window resets.
+
+---
+Task ID: CODER-R401-WC2 (deploy + build fix)
+Agent: CODER (Super Z session 2026-09-03, continuation)
+Task: Deploy the certified engine (the R397 runbook's operator action — now possible: the Render API key is provisioned) and run the post-deploy acceptance. The deploy of 6ffdbbb5 FAILED at the Docker webapp stage; root-caused and fixed.
+
+Work Log:
+- DEPLOY ATTEMPT (dep-dacp3fm1egvs73asnjc0, commit 6ffdbbb5, 15:25Z): build_failed. ROOT CAUSE (reproduced locally): TOSCANINI_UI/webapp/components/RunNarrative.tsx:45 — a TypeScript strict-cast error ('Conversion of StageDigest to Record<string, unknown> may be a mistake') shipped at R397 (the PHYSICS stage UI) with NO build check anywhere: the CI never built the webapp and the last live deploy (f9dfd45d, R393) predated the change. The Dockerfile's own mechanical assertion (verify-export.mjs) worked exactly as designed — the deploy failed LOUDLY instead of shipping a broken export (the R389->R392 class). Render's log API returned no logs for the failed build (endpoint limitation); the local reproduction (npm ci + NEXT_OUTPUT=export npm run build) reproduced the exact error.
+- FIX: the StageDigest type now carries lifecycle_verdict?/baseline_outcome? explicitly (lib/types.ts) and RunNarrative reads them directly — the proper fix (typed fields), not an unknown-cast. Local verification: the build compiles clean + verify-export.mjs all green (index/run/showcase pages, CSS, 11 JS chunks).
+- PREVENTION (Art. XVII/XIX): the webapp build + verify-export now runs in BOTH CI tiers (certify + fast-check — the fast tier is where UI changes land). The class (UI code with no build check until deploy time) is closed at CI.
+- r400_post_deploy_acceptance.py: the deployed SHA is now an operator input (--deployed-sha; default = the session's deploy of record 6ffdbbb5).
+- The re-deploy runs after this commit's CI goes green (Art. XIV: no deploy of a red commit; the certification is the independent check).
+
+Stage Summary:
+- The deploy attempt measured a REAL gap (un-built UI code) and the Dockerfile's mechanical assertion caught it loudly — the fix is typed, locally verified, CI-prevented; the acceptance harness is parameterized; the re-deploy follows the green CI.

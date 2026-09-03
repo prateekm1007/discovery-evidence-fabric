@@ -41,9 +41,7 @@ export const STAGE_SENTENCE: Record<string, (s: StageDigest) => string> = {
   VERIFY: () =>
     "Each claim verified against its exact evidence binding — no fuzzy matches admitted.",
   PHYSICS: (s) => {
-    const verdict =
-      (s as Record<string, unknown>).lifecycle_verdict ??
-      (s as Record<string, unknown>).baseline_outcome;
+    const verdict = s.lifecycle_verdict ?? s.baseline_outcome;
     return verdict
       ? `Physics gate: ${String(verdict).replace(/_/g, " ").toLowerCase()} against the un-invented baseline.`
       : "Solving the candidate's physics against its baseline — plausibility bounds, failure modes, and the baseline comparison.";

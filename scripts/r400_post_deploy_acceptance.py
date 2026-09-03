@@ -38,7 +38,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEPLOYED_SHA = "930eca8b7db8b0885abccb4e8159a77b8e802723"
+DEPLOYED_SHA = "6ffdbbb59a5a641888cc216b30f6043038c6de63"
 OUT_DIR = REPO_ROOT / "R400"
 
 # R401 Phase 0: the explicit acceptance-state vocabulary is owned by
@@ -117,12 +117,19 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base",
                     default="https://toscanini-engine-docker.onrender.com")
+    # R401-WC2: the deployed SHA is an operator input (the runbook's
+    # own contract — the deploy of record defines the acceptance
+    # target; the constant is the default for the session of record)
+    ap.add_argument("--deployed-sha", default=DEPLOYED_SHA,
+                    help="the commit the operator deployed (P1 pins "
+                         "the identity chain to it)")
     args = ap.parse_args()
     base = args.base
+    deployed_sha = args.deployed_sha
     verdict: Dict[str, Any] = {
         "suite": "R400 post-deploy live acceptance",
         "base": base,
-        "deployed_sha": DEPLOYED_SHA,
+        "deployed_sha": deployed_sha,
         "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                      time.gmtime()),
         "gates": {},
@@ -136,7 +143,7 @@ def main() -> int:
     # ---- 1. identity chain (P1 with the pinned target) -------------
     r = _run([sys.executable, "scripts/r396_external_probes.py",
               "--base", base, "--p", "1,2",
-              "--deployed-sha", DEPLOYED_SHA,
+              "--deployed-sha", deployed_sha,
               "--out", str(OUT_DIR / "LIVE_PROBES_P1_P2_postdeploy.json")],
              240)
     verdict["gates"]["P1_P2"] = {"result": _probe_pass(
