@@ -121,6 +121,42 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install git-filter-repo
+          # R401-WC2 (CEO directive 6): the canonical CI environment
+          # must have the ENGINE RUNTIME dependencies installed —
+          # cadquery/OCP included. "CAD actually executable in the
+          # canonical CI/runtime environment" is proven by the next
+          # two steps, not asserted.
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: CAD executability proof (build + validate + export)
+        run: |
+          python - <<'PY'
+          import cadquery as cq
+          import tempfile, pathlib
+          # A REAL parametric build through the OCCT kernel (the same
+          # kernel class the engine's cad_pipeline drives): construct,
+          # boolean-cut, export STEP and STL, verify real bytes.
+          part = (cq.Workplane("XY").circle(2.0).extrude(10.0)
+                  .faces(">Z").workplane().circle(0.8).cutBlind(-2.0))
+          out = pathlib.Path(tempfile.mkdtemp())
+          step, stl = out / "probe.step", out / "probe.stl"
+          cq.exporters.export(part, str(step))
+          cq.exporters.export(part, str(stl))
+          sz_step, sz_stl = step.stat().st_size, stl.stat().st_size
+          assert sz_step > 1000, f"STEP export too small: {sz_step}"
+          assert sz_stl > 100, f"STL export too small: {sz_stl}"
+          bb = part.val().BoundingBox()
+          assert abs(bb.xlen - 4.0) < 1e-2, bb.xlen
+          print(f"CAD_EXECUTABLE: cadquery {cq.__version__} — build+cut+"
+                f"export OK (STEP {sz_step}B, STL {sz_stl}B, bbox "
+                f"{bb.xlen:.4f}x{bb.ylen:.4f}x{bb.zlen:.4f})")
+          PY
+
+      - name: CAD kernel suites (hermetic)
+        run: |
+          python -m pytest tests/test_r380_cad_pipeline.py \
+            tests/test_e21_series.py -q
 
       - name: Configure git identity
         run: |
@@ -313,6 +349,23 @@ jobs:
           python -m pytest tests/test_r394_benchmark.py tests/test_r396_release_gate.py \
             tests/test_r397_physics_stage.py tests/test_r399_gates.py \
             tests/test_r399_routing_states.py -q
+      - name: CAD executability proof + kernel suites (R401-WC2)
+        run: |
+          python - <<'PY'
+          import cadquery as cq
+          import tempfile, pathlib
+          part = (cq.Workplane("XY").circle(2.0).extrude(10.0)
+                  .faces(">Z").workplane().circle(0.8).cutBlind(-2.0))
+          out = pathlib.Path(tempfile.mkdtemp())
+          step, stl = out / "probe.step", out / "probe.stl"
+          cq.exporters.export(part, str(step))
+          cq.exporters.export(part, str(stl))
+          assert step.stat().st_size > 1000
+          assert stl.stat().st_size > 100
+          print(f"CAD_EXECUTABLE: cadquery {cq.__version__}")
+          PY
+          python -m pytest tests/test_r380_cad_pipeline.py \
+            tests/test_e21_series.py -q
       - name: Tier summary
         if: always()
         run: |

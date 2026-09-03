@@ -1,0 +1,140 @@
+{
+  "benchmark_version": "r401wc2-benchmark/1.0.0",
+  "frozen_at": "2026-09-03",
+  "frozen_by": "CODER (R401-WC2 session), CEO directive #3: 'Freeze the 10+ problem cross-domain benchmark. Do this before optimizing the engine against the benchmark.'",
+  "freeze_semantics": {
+    "held_out": "NONE of these problems appear in the 18-case production battery (scripts/r396_external_probes._benchmark_cases), the f-series DOMAIN_PROBES, the R401 held-out problem, or any engine test fixture. Authored fresh 2026-09-03 from domain-failure knowledge BEFORE any engine run against this set.",
+    "freeze_first": "This file is committed BEFORE any measurement run. Engine optimization against any problem in this set is FORBIDDEN until the baseline-vs-R401 measurement is recorded (an optimized-then-measured result is contaminated by construction).",
+    "problem_shape": ["problem_id", "device", "failure", "failure_mode", "constraint", "domain"]
+  },
+  "problems": [
+    {
+      "problem_id": "bench-p01-pemfc-dehydration",
+      "device": "proton exchange membrane fuel cell stack",
+      "failure": "membrane dehydration under high current density raises ionic resistance and localizes hot spots, degrading power output even when coolant temperature is nominal",
+      "failure_mode": "dehydration",
+      "constraint": "maintain 1.5 A/cm2 current density at 80 C stack temperature without increasing cathode humidification parasitic load above 10 percent",
+      "domain": "electrochemical-energy"
+    },
+    {
+      "problem_id": "bench-p02-leadacid-grid-corrosion",
+      "device": "valve-regulated lead-acid battery positive plate",
+      "failure": "positive grid corrosion during extended float charge consumes grid cross-section, raising internal resistance until capacity falls below service threshold",
+      "failure_mode": "corrosion",
+      "constraint": "achieve 15-year float service life at 2.27 V per cell continuous charge without antimony content above 2 percent",
+      "domain": "electrochemical-materials"
+    },
+    {
+      "problem_id": "bench-p03-phe-biofouling",
+      "device": "stainless steel plate heat exchanger in a district cooling loop",
+      "failure": "biofilm and scale accumulation on plate channels reduces overall heat transfer coefficient and raises pressure drop between cleanings",
+      "failure_mode": "fouling",
+      "constraint": "sustain heat transfer coefficient above 2500 W/m2K for 12 months between mechanical cleanings without chlorination above 0.5 ppm residual",
+      "domain": "thermal-fluid-process"
+    },
+    {
+      "problem_id": "bench-p04-pump-cavitation",
+      "device": "centrifugal cooling water pump impeller",
+      "failure": "cavitation bubble collapse near impeller vane leading edges erodes material and degrades head delivery at off-design flow",
+      "failure_mode": "erosion",
+      "constraint": "operate at 85 percent of best-efficiency flow while keeping NPSH margin above 1.5 m and vane life above 5 years",
+      "domain": "fluid-machinery"
+    },
+    {
+      "problem_id": "bench-p05-bridge-bearing-aging",
+      "device": "laminated elastomeric bridge bearing pad",
+      "failure": "creep and ozone-induced cracking of elastomer layers accumulate permanent deformation and stiffness drift over decades of traffic cycling",
+      "failure_mode": "degradation",
+      "constraint": "hold vertical deflection drift below 10 percent of design over a 75-year service life with no replacement access after installation",
+      "domain": "civil-infrastructure"
+    },
+    {
+      "problem_id": "bench-p06-water-biofilm",
+      "device": "chloraminated drinking water distribution mains",
+      "failure": "biofilm regrowth in dead-end mains consumes disinfectant residual and drives nitrification episodes raising nitrite above the regulatory limit",
+      "failure_mode": "regrowth",
+      "constraint": "maintain total chlorine residual above 1.0 mg/L at the farthest customer during 25 C summer demand without boosting disinfectant dose",
+      "domain": "environmental-engineering"
+    },
+    {
+      "problem_id": "bench-p07-cgm-biofouling",
+      "device": "wearable continuous glucose monitor electrochemical sensor",
+      "failure": "protein and tissue encapsulation at the sensor working electrode attenuates glucose signal within days of wear, drifting readings outside the MARD limit",
+      "failure_mode": "encapsulation",
+      "constraint": "keep mean absolute relative difference below 10 percent over a 14-day wear without daily recalibration",
+      "domain": "biomedical-sensing"
+    },
+    {
+      "problem_id": "bench-p08-mems-stiction",
+      "device": "MEMS capacitive accelerometer comb structure",
+      "failure": "shock-induced contact between comb fingers causes stiction that permanently shorts interdigitated electrodes and latches the proof mass",
+      "failure_mode": "stiction",
+      "constraint": "survive 10000 g mechanical shock in all axes without permanent zero-g offset above 50 mg",
+      "domain": "microsystems"
+    },
+    {
+      "problem_id": "bench-p09-packaging-barrier",
+      "device": "multilayer polymer food packaging film",
+      "failure": "moisture and oxygen barrier properties of the ethylene-vinyl alcohol layer degrade during distribution as humidity plasticizes the polymer matrix",
+      "failure_mode": "permeation",
+      "constraint": "hold water vapor transmission rate below 0.5 g/m2/day over 18 months of shelf life at 25 C and 65 percent relative humidity",
+      "domain": "materials-food"
+    },
+    {
+      "problem_id": "bench-p10-pv-pid",
+      "device": "crystalline silicon photovoltaic module in a high-voltage string",
+      "failure": "potential-induced degradation as sodium ions migrate from cover glass into cell shunting paths under sustained system voltage bias",
+      "failure_mode": "degradation",
+      "constraint": "limit annual power loss below 0.5 percent over 25 years at 1000 V system bias without encapsulant replacement",
+      "domain": "energy-photovoltaic"
+    },
+    {
+      "problem_id": "bench-p11-spindle-thermal-drift",
+      "device": "high-speed precision machining center spindle",
+      "failure": "internal bearing heat generation thermally elongates the spindle shaft, shifting the tool center point and widening part tolerance during warmup cycles",
+      "failure_mode": "drift",
+      "constraint": "hold tool center point displacement below 10 micrometers across the full 20-minute warmup transient without adding warmup idle cycles",
+      "domain": "precision-engineering"
+    },
+    {
+      "problem_id": "bench-p12-mbr-fouling",
+      "device": "submerged hollow-fiber membrane bioreactor for municipal wastewater",
+      "failure": "soluble microbial product and extracellular polymeric substance layers consolidate on membrane fibers, collapsing permeability and forcing intense chemical cleaning",
+      "failure_mode": "fouling",
+      "constraint": "sustain net flux above 18 LMH with chemical cleaning intervals longer than 6 months at mixed liquor suspended solids of 8 g/L",
+      "domain": "water-treatment"
+    }
+  ],
+  "metrics": {
+    "identical_instrument_rule": "Every metric below is computed by the SAME code path on BOTH arms (baseline worktree 7dbebe94 and R401 HEAD) from the SAME artifact shapes. Instruments that are structurally impossible on an arm (the baseline produces no structured mechanism space) are reported as NOT_COMPUTABLE_ON_BASELINE (NCB) — never as zero, never silently dropped (Art. XXV).",
+    "per_problem": {
+      "n_candidates_generated": "count of candidate records produced by the arm's own generation stages (baseline: EXPLORATION_GRID candidates + primary SYNTHESIZE mechanism; R401: mechanism-space candidates in envelope_MECHANISM_SPACE.json)",
+      "n_materially_distinct": "the R401 structural comparator (mechanism_space.deduplicate_candidates) applied to the arm's own candidate records — same instrument, both arms",
+      "material_distinctness_rate": "n_materially_distinct / n_candidates_generated (null when no candidates)",
+      "testable_prediction_rate": "fraction of candidates whose testable-prediction field passes mechanism_space._testable_prediction_check — same instrument, both arms",
+      "evidence_support_rate": "from the arm's own envelope_VERIFY.json evidence_classification counts: (DIRECT_SUPPORT + PARTIAL_SUPPORT) / n_items",
+      "contradiction_rate": "CONTRADICTORY / n_items from the same envelope",
+      "final_status": "the run's own final_state.json final_status (honest vocabulary: REJECTED is an acceptable result)",
+      "cad_rate": "fraction of candidates reaching an INVENTION_SPECIFICATION artifact",
+      "physics_beats_baseline": "count of stage_PHYSICS.json records with lifecycle BEATS_BASELINE",
+      "attack_survival": "count of candidates whose ENGINEERING_ATTACK overall != KILLED",
+      "runtime_s": "wall clock per problem",
+      "llm_calls": "gateway call-log delta per problem",
+      "retrieval_calls": "retrieval-log delta per problem"
+    },
+    "headline": {
+      "name": "MD-EST per problem (materially distinct, evidence-supported, technically testable mechanisms on a previously unseen problem)",
+      "definition": "per problem, the count of mechanisms that satisfy ALL THREE: (a) materially distinct — kept by the common structural comparator; (b) technically testable — passes the common testable-prediction check; (c) evidence-supported — the arm's own VERIFY-stage evidence classification shows DIRECT_SUPPORT + PARTIAL_SUPPORT above zero for the run (the run-level evidence condition is computable identically on both arms; the R401 arm ADDITIONALLY reports per-candidate mechanism-level SUPPORTS as a capability column, marked NCB for the baseline).",
+      "benchmark_score": "fraction of the 12 problems with MD-EST >= 3, plus the mean MD-EST count; both reported per arm with the delta.",
+      "rule": "the headline is computed by the same code on both arms; a rejection-heavy result is honest; a fabricated winner is not."
+    }
+  },
+  "protocol": {
+    "baseline_arm": "detached git worktree at 7dbebe940fe73f47a420b4f0ca2f9e5188d22ca4 (the pre-R401 production engine; byte-identical to the deployed artifact, proven R401-WC); .env.keys copied for retrieval; ENGINE_*_PROVIDER=zai pins (the documented degraded-endpoint mechanism, recorded in the per-call ledger)",
+    "r401_arm": "the HEAD engine (mechanism_space 16-stage chain) in the main checkout at the measurement commit (recorded in the run record)",
+    "llm_transport": "zai local gateway (scripts/zai_gateway.mjs) with the in-process lifecycle; every call logged with hashes; quota exhaustion is an honest BLOCKED state (Art. XXV), never a quality result",
+    "retrieval": "live, both arms, identical lanes (EuropePMC primary + the engine's own multi-source expansion); rate limits are recorded states, never absence",
+    "order": "problems are run in the frozen list order, one at a time, per arm; each problem is resumable (the EngineRun conductor's own resume path); an interrupted battery continues without re-burning completed problems",
+    "fidelity_guard": "before the battery, the frozen benchmark file hash is verified (the battery refuses to run against a mutated benchmark); after the battery, per-problem artifacts are committed under R401-WC2/BENCHMARK/RUNS/"
+  }
+}
