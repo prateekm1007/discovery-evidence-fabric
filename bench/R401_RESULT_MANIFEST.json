@@ -1,0 +1,99 @@
+{
+ "manifest_version": "r401-empirical/1.0",
+ "git_base_sha": "7dbebe940fe73f47a420b4f0ca2f9e5188d22ca4",
+ "branch": "r401/empirical-canonicalization",
+ "hardware_local": "Linux-6.1.158+-x86_64-with-glibc2.41 | CPU-only sandbox",
+ "hardware_kernel": "Kaggle Tesla P100-PCIE-16GB env (CUDA unusable: sm60 vs torch wheels \u2014 CPU-fallback arms, documented)",
+ "model_versions": {
+  "embedders_gpu": [
+   "BAAI/bge-large-en-v1.5",
+   "intfloat/e5-large-v2"
+  ],
+  "gliner": "urchade/gliner_largev2 (v2.5 id 404)",
+  "synth_local": "Qwen/Qwen2.5-0.5B-Instruct fp16 CPU",
+  "crossencoder": "cross-encoder/ms-marco-MiniLM-L-6-v2"
+ },
+ "dataset": {
+  "labeled_pairs_sha256": "611bbb5fe08ba97e",
+  "n": 153,
+  "relevance_split": "85/68"
+ },
+ "deterministic_replay": {
+  "authority": "harness lexical_score (bench/benchmark_worldclass.py) on committed labeled_pairs.json, full 153-pair set, threshold 0.10",
+  "recomputed": {
+   "P": 0.735,
+   "R": 0.882,
+   "F1": 0.802
+  },
+  "matches_committed": true,
+  "known_variance": "the Kaggle kernel's lexical-parity block reports F1 0.773 \u2014 it uses a different stoplist; documented variance, harness is the authority"
+ },
+ "files": {
+  "benchmark_worldclass.py": {
+   "sha256_16": "9c6e699dd1102ead",
+   "what": "harness (6 stages: db/label/relevance/synth/micro/fidelity)"
+  },
+  "dedup_adversarial.py": {
+   "sha256_16": "b590addaf6e9d472",
+   "what": "phase-5 dedup adversarial fixture generator"
+  },
+  "data/db_probe.json": {
+   "sha256_16": "6239f094b9490d75",
+   "what": "raw live DB probe inputs/outputs (8 problems x 6 sources)"
+  },
+  "results/db_ab.json": {
+   "sha256_16": "973b251554d02312",
+   "what": "database A/B verdicts (live, 2026-09-03)"
+  },
+  "results/labeled_pairs.json": {
+   "sha256_16": "611bbb5fe08ba97e",
+   "what": "gold set: 153 pairs, 85 RELEVANT / 68 IRRELEVANT, auditor rule+adjudication"
+  },
+  "results/relevance_lexical_corrected.json": {
+   "sha256_16": "c48e6fef464853b8",
+   "what": "lexical P/R/F1 sweep on corrected gold"
+  },
+  "results/relevance_ab.json": {
+   "sha256_16": "7f2c7830b6038c56",
+   "what": "relevance A/B raw (lexical + LLM arms all-403 \u2014 dead arms retained as failure evidence)"
+  },
+  "results/relevance_crossencoder.json": {
+   "sha256_16": "956898d35bd3047e",
+   "what": "cross-encoder measured (title-level: NO usable signal, AUC .687; honest rejection)"
+  },
+  "results/synth_local.json": {
+   "sha256_16": "7b19129a831d1849",
+   "what": "pure-vs-hybrid synthesis (Qwen2.5-0.5B CPU; structural grounding metrics only)"
+  },
+  "results/micro.json": {
+   "sha256_16": "554216d637ef1783",
+   "what": "dedup/store micro (96.7% redundancy measured on title spine)"
+  },
+  "results/fidelity_guard.json": {
+   "sha256_16": "376de8e02cc089f6",
+   "what": "fidelity guard with explicit state vocabulary"
+  },
+  "results/dedup_adversarial.json": {
+   "sha256_16": "322d1d254cdf12b1",
+   "what": "spine-60 fails adversarially (50%/50%); anchored containment 16/16 (16-item fixture caveat)"
+  },
+  "results/r401_heldout.json": {
+   "sha256_16": "a6cc4b09e410a2ab",
+   "what": "held-out problem end-to-end: 5/5 operators PASS fidelity, 6 distinct, honest verification"
+  },
+  "kkernel/bench.py": {
+   "sha256_16": "ddef6186101cf7a3",
+   "what": "Kaggle GPU kernel source (5th iteration)"
+  },
+  "kkernel/kernel-metadata.json": {
+   "sha256_16": "2874b7f7a510b07e",
+   "what": "kernel metadata"
+  },
+  "kkernel/results_kernel.json": {
+   "sha256_16": "623e4569896972c5",
+   "what": "GPU arms raw results (P100 env, CPU fallback documented)"
+  }
+ },
+ "classification": "REPORTED -> CANONICAL (this commit). Release certification still requires team review + CI on this branch.",
+ "claim_downgrades_recorded": "R401 stack = CURRENT BEST ARCHITECTURAL HYPOTHESIS; cross-encoder title-level REJECTED; abstract-level rerank UNTESTED; S2 quality UNKNOWN (access, not quality); frontier contest NOT RUN (no inference entitlement); mechanism space STRUCTURALLY_READY, behavioral downstream INCOMPLETE."
+}

@@ -1,0 +1,68 @@
+{
+ "fixture_sha256": "71e476e25f8abc81",
+ "fixtures": [
+  {
+   "run": "ts_2fc0eb0dbe3d",
+   "pid": "wind",
+   "final": "REJECTED",
+   "reason_class": "evidence verification failed"
+  },
+  {
+   "run": "ts_bef956d83444",
+   "pid": "wind",
+   "final": "REJECTED",
+   "reason_class": "evidence verification failed"
+  },
+  {
+   "run": "ts_5c6ea3076a42",
+   "pid": "glass",
+   "final": "REJECTED",
+   "reason_class": "adversarial"
+  },
+  {
+   "run": "ts_f796e7dfd5d0",
+   "pid": "hemo",
+   "final": "REJECTED",
+   "reason_class": "evidence verification failed"
+  },
+  {
+   "run": "ts_d1ab9fd4d756",
+   "pid": "hemo",
+   "final": "AUTOMATED_INVENTION_CANDIDATE",
+   "reason_class": "all checks passed"
+  },
+  {
+   "run": "ts_017c842cd4c2",
+   "pid": "glass",
+   "final": "REJECTED",
+   "reason_class": "adversarial"
+  }
+ ],
+ "suites": {
+  "benchmark": {
+   "exit": 0,
+   "tail": "27 passed in 14.98s",
+   "state": "PASS",
+   "observed_failures": []
+  },
+  "release_gate": {
+   "exit": 1,
+   "tail": "2 failed, 29 passed in 0.33s",
+   "state": "ENVIRONMENTAL_NONBLOCKING",
+   "observed_failures": [
+    "../audit/engine/tests/test_r396_release_gate.py::TestArtifactIdentity::test_no_artifact_falls_back_to_git_not_env",
+    "../audit/engine/tests/test_r396_release_gate.py::TestDurableIntegrity::test_snapshot_records_identity_count_and_integrity"
+   ]
+  }
+ },
+ "state_vocabulary": [
+  "PASS",
+  "ENVIRONMENTAL_NONBLOCKING",
+  "FAIL",
+  "INCOMPLETE",
+  "UNKNOWN"
+ ],
+ "overall_state": "ACCEPTED_WITH_DECLARED_ENVIRONMENTAL_LIMITATION",
+ "env_failure_evidence": "local engine tree has no .git (workspace snapshot) -> identity/snapshot tests fail; CI 'Epistemic Certification' green on 7dbebe94 both tiers; same suite 48/48 in auditor env at 5736cb10. 29/31 is NEVER reported as 31/31.",
+ "contract": "R401 refactor is fidelity-clean iff: both suites exit 0 AND no fixture verdict may flip (REJECTED stays REJECTED for its recorded reason class; the hemo 04:35 CANDIDATE case is governed by bench_04/06 determinism pins, since its verdict was transport-dependent \u2014 documented)."
+}

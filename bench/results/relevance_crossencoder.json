@@ -1,0 +1,30 @@
+{
+ "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+ "level": "title (identical fixture & split protocol as lexical/e5/bge)",
+ "threshold_tuned_on_train": -11.442,
+ "train": {
+  "P": 0.533,
+  "R": 0.976,
+  "F1": 0.69
+ },
+ "test": {
+  "P": 0.571,
+  "R": 1.0,
+  "F1": 0.727
+ },
+ "latency_s_153pairs": 1.04,
+ "test_false_positives_examples": [
+  "Electrochemical Detection of Cancer Biomarkers: From Molecular Sensing to Clinical Translation.",
+  "Sampling Trade-Offs in Duty-Cycled Systems for Air Quality Low-Cost Sensors",
+  "The perils of automated fitting of datasets: the case of a wind turbine cost model"
+ ],
+ "test_false_negatives_examples": [],
+ "comparison": {
+  "lexical@0.10_full_set_F1": 0.802,
+  "e5_large_test_F1": 0.747,
+  "bge_large_test_F1": 0.729
+ },
+ "note": "cross-encoder measured at title level with threshold swept over the observed score distribution; abstract-level reranking remains the stronger untested hypothesis",
+ "auc": "0.687",
+ "honest_verdict": "AUC ~0.5-0.6 and tuned threshold at the distribution floor => the ms-marco MiniLM cross-encoder has NO usable ranking signal on (long problem-question vs short title) pairs; test F1 .727 is majority-class performance (85/153=.556 base rate), NOT a win. Title-level cross-encoding is measured and REJECTED. The abstract-level rerank hypothesis remains UNTESTED (requires an abstract-bearing fixture)."
+}
