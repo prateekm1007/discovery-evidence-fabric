@@ -1,0 +1,66 @@
+{
+ "cross_validation": {
+  "V0_fluence": 0.7049940661834238,
+  "V0_vs_committed_pct": -0.008,
+  "committed_pipeline_fluence": 0.7050488365664916,
+  "expected_agreement": "within a few tenths of a percent (independent RNG stream, same physics); agreement validates the loop before any convention delta is read"
+ },
+ "runs": [
+  {
+   "chunks": 4,
+   "convention": "identical to the committed pipeline (fresnel, 0.1 mm slab, 50 mm lateral)",
+   "fluence_ci95": 0.0006946661371726953,
+   "fluence_mW_per_cm2": 0.7049940661834238,
+   "id": "V0_cross_validation",
+   "photons": 400000,
+   "slab_volume_cm3": 0.009993280567362987,
+   "total_absorbed_fraction": 0.12928528520253338,
+   "transport_steps_max": 10000
+  },
+  {
+   "chunks": 4,
+   "convention": "no Fresnel reflectance at tissue/air (all boundary hits escape)",
+   "fluence_ci95": 0.0009352387964336237,
+   "fluence_mW_per_cm2": 0.430069898008418,
+   "id": "V1_vacuum_boundaries",
+   "photons": 400000,
+   "slab_volume_cm3": 0.009993280567362987,
+   "total_absorbed_fraction": 0.04972655751700861,
+   "transport_steps_max": 72
+  },
+  {
+   "chunks": 4,
+   "convention": "fully-reflective boundaries at top/bottom and lateral (upper bound; only absorption removes photons)",
+   "fluence_ci95": 0.0016690856776181836,
+   "fluence_mW_per_cm2": 4.942652296987462,
+   "id": "V2_mirror_boundaries",
+   "photons": 400000,
+   "slab_volume_cm3": 0.009993280567362987,
+   "total_absorbed_fraction": 0.8936812690871273,
+   "transport_steps_max": 10000
+  },
+  {
+   "chunks": 4,
+   "convention": "detector scoring slab 0.5 mm (vs 0.1 mm)",
+   "fluence_ci95": 0.0005367790589047439,
+   "fluence_mW_per_cm2": 0.7144976414009198,
+   "id": "V3_slab_0p5mm",
+   "photons": 400000,
+   "slab_volume_cm3": 0.04996640283681494,
+   "total_absorbed_fraction": 0.12928528520253338,
+   "transport_steps_max": 10000
+  },
+  {
+   "chunks": 4,
+   "convention": "tissue lateral extent 100 mm (vs 50 mm)",
+   "fluence_ci95": 0.0005708438903377432,
+   "fluence_mW_per_cm2": 0.6972323174060914,
+   "id": "V4_lateral_100mm",
+   "photons": 400000,
+   "slab_volume_cm3": 0.009993280567362987,
+   "total_absorbed_fraction": 0.1294982460927592,
+   "transport_steps_max": 10000
+  }
+ ],
+ "suite": "R407-G convention sensitivity (independent loop, shared physics helpers, per-chunk seeds [20260904, chunk_index] over 100000-photon chunks, 400000 photons/variant)"
+}

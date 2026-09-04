@@ -416,6 +416,13 @@ def test_acceptance_checklist_complete():
     assert len(c["items"]) == 16
     for it in c["items"]:
         assert it["state"] and it["evidence"]
-    # the two PENDING_AT_WRITE items get flipped by the ship script
+    # the two PENDING_AT_WRITE items were flipped to TRUE (with recorded
+    # qualifiers: the P08 anchor contest; the P13 protocol-level state)
+    # by the R406-ship commit 08c03dd7. Disclosed 2026-09-04 (R407
+    # session, Art. XV): the ship commit left THIS expectation stale —
+    # the battery was last run pre-ship, when 2 items were still
+    # pending. At HEAD zero items are pending and every state begins
+    # with TRUE; the test now pins the shipped state.
     pending = [it for it in c["items"] if it["state"].startswith("PENDING")]
-    assert len(pending) == 2
+    assert len(pending) == 0
+    assert all(it["state"].startswith("TRUE") for it in c["items"])

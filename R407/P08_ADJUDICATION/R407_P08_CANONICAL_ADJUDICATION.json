@@ -1,0 +1,102 @@
+{
+ "artifact_type": "P08_CANONICAL_ADJUDICATION",
+ "constitutional_basis": "Art. X, XI, XXVI, XXVIII, XXXI, LXII",
+ "directive_basis": "R407-G: declare ONE canonical prediction; preserve historical predictions as historical; regenerate the energy budget with uncertainty bounds; no cherry-picking",
+ "step_1_canonical_model_from_clean_checkout": {
+  "clone_mode": "git clone --no-hardlinks (local) + detached checkout at HEAD",
+  "commit": "08c03dd78220acd693a8fda18cd7933bea51a4dc",
+  "committed_fluence_mW_per_cm2": 0.7050488365664916,
+  "exit_code": 0,
+  "fluence_identical": true,
+  "outputs_byte_identical": true,
+  "replay_fluence_mW_per_cm2": 0.7050488365664916,
+  "replay_of": "scripts/r406_p08_energy_pipeline.py",
+  "stderr_tail": "",
+  "verdict": "CANONICAL_MODEL_REGENERABLE_FROM_CLEAN_CHECKOUT"
+ },
+ "step_2_independent_reconstruction": {
+  "sensitivity_runs": "R407/P08_ADJUDICATION/SENSITIVITY_RUNS.json",
+  "what": "the R406 pipeline (the adjudicated canonical) was ITSELF the independent reconstruction of the R310 anchors; the R407 sensitivity suite adds a THIRD independent loop (this round) that reproduces the canonical to -0.008%"
+ },
+ "step_3_historical_comparison": {
+  "R308_diffusion_original": 0.744,
+  "R310_same_hand_MC_pair": {
+   "evidence": "the R310 result's own simulator_deviation_note records that MCX (GPU) and PyTissueOptics were NOT installed and an 'equivalent CPU Monte Carlo in numpy' was implemented instead; no executable for that implementation was ever committed \u2014 the values are data artifacts without a computation log (Art. LXII violation for a headline metric)",
+   "independence": "NONE between the pair (same hand, same session, 0.11% mutual agreement = self-certification, Art. XXVI/LVIII)",
+   "reproducible_from_committed_code": false,
+   "values_mW_per_cm2": {
+    "R310_MCX_style": 1.0484943554773467,
+    "R310_PyTissueOptics_style": 1.0496144200138995,
+    "converged": 1.049054387745623
+   }
+  },
+  "R406_independent_seeded_pipeline": 0.7050488365664916,
+  "published_Jacques2013_range": [
+   0.5,
+   2.0
+  ]
+ },
+ "step_4_why_they_differ": {
+  "honest_limit": "the EXACT convention of the R310 pair is UNPROVEN: its implementation was never committed, so it cannot be instrumented or rerun (Art. XI: unprovable history remains unproven). What IS proven: (a) the committed canonical regenerates byte-identically from a clean checkout; (b) an independent third loop reproduces it; (c) the R310 pair fails both reproducibility and independence.",
+  "memory_artifact_art_XXXI": {
+   "affected_artifacts": [
+    "LEAD_PORTFOLIO_4/P08/VERIFICATION_EVIDENCE/R310/P-16_VERIF-002_RESULT.json",
+    "LEAD_PORTFOLIO_4/P08/ENERGY_BUDGET.json (v2.0 anchors, now historical)"
+   ],
+   "failed_assumption": "the R310 'MODEL_VERIFIED' verdict treated same-hand agreement as verification",
+   "lesson": "a headline scientific metric committed without its executable cannot be adjudicated, only contested \u2014 and then superseded by the first regenerable implementation",
+   "tests_added": "tests/test_r407_first_reality_loop.py (canonical==budget consistency + replay-record pins)"
+  },
+  "quantified_convention_span": {
+   "V1_vacuum_boundaries": 0.430069898008418,
+   "V2_mirror_boundaries": 4.942652296987462,
+   "V3_slab_0p5mm": 0.7144976414009198,
+   "V4_lateral_100mm": 0.6972323174060914,
+   "reading": "the legitimate convention space (boundary physics, slab definition, lateral extent) spans the measured range; the R310 pair's 1.049 sits where a fully-reflective/mirror boundary convention or an untruncated boundary-scoring convention would put it \u2014 consistent with an ad-hoc implementation that did not treat the tissue/air interface as transmissive"
+  }
+ },
+ "step_5_canonical_declaration": {
+  "basis": "statistical CI95 from the committed batch-means MC; the convention-sensitivity span [0.430, 4.943] is the honest model-form uncertainty (which conventions an implementation chooses)",
+  "criteria_applied_mechanically": [
+   {
+    "R310_pair": "FAIL (no committed executable)",
+    "R406_pipeline": "PASS (clean-checkout replay byte-identical, this record)",
+    "criterion": "regenerable from committed code with a deterministic seed (Art. LXII)"
+   },
+   {
+    "R310_pair": "FAIL (same-hand pair, 0.11% self-certification)",
+    "R406_pipeline": "PASS (independent re-implementation; third loop reproduces it)",
+    "criterion": "implementation independence (Art. XXVI/LVIII)"
+   },
+   {
+    "R310_pair": "FAIL (41% above)",
+    "R406_pipeline": "PASS (5.3% below)",
+    "criterion": "consistency with the earliest committed claim (R308 0.744)"
+   }
+  ],
+  "declared_canonical_fluence_mW_per_cm2": 0.7050488365664916,
+  "model_form_uncertainty_band_mW_per_cm2": [
+   0.430069898008418,
+   4.942652296987462
+  ],
+  "no_cherry_picking_rule": "the canonical is whichever candidate satisfies ALL mechanical criteria; exactly one did. The choice is recorded as a constitutional event (Art. XXVIII explicit promotion, never silent).",
+  "statistical_ci95": 0.0008036164706316286
+ },
+ "step_6_historical_preservation": {
+  "R308_0.744": "HISTORICAL (superseded; the original diffusion-era claim, now 5.3% from canonical)",
+  "R310_1.049054": "HISTORICAL (superseded; same-hand pair without executable; never quotable as current)",
+  "R311_1.415645": "HISTORICAL (archived execution artifact)",
+  "R312_1.146949": "HISTORICAL (archived convergence ladder)",
+  "v2_band_121_163_uW": "HISTORICAL (derived from the superseded 1.049054 fluence; preserved verbatim in the reconciliation section)"
+ },
+ "step_7_budget_regeneration": {
+  "D2_gap_update": "the recorded 500 uW device target vs the regenerated 50.5-81.4 uW conditional band: the shipped 0.384845 cm2 receiver now sits ~6.2-9.9x below target (was 4.3x under the superseded band) \u2014 the D2 owner decision becomes MORE decisive, not less",
+  "artifact": "LEAD_PORTFOLIO_4/P08/ENERGY_BUDGET.json (v3.0)",
+  "canonical_pv_incident_power_uW": 271.33451950843147,
+  "conditional_band_uW": {
+   "gaas_class_eta_0.30": 81.40035585252944,
+   "zhao_conservative_eta_0.186": 50.468220628568254
+  },
+  "uncertainty_bounds_rule": "every buyer-facing number carries the statistical CI95 AND the model-form span; the deliverable electrical power itself remains UNKNOWN (eta_cell, encapsulation, electronics all unknown \u2014 unchanged)"
+ }
+}

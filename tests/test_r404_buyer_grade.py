@@ -183,14 +183,31 @@ class TestCanonicalEnergyBudget(unittest.TestCase):
         # eta_cell is UNKNOWN (value None)
         eta = [i for i in cc["inputs"] if i["symbol"] == "eta_cell"][0]
         self.assertIsNone(eta["value"])
-        # derived conditional values recompute
+        # derived conditional values recompute — v3.0 (R407-G
+        # adjudication, directive-ordered) carries TWO conditionals:
+        # eta 0.30 and the Zhao-conservative 0.186, both on the canonical
+        # Phi 0.705049; eta is parsed from the calculation string, never
+        # hardcoded (the pre-R407 test hardcoded 0.30, which held only
+        # for the v2.0 single-conditional budget)
         for dv in cc["derived_conditional_values"]:
-            # parse the condition's Phi from the calculation string
+            # parse the condition's Phi and eta from the calculation string
             calc = dv["calculation"]
-            phi = float(calc.split("×")[0].strip())
-            got = phi * 0.384845 * 0.30 * 1000
+            parts = [p.strip() for p in calc.split("×")]
+            phi, eta = float(parts[0]), float(parts[2])
+            got = phi * 0.384845 * eta * 1000
             self.assertTrue(math.isclose(got, dv["value"], rel_tol=1e-3),
                             (calc, got, dv["value"]))
+        # the canonical fluence input is the R407-adjudicated value with
+        # uncertainty bounds; the superseded anchors stay HISTORICAL
+        phi_inp = [i for i in cc["inputs"]
+                   if i["symbol"] == "Phi_det"][0]
+        self.assertTrue(math.isclose(
+            phi_inp["value"], 0.7050488365664916, rel_tol=1e-12))
+        self.assertEqual(phi_inp["evidence_class"],
+                         "COMPUTATIONAL_RESULT_CANONICAL")
+        self.assertEqual(
+            cc["historical_values_preserved"][
+                "R310_converged_fluence_mW_per_cm2"], 1.049054387745623)
 
     def test_canonical_figure_is_unknown_not_a_number(self):
         b = self._budget()
@@ -228,7 +245,14 @@ class TestCanonicalEnergyBudget(unittest.TestCase):
         bs = load(LP4 / "P08" / "BUYER_SEQUENCE.json")
         self.assertIn("RECONCILED", bs["sections"]["4_mechanism"])
         self.assertIn("ARCHIVED", bs["sections"]["5_evidence"])
-        self.assertIn("121-163", bs["sections"]["5_evidence"])
+        # R407-G adjudication (2026-09-04, directive-ordered): the
+        # buyer-facing band is the regenerated 50.5-81.4 uW canonical
+        # statement with uncertainty bounds; the v2.0 121-163 uW band is
+        # superseded and must NOT be quotable as current
+        self.assertIn("50.5-81.4 uW", bs["sections"]["5_evidence"])
+        self.assertIn("R407-G adjudication", bs["sections"]["5_evidence"])
+        self.assertIn("HISTORICAL", bs["sections"]["5_evidence"])
+        self.assertNotIn("121-163", bs["sections"]["5_evidence"])
         ts = load(LP4 / "P08" / "TRANSFER_STATE.json")
         self.assertIn("RESTORED", ts["current_state_basis"])
         self.assertIn("D2", ts["blocking_items_before_SUPPORTED_FOR_VALIDATION"][0])

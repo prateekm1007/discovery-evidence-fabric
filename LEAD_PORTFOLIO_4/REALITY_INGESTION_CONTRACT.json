@@ -1,0 +1,48 @@
+{
+ "artifact_type": "REALITY_INGESTION_CONTRACT",
+ "version": "1.0",
+ "directive_basis": "R407-B: build the physical-observation ingestion contract — REALITY_EVENT with mandatory experiment_id, package_id, timestamp, apparatus_id, operator, raw_data_hash, processed_data_hash, measurement_units, uncertainty, baseline_result, candidate_result, pre_registered_threshold, decision. No physical observation should enter the system without provenance.",
+ "enforcement_module": "discovery_fabric/engine/reality_ingestion.py (validate_reality_event_v2 + ingest_reality_event + verify_ledger)",
+ "constitutional_basis": "Art. XXXVIII (the Reality Boundary: AI may not claim reality happened unless reality produced the evidence; the R370G REALITY_EVENT schema is the base layer), Art. VI (never manufacture provenance), Art. XII (provenance custody chain), Art. XXV (unknown stays unknown; UNKNOWN apparatus/operator values are legitimate — blank or missing is not), Art. XXXVII (CONTROLLED_REHEARSAL never promotes, never counts as learning)",
+ "mandatory_fields": {
+  "experiment_id": "the frozen experiment contract this observation answers (e.g. P04-R407-EXP-001); binds the observation to its pre-registered thresholds",
+  "package_id": "the technology package (P04/P08/P11/P13...)",
+  "timestamp": "ISO-8601 acquisition instant",
+  "apparatus_id": "identity of the physical apparatus that produced the data (serial/registry id; 'UNKNOWN' is legitimate, blank is not)",
+  "operator": "the human or instrument operator of record (identity + organization; 'UNKNOWN' is legitimate, blank is not)",
+  "raw_data_hash": "sha256 of the RAW acquisition bytes (traces, images, logs) BEFORE any processing — the attestation binds to this",
+  "processed_data_hash": "sha256 of the processed dataset the results are computed from (the processing script must itself be committed; the raw->processed step is part of the custody chain)",
+  "measurement_units": "explicit units for every measured quantity in the results (bare numbers are forbidden)",
+  "uncertainty": "the stated uncertainty of the measurement (per-quantity; resolution + repeatability class)",
+  "baseline_result": "the control-arm result (Art. XLVII: the baseline is measured, not assumed)",
+  "candidate_result": "the treatment-arm result, structured per the frozen contract's endpoint schema",
+  "pre_registered_threshold": "the threshold set the decision was computed against (must hash-match the frozen contract's registered values)",
+  "decision": "the machine verdict computed by the frozen contract's decision function — {verdict, rule_id, rule_trace}; free-text decisions are rejected at ingestion",
+  "art_XXXVIII_base": {
+   "event_id": "unique event identity",
+   "source_type": "EXTERNAL_HUMAN | EXTERNAL_INSTRUMENT | EXTERNAL_SYSTEM | CONTROLLED_REHEARSAL",
+   "organization": "the acquiring organization",
+   "custody_chain": "non-empty list of {actor, action, timestamp} steps from acquisition to ingestion",
+   "attestation": "attestation_text + attestation_hash binding the bytes to the acquisition event",
+   "provenance_validated": "must be true (the validator sets it only after the schema passes)"
+  }
+ },
+ "ledger": {
+  "format": "append-only JSON ledger; each entry carries {prev_entry_sha256, entry_sha256 = H(prev | record)}; ingestion rejects duplicate event_ids; verify_ledger() recomputes the chain and detects any mutation of a past entry",
+  "real_ledger": "LEAD_PORTFOLIO_4/P04/REALITY_LOOP/REALITY_LEDGER.json (EMPTY at registration — zero entries; the first real observation will be entry 1)",
+  "rehearsal_ledgers": "separate REHEARSAL_* ledgers (CONTROLLED_REHEARSAL source_type can NEVER enter the real ledger — the ingestion layer classifies by source_type and the ledger files are physically separate)",
+  "promotion_rule": "an observation advances a package's loop chain only through discovery_fabric/engine/loop_chain.py (Art. XXXVIII transition rules); ingestion alone changes nothing — it is the gate, not the promoter"
+ },
+ "decision_functions": {
+  "P04": "decide_p04 (EXPERIMENT_CONTRACT_FROZEN.json rule set: KEEP/MODIFY/KILL + EXECUTION_INVALID)",
+  "P11": "decide_p11 (EXPERIMENT_CONTRACT_FROZEN.json rule set: SUPPORTED/MIXED/KILLED + EXECUTION_INVALID)",
+  "other_packages": "a frozen contract + decision function pair must exist BEFORE an observation can be ingested for that package (no contract, no ingestion — no post-hoc thresholds)"
+ },
+ "anti_fabrication_guards": [
+  "the decision field is RECOMPUTED by the machine function at test time and compared to the stored verdict (tamper-evident)",
+  "raw_data_hash must be a sha256 of bytes that exist in custody (raw artifact committed or custody-referenced); the attestation text must name the acquisition event",
+  "CONTROLLED_REHEARSAL events are structurally valid but can never promote a chain or produce a learning verdict (adjudicate_learning returns INSUFFICIENT_DATA for rehearsal source types)",
+  "the ingestion validator rejects any event whose candidate_result does not carry explicit units and uncertainty (bare numbers are unverifiable claims)"
+ ],
+ "no_observation_without_provenance": "this is the whole contract: an observation missing any mandatory field is rejected at the boundary — it never becomes evidence, never enters a ledger, never updates a model (fail-closed, Art. XIV)"
+}

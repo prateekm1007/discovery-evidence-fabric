@@ -1,0 +1,65 @@
+{
+ "artifact_type": "LOOP_CLOSURE_PATHS",
+ "directive_basis": "R407-E: close the P04 engineering loop on both outcomes",
+ "failure_path": {
+  "kill_channel_epistemic_classes": {
+   "P04-KILL-A-COMMONCAUSE": {
+    "class_justification": "bench-measured mechanism defeat for the dual-lumen common-cause mode; future candidates in this architecture family require explicit override justification",
+    "epistemic_class": "STRONG_CONSTRAINT"
+   },
+   "P04-KILL-B-NOPROTECTION": {
+    "class_justification": "measured zero protection under verified zero-leak anchors: the small-parallel-lumen safety floor cannot deliver Q_min in the tested regime \u2014 a physics-level negative for this design class",
+    "epistemic_class": "PROVEN_INVARIANT"
+   },
+   "P04-KILL-C-MFG": {
+    "class_justification": "manufacturing invariant across the full attempt (Art. XXIX design-space clause)",
+    "epistemic_class": "STRONG_CONSTRAINT"
+   }
+  },
+  "stages": [
+   "physical observation -> KILL (decide_p04 rule a/b/c)",
+   "-> cemetery entry (reality_ingestion.apply_kill_path -> orchestrator/mechanism_cemetery.py, append-only)",
+   "-> failure-memory update (lesson + failed assumption + affected artifacts, Art. XXXI)",
+   "-> discovery search constrained by the failure (check_candidate_against_cemetery: PROVEN_INVARIANT hard-blocks, STRONG_CONSTRAINT warns; the cemetery is READ by mechanism_space/adapters/run \u2014 a cemetery that is never read is a log, not a memory, Art. LI)"
+  ],
+  "trigger": "decision.verdict == KILL from the frozen contract on a REAL ingested observation",
+  "verified_by": "tests/test_r407_first_reality_loop.py (sandboxed cemetery: a P04-class candidate description is BLOCKED after the kill path runs)"
+ },
+ "state_today": "neither path has fired: zero real observations (see EXECUTION_ATTEMPT_R407.json); the machinery for both paths is armed and test-proven",
+ "success_path": {
+  "note": "physical observation -> update evidence -> update engineering model -> update buyer package -> update commercial maturity (R407-E success branch)",
+  "path": "SUCCESS",
+  "reality_class": "REAL",
+  "stages": [
+   {
+    "guard": "stage is NOT applied while trigger_event_id is a CONTROLLED_REHEARSAL or absent",
+    "requires": "the same validated REALITY_EVENT + the adjudicated model-error/model-update record",
+    "stage": "EVIDENCE_UPDATE",
+    "step": 1,
+    "trigger_event_id": "REAL-P04-0001"
+   },
+   {
+    "guard": "stage is NOT applied while trigger_event_id is a CONTROLLED_REHEARSAL or absent",
+    "requires": "the same validated REALITY_EVENT + the adjudicated model-error/model-update record",
+    "stage": "ENGINEERING_MODEL_UPDATE",
+    "step": 2,
+    "trigger_event_id": "REAL-P04-0001"
+   },
+   {
+    "guard": "stage is NOT applied while trigger_event_id is a CONTROLLED_REHEARSAL or absent",
+    "requires": "the same validated REALITY_EVENT + the adjudicated model-error/model-update record",
+    "stage": "BUYER_PACKAGE_UPDATE",
+    "step": 3,
+    "trigger_event_id": "REAL-P04-0001"
+   },
+   {
+    "guard": "stage is NOT applied while trigger_event_id is a CONTROLLED_REHEARSAL or absent",
+    "requires": "the same validated REALITY_EVENT + the adjudicated model-error/model-update record",
+    "stage": "COMMERCIAL_MATURITY_UPDATE",
+    "step": 4,
+    "trigger_event_id": "REAL-P04-0001"
+   }
+  ],
+  "trigger": "REAL-P04-0001"
+ }
+}
