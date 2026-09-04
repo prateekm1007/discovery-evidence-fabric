@@ -31,6 +31,7 @@ AUDIT = REPO / "LEAD_PORTFOLIO_4_AUDIT.md"
 CORPUS = REPO / "BENCHMARK_ENGINEERING_DOSSIERS" / "frozen_corpus_r370"
 NOVELTY = REPO / "NOVELTY_EVIDENCE"
 LP4 = REPO / "LEAD_PORTFOLIO_4"
+MECHANISM_CEMETERY_FILE = REPO / "MECHANISM_CEMETERY" / "CEMETERY.json"
 
 # The CEO-declared canonical mapping (directive section 3) — the test's own
 # ground truth, independent of any file under test.
@@ -304,6 +305,47 @@ def test_p08_d2_owner_decision_gate_complete_and_open():
     assert "D2_OWNER_DECISION_GATE.json" in eb["open_owner_actions"][0]
     chain = load(LP4 / "P08" / "DECISION_CHAIN.json")["chain"]
     assert "D2_OWNER_DECISION_GATE.json" in chain["next_experiment"]
+
+
+def test_p13_learning_artifact_recorded():
+    """R408 audit instruction 5: P13 is preserved as a LEARNING ARTIFACT
+    (not a zombie) — the fab spend is FROZEN, exactly one narrow live
+    item remains, and the causal lesson is in the machine cemetery."""
+    la = load(LP4 / "P13" / "LEARNING_ARTIFACT_R408.json")
+    assert la["artifact_class"].startswith("LEARNING ARTIFACT")
+    assert la["fabrication_spend"]["status"].startswith("FROZEN — "
+                                                        "PERMANENT")
+    assert "$95-265K" in la["fabrication_spend"]["amount_class"]
+    live = la["the_one_remaining_live_item"]
+    assert "measurement-method claim" in live["item"]
+    assert live["status"].startswith("CONDITIONAL")
+    # the 4-stage causal chain of the novelty collapse
+    stages = " ".join(la["the_causal_chain"])
+    assert "REPORTED_BUT_UNLOCATED" in stages
+    assert "R406 hard gate" in stages
+    assert "Art. XLVI mechanism-level test" in stages
+    # zombie prevention rules present
+    zr = " ".join(la["zombie_prevention_rules"])
+    assert "no further engineering work" in zr
+    assert "no buyer-surface presence" in zr
+    # the cemetery entry exists, is a FAILURE_LESSON, and the chain
+    # verifies (Art. XI/LI: the lesson is machine-readable memory)
+    cem = load(MECHANISM_CEMETERY_FILE)
+    hit = [e for e in cem["entries"]
+           if e.get("entry_id") == "cem:r408:p13-arch-novelty"]
+    assert len(hit) == 1
+    e = hit[0]
+    assert e["epistemic_class"] == "FAILURE_LESSON"
+    assert "LOCATED art" in e["reusable_lesson"]
+    assert "claim-element differentiation" in e["reusable_lesson"]
+    from premium_package_factory.r374 import pathway
+    assert pathway._chain_verify(cem)["valid"] is True
+    # the classification carries the repositioning (role, not evidence
+    # state — the REQUIRES_EVIDENCE_REPAIR class is unchanged)
+    fc = load(LP4 / "FINAL_CLASSIFICATION.json")
+    ext = fc["r408_extensions"]["P13"]
+    assert "LEARNING ARTIFACT" in ext["state"]
+    assert "unchanged" in ext["state"]
 
 
 # --------------------------------------------------------------------------
