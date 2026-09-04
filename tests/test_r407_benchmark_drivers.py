@@ -19,6 +19,7 @@ the driver's individual check functions. No network, no real clones.
 
 import json
 import os
+import subprocess
 import sys
 import zipfile
 
@@ -31,17 +32,118 @@ from scripts import r407_benchmark_drivers as drv  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
-# fixtures: a synthetic mini-portfolio
+# fixtures: a synthetic mini-engine + a synthetic mini-portfolio
+#
+# R408: the mini-ENGINE fixture (git repo + ENGINE_RELEASE_REGISTRY + the
+# registry-NAMED certificate) exists because the D-A/D-C/D-E defect class
+# is exactly "the driver compared against convenient engine-side state
+# instead of the authority record's own pointers". Hermetic tests must
+# control BOTH sides.
 # ---------------------------------------------------------------------------
 
 def _sha(path):
     return drv.sha256_file(path)
 
 
-def build_mini_portfolio(tmp_path, *, tamper=None):
+def _git(repo, *args):
+    subprocess.run(["git", "-C", str(repo), *args], check=True,
+                   capture_output=True, text=True)
+
+
+def _commit_all(repo, msg):
+    _git(repo, "add", "-A")
+    _git(repo, "-c", "user.name=Test", "-c", "user.email=t@t",
+         "commit", "-m", msg)
+    return subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],
+        capture_output=True, text=True).stdout.strip()
+
+
+def build_mini_engine(tmp_path, *, release_id="R-TEST-1",
+                      cert_name="RELEASE_CHAIN_VERIFICATION_R-TEST-1.json",
+                      cert_overall="PASS", cert_release_id=None,
+                      cert_at_root=True, cert_checks=25,
+                      extra_cert=None, honesty_scope=(
+                          "This certificate verifies DELIVERY from clean "
+                          "clones. It does NOT claim rebuild-from-source "
+                          "reproduction of those bytes.")):
+    """A minimal well-formed engine authority: a git repo whose
+    ENGINE_RELEASE_REGISTRY last release names a certificate that exists
+    and is release-consistent."""
+    engine = tmp_path / "engine"
+    engine.mkdir()
+    cert_rel = cert_name if cert_at_root else f"RELEASE_CHAIN/{cert_name}"
+    cert_path = engine / cert_rel
+    cert_path.parent.mkdir(parents=True, exist_ok=True)
+    checks = [{"id": f"E{i+1}", "state": "ENGINE", "status": "PASS",
+               "description": "check", "details": []}
+              for i in range(cert_checks)]
+    if cert_overall != "PASS":
+        checks[0]["status"] = "FAIL"
+    cert = {
+        "artifact": "RELEASE_CHAIN_VERIFICATION",
+        "release_id": cert_release_id or release_id,
+        "mode": "fresh-clone (authoritative)",
+        "overall": cert_overall,
+        "checks": checks,
+        "states": {
+            "engine_head": "b" * 40,
+            "portfolio_head": "e" * 40,
+            "portfolio_release_commit": "a" * 40,
+            "manifest_sha256": "f" * 64,
+            "master_zip_sha256": "9" * 64,
+        },
+        "honesty_scope": honesty_scope,
+    }
+    cert_path.write_text(json.dumps(cert, indent=1) + "\n")
+    if extra_cert:
+        # a sort-order-NEWER certificate in RELEASE_CHAIN/ belonging to an
+        # OLDER release era — the D-A glob trap: a directory-glob driver
+        # would cite this one instead of the registry-named certificate
+        ec = dict(cert)
+        ec["release_id"] = extra_cert.get("release_id", "R-OLDER-ERA")
+        ec["overall"] = extra_cert.get("overall", "PASS")
+        ec["states"] = dict(cert["states"])
+        ec["states"]["portfolio_release_commit"] = extra_cert.get(
+            "portfolio_release_commit", "7" * 40)
+        ecp = engine / "RELEASE_CHAIN" / extra_cert["name"]
+        ecp.parent.mkdir(parents=True, exist_ok=True)
+        ecp.write_text(json.dumps(ec, indent=1) + "\n")
+    registry = {
+        "registry": "ENGINE_RELEASE_REGISTRY",
+        "releases": [{
+            "release_id": release_id,
+            "portfolio_release_commit": "a" * 40,
+            "engine_build_commit": "b" * 40,
+            "manifest_sha256": "f" * 64,
+            "master_zip_sha256": "9" * 64,
+            "status": "SUBMITTED_FOR_CEO_AUDIT (test fixture)",
+            "verifications": [{
+                "certificate": cert_rel,
+                "mode": "fresh-clone (authoritative)",
+                "overall": cert_overall,
+                "checks_passed": cert_checks if cert_overall == "PASS"
+                else cert_checks - 1,
+                "checks_total": cert_checks,
+                "engine_main_verified": "b" * 40,
+                "portfolio_main_verified": "e" * 40,
+                "honesty_scope": honesty_scope,
+            }],
+        }],
+    }
+    (engine / "ENGINE_RELEASE_REGISTRY.json").write_text(
+        json.dumps(registry, indent=1) + "\n")
+    _git(engine, "init", "-q")
+    record_commit = _commit_all(engine, "mini engine: registry + cert")
+    return engine, record_commit
+
+
+def build_mini_portfolio(tmp_path, *, tamper=None, record_commit=None,
+                         release_id="R-TEST-1", include_repro=True):
     """A minimal well-formed portfolio: one package, a fresh identity
-    registry, a consistent LATEST_RELEASE, a matching canonical manifest,
-    a passing reproduction record. `tamper` injects one defect."""
+    registry, a consistent LATEST_RELEASE (pointing at the mini-engine
+    authority), a matching canonical manifest, a matching reproduction
+    record. `tamper` injects one defect."""
     root = tmp_path / "portfolio"
     pkg = root / "DOWNLOAD" / "01_test_pkg"
     pkg.mkdir(parents=True)
@@ -75,6 +177,7 @@ def build_mini_portfolio(tmp_path, *, tamper=None):
         json.dumps(reg, indent=2) + "\n")
 
     master_zip = root / "DOWNLOAD" / "technology-transfer-portfolio-15.zip"
+    cert_claims_count = 25
     with zipfile.ZipFile(master_zip, "w") as zf:
         zf.write(pkg / "00_PACKAGE_README.pdf",
                  "DOWNLOAD/01_test_pkg/00_PACKAGE_README.pdf")
@@ -95,20 +198,26 @@ def build_mini_portfolio(tmp_path, *, tamper=None):
     (root / "RELEASE").mkdir()
     lr = {
         "artifact": "LATEST_RELEASE",
-        "release_id": "R-TEST-1",
-        "git_tag": "v-test",
+        "release_id": release_id,
         "portfolio_release_commit": "a" * 40,
         "engine_build_commit": "b" * 40,
+        "engine_chain_record_commit": record_commit,
         "master_zip_sha256": _sha(master_zip),
-        "chain_verification": "25/25 PASS from clean clones",
+        "chain_verification": f"{cert_claims_count}"
+        f"/{cert_claims_count} PASS from clean clones",
     }
+    if tamper == "short_record_commit":
+        lr["engine_chain_record_commit"] = str(record_commit)[:8]
     (root / "RELEASE" / "LATEST_RELEASE.json").write_text(
         json.dumps(lr, indent=1) + "\n")
 
     iq = root / "INTERNAL_QA"
     iq.mkdir()
-    (iq / "R399_FRESH_CLONE_REPRODUCTION.json").write_text(json.dumps(
-        {"all_pass": True, "portfolio_head": "c" * 40}) + "\n")
+    if include_repro:
+        (iq / "R399_FRESH_CLONE_REPRODUCTION.json").write_text(json.dumps(
+            {"all_pass": True, "release_id": release_id,
+             "portfolio_release_commit": "a" * 40,
+             "portfolio_head": "c" * 40}) + "\n")
 
     if tamper == "identity_hash":
         reg["packages"][0]["package_zip_hash"] = "0" * 64
@@ -129,7 +238,13 @@ def build_mini_portfolio(tmp_path, *, tamper=None):
             json.dumps(lr, indent=1) + "\n")
     elif tamper == "repro_fail":
         (iq / "R399_FRESH_CLONE_REPRODUCTION.json").write_text(json.dumps(
-            {"all_pass": False}) + "\n")
+            {"all_pass": False, "release_id": release_id,
+             "portfolio_release_commit": "a" * 40}) + "\n")
+    elif tamper == "repro_stale_era":
+        # the D-B trap: an OLDER-era PASS record at a phantom commit —
+        # first-PASS-wins would have counted it
+        (iq / "R399_FRESH_CLONE_REPRODUCTION.json").write_text(json.dumps(
+            {"all_pass": True, "portfolio_head": "a73d897eb3ca"}) + "\n")
     return root
 
 
@@ -210,28 +325,211 @@ class TestDeliveryChecks:
         r = drv.check_manifest_pins_agree(root)
         assert r["pass"], r["failures"]
 
+    def test_latest_release_consistent_on_matching_fixture(self, tmp_path):
+        engine, record_commit = build_mini_engine(tmp_path)
+        root = build_mini_portfolio(tmp_path, record_commit=record_commit)
+        r = drv.check_latest_release(root, engine)
+        assert r["pass"], r["failures"]
+
     def test_latest_release_count_mismatch_detected(self, tmp_path):
-        # the mini fixture has no authority certificate in the engine
-        # RELEASE_CHAIN for R-TEST-1; the pointer's 25/25 claim cannot
-        # be confirmed -> the check must fail (fail-closed, Art. IV)
-        root = build_mini_portfolio(tmp_path, tamper="lr_count")
-        r = drv.check_latest_release(root, drv.ENGINE_ROOT)
+        engine, record_commit = build_mini_engine(tmp_path)
+        root = build_mini_portfolio(tmp_path, record_commit=record_commit,
+                                    tamper="lr_count")
+        r = drv.check_latest_release(root, engine)
         assert not r["pass"]
 
     def test_latest_release_commit_mismatch_detected(self, tmp_path):
-        root = build_mini_portfolio(tmp_path, tamper="lr_commit")
-        r = drv.check_latest_release(root, drv.ENGINE_ROOT)
+        engine, record_commit = build_mini_engine(tmp_path)
+        root = build_mini_portfolio(tmp_path, record_commit=record_commit,
+                                    tamper="lr_commit")
+        r = drv.check_latest_release(root, engine)
         assert not r["pass"]
 
     def test_reproduction_evidence_reads_all_pass(self, tmp_path):
-        root = build_mini_portfolio(tmp_path)
-        r = drv.check_reproduction_evidence(root)
+        engine, record_commit = build_mini_engine(tmp_path)
+        root = build_mini_portfolio(tmp_path, record_commit=record_commit)
+        r = drv.check_reproduction_evidence(root, engine)
         assert r["pass"], r["failures"]
 
     def test_reproduction_evidence_failing_record_detected(self, tmp_path):
-        root = build_mini_portfolio(tmp_path, tamper="repro_fail")
-        r = drv.check_reproduction_evidence(root)
+        engine, record_commit = build_mini_engine(tmp_path)
+        root = build_mini_portfolio(tmp_path, record_commit=record_commit,
+                                    tamper="repro_fail")
+        r = drv.check_reproduction_evidence(root, engine)
         assert not r["pass"]
+
+
+# ---------------------------------------------------------------------------
+# R408 stale-evidence regressions (findings D-A..D-E + the stale-tag trap)
+# ---------------------------------------------------------------------------
+
+class TestR408StaleEvidenceRegressions:
+    """The P0-boot audit found the DELIVERY driver citing evidence from the
+    wrong era. Each test here reproduces one finding as a hermetic
+    negative case (Art. V/VIII: every check must be able to FAIL)."""
+
+    def test_certificate_at_repo_root_is_named(self, tmp_path):
+        """D-A/D-C regression: the registry names a certificate at the
+        engine ROOT (outside RELEASE_CHAIN/); the driver must resolve and
+        name exactly that file — the 1.0.0 RELEASE_CHAIN/ glob missed it
+        and cited an older-era certificate instead."""
+        engine, _ = build_mini_engine(tmp_path, cert_at_root=True)
+        r = drv.check_chain_certificate(engine)
+        assert r["pass"], r["failures"]
+        assert "RELEASE_CHAIN_VERIFICATION_R-TEST-1.json" in r["evidence"]
+
+    def test_registry_named_certificate_missing_is_red(self, tmp_path):
+        """A registry pointer that names a certificate which does not
+        resolve is RED — never a fallback to whatever else lies in
+        RELEASE_CHAIN/ (Art. IV: no fallback epistemology)."""
+        engine, _ = build_mini_engine(tmp_path)
+        (engine / "RELEASE_CHAIN_VERIFICATION_R-TEST-1.json").unlink()
+        r = drv.check_chain_certificate(engine)
+        assert not r["pass"]
+        assert "CERTIFICATE_NOT_RESOLVED" in r["failures"]
+        assert "does not resolve" in r["evidence"]
+
+    def test_wrong_cert_stale_scores_red(self, tmp_path):
+        """The mandated negative case 'wrong-cert-stale': the
+        registry-named certificate is FAIL/stale for the scored release
+        while a sort-order-newer PASS certificate from an older era sits
+        in RELEASE_CHAIN/ — the driver must score RED (a glob would have
+        returned PASS)."""
+        engine, _ = build_mini_engine(
+            tmp_path, cert_overall="FAIL",
+            extra_cert={"name": "RELEASE_CHAIN_VERIFICATION_R-ZZZ.json",
+                        "release_id": "R-OLDER-ERA", "overall": "PASS"})
+        r = drv.check_chain_certificate(engine)
+        assert not r["pass"]
+        # and the LATEST_RELEASE consistency check must ALSO be red: its
+        # claims cannot be confirmed by an authority certificate that
+        # is not PASS
+        root = build_mini_portfolio(
+            tmp_path, record_commit=_head(engine),
+            tamper="lr_count")  # claims 26/26 while authority says 24/25
+        r2 = drv.check_latest_release(root, engine)
+        assert not r2["pass"]
+        assert any("AUTHORITY_CERTIFICATE" in f for f in r2["failures"])
+
+    def test_certificate_release_mismatch_is_red(self, tmp_path):
+        """The registry-named certificate belongs to a different
+        release_id than the registry's last release -> RED."""
+        engine, _ = build_mini_engine(
+            tmp_path, cert_release_id="R-SOME-OTHER-RELEASE")
+        r = drv.check_chain_certificate(engine)
+        assert not r["pass"]
+        assert any("CERTIFICATE_RELEASE_ID_MISMATCH" in f
+                   for f in r["failures"])
+
+    def test_wrong_repro_stale_scores_red(self, tmp_path):
+        """The mandated negative case 'wrong-repro-stale': an
+        R373-era-style PASS record at a phantom commit exists, but NO
+        record matches the release being scored -> the check must be RED
+        with the honest N/A state (1.0.0's first-PASS-wins returned
+        PASS)."""
+        engine, record_commit = build_mini_engine(tmp_path)
+        root = build_mini_portfolio(
+            tmp_path, record_commit=record_commit,
+            tamper="repro_stale_era")
+        r = drv.check_reproduction_evidence(root, engine)
+        assert not r["pass"]
+        assert any("NO_MATCHING_REPRODUCTION_RECORD" in f
+                   for f in r["failures"])
+        assert "N/A" in r["evidence"]
+        # the honesty note carries the certificate's own honesty_scope
+        assert "rebuild-from-source" in r["evidence"]
+
+    def test_honest_na_when_no_reproduction_records_exist(self, tmp_path):
+        """D-B honest-N/A path: INTERNAL_QA empty -> RED with the N/A
+        note carrying the chain certificate's own honesty_scope (never a
+        silent pass, never a borrowed older-era record)."""
+        engine, record_commit = build_mini_engine(tmp_path)
+        root = build_mini_portfolio(tmp_path, record_commit=record_commit,
+                                    include_repro=False)
+        r = drv.check_reproduction_evidence(root, engine)
+        assert not r["pass"]
+        assert "N/A" in r["evidence"]
+
+    def test_short_engine_chain_record_commit_is_red(self, tmp_path):
+        """D-E: an 8-char engine_chain_record_commit is RED (Art. II
+        exactness — the R407 LATEST_RELEASE carried exactly this defect
+        with value 'cf2665b6')."""
+        engine, record_commit = build_mini_engine(tmp_path)
+        root = build_mini_portfolio(
+            tmp_path, record_commit=record_commit,
+            tamper="short_record_commit")
+        r = drv.check_latest_release(root, engine)
+        assert not r["pass"]
+        assert any("ENGINE_CHAIN_RECORD_COMMIT_NOT_FULL40" in f
+                   for f in r["failures"])
+
+    def test_foreign_engine_chain_record_commit_is_red(self, tmp_path):
+        """D-E: a full-40 hash that is NOT a registry-record commit is
+        RED (a plausible-looking foreign hash must not pass)."""
+        engine, _ = build_mini_engine(tmp_path)
+        root = build_mini_portfolio(
+            tmp_path, record_commit="c" * 40)
+        r = drv.check_latest_release(root, engine)
+        assert not r["pass"]
+        assert any("ENGINE_CHAIN_RECORD_COMMIT_NOT_A_REGISTRY_RECORD_COMMIT"
+                   in f for f in r["failures"])
+
+    def test_stale_tag_pointing_backwards_is_red(self, tmp_path):
+        """The stale-tag trap: LATEST_RELEASE.git_tag exists but points
+        at a commit BEFORE the release commit -> RED (the v1.0.0-3D-edition
+        trap: a tag at a superseded release)."""
+        engine, record_commit = build_mini_engine(tmp_path)
+        root = build_mini_portfolio(tmp_path, record_commit=record_commit)
+        # give the portfolio a git history: an OLD root commit, then the
+        # release state; tag the OLD root commit (points backwards)
+        _git(root, "init", "-q")
+        (root / "OLD_MARKER.txt").write_text("old era\n")
+        _commit_all(root, "old state (pre-release)")
+        old_root = _head(root)
+        (root / "OLD_MARKER.txt").unlink()
+        _commit_all(root, "release state")
+        rel_head = _head(root)
+        lr_path = root / "RELEASE" / "LATEST_RELEASE.json"
+        lr = json.loads(lr_path.read_text())
+        lr["git_tag"] = "v-stale-trap"
+        lr["portfolio_release_commit"] = rel_head
+        lr_path.write_text(json.dumps(lr, indent=1) + "\n")
+        _commit_all(root, "pointer state")
+        assert old_root != rel_head
+        _git(root, "tag", "v-stale-trap", old_root)
+        r = drv.check_latest_release(root, engine)
+        assert not r["pass"]
+        assert any("TAG_POINTS_BACKWARDS" in f for f in r["failures"])
+
+    def test_tag_at_release_commit_is_green(self, tmp_path):
+        """Positive control: a tag at/after the release commit passes the
+        tag-agreement check (a universal rejector would fail this)."""
+        engine, record_commit = build_mini_engine(tmp_path)
+        root = build_mini_portfolio(tmp_path, record_commit=record_commit)
+        _git(root, "init", "-q")
+        _commit_all(root, "release state")
+        rel_head = _head(root)
+        lr_path = root / "RELEASE" / "LATEST_RELEASE.json"
+        lr = json.loads(lr_path.read_text())
+        lr["git_tag"] = "v-current"
+        lr["portfolio_release_commit"] = rel_head
+        lr_path.write_text(json.dumps(lr, indent=1) + "\n")
+        _git(root, "add", "-A")
+        _git(root, "-c", "user.name=T", "-c", "user.email=t@t",
+             "commit", "-q", "-m", "pointer state")
+        _git(root, "tag", "v-current", "HEAD")
+        r = drv.check_latest_release(root, engine)
+        # the tag check itself must be the ONLY thing standing between
+        # red and green here: assert the tag evidence is present and no
+        # tag-related failure is recorded
+        assert not any("TAG_" in f for f in r["failures"])
+        assert "git_tag=v-current" in r["evidence"]
+
+
+def _head(repo):
+    return subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],
+        capture_output=True, text=True).stdout.strip()
 
 
 class TestHonestyChecks:

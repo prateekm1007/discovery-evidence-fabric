@@ -118,20 +118,27 @@ class TestV2Mutations:
         v2 = [p for p in packages if p.addendum]
         assert len(v2) == 8
         for p in v2:
-            # R394: a package carrying V3 corrections is version 3.0
-            # (P-07, P-24 — the mechanism/CAD correction trails); the
-            # other V2 packages remain 2.0.
+            # R394: a package carrying V3 corrections is at the
+            # corrections' v3_version (P-07, P-24 — 3.0, the R394
+            # mechanism/CAD correction trails); the other V2 packages
+            # remain 2.0. R408: P-22-R1's corrections extended to V3.1
+            # (the vocabulary-closure operations) — the version follows
+            # the recorded corrections version, never a hardcoded
+            # constant.
             if p.v3_corrections:
-                assert p.version == "3.0"
+                assert p.version == p.v3_corrections.get(
+                    "v3_version", "3.0"), p.pkg_id
             else:
                 assert p.version == "2.0"
         for p in packages:
             if not p.addendum:
                 # R394: a V1 package carrying V3 corrections jumps to
-                # 3.0 (P-22-R1 — the steering-lumen embodiment
-                # correction); pure V1 packages remain 1.0.
+                # the corrections' v3_version (P-22-R1 — the
+                # steering-lumen embodiment correction, 3.1 after the
+                # R408 vocabulary closure); pure V1 packages remain 1.0.
                 if p.v3_corrections:
-                    assert p.version == "3.0"
+                    assert p.version == p.v3_corrections.get(
+                        "v3_version", "3.0"), p.pkg_id
                 else:
                     assert p.version == "1.0"
 

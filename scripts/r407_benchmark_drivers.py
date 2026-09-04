@@ -22,12 +22,32 @@ Constitution basis:
                with this rubric version; changing them requires a new
                rubric version and adversarial re-test.
 
-Scoring model (FROZEN with rubric 1.0.0):
+Scoring model (FROZEN with rubric 1.1.0 — see RUBRIC_CHANGE_RECORD):
   score = 10 - sum(deductions), floor 0, integer-truncated.
   The 9-bar (release bar) requires zero deductions on that family's checks.
   Deduction weights are per-check-class, NOT per-instance, except where a
   per-instance cap is explicitly declared — a hundred stale hashes is one
   defect class (D1), not a hundred deductions.
+
+R408 driver changes (rubric rule_7: driver change => new rubric version +
+adversarial re-test; deduction tables UNCHANGED — no threshold moved):
+  D-A/D-C  check_chain_certificate + check_latest_release now resolve the
+           certificate the ENGINE_RELEASE_REGISTRY's last verification
+           actually NAMES (exact path, no RELEASE_CHAIN/ glob, no hardcoded
+           R387-era certificate). A registry-named certificate that does
+           not resolve is RED (fail-closed, Art. II/IV).
+  D-B      check_reproduction_evidence matches the release being scored
+           (engine-registry release_id + portfolio_release_commit) or
+           returns the honest N/A state carrying the chain certificate's
+           own honesty_scope note — never first-PASS-wins on an R373-era
+           record at a phantom commit.
+  D-E      check_latest_release verifies LATEST_RELEASE.engine_chain_
+           record_commit is the full-40 engine commit that recorded the
+           registry release record (short hashes and foreign commits are
+           RED).
+  tag      LATEST_RELEASE.git_tag must exist and point at the release
+           commit or a chain-neutral descendant (the stale-tag trap: a tag
+           at a superseded release is RED).
 
 Usage:
   python scripts/r407_benchmark_drivers.py --family all \
@@ -49,10 +69,12 @@ DEFAULT_OUT_DIR = ENGINE_ROOT / "R407" / "DRIVERS"
 
 sys.path.insert(0, str(ENGINE_ROOT))
 
-RUBRIC_VERSION = "1.0.0"
+RUBRIC_VERSION = "1.1.0"
 
 # ---------------------------------------------------------------------------
-# Frozen deduction tables (rubric 1.0.0). Rule 7: no tuning against output.
+# Frozen deduction tables (rubric 1.0.0; UNCHANGED through 1.1.0 — the
+# R408 driver changes moved check SEMANTICS to registry-named resolution,
+# they did not move any threshold. Rule 7: no tuning against output.)
 # ---------------------------------------------------------------------------
 
 DELIVERY_DEDUCTIONS = {
@@ -89,12 +111,15 @@ AUDIT_NOTES = {
     "latest_release_consistency": "D2: LATEST_RELEASE claims vs the engine "
     "authority records (certificate check-count, registry commits, tag "
     "status)",
-    "chain_certificate_pass": "the freshest clean-clone chain certificate "
-    "in the engine repo is overall PASS",
+    "chain_certificate_pass": "the certificate the engine registry's "
+    "last verification NAMES is overall PASS and release-consistent "
+    "(D-A/D-C: exact-path resolution, no globs, no first-PASS-wins)",
     "release_audits_green": "B1: r373 independent audit + r374 equation "
     "status audit green on every shipped package",
     "reproduction_evidence": "a committed fresh-clone byte-reproduction "
-    "record exists for the release",
+    "record MATCHING the release being scored exists (D-B: engine-registry "
+    "release_id + portfolio_release_commit; otherwise the honest N/A state "
+    "carries the chain certificate's own honesty_scope note)",
     "manifest_pins_agree": "the 9-bar's 924/924 pins: every "
     "buyer-surface file the CANONICAL_RELEASE_MANIFEST pins hash-matches "
     "the current tree (a stale manifest after content changes is RED "
@@ -171,6 +196,78 @@ def check_identity_registry(portfolio_root):
                   mismatches)
 
 
+def _latest_registry_release(engine_root):
+    """(release_record, error) for the LAST release in the engine-side
+    ENGINE_RELEASE_REGISTRY — the authority for what the current release
+    is (Art. XXXIX)."""
+    erp = engine_root / "ENGINE_RELEASE_REGISTRY.json"
+    if not erp.exists():
+        return None, "ENGINE_RELEASE_REGISTRY.json missing"
+    registry = json.loads(erp.read_text(encoding="utf-8"))
+    releases = registry.get("releases", [])
+    if not releases:
+        return None, "engine registry empty"
+    return releases[-1], None
+
+
+def _registry_named_certificate(engine_root, release):
+    """(resolved_path, cert_ref, error) — the certificate the registry's
+    LAST verification entry NAMES, resolved exactly (no globs, no
+    newest-in-directory wins — the R408 D-A/D-C fix). The reference is
+    repo-relative as recorded; a reference that does not resolve is an
+    error, never a fallback to some other certificate (Art. IV)."""
+    verifs = release.get("verifications") or []
+    if not verifs:
+        return None, None, "no verification recorded for the release"
+    cert_ref = verifs[-1].get("certificate")
+    if not cert_ref:
+        return None, None, "verification record carries no certificate name"
+    cert_path = engine_root / cert_ref
+    if not cert_path.exists():
+        return None, cert_ref, (
+            f"registry-named certificate does not resolve: {cert_ref}")
+    return cert_path, cert_ref, None
+
+
+def _git_commits_touching(engine_root, rel_path):
+    """Commits (full-40, newest first) that modified rel_path — used to
+    verify the D-E engine_chain_record_commit pointer."""
+    import subprocess
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(engine_root), "log", "--format=%H",
+             "--", rel_path],
+            capture_output=True, text=True, timeout=30).stdout
+        return [l.strip() for l in out.splitlines() if l.strip()]
+    except Exception:
+        return []
+
+
+def _git_tag_commit(portfolio_root, tag):
+    """The commit a tag points at in the portfolio clone, or None."""
+    import subprocess
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(portfolio_root), "rev-parse",
+             f"refs/tags/{tag}^{{commit}}"],
+            capture_output=True, text=True, timeout=30).stdout.strip()
+        return out or None
+    except Exception:
+        return None
+
+
+def _git_is_ancestor(repo_root, ancestor, descendant):
+    import subprocess
+    try:
+        rc = subprocess.run(
+            ["git", "-C", str(repo_root), "merge-base", "--is-ancestor",
+             ancestor, descendant],
+            capture_output=True, timeout=30).returncode
+        return rc == 0
+    except Exception:
+        return False
+
+
 def check_latest_release(portfolio_root, engine_root):
     """D2 — LATEST_RELEASE claims vs engine authority records."""
     lr_path = portfolio_root / "RELEASE" / "LATEST_RELEASE.json"
@@ -181,17 +278,11 @@ def check_latest_release(portfolio_root, engine_root):
                       "RELEASE/LATEST_RELEASE.json missing", ["FILE_MISSING"])
     lr = json.loads(lr_path.read_text(encoding="utf-8"))
     # engine-side registry (authority for releases)
-    erp = engine_root / "ENGINE_RELEASE_REGISTRY.json"
-    if not erp.exists():
-        return _check("latest_release_consistency", False,
-                      "ENGINE_RELEASE_REGISTRY.json missing",
-                      ["ENGINE_REGISTRY_MISSING"])
-    registry = json.loads(erp.read_text(encoding="utf-8"))
-    releases = registry.get("releases", [])
-    if not releases:
-        return _check("latest_release_consistency", False,
-                      "engine registry empty", ["ENGINE_REGISTRY_EMPTY"])
-    last = releases[-1]
+    last, err = _latest_registry_release(engine_root)
+    if err:
+        return _check("latest_release_consistency", False, err,
+                      ["ENGINE_REGISTRY_MISSING" if "missing" in err
+                       else "ENGINE_REGISTRY_EMPTY"])
     # 1. pointer must reference the LAST recorded release
     if lr.get("release_id") != last.get("release_id"):
         problems.append(f"POINTER_NOT_LATEST: {lr.get('release_id')} "
@@ -202,28 +293,69 @@ def check_latest_release(portfolio_root, engine_root):
     if lr.get("engine_build_commit") and \
             lr["engine_build_commit"] != last["engine_build_commit"]:
         problems.append("ENGINE_COMMIT_MISMATCH")
-    # 2. claimed chain check-count must equal the authority certificate's
-    cert_path = engine_root / "RELEASE_CHAIN" / \
-        "RELEASE_CHAIN_VERIFICATION_R387-3D-QUALITY-EDITION.json"
+    # 2. D-E: engine_chain_record_commit must be the full-40 engine commit
+    #    that recorded the registry release record (short/foreign values
+    #    are RED — Art. II exactness)
+    ecr = lr.get("engine_chain_record_commit")
+    if not ecr:
+        problems.append("ENGINE_CHAIN_RECORD_COMMIT_ABSENT")
+    else:
+        if not (isinstance(ecr, str) and len(ecr) == 40 and
+                all(c in "0123456789abcdef" for c in ecr.lower())):
+            problems.append(
+                f"ENGINE_CHAIN_RECORD_COMMIT_NOT_FULL40: {str(ecr)[:44]}")
+        else:
+            touched = _git_commits_touching(engine_root,
+                                            "ENGINE_RELEASE_REGISTRY.json")
+            if ecr not in touched:
+                problems.append(
+                    "ENGINE_CHAIN_RECORD_COMMIT_NOT_A_REGISTRY_RECORD_"
+                    "COMMIT")
+            else:
+                evidence.append(
+                    f"engine_chain_record_commit={ecr[:12]} (registry "
+                    f"record commit, verified)")
+    # 3. claimed chain check-count must equal the AUTHORITY certificate's —
+    #    the certificate the registry's last verification names (D-C fix:
+    #    never a hardcoded R387-era certificate)
     claimed = lr.get("chain_verification", "")
     m = re.search(r"(\d+)\s*/\s*(\d+)", str(claimed))
-    cert_checks = None
-    if cert_path.exists():
+    cert_path, cert_ref, cert_err = _registry_named_certificate(
+        engine_root, last)
+    if cert_err:
+        problems.append(f"AUTHORITY_CERTIFICATE_UNRESOLVED: {cert_err}")
+    else:
         cert = json.loads(cert_path.read_text(encoding="utf-8"))
         cc = cert.get("checks", cert.get("results", []))
-        cert_checks = len(cc) if isinstance(cc, list) else cert.get(
+        cert_total = len(cc) if isinstance(cc, list) else cert.get(
             "checks_total")
-        evidence.append(f"certificate checks={cert_checks}")
-    if m:
-        claimed_passed, claimed_total = int(m.group(1)), int(m.group(2))
-        evidence.append(f"claimed {claimed_passed}/{claimed_total}")
-        if cert_checks is not None and claimed_total != cert_checks:
-            problems.append(f"CHECK_COUNT_MISMATCH: pointer claims "
-                            f"{claimed_total}, authority certificate has "
-                            f"{cert_checks}")
-        if claimed_passed != claimed_total:
-            problems.append("POINTER_CLAIMS_PARTIAL_PASS")
-    # 3. master zip hash vs the canonical manifest (buyer truth)
+        cert_passed = sum(1 for c in (cc if isinstance(cc, list) else [])
+                          if c.get("status") == "PASS") \
+            if isinstance(cc, list) else None
+        cert_overall = cert.get("overall")
+        evidence.append(f"registry-named certificate: {cert_ref} "
+                        f"(overall={cert_overall}, "
+                        f"checks={cert_passed}/{cert_total})")
+        if cert_overall != "PASS":
+            problems.append("AUTHORITY_CERTIFICATE_NOT_PASS")
+        if cert.get("release_id") != last.get("release_id"):
+            problems.append("CERTIFICATE_RELEASE_ID_MISMATCH")
+        if m:
+            claimed_passed, claimed_total = int(m.group(1)), int(m.group(2))
+            evidence.append(f"claimed {claimed_passed}/{claimed_total}")
+            if cert_total is not None and claimed_total != cert_total:
+                problems.append(f"CHECK_COUNT_MISMATCH: pointer claims "
+                                f"{claimed_total}, authority certificate has "
+                                f"{cert_total}")
+            if cert_passed is not None and claimed_passed != cert_passed:
+                problems.append(f"CHECKS_PASSED_MISMATCH: pointer claims "
+                                f"{claimed_passed}, authority certificate "
+                                f"has {cert_passed}")
+            if claimed_passed != claimed_total:
+                problems.append("POINTER_CLAIMS_PARTIAL_PASS")
+        else:
+            problems.append("POINTER_CARRIES_NO_CHECK_COUNT")
+    # 4. master zip hash vs the canonical manifest (buyer truth)
     manifest = json.loads((portfolio_root /
                            "CANONICAL_RELEASE_MANIFEST.json")
                           .read_text(encoding="utf-8"))
@@ -231,18 +363,27 @@ def check_latest_release(portfolio_root, engine_root):
     if lr.get("master_zip_sha256") and \
             lr["master_zip_sha256"] != mz.get("sha256"):
         problems.append("MASTER_ZIP_HASH_MISMATCH_VS_MANIFEST")
-    # 4. tag/status agreement: engine registry status says NOT_TAGGED while
-    #    the tag exists on the portfolio remote is an inconsistency the
-    #    auditor counts under D2.
-    if last.get("status") == "SUBMITTED_FOR_CEO_AUDIT_NOT_TAGGED":
-        # verify against the local clone's tags (remote tag check is the
-        # clean-clone verifier's job; here the presence of the tag in the
-        # release clone contradicts the engine status field)
-        tag_file = portfolio_root / ".git" / "refs" / "tags" / \
-            str(lr.get("git_tag", "v1.0.0-3D-edition"))
-        packed = (portfolio_root / ".git" / "packed-refs").exists()
-        if tag_file.exists() or packed:
-            problems.append("REGISTRY_STATUS_SAYS_NOT_TAGGED_BUT_TAG_EXISTS")
+    # 5. tag agreement (the stale-tag trap): LATEST_RELEASE.git_tag must
+    #    exist in the portfolio clone and point at the release commit or
+    #    a chain-neutral descendant — a tag at a superseded release is
+    #    exactly the stale-commit trap the machinery warns about.
+    tag = lr.get("git_tag")
+    if tag:
+        tag_commit = _git_tag_commit(portfolio_root, tag)
+        if not tag_commit:
+            problems.append(f"TAG_MISSING_IN_CLONE: {tag}")
+        else:
+            rel_commit = lr.get("portfolio_release_commit") or \
+                last.get("portfolio_release_commit")
+            if rel_commit and not _git_is_ancestor(
+                    portfolio_root, rel_commit, tag_commit):
+                problems.append(
+                    f"TAG_POINTS_BACKWARDS: {tag} at {tag_commit[:12]} is "
+                    f"not at/after the release commit "
+                    f"{str(rel_commit)[:12]}")
+            else:
+                evidence.append(f"git_tag={tag} at {tag_commit[:12]} "
+                                f"(at/after the release commit)")
     evidence.append(f"engine registry last release: "
                     f"{last.get('release_id')} status={last.get('status')}")
     return _check("latest_release_consistency", not problems,
@@ -302,22 +443,49 @@ def check_manifest_pins_agree(portfolio_root):
 
 
 def check_chain_certificate(engine_root):
-    """Freshest clean-clone chain certificate is overall PASS."""
-    certs = []
-    rc = engine_root / "RELEASE_CHAIN"
-    if rc.exists():
-        for fp in sorted(rc.glob("*.json")):
-            try:
-                c = json.loads(fp.read_text(encoding="utf-8"))
-            except Exception:
-                continue
-            if isinstance(c, dict) and c.get("overall"):
-                certs.append((fp.name, c.get("overall")))
-    ok = bool(certs) and certs[-1][1] == "PASS"
-    return _check("chain_certificate_pass", ok,
-                  f"latest certificate: {certs[-1][0]} -> {certs[-1][1]}"
-                  if certs else "no certificates found",
-                  [] if ok else ["NO_PASS_CERTIFICATE"])
+    """The certificate the engine registry's last verification NAMES is
+    overall PASS and release-consistent (D-A/D-C fix: exact-path
+    resolution of the authority record's own pointer — never a directory
+    glob whose sort order can hand back an older era's certificate)."""
+    release, err = _latest_registry_release(engine_root)
+    if err:
+        return _check("chain_certificate_pass", False, err,
+                      ["ENGINE_REGISTRY_UNAVAILABLE"])
+    cert_path, cert_ref, cert_err = _registry_named_certificate(
+        engine_root, release)
+    if cert_err:
+        return _check("chain_certificate_pass", False, cert_err,
+                      ["CERTIFICATE_NOT_RESOLVED"])
+    try:
+        cert = json.loads(cert_path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        return _check("chain_certificate_pass", False,
+                      f"registry-named certificate unreadable: {exc}",
+                      ["CERTIFICATE_UNREADABLE"])
+    cc = cert.get("checks", cert.get("results", []))
+    total = len(cc) if isinstance(cc, list) else cert.get("checks_total")
+    passed = sum(1 for c in (cc if isinstance(cc, list) else [])
+                 if c.get("status") == "PASS") \
+        if isinstance(cc, list) else None
+    problems = []
+    if cert.get("overall") != "PASS":
+        problems.append(f"CERTIFICATE_OVERALL_{cert.get('overall')}")
+    if cert.get("release_id") != release.get("release_id"):
+        problems.append("CERTIFICATE_RELEASE_ID_MISMATCH")
+    states = cert.get("states", {}) or {}
+    if states.get("portfolio_release_commit") and \
+            release.get("portfolio_release_commit") and \
+            states["portfolio_release_commit"] != \
+            release["portfolio_release_commit"]:
+        problems.append("CERTIFICATE_PORTFOLIO_COMMIT_MISMATCH")
+    evidence = (
+        f"registry-named certificate: {cert_ref} -> {cert.get('overall')} "
+        f"({passed}/{total} checks; verified engine_main "
+        f"{str(states.get('engine_head'))[:12]}, portfolio_main "
+        f"{str(states.get('portfolio_head'))[:12]}, release commit "
+        f"{str(states.get('portfolio_release_commit'))[:12]})")
+    return _check("chain_certificate_pass", not problems, evidence,
+                  problems)
 
 
 def run_release_audits(portfolio_root):
@@ -365,40 +533,68 @@ def check_release_audits(r373_result, r374_failures):
                   problems[:40])
 
 
-def check_reproduction_evidence(portfolio_root):
-    """Committed fresh-clone byte-reproduction record for the release."""
-    candidates = [
-        portfolio_root / "INTERNAL_QA" / "R373_FRESH_CLONE_REPRODUCTION.json",
-    ]
+def check_reproduction_evidence(portfolio_root, engine_root):
+    """Committed fresh-clone byte-reproduction record MATCHING the release
+    being scored (D-B fix). The scored release is the engine registry's
+    last release (the authority). A record matches when it names that
+    release_id and that release's portfolio_release_commit. Records from
+    other releases (e.g. an R373-era record at a phantom commit) are
+    disclosed as stale, never counted (Art. XXIV: an older PASS is not
+    evidence for a newer release). No match -> the honest N/A state,
+    carrying the chain certificate's own honesty_scope note."""
+    release, err = _latest_registry_release(engine_root)
+    if err:
+        return _check("reproduction_evidence", False, err,
+                      ["ENGINE_REGISTRY_UNAVAILABLE"])
+    scored_rid = release.get("release_id")
+    scored_commit = release.get("portfolio_release_commit")
+    honesty_scope = ""
+    verifs = release.get("verifications") or []
+    if verifs:
+        honesty_scope = str(verifs[-1].get("honesty_scope", ""))
     iq = portfolio_root / "INTERNAL_QA"
-    if iq.exists():
-        candidates.extend(iq.glob("*FRESH_CLONE*REPRODUCTION*.json"))
-        candidates.extend(iq.glob("*REPRODUCTION*.json"))
-    found_pass = None
-    stale_note = None
+    candidates = sorted(set(iq.glob("*REPRODUCTION*.json"))) \
+        if iq.exists() else []
+    matched = None      # (name, verdict, commit_of_record)
+    stale_seen = []
     for c in candidates:
-        if not c.exists():
-            continue
         try:
             d = json.loads(c.read_text(encoding="utf-8"))
         except Exception:
             continue
         verdict = (d.get("overall") or d.get("verdict") or d.get("result")
                    or ("PASS" if d.get("all_pass") is True else None))
-        if verdict == "PASS":
-            found_pass = c.name
-            stale_note = f"recorded at portfolio_head " \
-                         f"{str(d.get('portfolio_head'))[:12]}"
-            break
-        if found_pass is None:
-            found_pass = f"{c.name}->{verdict}"
-    ok = found_pass is not None and not found_pass.endswith("->None")
-    return _check("reproduction_evidence", ok,
-                  f"record: {found_pass} ({stale_note})" if found_pass and
-                  stale_note else
-                  (f"record: {found_pass}" if found_pass else
-                   "no reproduction record found"),
-                  [] if ok else ["NO_PASSING_REPRODUCTION_RECORD"])
+        rec_rid = d.get("release_id")
+        rec_commit = d.get("portfolio_release_commit") or \
+            d.get("portfolio_head")
+        if rec_rid == scored_rid and (rec_commit == scored_commit
+                                      if d.get("portfolio_release_commit")
+                                      else True):
+            if matched is None or verdict == "PASS":
+                matched = (c.name, verdict, rec_commit)
+            if verdict == "PASS":
+                break
+        else:
+            stale_seen.append(
+                f"{c.name}(release_id={rec_rid or 'ABSENT'}, "
+                f"head={str(rec_commit)[:12]})")
+    if matched and matched[1] == "PASS":
+        return _check(
+            "reproduction_evidence", True,
+            f"record: {matched[0]} (release_id {scored_rid}, "
+            f"portfolio_release_commit {str(matched[2])[:12]}, "
+            f"verdict PASS)", [])
+    if matched:
+        return _check("reproduction_evidence", False,
+                      f"record: {matched[0]} -> {matched[1]} for "
+                      f"{scored_rid}", ["MATCHED_RECORD_NOT_PASS"])
+    return _check(
+        "reproduction_evidence", False,
+        (f"N/A — no reproduction record matches the release being scored "
+         f"({scored_rid}); records found: "
+         f"{'; '.join(stale_seen) if stale_seen else 'none'}; the chain "
+         f"certificate's own honesty_scope: {honesty_scope[:240]}"),
+        ["NO_MATCHING_REPRODUCTION_RECORD"])
 
 
 # ---------------------------------------------------------------------------
@@ -668,11 +864,20 @@ def check_semantic_genericness_live(portfolio_root):
     mismatches = result.get("semantic_mismatches") or []
     problems = [f"{m.get('package_id')}:{str(m.get('sentence'))[:60]}"
                 for m in mismatches]
+    gold = result.get("gold_corpus_calibration") or {}
+    gold_note = (
+        f"gold calibration available ({gold.get('packages_scanned')} "
+        f"packages, {gold.get('recurring_sentence_count')} recurring)"
+        if gold.get("available") else
+        f"gold calibration UNAVAILABLE — {str(gold.get('reason'))[:90]} "
+        f"(the recurring-boilerplate ceiling comparator could not run; "
+        f"set GOLD_CORPUS_DIR to a full-dossier corpus to enable it; the "
+        f"mismatch-based FAIL logic is unaffected)")
     return _check("semantic_genericness_live",
                   result.get("verdict") == "PASS" and not mismatches,
                   f"B4 live on {len(run_packages)} shipped packages: "
                   f"verdict={result.get('verdict')}, "
-                  f"mismatches={len(mismatches)}", problems)
+                  f"mismatches={len(mismatches)}; {gold_note}", problems)
 
 
 # ---------------------------------------------------------------------------
@@ -746,7 +951,9 @@ def build_family_result(family, checks, deduction_table, rubric,
         "auditor_estimate_r407_recorded_as_estimate": est,
         "estimate_is_not_the_score": True,
         "scoring_rules": "R407/BENCHMARK_RUBRIC.json rule_1..rule_8; "
-                         "deduction table frozen with rubric 1.0.0",
+                         "deduction table frozen with rubric 1.0.0, "
+                         "check semantics at rubric 1.1.0 (R408 "
+                         "registry-named resolution; no threshold moved)",
     }
 
 
@@ -779,7 +986,7 @@ def measure_family(family, portfolio_root):
             check_manifest_pins_agree(portfolio_root),
             check_chain_certificate(ENGINE_ROOT),
             check_release_audits(r373, r374f),
-            check_reproduction_evidence(portfolio_root),
+            check_reproduction_evidence(portfolio_root, ENGINE_ROOT),
         ]
         return build_family_result(family, checks, DELIVERY_DEDUCTIONS,
                                     rubric, portfolio_root, "MEASURED")

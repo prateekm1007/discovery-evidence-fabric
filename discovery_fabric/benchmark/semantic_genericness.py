@@ -50,6 +50,7 @@ boilerplate load exceeds the gold-calibrated ceiling; else PASS.
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
@@ -58,7 +59,19 @@ from . import semantic_causal as sc
 from .contamination import _BOILERPLATE, _WORD_RE
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_GOLD_CORPUS = Path("/home/z/my-project/portfolio/FULL_DOSSIERS")
+# R408 portability fix (Art. LXII — no machine-bound paths): the gold
+# corpus location is resolved from the environment FIRST
+# (GOLD_CORPUS_DIR), then the repo-relative conventional locations; the
+# unconditional /home/z default is gone so a third party running the
+# drivers/audits from a clean clone outside the original workspace gets
+# an honest "gold calibration unavailable" disclosure (recorded in the
+# driver evidence) instead of a silently machine-bound path. The
+# mismatch-based FAIL logic never depended on the gold corpus.
+DEFAULT_GOLD_CORPUS = (
+    Path(os.environ["GOLD_CORPUS_DIR"])
+    if os.environ.get("GOLD_CORPUS_DIR")
+    else (REPO_ROOT / "BENCHMARK_ENGINEERING_DOSSIERS"
+          / "gold_corpus_full_dossiers"))
 
 # minimum content words for a sentence to be auditable
 _MIN_WORDS = 6
