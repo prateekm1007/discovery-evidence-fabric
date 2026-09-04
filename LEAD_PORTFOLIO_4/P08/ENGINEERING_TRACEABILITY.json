@@ -1,0 +1,107 @@
+{
+ "artifact_type": "ENGINEERING_TRACEABILITY",
+ "binding_rules_verbatim": {
+  "IDENTIFIER": "shared canonical engineering identifier (underscore symbol or standard number) present in both artifacts' recorded text",
+  "NEVER": "semantic association, fuzzy match, or invented binding (Art. II)",
+  "PHRASE": "exact normalized phrase (>= 12 chars) shared"
+ },
+ "chains": [
+  {
+   "decision": "inside band -> chain confirmed + D2 relocation decision; fluence materially below range at permissible power -> KILL (physics)",
+   "design_input_id": "DI-001",
+   "design_input_parameter": "Clinical need",
+   "design_output_id": "DO-001",
+   "design_output_parameter": "940 nm PV receiver",
+   "evidence_classes": {
+    "di": "SOURCE_FACT (dossier)",
+    "do": "COMPUTATIONAL_RESULT (validated CAD)",
+    "fluence": "RECOVERED_EXECUTION_ARTIFACT (restored simulations, hash-pinned)",
+    "v": "NOT_TESTED"
+   },
+   "expected_observation": "measured electrical power inside the pre-registered band; phantom fluence consistent with the asserted range (RECOVERED_EXECUTION_ARTIFACT chain: R310/R311/R312 restored with custody)",
+   "experiment": {
+    "binding": "IDENTIFIER",
+    "evidence": "the R403 DECISIVE_EXPERIMENT contract carries the same primary endpoint identifiers and the same parameter names",
+    "linked_id": "LEAD_PORTFOLIO_4/P08/DECISIVE_EXPERIMENT.json",
+    "state": "EXPLICIT"
+   },
+   "geometry_parameter": "PV receiver area 0.3848 cm2 (38.4845 mm2)",
+   "mechanism_feature": {
+    "binding": "IDENTIFIER",
+    "evidence": "shared identifier DO-001 + exact phrase 'battery-elimination for shunt electronics' in the frozen corpus MATURITY_BASIS design_output_evidence_ids and the R403 canonical records",
+    "state": "EXPLICIT"
+   },
+   "verification_id": "V-001",
+   "verification_parameter": "Phantom optical bench test (three-instrument triangle)"
+  },
+  {
+   "decision": "chain-confirmation vs kill is decided by the phantom experiment, not by the restored chain alone (Art. XXVIII)",
+   "design_input_id": "DI-004",
+   "design_input_parameter": "Wavelength",
+   "design_output_id": "DO-001",
+   "design_output_parameter": "940 nm PV receiver",
+   "evidence_classes": {
+    "di": "RECORDED (dossier design input)",
+    "simulation": "COMPUTATIONAL_RESULT (recovered artifacts)",
+    "v": "NOT_TESTED"
+   },
+   "expected_observation": "fluence 1.049-1.416 mW/cm2 at the receiver (restored simulation chain, converged, CI-overlap verdict)",
+   "experiment": {
+    "binding": "IDENTIFIER",
+    "evidence": "the R403 DECISIVE_EXPERIMENT contract carries the same primary endpoint identifiers and the same parameter names",
+    "linked_id": "LEAD_PORTFOLIO_4/P08/VERIFICATION_EVIDENCE/ (R310/R311/R312 restored artifacts)",
+    "state": "EXPLICIT"
+   },
+   "geometry_parameter": "receiver + source spectral class",
+   "mechanism_feature": {
+    "binding": "IDENTIFIER",
+    "evidence": "shared identifier DO-001 + exact phrase '940 nm tissue window' in the frozen corpus MATURITY_BASIS design_output_evidence_ids and the R403 canonical records",
+    "state": "EXPLICIT"
+   },
+   "verification_id": "V-002",
+   "verification_parameter": "Fluence measurement at the receiver plane"
+  },
+  {
+   "decision": "exceeds the pre-registered limit at useful power -> KILL (thermally infeasible)",
+   "design_input_id": "DI-008",
+   "design_input_parameter": "Thermal safety",
+   "design_output_id": "DO-003",
+   "design_output_parameter": "Thermal envelope / source operating point",
+   "evidence_classes": {
+    "di": "RECORDED (dossier design input)",
+    "threshold": "OWNER-GATED (paywalled standards; numbers reported-not-verified by the audit)",
+    "v": "NOT_TESTED"
+   },
+   "expected_observation": "surface irradiance within the pre-registered ANSI/IEC-class skin limit for the declared exposure duration",
+   "experiment": {
+    "binding": "IDENTIFIER",
+    "evidence": "the R403 DECISIVE_EXPERIMENT contract carries the same primary endpoint identifiers and the same parameter names",
+    "linked_id": "LEAD_PORTFOLIO_4/P08/DECISIVE_EXPERIMENT.json + ENERGY_BUDGET.r405_extensions.thermal_kill_boundary",
+    "state": "EXPLICIT"
+   },
+   "geometry_parameter": "source power class (owner action: real source spec)",
+   "mechanism_feature": {
+    "binding": "IDENTIFIER",
+    "evidence": "shared identifier DO-003 + exact phrase 'skin/thermal exposure boundary' in the frozen corpus MATURITY_BASIS design_output_evidence_ids and the R403 canonical records",
+    "state": "EXPLICIT"
+   },
+   "verification_id": "V-001",
+   "verification_parameter": "Phantom optical bench test (thermal probes)"
+  }
+ ],
+ "company_designation": "P08",
+ "constitutional_basis": "R394 identifier-binding rules (IDENTIFIER or exact PHRASE >= 12 chars shared between artifacts; NEVER semantic association); Art. II; the external audit's finding that the buyer-side truth model records EXPLICIT 0 / PARTIAL 0 / UNKNOWN 9-11 chains per package",
+ "historical_package_id": "P-16",
+ "honest_limits": [
+  "the V items are NOT_TESTED — linking a chain documents the graph, it does not execute the verification (Art. XXVIII: no promotion without new evidence)",
+  "these are ENGINE-side records; the buyer surface is frozen (Art. XXXIX) and changes only through the release chain",
+  "chains not listed here remain TRACEABILITY_UNKNOWN in the buyer-side truth model — they are not silently linked by this record"
+ ],
+ "package_state_after_r405": {
+  "chains_linked_this_round": 3,
+  "chains_remaining_unknown": "6 of 9 — the biocompatibility/sterilization/interface chains carry no experiment binding in the current records",
+  "state": "TRACEABILITY_PARTIAL (engine-side canonical; the buyer-side frozen files remain all-UNKNOWN until the owner release-chain operation)"
+ },
+ "purpose": "the audit's $0 item 'Link 3 critical DI chains': link the clinical-need -> primary-function -> primary-verification chain per package ENGINE-SIDE so the next buyer release carries an honest partial graph instead of an all-UNKNOWN one",
+ "technology_name": "NIR Photovoltaic Power Delivery for Implantable Devices"
+}

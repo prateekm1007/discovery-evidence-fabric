@@ -151,6 +151,20 @@ def poiseuille_conductance(diameter_mm: float, length_mm: float,
 
     G = pi*d^4 / (128*mu*L) with d in m, L in m, mu in Pa.s, G in
     m^3/(s.Pa); converted to (mL/s)/mmHg for physiological units.
+
+    R405 CORRECTION (unit-conversion defect, disclosed at
+    R405/UNIT_CONVERSION_DEFECT_DISCLOSURE.json): converting a
+    conductance FROM per-Pa TO per-mmHg MULTIPLIES by 133.322 (each
+    mmHg = 133.322 Pa drives 133.322x the per-Pa flow). The pre-R405
+    code divided, making every absolute conductance and therefore
+    every absolute flow emitted by solve_network 133.322^2 = 17,774.7x
+    too small (node pressures are fixed in mmHg, so Q = G * dP_mmHg
+    inherited the same factor). All recorded RATIO-based verdicts
+    (BEATS_BASELINE margins, G_floor/G_primary, conductance
+    restoration ratios, KEEP/KILL gate decisions) are unaffected —
+    the constant factor cancels. Physical magnitude sanity: a 1.0 mm
+    ID x 90 mm water segment at 8 mmHg passes ~17 mL/min, not
+    ~9.8e-6 mL/min.
     """
     if diameter_mm < 0 or length_mm <= 0 or viscosity_mPa_s <= 0:
         raise ValueError(
@@ -165,7 +179,9 @@ def poiseuille_conductance(diameter_mm: float, length_mm: float,
     L_m = length_mm * 1e-3
     mu_pa_s = viscosity_mPa_s * 1e-3
     g_si = math.pi * d_m ** 4 / (128.0 * mu_pa_s * L_m)   # m3/(s.Pa)
-    return g_si * 1e6 / _UNIT_MM_HG_TO_PA                  # (mL/s)/mmHg
+    # per-mmHg conductance = per-Pa conductance x 133.322 (R405:
+    # MULTIPLY — the pre-R405 divide was the defect); m3 -> mL is 1e6
+    return g_si * 1e6 * _UNIT_MM_HG_TO_PA                 # (mL/s)/mmHg
 
 
 def effective_diameter(diameter_mm: float, obstruction_pct: float) -> float:

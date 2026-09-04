@@ -397,7 +397,14 @@ def test_bench_15_successful_model_correction():
     imp = r["improvement"]
     assert imp["improved"] is True
     assert imp["error_after"] < imp["error_before"]
-    assert imp["improvement_ratio"] > 100.0  # 31% -> ~0%
+    # R405: with the conductance unit-conversion corrected, the
+    # calibration arithmetic cancels EXACTLY to err_2_after == 0.0
+    # (pre-R405 a float residue made the ratio finite-but-huge). An
+    # exactly-zero held-out error is the strongest possible
+    # improvement — the ratio is then undefined-by-division (None by
+    # the honest zero-denominator guard), so accept either form.
+    assert (imp["error_after"] == 0.0
+            or imp["improvement_ratio"] > 100.0)  # 31% -> ~0%
     assert abs(r["steps"]["PARAMETER_UPDATE"]["after"] - 0.6913) < 1e-6
 
 

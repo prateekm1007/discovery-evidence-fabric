@@ -1,13 +1,17 @@
 {
  "artifact_type": "BUYER_SEQUENCE",
  "company_designation": "P04",
- "portfolio_number": "04",
  "historical_package_id": "P-07",
- "technology_name": "Passive Drainage Priority Safety Floor",
- "sequence_purpose": "The standardized 10-step buyer-facing sequence (directive section 13) \u2014 identical structure across P04/P08/P11/P13 so the four technologies are directly comparable. Identity lines use the COMPANY DESIGNATION; the historical ID appears only in the machine-readable provenance fields (directive section 19).",
- "identity_line_external": "P04 \u2014 Passive Drainage Priority Safety Floor",
- "provenance_line_machine_readable": "P04 = Portfolio 04 = historical package P-07 = folder 04_drainage_floor = version 2.0 (LEAD_PORTFOLIO_IDENTITY_REGISTRY.json)",
+ "identity_line_external": "P04 — Passive Drainage Priority Safety Floor",
  "information_classification": {
+  "BUYER_VISIBLE": [
+   "all ten sections below",
+   "company designation",
+   "technology name"
+  ],
+  "CONFIDENTIAL_AFTER_NDA": [
+   "frozen dossier internals (BENCHMARK_ENGINEERING_DOSSIERS/frozen_corpus_r370/04_drainage_floor PDFs are CONFIDENTIAL — TECHNOLOGY TRANSFER EVALUATION stamped, distributed under the buyer-distribution rule)"
+  ],
   "INTERNAL_PROVENANCE": [
    "historical_package_id",
    "folder_name",
@@ -15,28 +19,53 @@
    "model ids",
    "source artifact paths"
   ],
-  "BUYER_VISIBLE": [
-   "all ten sections below",
-   "company designation",
-   "technology name"
-  ],
-  "CONFIDENTIAL_AFTER_NDA": [
-   "frozen dossier internals (BENCHMARK_ENGINEERING_DOSSIERS/frozen_corpus_r370/04_drainage_floor PDFs are CONFIDENTIAL \u2014 TECHNOLOGY TRANSFER EVALUATION stamped, distributed under the buyer-distribution rule)"
-  ],
   "LEGAL_IP": [
    "NOVELTY_ASSESSMENT.json (search documentation; NOT a legal opinion; NOT patentability; NOT FTO)"
   ]
  },
+ "portfolio_number": "04",
+ "provenance_line_machine_readable": "P04 = Portfolio 04 = historical package P-07 = folder 04_drainage_floor = version 2.0 (LEAD_PORTFOLIO_IDENTITY_REGISTRY.json)",
+ "r405_extensions": {
+  "commercial_anchor": {
+   "anchors": {
+    "revision_cost": {
+     "source": "external-audit figure",
+     "value": "$30-60K per revision (hospital cost class)",
+     "verification": "NOT independently verified this session (REPORTED)"
+    },
+    "revision_rate_class": {
+     "sources": "PMC12535486 (2025: 35.9% at 1yr, 54.3% overall, pediatric); ScienceDirect S1878875024016565 (2024: 17.7% adults, communicating); Longeviti (2021: 81% >=1 revision)",
+     "value": "18-54% within cohorts; 30-50% is the commonly cited class; >=1-revision rates up to 81% in long-horizon cohorts",
+     "verification": "web-search-verified snippets, 2026-09-04"
+    },
+    "us_shunt_surgeries_per_year": {
+     "audit_figure_flagged": "the external audit's '~125,000 CSF shunts implanted annually (Isaacs et al. 2016)' was NOT verifiable in open sources this session — recorded as DISPUTED, not adopted",
+     "source": "Hydrocephalus Association ('over 36,000 shunt surgeries each year — one every 15 minutes'; revision/diversion = 'nearly one third of all neurosurgical procedures annually')",
+     "value": "36,000+",
+     "verification": "web-search-verified snippet, 2026-09-04"
+    }
+   },
+   "class": "ROUGH_ESTIMATE / REPORTED",
+   "framing_reported": "the audit's prevention-economics framing (prevent 10% of revisions -> order $100M+ healthcare savings/yr) is recorded as the audit's PROPOSAL — its arithmetic requires the disputed 125k/yr and unverified $30-60K inputs before it can be presented as an estimate",
+   "origin": {
+    "provenance": "R405 external audit (Claude Sonnet 4.6, SHA 135fd74f) — 'Lead Portfolio 4 — External Audit & Elite Package Roadmap', 2026-09-04",
+    "response_record": "R405/EXTERNAL_AUDIT_RESPONSE.md"
+   },
+   "status": "REPORTED ANCHOR (divergent sources disclosed; verify before buyer presentation — owner action)"
+  }
+ },
  "sections": {
-  "1_problem": "CSF shunt distal-catheter obstruction is a dominant shunt-failure mode requiring revision surgery; a standard single-lumen catheter has no intrinsic redundancy \u2014 total obstruction means zero drainage. The frozen dossier records the failure-mode family (obstruction, over-drainage, manufacturing) with the clinical benefit magnitude honestly recorded as UNKNOWN until trial.",
-  "2_existing_limitation": "Existing shunts rely on valve mechanisms proximal to the problem and offer no passive floor: when the distal lumen occludes, drainage stops entirely. The recorded baseline is the standard single-lumen distal catheter (same material/OD/length); no documented multi-lumen floor mechanism was found in the closest prior art (PatentBear specific-mechanism query: 50 hits, none disclosing the full limitation set \u2014 see NOVELTY_ASSESSMENT.json).",
+  "10_buyer_decision": "Fund the bench experiment (cost UNESTIMATED — owner input; sibling-class protocols ran $15K/8 weeks) to buy off the mechanism-level uncertainty before any development chain is entered; the cheapest credible kill-or-survive gate in front of the entire downstream program. Package transfer state: TECHNICAL_REVIEW (evidence-gated ladder; REAL_BUYER 0; commercial posture labels are a different axis).",
+  "1_problem": "CSF shunt distal-catheter obstruction is a dominant shunt-failure mode requiring revision surgery; a standard single-lumen catheter has no intrinsic redundancy — total obstruction means zero drainage. The frozen dossier records the failure-mode family (obstruction, over-drainage, manufacturing) with the clinical benefit magnitude honestly recorded as UNKNOWN until trial.",
+  "2_existing_limitation": "Existing shunts rely on valve mechanisms proximal to the problem and offer no passive floor: when the distal lumen occludes, drainage stops entirely. The recorded baseline is the standard single-lumen distal catheter (same material/OD/length); no documented multi-lumen floor mechanism was found in the closest prior art (PatentBear specific-mechanism query: 50 hits, none disclosing the full limitation set — see NOVELTY_ASSESSMENT.json).",
   "3_proposed_technology": "A passive dual-lumen catheter: primary lumen carries nominal flow; a small eccentric floor lumen in the same extruded body keeps a minimum drainage path alive when the primary lumen obstructs. No valve, no electronics, no moving parts.",
-  "4_mechanism": "Hydraulic conductance split: G_floor/G_primary = (d_floor/d_primary)^4 (Poiseuille, MODELLED) \u2014 the floor lumen is intentionally low-conductance so it is subordinate in normal operation but non-zero when the primary path fails. Boundary regime: laminar, incompressible, steady; the deterministic solver and physical caps are the frozen dossier's governing model (MODELLED class).",
+  "4_mechanism": "Hydraulic conductance split: G_floor/G_primary = (d_floor/d_primary)^4 (Poiseuille, MODELLED) — the floor lumen is intentionally low-conductance so it is subordinate in normal operation but non-zero when the primary path fails. Boundary regime: laminar, incompressible, steady; the deterministic solver and physical caps are the frozen dossier's governing model (MODELLED class).",
   "5_evidence": "4 governing equations, 10 design inputs, 3 design outputs, 5 failure modes, 5 build-plan steps, 4 verification items (all NOT_TESTED), 5 external evidence items (engineering-precedent class) in the frozen dossier; parametric CAD shipped and VALID (all geometry gates; regeneration reproducible); all traceability chains honestly UNKNOWN (release-gate truth model: EXPLICIT 0, UNKNOWN 10); zero physical observation; one external NIST-viscosity constants acquisition refuted a design constant and produced a valid refined rebuild (sandbox, not applied).",
-  "6_novelty_assessment": "DOCUMENTED PRIOR-ART SEARCH: PatentBear real searches (2026-08-26) \u2014 broad 496 hits / specific-mechanism 50 hits, CONDITIONAL (MEDIUM), closest US20240207499A1; selected references do not disclose all mapped limitations; global novelty NOT established; PatSnap attempted but never executed (documented failure); NOT a patentability opinion, NOT FTO. Full record: NOVELTY_ASSESSMENT.json.",
-  "7_engineering_definition": "Parametric template P07_drainage_floor_dual_lumen:v1: 3.0 mm OD body, 1.1 mm primary lumen, 0.6 mm floor lumen at 1.0 mm offset, 100 mm length; constraints min wall \u2265 0.15 mm + conductance split \u2265 0; STEP/STL/GLB shipped sha-pinned; the single attempted improvement mutation (floor 0.6\u21920.8) was KILLED by the min-wall gate (measured 0.1 < 0.15) and is preserved verbatim; the shipped base model is VALID (see GEOMETRY_SEPARATION.json \u2014 implementation failure, not mechanism failure, Art. XXIX).",
-  "8_known_unknowns": "Common-cause obstruction immunity (CRITICAL, the kill condition); clinically defensible Q_min; G_floor/G_primary manufacturable ratio; multi-lumen extrusion process capability; regulatory pathway; clinical benefit magnitude. All recorded UNKNOWN \u2014 none converted to certainty.",
-  "9_decisive_experiment": "Bench obstruction challenge vs a single-lumen control catheter: does the floor lumen alone carry \u2265 the literature-derived Q_min when the primary lumen is fully obstructed, and does the dominant obstruction material also kill the floor lumen (common-cause)? Full falsification contract: DECISIVE_EXPERIMENT.json.",
-  "10_buyer_decision": "Fund the bench experiment (cost UNESTIMATED \u2014 owner input; sibling-class protocols ran $15K/8 weeks) to buy off the mechanism-level uncertainty before any development chain is entered; the cheapest credible kill-or-survive gate in front of the entire downstream program. Package transfer state: TECHNICAL_REVIEW (evidence-gated ladder; REAL_BUYER 0; commercial posture labels are a different axis)."
- }
+  "6_novelty_assessment": "DOCUMENTED PRIOR-ART SEARCH: PatentBear real searches (2026-08-26) — broad 496 hits / specific-mechanism 50 hits, CONDITIONAL (MEDIUM), closest US20240207499A1; selected references do not disclose all mapped limitations; global novelty NOT established; PatSnap attempted but never executed (documented failure); NOT a patentability opinion, NOT FTO. Full record: NOVELTY_ASSESSMENT.json.",
+  "7_engineering_definition": "Parametric template P07_drainage_floor_dual_lumen:v1: 3.0 mm OD body, 1.1 mm primary lumen, 0.6 mm floor lumen at 1.0 mm offset, 100 mm length; constraints min wall ≥ 0.15 mm + conductance split ≥ 0; STEP/STL/GLB shipped sha-pinned; the single attempted improvement mutation (floor 0.6→0.8) was KILLED by the min-wall gate (measured 0.1 < 0.15) and is preserved verbatim; the shipped base model is VALID (see GEOMETRY_SEPARATION.json — implementation failure, not mechanism failure, Art. XXIX).",
+  "8_known_unknowns": "Common-cause obstruction immunity (CRITICAL, the kill condition); clinically defensible Q_min; G_floor/G_primary manufacturable ratio; multi-lumen extrusion process capability; regulatory pathway; clinical benefit magnitude. All recorded UNKNOWN — none converted to certainty.",
+  "9_decisive_experiment": "Bench obstruction challenge vs a single-lumen control catheter: does the floor lumen alone carry ≥ the literature-derived Q_min when the primary lumen is fully obstructed, and does the dominant obstruction material also kill the floor lumen (common-cause)? Full falsification contract: DECISIVE_EXPERIMENT.json."
+ },
+ "sequence_purpose": "The standardized 10-step buyer-facing sequence (directive section 13) — identical structure across P04/P08/P11/P13 so the four technologies are directly comparable. Identity lines use the COMPANY DESIGNATION; the historical ID appears only in the machine-readable provenance fields (directive section 19).",
+ "technology_name": "Passive Drainage Priority Safety Floor"
 }

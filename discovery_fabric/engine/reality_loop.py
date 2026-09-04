@@ -425,13 +425,27 @@ def _conductance_ml_per_min_mmhg(d_mm: float, eta_mPa_s: float,
     conversions: 1 mm = 1e-3 m; 1 mPa*s = 1e-3 Pa*s; 1 mmHg = 133.322 Pa;
     1 mL = 1e-6 m^3; 1 min = 60 s). COMPUTATIONAL_RESULT, computation-
     logged by the closure record (this function's inputs and output are
-    recorded verbatim in the record)."""
+    recorded verbatim in the record).
+
+    R405 CORRECTION (unit-conversion defect, disclosed at
+    R405/UNIT_CONVERSION_DEFECT_DISCLOSURE.json): converting a
+    conductance FROM per-Pa TO per-mmHg MULTIPLIES by 133.322 (a mmHg
+    is 133.322 Pa, so each mmHg drives 133.322x the flow of each Pa).
+    The pre-R405 code divided, making every absolute conductance
+    133.322^2 = 17,774.7x too small. Ratio-based results (the NIST
+    diameter compensation, conductance_restored_ratio) were unaffected
+    because the constant error cancels in ratios. Physical magnitude
+    sanity: a 0.6 mm ID x 100 mm water column at 1 mmHg passes
+    ~0.25 mL/min, not ~1.4e-5 mL/min.
+    """
     d_m = d_mm * 1e-3
     eta_pa_s = eta_mPa_s * 1e-3
     L_m = L_mm * 1e-3
     g_m3_per_s_pa = math.pi * d_m ** 4 / (128.0 * eta_pa_s * L_m)
-    # m^3 -> mL is 1e6 (not 1e-6); min = 60 s; 1 mmHg = 133.322 Pa
-    return g_m3_per_s_pa * 1e6 * 60.0 / 133.322
+    # m^3 -> mL is 1e6 (1 mL = 1e-6 m^3); min = 60 s; per-mmHg is
+    # 133.322x per-Pa (R405: MULTIPLY, the pre-R405 divide was the
+    # defect)
+    return g_m3_per_s_pa * 1e6 * 60.0 * 133.322
 
 
 def close_reality_loop(

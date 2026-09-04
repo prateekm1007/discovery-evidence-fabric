@@ -1,0 +1,58 @@
+{
+ "artifact_type": "UNIT_CONVERSION_DEFECT_DISCLOSURE",
+ "round": "R405",
+ "date": "2026-09-04",
+ "constitutional_basis": "Art. XV (disclose inconvenient results), Art. XXXI (every correction creates a memory artifact), Art. XI (history is evidence — committed records stand, corrections are additive), Art. XVII/XVIII (the defect class is now pinned by adversarial magnitude guards)",
+ "trigger": "The R405 external audit demanded explicit arithmetic for the P04 Q_min declaration ('Compute the theoretical floor lumen flow... If it's below, the package has a physics problem to address'). Performing that arithmetic independently exposed that the repository's recorded absolute conductances were physically impossible by ~4-5 orders of magnitude.",
+
+ "the_defect": {
+  "where": [
+   "discovery_fabric/engine/reality_loop.py :: _conductance_ml_per_min_mmhg (pre-R405 line 434: 'return g_m3_per_s_pa * 1e6 * 60.0 / 133.322')",
+   "discovery_fabric/engine/physics_core.py :: poiseuille_conductance (pre-R405 line 168: 'return g_si * 1e6 / _UNIT_MM_HG_TO_PA')"
+  ],
+  "error": "Converting a conductance FROM per-Pa units TO per-mmHg units requires MULTIPLYING by 133.322 (one mmHg = 133.322 Pa, so each mmHg of head drives 133.322x the flow of one Pa). Both functions DIVIDED by 133.322.",
+  "effect": "Every absolute conductance (and therefore every absolute flow emitted by solve_network, whose node pressures are fixed in mmHg so Q = G x dP_mmHg) was 133.322^2 = 17,774.7x too small.",
+  "physical_sanity_proof": "A 0.6 mm ID x 100 mm water column at 10 mmHg passes ~2.5 mL/min by Poiseuille (independent SI derivation). The recorded value implied 1.4e-4 mL/min at 10 mmHg — roughly one eyedropper drop per week. The recorded values were physically impossible; the error was masked because the numbers LOOKED 'physiological' (uL/s scale) and no test asserted a physical magnitude band.",
+  "why_the_pin_did_not_catch_it": "tests/test_r390_reality_loop.py::test_conductance_math_pinned_by_hand_computation pinned 1.4315e-05 with a docstring claiming hand computation — but the 'hand computation' in the test body used the SAME division by 133.322 as the implementation. A verification that repeats the implementation's own unit convention verifies nothing about the convention. (Art. XXXI lesson recorded below.)"
+ },
+
+ "unaffected": {
+  "ratio_based_results": "ALL ratio-based verdicts are unaffected because the constant error cancels: the NIST diameter compensation (d_new = d_old x (eta_meas/eta_design)^(1/4)), conductance_restored_ratio = 0.999984, the +44.65% as-built over-drainage discrepancy, G_floor/G_primary = (d_floor/d_primary)^4, BEATS_BASELINE margins, KEEP/KILL geometry-gate decisions, the R396/R401 improvement-loop verdicts.",
+  "the_nist_correction": "The R390 reality event's diameter correction 0.6 -> 0.5471 mm is ratio-based and remains exactly correct.",
+  "recorded_verdict_fields": "No KEEP/KILL/pass/fail state recorded anywhere in the repository changes as a result of this correction."
+ },
+
+ "affected_recorded_artifacts": [
+  {"path": "TOSCANINI/R390_REALITY_LOOP/live/loop-EVT-R390-NIST-WATER-VISC-310K/LOOP_CLOSURE_RECORD.json + SUMMARY.json", "fields": "re_evaluation.before/as_built_at_design_geometry/after . G_ml_min_mmHg (1.43151e-05 / 2.07074e-05 / 1.43149e-05)", "true_values": "0.254447 / 0.368069 / 0.254443 mL/(min*mmHg)", "disposition": "HISTORICAL RECORD STANDS (Art. XI — the event record is committed history). This disclosure is the correction of record; the values' ratio structure (restoration 0.999984) was and remains correct."},
+  {"path": "TOSCANINI/R390_REALITY_LOOP/rehearsal/** (same fields, rehearsal copy)", "fields": "same", "true_values": "same", "disposition": "same"},
+  {"path": "R396/P07_FAILURE_MODE_CONTRACT.json", "fields": "all total_flow_ml_min / total_flow_ml_s / conductance_ml_s_mmhg values (baseline 9.81831e-06 mL/min; severe-obstruction floor 1.37064e-04; partial 3.72703e-04)", "true_values": "baseline 0.17453 mL/min; severe 2.43575 mL/min; partial 6.62364 mL/min (x17,774.7 each)", "disposition": "HISTORICAL RECORD STANDS. BEATS_BASELINE outcome and margins are ratios — unaffected."},
+  {"path": "R400/PRODUCTION_PHYSICS_RUN_930eca8b.json", "fields": "value fields (9.81831e-06, 1.37064e-04, 4.11976e-04)", "true_values": "same x17,774.7", "disposition": "HISTORICAL RECORD STANDS (R400 run-of-record)."},
+  {"path": "R401/BASELINE_RUN_ARTIFACTS/envelope_PHYSICS.json (+ derived envelopes)", "fields": "total_flow_ml_min = 1.10908e-03", "true_values": "19.713 mL/min", "disposition": "FROZEN BASELINE (Art. LIX: the baseline is a measurement of the then-current code and stays frozen). The R401 baseline was frozen WITH the defect; future runs with corrected code must disclose the discontinuity rather than retune."}
+ ],
+
+ "the_fix": {
+  "reality_loop.py": "return g_m3_per_s_pa * 1e6 * 60.0 * 133.322 (R405; the inverse-direction defect and its disclosure are documented in the function docstring)",
+  "physics_core.py": "return g_si * 1e6 * _UNIT_MM_HG_TO_PA (R405; same docstring disclosure)",
+  "test_updates": "tests/test_r390_reality_loop.py — the pin is re-derived through an INDEPENDENT unit path (flow at 1333.22 Pa converted once, then divided by 10 mmHg) so a direction error cannot cancel; an ADVERSARIAL MAGNITUDE GUARD asserts 0.05 <= G(0.6mm,100mm,1.0) <= 5.0 mL/(min*mmHg) (a unit-direction bug produces 1.4e-5 and fails); the pre-R405 recorded value is pinned as exactly 133.322^2 times too small.",
+  "test_r394_adjustment": "tests/test_r394_benchmark.py::test_bench_15_successful_model_correction — with corrected arithmetic the calibration cancels EXACTLY to err_2_after == 0.0, so the honest zero-denominator guard returns improvement_ratio=None; the assertion now accepts exactly-zero error as the strongest improvement form (the verified property — held-out error collapse — is unchanged and strengthened)."
+ },
+
+ "memory_artifact_art_xxxi": {
+  "lesson": "A 'hand computation' that re-derives an expected value using the implementation's own unit convention is not independent verification — it is the implementation verifying itself with extra steps.",
+  "failed_assumption": "That the test's hand-derived constant (1.4315e-5 mL/(min*mmHg)) had been checked against physical magnitude rather than against the code's conversion direction.",
+  "contaminated_artifacts": "The five artifact families listed above; every absolute conductance/flow recorded between R383 and R405.",
+  "tests_added": "(1) independent-unit-path derivation in test_r390 (structure: expected value must come from a DIFFERENT conversion route than the function under test); (2) physical-magnitude adversarial bound (0.05-5.0 mL/(min*mmHg) for the reference geometry); (3) the 133.322^2 correction-factor pin; (4) test_r405_external_audit_response.py re-asserts all of these against the engine functions."
+ },
+
+ "blast_radius_verification": {
+  "grep_inventory": "11 JSON artifacts carry conductance/flow fields (R396 x1, R400 x1, R401 x8, plus the R390 loop dirs); no LEAD_PORTFOLIO_4 record cites the contaminated absolute values (verified by grep over LEAD_PORTFOLIO_4/ — the R403/R404 records quote only the restoration RATIO 0.999984 and the diameter values, both unaffected).",
+  "test_suites_run_post_fix": "test_r390 17/17 PASS (with the portfolio clone present), test_r394 31/31, test_r396 31/31, test_r397 48/48, test_r402 36/36, test_r403 38/38, test_r404 33/33, test_r386 23/23 — zero regressions.",
+  "buyer_surface": "UNTOUCHED (zero buyer-repository bytes; the frozen corpus and the public release are unaffected — Art. XXXIX)."
+ },
+
+ "what_this_changes_for_the_packages": {
+  "P04": "The floor lumen's TRUE Poiseuille conductance is 0.254 mL/(min*mmHg) (NIST-corrected geometry) — 6-12x the physiological CSF production rate at minimum head. The safety floor is NOT the flow-limiting element; the Q_min pass rule is satisfiable with large margin when the floor lumen is unobstructed, so the decisive experiment's discriminating power lies in PARTIAL common-cause obstruction (quantified boundary: ~47% effective-diameter reduction tolerance — see LEAD_PORTFOLIO_4/P04/QMIN_FLOOR_FLOW_CALCULATION.json).",
+  "P11": "No P11 record cited absolute conductances; the settling-time model is time-domain and unaffected.",
+  "P08/P13": "No cited absolute conductances; unaffected."
+ }
+}

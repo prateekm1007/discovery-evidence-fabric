@@ -100,16 +100,43 @@ def test_rehearsal_closes_loop_without_flipping_state(tmp_path):
 def test_conductance_math_pinned_by_hand_computation():
     """Art. II: the pinned value is hand-derived, not self-referential.
     G = pi*d^4/(128*eta*L); d=0.6mm, eta=1.0 mPa*s, L=100mm
-      = 3.178e-11 m^3/(s*Pa) -> 1.4315e-5 mL/(min*mmHg)."""
+      = 3.178e-11 m^3/(s*Pa).
+
+    R405 CORRECTION: the pre-R405 pin (1.4315e-5 mL/(min*mmHg)) and its
+    "hand computation" BOTH divided by 133.322 — the test re-derived
+    with the code's own unit convention, so it verified nothing about
+    the conversion direction (Art. XXXI lesson: a hand computation that
+    repeats the implementation's convention is not independent
+    verification). The independent derivation below derives the flow
+    at a known pressure through PURE SI and converts once, so a
+    direction error cannot cancel: at dP = 1333.22 Pa (= 10 mmHg),
+    Q = G*Pa -> m^3/s -> mL/min; G = Q/10.
+    """
     g = reality_loop._conductance_ml_per_min_mmhg(0.6, 1.0, 100.0)
     d_m, eta, L = 0.6e-3, 1.0e-3, 100.0e-3
-    expected = (math.pi * d_m ** 4 / (128.0 * eta * L)) * 1e6 * 60.0 \
-        / 133.322
+    # independent path: flow at 10 mmHg expressed in Pa, converted to
+    # mL/min once, then divided by 10 mmHg
+    q_m3_s = (math.pi * d_m ** 4 / (128.0 * eta * L)) * 1333.22
+    q_ml_min = q_m3_s * 1e6 * 60.0
+    expected = q_ml_min / 10.0
     assert g == pytest.approx(expected, rel=1e-12)
-    assert g == pytest.approx(1.4315098311274948e-05, rel=1e-9)
+    assert g == pytest.approx(0.2544473751, rel=1e-9)
+    # ADVERSARIAL MAGNITUDE GUARD (Art. XVII): a 0.6 mm ID x 100 mm
+    # water column passes mL/min at mmHg heads — a unit-direction bug
+    # (pre-R405: 1.43e-5) is 4-5 orders below physical reality and must
+    # fail this bound
+    assert 0.05 <= g <= 5.0, (
+        f"conductance {g} mL/(min*mmHg) outside the physical magnitude "
+        "band for a 0.6 mm x 100 mm water column — unit conversion "
+        "defect (R405 disclosure)")
     # the +44.65% over-drainage discrepancy at the measured viscosity
+    # (ratio: unaffected by the R405 correction — constants cancel)
     g2 = reality_loop._conductance_ml_per_min_mmhg(0.6, 0.6913036, 100.0)
     assert g2 / g == pytest.approx(1.0 / 0.6913036, rel=1e-9)
+    assert g2 == pytest.approx(0.3680689281, rel=1e-6)
+    # pre-R405 recorded values were 133.322^2 = 17,774.7x too small
+    assert g / 1.4315098311274948e-05 == pytest.approx(
+        133.322 ** 2, rel=1e-6)
 
 
 def test_compensation_restores_declared_conductance():

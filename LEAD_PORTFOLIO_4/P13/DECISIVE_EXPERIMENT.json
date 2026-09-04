@@ -1,21 +1,71 @@
 {
- "artifact_type": "DECISIVE_EXPERIMENT",
- "company_designation": "P13",
- "portfolio_number": "13",
- "historical_package_id": "P-27-R1",
- "technology_name": "Self-Referencing Piezoresistive Pressure Sensor",
- "constitutional_basis": "Article LII (falsification contract) + directive section 12 (the benchmark is baseline vs self-referencing; the question is whether the drift/error improvement is commercially meaningful).",
- "question": "What is the cheapest credible way to learn whether this technology deserves more money?",
- "hypothesis": "A self-referencing piezoresistive sensor (active + dummy element bridge) shows materially lower zero/sensitivity drift and thermal error than an otherwise-identical single-ended baseline sensor of the same die/process family, over a bench horizon sufficient to bound the monthly drift rate — WITHOUT the non-common-mode channel (asymmetric fouling) erasing the advantage.",
- "null_hypothesis": "The self-referencing arm's drift/error is not materially better than the baseline arm (the differential bridge cancels only common-mode thermal drift, which the baseline can also be trimmed for), OR the non-common-mode channel (asymmetric fouling of the exposed active element vs the shielded dummy — the exact channel that killed predecessor P-25) dominates and the differential error grows beyond the acceptance threshold.",
- "control": "The single-ended baseline sensor: same die/process family, same packaging, same electronics, same instrument — ONLY the self-referencing architecture differs (Constitution Art. XLVII; per BENCHMARK_SPECIFICATION.json).",
- "treatment": "The self-referencing architecture: active pressure-exposed element + dummy pressure-shielded element, bridge output per the shipped design.",
+ "acceptance_threshold": "ACCEPT only if: the drift improvement ratio exceeds the pre-registered material margin AND the post-fouling differential error stays inside the pre-registered band. The margins must be pre-registered with provenance (Constitution Art. XXVII): clinical-utility-derived for the error budget (the dossier's ~1-2 mmHg accuracy target class), MODEL_DERIVED for the drift target (< 0.5 mmHg/month) — classes never silently mixed. The retired P-25's numbers (2.0 mmHg threshold, 67.8 % cancellation) are recorded PRECEDENT, not borrowed thresholds.",
  "apparatus": "Environmental bench: pressure reference (calibrated, ICP range 0-40 mmHg class), temperature chamber (33-41 C class sweep), data acquisition for both arms simultaneously, and an accelerated-fouling exposure protocol arm (protein-adsorption class exposure of the active element — the P-25-recorded kill channel).",
- "inputs": "Both sensor arms (n per sample-size basis); pressure/temperature profiles per BENCHMARK_SPECIFICATION.json's measurement matrix (static accuracy, thermal sweep, drift duration, cycling, fouling exposure).",
- "outputs": "Per arm per condition: zero offset, sensitivity, drift rates, hysteresis loop area, reference-element stability, post-fouling differential error.",
- "measurement_method": "Simultaneous two-arm acquisition against the same calibrated pressure reference; pre-registered analysis script; blinded analysis; fouling exposure quantified (mass/QCM-class or equivalent deposition measure) so the exposure class is recorded, not narrative.",
+ "artifact_type": "DECISIVE_EXPERIMENT",
  "baseline": "The baseline arm measured under the identical protocol (identical instrument, simultaneous acquisition — no cross-run instrument drift confound).",
+ "company_designation": "P13",
+ "constitutional_basis": "Article LII (falsification contract) + directive section 12 (the benchmark is baseline vs self-referencing; the question is whether the drift/error improvement is commercially meaningful).",
+ "control": "The single-ended baseline sensor: same die/process family, same packaging, same electronics, same instrument — ONLY the self-referencing architecture differs (Constitution Art. XLVII; per BENCHMARK_SPECIFICATION.json).",
+ "cost_basis": "UNESTIMATED — owner input required. Component class: MEMS test die (baseline + self-referencing variants of the same family), chamber time, reference instrument, fouling protocol — bench-class, no human/animal subjects.",
+ "decision_rule": "ACCEPT -> SPONSORED_VALIDATION with the first PHYSICAL_OBSERVATION-class drift comparison attached; the novelty record REMAINS NOVELTY_SEARCH_REPORTED/SOURCE_ARTIFACT_UNAVAILABLE (a bench result is not a patent search — the two owner actions are independent). KILL/REPAIR per the falsifier classes; the KA-014 lesson governs the repair path (a non-common-mode mechanism or nothing). INDETERMINATE (proxy-transfer doubt dominant) -> recorded exactly so.",
+ "falsifier": "KILL (or route to repair) if: (a) the improvement ratio is immaterial (the bridge buys nothing the baseline does not already have — the central proposition dies), or (b) asymmetric fouling drives differential error beyond the band (the P-25 kill channel recurs — repair requires a NON-common-mode compensation mechanism per KA-014, else cemetery), or (c) the reference element itself drifts comparably to the active element (the bridge references an equally unstable reference — architectural self-defeat).",
+ "historical_package_id": "P-27-R1",
+ "hypothesis": "A self-referencing piezoresistive sensor (active + dummy element bridge) shows materially lower zero/sensitivity drift and thermal error than an otherwise-identical single-ended baseline sensor of the same die/process family, over a bench horizon sufficient to bound the monthly drift rate — WITHOUT the non-common-mode channel (asymmetric fouling) erasing the advantage.",
+ "inputs": "Both sensor arms (n per sample-size basis); pressure/temperature profiles per BENCHMARK_SPECIFICATION.json's measurement matrix (static accuracy, thermal sweep, drift duration, cycling, fouling exposure).",
+ "measurement_method": "Simultaneous two-arm acquisition against the same calibrated pressure reference; pre-registered analysis script; blinded analysis; fouling exposure quantified (mass/QCM-class or equivalent deposition measure) so the exposure class is recorded, not narrative.",
+ "null_hypothesis": "The self-referencing arm's drift/error is not materially better than the baseline arm (the differential bridge cancels only common-mode thermal drift, which the baseline can also be trimmed for), OR the non-common-mode channel (asymmetric fouling of the exposed active element vs the shielded dummy — the exact channel that killed predecessor P-25) dominates and the differential error grows beyond the acceptance threshold.",
+ "outputs": "Per arm per condition: zero offset, sensitivity, drift rates, hysteresis loop area, reference-element stability, post-fouling differential error.",
+ "portfolio_number": "13",
  "primary_endpoint": "Drift improvement ratio (baseline drift / self-referencing drift) on zero + sensitivity over the pre-registered horizon, expressed against the MODEL_DERIVED < 0.5 mmHg/month target — with the improvement being the headline (the architecture's reason to exist), never the absolute drift alone (a sensor can be stable without self-referencing — that would not validate THIS mechanism).",
+ "prior_state": "No decisive experiment contract existed at this schema level; the dossier carries planned verification items (temperature cycle test, chronic aging study, hermeticity — all NOT_TESTED). This contract is the versioned addition; BENCHMARK_SPECIFICATION.json is its measurement matrix.",
+ "question": "What is the cheapest credible way to learn whether this technology deserves more money?",
+ "r405_extensions": {
+  "accelerated_fouling_protocol_r405": {
+   "kill_criterion": "differential bridge output drift > 1 mmHg after 4 weeks of fouling exposure -> the non-common-mode channel dominates -> KA-014 recurs -> repair (a NON-common-mode compensation mechanism) or cemetery",
+   "note": "this is the exact test P-25 failed; specifying it explicitly is intellectual honesty, not pessimism",
+   "protocol": "expose BOTH arms (baseline single-ended and self-referencing) to accelerated protein adsorption: bovine serum albumin at physiological concentration, 37 C, 4-week soak; measure bridge output offset at weekly intervals",
+   "provenance": {
+    "class": "MODEL_DERIVED",
+    "justification": "aligned with the P-25 precedent's 2.0 mmHg total-error threshold class and the dossier's 1-2 mmHg accuracy target class; the exact value is an owner-registration item",
+    "origin": {
+     "provenance": "R405 external audit (Claude Sonnet 4.6, SHA 135fd74f) — 'Lead Portfolio 4 — External Audit & Elite Package Roadmap', 2026-09-04",
+     "response_record": "R405/EXTERNAL_AUDIT_RESPONSE.md"
+    },
+    "owner_gate": "REQUIRED",
+    "unit": "mmHg differential drift",
+    "value": 1
+   },
+   "status": "PROPOSED PROTOCOL (MODEL_DERIVED, external-audit proposal; owner pre-registration required)"
+  },
+  "cost_basis_r405": {
+   "itemization_reported": [
+    "MEMS die fabrication NRE $50-150K per mask set (material cost, stated honestly)",
+    "engineering-sample wafer run $20-50K",
+    "baseline comparator sensor (separate mask modification or commercial analog) $20-50K",
+    "bench packaging $5-15K"
+   ],
+   "material_disclosure": "5-10x the other three packages' experiments — this shifts the commercial calculus (a licensing deal covering fab NRE differs from one covering IP only); recorded per the audit's own disclosure requirement",
+   "range": "$95-265K",
+   "status": "REPORTED ESTIMATE (external auditor's itemization; owner confirmation required)"
+  },
+  "ka014_prominence_declaration": {
+   "design_mitigation_options_recorded": {
+    "options": [
+     "(a) protein-adsorption-reducing coating (PDMS/hydrophilic) on the exposed active element — MODELLED, requires EXTERNAL_PRECEDENT citation of coating-vs-biofouling evidence before adoption",
+     "(b) shield geometry making both elements EQUALLY exposed (common-cause fouling is then bridge-compensated) — MODELLED, a geometry change with its own gate run",
+     "(c) acknowledged-unresolved (current state, this declaration)"
+    ],
+    "status": "OWNER DESIGN DECISION — the machine records the options and their evidence requirements; it does not silently pick one"
+   },
+   "origin": {
+    "provenance": "R405 external audit (Claude Sonnet 4.6, SHA 135fd74f) — 'Lead Portfolio 4 — External Audit & Elite Package Roadmap', 2026-09-04",
+    "response_record": "R405/EXTERNAL_AUDIT_RESPONSE.md"
+   },
+   "statement": "KA-014 (biofouling-dominated NON-COMMON-MODE drift: asymmetric fouling of the active element vs the protected dummy) is THIS PACKAGE'S PRIMARY SCIENTIFIC RISK: the only measured self-referencing ICP sensor in repository history (P-25) failed through exactly this channel (67.8% in-model cancellation, 3.45 mmHg error > 2.0 threshold), and the recorded mitigations (periodic recalibration, spare bridge capacity) do not solve it. The fouling arm of this experiment is the literal test of whether this architecture survives its predecessor's failure mode. This sentence is deliberately the most prominent risk statement in the package (the external audit's option c)."
+  }
+ },
+ "safety_constraints": "No human/animal subjects; standard lab chemical handling for the fouling protocol.",
+ "sample_size_basis": "Minimum credible: ≥3 die pairs per arm (paired same-wafer where possible) through the thermal/drift/cycling matrix + the fouling-exposure arm — sized to detect the improvement-ratio order of magnitude, not a production qualification. Power sizing for the material margin is part of pre-registration (owner-gated).",
  "secondary_endpoints": [
   "Thermal zero/sensitivity error ratio between arms (the common-mode channel the architecture claims)",
   "Post-fouling differential error (the KA-014/P-25 non-common-mode channel — the kill-condition probe)",
@@ -23,13 +73,8 @@
   "Cycling endurance drift evolution",
   "Calibration retention interval ratio"
  ],
- "acceptance_threshold": "ACCEPT only if: the drift improvement ratio exceeds the pre-registered material margin AND the post-fouling differential error stays inside the pre-registered band. The margins must be pre-registered with provenance (Constitution Art. XXVII): clinical-utility-derived for the error budget (the dossier's ~1-2 mmHg accuracy target class), MODEL_DERIVED for the drift target (< 0.5 mmHg/month) — classes never silently mixed. The retired P-25's numbers (2.0 mmHg threshold, 67.8 % cancellation) are recorded PRECEDENT, not borrowed thresholds.",
- "falsifier": "KILL (or route to repair) if: (a) the improvement ratio is immaterial (the bridge buys nothing the baseline does not already have — the central proposition dies), or (b) asymmetric fouling drives differential error beyond the band (the P-25 kill channel recurs — repair requires a NON-common-mode compensation mechanism per KA-014, else cemetery), or (c) the reference element itself drifts comparably to the active element (the bridge references an equally unstable reference — architectural self-defeat).",
- "uncertainty": "Bench horizon vs real implant lifetime (acceleration assumptions must be declared, never silently equated); accelerated fouling is a proxy for in-vivo biofouling (the P-25 record itself notes the dominance of this channel — the proxy's transfer risk is the experiment's main caveat); die/process family representativeness (the eventual catheter-integrated MEMS process is unvalidated); temperature range is bench-class, not implant-environment complete.",
- "sample_size_basis": "Minimum credible: ≥3 die pairs per arm (paired same-wafer where possible) through the thermal/drift/cycling matrix + the fouling-exposure arm — sized to detect the improvement-ratio order of magnitude, not a production qualification. Power sizing for the material margin is part of pre-registration (owner-gated).",
- "cost_basis": "UNESTIMATED — owner input required. Component class: MEMS test die (baseline + self-referencing variants of the same family), chamber time, reference instrument, fouling protocol — bench-class, no human/animal subjects.",
+ "technology_name": "Self-Referencing Piezoresistive Pressure Sensor",
  "time_basis": "UNESTIMATED — owner input required (die procurement + drift horizon dominate; class: weeks-to-months).",
- "safety_constraints": "No human/animal subjects; standard lab chemical handling for the fouling protocol.",
- "decision_rule": "ACCEPT -> SPONSORED_VALIDATION with the first PHYSICAL_OBSERVATION-class drift comparison attached; the novelty record REMAINS NOVELTY_SEARCH_REPORTED/SOURCE_ARTIFACT_UNAVAILABLE (a bench result is not a patent search — the two owner actions are independent). KILL/REPAIR per the falsifier classes; the KA-014 lesson governs the repair path (a non-common-mode mechanism or nothing). INDETERMINATE (proxy-transfer doubt dominant) -> recorded exactly so.",
- "prior_state": "No decisive experiment contract existed at this schema level; the dossier carries planned verification items (temperature cycle test, chronic aging study, hermeticity — all NOT_TESTED). This contract is the versioned addition; BENCHMARK_SPECIFICATION.json is its measurement matrix."
+ "treatment": "The self-referencing architecture: active pressure-exposed element + dummy pressure-shielded element, bridge output per the shipped design.",
+ "uncertainty": "Bench horizon vs real implant lifetime (acceleration assumptions must be declared, never silently equated); accelerated fouling is a proxy for in-vivo biofouling (the P-25 record itself notes the dominance of this channel — the proxy's transfer risk is the experiment's main caveat); die/process family representativeness (the eventual catheter-integrated MEMS process is unvalidated); temperature range is bench-class, not implant-environment complete."
 }

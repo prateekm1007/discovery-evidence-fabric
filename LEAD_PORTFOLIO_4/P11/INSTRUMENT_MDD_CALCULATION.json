@@ -1,0 +1,66 @@
+{
+ "artifact_type": "INSTRUMENT_MDD_CALCULATION",
+ "company_designation": "P11",
+ "computation_log": "scripts/r405_p04_qmin_and_conductance.py",
+ "constitutional_basis": "Art. XXVII (declared assumptions with classes), Art. LII (measurement must be able to falsify: an instrument that cannot resolve the claimed difference cannot test the hypothesis)",
+ "contents": {
+  "computation": {
+   "claimed_difference_s": 0.1,
+   "margin_ratio": 3.95,
+   "mdd_at_p05_s": 0.0253,
+   "se_of_difference_s": 0.01291,
+   "settling_time_quantization_sigma_s": 0.02887,
+   "verdict": "DETECTABLE"
+  },
+  "declared_assumptions": [
+   {
+    "assumption": "sampling rate",
+    "class": "INSTRUMENT_SPEC (proposed, R339 protocol class)",
+    "unit": "Hz",
+    "value": 10
+   },
+   {
+    "assumption": "settling criterion",
+    "class": "PROTOCOL",
+    "value": "flow within 10% of steady state"
+   },
+   {
+    "assumption": "runs per arm",
+    "class": "RECORDED (R339 protocol)",
+    "unit": "count",
+    "value": 10
+   },
+   {
+    "assumption": "steady-state flow range",
+    "class": "MODELLED (valved mock-CSF loop class)",
+    "unit": "mL/min",
+    "value": [
+     0.1,
+     0.5
+    ]
+   },
+   {
+    "assumption": "flowmeter resolution",
+    "class": "INSTRUMENT_SPEC (proposed)",
+    "unit": "mL/min",
+    "value": 0.01
+   }
+  ],
+  "evidence_class": "COMPUTATIONAL_RESULT (this script is the computation log)",
+  "honest_limits": [
+   "the 0.4 s vs 0.5 s settling values are MODEL_DERIVED (tau = I_h/c_h with c_h back-calculated from gap geometry) — this MDD record says the INSTRUMENT can resolve the difference, not that the difference exists",
+   "trace noise beyond quantization is not modelled (no recorded noise spectrum for the proposed instrument); if run-to-run settling-time scatter exceeds 0.05 s sigma, n must rise above 10",
+   "the clinical materiality of a 0.1 s difference remains UNESTABLISHED (the differentiation record says so; this calculation does not touch that verdict)"
+  ],
+  "question": "can the proposed bench instrument resolve the claimed 0.1 s settling-time difference at p<0.05 with n=10 runs/arm?",
+  "resolution_check": {
+   "band_to_resolution_ratio": 1.0,
+   "instrument_resolution_mL_min": 0.01,
+   "verdict": "BAND-TO-RESOLUTION >= 1 REQUIRED; worst case (PASS): at 0.1 mL/min steady flow the 10% band (0.01 mL/min) equals the resolution — settling detection is marginal there; at >=0.2 mL/min it is resolved",
+   "worst_case_settling_band_mL_min": 0.01
+  }
+ },
+ "historical_package_id": "P-24",
+ "purpose": "R405 external-audit item 'power calculation or minimum-detectable-difference declaration': the recorded differentiator is a 0.1 s settling-time difference (MODELLED); this record computes whether the proposed bench instrument can resolve it at the recorded n=10/arm.",
+ "technology_name": "Gravity Compensation Hydraulic Damper for Postural Transients"
+}

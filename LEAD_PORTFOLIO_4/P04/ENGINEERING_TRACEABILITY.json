@@ -1,0 +1,107 @@
+{
+ "artifact_type": "ENGINEERING_TRACEABILITY",
+ "binding_rules_verbatim": {
+  "IDENTIFIER": "shared canonical engineering identifier (underscore symbol or standard number) present in both artifacts' recorded text",
+  "NEVER": "semantic association, fuzzy match, or invented binding (Art. II)",
+  "PHRASE": "exact normalized phrase (>= 12 chars) shared"
+ },
+ "chains": [
+  {
+   "decision": "ACCEPT -> sponsored bench validation; common-cause occlusion >= 90% of cases -> KILL (r405 quantified arm)",
+   "design_input_id": "DI-001",
+   "design_input_parameter": "Clinical need",
+   "design_output_id": "DO-001",
+   "design_output_parameter": "Dual-lumen catheter geometry",
+   "evidence_classes": {
+    "di": "SOURCE_FACT (frozen corpus dossier)",
+    "do": "COMPUTATIONAL_RESULT (validated CAD)",
+    "q_min": "EXTERNAL_PRECEDENT (web-verified citations)",
+    "v": "NOT_TESTED (bench experiment unexecuted)"
+   },
+   "expected_observation": "residual floor flow >= Q_min (0.2-0.4 mL/min declared range) under full primary obstruction at >= 2 of the physiological pressure heads",
+   "experiment": {
+    "binding": "IDENTIFIER",
+    "evidence": "the R403 DECISIVE_EXPERIMENT contract carries the same primary endpoint identifiers and the same parameter names",
+    "linked_id": "LEAD_PORTFOLIO_4/P04/DECISIVE_EXPERIMENT.json",
+    "state": "EXPLICIT"
+   },
+   "geometry_parameter": "floor_lumen_diameter_mm (canonical 0.6 / NIST 0.5471)",
+   "mechanism_feature": {
+    "binding": "IDENTIFIER",
+    "evidence": "shared identifier DO-001 + exact phrase 'dual-lumen drainage' in the frozen corpus MATURITY_BASIS design_output_evidence_ids and the R403 canonical records",
+    "state": "EXPLICIT"
+   },
+   "verification_id": "V-001",
+   "verification_parameter": "Bench obstruction challenge vs single-lumen control"
+  },
+  {
+   "decision": "the Q_min pass rule is quantified and testable; below-Q_min residual flow at all heads -> KILL",
+   "design_input_id": "DI-005",
+   "design_input_parameter": "Q_min target (minimum drainage)",
+   "design_output_id": "DO-001",
+   "design_output_parameter": "Dual-lumen catheter geometry",
+   "evidence_classes": {
+    "calculation": "COMPUTATIONAL_RESULT (R405 script log)",
+    "di": "RECORDED (dossier design input)",
+    "v": "NOT_TESTED"
+   },
+   "expected_observation": "corrected Poiseuille floor conductance 0.254 mL/(min*mmHg) -> 152.7 mL/hr at 10 mmHg (NIST-corrected geometry) vs Q_min 12-24 mL/hr: conductance margin 6-12x; the discriminating boundary is ~47% effective-diameter reduction (common-cause tolerance)",
+   "experiment": {
+    "binding": "IDENTIFIER",
+    "evidence": "the R403 DECISIVE_EXPERIMENT contract carries the same primary endpoint identifiers and the same parameter names",
+    "linked_id": "LEAD_PORTFOLIO_4/P04/QMIN_FLOOR_FLOW_CALCULATION.json",
+    "state": "EXPLICIT"
+   },
+   "geometry_parameter": "floor_lumen_diameter_mm x length_mm = 100",
+   "mechanism_feature": {
+    "binding": "IDENTIFIER",
+    "evidence": "shared identifier DO-001 + exact phrase 'floor lumen conductance' in the frozen corpus MATURITY_BASIS design_output_evidence_ids and the R403 canonical records",
+    "state": "EXPLICIT"
+   },
+   "verification_id": "V-001",
+   "verification_parameter": "Bench flow measurement"
+  },
+  {
+   "decision": "regime violation -> model invalidity declared, experiment re-specified (honest failure, not a silent retry)",
+   "design_input_id": "DI-003",
+   "design_input_parameter": "Flow regime",
+   "design_output_id": "DO-001",
+   "design_output_parameter": "Dual-lumen catheter geometry",
+   "evidence_classes": {
+    "di": "RECORDED (dossier design input)",
+    "model": "MODELLED (Poiseuille, deterministic)",
+    "v": "NOT_TESTED"
+   },
+   "expected_observation": "laminar regime holds across 10-40 mmHg (Reynolds far below the laminar limit at corrected magnitudes — R405 unit correction)",
+   "experiment": {
+    "binding": "IDENTIFIER",
+    "evidence": "the R403 DECISIVE_EXPERIMENT contract carries the same primary endpoint identifiers and the same parameter names",
+    "linked_id": "LEAD_PORTFOLIO_4/P04/DECISIVE_EXPERIMENT.json",
+    "state": "EXPLICIT"
+   },
+   "geometry_parameter": "primary_lumen_diameter_mm 1.1 / floor 0.5471",
+   "mechanism_feature": {
+    "binding": "IDENTIFIER",
+    "evidence": "shared identifier DO-001 + exact phrase 'Poiseuille laminar network model' in the frozen corpus MATURITY_BASIS design_output_evidence_ids and the R403 canonical records",
+    "state": "EXPLICIT"
+   },
+   "verification_id": "V-002",
+   "verification_parameter": "Flow/pressure measurement across the postural matrix"
+  }
+ ],
+ "company_designation": "P04",
+ "constitutional_basis": "R394 identifier-binding rules (IDENTIFIER or exact PHRASE >= 12 chars shared between artifacts; NEVER semantic association); Art. II; the external audit's finding that the buyer-side truth model records EXPLICIT 0 / PARTIAL 0 / UNKNOWN 9-11 chains per package",
+ "historical_package_id": "P-07",
+ "honest_limits": [
+  "the V items are NOT_TESTED — linking a chain documents the graph, it does not execute the verification (Art. XXVIII: no promotion without new evidence)",
+  "these are ENGINE-side records; the buyer surface is frozen (Art. XXXIX) and changes only through the release chain",
+  "chains not listed here remain TRACEABILITY_UNKNOWN in the buyer-side truth model — they are not silently linked by this record"
+ ],
+ "package_state_after_r405": {
+  "chains_linked_this_round": 3,
+  "chains_remaining_unknown": "7 of 10 (frozen-corpus chain count) — including DI-007 biocompatibility, DI-008 sterilization, DI-010 material, which are ISO/standard-verifiable but carry no experiment binding in the current records",
+  "state": "TRACEABILITY_PARTIAL (engine-side canonical; the buyer-side frozen files remain all-UNKNOWN until the owner release-chain operation)"
+ },
+ "purpose": "the audit's $0 item 'Link 3 critical DI chains': link the clinical-need -> primary-function -> primary-verification chain per package ENGINE-SIDE so the next buyer release carries an honest partial graph instead of an all-UNKNOWN one",
+ "technology_name": "Passive Drainage Priority Safety Floor"
+}
