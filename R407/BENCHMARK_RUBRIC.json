@@ -1,0 +1,188 @@
+{
+ "artifact_type": "BENCHMARK_RUBRIC",
+ "rubric_version": "1.0.0",
+ "defined": "2026-09-04",
+ "authority": "R407/ROADMAP_9_10_BENCHMARKS.md Part A — the CEO roadmap's rubric implemented as ONE machine contract so that \"9/10 in every benchmark\" means the same thing to every future session, every gate, and the next external auditor",
+ "constitution_anchors": ["Art. XXV (unknown stays unknown; estimates stay estimates)", "Art. XXVI (no self-certification)", "Art. XXVIII (no silent semantic promotion)", "Art. XXXVII/XXXVIII (synthetic vs real loop; reality boundary)", "Art. XXXIX (buyer-distribution repo is final authority)", "Art. LIX (no benchmark gaming)"],
+
+ "scale": {
+  "unit": "integer 0-10 per family",
+  "release_bar": 9,
+  "perfect": 10,
+  "aggregation": "families are reported individually; an aggregate mean may be REPORTED but never replaces the per-family rows"
+ },
+
+ "scoring_rules_non_negotiable": {
+  "rule_1_score_requires_driver_output": "A family score without a committed driver output artifact (R407/DRIVERS/<FAMILY>_SCORE.json with measured checks and an instrument_state) is REJECTED. The claim is not the measurement.",
+  "rule_2_missing_instrument_scores_zero": "A family whose driver does not exist yet scores 0 by rule — never 9, never the auditor estimate. '0 of 10 families have a driver-measured score' was the true standing before P0.",
+  "rule_3_reality_fed_stage_ceiling": "Reality-fed dimensions carry a RECORDED stage ceiling until a REALITY_EVENT of the right class lands (physical validation needs a physical observation; baseline strength needs an incumbent comparison measurement; commercial transfer needs a buyer evaluation). The ceiling is a STATE, not a defect.",
+  "rule_4_ceiling_defect_relabel_forbidden": "Relabeling a ceiling as a defect, or a defect as a ceiling, is itself a HONESTY failure. The two lists below are disjoint and any edit that moves an item between them must carry a constitutional event record.",
+  "rule_5_estimates_are_estimates": "External-audit estimates (auditor_estimate_r407 below) are recorded AS ESTIMATES. They are never promoted to machine scores. Promoting an estimate is Art. XXV + XXVI + XXVIII violation.",
+  "rule_6_certification_independence": "A benchmark counts as MET only when scored by an evaluator that is not the claimant (Art. XXVI). The coder may BUILD and RUN drivers; certification is the clean-clone replay and the R408 external audit.",
+  "rule_7_no_benchmark_gaming": "Once a driver is frozen it may not be tuned against its own measured output (Art. LIX). Driver changes require a new rubric version + adversarial re-test.",
+  "rule_8_hermetic_default": "A driver that cannot reach its instrument (e.g. portfolio repo unavailable in CI) reports score 0 with instrument_state INSTRUMENT_UNAVAILABLE — an honest BLOCKED state, never a silent pass, never a carry-forward of a stale score."
+ },
+
+ "families": {
+  "DELIVERY": {
+   "bar_10": "perfect delivery + independent clean-clone replay",
+   "bar_9": "924/924 buyer-surface pins, chain verification 25/25 from clean clones, byte-reproducible buyer artifacts, zero stale hashes anywhere on the delivery surface",
+   "auditor_estimate_r407": 8,
+   "auditor_estimate_basis": "D1 (identity registry stale hashes) and D2 (LATEST_RELEASE inconsistency) defects",
+   "measured_by": "scripts/r407_benchmark_drivers.py --family delivery --portfolio-root <path>",
+   "output_artifact": "R407/DRIVERS/DELIVERY_SCORE.json",
+   "driver_status": "BUILT_IN_P0",
+   "reaches_9_in": "P0",
+   "owner": "CODER"
+  },
+  "HONESTY": {
+   "bar_10": "no unsourced number ever shipped; nothing promoted; every unknown preserved",
+   "bar_9": "numeric-assertion audit clean; unknowns preserved (mechanical re-derivation agrees); PASS rows classified+logged; no semantic promotion anywhere",
+   "auditor_estimate_r407": 7,
+   "auditor_estimate_basis": "P-11 numbers, P-16 V-002 classification, exec-brief 'traced' wording (P1 items)",
+   "measured_by": "scripts/r407_benchmark_drivers.py --family honesty --portfolio-root <path>",
+   "output_artifact": "R407/DRIVERS/HONESTY_SCORE.json",
+   "driver_status": "BUILT_IN_P0",
+   "reaches_9_in": "P0/P1",
+   "owner": "CODER"
+  },
+  "FIDELITY": {
+   "bar_10": "frozen corpus pinned, hermetic, every reference resolves",
+   "bar_9": "zero stale paths, zero NOT_MEASURABLE on the frozen corpus, frozen file hash guard on",
+   "auditor_estimate_r407": 5,
+   "auditor_estimate_basis": "C1 (stale paths) and C2 (semantic-genericness restore) defects",
+   "measured_by": "scripts/r407_benchmark_drivers.py --family fidelity --portfolio-root <path>",
+   "output_artifact": "R407/DRIVERS/FIDELITY_SCORE.json",
+   "driver_status": "BUILT_IN_P0",
+   "reaches_9_in": "P0",
+   "owner": "CODER"
+  },
+  "MACHINERY": {
+   "bar_10": "full E/A/F suites green on clean clones",
+   "bar_9": "E15 A-J pass; E16 blind-holdout/causal/diversity pass; A2/A10/A12 pass",
+   "auditor_estimate_r407": 7,
+   "auditor_estimate_basis": "harnesses exist; some never run",
+   "measured_by": "P2 driver (planned): machinery suites from clean clone",
+   "output_artifact": "R407/DRIVERS/MACHINERY_SCORE.json",
+   "driver_status": "PLANNED_P2",
+   "reaches_9_in": "P1/P2",
+   "owner": "CODER"
+  },
+  "ADVERSARIAL": {
+   "bar_10": "attacker calibrated per-category with clean controls surviving",
+   "bar_9": "confusion matrix recorded, no arbitrary kill-rate target, negative-control suites green",
+   "auditor_estimate_r407": 2,
+   "auditor_estimate_basis": "corpus frozen (R401-WC2 16 cases), never run",
+   "measured_by": "P2 driver (planned): scripts/r401wc2_attacker_calibration.py raw records",
+   "output_artifact": "R407/DRIVERS/ADVERSARIAL_SCORE.json",
+   "driver_status": "PLANNED_P2",
+   "reaches_9_in": "P2",
+   "owner": "CODER"
+  },
+  "NOVELTY_PRACTICE": {
+   "bar_10": "adversarial prior-art hunt on every survivor with full custody",
+   "bar_9": "search neutrality (no hardcoded solution class), collision stage on, zero-results-are-not-novelty enforced",
+   "auditor_estimate_r407": 7,
+   "auditor_estimate_basis": "R402 CB-2 done; custody gap on prior_art_v2 direct searchers",
+   "measured_by": "P2 driver (planned): novelty/retrieval custody audit",
+   "output_artifact": "R407/DRIVERS/NOVELTY_PRACTICE_SCORE.json",
+   "driver_status": "PLANNED_P2",
+   "reaches_9_in": "P2",
+   "owner": "CODER"
+  },
+  "INDEPENDENCE": {
+   "bar_10": "stated reviewer kind + independent human/org review in the chain",
+   "bar_9": "every external claim discloses reviewer provenance; no opaque 'external consultant'; one human/org review on record",
+   "auditor_estimate_r407": 3,
+   "auditor_estimate_basis": "all reviews to date are AI-performed",
+   "measured_by": "P1 field audit + P4 human review event",
+   "output_artifact": "R407/DRIVERS/INDEPENDENCE_SCORE.json",
+   "driver_status": "PLANNED_P1",
+   "reaches_9_in": "P1 (>=6) / P4 (>=9)",
+   "owner": "CODER_P1_THEN_INSTITUTION_P4"
+  },
+  "DOSSIER_QUALITY": {
+   "bar_10": "per-dossier 9+ on every one of the 12 dimensions",
+   "bar_9": "per-dossier >=9 on definition-stage dims; reality dims at honest recorded ceiling WITH a decisive-experiment package",
+   "auditor_estimate_r407": "4-8 by dimension",
+   "auditor_estimate_basis": "see dossier_quality_dimensions below (per-dimension auditor ranges)",
+   "measured_by": "P1-P3 driver (planned): per-dossier 12-dim audit",
+   "output_artifact": "R407/DRIVERS/DOSSIER_QUALITY_SCORE.json",
+   "driver_status": "PLANNED_P1_P3",
+   "reaches_9_in": "P1-P3",
+   "owner": "CODER"
+  },
+  "LOOP": {
+   "bar_10": "one REAL_LOOP_VERIFIED package with the ledger correct",
+   "bar_9": "controlled-rehearsal ingest proven; REALITY_EVENT interface live; loop ledger correct; at least one package REAL_LOOP_VERIFIED",
+   "auditor_estimate_r407": 3,
+   "auditor_estimate_basis": "machinery armed + rehearsal-proven (R407); learning count 0; REAL_LOOP_VERIFIED 0",
+   "measured_by": "P3 driver (planned): loop-state ledger + rehearsal certificate",
+   "output_artifact": "R407/DRIVERS/LOOP_SCORE.json",
+   "driver_status": "PLANNED_P3",
+   "reaches_9_in": "P3 (>=6) / P5 (>=9)",
+   "owner": "CODER_P3_THEN_INSTITUTION_P5"
+  },
+  "REALITY_FED": {
+   "bar_10": "real observation + independent replication + buyer transaction",
+   "bar_9": "at least one decisive experiment executed per promoted dossier with attested provenance, ingested through the same code path as rehearsal",
+   "auditor_estimate_r407": "1-2",
+   "auditor_estimate_basis": "0 physical observations, 0 prototypes, 0 real buyers portfolio-wide",
+   "measured_by": "P5/P6 driver (planned): REALITY_EVENT ledger + attestation checks",
+   "output_artifact": "R407/DRIVERS/REALITY_FED_SCORE.json",
+   "driver_status": "PLANNED_P5",
+   "reaches_9_in": "P5/P6 ONLY (institution-gated)",
+   "owner": "INSTITUTION",
+   "stage_ceiling_note": "This family CANNOT be raised by code. Per the roadmap's honest spine it stays at its ceiling until the owner-side reality events land."
+  }
+ },
+
+ "dossier_quality_dimensions": {
+  "note": "12 dimensions scored per dossier, 0-10. Auditor-estimate RANGES are recorded as estimates only (roadmap Part B). reality_fed=true dimensions carry a stage ceiling until the named evidence class lands.",
+  "dimensions": {
+   "mechanism_clarity": {"auditor_estimate_r407": "6-8", "reality_fed": false, "evidence_class_for_9": "named causal mechanism established-novel or better"},
+   "evidence_quality": {"auditor_estimate_r407": "2-6", "reality_fed": false, "evidence_class_for_9": "hashed exact-span evidence with mechanism-level precedent"},
+   "provenance": {"auditor_estimate_r407": "4-6", "reality_fed": false, "evidence_class_for_9": "every computation carries a shipped computation log"},
+   "engineering_correctness": {"auditor_estimate_r407": "6-8", "reality_fed": false, "evidence_class_for_9": "0 unit/arithmetic errors, dimensional state proven"},
+   "baseline_strength": {"auditor_estimate_r407": "2", "reality_fed": true, "evidence_class_for_9": "measured advantage over a named incumbent (bench)", "stage_ceiling": "no dossier measures an advantage over an incumbent"},
+   "reproducibility": {"auditor_estimate_r407": "2-6", "reality_fed": false, "evidence_class_for_9": "shippable regeneration artifacts (CAD=6 today; sims=2)"},
+   "physical_validation": {"auditor_estimate_r407": "2", "reality_fed": true, "evidence_class_for_9": "physical observation ingested as REALITY_EVENT", "stage_ceiling": "zero observations, zero prototypes portfolio-wide"},
+   "novelty_practice": {"auditor_estimate_r407": "8", "reality_fed": false, "evidence_class_for_9": "never-claimed discipline maintained (NOT_ESTABLISHED everywhere)"},
+   "manufacturing_feasibility": {"auditor_estimate_r407": "2-6", "reality_fed": false, "evidence_class_for_9": "manufacturability evidence beyond CAD"},
+   "commercial_transferability": {"auditor_estimate_r407": "2-6", "reality_fed": true, "evidence_class_for_9": "licensable with buyer evaluation evidence", "stage_ceiling": "evaluable but not licensable; REAL_BUYER=0"},
+   "decisive_experiment_quality": {"auditor_estimate_r407": "6-8 (P-13=2)", "reality_fed": false, "evidence_class_for_9": "WP-01 + kill conditions defined; P3 acquisition layer"},
+   "closed_loop_maturity": {"auditor_estimate_r407": "2-4 (P-24=4 synthetic)", "reality_fed": true, "evidence_class_for_9": "REAL_LOOP_VERIFIED for the dossier", "stage_ceiling": "machinery armed, rehearsal-proven, learning count 0"}
+  }
+ },
+
+ "ownership_split": {
+  "note": "From roadmap Part E — recorded so scores never attribute institution actions to the coder.",
+  "CODER": ["W1-W12 work orders", "all rubric drivers", "reproduction/rehearsal machinery", "protocol packages", "honest ceilings"],
+  "CEO_INSTITUTION": ["fund decisive experiments (P-07 first)", "obtain at least one genuinely independent human/org review", "run at least one lab/bench cycle", "arrange buyer evaluation", "issue directives", "approve kill/promotion"],
+  "INDEPENDENT_EVALUATORS": ["the frozen drivers + the R408 external audit — never the coder"]
+ },
+
+ "defect_and_ceiling_ledger": {
+  "note": "Rule 4 requires the two lists to stay disjoint. Defects are coder-fixable without reality; ceilings require reality-side events.",
+  "p0_defects": {
+   "D1_identity_registry": "PORTFOLIO_IDENTITY_REGISTRY.json hashes stale vs the shipped R387 tree (all 15 entries) — measured 2026-09-04",
+   "D2_latest_release": "RELEASE/LATEST_RELEASE.json claims chain 26/26 while the authority certificate records 25 checks; engine registry status says NOT_TAGGED while tag v1.0.0-3D-edition exists on the remote — measured 2026-09-04",
+   "B1_p22_r1_v3_reship": "shipped 10_catheter_navigation EQUATION_REGISTRY carries pre-V3 'Actuator' names (3 VARIABLE_NAME_MISMATCH); V3_MUTATION_ADDENDUM.json missing from the shipped tree; r373/r374 audits red (4 test failures) — measured 2026-09-04",
+   "C1_stale_paths": "stale path references on the measured surfaces (driver-measured census in FIDELITY_SCORE.json)",
+   "C2_semantic_genericness": "semantic-genericness restore (B4 machinery re-wired to the shipped corpus; driver-measured in FIDELITY_SCORE.json)"
+  },
+  "honest_ceilings": {
+   "physical_validation_all_dossiers": "no physical observation has ever entered the system (physical_observation_count=0)",
+   "baseline_strength_all_dossiers": "no incumbent-comparison measurement exists",
+   "commercial_transfer_all_dossiers": "REAL_BUYER=0",
+   "independence_human_review": "0 human/org reviews in the chain (all AI-performed)",
+   "real_loop_verified": "0 packages; only the P-24 synthetic rehearsal exists"
+  }
+ },
+
+ "driver_output_contract": {
+  "required_fields": ["family", "rubric_version", "score", "instrument_state", "measured_at_source_commit", "checks (each with name, pass, evidence)", "defects (named, from the ledger above)", "estimate_recorded_as_estimate (never used for the score)"],
+  "instrument_states": ["MEASURED", "INSTRUMENT_UNAVAILABLE", "BLOCKED_TRANSPORT", "PARTIAL"],
+  "path": "R407/DRIVERS/"
+ }
+}

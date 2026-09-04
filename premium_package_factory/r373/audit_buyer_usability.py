@@ -134,21 +134,43 @@ def audit_buyer_usability(portfolio_root, pkg, headlines: dict) -> dict:
                                    f"{n_unknowns} recorded UNKNOWNs"})
 
     # ---- Q4: next decisive experiment ------------------------------------
-    wp1 = pkg.build_plan[0] if pkg.build_plan else {}
-    q4 = (_compact(wp1.get("work_package", "")) in card_c
-          and _compact(wp1.get("test_article", ""))[:50] in card_c
+    # R407 P0 (B1 class — instrument alignment with the R394 canonical
+    # rule): the decisive work package is DERIVED from the recorded kill
+    # condition (r394.decisive_experiment.derive_decisive_work_package),
+    # never build_plan[0]. The card must name the DERIVED decisive WP
+    # with its test article and an acceptance criterion — the same
+    # derivation the shipped VALIDATION_ECONOMICS.json carries (the
+    # derivation, matched tokens, and scored candidates ship in the JSON
+    # for buyer audit). The pre-R394 check (build_plan[0]) flagged the
+    # correctly-rendered kill-condition-derived card — a stale
+    # instrument, not a defective card (Art. XIX: what failure in
+    # reality did the red expose? the audit's, not the card's).
+    from premium_package_factory.r394.decisive_experiment import (
+        derive_decisive_work_package)
+    kill_if = (headlines or {}).get("kill_if", "")
+    decisive = derive_decisive_work_package(pkg, kill_if)
+    wp_id = decisive.get("work_package") or \
+        (pkg.build_plan[0].get("work_package", "")
+         if pkg.build_plan else "")
+    wp_entry = next(
+        (w for w in pkg.build_plan
+         if w.get("work_package") == wp_id), {})
+    q4 = (_compact(wp_id) in card_c
+          and _compact(wp_entry.get("test_article", ""))[:50] in card_c
           and "Acceptance:" in card_txt)
     answers["Q4_next_decisive_experiment"] = {
-        "wp_named": wp1.get("work_package", "") in card_txt,
+        "decisive_work_package": wp_id,
+        "derivation": decisive.get("decisive_experiment_state"),
+        "wp_named": wp_id in card_txt,
         "test_article_verbatim": _compact(
-            wp1.get("test_article", ""))[:50] in card_c,
+            wp_entry.get("test_article", ""))[:50] in card_c,
         "acceptance_present": "Acceptance:" in card_txt,
     }
     if not q4:
         failures.append({"check": "Q4_DECISIVE_EXPERIMENT",
-                         "detail": "card does not name canonical WP-01 "
-                                   "with test article and acceptance "
-                                   "criterion"})
+                         "detail": "card does not name the kill-condition-"
+                                   "derived decisive WP with test article "
+                                   "and acceptance criterion"})
 
     # ---- Q5: what they receive -------------------------------------------
     receives = (pkg.transfer_boundary or {}).get("buyer_receives", [])

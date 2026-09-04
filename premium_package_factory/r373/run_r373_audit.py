@@ -86,49 +86,80 @@ BASE_FILES = [
 ]
 
 
+def _package_tree(pdir):
+    """Relative-path walk of a package folder. 3D-aware (R407 P0 / B1):
+    the R384/R385 CEO-directed 3D edition added a MODEL/ layer to every
+    package; the pre-3D audit compared TOP-LEVEL listings and has been
+    red on every shipped package since. The walk is the correct basis;
+    the MODEL layer is additionally verified against the package manifest
+    and the ZIP bytes below (a strengthening: the pre-3D audit never
+    hash-checked MODEL content)."""
+    files = set()
+    for dp, _dn, fns in os.walk(pdir):
+        for fn in fns:
+            rel = os.path.relpath(os.path.join(dp, fn), pdir)
+            files.add(rel.replace(os.sep, "/"))
+    return files
+
+
 def audit_document_complete(portfolio_root, pkg) -> dict:
     failures = []
     pdir = os.path.join(portfolio_root, "DOWNLOAD", pkg.folder)
-    actual = set(os.listdir(pdir))
+    actual = _package_tree(pdir)
     expected = set(BASE_FILES)
     if pkg.addendum:
         expected |= {"V2_MUTATION_ADDENDUM.json",
                      f"PACKAGE_MUTATION_CERTIFICATE_{pkg.pkg_id}_V2.json"}
-    if actual != expected:
-        missing = sorted(expected - actual)
-        extra = sorted(actual - expected)
+    # R407 P0 / B1: the CEO-directed R394 V3 corrections ship inside the
+    # package as V3_MUTATION_ADDENDUM.json (+ mutation certificate), per
+    # the canonical_source V3 trail contract. P-22-R1 is the V3 package.
+    if getattr(pkg, "v3_corrections", None):
+        expected |= {"V3_MUTATION_ADDENDUM.json",
+                     f"PACKAGE_MUTATION_CERTIFICATE_{pkg.pkg_id}_V3.json"}
+    missing = sorted(expected - actual)
+    # Every non-BASE shipped file must live under MODEL/ (the 3D design
+    # layer) — anything else appearing at the package root is drift.
+    non_model_extra = sorted(
+        e for e in (actual - expected) if not e.startswith("MODEL/"))
+    if missing or non_model_extra:
         failures.append({"check": "FILE_SET",
                          "detail": f"missing={missing[:4]} "
-                                   f"extra={extra[:4]}"})
-    # identity line on every PDF
-    for fn in sorted(actual):
-        if not fn.endswith(".pdf"):
+                                   f"extra={non_model_extra[:4]}"})
+    # identity line on every buyer PDF (root-level only; MODEL/ carries
+    # engineering derivatives, not buyer PDFs)
+    import subprocess
+    for rel in sorted(actual):
+        if not rel.endswith(".pdf") or rel.startswith("MODEL/"):
             continue
-        import subprocess
-        r = subprocess.run(["pdftotext", "-raw", os.path.join(pdir, fn),
+        r = subprocess.run(["pdftotext", "-raw", os.path.join(pdir, rel),
                             "-"], capture_output=True, text=True)
         if f"Package {pkg.pkg_id}" not in (r.stdout or ""):
             failures.append({"check": "IDENTITY_LINE",
-                             "detail": f"{fn} lacks identity line"})
-    # manifest == filesystem
+                             "detail": f"{rel} lacks identity line"})
+    # manifest == filesystem (relative-path aware: the PACKAGE_MANIFEST
+    # lists MODEL/... files with forward slashes)
     pm = _load(os.path.join(pdir, "PACKAGE_MANIFEST.json"))
     listed = {f["file"] for f in pm.get("files", [])} | \
         {"PACKAGE_MANIFEST.json"}
     if listed != actual:
         failures.append({"check": "MANIFEST_FILESYSTEM_DRIFT",
-                         "detail": "PACKAGE_MANIFEST file list != folder"})
-    # ZIP == folder
+                         "detail": "PACKAGE_MANIFEST file list != folder "
+                                   "(relative-path walk incl. MODEL/)"})
+    # ZIP == folder, every member byte-identical (strengthened: ALL members
+    # including the MODEL/ 3D layer are hash-compared; the pre-3D audit
+    # compared only top-level names and skipped directory entries)
     zpath = os.path.join(portfolio_root, "DOWNLOAD",
                          f"{pkg.folder}.zip")
     if not os.path.exists(zpath):
         failures.append({"check": "ZIP_MISSING", "detail": "no package ZIP"})
     else:
         with zipfile.ZipFile(zpath) as zf:
-            if set(zf.namelist()) != actual:
+            znames = {n for n in zf.namelist() if not n.endswith("/")}
+            if znames != actual:
                 failures.append({"check": "ZIP_MEMBER_DRIFT",
                                  "detail": "ZIP members != folder files"})
             else:
-                for n in zf.namelist():
+                for n in sorted(znames):
                     if hashlib_sha256(zf.read(n)) != \
                             sha256_file(os.path.join(pdir, n)):
                         failures.append({"check": "ZIP_BYTE_DRIFT",

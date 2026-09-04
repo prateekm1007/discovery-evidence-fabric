@@ -78,6 +78,21 @@ _UNITS = {
     "µs": Dimension("time"),
     "pc/n": Dimension("force") / Dimension("charge"),
     "v·m/n": Dimension("voltage") * Dimension("length") / Dimension("force"),
+    # R407 P0 (B1 class — V3-aware instrument alignment): the R394
+    # set_symbol_units record (CEO directive 9) uses these unit strings;
+    # they were present in the r372 validator (equation_validation.py)
+    # but missing here, so the independent recompute disagreed with the
+    # builder for the SAME recorded units. Same dimensions, same
+    # discipline: recorded units only, never guessed (Art. VI).
+    "ml/(min·mmhg)": Dimension("volume") / Dimension("time") /
+                      Dimension("pressure"),
+    "ml/(min*mmhg)": Dimension("volume") / Dimension("time") /
+                     Dimension("pressure"),
+    "mpa·s": Dimension("pressure") * Dimension("time"),
+    "mpa*s": Dimension("pressure") * Dimension("time"),
+    "pa·s": Dimension("pressure") * Dimension("time"),
+    "pa*s": Dimension("pressure") * Dimension("time"),
+    "dimensionless": Dimension(1),
 }
 
 _IDENT = re.compile(r"[A-Za-z][A-Za-z0-9_]*")
@@ -111,32 +126,101 @@ _IDENT_RE = _IDENT
 
 
 def _parse(side: str):
+    """R407 P0 (B1 class — instrument alignment): identifiers immediately
+    followed by '(' (e.g. 'A_actuator(P, dP/dt)') are canonical
+    FUNCTION-APPLICATION notation and are mapped to sympy Function
+    objects, exactly as the r372 validator's _parse_side has done since
+    its R394-era evolution. The audit's parser predated that handling,
+    so the independent recompute returned NOT_EVALUABLE_SYNTAX for
+    expressions the validator parsed (an instrument divergence, not a
+    data defect). Same deterministic syntax-level handling; the
+    canonical string is never rewritten (Art. II)."""
     try:
-        local = {s: sympy.Symbol(s) for s in _symbols(side)}
+        func_names = set(re.findall(r"([A-Za-z][A-Za-z0-9_]*)\s*\(",
+                                    side or ""))
+        local = {}
+        for s in _symbols(side):
+            if s in func_names:
+                local[s] = sympy.Function(s)
+            else:
+                local[s] = sympy.Symbol(s)
         return sympy.parse_expr(side, local_dict=local,
                                 transformations="all"), None
     except Exception as e:
         return None, f"SYMPY_PARSE_ERROR: {str(e)[:80]}"
 
 
-def dimensional_state(math_expr: str, critical_parameters: list) -> str:
-    """Independent dimensional-consistency verdict (state only)."""
+def dimensional_state(math_expr: str, critical_parameters: list,
+                       symbol_units: dict | None = None) -> str:
+    """Independent dimensional-consistency verdict (state only).
+
+    R407 P0 (B1 class): `symbol_units` is the RECORDED
+    governing_model.symbol_units overlay from the canonical view (the
+    R394 CEO directive 9 unit record — every entry carries its own
+    basis). Using it here aligns the independent recompute with the
+    same recorded-unit discipline the r372 validator already applies
+    (equation_validation._symbol_units). No guessing is introduced:
+    units come only from the record (Art. VI); the recompute stays
+    independent of the shipped registry's own claims.
+    """
     if not math_expr or not math_expr.strip():
         return "NOT_EVALUABLE_SYNTAX"
-    if "=" not in math_expr:
+    # R407 P0 (B1 class — instrument alignment): relations =, ~, >=, <=
+    # are all dimension-comparable (a proportionality relates
+    # same-dimension quantities up to a constant), exactly as the r372
+    # validator's split_relation has handled since its evolution; the
+    # audit's split-on-'=' predated that and mislabeled '~' relations
+    # as NO_EQUALITY.
+    rel = re.search(r"(==|>=|<=|~|=)", math_expr)
+    if not rel:
         return "NOT_EVALUABLE_NO_EQUALITY"
-    lhs, rhs = math_expr.split("=", 1)
+    lhs, rhs = math_expr[:rel.start()].strip(), \
+        math_expr[rel.end():].strip()
+    # R407 P0 (B1 class — instrument alignment): the same deterministic
+    # notation normalization the r372 validator applies FOR THE CHECK
+    # ONLY (the canonical string is never rewritten — Art. II):
+    # [X] concentration notation -> bare symbol X; Python-keyword
+    # identifiers (lambda, in, ...) get a '_' suffix so they parse as
+    # symbols. Without this the audit mislabeled bracket/keyword
+    # expressions as SYNTAX while the validator evaluated them.
+    _norm = re.compile(r"\[([A-Za-z][A-Za-z0-9_]*)\]")
+    norm_expr = _norm.sub(r"\1", math_expr)
+    for _kw in ("lambda", "in", "if", "else", "for", "and", "or",
+                "not", "is", "as", "assert", "del", "pass", "raise",
+                "while", "with", "yield", "global", "nonlocal"):
+        norm_expr = re.sub(rf"\b{_kw}\b", f"{_kw}_", norm_expr)
+    if _norm.search(math_expr) or norm_expr != math_expr:
+        rel = re.search(r"(==|>=|<=|~|=)", norm_expr)
+        if not rel:
+            return "NOT_EVALUABLE_NO_EQUALITY"
+        lhs, rhs = norm_expr[:rel.start()].strip(), \
+            norm_expr[rel.end():].strip()
     l, e1 = _parse(lhs)
     r, e2 = _parse(rhs)
     if e1 or e2:
         return "NOT_EVALUABLE_SYNTAX"
     units = _recorded_units(math_expr, critical_parameters)
+    overlay = symbol_units or {}
+    for sym in _symbols(math_expr):
+        if sym in units or sym not in overlay:
+            continue
+        entry = overlay[sym]
+        u = entry.get("unit") if isinstance(entry, dict) else entry
+        if u and _dim(u) is not None:
+            units[sym] = (sym, u)
     free = set()
     for side in (l, r):
         try:
             free |= {str(s) for s in side.free_symbols}
         except Exception:
             pass
+    # keyword-renamed symbols (lambda_ from lambda) match their original
+    # name in the recorded units (the r372 discipline)
+    _KWS = ("lambda", "in", "if", "else", "for", "and", "or", "not",
+            "is", "as", "assert", "del", "pass", "raise", "while",
+            "with", "yield", "global", "nonlocal")
+    free = {s[:-1] if s.endswith("_") and s[:-1] in _KWS else s
+            for s in free}
     if free - set(units):
         return "NOT_EVALUABLE_UNITS_UNRECORDED"
     subs = {sympy.Symbol(s): _dim(units[s][1]) for s in units}
@@ -231,7 +315,8 @@ def audit_registry(pkg, shipped_registry: dict) -> dict:
             shipped_state = (val.get("dimensional_check", {})
                              .get("state"))
             recomputed = dimensional_state(math_expr,
-                                           pkg.critical_parameters)
+                                           pkg.critical_parameters,
+                                           gm.get("symbol_units"))
             if shipped_state != recomputed:
                 eq_fail.append(f"DIMENSIONAL_STATE_DRIFT:"
                                f"shipped={shipped_state},"

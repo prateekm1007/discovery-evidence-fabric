@@ -239,17 +239,28 @@ def audit_package_v2(portfolio_root, pkg, addendum_input_path,
            "shipped addendum byte-identical to engine input snapshot")
     pm = json.load(open(os.path.join(pdir, "PACKAGE_MANIFEST.json"),
                         encoding="utf-8"))
+    # R407 P0 (B1 class — V3-aware): the R394 V3 corrections supersede
+    # the V2 line for P-07 / P-22-R1 / P-24; the shipped manifest
+    # version and registry status carry the CURRENT shipped version.
+    expected_version = addendum.get("v2_version")
+    expected_status = "V2"
+    if getattr(pkg, "v3_corrections", None):
+        expected_version = pkg.v3_corrections.get(
+            "v3_version", "3.0")
+        expected_status = "V3"
     record("ENGINEERING_JSON.VERSION_2",
-           pm.get("package_version") == addendum.get("v2_version"),
-           f"PACKAGE_MANIFEST version == {addendum.get('v2_version')}")
+           pm.get("package_version") == expected_version,
+           f"PACKAGE_MANIFEST version == {expected_version}"
+           f"{' (V3 supersedes the V2 line)' if expected_status == 'V3'
+             else ''}")
     reg = json.load(open(os.path.join(portfolio_root,
                                       "PORTFOLIO_IDENTITY_REGISTRY.json"),
                          encoding="utf-8"))
     row = next((r for r in reg["packages"]
                 if r["historical_package_id"] == pkg.pkg_id), None)
     record("ENGINEERING_JSON.REGISTRY_V2",
-           bool(row) and row.get("status") == "V2",
-           "identity registry status == V2")
+           bool(row) and row.get("status") == expected_status,
+           f"identity registry status == {expected_status}")
 
     # ---- per-mutation stages -------------------------------------------
     pdf_texts = {pdf: _pdf_text(os.path.join(pdir, pdf))
@@ -292,17 +303,28 @@ def audit_package_v2(portfolio_root, pkg, addendum_input_path,
         v2_forms = _v2_forms(m.get("v2_text", ""))
 
         # 4 ENGINEERING_JSON: no shipped JSON carries stale v1 as current
+        # R407 P0 (B1 class — instrument alignment): a v1 occurrence
+        # COVERED BY a larger v2 rendering is not stale (the v2 mutation
+        # text legitimately opens by quoting the v1 sentence it extends —
+        # exactly the coverage rule the PDF stages below apply through
+        # _stale_v1_hits). The pre-fix substring check flagged the V2
+        # text itself.
         stale_json = []
         for fn in sorted(os.listdir(pdir)):
-            if not fn.endswith(".json"):
+            if not fn.endswith(".json") or fn == \
+                    "V2_MUTATION_ADDENDUM.json":
                 continue
             with open(os.path.join(pdir, fn), encoding="utf-8") as f:
                 body = f.read()
             body_c = _compact(body)
             for var in v1_forms:
                 var_c = _compact(var)
-                if var_c and var_c in body_c and fn != \
-                        "V2_MUTATION_ADDENDUM.json":
+                if not var_c or var_c not in body_c:
+                    continue
+                covered = any(
+                    _compact(f) and var_c in _compact(f)
+                    and _compact(f) in body_c for f in v2_forms)
+                if not covered:
                     stale_json.append(f"{fn}:{var[:40]}")
         mr["stages"].append({
             "stage": "ENGINEERING_JSON.NO_STALE_V1",
@@ -352,16 +374,25 @@ def audit_package_v2(portfolio_root, pkg, addendum_input_path,
     zip_ok = False
     if os.path.exists(zpath):
         with zipfile.ZipFile(zpath) as zf:
-            names = set(zf.namelist())
-            folder_files = set(os.listdir(pdir))
+            # R407 P0 (B1 class): 3D-aware relative-path comparison —
+            # the pre-3D top-level os.listdir() has been red on every
+            # shipped package since the R384/R385 MODEL/ layer. The fix
+            # mirrors run_r373_audit._package_tree and STRENGTHENS the
+            # stage: every MODEL/ member is now byte-compared too.
+            names = {n for n in zf.namelist() if not n.endswith("/")}
+            folder_files = set()
+            for dp, _dn, fns in os.walk(pdir):
+                for fn in fns:
+                    rel = os.path.relpath(os.path.join(dp, fn), pdir)
+                    folder_files.add(rel.replace(os.sep, "/"))
             if names == folder_files:
                 zip_ok = all(
                     hashlib.sha256(zf.read(n)).hexdigest()
                     == _sha256_file(os.path.join(pdir, n))
                     for n in names)
     record("ZIP_EQUIV", zip_ok,
-           "ZIP member set == folder set and every extracted file "
-           "byte-identical")
+           "ZIP member set == folder set (relative-path walk incl. "
+           "MODEL/) and every extracted file byte-identical")
     checks.extend([s for mr in mutation_reports for s in mr["stages"]])
 
     return {

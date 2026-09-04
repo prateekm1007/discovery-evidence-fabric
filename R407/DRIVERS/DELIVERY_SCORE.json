@@ -1,0 +1,67 @@
+{
+ "artifact_type": "BENCHMARK_FAMILY_SCORE",
+ "family": "delivery",
+ "rubric_version": "1.0.0",
+ "score": 8,
+ "release_bar": 9,
+ "bar_met": false,
+ "instrument_state": "MEASURED",
+ "measured_at_engine_head": "e811b6afcc2b0d4109abaffc1a8bb9af8fac03da",
+ "measured_at_portfolio_head": "04e4497bfb41acee86de528ef491eb0ad426efd1",
+ "checks": [
+  {
+   "name": "identity_registry_freshness",
+   "pass": true,
+   "note": "D1: PORTFOLIO_IDENTITY_REGISTRY.json dossier/manifest/zip hashes vs the shipped tree",
+   "evidence": "45 hash comparisons across 15 entries",
+   "failures": []
+  },
+  {
+   "name": "latest_release_consistency",
+   "pass": true,
+   "note": "D2: LATEST_RELEASE claims vs the engine authority records (certificate check-count, registry commits, tag status)",
+   "evidence": "certificate checks=25; claimed 25/25; engine registry last release: R387-3D-QUALITY-EDITION status=TAGGED v1.0.0-3D-edition (tag verified on the portfolio remote by ls-remote during R407 P0; the prior SUBMITTED_FOR_CEO_AUDIT_NOT_TAGGED label predated the R387 tag cut)",
+   "failures": []
+  },
+  {
+   "name": "manifest_pins_agree",
+   "pass": false,
+   "note": "the 9-bar's 924/924 pins: every buyer-surface file the CANONICAL_RELEASE_MANIFEST pins hash-matches the current tree (a stale manifest after content changes is RED until the r386 regeneration runs)",
+   "evidence": "1 pinned buyer-surface files hash-verified against the current tree",
+   "failures": [
+    "definition:MISSING",
+    "pinned_files:MISSING",
+    "sha256:MISSING",
+    "DOWNLOAD/technology-transfer-portfolio-15.zip:HASH_DRIFT"
+   ]
+  },
+  {
+   "name": "chain_certificate_pass",
+   "pass": true,
+   "note": "the freshest clean-clone chain certificate in the engine repo is overall PASS",
+   "evidence": "latest certificate: RELEASE_CHAIN_VERIFICATION_R388_DISTILLED_TREE.json -> PASS",
+   "failures": []
+  },
+  {
+   "name": "release_audits_green",
+   "pass": true,
+   "note": "B1: r373 independent audit + r374 equation status audit green on every shipped package",
+   "evidence": "r373 full audit + r374 equation status, all 15 packages",
+   "failures": []
+  },
+  {
+   "name": "reproduction_evidence",
+   "pass": true,
+   "note": "a committed fresh-clone byte-reproduction record exists for the release",
+   "evidence": "record: R373_FRESH_CLONE_REPRODUCTION.json (recorded at portfolio_head a73d897eb3ca)",
+   "failures": []
+  }
+ ],
+ "deduction_applied": 2.0,
+ "defects_named": [
+  "manifest_pins_agree"
+ ],
+ "auditor_estimate_r407_recorded_as_estimate": null,
+ "estimate_is_not_the_score": true,
+ "scoring_rules": "R407/BENCHMARK_RUBRIC.json rule_1..rule_8; deduction table frozen with rubric 1.0.0"
+}
