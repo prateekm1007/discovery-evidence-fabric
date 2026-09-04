@@ -1005,3 +1005,15 @@ Stage Summary:
 - The rubric version is now single-authority (the file); a parallel constant can never drift again.
 - DELIVERY 10 re-verified at the bar with only TRUE evidence strings; the battery, the audits, and the clean-clone replay agree.
 - Honest residue: 6 build-integration tests not re-run this session (environment window; unchanged by this diff; green at last record), B10 blind-custody still blocked (disclosed), ~257-file /home/z census unchanged (disclosed at 0c29f9ed).
+
+---
+Task ID: R408-DRIVER-OUTPUTS-AT-0b4bd44d (2026-09-04, session 3 — the D-D regeneration at the true final HEAD)
+Agent: CODER (Super Z session — R408)
+Task: regenerate the driver outputs at the D-F-fix HEAD (measured_at_engine_head = 0b4bd44dce78f5c5f711c84a2197ee11fd28534d) by re-running the driver, never hand-editing.
+
+Work Log:
+- Battery re-run at 0b4bd44d: DELIVERY 10/10 MEASURED, HONESTY 10/10 MEASURED, FIDELITY 10/10 MEASURED (all rubric 1.2.0, zero defects named; the 7 planned families honestly 0/INSTRUMENT_UNAVAILABLE by rule_2).
+- The manifest evidence now reads '946 pinned buyer-surface files hash-verified against the current tree (buyer_surface + package_zips + master_zip)' — the D-F fix measured, not asserted.
+
+Stage Summary:
+- The R407/DRIVERS/*_SCORE.json artifacts now carry the true final-HEAD measurement (0b4bd44d) with the complete 946-pin evidence; D-D discipline held (re-run, no hand-edit; reproducible from clean clones).
