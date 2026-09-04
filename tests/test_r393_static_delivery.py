@@ -234,18 +234,27 @@ class TestShowcaseBriefPayload:
         assert isinstance(d["known_blockers"], list) and d["known_blockers"]
         assert "SOURCE_FACT" in d["evidence_class_counts"]
         # Art. XXXIX honesty: the showcase displays EXACTLY what the
-        # portfolio authority records. The pinned release (b978e32)
-        # carries the LEGACY economics key (first_decisive_work_package
-        # = WP-01, the R371 build_plan[0] selection). The R394
-        # kill-condition derivation (common-cause obstruction -> WP-04)
-        # is implemented and pinned in premium_package_factory/r394/
-        # decisive_experiment.py + tests/test_r394_semantics.py, and
-        # ships in the economics JSON under `decisive_work_package` at
-        # the NEXT portfolio release — the showcase prefers that key
-        # when present. This test pins the CURRENT authority state so
-        # it cannot silently diverge from the deployed showcase truth
-        # (which reads the same pinned portfolio).
-        assert d["first_decisive_work_package"]["work_package"] == "WP-01"
+        # portfolio authority records. VERIFIED CANONICAL CHAIN (R408
+        # audit, stale-test-pin repair): the buyer-distribution repo at
+        # its current release (R408-P0-V31-RESHIP, LATEST_RELEASE
+        # portfolio_release_commit 0db3738, tag v1.1.0-R407-P0) ships
+        # VALIDATION_ECONOMICS.json with time_range.decisive_work_package
+        # = WP-04 (decisive_experiment_state DERIVED_FROM_KILL_CONDITION,
+        # common-cause obstruction) — the key landed at portfolio commit
+        # dbda328 (R407-P0 B1 re-ship of the R394 V3 corrections) and the
+        # legacy `first_decisive_work_package` key (WP-01, the R371
+        # build_plan[0] selection) is NO LONGER PRESENT in the canonical
+        # JSON — WP-01 survives only in decisive_work_package.all_candidates.
+        # The WP-04 derivation itself is independently pinned in
+        # tests/test_r394_semantics.py (incl. the WP-01-first negative
+        # control), and toscanini/showcase.py prefers the
+        # `decisive_work_package` key. The prior WP-01 pin here was
+        # written against the b978e32 release and became stale when the
+        # R407-P0 re-ship legitimately evolved the shipped economics —
+        # this pin now reflects the CURRENT authority state so it cannot
+        # silently diverge from the deployed showcase truth (which reads
+        # the same pinned portfolio).
+        assert d["first_decisive_work_package"]["work_package"] == "WP-04"
 
     def test_no_physical_validation_claim_in_payload(self):
         """Art. XXXVIII guard: the payload must not claim physical
