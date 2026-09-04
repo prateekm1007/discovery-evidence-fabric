@@ -263,12 +263,12 @@ def check_manifest_pins_agree(portfolio_root):
     m = json.loads(mpath.read_text(encoding="utf-8"))
     mismatches = []
     checked = 0
-    # buyer_surface pins + package_zips + master_zip
-    pins = m.get("buyer_surface")
-    if isinstance(pins, dict):
-        file_map = pins.get("files") or pins
-    else:
-        file_map = {}
+    # buyer_surface pins (the manifest's sha256 map: rel-path -> hash)
+    # + package_zips + master_zip
+    bs = m.get("buyer_surface") or {}
+    file_map = bs.get("sha256") if isinstance(bs, dict) else None
+    if not isinstance(file_map, dict):
+        file_map = bs.get("files") if isinstance(bs, dict) else None
     if isinstance(file_map, dict):
         for rel, expected in file_map.items():
             fp = portfolio_root / rel
