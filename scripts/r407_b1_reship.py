@@ -725,14 +725,14 @@ def regenerate_distribution_certificate(portfolio_root, apply, report):
 
 
 def rebuild_master_zip(portfolio_root, apply, report):
-    """Rebuild the master ZIP (8 root docs + 15 package ZIPs) from the
-    actual tree, mirroring the R385 layout."""
+    """Rebuild the master ZIP from the actual tree: the 8 ROOT_BUYER_FILES
+    + the 15 package ZIPs (the r386 chain Z3 contract — the master ZIP
+    member set must equal the manifest-defined buyer surface)."""
+    from scripts.r386_release_chain import ROOT_BUYER_FILES
     mz_name = "technology-transfer-portfolio-15.zip"
     mz_path = portfolio_root / "DOWNLOAD" / mz_name
-    root_docs = sorted(
-        p.name for p in portfolio_root.glob("*.pdf"))
     with zipfile.ZipFile(mz_path, "w") as zf:
-        for fn in root_docs:
+        for fn in ROOT_BUYER_FILES:
             _zip_add(zf, str(portfolio_root / fn), fn)
         for z in sorted((portfolio_root / "DOWNLOAD").glob("*.zip")):
             if z.name == mz_name:
