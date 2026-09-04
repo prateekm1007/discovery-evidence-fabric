@@ -47,7 +47,12 @@ EXPECTED_NOVELTY = {
     "P04": "SUPPORTED",
     "P08": "SUPPORTED",
     "P11": "SUPPORTED",
-    "P13": "NOVELTY_SEARCH_REPORTED",
+    # R406 legitimate state evolution: the P13 specific search now EXISTS
+    # (LEAD_PORTFOLIO_4/P13/NOVELTY_SEARCH_R406/) and the state moved from
+    # REPORTED-but-unlocated to SEARCHED_AND_CONTESTED. The R406 battery
+    # pins the new state; this R403 guard accepts the recorded evolution
+    # and still rejects any other drift.
+    "P13": ("NOVELTY_SEARCH_REPORTED", "SEARCHED_AND_CONTESTED"),
 }
 CORPUS_MATURITY_TERM = "ENGINEERING_DEFINITION"   # corpus vocabulary (immutable files)
 LADDER_MATURITY_TERM = "ENGINEERING_DEFINED"      # directive ladder vocabulary
@@ -153,7 +158,16 @@ def test_pdf_identity_lines_agree_with_registry():
 def test_novelty_states_and_artifacts():
     for desig, expected in EXPECTED_NOVELTY.items():
         na = load(LP4 / desig / "NOVELTY_ASSESSMENT.json")
-        assert na["assessment_status"] == expected, f"{desig} novelty state drift"
+        if isinstance(expected, tuple):
+            # R406 legitimate evolution (P13): the assessment file itself
+            # keeps its recorded NOVELTY_SEARCH_REPORTED status (the
+            # search record lives beside it in NOVELTY_SEARCH_R406/);
+            # the MANIFEST-level state moved to SEARCHED_AND_CONTESTED.
+            assert na["assessment_status"] == expected[0], (
+                f"{desig} assessment-file novelty state drift")
+        else:
+            assert na["assessment_status"] == expected, (
+                f"{desig} novelty state drift")
         assert na["legal_patentability_determination"] is False
         assert na["fto_determination"] is False
         assert na["prior_package_novelty_state"]["state"] == "NOT_ESTABLISHED", (

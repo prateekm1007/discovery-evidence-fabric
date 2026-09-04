@@ -1,0 +1,88 @@
+{
+ "artifact_type": "EXPERIMENT_PREREGISTRATION",
+ "company_designation": "P13",
+ "constitutional_basis": "Art. LII, Art. XXVII, Art. XLVII (paired same-die baseline; identical instrument, simultaneous acquisition), Art. XXIX (the predecessor T1-FAIL conditions re-admission, does not kill the family)",
+ "contract_of_record": "LEAD_PORTFOLIO_4/P13/DECISIVE_EXPERIMENT.json + LEAD_PORTFOLIO_4/P13/BENCHMARK_SPECIFICATION.json",
+ "cost_and_time": {
+  "cost_class": "ENGINEERING_ESTIMATE (REPORTED; 5-10x the other three packages \u2014 material to the commercial calculus, disclosed)",
+  "cost_range": "$95-265K (REPORTED external-audit itemization: MEMS NRE $50-150K/mask set; engineering-sample wafer $20-50K; baseline comparator $20-50K; bench packaging $5-15K)",
+  "time": "weeks-to-months (die procurement + 4-week fouling horizon dominate)"
+ },
+ "decision_rule": {
+  "ARCHITECTURAL_SELF_DEFEAT": "the reference element itself drifts comparably to the active element (falsifier channel c) -> the bridge references an equally unstable reference -> same path as KILLED",
+  "INDETERMINATE": "proxy-transfer doubt dominant (accelerated fouling vs in-vivo biofouling) -> recorded exactly so",
+  "KILLED": "ka014 criterion triggered (non-common-mode dominates) -> repair requires a non-common-mode compensation mechanism (per KA-014/DC-P-25-001), else cemetery",
+  "SUPPORTED": "ka014 criterion avoided (differential drift <= 1 mmHg in arms 3 AND 5) AND common-mode condition met (>= 3x cancellation vs baseline, retained >= 1.5x under cycling) -> SPONSORED_VALIDATION with the first PHYSICAL_OBSERVATION-class drift comparison attached"
+ },
+ "design": {
+  "apparatus": "calibrated pressure reference (ICP range 0-40 mmHg), temperature chamber (33-41 C), simultaneous two-arm acquisition (no cross-run instrument drift confound), fouling deposition quantified (mass/QCM-class or equivalent) so exposure is recorded, not narrative",
+  "arms": [
+   {
+    "arm": "1_baseline_single_ended",
+    "what": "same die/process family single-ended sensor \u2014 the control (ONLY the self-referencing architecture differs)"
+   },
+   {
+    "arm": "2_self_referencing_clean",
+    "what": "active + dummy bridge, no fouling/cycling stress \u2014 the common-mode thermal-drift claim, isolated"
+   },
+   {
+    "arm": "3_self_referencing_fouling",
+    "what": "self-referencing arm under accelerated fouling (BSA at physiological concentration, 37 C, 4-week soak, weekly bridge-offset reads) \u2014 the KA-014 kill channel, isolated"
+   },
+   {
+    "arm": "4_self_referencing_thermal_cycling",
+    "what": "self-referencing arm under thermal cycling (33-41 C sweep class) \u2014 the common-mode channel the architecture claims, stressed"
+   },
+   {
+    "arm": "5_combined_fouling_plus_thermal",
+    "what": "self-referencing arm under BOTH stresses simultaneously \u2014 the real-world composition the P-25 failure mode predicts"
+   }
+  ],
+  "simultaneous_acquisition_rule": "baseline and self-referencing arms are measured against the SAME reference at the SAME time in every stress arm (Art. XLVII)"
+ },
+ "directive_basis": "R406 Step 8: KA-014 must be an explicit kill experiment \u2014 build the predecessor failure directly in: baseline / self-reference / accelerated fouling / thermal cycling / combined fouling + thermal cycling. The experiment must determine whether the architecture actually suppresses non-common-mode drift. Periodic recalibration must NOT be counted as a mechanism fix.",
+ "historical_package_id": "P-27-R1",
+ "honest_limits": [
+  "accelerated fouling is a proxy for in-vivo biofouling (the P-25 record itself marks this channel dominant \u2014 the proxy's transfer risk is the experiment's main caveat)",
+  "bench horizon vs implant lifetime (acceleration assumptions must be declared, never silently equated)",
+  "die/process family representativeness (the catheter-integrated MEMS process is unvalidated)",
+  "zero physical measurement exists for ANY variant of this architecture \u2014 the predecessor's 3.45 mmHg record is in-model evidence, not hardware"
+ ],
+ "novelty_gate_note": "R406 Step 7 is a HARD GATE on this package: the specific novelty assessment (LEAD_PORTFOLIO_4/P13/NOVELTY_ASSESSMENT.json r406 extensions) must exist before large engineering spend; the experiment above is PROTOCOL-READY but spending the fab NRE before the novelty verdict is the exact inversion the directive forbids",
+ "portfolio_number": "13",
+ "primary_endpoint_preregistered": {
+  "common_mode_success_condition": {
+   "justification": "the bridge's reason to exist is the cancellation the predecessor actually demonstrated (67.8%) \u2014 this experiment must reproduce or beat it on hardware",
+   "margin_value": 3,
+   "rule": "the common-mode thermal claim is CONFIRMED only if arm 2 (clean) shows thermal zero/sensitivity error ratio vs the baseline arm >= the registered margin AND arm 4 retains >= half that margin under cycling",
+   "threshold_class": "MODEL_DERIVED (the P-25 precedent measured 67.8% common-mode cancellation in-model = ~3.1x vs uncancelled; the registered 3x requires the architecture to at least match the predecessor's measured cancellation)",
+   "unit": "x baseline"
+  },
+  "drift_target_modelled": {
+   "class": "MODEL_DERIVED (the dossier's recorded drift target; EXTERNAL_PRECEDENT sourcing remains an open owner action)",
+   "unit": "mmHg/month",
+   "value": 0.5
+  },
+  "endpoint": "differential bridge output drift (mmHg-equivalent) per arm over the registered horizon, decomposed into common-mode and non-common-mode channels",
+  "ka014_kill_criterion_registered": {
+   "provenance": "P-25 measured 3.45 mmHg over 30 days through exactly this channel (R337 falsification); the registered 1 mmHg over 4 weeks is the strict bound that catches the recurrence early",
+   "rule": "KILL (route to repair) if the self-referencing arm's differential output drifts > 1 mmHg after the 4-week fouling exposure (arm 3) or the combined arm (arm 5) \u2014 the non-common-mode channel dominates; KA-014 recurs; repair requires a NON-common-mode compensation mechanism, else cemetery",
+   "threshold_class": "MODEL_DERIVED (aligned with the P-25 precedent's 2.0 mmHg total-error class / 2 and the dossier's 1-2 mmHg accuracy target class; the R405-recorded proposal, registered under the R406 directive)",
+   "uncertainty": "model-derived strict bound; the owner may relax to 2 mmHg (P-25 precedent total-error class) ONLY before the run, never after",
+   "unit": "mmHg differential drift",
+   "value": 1
+  },
+  "recalibration_rule": {
+   "directive_basis": "R406 Step 8 verbatim: 'Periodic recalibration must not be counted as a mechanism fix'",
+   "precedent": "the P-25 cemetery entry's own open boundary question \u2014 carried as a label, never demonstrated",
+   "rule": "periodic recalibration is NOT counted as a mechanism fix: any arm whose post-recalibration performance is used to satisfy a criterion is recorded as CALIBRATION-DEPENDENT, which FAILS the mechanism claim (the architecture must suppress drift autonomously; recalibration is a maintenance procedure, not a compensation mechanism)"
+  },
+  "the_architectural_question": "does the self-referencing arm suppress NON-COMMON-MODE drift (the P-25 kill channel) or only common-mode drift (which the baseline can be trimmed for)?"
+ },
+ "registration_event": {
+  "frozen_before_any_run": true,
+  "no_post_hoc_rule": "any post-collection change to a registered threshold voids the run (Art. XXVII)",
+  "registered_by": "R406 round under the CEO directive (authorizing the R405 owner-gated fouling criterion)"
+ },
+ "technology_name": "Self-Referencing Piezoresistive Pressure Sensor"
+}

@@ -1,6 +1,5 @@
 {
  "artifact_type": "FINAL_CLASSIFICATION",
- "directive_basis": "R404 item 12: at the end, each package gets exactly one of READY_FOR_TECHNICAL_EVALUATION / READY_FOR_SPONSORED_VALIDATION / REQUIRES_EVIDENCE_REPAIR / REQUIRES_ENGINEERING_REPAIR / KILLED. No forced PASS.",
  "classification_vocabulary": [
   "READY_FOR_TECHNICAL_EVALUATION",
   "READY_FOR_SPONSORED_VALIDATION",
@@ -8,62 +7,99 @@
   "REQUIRES_ENGINEERING_REPAIR",
   "KILLED"
  ],
- "method": "Each classification cites the deciding facts from THIS round's verification (geometry re-verification, energy-budget reconciliation, novelty-evidence search, lineage audit, baseline audit). UNKNOWN never converts to PASS (Art. XXV).",
  "classifications": {
   "P04": {
-   "state": "READY_FOR_TECHNICAL_EVALUATION",
+   "blocking_items": [],
    "deciding_facts": [
     "geometry independently re-verified VALID on fresh rebuild (R404); the KILLED mutation reproduces \u2014 the record is honest and machine-checkable",
     "novelty evidence: Patent-Bear artifacts FOUND and hash-bound (CONDITIONAL posture, honestly scoped)",
     "no unresolved numerical contradictions in the canonical records",
     "decisive experiment fully specified but cost/time UNESTIMATED (owner-gated) \u2014 sponsored validation cannot be priced yet"
    ],
-   "blocking_items": [],
-   "note": "A technical evaluator can meaningfully assess this package today; the records do not overclaim."
+   "note": "A technical evaluator can meaningfully assess this package today; the records do not overclaim.",
+   "state": "READY_FOR_TECHNICAL_EVALUATION"
   },
   "P08": {
-   "state": "REQUIRES_ENGINEERING_REPAIR",
+   "blocking_items": [
+    "the D2 engineering decision (area vs fluence vs efficiency vs target revision) \u2014 an OWNER engineering decision, then a CAD/protocol update through the release chain",
+    "measurement of the low-irradiance cell efficiency (or an explicit design decision recording the assumption class)"
+   ],
    "deciding_facts": [
     "D1 RESOLVED (1050 \u00b5W = R310 reference-detector conversion; simulation chain restored and hash-pinned) \u2014 the evidence layer is now intact",
     "D2 OPEN and DECISIVE: the recorded 500 \u00b5W device target vs the 121-163 \u00b5W conditional band on the shipped 0.3848 cm\u00b2 receiver \u2014 the shipped design cannot meet its own recorded acceptance target under recorded assumptions (a ~4.3x area-equivalent gap); presenting the package as-is would hand a buyer a design-target inconsistency",
     "canonical deliverable power is UNKNOWN (eta_cell unknown, encapsulation unknown, electronics unknown)"
    ],
-   "blocking_items": [
-    "the D2 engineering decision (area vs fluence vs efficiency vs target revision) \u2014 an OWNER engineering decision, then a CAD/protocol update through the release chain",
-    "measurement of the low-irradiance cell efficiency (or an explicit design decision recording the assumption class)"
-   ],
-   "note": "The repair is an engineering-parameter decision, not an evidence-integrity failure: the evidence layer (archived simulations, reconciled budget) is now the strongest of the four."
+   "note": "The repair is an engineering-parameter decision, not an evidence-integrity failure: the evidence layer (archived simulations, reconciled budget) is now the strongest of the four.",
+   "state": "REQUIRES_ENGINEERING_REPAIR"
   },
   "P11": {
-   "state": "READY_FOR_SPONSORED_VALIDATION",
+   "blocking_items": [],
    "deciding_facts": [
     "the only package whose decisive experiment is COSTED and RECORDED ($15K / 8 weeks, 3-arm vs REAL ASD, blinded) \u2014 a sponsor can act on the record",
     "the comparator baseline is explicitly specified (real ASD + standard valve, identical instrument \u2014 Art. XLVII compliant)",
     "mechanism plausibility vs demonstrated advantage are explicitly separated (0 ESTABLISHED advantages; 2 UNESTABLISHED differentiators promoted to endpoints); the honest modeled finding (ASD better 3/4 postures) is quoted, not hidden",
     "SYNTHETIC_LOOP_VERIFIED state never presented as physical"
    ],
-   "blocking_items": [],
-   "note": "The package asks a sponsor to fund exactly the measurement that resolves its own claim set, with a pre-declared kill path. The premise-level unknown (clinical harm of TRANSIENTS vs steady over-drainage) stays disclosed (Art. XX)."
+   "note": "The package asks a sponsor to fund exactly the measurement that resolves its own claim set, with a pre-declared kill path. The premise-level unknown (clinical harm of TRANSIENTS vs steady over-drainage) stays disclosed (Art. XX).",
+   "state": "READY_FOR_SPONSORED_VALIDATION"
   },
   "P13": {
-   "state": "REQUIRES_EVIDENCE_REPAIR",
+   "blocking_items": [
+    "fresh prior-art search for THIS technology (cheap, parallel)",
+    "buyer-surface lineage correction (release-chain operation): fix the system_architecture narrative + add the biofouling failure channel to the failure-mode table",
+    "record the re-admission waiver or re-run the admission per DC-P-25-001"
+   ],
    "deciding_facts": [
     "novelty evidence: NO search artifact for THIS technology exists in the full reachable history \u2014 REPORTED_BUT_UNLOCATED (management's statement preserved as a report, never converted to a fact or to 'never performed')",
     "the frozen buyer dossier's lineage narrative is MIS-ATTRIBUTED ('original P-27 chronic drift' \u2014 the real predecessor is P-25) and its failure-mode table OMITS the predecessor's measured kill channel (biofouling: 0 mentions)",
     "the re-admission of a cemetery technology lacks a recorded waiver/DC-P-25-001-satisfaction (governance gap)",
     "the engineering itself is CAD-valid (independently re-verified) \u2014 the defects are in the evidence/documentation layer"
    ],
-   "blocking_items": [
-    "fresh prior-art search for THIS technology (cheap, parallel)",
-    "buyer-surface lineage correction (release-chain operation): fix the system_architecture narrative + add the biofouling failure channel to the failure-mode table",
-    "record the re-admission waiver or re-run the admission per DC-P-25-001"
-   ],
-   "note": "The R403/R404 canonical records (benchmark specification, lineage audit) already carry the honest layer engine-side; the buyer-facing surface repair is a release operation."
+   "note": "The R403/R404 canonical records (benchmark specification, lineage audit) already carry the honest layer engine-side; the buyer-facing surface repair is a release operation.",
+   "state": "REQUIRES_EVIDENCE_REPAIR"
   }
  },
+ "directive_basis": "R404 item 12: at the end, each package gets exactly one of READY_FOR_TECHNICAL_EVALUATION / READY_FOR_SPONSORED_VALIDATION / REQUIRES_EVIDENCE_REPAIR / REQUIRES_ENGINEERING_REPAIR / KILLED. No forced PASS.",
+ "method": "Each classification cites the deciding facts from THIS round's verification (geometry re-verification, energy-budget reconciliation, novelty-evidence search, lineage audit, baseline audit). UNKNOWN never converts to PASS (Art. XXV).",
+ "no_forced_pass": "No package is classified above its evidence. P08's repair class and P13's evidence class are the honest costs of the contradictions and erasures this round's audit surfaced; P04/P11's readiness states cite the facts that support them.",
  "p14_separation": {
-  "state": "NOT_IN_FOUR_LEAD_PORTFOLIO",
-  "basis": "R404 item 11: P14 is not part of the four-lead portfolio. Its external-distribution record (LEAD_PORTFOLIO_4/P14/P14_EXTERNAL_DISTRIBUTION_RECORD.json) is PRESERVED UNCHANGED this round (sha256-pinned by test against the R403 committed blob). Nothing was altered to improve the four-package metrics."
+  "basis": "R404 item 11: P14 is not part of the four-lead portfolio. Its external-distribution record (LEAD_PORTFOLIO_4/P14/P14_EXTERNAL_DISTRIBUTION_RECORD.json) is PRESERVED UNCHANGED this round (sha256-pinned by test against the R403 committed blob). Nothing was altered to improve the four-package metrics.",
+  "state": "NOT_IN_FOUR_LEAD_PORTFOLIO"
  },
- "no_forced_pass": "No package is classified above its evidence. P08's repair class and P13's evidence class are the honest costs of the contradictions and erasures this round's audit surfaced; P04/P11's readiness states cite the facts that support them."
+ "r406_extensions": {
+  "P04": {
+   "basis_updates": [
+    "canonical NIST state RESOLVED: RETAIN 0.6 mm with technical justification (R406/R406_P04_NIST_DECISION.json) \u2014 one canonical truth per quantity",
+    "contamination audit: the R396/R400/R401 meets_required_min verdict flip (false -> true under the corrected conductance) is disclosed and REQUIRES_REASSESSMENT-classified with zero propagation to the canonical records (R406/R406_CONDUCTANCE_CONTAMINATION_AUDIT.json)",
+    "the decisive experiment is now FULLY PRE-REGISTERED (Q_min 0.4/0.2, common-cause 90% rule, false-pass rule, repeatability, sample size, decision rule \u2014 EXPERIMENT_PREREGISTRATION.json): a technical evaluator can price and run it"
+   ],
+   "state": "READY_FOR_TECHNICAL_EVALUATION (unchanged)"
+  },
+  "P08": {
+   "basis_updates": [
+    "the energy model is now REPRODUCIBLE FROM CLEAN CHECKOUT (R406/P08_ENERGY_PIPELINE/PIPELINE_RUN.json: 7-stage chain, committed inputs/seed/outputs/plots/hashes/environment) \u2014 the R406 directive's reproducibility requirement is satisfied",
+    "NEW: the independent reproduction CONTESTS the anchor fluence at the ~40% level (0.705 vs 1.049-1.416 mW/cm2) and records that the R310 anchor pair was same-hand implemented (its 0.11% agreement is not independent confirmation) \u2014 the D2 decision now has two quantitative bases (121-163 uW anchor band vs 81 uW independent GaAs-conditional), BOTH below the 500 uW target: the REQUIRES_ENGINEERING_REPAIR direction is unchanged and strengthened"
+   ],
+   "state": "REQUIRES_ENGINEERING_REPAIR (unchanged, reinforced)"
+  },
+  "P11": {
+   "basis_updates": [
+    "the experimental contract is now BUYER-EXECUTABLE with every element registered: blinded analysis, primary endpoints, predefined MDD 0.0253 s, quantitative kill conditions A/B, manufacturing tolerance, SAP (Wilcoxon signed-rank, alpha 0.05, no peeking), cost $15K/8wk RECORDED (EXPERIMENT_PREREGISTRATION.json)",
+    "the experiment is capable of SUPPORTED or KILLED \u2014 not merely an interesting graph (the directive's Step 5 requirement)"
+   ],
+   "state": "READY_FOR_SPONSORED_VALIDATION (unchanged, strengthened)"
+  },
+  "P13": {
+   "basis_updates": [
+    "the prior gap 'no search artifact exists' is REPAIRED: a specific search now exists with committed provenance custody (LEAD_PORTFOLIO_4/P13/NOVELTY_SEARCH_R406/) \u2014 verdict CONTESTED at the architecture level by located prior art (Seaver 2018 dual matched-die implantable ICP sensor dissertation; US4320664 1982 dummy-element bridge; WO2014076620A2 implanted-sensor drift compensation; US11701504B2 shunt-mounted ICP sensing; US11422051B2 sealed-cavity reference)",
+    "the replacement gap is stronger than the old one: claim-differentiation review (owner patent counsel) is now the gating evidence action, and large engineering spend stays gated per the directive's hard-gate rule",
+    "the KA-014 kill experiment is registered with the predecessor failure built in (5 arms; recalibration explicitly not a mechanism fix)"
+   ],
+   "state": "REQUIRES_EVIDENCE_REPAIR (unchanged in class; the basis STRENGTHENED)"
+  },
+  "P14": {
+   "state": "NOT_IN_FOUR_LEAD_PORTFOLIO (unchanged; records untouched this round)"
+  },
+  "directive_basis": "R406 (real technology-transfer loop): the classification states are UNCHANGED \u2014 nothing this round is a class-changing fact; the BASIS of each is updated honestly below"
+ }
 }

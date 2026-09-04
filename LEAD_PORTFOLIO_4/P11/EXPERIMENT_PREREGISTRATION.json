@@ -1,0 +1,88 @@
+{
+ "MDD_and_resolution_disclosure": {
+  "mitigation_registered": "the physiological flow range for analysis is >= 0.2 mL/min pressures; runs at < 0.2 mL/min steady flow are flagged resolution-limited in the report (never silently included or excluded)",
+  "worst_case": "at 0.1 mL/min steady flow the 10% settling band equals the 0.01 mL/min flowmeter resolution \u2014 settling detection is marginal there (INSTRUMENT_MDD_CALCULATION resolution_check)"
+ },
+ "artifact_type": "EXPERIMENT_PREREGISTRATION",
+ "company_designation": "P11",
+ "constitutional_basis": "Art. LII, Art. XXVII, Art. XLVII (REAL ASD comparator, identical instrument, baseline unchanged across arms)",
+ "contract_of_record": "LEAD_PORTFOLIO_4/P11/DECISIVE_EXPERIMENT.json (the 12-element lift of the R339 protocol; this pre-registration freezes its numeric rules)",
+ "cost_and_time": {
+  "class": "RECORDED + REPORTED context",
+  "recorded": "$15K / 8 weeks (R339-recorded for this exact protocol class)",
+  "wider_range_context": "$15-38K (REPORTED audit itemization: loop $3-8K; prototypes $5-15K; commercial ASD controls $2-5K; personnel $5-10K)"
+ },
+ "decision_rule": {
+  "KILLED": "kill condition A (with endpoint 2 not decisively positive) OR kill condition B -> repair pipeline, then cemetery if repair fails (the R339-recorded path), lesson codified (Art. LI)",
+  "MIXED": "one differentiator positive, one null -> recorded exactly so; no partial promotion",
+  "SUPPORTED": "both kill conditions avoided AND at least one endpoint decisively positive -> SPONSORED_VALIDATION advances with the first PHYSICAL_OBSERVATION-class evidence attached",
+  "model_update_hook": "prediction_before registered: settling time 0.4 s (damper) / 0.5 s (ASD class) per the first-order model tau = I_h/c_h \u2014 the bench measurement updates this model through the Step 11 machinery (error_before/error_after/held_out_error)"
+ },
+ "design": {
+  "apparatus": "mock CSF loop: programmable pressure-head reservoir, flow sensor (0.01 mL/min resolution class), postural-step actuation, continuous acquisition >= 10 Hz, temperature-controlled fluid",
+  "arms": {
+   "control_1_ASD": "a REAL commercial anti-siphon device (the incumbent baseline the differentiators are claimed against \u2014 not a modeled ASD)",
+   "control_2_standard": "standard valve catheter (null anchor)",
+   "treatment": "the hydraulic damper element (annular-gap architecture, 0.18 mm gap class) inline in the mock CSF loop"
+  },
+  "blinding": "blinded analysis: the analysis script receives arm labels as anonymized codes A/B/C unsealed only after the primary-endpoint verdicts are computed and committed (the recorded R339 requirement, made explicit)",
+  "matrix": "3 arms x 4 postural pressures (10/20/30/40 mmHg) x 10 runs per arm-pressure (the recorded R339 protocol) x 2 step profiles (physiological 1-3 s transition class AND fast-step stress case)"
+ },
+ "directive_basis": "R406 Step 5: turn the R339 protocol into a buyer-executable experimental contract \u2014 blinded analysis, predefined primary endpoint, predefined MDD, quantitative kill condition, manufacturing tolerance, cost, timeline, statistical analysis plan; capable of SUPPORTED or KILLED, not merely an interesting graph",
+ "historical_package_id": "P-24",
+ "honest_limits": [
+  "mock loop fluid is water/CSF-mimic (NIST 310.15 K viscosity class; CSF residual disclosed)",
+  "excludes biological fouling and in-vivo compliance",
+  "clinical materiality of the settling difference is NOT established by this bench (it establishes engineering materiality only)",
+  "commercial ASD device tolerances may differ from the modeled ASD profile (why a REAL ASD is the comparator)"
+ ],
+ "manufacturing_tolerance": {
+  "class": "ENGINEERING (REPORTED external-audit challenge)",
+  "constraint": "damper prototypes at 0.18 mm +/- 0.01 mm annular gap, implant-grade polymer (the audit's tolerance challenge, recorded as the manufacturing feasibility UNKNOWN)",
+  "measurement": "gap verification per prototype (metrology record required before the run; prototypes outside tolerance are excluded and REPORTED, not silently dropped)"
+ },
+ "portfolio_number": "11",
+ "primary_endpoints_preregistered": {
+  "endpoint_1_response_time": {
+   "MDD_provenance": "LEAD_PORTFOLIO_4/P11/INSTRUMENT_MDD_CALCULATION.json (COMPUTATIONAL_RESULT: MDD 0.0253 s at p<0.05, n=10/arm \u2014 the claimed 0.1 s difference is 3.95x the MDD, DETECTABLE)",
+   "MDD_unit": "s",
+   "definition": "time from postural pressure step to flow settling within 10% of steady state (per run)",
+   "headline_claim_under_test": "damper settles 0.1 s FASTER than ASD (MODELLED: tau = I_h/c_h; 0.4 s vs 0.5 s class)",
+   "instrument_MDD": 0.0253,
+   "kill_condition_A_registered": {
+    "rule": "the response-speed differentiator is NOT established \u2014 KILL unless endpoint 2 is decisively positive \u2014 if the damper's mean settling time is not >= 20% faster than the ASD arm at ALL four postural pressures",
+    "statistical_form": "paired comparison per pressure: mean settling time damper vs ASD, one-sided test, alpha 0.05, n=10 pairs",
+    "threshold_class": "MODEL_DERIVED (engineering-judgment proposal, R405-recorded; registered under the R406 directive \u2014 NEVER presented as a clinical-materiality derivation)",
+    "uncertainty": "clinical materiality of a 0.1 s difference remains UNESTABLISHED (the differentiation record); the registered margin tests ENGINEERING materiality only",
+    "unit": "percent faster",
+    "value": 20
+   }
+  },
+  "endpoint_2_proportional_modulation": {
+   "definition": "flow-trace proportionality error: mean absolute deviation of instantaneous flow from the linear-in-pressure target trajectory across the step (per run)",
+   "headline_claim_under_test": "the damper modulates flow proportionally/continuously where the ASD acts stepwise",
+   "kill_condition_B_registered": {
+    "rule": "the safety case is negative \u2014 KILL \u2014 if the damper's target-flow accuracy (mean absolute deviation from target flow at steady state) is statistically worse than the ASD arm at ANY tested pressure",
+    "statistical_form": "paired one-sided test per pressure, alpha 0.05 (Wilcoxon signed-rank on paired per-pressure means; n=10 pairs)",
+    "threshold_class": "ENGINEERING (recorded falsifier disadvantage-class clause, R339/R405)"
+   }
+  }
+ },
+ "registration_event": {
+  "frozen_before_any_run": true,
+  "no_post_hoc_rule": "any post-collection change to a registered threshold voids the run (Art. XXVII)",
+  "registered_by": "R406 round under the CEO directive (the authorizing provenance for the R405 owner-gated kill conditions)"
+ },
+ "statistical_analysis_plan": {
+  "alpha_class": {
+   "class": "PROTOCOL (conventional; registered, not tuned)",
+   "value": 0.05
+  },
+  "multiplicity": "the four pressures are REPORTED per-pressure (no pooled override); a pooled verdict requires the same direction in >= 3 of 4 pressures (registered)",
+  "no_data_peeking": "all thresholds above are frozen; the analysis script is committed before any run (the recorded R339 blinded-analysis harness)",
+  "primary_analysis": "per-endpoint, per-pressure paired comparisons (damper vs ASD), one-sided, alpha = 0.05, n = 10 pairs per comparison",
+  "success_requires": "BOTH endpoint 1 kill-condition-A avoided AND endpoint 2 kill-condition-B avoided AND >= 1 endpoint decisively POSITIVE (the pre-declared differentiators promoted to endpoints) \u2014 otherwise the honest outcome is NOT SUPPORTED (recorded exactly)",
+  "test_choice": "Wilcoxon signed-rank (paired, distribution-free \u2014 no normality assumption for settling-time traces); reported with exact p and Hodges-Lehmann shift estimate"
+ },
+ "technology_name": "Gravity Compensation Hydraulic Damper for Postural Transients"
+}

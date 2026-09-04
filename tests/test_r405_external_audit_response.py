@@ -310,7 +310,11 @@ def test_traceability_ids_exist_in_frozen_corpus():
 
 def test_manifest_v3_enumerates_r405():
     m = _load(REPO / "LEAD_PORTFOLIO_4_MANIFEST.json")
-    assert m["manifest_version"] == "3.0"
+    # R406 bumped the manifest to 4.0 (legitimate forward evolution: the
+    # manifest is the living canonical enumeration). The R405 pin's
+    # PURPOSE — the R405 round block is intact and enumerated — is
+    # unchanged and still enforced below.
+    assert float(m["manifest_version"]) >= 3.0
     r405 = m["r405_external_audit_response_round"]
     assert "R405/EXTERNAL_AUDIT_RESPONSE.md" in r405["new_artifacts"]
     assert r405["final_classification"].startswith("UNCHANGED")

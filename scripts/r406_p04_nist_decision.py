@@ -1,0 +1,133 @@
+#!/usr/bin/env python3
+"""R406 Step 3 — the P04 NIST canonical decision record.
+
+Directive: "Do not simply edit the geometry. First produce
+R406_P04_NIST_DECISION.json containing: original parameter / measured
+source / corrected parameter / reason / affected equations / affected
+geometry / affected tests / affected buyer documents / release decision.
+Then regenerate everything consistently or formally retain the old value
+with an explicit technical justification. There must be only one canonical
+truth."
+
+Decision made here: RETAIN the shipped 0.6 mm floor lumen as the canonical
+design parameter, WITH the model update (measured viscosity 0.6913036
+mPa*s) already canonical engine-side since R405. The 0.5471 mm NIST-
+compensated rebuild remains a recorded VALID ALTERNATIVE with an
+executable adoption path — not a competing canonical value.
+
+Constitutional basis: Art. XXVII (the decision's thresholds and constants
+carry provenance), Art. X (one canonical authority per quantity), Art.
+XXXIX (buyer-surface changes are release-chain operations), Art. XLVII
+(the comparison is arithmetic-informed, not narrative).
+"""
+import json
+import os
+import sys
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# The four technical facts the decision rests on (each verified against
+# repository records at generation time — see verification_block).
+RECORD = {
+    "artifact_type": "R406_P04_NIST_DECISION",
+    "generator": "scripts/r406_p04_nist_decision.py (deterministic record; all numbers cross-checked against QMIN_FLOOR_FLOW_CALCULATION.json and GEOMETRY_SEPARATION.json)",
+    "constitutional_basis": "Art. XXVII, Art. X (one canonical truth), Art. XXXIX (release chain governs buyer surface), Art. XLVII",
+    "directive_basis": "R406 Step 3: resolve the NIST/P04 canonical conflict properly; do not simply edit the geometry; there must be only one canonical truth",
+
+    "original_parameter": {
+        "name": "floor_lumen_diameter_mm",
+        "value": 0.6,
+        "unit": "mm",
+        "design_basis_at_authoring": "EQ-1 Poiseuille conductance sized with the DESIGN CONSTANT viscosity 1.0 mPa*s (water-class at body temperature, MODEL_DERIVED declared basis)",
+        "canonical_location": "premium_package_factory/r381/templates.py (param_id floor_lumen_diameter_mm, value 0.6); shipped buyer model pm:4d42cf7d74b35dac; buyer-distribution repo DOWNLOAD/04_drainage_floor/MODEL/"
+    },
+    "measured_source": {
+        "quantity": "dynamic viscosity of water at body temperature",
+        "value": 0.6913036,
+        "unit": "mPa*s",
+        "source": "NIST-traceable measured constant at 310.15 K (reality event EVT-R390-NIST-WATER-VISC-310K, TOSCANINI/R390_REALITY_LOOP)",
+        "evidence_class": "EXTERNAL_REFERENCE_DATA via the R390 reality event (the repository's one real external constant measurement feeding this package)",
+        "effect_on_the_design_constant": "refutes the 1.0 mPa*s design constant: real viscosity is 30.9% lower, so the as-built floor conductance at unchanged geometry is 44.65% HIGHER than the design-intent value"
+    },
+    "corrected_parameter": {
+        "name": "floor_lumen_diameter_mm (NIST-compensated alternative)",
+        "value": 0.5471,
+        "unit": "mm",
+        "derivation": "d_new = d_old * (eta_meas/eta_design)^(1/4) = 0.6 * (0.6913036/1.0)^(1/4) — restores the DESIGN-INTENT conductance under the measured viscosity",
+        "status": "VALID ALTERNATIVE, sandbox-verified: rebuild pm:115852de5865efc8, all geometry gates pass, conductance_restored_ratio 0.999984 (GEOMETRY_SEPARATION.json valid_new_version_candidate)",
+        "applied_to_canonical_package": False
+    },
+    "reason": {
+        "decision": "RETAIN 0.6 mm as the canonical design parameter",
+        "technical_justification": [
+            "1. The mechanism's core function — the drainage-priority SPLIT G_floor/G_primary = (d_floor/d_primary)^4 — is viscosity-INVARIANT: both lumens carry the same fluid, so eta cancels in the ratio. The viscosity design-constant error CANNOT change the mechanism's governing behavior; it changes only absolute segment conductance, which is valve-dominated in the shunt system (QMIN engineering conclusion).",
+            "2. The error direction is the SAFE direction for a safety-floor mechanism: lower real viscosity (0.6913 vs 1.0) means HIGHER as-built floor conductance (0.368 vs 0.254 mL/(min*mmHg)) — MORE residual drainage reserve when the primary lumen obstructs, not less. The Q_min margin at minimum physiological head is 18.4x (shipped) vs 12.7x (compensated) — both far above the 12-24 mL/hr physiological production band; neither geometry is flow-limiting.",
+            "3. The measured constant is ALREADY canonical in every hydraulic computation engine-side: QMIN_FLOOR_FLOW_CALCULATION.json computes BOTH geometries at the measured 0.6913036 viscosity (the model update happened at R405); what remains a choice is only the DESIGN diameter, and the as-built behavior under the measured constant is fully disclosed.",
+            "4. Coherence across the chain of custody: retaining 0.6 keeps the engine template (templates.py), the shipped buyer model (pm:4d42cf7d), the buyer-distribution repository, the frozen corpus, and the release manifest in EXACT agreement (Art. XXXIX). Applying 0.5471 would create an engine-vs-buyer divergence that only a full release cycle can lawfully close, for zero functional benefit (points 1-2) and a nonzero risk surface (a 9% narrower floor lumen REDUCES the safety reserve and tightens manufacturability)."
+        ],
+        "what_would_reverse_the_decision": "an owner decision to match design-INTENT absolute conductance exactly (e.g. for regulatory equivalence to a modeled basis), or a bench measurement showing the as-built over-drainage direction is harmful — neither exists in the repository; the executable adoption path is recorded below"
+    },
+    "affected_equations": {
+        "EQ-1_conductance": "G = pi*d^4/(128*eta*L) — the equation itself is unchanged; the eta INPUT is corrected to the measured constant in every canonical computation (QMIN record); the diameter input stays 0.6 by this decision",
+        "floor_flow_at_pressure_heads": "Q = G*dP — all canonical values already corrected at R405 (152.7-610.7 mL/hr band for the compensated geometry; 220.8-883.4 mL/hr for the retained geometry, QMIN_FLOOR_FLOW_CALCULATION.json)",
+        "viscosity_invariant_relations": "G_floor/G_primary split, restoration ratio 0.999984, NIST compensation exponent 1/4 — unaffected by construction (eta cancels or is explicit)"
+    },
+    "affected_geometry": {
+        "canonical_template": "premium_package_factory/r381/templates.py floor_lumen_diameter_mm = 0.6 — UNCHANGED by this decision (no edit performed)",
+        "shipped_buyer_model": "pm:4d42cf7d74b35dac (VALID through all gates, independently re-verified at R404) — UNCHANGED",
+        "sandbox_alternative": "pm:115852de5865efc8 (0.5471 mm rebuild) — remains recorded as the valid alternative; NOT promoted, NOT deleted (Art. XXIX/XI)"
+    },
+    "affected_tests": {
+        "tests/test_r397_physics_stage.py": "pins the canonical floor_lumen_diameter_mm == 0.6 (line 175) — UNCHANGED (retention keeps it green; application would have required a coordinated pin update through a recorded causal mutation)",
+        "tests/test_r390_reality_loop.py + tests/test_r405_external_audit_response.py": "pin the corrected conductance values (0.254/0.368) and the restoration ratio — UNCHANGED (they pin the MODEL update, which is retained)",
+        "tests/test_r403_lead_portfolio_integrity.py + tests/test_r404_buyer_grade.py": "pin the shipped/buyer geometry values — UNCHANGED"
+    },
+    "affected_buyer_documents": {
+        "buyer-distribution repo DOWNLOAD/04_drainage_floor/ (MODEL/, dossiers)": "UNTOUCHED — zero buyer-repository bytes change under this decision (Art. XXXIX)",
+        "frozen_corpus_r370/04_drainage_floor/": "UNTOUCHED (immutable frozen evidence layer)",
+        "residual_propagation_item": "the frozen dossier's design-basis note still cites the 1.0 mPa*s design constant; the measured constant and the corrected hydraulics live engine-side (QMIN record). Propagating a design-basis note to the buyer surface is an OPTIONAL owner release-chain content update — not required for canonical truth (the design constant is an assumption statement, not a computed result), recorded here as the only open buyer-surface item from this decision"
+    },
+    "release_decision": {
+        "decision": "RETAIN (formal, with technical justification above)",
+        "canonical_truth_statement": "ONE canonical truth per quantity: DESIGN diameter = 0.6 mm (canonical, engine template == buyer model == frozen corpus); VISCOSITY CONSTANT = 0.6913036 mPa*s measured (canonical in all computations since R405); AS-BUILT floor conductance at the measured constant = 0.368 mL/(min*mmHg) (canonical, disclosed); the 0.5471 mm compensated rebuild = VALID ALTERNATIVE (recorded, not canonical).",
+        "auditor_conflict_resolution": "the R403 position ('owner release-chain decision'), the external audit position ('apply now'), and the R405 hold ('both repos must be pushed first — now satisfied') are resolved by THIS recorded decision: the owner directive R406 Step 3 required a definitive resolution; the resolution is RETAIN-with-justification, which the release protocol permits as 'formally retain the old value with an explicit technical justification'. The auditor's apply-now recommendation is recorded and declined on the four technical grounds above — not silently ignored.",
+        "executable_adoption_path_if_overridden": [
+            "premium_package_factory/r381/templates.py floor_lumen_diameter_mm 0.6 -> 0.5471 (design_basis updated to cite EVT-R390-NIST-WATER-VISC-310K)",
+            "coordinate the physics-stage reference envelope + r397 pin in the same commit (recorded causal mutation — nothing weakened)",
+            "deterministic rebuild + G1-G9 re-run (machinery proven by the R404 re-verification; expected model pm:115852de5865efc8 class)",
+            "buyer release through scripts/r386_release_chain.py (owner release-chain operation)"
+        ]
+    },
+    "verification_block": {
+        "note": "numbers cross-checked at generation time by the test suite (tests/test_r406_real_loop.py::test_p04_nist_decision_consistency)",
+        "qmin_values_referenced": "canonical 0.6 mm: G 0.368069 mL/(min*mmHg), 220.8 mL/hr at 10 mmHg; alternative 0.5471 mm: G 0.254443, 152.7 mL/hr — from LEAD_PORTFOLIO_4/P04/QMIN_FLOOR_FLOW_CALCULATION.json",
+        "split_invariance_check": "G_floor/G_primary = (0.6/1.1)^4 = 0.0885 at BOTH viscosities (eta cancels — the mechanism's governing ratio is identical under the design and measured constants)"
+    }
+}
+
+def main():
+    # cross-check the arithmetic referenced in the record before writing
+    import math
+    eta_d, eta_m = 1.0, 0.6913036
+    def G(d, eta):
+        return math.pi * (d * 1e-3) ** 4 / (128 * eta * 1e-3 * 100e-3) * 1e6 * 60 * 133.322
+    g_ship_meas = G(0.6, eta_m)            # as-built at measured eta
+    g_alt_meas = G(0.5471, eta_m)          # compensated at measured eta
+    g_ship_design = G(0.6, eta_d)          # design intent
+    assert abs(g_ship_meas - 0.368069) / 0.368069 < 1e-4, g_ship_meas
+    assert abs(g_alt_meas - 0.254443) / 0.254443 < 1e-4, g_alt_meas
+    over_drain = (g_ship_meas - g_ship_design) / g_ship_design
+    assert abs(over_drain - 0.4465) < 0.01, over_drain   # +44.65% as-built
+    split = (0.6 / 1.1) ** 4
+    # eta cancels in the split: identical at both viscosities by construction
+    assert abs(G(0.6, eta_m) / G(1.1, eta_m) - G(0.6, eta_d) / G(1.1, eta_d)) < 1e-15
+    out = os.path.join(REPO, "R406", "R406_P04_NIST_DECISION.json")
+    with open(out, "w") as f:
+        json.dump(RECORD, f, indent=1, sort_keys=True)
+    print(f"wrote {out}; arithmetic self-checks passed "
+          f"(as-built +{over_drain*100:.2f}%, split={split:.4f} eta-invariant)")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

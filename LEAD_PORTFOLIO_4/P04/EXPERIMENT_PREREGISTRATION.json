@@ -1,0 +1,110 @@
+{
+ "arms": {
+  "A_control_single_lumen": "standard single-lumen distal CSF shunt catheter, same material/OD/length \u2014 the clinical baseline (Art. XLVII: identical bench, identical instrument)",
+  "B_treatment_dual_lumen": "shipped parametric design: primary 1.1 mm + floor 0.6 mm, 3.0 mm OD, 100 mm (canonical geometry per R406_P04_NIST_DECISION.json: RETAIN 0.6)",
+  "measured_quantities": [
+   "steady-state flow per lumen (mL/min, gravimetric or calibrated meter)",
+   "inlet/outlet pressure (mmHg)",
+   "time-to-steady-state and time-to-zero-flow (s)",
+   "obstruction state (endoscopic/visual verification per lumen, post-test)",
+   "residual drainage (integrated volume over protocol horizon)"
+  ],
+  "obstruction_conditions": [
+   "PRIMARY_ONLY: primary lumen fully obstructed (simulant), floor lumen open \u2014 residual floor drainage is the headline measurement",
+   "FLOOR_ONLY: floor lumen fully obstructed, primary open \u2014 degradation behavior and drainage-priority validation (the primary must carry the load; this arm falsifies the 'floor is a liability when blocked' alternative)",
+   "COMMON_CAUSE: both lumens exposed to the same simulant simultaneously \u2014 the package's own recorded critical kill condition, measured per-lumen (isolated floor port sensor)"
+  ],
+  "pressure_heads_mmHg": [
+   10,
+   20,
+   40
+  ],
+  "simulant_classes": [
+   "proteinaceous debris analog",
+   "tissue-ingrowth analog"
+  ]
+ },
+ "artifact_type": "EXPERIMENT_PREREGISTRATION",
+ "company_designation": "P04",
+ "constitutional_basis": "Art. LII (falsification contract), Art. XXVII (threshold provenance \u2014 every value below carries class, source, uncertainty), Art. XLVII (identical instrument across arms)",
+ "contract_of_record": "LEAD_PORTFOLIO_4/P04/DECISIVE_EXPERIMENT.json (the 12-element contract; this pre-registration freezes its numeric rules)",
+ "cost_and_time": {
+  "cost_class": "ENGINEERING_ESTIMATE (REPORTED; owner confirmation outstanding)",
+  "cost_range": "$11-25K (REPORTED external-audit itemization: loop $2-5K, extrusion samples $3-8K, simulants $1-2K, personnel $5-10K)",
+  "sibling_anchor": "P-24's recorded $15K/8wk comparable bench loop",
+  "time": "~8 weeks (sibling protocol class, REPORTED)"
+ },
+ "decision_rule": {
+  "ACCEPT": "residual floor flow >= 0.4 mL/min at >=2 of 3 heads AND common-cause occlusion rate < 90% AND measured G ratio within +/-30% of the modelled 0.0885 (Poiseuille validity at bench Reynolds) -> package advances to SPONSORED_VALIDATION with the first PHYSICAL_OBSERVATION-class evidence through the reality-boundary interface",
+  "G_ratio_tolerance_provenance": {
+   "class": "ENGINEERING",
+   "justification": "bench-vs-Poiseuille agreement band for laminar micro-lumen flow with simulant-laden fixtures; the ratio endpoint is secondary, so a wide disclosed band; +/-30% is registered, not tuned",
+   "value": 30
+  },
+  "INDETERMINATE": "residual flow in the 0.2-0.4 band, or simulant-only doubt dominant -> recorded exactly so; never promoted (Art. XLII discipline applied to experiments)",
+  "KILL": "common-cause occlusion >= 90% (mechanism's own kill condition) OR residual floor flow < 0.2 mL/min at all heads (no meaningful protection) OR no sample passes the min-wall constraint across the full manufacturing attempt (Art. XXIX invariant-class only if proven for the design space) -> cemetery entry with the kill class + lesson codified (Art. LI)"
+ },
+ "directive_basis": "R406 Step 4: the common-cause experiment becomes the primary reality target; pre-register Q_min, common-cause kill threshold, false-pass rule, repeatability, sample size, decision rule \u2014 no post-hoc threshold selection",
+ "historical_package_id": "P-07",
+ "honest_limits": [
+  "obstruction simulants are analogs, not ex-vivo human tissue (transfer risk recorded)",
+  "water/CSF-mimic viscosity residual vs CSF (NIST 310.15 K water anchored; CSF slightly higher)",
+  "bench horizon excludes biological fouling timelines (chronic in-vivo obstruction differs from acute simulant occlusion)",
+  "the manufacturing observation is qualitative (process capability remains a recorded UNKNOWN)"
+ ],
+ "portfolio_number": "04",
+ "preregistered_thresholds": {
+  "Q_min_kill_rule": {
+   "justification": "the kill bound is the mirror of the pass bound; the 0.2-0.4 band between them routes to INDETERMINATE (recorded, never promoted)",
+   "provenance": "lower bound of the same literature range \u2014 below minimal production the floor provides no meaningful protection",
+   "rule": "KILL (channel b of the falsifier) if residual floor-lumen flow < 0.2 mL/min (6 mL/hr) at ALL pressure heads",
+   "threshold_class": "PHYSIOLOGICAL",
+   "unit": "mL/min",
+   "value": 0.2
+  },
+  "Q_min_pass_rule": {
+   "justification": "the floor must keep pace with the WORST-CASE production rate to claim clinically meaningful protection; using the upper bound makes the pass rule strict, not lenient",
+   "provenance": "upper bound of the literature-derived CSF production range 0.2-0.4 mL/min (Tariq et al. 2023 PMC10409822; Silverberg et al. 2002 J Neurosurg 97(6):1271 \u2014 web-search-verified snippets recorded in QMIN_FLOOR_FLOW_CALCULATION.json)",
+   "rule": "PASS requires residual floor-lumen flow (PRIMARY_ONLY arm) >= 0.4 mL/min (12 mL/hr) at >= 2 of the 3 pressure heads",
+   "threshold_class": "PHYSIOLOGICAL",
+   "uncertainty": "literature range carried from external precedent; full-text verification open",
+   "unit": "mL/min",
+   "value": 0.4
+  },
+  "common_cause_kill_threshold": {
+   "justification": "a safety floor that is occluded in the common-cause mode nearly always is not a safety floor; 90% leaves explicit room for borderline behavior to route to INDETERMINATE rather than KILL",
+   "provenance": "the R405-recorded proposal (external-audit quantification of the package's own recorded critical kill condition), now REGISTERED under the R406 directive",
+   "rule": "KILL (channel a) if the simulant occludes the floor lumen in >= 90% of the tested pressure/flow cases in the COMMON_CAUSE arm",
+   "threshold_class": "ENGINEERING",
+   "uncertainty": "engineering bound, not a clinical-epidemiology derivation; the common-cause mechanism itself is qualitatively recorded in the frozen dossier",
+   "unit": "percent of tested cases",
+   "value": 90
+  },
+  "false_pass_rule": {
+   "leak_threshold_derivation": "10% of the Q_min lower bound (0.2 mL/min) \u2014 derived arithmetically from the registered physiological bound, not invented",
+   "leak_threshold_value": 0.02,
+   "rule": "a trial counts as a PASS only if ALL hold: (1) primary-lumen obstruction verified post-test (endoscopic/visual) in obstruction arms; (2) floor flow measured through the isolated floor port with the primary fixture independently blanked (no parallel leak path); (3) fixture leak test at 1.5x max head passes with leak <= 0.02 mL/min; (4) the single-lumen control arm, fully obstructed, reads < 0.02 mL/min (the zero-leak anchor); (5) steady state confirmed (flow drift < 10% of mean over the final 5 minutes). Any trial failing (1)-(5) is VOID and cannot count toward a pass.",
+   "threshold_class": "ENGINEERING (derived from PHYSIOLOGICAL bound)"
+  },
+  "modelled_expectations_preregistered": {
+   "G_ratio_modelled": "G_floor/G_primary = (0.6/1.1)^4 = 0.0885 (viscosity-invariant; Poiseuille validity endpoint)",
+   "floor_segment_conductance": "0.368 mL/(min*mmHg) at the measured NIST viscosity (QMIN record, canonical geometry) \u2014 the bench value is compared against THIS prediction (Step 11 model-vs-measurement update)"
+  },
+  "repeatability": {
+   "rule": "3 repetitions per condition per sample; a condition-level criterion is met only if it holds in >= 2 of 3 repetitions; ALL raw traces are reported (no selection)",
+   "threshold_class": "PROTOCOL (recorded R403/R339 sibling-protocol class)"
+  },
+  "sample_size": {
+   "rule": "3 samples per arm x 2 simulant classes x 3 pressure heads x 3 repetitions (minimum credible matrix, per the R403 contract's sample_size_basis)",
+   "sizing_target": "detects qualitative mechanism failure (residual flow vs none; common-cause vs not); NOT powered for a clinical effect size \u2014 recorded limitation",
+   "threshold_class": "ENGINEERING (protocol)"
+  }
+ },
+ "registration_event": {
+  "frozen_before_any_run": true,
+  "no_post_hoc_rule": "if any threshold below is changed after data collection begins, the run is void and the change is recorded as a constitutional event (Art. XXVII forbids silent drift)",
+  "registered_by": "R406 round under the CEO directive (the operator instruction to pre-register is the authorizing provenance for the single-value rules the R405 records left owner-gated)"
+ },
+ "safety": "in-vitro bench only; no human/animal subjects; no implantation",
+ "technology_name": "Passive Drainage Priority Safety Floor"
+}
