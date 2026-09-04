@@ -264,6 +264,48 @@ def test_decisive_experiment_contracts_complete():
         assert "PHYSICAL_OBSERVATION" in de["decision_rule"]
 
 
+def test_p08_d2_owner_decision_gate_complete_and_open():
+    """R408 audit instruction 4: P08 D2 is an explicit owner-decision
+    gate — arithmetic-complete, canonical-preserving, status OPEN (the
+    machine prepares the contract, never picks the option)."""
+    gate = load(LP4 / "P08" / "D2_OWNER_DECISION_GATE.json")
+    assert gate["decision_id"] == "P08-D2"
+    assert gate["status"].startswith("OPEN")
+    assert gate["decision_owner"].startswith("OWNER")
+    # canonical vs historical fluence discipline (Art. XXVIII)
+    cb = gate["canonical_basis"]
+    assert cb["fluence_mW_per_cm2"]["value"] == 0.7050488365664916
+    assert cb["historical_fluence_mW_per_cm2"]["value"] == \
+        1.049054387745623
+    assert "HISTORICAL ONLY" in cb["historical_fluence_mW_per_cm2"]["class"]
+    # all four options present, each with requires/consequences
+    ids = [o["id"] for o in gate["options"]]
+    assert ids == ["A", "B", "C", "D"]
+    for opt in gate["options"]:
+        assert opt["requires"], f"option {opt['id']} lacks requirements"
+        assert opt["consequences"], f"option {opt['id']} lacks consequences"
+        if opt["id"] in ("A", "B", "C"):
+            # the three concrete options carry their own cost class; the
+            # hybrid's costs are component-inherited by construction
+            assert opt["cost_class"]
+    # the thermal ceiling is UNKNOWN, owner-extracted (Art. XXVII)
+    opt_c = gate["options"][2]
+    assert opt_c["name"].startswith("Increase the source power")
+    joined = json.dumps(opt_c)
+    assert "UNKNOWN" in joined and "MPE" in joined
+    # eta alone can never close the gap — the decisive arithmetic
+    eta_fact = gate["gap_arithmetic"]["eta_alone_can_never_close_it"]
+    assert "271.35" in eta_fact["fact"]
+    # the gap arithmetic from the canonical basis
+    assert gate["gap_arithmetic"]["deficit_factor_best_case"] > 6
+    assert gate["gap_arithmetic"]["deficit_factor_conservative"] > 9
+    # the gate is wired into the energy budget's open actions + chain
+    eb = load(LP4 / "P08" / "ENERGY_BUDGET.json")
+    assert "D2_OWNER_DECISION_GATE.json" in eb["open_owner_actions"][0]
+    chain = load(LP4 / "P08" / "DECISION_CHAIN.json")["chain"]
+    assert "D2_OWNER_DECISION_GATE.json" in chain["next_experiment"]
+
+
 # --------------------------------------------------------------------------
 # 5. Transfer states, buyer sequence, manifest
 # --------------------------------------------------------------------------

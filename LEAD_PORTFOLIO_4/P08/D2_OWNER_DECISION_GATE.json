@@ -1,0 +1,145 @@
+{
+ "artifact_type": "OWNER_DECISION_GATE",
+ "artifact_version": "1.0.0",
+ "portfolio_number": "P08",
+ "company_designation": "P-16",
+ "historical_package_id": "P-16 (NIR Photovoltaic Power Delivery for Implantable Devices)",
+ "decision_id": "P08-D2",
+ "created_round": "R408 (external-audit instruction 4: 'Put P08 D2 through an explicit owner-decision gate')",
+ "constitutional_basis": [
+  "Art. XIII (research proposes, the owner decides engineering-tradeoff questions with BUYER_DEFINED inputs)",
+  "Art. XXVII (every threshold carries provenance and class; the thermal ceiling is UNKNOWN, never invented)",
+  "Art. XXVIII (the 1.049 mW/cm2 fluence is HISTORICAL ONLY — never used to shrink this gap)",
+  "Art. LIV (the kill condition interacts with this gate: thermal infeasibility kills, in-band measurement relocates the gap here)",
+  "Art. LVI (the decision contract states what each option costs, requires, and risks)"
+ ],
+ "decision_question": "How does the package close the gap between the BUYER_DEFINED >= 500 uW device target and the conditional modelled band 50.5-81.4 uW on the shipped receiver at the canonical fluence?",
+ "decision_owner": "OWNER (CEO) — the machine prepares this contract and refuses to pick; picking would be an engineering decision on BUYER_DEFINED inputs the machine does not own",
+ "status": "OPEN — awaiting the owner decision; no option is pre-selected, none is excluded",
+ "canonical_basis": {
+  "fluence_mW_per_cm2": {
+   "value": 0.7050488365664916,
+   "class": "COMPUTATIONAL_RESULT_CANONICAL (R407 adjudication; committed seeded pipeline, clean-checkout byte-identical replay)",
+   "record": "R407/P08_ADJUDICATION/R407_P08_CANONICAL_ADJUDICATION.json"
+  },
+  "historical_fluence_mW_per_cm2": {
+   "value": 1.049054387745623,
+   "class": "HISTORICAL ONLY (R310 reference-detector conversion re-labeled at R332; superseded by the R407 canonical promotion; must never be quoted as current system truth and never used to shrink this gap — at the historical fluence the gap arithmetic looks ~1.49x smaller, which is exactly why it is not used)"
+  },
+  "receiver_area_cm2": {
+   "value": 0.384845,
+   "class": "COMPUTATIONAL_RESULT (CAD-verified 38.4845 mm2, independently re-measured at R404)"
+  },
+  "eta_cell": {
+   "value": "UNKNOWN",
+   "conditional_values": {
+    "eta_best_case": 0.3,
+    "eta_best_case_class": "ENGINEERING assumption (GaAs-class)",
+    "eta_conservative": 0.186,
+    "eta_conservative_class": "MODEL_DERIVED (Zhao conservative low-irradiance)"
+   },
+   "note": "the targeted cell's low-irradiance in-vivo-temperature efficiency is UNMEASURED — every number below is conditional on these two bounds"
+  },
+  "device_target_uW": {
+   "value": ">= 500",
+   "class": "BUYER_DEFINED (pre-correction '>= 500 mW' was a confirmed unit error, corrected to uW; the specific buyer derivation of the 500 figure is recorded as unknown in CLAIM_EVIDENCE_MATRIX)"
+  }
+ },
+ "gap_arithmetic": {
+  "conditional_band_uW": [50.468220628568254, 81.40035585252944],
+  "deficit_factor_best_case": 6.142,
+  "deficit_factor_conservative": 9.907,
+  "calculation": "500 / (705.0488 uW/cm2 x 0.384845 cm2 x eta) — MODEL_DERIVED from the canonical basis",
+  "eta_alone_can_never_close_it": {
+   "fact": "even eta = 1.0 (a physically impossible 100% cell) delivers 705.0488 x 0.384845 = 271.35 uW < 500 uW on the shipped receiver at the canonical fluence",
+   "consequence": "the efficiency axis is a MULTIPLIER on other options, never a standalone resolution — any decision that closes D2 must move target, area, or fluence (or a combination); this is arithmetic, not judgment"
+  }
+ },
+ "options": [
+  {
+   "id": "A",
+   "name": "Revise the device target",
+   "action": "move the BUYER_DEFINED target from >= 500 uW to the conditional modelled band (50.5-81.4 uW under stated assumptions) or to a re-derived load requirement",
+   "arithmetic": "none required at the current receiver/fluence — the band IS the honest modelled deliverable",
+   "requires": [
+    "owner acceptance that the application value case survives at ~50-80 uW (or a recorded re-derived load requirement for the actual target device class — the specific device load is NOT currently recorded anywhere in the package)"
+   ],
+   "consequences": [
+    "the D2 discrepancy closes by decision record, no engineering change order",
+    "the buyer-facing claim shrinks ~6.1-9.9x versus the current target language",
+    "the package classification can proceed from GATED toward the frozen experiment without an engineering change"
+   ],
+   "cost_class": "documentation-level (no fabrication, no CAD, no re-simulation)",
+   "risk": "if the real device class genuinely needs >= 500 uW, this option is an honest downgrade that may reduce commercial viability to zero — an owner judgment the machine cannot make"
+  },
+  {
+   "id": "B",
+   "name": "Enlarge the receiver",
+   "action": "grow the receiver area from 0.384845 cm2 toward the required area",
+   "arithmetic": {
+    "required_area_cm2_at_eta_030": 2.3638,
+    "required_area_cm2_at_eta_0186": 3.8126,
+    "area_growth_factor_best_case": 6.142,
+    "area_growth_factor_conservative": 9.907,
+    "calculation": "500 uW / (705.0488 uW/cm2 x eta)",
+    "caveat": "LINEAR EXTRAPOLATION — the canonical fluence was computed at the CURRENT detector-plane geometry; an enlarged receiver changes the sampled field and requires a NEW pre-registered simulation run at the new geometry (never a silent linear re-use of 0.705)"
+   },
+   "requires": [
+    "owner engineering judgment on anatomical fit at the implant site for a 2.4-3.8 cm2 subcutaneous receiver (no anatomical constraint is recorded in the package — this is an owner input, not a machine fact)",
+    "CAD revision + geometry re-verification",
+    "a new pre-registered MC run at the new receiver geometry",
+    "updated encapsulation/optics chain (currently UNKNOWN at any area)"
+   ],
+   "consequences": [
+    "surgical footprint and cosmetic/anatomical acceptability change materially",
+    "fluency assumptions must be re-measured, not extrapolated"
+   ],
+   "cost_class": "CAD + simulation revision, then the same bench protocol on the new receiver",
+   "risk": "anatomical infeasibility at the target site (owner judgment); the re-run fluence may differ from the linear estimate"
+  },
+  {
+   "id": "C",
+   "name": "Increase the source power (thermal constraints binding)",
+   "action": "raise the external 940 nm source power above the canonical 1.0 mW input until the detector-plane fluence closes the gap",
+   "arithmetic": {
+    "required_fluence_mW_per_cm2_at_eta_030": 4.3307,
+    "required_fluence_mW_per_cm2_at_eta_0186": 6.9852,
+    "required_source_power_mW_at_eta_030": 6.142,
+    "required_source_power_mW_at_eta_0186": 9.906,
+    "calculation": "source scales linearly from the canonical 1.0 mW -> 0.7050488 mW/cm2 mapping (MODEL_DERIVED)",
+    "caveat": "linear source-to-fluence scaling holds in the recorded homogeneous-phantom model; the real tissue path (skull, layered scalp — currently unquantified) may not scale linearly"
+   },
+   "requires": [
+    "THE THERMAL CEILING — the thermally-permissible source power at the skin is UNKNOWN in this package: the ANSI/IEC MPE skin-exposure numbers are owner-extracted inputs (KILLABILITY_ASSESSMENT names the thermal boundary as the second kill channel with 'owner-extracted numbers required'); Art. XXVII forbids the machine inventing this threshold",
+    "the DECISIVE_EXPERIMENT's pre-registered conservative thermal limits must be re-run at the chosen source power",
+    "tissue-heating estimate: the model's absorbed fraction (~12.93% of source power in the 5 mm slab) implies ~0.79-1.28 mW absorbed at the required source powers — the temperature-rise model is NOT part of the recorded chain and needs either measurement or an owner-approved thermal model"
+   ],
+   "consequences": [
+    "if the required source power exceeds the thermal/MPE ceiling, the DECISIVE_EXPERIMENT falsifier (c) fires: 'the thermal envelope is violated at source powers needed for useful power (thermally infeasible)' — a KILL of the mechanism at this receiver area, not a tradeoff",
+    "source hardware class (laser/LED, driver electronics, battery life of the external unit) changes with power",
+    "regulatory exposure-safety burden increases"
+   ],
+   "cost_class": "source hardware + bench protocol at elevated power + safety review",
+   "risk": "the HIGHEST-stakes option: it carries the package's recorded kill channel; deciding it without the owner-extracted MPE numbers would be an Art. XXVII violation"
+  },
+  {
+   "id": "D",
+   "name": "Hybrid (recorded because real engineering decisions usually combine levers)",
+   "action": "any combination of B + C + measured eta (option A remains the fallback for any hybrid that fails its constraints)",
+   "arithmetic": "the levers multiply: e.g. 2x area x ~3.1x source at eta = 0.30 also reaches 500 uW — every admissible combination satisfies (area growth) x (source growth) x (eta / 0.30) >= 6.142 (best case) or 9.907 (conservative)",
+   "requires": "the SAME owner inputs as B and C (anatomical judgment + the thermal ceiling) plus the measured eta",
+   "consequences": "each hybrid inherits the risks of its components; none is pre-computed here — the owner names the combination and the machine re-runs the arithmetic at the named values"
+  }
+ ],
+ "efficiency_axis_note": "the targeted-cell low-irradiance efficiency measurement is an open input for EVERY option (it selects which conditional row applies); it cannot be the standalone resolution (see gap_arithmetic.eta_alone_can_never_close_it)",
+ "interplay_with_kill_condition": "the DECISIVE_EXPERIMENT falsifier routing rule: (i) an in-band measured power (inside the pre-registered band) CONFIRMS the chain and RELOCATES the open question to exactly this gate — an engineering-tradeoff outcome, not a falsification; (ii) thermal-envelope violation at required source powers KILLS the mechanism — option C is the only option that can trigger a kill, which is why its threshold inputs are owner-extracted, never machine-invented",
+ "what_decides_this_gate": [
+  "the owner's chosen option (this record exists so the choice is explicit, arithmetic-complete, and auditable)",
+  "the phantom-path bench experiment (DECISIVE_EXPERIMENT.json) — converts fluence/efficiency/thermal from modelled to measured and may shrink or grow every number in this record",
+  "the owner-extracted ANSI/IEC MPE numbers (the thermal ceiling)",
+  "the targeted-cell efficiency measurement (selects the conditional row)"
+ ],
+ "presentation_rule": "0.705 mW/cm2 is the canonical fluence for every number in this gate; 1.049 mW/cm2 is historical only and appears in this record solely to be named as such; the conditional band 50.5-81.4 uW is stated with its eta assumptions everywhere it is quoted",
+ "superseded_arithmetic_disclosed": "the R404-era D2 note quoted a ~4.3x area shortfall at the then-recorded fluence — that figure is historical (computed at a superseded fluence basis and a superseded band); the current arithmetic at the canonical basis is 6.1-9.9x",
+ "update_rule": "when the owner decides: append the decision (chosen option, date, named values, rationale) to this record as decision_record[0]; never edit the options above — the record is append-only (Art. XI)"
+}
