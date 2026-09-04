@@ -69,12 +69,31 @@ DEFAULT_OUT_DIR = ENGINE_ROOT / "R407" / "DRIVERS"
 
 sys.path.insert(0, str(ENGINE_ROOT))
 
-RUBRIC_VERSION = "1.1.0"
+# The rubric FILE is the single authority for its version (Art. X — a
+# parallel hardcoded constant drifts, exactly as it did between the
+# 1.2.0 rubric bump and this driver's stale "1.1.0" constant: the
+# regenerated score artifact would have carried a wrong version while
+# claiming to measure at 1.2.0 semantics). Read at call time, never
+# cached, so a version bump cannot desynchronize from the file.
+def _rubric_version():
+    try:
+        return json.loads(RUBRIC_PATH.read_text(
+            encoding="utf-8"))["rubric_version"]
+    except Exception as exc:  # pragma: no cover — rubric always shipped
+        raise SystemExit(
+            f"BENCHMARK_RUBRIC.json unreadable at {RUBRIC_PATH}: {exc} "
+            f"(the rubric file is the version authority; the driver "
+            f"refuses to emit a score with an unverifiable rubric "
+            f"version — Art. IV fail-closed)")
+
+
+RUBRIC_VERSION = _rubric_version()
 
 # ---------------------------------------------------------------------------
-# Frozen deduction tables (rubric 1.0.0; UNCHANGED through 1.1.0 — the
-# R408 driver changes moved check SEMANTICS to registry-named resolution,
-# they did not move any threshold. Rule 7: no tuning against output.)
+# Frozen deduction tables (rubric 1.0.0; UNCHANGED through 1.2.0 — the
+# R408 driver changes moved check SEMANTICS (registry-named resolution,
+# release-matched reproduction, zip-key manifest rows), never a
+# threshold. Rule 7: no tuning against output.)
 # ---------------------------------------------------------------------------
 
 DELIVERY_DEDUCTIONS = {
@@ -420,16 +439,36 @@ def check_manifest_pins_agree(portfolio_root):
             if sha256_file(fp) != expected:
                 mismatches.append(f"{rel}:HASH_DRIFT")
     for pz in (m.get("package_zips") or []):
-        if isinstance(pz, dict) and pz.get("path") and pz.get("sha256"):
-            fp = portfolio_root / pz["path"]
-            if not fp.exists():
-                mismatches.append(f"{pz['path']}:MISSING")
-                continue
-            checked += 1
-            if sha256_file(fp) != pz["sha256"]:
-                mismatches.append(f"{pz['path']}:HASH_DRIFT")
+        if not isinstance(pz, dict):
+            continue
+        # D-F fix (the 3f269c23 driver-bug class, sibling instance):
+        # the manifest's package-zip rows carry the pin under the 'zip'
+        # key (both the R407-P0 and the R408 V3.1 manifests use this
+        # form); the R374-era 'path' form is accepted too. A row with
+        # neither key is a DISCLOSED problem — never a silent skip (a
+        # skipped row would let a tampered package ZIP pass green).
+        rel = pz.get("zip") or pz.get("path")
+        if not rel:
+            mismatches.append(
+                f"package_zips[{m.get('package_zips').index(pz)}]:"
+                f"NO_PATH_KEY")
+            continue
+        if not pz.get("sha256"):
+            mismatches.append(f"{rel}:NO_SHA256_PIN")
+            continue
+        fp = portfolio_root / rel
+        if not fp.exists():
+            mismatches.append(f"{rel}:MISSING")
+            continue
+        checked += 1
+        if sha256_file(fp) != pz["sha256"]:
+            mismatches.append(f"{rel}:HASH_DRIFT")
+    # master_zip: a manifest without a master-ZIP pin is a BROKEN
+    # manifest — RED, never a silent skip (same D-F discipline)
     mz = m.get("master_zip") or {}
-    if mz.get("path") and mz.get("sha256"):
+    if not (mz.get("path") and mz.get("sha256")):
+        mismatches.append("master_zip:PIN_ABSENT")
+    else:
         fp = portfolio_root / mz["path"]
         if not fp.exists():
             mismatches.append(f"{mz['path']}:MISSING")
@@ -439,7 +478,9 @@ def check_manifest_pins_agree(portfolio_root):
                 mismatches.append(f"{mz['path']}:HASH_DRIFT")
     return _check("manifest_pins_agree", not mismatches,
                   f"{checked} pinned buyer-surface files hash-verified "
-                  f"against the current tree", mismatches[:40])
+                  f"against the current tree "
+                  f"(buyer_surface + package_zips + master_zip)",
+                  mismatches[:40])
 
 
 def check_chain_certificate(engine_root):

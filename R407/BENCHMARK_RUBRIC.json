@@ -1,6 +1,6 @@
 {
  "artifact_type": "BENCHMARK_RUBRIC",
- "rubric_version": "1.1.0",
+ "rubric_version": "1.2.0",
  "defined": "2026-09-04",
  "authority": "R407/ROADMAP_9_10_BENCHMARKS.md Part A — the CEO roadmap's rubric implemented as ONE machine contract so that \"9/10 in every benchmark\" means the same thing to every future session, every gate, and the next external auditor",
  "constitution_anchors": [
@@ -283,6 +283,20 @@
    ],
    "adversarial_retest": "tests/test_r407_benchmark_drivers.py extended with the two mandated negative cases (wrong-cert-stale, wrong-repro-stale must score RED) plus registry-named-certificate resolution, honest-N/A, full-40 record-commit and stale-tag tests; the full hermetic suite re-run.",
    "authority": "R408 directive 'NEXT MOVE FOR THE CODER' (2026-09-04); rubric rule_7 discipline (driver change requires a new rubric version + adversarial re-test)"
+  },
+  {
+   "version": "1.2.0",
+   "date": "2026-09-04",
+   "round": "R408 (P0-closing directive: finding D-F — the 3f269c23 driver-bug class, sibling instance)",
+   "driver_changed": "scripts/r407_benchmark_drivers.py",
+   "deduction_tables_changed": false,
+   "no_threshold_moved": true,
+   "changes": [
+    "D-F: check_manifest_pins_agree reads the manifest's package-zip rows via their ACTUAL 'zip' key (the form both the R407-P0 and the R408 V3.1 manifests use; the R374-era 'path' form accepted too). The 1.1.0 behavior read only the 'path' form and silently skipped ALL 15 package-ZIP pins — the evidence string said '931 pinned files' while the manifest carries 946. The pre-fix driver would have scored DELIVERY green with a tampered package ZIP on disk (the exact defect class the 3f269c23 commit found and fixed in the sibling fresh-clone-reproduction script).",
+    "Fail-closed discipline extended: a package-zip row with neither key, and a manifest with no master-ZIP pin, are DISCLOSED problems (RED), never silent skips."
+   ],
+   "adversarial_retest": "tests/test_r407_benchmark_drivers.py 35 -> 39: zip-key rows counted (946-form), the D-F falsifier (tampered package ZIP pinned under the 'zip' key must score RED — pre-fix it passed green), unkeyed-row RED, master-pin-absent RED; full hermetic suite re-run.",
+   "authority": "R408 directive 'NEXT MOVE FOR THE CODER' (2026-09-04); rubric rule_7 discipline; Art. IV (no silent skip), Art. VII (the fix strengthens the check — no threshold moved, deduction tables unchanged)"
   }
  ]
 }

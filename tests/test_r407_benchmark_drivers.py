@@ -296,6 +296,15 @@ class TestRubricContract:
         for i in range(1, 9):
             assert any(k.startswith(f"rule_{i}_") for k in rules), i
 
+    def test_driver_rubric_version_equals_file_authority(self):
+        """The driver's rubric version is READ FROM the rubric file
+        (Art. X: one authority). A parallel hardcoded constant drifted
+        once — the 1.2.0 bump left the driver emitting '1.1.0' scores
+        — and this test makes that divergence structurally impossible:
+        whatever the file says, the driver must report exactly that."""
+        rubric = self.load()
+        assert drv.RUBRIC_VERSION == rubric["rubric_version"]
+
 
 # ---------------------------------------------------------------------------
 # driver check functions: positive + tampered negative cases
@@ -324,6 +333,75 @@ class TestDeliveryChecks:
         root = build_mini_portfolio(tmp_path)
         r = drv.check_manifest_pins_agree(root)
         assert r["pass"], r["failures"]
+
+    # -- D-F regression tests (the 3f269c23 driver-bug class, sibling
+    #    instance in check_manifest_pins_agree): the real manifest's
+    #    package-zip rows carry the pin under the 'zip' key — a driver
+    #    reading only the R374-era 'path' form silently skips ALL
+    #    package ZIPs (the 931-vs-946 finding) --
+
+    def test_manifest_pins_zip_key_rows_counted(self, tmp_path):
+        """The manifest's ACTUAL key form ('zip') must be verified —
+        the count must include the package ZIPs, not silently skip
+        them (pre-fix: 930+1=931 checked while the manifest carries
+        946 pins)."""
+        root = build_mini_portfolio(tmp_path)
+        mpath = root / "CANONICAL_RELEASE_MANIFEST.json"
+        m = json.loads(mpath.read_text())
+        # rewrite the package_zips rows in the current (R407-P0 and
+        # R408 V3.1) 'zip'-key form — byte-identical semantics
+        m["package_zips"] = [
+            {"folder": "01_test_pkg", "package_id": "P-01",
+             "sha256": row["sha256"], "zip": row["path"]}
+            for row in m["package_zips"]]
+        mpath.write_text(json.dumps(m, indent=1) + "\n")
+        r = drv.check_manifest_pins_agree(root)
+        assert r["pass"], r["failures"]
+        # 1 buyer-surface file + 1 package zip + 1 master zip = 3
+        assert "3 pinned" in r["evidence"], r["evidence"]
+
+    def test_manifest_pins_zip_key_tamper_detected(self, tmp_path):
+        """THE FALSIFIER for D-F: a tampered package ZIP pinned under
+        the 'zip' key must score RED. The pre-fix driver silently
+        skipped the row and scored green with a tampered ZIP on disk
+        — the exact defect the 3f269c23 commit found in the sibling
+        script."""
+        root = build_mini_portfolio(tmp_path)
+        mpath = root / "CANONICAL_RELEASE_MANIFEST.json"
+        m = json.loads(mpath.read_text())
+        m["package_zips"] = [
+            {"sha256": "0" * 64, "zip": row["path"]}
+            for row in m["package_zips"]]
+        mpath.write_text(json.dumps(m, indent=1) + "\n")
+        r = drv.check_manifest_pins_agree(root)
+        assert not r["pass"]
+        assert any("HASH_DRIFT" in f for f in r["failures"])
+
+    def test_manifest_pins_unkeyed_package_row_is_red(self, tmp_path):
+        """A package-zip row with neither 'zip' nor 'path' is a
+        DISCLOSED problem, never a silent skip (Art. IV: failure of
+        the verification mechanism is never evidence for the claim)."""
+        root = build_mini_portfolio(tmp_path)
+        mpath = root / "CANONICAL_RELEASE_MANIFEST.json"
+        m = json.loads(mpath.read_text())
+        m["package_zips"] = [{"folder": "01_test_pkg",
+                              "sha256": "0" * 64}]
+        mpath.write_text(json.dumps(m, indent=1) + "\n")
+        r = drv.check_manifest_pins_agree(root)
+        assert not r["pass"]
+        assert any("NO_PATH_KEY" in f for f in r["failures"])
+
+    def test_manifest_pins_missing_master_pin_is_red(self, tmp_path):
+        """A manifest without a master-ZIP pin is broken — RED, not a
+        silent skip."""
+        root = build_mini_portfolio(tmp_path)
+        mpath = root / "CANONICAL_RELEASE_MANIFEST.json"
+        m = json.loads(mpath.read_text())
+        del m["master_zip"]
+        mpath.write_text(json.dumps(m, indent=1) + "\n")
+        r = drv.check_manifest_pins_agree(root)
+        assert not r["pass"]
+        assert any("PIN_ABSENT" in f for f in r["failures"])
 
     def test_latest_release_consistent_on_matching_fixture(self, tmp_path):
         engine, record_commit = build_mini_engine(tmp_path)
