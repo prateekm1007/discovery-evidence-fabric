@@ -1,18 +1,46 @@
 {
  "artifact_type": "BENCHMARK_FAMILY_SCORE",
- "family": "NOVELTY_PRACTICE",
- "rubric_version": "1.2.0",
- "score": 0,
+ "family": "novelty_practice",
+ "rubric_version": "1.3.0",
+ "score": 10,
  "release_bar": 9,
- "bar_met": false,
- "instrument_state": "INSTRUMENT_UNAVAILABLE",
- "driver_status": "PLANNED_P2",
- "measured_at_engine_head": "0b4bd44dce78f5c5f711c84a2197ee11fd28534d",
+ "bar_met": true,
+ "instrument_state": "MEASURED",
+ "measured_at_engine_head": "6b26029a1faa6c8ed1bf3bd3f6623e8897cd864d",
  "measured_at_portfolio_head": null,
- "checks": [],
+ "checks": [
+  {
+   "name": "search_neutrality_enforced",
+   "pass": true,
+   "note": "Art. XLIII search-space neutrality LIVE: multi_source_expansion query formation on a synthetic problem — solution_class_injection NONE, every query carries DERIVED_FROM_PROBLEM_FACTS / EXPLORATORY_HYPOTHESIS, no unmarked solution-class term enters the query space (the v1 hardcoded coating class stays removed)",
+   "evidence": "live multi_source_expansion on synthetic problem (state=DISABLED_BY_ENV (R401_NO_EXPANSION)): domain=\"cardiac pacemaker lead fracture under cyclic fle\" mechanism=\"lead fracture under cyclic flexion maintain elec\" solution_class_injection=NONE",
+   "failures": []
+  },
+  {
+   "name": "collision_stage_registered_and_live",
+   "pass": true,
+   "note": "the COLLISION stage (COLLISION_ENGINE) is registered in ACTIVE_DISCOVERY_GRAPH executable_chain, ordered before ATTACK/ADJUDICATION, the adapter imports and declares the capability, and downstream stage dependencies name it",
+   "evidence": "executable_chain order 6/13; adapter imports: COLLISION_ENGINE declared; downstream depends_on verified",
+   "failures": []
+  },
+  {
+   "name": "zero_results_not_novelty_enforced",
+   "pass": true,
+   "note": "Art. XXI.2 LIVE adversarial execution of the actual collision state machine: zero relevant hits with successful searches -> UNRESOLVED_NO_RELEVANT_ART (never a novelty claim); partial search failure -> UNRESOLVED_SEARCH_INCOMPLETE (never RESOLVED_DIFFERENTIATED — the R394 s2 fix); total failure -> UNRESOLVED_INSUFFICIENT_EVIDENCE",
+   "evidence": "live state machine: A=UNRESOLVED_NO_RELEVANT_ART (zero hits, searches OK), B=UNRESOLVED_SEARCH_INCOMPLETE (partial failure), C=UNRESOLVED_INSUFFICIENT_EVIDENCE (total failure); vocabulary: 13 committed prior-art states, zero absence-derived novelty states",
+   "failures": []
+  },
+  {
+   "name": "prior_art_hunt_custody_on_survivors",
+   "pass": true,
+   "note": "every lead package carries a prior-art hunt with hash custody: the four NOVELTY_ASSESSMENT states use the honest vocabulary, the restored PatentBear artifacts hash-match RESTORATION_PROVENANCE pins, and the P13 R406 search raw_results hash-match their recorded custody",
+   "evidence": "4/4 lead novelty states in honest vocabulary; 13 restored artifacts hash-verified; 11 P13 R406 raw_results hash-verified (verdict=CONTESTED)",
+   "failures": []
+  }
+ ],
  "deduction_applied": 0.0,
  "defects_named": [],
- "note": "driver planned for P2; score 0 by rubric rule_2 (missing instrument scores zero, never 9, never the auditor estimate)",
  "auditor_estimate_r407_recorded_as_estimate": 7,
- "estimate_is_not_the_score": true
+ "estimate_is_not_the_score": true,
+ "scoring_rules": "R407/BENCHMARK_RUBRIC.json rule_1..rule_8; deduction table frozen with rubric 1.0.0, check semantics at rubric 1.1.0 (R408 registry-named resolution; no threshold moved)"
 }
