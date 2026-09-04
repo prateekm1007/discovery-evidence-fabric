@@ -142,15 +142,20 @@ def main():
                 problems.append(f"{rel}:HASH_DRIFT")
     package_zip_rows = []
     for pz in (manifest.get("package_zips") or []):
-        if isinstance(pz, dict) and pz.get("path") and pz.get("sha256"):
-            package_zip_rows.append(pz)
-            fp = clone / pz["path"]
+        # the r386 manifest rows carry "zip"; the R374-era rows used
+        # "path" — accept both, never guess (Art. II)
+        zpath = pz.get("zip") or pz.get("path")
+        if isinstance(pz, dict) and zpath and pz.get("sha256"):
+            row = dict(pz)
+            row["zip"] = zpath
+            package_zip_rows.append(row)
+            fp = clone / zpath
             if not fp.exists():
-                problems.append(f"{pz['path']}:MISSING")
+                problems.append(f"{zpath}:MISSING")
                 continue
             pinned += 1
             if sha256_file(fp) != pz["sha256"]:
-                problems.append(f"{pz['path']}:HASH_DRIFT")
+                problems.append(f"{zpath}:HASH_DRIFT")
     mz = manifest.get("master_zip") or {}
     if mz.get("path") and mz.get("sha256"):
         fp = clone / mz["path"]
@@ -168,7 +173,7 @@ def main():
     # 2. ZIP <-> folder byte-equality (package ZIPs)
     zip_members_checked = 0
     for pz in package_zip_rows:
-        zpath = clone / pz["path"]
+        zpath = clone / pz["zip"]
         if not zpath.exists():
             continue
         folder = zpath.with_suffix("")
@@ -177,12 +182,12 @@ def main():
                 member_bytes = zf.read(name)
                 tree_fp = folder / name
                 if not tree_fp.exists():
-                    problems.append(f"{pz['path']}:{name}:NOT_IN_TREE")
+                    problems.append(f"{pz['zip']}:{name}:NOT_IN_TREE")
                     continue
                 zip_members_checked += 1
                 if sha256_file(tree_fp) != hashlib.sha256(
                         member_bytes).hexdigest():
-                    problems.append(f"{pz['path']}:{name}:BYTE_DIFF")
+                    problems.append(f"{pz['zip']}:{name}:BYTE_DIFF")
     # 3. master ZIP <-> tree (the Z3 contract: root buyer files + the
     #    package ZIPs, byte-identical)
     master_members_checked = 0
@@ -195,7 +200,7 @@ def main():
                     if fn not in names:
                         problems.append(f"MASTER_ZIP_MISSING_ROOT:{fn}")
                 for pz in package_zip_rows:
-                    arc = f"DOWNLOAD/{Path(pz['path']).name}"
+                    arc = f"DOWNLOAD/{Path(pz['zip']).name}"
                     if arc not in names:
                         problems.append(f"MASTER_ZIP_MISSING_PACKAGE:"
                                         f"{arc}")
