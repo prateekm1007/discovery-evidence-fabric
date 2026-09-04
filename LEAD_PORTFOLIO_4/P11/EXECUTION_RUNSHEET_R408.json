@@ -1,0 +1,101 @@
+{
+ "artifact_type": "EXECUTION_RUNSHEET",
+ "artifact_version": "1.0.0",
+ "portfolio_number": "P11",
+ "company_designation": "P-24",
+ "historical_package_id": "P-24 (Adaptive Hydraulic Gravity-Damper Shunt)",
+ "created_round": "R408 (external-audit instruction 6: 'P04/P11 need reality, not more software; P11 is the cleanest first physical experiment — decision contract already frozen')",
+ "purpose": "THE single operator-facing document for the portfolio's FIRST physical experiment: everything a funded bench operator needs to run P11's pre-registered protocol and return data through the reality-ingestion interface, and everything the machine will do with the result. NO new machinery was built for this runsheet (Art. XXXIV: reality, not software — every machine-side capability named below already existed and is verified green at this commit).",
+ "constitutional_basis": [
+  "Art. XXXIV (stop coding when reality is the next bottleneck — this runsheet is documentation of the frozen state, not new instrumentation)",
+  "Art. XXXVIII (the reality boundary: the observation enters ONLY as a REALITY_EVENT with provenance; CONTROLLED_REHEARSAL can never promote)",
+  "Art. LII (the killer experiment is a falsification contract — the kill rules below are frozen, not negotiable at the bench)",
+  "Art. XXVII (every threshold below carries its registered provenance class; no post-hoc change is legal — any change voids the run)"
+ ],
+ "why_p11_is_first": {
+  "the_audit_basis": "the R408 external audit's verdict: P11 is the cleanest first physical experiment — its decision contract is frozen, its cost is the lowest of the four leads, its kill conditions are registered with statistical form, and its differentiators map one-to-one onto measurable bench endpoints",
+  "cost_and_time": "$15K / 8 weeks (R339-RECORDED for this exact protocol class; wider REPORTED context $15-38K)",
+  "compare": "P04's bench is comparable in class but its primary differentiator is an obstruction-survivability protocol with a 12-week SNR-bench work package; P08 requires the D2 owner decision BEFORE its bench is decisive; P13's spend is frozen permanent (learning artifact)"
+ },
+ "the_frozen_contract": {
+  "contract_of_record": "LEAD_PORTFOLIO_4/P11/EXPERIMENT_PREREGISTRATION.json (freezes the numeric rules) over LEAD_PORTFOLIO_4/P11/DECISIVE_EXPERIMENT.json (the 12-element protocol)",
+  "question": "What is the cheapest credible way to learn whether this technology deserves more money?",
+  "hypothesis": "Across the physiological postural pressure set, the hydraulic damper beats the ASD baseline on the two pre-declared unestablished differentiators — response time to a postural pressure step and proportional (continuous) flow modulation",
+  "treatment_arm": "the damper element (annular-gap architecture, shipped 0.18 mm gap class) inline in the mock CSF loop",
+  "control_arms": "TWO control arms on the identical bench loop (Art. XLVII — the baseline is MEASURED, identical instrument, unchanged across arms): (1) ASD — the incumbent real baseline; (2) per the frozen DECISIVE_EXPERIMENT.json",
+  "apparatus": "mock CSF loop (R339-recorded protocol): pressure-head reservoir programmable across 10/20/30/40 mmHg postural pressures, flow sensor, postural-step actuation (step profile representative of the 1-3 s physiological transition), continuous flow + pressure acquisition; blinded analysis by the committed script",
+  "n_per_arm": 10,
+  "pressures_mmHg": [10, 20, 30, 40],
+  "endpoint_1": {
+   "name": "response time to postural pressure step",
+   "definition": "time from postural pressure step to flow settling within 10% of steady state (per run)",
+   "claim_under_test": "damper settles 0.1 s faster than ASD (MODELLED: tau = I_h/c_h; 0.4 s vs 0.5 s class)",
+   "instrument_MDD_s": 0.0253,
+   "MDD_provenance": "LEAD_PORTFOLIO_4/P11/INSTRUMENT_MDD_CALCULATION.json (the claimed 0.1 s difference is 3.95x the MDD — DETECTABLE)",
+   "kill_condition_A": "the response-speed differentiator is NOT established — KILL unless endpoint 2 is decisively positive — if the damper's mean settling time is not >= 20% faster than the ASD arm (registered rule)"
+  },
+  "endpoint_2": {
+   "name": "proportional flow modulation error",
+   "definition": "mean absolute deviation of instantaneous flow from the linear-in-pressure target trajectory across the step (per run)",
+   "claim_under_test": "the damper modulates flow proportionally/continuously where the ASD acts stepwise",
+   "kill_condition_B": "the safety case is negative — KILL — if the damper's target-flow accuracy is statistically worse than the ASD arm at ANY tested pressure (paired one-sided, alpha 0.05, Wilcoxon signed-rank on paired per-pressure means, n=10 pairs)"
+  },
+  "statistical_analysis_plan": {
+   "primary": "per-endpoint, per-pressure paired comparisons (damper vs ASD), one-sided, alpha = 0.05, n = 10 pairs per comparison",
+   "multiplicity": "the four pressures are REPORTED per-pressure (no pooled override); a pooled verdict requires the same direction in >= 3 of 4 pressures (registered)",
+   "no_data_peeking": "all thresholds frozen; the analysis script is committed BEFORE any run (the R339 blinded-analysis harness)",
+   "post_hoc_rule": "any post-collection change to a registered threshold VOIDS the run (Art. XXVII)"
+  },
+  "honest_limits_inherited": [
+   "mock loop fluid is water/CSF-mimic (NIST 310.15 K viscosity class; CSF residual disclosed)",
+   "excludes biological fouling and in-vivo compliance",
+   "clinical materiality of the settling difference is NOT established by this bench (engineering materiality only)",
+   "commercial ASD device tolerances may differ from the modeled ASD profile (why a REAL ASD is the comparator)"
+  ]
+ },
+ "how_to_return_the_result": {
+  "interface": "REALITY_EVENT v2 (discovery_fabric/engine/reality_ingestion.py: validate_reality_event_v2 + ingest_reality_event + verify_ledger)",
+  "mandatory_fields": {
+   "experiment_id": "the frozen experiment contract id this observation answers (binds the observation to its pre-registered thresholds)",
+   "package_id": "P11",
+   "timestamp": "ISO-8601 acquisition instant",
+   "apparatus_id": "physical apparatus identity (serial/registry id; 'UNKNOWN' is legitimate, BLANK is not)",
+   "operator": "the human/instrument operator of record (identity + organization; 'UNKNOWN' is legitimate, blank is not)",
+   "source_type": "EXTERNAL_HUMAN or EXTERNAL_INSTRUMENT (NEVER 'CONTROLLED_REHEARSAL' for real data — rehearsal events are machine-rejected from promotion)",
+   "raw_data_hash": "sha256 of the RAW acquisition bytes BEFORE any processing (the attestation binds to this)",
+   "processed_data_hash": "sha256 of the processed dataset (the processing script must itself be committed — the raw->processed step is part of custody)",
+   "measurement_units": "explicit units for every measured quantity (bare numbers are REJECTED at ingestion)",
+   "uncertainty": "per-quantity stated uncertainty (resolution + repeatability class)",
+   "baseline_result": "the CONTROL-arm result (the ASD arm — measured, never assumed)",
+   "candidate_result": "the TREATMENT-arm result, structured per the frozen endpoint schema",
+   "pre_registered_threshold": "the threshold set the decision was computed against (must HASH-MATCH the frozen contract's registered values)",
+   "decision": "the machine verdict computed by the frozen contract's decision function decide_p11 — {verdict, rule_id, rule_trace}; free-text decisions are REJECTED at ingestion"
+  },
+  "attestation_and_custody": "per Art. XXXVIII: raw artifact -> sha256 -> acquisition attestation (instrument identity, serial, calibration record, operator, organization, protocol, timestamp, custody chain, signature) -> append-only ledger (LEAD_PORTFOLIO_4/P11/REALITY_LOOP/REALITY_LEDGER.json, prev_entry_sha256 chained; duplicate event_ids rejected; verify_ledger() detects any mutation of a past entry)",
+  "fabrication_guards": "the ingestion contract's anti-fabrication guards apply (no observation without provenance; AI/computation-sourced events are structurally rejected from PHYSICAL_OBSERVATION class)"
+ },
+ "what_the_machine_does_with_the_first_real_event": {
+  "step_1_validation": "validate_reality_event_v2 checks every mandatory field, the units, the threshold hash-match, and the decision structure",
+  "step_2_ingestion": "the event enters the append-only REALITY_LEDGER with full custody",
+  "step_3_loop_promotion": "discovery_fabric/engine/loop_chain.py advances P11's loop state from PREDICTION (NO_PHYSICAL_DATA) on the REALITY_EVENT alone — no narrative, no manual assignment (the R406 adversarial tests prove rehearsal/malformed events CANNOT promote)",
+  "step_4_decision": "decide_p11 applies the frozen rule set: SUPPORTED / MIXED / KILLED / EXECUTION_INVALID (an infrastructure or protocol violation is EXECUTION_INVALID, never a scientific rejection — Art. LXI)",
+  "step_5_model_update": "MODEL_UPDATE_LEDGER.json (armed, currently AWAITING_PHYSICAL_OBSERVATION): prediction_before / actual_measurement / error_before / model_update / prediction_after / error_after — MODEL_IMPROVED requires movement PLUS held-out improvement, never self-declared",
+  "step_6_next_search_changes": "the loop's discovery constraint update changes subsequent prediction/search — THIS is the milestone the R408 audit defined as the first real closed-loop traversal"
+ },
+ "machine_side_preconditions_verified_at_this_commit": {
+  "preregistration_frozen": "EXPERIMENT_PREREGISTRATION.json (frozen_before_any_run: true; no_post_hoc_rule registered)",
+  "decision_function_exists": "decide_p11 at discovery_fabric/engine/reality_ingestion.py:326",
+  "ingestion_module_exists": "validate_reality_event_v2 + ingest_reality_event + verify_ledger (same module)",
+  "model_update_ledger_armed": "LEAD_PORTFOLIO_4/P11/MODEL_UPDATE_LEDGER.json — state AWAITING_PHYSICAL_OBSERVATION, every field present, actual_measurement null until a REALITY_EVENT arrives",
+  "loop_chain_armed": "LEAD_PORTFOLIO_4/P11/LOOP_CHAIN.json — currently held at PREDICTION (NO_PHYSICAL_DATA); promotion is REALITY_EVENT-gated by machine rule",
+  "adversarial_rehearsal_protection": "tests/test_r406_real_loop.py proves CONTROLLED_REHEARSAL never promotes, malformed events are rejected, and model-update verdicts require held-out improvement",
+  "novelty_state_honest": "NOVELTY_ASSESSMENT.json SUPPORTED with committed search custody"
+ },
+ "what_is_missing_the_machine_cannot_supply": {
+  "funding": "$15K (RECORDED class for this protocol)",
+  "bench_and_operator": "a physical mock-CSF-loop bench, a real ASD comparator, and an operator of record",
+  "time": "8 weeks (RECORDED)",
+  "the_observation_itself": "the machine's honest headline unchanged: physical_observation_count = 0 until reality produces the evidence (Art. XXXVIII — AI may not claim that reality happened unless reality produced the evidence)"
+ },
+ "explicitly_not_claimed": "the portfolio does NOT claim a closed-loop discovery system. The decisive milestone remains: real experiment -> raw measurement -> provenance -> comparison with preregistered prediction -> model error -> model update -> changed subsequent prediction/search. This runsheet exists so the first traversal has zero machine-side friction when the owner funds the bench."
+}

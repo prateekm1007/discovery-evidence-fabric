@@ -348,6 +348,50 @@ def test_p13_learning_artifact_recorded():
     assert "unchanged" in ext["state"]
 
 
+def test_p11_execution_runsheet_the_first_physical_experiment():
+    """R408 audit instruction 6: P11 is the cleanest FIRST physical
+    experiment — the runsheet documents the frozen contract and the
+    return path, and every machine-side precondition it names verifies
+    LIVE (Art. XVI: code is a hypothesis; this test is evidence)."""
+    rs = load(LP4 / "P11" / "EXECUTION_RUNSHEET_R408.json")
+    assert rs["portfolio_number"] == "P11"
+    # the frozen contract is referenced, not re-stated as new authority
+    fc = rs["the_frozen_contract"]
+    assert "EXPERIMENT_PREREGISTRATION.json" in fc["contract_of_record"]
+    assert fc["n_per_arm"] == 10
+    assert fc["pressures_mmHg"] == [10, 20, 30, 40]
+    assert fc["endpoint_1"]["instrument_MDD_s"] == 0.0253
+    assert "kill_condition_A" in fc["endpoint_1"]
+    assert "kill_condition_B" in fc["endpoint_2"]
+    assert fc["statistical_analysis_plan"]["no_data_peeking"]
+    # the machine-side preconditions verify LIVE, not just on paper
+    from discovery_fabric.engine import reality_ingestion as ri
+    assert callable(ri.validate_reality_event_v2)
+    assert callable(ri.ingest_reality_event)
+    assert callable(ri.decide_p11)
+    ledger = load(LP4 / "P11" / "MODEL_UPDATE_LEDGER.json")
+    assert ledger["state"].startswith("AWAITING_PHYSICAL_OBSERVATION")
+    # the ledger is armed but empty of real observations — the honest
+    # state until reality lands
+    assert ledger.get("records") in ([], None) or all(
+        r.get("actual_measurement") is None
+        for r in ledger.get("records", []))
+    # the return path names the ingestion interface's real functions
+    ret = rs["how_to_return_the_result"]
+    assert "reality_ingestion.py" in ret["interface"]
+    assert "decide_p11" in ret["mandatory_fields"]["decision"]
+    assert "raw_data_hash" in ret["mandatory_fields"]
+    # what the machine cannot supply is named honestly
+    missing = rs["what_is_missing_the_machine_cannot_supply"]
+    assert "funding" in missing and "the_observation_itself" in missing
+    # NO closed-loop claim — the decisive milestone is stated, not
+    # asserted as reached
+    assert "does NOT claim a closed-loop discovery system" in \
+        rs["explicitly_not_claimed"]
+    assert "changed subsequent prediction/search" in \
+        rs["explicitly_not_claimed"]
+
+
 # --------------------------------------------------------------------------
 # 5. Transfer states, buyer sequence, manifest
 # --------------------------------------------------------------------------
