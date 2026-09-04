@@ -29,6 +29,15 @@ Scoring model (FROZEN with rubric 1.1.0 — see RUBRIC_CHANGE_RECORD):
   per-instance cap is explicitly declared — a hundred stale hashes is one
   defect class (D1), not a hundred deductions.
 
+R408 P2 driver wiring (rubric 1.3.0, R408 audit instruction 3): the
+  MACHINERY and NOVELTY_PRACTICE families move from PLANNED_P2 stubs to
+  BUILT_IN_P2 executable drivers. A family stays 0 until an executable
+  driver measures it (rule_2); no estimated scores (rule_5). The five
+  already-measured families' deduction tables are UNCHANGED; the two new
+  tables below are NEW instruments for families that previously scored 0
+  by the missing-instrument rule (no threshold moved on any measured
+  family — rule_7 change record in the rubric).
+
 R408 driver changes (rubric rule_7: driver change => new rubric version +
 adversarial re-test; deduction tables UNCHANGED — no threshold moved):
   D-A/D-C  check_chain_certificate + check_latest_release now resolve the
@@ -60,6 +69,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -124,6 +134,31 @@ FIDELITY_DEDUCTIONS = {
     "semantic_genericness_live": 2.0,         # C2: per-mismatch 0.5, capped
 }
 
+# MACHINERY (rubric 1.3.0 — NEW table for a previously-PLANNED family;
+# the rubric bar_9 names "E15 A-J pass; E16 blind-holdout/causal/diversity
+# pass; A2/A10/A12 pass", bar_10 adds "full E/A/F suites green on clean
+# clones" — the weights ENCODE the bar text: every bar_9 component's
+# failure drops below 9; the F-series check (bar_10 delta only) carries
+# 1.0 so its failure alone leaves the 9-bar intact)
+MACHINERY_DEDUCTIONS = {
+    "e15_series_green": 3.0,             # bar_9: E15 A-J machinery
+    "e16_series_green": 3.0,             # bar_9: E16 blind/holdout/causal/diversity
+    "a_series_green": 2.0,               # bar_9: A2/A10 (+ A1..A11 machinery)
+    "a12_capstone_record_intact": 2.0,   # bar_9: A12 (recorded-evidence basis)
+    "f_series_green": 1.0,               # bar_10: "full E/A/F" (beyond 9-bar)
+}
+
+# NOVELTY_PRACTICE (rubric 1.3.0 — NEW table; the rubric bar_9 names
+# "search neutrality, collision stage on, zero-results-are-not-novelty
+# enforced", bar_10 adds "adversarial prior-art hunt on every survivor
+# with full custody" — the custody check carries the bar_10 delta)
+NOVELTY_PRACTICE_DEDUCTIONS = {
+    "search_neutrality_enforced": 3.0,          # bar_9 item 1 (Art. XLIII)
+    "collision_stage_registered_and_live": 2.0, # bar_9 item 2
+    "zero_results_not_novelty_enforced": 3.0,   # bar_9 item 3 (Art. XXI.2)
+    "prior_art_hunt_custody_on_survivors": 1.0, # bar_10 (Art. XXI.9)
+}
+
 AUDIT_NOTES = {
     "identity_registry_freshness": "D1: PORTFOLIO_IDENTITY_REGISTRY.json "
     "dossier/manifest/zip hashes vs the shipped tree",
@@ -161,6 +196,44 @@ AUDIT_NOTES = {
     "shipped/frozen data surfaces",
     "semantic_genericness_live": "C2: the B4 semantic-genericness audit "
     "runs live on the shipped packages and passes",
+    "e15_series_green": "E15 A-J machinery suite (benchmark vectors, "
+    "dossier gates, reasoning chains, physical failure mechanisms, "
+    "two-path disagreement) executed LIVE: all tests green",
+    "e16_series_green": "E16 blind-holdout/causal/diversity machinery "
+    "(sealed split, blind protocol, causal correctness, diversity "
+    "metrics, n-ary comparison) executed LIVE: all tests green",
+    "a_series_green": "A-series machinery (A2 depth contract, A10 "
+    "benchmark floors, A1..A11 pipeline) executed LIVE: all tests green",
+    "a12_capstone_record_intact": "A12 capstone: the committed "
+    "A_SERIES_ACCEPTANCE.json record is intact (reader-readiness "
+    "contract, RELEASED status, code_commit resolves in git history); "
+    "the LIVE capstone re-run requires the LLM transport and is NOT "
+    "re-executed for this score — recorded-evidence basis, disclosed "
+    "(rule_5/rule_8; live replay remains the certification path)",
+    "f_series_green": "F-series integration machinery executed LIVE: "
+    "all tests green (the bar_10 'full E/A/F' delta)",
+    "search_neutrality_enforced": "Art. XLIII search-space neutrality "
+    "LIVE: multi_source_expansion query formation on a synthetic "
+    "problem — solution_class_injection NONE, every query carries "
+    "DERIVED_FROM_PROBLEM_FACTS / EXPLORATORY_HYPOTHESIS, no unmarked "
+    "solution-class term enters the query space (the v1 hardcoded "
+    "coating class stays removed)",
+    "collision_stage_registered_and_live": "the COLLISION stage "
+    "(COLLISION_ENGINE) is registered in ACTIVE_DISCOVERY_GRAPH "
+    "executable_chain, ordered before ATTACK/ADJUDICATION, the adapter "
+    "imports and declares the capability, and downstream stage "
+    "dependencies name it",
+    "zero_results_not_novelty_enforced": "Art. XXI.2 LIVE adversarial "
+    "execution of the actual collision state machine: zero relevant "
+    "hits with successful searches -> UNRESOLVED_NO_RELEVANT_ART (never "
+    "a novelty claim); partial search failure -> UNRESOLVED_SEARCH_"
+    "INCOMPLETE (never RESOLVED_DIFFERENTIATED — the R394 s2 fix); "
+    "total failure -> UNRESOLVED_INSUFFICIENT_EVIDENCE",
+    "prior_art_hunt_custody_on_survivors": "every lead package carries "
+    "a prior-art hunt with hash custody: the four NOVELTY_ASSESSMENT "
+    "states use the honest vocabulary, the restored PatentBear "
+    "artifacts hash-match RESTORATION_PROVENANCE pins, and the P13 "
+    "R406 search raw_results hash-match their recorded custody",
 }
 
 
@@ -922,6 +995,383 @@ def check_semantic_genericness_live(portfolio_root):
 
 
 # ---------------------------------------------------------------------------
+# MACHINERY driver (rubric 1.3.0 — R408 audit instruction 3: wire the
+# P2 families; a family stays 0 until an executable driver measures it)
+# ---------------------------------------------------------------------------
+
+def run_pytest_suite(engine_root, test_targets, name):
+    """Execute one machinery test suite LIVE (subprocess pytest, hermetic
+    repo-relative targets). The check FAILS on any test failure, any
+    collection error, or any driver-side execution error — an
+    unexecutable instrument is never a silent pass (rule_8)."""
+    targets = [str(engine_root / t) for t in test_targets]
+    missing = [t for t in targets if not Path(t).exists()]
+    if missing:
+        return _check(name, False, f"suite target(s) missing: {missing}",
+                      ["SUITE_TARGET_MISSING"])
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", "-q", "--tb=no", "-p",
+             "no:cacheprovider", *targets],
+            cwd=str(engine_root), capture_output=True, text=True,
+            timeout=900)
+    except Exception as exc:  # pragma: no cover — honest BLOCKED state
+        return _check(name, False, f"suite execution failed: {exc}",
+                      ["SUITE_EXECUTION_ERROR"])
+    tail = (proc.stdout or "").strip().splitlines()
+    summary = tail[-1] if tail else f"rc={proc.returncode}"
+    m = re.search(r"(\d+) (?:passed|failed)", summary)
+    n_ok = int(m.group(1)) if m and "passed" in summary else 0
+    failed = "failed" in summary or proc.returncode != 0
+    return _check(name, not failed,
+                  f"live run: {summary} (targets: "
+                  f"{', '.join(test_targets)})",
+                  [summary] if failed else [])
+
+
+def check_a12_capstone_record(engine_root):
+    """A12 capstone — recorded-evidence basis: the committed
+    A_SERIES_ACCEPTANCE.json must be intact (reader-readiness contract
+    with all 9 questions, RELEASED final state, code_commit that
+    resolves in git history). The LIVE capstone re-run requires the LLM
+    transport and is NOT re-executed for this score — disclosed here,
+    never silently passed off as a live replay (rule_5/rule_8)."""
+    problems = []
+    ap = engine_root / "A_SERIES_ACCEPTANCE.json"
+    if not ap.exists():
+        return _check("a12_capstone_record_intact", False,
+                      "A_SERIES_ACCEPTANCE.json missing",
+                      ["A12_RECORD_MISSING"])
+    d = json.loads(ap.read_text(encoding="utf-8"))
+    a12 = d.get("A12_reader_readiness") or {}
+    if not a12.get("contract"):
+        problems.append("A12_READER_READINESS_CONTRACT_ABSENT")
+    checks = a12.get("checks") or {}
+    if not isinstance(checks, dict) or len(checks) < 9:
+        problems.append(f"A12_QUESTIONS_INCOMPLETE: "
+                        f"{len(checks) if isinstance(checks, dict) else 0}/9")
+    if d.get("release_status") != "RELEASED":
+        problems.append(f"A12_RELEASE_STATUS_{d.get('release_status')}")
+    if not d.get("run_id"):
+        problems.append("A12_RUN_ID_ABSENT")
+    cc = d.get("code_commit")
+    provenance_state = "PROVENANCE_INCOMPLETE"
+    if not (isinstance(cc, str) and len(cc) == 40
+            and all(c in "0123456789abcdef" for c in cc.lower())):
+        problems.append(f"A12_CODE_COMMIT_NOT_FULL40: {str(cc)[:44]}")
+    else:
+        rc = subprocess.run(
+            ["git", "-C", str(engine_root), "rev-parse", "--verify",
+             f"{cc}^{{commit}}"],
+            capture_output=True, text=True, timeout=30).returncode
+        if rc == 0:
+            provenance_state = "RESOLVED"
+        else:
+            # the D-B honest-N/A precedent: the pointer is unreachable
+            # from this checkout — recorded evidence stands as committed,
+            # but byte-level replay from that commit is not possible.
+            # NEVER amend the historical record's pointer (that would
+            # manufacture provenance, Art. VI); disclose, deduct, and
+            # leave the live re-run as the certification path.
+            problems.append("A12_CODE_COMMIT_DOES_NOT_RESOLVE")
+    return _check("a12_capstone_record_intact", not problems,
+                  f"recorded evidence: run_id={d.get('run_id')}, "
+                  f"release={d.get('release_status')}, "
+                  f"{len(checks) if isinstance(checks, dict) else 0}/9 "
+                  f"reader-readiness questions, code_commit "
+                  f"{str(cc)[:12]} provenance={provenance_state}; "
+                  f"LIVE capstone re-run transport-gated, not "
+                  f"re-executed for this score"
+                  + ("; PROVENANCE_INCOMPLETE: the recorded code_commit "
+                     "is unreachable from the current object store "
+                     "(history rewritten since the run; the A12 "
+                     "machinery evidence stands as the committed record, "
+                     "byte-level replay from that commit is not "
+                     "possible; the live re-run remains the "
+                     "certification path — Art. VI/XXV, honest N/A per "
+                     "the D-B precedent)"
+                     if provenance_state != "RESOLVED" else ""),
+                  problems)
+
+
+# ---------------------------------------------------------------------------
+# NOVELTY_PRACTICE driver (rubric 1.3.0)
+# ---------------------------------------------------------------------------
+
+# The v1 hardcoded solution class (measured across 8 domains by the R402
+# audit) — the probe vocabulary for the neutrality check
+_SOLUTION_CLASS_PROBE_TERMS = ("coating", "coat", "paint", "overlay",
+                               "film", "liner", "cladding")
+
+_NEUTRALITY_SYNTHETIC_PROBLEM = {
+    "device": "cardiac pacemaker",
+    "failure_mode": "lead fracture under cyclic flexion",
+    "constraint": "maintain electrical continuity without increasing "
+                  "lead diameter",
+}
+
+
+def _neutrality_contract_violations(out):
+    """Pure verifier for the search-neutrality contract (Art. XLIII) —
+    separable so adversarial tests can feed it tampered outputs."""
+    problems = []
+    neutral = out.get("search_space_neutrality") or {}
+    if neutral.get("solution_class_injection") != "NONE":
+        problems.append(f"SOLUTION_CLASS_INJECTED: "
+                        f"{neutral.get('solution_class_injection')}")
+    queries = out.get("queries") or {}
+    if not queries:
+        problems.append("NO_QUERIES_FORMED")
+    for qname, q in queries.items():
+        derivation = str(q.get("derivation") or "")
+        if derivation not in ("DERIVED_FROM_PROBLEM_FACTS",
+                              "EXPLORATORY_HYPOTHESIS"):
+            problems.append(f"QUERY_{qname}_UNMARKED_DERIVATION: "
+                            f"{derivation or 'ABSENT'}")
+        text = str(q.get("text") or "").lower()
+        for term in _SOLUTION_CLASS_PROBE_TERMS:
+            # a probe term may appear ONLY if it is a problem fact (the
+            # synthetic problem carries none — any hit is an injection)
+            if term in text:
+                problems.append(f"QUERY_{qname}_SOLUTION_CLASS_TERM: "
+                                f"{term}")
+        sources = q.get("term_sources") or {}
+        for src_key in sources:
+            if src_key not in ("device", "failure_mode", "constraint",
+                               "mechanism", "expected_effect"):
+                problems.append(f"QUERY_{qname}_NON_FACT_SOURCE: "
+                                f"{src_key}")
+    return problems
+
+
+def check_search_neutrality_live(engine_root):
+    """Art. XLIII LIVE: execute the REAL query formation
+    (multi_source_expansion) on a synthetic problem under the recorded
+    R401_NO_EXPANSION hermetic switch (the queries and the neutrality
+    block are formed BEFORE the switch is read — measured surface is
+    the live code path, network stays off), then verify the neutrality
+    contract on the actual output."""
+    saved = os.environ.get("R401_NO_EXPANSION")
+    os.environ["R401_NO_EXPANSION"] = "1"
+    try:
+        from discovery_fabric.engine.mechanism_space import \
+            multi_source_expansion
+        out = multi_source_expansion(dict(_NEUTRALITY_SYNTHETIC_PROBLEM))
+    except Exception as exc:
+        return _check("search_neutrality_enforced", False,
+                      f"live execution failed: {exc}",
+                      ["NEUTRALITY_EXECUTION_ERROR"])
+    finally:
+        if saved is None:
+            os.environ.pop("R401_NO_EXPANSION", None)
+        else:
+            os.environ["R401_NO_EXPANSION"] = saved
+    problems = _neutrality_contract_violations(out)
+    q = out.get("queries") or {}
+    return _check("search_neutrality_enforced", not problems,
+                  f"live multi_source_expansion on synthetic problem "
+                  f"(state={out.get('state')}): domain="
+                  f"\"{str(q.get('domain', {}).get('text'))[:48]}\" "
+                  f"mechanism=\"{str(q.get('mechanism', {}).get('text'))[:48]}\" "
+                  f"solution_class_injection="
+                  f"{(out.get('search_space_neutrality') or {}).get('solution_class_injection')}",
+                  problems)
+
+
+def check_collision_stage_live(engine_root):
+    """The COLLISION stage is ON in the live discovery graph: registered
+    in ACTIVE_DISCOVERY_GRAPH's executable_chain, ordered before ATTACK
+    and ADJUDICATION (a collision that runs after adjudication would be
+    decorative), the adapter class imports and declares the capability,
+    and a downstream stage's depends_on names COLLISION."""
+    problems = []
+    gp = engine_root / "ACTIVE_DISCOVERY_GRAPH.json"
+    if not gp.exists():
+        return _check("collision_stage_registered_and_live", False,
+                      "ACTIVE_DISCOVERY_GRAPH.json missing",
+                      ["GRAPH_MISSING"])
+    g = json.loads(gp.read_text(encoding="utf-8"))
+    chain = g.get("executable_chain") or []
+    stages = {s.get("stage"): s for s in chain}
+    if "COLLISION" not in stages:
+        problems.append("COLLISION_STAGE_ABSENT_FROM_CHAIN")
+        col = None
+    else:
+        col = stages["COLLISION"]
+        if col.get("capability_id") != "COLLISION_ENGINE":
+            problems.append(f"COLLISION_CAPABILITY_{col.get('capability_id')}")
+        order = col.get("order")
+        for after_name in ("ATTACK", "ADJUDICATION"):
+            after = stages.get(after_name)
+            if after and order is not None and after.get("order", 0) < order:
+                problems.append(f"COLLISION_AFTER_{after_name}")
+    try:
+        from discovery_fabric.engine.adapters import CollisionEngineAdapter
+        if CollisionEngineAdapter.capability_id != "COLLISION_ENGINE":
+            problems.append("COLLISION_ADAPTER_CAPABILITY_MISMATCH")
+    except Exception as exc:
+        problems.append(f"COLLISION_ADAPTER_IMPORT_FAILED: {exc}")
+    try:
+        from discovery_fabric.engine import adapters
+        deps_ok = False
+        for attr in dir(adapters):
+            cls = getattr(adapters, attr)
+            if isinstance(cls, type) and hasattr(cls, "depends_on"):
+                if "COLLISION" in (getattr(cls, "depends_on") or []):
+                    deps_ok = True
+                    break
+        if not deps_ok:
+            problems.append("NO_DOWNSTREAM_STAGE_DEPENDS_ON_COLLISION")
+    except Exception as exc:
+        problems.append(f"ADAPTER_REGISTRY_SCAN_FAILED: {exc}")
+    evidence = (f"executable_chain order "
+                f"{col.get('order') if col else 'N/A'}/"
+                f"{len(chain)}; adapter imports: "
+                f"COLLISION_ENGINE declared; downstream depends_on "
+                f"verified")
+    return _check("collision_stage_registered_and_live", not problems,
+                  evidence, problems)
+
+
+def _run_resolve(families, search_errors, searches_succeeded,
+                 search_incomplete):
+    """Execute the REAL collision state machine on synthetic inputs
+    (pure function, hermetic — the same code path production runs)."""
+    from discovery_fabric.prior_art_v2.collision_resolution import (
+        CandidateProfile, resolve_differentiation,
+    )
+    profile = CandidateProfile(
+        intervention="differential pressure floor lumen with independent "
+                     "drainage geometry",
+        mechanism="parallel redundant outflow path",
+        expected_effect="obstruction susceptibility differs between lumens",
+        entity_terms=["cerebrospinal", "fluid", "shunt", "catheter",
+                      "obstruction"],
+        mechanism_terms=["parallel", "redundant", "outflow", "lumen"],
+        distinguishing_terms=["differential", "pressure", "floor",
+                              "drainage", "geometry"],
+        adjacent_terms=["pressure", "drainage", "flow"])
+    return resolve_differentiation(
+        families, profile, search_errors, searches_succeeded,
+        deep_fetch=False, precomputed=None,
+        search_incomplete=search_incomplete)
+
+
+def check_zero_results_not_novelty_live(engine_root):
+    """Art. XXI.2/XXV LIVE adversarial execution of the ACTUAL collision
+    state machine with synthetic search executions:
+      A. searches succeeded + zero relevant hits -> UNRESOLVED_NO_RELEVANT_ART
+         (zero results is NOT novelty — a novelty/differentiation state
+         here would be the exact constitutional violation)
+      B. partial mandatory-search failure -> UNRESOLVED_SEARCH_INCOMPLETE
+         (never RESOLVED_DIFFERENTIATED — the R394 s2 regression the
+         production audit measured on ts_d1ab9fd4d756)
+      C. total search failure -> UNRESOLVED_INSUFFICIENT_EVIDENCE
+         (provider failure is not absence — Art. XXI.3)
+    Plus the state vocabulary guard: the committed prior-art state
+    vocabulary contains no absence-derived novelty state."""
+    problems = []
+    # scenario A: zero relevant hits, all searches OK
+    res_a = _run_resolve([], [], True, False)
+    if res_a.get("state") != "UNRESOLVED_NO_RELEVANT_ART":
+        problems.append(f"ZERO_HITS_STATE_{res_a.get('state')}")
+    # scenario B: partial failure forbids differentiation
+    err = [{"query": "differential pressure floor lumen",
+            "source": "google_patents", "error": "timeout"}]
+    res_b = _run_resolve([], err, True, True)
+    if res_b.get("state") != "UNRESOLVED_SEARCH_INCOMPLETE":
+        problems.append(f"PARTIAL_FAILURE_STATE_{res_b.get('state')}")
+    # scenario C: total failure
+    res_c = _run_resolve([], err, False, True)
+    if res_c.get("state") != "UNRESOLVED_INSUFFICIENT_EVIDENCE":
+        problems.append(f"TOTAL_FAILURE_STATE_{res_c.get('state')}")
+    # vocabulary guard: the machine's prior-art state vocabulary
+    # contains NO novelty state at all — novelty determinations live
+    # only in the separately recorded three-state assessments (whose
+    # honest vocabulary is checked in the custody check). A state like
+    # NOVEL_BECAUSE_NO_RESULTS appearing in KILL/NON_KILL states would
+    # be the exact Art. XXI.2 violation, and this goes RED on it.
+    from discovery_fabric.a2 import classify as a2_classify
+    vocab = (a2_classify.KILL_STATES | a2_classify.NON_KILL_STATES)
+    for st in vocab:
+        if "NOVEL" in st.upper():
+            problems.append(f"SEARCH_STATE_ASSERTS_NOVELTY: {st}")
+    evidence = (f"live state machine: A={res_a.get('state')} "
+                f"(zero hits, searches OK), B={res_b.get('state')} "
+                f"(partial failure), C={res_c.get('state')} (total "
+                f"failure); vocabulary: {len(vocab)} committed "
+                f"prior-art states, zero absence-derived novelty states")
+    return _check("zero_results_not_novelty_enforced", not problems,
+                  evidence, problems)
+
+
+_HONEST_NOVELTY_STATES = ("SUPPORTED", "CONTESTED", "UNKNOWN",
+                          "NOVELTY_SEARCH_REPORTED")
+
+
+def check_prior_art_hunt_custody_on_survivors(engine_root):
+    """Bar_10: every lead package carries an adversarial prior-art hunt
+    with full custody — the four NOVELTY_ASSESSMENT states use the
+    honest vocabulary (never inferred novelty), the restored PatentBear
+    artifacts hash-match their RESTORATION_PROVENANCE pins, and the P13
+    R406 search raw_results hash-match the recorded custody chain."""
+    problems = []
+    n_states = 0
+    for pid in ("P04", "P08", "P11", "P13"):
+        fp = engine_root / "LEAD_PORTFOLIO_4" / pid / \
+            "NOVELTY_ASSESSMENT.json"
+        if not fp.exists():
+            problems.append(f"{pid}:NOVELTY_ASSESSMENT_MISSING")
+            continue
+        d = json.loads(fp.read_text(encoding="utf-8"))
+        status = d.get("assessment_status")
+        n_states += 1
+        if status not in _HONEST_NOVELTY_STATES:
+            problems.append(f"{pid}:DISHONEST_STATE_{status}")
+    # restored PatentBear custody (P04/P08/P11 basis)
+    rp = engine_root / "NOVELTY_EVIDENCE" / "RESTORATION_PROVENANCE.json"
+    n_restored = 0
+    if not rp.exists():
+        problems.append("RESTORATION_PROVENANCE_MISSING")
+    else:
+        prov = json.loads(rp.read_text(encoding="utf-8"))
+        for f in prov.get("files", []):
+            fp = engine_root / f.get("restored_to", " ")
+            if not fp.exists():
+                problems.append(f"{f.get('restored_to')}:MISSING")
+                continue
+            n_restored += 1
+            if sha256_file(fp) != f.get("sha256"):
+                problems.append(f"{f.get('restored_to')}:HASH_DRIFT")
+    # P13 R406 live-search custody
+    sr = engine_root / "LEAD_PORTFOLIO_4" / "P13" / \
+        "NOVELTY_SEARCH_R406" / "NOVELTY_SEARCH_RESULT.json"
+    n_p13 = 0
+    if not sr.exists():
+        problems.append("P13:NOVELTY_SEARCH_RESULT_MISSING")
+    else:
+        rec = json.loads(sr.read_text(encoding="utf-8"))
+        determination = rec.get("determination") or {}
+        verdict = determination.get("verdict")
+        if verdict not in _HONEST_NOVELTY_STATES:
+            problems.append(f"P13:SEARCH_VERDICT_{verdict}")
+        for rel, expected in (rec.get("provenance_custody") or {}).items():
+            fp = engine_root / rel
+            if not fp.exists():
+                problems.append(f"{rel}:MISSING")
+                continue
+            n_p13 += 1
+            if sha256_file(fp) != expected:
+                problems.append(f"{rel}:HASH_DRIFT")
+    evidence = (f"{n_states}/4 lead novelty states in honest "
+                f"vocabulary; {n_restored} restored artifacts "
+                f"hash-verified; {n_p13} P13 R406 raw_results "
+                f"hash-verified (verdict={verdict if sr.exists() else 'N/A'})")
+    return _check("prior_art_hunt_custody_on_survivors", not problems,
+                  evidence, problems)
+
+
+# ---------------------------------------------------------------------------
 # Scoring + output
 # ---------------------------------------------------------------------------
 
@@ -973,7 +1423,12 @@ def build_family_result(family, checks, deduction_table, rubric,
         # a family score. The checks are recorded for disclosure; the
         # score is suppressed to 0.
         score = 0
-    est = (rubric["families"].get(family, {})
+    # the rubric's family keys are UPPERCASE; measured families are
+    # passed lowercase (the CLI vocabulary) — uppercase-first lookup so
+    # the DISCLOSURE field carries the recorded estimate (a null here
+    # was the 1.2.0-era case-miss; never a score input, rule_5)
+    est = (rubric["families"].get(str(family).upper(),
+                                  rubric["families"].get(family, {}))
            .get("auditor_estimate_r407"))
     return {
         "artifact_type": "BENCHMARK_FAMILY_SCORE",
@@ -1073,6 +1528,40 @@ def measure_family(family, portfolio_root):
         ])
         return build_family_result(family, checks, FIDELITY_DEDUCTIONS,
                                     rubric, portfolio_root, "MEASURED")
+    if family == "machinery":
+        # engine-side only: the machinery suites live in the engine repo;
+        # no portfolio dependency (rule_8: portfolio unavailability can
+        # never silently suppress a MACHINERY measurement)
+        checks = [
+            run_pytest_suite(ENGINE_ROOT,
+                             ["tests/test_e15_series.py"],
+                             "e15_series_green"),
+            run_pytest_suite(ENGINE_ROOT,
+                             ["tests/test_e16_series.py"],
+                             "e16_series_green"),
+            run_pytest_suite(ENGINE_ROOT,
+                             ["tests/test_a2_migration.py",
+                              "tests/test_a_series_integration.py"],
+                             "a_series_green"),
+            check_a12_capstone_record(ENGINE_ROOT),
+            run_pytest_suite(ENGINE_ROOT,
+                             ["tests/test_f_series_integration.py"],
+                             "f_series_green"),
+        ]
+        return build_family_result(family, checks, MACHINERY_DEDUCTIONS,
+                                    rubric, None, "MEASURED")
+    if family == "novelty_practice":
+        # engine-side only: live query formation + live collision state
+        # machine + committed custody artifacts
+        checks = [
+            check_search_neutrality_live(ENGINE_ROOT),
+            check_collision_stage_live(ENGINE_ROOT),
+            check_zero_results_not_novelty_live(ENGINE_ROOT),
+            check_prior_art_hunt_custody_on_survivors(ENGINE_ROOT),
+        ]
+        return build_family_result(family, checks,
+                                   NOVELTY_PRACTICE_DEDUCTIONS, rubric,
+                                   None, "MEASURED")
     raise SystemExit(f"unknown family: {family}")
 
 
@@ -1125,7 +1614,8 @@ def write_planned_stubs(out_dir, rubric):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--family",
-                    choices=["delivery", "honesty", "fidelity", "all"],
+                    choices=["delivery", "honesty", "fidelity",
+                             "machinery", "novelty_practice", "all"],
                     default="all")
     ap.add_argument("--portfolio-root", default=None,
                     help="path to a clone of technology-transfer-"
@@ -1140,8 +1630,9 @@ def main():
                          f"{portfolio_root}")
 
     out_dir = Path(args.out_dir)
-    families = ["delivery", "honesty", "fidelity"] \
-        if args.family == "all" else [args.family]
+    families = (["delivery", "honesty", "fidelity", "machinery",
+                 "novelty_practice"]
+                if args.family == "all" else [args.family])
     rubric = json.loads(RUBRIC_PATH.read_text(encoding="utf-8"))
     # stubs FIRST: the rubric references every family's output artifact,
     # so the planned-family score-0 stubs must exist on disk before the

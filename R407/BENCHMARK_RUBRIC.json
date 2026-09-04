@@ -1,6 +1,6 @@
 {
  "artifact_type": "BENCHMARK_RUBRIC",
- "rubric_version": "1.2.0",
+ "rubric_version": "1.3.0",
  "defined": "2026-09-04",
  "authority": "R407/ROADMAP_9_10_BENCHMARKS.md Part A — the CEO roadmap's rubric implemented as ONE machine contract so that \"9/10 in every benchmark\" means the same thing to every future session, every gate, and the next external auditor",
  "constitution_anchors": [
@@ -66,9 +66,9 @@
    "bar_9": "E15 A-J pass; E16 blind-holdout/causal/diversity pass; A2/A10/A12 pass",
    "auditor_estimate_r407": 7,
    "auditor_estimate_basis": "harnesses exist; some never run",
-   "measured_by": "P2 driver (planned): machinery suites from clean clone",
+   "measured_by": "scripts/r407_benchmark_drivers.py --family machinery (live E15/E16/A-series/F-series suite execution + A12 recorded-evidence integrity; engine-side)",
    "output_artifact": "R407/DRIVERS/MACHINERY_SCORE.json",
-   "driver_status": "PLANNED_P2",
+   "driver_status": "BUILT_IN_P2",
    "reaches_9_in": "P1/P2",
    "owner": "CODER"
   },
@@ -88,9 +88,9 @@
    "bar_9": "search neutrality (no hardcoded solution class), collision stage on, zero-results-are-not-novelty enforced",
    "auditor_estimate_r407": 7,
    "auditor_estimate_basis": "R402 CB-2 done; custody gap on prior_art_v2 direct searchers",
-   "measured_by": "P2 driver (planned): novelty/retrieval custody audit",
+   "measured_by": "scripts/r407_benchmark_drivers.py --family novelty_practice (live query-formation neutrality + live collision state machine + survivor custody hash-verification; engine-side)",
    "output_artifact": "R407/DRIVERS/NOVELTY_PRACTICE_SCORE.json",
-   "driver_status": "PLANNED_P2",
+   "driver_status": "BUILT_IN_P2",
    "reaches_9_in": "P2",
    "owner": "CODER"
   },
@@ -297,6 +297,23 @@
    ],
    "adversarial_retest": "tests/test_r407_benchmark_drivers.py 35 -> 39: zip-key rows counted (946-form), the D-F falsifier (tampered package ZIP pinned under the 'zip' key must score RED — pre-fix it passed green), unkeyed-row RED, master-pin-absent RED; full hermetic suite re-run.",
    "authority": "R408 directive 'NEXT MOVE FOR THE CODER' (2026-09-04); rubric rule_7 discipline; Art. IV (no silent skip), Art. VII (the fix strengthens the check — no threshold moved, deduction tables unchanged)"
+  },
+  {
+   "version": "1.3.0",
+   "date": "2026-09-05",
+   "round": "R408 (external-audit response, instruction 3: wire the MACHINERY and NOVELTY_PRACTICE drivers)",
+   "driver_changed": "scripts/r407_benchmark_drivers.py",
+   "deduction_tables_changed": true,
+   "deduction_tables_changed_scope": "NEW tables ONLY (MACHINERY_DEDUCTIONS, NOVELTY_PRACTICE_DEDUCTIONS) for two families that previously scored 0 by rule_2 (missing instrument). The five measured families' tables (DELIVERY/HONESTY/FIDELITY) are byte-unchanged; no threshold moved on any measured family; the two new tables' weights encode the rubric's own bar text (bar_9 checks carry the weight; the bar_10 deltas carry 1.0 so their failure alone leaves the 9-bar intact).",
+   "no_threshold_moved": true,
+   "changes": [
+    "MACHINERY driver wired: E15/E16/A-series/F-series suites executed LIVE (subprocess pytest, honest fail on any test failure or execution error); A12 capstone measured on the committed-record basis (A_SERIES_ACCEPTANCE.json integrity + git-resolvable code_commit) with the live-re-run transport gate DISCLOSED in the check evidence — recorded evidence, never passed off as live replay.",
+    "NOVELTY_PRACTICE driver wired: live multi_source_expansion query formation under the recorded R401_NO_EXPANSION hermetic switch (neutrality contract: solution_class_injection NONE, derivation marked per query, no unmarked solution-class term); COLLISION stage verified ON in ACTIVE_DISCOVERY_GRAPH executable_chain with adapter + downstream depends_on; the ACTUAL collision state machine executed on synthetic zero-result / partial-failure / total-failure executions (zero hits -> UNRESOLVED_NO_RELEVANT_ART, partial failure -> UNRESOLVED_SEARCH_INCOMPLETE, total failure -> UNRESOLVED_INSUFFICIENT_EVIDENCE; the search-state vocabulary contains no novelty state); the four lead packages' prior-art hunt custody hash-verified (13 restored PatentBear artifacts + 11 P13 R406 raw_results + honest state vocabulary).",
+    "Driver disclosure-field fix: build_family_result's auditor-estimate lookup was case-sensitive and returned null for the lowercase measured-family names — the estimate now resolves (disclosure only; never a score input, rule_5).",
+    "Planned-family stubs drop from 7 to 5 (ADVERSARIAL, DOSSIER_QUALITY, INDEPENDENCE, LOOP, REALITY_FED stay 0 by rule_2 — no driver exists, no estimated scores)."
+   ],
+   "adversarial_retest": "tests/test_r407_benchmark_drivers.py: new TestMachineryChecks + TestNoveltyPracticeChecks classes — tampered A12 record (missing questions, short commit, non-RELEASED) goes RED; the pure neutrality verifier rejects injected solution-class terms, unmarked derivations, and non-fact term sources; monkeypatched R394-regression state machine (zero-hits -> RESOLVED_DIFFERENTIATED) goes RED; tampered custody hashes go RED; a failing suite target is RED, never a silent pass.",
+   "authority": "R408 external audit instruction 3 (2026-09-05): 'Wire the MACHINERY and NOVELTY_PRACTICE benchmark drivers; a family stays 0 until an executable driver measures it; no estimated scores.'; rubric rule_2/rule_5/rule_7; Art. LIX (no benchmark gaming — new instruments for previously-unmeasured families, not tuning against measured output)"
   }
  ]
 }

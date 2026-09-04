@@ -1,6 +1,8 @@
 """
-test_r407_benchmark_drivers.py — adversarial tests for the P0 benchmark
-rubric + the DELIVERY/HONESTY/FIDELITY drivers.
+test_r407_benchmark_drivers.py — adversarial tests for the benchmark
+rubric + the DELIVERY/HONESTY/FIDELITY drivers (rubric 1.0-1.2) and the
+MACHINERY/NOVELTY_PRACTICE P2 drivers (rubric 1.3.0, R408 external-audit
+instruction 3).
 
 Constitution basis:
   Art. V      — positive AND negative cases (every check must be able to
@@ -714,3 +716,333 @@ class TestScoringSemantics:
         result = drv.measure_family("fidelity", None)
         assert result["estimate_is_not_the_score"] is True
         assert result["score"] == 0  # instrument unavailable, not estimate
+
+
+# ---------------------------------------------------------------------------
+# rubric 1.3.0 — the P2 driver wiring (R408 external-audit instruction 3)
+# ---------------------------------------------------------------------------
+
+class TestP2DriverWiring:
+    def load(self):
+        return json.loads(drv.RUBRIC_PATH.read_text(encoding="utf-8"))
+
+    def test_machinery_and_novelty_drivers_wired(self):
+        """The two P2 families are BUILT_IN (executable drivers, live
+        measurement) — no family may claim a driver it does not have."""
+        rubric = self.load()
+        for fam in ("MACHINERY", "NOVELTY_PRACTICE"):
+            meta = rubric["families"][fam]
+            assert meta["driver_status"] == "BUILT_IN_P2", fam
+            assert "r407_benchmark_drivers.py" in meta["measured_by"], fam
+
+    def test_rubric_version_bumped_for_new_tables(self):
+        """Rubric rule_7: driver changes require a new rubric version;
+        the 1.3.0 entry records the NEW-table scope (no threshold moved
+        on any measured family)."""
+        rubric = self.load()
+        assert rubric["rubric_version"] == "1.3.0"
+        entry = rubric["rubric_change_record"][-1]
+        assert entry["version"] == "1.3.0"
+        assert entry["deduction_tables_changed"] is True
+        assert "NEW tables ONLY" in entry[
+            "deduction_tables_changed_scope"]
+        assert entry["no_threshold_moved"] is True
+
+    def test_planned_stub_families_drop_to_five(self):
+        """The planned-stub writer now covers exactly the five families
+        that still have no driver (rule_2: 0 until measured)."""
+        rubric = self.load()
+        planned = {fam for fam, meta in rubric["families"].items()
+                   if str(meta.get("driver_status", "")).startswith(
+                       "PLANNED")}
+        assert planned == {"ADVERSARIAL", "DOSSIER_QUALITY",
+                           "INDEPENDENCE", "LOOP", "REALITY_FED"}
+
+    def test_new_deduction_weights_follow_the_bar_text(self):
+        """The weights ENCODE the rubric's own bars, they do not invent
+        thresholds: every bar_9 component's failure drops below 9; the
+        bar_10 delta checks (F-series, custody) carry 1.0 so their
+        failure alone leaves the 9-bar intact."""
+        bar9_machinery = ("e15_series_green", "e16_series_green",
+                          "a_series_green", "a12_capstone_record_intact")
+        for name in bar9_machinery:
+            assert drv.MACHINERY_DEDUCTIONS[name] >= 2.0, name
+        assert drv.MACHINERY_DEDUCTIONS["f_series_green"] == 1.0
+        bar9_novelty = ("search_neutrality_enforced",
+                        "collision_stage_registered_and_live",
+                        "zero_results_not_novelty_enforced")
+        for name in bar9_novelty:
+            assert drv.NOVELTY_PRACTICE_DEDUCTIONS[name] >= 2.0, name
+        assert drv.NOVELTY_PRACTICE_DEDUCTIONS[
+            "prior_art_hunt_custody_on_survivors"] == 1.0
+        for name, w in drv.MACHINERY_DEDUCTIONS.items():
+            assert w > 0, name
+        for name, w in drv.NOVELTY_PRACTICE_DEDUCTIONS.items():
+            assert w > 0, name
+
+
+class TestMachineryChecks:
+    def _mini_engine_with_a12(self, tmp_path, **overrides):
+        """A git repo carrying a well-formed A_SERIES_ACCEPTANCE.json
+        whose code_commit points at a real commit in that repo (unless
+        a code_commit override is given, which must stick)."""
+        engine = tmp_path / "mach_engine"
+        engine.mkdir()
+        good = {
+            "A12_reader_readiness": {
+                "contract": "A12 READER-READINESS (the 9 questions)",
+                "checks": {f"Q{i}": "answered" for i in range(1, 10)},
+                "invention_id": "inv:test:1",
+                "passed": True},
+            "release_status": "RELEASED",
+            "run_id": "A12_CAPSTONE_test",
+            "code_commit": "0" * 40,
+            "final_status": "AUTOMATED_INVENTION_CANDIDATE",
+        }
+        good.update(overrides)
+        (engine / "A_SERIES_ACCEPTANCE.json").write_text(
+            json.dumps(good, indent=1) + "\n")
+        _git(engine, "init", "-q")
+        _git(engine, "config", "user.name", "T")
+        _git(engine, "config", "user.email", "t@t")
+        # the record's code_commit points at the FIRST commit (the
+        # check verifies the pointer RESOLVES in history — the record
+        # itself is committed afterwards with that pointer)
+        first_cc = _commit_all(engine, "a12 record fixture")
+        if "code_commit" not in overrides:
+            good["code_commit"] = first_cc
+            (engine / "A_SERIES_ACCEPTANCE.json").write_text(
+                json.dumps(good, indent=1) + "\n")
+            _commit_all(engine, "a12 record with resolvable pointer")
+        return engine
+
+    def test_a12_record_live_repo_measures_honest_na(self):
+        """The LIVE repo's A12 record carries a code_commit that is
+        unreachable from the current object store (the run pre-dates
+        the history rewrites). Per the D-B honest-N/A precedent the
+        check FAILS with the PROVENANCE_INCOMPLETE disclosure — never
+        a silent pass, never a fabricated pointer."""
+        r = drv.check_a12_capstone_record(drv.ENGINE_ROOT)
+        assert not r["pass"]
+        assert "A12_CODE_COMMIT_DOES_NOT_RESOLVE" in r["failures"]
+        assert "PROVENANCE_INCOMPLETE" in r["evidence"]
+        assert "not re-executed for this score" in r["evidence"]
+
+    def test_a12_record_passes_on_wellformed_fixture(self, tmp_path):
+        engine = self._mini_engine_with_a12(tmp_path)
+        r = drv.check_a12_capstone_record(engine)
+        assert r["pass"], r["failures"]
+
+    def test_a12_record_tamper_missing_questions(self, tmp_path):
+        engine = self._mini_engine_with_a12(
+            tmp_path, A12_reader_readiness={"contract": "x",
+                                            "checks": {"Q1": "y"}})
+        r = drv.check_a12_capstone_record(engine)
+        assert not r["pass"]
+        assert any("A12_QUESTIONS_INCOMPLETE" in f for f in r["failures"])
+
+    def test_a12_record_tamper_short_commit(self, tmp_path):
+        engine = self._mini_engine_with_a12(tmp_path, code_commit="162ca5d")
+        r = drv.check_a12_capstone_record(engine)
+        assert not r["pass"]
+        assert any("A12_CODE_COMMIT_NOT_FULL40" in f
+                   for f in r["failures"])
+
+    def test_a12_record_tamper_not_released(self, tmp_path):
+        engine = self._mini_engine_with_a12(
+            tmp_path, release_status="PENDING")
+        r = drv.check_a12_capstone_record(engine)
+        assert not r["pass"]
+        assert any("A12_RELEASE_STATUS" in f for f in r["failures"])
+
+    def test_a12_record_missing_file_is_red(self, tmp_path):
+        engine = tmp_path / "empty_engine"
+        engine.mkdir()
+        r = drv.check_a12_capstone_record(engine)
+        assert not r["pass"]
+        assert "A12_RECORD_MISSING" in r["failures"]
+
+    def test_suite_check_fails_on_missing_target(self, tmp_path):
+        r = drv.run_pytest_suite(tmp_path, ["tests/nope_missing.py"],
+                                 "e15_series_green")
+        assert not r["pass"]
+        assert "SUITE_TARGET_MISSING" in r["failures"]
+
+    def test_suite_check_fails_on_failing_suite(self, tmp_path,
+                                                monkeypatch):
+        """A red suite is RED — never a silent pass (rule_8)."""
+        class FakeProc:
+            returncode = 1
+            stdout = "FF.\n2 failed, 1 passed in 0.01s\n"
+            stderr = ""
+        monkeypatch.setattr(drv.subprocess, "run",
+                            lambda *a, **k: FakeProc())
+        (tmp_path / "tests").mkdir()
+        (tmp_path / "tests" / "fake.py").write_text("")
+        r = drv.run_pytest_suite(tmp_path, ["tests/fake.py"],
+                                 "e15_series_green")
+        assert not r["pass"]
+        assert any("failed" in f for f in r["failures"])
+
+    def test_suite_check_passes_on_green_suite(self, tmp_path,
+                                               monkeypatch):
+        class FakeProc:
+            returncode = 0
+            stdout = "...\n3 passed in 0.01s\n"
+            stderr = ""
+        monkeypatch.setattr(drv.subprocess, "run",
+                            lambda *a, **k: FakeProc())
+        (tmp_path / "tests").mkdir()
+        (tmp_path / "tests" / "fake.py").write_text("")
+        r = drv.run_pytest_suite(tmp_path, ["tests/fake.py"],
+                                 "e15_series_green")
+        assert r["pass"], r["failures"]
+
+    def test_machinery_family_measured_on_live_repo(self):
+        """The MACHINERY family measurement executes the real suites
+        (slow: ~4 min live run) and scores from checks only."""
+        result = drv.measure_family("machinery", None)
+        assert result["instrument_state"] == "MEASURED"
+        names = [c["name"] for c in result["checks"]]
+        assert names == ["e15_series_green", "e16_series_green",
+                         "a_series_green", "a12_capstone_record_intact",
+                         "f_series_green"]
+
+
+class TestNoveltyPracticeChecks:
+    def test_neutrality_live_passes(self):
+        r = drv.check_search_neutrality_live(drv.ENGINE_ROOT)
+        assert r["pass"], r["failures"]
+        assert "solution_class_injection" in r["evidence"]
+
+    def test_neutrality_verifier_rejects_injected_class(self):
+        out = {"search_space_neutrality": {
+            "solution_class_injection": "HARDWARE_COATING"},
+            "queries": {"domain": {"text": "pacemaker lead fracture",
+                                   "derivation":
+                                   "DERIVED_FROM_PROBLEM_FACTS",
+                                   "term_sources": {}}}}
+        problems = drv._neutrality_contract_violations(out)
+        assert any("SOLUTION_CLASS_INJECTED" in p for p in problems)
+
+    def test_neutrality_verifier_rejects_unmarked_derivation(self):
+        out = {"search_space_neutrality": {
+            "solution_class_injection": "NONE"},
+            "queries": {"domain": {"text": "pacemaker lead fracture",
+                                   "derivation": "",
+                                   "term_sources": {}}}}
+        problems = drv._neutrality_contract_violations(out)
+        assert any("UNMARKED_DERIVATION" in p for p in problems)
+
+    def test_neutrality_verifier_rejects_solution_class_term(self):
+        """THE v1 defect: a 'coating' term entering a query whose
+        problem facts carry no coating vocabulary is an injection."""
+        out = {"search_space_neutrality": {
+            "solution_class_injection": "NONE"},
+            "queries": {"domain": {
+                "text": "pacemaker lead fracture prevention coating flow",
+                "derivation": "DERIVED_FROM_PROBLEM_FACTS",
+                "term_sources": {}}}}
+        problems = drv._neutrality_contract_violations(out)
+        assert any("SOLUTION_CLASS_TERM" in p for p in problems)
+
+    def test_neutrality_verifier_rejects_non_fact_source(self):
+        out = {"search_space_neutrality": {
+            "solution_class_injection": "NONE"},
+            "queries": {"domain": {"text": "pacemaker lead fracture",
+                                   "derivation":
+                                   "DERIVED_FROM_PROBLEM_FACTS",
+                                   "term_sources": {"hypothesis": "x"}}}}
+        problems = drv._neutrality_contract_violations(out)
+        assert any("NON_FACT_SOURCE" in p for p in problems)
+
+    def test_neutrality_verifier_accepts_wellformed_output(self):
+        out = {"search_space_neutrality": {
+            "solution_class_injection": "NONE"},
+            "queries": {
+                "domain": {"text": "pacemaker lead fracture",
+                           "derivation": "DERIVED_FROM_PROBLEM_FACTS",
+                           "term_sources": {"device": "pacemaker"}},
+                "mechanism": {"text": "lead fracture diameter",
+                              "derivation": "EXPLORATORY_HYPOTHESIS",
+                              "term_sources": {"constraint": "x"}}}}
+        assert drv._neutrality_contract_violations(out) == []
+
+    def test_collision_stage_live_passes(self):
+        r = drv.check_collision_stage_live(drv.ENGINE_ROOT)
+        assert r["pass"], r["failures"]
+
+    def test_collision_stage_absent_is_red(self, tmp_path):
+        engine = tmp_path / "g_engine"
+        engine.mkdir()
+        (engine / "ACTIVE_DISCOVERY_GRAPH.json").write_text(json.dumps(
+            {"executable_chain": [
+                {"order": 1, "stage": "RETRIEVE",
+                 "capability_id": "A2_RETRIEVAL"}]}))
+        r = drv.check_collision_stage_live(engine)
+        assert not r["pass"]
+        assert "COLLISION_STAGE_ABSENT_FROM_CHAIN" in r["failures"]
+
+    def test_zero_results_live_passes(self):
+        r = drv.check_zero_results_not_novelty_live(drv.ENGINE_ROOT)
+        assert r["pass"], r["failures"]
+        assert "UNRESOLVED_NO_RELEVANT_ART" in r["evidence"]
+
+    def test_zero_results_r394_regression_is_red(self, monkeypatch):
+        """THE FALSIFIER for the R394 s2 fix: if the state machine
+        regresses to the pre-fix behavior (zero hits with a partial
+        search failure -> RESOLVED_DIFFERENTIATED, the production
+        defect measured on ts_d1ab9fd4d756), the check goes RED."""
+        def broken_resolve(families, search_errors,
+                           searches_succeeded, search_incomplete):
+            return {"state": "RESOLVED_DIFFERENTIATED"}
+        monkeypatch.setattr(drv, "_run_resolve", broken_resolve)
+        r = drv.check_zero_results_not_novelty_live(drv.ENGINE_ROOT)
+        assert not r["pass"]
+        assert any("STATE_RESOLVED_DIFFERENTIATED" in f
+                   for f in r["failures"])
+
+    def test_novelty_state_machine_admits_a_novelty_state(self,
+                                                           monkeypatch):
+        """If someone adds a NOVEL* state to the machine's prior-art
+        vocabulary (novelty asserted from search), the check goes RED."""
+        import discovery_fabric.a2.classify as a2c
+        monkeypatch.setattr(a2c, "NON_KILL_STATES",
+                            a2c.NON_KILL_STATES | {"NOVEL_DETERMINED"})
+        r = drv.check_zero_results_not_novelty_live(drv.ENGINE_ROOT)
+        assert not r["pass"]
+        assert any("SEARCH_STATE_ASSERTS_NOVELTY" in f
+                   for f in r["failures"])
+
+    def test_custody_live_passes(self):
+        r = drv.check_prior_art_hunt_custody_on_survivors(drv.ENGINE_ROOT)
+        assert r["pass"], r["failures"]
+        assert "hash-verified" in r["evidence"]
+
+    def test_custody_tampered_hash_is_red(self, tmp_path, monkeypatch):
+        """Tamper a restored artifact byte -> custody check RED (the
+        bar_10 hunt is only full custody if the hashes still bind)."""
+        import shutil
+        engine = tmp_path / "cust_engine"
+        engine.mkdir()
+        for rel in ("NOVELTY_EVIDENCE", "LEAD_PORTFOLIO_4"):
+            shutil.copytree(drv.ENGINE_ROOT / rel, engine / rel)
+        # tamper one restored artifact
+        target = engine / "NOVELTY_EVIDENCE" / "restored" / "R354" / \
+            "patsnap_pipeline" / "PATSNAP_API_STATUS.json"
+        if target.exists():
+            target.write_text("{}\n")
+        r = drv.check_prior_art_hunt_custody_on_survivors(engine)
+        assert not r["pass"]
+        assert any("HASH_DRIFT" in f for f in r["failures"])
+
+    def test_novelty_practice_family_measured_on_live_repo(self):
+        result = drv.measure_family("novelty_practice", None)
+        assert result["instrument_state"] == "MEASURED"
+        names = [c["name"] for c in result["checks"]]
+        assert names == ["search_neutrality_enforced",
+                         "collision_stage_registered_and_live",
+                         "zero_results_not_novelty_enforced",
+                         "prior_art_hunt_custody_on_survivors"]
+        # rule_5: the estimate is recorded AS ESTIMATE, never the score
+        assert result["estimate_is_not_the_score"] is True
