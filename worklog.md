@@ -1191,3 +1191,22 @@ Work Log:
 
 Stage Summary:
 - Repository at 5dee0972; seals intact (re-verified after every change); zero gradient model calls to this point; ready for GA-1b.
+
+---
+Task ID: R412-gradient-arm-2
+Agent: coder (main session)
+Task: R412 gradient arm — the sealed live run (Phase B/C/D/E/F/G)
+
+Work Log:
+- GA-1b: 13/13 span-verified deficit extractions (13 LLM calls, 0 retries, budget 13 exactly).
+- GA-2: 10 attempt-ready allocation seeds (deterministic).
+- TVM construction: 12 rung attempts (sealed cap), 132 records retrieved, 34 proposals, 0 admitted — 31 VALUE_OR_YEAR_NOT_NUMERIC, 2 RECORD_ID_NOT_IN_POOL, 1 SPAN_NOT_VERBATIM; 13th rung recorded INCOMPLETE_BUDGET_SHORTFALL; machinery parsing verified sound on synthetic input before concluding.
+- tvm-freeze: 0 entries, sha256 ae2f4c8a..., frozen_before_ga4=true (Art. XLIV honored).
+- GA-3: exactly the 10 sealed allocation seeds in priority order, ALL DEAD_AT_TVM_QUERY (empty map); 3 ineligible + 387 non-technical never attempted.
+- GA-4..GA-9: 0 calls (no FAST_MOVERS_RANKED seeds). finalize: LIRY=0.0, attempted=10, PRESENT_RECOVERY=0.
+- Phase F accounting + failure learning + incident disclosures written to R412/RECOVERY_ARM/GRADIENT_RUN/R412_GRADIENT_ARM_FINAL_REPORT.md.
+- Root cause measured: the sealed TVM proposal prompt's pipe ENTRY format + pinned free-tier model = 91% numeric-format non-compliance; the model follows the field-line format perfectly (GA-1b 13/13). The zero is instrument-attributed, NOT a scientific absence of measured movers (Art. LXI discipline in the report).
+- Recommendation recorded (owner decision): a NEW sealed arm with the field-line TVM prompt; NO mid-run prompt/gate change (Art. LIX/VII respected).
+
+Stage Summary:
+- The sealed gradient arm executed end-to-end for the first time; 0 rediscoveries with an instrument-attributed cause; allocation discipline held in production; the temporal control arm preserved and re-verified at every stage.
