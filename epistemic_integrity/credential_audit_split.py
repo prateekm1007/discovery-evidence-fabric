@@ -68,7 +68,136 @@ from typing import List, Dict, Optional, Tuple, Set
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EPISTEMIC_DIR = Path(__file__).resolve().parent
 
-AUDIT_SCHEMA_VERSION = "1.0.0"
+AUDIT_SCHEMA_VERSION = "1.1.0"
+
+# ---------------------------------------------------------------------------
+# R412 (2026-09-05): Narrowly-scoped, auditable false-positive
+# classification registry.
+#
+# MEASURED context (Art. II): the R411 evidence snapshot
+# R411/DISCOVERY_RUN/evidence/solar_pv_canonical.json carries the OpenAIRE
+# dedup-workflow record identifier
+# 'openaire:dedup_wf_002::1568830f8629cccd3a73d0cfba14a815' — a 32-hex
+# PUBLIC bibliographic record id distributed by the public OpenAIRE API to
+# every consumer. Its 32-hex form starting with '15' collides with the
+# SCOPUS_API_KEY_FORMAT pattern, turning the G12 audit RED with zero
+# credential material present.
+#
+# DESIGN (CEO R412 directive: "narrowly scoped, auditable false-positive
+# classification mechanism; do not weaken the scanner generically"):
+#   - The scanner is UNCHANGED: same regexes, same blob iteration, same
+#     PDF /ID structural masking, same self-exclusions. Every match is
+#     still detected and recorded.
+#   - Classification is keyed on the EXACT (pattern_name, matched_value)
+#     pair recorded in
+#     epistemic_integrity/credential_false_positive_registry.json. The
+#     registry entries carry classification, basis, evidence, and
+#     reviewer_provenance (Art. LXVII) — every classification is a
+#     reviewable, hashable, committed artifact.
+#   - A match NOT present in the registry remains UNCLASSIFIED and fails
+#     the audit. A different value, even in the same file, fails. The
+#     same value under a different pattern name fails. There is no
+#     path-level, file-level, or pattern-level suppression.
+#   - The registry file ITSELF is scanned (it contains the matched value
+#     verbatim); its own occurrence is classified by the same exact-pair
+#     rule — the registry is self-consistent and its content is fully
+#     disclosed in the audit report.
+#
+# ADVERSARIAL BOUNDARY (Art. XVII): an attacker who wants to smuggle a
+# real Scopus key cannot use this mechanism without a registry entry for
+# that exact value. Registry entries are committed, reviewable, and
+# schema-enforced (basis + evidence + reviewer_provenance required;
+# malformed registries fail CLOSED). The registry is a classification
+# layer, never a masking layer.
+# ---------------------------------------------------------------------------
+
+FALSE_POSITIVE_REGISTRY_PATH = (
+    EPISTEMIC_DIR / "credential_false_positive_registry.json")
+
+_FP_REQUIRED_FIELDS = (
+    "entry_id", "pattern_name", "matched_value", "classification",
+    "first_seen_path", "first_seen_blob", "basis", "evidence",
+    "reviewer_provenance", "classified_at", "classified_in",
+)
+
+
+def load_false_positive_registry(
+        path: Optional[Path] = None) -> Dict[str, Dict[str, Dict[str, str]]]:
+    """Load and validate the false-positive classification registry.
+
+    Returns a lookup dict keyed on (pattern_name, matched_value) → entry.
+
+    Fail-closed discipline: a registry that exists but is malformed
+    (wrong schema, or any entry missing required fields) raises — the
+    caller must treat classification as unavailable rather than silently
+    proceeding (Art. IV: no fallback epistemology; Art. XIV: RED = STOP).
+    A registry that does not exist returns an EMPTY lookup (no
+    classification available; every match stays unclassified and fails).
+    """
+    if path is None:
+        path = FALSE_POSITIVE_REGISTRY_PATH
+    lookup: Dict[str, Dict[str, Dict[str, str]]] = {}
+    if not path or not Path(path).exists():
+        return lookup
+    with open(path) as f:
+        raw = json.load(f)
+    schema = raw.get("schema", "")
+    if not str(schema).startswith("CREDENTIAL_FALSE_POSITIVE_REGISTRY.v"):
+        raise ValueError(
+            f"false-positive registry schema unrecognized: {schema!r} "
+            f"({path}) — classification unavailable; audit must fail closed")
+    for entry in raw.get("entries", []):
+        missing = [f for f in _FP_REQUIRED_FIELDS if not entry.get(f)]
+        if missing:
+            raise ValueError(
+                f"false-positive registry entry {entry.get('entry_id')!r} "
+                f"missing required fields {missing} — classification "
+                f"unavailable; audit must fail closed")
+        key = f"{entry['pattern_name']}\x00{entry['matched_value']}"
+        if key in lookup:
+            raise ValueError(
+                f"false-positive registry duplicate entry for "
+                f"({entry['pattern_name']}, {entry['matched_value']})")
+        lookup[key] = entry
+    return lookup
+
+
+def classify_pattern_matches(
+        matches: List[Dict[str, object]],
+        registry: Dict[str, Dict[str, Dict[str, str]]],
+) -> Tuple[List[Dict[str, object]], List[Dict[str, object]]]:
+    """Classify exact (pattern_name, matched_value) pairs against the registry.
+
+    Args:
+        matches: list of dicts with keys pattern_name, matched_value,
+            blob_sha, path.
+        registry: the lookup returned by load_false_positive_registry().
+
+    Returns:
+        (classified, unclassified) — classified entries carry the full
+        registry entry (entry_id, classification, basis, evidence,
+        reviewer_provenance); unclassified entries carry only the raw
+        match facts. Classification NEVER mutates the match facts.
+    """
+    classified: List[Dict[str, object]] = []
+    unclassified: List[Dict[str, object]] = []
+    for m in matches:
+        key = f"{m['pattern_name']}\x00{m['matched_value']}"
+        entry = registry.get(key)
+        if entry is not None:
+            classified.append({
+                **m,
+                "entry_id": entry["entry_id"],
+                "classification": entry["classification"],
+                "basis": entry["basis"],
+                "evidence": entry["evidence"],
+                "reviewer_provenance": entry["reviewer_provenance"],
+                "classified_in": entry["classified_in"],
+            })
+        else:
+            unclassified.append(dict(m))
+    return classified, unclassified
+
 
 # ---------------------------------------------------------------------------
 # PASS A — Credential format patterns (exact-length, boundary-aware)
@@ -294,6 +423,10 @@ class PatternScanResult:
     path: str
     matches_by_type: Dict[str, int]  # cred_type → count
     total_matches: int
+    # R412: exact matched values per pattern (classification input).
+    # Same regexes, same scan — only the match strings are now recorded
+    # alongside the counts that were always recorded.
+    match_values: Dict[str, List[str]] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -332,6 +465,12 @@ class CredentialAuditSplitReport:
     authorized_claim: str  # the exact wording the CEO requested
     forbidden_files_in_history: List[str]
     sample_findings: List[str]  # first 5 findings for review
+    # R412: false-positive classification layer (exact-pair registry)
+    pass_a_classified_matches: List[dict] = field(default_factory=list)
+    pass_a_unclassified_matches: List[dict] = field(default_factory=list)
+    pass_a_unclassified_count: int = 0
+    false_positive_registry_path: str = ""
+    false_positive_registry_sha256: str = ""
     audit_hash: str = ""
 
     def compute_hash(self) -> str:
@@ -348,6 +487,9 @@ class CredentialAuditSplitReport:
             "pass_b_base64_secret_matches": self.pass_b_base64_secret_matches,
             "forbidden_files_in_history": self.forbidden_files_in_history,
             "sample_findings": self.sample_findings,
+            "pass_a_classified_matches": self.pass_a_classified_matches,
+            "pass_a_unclassified_matches": self.pass_a_unclassified_matches,
+            "false_positive_registry_sha256": self.false_positive_registry_sha256,
         }, sort_keys=True)
         return hashlib.sha256(content.encode()).hexdigest()
 
@@ -449,6 +591,35 @@ def _pattern_scan_blob(blob_bytes: bytes) -> Dict[str, int]:
     return matches
 
 
+def _pattern_scan_blob_with_values(
+        blob_bytes: bytes) -> Dict[str, List[str]]:
+    """Scan one blob and record the EXACT matched strings per cred_type.
+
+    R412: same corpus, same regexes, same PDF masking as
+    _pattern_scan_blob — the ONLY difference is that the match strings
+    themselves are recorded (finditer instead of findall-count). This is
+    the classification input; it is not a detection change.
+
+    Consistency invariant: for every cred_type the length of the value
+    list here MUST equal the count from _pattern_scan_blob on the same
+    bytes (pinned by test).
+    """
+    try:
+        text = blob_bytes.decode("utf-8", errors="replace")
+    except Exception:
+        return {}
+
+    if text.startswith("%PDF-"):
+        text = _PDF_ID_ARRAY_RE.sub("/ID [<<MASKED-PDF-FILE-ID>>]", text)
+
+    values: Dict[str, List[str]] = {}
+    for cred_type, spec in PATTERN_SCAN_CORPUS.items():
+        found = [m.group(0) for m in spec["pattern"].finditer(text)]
+        if found:
+            values[cred_type] = found
+    return values
+
+
 def run_pass_a_pattern_scan() -> Tuple[int, Dict[str, int], List[PatternScanResult], List[str]]:
     """Run Pass A: scan every reachable blob with the credential format corpus.
 
@@ -469,10 +640,21 @@ def run_pass_a_pattern_scan() -> Tuple[int, Dict[str, int], List[PatternScanResu
 
         matches = _pattern_scan_blob(blob_bytes)
         if matches:
+            # R412: record the exact matched values (classification
+            # input). finditer and findall-count share the regex, so the
+            # per-type counts agree by construction; the assertion makes
+            # that agreement an executable invariant rather than an
+            # assumption (Art. XVI).
+            match_values = _pattern_scan_blob_with_values(blob_bytes)
+            for cred_type, count in matches.items():
+                assert len(match_values.get(cred_type, [])) == count, (
+                    f"Pass A count/value disagreement for {cred_type} in "
+                    f"{path} (blob {blob_sha[:12]})")
             total = sum(matches.values())
             per_blob.append(PatternScanResult(
                 blob_sha=blob_sha, path=path,
                 matches_by_type=matches, total_matches=total,
+                match_values=match_values,
             ))
             for cred_type, count in matches.items():
                 total_matches_by_type[cred_type] = total_matches_by_type.get(cred_type, 0) + count
@@ -645,8 +827,36 @@ def build_report(certified_commit: Optional[str] = None) -> CredentialAuditSplit
         certified_commit = out if rc == 0 else "UNKNOWN"
 
     # Pass A
-    pass_a_total, pass_a_by_type, _, pass_a_samples = run_pass_a_pattern_scan()
-    pass_a_clean = sum(pass_a_by_type.values()) == 0
+    pass_a_total, pass_a_by_type, pass_a_per_blob, pass_a_samples = run_pass_a_pattern_scan()
+
+    # R412: classify every exact (pattern_name, matched_value) pair from
+    # Pass A against the narrow false-positive registry. The scan itself
+    # is unchanged; classification only decides which DETECTED matches are
+    # recorded non-secret with a committed basis. Unclassified matches
+    # still fail (Art. VII: never weaken the verifier to rescue a claim).
+    # A malformed registry raises — the audit fails closed, it never
+    # silently skips classification (Art. IV).
+    fp_registry = load_false_positive_registry()
+    flat_matches: List[Dict[str, object]] = []
+    for r in pass_a_per_blob:
+        for cred_type, values in (r.match_values or {}).items():
+            for value in values:
+                flat_matches.append({
+                    "pattern_name": cred_type,
+                    "matched_value": value,
+                    "blob_sha": r.blob_sha,
+                    "path": r.path,
+                })
+    classified_matches, unclassified_matches = classify_pattern_matches(
+        flat_matches, fp_registry)
+    pass_a_clean = len(unclassified_matches) == 0
+
+    # Registry identity (auditable: the hash pins WHICH registry governed
+    # this audit run — Art. XII provenance custody for the classification)
+    registry_sha = ""
+    if FALSE_POSITIVE_REGISTRY_PATH.exists():
+        registry_sha = hashlib.sha256(
+            FALSE_POSITIVE_REGISTRY_PATH.read_bytes()).hexdigest()
 
     # Pass B
     (pass_b_total, _, pass_b_forbidden,
@@ -667,16 +877,51 @@ def build_report(certified_commit: Optional[str] = None) -> CredentialAuditSplit
     # Combined verdict
     combined_clean = pass_a_clean and pass_b_clean and len(forbidden_in_history) == 0
 
-    # Authorized claim wording (per CEO directive)
+    # Authorized claim wording (per CEO directive, extended R412 to
+    # disclose the classification layer honestly — the claim is scoped to
+    # the corpus AND to the recorded, basis-cited classifications)
     if combined_clean:
-        authorized_claim = (
-            "No credentials matching the configured detection corpus were found "
-            "in reachable history"
-        )
+        if classified_matches:
+            ids = ", ".join(sorted({
+                str(m.get("entry_id")) for m in classified_matches}))
+            authorized_claim = (
+                "No credentials matching the configured detection corpus were found "
+                "in reachable history; "
+                f"{len(classified_matches)} detected match(es) classified as "
+                f"recorded false positives with committed basis and evidence "
+                f"(registry entries {ids}; classification layer: "
+                "credential_false_positive_registry.json)"
+            )
+        else:
+            authorized_claim = (
+                "No credentials matching the configured detection corpus were found "
+                "in reachable history"
+            )
     else:
-        authorized_claim = "CREDENTIALS DETECTED — see findings"
+        authorized_claim = (
+            "CREDENTIALS DETECTED — see findings; unclassified Pass A "
+            f"matches: {len(unclassified_matches)}"
+        )
 
-    all_samples = (pass_a_samples + pass_b_samples)[:5]
+    # Classified matches are DISCLOSED in the samples — a reviewer sees
+    # exactly what was classified and why (Art. XV: never optimize the
+    # reporting layer to make the system look healthier).
+    classification_samples = [
+        f"Pass A CLASSIFIED FALSE POSITIVE {m['entry_id']}: "
+        f"{m['pattern_name']} value {str(m['matched_value'])[:12]}... in "
+        f"{m['path']} (blob {str(m['blob_sha'])[:12]}) — "
+        f"{m['classification']}; basis: {str(m['basis'])[:140]}"
+        for m in classified_matches
+    ]
+    unclassified_samples = [
+        f"Pass A UNCLASSIFIED: {m['pattern_name']} value "
+        f"{str(m['matched_value'])[:12]}... in {m['path']} "
+        f"(blob {str(m['blob_sha'])[:12]}) — NOT in registry; audit RED"
+        for m in unclassified_matches
+    ]
+    all_samples = (
+        unclassified_samples + classification_samples +
+        pass_a_samples + pass_b_samples)[:8]
 
     report = CredentialAuditSplitReport(
         audit_schema_version=AUDIT_SCHEMA_VERSION,
@@ -696,6 +941,11 @@ def build_report(certified_commit: Optional[str] = None) -> CredentialAuditSplit
         authorized_claim=authorized_claim,
         forbidden_files_in_history=forbidden_in_history,
         sample_findings=all_samples,
+        pass_a_classified_matches=classified_matches,
+        pass_a_unclassified_matches=unclassified_matches,
+        pass_a_unclassified_count=len(unclassified_matches),
+        false_positive_registry_path=str(FALSE_POSITIVE_REGISTRY_PATH),
+        false_positive_registry_sha256=registry_sha,
     )
     audit_hash = report.compute_hash()
     object.__setattr__(report, "audit_hash", audit_hash)

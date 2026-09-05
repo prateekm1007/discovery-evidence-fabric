@@ -181,7 +181,16 @@ class TestLedgerRemap:
                     e["artifact_hash"]
 
     def test_ledger_chain_replays(self):
-        """The root hash recomputes and the chain links are intact."""
+        """The root hash recomputes and the chain links are intact.
+
+        R412 (2026-09-05): the count moved 29 -> 31 because the G5
+        reconciliation APPENDED two evidence-backed correction
+        transitions (ST-CV-T06-0007 V22.6; ST-CV-T07-0004 V5) through
+        record_transition per PCEF-2026-08-20-001 — a legitimate,
+        mechanism-recorded append (Art. XI: history preserved, never
+        rewritten). This pin fired exactly as designed on the append;
+        the new count is the corrected-state pin. The chain-validity
+        assertions above are unchanged and are the real invariant."""
         from epistemic_integrity.post_scrub_evidence_revalidation import (
             _replay_ledger)
         root, valid, failures = _replay_ledger(self.events())
@@ -191,7 +200,7 @@ class TestLedgerRemap:
                                "state_transition_ledger_root.json")
                               .read_text())
         assert root_doc["ledger_root_hash"] == root
-        assert root_doc["total_events"] == 29
+        assert root_doc["total_events"] == 31
 
     def test_no_destroyed_commit_remains_referenced(self):
         """No ledger event points at a commit that does not exist."""

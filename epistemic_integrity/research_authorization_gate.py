@@ -1099,11 +1099,18 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
             report = build_report(certified_commit=self.git_head)
 
             if report.combined_clean:
+                classified_note = ""
+                if report.pass_a_classified_matches:
+                    classified_note = (
+                        f" classified_false_positives="
+                        f"{len(report.pass_a_classified_matches)} "
+                        f"(registry {report.false_positive_registry_sha256[:16]}...)")
                 return FreshCheck(
                     "G12", "credential_audit_split", True,
                     f"audit_hash={report.audit_hash[:16]}... "
                     f"pass_a_blobs={report.pass_a_total_blobs_scanned} "
                     f"pass_b_blobs={report.pass_b_total_blobs_scanned} "
+                    f"{classified_note} "
                     f"claim=\"{report.authorized_claim}\"",
                     self.git_head, self.verifier_version, self.schema_version,
                     raw_result={"audit_hash": report.audit_hash,
@@ -1115,7 +1122,9 @@ print(json.dumps({{"passed": results["overall_pass"], "details": str(results["bl
                     f"audit_hash={report.audit_hash[:16]}... "
                     f"pass_a_clean={report.pass_a_clean} "
                     f"pass_b_clean={report.pass_b_clean} "
-                    f"forbidden_files={report.forbidden_files_in_history}",
+                    f"pass_a_unclassified={report.pass_a_unclassified_count} "
+                    f"forbidden_files={report.forbidden_files_in_history} "
+                    f"samples={report.sample_findings[:3]}",
                     self.git_head, self.verifier_version, self.schema_version,
                 )
         except Exception as e:

@@ -324,10 +324,31 @@ class TestRealArtifactAnchors:
         """The r389 fake-secret fixture is now assembled at runtime:
         the file's own bytes audit clean while the test's runtime
         semantics are byte-identical (concatenation yields the same
-        value the provider receives)."""
+        value the provider receives).
+
+        R412 (2026-09-05): the fixture file itself was deleted by R410
+        (commit cd6f0fc8, Gen-1 reality-loop cluster deletion). The file
+        not existing is the strongest possible scrub of the CURRENT tree.
+        The reachable HISTORICAL blob remains excluded through
+        SCANNER_SELF_EXCLUSIONS, which the exclusion-list guard below
+        pins byte-exactly — that pin is what keeps this deletion honest
+        (the historical blob stays excluded by an ENUMERATED, TESTED
+        entry, never by silence). This test therefore asserts the
+        deletion state instead of failing on a missing file (the R410
+        state left it red for four rounds — the Art. LXIV stale-test
+        class, disclosed and fixed here)."""
         from epistemic_integrity.credential_audit_split import (
-            _object_audit_blob)
-        blob = (REPO / "tests" / "test_r389_reality_provider.py").read_bytes()
+            SCANNER_SELF_EXCLUSIONS, _object_audit_blob)
+        path = REPO / "tests" / "test_r389_reality_provider.py"
+        if not path.exists():
+            # The CURRENT tree must not carry the fixture file...
+            assert "tests/test_r389_reality_provider.py" in \
+                SCANNER_SELF_EXCLUSIONS, (
+                    "the historical r389 blob is reachable in git history "
+                    "and MUST stay excluded through the enumerated, "
+                    "test-pinned exclusion set (Art. XVII)")
+            return
+        blob = path.read_bytes()
         _, env, _, _, _, samples = _object_audit_blob(
             blob, "tests/test_r389_reality_provider.py")
         assert env == 0, samples
