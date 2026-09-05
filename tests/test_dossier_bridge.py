@@ -47,14 +47,37 @@ CTX = {"run_id": "testrun:ebridge", "problem_id": "fixture"}
 
 
 # ---------------------------------------------------------------- E1
-def test_e1_registry_has_nine_providers():
+def test_e1_registry_has_ten_providers():
     # 2026-08-30 (R375): the zai sandbox-local gateway (glm-4-plus) was
     # added as the ninth provider — the documented healthy-transport
-    # unblock after the measured NVIDIA latency collapse. E1 credential
+    # unblock after the measured NVIDIA latency collapse. 2026-09-05
+    # (R411): the tokenrouter direct-HTTPS provider (owner-supplied key,
+    # z-ai/glm-5.3-free) was added as the tenth — the R411 campaign
+    # unblock when the sandbox zai quota rate-limited. E1 credential
     # independence working as designed; no semantics changed.
     ids = {p.provider_id for p in PROVIDER_SPECS}
-    assert ids == {"zai", "openrouter", "nvidia", "anthropic", "gemini",
-                   "openai", "qwen", "deepseek", "mistral"}
+    assert ids == {"tokenrouter", "zai", "openrouter", "nvidia",
+                   "anthropic", "gemini", "openai", "qwen", "deepseek",
+                   "mistral"}
+
+
+def test_e1_tokenrouter_is_explicit_and_documented():
+    # The R411 unblock: owner-supplied key, live-measured BEFORE wiring
+    # (Art. III): models listing 200/135 models, glm-5.3-free serves the
+    # flagship model, paid route 403 zero credit, default UA passes.
+    # Everything recorded in the policy note (Art. XXVII), never silent.
+    tr = next(p for p in PROVIDER_SPECS if p.provider_id == "tokenrouter")
+    assert tr.env_var == "TOKEN_ROUTER_API_KEY"
+    assert tr.url == ("https://api.tokenrouter.com/v1/chat/"
+                      "completions")
+    assert tr.default_model == "z-ai/glm-5.3-free"
+    assert tr.flavor == "openai"
+    note = tr.policy_note.lower()
+    assert "r411" in note and "live-measured" in note
+    # placed at the head of the tier-2 group (before zai) so
+    # llm_generate's availability order prefers the healthy path
+    assert PROVIDER_SPECS[0].provider_id == "tokenrouter"
+    assert PROVIDER_SPECS[1].provider_id == "zai"
 
 
 def test_e1_zai_gateway_is_explicit_and_documented():
@@ -101,7 +124,7 @@ def test_e1_explicit_policy_no_silent_substitution(monkeypatch):
 
 def test_e1_availability_matrix_records_all_env_vars():
     matrix = availability_matrix()
-    assert len(matrix) == 9
+    assert len(matrix) == 10  # ten providers since 2026-09-05 (R411)
     for m in matrix:
         assert m["env_var"].endswith("_API_KEY")
         assert isinstance(m["available"], bool)

@@ -1,0 +1,62 @@
+{
+ "attack_version": "R411-ATTACK-V1",
+ "candidate_id": "C-semiconductor_fab-7~4",
+ "status": "OK",
+ "attacker_provider": "openrouter",
+ "attacker_model": "minimax/minimax-m3:free",
+ "generator_provider": "zai",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "surfaces": {
+  "mechanism": {
+   "attack": "The \"mechanism chain\" is a description of generic closed-loop statistical process control (SPC), not a physics-of-CMP mechanism. CMP MRR is governed by the Preston equation (MRR = K\u00b7P\u00b7v), pad asperity contact, slurry chemistry, slurry film hydrodynamics, and pad conditioning \u2014 none of which appear in the chain. A stochastic term added to a scalar MRR ignores that MRR variation in CMP is dominated by systematic, spatially correlated drivers (pad wear, slurry age, conditioning disc loading, film thickness, pattern density via the Armbrust \"h-pattern\" effect). Adding \u03c3\u00b7N(0,1) on top of \u03bc does not isolate or correct these; it merely describes it. Modeling removal as \u03bc + \u03c3\u00b7N(0,1) also violates stationarity \u2014 in real CMP, \u03bc drifts over a pad life cycle (hundreds of wafers) with known non-Gaussian structure, so an i.i.d. Gaussian assumption is wrong on its face.",
+   "verdict": "KILL",
+   "basis": "Preston equation and documented non-stationary pad-life drift (Armbrust et al., VMIC 2000 references within the prior-art set); i.i.d. N(0,1) is inconsistent with the systematic, correlated nature of CMP variation."
+  },
+  "physics": {
+   "attack": "The \"unexploited phenomenon\" is a 2013 Iowa State thesis (rtd-180813-11531) proposing stochastic MRR modeling \u2014 there is no novel physical phenomenon here, only a statistical description. Equations given: MRR(t) = \u03bc + \u03c3\u00b7N(0,1). This is dimensionally a rate but contains no physical variables (pressure, velocity, pad roughness, slurry chemistry). No physics is being exploited; this is pure curve-fitting. Furthermore, CMP MRR is bounded below by zero and frequently exhibits skewed/heavy-tailed behavior (slurry depletion events, bubble entrapment, large particles) \u2014 Gaussian residuals are physically inappropriate.",
+   "verdict": "KILL",
+   "basis": "Preston equation (MRR = K\u00b7P\u00b7v) governs real MRR; absence of P, v, pad roughness, slurry concentration, and temperature from the equation means no physical law is operative. Non-negativity and known positive-skew of real MRR distributions contradict the i.i.d. Gaussian assumption."
+  },
+  "evidence": {
+   "attack": "The candidate cites exactly one evidence record \u2014 itself (doi:10.31274/rtd-180813-11531), a 2013 thesis. A thesis is not peer-reviewed publication in a CMP venue (e.g., VMIC, ICPT, MRS, JES), and it has not been independently replicated in the manufacturing literature since. No fab data, no production evidence, no A/B comparison against the stated \"deterministic baseline\" is provided. A single thesis is insufficient evidence to claim \"proactive process adjustment\" delivering 15\u201330% MRR-variation reduction in a domain where control engineers have used SPC, EWMA, and run-to-run (R2R) control for two decades.",
+   "verdict": "KILL",
+   "basis": "Sole citation is doi:10.31274/rtd-180813-11531 (an unpublished Iowa State thesis); zero peer-reviewed CMP venue publications; zero production data backing the 15\u201330% number."
+  },
+  "prior_art": {
+   "attack": "The candidate is fully anticipated. doi:10.31274/etd-180810-313 explicitly teaches \"modeling and control of material removal and defectivity in CMP\" \u2014 i.e., MRR modeling + control with a richer physics base. doi:10.31274/rtd-20200616-20 teaches \"yield improvement in CMP via material removal variation on a surface,\" which is the same mechanism (MRR-variation modeling \u2192 yield). doi:10.1109/iitc.2011.5940349 teaches pad-roughness-driven MRR variation modeling. doi:10.1016/b978-0-12-821791-7.00099-x and doi:10.1016/b978-0-08-100165-3.00016-4 are book chapters on CMP process control. The 2021 Hypergraph NN paper (detc2021-68250) teaches data-driven MRR prediction with strictly better functional form than \u03bc+\u03c3\u00b7N(0,1). At minimum six prior-art records already teach MRR-variation modeling for process control.",
+   "verdict": "KILL",
+   "basis": "doi:10.31274/etd-180810-313, doi:10.31274/rtd-20200616-20, doi:10.1109/iitc.2011.5940349, and detc2021-68250 each teach MRR-variation modeling with control in CMP, anticipating mechanism+intervention+effect."
+  },
+  "equations": {
+   "attack": "MRR(t) = \u03bc + \u03c3\u00b7N(0,1) is i) a static scalar \u2014 no time dependence; the (t) is decorative because \u03bc and \u03c3 are constants in this form; ii) N(0,1) samples once and is consumed, so this is not a process model but a single random draw; iii) there is no feedback term, no controller, no actuator model \u2014 so nothing in the equation \"proactively adjusts\" anything; iv) units: MRR has units of nm/min; \u03c3\u00b7N(0,1) inherits whatever units \u03c3 is given, but no physical \u03c3 is defined (it is not Preston-anchored). The equation cannot, by construction, support a prediction that drives intervention.",
+   "verdict": "KILL",
+   "basis": "The form contains no control action, no dynamics, and no physical coupling; MRR(t) = \u03bc + \u03c3\u00b7N(0,1) is functionally identical to a constant plus one-shot noise sample, not a model capable of driving \"proactive process adjustment.\""
+  },
+  "experiment_design": {
+   "attack": "The \"killer experiment\" is a \"lab-scale simulation using historical CMP data.\" This is unfalsifiable in the relevant sense: (a) there is no protocol specified \u2014 wafer count, polishing time, pad/conditioner/slurry, metrology; (b) the comparison is \"stochastic vs deterministic\" without defining what the \"deterministic model\" is (mean? Preston with fixed K? EWMA? MPC? \u2014 each would give different answers); (c) the kill condition is \"no improvement in MRR prediction accuracy,\" but accuracy on which metric (RMSE? MAPE? wafer-level vs die-level? \u2014 CMP control engineers measure within-wafer-non-uniformity, WIWNU%, not MRR point accuracy); (d) no production-tool A/B, no economic endpoint (yield, cost-per-wafer); (e) the experiment cannot test \"proactive adjustment\" because the equation has no control input.",
+   "verdict": "KILL",
+   "basis": "No defined protocol, no industrial-standard endpoint (WIWNU, die-level planarity), undefined deterministic baseline, no production fab A/B, and the equation lacks a control input so \"proactive adjustment\" cannot be tested at all."
+  },
+  "scaling_to_production": {
+   "attack": "The boundary conditions admit \"limited by insufficient historical data\" and \"ineffective for highly deterministic processes.\" Real CMP at production scale (e.g., 300 mm Cu/STI, advanced-node logic, memory) operates with hundreds of sensors (downforce, backpressure, slurry flow, pad temperature, eddy-current endpoint) feeding run-to-run controllers on a per-wafer cadence. A statistical post-hoc MRR model with no real-time actuator model has no path to production fab deployment because: (i) tool FDC systems already capture and feed back richer data than a stochastic MRR model can use; (ii) CMP tools are already tightly SPC-controlled with WIWNU spec of <3% on mature nodes \u2014 beating that with a stochastic model on top is not credibly demonstrated; (iii) advanced-node CMP (e.g., 7nm/5nm metals, MOL dielectrics) is pattern-density-driven to a degree that pure stochastic modeling cannot address without layout-aware terms.",
+   "verdict": "KILL",
+   "basis": "CMP tools already use multi-sensor FDC + R2R control; production WIWNU specs are sub-3%; no path exists to integrate \u03bc+\u03c3\u00b7N(0,1) above existing control without physical terms the equation lacks."
+  }
+ },
+ "kill_surfaces": [
+  "mechanism",
+  "physics",
+  "evidence",
+  "prior_art",
+  "equations",
+  "experiment_design",
+  "scaling_to_production"
+ ],
+ "wound_surfaces": [],
+ "final_objection": "KILLED. The single most dangerous surviving objection is prior-art anticipation \u2014 six independent CMP records (notably doi:10.31274/etd-180810-313 and doi:10.1016/b978-0-12-821791-7.00099-x) already teach MRR-variation modeling for CMP process control with richer mechanistic content, so even if the equation were salvaged the intervention offers no defensible novelty against incumbent FDC/R2R stacks.",
+ "prompt_hash": "1f9b689483a2e36e229ae4c6fbf81998a697c21e4e6fa06cf340005ce3b39ce4",
+ "output_hash": "9cd9d5fad0e9ca804eb834e0143f36f1df23616a6aa76b422378c22167dc5496",
+ "survived": false,
+ "verdict": "KILLED"
+}

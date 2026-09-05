@@ -1,0 +1,1940 @@
+{
+ "domain_id": "chemical_process",
+ "status": "OK",
+ "transport_failures": 0,
+ "n_calls": 4,
+ "accepted": [
+  {
+   "candidate_id": "C-chemical_process-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Sliding Mode Control for Reactor Trains",
+   "target_domain": "industrial",
+   "source_domain": "control engineering",
+   "domain_id": "chemical_process",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Expensive control of continuous stirred-tank reactor train due to nonlinear dynamics and parameter variations",
+   "causal_chain": [
+    "Parameter variations",
+    "nonlinear system behavior",
+    "increased control effort",
+    "higher operational costs",
+    "reduced process efficiency"
+   ],
+   "unexploited_phenomenon": "Sliding mode control's robustness against parameter variations and disturbances in exothermic reactors",
+   "intervention": "Implement sliding mode control algorithm to replace conventional PID controllers",
+   "governing_variables": "Sliding surface coefficient (\u03bb, dimensionless), switching gain (K, V\u00b7s), system uncertainty bounds (\u0394, %)",
+   "predicted_effect": "40-70% reduction in control effort and 20-40% improvement in setpoint tracking due to robustness against parameter variations",
+   "equations": [
+    "s(x) = (dx/dt) + \u03bbx",
+    "u = -K\u00b7sign(s) where s is the sliding surface, \u03bb is the design parameter, K is the control gain"
+   ],
+   "boundary_conditions": "Effective for systems with bounded uncertainties; may cause chattering in systems with unmodeled dynamics or time delays",
+   "evidence_refs": [
+    "doi:10.23919/acc.1991.4791930"
+   ],
+   "cross_domain_transition": "control engineering \u2192 industrial process control + robust control reduces maintenance costs and improves product quality",
+   "baseline": {
+    "baseline_incumbent": "PID controllers with manual tuning",
+    "baseline_metric": "PID controllers typically achieve \u00b15% setpoint tracking with 15-20% overshoot",
+    "candidate_metric": "Sliding mode control achieves \u00b12-3% setpoint tracking with <5% overshoot",
+    "expected_delta": "60% improvement in setpoint tracking accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale CSTR with sliding mode controller vs PID controller, step input response measurement, n=5 replicates",
+    "decisive_uncertainty": "Robustness of sliding mode control against unmodeled dynamics in industrial CSTRs",
+    "kill_condition": "If sliding mode controller shows >10% worse performance than PID in tracking setpoint changes",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Chattering",
+     "detectability": "detectable via high-frequency oscillations in control signal",
+     "mitigation": "mitigation via boundary layer implementation"
+    },
+    {
+     "failure_mode": "Unmodeled dynamics",
+     "detectability": "detectable via persistent tracking errors",
+     "mitigation": "mitigation via adaptive gain adjustment"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Process control engineers in chemical manufacturing plants",
+    "use_case": "Controlling temperature and concentration in continuous stirred-tank reactors",
+    "integration_point": "Between sensor measurements and control actuators in the reactor control system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "72f0ea4779c18cc02b435efa1b82e8e77978c43743ed99552db5340fe7eceaac",
+    "output_hash": "ab441a9ca26f6fdbcaeafe3d046e34a01bf689f2c186f504ef9a493666d1adae",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "reactor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-chemical_process-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Dynamic Discrepancy Reduced-Order Modeling",
+   "target_domain": "industrial",
+   "source_domain": "process control",
+   "domain_id": "chemical_process",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Expensive control of distillation columns due to complex dynamics and computational requirements of high-fidelity models",
+   "causal_chain": [
+    "High computational complexity",
+    "infrequent control updates",
+    "suboptimal control performance",
+    "increased energy consumption",
+    "higher operational costs"
+   ],
+   "unexploited_phenomenon": "Gray-box modeling combining first-principles components with black-box functions to reduce computational complexity while maintaining accuracy",
+   "intervention": "Implement dynamic discrepancy reduced-order modeling framework for distillation column control",
+   "governing_variables": "Model order reduction factor (r, dimensionless), computational time reduction ratio (\u03c4, dimensionless), model accuracy (\u03b5, %)",
+   "predicted_effect": "70-90% reduction in computational time with <5% loss in model accuracy, enabling real-time control optimization",
+   "equations": [
+    "\u03c4 = t_full/t_reduced where t_full is computational time of full model, t_reduced is computational time of reduced model",
+    "\u03b5 = |y_full - y_reduced|/y_ref"
+   ],
+   "boundary_conditions": "Effective for systems with dominant time constants; may lose accuracy for highly nonlinear or multi-scale phenomena",
+   "evidence_refs": [
+    "doi:10.1021/acs.iecr.5c02195"
+   ],
+   "cross_domain_transition": "process control \u2192 distillation column control + reduced computational cost enables advanced control strategies",
+   "baseline": {
+    "baseline_incumbent": "First-principles models with simplified assumptions",
+    "baseline_metric": "First-principles models require 5-10 minutes per control update, limiting optimization frequency",
+    "candidate_metric": "Reduced-order models require 30-60 seconds per control update, enabling real-time optimization",
+    "expected_delta": "90% reduction in computational time for control updates"
+   },
+   "killer_experiment": {
+    "experiment": "Simulation study comparing computational time and accuracy of reduced-order model vs full model for distillation column dynamics",
+    "decisive_uncertainty": "Trade-off between model reduction factor and accuracy for industrial distillation columns",
+    "kill_condition": "If reduced-order model shows >10% deviation from full model predictions in key process variables",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model mismatch",
+     "detectability": "detectable via prediction errors during validation",
+     "mitigation": "mitigation via online correction terms"
+    },
+    {
+     "failure_mode": "Over-reduction",
+     "detectability": "detectable via loss of dynamic response",
+     "mitigation": "mitigation via adaptive model order adjustment"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Process control engineers in petroleum and chemical industries",
+    "use_case": "Real-time optimization of distillation column operations",
+    "integration_point": "Between process data and advanced process control systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "72f0ea4779c18cc02b435efa1b82e8e77978c43743ed99552db5340fe7eceaac",
+    "output_hash": "ab441a9ca26f6fdbcaeafe3d046e34a01bf689f2c186f504ef9a493666d1adae",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "distillation"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-chemical_process-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Multi-objective Optimization of Microchannel Reactors",
+   "target_domain": "industrial",
+   "source_domain": "chemical engineering",
+   "domain_id": "chemical_process",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Expensive control of industrial crystallizers due to inefficient mixing and heat transfer",
+   "causal_chain": [
+    "Inefficient mixing",
+    "poor temperature control",
+    "inconsistent nucleation",
+    "crystal size distribution variability",
+    "increased purification costs"
+   ],
+   "unexploited_phenomenon": "Microchannel reactors' enhanced mass and heat transfer characteristics compared to conventional reactors",
+   "intervention": "Replace conventional crystallizer with microchannel reactor design optimized via CFD and neural network",
+   "governing_variables": "Channel diameter (d, m), Reynolds number (Re, dimensionless), Nusselt number (Nu, dimensionless), Peclet number (Pe, dimensionless)",
+   "predicted_effect": "50-70% improvement in heat transfer coefficient and 30-50% reduction in mixing time due to enhanced microchannel geometry",
+   "equations": [
+    "Nu = C\u00b7Re^a\u00b7Pr^b where C, a, b are constants depending on channel geometry",
+    "Re = \u03c1vD/\u03bc where \u03c1 is density, v is velocity, D is hydraulic diameter, \u03bc is viscosity"
+   ],
+   "boundary_conditions": "Effective for small-scale continuous processes; may not scale economically for very large production volumes",
+   "evidence_refs": [
+    "doi:10.1039/d5ra09551d"
+   ],
+   "cross_domain_transition": "chemical engineering \u2192 crystallization processes + improved heat transfer enables better crystal quality control",
+   "baseline": {
+    "baseline_incumbent": "Conventional stirred-tank crystallizers",
+    "baseline_metric": "Conventional crystallizers achieve heat transfer coefficients of 500-1000 W/m\u00b2\u00b7K",
+    "candidate_metric": "Microchannel crystallizers achieve heat transfer coefficients of 1000-3000 W/m\u00b2\u00b7K",
+    "expected_delta": "100-200% improvement in heat transfer coefficient"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale microchannel crystallizer vs conventional crystallizer, heat transfer coefficient measurement, crystal size distribution analysis",
+    "decisive_uncertainty": "Scalability of microchannel heat transfer advantages to industrial crystallization",
+    "kill_condition": "If microchannel reactor shows <30% improvement in heat transfer coefficient compared to conventional crystallizer",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Fouling",
+     "detectability": "detectable via pressure drop increase",
+     "mitigation": "mitigation via surface treatment or periodic cleaning"
+    },
+    {
+     "failure_mode": "Scaling limitations",
+     "detectability": "detectable via performance drop at larger scales",
+     "mitigation": "mitigation via modular design approach"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Process engineers in pharmaceutical and specialty chemical industries",
+    "use_case": "Crystallization of active pharmaceutical ingredients and fine chemicals",
+    "integration_point": "Between feed preparation and product separation in crystallization processes"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "72f0ea4779c18cc02b435efa1b82e8e77978c43743ed99552db5340fe7eceaac",
+    "output_hash": "ab441a9ca26f6fdbcaeafe3d046e34a01bf689f2c186f504ef9a493666d1adae",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "reactor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-chemical_process-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Continuous Flow Technology for Biotherapeutics",
+   "target_domain": "industrial",
+   "source_domain": "bioprocessing",
+   "domain_id": "chemical_process",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Expensive control of downstream purification in biotherapeutic manufacturing due to batch processing inefficiencies",
+   "causal_chain": [
+    "Batch processing limitations",
+    "long cycle times",
+    "high facility footprint",
+    "increased capital costs",
+    "higher operational expenses"
+   ],
+   "unexploited_phenomenon": "Continuous production processes offering increased productivity, consistent product quality, reduced facility footprint, and decreased process turnaround time",
+   "intervention": "Replace batch purification processes with continuous flow systems",
+   "governing_variables": "Residence time (t, s), flow rate (Q, m\u00b3/s), reactor volume (V, m\u00b3), productivity (P, kg/m\u00b3\u00b7h)",
+   "predicted_effect": "40-60% reduction in facility footprint and 30-50% decrease in process turnaround time due to continuous operation",
+   "equations": [
+    "Productivity P = m/(V\u00b7t) where m is mass produced",
+    "Residence time t = V/Q where V is reactor volume, Q is flow rate"
+   ],
+   "boundary_conditions": "Effective for well-understood processes with consistent feed quality; may struggle with variable feed compositions or complex purification requirements",
+   "evidence_refs": [
+    "doi:10.1016/j.omta.2026.201744",
+    "doi:10.1021/acs.oprd.5c00309"
+   ],
+   "cross_domain_transition": "bioprocessing \u2192 chemical manufacturing + continuous processing reduces capital costs and improves efficiency",
+   "baseline": {
+    "baseline_incumbent": "Batch purification processes",
+    "baseline_metric": "Batch processes require 5-10 days for complete purification cycle with 2-3x facility footprint compared to continuous",
+    "candidate_metric": "Continuous processes complete purification in 1-2 days with 40-60% smaller facility footprint",
+    "expected_delta": "70-80% reduction in process time and 40-60% reduction in facility footprint"
+   },
+   "killer_experiment": {
+    "experiment": "Pilot-scale continuous purification system vs batch process, throughput measurement, product quality assessment",
+    "decisive_uncertainty": "Scalability of continuous purification to industrial production volumes",
+    "kill_condition": "If continuous system shows >10% reduction in yield or product quality compared to batch process",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Fouling",
+     "detectability": "detectable via pressure drop increase",
+     "mitigation": "mitigation via periodic cleaning or membrane modification"
+    },
+    {
+     "failure_mode": "Product variability",
+     "detectability": "detectable via quality deviations",
+     "mitigation": "mitigation via advanced process control"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Process engineers in biopharmaceutical manufacturing",
+    "use_case": "Downstream purification of monoclonal antibodies and other biotherapeutics",
+    "integration_point": "Between upstream cell culture and final product formulation"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "72f0ea4779c18cc02b435efa1b82e8e77978c43743ed99552db5340fe7eceaac",
+    "output_hash": "ab441a9ca26f6fdbcaeafe3d046e34a01bf689f2c186f504ef9a493666d1adae",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "MEDICAL_ADJACENT_FLAG",
+    "matched_medical_terms": [
+     "therapeutic"
+    ],
+    "matched_non_medical_terms": [
+     "industrial",
+     "manufacturing"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "strong medical vocabulary AND substantial non-medical target context; flagged for human review rather than silently resolved"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-chemical_process-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Gradient-Enhanced Neural Network Surrogate Modeling",
+   "target_domain": "industrial",
+   "source_domain": "process control",
+   "domain_id": "chemical_process",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Expensive control of distillation columns due to computational complexity of high-fidelity models",
+   "causal_chain": [
+    "High computational requirements",
+    "limited optimization frequency",
+    "suboptimal operation",
+    "increased energy consumption",
+    "higher operational costs"
+   ],
+   "unexploited_phenomenon": "Gradient-enhanced neural networks combining CFD with surrogate modeling to systematically evaluate process variables with reduced computational cost",
+   "intervention": "Replace high-fidelity CFD models with gradient-enhanced neural network surrogate models for distillation column optimization",
+   "governing_variables": "Neural network architecture (N, number of neurons), training data size (M, samples), prediction accuracy (\u03b5, %), computational time ratio (\u03c4, dimensionless)",
+   "predicted_effect": "80-95% reduction in computational time with <5% loss in prediction accuracy for distillation column optimization",
+   "equations": [
+    "\u03c4 = t_CFD/t_NN where t_CFD is computational time of CFD model, t_NN is computational time of neural network",
+    "\u03b5 = |y_CFD - y_NN|/y_ref"
+   ],
+   "boundary_conditions": "Effective for systems with sufficient training data; may lose accuracy for extrapolation beyond training domain",
+   "evidence_refs": [
+    "doi:10.1039/d5ra09551d"
+   ],
+   "cross_domain_transition": "computational fluid dynamics \u2192 distillation column control + reduced computational cost enables real-time optimization",
+   "baseline": {
+    "baseline_incumbent": "High-fidelity CFD models",
+    "baseline_metric": "CFD models require hours to days for single optimization iteration",
+    "candidate_metric": "Neural network surrogate models require minutes for same optimization iteration",
+    "expected_delta": "90-95% reduction in computational time for optimization"
+   },
+   "killer_experiment": {
+    "experiment": "Simulation study comparing computational time and accuracy of neural network surrogate vs CFD model for distillation column",
+    "decisive_uncertainty": "Generalization capability of neural network to unseen operating conditions",
+    "kill_condition": "If neural network shows >10% deviation from CFD predictions in key performance metrics",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Overfitting",
+     "detectability": "detectable via poor validation performance",
+     "mitigation": "mitigation via regularization and cross-validation"
+    },
+    {
+     "failure_mode": "Extrapolation error",
+     "detectability": "detectable via performance at operating boundaries",
+     "mitigation": "mitigation via domain-specific architecture design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Process control engineers in petroleum and chemical industries",
+    "use_case": "Real-time optimization of distillation column operations",
+    "integration_point": "Between process data and advanced process control systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "72f0ea4779c18cc02b435efa1b82e8e77978c43743ed99552db5340fe7eceaac",
+    "output_hash": "ab441a9ca26f6fdbcaeafe3d046e34a01bf689f2c186f504ef9a493666d1adae",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "distillation"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-chemical_process-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Robust Control for Exothermic Reactors",
+   "target_domain": "industrial",
+   "source_domain": "control engineering",
+   "domain_id": "chemical_process",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Expensive control of continuous stirred-tank reactors due to exothermic reactions and safety concerns",
+   "causal_chain": [
+    "Exothermic reactions",
+    "temperature excursions",
+    "safety shutdowns",
+    "production losses",
+    "increased operational costs"
+   ],
+   "unexploited_phenomenon": "Robust control techniques that maintain stability despite model uncertainty and disturbances in exothermic reactors",
+   "intervention": "Implement robust control algorithm specifically designed for exothermic reactor temperature control",
+   "governing_variables": "Robustness margin (\u03c1, dimensionless), disturbance rejection capability (D, %), temperature stability (\u0394T, \u00b0C)",
+   "predicted_effect": "60-80% reduction in temperature excursions and 30-50% decrease in safety shutdowns due to improved disturbance rejection",
+   "equations": [
+    "\u03c1 = min|det(I - L(j\u03c9)G(j\u03c9))| where L is the controller transfer function, G is the plant transfer function",
+    "\u0394T_max = K_p\u00b7D where K_p is process gain, D is disturbance magnitude"
+   ],
+   "boundary_conditions": "Effective for systems with bounded disturbances; may be conservative for highly uncertain systems",
+   "evidence_refs": [
+    "doi:10.1109/acc.1994.752500"
+   ],
+   "cross_domain_transition": "control engineering \u2192 chemical process control + robust control reduces safety risks and improves production efficiency",
+   "baseline": {
+    "baseline_incumbent": "Conventional PID controllers with conservative tuning",
+    "baseline_metric": "PID controllers experience \u00b15-10\u00b0C temperature excursions during disturbances, causing 1-2 safety shutdowns per month",
+    "candidate_metric": "Robust controllers maintain \u00b11-2\u00b0C temperature excursions during same disturbances, reducing shutdowns to 0-0.5 per month",
+    "expected_delta": "70-80% reduction in temperature excursions and 60-75% reduction in safety shutdowns"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale exothermic reactor with robust controller vs PID controller, disturbance injection test, temperature excursion measurement",
+    "decisive_uncertainty": "Robustness against unmodeled nonlinear dynamics in industrial reactors",
+    "kill_condition": "If robust controller shows >3\u00b0C temperature excursion during disturbances",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Overly conservative control",
+     "detectability": "detectable via sluggish response",
+     "mitigation": "mitigation via gain scheduling"
+    },
+    {
+     "failure_mode": "Unmodeled dynamics",
+     "detectability": "detectable via persistent oscillations",
+     "mitigation": "mitigation via adaptive robust control"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Process control engineers in chemical manufacturing plants",
+    "use_case": "Temperature control of exothermic continuous stirred-tank reactors",
+    "integration_point": "Between temperature measurements and cooling/heating actuators"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "72f0ea4779c18cc02b435efa1b82e8e77978c43743ed99552db5340fe7eceaac",
+    "output_hash": "ab441a9ca26f6fdbcaeafe3d046e34a01bf689f2c186f504ef9a493666d1adae",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "reactor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-chemical_process-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Dynamic Discrepancy Reduced-Order Modeling",
+   "target_domain": "chemical_process",
+   "source_domain": "chemical_process",
+   "domain_id": "chemical_process",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Unmeasurable states in continuous stirred-tank reactor trains lead to suboptimal control and process inefficiency",
+   "causal_chain": [
+    "Unmeasured state variables",
+    "plant-model mismatch",
+    "suboptimal control decisions",
+    "reduced process efficiency",
+    "increased operational costs"
+   ],
+   "unexploited_phenomenon": "Gray-box modeling combining first-principles components with black-box functions to represent critical process dynamics",
+   "intervention": "Implementation of a dynamic discrepancy reduced-order modeling framework that combines physics-based models with data-driven corrections",
+   "governing_variables": "Model accuracy (\u03b5), computational complexity (C), plant-model mismatch (\u0394), measurement frequency (f)",
+   "predicted_effect": "40-70% reduction in plant-model mismatch because the framework balances computational complexity and model accuracy by constructing a gray-box model",
+   "equations": [
+    "\u0394 = |y_plant - y_model|, \u03b5 = f(\u0394, C), where y represents process outputs"
+   ],
+   "boundary_conditions": "Effective when process dynamics are nonlinear but follow known physical principles; fails when system exhibits completely unpredictable behavior or when computational resources are severely limited",
+   "evidence_refs": [
+    "doi:10.1021/acs.iecr.5c02195"
+   ],
+   "cross_domain_transition": null,
+   "baseline": {
+    "baseline_incumbent": "Conventional model predictive control with fixed-order models",
+    "baseline_metric": "Plant-model mismatch typically 15-25% in nonlinear systems",
+    "candidate_metric": "Plant-model mismatch reduced to 5-15%",
+    "expected_delta": "10-20% absolute reduction in plant-model mismatch"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale CSTR with sensor array comparing conventional MPC vs dynamic discrepancy reduced-order model control",
+    "decisive_uncertainty": "Whether the gray-box approach can reduce mismatch without increasing computational burden",
+    "kill_condition": "If computational complexity increases by more than 50% while achieving less than 5% improvement in model accuracy",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model overfitting",
+     "detectability": "detectable through cross-validation",
+     "mitigation": "mitigation through regularization"
+    },
+    {
+     "failure_mode": "Computational instability",
+     "detectability": "detectable through real-time monitoring",
+     "mitigation": "mitigation through adaptive sampling"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Process control engineers in chemical manufacturing plants",
+    "use_case": "Implementing advanced process control for CSTR trains to improve efficiency and reduce energy consumption",
+    "integration_point": "Between process sensors and control system in distributed control systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "9492089641359f16394d50a2f766641e53121a5f1cbae9aa5c8590e198f8fcc8",
+    "output_hash": "ad8c2180ff9678a080ecd3304658efe30cd6993feb46112f70705c841d9b2e6c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "reactor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-chemical_process-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Microchannel Reactor Intensification",
+   "target_domain": "chemical_process",
+   "source_domain": "chemical_process",
+   "domain_id": "chemical_process",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Poor mixing and concentration gradients in industrial crystallizers lead to inconsistent product quality",
+   "causal_chain": [
+    "Inadequate mixing",
+    "concentration gradients",
+    "nucleation rate variability",
+    "inconsistent crystal size distribution",
+    "reduced product quality"
+   ],
+   "unexploited_phenomenon": "Microchannel reactors exhibit pronounced process intensification compared with conventional fixed-bed reactors due to enhanced mass and heat transfer",
+   "intervention": "Replacement of conventional crystallizer with microchannel reactor design optimized for crystal growth",
+   "governing_variables": "Channel diameter (d), Reynolds number (Re), Peclet number (Pe), Schmidt number (Sc)",
+   "predicted_effect": "50-80% reduction in concentration gradients because microchannel dimensions enhance mixing efficiency",
+   "equations": [
+    "Re = \u03c1vD/\u03bc, Pe = vL/D, where \u03c1 is density, v is velocity, \u03bc is viscosity, L is characteristic length, D is diffusion coefficient"
+   ],
+   "boundary_conditions": "Effective for crystallization processes with characteristic dimensions >10\u03bcm; fails for processes requiring extremely large volumes or when handling highly viscous materials",
+   "evidence_refs": [
+    "doi:10.1039/d5ra09551d"
+   ],
+   "cross_domain_transition": null,
+   "baseline": {
+    "baseline_incumbent": "Conventional batch crystallization with mechanical stirring",
+    "baseline_metric": "Typical coefficient of variation in crystal size distribution of 15-25%",
+    "candidate_metric": "Coefficient of variation reduced to 5-10%",
+    "expected_delta": "10-20% absolute improvement in crystal size distribution uniformity"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale crystallization unit comparing conventional stirred tank vs microchannel crystallizer with particle size analysis",
+    "decisive_uncertainty": "Whether microchannel dimensions can provide sufficient residence time for complete crystal growth",
+    "kill_condition": "If crystal size distribution variability increases by more than 10% compared to conventional method",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Channel clogging",
+     "detectability": "detectable through pressure monitoring",
+     "mitigation": "mitigation through periodic cleaning"
+    },
+    {
+     "failure_mode": "Scale-up limitations",
+     "detectability": "detectable through flow rate analysis",
+     "mitigation": "mitigation through parallel microchannel design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Crystallization engineers in pharmaceutical and specialty chemical manufacturing",
+    "use_case": "Improving product consistency in high-value crystallization processes",
+    "integration_point": "Between upstream reaction and downstream filtration in the production line"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "9492089641359f16394d50a2f766641e53121a5f1cbae9aa5c8590e198f8fcc8",
+    "output_hash": "ad8c2180ff9678a080ecd3304658efe30cd6993feb46112f70705c841d9b2e6c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "MEDICAL_ADJACENT_FLAG",
+    "matched_medical_terms": [
+     "stent"
+    ],
+    "matched_non_medical_terms": [
+     "industrial",
+     "reactor",
+     "cement"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "strong medical vocabulary AND substantial non-medical target context; flagged for human review rather than silently resolved"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-chemical_process-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Sliding Mode Control",
+   "target_domain": "chemical_process",
+   "source_domain": "chemical_process",
+   "domain_id": "chemical_process",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Distillation column efficiency limited by inability to measure internal concentration profiles",
+   "causal_chain": [
+    "Unmeasured internal concentrations",
+    "improper reflux ratio control",
+    "separation inefficiency",
+    "energy waste"
+   ],
+   "unexploited_phenomenon": "Sliding mode control can handle exothermic continuous stirred tank reactors with unmeasured states by using robust switching control",
+   "intervention": "Implementation of sliding mode control algorithm that estimates unmeasured states using available measurements",
+   "governing_variables": "Sliding surface (s), control gain (K), system uncertainty (\u0394f), measurement noise (\u03b7)",
+   "predicted_effect": "30-50% improvement in separation efficiency because sliding mode control maintains system performance despite unmeasured disturbances",
+   "equations": [
+    "s = x - x_desired, u = -K\u00b7sign(s), where x is system state, u is control input"
+   ],
+   "boundary_conditions": "Effective when system uncertainties are bounded and switching frequency can be practically implemented; fails when system exhibits unbounded disturbances or when actuator saturation occurs",
+   "evidence_refs": [
+    "doi:10.23919/acc.1991.4791930"
+   ],
+   "cross_domain_transition": null,
+   "baseline": {
+    "baseline_incumbent": "Conventional PID control with limited state feedback",
+    "baseline_metric": "Typical separation efficiency of 70-85% in complex mixtures",
+    "candidate_metric": "Separation efficiency improved to 85-95%",
+    "expected_delta": "15-20% absolute improvement in separation efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "Pilot-scale distillation column with sliding mode controller vs conventional PID control",
+    "decisive_uncertainty": "Whether the sliding mode control can handle the specific nonlinear dynamics of the distillation column",
+    "kill_condition": "If control oscillations exceed 20% of the setpoint or if energy consumption increases by more than 10%",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Chattering",
+     "detectability": "detectable through control signal analysis",
+     "mitigation": "mitigation through boundary layer adaptation"
+    },
+    {
+     "failure_mode": "State estimation error",
+     "detectability": "detectable through residual analysis",
+     "mitigation": "mitigation through observer design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Process control engineers in petroleum refining and chemical manufacturing",
+    "use_case": "Improving separation efficiency in distillation columns while reducing energy consumption",
+    "integration_point": "Between temperature/pressure sensors and reflux ratio control system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "9492089641359f16394d50a2f766641e53121a5f1cbae9aa5c8590e198f8fcc8",
+    "output_hash": "ad8c2180ff9678a080ecd3304658efe30cd6993feb46112f70705c841d9b2e6c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "distillation"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-chemical_process-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Adaptive Control Reactor Optimization",
+   "target_domain": "chemical",
+   "source_domain": "chemical_process",
+   "domain_id": "chemical_process",
+   "pain_class": "WASTE_STREAM",
+   "problem": "Continuous stirred-tank reactor trains generate waste streams due to inefficient control of exothermic reactions.",
+   "causal_chain": [
+    "Uncontrolled reaction dynamics",
+    "temperature excursions",
+    "side reactions",
+    "unwanted byproducts",
+    "waste stream generation"
+   ],
+   "unexploited_phenomenon": "Nonlinear adaptive control can maintain optimal temperature profiles in exothermic reactions (doi:10.1109/acc.1994.752500, doi:10.58837/chula.the.2007.1541)",
+   "intervention": "Implement sliding mode control with adaptive parameters to maintain optimal temperature in continuous stirred-tank reactors",
+   "governing_variables": "Reaction enthalpy (\u0394H, J/mol), heat transfer coefficient (U, W/m\u00b2\u00b7K), reactor volume (V, m\u00b3), activation energy (Ea, J/mol)",
+   "predicted_effect": "40-70% reduction in waste stream generation because temperature control precision directly minimizes side reaction rates",
+   "equations": [
+    "dT/dt = (Q - UA(T-Ta))/(\u03c1CpV)",
+    "reaction rate = k\u2080exp(-Ea/RT)[A]^n"
+   ],
+   "boundary_conditions": "Effective for exothermic reactions with moderate activation energies (50-150 kJ/mol); fails for highly unstable reactions with positive feedback",
+   "evidence_refs": [
+    "doi:10.1109/acc.1994.752500",
+    "doi:10.58837/chula.the.2007.1541",
+    "doi:10.17918/00010097"
+   ],
+   "cross_domain_transition": "chemical_process -> chemical_process (same domain with improved control implementation)",
+   "baseline": {
+    "baseline_incumbent": "PID control with fixed parameters; documented limitation: poor performance under varying feed conditions (doi:10.1109/acc.1994.752500)",
+    "baseline_metric": "15-25% waste stream generation relative to product",
+    "candidate_metric": "5-10% waste stream generation relative to product",
+    "expected_delta": "50-70% reduction in waste stream generation"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale CSTR with temperature sensors comparing PID vs sliding mode control under varying feed conditions",
+    "decisive_uncertainty": "Whether adaptive control maintains stability across all operating conditions",
+    "kill_condition": "If adaptive control shows instability or worse performance than PID at any operating condition",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Parameter drift",
+     "detectability": "detectable via monitoring control signal variance",
+     "mitigation": "mitigation: parameter bounds enforcement"
+    },
+    {
+     "failure_mode": "Sensor noise amplification",
+     "detectability": "detectable via excessive control signal oscillation",
+     "mitigation": "mitigation: filter design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Chemical process engineers",
+    "use_case": "Reducing waste in continuous stirred-tank reactor trains",
+    "integration_point": "Between reactor temperature sensors and control valves"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a23ba428efdee9b6ce81e380d0d7ce697b4958cea017191f606ebfff00c2137d",
+    "output_hash": "c5b733e40bcb60b71c6a6556d2cf6504c44d4c951c72f2357fb9aef78862e4c9",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "reactor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "WASTE_STREAM"
+  },
+  {
+   "candidate_id": "C-chemical_process-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Microchannel Reactor Intensification",
+   "target_domain": "chemical",
+   "source_domain": "chemical_process",
+   "domain_id": "chemical_process",
+   "pain_class": "WASTE_STREAM",
+   "problem": "Distillation columns generate waste streams due to inefficient separation and energy consumption.",
+   "causal_chain": [
+    "Conventional reactor design limitations",
+    "poor mass/heat transfer",
+    "incomplete reactions",
+    "unreacted feed",
+    "waste stream generation"
+   ],
+   "unexploited_phenomenon": "Microchannel reactors exhibit process intensification with improved mass/heat transfer (doi:10.1039/d5ra09551d)",
+   "intervention": "Replace conventional distillation columns with microchannel reactor networks for improved separation efficiency",
+   "governing_variables": "Channel diameter (d, m), Reynolds number (Re), Schmidt number (Sc), mass transfer coefficient (k, m/s)",
+   "predicted_effect": "50-80% reduction in waste stream generation due to improved separation efficiency and reduced energy consumption",
+   "equations": [
+    "Sh = k*d/D = f(Re, Sc)",
+    "Process intensification factor = (k_micro/k_conv)/(d_conv/d_micro)^0.5"
+   ],
+   "boundary_conditions": "Effective for liquid-phase separations with moderate viscosity; fails for gas-phase separations with very low concentrations",
+   "evidence_refs": [
+    "doi:10.1039/d5ra09551d",
+    "doi:10.1021/acs.iecr.5c02195"
+   ],
+   "cross_domain_transition": "chemical_process -> chemical_process (same domain with improved reactor geometry)",
+   "baseline": {
+    "baseline_incumbent": "Conventional distillation columns; documented limitation: high energy consumption and poor mass transfer (doi:10.1021/acs.iecr.5c02195)",
+    "baseline_metric": "30-40% energy consumption per unit separation",
+    "candidate_metric": "10-20% energy consumption per unit separation",
+    "expected_delta": "50-70% reduction in energy consumption leading to proportional waste reduction"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale microchannel reactor vs conventional column with identical feed compositions",
+    "decisive_uncertainty": "Whether microchannel geometry maintains separation efficiency at scale",
+    "kill_condition": "If microchannel reactor shows lower separation efficiency than conventional column",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Channel clogging",
+     "detectability": "detectable via pressure drop monitoring",
+     "mitigation": "mitigation: periodic cleaning protocols"
+    },
+    {
+     "failure_mode": "Manufacturing defects",
+     "detectability": "detectable via visual inspection",
+     "mitigation": "mitigation: improved fabrication quality control"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Process engineers in chemical manufacturing",
+    "use_case": "Improving separation efficiency in distillation columns",
+    "integration_point": "Between feed inlet and product outlet of distillation column"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a23ba428efdee9b6ce81e380d0d7ce697b4958cea017191f606ebfff00c2137d",
+    "output_hash": "c5b733e40bcb60b71c6a6556d2cf6504c44d4c951c72f2357fb9aef78862e4c9",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "reactor",
+     "distillation"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "WASTE_STREAM"
+  },
+  {
+   "candidate_id": "C-chemical_process-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Continuous Flow Bioprocessing",
+   "target_domain": "chemical",
+   "source_domain": "bioprocessing",
+   "domain_id": "chemical_process",
+   "pain_class": "WASTE_STREAM",
+   "problem": "Industrial crystallizers generate waste streams due to batch processing inefficiencies and inconsistent product quality.",
+   "causal_chain": [
+    "Batch processing limitations",
+    "inconsistent supersaturation",
+    "irregular crystal growth",
+    "poor yield",
+    "waste stream generation"
+   ],
+   "unexploited_phenomenon": "Continuous flow processes offer consistent product quality and reduced waste (doi:10.1016/j.omta.2026.201744, doi:10.1021/acs.oprd.5c00309)",
+   "intervention": "Convert batch crystallization to continuous flow crystallization with precise supersaturation control",
+   "governing_variables": "Supersaturation ratio (S), residence time (\u03c4, s), nucleation rate (B, m\u207b\u00b3s\u207b\u00b9), growth rate (G, m/s)",
+   "predicted_effect": "60-90% reduction in waste stream generation due to improved crystal size distribution and yield",
+   "equations": [
+    "B = k_b * (S-1)^b",
+    "G = k_g * (S-1)^g",
+    "Yield = \u222b(B\u00b7G)dt"
+   ],
+   "boundary_conditions": "Effective for crystallization with moderate supersaturation ratios (1.1-1.5); fails for highly supersaturated systems with rapid nucleation",
+   "evidence_refs": [
+    "doi:10.1016/j.omta.2026.201744",
+    "doi:10.1021/acs.oprd.5c00309",
+    "doi:10.1080/19420862.2026.2706886"
+   ],
+   "cross_domain_transition": "bioprocessing -> chemical_process (continuous flow technology transfer from bio to chemical manufacturing)",
+   "baseline": {
+    "baseline_incumbent": "Batch crystallization; documented limitation: inconsistent product quality and high waste generation (doi:10.1021/acs.oprd.5c00309)",
+    "baseline_metric": "30-50% yield with 10-20% waste stream",
+    "candidate_metric": "85-95% yield with 2-5% waste stream",
+    "expected_delta": "60-90% reduction in waste stream generation"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale continuous flow crystallizer vs batch crystallizer with identical feed compositions",
+    "decisive_uncertainty": "Whether continuous flow maintains crystal quality at production scale",
+    "kill_condition": "If continuous flow produces crystals with unacceptable size distribution or purity",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Fouling in microchannels",
+     "detectability": "detectable via pressure drop monitoring",
+     "mitigation": "mitigation: periodic cleaning protocols"
+    },
+    {
+     "failure_mode": "Crystal agglomeration",
+     "detectability": "detectable via particle size analysis",
+     "mitigation": "mitigation: flow rate optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Crystallization process engineers",
+    "use_case": "Converting batch crystallization to continuous flow",
+    "integration_point": "Between feed preparation and crystallization unit"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a23ba428efdee9b6ce81e380d0d7ce697b4958cea017191f606ebfff00c2137d",
+    "output_hash": "c5b733e40bcb60b71c6a6556d2cf6504c44d4c951c72f2357fb9aef78862e4c9",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": true,
+    "verdict": "EXCLUDED_MEDICAL",
+    "matched_medical_terms": [
+     "stent"
+    ],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "strong medical-application markers in the target fields without substantial non-medical target context"
+   },
+   "extraction_call": "WASTE_STREAM"
+  },
+  {
+   "candidate_id": "C-chemical_process-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Gray-Box Dynamic Control",
+   "target_domain": "chemical",
+   "source_domain": "chemical_process",
+   "domain_id": "chemical_process",
+   "pain_class": "WASTE_STREAM",
+   "problem": "Distillation columns generate waste streams due to plant-model mismatches in control systems.",
+   "causal_chain": [
+    "Plant-model mismatch",
+    "suboptimal control decisions",
+    "energy inefficiency",
+    "incomplete separation",
+    "waste stream generation"
+   ],
+   "unexploited_phenomenon": "Dynamic discrepancy reduced-order modeling can correct plant-model mismatches (doi:10.1021/acs.iecr.5c02195)",
+   "intervention": "Implement gray-box control framework combining first-principles with machine learning for distillation column control",
+   "governing_variables": "Model error (\u03b5), correction gain (K), process time constant (\u03c4, s), disturbance frequency (\u03c9, rad/s)",
+   "predicted_effect": "30-50% reduction in waste stream generation due to improved control accuracy and energy efficiency",
+   "equations": [
+    "\u03b5 = y - y_model",
+    "u_corrected = u + K\u00b7\u03b5",
+    "\u03c4_model = f(\u03c4_plant, K)"
+   ],
+   "boundary_conditions": "Effective for systems with moderate nonlinearity; fails for highly nonlinear systems with multiple interacting variables",
+   "evidence_refs": [
+    "doi:10.1021/acs.iecr.5c02195"
+   ],
+   "cross_domain_transition": "chemical_process -> chemical_process (same domain with improved modeling approach)",
+   "baseline": {
+    "baseline_incumbent": "First-principles modeling with fixed parameters; documented limitation: poor performance under varying conditions (doi:10.1021/acs.iecr.5c02195)",
+    "baseline_metric": "20-30% energy inefficiency due to control errors",
+    "candidate_metric": "10-15% energy inefficiency due to control errors",
+    "expected_delta": "30-50% reduction in energy inefficiency leading to proportional waste reduction"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale distillation column with gray-box vs first-principles control under varying feed conditions",
+    "decisive_uncertainty": "Whether gray-box model maintains accuracy across all operating conditions",
+    "kill_condition": "If gray-box model shows worse performance than first-principles model at any operating condition",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model drift",
+     "detectability": "detectable via prediction error monitoring",
+     "mitigation": "mitigation: online parameter estimation"
+    },
+    {
+     "failure_mode": "Overfitting to training data",
+     "detectability": "detectable via cross-validation error",
+     "mitigation": "mitigation: regularization techniques"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Process control engineers",
+    "use_case": "Improving distillation column control accuracy",
+    "integration_point": "Between process measurements and control actuators"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a23ba428efdee9b6ce81e380d0d7ce697b4958cea017191f606ebfff00c2137d",
+    "output_hash": "c5b733e40bcb60b71c6a6556d2cf6504c44d4c951c72f2357fb9aef78862e4c9",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "distillation"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "WASTE_STREAM"
+  },
+  {
+   "candidate_id": "C-chemical_process-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Collaborative Flow Chemistry",
+   "target_domain": "chemical",
+   "source_domain": "chemical_process",
+   "domain_id": "chemical_process",
+   "pain_class": "WASTE_STREAM",
+   "problem": "Continuous stirred-tank reactor trains generate waste streams due to suboptimal reaction conditions and scale-up challenges.",
+   "causal_chain": [
+    "Scale-up challenges",
+    "non-ideal mixing",
+    "concentration gradients",
+    "side reactions",
+    "waste stream generation"
+   ],
+   "unexploited_phenomenon": "Continuous flow technology with synthetic chemistry expertise can improve reaction efficiency (doi:10.1021/jacsau.5c01617)",
+   "intervention": "Implement collaborative flow chemistry approach combining synthetic chemistry expertise with reactor design",
+   "governing_variables": "Mixing time (t_m, s), Damk\u00f6hler number (Da), heat transfer coefficient (U, W/m\u00b2\u00b7K), residence time distribution (RTD)",
+   "predicted_effect": "40-70% reduction in waste stream generation due to improved reaction efficiency and reduced side products",
+   "equations": [
+    "Da = k\u00b7\u03c4",
+    "RTD = f(reactor geometry, flow rate)",
+    "t_m = f(Re, Sc, geometry)"
+   ],
+   "boundary_conditions": "Effective for liquid-phase reactions with moderate viscosity; fails for highly viscous systems or gas-liquid reactions",
+   "evidence_refs": [
+    "doi:10.1021/jacsau.5c01617"
+   ],
+   "cross_domain_transition": "chemical_process -> chemical_process (same domain with improved collaboration approach)",
+   "baseline": {
+    "baseline_incumbent": "Batch processing with separate synthetic chemistry and engineering teams; documented limitation: poor communication leading to suboptimal designs (doi:10.1021/jacsau.5c01617)",
+    "baseline_metric": "25-35% yield with 15-25% waste stream",
+    "candidate_metric": "70-80% yield with 5-10% waste stream",
+    "expected_delta": "40-70% reduction in waste stream generation"
+   },
+   "killer_experiment": {
+    "experiment": "Pilot-scale flow reactor vs batch reactor with identical reaction conditions",
+    "decisive_uncertainty": "Whether collaborative approach maintains efficiency at production scale",
+    "kill_condition": "If flow reactor shows lower yield than batch reactor at production scale",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Hot spots in reactor",
+     "detectability": "detectable via temperature mapping",
+     "mitigation": "mitigation: improved reactor design"
+    },
+    {
+     "failure_mode": "Flow maldistribution",
+     "detectability": "detectable via RTD measurement",
+     "mitigation": "mitigation: improved inlet design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Process development engineers",
+    "use_case": "Converting batch reactions to continuous flow",
+    "integration_point": "Between reaction development and manufacturing scale-up"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a23ba428efdee9b6ce81e380d0d7ce697b4958cea017191f606ebfff00c2137d",
+    "output_hash": "c5b733e40bcb60b71c6a6556d2cf6504c44d4c951c72f2357fb9aef78862e4c9",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "reactor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "WASTE_STREAM"
+  },
+  {
+   "candidate_id": "C-chemical_process-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Surrogate Model Optimization",
+   "target_domain": "chemical",
+   "source_domain": "chemical_process",
+   "domain_id": "chemical_process",
+   "pain_class": "WASTE_STREAM",
+   "problem": "Industrial crystallizers generate waste streams due to suboptimal operating conditions and poor process understanding.",
+   "causal_chain": [
+    "Suboptimal operating conditions",
+    "poor crystal quality",
+    "low yield",
+    "waste stream generation"
+   ],
+   "unexploited_phenomenon": "Surrogate models based on gradient-enhanced neural networks can optimize process parameters (doi:10.1039/d5ra09551d)",
+   "intervention": "Implement neural network surrogate model for crystallization process optimization",
+   "governing_variables": "Cooling rate (dT/dt, K/s), supersaturation ratio (S), agitation rate (rpm), seed loading (%)",
+   "predicted_effect": "50-80% reduction in waste stream generation due to optimized operating conditions",
+   "equations": [
+    "Crystal yield = f(S, T, t)",
+    "Crystal size distribution = f(S, cooling rate, agitation)",
+    "k_G = k_G0\u00b7exp(-Ea/RT)"
+   ],
+   "boundary_conditions": "Effective for systems with sufficient historical data; fails for novel crystallization systems with no prior data",
+   "evidence_refs": [
+    "doi:10.1039/d5ra09551d"
+   ],
+   "cross_domain_transition": "chemical_process -> chemical_process (same domain with improved optimization approach)",
+   "baseline": {
+    "baseline_incumbent": "Trial-and-error optimization; documented limitation: time-consuming and suboptimal results (doi:10.1039/d5ra09551d)",
+    "baseline_metric": "40-60% yield with 10-20% waste stream",
+    "candidate_metric": "85-95% yield with 2-5% waste stream",
+    "expected_delta": "50-80% reduction in waste stream generation"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale crystallizer with surrogate model vs manual optimization",
+    "decisive_uncertainty": "Whether surrogate model generalizes to unseen operating conditions",
+    "kill_condition": "If surrogate model shows worse performance than manual optimization at any condition",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model overfitting",
+     "detectability": "detectable via validation error",
+     "mitigation": "mitigation: cross-validation"
+    },
+    {
+     "failure_mode": "Local optima",
+     "detectability": "detectable via sensitivity analysis",
+     "mitigation": "mitigation: global optimization algorithms"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Crystallization process engineers",
+    "use_case": "Optimizing crystallization operating conditions",
+    "integration_point": "Between process measurements and control system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a23ba428efdee9b6ce81e380d0d7ce697b4958cea017191f606ebfff00c2137d",
+    "output_hash": "c5b733e40bcb60b71c6a6556d2cf6504c44d4c951c72f2357fb9aef78862e4c9",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "WASTE_STREAM"
+  },
+  {
+   "candidate_id": "C-chemical_process-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Admicellar Polymerization",
+   "target_domain": "chemical",
+   "source_domain": "chemical_process",
+   "domain_id": "chemical_process",
+   "pain_class": "WASTE_STREAM",
+   "problem": "Continuous stirred-tank reactor trains generate waste streams due to inefficient reaction conditions and byproduct formation.",
+   "causal_chain": [
+    "Inefficient reaction conditions",
+    "side reactions",
+    "unwanted byproducts",
+    "waste stream generation"
+   ],
+   "unexploited_phenomenon": "Admicellar polymerization in continuous stirred-tank reactors with nonionic surfactants can improve reaction efficiency (doi:10.58837/chula.the.2004.2025)",
+   "intervention": "Implement admicellar polymerization with optimized surfactant concentration in continuous stirred-tank reactors",
+   "governing_variables": "Surfactant concentration (C, mol/L), interfacial area (A, m\u00b2), monomer conversion (%), reaction rate (r, mol/L\u00b7s)",
+   "predicted_effect": "30-50% reduction in waste stream generation due to improved selectivity and reduced byproducts",
+   "equations": [
+    "r = k\u00b7[M]\u00b7[S]",
+    "Conversion = \u222br dt",
+    "Interfacial area = f(C, A_monomer)"
+   ],
+   "boundary_conditions": "Effective for polymerization reactions with moderate molecular weight; fails for high molecular weight polymers with complex architectures",
+   "evidence_refs": [
+    "doi:10.58837/chula.the.2004.2025"
+   ],
+   "cross_domain_transition": "chemical_process -> chemical_process (same domain with improved reaction conditions)",
+   "baseline": {
+    "baseline_incumbent": "Conventional polymerization without surfactant optimization; documented limitation: low selectivity and high byproduct formation (doi:10.58837/chula.the.2004.2025)",
+    "baseline_metric": "50-70% selectivity with 20-30% waste stream",
+    "candidate_metric": "80-90% selectivity with 5-10% waste stream",
+    "expected_delta": "30-50% reduction in waste stream generation"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale CSTR with varying surfactant concentrations",
+    "decisive_uncertainty": "Whether surfactant concentration maintains optimal performance at scale",
+    "kill_condition": "If surfactant optimization shows no improvement in selectivity",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Surfactant degradation",
+     "detectability": "detectable via surface tension measurement",
+     "mitigation": "mitigation: stabilizer addition"
+    },
+    {
+     "failure_mode": "Emulsion formation",
+     "detectability": "detectable via visual inspection",
+     "mitigation": "mitigation: pH control"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Polymer process engineers",
+    "use_case": "Improving polymerization selectivity",
+    "integration_point": "Between monomer feed and reactor outlet"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a23ba428efdee9b6ce81e380d0d7ce697b4958cea017191f606ebfff00c2137d",
+    "output_hash": "c5b733e40bcb60b71c6a6556d2cf6504c44d4c951c72f2357fb9aef78862e4c9",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "reactor",
+     "polymer"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "WASTE_STREAM"
+  },
+  {
+   "candidate_id": "C-chemical_process-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Microchannel Reactor Optimization",
+   "target_domain": "energy",
+   "source_domain": "chemical processing",
+   "domain_id": "chemical_process",
+   "pain_class": "Process Intensification",
+   "problem": "Inefficient Fischer-Tropsch synthesis due to suboptimal reactor design leading to poor catalytic performance.",
+   "causal_chain": [
+    "Suboptimal geometric variables",
+    "inefficient flow distribution",
+    "reduced catalytic performance",
+    "lower process efficiency",
+    "increased energy consumption"
+   ],
+   "unexploited_phenomenon": "Microchannel reactors exhibit pronounced process intensification compared with conventional fixed-bed reactors through optimized geometric variables.",
+   "intervention": "Multi-objective optimization of microchannel reactor geometry using CFD coupled with gradient-enhanced neural networks to systematically evaluate geometric variables.",
+   "governing_variables": "Characteristic geometric variables (channel diameter, length, spacing, shape), catalyst loading, fluid velocity, temperature",
+   "predicted_effect": "30-50% increase in catalytic performance due to optimized flow distribution and heat transfer characteristics",
+   "equations": [
+    "\u03b7 = f(\u03c7\u2081, \u03c7\u2082, \u03c7\u2083, \u03c7\u2084) where \u03b7 is catalytic performance and \u03c7\u2081-\u03c7\u2084 are characteristic geometric variables",
+    "\u2202\u03b7/\u2202\u03c7\u1d62 > 0 for optimized parameters"
+   ],
+   "boundary_conditions": "Holds for multi-tubular microchannel reactors with consistent catalyst loading; fails at extreme aspect ratios or when pressure drop constraints are violated",
+   "evidence_refs": [
+    "doi:10.1039/d5ra09551d"
+   ],
+   "cross_domain_transition": "chemical processing -> energy: Transfer microchannel optimization from chemical synthesis to energy production where catalytic performance directly impacts fuel efficiency",
+   "baseline": {
+    "baseline_incumbent": "Conventional fixed-bed reactors with fixed geometry",
+    "baseline_metric": "Standard catalytic yield (g product/g catalyst/hour) with uncertainty \u00b15%",
+    "candidate_metric": "30-50% higher catalytic yield (g product/g catalyst/hour)",
+    "expected_delta": "30-50% improvement in catalytic yield"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale microchannel reactor prototype with variable geometry, testing catalytic performance under controlled conditions",
+    "decisive_uncertainty": "Whether the optimized geometry scales to industrial production volumes",
+    "kill_condition": "<10% improvement in catalytic yield compared to baseline",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Fouling at microchannel scale",
+     "detectability": "detectable via pressure drop monitoring",
+     "mitigation": "mitigation by surface treatment"
+    },
+    {
+     "failure_mode": "Hot spots formation",
+     "detectability": "detectable via thermal imaging",
+     "mitigation": "mitigation by flow distribution optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Energy process engineer",
+    "use_case": "Optimizing Fischer-Tropsch synthesis for synthetic fuel production",
+    "integration_point": "Reactor design phase of new fuel production facilities"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "096fa29440e29913f63c8d817b8aea435cfe299a22c22f12171df48f096f516e",
+    "output_hash": "e690bb67ed4be4c6ead4f1f05e595c521dd52cfffa7d2d8c619cc63dde3ae461",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "reactor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-chemical_process-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Continuous Flow Bioprocessing",
+   "target_domain": "pharmaceutical manufacturing",
+   "source_domain": "biotechnology",
+   "domain_id": "chemical_process",
+   "pain_class": "Process Intensification",
+   "problem": "Batch processing limitations in biotherapeutic manufacturing leading to high costs and inconsistent product quality.",
+   "causal_chain": [
+    "Batch processing limitations",
+    "increased facility footprint",
+    "longer turnaround times",
+    "higher costs",
+    "reduced accessibility of biotherapeutics"
+   ],
+   "unexploited_phenomenon": "Continuous production processes offer significant advantages including increased productivity, more consistent product quality, reduced facility footprint, and decreased process turnaround time.",
+   "intervention": "Implementation of continuous production processes for recombinant adeno-associated virus manufacturing",
+   "governing_variables": "Flow rate, residence time, temperature, mixing efficiency, cell density",
+   "predicted_effect": "40-60% reduction in facility footprint and 30-50% decrease in process turnaround time",
+   "equations": [
+    "Productivity = k \u00d7 C \u00d7 F \u00d7 t where k is process constant, C is cell density, F is flow rate, t is residence time",
+    "Facility \u221d 1/Productivity"
+   ],
+   "boundary_conditions": "Holds for stable cell cultures with consistent viral production; fails when defective viral vector formation occurs",
+   "evidence_refs": [
+    "doi:10.1016/j.omta.2026.201744"
+   ],
+   "cross_domain_transition": "biotechnology -> pharmaceutical manufacturing: Transfer continuous production from viral vector manufacturing to general pharmaceutical bioprocessing",
+   "baseline": {
+    "baseline_incumbent": "Batch processing with fixed facility footprint and long turnaround times",
+    "baseline_metric": "Facility utilization rate (30-40%), process turnaround time (7-14 days)",
+    "candidate_metric": "60-80% facility utilization rate, 3-5 day process turnaround time",
+    "expected_delta": "50-100% improvement in facility utilization, 50-70% reduction in turnaround time"
+   },
+   "killer_experiment": {
+    "experiment": "Pilot-scale continuous bioreactor with parallel batch processing comparison",
+    "decisive_uncertainty": "Whether continuous processing maintains product quality while increasing throughput",
+    "kill_condition": ">5% reduction in product quality or yield compared to batch processing",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Cell viability drop",
+     "detectability": "detectable via continuous monitoring",
+     "mitigation": "mitigation by process parameter optimization"
+    },
+    {
+     "failure_mode": "Viral vector defects",
+     "detectability": "detectable via analytical testing",
+     "mitigation": "mitigation by improved cell culture conditions"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Pharmaceutical manufacturing process engineer",
+    "use_case": "Scaling up biologic drug production while reducing costs",
+    "integration_point": "Downstream purification and formulation processes"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "096fa29440e29913f63c8d817b8aea435cfe299a22c22f12171df48f096f516e",
+    "output_hash": "e690bb67ed4be4c6ead4f1f05e595c521dd52cfffa7d2d8c619cc63dde3ae461",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": true,
+    "verdict": "EXCLUDED_MEDICAL",
+    "matched_medical_terms": [
+     "therapeutic",
+     "stent"
+    ],
+    "matched_non_medical_terms": [
+     "manufacturing"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "strong medical-application markers in the target fields without substantial non-medical target context"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-chemical_process-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Gray-Box Process Control",
+   "target_domain": "industrial manufacturing",
+   "source_domain": "chemical processing",
+   "domain_id": "chemical_process",
+   "pain_class": "Process Control",
+   "problem": "Plant-model mismatches in advanced process control leading to suboptimal performance and increased operational costs.",
+   "causal_chain": [
+    "Plant-model mismatches",
+    "incorrect control actions",
+    "suboptimal process performance",
+    "increased operational costs",
+    "reduced product quality"
+   ],
+   "unexploited_phenomenon": "Dynamic discrepancy reduced-order modeling that balances computational complexity and model accuracy by combining first-principles components with black-box functions.",
+   "intervention": "Implementation of gray-box models combining first-principles components with black-box functions to represent critical process dynamics",
+   "governing_variables": "Model accuracy, computational complexity, plant-model mismatch, control horizon",
+   "predicted_effect": "25-40% reduction in control error and 20-30% decrease in computational requirements compared to full first-principles models",
+   "equations": [
+    "Error = f(|P - M|) where P is plant behavior and M is model prediction",
+    "Complexity = g(Principles, BlackBox) where Principles is first-principles component complexity and BlackBox is black-box component complexity"
+   ],
+   "boundary_conditions": "Holds for processes with moderate nonlinearity and identifiable dominant dynamics; fails for highly chaotic or poorly understood processes",
+   "evidence_refs": [
+    "doi:10.1021/acs.iecr.5c02195"
+   ],
+   "cross_domain_transition": "chemical processing -> industrial manufacturing: Transfer gray-box modeling from chemical processes to general industrial control systems",
+   "baseline": {
+    "baseline_incumbent": "Full first-principles models with high computational requirements or purely empirical models with limited extrapolation",
+    "baseline_metric": "Control error (\u00b15-10%), computational time (minutes per control cycle)",
+    "candidate_metric": "Control error (\u00b12-5%), computational time (seconds per control cycle)",
+    "expected_delta": "50-80% reduction in control error, 70-90% reduction in computational time"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale process simulation with real-time control implementation",
+    "decisive_uncertainty": "Whether the gray-box approach maintains accuracy across different operating conditions",
+    "kill_condition": ">3x increase in computational time or >2x increase in control error compared to baseline",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model drift over time",
+     "detectability": "detectable via performance monitoring",
+     "mitigation": "mitigation by periodic model recalibration"
+    },
+    {
+     "failure_mode": "Extrapolation errors",
+     "detectability": "detectable via validation testing",
+     "mitigation": "mitigation by maintaining conservative operating bounds"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial control systems engineer",
+    "use_case": "Implementing advanced process control in manufacturing facilities",
+    "integration_point": "Process control systems layer in manufacturing automation"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "096fa29440e29913f63c8d817b8aea435cfe299a22c22f12171df48f096f516e",
+    "output_hash": "e690bb67ed4be4c6ead4f1f05e595c521dd52cfffa7d2d8c619cc63dde3ae461",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "manufacturing"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-chemical_process-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Sliding Mode Control for Reactors",
+   "target_domain": "aerospace",
+   "source_domain": "chemical processing",
+   "domain_id": "chemical_process",
+   "pain_class": "Process Control",
+   "problem": "Instability in exothermic continuous stirred tank reactors due to nonlinear dynamics and parameter variations.",
+   "causal_chain": [
+    "Nonlinear reactor dynamics",
+    "parameter variations",
+    "control instability",
+    "safety risks",
+    "production losses"
+   ],
+   "unexploited_phenomenon": "Sliding mode control provides robust control for exothermic continuous stirred tank reactors by maintaining system trajectories on a predefined sliding surface.",
+   "intervention": "Implementation of sliding mode control algorithms for exothermic continuous stirred tank reactors",
+   "governing_variables": "Sliding surface parameters, control gain, system uncertainty, reaction kinetics",
+   "predicted_effect": "60-80% reduction in control error during parameter variations and 40-60% improvement in disturbance rejection",
+   "equations": [
+    "s = x - x_desired (sliding surface)",
+    "u = -K*sign(s) (control law) where K is control gain"
+   ],
+   "boundary_conditions": "Holds for systems with bounded uncertainties and measurable states; fails when system uncertainties exceed control authority or when states are unmeasurable",
+   "evidence_refs": [
+    "doi:10.23919/acc.1991.4791930"
+   ],
+   "cross_domain_transition": "chemical processing -> aerospace: Transfer sliding mode control from chemical reactors to aerospace systems where robust control is critical for safety",
+   "baseline": {
+    "baseline_incumbent": "PID control with fixed parameters",
+    "baseline_metric": "Control error (\u00b110-15% during parameter variations), disturbance rejection time (5-10 minutes)",
+    "candidate_metric": "Control error (\u00b12-5% during parameter variations), disturbance rejection time (1-2 minutes)",
+    "expected_delta": "70-90% reduction in control error, 80-90% reduction in disturbance rejection time"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale reactor simulation with sliding mode control implementation",
+    "decisive_uncertainty": "Whether the sliding mode approach can handle the extreme parameter variations encountered in aerospace applications",
+    "kill_condition": "Control error exceeds 10% during parameter variations or causes instability",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Chattering effects",
+     "detectability": "detectable via control signal analysis",
+     "mitigation": "mitigation by boundary layer modification"
+    },
+    {
+     "failure_mode": "State estimation errors",
+     "detectability": "detectable via residual analysis",
+     "mitigation": "mitigation by improved sensor placement"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Aerospace control systems engineer",
+    "use_case": "Implementing robust control in aerospace propulsion systems",
+    "integration_point": "Flight control systems in aerospace vehicles"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "096fa29440e29913f63c8d817b8aea435cfe299a22c22f12171df48f096f516e",
+    "output_hash": "e690bb67ed4be4c6ead4f1f05e595c521dd52cfffa7d2d8c619cc63dde3ae461",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "aerospace",
+     "reactor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-chemical_process-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Adaptive Reactor Control",
+   "target_domain": "automotive",
+   "source_domain": "chemical processing",
+   "domain_id": "chemical_process",
+   "pain_class": "Process Control",
+   "problem": "Nonlinear behavior in continuous stirred tank reactors leading to suboptimal control performance and product quality variations.",
+   "causal_chain": [
+    "Nonlinear reactor behavior",
+    "parameter variations",
+    "suboptimal control",
+    "product quality variations",
+    "increased waste and rework"
+   ],
+   "unexploited_phenomenon": "Nonlinear adaptive control that continuously adjusts control parameters to maintain optimal performance despite changing process conditions.",
+   "intervention": "Implementation of nonlinear adaptive control algorithms for continuous stirred tank reactors",
+   "governing_variables": "Adaptation gain, system parameters, reference trajectory, measurement noise",
+   "predicted_effect": "40-60% reduction in product quality variations and 30-50% improvement in control response time",
+   "equations": [
+    "\u03b8\u0302 = f(\u03b8\u0302_prev, e, u) (parameter estimation)",
+    "u = g(\u03b8\u0302, r) (control law) where \u03b8\u0302 is estimated parameter, e is error, u is control input, r is reference"
+   ],
+   "boundary_conditions": "Holds for systems with slowly varying parameters and measurable outputs; fails for systems with rapid parameter changes or unmeasurable critical states",
+   "evidence_refs": [
+    "doi:10.58837/chula.the.2007.1541",
+    "doi:10.17918/00008877",
+    "doi:10.17918/00010097"
+   ],
+   "cross_domain_transition": "chemical processing -> automotive: Transfer adaptive control from chemical reactors to automotive emission control systems where operating conditions vary widely",
+   "baseline": {
+    "baseline_incumbent": "Fixed-parameter PID control",
+    "baseline_metric": "Product quality variation (\u00b15-8%), control response time (3-5 minutes)",
+    "candidate_metric": "Product quality variation (\u00b12-3%), control response time (1-2 minutes)",
+    "expected_delta": "50-70% reduction in product quality variation, 60-80% improvement in control response time"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale reactor with adaptive control implementation under varying conditions",
+    "decisive_uncertainty": "Whether the adaptive approach can handle the rapid parameter changes encountered in automotive applications",
+    "kill_condition": "Product quality variation exceeds 4% or control response time exceeds 2.5 minutes",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Parameter drift",
+     "detectability": "detectable via performance monitoring",
+     "mitigation": "mitigation by parameter reset logic"
+    },
+    {
+     "failure_mode": "Control saturation",
+     "detectability": "detectable via actuator position monitoring",
+     "mitigation": "mitigation by anti-windup implementation"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive emissions control engineer",
+    "use_case": "Implementing adaptive control in catalytic converter systems",
+    "integration_point": "Engine control unit in automotive vehicles"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "096fa29440e29913f63c8d817b8aea435cfe299a22c22f12171df48f096f516e",
+    "output_hash": "e690bb67ed4be4c6ead4f1f05e595c521dd52cfffa7d2d8c619cc63dde3ae461",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "reactor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-chemical_process-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Continuous Flow Pharmaceutical Manufacturing",
+   "target_domain": "materials",
+   "source_domain": "pharmaceutical manufacturing",
+   "domain_id": "chemical_process",
+   "pain_class": "Process Intensification",
+   "problem": "Batch processing limitations in pharmaceutical manufacturing leading to high costs and inconsistent product quality.",
+   "causal_chain": [
+    "Batch processing limitations",
+    "high facility costs",
+    "long production times",
+    "inconsistent product quality",
+    "increased manufacturing uncertainty"
+   ],
+   "unexploited_phenomenon": "Continuous flow technology in pharmaceutical manufacturing that enables more efficient, scalable, and affordable manufacturing processes.",
+   "intervention": "Implementation of continuous flow technology for pharmaceutical synthesis and formulation",
+   "governing_variables": "Flow rate, residence time, mixing efficiency, temperature control, reaction kinetics",
+   "predicted_effect": "50-70% reduction in facility footprint and 40-60% decrease in production cycle time",
+   "equations": [
+    "Productivity = k \u00d7 F \u00d7 C where k is process constant, F is flow rate, C is concentration",
+    "Facility \u221d 1/Productivity"
+   ],
+   "boundary_conditions": "Holds for stable chemical reactions with well-defined kinetics; fails for reactions requiring precise batch timing or complex purification steps",
+   "evidence_refs": [
+    "doi:10.1021/acs.oprd.5c00309"
+   ],
+   "cross_domain_transition": "pharmaceutical manufacturing -> materials: Transfer continuous flow processing from pharmaceuticals to advanced material synthesis",
+   "baseline": {
+    "baseline_incumbent": "Batch processing with fixed facility footprint and long cycle times",
+    "baseline_metric": "Facility utilization rate (20-30%), production cycle time (5-7 days)",
+    "candidate_metric": "70-90% facility utilization rate, 2-3 day production cycle time",
+    "expected_delta": "150-250% improvement in facility utilization, 50-70% reduction in cycle time"
+   },
+   "killer_experiment": {
+    "experiment": "Pilot-scale continuous flow reactor with parallel batch processing comparison",
+    "decisive_uncertainty": "Whether continuous flow processing maintains material properties while increasing throughput",
+    "kill_condition": ">5% reduction in material quality or yield compared to batch processing",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Flow channel fouling",
+     "detectability": "detectable via pressure monitoring",
+     "mitigation": "mitigation by surface treatment"
+    },
+    {
+     "failure_mode": "Reaction inhomogeneity",
+     "detectability": "detectable via product sampling",
+     "mitigation": "mitigation by improved mixing design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Materials synthesis engineer",
+    "use_case": "Scaling up advanced material production while reducing costs",
+    "integration_point": "Synthesis and processing lines in material manufacturing"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "096fa29440e29913f63c8d817b8aea435cfe299a22c22f12171df48f096f516e",
+    "output_hash": "e690bb67ed4be4c6ead4f1f05e595c521dd52cfffa7d2d8c619cc63dde3ae461",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": true,
+    "verdict": "EXCLUDED_MEDICAL",
+    "matched_medical_terms": [
+     "stent"
+    ],
+    "matched_non_medical_terms": [
+     "manufacturing"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "strong medical-application markers in the target fields without substantial non-medical target context"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-chemical_process-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Surfactant-Mediated Polymerization",
+   "target_domain": "environmental",
+   "source_domain": "chemical processing",
+   "domain_id": "chemical_process",
+   "pain_class": "Process Chemistry",
+   "problem": "Inefficient polymerization processes leading to high costs and environmental impact.",
+   "causal_chain": [
+    "Inefficient polymerization",
+    "high reagent consumption",
+    "increased waste",
+    "higher environmental impact",
+    "increased processing costs"
+   ],
+   "unexploited_phenomenon": "Admicellar polymerization in continuous stirred tank reactors using nonionic surfactants to enhance reaction efficiency.",
+   "intervention": "Implementation of admicellar polymerization with nonionic surfactants in continuous stirred tank reactors",
+   "governing_variables": "Surfactant concentration, reaction temperature, mixing intensity, monomer concentration",
+   "predicted_effect": "30-50% reduction in reagent consumption and 40-60% decrease in waste generation",
+   "equations": [
+    "Conversion = f(Surf, T, [M]) where Surf is surfactant concentration, T is temperature, [M] is monomer concentration",
+    "Waste \u221d (1 - Conversion)"
+   ],
+   "boundary_conditions": "Holds for hydrophobic monomers in aqueous systems; fails for highly polar monomers or incompatible surfactants",
+   "evidence_refs": [
+    "doi:10.58837/chula.the.2004.2025"
+   ],
+   "cross_domain_transition": "chemical processing -> environmental: Transfer admicellar polymerization from general chemical processes to environmental remediation",
+   "baseline": {
+    "baseline_incumbent": "Conventional polymerization with high reagent consumption",
+    "baseline_metric": "Reagent utilization efficiency (40-60%), waste generation (50-70% of input mass)",
+    "candidate_metric": "Reagent utilization efficiency (70-90%), waste generation (20-40% of input mass)",
+    "expected_delta": "50-100% improvement in reagent utilization, 40-70% reduction in waste generation"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale continuous stirred tank reactor with admicellar polymerization setup",
+    "decisive_uncertainty": "Whether the admicellar approach maintains efficiency at industrial scale",
+    "kill_condition": "Reagent utilization efficiency <65% or waste generation >45% of input mass",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Surfactant degradation",
+     "detectability": "detectable via surface tension measurement",
+     "mitigation": "mitigation by temperature control"
+    },
+    {
+     "failure_mode": "Emulsion instability",
+     "detectability": "detectable via phase separation observation",
+     "mitigation": "mitigation by surfactant blend optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Environmental remediation engineer",
+    "use_case": "Implementing efficient polymerization processes for waste treatment",
+    "integration_point": "Waste treatment facilities in industrial plants"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "096fa29440e29913f63c8d817b8aea435cfe299a22c22f12171df48f096f516e",
+    "output_hash": "e690bb67ed4be4c6ead4f1f05e595c521dd52cfffa7d2d8c619cc63dde3ae461",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "reactor",
+     "polymer"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  }
+ ],
+ "rejected": [
+  {
+   "candidate_id": "C-chemical_process-4",
+   "reasons": [
+    "missing field UNEXPLOITED_PHENOMENON",
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-chemical_process-8",
+   "reasons": [
+    "missing field PAIN_CLASS",
+    "missing field PROBLEM",
+    "missing field CAUSAL_CHAIN",
+    "missing field UNEXPLOITED_PHENOMENON",
+    "missing field INTERVENTION",
+    "missing field GOVERNING_VARIABLES",
+    "missing field PREDICTED_EFFECT",
+    "missing field EQUATIONS",
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-chemical_process-4",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-chemical_process-5",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-chemical_process-6",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-chemical_process-7",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-chemical_process-8",
+   "reasons": [
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-chemical_process-8",
+   "reasons": [
+    "missing field INTERVENTION",
+    "missing field GOVERNING_VARIABLES",
+    "missing field PREDICTED_EFFECT",
+    "missing field EQUATIONS",
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-chemical_process-8",
+   "reasons": [
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  }
+ ],
+ "pool_sha256": "23faa855a0602d79f621c71a142511c7a989a4678fa3fdc70ad94831b46d970b"
+}

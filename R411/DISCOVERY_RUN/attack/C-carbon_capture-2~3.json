@@ -1,0 +1,75 @@
+{
+ "attack_version": "R411-ATTACK-V1",
+ "candidate_id": "C-carbon_capture-2~3",
+ "status": "OK",
+ "attacker_provider": "openrouter",
+ "attacker_model": "minimax/minimax-m3:free",
+ "generator_provider": "zai",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "surfaces": {
+  "mechanism": {
+   "attack": "The chain claims \"no requirement for extraneous energy input\" for converting CO2 into CaCO3 via glycine. This is thermodynamically dishonest. Forming CaCO3 from CO2 requires a cation source (Ca2+) and a base. Glycine (pKa1 \u2248 2.35, pKa2 \u2248 9.78) at flue-gas pH acts as a buffer but is not a Ca2+ source. The candidate silently assumes an external calcium supply (lime milk, Ca(OH)2, or dissolved Ca2+). Producing, dissolving, or pumping that Ca2+ stream, plus subsequent calcination if CaCO3 is to be sequestered rather than wasted, dominates the energy balance. The \"no extraneous energy\" claim collapses unless CaCO3 is the terminal product (i.e., permanently sequestered), in which case Ca2+ must still be replenished and slurry handling energy is non-zero. The cited prior art (doi:10.1016/j.enconman.2024.118955; doi:10.3390/ma19142934) shows that downstream acid drop-out and product handling routinely erase claimed capture-energy savings. Also, CO2 dissolution into aqueous glycine is not spontaneous against a 10\u201315% CO2 partial pressure without gas-liquid contacting equipment whose pumping work scales with volumetric flow \u2014 that work is \"extraneous energy input,\" contradicting the mechanism chain literally.",
+   "verdict": "KILL",
+   "basis": "Thermodynamics of CaCO3 precipitation requires a Ca2+ source not provided by glycine; contacting gas with aqueous sorbent requires pumping work that the chain explicitly denies. Glycine pKa values (2.35, 9.78) show it functions as a buffer, not a net hydroxide generator at flue-gas pH."
+  },
+  "unexploited_phenomenon": {
+   "attack": "The claim that amino acids \"can directly convert CO2 from power plant flue gas into CaCO3 nanoparticles without requiring additional energy input\" is not a new phenomenon. Amino-acid-promoted carbonation of Ca-bearing minerals and the use of amino-acid buffers in CO2 absorption have been studied for over a decade. doi:10.3390/molecules30143048 (nanomaterials/DAC review) and the thermogravimetric sorbent work doi:10.1109/iecec.1990.748050 establish that the underlying sorption phenomena are prior art. The novelty is reduced to \"glycine instead of generic amino acid,\" which is an obvious-to-one-skilled-in-the-art substitution given known glycine-CaCO3 biomineralization chemistry.",
+   "verdict": "WOUND",
+   "basis": "doi:10.3390/molecules30143048 already catalogs sorbent-mediated CO2 capture; glycine-mediated CaCO3 precipitation is well-established biomineralization chemistry, leaving only a routine substitution as the \"unexploited\" element."
+  },
+  "intervention": {
+   "attack": "\"Integration into existing flue gas cleanup trains\" presupposes (1) an on-site Ca2+ supply, (2) a wet scrubber already present, and (3) tolerance of the existing train to nanoparticle-bearing slurry. Most industrial flue gas trains are dry or semi-dry (e.g., ESP + wet FGD for SOx, not CO2). Adding glycine wet contact requires a new contactor, slurry handling, and a Ca2+ feed system \u2014 none of which \"integrates\" without capital and energy expenditure comparable to a packed MEA column. doi:10.1016/j.enconman.2007.06.007 shows that even optimized vacuum-swing adsorption trains require substantial parasitic power; the intervention does not bypass that fundamental contacting cost.",
+   "verdict": "WOUND",
+   "basis": "Existing flue gas cleanup trains target SOx/particulates, not CO2; integrating aqueous glycine contact requires new contactor and Ca2+ feed infrastructure not present in cited baseline."
+  },
+  "predicted_effect": {
+   "attack": "\"70\u201390% reduction in energy consumption for CO2 capture by eliminating thermal regeneration requirements\" is compared only against thermal MEA regeneration (~3.0\u20134.0 GJ/ton CO2). But (a) advanced amine systems, membrane contactors, and piperazine already claim 30\u201350% reductions; (b) the candidate ignores pumping, compression, and Ca2+ reagent energy; (c) the 70\u201390% figure has no cited source \u2014 it appears nowhere in the evidence record doi:10.1016/j.jece.2025.120601 title provided. A range that spans a factor of 1.29\u00d7 with no defined basis is a marketing number, not an engineering prediction.",
+   "verdict": "KILL",
+   "basis": "No quantitative basis in the cited evidence record for the 70\u201390% figure; comparison is selectively against worst-case MEA while ignoring reagent pumping, Ca2+ supply, and slurry handling energy; competing post-combustion systems (membranes, advanced amines) erode the claimed delta."
+  },
+  "equations": {
+   "attack": "The \"Conversion efficiency\" equation is trivial mole bookkeeping and proves nothing about energy. The \"Energy saving = Energy_regeneration \u2212 Energy_mixing\" equation is malformed: it subtracts mixing energy from regeneration energy and ignores pumping, compression, sensible heat, latent heat of water vapor, Ca2+ reagent enthalpy, and downstream separation. Mixing a gas into liquid at 10\u201315% CO2 also requires compression or fan work to overcome scrubber pressure drop, which the equation silently excludes. This is a two-term subtraction dressed as an energy balance.",
+   "verdict": "KILL",
+   "basis": "\"Energy saving = Energy_regeneration \u2212 Energy_mixing\" omits compression/fan work, reagent enthalpy, slurry handling, and water evaporation terms that dominate real CO2 capture energy balances; an incomplete energy balance is not an equation, it is an omission."
+  },
+  "boundary_conditions": {
+   "attack": "The candidate admits \"limited by impurities in flue gas that may interfere with reaction\" but does not quantify. Real flue gas contains SOx (100s\u20131000s ppm), NOx, HCl, HF, fly ash, and trace heavy metals. Glycine reacts with SO2/HCl to form glycinium salts, consuming sorbent and generating degradation products. doi:10.3390/ma19142934 (acid drop-out review) directly documents how acidic flue gas components disrupt sorbent systems and erode capture performance. The 10\u201315% CO2 boundary also assumes dry, O2-free, SOx-free gas, which is not available from coal flue gas (~12\u201314% CO2, ~800 ppm SO2 for a sub-bituminous plant).",
+   "verdict": "KILL",
+   "basis": "SO2 at typical coal-flue-gas concentrations (\u2265400 ppm) protonates glycine (pKa2 = 9.78) and forms heat-stable salts, sorbent loss, and degradation products documented in doi:10.3390/ma19142934; no impurity tolerance specification is provided."
+  },
+  "evidence": {
+   "attack": "The single evidence record is doi:10.1016/j.jece.2025.120601, titled \"Conversion of CO2 from Power Plant into CaCO3 Nanoparticles.\" A single paper, with no independent replication cited, no scale-up data, no impurity challenge, and no energy audit, is the entire evidentiary basis for a claimed 70\u201390% energy reduction at industrial scale. The title also suggests the work is a nanoparticle synthesis demonstration, not an integrated flue-gas capture engineering study. No field data, no pilot, no TEA.",
+   "verdict": "KILL",
+   "basis": "One journal article with no independent replication, no pilot/field data, and no techno-economic analysis is the sole evidence for a 70\u201390% energy-reduction claim at industrial scale; the title indicates a synthesis paper, not an integrated capture engineering study."
+  },
+  "prior_art": {
+   "attack": "doi:10.1021/acs.energyfuels.5c04026 (INITIATE Process) describes industrial symbiosis between steel and urea plants where CO2 is converted using amine/amino-acid chemistry into solid carbonate products. doi:10.3390/molecules30143048 covers nanomaterials (including CaCO3 nanoparticles) for CO2 capture. The combination teaches: (a) amine/amino-acid conversion of CO2 from flue gas, (b) CaCO3 nanoparticle product, and (c) industrial integration considerations. The candidate's only differentiator is \"glycine specifically,\" which is a trivial substitution within an amino-acid class already known to perform this function.",
+   "verdict": "KILL",
+   "basis": "doi:10.1021/acs.energyfuels.5c04026 teaches amine/amino-acid CO2 conversion with solid carbonate product at industrial scale; doi:10.3390/molecules30143048 teaches CaCO3-nanoparticle CO2 capture; combined, they anticipate every element of the candidate's mechanism+intervention+effect."
+  },
+  "experiment_design": {
+   "attack": "The \"killer experiment\" specifies a lab-scale continuous flow reactor with \"real flue gas feed\" and a kill condition of <50% CO2 conversion. This is insufficient. A lab-scale reactor with synthetic flue gas (even if labeled \"real\") will not reproduce (i) multi-week sorbent degradation, (ii) trace impurity accumulation, (iii) nanoparticle fouling of contactors, (iv) realistic gas-liquid residence time distributions at industrial L/G ratios, or (v) Ca2+ reagent cost at scale. Furthermore, \"less than 50% conversion\" as a single kill threshold is generous \u2014 modern MEA achieves >90% conversion, so a glycine system at <50% is dead on arrival without addressing why it would even reach 50%. The experiment cannot falsify the 70\u201390% energy claim because energy consumption is not measured with the specified kill threshold.",
+   "verdict": "KILL",
+   "basis": "The defined experiment measures only conversion efficiency against a 50% threshold but does not measure energy consumption with any kill threshold, so the central 70\u201390% energy-reduction claim is unfalsifiable by the proposed killer experiment."
+  }
+ },
+ "kill_surfaces": [
+  "mechanism",
+  "predicted_effect",
+  "equations",
+  "boundary_conditions",
+  "evidence",
+  "prior_art",
+  "experiment_design"
+ ],
+ "wound_surfaces": [
+  "unexploited_phenomenon",
+  "intervention"
+ ],
+ "final_objection": "KILLED. The single most dangerous surviving objection is the prior-art overlap: doi:10.1021/acs.energyfuels.5c04026 already teaches amino-acid-mediated CO2 conversion to solid carbonate at industrial scale, reducing the candidate to a routine glycine-for-generic-amino-acid substitution that cannot sustain a defensible novelty or freedom-to-operate position.",
+ "prompt_hash": "3f6ac4dda11381cca1a348c01fa54f38f430355972b6a6a55e289cc5ecb008c4",
+ "output_hash": "909f9e3618b40a5c5d6bda8684a34165980bcf308e0eef795f994f5c79361a9c",
+ "survived": false,
+ "verdict": "KILLED"
+}

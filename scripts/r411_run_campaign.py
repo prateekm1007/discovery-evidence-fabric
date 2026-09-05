@@ -10,6 +10,8 @@ Stages (resumable; each invocation processes work units and checkpoints):
     extraction [n]  F2: n domain LLM extractions (default 3)
     collision       F3
     scoring         F4
+    evidence [n]    F4a: n verifier-side evidence resolutions (default 4)
+    rescore         F4b(v2): re-score resolved candidates (same anchors+floor)
     shortlist       F4b
     priorart [n]    F5: n finalist prior-art searches (default 2)
     calibrate       F7a: attacker calibration
@@ -39,6 +41,40 @@ from discovery_fabric.engine.adapters import load_credentials  # noqa: E402
 
 load_credentials()
 
+# ---------------------------------------------------------------------------
+# R411 LLM transport pin (operator-override class, R391 — recorded, never
+# silent; travels in every call meta as engine_llm_provider_pin + model).
+#
+# Owner directive 2026-09-05: "try free models" on the OpenRouter free-model
+# collection (key delivered via .env.keys OPENROUTER_API_KEY, gitignored +
+# secret-scan enforced). LIVE-MEASURED at wiring time (Art. III):
+#   - thinkingmachines/inkling:free + inkling-small:free -> HTTP 403
+#     "only available on agentic harnesses" — honestly recorded as
+#     UNAVAILABLE_TO_THIS_HARNESS (app-identity spoofing NOT attempted);
+#   - z-ai/glm-5.2:free -> HTTP 429 upstream (shared free pool), retried,
+#     still limited at wiring time;
+#   - nvidia/nemotron-3-super-120b-a12b:free -> 200 but REASONING LEAKS
+#     into content (claims 0/4 parsed on the A/B probe; the frozen
+#     FIELD-line protocol must not be changed mid-run to chase a model);
+#   - nvidia/nemotron-3.5-lightning:free -> 200 but leaks "Here's a
+#     thinking process:" into content (55 parse failures);
+#   - minimax/minimax-m3:free -> 200, 2.9 s average on the REAL resolve
+#     prompt, 4/4 claim lines, 8/10 reference bindings recovered vs the
+#     recorded glm-4-plus proposer -> OPERATIVE free model for this
+#     campaign's LLM stages.
+# The incumbent transports measured UNHEALTHY at resume time (zai gateway
+# shared-upstream quota still rate-limited; tokenrouter z-ai/glm-5.3-free
+# 30 s -> empty content). E1 credential independence by design.
+#
+# Epistemic note: the F4a verifier is the DETERMINISTIC span gate (frozen);
+# the LLM is an untrusted quoting transport recorded per call. The
+# proposer transition glm-4-plus/glm-5.3-free -> minimax-m3 is disclosed in
+# the run record with per-model admission rates.
+# ---------------------------------------------------------------------------
+os.environ.setdefault("ENGINE_LLM_PROVIDER", "openrouter")
+os.environ.setdefault("OPENROUTER_MODEL", "minimax/minimax-m3:free")
+os.environ.setdefault("R411_LLM_PACE_SECONDS", "3.0")
+
 from discovery_fabric.r411 import Campaign  # noqa: E402
 from discovery_fabric.r411.campaign import (  # noqa: E402
     CAMPAIGN_VERSION, DEFAULT_RUN_DIR)
@@ -62,6 +98,27 @@ def main() -> int:
     stage = sys.argv[1] if len(sys.argv) > 1 else "status"
     limit = int(sys.argv[2]) if len(sys.argv) > 2 else None
     c = Campaign(REPO)
+
+    # one-time state disclosure of the operator transport pin (the pin
+    # itself is env-level and travels per call; this makes the run record
+    # self-describing about the mid-run transport transition)
+    pin_note = {
+        "pin": "ENGINE_LLM_PROVIDER=openrouter",
+        "model_override": "OPENROUTER_MODEL=minimax/minimax-m3:free",
+        "reason": ("owner directive 2026-09-05 'try free models' (OpenRouter "
+                   "free-model collection, key via .env.keys); incumbent "
+                   "transports unhealthy at resume (zai shared-upstream "
+                   "rate-limit; tokenrouter empty-content 30s); minimax-m3 "
+                   "live-measured 2.9s avg, 4/4 claim lines, 8/10 reference "
+                   "bindings vs glm-4-plus proposer; inkling 403 "
+                   "agentic-harness-gated (not spoofed); glm-5.2:free 429 "
+                   "upstream; nemotron variants leak reasoning into content"),
+        "epistemic_class": "transport_only",
+        "recorded_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    }
+    if c.state.get("llm_transport_pin") is None:
+        c.state["llm_transport_pin"] = pin_note
+        c.save()
 
     if stage == "status":
         print(json.dumps(c.state, indent=1))
@@ -122,6 +179,37 @@ def main() -> int:
         res = c.run_scoring()
         print(f"F4 done: {res['n']} scored; "
               f"{c.state['scoring_counts']}")
+        return 0
+
+    if stage == "evidence":
+        n = limit or 4
+
+        def work():
+            res = c.run_evidence_resolution(n)
+            print(f"F4a batch: {res['processed']} resolved this batch; "
+                  f"subset={res['subset_size']}, "
+                  f"resolved_total={res['resolved_total']}")
+        return _with_gateway(work) or 0
+
+    if stage == "evidenceall":
+        # mid-run correction (recorded): complete the measurement over
+        # the full pool, then resolve n candidates per invocation
+        n = limit or 20
+        if c.state.get("evidence_subset_mode") != "FULL_POOL":
+            c.extend_evidence_resolution_to_full_pool()
+            print("F4a mode -> FULL_POOL (correction recorded in state)")
+
+        def work():
+            res = c.run_evidence_resolution(n)
+            print(f"F4a batch: {res['processed']} resolved this batch; "
+                  f"pool={res['subset_size']}, "
+                  f"resolved_total={res['resolved_total']}")
+        return _with_gateway(work) or 0
+
+    if stage == "rescore":
+        res = c.run_scoring_v2()
+        print(f"F4b(v2) done: {res['n_rescored']} re-scored on verified "
+              f"evidence; {c.state['scoring_counts_v2']}")
         return 0
 
     if stage == "shortlist":
@@ -253,9 +341,12 @@ def _do_dossiers(c: Campaign) -> int:
 
 def _append_cemetery(c: Campaign, sel: dict) -> None:
     """Killed candidates -> MECHANISM_CEMETERY with rejection reasons
-    (s14; the chain extension is the orchestrator's own machinery)."""
+    (s14; the chain extension is the orchestrator's own machinery).
+    Entries are CemeteryEntry DATACLASSES — the append API hashes them
+    into the cemetery's internal chain (Art. LXII); passing plain dicts
+    raises (the R410 import-closure work moved asdict into the API)."""
     from orchestrator.mechanism_cemetery import (
-        append_entries_to_cemetery_file)
+        CemeteryEntry, append_entries_to_cemetery_file)
     entries = []
     for r in sel.get("rejected") or []:
         cand = None
@@ -275,29 +366,30 @@ def _append_cemetery(c: Campaign, sel: dict) -> None:
             # are recorded in the run record (a quota rejection is not a
             # mechanism-death — putting it in the cemetery would poison
             # future search with non-failures)
-        entries.append({
-            "territory_id": f"r411:{r['candidate_id']}",
-            "mechanism_name": cand.get("technology_name") or
-                              r["candidate_id"],
-            "proposed_version": CAMPAIGN_VERSION,
-            "killed_at_version": CAMPAIGN_VERSION,
-            "kill_reason": str(r.get("reason"))[:300],
-            "what_was_proposed": " -> ".join(
+        entries.append(CemeteryEntry(
+            entry_id=f"cem:r411:{r['candidate_id']}",
+            territory_id=f"r411:{r['candidate_id']}",
+            mechanism_name=cand.get("technology_name") or
+                           r["candidate_id"],
+            proposed_version=CAMPAIGN_VERSION,
+            killed_at_version=CAMPAIGN_VERSION,
+            kill_reason=("ATTACK_KILL: " + str(r.get("reason"))[:280]),
+            what_was_proposed=" -> ".join(
                 cand.get("causal_chain") or [])[:500],
-            "why_it_failed": str(
+            why_it_failed=str(
                 (funnel.get("attack") or {}).get("final_objection") or
                 r.get("reason"))[:500],
-            "reusable_lesson": (
+            reusable_lesson=(
                 "R411 attacker tournament: this causal configuration did "
                 "not survive adversarial attack; future generation must "
                 "address the recorded objection before re-proposing"),
-            "what_to_avoid": str(
+            what_to_avoid=str(
                 (funnel.get("attack") or {}).get("kill_surfaces"))[:300],
-            "physical_constraint": "",
-            "evidence_sources": [str(x) for x in
-                                 (cand.get("evidence_refs") or [])][:8],
-            "epistemic_class": "FAILURE_LESSON",
-        })
+            physical_constraint="",
+            evidence_sources=[str(x) for x in
+                              (cand.get("evidence_refs") or [])][:8],
+            epistemic_class="FAILURE_LESSON",
+        ))
     if entries:
         append_entries_to_cemetery_file(entries)
     print(f"cemetery: {len(entries)} entries appended "

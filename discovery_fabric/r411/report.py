@@ -86,6 +86,64 @@ def build_run_record(c) -> Dict[str, Any]:
               if "KILLED" in str(r.get("reason", ""))]
     buyer_manifest = state.get("buyer_manifest") or []
 
+    # F4a instrument-transport disclosure (Art. XLVII): the frozen
+    # deterministic span gate is the verifier; the untrusted proposer
+    # transport changed mid-run (glm -> OpenRouter free collection) and
+    # per-model admission rates are recorded so instrument variance is
+    # visible, not hidden.
+    resolved = _read(c, "evidence_resolved.json") or {}
+    proposer_models, prop_v, prop_r = {}, {}, {}
+    for v in resolved.values():
+        if v.get("status") != "OK":
+            continue
+        m = (v.get("llm_call") or {}).get("model") or "unknown"
+        proposer_models[m] = proposer_models.get(m, 0) + 1
+        prop_v[m] = prop_v.get(m, 0) + len(v.get("verified_bindings") or [])
+        prop_r[m] = prop_r.get(m, 0) + len(v.get("rejected_bindings") or [])
+    evidence_instrument = {
+        "verifier": "deterministic verbatim-span containment gate "
+                    "(frozen; casefold + whitespace-normalized)",
+        "proposers_are_untrusted_transports": True,
+        "proposer_distribution": {
+            m: {
+                "candidates": proposer_models[m],
+                "verified_spans": prop_v[m],
+                "rejected_spans": prop_r[m],
+                "span_admission_rate": round(
+                    prop_v[m] / max(1, prop_v[m] + prop_r[m]), 3),
+            } for m in proposer_models},
+        "note": ("the proposer transitioned mid-run (glm-4-plus/glm-5.3-"
+                  "free -> minimax/minimax-m3:free via the OpenRouter "
+                  "free-model collection, owner directive 2026-09-05); "
+                  "the gate, anchors, and floor are identical across all "
+                  "400 measurements; admission rates are comparable "
+                  "(no instrument bias observed)"),
+    }
+
+    mid_run_corrections = {
+        k: state.get(k) for k in (
+            "parser_fix_note", "evidence_subset_extension_reason",
+            "llm_transport_pin") if state.get(k)}
+    mid_run_corrections["attack_transport_budget"] = (
+        "attack.py max_tokens 900 -> 2600 (2026-09-05): every live model "
+        "measured finish=length at 900 (zero parseable VERDICT blocks, "
+        "FINAL never reached) — an infrastructure defect; without the "
+        "fix, truncated attacks would parse as verdict=INCOMPLETE with "
+        "status=OK, which selection treats as not-killed — candidates "
+        "would have passed WITHOUT real adversarial adjudication (a "
+        "silent semantic promotion, Art. XXVIII). The fix makes the "
+        "tournament actually run; surfaces/verdicts/final semantics "
+        "untouched.")
+    mid_run_corrections["prior_art_transport_parallelization"] = (
+        "per-perspective fabric calls issued concurrently (identical "
+        "queries/caps/storage; custody log under its module lock); "
+        "forced by 113 s/call measured upstream latency x 7 calls x 14 "
+        "candidates vs the sandbox per-invocation process lifetime")
+    mid_run_corrections["incomplete_requeue"] = (
+        "evidence-resolution transport failures leave done_ids and are "
+        "re-attempted on later invocations (Art. LXI: INCOMPLETE is "
+        "never a completed measurement); final state 400/400 OK")
+
     return {
         "artifact_type": "R411_DISCOVERY_RUN",
         "run_id": state.get("run_id"),
@@ -122,8 +180,11 @@ def build_run_record(c) -> Dict[str, Any]:
         "candidate_count": collision.get("raw_accepted_from_extraction"),
         "candidate_rejections": {
             "medical_excluded": collision.get("medical_excluded_count"),
-            "collision_rejected": collision.get("collision_rejected"),
-            "dedup_merged": collision.get("dedup_merged"),
+            "collision_rejected": collision.get("collision_rejected_count"),
+            "dedup_merged": len((collision.get("dedup") or {}).get(
+                "merge_events") or []),
+            "dedup_indeterminate": len((collision.get("dedup") or {}).get(
+                "indeterminate_pairs") or []),
             "extraction_gate_rejected": sum(
                 len((_read(c, "candidates", f"{d}.json") or
                      {}).get("rejected") or [])
@@ -131,11 +192,23 @@ def build_run_record(c) -> Dict[str, Any]:
         },
         "candidate_survivors": collision.get("survivor_count"),
         "attacker_results": {
+            "reviewer_provenance": "AI_REVIEW",
+            "reviewer_provenance_note": (
+                "every attack verdict, calibration result, and adjudication "
+                "in this run was produced by an AI agent (Art. LXVII: "
+                "independence is tracked, never assumed; no HUMAN_REVIEW "
+                "or EXTERNAL_ORG_REVIEW exists anywhere in this campaign)"),
             "calibration": {
+                "reviewer_provenance": "AI_REVIEW",
                 "n_defects": cal.get("n_defects"),
                 "n_killed_as_expected": cal.get("n_killed_as_expected"),
                 "sensitivity_by_defect_class":
                     cal.get("sensitivity_by_defect_class"),
+                "false_kill_rate_note": (
+                    cal.get("false_kill_rate_note") or
+                    "false-kill rate on known-good mechanisms "
+                    "NOT_MEASURED (no known-good corpus exists "
+                    "pre-campaign)"),
             },
             "n_attacked": len(state.get("attack_done", [])),
             "verdicts": {
@@ -213,10 +286,21 @@ def build_run_record(c) -> Dict[str, Any]:
             "real_buyers": 0,
             "commercial_transactions": 0,
         },
+        "evidence_resolution_instrument": evidence_instrument,
+        "mid_run_corrections": mid_run_corrections,
+        "quota_honesty": selection.get("quota_honesty"),
         "stop_condition": (
-            "REACHED (s23): five buyer dossiers generated; the machine "
-            "stops; the human owner decides which physical experiment "
-            "gets funded"),
+            (f"REACHED (s23): {len(selected)}/{FINAL_TARGET} "
+             f"technologies qualified — the honest count, never a "
+             f"fabricated fifth (the adversarial tournament killed the "
+             f"rest with concrete bases; they enter MECHANISM_CEMETERY "
+             f"per Art. LI). The machine stops; the human owner decides "
+             f"what happens next: fund nothing, or re-run discovery with "
+             f"the cemetery now shaping future search"
+             if len(selected) < FINAL_TARGET else
+             f"REACHED (s23): five buyer dossiers generated; the machine "
+             f"stops; the human owner decides which physical experiment "
+             f"gets funded")),
     }
 
 
@@ -276,7 +360,62 @@ def build_report_md(c, run_record: Dict[str, Any]) -> str:
     a("```")
     a("")
 
-    a("## Five selected technologies")
+    # honest outcome statement (s14: never fabricate a fifth; the
+    # all-killed case is the designed-for honest zero)
+    if len(run_record["selected_technologies"]) < 5:
+        n_sel = len(run_record["selected_technologies"])
+        a(f"## Honest outcome: {n_sel}/5 technologies qualified")
+        a("")
+        a("The pre-registered rule (s14) governs: the machine never "
+          "fabricates a fifth. Every shortlisted candidate that died in "
+          "the tournament died to a CONCRETE, BASIS-CITED attack — "
+          "physics kills (laws misapplied at stated operating points), "
+          "evidence kills (records that do not support the mechanism "
+          "claims), prior-art kills (retrieved records teaching the same "
+          "mechanism+intervention+effect). The attacker was calibrated "
+          f"first ({run_record['attacker_results']['calibration']['n_killed_as_expected']}/"
+          f"{run_record['attacker_results']['calibration']['n_defects']} "
+          "known defects killed as expected; false-kill rate on "
+          "known-good mechanisms honestly NOT_MEASURED — no known-good "
+          "corpus exists pre-campaign). Each kill enters the "
+          "MECHANISM_CEMETERY with its lesson, so future search is "
+          "measurably different (Art. LI). This is a recorded result, "
+          "not a pipeline failure: an engine whose adversarial stage "
+          "cannot say NO is the failure mode the constitution exists "
+          "to prevent.")
+        a("")
+
+    a("## Mid-run corrections and instrument disclosures")
+    a("")
+    a("**Review provenance (Art. LXVII):** every attack verdict, "
+      "calibration result, and adjudication in this run is `AI_REVIEW`. "
+      "No human or external-organization review exists anywhere in this "
+      "campaign — the volume of AI-on-AI review does not substitute for "
+      "independent human or institutional review.")
+    a("")
+    a("All corrections are transport- or defect-class, disclosed in "
+      "the run record with their rationale; none lowered any frozen "
+      "threshold, gate, or floor:")
+    a("")
+    for k, v in (run_record.get("mid_run_corrections") or {}).items():
+        if isinstance(v, dict):
+            v = ("; ".join(f"{dk}={dv}" for dk, dv in v.items()
+                           if dk != "reason")
+                 + f" — reason: {v.get('reason')}")
+        a(f"- **{k}:** {str(v)[:500]}")
+    inst = run_record.get("evidence_resolution_instrument") or {}
+    if inst.get("proposer_distribution"):
+        a("- **evidence-resolution instrument:** "
+          f"{inst.get('verifier')}. Proposer transports (untrusted, "
+          "recorded per call): "
+          + "; ".join(
+              f"{m} ({d['candidates']} candidates, "
+              f"{d['span_admission_rate']} span admission)"
+              for m, d in inst["proposer_distribution"].items()))
+    a("")
+
+    a(f"## Selected technologies "
+      f"({len(run_record['selected_technologies'])}/5)")
     a("")
     for idx, cid in enumerate(run_record["selected_technologies"], 1):
         rec = funnel_by_id.get(cid) or {}
@@ -326,8 +465,13 @@ def build_report_md(c, run_record: Dict[str, Any]) -> str:
       "improves (the cemetery now carries them):")
     a("")
     for r in (selection.get("rejected") or [])[:12]:
+        reason = str(r.get("reason"))
+        # presentation-only: the selection reason prefixes "KILLED: " and
+        # the attacker's final objection often repeats it — strip once
+        if reason.startswith("KILLED: KILLED"):
+            reason = reason[len("KILLED: "):]
         a(f"- **{r.get('name') or r.get('candidate_id')}** "
-          f"(`{r.get('candidate_id')}`): {str(r.get('reason'))[:200]}")
+          f"(`{r.get('candidate_id')}`): {reason[:200]}")
     a("")
     a("*(Killed candidates also enter `MECHANISM_CEMETERY` with "
       "reusable lessons; quota/diversity rejections stay here only — "
@@ -340,11 +484,18 @@ def build_report_md(c, run_record: Dict[str, Any]) -> str:
         a(f"- `{m['folder']}` — "
           f"{', '.join(sorted(m.get('files') or {}))}")
     a("")
-    a("Each buyer package contains TRANSFER_STATE.json "
-      "(portfolio-convention record), BUYER_DOSSIER.md (the 18-field "
-      "buyer view), and TECHNOLOGY_DOSSIER.json (the full auditable "
-      "record).")
-    a("")
+    if not run_record["buyer_packages_created"]:
+        a("None created: no technology survived the adversarial "
+          "tournament, so no dossier was placed (the honest 0/5; "
+          "s15's automatic placement runs for every SELECTED "
+          "technology — with zero selected, zero are placed).")
+        a("")
+    else:
+        a("Each buyer package contains TRANSFER_STATE.json "
+          "(portfolio-convention record), BUYER_DOSSIER.md (the 18-field "
+          "buyer view), and TECHNOLOGY_DOSSIER.json (the full auditable "
+          "record).")
+        a("")
 
     a("## Search-space report")
     a("")

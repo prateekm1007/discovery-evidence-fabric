@@ -1,0 +1,37 @@
+{
+ "attack_version": "R411-ATTACK-V1",
+ "candidate_id": "C-wind-2",
+ "status": "OK",
+ "attacker_provider": "openrouter",
+ "attacker_model": "minimax/minimax-m3:free",
+ "generator_provider": "zai",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "surfaces": {
+  "problem": {
+   "attack": "The problem statement is real \u2014 bearing wear in wind turbine drivetrains is a documented major cost driver. However, the framing assumes misalignment is the dominant lever, when industry data (e.g., the cited we.1629 corpus and we.2842 review) attributes drivetrain bearing failures predominantly to transient torque loading, white etching cracks, lubrication starvation, and contamination \u2014 not static alignment. Pre-misalignment addresses a subset of load distribution issues but ignores the dominant failure modes in modern multi-MW turbines.",
+   "verdict": "HOLDS",
+   "basis": "Problem is real and well-documented; only the causal attribution to alignment is questionable, which is a mechanism attack, not a problem attack."
+  },
+  "intervention": {
+   "attack": "\"Engineered pre-misalignment during installation\" is operationally self-contradictory in a multi-MW wind turbine drivetrain. Drivetrain alignment is set within microns over meter-scale spans during shop assembly of the gearbox, main shaft, and generator couplings. The loads (gear mesh, rotor weight, aerodynamic thrust) dynamically shift the shaft; any installed static misalignment is swamped by operating deflections orders of magnitude larger. The intervention cannot be maintained in service without active control, which is not described.",
+   "verdict": "KILL",
+   "basis": "Wind turbine main shaft deflections under operational loads exceed installed misalignment tolerances by 10\u2013100\u00d7 (rotor weight on a soft-mounted drivetrain produces mm-scale shaft sag). A static \"engineered\" misalignment is not a controllable state in service."
+  },
+  "evidence": {
+   "attack": "The candidate cites exactly one record: doi:10.1002/we.1629 \"Improving wind turbine drivetrain bearing reliability through pre-misalignment.\" I cannot verify the existence of this DOI from the candidate's text alone, and the title is suspiciously aligned with the claim (potential circularity). No independent corroborating record is cited. The adversarial prior art (we.2842 review on drivetrain transient torque, the etd.wy2nj1oi multibody dynamics framework, the wes-2026-105 fatigue-constrained gradient optimization of main bearings) treat alignment as a constraint to satisfy, not a degree of freedom to optimize. None of the cited prior art supports the inversion.",
+   "verdict": "KILL",
+   "basis": "Single self-supporting citation; no independent corroboration; the entire adversarial prior-art corpus treats alignment as a constraint rather than an exploitable variable."
+  }
+ },
+ "kill_surfaces": [
+  "intervention",
+  "evidence"
+ ],
+ "wound_surfaces": [],
+ "final_objection": "KILLED",
+ "prompt_hash": "386cd7c74009dfb8d7b250f76e70b8aab85b67c48a68488b7bfbec63fc143f06",
+ "output_hash": "681ac7dab2adf6101b90da1c880a15d1ac52bdf3310d16d1d79374605f94d105",
+ "survived": false,
+ "verdict": "KILLED"
+}

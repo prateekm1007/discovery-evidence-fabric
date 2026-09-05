@@ -1,0 +1,1029 @@
+{
+ "domain_id": "machining",
+ "status": "OK",
+ "transport_failures": 0,
+ "n_calls": 4,
+ "accepted": [
+  {
+   "candidate_id": "C-machining-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Cryogenic Coolant Enhancement",
+   "target_domain": "manufacturing",
+   "source_domain": "machining",
+   "domain_id": "machining",
+   "pain_class": "MANUFACTURING_BOTTLENECK",
+   "problem": "CNC machining center with flood coolant experiences reduced tool life and surface finish due to inadequate cooling at high cutting speeds.",
+   "causal_chain": [
+    "Conventional flood coolant at ambient temperature",
+    "insufficient heat removal at tool-chip interface",
+    "thermal softening of cutting tool",
+    "accelerated tool wear",
+    "increased downtime for tool changes",
+    "manufacturing bottleneck"
+   ],
+   "unexploited_phenomenon": "Cryogenic cooling at 0\u00b0C significantly improves machining performance by enhancing heat removal",
+   "intervention": "Implementation of a cryogenic coolant system that maintains coolant at 0\u00b0C for CNC machining operations",
+   "governing_variables": "Coolant temperature (\u00b0C), thermal conductivity of coolant (W/m\u00b7K), cutting speed (m/min), feed rate (mm/rev)",
+   "predicted_effect": "30-60% improvement in surface finish and tool life due to enhanced heat removal at lower temperatures",
+   "equations": [
+    "Heat transfer rate Q = k\u00b7A\u00b7(\u0394T/d), where k is thermal conductivity, A is contact area, \u0394T is temperature difference, d is distance"
+   ],
+   "boundary_conditions": "Effective for materials like SS304 and INCONEL; limited by coolant viscosity at very low temperatures and potential thermal shock to workpiece",
+   "evidence_refs": [
+    "doi:10.3390/jmmp6060128"
+   ],
+   "cross_domain_transition": "machining -> manufacturing (cryogenic cooling already demonstrated in machining but not widely adopted)",
+   "baseline": {
+    "baseline_incumbent": "Conventional flood coolant at ambient temperature",
+    "baseline_metric": "Surface roughness Ra values typically in the range of 1.5-3.5 \u03bcm for SS304 machining",
+    "candidate_metric": "Surface roughness Ra values reduced to 0.8-2.0 \u03bcm",
+    "expected_delta": "40-50% reduction in surface roughness"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-top CNC lathe with cryogenic cooling system vs conventional flood cooling, machining SS304 workpieces, surface roughness measurement using profilometer",
+    "decisive_uncertainty": "Whether the cryogenic effect is consistent across different cutting speeds and feed rates",
+    "kill_condition": "No significant improvement in surface finish or tool life compared to conventional cooling",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Thermal shock to workpiece",
+     "detectability": "detectable via visual inspection and stress testing",
+     "mitigation": "gradual temperature ramping"
+    },
+    {
+     "failure_mode": "Coolant viscosity increase at low temperatures",
+     "detectability": "detectable via flow rate monitoring",
+     "mitigation": "viscosity modifiers or temperature optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "CNC machining shop manager",
+    "use_case": "High-precision machining of stainless steel components for aerospace industry",
+    "integration_point": "Between coolant reservoir and cutting tool in existing CNC machining center"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "05e77b08ee17db82ae32b6405d780b3b46cdc58337a1b1b2361dc48e410a0c3b",
+    "output_hash": "d3f12993971563e5b2b262010ffac20c5c8cd6583a95006d1c8f1ea66b23c59e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "cement",
+     "machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MANUFACTURING_BOTTLENECK"
+  },
+  {
+   "candidate_id": "C-machining-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Nanofluid Coolant Enhancement",
+   "target_domain": "manufacturing",
+   "source_domain": "machining",
+   "domain_id": "machining",
+   "pain_class": "MANUFACTURING_BOTTLENECK",
+   "problem": "Hot strip rolling mill experiences reduced efficiency and yield due to inadequate cooling of the rolling surfaces.",
+   "causal_chain": [
+    "Conventional coolant",
+    "lower thermal conductivity",
+    "insufficient heat removal at rolling interface",
+    "thermal softening of rolls",
+    "reduced dimensional accuracy",
+    "increased scrap rate",
+    "manufacturing bottleneck"
+   ],
+   "unexploited_phenomenon": "SiO2 nanofluid significantly improves thermal conductivity and heat removal compared to conventional coolants",
+   "intervention": "Implementation of SiO2 nanofluid coolant system for hot strip rolling mill operations",
+   "governing_variables": "Nanoparticle concentration (%), thermal conductivity enhancement factor, rolling speed (m/s), strip thickness (mm)",
+   "predicted_effect": "25-40% improvement in heat transfer efficiency leading to better dimensional accuracy and reduced scrap rate",
+   "equations": [
+    "Enhanced thermal conductivity k_eff = k_base(1 + 2.5\u03c6) where \u03c6 is volume fraction of nanoparticles"
+   ],
+   "boundary_conditions": "Effective for rolling operations on steel strips; limited by nanoparticle agglomeration at high concentrations and potential filter clogging",
+   "evidence_refs": [
+    "doi:10.1016/j.matpr.2022.08.165"
+   ],
+   "cross_domain_transition": "machining -> manufacturing (nanofluid cooling demonstrated in CNC turning but not in rolling)",
+   "baseline": {
+    "baseline_incumbent": "Conventional flood coolant in hot strip rolling mill",
+    "baseline_metric": "Typical dimensional accuracy variation of \u00b10.1mm with 5-8% scrap rate",
+    "candidate_metric": "Dimensional accuracy variation reduced to \u00b10.06mm with 3-5% scrap rate",
+    "expected_delta": "40% reduction in dimensional variation and 30% reduction in scrap rate"
+   },
+   "killer_experiment": {
+    "experiment": "Laboratory-scale rolling mill simulator with nanofluid cooling vs conventional cooling, temperature monitoring at rolling interface, dimensional measurement of rolled strips",
+    "decisive_uncertainty": "Whether nanofluid maintains stability and enhanced thermal properties under high-pressure rolling conditions",
+    "kill_condition": "No significant improvement in heat transfer or dimensional accuracy compared to conventional cooling",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Nanoparticle agglomeration",
+     "detectability": "detectable via viscosity monitoring and filtration analysis",
+     "mitigation": "continuous agitation and filtration system"
+    },
+    {
+     "failure_mode": "Environmental and disposal concerns",
+     "detectability": "detectable via waste testing",
+     "mitigation": "proper treatment protocols and filtration"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Hot strip rolling mill operations manager",
+    "use_case": "High-precision steel rolling for automotive industry with stringent dimensional requirements",
+    "integration_point": "Between coolant system and rolling mill rolls"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "05e77b08ee17db82ae32b6405d780b3b46cdc58337a1b1b2361dc48e410a0c3b",
+    "output_hash": "d3f12993971563e5b2b262010ffac20c5c8cd6583a95006d1c8f1ea66b23c59e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "cement",
+     "rolling"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MANUFACTURING_BOTTLENECK"
+  },
+  {
+   "candidate_id": "C-machining-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Megasonic Coolant Enhancement",
+   "target_domain": "manufacturing",
+   "source_domain": "machining",
+   "domain_id": "machining",
+   "pain_class": "MANUFACTURING_BOTTLENECK",
+   "problem": "Metal casting foundry line experiences reduced yield due to inadequate cooling and surface defects in cast products.",
+   "causal_chain": [
+    "Conventional cooling",
+    "poor heat transfer at mold-metal interface",
+    "uneven solidification",
+    "surface defects and internal stresses",
+    "increased scrap rate",
+    "manufacturing bottleneck"
+   ],
+   "unexploited_phenomenon": "Actively cooled megasonic coolant significantly improves heat transfer and mold filling precision",
+   "intervention": "Implementation of megasonic coolant system with active cooling for metal casting operations",
+   "governing_variables": "Ultrasonic frequency (MHz), coolant temperature (\u00b0C), acoustic intensity (W/cm\u00b2), mold material thermal conductivity (W/m\u00b7K)",
+   "predicted_effect": "20-35% improvement in surface quality and 15-25% reduction in scrap rate due to enhanced heat transfer and mold filling",
+   "equations": [
+    "Enhanced heat transfer coefficient h = h_base(1 + \u03b1\u00b7I) where \u03b1 is enhancement factor and I is acoustic intensity"
+   ],
+   "boundary_conditions": "Effective for precision casting operations; limited by potential erosion of mold material at high ultrasonic intensities",
+   "evidence_refs": [
+    "doi:10.14711/thesis-b924477"
+   ],
+   "cross_domain_transition": "machining -> manufacturing (megasonic cooling demonstrated in precision machining but not in casting)",
+   "baseline": {
+    "baseline_incumbent": "Conventional cooling methods in metal casting foundry",
+    "baseline_metric": "Typical scrap rate of 10-15% with surface defects in 5-8% of castings",
+    "candidate_metric": "Scrap rate reduced to 7-10% with surface defects in 2-4% of castings",
+    "expected_delta": "30% reduction in scrap rate and 50% reduction in surface defects"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale casting apparatus with megasonic cooling vs conventional cooling, temperature monitoring during solidification, non-destructive testing for surface defects",
+    "decisive_uncertainty": "Whether the ultrasonic effect improves heat transfer uniformly across different casting geometries",
+    "kill_condition": "No significant improvement in heat transfer or reduction in surface defects compared to conventional cooling",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Mold erosion",
+     "detectability": "detectable via visual inspection and dimensional measurement",
+     "mitigation": "controlled intensity settings"
+    },
+    {
+     "failure_mode": "Acoustic energy absorption by molten metal",
+     "detectability": "detectable via temperature monitoring",
+     "mitigation": "frequency optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Foundry production manager",
+    "use_case": "High-quality metal casting for aerospace components with strict surface requirements",
+    "integration_point": "Between cooling system and casting molds"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "05e77b08ee17db82ae32b6405d780b3b46cdc58337a1b1b2361dc48e410a0c3b",
+    "output_hash": "d3f12993971563e5b2b262010ffac20c5c8cd6583a95006d1c8f1ea66b23c59e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "cement",
+     "casting"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MANUFACTURING_BOTTLENECK"
+  },
+  {
+   "candidate_id": "C-machining-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Tool Path Compensation System",
+   "target_domain": "manufacturing",
+   "source_domain": "machining",
+   "domain_id": "machining",
+   "pain_class": "MANUFACTURING_BOTTLENECK",
+   "problem": "CNC machining center experiences reduced throughput due to dimensional inaccuracies requiring rework and scrap.",
+   "causal_chain": [
+    "Mechanical vibrations and thermal expansion",
+    "tool path deviations",
+    "dimensional inaccuracies",
+    "increased rework time",
+    "manufacturing bottleneck"
+   ],
+   "unexploited_phenomenon": "Real-time tool path compensation can correct for mechanical and thermal errors in CNC machining",
+   "intervention": "Implementation of a tool path compensation system that dynamically adjusts machining paths based on real-time error measurements",
+   "governing_variables": "Tool deflection (\u03bcm), thermal expansion coefficient (\u03bcm/\u00b0C), spindle runout (\u03bcm), sampling frequency (Hz)",
+   "predicted_effect": "40-60% reduction in dimensional inaccuracies leading to 20-30% reduction in rework time",
+   "equations": [
+    "Compensated path P_comp = P_nominal + \u0394P_thermal + \u0394P_mechanical where \u0394P represents deviations"
+   ],
+   "boundary_conditions": "Effective for precision machining operations; limited by computational delay and sensor accuracy",
+   "evidence_refs": [
+    "doi:10.14711/thesis-b921739"
+   ],
+   "cross_domain_transition": "machining -> manufacturing (tool path compensation demonstrated in CNC but not widely implemented)",
+   "baseline": {
+    "baseline_incumbent": "Standard CNC machining without real-time compensation",
+    "baseline_metric": "Dimensional tolerance typically \u00b10.05mm with 5-8% parts requiring rework",
+    "candidate_metric": "Dimensional tolerance reduced to \u00b10.02mm with 2-4% parts requiring rework",
+    "expected_delta": "60% improvement in dimensional accuracy and 50% reduction in rework rate"
+   },
+   "killer_experiment": {
+    "experiment": "CNC machining test with compensation system vs without, using calibrated test pieces, coordinate measuring machine for dimensional verification",
+    "decisive_uncertainty": "Whether the compensation system maintains accuracy across different cutting speeds and materials",
+    "kill_condition": "No significant improvement in dimensional accuracy compared to standard machining",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Computational delay",
+     "detectability": "detectable via timing analysis",
+     "mitigation": "faster processors and optimized algorithms"
+    },
+    {
+     "failure_mode": "Sensor drift",
+     "detectability": "detectable via calibration checks",
+     "mitigation": "regular recalibration protocol"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "CNC machining shop supervisor",
+    "use_case": "High-precision aerospace component machining with tight tolerances",
+    "integration_point": "Between CNC controller and machine axes"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "05e77b08ee17db82ae32b6405d780b3b46cdc58337a1b1b2361dc48e410a0c3b",
+    "output_hash": "d3f12993971563e5b2b262010ffac20c5c8cd6583a95006d1c8f1ea66b23c59e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MANUFACTURING_BOTTLENECK"
+  },
+  {
+   "candidate_id": "C-machining-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Spindle Vibration Monitoring System",
+   "target_domain": "manufacturing",
+   "source_domain": "machining",
+   "domain_id": "machining",
+   "pain_class": "MANUFACTURING_BOTTLENECK",
+   "problem": "CNC machining center experiences unplanned downtime due to spindle failures and reduced tool life from undetected vibrations.",
+   "causal_chain": [
+    "Undetected spindle vibrations",
+    "accelerated tool wear",
+    "unexpected tool failure",
+    "unplanned machine downtime",
+    "manufacturing bottleneck"
+   ],
+   "unexploited_phenomenon": "Real-time vibration diagnostics can predict spindle failures and optimize cutting parameters",
+   "intervention": "Implementation of a spindle vibration monitoring system with predictive maintenance capabilities",
+   "governing_variables": "Vibration amplitude (\u03bcm), vibration frequency (Hz), spindle bearing temperature (\u00b0C), cutting force (N)",
+   "predicted_effect": "30-50% reduction in unplanned downtime and 20-30% extension of tool life through early detection of spindle issues",
+   "equations": [
+    "Remaining useful life RUL = (T_failure - T_current) where T_failure is predicted failure time"
+   ],
+   "boundary_conditions": "Effective for high-speed machining operations; limited by vibration signal interpretation complexity",
+   "evidence_refs": [
+    "doi:10.21062/ujep/295.2019/a/1213-2489/mt/19/2/350"
+   ],
+   "cross_domain_transition": "machining -> manufacturing (vibration diagnostics demonstrated in CNC but not widely implemented for predictive maintenance)",
+   "baseline": {
+    "baseline_incumbent": "CNC machining with scheduled maintenance and reactive repairs",
+    "baseline_metric": "Average unplanned downtime of 4-6 hours per month due to spindle issues",
+    "candidate_metric": "Unplanned downtime reduced to 1-3 hours per month",
+    "expected_delta": "50% reduction in unplanned downtime"
+   },
+   "killer_experiment": {
+    "experiment": "CNC machining center with vibration monitoring system vs without, accelerated spindle testing, failure prediction accuracy measurement",
+    "decisive_uncertainty": "Whether the vibration monitoring system can reliably detect early signs of spindle failure",
+    "kill_condition": "No significant reduction in unplanned downtime or improvement in failure prediction accuracy",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "False positive alerts",
+     "detectability": "detectable via maintenance records",
+     "mitigation": "algorithm refinement"
+    },
+    {
+     "failure_mode": "Sensor failure",
+     "detectability": "detectable via diagnostic checks",
+     "mitigation": "redundant sensor system"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "CNC maintenance manager",
+    "use_case": "High-value CNC machining operations requiring maximum uptime",
+    "integration_point": "Between spindle and machine monitoring system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "05e77b08ee17db82ae32b6405d780b3b46cdc58337a1b1b2361dc48e410a0c3b",
+    "output_hash": "d3f12993971563e5b2b262010ffac20c5c8cd6583a95006d1c8f1ea66b23c59e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "machining"
+    ],
+    "medical_terms_in_origin_only": [
+     "diagnostic"
+    ],
+    "basis": "no medical-application vocabulary in the target application fields (origin-field medical vocabulary present: ['diagnostic'] \u2014 physics origin, allowed by s1)"
+   },
+   "extraction_call": "MANUFACTURING_BOTTLENECK"
+  },
+  {
+   "candidate_id": "C-machining-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Automatic Feeder System",
+   "target_domain": "manufacturing",
+   "source_domain": "machining",
+   "domain_id": "machining",
+   "pain_class": "MANUFACTURING_BOTTLENECK",
+   "problem": "CNC machining center experiences reduced throughput due to manual loading/unloading operations creating bottlenecks.",
+   "causal_chain": [
+    "Manual workpiece handling",
+    "increased cycle time",
+    "reduced machine utilization",
+    "manufacturing bottleneck"
+   ],
+   "unexploited_phenomenon": "Automated feeding systems can significantly reduce cycle time and increase machine utilization",
+   "intervention": "Implementation of an automatic feeder system for CNC machining center",
+   "governing_variables": "Feeding speed (parts/min), workpiece weight (kg), gripper precision (mm), system reliability (%)",
+   "predicted_effect": "40-60% reduction in cycle time and 30-40% increase in machine utilization",
+   "equations": [
+    "Throughput increase \u0394T = (T_manual - T_auto)/T_manual \u00d7 100% where T represents cycle time"
+   ],
+   "boundary_conditions": "Effective for batch production operations; limited by workpiece variety and size constraints",
+   "evidence_refs": [
+    "doi:10.1016/j.promfg.2018.10.111"
+   ],
+   "cross_domain_transition": "machining -> manufacturing (automatic feeders demonstrated in CNC but not widely implemented)",
+   "baseline": {
+    "baseline_incumbent": "Manual workpiece loading and unloading",
+    "baseline_metric": "Average cycle time of 3-5 minutes per part including manual handling",
+    "candidate_metric": "Cycle time reduced to 1.5-3 minutes per part",
+    "expected_delta": "50% reduction in cycle time"
+   },
+   "killer_experiment": {
+    "experiment": "CNC machining center with automatic feeder vs manual operation, time-motion analysis, throughput measurement",
+    "decisive_uncertainty": "Whether the automatic feeder can handle the full range of workpiece geometries in the production environment",
+    "kill_condition": "No significant reduction in cycle time or increase in throughput compared to manual operation",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Gripper slippage",
+     "detectability": "detectable via position sensors and workpiece monitoring",
+     "mitigation": "improved gripping surface and force control"
+    },
+    {
+     "failure_mode": "Misalignment",
+     "detectability": "detectable via vision system",
+     "mitigation": "calibration and alignment procedures"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "CNC production supervisor",
+    "use_case": "High-volume production of machined components for automotive industry",
+    "integration_point": "Between workpiece storage and CNC machining center"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "05e77b08ee17db82ae32b6405d780b3b46cdc58337a1b1b2361dc48e410a0c3b",
+    "output_hash": "d3f12993971563e5b2b262010ffac20c5c8cd6583a95006d1c8f1ea66b23c59e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MANUFACTURING_BOTTLENECK"
+  },
+  {
+   "candidate_id": "C-machining-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Strategic Sequencing System",
+   "target_domain": "manufacturing",
+   "source_domain": "machining",
+   "domain_id": "machining",
+   "pain_class": "MANUFACTURING_BOTTLENECK",
+   "problem": "Hot strip rolling mill experiences reduced throughput due to inefficient job scheduling and bottleneck operations.",
+   "causal_chain": [
+    "Suboptimal job sequencing",
+    "bottleneck formation at certain operations",
+    "reduced overall throughput",
+    "manufacturing bottleneck"
+   ],
+   "unexploited_phenomenon": "Strategic sequencing can optimize job flow and minimize bottleneck formation",
+   "intervention": "Implementation of a bottleneck management system through strategic sequencing in smart manufacturing",
+   "governing_variables": "Job priority index, machine utilization rate (%), bottleneck probability index, sequence optimization algorithm efficiency",
+   "predicted_effect": "25-40% improvement in overall throughput and 15-25% reduction in bottleneck formation",
+   "equations": [
+    "Throughput improvement \u0394P = (P_optimal - P_current)/P_current \u00d7 100% where P represents throughput"
+   ],
+   "boundary_conditions": "Effective for batch production environments; limited by dynamic changes in production requirements",
+   "evidence_refs": [
+    "doi:10.33915/etd.11493"
+   ],
+   "cross_domain_transition": "smart manufacturing -> manufacturing (sequencing systems demonstrated in smart manufacturing but not widely applied to rolling mills)",
+   "baseline": {
+    "baseline_incumbent": "First-come-first-served or priority-based job scheduling",
+    "baseline_metric": "Average throughput of 80-85% of theoretical maximum with 3-5 bottleneck events per week",
+    "candidate_metric": "Throughput increased to 95-100% of theoretical maximum with 1-2 bottleneck events per week",
+    "expected_delta": "20% improvement in throughput and 60% reduction in bottleneck events"
+   },
+   "killer_experiment": {
+    "experiment": "Digital twin simulation of rolling mill with strategic sequencing vs traditional scheduling, throughput measurement, bottleneck frequency analysis",
+    "decisive_uncertainty": "Whether the sequencing algorithm can adapt to real-time changes in production requirements",
+    "kill_condition": "No significant improvement in throughput or reduction in bottleneck events compared to traditional scheduling",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Algorithm rigidity",
+     "detectability": "detectable via scheduling performance analysis",
+     "mitigation": "adaptive learning capabilities"
+    },
+    {
+     "failure_mode": "Data integration issues",
+     "detectability": "detectable via system diagnostics",
+     "mitigation": "improved data interfaces"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Production planning manager",
+    "use_case": "High-throughput hot strip rolling mill for steel production",
+    "integration_point": "Between production planning system and rolling mill control system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "05e77b08ee17db82ae32b6405d780b3b46cdc58337a1b1b2361dc48e410a0c3b",
+    "output_hash": "d3f12993971563e5b2b262010ffac20c5c8cd6583a95006d1c8f1ea66b23c59e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "rolling"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MANUFACTURING_BOTTLENECK"
+  },
+  {
+   "candidate_id": "C-machining-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Nanofluid Cooling Enhancement",
+   "target_domain": "Manufacturing",
+   "source_domain": "Machining",
+   "domain_id": "machining",
+   "pain_class": "WASTE_STREAM",
+   "problem": "CNC machining centers with flood coolant generate significant waste streams through inefficient coolant usage and contamination.",
+   "causal_chain": [
+    "Improved thermal conductivity of SiO2 nanofluid",
+    "enhanced heat transfer at tool-workpiece interface",
+    "reduced coolant volume requirement",
+    "decreased waste stream generation"
+   ],
+   "unexploited_phenomenon": "Enhanced thermal properties of nanofluids compared to conventional coolants",
+   "intervention": "Replace conventional flood coolant with SiO2 nanofluid in CNC machining operations",
+   "governing_variables": "Nanoparticle concentration (wt%), thermal conductivity (W/m\u00b7K), viscosity (Pa\u00b7s), heat transfer coefficient (W/m\u00b2\u00b7K)",
+   "predicted_effect": "30-60% reduction in coolant waste volume due to improved thermal properties allowing reduced flow rates while maintaining cooling performance",
+   "equations": [
+    "h = k/(\u03b4\u00b7A) where h is heat transfer coefficient, k is thermal conductivity, \u03b4 is thermal boundary layer thickness, A is area"
+   ],
+   "boundary_conditions": "Effective at nanoparticle concentrations <5%; fails at higher concentrations due to increased viscosity and clogging",
+   "evidence_refs": [
+    "doi:10.1016/j.matpr.2022.08.165"
+   ],
+   "cross_domain_transition": "Nanofluid thermal enhancement from electronics cooling to machining waste reduction",
+   "baseline": {
+    "baseline_incumbent": "Conventional flood coolant systems with high volume usage and frequent disposal",
+    "baseline_metric": "High coolant consumption rates with documented waste disposal challenges",
+    "candidate_metric": "Reduced coolant consumption while maintaining or improving surface finish",
+    "expected_delta": "30-60% reduction in coolant waste volume"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale CNC turning test with conventional coolant vs SiO2 nanofluid at varying concentrations, measuring surface finish and coolant consumption",
+    "decisive_uncertainty": "Whether the improved thermal properties translate to reduced coolant volume requirements",
+    "kill_condition": "No significant reduction in coolant volume required to achieve equivalent surface finish",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Nanoparticle agglomeration",
+     "detectability": "detectable via viscosity measurements",
+     "mitigation": "mitigation with surfactants"
+    },
+    {
+     "failure_mode": "Filtration system clogging",
+     "detectability": "detectable via pressure drop",
+     "mitigation": "mitigation with improved filtration"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Manufacturing engineers in metalworking facilities",
+    "use_case": "Reducing coolant waste disposal costs while maintaining machining quality",
+    "integration_point": "Coolant delivery system in CNC machining centers"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "1256e7ba9f88783ab738e417b1216917bb40d96b8fe8ac363686107b077ef8db",
+    "output_hash": "39e7a827eb9127b2642e3b959e11001424b4df81dc9df7688dcc61add799b90f",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "cement",
+     "machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "WASTE_STREAM"
+  },
+  {
+   "candidate_id": "C-machining-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Cryogenic Cooling Enhancement",
+   "target_domain": "Manufacturing",
+   "source_domain": "Machining",
+   "domain_id": "machining",
+   "pain_class": "MATERIAL_DEGRADATION",
+   "problem": "Conventional coolant systems in CNC machining centers fail to prevent material degradation during high-speed machining of difficult-to-machine alloys.",
+   "causal_chain": [
+    "Cryogenic coolant application",
+    "reduced thermal stress at tool-workpiece interface",
+    "minimized microstructural changes",
+    "reduced material degradation and tool wear"
+   ],
+   "unexploited_phenomenon": "Cooling at 0\u00b0C significantly improves machining parameters and surface finish in CNC turning (RECORD_ID: doi:10.3390/jmmp6060128)",
+   "intervention": "Implementation of a cryogenic cooling system that maintains coolant at 0\u00b0C during CNC machining operations",
+   "governing_variables": "Coolant temperature (\u00b0C), thermal conductivity (W/m\u00b7K), coefficient of thermal expansion (1/K)",
+   "predicted_effect": "30-50% reduction in tool wear rate due to reduced thermal stress, with improvement scaling inversely with thermal conductivity of workpiece material",
+   "equations": [
+    "Tool wear rate \u221d (T_workpiece - T_coolant) / k, where T is temperature in K and k is thermal conductivity in W/m\u00b7K"
+   ],
+   "boundary_conditions": "Effective for materials with high thermal conductivity; less effective for insulating materials; optimal at temperatures between -20\u00b0C to 0\u00b0C",
+   "evidence_refs": [
+    "doi:10.3390/jmmp6060128"
+   ],
+   "cross_domain_transition": "Cryogenic food preservation -> precision machining by applying ultra-low temperatures to reduce thermal degradation",
+   "baseline": {
+    "baseline_incumbent": "Conventional flood cooling at ambient temperature",
+    "baseline_metric": "Standard surface roughness (Ra) values with conventional cooling not specified in evidence",
+    "candidate_metric": "Surface roughness (Ra) reduced by 30-50% compared to conventional cooling",
+    "expected_delta": "30-50% improvement in surface finish quality"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale CNC turning setup with temperature-controlled coolant system, comparing surface finish and tool wear between 0\u00b0C coolant and ambient coolant conditions",
+    "decisive_uncertainty": "Whether the cryogenic effect is sufficient to offset the cost and complexity of the cooling system",
+    "kill_condition": "If no significant improvement in surface finish or tool wear reduction is observed at 0\u00b0C cooling compared to ambient conditions",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Condensation formation",
+     "detectability": "detectable via moisture sensors",
+     "mitigation": "mitigation by humidity control system"
+    },
+    {
+     "failure_mode": "Coolant viscosity increase",
+     "detectability": "detectable via flow rate monitoring",
+     "mitigation": "mitigation by viscosity adjustment additives"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "CNC machining operations manager",
+    "use_case": "Improving surface finish and extending tool life during high-precision machining of stainless steel and nickel alloys",
+    "integration_point": "Coolant delivery system in CNC machining center"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "e3942cd46327154e5714558eb154e03fb635f8e10230d754f5401102e193c558",
+    "output_hash": "16db7ef94052b452003723a7ef9f729f3dd5d26be25d0003099b43fe154c59a0",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "cement",
+     "machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MATERIAL_DEGRADATION"
+  },
+  {
+   "candidate_id": "C-machining-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Cryogenic Cooling Enhancement",
+   "target_domain": "Manufacturing",
+   "source_domain": "Machining",
+   "domain_id": "machining",
+   "pain_class": "Thermal Management",
+   "problem": "Inefficient heat dissipation during CNC machining leading to tool wear and poor surface finish",
+   "causal_chain": [
+    "High machining temperatures",
+    "tool material degradation",
+    "increased friction",
+    "surface roughness",
+    "reduced part quality"
+   ],
+   "unexploited_phenomenon": "Sub-zero coolant temperature effects on material properties and heat transfer",
+   "intervention": "Implementation of cryogenic cooling system at 0\u00b0C for CNC turning operations",
+   "governing_variables": "Coolant temperature (\u00b0C), thermal conductivity (W/m\u00b7K), heat transfer coefficient (W/m\u00b2\u00b7K)",
+   "predicted_effect": "30-50% improvement in surface finish due to reduced thermal softening of workpiece material",
+   "equations": [
+    "Heat transfer rate: Q = h\u00b7A\u00b7(T_surface - T_coolant)",
+    "Thermal stress: \u03c3 = E\u00b7\u03b1\u00b7\u0394T"
+   ],
+   "boundary_conditions": "Effective for materials with high thermal sensitivity (SS304, Ti-6Al-4V); limited effectiveness for materials with low thermal conductivity",
+   "evidence_refs": [
+    "doi:10.3390/jmmp6060128"
+   ],
+   "cross_domain_transition": "Machining -> Electronics manufacturing (cryogenic cooling for semiconductor fabrication precision)",
+   "baseline": {
+    "baseline_incumbent": "Flood cooling at ambient temperature",
+    "baseline_metric": "Surface roughness Ra 1.2-1.8 \u03bcm (uncertainty \u00b10.2 \u03bcm)",
+    "candidate_metric": "Surface roughness Ra 0.6-1.0 \u03bcm",
+    "expected_delta": "40-50% reduction in surface roughness"
+   },
+   "killer_experiment": {
+    "experiment": "Benchtop cryogenic cooling system with temperature-controlled coolant bath, machining identical test specimens under identical conditions, surface profilometry measurement of 10 samples each",
+    "decisive_uncertainty": "Whether the temperature reduction provides sufficient thermal shock to improve material properties without causing thermal cracking",
+    "kill_condition": "No statistically significant difference in surface roughness between cryogenic and ambient cooling (p>0.05)",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Thermal cracking of workpiece",
+     "detectability": "detectable via visual inspection and acoustic emission",
+     "mitigation": "gradual temperature ramp-up"
+    },
+    {
+     "failure_mode": "Coolant viscosity increase",
+     "detectability": "detectable via flow rate monitoring",
+     "mitigation": "temperature optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Precision machining operations manager",
+    "use_case": "High-precision aerospace component manufacturing",
+    "integration_point": "Coolant delivery system in CNC machine tool"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "769b1de0cd71d25f15f9902528ca090964f8ba67593483cf1dabb661a841068c",
+    "output_hash": "b3c47782befc83fc99c8312768d3b37d016d1988af8718af987defee9a70b051",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "cement",
+     "machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-machining-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Nanofluid Enhancement",
+   "target_domain": "Energy",
+   "source_domain": "Machining",
+   "domain_id": "machining",
+   "pain_class": "Tool Wear",
+   "problem": "Accelerated tool wear during machining of difficult-to-machine alloys",
+   "causal_chain": [
+    "High cutting forces",
+    "abrasive wear on tool edge",
+    "tool degradation",
+    "dimensional inaccuracy",
+    "increased tool replacement costs"
+   ],
+   "unexploited_phenomenon": "Enhanced thermal properties of SiO2 nanofluids for improved cooling",
+   "intervention": "Implementation of SiO2 nanofluid coolant in flood cooling system",
+   "governing_variables": "Nanoparticle concentration (%), thermal conductivity enhancement (W/m\u00b7K), viscosity (cP)",
+   "predicted_effect": "25-40% reduction in tool wear rate due to improved heat transfer at tool-chip interface",
+   "equations": [
+    "Effective thermal conductivity: k_eff = k_base(1+2.5\u03c6)",
+    "Nusselt number: Nu = 0.023Re^0.8Pr^0.4"
+   ],
+   "boundary_conditions": "Effective for materials with high thermal conductivity requirements; limited by agglomeration at high concentrations",
+   "evidence_refs": [
+    "doi:10.1016/j.matpr.2022.08.165"
+   ],
+   "cross_domain_transition": "Machining -> Thermal energy systems (nanofluids for enhanced heat exchangers)",
+   "baseline": {
+    "baseline_incumbent": "Conventional flood cooling with mineral oil-based coolant",
+    "baseline_metric": "Tool wear rate 0.15-0.25 mm/hour (uncertainty \u00b10.03 mm/hour)",
+    "candidate_metric": "Tool wear rate 0.09-0.15 mm/hour",
+    "expected_delta": "30-40% reduction in tool wear rate"
+   },
+   "killer_experiment": {
+    "experiment": "Benchtop machining test with identical tools and parameters using conventional vs. nanofluid coolant, tool wear measurement via optical profilometry after fixed machining time",
+    "decisive_uncertainty": "Whether nanofluid dispersion remains stable during machining operation",
+    "kill_condition": "Tool wear rate difference between nanofluid and conventional coolant is less than 10% of baseline",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Nanoparticle agglomeration",
+     "detectability": "detectable via viscosity measurements and filtration",
+     "mitigation": "continuous agitation system"
+    },
+    {
+     "failure_mode": "Filtration clogging",
+     "detectability": "detectable via pressure drop monitoring",
+     "mitigation": "multi-stage filtration"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Energy systems thermal management engineer",
+    "use_case": "Enhanced heat transfer in concentrated solar power systems",
+    "integration_point": "Heat exchanger coolant loop"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "769b1de0cd71d25f15f9902528ca090964f8ba67593483cf1dabb661a841068c",
+    "output_hash": "b3c47782befc83fc99c8312768d3b37d016d1988af8718af987defee9a70b051",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "cement",
+     "machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  }
+ ],
+ "rejected": [
+  {
+   "candidate_id": "C-machining-8",
+   "reasons": [
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-2",
+   "reasons": [
+    "missing field UNEXPLOITED_PHENOMENON"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-3",
+   "reasons": [
+    "missing field UNEXPLOITED_PHENOMENON"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-4",
+   "reasons": [
+    "missing field UNEXPLOITED_PHENOMENON"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-5",
+   "reasons": [
+    "missing field UNEXPLOITED_PHENOMENON"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-6",
+   "reasons": [
+    "missing field UNEXPLOITED_PHENOMENON"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-7",
+   "reasons": [
+    "missing field UNEXPLOITED_PHENOMENON"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-8",
+   "reasons": [
+    "missing field UNEXPLOITED_PHENOMENON"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-2",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-3",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-4",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-5",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-6",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-7",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-8",
+   "reasons": [
+    "missing field UNEXPLOITED_PHENOMENON",
+    "missing field INTERVENTION",
+    "missing field GOVERNING_VARIABLES",
+    "missing field PREDICTED_EFFECT",
+    "missing field EQUATIONS",
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-3",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-4",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-5",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-6",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-7",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-machining-8",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  }
+ ],
+ "pool_sha256": "84a1113f266c79fb8db7310dafc1559e580184b42c702a7c73db9e5d022b40c7"
+}

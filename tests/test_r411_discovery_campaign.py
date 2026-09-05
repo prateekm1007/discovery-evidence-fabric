@@ -826,7 +826,12 @@ class TestNeverFabricateFifth:
         sel = json.load(open(tmp_path / "run" / "selection.json"))
         assert sel["n_selected"] == 4
         assert "4/5 qualified" in sel["quota_honesty"]
-        assert "1/5 insufficient" in sel["quota_honesty"]
+        # the label names the actual death cause (tournament kills),
+        # never a generic "insufficient evidence" (reporting-layer
+        # truthfulness, Art. XV)
+        assert "killed by the adversarial tournament" in \
+            sel["quota_honesty"]
+        assert "no threshold was lowered" in sel["quota_honesty"]
 
     def test_all_killed_gives_zero_not_five(self, tmp_path):
         survivors = ["KILLED"] * 8
@@ -900,18 +905,29 @@ class TestCemeteryIntegration:
         }
         _append_cemetery(c, sel)
         assert len(appended) == 1
-        assert appended[0]["epistemic_class"] == "FAILURE_LESSON"
-        assert appended[0]["kill_reason"]
+        # entries are CemeteryEntry dataclasses — the append API hashes
+        # them into the cemetery's internal chain (Art. LXII); plain
+        # dicts raise TypeError in asdict (defect found live in F9)
+        from orchestrator.mechanism_cemetery import CemeteryEntry
+        assert isinstance(appended[0], CemeteryEntry)
+        assert appended[0].epistemic_class == "FAILURE_LESSON"
+        assert appended[0].kill_reason.startswith("ATTACK_KILL")
+        assert appended[0].entry_id == "cem:r411:C-killed"
 
-    def test_quota_rejections_do_not_pollute_cemetery(self, tmp_path):
+    def test_quota_rejections_do_not_pollute_cemetery(self, tmp_path,
+                                                      monkeypatch):
         """A quota rejection is not a mechanism death — putting it in
         the cemetery would poison future search with non-failures."""
         from scripts.r411_run_campaign import _append_cemetery
         import orchestrator.mechanism_cemetery as mc
 
         appended = []
-        mc.append_entries_to_cemetery_file = \
-            lambda entries: appended.extend(entries)
+        # monkeypatch (NOT direct assignment): a bare attribute
+        # assignment leaks the stub into every later suite in the same
+        # pytest session (defect found running the combined battery —
+        # test_cemetery_chain_preservation's append silently no-op'd)
+        monkeypatch.setattr(mc, "append_entries_to_cemetery_file",
+                            lambda entries: appended.extend(entries))
         c = Campaign(str(REPO), run_dir=str(tmp_path / "run"))
         sel = {
             "full_records": [],
@@ -939,6 +955,63 @@ class TestCampaignState:
         assert c2.state["retrieval_done"] == ["energy_storage"]
         assert c2.state["campaign_version"] == CAMPAIGN_VERSION
 
+    def test_incomplete_transport_requeues_not_marks_done(
+            self, tmp_path, monkeypatch):
+        """Art. LXI pin: a transport failure is INCOMPLETE, never a
+        completed measurement. The failing id must LEAVE done_ids (and
+        the stale done-id must be reconciled away from the results
+        file's INCOMPLETE records) so a later invocation re-attempts
+        it; the honest INCOMPLETE record stays until overwritten by a
+        real measurement. Regression pin for the mid-run defect where
+        done_ids grew unconditionally and froze INCOMPLETE ids."""
+        from discovery_fabric.engine import mechanism_space as ms
+        rd = str(tmp_path / "run")
+        c = Campaign(str(REPO), run_dir=rd)
+        os.makedirs(os.path.join(rd, "evidence"), exist_ok=True)
+        cand = {"candidate_id": "C-x-1", "domain_id": "x",
+                "problem": "p", "unexploited_phenomenon": "u",
+                "baseline": {"baseline_incumbent": "b"},
+                "predicted_effect": "e", "pool_sha256": "h" * 64,
+                "scoring": {"composite": 1.0}}
+        json.dump([cand], open(os.path.join(rd, "scored_pool.json"), "w"))
+        json.dump({"pool": [{"record_id": "R1", "title": "t",
+                            "abstract": "a", "provenance": {
+                                "source_family": "openalex"}}]},
+                  open(os.path.join(rd, "evidence", "x.json"), "w"))
+        c.state["extraction_done"] = ["x"]
+        c.state["evidence_subset_mode"] = "FULL_POOL"
+        # stale state: INCOMPLETE record + the id wrongly inside done
+        json.dump({"C-x-1": {"status": "INCOMPLETE_LLM_TRANSPORT"}},
+                  open(os.path.join(rd, "evidence_resolved.json"), "w"))
+        c.state["evidence_resolution_done"] = ["C-x-1"]
+        c.save()
+        # 1) failing transport: id is re-queued, NOT done
+        monkeypatch.setattr(ms, "llm_generate", lambda *a, **k: {
+            "ok": False, "status": "CALL_FAILED"})
+        c.run_evidence_resolution(5)
+        assert "C-x-1" not in c.state["evidence_resolution_done"]
+        assert "C-x-1" in c.state["evidence_resolution_incomplete"]
+        rec = json.load(open(os.path.join(rd, "evidence_resolved.json")))
+        assert rec["C-x-1"]["status"] == "INCOMPLETE_LLM_TRANSPORT"
+        # 2) recovered transport: measured, done, ledger cleared
+        monkeypatch.setattr(ms, "llm_generate", lambda *a, **k: {
+            "ok": True, "status": "OK", "provider": "openrouter",
+            "model": "minimax/minimax-m3:free",
+            "prompt_hash": "x", "output_hash": "y",
+            "content": "CLAIM: PROBLEM_EXISTS\nUNBOUND\n"
+                       "CLAIM: PHENOMENON\nUNBOUND\n"
+                       "CLAIM: BASELINE_LIMITATION\nUNBOUND\n"
+                       "CLAIM: MAGNITUDE_PHYSICS\nUNBOUND\n"})
+        c2 = Campaign(str(REPO), run_dir=rd)
+        c2.run_evidence_resolution(5)
+        assert "C-x-1" in c2.state["evidence_resolution_done"]
+        assert "C-x-1" not in (
+            c2.state.get("evidence_resolution_incomplete") or [])
+        rec2 = json.load(open(os.path.join(rd, "evidence_resolved.json")))
+        assert rec2["C-x-1"]["status"] == "OK"
+        assert rec2["C-x-1"]["resolved_evidence"][
+            "distinct_verified_records"] == 0
+
     def test_frozen_inputs_recorded(self, tmp_path):
         c = Campaign(str(REPO), run_dir=str(tmp_path / "run"))
         assert c.state["domain_matrix"]["matrix_sha256"]
@@ -963,6 +1036,260 @@ class TestCampaignState:
         assert pool[0]["provenance"]["source_family"] == "openalex"
         assert pool[0]["lane"] == "SCHOLARLY"
 
+    def test_candidate_ids_disambiguated_at_collision(self, tmp_path):
+        """Art. XII/LXII traceability: per-pain-class extraction calls
+        restart sequential numbering, so identical ids legitimately occur
+        across calls. The collision stage MUST canonicalize identity so
+        downstream stages (prior_art/<id>.json, attack/<id>.json,
+        dossiers, cemetery) key on unique ids. Regression pin for the
+        defect found mid-R411-run: 400 survivors, 182 unique ids."""
+        from discovery_fabric.r411.campaign import (
+            _disambiguate_candidate_ids)
+        cands = [
+            {"candidate_id": "C-x-1", "domain_id": "x",
+             "extraction_call": "PAIN_A"},
+            {"candidate_id": "C-x-2", "domain_id": "x",
+             "extraction_call": "PAIN_A"},
+            {"candidate_id": "C-x-1", "domain_id": "x",
+             "extraction_call": "PAIN_B"},      # collides with first
+            {"candidate_id": "C-x-1", "domain_id": "x",
+             "extraction_call": "CROSS_DOMAIN_FORCING"},  # collides again
+        ]
+        res = _disambiguate_candidate_ids(cands)
+        ids = [c["candidate_id"] for c in cands]
+        assert len(ids) == len(set(ids)) == 4
+        assert ids == ["C-x-1", "C-x-2", "C-x-1~2", "C-x-1~3"]
+        # originals preserved for traceability back to the extraction file
+        assert cands[2]["original_candidate_id"] == "C-x-1"
+        assert cands[0].get("original_candidate_id") is None
+        # mapping recorded + replayable
+        assert res["n_candidates"] == 4
+        assert res["n_collisions"] == 2
+        assert [m["assigned_id"] for m in res["collisions"]] == [
+            "C-x-1~2", "C-x-1~3"]
+        assert all(m["domain_id"] == "x" for m in res["collisions"])
+
+    def test_disambiguation_is_deterministic(self):
+        from discovery_fabric.r411.campaign import (
+            _disambiguate_candidate_ids)
+        base = [{"candidate_id": f"C-y-{i}", "domain_id": "y"}
+                for i in range(3)]
+        a = _disambiguate_candidate_ids([dict(c) for c in base + [
+            {"candidate_id": "C-y-1", "domain_id": "y"}]])
+        b = _disambiguate_candidate_ids([dict(c) for c in base + [
+            {"candidate_id": "C-y-1", "domain_id": "y"}]])
+        assert a == b
+
+    def test_run_collision_unique_ids_end_to_end(self, tmp_path, monkeypatch):
+        """End-to-end: extraction files with colliding ids -> the scored
+        pool every candidate has a unique id and funnel_collision.json
+        records the disambiguation."""
+        c = Campaign(str(REPO), run_dir=str(tmp_path / "run"))
+        os.makedirs(os.path.join(str(tmp_path / "run"), "candidates"))
+        os.makedirs(os.path.join(str(tmp_path / "run"), "evidence"))
+        dup = {
+            "domain_id": "x", "status": "OK", "transport_failures": 0,
+            "n_calls": 2, "pool_sha256": "h" * 64,
+            "accepted": [
+                {"candidate_id": "C-x-1", "domain_id": "x",
+                 "technology_name": "T one",
+                 "target_domain": "energy",
+                 "causal_chain": ["a", "b", "c"],
+                 "evidence_refs": ["r1"],
+                 "intervention": "i", "problem": "p",
+                 "pain_class": "P1"},
+                {"candidate_id": "C-x-1", "domain_id": "x",
+                 "technology_name": "T two (different mechanism)",
+                 "target_domain": "energy",
+                 "causal_chain": ["d", "e", "f"],
+                 "evidence_refs": ["r1"],
+                 "intervention": "i2", "problem": "p2",
+                 "pain_class": "P2"},
+            ],
+            "rejected": [],
+        }
+        p = os.path.join(str(tmp_path / "run"), "candidates", "x.json")
+        json.dump(dup, open(p, "w"))
+        c.state["extraction_done"] = ["x"]
+        c.run_collision()
+        pool = json.load(open(os.path.join(
+            str(tmp_path / "run"), "scored_pool.json")))
+        ids = [x["candidate_id"] for x in pool]
+        assert len(ids) == len(set(ids))
+        fun = json.load(open(os.path.join(
+            str(tmp_path / "run"), "funnel_collision.json")))
+        assert fun["candidate_id_disambiguation"]["colliding_ids"] >= 1
+
+
+# ---------------------------------------------------------------------------
+# F4a: verifier-side evidence resolution (Art. II/III/XXI.4)
+# ---------------------------------------------------------------------------
+
+class TestEvidenceResolve:
+
+    def _pool(self):
+        return [
+            {"record_id": "R1", "title": "Fouling costs in heat exchangers",
+             "abstract": "Heat exchanger fouling reduces thermal "
+                         "efficiency by 20 percent and costs industry "
+                         "billions annually in maintenance.",
+             "provenance": {"source_family": "scholarly_openalex"}},
+            {"record_id": "R2", "title": "Ultrasonic cleaning review",
+             "abstract": "Ultrasonic cavitation removes deposits from "
+                         "surfaces without disassembly in industrial "
+                         "cleaning applications.",
+             "provenance": {"source_family": "repository_core"}},
+            {"record_id": "R3", "title": "Pump degradation study",
+             "abstract": "Pump impeller degradation raises energy "
+                         "consumption measurably over service life.",
+             "provenance": {"source_family": "doi_datacite"}},
+        ]
+
+    def test_parse_bindings_structure(self):
+        from discovery_fabric.r411.evidence_resolve import parse_bindings
+        text = (
+            "CLAIM: PROBLEM_EXISTS\n"
+            "RECORD: R1\n"
+            'SPAN: "reduces thermal efficiency by 20 percent"\n'
+            "RECORD: R3\n"
+            'SPAN: "raises energy consumption measurably"\n'
+            "CLAIM: PHENOMENON\n"
+            "RECORD: R2\n"
+            'SPAN: "Ultrasonic cavitation removes deposits"\n'
+            "CLAIM: BASELINE_LIMITATION\n"
+            "UNBOUND\n"
+            "CLAIM: MAGNITUDE_PHYSICS\n"
+            "UNBOUND\n")
+        parsed = parse_bindings(text)
+        assert len(parsed["proposals"]) == 3
+        assert set(parsed["unbound"]) == {"BASELINE_LIMITATION",
+                                          "MAGNITUDE_PHYSICS"}
+        assert parsed["claims_seen"] == ["PROBLEM_EXISTS", "PHENOMENON",
+                                         "BASELINE_LIMITATION",
+                                         "MAGNITUDE_PHYSICS"]
+        assert not parsed["parse_failures"]
+
+    def test_span_gate_admits_verbatim_rejects_fabrication(self):
+        from discovery_fabric.r411.evidence_resolve import verify_spans
+        proposals = [
+            {"claim": "PROBLEM_EXISTS", "record_id": "R1",
+             "proposed_span": "reduces thermal efficiency by 20 percent"},
+            # fabricated span: never appears in the record
+            {"claim": "PROBLEM_EXISTS", "record_id": "R2",
+             "proposed_span": "saves ninety percent of global energy"},
+            # paraphrased span: near, but NOT verbatim
+            {"claim": "PHENOMENON", "record_id": "R2",
+             "proposed_span": "ultrasonic cavitation eliminates deposits"},
+            # invented record id
+            {"claim": "PHENOMENON", "record_id": "R99",
+             "proposed_span": "Ultrasonic cavitation removes deposits"},
+        ]
+        gate = verify_spans(proposals, self._pool())
+        assert len(gate["verified"]) == 1
+        assert gate["verified"][0]["record_id"] == "R1"
+        reasons = [r["reason"] for r in gate["rejected"]]
+        assert "SPAN_NOT_VERBATIM_IN_RECORD" in reasons
+        assert "RECORD_ID_NOT_IN_FROZEN_POOL" in reasons
+
+    def test_span_gate_normalizes_case_and_whitespace(self):
+        from discovery_fabric.r411.evidence_resolve import verify_spans
+        proposals = [
+            {"claim": "PHENOMENON", "record_id": "R2",
+             "proposed_span": "ultrasonic CAVITATION   removes "
+                              "deposits"},  # case + runs of spaces
+        ]
+        gate = verify_spans(proposals, self._pool())
+        assert len(gate["verified"]) == 1
+
+    def test_resolved_summary_counts_distinct_and_families(self):
+        from discovery_fabric.r411.evidence_resolve import (
+            resolved_evidence_summary)
+        verified = [
+            {"claim": "C1", "record_id": "R1", "span": "x"},
+            {"claim": "C2", "record_id": "R1", "span": "y"},
+            {"claim": "C1", "record_id": "R2", "span": "z"},
+            {"claim": "C1", "record_id": "R3", "span": "w"},
+        ]
+        s = resolved_evidence_summary(verified, self._pool())
+        assert s["distinct_verified_records"] == 3
+        assert s["n_source_families"] == 3
+        assert set(s["claims_with_verified_binding"]) == {"C1", "C2"}
+
+    def test_resolved_strength_same_frozen_ladder(self):
+        from discovery_fabric.r411.evidence_resolve import (
+            resolved_evidence_strength)
+        # identical anchors to measure_evidence_strength: >=3 -> 2 etc.
+        def ev(n, fam):
+            return {"resolved_evidence": {
+                "distinct_verified_records": n, "n_source_families": fam}}
+        assert resolved_evidence_strength(ev(0, 0)) == 0
+        assert resolved_evidence_strength(ev(1, 1)) == 1
+        assert resolved_evidence_strength(ev(2, 2)) == 1
+        assert resolved_evidence_strength(ev(3, 1)) == 2
+        assert resolved_evidence_strength(ev(3, 2)) == 3
+        assert resolved_evidence_strength(ev(5, 2)) == 3
+        assert resolved_evidence_strength(ev(5, 3)) == 4
+
+    def test_resolve_evidence_labels_proposer_not_independent(self):
+        from discovery_fabric.r411.evidence_resolve import resolve_evidence
+        cand = {"candidate_id": "C-x-1"}
+        parsed = {"claims_seen": ["PROBLEM_EXISTS"],
+                  "proposals": [
+                      {"claim": "PROBLEM_EXISTS", "record_id": "R1",
+                       "proposed_span": "reduces thermal efficiency by "
+                                        "20 percent"}],
+                  "unbound": [], "parse_failures": []}
+        ev = resolve_evidence(cand, self._pool(), {"ok": True}, parsed)
+        assert ev["proposer_independence"] == "SEPARATE_CONTEXT_ONLY"
+        assert "deterministic verbatim span containment" in ev["gate"]
+        assert ev["resolved_evidence"]["distinct_verified_records"] == 1
+        # metamorphic: same claim, weaker (paraphrased) span -> the
+        # binding must vanish; nothing is repaired
+        parsed2 = {"claims_seen": ["PROBLEM_EXISTS"],
+                   "proposals": [
+                       {"claim": "PROBLEM_EXISTS", "record_id": "R1",
+                        "proposed_span": "eliminates thermal losses"}],
+                   "unbound": [], "parse_failures": []}
+        ev2 = resolve_evidence(cand, self._pool(), {"ok": True}, parsed2)
+        assert ev2["resolved_evidence"]["distinct_verified_records"] == 0
+        assert ev2["rejected_bindings"]
+
+    def test_scoring_v2_keeps_other_subscores_and_same_floor(self):
+        """The v2 swap only replaces evidence_strength (verified ladder
+        output); every other deterministic sub-score is identical, and
+        the floor arithmetic is unchanged."""
+        from discovery_fabric.r411.scoring import score_candidate
+        from discovery_fabric.r411.evidence_resolve import (
+            resolved_evidence_strength)
+        cand = {
+            "candidate_id": "C-x-1", "evidence_refs": ["R1"],
+            "causal_chain": ["a", "b", "c"],
+            "governing_variables": "v", "equations": ["e"],
+            "boundary_conditions": "bc",
+            "baseline": {"baseline_metric": "m", "candidate_metric": "c",
+                         "expected_delta": "d", "uncertainty": "u"},
+            "killer_experiment": {"cost_class": "BENCH",
+                                  "kill_condition": "k",
+                                  "decisive_uncertainty": "du"},
+            "failure_modes": [{"failure_mode": "f", "mitigation": "m"}],
+            "commercial_path": {"buyer": "b", "use_case": "u",
+                                "integration_point": "i"},
+        }
+        pool = self._pool()
+        v1 = score_candidate(cand, pool, {})
+        assert v1["sub_scores"]["evidence_strength"] == 1  # 1 self-cited
+        ev2 = {"status": "OK", "resolved_evidence": {
+            "distinct_verified_records": 3, "n_source_families": 3}}
+        strength = resolved_evidence_strength(ev2)
+        assert strength == 3
+        subs = dict(v1["sub_scores"])
+        subs["evidence_strength"] = strength
+        for k in subs:
+            if k != "evidence_strength":
+                assert subs[k] == v1["sub_scores"][k]
+        # floor arithmetic: strength 1 -> LOW; strength 3 -> not LOW
+        assert v1["confidence"] == "LOW"
+
 
 # ---------------------------------------------------------------------------
 # portfolio bias isolation (s21)
@@ -982,3 +1309,62 @@ class TestNoPortfolioBias:
                          "gravity compensation", "self-referencing",
                          "acoustic obstruction"):
                 assert term not in prompt_src
+
+
+# ---------------------------------------------------------------------------
+# ENGINE_LLM_PROVIDER operator pin (registry operator-override class)
+# ---------------------------------------------------------------------------
+
+class TestEngineLLMProviderPin:
+
+    def _patch(self, monkeypatch):
+        import discovery_fabric.engine.llm_registry as reg
+        import discovery_fabric.engine.mechanism_space as ms
+        matrix = [
+            {"provider_id": "zai", "available": True},
+            {"provider_id": "nvidia", "available": True},
+            {"provider_id": "openai", "available": False},
+        ]
+        monkeypatch.setattr(reg, "availability_matrix", lambda: matrix)
+
+        class FakeResult:
+            ok = True
+            status = "OK"
+            content = "x"
+            provider_id = "nvidia"
+            model = "openai/gpt-oss-120b"
+            prompt_hash = "h"
+            output_hash = "h"
+            error = None
+
+        captured = {}
+
+        def fake_generate(prompt, system="", **kw):
+            captured["policy"] = kw.get("policy")
+            return FakeResult()
+
+        monkeypatch.setattr(reg, "generate", fake_generate)
+        return ms, captured
+
+    def test_pin_moves_provider_to_head(self, monkeypatch):
+        ms, captured = self._patch(monkeypatch)
+        monkeypatch.setenv("ENGINE_LLM_PROVIDER", "nvidia")
+        meta = ms.llm_generate("p")
+        assert captured["policy"].preferred_providers[0] == "nvidia"
+        assert meta["engine_llm_provider_pin"] == "pinned_to_head"
+
+    def test_unavailable_pin_falls_through_recorded(self, monkeypatch):
+        ms, captured = self._patch(monkeypatch)
+        monkeypatch.setenv("ENGINE_LLM_PROVIDER", "anthropic")
+        meta = ms.llm_generate("p")
+        # normal order preserved (zai first); pin honestly recorded
+        assert captured["policy"].preferred_providers[0] == "zai"
+        assert meta["engine_llm_provider_pin"].startswith(
+            "requested_but_unavailable")
+
+    def test_no_pin_default_order(self, monkeypatch):
+        ms, captured = self._patch(monkeypatch)
+        monkeypatch.delenv("ENGINE_LLM_PROVIDER", raising=False)
+        meta = ms.llm_generate("p")
+        assert captured["policy"].preferred_providers[0] == "zai"
+        assert meta["engine_llm_provider_pin"] == "not_set"

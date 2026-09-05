@@ -1,0 +1,1282 @@
+{
+ "domain_id": "telecom_optics",
+ "status": "OK",
+ "transport_failures": 0,
+ "n_calls": 4,
+ "accepted": [
+  {
+   "candidate_id": "C-telecom_optics-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Metasurface Coupling Isolation",
+   "target_domain": "telecommunications",
+   "source_domain": "photonics",
+   "domain_id": "telecom_optics",
+   "pain_class": "UNWANTED_COUPLING",
+   "problem": "Unwanted electromagnetic coupling between subsystems in fiber-optic communication links causes signal degradation and data loss.",
+   "causal_chain": [
+    "Unwanted electromagnetic waves propagate between subsystems",
+    "metasurface manipulates amplitude and phase of these waves",
+    "destructive interference blocks unwanted coupling",
+    "desired signal transmission remains unaffected."
+   ],
+   "unexploited_phenomenon": "Non-linear active metasurfaces that can manipulate electromagnetic waves to cause destructive interference (doi:10.1038/s41467-025-57132-x)",
+   "intervention": "Integration of reconfigurable non-linear active metasurfaces at subsystem interfaces to block unwanted electromagnetic coupling.",
+   "governing_variables": "Metasurface geometry (\u03bcm), operating wavelength (nm), applied voltage (V), material nonlinearity coefficient (m\u00b2/W)",
+   "predicted_effect": "40-70% reduction in unwanted coupling loss because metasurface can be tuned to create destructive interference at specific frequencies.",
+   "equations": [
+    "Transmission coefficient T = |t|\u00b2 where t depends on metasurface parameters",
+    "Coupling reduction factor CR = 20log\u2081\u2080(P_in/P_out) (dB)"
+   ],
+   "boundary_conditions": "Effective at frequencies matching metasurface resonance; fails at extremely high power levels where nonlinearity saturates.",
+   "evidence_refs": [
+    "doi:10.1038/s41467-025-57132-x"
+   ],
+   "cross_domain_transition": "photonics -> telecommunications: metasurfaces developed for quantum systems can be adapted for telecom coupling isolation",
+   "baseline": {
+    "baseline_incumbent": "Physical shielding and isolation techniques with documented limitations in complex, miniaturized systems",
+    "baseline_metric": "Typical isolation achieved with conventional shielding: 20-30 dB",
+    "candidate_metric": "Predicted isolation: 50-60 dB",
+    "expected_delta": "30 dB improvement in isolation"
+   },
+   "killer_experiment": {
+    "experiment": "Test bench with two coupled fiber-optic subsystems, with and without metasurface insertion, measuring crosstalk with optical spectrum analyzer",
+    "decisive_uncertainty": "Whether metasurface can maintain isolation across the entire telecom wavelength band (1530-1565 nm)",
+    "kill_condition": "Less than 10 dB improvement in isolation compared to baseline shielding",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Thermal saturation of metasurface",
+     "detectability": "detectable by increased insertion loss",
+     "mitigation": "mitigation by active cooling or material selection"
+    },
+    {
+     "failure_mode": "Fabrication imperfections causing scattering",
+     "detectability": "detectable by optical microscopy",
+     "mitigation": "mitigation by improved fabrication process control"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Telecommunications infrastructure providers",
+    "use_case": "Deploying in high-density fiber-optic communication nodes where crosstalk between channels degrades signal quality",
+    "integration_point": "At optical multiplexer/demultiplexer interfaces in fiber-optic communication systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "8bdefcd84dfd69ec767b582e234c145a348ace6cfd9e46088c4695ba20e4f415",
+    "output_hash": "833586239cb688e46ed39b290ccb90bf02e2b5aed186b43b792fe461f8bd9d52",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "telecommunication"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "UNWANTED_COUPLING"
+  },
+  {
+   "candidate_id": "C-telecom_optics-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Metasurface Sensing Array",
+   "target_domain": "telecommunications",
+   "source_domain": "photonics",
+   "domain_id": "telecom_optics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Fiber-optic communication links have blind spots where signal quality cannot be measured due to lack of integrated sensing capabilities.",
+   "causal_chain": [
+    "Non-linear active metasurface manipulates electromagnetic wave properties",
+    "Wave down-conversion occurs",
+    "Information transfer from high to low frequency",
+    "Enables detection of previously unmeasurable states",
+    "Blind spot eliminated"
+   ],
+   "unexploited_phenomenon": "Non-linear active electronic-photonic metasurface for coherent wave down-conversion (RECORD_ID: doi:10.1038/s41467-025-57132-x)",
+   "intervention": "Integration of non-linear active metasurfaces into fiber-optic communication systems to enable real-time sensing of signal states previously unmeasurable.",
+   "governing_variables": "Metasurface nonlinear coefficient (\u03c7\u00b2, m\u00b2/V), input optical power (P_in, W), conversion efficiency (\u03b7, dimensionless)",
+   "predicted_effect": "40-70% reduction in blind spot coverage area due to enhanced sensing capability at previously inaccessible frequencies",
+   "equations": [
+    "\u03b7 = (P_out/P_in) = \u03c7\u00b2 \u00d7 P_in \u00d7 L (where L is interaction length, m)"
+   ],
+   "boundary_conditions": "Effective at optical frequencies (1550 nm range), requires minimum input power for nonlinear effects, temperature-sensitive operation",
+   "evidence_refs": [
+    "doi:10.1038/s41467-025-57132-x"
+   ],
+   "cross_domain_transition": "photonics sensing -> telecommunications measurement systems, leveraging frequency conversion for enhanced signal monitoring",
+   "baseline": {
+    "baseline_incumbent": "Traditional power monitoring with photodiodes, limited to measuring total power without frequency-resolved information",
+    "baseline_metric": "\u00b13 dB power measurement uncertainty, no frequency resolution in blind spots",
+    "candidate_metric": "\u00b10.5 dB power measurement uncertainty, frequency resolution across 10 nm bandwidth",
+    "expected_delta": "85% improvement in measurement accuracy with frequency resolution capability"
+   },
+   "killer_experiment": {
+    "experiment": "Benchtop test setup with metasurface device vs conventional photodiode, measuring signal-to-noise ratio of detected signals across frequency range",
+    "decisive_uncertainty": "Whether the metasurface can maintain conversion efficiency under realistic telecom power levels and environmental conditions",
+    "kill_condition": "Conversion efficiency drops below 10% of theoretical maximum under operational conditions",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Optical damage at high power levels",
+     "detectability": "detectable via visual inspection and power transmission measurement",
+     "mitigation": "mitigation with power limiting circuitry"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Fiber optic network infrastructure providers",
+    "use_case": "Monitoring and maintaining signal quality across long-haul communication networks",
+    "integration_point": "Within optical amplifiers and multiplexers in the communication link"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a52d00babcfa91243290a983f51136f07c9906e4747919ee6dc9bbddb6e01cc0",
+    "output_hash": "03666650b4a09faa4064f71e1846e75369ea2bdcd3c6aade2a1c8444f0f6aa8b",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "telecommunication"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-telecom_optics-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Quantum-Enhanced Time Dissemination",
+   "target_domain": "telecommunications",
+   "source_domain": "quantum cryptography",
+   "domain_id": "telecom_optics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Free-space optical communication terminals lack precise time synchronization capabilities in blind spot regions.",
+   "causal_chain": [
+    "Quantum key distribution (QKD) implemented over fiber",
+    "Secure time dissemination enabled",
+    "Precise timing information transmitted",
+    "Synchronization accuracy improved",
+    "Blind spot temporal characteristics measured"
+   ],
+   "unexploited_phenomenon": "QKD protected fiber-based infrastructure for time dissemination (RECORD_ID: doi:10.1038/s41598-025-97480-8)",
+   "intervention": "Integration of QKD-protected time dissemination systems into free-space optical terminals to enable precise timing measurements in blind spots.",
+   "governing_variables": "Quantum bit error rate (QBER, %), timing resolution (\u0394t, ps), channel loss (\u03b1, dB/km)",
+   "predicted_effect": "10-100x improvement in timing resolution from current \u03bcs to ps range, enabling detection of previously unresolvable temporal variations",
+   "equations": [
+    "\u0394t = \u221a(N)/\u03b7 (where N is photon count, \u03b7 is detection efficiency)"
+   ],
+   "boundary_conditions": "Requires quantum channel establishment, limited by channel loss, effective only with single-photon detectors",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-97480-8"
+   ],
+   "cross_domain_transition": "quantum cryptography timing protocols -> optical communication synchronization systems, leveraging quantum properties for enhanced temporal resolution",
+   "baseline": {
+    "baseline_incumbent": "Classical timing protocols with \u03bcs resolution, vulnerable to environmental disturbances",
+    "baseline_metric": "\u00b11 \u03bcs timing uncertainty, susceptible to atmospheric effects in free-space links",
+    "candidate_metric": "\u00b150 ps timing uncertainty, resistant to atmospheric disturbances through quantum encoding",
+    "expected_delta": "20,000x improvement in timing accuracy with environmental robustness"
+   },
+   "killer_experiment": {
+    "experiment": "Laboratory comparison of QKD-protected timing system vs classical system under controlled environmental perturbations",
+    "decisive_uncertainty": "Whether quantum timing protocols can maintain accuracy under realistic free-space optical channel conditions with atmospheric turbulence",
+    "kill_condition": "Timing accuracy degrades beyond \u00b1100 ps in the presence of simulated atmospheric turbulence",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Detector saturation at high signal levels",
+     "detectability": "detectable via count rate monitoring",
+     "mitigation": "mitigation with automatic gain control"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Satellite communication providers",
+    "use_case": "Precise time synchronization for satellite-ground communication links",
+    "integration_point": "Within the ground station optical terminal subsystem"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a52d00babcfa91243290a983f51136f07c9906e4747919ee6dc9bbddb6e01cc0",
+    "output_hash": "03666650b4a09faa4064f71e1846e75369ea2bdcd3c6aade2a1c8444f0f6aa8b",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "telecommunication"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-telecom_optics-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Multicore Fiber Sensing Network",
+   "target_domain": "telecommunications",
+   "source_domain": "fiber optics",
+   "domain_id": "telecom_optics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Laser machining heads have blind spots where beam quality parameters cannot be measured due to limited access points.",
+   "causal_chain": [
+    "Lensed chemically etched optical fibers (LEOFs) coupled to multicore fibers",
+    "Multiple sensing points established",
+    "Distributed beam parameter monitoring",
+    "Real-time quality assessment",
+    "Blind spot coverage eliminated"
+   ],
+   "unexploited_phenomenon": "Lensed Chemically Etched Optical Fibers for Free-Space Coupling of Multicore Fibers (RECORD_ID: doi:10.3390/ma19051013)",
+   "intervention": "Integration of multicore fiber networks with LEOFs into laser machining heads to enable distributed sensing of beam parameters.",
+   "governing_variables": "Number of cores (N), coupling loss (L_c, dB), working distance (d, \u03bcm)",
+   "predicted_effect": "60-90% reduction in blind spot area due to distributed sensing capability with minimal additional loss",
+   "equations": [
+    "L_c = -10log\u2081\u2080(\u03b7\u2081\u00d7\u03b7\u2082\u00d7...\u00d7\u03b7_N) where \u03b7_i is coupling efficiency for each core"
+   ],
+   "boundary_conditions": "Effective at 1550 nm wavelength, requires precise alignment, limited by core-to-core crosstalk",
+   "evidence_refs": [
+    "doi:10.3390/ma19051013"
+   ],
+   "cross_domain_transition": "multicore fiber coupling -> laser beam parameter monitoring, leveraging multiple sensing points for comprehensive coverage",
+   "baseline": {
+    "baseline_incumbent": "Single-point photodiode monitoring with limited spatial coverage",
+    "baseline_metric": "70% coverage of beam cross-section with \u00b12 dB measurement uncertainty",
+    "candidate_metric": "95% coverage of beam cross-section with \u00b10.5 dB measurement uncertainty",
+    "expected_delta": "35% improvement in spatial coverage with 75% improvement in measurement accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "Benchtop comparison of single-point vs multicore sensing system mapping beam intensity profile",
+    "decisive_uncertainty": "Whether multicore fiber can maintain coupling efficiency under high-power laser conditions",
+    "kill_condition": "Coupling loss exceeds 3 dB at operational laser power levels",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Fiber damage at high power",
+     "detectability": "detectable via transmission monitoring",
+     "mitigation": "mitigation with power distribution optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial laser system manufacturers",
+    "use_case": "Quality monitoring in precision laser machining applications",
+    "integration_point": "Within the laser beam delivery and focusing system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a52d00babcfa91243290a983f51136f07c9906e4747919ee6dc9bbddb6e01cc0",
+    "output_hash": "03666650b4a09faa4064f71e1846e75369ea2bdcd3c6aade2a1c8444f0f6aa8b",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "machining",
+     "telecommunication",
+     "laser machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-telecom_optics-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Active Wavelength Monitoring System",
+   "target_domain": "telecommunications",
+   "source_domain": "fiber optics",
+   "domain_id": "telecom_optics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Free-space optical communication terminals experience blind spots where wavelength drift cannot be detected, leading to signal degradation.",
+   "causal_chain": [
+    "Fiber Bragg gratings with active wavelength control",
+    "Real-time wavelength monitoring",
+    "Drift detection and compensation",
+    "Signal quality maintained",
+    "Blind spot wavelength characteristics measured"
+   ],
+   "unexploited_phenomenon": "Active Wavelength Control of Fiber Bragg Gratings (RECORD_ID: doi:10.3390/mi17020263)",
+   "intervention": "Integration of actively tunable FBGs into free-space optical terminals to enable wavelength drift monitoring in blind spots.",
+   "governing_variables": "Wavelength shift sensitivity (\u0394\u03bb/\u0394T, pm/\u00b0C), tuning range (\u0394\u03bb_max, nm), response time (\u03c4, ms)",
+   "predicted_effect": "10-100x improvement in wavelength drift detection speed from current Hz to kHz range, enabling real-time compensation",
+   "equations": [
+    "\u0394\u03bb = (1-\u03c1_e)\u00b7\u039b\u00b7(1+\u03c1_s)\u00b7\u03b5_z (where \u03c1_e is elasto-optic coefficient, \u039b is grating period, \u03c1_s is strain coefficient, \u03b5_z is axial strain)"
+   ],
+   "boundary_conditions": "Effective within C-band (1530-1565 nm), requires temperature control, limited by grating reflectivity bandwidth",
+   "evidence_refs": [
+    "doi:10.3390/mi17020263"
+   ],
+   "cross_domain_transition": "active fiber grating tuning -> free-space optical wavelength stabilization, leveraging active control for enhanced monitoring",
+   "baseline": {
+    "baseline_incumbent": "Passive wavelength monitoring with slow response time and limited accuracy",
+    "baseline_metric": "\u00b150 pm wavelength uncertainty, 1 Hz response rate",
+    "candidate_metric": "\u00b15 pm wavelength uncertainty, 1 kHz response rate",
+    "expected_delta": "90% improvement in wavelength accuracy with 1000x improvement in response speed"
+   },
+   "killer_experiment": {
+    "experiment": "Laboratory comparison of active vs passive FBG wavelength monitoring under simulated atmospheric conditions",
+    "decisive_uncertainty": "Whether active FBGs can maintain wavelength stability under thermal cycling conditions expected in free-space terminals",
+    "kill_condition": "Wavelength drift exceeds \u00b120 pm under thermal cycling from -40\u00b0C to +85\u00b0C",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Optical power loss during tuning",
+     "detectability": "detectable via transmission monitoring",
+     "mitigation": "mitigation with optimized grating design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Free-space optical communication system providers",
+    "use_case": "Maintaining signal quality in atmospheric optical communication links",
+    "integration_point": "Within the wavelength division multiplexing subsystem"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a52d00babcfa91243290a983f51136f07c9906e4747919ee6dc9bbddb6e01cc0",
+    "output_hash": "03666650b4a09faa4064f71e1846e75369ea2bdcd3c6aade2a1c8444f0f6aa8b",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "telecommunication"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-telecom_optics-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Frequency-Bin Entanglement Sensing",
+   "target_domain": "telecommunications",
+   "source_domain": "quantum photonics",
+   "domain_id": "telecom_optics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Fiber-optic communication links have blind spots where signal degradation cannot be detected due to lack of advanced sensing capabilities.",
+   "causal_chain": [
+    "Time-resolved certification of frequency-bin entanglement",
+    "Multi-channel state analysis",
+    "Degradation detection",
+    "Signal quality assessment",
+    "Blind spot characteristics measured"
+   ],
+   "unexploited_phenomenon": "Time-resolved certification of frequency-bin entanglement over multi-mode channels (RECORD_ID: doi:10.1038/s41534-026-01183-5)",
+   "intervention": "Integration of frequency-bin entanglement sensing into fiber-optic communication links to enable detection of signal degradation in blind spots.",
+   "governing_variables": "Entanglement visibility (V, %), mode coupling efficiency (\u03b7_c, %), temporal resolution (\u0394t, ps)",
+   "predicted_effect": "50-80% improvement in degradation detection sensitivity due to quantum-enhanced sensing capabilities",
+   "equations": [
+    "V = (I_max - I_min)/(I_max + I_min) where I_max and I_min are maximum and minimum coincidence counts"
+   ],
+   "boundary_conditions": "Requires quantum light source, limited by detector efficiency, effective only in low-loss channels",
+   "evidence_refs": [
+    "doi:10.1038/s41534-026-01183-5"
+   ],
+   "cross_domain_transition": "quantum entanglement certification -> classical signal quality monitoring, leveraging quantum correlations for enhanced sensitivity",
+   "baseline": {
+    "baseline_incumbent": "Classical power monitoring with limited sensitivity to subtle signal changes",
+    "baseline_metric": "3 dB signal-to-noise ratio for detecting 1 dB power variations",
+    "candidate_metric": "15 dB signal-to-noise ratio for detecting 0.1 dB power variations",
+    "expected_delta": "400% improvement in detection sensitivity with enhanced resolution"
+   },
+   "killer_experiment": {
+    "experiment": "Laboratory comparison of quantum-enhanced vs classical sensing system detecting signal degradation",
+    "decisive_uncertainty": "Whether quantum entanglement can be maintained and detected in realistic telecom channel conditions with losses",
+    "kill_condition": "Entanglement visibility drops below 50% under simulated channel loss conditions",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Detector dark counts",
+     "detectability": "detectable via coincidence measurement",
+     "mitigation": "mitigation with cooled detectors"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Long-haul fiber optic network operators",
+    "use_case": "Monitoring signal integrity across transoceanic communication links",
+    "integration_point": "Within optical amplification and regeneration stations"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a52d00babcfa91243290a983f51136f07c9906e4747919ee6dc9bbddb6e01cc0",
+    "output_hash": "03666650b4a09faa4064f71e1846e75369ea2bdcd3c6aade2a1c8444f0f6aa8b",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "telecommunication"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-telecom_optics-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "CMOS Photonics Sensing Integration",
+   "target_domain": "telecommunications",
+   "source_domain": "integrated photonics",
+   "domain_id": "telecom_optics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Laser machining heads have blind spots where beam parameters cannot be measured due to lack of integrated sensing capabilities.",
+   "causal_chain": [
+    "CMOS photonics based 10Gbps fiber optic communication link",
+    "Integrated photonic sensing",
+    "Real-time parameter monitoring",
+    "Quality assessment",
+    "Blind spot characteristics measured"
+   ],
+   "unexploited_phenomenon": "A CMOS photonics based 10Gbps fiber optic communication link (RECORD_ID: doi:10.1109/ofc.2007.4348391)",
+   "intervention": "Integration of CMOS photonics sensing components into laser machining heads to enable real-time beam parameter monitoring.",
+   "governing_variables": "Integration density (components/mm\u00b2), response time (\u03c4, ps), power consumption (P, mW)",
+   "predicted_effect": "70-90% reduction in blind spot area due to compact, high-density sensor integration",
+   "equations": [
+    "Sensitivity = \u221a(P_in\u00d7\u03b7)/(\u0394\u03bd\u00d7h\u03bd) where P_in is input power, \u03b7 is detector efficiency, \u0394\u03bd is bandwidth, h is Planck's constant"
+   ],
+   "boundary_conditions": "Limited by CMOS process node, requires thermal management, effective only at designed wavelengths",
+   "evidence_refs": [
+    "doi:10.1109/ofc.2007.4348391"
+   ],
+   "cross_domain_transition": "high-speed communication photonic integration -> laser parameter sensing, leveraging compact integration for distributed sensing",
+   "baseline": {
+    "baseline_incumbent": "Discrete photodiode arrays with limited integration density",
+    "baseline_metric": "5 sensors per mm\u00b2 with 10 ns response time",
+    "candidate_metric": "50 sensors per mm\u00b2 with 100 ps response time",
+    "expected_delta": "900% improvement in sensor density with 100x improvement in response speed"
+   },
+   "killer_experiment": {
+    "experiment": "Benchtop comparison of CMOS vs discrete sensor array mapping beam intensity profile",
+    "decisive_uncertainty": "Whether CMOS photonic sensors can maintain performance under high-power laser conditions",
+    "kill_condition": "Sensor failure rate exceeds 5% at operational laser power levels",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Optical power saturation",
+     "detectability": "detectable via linearity testing",
+     "mitigation": "mitigation with automatic gain control"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Precision laser equipment manufacturers",
+    "use_case": "Quality monitoring in industrial laser processing systems",
+    "integration_point": "Within the laser beam delivery and focusing assembly"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "a52d00babcfa91243290a983f51136f07c9906e4747919ee6dc9bbddb6e01cc0",
+    "output_hash": "03666650b4a09faa4064f71e1846e75369ea2bdcd3c6aade2a1c8444f0f6aa8b",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "machining",
+     "telecommunication",
+     "laser machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-telecom_optics-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Metasurface-Based Optical Signal Conversion",
+   "target_domain": "Telecommunications",
+   "source_domain": "Photonics",
+   "domain_id": "telecom_optics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "Fiber-optic communication link reliability failures due to signal degradation and environmental interference.",
+   "causal_chain": [
+    "Environmental disturbances cause signal distortion",
+    "Non-linear metasurface manipulates electromagnetic wave properties",
+    "Coherent wave down-conversion occurs",
+    "Signal quality is restored",
+    "Communication link reliability improves."
+   ],
+   "unexploited_phenomenon": "Non-linear active metasurfaces that can adjust the frequency of impinging waves while manipulating amplitude and phase.",
+   "intervention": "Integration of a reconfigurable non-linear active metasurface into fiber-optic communication systems for signal conversion and quality enhancement.",
+   "governing_variables": "Metasurface material properties (\u03c7\u207d\u00b3\u207e, m\u00b2/W), input power (P, W), frequency conversion efficiency (\u03b7, %).",
+   "predicted_effect": "40-70% reduction in signal error rate because the metasurface can compensate for phase distortions and frequency shifts.",
+   "equations": [
+    "\u03b7 = (P_out/P_in) \u00d7 100%, where P_out is the output power after conversion",
+    "\u03c7\u207d\u00b3\u207e determines the efficiency of three-wave mixing processes."
+   ],
+   "boundary_conditions": "Effective at optical frequencies (1550 nm range), requires precise alignment, fails at extreme power levels causing material damage.",
+   "evidence_refs": [
+    "doi:10.1038/s41467-025-57132-x"
+   ],
+   "cross_domain_transition": "Photonics research on metasurfaces -> Telecommunication signal processing, creating value by enabling more robust communication links.",
+   "baseline": {
+    "baseline_incumbent": "Traditional optical amplifiers and repeaters that cannot perform frequency conversion and are susceptible to environmental disturbances.",
+    "baseline_metric": "Current systems achieve bit error rates of 10\u207b\u2079 to 10\u207b\u00b9\u00b2 under ideal conditions.",
+    "candidate_metric": "Predicted bit error rate of 10\u207b\u00b9\u00b3 to 10\u207b\u00b9\u2074 under the same conditions.",
+    "expected_delta": "10-100x improvement in bit error rate reliability."
+   },
+   "killer_experiment": {
+    "experiment": "Test bench with metasurface integrated into fiber-optic link, test with controlled environmental disturbances, measure bit error rate.",
+    "decisive_uncertainty": "Whether the metasurface can maintain conversion efficiency under varying environmental conditions.",
+    "kill_condition": "Bit error rate not improved or worsened compared to baseline system.",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Metasurface degradation over time",
+     "detectability": "detectable through increased insertion loss",
+     "mitigation": "mitigation through protective coating"
+    },
+    {
+     "failure_mode": "Thermal management issues",
+     "detectability": "detectable through temperature monitoring",
+     "mitigation": "mitigation through active cooling."
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Telecommunications network operators",
+    "use_case": "Enhancing reliability of long-haul fiber-optic communication links in harsh environments.",
+    "integration_point": "Between signal regeneration points in existing fiber-optic infrastructure."
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "afb12ce6d691e8a65b41ae1de52f8893d6318196b6f996dd53a69e8d3956bf9c",
+    "output_hash": "5022476195b93d78461c80065d6e72c0a57f5f73194972db2aeb69ea4c809936",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "cement",
+     "telecommunication"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-telecom_optics-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "QKD-Protected Time Dissemination",
+   "target_domain": "Telecommunications",
+   "source_domain": "Quantum Security",
+   "domain_id": "telecom_optics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "Free-space optical communication terminal reliability failures due to interception and signal tampering.",
+   "causal_chain": [
+    "Signal interception attempts occur",
+    "Quantum key distribution (QKD) secures the communication channel",
+    "Time dissemination signals are protected",
+    "Unauthorized access is prevented",
+    "Communication reliability is enhanced."
+   ],
+   "unexploited_phenomenon": "Quantum key distribution techniques that can protect critical infrastructure while maintaining precise time and frequency dissemination.",
+   "intervention": "Implementation of QKD-protected fiber-based infrastructure for time dissemination in free-space optical communication terminals.",
+   "governing_variables": "Quantum bit error rate (QBER, %), key generation rate (R, kbps), distance between nodes (L, km).",
+   "predicted_effect": "90-99% reduction in successful interception attempts because QKD provides theoretically unbreakable encryption.",
+   "equations": [
+    "R = f(L, \u03b7) where f is a decreasing function of distance L and channel efficiency \u03b7",
+    "QBER < 11% required for secure key generation."
+   ],
+   "boundary_conditions": "Effective for point-to-point connections up to 100km, requires dedicated fiber infrastructure, fails if quantum channel is physically tampered with.",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-97480-8"
+   ],
+   "cross_domain_transition": "Quantum security research -> Telecommunication security systems, creating value by enabling secure last-mile communication.",
+   "baseline": {
+    "baseline_incumbent": "Traditional encryption methods that can be broken with sufficient computational resources.",
+    "baseline_metric": "Current systems can be compromised with advanced cryptographic attacks.",
+    "candidate_metric": "Predicted security level where computational\u7834\u89e3 requires resources exceeding global computing capacity.",
+    "expected_delta": "Orders of magnitude improvement in security against interception."
+   },
+   "killer_experiment": {
+    "experiment": "Laboratory test of QKD system with simulated interception attempts, measure key generation rate and QBER.",
+    "decisive_uncertainty": "Whether QKD can be practically integrated with existing free-space optical systems without significant performance degradation.",
+    "kill_condition": "QBER exceeds threshold or key generation rate drops below practical requirements.",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Quantum detector inefficiency",
+     "detectability": "detectable through reduced key generation rate",
+     "mitigation": "mitigation through improved detector technology"
+    },
+    {
+     "failure_mode": "Environmental interference",
+     "detectability": "detectable through increased QBER",
+     "mitigation": "mitigation through quantum error correction."
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Government agencies and secure communication providers",
+    "use_case": "Securing free-space optical communication terminals in critical infrastructure.",
+    "integration_point": "Between communication terminals and secure network infrastructure."
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "afb12ce6d691e8a65b41ae1de52f8893d6318196b6f996dd53a69e8d3956bf9c",
+    "output_hash": "5022476195b93d78461c80065d6e72c0a57f5f73194972db2aeb69ea4c809936",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "telecommunication"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-telecom_optics-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Lensed Chemically Etched Fiber Coupling",
+   "target_domain": "Telecommunications",
+   "source_domain": "Photonics Manufacturing",
+   "domain_id": "telecom_optics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "Laser machining head reliability failures due to misalignment and coupling losses in optical systems.",
+   "causal_chain": [
+    "Mechanical vibrations cause misalignment",
+    "Lensed chemically etched optical fibers (LEOFs) provide efficient coupling",
+    "Coupling losses are minimized",
+    "Signal integrity is maintained",
+    "Machining precision is maintained."
+   ],
+   "unexploited_phenomenon": "Lensed, chemically etched optical fibers that achieve low coupling loss with multicore fibers through optimized geometry.",
+   "intervention": "Replacement of standard fiber coupling with LEOFs in laser machining heads to reduce sensitivity to misalignment.",
+   "governing_variables": "Coupling loss (L, dB), working distance (d, \u03bcm), numerical aperture (NA).",
+   "predicted_effect": "50-80% reduction in coupling losses because LEOFs maintain efficiency even with minor misalignments.",
+   "equations": [
+    "L = -10log\u2081\u2080(P_out/P_in), where P_out and P_in are output and input powers",
+    "optimal d minimizes L for given NA."
+   ],
+   "boundary_conditions": "Effective at 1550nm wavelength, requires precise etching process, fails under extreme mechanical stress exceeding material limits.",
+   "evidence_refs": [
+    "doi:10.3390/ma19051013"
+   ],
+   "cross_domain_transition": "Photonics manufacturing research -> Laser machining systems, creating value by improving machining precision and reliability.",
+   "baseline": {
+    "baseline_incumbent": "Standard fiber coupling that requires precise alignment and suffers from high losses under misalignment.",
+    "baseline_metric": "Current systems achieve coupling losses of 1-3 dB under ideal conditions.",
+    "candidate_metric": "Predicted coupling losses of 0.4-0.76 dB under the same conditions.",
+    "expected_delta": "2-7x improvement in coupling efficiency."
+   },
+   "killer_experiment": {
+    "experiment": "Test bench with LEOFs and standard fibers, measure coupling loss under controlled misalignment conditions.",
+    "decisive_uncertainty": "Whether LEOFs can maintain low coupling loss in high-vibration machining environments.",
+    "kill_condition": "Coupling loss not significantly improved compared to standard fibers.",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Fiber tip degradation",
+     "detectability": "detectable through increased coupling loss",
+     "mitigation": "mitigation through protective coating"
+    },
+    {
+     "failure_mode": "Etching inconsistency",
+     "detectability": "detectable through performance variation",
+     "mitigation": "mitigation through improved manufacturing process."
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial laser system manufacturers",
+    "use_case": "Improving reliability of laser machining heads in precision manufacturing applications.",
+    "integration_point": "Between laser source and machining head in existing laser systems."
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "afb12ce6d691e8a65b41ae1de52f8893d6318196b6f996dd53a69e8d3956bf9c",
+    "output_hash": "5022476195b93d78461c80065d6e72c0a57f5f73194972db2aeb69ea4c809936",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "cement",
+     "machining",
+     "telecommunication",
+     "laser machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-telecom_optics-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Metasurface Frequency Conversion",
+   "target_domain": "Quantum Computing",
+   "source_domain": "Telecommunications",
+   "domain_id": "telecom_optics",
+   "pain_class": "Signal Processing Efficiency",
+   "problem": "Current quantum computing systems suffer from inefficient frequency conversion of quantum signals, limiting scalability and multi-mode compatibility.",
+   "causal_chain": [
+    "Non-linear electronic-photonic metasurface absorbs input electromagnetic wave",
+    "metasurface properties manipulated to transfer information",
+    "frequency of wave down-converted",
+    "quantum signal processed with higher efficiency"
+   ],
+   "unexploited_phenomenon": "Coherent wave down-conversion using non-linear active metasurfaces",
+   "intervention": "Integration of reconfigurable non-linear active metasurfaces into quantum computing signal processing chains",
+   "governing_variables": "Metasurface material properties (\u03c7\u207d\u00b2\u207e nonlinear susceptibility), input frequency (\u03c9), output frequency (\u03c9'), power density (W/m\u00b2)",
+   "predicted_effect": "40-70% reduction in quantum signal processing loss because metasurfaces enable direct frequency conversion without intermediate components",
+   "equations": [
+    "\u03c9' = \u03c9 - \u0394\u03c9 (down-conversion), P_out = P_in \u00d7 |\u03c7\u207d\u00b2\u207e|\u00b2 \u00d7 L\u00b2 (output power)"
+   ],
+   "boundary_conditions": "Effective at optical frequencies (1550nm range), requires precise metasurface fabrication, fails at extremely high input powers causing damage",
+   "evidence_refs": [
+    "doi:10.1038/s41467-025-57132-x"
+   ],
+   "cross_domain_transition": "Telecommunications photonics -> quantum computing signal processing, transferring metasurface frequency conversion technology enables more efficient quantum state manipulation",
+   "baseline": {
+    "baseline_incumbent": "Active and lossy components for frequency-bin entangled photon analysis",
+    "baseline_metric": "3-5 dB loss in quantum signal processing components",
+    "candidate_metric": "1-2 dB loss in quantum signal processing components",
+    "expected_delta": "2-3 dB reduction in signal loss (60-80% improvement)"
+   },
+   "killer_experiment": {
+    "experiment": "Benchtop optical setup with metasurface sample vs conventional frequency converter, measure output power and signal fidelity",
+    "decisive_uncertainty": "Whether metasurface frequency conversion maintains quantum state coherence",
+    "kill_condition": "If quantum state fidelity drops below 90% of conventional method",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Metasurface fabrication defects",
+     "detectability": "detectable through optical characterization",
+     "mitigation": "mitigation through improved fabrication control"
+    },
+    {
+     "failure_mode": "Thermal damage at high power",
+     "detectability": "detectable through temperature monitoring",
+     "mitigation": "mitigation through active cooling"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Quantum computing hardware manufacturers",
+    "use_case": "Signal processing in quantum computing systems requiring frequency conversion",
+    "integration_point": "Between quantum state generation and processing units in quantum processors"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "6e96c969ea858e6de227801056047214e15cf061f60dd059bdf83efe7c9c68db",
+    "output_hash": "963060710d4aa5346b45eba67ec18f03b5d971c20ca6ea01a8a1e118d63abc57",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-telecom_optics-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Lensed Chemically Etched Optical Fibers",
+   "target_domain": "Semiconductor Manufacturing",
+   "source_domain": "Telecommunications",
+   "domain_id": "telecom_optics",
+   "pain_class": "Precision Optical Coupling",
+   "problem": "Semiconductor manufacturing requires precise optical coupling between components with minimal loss, especially in multi-core fiber configurations.",
+   "causal_chain": [
+    "Chemical etching creates lens profile on fiber tip",
+    "lens shape optimized for multicore fiber coupling",
+    "physical contact or optimal working distance established",
+    "light efficiently coupled between components"
+   ],
+   "unexploited_phenomenon": "Lensed chemically etched optical fibers for efficient multicore fiber coupling",
+   "intervention": "Integration of lensed chemically etched optical fibers into semiconductor manufacturing equipment requiring optical coupling",
+   "governing_variables": "Numerical aperture (NA), working distance (mm), coupling loss (dB), core diameter (\u03bcm)",
+   "predicted_effect": "50-80% reduction in coupling loss compared to standard fiber coupling because lensed fibers provide optimal focusing for multicore configurations",
+   "equations": [
+    "Coupling_loss(dB) = -10\u00d7log\u2081\u2080(\u03b7), \u03b7 = (\u03c0\u00d7NA\u00b2\u00d7d\u00b2)/(4\u00d7\u03bb\u00b2) (coupling efficiency)"
+   ],
+   "boundary_conditions": "Effective at 1550nm wavelength, requires precise etching control, fails with misaligned cores or extreme temperature variations",
+   "evidence_refs": [
+    "doi:10.3390/ma19051013"
+   ],
+   "cross_domain_transition": "Telecommunications optical coupling -> semiconductor manufacturing equipment, transferring lensed fiber technology enables more precise optical alignment in semiconductor manufacturing processes",
+   "baseline": {
+    "baseline_incumbent": "Standard fiber coupling with additional focusing optics",
+    "baseline_metric": "3-5 dB coupling loss in multicore fiber systems",
+    "candidate_metric": "0.4-0.76 dB coupling loss in multicore fiber systems",
+    "expected_delta": "2.5-4.5 dB reduction in coupling loss (80-90% improvement)"
+   },
+   "killer_experiment": {
+    "experiment": "Benchtop optical coupling setup with lensed etched fibers vs standard fibers, measure coupling efficiency and alignment tolerance",
+    "decisive_uncertainty": "Whether lensed fibers maintain performance in semiconductor manufacturing environment conditions",
+    "kill_condition": "If coupling loss exceeds 1 dB or performance degrades in temperature cycling test",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Etching inconsistency",
+     "detectability": "detectable through microscopy",
+     "mitigation": "mitigation through improved process control"
+    },
+    {
+     "failure_mode": "Environmental degradation",
+     "detectability": "detectable through performance monitoring",
+     "mitigation": "mitigation through protective coating"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Semiconductor manufacturing equipment manufacturers",
+    "use_case": "Optical coupling in semiconductor inspection and lithography systems",
+    "integration_point": "Between optical sources and detectors in semiconductor manufacturing equipment"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "6e96c969ea858e6de227801056047214e15cf061f60dd059bdf83efe7c9c68db",
+    "output_hash": "963060710d4aa5346b45eba67ec18f03b5d971c20ca6ea01a8a1e118d63abc57",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "semiconductor",
+     "manufacturing",
+     "optical fiber"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-telecom_optics-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Active Wavelength Control FBGs",
+   "target_domain": "Aerospace Sensing",
+   "source_domain": "Telecommunications",
+   "domain_id": "telecom_optics",
+   "pain_class": "Sensor Calibration Stability",
+   "problem": "Aerospace sensing systems require stable, calibration-resistant optical sensors that can operate in extreme temperature and vibration environments.",
+   "causal_chain": [
+    "Fiber Bragg grating with active wavelength control mechanism",
+    "temperature/vibration induced wavelength shifts compensated",
+    "stable wavelength output maintained",
+    "precise sensing measurements achieved"
+   ],
+   "unexploited_phenomenon": "Active wavelength control of fiber Bragg gratings for dynamic compensation",
+   "intervention": "Integration of actively tunable fiber Bragg gratings into aerospace sensing systems",
+   "governing_variables": "Temperature coefficient (pm/\u00b0C), strain sensitivity (pm/\u03bc\u03b5), tuning range (nm), response time (ms)",
+   "predicted_effect": "10-50x improvement in sensor stability under extreme conditions because active compensation counteracts environmental effects",
+   "equations": [
+    "\u0394\u03bb = \u03bb\u2080(1.44\u00d7\u0394\u03b5 + 6.8\u00d710\u207b\u2076\u00d7\u0394T) (Bragg wavelength shift), \u03bb_tuned = \u03bb\u2080 + \u0394\u03bb_compensation"
+   ],
+   "boundary_conditions": "Effective for temperature ranges -40\u00b0C to 85\u00b0C, requires power for active control, fails if control system malfunctions",
+   "evidence_refs": [
+    "doi:10.3390/mi17020263"
+   ],
+   "cross_domain_transition": "Telecommunications sensing -> aerospace structural monitoring, transferring active FBG technology enables more reliable structural health monitoring in extreme aerospace environments",
+   "baseline": {
+    "baseline_incumbent": "Passive fiber Bragg gratings with periodic recalibration",
+    "baseline_metric": "\u00b1100 pm wavelength drift under temperature variation",
+    "candidate_metric": "\u00b12 pm wavelength drift under temperature variation",
+    "expected_delta": "50x improvement in wavelength stability (98% reduction in drift)"
+   },
+   "killer_experiment": {
+    "experiment": "Environmental chamber test with actively controlled FBG vs passive FBG, measure wavelength stability under temperature cycling and vibration",
+    "decisive_uncertainty": "Whether active control system can maintain performance under extreme aerospace conditions",
+    "kill_condition": "If wavelength drift exceeds \u00b15 pm or control system fails under vibration testing",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Control system failure",
+     "detectability": "detectable through monitoring",
+     "mitigation": "mitigation through redundant control"
+    },
+    {
+     "failure_mode": "Fiber fatigue",
+     "detectability": "detectable through optical monitoring",
+     "mitigation": "mitigation through periodic replacement"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Aerospace structural health monitoring system providers",
+    "use_case": "Structural monitoring in aircraft, spacecraft, and launch vehicles",
+    "integration_point": "Between optical interrogators and structural sensors in aerospace platforms"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "6e96c969ea858e6de227801056047214e15cf061f60dd059bdf83efe7c9c68db",
+    "output_hash": "963060710d4aa5346b45eba67ec18f03b5d971c20ca6ea01a8a1e118d63abc57",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "aerospace"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-telecom_optics-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Free-Space Optical QKD Last-Mile",
+   "target_domain": "Smart Grid Security",
+   "source_domain": "Telecommunications",
+   "domain_id": "telecom_optics",
+   "pain_class": "Secure Communication",
+   "problem": "Smart grid infrastructure requires secure last-mile communication between substations and control centers vulnerable to interception.",
+   "causal_chain": [
+    "Free-space optical quantum key distribution established between points",
+    "quantum keys generated and distributed",
+    "classical data encrypted with quantum keys",
+    "secure communication achieved without physical infrastructure"
+   ],
+   "unexploited_phenomenon": "Free-space optical quantum key distribution for secure last-mile communication",
+   "intervention": "Deployment of free-space optical QKD systems for smart grid last-mile communication",
+   "governing_variables": "Free-space distance (km), atmospheric attenuation (dB/km), key generation rate (bits/s), quantum bit error rate",
+   "predicted_effect": "100-1000x improvement in communication security against eavesdropping because quantum key distribution provides theoretically unbreakable encryption",
+   "equations": [
+    "Key_rate = \u03bc \u00d7 \u03b7 \u00d7 f \u00d7 R (quantum key generation rate), \u03b7 = e^(-\u03b1\u00d7d) (atmospheric transmission)"
+   ],
+   "boundary_conditions": "Effective for distances up to 5km in clear weather, requires line-of-sight, fails in heavy fog or precipitation",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-34184-z"
+   ],
+   "cross_domain_transition": "Telecommunications quantum security -> smart grid infrastructure, transferring FSO-QKD technology provides quantum-level security for critical smart grid communications without requiring expensive fiber infrastructure",
+   "baseline": {
+    "baseline_incumbent": "Encrypted radio frequency or wired communication",
+    "baseline_metric": "128-256 bit classical encryption with potential vulnerabilities",
+    "candidate_metric": "Quantum encryption with information-theoretic security",
+    "expected_delta": "100-1000x improvement in security against computational attacks"
+   },
+   "killer_experiment": {
+    "experiment": "Field test with FSO-QKD link vs RF encrypted link, measure key generation rate and attempt interception",
+    "decisive_uncertainty": "Whether FSO-QKD can maintain sufficient key rate in typical smart grid environmental conditions",
+    "kill_condition": "If key generation rate drops below 10 bps or QBER exceeds 5%",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Atmospheric interference",
+     "detectability": "detectable through signal monitoring",
+     "mitigation": "mitigation through adaptive optics"
+    },
+    {
+     "failure_mode": "Alignment drift",
+     "detectability": "detectable through tracking systems",
+     "mitigation": "mitigation through auto-alignment mechanisms"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Smart grid infrastructure providers",
+    "use_case": "Secure communication between substations and control centers",
+    "integration_point": "Between smart grid sensors and control networks"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "6e96c969ea858e6de227801056047214e15cf061f60dd059bdf83efe7c9c68db",
+    "output_hash": "963060710d4aa5346b45eba67ec18f03b5d971c20ca6ea01a8a1e118d63abc57",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "grid"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-telecom_optics-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Multimode Fiber Frequency-Bin Entanglement",
+   "target_domain": "Satellite Communications",
+   "source_domain": "Telecommunications",
+   "domain_id": "telecom_optics",
+   "pain_class": "Quantum State Transmission",
+   "problem": "Satellite-based quantum communication systems require robust quantum state transmission that can handle multi-modal channel conditions.",
+   "causal_chain": [
+    "Frequency-bin entangled photons generated on-chip",
+    "multimode channel transmission",
+    "time-resolved certification of entanglement",
+    "quantum state maintained despite channel variations"
+   ],
+   "unexploited_phenomenon": "Time-resolved certification of frequency-bin entanglement over multimode channels",
+   "intervention": "Integration of multimode fiber frequency-bin entanglement systems into satellite quantum communication terminals",
+   "governing_variables": "Mode count, channel length (km), entanglement fidelity, photon loss (dB/km)",
+   "predicted_effect": "3-10x improvement in quantum communication robustness because frequency-bin entanglement maintains coherence across multimode channels",
+   "equations": [
+    "Fidelity = |\u27e8\u03c8|\u03c6\u27e9|\u00b2 (entanglement fidelity), Loss = 10\u00d7log\u2081\u2080(N_in/N_out) (channel loss)"
+   ],
+   "boundary_conditions": "Effective for satellite-to-ground links, requires precise wavelength control, fails with extreme temperature variations",
+   "evidence_refs": [
+    "doi:10.1038/s41534-026-01183-5"
+   ],
+   "cross_domain_transition": "Telecommunications quantum communication -> satellite quantum networks, transferring frequency-bin entanglement technology enables more robust satellite-based quantum communication systems",
+   "baseline": {
+    "baseline_incumbent": "Single-mode fiber quantum communication systems",
+    "baseline_metric": "70-80% entanglement fidelity over multimode channels",
+    "candidate_metric": "90-95% entanglement fidelity over multimode channels",
+    "expected_delta": "20-25% improvement in entanglement fidelity"
+   },
+   "killer_experiment": {
+    "experiment": "Laboratory simulation of satellite link conditions with multimode fiber, measure entanglement fidelity and mode coupling effects",
+    "decisive_uncertainty": "Whether time-resolved certification can maintain performance in actual satellite link conditions",
+    "kill_condition": "If entanglement fidelity drops below 85% or mode coupling exceeds 10%",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Temperature-induced wavelength drift",
+     "detectability": "detectable through monitoring",
+     "mitigation": "mitigation through active temperature control"
+    },
+    {
+     "failure_mode": "Mode coupling",
+     "detectability": "detectable through analysis",
+     "mitigation": "mitigation through optimized fiber design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Satellite quantum communication system providers",
+    "use_case": "Quantum key distribution between satellites and ground stations",
+    "integration_point": "Between quantum light sources and communication terminals in satellite systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "6e96c969ea858e6de227801056047214e15cf061f60dd059bdf83efe7c9c68db",
+    "output_hash": "963060710d4aa5346b45eba67ec18f03b5d971c20ca6ea01a8a1e118d63abc57",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  }
+ ],
+ "rejected": [
+  {
+   "candidate_id": "C-telecom_optics-2",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-3",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-4",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-5",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-6",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-7",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-8",
+   "reasons": [
+    "missing field TECHNOLOGY_NAME",
+    "missing field TARGET_DOMAIN",
+    "missing field SOURCE_DOMAIN",
+    "missing field PAIN_CLASS",
+    "missing field PROBLEM",
+    "missing field CAUSAL_CHAIN",
+    "missing field UNEXPLOITED_PHENOMENON",
+    "missing field INTERVENTION",
+    "missing field GOVERNING_VARIABLES",
+    "missing field PREDICTED_EFFECT",
+    "missing field EQUATIONS",
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-7",
+   "reasons": [
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-4",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-5",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-6",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-7",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-8",
+   "reasons": [
+    "missing field GOVERNING_VARIABLES",
+    "missing field PREDICTED_EFFECT",
+    "missing field EQUATIONS",
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-2",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-7",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-telecom_optics-8",
+   "reasons": [
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  }
+ ],
+ "pool_sha256": "1fc3d997bb7b1a7e56ec19ed14f1c627098444ee483f17d63c0da8759689d5b5"
+}

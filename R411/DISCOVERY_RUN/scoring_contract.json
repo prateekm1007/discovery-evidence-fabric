@@ -1,0 +1,63 @@
+{
+ "contract_version": "R411-SCORING-V1",
+ "dimensions": {
+  "technical_problem_severity": {
+   "weight": 1.2,
+   "measure": "evidence-pool records documenting the problem's severity/cost (count + explicit severity language), deterministically counted"
+  },
+  "economic_consequence": {
+   "weight": 1.3,
+   "measure": "evidence records carrying quantified cost/loss figures (currency, percentage, downtime) near the problem"
+  },
+  "incumbent_cost": {
+   "weight": 1.0,
+   "measure": "baseline existence + evidence of incumbent's cost/burden (documented baseline artifacts)"
+  },
+  "performance_headroom": {
+   "weight": 1.2,
+   "measure": "predicted delta vs baseline present with magnitude class + governing variables + equations"
+  },
+  "mechanism_plausibility": {
+   "weight": 1.2,
+   "measure": "structural: causal-chain step count, governing variables, equations, boundary conditions present; physics vocabulary matched to the claimed effect"
+  },
+  "evidence_strength": {
+   "weight": 1.6,
+   "measure": "number AND family-independence of fabric evidence records backing the mechanism claims (binding enforced: refs must exist in the frozen pool)"
+  },
+  "engineering_feasibility": {
+   "weight": 1.1,
+   "measure": "structural: design variables, realization path, materials/components referenced in evidence pool"
+  },
+  "implementation_complexity": {
+   "weight": 0.9,
+   "measure": "deterministic complexity token count (moving parts, regimes, subsystems) \u2014 LOWER complexity scores HIGHER"
+  },
+  "validation_cost": {
+   "weight": 1.0,
+   "measure": "experiment apparatus class from the recorded killer experiment (bench/lab/pilot/field) \u2014 cheaper scores HIGHER"
+  },
+  "commercial_adoption_path": {
+   "weight": 1.1,
+   "measure": "buyer/use-case/integration-point present + evidence records showing industrial adoption of adjacent technologies"
+  },
+  "differentiation": {
+   "weight": 1.4,
+   "measure": "prior-art distance from the adversarial search: closest art found + typed distinction surviving the collision gate"
+  },
+  "cross_domain_opportunity": {
+   "weight": 0.8,
+   "measure": "recorded cross-domain transition (source domain -> target domain differs) with target-domain evidence records"
+  },
+  "failure_risk": {
+   "weight": 0.9,
+   "measure": "known failure modes enumerated with detection + mitigation \u2014 MORE enumerated-with-mitigation scores HIGHER (blanket optimism scores LOWER)"
+  }
+ },
+ "composite_rule": "score = sum(weight_i * sub_i) / sum(weight_i), sub_i in [0,4] anchored; deterministic function of recorded state; no LLM narrative input",
+ "evidence_floor": 2,
+ "evidence_floor_rule": "evidence_strength sub-score < EVIDENCE_FLOOR => confidence LOW and finalist-ineligible regardless of composite (the score never substitutes for evidence)",
+ "ranking_rule": "final ranking = information_gain_per_cost = resolved_uncertainty_class / validation_cost_class (Art. LVI), tie-broken by composite score",
+ "frozen_before_candidates": true,
+ "contract_sha256": "614a27c263dfd148fbc8b4f91d45dc54d72697d4a9eea774d6259f3021ddb513"
+}

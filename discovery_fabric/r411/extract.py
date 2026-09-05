@@ -26,13 +26,17 @@ import json
 import re
 from typing import Any, Dict, List, Optional
 
+from .domain_matrix import PAIN_POINT_CLASSES
 from .medical_exclusion import medical_exclusion_screen
 
 EXTRACTION_VERSION = "R411-EXTRACT-V1"
 
-# The 13 evidence-grounded candidates-per-call target: keep prompts small
+# The evidence-grounded candidates-per-call target: keep prompts small
 # enough for the gateway's token budget while hitting the >=500 pool.
-CANDIDATES_PER_CALL = 6
+CANDIDATES_PER_CALL = 8
+
+# The s6 cross-domain forcing call (4th call per domain)
+CROSS_DOMAIN_MARKER = "__CROSS_DOMAIN__"
 
 EXTRACTION_PROMPT = """You are a mechanism-discovery instrument inside an engineering discovery engine.
 
@@ -52,7 +56,7 @@ TASK: Extract {n_candidates} TECHNOLOGY OPPORTUNITIES grounded in this evidence.
 6. Enumerate at least 2 failure modes of the candidate itself with detection and mitigation.
 
 OUTPUT FORMAT — for EACH candidate, exactly this block (plain text, no markdown):
-CANDIDATE_ID: C-{domain_id}-{n}
+CANDIDATE_ID: C-{domain_id}-<sequential number starting at 1>
 TECHNOLOGY_NAME: <short name>
 TARGET_DOMAIN: <the commercial application domain (NON-MEDICAL only: energy, industrial, manufacturing, materials, robotics, aerospace, automotive, electronics, thermal, fluid, environmental, agriculture, construction, semiconductor, telecom, data-center, mining, marine, chemical)>
 SOURCE_DOMAIN: <the domain the evidence/mechanism comes from>
@@ -124,16 +128,37 @@ def _evidence_block(pool: List[Dict[str, Any]], limit: int = 28) -> str:
 def build_extraction_prompt(entry: Dict[str, Any],
                             domain_spec: Dict[str, Any],
                             pool: List[Dict[str, Any]],
-                            batch_offset: int = 0) -> str:
-    pains = "\n".join(
-        f"- {p}: {domain_spec['label']} / {system}"
-        for system in domain_spec["systems"]
-        for p in domain_spec["pain_points"])
+                            pain_class: Optional[str] = None) -> str:
+    """Prompt for one extraction call. When pain_class is given the call
+    focuses on that ONE pain point (problem-first discipline); the
+    CROSS_DOMAIN_MARKER triggers the s6 forcing call (mechanisms in this
+    pool that transfer to OTHER domains)."""
+    if pain_class == CROSS_DOMAIN_MARKER:
+        pains = ("THE CROSS-DOMAIN FORCING TASK (s6): for every promising "
+                 "mechanism evidenced below, ask 'where else does this "
+                 "physical mechanism appear?' and propose candidates that "
+                 "RETARGET the mechanism to a DIFFERENT target domain "
+                 "than the source literature (aerospace->energy, "
+                 "optics->manufacturing, biology->industrial, "
+                 "microfluidics->chemical processing...). TARGET_DOMAIN "
+                 "must differ from SOURCE_DOMAIN for these candidates.")
+    elif pain_class and pain_class in domain_spec["pain_points"]:
+        pains = "\n".join(
+            f"- {system}: {pain_class}"
+            for system in domain_spec["systems"]) + "\n" + \
+            f"THE pain point this batch attacks: {pain_class} — " \
+            f"{PAIN_POINT_CLASSES.get(pain_class, {}).get('label', '')}"
+    else:
+        pains = "\n".join(
+            f"- {p}: {domain_spec['label']} / {system}"
+            for system in domain_spec["systems"]
+            for p in domain_spec["pain_points"]) + \
+            "\nattack the pain points listed below"
     return EXTRACTION_PROMPT.format(
         domain_label=domain_spec["label"],
         domain_id=entry["domain_id"],
         pain_points=pains,
-        evidence_records=_evidence_block(pool[batch_offset:]),
+        evidence_records=_evidence_block(pool),
         n_candidates=CANDIDATES_PER_CALL,
     )
 
@@ -147,14 +172,38 @@ def parse_candidates(text: str, domain_id: str,
     - any violation REJECTS that candidate (recorded, never repaired —
       Art. IV: no fallback epistemology, Art. VII: no weakening to
       rescue).
+
+    Block boundaries: a block starts at CANDIDATE_ID: and ends at the
+    next CANDIDATE_ID: or an END CANDIDATE marker or end-of-text (LLM
+    output can truncate at the token budget — an incomplete final block
+    simply fails the required-fields check and is rejected honestly).
     """
     pool_ids = {str(r.get("record_id") or r.get("id")) for r in pool}
     accepted: List[Dict[str, Any]] = []
     rejected: List[Dict[str, Any]] = []
-    for m in _CAND_RE.finditer(text or ""):
-        body = m.group(2)
-        fields = dict(_FIELD_RE.findall(body))
+    # split into blocks on CANDIDATE_ID occurrences
+    starts = [m.start() for m in re.finditer(
+        r"^CANDIDATE_ID\s*:\s*", text or "", re.MULTILINE)]
+    if not starts:
+        return {
+            "accepted": [],
+            "rejected": [],
+            "extraction_version": EXTRACTION_VERSION,
+            "no_fabrication_rule": (
+                "every evidence_ref validated against the frozen pool; "
+                "violations rejected, never repaired (Art. IV/VII)"),
+        }
+    blocks = []
+    for i, s in enumerate(starts):
+        end = starts[i + 1] if i + 1 < len(starts) else len(text)
+        blocks.append(text[s:end])
+    for block in blocks:
+        block = re.sub(r"END CANDIDATE\s*$", "", block.strip()) + "\n"
+        m = re.match(r"CANDIDATE_ID\s*:\s*(.+?)\n", block)
+        if not m:
+            continue
         cand_id = m.group(1).strip()
+        fields = dict(_FIELD_RE.findall(block))
         reasons = []
         for f in REQUIRED_FIELDS:
             if not fields.get(f, "").strip():

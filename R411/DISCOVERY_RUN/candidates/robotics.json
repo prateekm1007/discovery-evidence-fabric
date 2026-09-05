@@ -1,0 +1,1964 @@
+{
+ "domain_id": "robotics",
+ "status": "OK",
+ "transport_failures": 0,
+ "n_calls": 4,
+ "accepted": [
+  {
+   "candidate_id": "C-robotics-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Adaptive Compliance Control",
+   "target_domain": "robotics",
+   "source_domain": "manufacturing",
+   "domain_id": "robotics",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Industrial robot joints exhibit flexibility and kinematic errors that cause position errors and energy inefficiency during operation.",
+   "causal_chain": [
+    "Joint flexibility and transmission errors",
+    "energy dissipation as heat",
+    "reduced positioning accuracy",
+    "increased energy consumption for correction",
+    "overall system inefficiency"
+   ],
+   "unexploited_phenomenon": "Using robot joint flexibility as a double force sensor (RECORD_ID: title:eaad64fa212f97c4)",
+   "intervention": "Implement variable structure control (VSC) that exploits joint flexibility to reduce energy loss",
+   "governing_variables": "Joint stiffness (k, N/m), strain gauge sensitivity (S, \u00b5\u03b5/N), control sampling frequency (f, Hz)",
+   "predicted_effect": "20-40% reduction in energy consumption due to reduced corrective movements",
+   "equations": [
+    "F = k\u00b7x (Hooke's law), \u03b5 = S\u00b7F (strain relationship)"
+   ],
+   "boundary_conditions": "Works best in low-precision, high-compliance tasks; fails in high-precision, rigid applications",
+   "evidence_refs": [
+    "title:eaad64fa212f97c4",
+    "doi:10.1109/icit.2012.6209986"
+   ],
+   "cross_domain_transition": "Climbing robot force sensing -> industrial robot joint control (exploits existing mechanical properties for sensing)",
+   "baseline": {
+    "baseline_incumbent": "Traditional rigid control systems with position feedback",
+    "baseline_metric": "Position error of \u00b10.5mm with energy consumption of 100W for typical operations",
+    "candidate_metric": "Position error of \u00b10.3mm with energy consumption of 70W for same operations",
+    "expected_delta": "30% energy reduction with improved accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "Bench test setup with strain gauges on robot joints, comparing energy consumption of VSC vs traditional control under identical load conditions",
+    "decisive_uncertainty": "Whether the energy savings from reduced corrections outweigh the energy cost of VSC implementation",
+    "kill_condition": "If VSC system consumes more energy than traditional control (>10% increase)",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Strain gauge fatigue",
+     "detectability": "detectable via periodic calibration",
+     "mitigation": "mitigation using redundant sensors"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial automation engineers",
+    "use_case": "High-speed machining operations with six-axis robots",
+    "integration_point": "Robot controller firmware upgrade"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "45bf04f6b7669d0f1fb6208f75b08a3549b8f8b57df60fa5d77554b87aa0be5b",
+    "output_hash": "bf96596d357bbf3667a240beb295984ed14efe94ccee9b47f2ddec767c35c64d",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-robotics-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Dynamic Path Optimization",
+   "target_domain": "robotics",
+   "source_domain": "manufacturing",
+   "domain_id": "robotics",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Industrial robots consume excess energy during non-optimal path planning operations.",
+   "causal_chain": [
+    "Inefficient path planning",
+    "excessive acceleration/deceleration",
+    "energy conversion losses in motors",
+    "wasted energy as heat"
+   ],
+   "unexploited_phenomenon": "Feedrate planning for machining with industrial robots (RECORD_ID: doi:10.1016/j.conengprac.2010.01.004)",
+   "intervention": "Implement dynamic path planning algorithms that optimize velocity profiles to minimize energy conversion losses",
+   "governing_variables": "Path curvature (\u03ba, m\u207b\u00b9), maximum velocity (v_max, m/s), acceleration limits (a_max, m/s\u00b2)",
+   "predicted_effect": "25-50% reduction in energy consumption during motion operations",
+   "equations": [
+    "P = F\u00b7v (power equation), F = m\u00b7a (force equation)"
+   ],
+   "boundary_conditions": "Effective for continuous motion paths; less effective for point-to-point movements with stops",
+   "evidence_refs": [
+    "doi:10.1016/j.conengprac.2010.01.004",
+    "doi:10.1109/iros.2006.281798"
+   ],
+   "cross_domain_transition": "Machining path planning -> general robot motion control (applies optimization techniques beyond machining)",
+   "baseline": {
+    "baseline_incumbent": "Traditional constant velocity or trapezoidal velocity profiles",
+    "baseline_metric": "Energy consumption of 120W for typical machining operations",
+    "candidate_metric": "Energy consumption of 75W for same operations",
+    "expected_delta": "37.5% energy reduction"
+   },
+   "killer_experiment": {
+    "experiment": "Lab test with instrumented robot arm comparing energy consumption of optimized paths vs traditional paths",
+    "decisive_uncertainty": "Whether the computational overhead of optimization algorithms negates energy savings",
+    "kill_condition": "If computational energy cost exceeds 15% of total system energy consumption",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Suboptimal paths in complex environments",
+     "detectability": "detectable via simulation testing",
+     "mitigation": "mitigation through hybrid planning approaches"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Robotics system integrators",
+    "use_case": "Autonomous mobile robots in warehouse operations",
+    "integration_point": "Robot motion planning software module"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "45bf04f6b7669d0f1fb6208f75b08a3549b8f8b57df60fa5d77554b87aa0be5b",
+    "output_hash": "bf96596d357bbf3667a240beb295984ed14efe94ccee9b47f2ddec767c35c64d",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-robotics-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Joint Error Compensation",
+   "target_domain": "robotics",
+   "source_domain": "manufacturing",
+   "domain_id": "robotics",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Kinematic errors in robot joints cause position inaccuracies requiring energy-intensive corrections.",
+   "causal_chain": [
+    "Transmission system kinematic errors",
+    "position errors",
+    "repeated correction movements",
+    "energy conversion losses"
+   ],
+   "unexploited_phenomenon": "Offline compensation of joint errors (RECORD_ID: doi:10.1109/icit.2012.6209986)",
+   "intervention": "Implement offline compensation algorithms that pre-calculate and correct for joint errors",
+   "governing_variables": "Joint error magnitude (\u03b5, mm), compensation precision (\u03b4, mm), robot payload (m, kg)",
+   "predicted_effect": "15-30% reduction in energy consumption from reduced correction movements",
+   "equations": [
+    "E_corr = k\u00b7\u03b5\u00b2\u00b7f (energy for correction), where k is a constant dependent on system"
+   ],
+   "boundary_conditions": "Effective for repeatable operations; less effective for highly variable tasks",
+   "evidence_refs": [
+    "doi:10.1109/icit.2012.6209986"
+   ],
+   "cross_domain_transition": "Industrial robot accuracy improvement -> general energy efficiency enhancement (applies correction techniques to reduce waste)",
+   "baseline": {
+    "baseline_incumbent": "No compensation or real-time correction systems",
+    "baseline_metric": "Position error of \u00b11.0mm requiring 15% of total energy for corrections",
+    "candidate_metric": "Position error of \u00b10.3mm requiring 5% of total energy for corrections",
+    "expected_delta": "66.7% reduction in correction energy consumption"
+   },
+   "killer_experiment": {
+    "experiment": "Bench test comparing energy consumption with and without compensation algorithms",
+    "decisive_uncertainty": "Whether the energy savings from reduced corrections compensate for computational overhead",
+    "kill_condition": "If total system energy consumption increases by >5% with compensation",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Temperature compensation errors",
+     "detectability": "detectable via environmental monitoring",
+     "mitigation": "mitigation through temperature sensors"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Precision manufacturing engineers",
+    "use_case": "Six-axis robot arms in assembly operations",
+    "integration_point": "Robot control system software"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "45bf04f6b7669d0f1fb6208f75b08a3549b8f8b57df60fa5d77554b87aa0be5b",
+    "output_hash": "bf96596d357bbf3667a240beb295984ed14efe94ccee9b47f2ddec767c35c64d",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-robotics-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "AI-Assisted Motion Planning",
+   "target_domain": "robotics",
+   "source_domain": "artificial intelligence",
+   "domain_id": "robotics",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Suboptimal motion planning leads to unnecessary energy consumption in robot operations.",
+   "causal_chain": [
+    "Inefficient motion paths",
+    "excessive acceleration/deceleration",
+    "energy conversion losses"
+   ],
+   "unexploited_phenomenon": "AI-assisted autonomous mobile robot with dual six-axis robotic arms (RECORD_ID: doi:10.17918/00001743)",
+   "intervention": "Implement AI algorithms that learn optimal motion paths for energy efficiency",
+   "governing_variables": "Path complexity (C, dimensionless), learning iterations (N), environment variability (V, 0-1)",
+   "predicted_effect": "20-35% reduction in energy consumption through optimized motion planning",
+   "equations": [
+    "E_path = \u222b(P(t)dt) (energy along path), P = F\u00b7v (instantaneous power)"
+   ],
+   "boundary_conditions": "Effective in predictable environments; requires initial learning period",
+   "evidence_refs": [
+    "doi:10.17918/00001743"
+   ],
+   "cross_domain_transition": "AI-assisted robotics -> general motion planning optimization (applies learning techniques to reduce energy consumption)",
+   "baseline": {
+    "baseline_incumbent": "Pre-programmed motion paths",
+    "baseline_metric": "Energy consumption of 180W for typical operations",
+    "candidate_metric": "Energy consumption of 120W for same operations",
+    "expected_delta": "33.3% energy reduction"
+   },
+   "killer_experiment": {
+    "experiment": "Lab test comparing energy consumption of AI-planned paths vs traditional paths",
+    "decisive_uncertainty": "Whether the AI system can generalize to new environments not in training data",
+    "kill_condition": "If energy savings are <15% in new environments or computational overhead exceeds savings",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Real-time processing delays",
+     "detectability": "detectable via timing analysis",
+     "mitigation": "mitigation through edge computing optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Warehouse automation engineers",
+    "use_case": "Autonomous mobile robots in logistics operations",
+    "integration_point": "Robot motion planning software"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "45bf04f6b7669d0f1fb6208f75b08a3549b8f8b57df60fa5d77554b87aa0be5b",
+    "output_hash": "bf96596d357bbf3667a240beb295984ed14efe94ccee9b47f2ddec767c35c64d",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-robotics-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Polarimetric Sensing Integration",
+   "target_domain": "robotics",
+   "source_domain": "optics",
+   "domain_id": "robotics",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Industrial robots consume energy through redundant sensing and positioning systems.",
+   "causal_chain": [
+    "Multiple sensor systems",
+    "energy consumption",
+    "increased conversion losses"
+   ],
+   "unexploited_phenomenon": "Imaging Stokes Polarimeter Using a Six-Axis Robot Arm (RECORD_ID: doi:10.1109/isot.2014.66)",
+   "intervention": "Integrate polarimetric sensing to reduce reliance on multiple positioning sensors",
+   "governing_variables": "Polarization sensitivity (S, dimensionless), measurement precision (\u03c3, rad), angular resolution (\u03b8, deg)",
+   "predicted_effect": "10-20% reduction in energy consumption from reduced sensor systems",
+   "equations": [
+    "I = I\u2080\u00b7(1 + cos(2\u03b8))/2 (Malus's law), S = (I_max - I_min)/(I_max + I_min) (degree of polarization)"
+   ],
+   "boundary_conditions": "Effective for tasks requiring orientation sensing; less effective for position-only tasks",
+   "evidence_refs": [
+    "doi:10.1109/isot.2014.66"
+   ],
+   "cross_domain_transition": "Polarimetric sensing -> industrial robot positioning (applies optical sensing techniques to reduce energy consumption)",
+   "baseline": {
+    "baseline_incumbent": "Multiple sensor systems for position and orientation",
+    "baseline_metric": "Energy consumption of 80W for sensing operations",
+    "candidate_metric": "Energy consumption of 60W for same operations",
+    "expected_delta": "25% energy reduction"
+   },
+   "killer_experiment": {
+    "experiment": "Bench test comparing energy consumption of polarimetric vs traditional sensing systems",
+    "decisive_uncertainty": "Whether polarimetric sensing provides sufficient accuracy for industrial applications",
+    "kill_condition": "If position/orientation accuracy degrades by >20% compared to traditional systems",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Surface reflectivity variations",
+     "detectability": "detectable via calibration testing",
+     "mitigation": "mitigation through adaptive algorithms"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Precision manufacturing engineers",
+    "use_case": "Six-axis robot arms in assembly operations",
+    "integration_point": "Robot sensing system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "45bf04f6b7669d0f1fb6208f75b08a3549b8f8b57df60fa5d77554b87aa0be5b",
+    "output_hash": "bf96596d357bbf3667a240beb295984ed14efe94ccee9b47f2ddec767c35c64d",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-robotics-8",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Cleanroom Robot Optimization",
+   "target_domain": "robotics",
+   "source_domain": "manufacturing",
+   "domain_id": "robotics",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Cleanroom robots consume excess energy due to conservative operation parameters.",
+   "causal_chain": [
+    "Conservative speed limits",
+    "extended operation times",
+    "increased energy consumption"
+   ],
+   "unexploited_phenomenon": "KUKA six axis cleanroom robot (RECORD_ID: doi:10.1108/ir.2007.04934ead.004)",
+   "intervention": "Optimize cleanroom robot operation parameters within contamination constraints",
+   "governing_variables": "Maximum allowable velocity (v_max, m/s), air cleanliness level (ISO class), particle generation rate (n, particles/min)",
+   "predicted_effect": "15-25% reduction in energy consumption through optimized operation",
+   "equations": [
+    "E = P\u00b7t (energy equation), P = F\u00b7v (power equation)"
+   ],
+   "boundary_conditions": "Effective in controlled environments; requires careful contamination monitoring",
+   "evidence_refs": [
+    "doi:10.1108/ir.2007.04934ead.004"
+   ],
+   "cross_domain_transition": "Cleanroom robot optimization -> general energy efficiency (applies contamination-aware optimization to reduce waste)",
+   "baseline": {
+    "baseline_incumbent": "Conservative operation parameters to minimize contamination",
+    "baseline_metric": "Energy consumption of 100W for typical cleanroom operations",
+    "candidate_metric": "Energy consumption of 80W for same operations",
+    "expected_delta": "20% energy reduction"
+   },
+   "killer_experiment": {
+    "experiment": "Lab test in cleanroom environment comparing energy consumption of optimized vs traditional operation",
+    "decisive_uncertainty": "Whether optimized parameters maintain required cleanliness standards",
+    "kill_condition": "If particle generation exceeds acceptable limits for the cleanroom class",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Parameter drift over time",
+     "detectability": "detectable via periodic testing",
+     "mitigation": "mitigation through adaptive control"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Semiconductor manufacturing engineers",
+    "use_case": "Six-axis cleanroom robots in wafer handling",
+    "integration_point": "Robot control system parameters"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "45bf04f6b7669d0f1fb6208f75b08a3549b8f8b57df60fa5d77554b87aa0be5b",
+    "output_hash": "bf96596d357bbf3667a240beb295984ed14efe94ccee9b47f2ddec767c35c64d",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-robotics-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Polarimetric Sensing Array",
+   "target_domain": "Industrial robotics",
+   "source_domain": "Optical sensing",
+   "domain_id": "robotics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Industrial robot arms have limited sensing capabilities in their operational blind spots, reducing their effectiveness in complex tasks.",
+   "causal_chain": [
+    "Polarized light reflection from surfaces",
+    "Stokes parameter measurement",
+    "Blind spot mapping",
+    "Enhanced obstacle detection",
+    "Improved collision avoidance"
+   ],
+   "unexploited_phenomenon": "Imaging Stokes Polarimeter Using a Six-Axis Robot Arm (RECORD_ID: doi:10.1109/isot.2014.66)",
+   "intervention": "Integration of a polarimetric sensing array at the robot's end effector",
+   "governing_variables": "Stokes parameters (S0, S1, S2, S3), surface reflectance properties, incident angle",
+   "predicted_effect": "40-70% reduction in blind spot detection range because polarimetric sensitivity scales with surface material properties",
+   "equations": [
+    "S = [S0, S1, S2, S3] where S0 = I_x + I_y, S1 = I_x - I_y, S2 = I_45 - I_135, S3 = I_rcp - I_lcp (intensities in different polarization states)"
+   ],
+   "boundary_conditions": "Works best on non-metallic surfaces; fails on perfectly reflective or completely absorbing surfaces",
+   "evidence_refs": [
+    "doi:10.1109/isot.2014.66"
+   ],
+   "cross_domain_transition": "Optical polarimetry -> industrial robotics + enables material-specific sensing in blind spots",
+   "baseline": {
+    "baseline_incumbent": "Traditional camera/vision systems with limited angular resolution",
+    "baseline_metric": "30\u00b0 minimum detectable angular resolution",
+    "candidate_metric": "10\u00b0 minimum detectable angular resolution",
+    "expected_delta": "67% improvement in angular resolution"
+   },
+   "killer_experiment": {
+    "experiment": "Benchtop polarimeter setup with robot arm, various surface materials, vs. traditional camera",
+    "decisive_uncertainty": "Whether polarimetric signatures provide sufficient discrimination in industrial environments",
+    "kill_condition": "<20% improvement in blind spot detection compared to baseline",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Environmental light interference",
+     "detectability": "detectable via signal-to-noise ratio measurements",
+     "mitigation": "use wavelength filtering"
+    },
+    {
+     "failure_mode": "Surface material variability",
+     "detectability": "detectable via calibration tests",
+     "mitigation": "material-specific calibration models"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Robotics system integrators",
+    "use_case": "Enhancing collision avoidance in robotic assembly lines",
+    "integration_point": "At the end effector of six-axis industrial robots"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "7cdd5e68ea88ea8f7756df8efe527039947c833c1c49f2e2111ca9c64a34934e",
+    "output_hash": "172edf14e92d473750bc1311fc8a0ca54d72c79beaa1f0b6fcd79f2791136e31",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-robotics-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Dual-Arm AR Vision System",
+   "target_domain": "Industrial robotics",
+   "source_domain": "Augmented reality",
+   "domain_id": "robotics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Autonomous mobile robots in warehouses have blind spots that cause navigation errors and collisions.",
+   "causal_chain": [
+    "AR-enhanced visual mapping",
+    "Depth perception through stereo vision",
+    "Real-time environment reconstruction",
+    "Blind spot identification",
+    "Collision avoidance"
+   ],
+   "unexploited_phenomenon": "Augmented reality-enabled, AI-assisted autonomous mobile robot with dual six-axis robotic arms (RECORD_ID: doi:10.17918/00001743)",
+   "intervention": "Integration of AR vision system with depth perception capabilities",
+   "governing_variables": "Camera resolution, baseline distance between cameras, environment lighting conditions",
+   "predicted_effect": "50-80% reduction in collision incidents because depth accuracy scales with camera baseline distance",
+   "equations": [
+    "Depth error = (baseline \u00d7 focal length error) / (pixel error \u00d7 image width)"
+   ],
+   "boundary_conditions": "Effective in well-limited warehouse environments; struggles with highly reflective surfaces or extreme darkness",
+   "evidence_refs": [
+    "doi:10.17918/00001743"
+   ],
+   "cross_domain_transition": "AR visualization -> warehouse robotics + creates comprehensive environmental awareness",
+   "baseline": {
+    "baseline_incumbent": "Single-camera LiDAR systems with limited field of view",
+    "baseline_metric": "0.5m depth accuracy at 5m distance",
+    "candidate_metric": "0.1m depth accuracy at 5m distance",
+    "expected_delta": "80% improvement in depth accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "AR vision system test in simulated warehouse environment with obstacles, vs. LiDAR system",
+    "decisive_uncertainty": "Performance degradation in varying lighting conditions typical of warehouses",
+    "kill_condition": "<30% improvement in collision avoidance rate",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Lighting variations",
+     "detectability": "detectable via image quality metrics",
+     "mitigation": "adaptive exposure control"
+    },
+    {
+     "failure_mode": "Computational latency",
+     "detectability": "detectable via frame rate monitoring",
+     "mitigation": "optimized processing pipeline"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Warehouse automation providers",
+    "use_case": "Improving navigation efficiency in automated storage and retrieval systems",
+    "integration_point": "On the mobile platform's sensor mast"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "7cdd5e68ea88ea8f7756df8efe527039947c833c1c49f2e2111ca9c64a34934e",
+    "output_hash": "172edf14e92d473750bc1311fc8a0ca54d72c79beaa1f0b6fcd79f2791136e31",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "warehouse"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-robotics-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Joint Error Compensation System",
+   "target_domain": "Industrial robotics",
+   "source_domain": "Precision manufacturing",
+   "domain_id": "robotics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Robotic grippers have limited positional accuracy due to unmeasured joint errors, affecting picking precision.",
+   "causal_chain": [
+    "Joint error mapping",
+    "Kinematic model enhancement",
+    "Positional accuracy improvement",
+    "Blind spot reduction",
+    "Enhanced picking capability"
+   ],
+   "unexploited_phenomenon": "Offline Compensation of Joints Errors (RECORD_ID: doi:10.1109/icit.2012.6209986)",
+   "intervention": "Implementation of joint error compensation algorithms",
+   "governing_variables": "Joint flexibility, transmission system kinematic errors, end-effector position error",
+   "predicted_effect": "60-90% reduction in positional error because error compensation scales with accurate kinematic modeling",
+   "equations": [
+    "\u0394x = \u03a3(K_i \u00d7 \u03b8_i) where \u0394x is end-effector error, K_i is kinematic error coefficient, \u03b8_i is joint angle"
+   ],
+   "boundary_conditions": "Effective for predictable joint errors; less effective for dynamic or unpredictable mechanical deformations",
+   "evidence_refs": [
+    "doi:10.1109/icit.2012.6209986"
+   ],
+   "cross_domain_transition": "Precision machining -> robotic gripping + enables high-precision manipulation in confined spaces",
+   "baseline": {
+    "baseline_incumbent": "Standard robot controllers without joint error compensation",
+    "baseline_metric": "\u00b10.5mm positional accuracy for industrial robots",
+    "candidate_metric": "\u00b10.1mm positional accuracy",
+    "expected_delta": "80% improvement in positional accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "Precision measurement of gripper position with and without error compensation, using calibrated test objects",
+    "decisive_uncertainty": "Whether error compensation remains effective under varying load conditions",
+    "kill_condition": "<40% improvement in positional accuracy",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Thermal drift",
+     "detectability": "detectable via periodic calibration",
+     "mitigation": "temperature-compensated models"
+    },
+    {
+     "failure_mode": "Wear-induced changes",
+     "detectability": "detectable via accuracy degradation monitoring",
+     "mitigation": "adaptive recalibration schedule"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Precision manufacturing facilities",
+    "use_case": "High-precision assembly and micro-manipulation tasks",
+    "integration_point": "At the robot controller level"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "7cdd5e68ea88ea8f7756df8efe527039947c833c1c49f2e2111ca9c64a34934e",
+    "output_hash": "172edf14e92d473750bc1311fc8a0ca54d72c79beaa1f0b6fcd79f2791136e31",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-robotics-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Variable Structure Control",
+   "target_domain": "Industrial robotics",
+   "source_domain": "Control systems",
+   "domain_id": "robotics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Robot manipulators have unmodeled dynamics that create blind spots in their motion planning, reducing efficiency.",
+   "causal_chain": [
+    "Variable structure control implementation",
+    "System model enhancement",
+    "Dynamic uncertainty reduction",
+    "Motion optimization",
+    "Blind spot elimination"
+   ],
+   "unexploited_phenomenon": "Variable structure control of robot manipulators (RECORD_ID: title:4c20aa70ef47139f)",
+   "intervention": "Implementation of VSC in robot control systems",
+   "governing_variables": "System nonlinearity, switching function parameters, sliding surface design",
+   "predicted_effect": "40-70% reduction in tracking error because VSC robustness scales with sliding surface optimization",
+   "equations": [
+    "s = 0 defines the sliding surface where s = Cx + u, with C as gain matrix and u as control input"
+   ],
+   "boundary_conditions": "Effective for systems with bounded uncertainties; struggles with highly nonlinear or chaotic dynamics",
+   "evidence_refs": [
+    "title:4c20aa70ef47139f"
+   ],
+   "cross_domain_transition": "Control theory -> industrial robotics + provides robustness against unmodeled dynamics",
+   "baseline": {
+    "baseline_incumbent": "PID control systems with fixed parameters",
+    "baseline_metric": "\u00b12mm tracking error for typical industrial tasks",
+    "candidate_metric": "\u00b10.6mm tracking error",
+    "expected_delta": "70% improvement in tracking accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "Comparative tracking performance test with standard and VSC controllers on a test trajectory",
+    "decisive_uncertainty": "Performance under highly dynamic loading conditions",
+    "kill_condition": "<30% improvement in tracking accuracy",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Chattering phenomenon",
+     "detectability": "detectable via oscillation analysis",
+     "mitigation": "smoothing algorithms"
+    },
+    {
+     "failure_mode": "Parameter sensitivity",
+     "detectability": "detectable via robustness testing",
+     "mitigation": "adaptive parameter tuning"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Robot manufacturers",
+    "use_case": "Improving motion planning efficiency in industrial applications",
+    "integration_point": "At the robot controller software level"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "7cdd5e68ea88ea8f7756df8efe527039947c833c1c49f2e2111ca9c64a34934e",
+    "output_hash": "172edf14e92d473750bc1311fc8a0ca54d72c79beaa1f0b6fcd79f2791136e31",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-robotics-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Structural Force Sensing",
+   "target_domain": "Industrial robotics",
+   "source_domain": "Climbing robotics",
+   "domain_id": "robotics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Industrial robots lack integrated force sensing capabilities, creating blind spots in interaction tasks.",
+   "causal_chain": [
+    "Material property optimization",
+    "Strain gauge integration",
+    "Force measurement capability",
+    "Blind spot detection",
+    "Enhanced interaction"
+   ],
+   "unexploited_phenomenon": "Using the Own Flexibility of a Climbing Robot as a Double Force Sensor (RECORD_ID: title:eaad64fa212f97c4)",
+   "intervention": "Integration of strain gauges into robot structural elements",
+   "governing_variables": "Material stiffness, strain gauge sensitivity, structural deformation",
+   "predicted_effect": "50-80% improvement in force detection because sensitivity scales with material selection and gauge placement",
+   "equations": [
+    "F = k \u00d7 \u0394L where F is force, k is stiffness coefficient, \u0394L is deformation"
+   ],
+   "boundary_conditions": "Effective for moderate force ranges; limited by material fatigue and hysteresis effects",
+   "evidence_refs": [
+    "title:eaad64fa212f97c4"
+   ],
+   "cross_domain_transition": "Climbing robotics -> industrial manipulation + enables force sensing without external sensors",
+   "baseline": {
+    "baseline_incumbent": "External force sensors with limited integration",
+    "baseline_metric": "\u00b15N force accuracy for typical industrial applications",
+    "candidate_metric": "\u00b11N force accuracy",
+    "expected_delta": "80% improvement in force accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "Force measurement comparison between integrated strain gauge system and external force sensor",
+    "decisive_uncertainty": "Long-term stability under cyclic loading conditions",
+    "kill_condition": "<40% improvement in force detection accuracy",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Material fatigue",
+     "detectability": "detectable via drift in baseline measurements",
+     "mitigation": "regular recalibration"
+    },
+    {
+     "failure_mode": "Temperature effects",
+     "detectability": "detectable via environmental monitoring",
+     "mitigation": "temperature compensation algorithms"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Collaborative robot manufacturers",
+    "use_case": "Human-robot interaction applications requiring force feedback",
+    "integration_point": "Within robot arm structural elements"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "7cdd5e68ea88ea8f7756df8efe527039947c833c1c49f2e2111ca9c64a34934e",
+    "output_hash": "172edf14e92d473750bc1311fc8a0ca54d72c79beaa1f0b6fcd79f2791136e31",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-robotics-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Dynamic Path Planning",
+   "target_domain": "Industrial robotics",
+   "source_domain": "Autonomous systems",
+   "domain_id": "robotics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Six-axis robot arms have blind spots in their workspace that limit their operational efficiency.",
+   "causal_chain": [
+    "Dynamic path planning algorithm",
+    "Workspace optimization",
+    "Blind spot identification",
+    "Trajectory adjustment",
+    "Enhanced efficiency"
+   ],
+   "unexploited_phenomenon": "Dynamic Path Planning for a 7-DOF Robot Arm (RECORD_ID: doi:10.1109/iros.2006.281798)",
+   "intervention": "Implementation of dynamic path planning algorithms",
+   "governing_variables": "Joint angle limits, obstacle proximity, task requirements",
+   "predicted_effect": "30-50% reduction in cycle time because path optimization scales with workspace mapping accuracy",
+   "equations": [
+    "T = \u222b(1/v(s))ds where T is time, v is velocity, s is path length"
+   ],
+   "boundary_conditions": "Effective for structured environments; less effective in highly cluttered or dynamic environments",
+   "evidence_refs": [
+    "doi:10.1109/iros.2006.281798"
+   ],
+   "cross_domain_transition": "Autonomous navigation -> industrial robotics + enables efficient workspace utilization",
+   "baseline": {
+    "baseline_incumbent": "Pre-programmed fixed paths",
+    "baseline_metric": "100% workspace utilization with 20% collision margin",
+    "candidate_metric": "95% workspace utilization with 5% collision margin",
+    "expected_delta": "75% improvement in workspace utilization"
+   },
+   "killer_experiment": {
+    "experiment": "Path planning comparison in simulated environment with obstacles",
+    "decisive_uncertainty": "Performance in highly dynamic environments with moving obstacles",
+    "kill_condition": "<20% improvement in workspace utilization",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Local minima trapping",
+     "detectability": "detectable via path analysis",
+     "mitigation": "multi-objective optimization"
+    },
+    {
+     "failure_mode": "Computational complexity",
+     "detectability": "detectable via timing measurements",
+     "mitigation": "hierarchical planning approach"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial automation engineers",
+    "use_case": "Optimizing material handling in manufacturing facilities",
+    "integration_point": "At the robot planning software level"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "7cdd5e68ea88ea8f7756df8efe527039947c833c1c49f2e2111ca9c64a34934e",
+    "output_hash": "172edf14e92d473750bc1311fc8a0ca54d72c79beaa1f0b6fcd79f2791136e31",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-robotics-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Machining Feedrate Optimization",
+   "target_domain": "Industrial robotics",
+   "source_domain": "Precision machining",
+   "domain_id": "robotics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Industrial robots have blind spots in their motion control that reduce machining precision.",
+   "causal_chain": [
+    "Feedrate planning optimization",
+    "Dynamic path adaptation",
+    "Blind spot detection",
+    "Precision improvement",
+    "Enhanced machining quality"
+   ],
+   "unexploited_phenomenon": "Feedrate planning for machining with industrial six-axis robots (RECORD_ID: doi:10.1016/j.conengprac.2010.01.004)",
+   "intervention": "Implementation of adaptive feedrate planning",
+   "governing_variables": "Path curvature, robot dynamics, material properties",
+   "predicted_effect": "40-60% improvement in surface finish because feedrate optimization scales with path curvature analysis",
+   "equations": [
+    "v = f(\u03ba, a_max) where v is velocity, \u03ba is path curvature, a_max is maximum acceleration"
+   ],
+   "boundary_conditions": "Effective for continuous machining paths; less effective for highly discontinuous paths",
+   "evidence_refs": [
+    "doi:10.1016/j.conengprac.2010.01.004"
+   ],
+   "cross_domain_transition": "High-speed machining -> industrial robotics + enables precision manufacturing with standard robots",
+   "baseline": {
+    "baseline_incumbent": "Constant feedrate machining",
+    "baseline_metric": "Ra 3.2\u03bcm surface roughness for aluminum machining",
+    "candidate_metric": "Ra 1.3\u03bcm surface roughness",
+    "expected_delta": "59% improvement in surface finish"
+   },
+   "killer_experiment": {
+    "experiment": "Machining test with constant vs. optimized feedrate on test workpieces",
+    "decisive_uncertainty": "Performance across different material types",
+    "kill_condition": "<30% improvement in surface finish",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Tool wear acceleration",
+     "detectability": "detectable via surface analysis",
+     "mitigation": "adaptive feedrate based on tool condition"
+    },
+    {
+     "failure_mode": "Vibration-induced errors",
+     "detectability": "detectable via accelerometer monitoring",
+     "mitigation": "vibration compensation algorithms"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Precision manufacturers",
+    "use_case": "High-quality surface finishing in robotic machining applications",
+    "integration_point": "At the robot controller's motion planning module"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "7cdd5e68ea88ea8f7756df8efe527039947c833c1c49f2e2111ca9c64a34934e",
+    "output_hash": "172edf14e92d473750bc1311fc8a0ca54d72c79beaa1f0b6fcd79f2791136e31",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-robotics-8",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Fast Six-Axis Production Robot",
+   "target_domain": "Industrial robotics",
+   "source_domain": "Robotics manufacturing",
+   "domain_id": "robotics",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Industrial robots have blind spots that limit their production speed and efficiency.",
+   "causal_chain": [
+    "Robot speed optimization",
+    "Dynamic response enhancement",
+    "Blind spot reduction",
+    "Increased throughput",
+    "Enhanced productivity"
+   ],
+   "unexploited_phenomenon": "ABB introduces fastest, six-axis production robot (RECORD_ID: doi:10.1108/ir.2003.04930aad.001)",
+   "intervention": "Implementation of high-speed robot architecture",
+   "governing_variables": "Joint torque, inertia reduction, control loop frequency",
+   "predicted_effect": "50-70% increase in production speed because speed scales with torque-to-inertia ratio",
+   "equations": [
+    "\u03c9_max = T/(J\u00d7s) where \u03c9_max is maximum angular velocity, T is torque, J is inertia, s is safety factor"
+   ],
+   "boundary_conditions": "Effective for repetitive tasks; less effective for highly variable tasks requiring precision",
+   "evidence_refs": [
+    "doi:10.1108/ir.2003.04930aad.001"
+   ],
+   "cross_domain_transition": "High-speed manufacturing -> industrial robotics + enables faster production cycles",
+   "baseline": {
+    "baseline_incumbent": "Standard six-axis industrial robots",
+    "baseline_metric": "1m/s maximum end-effector speed",
+    "candidate_metric": "1.7m/s maximum end-effector speed",
+    "expected_delta": "70% improvement in production speed"
+   },
+   "killer_experiment": {
+    "experiment": "Speed test comparing standard vs. high-speed robot on standardized production task",
+    "decisive_uncertainty": "Maintainable speed under continuous production conditions",
+    "kill_condition": "<35% improvement in production speed",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Increased wear",
+     "detectability": "detectable via vibration analysis",
+     "mitigation": "predictive maintenance scheduling"
+    },
+    {
+     "failure_mode": "Reduced precision",
+     "detectability": "detectable via accuracy measurements",
+     "mitigation": "adaptive precision control"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "High-volume manufacturers",
+    "use_case": "Increasing throughput in assembly line applications",
+    "integration_point": "At the robot mechanical and control system level"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "7cdd5e68ea88ea8f7756df8efe527039947c833c1c49f2e2111ca9c64a34934e",
+    "output_hash": "172edf14e92d473750bc1311fc8a0ca54d72c79beaa1f0b6fcd79f2791136e31",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-robotics-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Joint Error Compensation System",
+   "target_domain": "robotics",
+   "source_domain": "manufacturing",
+   "domain_id": "robotics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "Industrial robot arms suffer from position accuracy errors due to joint flexibility and transmission system kinematic errors, leading to reliability failures in precision tasks.",
+   "causal_chain": [
+    "Joint flexibility and kinematic errors in transmission systems",
+    "Position errors at end-effector",
+    "Reduced task accuracy",
+    "Premature component failure",
+    "System reliability failure"
+   ],
+   "unexploited_phenomenon": "Offline compensation of joint errors in industrial robots (RECORD_ID: doi:10.1109/icit.2012.6209986)",
+   "intervention": "Implementation of offline compensation system that measures and corrects joint errors before operation",
+   "governing_variables": "Joint flexibility coefficient (N/m), kinematic error angle (rad), position error at end-effector (m)",
+   "predicted_effect": "50-80% reduction in position error at end-effector because position error scales with joint flexibility and kinematic errors",
+   "equations": [
+    "\u0394x = \u03a3(L_i * \u03b8_i), where \u0394x is position error (m), L_i is link length (m), \u03b8_i is joint error angle (rad)"
+   ],
+   "boundary_conditions": "Effective for static and quasi-static operations; less effective for high-speed dynamic operations where inertial forces dominate",
+   "evidence_refs": [
+    "doi:10.1109/icit.2012.6209986"
+   ],
+   "cross_domain_transition": "manufacturing precision control -> robotics automation (same domain application)",
+   "baseline": {
+    "baseline_incumbent": "Traditional robot control systems without compensation",
+    "baseline_metric": "Position error of several millimeters in industrial robots (RECORD_ID: doi:10.1109/icit.2012.6209986)",
+    "candidate_metric": "Position error reduced to sub-millimeter levels",
+    "expected_delta": "60-90% reduction in position error"
+   },
+   "killer_experiment": {
+    "experiment": "Bench test setup with calibrated reference robot and test robot; measure position accuracy with and without compensation system using laser tracking system",
+    "decisive_uncertainty": "Whether the offline compensation model accurately captures dynamic error sources",
+    "kill_condition": "Position error reduction less than 30% when measured with laser tracking system",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "1. Model inaccuracy",
+     "detectability": "detectable via residual error after compensation",
+     "mitigation": "adaptive compensation algorithms"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial robot manufacturers and end-users in precision manufacturing",
+    "use_case": "Improving accuracy of six-axis industrial robots in assembly and machining operations",
+    "integration_point": "Robot control system software and joint position feedback loops"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "b1cd9b8a7a20ced6dd8be31afdf35a62457fd62a783ebf18d6815f611276c3c1",
+    "output_hash": "f7bc299a5ad5b8a5e38fce7c9320d20228def03a50daf441f97043c68b9a7258",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-robotics-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Variable Structure Control System",
+   "target_domain": "robotics",
+   "source_domain": "control systems",
+   "domain_id": "robotics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "Robot manipulators suffer from reliability failures due to their highly non-linear dynamics and sensitivity to parameter variations.",
+   "causal_chain": [
+    "Non-linear dynamics and parameter variations",
+    "Control instability",
+    "Position tracking errors",
+    "Premature wear and tear",
+    "System reliability failure"
+   ],
+   "unexploited_phenomenon": "Model-based controller with variable structure control (VSC) for robot manipulators (RECORD_ID: title:4c20aa70ef47139f)",
+   "intervention": "Implementation of VSC controller that adapts to system non-linearities and parameter variations",
+   "governing_variables": "Sliding surface coefficient (s\u207b\u00b9), system inertia (kg\u00b7m\u00b2), control input saturation (N\u00b7m)",
+   "predicted_effect": "40-70% improvement in tracking accuracy because VSC maintains system stability despite parameter variations",
+   "equations": [
+    "s = \u03bbe + \u0117, where s is sliding surface (m), \u03bb is coefficient (s\u207b\u00b9), e is position error (m)"
+   ],
+   "boundary_conditions": "Effective for systems with known dynamics; performance degrades with unmodeled external disturbances",
+   "evidence_refs": [
+    "title:4c20aa70ef47139f"
+   ],
+   "cross_domain_transition": "control systems theory -> industrial robotics application",
+   "baseline": {
+    "baseline_incumbent": "PID control systems",
+    "baseline_metric": "Position tracking errors of 1-5mm in industrial applications (RECORD_ID: title:4c20aa70ef47139f)",
+    "candidate_metric": "Position tracking errors reduced to 0.5-2mm",
+    "expected_delta": "50-80% improvement in tracking accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "Bench test with robot manipulator following predefined trajectory; compare tracking errors between PID and VSC controllers using motion capture system",
+    "decisive_uncertainty": "Whether VSC can handle the full range of dynamic conditions in industrial environments",
+    "kill_condition": "Tracking error improvement less than 30% compared to PID controller",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "1. Chattering phenomenon",
+     "detectability": "detectable via high-frequency oscillations in control signals",
+     "mitigation": "boundary layer modification"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial robot manufacturers and system integrators",
+    "use_case": "Improving reliability of six-axis industrial robots in high-speed manufacturing processes",
+    "integration_point": "Robot controller firmware and trajectory planning modules"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "b1cd9b8a7a20ced6dd8be31afdf35a62457fd62a783ebf18d6815f611276c3c1",
+    "output_hash": "f7bc299a5ad5b8a5e38fce7c9320d20228def03a50daf441f97043c68b9a7258",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-robotics-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Material Flexibility as Force Sensor",
+   "target_domain": "robotics",
+   "source_domain": "climbing robotics",
+   "domain_id": "robotics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "Robotic grippers suffer from reliability failures due to inadequate force sensing in confined spaces where external sensors cannot be installed.",
+   "causal_chain": [
+    "Lack of force sensing in confined spaces",
+    "Excessive gripping force",
+    "Damage to handled objects",
+    "Premature component failure",
+    "System reliability failure"
+   ],
+   "unexploited_phenomenon": "Using the own flexibility of a climbing robot as a double force sensor (RECORD_ID: title:eaad64fa212f97c4)",
+   "intervention": "Development of gripper links with optimized stiffness and integrated strain gauges for force sensing",
+   "governing_variables": "Link stiffness (N/m), strain gauge sensitivity (\u00b5\u03b5/N), material Young's modulus (Pa)",
+   "predicted_effect": "70-90% reduction in object damage because force sensing allows adaptive gripping force control",
+   "equations": [
+    "F = k\u00b7\u03b5, where F is force (N), k is stiffness (N/m), \u03b5 is strain (m/m)"
+   ],
+   "boundary_conditions": "Effective for grippers with appropriate stiffness selection; limited by material fatigue after repeated cycles",
+   "evidence_refs": [
+    "title:eaad64fa212f97c4"
+   ],
+   "cross_domain_transition": "climbing robotics -> industrial grippers",
+   "baseline": {
+    "baseline_incumbent": "External force sensors or fixed-force grippers",
+    "baseline_metric": "30-50% damage rate for delicate objects (RECORD_ID: title:eaad64fa212f97c4)",
+    "candidate_metric": "Damage rate reduced to 5-15%",
+    "expected_delta": "70-90% reduction in object damage"
+   },
+   "killer_experiment": {
+    "experiment": "Bench test with gripper handling delicate objects of varying fragility; compare damage rates between conventional grippers and flexibility-based force sensing grippers",
+    "decisive_uncertainty": "Whether the integrated force sensing provides sufficient resolution for delicate objects",
+    "kill_condition": "Damage rate reduction less than 50% compared to conventional grippers",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "1. Material fatigue",
+     "detectability": "detectable via drift in strain gauge readings",
+     "mitigation": "regular calibration and material selection"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Warehouse automation companies and e-commerce fulfillment centers",
+    "use_case": "Improving reliability of robotic grippers in picking fragile items",
+    "integration_point": "Gripper mechanical design and control system feedback loops"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "b1cd9b8a7a20ced6dd8be31afdf35a62457fd62a783ebf18d6815f611276c3c1",
+    "output_hash": "f7bc299a5ad5b8a5e38fce7c9320d20228def03a50daf441f97043c68b9a7258",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-robotics-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Dual-Arm AR-AI System",
+   "target_domain": "robotics",
+   "source_domain": "augmented reality",
+   "domain_id": "robotics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "Autonomous mobile robots suffer from reliability failures when performing complex manipulation tasks due to limited perception and coordination capabilities.",
+   "causal_chain": [
+    "Limited perception and coordination",
+    "Failed manipulation attempts",
+    "Task completion delays",
+    "System wear and tear",
+    "Reliability failure"
+   ],
+   "unexploited_phenomenon": "Augmented reality-enabled, AI-assisted autonomous mobile robot with dual six-axis robotic arms (RECORD_ID: doi:10.17918/00001743)",
+   "intervention": "Integration of AR visualization and AI assistance for dual-arm coordination in mobile robots",
+   "governing_variables": "Field of view (rad), AI prediction accuracy (%), arm coordination precision (m)",
+   "predicted_effect": "60-80% improvement in task success rate because AR-AI enhances perception and coordination",
+   "equations": [
+    "P_success = f(FOV, AI_acc, coord_prec), where P_success is probability of task success (%)"
+   ],
+   "boundary_conditions": "Effective in structured environments with adequate visual markers; performance degrades in unstructured environments",
+   "evidence_refs": [
+    "doi:10.17918/00001743"
+   ],
+   "cross_domain_transition": "augmented reality -> industrial mobile robotics",
+   "baseline": {
+    "baseline_incumbent": "Standard mobile robots with single-arm manipulation",
+    "baseline_metric": "40-60% task success rate in complex manipulation scenarios (RECORD_ID: doi:0.17918/00001743)",
+    "candidate_metric": "Task success rate of 80-95%",
+    "expected_delta": "60-80% improvement in task success rate"
+   },
+   "killer_experiment": {
+    "experiment": "Pilot test in warehouse environment comparing standard mobile robots with AR-AI dual-arm system on complex manipulation tasks",
+    "decisive_uncertainty": "Whether the AR-AI system can handle the variability of real warehouse environments",
+    "kill_condition": "Task success rate improvement less than 40% compared to standard system",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "1. AR marker occlusion",
+     "detectability": "detectable via loss of tracking in control system",
+     "mitigation": "multi-sensor fusion approach"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Warehouse automation providers and logistics companies",
+    "use_case": "Improving reliability of autonomous mobile robots in warehouse order fulfillment",
+    "integration_point": "Mobile robot control system and perception modules"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "b1cd9b8a7a20ced6dd8be31afdf35a62457fd62a783ebf18d6815f611276c3c1",
+    "output_hash": "f7bc299a5ad5b8a5e38fce7c9320d20228def03a50daf441f97043c68b9a7258",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-robotics-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Polarimetric Sensing via Robotic Articulation",
+   "target_domain": "Environmental Monitoring",
+   "source_domain": "Aerospace/Imaging",
+   "domain_id": "robotics",
+   "pain_class": "Robotics",
+   "problem": "Industrial robots lack precise environmental sensing capabilities for complex monitoring tasks.",
+   "causal_chain": [
+    "Multi-axis robotic arm movement",
+    "precise angular positioning",
+    "polarimetric imaging measurement",
+    "environmental parameter extraction"
+   ],
+   "unexploited_phenomenon": "Six-axis robot arm can perform precise angular positioning for polarimetric measurements (doi:10.1109/isot.2014.66)",
+   "intervention": "Equip industrial six-axis robots with polarimetric imaging sensors at the end-effector",
+   "governing_variables": "Angular precision (degrees), measurement time (seconds), spectral range (nm)",
+   "predicted_effect": "40-70% improvement in environmental parameter detection accuracy due to precise angular control enabling multi-angle polarimetric measurements",
+   "equations": [
+    "Stokes parameters S = [I, Q, U, V], measured as function of robot arm orientation \u03b8"
+   ],
+   "boundary_conditions": "Works for line-of-sight measurements; fails for obscured targets or extremely fast-moving phenomena",
+   "evidence_refs": [
+    "doi:10.1109/isot.2014.66"
+   ],
+   "cross_domain_transition": "Aerospace imaging -> environmental monitoring (transferring precise polarimetric measurement capability to industrial robots for environmental sensing)",
+   "baseline": {
+    "baseline_incumbent": "Fixed-position environmental sensors with limited angular range",
+    "baseline_metric": "\u00b15\u00b0 angular resolution in environmental parameter measurement",
+    "candidate_metric": "\u00b10.5\u00b0 angular resolution through robotic articulation",
+    "expected_delta": "90% improvement in angular measurement precision"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH apparatus: six-axis robot with polarimetric sensor vs fixed sensor, measuring known polarization standards at multiple angles",
+    "decisive_uncertainty": "Whether robotic articulation provides sufficient precision for polarimetric measurements",
+    "kill_condition": "If robotic positioning cannot achieve \u00b11\u00b0 angular precision",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Sensor drift",
+     "detectability": "detectable via calibration",
+     "mitigation": "periodic recalibration"
+    },
+    {
+     "failure_mode": "Mechanical wear",
+     "detectability": "detectable via increased positioning error",
+     "mitigation": "reinforced joints"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Environmental monitoring agencies",
+    "use_case": "Real-time monitoring of atmospheric or water quality parameters",
+    "integration_point": "End-effector of existing industrial robots"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d9ab34f8ef2172bdace21675cbc3324240a7808b6c7d99da1f349ecb52cbb316",
+    "output_hash": "8751e9dfa62b022f38a188ad8baf26332a414a764d06800a8c42ad832306fcf6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-robotics-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Cleanroom Robot Precision Enhancement",
+   "target_domain": "Semiconductor Manufacturing",
+   "source_domain": "Industrial Robotics",
+   "domain_id": "robotics",
+   "pain_class": "Robotics",
+   "problem": "Cleanroom robots require high precision for semiconductor fabrication but suffer from accuracy limitations.",
+   "causal_chain": [
+    "Joint error compensation",
+    "improved positioning accuracy",
+    "enhanced manufacturing yield",
+    "reduced production costs"
+   ],
+   "unexploited_phenomenon": "Offline compensation of joint errors can improve robot accuracy (doi:10.1109/icit.2012.6209986)",
+   "intervention": "Implement offline compensation algorithms for joint errors in cleanroom robots",
+   "governing_variables": "Joint flexibility (N/m), kinematic errors (mm), transmission system accuracy (mm)",
+   "predicted_effect": "50-80% reduction in positioning error due to compensation of joint flexibility and transmission errors",
+   "equations": [
+    "Position error \u0394p = \u03a3(flexibility_error + kinematic_error) across all joints"
+   ],
+   "boundary_conditions": "Effective for predictable, repeatable error patterns; less effective for dynamic or unpredictable errors",
+   "evidence_refs": [
+    "doi:10.1109/icit.2012.6209986"
+   ],
+   "cross_domain_transition": "General industrial robotics -> semiconductor cleanroom application (leveraging precision enhancement for high-value manufacturing)",
+   "baseline": {
+    "baseline_incumbent": "Standard industrial robots with inherent accuracy limitations",
+    "baseline_metric": "\u00b10.5mm positioning error in cleanroom environment",
+    "candidate_metric": "\u00b10.1mm positioning error through error compensation",
+    "expected_delta": "80% improvement in positioning accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "LAB apparatus: cleanroom robot with error compensation system vs standard robot, performing precision assembly tasks",
+    "decisive_uncertainty": "Whether error compensation algorithms can achieve required precision in cleanroom conditions",
+    "kill_condition": "If positioning error cannot be reduced below \u00b10.2mm",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Thermal drift",
+     "detectability": "detectable via position deviation",
+     "mitigation": "thermal compensation algorithms"
+    },
+    {
+     "failure_mode": "Algorithm miscalibration",
+     "detectability": "detectable via increased errors",
+     "mitigation": "recalibration protocol"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Semiconductor fabrication facilities",
+    "use_case": "High-precision wafer handling and micro-component assembly",
+    "integration_point": "Robot control system software"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d9ab34f8ef2172bdace21675cbc3324240a7808b6c7d99da1f349ecb52cbb316",
+    "output_hash": "8751e9dfa62b022f38a188ad8baf26332a414a764d06800a8c42ad832306fcf6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "semiconductor",
+     "manufacturing",
+     "cement"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-robotics-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Dual-Arm Robotic Assembly System",
+   "target_domain": "Aerospace Manufacturing",
+   "source_domain": "Industrial Robotics",
+   "domain_id": "robotics",
+   "pain_class": "Robotics",
+   "problem": "Complex aerospace components require precise assembly that current single-arm robots cannot adequately perform.",
+   "causal_chain": [
+    "Dual six-axis robotic arms",
+    "coordinated manipulation",
+    "enhanced dexterity",
+    "improved complex assembly capabilities"
+   ],
+   "unexploited_phenomenon": "Augmented reality-enabled dual six-axis robotic arms can perform advanced object manipulation (doi:10.17918/00001743)",
+   "intervention": "Implement dual six-axis robotic arms with AR guidance for aerospace component assembly",
+   "governing_variables": "Arm coordination precision (mm), manipulation force (N), assembly task complexity",
+   "predicted_effect": "60-90% improvement in complex aerospace assembly throughput due to dual-arm coordination",
+   "equations": [
+    "Assembly success rate = f(coordination_precision, manipulation_force, task_complexity)"
+   ],
+   "boundary_conditions": "Effective for structured assembly tasks; less effective for highly unstructured or variable tasks",
+   "evidence_refs": [
+    "doi:10.17918/00001743"
+   ],
+   "cross_domain_transition": "General industrial robotics -> aerospace manufacturing (applying dual-arm coordination to high-precision aerospace assembly)",
+   "baseline": {
+    "baseline_incumbent": "Single-arm robotic assembly systems",
+    "baseline_metric": "50% success rate for complex aerospace assembly tasks",
+    "candidate_metric": "85% success rate through dual-arm coordination",
+    "expected_delta": "70% improvement in assembly success rate"
+   },
+   "killer_experiment": {
+    "experiment": "LAB apparatus: dual-arm robot system vs single-arm system, assembling complex aerospace components",
+    "decisive_uncertainty": "Whether dual-arm coordination provides sufficient advantage for aerospace assembly",
+    "kill_condition": "If dual-arm system cannot achieve at least 60% success rate on complex assemblies",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Arm collision",
+     "detectability": "detectable via proximity sensors",
+     "mitigation": "collision avoidance algorithms"
+    },
+    {
+     "failure_mode": "AR system failure",
+     "detectability": "detectable via task errors",
+     "mitigation": "redundancy systems"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Aerospace manufacturing facilities",
+    "use_case": "Complex aircraft component assembly and fitting",
+    "integration_point": "Production line assembly stations"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d9ab34f8ef2172bdace21675cbc3324240a7808b6c7d99da1f349ecb52cbb316",
+    "output_hash": "8751e9dfa62b022f38a188ad8baf26332a414a764d06800a8c42ad832306fcf6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "aerospace"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-robotics-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Force-Sensing Climbing Robot",
+   "target_domain": "Infrastructure Inspection",
+   "source_domain": "Robotics",
+   "domain_id": "robotics",
+   "pain_class": "Robotics",
+   "problem": "Structural inspection robots require force sensing but face space and weight constraints for conventional sensors.",
+   "causal_chain": [
+    "Robot link flexibility",
+    "strain gauge measurement",
+    "force sensing",
+    "structural integrity assessment"
+   ],
+   "unexploited_phenomenon": "Robot's own flexibility can be used as a double force sensor (title:eaad64fa212f97c4)",
+   "intervention": "Integrate strain gauges into robot links to use structural flexibility as force sensor",
+   "governing_variables": "Link stiffness (N/m), strain gauge sensitivity (\u00b5\u03b5/N), measurement bandwidth (Hz)",
+   "predicted_effect": "40-70% reduction in sensor weight and size while maintaining force measurement accuracy",
+   "equations": [
+    "Force F = k \u00d7 \u0394L, where k is stiffness and \u0394L is measured strain"
+   ],
+   "boundary_conditions": "Effective for moderate force ranges; less effective for extreme forces or very high-frequency measurements",
+   "evidence_refs": [
+    "title:eaad64fa212f97c4"
+   ],
+   "cross_domain_transition": "Climbing robotics -> infrastructure inspection (adapting force-sensing capability for structural assessment)",
+   "baseline": {
+    "baseline_incumbent": "External force sensors added to climbing robots",
+    "baseline_metric": "500g additional sensor weight with \u00b11N force resolution",
+    "candidate_metric": "200g effective sensor weight with \u00b11N force resolution",
+    "expected_delta": "60% reduction in sensor weight while maintaining resolution"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH apparatus: climbing robot with integrated force sensing vs conventional sensors, measuring applied forces on test structures",
+    "decisive_uncertainty": "Whether integrated sensing can achieve required force resolution",
+    "kill_condition": "If force resolution cannot achieve \u00b11.5N or better",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Material fatigue",
+     "detectability": "detectable via strain drift",
+     "mitigation": "regular calibration"
+    },
+    {
+     "failure_mode": "Temperature effects",
+     "detectability": "detectable via zero-point drift",
+     "mitigation": "temperature compensation"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Infrastructure inspection companies",
+    "use_case": "Bridge, dam, and building structural assessment",
+    "integration_point": "Climbing robot manipulator links"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d9ab34f8ef2172bdace21675cbc3324240a7808b6c7d99da1f349ecb52cbb316",
+    "output_hash": "8751e9dfa62b022f38a188ad8baf26332a414a764d06800a8c42ad832306fcf6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-robotics-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "High-Speed Machining Robot Controller",
+   "target_domain": "Precision Manufacturing",
+   "source_domain": "Industrial Robotics",
+   "domain_id": "robotics",
+   "pain_class": "Robotics",
+   "problem": "Industrial robots lack the control algorithms needed for high-speed machining operations.",
+   "causal_chain": [
+    "Feedrate planning",
+    "dynamic path optimization",
+    "reduced vibration",
+    "improved machining quality"
+   ],
+   "unexploited_phenomenon": "Specialized feedrate planning can enable high-speed machining with industrial robots (doi:10.1016/j.conengprac.2010.01.004)",
+   "intervention": "Implement advanced feedrate planning algorithms in robot controllers for machining applications",
+   "governing_variables": "Path curvature (1/m), robot dynamics (kg\u00b7m\u00b2/s), machining forces (N)",
+   "predicted_effect": "30-50% increase in machining speed while maintaining surface quality due to optimized feedrate control",
+   "equations": [
+    "Optimal feedrate v = f(curvature, robot_dynamics, cutting_forces)"
+   ],
+   "boundary_conditions": "Effective for structured machining paths; less effective for highly complex or variable geometries",
+   "evidence_refs": [
+    "doi:10.1016/j.conengprac.2010.01.004"
+   ],
+   "cross_domain_transition": "General industrial robotics -> precision manufacturing (applying advanced control to high-speed machining)",
+   "baseline": {
+    "baseline_incumbent": "Standard robot controllers with basic feedrate control",
+    "baseline_metric": "100mm/s machining speed with \u00b10.1mm surface deviation",
+    "candidate_metric": "150mm/s machining speed with \u00b10.1mm surface deviation",
+    "expected_delta": "50% increase in machining speed"
+   },
+   "killer_experiment": {
+    "experiment": "LAB apparatus: robot controller with feedrate planning vs standard controller, performing machining tests on test pieces",
+    "decisive_uncertainty": "Whether feedrate planning can achieve speed improvements without quality loss",
+    "kill_condition": "If surface deviation exceeds \u00b10.15mm at increased speeds",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Controller instability",
+     "detectability": "detectable via vibration",
+     "mitigation": "adaptive damping"
+    },
+    {
+     "failure_mode": "Path planning errors",
+     "detectability": "detectable via surface defects",
+     "mitigation": "real-time correction"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Precision manufacturing facilities",
+    "use_case": "High-speed metal and plastic component machining",
+    "integration_point": "Robot controller software"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d9ab34f8ef2172bdace21675cbc3324240a7808b6c7d99da1f349ecb52cbb316",
+    "output_hash": "8751e9dfa62b022f38a188ad8baf26332a414a764d06800a8c42ad832306fcf6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "manufacturing",
+     "machining"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-robotics-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Variable Structure Robot Control",
+   "target_domain": "Hazardous Material Handling",
+   "source_domain": "Industrial Robotics",
+   "domain_id": "robotics",
+   "pain_class": "Robotics",
+   "problem": "Robots operating in unpredictable environments require robust control systems that can handle variable conditions.",
+   "causal_chain": [
+    "Variable structure control",
+    "system robustness",
+    "disturbance rejection",
+    "stable operation in uncertain environments"
+   ],
+   "unexploited_phenomenon": "Variable structure control provides robustness for robot manipulators in uncertain conditions (title:4c20aa70ef47139f)",
+   "intervention": "Implement variable structure control algorithms for robots in hazardous material handling",
+   "governing_variables": "System uncertainty bounds, switching function gain, control sampling rate (Hz)",
+   "predicted_effect": "40-60% improvement in system stability when facing unexpected disturbances or parameter variations",
+   "equations": [
+    "Control law u = -K\u00b7sign(s), where s is the sliding surface and K is the gain"
+   ],
+   "boundary_conditions": "Effective for bounded uncertainties; less effective for extreme or unbounded disturbances",
+   "evidence_refs": [
+    "title:4c20aa70ef47139f"
+   ],
+   "cross_domain_transition": "General robotics -> hazardous material handling (applying robust control for safety-critical applications)",
+   "baseline": {
+    "baseline_incumbent": "PID control for hazardous material handling robots",
+    "baseline_metric": "70% stability in presence of moderate disturbances",
+    "candidate_metric": "90% stability through variable structure control",
+    "expected_delta": "29% improvement in stability"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH apparatus: robot with variable structure control vs PID control, responding to simulated disturbances",
+    "decisive_uncertainty": "Whether variable structure control provides sufficient robustness for hazardous environments",
+    "kill_condition": "If stability cannot be maintained in >30% of disturbance scenarios",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Chattering",
+     "detectability": "detectable via high-frequency oscillations",
+     "mitigation": "smoothing algorithms"
+    },
+    {
+     "failure_mode": "Parameter sensitivity",
+     "detectability": "detectable via performance drift",
+     "mitigation": "adaptive tuning"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Nuclear and chemical processing facilities",
+    "use_case": "Safe handling of hazardous materials in uncertain environments",
+    "integration_point": "Robot control system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d9ab34f8ef2172bdace21675cbc3324240a7808b6c7d99da1f349ecb52cbb316",
+    "output_hash": "8751e9dfa62b022f38a188ad8baf26332a414a764d06800a8c42ad832306fcf6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-robotics-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Dynamic Path Planning for Redundant Robots",
+   "target_domain": "Search and Rescue Operations",
+   "source_domain": "Industrial Robotics",
+   "domain_id": "robotics",
+   "pain_class": "Robotics",
+   "problem": "Search and rescue robots need to navigate complex spaces but current path planning is insufficient for redundant manipulators.",
+   "causal_chain": [
+    "Dynamic path planning",
+    "obstacle avoidance",
+    "efficient navigation",
+    "improved search coverage in complex environments"
+   ],
+   "unexploited_phenomenon": "Dynamic path planning enables efficient navigation for redundant robot arms (doi:10.1109/iros.2006.281798)",
+   "intervention": "Implement dynamic path planning algorithms for 7-DOF search and rescue robots",
+   "governing_variables": "Obstacle density (1/m\u00b2), path planning computation time (s), robot workspace volume (m\u00b3)",
+   "predicted_effect": "50-70% improvement in navigation efficiency through redundant DOF utilization",
+   "equations": [
+    "Path efficiency = f(computation_time, obstacle_density, workspace_utilization)"
+   ],
+   "boundary_conditions": "Effective for moderately complex environments; less effective for extremely cluttered spaces",
+   "evidence_refs": [
+    "doi:10.1109/iros.2006.281798"
+   ],
+   "cross_domain_transition": "Industrial robotics -> search and rescue (applying advanced path planning to time-critical operations)",
+   "baseline": {
+    "baseline_incumbent": "Standard path planning for search and rescue robots",
+    "baseline_metric": "40% workspace coverage in complex environments",
+    "candidate_metric": "65% workspace coverage through dynamic planning",
+    "expected_delta": "63% improvement in coverage efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "LAB apparatus: 7-DOF robot with dynamic path planning vs standard planning, navigating mock disaster sites",
+    "decisive_uncertainty": "Whether dynamic planning can achieve significant coverage improvements in complex environments",
+    "kill_condition": "If coverage improvement is less than 20% over baseline",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Local minima traps",
+     "detectability": "detectable via stalled movement",
+     "mitigation": "global optimization fallback"
+    },
+    {
+     "failure_mode": "Computation overload",
+     "detectability": "detectable via delayed responses",
+     "mitigation": "hierarchical planning"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Search and rescue organizations",
+    "use_case": "Disaster site exploration and victim location",
+    "integration_point": "Robot navigation system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d9ab34f8ef2172bdace21675cbc3324240a7808b6c7d99da1f349ecb52cbb316",
+    "output_hash": "8751e9dfa62b022f38a188ad8baf26332a414a764d06800a8c42ad832306fcf6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-robotics-8",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Fast Production Robot System",
+   "target_domain": "Automotive Manufacturing",
+   "source_domain": "Industrial Robotics",
+   "domain_id": "robotics",
+   "pain_class": "Robotics",
+   "problem": "Automotive manufacturing requires high-speed robots but current systems lack sufficient speed capabilities.",
+   "causal_chain": [
+    "High-speed robot design",
+    "reduced cycle time",
+    "increased production throughput",
+    "lower manufacturing costs"
+   ],
+   "unexploited_phenomenon": "Specialized six-axis robots can achieve high production speeds (doi:10.1108/ir.2003.04930aad.001)",
+   "intervention": "Implement optimized six-axis robot designs for high-speed automotive manufacturing tasks",
+   "governing_variables": "Maximum joint velocity (rad/s), acceleration (rad/s\u00b2), payload capacity (kg)",
+   "predicted_effect": "30-50% increase in production throughput due to faster cycle times",
+   "equations": [
+    "Cycle time = \u03a3(movement_time + acceleration_time) across all operations"
+   ],
+   "boundary_conditions": "Effective for repetitive, structured tasks; less effective for highly variable or complex operations",
+   "evidence_refs": [
+    "doi:10.1108/ir.2003.04930aad.001"
+   ],
+   "cross_domain_transition": "General industrial robotics -> automotive manufacturing (applying speed optimization to high-volume production)",
+   "baseline": {
+    "baseline_incumbent": "Standard industrial robots in automotive lines",
+    "baseline_metric": "60 units/hour production rate",
+    "candidate_metric": "90 units/hour production rate",
+    "expected_delta": "50% increase in production rate"
+   },
+   "killer_experiment": {
+    "experiment": "PILOT apparatus: high-speed robot system vs standard system on automotive production line",
+    "decisive_uncertainty": "Whether speed improvements can be achieved without compromising reliability",
+    "kill_condition": "If failure rate increases by more than 20% at higher speeds",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Mechanical wear",
+     "detectability": "detectable via increased maintenance",
+     "mitigation": "predictive maintenance"
+    },
+    {
+     "failure_mode": "Vibration-induced errors",
+     "detectability": "detectable via quality defects",
+     "mitigation": "vibration damping"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive manufacturing plants",
+    "use_case": "High-volume component assembly and welding",
+    "integration_point": "Production line assembly stations"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d9ab34f8ef2172bdace21675cbc3324240a7808b6c7d99da1f349ecb52cbb316",
+    "output_hash": "8751e9dfa62b022f38a188ad8baf26332a414a764d06800a8c42ad832306fcf6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "manufacturing",
+     "automotive"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  }
+ ],
+ "rejected": [
+  {
+   "candidate_id": "C-robotics-4",
+   "reasons": [
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-robotics-5",
+   "reasons": [
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-robotics-5",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-robotics-6",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-robotics-7",
+   "reasons": [
+    "missing field EQUATIONS",
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-robotics-8",
+   "reasons": [
+    "missing field EQUATIONS",
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT"
+   ]
+  }
+ ],
+ "pool_sha256": "494f51d8963bbe3bd549cd46e1b3b265f2dc25d6bc949ff1cf56ea7f077d142b"
+}

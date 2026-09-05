@@ -1,0 +1,1454 @@
+{
+ "domain_id": "power_electronics",
+ "status": "OK",
+ "transport_failures": 0,
+ "n_calls": 4,
+ "accepted": [
+  {
+   "candidate_id": "C-power_electronics-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Discontinuous PWM Loss Reduction",
+   "target_domain": "automotive",
+   "source_domain": "motor drives",
+   "domain_id": "power_electronics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "High-power inverters for motor drives suffer from reliability failures due to excessive switching losses and thermal stress.",
+   "causal_chain": [
+    "High switching frequency",
+    "increased switching losses",
+    "elevated junction temperature",
+    "thermal stress",
+    "reduced component lifetime",
+    "reliability failure"
+   ],
+   "unexploited_phenomenon": "Discontinuous pulse width modulation (DPWM) reduces switching losses by clamping phase voltage to DC bus during certain switching intervals.",
+   "intervention": "Implement discontinuous PWM in flux angle control for induction motor drives to reduce switching losses under light load conditions.",
+   "governing_variables": "Switching frequency (fsw, Hz), DC bus voltage (Vdc, V), load current (Iload, A), switching energy per cycle (Esw, J)",
+   "predicted_effect": "20-40% reduction in switching losses under light load conditions (0.3-0.6 pu) due to reduced number of switching transitions per fundamental cycle.",
+   "equations": [
+    "Psw = fsw \u00d7 Esw",
+    "Esw = (1/2) \u00d7 Vdc \u00d7 Iload \u00d7 tsw"
+   ],
+   "boundary_conditions": "Effective at light to medium loads (0.3-0.6 pu), less effective at full load where continuous PWM may be preferable. Requires precise timing control.",
+   "evidence_refs": [
+    "doi:10.1049/elp2.12345",
+    "doi:10.48308/ijrtei.2025.240319.1092"
+   ],
+   "cross_domain_transition": "Motor drives to automotive electric vehicle powertrains, where reduced losses directly extend battery range and improve thermal management.",
+   "baseline": {
+    "baseline_incumbent": "Continuous PWM with fixed switching frequency, which maintains consistent switching losses regardless of load.",
+    "baseline_metric": "Typical efficiency of 85-90% at light loads with conventional PWM.",
+    "candidate_metric": "Predicted efficiency of 92-95% at light loads with DPWM implementation.",
+    "expected_delta": "5-10% absolute efficiency improvement at light loads."
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale test setup with induction motor drive, DPWM controller implementation, and efficiency/power analyzer comparing DPWM vs continuous PWM at various loads.",
+    "decisive_uncertainty": "Whether the efficiency improvement from reduced switching losses outweighs any potential increase in harmonic losses.",
+    "kill_condition": "If DPWM shows no improvement or degradation in total system efficiency compared to continuous PWM.",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Increased harmonic distortion",
+     "detectability": "detectable via THD measurement",
+     "mitigation": "mitigation through optimized switching pattern design"
+    },
+    {
+     "failure_mode": "Transient instability during mode transitions",
+     "detectability": "detectable via oscilloscope monitoring",
+     "mitigation": "mitigation through smooth transition algorithms"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Electric vehicle powertrain engineers",
+    "use_case": "Improving efficiency and reliability of motor drive inverters in electric vehicles",
+    "integration_point": "Inverter control software/firmware in electric vehicle powertrain systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "3683fa4701bcd5757f9296a75e56e009c74ff79535e4a38b3afd15305bbeee76",
+    "output_hash": "031b165aad66eb55d2516d673142265a6b631bf6c81cacc4052ca4a44f76dbdd",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "inverter",
+     "motor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-power_electronics-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "GaN-Based Modular Multilevel Converter",
+   "target_domain": "data-center",
+   "source_domain": "power electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "Data-center power supply units suffer from reliability failures due to thermal management challenges in high-power density applications.",
+   "causal_chain": [
+    "High power density",
+    "increased thermal stress",
+    "reduced component lifetime",
+    "reliability failure"
+   ],
+   "unexploited_phenomenon": "Wide-bandgap GaN devices offer superior thermal conductivity and switching characteristics compared to traditional silicon devices.",
+   "intervention": "Replace traditional silicon-based converters with GaN-based modular multilevel converters for high-power density applications.",
+   "governing_variables": "Thermal conductivity (k, W/m\u00b7K), operating temperature (T, \u00b0C), power density (W/cm\u00b3), switching frequency (fsw, Hz)",
+   "predicted_effect": "30-50% reduction in operating temperature due to superior thermal properties of GaN, leading to 2-3\u00d7 longer component lifetime.",
+   "equations": [
+    "Rth = Tj - Ta / P",
+    "Lth = k \u00d7 A / d"
+   ],
+   "boundary_conditions": "Effective at high switching frequencies (>100 kHz), requires proper thermal management design. Most beneficial in high-power density applications (>1 kW/cm\u00b3).",
+   "evidence_refs": [
+    "doi:10.54209/elimensi.v2i03.403"
+   ],
+   "cross_domain_transition": "High-power motor drives to data-center power supplies, where improved thermal management directly improves reliability and reduces cooling requirements.",
+   "baseline": {
+    "baseline_incumbent": "Silicon-based IGBT converters with conventional thermal management.",
+    "baseline_metric": "Typical junction temperature of 125-150\u00b0C with limited power density.",
+    "candidate_metric": "Predicted junction temperature of 80-100\u00b0C with higher power density capability.",
+    "expected_delta": "25-50\u00b0C reduction in operating temperature."
+   },
+   "killer_experiment": {
+    "experiment": "LAB-scale thermal testing of GaN-based modules vs silicon-based modules under identical power loading conditions.",
+    "decisive_uncertainty": "Whether GaN devices maintain reliability advantages under long-term high-temperature cycling conditions.",
+    "kill_condition": "If GaN devices show no thermal advantage or exhibit unexpected failure modes under accelerated aging tests.",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "GaN device degradation under high voltage stress",
+     "detectability": "detectable via parameter monitoring",
+     "mitigation": "mitigation through voltage derating"
+    },
+    {
+     "failure_mode": "Thermal cycling fatigue",
+     "detectability": "detectable via thermal imaging",
+     "mitigation": "mitigation through optimized thermal design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data-center infrastructure engineers",
+    "use_case": "Improving reliability and reducing cooling requirements of power supply units in data centers",
+    "integration_point": "Power conversion stage in data-center power distribution units"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "3683fa4701bcd5757f9296a75e56e009c74ff79535e4a38b3afd15305bbeee76",
+    "output_hash": "031b165aad66eb55d2516d673142265a6b631bf6c81cacc4052ca4a44f76dbdd",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-power_electronics-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Phase-Shift DPWM for Thermally Limited Applications",
+   "target_domain": "aerospace",
+   "source_domain": "power electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "High-power inverters for motor drives suffer from reliability failures in thermally limited applications where heat dissipation is challenging.",
+   "causal_chain": [
+    "Thermal limitations",
+    "reduced power density",
+    "increased current stress",
+    "reduced component lifetime",
+    "reliability failure"
+   ],
+   "unexploited_phenomenon": "Phase-shift-based discontinuous PWM reduces switching losses by clamping phase voltage to DC bus while maintaining output quality.",
+   "intervention": "Implement phase-shift-based DPWM in thermally limited high-power inverter applications to reduce switching losses and enable higher power density.",
+   "governing_variables": "Switching frequency (fsw, Hz), phase shift angle (\u03b8, degrees), DC bus voltage (Vdc, V), load current (Iload, A), thermal resistance (Rth, \u00b0C/W)",
+   "predicted_effect": "20-35% reduction in switching losses, enabling 15-25% increase in power density within the same thermal constraints.",
+   "equations": [
+    "Psw = fsw \u00d7 Esw",
+    "Esw = (1/2) \u00d7 Vdc \u00d7 Iload \u00d7 tsw \u00d7 (1 - cos(\u03b8))"
+   ],
+   "boundary_conditions": "Most effective in thermally limited applications where heat dissipation is the primary constraint. Requires precise phase shift control.",
+   "evidence_refs": [
+    "doi:10.3390/mi16101128"
+   ],
+   "cross_domain_transition": "Low-voltage micro inverters to aerospace high-power motor drives, where thermal management is critical for reliability in confined spaces.",
+   "baseline": {
+    "baseline_incumbent": "Continuous PWM with fixed switching frequency, which produces consistent switching losses regardless of thermal constraints.",
+    "baseline_metric": "Typical power density of 0.5-1 kW/L with conventional thermal management.",
+    "candidate_metric": "Predicted power density of 0.6-1.25 kW/L with phase-shift DPWM.",
+    "expected_delta": "15-25% increase in power density."
+   },
+   "killer_experiment": {
+    "experiment": "LAB-scale thermal testing of phase-shift DPWM vs conventional PWM in a thermally limited environment.",
+    "decisive_uncertainty": "Whether the reduction in switching losses translates directly to increased power density without compromising reliability.",
+    "kill_condition": "If phase-shift DPWM shows no power density improvement or introduces reliability issues.",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Increased electromagnetic interference",
+     "detectability": "detectable via EMI measurements",
+     "mitigation": "mitigation through filtering design"
+    },
+    {
+     "failure_mode": "Transient instability during phase transitions",
+     "detectability": "detectable via oscilloscope monitoring",
+     "mitigation": "mitigation through smooth transition algorithms"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Aerospace power electronics engineers",
+    "use_case": "Improving power density and thermal management in aerospace motor drives",
+    "integration_point": "Inverter control systems for aerospace electric propulsion"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "3683fa4701bcd5757f9296a75e56e009c74ff79535e4a38b3afd15305bbeee76",
+    "output_hash": "031b165aad66eb55d2516d673142265a6b631bf6c81cacc4052ca4a44f76dbdd",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "aerospace",
+     "inverter",
+     "motor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-power_electronics-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Neural Network Based Loss Model Control",
+   "target_domain": "industrial",
+   "source_domain": "motor drives",
+   "domain_id": "power_electronics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "High-power inverters for motor drives suffer from reliability failures due to suboptimal efficiency control under varying operating conditions.",
+   "causal_chain": [
+    "Suboptimal efficiency",
+    "increased losses",
+    "elevated temperature",
+    "reduced component lifetime",
+    "reliability failure"
+   ],
+   "unexploited_phenomenon": "Neural networks can adapt to varying operating conditions and optimize loss model control for maximum efficiency.",
+   "intervention": "Implement neural network-based loss model control for medium-sized induction motor drives to optimize efficiency across all operating points.",
+   "governing_variables": "Motor speed (\u03c9, rad/s), load torque (T, Nm), flux linkage (\u03c8, Wb), switching frequency (fsw, Hz), copper losses (Pcu, W), iron losses (Pfe, W)",
+   "predicted_effect": "10-20% improvement in efficiency across the operating range, particularly at partial loads where conventional control methods are less efficient.",
+   "equations": [
+    "\u03b7 = Pout / (Pout + Plosses)",
+    "Plosses = Pcu + Pfe + Psw"
+   ],
+   "boundary_conditions": "Requires sufficient training data across the operating range. Most effective when operating conditions vary significantly.",
+   "evidence_refs": [
+    "doi:10.1049/elp2.12345"
+   ],
+   "cross_domain_transition": "Motor drives to industrial pump systems, where efficiency improvements directly reduce energy consumption and thermal stress.",
+   "baseline": {
+    "baseline_incumbent": "Conventional loss model control with fixed parameters across operating range.",
+    "baseline_metric": "Typical efficiency of 85-90% across operating range.",
+    "candidate_metric": "Predicted efficiency of 92-95% across operating range with neural network optimization.",
+    "expected_delta": "5-10% absolute efficiency improvement."
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale testing of neural network control vs conventional control on an induction motor drive test bench.",
+    "decisive_uncertainty": "Whether the neural network maintains efficiency improvements under dynamic load conditions.",
+    "kill_condition": "If neural network control shows no efficiency improvement or introduces instability.",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Neural network overfitting to training data",
+     "detectability": "detectable via validation testing",
+     "mitigation": "mitigation through regularization techniques"
+    },
+    {
+     "failure_mode": "Computational latency",
+     "detectability": "detectable via timing analysis",
+     "mitigation": "mitigation through network optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial motor control system designers",
+    "use_case": "Improving efficiency and reliability of motor drives in industrial applications",
+    "integration_point": "Motor drive control software for industrial pumps and compressors"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "3683fa4701bcd5757f9296a75e56e009c74ff79535e4a38b3afd15305bbeee76",
+    "output_hash": "031b165aad66eb55d2516d673142265a6b631bf6c81cacc4052ca4a44f76dbdd",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "inverter",
+     "motor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-power_electronics-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Surface-Mount vs Power Module Inverter Design",
+   "target_domain": "automotive",
+   "source_domain": "power electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "RELIABILITY_FAILURE",
+   "problem": "High-power inverters for motor drives suffer from reliability failures due to suboptimal component selection and packaging.",
+   "causal_chain": [
+    "Suboptimal component selection",
+    "increased thermal stress",
+    "reduced component lifetime",
+    "reliability failure"
+   ],
+   "unexploited_phenomenon": "Surface-mounted discrete MOSFETs can provide comparable output capabilities to power modules with potentially better thermal performance.",
+   "intervention": "Replace power modules with optimized arrays of surface-mounted discrete MOSFETs in high-power inverter applications.",
+   "governing_variables": "Thermal resistance (Rth, \u00b0C/W), power dissipation (P, W), junction temperature (Tj, \u00b0C), current density (J, A/cm\u00b2), packaging efficiency (\u03b7pkg, %)",
+   "predicted_effect": "15-30% reduction in thermal resistance compared to equivalent power modules, enabling lower operating temperatures and longer component lifetime.",
+   "equations": [
+    "Tj = Ta + P \u00d7 Rth",
+    "Rth = Rjc + Rcs + Rsa"
+   ],
+   "boundary_conditions": "Effective at medium to high power levels (10-100 kW). Requires optimized layout and thermal design.",
+   "evidence_refs": [
+    "doi:10.3390/electronics13020355"
+   ],
+   "cross_domain_transition": "High-power motor drives to automotive electric vehicle powertrains, where thermal reliability directly impacts vehicle lifetime.",
+   "baseline": {
+    "baseline_incumbent": "Power modules with integrated thermal management but limited thermal performance.",
+    "baseline_metric": "Typical thermal resistance of 0.5-1.0 \u00b0C/W for high-power modules.",
+    "candidate_metric": "Predicted thermal resistance of 0.3-0.7 \u00b0C/W with optimized surface-mounted design.",
+    "expected_delta": "20-40% reduction in thermal resistance."
+   },
+   "killer_experiment": {
+    "experiment": "LAB-scale thermal testing of surface-mounted discrete MOSFET arrays vs equivalent power modules under identical operating conditions.",
+    "decisive_uncertainty": "Whether surface-mounted designs maintain reliability advantages under thermal cycling conditions.",
+    "kill_condition": "If surface-mounted designs show no thermal advantage or exhibit unexpected failure modes under thermal cycling.",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Interconnection reliability issues",
+     "detectability": "detectable via accelerated thermal cycling",
+     "mitigation": "mitigation through optimized interconnection design"
+    },
+    {
+     "failure_mode": "EMI concerns",
+     "detectability": "detectable via EMI testing",
+     "mitigation": "mitigation through layout optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Electric vehicle powertrain engineers",
+    "use_case": "Improving thermal reliability of motor drive inverters in electric vehicles",
+    "integration_point": "Inverter power stage design for electric vehicle powertrains"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "3683fa4701bcd5757f9296a75e56e009c74ff79535e4a38b3afd15305bbeee76",
+    "output_hash": "031b165aad66eb55d2516d673142265a6b631bf6c81cacc4052ca4a44f76dbdd",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "inverter",
+     "motor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "RELIABILITY_FAILURE"
+  },
+  {
+   "candidate_id": "C-power_electronics-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "DPWM Loss Reduction",
+   "target_domain": "automotive",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "SCALING_CONSTRAINT",
+   "problem": "High-power inverter for motor drives experiences thermal limitations that constrain power density.",
+   "causal_chain": [
+    "Discontinuous PWM implementation",
+    "phase voltage clamped to DC bus",
+    "reduced switching frequency",
+    "decreased switching losses",
+    "improved thermal management",
+    "higher power density"
+   ],
+   "unexploited_phenomenon": "Discontinuous PWM reduces switching losses by clamping phase voltage to DC bus (RECORD_ID: doi:10.3390/mi16101128)",
+   "intervention": "Implement discontinuous PWM technique in flux angle control for induction motor drives",
+   "governing_variables": "Switching frequency (fsw, Hz), DC bus voltage (Vdc, V), load current (I, A), thermal resistance (Rth, \u00b0C/W)",
+   "predicted_effect": "15-30% reduction in switching losses under light load conditions (RECORD_ID: doi:10.48308/ijrtei.2025.240319.1092)",
+   "equations": [
+    "Psw = 0.5 * Vdc * I * fsw * tsw (switching losses), Ptotal = Psw + Pconduction (total losses)"
+   ],
+   "boundary_conditions": "Effective under light to medium load conditions; less beneficial at full load where conduction losses dominate",
+   "evidence_refs": [
+    "doi:10.48308/ijrtei.2025.240319.1092",
+    "doi:10.3390/mi16101128"
+   ],
+   "cross_domain_transition": "power_electronics -> automotive (improves EV power density and range)",
+   "baseline": {
+    "baseline_incumbent": "Continuous PWM technique with higher switching frequency",
+    "baseline_metric": "Continuous PWM maintains higher switching frequency but produces 20-40% more switching losses at light loads",
+    "candidate_metric": "DPWM reduces switching losses by 15-30% while maintaining acceptable torque ripple",
+    "expected_delta": "15-30% reduction in switching losses at light loads"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale test setup with induction motor drive, DPWM vs continuous PWM implementation, temperature measurement at power devices, power analyzer measurements",
+    "decisive_uncertainty": "Whether DPWM maintains acceptable torque ripple and harmonic distortion in automotive applications",
+    "kill_condition": "DPWM causes >15% increase in torque ripple or THD compared to continuous PWM",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Increased torque ripple",
+     "detectability": "detectable via current measurement",
+     "mitigation": "mitigation through optimized switching pattern"
+    },
+    {
+     "failure_mode": "Reduced efficiency at high loads",
+     "detectability": "detectable via power analyzer",
+     "mitigation": "mitigation through hybrid PWM strategy"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "EV power electronics engineers",
+    "use_case": "High-power motor drives in electric vehicles",
+    "integration_point": "Inverter control software in the motor drive controller"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "11c64586abed0245552df57db20e4018f51367231eb42a15771f0cfa98243677",
+    "output_hash": "664759bbff70472a2251d52a995aff87cc432214a726ca4541971915d1cdc64c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "inverter",
+     "motor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SCALING_CONSTRAINT"
+  },
+  {
+   "candidate_id": "C-power_electronics-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "GaN Modular Multilevel Converter",
+   "target_domain": "data-center",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "SCALING_CONSTRAINT",
+   "problem": "Data-center power supply units face thermal management challenges that limit power density.",
+   "causal_chain": [
+    "Wide-bandgap GaN devices",
+    "higher switching frequency",
+    "reduced passive component size",
+    "improved thermal performance",
+    "higher power density"
+   ],
+   "unexploited_phenomenon": "GaN-based modular multilevel converters enable higher switching frequencies while maintaining efficiency (RECORD_ID: doi:10.54209/elimensi.v2i03.403)",
+   "intervention": "Replace traditional silicon-based converters with GaN-based modular multilevel converters",
+   "governing_variables": "Bandgap energy (Eg, eV), thermal conductivity (k, W/mK), switching frequency (fsw, Hz), device capacitance (C, F)",
+   "predicted_effect": "20-40% increase in power density due to higher switching frequency and reduced passive component size",
+   "equations": [
+    "Pdensity = Pout/Volume, V \u221d 1/fsw (passive component volume)"
+   ],
+   "boundary_conditions": "Effective at medium to high power levels; limited by GaN device availability and cost at very high power",
+   "evidence_refs": [
+    "doi:10.54209/elimensi.v2i03.403"
+   ],
+   "cross_domain_transition": "power_electronics -> data-center (improves power efficiency and density in computing infrastructure)",
+   "baseline": {
+    "baseline_incumbent": "Silicon-based power converters with lower switching frequency",
+    "baseline_metric": "Traditional converters achieve 5-10 kW/L power density with 90-95% efficiency",
+    "candidate_metric": "GaN-based converters achieve 6-14 kW/L power density with 95-97% efficiency",
+    "expected_delta": "20-40% increase in power density"
+   },
+   "killer_experiment": {
+    "experiment": "LAB-scale prototype with GaN-based modular multilevel converter, thermal imaging, power density measurement",
+    "decisive_uncertainty": "Thermal performance and reliability of GaN devices in data-center operating conditions",
+    "kill_condition": "Temperature rise exceeds 10\u00b0C above silicon-based equivalents at same power density",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "GaN device degradation",
+     "detectability": "detectable through increased leakage current",
+     "mitigation": "mitigation through derating and thermal management"
+    },
+    {
+     "failure_mode": "Electromagnetic interference",
+     "detectability": "detectable via spectrum analyzer",
+     "mitigation": "mitigation through improved PCB layout and filtering"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data-center power system architects",
+    "use_case": "High-efficiency, high-density power supplies for server racks",
+    "integration_point": "Power distribution units in data-center infrastructure"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "11c64586abed0245552df57db20e4018f51367231eb42a15771f0cfa98243677",
+    "output_hash": "664759bbff70472a2251d52a995aff87cc432214a726ca4541971915d1cdc64c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SCALING_CONSTRAINT"
+  },
+  {
+   "candidate_id": "C-power_electronics-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Parallel Discrete MOSFET Configuration",
+   "target_domain": "automotive",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "SCALING_CONSTRAINT",
+   "problem": "High-power inverter for motor drives experiences thermal limitations that constrain power density.",
+   "causal_chain": [
+    "Parallel discrete MOSFETs",
+    "distributed thermal paths",
+    "reduced hot spot formation",
+    "improved heat dissipation",
+    "higher power handling capability"
+   ],
+   "unexploited_phenomenon": "Parallel discrete MOSFETs can achieve similar output capabilities as power modules with better thermal management (RECORD_ID: doi:10.3390/electronics13020355)",
+   "intervention": "Replace power modules with parallel discrete MOSFET configuration in high-power inverters",
+   "governing_variables": "Number of parallel devices (N), thermal resistance (Rth, \u00b0C/W), current sharing factor (CSF, %), device junction temperature (Tj, \u00b0C)",
+   "predicted_effect": "10-25% improvement in thermal performance due to distributed heat sources",
+   "equations": [
+    "Ptotal = N * Pdevice (total power handling), Rth_total = Rth_device/N (effective thermal resistance)"
+   ],
+   "boundary_conditions": "Effective at medium to high power levels; requires careful current sharing design",
+   "evidence_refs": [
+    "doi:10.3390/electronics13020355"
+   ],
+   "cross_domain_transition": "power_electronics -> automotive (improves EV power density and reliability)",
+   "baseline": {
+    "baseline_incumbent": "Traditional power module configurations",
+    "baseline_metric": "Power modules achieve 50-100 A/cm\u00b2 current density with 15-20\u00b0C temperature rise",
+    "candidate_metric": "Parallel discrete MOSFETs achieve 55-125 A/cm\u00b2 current density with 12-16\u00b0C temperature rise",
+    "expected_delta": "10-25% improvement in thermal performance"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale test setup with parallel MOSFET configuration vs power module, infrared thermal imaging, current distribution measurement",
+    "decisive_uncertainty": "Current sharing imbalance under dynamic load conditions",
+    "kill_condition": "Current imbalance exceeds 15% between parallel devices at peak load",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Current sharing imbalance",
+     "detectability": "detectable via current probes",
+     "mitigation": "mitigation through gate resistance optimization"
+    },
+    {
+     "failure_mode": "Parasitic inductance",
+     "detectability": "detectable via voltage spikes",
+     "mitigation": "mitigation through optimized layout and gate driving"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "EV power electronics engineers",
+    "use_case": "High-power motor drives in electric vehicles",
+    "integration_point": "Inverter power stage design"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "11c64586abed0245552df57db20e4018f51367231eb42a15771f0cfa98243677",
+    "output_hash": "664759bbff70472a2251d52a995aff87cc432214a726ca4541971915d1cdc64c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "inverter",
+     "motor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SCALING_CONSTRAINT"
+  },
+  {
+   "candidate_id": "C-power_electronics-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Gray-Box Loss Model Control",
+   "target_domain": "industrial",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "SCALING_CONSTRAINT",
+   "problem": "Data-center power supply units face efficiency limitations that constrain scalability.",
+   "causal_chain": [
+    "Gray-box model combining physics-based principles",
+    "accurate loss prediction",
+    "optimized control parameters",
+    "reduced losses",
+    "improved efficiency"
+   ],
+   "unexploited_phenomenon": "Gray-box models combine first-order principles from physics with data-driven approaches for accurate loss prediction (RECORD_ID: doi:10.1109/pemc48073.2021.9432491)",
+   "intervention": "Implement gray-box loss model in induction motor drive control systems",
+   "governing_variables": "Motor flux (\u03a6, Wb), rotor speed (\u03c9, rad/s), torque (T, Nm), switching frequency (fsw, Hz)",
+   "predicted_effect": "5-15% improvement in efficiency through optimized flux and switching frequency control",
+   "equations": [
+    "Ploss = Pconduction + Psw (total losses), \u03a6 = k * V/f (flux control)"
+   ],
+   "boundary_conditions": "Effective across load range; requires accurate parameter identification",
+   "evidence_refs": [
+    "doi:10.1109/pemc48073.2021.9432491",
+    "doi:10.1049/elp2.12345"
+   ],
+   "cross_domain_transition": "power_electronics -> industrial (improves energy efficiency in industrial motor applications)",
+   "baseline": {
+    "baseline_incumbent": "Traditional loss model control with fixed parameters",
+    "baseline_metric": "Traditional LMC achieves 85-90% efficiency in medium-sized pump drives",
+    "candidate_metric": "Gray-box LMC achieves 90-95% efficiency in medium-sized pump drives",
+    "expected_delta": "5-15% improvement in efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale test with induction motor drive, gray-box vs traditional LMC implementation, power analyzer measurements",
+    "decisive_uncertainty": "Model accuracy across varying load conditions and temperature ranges",
+    "kill_condition": "Model prediction error exceeds 10% across operating range",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model parameter drift",
+     "detectability": "detectable via efficiency monitoring",
+     "mitigation": "mitigation through online parameter adaptation"
+    },
+    {
+     "failure_mode": "Computational complexity",
+     "detectability": "detectable via control loop timing",
+     "mitigation": "mitigation through simplified implementation"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial motor drive engineers",
+    "use_case": "Medium-sized pump drives in industrial applications",
+    "integration_point": "Motor drive control software"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "11c64586abed0245552df57db20e4018f51367231eb42a15771f0cfa98243677",
+    "output_hash": "664759bbff70472a2251d52a995aff87cc432214a726ca4541971915d1cdc64c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "motor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SCALING_CONSTRAINT"
+  },
+  {
+   "candidate_id": "C-power_electronics-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "High-Fundamental-Frequency Optimization",
+   "target_domain": "aerospace",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "SCALING_CONSTRAINT",
+   "problem": "High-power inverter for motor drives experiences scaling limitations in aerospace applications.",
+   "causal_chain": [
+    "High-fundamental-frequency operation",
+    "reduced passive component size",
+    "improved power density",
+    "better suitability for aerospace applications"
+   ],
+   "unexploited_phenomenon": "System-level investigation of switching-frequency trade-offs in MW-class PMSM drives (RECORD_ID: doi:10.1109/access.2026.3705237)",
+   "intervention": "Optimize switching frequency for high-fundamental-frequency MW-class PMSM drives",
+   "governing_variables": "Fundamental frequency (f1, Hz), switching frequency (fsw, Hz), power rating (P, W), thermal resistance (Rth, \u00b0C/W)",
+   "predicted_effect": "20-40% reduction in passive component size through optimized switching frequency",
+   "equations": [
+    "V \u221d 1/fsw (passive component volume), Ploss \u221d fsw (switching losses)"
+   ],
+   "boundary_conditions": "Effective at high power levels (>1MW); limited by device switching capabilities",
+   "evidence_refs": [
+    "doi:10.1109/access.2026.3705237"
+   ],
+   "cross_domain_transition": "power_electronics -> aerospace (improves power density for aerospace applications)",
+   "baseline": {
+    "baseline_incumbent": "Standard switching frequency (1-2 kHz) for MW-class drives",
+    "baseline_metric": "Standard drives achieve 0.5-1 kW/kg power density",
+    "candidate_metric": "Optimized drives achieve 0.6-1.4 kW/kg power density",
+    "expected_delta": "20-40% improvement in power density"
+   },
+   "killer_experiment": {
+    "experiment": "LAB-scale MW-class PMSM drive test, varying switching frequency, power density measurement",
+    "decisive_uncertainty": "Thermal performance at high switching frequencies",
+    "kill_condition": "Temperature rise exceeds 25\u00b0C at optimized switching frequency",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Increased EMI",
+     "detectability": "detectable via spectrum analyzer",
+     "mitigation": "mitigation through filtering"
+    },
+    {
+     "failure_mode": "Device stress",
+     "detectability": "detectable via voltage/current monitoring",
+     "mitigation": "mitigation through derating"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Aerospace power electronics engineers",
+    "use_case": "MW-class PMSM drives for aerospace applications",
+    "integration_point": "Power conversion system in aerospace platforms"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "11c64586abed0245552df57db20e4018f51367231eb42a15771f0cfa98243677",
+    "output_hash": "664759bbff70472a2251d52a995aff87cc432214a726ca4541971915d1cdc64c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "aerospace",
+     "inverter",
+     "motor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SCALING_CONSTRAINT"
+  },
+  {
+   "candidate_id": "C-power_electronics-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Neural Network Based MPPT Control",
+   "target_domain": "renewable_energy",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "SCALING_CONSTRAINT",
+   "problem": "Data-center power supply units face efficiency limitations that constrain scalability.",
+   "causal_chain": [
+    "Neural network based MPPT",
+    "improved energy harvesting",
+    "optimized power flow",
+    "reduced losses",
+    "improved efficiency"
+   ],
+   "unexploited_phenomenon": "Neural network based robust optimal energy control for PWM-inverter fed motor driving pump (RECORD_ID: doi:10.1049/elp2.12345)",
+   "intervention": "Implement neural network based MPPT algorithm in solar PV fed NPC inverter driven induction motor drives",
+   "governing_variables": "Solar irradiance (G, W/m\u00b2), temperature (T, \u00b0C), voltage (V, V), current (I, A)",
+   "predicted_effect": "10-20% improvement in energy harvesting efficiency through optimized MPPT",
+   "equations": [
+    "Pmax = G * A * \u03b7 (maximum power), \u03b7 = f(V, I, T) (efficiency function)"
+   ],
+   "boundary_conditions": "Effective in varying solar conditions; requires training data for specific installation",
+   "evidence_refs": [
+    "doi:10.1049/elp2.12345",
+    "doi:10.1109/access.2023.3291339"
+   ],
+   "cross_domain_transition": "power_electronics -> renewable_energy (improves solar energy harvesting efficiency)",
+   "baseline": {
+    "baseline_incumbent": "Traditional MPPT algorithms with fixed update rates",
+    "baseline_metric": "Traditional MPPT achieves 85-90% efficiency under varying conditions",
+    "candidate_metric": "Neural network MPPT achieves 95-98% efficiency under varying conditions",
+    "expected_delta": "10-20% improvement in energy harvesting efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale test with solar simulator, neural network vs traditional MPPT implementation, power analyzer measurements",
+    "decisive_uncertainty": "Performance under rapidly changing solar conditions",
+    "kill_condition": "Response time exceeds 100ms during rapid irradiance changes",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Overfitting to training data",
+     "detectability": "detectable via performance validation",
+     "mitigation": "mitigation through diverse training data"
+    },
+    {
+     "failure_mode": "Computational latency",
+     "detectability": "detectable via response time measurement",
+     "mitigation": "mitigation through optimized network architecture"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Renewable energy system integrators",
+    "use_case": "Solar PV fed motor drives for water pumping",
+    "integration_point": "MPPT controller in solar inverter system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "11c64586abed0245552df57db20e4018f51367231eb42a15771f0cfa98243677",
+    "output_hash": "664759bbff70472a2251d52a995aff87cc432214a726ca4541971915d1cdc64c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "inverter",
+     "motor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SCALING_CONSTRAINT"
+  },
+  {
+   "candidate_id": "C-power_electronics-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "GaN-Based MMC Thermal Optimization",
+   "target_domain": "energy",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "thermal_management",
+   "problem": "High power density converters generate excessive heat that limits performance and reliability in renewable energy systems.",
+   "causal_chain": [
+    "Wide-bandgap GaN devices enable higher switching frequencies",
+    "higher power density",
+    "increased thermal density",
+    "requires advanced thermal management",
+    "optimized thermal design improves reliability and power output"
+   ],
+   "unexploited_phenomenon": "Wide-bandgap GaN devices enable higher switching frequencies with lower losses, allowing for more compact thermal management solutions",
+   "intervention": "Modular multilevel converter with optimized thermal design using GaN devices",
+   "governing_variables": "Thermal resistance (R_\u03b8, \u00b0C/W), junction temperature (T_j, \u00b0C), ambient temperature (T_a, \u00b0C), power dissipation (P_diss, W)",
+   "predicted_effect": "30-50% reduction in thermal resistance compared to traditional Si-based converters because GaN has superior thermal conductivity",
+   "equations": [
+    "T_j = T_a + P_diss * R_\u03b8, where R_\u03b8 = R_\u03b8jc + R_\u03b8cs + R_\u03b8sa"
+   ],
+   "boundary_conditions": "Effective at high power densities (>1 kW/L); less beneficial at low power applications where thermal constraints are less severe",
+   "evidence_refs": [
+    "doi:10.54209/elimensi.v2i03.403"
+   ],
+   "cross_domain_transition": "power_electronics -> energy + transferring high-power-density thermal management from motor drives to renewable energy systems improves grid stability",
+   "baseline": {
+    "baseline_incumbent": "Si-based modular multilevel converters with conventional cooling systems",
+    "baseline_metric": "Thermal resistance of 0.5-1.0 \u00b0C/W at high power densities",
+    "candidate_metric": "Thermal resistance of 0.25-0.5 \u00b0C/W at equivalent power densities",
+    "expected_delta": "50-70% reduction in thermal resistance"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale thermal characterization test with GaN and Si-based modules under identical operating conditions",
+    "decisive_uncertainty": "Whether the thermal improvement translates to long-term reliability in energy system applications",
+    "kill_condition": "<20% improvement in thermal resistance compared to baseline",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "GaN device degradation at high temperatures",
+     "detectability": "detectable by increased leakage current",
+     "mitigation": "mitigation through derating"
+    },
+    {
+     "failure_mode": "Thermal cycling fatigue",
+     "detectability": "detectable by resistance monitoring",
+     "mitigation": "mitigation through thermal stress analysis"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Renewable energy system integrator",
+    "use_case": "Improving power density and reliability in grid-connected inverters for solar and wind energy systems",
+    "integration_point": "Power conversion stage in renewable energy inverters"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d0c0ac92aadfce9f533ad34b37abd6a5aed0a9a06f2ce3bb9bb8caf38db87296",
+    "output_hash": "3a65c2d95c917709888dba925943f66874eca48f8c1bf912c353ddda041821ea",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-power_electronics-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Gray-Box Flux Observer",
+   "target_domain": "automotive",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "control_precision",
+   "problem": "High-precision torque control in electric vehicle motor drives is compromised by inverter nonlinearities and sensorless operation limitations.",
+   "causal_chain": [
+    "Inverter nonlinearities cause voltage errors",
+    "deteriorates flux estimation accuracy",
+    "affects torque control precision",
+    "gray-box observer combines first principles with data-driven modeling",
+    "improves flux estimation",
+    "enhances torque control accuracy"
+   ],
+   "unexploited_phenomenon": "Gray-box models (GBMs) combine first-order principles from physics with data-driven modeling to achieve high-precision rotor flux estimation",
+   "intervention": "Implementation of gray-box rotor flux observer and inverter model for induction motor drives",
+   "governing_variables": "Flux estimation error (\u0394\u03c8, Wb), torque ripple (\u0394T, Nm), rotor time constant (\u03c4_r, s), stator resistance (R_s, \u03a9)",
+   "predicted_effect": "40-60% reduction in flux estimation error compared to pure model-based approaches because GBMs adapt to system variations",
+   "equations": [
+    "\u03c8_est = \u03c8_model + K * (\u03c8_measured - \u03c8_model), where K is adaptation gain"
+   ],
+   "boundary_conditions": "Effective in low to medium speed ranges; performance degrades at very low speeds where back-EMF is small",
+   "evidence_refs": [
+    "doi:10.1109/pemc48073.2021.9432491"
+   ],
+   "cross_domain_transition": "power_electronics -> automotive + transferring high-precision flux control from industrial drives to electric vehicles improves torque response and efficiency",
+   "baseline": {
+    "baseline_incumbent": "Standard model-based flux observers with documented limitations at low speeds and under parameter variations",
+    "baseline_metric": "15-25% flux estimation error under varying load conditions",
+    "candidate_metric": "5-10% flux estimation error under same conditions",
+    "expected_delta": "10-15% absolute improvement in flux estimation accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "Bench test with EV motor drive system, flux observer implementation, and torque measurement equipment",
+    "decisive_uncertainty": "Whether the improvement persists across different operating temperatures and aging conditions",
+    "kill_condition": "<10% improvement in flux estimation error compared to baseline",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Parameter drift over time",
+     "detectability": "detectable by increased estimation error",
+     "mitigation": "mitigation through online parameter identification"
+    },
+    {
+     "failure_mode": "Computational load",
+     "detectability": "detectable by processor utilization",
+     "mitigation": "mitigation through optimized algorithms"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Electric vehicle powertrain engineer",
+    "use_case": "Improving torque response and efficiency in electric vehicle motor drives",
+    "integration_point": "Between current control loop and inverter in EV motor controllers"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d0c0ac92aadfce9f533ad34b37abd6a5aed0a9a06f2ce3bb9bb8caf38db87296",
+    "output_hash": "3a65c2d95c917709888dba925943f66874eca48f8c1bf912c353ddda041821ea",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "inverter",
+     "motor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-power_electronics-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Phase-Shift DPWM for Micro-Inverters",
+   "target_domain": "aerospace",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "power_density",
+   "problem": "Thermally limited micro-inverters in aerospace applications require high efficiency in compact form factors.",
+   "causal_chain": [
+    "Phase-shift-based discontinuous PWM",
+    "clamps phase voltage to DC bus",
+    "reduces switching losses",
+    "improves efficiency",
+    "enables higher power density in thermally constrained applications"
+   ],
+   "unexploited_phenomenon": "Discontinuous PWM reduces switching losses by clamping phase voltage to DC bus, improving efficiency in thermally limited applications",
+   "intervention": "Phase-shift-based discontinuous PWM method for 24V battery-powered micro-inverters",
+   "governing_variables": "Switching frequency (f_sw, Hz), DC bus voltage (V_dc, V), thermal resistance (R_\u03b8, \u00b0C/W), power density (P_d, W/L)",
+   "predicted_effect": "25-35% improvement in power density because reduced switching losses allow for smaller heat sinks",
+   "equations": [
+    "P_sw = k_sw * f_sw * V_dc * I_load, P_d = P_out / Volume"
+   ],
+   "boundary_conditions": "Effective at low voltage (24V) and low to medium power applications (<1kW); less beneficial at higher voltages",
+   "evidence_refs": [
+    "doi:10.3390/mi16101128"
+   ],
+   "cross_domain_transition": "power_electronics -> aerospace + transferring thermally optimized micro-inverter technology from terrestrial to aerospace applications improves payload efficiency",
+   "baseline": {
+    "baseline_incumbent": "Continuous PWM micro-inverters with conventional thermal management",
+    "baseline_metric": "Power density of 100-200 W/L for 24V systems",
+    "candidate_metric": "Power density of 125-270 W/L for equivalent systems",
+    "expected_delta": "25-35% improvement in power density"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale thermal characterization test with DPWM and continuous PWM micro-inverters under identical aerospace conditions",
+    "decisive_uncertainty": "Whether the efficiency improvement persists in the vacuum conditions of space",
+    "kill_condition": "<15% improvement in power density compared to baseline",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Electromagnetic interference at discontinuous transitions",
+     "detectability": "detectable by spectrum analyzer",
+     "mitigation": "mitigation through optimized filtering"
+    },
+    {
+     "failure_mode": "Thermal runaway in vacuum",
+     "detectability": "detectable by temperature monitoring",
+     "mitigation": "mitigation through advanced thermal design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Aerospace power systems engineer",
+    "use_case": "Improving power density and efficiency in satellite and spacecraft power systems",
+    "integration_point": "Power conversion stage in aerospace electrical power systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d0c0ac92aadfce9f533ad34b37abd6a5aed0a9a06f2ce3bb9bb8caf38db87296",
+    "output_hash": "3a65c2d95c917709888dba925943f66874eca48f8c1bf912c353ddda041821ea",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "battery",
+     "aerospace",
+     "inverter"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-power_electronics-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Neural Network LMC for Pump Drives",
+   "target_domain": "agriculture",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "energy_efficiency",
+   "problem": "Medium-sized pump drives experience significant energy losses due to suboptimal flux control under varying load conditions.",
+   "causal_chain": [
+    "Varying load conditions",
+    "suboptimal flux control",
+    "increased copper and iron losses",
+    "neural network-based LMC algorithm",
+    "fast and smooth flux adaptation",
+    "reduced losses",
+    "improved energy efficiency"
+   ],
+   "unexploited_phenomenon": "Neural network-based loss model control (LMC) provides fast and smooth flux adaptation with high accuracy for medium-sized pump drives",
+   "intervention": "Robust LMC algorithm for medium-sized pump drives using neural networks",
+   "governing_variables": "Flux adaptation rate (d\u03c8/dt, Wb/s), loss reduction (\u0394P_loss, W), load variation (\u0394Load, %), motor efficiency (\u03b7, %)",
+   "predicted_effect": "15-25% reduction in energy consumption because the algorithm optimizes flux for varying load conditions",
+   "equations": [
+    "P_loss = P_cu + P_core, where P_cu \u221d I\u00b2 and P_core \u221d f"
+   ],
+   "boundary_conditions": "Effective for medium-sized pumps (10-100 kW); less beneficial for very small or very large pumps",
+   "evidence_refs": [
+    "doi:10.1049/elp2.12345"
+   ],
+   "cross_domain_transition": "power_electronics -> agriculture + transferring optimized motor control from industrial processes to agricultural irrigation reduces energy consumption in farming",
+   "baseline": {
+    "baseline_incumbent": "Conventional V/f control with documented limitations under varying load conditions",
+    "baseline_metric": "70-80% motor efficiency at partial loads",
+    "candidate_metric": "85-90% motor efficiency at partial loads",
+    "expected_delta": "10-15% absolute improvement in motor efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "Bench test with pump drive system, neural network LMC implementation, and power measurement equipment",
+    "decisive_uncertainty": "Whether the improvement persists across different water quality and pump types",
+    "kill_condition": "<5% improvement in motor efficiency compared to baseline",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Neural network overfitting",
+     "detectability": "detectable by validation performance",
+     "mitigation": "mitigation through regularization"
+    },
+    {
+     "failure_mode": "Computational delay",
+     "detectability": "detectable by response time measurement",
+     "mitigation": "mitigation through optimized architecture"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Agricultural irrigation system operator",
+    "use_case": "Reducing energy consumption in irrigation pump systems",
+    "integration_point": "Between pump controller and motor drive in irrigation systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d0c0ac92aadfce9f533ad34b37abd6a5aed0a9a06f2ce3bb9bb8caf38db87296",
+    "output_hash": "3a65c2d95c917709888dba925943f66874eca48f8c1bf912c353ddda041821ea",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "agricultur",
+     "pump"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-power_electronics-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "High-Frequency PMSM Trade-off Analysis",
+   "target_domain": "marine",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "system_integration",
+   "problem": "High-power marine propulsion systems face challenges in optimizing switching frequency for both machine and inverter performance.",
+   "causal_chain": [
+    "High switching frequency",
+    "increased switching losses but reduced machine losses",
+    "system-level trade-off analysis",
+    "optimized switching frequency",
+    "balanced loss distribution",
+    "improved overall efficiency"
+   ],
+   "unexploited_phenomenon": "System-level switching-frequency trade-offs in MW-class PMSM drives can be optimized through comprehensive measurement-based analysis",
+   "intervention": "System-level investigation of switching-frequency trade-offs in high-power marine propulsion systems",
+   "governing_variables": "Switching frequency (f_sw, Hz), machine efficiency (\u03b7_m, %), inverter efficiency (\u03b7_inv, %), total system efficiency (\u03b7_sys, %)",
+   "predicted_effect": "8-12% improvement in total system efficiency through optimized switching frequency selection",
+   "equations": [
+    "\u03b7_sys = \u03b7_m * \u03b7_inv, P_sw = k_sw * f_sw * V_dc * I"
+   ],
+   "boundary_conditions": "Effective for MW-class marine propulsion systems; less beneficial for smaller propulsion systems",
+   "evidence_refs": [
+    "doi:10.1109/access.2026.3705237"
+   ],
+   "cross_domain_transition": "aerospace -> marine + transferring high-frequency PMSM optimization from aerospace to marine applications improves propulsion efficiency",
+   "baseline": {
+    "baseline_incumbent": "Fixed switching frequency designs without system-level optimization",
+    "baseline_metric": "85-90% total system efficiency at rated load",
+    "candidate_metric": "93-95% total system efficiency at rated load",
+    "expected_delta": "5-7% absolute improvement in system efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale test with marine propulsion motor drive system, variable frequency control, and efficiency measurement",
+    "decisive_uncertainty": "Whether the optimized switching frequency persists in harsh marine environments with saltwater exposure",
+    "kill_condition": "<3% improvement in system efficiency compared to baseline",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Electromagnetic interference with marine communication systems",
+     "detectability": "detectable by spectrum analysis",
+     "mitigation": "mitigation through filtering"
+    },
+    {
+     "failure_mode": "Corrosion at high frequencies",
+     "detectability": "detectable by visual inspection",
+     "mitigation": "mitigation through conformal coating"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Marine propulsion systems engineer",
+    "use_case": "Improving efficiency in electric and hybrid marine propulsion systems",
+    "integration_point": "Power conversion stage in marine propulsion systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d0c0ac92aadfce9f533ad34b37abd6a5aed0a9a06f2ce3bb9bb8caf38db87296",
+    "output_hash": "3a65c2d95c917709888dba925943f66874eca48f8c1bf912c353ddda041821ea",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "marine",
+     "inverter"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-power_electronics-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "ANN-Based MPPT for Solar PV Inverters",
+   "target_domain": "energy",
+   "source_domain": "power_electronics",
+   "domain_id": "power_electronics",
+   "pain_class": "energy_harvesting",
+   "problem": "Solar PV fed induction motor drives experience suboptimal energy harvesting due to varying environmental conditions.",
+   "causal_chain": [
+    "Varying solar irradiance",
+    "suboptimal MPPT",
+    "reduced energy harvest",
+    "ANN-based MPPT algorithm",
+    "improved tracking accuracy",
+    "increased energy harvest",
+    "improved system efficiency"
+   ],
+   "unexploited_phenomenon": "Improved ANN-based MPPT algorithm enhances tracking accuracy for solar PV fed NPC inverter driven induction motor drives",
+   "intervention": "Modified PWM strategy with improved ANN-based MPPT algorithm for solar PV systems",
+   "governing_variables": "Solar irradiance (G, W/m\u00b2), temperature (T, \u00b0C), MPPT efficiency (\u03b7_mppt, %), energy harvest (E, kWh)",
+   "predicted_effect": "10-15% improvement in daily energy harvest because ANN adapts to varying environmental conditions faster than conventional methods",
+   "equations": [
+    "P_pv = G * A * \u03b7, where A is panel area and \u03b7 is efficiency"
+   ],
+   "boundary_conditions": "Effective for medium voltage induction motors (0.4-1kV); less beneficial for very small or very large systems",
+   "evidence_refs": [
+    "doi:10.1109/access.2023.3291339"
+   ],
+   "cross_domain_transition": "power_electronics -> energy + transferring optimized MPPT from motor drives to solar PV systems improves renewable energy harvesting",
+   "baseline": {
+    "baseline_incumbent": "Conventional perturb and observe MPPT with documented limitations under rapidly changing conditions",
+    "baseline_metric": "95-97% MPPT efficiency under steady conditions",
+    "candidate_metric": "98-99% MPPT efficiency under variable conditions",
+    "expected_delta": "2-4% absolute improvement in MPPT efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "Solar simulator test with ANN MPPT and conventional MPPT implementations under varying irradiance conditions",
+    "decisive_uncertainty": "Whether the improvement persists in partial shading conditions",
+    "kill_condition": "<1% improvement in MPPT efficiency compared to baseline",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "ANN overfitting to specific conditions",
+     "detectability": "detectable by validation performance",
+     "mitigation": "mitigation through diverse training data"
+    },
+    {
+     "failure_mode": "Convergence time",
+     "detectability": "detectable by response time measurement",
+     "mitigation": "mitigation through optimized architecture"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Renewable energy system integrator",
+    "use_case": "Improving energy harvest in solar PV systems with motor loads",
+    "integration_point": "Between PV array and inverter in solar energy systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d0c0ac92aadfce9f533ad34b37abd6a5aed0a9a06f2ce3bb9bb8caf38db87296",
+    "output_hash": "3a65c2d95c917709888dba925943f66874eca48f8c1bf912c353ddda041821ea",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "inverter",
+     "motor"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  }
+ ],
+ "rejected": [
+  {
+   "candidate_id": "C-power_electronics-1",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-2",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-3",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-4",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-5",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-6",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-7",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-3",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-7",
+   "reasons": [
+    "missing field INTEGRATION_POINT"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-7",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-8",
+   "reasons": [
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-1",
+   "reasons": [
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-power_electronics-8",
+   "reasons": [
+    "missing field UNEXPLOITED_PHENOMENON",
+    "missing field INTERVENTION",
+    "missing field GOVERNING_VARIABLES",
+    "missing field PREDICTED_EFFECT",
+    "missing field EQUATIONS",
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  }
+ ],
+ "pool_sha256": "6b56a08c8ebb4cc8d71f9ed85999bd9e4a3291970d42f0b6bc51ea854bcc84b5"
+}

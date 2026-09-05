@@ -1,0 +1,75 @@
+{
+ "attack_version": "R411-ATTACK-V1",
+ "candidate_id": "C-carbon_capture-7~3",
+ "status": "OK",
+ "attacker_provider": "openrouter",
+ "attacker_model": "minimax/minimax-m3:free",
+ "generator_provider": "zai",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "surfaces": {
+  "mechanism": {
+   "attack": "The proposed chain \"Thermal integration -> waste heat recovery -> reduced thermal energy requirement -> lower conversion loss -> more efficient DAC\" contains a category error. Direct air capture systems (amine-based, alkaline hydroxide, MOF-based) require high-grade thermal energy for sorbent regeneration, typically 80-150\u00b0C for amine systems and 600-900\u00b0C for alkaline sorbents (e.g., the Climeworks process uses 80-120\u00b0C; the \"thermal\" KOH/calcite cycle requires ~900\u00b0C calcination). The mechanism proposes recovering waste heat from the capture process itself, but the majority of thermal input is for regeneration, not the capture step. Capture is exothermic (CO2 binding releases heat); regenerating the sorbent requires concentrating that dilute binding energy and adding high-grade heat. The claimed 25-40% reduction would require Carnot-limited heat pump integration across a wide temperature lift, which is not \"waste heat recovery\" but active heat pumping \u2014 a fundamentally different intervention. The equations provided (\"Energy consumption = Energy_input - Energy_recovered\") are a tautology that proves nothing about the magnitude of recoverability.",
+   "verdict": "WOUND",
+   "basis": "Heat integration in DAC is real but the magnitude cannot approach 25-40% without violating the Second Law for the regeneration temperature lifts required (>700\u00b0C for alkaline cycles where 2nd-law penalties dominate). The mechanism conflates \"heat recovery\" with \"heat upgrading.\""
+  },
+  "unexploited_phenomenon": {
+   "attack": "This is not unexploited. Commercial DAC vendors (Climeworks, Heirloom, Carbon Engineering, Skytree/Infinitree) already publish designs incorporating thermal integration. Climeworks' \"temperature-swing adsorption with heat recovery\" is documented in their process flowsheets. Heirloom's \"thermal battery\" approach is explicitly a thermal integration scheme. The phenomenon is industry-standard practice, not an unexploited opportunity.",
+   "verdict": "KILL",
+   "basis": "Claim is false on its face \u2014 the prior-art record doi:10.1016/j.ecmx.2023.100489 (KOH DAC energy optimization) and the cited doi:10.1039/d5ee01732g review explicitly cover thermal integration as established practice. Commercial DAC deployments since at least 2017 use integrated heat management."
+  },
+  "intervention": {
+   "attack": "\"Implementation of thermal integration strategies in direct air capture systems\" is operationally vacuous. No specific integration topology is named (pinch analysis placement, heat pump integration, heat exchanger network design, sorbent-coupled thermal storage). Any energy process can be analyzed for heat integration; the intervention reduces to \"do standard chemical engineering process design,\" with no novel claim of inventiveness.",
+   "verdict": "WOUND",
+   "basis": "Without specification of heat exchanger network, temperature windows, or duty targets, the intervention is generic chemical engineering (e.g., Linnhoff pinch analysis, established since 1978). No claim of inventiveness survives generic-ness."
+  },
+  "predicted_effect": {
+   "attack": "The 25-40% reduction figure is unsourced and physically optimistic. Published DAC energy analyses report thermal demands of ~1,500-2,500 kWh/tCO2 for amine TSA and ~1,800-2,200 kWh/tCO2 for alkaline systems. Even aggressive heat integration (90% pinch target) typically recovers only 10-20% of total thermal duty because (a) the highest-grade heat is the calcination duty which cannot easily be cascaded to lower-temperature capture steps, and (b) the dilute CO2 stream (400 ppm) means the capture exotherm is dispersed across huge gas volumes with low recoverable flux density.",
+   "verdict": "KILL",
+   "basis": "The candidate's own kill condition (<15% = fail) directly conflicts with the lower bound of its predicted effect (25%). The 25-40% prediction is inconsistent with published energy-optimization simulations (e.g., doi:10.1016/j.ecmx.2023.100489 reports ~10-18% energy reductions from heat integration in KOH DAC, well below the predicted band)."
+  },
+  "equations": {
+   "attack": "\"Energy consumption = Energy_input - Energy_recovered\" is a definitional identity, not a predictive model. \"Heat recovery efficiency = Q_recovered / Q_available\" is a ratio with no defined denominator scope. Neither equation predicts the magnitude of the predicted effect; they cannot be evaluated, parameterized, or falsified. There is no mass balance, no sorbent equilibrium relation (e.g., Temkin isotherm for amine loading vs temperature), no kinetic term, and no thermodynamic minimum work (which for 400 ppm CO2 is ~0.15-0.20 kWh/kgCO2 \u2014 the absolute floor far below today's ~2,000 kWh/tCO2).",
+   "verdict": "KILL",
+   "basis": "The equations lack any DAC-specific physics: no sorbent isotherm, no \u0394H_ads, no temperature swing magnitude, no heat exchanger UA. They cannot predict 25-40% from any parameter set, rendering them decorative rather than predictive."
+  },
+  "boundary_conditions": {
+   "attack": "The boundary conditions are vague. \"Systems with significant thermal mass and temperature gradients\" applies to virtually every process. \"Limited by heat transfer constraints and system complexity\" is generic engineering hedging, not an identified, quantified constraint. The stated boundaries do not delineate where the intervention works vs. fails \u2014 they do not specify minimum temperature lift, minimum sorbent loading swing, or minimum plant scale at which integration pays back its capex.",
+   "verdict": "WOUND",
+   "basis": "No quantitative threshold (temperature, scale, \u0394Tmin, payback years) is provided. This is engineering jargon, not a constraint."
+  },
+  "evidence": {
+   "attack": "Only one evidence record is cited: doi:10.1039/d5ee01732g, which is a broad review of DAC. Reviews do not, by themselves, establish the mechanism or the 25-40% figure. No primary experimental record, no pilot-scale data, no quantified heat integration study is cited. The prior-art search returned seven additional relevant records (MOFs for DAC, ionic liquid capture, membrane DAC, photothermal catalysis, KOH DAC energy optimization), none of which are engaged with. The evidence base for the specific 25-40% claim is zero primary sources.",
+   "verdict": "KILL",
+   "basis": "Single review citation cannot support a specific quantitative claim of 25-40% reduction. Zero primary experimental evidence is offered. Prior-art record doi:10.1016/j.ecmx.2023.100489 specifically addresses KOH DAC energy optimization and would be the natural primary citation \u2014 it is conspicuously absent from the evidence list while being available in retrieval."
+  },
+  "prior_art": {
+   "attack": "Multiple retrieved prior-art records already teach the exact mechanism+intervention. doi:10.1016/j.ecmx.2023.100489 (\"Simulation of carbon dioxide direct air capture plant using potassium hydroxide aqueous solution: Energy optimization\") explicitly simulates thermal integration / heat recovery in DAC and reports the achievable efficiency range. doi:10.1021/acsami.6c01406 reviews membrane DAC including thermal considerations. The intervention (\"thermal integration in DAC\") is taught by the prior art; the candidate is not novel.",
+   "verdict": "KILL",
+   "basis": "doi:10.1016/j.ecmx.2023.100489 is a direct hit on mechanism + intervention + reported energy-reduction figures. The candidate's mechanism is not novel over this record."
+  },
+  "experiment_design": {
+   "attack": "The killer experiment is described as \"Lab-scale thermal integration test rig with temperature monitoring and energy measurement.\" This is fatally underspecified. (a) Which DAC chemistry (amine, KOH, MOF, CaO)? (b) What is the reference (no integration) baseline energy per kgCO2? (c) What temperature swing range? (d) What sorbent loading delta? (e) What is the minimum detectable effect size given the test rig's parasitic loads (pumps, blowers, instruments)? Without these, a measurement of \"15% improvement\" is not interpretable \u2014 parasitic energy alone in a lab-scale rig often exceeds 5-10% of system duty, swamping the kill threshold. (f) Lab-scale rig dynamics do not replicate the high-grade/low-grade heat cascades of full-scale DAC, so even a positive lab result would not extrapolate to the 25-40% full-scale claim.",
+   "verdict": "KILL",
+   "basis": "The kill threshold (15%) sits inside the typical uncertainty band of lab-scale DAC energy measurements (parasitic loads \u00b110-15%), making the experiment intrinsically unable to kill the hypothesis at the stated threshold. No baseline specification, no chemistry selection, no parasitic accounting."
+  }
+ },
+ "kill_surfaces": [
+  "unexploited_phenomenon",
+  "predicted_effect",
+  "equations",
+  "evidence",
+  "prior_art",
+  "experiment_design"
+ ],
+ "wound_surfaces": [
+  "mechanism",
+  "intervention",
+  "boundary_conditions"
+ ],
+ "final_objection": "KILLED. The single most dangerous surviving objection is that the underlying physics (heat integration in DAC) is real and partially effective \u2014 the candidate is killed by lack of novelty, lack of primary evidence, and unquantified prediction, but a more rigorously specified version (with specific sorbent, defined \u0394T, and a credible 10-20% range rather than 25-40%) could legitimately wound the problem statement.",
+ "prompt_hash": "6e69cfe6c57e232d193d3bb2b1fff63b185dda7bf3bdcbb249c91daa6257b812",
+ "output_hash": "cb0bafd26f8ba10a1ed9a358d4d032fbe92294e87617913941c160effa44d32e",
+ "survived": false,
+ "verdict": "KILLED"
+}

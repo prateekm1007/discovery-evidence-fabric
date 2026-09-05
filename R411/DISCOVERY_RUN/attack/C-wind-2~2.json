@@ -1,0 +1,69 @@
+{
+ "attack_version": "R411-ATTACK-V1",
+ "candidate_id": "C-wind-2~2",
+ "status": "OK",
+ "attacker_provider": "openrouter",
+ "attacker_model": "minimax/minimax-m3:free",
+ "generator_provider": "zai",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "surfaces": {
+  "mechanism": {
+   "attack": "The causal chain \"Bearing defects -> electrical signature changes\" requires a physical coupling path from mechanical bearing defects to measurable electrical signals. While motor current signature analysis (MCSA) is established for induction motors via air-gap torque perturbations coupling back to stator currents, wind turbine drivetrains are typically connected to generators through gearboxes with significant mechanical decoupling, and many configurations (DFIG, PMSG) have power electronics that dominate the electrical noise floor. The claim that bearing defects produce a usable electrical signature in a grid-connected turbine drivetrain ignores that the generator's own manufacturing asymmetries, supply harmonics, controller switching, and grid impedance variations produce electrical signatures orders of magnitude larger than the bearing-induced modulation. THD as defined is a power-quality metric, not a bearing defect discriminator \u2014 it cannot distinguish bearing damage from any other source of harmonic distortion.",
+   "verdict": "WOUND",
+   "basis": "The equation given (THD = \u221a(\u03a3V_n\u00b2)/V\u2081 \u00d7 100%) is a broadband power-quality metric that sums all harmonic energy without frequency selectivity. Bearing defect frequencies (BPFO, BPFI, BSF, FTF) produce specific spectral lines typically requiring demodulation around supply frequency, not total harmonic distortion. THD aggregates all non-fundamental energy into one number, destroying the frequency information needed to identify defect type. The mechanism conflates \"any electrical change\" with \"diagnostically useful electrical signature.\""
+  },
+  "evidence": {
+   "attack": "The single cited record (doi:10.5204/thesis.eprints.107650) is a thesis, not a peer-reviewed publication with independent replication. A thesis demonstrates a single researcher's experimental work under advisor supervision, often with idealized laboratory conditions. One thesis does not constitute a body of evidence for a 50-80% reduction in undetected failures. No industry deployment data, no OEM validation, no field-trial statistics are cited. The candidate's entire evidence base for a quantitative performance claim is a single graduate thesis.",
+   "verdict": "WOUND",
+   "basis": "Exactly one cited record, a thesis (doi:10.5204/thesis.eprints.107650), supporting quantitative claims of 50-80% failure reduction. No peer-reviewed corroboration, no field validation, no independent replication cited."
+  },
+  "prior_art": {
+   "attack": "doi:10.1109/eic63069.2025.11123384 explicitly evaluates electrical signature analysis for wind turbine defect detection (nacelle circulating currents), and doi:10.1109/eic63069.2025.11123235 describes \"A Novel Approach to Detecting Machinery Insulation Defects with Electrical and Current Signature Analysis\" \u2014 both are 2025 publications teaching the same mechanism (electrical signature analysis for rotating machinery defect detection) in the same application domain. The candidate claims to exploit an \"unexploited phenomenon\" that is demonstrably already taught in the prior art. Furthermore, MCSA (Motor Current Signature Analysis) for bearing defect detection in induction motors is a mature field dating to the 1980s-90s with extensive literature, meaning the underlying phenomenon is not novel at all \u2014 only its specific application to wind turbine drivetrains might be.",
+   "verdict": "KILL",
+   "basis": "doi:10.1109/eic63069.2025.11123235 directly teaches electrical/current signature analysis for machinery defect detection, and doi:10.1109/eic63069.2025.11123384 applies the same concept to wind turbines. The claimed \"unexploited phenomenon\" is already exploited and published."
+  },
+  "boundary_conditions": {
+   "attack": "The candidate states effectiveness requires \"sufficient electrical load\" and acknowledges \"reduced sensitivity during low power operation.\" This is a fatal admission, not a minor caveat. Wind turbines frequently operate at partial load (below rated wind speed) for 60-80% of their operating hours in most wind regimes. During low-power conditions, the very bearing defects that propagate most slowly (and are most amenable to early detection) would be missed. The monitoring system has its worst sensitivity precisely when the turbine accumulates the most operating hours and when early-stage defects are most likely to be present and detectable in their incipient form. The boundary condition effectively negates the value proposition during the majority of operational time.",
+   "verdict": "KILL",
+   "basis": "Wind turbines operate below rated power 60-80% of annual hours in typical wind regimes (IEC Class II/III sites); the candidate admits sensitivity degrades in this regime, eliminating detection capability during the majority of the duty cycle."
+  },
+  "predicted_effect": {
+   "attack": "The 50-80% reduction in undetected bearing failures is an extraordinarily wide range with no confidence interval, no statistical basis, and no operational definition of \"undetected.\" The claim conflates detection probability improvement with failure rate reduction \u2014 detecting a defect earlier does not prevent the failure unless maintenance is actually performed, and the intervention as described is only a monitoring system, not a closed-loop maintenance trigger. The range is suspiciously wide (factor of 1.6\u00d7), suggesting it is a back-of-envelope guess rather than a derived prediction. No baseline failure rate is given, no MTBF data, no cost model.",
+   "verdict": "WOUND",
+   "basis": "The 50-80% range has no cited basis, no operational definition of \"undetected bearing failures,\" and no accounting for the fact that detection alone (without guaranteed maintenance action) does not reduce failure rate."
+  },
+  "experiment_design": {
+   "attack": "The proposed killer experiment is a \"laboratory test setup with controlled bearing defects, comparing electrical signature analysis against vibration analysis.\" This is a test-to-the-comparison, not a test-to-kill-the-mechanism. The kill condition is \"poor correlation between specific electrical signatures and bearing defect types\" \u2014 but the candidate never commits to what specific electrical signatures (which frequencies, which modulations) it expects for which defect types. Without specific, pre-registered spectral predictions tied to bearing geometry (number of balls, pitch diameter, contact angle, rotor speed), the experimenter can always claim that a different signal processing approach would have worked. The experiment is additionally limited to laboratory conditions \u2014 a single motor, controlled load, no power electronics, no grid interactions, no variable wind input \u2014 and therefore cannot validate field performance regardless of outcome. It is also not blinded: experimenters knowing which bearings have seeded defects will bias feature selection.",
+   "verdict": "KILL",
+   "basis": "The kill condition (\"poor correlation\") is undefined in terms of specific frequency predictions from bearing geometry equations (BPFO, BPFI). Laboratory-only testing cannot represent grid-connected turbine conditions with power electronics. No blinding specified. Results cannot be extrapolated to field operation where boundary conditions (low load) are not met."
+  },
+  "buyer": {
+   "attack": "Wind turbine OEMs already have established supplier ecosystems for condition monitoring (Bently Nevada, Br\u00fcel & Kj\u00e6r, SKF, Schaeffler, Romax, Moventas, etc.) with integrated SCADA, vibration-based monitoring certified under IEC 61400-25, and decades of operational data. A new entrant proposing an unproven modality based on a single thesis, with explicit boundary condition failures during low-load operation, faces a procurement process (DNV-GL, T\u00dcV certification, type certification under IEC 61400-22) that takes 2-5 years and costs millions. OEMs buy monitoring systems that integrate with existing CMS architectures and certified maintenance procedures, not standalone sensors requiring new certification. The buyer is misidentified: OEMs specify requirements; the actual buyers are wind farm operators/owners (utilities, IPPs) or independent service providers (GE, Siemens Gamesa, Vestas service arms).",
+   "verdict": "WOUND",
+   "basis": "Wind turbine condition monitoring procurement requires IEC 61400-25 conformance, OEM type certification (IEC 61400-22), and integration with certified SCADA. OEMs are not direct buyers of monitoring subsystems; asset owners/operators are. A thesis-stage technology with stated low-load sensitivity gaps cannot clear this procurement gate."
+  },
+  "intervention": {
+   "attack": "The intervention is described as \"non-invasive monitoring system\" with no specification of where the electrical signature is measured (stator terminals? converter DC bus? grid-side? nacelle? tower base?), what sensor is used (current transformer? voltage tap? Rogowski coil?), what sampling rate, what signal processing, and what data transmission. \"Non-invasive\" is a marketing term, not an engineering specification. The intervention claims to work \"without direct mechanical access\" but electrical access still requires installation in the nacelle or converter cabinet, with associated certification, cable routing, and EMC compliance. No cost, power consumption, installation labor, or reliability figures are given. The intervention as described is a concept, not a deployable system.",
+   "verdict": "WOUND",
+   "basis": "Zero specification of measurement location, sensor type, sampling rate, signal processing pipeline, installation requirements, power budget, or cost. \"Non-invasive\" is undefined. A concept is not an intervention."
+  }
+ },
+ "kill_surfaces": [
+  "prior_art",
+  "boundary_conditions",
+  "experiment_design"
+ ],
+ "wound_surfaces": [
+  "mechanism",
+  "evidence",
+  "predicted_effect",
+  "buyer",
+  "intervention"
+ ],
+ "final_objection": "KILLED. The single most dangerous surviving objection is prior_art: doi:10.1109/eic63069.2025.11123235 and doi:10.1109/eic63069.2025.11123384 directly teach electrical signature analysis for wind turbine defect detection in 2025, destroying the novelty claim that the candidate's \"unexploited phenomenon\" rests upon \u2014 even if every other surface were repaired, the technology is already in the public domain.",
+ "prompt_hash": "38336a1aa403fe0c3fe7534a6a6aa82a7dfff247b9c269d89ad20079fd679c6c",
+ "output_hash": "eb2857ccf6cbb275c9eff3ad35b5aab952b84dd7a35d5b1c00d175d881efe6ce",
+ "survived": false,
+ "verdict": "KILLED"
+}

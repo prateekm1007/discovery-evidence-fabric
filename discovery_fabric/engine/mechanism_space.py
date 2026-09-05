@@ -115,6 +115,19 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
         preferred = remaining or available  # honest fallback, recorded
     else:
         preferred = available
+    # ENGINE_LLM_PROVIDER operator pin (R391 operator-override class):
+    # the operator may pin one provider at the head of the eligibility
+    # order. A pinned provider without a credential is RECORDED and
+    # falls through to the normal order honestly — it never blocks a
+    # call, and the pin status travels in the call meta (never silent).
+    pin = os.environ.get("ENGINE_LLM_PROVIDER", "").strip()
+    pin_status = "not_set"
+    if pin:
+        if pin in preferred:
+            preferred = [pin] + [p for p in preferred if p != pin]
+            pin_status = "pinned_to_head"
+        else:
+            pin_status = f"requested_but_unavailable ({pin})"
     policy = SelectionPolicy(
         preferred_providers=preferred or ["zai", "openrouter", "nvidia",
                                            "anthropic", "openai", "gemini",
@@ -127,6 +140,7 @@ def llm_generate(prompt: str, system: str = "", timeout: int = 240,
         "provider": res.provider_id, "model": res.model,
         "prompt_hash": res.prompt_hash, "output_hash": res.output_hash,
         "error": res.error,
+        "engine_llm_provider_pin": pin_status,
         "excluded_providers": list(exclude_providers or []),
         "fallback_to_excluded": bool(
             exclude_providers and not remaining) if exclude_providers

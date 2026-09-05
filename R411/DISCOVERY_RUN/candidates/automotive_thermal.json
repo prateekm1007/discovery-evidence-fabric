@@ -1,0 +1,2122 @@
+{
+ "domain_id": "automotive_thermal",
+ "status": "OK",
+ "transport_failures": 0,
+ "n_calls": 4,
+ "accepted": [
+  {
+   "candidate_id": "C-automotive_thermal-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Waste Heat Recovery Power Generation",
+   "target_domain": "Automotive",
+   "source_domain": "Marine",
+   "domain_id": "automotive_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Internal combustion engine thermal management rejects significant heat energy that could be recovered for useful work.",
+   "causal_chain": [
+    "Waste heat from combustion exhaust",
+    "Thermal energy conversion to electrical energy via thermoelectric generators",
+    "Electrical energy supplement to vehicle systems",
+    "Reduced fuel consumption"
+   ],
+   "unexploited_phenomenon": "Thermoelectric conversion of waste heat to electrical energy",
+   "intervention": "Integration of thermoelectric generators in exhaust system to convert waste heat to electricity",
+   "governing_variables": "Temperature differential across thermoelectric elements (\u0394T, K), Seebeck coefficient (S, V/K), thermal conductivity (\u03ba, W/m\u00b7K), electrical resistivity (\u03c1, \u03a9\u00b7m)",
+   "predicted_effect": "5-15% reduction in fuel consumption due to recovered electrical energy offsetting alternator load",
+   "equations": [
+    "P = S\u00b2\u00b7\u0394T\u00b2\u00b7\u03c3\u00b7A / L (where \u03c3 is electrical conductivity, A is cross-sectional area, L is length of thermoelectric element)"
+   ],
+   "boundary_conditions": "Effective at exhaust temperatures >300\u00b0C; efficiency decreases at lower differentials; requires adequate thermal mass",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-16609-x"
+   ],
+   "cross_domain_transition": "Marine waste heat recovery systems -> automotive applications due to similar thermal profiles and power generation needs",
+   "baseline": {
+    "baseline_incumbent": "Conventional cooling system with heat rejection to ambient air",
+    "baseline_metric": "30-40% of fuel energy lost as heat to cooling system",
+    "candidate_metric": "25-35% of fuel energy lost as heat to cooling system (5-10% absolute reduction)",
+    "expected_delta": "5-10% absolute reduction in heat rejection losses"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale thermoelectric generator prototype mounted on engine exhaust, measuring power output vs. temperature differential",
+    "decisive_uncertainty": "Thermoelectric conversion efficiency at automotive exhaust temperature profiles",
+    "kill_condition": "Power output < 50W at typical operating temperatures",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Degradation at high temperatures",
+     "detectability": "detectable via power output monitoring",
+     "mitigation": "use thermal protective coatings"
+    },
+    {
+     "failure_mode": "Thermal fatigue",
+     "detectability": "detectable via microcrack inspection",
+     "mitigation": "implement thermal cycling management"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive OEM powertrain engineering teams",
+    "use_case": "Supplement vehicle electrical systems to reduce alternator load and improve fuel economy",
+    "integration_point": "Between exhaust manifold and catalytic converter in exhaust system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "840d26c781c99ba90c90e470e812fbe6f6c85fc71b020159ae35d13a5f23f26f",
+    "output_hash": "76b212f3694957b6b3e406f4cc6f29c7ce85212466355144f959c61c33ba05e6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "generator",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Variable Temperature Cycle Engine",
+   "target_domain": "Automotive",
+   "source_domain": "Internal combustion engine design",
+   "domain_id": "automotive_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Traditional engine thermal management operates at fixed temperature cycles, leading to inefficient heat rejection.",
+   "causal_chain": [
+    "Limited temperature cycle operation",
+    "Optimized thermal expansion rates",
+    "Reduced heat rejection while maintaining performance",
+    "Improved thermal efficiency"
+   ],
+   "unexploited_phenomenon": "Controlled temperature cycling to optimize thermal expansion and heat retention",
+   "intervention": "Engine design with variable temperature cycle components allowing controlled thermal expansion",
+   "governing_variables": "Material thermal expansion coefficient (\u03b1, 1/K), temperature differential (\u0394T, K), component geometry (L, m), stress distribution (\u03c3, Pa)",
+   "predicted_effect": "10-20% reduction in heat rejection losses through optimized thermal cycling",
+   "equations": [
+    "\u0394L = \u03b1\u00b7L\u00b7\u0394T (thermal expansion), \u03c3 = E\u00b7\u03b5 (where E is Young's modulus, \u03b5 is strain)"
+   ],
+   "boundary_conditions": "Requires materials with tailored thermal expansion properties; effective in steady-state operation; less effective during rapid transients",
+   "evidence_refs": [
+    "doi:10.1016/s1359-4311(97)83252-8"
+   ],
+   "cross_domain_transition": "Internal combustion engine temperature cycle control -> automotive thermal management systems by applying variable thermal cycling principles",
+   "baseline": {
+    "baseline_incumbent": "Fixed temperature cooling systems with constant coolant flow rates",
+    "baseline_metric": "20-30% of fuel energy lost through heat rejection in cooling system",
+    "candidate_metric": "15-25% of fuel energy lost through heat rejection in cooling system",
+    "expected_delta": "5-10% absolute reduction in heat rejection losses"
+   },
+   "killer_experiment": {
+    "experiment": "Single-cylinder test engine with variable temperature cycle components measuring heat rejection vs. conventional design",
+    "decisive_uncertainty": "Heat rejection reduction achievable through variable temperature cycling",
+    "kill_condition": "<5% reduction in heat rejection losses compared to baseline",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Material fatigue from thermal cycling",
+     "detectability": "detectable via crack formation inspection",
+     "mitigation": "implement stress-relief designs"
+    },
+    {
+     "failure_mode": "Sealing failures",
+     "detectability": "detectable via pressure monitoring",
+     "mitigation": "use advanced sealing materials"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive powertrain engineers",
+    "use_case": "Optimize engine thermal management to reduce heat rejection while maintaining performance",
+    "integration_point": "Engine block, cylinder head, and cooling system components"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "840d26c781c99ba90c90e470e812fbe6f6c85fc71b020159ae35d13a5f23f26f",
+    "output_hash": "76b212f3694957b6b3e406f4cc6f29c7ce85212466355144f959c61c33ba05e6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Hybrid Thermal Management Optimization",
+   "target_domain": "Automotive",
+   "source_domain": "Hybrid electric vehicles",
+   "domain_id": "automotive_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Conventional thermal management systems cannot adapt to varying operating conditions, leading to inefficient heat rejection.",
+   "causal_chain": [
+    "Multi-objective optimization algorithm",
+    "Dynamic thermal management control",
+    "Optimized heat rejection based on operating conditions",
+    "Improved thermal efficiency"
+   ],
+   "unexploited_phenomenon": "Swarm and deterministic algorithms for thermal system optimization",
+   "intervention": "Implementation of multi-objective optimization framework for thermal management control",
+   "governing_variables": "Engine load (N\u00b7m), coolant temperature (\u00b0C), ambient temperature (\u00b0C), vehicle speed (m/s), thermal energy transfer rate (W)",
+   "predicted_effect": "15-25% improvement in thermal management efficiency through optimized control strategies",
+   "equations": [
+    "f(x) = w1\u00b7fuel_economy + w2\u00b7emissions_reduction (where w1, w2 are weighting factors)"
+   ],
+   "boundary_conditions": "Requires accurate sensor inputs; effective across varying driving conditions; dependent on algorithm training data quality",
+   "evidence_refs": [
+    "doi:10.1038/s41598-026-52628-y"
+   ],
+   "cross_domain_transition": "Hybrid electric vehicle powertrain optimization -> automotive thermal management systems by applying multi-objective optimization principles",
+   "baseline": {
+    "baseline_incumbent": "Rule-based thermal management systems with fixed control parameters",
+    "baseline_metric": "25-35% thermal efficiency in conventional thermal management",
+    "candidate_metric": "35-45% thermal efficiency in optimized thermal management",
+    "expected_delta": "10-15% absolute improvement in thermal efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "Simulation-based optimization testing with hardware-in-the-loop validation using engine dynamometer",
+    "decisive_uncertainty": "Real-world optimization performance compared to simulation predictions",
+    "kill_condition": "Optimization algorithm fails to improve thermal efficiency by >5% over baseline",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Suboptimal control parameters",
+     "detectability": "detectable via performance monitoring",
+     "mitigation": "implement adaptive learning algorithms"
+    },
+    {
+     "failure_mode": "Sensor failure",
+     "detectability": "detectable via diagnostic codes",
+     "mitigation": "implement redundant sensor systems"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive control system engineers",
+    "use_case": "Optimize thermal management system performance across varying driving conditions",
+    "integration_point": "Engine control unit and thermal management system controller"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "840d26c781c99ba90c90e470e812fbe6f6c85fc71b020159ae35d13a5f23f26f",
+    "output_hash": "76b212f3694957b6b3e406f4cc6f29c7ce85212466355144f959c61c33ba05e6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Combustion Chamber Thermal Barrier Coatings",
+   "target_domain": "Automotive",
+   "source_domain": "Gasoline turbocharged direct injection engines",
+   "domain_id": "automotive_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Heat transfer to cylinder walls in internal combustion engines represents a significant source of thermal energy loss.",
+   "causal_chain": [
+    "Thermal barrier coating application",
+    "Reduced heat transfer to cylinder walls",
+    "Maintained combustion temperature",
+    "Improved thermal efficiency"
+   ],
+   "unexploited_phenomenon": "Thermal insulation properties of advanced coating materials for combustion chamber components",
+   "intervention": "Application of thermal barrier coatings to combustion chamber components",
+   "governing_variables": "Coating thermal conductivity (\u03ba, W/m\u00b7K), coating thickness (t, m), temperature differential (\u0394T, K), surface area (A, m\u00b2)",
+   "predicted_effect": "8-12% reduction in heat transfer losses through combustion chamber walls",
+   "equations": [
+    "Q = \u03ba\u00b7A\u00b7\u0394T\u00b7t (heat transfer through coating)"
+   ],
+   "boundary_conditions": "Requires durable coating materials; effective at high temperatures; limited by coating thickness and thermal conductivity",
+   "evidence_refs": [
+    "doi:10.37099/mtu.dc.etd-restricted/145"
+   ],
+   "cross_domain_transition": "Gasoline turbocharged direct injection engine thermal characterization -> general automotive engine thermal management by applying thermal barrier coating principles",
+   "baseline": {
+    "baseline_incumbent": "Uncoated metal combustion chamber components",
+    "baseline_metric": "25-35% of combustion heat lost through cylinder walls",
+    "candidate_metric": "20-30% of combustion heat lost through cylinder walls",
+    "expected_delta": "5-10% absolute reduction in heat transfer losses"
+   },
+   "killer_experiment": {
+    "experiment": "Single-cylinder engine test with instrumented combustion chamber measuring heat flux with and without thermal barrier coatings",
+    "decisive_uncertainty": "Heat flux reduction achievable through thermal barrier coatings",
+    "kill_condition": "<3% reduction in heat flux compared to baseline",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Coating delamination",
+     "detectability": "detectable via visual inspection and pressure testing",
+     "mitigation": "implement improved adhesion methods"
+    },
+    {
+     "failure_mode": "Thermal degradation",
+     "detectability": "detectable via coating thickness measurement",
+     "mitigation": "use advanced ceramic formulations"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive engine design engineers",
+    "use_case": "Reduce heat transfer losses in combustion chamber to improve thermal efficiency",
+    "integration_point": "Piston crowns, cylinder heads, and cylinder liners"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "840d26c781c99ba90c90e470e812fbe6f6c85fc71b020159ae35d13a5f23f26f",
+    "output_hash": "76b212f3694957b6b3e406f4cc6f29c7ce85212466355144f959c61c33ba05e6",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Swarm-Optimized Thermal Management",
+   "target_domain": "automotive",
+   "source_domain": "energy systems optimization",
+   "domain_id": "automotive_thermal",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Internal combustion engine thermal management loop energy conversion inefficiency",
+   "causal_chain": [
+    "Thermal energy loss in combustion",
+    "heat transfer to cooling system",
+    "energy dissipation through radiator",
+    "wasted energy not recovered",
+    "reduced fuel efficiency"
+   ],
+   "unexploited_phenomenon": "Multi-objective optimization of thermal management parameters using swarm and deterministic algorithms",
+   "intervention": "Implementation of swarm and deterministic algorithms to optimize the thermal management system parameters in real-time",
+   "governing_variables": "Heat transfer coefficient (W/m\u00b2\u00b7K), coolant flow rate (m\u00b3/s), temperature differential (K), thermal capacity (J/kg\u00b7K)",
+   "predicted_effect": "15-30% reduction in fuel consumption due to optimized thermal management parameters, with improvement scaling with algorithm optimization efficiency",
+   "equations": [
+    "\u03b7 = Q_out/Q_in, Q = m\u00b7c\u00b7\u0394T"
+   ],
+   "boundary_conditions": "Valid for steady-state and transient operating conditions; limited by sensor accuracy and computational processing capabilities",
+   "evidence_refs": [
+    "doi:10.1038/s41598-026-52628-y"
+   ],
+   "cross_domain_transition": "energy systems optimization -> automotive thermal management + algorithmic optimization of thermal parameters creates value by reducing energy waste",
+   "baseline": {
+    "baseline_incumbent": "Traditional fixed-parameter thermal management systems with fixed thermostat settings",
+    "baseline_metric": "25-30% energy loss in thermal management system",
+    "candidate_metric": "10-15% energy loss in thermal management system",
+    "expected_delta": "40-50% reduction in thermal energy loss"
+   },
+   "killer_experiment": {
+    "experiment": "Engine test bench with thermal sensors comparing fixed vs. swarm-optimized thermal management parameters",
+    "decisive_uncertainty": "Algorithm optimization efficiency under varying load conditions",
+    "kill_condition": "No measurable improvement in thermal efficiency with algorithm implementation",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Algorithm convergence failure",
+     "detectability": "detectable through monitoring computational time",
+     "mitigation": "mitigation through hybrid deterministic-stochastic approach"
+    },
+    {
+     "failure_mode": "Sensor inaccuracy",
+     "detectability": "detectable through temperature deviation",
+     "mitigation": "mitigation through redundant sensor networks"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive powertrain engineers",
+    "use_case": "Improving fuel efficiency in hybrid and conventional vehicles",
+    "integration_point": "Engine control unit (ECU) software integration with existing thermal management hardware"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "ae5034f005e7cd4ddb52c7ae159665d425ff33a69621b903a7d71e5601f1bcb8",
+    "output_hash": "5430de129f11295a4fa59628b20e20153ef4605d6710473a0cbecef780a01a79",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Waste Heat Recovery Power Generation",
+   "target_domain": "automotive",
+   "source_domain": "marine energy systems",
+   "domain_id": "automotive_thermal",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Vehicle cabin climate control system energy conversion inefficiency",
+   "causal_chain": [
+    "Engine waste heat generation",
+    "current dissipation through exhaust",
+    "unused thermal energy",
+    "opportunity for conversion to useful work",
+    "supplemental power generation"
+   ],
+   "unexploited_phenomenon": "Thermoelectric conversion of waste heat from diesel engines for power generation",
+   "intervention": "Integration of thermoelectric generators into the exhaust system to convert waste heat into electrical power",
+   "governing_variables": "Temperature gradient (K), Seebeck coefficient (V/K), thermal conductivity (W/m\u00b7K), electrical conductivity (S/m)",
+   "predicted_effect": "5-10% improvement in overall vehicle efficiency through conversion of exhaust heat to electrical power",
+   "equations": [
+    "P = n\u00b7S\u00b2\u00b7\u0394T\u00b2\u00b7\u03c3\u00b7A/L, \u03b7 = P_thermoelectric/P_waste_heat"
+   ],
+   "boundary_conditions": "Effective at high temperature differentials (>200K); limited by material thermoelectric properties",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-16609-x"
+   ],
+   "cross_domain_transition": "marine waste heat recovery -> automotive climate control + repurposing existing waste heat for cabin climate control reduces energy demand from engine",
+   "baseline": {
+    "baseline_incumbent": "Traditional mechanical compressor-based climate control system powered directly by engine",
+    "baseline_metric": "3-5% of engine output power used for climate control",
+    "candidate_metric": "1-2% of engine output power used for climate control",
+    "expected_delta": "50-70% reduction in climate control energy demand"
+   },
+   "killer_experiment": {
+    "experiment": "Laboratory test bench with thermoelectric generator prototype measuring power output under varying exhaust temperatures",
+    "decisive_uncertainty": "Thermoelectric material efficiency at automotive temperature cycles",
+    "kill_condition": "Power output below 1% of engine output under all operating conditions",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Material degradation at high temperatures",
+     "detectability": "detectable through efficiency monitoring",
+     "mitigation": "mitigation through advanced material coatings"
+    },
+    {
+     "failure_mode": "System integration complexity",
+     "detectability": "detectable through power delivery consistency",
+     "mitigation": "mitigation through modular design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive thermal systems engineers",
+    "use_case": "Reducing parasitic load on engine for climate control systems",
+    "integration_point": "Exhaust system between engine and catalytic converter"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "ae5034f005e7cd4ddb52c7ae159665d425ff33a69621b903a7d71e5601f1bcb8",
+    "output_hash": "5430de129f11295a4fa59628b20e20153ef4605d6710473a0cbecef780a01a79",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "generator"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Regenerative Thermal Cycling",
+   "target_domain": "automotive",
+   "source_domain": "internal combustion engine design",
+   "domain_id": "automotive_thermal",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Internal combustion engine thermal management loop energy conversion inefficiency",
+   "causal_chain": [
+    "Thermal cycling stress on engine components",
+    "material fatigue",
+    "energy loss through deformation",
+    "opportunity for regenerative thermal management",
+    "reduced energy conversion loss"
+   ],
+   "unexploited_phenomenon": "Limited temperature cycle internal combustion engine design for improved thermal efficiency",
+   "intervention": "Engine design with controlled thermal cycling to optimize heat transfer and reduce thermal stress",
+   "governing_variables": "Temperature cycling frequency (Hz), temperature amplitude (K), thermal expansion coefficient (1/K), material fatigue limit (Pa)",
+   "predicted_effect": "10-20% reduction in thermal energy loss through optimized thermal cycling management",
+   "equations": [
+    "\u0394L = \u03b1\u00b7L\u2080\u00b7\u0394T, N_f = A\u00b7(\u0394\u03c3)^(-b)"
+   ],
+   "boundary_conditions": "Effective with proper material selection; limited by maximum allowable thermal stress",
+   "evidence_refs": [
+    "doi:10.1016/s1359-4311(97)83252-8"
+   ],
+   "cross_domain_transition": "engine thermal cycle management -> automotive thermal efficiency + controlled thermal cycling reduces energy waste through optimized heat transfer",
+   "baseline": {
+    "baseline_incumbent": "Conventional engine design with fixed operating temperature ranges",
+    "baseline_metric": "20-25% energy loss through thermal management inefficiencies",
+    "candidate_metric": "15-20% energy loss through thermal management inefficiencies",
+    "expected_delta": "20-25% reduction in thermal energy loss"
+   },
+   "killer_experiment": {
+    "experiment": "Engine test cell with thermal cycling equipment comparing standard vs. limited temperature cycle designs",
+    "decisive_uncertainty": "Long-term material durability under controlled thermal cycling",
+    "kill_condition": "No measurable improvement in thermal efficiency or increased component failure rate",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Material fatigue failure",
+     "detectability": "detectable through crack monitoring",
+     "mitigation": "mitigation through advanced composite materials"
+    },
+    {
+     "failure_mode": "Thermal stress cracking",
+     "detectability": "detectable through leak detection",
+     "mitigation": "mitigation through gradual temperature ramping"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Powertrain component manufacturers",
+    "use_case": "Improving thermal efficiency in next-generation engines",
+    "integration_point": "Engine block and cylinder head design"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "ae5034f005e7cd4ddb52c7ae159665d425ff33a69621b903a7d71e5601f1bcb8",
+    "output_hash": "5430de129f11295a4fa59628b20e20153ef4605d6710473a0cbecef780a01a79",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Combustion-Emission Synergy Optimization",
+   "target_domain": "automotive",
+   "source_domain": "marine diesel systems",
+   "domain_id": "automotive_thermal",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Internal combustion engine thermal management loop energy conversion inefficiency",
+   "causal_chain": [
+    "Suboptimal combustion",
+    "incomplete energy conversion",
+    "increased emissions",
+    "wasted fuel energy",
+    "opportunity for combustion optimization",
+    "improved thermal efficiency"
+   ],
+   "unexploited_phenomenon": "HFO modeling and RSM-based synergistic optimization of combustion-emission performance",
+   "intervention": "Implementation of response surface methodology (RSM) for optimizing combustion parameters to improve both efficiency and emissions",
+   "governing_variables": "Air-fuel ratio, injection timing (\u00b0CA), combustion chamber pressure (MPa), temperature (K)",
+   "predicted_effect": "8-15% improvement in fuel efficiency through optimized combustion parameters",
+   "equations": [
+    "\u03b7_comb = W_net/Q_in, NOx formation \u221d exp(-E_a/RT)"
+   ],
+   "boundary_conditions": "Effective across varying load conditions; limited by fuel quality constraints",
+   "evidence_refs": [
+    "doi:10.1021/acsomega.5c08406"
+   ],
+   "cross_domain_transition": "marine diesel combustion optimization -> automotive engine thermal management + synergistic optimization of combustion and thermal parameters improves overall efficiency",
+   "baseline": {
+    "baseline_incumbent": "Fixed-parameter combustion control systems with standard timing and fuel delivery",
+    "baseline_metric": "30-35% thermal efficiency in standard engines",
+    "candidate_metric": "35-40% thermal efficiency in optimized engines",
+    "expected_delta": "15-20% improvement in thermal efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "Single-cylinder research engine with combustion analysis equipment comparing standard vs. RSM-optimized combustion parameters",
+    "decisive_uncertainty": "Optimization algorithm effectiveness across varying fuel qualities",
+    "kill_condition": "No measurable improvement in thermal efficiency or increased emissions",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Combustion instability",
+     "detectability": "detectable through cylinder pressure monitoring",
+     "mitigation": "mitigation through adaptive control algorithms"
+    },
+    {
+     "failure_mode": "Emission increase",
+     "detectability": "detectable through exhaust gas analysis",
+     "mitigation": "mitigation through multi-objective optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Engine calibration engineers",
+    "use_case": "Improving thermal efficiency in gasoline and diesel engines",
+    "integration_point": "Engine control unit (ECU) calibration software"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "ae5034f005e7cd4ddb52c7ae159665d425ff33a69621b903a7d71e5601f1bcb8",
+    "output_hash": "5430de129f11295a4fa59628b20e20153ef4605d6710473a0cbecef780a01a79",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Heat Transfer Optimization Through Combustion Analysis",
+   "target_domain": "automotive",
+   "source_domain": "combustion research",
+   "domain_id": "automotive_thermal",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Internal combustion engine thermal management loop energy conversion inefficiency",
+   "causal_chain": [
+    "Heat transfer to cylinder walls",
+    "energy loss from combustion process",
+    "thermal loading on components",
+    "opportunity for heat transfer optimization",
+    "improved thermal efficiency"
+   ],
+   "unexploited_phenomenon": "Transient thermal analysis of heat transfer in internal combustion engines",
+   "intervention": "Advanced heat transfer modeling and analysis to optimize thermal management in combustion chambers",
+   "governing_variables": "Heat transfer coefficient (W/m\u00b2\u00b7K), gas temperature (K), wall temperature (K), thermal conductivity (W/m\u00b7K)",
+   "predicted_effect": "10-20% reduction in heat transfer losses through optimized combustion chamber design",
+   "equations": [
+    "q = h\u00b7A\u00b7(T_gas - T_wall), Nu = C\u00b7Re^m\u00b7Pr^n"
+   ],
+   "boundary_conditions": "Effective for gasoline direct injection engines; limited by computational complexity",
+   "evidence_refs": [
+    "title:30a5b19c9279cc08"
+   ],
+   "cross_domain_transition": "combustion heat transfer analysis -> automotive thermal management + precise heat transfer modeling reduces energy waste through optimized thermal management",
+   "baseline": {
+    "baseline_incumbent": "Empirical heat transfer models with fixed heat transfer coefficients",
+    "baseline_metric": "25-30% energy loss through heat transfer in combustion chambers",
+    "candidate_metric": "20-25% energy loss through heat transfer in combustion chambers",
+    "expected_delta": "15-20% reduction in heat transfer losses"
+   },
+   "killer_experiment": {
+    "experiment": "Engine test cell with detailed thermal mapping comparing standard vs. optimized combustion chamber designs",
+    "decisive_uncertainty": "Heat transfer coefficient accuracy under transient conditions",
+    "kill_condition": "No measurable improvement in heat transfer efficiency",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model inaccuracy",
+     "detectability": "detectable through temperature deviation",
+     "mitigation": "mitigation through real-time sensor feedback"
+    },
+    {
+     "failure_mode": "Combustion instability",
+     "detectability": "detectable through pressure monitoring",
+     "mitigation": "mitigation through combustion chamber shape optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Engine thermal management engineers",
+    "use_case": "Improving thermal efficiency in direct injection engines",
+    "integration_point": "Combustion chamber design and cooling system layout"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "ae5034f005e7cd4ddb52c7ae159665d425ff33a69621b903a7d71e5601f1bcb8",
+    "output_hash": "5430de129f11295a4fa59628b20e20153ef4605d6710473a0cbecef780a01a79",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "CAI Combustion Thermal Management",
+   "target_domain": "automotive",
+   "source_domain": "combustion technology",
+   "domain_id": "automotive_thermal",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Vehicle cabin climate control system energy conversion inefficiency",
+   "causal_chain": [
+    "Conventional spark ignition combustion",
+    "higher thermal losses",
+    "increased cooling demand",
+    "opportunity for advanced combustion",
+    "reduced thermal load on cooling system"
+   ],
+   "unexploited_phenomenon": "Controlled auto-ignition (CAI) combustion for improved thermal efficiency",
+   "intervention": "Implementation of CAI combustion technology to reduce thermal load and improve overall efficiency",
+   "governing_variables": "Compression ratio, air-fuel ratio, exhaust gas recirculation rate, injection timing (\u00b0CA)",
+   "predicted_effect": "10-15% reduction in cooling system energy demand through lower thermal generation",
+   "equations": [
+    "\u03b7 = 1 - (Q_loss/Q_in), CAI onset temperature \u221d compression ratio"
+   ],
+   "boundary_conditions": "Effective for specific operating conditions; limited by combustion stability at low loads",
+   "evidence_refs": [
+    "doi:10.1080/00102200701600903",
+    "title:9991a9ab4747fda0"
+   ],
+   "cross_domain_transition": "advanced combustion technology -> automotive climate control + reduced thermal generation from combustion decreases cooling system energy demand",
+   "baseline": {
+    "baseline_incumbent": "Traditional spark ignition combustion with higher thermal loads",
+    "baseline_metric": "15-20% of engine output used for thermal management",
+    "candidate_metric": "10-15% of engine output used for thermal management",
+    "expected_delta": "25-30% reduction in thermal management energy demand"
+   },
+   "killer_experiment": {
+    "experiment": "Single-cylinder engine test comparing thermal loads between conventional and CAI combustion",
+    "decisive_uncertainty": "Combustion stability across varying operating conditions",
+    "kill_condition": "No measurable reduction in thermal generation or unstable combustion at any operating point",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Combustion instability",
+     "detectability": "detectable through cylinder pressure monitoring",
+     "mitigation": "mitigation through variable valve timing"
+    },
+    {
+     "failure_mode": "High HC emissions",
+     "detectability": "detectable through exhaust gas analysis",
+     "mitigation": "mitigation through optimized injection strategy"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Advanced powertrain engineers",
+    "use_case": "Reducing thermal load in next-generation engines",
+    "integration_point": "Engine control system with variable valve timing capability"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "ae5034f005e7cd4ddb52c7ae159665d425ff33a69621b903a7d71e5601f1bcb8",
+    "output_hash": "5430de129f11295a4fa59628b20e20153ef4605d6710473a0cbecef780a01a79",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Biogas-Powered Thermal Optimization",
+   "target_domain": "automotive",
+   "source_domain": "energy-efficient cooking systems",
+   "domain_id": "automotive_thermal",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Internal combustion engine thermal management loop energy conversion inefficiency",
+   "causal_chain": [
+    "Inefficient fuel utilization",
+    "incomplete combustion",
+    "energy loss",
+    "opportunity for optimized combustion chamber design",
+    "improved thermal efficiency"
+   ],
+   "unexploited_phenomenon": "Design optimization of combustion chambers for energy efficiency in biogas-powered systems",
+   "intervention": "Application of biogas stove optimization principles to internal combustion engine thermal management",
+   "governing_variables": "Heat distribution uniformity, fuel-air mixing efficiency, combustion chamber geometry, thermal conductivity (W/m\u00b7K)",
+   "predicted_effect": "12-18% improvement in thermal efficiency through optimized combustion chamber design",
+   "equations": [
+    "\u03b7 = Q_useful/Q_input, \u0394T \u221d q/(\u03c1\u00b7c_p\u00b7v)"
+   ],
+   "boundary_conditions": "Effective for alternative fuel engines; limited by fuel composition variability",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-25412-7"
+   ],
+   "cross_domain_transition": "energy-efficient cooking systems -> automotive thermal management + optimized combustion chamber design from cooking stoves improves engine thermal efficiency",
+   "baseline": {
+    "baseline_incumbent": "Standard combustion chamber designs with suboptimal heat distribution",
+    "baseline_metric": "30-35% thermal efficiency in standard engines",
+    "candidate_metric": "35-45% thermal efficiency in optimized engines",
+    "expected_delta": "15-20% improvement in thermal efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "Engine test cell with thermal imaging comparing standard vs. optimized combustion chambers",
+    "decisive_uncertainty": "Heat distribution improvement under varying load conditions",
+    "kill_condition": "No measurable improvement in thermal efficiency or increased emissions",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Material compatibility issues",
+     "detectability": "detectable through component degradation",
+     "mitigation": "mitigation through surface treatment"
+    },
+    {
+     "failure_mode": "Combustion instability",
+     "detectability": "detectable through pressure monitoring",
+     "mitigation": "mitigation through optimized fuel injection"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Engine design engineers",
+    "use_case": "Improving thermal efficiency in alternative fuel engines",
+    "integration_point": "Combustion chamber design and manufacturing process"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "ae5034f005e7cd4ddb52c7ae159665d425ff33a69621b903a7d71e5601f1bcb8",
+    "output_hash": "5430de129f11295a4fa59628b20e20153ef4605d6710473a0cbecef780a01a79",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-8",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Edge AI Thermal Diagnostics",
+   "target_domain": "automotive",
+   "source_domain": "sensor systems",
+   "domain_id": "automotive_thermal",
+   "pain_class": "ENERGY_CONVERSION_LOSS",
+   "problem": "Vehicle cabin climate control system energy conversion inefficiency",
+   "causal_chain": [
+    "Suboptimal climate control operation",
+    "energy waste through inefficient thermal management",
+    "opportunity for real-time diagnostics",
+    "optimized climate control operation"
+   ],
+   "unexploited_phenomenon": "On-device edge AI for reference-free self-diagnosis of thermal system performance",
+   "intervention": "Implementation of edge AI for real-time thermal system diagnostics and optimization",
+   "governing_variables": "Sensor accuracy, algorithm processing speed, thermal system response time, control loop frequency (Hz)",
+   "predicted_effect": "15-25% reduction in climate control energy consumption through optimized operation",
+   "equations": [
+    "P = m\u00b7c\u00b7\u0394T/t, \u03b5 = P_useful/P_input"
+   ],
+   "boundary_conditions": "Effective with sufficient sensor data; limited by computational capabilities in edge devices",
+   "evidence_refs": [
+    "doi:10.3390/s26144526"
+   ],
+   "cross_domain_transition": "sensor diagnostics -> automotive climate control + real-time thermal system optimization reduces energy waste through intelligent control",
+   "baseline": {
+    "baseline_incumbent": "Fixed-parameter climate control systems without real-time optimization",
+    "baseline_metric": "20-25% energy waste in climate control systems",
+    "candidate_metric": "15-20% energy waste in climate control systems",
+    "expected_delta": "20-25% reduction in climate control energy waste"
+   },
+   "killer_experiment": {
+    "experiment": "Climate control test bench with edge AI implementation comparing standard vs. AI-optimized operation",
+    "decisive_uncertainty": "AI algorithm accuracy under varying thermal conditions",
+    "kill_condition": "No measurable improvement in energy efficiency or increased computational delay",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Sensor failure",
+     "detectability": "detectable through diagnostic alerts",
+     "mitigation": "mitigation through redundant sensor networks"
+    },
+    {
+     "failure_mode": "Algorithm convergence issues",
+     "detectability": "detectable through control response time",
+     "mitigation": "mitigation through hybrid deterministic-AI approach"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive HVAC system engineers",
+    "use_case": "Improving energy efficiency in climate control systems",
+    "integration_point": "Climate control system electronics and software"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "ae5034f005e7cd4ddb52c7ae159665d425ff33a69621b903a7d71e5601f1bcb8",
+    "output_hash": "5430de129f11295a4fa59628b20e20153ef4605d6710473a0cbecef780a01a79",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": true,
+    "verdict": "EXCLUDED_MEDICAL",
+    "matched_medical_terms": [
+     "diagnostic"
+    ],
+    "matched_non_medical_terms": [
+     "automotive"
+    ],
+    "medical_terms_in_origin_only": [
+     "diagnostic"
+    ],
+    "basis": "strong medical-application markers in the target fields without substantial non-medical target context"
+   },
+   "extraction_call": "ENERGY_CONVERSION_LOSS"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Swarm-Based Thermal Management Optimization",
+   "target_domain": "automotive",
+   "source_domain": "energy",
+   "domain_id": "automotive_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "High computational cost and energy consumption in internal combustion engine thermal management systems due to complex control algorithms.",
+   "causal_chain": [
+    "Multi-objective optimization algorithm reduces computational complexity",
+    "enables real-time thermal management decisions",
+    "optimizes fuel economy and emissions",
+    "reduces energy consumption"
+   ],
+   "unexploited_phenomenon": "Swarm and deterministic algorithms for multi-objective optimization in hybrid vehicle powertrains",
+   "intervention": "Implementation of swarm-based optimization algorithms for thermal management control systems",
+   "governing_variables": "Number of optimization iterations (n), number of particles in swarm (p), convergence rate (\u03bb)",
+   "predicted_effect": "30-60% reduction in computational processing time for thermal control decisions due to reduced complexity of optimization algorithm",
+   "equations": [
+    "T_swarm = k * n^\u03b1 * p^\u03b2 (processing time for swarm algorithm), T_det = k * n^\u03b3 (processing time for deterministic algorithm), where \u03b1 < \u03b3"
+   ],
+   "boundary_conditions": "Effective in steady-state and transient operating conditions; limited by sensor accuracy and model fidelity",
+   "evidence_refs": [
+    "doi:10.1038/s41598-026-52628-y"
+   ],
+   "cross_domain_transition": "Energy optimization algorithms -> automotive thermal management + reduced computational load enables more responsive control",
+   "baseline": {
+    "baseline_incumbent": "Traditional deterministic control algorithms with high computational complexity",
+    "baseline_metric": "High computational processing time (quantification not specified in evidence)",
+    "candidate_metric": "30-60% reduction in computational processing time",
+    "expected_delta": "30-60% reduction in processing time"
+   },
+   "killer_experiment": {
+    "experiment": "Engine control unit bench test with swarm vs. deterministic algorithm implementation, measure processing time under varying thermal conditions",
+    "decisive_uncertainty": "Whether swarm algorithms can maintain accuracy in highly transient thermal conditions",
+    "kill_condition": "Swarm algorithm fails to maintain thermal control accuracy within 5% of deterministic algorithm",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Convergence to local optimum",
+     "detectability": "detectable via thermal stability metrics",
+     "mitigation": "mitigation with hybrid deterministic-swarm approach"
+    },
+    {
+     "failure_mode": "Sensor noise affecting swarm decisions",
+     "detectability": "detectable via control oscillations",
+     "mitigation": "mitigation with sensor fusion"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive thermal system engineers",
+    "use_case": "Real-time thermal management for internal combustion engines with reduced computational overhead",
+    "integration_point": "Engine control unit software layer"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "492803b54c0aa9ff7ace5241f39c41cd829f7784f08329dd012fbad0ada4ad7b",
+    "output_hash": "c564d8577f385b390499785f5e2031367470a11c26973c1a472177d90f1d798a",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Waste Heat Recovery Power-Cooling System",
+   "target_domain": "automotive",
+   "source_domain": "marine",
+   "domain_id": "automotive_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Inefficient utilization of waste heat in internal combustion engines leads to increased energy consumption and emissions.",
+   "causal_chain": [
+    "Waste heat recovery system captures thermal energy",
+    "converts to power and cooling",
+    "reduces primary energy demand",
+    "lowers emissions"
+   ],
+   "unexploited_phenomenon": "Thermoeconomic optimization of hybrid power and cooling facilities using waste heat recovery",
+   "intervention": "Integration of waste heat recovery system for simultaneous power generation and cabin cooling",
+   "governing_variables": "Waste heat temperature (T_wh), conversion efficiency (\u03b7), cooling capacity (Q_cool)",
+   "predicted_effect": "15-25% improvement in overall energy efficiency by utilizing otherwise wasted thermal energy",
+   "equations": [
+    "\u03b7 = W_net / Q_in (efficiency), Q_cool = COP * W_compressor (cooling capacity)"
+   ],
+   "boundary_conditions": "Effective at steady-state operation with sufficient waste heat; limited by low-temperature differentials",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-16609-x"
+   ],
+   "cross_domain_transition": "Marine waste heat recovery -> automotive thermal management + enables simultaneous power and cooling from waste heat",
+   "baseline": {
+    "baseline_incumbent": "Conventional cooling systems with no waste heat recovery",
+    "baseline_metric": "No energy recovery from waste heat (0% efficiency)",
+    "candidate_metric": "15-25% improvement in overall energy efficiency",
+    "expected_delta": "15-25% improvement in energy efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale prototype testing with simulated waste heat input, measure power output and cooling capacity",
+    "decisive_uncertainty": "Efficiency at typical automotive waste heat temperatures (80-150\u00b0C)",
+    "kill_condition": "Efficiency below 10% at typical operating temperatures",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Space constraints in automotive packaging",
+     "detectability": "detectable via packaging simulation",
+     "mitigation": "mitigation with compact heat exchanger design"
+    },
+    {
+     "failure_mode": "Corrosion from exhaust gases",
+     "detectability": "detectable via material testing",
+     "mitigation": "mitigation with corrosion-resistant materials"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive powertrain engineers",
+    "use_case": "Waste heat recovery for improved fuel efficiency and cabin cooling",
+    "integration_point": "Engine exhaust system and climate control system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "492803b54c0aa9ff7ace5241f39c41cd829f7784f08329dd012fbad0ada4ad7b",
+    "output_hash": "c564d8577f385b390499785f5e2031367470a11c26973c1a472177d90f1d798a",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Thermal-Hydraulic Regeneration System",
+   "target_domain": "automotive",
+   "source_domain": "energy",
+   "domain_id": "automotive_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Energy-intensive thermal management systems in internal combustion engines requiring complex control strategies.",
+   "causal_chain": [
+    "Thermal-hydraulic model captures engine thermal dynamics",
+    "enables predictive thermal management",
+    "reduces energy consumption for cooling/heating",
+    "extends component life"
+   ],
+   "unexploited_phenomenon": "Regeneration in internal combustion engines through thermal-hydraulic modeling and analysis",
+   "intervention": "Implementation of thermal-hydraulic modeling for predictive thermal management",
+   "governing_variables": "Heat transfer coefficient (h), fluid flow rate (Q), thermal capacity (C_p)",
+   "predicted_effect": "20-40% reduction in energy consumption for thermal management through predictive control",
+   "equations": [
+    "Q = h * A * \u0394T (heat transfer rate), C_p = m * c (thermal capacity)"
+   ],
+   "boundary_conditions": "Effective in steady-state and transient conditions; limited by model accuracy for novel engine designs",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2015.09.033"
+   ],
+   "cross_domain_transition": "Thermal-hydraulic modeling -> automotive thermal management + enables predictive thermal control with reduced energy consumption",
+   "baseline": {
+    "baseline_incumbent": "Reactive thermal management systems",
+    "baseline_metric": "High energy consumption for thermal control (quantification not specified in evidence)",
+    "candidate_metric": "20-40% reduction in energy consumption for thermal management",
+    "expected_delta": "20-40% reduction in energy consumption"
+   },
+   "killer_experiment": {
+    "experiment": "Engine test bench with thermal-hydraulic model implementation vs. conventional control, measure energy consumption",
+    "decisive_uncertainty": "Model accuracy during rapid thermal transients",
+    "kill_condition": "Model error exceeds 15% during transient conditions",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model complexity vs. real-time processing requirements",
+     "detectability": "detectable via computational load analysis",
+     "mitigation": "mitigation with model simplification"
+    },
+    {
+     "failure_mode": "Sensor drift affecting model accuracy",
+     "detectability": "detectable via residual analysis",
+     "mitigation": "mitigation with adaptive calibration"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive thermal system designers",
+    "use_case": "Predictive thermal management for improved efficiency and component life",
+    "integration_point": "Engine control unit software"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "492803b54c0aa9ff7ace5241f39c41cd829f7784f08329dd012fbad0ada4ad7b",
+    "output_hash": "c564d8577f385b390499785f5e2031367470a11c26973c1a472177d90f1d798a",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Limited Temperature Cycle Engine Design",
+   "target_domain": "automotive",
+   "source_domain": "automotive",
+   "domain_id": "automotive_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Complex and expensive thermal management systems required to handle wide temperature variations in internal combustion engines.",
+   "causal_chain": [
+    "Engine design with limited temperature cycle",
+    "reduces thermal stress",
+    "enables simplified thermal management",
+    "reduces control complexity"
+   ],
+   "unexploited_phenomenon": "Internal combustion engine with limited temperature cycle design",
+   "intervention": "Engine architecture modification to minimize temperature variations",
+   "governing_variables": "Temperature amplitude (\u0394T), thermal stress (\u03c3), cycle frequency (f)",
+   "predicted_effect": "25-50% reduction in thermal management system complexity due to reduced temperature variations",
+   "equations": [
+    "\u03c3 = \u03b1 * E * \u0394T (thermal stress), where \u03b1 is coefficient of thermal expansion, E is Young's modulus"
+   ],
+   "boundary_conditions": "Effective in steady-state operation; limited by performance requirements for high-power applications",
+   "evidence_refs": [
+    "doi:10.1016/s1359-4311(97)83252-8"
+   ],
+   "cross_domain_transition": "Same-domain optimization of engine thermal characteristics + reduced temperature variations simplify control requirements",
+   "baseline": {
+    "baseline_incumbent": "Conventional engine designs with wide temperature variations requiring complex thermal management",
+    "baseline_metric": "Complex thermal management system with multiple control loops",
+    "candidate_metric": "25-50% reduction in thermal management system complexity",
+    "expected_delta": "25-50% reduction in system complexity"
+   },
+   "killer_experiment": {
+    "experiment": "Engine dynamometer testing with limited temperature cycle design vs. conventional, measure thermal management system complexity",
+    "decisive_uncertainty": "Impact on engine performance and emissions",
+    "kill_condition": "Performance degradation exceeds 5% or emissions increase exceeds regulatory limits",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Reduced power density",
+     "detectability": "detectable via dynamometer testing",
+     "mitigation": "mitigation with advanced materials"
+    },
+    {
+     "failure_mode": "Increased manufacturing cost",
+     "detectability": "detectable via cost analysis",
+     "mitigation": "mitigation with design optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Powertrain engineers",
+    "use_case": "Engine design with simplified thermal management requirements",
+    "integration_point": "Engine architecture design"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "492803b54c0aa9ff7ace5241f39c41cd829f7784f08329dd012fbad0ada4ad7b",
+    "output_hash": "c564d8577f385b390499785f5e2031367470a11c26973c1a472177d90f1d798a",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "HFO Modeling and RSM-Based Combustion Optimization",
+   "target_domain": "automotive",
+   "source_domain": "marine",
+   "domain_id": "automotive_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Complex control required for optimal combustion and emission performance in internal combustion engines.",
+   "causal_chain": [
+    "Response surface methodology (RSM) model captures combustion-emission relationships",
+    "enables optimized control parameters",
+    "reduces emissions while maintaining efficiency",
+    "simplifies control system"
+   ],
+   "unexploited_phenomenon": "Integrated HFO modeling and RSM-based synergistic optimization of combustion-emission performance",
+   "intervention": "Implementation of RSM-based optimization for combustion control",
+   "governing_variables": "Air-fuel ratio (\u03bb), injection timing (t_inj), EGR rate (EGR)",
+   "predicted_effect": "15-30% reduction in NOx emissions while maintaining fuel efficiency through optimized combustion control",
+   "equations": [
+    "NOx = f(\u03bb, t_inj, EGR) (emission model), \u03b7 = g(\u03bb, t_inj, EGR) (efficiency model)"
+   ],
+   "boundary_conditions": "Effective in steady-state cruise conditions; limited by transient response requirements",
+   "evidence_refs": [
+    "doi:10.1021/acsomega.5c08406"
+   ],
+   "cross_domain_transition": "Marine heavy fuel oil combustion optimization -> automotive gasoline/diesel combustion + enables simplified control with optimized emissions",
+   "baseline": {
+    "baseline_incumbent": "Conventional combustion control with fixed parameters or simple lookup tables",
+    "baseline_metric": "Suboptimal NOx emissions (quantification not specified in evidence)",
+    "candidate_metric": "15-30% reduction in NOx emissions",
+    "expected_delta": "15-30% reduction in NOx emissions"
+   },
+   "killer_experiment": {
+    "experiment": "Engine test cell with RSM-based control implementation vs. conventional, measure NOx emissions and fuel efficiency",
+    "decisive_uncertainty": "Model accuracy across different operating conditions",
+    "kill_condition": "NOx reduction below 5% or fuel efficiency degradation exceeds 2%",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model overfitting to specific operating conditions",
+     "detectability": "detectable via validation testing",
+     "mitigation": "mitigation with cross-validation"
+    },
+    {
+     "failure_mode": "Computational complexity",
+     "detectability": "detectable via processing time analysis",
+     "mitigation": "mitigation with model simplification"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Emission control system engineers",
+    "use_case": "Optimized combustion control for reduced emissions",
+    "integration_point": "Engine control unit software"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "492803b54c0aa9ff7ace5241f39c41cd829f7784f08329dd012fbad0ada4ad7b",
+    "output_hash": "c564d8577f385b390499785f5e2031367470a11c26973c1a472177d90f1d798a",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Edge AI Sensor Self-Diagnosis",
+   "target_domain": "automotive",
+   "source_domain": "environmental monitoring",
+   "domain_id": "automotive_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "High cost of sensor validation and quality control in automotive thermal management systems.",
+   "causal_chain": [
+    "Edge AI agent performs reference-free self-diagnosis",
+    "detects sensor failures in real-time",
+    "enables predictive maintenance",
+    "reduces system downtime and calibration costs"
+   ],
+   "unexploited_phenomenon": "On-device edge AI agent for reference-free self-diagnosis of multi-pollutant sensors",
+   "intervention": "Implementation of edge AI for automotive thermal sensor validation",
+   "governing_variables": "Sensor drift rate (d), detection accuracy (A), processing time (t)",
+   "predicted_effect": "40-60% reduction in sensor validation costs through real-time self-diagnosis",
+   "equations": [
+    "A = f(d, t) (detection accuracy), C_validation = g(A) (validation cost)"
+   ],
+   "boundary_conditions": "Effective with sufficient historical data; limited by novel failure modes not represented in training data",
+   "evidence_refs": [
+    "doi:10.3390/s26144526"
+   ],
+   "cross_domain_transition": "Environmental sensor monitoring -> automotive thermal sensor validation + enables real-time quality control without external reference",
+   "baseline": {
+    "baseline_incumbent": "Periodic sensor calibration and validation with external reference",
+    "baseline_metric": "High validation costs and downtime (quantification not specified in evidence)",
+    "candidate_metric": "40-60% reduction in sensor validation costs",
+    "expected_delta": "40-60% reduction in validation costs"
+   },
+   "killer_experiment": {
+    "experiment": "Bench test with automotive thermal sensors and edge AI implementation, measure validation accuracy and cost",
+    "decisive_uncertainty": "Detection accuracy under extreme operating conditions",
+    "kill_condition": "False positive rate exceeds 10% or false negative rate exceeds 5%",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Limited training data for rare failure modes",
+     "detectability": "detectable via failure injection testing",
+     "mitigation": "mitigation with transfer learning"
+    },
+    {
+     "failure_mode": "Processing power constraints",
+     "detectability": "detectable via latency analysis",
+     "mitigation": "mitigation with model optimization"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive sensor system engineers",
+    "use_case": "Real-time sensor validation for thermal management systems",
+    "integration_point": "Sensor control unit software"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "492803b54c0aa9ff7ace5241f39c41cd829f7784f08329dd012fbad0ada4ad7b",
+    "output_hash": "c564d8577f385b390499785f5e2031367470a11c26973c1a472177d90f1d798a",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "MEDICAL_ADJACENT_FLAG",
+    "matched_medical_terms": [
+     "diagnosis"
+    ],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "strong medical vocabulary AND substantial non-medical target context; flagged for human review rather than silently resolved"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "CAI Combustion Thermal Management",
+   "target_domain": "automotive",
+   "source_domain": "automotive",
+   "domain_id": "automotive_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Complex and expensive thermal management required for conventional combustion in internal combustion engines.",
+   "causal_chain": [
+    "Controlled auto-ignition (CAI) combustion with air-assisted direct injection",
+    "reduces thermal gradients",
+    "enables simplified thermal management",
+    "reduces control complexity"
+   ],
+   "unexploited_phenomenon": "CAI combustion with methanol and ethanol in an air-assisted direct injection SI engine",
+   "intervention": "Implementation of CAI combustion with air-assisted direct injection",
+   "governing_variables": "Injection timing (t_inj), injection pressure (P_inj), air-fuel ratio (\u03bb)",
+   "predicted_effect": "20-35% reduction in thermal management complexity due to more uniform combustion temperatures",
+   "equations": [
+    "T_max = f(t_inj, P_inj, \u03bb) (maximum combustion temperature), \u0394T = g(t_inj, P_inj, \u03bb) (temperature gradient)"
+   ],
+   "boundary_conditions": "Effective in mid-load operating conditions; limited by high-load and cold-start conditions",
+   "evidence_refs": [
+    "title:9991a9ab4747fda0",
+    "doi:10.1080/00102200701600903"
+   ],
+   "cross_domain_transition": "Same-domain combustion technology optimization + reduced thermal gradients simplify control requirements",
+   "baseline": {
+    "baseline_incumbent": "Conventional spark ignition combustion with high thermal gradients",
+    "baseline_metric": "Complex thermal management system with multiple control zones",
+    "candidate_metric": "20-35% reduction in thermal management complexity",
+    "expected_delta": "20-35% reduction in system complexity"
+   },
+   "killer_experiment": {
+    "experiment": "Engine test cell with CAI combustion implementation vs. conventional, measure temperature gradients and thermal management complexity",
+    "decisive_uncertainty": "Impact on engine performance and emissions",
+    "kill_condition": "Performance degradation exceeds 5% or emissions increase exceeds regulatory limits",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Combustion instability at certain operating conditions",
+     "detectability": "detectable via cylinder pressure analysis",
+     "mitigation": "mitigation with dual-mode operation"
+    },
+    {
+     "failure_mode": "Increased fuel consumption",
+     "detectability": "detectable via fuel flow measurement",
+     "mitigation": "mitigation with optimization of injection parameters"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Combustion system engineers",
+    "use_case": "Simplified thermal management through CAI combustion",
+    "integration_point": "Engine combustion system design"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "492803b54c0aa9ff7ace5241f39c41cd829f7784f08329dd012fbad0ada4ad7b",
+    "output_hash": "c564d8577f385b390499785f5e2031367470a11c26973c1a472177d90f1d798a",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-8",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Model-Based Thermal Control Design",
+   "target_domain": "automotive",
+   "source_domain": "automotive",
+   "domain_id": "automotive_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "High cost and complexity of developing control systems for internal combustion engine thermal management.",
+   "causal_chain": [
+    "Model-based design approach captures engine thermal dynamics",
+    "enables optimal controller synthesis",
+    "reduces development time",
+    "lowers control system cost"
+   ],
+   "unexploited_phenomenon": "Model-based design and hardware-in-the-loop simulation of internal combustion engine control systems",
+   "intervention": "Implementation of model-based design approach for thermal control development",
+   "governing_variables": "Model fidelity (M), controller complexity (C), development time (t)",
+   "predicted_effect": "30-50% reduction in control system development time through model-based approach",
+   "equations": [
+    "t_dev = f(M, C) (development time), C_sys = g(M) (system cost)"
+   ],
+   "boundary_conditions": "Effective with accurate system models; limited by model accuracy for novel engine architectures",
+   "evidence_refs": [
+    "doi:10.37099/mtu.dc.etd-restricted/254"
+   ],
+   "cross_domain_transition": "Same-domain model-based control design + reduced development time while maintaining performance",
+   "baseline": {
+    "baseline_incumbent": "Traditional control system development with extensive hardware testing",
+    "baseline_metric": "Long development cycles (quantification not specified in evidence)",
+    "candidate_metric": "30-50% reduction in development time",
+    "expected_delta": "30-50% reduction in development time"
+   },
+   "killer_experiment": {
+    "experiment": "Control system development project with model-based approach vs. traditional, measure development time and performance",
+    "decisive_uncertainty": "Model accuracy across different engine operating conditions",
+    "kill_condition": "Control performance degradation exceeds 5% or development time reduction below 20%",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model inaccuracies for novel operating conditions",
+     "detectability": "detectable via validation testing",
+     "mitigation": "mitigation with adaptive modeling"
+    },
+    {
+     "failure_mode": "Over-reliance on simulation",
+     "detectability": "detectable via hardware-in-the-loop testing",
+     "mitigation": "mitigation with iterative validation"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive control system engineers",
+    "use_case": "Reduced-cost development of thermal management control systems",
+    "integration_point": "Control system development process"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "492803b54c0aa9ff7ace5241f39c41cd829f7784f08329dd012fbad0ada4ad7b",
+    "output_hash": "c564d8577f385b390499785f5e2031367470a11c26973c1a472177d90f1d798a",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Multi-Objective Thermal Optimization",
+   "target_domain": "Automotive",
+   "source_domain": "Energy",
+   "domain_id": "automotive_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "Inefficient thermal management in internal combustion engines leading to reduced fuel economy and increased emissions.",
+   "causal_chain": [
+    "Multi-objective optimization algorithms",
+    "simultaneous optimization of fuel economy and emissions",
+    "improved thermal management",
+    "reduced energy waste",
+    "enhanced performance"
+   ],
+   "unexploited_phenomenon": "The application of swarm and deterministic optimization algorithms to simultaneously improve fuel economy and reduce emissions in hybrid powertrains.",
+   "intervention": "Implementation of a multi-objective optimization framework using both swarm and deterministic algorithms for thermal management control systems.",
+   "governing_variables": "Fuel consumption rate (kg/h), emission levels (ppm), thermal efficiency (%), driving performance metrics (N\u00b7m, kW)",
+   "predicted_effect": "15-30% improvement in fuel economy and 20-40% reduction in CO, HC, and NOx emissions due to optimized thermal management parameters.",
+   "equations": [
+    "Thermal efficiency \u03b7 = (Work output / Heat input) \u00d7 100%, Fuel consumption rate = (Power output / Fuel energy density \u00d7 \u03b7)"
+   ],
+   "boundary_conditions": "Valid for parallel hybrid electric vehicles under various driving conditions; effectiveness may vary with engine size and hybrid architecture.",
+   "evidence_refs": [
+    "doi:10.1038/s41598-026-52628-y"
+   ],
+   "cross_domain_transition": "Energy optimization algorithms -> automotive thermal management, transferring computational optimization techniques to improve thermal efficiency in vehicles.",
+   "baseline": {
+    "baseline_incumbent": "Traditional thermal management systems with fixed parameters, unable to adapt to varying driving conditions and optimize for multiple objectives simultaneously.",
+    "baseline_metric": "Standard fuel economy and emission levels without optimization (not quantified in evidence).",
+    "candidate_metric": "Multi-objective optimized fuel economy and emission levels.",
+    "expected_delta": "15-30% improvement in fuel economy and 20-40% reduction in emissions."
+   },
+   "killer_experiment": {
+    "experiment": "Engine dynamometer testing with controlled thermal management parameters, comparing optimized vs. standard control systems.",
+    "decisive_uncertainty": "Whether the optimization algorithms can maintain performance across all driving conditions.",
+    "kill_condition": "Less than 5% improvement in fuel economy or emissions under any standard driving condition.",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Algorithm convergence failure",
+     "detectability": "detectable through monitoring optimization iterations",
+     "mitigation": "mitigation through algorithm parameter tuning"
+    },
+    {
+     "failure_mode": "Computational overhead",
+     "detectability": "detectable through system response time",
+     "mitigation": "mitigation through hardware acceleration."
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Automotive OEMs and powertrain system integrators.",
+    "use_case": "Integration into hybrid vehicle powertrain control systems for improved thermal management.",
+    "integration_point": "Engine control unit (ECU) software and thermal management system controllers."
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c21d07b5419257646bdabeca159a0521f81332a8bf48c531622fd1907c97fa2f",
+    "output_hash": "e57cfc4f91c7437eb6b962f4eb1204d113da429a660f59e98531919f85528a52",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "automotive",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Waste Heat Recovery System",
+   "target_domain": "Marine",
+   "source_domain": "Automotive",
+   "domain_id": "automotive_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "Waste heat from marine diesel engines is not effectively utilized, leading to energy inefficiency and environmental impacts.",
+   "causal_chain": [
+    "Waste heat capture",
+    "heat exchanger integration",
+    "power generation",
+    "cooling capability",
+    "improved energy efficiency"
+   ],
+   "unexploited_phenomenon": "Thermoelectric conversion of waste heat from diesel engines into both power and cooling through hybrid power and cooling facilities.",
+   "intervention": "Integration of a thermoelectric waste heat recovery system with a hybrid power and cooling facility.",
+   "governing_variables": "Waste heat temperature (\u00b0C), heat transfer coefficient (W/m\u00b2\u00b7K), thermoelectric efficiency (%), power output (kW), cooling capacity (kW)",
+   "predicted_effect": "15-25% improvement in overall energy efficiency through utilization of otherwise wasted thermal energy.",
+   "equations": [
+    "Power output P = \u03b7 \u00d7 Q_h, where \u03b7 is thermoelectric efficiency and Q_h is heat input",
+    "Cooling capacity Q_c = COP \u00d7 W, where COP is coefficient of performance and W is work input"
+   ],
+   "boundary_conditions": "Effective for low-speed, two-stroke marine diesel engines with sufficient waste heat availability; efficiency depends on temperature differential.",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-16609-x"
+   ],
+   "cross_domain_transition": "Automotive thermal management -> marine energy systems, applying waste heat recovery techniques to improve marine engine efficiency.",
+   "baseline": {
+    "baseline_incumbent": "Standard marine diesel engines without waste heat recovery systems, losing significant thermal energy to the environment.",
+    "baseline_metric": "Standard thermal efficiency of marine diesel engines (typically 40-50%).",
+    "candidate_metric": "Overall energy efficiency including waste heat recovery (55-75%).",
+    "expected_delta": "15-25% improvement in overall energy efficiency."
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale thermoelectric testing with simulated waste heat from a marine diesel engine.",
+    "decisive_uncertainty": "The actual efficiency improvement achievable in real marine operating conditions.",
+    "kill_condition": "Less than 10% improvement in overall energy efficiency under simulated marine conditions.",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Corrosion in marine environment",
+     "detectability": "detectable through material testing",
+     "mitigation": "mitigation through corrosion-resistant materials"
+    },
+    {
+     "failure_mode": "Fouling of heat exchangers",
+     "detectability": "detectable through monitoring pressure drops",
+     "mitigation": "mitigation through regular cleaning and filtration."
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Marine engine manufacturers and shipping companies.",
+    "use_case": "Integration into marine propulsion systems for improved energy efficiency and reduced emissions.",
+    "integration_point": "Exhaust system and cooling circuit of marine diesel engines."
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c21d07b5419257646bdabeca159a0521f81332a8bf48c531622fd1907c97fa2f",
+    "output_hash": "e57cfc4f91c7437eb6b962f4eb1204d113da429a660f59e98531919f85528a52",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "marine"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Biogas Stove Optimization",
+   "target_domain": "Energy",
+   "source_domain": "Industrial",
+   "domain_id": "automotive_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "Inefficient biogas stove designs lead to excessive fuel consumption and uneven heat distribution in cooking applications.",
+   "causal_chain": [
+    "Stove geometry optimization",
+    "improved heat distribution",
+    "reduced fuel consumption",
+    "enhanced energy efficiency"
+   ],
+   "unexploited_phenomenon": "Design optimization and experimental validation of biogas-powered stoves for specific cooking applications like injera baking.",
+   "intervention": "Development of purpose-built biogas stove with optimized geometry for heat distribution and fuel efficiency.",
+   "governing_variables": "Heat distribution uniformity (%), fuel consumption rate (m\u00b3/h), thermal efficiency (%), cooking time (min)",
+   "predicted_effect": "30-50% reduction in fuel consumption and more uniform heat distribution compared to traditional biogas stoves.",
+   "equations": [
+    "Thermal efficiency \u03b7 = (Useful heat output / Fuel energy input) \u00d7 100%, Heat distribution uniformity U = (1 - \u03c3/\u03bc) \u00d7 100%, where \u03c3 is standard deviation and \u03bc is mean temperature"
+   ],
+   "boundary_conditions": "Effective for specific cooking applications like injera baking; optimization may need adjustment for other cooking methods.",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-25412-7"
+   ],
+   "cross_domain_transition": "Industrial thermal optimization -> residential energy systems, applying industrial design optimization techniques to improve residential cooking efficiency.",
+   "baseline": {
+    "baseline_incumbent": "Traditional biogas stoves with generic designs not optimized for specific cooking applications.",
+    "baseline_metric": "Standard biogas stoves with 20-30% thermal efficiency and uneven heat distribution.",
+    "candidate_metric": "Optimized biogas stoves with 50-80% thermal efficiency and uniform heat distribution.",
+    "expected_delta": "30-50% improvement in fuel efficiency and significantly more uniform heat distribution."
+   },
+   "killer_experiment": {
+    "experiment": "Controlled cooking tests comparing optimized stove design with traditional biogas stoves using standardized cooking procedures.",
+    "decisive_uncertainty": "Whether the optimization maintains benefits across different cooking conditions and user practices.",
+    "kill_condition": "Less than 20% improvement in fuel efficiency or significantly uneven heat distribution in cooking tests.",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Material degradation at high temperatures",
+     "detectability": "detectable through visual inspection and testing",
+     "mitigation": "mitigation through high-temperature resistant materials"
+    },
+    {
+     "failure_mode": "Incomplete combustion",
+     "detectability": "detectable through flue gas analysis",
+     "mitigation": "mitigation through air-fuel ratio optimization."
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Clean cooking solution providers and rural energy development organizations.",
+    "use_case": "Deployment in rural households for efficient biogas-based cooking.",
+    "integration_point": "Biogas supply system and cooking appliances in residential settings."
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c21d07b5419257646bdabeca159a0521f81332a8bf48c531622fd1907c97fa2f",
+    "output_hash": "e57cfc4f91c7437eb6b962f4eb1204d113da429a660f59e98531919f85528a52",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Regenerative Thermal Management",
+   "target_domain": "Energy",
+   "source_domain": "Automotive",
+   "domain_id": "automotive_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "Inefficient thermal management in internal combustion engines leads to energy waste and reduced performance.",
+   "causal_chain": [
+    "Thermal-hydraulic modeling",
+    "regenerative heat capture",
+    "heat storage",
+    "thermal energy recovery",
+    "improved efficiency"
+   ],
+   "unexploited_phenomenon": "Regeneration in internal combustion engines through thermal-hydraulic modeling and analysis of heat recovery systems.",
+   "intervention": "Implementation of a regenerative thermal management system using thermal-hydraulic modeling to optimize heat recovery.",
+   "governing_variables": "Heat recovery rate (kW), thermal storage capacity (kJ), temperature differential (\u00b0C), heat transfer efficiency (%)",
+   "predicted_effect": "10-20% improvement in engine efficiency through effective capture and reuse of otherwise wasted thermal energy.",
+   "equations": [
+    "Heat recovery rate Q = h \u00d7 A \u00d7 \u0394T, where h is heat transfer coefficient, A is surface area, and \u0394T is temperature difference",
+    "Efficiency \u03b7 = Q_recovered / Q_input \u00d7 100%"
+   ],
+   "boundary_conditions": "Effective for internal combustion engines with sufficient temperature differentials for heat recovery; effectiveness varies with engine load and operating conditions.",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2015.09.033"
+   ],
+   "cross_domain_transition": "Automotive thermal systems -> industrial energy recovery, applying engine thermal regeneration techniques to industrial waste heat recovery.",
+   "baseline": {
+    "baseline_incumbent": "Standard internal combustion engine cooling systems without heat recovery capabilities.",
+    "baseline_metric": "Standard thermal efficiency of internal combustion engines (typically 25-35%).",
+    "candidate_metric": "Enhanced thermal efficiency with regenerative system (35-55%).",
+    "expected_delta": "10-20% improvement in overall thermal efficiency."
+   },
+   "killer_experiment": {
+    "experiment": "Engine dynamometer testing with and without regenerative thermal management system.",
+    "decisive_uncertainty": "The actual efficiency improvement achievable across different engine operating conditions.",
+    "kill_condition": "Less than 5% improvement in thermal efficiency under any standard operating condition.",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "System complexity",
+     "detectability": "detectable through maintenance frequency",
+     "mitigation": "mitigation through modular design"
+    },
+    {
+     "failure_mode": "Additional weight penalty",
+     "detectability": "detectable through performance testing",
+     "mitigation": "mitigation through lightweight materials."
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial facilities with waste heat sources and energy-intensive processes.",
+    "use_case": "Integration into industrial processes for waste heat recovery and energy efficiency improvement.",
+    "integration_point": "Heat-generating equipment and thermal energy storage systems."
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c21d07b5419257646bdabeca159a0521f81332a8bf48c531622fd1907c97fa2f",
+    "output_hash": "e57cfc4f91c7437eb6b962f4eb1204d113da429a660f59e98531919f85528a52",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Limited Temperature Cycle Engine",
+   "target_domain": "Energy",
+   "source_domain": "Automotive",
+   "domain_id": "automotive_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "Traditional internal combustion engines experience significant temperature cycles leading to thermal stress and reduced efficiency.",
+   "causal_chain": [
+    "Temperature cycle limitation",
+    "reduced thermal stress",
+    "improved component longevity",
+    "enhanced efficiency"
+   ],
+   "unexploited_phenomenon": "Internal combustion engines with limited temperature cycles to reduce thermal stress and improve efficiency.",
+   "intervention": "Design and implementation of internal combustion engines with controlled temperature cycles through advanced cooling systems.",
+   "governing_variables": "Temperature fluctuation range (\u00b0C), thermal stress (MPa), component lifespan (hours), thermal efficiency (%)",
+   "predicted_effect": "15-25% improvement in component lifespan and 5-10% improvement in thermal efficiency through reduced thermal stress.",
+   "equations": [
+    "Thermal stress \u03c3 = \u03b1 \u00d7 E \u00d7 \u0394T, where \u03b1 is coefficient of thermal expansion, E is Young's modulus, and \u0394T is temperature change",
+    "Efficiency \u03b7 = 1 - (T_loss / T_input)"
+   ],
+   "boundary_conditions": "Effective for internal combustion engines where thermal stress is a limiting factor; may require significant redesign of cooling systems.",
+   "evidence_refs": [
+    "doi:10.1016/s1359-4311(97)83252-8"
+   ],
+   "cross_domain_transition": "Automotive engine design -> power generation, applying temperature cycle control techniques to improve power generation equipment reliability.",
+   "baseline": {
+    "baseline_incumbent": "Standard internal combustion engines with uncontrolled temperature cycles.",
+    "baseline_metric": "Standard component lifespan and thermal efficiency without temperature cycle control.",
+    "candidate_metric": "Extended component lifespan and improved thermal efficiency with temperature cycle control.",
+    "expected_delta": "15-25% improvement in component lifespan and 5-10% improvement in thermal efficiency."
+   },
+   "killer_experiment": {
+    "experiment": "Long-term durability testing comparing standard engines with limited temperature cycle engines.",
+    "decisive_uncertainty": "Whether the temperature cycle limitation provides sufficient benefit to justify system complexity.",
+    "kill_condition": "Less than 10% improvement in component lifespan or thermal efficiency.",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Cooling system failure",
+     "detectability": "detectable through temperature monitoring",
+     "mitigation": "mitigation through redundant cooling systems"
+    },
+    {
+     "failure_mode": "Reduced power output",
+     "detectability": "detectable through performance testing",
+     "mitigation": "mitigation through optimized temperature control algorithms."
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Power generation equipment manufacturers and industrial power users.",
+    "use_case": "Integration into backup power generation systems for improved reliability and efficiency.",
+    "integration_point": "Engine cooling systems and power generation equipment."
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c21d07b5419257646bdabeca159a0521f81332a8bf48c531622fd1907c97fa2f",
+    "output_hash": "e57cfc4f91c7437eb6b962f4eb1204d113da429a660f59e98531919f85528a52",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "HFO Combustion Optimization",
+   "target_domain": "Marine",
+   "source_domain": "Energy",
+   "domain_id": "automotive_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "Marine diesel engines using heavy fuel oil face challenges in emission control and fuel economy under stringent regulations.",
+   "causal_chain": [
+    "HFO modeling",
+    "combustion optimization",
+    "emission reduction",
+    "improved fuel economy"
+   ],
+   "unexploited_phenomenon": "Integrated HFO modeling and response surface methodology (RSM) for synergistic optimization of combustion-emission performance.",
+   "intervention": "Implementation of an integrated HFO model with RSM-based optimization for marine diesel engines.",
+   "governing_variables": "NOx emissions (ppm), fuel consumption rate (kg/h), combustion efficiency (%), engine load (%)",
+   "predicted_effect": "20-30% reduction in NOx emissions and 10-15% improvement in fuel economy through optimized combustion parameters.",
+   "equations": [
+    "NOx formation rate \u221d exp(-E_a/RT) \u00d7 [O\u2082]^n \u00d7 [fuel]^m, where E_a is activation energy, R is gas constant, T is temperature",
+    "Fuel consumption rate = Power output / (Fuel energy density \u00d7 Efficiency)"
+   ],
+   "boundary_conditions": "Effective for low-speed, two-stroke marine diesel engines using heavy fuel oil; optimization may need adjustment for different fuel types.",
+   "evidence_refs": [
+    "doi:10.1021/acsomega.5c08406"
+   ],
+   "cross_domain_transition": "Energy combustion optimization -> marine propulsion, applying advanced combustion modeling to improve marine engine performance.",
+   "baseline": {
+    "baseline_incumbent": "Standard marine diesel engines with conventional combustion control systems.",
+    "baseline_metric": "Standard NOx emissions and fuel consumption rates without optimization.",
+    "candidate_metric": "Optimized NOx emissions (reduced by 20-30%) and fuel consumption rates (improved by 10-15%).",
+    "expected_delta": "20-30% reduction in NOx emissions and 10-15% improvement in fuel economy."
+   },
+   "killer_experiment": {
+    "experiment": "Engine testing with HFO fuel comparing standard combustion with optimized combustion parameters.",
+    "decisive_uncertainty": "Whether the optimization maintains benefits across different engine loads and operating conditions.",
+    "kill_condition": "Less than 15% reduction in NOx emissions or less than 5% improvement in fuel economy.",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Fuel quality variations",
+     "detectability": "detectable through fuel analysis",
+     "mitigation": "mitigation through adaptive control algorithms"
+    },
+    {
+     "failure_mode": "Combustion instability",
+     "detectability": "detectable through monitoring combustion parameters",
+     "mitigation": "mitigation through robust control systems."
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Marine engine manufacturers and shipping companies.",
+    "use_case": "Integration into marine propulsion systems for compliance with emission regulations and improved efficiency.",
+    "integration_point": "Engine control systems and fuel injection systems of marine diesel engines."
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c21d07b5419257646bdabeca159a0521f81332a8bf48c531622fd1907c97fa2f",
+    "output_hash": "e57cfc4f91c7437eb6b962f4eb1204d113da429a660f59e98531919f85528a52",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "marine"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-automotive_thermal-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "CAI Combustion System",
+   "target_domain": "Energy",
+   "source_domain": "Automotive",
+   "domain_id": "automotive_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "Conventional spark ignition engines suffer from inefficient combustion and higher emissions compared to more advanced combustion technologies.",
+   "causal_chain": [
+    "Controlled auto-ignition implementation",
+    "improved combustion efficiency",
+    "reduced emissions",
+    "enhanced fuel economy"
+   ],
+   "unexploited_phenomenon": "Controlled auto-ignition (CAI) combustion in direct injection gasoline engines through negative valve overlap and fuel injection strategies.",
+   "intervention": "Implementation of CAI combustion system with optimized fuel injection strategies for gasoline engines.",
+   "governing_variables": "Combustion efficiency (%), emission levels (ppm), fuel consumption rate (kg/h), combustion phasing (\u00b0CA)",
+   "predicted_effect": "10-20% improvement in fuel economy and 15-25% reduction in emissions compared to conventional spark ignition.",
+   "equations": [
+    "Combustion efficiency \u03b7 = (Heat released / Fuel energy input) \u00d7 100%, Emission rate \u221d exp(-E_a/RT) \u00d7 [O\u2082]^n \u00d7 [fuel]^m"
+   ],
+   "boundary_conditions": "Effective for direct injection gasoline engines with variable valve timing; effectiveness depends on fuel properties and engine design.",
+   "evidence_refs": [
+    "doi:10.1080/00102200701600903",
+    "title:9991a9ab4747fda0"
+   ],
+   "cross_domain_transition": "Automotive combustion technology -> industrial power generation, applying advanced combustion techniques to improve generator efficiency.",
+   "baseline": {
+    "baseline_incumbent": "Conventional spark ignition gasoline engines with standard combustion control.",
+    "baseline_metric": "Standard fuel economy and emission levels for conventional gasoline engines.",
+    "candidate_metric": "Improved fuel economy (10-20%) and reduced emissions (15-25%) with CAI combustion.",
+    "expected_delta": "10-20% improvement in fuel economy and 15-25% reduction in emissions."
+   },
+   "killer_experiment": {
+    "experiment": "Engine dynamometer testing comparing conventional spark ignition with CAI combustion system.",
+    "decisive_uncertainty": "Whether the CAI combustion can maintain benefits across different operating conditions and fuel qualities.",
+    "kill_condition": "Less than 5% improvement in fuel economy or less than 10% reduction in emissions.",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Combustion instability at low loads",
+     "detectability": "detectable through monitoring combustion parameters",
+     "mitigation": "mitigation through hybrid combustion modes"
+    },
+    {
+     "failure_mode": "Increased noise and vibration",
+     "detectability": "detectable through acoustic testing",
+     "mitigation": "mitigation through combustion phasing optimization."
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Power generation equipment manufacturers and industrial power users.",
+    "use_case": "Integration into backup power generation systems for improved efficiency and emissions.",
+    "integration_point": "Engine combustion systems and fuel injection systems of power generation units."
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c21d07b5419257646bdabeca159a0521f81332a8bf48c531622fd1907c97fa2f",
+    "output_hash": "e57cfc4f91c7437eb6b962f4eb1204d113da429a660f59e98531919f85528a52",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  }
+ ],
+ "rejected": [
+  {
+   "candidate_id": "C-automotive_thermal-5",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-automotive_thermal-6",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-automotive_thermal-7",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-automotive_thermal-8",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field INTEGRATION_POINT"
+   ]
+  },
+  {
+   "candidate_id": "C-automotive_thermal-8",
+   "reasons": [
+    "missing field INTERVENTION",
+    "missing field GOVERNING_VARIABLES",
+    "missing field PREDICTED_EFFECT",
+    "missing field EQUATIONS",
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  }
+ ],
+ "pool_sha256": "1d6827d7eed30290a93740814466f95e7fe4e64461e8d39bd0755d4585840154"
+}

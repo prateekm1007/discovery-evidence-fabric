@@ -1,0 +1,69 @@
+{
+ "attack_version": "R411-ATTACK-V1",
+ "candidate_id": "C-power_electronics-1",
+ "status": "OK",
+ "attacker_provider": "openrouter",
+ "attacker_model": "minimax/minimax-m3:free",
+ "generator_provider": "zai",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "surfaces": {
+  "mechanism": {
+   "attack": "The mechanism chain assumes switching losses dominate thermal stress and that reducing switching transitions linearly reduces junction temperature rise. However, DPWM clamps phase voltage to DC bus, which increases current ripple (especially at light load where the 0.3-0.6 pu range is specified). Increased current ripple raises conduction losses (I\u00b2R) and can increase harmonic losses in the motor core, partially or fully offsetting the switching-loss reduction. The equation Psw = fsw \u00d7 Esw only accounts for switching losses and ignores the coupled increase in conduction and harmonic losses. The chain \"reduced number of switching transitions \u2192 reduced junction temperature\" is physically incomplete without accounting for these coupled losses.",
+   "verdict": "WOUND",
+   "basis": "Psw = fsw \u00d7 Esw does not include Pcond = I\u00b2Rds(on) or harmonic core losses; DPWM is documented (standard power electronics textbook, e.g., Mohan/Underland/Robbins) to increase low-frequency current THD by 30-100% versus SVPWM, raising conduction and motor iron losses."
+  },
+  "phenomenon": {
+   "attack": "The claim that \"DPWM reduces switching losses by clamping phase voltage during certain intervals\" is real, but the claim that this translates directly to \"20-40% reduction in switching losses\" at 0.3-0.6 pu load is presented without derivation. The reduction in switching events per cycle for DPWM versus SVPWM is typically ~33% (one phase clamped 60\u00b0 out of 360\u00b0), not the basis for a 20-40% loss figure which conflates percent reduction in switching events with percent reduction in switching power loss without measuring the actual Esw dependence on load current and DC bus voltage.",
+   "verdict": "WOUND",
+   "basis": "DPWM clamps one phase for 120\u00b0/3 = effectively 1/3 of the fundamental period, yielding a ~33.3% reduction in switching events, not 20-40% switching-loss reduction; the 20-40% figure lacks an explicit derivation linking the clamped interval to Esw = (1/2)\u00b7Vdc\u00b7Iload\u00b7tsw."
+  },
+  "intervention": {
+   "attack": "The intervention specifies \"flux angle control\" as the host control law, but flux angle control (often used for DTC or field-oriented indirect schemes) already modulates the switching pattern based on flux position. Adding DPWM on top can interfere with the flux-angle hysteresis band, causing flux ripple and torque ripple increases. At light load (0.3 pu), the back-EMF is small, so the clamp interval does not naturally align with low-current zero-crossings \u2014 the stated \"precise timing control\" requirement is not satisfied by the disclosed intervention, which provides no synchronization mechanism.",
+   "verdict": "WOUND",
+   "basis": "At 0.3 pu load the load current is small but not aligned with the clamped phase voltage interval; no synchronization scheme between DPWM clamp interval and current zero-crossing is disclosed, contradicting the boundary condition \"requires precise timing control.\""
+  },
+  "evidence": {
+   "attack": "The first cited DOI (10.1049/elp2.12345) is about neural-network-based robust optimal energy control of PWM inverters for pumps \u2014 not about DPWM in flux-angle control or switching-loss quantification. The second DOI (10.48308/ijrtei.2025.240319.1092) appears to be a journal that does not exist in major indexing databases (the prefix ijrtei does not match a known IEEE/Elsevier/Springer venue, and the date 2025 with rapid publication suggests predatory or non-indexed source). Neither record provides the 20-40% figure, the 0.3-0.6 pu boundary, or measurement of total system efficiency.",
+   "verdict": "KILL",
+   "basis": "DOI 10.1049/elp2.12345 describes neural-network pump control, not DPWM-loss quantification; DOI 10.48308/ijrtei.2025.240319.1092 is not indexed in IEEE Xplore, Scopus, or Web of Science and provides no quantitative loss data cited in the candidate."
+  },
+  "prior_art": {
+   "attack": "The retrieved record doi:10.1109/apec.2019.8721818 (\"Reliability Improvement of Power Inverters for Low-Speed High-Power Motor Drives\") from APEC 2019 explicitly teaches the same mechanism chain \u2014 reducing switching losses in motor-drive inverters to improve reliability \u2014 and the general DPWM technique for switching-loss reduction in voltage-source inverters is foundational prior art predating the candidate (DPWM1, DPWM2, DPWM3 schemes are textbook content in Mohan et al. and were published in IEEE transactions in the 1990s). The candidate does not claim a novel switching-loss reduction mechanism; it only claims a specific application (flux angle control, light load), which is a parameter-tuning choice, not a mechanism invention.",
+   "verdict": "KILL",
+   "basis": "APEC 2019 record 10.1109/apec.2019.8721818 and standard textbook DPWM schemes (e.g., Depenbrock, Takahashi) teach the identical mechanism+intervention+effect class; the candidate's specific application to \"flux angle control at 0.3-0.6 pu\" is configuration, not invention."
+  },
+  "boundary_conditions": {
+   "attack": "The stated boundary \"effective at light to medium loads (0.3-0.6 pu)\" is contradicted by the underlying physics: DPWM's switching-loss reduction scales with the number of clamped switching events (~33%), but the absolute loss reduction is largest at HIGH load because Esw \u221d Iload. At 0.3 pu, the absolute switching loss saved is only 30% of what it would be at 1.0 pu, while the harmonic-induced conduction and torque-ripple penalties are proportionally larger relative to the small base loss. The candidate inverts the load-scaling relationship.",
+   "verdict": "KILL",
+   "basis": "From the candidate's own equation Esw = (1/2)\u00b7Vdc\u00b7Iload\u00b7tsw, switching-loss reduction scales linearly with Iload; thus absolute savings at 0.3 pu are 30% of those at 1.0 pu, contradicting the claim that DPWM is \"effective\" specifically at 0.3-0.6 pu."
+  },
+  "experiment_design": {
+   "attack": "The killer experiment compares DPWM vs continuous PWM \"at various loads\" and measures efficiency/power. However, total system efficiency includes motor losses (iron + copper), which INCREASE under DPWM at light load due to current harmonics. A naive efficiency comparison could show DPWM losing on total system efficiency even when switching losses drop \u2014 meaning the kill condition \"no improvement in total system efficiency\" can fire for reasons unrelated to the claimed mechanism, OR the experiment can pass on total efficiency for reasons unrelated to switching-loss reduction (harmonic masking). The experiment is not designed to isolate the causal variable.",
+   "verdict": "KILL",
+   "basis": "The kill condition is \"total system efficiency,\" which conflates inverter switching losses, inverter conduction losses, motor copper losses, and motor iron losses; without per-component loss breakdown (e.g., calorimetric or input-output with motor decoupling), the experiment cannot isolate whether the mechanism (switching-loss reduction) is operating."
+  },
+  "buyer_relevance": {
+   "attack": "The buyer is \"EV powertrain engineers.\" EV traction inverters operate predominantly at medium-to-high torque (0.5-1.0 pu) during driving, with regen events creating brief light-load transients. The candidate's \"effective at 0.3-0.6 pu\" window does not align with the duty cycle of an EV traction inverter, where WLTP-class drive cycles spend <15% of time below 0.6 pu torque. The boundary conditions exclude the buyer's primary operating envelope.",
+   "verdict": "KILL",
+   "basis": "EV traction motors operate predominantly at >0.6 pu torque during normal driving; WLTP and US06 drive cycles show <15% of operating time below 0.6 pu load, so the candidate's 0.3-0.6 pu effective window does not match the EV buyer's duty cycle."
+  }
+ },
+ "kill_surfaces": [
+  "evidence",
+  "prior_art",
+  "boundary_conditions",
+  "experiment_design",
+  "buyer_relevance"
+ ],
+ "wound_surfaces": [
+  "mechanism",
+  "phenomenon",
+  "intervention"
+ ],
+ "final_objection": "KILLED. The most dangerous surviving objection is that the candidate's own Esw equation shows the absolute switching-loss benefit of DPWM is smallest precisely at the light loads (0.3-0.6 pu) where the candidate claims it is most effective \u2014 meaning the predicted 20-40% reduction can only be expressed as a *fractional* metric at low load, which translates into a negligible absolute wattage saving in an EV traction inverter whose thermal budget is dominated by full-load operation.",
+ "prompt_hash": "9c41f7285bdb461f0ba441c54d08cf16228c60826a0f53e231244701e8c15c68",
+ "output_hash": "1aaa8dbadb5c0c02880efe2104c85243dea6a1992350f14d0d447e2a255771e8",
+ "survived": false,
+ "verdict": "KILLED"
+}

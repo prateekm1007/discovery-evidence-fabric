@@ -1,0 +1,68 @@
+{
+ "attack_version": "R411-ATTACK-V1",
+ "candidate_id": "C-batteries_ev-1~3",
+ "status": "OK",
+ "attacker_provider": "openrouter",
+ "attacker_model": "minimax/minimax-m3:free",
+ "generator_provider": "zai",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "surfaces": {
+  "mechanism": {
+   "attack": "Acoustic streaming in air at 100\u20131000 Hz produces only millimeter-scale Stokes drift velocities. The Rayleigh streaming velocity scales as V_stream ~ (p_acoustic^2)/(\u03c1\u00b7c\u00b7\u03bc) and at SPL levels compatible with a battery enclosure (<110 dB to avoid excitation of cell vibrations) yields velocities on the order of mm/s, not m/s. Convective enhancement h = Nu\u00b7k/L over a cell surface ~10 cm requires Nu improvements of order 10x to claim 40\u201370% heat dissipation gains. Published measurements of acoustic streaming in confined geometries (e.g., doi:10.1097/01.wnr.0000134930.04561.b2 concerns neural evoked fields, not fluid streaming, and is miscited) show boundary-layer streaming vortices, not bulk flow. The boundary condition \"fails at >60\u00b0C\" is incoherent: acoustic impedance of air is nearly constant up to 200\u00b0C, so the stated failure cannot be attributed to acoustic property change \u2014 it must be transducer/material limits, which the candidate hides.",
+   "verdict": "KILL",
+   "basis": "Acoustic streaming velocity in air at stated SPL scales as ~mm/s (Morse & Ingard, Theoretical Acoustics, Ch. 8); convective h enhancement Nu gains of >2x over forced convection have not been demonstrated in sealed enclosures at <110 dB. The \"phase-locked acoustic fields creating efficient airflow\" claim is unsupported for bulk cooling."
+  },
+  "evidence": {
+   "attack": "The two cited records do not support the core claim. doi:10.3390/en14113096 is about parallel-plate passive air cooling, not acoustic actuation \u2014 it provides zero evidence that acoustic fields enhance heat transfer. doi:10.5281/zenodo.19488056 is cited as \"sonic tech\" with no peer review, no volume, no pages, no DOI resolution guarantee, and no demonstrated link between LRAD-type transducers and battery thermal management. The evidence chain is two disconnected citations glued together.",
+   "verdict": "KILL",
+   "basis": "doi:10.3390/en14113096 title explicitly addresses \"Adding Parallel Plates\" \u2014 a passive modification, not acoustic. doi:10.5281/zenodo.19488056 is a Zenodo deposit with no editorial standard; it cannot independently substantiate the 40\u201370% figure."
+  },
+  "prior_art": {
+   "attack": "Forward-cited records (10.14711/thesis-b1333608, 10.15368/theses.2012.232) and others teach conventional air-cooled BTMS with quantified thermal uniformity metrics using thermocouples \u2014 they establish the baseline state of the art and provide benchmark datasets the killer experiment must beat, but they do not pre-teach the acoustic intervention. The cited mechanism record 10.1097/01.wnr.0000134930.04561.b2 is neuroscience (auditory evoked fields), not fluid dynamics. No retrieved prior-art record anticipates acoustic actuation of airflow in a battery pack enclosure.",
+   "verdict": "HOLDS",
+   "basis": "Search returned no acoustic-cooling-of-batteries patent or paper; the mechanism record is misapplied neuroscience literature, not a teaching reference."
+  },
+  "boundary_conditions": {
+   "attack": "The claim \"fails at extreme temperatures (>60\u00b0C) where acoustic properties change\" is physically wrong. Speed of sound in air varies by ~20% from 0\u00b0C to 100\u00b0C; acoustic impedance changes negligibly. The real failure mode is Li-ion cell degradation above 60\u00b0C, not acoustic media change. This misattribution indicates the authors do not understand which subsystem limits operation, making the entire frequency/operating envelope claim untrustworthy.",
+   "verdict": "WOUND",
+   "basis": "c_air(60\u00b0C) \u2248 365 m/s vs c_air(20\u00b0C) \u2248 343 m/s \u2014 a 6.4% shift, not a failure mode. The stated failure cause is physically incorrect; the true limit is cell chemistry, not acoustics."
+  },
+  "predicted_effect": {
+   "attack": "A 40\u201370% improvement in heat dissipation efficiency is implausible from acoustic streaming alone. Reference air-cooled BTMS with parallel plates already achieve h \u2248 5\u201325 W/m\u00b2K. Doubling this with <1 m/s induced flow is the upper bound reported in acoustic-streaming literature; 40\u201370% would require either phase-change enhancement or active fan power \u2014 neither of which acoustic actuation delivers without a fan. The candidate confuses passive acoustic streaming with active forced convection.",
+   "verdict": "KILL",
+   "basis": "Forced-air BTMS with modest fans (0.5\u20132 W electrical input) achieves h \u2248 15\u201350 W/m\u00b2K; acoustic streaming at sub-W acoustic power cannot exceed the fan baseline by 40\u201370% \u2014 energy conservation forbids it. Carnot-limited efficiency of the acoustic-to-kinetic conversion in air is <10%."
+  },
+  "experiment_design": {
+   "attack": "The killer experiment uses 4 cells with thermocouples measuring temperature distribution \u2014 this is a thermal-uniformity test, not a falsification of the acoustic mechanism. Even if temperature uniformity improves (e.g., due to added acoustic chamber mass acting as thermal ballast), the experiment cannot distinguish acoustic streaming from acoustic-induced structural vibration improving contact conductance, from parasitic fan cooling, or from acoustic chamber thermal mass. There is no control arm isolating the acoustic field from ancillary thermal effects. A kill condition of <10% uniformity improvement is also far too lenient given a claimed 40\u201370% dissipation gain.",
+   "verdict": "KILL",
+   "basis": "Single-arm comparison vs. \"conventional air cooling\" without matched acoustic-power control; no ablation of transducer energization to separate streaming from vibration/mass effects. The kill threshold (<10%) contradicts the claimed effect (40\u201370%) \u2014 even a 3x underperformance would still \"pass.\""
+  },
+  "intervention": {
+   "attack": "The \"Helmholtz-derived Harmonic Insulation Chamber\" is not a standard term in acoustics or thermal engineering. A Helmholtz resonator has a single tuned frequency with narrow Q; using one as an \"insulation chamber\" for broadband airflow enhancement at 100\u20131000 Hz is self-contradictory. GaN-based LRAD transducers are designed for long-range directed sound (kHz range, high SPL), not in-pack enclosed acoustic actuation. Mounting an LRAD device inside a metal battery enclosure creates EMI, vibration coupling to cell tabs (causing mechanical fatigue and micro-fracture), and acoustic resonances that can damage cell jelly-roll structures. No safety qualification pathway (UN 38.3, IEC 62660) addresses acoustic actuators.",
+   "verdict": "KILL",
+   "basis": "Helmholtz resonator Q factor of ~10\u201350 precludes broadband 100\u20131000 Hz operation (Rossing & Fletcher, Principles of Vibration and Sound, Ch. 9). LRAD devices operate 2\u20135 kHz, outside the stated 100\u20131000 Hz operating band, and induce structural vibration incompatible with cell mechanical integrity."
+  },
+  "baseline": {
+   "attack": "The baseline \"traditional air-cooled BTMS with parallel plates\" (from doi:10.3390/en14113096) is itself a passive enhancement showing ~10\u201315% improvement over plain channels. Comparing an active acoustic system to a passive baseline is an unfair and uninformative benchmark \u2014 the candidate must beat state-of-the-art active liquid cooling or active forced-air with fans, which already achieve 5\u201310x the heat transfer coefficient of passive parallel-plate designs.",
+   "verdict": "KILL",
+   "basis": "Liquid-cooled BTMS achieve h \u2248 500\u20132000 W/m\u00b2K (Pesaran et al., NREL reports); the chosen baseline is ~30x weaker than commercial state of the art, inflating the apparent \"improvement.\""
+  }
+ },
+ "kill_surfaces": [
+  "mechanism",
+  "evidence",
+  "predicted_effect",
+  "experiment_design",
+  "intervention",
+  "baseline"
+ ],
+ "wound_surfaces": [
+  "boundary_conditions"
+ ],
+ "final_objection": "KILLED. The single most dangerous surviving objection is that the killer experiment conflates thermal uniformity (a geometric/ballast effect) with acoustic-streaming-driven convection, making the proposed test incapable of falsifying the mechanism even if the underlying physics is wrong \u2014 and the underlying physics IS wrong, as energy-balance constraints and Helmholtz resonator Q-factors independently demonstrate.",
+ "prompt_hash": "3d9246430662f2c6b369a1cdb25dfc746360ccbed113fc6760c4788b461c34ac",
+ "output_hash": "92ab0b509cf14021f57615721e4d086d24c6c693491cb8eae7018283f524cd12",
+ "survived": false,
+ "verdict": "KILLED"
+}

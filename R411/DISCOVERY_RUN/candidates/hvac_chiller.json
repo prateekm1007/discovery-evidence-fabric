@@ -1,0 +1,1729 @@
+{
+ "domain_id": "hvac_chiller",
+ "status": "OK",
+ "transport_failures": 0,
+ "n_calls": 4,
+ "accepted": [
+  {
+   "candidate_id": "C-hvac_chiller-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Solar-Driven Hybrid Absorption Chiller",
+   "target_domain": "energy",
+   "source_domain": "thermal",
+   "domain_id": "hvac_chiller",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Industrial chiller plants suffer from thermal losses during heat rejection processes, reducing overall efficiency and increasing energy consumption.",
+   "causal_chain": [
+    "Solar radiation absorption",
+    "Heat transfer to refrigerant",
+    "Phase change in absorption cycle",
+    "Cooling generation",
+    "Reduced compressor workload"
+   ],
+   "unexploited_phenomenon": "Solar energy conversion to refrigeration through absorption cycles without electricity consumption",
+   "intervention": "Integration of solar collectors with absorption chillers to utilize renewable energy for cooling generation",
+   "governing_variables": "Solar irradiance (W/m\u00b2), collector efficiency (%), coefficient of performance (COP) of absorption chiller",
+   "predicted_effect": "30-50% reduction in electricity consumption for cooling because solar energy replaces compressor work",
+   "equations": [
+    "Q_cooling = COP \u00d7 Q_input",
+    "Q_solar = A \u00d7 I \u00d7 \u03b7_collector",
+    "COP_absorption = Q_cooling / Q_heat_input"
+   ],
+   "boundary_conditions": "Works best in sunny climates with high solar irradiance; efficiency drops at night or during cloudy periods",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-33313-y",
+    "title:8f7d4e77ebe95c08"
+   ],
+   "cross_domain_transition": "Solar thermal energy -> industrial cooling + direct heat utilization eliminates conversion losses",
+   "baseline": {
+    "baseline_incumbent": "Vapor compression chillers with electrically driven compressors",
+    "baseline_metric": "COP of 3-4 for electric chillers (from literature)",
+    "candidate_metric": "COP of 0.6-0.8 for absorption chillers but with 30-50% reduced electricity consumption",
+    "expected_delta": "30-50% reduction in electricity consumption for cooling applications"
+   },
+   "killer_experiment": {
+    "experiment": "Small-scale demonstration plant with solar collectors connected to absorption chiller, comparing energy consumption with and without solar input",
+    "decisive_uncertainty": "Real-world performance coefficient under varying solar conditions",
+    "kill_condition": "If solar contribution is less than 15% of total cooling energy requirement",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Solar intermittency",
+     "detectability": "detectable by energy monitoring",
+     "mitigation": "hybrid backup system"
+    },
+    {
+     "failure_mode": "Refrigerant degradation",
+     "detectability": "detectable by performance monitoring",
+     "mitigation": "regular maintenance"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial facility operators with high cooling demands",
+    "use_case": "Process cooling in manufacturing facilities with available roof space for solar installations",
+    "integration_point": "Parallel integration with existing chiller plant to supplement cooling capacity"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c29a44bc50a9f76f54a7075c20c938db75a50f064d542d0044bd00e9e43e3bf0",
+    "output_hash": "e57664142b3fdc0c2a2ad1c1eb7e2126199905b4d0d798a69925145110310953",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Machine Learning Cooling Tower Optimization",
+   "target_domain": "energy",
+   "source_domain": "data science",
+   "domain_id": "hvac_chiller",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Cooling towers in HVAC systems experience inefficient heat rejection due to suboptimal operation parameters, leading to increased energy consumption.",
+   "causal_chain": [
+    "Sensor data collection",
+    "Machine learning algorithm processing",
+    "Optimal parameter identification",
+    "Automated control adjustments",
+    "Enhanced heat transfer efficiency"
+   ],
+   "unexploited_phenomenon": "Advanced machine learning algorithms can predict and optimize cooling tower performance with greater accuracy than traditional control methods",
+   "intervention": "Implementation of machine learning algorithms (random forest, SVM, decision tree, AdaBoost) for real-time performance forecasting and control optimization",
+   "governing_variables": "Ambient temperature (\u00b0C), wet bulb temperature (\u00b0C), water flow rate (m\u00b3/h), fan speed (rpm), heat load (kW)",
+   "predicted_effect": "15-25% improvement in heat rejection efficiency because ML algorithms optimize multiple variables simultaneously",
+   "equations": [
+    "Q = m \u00d7 Cp \u00d7 \u0394T",
+    "\u03b7 = Q_actual / Q_max",
+    "ML_prediction = f(T_ambient, T_wetbulb, flow_rate, fan_speed)"
+   ],
+   "boundary_conditions": "Requires historical data for training; performance depends on sensor accuracy and data quality",
+   "evidence_refs": [
+    "doi:10.1371/journal.pone.0351944"
+   ],
+   "cross_domain_transition": "Data science algorithms -> thermal system optimization + predictive control enables proactive adjustments",
+   "baseline": {
+    "baseline_incumbent": "Traditional control strategies with fixed setpoints or simple feedback loops",
+    "baseline_metric": "Typical cooling tower efficiency of 60-70% (from literature)",
+    "candidate_metric": "Predicted cooling tower efficiency of 75-85% with ML optimization",
+    "expected_delta": "15-25% improvement in heat rejection efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "Installation of sensors and ML controller on existing cooling tower with A/B testing against current control system",
+    "decisive_uncertainty": "Real-world performance improvement under varying load conditions",
+    "kill_condition": "If improvement in heat rejection efficiency is less than 10%",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Sensor failure",
+     "detectability": "detectable by data validation protocols",
+     "mitigation": "redundant sensors"
+    },
+    {
+     "failure_mode": "Algorithm overfitting",
+     "detectability": "detectable by cross-validation",
+     "mitigation": "regular model retraining"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Facility managers with large HVAC systems",
+    "use_case": "Optimization of existing cooling towers in commercial buildings and industrial facilities",
+    "integration_point": "Between existing control system and cooling tower actuators"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c29a44bc50a9f76f54a7075c20c938db75a50f064d542d0044bd00e9e43e3bf0",
+    "output_hash": "e57664142b3fdc0c2a2ad1c1eb7e2126199905b4d0d798a69925145110310953",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "hvac",
+     "casting",
+     "cooling tower"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Pipe Freeze Crystallization for Thermal Recovery",
+   "target_domain": "industrial",
+   "source_domain": "waste treatment",
+   "domain_id": "hvac_chiller",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Industrial processes lose thermal energy through inefficient heat rejection and waste heat disposal.",
+   "causal_chain": [
+    "Waste heat capture",
+    "Heat exchanger transfer",
+    "Controlled freezing",
+    "Crystallization separation",
+    "Energy recovery"
+   ],
+   "unexploited_phenomenon": "Pipe Freeze Crystallization (PFC) technology can concentrate and recover resources from waste streams while extracting thermal energy",
+   "intervention": "Implementation of PFC technology to treat industrial effluents while recovering thermal energy",
+   "governing_variables": "Freezing temperature (\u00b0C), cooling rate (\u00b0C/h), waste stream concentration (kg/m\u00b3), heat transfer coefficient (W/m\u00b2K)",
+   "predicted_effect": "40-60% reduction in thermal waste because PFC extracts energy while processing waste streams",
+   "equations": [
+    "Q = m \u00d7 Cp \u00d7 \u0394T",
+    "Crystallization efficiency = C_concentrated / C_initial",
+    "Energy recovery = Q_recovered / Q_input"
+   ],
+   "boundary_conditions": "Effective for liquid waste streams with dissolved solids; limited by freezing point depression",
+   "evidence_refs": [
+    "doi:10.1007/s40710-025-00757-3"
+   ],
+   "cross_domain_transition": "Waste treatment technology -> thermal energy recovery + dual benefit of waste processing and energy extraction",
+   "baseline": {
+    "baseline_incumbent": "Traditional cooling towers with no energy recovery from waste streams",
+    "baseline_metric": "Typical waste heat rejection without recovery (100% energy loss)",
+    "candidate_metric": "40-60% energy recovery from waste streams",
+    "expected_delta": "40-60% reduction in thermal energy loss from waste streams"
+   },
+   "killer_experiment": {
+    "experiment": "Small-scale PFC demonstration plant treating industrial effluent with energy recovery measurement",
+    "decisive_uncertainty": "Energy recovery efficiency under different waste stream compositions",
+    "kill_condition": "If energy recovery efficiency is less than 30%",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Pipe clogging",
+     "detectability": "detectable by flow monitoring",
+     "mitigation": "pre-filtration"
+    },
+    {
+     "failure_mode": "Ice formation inconsistency",
+     "detectability": "detectable by temperature mapping",
+     "mitigation": "controlled cooling rate"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial facilities with liquid waste streams and thermal management needs",
+    "use_case": "Treatment of industrial effluents while recovering thermal energy for reuse",
+    "integration_point": "Between process waste streams and cooling systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c29a44bc50a9f76f54a7075c20c938db75a50f064d542d0044bd00e9e43e3bf0",
+    "output_hash": "e57664142b3fdc0c2a2ad1c1eb7e2126199905b4d0d798a69925145110310953",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Multi-Objective System Optimization with Pinch and Exergy Analysis",
+   "target_domain": "energy",
+   "source_domain": "thermodynamics",
+   "domain_id": "hvac_chiller",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Industrial chiller plants operate with suboptimal energy integration, leading to excessive thermal losses and inefficiency.",
+   "causal_chain": [
+    "System modeling",
+    "Pinch analysis identification",
+    "Exergy efficiency calculation",
+    "Multi-objective optimization",
+    "Integrated system design"
+   ],
+   "unexploited_phenomenon": "Combined Pinch and exergy analysis can identify optimal heat integration points and energy recovery opportunities",
+   "intervention": "Implementation of multi-objective optimization system using Pinch and exergy analysis for industrial chiller plants",
+   "governing_variables": "Pinch temperature difference (\u00b0C), exergy destruction rate (kW), heat recovery effectiveness (%), system efficiency (%)",
+   "predicted_effect": "20-35% reduction in thermal losses because optimal heat integration minimizes exergy destruction",
+   "equations": [
+    "Exergy destruction = T_ambient \u00d7 \u0394S",
+    "Heat recovery = Q_hot \u00d7 \u03b5",
+    "Pinch difference = \u0394T_min"
+   ],
+   "boundary_conditions": "Requires detailed system modeling; most effective for complex systems with multiple heat streams",
+   "evidence_refs": [
+    "doi:10.1038/s41598-024-84765-7"
+   ],
+   "cross_domain_transition": "Process optimization techniques -> thermal system design + mathematical optimization enables holistic energy integration",
+   "baseline": {
+    "baseline_incumbent": "Traditional chiller plant design with sequential component optimization",
+    "baseline_metric": "Typical energy efficiency of 50-60% for industrial chiller plants",
+    "candidate_metric": "Predicted energy efficiency of 65-80% with integrated optimization",
+    "expected_delta": "20-35% reduction in thermal losses"
+   },
+   "killer_experiment": {
+    "experiment": "Computer simulation of existing chiller plant with and without optimization analysis",
+    "decisive_uncertainty": "Real-world implementation complexity and cost",
+    "kill_condition": "If implementation cost exceeds 5 years of energy savings",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model inaccuracy",
+     "detectability": "detectable by validation testing",
+     "mitigation": "sensitivity analysis"
+    },
+    {
+     "failure_mode": "Implementation complexity",
+     "detectability": "detectable by pilot study",
+     "mitigation": "phased implementation"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial facility engineers and energy managers",
+    "use_case": "Optimization of existing chiller plants and design of new systems",
+    "integration_point": "System design phase or retrofit planning for existing plants"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c29a44bc50a9f76f54a7075c20c938db75a50f064d542d0044bd00e9e43e3bf0",
+    "output_hash": "e57664142b3fdc0c2a2ad1c1eb7e2126199905b4d0d798a69925145110310953",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Solar Adsorption Cooling with Evacuated Tube Collectors",
+   "target_domain": "energy",
+   "source_domain": "renewable energy",
+   "domain_id": "hvac_chiller",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Commercial buildings in hot climates lose thermal energy through inefficient cooling systems that rely heavily on electricity.",
+   "causal_chain": [
+    "Solar radiation capture",
+    "Heat transfer to adsorbent",
+    "Desorption process",
+    "Refrigerant evaporation",
+    "Cooling generation"
+   ],
+   "unexploited_phenomenon": "Solar adsorption cooling systems using evacuated tube collectors can provide cooling without electricity consumption in hot arid climates",
+   "intervention": "Implementation of solar adsorption cooling systems using Evacuated Tube Collectors (ETCs) for commercial building cooling",
+   "governing_variables": "Solar irradiance (W/m\u00b2), collector area (m\u00b2), COP of adsorption system, ambient temperature (\u00b0C)",
+   "predicted_effect": "40-70% reduction in electricity consumption for cooling because solar energy drives the refrigeration cycle",
+   "equations": [
+    "Q_cooling = COP \u00d7 Q_solar",
+    "COP_adsorption = Q_cooling / Q_input",
+    "\u03b7_collector = Q_collected / (A \u00d7 I)"
+   ],
+   "boundary_conditions": "Most effective in hot, dry climates with high solar irradiance; performance decreases at night",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-33313-y"
+   ],
+   "cross_domain_transition": "Solar thermal technology -> building cooling + direct heat utilization eliminates conversion losses",
+   "baseline": {
+    "baseline_incumbent": "Conventional vapor compression air conditioning systems",
+    "baseline_metric": "Typical COP of 3-4 for electric air conditioning systems",
+    "candidate_metric": "COP of 0.4-0.6 for solar adsorption systems but with 40-70% reduced electricity consumption",
+    "expected_delta": "40-70% reduction in electricity consumption for cooling"
+   },
+   "killer_experiment": {
+    "experiment": "Small-scale demonstration system with ETC collectors connected to adsorption chiller",
+    "decisive_uncertainty": "Real-world performance under varying solar conditions and building loads",
+    "kill_condition": "If solar contribution is less than 30% of total cooling energy requirement",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Adsorbent degradation",
+     "detectability": "detectable by performance monitoring",
+     "mitigation": "periodic replacement"
+    },
+    {
+     "failure_mode": "System intermittency",
+     "detectability": "detectable by energy monitoring",
+     "mitigation": "hybrid backup system"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Commercial building owners in hot climates",
+    "use_case": "Cooling for commercial buildings in hot, dry regions",
+    "integration_point": "Parallel integration with existing HVAC systems to supplement cooling capacity"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c29a44bc50a9f76f54a7075c20c938db75a50f064d542d0044bd00e9e43e3bf0",
+    "output_hash": "e57664142b3fdc0c2a2ad1c1eb7e2126199905b4d0d798a69925145110310953",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Particle Swarm Optimization for Chiller Plant Control",
+   "target_domain": "energy",
+   "source_domain": "control systems",
+   "domain_id": "hvac_chiller",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Multi-chiller plants operate inefficiently due to suboptimal control strategies that fail to account for varying load conditions.",
+   "causal_chain": [
+    "Load monitoring",
+    "PSO algorithm processing",
+    "Optimal chiller sequencing",
+    "Variable speed adjustment",
+    "Energy efficiency improvement"
+   ],
+   "unexploited_phenomenon": "Particle Swarm Optimization algorithms can dynamically optimize chiller plant operation by considering multiple variables simultaneously",
+   "intervention": "Implementation of PSO algorithm for control operation of all-variable speed water-cooled chiller plants",
+   "governing_variables": "Building load (kW), chiller efficiency (COP), condenser temperature (\u00b0C), chilled water temperature (\u00b0C)",
+   "predicted_effect": "15-25% reduction in energy consumption because PSO optimizes chiller sequencing and speed based on real-time conditions",
+   "equations": [
+    "Total energy = \u03a3(P_i \u00d7 t_i)",
+    "COP_i = Q_cooling_i / P_i",
+    "PSO solution = f(load, COP, T_condenser, T_chilled)"
+   ],
+   "boundary_conditions": "Requires accurate load prediction; most effective for plants with multiple chillers of different capacities",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2017.11.037"
+   ],
+   "cross_domain_transition": "Swarm intelligence algorithms -> thermal system control + adaptive optimization enables dynamic efficiency",
+   "baseline": {
+    "baseline_incumbent": "Traditional control strategies with fixed setpoints or simple sequencing",
+    "baseline_metric": "Typical energy efficiency of 0.6-0.7 kW/ton for conventional chiller control",
+    "candidate_metric": "Predicted energy efficiency of 0.45-0.55 kW/ton with PSO optimization",
+    "expected_delta": "15-25% reduction in energy consumption"
+   },
+   "killer_experiment": {
+    "experiment": "Implementation of PSO controller on existing chiller plant with A/B testing against current control system",
+    "decisive_uncertainty": "Real-world performance improvement under varying load conditions",
+    "kill_condition": "If energy consumption reduction is less than 10%",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Control instability",
+     "detectability": "detectable by performance monitoring",
+     "mitigation": "safety interlocks"
+    },
+    {
+     "failure_mode": "Algorithm convergence issues",
+     "detectability": "detectable by performance tracking",
+     "mitigation": "parameter tuning"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Facility managers with multi-chiller plants",
+    "use_case": "Optimization of existing chiller plant operations in commercial buildings",
+    "integration_point": "Between building management system and chiller plant controls"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c29a44bc50a9f76f54a7075c20c938db75a50f064d542d0044bd00e9e43e3bf0",
+    "output_hash": "e57664142b3fdc0c2a2ad1c1eb7e2126199905b4d0d798a69925145110310953",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Deep Learning Predictive Model for Absorption Chiller Control",
+   "target_domain": "energy",
+   "source_domain": "artificial intelligence",
+   "domain_id": "hvac_chiller",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Absorption chiller plants operate inefficiently due to inability to predict and respond to changing load conditions accurately.",
+   "causal_chain": [
+    "Data collection",
+    "Deep learning model training",
+    "Load prediction",
+    "Optimal control parameter identification",
+    "Enhanced performance"
+   ],
+   "unexploited_phenomenon": "Deep learning predictive models can forecast cooling demand with greater accuracy than traditional methods, enabling proactive control adjustments",
+   "intervention": "Implementation of deep learning predictive model for global optimization control of absorption chiller plants",
+   "governing_variables": "Historical load data (kW), weather conditions (\u00b0C), humidity (%), chiller efficiency (COP), heat source temperature (\u00b0C)",
+   "predicted_effect": "20-30% improvement in thermal efficiency because predictive control enables optimal operation before demand changes",
+   "equations": [
+    "Load_prediction = f(historical_load, weather, time)",
+    "COP = Q_cooling / Q_heat",
+    "Efficiency = actual_output / theoretical_max"
+   ],
+   "boundary_conditions": "Requires large datasets for training; performance depends on data quality and system complexity",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2026.132998"
+   ],
+   "cross_domain_transition": "Predictive AI models -> thermal system control + anticipatory operation enables proactive efficiency improvements",
+   "baseline": {
+    "baseline_incumbent": "Traditional control strategies with reactive adjustments to current conditions",
+    "baseline_metric": "Typical thermal efficiency of 60-70% for absorption chiller plants",
+    "candidate_metric": "Predicted thermal efficiency of 75-85% with deep learning optimization",
+    "expected_delta": "20-30% improvement in thermal efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "Implementation of deep learning controller on existing absorption chiller plant with A/B testing",
+    "decisive_uncertainty": "Real-world performance improvement under varying load conditions",
+    "kill_condition": "If thermal efficiency improvement is less than 15%",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model overfitting",
+     "detectability": "detectable by cross-validation",
+     "mitigation": "regular model retraining"
+    },
+    {
+     "failure_mode": "Data drift",
+     "detectability": "detectable by performance monitoring",
+     "mitigation": "continuous data collection"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial facility operators with absorption chiller systems",
+    "use_case": "Optimization of absorption chiller plants in industrial and commercial applications",
+    "integration_point": "Between control system and absorption chiller actuators"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c29a44bc50a9f76f54a7075c20c938db75a50f064d542d0044bd00e9e43e3bf0",
+    "output_hash": "e57664142b3fdc0c2a2ad1c1eb7e2126199905b4d0d798a69925145110310953",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "ML-Optimized Cooling Tower Performance",
+   "target_domain": "industrial",
+   "source_domain": "energy",
+   "domain_id": "hvac_chiller",
+   "pain_class": "MAINTENANCE_BURDEN",
+   "problem": "Industrial cooling systems suffer from unpredictable performance degradation leading to increased maintenance burden and downtime",
+   "causal_chain": [
+    "Unmonitored cooling tower fouling",
+    "reduced heat transfer efficiency",
+    "increased energy consumption",
+    "premature component failure",
+    "maintenance burden"
+   ],
+   "unexploited_phenomenon": "Machine learning algorithms can predict cooling tower performance degradation before failure occurs (RECORD_ID: doi:10.1371/journal.pone.0351944)",
+   "intervention": "Implementation of real-time performance monitoring with random forest, SVM, decision tree, and AdaBoost algorithms to predict maintenance needs",
+   "governing_variables": "Heat transfer coefficient (W/m\u00b2\u00b7K), water flow rate (m\u00b3/s), air flow rate (m\u00b3/s), approach temperature difference (\u00b0C)",
+   "predicted_effect": "30-50% reduction in unscheduled maintenance events because predictive algorithms identify degradation patterns 2-4 weeks before failure",
+   "equations": [
+    "NTU = Q/(U\u00b7A\u00b7\u0394T_lm), where NTU is number of transfer units, U is overall heat transfer coefficient (W/m\u00b2\u00b7K), A is heat transfer area (m\u00b2), \u0394T_lm is log mean temperature difference (\u00b0C)"
+   ],
+   "boundary_conditions": "Holds for standard cooling tower configurations; fails for highly customized or non-standard cooling systems with insufficient historical data",
+   "evidence_refs": [
+    "doi:10.1371/journal.pone.0351944"
+   ],
+   "cross_domain_transition": "Industrial process optimization -> HVAC systems, transferring predictive maintenance algorithms from industrial equipment to building HVAC systems",
+   "baseline": {
+    "baseline_incumbent": "Reactive maintenance schedule based on fixed time intervals or manual inspections",
+    "baseline_metric": "Average 2-3 unplanned cooling tower failures per year with 48-72 hour downtime per event",
+    "candidate_metric": "0.5-1 unplanned cooling tower failures per year with 12-24 hour downtime per event",
+    "expected_delta": "60-75% reduction in unplanned downtime events"
+   },
+   "killer_experiment": {
+    "experiment": "Installation of IoT sensors on cooling tower with ML monitoring system vs. control group with standard monitoring, comparing prediction accuracy and maintenance scheduling over 6 months",
+    "decisive_uncertainty": "Whether ML algorithms can accurately predict cooling tower performance degradation with sufficient lead time to prevent failures",
+    "kill_condition": "ML system fails to predict cooling tower failures with at least 7 days lead time",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Sensor failure",
+     "detectability": "detectable through automated validation checks",
+     "mitigation": "redundant sensor network"
+    },
+    {
+     "failure_mode": "Algorithm drift",
+     "detectability": "detectable through performance monitoring",
+     "mitigation": "quarterly retraining with new data"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Facility manager for industrial plants",
+    "use_case": "Maintaining cooling tower performance while reducing maintenance costs and unplanned downtime",
+    "integration_point": "Cooling tower control system with predictive maintenance alerts"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "460aeae20392694ee958cf8ef036e110060ad64dbc855ac623cf1104aeedc521",
+    "output_hash": "7ef24b64fa1c27e5b246731b915f53474c17a87b7f083c8d16dd913cd7050b6e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "cooling tower"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MAINTENANCE_BURDEN"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Solar-Driven Hybrid Absorption Chiller",
+   "target_domain": "energy",
+   "source_domain": "renewable energy",
+   "domain_id": "hvac_chiller",
+   "pain_class": "MAINTENANCE_BURDEN",
+   "problem": "Conventional vapor compression chillers require frequent maintenance due to complex mechanical components and refrigerant leaks",
+   "causal_chain": [
+    "Solar energy input",
+    "thermal energy conversion",
+    "absorption refrigeration cycle",
+    "reduced mechanical complexity",
+    "lower maintenance requirements"
+   ],
+   "unexploited_phenomenon": "Solar absorption chillers can utilize low-grade heat sources and have fewer moving parts than compression systems (RECORD_ID: title:8f7d4e77ebe95c08)",
+   "intervention": "Integration of solar collectors with absorption chiller system using water as refrigerant, eliminating compressor and reducing refrigerant leaks",
+   "governing_variables": "Solar irradiation (W/m\u00b2), collector efficiency, COP (coefficient of performance), heat source temperature (\u00b0C)",
+   "predicted_effect": "40-60% reduction in maintenance events because absorption systems have 60-80% fewer moving parts than compression systems",
+   "equations": [
+    "COP = Q_cooling / Q_input, where Q_cooling is cooling effect (W), Q_input is heat input (W)"
+   ],
+   "boundary_conditions": "Effective in regions with high solar irradiation; less efficient in cloudy climates or with insufficient heat source",
+   "evidence_refs": [
+    "title:8f7d4e77ebe95c08",
+    "doi:10.1038/s41598-025-33313-y"
+   ],
+   "cross_domain_transition": "Solar thermal energy conversion -> building cooling systems, transferring renewable energy harvesting to HVAC applications",
+   "baseline": {
+    "baseline_incumbent": "Traditional vapor compression chillers with mechanical compressors and refrigerants",
+    "baseline_metric": "2-4 maintenance interventions per year with 4-8 hours downtime per intervention",
+    "candidate_metric": "1-2 maintenance interventions per year with 2-4 hours downtime per intervention",
+    "expected_delta": "50-70% reduction in maintenance frequency and downtime"
+   },
+   "killer_experiment": {
+    "experiment": "Side-by-side comparison of absorption chiller vs. compression chiller in identical operating conditions, measuring maintenance requirements over 12 months",
+    "decisive_uncertainty": "Whether the absorption system can maintain equivalent cooling capacity while reducing maintenance needs",
+    "kill_condition": "Absorption system requires more frequent maintenance than compression system or fails to achieve equivalent cooling performance",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Degradation of solar collectors",
+     "detectability": "detectable through efficiency monitoring",
+     "mitigation": "regular cleaning and protective coatings"
+    },
+    {
+     "failure_mode": "Refrigerant absorption issues",
+     "detectability": "detectable through temperature monitoring",
+     "mitigation": "improved heat exchanger design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Building facility managers in sunny climates",
+    "use_case": "Reducing maintenance costs while providing cooling for commercial buildings",
+    "integration_point": "Building HVAC system as primary cooling source with backup compression system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "460aeae20392694ee958cf8ef036e110060ad64dbc855ac623cf1104aeedc521",
+    "output_hash": "7ef24b64fa1c27e5b246731b915f53474c17a87b7f083c8d16dd913cd7050b6e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "compressor",
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MAINTENANCE_BURDEN"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Pinch-Exergy Integrated Optimization",
+   "target_domain": "industrial",
+   "source_domain": "energy systems",
+   "domain_id": "hvac_chiller",
+   "pain_class": "MAINTENANCE_BURDEN",
+   "problem": "Multi-chiller plants experience inefficient operation leading to unnecessary wear and tear on components",
+   "causal_chain": [
+    "Suboptimal chiller loading",
+    "increased energy consumption",
+    "accelerated component degradation",
+    "premature maintenance requirements"
+   ],
+   "unexploited_phenomenon": "Integrated Pinch and exergy analysis can optimize multi-chiller plant operation to minimize energy consumption and component stress (RECORD_ID: doi:10.1038/s41598-024-84765-7)",
+   "intervention": "Implementation of optimization algorithms that balance chiller loading based on real-time exergy analysis",
+   "governing_variables": "Exergy destruction rate (W), chiller loading (%), temperature difference (\u00b0C), energy consumption (kWh)",
+   "predicted_effect": "25-40% reduction in maintenance requirements because optimized operation reduces component stress by 30-50%",
+   "equations": [
+    "Exergy destruction = T_0 \u00b7 \u0394S, where T_0 is dead state temperature (K), \u0394S is entropy generation rate (W/K)"
+   ],
+   "boundary_conditions": "Effective for multi-chiller plants with varying load profiles; less beneficial for single-chiller systems",
+   "evidence_refs": [
+    "doi:10.1038/s41598-024-84765-7"
+   ],
+   "cross_domain_transition": "Industrial process optimization -> HVAC systems, transferring energy optimization techniques from industrial processes to building cooling systems",
+   "baseline": {
+    "baseline_incumbent": "Fixed or simple rule-based chiller loading strategies",
+    "baseline_metric": "3-5 maintenance interventions per year with 6-12 hours downtime per intervention",
+    "candidate_metric": "2-3 maintenance interventions per year with 3-6 hours downtime per intervention",
+    "expected_delta": "30-50% reduction in maintenance frequency and downtime duration"
+   },
+   "killer_experiment": {
+    "experiment": "Implementation of optimization algorithm on existing chiller plant with historical data comparison vs. current operation over 6 months",
+    "decisive_uncertainty": "Whether the optimization algorithm can consistently reduce component stress while maintaining cooling requirements",
+    "kill_condition": "Optimization algorithm fails to reduce component stress or increases energy consumption compared to current operation",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Algorithm convergence issues",
+     "detectability": "detectable through monitoring of control variables",
+     "mitigation": "robust algorithm design with fallback modes"
+    },
+    {
+     "failure_mode": "Sensor inaccuracy",
+     "detectability": "detectable through validation checks",
+     "mitigation": "redundant sensor network"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial facility engineers",
+    "use_case": "Optimizing multi-chiller plant operation to extend equipment life and reduce maintenance costs",
+    "integration_point": "Building automation system controlling chiller plant operation"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "460aeae20392694ee958cf8ef036e110060ad64dbc855ac623cf1104aeedc521",
+    "output_hash": "7ef24b64fa1c27e5b246731b915f53474c17a87b7f083c8d16dd913cd7050b6e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MAINTENANCE_BURDEN"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Pipe Freeze Crystallization for Leachate Treatment",
+   "target_domain": "environmental",
+   "source_domain": "waste treatment",
+   "domain_id": "hvac_chiller",
+   "pain_class": "MAINTENANCE_BURDEN",
+   "problem": "Industrial refrigeration systems in waste treatment facilities suffer from corrosion and scaling due to contaminated water",
+   "causal_chain": [
+    "Contaminated water circulation",
+    "scaling and corrosion",
+    "reduced efficiency",
+    "increased maintenance requirements"
+   ],
+   "unexploited_phenomenon": "Pipe Freeze Crystallization (PFC) technology can concentrate and solidify contaminants before they cause scaling (RECORD_ID: doi:10.1007/s40710-025-00757-3)",
+   "intervention": "Integration of PFC technology into industrial refrigeration systems to pre-treat water and prevent scaling",
+   "governing_variables": "Freezing point depression (\u00b0C), crystallization rate (kg/s), contaminant concentration (mg/L)",
+   "predicted_effect": "60-80% reduction in maintenance events because PFC removes 90-95% of scaling contaminants before circulation",
+   "equations": [
+    "\u0394T_f = K_f \u00b7 m, where \u0394T_f is freezing point depression (\u00b0C), K_f is cryoscopic constant (\u00b0C\u00b7kg/mol), m is molality (mol/kg)"
+   ],
+   "boundary_conditions": "Effective for systems with high contaminant loads; less beneficial for clean water systems",
+   "evidence_refs": [
+    "doi:10.1007/s40710-025-00757-3"
+   ],
+   "cross_domain_transition": "Waste treatment technology -> industrial refrigeration, transferring contaminant removal techniques to prevent scaling in cooling systems",
+   "baseline": {
+    "baseline_incumbent": "Chemical water treatment with regular system flushes and descaling",
+    "baseline_metric": "4-6 maintenance interventions per year with 8-16 hours downtime per intervention",
+    "candidate_metric": "1-2 maintenance interventions per year with 2-4 hours downtime per intervention",
+    "expected_delta": "70-85% reduction in maintenance frequency and downtime"
+   },
+   "killer_experiment": {
+    "experiment": "Small-scale demonstration plant comparing PFC-treated water vs. conventional treatment in refrigeration system over 3 months",
+    "decisive_uncertainty": "Whether PFC can effectively remove contaminants without introducing new maintenance challenges",
+    "kill_condition": "PFC system requires more maintenance than conventional treatment or fails to prevent scaling",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Ice formation in pipes",
+     "detectability": "detectable through temperature monitoring",
+     "mitigation": "improved flow dynamics and heating elements"
+    },
+    {
+     "failure_mode": "Contaminant breakthrough",
+     "detectability": "detectable through water quality monitoring",
+     "mitigation": "multi-stage filtration"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Environmental facility managers",
+    "use_case": "Reducing maintenance costs in refrigeration systems treating contaminated water",
+    "integration_point": "Water treatment system for industrial refrigeration plants"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "460aeae20392694ee958cf8ef036e110060ad64dbc855ac623cf1104aeedc521",
+    "output_hash": "7ef24b64fa1c27e5b246731b915f53474c17a87b7f083c8d16dd913cd7050b6e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "refrigerat"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MAINTENANCE_BURDEN"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Deep Learning Predictive Control for Absorption Chillers",
+   "target_domain": "energy",
+   "source_domain": "control systems",
+   "domain_id": "hvac_chiller",
+   "pain_class": "MAINTENANCE_BURDEN",
+   "problem": "Absorption chiller systems operate inefficiently due to inability to adapt to changing conditions, leading to component stress",
+   "causal_chain": [
+    "Fixed control parameters",
+    "inefficient operation under varying loads",
+    "increased thermal stress",
+    "premature component failure"
+   ],
+   "unexploited_phenomenon": "Deep learning predictive models can optimize absorption chiller operation in real-time (RECORD_ID: doi:10.1016/j.applthermaleng.2026.132998)",
+   "intervention": "Implementation of deep learning predictive control system that continuously optimizes absorption chiller operation based on load conditions",
+   "governing_variables": "Thermal load variation (%), COP (coefficient of performance), heat source temperature (\u00b0C), cooling demand (kW)",
+   "predicted_effect": "35-55% reduction in maintenance requirements because optimized operation reduces thermal stress by 40-60%",
+   "equations": [
+    "COP = Q_cooling / Q_input, where Q_cooling is cooling effect (W), Q_input is heat input (W)"
+   ],
+   "boundary_conditions": "Effective for systems with variable loads; less beneficial for constant load applications",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2026.132998"
+   ],
+   "cross_domain_transition": "Predictive control algorithms -> HVAC systems, transferring adaptive control techniques from industrial processes to building cooling systems",
+   "baseline": {
+    "baseline_incumbent": "Fixed-parameter control systems for absorption chillers",
+    "baseline_metric": "2-3 maintenance interventions per year with 6-12 hours downtime per intervention",
+    "candidate_metric": "1-1.5 maintenance interventions per year with 3-6 hours downtime per intervention",
+    "expected_delta": "40-60% reduction in maintenance frequency and downtime"
+   },
+   "killer_experiment": {
+    "experiment": "Implementation of deep learning control system on existing absorption chiller with comparison to current operation over 6 months",
+    "decisive_uncertainty": "Whether the deep learning system can accurately predict optimal operating conditions and adapt to changing loads",
+    "kill_condition": "Deep learning system fails to improve efficiency or increases maintenance requirements compared to current operation",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model overfitting",
+     "detectability": "detectable through performance validation",
+     "mitigation": "regularization techniques and cross-validation"
+    },
+    {
+     "failure_mode": "Sensor drift",
+     "detectability": "detectable through automated validation checks",
+     "mitigation": "redundant sensor network"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Facility managers with absorption chiller systems",
+    "use_case": "Reducing maintenance costs while optimizing energy efficiency in absorption cooling systems",
+    "integration_point": "Building automation system controlling absorption chiller operation"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "460aeae20392694ee958cf8ef036e110060ad64dbc855ac623cf1104aeedc521",
+    "output_hash": "7ef24b64fa1c27e5b246731b915f53474c17a87b7f083c8d16dd913cd7050b6e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MAINTENANCE_BURDEN"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Enhanced Heat Transfer in Adsorption Beds",
+   "target_domain": "industrial",
+   "source_domain": "materials science",
+   "domain_id": "hvac_chiller",
+   "pain_class": "MAINTENANCE_BURDEN",
+   "problem": "Adsorption chillers suffer from reduced efficiency due to poor heat transfer in adsorbent beds, leading to more frequent maintenance",
+   "causal_chain": [
+    "Poor heat transfer in adsorbent beds",
+    "reduced efficiency",
+    "increased runtime to achieve cooling",
+    "accelerated component degradation"
+   ],
+   "unexploited_phenomenon": "Metal additives in finned-tube adsorbent beds can enhance heat transfer and improve system efficiency (RECORD_ID: doi:10.1016/j.applthermaleng.2012.04.008)",
+   "intervention": "Integration of finned-tube adsorbent beds with metal additives to improve heat transfer efficiency",
+   "governing_variables": "Heat transfer coefficient (W/m\u00b2\u00b7K), contact resistance (K/W), metal additive concentration (%)",
+   "predicted_effect": "30-50% reduction in maintenance events because improved heat transfer reduces runtime by 25-40%",
+   "equations": [
+    "Q = U\u00b7A\u00b7\u0394T, where Q is heat transfer rate (W), U is heat transfer coefficient (W/m\u00b2\u00b7K), A is area (m\u00b2), \u0394T is temperature difference (K)"
+   ],
+   "boundary_conditions": "Effective for silica gel/water adsorption systems; may require adaptation for other adsorbent/refrigerant pairs",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2012.04.008"
+   ],
+   "cross_domain_transition": "Enhanced heat transfer materials -> adsorption cooling, transferring material science improvements to HVAC applications",
+   "baseline": {
+    "baseline_incumbent": "Granular packed adsorbent beds without enhanced heat transfer",
+    "baseline_metric": "3-4 maintenance interventions per year with 6-12 hours downtime per intervention",
+    "candidate_metric": "1.5-2 maintenance interventions per year with 3-6 hours downtime per intervention",
+    "expected_delta": "40-60% reduction in maintenance frequency and downtime"
+   },
+   "killer_experiment": {
+    "experiment": "Laboratory testing of enhanced adsorbent beds vs. conventional beds under simulated operating conditions over 3 months",
+    "decisive_uncertainty": "Whether the enhanced heat transfer translates to improved system efficiency and reduced maintenance requirements",
+    "kill_condition": "Enhanced beds fail to improve efficiency or introduce new maintenance challenges",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Metal additive degradation",
+     "detectability": "detectable through efficiency monitoring",
+     "mitigation": "protective coatings"
+    },
+    {
+     "failure_mode": "Adsorbent bed fouling",
+     "detectability": "detectable through temperature monitoring",
+     "mitigation": "improved filtration"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial refrigeration system operators",
+    "use_case": "Reducing maintenance costs while improving energy efficiency in adsorption chillers",
+    "integration_point": "Adsorption chiller heat exchanger system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "460aeae20392694ee958cf8ef036e110060ad64dbc855ac623cf1104aeedc521",
+    "output_hash": "7ef24b64fa1c27e5b246731b915f53474c17a87b7f083c8d16dd913cd7050b6e",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "MAINTENANCE_BURDEN"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Solar-Wind Hybrid Absorption Cooling",
+   "target_domain": "energy",
+   "source_domain": "renewable energy systems",
+   "domain_id": "hvac_chiller",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Industrial chiller plants face high operational costs due to expensive control systems and energy consumption.",
+   "causal_chain": [
+    "Solar and wind energy generation",
+    "Kalina cycle integration",
+    "Absorption refrigeration cycle",
+    "Industrial air conditioning",
+    "Reduced electricity demand from grid"
+   ],
+   "unexploited_phenomenon": "Integration of renewable energy sources with thermodynamic cycles to drive absorption refrigeration without grid electricity",
+   "intervention": "Hybrid solar-wind power system integrated with Kalina cycle to drive absorption refrigeration for industrial cooling",
+   "governing_variables": "Solar irradiance (W/m\u00b2), wind velocity (m/s), Kalina cycle efficiency, absorption COP",
+   "predicted_effect": "40-70% reduction in electricity consumption for cooling because renewable energy replaces grid power",
+   "equations": [
+    "COP_absorption = Q_evaporator / (Q_generator + W_pump), where Q_evaporator is cooling effect, Q_generator is heat input, W_pump is work input"
+   ],
+   "boundary_conditions": "Effective in regions with moderate to high solar irradiance and consistent wind patterns; less effective in areas with low renewable resources",
+   "evidence_refs": [
+    "doi:10.1038/s41598-024-84765-7"
+   ],
+   "cross_domain_transition": "renewable energy systems -> industrial cooling + direct substitution of grid electricity with free renewable energy sources",
+   "baseline": {
+    "baseline_incumbent": "Conventional vapor compression chiller systems with electrically driven compressors",
+    "baseline_metric": "Typical COP of 3-4 for electric chillers",
+    "candidate_metric": "Predicted COP of 0.7-1.0 for absorption cycle but with zero electricity cost for cooling",
+    "expected_delta": "40-70% reduction in electricity consumption for cooling"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale demonstration unit with solar simulator and wind tunnel, comparing energy consumption between conventional and hybrid systems",
+    "decisive_uncertainty": "Real-world performance under varying weather conditions",
+    "kill_condition": "If hybrid system cannot achieve at least 30% electricity savings compared to conventional system",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Intermittent renewable supply",
+     "detectability": "detectable with energy monitoring",
+     "mitigation": "mitigation with thermal storage"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial facility energy managers",
+    "use_case": "Reducing operational costs of industrial cooling systems",
+    "integration_point": "Primary cooling system for industrial processes"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "f7c14ce0dee29d6116839758203dddcf87d3abc05d78fe3b6c9e71607f09b5e4",
+    "output_hash": "d11fc143d59e481059ace235abbccc8b8ff0d745665fe234ebc766fa1b3aed5a",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "refrigerat",
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Pinch-Exergy Integrated Solar-Wind Refrigeration",
+   "target_domain": "energy",
+   "source_domain": "industrial",
+   "domain_id": "hvac_chiller",
+   "pain_class": "efficiency",
+   "problem": "Inefficient energy utilization in industrial refrigeration systems due to lack of integrated system optimization.",
+   "causal_chain": [
+    "Solar and wind energy capture",
+    "Kalina cycle conversion",
+    "Absorption refrigeration cycle",
+    "Compression refrigeration cycle",
+    "Industrial cooling"
+   ],
+   "unexploited_phenomenon": "Thermodynamic integration of renewable energy sources with absorption refrigeration cycles using pinch analysis and exergy optimization.",
+   "intervention": "Multipurpose system integrating solar power plant with coastal wind farm to generate refrigeration for industrial processes.",
+   "governing_variables": "Exergy efficiency (\u03b7_ex), temperature difference (\u0394T), energy input (E_in)",
+   "predicted_effect": "30-50% improvement in energy utilization efficiency because exergy analysis identifies maximum work potential and pinch analysis minimizes thermodynamic losses.",
+   "equations": [
+    "\u03b7_ex = (Exergy output)/(Exergy input), \u0394T_min = minimum temperature difference in heat exchanger network"
+   ],
+   "boundary_conditions": "Effective in industrial settings with consistent renewable energy sources; limited in locations with inconsistent solar/wind availability.",
+   "evidence_refs": [
+    "doi:10.1038/s41598-024-84765-7"
+   ],
+   "cross_domain_transition": "industrial refrigeration -> energy production + transferring optimization techniques from industrial processes to renewable energy systems creates value by maximizing clean energy utilization.",
+   "baseline": {
+    "baseline_incumbent": "Conventional vapor compression refrigeration systems",
+    "baseline_metric": "Standard COP of 3-4 for vapor compression systems",
+    "candidate_metric": "Integrated system COP of 4.5-6.0",
+    "expected_delta": "25-50% improvement in coefficient of performance"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale prototype with solar simulator and wind turbine simulator, measuring energy input and cooling output",
+    "decisive_uncertainty": "The actual exergy efficiency improvement achievable in integrated system",
+    "kill_condition": "Less than 15% improvement in COP compared to conventional system",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Intermittent renewable supply",
+     "detectability": "detectable via monitoring energy input fluctuations",
+     "mitigation": "mitigation via hybrid energy storage system, Heat transfer degradation"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial facility energy managers",
+    "use_case": "Providing cooling for refinery processes and industrial air conditioning using renewable energy",
+    "integration_point": "Between renewable energy generation and industrial refrigeration systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d1a6b5df91780e849dfab4ca4e0503429065aaa763bce61e3743222c605801c4",
+    "output_hash": "74e6bea8f0e317b7da32c58c12150a3252b60bdac05547a50408457ad251630c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "power plant",
+     "refrigerat"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Machine Learning Cooling Tower Optimization",
+   "target_domain": "industrial",
+   "source_domain": "data science",
+   "domain_id": "hvac_chiller",
+   "pain_class": "performance",
+   "problem": "Poor performance prediction and optimization of cooling towers in industrial thermal systems.",
+   "causal_chain": [
+    "Operational data collection",
+    "Machine learning algorithm training",
+    "Performance forecasting",
+    "Control optimization",
+    "Enhanced heat rejection"
+   ],
+   "unexploited_phenomenon": "Advanced machine learning algorithms (random forest, SVM, decision tree, AdaBoost) for cooling tower performance forecasting.",
+   "intervention": "Implementation of machine learning algorithms for real-time performance monitoring and optimization of cooling towers.",
+   "governing_variables": "Ambient temperature (T_amb), wet bulb temperature (T_wb), water flow rate (m_dot), fan power (P_fan)",
+   "predicted_effect": "20-40% improvement in cooling tower efficiency because ML algorithms can optimize control parameters based on multiple variables simultaneously.",
+   "equations": [
+    "Cooling efficiency = (T_in - T_out)/(T_in - T_wb), Energy consumption = P_fan \u00d7 time"
+   ],
+   "boundary_conditions": "Effective in industrial settings with consistent data collection; limited in systems with highly variable operating conditions.",
+   "evidence_refs": [
+    "doi:10.1371/journal.pone.0351944"
+   ],
+   "cross_domain_transition": "data science -> industrial cooling + transferring predictive modeling techniques from data analysis to thermal system optimization creates value by reducing energy consumption while maintaining performance.",
+   "baseline": {
+    "baseline_incumbent": "Traditional control methods based on fixed setpoints",
+    "baseline_metric": "Typical cooling tower approach temperature of 5-10\u00b0C",
+    "candidate_metric": "Optimized approach temperature of 3-6\u00b0C",
+    "expected_delta": "30-50% reduction in approach temperature"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale cooling tower testbed with sensors and ML controller, comparing performance against traditional control",
+    "decisive_uncertainty": "The actual improvement in cooling efficiency achievable with ML optimization",
+    "kill_condition": "Less than 10% improvement in cooling efficiency compared to traditional control",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Algorithm overfitting",
+     "detectability": "detectable via validation testing",
+     "mitigation": "mitigation via cross-validation and regularization, Sensor failure"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial plant operations managers",
+    "use_case": "Optimizing cooling tower performance in industrial thermal systems to reduce energy consumption",
+    "integration_point": "Between cooling tower control system and plant energy management system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d1a6b5df91780e849dfab4ca4e0503429065aaa763bce61e3743222c605801c4",
+    "output_hash": "74e6bea8f0e317b7da32c58c12150a3252b60bdac05547a50408457ad251630c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "cooling tower"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Pipe Freeze Crystallization Leachate Treatment",
+   "target_domain": "environmental",
+   "source_domain": "refrigeration",
+   "domain_id": "hvac_chiller",
+   "pain_class": "waste management",
+   "problem": "Expensive and inefficient treatment of hazardous landfill leachate.",
+   "causal_chain": [
+    "Leachate collection",
+    "Pipe freeze crystallization",
+    "Solid-liquid separation",
+    "Resource recovery",
+    "Environmental compliance"
+   ],
+   "unexploited_phenomenon": "Pipe Freeze Crystallization (PFC) technology for concentrating and solidifying industrial effluents.",
+   "intervention": "Implementation of PFC technology for treating hazardous landfill leachate.",
+   "governing_variables": "Freezing temperature (T_freeze), cooling rate (dT/dt), flow rate (Q), concentration factor (CF)",
+   "predicted_effect": "60-80% reduction in treatment costs because PFC technology requires less energy than thermal evaporation methods.",
+   "equations": [
+    "Energy consumption = m \u00d7 Cp \u00d7 \u0394T, Concentration factor = C_out/C_in"
+   ],
+   "boundary_conditions": "Effective for high-volume leachate treatment; limited for highly variable or complex waste streams.",
+   "evidence_refs": [
+    "doi:10.1007/s40710-025-00757-3"
+   ],
+   "cross_domain_transition": "refrigeration -> environmental treatment + transferring freeze concentration techniques from food processing to waste treatment creates value by enabling resource recovery from hazardous waste.",
+   "baseline": {
+    "baseline_incumbent": "Traditional evaporation and chemical treatment methods",
+    "baseline_metric": "Typical treatment cost of $50-100 per cubic meter",
+    "candidate_metric": "Reduced treatment cost of $20-40 per cubic meter",
+    "expected_delta": "50-70% reduction in treatment costs"
+   },
+   "killer_experiment": {
+    "experiment": "Pilot-scale PFC demonstration plant treating actual leachate",
+    "decisive_uncertainty": "The actual concentration factor achievable with PFC technology",
+    "kill_condition": "Concentration factor less than 5:1 or energy consumption higher than evaporation methods",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Ice formation blockage",
+     "detectability": "detectable via pressure monitoring",
+     "mitigation": "mitigation via flow control systems, Incomplete separation"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Waste treatment facility operators",
+    "use_case": "Treating hazardous landfill leachate while recovering valuable resources",
+    "integration_point": "Between leachate collection system and final disposal/treatment processes"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d1a6b5df91780e849dfab4ca4e0503429065aaa763bce61e3743222c605801c4",
+    "output_hash": "74e6bea8f0e317b7da32c58c12150a3252b60bdac05547a50408457ad251630c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Multi-Chiller Plant Three-Zone Optimization",
+   "target_domain": "data-center",
+   "source_domain": "HVAC",
+   "domain_id": "hvac_chiller",
+   "pain_class": "efficiency",
+   "problem": "Inefficient operation of multiple chiller plants due to lack of sophisticated control strategies.",
+   "causal_chain": [
+    "Load profiling",
+    "Three-zone system simulation",
+    "Dynamic control",
+    "Optimal chiller loading",
+    "Energy efficiency"
+   ],
+   "unexploited_phenomenon": "Three-zone system simulation model for optimizing multiple-chiller plant operation.",
+   "intervention": "Implementation of three-zone system simulation model for dynamic control of multiple-chiller plants.",
+   "governing_variables": "Building load profile, chiller efficiency curve, ambient conditions, return water temperature",
+   "predicted_effect": "15-25% energy savings because the three-zone model optimizes chiller loading based on actual load conditions.",
+   "equations": [
+    "Total energy = \u03a3(P_i \u00d7 t_i), COP = Q_cooling / P_input"
+   ],
+   "boundary_conditions": "Effective in large buildings with multiple chillers; limited in small facilities with single chiller systems.",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2004.02.011"
+   ],
+   "cross_domain_transition": "HVAC -> data-center cooling + transferring thermal system optimization techniques from building HVAC to data-center cooling creates value by reducing energy consumption in energy-intensive facilities.",
+   "baseline": {
+    "baseline_incumbent": "Fixed chiller loading strategies",
+    "baseline_metric": "Typical energy consumption of 0.8-1.2 kW/ton",
+    "candidate_metric": "Reduced energy consumption of 0.6-0.9 kW/ton",
+    "expected_delta": "15-25% reduction in energy consumption"
+   },
+   "killer_experiment": {
+    "experiment": "Simulation model validation with historical data from existing chiller plant",
+    "decisive_uncertainty": "The actual energy savings achievable in real-world implementation",
+    "kill_condition": "Less than 10% energy savings compared to current operation",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model inaccuracy",
+     "detectability": "detectable via validation testing",
+     "mitigation": "mitigation via regular model calibration, Control system failure"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data-center facility managers",
+    "use_case": "Optimizing energy consumption in data-center cooling systems",
+    "integration_point": "Between building automation system and chiller plant controls"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d1a6b5df91780e849dfab4ca4e0503429065aaa763bce61e3743222c605801c4",
+    "output_hash": "74e6bea8f0e317b7da32c58c12150a3252b60bdac05547a50408457ad251630c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Carbon-Neutral Chiller Optimization",
+   "target_domain": "energy",
+   "source_domain": "HVAC",
+   "domain_id": "hvac_chiller",
+   "pain_class": "sustainability",
+   "problem": "High carbon footprint of conventional chiller systems in industrial applications.",
+   "causal_chain": [
+    "Renewable energy integration",
+    "Carbon-neutral operation",
+    "System optimization",
+    "Field validation",
+    "Implementation"
+   ],
+   "unexploited_phenomenon": "Chiller plant optimization techniques for carbon-neutral cooling based on field case studies.",
+   "intervention": "Implementation of carbon-neutral chiller plant optimization strategies using renewable energy sources.",
+   "governing_variables": "Renewable energy availability, chiller efficiency, carbon intensity of grid electricity, thermal load profile",
+   "predicted_effect": "70-90% reduction in carbon emissions because optimization maximizes renewable energy utilization while minimizing grid dependency.",
+   "equations": [
+    "Carbon emissions = E_grid \u00d7 CI_grid + E_renewable \u00d7 CI_renewable, Total energy = E_grid + E_renewable"
+   ],
+   "boundary_conditions": "Effective in locations with high renewable energy availability; limited in areas with limited renewable resources.",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2026.132459"
+   ],
+   "cross_domain_transition": "HVAC -> energy systems + transferring carbon optimization techniques from building systems to energy production creates value by enabling low-carbon industrial cooling.",
+   "baseline": {
+    "baseline_incumbent": "Conventional grid-powered chiller systems",
+    "baseline_metric": "Typical carbon emissions of 0.5-1.0 kg CO2 per kWh cooling",
+    "candidate_metric": "Reduced carbon emissions of 0.05-0.3 kg CO2 per kWh cooling",
+    "expected_delta": "70-90% reduction in carbon emissions"
+   },
+   "killer_experiment": {
+    "experiment": "Field case study implementation with carbon monitoring",
+    "decisive_uncertainty": "The actual carbon reduction achievable in real-world implementation",
+    "kill_condition": "Less than 50% reduction in carbon emissions compared to conventional system",
+    "cost_class": "FIELD"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Intermittent renewable supply",
+     "detectability": "detectable via energy monitoring",
+     "mitigation": "mitigation via energy storage systems, High initial investment"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Sustainability officers in industrial facilities",
+    "use_case": "Reducing carbon footprint of industrial cooling systems",
+    "integration_point": "Between renewable energy systems and industrial cooling infrastructure"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d1a6b5df91780e849dfab4ca4e0503429065aaa763bce61e3743222c605801c4",
+    "output_hash": "74e6bea8f0e317b7da32c58c12150a3252b60bdac05547a50408457ad251630c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Particle Swarm Chiller Optimization",
+   "target_domain": "industrial",
+   "source_domain": "control systems",
+   "domain_id": "hvac_chiller",
+   "pain_class": "efficiency",
+   "problem": "Suboptimal control of variable-speed water-cooled chiller plants.",
+   "causal_chain": [
+    "Load variations",
+    "Particle swarm optimization",
+    "Control parameter adjustment",
+    "Optimal chiller operation",
+    "Energy efficiency"
+   ],
+   "unexploited_phenomenon": "Particle Swarm optimization algorithm for control operation of variable-speed water-cooled chiller plants.",
+   "intervention": "Implementation of PSO algorithm for real-time optimization of chiller plant control parameters.",
+   "governing_variables": "Load demand, compressor speed, condenser water temperature, evaporator water temperature",
+   "predicted_effect": "10-20% energy savings because PSO algorithm optimizes multiple control parameters simultaneously to match load conditions.",
+   "equations": [
+    "Energy consumption = f(speed, temperature, load), COP = Q_cooling / P_input"
+   ],
+   "boundary_conditions": "Effective in variable-load applications; limited in constant-load or highly unpredictable load scenarios.",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2017.11.037"
+   ],
+   "cross_domain_transition": "control systems -> industrial refrigeration + transferring optimization algorithms from theoretical control to industrial refrigeration creates value by improving energy efficiency in critical systems.",
+   "baseline": {
+    "baseline_incumbent": "Traditional PID control methods",
+    "baseline_metric": "Typical chiller plant COP of 4.5-5.5",
+    "candidate_metric": "Optimized chiller plant COP of 5.0-6.5",
+    "expected_delta": "10-20% improvement in COP"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale chiller testbed with PSO controller implementation",
+    "decisive_uncertainty": "The actual COP improvement achievable with PSO optimization",
+    "kill_condition": "Less than 8% improvement in COP compared to traditional control",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Algorithm convergence issues",
+     "detectability": "detectable via performance monitoring",
+     "mitigation": "mitigation via parameter tuning, Control instability"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Industrial facility energy managers",
+    "use_case": "Optimizing energy consumption in industrial water-cooled chiller plants",
+    "integration_point": "Between chiller control system and building automation system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d1a6b5df91780e849dfab4ca4e0503429065aaa763bce61e3743222c605801c4",
+    "output_hash": "74e6bea8f0e317b7da32c58c12150a3252b60bdac05547a50408457ad251630c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "industrial",
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Deep Learning Absorption Chiller Optimization",
+   "target_domain": "energy",
+   "source_domain": "AI",
+   "domain_id": "hvac_chiller",
+   "pain_class": "performance",
+   "problem": "Inefficient operation of absorption chiller plants due to lack of advanced predictive capabilities.",
+   "causal_chain": [
+    "Operational data collection",
+    "Deep learning model training",
+    "Performance prediction",
+    "Control optimization",
+    "Enhanced efficiency"
+   ],
+   "unexploited_phenomenon": "Deep learning predictive model for global optimization control of absorption chiller plants.",
+   "intervention": "Implementation of deep learning-based predictive model for absorption chiller plant optimization.",
+   "governing_variables": "Generator temperature, absorber temperature, condenser temperature, evaporator temperature, heat input",
+   "predicted_effect": "15-25% improvement in system efficiency because deep learning can predict optimal operating points based on multiple variables.",
+   "equations": [
+    "COP = Q_cooling / Q_heat, Efficiency = f(T_gen, T_abs, T_cond, T_evap)"
+   ],
+   "boundary_conditions": "Effective in systems with consistent operating patterns; limited in highly variable or novel operating conditions.",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2026.132998"
+   ],
+   "cross_domain_transition": "AI -> energy systems + transferring predictive modeling techniques from data analysis to thermal system optimization creates value by improving efficiency in energy-intensive applications.",
+   "baseline": {
+    "baseline_incumbent": "Traditional rule-based control systems",
+    "baseline_metric": "Typical absorption chiller COP of 0.7-1.0",
+    "candidate_metric": "Optimized absorption chiller COP of 0.8-1.25",
+    "expected_delta": "15-25% improvement in COP"
+   },
+   "killer_experiment": {
+    "experiment": "Simulation model validation with historical chiller operation data",
+    "decisive_uncertainty": "The actual COP improvement achievable with deep learning optimization",
+    "kill_condition": "Less than 10% improvement in COP compared to traditional control",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model overfitting",
+     "detectability": "detectable via validation testing",
+     "mitigation": "mitigation via regularization techniques, Data quality issues"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Energy system operators",
+    "use_case": "Optimizing absorption chiller plant performance in combined cooling, heating and power systems",
+    "integration_point": "Between chiller control system and energy management system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d1a6b5df91780e849dfab4ca4e0503429065aaa763bce61e3743222c605801c4",
+    "output_hash": "74e6bea8f0e317b7da32c58c12150a3252b60bdac05547a50408457ad251630c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "chiller"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-hvac_chiller-8",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Solar Adsorption Cooling System",
+   "target_domain": "agriculture",
+   "source_domain": "renewable energy",
+   "domain_id": "hvac_chiller",
+   "pain_class": "sustainability",
+   "problem": "High energy consumption and carbon footprint of conventional air conditioning in hot arid climates.",
+   "causal_chain": [
+    "Solar radiation capture",
+    "Adsorption cooling",
+    "Heat exchange",
+    "Air conditioning",
+    "Energy savings"
+   ],
+   "unexploited_phenomenon": "Solar adsorption cooling systems using evacuated tube and parabolic trough concentrators.",
+   "intervention": "Implementation of solar-driven adsorption cooling systems for agricultural applications in hot arid climates.",
+   "governing_variables": "Solar radiation intensity, collector efficiency, adsorbent material properties, cooling load",
+   "predicted_effect": "60-80% reduction in energy consumption because solar energy replaces conventional electricity for cooling.",
+   "equations": [
+    "COP_cooling = Q_cooling / Q_solar, Energy savings = E_conventional - E_solar"
+   ],
+   "boundary_conditions": "Effective in hot arid climates with high solar radiation; limited in cloudy or low-sunlight regions.",
+   "evidence_refs": [
+    "doi:10.1038/s41598-025-33313-y"
+   ],
+   "cross_domain_transition": "renewable energy -> agriculture + transferring solar cooling techniques from building applications to agricultural systems creates value by reducing energy consumption in food production and storage.",
+   "baseline": {
+    "baseline_incumbent": "Conventional vapor compression air conditioning",
+    "baseline_metric": "Typical energy consumption of 1.5-2.5 kWh per ton-hour of cooling",
+    "candidate_metric": "Reduced energy consumption of 0.3-1.0 kWh per ton-hour of cooling",
+    "expected_delta": "60-80% reduction in energy consumption"
+   },
+   "killer_experiment": {
+    "experiment": "Prototype solar cooling system for agricultural storage facility",
+    "decisive_uncertainty": "The actual energy savings achievable in real-world agricultural applications",
+    "kill_condition": "Less than 40% reduction in energy consumption compared to conventional system",
+    "cost_class": "PILOT"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Intermittent solar supply",
+     "detectability": "detectable via energy monitoring",
+     "mitigation": "mitigation via thermal energy storage, High initial investment"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Agricultural facility managers",
+    "use_case": "Providing cooling for agricultural products in storage facilities in hot arid climates",
+    "integration_point": "Between solar energy system and agricultural cooling infrastructure"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d1a6b5df91780e849dfab4ca4e0503429065aaa763bce61e3743222c605801c4",
+    "output_hash": "74e6bea8f0e317b7da32c58c12150a3252b60bdac05547a50408457ad251630c",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "agricultur"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  }
+ ],
+ "rejected": [
+  {
+   "candidate_id": "C-hvac_chiller-8",
+   "reasons": [
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT"
+   ]
+  },
+  {
+   "candidate_id": "C-hvac_chiller-7",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT"
+   ]
+  },
+  {
+   "candidate_id": "C-hvac_chiller-2",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-hvac_chiller-3",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-hvac_chiller-4",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-hvac_chiller-5",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-hvac_chiller-6",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-hvac_chiller-7",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  },
+  {
+   "candidate_id": "C-hvac_chiller-8",
+   "reasons": [
+    "missing field CROSS_DOMAIN_TRANSITION"
+   ]
+  }
+ ],
+ "pool_sha256": "6de9c702eed40252d223ce27f77dc7abfb154c65c682b85854e590cf75ad4c6d"
+}

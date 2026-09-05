@@ -1,0 +1,61 @@
+{
+ "attack_version": "R411-ATTACK-V1",
+ "candidate_id": "C-machining-1~4",
+ "status": "OK",
+ "attacker_provider": "openrouter",
+ "attacker_model": "minimax/minimax-m3:free",
+ "generator_provider": "zai",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "surfaces": {
+  "mechanism": {
+   "verdict": "WOUND",
+   "basis": "Q = h\u00b7A\u00b7(T_surface \u2013 T_coolant); with T_surface \u2248 700\u00b0C and T_coolant moving 293K\u2192273K, the fractional change in \u0394T is only (700\u2013273)/(700\u2013293) = 1.06, i.e., ~6% increase in heat flux \u2014 far short of the 30\u201350% surface finish improvement claimed."
+  },
+  "physics_of_phenomenon": {
+   "verdict": "KILL",
+   "basis": "0\u00b0C is not cryogenic (NIST definition: < \u2013150\u00b0C); SS304 and Ti-6Al-4V show <2% change in E and <5% change in \u03b1 between 20\u00b0C and 0\u00b0C (per standard ASME/ASM materials handbooks), so \u03c3 = E\u00b7\u03b1\u00b7\u0394T in the workpiece is effectively unchanged."
+  },
+  "evidence": {
+   "verdict": "WOUND",
+   "basis": "Only one cited record (doi:10.3390/jmmp6060128), and its title indicates it studies machining parameter optimization generally, not a controlled A/B test isolating coolant temperature as the independent variable."
+  },
+  "prior_art": {
+   "verdict": "WOUND",
+   "basis": "doi:10.1016/0043-1648(73)90228-7 (1973) and doi:10.1115/imece2013-63777 already teach surface-finish dependence on cutting environment/dielectric; the specific 0\u00b0C coolant variant is incremental, not novel."
+  },
+  "experiment_design": {
+   "verdict": "WOUND",
+   "basis": "n=10/group gives limited power against the high-variance confounder of progressive tool wear; no specification of fresh-tool-per-sample or randomized block design means tool wear can dominate the Ra signal and produce either false positive or false negative."
+  },
+  "boundary_conditions": {
+   "verdict": "KILL",
+   "basis": "Ti-6Al-4V k\u22487 W/m\u00b7K (low) and SS304 k\u224816 W/m\u00b7K (higher); low-k materials concentrate heat at the tool-workpiece interface, so coolant temperature has LARGER effect on low-k materials, inverting the stated boundary condition."
+  },
+  "predicted_effect_quantification": {
+   "verdict": "WOUND",
+   "basis": "Typical turning Ra CV is 10\u201320%; published cooling-environment studies (doi:10.3390/ma19091850) show Ra improvements <15% from cooling changes alone, contradicting the lower bound of the 30\u201350% claim."
+  },
+  "reproducibility_translation": {
+   "verdict": "KILL",
+   "basis": "Water-based coolant at 0\u00b0C in an open bath during sustained turning will (i) absorb heat from chips and rise above 0\u00b0C within minutes (water cp = 4.18 kJ/kg\u00b7K; a single cut can release kJ-scale energy), (ii) risk freezing/icing at the workpiece-fixture interface, and (iii) splash onto machine ways causing corrosion \u2014 none of which is addressed in the experimental specification."
+  }
+ },
+ "kill_surfaces": [
+  "physics_of_phenomenon",
+  "boundary_conditions",
+  "reproducibility_translation"
+ ],
+ "wound_surfaces": [
+  "mechanism",
+  "evidence",
+  "prior_art",
+  "experiment_design",
+  "predicted_effect_quantification"
+ ],
+ "final_objection": "KILLED. The single most dangerous surviving objection is the boundary-condition inversion (Surface 6): the candidate's own stated materials (SS304, Ti-6Al-4V) contradict its own stated effectiveness rule, which means even if the underlying effect were real, the targeting logic for the buyer (precision machining of thermally sensitive alloys) is self-defeating.",
+ "prompt_hash": "0585961b7c71fe6349c4927a2252eafd6e6b06975db27901589844ed67e1aad0",
+ "output_hash": "495e8d1f10c91578081be6f6e5119ba530fe14acbeade1104910e557fb7e053c",
+ "survived": false,
+ "verdict": "KILLED"
+}

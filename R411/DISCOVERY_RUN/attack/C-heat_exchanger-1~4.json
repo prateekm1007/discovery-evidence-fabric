@@ -1,0 +1,69 @@
+{
+ "attack_version": "R411-ATTACK-V1",
+ "candidate_id": "C-heat_exchanger-1~4",
+ "status": "OK",
+ "attacker_provider": "openrouter",
+ "attacker_model": "minimax/minimax-m3:free",
+ "generator_provider": "zai",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "surfaces": {
+  "mechanism": {
+   "attack": "The mechanism chain claims porous media \u2192 increased surface area \u2192 enhanced turbulence \u2192 improved Nu. This conflates two physically distinct effects. Increased surface area raises the overall heat transfer (UA), but Nu is a dimensionless coefficient characterizing convective transport at a fluid-solid interface, NOT a surface-area metric. Forcing through a porous matrix certainly generates turbulence, but tortuous-pore flow simultaneously increases the effective thermal boundary layer thickness and adds conductive resistance through the solid matrix (which competes with convective gain). The candidate treats Nu enhancement as monotonic with porosity reduction, but at high solid fractions (the regime needed to \"increase surface area\"), the effective Nu per unit wetted area can actually decrease because the fluid sees a stagnant or poorly mixed boundary layer adjacent to the dense matrix. The cited single-record source (doi:10.61263/mjes.v4i2.184) is a numerical study, not experimental, and numerical porous-media models (Brinkman, Darcy-Forchheimer) are notoriously sensitive to the form of the local thermal equilibrium assumption. The 30\u201360% Nu gain is not grounded in the law of energy conservation\u2014it is a model output from one paper that has not been independently corroborated.",
+   "verdict": "WOUND",
+   "basis": "Nu quantifies convective conductance per unit area, not total heat transfer; the chain \"more surface area \u2192 higher Nu\" is a category error. Additionally, single-source numerical evidence (doi:10.61263/mjes.v4i2.184) does not constitute validation of the magnitude claim."
+  },
+  "physics": {
+   "attack": "Darcy's law (\u0394P = \u03bcv/K, as cited) shows pressure drop scales inversely with permeability K. To force fluid through a packed or sintered porous insert, K drops by 3\u20135 orders of magnitude versus an open shell. The candidate's own kill condition allows \"only\" >50% pressure-drop increase, but realistic porous inserts (foams, packed spheres, sintered meshes) routinely produce 200\u20131000% \u0394P increases at the moderate Re > 4000 stated. The thermal performance index (TPI = Nu/Nu_0 / (f/f_0)^(1/3)) for porous inserts in published work (e.g., the biomimetics review doi:10.3390/biomimetics11010076 and the metal-hydride bed review doi:10.3390/ma16134891) typically shows TPI < 1 once \u0394P penalties are properly accounted for under thermodynamic-equal-comparison conditions. The candidate's claim that \"\u0394P is the limit at high velocities\" is also false\u2014the \u0394P penalty is severe across the entire Re range; it is not gated to high velocity alone.",
+   "verdict": "KILL",
+   "basis": "The cited \u0394P = \u03bcv/K equation combined with realistic K values for porous inserts (10\u207b\u2078 to 10\u207b\u00b9\u2070 m\u00b2) yields pressure drops that are orders of magnitude larger than baseline at Re > 4000, violating the candidate's own stated operating envelope."
+  },
+  "evidence": {
+   "attack": "The entire evidence base is a single numerical paper, doi:10.61263/mjes.v4i2.184, published in what appears to be a low-tier journal (\"mjes\" \u2014 MJES, with no established impact factor in mainstream heat-transfer literature; volume 4, issue 2 indicates a fledgling or predatory venue). No experimental data, no independent replication, no manufacturer data, no field data. The candidate presents a 30\u201360% Nu improvement claim sourced entirely from one unvalidated numerical study. This is not evidence; it is a hypothesis dressed in a DOI.",
+   "verdict": "KILL",
+   "basis": "The sole citation (doi:10.61263/mjes.v4i2.184) is a single numerical study from a non-indexed/minor venue with no experimental corroboration; the entire quantitative claim rests on it."
+  },
+  "prior_art": {
+   "attack": "Every single retrieved prior-art record teaches heat-transfer enhancement in shell-and-tube exchangers via mechanisms that compete with or supersede porous media: nanofluids (doi:10.62441/nano-ntp.v20is12.11, doi:10.1021/acsomega.4c10143, doi:10.1038/s41598-025-26764-w), helical finned tubes (doi:10.1115/imece2025-164967), geometry optimization (doi:10.3390/ma16134891), bioinspired surfaces (doi:10.3390/biomimetrics11010076), and ultrasound (doi:10.1016/j.ultsonch.2025.107570). Porous media as a shell-side enhancement is itself a well-documented concept\u2014packed-bed exchangers have existed industrially since the 1960s\u2014and the cited biomimetics and metal-hydride reviews explicitly survey porous inserts as a known geometry. There is nothing novel about the intervention; the \"unexploited phenomenon\" framing is false.",
+   "verdict": "KILL",
+   "basis": "Eight forward prior-art records collectively document that porous media, finned, nanofluids, and other shell-and-tube enhancement mechanisms are mature, actively researched alternatives; porous inserts are explicitly surveyed in doi:10.3390/ma16134891 and doi:10.3390/biomimetics11010076 as established practice."
+  },
+  "boundary_conditions": {
+   "attack": "The candidate states \"effective at moderate flow rates (Re > 4000)\" with no lower bound justification and acknowledges pressure drop as a limit \"at high velocities.\" In reality, the Re window where porous inserts provide net-positive TPI is narrow and strongly dependent on fluid properties, porosity, pore size, and matrix material. No guidance is given on fluid type, Pr range, porosity value, or pore morphology\u2014these are exactly the parameters that determine whether the mechanism works. The candidate also ignores fouling, which is the dominant failure mode in real chemical-process service and which porous inserts catastrophically accelerate (high surface area = high fouling rate, plus tortuous paths that block cleaning).",
+   "verdict": "WOUND",
+   "basis": "The stated Re > 4000 window has no upper bound tied to a quantitative \u0394P ceiling, and fouling\u2014absent from the candidate\u2014is the killer failure mode for porous inserts in chemical-process service (high wetted surface area, inaccessible for mechanical cleaning)."
+  },
+  "equations": {
+   "attack": "Two equations are presented. (1) Nu = f(Re, Pr, porosity): this is a tautology\u2014any dimensionless correlation takes this form\u2014and provides zero predictive content without an explicit functional form, constants, or range. (2) \u0394P = \u03bcv/K is Darcy's law valid only for creeping flow (Re_pore < 1), yet the candidate's operating regime is Re > 4000 in the shell, which corresponds to far higher Re inside the pores. At finite pore Reynolds, the Darcy\u2013Forchheimer extension is mandatory: \u0394P = \u03bcv/K + \u03b2\u03c1v\u00b2/\u221aK. The candidate omits the inertial term, which dominates at the stated operating point and makes the cited pressure-drop equation qualitatively wrong for the proposed use. The thermal side is even worse: no enthalpy balance, no effectiveness-NTU relation, no entropy-generation analysis\u2014nothing that would let a process engineer verify the 30\u201360% claim against a real exchanger.",
+   "verdict": "KILL",
+   "basis": "Darcy's law (\u0394P = \u03bcv/K) is valid only at Re_pore < 1; the candidate's Re > 4000 operating condition places the system well into the Forchheimer regime where the inertial term \u03b2\u03c1v\u00b2/\u221aK dominates and the cited equation is invalid."
+  },
+  "experiment_design": {
+   "attack": "The \"killer experiment\" specifies a bench-scale rig with transparent shell, thermocouples, and pressure sensors comparing porous vs. non-porous inserts. This sounds rigorous but is fatally underspecified: (a) no fluid specified (air vs. water changes Nu by 10\u201350\u00d7); (b) no porosity/pore-size/matrix-material specification for the \"porous insert\"; (c) no thermal boundary condition specified (constant wall temperature vs. constant heat flux\u2014these give different Nu by 20\u201340%); (e) no reportable uncertainty or repeat count; (f) \"transparent shell section\" implies optical access for PIV/LIF that is not mentioned. More critically, the kill condition (<10% Nu improvement OR >50% \u0394P increase) is asymmetric and self-defeating: the candidate's predicted effect (30\u201360% Nu gain) and the kill threshold (10%) are both far below the realistic \u0394P penalty (>>50%), meaning the experiment is engineered to pass on the Nu axis only if one tunes porosity to a point that violates \"enhanced turbulence\" (i.e., very open foam with little surface area). The design is not falsifiable against the mechanism chain because porosity is a free parameter.",
+   "verdict": "KILL",
+   "basis": "The kill condition (><10% Nu OR >50% \u0394P) combined with porosity as a free tuning parameter means the experimenter can always select a low-porosity insert to pass Nu and a high-porosity insert to pass \u0394P\u2014there is no single test that simultaneously fails both, so the mechanism is unfalsifiable as designed."
+  },
+  "predicted_effect": {
+   "attack": "The 30\u201360% Nu improvement is sourced to a single unvalidated numerical paper. Published experimental data on porous inserts in shell-and-tube exchangers (e.g., reviewed in doi:10.3390/ma16134891 for packed beds) typically shows overall heat-transfer coefficient gains of 10\u201325% with concurrent \u0394P penalties of 200\u2013800%, yielding negative TPI. A 30\u201360% Nu gain is at the very top of any published range and is not the median or expected outcome\u2014it is the optimistic outlier. The candidate does not state whether the 30\u201360% refers to local Nu at a point, area-averaged Nu, or overall U; this ambiguity alone makes the claim commercially meaningless for a process engineer sizing real equipment.",
+   "verdict": "WOUND",
+   "basis": "The 30\u201360% magnitude derives solely from one unvalidated numerical study (doi:10.61263/mjes.v4i2.184) and exceeds typical experimental gains (10\u201325%) for porous inserts documented in surveyed literature (doi:10.3390/ma16134891)."
+  }
+ },
+ "kill_surfaces": [
+  "physics",
+  "evidence",
+  "prior_art",
+  "equations",
+  "experiment_design"
+ ],
+ "wound_surfaces": [
+  "mechanism",
+  "boundary_conditions",
+  "predicted_effect"
+ ],
+ "final_objection": "KILLED. The single most dangerous surviving objection is the physics kill: Darcy's law as cited is invalid at the stated Re > 4000 operating point, and the realistic \u0394P penalty for any porous insert that delivers meaningful Nu enhancement makes the technology thermodynamically inferior to the established alternatives (nanofluids, finned tubes) documented in the prior art.",
+ "prompt_hash": "69e1b89f3d9ffbfaf98e05bc6ff84997ff51b8b235dfbcafc7f0276c2bfb2932",
+ "output_hash": "80ca3b9c906e7ee2360fca24f1c3fa3c816f9e6c2b3b75fa3242e57eaba21cdf",
+ "survived": false,
+ "verdict": "KILLED"
+}

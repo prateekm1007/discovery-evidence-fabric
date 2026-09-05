@@ -84,6 +84,37 @@ def engine_commit(repo_root: str) -> str:
         capture_output=True, text=True).stdout.strip()
 
 
+def _disambiguate_candidate_ids(
+        candidates: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Deterministic candidate-id canonicalization (Art. XII/LXII).
+
+    Per-pain-class extraction calls number their own candidates from 1,
+    so the same id can be emitted by several calls in one domain. The
+    first occurrence keeps the id; every later occurrence is re-labeled
+    '<id>~<k>' with the original preserved as 'original_candidate_id'.
+    Input order is the extraction-record order (frozen), so the mapping
+    is replayable. Mutates the loaded copies only — the frozen
+    extraction files on disk are never rewritten."""
+    seen: Dict[str, int] = {}
+    collisions: List[Dict[str, str]] = []
+    for c in candidates:
+        orig = str(c.get("candidate_id"))
+        seen[orig] = seen.get(orig, 0) + 1
+        if seen[orig] > 1:
+            new_id = f"{orig}~{seen[orig]}"
+            collisions.append({
+                "original_id": orig,
+                "assigned_id": new_id,
+                "domain_id": str(c.get("domain_id")),
+                "extraction_call": str(c.get("extraction_call", "")),
+            })
+            c["original_candidate_id"] = orig
+            c["candidate_id"] = new_id
+    return {"n_candidates": len(candidates),
+            "n_collisions": len(collisions),
+            "collisions": collisions}
+
+
 def normalize_pool(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Fabric engine items -> the campaign pool record shape (record_id,
     title, abstract, year, lane, publication_status, provenance)."""
@@ -222,15 +253,18 @@ class Campaign:
 
     # ---------------- F2: extraction ------------------------------------
     def run_extraction_for(self, entry: Dict[str, Any]) -> Dict[str, Any]:
-        """LLM extraction over the domain's frozen pool. Each call sees a
-        batch of records; every result passes the no-fabrication gate.
-        Transport failure => the domain is INCOMPLETE (recorded), never
-        fabricated (Art. LXI)."""
+        """LLM extraction over the domain's frozen pool — ONE CALL PER
+        PAIN CLASS (problem-first: each call attacks one pain point).
+        Every result passes the no-fabrication gate. Transport failure
+        => the domain is INCOMPLETE (recorded), never fabricated
+        (Art. LXI)."""
         from discovery_fabric.engine.mechanism_space import llm_generate
+        from .domain_matrix import DOMAIN_MATRIX_SPEC
         snap_path = os.path.join(self.run_dir, "evidence",
                                  f"{entry['domain_id']}.json")
         snapshot = _read_json(snap_path)
         pool = snapshot["pool"]
+        domain_spec = DOMAIN_MATRIX_SPEC[entry["domain_id"]]
         if not pool:
             result = {
                 "domain_id": entry["domain_id"],
@@ -243,24 +277,26 @@ class Campaign:
             self.state["extraction_done"].append(entry["domain_id"])
             self.save()
             return result
-        domain_spec = DOMAIN_MATRIX_SPEC[entry["domain_id"]]
         accepted: List[Dict[str, Any]] = []
         rejected: List[Dict[str, Any]] = []
         transport_failures = 0
-        n_batches = max(1, min(3, (len(pool) + 27) // 28))
-        for batch in range(n_batches):
+        calls = 0
+        from .extract import CROSS_DOMAIN_MARKER
+        for pain_class in list(domain_spec["pain_points"]) + \
+                [CROSS_DOMAIN_MARKER]:
+            calls += 1
             prompt = build_extraction_prompt(entry, domain_spec, pool,
-                                             batch_offset=batch * 28)
+                                             pain_class=pain_class)
             meta = llm_generate(
                 prompt,
                 system="You are a mechanism-discovery instrument. "
                        "Ground every candidate in the evidence records. "
                        "Never invent record ids or findings.",
-                purpose="r411_candidate_extraction", max_tokens=2400)
+                purpose="r411_candidate_extraction", max_tokens=2600)
             if not meta.get("ok"):
                 transport_failures += 1
                 rejected.append({
-                    "candidate_id": f"TRANSPORT-FAIL-{batch}",
+                    "candidate_id": f"TRANSPORT-FAIL-{pain_class}",
                     "reasons": [f"LLM transport: {meta.get('status')}"],
                 })
                 continue
@@ -272,14 +308,20 @@ class Campaign:
                     "prompt_hash": meta.get("prompt_hash"),
                     "output_hash": meta.get("output_hash"),
                 })
+            for c in parsed["accepted"]:
+                if pain_class != CROSS_DOMAIN_MARKER:
+                    c["pain_class"] = c.get("pain_class") or pain_class
+                c["extraction_call"] = (
+                    "CROSS_DOMAIN_FORCING" if pain_class == CROSS_DOMAIN_MARKER
+                    else pain_class)
             accepted.extend(parsed["accepted"])
             rejected.extend(parsed["rejected"])
         result = {
             "domain_id": entry["domain_id"],
-            "status": "OK" if transport_failures < n_batches else
+            "status": "OK" if transport_failures < calls else
                       "INCOMPLETE_LLM_TRANSPORT",
             "transport_failures": transport_failures,
-            "n_batches": n_batches,
+            "n_calls": calls,
             "accepted": accepted,
             "rejected": rejected,
             "pool_sha256": snapshot["pool_sha256"],
@@ -300,6 +342,13 @@ class Campaign:
             if os.path.exists(path):
                 all_accepted.extend(
                     _read_json(path).get("accepted") or [])
+        # candidate-id disambiguation (Art. XII/LXII traceability):
+        # each per-pain-class extraction call numbers its own candidates
+        # from 1, so ids collide across calls within a domain. The frozen
+        # extraction records stay byte-unchanged; identity is
+        # canonicalized HERE (deterministic, order-stable, recorded) so
+        # every downstream stage keys on a unique id.
+        id_map = _disambiguate_candidate_ids(all_accepted)
         # medical exclusion (s1) first
         from .medical_exclusion import medical_exclusion_screen
         medical_excluded = []
@@ -332,6 +381,16 @@ class Campaign:
         dedup = intra_campaign_dedup(admitted)
         _write_json(os.path.join(self.run_dir, "funnel_collision.json"), {
             "raw_accepted_from_extraction": len(all_accepted),
+            "candidate_id_disambiguation": {
+                "reason": (
+                    "per-pain-class extraction calls restart sequential "
+                    "numbering; collision stage canonicalizes identity "
+                    "deterministically (Art. XII/LXII). Frozen extraction "
+                    "records unchanged; occurrence >1 gets '~<n>' suffix; "
+                    "original id preserved as original_candidate_id."),
+                "colliding_ids": len(id_map["collisions"]),
+                "reassigned": id_map["collisions"],
+            },
             "medical_excluded": medical_excluded,
             "medical_excluded_count": len(medical_excluded),
             "collision_gate_results": gate_results,
@@ -389,6 +448,247 @@ class Campaign:
         self.save()
         return {"n": len(scored)}
 
+    # ---------------- F4a: evidence resolution ---------------------------
+    # Mid-run implementation correction (disclosed in run record): the
+    # frozen contract's evidence_strength is the number of records
+    # BACKING the claims; v1 measured the generator's self-citations
+    # (Art. III violation). F4a resolves evidence verifier-side: an
+    # untrusted LLM proposes claim->record bindings with exact spans; a
+    # deterministic verbatim-containment gate admits them. Same frozen
+    # anchor ladder, same evidence floor — strictly stronger measurement.
+    def _evidence_subset(self) -> List[Dict[str, Any]]:
+        """Verification-budget allocation. Two modes, both recorded:
+        - SUBSET (the frozen first rule): v1-finalist-eligible UNION
+          diversity-constrained top SHORTLIST_SIZE+4 by (eig desc,
+          composite desc), family cap 2.
+        - FULL_POOL (mid-run correction, disclosed): after the subset
+          pass produced a family-concentrated eligible set, the
+          measurement is completed over the ENTIRE pool so the floor
+          is applied to every candidate with the same instrument —
+          removing budget-allocation bias, never the floor itself.
+        The first 18 subset ids remain recorded in
+        state['evidence_subset_ids'] for the audit trail."""
+        pool = _read_json(os.path.join(self.run_dir, "scored_pool.json"))
+        if self.state.get("evidence_subset_mode") == "FULL_POOL":
+            return pool
+        if self.state.get("evidence_subset_ids"):
+            ids = set(self.state["evidence_subset_ids"])
+            return [c for c in pool if c["candidate_id"] in ids]
+        matrix = _read_json(self.state["domain_matrix"]["path"])
+        family_of = {e["domain_id"]: e["domain_family"]
+                     for e in matrix["entries"]}
+        subset = [c for c in pool if c["scoring"]["finalist_eligible"]]
+        chosen_ids = {c["candidate_id"] for c in subset}
+        ordered = sorted(pool, key=lambda c: (-c["eig_per_cost"],
+                                              -c["scoring"]["composite"]))
+        family_count: Dict[str, int] = {}
+        for c in subset:
+            fam = family_of.get(c["domain_id"], "?")
+            family_count[fam] = family_count.get(fam, 0) + 1
+        for c in ordered:
+            if len(chosen_ids) >= SHORTLIST_SIZE + 4:
+                break
+            fam = family_of.get(c["domain_id"], "?")
+            if family_count.get(fam, 0) >= MAX_PER_DOMAIN_FAMILY_SHORTLIST:
+                continue
+            if c["candidate_id"] in chosen_ids:
+                continue
+            family_count[fam] = family_count.get(fam, 0) + 1
+            chosen_ids.add(c["candidate_id"])
+            subset.append(c)
+        self.state["evidence_subset_ids"] = [
+            c["candidate_id"] for c in subset]
+        self.state["evidence_subset_rule"] = (
+            "v1-finalist-eligible UNION diversity-constrained top "
+            f"{SHORTLIST_SIZE + 4} by (eig_per_cost desc, composite desc) "
+            "with family cap {cap} — frozen before F4a executed".format(
+                cap=MAX_PER_DOMAIN_FAMILY_SHORTLIST))
+        self.save()
+        return subset
+
+    def extend_evidence_resolution_to_full_pool(self) -> None:
+        """Mid-run correction (recorded): complete the verifier-side
+        measurement over the whole pool. The floor/anchors/gate never
+        change; every candidate is measured with the same instrument,
+        so the eligible set is determined by evidence, not by which
+        candidates happened to receive verification budget first."""
+        self.state["evidence_subset_mode"] = "FULL_POOL"
+        self.state["evidence_subset_extension_reason"] = (
+            "the frozen 18-id subset (composite-ranked budget "
+            "allocation) yielded an eligible set concentrated in 3 "
+            "domain families while 14 domains received zero "
+            "verification budget; the correction measures ALL "
+            "candidates with the same instrument — the floor, "
+            "anchors, and span gate are unchanged")
+        self.save()
+
+    def run_evidence_resolution(self, n: int = 4) -> Dict[str, Any]:
+        """F4a: verifier-side span-verified evidence resolution for the
+        subset. LLM proposes; the deterministic gate admits. Transport
+        failure => candidate stays on v1 (recorded INCOMPLETE, Art. LXI)."""
+        from discovery_fabric.engine.mechanism_space import llm_generate
+        from .evidence_resolve import (build_resolve_prompt, parse_bindings,
+                                       resolve_evidence)
+        subset = self._evidence_subset()
+        done_ids = set(self.state.get("evidence_resolution_done") or [])
+        pools_by_domain = {}
+        for dom in self.state["extraction_done"]:
+            p = os.path.join(self.run_dir, "evidence", f"{dom}.json")
+            if os.path.exists(p):
+                pools_by_domain[dom] = _read_json(p)["pool"]
+        pool_path = os.path.join(self.run_dir, "scored_pool.json")
+        pool_all = {c["candidate_id"]: c for c in _read_json(pool_path)}
+        results_path = os.path.join(self.run_dir,
+                                    "evidence_resolved.json")
+        results = (_read_json(results_path)
+                   if os.path.exists(results_path) else {})
+        # state reconciliation (disclosed mid-run correction): ids whose
+        # recorded resolution is INCOMPLETE_* are transport failures, not
+        # completed measurements (Art. LXI) — they are re-queued by
+        # removing them from done_ids so the next invocation re-attempts
+        # them when transport recovers. The INCOMPLETE record stays in
+        # the results file (honest status) until overwritten by a fresh
+        # measurement.
+        incomplete_now = {k for k, v in results.items()
+                          if v.get("status") != "OK"}
+        requeued = incomplete_now & done_ids
+        if requeued:
+            done_ids -= requeued
+            self.state["evidence_resolution_done"] = sorted(done_ids)
+            print(f"  [evidence] re-queued {len(requeued)} INCOMPLETE "
+                  f"ids for transport recovery (Art. LXI)")
+        # transport pacing for shared free-tier provider pools (e.g. the
+        # OpenRouter :free collection's per-model requests-per-minute
+        # budget). Env-gated, default 0 -> hermetic tests run at full
+        # speed. This is TRANSPORT infrastructure only: it changes no
+        # scoring semantic, no gate, no threshold.
+        pace = float(os.environ.get("R411_LLM_PACE_SECONDS", "0") or 0)
+        processed = 0
+        for cand in subset:
+            if cand["candidate_id"] in done_ids or processed >= n:
+                continue
+            dom_pool = pools_by_domain.get(cand["domain_id"], [])
+            prompt = build_resolve_prompt(cand, dom_pool)
+            meta = llm_generate(
+                prompt,
+                system="You are an evidence-verification instrument. "
+                       "Quote exact text only. Never invent record ids "
+                       "or spans.",
+                purpose="r411_evidence_resolution", max_tokens=1600)
+            if not meta.get("ok"):
+                results[cand["candidate_id"]] = {
+                    "resolve_version": "R411-EVIDENCE-RESOLVE-V1",
+                    "candidate_id": cand["candidate_id"],
+                    "status": "INCOMPLETE_LLM_TRANSPORT",
+                    "transport_status": meta.get("status"),
+                }
+                # stays on v1 scoring (Art. LXI) — recorded, not rejected;
+                # NOT added to done_ids: a transport failure is not a
+                # completed measurement, the id is re-attempted on the
+                # next invocation (the re-queue discipline)
+                inc = set(self.state.get(
+                    "evidence_resolution_incomplete") or [])
+                inc.add(cand["candidate_id"])
+                self.state["evidence_resolution_incomplete"] = sorted(inc)
+            else:
+                parsed = parse_bindings(meta.get("content") or "")
+                ev = resolve_evidence(cand, dom_pool, meta, parsed)
+                ev["status"] = "OK"
+                results[cand["candidate_id"]] = ev
+                rec = pool_all.get(cand["candidate_id"])
+                if rec is not None:
+                    rec["evidence_v2"] = ev
+                # a completed measurement leaves the incomplete ledger
+                inc = set(self.state.get(
+                    "evidence_resolution_incomplete") or [])
+                inc.discard(cand["candidate_id"])
+                self.state["evidence_resolution_incomplete"] = sorted(inc)
+                done_ids.add(cand["candidate_id"])
+                self.state["evidence_resolution_done"] = sorted(done_ids)
+            # checkpoint EVERY artifact per candidate (state alone is
+            # not enough: a killed invocation must never orphan a
+            # done-id without its resolution record — Art. LXI)
+            _write_json(results_path, results)
+            _write_json(pool_path, list(pool_all.values()))
+            self.save()
+            processed += 1
+            if pace > 0 and processed < n:
+                time.sleep(pace)
+        _write_json(results_path, results)
+        # persist pool with evidence_v2 blocks
+        _write_json(pool_path, list(pool_all.values()))
+        return {"processed": processed,
+                "subset_size": len(subset),
+                "resolved_total": sum(
+                    1 for v in results.values() if v.get("status") == "OK")}
+
+    # ---------------- F4b(v2): re-score with resolved evidence -----------
+    def run_scoring_v2(self) -> Dict[str, Any]:
+        """Re-score candidates carrying evidence_v2 with the SAME frozen
+        contract, evidence_strength measured on the gate-verified set
+        (same anchors, same floor). v1 scores are preserved verbatim as
+        scoring_v1; the funnel report discloses both passes."""
+        from .scoring import (score_candidate, information_gain_per_cost,
+                              DIMENSIONS)
+        from .evidence_resolve import resolved_evidence_strength
+        pool_path = os.path.join(self.run_dir, "scored_pool.json")
+        pool = _read_json(pool_path)
+        pools_by_domain = {}
+        for dom in self.state["extraction_done"]:
+            p = os.path.join(self.run_dir, "evidence", f"{dom}.json")
+            if os.path.exists(p):
+                pools_by_domain[dom] = _read_json(p)["pool"]
+        n_v2 = 0
+        for c in pool:
+            ev2 = c.get("evidence_v2")
+            if not ev2 or ev2.get("status") != "OK":
+                continue  # no resolution budget spent: v1 stands (Art. LXI)
+            dom_pool = pools_by_domain.get(c["domain_id"], [])
+            funnel_stub = {"typed_distinction":
+                           (c.get("collision_gate") or {}).get(
+                               "typed_distinction")}
+            sc = score_candidate(c, dom_pool, funnel_stub)
+            ev_strength_v2 = resolved_evidence_strength(ev2)
+            subs = dict(sc["sub_scores"])
+            subs["evidence_strength"] = ev_strength_v2
+            total_w = sum(d["weight"] for d in DIMENSIONS.values())
+            composite_v2 = round(sum(
+                DIMENSIONS[k]["weight"] * v
+                for k, v in subs.items()) / total_w, 3)
+            confidence = "LOW" if ev_strength_v2 < 2 else (
+                "MEDIUM" if composite_v2 >= 1.5 else "LOW")
+            if confidence == "MEDIUM" and composite_v2 >= 2.6 \
+                    and ev_strength_v2 >= 3:
+                confidence = "HIGH"
+            c["scoring_v1"] = c.get("scoring")
+            c["scoring"] = {
+                **sc,
+                "sub_scores": subs,
+                "composite": composite_v2,
+                "confidence": confidence,
+                "evidence_floor_applied": ev_strength_v2 < 2,
+                "finalist_eligible": confidence != "LOW",
+                "measurement_rule": (
+                    "v2: deterministic functions of recorded state with "
+                    "evidence_strength from the F4a gate-verified span "
+                    "set (same frozen anchors + floor; Art. II/III/XXI.4); "
+                    "v1 preserved as scoring_v1"),
+                "scoring_version": "R411-SCORING-V2-RESOLVED",
+            }
+            c["eig_per_cost"] = information_gain_per_cost(c)
+            n_v2 += 1
+        _write_json(pool_path, pool)
+        self.state["scoring_v2_done"] = True
+        self.state["scoring_counts_v2"] = {
+            "n_rescored": n_v2,
+            "n_finalist_eligible": sum(
+                1 for c in pool if c["scoring"]["finalist_eligible"]),
+            "n_low_confidence": sum(
+                1 for c in pool if c["scoring"]["confidence"] == "LOW"),
+        }
+        self.save()
+        return {"n_rescored": n_v2}
+
     # ---------------- F4b: shortlist --------------------------------------
     def run_shortlist(self) -> List[Dict[str, Any]]:
         scored = _read_json(os.path.join(self.run_dir, "scored_pool.json"))
@@ -420,38 +720,56 @@ class Campaign:
         """Four retrieval perspectives + terminology registers for one
         finalist. The fabric is called with the perspective problems;
         register queries run as plain variant-class queries through the
-        fabric's lane fan-out (each perspective call = 1 fabric call)."""
+        fabric's lane fan-out (each perspective call = 1 fabric call).
+
+        TRANSPORT-PARALLELIZATION (disclosed mid-run correction): the
+        per-perspective fabric calls are issued concurrently. The calls,
+        queries, lane caps, and per-perspective result storage are
+        IDENTICAL to the sequential form — only wall time changes; each
+        perspective's retrieved set is independent of the others', so
+        no measurement semantic moves. The custody log appends under
+        its own module lock (hash chain stays verifiable; entry order
+        across perspectives is nondeterministic, which the chain
+        tolerates by design). Forced by measured upstream latency
+        (113 s/call live-measured 2026-09-05 vs 35.5 s in F1) x 7
+        calls/candidate x 14 candidates exceeding the sandbox's
+        per-invocation process lifetime — transport infrastructure
+        (Art. LXI), not an epistemic change.
+        """
+        from concurrent.futures import ThreadPoolExecutor
         from discovery_fabric.retrieval_fabric.pipeline import retrieve_fabric
         perspectives = build_perspectives(cand)
-        retrieved = {}
-        forward_records = []
-        for p in perspectives:
-            items, report = retrieve_fabric(
-                p["problem"], lane_caps=FABRIC_LANE_CAPS,
-                enable_reciprocal=False, enable_unpaywall=False)
-            norm = normalize_pool(items)
-            retrieved[p["perspective"]] = norm
-            if p["perspective"] == "FORWARD":
-                forward_records = norm
+        jobs = [(p["perspective"], p["problem"], FABRIC_LANE_CAPS)
+                for p in perspectives]
         # terminology-register queries: run the MECHANISM problem with
         # register-substituted device text (a cheap deterministic
         # anti-lock-in expansion on top of the fabric's own variants)
-        mech_problem = perspectives[1]["problem"]
         for reg_query in register_queries(cand):
-            reg_problem = {
-                "device": reg_query["query"][:120],
-                "failure_mode": cand.get("pain_class") or "",
-                "constraint": f"terminology register {reg_query['register']}",
-            }
-            items, report = retrieve_fabric(
-                reg_problem, lane_caps={"SCHOLARLY": 4, "PATENT": 4,
-                                        "THESIS": 2, "REPOSITORY": 3,
-                                        "PREPRINT": 2,
-                                        "TECHNICAL_REPORT": 2,
-                                        "DATASET": 1},
+            jobs.append((
+                f"REGISTER_{reg_query['register']}",
+                {
+                    "device": reg_query["query"][:120],
+                    "failure_mode": cand.get("pain_class") or "",
+                    "constraint":
+                        f"terminology register {reg_query['register']}",
+                },
+                {"SCHOLARLY": 4, "PATENT": 4, "THESIS": 2, "REPOSITORY": 3,
+                 "PREPRINT": 2, "TECHNICAL_REPORT": 2, "DATASET": 1}))
+
+        def _fetch(problem: Dict[str, str], caps: Dict[str, int]
+                   ) -> List[Dict[str, Any]]:
+            items, _report = retrieve_fabric(
+                problem, lane_caps=caps,
                 enable_reciprocal=False, enable_unpaywall=False)
-            retrieved[f"REGISTER_{reg_query['register']}"] = \
-                normalize_pool(items)
+            return normalize_pool(items)
+
+        retrieved: Dict[str, Any] = {}
+        with ThreadPoolExecutor(max_workers=len(jobs)) as ex:
+            futures = {ex.submit(_fetch, prob, caps): name
+                       for name, prob, caps in jobs}
+            for fut, name in futures.items():
+                retrieved[name] = fut.result()
+        forward_records = retrieved.get("FORWARD") or []
         pa = assess_prior_art(cand, retrieved,
                               generator_provider=(
                                   cand.get("generation") or {}).get(
@@ -606,8 +924,12 @@ class Campaign:
             "target": FINAL_TARGET,
             "quota_honesty": (
                 f"{len(selected)}/{FINAL_TARGET} qualified; "
-                f"{FINAL_TARGET - len(selected)}/{FINAL_TARGET} "
-                f"insufficient evidence" if len(selected) < FINAL_TARGET
+                f"{sum(1 for r in rejected if r.get('killed'))} killed "
+                f"by the adversarial tournament; "
+                f"{sum(1 for r in rejected if not r.get('killed'))} "
+                f"rejected for diversity/quota — no threshold was "
+                f"lowered to force five winners"
+                if len(selected) < FINAL_TARGET
                 else f"{FINAL_TARGET}/{FINAL_TARGET} qualified — no "
                      f"threshold was lowered to force five winners"),
             "rejected": [{

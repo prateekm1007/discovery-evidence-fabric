@@ -1,0 +1,69 @@
+{
+ "attack_version": "R411-ATTACK-V1",
+ "candidate_id": "C-chemical_process-1~3",
+ "status": "OK",
+ "attacker_provider": "openrouter",
+ "attacker_model": "minimax/minimax-m3:free",
+ "generator_provider": "zai",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "surfaces": {
+  "mechanism": {
+   "attack": "The candidate claims a single-step causal chain (temperature excursion \u2192 side reactions \u2192 byproducts \u2192 waste) and treats \"optimal temperature\" as a scalar target that adaptive control can track. But the mechanism chain ignores that CSTR exothermic reactions typically involve multiple competing pathways whose selectivity is governed by activation-energy differences, not temperature precision alone. Lowering temperature variance does not necessarily suppress side reactions if the main and side reactions have similar Ea (within the stated 50\u2013150 kJ/mol band) \u2014 in many industrial systems (e.g., nitrations, sulfonations, polymerizations) side pathways actually have comparable or higher Ea and are favored at lower conversions regardless of control tightness. Also, the candidate's own stated failure mode (\"fails for highly unstable reactions with positive feedback\") is precisely where most industrial runaway/waste problems occur (e.g., acrylic acid, ethylene oxide). The mechanism is therefore only valid in the narrow regime where adaptive control is not critically needed, and inadequate where it is.",
+   "verdict": "WOUND",
+   "basis": "Arrhenius selectivity \u0394Ea governs byproduct ratio, not temperature variance \u03c3_T; for reactions where side Ea \u2265 main Ea, reducing \u03c3_T can paradoxically increase byproducts (standard selectivity theory, Levenspiel, \"Chemical Reaction Engineering,\" Ch. 6)."
+  },
+  "phenomenon": {
+   "attack": "The candidate states \"nonlinear adaptive control can maintain optimal temperature profiles in exothermic reactions.\" The cited Chula thesis and 1994 ACC paper demonstrate *stabilization*, not *optimal profile tracking*. Sliding mode control with adaptive parameters is proven to handle model uncertainty and reject disturbances, but it tracks a reference trajectory supplied by an external optimizer \u2014 it does not itself compute \"optimal\" profiles. The candidate conflates regulation with optimization. The doi:10.1109/acc.1994.752500 record is from 1994 and predates modern NMPC/model-predictive approaches that have since been shown to outperform SMC in CSTR thermal management.",
+   "verdict": "WOUND",
+   "basis": "Sliding mode control is a regulation/tracking technique; optimality requires a separate objective function and optimizer (e.g., Economou et al., 1986; Rawlings & Mayne, \"Model Predictive Control,\" 2009)."
+  },
+  "equations": {
+   "attack": "The two equations given (energy balance dT/dt and Arrhenius rate) are the textbook CSTR model used universally since at least 1965 (Fogler; Levenspiel). They contain no adaptive-control term, no sliding-mode gain, and no sliding surface. Therefore the equations do not represent the intervention \u2014 they represent only the plant. The candidate provides no equation describing the controller action (e.g., u = u_eq + K\u00b7sgn(s)), so the \"mechanism chain\" is not actually encoded mathematically. Any quantitative prediction (40\u201370% reduction) cannot be derived from these two plant equations alone.",
+   "verdict": "KILL",
+   "basis": "The two equations describe the open-loop plant only; no control law, sliding surface, or adaptation law appears, so the predicted 40\u201370% reduction is uncomputable from the stated mathematics."
+  },
+  "boundary_conditions": {
+   "attack": "The candidate admits failure for \"highly unstable reactions with positive feedback\" but the dominant exothermic industrial waste-generating reactions (acrylic acid, MMA, caprolactam, ethylene oxide, adipic acid/N2O routes) sit precisely in this unstable-positive-feedback regime (High-temperature instability criterion: Qr > Qc leading to parametric sensitivity, as per van Welsenaere & Froment, Chem. Eng. Sci., 1970). The stated effective window (50\u2013150 kJ/mol Ea, moderate stability) excludes the very reactions generating the bulk of industrial waste streams \u2014 i.e., the addressable market in the candidate's own problem statement. This is a self-inflicted scope contradiction.",
+   "verdict": "KILL",
+   "basis": "Industrial exothermic runaway waste problems predominantly involve reactions in the \"highly unstable / positive feedback\" exclusion zone (van Welsenaere & Froment, 1970, Chem. Eng. Sci. 25, 1003); the candidate's effective window excludes the target use case."
+  },
+  "evidence": {
+   "attack": "The three cited DOIs (10.1109/acc.1994.752500; 10.58837/chula.the.2007.1541; 10.17918/00010097) are control-theory conference papers and theses that demonstrate temperature regulation in simulation, not waste-stream reduction in operating reactors. None of them measure byproduct yield or waste stream mass. The candidate's leap from \"controller tracks temperature setpoint better than PID\" to \"40\u201370% reduction in waste stream generation\" is unsupported by the cited evidence; the papers do not measure the dependent variable of the predicted effect. Furthermore, 10.1109/acc.1994.752500 is a 1994 robustness paper \u2014 three decades old, predating any modern industrial validation.",
+   "verdict": "KILL",
+   "basis": "None of the three cited DOIs report waste-stream or byproduct measurements; they report setpoint tracking errors in simulation. The predicted 40\u201370% waste reduction is unsupported by any cited empirical measurement."
+  },
+  "prior_art": {
+   "attack": "The retrieved prior art doi:10.23919/acc.1991.4791930 (\"Sliding Mode Control of an Exothermic Continuous Stirred Tank Reactor\") was published in 1991 \u2014 three years BEFORE the candidate's primary citation 10.1109/acc.1994.752500 \u2014 and explicitly combines sliding mode control with CSTR exothermic reactor control. Additionally, doi:10.3182/20090712-4-tr-2008.00015 (2008) teaches power-shaping control of an exothermic CSTR, and doi:10.2172/758796 documents CSTR operations with high-level waste. The combination of sliding mode + CSTR + exothermic + adaptive is already disclosed in prior art predating the candidate. The candidate's intervention is therefore not novel.",
+   "verdict": "KILL",
+   "basis": "doi:10.23919/acc.1991.4791930 (1991) discloses sliding mode control of an exothermic CSTR \u2014 the exact intervention \u2014 predating the candidate's primary citation by three years."
+  },
+  "experiment_design": {
+   "attack": "The \"killer experiment\" compares PID vs sliding mode under varying feed conditions and kills if adaptive control shows instability or worse performance than PID \"at any operating condition.\" This kill criterion is unfalsifiable in the favorable direction: SMC chattering is well-documented and manifests as high-frequency oscillation (Utkin, 1977) that would not necessarily appear in low-bandwidth temperature sensors. Common thermocouple time constants (5\u201315 s) filter chattering, masking the very failure mode that would degrade catalyst life and selectivity in real operation. The experiment does not measure selectivity, byproduct formation, or waste stream composition \u2014 only temperature tracking. Therefore the design cannot falsify the predicted 40\u201370% waste reduction claim; a passing result in this experiment is necessary but not sufficient evidence for the effect.",
+   "verdict": "WOUND",
+   "basis": "Sensor time constants (typical industrial RTD/thermocouple 5\u201315 s) low-pass-filter sliding-mode chattering at kHz frequencies (Utkin, \"Sliding Modes and Their Application in Variable Structure Systems,\" 1978), so chattering-induced catalyst degradation and byproduct formation would be invisible to the proposed measurement."
+  },
+  "predicted_effect": {
+   "attack": "The 40\u201370% reduction range is suspiciously wide \u2014 a factor of 1.75\u00d7 span \u2014 and lacks any citation, model derivation, or experimental basis. Industrial CSTR retrofit projects (Honeywell/ABB/Emerson APC case studies) report typical energy/yield improvements of 2\u20138% from advanced control, not 40\u201370%. A reduction of that magnitude from control alone would imply the baseline PID is performing catastrophically badly, contradicting its decades of successful industrial use. The claim violates engineering prior on control-loop ROI in well-instrumented reactors.",
+   "verdict": "KILL",
+   "basis": "Industrial APC retrofits on exothermic CSTRs (e.g., Dow, BASF published case studies) historically report 2\u20138% yield/energy improvement, not 40\u201370%; the claimed effect is one to two orders of magnitude above established engineering precedent for control-only interventions."
+  }
+ },
+ "kill_surfaces": [
+  "equations",
+  "boundary_conditions",
+  "evidence",
+  "prior_art",
+  "predicted_effect"
+ ],
+ "wound_surfaces": [
+  "mechanism",
+  "phenomenon",
+  "experiment_design"
+ ],
+ "final_objection": "KILLED. The single most dangerous surviving objection is that the equations provide no controller dynamics, so the claimed 40\u201370% waste reduction is mathematically ungrounded \u2014 the candidate cannot be validated, falsified, or scaled from the stated mathematics alone, and any pilot implementation would be a fishing expedition rather than a test of a quantified prediction.",
+ "prompt_hash": "7289daf33d2228787f98bc01ea825292a8f36960e7b3068382712cbe8fda36e7",
+ "output_hash": "09972d77fdf377c7d4dbab269e27c2bcde4e800635fa93c1346a70b0161827d3",
+ "survived": false,
+ "verdict": "KILLED"
+}

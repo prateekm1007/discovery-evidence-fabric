@@ -5,11 +5,14 @@ exposes ONE interface:
 
     generate(prompt, system, schema, policy) -> LLMCallResult
 
-over nine providers (zai, OpenRouter, NVIDIA, Anthropic, Gemini, OpenAI,
-Qwen, DeepSeek, Mistral). The engine selects a provider by explicit policy:
-availability -> quality tier -> cost tier -> latency tier. The ninth
-provider (zai, 2026-08-30) is the sandbox-local gateway added as the healthy
-transport path after the NVIDIA latency collapse — E1 credential
+over ten providers (tokenrouter, zai, OpenRouter, NVIDIA, Anthropic,
+Gemini, OpenAI, Qwen, DeepSeek, Mistral). The engine selects a provider
+by explicit policy: availability -> quality tier -> cost tier -> latency
+tier. The ninth provider (zai, 2026-08-30) is the sandbox-local gateway
+added as the healthy transport path after the NVIDIA latency collapse;
+the tenth (tokenrouter, 2026-09-05) is the owner-supplied Token Router
+credential that unblocked the R411 campaign when the sandbox zai
+transport's shared upstream quota rate-limited — E1 credential
 independence working as designed, not a policy change.
 
 Constitutional contract (Art. I, IV, VI, XVIII, XXV):
@@ -86,12 +89,42 @@ class ProviderSpec:
         return override or self.default_model
 
 
-# The provider registry (CEO E1; nine providers since 2026-08-30 — the
-# zai sandbox gateway is the healthy-transport ninth). Quality tiers are
-# RECORDED POLICY INPUTS (Art. XXVII: explicit, documented), not
+# The provider registry (CEO E1; ten providers since 2026-09-05 — the
+# tokenrouter direct-HTTPS provider is the R411-campaign unblock). Quality
+# tiers are RECORDED POLICY INPUTS (Art. XXVII: explicit, documented), not
 # measurements; they encode the engine's default preference order and are
 # inspected in every ledger.
 PROVIDER_SPECS: List[ProviderSpec] = [
+    ProviderSpec(
+        "tokenrouter", "TOKEN_ROUTER_API_KEY",
+        "https://api.tokenrouter.com/v1/chat/completions",
+        "z-ai/glm-5.3-free", "openai", 128_000,
+        quality_tier=2, cost_tier=1, latency_tier=2,
+        policy_note=(
+            "owner-supplied Token Router credential (delivered 2026-09-05 "
+            "with the statement 'GLM 5.3 is free to use'), wired as the "
+            "tenth provider to unblock the R411 campaign when the sandbox "
+            "zai gateway's shared upstream GLM quota rate-limited mid-F4a "
+            "(137/400 evidence resolutions measured, 263 pending, Art. LXI "
+            "INCOMPLETE discipline held). LIVE-MEASURED at wiring time "
+            "(Art. III): GET /v1/models -> 200 with 135 served models "
+            "incl. the z-ai GLM family; z-ai/glm-5.3-free tiny completion "
+            "-> 200, serves the FLAGSHIP glm-5.3 model, 3.5-4.5 s plain / "
+            "~16 s with reasoning enabled on a realistic evidence-resolution "
+            "prompt (the model's default thinking mode is kept: it is "
+            "format-compliant for the engine's FIELD-line protocol, unlike "
+            "thinking-disabled which measured 5x faster but leaked "
+            "meta-commentary instead of field lines); the paid z-ai/glm-5.3 "
+            "route measured 403 insufficient_user_quota ($0.00 credit), so "
+            "the free tier is the operative path; default urllib User-Agent "
+            "passes (no CF block on api.tokenrouter.com, unlike "
+            "token-router.ai). Placed at the head of the tier-2 group "
+            "(before zai) so llm_generate's availability-order prefers it "
+            "when the key is present — the documented healthy-path "
+            "precedent of the zai insertion (R375). Tier assignment is a "
+            "recorded policy input (Art. XXVII), not a measurement; the "
+            "latency tier honestly records the measured reasoning latency "
+            "behind the sandbox gateway's ~2 s.")),
     ProviderSpec(
         "zai", "ZAI_API_KEY",
         "http://127.0.0.1:8787/v1/chat/completions",

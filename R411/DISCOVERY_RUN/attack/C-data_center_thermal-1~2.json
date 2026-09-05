@@ -1,0 +1,51 @@
+{
+ "attack_version": "R411-ATTACK-V1",
+ "candidate_id": "C-data_center_thermal-1~2",
+ "status": "OK",
+ "attacker_provider": "openrouter",
+ "attacker_model": "minimax/minimax-m3:free",
+ "generator_provider": "zai",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "surfaces": {
+  "intervention": {
+   "attack": "\"Implementation of a data-driven thermal prediction model using POD\" is identical to the intervention in [doi:10.1016/j.applthermaleng.2026.132277] and substantially overlaps [doi:10.1109/itherm.2006.1645377], [doi:10.25148/etd.fidc007790], and [doi:10.1016/j.apenergy.2024.124568]. No novel sensor configuration, retraining protocol, online adaptation scheme, or deployment topology is specified. The intervention is a generic reimplementation.",
+   "verdict": "KILL",
+   "basis": "The intervention is mechanically indistinguishable from [doi:10.1016/j.applthermaleng.2026.132277]; the candidate's own evidence record is the prior art."
+  },
+  "evidence": {
+   "attack": "The two cited DOIs are the candidate's own self-references; they describe the same approach being proposed. They do not constitute independent validation. No third-party replication, no field deployment record, and no comparison to an alternative method (CFD, neural operator, physics-informed NN) is provided. Record [doi:10.1016/j.apenergy.2024.124568] from 2024 uses deep learning for the same problem \u2014 the candidate does not show why POD would be competitive with or superior to that approach.",
+   "verdict": "KILL",
+   "basis": "Both cited records are authored by the candidate's group (identical mechanism, intervention, and application); this is circular evidence with no independent confirmation."
+  },
+  "prior_art": {
+   "attack": "At least five retrieved records teach the same mechanism+intervention+effect: [doi:10.1016/j.apenergy.2024.124568] (deep-learning thermal prediction, air-cooled DC), [doi:10.1109/itherm.2006.1645377] (dynamic thermal management, air-cooled DC), [doi:10.25148/etd.fidc007790] (fast accurate modeling for thermal management in air-cooled DCs), and the candidate's own [doi:10.1016/j.applthermaleng.2026.132277] (POD for air-cooled DC). The combined teaching set fully anticipates this candidate.",
+   "verdict": "KILL",
+   "basis": "[doi:10.1016/j.applthermaleng.2026.132277] alone is dispositive \u2014 it is the identical mechanism (data-driven POD), identical intervention (ROM for thermal prediction), identical effect (cooling optimization) for the identical application (air-cooled data centers)."
+  },
+  "experiment_design": {
+   "attack": "The \"killer experiment\" specifies a \"BENCH-scale test with sensor-equipped rack prototype.\" A bench-scale single-rack prototype does not exhibit the multi-rack recirculation, stratus effects, cold-aisle containment interactions, or CRAC-coupled dynamics that govern real data center thermal fields. The kill condition (>5\u00b0C error at any critical point) is unanchored: critical points are not specified, sensor count is not specified, load profile is not specified, and \"during testing\" is undefined. The experiment cannot falsify the mechanism because (a) on a bench rig with smooth laminar flow, POD will trivially fit; (b) on a real data hall, the model will fail but the experiment is not the real data hall. This is a textbook unfalsifiable design.",
+   "verdict": "KILL",
+   "basis": "No specification of rack count, aisle geometry, load transients, sensor density, or critical-point definition; a bench rig cannot reproduce the hot-aisle/cold-aisle recirculation pattern that drives real cooling energy. ASHRAE TC 9.9 guidelines require multi-rack testing for any control-relevant thermal claim."
+  },
+  "boundary_conditions": {
+   "attack": "The candidate states \"requires sufficient sensor coverage for training\" without quantifying it. A typical 40-rack row requires 40-200 calibrated thermal sensors at inlet/outlet planes for a useful ROM; the deployment cost, calibration drift (typical \u00b11\u00b0C/year for thermistors), and replacement burden are unaddressed. Additionally, \"valid for steady-state and transient\" is asserted without defining the transient bandwidth \u2014 POD modal truncation is known to lose accuracy at frequencies above the snapshot sampling rate's Nyquist limit divided by the mode count, which for a typical 10-mode model caps useful transients near 0.01 Hz, far slower than server load steps.",
+   "verdict": "WOUND",
+   "basis": "Sensor calibration drift of \u00b11\u00b0C/year per typical RTD/thermistor datasheets (e.g., Murata NCP18, \u00b11% B-constant tolerance) directly compromises the <5\u00b0C kill condition; no mitigation strategy is described."
+  }
+ },
+ "kill_surfaces": [
+  "intervention",
+  "evidence",
+  "prior_art",
+  "experiment_design"
+ ],
+ "wound_surfaces": [
+  "boundary_conditions"
+ ],
+ "final_objection": "KILLED. The single most dangerous surviving objection is prior-art self-cancellation: the candidate's own evidence record [doi:10.1016/j.applthermaleng.2026.132277] is identical in mechanism, intervention, application, and effect to what is being proposed, leaving no defensible novelty basis.",
+ "prompt_hash": "75d578ef275cf440f8746f3a97905714549d501e340f1e5307d725df651734af",
+ "output_hash": "716581838168f66a61f99a8c72f777a3a8751ffec9e20e69c35693c3cb7d5946",
+ "survived": false,
+ "verdict": "KILLED"
+}

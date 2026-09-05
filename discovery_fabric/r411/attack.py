@@ -202,7 +202,17 @@ def attack_candidate(candidate: Dict[str, Any],
         purpose="r411_independent_attack",
         exclude_providers=[generator_provider]
         if generator_provider else None,
-        max_tokens=900)
+        # TRANSPORT BUDGET CORRECTION (disclosed mid-run, 2026-09-05):
+        # the original 900-token cap TRUNCATED the 8-surface protocol on
+        # every live model measured (minimax/cohere/ling/nemotron-ultra
+        # all finish=length, zero parseable VERDICT blocks, FINAL line
+        # never reached — an infrastructure defect, Art. LXI class).
+        # 2600 = the same cap the campaign's extraction stage already
+        # uses (precedent); surfaces/verdicts/final semantics untouched;
+        # bounded generation stays bounded. The registry's own
+        # empty-content retry path bumps caps for the same reason
+        # ("a larger cap on the SAME provider/model is not a downgrade").
+        max_tokens=2600)
     if not meta.get("ok"):
         return {
             "attack_version": ATTACK_VERSION,

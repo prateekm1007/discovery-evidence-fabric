@@ -1,0 +1,2086 @@
+{
+ "domain_id": "data_center_thermal",
+ "status": "OK",
+ "transport_failures": 0,
+ "n_calls": 4,
+ "accepted": [
+  {
+   "candidate_id": "C-data_center_thermal-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Air Flow Optimization Grid",
+   "target_domain": "data-center",
+   "source_domain": "aerospace",
+   "domain_id": "data_center_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Inefficient air distribution in air-cooled data centers creates thermal hotspots and energy waste",
+   "causal_chain": [
+    "Unoptimized airflow patterns",
+    "uneven cooling distribution",
+    "localized hotspots",
+    "increased cooling energy consumption",
+    "thermal losses"
+   ],
+   "unexploited_phenomenon": "Aerodynamic flow management using computational fluid dynamics (CFD) modeling for heat exchanger optimization",
+   "intervention": "Installation of adaptive flow control baffles and perforated panels in data center aisles",
+   "governing_variables": "Reynolds number (dimensionless), pressure differential (Pa), flow velocity (m/s), thermal resistance (K/W)",
+   "predicted_effect": "25-40% reduction in cooling energy consumption because pressure drop scales with flow velocity squared",
+   "equations": [
+    "\u0394P = f(\u03c1, v, L, D, \u03bc) where \u0394P is pressure drop, \u03c1 is air density, v is velocity, L is length, D is diameter, \u03bc is viscosity",
+    "Q = hA\u0394T where Q is heat transfer, h is heat transfer coefficient, A is area, \u0394T is temperature difference"
+   ],
+   "boundary_conditions": "Effective for Reynolds numbers 2,000-10,000; fails at extreme humidity (>80% RH) or with non-uniform heat loads",
+   "evidence_refs": [
+    "doi:10.1115/ipack2015-48476",
+    "doi:10.21979/n9/r1ku6r",
+    "doi:10.21979/n9/blbq2t"
+   ],
+   "cross_domain_transition": "aerospace heat exchanger design -> data center thermal management (optimized flow patterns reduce energy consumption)",
+   "baseline": {
+    "baseline_incumbent": "Traditional air cooling with fixed airflow patterns and no dynamic adjustment",
+    "baseline_metric": "1.2-1.8 PUE (Power Usage Effectiveness) with 30-45% of total energy consumed by cooling",
+    "candidate_metric": "0.9-1.2 PUE with 15-25% of total energy consumed by cooling",
+    "expected_delta": "25-40% reduction in cooling energy consumption"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale wind tunnel test with 1:10 scale data center model, comparing baseline vs. baffled configurations with thermal mapping",
+    "decisive_uncertainty": "The effectiveness of adaptive flow control in reducing temperature differentials across server racks",
+    "kill_condition": "Temperature differential increase of >2\u00b0C with baffled configuration compared to baseline",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Airflow obstruction",
+     "detectability": "detectable via pressure sensors",
+     "mitigation": "mitigation with adjustable baffles"
+    },
+    {
+     "failure_mode": "Condensation formation",
+     "detectability": "detectable via humidity sensors",
+     "mitigation": "mitigation with dehumidification pre-treatment"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center facility managers",
+    "use_case": "Reducing cooling costs while maintaining server reliability in existing air-cooled facilities",
+    "integration_point": "Within the cold aisle containment system between server racks"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "3c42420dacff774159c36172919c46410eade89fce0194e30def1c665acc15ae",
+    "output_hash": "ff5c3ba60e99abcb5cf494520aee6968c2680a9891eb3551f3e00a6fb2549838",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "grid",
+     "data center"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Reduced Order Modeling for Thermal Prediction",
+   "target_domain": "data-center",
+   "source_domain": "computational science",
+   "domain_id": "data_center_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Inaccurate thermal predictions lead to over-provisioning of cooling systems and energy waste",
+   "causal_chain": [
+    "Inadequate thermal modeling",
+    "oversized cooling systems",
+    "excessive energy consumption",
+    "thermal losses"
+   ],
+   "unexploited_phenomenon": "Data-driven proper orthogonal decomposition (POD) for reduced order thermal modeling",
+   "intervention": "Implementation of POD-based reduced order models integrated with real-time sensor data",
+   "governing_variables": "Thermal conductivity (W/m\u00b7K), heat capacity (J/kg\u00b7K), flow rate (m\u00b3/s), temperature distribution (K)",
+   "predicted_effect": "30-50% reduction in over-provisioned cooling capacity because POD models capture 95% of thermal variance with <5% of full model computational cost",
+   "equations": [
+    "T(x,y,z,t) = \u03a3 a_i(t) \u03c6_i(x,y,z) where T is temperature, a_i are time-dependent coefficients, \u03c6_i are spatial eigenfunctions",
+    "Q = \u03c1cp\u222b\u222b\u222b(v\u00b7\u2207T)dV where Q is heat transfer, \u03c1 is density, cp is specific heat, v is velocity"
+   ],
+   "boundary_conditions": "Effective for steady-state and quasi-steady operations; fails during rapid load transients (<1 minute) or with non-linear heat sources",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2026.132277",
+    "doi:10.25148/etd.fidc007790"
+   ],
+   "cross_domain_transition": "aerospace computational fluid dynamics -> data center thermal management (efficient modeling enables precise cooling control)",
+   "baseline": {
+    "baseline_incumbent": "Traditional CFD modeling with full Navier-Stokes equations requiring hours per simulation",
+    "baseline_metric": "4-6 hours per thermal simulation with 15-20% prediction error",
+    "candidate_metric": "5-10 minutes per thermal simulation with 5-8% prediction error",
+    "expected_delta": "70-85% reduction in computational time and 40-60% improvement in prediction accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "LAB-scale testbed with sensor-equipped server rack comparing POD model predictions against actual temperature measurements under varying workloads",
+    "decisive_uncertainty": "The accuracy of POD models in capturing localized hotspots under dynamic load conditions",
+    "kill_condition": "Prediction error >12% for any server component temperature",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model drift",
+     "detectability": "detectable via prediction error monitoring",
+     "mitigation": "mitigation with periodic retraining"
+    },
+    {
+     "failure_mode": "Sensor failure",
+     "detectability": "detectable via anomaly detection",
+     "mitigation": "mitigation with redundant sensors"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center operations engineers",
+    "use_case": "Optimizing cooling capacity allocation based on accurate thermal predictions",
+    "integration_point": "Building management system (BMS) software for thermal control algorithms"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "3c42420dacff774159c36172919c46410eade89fce0194e30def1c665acc15ae",
+    "output_hash": "ff5c3ba60e99abcb5cf494520aee6968c2680a9891eb3551f3e00a6fb2549838",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Hybrid Water-Air Cooling System",
+   "target_domain": "data-center",
+   "source_domain": "energy systems",
+   "domain_id": "data_center_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Traditional air cooling systems reject heat inefficiently due to limited heat transfer capacity",
+   "causal_chain": [
+    "Low heat transfer coefficient of air",
+    "high temperature differentials",
+    "increased cooling energy",
+    "thermal losses"
+   ],
+   "unexploited_phenomenon": "Hybrid water-air cooling combining the benefits of both mediums for improved heat transfer",
+   "intervention": "Integration of water-cooled cold plates with air-cooled heat exchangers in server racks",
+   "governing_variables": "Heat transfer coefficient (W/m\u00b2\u00b7K), thermal conductivity (W/m\u00b7K), flow rate (m\u00b3/s), temperature difference (K)",
+   "predicted_effect": "40-60% reduction in cooling energy consumption because water has 25x higher heat capacity than air",
+   "equations": [
+    "Q = UA\u0394T where Q is heat transfer, U is overall heat transfer coefficient, A is area, \u0394T is temperature difference",
+    "\u03b5 = 1 - exp(-NTU) where \u03b5 is effectiveness, NTU is number of transfer units"
+   ],
+   "boundary_conditions": "Effective for heat loads >5 kW per rack; fails in water-constrained regions or with incompatible server architectures",
+   "evidence_refs": [
+    "doi:10.1115/ipack2015-48476",
+    "doi:10.1115/ipack2003-35362"
+   ],
+   "cross_domain_transition": "automotive hybrid cooling systems -> data center thermal management (combines cooling mediums for optimal heat transfer)",
+   "baseline": {
+    "baseline_incumbent": "Traditional air-cooled systems with CRAC units",
+    "baseline_metric": "1.3-1.6 PUE with 35-50% of energy consumed by cooling",
+    "candidate_metric": "1.1-1.3 PUE with 20-30% of energy consumed by cooling",
+    "expected_delta": "30-40% reduction in cooling energy consumption"
+   },
+   "killer_experiment": {
+    "experiment": "LAB-scale test with representative server workload comparing hybrid cooling vs. air-only cooling with power and temperature monitoring",
+    "decisive_uncertainty": "The reliability of hybrid cooling under sustained high-load conditions without condensation",
+    "kill_condition": "Temperature increase >5\u00b0C or condensation formation in any component",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Water leakage",
+     "detectability": "detectable via moisture sensors",
+     "mitigation": "mitigation with leak detection and automatic shutoff"
+    },
+    {
+     "failure_mode": "Corrosion",
+     "detectability": "detectable via periodic inspection",
+     "mitigation": "mitigation with corrosion inhibitors"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center facility operators",
+    "use_case": "Reducing cooling costs in high-density computing environments",
+    "integration_point": "Between server CPUs and existing air cooling infrastructure"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "3c42420dacff774159c36172919c46410eade89fce0194e30def1c665acc15ae",
+    "output_hash": "ff5c3ba60e99abcb5cf494520aee6968c2680a9891eb3551f3e00a6fb2549838",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "heat exchanger"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Free-Cooling Optimization System",
+   "target_domain": "data-center",
+   "source_domain": "environmental systems",
+   "domain_id": "data_center_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Air-cooled data centers reject heat inefficiently due to mechanical cooling dependency even when ambient conditions allow free cooling",
+   "causal_chain": [
+    "Unoptimized use of ambient temperature",
+    "unnecessary mechanical cooling",
+    "energy waste",
+    "thermal losses"
+   ],
+   "unexploited_phenomenon": "Direct air free-cooling using temperature differential between ambient and data center",
+   "intervention": "Automated control system maximizing ambient air intake while maintaining safe operating temperatures",
+   "governing_variables": "Ambient temperature (\u00b0C), humidity (%), heat load (kW), air flow rate (m\u00b3/s)",
+   "predicted_effect": "50-70% reduction in mechanical cooling energy because free cooling can be used 85% of the time in tropical climates",
+   "equations": [
+    "Q = \u03c1cpV\u0394T where Q is heat transfer, \u03c1 is air density, cp is specific heat, V is volume flow, \u0394T is temperature difference",
+    "COP = Qc/W where COP is coefficient of performance, Qc is cooling effect, W is work input"
+   ],
+   "boundary_conditions": "Effective for ambient temperatures within 5-25\u00b0C of data center temperature; fails at extreme humidity (>70% RH) or with particulate-contaminated air",
+   "evidence_refs": [
+    "doi:10.21979/n9/r1ku6r",
+    "doi:10.21979/n9/blbq2t"
+   ],
+   "cross_domain_transition": "building HVAC systems -> data center thermal management (optimized ambient air utilization reduces energy consumption)",
+   "baseline": {
+    "baseline_incumbent": "Traditional CRAC units with fixed temperature setpoints",
+    "baseline_metric": "40-60% of cooling energy from mechanical systems even when ambient temperatures are favorable",
+    "candidate_metric": "10-25% of cooling energy from mechanical systems with optimized free cooling",
+    "expected_delta": "50-70% reduction in mechanical cooling energy consumption"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale test with environmental chamber simulating tropical conditions comparing free cooling optimization vs. baseline control",
+    "decisive_uncertainty": "The effectiveness of humidity control in preventing condensation during free cooling",
+    "kill_condition": "Relative humidity >70% at any server intake point",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Particulate contamination",
+     "detectability": "detectable via air quality sensors",
+     "mitigation": "mitigation with filtration"
+    },
+    {
+     "failure_mode": "Condensation risk",
+     "detectability": "detectable via humidity sensors",
+     "mitigation": "mitigation with humidity control"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center sustainability officers",
+    "use_case": "Reducing carbon footprint and energy costs in tropical climates",
+    "integration_point": "Building management system controls for air intake and humidity"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "3c42420dacff774159c36172919c46410eade89fce0194e30def1c665acc15ae",
+    "output_hash": "ff5c3ba60e99abcb5cf494520aee6968c2680a9891eb3551f3e00a6fb2549838",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Thermal Interface Material Enhancement",
+   "target_domain": "electronics",
+   "source_domain": "materials science",
+   "domain_id": "data_center_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Poor thermal contact between server components and heat sinks creates thermal resistance and heat buildup",
+   "causal_chain": [
+    "High thermal interface resistance",
+    "localized hotspots",
+    "reduced efficiency",
+    "thermal losses"
+   ],
+   "unexploited_phenomenon": "Advanced thermal interface materials with enhanced thermal conductivity",
+   "intervention": "Application of nanostructured thermal interface materials between heat-generating components and heat sinks",
+   "governing_variables": "Thermal conductivity (W/m\u00b7K), contact pressure (Pa), interface thickness (m), temperature difference (K)",
+   "predicted_effect": "20-35% reduction in thermal resistance because nanostructured materials achieve 5-10x higher thermal conductivity than traditional interfaces",
+   "equations": [
+    "Q = kA\u0394T/t where Q is heat transfer, k is thermal conductivity, A is area, \u0394T is temperature difference, t is thickness",
+    "R = t/(kA) where R is thermal resistance"
+   ],
+   "boundary_conditions": "Effective for interface pressures 0.1-1.0 MPa; fails at extreme temperatures (>100\u00b0C) or with highly uneven surfaces",
+   "evidence_refs": [
+    "doi:10.1016/j.apenergy.2013.02.047",
+    "doi:10.1615/978-1-56700-245-4.120"
+   ],
+   "cross_domain_transition": "semiconductor packaging -> data center thermal management (improved thermal contact reduces hotspots)",
+   "baseline": {
+    "baseline_incumbent": "Traditional thermal greases and pads with thermal conductivity 1-5 W/m\u00b7K",
+    "baseline_metric": "0.5-2.0 K/W thermal resistance at CPU-heat sink interface",
+    "candidate_metric": "0.1-0.5 K/W thermal resistance at CPU-heat sink interface",
+    "expected_delta": "70-85% reduction in thermal resistance"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale thermal resistance measurement comparing baseline vs. enhanced interface materials with controlled pressure application",
+    "decisive_uncertainty": "Long-term stability of enhanced materials under thermal cycling conditions",
+    "kill_condition": "Thermal degradation >20% after 1000 thermal cycles",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Material degradation",
+     "detectability": "detectable via thermal resistance monitoring",
+     "mitigation": "mitigation with periodic replacement"
+    },
+    {
+     "failure_mode": "Pump-out effect",
+     "detectability": "detectable via void detection",
+     "mitigation": "mitigation with improved adhesion"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Server hardware manufacturers",
+    "use_case": "Improving thermal management in high-performance computing systems",
+    "integration_point": "Between CPU/GPU and heat sink in server components"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "3c42420dacff774159c36172919c46410eade89fce0194e30def1c665acc15ae",
+    "output_hash": "ff5c3ba60e99abcb5cf494520aee6968c2680a9891eb3551f3e00a6fb2549838",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "cement",
+     "electronics"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Immersion Cooling Enhancement",
+   "target_domain": "data-center",
+   "source_domain": "chemical engineering",
+   "domain_id": "data_center_thermal",
+   "pain_class": "THERMAL_LOSS",
+   "problem": "Immersion-cooled server racks experience thermal losses due to inefficient heat transfer from electronics to coolant",
+   "causal_chain": [
+    "Low heat transfer coefficient between electronics and coolant",
+    "high thermal resistance",
+    "energy waste",
+    "thermal losses"
+   ],
+   "unexploited_phenomenon": "Enhanced boiling heat transfer using microstructured surfaces",
+   "intervention": "Integration of microstructured surfaces on server components to improve nucleate boiling heat transfer",
+   "governing_variables": "Heat transfer coefficient (W/m\u00b2\u00b7K), surface roughness (\u03bcm), nucleation site density (sites/m\u00b2), coolant properties (W/m\u00b7K)",
+   "predicted_effect": "40-60% improvement in heat transfer because microstructured surfaces increase nucleation sites by 10-100x",
+   "equations": [
+    "q = hA\u0394T where q is heat flux, h is heat transfer coefficient, A is area, \u0394T is temperature difference",
+    "\u0394Tsat = q/(hfg\u03c1g) where \u0394Tsat is saturation temperature difference, hfg is latent heat, \u03c1g is vapor density"
+   ],
+   "boundary_conditions": "Effective for heat fluxes 10-100 W/cm\u00b2; fails with non-compatible coolants or at sub-atmospheric pressures",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2022.119207",
+    "doi:10.1115/ipack2015-48476"
+   ],
+   "cross_domain_transition": "nuclear reactor cooling -> data center thermal management (enhanced boiling heat transfer improves efficiency)",
+   "baseline": {
+    "baseline_incumbent": "Direct immersion cooling with smooth surfaces",
+    "baseline_metric": "5-15 kW heat rejection per rack with 10-20\u00b0C temperature rise",
+    "candidate_metric": "7-25 kW heat rejection per rack with 5-10\u00b0C temperature rise",
+    "expected_delta": "40-60% improvement in heat rejection capacity"
+   },
+   "killer_experiment": {
+    "experiment": "LAB-scale immersion cooling test with representative server components comparing microstructured vs. smooth surfaces",
+    "decisive_uncertainty": "The long-term stability of microstructured surfaces under continuous nucleate boiling conditions",
+    "kill_condition": "Surface degradation >15% after 1000 hours of operation",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Surface fouling",
+     "detectability": "detectable via heat transfer coefficient monitoring",
+     "mitigation": "mitigation with filtration"
+    },
+    {
+     "failure_mode": "Coolant degradation",
+     "detectability": "detectable via pH monitoring",
+     "mitigation": "mitigation with coolant treatment"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "High-performance data center operators",
+    "use_case": "Improving thermal management in dense computing deployments",
+    "integration_point": "Server components immersed in coolant bath"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "3c42420dacff774159c36172919c46410eade89fce0194e30def1c665acc15ae",
+    "output_hash": "ff5c3ba60e99abcb5cf494520aee6968c2680a9891eb3551f3e00a6fb2549838",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "cement",
+     "electronics"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "THERMAL_LOSS"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Data-Driven Thermal Prediction Model",
+   "target_domain": "data-center",
+   "source_domain": "computational modeling",
+   "domain_id": "data_center_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Inefficient thermal management in air-cooled data centers due to lack of accurate real-time thermal prediction capabilities",
+   "causal_chain": [
+    "1) Collect sensor data from data center environment",
+    "2) Apply data-driven proper orthogonal decomposition",
+    "3) Generate reduced order thermal model",
+    "4) Predict temperature distributions",
+    "5) Optimize cooling control strategies"
+   ],
+   "unexploited_phenomenon": "Proper orthogonal decomposition for reduced order modeling of thermal systems",
+   "intervention": "Implementation of a data-driven thermal prediction model using proper orthogonal decomposition",
+   "governing_variables": "Temperature field variables (T), spatial coordinates (x,y,z), time (t), eigenvalues (\u03bb)",
+   "predicted_effect": "30-50% reduction in cooling energy consumption due to more precise thermal control enabled by accurate temperature field prediction",
+   "equations": [
+    "T(x,y,z,t) = \u03a3 \u03bb_i \u03c6_i(x,y,z) \u03c8_i(t), where \u03c6_i are spatial eigenfunctions and \u03c8_i are temporal coefficients"
+   ],
+   "boundary_conditions": "Valid for steady-state and transient thermal conditions; requires sufficient sensor coverage for training",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2022.119207",
+    "doi:10.1016/j.applthermaleng.2026.132277"
+   ],
+   "cross_domain_transition": "aerospace computational fluid dynamics -> data center thermal management (transferring established modeling techniques to optimize energy-intensive cooling systems)",
+   "baseline": {
+    "baseline_incumbent": "Traditional rule-based thermal control systems with fixed setpoints",
+    "baseline_metric": "Baseline systems achieve ~60% cooling efficiency with 15-20% overcooling margin",
+    "candidate_metric": "Predicted 80-90% cooling efficiency with 5-10% overcooling margin",
+    "expected_delta": "20-30% improvement in cooling efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale test with sensor-equipped rack prototype, comparing model predictions vs actual temperature distributions",
+    "decisive_uncertainty": "Model accuracy in predicting localized hot spots under variable load conditions",
+    "kill_condition": "Prediction error > 5\u00b0C at any critical point during testing",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Sensor failure",
+     "detectability": "detectable via redundancy",
+     "mitigation": "mitigation: redundant sensor network"
+    },
+    {
+     "failure_mode": "Model drift",
+     "detectability": "detectable via prediction accuracy monitoring",
+     "mitigation": "mitigation: periodic retraining with new data"
+    },
+    {
+     "failure_mode": "Computational load",
+     "detectability": "detectable via system monitoring",
+     "mitigation": "mitigation: model simplification for real-time constraints"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center facility managers",
+    "use_case": "Optimizing cooling system operation to reduce energy costs while maintaining safe operating temperatures",
+    "integration_point": "Building management system integration with cooling control algorithms"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d2e352a22ff07303e121a99c0f22769190e97ed80e29093a43ecc5b83e0f2091",
+    "output_hash": "42ba80ab2d82082d87bf90b8aca5171f61ff944d8b14c0a9860a7d81af1d8b68",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center",
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Hybrid Cooling System Optimization",
+   "target_domain": "data-center",
+   "source_domain": "thermal engineering",
+   "domain_id": "data_center_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Suboptimal energy efficiency in data centers due to inefficient hybrid cooling system operation",
+   "causal_chain": [
+    "1) Monitor server heat loads and ambient conditions",
+    "2) Calculate optimal cooling mode allocation",
+    "3) Dynamically adjust air-water cooling ratios",
+    "4) Minimize total energy consumption"
+   ],
+   "unexploited_phenomenon": "Energy optimization through hybrid cooling system control",
+   "intervention": "Dynamic control system that optimizes between air and water cooling based on real-time conditions",
+   "governing_variables": "Heat load (Q), ambient temperature (T_amb), cooling system efficiency (\u03b7), energy consumption (E)",
+   "predicted_effect": "25-40% reduction in cooling energy consumption through optimal hybrid cooling operation",
+   "equations": [
+    "E_total = E_air(Q,T_amb) + E_water(Q,T_amb), optimized when dE_total/dT_amb = 0"
+   ],
+   "boundary_conditions": "Valid for hybrid cooling systems with both air and water components; requires accurate heat load and ambient temperature measurements",
+   "evidence_refs": [
+    "doi:10.1115/ipack2015-48476"
+   ],
+   "cross_domain_transition": "automotive thermal management -> data center cooling (applying dynamic thermal control optimization from vehicles to data centers)",
+   "baseline": {
+    "baseline_incumbent": "Fixed-ratio hybrid cooling systems with manual adjustments",
+    "baseline_metric": "Fixed systems achieve ~65% cooling efficiency with 20-30% energy waste",
+    "candidate_metric": "Predicted 85-90% cooling efficiency with 5-10% energy waste",
+    "expected_delta": "20-25% improvement in cooling efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "LAB-scale test with hybrid cooling test bench, comparing fixed vs dynamic control under varying load conditions",
+    "decisive_uncertainty": "Optimal switching points between cooling modes under different humidity conditions",
+    "kill_condition": "Energy consumption reduction < 10% under any tested condition",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Control system failure",
+     "detectability": "detectable via temperature monitoring",
+     "mitigation": "mitigation: fail-safe default to air cooling"
+    },
+    {
+     "failure_mode": "Sensor malfunction",
+     "detectability": "detectable via anomaly detection",
+     "mitigation": "mitigation: redundant sensors"
+    },
+    {
+     "failure_mode": "Mode switching instability",
+     "detectability": "detectable via temperature fluctuations",
+     "mitigation": "mitigation: hysteresis in switching logic"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center operations engineers",
+    "use_case": "Reducing cooling energy costs while maintaining server temperature within specifications",
+    "integration_point": "Cooling system control unit with real-time optimization algorithms"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d2e352a22ff07303e121a99c0f22769190e97ed80e29093a43ecc5b83e0f2091",
+    "output_hash": "42ba80ab2d82082d87bf90b8aca5171f61ff944d8b14c0a9860a7d81af1d8b68",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Air Flow Management Optimization",
+   "target_domain": "data-center",
+   "source_domain": "fluid dynamics",
+   "domain_id": "data_center_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Inefficient air flow patterns in data centers leading to hot spots and increased cooling energy consumption",
+   "causal_chain": [
+    "1) Map air flow patterns in data center aisles",
+    "2) Identify recirculation zones and hot spots",
+    "3) Implement targeted airflow adjustments",
+    "4) Reduce mixing and improve cooling efficiency"
+   ],
+   "unexploited_phenomenon": "Optimized air flow management through strategic rack placement and airflow control",
+   "intervention": "Airflow management system with adjustable baffles and directional controls",
+   "governing_variables": "Air velocity (v), pressure differential (\u0394P), temperature gradient (\u2207T), rack density (\u03c1)",
+   "predicted_effect": "20-35% reduction in cooling energy through optimized air flow patterns",
+   "equations": [
+    "\u0394P = (1/2)\u03c1v\u00b2, cooling efficiency \u221d v/\u2207T"
+   ],
+   "boundary_conditions": "Valid for standard air-cooled data center layouts; requires adjustable airflow control elements",
+   "evidence_refs": [
+    "title:3e0d567c08b85f45"
+   ],
+   "cross_domain_transition": "HVAC building systems -> data center thermal management (applying advanced airflow control from buildings to optimize data center cooling)",
+   "baseline": {
+    "baseline_incumbent": "Standard fixed-position rack layouts with uncontrolled airflow patterns",
+    "baseline_metric": "Standard layouts achieve 55-65% cooling efficiency with 15-20\u00b0C hot spot differentials",
+    "candidate_metric": "Predicted 75-85% cooling efficiency with 5-10\u00b0C hot spot differentials",
+    "expected_delta": "20-30% improvement in cooling efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale test with sensor-equipped rack mockup, comparing standard vs optimized airflow patterns",
+    "decisive_uncertainty": "Impact of rack density variations on airflow optimization effectiveness",
+    "kill_condition": "Hot spot differential reduction < 5\u00b0C under any tested configuration",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Baffle failure",
+     "detectability": "detectable via airflow monitoring",
+     "mitigation": "mitigation: redundant control systems"
+    },
+    {
+     "failure_mode": "Air blockage",
+     "detectability": "detectable via pressure drop",
+     "mitigation": "mitigation: regular maintenance"
+    },
+    {
+     "failure_mode": "Control system error",
+     "detectability": "detectable via temperature monitoring",
+     "mitigation": "mitigation: manual override capability"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center facility designers",
+    "use_case": "Optimizing new data center layouts to minimize cooling costs while maintaining temperature uniformity",
+    "integration_point": "Rack design and placement planning tools with airflow simulation"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d2e352a22ff07303e121a99c0f22769190e97ed80e29093a43ecc5b83e0f2091",
+    "output_hash": "42ba80ab2d82082d87bf90b8aca5171f61ff944d8b14c0a9860a7d81af1d8b68",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Tropical Data Center Free-Cooling",
+   "target_domain": "data-center",
+   "source_domain": "environmental engineering",
+   "domain_id": "data_center_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "High cooling costs in tropical climates due to inefficient use of ambient cooling potential",
+   "causal_chain": [
+    "1) Monitor ambient temperature and humidity",
+    "2) Calculate free-cooling potential",
+    "3) Implement variable-speed cooling control",
+    "4) Maximize use of ambient cooling while maintaining required conditions"
+   ],
+   "unexploited_phenomenon": "Free-cooling optimization in tropical climates through variable-speed control",
+   "intervention": "Variable-speed free-cooling system with humidity control",
+   "governing_variables": "Ambient temperature (T_amb), humidity (H), cooling load (Q), energy consumption (E)",
+   "predicted_effect": "40-60% reduction in cooling energy through optimized free-cooling utilization",
+   "equations": [
+    "E = f(Q, T_amb, H), minimized when T_amb approaches supply temperature"
+   ],
+   "boundary_conditions": "Valid for tropical climates with diurnal temperature variations; requires humidity control capabilities",
+   "evidence_refs": [
+    "doi:10.21979/n9/r1ku6r",
+    "doi:10.21979/n9/blbq2t"
+   ],
+   "cross_domain_transition": "industrial process cooling -> data center thermal management (applying industrial free-cooling techniques to tropical data centers)",
+   "baseline": {
+    "baseline_incumbent": "Constant-speed cooling systems with minimal free-cooling utilization",
+    "baseline_metric": "Constant-speed systems achieve 40-50% cooling efficiency in tropical climates",
+    "candidate_metric": "Predicted 80-90% cooling efficiency in tropical climates",
+    "expected_delta": "40-50% improvement in cooling efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "LAB-scale test with tropical climate simulation chamber, comparing constant vs variable-speed cooling",
+    "decisive_uncertainty": "Optimal humidity control thresholds for maximum free-cooling utilization",
+    "kill_condition": "Energy consumption reduction < 30% under any tested tropical condition",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Humidity sensor failure",
+     "detectability": "detectable via condensation monitoring",
+     "mitigation": "mitigation: redundant sensors"
+    },
+    {
+     "failure_mode": "Variable-speed drive failure",
+     "detectability": "detectable via motor current monitoring",
+     "mitigation": "mitigation: backup constant-speed operation"
+    },
+    {
+     "failure_mode": "Control algorithm error",
+     "detectability": "detectable via temperature/humidity deviations",
+     "mitigation": "mitigation: manual override capability"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center operators in tropical regions",
+    "use_case": "Reducing cooling energy costs in hot climates while maintaining server temperature and humidity within specifications",
+    "integration_point": "Cooling system control unit with tropical climate optimization algorithms"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d2e352a22ff07303e121a99c0f22769190e97ed80e29093a43ecc5b83e0f2091",
+    "output_hash": "42ba80ab2d82082d87bf90b8aca5171f61ff944d8b14c0a9860a7d81af1d8b68",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Condensing Heat Exchanger Optimization",
+   "target_domain": "data-center",
+   "source_domain": "thermal engineering",
+   "domain_id": "data_center_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Inefficient heat exchange in air-cooled systems due to suboptimal condenser design",
+   "causal_chain": [
+    "1) Monitor heat load and ambient conditions",
+    "2) Calculate optimal condenser configuration",
+    "3) Implement variable condenser geometry",
+    "4) Maximize heat transfer efficiency"
+   ],
+   "unexploited_phenomenon": "Variable geometry condensing heat exchangers for optimized thermal performance",
+   "intervention": "Adaptive condenser with adjustable fin geometry and flow control",
+   "governing_variables": "Heat transfer coefficient (h), surface area (A), temperature difference (\u0394T), flow rate (m)",
+   "predicted_effect": "25-40% improvement in heat transfer efficiency through adaptive condenser design",
+   "equations": [
+    "Q = hA\u0394T, optimized when h is maximized for given conditions"
+   ],
+   "boundary_conditions": "Valid for air-cooled heat exchangers with variable geometry capabilities; requires precise temperature and flow control",
+   "evidence_refs": [
+    "doi:10.1615/978-1-56700-245-4.120"
+   ],
+   "cross_domain_transition": "automotive radiators -> data center cooling (applying adaptive heat exchanger technology from vehicles to data centers)",
+   "baseline": {
+    "baseline_incumbent": "Fixed geometry condensing heat exchangers",
+    "baseline_metric": "Fixed heat exchangers achieve 60-70% of theoretical maximum heat transfer",
+    "candidate_metric": "Predicted 85-95% of theoretical maximum heat transfer",
+    "expected_delta": "25-35% improvement in heat transfer efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "LAB-scale test with variable geometry heat exchanger prototype, comparing fixed vs variable configurations",
+    "decisive_uncertainty": "Optimal fin geometry variations under different temperature and humidity conditions",
+    "kill_condition": "Heat transfer improvement < 15% under any tested condition",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Mechanical failure of moving parts",
+     "detectability": "detectable via vibration monitoring",
+     "mitigation": "mitigation: regular maintenance"
+    },
+    {
+     "failure_mode": "Control system error",
+     "detectability": "detectable via temperature monitoring",
+     "mitigation": "mitigation: fail-safe to fixed geometry"
+    },
+    {
+     "failure_mode": "Fouling of heat exchange surfaces",
+     "detectability": "detectable via pressure drop",
+     "mitigation": "mitigation: automated cleaning cycles"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center equipment manufacturers",
+    "use_case": "Developing more efficient cooling equipment for data centers",
+    "integration_point": "Heat exchanger design in cooling units"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d2e352a22ff07303e121a99c0f22769190e97ed80e29093a43ecc5b83e0f2091",
+    "output_hash": "42ba80ab2d82082d87bf90b8aca5171f61ff944d8b14c0a9860a7d81af1d8b68",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "heat exchanger"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Multiscale Thermal Management System",
+   "target_domain": "data-center",
+   "source_domain": "systems engineering",
+   "domain_id": "data_center_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "Suboptimal energy efficiency due to lack of integrated thermal management across multiple scales",
+   "causal_chain": [
+    "1) Monitor thermal conditions at chip, server, and room levels",
+    "2) Apply multiscale thermal management algorithms",
+    "3) Coordinate cooling strategies across scales",
+    "4) Minimize total energy consumption"
+   ],
+   "unexploited_phenomenon": "Multiscale thermal management coordination across system levels",
+   "intervention": "Hierarchical thermal control system with cross-scale optimization",
+   "governing_variables": "Temperature at multiple scales (T_chip, T_server, T_room), power consumption (P), thermal resistance (R)",
+   "predicted_effect": "30-50% reduction in total cooling energy through coordinated multiscale management",
+   "equations": [
+    "P_total = P_chip + P_server + P_room, optimized when \u2202P_total/\u2202T = 0 across all scales"
+   ],
+   "boundary_conditions": "Valid for data centers with multiple thermal management levels; requires sensor integration across scales",
+   "evidence_refs": [
+    "doi:10.1016/j.apenergy.2013.02.047"
+   ],
+   "cross_domain_transition": "power grid management -> data center thermal control (applying hierarchical control from power grids to optimize thermal management)",
+   "baseline": {
+    "baseline_incumbent": "Independent thermal management at each scale without coordination",
+    "baseline_metric": "Independent systems achieve 50-60% overall thermal efficiency",
+    "candidate_metric": "Predicted 80-90% overall thermal efficiency",
+    "expected_delta": "30-40% improvement in thermal efficiency"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale test with multiscale thermal simulation, comparing independent vs coordinated control",
+    "decisive_uncertainty": "Optimal coordination strategy under transient load conditions",
+    "kill_condition": "Energy consumption reduction < 20% under any tested condition",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Communication failure between scales",
+     "detectability": "detectable via error logging",
+     "mitigation": "mitigation: redundant communication channels"
+    },
+    {
+     "failure_mode": "Control algorithm divergence",
+     "detectability": "detectable via temperature monitoring",
+     "mitigation": "mitigation: hierarchical override capability"
+    },
+    {
+     "failure_mode": "Sensor failure",
+     "detectability": "detectable via anomaly detection",
+     "mitigation": "mitigation: redundant sensors"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center infrastructure providers",
+    "use_case": "Developing integrated thermal management systems for next-generation data centers",
+    "integration_point": "Building management system with hierarchical thermal control"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d2e352a22ff07303e121a99c0f22769190e97ed80e29093a43ecc5b83e0f2091",
+    "output_hash": "42ba80ab2d82082d87bf90b8aca5171f61ff944d8b14c0a9860a7d81af1d8b68",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Reduced Order Thermal Modeling",
+   "target_domain": "data-center",
+   "source_domain": "computational physics",
+   "domain_id": "data_center_thermal",
+   "pain_class": "EXPENSIVE_CONTROL",
+   "problem": "High computational cost of detailed thermal simulations preventing real-time optimization",
+   "causal_chain": [
+    "1) Collect detailed thermal data",
+    "2) Apply proper orthogonal decomposition",
+    "3) Generate reduced order model",
+    "4) Enable real-time thermal optimization"
+   ],
+   "unexploited_phenomenon": "Reduced order modeling for real-time thermal simulation",
+   "intervention": "Reduced order thermal model with real-time updating capabilities",
+   "governing_variables": "Eigenvalues (\u03bb), eigenfunctions (\u03c6), temperature field (T), computational time (t_comp)",
+   "predicted_effect": "90% reduction in computational time while maintaining 95% accuracy of detailed simulations",
+   "equations": [
+    "T_red = \u03a3 \u03bb_i \u03c6_i, where i spans reduced basis rather than full domain"
+   ],
+   "boundary_conditions": "Valid for steady-state and slowly varying thermal conditions; requires sufficient training data",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2026.132277"
+   ],
+   "cross_domain_transition": "aerospace computational fluid dynamics -> data center thermal modeling (applying reduced order modeling techniques from aerospace to enable real-time data center thermal optimization)",
+   "baseline": {
+    "baseline_incumbent": "Full-order computational fluid dynamics simulations",
+    "baseline_metric": "Full-order simulations take hours per run with 99% accuracy",
+    "candidate_metric": "Reduced order models take minutes per run with 95% accuracy",
+    "expected_delta": "90% reduction in computational time with minimal accuracy loss"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH-scale test comparing computational time and accuracy of full vs reduced order models",
+    "decisive_uncertainty": "Model accuracy under rapid transient conditions",
+    "kill_condition": "Prediction error > 5\u00b0C or computational time reduction < 85%",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model drift",
+     "detectability": "detectable via prediction accuracy monitoring",
+     "mitigation": "mitigation: periodic retraining"
+    },
+    {
+     "failure_mode": "Basis insufficiency",
+     "detectability": "detectable via error analysis",
+     "mitigation": "mitigation: expanded basis functions"
+    },
+    {
+     "failure_mode": "Numerical instability",
+     "detectability": "detectable via convergence monitoring",
+     "mitigation": "mitigation: regularization techniques"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center simulation software providers",
+    "use_case": "Developing real-time thermal simulation tools for data center optimization",
+    "integration_point": "Thermal simulation software modules with reduced order modeling capabilities"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "d2e352a22ff07303e121a99c0f22769190e97ed80e29093a43ecc5b83e0f2091",
+    "output_hash": "42ba80ab2d82082d87bf90b8aca5171f61ff944d8b14c0a9860a7d81af1d8b68",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "EXPENSIVE_CONTROL"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Data-Driven Thermal Prediction Network",
+   "target_domain": "data-center",
+   "source_domain": "computational physics",
+   "domain_id": "data_center_thermal",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Air-cooled data center halls have thermal blind spots where temperature and airflow cannot be measured, leading to inefficient cooling and potential hotspots.",
+   "causal_chain": [
+    "Sparse sensor data",
+    "data-driven proper orthogonal decomposition",
+    "reduced order model",
+    "full thermal field prediction",
+    "optimized cooling control"
+   ],
+   "unexploited_phenomenon": "Proper orthogonal decomposition can reconstruct complete thermal fields from limited sensor measurements by identifying dominant spatial patterns in airflow and heat transfer.",
+   "intervention": "Deploy a sparse sensor network combined with a proper orthogonal decomposition model to predict thermal conditions throughout the data center hall.",
+   "governing_variables": "Number of sensors (n), sensor placement accuracy (m), correlation length of temperature field (\u03bb), reconstruction error (\u03b5)",
+   "predicted_effect": "40-70% reduction in blind spot coverage with 50% fewer sensors because proper orthogonal decomposition maximizes information capture from minimal measurements.",
+   "equations": [
+    "\u03b5 = f(n, \u03bb, m), where \u03b5 is reconstruction error",
+    "POD modes: \u03a6_k = (1/\u221a\u03bb_k) \u2211_{i=1}^{n} u_i(x_i)\u03c8_k(x_i)"
+   ],
+   "boundary_conditions": "Valid for steady-state and quasi-steady thermal conditions; fails during rapid transients or when airflow patterns change abruptly.",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2026.132277",
+    "doi:10.25148/etd.fidc007790"
+   ],
+   "cross_domain_transition": "Fluid dynamics modeling -> data center thermal management + transfer enables real-time prediction of unmeasured regions",
+   "baseline": {
+    "baseline_incumbent": "Traditional sensor grid with uniform spacing + manual thermal mapping",
+    "baseline_metric": "1 sensor per 2-3 rack units with \u00b11.5\u00b0C uncertainty",
+    "candidate_metric": "1 sensor per 4-6 rack units with \u00b11.0\u00b0C uncertainty",
+    "expected_delta": "50% reduction in sensor density with 33% improvement in accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH test with small-scale data center mockup, comparing POD reconstruction against full sensor array",
+    "decisive_uncertainty": "Whether POD can maintain accuracy with <50% sensor density",
+    "kill_condition": "Reconstruction error >2\u00b0C in any region with sparse sensors",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model drift due to changing airflow patterns",
+     "detectability": "detectable via increased prediction error",
+     "mitigation": "mitigation with periodic recalibration"
+    },
+    {
+     "failure_mode": "Sensor failure in critical locations",
+     "detectability": "detectable via sudden increase in reconstruction error",
+     "mitigation": "mitigation with redundant sensors"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center facility engineers",
+    "use_case": "Optimizing sensor placement while maintaining thermal monitoring coverage",
+    "integration_point": "Building management system (BMS) for real-time thermal optimization"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "db460cdd2d2b29124f9e84796a2131e140fa370548c98c9d9b36462fc8239fc9",
+    "output_hash": "da2d9219a5f48a02a6182e128e37508773daf319006e1965150d9c1e2bfbb42f",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center",
+     "sensor network"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Immersion-Cooling Phase Transition Monitoring",
+   "target_domain": "data-center",
+   "source_domain": "aerospace thermal management",
+   "domain_id": "data_center_thermal",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Immersion-cooled server racks have internal thermal blind spots where liquid phase transitions and local heat transfer coefficients cannot be directly measured.",
+   "causal_chain": [
+    "Surface temperature measurements",
+    "thermal resistance network model",
+    "internal phase state inference",
+    "localized boiling/condensation detection",
+    "targeted cooling adjustment"
+   ],
+   "unexploited_phenomenon": "The relationship between surface temperature gradients and internal phase transitions in immersion cooling systems can be modeled through thermal resistance networks.",
+   "intervention": "External surface temperature sensors with thermal resistance modeling to infer internal phase states and heat transfer coefficients.",
+   "governing_variables": "Surface temperature gradient (dT/dx), thermal conductivity (k), heat flux (q), phase change enthalpy (\u0394H)",
+   "predicted_effect": "25-40% reduction in cooling fluid consumption by detecting and responding to localized phase transitions before they propagate.",
+   "equations": [
+    "q = -k(dT/dx), \u0394T = qR_thermal where R_thermal is the thermal resistance network"
+   ],
+   "boundary_conditions": "Valid for single-phase and two-phase regions; fails at critical heat flux points where boiling becomes unstable.",
+   "evidence_refs": [
+    "doi:10.1115/ipack2003-35362",
+    "doi:10.1115/ipack2015-48476"
+   ],
+   "cross_domain_transition": "Avionics heat exchanger design -> immersion cooling server racks + transfer enables precise control of phase transitions",
+   "baseline": {
+    "baseline_incumbent": "Bulk temperature measurements with uniform cooling fluid flow",
+    "baseline_metric": "\u00b13\u00b0C uncertainty in internal temperature with 15-20% over-cooling",
+    "candidate_metric": "\u00b11.5\u00b0C uncertainty in internal temperature with 5-10% over-cooling",
+    "expected_delta": "50% improvement in temperature accuracy with 30-50% reduction in over-cooling"
+   },
+   "killer_experiment": {
+    "experiment": "LAB test with transparent immersion cooling mockup, comparing surface temperature predictions against internal measurements",
+    "decisive_uncertainty": "Whether surface temperature gradients can predict internal phase transitions with <1.5\u00b0C error",
+    "kill_condition": "Prediction error >2\u00b0C during phase transition events",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Non-uniform surface properties",
+     "detectability": "detectable via inconsistent temperature readings",
+     "mitigation": "mitigation with surface property characterization"
+    },
+    {
+     "failure_mode": "Rapid thermal transients",
+     "detectability": "detectable via model prediction lag",
+     "mitigation": "mitigation with adaptive time stepping"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center cooling system designers",
+    "use_case": "Optimizing immersion cooling fluid flow and temperature control",
+    "integration_point": "Cooling system control unit with real-time adjustment capabilities"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "db460cdd2d2b29124f9e84796a2131e140fa370548c98c9d9b36462fc8239fc9",
+    "output_hash": "da2d9219a5f48a02a6182e128e37508773daf319006e1965150d9c1e2bfbb42f",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Cold Plate Thermal Tomography",
+   "target_domain": "data-center",
+   "source_domain": "medical imaging",
+   "domain_id": "data_center_thermal",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Liquid-cooled cold plates for AI accelerators have internal thermal blind spots where local hotspots cannot be detected until they cause damage.",
+   "causal_chain": [
+    "External surface temperature measurements",
+    "thermal tomography reconstruction",
+    "internal temperature mapping",
+    "hotspot detection",
+    "targeted cooling enhancement"
+   ],
+   "unexploited_phenomenon": "Thermal tomography can reconstruct internal temperature distributions from surface measurements using the heat diffusion equation.",
+   "intervention": "Non-invasive surface temperature array with thermal tomography algorithm to map internal cold plate temperatures.",
+   "governing_variables": "Surface temperature measurement density (\u03c1), thermal diffusivity (\u03b1), reconstruction depth (d), measurement error (\u03c3)",
+   "predicted_effect": "60-80% reduction in undetected hotspots by enabling internal temperature mapping without invasive sensors.",
+   "equations": [
+    "\u2202T/\u2202t = \u03b1\u2207\u00b2T (heat diffusion equation), T_internal = f(T_surface, \u03b1, geometry)"
+   ],
+   "boundary_conditions": "Valid for steady-state and slow transients; fails during rapid power fluctuations or when thermal properties are unknown.",
+   "evidence_refs": [
+    "doi:10.1016/j.apenergy.2013.02.047",
+    "doi:10.21979/n9/r1ku6r"
+   ],
+   "cross_domain_transition": "Medical imaging technology -> data center cold plate monitoring + transfer enables non-invasive internal temperature mapping",
+   "baseline": {
+    "baseline_incumbent": "Discrete internal temperature sensors with limited spatial coverage",
+    "baseline_metric": "1 sensor per 10cm\u00b2 with \u00b12\u00b0C uncertainty",
+    "candidate_metric": "Continuous mapping with \u00b11\u00b0C uncertainty at 1cm resolution",
+    "expected_delta": "100x spatial resolution improvement with 50% accuracy improvement"
+   },
+   "killer_experiment": {
+    "experiment": "LAB test with instrumented cold plate, comparing tomography reconstruction against internal sensor array",
+    "decisive_uncertainty": "Whether thermal tomography can achieve <1\u00b0C accuracy in internal temperature mapping",
+    "kill_condition": "Reconstruction error >1.5\u00b0C in any region",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Unknown thermal properties",
+     "detectability": "detectable via inconsistent reconstructions",
+     "mitigation": "mitigation with material characterization"
+    },
+    {
+     "failure_mode": "Anisotropic heat transfer",
+     "detectability": "detectable via directional temperature bias",
+     "mitigation": "mitigation with directional calibration"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "AI accelerator system designers",
+    "use_case": "Preventing thermal runaway in high-density computing systems",
+    "integration_point": "Cold plate thermal management system with real-time visualization"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "db460cdd2d2b29124f9e84796a2131e140fa370548c98c9d9b36462fc8239fc9",
+    "output_hash": "da2d9219a5f48a02a6182e128e37508773daf319006e1965150d9c1e2bfbb42f",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [],
+    "medical_terms_in_origin_only": [
+     "medical imaging",
+     "medical"
+    ],
+    "basis": "no medical-application vocabulary in the target application fields (origin-field medical vocabulary present: ['medical imaging', 'medical'] \u2014 physics origin, allowed by s1)"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Tropical Data Center Free-Cooling Optimization",
+   "target_domain": "data-center",
+   "source_domain": "environmental science",
+   "domain_id": "data_center_thermal",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Air free-cooled tropical data centers have blind spots where external weather conditions cannot be accurately predicted, leading to suboptimal cooling decisions.",
+   "causal_chain": [
+    "Historical weather data",
+    "machine learning prediction model",
+    "free-cooling potential forecasting",
+    "dynamic damper control",
+    "energy savings"
+   ],
+   "unexploited_phenomenon": "Machine learning models can predict free-cooling potential from historical weather data patterns with high accuracy.",
+   "intervention": "AI-driven weather prediction system integrated with free-cooling control for tropical data centers.",
+   "governing_variables": "Historical data completeness (D), prediction horizon (h), weather pattern stability (S), prediction error (\u03b5)",
+   "predicted_effect": "20-35% increase in free-cooling utilization by accurately predicting optimal windows for external air intake.",
+   "equations": [
+    "Free-cooling potential = f(T_outside, T_inside, humidity, \u03b5), \u03b5 = g(D, h, S)"
+   ],
+   "boundary_conditions": "Valid for predictable weather patterns; fails during extreme weather events or when historical data is insufficient.",
+   "evidence_refs": [
+    "doi:10.21979/n9/r1ku6r",
+    "doi:10.21979/n9/blbq2t"
+   ],
+   "cross_domain_transition": "Weather forecasting -> data center thermal management + transfer enables energy-efficient cooling decisions",
+   "baseline": {
+    "baseline_incumbent": "Time-based free-cooling schedules with fixed thresholds",
+    "baseline_metric": "40-50% free-cooling utilization with \u00b13\u00b0C temperature control",
+    "candidate_metric": "60-85% free-cooling utilization with \u00b12\u00b0C temperature control",
+    "expected_delta": "50% increase in free-cooling utilization with 33% improvement in temperature control"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH test with historical data simulation, comparing AI predictions against actual weather outcomes",
+    "decisive_uncertainty": "Whether ML can predict free-cooling potential with <1\u00b0C error for 24-hour horizon",
+    "kill_condition": "Prediction error >2\u00b0C for more than 20% of prediction periods",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Unprecedented weather events",
+     "detectability": "detectable via sudden prediction errors",
+     "mitigation": "mitigation with weather alert integration"
+    },
+    {
+     "failure_mode": "Seasonal pattern changes",
+     "detectability": "detectable via gradual degradation in accuracy",
+     "mitigation": "mitigation with continuous model retraining"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center facility managers",
+    "use_case": "Reducing cooling energy costs in tropical climates",
+    "integration_point": "Building management system with weather API integration"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "db460cdd2d2b29124f9e84796a2131e140fa370548c98c9d9b36462fc8239fc9",
+    "output_hash": "da2d9219a5f48a02a6182e128e37508773daf319006e1965150d9c1e2bfbb42f",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Airflow Management Digital Twin",
+   "target_domain": "data-center",
+   "source_domain": "aerospace",
+   "domain_id": "data_center_thermal",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Data centers have airflow blind spots where recirculation and mixing cannot be measured, leading to cooling inefficiencies and hotspots.",
+   "causal_chain": [
+    "Limited airflow measurements",
+    "computational fluid dynamics model",
+    "digital twin reconstruction",
+    "airflow optimization",
+    "cooling efficiency improvement"
+   ],
+   "unexploited_phenomenon": "Reduced order modeling can reconstruct complete airflow fields from limited measurements by identifying dominant flow patterns.",
+   "intervention": "Sparse sensor network combined with reduced order CFD model to create a real-time digital twin of data center airflow.",
+   "governing_variables": "Sensor density (n), airflow complexity index (C), reconstruction error (\u03b5), turbulence intensity (I)",
+   "predicted_effect": "30-50% reduction in hotspots by identifying and eliminating recirculation zones with minimal sensor deployment.",
+   "equations": [
+    "\u03b5 = f(n, C, I), Flow field: u(x,y,z) = \u2211_{k=1}^{N} a_k \u03c6_k(x,y,z)"
+   ],
+   "boundary_conditions": "Valid for steady and quasi-steady airflow; fails during rapid equipment changes or extreme turbulence.",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2026.132277",
+    "doi:10.1615/978-1-56700-245-4.120"
+   ],
+   "cross_domain_transition": "Aerospace flow modeling -> data center airflow management + transfer enables efficient cooling with minimal sensors",
+   "baseline": {
+    "baseline_incumbent": "Uniform sensor grid with manual airflow adjustments",
+    "baseline_metric": "1 airflow sensor per rack with \u00b10.5 m/s uncertainty",
+    "candidate_metric": "1 airflow sensor per 2 racks with \u00b10.3 m/s uncertainty",
+    "expected_delta": "50% reduction in sensor density with 40% improvement in accuracy"
+   },
+   "killer_experiment": {
+    "experiment": "LAB test with small-scale data center model, comparing digital twin reconstruction against full sensor array",
+    "decisive_uncertainty": "Whether reduced order model can achieve <0.3 m/s error with 50% fewer sensors",
+    "kill_condition": "Reconstruction error >0.5 m/s in any region",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Changing rack configurations",
+     "detectability": "detectable via increased prediction error",
+     "mitigation": "mitigation with configuration-aware model adaptation"
+    },
+    {
+     "failure_mode": "Sensor drift",
+     "detectability": "detectable via inconsistent measurements",
+     "mitigation": "mitigation with periodic calibration"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center operations engineers",
+    "use_case": "Optimizing airflow management for cooling efficiency",
+    "integration_point": "Building management system with real-time airflow visualization"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "db460cdd2d2b29124f9e84796a2131e140fa370548c98c9d9b36462fc8239fc9",
+    "output_hash": "da2d9219a5f48a02a6182e128e37508773daf319006e1965150d9c1e2bfbb42f",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center",
+     "sensor network"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Condensing Heat Exchanger Thermal Design",
+   "target_domain": "data-center",
+   "source_domain": "chemical engineering",
+   "domain_id": "data_center_thermal",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Air-cooled heat exchangers have blind spots where condensation and fouling cannot be detected, leading to reduced efficiency and increased energy consumption.",
+   "causal_chain": [
+    "Surface temperature measurements",
+    "condensation prediction model",
+    "fouling detection",
+    "optimized maintenance schedule",
+    "energy efficiency maintenance"
+   ],
+   "unexploited_phenomenon": "The relationship between surface temperature and condensation in heat exchangers can be modeled to predict fouling before it impacts performance.",
+   "intervention": "Non-invasive temperature monitoring system with condensation/fouling prediction algorithm for air-cooled heat exchangers.",
+   "governing_variables": "Surface temperature (T), relative humidity (RH), heat transfer coefficient (h), fouling factor (Rf)",
+   "predicted_effect": "15-25% reduction in energy consumption by detecting and addressing condensation and fouling 30-60 days earlier.",
+   "equations": [
+    "Q = hA(T_surface - T_ambient), Rf = f(T, RH, time)"
+   ],
+   "boundary_conditions": "Valid for stable operating conditions; fails during rapid humidity changes or when heat exchanger geometry is unknown.",
+   "evidence_refs": [
+    "doi:10.1615/978-1-56700-245-4.120",
+    "doi:10.1016/j.apenergy.2013.02.047"
+   ],
+   "cross_domain_transition": "Chemical process monitoring -> data center heat exchanger maintenance + transfer enables predictive maintenance of cooling systems",
+   "baseline": {
+    "baseline_incumbent": "Scheduled maintenance with no early detection of condensation/fouling",
+    "baseline_metric": "3-6 month maintenance intervals with 10-15% energy degradation between intervals",
+    "candidate_metric": "1-2 month maintenance intervals with 3-5% energy degradation between intervals",
+    "expected_delta": "50% reduction in energy degradation with 60% improvement in maintenance timing"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH test with instrumented heat exchanger, comparing predictions against actual fouling measurements",
+    "decisive_uncertainty": "Whether temperature measurements can predict fouling with <5% error 30 days in advance",
+    "kill_condition": "Prediction error >10% in fouling factor estimation",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Non-uniform airflow",
+     "detectability": "detectable via inconsistent temperature patterns",
+     "mitigation": "mitigation with airflow characterization"
+    },
+    {
+     "failure_mode": "Chemical contamination",
+     "detectability": "detectable via unexpected condensation behavior",
+     "mitigation": "mitigation with contaminant-specific models"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center maintenance engineers",
+    "use_case": "Preventing efficiency loss in cooling heat exchangers",
+    "integration_point": "Maintenance scheduling system with early warning alerts"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "db460cdd2d2b29124f9e84796a2131e140fa370548c98c9d9b36462fc8239fc9",
+    "output_hash": "da2d9219a5f48a02a6182e128e37508773daf319006e1965150d9c1e2bfbb42f",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "heat exchanger",
+     "fouling"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-7",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Aisle-Level Thermal Mapping",
+   "target_domain": "data-center",
+   "source_domain": "remote sensing",
+   "domain_id": "data_center_thermal",
+   "pain_class": "SENSING_BLIND_SPOT",
+   "problem": "Data center aisles have thermal blind spots between racks where temperature gradients cannot be measured, leading to suboptimal cooling distribution.",
+   "causal_chain": [
+    "Rack perimeter temperature measurements",
+    "aisle interpolation model",
+    "3D thermal field reconstruction",
+    "cooling optimization",
+    "energy efficiency"
+   ],
+   "unexploited_phenomenon": "Thermal gradients between racks can be interpolated from perimeter measurements using spatial correlation models.",
+   "intervention": "Perimeter sensor array with aisle-level thermal interpolation for hot/cold aisle containment.",
+   "governing_variables": "Sensor spacing (d), thermal gradient magnitude (G), interpolation error (\u03b5), airflow velocity (v)",
+   "predicted_effect": "20-35% improvement in cooling distribution by eliminating blind spots between racks with minimal additional sensors.",
+   "equations": [
+    "\u03b5 = f(d, G, v), T_aisle(x,y) = T_rack + \u2207T\u00b7r + \u03b5"
+   ],
+   "boundary_conditions": "Valid for steady airflow conditions; fails during rapid equipment changes or when airflow patterns are chaotic.",
+   "evidence_refs": [
+    "doi:10.21979/n9/blbq2t",
+    "title:3e0d567c08b85f45"
+   ],
+   "cross_domain_transition": "Remote sensing interpolation -> data center aisle thermal mapping + transfer enables efficient cooling with minimal sensors",
+   "baseline": {
+    "baseline_incumbent": "No inter-rack temperature measurements with uniform cooling distribution",
+    "baseline_metric": "\u00b14\u00b0C temperature variation between racks",
+    "candidate_metric": "\u00b12\u00b0C temperature variation between racks",
+    "expected_delta": "50% reduction in temperature variation between racks"
+   },
+   "killer_experiment": {
+    "experiment": "BENCH test with small-scale aisle mockup, comparing interpolated temperatures against actual measurements",
+    "decisive_uncertainty": "Whether perimeter measurements can predict aisle temperatures with <2\u00b0C error",
+    "kill_condition": "Interpolation error >2.5\u00b0C in any region",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Obstructed airflow",
+     "detectability": "detectable via inconsistent temperature patterns",
+     "mitigation": "mitigation with airflow path characterization"
+    },
+    {
+     "failure_mode": "Changing rack configurations",
+     "detectability": "detectable via sudden interpolation errors",
+     "mitigation": "mitigation with configuration-aware model adaptation"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center facility planners",
+    "use_case": "Optimizing cooling in high-density rack arrangements",
+    "integration_point": "Cooling system control with dynamic damper adjustment"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "db460cdd2d2b29124f9e84796a2131e140fa370548c98c9d9b36462fc8239fc9",
+    "output_hash": "da2d9219a5f48a02a6182e128e37508773daf319006e1965150d9c1e2bfbb42f",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "SENSING_BLIND_SPOT"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-1",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Data-Driven Reduced Order Modeling",
+   "target_domain": "data-center",
+   "source_domain": "data-center",
+   "domain_id": "data_center_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "Inefficient thermal prediction in air-cooled data centers leading to suboptimal cooling energy consumption",
+   "causal_chain": [
+    "Sensor data collection",
+    "Proper Orthogonal Decomposition",
+    "Reduced order model",
+    "Optimized cooling control",
+    "Energy savings"
+   ],
+   "unexploited_phenomenon": "Data-driven proper orthogonal decomposition for reduced order modeling of air-cooled systems",
+   "intervention": "Implementation of a reduced order model using proper orthogonal decomposition on sensor data from air-cooled data centers",
+   "governing_variables": "Number of spatial dimensions (n), Number of temporal modes (k), Sensor measurement accuracy (\u03c3)",
+   "predicted_effect": "40-70% reduction in computational time for thermal prediction with <5% error in temperature prediction compared to full-order models",
+   "equations": [
+    "X_k = U_k * S_k * V_k^T, where X_k is the reduced matrix, U_k and V_k are truncated singular vectors, S_k is the diagonal matrix of singular values"
+   ],
+   "boundary_conditions": "Valid for steady-state and quasi-steady thermal conditions; fails during rapid transient events not captured in training data",
+   "evidence_refs": [
+    "doi:10.1016/j.applthermaleng.2026.132277",
+    "doi:10.25148/etd.fidc007790"
+   ],
+   "cross_domain_transition": null,
+   "baseline": {
+    "baseline_incumbent": "Traditional full-order computational fluid dynamics modeling",
+    "baseline_metric": "High computational cost (hours to days for single simulation)",
+    "candidate_metric": "Minutes to hours for simulation with comparable accuracy",
+    "expected_delta": "60-90% reduction in computational time"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale test with computational time comparison between full-order and reduced-order models using identical thermal boundary conditions",
+    "decisive_uncertainty": "Whether the reduced-order model can maintain accuracy across varying operating conditions",
+    "kill_condition": "Error in temperature prediction exceeds 10% of actual measurements",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model degradation over time",
+     "detectability": "detectable through periodic validation tests",
+     "mitigation": "mitigation through periodic model retraining with new sensor data"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center facility managers",
+    "use_case": "Real-time thermal management optimization to reduce cooling energy consumption",
+    "integration_point": "Building management system control algorithms"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c74a20b19042405c7d2eae912150462e991b21dca0ebd85dcfef3e3b0cc4a010",
+    "output_hash": "9090a5a2b3f830fd598e24a421ad6bf6aad52fe966071af3c8aac5420b609f78",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-2",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Hybrid Water-Air Cooling System",
+   "target_domain": "data-center",
+   "source_domain": "aerospace",
+   "domain_id": "data_center_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "High energy consumption in traditional air-cooled data centers due to inefficient heat removal",
+   "causal_chain": [
+    "Heat generation in servers",
+    "Hybrid cooling system (air + water)",
+    "Heat transfer to coolant",
+    "Energy-efficient heat dissipation"
+   ],
+   "unexploited_phenomenon": "Compact heat exchanger design principles from avionics thermal management applied to data centers",
+   "intervention": "Implementation of hybrid water-air cooling system using compact heat exchanger designs adapted from aerospace applications",
+   "governing_variables": "Heat transfer coefficient (h), Surface area (A), Temperature difference (\u0394T), Flow rate (\u1e41)",
+   "predicted_effect": "30-50% reduction in cooling energy consumption compared to traditional air-cooled systems",
+   "equations": [
+    "Q = h*A*\u0394T, where Q is heat transfer rate",
+    "COP = Q_cooling/W_input, where COP is coefficient of performance"
+   ],
+   "boundary_conditions": "Effective for medium to high heat density servers; less efficient for low-density deployments",
+   "evidence_refs": [
+    "doi:10.1115/ipack2003-35362",
+    "doi:10.1115/ipack2015-48476"
+   ],
+   "cross_domain_transition": "aerospace thermal management -> data center cooling (leveraging compact heat exchange designs from space-constrained avionics for high-density computing environments)",
+   "baseline": {
+    "baseline_incumbent": "Traditional air-cooled systems",
+    "baseline_metric": "1.0-1.5 PUE (Power Usage Effectiveness) for typical air-cooled data centers",
+    "candidate_metric": "0.8-1.1 PUE for hybrid cooled data centers",
+    "expected_delta": "15-30% improvement in PUE"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale prototype testing with heat load simulation and energy consumption measurement",
+    "decisive_uncertainty": "Whether the hybrid system can maintain efficiency at varying server loads",
+    "kill_condition": "Energy consumption exceeds traditional air-cooled system by >5%",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Water leakage",
+     "detectability": "detectable through moisture sensors and flow monitoring",
+     "mitigation": "mitigation through redundant sealing and automated shutoff"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center operators",
+    "use_case": "Reducing cooling energy costs while maintaining server temperature within optimal operating ranges",
+    "integration_point": "Rack-level cooling infrastructure"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c74a20b19042405c7d2eae912150462e991b21dca0ebd85dcfef3e3b0cc4a010",
+    "output_hash": "9090a5a2b3f830fd598e24a421ad6bf6aad52fe966071af3c8aac5420b609f78",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center",
+     "aerospace",
+     "heat exchanger"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-3",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Free-Cooling Optimization System",
+   "target_domain": "data-center",
+   "source_domain": "environmental",
+   "domain_id": "data_center_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "High energy consumption in data center cooling systems due to continuous mechanical cooling",
+   "causal_chain": [
+    "Ambient temperature monitoring",
+    "Free-cooling potential assessment",
+    "Dynamic airflow management",
+    "Reduced mechanical cooling"
+   ],
+   "unexploited_phenomenon": "Air free-cooling systems utilizing ambient temperature differentials for data center cooling",
+   "intervention": "Implementation of an intelligent free-cooling system that dynamically adjusts airflow based on ambient conditions",
+   "governing_variables": "Ambient temperature (T_amb), Server inlet temperature (T_in), Heat load (Q), Fan power (P_fan)",
+   "predicted_effect": "40-60% reduction in cooling energy consumption during favorable ambient conditions",
+   "equations": [
+    "COP_free = Q_cooling/P_fan, where COP_free is coefficient of performance for free cooling",
+    "Energy_savings = P_mechanical - P_fan"
+   ],
+   "boundary_conditions": "Effective in climates with significant diurnal temperature variations; less effective in consistently hot or humid climates",
+   "evidence_refs": [
+    "doi:10.21979/n9/r1ku6r",
+    "doi:10.21979/n9/blbq2t"
+   ],
+   "cross_domain_transition": null,
+   "baseline": {
+    "baseline_incumbent": "Traditional mechanical cooling systems",
+    "baseline_metric": "100% mechanical cooling regardless of ambient conditions",
+    "candidate_metric": "40-60% mechanical cooling reduction during favorable conditions",
+    "expected_delta": "40-60% energy savings during favorable conditions"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale test with environmental chamber and energy consumption monitoring",
+    "decisive_uncertainty": "Whether the system can maintain server temperatures within specifications during maximum ambient temperature",
+    "kill_condition": "Server inlet temperature exceeds manufacturer's specification by >2\u00b0C",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Inadequate cooling during peak ambient temperatures",
+     "detectability": "detectable through temperature monitoring",
+     "mitigation": "mitigation through hybrid cooling approach"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center facility managers",
+    "use_case": "Reducing cooling energy costs by leveraging ambient temperature differentials",
+    "integration_point": "Data center HVAC control system"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c74a20b19042405c7d2eae912150462e991b21dca0ebd85dcfef3e3b0cc4a010",
+    "output_hash": "9090a5a2b3f830fd598e24a421ad6bf6aad52fe966071af3c8aac5420b609f78",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-4",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Thermal Management Analytics Platform",
+   "target_domain": "data-center",
+   "source_domain": "industrial",
+   "domain_id": "data_center_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "Lack of comprehensive thermal management data leading to suboptimal cooling decisions",
+   "causal_chain": [
+    "Sensor data collection",
+    "Multiscale thermal analysis",
+    "Predictive thermal modeling",
+    "Optimized cooling control"
+   ],
+   "unexploited_phenomenon": "Multiscale thermal, electrical, and energy management from industrial systems applied to data centers",
+   "intervention": "Implementation of a comprehensive analytics platform integrating multiscale thermal management principles",
+   "governing_variables": "Thermal resistance (R_\u03b8), Heat capacity (C), Thermal time constant (\u03c4), Power density (P_d)",
+   "predicted_effect": "20-40% improvement in cooling efficiency through predictive thermal management",
+   "equations": [
+    "T(t) = T_amb + (P_d * R_\u03b8) * (1 - e^(-t/\u03c4)), where T(t) is temperature at time t"
+   ],
+   "boundary_conditions": "Effective for steady-state and predictable load patterns; less effective for highly variable or unpredictable workloads",
+   "evidence_refs": [
+    "doi:10.1016/j.apenergy.2013.02.047"
+   ],
+   "cross_domain_transition": "industrial thermal management -> data center thermal analytics (applying industrial multiscale analysis techniques to the unique thermal challenges of computing environments)",
+   "baseline": {
+    "baseline_incumbent": "Reactive thermal management based on current temperature readings",
+    "baseline_metric": "10-15% cooling energy waste due to over-provisioning",
+    "candidate_metric": "5-8% cooling energy waste through predictive management",
+    "expected_delta": "50-70% reduction in cooling energy waste"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale test with simulated server loads and thermal management algorithms",
+    "decisive_uncertainty": "Whether the predictive model can accurately forecast thermal behavior under variable workloads",
+    "kill_condition": "Prediction error exceeds 15% of actual temperature measurements",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Model inaccuracy during workload spikes",
+     "detectability": "detectable through real-time temperature monitoring",
+     "mitigation": "mitigation through adaptive algorithms"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center operations engineers",
+    "use_case": "Optimizing cooling systems based on predictive thermal analytics",
+    "integration_point": "Data center monitoring and control systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c74a20b19042405c7d2eae912150462e991b21dca0ebd85dcfef3e3b0cc4a010",
+    "output_hash": "9090a5a2b3f830fd598e24a421ad6bf6aad52fe966071af3c8aac5420b609f78",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "thermal management"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-5",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Condensing Air-Cooled Heat Exchanger",
+   "target_domain": "data-center",
+   "source_domain": "chemical processing",
+   "domain_id": "data_center_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "Inefficient heat rejection in air-cooled data centers due to suboptimal heat exchanger design",
+   "causal_chain": [
+    "Hot air from servers",
+    "Condensing heat exchanger",
+    "Enhanced heat transfer",
+    "Efficient heat rejection"
+   ],
+   "unexploited_phenomenon": "Condensing heat exchanger design principles from chemical processing applied to data centers",
+   "intervention": "Implementation of condensing air-cooled heat exchangers with optimized fin design and condensation enhancement",
+   "governing_variables": "Heat transfer coefficient (h), Condensation rate (\u1e41_cond), Surface area (A), Temperature difference (\u0394T)",
+   "predicted_effect": "25-40% improvement in heat rejection efficiency compared to traditional air-cooled heat exchangers",
+   "equations": [
+    "Q = h*A*\u0394T + \u1e41_cond*h_fg, where h_fg is latent heat of vaporization"
+   ],
+   "boundary_conditions": "Effective in high humidity environments; less efficient in very dry conditions where condensation is minimal",
+   "evidence_refs": [
+    "doi:10.1615/978-1-56700-245-4.120"
+   ],
+   "cross_domain_transition": "chemical processing heat exchangers -> data center cooling (applying condensation enhancement techniques from chemical processing to improve heat rejection in computing environments)",
+   "baseline": {
+    "baseline_incumbent": "Traditional air-cooled heat exchangers",
+    "baseline_metric": "0.7-0.9 thermal effectiveness for typical air-cooled heat exchangers",
+    "candidate_metric": "0.9-1.1 thermal effectiveness for condensing heat exchangers",
+    "expected_delta": "30-40% improvement in thermal effectiveness"
+   },
+   "killer_experiment": {
+    "experiment": "Lab-scale heat exchanger testing with controlled temperature and humidity conditions",
+    "decisive_uncertainty": "Whether the condensation enhancement provides significant benefit in typical data center humidity conditions",
+    "kill_condition": "Thermal effectiveness improvement <10% compared to traditional design",
+    "cost_class": "LAB"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Condensate drainage issues",
+     "detectability": "detectable through moisture accumulation",
+     "mitigation": "mitigation through improved drainage design"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center equipment manufacturers",
+    "use_case": "Developing more efficient cooling solutions for data center racks",
+    "integration_point": "Rack-level cooling units"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c74a20b19042405c7d2eae912150462e991b21dca0ebd85dcfef3e3b0cc4a010",
+    "output_hash": "9090a5a2b3f830fd598e24a421ad6bf6aad52fe966071af3c8aac5420b609f78",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center",
+     "heat exchanger",
+     "cement"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  },
+  {
+   "candidate_id": "C-data_center_thermal-6",
+   "extraction_version": "R411-EXTRACT-V1",
+   "technology_name": "Airflow Management Optimization",
+   "target_domain": "data-center",
+   "source_domain": "fluid dynamics",
+   "domain_id": "data_center_thermal",
+   "pain_class": "Thermal Management",
+   "problem": "Inefficient airflow patterns in data centers leading to hotspots and uneven cooling",
+   "causal_chain": [
+    "Airflow pattern analysis",
+    "Hotspot identification",
+    "Strategic airflow modification",
+    "Improved cooling uniformity"
+   ],
+   "unexploited_phenomenon": "Airflow management principles from fluid dynamics applied to data center layout optimization",
+   "intervention": "Implementation of an intelligent airflow management system using computational fluid dynamics principles",
+   "governing_variables": "Air velocity (v), Pressure differential (\u0394P), Air density (\u03c1), Turbulence intensity (I)",
+   "predicted_effect": "20-35% reduction in hotspots and 15-25% improvement in cooling uniformity",
+   "equations": [
+    "\u0394P = 0.5 * \u03c1 * v^2 * f, where f is friction factor",
+    "Q = v * A, where Q is volumetric flow rate"
+   ],
+   "boundary_conditions": "Effective for both raised floor and overhead plenum designs; less effective in highly irregular layouts",
+   "evidence_refs": [
+    "title:3e0d567c08b85f45"
+   ],
+   "cross_domain_transition": "fluid dynamics -> data center thermal management (applying advanced airflow modeling techniques from fluid dynamics to optimize data center cooling efficiency)",
+   "baseline": {
+    "baseline_incumbent": "Standard hot aisle/cold aisle configuration without dynamic adjustment",
+    "baseline_metric": "5-8\u00b0C temperature variation between hot and cold aisles",
+    "candidate_metric": "2-4\u00b0C temperature variation between hot and cold aisles",
+    "expected_delta": "50-70% improvement in temperature uniformity"
+   },
+   "killer_experiment": {
+    "experiment": "Bench-scale test with scaled data center model and airflow visualization",
+    "decisive_uncertainty": "Whether the optimized airflow pattern can be effectively implemented in full-scale data centers",
+    "kill_condition": "Temperature variation exceeds baseline improvement by >20%",
+    "cost_class": "BENCH"
+   },
+   "failure_modes": [
+    {
+     "failure_mode": "Increased fan energy consumption",
+     "detectability": "detectable through power monitoring",
+     "mitigation": "mitigation through optimized fan speed control"
+    }
+   ],
+   "commercial_path": {
+    "buyer": "Data center facility managers",
+    "use_case": "Optimizing airflow patterns to eliminate hotspots and improve cooling efficiency",
+    "integration_point": "Data center HVAC and rack cooling systems"
+   },
+   "generation": {
+    "provider": "zai",
+    "model": "glm-4-plus",
+    "prompt_hash": "c74a20b19042405c7d2eae912150462e991b21dca0ebd85dcfef3e3b0cc4a010",
+    "output_hash": "9090a5a2b3f830fd598e24a421ad6bf6aad52fe966071af3c8aac5420b609f78",
+    "purpose": "r411_candidate_extraction"
+   },
+   "medical_screen": {
+    "excluded": false,
+    "verdict": "NON_MEDICAL",
+    "matched_medical_terms": [],
+    "matched_non_medical_terms": [
+     "data center"
+    ],
+    "medical_terms_in_origin_only": [],
+    "basis": "no medical-application vocabulary in the target application fields"
+   },
+   "extraction_call": "CROSS_DOMAIN_FORCING"
+  }
+ ],
+ "rejected": [
+  {
+   "candidate_id": "C-data_center_thermal-7",
+   "reasons": [
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT"
+   ]
+  },
+  {
+   "candidate_id": "C-data_center_thermal-8",
+   "reasons": [
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT"
+   ]
+  },
+  {
+   "candidate_id": "C-data_center_thermal-8",
+   "reasons": [
+    "missing field UNEXPLOITED_PHENOMENON",
+    "missing field INTERVENTION",
+    "missing field GOVERNING_VARIABLES",
+    "missing field PREDICTED_EFFECT",
+    "missing field EQUATIONS",
+    "missing field BOUNDARY_CONDITIONS",
+    "missing field EVIDENCE_REFS",
+    "missing field CROSS_DOMAIN_TRANSITION",
+    "missing field BASELINE_INCUMBENT",
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT",
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-data_center_thermal-7",
+   "reasons": [
+    "no valid evidence refs (fabrication gate)"
+   ]
+  },
+  {
+   "candidate_id": "C-data_center_thermal-8",
+   "reasons": [
+    "missing field BASELINE_METRIC",
+    "missing field CANDIDATE_METRIC",
+    "missing field EXPECTED_DELTA",
+    "missing field CHEAPEST_DECISIVE_EXPERIMENT",
+    "missing field DECISIVE_UNCERTAINTY",
+    "missing field KILL_CONDITION",
+    "missing field COST_CLASS",
+    "missing field FAILURE_MODES",
+    "missing field BUYER",
+    "missing field USE_CASE",
+    "missing field INTEGRATION_POINT"
+   ]
+  }
+ ],
+ "pool_sha256": "4613ca393b8fbaea9b8cd3cef6a851a37268e66820aef7dfc328d9c17f9bd44b"
+}
