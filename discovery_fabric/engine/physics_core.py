@@ -901,3 +901,45 @@ def to_computational_result(record: Dict[str, Any]) -> Dict[str, Any]:
                            "layer 4; may never be cited as physical "
                            "observation"),
     }
+
+
+def conductance_ml_per_min_mmhg(d_mm: float, eta_mPa_s: float,
+                                L_mm: float) -> float:
+    """G = pi*d^4 / (128*eta*L), converted to mL/(min*mmHg).
+
+    R410 RELOCATION NOTE: this function is the VERBATIM body of the
+    legacy discovery_fabric/engine/reality_loop.py::
+    _conductance_ml_per_min_mmhg (Gen-1 reality-loop code, deleted this
+    round as superseded). The function itself is pure deterministic
+    physics arithmetic (COMPUTATIONAL_RESULT class) — it lived in the
+    wrong module. Relocated byte-equivalent so the R405/R406 test pins
+    (tests/test_r405_external_audit_response.py,
+    tests/test_r406_real_loop.py — the 17,774.7x unit-conversion-defect
+    pins) keep testing the IDENTICAL arithmetic with the IDENTICAL
+    values (Art. VII: relocation, never semantic change).
+
+    Pure deterministic arithmetic from the package's EQ-1 (unit
+    conversions: 1 mm = 1e-3 m; 1 mPa*s = 1e-3 Pa*s; 1 mmHg = 133.322 Pa;
+    1 mL = 1e-6 m^3; 1 min = 60 s). COMPUTATIONAL_RESULT, computation-
+    logged by the closure records (this function's inputs and output are
+    recorded verbatim in those records).
+
+    R405 CORRECTION (unit-conversion defect, disclosed at
+    R405/UNIT_CONVERSION_DEFECT_DISCLOSURE.json): converting a
+    conductance FROM per-Pa TO per-mmHg MULTIPLIES by 133.322 (a mmHg
+    is 133.322 Pa, so each mmHg drives 133.322x the flow of each Pa).
+    The pre-R405 code divided, making every absolute conductance
+    133.322^2 = 17,774.7x too small. Ratio-based results (the NIST
+    diameter compensation, conductance_restored_ratio) were unaffected
+    because the constant error cancels in ratios. Physical magnitude
+    sanity: a 0.6 mm ID x 100 mm water column at 1 mmHg passes
+    ~0.25 mL/min, not ~1.4e-5 mL/min.
+    """
+    d_m = d_mm * 1e-3
+    eta_pa_s = eta_mPa_s * 1e-3
+    L_m = L_mm * 1e-3
+    g_m3_per_s_pa = math.pi * d_m ** 4 / (128.0 * eta_pa_s * L_m)
+    # m^3 -> mL is 1e6 (1 mL = 1e-6 m^3); min = 60 s; per-mmHg is
+    # 133.322x per-Pa (R405: MULTIPLY, the pre-R405 divide was the
+    # defect)
+    return g_m3_per_s_pa * 1e6 * 60.0 * 133.322

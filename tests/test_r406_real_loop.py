@@ -29,7 +29,8 @@ sys.path.insert(0, REPO)
 
 from discovery_fabric.engine import loop_chain  # noqa: E402
 from discovery_fabric.engine import model_measurement as mm  # noqa: E402
-from discovery_fabric.engine import reality_loop  # noqa: E402
+from discovery_fabric.engine.physics_core import (  # noqa: E402
+    conductance_ml_per_min_mmhg,)
 
 
 def load(rel):
@@ -247,7 +248,7 @@ def test_ratio_survival_equality_recomputed():
 
 
 def test_engine_conductance_magnitude_guard():
-    g = reality_loop._conductance_ml_per_min_mmhg(0.6, 0.6913036, 100.0)
+    g = conductance_ml_per_min_mmhg(0.6, 0.6913036, 100.0)
     assert 0.05 <= g <= 5.0
     assert abs(g - 0.368069) / 0.368069 < 1e-4
 

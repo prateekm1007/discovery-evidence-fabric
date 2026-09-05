@@ -25,7 +25,9 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 from discovery_fabric.engine import physics_core as pc  # noqa: E402
-from discovery_fabric.engine import reality_loop  # noqa: E402
+from discovery_fabric.engine import physics_core as _phys  # noqa: E402
+from discovery_fabric.engine.physics_core import (  # noqa: E402
+    conductance_ml_per_min_mmhg as _conductance_ml_per_min_mmhg,)
 
 R405 = REPO / "R405"
 LP4 = REPO / "LEAD_PORTFOLIO_4"
@@ -44,7 +46,7 @@ def test_conductance_conversion_direction_pinned():
     (one mmHg = 133.322 Pa). Under the pre-R405 inverted code this fails
     by 133.322^2 — the adversarial demonstration (Art. XVIII)."""
     d, eta, L = 0.6, 1.0, 100.0
-    g_per_mmHg = reality_loop._conductance_ml_per_min_mmhg(d, eta, L)
+    g_per_mmHg = _conductance_ml_per_min_mmhg(d, eta, L)
     g_si = (math.pi * (d * 1e-3) ** 4
             / (128.0 * eta * 1e-3 * L * 1e-3))       # m3/(s*Pa)
     g_per_pa_ml_min = g_si * 1e6 * 60.0               # mL/(min*Pa)
